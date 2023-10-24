@@ -1,0 +1,11 @@
+slot:
+  a$pool: pool-slot-a
+  b$pool: pool-slot-b
+  c$attack-damage: idx-
+condition:
+  a:
+    -
+  b:
+    -
+  c:
+index:

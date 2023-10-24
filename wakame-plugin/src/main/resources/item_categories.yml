@@ -1,0 +1,6 @@
+demo_category:
+  icon: wakame:ruby
+  name: "menu.wakame.items.category.demo"
+  priority: 0
+  items:
+    - wakame:ruby
