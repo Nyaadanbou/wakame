@@ -3,12 +3,12 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.attribute.Attribute
 
 /**
- * A container that contains an attribute.
+ * An attribute container that can output an attribute.
  */
-interface AttributeContainer {
+interface AttributeContainer<T : Attribute> {
     /**
      * Generates an attribute from this container.
-     * The result of this function is non-deterministic.
+     * The returned attribute is non-deterministic.
      */
-    fun generateAttribute(): Attribute
+    fun generateAttribute(): T
 }

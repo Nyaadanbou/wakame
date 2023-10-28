@@ -1,11 +1,104 @@
-slot:
-  a$pool: pool-slot-a
-  b$pool: pool-slot-b
-  c$attack-damage: idx-
-condition:
-  a:
-    -
-  b:
-    -
-  c:
+# 原版物品
+material: wooden_sword
+
+# 属性栏
+# 只有「属性栏」的值为一个「属性池」时，「重铸」才可用
+attribute-slot:
+  - slot-id: a
+    slot-pool: slot-pool-a
+  - slot-id: b
+    slot-pool: slot-pool-b
+  - slot-id: c
+    slot-pool: slot-pool-c
+  - slot-id: d
+    attack-damage: idx-1
+
+# 可重铸的属性栏
+reforgeable-slot:
+  - a
+  - b
+
+# 属性栏的使用条件
+slot-condition:
+  a: condition-pool-1
+  b: condition-pool-2
+
+# 属性池
+slot-pool:
+  slot-pool-a:
+    common:
+      - id: attack-damage
+        index: attack-damage-1
+        weight: 10
+      - id: critical-strike-chance
+        index: attack-damage-1
+        weight: 10
+      - id: lifesteal
+        index: attack-damage-1
+        weight: 10
+  slot-pool-b:
+    common:
+      - id: attack-damage
+        index: attack-damage-1
+        weight: 10
+      - id: critical-strike-chance
+        index: attack-damage-1
+        weight: 10
+      - id: lifesteal
+        index: attack-damage-1
+        weight: 10
+  slot-pool-c:
+    common:
+      - id: attack-damage
+        index: attack-damage-1
+        weight: 10
+      - id: critical-strike-chance
+        index: attack-damage-1
+        weight: 10
+      - id: lifesteal
+        index: attack-damage-1
+        weight: 10
+
+# 条件池
+condition-pool:
+  condition-pool-1:
+    common:
+      boss-kill-count:
+        id: example
+        count: 1
+        weight: 1
+      creep-kill-count:
+        id: example
+        count: 3
+        weight: 1
+      total-damage:
+        type: fire
+        count: 1000
+        weight: 1
+      reforge-cost:
+        count: 10000
+        weight: 1
+  condition-pool-2:
+    common:
+      boss-kill-count:
+        id: example
+        count: 2
+        weight: 1
+      creep-kill-count:
+        id: example
+        count: 6
+        weight: 1
+      total-damage:
+        type: fire
+        count: 2000
+        weight: 1
+      reforge-cost:
+        count: 20000
+        weight: 1
+
+# 本地索引
 index:
+  attack-damage-1: 10-15
+  attack-damage-2: 12-17
+  attack-damage-3: 14-19
+  idx-2: 20

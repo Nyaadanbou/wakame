@@ -1,7 +1,6 @@
 plugins {
     id("cc.mewcraft.repo-conventions")
     id("cc.mewcraft.kotlin-conventions")
-    alias(libs.plugins.paperdev)
 }
 
 group = "cc.mewcraft.wakame"
@@ -10,14 +9,11 @@ description = "Add custom stuff to server"
 
 dependencies {
     // server
-    paperweight.paperDevBundle("1.20.2-R0.1-SNAPSHOT")
+    compileOnly(libs.server.paper)
 
     // helper
     compileOnly(libs.helper)
-}
 
-tasks {
-    assemble {
-        dependsOn(reobfJar)
-    }
+    // internal
+    compileOnly("net.kyori:adventure-nbt:4.14.0")
 }

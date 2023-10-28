@@ -1,0 +1,10 @@
+common:
+  display-name: 普通
+uncommon:
+  display-name: 罕见
+rare:
+  display-name: 稀有
+epic:
+  display-name: 史诗
+ancient:
+  display-name: 上古
