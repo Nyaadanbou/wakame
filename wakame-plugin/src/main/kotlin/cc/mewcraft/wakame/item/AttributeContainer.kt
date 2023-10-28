@@ -5,10 +5,10 @@ import cc.mewcraft.wakame.attribute.Attribute
 /**
  * An attribute container that can output an attribute.
  */
-interface AttributeContainer<T : Attribute> {
+interface AttributeContainer {
     /**
      * Generates an attribute from this container.
      * The returned attribute is non-deterministic.
      */
-    fun generateAttribute(): T
+    fun generateAttribute(): Attribute
 }

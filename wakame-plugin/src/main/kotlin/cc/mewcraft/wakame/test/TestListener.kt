@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.test
 
-import cc.mewcraft.wakame.util.compoundBinaryTag
-import cc.mewcraft.wakame.util.readNbt
-import cc.mewcraft.wakame.util.writeNbt
+import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.kyori.examination.string.StringExaminer
@@ -17,18 +15,27 @@ class TestListener : Listener {
         when (plainMessage) {
             "1" -> {
                 val nbt = player.inventory.itemInMainHand.readNbt()
-                println(nbt?.examine(StringExaminer.simpleEscaping()))
+                val nbtOrNull = player.inventory.itemInMainHand.readNbtOrNull()
+                println("nbt: " + nbt.examine(StringExaminer.simpleEscaping()))
+                println("nbtOrNull: " + nbtOrNull?.examine(StringExaminer.simpleEscaping()))
             }
 
             "2" -> {
-                player.inventory.itemInMainHand.writeNbt(compoundBinaryTag {
-                    put("waka", compoundBinaryTag {
-                        put("namespaced_id", compoundBinaryTag {
-                            putString("namespace", "short_sword")
-                            putString("id", "demo")
-                        })
+                player.inventory.itemInMainHand.modifyNbt {
+                    put("wakame", compoundBinaryTag {
+                        putString("namespace", "short_sword")
+                        putString("id", "demo")
                     })
-                }).apply {
+                }
+            }
+
+            "3" -> {
+                player.inventory.itemInMainHand.copyWriteNbt {
+                    put("wakame", compoundBinaryTag {
+                        putString("namespace", "long_sword")
+                        putString("id", "demo")
+                    })
+                }.apply {
                     player.inventory.addItem(this)
                 }
             }

@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 class WakaItem(
     val key: Key,
 ) {
-    val attributeContainers: Map<String, AttributeContainer<*>> = HashMap()
+    val attributeContainers: Map<String, AttributeContainer> = HashMap()
 
     fun createItemStack(player: Player?) {
         TODO()

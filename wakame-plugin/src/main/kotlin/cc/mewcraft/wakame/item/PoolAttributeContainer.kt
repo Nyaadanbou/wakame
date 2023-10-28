@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.attribute.Attribute
 /**
  * An attribute container that is backed by a pool.
  */
-class PoolAttributeContainer<T : Attribute> : AttributeContainer<T> {
-    override fun generateAttribute(): T {
+class PoolAttributeContainer : AttributeContainer {
+    override fun generateAttribute(): Attribute {
         TODO("Not yet implemented")
     }
 }
