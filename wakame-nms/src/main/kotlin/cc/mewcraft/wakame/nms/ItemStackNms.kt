@@ -1,28 +1,32 @@
 package cc.mewcraft.wakame.nms
 
+import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
+import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import net.kyori.adventure.nbt.BinaryTagIO
 import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
-import java.io.*
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.io.InputStream
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 private val CompoundTag.asAdventureCompound: CompoundBinaryTag
     get() {
-        val arrayOutputStream = ByteArrayOutputStream()
+        val arrayOutputStream = FastByteArrayOutputStream()
         val dataOutputStream = DataOutputStream(arrayOutputStream)
         NbtIo.write(this, dataOutputStream)
-        val dataInputStream = DataInputStream(ByteArrayInputStream(arrayOutputStream.toByteArray()))
+        val dataInputStream = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
         return BinaryTagIO.reader().read(dataInputStream as InputStream)
     }
 
 private val CompoundBinaryTag.asMojangCompound: CompoundTag
     get() {
-        val arrayOutputStream = ByteArrayOutputStream()
+        val arrayOutputStream = FastByteArrayOutputStream()
         BinaryTagIO.writer().write(this, arrayOutputStream)
-        val dataInputStream = DataInputStream(ByteArrayInputStream(arrayOutputStream.toByteArray()))
+        val dataInputStream = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
         return NbtIo.read(dataInputStream)
     }
 
@@ -57,8 +61,9 @@ class ItemStackNms {
 
     /**
      * Modifies NBT of the [itemStack] in-place or does nothing,
-     * if the [itemStack] is not backed by an NMS item
-     * or the NMS item is empty.
+     * if any of the following holds:
+     * - the [itemStack] is not backed by an NMS item.
+     * - the backed NMS item is empty.
      */
     fun modifyNbt(
         itemStack: BukkitStack,
