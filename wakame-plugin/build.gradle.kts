@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":spatula:bukkit:message"))
     implementation(project(":wakame:wakame-api"))
     implementation(project(":wakame:wakame-nms", configuration = "reobf"))
+    implementation(libs.configurate)
     implementation("net.kyori:adventure-nbt:4.14.0")
     implementation("team.unnamed:creative-api:1.1.0")
     implementation("team.unnamed:creative-serializer-minecraft:1.1.0")

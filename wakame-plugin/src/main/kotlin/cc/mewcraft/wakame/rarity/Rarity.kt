@@ -2,6 +2,10 @@ package cc.mewcraft.wakame.rarity
 
 import net.kyori.adventure.text.Component
 
-interface Rarity {
-    val displayName: Component
+class Rarity(
+    val id: Byte,
+    val name: String,
+    val displayName: Component,
+) {
+
 }

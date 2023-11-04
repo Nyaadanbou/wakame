@@ -15,12 +15,15 @@ class TestListener : Listener {
         when (plainMessage) {
             "1" -> {
                 val nbt = player.inventory.itemInMainHand.readNbt()
-                val nbtOrNull = player.inventory.itemInMainHand.readNbtOrNull()
                 println("nbt: " + nbt.examine(StringExaminer.simpleEscaping()))
-                println("nbtOrNull: " + nbtOrNull?.examine(StringExaminer.simpleEscaping()))
             }
 
             "2" -> {
+                val nbtOrNull = player.inventory.itemInMainHand.readNbtOrNull()
+                println("nbtOrNull: " + nbtOrNull?.examine(StringExaminer.simpleEscaping()))
+            }
+
+            "3" -> {
                 player.inventory.itemInMainHand.modifyNbt {
                     put("wakame", compoundBinaryTag {
                         putString("namespace", "short_sword")
@@ -29,7 +32,7 @@ class TestListener : Listener {
                 }
             }
 
-            "3" -> {
+            "4" -> {
                 player.inventory.itemInMainHand.copyWriteNbt {
                     put("wakame", compoundBinaryTag {
                         putString("namespace", "long_sword")

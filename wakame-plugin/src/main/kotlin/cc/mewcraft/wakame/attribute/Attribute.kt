@@ -1,17 +1,19 @@
 package cc.mewcraft.wakame.attribute
 
-import net.kyori.adventure.key.Key
+import cc.mewcraft.wakame.item.SlotContent
 
 /**
- * This is the most high-level interface.
- *
- * Represents an attribute, which can be a modifier, an element type, an item level, a skill...
+ * An attribute in a slot.
  */
-interface Attribute {
-    /**
-     * Attribute identifier, where
-     * - `namespace` is uniformly `waka` for any attribute
-     * - `value` is the unique identifier of this attribute
-     */
-    val attributeKey: Key
+abstract class Attribute : SlotContent {
+    abstract val value: Int
+
+    open fun compute(mods: List<AttributeModifier>): Int {
+        var x: Double = value.toDouble()
+        mods.filter { it.operation == AttributeModifier.Operation.ADDITION }.forEach { x += it.amount.toDouble() }
+        var y: Double = x
+        mods.filter { it.operation == AttributeModifier.Operation.MULTIPLY_BASE }.forEach { y += x * it.amount.toDouble() }
+        mods.filter { it.operation == AttributeModifier.Operation.MULTIPLY_TOTAL }.forEach { y *= 1.0 + it.amount.toDouble() }
+        return y.toInt()
+    }
 }

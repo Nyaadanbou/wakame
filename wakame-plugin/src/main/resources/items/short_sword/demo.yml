@@ -2,7 +2,6 @@
 material: wooden_sword
 
 # 属性栏
-# 只有「属性栏」的值为一个「属性池」时，「重铸」才可用
 attribute-slot:
   - slot-id: a
     slot-pool: slot-pool-a
@@ -11,94 +10,127 @@ attribute-slot:
   - slot-id: c
     slot-pool: slot-pool-c
   - slot-id: d
-    attack-damage: idx-1
+    slot-pool: slot-pool-d
 
 # 可重铸的属性栏
 reforgeable-slot:
   - a
   - b
+  - c
 
 # 属性栏的使用条件
 slot-condition:
-  a: condition-pool-1
-  b: condition-pool-2
+  a: condition-pool-a
+  b: condition-pool-b
+  c: condition-pool-c
 
 # 属性池
 slot-pool:
+
+  # 第一个属性池 slot-pool-a
   slot-pool-a:
-    common:
+    rare:
       - id: attack-damage
-        index: attack-damage-1
-        weight: 10
+        min: 10
+        max: 15
+        weight: 1
       - id: critical-strike-chance
-        index: attack-damage-1
-        weight: 10
-      - id: lifesteal
-        index: attack-damage-1
-        weight: 10
+        value: 5
+        weight: 1
+    fallback:
+      - id: attack-damage
+        min: 5
+        max: 8
+        weight: 1
+      - id: critical-strike-chance
+        value: 3
+        weight: 1
+
+  # 第二个属性池 slot-pool-b
   slot-pool-b:
-    common:
-      - id: attack-damage
-        index: attack-damage-1
-        weight: 10
-      - id: critical-strike-chance
-        index: attack-damage-1
-        weight: 10
-      - id: lifesteal
-        index: attack-damage-1
-        weight: 10
+    rare:
+      - id: attack-speed
+        value: 3
+        weight: 1
+      - id: movement-speed
+        value: 3
+        weight: 1
+    fallback:
+      - id: attack-speed
+        value: 2
+        weight: 1
+      - id: movement-speed
+        value: 2
+        weight: 1
+
+  # 第三个属性池 slot-pool-c
   slot-pool-c:
-    common:
-      - id: attack-damage
-        index: attack-damage-1
-        weight: 10
-      - id: critical-strike-chance
-        index: attack-damage-1
-        weight: 10
+    rare:
+      - id: maximum-health
+        value: 40
+        weight: 1
+      - id: maximum-mana
+        value: 10
+        weight: 1
+    fallback:
+      - id: maximum-health
+        value: 20
+        weight: 1
+      - id: maximum-mana
+        value: 5
+        weight: 1
+
+  # 第四个属性池 slot-pool-d
+  slot-pool-d:
+    fallback:
       - id: lifesteal
-        index: attack-damage-1
+        value: 5
         weight: 10
 
 # 条件池
 condition-pool:
-  condition-pool-1:
+
+  # 第一个条件池 condition-pool-a
+  condition-pool-a:
     common:
-      boss-kill-count:
-        id: example
+      - id: boss-kill-count
+        boss: example-boss
         count: 1
         weight: 1
-      creep-kill-count:
-        id: example
+      - id: creep-kill-count
+        creep: example-creep
         count: 3
         weight: 1
-      total-damage:
-        type: fire
-        count: 1000
-        weight: 1
-      reforge-cost:
-        count: 10000
-        weight: 1
-  condition-pool-2:
-    common:
-      boss-kill-count:
-        id: example
+    fallback:
+      - id: boss-kill-count
+        boss: example-boss
         count: 2
         weight: 1
-      creep-kill-count:
-        id: example
+      - id: creep-kill-count
+        creep: example-creep
         count: 6
         weight: 1
-      total-damage:
+
+  # 第二个条件池 condition-pool-b
+  condition-pool-b:
+    common:
+      - id: total-damage
         type: fire
-        count: 2000
+        damage: 100
         weight: 1
-      reforge-cost:
-        count: 20000
+    fallback:
+      - id: total-damage
+        type: neutral
+        damage: 100
         weight: 1
 
-# 本地索引
-index:
-  attack-damage-1: 10-15
-  attack-damage-2: 12-17
-  attack-damage-3: 14-19
-  idx-2: 20
+  # 第三个条件池 condition-pool-c
+  condition-pool-c:
+    common:
+      - id: reforge-cost
+        cost: 2000
+        weight: 1
+    fallback:
+      - id: reforge-cost
+        cost: 4000
+        weight: 1

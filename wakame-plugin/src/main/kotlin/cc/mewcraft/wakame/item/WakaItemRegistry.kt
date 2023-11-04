@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item
 
 /**
- * Handles item obtaining and reloading.
+ * Handles waka item obtaining and reloading.
  */
 interface WakaItemRegistry {
 }

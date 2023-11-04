@@ -69,9 +69,7 @@ class ItemStackNms {
         itemStack: BukkitStack,
         compoundModifier: CompoundBinaryTag.() -> CompoundBinaryTag,
     ) {
-        if (itemStack is CraftItemStack) {
-            if (itemStack.isEmpty)
-                return
+        if (itemStack is CraftItemStack && !itemStack.isEmpty) {
             itemStack.handle.tag = compoundModifier(itemStack.handle.orCreateTag.asAdventureCompound).asMojangCompound
         }
     }
