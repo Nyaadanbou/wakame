@@ -1,4 +1,4 @@
-import net.minecrell.pluginyml.paper.PaperPluginDescription
+import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
 
 plugins {
     id("cc.mewcraft.repo-conventions")
@@ -25,15 +25,16 @@ dependencies {
     compileOnly(libs.helper)
 
     // internal
-    implementation(project(":spatula:koin"))
-    implementation(project(":spatula:bukkit:message"))
     implementation(project(":wakame:wakame-api"))
     implementation(project(":wakame:wakame-nms", configuration = "reobf"))
+    implementation(project(":spatula:koin"))
+    implementation(project(":spatula:bukkit:message"))
     implementation(libs.configurate)
-    implementation("net.kyori:adventure-nbt:4.14.0")
-    implementation("team.unnamed:creative-api:1.1.0")
-    implementation("team.unnamed:creative-serializer-minecraft:1.1.0")
-    implementation("team.unnamed:creative-server:1.1.0")
+    compileOnly(libs.bundles.mccoroutine.bukkit) // already shaded by helper JAR
+    implementation("net.kyori", "adventure-nbt", "4.14.0")
+    implementation("team.unnamed", "creative-api", "1.1.0")
+    implementation("team.unnamed", "creative-serializer-minecraft", "1.1.0")
+    implementation("team.unnamed", "creative-server", "1.1.0")
 }
 
 paper {
@@ -46,11 +47,11 @@ paper {
     serverDependencies {
         register("Kotlin") {
             required = true
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+            load = RelativeLoadOrder.BEFORE
         }
         register("helper") {
             required = true
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+            load = RelativeLoadOrder.BEFORE
         }
     }
 }
