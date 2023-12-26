@@ -32,7 +32,7 @@ level: context
 rarity: context
 
 # 随机词条栏
-attribute-slot:
+slots:
   - id: x
     pool: pool-group-x
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
@@ -47,20 +47,20 @@ attribute-slot:
     pool: pool-group-e
 
 # 可重铸的词条栏
-reforgeable-slot:
+reforgeable-slots:
   - a # 写词条栏的 id
   - b
   - c
 
 # 词条栏的使用条件
-slot-condition:
+slot-conditions:
   a: pool-group-a # key 写词条栏的 id，value 写使用条件的 id
   b: pool-group-b
   c: pool-group-c
 
 # 词条堆
 # 词条堆将按照配置文件里的顺序，逐个生成内容，放入词条栏
-slot-pool:
+slot-pools:
 
   # 词条堆：pool-group-x
   # 这是一个特殊的堆，用于抽选该物品的元素类型，因此必须作为第一个堆
@@ -79,7 +79,7 @@ slot-pool:
   # 词条堆：pool-group-a
   pool-group-a: # 该词条堆的 id
     pool-a-1: # 该词条堆的一个候选池，取值必须在本堆中不重复，意思为如果满足条件，则从该池中抽取词条
-      condition: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
+      conditions: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
         - type: rarity
           value: rare
       entries: # 该池拥有的所有词条
@@ -92,7 +92,7 @@ slot-pool:
         - id: attribute:critical_strike_rate
           value: 0.25
           weight: 1
-          condition: # 单独设置该词条的筛选条件
+          conditions: # 单独设置该词条的筛选条件
             - type: item_level
               value: "[10,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
     fallback: # 备用池，固定写成 fallback，如果没有相匹配的稀有度，将使用备用池
@@ -109,7 +109,7 @@ slot-pool:
   # 词条堆：pool-group-b
   pool-group-b:
     pool-b-1:
-      condition:
+      conditions:
         - type: rarity
           value: rare
       entries:
@@ -134,7 +134,7 @@ slot-pool:
   # 词条堆：pool-group-c
   pool-group-c:
     pool-c-1:
-      condition:
+      conditions:
         - type: rarity
           value: rare
       entries:
@@ -147,7 +147,7 @@ slot-pool:
         - id: attribute:damage_reduction_rate
           value: 0.25
           weight: 99
-          condition:
+          conditions:
             - type: slot_meta # 该类型条件将检查词条在生成时的 meta
               value: x1 # 如果 meta 为 x1 的词条已经生成，则该词条会被筛掉
     fallback:
@@ -170,7 +170,7 @@ slot-pool:
     # 注意，这里没有定义 fallback 池
     # 因此如果一个条件都不满足，那么使用该堆的词条栏将为空
     fire:
-      condition:
+      conditions:
         - type: element
           value: fire
       entries:
@@ -188,7 +188,7 @@ slot-pool:
           value: 0.38
           weight: 8
     water:
-      condition:
+      conditions:
         - type: element
           value: water
       entries:
@@ -206,7 +206,7 @@ slot-pool:
           value: 0.42
           weight: 8
     wind:
-      condition:
+      conditions:
         - type: element
           value: wind
       entries:
@@ -227,7 +227,7 @@ slot-pool:
   # 词条堆：pool-group-f
   pool-group-f:
     fire:
-      condition:
+      conditions:
         - type: element
           value: fire
       entries:
@@ -246,12 +246,12 @@ slot-pool:
           weight: 8
 
 # 词条的使用条件
-condition-pool:
+condition-pools:
 
   # 自定义条件堆：condition-pool-a
   pool-group-a:
     common:
-      condition:
+      conditions:
         - type: rarity
           value: common
       entries:
@@ -277,7 +277,7 @@ condition-pool:
   # 自定义条件堆：condition-pool-b
   pool-group-b:
     common:
-      condition:
+      conditions:
         - type: rarity
           value: common
       entries:
@@ -294,7 +294,7 @@ condition-pool:
   # 自定义条件堆：condition-pool-c
   pool-group-c:
     common:
-      condition:
+      conditions:
         - type: rarity
           value: common
       entries:
