@@ -1,0 +1,21 @@
+# 物品稀有度
+
+demo: # 稀有度的 id，供其他模块引用
+  binary-index: 99 # 稀有度的二进制 id，仅用于代码的内部实现
+  display-name: 演示 # 稀有度的展示名字，会出现在聊天消息等地方
+
+common:
+  binary-index: 0
+  display-name: 普通
+uncommon:
+  binary-index: 1
+  display-name: 罕见
+rare:
+  binary-index: 2
+  display-name: 稀有
+epic:
+  binary-index: 3
+  display-name: 史诗
+ancient:
+  binary-index: 4
+  display-name: 上古

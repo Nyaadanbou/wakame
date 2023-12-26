@@ -1,0 +1,12 @@
+# 元素
+
+elements:
+  fire:
+    binary-index: 0
+    display-name: 火
+  wind:
+    binary-index: 1
+    display-name: 风
+  water:
+    binary-index: 2
+    display-name: 水

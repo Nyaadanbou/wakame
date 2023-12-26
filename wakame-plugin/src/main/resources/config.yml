@@ -1,3 +1,5 @@
+# 全局配置文件
+
 resource_pack:
   auto_upload:
     enabled: true

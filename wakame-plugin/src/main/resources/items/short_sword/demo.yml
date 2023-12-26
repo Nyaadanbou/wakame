@@ -1,136 +1,307 @@
+# 所有值均区分大小写
+
+# 物品的唯一标识，生成工具：https://www.uuidgenerator.net/version4
+uuid: cfee549f-e4d7-4574-b104-92d8251ebee4
+
 # 原版物品
 material: wooden_sword
 
-# 属性栏
-attribute-slot:
-  - slot-id: a
-    slot-pool: slot-pool-a
-  - slot-id: b
-    slot-pool: slot-pool-b
-  - slot-id: c
-    slot-pool: slot-pool-c
-  - slot-id: d
-    slot-pool: slot-pool-d
+# 物品名字
+display-name: "<red>Demo"
 
-# 可重铸的属性栏
+# 物品描述
+lore:
+  - "<gold>Demo 1"
+  - "<gold>Demo 2"
+
+# 物品模型
+model: # TODO 写资源包实现时再考虑
+
+# 物品皮肤
+# 如有设置，则物品自带预设的皮肤
+skin: demo_1
+
+# 物品等级
+# 如果写 "context"，则根据玩家的冒险等级生成
+# 如果写 <正整数>，则始终以这里指定的物品等级生成
+level: context
+
+# 物品稀有度
+# 如果写 "context"，则根据玩家的冒险等级生成
+# 如果写 <稀有度名>，则始终以这里指定的稀有度生成
+rarity: context
+
+# 随机词条栏
+attribute-slot:
+  - id: x
+    pool: pool-group-x
+  - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
+    pool: pool-group-a # 该词条栏所使用的词条堆的 id，词条将从堆中的一个池中抽取
+  - id: b
+    pool: pool-group-b
+  - id: c
+    pool: pool-group-c
+  - id: d
+    pool: pool-group-d
+  - id: e
+    pool: pool-group-e
+
+# 可重铸的词条栏
 reforgeable-slot:
-  - a
+  - a # 写词条栏的 id
   - b
   - c
 
-# 属性栏的使用条件
+# 词条栏的使用条件
 slot-condition:
-  a: condition-pool-a
-  b: condition-pool-b
-  c: condition-pool-c
+  a: pool-group-a # key 写词条栏的 id，value 写使用条件的 id
+  b: pool-group-b
+  c: pool-group-c
 
-# 属性池
+# 词条堆
+# 词条堆将按照配置文件里的顺序，逐个生成内容，放入词条栏
 slot-pool:
 
-  # 第一个属性池 slot-pool-a
-  slot-pool-a:
-    rare:
-      - id: attack-damage
-        min: 10
-        max: 15
-        weight: 1
-      - id: critical-strike-chance
-        value: 5
-        weight: 1
+  # 词条堆：pool-group-x
+  # 这是一个特殊的堆，用于抽选该物品的元素类型，因此必须作为第一个堆
+  pool-group-x:
     fallback:
-      - id: attack-damage
+      - id: meta:element
+        value: water
+        weight: 1
+      - id: meta:element
+        value: fire
+        weight: 1
+      - id: meta:element
+        value: wind
+        weight: 1
+
+  # 词条堆：pool-group-a
+  pool-group-a: # 该词条堆的 id
+    pool-a-1: # 该词条堆的一个候选池，取值必须在本堆中不重复，意思为如果满足条件，则从该池中抽取词条
+      condition: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
+        - type: rarity
+          value: rare
+      entries: # 该池拥有的所有词条
+        - id: attribute:attack_damage
+          range: '[10,15]' # 如果最大最小值是固定的，不是正态分布，则可以写成不带无穷的区间形式
+          weight: 1
+        - id: attribute:critical_strike_chance
+          value: 0.5
+          weight: 1
+        - id: attribute:critical_strike_rate
+          value: 0.25
+          weight: 1
+          condition: # 单独设置该词条的筛选条件
+            - type: item_level
+              value: "[10,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
+    fallback: # 备用池，固定写成 fallback，如果没有相匹配的稀有度，将使用备用池
+      - id: attribute:attack_damage
         min: 5
         max: 8
+        scale: 1.2 # 等级加成，这里意思是每一物品等级提供 1.2 的数值加成
         weight: 1
-      - id: critical-strike-chance
-        value: 3
-        weight: 1
-
-  # 第二个属性池 slot-pool-b
-  slot-pool-b:
-    rare:
-      - id: attack-speed
-        value: 3
-        weight: 1
-      - id: movement-speed
-        value: 3
-        weight: 1
-    fallback:
-      - id: attack-speed
-        value: 2
-        weight: 1
-      - id: movement-speed
-        value: 2
+      - id: attribute:critical_strike_chance
+        value: 0.3
+        scale: 0.1
         weight: 1
 
-  # 第三个属性池 slot-pool-c
-  slot-pool-c:
-    rare:
-      - id: maximum-health
-        value: 40
-        weight: 1
-      - id: maximum-mana
-        value: 10
-        weight: 1
+  # 词条堆：pool-group-b
+  pool-group-b:
+    pool-b-1:
+      condition:
+        - type: rarity
+          value: rare
+      entries:
+        - id: attribute:attack_speed_level
+          value: 4
+          weight: 1
+        - id: attribute:movement_speed_rate
+          value: 0.4
+          weight: 1
+        - id: attribute:defense
+          meta: x1 # （可选）为该词条指定一个 meta，目前只有生成条件会用到这个
+          value: 23
+          weight: 1
     fallback:
-      - id: maximum-health
+      - id: attribute:attack_speed_level
+        value: 2
+        weight: 1
+      - id: attribute:movement_speed_rate
+        value: 0.2
+        weight: 1
+
+  # 词条堆：pool-group-c
+  pool-group-c:
+    pool-c-1:
+      condition:
+        - type: rarity
+          value: rare
+      entries:
+        - id: attribute:max_health
+          value: 40
+          weight: 1
+        - id: attribute:max_mana
+          value: 10
+          weight: 1
+        - id: attribute:damage_reduction_rate
+          value: 0.25
+          weight: 99
+          condition:
+            - type: slot_meta # 该类型条件将检查词条在生成时的 meta
+              value: x1 # 如果 meta 为 x1 的词条已经生成，则该词条会被筛掉
+    fallback:
+      - id: attribute:max_health
         value: 20
         weight: 1
-      - id: maximum-mana
+      - id: attribute:max_mana
         value: 5
         weight: 1
 
-  # 第四个属性池 slot-pool-d
-  slot-pool-d:
-    fallback:
-      - id: lifesteal
-        value: 5
+  # 词条堆：pool-group-d
+  pool-group-d:
+    fallback: # 这是一个只有固定内容的词条栏的基本写法
+      - id: attribute:lifesteal
+        value: 0.2
         weight: 10
 
-# 条件池
+  # 词条堆：pool-group-e
+  pool-group-e:
+    # 注意，这里没有定义 fallback 池
+    # 因此如果一个条件都不满足，那么使用该堆的词条栏将为空
+    fire:
+      condition:
+        - type: element
+          value: fire
+      entries:
+        - id: attribute:element_attack_damage
+          element: fire
+          min: 10
+          max: 16
+          weight: 8
+        - id: attribute:element_attack_damage_rate
+          element: fire
+          value: 0.1
+          weight: 8
+        - id: attribute:element_effect_chance
+          element: fire
+          value: 0.38
+          weight: 8
+    water:
+      condition:
+        - type: element
+          value: water
+      entries:
+        - id: attribute:element_attack_damage
+          element: water
+          min: 10
+          max: 17
+          weight: 8
+        - id: attribute:element_attack_damage_rate
+          element: water
+          value: 0.2
+          weight: 8
+        - id: attribute:element_effect_chance
+          element: water
+          value: 0.42
+          weight: 8
+    wind:
+      condition:
+        - type: element
+          value: wind
+      entries:
+        - id: attribute:element_attack_damage
+          element: wind
+          min: 10
+          max: 18
+          weight: 8
+        - id: attribute:element_attack_damage_rate
+          element: wind
+          value: 0.3
+          weight: 8
+        - id: attribute:element_effect_chance
+          element: wind
+          value: 0.56
+          weight: 8
+
+  # 词条堆：pool-group-f
+  pool-group-f:
+    fire:
+      condition:
+        - type: element
+          value: fire
+      entries:
+        - id: attribute:element_attack_damage
+          element: fire
+          min: 10
+          max: 16
+          weight: 8
+        - id: attribute:element_attack_damage_rate
+          element: fire
+          value: 0.1
+          weight: 8
+        - id: attribute:element_effect_chance
+          element: fire
+          value: 0.38
+          weight: 8
+
+# 词条的使用条件
 condition-pool:
 
-  # 第一个条件池 condition-pool-a
-  condition-pool-a:
+  # 自定义条件堆：condition-pool-a
+  pool-group-a:
     common:
-      - id: boss-kill-count
-        boss: example-boss
-        count: 1
-        weight: 1
-      - id: creep-kill-count
-        creep: example-creep
-        count: 3
-        weight: 1
+      condition:
+        - type: rarity
+          value: common
+      entries:
+        # TODO 条件的数值要不要也支持正态分布？如果要的话，那条件的数据就必须存在 NBT 里
+        - id: count_boss_kill
+          name: example_boss
+          count: 1
+          weight: 1
+        - id: count_creep_kill
+          name: example_creep
+          count: 3
+          weight: 1
     fallback:
-      - id: boss-kill-count
-        boss: example-boss
+      - id: count_boss_kill
+        name: example_boss
         count: 2
         weight: 1
-      - id: creep-kill-count
-        creep: example-creep
+      - id: count_creep_kill
+        name: example_creep
         count: 6
         weight: 1
 
-  # 第二个条件池 condition-pool-b
-  condition-pool-b:
+  # 自定义条件堆：condition-pool-b
+  pool-group-b:
     common:
-      - id: total-damage
-        type: fire
-        damage: 100
-        weight: 1
+      condition:
+        - type: rarity
+          value: common
+      entries:
+        - id: total_damage
+          source: fire
+          amount: 100
+          weight: 1
     fallback:
-      - id: total-damage
-        type: neutral
-        damage: 100
+      - id: total_damage
+        source: neutral
+        amount: 100
         weight: 1
 
-  # 第三个条件池 condition-pool-c
-  condition-pool-c:
+  # 自定义条件堆：condition-pool-c
+  pool-group-c:
     common:
-      - id: reforge-cost
-        cost: 2000
-        weight: 1
+      condition:
+        - type: rarity
+          value: common
+      entries:
+        - id: total_reforge_cost
+          cost: 2000
+          weight: 1
     fallback:
-      - id: reforge-cost
+      - id: total_reforge_cost
         cost: 4000
         weight: 1
