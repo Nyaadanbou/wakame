@@ -14,9 +14,6 @@ lore:
   - "<gold>Demo 1"
   - "<gold>Demo 2"
 
-# 物品模型
-model: # TODO 写资源包实现时再考虑
-
 # 物品皮肤
 # 如有设置，则物品自带预设的皮肤
 skin: demo_1
@@ -31,10 +28,24 @@ level: context
 # 如果写 <稀有度名>，则始终以这里指定的稀有度生成
 rarity: context
 
-# 随机词条栏
+# 物品元素标识
+elements:
+  sample: 2 # 抽选 n 个元素作为该物品的元素标识
+  entries: # 候选的元素标识，以及它们各自的权重
+    - id: meta:element
+      value: neutral
+      weight: 2
+    - id: meta:element
+      value: water
+      weight: 1
+    - id: meta:element
+      value: fire
+      weight: 1
+    - id: meta:element
+      value: wind
+      weight: 1
+
 slots:
-  - id: x
-    pool: pool-group-x
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
     pool: pool-group-a # 该词条栏所使用的词条堆的 id，词条将从堆中的一个池中抽取
   - id: b
@@ -45,6 +56,8 @@ slots:
     pool: pool-group-d
   - id: e
     pool: pool-group-e
+  - id: f
+    pool: pool-group-f
 
 # 可重铸的词条栏
 reforgeable-slots:
@@ -62,29 +75,34 @@ slot-conditions:
 # 词条堆将按照配置文件里的顺序，逐个生成内容，放入词条栏
 slot-pools:
 
-  # 词条堆：pool-group-x
-  # 这是一个特殊的堆，用于抽选该物品的元素类型，因此必须作为第一个堆
-  pool-group-x:
-    fallback:
-      - id: meta:element
-        value: water
-        weight: 1
-      - id: meta:element
-        value: fire
-        weight: 1
-      - id: meta:element
-        value: wind
-        weight: 1
-
   # 词条堆：pool-group-a
   pool-group-a: # 该词条堆的 id
-    pool-a-1: # 该词条堆的一个候选池，取值必须在本堆中不重复，意思为如果满足条件，则从该池中抽取词条
+    pool-a-1: # 该词条堆的一个候选池，取值必须在本堆中不重复
       conditions: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
         - type: rarity
           value: rare
       entries: # 该池拥有的所有词条
         - id: attribute:attack_damage
-          range: '[10,15]' # 如果最大最小值是固定的，不是正态分布，则可以写成不带无穷的区间形式
+          elem: neutral
+          range: '[15,20]' # 如果最大最小值是固定的，不是正态分布，则可以写成不带无穷的区间形式
+          weight: 1
+        - id: attribute:critical_strike_chance
+          value: 0.75
+          weight: 1
+        - id: attribute:critical_strike_rate
+          value: 0.52
+          weight: 1
+          conditions: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该堆里
+            - type: item_level # 这是一个关于物品等级要求的条件
+              value: "[20,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
+    pool-a-2:
+      conditions:
+        - type: rarity
+          value: common
+      entries:
+        - id: attribute:attack_damage
+          elem: neutral
+          range: '[10,15]'
           weight: 1
         - id: attribute:critical_strike_chance
           value: 0.5
@@ -92,12 +110,13 @@ slot-pools:
         - id: attribute:critical_strike_rate
           value: 0.25
           weight: 1
-          conditions: # 单独设置该词条的筛选条件
+          conditions:
             - type: item_level
-              value: "[10,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
+              value: "[10,)"
     fallback: # 备用池，固定写成 fallback，如果没有相匹配的稀有度，将使用备用池
       - id: attribute:attack_damage
-        min: 5
+        elem: neutral
+        min: 5 # 这里的 min/max 相当于写成了区间 '[5,8]' - 另一种等效的写法
         max: 8
         scale: 1.2 # 等级加成，这里意思是每一物品等级提供 1.2 的数值加成
         weight: 1
@@ -120,7 +139,7 @@ slot-pools:
           value: 0.4
           weight: 1
         - id: attribute:defense
-          meta: x1 # （可选）为该词条指定一个 meta，目前只有生成条件会用到这个
+          meta: x1 # 为该词条指定一个 meta，目前只有生成时会用到这个（可选）
           value: 23
           weight: 1
     fallback:
@@ -174,17 +193,16 @@ slot-pools:
         - type: element
           value: fire
       entries:
-        - id: attribute:element_attack_damage
-          element: fire
-          min: 10
-          max: 16
+        - id: attribute:attack_damage
+          elem: fire
+          range: '[10,16]'
           weight: 8
-        - id: attribute:element_attack_damage_rate
-          element: fire
+        - id: attribute:attack_damage_rate
+          elem: fire
           value: 0.1
           weight: 8
-        - id: attribute:element_effect_chance
-          element: fire
+        - id: attribute:attack_effect_chance
+          elem: fire
           value: 0.38
           weight: 8
     water:
@@ -192,17 +210,16 @@ slot-pools:
         - type: element
           value: water
       entries:
-        - id: attribute:element_attack_damage
-          element: water
-          min: 10
-          max: 17
+        - id: attribute:attack_damage
+          elem: water
+          range: '[10,17]'
           weight: 8
-        - id: attribute:element_attack_damage_rate
-          element: water
+        - id: attribute:attack_damage_rate
+          elem: water
           value: 0.2
           weight: 8
-        - id: attribute:element_effect_chance
-          element: water
+        - id: attribute:attack_effect_chance
+          elem: water
           value: 0.42
           weight: 8
     wind:
@@ -210,40 +227,33 @@ slot-pools:
         - type: element
           value: wind
       entries:
-        - id: attribute:element_attack_damage
-          element: wind
-          min: 10
-          max: 18
+        - id: attribute:attack_damage
+          elem: wind
+          range: '[10,18]'
           weight: 8
-        - id: attribute:element_attack_damage_rate
-          element: wind
+        - id: attribute:attack_damage_rate
+          elem: wind
           value: 0.3
           weight: 8
-        - id: attribute:element_effect_chance
-          element: wind
+        - id: attribute:attack_effect_chance
+          elem: wind
           value: 0.56
           weight: 8
 
   # 词条堆：pool-group-f
   pool-group-f:
-    fire:
-      conditions:
-        - type: element
-          value: fire
+    ability: # 这个池的 id
       entries:
-        - id: attribute:element_attack_damage
-          element: fire
-          min: 10
-          max: 16
-          weight: 8
-        - id: attribute:element_attack_damage_rate
-          element: fire
-          value: 0.1
-          weight: 8
-        - id: attribute:element_effect_chance
-          element: fire
-          value: 0.38
-          weight: 8
+        - id: ability:blink
+          mana: 12
+          cooldown: 10
+          distance: 16
+          weight: 1
+        - id: ability:dash
+          mana: 12
+          cooldown: 4
+          damage: 8 * damage # 技能伤害为 8 倍的玩家所有元素伤害之和
+          weight: 1
 
 # 词条的使用条件
 condition-pools:

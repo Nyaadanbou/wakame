@@ -1,12 +1,15 @@
 # 元素
 
 elements:
-  fire:
+  neutral:
     binary-index: 0
+    display-name: 中立
+  fire:
+    binary-index: 1
     display-name: 火
   wind:
-    binary-index: 1
+    binary-index: 2
     display-name: 风
   water:
-    binary-index: 2
+    binary-index: 3
     display-name: 水
