@@ -49,42 +49,41 @@ Compound('wakame')
   Compound('slots') // 词条栏
     Compound('a') // 词条栏的 id
       String('id'): 'attribute:attack_damage' // 词条的 id
+      Boolean('reforgeable'): true
+      Boolean('overridable'): false
       Compound('data') // 词条的元数据
         Short('min'): 10
         Short('max'): 15
     Compound('b')
       String('id'): 'attribute:element_attack_damage'
+      Boolean('reforgeable'): false
+      Boolean('overridable'): false
       Compound('data')
         Short('min'): 10
         Short('max'): 15
         Byte('element'): 2
     Compound('c')
       String('id'): 'attribute:attack_damage_rate'
+      Boolean('reforgeable'): true
+      Boolean('overridable'): false
       Compound('data'):
         Short('value'): 0.2
     Compound('d')
       String('id'): 'ability:dash'
+      Boolean('reforgeable'): false
+      Boolean('overridable'): false
       Compound('data')
         Byte('mana'): 12
         Byte('cooldown'): 4
         Byte('damage'): 8
     Compound('e')
       String('id'): 'ability:blink'
+      Boolean('reforgeable'): false
+      Boolean('overridable'): false
       Compound('data')
         Byte('mana'): 12
         Byte('cooldown'): 10
         Byte('distance'): 16
-  Compound('reforge') // 重铸数据
-    Compound('a') // 词条栏 a 的数据
-      Boolean('changeable'): 1
-    Compound('b') // 词条栏 b 的数据
-      Boolean('changeable'): 0
-    Compound('c') // ...
-      Boolean('changeable'): 1
-    Compound('d')
-      Boolean('changeable'): 0
-    Compound('e')
-      Boolean('changeable'): 0
   Compound('conditions') // 词条栏使用条件
     String('b'): 'condition_a' // TODO 单纯一个字符串不足以定位条件
     String('c'): 'condition_b'
