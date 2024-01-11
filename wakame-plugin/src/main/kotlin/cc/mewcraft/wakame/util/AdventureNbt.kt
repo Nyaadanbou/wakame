@@ -2,8 +2,12 @@ package cc.mewcraft.wakame.util
 
 import net.kyori.adventure.nbt.*
 
+/* Check if a key with given type exists */
+
 fun CompoundBinaryTag.contains(key: String, type: BinaryTagType<*>): Boolean =
     get(key)?.let { type.test(it.type()) } == true
+
+/* Nullable getters */
 
 fun CompoundBinaryTag.getBooleanOrNull(key: String): Boolean? =
     if (this.contains(key, BinaryTagTypes.BYTE)) getByte(key) != 0.toByte() else null
@@ -27,7 +31,7 @@ fun CompoundBinaryTag.getDoubleOrNull(key: String): Double? =
     if (this.contains(key, BinaryTagTypes.DOUBLE)) (get(key) as NumberBinaryTag).doubleValue() else null
 
 fun CompoundBinaryTag.getByteArrayOrNull(key: String): ByteArray? =
-    if (this.contains(key, BinaryTagTypes.BYTE_ARRAY)) (this.get(key) as ByteArrayBinaryTag).value() else null
+    if (this.contains(key, BinaryTagTypes.BYTE_ARRAY)) (get(key) as ByteArrayBinaryTag).value() else null
 
 fun CompoundBinaryTag.getStringOrNull(key: String): String? =
     if (this.contains(key, BinaryTagTypes.STRING)) (get(key) as StringBinaryTag).value() else null
@@ -52,7 +56,56 @@ fun CompoundBinaryTag.getIntArrayOrNull(key: String): IntArray? =
     if (this.contains(key, BinaryTagTypes.INT_ARRAY)) (get(key) as IntArrayBinaryTag).value() else null
 
 fun CompoundBinaryTag.getLongArrayOrNull(key: String): LongArray? =
-    if (this.contains(key, BinaryTagTypes.LONG_ARRAY)) (get(key) as LongArrayBinaryTag).value() else LongArray(0)
+    if (this.contains(key, BinaryTagTypes.LONG_ARRAY)) (get(key) as LongArrayBinaryTag).value() else null
+
+/* Throwable getters */
+
+fun CompoundBinaryTag.getBooleanOrThrow(key: String): Boolean =
+    getBooleanOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getByteOrThrow(key: String): Byte =
+    getByteOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getShortOrThrow(key: String): Short =
+    getShortOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getIntOrThrow(key: String): Int =
+    getIntOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getLongOrThrow(key: String): Long =
+    getLongOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getFloatOrThrow(key: String): Float =
+    getFloatOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getDoubleOrThrow(key: String): Double =
+    getDoubleOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getByteArrayOrThrow(key: String): ByteArray =
+    getByteArrayOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getStringOrThrow(key: String): String =
+    getStringOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getListOrThrow(key: String): ListBinaryTag =
+    getListOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getListOrThrow(key: String, expectedType: BinaryTagType<out BinaryTag>): ListBinaryTag =
+    getListOrNull(key, expectedType) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getCompoundOrThrow(key: String): CompoundBinaryTag =
+    getCompoundOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getIntArrayOrThrow(key: String): IntArray =
+    getIntArrayOrNull(key) ?: throw NullPointerException()
+
+fun CompoundBinaryTag.getLongArrayOrThrow(key: String): LongArray =
+    getLongArrayOrNull(key) ?: throw NullPointerException()
+
+/* Kotlin-style builders */
+
+fun compoundBinaryTag(base: CompoundBinaryTag, builder: CompoundBinaryTag.Builder.() -> Unit): CompoundBinaryTag =
+    CompoundBinaryTag.builder().put(base).apply(builder).build()
 
 fun compoundBinaryTag(builder: CompoundBinaryTag.Builder.() -> Unit): CompoundBinaryTag =
     CompoundBinaryTag.builder().apply(builder).build()
