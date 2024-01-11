@@ -28,6 +28,23 @@ level: context
 # 如果写 <稀有度名>，则始终以这里指定的稀有度生成
 rarity: context
 
+# 物品铭刻标识
+kizami:
+  sample: 2 # 抽选 n 个铭刻作为该物品的铭刻标识
+  entries: # 候选的铭刻标识，以及它们各自的权重
+    - id: meta:kizami
+      value: iron
+      weight: 2
+    - id: meta:kizami
+      value: gold
+      weight: 1
+    - id: meta:kizami
+      value: diamond
+      weight: 1
+    - id: meta:kizami
+      value: netherite
+      weight: 1
+
 # 物品元素标识
 elements:
   sample: 2 # 抽选 n 个元素作为该物品的元素标识
@@ -109,7 +126,7 @@ slot-groups:
           - id: attribute:critical_strike_rate
             value: 0.52
             weight: 1
-            conditions: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该组里
+            conditions: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该池里
               - type: item_level # 这是一个关于物品等级要求的条件
                 value: "[20,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
       pool-2:
@@ -130,10 +147,10 @@ slot-groups:
             conditions:
               - type: item_level
                 value: "[10,)"
-    fallback: # 备用池，固定写成 fallback，如果没有相匹配的稀有度，将使用备用池
+    fallback: # 备用池，固定写成 fallback，如果 pools 中没有满足条件的 pool，将使用备用池
       - id: attribute:attack_damage
         elem: neutral
-        min: 5 # 这里的 min/max 相当于写成了区间 '[5,8]' - 另一种等效的写法
+        min: 5 # 这里的 min/max 相当于写成了区间 '[5,8]'，是另一种等效写法
         max: 8
         scale: 1.2 # 等级加成，这里意思是每一物品等级提供 1.2 的数值加成
         weight: 1
@@ -158,7 +175,7 @@ slot-groups:
             value: 0.4
             weight: 1
           - id: attribute:defense
-            meta: x1 # 为该词条指定一个 meta，目前只有生成时会用到这个（可选）
+            meta: x1 # 为该项指定一个元数据（string），当该项被选中时，指定的元数据将被加入到上下文中
             value: 23
             weight: 1
     fallback:
@@ -188,8 +205,8 @@ slot-groups:
             value: 0.25
             weight: 99
             conditions:
-              - type: slot_meta # 该类型条件将检查词条在生成时的 meta
-                value: x1 # 如果 meta 为 x1 的词条已经生成，则该词条会被筛掉
+              - type: context_meta # 该类型条件将检查物品生成的上下文中是否有指定的元数据存在
+                value: x1 # 如果已经存在值为 x1 的元数据，则该项在随机选择前会被排除掉
     fallback:
       - id: attribute:max_health
         value: 20

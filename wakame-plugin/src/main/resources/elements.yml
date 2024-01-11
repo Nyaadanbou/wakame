@@ -1,6 +1,9 @@
 # 元素
 
 elements:
+  universal: # 通用元素，影响所有元素
+    binary-index: 127
+    display-name: 通用
   neutral:
     binary-index: 0
     display-name: 中立
