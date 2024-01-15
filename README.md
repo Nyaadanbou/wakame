@@ -16,7 +16,8 @@ Slots，中文叫做「词条栏」。「词条栏」可以看作一个容器，
 
 ## InstanceSlot
 
-`InstanceSlot` 代表一个状态已经确定了的词条栏。从接口之间的关系来说，它可以看成是 `TemplateSlot` 多个状态中的一个。从代码的使用角度来看，用户可以调用 `TemplateSlot` 的某个函数来让其产生一个 `InstanceSlot`。这有点像母鸡生蛋的感觉。~~目前 `InstanceSlot` 只会出现在世界里的实际物品上（注意区别于只存在于数据库里的「物品模板」）~~。
+`InstanceSlot` 代表一个状态已经确定了的词条栏。从接口之间的关系来说，它可以看成是 `TemplateSlot` 多个状态中的一个。从代码的使用角度来看，用户可以调用 `TemplateSlot` 的某个函数来让其产生一个 `InstanceSlot`。这有点像母鸡生蛋的感觉。
+~~目前 `InstanceSlot` 只会出现在世界里的实际物品上（注意区别于只存在于数据库里的「物品模板」）~~。
 
 # Attributes
 
@@ -32,7 +33,53 @@ AttributeModifier 的 UUID 是肯定不与其他对象提供的 AttributeModifie
 例如，未来如果还想要给玩家添加一个**任意来源**的 AttributeModifier，比如说来自特殊药剂的效果，
 那么这个 AttributeModifier 的 UUID 就可以用药剂物品本身的 UUID。
 
-# NBT Specifications of WakaItemStack
+# Item Composition
+
+`WakameItemStack` 是游戏世界内的表现，
+
+# NBT Specifications
+
+`WakameItem` 是物品在模板中的抽象，而 `WakaItemStack` 是物品在游戏世界内的抽象。
+
+## Namespace & Value
+
+其中最基础的信息是「物品是什么」，也就是「物品对应哪一个配置文件」。这些信息存在于所有物品上。
+
+| Path (wakame.) | Description                     |
+|----------------|:--------------------------------|
+| ns             | namespace, i.e. the folder name |
+| id             | value, i.e., the file name      |
+
+## Metadata
+
+其次是物品的「元数据」，包含描述该物品的额外信息。这些信息并不存在于每个物品上。根据具体的物品种类，每种信息都可能不存在。
+
+| Path (wakame.meta.) | Description  |
+|---------------------|--------------|
+| name                | display name |
+| lore                | lore         |
+| lvl                 | level        |
+| rarity              | rarity       |
+| kizami              | kizami       |
+| elem                | elem         |
+| skin                | skin         |
+| skin_owner          | skin owner   |
+
+## Slots
+
+词条栏。
+
+## Conditions
+
+词条栏的激活条件。
+
+## Statistics
+
+物品的统计数据。
+
+## Example
+
+以下是一个 `WakameItemStack` 的 NBT 格式实例。请注意所有字符串都区分大小写。
 
 ```
 Compound('wakame')
@@ -40,7 +87,7 @@ Compound('wakame')
   String('id'): 'demo' // 物品的 id
   Compound('meta')
     String('name'): '<MiniMessage Text>'
-    List('lore'):
+    List('(String) lore'):
       String(None): '<MiniMessage Text>'
       String(None): '<MiniMessage Text>'
       String(None): '<MiniMessage Text>'
@@ -49,41 +96,45 @@ Compound('wakame')
     ByteArray('kizami'): [0b, 3b] // 铭刻
     ByteArray('elem'): [1b, 2b] // 元素（可能根本不需要）
     Short('skin'): 35s // 皮肤 ID
-    IntArray('skin_owner'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 [高32位MSB, 低32为MSB, 高32位LSB, 低32位LSB]
+    IntArray('skin_owner'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
   Compound('slots') // 词条栏
     Compound('a') // 词条栏的 id
       Boolean('reforgeable'): true // 词条栏是否可重铸
       Boolean('overridable'): false // 词条栏是否可由玩家覆盖
-      Compound('insert') // 词条栏的内容（词条）
+      Compound('tang') // 词条栏的内容（词条）
         String('id'): 'attribute:attack_damage' // 词条的 id
         Short('min'): 10s // 词条的元数据，下面两个也是
         Short('max'): 15s
         Byte('elem'): 0b
+        Byte('op'): 0b // 属性修饰符的操作模式，可以不存在，默认 0b
       Compound('reforge') // 重铸的元数据（可能会用到）
-        <TODO>
+        Byte('success'): 5b // 重铸成功的次数
+        Byte('failure'): 1b // 重铸失败的次数
     Compound('b')
       Boolean('reforgeable'): false
       Boolean('overridable'): false
-      Compound('insert')
+      Compound('tang')
         String('id'): 'attribute:attack_damage'
         Short('min'): 10s
         Short('max'): 15s
         Byte('elem'): 2b
+        Byte('op'): 0b
       Compound('reforge')
         <TODO>
     Compound('c')
       Boolean('reforgeable'): true
       Boolean('overridable'): false
-      Compound('insert'):
+      Compound('tang'):
         String('id'): 'attribute:attack_damage_rate'
         Float('value'): 0.2f
         Byte('elem'): 2b
+        Byte('op'): 0b
       Compound('reforge')
         <TODO>
     Compound('d')
       Boolean('reforgeable'): false
       Boolean('overridable'): false
-      Compound('insert')
+      Compound('tang')
         String('id'): 'ability:dash'
         Byte('mana'): 12b
         Byte('cooldown'): 4b
@@ -93,11 +144,17 @@ Compound('wakame')
     Compound('e')
       Boolean('reforgeable'): false
       Boolean('overridable'): false
-      Compound('insert')
+      Compound('tang')
         String('id'): 'ability:blink'
         Byte('mana'): 12b
         Byte('cooldown'): 10b
         Byte('distance'): 16b
+      Compound('reforge')
+        <TODO>
+    Compound('f')
+      Boolean('reforgeable'): false
+      Boolean('overridable'): false
+      Compound('tang') // 表示一个空槽
       Compound('reforge')
         <TODO>
   Compound('conditions') // 词条栏使用条件
