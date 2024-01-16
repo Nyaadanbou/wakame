@@ -118,24 +118,24 @@ slot-groups:
         entries: # 该池拥有的所有词条
           - id: attribute:attack_damage
             weight: 1
-            operation: addition # 属性支持自定义操作模式 addition(默认值), multiply_base, multiply_total
+            operation: add # 属性支持自定义操作模式 add(默认值), multiply_base, multiply_total
             element: neutral
             lower: 15 # 固定数值
             upper: # 随机数值
               base: 20 # 正态分布的平均值
-              scale: 0 # 等级加成，加成数值为 scale * level，可不写，默认为 0
+              scale: 0 # 等级加成，数值为 scale * level，可省略，默认为 0
               spread: 0.2 # 正态分布的标准差
-              max: 0.3 # 正态分布的最大标准差，默认为 spread * 2
+              max: 0.3 # 正态分布的最大标准差，可省略，默认为 spread * 2
           - id: attribute:critical_strike_chance
             weight: 1
-            operation: addition
+            operation: add
             value: # 随机数值
               base: 0.75
               spread: 0.1
               max: 0.2
           - id: attribute:critical_strike_rate
             weight: 1
-            operation: addition
+            operation: add
             value: 0.52 # 固定数值
             conditions: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该池里
               - type: item_level # 这是一个关于物品等级要求的条件
@@ -148,7 +148,7 @@ slot-groups:
           - id: attribute:attack_damage
             weight: 1
             element: neutral
-            operation: addition
+            operation: add
             lower: 10
             upper: 15
           - id: attribute:critical_strike_chance
