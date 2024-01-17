@@ -1,51 +1,35 @@
-# 所有值均区分大小写
+# !!! 所有内容均区分大小写 !!!
 
-# 物品的唯一标识，生成工具：https://www.uuidgenerator.net/version4
+# 唯一标识，生成工具：https://www.uuidgenerator.net/version4
 uuid: cfee549f-e4d7-4574-b104-92d8251ebee4
 
 # 原版物品
 material: wooden_sword
 
-# 物品名字
-display-name: "<red>Demo"
+# 名字
+display_name: "<red>Demo"
 
-# 物品描述
+# 描述
 lore:
   - "<gold>Demo 1"
   - "<gold>Demo 2"
 
-# 物品皮肤
+# 皮肤
 # 如有设置，则物品自带预设的皮肤
+# 这种情况下，皮肤的所有者为匿名
 skin: demo_1
 
-# 物品等级
+# 等级
 # 如果写 "context"，则根据玩家的冒险等级生成
 # 如果写 <正整数>，则始终以这里指定的物品等级生成
 level: context
 
-# 物品稀有度
+# 稀有度
 # 如果写 "context"，则根据玩家的冒险等级生成
 # 如果写 <稀有度名>，则始终以这里指定的稀有度生成
 rarity: context
 
-# 物品铭刻标识
-kizami:
-  sample: 2 # 抽选 n 个铭刻作为该物品的铭刻标识
-  entries: # 候选的铭刻标识，以及它们各自的权重
-    - id: meta:kizami
-      value: iron
-      weight: 2
-    - id: meta:kizami
-      value: gold
-      weight: 1
-    - id: meta:kizami
-      value: diamond
-      weight: 1
-    - id: meta:kizami
-      value: netherite
-      weight: 1
-
-# 物品元素标识
+# 元素标识
 elements:
   sample: 2 # 抽选 n 个元素作为该物品的元素标识
   entries: # 候选的元素标识，以及它们各自的权重
@@ -60,6 +44,23 @@ elements:
       weight: 1
     - id: meta:element
       value: wind
+      weight: 1
+
+# 铭刻标识
+kizami:
+  sample: 2 # 抽选 n 个铭刻作为该物品的铭刻标识
+  entries: # 候选的铭刻标识，以及它们各自的权重
+    - id: meta:kizami
+      value: iron
+      weight: 2
+    - id: meta:kizami
+      value: gold
+      weight: 1
+    - id: meta:kizami
+      value: diamond
+      weight: 1
+    - id: meta:kizami
+      value: netherite
       weight: 1
 
 # 词条栏
@@ -95,23 +96,17 @@ slots:
     overridable: false
     keep_empty: false
 
-# 词条栏的使用条件
-slot-conditions:
-  a: group-a # key 写词条栏的 id，value 写使用条件的 id
-  b: group-b
-  c: group-c
-
 # 词条组
 # 词条组将按照配置文件里的顺序，逐个生成内容，放入词条栏
-slot-groups:
+slot_groups:
 
   # 词条组：group-a
-  group-a: # 该词条组的 id
+  group_a: # 该词条组的 id
     conditions:
       - type: rarity
         value: common
     pools:
-      pool-1: # 该词条组的一个候选池，取值必须在本堆中不重复
+      pool_1: # 该词条组的一个候选池，取值必须在本堆中不重复
         conditions: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
           - type: rarity
             value: rare
@@ -140,7 +135,7 @@ slot-groups:
             conditions: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该池里
               - type: item_level # 这是一个关于物品等级要求的条件
                 value: "[20,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
-      pool-2:
+      pool_2:
         conditions:
           - type: rarity
             value: common
@@ -173,10 +168,10 @@ slot-groups:
           scale: 0.1
 
   # 词条组：group-b
-  group-b:
+  group_b:
     conditions: [ ]
     pools:
-      pool-1:
+      pool_1:
         conditions:
           - type: rarity
             value: rare
@@ -200,10 +195,10 @@ slot-groups:
         value: 0.2
 
   # 词条组：group-c
-  group-c:
+  group_c:
     conditions: [ ]
     pools:
-      pool-1:
+      pool_1:
         conditions:
           - type: rarity
             value: rare
@@ -229,7 +224,7 @@ slot-groups:
         value: 5
 
   # 词条组：group-d
-  group-d:
+  group_d:
     conditions: [ ]
     pools: { }
     fallback: # 这是一个只有固定内容的词条栏的基本写法
@@ -241,7 +236,7 @@ slot-groups:
         value: 0.21
 
   # 词条组：group-e
-  group-e:
+  group_e:
     conditions: [ ]
     pools:
       fire:
@@ -301,7 +296,7 @@ slot-groups:
     fallback: [ ] # 这里没有定义 fallback
 
   # 词条组：group-f
-  group-f:
+  group_f:
     conditions: [ ]
     pools:
       ability: # 这个池的 id
@@ -318,11 +313,17 @@ slot-groups:
             damage: 8 * damage # 技能伤害为 8 倍的玩家所有元素伤害之和
     fallback: [ ]
 
-# 词条的使用条件
-condition-groups:
+# 词条栏的使用条件
+slot_conditions:
+  a: group-a # key 写词条栏的 id，value 写使用条件的 id
+  b: group-b
+  c: group-c
+
+# 词条栏的使用条件组
+slot_condition_groups:
 
   # 自定义条件组：group-a
-  group-a:
+  group_a:
     pools:
       common:
         conditions:
@@ -349,7 +350,7 @@ condition-groups:
         count: 6
 
   # 自定义条件组：group-b
-  group-b:
+  group_b:
     pools:
       common:
         conditions:
@@ -367,7 +368,7 @@ condition-groups:
         amount: 100
 
   # 自定义条件组：group-c
-  group-c:
+  group_c:
     pools:
       common:
         conditions:
