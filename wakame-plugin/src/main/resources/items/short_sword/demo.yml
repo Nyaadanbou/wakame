@@ -66,34 +66,38 @@ kizami:
 # 词条栏
 slots:
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
-    group: group-a # 该词条栏所使用的词条组 id，词条将从组中的一个池中抽取
-    reforgeable: true # 该词条栏是否可重铸
-    overridable: false # 该词条栏是否可以被玩家自由修改和覆盖
+    content: group_a # 该词条栏所使用的词条组 id，词条将从组中的一个池中抽取
+    condition: group_a # 词条栏的使用条件
+    can_reforge: true # 该词条栏是否可重铸
+    can_override: false # 该词条栏是否可以被玩家自由修改和覆盖
     keep_empty: false # 该词条栏在生成时没有随机出词条，是否保留空词条栏
   - id: b
-    group: group-b
-    reforgeable: true
-    overridable: false
+    content: group_b
+    condition: group_b
+    can_reforge: true
+    can_override: false
     keep_empty: false
   - id: c
-    group: group-c
-    reforgeable: true
-    overridable: false
+    content: group_c
+    condition: group_c
+    can_reforge: true
+    can_override: false
     keep_empty: false
   - id: d
-    group: group-d
-    reforgeable: false
-    overridable: false
+    content: group_d
+    # condition: group_c # 可以省略不写，意思就是没有条件限制
+    can_reforge: false
+    can_override: false
     keep_empty: false
   - id: e
-    group: group-e
-    reforgeable: false
-    overridable: false
+    content: group_e
+    can_reforge: false
+    can_override: false
     keep_empty: false
   - id: f
-    group: group-f
-    reforgeable: false
-    overridable: false
+    content: group_f
+    can_reforge: false
+    can_override: false
     keep_empty: false
 
 # 词条组
@@ -312,12 +316,6 @@ slot_groups:
             cooldown: 4
             damage: 8 * damage # 技能伤害为 8 倍的玩家所有元素伤害之和
     fallback: [ ]
-
-# 词条栏的使用条件
-slot_conditions:
-  a: group-a # key 写词条栏的 id，value 写使用条件的 id
-  b: group-b
-  c: group-c
 
 # 词条栏的使用条件组
 slot_condition_groups:
