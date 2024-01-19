@@ -99,8 +99,8 @@ Compound('wakame')
     IntArray('skin_owner'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
   Compound('slots') // 词条栏
     Compound('a') // 词条栏的 id
-      Boolean('reforgeable'): true // 词条栏是否可重铸
-      Boolean('overridable'): false // 词条栏是否可由玩家覆盖
+      Boolean('can_reforge'): true // 词条栏是否可重铸
+      Boolean('can_override'): false // 词条栏是否可由玩家覆盖
       Compound('tang') // 词条栏的内容（词条）
         String('id'): 'attribute:attack_damage' // 词条的 id
         Short('min'): 10s // 词条的元数据，下面两个也是
@@ -111,8 +111,8 @@ Compound('wakame')
         Byte('success'): 5b // 重铸成功的次数
         Byte('failure'): 1b // 重铸失败的次数
     Compound('b')
-      Boolean('reforgeable'): false
-      Boolean('overridable'): false
+      Boolean('can_reforge'): false
+      Boolean('can_override'): false
       Compound('tang')
         String('id'): 'attribute:attack_damage'
         Short('min'): 10s
@@ -122,8 +122,8 @@ Compound('wakame')
       Compound('reforge')
         <TODO>
     Compound('c')
-      Boolean('reforgeable'): true
-      Boolean('overridable'): false
+      Boolean('can_reforge'): true
+      Boolean('can_override'): false
       Compound('tang'):
         String('id'): 'attribute:attack_damage_rate'
         Float('value'): 0.2f
@@ -132,8 +132,8 @@ Compound('wakame')
       Compound('reforge')
         <TODO>
     Compound('d')
-      Boolean('reforgeable'): false
-      Boolean('overridable'): false
+      Boolean('can_reforge'): false
+      Boolean('can_override'): false
       Compound('tang')
         String('id'): 'ability:dash'
         Byte('mana'): 12b
@@ -142,8 +142,8 @@ Compound('wakame')
       Compound('reforge')
         <TODO>
     Compound('e')
-      Boolean('reforgeable'): false
-      Boolean('overridable'): false
+      Boolean('can_reforge'): false
+      Boolean('can_override'): false
       Compound('tang')
         String('id'): 'ability:blink'
         Byte('mana'): 12b
@@ -152,8 +152,8 @@ Compound('wakame')
       Compound('reforge')
         <TODO>
     Compound('f')
-      Boolean('reforgeable'): false
-      Boolean('overridable'): false
+      Boolean('can_reforge'): false
+      Boolean('can_override'): false
       Compound('tang') // 表示一个空槽
       Compound('reforge')
         <TODO>
