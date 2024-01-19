@@ -33,16 +33,16 @@ rarity: context
 elements:
   sample: 2 # 抽选 n 个元素作为该物品的元素标识
   entries: # 候选的元素标识，以及它们各自的权重
-    - id: meta:element
+    - key: meta:element
       value: neutral
       weight: 2
-    - id: meta:element
+    - key: meta:element
       value: water
       weight: 1
-    - id: meta:element
+    - key: meta:element
       value: fire
       weight: 1
-    - id: meta:element
+    - key: meta:element
       value: wind
       weight: 1
 
@@ -66,11 +66,11 @@ kizami:
 # 词条栏
 slots:
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
-    content: group_a # 该词条栏所使用的词条组 id，词条将从组中的一个池中抽取
-    condition: group_a # 词条栏的使用条件
+    content: group_a # 该词条栏所使用的词条组 id，词条将从组中的一个池中选择
+    condition: group_a # 该词条栏所使用的条件组 id，条件将从组中的一个池中选择
     can_reforge: true # 该词条栏是否可重铸
     can_override: false # 该词条栏是否可以被玩家自由修改和覆盖
-    keep_empty: false # 该词条栏在生成时没有随机出词条，是否保留空词条栏
+    keep_empty: false # 该词条栏在生成时如果没有词条被选中的话，是否在物品上保留空的词条栏
   - id: b
     content: group_b
     condition: group_b
@@ -84,8 +84,8 @@ slots:
     can_override: false
     keep_empty: false
   - id: d
-    content: group_d
-    # condition: group_c # 可以省略不写，意思就是没有条件限制
+    content: group_d # TODO 词条组是不是也可以不写，表示这就是个空栏？
+    # condition: group_c # 条件组可以省略不写，意思就是没有条件限制
     can_reforge: false
     can_override: false
     keep_empty: false
@@ -108,12 +108,12 @@ slot_groups:
   group_a: # 该词条组的 id
     conditions:
       - type: rarity
-        value: common
+        rarity: common
     pools:
       pool_1: # 该词条组的一个候选池，取值必须在本堆中不重复
         conditions: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
           - type: rarity
-            value: rare
+            rarity: rare
         entries: # 该池拥有的所有词条
           - id: attribute:attack_damage
             weight: 1
@@ -137,8 +137,8 @@ slot_groups:
             operation: add
             value: 0.52 # 固定数值
             conditions: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该池里
-              - type: item_level # 这是一个关于物品等级要求的条件
-                value: "[20,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
+              - type: level # 这是一个关于物品等级要求的条件
+                level: "[20,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
       pool_2:
         conditions:
           - type: rarity
@@ -329,20 +329,20 @@ slot_condition_groups:
             value: common
         entries:
           # TODO 条件的数值要不要也支持正态分布？如果要的话，那条件的数据就必须存在 NBT 里
-          - id: count_boss_kill
+          - id: count_boss_kills
             weight: 1
             entity: example_boss
             count: 1
-          - id: count_creep_kill
+          - id: count_creep_kills
             weight: 1
             entity: example_creep
             count: 3
     fallback:
-      - id: count_boss_kill
+      - id: count_boss_kills
         weight: 1
         entity: example_boss
         count: 2
-      - id: count_creep_kill
+      - id: count_creep_kills
         weight: 1
         entity: example_creep
         count: 6
