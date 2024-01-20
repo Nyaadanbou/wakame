@@ -50,16 +50,16 @@ elements:
 kizami:
   sample: 2 # 抽选 n 个铭刻作为该物品的铭刻标识
   entries: # 候选的铭刻标识，以及它们各自的权重
-    - id: meta:kizami
+    - key: meta:kizami
       value: iron
       weight: 2
-    - id: meta:kizami
+    - key: meta:kizami
       value: gold
       weight: 1
-    - id: meta:kizami
+    - key: meta:kizami
       value: diamond
       weight: 1
-    - id: meta:kizami
+    - key: meta:kizami
       value: netherite
       weight: 1
 
@@ -104,7 +104,7 @@ slots:
 # 词条组将按照配置文件里的顺序，逐个生成内容，放入词条栏
 slot_groups:
 
-  # 词条组：group-a
+  # 词条组：group_a
   group_a: # 该词条组的 id
     conditions:
       - type: rarity
@@ -115,7 +115,7 @@ slot_groups:
           - type: rarity
             rarity: rare
         entries: # 该池拥有的所有词条
-          - id: attribute:attack_damage
+          - key: attribute:attack_damage
             weight: 1
             operation: add # 属性支持自定义操作模式 add(默认值), multiply_base, multiply_total
             element: neutral
@@ -125,14 +125,14 @@ slot_groups:
               scale: 0 # 等级加成，数值为 scale * level，可省略，默认为 0
               spread: 0.2 # 正态分布的标准差
               max: 0.3 # 正态分布的最大标准差，可省略，默认为 spread * 2
-          - id: attribute:critical_strike_chance
+          - key: attribute:critical_strike_chance
             weight: 1
             operation: add
             value: # 随机数值
               base: 0.75
               spread: 0.1
               max: 0.2
-          - id: attribute:critical_strike_rate
+          - key: attribute:critical_strike_rate
             weight: 1
             operation: add
             value: 0.52 # 固定数值
@@ -142,175 +142,175 @@ slot_groups:
       pool_2:
         conditions:
           - type: rarity
-            value: common
+            rarity: common
         entries:
-          - id: attribute:attack_damage
+          - key: attribute:attack_damage
             weight: 1
             element: neutral
             operation: add
             lower: 10
             upper: 15
-          - id: attribute:critical_strike_chance
+          - key: attribute:critical_strike_chance
             weight: 1
             value: 0.5
-          - id: attribute:critical_strike_rate
+          - key: attribute:critical_strike_rate
             weight: 1
             value: 0.25
             conditions:
               - type: item_level
-                value: "[10,)"
+                level: "[10,)"
     fallback: # 备用池，固定写成 fallback，如果 pools 中没有满足条件的 pool，将使用备用池
-      - id: attribute:attack_damage
+      - key: attribute:attack_damage
         weight: 1
         element: neutral
         lower: 5 # 固定数值
         upper: 8 # 固定数值
-      - id: attribute:critical_strike_chance
+      - key: attribute:critical_strike_chance
         weight: 1
         value: # 随机数值
           base: 0.3
           scale: 0.1
 
-  # 词条组：group-b
+  # 词条组：group_b
   group_b:
     conditions: [ ]
     pools:
       pool_1:
         conditions:
           - type: rarity
-            value: rare
+            rarity: rare
         entries:
-          - id: attribute:attack_speed_level
+          - key: attribute:attack_speed_level
             weight: 1
             value: 4
-          - id: attribute:movement_speed_rate
+          - key: attribute:movement_speed_rate
             weight: 1
             value: 0.4
-          - id: attribute:defense
+          - key: attribute:defense
             weight: 1
             value: 23
             meta: x1 # 为该项指定一个元数据（string），当该项被选中时，指定的元数据将被加入到上下文中
     fallback:
-      - id: attribute:attack_speed_level
+      - key: attribute:attack_speed_level
         weight: 1
         value: 2
-      - id: attribute:movement_speed_rate
+      - key: attribute:movement_speed_rate
         weight: 1
         value: 0.2
 
-  # 词条组：group-c
+  # 词条组：group_c
   group_c:
     conditions: [ ]
     pools:
       pool_1:
         conditions:
           - type: rarity
-            value: rare
+            rarity: rare
         entries:
-          - id: attribute:max_health
+          - key: attribute:max_health
             weight: 1
             value: 40
-          - id: attribute:max_mana
+          - key: attribute:max_mana
             weight: 1
             value: 10
-          - id: attribute:damage_reduction_rate
+          - key: attribute:damage_reduction_rate
             weight: 99
             value: 0.25
             conditions:
-              - type: context_meta # 该类型条件将检查物品生成的上下文中是否有指定的元数据存在
-                value: x1 # 如果已经存在值为 x1 的元数据，则该项在随机选择前会被排除掉
+              - type: sample_meta # 该类型条件将检查物品生成的上下文中是否有指定的元数据存在
+                meta: x1 # 如果已经存在值为 x1 的元数据，则该项在随机选择前会被排除掉
     fallback:
-      - id: attribute:max_health
+      - key: attribute:max_health
         weight: 1
         value: 20
-      - id: attribute:max_mana
+      - key: attribute:max_mana
         weight: 1
         value: 5
 
-  # 词条组：group-d
+  # 词条组：group_d
   group_d:
     conditions: [ ]
     pools: { }
     fallback: # 这是一个只有固定内容的词条栏的基本写法
-      - id: attribute:lifesteal
+      - key: attribute:lifesteal
         weight: 10
         value: 0.2
-      - id: attribute:manasteal
+      - key: attribute:manasteal
         weight: 10
         value: 0.21
 
-  # 词条组：group-e
+  # 词条组：group_e
   group_e:
     conditions: [ ]
     pools:
       fire:
         conditions:
           - type: element
-            value: fire
+            element: fire
         entries:
-          - id: attribute:attack_damage
+          - key: attribute:attack_damage
             weight: 8
             element: fire
             lower: 10
             upper: 16
-          - id: attribute:attack_damage_rate
+          - key: attribute:attack_damage_rate
             weight: 8
             element: fire
             value: 0.1
-          - id: attribute:attack_effect_chance
+          - key: attribute:attack_effect_chance
             weight: 8
             element: fire
             value: 0.38
       water:
         conditions:
           - type: element
-            value: water
+            element: water
         entries:
-          - id: attribute:attack_damage
+          - key: attribute:attack_damage
             weight: 8
             element: water
             lower: 10
             upper: 17
-          - id: attribute:attack_damage_rate
+          - key: attribute:attack_damage_rate
             weight: 8
             element: water
             value: 0.2
-          - id: attribute:attack_effect_chance
+          - key: attribute:attack_effect_chance
             weight: 8
             element: water
             value: 0.42
       wind:
         conditions:
           - type: element
-            value: wind
+            element: wind
         entries:
-          - id: attribute:attack_damage
+          - key: attribute:attack_damage
             weight: 8
             element: wind
             lower: 10
             upper: 18
-          - id: attribute:attack_damage_rate
+          - key: attribute:attack_damage_rate
             weight: 8
             element: wind
             value: 0.3
-          - id: attribute:attack_effect_chance
+          - key: attribute:attack_effect_chance
             weight: 8
             element: wind
             value: 0.56
     fallback: [ ] # 这里没有定义 fallback
 
-  # 词条组：group-f
+  # 词条组：group_f
   group_f:
     conditions: [ ]
     pools:
       ability: # 这个池的 id
         entries:
-          - id: ability:blink
+          - key: ability:blink
             weight: 1
             mana: 12
             cooldown: 10
             distance: 16
-          - id: ability:dash
+          - key: ability:dash
             weight: 1
             mana: 12
             cooldown: 4
@@ -320,63 +320,63 @@ slot_groups:
 # 词条栏的使用条件组
 slot_condition_groups:
 
-  # 自定义条件组：group-a
+  # 自定义条件组：group_a
   group_a:
     pools:
       common:
         conditions:
           - type: rarity
-            value: common
+            rarity: common
         entries:
           # TODO 条件的数值要不要也支持正态分布？如果要的话，那条件的数据就必须存在 NBT 里
-          - id: count_boss_kills
+          - key: condition:entity_kills
             weight: 1
-            entity: example_boss
-            count: 1
-          - id: count_creep_kills
+            index: demo_bosses_1
+            count: 2
+          - key: condition:entity_kills
             weight: 1
-            entity: example_creep
-            count: 3
+            index: demo_bosses_2
+            count: 2
+          - key: condition:entity_kills
+            weight: 1
+            index: demo_bosses_3
+            count: 2
     fallback:
-      - id: count_boss_kills
+      - key: condition:entity_kills
         weight: 1
-        entity: example_boss
+        index: demo_creeps_1
         count: 2
-      - id: count_creep_kills
+      - key: condition:entity_kills
         weight: 1
-        entity: example_creep
-        count: 6
+        index: demo_creeps_2
+        count: 2
+      - key: condition:entity_kills
+        weight: 1
+        index: demo_creeps_3
+        count: 2
 
-  # 自定义条件组：group-b
+  # 自定义条件组：group_b
   group_b:
     pools:
       common:
         conditions:
           - type: rarity
-            value: common
+            rarity: common
         entries:
-          - id: total_damage
+          - key: condition:highest_damage
             weight: 1
-            source: fire
-            amount: 100
-    fallback:
-      - id: total_damage
-        weight: 1
-        source: neutral
-        amount: 100
-
-  # 自定义条件组：group-c
-  group_c:
-    pools:
-      common:
-        conditions:
-          - type: rarity
-            value: common
-        entries:
-          - id: total_reforge_cost
+            element: fire
+            amount: 20
+          - key: condition:highest_damage
             weight: 1
-            cost: 2000
+            element: water
+            amount: 32
     fallback:
-      - id: total_reforge_cost
+      - key: condition:highest_damage
         weight: 1
-        cost: 4000
+        element: fire
+        amount: 10
+      - key: condition:highest_damage
+        weight: 1
+        element: water
+        amount: 16

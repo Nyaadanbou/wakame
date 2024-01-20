@@ -86,11 +86,11 @@ Compound('wakame')
   String('ns'): 'short_sword' // 物品的 namespace
   String('id'): 'demo' // 物品的 id
   Compound('meta')
-    String('name'): '<MiniMessage Text>'
+    String('name'): '<JSON text>'
     List('(String) lore'):
-      String(None): '<MiniMessage Text>'
-      String(None): '<MiniMessage Text>'
-      String(None): '<MiniMessage Text>'
+      String(None): '<JSON text>'
+      String(None): '<JSON text>'
+      String(None): '<JSON text>'
     Byte('lvl'): 12b // 等级
     Byte('rarity'): 0b // 稀有度
     ByteArray('kizami'): [0b, 3b] // 铭刻
@@ -110,6 +110,10 @@ Compound('wakame')
       Compound('reforge') // 重铸的元数据（可能会用到）
         Byte('success'): 5b // 重铸成功的次数
         Byte('failure'): 1b // 重铸失败的次数
+      Compound('condition') // 词条栏的解锁条件
+        String('id'): 'condition:entity_kills' // 条件的种类，这里是实体击杀
+        String('index'): 'demo_bosses_1' // 要求的击杀种类
+        Short('count'): 18s // 要求的击杀数量
     Compound('b')
       Boolean('can_reforge'): false
       Boolean('can_override'): false
@@ -120,7 +124,9 @@ Compound('wakame')
         Byte('elem'): 2b
         Byte('op'): 0b
       Compound('reforge')
-        <TODO>
+        // 空的，意为 0
+      Compound('condition')
+        // 空的，意为没有条件限制
     Compound('c')
       Boolean('can_reforge'): true
       Boolean('can_override'): false
@@ -130,7 +136,9 @@ Compound('wakame')
         Byte('elem'): 2b
         Byte('op'): 0b
       Compound('reforge')
-        <TODO>
+        // 空的，意为 0
+      Compound('condition')
+        // 空的，意为没有条件限制
     Compound('d')
       Boolean('can_reforge'): false
       Boolean('can_override'): false
@@ -140,7 +148,7 @@ Compound('wakame')
         Byte('cooldown'): 4b
         Byte('damage'): 8b
       Compound('reforge')
-        <TODO>
+      Compound('condition')
     Compound('e')
       Boolean('can_reforge'): false
       Boolean('can_override'): false
@@ -150,38 +158,29 @@ Compound('wakame')
         Byte('cooldown'): 10b
         Byte('distance'): 16b
       Compound('reforge')
-        <TODO>
+      Compound('condition')
     Compound('f')
       Boolean('can_reforge'): false
       Boolean('can_override'): false
       Compound('tang') // 表示一个空槽
       Compound('reforge')
-        <TODO>
-  Compound('conditions') // 词条栏使用条件
-    String('b'): 'condition_a' // TODO 单纯一个字符串不足以定位条件
-    String('c'): 'condition_b'
-    String('d'): 'condition_c'
+      Compound('condition')
   Compound('stats') // 物品统计数据
-    Compound('boss_kill')
-      Boolean('visible'): 1
-      Int('混沌骑士'): 1
-      Int('gojira'): 2
-      Int('wither'): 3
-      Int('skeletonking'): 11
-      Int('enderdragon'): 4 // 数量不为 0 将储存在 NBT
-      Int('sister'): 0 // 数量为 0 则实际不会储存
-    Compound('creep_kill')
-      Boolean('visible'): 0
-      Int('zombie'): 5
-      Int('spider'): 2
-    Compound('damage_contribution')
-      Boolean('visible'): 0
-      Int('neutral'): 122
-      Int('fire'): 2344
-      Int('wind'): 23
-      Int('water'): 1120
+    Compound('entity_kills')
+      Short('minecraft:zombie'): 5s
+      Short('minecraft:spider'): 2s
+      Short('minecraft:wither'): 3s
+      Short('minecraft:ender_dragon'): 4s // 数量不为 0 将储存在 NBT
+      Short('mythicmobs:gojira'): 2s
+      Short('mythicmobs:skeleton_king'): 11s
+      Short('mythicmobs:sister'): 0s // 数量为 0 则实际不会储存在 NBT
+    Compound('peak_damage')
+      Short('fire'): 12s
+      Short('metal'): 5s
+      Short('water'): 30s
+      Short('earth'): 0s // 没有造成过伤害的元素，不需要写进 NBT，意为 0
+      Short('wood'): 0s
     Compound('reforge')
-      Boolean('visible'): 0
-      Int('cost'): 47283 // 重铸总花费
-      Int('count'): 38 // 重铸次数
+      Byte('count'): 38b // 重铸总次数
+      Short('cost'): 32767s // 重铸总花费
 ```
