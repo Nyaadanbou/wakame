@@ -23,18 +23,41 @@ dependencies {
 
     // helper
     compileOnly(libs.helper)
+    compileOnly(libs.helper.sql)
+    compileOnly(libs.helper.profiles)
 
     // internal
+    compileOnly(libs.asm) // provided by Paper runtime
+    compileOnly(libs.asm.commons) // provided by Paper runtime
     implementation(project(":wakame:wakame-api"))
     implementation(project(":wakame:wakame-nms", configuration = "reobf"))
     implementation(project(":spatula:koin"))
-    implementation(project(":spatula:bukkit:message"))
-    implementation(libs.configurate)
-    compileOnly(libs.bundles.mccoroutine.bukkit) // already shaded by helper JAR
-    implementation("net.kyori", "adventure-nbt", "4.14.0")
-    implementation("team.unnamed", "creative-api", "1.1.0")
-    implementation("team.unnamed", "creative-serializer-minecraft", "1.1.0")
-    implementation("team.unnamed", "creative-server", "1.1.0")
+    // implementation(project(":spatula:bukkit:message")) // TODO use adventure global translator
+    implementation(project(":spatula:bukkit:utils"))
+    implementation(libs.configurate.yaml) { exclude("com.google.errorprone") }
+    implementation(libs.configurate.extra.kotlin)
+    implementation(libs.caffeine) {
+        exclude("com.google.errorprone")
+        exclude("org.checkerframework")
+    }
+    val adventureVersion = "4.15.0"
+    implementation("net.kyori", "adventure-nbt", adventureVersion)
+    val creativeVersion = "1.1.0"
+    implementation("team.unnamed", "creative-api", creativeVersion) {
+        exclude("net.kyori", "adventure-api")
+        exclude("net.kyori", "adventure-key")
+        exclude("org.jetbrains", "annotations")
+    }
+    implementation("team.unnamed", "creative-serializer-minecraft", creativeVersion) {
+        exclude("team.unnamed", "creative-api")
+        exclude("com.google.code.gson", "gson")
+    }
+    implementation("team.unnamed", "creative-server", creativeVersion) {
+        exclude("team.unnamed", "creative-api")
+    }
+
+    // test
+    testImplementation(libs.configurate.yaml)
 }
 
 paper {
