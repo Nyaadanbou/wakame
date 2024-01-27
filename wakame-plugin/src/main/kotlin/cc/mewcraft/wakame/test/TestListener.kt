@@ -9,37 +9,68 @@ import org.bukkit.event.Listener
 
 class TestListener : Listener {
     @EventHandler
-    fun onTest(e: AsyncChatEvent) {
+    fun testShadowNbt(e: AsyncChatEvent) {
         val player = e.player
         val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        val inventory = player.inventory
+
         when (plainMessage) {
-            "1" -> {
-                val nbt = player.inventory.itemInMainHand.readNbt()
+            "s1" -> {
+                val nbt = inventory.itemInMainHand.wakameCompound
+                println("wakameCompound: " + nbt.asString())
+            }
+
+            "s2" -> {
+                val nbtOrNull = inventory.itemInMainHand.wakameCompoundOrNull
+                println("wakameCompoundOrNull: " + nbtOrNull?.asString())
+            }
+
+            "s3" -> {
+                inventory.itemInMainHand.wakameCompound = compoundShadowTag {
+                    putString("ns", "short_sword")
+                    putString("id", "demo")
+                    putByte("sid", 0)
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    fun testAdventureNbt(e: AsyncChatEvent) {
+        val player = e.player
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        val inventory = player.inventory
+
+        when (plainMessage) {
+            "a1" -> {
+                val nbt = player.inventory.itemInMainHand.getNbt()
                 println("nbt: " + nbt.examine(StringExaminer.simpleEscaping()))
             }
 
-            "2" -> {
-                val nbtOrNull = player.inventory.itemInMainHand.readNbtOrNull()
+            "a2" -> {
+                val nbtOrNull = player.inventory.itemInMainHand.getNbtOrNull()
                 println("nbtOrNull: " + nbtOrNull?.examine(StringExaminer.simpleEscaping()))
             }
 
-            "3" -> {
-                player.inventory.itemInMainHand.modifyNbt {
+            "a3" -> {
+                inventory.itemInMainHand.setNbt {
                     put("wakame", compoundBinaryTag {
-                        putString("namespace", "short_sword")
+                        putString("ns", "short_sword")
                         putString("id", "demo")
+                        putByte("sid", 0)
                     })
                 }
             }
 
-            "4" -> {
-                player.inventory.itemInMainHand.copyWriteNbt {
+            "a4" -> {
+                inventory.itemInMainHand.copyWriteNbt {
                     put("wakame", compoundBinaryTag {
-                        putString("namespace", "long_sword")
+                        putString("ns", "long_sword")
                         putString("id", "demo")
+                        putByte("sid", 0)
                     })
                 }.apply {
-                    player.inventory.addItem(this)
+                    inventory.addItem(this)
                 }
             }
         }

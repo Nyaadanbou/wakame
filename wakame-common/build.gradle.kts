@@ -1,7 +1,6 @@
 plugins {
     id("cc.mewcraft.repo-conventions")
-    id("cc.mewcraft.java-conventions")
-    // id("cc.mewcraft.publishing-conventions")
+    id("cc.mewcraft.kotlin-conventions")
 }
 
 group = "cc.mewcraft.wakame"
@@ -14,7 +13,4 @@ dependencies {
 
     // helper
     compileOnly(libs.helper)
-
-    // internal
-    compileOnly(project(":wakame:wakame-common"))
 }

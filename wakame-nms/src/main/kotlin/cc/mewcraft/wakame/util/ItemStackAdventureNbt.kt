@@ -1,7 +1,8 @@
-package cc.mewcraft.wakame.nms
+package cc.mewcraft.wakame.util
 
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
+import net.kyori.adventure.nbt.BinaryTag
 import net.kyori.adventure.nbt.BinaryTagIO
 import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.minecraft.nbt.CompoundTag
@@ -13,15 +14,20 @@ import java.io.InputStream
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
-class ItemStackNms {
+/**
+ * Reads/writes the NBT tags from items as [BinaryTag].
+ */
+object ItemStackAdventureNbt {
     /**
      * Reads NBT from the [bukkitStack]. Returns [CompoundBinaryTag.empty] if
-     * the [bukkitStack] does not have any tag.
+     * the [bukkitStack] does not have any tags.
      */
-    fun readNbt(bukkitStack: BukkitStack): CompoundBinaryTag {
-        val mojangStack = CraftItemStack.unwrap(bukkitStack)
+    fun getNbt(bukkitStack: BukkitStack): CompoundBinaryTag {
+        val mojangStack: MojangStack = CraftItemStack.unwrap(bukkitStack)
         if (mojangStack.hasTag()) {
-            return mojangStack.tag!!.asAdventureCompound
+            return mojangStack
+                .tag!!
+                .asAdventureCompound
         }
         return CompoundBinaryTag.empty()
     }
@@ -32,15 +38,18 @@ class ItemStackNms {
      * This function returns `null` if any of the following holds:
      * - the [bukkitStack] is not CraftItemStack
      * - the [bukkitStack] is not backed by NMS item stack
-     * - the [bukkitStack] has no tag
+     * - the [bukkitStack] has no tags
      */
-    fun readNbtOrNull(bukkitStack: BukkitStack): CompoundBinaryTag? {
+    fun getNbtOrNull(bukkitStack: BukkitStack): CompoundBinaryTag? {
         if (bukkitStack is CraftItemStack) {
             // If handle is null, that means this Bukkit item is not backed by an NMS item
-            // If tag is null, that means this item simply does not have any NBT tag
-            return bukkitStack.handle?.tag?.asAdventureCompound
+            // If tag is null, that means this item simply does not have any NBT tags
+            return bukkitStack
+                .handle
+                ?.tag
+                ?.asAdventureCompound
         }
-        return null // The item is an ItemStack
+        return null // The item is a strictly-Bukkit stack
     }
 
     /**
@@ -49,31 +58,47 @@ class ItemStackNms {
      * - the [bukkitStack] is not backed by NMS item stack
      * - the [bukkitStack] is either air or the stack has a size of 0
      */
-    fun modifyNbt(
+    fun setNbt(
         bukkitStack: BukkitStack,
-        mutator: CompoundBinaryTag.() -> CompoundBinaryTag,
+        setter: CompoundBinaryTag.Builder.() -> Unit,
     ) {
         if (bukkitStack is CraftItemStack && !bukkitStack.isEmpty) {
-            bukkitStack.handle.tag = mutator(bukkitStack.handle.orCreateTag.asAdventureCompound).asMojangCompound
+            val adventureCompound = bukkitStack
+                .handle
+                .orCreateTag
+                .asAdventureCompound
+            val adventureCompoundBuilder = CompoundBinaryTag.builder()
+                .put(adventureCompound)
+                .apply(setter)
+            bukkitStack.handle.tag = adventureCompoundBuilder
+                .build()
+                .asMojangCompound
         }
     }
 
     /**
      * Modifies NBT of the [bukkitStack] and returns a modified copy of it.
-     *
-     * This function leaves the [bukkitStack] intact.
+     * This function will leave the [bukkitStack] intact.
      */
     fun copyWriteNbt(
         bukkitStack: BukkitStack,
-        mutator: CompoundBinaryTag.() -> CompoundBinaryTag,
+        setter: CompoundBinaryTag.Builder.() -> Unit,
     ): BukkitStack {
         val mojangStack: MojangStack = CraftItemStack.asNMSCopy(bukkitStack)
-        mojangStack.tag = mutator(mojangStack.orCreateTag.asAdventureCompound).asMojangCompound
+        val adventureCompound = mojangStack
+            .orCreateTag
+            .asAdventureCompound
+        val adventureCompoundBuilder = CompoundBinaryTag.builder()
+            .put(adventureCompound)
+            .apply(setter)
+        mojangStack.tag = adventureCompoundBuilder
+            .build()
+            .asMojangCompound
         return mojangStack.asBukkitMirror()
     }
 }
 
-private val CompoundTag.asAdventureCompound: CompoundBinaryTag
+internal val CompoundTag.asAdventureCompound: CompoundBinaryTag
     get() {
         val arrayOutputStream = FastByteArrayOutputStream()
         val dataOutputStream = DataOutputStream(arrayOutputStream)
@@ -82,7 +107,7 @@ private val CompoundTag.asAdventureCompound: CompoundBinaryTag
         return BinaryTagIO.reader().read(dataInputStream)
     }
 
-private val CompoundBinaryTag.asMojangCompound: CompoundTag
+internal val CompoundBinaryTag.asMojangCompound: CompoundTag
     get() {
         val arrayOutputStream = FastByteArrayOutputStream()
         BinaryTagIO.writer().write(this, arrayOutputStream)

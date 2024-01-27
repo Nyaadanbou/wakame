@@ -29,30 +29,42 @@ dependencies {
     // internal
     compileOnly(libs.asm) // provided by Paper runtime
     compileOnly(libs.asm.commons) // provided by Paper runtime
+    implementation(project(":wakame:wakame-common"))
     implementation(project(":wakame:wakame-api"))
+    implementation(project(":wakame:wakame-ext"))
     implementation(project(":wakame:wakame-nms", configuration = "reobf"))
     implementation(project(":spatula:koin"))
     // implementation(project(":spatula:bukkit:message")) // TODO use adventure global translator
     implementation(project(":spatula:bukkit:utils"))
-    implementation(libs.configurate.yaml) { exclude("com.google.errorprone") }
-    implementation(libs.configurate.extra.kotlin)
+    implementation(libs.configurate.yaml) {
+        exclude("io.leangen.geantyref") // provided by Paper runtime
+        exclude("com.google.errorprone")
+    }
+    implementation(libs.configurate.extra.kotlin) {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+        exclude("xyz.xenondevs.configurate")
+    }
     implementation(libs.caffeine) {
         exclude("com.google.errorprone")
         exclude("org.checkerframework")
     }
     val adventureVersion = "4.15.0"
-    implementation("net.kyori", "adventure-nbt", adventureVersion)
+    implementation("net.kyori", "adventure-nbt", adventureVersion) {
+        exclude("net.kyori") // provided by Paper runtime
+    }
     val creativeVersion = "1.1.0"
     implementation("team.unnamed", "creative-api", creativeVersion) {
-        exclude("net.kyori", "adventure-api")
-        exclude("net.kyori", "adventure-key")
+        exclude("net.kyori")
         exclude("org.jetbrains", "annotations")
     }
     implementation("team.unnamed", "creative-serializer-minecraft", creativeVersion) {
+        exclude("net.kyori")
+        exclude("com.google.code.gson")
         exclude("team.unnamed", "creative-api")
-        exclude("com.google.code.gson", "gson")
     }
     implementation("team.unnamed", "creative-server", creativeVersion) {
+        exclude("net.kyori")
         exclude("team.unnamed", "creative-api")
     }
 

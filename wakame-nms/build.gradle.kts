@@ -17,6 +17,7 @@ dependencies {
 
     // internal
     compileOnly("net.kyori:adventure-nbt:4.14.0")
+    compileOnly(project(":wakame:wakame-common"))
 }
 
 tasks {

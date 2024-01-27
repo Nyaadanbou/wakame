@@ -10,7 +10,10 @@ fun CompoundBinaryTag.contains(key: String, type: BinaryTagType<*>): Boolean =
 /* Nullable getters */
 
 fun CompoundBinaryTag.getBooleanOrNull(key: String): Boolean? =
-    if (this.contains(key, BinaryTagTypes.BYTE)) getByte(key) != 0.toByte() else null
+    if (this.contains(key, BinaryTagTypes.BYTE)) {
+        val zero: Byte = 0
+        getByte(key) != zero
+    } else null
 
 fun CompoundBinaryTag.getByteOrNull(key: String): Byte? =
     if (this.contains(key, BinaryTagTypes.BYTE)) (get(key) as NumberBinaryTag).byteValue() else null
