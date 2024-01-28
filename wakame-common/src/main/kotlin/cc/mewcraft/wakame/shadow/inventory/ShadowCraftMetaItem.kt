@@ -35,7 +35,7 @@ private class UnhandledTagsShadowingStrategy : Wrapper, Unwrapper {
     }
 
     override fun unwrap(wrappedClass: Class<*>?, shadowFactory: ShadowFactory): Class<*> {
-        return shadowFactory.getTargetClass(requireNotNull(wrappedClass))
+        return shadowFactory.targetClass(requireNotNull(wrappedClass))
     }
 }
 

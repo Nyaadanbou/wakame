@@ -156,5 +156,8 @@ fun compoundShadowTag(builder: CompoundShadowTag.() -> Unit): CompoundShadowTag 
 fun listShadowTag(builder: ListShadowTag.() -> Unit): ListShadowTag =
     ListShadowTag.create().apply(builder)
 
-fun listShadowTag(vararg tags: ShadowTag): ListShadowTag =
-    listShadowTag { tags.forEach(::add) }
+fun listShadowTag(vararg tags: ShadowTag): ListShadowTag {
+    val list = tags.asList()
+    val type = list.first().type
+    return ListShadowTag.create(list, type)
+}
