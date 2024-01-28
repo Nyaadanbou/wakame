@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.shadow.inventory
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
-import me.lucko.helper.shadows.nbt2.ShadowTag
+import me.lucko.helper.shadows.nbt.ShadowTag
 import me.lucko.shadow.*
 import me.lucko.shadow.ShadowingStrategy.Unwrapper
 import me.lucko.shadow.ShadowingStrategy.Wrapper

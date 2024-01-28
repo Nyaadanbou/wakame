@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.util
 
-import me.lucko.helper.nbt2.ShadowTagType
-import me.lucko.helper.shadows.nbt2.*
+import me.lucko.helper.nbt.ShadowTagType
+import me.lucko.helper.shadows.nbt.*
 
 object ShadowNbtUtils {
 

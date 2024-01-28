@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.shadow.inventory.ShadowCraftMetaItem
-import me.lucko.helper.shadows.nbt2.CompoundShadowTag
-import me.lucko.helper.shadows.nbt2.ShadowTag
+import me.lucko.helper.shadows.nbt.CompoundShadowTag
+import me.lucko.helper.shadows.nbt.ShadowTag
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
 import net.kyori.adventure.nbt.CompoundBinaryTag

@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.test
 
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent
-import me.lucko.helper.nbt2.ShadowTagType
-import me.lucko.helper.shadows.nbt2.CompoundShadowTag
-import me.lucko.helper.shadows.nbt2.IntShadowTag
-import me.lucko.helper.shadows.nbt2.ListShadowTag
-import me.lucko.helper.shadows.nbt2.ShortShadowTag
+import me.lucko.helper.nbt.ShadowTagType
+import me.lucko.helper.shadows.nbt.CompoundShadowTag
+import me.lucko.helper.shadows.nbt.IntShadowTag
+import me.lucko.helper.shadows.nbt.ListShadowTag
+import me.lucko.helper.shadows.nbt.ShortShadowTag
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.kyori.examination.string.StringExaminer
 import org.bukkit.Material
