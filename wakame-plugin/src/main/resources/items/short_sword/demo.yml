@@ -1,18 +1,18 @@
 # !!! 所有内容均区分大小写 !!!
 
-# 唯一标识，生成工具：https://www.uuidgenerator.net/version4
+# 唯一标识，生成工具：https://www.uuidgenerator.net/version7
 uuid: cfee549f-e4d7-4574-b104-92d8251ebee4
 
 # 原版物品
 material: wooden_sword
 
 # 名字
-display_name: "<red>Demo"
+display_name: "<red>Demo Short Sword"
 
 # 描述
 lore:
-  - "<gold>Demo 1"
-  - "<gold>Demo 2"
+  - "<gold>Demo Lore 1"
+  - "<gold>Demo Lore 2"
 
 # 皮肤
 # 如有设置，则物品自带预设的皮肤
@@ -20,14 +20,19 @@ lore:
 skin: demo_1
 
 # 等级
-# 如果写 "context"，则根据玩家的冒险等级生成
+# 如果写 "ADVENTURE_LEVEL"，则根据玩家的冒险等级生成
+# 如果写 "EXPERIENCE_LEVEL"，则根据玩家的经验等级生成（原版经验等级）
 # 如果写 <正整数>，则始终以这里指定的物品等级生成
-level: context
+level: EXPERIENCE_LEVEL
+#level: ADVENTURE_LEVEL
+#level: 32
 
 # 稀有度
-# 如果写 "context"，则根据玩家的冒险等级生成
-# 如果写 <稀有度名>，则始终以这里指定的稀有度生成
-rarity: context
+# 如果写 "mapping:<唯一标识>"，则根据唯一标识对应的映射生成
+# 如果写 "rarity:<稀有度名>"，则始终以这里指定的稀有度生成
+# 如果不写，则使用唯一标识为 "global" 的映射生成
+rarity: mapping:demo_1
+#rarity: rarity:ancient
 
 # 元素标识
 elements:
@@ -66,39 +71,39 @@ kizami:
 # 词条栏
 slots:
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
-    content: group_a # 该词条栏所使用的词条组 id，词条将从组中的一个池中选择
-    condition: group_a # 该词条栏所使用的条件组 id，条件将从组中的一个池中选择
     can_reforge: true # 该词条栏是否可重铸
     can_override: false # 该词条栏是否可以被玩家自由修改和覆盖
     keep_empty: false # 该词条栏在生成时如果没有词条被选中的话，是否在物品上保留空的词条栏
+    content: group_a # 该词条栏所使用的词条组 id，从 slot_groups 中选择
+    condition: group_a # 该词条栏所使用的条件组 id，从 slot_condition_groups 中选择
   - id: b
+    can_reforge: true
+    can_override: false
+    keep_empty: false
     content: group_b
     condition: group_b
+  - id: c
     can_reforge: true
     can_override: false
     keep_empty: false
-  - id: c
     content: group_c
     condition: group_c
-    can_reforge: true
-    can_override: false
-    keep_empty: false
   - id: d
-    content: group_d # TODO 词条组是不是也可以不写，表示这就是个空栏？
-    # condition: group_c # 条件组可以省略不写，意思就是没有条件限制
     can_reforge: false
     can_override: false
     keep_empty: false
+    # content: group_d # 词条组可以省略不写，表示这就是个空栏
+    # condition: group_c # 条件组可以省略不写，标识没有解锁条件
   - id: e
+    can_reforge: false
+    can_override: false
+    keep_empty: false
     content: group_e
-    can_reforge: false
-    can_override: false
-    keep_empty: false
   - id: f
-    content: group_f
     can_reforge: false
     can_override: false
     keep_empty: false
+    content: group_f
 
 # 词条组
 # 词条组将按照配置文件里的顺序，逐个生成内容，放入词条栏
@@ -132,7 +137,7 @@ slot_groups:
               base: 0.75
               spread: 0.1
               max: 0.2
-          - key: attribute:critical_strike_rate
+          - key: attribute:critical_strike_power
             weight: 1
             operation: add
             value: 0.52 # 固定数值
@@ -153,7 +158,7 @@ slot_groups:
           - key: attribute:critical_strike_chance
             weight: 1
             value: 0.5
-          - key: attribute:critical_strike_rate
+          - key: attribute:critical_strike_power
             weight: 1
             value: 0.25
             conditions:
@@ -328,7 +333,6 @@ slot_condition_groups:
           - type: rarity
             rarity: common
         entries:
-          # TODO 条件的数值要不要也支持正态分布？如果要的话，那条件的数据就必须存在 NBT 里
           - key: condition:entity_kills
             weight: 1
             index: demo_bosses_1

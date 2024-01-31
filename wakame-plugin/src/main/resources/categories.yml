@@ -1,0 +1,18 @@
+# 类别
+
+# 物品浏览器
+item_browser:
+
+  demo_category_1: # 类别的唯一标识
+    icon: wakame:ruby # 类别的物品图标
+    name: "menu.wakame.items.category.demo.1" # 类别的展示名字
+    priority: 0 # 类别的优先级
+    items: # 类别所包含的物品
+      - wakame:ruby
+
+  demo_category_2:
+    icon: wakame:ruby
+    name: "menu.wakame.items.category.demo.2"
+    priority: 1
+    items:
+      - wakame:ruby

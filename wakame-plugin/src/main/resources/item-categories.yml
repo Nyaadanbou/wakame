@@ -1,8 +1,0 @@
-# 物品的 GUI 浏览器分类
-
-demo_category:
-  icon: wakame:ruby
-  name: "menu.wakame.items.category.demo"
-  priority: 0
-  items:
-    - wakame:ruby

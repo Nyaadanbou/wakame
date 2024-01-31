@@ -1,0 +1,28 @@
+# 实体 Entities
+
+# 实体索引表（目前仅用于条件判断）
+references:
+
+  demo_bosses_1: # 索引的唯一标识
+    - minecraft:ender_dragon # 原版怪物 minecraft:_value_（必须小写）
+    - minecraft:wither # 可用值参考 https://jd.papermc.io/paper/1.20/org/bukkit/entity/EntityType.html
+
+  demo_bosses_2:
+    - mythicmobs:soul_knight # MM 怪物 mythicmobs:_value_（必须小写）
+    - mythicmobs:nature_golem
+
+  demo_bosses_3:
+    - mythicmobs:king_slime
+    - mythicmobs:eye_of_cthulhu
+
+  demo_creeps_1:
+    - minecraft:zombie
+    - minecraft:skeleton
+
+  demo_creeps_2:
+    - mythicmobs:flying_fish
+    - mythicmobs:goblin_thief
+
+  demo_creeps_3:
+    - mythicmobs:mister_stabby
+    - mythicmobs:snow_balla

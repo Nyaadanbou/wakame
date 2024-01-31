@@ -1,0 +1,7 @@
+# 弹射物
+
+# 弹射物资源设置
+assets:
+  projectile-demo:
+    model: path/to/model/json
+    sound: path/to/sound/key

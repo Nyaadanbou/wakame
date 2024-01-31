@@ -1,0 +1,45 @@
+# 渲染器
+
+# 渲染器负责修改 ItemStack 的网络封包
+# 将其 NBT 的 `tags.display` 标签下的内容
+# 根据此配置文件定义的格式进行修改
+
+# 物品 name 的呈现
+name-render: "<meta:name>"
+
+# 物品 lore 的呈现
+lore-render:
+  # meta
+  - "等级: <meta:level>"
+  - "稀有度: <meta:rarity>"
+  - "元素: <meta:element>"
+  - "铭刻: <meta:kizami>"
+  - "皮肤: <meta:skin>"
+  - "描述: <meta:lore>"
+  # attribute
+  - "全元素攻击: <attribute:attack_damage:universal>" # 带参数的占位符：<attribute:attack_damage:_element_>
+  - "无元素攻击: <attribute:attack_damage:neutral>"
+  - "火元素攻击: <attribute:attack_damage:fire>"
+  - "水元素攻击: <attribute:attack_damage:water>"
+  - "风元素攻击: <attribute:attack_damage:wind>"
+  - "土元素攻击: <attribute:attack_damage:earth>"
+  - "雷元素攻击: <attribute:attack_damage:thunder>"
+  - "元素叠加: <attribute:attack_effect_chance>"
+  - "攻击速度: <attribute:attack_speed_level>"
+  - "暴击概率: <attribute:critical_strike_chance>"
+  - "暴击伤害: <attribute:critical_strike_power>"
+  - "伤害承受: <attribute:damage_taken_rate>"
+  - "防御力: <attribute:defense>"
+  - "防御穿透: <attribute:defense_penetration>"
+  - "防御穿透率: <attribute:defense_penetration_rate>"
+  - "生命恢复: <attribute:health_regeneration>"
+  - "攻击吸血: <attribute:lifesteal>"
+  - "攻击吸血率: <attribute:lifesteal_rate>"
+  - "魔法消耗: <attribute:mana_consumption_rate>"
+  - "魔法恢复: <attribute:mana_regeneration>"
+  - "魔法汲取: <attribute:manasteal>"
+  - "魔法汲取率: <attribute:manasteal_rate>"
+  - "最大护盾: <attribute:max_absorption>"
+  - "最大生命: <attribute:max_health>"
+  - "最大魔法: <attribute:max_mana>"
+  - "移动速率: <attribute:movement_speed_rate>"
