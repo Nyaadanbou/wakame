@@ -112,6 +112,13 @@ class TestListener : Listener {
                 // add to inv
                 inventory.addItem(bukkitStack)
             }
+
+            "s5" -> {
+                val nbtOrNull = inventory.itemInMainHand.wakameCompoundOrNull
+                nbtOrNull?.run {
+                    putInt("in_place", 233)
+                }
+            }
         }
     }
 
