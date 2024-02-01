@@ -5,10 +5,10 @@
 # 根据此配置文件定义的格式进行修改
 
 # 物品 name 的呈现
-name-render: "<meta:name>"
+name_render: "<meta:name>"
 
 # 物品 lore 的呈现
-lore-render:
+lore_render:
   # meta
   - "等级: <meta:level>"
   - "稀有度: <meta:rarity>"

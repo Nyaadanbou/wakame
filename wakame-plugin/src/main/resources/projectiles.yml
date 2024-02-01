@@ -2,6 +2,6 @@
 
 # 弹射物资源设置
 assets:
-  projectile-demo:
+  projectile_demo:
     model: path/to/model/json
     sound: path/to/sound/key

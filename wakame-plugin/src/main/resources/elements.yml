@@ -5,29 +5,29 @@ elements:
 
   # 通用元素，设定上影响所有元素效果
   universal: # 元素的 name，一旦确定不要修改
-    binary-index: 127 # 元素的二进制索引，一旦确定不要修改
-    display-name: 通用 # 元素的展示名字，也是玩家看到的元素名字
+    binary_index: 127 # 元素的二进制索引，一旦确定不要修改
+    display_name: 通用 # 元素的展示名字，也是玩家看到的元素名字
 
   neutral:
-    binary-index: 0
-    display-name: 中立 # FIXME 也叫做混沌？
+    binary_index: 0
+    display_name: 中立 # 混沌
 
   fire:
-    binary-index: 1
-    display-name: 火
+    binary_index: 1
+    display_name: 火
 
   water:
-    binary-index: 2
-    display-name: 水
+    binary_index: 2
+    display_name: 水
 
   wind:
-    binary-index: 3
-    display-name: 风
+    binary_index: 3
+    display_name: 风
 
   earth:
-    binary-index: 4
-    display-name: 土
+    binary_index: 4
+    display_name: 土
 
   thunder:
-    binary-index: 5
-    display-name: 雷
+    binary_index: 5
+    display_name: 雷
