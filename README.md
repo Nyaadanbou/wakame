@@ -94,7 +94,7 @@ Compound('wakame')
     Byte('lvl'): 12b // 等级
     Byte('rarity'): 0b // 稀有度
     ByteArray('kizami'): [0b, 3b] // 铭刻
-    ByteArray('elem'): [1b, 2b] // 元素（可能根本不需要）
+    ByteArray('elem'): [1b, 2b] // 元素
     Short('skin'): 35s // 皮肤 ID
     IntArray('skin_owner'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
   Compound('slots') // 词条栏
@@ -175,11 +175,12 @@ Compound('wakame')
       Short('mythicmobs:skeleton_king'): 11s
       Short('mythicmobs:sister'): 0s // 数量为 0 则实际不会储存在 NBT
     Compound('peak_damage')
-      Short('fire'): 12s
-      Short('metal'): 5s
+      Short('neutral'): 55s
+      Short('fire'): 5s
       Short('water'): 30s
+      Short('wind'): 0s
       Short('earth'): 0s // 没有造成过伤害的元素，不需要写进 NBT，意为 0
-      Short('wood'): 0s
+      Short('thunder'): 12s
     Compound('reforge')
       Byte('count'): 38b // 重铸总次数
       Short('cost'): 32767s // 重铸总花费
