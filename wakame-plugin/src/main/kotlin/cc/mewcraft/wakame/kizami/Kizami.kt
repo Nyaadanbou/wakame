@@ -1,8 +1,8 @@
-package cc.mewcraft.wakame.rarity
+package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.BiIdentified
 
-data class Rarity internal constructor(
+data class Kizami internal constructor(
     override val name: String,
     override val binary: Byte,
     /**
@@ -10,14 +10,15 @@ data class Rarity internal constructor(
      */
     val displayName: String,
 ) : BiIdentified<String, Byte> {
-    override fun hashCode(): Int {
-        return name.hashCode()
+    override fun equals(other: Any?): Boolean {
+        return if (other is Kizami) {
+            other.name == name
+        } else {
+            false
+        }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (other is Rarity) {
-            return other.name == name
-        }
-        return false
+    override fun hashCode(): Int {
+        return name.hashCode()
     }
 }

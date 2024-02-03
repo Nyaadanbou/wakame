@@ -2,21 +2,20 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
-import cc.mewcraft.wakame.util.require
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.StringQualifier
 import org.koin.core.qualifier.named
 
-object RarityRegistry : KoinComponent, Initializable, Reloadable,
-    Registry<String, Rarity> by RegistryBase(),
-    BiMapRegistry<String, Byte> by BiMapRegistryBase() {
+object ItemSkinRegistry : KoinComponent, Initializable, Reloadable,
+    Registry<String, ItemSkin> by RegistryBase(),
+    BiMapRegistry<String, Short> by BiMapRegistryBase() {
 
     // constants
-    val CONFIG_LOADER_QUALIFIER: StringQualifier = named("rarity_config_loader")
+    val CONFIG_LOADER_QUALIFIER: StringQualifier = named("item_skin_config_loader")
 
     // configuration stuff
     private val configLoader: NekoConfigurationLoader by inject(CONFIG_LOADER_QUALIFIER)
@@ -24,17 +23,14 @@ object RarityRegistry : KoinComponent, Initializable, Reloadable,
 
     private fun loadConfiguration() {
         configNode = configLoader.load()
-        configNode.childrenList().forEach { n ->
-            val rarity = n.require<Rarity>()
-            registerBothMapping(rarity.name, rarity)
-        }
-    }
-
-    override fun onPreWorld() {
-        loadConfiguration()
+        // TODO read config and populate values
     }
 
     override fun onReload() {
+        loadConfiguration()
+    }
+
+    override fun onPreWorld() {
         loadConfiguration()
     }
 }
