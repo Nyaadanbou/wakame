@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.shadow.inventory.ShadowItemStack
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import me.lucko.shadow.bukkit.BukkitShadowFactory
-import me.lucko.shadow.bukkit.PackageVersion
 import me.lucko.shadow.shadow
+import me.lucko.shadow.targetClass
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import org.bukkit.Bukkit
@@ -25,7 +25,7 @@ object ItemStackShadowNbt {
     private const val ROOT_COMPOUND_NAME = "wakame"
 
     /**
-     * Gets the wakame compound tag from [itemStack]. If the wakame compound
+     * Gets the wakame compound tag from [itemStack]. If the `wakame` compound
      * tag does not already exist, a new compound tag will be created and
      * **saved** to the [itemStack].
      */
@@ -43,7 +43,7 @@ object ItemStackShadowNbt {
 
     /**
      * Sets the wakame compound tag as [value] for [itemStack], **overwriting**
-     * any existing wakame compound tag.
+     * any existing `wakame` compound tag.
      */
     @Contract(mutates = "param1")
     fun setWakameCompound(itemStack: ItemStack, value: CompoundShadowTag) {
@@ -56,9 +56,9 @@ object ItemStackShadowNbt {
     }
 
     /**
-     * Gets the wakame compound tag from [itemStack] or null, if it does
-     * not exist. Unlike [getWakameCompound], which possibly modifies the
-     * item's NBT tags, this function will leave the [itemStack] **intact**.
+     * Gets the `wakame` compound tag from [itemStack] or null, if it does not
+     * exist. Unlike [getWakameCompound], which possibly modifies the item's
+     * NBT tags, this function will leave the [itemStack] **intact**.
      */
     @Contract(pure = true)
     fun getWakameCompoundOrNull(itemStack: ItemStack): CompoundShadowTag? {
@@ -126,7 +126,7 @@ internal val ItemStack.backingItemMeta: ItemMeta?
 
 internal val ItemStack.handle: MojangStack?
     get() {
-        val obcClass = PackageVersion.runtimeVersion().obcClass("inventory.CraftItemStack")
+        val obcClass = BukkitShadowFactory.global().targetClass<ShadowCraftItemStack0>()
         if (obcClass.isInstance(this)) { // Use shadow to avoid versioned CB package import
             val shadow = BukkitShadowFactory.global().shadow<ShadowCraftItemStack0>(this)
             return shadow.getHandle()
