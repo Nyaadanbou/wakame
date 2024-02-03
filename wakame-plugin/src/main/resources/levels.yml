@@ -3,7 +3,7 @@
 # 等级->稀有度的映射组（全局）
 # 当没有指定时，将使用全局映射组
 # 该映射组的唯一标识为固定的 "global"
-global-rarity-mappings:
+global_rarity_mappings:
 
   # 映射的唯一标识
   tier_1:
@@ -57,7 +57,7 @@ global-rarity-mappings:
 
 # 等级->稀有度的映射组（自定义）
 # 可以引用这里的映射组标识，以直接使用这里的映射组
-custom-rarity-mappings:
+custom_rarity_mappings:
 
   # 映射组的唯一标识（注意这里多了一级缩进）
   demo_1:
