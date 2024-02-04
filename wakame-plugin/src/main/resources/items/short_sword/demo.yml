@@ -30,42 +30,36 @@ level: EXPERIENCE_LEVEL
 # 稀有度
 # 如果写 "mapping:<唯一标识>"，则根据唯一标识对应的映射生成
 # 如果写 "rarity:<稀有度名>"，则始终以这里指定的稀有度生成
-# 如果不写，则使用唯一标识为 "global" 的映射生成
+# 如果不写，则相当于 "mapping:global"
 rarity: mapping:demo_1
 #rarity: rarity:ancient
 
 # 元素标识
 elements:
   sample: 2 # 抽选 n 个元素作为该物品的元素标识
+  conditions: [ ] # 代码上支持写条件，但可能没用
   entries: # 候选的元素标识，以及它们各自的权重
-    - key: meta:element
-      value: neutral
+    - value: neutral
       weight: 2
-    - key: meta:element
-      value: water
+    - value: water
       weight: 1
-    - key: meta:element
-      value: fire
+    - value: fire
       weight: 1
-    - key: meta:element
-      value: wind
+    - value: wind
       weight: 1
 
 # 铭刻标识
 kizami:
   sample: 2 # 抽选 n 个铭刻作为该物品的铭刻标识
+  conditions: [ ] # 代码上支持写条件，但可能没用
   entries: # 候选的铭刻标识，以及它们各自的权重
-    - key: meta:kizami
-      value: iron
+    - value: iron
       weight: 2
-    - key: meta:kizami
-      value: gold
+    - value: gold
       weight: 1
-    - key: meta:kizami
-      value: diamond
+    - value: diamond
       weight: 1
-    - key: meta:kizami
-      value: netherite
+    - value: netherite
       weight: 1
 
 # 词条栏
@@ -196,7 +190,7 @@ slot_groups:
           - key: attribute:defense
             weight: 1
             value: 23
-            meta: x1 # 为该项指定一个元数据（string），当该项被选中时，指定的元数据将被加入到上下文中
+            mark: x1y1z1 # 为该项指定一个印记（string），当该项被选中时，指定的印记将被加入到上下文中
     fallback:
       - key: attribute:attack_speed_level
         weight: 1
@@ -224,8 +218,8 @@ slot_groups:
             weight: 99
             value: 0.25
             conditions:
-              - type: sample_meta # 该类型条件将检查物品生成的上下文中是否有指定的元数据存在
-                meta: x1 # 如果已经存在值为 x1 的元数据，则该项在随机选择前会被排除掉
+              - type: mark # 该类型条件将检查物品生成的上下文中是否有指定的印记存在
+                mark: x1y1z1 # 如果已经存在值为 "x1y1z1" 的印记，则该项会在随机选择开始前被排除掉
     fallback:
       - key: attribute:max_health
         weight: 1
