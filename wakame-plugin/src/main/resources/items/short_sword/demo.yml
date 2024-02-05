@@ -9,15 +9,20 @@ material: wooden_sword
 # 名字
 display_name: "<red>Demo Short Sword"
 
-# 描述
+# 描述（可选）
 lore:
   - "<gold>Demo Lore 1"
   - "<gold>Demo Lore 2"
 
-# 皮肤
+# 皮肤（可选）
 # 如有设置，则物品自带预设的皮肤
-# 这种情况下，皮肤的所有者为匿名
+# 这种情况下，皮肤的所有者为无
 skin: demo_1
+
+# 皮肤所有者（可选）
+# 可以手动设置初始皮肤的所有者
+# 写玩家的 UUID (Mojang)
+skin_owner: 018d7949-3756-7c0a-8fce-eaa176a37aee
 
 # 等级
 # 如果写 "ADVENTURE_LEVEL"，则根据玩家的冒险等级生成
@@ -37,7 +42,7 @@ rarity: mapping:demo_1
 # 元素标识
 elements:
   sample: 2 # 抽选 n 个元素作为该物品的元素标识
-  conditions: [ ] # 代码上支持写条件，但可能没用
+  conditions: [ ] # 实现上支持写条件，但没实际作用
   entries: # 候选的元素标识，以及它们各自的权重
     - value: neutral
       weight: 2
@@ -47,11 +52,14 @@ elements:
       weight: 1
     - value: wind
       weight: 1
+      conditions: # 这里支持写筛选的条件
+        - type: element
+          element: water
 
-# 铭刻标识
+# 铭刻标识（可选）
 kizami:
   sample: 2 # 抽选 n 个铭刻作为该物品的铭刻标识
-  conditions: [ ] # 代码上支持写条件，但可能没用
+  conditions: [ ] # 实现上支持写条件，但没实际作用
   entries: # 候选的铭刻标识，以及它们各自的权重
     - value: iron
       weight: 2
@@ -61,6 +69,9 @@ kizami:
       weight: 1
     - value: netherite
       weight: 1
+      conditions: # 这里支持写筛选的条件
+        - type: element
+          element: water
 
 # 词条栏
 slots:
@@ -110,7 +121,7 @@ slot_groups:
     conditions:
       - type: rarity
         rarity: common
-    pools:
+    selectors:
       pool_1: # 该词条组的一个候选池，取值必须在本堆中不重复
         conditions: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
           - type: rarity
@@ -160,7 +171,7 @@ slot_groups:
             conditions:
               - type: item_level
                 level: "[10,)"
-    fallback: # 备用池，固定写成 fallback，如果 pools 中没有满足条件的 pool，将使用备用池
+    default: # 备用池，固定写成 default，如果 pools 中没有满足条件的 pool，将使用备用池
       - key: attribute:attack_damage
         weight: 1
         element: neutral
@@ -175,7 +186,7 @@ slot_groups:
   # 词条组：group_b
   group_b:
     conditions: [ ]
-    pools:
+    selectors:
       pool_1:
         conditions:
           - type: rarity
@@ -191,7 +202,7 @@ slot_groups:
             weight: 1
             value: 23
             mark: x1y1z1 # 为该项指定一个印记（string），当该项被选中时，指定的印记将被加入到上下文中
-    fallback:
+    default:
       - key: attribute:attack_speed_level
         weight: 1
         value: 2
@@ -202,7 +213,7 @@ slot_groups:
   # 词条组：group_c
   group_c:
     conditions: [ ]
-    pools:
+    selectors:
       pool_1:
         conditions:
           - type: rarity
@@ -220,7 +231,7 @@ slot_groups:
             conditions:
               - type: mark # 该类型条件将检查物品生成的上下文中是否有指定的印记存在
                 mark: x1y1z1 # 如果已经存在值为 "x1y1z1" 的印记，则该项会在随机选择开始前被排除掉
-    fallback:
+    default:
       - key: attribute:max_health
         weight: 1
         value: 20
@@ -231,8 +242,8 @@ slot_groups:
   # 词条组：group_d
   group_d:
     conditions: [ ]
-    pools: { }
-    fallback: # 这是一个只有固定内容的词条栏的基本写法
+    selectors: { }
+    default: # 这是一个只有固定内容的词条栏的基本写法
       - key: attribute:lifesteal
         weight: 10
         value: 0.2
@@ -243,7 +254,7 @@ slot_groups:
   # 词条组：group_e
   group_e:
     conditions: [ ]
-    pools:
+    selectors:
       fire:
         conditions:
           - type: element
@@ -298,12 +309,12 @@ slot_groups:
             weight: 8
             element: wind
             value: 0.56
-    fallback: [ ] # 这里没有定义 fallback
+    default: [ ] # 这里没有定义 fallback
 
   # 词条组：group_f
   group_f:
     conditions: [ ]
-    pools:
+    selectors:
       ability: # 这个池的 id
         entries:
           - key: ability:blink
@@ -316,14 +327,14 @@ slot_groups:
             mana: 12
             cooldown: 4
             damage: 8 * damage # 技能伤害为 8 倍的玩家所有元素伤害之和
-    fallback: [ ]
+    default: [ ]
 
 # 词条栏的使用条件组
 slot_condition_groups:
 
   # 自定义条件组：group_a
   group_a:
-    pools:
+    selectors:
       common:
         conditions:
           - type: rarity
@@ -341,7 +352,7 @@ slot_condition_groups:
             weight: 1
             index: demo_bosses_3
             count: 2
-    fallback:
+    default:
       - key: condition:entity_kills
         weight: 1
         index: demo_creeps_1
@@ -357,7 +368,7 @@ slot_condition_groups:
 
   # 自定义条件组：group_b
   group_b:
-    pools:
+    selectors:
       common:
         conditions:
           - type: rarity
@@ -371,7 +382,7 @@ slot_condition_groups:
             weight: 1
             element: water
             amount: 32
-    fallback:
+    default:
       - key: condition:highest_damage
         weight: 1
         element: fire

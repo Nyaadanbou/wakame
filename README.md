@@ -111,7 +111,7 @@ Compound('wakame')
         Byte('success'): 5b // 重铸成功的次数
         Byte('failure'): 1b // 重铸失败的次数
       Compound('condition') // 词条栏的解锁条件
-        String('id'): 'condition:entity_kills' // 条件的种类，这里是实体击杀
+        String('id'): 'entity_kills' // 条件的种类，这里是实体击杀
         String('index'): 'demo_bosses_1' // 要求的击杀种类
         Short('count'): 18s // 要求的击杀数量
     Compound('b')
