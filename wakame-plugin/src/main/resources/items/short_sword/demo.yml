@@ -343,28 +343,28 @@ curse_groups:
           - type: rarity
             rarity: common
         entries:
-          - key: condition:entity_kills
+          - key: curse:entity_kills
             index: demo_bosses_1
             count: 2
             weight: 1
-          - key: condition:entity_kills
+          - key: curse:entity_kills
             index: demo_bosses_2
             count: 2
             weight: 1
-          - key: condition:entity_kills
+          - key: curse:entity_kills
             index: demo_bosses_3
             count: 2
             weight: 1
     default:
-      - key: condition:entity_kills
+      - key: curse:entity_kills
         index: demo_creeps_1
         count: 2
         weight: 1
-      - key: condition:entity_kills
+      - key: curse:entity_kills
         index: demo_creeps_2
         count: 2
         weight: 1
-      - key: condition:entity_kills
+      - key: curse:entity_kills
         index: demo_creeps_3
         count: 2
         weight: 1
@@ -378,20 +378,20 @@ curse_groups:
           - type: rarity
             rarity: common
         entries:
-          - key: condition:highest_damage
+          - key: curse:highest_damage
             amount: 20
             element: fire
             weight: 1
-          - key: condition:highest_damage
+          - key: curse:highest_damage
             amount: 32
             element: water
             weight: 1
     default:
-      - key: condition:highest_damage
+      - key: curse:highest_damage
         amount: 10
         element: fire
         weight: 1
-      - key: condition:highest_damage
+      - key: curse:highest_damage
         amount: 16
         element: water
         weight: 1
