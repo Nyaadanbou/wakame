@@ -78,39 +78,39 @@ slots:
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
     content: group_a # 该词条栏所使用的词条组 id，从 slot_groups 中选择
     condition: group_a # 该词条栏所使用的条件组 id，从 slot_condition_groups 中选择
+    keep_empty: false # 该词条栏在生成时如果没有词条被选中的话，是否在物品上保留空的词条栏
     can_reforge: true # 该词条栏是否可重铸
     can_override: false # 该词条栏是否可以被玩家自由修改和覆盖
-    keep_empty: false # 该词条栏在生成时如果没有词条被选中的话，是否在物品上保留空的词条栏
   - id: b
     content: group_b
     condition: group_b
+    keep_empty: false
     can_reforge: true
     can_override: false
-    keep_empty: false
   - id: c
     content: group_c
     condition: group_c
+    keep_empty: false
     can_reforge: true
     can_override: false
-    keep_empty: false
   - id: d
     # content: group_d # 词条组可以省略不写，表示这就是个空栏
     # condition: group_c # 条件组可以省略不写，表示没有解锁条件
+    keep_empty: false
     can_reforge: false
     can_override: false
-    keep_empty: false
   - id: e
     content: group_e
     # condition: group_e
+    keep_empty: false
     can_reforge: false
     can_override: false
-    keep_empty: false
   - id: f
     content: group_f
     # condition: group_f
+    keep_empty: false
     can_reforge: false
     can_override: false
-    keep_empty: false
 
 # 词条组
 # 词条组将按照配置文件里的顺序，逐个生成内容，放入词条栏
