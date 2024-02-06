@@ -7,22 +7,21 @@ import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.StringQualifier
 import org.koin.core.qualifier.named
 
 object ItemSkinRegistry : KoinComponent, Initializable, Reloadable,
-    Registry<String, ItemSkin> by RegistryBase(),
-    BiMapRegistry<String, Short> by BiMapRegistryBase() {
+    Registry<String, ItemSkin> by HashMapRegistry(),
+    BiMapRegistry<String, Short> by HashBiMapRegistry() {
 
-    // constants
-    val CONFIG_LOADER_QUALIFIER: StringQualifier = named("item_skin_config_loader")
+    // empty skin - TEST ONLY
+    val EMPTY_SKIN = ItemSkin("empty", 0, "Empty")
 
     // configuration stuff
-    private val configLoader: NekoConfigurationLoader by inject(CONFIG_LOADER_QUALIFIER)
-    private lateinit var configNode: NekoConfigurationNode
+    private val loader: NekoConfigurationLoader by inject(named(SKIN_CONFIG_LOADER))
+    private lateinit var node: NekoConfigurationNode
 
     private fun loadConfiguration() {
-        configNode = configLoader.load()
+        node = loader.load()
         // TODO read config and populate values
     }
 

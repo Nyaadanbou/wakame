@@ -8,9 +8,14 @@ import java.text.DecimalFormat
 import java.util.concurrent.ThreadLocalRandom
 
 /**
- * Represents a numeric value which optionally:
- * - follows the normal distribution
- * - scales with a given factor
+ * Represents a numeric value which
+ *
+ * **EITHER**:
+ * - is a fixed value
+ *
+ * **OR**
+ * - follows the normal distribution, and/or
+ * - scales with a given scaling factor
  */
 data class NumericValue(
     /**
@@ -156,10 +161,10 @@ data class NumericValue(
         // Calculate "z * sigma", where we call it "spread"
         val spread = if (threshold != null) {
             (randomVariable * sigma).coerceIn(-threshold, threshold)
-            // ^z-score ^sigma        ^min spread ^max spread
+            // ^z-score        ^sigma          ^min spread ^max spread
         } else {
-            (randomVariable * sigma)
-            // ^z-score ^sigma
+            (randomVariable * sigma).coerceIn(-sigma * 2, sigma * 2)
+            // ^z-score        ^sigma          ^min spread ^max spread
         }
 
         // Since the mean (mu) is already scaled,
@@ -177,7 +182,7 @@ data class NumericValue(
      * [Number.toDouble].
      */
     fun calculate(scalingFactor: Number = .0, randomVariable: Number = ThreadLocalRandom.current().nextGaussian()): Double {
-        return calculate(scalingFactor = scalingFactor.toDouble())
+        return calculate(scalingFactor = scalingFactor.toDouble(), randomVariable = randomVariable.toDouble())
     }
 
     /**
@@ -190,7 +195,7 @@ data class NumericValue(
         return calculate(.0)
     }
 
-    class ConfigSerializer : TypeSerializer<NumericValue> {
+    private class ConfigSerializer : TypeSerializer<NumericValue> {
         override fun deserialize(type: Type, node: ConfigurationNode): NumericValue {
             val scalar = node.rawScalar()
             if (scalar != null) {
@@ -199,10 +204,9 @@ data class NumericValue(
             }
 
             val base = node.node("base").apply { require(Double::class.java) }.double
-
             val scale = node.node("scale").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-            val sigma = node.node("sigma").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-            val threshold = node.node("threshold").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+            val sigma = node.node("spread").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+            val threshold = node.node("max").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
 
             return NumericValue(base, scale ?: .0, sigma ?: .0, threshold)
         }
@@ -214,30 +218,30 @@ data class NumericValue(
             /*
                Possible config structures:
 
-               Case 1: (w/o scale and normal distribution)
+               Case 1: (only base)
                    ```
                    node: <base>
                    ```
-               Case 2: (w/o normal distribution)
+               Case 2: (base + scale)
                    ```
                    node:
                        base: <base>
                        scale: <scale>
                    ```
-               Case 3: (w/o scale)
+               Case 3: (base + normal dist)
                    ```
                    node:
                        base: <base>
-                       sigma: <sigma>
-                       threshold: <threshold>
+                       spread: <sigma>
+                       max: <threshold>
                    ```
-               Case 4: (w/ scale and normal distribution)
+               Case 4: (base + scale + normal dist)
                    ```
                    node:
                        base: <base>
                        scale: <scale>
-                       sigma: <sigma>
-                       threshold: <threshold>
+                       spread: <sigma>
+                       max: <threshold>
                    ```
             */
 
@@ -258,10 +262,10 @@ data class NumericValue(
                         }
                         if (isRandom) {
                             // if random is on
-                            node("sigma").set(sigma)
+                            node("spread").set(sigma)
                             if (isBounded) {
                                 // if threshold is set
-                                node("threshold").set(threshold)
+                                node("max").set(threshold)
                             }
                         }
                     }

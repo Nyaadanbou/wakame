@@ -30,6 +30,7 @@ import org.koin.core.component.inject
  */
 class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
     Listener {
+
     private val playerAttributeAccessor: PlayerAttributeAccessor by inject()
     private val compositeTerminable: CompositeTerminable = CompositeTerminable.create()
 
@@ -122,7 +123,7 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
             return ImmutableMultimap.of()
         }
 
-        return waka.slotAccessor.getModifiers()
+        return waka.cellAccessor.getModifiers()
     }
 
     private fun addAttributeModifiers(bukkitItem: ItemStack?, player: Player) {

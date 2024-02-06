@@ -4,7 +4,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 
 /**
- * Just a simple data structure which holds a set of entity [keys][Key].
+ * Just a simple data structure holding a set of entity [keys][Key].
  */
 interface EntityReference {
     /**

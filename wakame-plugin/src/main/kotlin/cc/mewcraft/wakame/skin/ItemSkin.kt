@@ -9,7 +9,7 @@ data class ItemSkin internal constructor(
      * The display name to players.
      */
     val displayName: String,
-) : BiIdentified<String, Short> {
+) : Skin, BiIdentified<String, Short> {
     override fun equals(other: Any?): Boolean {
         return if (other is ItemSkin) {
             other.name == name

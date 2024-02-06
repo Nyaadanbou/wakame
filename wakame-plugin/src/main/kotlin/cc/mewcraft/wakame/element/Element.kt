@@ -18,8 +18,8 @@ data class Element internal constructor(
 ) : BiIdentified<String, Byte> {
     // Instances of this class might be used as map keys
     // So we need to properly implement hashCode() and equals()
-    // FIXME we might not need this because if we don't override hashCode/equals
-    //  the JVM will simply compare the objects by their reference
+    // FIXME we might not need this because if we don't override hashCode/equals,
+    //  the JVM will simply compare the objects by their references.
     //  All element instances are created at the pre-world stage,
     //  and no element instance will be created after that stage.
 

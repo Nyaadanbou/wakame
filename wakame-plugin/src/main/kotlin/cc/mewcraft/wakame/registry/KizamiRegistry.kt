@@ -10,26 +10,23 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
 object KizamiRegistry : KoinComponent, Initializable, Reloadable,
-    Registry<String, Kizami> by RegistryBase(),
-    BiMapRegistry<String, Byte> by BiMapRegistryBase() {
-
-    // constants
-    val CONFIG_LOADER_QUALIFIER = named("kizami_config_loader")
+    Registry<String, Kizami> by HashMapRegistry(),
+    BiMapRegistry<String, Byte> by HashBiMapRegistry() {
 
     // configuration stuff
-    private val configLoader: NekoConfigurationLoader by inject(CONFIG_LOADER_QUALIFIER)
-    private lateinit var configNode: NekoConfigurationNode
+    private val loader: NekoConfigurationLoader by inject(named(KIZAMI_CONFIG_LOADER))
+    private lateinit var node: NekoConfigurationNode
 
     private fun loadConfiguration() {
-        configNode = configLoader.load()
+        node = loader.load()
         // TODO read config and populate values
     }
 
     override fun onPreWorld() {
-        TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun onReload() {
-        TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 }

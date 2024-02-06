@@ -5,37 +5,35 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.rarity.RarityMappings
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
-import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.typedRequire
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.StringQualifier
 import org.koin.core.qualifier.named
 
 /**
  * The registry of `level -> rarity` mappings.
  */
 object RarityMappingRegistry : KoinComponent, Initializable, Reloadable,
-    Registry<String, RarityMappings> by RegistryBase() {
+    Registry<String, RarityMappings> by HashMapRegistry() {
 
     // constants
     const val GLOBAL_RARITY_MAPPING_NAME: String = "global"
-    val CONFIG_LOADER_QUALIFIER: StringQualifier = named("rarity_mapping_config_loader")
 
     // configuration stuff
-    private val configLoader: NekoConfigurationLoader by inject(CONFIG_LOADER_QUALIFIER)
-    private lateinit var configNode: NekoConfigurationNode
+    private val loader: NekoConfigurationLoader by inject(named(RARITY_CONFIG_LOADER))
+    private lateinit var node: NekoConfigurationNode
 
     private fun loadConfiguration() {
-        configNode = configLoader.load()
+        node = loader.load()
 
         // load the `global` mappings
-        val globalRarityMappings = configNode.node("global_rarity_mappings").require<RarityMappings>()
+        val globalRarityMappings = node.node("global_rarity_mappings").typedRequire<RarityMappings>()
         registerName2Object(GLOBAL_RARITY_MAPPING_NAME, globalRarityMappings)
 
         // load all custom mappings
-        configNode.node("custom_rarity_mappings").childrenMap().forEach { (k, n) ->
+        node.node("custom_rarity_mappings").childrenMap().forEach { (k, n) ->
             val rarityMappingsName = k.toString()
-            val rarityMappings = n.require<RarityMappings>()
+            val rarityMappings = n.typedRequire<RarityMappings>()
             registerName2Object(rarityMappingsName, rarityMappings)
         }
     }

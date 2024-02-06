@@ -1,0 +1,50 @@
+package cc.mewcraft.wakame.item.binary.curse
+
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.item.BinaryData
+import cc.mewcraft.wakame.item.CurseKeys
+import cc.mewcraft.wakame.util.compoundShadowTag
+import cc.mewcraft.wakame.util.toStableShort
+import me.lucko.helper.shadows.nbt.ShadowTag
+import net.kyori.adventure.key.Key
+
+/**
+ * Checks the highest damage dealt by the item.
+ *
+ * @property element the required source of damage
+ * @property amount the required amount of damage
+ */
+@BinaryData
+class PeakDamageCurse(
+    private val element: Element,
+    private val amount: Int,
+) : BinaryCurse, Initializable {
+
+    companion object Constants {
+        const val ID_TAG_NAME = "id"
+        const val AMOUNT_TAG_NAME = "amount"
+        const val ELEMENT_TAG_NAME = "elem"
+    }
+
+    override val key: Key = CurseKeys.PEAK_DAMAGE
+
+    /**
+     * Returns `true` if the highest damage from [element] dealt by the item is
+     * greater than [amount].
+     */
+    override fun test(context: BinaryCurseContext): Boolean =
+        context.statsContext.peakDamageStats.get(element) >= amount
+
+    override fun asShadowTag(): ShadowTag {
+        return compoundShadowTag {
+            putString(ID_TAG_NAME, key.asString())
+            putShort(AMOUNT_TAG_NAME, amount.toStableShort())
+            putByte(ELEMENT_TAG_NAME, element.binary)
+        }
+    }
+
+    override fun onPreWorld() {
+        // TODO load it to the factory
+    }
+}

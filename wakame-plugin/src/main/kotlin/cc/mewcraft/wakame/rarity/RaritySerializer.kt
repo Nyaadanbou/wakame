@@ -1,20 +1,40 @@
 package cc.mewcraft.wakame.rarity
 
-import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.toStableByte
+import cc.mewcraft.wakame.util.typedRequire
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 
-internal class RaritySerializer : TypeSerializer<Rarity> {
+/**
+ * ## Node structure 1: read from registry
+ *
+ * ```yaml
+ * <node>: epic
+ * ```
+ *
+ * ## Node structure 2: create from config
+ *
+ * ```yaml
+ * epic:
+ *   binary_index: 3
+ *   display_name: 史诗
+ *   ...
+ * ```
+ */
+internal class RaritySerializer : SchemeSerializer<Rarity> {
     override fun deserialize(type: Type, node: ConfigurationNode): Rarity {
-        val name = node.key().toString()
-        val binary = node.node("binary_index").require<Int>().toStableByte()
-        val displayName = node.node("display_name").require<String>()
-        return Rarity(name, binary, displayName)
-    }
+        val scalar = node.rawScalar() as? String
+        if (scalar != null) {
+            // if it's structure 1
+            return RarityRegistry.getOrThrow(scalar)
+        }
 
-    override fun serialize(type: Type, obj: Rarity?, node: ConfigurationNode) {
-        TODO("Not yet implemented")
+        // if it's structure 2
+        val name = node.key().toString()
+        val binary = node.node("binary_index").typedRequire<Int>().toStableByte()
+        val displayName = node.node("display_name").typedRequire<String>()
+        return Rarity(name, binary, displayName)
     }
 }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute.instance
 
-import cc.mewcraft.wakame.item.Tang
+import cc.mewcraft.wakame.item.Core
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 
@@ -8,5 +8,5 @@ import org.koin.core.component.KoinComponent
  * 魔法消耗倍率 %
  */
 class ManaConsumptionRate : KoinComponent {
-    private val key = Key.key(Tang.ATTRIBUTE_NAMESPACE, "mana_consumption_rate")
+    private val key = Key.key(Core.ATTRIBUTE_NAMESPACE, "mana_consumption_rate")
 }

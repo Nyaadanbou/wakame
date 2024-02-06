@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute.instance
 
-import cc.mewcraft.wakame.item.Tang
+import cc.mewcraft.wakame.item.Core
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 
@@ -8,5 +8,5 @@ import org.koin.core.component.KoinComponent
  * 最大生命值
  */
 class MaxHealth : KoinComponent {
-    private val key = Key.key(Tang.ATTRIBUTE_NAMESPACE, "max_health")
+    private val key = Key.key(Core.ATTRIBUTE_NAMESPACE, "max_health")
 }

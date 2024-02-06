@@ -1,20 +1,40 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.toStableByte
+import cc.mewcraft.wakame.util.typedRequire
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 
-class KizamiSerializer : TypeSerializer<Kizami> {
+/**
+ * ## Node structure 1: read from registry
+ *
+ * ```yaml
+ * <node>: iron
+ * ```
+ *
+ * ## Node structure 2: create from config
+ *
+ * ```yaml
+ * iron:
+ *   binary_index: 0
+ *   display_name: 中立
+ *   ...
+ * ```
+ */
+internal class KizamiSerializer : SchemeSerializer<Kizami> {
     override fun deserialize(type: Type, node: ConfigurationNode): Kizami {
-        val name = node.key().toString()
-        val binary = node.node("binary_index").require<Int>().toStableByte()
-        val displayName = node.node("display_name").require<String>()
-        return Kizami(name, binary, displayName)
-    }
+        val scalar = node.rawScalar() as? String
+        if (scalar != null) {
+            // if it's structure 1
+            return KizamiRegistry.getOrThrow(scalar)
+        }
 
-    override fun serialize(type: Type, obj: Kizami?, node: ConfigurationNode) {
-        TODO("Not yet implemented")
+        // if it's structure 2
+        val name = node.key().toString()
+        val binary = node.node("binary_index").typedRequire<Int>().toStableByte()
+        val displayName = node.node("display_name").typedRequire<String>()
+        return Kizami(name, binary, displayName)
     }
 }

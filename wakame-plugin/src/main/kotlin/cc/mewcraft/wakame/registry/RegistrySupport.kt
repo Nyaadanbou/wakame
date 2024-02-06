@@ -46,21 +46,6 @@ interface Registry<K, V> {
     fun registerName2Object(name: K, value: V)
 }
 
-internal class RegistryBase<K, V> : Registry<K, V> {
-    override val name2ObjectMapping: MutableMap<K, V> = HashMap()
-
-    override val all: Set<V>
-        get() = ImmutableSet.copyOf(name2ObjectMapping.values)
-
-    override fun get(name: K?): V? {
-        return if (name == null) null else name2ObjectMapping[name]
-    }
-
-    override fun registerName2Object(name: K, value: V) {
-        name2ObjectMapping[name] = value
-    }
-}
-
 /**
  * Operations of mapping [STRING] to [BINARY], and the reversed way.
  */
@@ -75,7 +60,23 @@ interface BiMapRegistry<STRING, BINARY> {
     fun registerBinary2Name(name: STRING, binary: BINARY)
 }
 
-internal class BiMapRegistryBase<STRING, BINARY> : BiMapRegistry<STRING, BINARY> {
+//<editor-fold desc="Internal Implementations">
+internal class HashMapRegistry<K, V> : Registry<K, V> {
+    override val name2ObjectMapping: MutableMap<K, V> = HashMap()
+
+    override val all: Set<V>
+        get() = ImmutableSet.copyOf(name2ObjectMapping.values)
+
+    override fun get(name: K?): V? {
+        return if (name == null) null else name2ObjectMapping[name]
+    }
+
+    override fun registerName2Object(name: K, value: V) {
+        name2ObjectMapping[name] = value
+    }
+}
+
+internal class HashBiMapRegistry<STRING, BINARY> : BiMapRegistry<STRING, BINARY> {
     override val binary2NameMapping: BiMap<STRING, BINARY> = HashBiMap.create()
 
     override fun getBinaryBy(name: STRING?): BINARY? =
@@ -94,3 +95,4 @@ internal class BiMapRegistryBase<STRING, BINARY> : BiMapRegistry<STRING, BINARY>
         binary2NameMapping[name] = binary
     }
 }
+//</editor-fold>

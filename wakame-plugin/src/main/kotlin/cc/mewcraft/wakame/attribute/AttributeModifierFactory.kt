@@ -7,7 +7,7 @@ import java.util.UUID
  *
  * @see AttributeModifierFactoryRegistry
  */
-interface AttributeModifierFactory<T : AttributeBinaryValue> {
+interface AttributeModifierFactory<T : BinaryAttributeValue> {
     /**
      * Creates one or more [AttributeModifiers][AttributeModifier] from the
      * given [value] with the given [uuid] being the modifiers' identifier. The

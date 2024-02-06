@@ -5,18 +5,18 @@ import cc.mewcraft.wakame.condition.Condition
 /**
  * 一个基于权重的随机内容选择器。
  *
- * @param T 样本所携带的实例
+ * @param S 样本所携带的实例
  * @param C 条件所需要的上下文
  */
-interface Pool<out T, C> {
+interface Pool<S, C : SelectionContext> {
 
     /**
-     * 该 [pool][Pool] 包含的所有 [Sample]。
+     * 该 [pool][Pool] 包含的所有 [sample][Sample]。
      */
-    val samples: List<Sample<T, C>>
+    val samples: List<Sample<S, C>>
 
     /**
-     * 需要抽几个 [Sample]。
+     * 需要抽几个 [sample][Sample]。
      */
     val pickCount: Long
 
@@ -35,48 +35,48 @@ interface Pool<out T, C> {
     val isReplacement: Boolean
 
     /**
-     * Randomly pick several [T]s with given [context]. Returns [EmptyList] if:
+     * Randomly pick several [S's][S] with given [context]. Returns [EmptyList]
+     * if:
      * - none of the [conditions] are not met, or
      * - none of [samples][Sample] meet their own conditions
      */
-    fun pick(context: C): List<T>
+    fun pick(context: C): List<S>
 
     /**
-     * The same as [pick] but it only picks a **single** random [T]. In the
+     * The same as [pick] but it only picks a **single** random [S]. In the
      * case where [pick] returns [EmptyList], this function returns a `null`
      * instead.
      *
      * Use this function if you already know `this` pool can only pick a single
-     * [T].
+     * [S].
      */
-    fun pickOne(context: C): T?
+    fun pickOne(context: C): S?
 
     /**
      * A [pool][Pool] builder.
      *
-     * @param T the instance type wrapped in [sample][Sample]
+     * @param S the instance type wrapped in [sample][Sample]
      * @param C the context type required by [conditions][Condition]
      */
-    interface Builder<out T, C> {
-        var count: Long
-        var replacement: Boolean
-        val samples: MutableList<Sample<@UnsafeVariance T, C>>
+    interface Builder<S, C : SelectionContext> {
+        val samples: MutableList<Sample<S, C>>
+        var pickCount: Long
+        var isReplacement: Boolean
         val conditions: MutableList<Condition<C>>
     }
-}
 
-fun <T, C> emptyPool(): Pool<T, C> {
-    @Suppress("UNCHECKED_CAST")
-    return EmptyPool as Pool<T, C>
-}
+    companion object Constants {
+        fun <S, C : SelectionContext> emptyPool(): Pool<S, C> = @Suppress("UNCHECKED_CAST") (EmptyPool as Pool<S, C>)
 
-fun <T, C> buildPool(block: Pool.Builder<T, C>.() -> Unit): Pool<T, C> {
-    val builder = ImmutablePool.Builder<T, C>().apply(block)
-    val ret = ImmutablePool(
-        samples = builder.samples,
-        pickCount = builder.count,
-        conditions = builder.conditions,
-        isReplacement = builder.replacement,
-    )
-    return ret
+        fun <S, C : SelectionContext> buildPool(block: Builder<S, C>.() -> Unit): Pool<S, C> {
+            val builder = ImmutablePool.Builder<S, C>().apply(block)
+            val ret = ImmutablePool(
+                samples = builder.samples,
+                pickCount = builder.pickCount,
+                isReplacement = builder.isReplacement,
+                conditions = builder.conditions,
+            )
+            return ret
+        }
+    }
 }

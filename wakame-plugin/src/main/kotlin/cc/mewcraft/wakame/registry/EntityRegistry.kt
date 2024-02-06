@@ -9,18 +9,14 @@ import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.StringQualifier
 import org.koin.core.qualifier.named
 
 object EntityRegistry : KoinComponent, Initializable, Reloadable,
-    Registry<String, EntityReference> by RegistryBase() {
-
-    // constants
-    val CONFIG_LOADER_QUALIFIER: StringQualifier = named("entity_reference_loader")
+    Registry<String, EntityReference> by HashMapRegistry() {
 
     // configuration stuff
-    private val configLoader: NekoConfigurationLoader by inject(CONFIG_LOADER_QUALIFIER)
-    private lateinit var configNode: NekoConfigurationNode
+    private val loader: NekoConfigurationLoader by inject(named(ENTITY_CONFIG_LOADER))
+    private lateinit var node: NekoConfigurationNode
 
     /**
      * Gets the key of specified [entity].
@@ -33,7 +29,7 @@ object EntityRegistry : KoinComponent, Initializable, Reloadable,
     }
 
     private fun loadConfiguration() {
-        configNode = configLoader.load()
+        node = loader.load()
         // TODO read config and populate values
     }
 

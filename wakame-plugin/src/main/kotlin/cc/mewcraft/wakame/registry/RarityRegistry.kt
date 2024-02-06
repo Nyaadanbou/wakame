@@ -5,27 +5,23 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
-import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.typedRequire
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.StringQualifier
 import org.koin.core.qualifier.named
 
 object RarityRegistry : KoinComponent, Initializable, Reloadable,
-    Registry<String, Rarity> by RegistryBase(),
-    BiMapRegistry<String, Byte> by BiMapRegistryBase() {
-
-    // constants
-    val CONFIG_LOADER_QUALIFIER: StringQualifier = named("rarity_config_loader")
+    Registry<String, Rarity> by HashMapRegistry(),
+    BiMapRegistry<String, Byte> by HashBiMapRegistry() {
 
     // configuration stuff
-    private val configLoader: NekoConfigurationLoader by inject(CONFIG_LOADER_QUALIFIER)
-    private lateinit var configNode: NekoConfigurationNode
+    private val loader: NekoConfigurationLoader by inject(named(RARITY_CONFIG_LOADER))
+    private lateinit var node: NekoConfigurationNode
 
     private fun loadConfiguration() {
-        configNode = configLoader.load()
-        configNode.childrenList().forEach { n ->
-            val rarity = n.require<Rarity>()
+        node = loader.load()
+        node.childrenList().forEach { n ->
+            val rarity = n.typedRequire<Rarity>()
             registerBothMapping(rarity.name, rarity)
         }
     }

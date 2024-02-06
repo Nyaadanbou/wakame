@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.reference
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 
-class ImmutableEntityReference(
+internal class ImmutableEntityReference(
     override val name: String,
     override val keySet: Set<Key>,
 ) : EntityReference {

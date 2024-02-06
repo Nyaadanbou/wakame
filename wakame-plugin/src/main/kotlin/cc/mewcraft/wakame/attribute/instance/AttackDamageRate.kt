@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.instance
 
 import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.item.Tang
+import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.getByOrThrow
 import cc.mewcraft.wakame.util.compoundShadowTag
@@ -14,15 +14,15 @@ import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.UUID
 
-private typealias BinaryValueADR = AttributeBinaryValueVE<Float>
-private typealias SchemeValueADR = AttributeSchemaValueVE
+private typealias BinaryValueADR = BinaryAttributeValueVE<Float>
+private typealias SchemeValueADR = SchemeAttributeValueVE
 
 /**
  * 元素攻击力倍率 %
  */
 @Deprecated(message = "每个属性修饰符均已支持独立的 Operation")
 class AttackDamageRate : KoinComponent, Initializable,
-    AttributeTangCodec<BinaryValueADR, SchemeValueADR>,
+    AttributeCoreCodec<BinaryValueADR, SchemeValueADR>,
     AttributeModifierFactory<BinaryValueADR> {
 
     companion object {
@@ -31,7 +31,7 @@ class AttackDamageRate : KoinComponent, Initializable,
         }
     }
 
-    override val key: Key = Key.key(Tang.ATTRIBUTE_NAMESPACE, "attack_damage_rate")
+    override val key: Key = Key.key(Core.ATTRIBUTE_NAMESPACE, "attack_damage_rate")
 
     override fun schemeOf(node: ConfigurationNode): SchemeValueADR {
         return SchemeValueADR.deserialize(node)
@@ -46,17 +46,17 @@ class AttackDamageRate : KoinComponent, Initializable,
 
     override fun decode(tag: CompoundShadowTag): BinaryValueADR {
         return localBinaryValue.get().apply {
-            value = tag.getFloat(AttributeTags.VALUE)
-            element = ElementRegistry.getByOrThrow(tag.getByte(AttributeTags.ELEMENT))
-            operation = AttributeModifier.Operation.byId(tag.getInt(AttributeTags.OPERATION))
+            value = tag.getFloat(AttributeTagNames.VALUE)
+            element = ElementRegistry.getByOrThrow(tag.getByte(AttributeTagNames.ELEMENT))
+            operation = AttributeModifier.Operation.byId(tag.getInt(AttributeTagNames.OPERATION))
         }
     }
 
     override fun encode(binary: BinaryValueADR): CompoundShadowTag {
         return compoundShadowTag {
-            putFloat(AttributeTags.VALUE, binary.value)
-            putByte(AttributeTags.ELEMENT, binary.element.binary)
-            putByte(AttributeTags.OPERATION, binary.operation.binary)
+            putFloat(AttributeTagNames.VALUE, binary.value)
+            putByte(AttributeTagNames.ELEMENT, binary.element.binary)
+            putByte(AttributeTagNames.OPERATION, binary.operation.binary)
         }
     }
 
@@ -68,7 +68,7 @@ class AttackDamageRate : KoinComponent, Initializable,
     }
 
     override fun onPreWorld() {
-        AttributeTangCodecRegistry.register(key, this)
+        AttributeCoreCodecRegistry.register(key, this)
         AttributeModifierFactoryRegistry.register(key, this)
     }
 }

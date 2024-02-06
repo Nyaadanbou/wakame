@@ -5,32 +5,28 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
-import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.typedRequire
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.StringQualifier
 import org.koin.core.qualifier.named
 
 object ElementRegistry : KoinComponent, Initializable, Reloadable,
-    Registry<String, Element> by RegistryBase(),
-    BiMapRegistry<String, Byte> by BiMapRegistryBase() {
+    Registry<String, Element> by HashMapRegistry(),
+    BiMapRegistry<String, Byte> by HashBiMapRegistry() {
 
     // default element
     val DEFAULT_ELEMENT: Element get() = name2ObjectMapping.values.first()
 
-    // constants
-    val CONFIG_LOADER_QUALIFIER: StringQualifier = named("element_config_loader")
-
     // configuration stuff
-    private val configLoader: NekoConfigurationLoader by inject(CONFIG_LOADER_QUALIFIER)
-    private lateinit var configNode: NekoConfigurationNode
+    private val loader: NekoConfigurationLoader by inject(named(ELEMENT_CONFIG_LOADER))
+    private lateinit var node: NekoConfigurationNode
 
     private fun loadConfiguration() {
-        configNode = configLoader.load()
-        with(configNode) {
+        node = loader.load()
+        with(node) {
             val elementsNode = node("elements")
             elementsNode.childrenMap().forEach { (_, n) ->
-                val element = n.require<Element>()
+                val element = n.typedRequire<Element>()
                 registerBothMapping(element.name, element)
             }
         }

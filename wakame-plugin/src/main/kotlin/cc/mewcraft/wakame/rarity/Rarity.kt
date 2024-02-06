@@ -1,7 +1,13 @@
 package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.BiIdentified
+import cc.mewcraft.wakame.registry.RarityRegistry
 
+/**
+ * **DO NOT CONSTRUCT IT YOURSELF!**
+ *
+ * Use [RarityRegistry] to get the instances instead.
+ */
 data class Rarity internal constructor(
     override val name: String,
     override val binary: Byte,

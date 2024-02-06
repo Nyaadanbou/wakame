@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.instance
 
 import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.item.Tang
+import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.util.compoundShadowTag
 import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.toStableDouble
@@ -14,13 +14,13 @@ import org.koin.mp.ThreadLocal
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.UUID
 
-private typealias BinaryValueASL = AttributeBinaryValueV<Byte>
-private typealias SchemeValueASL = AttributeSchemaValueV
+private typealias BinaryValueASL = BinaryAttributeValueV<Byte>
+private typealias SchemeValueASL = SchemeAttributeValueV
 
 /**
  * 武器攻击速度
  *
- * The states of Attack Speed Level is finite. There are only 9 levels:
+ * The states of Attack Speed Level is **finite**. There are only 9 levels:
  * - (0) Extreme slow
  * - (1) Super slow
  * - (2) Very slow
@@ -32,7 +32,7 @@ private typealias SchemeValueASL = AttributeSchemaValueV
  * - (8) Extreme fast
  */
 class AttackSpeedLevel : KoinComponent, Initializable,
-    AttributeTangCodec<BinaryValueASL, SchemeValueASL>,
+    AttributeCoreCodec<BinaryValueASL, SchemeValueASL>,
     AttributeModifierFactory<BinaryValueASL> {
 
     companion object {
@@ -41,7 +41,7 @@ class AttackSpeedLevel : KoinComponent, Initializable,
         }
     }
 
-    override val key: Key = Key.key(Tang.ATTRIBUTE_NAMESPACE, "attack_speed_level")
+    override val key: Key = Key.key(Core.ATTRIBUTE_NAMESPACE, "attack_speed_level")
 
     override fun schemeOf(node: ConfigurationNode): SchemeValueASL {
         // FIXME 确保数值稳定：攻速比较特殊，就那么几个值会存在，但 SchemeValue 存的是 Double
@@ -57,15 +57,15 @@ class AttackSpeedLevel : KoinComponent, Initializable,
 
     override fun decode(tag: CompoundShadowTag): BinaryValueASL {
         return localBinaryValue.get().apply {
-            value = tag.getByte(AttributeTags.VALUE)
-            operation = AttributeModifier.Operation.byId(tag.getInt(AttributeTags.OPERATION))
+            value = tag.getByte(AttributeTagNames.VALUE)
+            operation = AttributeModifier.Operation.byId(tag.getInt(AttributeTagNames.OPERATION))
         }
     }
 
     override fun encode(binary: BinaryValueASL): CompoundShadowTag {
         return compoundShadowTag {
-            putByte(AttributeTags.VALUE, binary.value)
-            putByte(AttributeTags.OPERATION, binary.operation.binary)
+            putByte(AttributeTagNames.VALUE, binary.value)
+            putByte(AttributeTagNames.OPERATION, binary.operation.binary)
         }
     }
 
@@ -76,7 +76,7 @@ class AttackSpeedLevel : KoinComponent, Initializable,
     }
 
     override fun onPreWorld() {
-        AttributeTangCodecRegistry.register(key, this)
+        AttributeCoreCodecRegistry.register(key, this)
         AttributeModifierFactoryRegistry.register(key, this)
     }
 }
