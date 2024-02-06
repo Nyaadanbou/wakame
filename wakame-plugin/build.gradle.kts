@@ -1,3 +1,4 @@
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
 
 plugins {
@@ -37,7 +38,6 @@ dependencies {
     // implementation(project(":spatula:bukkit:message")) // TODO use adventure global translator
     implementation(project(":spatula:bukkit:utils"))
     implementation(libs.configurate.yaml) {
-        exclude("io.leangen.geantyref") // provided by Paper runtime
         exclude("com.google.errorprone")
     }
     implementation(libs.configurate.extra.kotlin) {
@@ -79,6 +79,7 @@ paper {
     description = project.description
     apiVersion = "1.19"
     author = "Nailm"
+    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     serverDependencies {
         register("Kotlin") {
             required = true
