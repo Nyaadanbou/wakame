@@ -130,26 +130,26 @@ cell_groups:
             rarity: epic
         entries: # 该池拥有的所有词条
           - key: attribute:attack_damage
-            weight: 1
-            operation: add # 属性支持自定义操作模式 add(默认值), multiply_base, multiply_total
-            element: neutral
             lower: 15 # 固定数值
             upper: # 随机数值
               base: 20 # 正态分布的平均值
               scale: 0 # 等级加成，数值为 scale * level，可省略，默认为 0
               spread: 0.2 # 正态分布的标准差
               max: 0.3 # 正态分布的最大标准差，可省略，默认为 spread * 2
-          - key: attribute:critical_strike_chance
+            element: neutral
+            operation: add # 属性支持自定义操作模式 add(默认值), multiply_base, multiply_total
             weight: 1
-            operation: add
+          - key: attribute:critical_strike_chance
             value: # 随机数值
               base: 0.75
               spread: 0.1
               max: 0.2
-          - key: attribute:critical_strike_power
-            weight: 1
             operation: add
+            weight: 1
+          - key: attribute:critical_strike_power
             value: 0.52 # 固定数值
+            operation: add
+            weight: 1
             filters: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该池里
               - type: level # 这是一个关于物品等级要求的条件
                 level: "[20,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
@@ -159,31 +159,31 @@ cell_groups:
             rarity: common
         entries:
           - key: attribute:attack_damage
-            weight: 1
-            element: neutral
-            operation: add
             lower: 10
             upper: 15
+            element: neutral
+            operation: add
+            weight: 1
           - key: attribute:critical_strike_chance
-            weight: 1
             value: 0.5
-          - key: attribute:critical_strike_power
             weight: 1
+          - key: attribute:critical_strike_power
             value: 0.25
+            weight: 1
             filters:
               - type: item_level
                 level: "[10,)"
     default: # 备用池，固定写成 default，如果 pools 中没有满足条件的 pool，将使用备用池
       - key: attribute:attack_damage
-        weight: 1
-        element: neutral
         lower: 5 # 固定数值
         upper: 8 # 固定数值
-      - key: attribute:critical_strike_chance
+        element: neutral
         weight: 1
+      - key: attribute:critical_strike_chance
         value: # 随机数值
           base: 0.3
           scale: 0.1
+        weight: 1
 
   # 词条组：group_b
   group_b:
@@ -195,22 +195,22 @@ cell_groups:
             rarity: rare
         entries:
           - key: attribute:attack_speed_level
-            weight: 1
             value: 4
+            weight: 1
           - key: attribute:movement_speed_rate
-            weight: 1
             value: 0.4
-          - key: attribute:defense
             weight: 1
+          - key: attribute:defense
             value: 23
+            weight: 1
             mark: x1y1z1 # 为该项指定一个印记（string），当该项被选中时，指定的印记将被加入到上下文中
     default:
       - key: attribute:attack_speed_level
-        weight: 1
         value: 2
-      - key: attribute:movement_speed_rate
         weight: 1
+      - key: attribute:movement_speed_rate
         value: 0.2
+        weight: 1
 
   # 词条组：group_c
   group_c:
@@ -222,24 +222,24 @@ cell_groups:
             rarity: rare
         entries:
           - key: attribute:max_health
-            weight: 1
             value: 40
-          - key: attribute:max_mana
             weight: 1
+          - key: attribute:max_mana
             value: 10
+            weight: 1
           - key: attribute:damage_reduction_rate
-            weight: 99
             value: 0.25
+            weight: 99
             filters:
               - type: mark # 该类型条件将检查物品生成的上下文中是否有指定的印记存在
                 mark: x1y1z1 # 如果已经存在值为 "x1y1z1" 的印记，则该项会在随机选择开始前被排除掉
     default:
       - key: attribute:max_health
-        weight: 1
         value: 20
-      - key: attribute:max_mana
         weight: 1
+      - key: attribute:max_mana
         value: 5
+        weight: 1
 
   # 词条组：group_d
   group_d:
@@ -247,11 +247,11 @@ cell_groups:
     selectors: { }
     default: # 这是一个只有固定内容的词条栏的基本写法
       - key: attribute:lifesteal
-        weight: 10
         value: 0.2
-      - key: attribute:manasteal
         weight: 10
+      - key: attribute:manasteal
         value: 0.21
+        weight: 10
 
   # 词条组：group_e
   group_e:
@@ -263,54 +263,54 @@ cell_groups:
             element: fire
         entries:
           - key: attribute:attack_damage
-            weight: 8
-            element: fire
             lower: 10
             upper: 16
+            element: fire
+            weight: 8
           - key: attribute:attack_damage_rate
-            weight: 8
-            element: fire
             value: 0.1
-          - key: attribute:attack_effect_chance
-            weight: 8
             element: fire
+            weight: 8
+          - key: attribute:attack_effect_chance
             value: 0.38
+            element: fire
+            weight: 8
       water:
         filters:
           - type: element
             element: water
         entries:
           - key: attribute:attack_damage
-            weight: 8
-            element: water
             lower: 10
             upper: 17
+            element: water
+            weight: 8
           - key: attribute:attack_damage_rate
-            weight: 8
-            element: water
             value: 0.2
-          - key: attribute:attack_effect_chance
-            weight: 8
             element: water
+            weight: 8
+          - key: attribute:attack_effect_chance
             value: 0.42
+            element: water
+            weight: 8
       wind:
         filters:
           - type: element
             element: wind
         entries:
           - key: attribute:attack_damage
-            weight: 8
-            element: wind
             lower: 10
             upper: 18
+            element: wind
+            weight: 8
           - key: attribute:attack_damage_rate
-            weight: 8
-            element: wind
             value: 0.3
-          - key: attribute:attack_effect_chance
-            weight: 8
             element: wind
+            weight: 8
+          - key: attribute:attack_effect_chance
             value: 0.56
+            element: wind
+            weight: 8
     default: [ ] # 这里没有定义 fallback
 
   # 词条组：group_f
@@ -320,15 +320,15 @@ cell_groups:
       ability: # 这个池的 id
         entries:
           - key: ability:blink
-            weight: 1
             mana: 12
             cooldown: 10
             distance: 16
-          - key: ability:dash
             weight: 1
+          - key: ability:dash
             mana: 12
             cooldown: 4
             damage: 8 * damage # 技能伤害为 8 倍的玩家所有元素伤害之和
+            weight: 1
     default: [ ]
 
 # 词条栏的使用条件组
@@ -336,6 +336,7 @@ curse_groups:
 
   # 自定义条件组：group_a
   group_a:
+    filters: [ ]
     selectors:
       common:
         filters:
@@ -343,33 +344,34 @@ curse_groups:
             rarity: common
         entries:
           - key: condition:entity_kills
-            weight: 1
             index: demo_bosses_1
             count: 2
-          - key: condition:entity_kills
             weight: 1
+          - key: condition:entity_kills
             index: demo_bosses_2
             count: 2
-          - key: condition:entity_kills
             weight: 1
+          - key: condition:entity_kills
             index: demo_bosses_3
             count: 2
+            weight: 1
     default:
       - key: condition:entity_kills
-        weight: 1
         index: demo_creeps_1
         count: 2
-      - key: condition:entity_kills
         weight: 1
+      - key: condition:entity_kills
         index: demo_creeps_2
         count: 2
-      - key: condition:entity_kills
         weight: 1
+      - key: condition:entity_kills
         index: demo_creeps_3
         count: 2
+        weight: 1
 
   # 自定义条件组：group_b
   group_b:
+    filters: [ ]
     selectors:
       common:
         filters:
@@ -377,19 +379,19 @@ curse_groups:
             rarity: common
         entries:
           - key: condition:highest_damage
-            weight: 1
-            element: fire
             amount: 20
-          - key: condition:highest_damage
+            element: fire
             weight: 1
-            element: water
+          - key: condition:highest_damage
             amount: 32
+            element: water
+            weight: 1
     default:
       - key: condition:highest_damage
-        weight: 1
-        element: fire
         amount: 10
-      - key: condition:highest_damage
+        element: fire
         weight: 1
-        element: water
+      - key: condition:highest_damage
         amount: 16
+        element: water
+        weight: 1
