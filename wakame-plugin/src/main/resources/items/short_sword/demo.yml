@@ -77,7 +77,7 @@ kizami:
 cells:
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
     core: group_a # 该词条栏所使用的词条组 id，从 cell_groups 中选择
-    curse: group_a # 该词条栏所使用的条件组 id，从 cell_condition_groups 中选择
+    curse: group_a # 该词条栏所使用的条件组 id，从 curse_groups 中选择
     keep_empty: false # 该词条栏在生成时如果没有词条被选中的话，是否在物品上保留空的词条栏
     can_reforge: true # 该词条栏是否可重铸
     can_override: false # 该词条栏是否可以被玩家自由修改和覆盖
@@ -332,7 +332,7 @@ cell_groups:
     default: [ ]
 
 # 词条栏的使用条件组
-cell_condition_groups:
+curse_groups:
 
   # 自定义条件组：group_a
   group_a:
