@@ -32,17 +32,17 @@ level: EXPERIENCE_LEVEL
 #level: ADVENTURE_LEVEL
 #level: 32
 
-# 稀有度
+# 稀有度（可选）
 # 如果写 "mapping:<唯一标识>"，则根据唯一标识对应的映射生成
 # 如果写 "rarity:<稀有度名>"，则始终以这里指定的稀有度生成
-# 如果不写，则相当于 "mapping:global"
+# 如果省略，则相当于 "mapping:global"
 rarity: mapping:demo_1
 #rarity: rarity:ancient
 
 # 元素标识
 elements:
   sample: 2 # 抽选 n 个元素作为该物品的元素标识
-  conditions: [ ] # 实现上支持写条件，但没实际作用
+  filters: [ ] # 实现上支持写条件，但没实际作用
   entries: # 候选的元素标识，以及它们各自的权重
     - value: neutral
       weight: 2
@@ -52,14 +52,14 @@ elements:
       weight: 1
     - value: wind
       weight: 1
-      conditions: # 这里支持写筛选的条件
+      filters: # 这里支持写筛选的条件
         - type: element
           element: water
 
 # 铭刻标识（可选）
 kizami:
   sample: 2 # 抽选 n 个铭刻作为该物品的铭刻标识
-  conditions: [ ] # 实现上支持写条件，但没实际作用
+  filters: [ ] # 实现上支持写条件，但没实际作用
   entries: # 候选的铭刻标识，以及它们各自的权重
     - value: iron
       weight: 2
@@ -69,63 +69,65 @@ kizami:
       weight: 1
     - value: netherite
       weight: 1
-      conditions: # 这里支持写筛选的条件
+      filters: # 这里支持写筛选的条件
         - type: element
           element: water
 
 # 词条栏
-slots:
+cells:
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
-    content: group_a # 该词条栏所使用的词条组 id，从 slot_groups 中选择
-    condition: group_a # 该词条栏所使用的条件组 id，从 slot_condition_groups 中选择
+    core: group_a # 该词条栏所使用的词条组 id，从 cell_groups 中选择
+    curse: group_a # 该词条栏所使用的条件组 id，从 cell_condition_groups 中选择
     keep_empty: false # 该词条栏在生成时如果没有词条被选中的话，是否在物品上保留空的词条栏
     can_reforge: true # 该词条栏是否可重铸
     can_override: false # 该词条栏是否可以被玩家自由修改和覆盖
   - id: b
-    content: group_b
-    condition: group_b
+    core: group_b
+    curse: group_b
     keep_empty: false
     can_reforge: true
     can_override: false
   - id: c
-    content: group_c
-    condition: group_c
+    core: group_c
+    curse: group_c
     keep_empty: false
     can_reforge: true
     can_override: false
   - id: d
-    # content: group_d # 词条组可以省略不写，表示这就是个空栏
-    # condition: group_c # 条件组可以省略不写，表示没有解锁条件
+    # core: group_d # 词条组可以省略不写，表示这就是个空栏
+    # curse: group_c # 条件组可以省略不写，表示没有解锁条件
     keep_empty: false
     can_reforge: false
     can_override: false
   - id: e
-    content: group_e
-    # condition: group_e
+    core: group_e
+    # curse: group_e
     keep_empty: false
     can_reforge: false
     can_override: false
   - id: f
-    content: group_f
-    # condition: group_f
+    core: group_f
+    # curse: group_f
     keep_empty: false
     can_reforge: false
     can_override: false
 
 # 词条组
 # 词条组将按照配置文件里的顺序，逐个生成内容，放入词条栏
-slot_groups:
+cell_groups:
 
   # 词条组：group_a
   group_a: # 该词条组的 id
-    conditions:
+    filters:
       - type: rarity
         rarity: common
     selectors:
       pool_1: # 该词条组的一个候选池，取值必须在本堆中不重复
-        conditions: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
+        filters: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
           - type: rarity
             rarity: rare
+          - type: ~rarity # 如果 type 以 ~ 开头，则反转原本的布尔值
+            rarity: epic
         entries: # 该池拥有的所有词条
           - key: attribute:attack_damage
             weight: 1
@@ -148,11 +150,11 @@ slot_groups:
             weight: 1
             operation: add
             value: 0.52 # 固定数值
-            conditions: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该池里
+            filters: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该池里
               - type: level # 这是一个关于物品等级要求的条件
                 level: "[20,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
       pool_2:
-        conditions:
+        filters:
           - type: rarity
             rarity: common
         entries:
@@ -168,7 +170,7 @@ slot_groups:
           - key: attribute:critical_strike_power
             weight: 1
             value: 0.25
-            conditions:
+            filters:
               - type: item_level
                 level: "[10,)"
     default: # 备用池，固定写成 default，如果 pools 中没有满足条件的 pool，将使用备用池
@@ -185,10 +187,10 @@ slot_groups:
 
   # 词条组：group_b
   group_b:
-    conditions: [ ]
+    filters: [ ]
     selectors:
       pool_1:
-        conditions:
+        filters:
           - type: rarity
             rarity: rare
         entries:
@@ -212,10 +214,10 @@ slot_groups:
 
   # 词条组：group_c
   group_c:
-    conditions: [ ]
+    filters: [ ]
     selectors:
       pool_1:
-        conditions:
+        filters:
           - type: rarity
             rarity: rare
         entries:
@@ -228,7 +230,7 @@ slot_groups:
           - key: attribute:damage_reduction_rate
             weight: 99
             value: 0.25
-            conditions:
+            filters:
               - type: mark # 该类型条件将检查物品生成的上下文中是否有指定的印记存在
                 mark: x1y1z1 # 如果已经存在值为 "x1y1z1" 的印记，则该项会在随机选择开始前被排除掉
     default:
@@ -241,7 +243,7 @@ slot_groups:
 
   # 词条组：group_d
   group_d:
-    conditions: [ ]
+    filters: [ ]
     selectors: { }
     default: # 这是一个只有固定内容的词条栏的基本写法
       - key: attribute:lifesteal
@@ -253,10 +255,10 @@ slot_groups:
 
   # 词条组：group_e
   group_e:
-    conditions: [ ]
+    filters: [ ]
     selectors:
       fire:
-        conditions:
+        filters:
           - type: element
             element: fire
         entries:
@@ -274,7 +276,7 @@ slot_groups:
             element: fire
             value: 0.38
       water:
-        conditions:
+        filters:
           - type: element
             element: water
         entries:
@@ -292,7 +294,7 @@ slot_groups:
             element: water
             value: 0.42
       wind:
-        conditions:
+        filters:
           - type: element
             element: wind
         entries:
@@ -313,7 +315,7 @@ slot_groups:
 
   # 词条组：group_f
   group_f:
-    conditions: [ ]
+    filters: [ ]
     selectors:
       ability: # 这个池的 id
         entries:
@@ -330,13 +332,13 @@ slot_groups:
     default: [ ]
 
 # 词条栏的使用条件组
-slot_condition_groups:
+cell_condition_groups:
 
   # 自定义条件组：group_a
   group_a:
     selectors:
       common:
-        conditions:
+        filters:
           - type: rarity
             rarity: common
         entries:
@@ -370,7 +372,7 @@ slot_condition_groups:
   group_b:
     selectors:
       common:
-        conditions:
+        filters:
           - type: rarity
             rarity: common
         entries:

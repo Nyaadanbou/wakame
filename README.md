@@ -1,23 +1,23 @@
-# Slots
+# Cells
 
-Slots，中文叫做「词条栏」。「词条栏」可以看作一个容器，里面存放着具体的东西，比如属性和技能。
+Cells，中文叫做「词条栏」。「词条栏」可以看作一个容器，里面存放着具体的东西，比如属性和技能。
 
 「词条栏」这一概念贯穿于多个系统之间，包含但不仅限于物品的NBT结构、物品的生成、配置文件的结构。
 
-从顶层设计来看，我们把词条栏分为两大类：`TemplateSlot` 与 `InstanceSlot`。这两都继承顶层接口 `Slot`。
+从顶层设计来看，我们把词条栏分为两大类：`SchemeCell` 与 `BinaryCell`。这两都继承顶层接口 `Cell`。
 
-## Slot
+## Cell
 
-`Slot` 是一个顶层接口，代表一个词条栏。
+`Cell` 是一个顶层接口，代表一个词条栏。
 
-## TemplateSlot
+## SchemeCell
 
-`TemplateSlot` 代表一个词条栏可能出现的所有状态。它用来代表物品的生成，以及物品的配置文件。例如它会出现在插件数据库里的“物品”上。打引号是因为数据库里的“物品”准确应该叫做「物品模板」。在特定的语境下，应该特别区分「物品」和「物品模板」的区别。
+`SchemeCell` 代表一个词条栏可能出现的所有状态。它用来代表物品的生成，以及物品的配置文件。例如它会出现在插件数据库里的“物品”上。打引号是因为数据库里的“物品”准确应该叫做「物品模板」。在特定的语境下，应该特别区分「物品」和「物品模板」的区别。
 
-## InstanceSlot
+## BinaryCell
 
-`InstanceSlot` 代表一个状态已经确定了的词条栏。从接口之间的关系来说，它可以看成是 `TemplateSlot` 多个状态中的一个。从代码的使用角度来看，用户可以调用 `TemplateSlot` 的某个函数来让其产生一个 `InstanceSlot`。这有点像母鸡生蛋的感觉。
-~~目前 `InstanceSlot` 只会出现在世界里的实际物品上（注意区别于只存在于数据库里的「物品模板」）~~。
+`BinaryCell` 代表一个状态已经确定了的词条栏。从接口之间的关系来说，它可以看成是 `SchemeCell` 多个状态中的一个。从代码的使用角度来看，用户可以调用 `SchemeCell` 的某个函数来让其产生一个 `BinaryCell`。这有点像母鸡生蛋的感觉。
+~~目前 `BinaryCell` 只会出现在世界里的实际物品上（注意区别于只存在于数据库里的「物品模板」）~~。
 
 # Attributes
 
@@ -65,13 +65,13 @@ AttributeModifier 的 UUID 是肯定不与其他对象提供的 AttributeModifie
 | skin                | skin         |
 | skin_owner          | skin owner   |
 
-## Slots
+## Cells
 
 词条栏。
 
-## Conditions
+## Curses
 
-词条栏的激活条件。
+词条栏的诅咒，概念上等同于词条栏激活所需要满足的条件。
 
 ## Statistics
 
@@ -97,11 +97,11 @@ Compound('wakame')
     ByteArray('elem'): [1b, 2b] // 元素
     Short('skin'): 35s // 皮肤 ID
     IntArray('skin_owner'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
-  Compound('slots') // 词条栏
+  Compound('cells') // 词条栏
     Compound('a') // 词条栏的 id
       Boolean('can_reforge'): true // 词条栏是否可重铸
       Boolean('can_override'): false // 词条栏是否可由玩家覆盖
-      Compound('tang') // 词条栏的内容（词条）
+      Compound('core') // 词条栏的内容（词条）
         String('id'): 'attribute:attack_damage' // 词条的 id
         Short('min'): 10s // 词条的元数据，下面两个也是
         Short('max'): 15s
@@ -110,14 +110,14 @@ Compound('wakame')
       Compound('reforge') // 重铸的元数据（可能会用到）
         Byte('success'): 5b // 重铸成功的次数
         Byte('failure'): 1b // 重铸失败的次数
-      Compound('condition') // 词条栏的解锁条件
+      Compound('curse') // 词条栏的解锁条件
         String('id'): 'entity_kills' // 条件的种类，这里是实体击杀
         String('index'): 'demo_bosses_1' // 要求的击杀种类
         Short('count'): 18s // 要求的击杀数量
     Compound('b')
       Boolean('can_reforge'): false
       Boolean('can_override'): false
-      Compound('tang')
+      Compound('core')
         String('id'): 'attribute:attack_damage'
         Short('min'): 10s
         Short('max'): 15s
@@ -125,46 +125,46 @@ Compound('wakame')
         Byte('op'): 0b
       Compound('reforge')
         // 空的，意为 0
-      Compound('condition')
-        // 空的，意为没有条件限制
+      Compound('curse')
+        // 空的，意为没有诅咒
     Compound('c')
       Boolean('can_reforge'): true
       Boolean('can_override'): false
-      Compound('tang'):
+      Compound('core'):
         String('id'): 'attribute:attack_damage_rate'
         Float('value'): 0.2f
         Byte('elem'): 2b
         Byte('op'): 0b
       Compound('reforge')
         // 空的，意为 0
-      Compound('condition')
-        // 空的，意为没有条件限制
+      Compound('curse')
+        // 空的，意为没有诅咒
     Compound('d')
       Boolean('can_reforge'): false
       Boolean('can_override'): false
-      Compound('tang')
+      Compound('core')
         String('id'): 'ability:dash'
         Byte('mana'): 12b
         Byte('cooldown'): 4b
         Byte('damage'): 8b
       Compound('reforge')
-      Compound('condition')
+      Compound('curse')
     Compound('e')
       Boolean('can_reforge'): false
       Boolean('can_override'): false
-      Compound('tang')
+      Compound('core')
         String('id'): 'ability:blink'
         Byte('mana'): 12b
         Byte('cooldown'): 10b
         Byte('distance'): 16b
       Compound('reforge')
-      Compound('condition')
+      Compound('curse')
     Compound('f')
       Boolean('can_reforge'): false
       Boolean('can_override'): false
-      Compound('tang') // 表示一个空槽
+      Compound('core') // 表示一个空槽
       Compound('reforge')
-      Compound('condition')
+      Compound('curse')
   Compound('stats') // 物品统计数据
     Compound('entity_kills')
       Short('minecraft:zombie'): 5s
