@@ -25,7 +25,7 @@ const val ITEM_CONFIG_LOADER = "item_config_loader"
 const val RARITY_CONFIG_LOADER = "rarity_config_loader"
 
 const val ELEMENT_CONFIG_PATH = "elements.yml"
-const val ENTITY_REFERENCE_CONFIG_PATH = "entities.yml"
+const val ENTITY_CONFIG_PATH = "entities.yml"
 const val SKIN_CONFIG_PATH = "skins.yml"
 const val KIZAMI_CONFIG_PATH = "kizami.yml"
 const val ITEM_CONFIG_DIR = "items"
@@ -40,7 +40,7 @@ fun registryModule(): Module = module {
     }
 
     single<YamlConfigurationLoader>(named(ENTITY_CONFIG_LOADER)) {
-        createRegistryConfigurationLoader(ENTITY_REFERENCE_CONFIG_PATH) {
+        createRegistryConfigurationLoader(ENTITY_CONFIG_PATH) {
             registerAll(get(named(REFERENCE_SERIALIZERS)))
         }
     }
@@ -57,7 +57,7 @@ fun registryModule(): Module = module {
         }
     }
 
-    factory<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER)) {
+    single<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER)) {
         YamlConfigurationLoader.builder()
             .applyCommons()
             .defaultOptions { options ->

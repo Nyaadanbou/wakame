@@ -16,11 +16,18 @@ internal typealias NekoConfigurationLoader = ConfigurationLoader<CommentedConfig
 internal typealias NekoConfigurationNode = CommentedConfigurationNode
 
 internal fun YamlConfigurationLoader.Builder.applyCommons(): YamlConfigurationLoader.Builder {
-    return this.indent(2).nodeStyle(NodeStyle.BLOCK).defaultOptions { options ->
-        options.serializers {
-            it.typedRegister<Key>(KeySerializer())
+    return this
+        // use 2 spaces indent
+        .indent(2)
+        // always use block style
+        .nodeStyle(NodeStyle.BLOCK)
+        // register common serializers
+        .defaultOptions { options ->
+            options.serializers {
+                it.typedRegister(KeySerializer())
+                it.typedRegister(NumericValueSerializer())
+            }
         }
-    }
 }
 
 internal inline fun <reified T> TypeSerializerCollection.Builder.typedRegister(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder =

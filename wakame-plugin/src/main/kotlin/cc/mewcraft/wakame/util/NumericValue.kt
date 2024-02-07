@@ -88,7 +88,7 @@ data class NumericValue(
 
     companion object Factory {
         private val DECIMAL_FORMAT: DecimalFormat = DecimalFormat("0.####")
-        private val CONFIG_SERIALIZER: TypeSerializer<NumericValue> = ConfigSerializer()
+        private val CONFIG_SERIALIZER: TypeSerializer<NumericValue> = NumericValueSerializer()
 
         /**
          * Creates an instance from a string.
@@ -194,79 +194,79 @@ data class NumericValue(
     fun calculate(): Double {
         return calculate(.0)
     }
+}
 
-    private class ConfigSerializer : TypeSerializer<NumericValue> {
-        override fun deserialize(type: Type, node: ConfigurationNode): NumericValue {
-            val scalar = node.rawScalar()
-            if (scalar != null) {
-                // if it's just a simple plain value like "value: 32"
-                return NumericValue(node.double, .0, .0, .0)
-            }
-
-            val base = node.node("base").apply { require(Double::class.java) }.double
-            val scale = node.node("scale").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-            val sigma = node.node("spread").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-            val threshold = node.node("max").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-
-            return NumericValue(base, scale ?: .0, sigma ?: .0, threshold)
+class NumericValueSerializer : TypeSerializer<NumericValue> {
+    override fun deserialize(type: Type, node: ConfigurationNode): NumericValue {
+        val scalar = node.rawScalar()
+        if (scalar != null) {
+            // if it's just a simple plain value like "value: 32"
+            return NumericValue(node.double, .0, .0, .0)
         }
 
-        override fun serialize(type: Type, obj: NumericValue?, node: ConfigurationNode) {
-            // throws if no value is provided
-            obj ?: throw SerializationException()
+        val base = node.node("base").apply { require(Double::class.java) }.double
+        val scale = node.node("scale").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+        val sigma = node.node("spread").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+        val threshold = node.node("max").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
 
-            /*
-               Possible config structures:
+        return NumericValue(base, scale ?: .0, sigma ?: .0, threshold)
+    }
 
-               Case 1: (only base)
-                   ```
-                   node: <base>
-                   ```
-               Case 2: (base + scale)
-                   ```
-                   node:
-                       base: <base>
-                       scale: <scale>
-                   ```
-               Case 3: (base + normal dist)
-                   ```
-                   node:
-                       base: <base>
-                       spread: <sigma>
-                       max: <threshold>
-                   ```
-               Case 4: (base + scale + normal dist)
-                   ```
-                   node:
-                       base: <base>
-                       scale: <scale>
-                       spread: <sigma>
-                       max: <threshold>
-                   ```
-            */
+    override fun serialize(type: Type, obj: NumericValue?, node: ConfigurationNode) {
+        // throws if no value is provided
+        obj ?: throw SerializationException()
 
-            with(obj) {
+        /*
+           Possible config structures:
 
-                // intentionally write the redundant boolean logic
+           Case 1: (only base)
+               ```
+               node: <base>
+               ```
+           Case 2: (base + scale)
+               ```
+               node:
+                   base: <base>
+                   scale: <scale>
+               ```
+           Case 3: (base + normal dist)
+               ```
+               node:
+                   base: <base>
+                   spread: <sigma>
+                   max: <threshold>
+               ```
+           Case 4: (base + scale + normal dist)
+               ```
+               node:
+                   base: <base>
+                   scale: <scale>
+                   spread: <sigma>
+                   max: <threshold>
+               ```
+        */
 
-                if (!isScaled && !isRandom) {
-                    // case 1
-                    node.set(base)
-                } else {
-                    // case 2/3/4
-                    with(node) {
-                        node("base").set(base)
-                        if (isScaled) {
-                            // if scale is on
-                            node("scale").set(scale)
-                        }
-                        if (isRandom) {
-                            // if random is on
-                            node("spread").set(sigma)
-                            if (isBounded) {
-                                // if threshold is set
-                                node("max").set(threshold)
-                            }
+        with(obj) {
+
+            // intentionally write the redundant boolean logic
+
+            if (!isScaled && !isRandom) {
+                // case 1
+                node.set(base)
+            } else {
+                // case 2/3/4
+                with(node) {
+                    node("base").set(base)
+                    if (isScaled) {
+                        // if scale is on
+                        node("scale").set(scale)
+                    }
+                    if (isRandom) {
+                        // if random is on
+                        node("spread").set(sigma)
+                        if (isBounded) {
+                            // if threshold is set
+                            node("max").set(threshold)
                         }
                     }
                 }

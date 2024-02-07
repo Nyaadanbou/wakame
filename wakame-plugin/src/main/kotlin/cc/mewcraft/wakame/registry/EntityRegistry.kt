@@ -5,8 +5,7 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.reference.EntityReference
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
-import net.kyori.adventure.key.Key
-import org.bukkit.entity.Entity
+import cc.mewcraft.wakame.util.typedRequire
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -30,14 +29,17 @@ object EntityRegistry : KoinComponent, Initializable, Reloadable,
 
     private fun loadConfiguration() {
         node = loader.load()
-        // TODO read config and populate values
+        node.node("entity_references").childrenMap().forEach { (_, n) ->
+            val entityReference = n.typedRequire<EntityReference>()
+            registerName2Object(entityReference.name, entityReference)
+        }
     }
 
     override fun onPreWorld() {
-        TODO("Not yet implemented")
+        loadConfiguration()
     }
 
     override fun onReload() {
-        TODO("Not yet implemented")
+        loadConfiguration()
     }
 }

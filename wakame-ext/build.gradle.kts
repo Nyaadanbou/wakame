@@ -13,4 +13,9 @@ dependencies {
 
     // helper
     compileOnly(libs.helper)
+
+    // internal
+    compileOnly(project(":wakame:wakame-common"))
+
+    // external
 }

@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display.displayModule
 import cc.mewcraft.wakame.element.elementModule
+import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.initializer.initializerModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
@@ -49,6 +50,8 @@ class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
 
         // Start Koin container
         startKoin {
+
+            // Define modules
             modules(
                 // main module
                 wakameModule(this@WakamePlugin),
@@ -61,6 +64,7 @@ class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
                 damageModule(),
                 displayModule(),
                 elementModule(),
+                entityModule(),
                 initializerModule(),
                 itemModule(),
                 kizamiModule(),
@@ -74,6 +78,9 @@ class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
                 skinModule(),
                 testModule()
             )
+
+            // Create eager instances
+            createEagerInstances()
         }
 
         // Register listeners
