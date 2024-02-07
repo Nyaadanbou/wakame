@@ -89,5 +89,9 @@ paper {
             required = true
             load = RelativeLoadOrder.BEFORE
         }
+        register("MythicMobs") {
+            required = false
+            load = RelativeLoadOrder.OMIT
+        }
     }
 }

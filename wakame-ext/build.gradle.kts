@@ -15,7 +15,9 @@ dependencies {
     compileOnly(libs.helper)
 
     // internal
+    compileOnly(libs.caffeine)
     compileOnly(project(":wakame:wakame-common"))
 
     // external
+    compileOnly(libs.mythicmobs) { isTransitive = false }
 }
