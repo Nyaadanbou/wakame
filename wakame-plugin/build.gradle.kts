@@ -4,6 +4,7 @@ import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
 plugins {
     id("cc.mewcraft.repo-conventions")
     id("cc.mewcraft.kotlin-conventions")
+    id("cc.mewcraft.koin-conventions")
     id("cc.mewcraft.deploy-conventions")
     alias(libs.plugins.pluginyml.paper)
 }
@@ -34,8 +35,6 @@ dependencies {
     implementation(project(":wakame:wakame-api"))
     implementation(project(":wakame:wakame-ext"))
     implementation(project(":wakame:wakame-nms", configuration = "reobf"))
-    implementation(project(":spatula:koin"))
-    // implementation(project(":spatula:bukkit:message")) // TODO use adventure global translator
     implementation(project(":spatula:bukkit:utils"))
     implementation(libs.configurate.yaml) {
         exclude("com.google.errorprone")
