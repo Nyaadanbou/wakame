@@ -9,7 +9,7 @@ description = "Add custom stuff to server"
 
 dependencies {
     // server
-    compileOnly(libs.server.paper)
+    compileOnly(libs.server.purpur)
 
     // helper
     compileOnly(libs.helper)
