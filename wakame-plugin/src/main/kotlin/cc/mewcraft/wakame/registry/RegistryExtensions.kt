@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.BiIdentified
+import cc.mewcraft.wakame.annotation.InternalApi
 
 /**
  * Gets an element by its binary identifier.
@@ -50,4 +51,12 @@ fun <R, B, K, V : BiIdentified<K, B>> R.registerBothMapping(name: K, value: V)
               R : BiMapRegistry<K, B> {
     registerName2Object(name, value)
     registerBinary2Name(name, value.binary)
+}
+
+@InternalApi
+fun <R, B, K, V : BiIdentified<K, B>> R.clearBoth()
+        where R : Registry<K, V>,
+              R : BiMapRegistry<K, B> {
+    clearName2Object()
+    clearBinary2Name()
 }

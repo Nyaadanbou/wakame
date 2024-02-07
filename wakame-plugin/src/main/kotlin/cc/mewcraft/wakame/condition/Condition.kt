@@ -15,11 +15,6 @@ fun interface Condition<in C> {
 
     companion object {
         /**
-         * The namespace for all conditions.
-         */
-        const val CONDITION_NAMESPACE = "condition"
-
-        /**
          * A condition that always return `true`.
          */
         fun <C> alwaysTrue(): Condition<C> = ALWAYS_TRUE

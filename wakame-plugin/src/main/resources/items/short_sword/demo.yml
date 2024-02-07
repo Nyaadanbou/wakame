@@ -151,7 +151,7 @@ cell_groups:
             operation: add
             weight: 1
             filters: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该池里
-              - type: level # 这是一个关于物品等级要求的条件
+              - type: item_level # 这是一个关于物品等级要求的条件
                 level: "[20,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
       pool_2:
         filters:

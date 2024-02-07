@@ -7,7 +7,7 @@ import net.kyori.adventure.key.Keyed
 ////// Interfaces //////
 
 /**
- * Represents a condition which tests whether a [cell][Cell] in a
+ * Represents a condition testing whether a [cell][Cell] in a
  * [WakaItemStack] should be enabled or not. If a [cell][Cell] is
  * not enabled, it won't provide any effects as if it doesn't exist.
  */

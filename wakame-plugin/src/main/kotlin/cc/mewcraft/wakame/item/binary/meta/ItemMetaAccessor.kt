@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
@@ -12,6 +13,7 @@ interface ItemMetaAccessor : ItemMetaSetter {
     /**
      * Encompassing all tags of this [ItemMetaAccessor].
      */
+    @InternalApi
     val tags: CompoundShadowTag // 外部不应该读取该变量
 
     /**

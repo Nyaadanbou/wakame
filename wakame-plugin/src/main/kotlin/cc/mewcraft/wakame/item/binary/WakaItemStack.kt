@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.item.binary.cell.CellAccessor
 import cc.mewcraft.wakame.item.binary.curse.BinaryCurseContext
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
-import cc.mewcraft.wakame.item.binary.cell.CellAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessor
 import cc.mewcraft.wakame.item.scheme.WakaItem
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -75,6 +76,7 @@ interface WakaItemStack : WakaItemStackSetter, BinaryCurseContext {
      * durability, which are already accessible via Paper API. To get access to
      * these tags, just use the wrapped [handle].
      */
+    @InternalApi
     val tags: CompoundShadowTag // 外部不应该读取该变量
 
     /**

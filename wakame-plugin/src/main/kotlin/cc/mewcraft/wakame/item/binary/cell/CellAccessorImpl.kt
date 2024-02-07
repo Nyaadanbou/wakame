@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.AbilityBinaryValue
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.WakaItemStackImpl
@@ -13,6 +14,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
+@OptIn(InternalApi::class)
 internal class CellAccessorImpl(
     private val base: WakaItemStackImpl,
 ) : CellAccessor {
@@ -23,7 +25,10 @@ internal class CellAccessorImpl(
     //  in a wider scope of the project to make it effective,
     //  not just here
     private val cache: Object2ObjectMap<String, BinaryCell> = Object2ObjectArrayMap(tags.size()) // cache binary cells
-    override val tags: CompoundShadowTag get() = base.tags.getCompound(CellTagNames.ROOT)
+
+    override val tags: CompoundShadowTag
+        get() = base.tags.getCompound(CellTagNames.ROOT)
+
     override fun get(id: String): BinaryCell? {
         val compoundTag = tags.getCompoundOrNull(id) ?: return null
         // don't use computeIfAbsent to avoid creating non-capturing lambda

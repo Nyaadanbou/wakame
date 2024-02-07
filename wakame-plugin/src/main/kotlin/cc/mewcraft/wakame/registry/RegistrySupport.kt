@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableSet
-import org.jetbrains.annotations.ApiStatus
 
 // Side note: use CMD-7 to navigate this file
 
@@ -11,46 +11,52 @@ import org.jetbrains.annotations.ApiStatus
  * An abstract registry.
  */
 interface Registry<K, V> {
-    @get:ApiStatus.Internal
+    @InternalApi
     val name2ObjectMapping: MutableMap<K, V>
 
     /**
-     * All the elements in this registry.
+     * All the values in this registry.
      */
     val all: Set<V>
 
     /**
-     * Gets specified element in this registry.
+     * Gets specified value in this registry.
      *
-     * @param name the name from which element you want to retrieve
-     * @return the specified element or `null` if not existing
+     * @param name the name from which value you want to retrieve
+     * @return the specified value or `null` if not existing
      */
     fun get(name: K?): V?
 
     /**
-     * Gets specified element in this registry.
+     * Gets specified value in this registry.
      *
-     * @param name the name from which element you want to retrieve
-     * @return the specified element
-     * @throws IllegalStateException if the specified element does not exist
+     * @param name the name from which value you want to retrieve
+     * @return the specified value
+     * @throws IllegalStateException if the specified value does not exist
      */
     fun getOrThrow(name: K): V =
         checkNotNull(get(name)) { "Can't find object for name $name" }
 
     /**
-     * Registers a new element into this registry.
+     * Registers a new entry into this registry.
      *
-     * @param name the name of the new element
-     * @param value the new element itself
+     * @param name the name of the new entry
+     * @param value the new value
      */
     fun registerName2Object(name: K, value: V)
+
+    /**
+     * Clears all entries.
+     */
+    @InternalApi
+    fun clearName2Object()
 }
 
 /**
  * Operations of mapping [STRING] to [BINARY], and the reversed way.
  */
 interface BiMapRegistry<STRING, BINARY> {
-    @get:ApiStatus.Internal
+    @InternalApi
     val binary2NameMapping: BiMap<STRING, BINARY>
 
     fun getBinaryBy(name: STRING?): BINARY?
@@ -58,9 +64,16 @@ interface BiMapRegistry<STRING, BINARY> {
     fun getNameBy(binary: BINARY?): STRING?
     fun getNameByOrThrow(binary: BINARY): STRING
     fun registerBinary2Name(name: STRING, binary: BINARY)
+
+    /**
+     * Clears all entries.
+     */
+    @InternalApi
+    fun clearBinary2Name()
 }
 
 //<editor-fold desc="Internal Implementations">
+@OptIn(InternalApi::class)
 internal class HashMapRegistry<K, V> : Registry<K, V> {
     override val name2ObjectMapping: MutableMap<K, V> = HashMap()
 
@@ -74,8 +87,13 @@ internal class HashMapRegistry<K, V> : Registry<K, V> {
     override fun registerName2Object(name: K, value: V) {
         name2ObjectMapping[name] = value
     }
+
+    override fun clearName2Object() {
+        name2ObjectMapping.clear()
+    }
 }
 
+@OptIn(InternalApi::class)
 internal class HashBiMapRegistry<STRING, BINARY> : BiMapRegistry<STRING, BINARY> {
     override val binary2NameMapping: BiMap<STRING, BINARY> = HashBiMap.create()
 
@@ -83,16 +101,20 @@ internal class HashBiMapRegistry<STRING, BINARY> : BiMapRegistry<STRING, BINARY>
         if (name == null) null else binary2NameMapping[name]
 
     override fun getBinaryByOrThrow(name: STRING): BINARY =
-        checkNotNull(binary2NameMapping[name]) { "Can't find binary by name $name" }
+        requireNotNull(binary2NameMapping[name]) { "Can't find binary by name $name" }
 
     override fun getNameBy(binary: BINARY?): STRING? =
         if (binary == null) null else binary2NameMapping.inverse()[binary]
 
     override fun getNameByOrThrow(binary: BINARY): STRING =
-        checkNotNull(binary2NameMapping.inverse()[binary]) { "Can't find name by binary $binary" }
+        requireNotNull(binary2NameMapping.inverse()[binary]) { "Can't find name by binary $binary" }
 
     override fun registerBinary2Name(name: STRING, binary: BINARY) {
         binary2NameMapping[name] = binary
+    }
+
+    override fun clearBinary2Name() {
+        binary2NameMapping.clear()
     }
 }
 //</editor-fold>

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.cell.CellAccessor
 import cc.mewcraft.wakame.item.binary.cell.CellAccessorImpl
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
@@ -18,6 +19,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.UUID
 
+@OptIn(InternalApi::class)
 internal class WakaItemStackImpl(
     override val handle: ItemStack,
     override val isOneOff: Boolean = false,

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.reference.EntityReference
@@ -17,17 +18,10 @@ object EntityRegistry : KoinComponent, Initializable, Reloadable,
     private val loader: NekoConfigurationLoader by inject(named(ENTITY_CONFIG_LOADER))
     private lateinit var node: NekoConfigurationNode
 
-    /**
-     * Gets the key of specified [entity].
-     *
-     * @param entity the entity that you want lookup the key for
-     * @return the key of the specified entity
-     */
-    fun getEntityKey(entity: Entity): Key {
-        TODO("Not yet implemented")
-    }
-
+    @OptIn(InternalApi::class)
     private fun loadConfiguration() {
+        clearName2Object()
+
         node = loader.load()
         node.node("entity_references").childrenMap().forEach { (_, n) ->
             val entityReference = n.typedRequire<EntityReference>()

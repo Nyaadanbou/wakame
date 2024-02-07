@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.AbilityBinaryValue
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import com.google.common.collect.Multimap
@@ -11,6 +12,7 @@ interface CellAccessor : CellSetter {
     /**
      * Encompassing all tags of this [CellAccessor].
      */
+    @InternalApi
     val tags: CompoundShadowTag // 外部不应该读取该变量
 
     /**

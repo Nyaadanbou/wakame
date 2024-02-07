@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.WakaItemStackImpl
 import cc.mewcraft.wakame.kizami.Kizami
@@ -18,6 +19,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.UUID
 
+@OptIn(InternalApi::class)
 internal class ItemMetaAccessorImpl(
     private val base: WakaItemStackImpl,
 ) : KoinComponent, ItemMetaAccessor {
@@ -25,7 +27,9 @@ internal class ItemMetaAccessorImpl(
 
     ////// ItemMetaMap //////
 
-    override val tags: CompoundShadowTag get() = base.tags.getCompound(ItemMetaTagNames.ROOT)
+    override val tags: CompoundShadowTag
+        get() = base.tags.getCompound(ItemMetaTagNames.ROOT)
+
     override val name: Component
         get() = gsonSerializer.deserialize(tags.getString(ItemMetaTagNames.NAME))
 

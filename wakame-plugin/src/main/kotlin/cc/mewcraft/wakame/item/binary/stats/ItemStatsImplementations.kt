@@ -1,5 +1,8 @@
+@file:OptIn(InternalApi::class)
+
 package cc.mewcraft.wakame.item.binary.stats
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.toStableShort

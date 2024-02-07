@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.rarity.RarityMappings
@@ -23,7 +24,10 @@ object RarityMappingRegistry : KoinComponent, Initializable, Reloadable,
     private val loader: NekoConfigurationLoader by inject(named(RARITY_CONFIG_LOADER))
     private lateinit var node: NekoConfigurationNode
 
+    @OptIn(InternalApi::class)
     private fun loadConfiguration() {
+        clearName2Object()
+
         node = loader.load()
 
         // load the `global` mappings

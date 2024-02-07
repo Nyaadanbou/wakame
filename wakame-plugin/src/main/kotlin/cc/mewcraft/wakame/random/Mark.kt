@@ -16,7 +16,7 @@ interface Mark<T> {
         /**
          * Creates a [StringMark].
          */
-        fun stringMarkOf(value: String): StringMark {
+        fun stringMarkOf(value: String): Mark<String> {
             return StringMark(value)
         }
     }

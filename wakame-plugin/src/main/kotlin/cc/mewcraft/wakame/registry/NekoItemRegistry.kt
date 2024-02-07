@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.initializer.Initializable
@@ -25,7 +26,10 @@ object NekoItemRegistry : KoinComponent, Initializable, Reloadable,
     fun get(key: String): WakaItem? = get(Key.key(key))
     fun getOrThrow(key: String): WakaItem = getOrThrow(Key.key(key))
 
+    @OptIn(InternalApi::class)
     private fun loadConfiguration() {
+        clearName2Object()
+
         val namespaceDirs = mutableListOf<File>()
 
         // first walk each directory, i.e., each namespace
@@ -37,11 +41,15 @@ object NekoItemRegistry : KoinComponent, Initializable, Reloadable,
             }
 
         // then walk each file (i.e., each item) in each namespace
+        val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER))
         namespaceDirs.forEach { namespaceDir ->
             namespaceDir.walk().forEach { itemFile ->
-                val builder = get<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER))
-                val node = builder.buildAndLoadString(itemFile.bufferedReader().use { it.readText() })
-                val key = Key.key(namespaceDir.name.lowercase(), itemFile.name.lowercase())
+                val node = loaderBuilder.buildAndLoadString(itemFile.bufferedReader().use { it.readText() })
+
+                val namespace = namespaceDir.name
+                val value = itemFile.name
+
+                val key = Key.key(namespace, value)
                 val item = WakaItemFactory.create(key, node)
 
                 registerName2Object(key, item)
