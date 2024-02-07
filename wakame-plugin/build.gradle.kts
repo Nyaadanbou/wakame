@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     // server
-    compileOnly(libs.server.paper)
+    compileOnly(libs.server.purpur)
 
     // helper
     compileOnly(libs.helper)
