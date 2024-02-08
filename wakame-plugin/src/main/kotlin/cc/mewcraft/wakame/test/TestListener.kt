@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.test
 
+import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent
 import me.lucko.helper.nbt.ShadowTagType
@@ -16,6 +17,21 @@ import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 class TestListener : Listener {
+    @EventHandler
+    fun testItem(e: AsyncChatEvent) {
+        val player = e.player
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        val inventory = player.inventory
+
+        when (plainMessage) {
+            "i1" -> {
+                val nekoItem = NekoItemRegistry.getOrThrow("short_sword:demo")
+                val nekoItemStack = nekoItem.createItemStack(player)
+                inventory.addItem(nekoItemStack.handle)
+            }
+        }
+    }
+
     @EventHandler
     fun testShadowNbt(e: AsyncChatEvent) {
         val player = e.player
