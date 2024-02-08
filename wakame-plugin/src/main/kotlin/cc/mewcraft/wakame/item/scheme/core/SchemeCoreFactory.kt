@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.ability.AbilityCoreCodecRegistry
 import cc.mewcraft.wakame.ability.AbilitySchemeValue
 import cc.mewcraft.wakame.attribute.BinaryAttributeValue
 import cc.mewcraft.wakame.attribute.SchemeAttributeValue
-import cc.mewcraft.wakame.attribute.instance.AttributeCoreCodec
-import cc.mewcraft.wakame.attribute.instance.AttributeCoreCodecRegistry
+import cc.mewcraft.wakame.attribute.AttributeCoreCodec
+import cc.mewcraft.wakame.attribute.AttributeCoreCodecRegistry
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.util.typedRequire
 import net.kyori.adventure.key.Key

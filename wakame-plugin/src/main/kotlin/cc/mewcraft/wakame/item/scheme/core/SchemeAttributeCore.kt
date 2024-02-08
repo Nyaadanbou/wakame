@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.item.scheme.core
 
 import cc.mewcraft.wakame.attribute.BinaryAttributeValue
 import cc.mewcraft.wakame.attribute.SchemeAttributeValue
-import cc.mewcraft.wakame.attribute.instance.AttributeCoreCodec
-import cc.mewcraft.wakame.attribute.instance.AttributeCoreCodecRegistry
+import cc.mewcraft.wakame.attribute.AttributeCoreCodec
+import cc.mewcraft.wakame.attribute.AttributeCoreCodecRegistry
 import net.kyori.adventure.key.Key
 
 /**

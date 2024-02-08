@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.binary.core
 
 import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.attribute.instance.AttributeCoreCodec
-import cc.mewcraft.wakame.attribute.instance.AttributeCoreCodecRegistry
+import cc.mewcraft.wakame.attribute.AttributeCoreCodec
+import cc.mewcraft.wakame.attribute.AttributeCoreCodecRegistry
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
