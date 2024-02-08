@@ -17,5 +17,5 @@ interface AttributeModifierFactory<T : BinaryAttributeValue> {
      * @throws IllegalArgumentException if this factory can't create such
      *     attribute modifiers from given values
      */
-    fun createModifier(uuid: UUID, value: T): Map<out Attribute, AttributeModifier>
+    fun createAttributeModifiers(uuid: UUID, value: T): Map<out Attribute, AttributeModifier>
 }

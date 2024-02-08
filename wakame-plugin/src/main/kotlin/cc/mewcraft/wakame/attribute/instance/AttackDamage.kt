@@ -16,37 +16,34 @@ import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.UUID
 
-private typealias BAV_AD = BinaryAttributeValueLUE<Short>
-private typealias SAV_AD = SchemeAttributeValueLUE
-
 /**
  * 元素攻击力
  */
 class AttackDamage : KoinComponent, Initializable,
-    AttributeCoreCodec<BAV_AD, SAV_AD>,
-    AttributeModifierFactory<BAV_AD> {
+    AttributeCoreCodec<BinaryAttributeValueLUE<Short>, SchemeAttributeValueLUE>,
+    AttributeModifierFactory<BinaryAttributeValueLUE<Short>> {
 
     companion object {
-        val localBinaryValue: ThreadLocal<BAV_AD> = ThreadLocal.withInitial {
-            BAV_AD(0, 0, ElementRegistry.DEFAULT_ELEMENT, Operation.ADDITION)
+        val localBinaryValue: ThreadLocal<BinaryAttributeValueLUE<Short>> = ThreadLocal.withInitial {
+            BinaryAttributeValueLUE(0, 0, ElementRegistry.DEFAULT_ELEMENT, Operation.ADDITION)
         }
     }
 
     override val key: Key = Key.key(Core.ATTRIBUTE_NAMESPACE, "attack_damage")
 
-    override fun schemeOf(node: ConfigurationNode): SAV_AD {
-        return SAV_AD.deserialize(node)
+    override fun schemeOf(node: ConfigurationNode): SchemeAttributeValueLUE {
+        return SchemeAttributeValueLUE.deserialize(node)
     }
 
-    override fun generate(scheme: SAV_AD, scalingFactor: Int): BAV_AD {
+    override fun generate(scheme: SchemeAttributeValueLUE, scalingFactor: Int): BinaryAttributeValueLUE<Short> {
         val lower = scheme.lower.calculate(scalingFactor).toStableShort()
         val upper = scheme.upper.calculate(scalingFactor).toStableShort()
         val element = scheme.element
         val operation = scheme.operation
-        return BAV_AD(lower, upper, element, operation)
+        return BinaryAttributeValueLUE(lower, upper, element, operation)
     }
 
-    override fun decode(tag: CompoundShadowTag): BAV_AD {
+    override fun decode(tag: CompoundShadowTag): BinaryAttributeValueLUE<Short> {
         // FIXME 该函数无法很好的做抽象，因为每个属性存到 NBT 里的数据类型可能不一样
         //  如果真要做抽象，比如共享代码，那也只能把每种数据类型的实现都枚举一遍
         //  不好用反射，因为该函数会极高频率调用，而反射性能没有静态编译好
@@ -58,7 +55,7 @@ class AttackDamage : KoinComponent, Initializable,
         }
     }
 
-    override fun encode(binary: BAV_AD): CompoundShadowTag {
+    override fun encode(binary: BinaryAttributeValueLUE<Short>): CompoundShadowTag {
         return compoundShadowTag {
             putShort(AttributeTagNames.MIN_VALUE, binary.lower)
             putShort(AttributeTagNames.MAX_VALUE, binary.upper)
@@ -67,13 +64,13 @@ class AttackDamage : KoinComponent, Initializable,
         }
     }
 
-    override fun createModifier(uuid: UUID, value: BAV_AD): Map<out Attribute, AttributeModifier> {
+    override fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeValueLUE<Short>): Map<out Attribute, AttributeModifier> {
         val elem = value.element
         val minAtk = Attributes.byElement(elem).MIN_ATTACK_DAMAGE
         val maxAtk = Attributes.byElement(elem).MAX_ATTACK_DAMAGE
         val operation = value.operation
-        val minAtkMod = AttributeModifier(id = uuid, amount = value.lower.toStableDouble(), operation = operation)
-        val maxAtkMod = AttributeModifier(id = uuid, amount = value.upper.toStableDouble(), operation = operation)
+        val minAtkMod = AttributeModifier(uuid, value.lower.toStableDouble(), operation)
+        val maxAtkMod = AttributeModifier(uuid, value.upper.toStableDouble(), operation)
         return ImmutableMap.of(minAtk, minAtkMod, maxAtk, maxAtkMod)
     }
 

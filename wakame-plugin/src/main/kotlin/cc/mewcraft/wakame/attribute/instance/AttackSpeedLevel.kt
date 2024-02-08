@@ -14,9 +14,6 @@ import org.koin.mp.ThreadLocal
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.UUID
 
-private typealias BinaryValueASL = BinaryAttributeValueV<Byte>
-private typealias SchemeValueASL = SchemeAttributeValueV
-
 /**
  * 武器攻击速度
  *
@@ -32,46 +29,46 @@ private typealias SchemeValueASL = SchemeAttributeValueV
  * - (8) Extreme fast
  */
 class AttackSpeedLevel : KoinComponent, Initializable,
-    AttributeCoreCodec<BinaryValueASL, SchemeValueASL>,
-    AttributeModifierFactory<BinaryValueASL> {
+    AttributeCoreCodec<BinaryAttributeValueV<Byte>, SchemeAttributeValueV>,
+    AttributeModifierFactory<BinaryAttributeValueV<Byte>> {
 
     companion object {
-        val localBinaryValue: ThreadLocal<BinaryValueASL> = ThreadLocal.withInitial {
-            BinaryValueASL(0, AttributeModifier.Operation.ADDITION)
+        val localBinaryValue: ThreadLocal<BinaryAttributeValueV<Byte>> = ThreadLocal.withInitial {
+            BinaryAttributeValueV(0, AttributeModifier.Operation.ADDITION)
         }
     }
 
     override val key: Key = Key.key(Core.ATTRIBUTE_NAMESPACE, "attack_speed_level")
 
-    override fun schemeOf(node: ConfigurationNode): SchemeValueASL {
+    override fun schemeOf(node: ConfigurationNode): SchemeAttributeValueV {
         // FIXME 确保数值稳定：攻速比较特殊，就那么几个值会存在，但 SchemeValue 存的是 Double
-        return SchemeValueASL.deserialize(node)
+        return SchemeAttributeValueV.deserialize(node)
     }
 
-    override fun generate(scheme: SchemeValueASL, scalingFactor: Int): BinaryValueASL {
+    override fun generate(scheme: SchemeAttributeValueV, scalingFactor: Int): BinaryAttributeValueV<Byte> {
         // FIXME 确保数值稳定
         val value = scheme.value.calculate(scalingFactor).toStableByte()
         val operation = scheme.operation
-        return BinaryValueASL(value, operation)
+        return BinaryAttributeValueV(value, operation)
     }
 
-    override fun decode(tag: CompoundShadowTag): BinaryValueASL {
+    override fun decode(tag: CompoundShadowTag): BinaryAttributeValueV<Byte> {
         return localBinaryValue.get().apply {
             value = tag.getByte(AttributeTagNames.VALUE)
             operation = AttributeModifier.Operation.byId(tag.getInt(AttributeTagNames.OPERATION))
         }
     }
 
-    override fun encode(binary: BinaryValueASL): CompoundShadowTag {
+    override fun encode(binary: BinaryAttributeValueV<Byte>): CompoundShadowTag {
         return compoundShadowTag {
             putByte(AttributeTagNames.VALUE, binary.value)
             putByte(AttributeTagNames.OPERATION, binary.operation.binary)
         }
     }
 
-    override fun createModifier(uuid: UUID, value: BinaryValueASL): Map<out Attribute, AttributeModifier> {
+    override fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeValueV<Byte>): Map<out Attribute, AttributeModifier> {
         val attribute = Attributes.ATTACK_SPEED_LEVEL
-        val modifier = AttributeModifier(id = uuid, amount = value.value.toStableDouble(), operation = value.operation)
+        val modifier = AttributeModifier(uuid, value.value.toStableDouble(), value.operation)
         return ImmutableMap.of(attribute, modifier)
     }
 

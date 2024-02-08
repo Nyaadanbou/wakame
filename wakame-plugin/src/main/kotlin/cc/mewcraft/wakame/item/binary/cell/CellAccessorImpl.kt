@@ -60,7 +60,7 @@ internal class CellAccessorImpl(
             val core = binaryCell.binaryCore
             // TODO check lock conditions
             if (core is BinaryAttributeCore) {
-                val modifiers = core.provideModifier(base.uuid)
+                val modifiers = core.provideAttributeModifiers(base.uuid)
                 val modifiersEntries = modifiers.entries
                 multimap.putAll(modifiersEntries)
             }

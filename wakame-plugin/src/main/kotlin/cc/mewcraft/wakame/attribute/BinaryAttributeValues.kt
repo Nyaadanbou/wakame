@@ -15,6 +15,7 @@ sealed interface BinaryAttributeValue : BinaryCoreValue
 ////// 以下实现考虑了属性可能拥有的全部数据结构
 
 data class BinaryAttributeValueV<T>(
+    // FIXME 也许根本不需要 generics
     var value: T, var operation: AttributeModifier.Operation,
 ) : BinaryAttributeValue
 

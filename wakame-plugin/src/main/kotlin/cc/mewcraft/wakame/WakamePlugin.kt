@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display.displayModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.entity.entityModule
+import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer.initializerModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
@@ -19,35 +20,18 @@ import cc.mewcraft.wakame.reference.referenceModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.skin.skinModule
-import cc.mewcraft.wakame.test.TestListener
 import cc.mewcraft.wakame.test.testModule
 import me.lucko.helper.plugin.KExtendedJavaPlugin
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.stopKoin
 
+val NEKO_PLUGIN: WakamePlugin by lazy { GlobalContext.get().get<WakamePlugin>() }
+
 class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
+
     override suspend fun load() {
-
-    }
-
-    override suspend fun enable() {
-        // Save default config files
-        saveDefaultConfig()
-        saveResourceRecursively("crates")
-        saveResourceRecursively("items")
-        saveResourceRecursively("skills")
-        saveResource("attributes.yml")
-        saveResource("elements.yml")
-        saveResource("categories.yml")
-        saveResource("kizami.yml")
-        saveResource("levels.yml")
-        saveResource("projectiles.yml")
-        saveResource("rarities.yml")
-        saveResource("renderer.yml")
-        saveResource("skins.yml")
-
         // Start Koin container
         startKoin {
 
@@ -78,16 +62,16 @@ class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
                 skinModule(),
                 testModule()
             )
-
-            // Create eager instances
-            createEagerInstances()
         }
+    }
 
-        // Register listeners
-        registerTerminableListener(get<TestListener>()).bindWith(this)
+    override suspend fun enable() {
+        Initializer.start()
     }
 
     override suspend fun disable() {
+        Initializer.disable()
         stopKoin()
     }
+
 }
