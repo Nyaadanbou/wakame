@@ -1,15 +1,17 @@
 package cc.mewcraft.wakame.initializer
 
+import me.lucko.helper.terminable.Terminable
+
 /**
  * Something initializable.
  *
  * The functions will be called at certain stages.
  */
-internal interface Initializable {
+internal interface Initializable : Terminable {
     /**
      * Before the world is loaded.
      */
-    fun onPreWorld() {} // FIXME call it somewhere
+    fun onPreWorld() {}
 
     /**
      * Before the resource pack generation starts.
@@ -43,4 +45,9 @@ internal interface Initializable {
      * ("post-world") has finished, in an async thread.
      */
     suspend fun onPostPackAsync() {}
+
+    /**
+     * Closes this terminable.
+     */
+    override fun close() {}
 }
