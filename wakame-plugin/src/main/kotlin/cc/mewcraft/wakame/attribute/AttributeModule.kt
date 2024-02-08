@@ -1,15 +1,13 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.attribute.component.*
+import cc.mewcraft.wakame.attribute.facade.*
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 fun attributeModule(): Module = module {
-    // TODO setup it
 
     singleOf(::AttackDamage)
-    singleOf(::AttackDamageRate)
     singleOf(::AttackEffectChance)
     singleOf(::AttackSpeedLevel)
     singleOf(::CriticalStrikeChance)

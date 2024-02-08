@@ -9,7 +9,7 @@ import java.util.UUID
  * [AttributeModifier]s. That's why the function [provideAttributeModifiers] only
  * accepts a [UUID].
  *
- * @see AttributeModifierFactory
+ * @see AttributeFactory
  */
 interface AttributeModifierProvider {
     /**

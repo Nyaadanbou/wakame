@@ -19,6 +19,7 @@ interface Core : Keyed {
      * The key, which must be unique among all others of [cores][Core].
      */
     val key: Key
+
     override fun key(): Key = key
 
     companion object {

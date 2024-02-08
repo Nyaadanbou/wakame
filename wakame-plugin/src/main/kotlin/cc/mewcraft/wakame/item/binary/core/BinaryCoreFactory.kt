@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ability.AbilityCoreCodecRegistry
 import cc.mewcraft.wakame.ability.AbilitySchemeValue
 import cc.mewcraft.wakame.attribute.BinaryAttributeValue
 import cc.mewcraft.wakame.attribute.SchemeAttributeValue
-import cc.mewcraft.wakame.attribute.AttributeCoreCodec
+import cc.mewcraft.wakame.attribute.AttributeFacade
 import cc.mewcraft.wakame.attribute.AttributeCoreCodecRegistry
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.binary.cell.CellTagNames
@@ -46,7 +46,7 @@ object BinaryCoreFactory {
             }
 
             Core.ATTRIBUTE_NAMESPACE -> {
-                val codec: AttributeCoreCodec<BinaryAttributeValue, SchemeAttributeValue> = AttributeCoreCodecRegistry.getOrThrow(key)
+                val codec: AttributeFacade<BinaryAttributeValue, SchemeAttributeValue> = AttributeCoreCodecRegistry.getOrThrow(key)
                 val value: BinaryAttributeValue = codec.decode(compoundTag)
                 ret = BinaryAttributeCore(key, value)
             }

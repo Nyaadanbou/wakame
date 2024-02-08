@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.scheme.core
 
 import cc.mewcraft.wakame.attribute.BinaryAttributeValue
 import cc.mewcraft.wakame.attribute.SchemeAttributeValue
-import cc.mewcraft.wakame.attribute.AttributeCoreCodec
+import cc.mewcraft.wakame.attribute.AttributeFacade
 import cc.mewcraft.wakame.attribute.AttributeCoreCodecRegistry
 import net.kyori.adventure.key.Key
 
@@ -27,7 +27,7 @@ data class SchemeAttributeCore(
      * @return a new random [BinaryAttributeValue]
      */
     override fun generate(scalingFactor: Int): BinaryAttributeValue {
-        val codec: AttributeCoreCodec<BinaryAttributeValue, SchemeAttributeValue> = AttributeCoreCodecRegistry.getOrThrow(key)
+        val codec: AttributeFacade<BinaryAttributeValue, SchemeAttributeValue> = AttributeCoreCodecRegistry.getOrThrow(key)
         val value: BinaryAttributeValue = codec.generate(value, scalingFactor)
         return value
     }

@@ -51,7 +51,6 @@ class PlayerAttributeAccessor : AttributeAccessor<Player>() {
  *
  * **Not thread-safe.**
  */
-
 class EntityAttributeAccessor : AttributeAccessor<Entity>() {
     override fun getAttributeMap(uuid: UUID): AttributeMap {
         TODO("Read the NBT on the entity. Use cache if feasible")

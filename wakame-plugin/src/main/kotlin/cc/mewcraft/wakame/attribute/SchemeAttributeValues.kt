@@ -15,14 +15,14 @@ sealed interface SchemeAttributeValue : SchemeCoreValue
 
 ////// 模板数据都支持随机数值
 
-data class SchemeAttributeValueV(
+data class SchemeAttributeValueS(
     val value: NumericValue, val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
-    companion object : AttributeConfigSerializer<SchemeAttributeValueV> {
-        override fun deserialize(node: ConfigurationNode): SchemeAttributeValueV {
+    companion object : AttributeConfigSerializer<SchemeAttributeValueS> {
+        override fun deserialize(node: ConfigurationNode): SchemeAttributeValueS {
             val value = getValue(node)
             val operation = getOperation(node)
-            return SchemeAttributeValueV(value, operation)
+            return SchemeAttributeValueS(value, operation)
         }
     }
 }
@@ -40,15 +40,15 @@ data class SchemeAttributeValueLU(
     }
 }
 
-data class SchemeAttributeValueVE(
+data class SchemeAttributeValueSE(
     val value: NumericValue, val element: Element, val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
-    companion object : AttributeConfigSerializer<SchemeAttributeValueVE> {
-        override fun deserialize(node: ConfigurationNode): SchemeAttributeValueVE {
+    companion object : AttributeConfigSerializer<SchemeAttributeValueSE> {
+        override fun deserialize(node: ConfigurationNode): SchemeAttributeValueSE {
             val value = getValue(node)
             val element = getElement(node)
             val operation = getOperation(node)
-            return SchemeAttributeValueVE(value, element, operation)
+            return SchemeAttributeValueSE(value, element, operation)
         }
     }
 }

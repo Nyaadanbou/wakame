@@ -17,6 +17,7 @@ interface Curse : Keyed {
      * context of binary and scheme item.
      */
     val key: Key
+
     override fun key(): Key = key
 
     companion object Constants {
