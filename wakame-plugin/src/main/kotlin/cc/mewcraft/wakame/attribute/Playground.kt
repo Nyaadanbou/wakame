@@ -97,8 +97,8 @@ class SingleSelection(
         // register scheme baker
         AttributeFacadeRegistry.schemeBakerRegistry[key] = SchemeBaker { scheme, factor ->
             scheme as SchemeAttributeValueS
-            val value = scheme.value.calculate(factor)
-            when (type) {
+            val value: Double = scheme.value.calculate(factor)
+            val ret: BinaryAttributeValueS<out Number> = when (type) {
                 ShadowTagType.BYTE -> BinaryAttributeValueS(value.toStableByte(), scheme.operation)
                 ShadowTagType.SHORT -> BinaryAttributeValueS(value.toStableShort(), scheme.operation)
                 ShadowTagType.INT -> BinaryAttributeValueS(value.toStableInt(), scheme.operation)
@@ -107,11 +107,12 @@ class SingleSelection(
                 ShadowTagType.DOUBLE -> BinaryAttributeValueS(value.toStableDouble(), scheme.operation)
                 else -> throw IllegalArgumentException()
             }
+            return@SchemeBaker ret
         }
 
         // register shadow tag encoder
         AttributeFacadeRegistry.shadowTagEncoder[key] = ShadowTagEncoder {
-            compoundShadowTag {
+            val ret: CompoundShadowTag = compoundShadowTag {
                 // put value
                 when (type) {
                     ShadowTagType.BYTE -> putByte(AttributeTagNames.VALUE, (it as BinaryAttributeValueS<Byte>).value)
@@ -126,12 +127,13 @@ class SingleSelection(
                 // put operation
                 putByte(AttributeTagNames.OPERATION, (it as BinaryAttributeValueS<*>).operation.binary)
             }
+            return@ShadowTagEncoder ret
         }
 
         // register shadow tag decoder
         AttributeFacadeRegistry.shadowTagDecoder[key] = ShadowTagDecoder {
             it as CompoundShadowTag
-            when (type) {
+            val ret: BinaryAttributeValueS<out Number> = when (type) {
                 ShadowTagType.BYTE -> BinaryAttributeValueS(it.getByte(AttributeTagNames.VALUE), AttributeModifier.Operation.byId(it.getInt(AttributeTagNames.OPERATION)))
                 ShadowTagType.SHORT -> BinaryAttributeValueS(it.getShort(AttributeTagNames.VALUE), AttributeModifier.Operation.byId(it.getInt(AttributeTagNames.OPERATION)))
                 ShadowTagType.INT -> BinaryAttributeValueS(it.getInt(AttributeTagNames.VALUE), AttributeModifier.Operation.byId(it.getInt(AttributeTagNames.OPERATION)))
@@ -140,35 +142,12 @@ class SingleSelection(
                 ShadowTagType.DOUBLE -> BinaryAttributeValueS(it.getDouble(AttributeTagNames.VALUE), AttributeModifier.Operation.byId(it.getInt(AttributeTagNames.OPERATION)))
                 else -> throw IllegalArgumentException()
             }
+            return@ShadowTagDecoder ret
         }
 
         // register attribute factory
-        AttributeFacadeRegistry.attributeFactoryRegistry[key] = when (type) {
-            ShadowTagType.BYTE -> AttributeFactory<BinaryAttributeValueS<Byte>> { uuid, value ->
-                ImmutableMap.of(component, AttributeModifier(uuid, value.value.toStableDouble(), value.operation))
-            }
-
-            ShadowTagType.SHORT -> AttributeFactory<BinaryAttributeValueS<Short>> { uuid, value ->
-                ImmutableMap.of(component, AttributeModifier(uuid, value.value.toStableDouble(), value.operation))
-            }
-
-            ShadowTagType.INT -> AttributeFactory<BinaryAttributeValueS<Int>> { uuid, value ->
-                ImmutableMap.of(component, AttributeModifier(uuid, value.value.toStableDouble(), value.operation))
-            }
-
-            ShadowTagType.LONG -> AttributeFactory<BinaryAttributeValueS<Long>> { uuid, value ->
-                ImmutableMap.of(component, AttributeModifier(uuid, value.value.toStableDouble(), value.operation))
-            }
-
-            ShadowTagType.FLOAT -> AttributeFactory<BinaryAttributeValueS<Float>> { uuid, value ->
-                ImmutableMap.of(component, AttributeModifier(uuid, value.value.toStableDouble(), value.operation))
-            }
-
-            ShadowTagType.DOUBLE -> AttributeFactory<BinaryAttributeValueS<Double>> { uuid, value ->
-                ImmutableMap.of(component, AttributeModifier(uuid, value.value.toStableDouble(), value.operation))
-            }
-
-            else -> throw IllegalArgumentException()
+        AttributeFacadeRegistry.attributeFactoryRegistry[key] = AttributeFactory<BinaryAttributeValueS<out Number>> { uuid, value ->
+            ImmutableMap.of(component, AttributeModifier(uuid, value.value.toStableDouble(), value.operation))
         }
     }
 }
