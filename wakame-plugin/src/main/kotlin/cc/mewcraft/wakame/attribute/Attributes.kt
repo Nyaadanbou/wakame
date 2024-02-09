@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.element.Element
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Holds all default [Attribute] instances.
+ * A holder that holds all default [Attribute] instances.
  *
  * The attribute instances in this singleton object are primarily served as
  * "lookup index" for other code in this project. The given numeric values
@@ -64,15 +64,56 @@ object Attributes {
 
     // Use CHM to allow concurrent invocations
     private val elementAttributeMap: ConcurrentHashMap<Element, ElementAttributes> = ConcurrentHashMap()
+
+    /**
+     * Gets an [element attribute][ElementAttribute] by the specific [element].
+     *
+     * Note that this function does not directly give you a
+     * [element attribute]. Instead, you first get a "holder" that holds all
+     * the [element attribute][ElementAttribute] instances for the specific
+     * [element]. Then, you get the [element attribute][ElementAttribute]
+     * by accessing the properties of the [ElementAttribute].
+     *
+     * Example usage:
+     * ```kotlin
+     * val neutralElement = ...
+     * val minAttackDamage = Attributes.byElement(neutralElement).MIN_ATTACK_DAMAGE
+     * ```
+     *
+     * @param element the element of the attribute you want
+     * @return the holder of the specific element attribute you want
+     */
     fun byElement(element: Element): ElementAttributes {
         return elementAttributeMap.computeIfAbsent(element) {
             ElementAttributes(element)
         }
     }
+
+    /**
+     * Lazily gets an [element attribute][ElementAttribute]. You can use
+     * this function at the time when you are required to specify an
+     * [ElementAttribute] but the specific element is unknown.
+     *
+     * Example usage:
+     * ```
+     * val lazyMinAttackDamage = Attributes.byElement { MIN_ATTACK_DAMAGE }
+     * // Some other code that knows the element
+     * val neutralElement = ...
+     * val minAttackDamage = lazyMinAttackDamage(neutralElement)
+     * ```
+     *
+     * @param attribute the function used to specify the element attribute
+     * @return a function that returns the specific element attribute
+     * @receiver the holder of the specific element attribute
+     */
+    fun byElement(attribute: ElementAttributes.() -> ElementAttribute): (Element) -> ElementAttribute {
+        return { element -> byElement(element).attribute() }
+    }
 }
 
 /**
- * Holds all default [ElementAttribute] for an [Element].
+ * A holder that holds all default [ElementAttribute] instances for an
+ * [Element].
  */
 class ElementAttributes(
     element: Element,
