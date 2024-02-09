@@ -14,18 +14,18 @@ sealed interface BinaryAttributeValue : BinaryCoreValue
 
 ////// 以下实现考虑了属性可能拥有的全部数据结构
 
-data class BinaryAttributeValueS(
-    var value: Number, var operation: AttributeModifier.Operation,
+data class BinaryAttributeValueS<T>(
+    var value: T, var operation: AttributeModifier.Operation,
 ) : BinaryAttributeValue
 
-data class BinaryAttributeValueLU(
-    var lower: Number, var upper: Number, var operation: AttributeModifier.Operation,
+data class BinaryAttributeValueLU<T>(
+    var lower: T, var upper: T, var operation: AttributeModifier.Operation,
 ) : BinaryAttributeValue
 
-data class BinaryAttributeValueSE(
-    var value: Number, var element: Element, var operation: AttributeModifier.Operation,
+data class BinaryAttributeValueSE<T>(
+    var value: T, var element: Element, var operation: AttributeModifier.Operation,
 ) : BinaryAttributeValue
 
-data class BinaryAttributeValueLUE(
-    var lower: Number, var upper: Number, var element: Element, var operation: AttributeModifier.Operation,
+data class BinaryAttributeValueLUE<T>(
+    var lower: T, var upper: T, var element: Element, var operation: AttributeModifier.Operation,
 ) : BinaryAttributeValue

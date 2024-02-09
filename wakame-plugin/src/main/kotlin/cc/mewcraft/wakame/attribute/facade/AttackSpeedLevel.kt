@@ -29,12 +29,12 @@ import java.util.UUID
  * - (8) Extreme fast
  */
 class AttackSpeedLevel : KoinComponent, Initializable,
-    AttributeFacade<BinaryAttributeValueS, SchemeAttributeValueS>,
-    AttributeFactory<BinaryAttributeValueS> {
+    AttributeFacade<BinaryAttributeValueS<Byte>, SchemeAttributeValueS>,
+    AttributeFactory<BinaryAttributeValueS<Byte>> {
 
     companion object {
-        val localBinaryValue: ThreadLocal<BinaryAttributeValueS> = ThreadLocal.withInitial {
-            BinaryAttributeValueS(0, AttributeModifier.Operation.ADDITION)
+        val localBinaryValue: ThreadLocal<BinaryAttributeValueS<Byte>> = ThreadLocal.withInitial {
+            BinaryAttributeValueS<Byte>(0, AttributeModifier.Operation.ADDITION)
         }
     }
 
@@ -45,28 +45,28 @@ class AttackSpeedLevel : KoinComponent, Initializable,
         return SchemeAttributeValueS.deserialize(node)
     }
 
-    override fun generate(scheme: SchemeAttributeValueS, scalingFactor: Int): BinaryAttributeValueS {
+    override fun generate(scheme: SchemeAttributeValueS, scalingFactor: Int): BinaryAttributeValueS<Byte> {
         // FIXME 确保数值稳定
         val value = scheme.value.calculate(scalingFactor).toStableByte()
         val operation = scheme.operation
-        return BinaryAttributeValueS(value, operation)
+        return BinaryAttributeValueS<Byte>(value, operation)
     }
 
-    override fun decode(tag: CompoundShadowTag): BinaryAttributeValueS {
+    override fun decode(tag: CompoundShadowTag): BinaryAttributeValueS<Byte> {
         return localBinaryValue.get().apply {
             value = tag.getByte(AttributeTagNames.VALUE)
             operation = AttributeModifier.Operation.byId(tag.getInt(AttributeTagNames.OPERATION))
         }
     }
 
-    override fun encode(binary: BinaryAttributeValueS): CompoundShadowTag {
+    override fun encode(binary: BinaryAttributeValueS<Byte>): CompoundShadowTag {
         return compoundShadowTag {
             putByte(AttributeTagNames.VALUE, binary.value.toStableByte())
             putByte(AttributeTagNames.OPERATION, binary.operation.binary)
         }
     }
 
-    override fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeValueS): Map<out Attribute, AttributeModifier> {
+    override fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeValueS<Byte>): Map<out Attribute, AttributeModifier> {
         val attribute = Attributes.ATTACK_SPEED_LEVEL
         val modifier = AttributeModifier(uuid, value.value.toStableDouble(), value.operation)
         return ImmutableMap.of(attribute, modifier)

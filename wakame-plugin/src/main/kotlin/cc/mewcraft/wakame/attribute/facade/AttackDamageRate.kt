@@ -20,12 +20,12 @@ import java.util.UUID
  */
 @Deprecated(message = "每个属性修饰符均已支持独立的 Operation")
 class AttackDamageRate : KoinComponent, Initializable,
-    AttributeFacade<BinaryAttributeValueSE, SchemeAttributeValueSE>,
-    AttributeFactory<BinaryAttributeValueSE> {
+    AttributeFacade<BinaryAttributeValueSE<Float>, SchemeAttributeValueSE>,
+    AttributeFactory<BinaryAttributeValueSE<Float>> {
 
     companion object {
-        val localBinaryValue: ThreadLocal<BinaryAttributeValueSE> = ThreadLocal.withInitial {
-            BinaryAttributeValueSE(0F, ElementRegistry.DEFAULT_ELEMENT, AttributeModifier.Operation.ADDITION)
+        val localBinaryValue: ThreadLocal<BinaryAttributeValueSE<Float>> = ThreadLocal.withInitial {
+            BinaryAttributeValueSE<Float>(0F, ElementRegistry.DEFAULT_ELEMENT, AttributeModifier.Operation.ADDITION)
         }
     }
 
@@ -35,14 +35,14 @@ class AttackDamageRate : KoinComponent, Initializable,
         return SchemeAttributeValueSE.deserialize(node)
     }
 
-    override fun generate(scheme: SchemeAttributeValueSE, scalingFactor: Int): BinaryAttributeValueSE {
+    override fun generate(scheme: SchemeAttributeValueSE, scalingFactor: Int): BinaryAttributeValueSE<Float> {
         val value = scheme.value.calculate(scalingFactor).toFloat()
         val element = scheme.element
         val operation = scheme.operation
-        return BinaryAttributeValueSE(value, element, operation)
+        return BinaryAttributeValueSE<Float>(value, element, operation)
     }
 
-    override fun decode(tag: CompoundShadowTag): BinaryAttributeValueSE {
+    override fun decode(tag: CompoundShadowTag): BinaryAttributeValueSE<Float> {
         return localBinaryValue.get().apply {
             value = tag.getFloat(AttributeTagNames.VALUE)
             element = ElementRegistry.getByOrThrow(tag.getByte(AttributeTagNames.ELEMENT))
@@ -50,7 +50,7 @@ class AttackDamageRate : KoinComponent, Initializable,
         }
     }
 
-    override fun encode(binary: BinaryAttributeValueSE): CompoundShadowTag {
+    override fun encode(binary: BinaryAttributeValueSE<Float>): CompoundShadowTag {
         return compoundShadowTag {
             putFloat(AttributeTagNames.VALUE, binary.value.toStableFloat())
             putByte(AttributeTagNames.ELEMENT, binary.element.binary)
@@ -58,7 +58,7 @@ class AttackDamageRate : KoinComponent, Initializable,
         }
     }
 
-    override fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeValueSE): Map<Attribute, AttributeModifier> {
+    override fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeValueSE<Float>): Map<Attribute, AttributeModifier> {
         val element = value.element
         val attribute = Attributes.byElement(element).ATTACK_DAMAGE_RATE
         val attributeModifier = AttributeModifier(uuid, value.value.toStableDouble(), value.operation)

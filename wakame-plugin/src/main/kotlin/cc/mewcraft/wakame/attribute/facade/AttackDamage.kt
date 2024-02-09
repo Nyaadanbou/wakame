@@ -20,12 +20,12 @@ import java.util.UUID
  * 元素攻击力
  */
 class AttackDamage : KoinComponent, Initializable,
-    AttributeFacade<BinaryAttributeValueLUE, SchemeAttributeValueLUE>,
-    AttributeFactory<BinaryAttributeValueLUE> {
+    AttributeFacade<BinaryAttributeValueLUE<Short>, SchemeAttributeValueLUE>,
+    AttributeFactory<BinaryAttributeValueLUE<Short>> {
 
     companion object {
-        val localBinaryValue: ThreadLocal<BinaryAttributeValueLUE> = ThreadLocal.withInitial {
-            BinaryAttributeValueLUE(0, 0, ElementRegistry.DEFAULT_ELEMENT, Operation.ADDITION)
+        val localBinaryValue: ThreadLocal<BinaryAttributeValueLUE<Short>> = ThreadLocal.withInitial {
+            BinaryAttributeValueLUE<Short>(0, 0, ElementRegistry.DEFAULT_ELEMENT, Operation.ADDITION)
         }
     }
 
@@ -35,15 +35,15 @@ class AttackDamage : KoinComponent, Initializable,
         return SchemeAttributeValueLUE.deserialize(node)
     }
 
-    override fun generate(scheme: SchemeAttributeValueLUE, scalingFactor: Int): BinaryAttributeValueLUE {
+    override fun generate(scheme: SchemeAttributeValueLUE, scalingFactor: Int): BinaryAttributeValueLUE<Short> {
         val lower = scheme.lower.calculate(scalingFactor).toStableShort()
         val upper = scheme.upper.calculate(scalingFactor).toStableShort()
         val element = scheme.element
         val operation = scheme.operation
-        return BinaryAttributeValueLUE(lower, upper, element, operation)
+        return BinaryAttributeValueLUE<Short>(lower, upper, element, operation)
     }
 
-    override fun decode(tag: CompoundShadowTag): BinaryAttributeValueLUE {
+    override fun decode(tag: CompoundShadowTag): BinaryAttributeValueLUE<Short> {
         // FIXME 该函数无法很好的做抽象，因为每个属性存到 NBT 里的数据类型可能不一样
         //  如果真要做抽象，比如共享代码，那也只能把每种数据类型的实现都枚举一遍
         //  不好用反射，因为该函数会极高频率调用，而反射性能没有静态编译好
@@ -55,7 +55,7 @@ class AttackDamage : KoinComponent, Initializable,
         }
     }
 
-    override fun encode(binary: BinaryAttributeValueLUE): CompoundShadowTag {
+    override fun encode(binary: BinaryAttributeValueLUE<Short>): CompoundShadowTag {
         return compoundShadowTag {
             putShort(AttributeTagNames.MIN_VALUE, binary.lower.toStableShort())
             putShort(AttributeTagNames.MAX_VALUE, binary.upper.toStableShort())
@@ -64,7 +64,7 @@ class AttackDamage : KoinComponent, Initializable,
         }
     }
 
-    override fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeValueLUE): Map<out Attribute, AttributeModifier> {
+    override fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeValueLUE<Short>): Map<out Attribute, AttributeModifier> {
         val elem = value.element
         val minAtk = Attributes.byElement(elem).MIN_ATTACK_DAMAGE
         val maxAtk = Attributes.byElement(elem).MAX_ATTACK_DAMAGE
