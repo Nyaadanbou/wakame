@@ -150,18 +150,12 @@ fun CompoundShadowTag.getListOrNull(key: String, type: ShadowTagType): ListShado
 
 /* Kotlin-style builders */
 
-@DslMarker
-annotation class ShadowDslMarker
-
-@ShadowDslMarker
 fun compoundShadowTag(builder: CompoundShadowTag.() -> Unit): CompoundShadowTag =
     CompoundShadowTag.create().apply(builder)
 
-@ShadowDslMarker
 fun listShadowTag(builder: ListShadowTag.() -> Unit): ListShadowTag =
     ListShadowTag.create().apply(builder)
 
-@ShadowDslMarker
 fun listShadowTag(vararg tags: ShadowTag): ListShadowTag {
     val list = tags.asList()
     val type = list.first().type
