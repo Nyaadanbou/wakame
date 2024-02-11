@@ -27,13 +27,13 @@ interface ItemMetaAccessor : ItemMetaSetter {
     val lore: List<Component>
 
     /**
-     * 物品的等级。
+     * 物品的等级。不是所有物品都有等级，因此可能为空。
      */
     val level: Int?
     val levelOrThrow: Int
 
     /**
-     * 物品的稀有度。
+     * 物品的稀有度。不是所有物品都有稀有度，因此可能为空。
      */
     val rarity: Rarity?
     val rarityOrThrow: Rarity
@@ -43,7 +43,7 @@ interface ItemMetaAccessor : ItemMetaSetter {
      *
      * 可以用来快速判断物品能打出什么元素效果。
      */
-    val elements: Set<Element>
+    val element: Set<Element>
 
     /**
      * 物品的铭刻。如果没有铭刻则返回空集。

@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.SchemeCoreValue
-import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.NumericValue
+import cc.mewcraft.wakame.util.typedRequire
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
@@ -15,74 +15,83 @@ sealed interface SchemeAttributeValue : SchemeCoreValue
 
 ////// 模板数据都支持随机数值
 
+/**
+ * S = Single.
+ */
 data class SchemeAttributeValueS(
     val value: NumericValue, val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
     companion object : AttributeConfigSerializer<SchemeAttributeValueS> {
         override fun deserialize(node: ConfigurationNode): SchemeAttributeValueS {
-            val value = getValue(node)
-            val operation = getOperation(node)
+            val value = deserializeSingle(node)
+            val operation = deserializeOperation(node)
             return SchemeAttributeValueS(value, operation)
         }
     }
 }
 
+/**
+ * LU = Lower & Upper.
+ */
 data class SchemeAttributeValueLU(
     val lower: NumericValue, val upper: NumericValue, val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
     companion object : AttributeConfigSerializer<SchemeAttributeValueLU> {
         override fun deserialize(node: ConfigurationNode): SchemeAttributeValueLU {
-            val lower = getLower(node)
-            val upper = getUpper(node)
-            val operation = getOperation(node)
+            val lower = deserializeLower(node)
+            val upper = deserializeUpper(node)
+            val operation = deserializeOperation(node)
             return SchemeAttributeValueLU(lower, upper, operation)
         }
     }
 }
 
+/**
+ * SE = Single & Element.
+ */
 data class SchemeAttributeValueSE(
     val value: NumericValue, val element: Element, val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
     companion object : AttributeConfigSerializer<SchemeAttributeValueSE> {
         override fun deserialize(node: ConfigurationNode): SchemeAttributeValueSE {
-            val value = getValue(node)
-            val element = getElement(node)
-            val operation = getOperation(node)
+            val value = deserializeSingle(node)
+            val element = deserializeElement(node)
+            val operation = deserializeOperation(node)
             return SchemeAttributeValueSE(value, element, operation)
         }
     }
 }
 
+/**
+ * LUE = Lower & Upper & Element.
+ */
 data class SchemeAttributeValueLUE(
     val lower: NumericValue, val upper: NumericValue, val element: Element, val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
     companion object : AttributeConfigSerializer<SchemeAttributeValueLUE> {
         override fun deserialize(node: ConfigurationNode): SchemeAttributeValueLUE {
-            val lower = getLower(node)
-            val upper = getUpper(node)
-            val element = getElement(node)
-            val operation = getOperation(node)
+            val lower = deserializeLower(node)
+            val upper = deserializeUpper(node)
+            val element = deserializeElement(node)
+            val operation = deserializeOperation(node)
             return SchemeAttributeValueLUE(lower, upper, element, operation)
         }
     }
 }
 
-private fun getValue(node: ConfigurationNode): NumericValue =
-    requireNotNull(node.node("value")) { "`value` must be not null" }
-        .let { NumericValue.create(it) }
+private fun deserializeSingle(node: ConfigurationNode): NumericValue =
+    node.node("value").typedRequire<NumericValue>()
 
-private fun getUpper(node: ConfigurationNode) =
-    requireNotNull(node.node("upper")) { "`upper` must be not null" }
-        .let { NumericValue.create(it) }
+private fun deserializeLower(node: ConfigurationNode): NumericValue =
+    node.node("lower").typedRequire<NumericValue>()
 
-private fun getLower(node: ConfigurationNode) =
-    requireNotNull(node.node("lower")) { "`lower` must be not null" }
-        .let { NumericValue.create(it) }
+private fun deserializeUpper(node: ConfigurationNode): NumericValue =
+    node.node("upper").typedRequire<NumericValue>()
 
-private fun getElement(node: ConfigurationNode) =
-    requireNotNull(node.node("element").string) { "`element` must be not null" }
-        .let { ElementRegistry.getOrThrow(it) }
+private fun deserializeElement(node: ConfigurationNode): Element =
+    node.node("element").typedRequire<Element>()
 
-private fun getOperation(node: ConfigurationNode) =
-    node.node("operation").string?.let { AttributeModifier.Operation.byKey(it) }
+private fun deserializeOperation(node: ConfigurationNode): AttributeModifier.Operation =
+    node.node("operation").string
+        ?.let { AttributeModifier.Operation.byKey(it) }
         ?: AttributeModifier.Operation.ADDITION // ADDITION by default

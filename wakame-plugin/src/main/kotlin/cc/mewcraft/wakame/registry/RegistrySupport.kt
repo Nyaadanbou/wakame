@@ -17,7 +17,7 @@ interface Registry<K, V> {
     /**
      * All the values in this registry.
      */
-    val all: Set<V>
+    val values: Set<V>
 
     /**
      * Gets specified value in this registry.
@@ -35,7 +35,7 @@ interface Registry<K, V> {
      * @throws IllegalStateException if the specified value does not exist
      */
     fun getOrThrow(name: K): V =
-        checkNotNull(get(name)) { "Can't find object for name $name" }
+        requireNotNull(get(name)) { "Can't find object for name $name" }
 
     /**
      * Registers a new entry into this registry.
@@ -77,7 +77,7 @@ interface BiMapRegistry<STRING, BINARY> {
 internal class HashMapRegistry<K, V> : Registry<K, V> {
     override val name2ObjectMapping: MutableMap<K, V> = HashMap()
 
-    override val all: Set<V>
+    override val values: Set<V>
         get() = ImmutableSet.copyOf(name2ObjectMapping.values)
 
     override fun get(name: K?): V? {

@@ -15,9 +15,10 @@ object ElementRegistry : KoinComponent, Initializable, Reloadable,
     Registry<String, Element> by HashMapRegistry(),
     BiMapRegistry<String, Byte> by HashBiMapRegistry() {
 
-    // default element
-    @OptIn(InternalApi::class)
-    val DEFAULT_ELEMENT: Element get() = name2ObjectMapping.values.first()
+    /**
+     * The default element. By design, it should be the most common element.
+     */
+    val DEFAULT_ELEMENT: Element by lazy { values.first() }
 
     // configuration stuff
     private val loader: NekoConfigurationLoader by inject(named(ELEMENT_CONFIG_LOADER))

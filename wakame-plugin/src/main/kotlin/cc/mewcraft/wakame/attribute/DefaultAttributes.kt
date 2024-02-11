@@ -54,7 +54,7 @@ object DefaultAttributes {
                   Mechanics of these attributes are implementation-defined.
                 */
 
-                ElementRegistry.all.forEach {
+                ElementRegistry.values.forEach {
                     add(Attributes.byElement(it).DEFENSE)
                     add(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
                     add(Attributes.byElement(it).MAX_ATTACK_DAMAGE)

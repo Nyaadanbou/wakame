@@ -51,34 +51,33 @@ internal class ItemMetaAccessorImpl(
         get() = level ?: throwIfNull()
 
     override val rarity: Rarity?
-        get() = RarityRegistry.get(
-            RarityRegistry.getNameBy(
-                tags.getByteOrNull(ItemMetaTagNames.RARITY)
-            )
-        )
+        get() {
+            val byte = tags.getByteOrNull(ItemMetaTagNames.RARITY)
+                ?: return null
+            return RarityRegistry.getBy(byte)
+        }
     override val rarityOrThrow: Rarity
         get() = rarity ?: throwIfNull()
 
-    override val elements: Set<Element>
+    override val element: Set<Element>
         get() {
-            val byteArray = tags.getByteArrayOrNull(ItemMetaTagNames.ELEMENTS)
+            val byteArray = tags.getByteArrayOrNull(ItemMetaTagNames.ELEMENT)
                 ?: return emptySet()
-            val ret = ObjectArraySet<Element>(byteArray.size)
-            byteArray.map {
-                ElementRegistry.getBy(it)
-            }.filterNotNullTo(ret)
-            return ret
+            return byteArray.mapTo(
+                ObjectArraySet(byteArray.size)
+            ) {
+                ElementRegistry.getByOrThrow(it)
+            }
         }
-
     override val kizami: Set<Kizami>
         get() {
             val byteArray = tags.getByteArrayOrNull(ItemMetaTagNames.KIZAMI)
                 ?: return emptySet()
-            val ret = ObjectArraySet<Kizami>(byteArray.size)
-            byteArray.map {
-                KizamiRegistry.getBy(it)
-            }.filterNotNullTo(ret)
-            return ret
+            return byteArray.mapTo(
+                ObjectArraySet(byteArray.size)
+            ) {
+                KizamiRegistry.getByOrThrow(it)
+            }
         }
 
     override val skin: ItemSkin?
@@ -89,12 +88,10 @@ internal class ItemMetaAccessorImpl(
         }
     override val skinOrThrow: ItemSkin
         get() = skin ?: throwIfNull()
-
     override val skinOwner: UUID?
         get() {
-            if (!tags.hasUUID(ItemMetaTagNames.SKIN_OWNER)) {
+            if (!tags.hasUUID(ItemMetaTagNames.SKIN_OWNER))
                 return null
-            }
             return tags.getUUID(ItemMetaTagNames.SKIN_OWNER)
         }
     override val skinOwnerOrThrow: UUID
@@ -144,7 +141,7 @@ internal class ItemMetaAccessorImpl(
 
     override fun putElements(elements: Iterable<Element>) {
         val byteArray = elements.map { it.binary }.toByteArray()
-        edit { putByteArray(ItemMetaTagNames.ELEMENTS, byteArray) }
+        edit { putByteArray(ItemMetaTagNames.ELEMENT, byteArray) }
     }
 
     override fun putKizami(kizami: Iterable<Kizami>) {

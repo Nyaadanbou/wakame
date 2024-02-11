@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.Reloadable
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
@@ -14,6 +14,11 @@ import org.koin.core.qualifier.named
 object RarityRegistry : KoinComponent, Initializable, Reloadable,
     Registry<String, Rarity> by HashMapRegistry(),
     BiMapRegistry<String, Byte> by HashBiMapRegistry() {
+
+    /**
+     * The default rarity. By design, it should be the most common rarity.
+     */
+    val DEFAULT_RARITY: Rarity by lazy { values.first() }
 
     // configuration stuff
     private val loader: NekoConfigurationLoader by inject(named(RARITY_CONFIG_LOADER))
