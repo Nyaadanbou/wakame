@@ -10,22 +10,24 @@ import cc.mewcraft.wakame.item.BinaryCoreValue
  *
  * 实现类应该将成员变量声明为 `var` 而不是 `val` 以实现复用。同时配合 [ThreadLocal] 高效解决并发问题。
  */
-sealed interface BinaryAttributeValue : BinaryCoreValue
+sealed interface BinaryAttributeValue : BinaryCoreValue {
+    var operation: AttributeModifier.Operation
+}
 
 ////// 以下实现考虑了属性可能拥有的全部数据结构
 
-data class BinaryAttributeValueS<T>(
-    var value: T, var operation: AttributeModifier.Operation,
+data class BinaryAttributeValueS<T : Number>(
+    var value: T, override var operation: AttributeModifier.Operation,
 ) : BinaryAttributeValue
 
-data class BinaryAttributeValueLU<T>(
-    var lower: T, var upper: T, var operation: AttributeModifier.Operation,
+data class BinaryAttributeValueLU<T : Number>(
+    var lower: T, var upper: T, override var operation: AttributeModifier.Operation,
 ) : BinaryAttributeValue
 
-data class BinaryAttributeValueSE<T>(
-    var value: T, var element: Element, var operation: AttributeModifier.Operation,
+data class BinaryAttributeValueSE<T : Number>(
+    var value: T, var element: Element, override var operation: AttributeModifier.Operation,
 ) : BinaryAttributeValue
 
-data class BinaryAttributeValueLUE<T>(
-    var lower: T, var upper: T, var element: Element, var operation: AttributeModifier.Operation,
+data class BinaryAttributeValueLUE<T : Number>(
+    var lower: T, var upper: T, var element: Element, override var operation: AttributeModifier.Operation,
 ) : BinaryAttributeValue

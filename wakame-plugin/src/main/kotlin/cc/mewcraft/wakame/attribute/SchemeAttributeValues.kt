@@ -11,7 +11,9 @@ import org.spongepowered.configurate.ConfigurationNode
  *
  * 模板中的数值可能为固定值，也可能为随机值，因此所有实现的数值都是 [NumericValue]
  */
-sealed interface SchemeAttributeValue : SchemeCoreValue
+sealed interface SchemeAttributeValue : SchemeCoreValue {
+    val operation: AttributeModifier.Operation
+}
 
 ////// 模板数据都支持随机数值
 
@@ -19,7 +21,7 @@ sealed interface SchemeAttributeValue : SchemeCoreValue
  * S = Single.
  */
 data class SchemeAttributeValueS(
-    val value: NumericValue, val operation: AttributeModifier.Operation,
+    val value: NumericValue, override val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
     companion object : AttributeConfigSerializer<SchemeAttributeValueS> {
         override fun deserialize(node: ConfigurationNode): SchemeAttributeValueS {
@@ -34,7 +36,7 @@ data class SchemeAttributeValueS(
  * LU = Lower & Upper.
  */
 data class SchemeAttributeValueLU(
-    val lower: NumericValue, val upper: NumericValue, val operation: AttributeModifier.Operation,
+    val lower: NumericValue, val upper: NumericValue, override val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
     companion object : AttributeConfigSerializer<SchemeAttributeValueLU> {
         override fun deserialize(node: ConfigurationNode): SchemeAttributeValueLU {
@@ -50,7 +52,7 @@ data class SchemeAttributeValueLU(
  * SE = Single & Element.
  */
 data class SchemeAttributeValueSE(
-    val value: NumericValue, val element: Element, val operation: AttributeModifier.Operation,
+    val value: NumericValue, val element: Element, override val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
     companion object : AttributeConfigSerializer<SchemeAttributeValueSE> {
         override fun deserialize(node: ConfigurationNode): SchemeAttributeValueSE {
@@ -66,7 +68,7 @@ data class SchemeAttributeValueSE(
  * LUE = Lower & Upper & Element.
  */
 data class SchemeAttributeValueLUE(
-    val lower: NumericValue, val upper: NumericValue, val element: Element, val operation: AttributeModifier.Operation,
+    val lower: NumericValue, val upper: NumericValue, val element: Element, override val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValue {
     companion object : AttributeConfigSerializer<SchemeAttributeValueLUE> {
         override fun deserialize(node: ConfigurationNode): SchemeAttributeValueLUE {

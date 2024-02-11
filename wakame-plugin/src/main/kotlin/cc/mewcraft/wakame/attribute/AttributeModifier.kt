@@ -14,7 +14,9 @@ data class AttributeModifier(
     val operation: Operation,
 ) {
 
-    constructor(id: UUID, amount: Double, operation: Operation) : this(id, null, amount, operation)
+    constructor(id: UUID, amount: Double, operation: Operation) : this(
+        id, null, amount, operation
+    )
 
     enum class Operation(
         val key: String,
