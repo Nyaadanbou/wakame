@@ -93,30 +93,28 @@ interface FormatSelection {
     fun single(): SingleSelection
 }
 
-interface SingleSelection {
+interface SingleSelection : SingleAttributeBinder {
     fun element(): SingleElementAttributeBinder
+}
+
+interface RangedSelection : RangedAttributeBinder {
+    fun element(): RangedElementAttributeBinder
+}
+
+interface SingleAttributeBinder {
     fun bind(component: Attribute)
 }
 
-interface RangedSelection {
-    fun element(): RangedElementAttributeBinder
-    fun bind(
-        component1: Attribute,
-        component2: Attribute,
-    )
+interface RangedAttributeBinder {
+    fun bind(component1: Attribute, component2: Attribute)
 }
 
 interface SingleElementAttributeBinder {
-    fun bind(
-        component: (Element) -> ElementAttribute,
-    )
+    fun bind(component: (Element) -> ElementAttribute)
 }
 
 interface RangedElementAttributeBinder {
-    fun bind(
-        component1: (Element) -> ElementAttribute,
-        component2: (Element) -> ElementAttribute,
-    )
+    fun bind(component1: (Element) -> ElementAttribute, component2: (Element) -> ElementAttribute)
 }
 
 // Implementations Start!
