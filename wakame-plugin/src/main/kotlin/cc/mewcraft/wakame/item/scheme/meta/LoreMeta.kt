@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
+import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import net.kyori.adventure.key.Key
@@ -27,7 +28,7 @@ class LoreMeta(
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(SchemeMeta.ITEM_META_NAMESPACE, "lore")
+        override fun key(): Key = Key.key(NekoNamespaces.META, "lore")
     }
 }
 

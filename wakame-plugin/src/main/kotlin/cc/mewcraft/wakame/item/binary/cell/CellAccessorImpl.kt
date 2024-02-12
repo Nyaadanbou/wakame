@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.item.binary.cell
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.AbilityBinaryValue
+import cc.mewcraft.wakame.ability.BinaryAbilityValue
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.base.Attribute
+import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.item.binary.WakaItemStackImpl
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.util.getCompoundOrNull
@@ -27,7 +28,7 @@ internal class CellAccessorImpl(
     private val cache: Object2ObjectMap<String, BinaryCell> = Object2ObjectArrayMap(tags.size()) // cache binary cells
 
     override val tags: CompoundShadowTag
-        get() = base.tags.getCompound(CellTagNames.ROOT)
+        get() = base.tags.getCompound(NekoTags.Cell.ROOT)
 
     override fun get(id: String): BinaryCell? {
         val compoundTag = tags.getCompoundOrNull(id) ?: return null
@@ -56,19 +57,24 @@ internal class CellAccessorImpl(
         // 并且 Operation 不同的情况
 
         val multimap = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
+
         for (binaryCell in asMap().values) {
+            if (!binaryCell.binaryCurse.test(base)) {
+                continue // curse has not been unlocked yet
+            }
+
             val core = binaryCell.binaryCore
-            // TODO check lock conditions
             if (core is BinaryAttributeCore) {
                 val modifiers = core.provideAttributeModifiers(base.uuid)
                 val modifiersEntries = modifiers.entries
                 multimap.putAll(modifiersEntries)
             }
         }
+
         return multimap.build()
     }
 
-    override fun getAbilities(): Map<out Ability, AbilityBinaryValue> {
+    override fun getAbilities(): Map<out Ability, BinaryAbilityValue> {
         TODO("Not yet implemented")
     }
 

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
+import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
@@ -28,14 +29,14 @@ class KizamiMeta(
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(SchemeMeta.ITEM_META_NAMESPACE, "kizami")
+        override fun key(): Key = Key.key(NekoNamespaces.META, "kizami")
     }
 }
 
 internal class KizamiMetaSerializer : SchemeSerializer<KizamiMeta> {
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiMeta {
         if (node.virtual()) { // make it optional
-            return KizamiMeta(Pool.emptyPool())
+            return KizamiMeta(Pool.empty())
         }
 
         return KizamiMeta(node.typedRequire<KizamiPool>())

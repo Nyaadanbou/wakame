@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.curse
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.CurseKeys
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.curse.EmptySchemeCurse
@@ -12,8 +13,6 @@ import cc.mewcraft.wakame.item.binary.curse.EntityKillsCurse as BEntityKillsCurs
 import cc.mewcraft.wakame.item.binary.curse.PeakDamageCurse as BPeakDamageCurse
 import cc.mewcraft.wakame.item.scheme.curse.EntityKillsCurse as SEntityKillsCurse
 import cc.mewcraft.wakame.item.scheme.curse.PeakDamageCurse as SPeakDamageCurse
-
-// TODO use flyweight pattern to save memory
 
 object BinaryCurseFactory {
     fun decode(compoundTag: CompoundShadowTag): BinaryCurse {
@@ -41,6 +40,7 @@ object BinaryCurseFactory {
         return ret
     }
 
+    @OptIn(InternalApi::class)
     fun generate(context: SchemeGenerationContext, schemeCurse: SchemeCurse): BinaryCurse {
         val ret: BinaryCurse = when (schemeCurse) {
             is EmptySchemeCurse -> {

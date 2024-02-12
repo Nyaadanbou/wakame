@@ -55,19 +55,21 @@ interface Sample<T, in C : SelectionContext> : Weighted {
         var mark: Mark<*>?
         var trace: (C) -> Unit
     }
-}
 
-inline fun <T, C : SelectionContext> buildSample(content: T, block: Sample.Builder<T, C>.() -> Unit): Sample<T, C> {
-    val builder = SampleBuilder<T, C>(content).apply(block)
-    val sample = object : AbstractSample<T, C>(
-        content = builder.content,
-        weight0 = builder.weight,
-        conditions = builder.conditions,
-        mark = builder.mark
-    ) {
-        override fun trace(context: C) {
-            builder.trace(context)
+    companion object Factory {
+        inline fun <T, C : SelectionContext> build(content: T, block: Sample.Builder<T, C>.() -> Unit): Sample<T, C> {
+            val builder = SampleBuilder<T, C>(content).apply(block)
+            val sample = object : AbstractSample<T, C>(
+                content = builder.content,
+                weight0 = builder.weight,
+                conditions = builder.conditions,
+                mark = builder.mark
+            ) {
+                override fun trace(context: C) {
+                    builder.trace(context)
+                }
+            }
+            return sample
         }
     }
-    return sample
 }

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.filter
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.binary.WakaItemStack
@@ -49,5 +50,6 @@ sealed interface Filter : Condition<SchemeGenerationContext> {
 /**
  * Gets an empty filter.
  */
+@OptIn(InternalApi::class)
 fun emptyFilter(): Filter =
     EmptyFilter

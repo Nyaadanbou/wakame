@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.AbilityBinaryValue
+import cc.mewcraft.wakame.ability.BinaryAbilityValue
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.base.Attribute
+import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import com.google.common.collect.Multimap
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
@@ -60,6 +60,6 @@ interface CellAccessor : CellSetter {
     /**
      * Gets all abilities and corresponding values from `this`.
      */
-    fun getAbilities(): Map<out Ability, AbilityBinaryValue>
+    fun getAbilities(): Map<out Ability, BinaryAbilityValue>
 }
 

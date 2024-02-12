@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.MINIMESSAGE_FULL
+import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.util.typedRequire
@@ -29,7 +30,7 @@ class DisplayNameMeta(
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(SchemeMeta.ITEM_META_NAMESPACE, "display_name")
+        override fun key(): Key = Key.key(NekoNamespaces.META, "display_name")
     }
 }
 

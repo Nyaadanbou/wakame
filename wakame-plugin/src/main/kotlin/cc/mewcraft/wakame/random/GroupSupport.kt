@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.random
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import java.util.Collections
 import java.util.SequencedMap
@@ -42,17 +43,19 @@ internal class ImmutableGroup<S, C : SelectionContext>(
     class Builder<S, C : SelectionContext> : Group.Builder<S, C> {
         override val pools: SequencedMap<String, Pool<S, C>> = LinkedHashMap()
         override val conditions: MutableList<Condition<C>> = ArrayList()
-        override var default: Pool<S, C> = Pool.emptyPool()
+        override var default: Pool<S, C> = Pool.empty()
     }
 }
 
 /**
  * A minimal empty [group][Group].
  */
+@InternalApi
 internal object EmptyGroup : Group<Nothing, SelectionContext> {
     override val pools: SequencedMap<String, Pool<Nothing, SelectionContext>> = Collections.emptySortedMap()
     override val conditions: List<Condition<SelectionContext>> = Collections.emptyList()
-    override val default: Pool<Nothing, SelectionContext> = Pool.emptyPool()
+    override val default: Pool<Nothing, SelectionContext> = Pool.empty()
+
     override fun pickOne(context: SelectionContext): Nothing? = null
     override fun pick(context: SelectionContext): List<Nothing> = Collections.emptyList()
 }

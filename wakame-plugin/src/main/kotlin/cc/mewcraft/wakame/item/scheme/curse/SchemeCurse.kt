@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.curse
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.Curse
 import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
 
@@ -19,4 +20,5 @@ sealed interface SchemeCurse : Curse {
 /**
  * Gets the empty condition.
  */
+@OptIn(InternalApi::class)
 fun emptySchemeCurse(): SchemeCurse = EmptySchemeCurse

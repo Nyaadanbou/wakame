@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
+import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import net.kyori.adventure.key.Key
@@ -21,7 +22,7 @@ class SkinOwnerMeta(
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(SchemeMeta.ITEM_META_NAMESPACE, "skin_owner")
+        override fun key(): Key = Key.key(NekoNamespaces.META, "skin_owner")
     }
 }
 

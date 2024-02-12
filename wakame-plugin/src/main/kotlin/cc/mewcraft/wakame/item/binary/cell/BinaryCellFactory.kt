@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.item.binary.cell
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.item.binary.core.BinaryCoreFactory
 import cc.mewcraft.wakame.item.binary.core.emptyBinaryCore
 import cc.mewcraft.wakame.item.binary.curse.BinaryCurseFactory
-import cc.mewcraft.wakame.item.scheme.curse.emptySchemeCurse
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
+import cc.mewcraft.wakame.item.scheme.curse.emptySchemeCurse
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 /**
@@ -40,11 +41,11 @@ object BinaryCellFactory {
      */
     fun decode(compoundTag: CompoundShadowTag): BinaryCell {
         return BinaryCellImpl(
-            canReforge = compoundTag.getBoolean(CellTagNames.CAN_REFORGE),
-            canOverride = compoundTag.getBoolean(CellTagNames.CAN_OVERRIDE),
-            binaryCore = BinaryCoreFactory.decode(compoundTag.getCompound(CellTagNames.CORE)),
-            binaryCurse = BinaryCurseFactory.decode(compoundTag.getCompound(CellTagNames.CURSE)),
-            reforgeMeta = ReforgeMetaFactory.decode(compoundTag.getCompound(CellTagNames.REFORGE_META))
+            canReforge = compoundTag.getBoolean(NekoTags.Cell.CAN_REFORGE),
+            canOverride = compoundTag.getBoolean(NekoTags.Cell.CAN_OVERRIDE),
+            binaryCore = BinaryCoreFactory.decode(compoundTag.getCompound(NekoTags.Cell.CORE)),
+            binaryCurse = BinaryCurseFactory.decode(compoundTag.getCompound(NekoTags.Cell.CURSE)),
+            reforgeMeta = ReforgeMetaFactory.decode(compoundTag.getCompound(NekoTags.Cell.REFORGE))
         )
     }
 

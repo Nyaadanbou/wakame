@@ -28,7 +28,7 @@ abstract class AbstractGroupSerializer<S, C : SelectionContext> : SchemeSerializ
     protected abstract fun conditionFactory(node: ConfigurationNode): Condition<C>
 
     final override fun deserialize(type: Type, node: ConfigurationNode): Group<S, C> {
-        return Group.buildGroup {
+        return Group.build {
             node.node("filters").childrenList().forEach {
                 this.conditions += conditionFactory(it)
             }

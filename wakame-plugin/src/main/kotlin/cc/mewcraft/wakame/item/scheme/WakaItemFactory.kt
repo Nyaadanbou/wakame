@@ -43,8 +43,8 @@ object WakaItemFactory {
 
             node.node("cells").childrenList().forEach { n ->
                 val cellId = n.node("id").typedRequire<String>()
-                val coreNode = n.node("core").typedRequire<String>().let { groupId -> node.node("cell_groups", groupId) } // FIXME make it optional
-                val curseNode = n.node("curse").typedRequire<String>().let { groupId -> node.node("curse_groups", groupId) } // FIXME make it optional
+                val coreNode = n.node("core").string?.let { groupId -> node.node("cell_groups", groupId) }
+                val curseNode = n.node("curse").string?.let { groupId -> node.node("curse_groups", groupId) }
                 val schemeCell = SchemeCellFactory.schemeOf(n, coreNode, curseNode)
 
                 put(cellId, schemeCell)
@@ -60,7 +60,12 @@ object WakaItemFactory {
         node: ConfigurationNode,
         vararg path: Any,
     ) {
-        // always put all scheme data on each blueprint instance
+        // always put all metadata for all `NekoItem`s
+        // even if the metadata contains "nothing".
+
+        // whether the data will be actually put on the item's NBT or not
+        // is decided by the item stack generation process, not here.
+
         put(SchemeMetaKeys.get<T>(), node.node(path).typedRequire<T>())
     }
 }

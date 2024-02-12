@@ -40,7 +40,7 @@ interface WakaItemStack : WakaItemStackSetter, BinaryCurseContext {
      *
      * @see isOneOff
      */
-    val handle: ItemStack
+    val handle: ItemStack // TODO use `Any` to directly store a NMS object?
 
     /**
      * Records whether `this` is a one-off [WakaItemStack] instance.

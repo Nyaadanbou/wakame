@@ -1,54 +1,53 @@
 package cc.mewcraft.wakame.item.scheme.cell
 
+import cc.mewcraft.wakame.random.Group
+import cc.mewcraft.wakame.util.typedRequire
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 
 object SchemeCellFactory {
     /**
      * Creates a [SchemeCell] from given configuration nodes.
      *
-     * Note that, by design, all the information about a [SchemeCell] in the
-     * configuration file are possibly **scattered**, which means they are
-     * not necessarily in a same node. That's why this function have three
-     * arguments: [cellNode], [coreNode] and [curseNode]. We need all these
-     * nodes to construct a complete [SchemeCell].
+     * Note that some information about a [SchemeCell] in the configuration
+     * file are possibly **scattered** by design, which means they are not
+     * necessarily in a single node (i.e. [cellNode]). That's why this function
+     * have three arguments: [cellNode], [coreNode] and [curseNode]. We need
+     * all these nodes to construct a complete [SchemeCell].
      *
      * For example, given a such cell node:
      * ```yaml
      * id: b
-     * core: group_b # it's just a path to a group node
-     * curse: group_b # same as above, it's just a path
-     * keep_empty: false
+     * core: group_b # it's just a path to a group node in the root
+     * curse: group_b # same as above - it's just a path
+     * keep_empty: true
      * can_reforge: true
      * can_override: false
      * ```
      *
-     * As mentioned in the YAML comments, the `core`'s and `curse`'s values
-     * are simply **paths** to wider nodes. The caller of this function needs
-     * to pass these nodes to this function in order to construct a complete
-     * [SchemeCell].
+     * As mentioned in the YAML comments, the values of node `core` and
+     * `curse` are simply **paths** to other nodes in the root. The caller of
+     * this function needs to pass these nodes to this function in order to
+     * construct a complete [SchemeCell].
      *
-     * @param cellNode the node holding the cell to be created
-     * @param coreNode the node holding the core for the cell
-     * @param curseNode the node holding the curse for the cell
+     * @param cellNode the node holding the cell itself
+     * @param coreNode the node holding the core for the cell or `null`, if it
+     *     should be an empty core
+     * @param curseNode the node holding the curse for the cell or `null`, if
+     *     it should be an empty curse
      * @return a new [SchemeCell]
      */
     fun schemeOf(
         cellNode: ConfigurationNode,
-        coreNode: ConfigurationNode,
-        curseNode: ConfigurationNode,
+        coreNode: ConfigurationNode?,
+        curseNode: ConfigurationNode?,
     ): SchemeCell {
-        // val id = cellNode.node("id").string
-
+        // all are `false` by default if `null`
         val keepEmpty = cellNode.node("keep_empty").boolean
         val reforgeable = cellNode.node("can_reforge").boolean
         val overridable = cellNode.node("can_override").boolean
 
-        val coreSelector = coreNode.get<SchemeCoreGroup>()
-        val curseSelector = curseNode.get<SchemeCurseGroup>()
-
-        checkNotNull(coreSelector)
-        checkNotNull(curseSelector)
+        val coreSelector = coreNode?.typedRequire<SchemeCoreGroup>() ?: Group.empty()
+        val curseSelector = curseNode?.typedRequire<SchemeCurseGroup>() ?: Group.empty()
 
         return SchemeCellImpl(
             keepEmpty = keepEmpty,

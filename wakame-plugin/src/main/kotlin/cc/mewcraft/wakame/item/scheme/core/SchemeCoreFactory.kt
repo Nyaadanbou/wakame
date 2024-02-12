@@ -1,14 +1,12 @@
 package cc.mewcraft.wakame.item.scheme.core
 
-import cc.mewcraft.wakame.ability.AbilityBinaryValue
-import cc.mewcraft.wakame.ability.AbilityCoreCodec
-import cc.mewcraft.wakame.ability.AbilityCoreCodecRegistry
-import cc.mewcraft.wakame.ability.AbilitySchemeValue
-import cc.mewcraft.wakame.attribute.BinaryAttributeValue
-import cc.mewcraft.wakame.attribute.SchemeAttributeValue
-import cc.mewcraft.wakame.attribute.AttributeFacade
-import cc.mewcraft.wakame.attribute.AttributeCoreCodecRegistry
-import cc.mewcraft.wakame.item.Core
+import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.ability.AbilityFacadeRegistry
+import cc.mewcraft.wakame.ability.SchemeAbilityValue
+import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.attribute.facade.AttributeFacadeRegistry
+import cc.mewcraft.wakame.attribute.facade.SchemeAttributeValue
+import cc.mewcraft.wakame.util.getOrThrow
 import cc.mewcraft.wakame.util.typedRequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -26,21 +24,22 @@ object SchemeCoreFactory {
      * - Namespace
      * - Value
      *
-     * 通过 Namespace + ID 我们可以唯一确定用什么实现来反序列化该 [ConfigurationNode].
+     * 通过 Namespace + Value 我们可以唯一确定用什么实现来反序列化该 [ConfigurationNode].
      */
+    @OptIn(InternalApi::class)
     fun schemeOf(node: ConfigurationNode): SchemeCore {
         val key = node.node("key").typedRequire<Key>()
         val ret: SchemeCore = when (key.namespace()) {
-            Core.ABILITY_NAMESPACE -> {
-                val codec: AbilityCoreCodec<AbilityBinaryValue, AbilitySchemeValue> = AbilityCoreCodecRegistry.getOrThrow(key)
-                val value: AbilitySchemeValue = codec.schemeOf(node)
-                SchemeAbilityCore(key, value)
+            NekoNamespaces.ABILITY -> {
+                val builder = AbilityFacadeRegistry.schemeBuilderRegistry.getOrThrow(key)
+                val value = builder.build(node)
+                SchemeAbilityCore(key, value as SchemeAbilityValue)
             }
 
-            Core.ATTRIBUTE_NAMESPACE -> {
-                val codec: AttributeFacade<BinaryAttributeValue, SchemeAttributeValue> = AttributeCoreCodecRegistry.getOrThrow(key)
-                val value: SchemeAttributeValue = codec.schemeOf(node)
-                SchemeAttributeCore(key, value)
+            NekoNamespaces.ATTRIBUTE -> {
+                val builder = AttributeFacadeRegistry.schemeBuilderRegistry.getOrThrow(key)
+                val value = builder.build(node)
+                SchemeAttributeCore(key, value as SchemeAttributeValue)
             }
 
             else -> throw IllegalArgumentException()

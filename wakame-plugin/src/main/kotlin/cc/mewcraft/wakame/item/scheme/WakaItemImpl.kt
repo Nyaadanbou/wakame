@@ -66,6 +66,9 @@ internal class WakaItemImpl(
 
         //<editor-fold desc="Sets Item Cells">
         with(nekoStack.cellAccessor) {
+            // Side note:
+            // the order of cell population is the same as
+            // that they are declared in the YAML list
             schemeCells.forEach { (cellId, schemeCell) ->
                 val binaryCell = BinaryCellFactory.generate(context, schemeCell)
                 if (binaryCell != null) {

@@ -7,13 +7,6 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
  * 代表一个物品上的统计数据。
  */
 sealed interface ItemStats {
-    companion object {
-        /**
-         * The namespace of all types of [ItemStats].
-         */
-        const val NAMESPACE = "stats"
-    }
-
     /**
      * The [ItemStatsAccessor] encompassing `this`.
      */

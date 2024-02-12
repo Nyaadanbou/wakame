@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.random
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import java.util.SequencedMap
 
@@ -58,10 +59,11 @@ interface Group<S, C : SelectionContext> {
         var default: Pool<S, C>
     }
 
-    companion object Static {
-        fun <S, C : SelectionContext> emptyGroup(): Group<S, C> = @Suppress("UNCHECKED_CAST") (EmptyGroup as Group<S, C>)
+    companion object Factory {
+        @OptIn(InternalApi::class)
+        fun <S, C : SelectionContext> empty(): Group<S, C> = @Suppress("UNCHECKED_CAST") (EmptyGroup as Group<S, C>)
 
-        fun <S, C : SelectionContext> buildGroup(block: Builder<S, C>.() -> Unit): Group<S, C> {
+        fun <S, C : SelectionContext> build(block: Builder<S, C>.() -> Unit): Group<S, C> {
             val builder = ImmutableGroup.Builder<S, C>().apply(block)
             val ret = ImmutableGroup(
                 pools = builder.pools,

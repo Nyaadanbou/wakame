@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.random
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 
 /**
@@ -65,10 +66,11 @@ interface Pool<S, C : SelectionContext> {
         val conditions: MutableList<Condition<C>>
     }
 
-    companion object Constants {
-        fun <S, C : SelectionContext> emptyPool(): Pool<S, C> = @Suppress("UNCHECKED_CAST") (EmptyPool as Pool<S, C>)
+    companion object Factory {
+        @OptIn(InternalApi::class)
+        fun <S, C : SelectionContext> empty(): Pool<S, C> = @Suppress("UNCHECKED_CAST") (EmptyPool as Pool<S, C>)
 
-        fun <S, C : SelectionContext> buildPool(block: Builder<S, C>.() -> Unit): Pool<S, C> {
+        fun <S, C : SelectionContext> build(block: Builder<S, C>.() -> Unit): Pool<S, C> {
             val builder = ImmutablePool.Builder<S, C>().apply(block)
             val ret = ImmutablePool(
                 samples = builder.samples,

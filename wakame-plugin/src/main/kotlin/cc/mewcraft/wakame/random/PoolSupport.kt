@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.random
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import me.lucko.helper.random.RandomSelector
 import java.util.stream.Stream
@@ -77,11 +78,13 @@ internal class ImmutablePool<S, C : SelectionContext>(
 /**
  * A minimal empty [pool][Pool].
  */
+@InternalApi
 internal object EmptyPool : Pool<Nothing, SelectionContext> {
     override val samples: List<Sample<Nothing, SelectionContext>> = emptyList()
     override val pickCount: Long = 1
     override val isReplacement: Boolean = true
     override val conditions: List<Condition<SelectionContext>> = emptyList()
+
     override fun pick(context: SelectionContext): List<Nothing> = emptyList()
     override fun pickOne(context: SelectionContext): Nothing? = null
 }

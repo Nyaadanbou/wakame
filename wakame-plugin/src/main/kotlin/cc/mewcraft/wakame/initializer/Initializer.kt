@@ -41,7 +41,7 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
     var isDone: Boolean = false
         private set
 
-    suspend fun start() {
+    fun start() {
         initPreWorld()
     }
 
@@ -81,7 +81,7 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
     /**
      * Starts the pre-world initialization process.
      */
-    private suspend fun initPreWorld() {
+    private fun initPreWorld() {
         initConfig()
         registerEvents() // register `this` listener
         registerListeners()
@@ -136,6 +136,7 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
                 initializable.onPostWorldAsync()
             }
         }
+        logger.info("[Initializer] onPostWorldAsync - Waiting")
         onPostWorldJobs.joinAll() // wait for all async jobs
         if (!onPostWorldAsyncResult) {
             shutdown(); return
@@ -160,6 +161,7 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
                 initializable.onPostPackAsync()
             }
         }
+        logger.info("[Initializer] onPostPackAsync - Waiting")
         onPostPackJobs.joinAll() // wait for all async jobs
         if (!onPostPackAsyncResult) {
             shutdown(); return
@@ -177,7 +179,7 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
      * Disables all [Initializable]'s in the reverse order that they were
      * initialized in.
      */
-    suspend fun disable() {
+    fun disable() {
         unregisterEvents()
         forEachInitializable(Initializable::closeAndReportException)
         terminables.closeAndReportException()

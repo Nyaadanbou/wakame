@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.WakaItemStackImpl
@@ -28,14 +29,14 @@ internal class ItemMetaAccessorImpl(
     ////// ItemMetaMap //////
 
     override val tags: CompoundShadowTag
-        get() = base.tags.getCompound(ItemMetaTagNames.ROOT)
+        get() = base.tags.getCompound(NekoTags.Meta.ROOT)
 
     override val name: Component
-        get() = gsonSerializer.deserialize(tags.getString(ItemMetaTagNames.NAME))
+        get() = gsonSerializer.deserialize(tags.getString(NekoTags.Meta.NAME))
 
     override val lore: List<Component>
         get() {
-            val miniText = tags.getList(ItemMetaTagNames.LORE, ShadowTagType.STRING)
+            val miniText = tags.getList(NekoTags.Meta.LORE, ShadowTagType.STRING)
             return if (miniText.size() == 0) {
                 emptyList()
             } else {
@@ -46,13 +47,13 @@ internal class ItemMetaAccessorImpl(
         }
 
     override val level: Int?
-        get() = tags.getIntOrNull(ItemMetaTagNames.LEVEL)
+        get() = tags.getIntOrNull(NekoTags.Meta.LEVEL)
     override val levelOrThrow: Int
         get() = level ?: throwIfNull()
 
     override val rarity: Rarity?
         get() {
-            val byte = tags.getByteOrNull(ItemMetaTagNames.RARITY)
+            val byte = tags.getByteOrNull(NekoTags.Meta.RARITY)
                 ?: return null
             return RarityRegistry.getBy(byte)
         }
@@ -61,7 +62,7 @@ internal class ItemMetaAccessorImpl(
 
     override val element: Set<Element>
         get() {
-            val byteArray = tags.getByteArrayOrNull(ItemMetaTagNames.ELEMENT)
+            val byteArray = tags.getByteArrayOrNull(NekoTags.Meta.ELEMENT)
                 ?: return emptySet()
             return byteArray.mapTo(
                 ObjectArraySet(byteArray.size)
@@ -71,7 +72,7 @@ internal class ItemMetaAccessorImpl(
         }
     override val kizami: Set<Kizami>
         get() {
-            val byteArray = tags.getByteArrayOrNull(ItemMetaTagNames.KIZAMI)
+            val byteArray = tags.getByteArrayOrNull(NekoTags.Meta.KIZAMI)
                 ?: return emptySet()
             return byteArray.mapTo(
                 ObjectArraySet(byteArray.size)
@@ -82,7 +83,7 @@ internal class ItemMetaAccessorImpl(
 
     override val skin: ItemSkin?
         get() {
-            val short = tags.getShortOrNull(ItemMetaTagNames.SKIN)
+            val short = tags.getShortOrNull(NekoTags.Meta.SKIN)
                 ?: return null
             return ItemSkinRegistry.getBy(short)
         }
@@ -90,9 +91,9 @@ internal class ItemMetaAccessorImpl(
         get() = skin ?: throwIfNull()
     override val skinOwner: UUID?
         get() {
-            if (!tags.hasUUID(ItemMetaTagNames.SKIN_OWNER))
+            if (!tags.hasUUID(NekoTags.Meta.SKIN_OWNER))
                 return null
-            return tags.getUUID(ItemMetaTagNames.SKIN_OWNER)
+            return tags.getUUID(NekoTags.Meta.SKIN_OWNER)
         }
     override val skinOwnerOrThrow: UUID
         get() = skinOwner ?: throwIfNull()
@@ -104,12 +105,12 @@ internal class ItemMetaAccessorImpl(
     }
 
     override fun putRoot(compoundTag: CompoundShadowTag) {
-        base.tags.put(ItemMetaTagNames.ROOT, compoundTag)
+        base.tags.put(NekoTags.Meta.ROOT, compoundTag)
     }
 
     override fun putName(name: Component) {
         val gsonString = gsonSerializer.serialize(name)
-        edit { putString(ItemMetaTagNames.NAME, gsonString) }
+        edit { putString(NekoTags.Meta.NAME, gsonString) }
     }
 
     override fun putLore(lore: List<Component>) {
@@ -120,48 +121,48 @@ internal class ItemMetaAccessorImpl(
             },
             ShadowTagType.STRING
         )
-        edit { put(ItemMetaTagNames.LORE, listBinaryTag) }
+        edit { put(NekoTags.Meta.LORE, listBinaryTag) }
     }
 
     override fun putLevel(level: Int?) {
         if (level == null) {
-            edit { remove(ItemMetaTagNames.LEVEL) }
+            edit { remove(NekoTags.Meta.LEVEL) }
         } else {
-            edit { putByte(ItemMetaTagNames.LEVEL, level.toStableByte()) }
+            edit { putByte(NekoTags.Meta.LEVEL, level.toStableByte()) }
         }
     }
 
     override fun putRarity(rarity: Rarity?) {
         if (rarity == null) {
-            edit { remove(ItemMetaTagNames.RARITY) }
+            edit { remove(NekoTags.Meta.RARITY) }
         } else {
-            edit { putByte(ItemMetaTagNames.RARITY, rarity.binary) }
+            edit { putByte(NekoTags.Meta.RARITY, rarity.binary) }
         }
     }
 
     override fun putElements(elements: Iterable<Element>) {
         val byteArray = elements.map { it.binary }.toByteArray()
-        edit { putByteArray(ItemMetaTagNames.ELEMENT, byteArray) }
+        edit { putByteArray(NekoTags.Meta.ELEMENT, byteArray) }
     }
 
     override fun putKizami(kizami: Iterable<Kizami>) {
         val byteArray = kizami.map { it.binary }.toByteArray()
-        edit { putByteArray(ItemMetaTagNames.KIZAMI, byteArray) }
+        edit { putByteArray(NekoTags.Meta.KIZAMI, byteArray) }
     }
 
     override fun putSkin(skin: ItemSkin?) {
         if (skin == null) {
-            edit { remove(ItemMetaTagNames.SKIN) }
+            edit { remove(NekoTags.Meta.SKIN) }
         } else {
-            edit { putShort(ItemMetaTagNames.SKIN, skin.binary) }
+            edit { putShort(NekoTags.Meta.SKIN, skin.binary) }
         }
     }
 
     override fun putSkinOwner(skinOwner: UUID?) {
         if (skinOwner == null) {
-            edit { remove(ItemMetaTagNames.SKIN_OWNER) }
+            edit { remove(NekoTags.Meta.SKIN_OWNER) }
         } else {
-            edit { putUUID(ItemMetaTagNames.SKIN_OWNER, skinOwner) }
+            edit { putUUID(NekoTags.Meta.SKIN_OWNER, skinOwner) }
         }
     }
 

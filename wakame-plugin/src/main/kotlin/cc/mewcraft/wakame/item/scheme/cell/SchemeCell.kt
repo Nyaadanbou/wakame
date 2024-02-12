@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.cell
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.Cell
 import cc.mewcraft.wakame.item.binary.cell.BinaryCell
 import cc.mewcraft.wakame.item.binary.core.BinaryCore
@@ -68,4 +69,5 @@ interface SchemeCell : Cell {
 /**
  * Gets the empty cell.
  */
+@OptIn(InternalApi::class)
 fun emptySchemeCell(): SchemeCell = EmptySchemeCell

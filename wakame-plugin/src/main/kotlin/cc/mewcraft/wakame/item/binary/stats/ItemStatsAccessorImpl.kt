@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.stats
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.WakaItemStackImpl
 import cc.mewcraft.wakame.util.getOrPut
@@ -11,7 +12,7 @@ internal class ItemStatsAccessorImpl(
 ) : ItemStatsAccessor {
 
     override val tags: CompoundShadowTag
-        get() = base.tags.getOrPut(ItemStatsTagNames.ROOT, CompoundShadowTag::create)
+        get() = base.tags.getOrPut(NekoTags.Stats.ROOT, CompoundShadowTag::create)
 
     //<editor-fold desc="Item Stats Instances">
     override val entityKillsStats: EntityKillsStats = EntityKillsStats(this)

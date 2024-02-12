@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
+import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.element.Element
@@ -28,7 +29,7 @@ class ElementMeta(
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(SchemeMeta.ITEM_META_NAMESPACE, "element")
+        override fun key(): Key = Key.key(NekoNamespaces.META, "element")
     }
 }
 

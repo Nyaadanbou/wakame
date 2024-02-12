@@ -1,12 +1,14 @@
 package cc.mewcraft.wakame.item.binary.cell
 
+import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.ShadowTagLike
 
 /**
  * Metadata of reforging.
  *
  * @see ReforgeMetaFactory
- * @see ReforgeMetaTagNames
+ * @see NekoTags.Reforge
  */
 interface ReforgeMeta : ShadowTagLike {
     /**
@@ -23,7 +25,9 @@ interface ReforgeMeta : ShadowTagLike {
 /**
  * Gets the empty reforge meta.
  */
+@OptIn(InternalApi::class)
 fun emptyReforgeMeta(): ReforgeMeta = EmptyReforgeMeta
 
+@OptIn(InternalApi::class)
 val ReforgeMeta.isEmpty: Boolean get() = this is EmptyReforgeMeta
 val ReforgeMeta.isNotEmpty: Boolean get() = !isEmpty

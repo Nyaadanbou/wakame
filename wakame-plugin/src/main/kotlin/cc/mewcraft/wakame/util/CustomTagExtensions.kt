@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity

@@ -1,21 +1,21 @@
 package cc.mewcraft.wakame.item.binary.core
 
-import cc.mewcraft.wakame.ability.AbilityBinaryValue
-import cc.mewcraft.wakame.ability.AbilityCoreCodec
-import cc.mewcraft.wakame.ability.AbilityCoreCodecRegistry
-import cc.mewcraft.wakame.ability.AbilitySchemeValue
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
+import cc.mewcraft.wakame.ability.BinaryAbilityValue
+import cc.mewcraft.wakame.ability.AbilityFacadeRegistry
+import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.util.getOrThrow
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
 
 data class BinaryAbilityCore(
     override val key: Key,
-    override val value: AbilityBinaryValue,
+    override val value: BinaryAbilityValue,
 ) : BinaryCore {
 
+    @OptIn(InternalApi::class)
     override fun asShadowTag(): ShadowTag {
-        val codec: AbilityCoreCodec<AbilityBinaryValue, AbilitySchemeValue> = AbilityCoreCodecRegistry.getOrThrow(key)
-        val compound: CompoundShadowTag = codec.encode(value)
+        val encoder = AbilityFacadeRegistry.shadowTagEncoder.getOrThrow(key)
+        val compound = encoder.encode(value)
         return compound
     }
 }

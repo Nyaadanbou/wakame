@@ -37,3 +37,24 @@ interface PassiveAbility : Ability {
  */
 interface ElementAbility : Ability {
 }
+
+/**
+ * 元素异常。
+ *
+ * 当元素标记叠满N层后，在**怪物**身上触发的技能。
+ */
+interface ElementMonsterAbility
+
+/**
+ * 元素特效。
+ *
+ * 当元素标记叠满N层后，在**玩家**身上触发的技能。
+ */
+interface ElementPlayerAbility
+
+/**
+ * 需要额外读写持久性数据的技能。
+ *
+ * 例如，记录该技能积攒了多少灵魂（写入），并且在释放技能时将灵魂释放出去（读取+写入）。
+ */
+interface PersistentDataAbility

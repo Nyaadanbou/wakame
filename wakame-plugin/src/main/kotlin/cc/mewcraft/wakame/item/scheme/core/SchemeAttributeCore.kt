@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.item.scheme.core
 
-import cc.mewcraft.wakame.attribute.BinaryAttributeValue
-import cc.mewcraft.wakame.attribute.SchemeAttributeValue
-import cc.mewcraft.wakame.attribute.AttributeFacade
-import cc.mewcraft.wakame.attribute.AttributeCoreCodecRegistry
+import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.attribute.facade.AttributeFacadeRegistry
+import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValue
+import cc.mewcraft.wakame.attribute.facade.SchemeAttributeValue
+import cc.mewcraft.wakame.util.getOrThrow
 import net.kyori.adventure.key.Key
 
 /**
@@ -26,9 +27,10 @@ data class SchemeAttributeCore(
      * @param scalingFactor the scaling factor, such as item levels
      * @return a new random [BinaryAttributeValue]
      */
+    @OptIn(InternalApi::class)
     override fun generate(scalingFactor: Int): BinaryAttributeValue {
-        val codec: AttributeFacade<BinaryAttributeValue, SchemeAttributeValue> = AttributeCoreCodecRegistry.getOrThrow(key)
-        val value: BinaryAttributeValue = codec.generate(value, scalingFactor)
-        return value
+        val baker = AttributeFacadeRegistry.schemeBakerRegistry.getOrThrow(key)
+        val value = baker.bake(value, scalingFactor)
+        return value as BinaryAttributeValue
     }
 }

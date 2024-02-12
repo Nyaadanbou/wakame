@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
+import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.util.toStableInt
@@ -40,7 +41,7 @@ class LevelMeta(
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(SchemeMeta.ITEM_META_NAMESPACE, "level")
+        override fun key(): Key = Key.key(NekoNamespaces.META, "level")
 
         const val ADVENTURE_LEVEL_STRING = "ADVENTURE_LEVEL"
         const val EXPERIENCE_LEVEL_STRING = "EXPERIENCE_LEVEL"

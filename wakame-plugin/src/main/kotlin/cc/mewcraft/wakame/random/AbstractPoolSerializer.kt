@@ -135,7 +135,7 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
             val content = contentFactory(n)
 
             // wrap it into a sample
-            buildSample(content) {
+            Sample.build(content) {
                 weight = n.node("weight").typedRequire<Double>()
                 conditions += deserializeConditionList(n.node("filters"))
                 mark = n.node("mark").string?.let { Mark.stringMarkOf(it) }
@@ -154,7 +154,7 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
         if (node.isList) {
             // it's the structure 1
 
-            return Pool.buildPool {
+            return Pool.build {
                 samples += deserializeSampleList(node)
                 // other values are all default
 
@@ -163,7 +163,7 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
         } else if (node.isMap) {
             // it's the structure 2
 
-            return Pool.buildPool {
+            return Pool.build {
                 samples += deserializeSampleList(node.node("entries"))
                 conditions += deserializeConditionList(node.node("filters"))
                 pickCount = node.node("sample").getLong(1)

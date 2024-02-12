@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.base.Attribute
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 
@@ -21,16 +21,4 @@ interface Core : Keyed {
     val key: Key
 
     override fun key(): Key = key
-
-    companion object {
-        /**
-         * The namespace of all [abilities][Ability] within all [Nuclei][Core].
-         */
-        const val ABILITY_NAMESPACE = "ability"
-
-        /**
-         * The namespace of all [attributes][Attribute] within all [Nuclei][Core].
-         */
-        const val ATTRIBUTE_NAMESPACE = "attribute"
-    }
 }

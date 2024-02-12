@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.cell.CellAccessor
 import cc.mewcraft.wakame.item.binary.cell.CellAccessorImpl
@@ -58,10 +59,10 @@ internal class WakaItemStackImpl(
             ?: throw NullPointerException()
 
     override val namespace: String
-        get() = tags.getString(WakaItemStackTagNames.NAMESPACE)
+        get() = tags.getString(NekoTags.Root.NAMESPACE)
 
     override val id: String
-        get() = tags.getString(WakaItemStackTagNames.ID)
+        get() = tags.getString(NekoTags.Root.ID)
 
     override val key: Key
         get() = Key.key(namespace, id)
@@ -101,16 +102,16 @@ internal class WakaItemStackImpl(
     }
 
     override fun putKey(key: Key) = edit {
-        putString(WakaItemStackTagNames.NAMESPACE, key.namespace())
-        putString(WakaItemStackTagNames.ID, key.value())
+        putString(NekoTags.Root.NAMESPACE, key.namespace())
+        putString(NekoTags.Root.ID, key.value())
     }
 
     override fun putNamespace(namespace: String) = edit {
-        putString(WakaItemStackTagNames.NAMESPACE, namespace)
+        putString(NekoTags.Root.NAMESPACE, namespace)
     }
 
     override fun putPath(id: String) = edit {
-        putString(WakaItemStackTagNames.ID, id)
+        putString(NekoTags.Root.ID, id)
     }
     // endregion
 

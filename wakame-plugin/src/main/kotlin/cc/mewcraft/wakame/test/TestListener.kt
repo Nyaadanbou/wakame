@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.test
 
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
-import com.google.common.collect.Multimap
 import io.papermc.paper.event.player.AsyncChatEvent
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag

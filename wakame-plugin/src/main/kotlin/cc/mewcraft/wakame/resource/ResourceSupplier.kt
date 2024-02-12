@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.resource
 
-import cc.mewcraft.wakame.attribute.AttributeMap
-import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.base.AttributeMap
+import cc.mewcraft.wakame.attribute.base.Attributes
 import cc.mewcraft.wakame.util.toStableInt
 
 class ResourceSupplier(

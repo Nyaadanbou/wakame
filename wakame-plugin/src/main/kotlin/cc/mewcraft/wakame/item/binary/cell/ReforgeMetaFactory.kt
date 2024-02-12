@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell
 
+import cc.mewcraft.wakame.NekoTags
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 /**
@@ -12,8 +13,8 @@ object ReforgeMetaFactory {
         }
 
         return ReforgeMetaImpl(
-            successCount = compoundTag.getInt(ReforgeMetaTagNames.SUCCESS),
-            failureCount = compoundTag.getInt(ReforgeMetaTagNames.FAILURE)
+            successCount = compoundTag.getInt(NekoTags.Reforge.SUCCESS),
+            failureCount = compoundTag.getInt(NekoTags.Reforge.FAILURE)
         )
     }
 }

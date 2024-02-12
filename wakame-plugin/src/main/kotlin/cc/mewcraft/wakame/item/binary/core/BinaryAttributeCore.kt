@@ -1,9 +1,12 @@
 package cc.mewcraft.wakame.item.binary.core
 
-import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.attribute.AttributeFacade
-import cc.mewcraft.wakame.attribute.AttributeCoreCodecRegistry
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
+import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.attribute.base.Attribute
+import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.facade.AttributeFacadeRegistry
+import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
+import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValue
+import cc.mewcraft.wakame.util.getOrThrow
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
 import java.util.UUID
@@ -13,15 +16,17 @@ data class BinaryAttributeCore(
     override val value: BinaryAttributeValue,
 ) : BinaryCore, AttributeModifierProvider {
 
+    @OptIn(InternalApi::class)
     override fun provideAttributeModifiers(uuid: UUID): Map<out Attribute, AttributeModifier> {
-        val provider: AttributeFactory<BinaryAttributeValue> = AttributeFactoryRegistry.getOrThrow(key)
-        val modifiers: Map<out Attribute, AttributeModifier> = provider.createAttributeModifiers(uuid, value)
+        val factory = AttributeFacadeRegistry.attributeFactoryRegistry.getOrThrow(key)
+        val modifiers = factory.createAttributeModifiers(uuid, value)
         return modifiers
     }
 
+    @OptIn(InternalApi::class)
     override fun asShadowTag(): ShadowTag {
-        val codec: AttributeFacade<BinaryAttributeValue, SchemeAttributeValue> = AttributeCoreCodecRegistry.getOrThrow(key)
-        val compound: CompoundShadowTag = codec.encode(value)
-        return compound
+        val encoder = AttributeFacadeRegistry.shadowTagEncoder.getOrThrow(key)
+        val tag = encoder.encode(value)
+        return tag
     }
 }

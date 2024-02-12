@@ -13,10 +13,6 @@ interface SchemeMeta<T : Any> {
       数值储存上可能需要支持正态分布 (NumericValue)
     */
 
-    companion object {
-        const val ITEM_META_NAMESPACE = "meta"
-    }
-
     /**
      * Generate a value [T] from this scheme.
      *

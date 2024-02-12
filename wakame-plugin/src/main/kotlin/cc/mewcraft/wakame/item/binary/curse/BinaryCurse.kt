@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.curse
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.Curse
 import cc.mewcraft.wakame.item.ShadowTagLike
@@ -18,7 +19,9 @@ sealed interface BinaryCurse : Curse, ShadowTagLike, Condition<BinaryCurseContex
 /**
  * Gets the empty condition.
  */
+@OptIn(InternalApi::class)
 fun emptyBinaryCurse(): BinaryCurse = EmptyBinaryCurse
 
+@OptIn(InternalApi::class)
 val BinaryCurse.isEmpty: Boolean get() = this is EmptyBinaryCurse
 val BinaryCurse.isNotEmpty: Boolean get() = !isEmpty

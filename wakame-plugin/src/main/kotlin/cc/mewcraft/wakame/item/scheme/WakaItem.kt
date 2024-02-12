@@ -58,6 +58,9 @@ interface WakaItem : Keyed {
     /**
      * The map holds all the cell data about `this` item, where `map key` is
      * cell ID and `map value` is [SchemeCell].
+     *
+     * The underlying map is actually an ordered map, and the iteration order
+     * is always the same as the insertion order.
      */
     val schemeCells: Map<String, SchemeCell>
 
@@ -100,6 +103,6 @@ interface WakaItem : Keyed {
  */
 inline fun <reified V : SchemeMeta<*>> WakaItem.getSchemeMetaByClass(): V {
     val key = SchemeMetaKeys.get<V>()
-    val meta = checkNotNull(this.schemeMeta[key])
+    val meta = checkNotNull(schemeMeta[key])
     return meta as V
 }
