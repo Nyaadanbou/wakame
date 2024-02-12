@@ -9,15 +9,15 @@ import org.spongepowered.configurate.ConfigurationNode
 import java.util.UUID
 
 
-object WakaItemFactory {
+object NekoItemFactory {
     /**
-     * Creates a [WakaItem] from a [configuration node][ConfigurationNode].
+     * Creates a [NekoItem] from a [configuration node][ConfigurationNode].
      *
      * @param key the key of the item
      * @param node the configuration node holding the data of the item
-     * @return a new [WakaItem]
+     * @return a new [NekoItem]
      */
-    fun create(key: Key, node: ConfigurationNode): WakaItem {
+    fun create(key: Key, node: ConfigurationNode): NekoItem {
         val uuid = node.node("uuid").typedRequire<UUID>()
 
         // region Read item meta
@@ -52,7 +52,7 @@ object WakaItemFactory {
         }
         // endregion
 
-        val ret = WakaItemImpl(key, uuid, schemeMeta, schemeCells)
+        val ret = NekoItemImpl(key, uuid, schemeMeta, schemeCells)
         return ret
     }
 

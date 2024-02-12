@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorImpl
 import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessorImpl
-import cc.mewcraft.wakame.item.scheme.WakaItem
+import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.wakameCompound
 import cc.mewcraft.wakame.util.wakameCompoundOrNull
@@ -21,10 +21,10 @@ import org.koin.core.component.inject
 import java.util.UUID
 
 @OptIn(InternalApi::class)
-internal class WakaItemStackImpl(
+internal class NekoItemStackImpl(
     override val handle: ItemStack,
     override val isOneOff: Boolean = false,
-) : KoinComponent, WakaItemStack {
+) : KoinComponent, NekoItemStack {
     private val itemRegistry: NekoItemRegistry by inject()
 
     constructor(mat: Material) : this(
@@ -43,7 +43,7 @@ internal class WakaItemStackImpl(
             return checkNotNull(handle.wakameCompoundOrNull) { "Can't read/modify the NBT of NMS-backed ItemStack which is not WakaItemStack" }
         }
 
-    override val isWakame: Boolean
+    override val isNeko: Boolean
         /*
         Implementation Notes:
           1) a one-off `this` is always considered Wakame item
@@ -51,10 +51,10 @@ internal class WakaItemStackImpl(
         */
         get() = isOneOff || handle.wakameCompoundOrNull != null
 
-    override val isNotWakame: Boolean
-        get() = !isWakame
+    override val isNotNeko: Boolean
+        get() = !isNeko
 
-    override val scheme: WakaItem
+    override val scheme: NekoItem
         get() = itemRegistry.get(key)
             ?: throw NullPointerException()
 

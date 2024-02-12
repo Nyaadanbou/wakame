@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ability.BinaryAbilityValue
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.base.Attribute
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
-import cc.mewcraft.wakame.item.binary.WakaItemStackImpl
+import cc.mewcraft.wakame.item.binary.NekoItemStackImpl
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import com.google.common.collect.ImmutableListMultimap
@@ -15,9 +15,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
-@OptIn(InternalApi::class)
 internal class CellAccessorImpl(
-    private val base: WakaItemStackImpl,
+    private val base: NekoItemStackImpl,
 ) : CellAccessor {
     ////// CellAccessor //////
 
@@ -27,6 +26,7 @@ internal class CellAccessorImpl(
     //  not just here
     private val cache: Object2ObjectMap<String, BinaryCell> = Object2ObjectArrayMap(tags.size()) // cache binary cells
 
+    @OptIn(InternalApi::class)
     override val tags: CompoundShadowTag
         get() = base.tags.getCompound(NekoTags.Cell.ROOT)
 

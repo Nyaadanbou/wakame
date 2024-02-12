@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.crate.BinaryCrate
-import cc.mewcraft.wakame.item.binary.WakaItemStack
+import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.MaterialMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeMeta
@@ -17,17 +17,17 @@ import java.util.UUID
  * Essentially, this is a representation of the item in the configuration
  * file.
  *
- * The design philosophy of `this` is, that you can use a [WakaItem] as
- * a **blueprint** to create as many [WakaItemStacks][WakaItemStack] as
- * you want by calling [WakaItem.createItemStack], where each of the
+ * The design philosophy of `this` is, that you can use a [NekoItem] as
+ * a **blueprint** to create as many [WakaItemStacks][NekoItemStack] as
+ * you want by calling [NekoItem.createItemStack], where each of the
  * [ItemStack] will have the data of different values, and even have the
  * data of different types. This allows us to create more possibilities
  * for items, achieving better game experience by randomizing the item
  * generation and hence reducing duplication.
  *
- * @see WakaItemStack
+ * @see NekoItemStack
  */
-interface WakaItem : Keyed {
+interface NekoItem : Keyed {
     /**
      * The UUID of this item.
      */
@@ -47,7 +47,7 @@ interface WakaItem : Keyed {
      * the subclasses of [SchemeMeta] for all types of metadata.
      *
      * It should be noted that only necessary metadata should be written to
-     * the item's NBT while generating an [ItemStack] from `this` [WakaItem].
+     * the item's NBT while generating an [ItemStack] from `this` [NekoItem].
      * The data that can be derived from other metadata such as [MaterialMeta]
      * should not be written to the NBT.
      *
@@ -68,17 +68,17 @@ interface WakaItem : Keyed {
      * Generates an [ItemStack] from this scheme.
      *
      * @param player the player from whom the item is generated
-     * @return an once-off [WakaItemStack]
+     * @return an once-off [NekoItemStack]
      */
-    fun createItemStack(player: Player?): WakaItemStack
+    fun createItemStack(player: Player?): NekoItemStack
 
     /**
      * Generates an [ItemStack] from this scheme.
      *
      * @param crate the crate from which the item is generated
-     * @return an once-off [WakaItemStack]
+     * @return an once-off [NekoItemStack]
      */
-    fun createItemStack(crate: BinaryCrate): WakaItemStack
+    fun createItemStack(crate: BinaryCrate): NekoItemStack
 
     // region Java interface overrides
     override fun key(): Key = key
@@ -88,7 +88,7 @@ interface WakaItem : Keyed {
 ////// Extension functions //////
 
 /**
- * Gets specified [SchemeMeta] from this [WakaItem].
+ * Gets specified [SchemeMeta] from this [NekoItem].
  *
  * This function allows you to quickly get specified [SchemeMeta] by
  * corresponding class reference. You can use this function as the
@@ -99,9 +99,9 @@ interface WakaItem : Keyed {
  * ```
  *
  * @param V the subclass of [SchemeMeta]
- * @return the instance of class [V] from this [WakaItem]
+ * @return the instance of class [V] from this [NekoItem]
  */
-inline fun <reified V : SchemeMeta<*>> WakaItem.getSchemeMetaByClass(): V {
+inline fun <reified V : SchemeMeta<*>> NekoItem.getSchemeMetaByClass(): V {
     val key = SchemeMetaKeys.get<V>()
     val meta = checkNotNull(schemeMeta[key])
     return meta as V

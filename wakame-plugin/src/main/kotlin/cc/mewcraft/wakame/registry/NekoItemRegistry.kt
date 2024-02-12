@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.item.scheme.WakaItem
-import cc.mewcraft.wakame.item.scheme.WakaItemFactory
+import cc.mewcraft.wakame.item.scheme.NekoItem
+import cc.mewcraft.wakame.item.scheme.NekoItemFactory
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -16,15 +16,15 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
 object NekoItemRegistry : KoinComponent, Initializable, Reloadable,
-    Registry<Key, WakaItem> by HashMapRegistry() {
+    Registry<Key, NekoItem> by HashMapRegistry() {
 
     private val logger: Logger by inject()
 
     // configuration stuff
     private val dataDir: File by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_CONFIG_DIR) }
 
-    fun get(key: String): WakaItem? = get(Key.key(key))
-    fun getOrThrow(key: String): WakaItem = getOrThrow(Key.key(key))
+    fun get(key: String): NekoItem? = get(Key.key(key))
+    fun getOrThrow(key: String): NekoItem = getOrThrow(Key.key(key))
 
     @OptIn(InternalApi::class)
     private fun loadConfiguration() {
@@ -50,7 +50,7 @@ object NekoItemRegistry : KoinComponent, Initializable, Reloadable,
                 val value = itemFile.name
 
                 val key = Key.key(namespace, value)
-                val item = WakaItemFactory.create(key, node)
+                val item = NekoItemFactory.create(key, node)
 
                 registerName2Object(key, item)
                 logger.info("Loaded item file: {}", key)

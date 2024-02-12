@@ -5,16 +5,16 @@ import cc.mewcraft.wakame.item.binary.cell.CellAccessor
 import cc.mewcraft.wakame.item.binary.curse.BinaryCurseContext
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessor
-import cc.mewcraft.wakame.item.scheme.WakaItem
+import cc.mewcraft.wakame.item.scheme.NekoItem
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 /**
- * A wrapper of [ItemStack] which is created from a [WakaItem].
+ * A wrapper of [ItemStack] which is created from a [NekoItem].
  *
- * To get an instance of [WakaItemStack], use [WakaItemStackFactory].
+ * To get an instance of [NekoItemStack], use [NekoItemStackFactory].
  *
  * This class provides several properties to work with the underlying item
  * stack, mainly manipulating the non-vanilla NBT tags of it, such as:
@@ -22,7 +22,7 @@ import java.util.UUID
  * - getting the identifier of the wakame item
  * - retrieving the NBT tags of the bukkit item
  */
-interface WakaItemStack : WakaItemStackSetter, BinaryCurseContext {
+interface NekoItemStack : NekoItemStackSetter, BinaryCurseContext {
     /**
      * The wrapped [ItemStack].
      *
@@ -43,15 +43,15 @@ interface WakaItemStack : WakaItemStackSetter, BinaryCurseContext {
     val handle: ItemStack // TODO use `Any` to directly store a NMS object?
 
     /**
-     * Records whether `this` is a one-off [WakaItemStack] instance.
+     * Records whether `this` is a one-off [NekoItemStack] instance.
      *
-     * A one-off [WakaItemStack] instance is effectively backed by a
+     * A one-off [NekoItemStack] instance is effectively backed by a
      * strictly-Bukkit [ItemStack]. That is, the [handle] is a strictly-Bukkit
      * [ItemStack].
      *
-     * It should be noted, once the [handle] of a one-off [WakaItemStack] has
+     * It should be noted, once the [handle] of a one-off [NekoItemStack] has
      * been added to the underlying game world, any changes to the one-off
-     * [WakaItemStack] **will not** reflect to that one in the underlying game
+     * [NekoItemStack] **will not** reflect to that one in the underlying game
      * world. This is because the server implementation always makes a NMS copy
      * out of the strictly-Bukkit [ItemStack] when the item is being added to
      * the underlying game world.
@@ -82,23 +82,23 @@ interface WakaItemStack : WakaItemStackSetter, BinaryCurseContext {
     /**
      * Returns `true` if this item is a wakame item.
      *
-     * In this case [isNotWakame] returns `false`.
+     * In this case [isNotNeko] returns `false`.
      */
-    val isWakame: Boolean
+    val isNeko: Boolean
 
     /**
      * Returns `true` if this item is not a wakame item.
      *
-     * In this case [isWakame] returns `false`.
+     * In this case [isNeko] returns `false`.
      */
-    val isNotWakame: Boolean
+    val isNotNeko: Boolean
 
     /**
-     * The corresponding [WakaItem] scheme.
+     * The corresponding [NekoItem] scheme.
      *
      * @throws NullPointerException if this is not a legal wakame item
      */
-    val scheme: WakaItem
+    val scheme: NekoItem
 
     /**
      * The namespace of this item.

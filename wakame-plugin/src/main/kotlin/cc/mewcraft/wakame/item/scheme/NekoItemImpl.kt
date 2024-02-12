@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.binary.WakaItemStack
-import cc.mewcraft.wakame.item.binary.WakaItemStackFactory
+import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaSetter
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
@@ -16,13 +16,13 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import java.util.UUID
 
-internal class WakaItemImpl(
+internal class NekoItemImpl(
     override val key: Key,
     override val uuid: UUID,
     override val schemeMeta: Map<Key, SchemeMeta<*>>,
     override val schemeCells: Map<String, SchemeCell>,
-) : WakaItem {
-    override fun createItemStack(player: Player?): WakaItemStack {
+) : NekoItem {
+    override fun createItemStack(player: Player?): NekoItemStack {
         // create a blank generation context
         // TODO("actually reads the player's level")
         val context = SchemeGenerationContext(player?.level ?: 1)
@@ -30,7 +30,7 @@ internal class WakaItemImpl(
         return nekoStack
     }
 
-    override fun createItemStack(crate: BinaryCrate): WakaItemStack {
+    override fun createItemStack(crate: BinaryCrate): NekoItemStack {
         // create a blank generation context
         val context = SchemeGenerationContext(crate.level)
         val nekoStack = createItemStack0(context)
@@ -43,16 +43,17 @@ internal class WakaItemImpl(
      * @param context the input context
      * @return a new NekoStack
      */
-    private fun createItemStack0(context: SchemeGenerationContext): WakaItemStack {
+    private fun createItemStack0(context: SchemeGenerationContext): NekoItemStack {
         // create a blank WakaItemStack
         val materialMeta = getSchemeMetaByClass<MaterialMeta>()
         val material = materialMeta.generate(context)
-        val nekoStack = WakaItemStackFactory.new(material)
+        val nekoStack = NekoItemStackFactory.new(material)
 
         //<editor-fold desc="Sets Item Meta">
         with(nekoStack.metaAccessor) {
+            // Side note:
+            // the order of meta population is by alphabet currently
             // TODO make the order of meta population configurable
-            // (by alphabet order)
             generateAndSetItemMeta<DisplayNameMeta, Component>(context, ItemMetaSetter::putName)
             generateAndSetItemMeta<ElementMeta, Set<Element>>(context, ItemMetaSetter::putElements)
             generateAndSetItemMeta<KizamiMeta, Set<Kizami>>(context, ItemMetaSetter::putKizami)
@@ -67,7 +68,7 @@ internal class WakaItemImpl(
         //<editor-fold desc="Sets Item Cells">
         with(nekoStack.cellAccessor) {
             // Side note:
-            // the order of cell population is the same as
+            // the order of cell population should be the same as
             // that they are declared in the YAML list
             schemeCells.forEach { (cellId, schemeCell) ->
                 val binaryCell = BinaryCellFactory.generate(context, schemeCell)
@@ -79,12 +80,6 @@ internal class WakaItemImpl(
                 }
                 // if it's null, simply don't put the cell
             }
-        }
-        //</editor-fold>
-
-        //<editor-fold desc="Sets Item Statistics">
-        with(nekoStack.statsAccessor) {
-            // TODO probably we don't have to write the `stats` tag here
         }
         //</editor-fold>
 

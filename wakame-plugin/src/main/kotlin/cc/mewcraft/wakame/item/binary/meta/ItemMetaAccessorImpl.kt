@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.binary.WakaItemStackImpl
+import cc.mewcraft.wakame.item.binary.NekoItemStackImpl
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.*
@@ -20,14 +20,14 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.UUID
 
-@OptIn(InternalApi::class)
 internal class ItemMetaAccessorImpl(
-    private val base: WakaItemStackImpl,
+    private val base: NekoItemStackImpl,
 ) : KoinComponent, ItemMetaAccessor {
     private val gsonSerializer: GsonComponentSerializer by inject()
 
     ////// ItemMetaMap //////
 
+    @OptIn(InternalApi::class)
     override val tags: CompoundShadowTag
         get() = base.tags.getCompound(NekoTags.Meta.ROOT)
 

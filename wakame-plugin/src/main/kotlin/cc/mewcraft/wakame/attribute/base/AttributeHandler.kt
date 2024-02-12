@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute.base
 
-import cc.mewcraft.wakame.item.binary.WakaItemStackFactory
+import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
@@ -24,7 +24,7 @@ import org.koin.core.component.inject
 /**
  * Handles the update process of [AttributeMap].
  *
- * Specifically, it handles custom attributes from wakame items:
+ * Specifically, it handles custom attributes from neko items:
  * - which should be reflected in [AttributeMap] in real-time.
  * - which must be applied to players as real vanilla attribute modifiers.
  */
@@ -118,12 +118,12 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
             return ImmutableMultimap.of()
         }
 
-        val waka = WakaItemStackFactory.wrap(bukkitItem)
-        if (waka.isNotWakame) {
+        val neko = NekoItemStackFactory.wrap(bukkitItem)
+        if (neko.isNotNeko) {
             return ImmutableMultimap.of()
         }
 
-        return waka.cellAccessor.getModifiers()
+        return neko.cellAccessor.getModifiers()
     }
 
     private fun addAttributeModifiers(bukkitItem: ItemStack?, player: Player) {

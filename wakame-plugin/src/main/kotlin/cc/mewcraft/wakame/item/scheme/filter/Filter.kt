@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.item.scheme.filter
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.Core
-import cc.mewcraft.wakame.item.binary.WakaItemStack
+import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.WakaItem
+import cc.mewcraft.wakame.item.scheme.NekoItem
 import me.lucko.helper.random.RandomSelector
 
 /**
@@ -15,7 +15,7 @@ import me.lucko.helper.random.RandomSelector
  *
  * We primarily use it to implement the "all or nothing" feature,
  * where a type of [Core] may be present, **or not at all**, in the
- * [WakaItemStack]s created from a [WakaItem]. Compared to other public
+ * [NekoItemStack]s created from a [NekoItem]. Compared to other public
  * projects (by 16 Jan, 2024), an "attribute" in the config must be
  * present in all instance items, where the only difference is values.
  */

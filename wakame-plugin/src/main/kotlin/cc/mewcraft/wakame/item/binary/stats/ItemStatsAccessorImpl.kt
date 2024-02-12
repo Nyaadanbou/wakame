@@ -2,15 +2,15 @@ package cc.mewcraft.wakame.item.binary.stats
 
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.item.binary.WakaItemStackImpl
+import cc.mewcraft.wakame.item.binary.NekoItemStackImpl
 import cc.mewcraft.wakame.util.getOrPut
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
-@OptIn(InternalApi::class)
 internal class ItemStatsAccessorImpl(
-    private val base: WakaItemStackImpl,
+    private val base: NekoItemStackImpl,
 ) : ItemStatsAccessor {
 
+    @OptIn(InternalApi::class)
     override val tags: CompoundShadowTag
         get() = base.tags.getOrPut(NekoTags.Stats.ROOT, CompoundShadowTag::create)
 
