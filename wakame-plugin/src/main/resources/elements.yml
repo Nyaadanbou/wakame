@@ -1,16 +1,12 @@
 # 元素
 
-# 元素列表
+# 所有的元素
 elements:
 
-  # 通用元素，设定上影响所有元素效果
-  universal: # 元素的 name，一旦确定不要修改
-    binary_index: 127 # 元素的二进制索引，一旦确定不要修改
-    display_name: 通用 # 元素的展示名字，也是玩家看到的元素名字
-
+  # 排在首位的元素将成为默认元素
   neutral:
     binary_index: 0
-    display_name: 中立 # 混沌
+    display_name: 中立
 
   fire:
     binary_index: 1
@@ -31,3 +27,8 @@ elements:
   thunder:
     binary_index: 5
     display_name: 雷
+
+  # 通用元素，设定上影响所有元素效果
+  universal: # 元素的唯一标识，一旦确定不要修改
+    binary_index: 127 # 元素的二进制索引，一旦确定不要修改
+    display_name: 通用 # 元素的展示名字，也是玩家看到的元素名字

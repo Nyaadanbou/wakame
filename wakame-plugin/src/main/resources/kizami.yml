@@ -1,1 +1,24 @@
-# 物品铭刻
+# 铭刻
+
+# 所有的铭刻
+kizami:
+
+  wood: # 铭刻的唯一标识，一旦确定不要修改
+    binary_index: 0 # 铭刻的二进制索引，一旦确定不要修改
+    display_name: 木 # 铭刻的展示名字，也是玩家看到的铭刻名字
+
+  iron:
+    binary_index: 1
+    display_name: 铁
+
+  gold:
+    binary_index: 2
+    display_name: 金
+
+  diamond:
+    binary_index: 3
+    display_name: 钻石
+
+  netherite:
+    binary_index: 4
+    display_name: 下届合金

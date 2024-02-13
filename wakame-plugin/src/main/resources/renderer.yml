@@ -28,7 +28,7 @@ lore_render:
   - "攻击速度: <attribute:attack_speed_level>"
   - "暴击概率: <attribute:critical_strike_chance>"
   - "暴击伤害: <attribute:critical_strike_power>"
-  - "伤害承受: <attribute:damage_taken_rate>"
+  - "伤害承受: <attribute:damage_reduction_rate>"
   - "防御力: <attribute:defense>"
   - "防御穿透: <attribute:defense_penetration>"
   - "防御穿透率: <attribute:defense_penetration_rate>"

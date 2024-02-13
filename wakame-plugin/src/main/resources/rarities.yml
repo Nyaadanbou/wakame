@@ -3,10 +3,7 @@
 # 所有的稀有度
 rarities:
 
-  demo: # 稀有度的 name，供其他模块引用，一旦确定不要修改
-    binary_index: 99 # 稀有度的二进制形式，最大 127，一旦确定不要修改
-    display_name: 演示 # 稀有度的展示名字，会出现在聊天消息等地方，可以随意修改
-
+  # 排在首位的稀有度将成为默认稀有度
   common:
     binary_index: 0
     display_name: 普通
@@ -26,3 +23,7 @@ rarities:
   ancient:
     binary_index: 4
     display_name: 上古
+
+  demo: # 稀有度的 name，供其他模块引用，一旦确定不要修改
+    binary_index: 99 # 稀有度的二进制形式，最大 127，一旦确定不要修改
+    display_name: 演示 # 稀有度的展示名字，会出现在聊天消息等地方，可以随意修改

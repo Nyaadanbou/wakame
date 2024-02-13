@@ -1,30 +1,38 @@
 # !!! 所有内容均区分大小写 !!!
 
-# 唯一标识，生成工具：https://www.uuidgenerator.net/version7
+# 唯一标识
+# 必填
+# 生成工具：https://www.uuidgenerator.net/version7
 uuid: cfee549f-e4d7-4574-b104-92d8251ebee4
 
 # 原版物品
+# 可选，默认 "stone"
 material: wooden_sword
 
 # 名字
+# 可选，默认 "Unnamed"
 display_name: "<red>Demo Short Sword"
 
-# 描述（可选）
+# 描述
+# 可选，默认 无
 lore:
   - "<gold>Demo Lore 1"
   - "<gold>Demo Lore 2"
 
-# 皮肤（可选）
+# 皮肤
+# 可选，默认 无
 # 如有设置，则物品自带预设的皮肤
 # 这种情况下，皮肤的所有者为无
 skin: demo_1
 
-# 皮肤所有者（可选）
+# 皮肤所有者
+# 可选，默认 无
 # 可以手动设置初始皮肤的所有者
-# 写玩家的 UUID (Mojang)
-skin_owner: 018d7949-3756-7c0a-8fce-eaa176a37aee
+# 必须写玩家的 UUID (Mojang)
+skin_owner: 174eb4a8-20d1-4838-ab07-877cd1d68c14
 
 # 等级
+# 可选，默认 1
 # 如果写 "ADVENTURE_LEVEL"，则根据玩家的冒险等级生成
 # 如果写 "EXPERIENCE_LEVEL"，则根据玩家的经验等级生成（原版经验等级）
 # 如果写 <正整数>，则始终以这里指定的物品等级生成
@@ -32,17 +40,18 @@ level: EXPERIENCE_LEVEL
 #level: ADVENTURE_LEVEL
 #level: 32
 
-# 稀有度（可选）
+# 稀有度
+# 可选，默认 首个稀有度
 # 如果写 "mapping:<唯一标识>"，则根据唯一标识对应的映射生成
 # 如果写 "rarity:<稀有度名>"，则始终以这里指定的稀有度生成
-# 如果省略，则相当于 "mapping:global"
 rarity: mapping:demo_1
 #rarity: rarity:ancient
 
 # 元素标识
+# 可选，默认 无
 elements:
   sample: 2 # 抽选 n 个元素作为该物品的元素标识
-  filters: [ ] # 实现上支持写条件，但没实际作用
+  filters: [ ] # 条件，可用于实现特定条件下完全不生成元素
   entries: # 候选的元素标识，以及它们各自的权重
     - value: neutral
       weight: 2
@@ -56,10 +65,11 @@ elements:
         - type: element
           element: water
 
-# 铭刻标识（可选）
+# 铭刻标识
+# 可选，默认 无
 kizami:
   sample: 2 # 抽选 n 个铭刻作为该物品的铭刻标识
-  filters: [ ] # 实现上支持写条件，但没实际作用
+  filters: [ ] # 条件，可用于实现特定条件下完全不生成铭刻
   entries: # 候选的铭刻标识，以及它们各自的权重
     - value: iron
       weight: 2
@@ -74,50 +84,51 @@ kizami:
           element: water
 
 # 词条栏
+# 可选，默认 无
+# 生成将按照该列表的顺序进行
 cells:
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
-    core: group_a # 该词条栏所使用的词条组 id，从 cell_groups 中选择
-    curse: group_a # 该词条栏所使用的条件组 id，从 curse_groups 中选择
-    keep_empty: false # 该词条栏在生成时如果没有词条被选中的话，是否在物品上保留空的词条栏
+    core: core_a # 该词条栏所使用的核心选择器 id，从 core_selectors 中选择
+    curse: curse_a # 该词条栏所使用的诅咒选择器 id，从 curse_selectors 中选择
+    keep_empty: false # 该词条栏在生成时如果没有核心被选中的话，是否在物品上保留空的词条栏
     can_reforge: true # 该词条栏是否可重铸
-    can_override: false # 该词条栏是否可以被玩家自由修改和覆盖
+    can_override: false # 该词条栏是否可以被玩家自由修改和覆盖 TODO 具体用途等待开始写重铸时再决定
   - id: b
-    core: group_b
-    curse: group_b
+    core: core_b
+    curse: curse_b
     keep_empty: false
     can_reforge: true
     can_override: false
   - id: c
-    core: group_c
-    curse: group_c
+    core: core_c
+    curse: curse_c
     keep_empty: false
     can_reforge: true
     can_override: false
   - id: d
-    # core: group_d # 词条组可以省略不写，表示这就是个空栏
-    # curse: group_c # 条件组可以省略不写，表示没有解锁条件
+    # core: core_d # 核心选择器可以省略不写，表示该词条栏没有核心
+    # curse: curse_d # 诅咒选择器可以省略不写，表示该词条栏没有诅咒
     keep_empty: false
     can_reforge: false
     can_override: false
   - id: e
-    core: group_e
-    # curse: group_e
+    core: core_e
+    # curse: curse_e # 也可以只省略诅咒
     keep_empty: false
     can_reforge: false
     can_override: false
   - id: f
-    core: group_f
-    # curse: group_f
+    # core: core_f # 或者只省略核心
+    curse: curse_f
     keep_empty: false
     can_reforge: false
     can_override: false
 
-# 词条组
-# 词条组将按照配置文件里的顺序，逐个生成内容，放入词条栏
-cell_groups:
+# 词条栏的核心
+core_selectors:
 
-  # 词条组：group_a
-  group_a: # 该词条组的 id
+  # 核心组：group_a
+  core_a: # 该词条组的 id
     filters:
       - type: rarity
         rarity: common
@@ -185,8 +196,8 @@ cell_groups:
           scale: 0.1
         weight: 1
 
-  # 词条组：group_b
-  group_b:
+  # 核心组：core_b
+  core_b:
     filters: [ ]
     selectors:
       pool_1:
@@ -202,6 +213,7 @@ cell_groups:
             weight: 1
           - key: attribute:defense
             value: 23
+            element: universal
             weight: 1
             mark: x1y1z1 # 为该项指定一个印记（string），当该项被选中时，指定的印记将被加入到上下文中
     default:
@@ -212,8 +224,8 @@ cell_groups:
         value: 0.2
         weight: 1
 
-  # 词条组：group_c
-  group_c:
+  # 核心组：core_c
+  core_c:
     filters: [ ]
     selectors:
       pool_1:
@@ -241,8 +253,8 @@ cell_groups:
         value: 5
         weight: 1
 
-  # 词条组：group_d
-  group_d:
+  # 核心组：core_d
+  core_d:
     filters: [ ]
     selectors: { }
     default: # 这是一个只有固定内容的词条栏的基本写法
@@ -253,8 +265,8 @@ cell_groups:
         value: 0.21
         weight: 10
 
-  # 词条组：group_e
-  group_e:
+  # 核心组：core_e
+  core_e:
     filters: [ ]
     selectors:
       fire:
@@ -313,8 +325,8 @@ cell_groups:
             weight: 8
     default: [ ] # 这里没有定义 fallback
 
-  # 词条组：group_f
-  group_f:
+  # 核心组：core_f
+  core_f:
     filters: [ ]
     selectors:
       ability: # 这个池的 id
@@ -331,11 +343,11 @@ cell_groups:
             weight: 1
     default: [ ]
 
-# 词条栏的使用条件组
-curse_groups:
+# 词条栏的诅咒
+curse_selectors:
 
-  # 自定义条件组：group_a
-  group_a:
+  # 诅咒组：curse_a
+  curse_a:
     filters: [ ]
     selectors:
       common:
@@ -369,8 +381,8 @@ curse_groups:
         count: 2
         weight: 1
 
-  # 自定义条件组：group_b
-  group_b:
+  # 诅咒组：curse_b
+  curse_b:
     filters: [ ]
     selectors:
       common:
@@ -378,20 +390,60 @@ curse_groups:
           - type: rarity
             rarity: common
         entries:
-          - key: curse:highest_damage
+          - key: curse:peak_damage
             amount: 20
             element: fire
             weight: 1
-          - key: curse:highest_damage
+          - key: curse:peak_damage
             amount: 32
             element: water
             weight: 1
     default:
-      - key: curse:highest_damage
+      - key: curse:peak_damage
         amount: 10
         element: fire
         weight: 1
-      - key: curse:highest_damage
+      - key: curse:peak_damage
         amount: 16
+        element: water
+        weight: 1
+
+  # 诅咒组：curse_c
+  curse_c:
+    filters: [ ]
+    selectors: { }
+    default:
+      - key: curse:peak_damage
+        amount: 20
+        element: fire
+        weight: 1
+
+  # 诅咒组：curse_d
+  curse_d:
+    filters: [ ]
+    selectors: { }
+    default:
+      - key: curse:peak_damage
+        amount: 30
+        element: water
+        weight: 1
+
+  # 诅咒组：curse_e
+  curse_e:
+    filters: [ ]
+    selectors: { }
+    default:
+      - key: curse:peak_damage
+        amount: 40
+        element: fire
+        weight: 1
+
+  # 诅咒组：curse_f
+  curse_f:
+    filters: [ ]
+    selectors: { }
+    default:
+      - key: curse:peak_damage
+        amount: 50
         element: water
         weight: 1
