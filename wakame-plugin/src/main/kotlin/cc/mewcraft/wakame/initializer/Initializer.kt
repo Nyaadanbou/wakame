@@ -29,8 +29,8 @@ import org.koin.core.component.inject
 
 object Initializer : KoinComponent, TerminableConsumer, Listener {
 
-    private val logger: ComponentLogger by inject()
-    private val plugin: WakamePlugin by inject()
+    private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
+    private val plugin: WakamePlugin by inject(mode = LazyThreadSafetyMode.NONE)
     private val terminables: CompositeTerminable = CompositeTerminable.create()
 
     /**
@@ -88,17 +88,19 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
 
         ////
 
-        logger.info("[Initializer] onPreWorld")
+        logger.info("[Initializer] onPreWorld - Start")
         if (!forEachInitializable(Initializable::onPreWorld)) {
             shutdown(); return
         }
+        logger.info("[Initializer] onPreWorld - Complete")
 
         ////
 
-        logger.info("[Initializer] onPrePack")
+        logger.info("[Initializer] onPrePack - Start")
         if (!forEachInitializable(Initializable::onPrePack)) {
             shutdown(); return
         }
+        logger.info("[Initializer] onPrePack - Complete")
 
         ////
 
@@ -106,10 +108,11 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
 
         ////
 
-        logger.info("[Initializer] onPostPackPreWorld")
+        logger.info("[Initializer] onPostPackPreWorld - Start")
         if (!forEachInitializable(Initializable::onPostPackPreWorld)) {
             shutdown(); return
         }
+        logger.info("[Initializer] onPostPackPreWorld - Complete")
 
         ////
 
@@ -120,10 +123,11 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
      * Starts the post-world initialization process.
      */
     private suspend fun initPostWorld() {
-        logger.info("[Initializer] onPostWorld")
+        logger.info("[Initializer] onPostWorld - Start")
         if (!forEachInitializable(Initializable::onPostWorld)) {
             shutdown(); return
         }
+        logger.info("[Initializer] onPostWorld - Complete")
 
         ////
 
@@ -145,19 +149,19 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
 
         ////
 
-        logger.info("[Initializer] onPostPack")
+        logger.info("[Initializer] onPostPack - Start")
         if (!forEachInitializable(Initializable::onPostPack)) {
             shutdown(); return
         }
+        logger.info("[Initializer] onPostPack - Complete")
 
         ////
 
         logger.info("[Initializer] onPostPackAsync - Start")
+        val context = Dispatchers.IO + CoroutineName("Neko Initializer - Post Pack Async")
         val onPostPackJobs = mutableListOf<Job>()
         val onPostPackAsyncResult = forEachInitializable { initializable ->
-            onPostPackJobs += NEKO_PLUGIN.launch(
-                Dispatchers.IO + CoroutineName("Neko Initializer - Post Pack Async")
-            ) {
+            onPostPackJobs += NEKO_PLUGIN.launch(context) {
                 initializable.onPostPackAsync()
             }
         }
@@ -171,7 +175,9 @@ object Initializer : KoinComponent, TerminableConsumer, Listener {
         ////
 
         isDone = true
-        callEvent(NekoLoadDataEvent())
+        NEKO_PLUGIN.launch(context) {
+            callEvent(NekoLoadDataEvent()) // call it async
+        }
         logger.info(Component.text("Done loading").color(NamedTextColor.AQUA))
     }
 

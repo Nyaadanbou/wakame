@@ -5,6 +5,7 @@ plugins {
     id("cc.mewcraft.repo-conventions")
     id("cc.mewcraft.kotlin-conventions")
     id("cc.mewcraft.koin-conventions")
+    id("cc.mewcraft.koin-test-conventions")
     id("cc.mewcraft.deploy-conventions")
     alias(libs.plugins.pluginyml.paper)
 }
@@ -68,7 +69,21 @@ dependencies {
     }
 
     // test
+    testImplementation(libs.server.purpur)
+    testImplementation(libs.helper)
+    testImplementation(libs.helper.sql)
+    testImplementation(libs.helper.profiles)
     testImplementation(libs.configurate.yaml)
+    testImplementation(libs.configurate.extra.kotlin)
+    testImplementation(libs.logback.classic)
+}
+
+tasks.shadowJar {
+    relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
+    relocate("io.leangen.geantyref", "cc.mewcraft.wakame.external.geantyref")
+    relocate("org.koin", "cc.mewcraft.wakame.external.koin")
+    relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
+    relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
 }
 
 paper {

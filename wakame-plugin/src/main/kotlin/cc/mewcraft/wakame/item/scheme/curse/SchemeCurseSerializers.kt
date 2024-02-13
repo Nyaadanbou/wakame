@@ -6,12 +6,12 @@ import cc.mewcraft.wakame.item.scheme.cell.SchemeCursePool
 import cc.mewcraft.wakame.item.scheme.filter.FilterFactory
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
 
 internal class SchemeCurseGroupSerializer : AbstractGroupSerializer<SchemeCurse, SchemeGenerationContext>() {
     override fun poolFactory(node: ConfigurationNode): SchemeCursePool {
-        return node.typedRequire<SchemeCursePool>()
+        return node.requireKt<SchemeCursePool>()
     }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemeGenerationContext> {

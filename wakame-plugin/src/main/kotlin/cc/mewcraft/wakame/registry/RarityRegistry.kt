@@ -6,9 +6,9 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
 object RarityRegistry : KoinComponent, Initializable, Reloadable,
@@ -21,16 +21,16 @@ object RarityRegistry : KoinComponent, Initializable, Reloadable,
     val DEFAULT_RARITY: Rarity by lazy { values.first() }
 
     // configuration stuff
-    private val loader: NekoConfigurationLoader by inject(named(RARITY_CONFIG_LOADER))
     private lateinit var node: NekoConfigurationNode
 
     @OptIn(InternalApi::class)
     private fun loadConfiguration() {
         clearBoth()
 
-        node = loader.load()
-        node.childrenList().forEach { n ->
-            val rarity = n.typedRequire<Rarity>()
+        node = get<NekoConfigurationLoader>(named(RARITY_CONFIG_LOADER)).load()
+
+        node.node("rarities").childrenMap().forEach { (_, n) ->
+            val rarity = n.requireKt<Rarity>()
             registerBothMapping(rarity.name, rarity)
         }
     }

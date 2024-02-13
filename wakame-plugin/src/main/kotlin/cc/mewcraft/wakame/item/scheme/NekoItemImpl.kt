@@ -24,7 +24,7 @@ internal class NekoItemImpl(
 ) : NekoItem {
     override fun createItemStack(player: Player?): NekoItemStack {
         // create a blank generation context
-        // TODO("actually reads the player's level")
+        // TODO("actually reads the player's adventure level")
         val context = SchemeGenerationContext(player?.level ?: 1)
         val nekoStack = createItemStack0(context)
         return nekoStack
@@ -52,14 +52,15 @@ internal class NekoItemImpl(
         //<editor-fold desc="Sets Item Meta">
         with(nekoStack.metaAccessor) {
             // Side note:
-            // the order of meta population is by alphabet currently
+            // the order of meta population is hardcoded currently
             // TODO make the order of meta population configurable
+
             generateAndSetItemMeta<DisplayNameMeta, Component>(context, ItemMetaSetter::putName)
+            generateAndSetItemMeta<LoreMeta, List<Component>>(context, ItemMetaSetter::putLore)
+            generateAndSetItemMeta<LevelMeta, Int>(context, ItemMetaSetter::putLevel)
+            generateAndSetItemMeta<RarityMeta, Rarity>(context, ItemMetaSetter::putRarity)
             generateAndSetItemMeta<ElementMeta, Set<Element>>(context, ItemMetaSetter::putElements)
             generateAndSetItemMeta<KizamiMeta, Set<Kizami>>(context, ItemMetaSetter::putKizami)
-            generateAndSetItemMeta<LevelMeta, Int>(context, ItemMetaSetter::putLevel)
-            generateAndSetItemMeta<LoreMeta, List<Component>>(context, ItemMetaSetter::putLore)
-            generateAndSetItemMeta<RarityMeta, Rarity>(context, ItemMetaSetter::putRarity)
             generateAndSetItemMeta<SkinMeta, ItemSkin>(context, ItemMetaSetter::putSkin)
             generateAndSetItemMeta<SkinOwnerMeta, UUID>(context, ItemMetaSetter::putSkinOwner)
         }
@@ -87,7 +88,9 @@ internal class NekoItemImpl(
     }
 
     /**
-     * A convenient function.
+     * Generates meta and then sets it. **Only if something is generated will
+     * the item meta be put in the item.** Otherwise, this function does
+     * nothing to the item.
      *
      * @param context the context
      * @param setter a member function of [ItemMetaSetter]

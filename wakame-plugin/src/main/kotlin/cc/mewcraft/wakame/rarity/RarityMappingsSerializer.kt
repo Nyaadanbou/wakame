@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.rarity
 import cc.mewcraft.spatula.utils.RangeParser
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.registry.RarityRegistry
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import com.google.common.collect.ImmutableRangeMap
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -34,7 +34,7 @@ internal class RarityMappingsSerializer : SchemeSerializer<RarityMappings> {
     override fun deserialize(type: Type, node: ConfigurationNode): RarityMappings {
         val rangeMapBuilder = ImmutableRangeMap.builder<Int, RarityMapping>()
         node.childrenList().forEach { n1 ->
-            val levelNode = n1.node("level").typedRequire<String>()
+            val levelNode = n1.node("level").requireKt<String>()
             val weightNode = n1.node("weight").takeIf { it.isMap }
                 ?: throw SerializationException("`weight` node must be a map")
 
@@ -42,7 +42,7 @@ internal class RarityMappingsSerializer : SchemeSerializer<RarityMappings> {
             val rarityMapping = RarityMapping.build {
                 weightNode.childrenMap().forEach { (k, n2) ->
                     val rarityName = k.toString()
-                    val rarityWeight = n2.typedRequire<Double>()
+                    val rarityWeight = n2.requireKt<Double>()
                     weight[RarityRegistry.getOrThrow(rarityName)] = rarityWeight
                 }
             }

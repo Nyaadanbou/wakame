@@ -4,22 +4,22 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.CurseKeys
 import cc.mewcraft.wakame.reference.EntityReference
 import cc.mewcraft.wakame.util.NumericValue
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
 object SchemeCurseFactory {
     fun schemeOf(node: ConfigurationNode): SchemeCurse {
-        val ret: SchemeCurse = when (val key = node.node("key").typedRequire<Key>()) {
+        val ret: SchemeCurse = when (val key = node.node("key").requireKt<Key>()) {
             CurseKeys.ENTITY_KILLS -> {
-                val index = node.node("index").typedRequire<EntityReference>() // FIXME impl serialization
-                val count = node.node("count").typedRequire<NumericValue>()
-                EntityKillsCurse(index, count)
+                val count = node.node("count").requireKt<NumericValue>()
+                val index = node.node("index").requireKt<EntityReference>()
+                EntityKillsCurse(count, index)
             }
 
             CurseKeys.PEAK_DAMAGE -> {
-                val amount = node.node("amount").typedRequire<NumericValue>()
-                val element = node.node("element").typedRequire<Element>()
+                val amount = node.node("amount").requireKt<NumericValue>()
+                val element = node.node("element").requireKt<Element>()
                 PeakDamageCurse(amount, element)
             }
 

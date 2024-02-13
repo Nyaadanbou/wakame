@@ -70,7 +70,7 @@ object AttributeFacadeRegistry : Initializable {
         build("attack_speed_level", ShadowTagType.BYTE).single().bind(Attributes.ATTACK_SPEED_LEVEL)
         build("critical_strike_chance", ShadowTagType.DOUBLE).single().bind(Attributes.CRITICAL_STRIKE_CHANCE)
         build("critical_strike_power", ShadowTagType.DOUBLE).single().bind(Attributes.CRITICAL_STRIKE_POWER)
-        build("damage_taken_rate", ShadowTagType.DOUBLE).single().bind(Attributes.DAMAGE_TAKEN_RATE)
+        build("damage_reduction_rate", ShadowTagType.DOUBLE).single().bind(Attributes.DAMAGE_REDUCTION_RATE)
         build("defense", ShadowTagType.SHORT).single().element().bind(Attributes.byElement { DEFENSE })
         build("defense_penetration", ShadowTagType.SHORT).single().element().bind(Attributes.byElement { DEFENSE_PENETRATION })
         build("defense_penetration_rate", ShadowTagType.DOUBLE).single().element().bind(Attributes.byElement { DEFENSE_PENETRATION_RATE })

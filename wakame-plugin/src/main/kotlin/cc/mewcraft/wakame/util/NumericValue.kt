@@ -196,7 +196,7 @@ data class NumericValue(
     }
 }
 
-class NumericValueSerializer : TypeSerializer<NumericValue> {
+internal class NumericValueSerializer : TypeSerializer<NumericValue> {
     override fun deserialize(type: Type, node: ConfigurationNode): NumericValue {
         val scalar = node.rawScalar()
         if (scalar != null) {
@@ -204,7 +204,7 @@ class NumericValueSerializer : TypeSerializer<NumericValue> {
             return NumericValue(node.double, .0, .0, .0)
         }
 
-        val base = node.node("base").typedRequire<Double>()
+        val base = node.node("base").requireKt<Double>()
         val scale = node.node("scale").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
         val sigma = node.node("spread").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
         val threshold = node.node("max").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double

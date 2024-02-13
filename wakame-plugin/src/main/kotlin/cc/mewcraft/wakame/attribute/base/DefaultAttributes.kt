@@ -34,7 +34,7 @@ object DefaultAttributes {
                 add(Attributes.ATTACK_SPEED_LEVEL)
                 add(Attributes.CRITICAL_STRIKE_CHANCE)
                 add(Attributes.CRITICAL_STRIKE_POWER)
-                add(Attributes.DAMAGE_TAKEN_RATE)
+                add(Attributes.DAMAGE_REDUCTION_RATE)
                 add(Attributes.LIFESTEAL)
                 add(Attributes.LIFESTEAL_RATE)
                 add(Attributes.MANASTEAL)

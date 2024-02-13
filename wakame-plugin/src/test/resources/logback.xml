@@ -1,0 +1,17 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{HH:mm:ss}] [%thread/%level]: %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 定义日志级别 -->
+    <logger name="cc.mewcraft" level="DEBUG"/>
+
+    <!-- 设置根日志级别为DEBUG，并添加STDOUT -->
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

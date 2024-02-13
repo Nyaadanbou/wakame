@@ -36,8 +36,8 @@ interface Pool<S, C : SelectionContext> {
     val isReplacement: Boolean
 
     /**
-     * Randomly pick several [S's][S] with given [context]. Returns [EmptyList]
-     * if:
+     * Randomly pick several [S's][S] with given [context]. Returns an empty
+     * list if:
      * - none of the [conditions] are not met, or
      * - none of [samples][Sample] meet their own conditions
      */
@@ -45,7 +45,7 @@ interface Pool<S, C : SelectionContext> {
 
     /**
      * The same as [pick] but it only picks a **single** random [S]. In the
-     * case where [pick] returns [EmptyList], this function returns a `null`
+     * case where [pick] returns an empty list, this function returns a `null`
      * instead.
      *
      * Use this function if you already know `this` pool can only pick a single

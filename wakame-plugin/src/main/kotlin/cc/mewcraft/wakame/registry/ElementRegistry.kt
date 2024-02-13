@@ -6,9 +6,9 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
 object ElementRegistry : KoinComponent, Initializable, Reloadable,
@@ -21,20 +21,17 @@ object ElementRegistry : KoinComponent, Initializable, Reloadable,
     val DEFAULT_ELEMENT: Element by lazy { values.first() }
 
     // configuration stuff
-    private val loader: NekoConfigurationLoader by inject(named(ELEMENT_CONFIG_LOADER))
-    private lateinit var node: NekoConfigurationNode
+    private lateinit var root: NekoConfigurationNode
 
     @OptIn(InternalApi::class)
     private fun loadConfiguration() {
         clearBoth()
 
-        node = loader.load()
-        with(node) {
-            val elementsNode = node("elements")
-            elementsNode.childrenMap().forEach { (_, n) ->
-                val element = n.typedRequire<Element>()
-                registerBothMapping(element.name, element)
-            }
+        root = get<NekoConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)).load()
+
+        root.node("elements").childrenMap().forEach { (_, n) ->
+            val element = n.requireKt<Element>()
+            registerBothMapping(element.name, element)
         }
     }
 

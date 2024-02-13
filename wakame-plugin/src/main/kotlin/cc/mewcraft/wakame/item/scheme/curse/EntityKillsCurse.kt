@@ -11,8 +11,8 @@ import net.kyori.adventure.key.Key
 
 @SchemeData
 class EntityKillsCurse(
-    private val index: EntityReference,
     private val count: NumericValue,
+    private val index: EntityReference,
 ) : SchemeCurse {
 
     override fun generate(scalingFactor: Int): BinaryCurse {

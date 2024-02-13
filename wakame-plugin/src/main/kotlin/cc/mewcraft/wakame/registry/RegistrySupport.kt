@@ -75,7 +75,7 @@ interface BiMapRegistry<STRING, BINARY> {
 //<editor-fold desc="Internal Implementations">
 @OptIn(InternalApi::class)
 internal class HashMapRegistry<K, V> : Registry<K, V> {
-    override val name2ObjectMapping: MutableMap<K, V> = HashMap()
+    override val name2ObjectMapping: MutableMap<K, V> = LinkedHashMap() // order matters
 
     override val values: Set<V>
         get() = ImmutableSet.copyOf(name2ObjectMapping.values)

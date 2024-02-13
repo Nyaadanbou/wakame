@@ -1,13 +1,8 @@
-import cc.mewcraft.wakame.util.toStableByte
-import cc.mewcraft.wakame.util.toStableDouble
-import cc.mewcraft.wakame.util.toStableFloat
-import cc.mewcraft.wakame.util.toStableInt
-import cc.mewcraft.wakame.util.toStableShort
-import cc.mewcraft.wakame.util.toStableLong
-import org.junit.Test
+import cc.mewcraft.wakame.util.*
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class NumberExtensionsTest {
+class NumberConversionTest {
 
     private val floatTolerance = 0.0001f
     private val doubleTolerance = 0.0001

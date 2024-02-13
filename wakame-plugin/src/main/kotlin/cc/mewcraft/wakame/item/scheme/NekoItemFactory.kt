@@ -3,13 +3,19 @@ package cc.mewcraft.wakame.item.scheme
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCellFactory
 import cc.mewcraft.wakame.item.scheme.meta.*
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 import java.util.UUID
 
 
-object NekoItemFactory {
+object NekoItemFactory : KoinComponent {
+    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
+
     /**
      * Creates a [NekoItem] from a [configuration node][ConfigurationNode].
      *
@@ -18,9 +24,9 @@ object NekoItemFactory {
      * @return a new [NekoItem]
      */
     fun create(key: Key, node: ConfigurationNode): NekoItem {
-        val uuid = node.node("uuid").typedRequire<UUID>()
+        val uuid = node.node("uuid").requireKt<UUID>()
 
-        // region Read item meta
+        // Deserialize item meta
         val schemeMeta: Map<Key, SchemeMeta<*>> = buildMap {
             // Side note: buildMap preserves the insertion order
 
@@ -35,22 +41,20 @@ object NekoItemFactory {
             loadAndPutMeta<SkinMeta>(node, "skin")
             loadAndPutMeta<SkinOwnerMeta>(node, "skin_owner")
         }
-        // endregion
 
-        // region Read item cells
+        // Deserialize item cells
         val schemeCells: Map<String, SchemeCell> = buildMap {
             // Side note: buildMap preserves the insertion order
 
             node.node("cells").childrenList().forEach { n ->
-                val cellId = n.node("id").typedRequire<String>()
-                val coreNode = n.node("core").string?.let { groupId -> node.node("cell_groups", groupId) }
-                val curseNode = n.node("curse").string?.let { groupId -> node.node("curse_groups", groupId) }
-                val schemeCell = SchemeCellFactory.schemeOf(n, coreNode, curseNode)
+                val id = n.node("id").requireKt<String>()
+                val coreN = n.node("core").string?.let { groupId -> node.node("core_selectors", groupId) }
+                val curseN = n.node("curse").string?.let { groupId -> node.node("curse_selectors", groupId) }
+                val cell = SchemeCellFactory.schemeOf(n, coreN, curseN)
 
-                put(cellId, schemeCell)
+                put(id, cell)
             }
         }
-        // endregion
 
         val ret = NekoItemImpl(key, uuid, schemeMeta, schemeCells)
         return ret
@@ -58,14 +62,15 @@ object NekoItemFactory {
 
     private inline fun <reified T : SchemeMeta<*>> MutableMap<Key, SchemeMeta<*>>.loadAndPutMeta(
         node: ConfigurationNode,
-        vararg path: Any,
+        vararg path: String,
     ) {
         // always put all metadata for all `NekoItem`s
         // even if the metadata contains "nothing".
 
-        // whether the data will be actually put on the item's NBT or not
+        // whether the data will be ultimately put on the item's NBT
         // is decided by the item stack generation process, not here.
 
-        put(SchemeMetaKeys.get<T>(), node.node(path).typedRequire<T>())
+        val deserialized = requireNotNull(node.node(*path).get<T>()) { "Can't deserialize scheme meta from path ${path.contentToString()}" }
+        put(SchemeMetaKeys.get<T>(), deserialized)
     }
 }

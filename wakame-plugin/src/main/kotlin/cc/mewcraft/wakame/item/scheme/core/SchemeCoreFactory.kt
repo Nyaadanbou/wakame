@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.facade.AttributeFacadeRegistry
 import cc.mewcraft.wakame.attribute.facade.SchemeAttributeValue
 import cc.mewcraft.wakame.util.getOrThrow
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -28,7 +28,7 @@ object SchemeCoreFactory {
      */
     @OptIn(InternalApi::class)
     fun schemeOf(node: ConfigurationNode): SchemeCore {
-        val key = node.node("key").typedRequire<Key>()
+        val key = node.node("key").requireKt<Key>()
         val ret: SchemeCore = when (key.namespace()) {
             NekoNamespaces.ABILITY -> {
                 val builder = AbilityFacadeRegistry.schemeBuilderRegistry.getOrThrow(key)

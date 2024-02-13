@@ -37,7 +37,7 @@ object Attributes {
        we mean that we will implement them by listeners or schedulers.
      */
 
-    val DAMAGE_TAKEN_RATE = RangedAttribute("damage_taken_rate", 1.0, .0, 5.0)
+    val DAMAGE_REDUCTION_RATE = RangedAttribute("damage_reduction_rate", .0, .0, 1.0)
 
     // Possible values for ATTACK_SPEED_LEVEL are finite: i = 0 ~ 8 (9 states), where i is an int
     val ATTACK_SPEED_LEVEL = RangedAttribute("attack_speed_level", .0, .0, 8.0)

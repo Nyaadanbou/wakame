@@ -17,7 +17,6 @@ import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.UUID
 
 @OptIn(InternalApi::class)
@@ -25,8 +24,6 @@ internal class NekoItemStackImpl(
     override val handle: ItemStack,
     override val isOneOff: Boolean = false,
 ) : KoinComponent, NekoItemStack {
-    private val itemRegistry: NekoItemRegistry by inject()
-
     constructor(mat: Material) : this(
         handle = ItemStack(mat) /* strictly-Bukkit ItemStack */,
         isOneOff = true /* so, it's a one-off instance */
@@ -55,7 +52,7 @@ internal class NekoItemStackImpl(
         get() = !isNeko
 
     override val scheme: NekoItem
-        get() = itemRegistry.get(key)
+        get() = NekoItemRegistry.get(key)
             ?: throw NullPointerException()
 
     override val namespace: String
@@ -68,7 +65,7 @@ internal class NekoItemStackImpl(
         get() = Key.key(namespace, id)
 
     override val uuid: UUID
-        get() = itemRegistry.get(key)?.uuid
+        get() = NekoItemRegistry.get(key)?.uuid
             ?: throw NullPointerException()
 
     override val cellAccessor: CellAccessor by lazy(LazyThreadSafetyMode.NONE) {

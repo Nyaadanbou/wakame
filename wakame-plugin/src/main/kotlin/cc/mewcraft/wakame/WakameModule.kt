@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame
 
 import me.lucko.helper.plugin.KExtendedJavaPlugin
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.bukkit.Server
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.PluginManager
@@ -33,13 +35,15 @@ fun wakameModule(plugin: WakamePlugin): Module = module {
 
     single<PluginManager> { plugin.server.pluginManager }
 
-    single<Logger> { plugin.componentLogger } bind Logger::class
+    single<ComponentLogger> { plugin.componentLogger } bind Logger::class
 
     single<Server> { plugin.server }
 
     single<File>(named(PLUGIN_DATA_DIR)) { plugin.dataFolder }
 
-    ////// MiniMessage injections
+    ////// ComponentSerializer injections
+
+    single<GsonComponentSerializer> { GsonComponentSerializer.gson() }
 
     single<MiniMessage>(named(MINIMESSAGE_FULL)) { MiniMessage.miniMessage() }
 }

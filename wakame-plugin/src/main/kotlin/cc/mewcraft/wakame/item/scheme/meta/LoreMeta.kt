@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
@@ -19,9 +18,9 @@ import java.lang.reflect.Type
  * @property lore the item lore in the format of MiniMessage string
  */
 class LoreMeta(
-    private val lore: List<String>,
+    private val lore: List<String> = emptyList(),
 ) : SchemeMeta<List<Component>>, KoinComponent {
-    private val miniMessage: MiniMessage by inject()
+    private val miniMessage: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
 
     override fun generate(context: SchemeGenerationContext): List<Component>? {
         return lore.map { miniMessage.deserialize(it) }.takeIf { it.isNotEmpty() }
@@ -32,12 +31,10 @@ class LoreMeta(
     }
 }
 
-internal class LoreMetaSerializer : SchemeSerializer<LoreMeta> {
-    override fun deserialize(type: Type, node: ConfigurationNode): LoreMeta {
-        if (node.virtual()) { // make it optional
-            return LoreMeta(emptyList())
-        }
+internal class LoreMetaSerializer : SchemeMetaSerializer<LoreMeta> {
+    override val emptyValue: LoreMeta = LoreMeta()
 
-        return LoreMeta(node.getList(String::class, emptyList()))
+    override fun deserialize(type: Type, node: ConfigurationNode): LoreMeta {
+        return LoreMeta(node.getList<String>(emptyList()))
     }
 }

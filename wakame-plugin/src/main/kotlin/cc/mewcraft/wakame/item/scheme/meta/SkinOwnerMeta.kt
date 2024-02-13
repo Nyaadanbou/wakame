@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
@@ -15,7 +14,7 @@ import java.util.UUID
  * @property skinOwner 物品的皮肤的所有者的 UUID
  */
 class SkinOwnerMeta(
-    private val skinOwner: UUID?,
+    private val skinOwner: UUID? = null,
 ) : SchemeMeta<UUID> {
     override fun generate(context: SchemeGenerationContext): UUID? {
         return skinOwner
@@ -26,13 +25,11 @@ class SkinOwnerMeta(
     }
 }
 
-internal class SkinOwnerMetaSerializer : SchemeSerializer<SkinOwnerMeta> {
+internal class SkinOwnerMetaSerializer : SchemeMetaSerializer<SkinOwnerMeta> {
+    override val emptyValue: SkinOwnerMeta = SkinOwnerMeta()
+
     override fun deserialize(type: Type, node: ConfigurationNode): SkinOwnerMeta {
         // TODO("Not yet implemented")
-        if (node.virtual()) { // make it optional
-            return SkinOwnerMeta(null)
-        }
-
         return SkinOwnerMeta(null)
     }
 }

@@ -1,14 +1,13 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.filter.FilterFactory
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.random.Pool
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.spongepowered.configurate.ConfigurationNode
@@ -22,7 +21,7 @@ typealias KizamiPool = Pool<Kizami, SchemeGenerationContext>
  * @property kizamiPool 铭刻池
  */
 class KizamiMeta(
-    private val kizamiPool: KizamiPool,
+    private val kizamiPool: KizamiPool = Pool.empty(),
 ) : SchemeMeta<Set<Kizami>> {
     override fun generate(context: SchemeGenerationContext): Set<Kizami> {
         return kizamiPool.pick(context).toSet()
@@ -33,13 +32,11 @@ class KizamiMeta(
     }
 }
 
-internal class KizamiMetaSerializer : SchemeSerializer<KizamiMeta> {
-    override fun deserialize(type: Type, node: ConfigurationNode): KizamiMeta {
-        if (node.virtual()) { // make it optional
-            return KizamiMeta(Pool.empty())
-        }
+internal class KizamiMetaSerializer : SchemeMetaSerializer<KizamiMeta> {
+    override val emptyValue: KizamiMeta = KizamiMeta()
 
-        return KizamiMeta(node.typedRequire<KizamiPool>())
+    override fun deserialize(type: Type, node: ConfigurationNode): KizamiMeta {
+        return KizamiMeta(node.requireKt<KizamiPool>())
     }
 }
 
@@ -63,7 +60,7 @@ internal class KizamiMetaSerializer : SchemeSerializer<KizamiMeta> {
  */
 internal class KizamiPoolSerializer : AbstractPoolSerializer<Kizami, SchemeGenerationContext>() {
     override fun contentFactory(node: ConfigurationNode): Kizami =
-        node.node("value").typedRequire<Kizami>()
+        node.node("value").requireKt<Kizami>()
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemeGenerationContext> {
         return FilterFactory.create(node)

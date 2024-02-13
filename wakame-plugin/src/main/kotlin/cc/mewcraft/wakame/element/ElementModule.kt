@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.element
 
-import cc.mewcraft.wakame.util.typedRegister
+import cc.mewcraft.wakame.util.registerKt
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -11,9 +11,9 @@ const val ELEMENT_SERIALIZERS = "element_serializers"
 fun elementModule(): Module = module {
 
     single<TypeSerializerCollection>(named(ELEMENT_SERIALIZERS)) {
-        TypeSerializerCollection.builder().apply {
-            typedRegister<Element>(ElementSerializer())
-        }.build()
+        TypeSerializerCollection.builder()
+            .registerKt<Element>(ElementSerializer())
+            .build()
     }
 
 }

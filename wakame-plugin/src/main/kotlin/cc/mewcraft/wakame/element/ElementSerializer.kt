@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.element
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.toStableByte
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -32,8 +32,8 @@ internal class ElementSerializer : SchemeSerializer<Element> {
 
         // if it's structure 2
         val elementName = node.key().toString()
-        val binaryIndex = node.node("binary_index").typedRequire<Int>().toStableByte()
-        val displayName = node.node("display_name").typedRequire<String>()
+        val binaryIndex = node.node("binary_index").requireKt<Int>().toStableByte()
+        val displayName = node.node("display_name").requireKt<String>()
         val element = Element(elementName, binaryIndex, displayName)
         return element
     }

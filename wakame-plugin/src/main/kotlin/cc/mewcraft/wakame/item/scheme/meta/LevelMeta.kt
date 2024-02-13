@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.key.Key
@@ -18,7 +17,7 @@ class LevelMeta(
     /**
      * The item level held in this scheme.
      */
-    private val level: Any,
+    private val level: Any = 1,
 ) : SchemeMeta<Int> {
     override fun generate(context: SchemeGenerationContext): Int {
         return when (level) {
@@ -37,6 +36,8 @@ class LevelMeta(
             else -> {
                 throw IllegalStateException("Impossible")
             }
+        }.also {
+            context.itemLevel = it // leave trace to the context
         }
     }
 
@@ -45,12 +46,13 @@ class LevelMeta(
 
         const val ADVENTURE_LEVEL_STRING = "ADVENTURE_LEVEL"
         const val EXPERIENCE_LEVEL_STRING = "EXPERIENCE_LEVEL"
-
-        val LEVEL_OPTIONS = setOf(ADVENTURE_LEVEL_STRING, EXPERIENCE_LEVEL_STRING)
+        val LEVEL_OPTIONS: Set<String> = setOf(ADVENTURE_LEVEL_STRING, EXPERIENCE_LEVEL_STRING)
     }
 }
 
-internal class LevelMetaSerializer : SchemeSerializer<LevelMeta> {
+internal class LevelMetaSerializer : SchemeMetaSerializer<LevelMeta> {
+    override val emptyValue: LevelMeta = LevelMeta()
+
     override fun deserialize(type: Type, node: ConfigurationNode): LevelMeta {
         val scalar = node.rawScalar()
         require(

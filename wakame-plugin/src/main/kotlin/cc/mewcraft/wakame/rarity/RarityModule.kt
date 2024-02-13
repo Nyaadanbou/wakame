@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.rarity
 
-import cc.mewcraft.wakame.util.typedRegister
+import cc.mewcraft.wakame.util.registerKt
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -11,10 +11,10 @@ const val RARITY_SERIALIZERS = "rarity_serializers"
 fun rarityModule(): Module = module {
 
     single<TypeSerializerCollection>(named(RARITY_SERIALIZERS)) {
-        TypeSerializerCollection.builder().apply {
-            typedRegister(RaritySerializer())
-            typedRegister(RarityMappingsSerializer())
-        }.build()
+        TypeSerializerCollection.builder()
+            .registerKt(RaritySerializer())
+            .registerKt(RarityMappingsSerializer())
+            .build()
     }
 
 }

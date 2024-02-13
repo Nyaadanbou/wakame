@@ -2,9 +2,8 @@ package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import net.kyori.adventure.text.Component
@@ -21,9 +20,9 @@ import java.lang.reflect.Type
  * @property displayName the item name in the format of MiniMessage string
  */
 class DisplayNameMeta(
-    private val displayName: String,
+    private val displayName: String = "Unnamed",
 ) : SchemeMeta<Component>, KoinComponent {
-    private val miniMessage: MiniMessage by inject(named(MINIMESSAGE_FULL))
+    private val miniMessage: MiniMessage by inject(named(MINIMESSAGE_FULL), mode = LazyThreadSafetyMode.NONE)
 
     override fun generate(context: SchemeGenerationContext): Component {
         return miniMessage.deserialize(displayName)
@@ -34,8 +33,10 @@ class DisplayNameMeta(
     }
 }
 
-internal class DisplayNameMetaSerializer : SchemeSerializer<DisplayNameMeta> {
+internal class DisplayNameMetaSerializer : SchemeMetaSerializer<DisplayNameMeta> {
+    override val emptyValue: DisplayNameMeta = DisplayNameMeta()
+
     override fun deserialize(type: Type, node: ConfigurationNode): DisplayNameMeta {
-        return DisplayNameMeta(node.typedRequire<String>())
+        return DisplayNameMeta(node.requireKt<String>())
     }
 }

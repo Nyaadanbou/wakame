@@ -4,8 +4,9 @@ import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.SchemeCoreValue
 import cc.mewcraft.wakame.util.NumericValue
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 
 /**
  * 代表一个属性在模板中的数值。
@@ -91,16 +92,16 @@ data object SchemeAttributeValueSerializerLUE : SchemeAttributeValueSerializer {
 }
 
 private fun deserializeSingle(node: ConfigurationNode): NumericValue =
-    node.node("value").typedRequire<NumericValue>()
+    node.node("value").requireKt<NumericValue>()
 
 private fun deserializeLower(node: ConfigurationNode): NumericValue =
-    node.node("lower").typedRequire<NumericValue>()
+    node.node("lower").requireKt<NumericValue>()
 
 private fun deserializeUpper(node: ConfigurationNode): NumericValue =
-    node.node("upper").typedRequire<NumericValue>()
+    node.node("upper").requireKt<NumericValue>()
 
 private fun deserializeElement(node: ConfigurationNode): Element =
-    node.node("element").typedRequire<Element>()
+    node.node("element").requireKt<Element>() // FIXME allow NullConfig
 
 private fun deserializeOperation(node: ConfigurationNode): AttributeModifier.Operation =
     node.node("operation").string

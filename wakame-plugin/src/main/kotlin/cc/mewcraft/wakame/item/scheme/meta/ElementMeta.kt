@@ -1,14 +1,13 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.filter.FilterFactory
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.random.Pool
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.spongepowered.configurate.ConfigurationNode
@@ -22,7 +21,7 @@ typealias ElementPool = Pool<Element, SchemeGenerationContext>
  * @property elementPool 元素池
  */
 class ElementMeta(
-    private val elementPool: ElementPool,
+    private val elementPool: ElementPool = Pool.empty(),
 ) : SchemeMeta<Set<Element>> {
     override fun generate(context: SchemeGenerationContext): Set<Element> {
         return elementPool.pick(context).toSet()
@@ -33,9 +32,11 @@ class ElementMeta(
     }
 }
 
-internal class ElementMetaSerializer : SchemeSerializer<ElementMeta> {
+internal class ElementMetaSerializer : SchemeMetaSerializer<ElementMeta> {
+    override val emptyValue: ElementMeta = ElementMeta()
+
     override fun deserialize(type: Type, node: ConfigurationNode): ElementMeta {
-        return ElementMeta(node.typedRequire<ElementPool>())
+        return ElementMeta(node.requireKt<ElementPool>())
     }
 }
 
@@ -59,7 +60,7 @@ internal class ElementMetaSerializer : SchemeSerializer<ElementMeta> {
  */
 internal class ElementPoolSerializer : AbstractPoolSerializer<Element, SchemeGenerationContext>() {
     override fun contentFactory(node: ConfigurationNode): Element {
-        return node.node("value").typedRequire<Element>()
+        return node.node("value").requireKt<Element>()
     }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemeGenerationContext> {

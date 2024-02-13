@@ -29,8 +29,8 @@ interface Group<S, C : SelectionContext> {
     val default: Pool<S, C>
 
     /**
-     * Randomly pick several [S's][S] with given [context]. Returns an
-     * [empty list][EmptyList] if:
+     * Randomly pick several [S's][S] with given [context]. Returns an empty
+     * list if:
      * - [conditions][conditions] are not met, and
      * - [fallback pool][default] returns a `null`.
      *
@@ -46,8 +46,8 @@ interface Group<S, C : SelectionContext> {
 
     /**
      * The same as [pick] but it only picks a **single** random [S]. In the
-     * case where [pick] returns an [empty list][EmptyList], this function
-     * returns a `null` instead.
+     * case where [pick] returns an empty list, this function returns a `null`
+     * instead.
      *
      * Use this function if you just want to pick a single [S].
      */

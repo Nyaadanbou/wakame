@@ -46,7 +46,7 @@ internal fun CompoundShadowTag.getElement(key: String): Element {
 }
 
 /**
- * Gets [Element] Set from the specified **Byte Array** tag.
+ * Gets all the stored [elements][Element] from the specified **Byte Array** tag.
  *
  * Returns empty set if the specified tag does not exist.
  *
@@ -79,7 +79,7 @@ internal fun CompoundShadowTag.putElement(key: String, elementCollection: Collec
 
 //<editor-fold desc="Kizami Getters/Setters">
 /**
- * Gets [Kizami] Set from the specified **Byte Array** tag.
+ * Gets all the stored [kizami][Kizami] from the specified **Byte Array** tag.
  *
  * Returns an empty set if the specified tag does not exist.
  *

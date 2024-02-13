@@ -34,7 +34,7 @@ open class BasicSelectionContext : SelectionContext {
 internal class SelectionContextWatcher<V>(initialValue: V) :
     KoinComponent, ObservableProperty<V>(initialValue) {
 
-    private val logger: Logger by inject()
+    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
 
     override fun afterChange(property: KProperty<*>, oldValue: V, newValue: V) {
         logger.info("[SelectionContextWatcher] ${property.name} has changed: $oldValue -> $newValue")

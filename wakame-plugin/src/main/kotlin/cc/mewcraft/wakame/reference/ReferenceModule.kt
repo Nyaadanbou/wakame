@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reference
 
-import cc.mewcraft.wakame.util.typedRegister
+import cc.mewcraft.wakame.util.registerKt
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -11,9 +11,9 @@ const val REFERENCE_SERIALIZERS = "reference_serializers"
 fun referenceModule(): Module = module {
 
     single<TypeSerializerCollection>(named(REFERENCE_SERIALIZERS)) {
-        TypeSerializerCollection.builder().apply {
-            typedRegister(EntityReferenceSerializer())
-        }.build()
+        TypeSerializerCollection.builder()
+            .registerKt(EntityReferenceSerializer())
+            .build()
     }
 
 }

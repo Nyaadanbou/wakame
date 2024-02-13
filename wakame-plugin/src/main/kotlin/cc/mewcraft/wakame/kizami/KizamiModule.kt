@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.util.typedRegister
+import cc.mewcraft.wakame.util.registerKt
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -11,9 +11,9 @@ const val KIZAMI_SERIALIZERS = "kizami_serializers"
 fun kizamiModule(): Module = module {
 
     single<TypeSerializerCollection>(named(KIZAMI_SERIALIZERS)) {
-        TypeSerializerCollection.builder().apply {
-            typedRegister(KizamiSerializer())
-        }.build()
+        TypeSerializerCollection.builder()
+            .registerKt(KizamiSerializer())
+            .build()
     }
 
 }

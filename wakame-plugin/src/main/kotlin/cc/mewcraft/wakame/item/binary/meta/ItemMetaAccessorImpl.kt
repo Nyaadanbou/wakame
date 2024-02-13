@@ -23,7 +23,7 @@ import java.util.UUID
 internal class ItemMetaAccessorImpl(
     private val base: NekoItemStackImpl,
 ) : KoinComponent, ItemMetaAccessor {
-    private val gsonSerializer: GsonComponentSerializer by inject()
+    private val gsonSerializer: GsonComponentSerializer by inject(mode = LazyThreadSafetyMode.NONE)
 
     ////// ItemMetaMap //////
 

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.random
 
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.condition.Condition
-import cc.mewcraft.wakame.util.typedRequire
+import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -136,7 +136,7 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
 
             // wrap it into a sample
             Sample.build(content) {
-                weight = n.node("weight").typedRequire<Double>()
+                weight = n.node("weight").requireKt<Double>()
                 conditions += deserializeConditionList(n.node("filters"))
                 mark = n.node("mark").string?.let { Mark.stringMarkOf(it) }
                 trace = {

@@ -8,7 +8,8 @@ import cc.mewcraft.wakame.item.scheme.curse.SchemeCursePoolSerializer
 import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
-import cc.mewcraft.wakame.util.typedRegister
+import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
+import cc.mewcraft.wakame.util.registerKt
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -21,38 +22,44 @@ fun schemeItemModule(): Module = module {
 
     // region Cells
     single<TypeSerializerCollection>(named(CELL_SERIALIZERS)) {
-        TypeSerializerCollection.builder().apply {
+        TypeSerializerCollection.builder()
+
             // cores
-            typedRegister(SchemeCorePoolSerializer())
-            typedRegister(SchemeCoreGroupSerializer())
+            .registerKt(SchemeCorePoolSerializer())
+            .registerKt(SchemeCoreGroupSerializer())
 
             // curses
-            typedRegister(SchemeCursePoolSerializer())
-            typedRegister(SchemeCurseGroupSerializer())
-        }.build()
+            .registerKt(SchemeCursePoolSerializer())
+            .registerKt(SchemeCurseGroupSerializer())
+
+            // curse contents
+            .registerAll(get<TypeSerializerCollection>(named(REFERENCE_SERIALIZERS)))
+
+            .build()
     }
     // endregion
 
     // region Metas
     single<TypeSerializerCollection>(named(META_SERIALIZERS)) {
-        TypeSerializerCollection.builder().apply {
-            registerAll(get(named(ELEMENT_SERIALIZERS)))
-            registerAll(get(named(KIZAMI_SERIALIZERS)))
-            registerAll(get(named(RARITY_SERIALIZERS)))
+        TypeSerializerCollection.builder()
+            .registerAll(get(named(ELEMENT_SERIALIZERS)))
+            .registerAll(get(named(KIZAMI_SERIALIZERS)))
+            .registerAll(get(named(RARITY_SERIALIZERS)))
 
-            typedRegister(ElementPoolSerializer())
-            typedRegister(KizamiPoolSerializer())
+            .registerKt(ElementPoolSerializer())
+            .registerKt(KizamiPoolSerializer())
 
-            typedRegister(DisplayNameMetaSerializer())
-            typedRegister(ElementMetaSerializer())
-            typedRegister(KizamiMetaSerializer())
-            typedRegister(LevelMetaSerializer())
-            typedRegister(LoreMetaSerializer())
-            typedRegister(MaterialMetaSerializer())
-            typedRegister(RarityMetaSerializer())
-            typedRegister(SkinMetaSerializer())
-            typedRegister(SkinOwnerMetaSerializer())
-        }.build()
+            .registerKt(DisplayNameMetaSerializer())
+            .registerKt(ElementMetaSerializer())
+            .registerKt(KizamiMetaSerializer())
+            .registerKt(LevelMetaSerializer())
+            .registerKt(LoreMetaSerializer())
+            .registerKt(MaterialMetaSerializer())
+            .registerKt(RarityMetaSerializer())
+            .registerKt(SkinMetaSerializer())
+            .registerKt(SkinOwnerMetaSerializer())
+
+            .build()
     }
     // endregion
 

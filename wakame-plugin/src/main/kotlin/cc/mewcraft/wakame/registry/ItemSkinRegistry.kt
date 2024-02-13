@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
 object ItemSkinRegistry : KoinComponent, Initializable, Reloadable,
@@ -15,14 +15,14 @@ object ItemSkinRegistry : KoinComponent, Initializable, Reloadable,
     BiMapRegistry<String, Short> by HashBiMapRegistry() {
 
     // configuration stuff
-    private val loader: NekoConfigurationLoader by inject(named(SKIN_CONFIG_LOADER))
     private lateinit var node: NekoConfigurationNode
 
     @OptIn(InternalApi::class)
     private fun loadConfiguration() {
         clearBoth()
 
-        node = loader.load()
+        node = get<NekoConfigurationLoader>(named(SKIN_CONFIG_LOADER)).load()
+
         // TODO read config and populate values
     }
 
