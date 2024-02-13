@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.random
 
 import cc.mewcraft.wakame.condition.Condition
+import me.lucko.helper.random.Weigher
 
 @PublishedApi
 internal abstract class AbstractSample<T, C : SelectionContext>(
     override val content: T,
-    override val weight0: Double,
+    override val weight: Double,
     override val conditions: List<Condition<C>>,
     override val mark: Mark<*>?,
 ) : Sample<T, C>
@@ -18,4 +19,10 @@ internal class SampleBuilder<T, C : SelectionContext>(
     override var conditions: MutableList<Condition<C>> = ArrayList()
     override var mark: Mark<*>? = null
     override var trace: (C) -> Unit = {}
+}
+
+internal object SampleWeigher : Weigher<Sample<*,*>> {
+    override fun weigh(element: Sample<*, *>): Double {
+        return element.weight
+    }
 }

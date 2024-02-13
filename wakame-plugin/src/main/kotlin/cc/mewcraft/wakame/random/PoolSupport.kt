@@ -55,7 +55,7 @@ internal class ImmutablePool<S, C : SelectionContext>(
             return Stream.empty()
         }
 
-        val selector = RandomSelector.weighted(samples)
+        val selector = RandomSelector.weighted(samples, SampleWeigher)
 
         // 设置是否重置抽样，以及要选择的样本个数
         val stream = if (isReplacement) {

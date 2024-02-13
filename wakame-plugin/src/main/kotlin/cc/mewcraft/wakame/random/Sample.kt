@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.random
 
 import cc.mewcraft.wakame.condition.Condition
-import me.lucko.helper.random.Weighted
 
 /**
  * 代表 [Pool] 中的一个样本。
@@ -9,7 +8,7 @@ import me.lucko.helper.random.Weighted
  * @param T 样本所携带的实例
  * @param C 条件所需要的上下文
  */
-interface Sample<T, in C : SelectionContext> : Weighted {
+interface Sample<T, in C : SelectionContext> {
     /**
      * The content wrapped within `this` [sample][Sample].
      */
@@ -18,8 +17,7 @@ interface Sample<T, in C : SelectionContext> : Weighted {
     /**
      * The weight of `this` sample. Must be non-null.
      */
-    val weight0: Double
-    override fun getWeight(): Double = weight0 // save the Java implementation
+    val weight: Double
 
     /**
      * 该 [sample][Sample] 被选中必须满足的条件。如果条件不满足，则该 [sample][Sample] 不会进入最终的样本空间当中。
@@ -61,7 +59,7 @@ interface Sample<T, in C : SelectionContext> : Weighted {
             val builder = SampleBuilder<T, C>(content).apply(block)
             val sample = object : AbstractSample<T, C>(
                 content = builder.content,
-                weight0 = builder.weight,
+                weight = builder.weight,
                 conditions = builder.conditions,
                 mark = builder.mark
             ) {
