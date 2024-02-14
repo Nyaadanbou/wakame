@@ -59,8 +59,9 @@ internal class KizamiMetaSerializer : SchemeMetaSerializer<KizamiMeta> {
  * ```
  */
 internal class KizamiPoolSerializer : AbstractPoolSerializer<Kizami, SchemeGenerationContext>() {
-    override fun contentFactory(node: ConfigurationNode): Kizami =
-        node.node("value").requireKt<Kizami>()
+    override fun contentFactory(node: ConfigurationNode): Kizami {
+        return node.node("value").requireKt<Kizami>()
+    }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemeGenerationContext> {
         return FilterFactory.create(node)

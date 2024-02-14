@@ -55,7 +55,7 @@ interface Sample<T, in C : SelectionContext> {
     }
 
     companion object Factory {
-        inline fun <T, C : SelectionContext> build(content: T, block: Sample.Builder<T, C>.() -> Unit): Sample<T, C> {
+        inline fun <T, C : SelectionContext> build(content: T, block: Builder<T, C>.() -> Unit): Sample<T, C> {
             val builder = SampleBuilder<T, C>(content).apply(block)
             val sample = object : AbstractSample<T, C>(
                 content = builder.content,

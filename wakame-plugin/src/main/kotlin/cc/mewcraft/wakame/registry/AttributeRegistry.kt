@@ -33,7 +33,7 @@ import net.kyori.adventure.key.Key
 @DependencyConfig(
     preWorldAfter = [ElementRegistry::class]
 )
-object AttributeRegistry : Initializable,Reloadable {
+object AttributeRegistry : Initializable, Reloadable {
 
     @InternalApi
     val schemeBuilderRegistry: MutableMap<Key, SchemeBuilder> = hashMapOf()
@@ -53,7 +53,7 @@ object AttributeRegistry : Initializable,Reloadable {
     /**
      * Registers an attribute facade.
      *
-     * ## Parameter: key
+     * ## 参数: [key]
      * 词条在 NBT/模板 中的唯一标识，用来定位词条的序列化实现。
      *
      * 注意，这仅仅是词条在 NBT/模板 中的唯一标识。底层由多个对象组成的词条标识就与这里的 [key] 不同。
@@ -62,8 +62,8 @@ object AttributeRegistry : Initializable,Reloadable {
      * `MAX_ATTACK_DAMAGE`，但攻击力属性词条在 NBT/模板中的标识是一个经过“合并”得到的
      * `attribute:attack_damage`.
      *
-     * ## Parameter: type
-     * 该此条在 NBT 中的数据类型。
+     * ## 参数: [type]
+     * 词条在 NBT 中的数据类型。
      */
     private fun build(key: String, type: ShadowTagType): FormatSelection {
         return FormatSelectionImpl(Key.key(NekoNamespaces.ATTRIBUTE, key), type)
