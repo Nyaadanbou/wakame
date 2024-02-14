@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.binary.curse
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.BinaryData
 import cc.mewcraft.wakame.item.CurseKeys
 import cc.mewcraft.wakame.util.compoundShadowTag
@@ -19,7 +18,7 @@ import net.kyori.adventure.key.Key
 class PeakDamageCurse(
     private val element: Element,
     private val amount: Int,
-) : BinaryCurse, Initializable {
+) : BinaryCurse {
 
     companion object Constants {
         const val ID_TAG_NAME = "id"
@@ -42,9 +41,5 @@ class PeakDamageCurse(
             putShort(AMOUNT_TAG_NAME, amount.toStableShort())
             putByte(ELEMENT_TAG_NAME, element.binary)
         }
-    }
-
-    override fun onPreWorld() {
-        // TODO load it to the factory
     }
 }

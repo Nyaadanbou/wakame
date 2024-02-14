@@ -22,8 +22,23 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.BufferedReader
 import java.io.File
 
+const val CRATE_CONFIG_DIR = "crates"
+const val CRATE_CONFIG_LOADER = "crate_config_loader"
+
 const val ITEM_CONFIG_DIR = "items"
 const val ITEM_CONFIG_LOADER = "item_config_loader"
+
+const val SKILL_CONFIG_DIR = "skills"
+const val SKILL_CONFIG_LOADER = "skill_config_loader"
+
+const val ATTRIBUTE_CONFIG_FILE = "attributes.yml"
+const val ATTRIBUTE_CONFIG_LOADER = "attribute_config_loader"
+
+const val CATEGORY_CONFIG_FILE = "categories.yml"
+const val CATEGORY_CONFIG_LOADER = "category_config_loader"
+
+const val PROJECTILE_CONFIG_FILE = "projectiles.yml"
+const val PROJECTILE_CONFIG_LOADER = "projectile_config_loader"
 
 const val ELEMENT_CONFIG_FILE = "elements.yml"
 const val ELEMENT_CONFIG_LOADER = "element_config_loader"
@@ -34,8 +49,8 @@ const val KIZAMI_CONFIG_LOADER = "kizami_config_loader"
 const val RARITY_CONFIG_FILE = "rarities.yml"
 const val RARITY_CONFIG_LOADER = "rarity_config_loader"
 
-const val RARITY_MAPPING_CONFIG_FILE = "levels.yml"
-const val RARITY_MAPPING_CONFIG_LOADER = "rarity_mapping_config_loader"
+const val LEVEL_CONFIG_FILE = "levels.yml"
+const val LEVEL_CONFIG_LOADER = "level_config_loader"
 
 const val SKIN_CONFIG_FILE = "skins.yml"
 const val SKIN_CONFIG_LOADER = "skin_config_loader"
@@ -48,12 +63,13 @@ fun registryModule(): Module = module {
     // We need to explicitly declare these Initializable,
     // so the functions can be called by the Initializer
     val registryBindings = arrayOf(Initializable::class, Reloadable::class)
+    single { AttributeRegistry } binds registryBindings
     single { ElementRegistry } binds registryBindings
-    single { EntityRegistry } binds registryBindings
+    single { EntityReferenceRegistry } binds registryBindings
     single { ItemSkinRegistry } binds registryBindings
     single { KizamiRegistry } binds registryBindings
     single { NekoItemRegistry } binds registryBindings
-    single { RarityMappingRegistry } binds registryBindings
+    single { LevelMappingRegistry } binds registryBindings
     single { RarityRegistry } binds registryBindings
 
     //<editor-fold desc="Definitions of YamlConfigurationLoader">
@@ -98,8 +114,8 @@ fun registryModule(): Module = module {
         }
     }
 
-    single<YamlConfigurationLoader>(named(RARITY_MAPPING_CONFIG_LOADER)) {
-        createRegistryConfigurationLoader(RARITY_MAPPING_CONFIG_FILE) {
+    single<YamlConfigurationLoader>(named(LEVEL_CONFIG_LOADER)) {
+        createRegistryConfigurationLoader(LEVEL_CONFIG_FILE) {
             registerAll(get(named(RARITY_SERIALIZERS)))
         }
     }
@@ -110,7 +126,7 @@ fun registryModule(): Module = module {
 private fun Scope.getConfigFileAsBufferedReader(path: String): BufferedReader {
     val plugin = getOrNull<WakamePlugin>()
     return if (plugin != null) {
-        // we are in a real server environment
+        // we are in a server environment
         get<WakamePlugin>().getBundledFile(path).bufferedReader()
     } else {
         // we are in a testing environment

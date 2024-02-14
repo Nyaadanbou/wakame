@@ -21,15 +21,15 @@ object RarityRegistry : KoinComponent, Initializable, Reloadable,
     val DEFAULT_RARITY: Rarity by lazy { values.first() }
 
     // configuration stuff
-    private lateinit var node: NekoConfigurationNode
+    private lateinit var root: NekoConfigurationNode
 
     @OptIn(InternalApi::class)
     private fun loadConfiguration() {
         clearBoth()
 
-        node = get<NekoConfigurationLoader>(named(RARITY_CONFIG_LOADER)).load()
+        root = get<NekoConfigurationLoader>(named(RARITY_CONFIG_LOADER)).load()
 
-        node.node("rarities").childrenMap().forEach { (_, n) ->
+        root.node("rarities").childrenMap().forEach { (_, n) ->
             val rarity = n.requireKt<Rarity>()
             registerBothMapping(rarity.name, rarity)
         }

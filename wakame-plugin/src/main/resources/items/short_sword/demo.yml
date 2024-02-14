@@ -279,9 +279,11 @@ core_selectors:
             upper: 16
             element: fire
             weight: 8
-          - key: attribute:attack_damage_rate
-            value: 0.1
+          - key: attribute:attack_damage
+            lower: 0.1
+            upper: 0.1
             element: fire
+            operation: multiply_base
             weight: 8
           - key: attribute:attack_effect_chance
             value: 0.38
@@ -297,9 +299,11 @@ core_selectors:
             upper: 17
             element: water
             weight: 8
-          - key: attribute:attack_damage_rate
-            value: 0.2
+          - key: attribute:attack_damage
+            lower: 0.2
+            upper: 0.2
             element: water
+            operation: multiply_base
             weight: 8
           - key: attribute:attack_effect_chance
             value: 0.42
@@ -315,9 +319,11 @@ core_selectors:
             upper: 18
             element: wind
             weight: 8
-          - key: attribute:attack_damage_rate
-            value: 0.3
+          - key: attribute:attack_damage
+            lower: 0.3
+            upper: 0.3
             element: wind
+            operation: multiply_base
             weight: 8
           - key: attribute:attack_effect_chance
             value: 0.56

@@ -57,7 +57,6 @@ object DefaultAttributes {
                     add(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
                     add(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
                     add(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
-                    add(Attributes.byElement(it).ATTACK_DAMAGE_RATE)
                 }
             }
         )

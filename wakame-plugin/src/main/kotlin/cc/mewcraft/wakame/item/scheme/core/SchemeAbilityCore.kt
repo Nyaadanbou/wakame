@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.scheme.core
 
 import cc.mewcraft.wakame.ability.BinaryAbilityValue
-import cc.mewcraft.wakame.ability.AbilityFacadeRegistry
+import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.ability.SchemeAbilityValue
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.util.getOrThrow
@@ -32,7 +32,7 @@ data class SchemeAbilityCore(
         // 技能本身的数值，写死在配置文件里，不太需要动态变化，顶多用到随机数值
         // 技能依赖的外部数值，目前包括属性数值，触发时才会知道。这部分取决于技能的具体实现
 
-        val baker = AbilityFacadeRegistry.schemeBakerRegistry.getOrThrow(key)
+        val baker = AbilityRegistry.schemeBakerRegistry.getOrThrow(key)
         val value = baker.bake(value, scalingFactor)
         return value as BinaryAbilityValue
     }

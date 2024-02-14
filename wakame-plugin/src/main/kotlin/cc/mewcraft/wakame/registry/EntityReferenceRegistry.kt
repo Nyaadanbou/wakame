@@ -11,7 +11,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
-object EntityRegistry : KoinComponent, Initializable, Reloadable,
+object EntityReferenceRegistry : KoinComponent, Initializable, Reloadable,
     Registry<String, EntityReference> by HashMapRegistry() {
 
     // configuration stuff

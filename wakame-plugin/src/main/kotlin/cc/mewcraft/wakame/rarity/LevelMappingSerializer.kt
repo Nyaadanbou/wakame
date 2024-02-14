@@ -30,9 +30,9 @@ import java.lang.reflect.Type
  *     ...
  * ```
  */
-internal class RarityMappingsSerializer : SchemeSerializer<RarityMappings> {
-    override fun deserialize(type: Type, node: ConfigurationNode): RarityMappings {
-        val rangeMapBuilder = ImmutableRangeMap.builder<Int, RarityMapping>()
+internal class LevelMappingSerializer : SchemeSerializer<LevelMappings> {
+    override fun deserialize(type: Type, node: ConfigurationNode): LevelMappings {
+        val rangeMapBuilder = ImmutableRangeMap.builder<Int, LevelMapping>()
         node.childrenMap().forEach { (_, n1) ->
             val levelN = n1.node("level").requireKt<String>()
             val weightN = n1.node("weight").takeIf { it.isMap }
@@ -40,7 +40,7 @@ internal class RarityMappingsSerializer : SchemeSerializer<RarityMappings> {
 
             // deserialize weight for each rarity
             val levelRange = RangeParser.parseIntRange(levelN)
-            val rarityMapping = RarityMapping.build {
+            val levelMapping = LevelMapping.build {
                 weightN.childrenMap().forEach { (k, n2) ->
                     val rarityName = k.toString()
                     val rarityWeight = n2.requireKt<Double>()
@@ -48,9 +48,9 @@ internal class RarityMappingsSerializer : SchemeSerializer<RarityMappings> {
                 }
             }
 
-            rangeMapBuilder.put(levelRange, rarityMapping)
+            rangeMapBuilder.put(levelRange, levelMapping)
         }
 
-        return RarityMappings(rangeMapBuilder.build())
+        return LevelMappings(rangeMapBuilder.build())
     }
 }

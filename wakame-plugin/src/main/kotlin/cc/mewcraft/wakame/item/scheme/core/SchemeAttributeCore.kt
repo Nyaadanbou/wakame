@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.scheme.core
 
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.attribute.facade.AttributeFacadeRegistry
+import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValue
 import cc.mewcraft.wakame.attribute.facade.SchemeAttributeValue
 import cc.mewcraft.wakame.util.getOrThrow
@@ -29,7 +29,7 @@ data class SchemeAttributeCore(
      */
     @OptIn(InternalApi::class)
     override fun generate(scalingFactor: Int): BinaryAttributeValue {
-        val baker = AttributeFacadeRegistry.schemeBakerRegistry.getOrThrow(key)
+        val baker = AttributeRegistry.schemeBakerRegistry.getOrThrow(key)
         val value = baker.bake(value, scalingFactor)
         return value as BinaryAttributeValue
     }

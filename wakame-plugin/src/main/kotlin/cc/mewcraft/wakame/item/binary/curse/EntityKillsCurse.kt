@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.binary.curse
 
-import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.BinaryData
 import cc.mewcraft.wakame.item.CurseKeys
 import cc.mewcraft.wakame.reference.EntityReference
@@ -19,7 +18,7 @@ import net.kyori.adventure.key.Key
 class EntityKillsCurse(
     private val index: EntityReference,
     private val count: Int,
-) : BinaryCurse, Initializable {
+) : BinaryCurse {
 
     companion object Constants {
         const val ID_TAG_NAME = "id"
@@ -47,9 +46,5 @@ class EntityKillsCurse(
             putString(INDEX_TAG_NAME, index.name)
             putShort(COUNT_TAG_NAME, count.toStableShort())
         }
-    }
-
-    override fun onPreWorld() {
-        // TODO load it to the factory
     }
 }

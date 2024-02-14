@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.binary.core
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.attribute.facade.AttributeFacadeRegistry
+import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValue
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.core.EmptySchemeCore
@@ -43,7 +43,7 @@ object BinaryCoreFactory {
             }
 
             NekoNamespaces.ATTRIBUTE -> {
-                val decoder = AttributeFacadeRegistry.shadowTagDecoder.getOrThrow(key)
+                val decoder = AttributeRegistry.shadowTagDecoder.getOrThrow(key)
                 val value = decoder.decode(compoundTag)
                 ret = BinaryAttributeCore(key, value as BinaryAttributeValue)
             }

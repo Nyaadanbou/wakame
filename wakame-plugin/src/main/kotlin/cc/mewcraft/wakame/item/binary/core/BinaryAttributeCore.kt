@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.binary.core
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.base.Attribute
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
-import cc.mewcraft.wakame.attribute.facade.AttributeFacadeRegistry
+import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValue
 import cc.mewcraft.wakame.util.getOrThrow
@@ -18,14 +18,14 @@ data class BinaryAttributeCore(
 
     @OptIn(InternalApi::class)
     override fun provideAttributeModifiers(uuid: UUID): Map<out Attribute, AttributeModifier> {
-        val factory = AttributeFacadeRegistry.attributeFactoryRegistry.getOrThrow(key)
+        val factory = AttributeRegistry.attributeFactoryRegistry.getOrThrow(key)
         val modifiers = factory.createAttributeModifiers(uuid, value)
         return modifiers
     }
 
     @OptIn(InternalApi::class)
     override fun asShadowTag(): ShadowTag {
-        val encoder = AttributeFacadeRegistry.shadowTagEncoder.getOrThrow(key)
+        val encoder = AttributeRegistry.shadowTagEncoder.getOrThrow(key)
         val tag = encoder.encode(value)
         return tag
     }

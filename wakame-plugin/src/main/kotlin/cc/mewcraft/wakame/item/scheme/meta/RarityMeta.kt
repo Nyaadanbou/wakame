@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.item.scheme.meta
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.rarity.RarityMappings
-import cc.mewcraft.wakame.registry.RarityMappingRegistry
+import cc.mewcraft.wakame.rarity.LevelMappings
+import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
@@ -27,7 +27,7 @@ class RarityMeta(
     /**
      * The mappings used to generate the rarity.
      */
-    private val dynamic: RarityMappings? = null,
+    private val dynamic: LevelMappings? = null,
 ) : SchemeMeta<Rarity> {
     override fun generate(context: SchemeGenerationContext): Rarity {
         @Suppress("IfThenToElvis") // FUNKY IDE
@@ -39,7 +39,7 @@ class RarityMeta(
             dynamic.pick(context.itemLevel)
         } else {
             // fallback to the global rarity mappings
-            RarityMappingRegistry.getOrThrow(RarityMappingRegistry.GLOBAL_RARITY_MAPPING_NAME).pick(context.itemLevel)
+            LevelMappingRegistry.getOrThrow(LevelMappingRegistry.GLOBAL_NAME).pick(context.itemLevel)
         }.also {
             context.rarities += it // leave trace to the context
         }
@@ -60,7 +60,7 @@ internal class RarityMetaSerializer : SchemeMetaSerializer<RarityMeta> {
         when {
             string.startsWith(mappingPrefix) -> {
                 return RarityMeta(
-                    dynamic = RarityMappingRegistry.getOrThrow(string.substringAfter(mappingPrefix)),
+                    dynamic = LevelMappingRegistry.getOrThrow(string.substringAfter(mappingPrefix)),
                 )
             }
 

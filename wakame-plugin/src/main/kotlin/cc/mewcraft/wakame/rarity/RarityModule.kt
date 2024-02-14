@@ -13,7 +13,7 @@ fun rarityModule(): Module = module {
     single<TypeSerializerCollection>(named(RARITY_SERIALIZERS)) {
         TypeSerializerCollection.builder()
             .registerKt(RaritySerializer())
-            .registerKt(RarityMappingsSerializer())
+            .registerKt(LevelMappingSerializer())
             .build()
     }
 

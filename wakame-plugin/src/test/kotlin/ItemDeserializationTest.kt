@@ -1,6 +1,5 @@
 import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.attribute.facade.AttributeFacadeRegistry
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
@@ -59,13 +58,13 @@ class ItemDeserializationTest : KoinTest {
             }
 
             // initialize attribute facades
-            AttributeFacadeRegistry.onPreWorld()
+            AttributeRegistry.onPreWorld()
 
             // initialize necessary registry
             ElementRegistry.onPreWorld()
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()
-            RarityMappingRegistry.onPreWorld()
+            LevelMappingRegistry.onPreWorld()
             NekoItemRegistry.onPreWorld()
         }
 

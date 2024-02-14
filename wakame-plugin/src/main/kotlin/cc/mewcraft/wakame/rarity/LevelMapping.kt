@@ -1,19 +1,19 @@
 package cc.mewcraft.wakame.rarity
 
-import cc.mewcraft.wakame.rarity.RarityMapping.Companion.build
+import cc.mewcraft.wakame.rarity.LevelMapping.Companion.build
 import com.google.common.collect.RangeMap
 import me.lucko.helper.random.RandomSelector
 
 /**
- * Represents a group of rarity mappings.
+ * Represents a group of "level -> rarity" mappings.
  */
-class RarityMappings(
+class LevelMappings(
     /**
      * A RangeMap holding all the rarity mappings. The `map key` is the range
-     * of levels to which the corresponding [RarityMapping] applies, and the
-     * `map value` is the corresponding [RarityMapping].
+     * of levels to which the corresponding [LevelMapping] applies, and the
+     * `map value` is the corresponding [LevelMapping].
      */
-    private val mappings: RangeMap<Int, RarityMapping>,
+    private val mappings: RangeMap<Int, LevelMapping>,
 ) {
     /**
      * Returns `true` if [mappings] is applicable to the input [lvl].
@@ -45,7 +45,7 @@ class RarityMappings(
  *
  * To construct it, use the [build] function.
  */
-class RarityMapping private constructor(
+class LevelMapping private constructor(
     /**
      * A weight map, where the `map key` is [Rarity] and `map value` is
      * corresponding weight.
@@ -64,22 +64,22 @@ class RarityMapping private constructor(
     }
 
     /**
-     * The builder of [RarityMapping].
+     * The builder of [LevelMapping].
      */
     interface Builder {
         val weight: MutableMap<Rarity, Double>
-        fun build(): RarityMapping
+        fun build(): LevelMapping
     }
 
     private class BuilderImpl : Builder {
         override val weight: MutableMap<Rarity, Double> = LinkedHashMap()
-        override fun build(): RarityMapping {
-            return RarityMapping(weight)
+        override fun build(): LevelMapping {
+            return LevelMapping(weight)
         }
     }
 
     companion object {
-        fun build(builder: Builder.() -> Unit): RarityMapping {
+        fun build(builder: Builder.() -> Unit): LevelMapping {
             return BuilderImpl().apply(builder).build()
         }
     }

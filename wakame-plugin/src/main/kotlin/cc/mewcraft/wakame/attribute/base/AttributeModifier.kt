@@ -29,15 +29,15 @@ data class AttributeModifier(
         val binary: Byte = id.toByte()
 
         companion object {
-            private val OPERATIONS_ARRAY = arrayOf(
+            private val OPERATIONS_ARRAY: Array<Operation> = arrayOf(
                 ADDITION,
                 MULTIPLY_BASE,
                 MULTIPLY_TOTAL
             )
-            private val OPERATIONS_MAP = mapOf(
+            private val OPERATIONS_MAP: Map<String, Operation> = mapOf(
                 ADDITION.key to ADDITION,
-                MULTIPLY_BASE to MULTIPLY_BASE,
-                MULTIPLY_TOTAL to MULTIPLY_TOTAL
+                MULTIPLY_BASE.key to MULTIPLY_BASE,
+                MULTIPLY_TOTAL.key to MULTIPLY_TOTAL
             )
 
             fun byKey(key: String): Operation {

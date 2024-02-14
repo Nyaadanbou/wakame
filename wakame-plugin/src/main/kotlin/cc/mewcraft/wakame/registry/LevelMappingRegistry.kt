@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.rarity.RarityMappings
+import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
 import cc.mewcraft.wakame.util.requireKt
@@ -18,34 +18,34 @@ object RarityMappingRegistry : KoinComponent, Initializable, Reloadable,
     Registry<String, RarityMappings> by HashMapRegistry() {
 
     // constants
-    const val GLOBAL_RARITY_MAPPING_NAME: String = "global"
+    const val GLOBAL_NAME: String = "global"
 
     // configuration stuff
-    private lateinit var node: NekoConfigurationNode
+    private lateinit var root: NekoConfigurationNode
 
     @OptIn(InternalApi::class)
     private fun loadConfiguration() {
         clearName2Object()
 
-        node = get<NekoConfigurationLoader>(named(RARITY_MAPPING_CONFIG_LOADER)).load()
+        root = get<NekoConfigurationLoader>(named(LEVEL_CONFIG_LOADER)).load()
 
         // deserialize the `global` mappings
-        val globalRarityMappings = node.node("global_rarity_mappings").requireKt<RarityMappings>()
-        registerName2Object(GLOBAL_RARITY_MAPPING_NAME, globalRarityMappings)
+        val globalLevelMappings = root.node("global").requireKt<LevelMappings>()
+        registerName2Object(GLOBAL_NAME, globalLevelMappings)
 
         // deserialize all custom mappings
-        node.node("custom_rarity_mappings").childrenMap().forEach { (k, n) ->
+        root.node("custom").childrenMap().forEach { (k, n) ->
             val rarityMappingsName = k.toString()
-            val rarityMappings = n.requireKt<RarityMappings>()
-            registerName2Object(rarityMappingsName, rarityMappings)
+            val levelMappings = n.requireKt<LevelMappings>()
+            registerName2Object(rarityMappingsName, levelMappings)
         }
     }
 
-    override fun onReload() {
+    override fun onPreWorld() {
         loadConfiguration()
     }
 
-    override fun onPreWorld() {
+    override fun onReload() {
         loadConfiguration()
     }
 }

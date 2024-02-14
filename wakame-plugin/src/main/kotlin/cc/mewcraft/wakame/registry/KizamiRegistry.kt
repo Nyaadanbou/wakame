@@ -16,15 +16,15 @@ object KizamiRegistry : KoinComponent, Initializable, Reloadable,
     BiMapRegistry<String, Byte> by HashBiMapRegistry() {
 
     // configuration stuff
-    private lateinit var node: NekoConfigurationNode
+    private lateinit var root: NekoConfigurationNode
 
     @OptIn(InternalApi::class)
     private fun loadConfiguration() {
         clearBoth()
 
-        node = get<NekoConfigurationLoader>(named(KIZAMI_CONFIG_LOADER)).load()
+        root = get<NekoConfigurationLoader>(named(KIZAMI_CONFIG_LOADER)).load()
 
-        node.node("kizami").childrenMap().forEach { (_, n) ->
+        root.node("kizami").childrenMap().forEach { (_, n) ->
             val kizami = n.requireKt<Kizami>()
             registerBothMapping(kizami.name, kizami)
         }

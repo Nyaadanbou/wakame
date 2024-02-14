@@ -1,10 +1,11 @@
-package cc.mewcraft.wakame.attribute.facade
+package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.base.Attribute
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.attribute.base.ElementAttribute
+import cc.mewcraft.wakame.attribute.facade.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.SchemeBaker
 import cc.mewcraft.wakame.item.SchemeBuilder
@@ -88,10 +89,10 @@ internal class SingleSelectionImpl(
         // format: S
 
         // register scheme builder
-        AttributeFacadeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerS::deserialize)
+        AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerS::deserialize)
 
         // register scheme baker
-        AttributeFacadeRegistry.schemeBakerRegistry[key] = SchemeBaker { scheme, factor ->
+        AttributeRegistry.schemeBakerRegistry[key] = SchemeBaker { scheme, factor ->
             scheme as SchemeAttributeValueS
             val value = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(type).call(scheme.value.calculate(factor))
             val operation = scheme.operation
@@ -99,7 +100,7 @@ internal class SingleSelectionImpl(
         }
 
         // register shadow tag encoder
-        AttributeFacadeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
+        AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
             compoundShadowTag {
                 binaryValue as BinaryAttributeValueS<*>
                 TAG_TYPE_2_TAG_SETTER_MAP.getOrThrow(type).call(this, NekoTags.Attribute.VAL, binaryValue.value)
@@ -108,7 +109,7 @@ internal class SingleSelectionImpl(
         }
 
         // register shadow tag decoder
-        AttributeFacadeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
+        AttributeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
             shadowTag as CompoundShadowTag
             val value = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(type).call(shadowTag, NekoTags.Attribute.VAL)
             val operation = shadowTag.getOperation(NekoTags.Attribute.OPERATION)
@@ -116,7 +117,7 @@ internal class SingleSelectionImpl(
         }
 
         // register attribute factory
-        AttributeFacadeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
+        AttributeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
             value as BinaryAttributeValueS<*>
             ImmutableMap.of(
                 component,
@@ -142,10 +143,10 @@ internal class RangedSelectionImpl(
         // format: LU
 
         // register scheme builder
-        AttributeFacadeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerLU::deserialize)
+        AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerLU::deserialize)
 
         // register scheme baker
-        AttributeFacadeRegistry.schemeBakerRegistry[key] = SchemeBaker { scheme, factor ->
+        AttributeRegistry.schemeBakerRegistry[key] = SchemeBaker { scheme, factor ->
             scheme as SchemeAttributeValueLU
             val lower = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(type).call(scheme.lower.calculate(factor))
             val upper = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(type).call(scheme.upper.calculate(factor))
@@ -154,7 +155,7 @@ internal class RangedSelectionImpl(
         }
 
         // register shadow tag encoder
-        AttributeFacadeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
+        AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
             compoundShadowTag {
                 binaryValue as BinaryAttributeValueLU<*>
                 TAG_TYPE_2_TAG_SETTER_MAP.getOrThrow(type).call(this, NekoTags.Attribute.MIN, binaryValue.lower)
@@ -164,7 +165,7 @@ internal class RangedSelectionImpl(
         }
 
         // register shadow tag decoder
-        AttributeFacadeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
+        AttributeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
             shadowTag as CompoundShadowTag
             val lower = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(type).call(shadowTag, NekoTags.Attribute.MIN)
             val upper = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(type).call(shadowTag, NekoTags.Attribute.MAX)
@@ -173,7 +174,7 @@ internal class RangedSelectionImpl(
         }
 
         // register attribute factory
-        AttributeFacadeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
+        AttributeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
             value as BinaryAttributeValueLU<*>
             ImmutableMap.of(
                 component1,
@@ -196,10 +197,10 @@ internal class SingleElementAttributeBinderImpl(
         // format: SE
 
         // register scheme builder
-        AttributeFacadeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerSE::deserialize)
+        AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerSE::deserialize)
 
         // register scheme baker
-        AttributeFacadeRegistry.schemeBakerRegistry[key] = SchemeBaker { scheme, factor ->
+        AttributeRegistry.schemeBakerRegistry[key] = SchemeBaker { scheme, factor ->
             scheme as SchemeAttributeValueSE
             val value = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(type).call(scheme.value.calculate(factor))
             val element = scheme.element
@@ -208,7 +209,7 @@ internal class SingleElementAttributeBinderImpl(
         }
 
         // register shadow tag encoder
-        AttributeFacadeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
+        AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
             compoundShadowTag {
                 binaryValue as BinaryAttributeValueSE<*>
                 TAG_TYPE_2_TAG_SETTER_MAP.getOrThrow(type).call(this, NekoTags.Attribute.VAL, binaryValue.value)
@@ -218,7 +219,7 @@ internal class SingleElementAttributeBinderImpl(
         }
 
         // register shadow tag decoder
-        AttributeFacadeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
+        AttributeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
             shadowTag as CompoundShadowTag
             val value = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(type).call(shadowTag, NekoTags.Attribute.VAL)
             val element = shadowTag.getElement(NekoTags.Attribute.ELEMENT)
@@ -227,7 +228,7 @@ internal class SingleElementAttributeBinderImpl(
         }
 
         // register attribute factory
-        AttributeFacadeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
+        AttributeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
             value as BinaryAttributeValueSE<*>
             ImmutableMap.of(
                 component(value.element),
@@ -249,10 +250,10 @@ internal class RangedElementAttributeBinderImpl(
         // format: LUE
 
         // register scheme builder
-        AttributeFacadeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerLUE::deserialize)
+        AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerLUE::deserialize)
 
         // register scheme baker
-        AttributeFacadeRegistry.schemeBakerRegistry[key] = SchemeBaker { scheme, factor ->
+        AttributeRegistry.schemeBakerRegistry[key] = SchemeBaker { scheme, factor ->
             scheme as SchemeAttributeValueLUE
             val lower = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(type).call(scheme.lower.calculate(factor))
             val upper = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(type).call(scheme.upper.calculate(factor))
@@ -262,7 +263,7 @@ internal class RangedElementAttributeBinderImpl(
         }
 
         // register shadow tag encoder
-        AttributeFacadeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
+        AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
             compoundShadowTag {
                 binaryValue as BinaryAttributeValueLUE<*>
                 TAG_TYPE_2_TAG_SETTER_MAP.getOrThrow(type).call(this, NekoTags.Attribute.MIN, binaryValue.lower)
@@ -273,7 +274,7 @@ internal class RangedElementAttributeBinderImpl(
         }
 
         // register shadow tag decoder
-        AttributeFacadeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
+        AttributeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
             shadowTag as CompoundShadowTag
             val lower = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(type).call(shadowTag, NekoTags.Attribute.MIN)
             val upper = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(type).call(shadowTag, NekoTags.Attribute.MAX)
@@ -283,7 +284,7 @@ internal class RangedElementAttributeBinderImpl(
         }
 
         // register attribute factory
-        AttributeFacadeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
+        AttributeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
             value as BinaryAttributeValueLUE<*>
             ImmutableMap.of(
                 component1(value.element),

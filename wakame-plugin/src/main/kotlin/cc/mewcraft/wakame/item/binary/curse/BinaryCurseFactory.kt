@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.curse.EmptySchemeCurse
 import cc.mewcraft.wakame.item.scheme.curse.SchemeCurse
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.EntityRegistry
+import cc.mewcraft.wakame.registry.EntityReferenceRegistry
 import cc.mewcraft.wakame.registry.getByOrThrow
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import cc.mewcraft.wakame.item.binary.curse.EntityKillsCurse as BEntityKillsCurse
@@ -23,7 +23,7 @@ object BinaryCurseFactory {
         val id = compoundTag.getString("id")
         val ret: BinaryCurse = when (id) {
             CurseKeys.ENTITY_KILLS.value() -> {
-                val index = EntityRegistry.getOrThrow(compoundTag.getString(BEntityKillsCurse.INDEX_TAG_NAME))
+                val index = EntityReferenceRegistry.getOrThrow(compoundTag.getString(BEntityKillsCurse.INDEX_TAG_NAME))
                 val count = compoundTag.getInt(BEntityKillsCurse.COUNT_TAG_NAME)
                 BEntityKillsCurse(index, count)
             }

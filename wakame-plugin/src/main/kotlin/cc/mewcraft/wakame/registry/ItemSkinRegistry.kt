@@ -15,13 +15,13 @@ object ItemSkinRegistry : KoinComponent, Initializable, Reloadable,
     BiMapRegistry<String, Short> by HashBiMapRegistry() {
 
     // configuration stuff
-    private lateinit var node: NekoConfigurationNode
+    private lateinit var root: NekoConfigurationNode
 
     @OptIn(InternalApi::class)
     private fun loadConfiguration() {
         clearBoth()
 
-        node = get<NekoConfigurationLoader>(named(SKIN_CONFIG_LOADER)).load()
+        root = get<NekoConfigurationLoader>(named(SKIN_CONFIG_LOADER)).load()
 
         // TODO read config and populate values
     }
