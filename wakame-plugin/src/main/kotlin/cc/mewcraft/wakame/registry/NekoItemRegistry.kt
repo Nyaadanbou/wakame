@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.initializer.DependencyConfig
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.item.scheme.NekoItemFactory
@@ -15,6 +16,17 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
+@DependencyConfig(
+    preWorldAfter = [
+        AttributeRegistry::class,
+        ElementRegistry::class,
+        KizamiRegistry::class,
+        RarityRegistry::class,
+        LevelMappingRegistry::class,
+        EntityReferenceRegistry::class,
+        ItemSkinRegistry::class
+    ]
+)
 object NekoItemRegistry : KoinComponent, Initializable, Reloadable,
     Registry<Key, NekoItem> by HashMapRegistry() {
 

@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.initializer.DependencyConfig
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
@@ -14,8 +15,11 @@ import org.koin.core.qualifier.named
 /**
  * The registry of `level -> rarity` mappings.
  */
-object RarityMappingRegistry : KoinComponent, Initializable, Reloadable,
-    Registry<String, RarityMappings> by HashMapRegistry() {
+@DependencyConfig(
+    preWorldAfter = [RarityRegistry::class]
+)
+object LevelMappingRegistry : KoinComponent, Initializable, Reloadable,
+    Registry<String, LevelMappings> by HashMapRegistry() {
 
     // constants
     const val GLOBAL_NAME: String = "global"
