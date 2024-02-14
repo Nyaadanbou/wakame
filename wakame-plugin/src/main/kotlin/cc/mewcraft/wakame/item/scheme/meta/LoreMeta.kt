@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
+import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import net.kyori.adventure.key.Key
@@ -8,6 +9,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.lang.reflect.Type
@@ -20,7 +22,7 @@ import java.lang.reflect.Type
 class LoreMeta(
     private val lore: List<String> = emptyList(),
 ) : SchemeMeta<List<Component>>, KoinComponent {
-    private val miniMessage: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
+    private val miniMessage: MiniMessage by inject(named(MINIMESSAGE_FULL), mode = LazyThreadSafetyMode.NONE)
 
     override fun generate(context: SchemeGenerationContext): List<Component>? {
         return lore.map { miniMessage.deserialize(it) }.takeIf { it.isNotEmpty() }

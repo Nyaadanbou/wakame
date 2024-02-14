@@ -33,14 +33,15 @@ import java.lang.reflect.Type
 internal class RarityMappingsSerializer : SchemeSerializer<RarityMappings> {
     override fun deserialize(type: Type, node: ConfigurationNode): RarityMappings {
         val rangeMapBuilder = ImmutableRangeMap.builder<Int, RarityMapping>()
-        node.childrenList().forEach { n1 ->
-            val levelNode = n1.node("level").requireKt<String>()
-            val weightNode = n1.node("weight").takeIf { it.isMap }
+        node.childrenMap().forEach { (_, n1) ->
+            val levelN = n1.node("level").requireKt<String>()
+            val weightN = n1.node("weight").takeIf { it.isMap }
                 ?: throw SerializationException("`weight` node must be a map")
 
-            val levelRange = RangeParser.parseIntRange(levelNode)
+            // deserialize weight for each rarity
+            val levelRange = RangeParser.parseIntRange(levelN)
             val rarityMapping = RarityMapping.build {
-                weightNode.childrenMap().forEach { (k, n2) ->
+                weightN.childrenMap().forEach { (k, n2) ->
                     val rarityName = k.toString()
                     val rarityWeight = n2.requireKt<Double>()
                     weight[RarityRegistry.getOrThrow(rarityName)] = rarityWeight
