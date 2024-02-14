@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class DependencyConfig(
+internal annotation class DependencyConfig(
     /**
      * [Initializable.onPreWorld] of `this` should run **after** that of the
      * specified classes.

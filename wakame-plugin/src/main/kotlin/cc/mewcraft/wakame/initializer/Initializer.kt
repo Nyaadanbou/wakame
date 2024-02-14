@@ -4,6 +4,8 @@ package cc.mewcraft.wakame.initializer
 
 import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.dependency.CircularDependencyException
+import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.test.TestListener
@@ -11,9 +13,6 @@ import cc.mewcraft.wakame.util.callEvent
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
-import com.google.common.graph.Graph
-import com.google.common.graph.GraphBuilder
-import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -31,8 +30,6 @@ import org.bukkit.event.server.ServerLoadEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
-import kotlin.reflect.KClass
-import kotlin.reflect.full.findAnnotation
 
 /**
  * @see Initializable
@@ -210,96 +207,24 @@ object Initializer : KoinComponent, Listener {
      * @throws CircularDependencyException
      */
     private fun handleDependencies() {
-        val preWorldGraph: MutableGraph<KClass<out Initializable>> = GraphBuilder.directed().allowsSelfLoops(false).build()
-        val postWorldGraph: MutableGraph<KClass<out Initializable>> = GraphBuilder.directed().allowsSelfLoops(false).build()
-
-        fun populateDependencyGraph(
-            dependencies: Array<KClass<out Initializable>>,
-            clazz: KClass<out Initializable>,
-            graph: MutableGraph<KClass<out Initializable>>, // <- graph to be populated
-            after: Boolean,
-        ) {
-            dependencies.forEach { dependency ->
-                if (after) {
-                    graph.putEdge(dependency, clazz) // clazz depends on dependency
-                } else {
-                    graph.putEdge(clazz, dependency) // dependency depends on clazz
-                }
-            }
-        }
-
-        getKoin().getAll<Initializable>().forEach { initializable ->
-            val clazz = initializable::class
-            clazz.findAnnotation<DependencyConfig>()?.let { config ->
-                populateDependencyGraph(config.preWorldAfter, clazz, preWorldGraph, true)
-                populateDependencyGraph(config.preWorldBefore, clazz, preWorldGraph, false)
-                populateDependencyGraph(config.postWorldAfter, clazz, postWorldGraph, true)
-                populateDependencyGraph(config.postWorldBefore, clazz, postWorldGraph, false)
-            }
-        }
+        val preWorldComponents = getKoin().getAll<Initializable>().map { initializable -> PreWorldDependencyComponent(initializable::class) }
+        val postWorldComponents = getKoin().getAll<Initializable>().map { initializable -> PostWorldDependencyComponent(initializable::class) }
 
         // 拓扑排序并更新列表
-        val sortedPreWorldClasses = topologicalSort(preWorldGraph)
-        val sortedPostWorldClasses = topologicalSort(postWorldGraph)
+        val sortedPreWorldClasses = DependencyResolver.resolveDependencies(preWorldComponents)
+        val sortedPostWorldClasses = DependencyResolver.resolveDependencies(postWorldComponents)
         toInitPreWorld.clear()
         toInitPostWorld.clear()
-        sortedPreWorldClasses.forEach { clazz -> getKoin().get<Initializable>(clazz).let(toInitPreWorld::add) }
-        sortedPostWorldClasses.forEach { clazz -> getKoin().get<Initializable>(clazz).let(toInitPostWorld::add) }
+        sortedPreWorldClasses.forEach { clazz ->
+            toInitPreWorld.add(getKoin().get(clazz))
+        }
+        sortedPostWorldClasses.forEach { clazz ->
+            toInitPostWorld.add(getKoin().get(clazz))
+        }
 
         // 按依赖顺序把所有的 Initializables 放到 CompositeTerminable 里以支持 Terminable.close()
         // Side note: CompositeTerminable 本来就会以 FILO 的顺序调用 Terminable.close() 因此这里不需要先 List.reverse()
         terminables.withAll(toInitPreWorld)
         terminables.withAll(toInitPostWorld)
     }
-
-    /**
-     * @throws CircularDependencyException
-     */
-    private fun topologicalSort(
-        graph: Graph<KClass<out Initializable>>,
-    ): List<KClass<out Initializable>> {
-        val visited = mutableSetOf<KClass<out Initializable>>()
-        val tempMarks = mutableSetOf<KClass<out Initializable>>()
-        val pathStack = mutableListOf<KClass<out Initializable>>()
-        val result = mutableListOf<KClass<out Initializable>>()
-
-        for (node in graph.nodes()) {
-            if (node !in visited) {
-                detectCycleAndSort(node, graph, visited, tempMarks, pathStack, result)
-            }
-        }
-
-        return result.reversed() // reverse to get the correct order
-    }
-
-    /**
-     * @throws CircularDependencyException
-     */
-    private fun detectCycleAndSort(
-        node: KClass<out Initializable>,
-        graph: Graph<KClass<out Initializable>>,
-        visited: MutableSet<KClass<out Initializable>>,
-        tempMarks: MutableSet<KClass<out Initializable>>,
-        pathStack: MutableList<KClass<out Initializable>>,
-        result: MutableList<KClass<out Initializable>>,
-    ) {
-        if (node in tempMarks) {
-            val cycleStartIndex = pathStack.indexOf(node)
-            val cycle = pathStack.subList(cycleStartIndex, pathStack.size).joinToString(" -> ") { it.simpleName ?: "Unknown" }
-            throw CircularDependencyException("Detected circular dependency: $cycle -> ${node.simpleName}")
-        }
-        if (node !in visited) {
-            tempMarks.add(node)
-            pathStack.add(node)
-            for (successor in graph.successors(node)) {
-                detectCycleAndSort(successor, graph, visited, tempMarks, pathStack, result)
-            }
-            pathStack.remove(node)
-            tempMarks.remove(node)
-            visited.add(node)
-            result.add(node)
-        }
-    }
-
-    private class CircularDependencyException(message: String) : RuntimeException(message)
 }
