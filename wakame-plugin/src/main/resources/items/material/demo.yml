@@ -7,7 +7,7 @@ uuid: 3fd29e3b-2e51-4ccc-bc11-9fe07ed5b848
 material: shulker_shell
 
 # 物品名字
-display-name: "<red>Demo"
+display_name: "<red>Demo"
 
 # 物品描述
 lore:
