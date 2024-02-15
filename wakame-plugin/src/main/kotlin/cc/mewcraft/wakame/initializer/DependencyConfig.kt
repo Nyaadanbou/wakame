@@ -12,23 +12,19 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 internal annotation class DependencyConfig(
     /**
-     * [Initializable.onPreWorld] of `this` should run **after** that of the
-     * specified classes.
+     * [Initializable.onPreWorld] of the classes must run **after** this.
      */
     val preWorldAfter: Array<KClass<out Initializable>> = [],
     /**
-     * [Initializable.onPreWorld] of `this` should run **before** that of the
-     * specified classes.
+     * [Initializable.onPreWorld] of the classes must run **before** `this`.
      */
     val preWorldBefore: Array<KClass<out Initializable>> = [],
     /**
-     * [Initializable.onPostWorld] of `this` should run **after** that of the
-     * specified classes.
+     * [Initializable.onPostWorld] of the classes must run **after** `this`.
      */
     val postWorldAfter: Array<KClass<out Initializable>> = [],
     /**
-     * [Initializable.onPostWorld] of `this` should run **before** that of the
-     * specified classes.
+     * [Initializable.onPostWorld] of the classes must run **before** `this`.
      */
     val postWorldBefore: Array<KClass<out Initializable>> = [],
 )

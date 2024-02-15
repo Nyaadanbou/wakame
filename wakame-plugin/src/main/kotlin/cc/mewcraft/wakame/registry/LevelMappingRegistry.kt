@@ -16,7 +16,7 @@ import org.koin.core.qualifier.named
  * The registry of `level -> rarity` mappings.
  */
 @DependencyConfig(
-    preWorldAfter = [RarityRegistry::class]
+    preWorldBefore = [RarityRegistry::class]
 )
 object LevelMappingRegistry : KoinComponent, Initializable, Reloadable,
     Registry<String, LevelMappings> by HashMapRegistry() {

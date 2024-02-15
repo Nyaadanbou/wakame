@@ -90,7 +90,9 @@ object Initializer : KoinComponent, Listener {
         fun forEachPreWorld(block: Initializable.() -> Unit): Result<Unit> {
             toInitPreWorld.forEach { initializable ->
                 try {
+                    logger.info("${initializable::class.simpleName} start")
                     block(initializable)
+                    logger.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
                     logger.error("An exception occurred during pre-world initialization. Shutting down the server...", e)
                     shutdown()
@@ -124,7 +126,9 @@ object Initializer : KoinComponent, Listener {
         fun forEachPostWorld(block: Initializable.() -> Unit): Result<Unit> {
             toInitPostWorld.forEach { initializable ->
                 try {
+                    logger.info("${initializable::class.simpleName} start")
                     block(initializable)
+                    logger.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
                     logger.error("An exception occurred during post-world initialization. Shutting down the server...", e)
                     shutdown()
@@ -210,9 +214,10 @@ object Initializer : KoinComponent, Listener {
         val preWorldComponents = getKoin().getAll<Initializable>().map { initializable -> PreWorldDependencyComponent(initializable::class) }
         val postWorldComponents = getKoin().getAll<Initializable>().map { initializable -> PostWorldDependencyComponent(initializable::class) }
 
-        // 拓扑排序并更新列表
+        // Sort the initializables by their dependency config
         val sortedPreWorldClasses = DependencyResolver.resolveDependencies(preWorldComponents)
         val sortedPostWorldClasses = DependencyResolver.resolveDependencies(postWorldComponents)
+        // Add them to the lists
         toInitPreWorld.clear()
         toInitPostWorld.clear()
         sortedPreWorldClasses.forEach { clazz ->
@@ -222,8 +227,9 @@ object Initializer : KoinComponent, Listener {
             toInitPostWorld.add(getKoin().get(clazz))
         }
 
-        // 按依赖顺序把所有的 Initializables 放到 CompositeTerminable 里以支持 Terminable.close()
-        // Side note: CompositeTerminable 本来就会以 FILO 的顺序调用 Terminable.close() 因此这里不需要先 List.reverse()
+        // Side note:
+        // CompositeTerminable 本来就会以 FILO 的顺序调用 Terminable.close()
+        // 因此这里按照加载的顺序添加 Terminable 就好，不需要先 List.reverse()
         terminables.withAll(toInitPreWorld)
         terminables.withAll(toInitPostWorld)
     }

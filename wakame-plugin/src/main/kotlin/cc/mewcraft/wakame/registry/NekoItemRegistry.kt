@@ -17,7 +17,7 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
 @DependencyConfig(
-    preWorldAfter = [
+    preWorldBefore = [
         AttributeRegistry::class,
         ElementRegistry::class,
         KizamiRegistry::class,

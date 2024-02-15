@@ -31,7 +31,7 @@ import net.kyori.adventure.key.Key
  * Check their kdoc for what they do.
  */
 @DependencyConfig(
-    preWorldAfter = [ElementRegistry::class]
+    preWorldBefore = [ElementRegistry::class]
 )
 object AttributeRegistry : Initializable, Reloadable {
 
