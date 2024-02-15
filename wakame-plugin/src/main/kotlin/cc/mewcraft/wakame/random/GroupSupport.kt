@@ -16,16 +16,14 @@ internal class ImmutableGroup<S, C : SelectionContext>(
 ) : Group<S, C> {
 
     override fun pick(context: C): List<S> {
-        val entryConditionTest = conditions.all { it.test(context) }
-        if (!entryConditionTest) {
+        val entryTest = conditions.all { it.test(context) }
+        if (!entryTest) {
             return emptyList() // 进入该 group 的条件未全部满足，返回空
         }
 
         val pool = pools.values.firstOrNull { pool ->
-            // 按顺序，找到一个符合条件的 pool
-            pool.conditions.all {
-                it.test(context)
-            }
+            // 按顺序找到一个符合条件的 pool
+            pool.conditions.all { it.test(context) }
         }
         if (pool != null) {
             // 我们找到了一个满足条件的 pool，因此从这个 pool 中选择

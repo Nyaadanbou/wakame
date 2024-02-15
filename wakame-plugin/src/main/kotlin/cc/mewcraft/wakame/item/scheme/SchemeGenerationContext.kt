@@ -35,7 +35,7 @@ class SchemeGenerationContext(
     var itemLevel: Int by SelectionContextWatcher(1)
 
     /**
-     * 已经生成的 [Rarity].
+     * 已经生成的 [Rarity]. // TODO implement ObservableSet
      */
     val rarities: MutableSet<Rarity> by SelectionContextWatcher(ObjectArraySet(2)) // 一个物品有且只有一个稀有度，但我们依然用 Set
 

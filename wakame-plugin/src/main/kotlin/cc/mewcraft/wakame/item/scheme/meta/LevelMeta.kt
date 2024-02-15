@@ -22,7 +22,7 @@ class LevelMeta(
     override fun generate(context: SchemeGenerationContext): Int {
         return when (level) {
             is Int -> {
-                return level.toStableInt()
+                return level.coerceAtLeast(1).toStableInt()
             }
 
             is String -> {

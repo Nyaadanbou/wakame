@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.curse
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.CurseKeys
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
@@ -20,7 +21,7 @@ object BinaryCurseFactory {
             return emptyBinaryCurse()
         }
 
-        val id = compoundTag.getString("id")
+        val id = compoundTag.getString(NekoTags.Cell.CURSE_ID)
         val ret: BinaryCurse = when (id) {
             CurseKeys.ENTITY_KILLS.value() -> {
                 val index = EntityReferenceRegistry.getOrThrow(compoundTag.getString(BEntityKillsCurse.INDEX_TAG_NAME))

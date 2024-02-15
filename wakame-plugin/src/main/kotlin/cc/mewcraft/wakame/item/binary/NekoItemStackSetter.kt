@@ -25,5 +25,5 @@ interface NekoItemStackSetter {
     /**
      * Sets ID.
      */
-    fun putPath(id: String)
+    fun putId(id: String)
 }

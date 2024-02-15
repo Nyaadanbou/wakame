@@ -30,8 +30,7 @@ object NekoItemStackFactory {
      * [NekoItemStack] and then immediately add it to the underlying game
      * world (such as adding it to a player's inventory and dropping it on
      * the ground). Once the [NekoItemStack] is added to the game world, any
-     * changes to it [NekoItemStack] **will not** reflect to that one in the
-     * game world. **In no way should you store the returned instance.**
+     * changes to it **will not** reflect to that one in the game world.
      *
      * If you want to modify the [NekoItemStack]s that are already in the game
      * world (such as modifying the item in a player's inventory), use the

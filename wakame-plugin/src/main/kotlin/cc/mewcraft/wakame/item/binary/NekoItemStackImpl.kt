@@ -107,7 +107,7 @@ internal class NekoItemStackImpl(
         putString(NekoTags.Root.NAMESPACE, namespace)
     }
 
-    override fun putPath(id: String) = edit {
+    override fun putId(id: String) = edit {
         putString(NekoTags.Root.ID, id)
     }
     // endregion

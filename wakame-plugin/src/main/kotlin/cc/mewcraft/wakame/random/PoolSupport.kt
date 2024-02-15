@@ -34,16 +34,14 @@ internal class ImmutablePool<S, C : SelectionContext>(
     }
 
     private fun pick0(context: C): Stream<Sample<S, C>> {
-        val entryConditionTest = conditions.all { it.test(context) }
-        if (!entryConditionTest) {
+        val entryTest = conditions.all { it.test(context) }
+        if (!entryTest) {
             return Stream.empty() // 进入该 pool 的条件未全部满足，返回空
         }
 
         val samples = samples.filter { sample ->
             // 筛掉不满足条件的 sample
-            sample.conditions.all {
-                it.test(context)
-            }
+            sample.conditions.all { it.test(context) }
         }
         if (samples.isEmpty()) {
             // 全都不满足条件，返回空
