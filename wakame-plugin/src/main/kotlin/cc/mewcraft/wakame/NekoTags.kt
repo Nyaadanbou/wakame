@@ -21,6 +21,7 @@ object NekoTags {
         const val CORE = "core"
         const val CORE_ID = "id"
         const val CURSE = "curse"
+        const val CURSE_ID = "id"
         const val REFORGE = "reforge"
     }
 

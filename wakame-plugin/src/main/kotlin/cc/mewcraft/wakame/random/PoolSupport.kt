@@ -17,12 +17,7 @@ internal class ImmutablePool<S, C : SelectionContext>(
 ) : Pool<S, C> {
 
     override fun pick(context: C): List<S> {
-        val stream = pick0(context)
-        if (stream.count() == 0L) { // improve a bit performance
-            return emptyList()
-        }
-
-        return stream.map {
+        return pick0(context).map {
             it.trace(context) // 将结果应用到 context
             it.content // 提取被样本封装的 S
         }.toList()

@@ -2,19 +2,11 @@ package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.BinaryAbilityValue
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.base.Attribute
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import com.google.common.collect.Multimap
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 interface CellAccessor : CellSetter {
-    /**
-     * Encompassing all tags of this [CellAccessor].
-     */
-    @InternalApi
-    val tags: CompoundShadowTag // 外部不应该读取该变量
-
     /**
      * Gets an immutable map describing the cells. This will call [get] for
      * each available cell on the backed item.
@@ -53,12 +45,12 @@ interface CellAccessor : CellSetter {
     fun contains(id: String): Boolean = get(id) != null
 
     /**
-     * Gets all attribute modifiers from `this`.
+     * Gets all attribute modifiers from `this` (cells).
      */
     fun getModifiers(): Multimap<out Attribute, AttributeModifier>
 
     /**
-     * Gets all abilities and corresponding values from `this`.
+     * Gets all abilities and corresponding values from `this` (cells).
      */
     fun getAbilities(): Map<out Ability, BinaryAbilityValue>
 }

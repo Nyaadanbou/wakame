@@ -4,11 +4,11 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 interface ItemStatsAccessor {
-    /**
-     * Encompassing all tags of this [ItemStatsAccessor].
-     */
     @InternalApi
-    val tags: CompoundShadowTag // 外部不应该读取该变量
+    val rootOrNull: CompoundShadowTag?
+
+    @InternalApi
+    val rootOrCreate: CompoundShadowTag
 
     ////// All Statistics Categories //////
 

@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.skin.ItemSkin
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.text.Component
-import java.util.*
+import java.util.UUID
 
 /**
  * 提供若干函数来修改一个 [ItemMetaAccessor] 的状态。
@@ -44,12 +44,12 @@ interface ItemMetaSetter {
     /**
      * Sets elements, overwriting any that are in `this`.
      */
-    fun putElements(elements: Iterable<Element>)
+    fun putElements(elements: Collection<Element>)
 
     /**
      * Sets kizami, overwriting any that are in `this`.
      */
-    fun putKizami(kizami: Iterable<Kizami>)
+    fun putKizami(kizami: Collection<Kizami>)
 
     /**
      * Sets skin or clears it.

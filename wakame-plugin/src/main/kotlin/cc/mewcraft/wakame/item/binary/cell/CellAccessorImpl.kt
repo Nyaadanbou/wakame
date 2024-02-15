@@ -3,12 +3,12 @@ package cc.mewcraft.wakame.item.binary.cell
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.BinaryAbilityValue
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.base.Attribute
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.item.binary.NekoItemStackImpl
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.util.getCompoundOrNull
+import cc.mewcraft.wakame.util.getOrPut
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
@@ -24,26 +24,31 @@ internal class CellAccessorImpl(
     //  the caching mechanism should be implemented properly
     //  in a wider scope of the project to make it effective,
     //  not just here
-    private val cache: Object2ObjectMap<String, BinaryCell> = Object2ObjectArrayMap(tags.size()) // cache binary cells
+    private val cache: Object2ObjectMap<String, BinaryCell> by lazy(LazyThreadSafetyMode.NONE) { Object2ObjectArrayMap() } // cache binary cells
 
-    @OptIn(InternalApi::class)
-    override val tags: CompoundShadowTag
-        get() = base.tags.getCompound(NekoTags.Cell.ROOT)
+    private val rootOrNull: CompoundShadowTag?
+        get() = base.tags.getCompoundOrNull(NekoTags.Cell.ROOT)
+    private val rootOrCreate: CompoundShadowTag
+        get() = base.tags.getOrPut(NekoTags.Cell.ROOT, CompoundShadowTag::create)
 
     override fun get(id: String): BinaryCell? {
-        val compoundTag = tags.getCompoundOrNull(id) ?: return null
+        val compoundTag = rootOrNull
+            ?.getCompoundOrNull(id)
+            ?: return null
         // don't use computeIfAbsent to avoid creating non-capturing lambda
-        val cell = cache[id]
+        var cell = cache[id]
         if (cell == null) {
-            val cell1 = BinaryCellFactory.decode(compoundTag)
-            cache[id] = cell1
-            return cell1
+            cell = BinaryCellFactory.decode(compoundTag)
+            cache[id] = cell
+            return cell
         }
         return cell
     }
 
     override fun asMap(): Map<String, BinaryCell> {
-        val ret = Object2ObjectArrayMap<String, BinaryCell>(tags.size())
+        val tags = rootOrNull
+            ?: return emptyMap()
+        val ret = Object2ObjectArrayMap<String, BinaryCell>(tags.size()) // pre-allocate
         for (key in tags.keySet()) {
             get(key)?.let { ret.put(key, it) }
         }
@@ -80,30 +85,20 @@ internal class CellAccessorImpl(
 
     ////// CellMapSetter //////
 
-    private fun edit(consumer: CompoundShadowTag.() -> Unit) {
-        tags.consumer()
-    }
-
     override fun put(id: String, cell: BinaryCell) {
         cache.remove(id) // remove cache
-        edit {
-            put(id, cell.asShadowTag())
-        }
+        rootOrCreate.put(id, cell.asShadowTag())
     }
 
     override fun edit(id: String, setter: BinaryCell?.() -> BinaryCell) {
         cache.remove(id)
         val oldCell = get(id)
         val newCell = oldCell.setter()
-        edit {
-            put(id, newCell.asShadowTag())
-        }
+        rootOrCreate.put(id, newCell.asShadowTag())
     }
 
     override fun remove(id: String) {
         cache.remove(id) // remove cache
-        edit {
-            remove(id)
-        }
+        rootOrNull?.remove(id)
     }
 }

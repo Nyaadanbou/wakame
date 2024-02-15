@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.curse
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.BinaryData
 import cc.mewcraft.wakame.item.CurseKeys
@@ -21,7 +22,6 @@ class PeakDamageCurse(
 ) : BinaryCurse {
 
     companion object Constants {
-        const val ID_TAG_NAME = "id"
         const val AMOUNT_TAG_NAME = "amount"
         const val ELEMENT_TAG_NAME = "elem"
     }
@@ -37,7 +37,7 @@ class PeakDamageCurse(
 
     override fun asShadowTag(): ShadowTag {
         return compoundShadowTag {
-            putString(ID_TAG_NAME, key.asString())
+            putString(NekoTags.Cell.CURSE_ID, key.asString())
             putShort(AMOUNT_TAG_NAME, amount.toStableShort())
             putByte(ELEMENT_TAG_NAME, element.binary)
         }

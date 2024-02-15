@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.Cell
 import cc.mewcraft.wakame.item.ShadowTagLike
 import cc.mewcraft.wakame.item.binary.core.BinaryCore
@@ -41,9 +40,3 @@ interface BinaryCell : Cell, ShadowTagLike {
      */
     val reforgeMeta: ReforgeMeta
 }
-
-/**
- * Gets the empty binary cell.
- */
-@OptIn(InternalApi::class)
-fun emptyBinaryCell(): BinaryCell = EmptyBinaryCell

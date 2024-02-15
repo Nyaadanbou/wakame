@@ -17,13 +17,13 @@ class EntityKillsStats(
     override val accessor: ItemStatsAccessor,
 ) : ItemStats, NumericMapLikeItemStats<Key, Int> {
     override val nbtPath: String = NekoTags.Stats.ENTITY_KILLS
-    override fun get(key: Key): Int = tags.getInt(key.asString())
-    override fun set(key: Key, value: Int) = tags.putShort(key.asString(), value.toStableShort())
+    override fun get(key: Key): Int = rootOrNull?.getInt(key.asString()) ?: 0
+    override fun set(key: Key, value: Int) = rootOrCreate.putShort(key.asString(), value.toStableShort())
     override fun increment(key: Key, value: Int) {
         val entityKey = key.asString()
-        val oldValue = tags.getShort(entityKey)
+        val oldValue = rootOrCreate.getShort(entityKey)
         val newValue = (oldValue + value).toStableShort()
-        tags.putShort(key.asString(), newValue)
+        rootOrCreate.putShort(key.asString(), newValue)
     }
 }
 
@@ -31,13 +31,13 @@ class PeakDamageStats(
     override val accessor: ItemStatsAccessor,
 ) : ItemStats, NumericMapLikeItemStats<Element, Int> {
     override val nbtPath: String = NekoTags.Stats.PEAK_DAMAGE
-    override fun get(key: Element): Int = tags.getInt(key.name)
-    override fun set(key: Element, value: Int) = tags.putShort(key.name, value.toStableShort())
+    override fun get(key: Element): Int = rootOrNull?.getInt(key.name) ?: 0
+    override fun set(key: Element, value: Int) = rootOrCreate.putShort(key.name, value.toStableShort())
     override fun increment(key: Element, value: Int) {
         val damageKey = key.name
-        val oldValue = tags.getShort(damageKey)
+        val oldValue = rootOrCreate.getShort(damageKey)
         val newValue = (oldValue + value).toStableShort()
-        tags.putShort(damageKey, newValue)
+        rootOrCreate.putShort(damageKey, newValue)
     }
 }
 
@@ -47,24 +47,22 @@ class ReforgeStats(
     override val nbtPath: String = NekoTags.Stats.REFORGE
     val count: NumericSingleItemStats<Int> = object : NumericSingleItemStats<Int> {
         override val nbtPath: String = "count"
-        override fun get(): Int = tags.getInt(nbtPath)
-        override fun set(value: Int) = tags.putByte(nbtPath, value.toStableByte())
-
+        override fun get(): Int = rootOrNull?.getInt(nbtPath) ?: 0
+        override fun set(value: Int) = rootOrCreate.putByte(nbtPath, value.toStableByte())
         override fun increment(value: Int) {
-            val oldValue = tags.getInt(nbtPath)
+            val oldValue = rootOrCreate.getInt(nbtPath)
             val newValue = (oldValue + value).toStableByte()
-            tags.putByte(nbtPath, newValue)
+            rootOrCreate.putByte(nbtPath, newValue)
         }
     }
     val cost: NumericSingleItemStats<Int> = object : NumericSingleItemStats<Int> {
         override val nbtPath: String = "cost"
-        override fun get(): Int = tags.getInt(nbtPath)
-        override fun set(value: Int) = tags.putShort(nbtPath, value.toStableShort())
-
+        override fun get(): Int = rootOrNull?.getInt(nbtPath) ?: 0
+        override fun set(value: Int) = rootOrCreate.putShort(nbtPath, value.toStableShort())
         override fun increment(value: Int) {
-            val oldValue = tags.getInt(nbtPath)
+            val oldValue = rootOrCreate.getInt(nbtPath)
             val newValue = (oldValue + value).toStableShort()
-            tags.putShort(nbtPath, newValue)
+            rootOrCreate.putShort(nbtPath, newValue)
         }
     }
 }

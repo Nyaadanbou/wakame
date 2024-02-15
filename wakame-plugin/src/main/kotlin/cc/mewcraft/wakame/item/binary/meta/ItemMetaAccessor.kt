@@ -1,30 +1,24 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.skin.ItemSkin
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.text.Component
 import java.util.UUID
 
 interface ItemMetaAccessor : ItemMetaSetter {
     /**
-     * Encompassing all tags of this [ItemMetaAccessor].
-     */
-    @InternalApi
-    val tags: CompoundShadowTag // 外部不应该读取该变量
-
-    /**
      * 物品的名字。
      */
-    val name: Component
+    val name: Component?
+    val nameOrEmpty: Component
 
     /**
      * 物品的额外描述。如果没有描述则返回空列表。
      */
-    val lore: List<Component>
+    val lore: List<Component>?
+    val loreOrEmpty: List<Component>
 
     /**
      * 物品的等级。不是所有物品都有等级，因此可能为空。
@@ -39,16 +33,18 @@ interface ItemMetaAccessor : ItemMetaSetter {
     val rarityOrThrow: Rarity
 
     /**
-     * 物品的元素。如果没有元素则返回空集。
+     * 物品的元素。
      *
-     * 可以用来快速判断物品能打出什么元素效果。
+     * 如果该物品上有X元素的属性或技能，那么该集合一定会包含X元素。
      */
-    val element: Set<Element>
+    val element: Set<Element>?
+    val elementOrEmpty: Set<Element>
 
     /**
-     * 物品的铭刻。如果没有铭刻则返回空集。
+     * 物品的铭刻。
      */
-    val kizami: Set<Kizami>
+    val kizami: Set<Kizami>?
+    val kizamiOrEmpty: Set<Kizami>
 
     /**
      * 物品的皮肤。

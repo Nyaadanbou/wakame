@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item.binary.stats
 
 import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.util.getCompoundOrNull
+import cc.mewcraft.wakame.util.getOrPut
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 /**
@@ -18,9 +20,11 @@ sealed interface ItemStats {
     @InternalApi
     val nbtPath: String
 
-    /**
-     * Encompassing all tags of this [ItemStats].
-     */
     @InternalApi
-    val tags: CompoundShadowTag get() = accessor.tags.getCompound(nbtPath)
+    val rootOrNull: CompoundShadowTag?
+        get() = accessor.rootOrNull?.getCompoundOrNull(nbtPath)
+
+    @InternalApi
+    val rootOrCreate: CompoundShadowTag
+        get() = accessor.rootOrCreate.getOrPut(nbtPath, CompoundShadowTag::create)
 }

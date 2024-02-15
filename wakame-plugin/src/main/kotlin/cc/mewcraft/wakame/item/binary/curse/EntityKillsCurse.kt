@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.curse
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.item.BinaryData
 import cc.mewcraft.wakame.item.CurseKeys
 import cc.mewcraft.wakame.reference.EntityReference
@@ -21,7 +22,6 @@ class EntityKillsCurse(
 ) : BinaryCurse {
 
     companion object Constants {
-        const val ID_TAG_NAME = "id"
         const val INDEX_TAG_NAME = "index"
         const val COUNT_TAG_NAME = "count"
     }
@@ -42,7 +42,7 @@ class EntityKillsCurse(
 
     override fun asShadowTag(): ShadowTag {
         return compoundShadowTag {
-            putString(ID_TAG_NAME, key.asString())
+            putString(NekoTags.Cell.CURSE_ID, key.asString())
             putString(INDEX_TAG_NAME, index.name)
             putShort(COUNT_TAG_NAME, count.toStableShort())
         }
