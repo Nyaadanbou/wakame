@@ -6,9 +6,6 @@ import me.lucko.helper.random.RandomSelector
 import java.util.stream.Stream
 import kotlin.jvm.optionals.getOrElse
 
-/**
- * An immutable [pool][Pool].
- */
 internal class ImmutablePool<S, C : SelectionContext>(
     override val samples: List<Sample<S, C>>,
     override val pickCount: Long,
@@ -59,18 +56,15 @@ internal class ImmutablePool<S, C : SelectionContext>(
 
         return stream
     }
-
-    class Builder<S, C : SelectionContext> : Pool.Builder<S, C> {
-        override val samples: MutableList<Sample<S, C>> = ArrayList()
-        override var pickCount: Long = 1
-        override var isReplacement = false
-        override val conditions: MutableList<Condition<C>> = ArrayList()
-    }
 }
 
-/**
- * A minimal empty [pool][Pool].
- */
+internal class PoolBuilderImpl<S, C : SelectionContext> : PoolBuilder<S, C> {
+    override val samples: MutableList<Sample<S, C>> = ArrayList()
+    override var pickCount: Long = 1
+    override var isReplacement = false
+    override val conditions: MutableList<Condition<C>> = ArrayList()
+}
+
 @InternalApi
 internal object EmptyPool : Pool<Nothing, SelectionContext> {
     override val samples: List<Sample<Nothing, SelectionContext>> = emptyList()

@@ -115,13 +115,13 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
     protected open fun traceApply(content: S, context: C) {}
 
     /**
-     * This function will be applied to the [pool builder][Pool.Builder]. You
+     * This function will be applied to the [pool builder][PoolBuilder]. You
      * can override this function if you need to specifically tweak the built
      * pool.
      *
      * @param builder the pool builder
      */
-    protected open fun builderApply(builder: Pool.Builder<S, C>) {}
+    protected open fun builderApply(builder: PoolBuilder<S, C>) {}
     // endregion
 
     private fun deserializeConditionList(node: ConfigurationNode): List<Condition<C>> {

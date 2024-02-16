@@ -5,12 +5,8 @@ import cc.mewcraft.wakame.condition.Condition
 import java.util.Collections
 import java.util.SequencedMap
 
-/**
- * An immutable [group][Group].
- */
 internal class ImmutableGroup<S, C : SelectionContext>(
-    // pool list 需要遵循配置文件里的顺序，因此必须为 SequencedMap
-    override val pools: SequencedMap<String, Pool<S, C>>,
+    override val pools: SequencedMap<String, Pool<S, C>>, // pool list 需要遵循配置文件里的顺序，因此必须为 SequencedMap
     override val conditions: List<Condition<C>>,
     override val default: Pool<S, C>,
 ) : Group<S, C> {
@@ -37,17 +33,14 @@ internal class ImmutableGroup<S, C : SelectionContext>(
     override fun pickOne(context: C): S? {
         return pick(context).firstOrNull()
     }
-
-    class Builder<S, C : SelectionContext> : Group.Builder<S, C> {
-        override val pools: SequencedMap<String, Pool<S, C>> = LinkedHashMap()
-        override val conditions: MutableList<Condition<C>> = ArrayList()
-        override var default: Pool<S, C> = Pool.empty()
-    }
 }
 
-/**
- * A minimal empty [group][Group].
- */
+internal class GroupBuilderImpl<S, C : SelectionContext> : GroupBuilder<S, C> {
+    override val pools: SequencedMap<String, Pool<S, C>> = LinkedHashMap()
+    override val conditions: MutableList<Condition<C>> = ArrayList()
+    override var default: Pool<S, C> = Pool.empty()
+}
+
 @InternalApi
 internal object EmptyGroup : Group<Nothing, SelectionContext> {
     override val pools: SequencedMap<String, Pool<Nothing, SelectionContext>> = Collections.emptySortedMap()

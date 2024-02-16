@@ -53,17 +53,11 @@ interface Group<S, C : SelectionContext> {
      */
     fun pickOne(context: C): S?
 
-    interface Builder<S, C : SelectionContext> {
-        val pools: SequencedMap<String, Pool<S, C>>
-        val conditions: MutableList<Condition<C>>
-        var default: Pool<S, C>
-    }
-
     companion object Factory {
         fun <S, C : SelectionContext> empty(): Group<S, C> = @OptIn(InternalApi::class) @Suppress("UNCHECKED_CAST") (EmptyGroup as Group<S, C>)
 
-        fun <S, C : SelectionContext> build(block: Builder<S, C>.() -> Unit): Group<S, C> {
-            val builder = ImmutableGroup.Builder<S, C>().apply(block)
+        fun <S, C : SelectionContext> build(block: GroupBuilder<S, C>.() -> Unit): Group<S, C> {
+            val builder = GroupBuilderImpl<S, C>().apply(block)
             val ret = ImmutableGroup(
                 pools = builder.pools,
                 conditions = builder.conditions,
@@ -72,4 +66,10 @@ interface Group<S, C : SelectionContext> {
             return ret
         }
     }
+}
+
+interface GroupBuilder<S, C : SelectionContext> {
+    val pools: SequencedMap<String, Pool<S, C>>
+    val conditions: MutableList<Condition<C>>
+    var default: Pool<S, C>
 }

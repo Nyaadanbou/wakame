@@ -40,23 +40,9 @@ interface Sample<T, in C : SelectionContext> {
      */
     fun trace(context: C)
 
-    /**
-     * A sample builder.
-     *
-     * @param T the instance type wrapped in [sample][Sample]
-     * @param C the context type required by [conditions][Condition]
-     */
-    interface Builder<T, C : SelectionContext> {
-        val content: T
-        var weight: Double
-        var conditions: MutableList<Condition<C>>
-        var mark: Mark<*>?
-        var trace: (C) -> Unit
-    }
-
     companion object Factory {
-        inline fun <T, C : SelectionContext> build(content: T, block: Builder<T, C>.() -> Unit): Sample<T, C> {
-            val builder = SampleBuilder<T, C>(content).apply(block)
+        inline fun <T, C : SelectionContext> build(content: T, block: SampleBuilder<T, C>.() -> Unit): Sample<T, C> {
+            val builder = SampleBuilderImpl<T, C>(content).apply(block)
             val sample = object : AbstractSample<T, C>(
                 content = builder.content,
                 weight = builder.weight,
@@ -70,4 +56,18 @@ interface Sample<T, in C : SelectionContext> {
             return sample
         }
     }
+}
+
+/**
+ * A sample builder.
+ *
+ * @param T the instance type wrapped in [sample][Sample]
+ * @param C the context type required by [conditions][Condition]
+ */
+interface SampleBuilder<T, C : SelectionContext>{
+    val content: T
+    var weight: Double
+    var conditions: MutableList<Condition<C>>
+    var mark: Mark<*>?
+    var trace: (C) -> Unit
 }

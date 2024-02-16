@@ -12,16 +12,16 @@ internal abstract class AbstractSample<T, C : SelectionContext>(
 ) : Sample<T, C>
 
 @PublishedApi
-internal class SampleBuilder<T, C : SelectionContext>(
+internal class SampleBuilderImpl<T, C : SelectionContext>(
     override val content: T,
-) : Sample.Builder<T, C> {
+) : SampleBuilder<T, C> {
     override var weight: Double = 1.0
     override var conditions: MutableList<Condition<C>> = ArrayList()
     override var mark: Mark<*>? = null
     override var trace: (C) -> Unit = {}
 }
 
-internal object SampleWeigher : Weigher<Sample<*,*>> {
+internal object SampleWeigher : Weigher<Sample<*, *>> {
     override fun weigh(element: Sample<*, *>): Double {
         return element.weight
     }

@@ -53,24 +53,11 @@ interface Pool<S, C : SelectionContext> {
      */
     fun pickOne(context: C): S?
 
-    /**
-     * A [pool][Pool] builder.
-     *
-     * @param S the instance type wrapped in [sample][Sample]
-     * @param C the context type required by [conditions][Condition]
-     */
-    interface Builder<S, C : SelectionContext> {
-        val samples: MutableList<Sample<S, C>>
-        var pickCount: Long
-        var isReplacement: Boolean
-        val conditions: MutableList<Condition<C>>
-    }
-
     companion object Factory {
         fun <S, C : SelectionContext> empty(): Pool<S, C> = @OptIn(InternalApi::class) @Suppress("UNCHECKED_CAST") (EmptyPool as Pool<S, C>)
 
-        fun <S, C : SelectionContext> build(block: Builder<S, C>.() -> Unit): Pool<S, C> {
-            val builder = ImmutablePool.Builder<S, C>().apply(block)
+        fun <S, C : SelectionContext> build(block: PoolBuilder<S, C>.() -> Unit): Pool<S, C> {
+            val builder = PoolBuilderImpl<S, C>().apply(block)
             val ret = ImmutablePool(
                 samples = builder.samples,
                 pickCount = builder.pickCount,
@@ -80,4 +67,17 @@ interface Pool<S, C : SelectionContext> {
             return ret
         }
     }
+}
+
+/**
+ * A [pool][Pool] builder.
+ *
+ * @param S the instance type wrapped in [sample][Sample]
+ * @param C the context type required by [conditions][Condition]
+ */
+interface PoolBuilder<S, C : SelectionContext> {
+    val samples: MutableList<Sample<S, C>>
+    var pickCount: Long
+    var isReplacement: Boolean
+    val conditions: MutableList<Condition<C>>
 }
