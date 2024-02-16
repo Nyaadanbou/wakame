@@ -5,14 +5,14 @@ import cc.mewcraft.wakame.condition.Condition
 /**
  * 代表 [Pool] 中的一个样本。
  *
- * @param T 样本所携带的实例
+ * @param S 样本所携带的实例
  * @param C 条件所需要的上下文
  */
-interface Sample<T, in C : SelectionContext> {
+interface Sample<S, in C : SelectionContext> {
     /**
      * The content wrapped within `this` [sample][Sample].
      */
-    val content: T
+    val content: S
 
     /**
      * The weight of `this` sample. Must be non-null.
@@ -41,9 +41,9 @@ interface Sample<T, in C : SelectionContext> {
     fun trace(context: C)
 
     companion object Factory {
-        inline fun <T, C : SelectionContext> build(content: T, block: SampleBuilder<T, C>.() -> Unit): Sample<T, C> {
-            val builder = SampleBuilderImpl<T, C>(content).apply(block)
-            val sample = object : AbstractSample<T, C>(
+        inline fun <S, C : SelectionContext> build(content: S, block: SampleBuilder<S, C>.() -> Unit): Sample<S, C> {
+            val builder = SampleBuilderImpl<S, C>(content).apply(block)
+            val sample = object : AbstractSample<S, C>(
                 content = builder.content,
                 weight = builder.weight,
                 conditions = builder.conditions,
@@ -61,11 +61,11 @@ interface Sample<T, in C : SelectionContext> {
 /**
  * A sample builder.
  *
- * @param T the instance type wrapped in [sample][Sample]
+ * @param S the instance type wrapped in [sample][Sample]
  * @param C the context type required by [conditions][Condition]
  */
-interface SampleBuilder<T, C : SelectionContext>{
-    val content: T
+interface SampleBuilder<S, C : SelectionContext>{
+    val content: S
     var weight: Double
     var conditions: MutableList<Condition<C>>
     var mark: Mark<*>?

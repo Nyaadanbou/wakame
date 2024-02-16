@@ -97,7 +97,7 @@ Compound('wakame')
     ByteArray('elem'): [1b, 2b] // 元素
     Short('skin'): 35s // 皮肤 ID
     IntArray('skin_owner'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
-  Compound('cells') // 词条栏
+  Compound('cells') // 所有的词条栏
     Compound('a') // 词条栏的 id
       Boolean('can_reforge'): true // 词条栏是否可重铸
       Boolean('can_override'): false // 词条栏是否可由玩家覆盖

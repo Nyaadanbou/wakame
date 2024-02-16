@@ -39,8 +39,8 @@ interface Group<S, C : SelectionContext> {
      *    * 如果条件满足，则继续接下来的操作
      *    * 如果条件不满足，则直接返回空列表
      * 2. 按顺序从 `this` 的 [pools] 选择第一个满足条件的池，然后调用 [Pool.pick] 来选择最终的样本
-     *    * 如果 [pools][Pool] 中没有满足条件的，将从 [fallback pool][fallbackPool] 中选择一个结果
-     *    * 如果 [fallback pool][fallbackPool] 也没有结果，最终将返回空列表
+     *    * 如果 [pools][Pool] 中没有满足条件的，将从 [fallback pool][default] 中选择一个结果
+     *    * 如果 [fallback pool][default] 也没有结果，最终将返回空列表
      */
     fun pick(context: C): List<S>
 
