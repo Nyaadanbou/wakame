@@ -3,10 +3,8 @@ package cc.mewcraft.wakame.item.binary.cell
 import cc.mewcraft.wakame.NekoTags
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
-/**
- * 用来从 NBT 创建 [ReforgeMeta] 的工厂。
- */
 object ReforgeMetaFactory {
+
     fun decode(compoundTag: CompoundShadowTag): ReforgeMeta {
         if (compoundTag.isEmpty) {
             return emptyReforgeMeta()
@@ -17,4 +15,5 @@ object ReforgeMetaFactory {
             failureCount = compoundTag.getInt(NekoTags.Reforge.FAILURE)
         )
     }
+
 }

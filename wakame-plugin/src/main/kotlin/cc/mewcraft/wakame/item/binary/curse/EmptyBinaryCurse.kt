@@ -9,7 +9,6 @@ import net.kyori.adventure.key.Key
 @InternalApi
 internal object EmptyBinaryCurse : BinaryCurse {
     override val key: Key = Key.key(NekoNamespaces.CURSE, "empty")
-
     override fun test(context: BinaryCurseContext): Boolean = true
     override fun asShadowTag(): ShadowTag = CompoundShadowTag.create()
 }

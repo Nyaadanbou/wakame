@@ -38,9 +38,8 @@ object NekoItemRegistry : KoinComponent, Initializable, Reloadable,
     fun get(key: String): NekoItem? = get(Key.key(key))
     fun getOrThrow(key: String): NekoItem = getOrThrow(Key.key(key))
 
-    @OptIn(InternalApi::class)
     private fun loadConfiguration() {
-        clearName2Object()
+        @OptIn(InternalApi::class) clearName2Object()
 
         val namespaceDirs = mutableListOf<File>()
 

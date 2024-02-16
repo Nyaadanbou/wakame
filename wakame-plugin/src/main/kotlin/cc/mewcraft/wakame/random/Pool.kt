@@ -67,8 +67,7 @@ interface Pool<S, C : SelectionContext> {
     }
 
     companion object Factory {
-        @OptIn(InternalApi::class)
-        fun <S, C : SelectionContext> empty(): Pool<S, C> = @Suppress("UNCHECKED_CAST") (EmptyPool as Pool<S, C>)
+        fun <S, C : SelectionContext> empty(): Pool<S, C> = @OptIn(InternalApi::class) @Suppress("UNCHECKED_CAST") (EmptyPool as Pool<S, C>)
 
         fun <S, C : SelectionContext> build(block: Builder<S, C>.() -> Unit): Pool<S, C> {
             val builder = ImmutablePool.Builder<S, C>().apply(block)

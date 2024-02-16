@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.BinaryCoreValue
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.SchemeCoreValue
+import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 
 /**
  * Represents a **scheme** [Core].
@@ -20,15 +21,14 @@ sealed interface SchemeCore : Core {
     /**
      * Generates a binary core value from `this`.
      *
-     * @param scalingFactor the scaling factor, such as player level
-     * @return a new [binary core value][BinaryCoreValue]
+     * @param context the context
+     * @return a new instance
      */
-    fun generate(scalingFactor: Int): BinaryCoreValue
+    fun generate(context: SchemeGenerationContext): BinaryCoreValue
 }
 
 /**
  * Gets the empty core.
  */
-@OptIn(InternalApi::class)
-fun emptySchemeCore(): SchemeCore = EmptySchemeCore
+fun emptySchemeCore(): SchemeCore = @OptIn(InternalApi::class) EmptySchemeCore
 

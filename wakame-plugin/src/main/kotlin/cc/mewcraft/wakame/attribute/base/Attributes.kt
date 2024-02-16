@@ -115,7 +115,8 @@ object Attributes {
  * [Element].
  */
 @OptIn(InternalApi::class)
-class ElementAttributes(
+class ElementAttributes
+@InternalApi internal constructor(
     element: Element,
 ) {
     // Notes: by design, ELEMENT DEFENSE is only used by monsters.

@@ -13,6 +13,5 @@ import me.lucko.helper.shadows.nbt.ShadowTag
 internal object EmptyBinaryCore : BinaryCore {
     override val key: Nothing get() = throw UnsupportedOperationException("EmptyBinaryCore has no key")
     override val value: Nothing get() = throw UnsupportedOperationException("EmptyBinaryCore has no value")
-
     override fun asShadowTag(): ShadowTag = CompoundShadowTag.create()
 }

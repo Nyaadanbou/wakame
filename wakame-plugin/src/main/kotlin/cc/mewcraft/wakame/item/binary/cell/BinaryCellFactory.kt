@@ -78,7 +78,7 @@ object BinaryCellFactory {
 
         // make a curse
         val schemeCurse = schemeCell.curseSelector.pickOne(context) ?: emptySchemeCurse()
-        val binaryCurse = BinaryCurseFactory.generate(context, schemeCurse)
+        val binaryCurse = schemeCurse.generate(context)
 
         // make a reforge meta (empty for new cell)
         val reforgeMeta = emptyReforgeMeta()

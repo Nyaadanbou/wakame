@@ -1,5 +1,3 @@
-@file:OptIn(InternalApi::class)
-
 package cc.mewcraft.wakame.entity
 
 import cc.mewcraft.wakame.WakamePlugin
@@ -9,6 +7,7 @@ import org.koin.dsl.module
 
 fun entityModule(): Module = module {
 
+    @OptIn(InternalApi::class)
     single<EntityKeyLookup> {
         val lookupList = mutableListOf<EntityKeyLookup>()
 

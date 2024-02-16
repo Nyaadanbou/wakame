@@ -19,7 +19,6 @@ import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import java.util.UUID
 
-@OptIn(InternalApi::class)
 internal class NekoItemStackImpl(
     override val handle: ItemStack,
     override val isOneOff: Boolean = false,
@@ -30,6 +29,7 @@ internal class NekoItemStackImpl(
     )
 
     // region WakaItemStack
+    @OptIn(InternalApi::class)
     override val tags: CompoundShadowTag
         get() {
             if (isOneOff) {

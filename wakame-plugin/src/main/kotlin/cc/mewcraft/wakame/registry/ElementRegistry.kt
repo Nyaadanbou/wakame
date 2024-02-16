@@ -23,9 +23,9 @@ object ElementRegistry : KoinComponent, Initializable, Reloadable,
     // configuration stuff
     private lateinit var root: NekoConfigurationNode
 
-    @OptIn(InternalApi::class)
+
     private fun loadConfiguration() {
-        clearBoth()
+        @OptIn(InternalApi::class) clearBoth()
 
         root = get<NekoConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)).load()
 

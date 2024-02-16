@@ -9,10 +9,12 @@ internal class ReforgeMetaImpl(
     override val successCount: Int,
     override val failureCount: Int,
 ) : ReforgeMeta {
+
     override fun asShadowTag(): ShadowTag {
         return compoundShadowTag {
             putByte(NekoTags.Reforge.SUCCESS, successCount.toStableByte())
             putByte(NekoTags.Reforge.FAILURE, failureCount.toStableByte())
         }
     }
+
 }

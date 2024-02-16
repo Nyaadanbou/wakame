@@ -65,8 +65,9 @@ object AttributeRegistry : Initializable, Reloadable {
      * ## 参数: [type]
      * 词条在 NBT 中的数据类型。
      */
+
     private fun build(key: String, type: ShadowTagType): FormatSelection {
-        return FormatSelectionImpl(Key.key(NekoNamespaces.ATTRIBUTE, key), type)
+        return (@OptIn(InternalApi::class) FormatSelectionImpl(Key.key(NekoNamespaces.ATTRIBUTE, key), type))
     }
 
     private fun register() {

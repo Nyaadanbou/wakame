@@ -1,21 +1,16 @@
 package cc.mewcraft.wakame.item.binary.curse
 
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.CurseKeys
-import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.curse.EmptySchemeCurse
-import cc.mewcraft.wakame.item.scheme.curse.SchemeCurse
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.EntityReferenceRegistry
 import cc.mewcraft.wakame.registry.getByOrThrow
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import cc.mewcraft.wakame.item.binary.curse.EntityKillsCurse as BEntityKillsCurse
 import cc.mewcraft.wakame.item.binary.curse.PeakDamageCurse as BPeakDamageCurse
-import cc.mewcraft.wakame.item.scheme.curse.EntityKillsCurse as SEntityKillsCurse
-import cc.mewcraft.wakame.item.scheme.curse.PeakDamageCurse as SPeakDamageCurse
 
 object BinaryCurseFactory {
+
     fun decode(compoundTag: CompoundShadowTag): BinaryCurse {
         if (compoundTag.isEmpty) {
             return emptyBinaryCurse()
@@ -41,22 +36,4 @@ object BinaryCurseFactory {
         return ret
     }
 
-    @OptIn(InternalApi::class)
-    fun generate(context: SchemeGenerationContext, schemeCurse: SchemeCurse): BinaryCurse {
-        val ret: BinaryCurse = when (schemeCurse) {
-            is EmptySchemeCurse -> {
-                emptyBinaryCurse()
-            }
-
-            is SEntityKillsCurse -> {
-                schemeCurse.generate(context.itemLevel)
-            }
-
-            is SPeakDamageCurse -> {
-                schemeCurse.generate(context.itemLevel)
-            }
-        }
-
-        return ret
-    }
 }

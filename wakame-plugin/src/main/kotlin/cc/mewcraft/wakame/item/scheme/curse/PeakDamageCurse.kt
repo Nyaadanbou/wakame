@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.CurseKeys
 import cc.mewcraft.wakame.item.SchemeData
 import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
 import cc.mewcraft.wakame.item.binary.curse.PeakDamageCurse
+import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.util.NumericValue
 import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.key.Key
@@ -15,8 +16,8 @@ class PeakDamageCurse(
     private val element: Element,
 ) : SchemeCurse {
 
-    override fun generate(scalingFactor: Int): BinaryCurse {
-        val randomAmount = amount.calculate(scalingFactor).toStableInt()
+    override fun generate(context: SchemeGenerationContext): BinaryCurse {
+        val randomAmount = amount.calculate(context.itemLevel).toStableInt()
         return PeakDamageCurse(element, randomAmount)
     }
 

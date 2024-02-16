@@ -19,9 +19,14 @@ sealed interface BinaryCurse : Curse, ShadowTagLike, Condition<BinaryCurseContex
 /**
  * Gets the empty condition.
  */
-@OptIn(InternalApi::class)
-fun emptyBinaryCurse(): BinaryCurse = EmptyBinaryCurse
+fun emptyBinaryCurse(): BinaryCurse = @OptIn(InternalApi::class) EmptyBinaryCurse
 
-@OptIn(InternalApi::class)
-val BinaryCurse.isEmpty: Boolean get() = this is EmptyBinaryCurse
+/**
+ * Checks if the curse is empty.
+ */
+val BinaryCurse.isEmpty: Boolean get() = @OptIn(InternalApi::class) (this is EmptyBinaryCurse)
+
+/**
+ * Checks if the curse is not empty.
+ */
 val BinaryCurse.isNotEmpty: Boolean get() = !isEmpty

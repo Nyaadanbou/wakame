@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.binary.NekoItemStack
-import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.NekoItem
+import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import me.lucko.helper.random.RandomSelector
 
 /**
@@ -50,6 +50,4 @@ sealed interface Filter : Condition<SchemeGenerationContext> {
 /**
  * Gets an empty filter.
  */
-@OptIn(InternalApi::class)
-fun emptyFilter(): Filter =
-    EmptyFilter
+fun emptyFilter(): Filter = @OptIn(InternalApi::class) EmptyFilter

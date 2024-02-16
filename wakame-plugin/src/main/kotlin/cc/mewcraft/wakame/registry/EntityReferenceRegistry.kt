@@ -17,9 +17,8 @@ object EntityReferenceRegistry : KoinComponent, Initializable, Reloadable,
     // configuration stuff
     private lateinit var root: NekoConfigurationNode
 
-    @OptIn(InternalApi::class)
     private fun loadConfiguration() {
-        clearName2Object()
+        @OptIn(InternalApi::class) clearName2Object()
 
         root = get<NekoConfigurationLoader>(named(ENTITY_CONFIG_LOADER)).load()
 

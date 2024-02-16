@@ -67,13 +67,13 @@ internal class NekoItemImpl(
         // Side note:
         // the order of cell population should be the same as
         // that they are declared in the YAML list
-        schemeCells.forEach { (cellId, schemeCell) ->
-            val binaryCell = BinaryCellFactory.generate(context, schemeCell)
-            if (binaryCell != null) {
+        schemeCells.forEach { (id, scheme) ->
+            val binary = BinaryCellFactory.generate(context, scheme)
+            if (binary != null) {
                 // if it's non-null, then it's either:
                 // 1) a cell with some content, or
                 // 2) a cell with no content + keepEmpty is true
-                nekoStack.cellAccessor.put(cellId, binaryCell)
+                nekoStack.cellAccessor.put(id, binary)
             }
             // if it's null, simply don't put the cell
         }

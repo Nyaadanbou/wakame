@@ -62,6 +62,7 @@ private inline fun <reified T : BinaryAttributeValue> constructBinaryValue(varar
     return constructor.call(*args)
 }
 
+@InternalApi
 internal class FormatSelectionImpl(
     private val key: Key,
     private val shadowTagType: ShadowTagType,
@@ -74,8 +75,7 @@ internal class FormatSelectionImpl(
         return SingleSelectionImpl(key, shadowTagType)
     }
 }
-
-@OptIn(InternalApi::class)
+@InternalApi
 internal class SingleSelectionImpl(
     private val key: Key,
     private val shadowTagType: ShadowTagType,
@@ -128,7 +128,7 @@ internal class SingleSelectionImpl(
     }
 }
 
-@OptIn(InternalApi::class)
+@InternalApi
 internal class RangedSelectionImpl(
     private val key: Key,
     private val shadowTagType: ShadowTagType,
@@ -189,7 +189,7 @@ internal class RangedSelectionImpl(
     }
 }
 
-@OptIn(InternalApi::class)
+@InternalApi
 internal class SingleElementAttributeBinderImpl(
     private val key: Key,
     private val shadowTagType: ShadowTagType,
@@ -244,7 +244,7 @@ internal class SingleElementAttributeBinderImpl(
     }
 }
 
-@OptIn(InternalApi::class)
+@InternalApi
 internal class RangedElementAttributeBinderImpl(
     private val key: Key,
     private val shadowTagType: ShadowTagType,

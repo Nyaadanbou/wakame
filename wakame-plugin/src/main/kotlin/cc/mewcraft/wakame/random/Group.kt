@@ -60,8 +60,7 @@ interface Group<S, C : SelectionContext> {
     }
 
     companion object Factory {
-        @OptIn(InternalApi::class)
-        fun <S, C : SelectionContext> empty(): Group<S, C> = @Suppress("UNCHECKED_CAST") (EmptyGroup as Group<S, C>)
+        fun <S, C : SelectionContext> empty(): Group<S, C> = @OptIn(InternalApi::class) @Suppress("UNCHECKED_CAST") (EmptyGroup as Group<S, C>)
 
         fun <S, C : SelectionContext> build(block: Builder<S, C>.() -> Unit): Group<S, C> {
             val builder = ImmutableGroup.Builder<S, C>().apply(block)

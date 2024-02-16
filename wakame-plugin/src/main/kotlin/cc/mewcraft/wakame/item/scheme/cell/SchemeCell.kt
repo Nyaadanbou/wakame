@@ -69,5 +69,4 @@ interface SchemeCell : Cell {
 /**
  * Gets the empty cell.
  */
-@OptIn(InternalApi::class)
-fun emptySchemeCell(): SchemeCell = EmptySchemeCell
+fun emptySchemeCell(): SchemeCell = @OptIn(InternalApi::class) EmptySchemeCell

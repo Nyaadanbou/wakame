@@ -25,9 +25,14 @@ interface ReforgeMeta : ShadowTagLike {
 /**
  * Gets the empty reforge meta.
  */
-@OptIn(InternalApi::class)
-fun emptyReforgeMeta(): ReforgeMeta = EmptyReforgeMeta
+fun emptyReforgeMeta(): ReforgeMeta = @OptIn(InternalApi::class) EmptyReforgeMeta
 
-@OptIn(InternalApi::class)
-val ReforgeMeta.isEmpty: Boolean get() = this is EmptyReforgeMeta
+/**
+ * Check if the meta is empty.
+ */
+val ReforgeMeta.isEmpty: Boolean get() = @OptIn(InternalApi::class) (this is EmptyReforgeMeta)
+
+/**
+ * Check if the meta is not empty.
+ */
 val ReforgeMeta.isNotEmpty: Boolean get() = !isEmpty
