@@ -1,6 +1,7 @@
 plugins {
     id("cc.mewcraft.repo-conventions")
     id("cc.mewcraft.kotlin-conventions")
+    id("cc.mewcraft.koin-conventions")
 }
 
 group = "cc.mewcraft.wakame"

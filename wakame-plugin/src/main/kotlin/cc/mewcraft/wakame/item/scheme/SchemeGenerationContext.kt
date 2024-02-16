@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.Curse
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random.BasicSelectionContext
-import cc.mewcraft.wakame.random.WatchedCollection
-import cc.mewcraft.wakame.random.WatchedPrimitive
 import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.util.WatchedPrimitive
+import cc.mewcraft.wakame.util.WatchedSet
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -38,25 +38,25 @@ class SchemeGenerationContext(
     /**
      * 已经生成的 [Rarity].
      */
-    val rarities: MutableCollection<Rarity> by WatchedPrimitive(ObjectArraySet(2)) // 一个物品有且只有一个稀有度，但我们依然用 Set
+    val rarities: MutableCollection<Rarity> by WatchedSet(ObjectArraySet(2)) // 一个物品有且只有一个稀有度，但我们依然用 Set
 
     /**
      * 已经生成的 [Element].
      */
-    val elements: MutableCollection<Element> by WatchedCollection(ObjectArraySet(4)) // 一个物品可以有多个元素，因此用 Set
+    val elements: MutableCollection<Element> by WatchedSet(ObjectArraySet(4)) // 一个物品可以有多个元素，因此用 Set
 
     /**
      * 已经生成的 [Kizami].
      */
-    val kizamis: MutableCollection<Kizami> by WatchedCollection(ObjectArraySet(4)) // 一个物品可以有多个铭刻，因此用 Set
+    val kizamis: MutableCollection<Kizami> by WatchedSet(ObjectArraySet(4)) // 一个物品可以有多个铭刻，因此用 Set
 
     /**
      * 已经生成的 [Core].
      */
-    val coreKeys: MutableCollection<Key> by WatchedCollection(ObjectArraySet(8)) // 一个物品可以有多个词条（当然
+    val coreKeys: MutableCollection<Key> by WatchedSet(ObjectArraySet(8)) // 一个物品可以有多个词条（当然
 
     /**
      * 已经生成的 [Curse].
      */
-    val curseKeys: MutableCollection<Key> by WatchedCollection(ObjectArraySet(8))
+    val curseKeys: MutableCollection<Key> by WatchedSet(ObjectArraySet(8))
 }
