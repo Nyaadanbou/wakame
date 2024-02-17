@@ -140,7 +140,7 @@ fun CompoundShadowTag.getListOrNull(key: String): ListShadowTag? {
 fun CompoundShadowTag.getListOrNull(key: String, type: ShadowTagType): ListShadowTag? {
     if (contains(key, ShadowTagType.LIST)) {
         val listTag = get(key) as ListShadowTag
-        if (listTag.type == type) {
+        if (listTag.elementType() == type) {
             return listTag
         }
     }
