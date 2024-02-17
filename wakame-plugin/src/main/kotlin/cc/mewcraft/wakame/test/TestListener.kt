@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.test
 
+import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent
@@ -18,7 +19,7 @@ import java.util.UUID
 
 class TestListener : Listener {
     @EventHandler
-    fun testItem(e: AsyncChatEvent) {
+    fun testItemGeneration(e: AsyncChatEvent) {
         val player = e.player
         val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
         val inventory = player.inventory
@@ -28,6 +29,22 @@ class TestListener : Listener {
                 val nekoItem = NekoItemRegistry.getOrThrow("short_sword:demo")
                 val nekoItemStack = nekoItem.createItemStack(player)
                 inventory.addItem(nekoItemStack.handle)
+            }
+        }
+    }
+
+    @EventHandler
+    fun testItemRead(e: AsyncChatEvent) {
+        val player = e.player
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        val inventory = player.inventory
+
+        when (plainMessage) {
+            "r1" -> {
+                val wrap = NekoItemStackFactory.wrap(inventory.itemInMainHand)
+                val lore = wrap.metaAccessor.loreOrEmpty
+                val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore) } }
+                inventory.addItem(preview)
             }
         }
     }
@@ -76,10 +93,10 @@ class TestListener : Listener {
                     putLongArray("long_array", longArrayOf(1, 2, 3))
                     putBoolean("boolean", true)
 
-                    val listShadowTag1: ListShadowTag /*jdk.proxy3.Proxy95*/ = listShadowTag(
+                    val listShadowTag1: ListShadowTag = listShadowTag(
                         IntShadowTag.valueOf(1),
                     )
-                    put("list1", listShadowTag1) // FIXME 如果先执行这个，就会出现问题 https://pastes.dev/NFfaw5ApqE
+                    put("list1", listShadowTag1)
 
                     val listShadowTag2 = listShadowTag {
                         add(ShortShadowTag.valueOf(1))
@@ -91,7 +108,7 @@ class TestListener : Listener {
                     val compoundShadowTag: CompoundShadowTag = compoundShadowTag {
                         putByte("k1", 31)
                     }
-                    put("stats", compoundShadowTag) // FIXME 如果先执行这个，就不会有问题
+                    put("stats", compoundShadowTag)
                 }
 
                 // read

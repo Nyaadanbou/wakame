@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary.stats
 
 interface MapLikeItemStats<K, V> {
-    fun get(key: K): V // TODO reduce memory footprint for all getters in this file
+    fun get(key: K): V
     fun set(key: K, value: V)
 }
 

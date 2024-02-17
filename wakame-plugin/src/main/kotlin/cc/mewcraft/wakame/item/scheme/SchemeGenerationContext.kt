@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme
 
+import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.Curse
@@ -22,11 +23,11 @@ import org.bukkit.entity.Player
  */
 class SchemeGenerationContext(
     /**
-     * 玩家的等级。
+     * 盲盒对象。如果是盲盒触发的物品生成，就把盲盒传进来。
      */
-    val playerLevel: Int,
+    val crateObject: BinaryCrate? = null,
     /**
-     * 玩家对象。
+     * 玩家对象。如果是玩家触发的物品生成，就把玩家传进来。
      */
     val playerObject: Player? = null,
 ) : BasicSelectionContext() {

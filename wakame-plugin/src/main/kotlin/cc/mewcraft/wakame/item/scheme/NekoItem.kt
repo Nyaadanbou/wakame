@@ -67,7 +67,10 @@ interface NekoItem : Keyed {
     /**
      * Generates an [ItemStack] from this scheme.
      *
-     * @param player the player from whom the item is generated
+     * This function is meant to be used for the case where the item generation
+     * is triggered directly by a [player][Player].
+     *
+     * @param player the player for whom the item is generated
      * @return an once-off [NekoItemStack]
      */
     fun createItemStack(player: Player?): NekoItemStack
@@ -75,7 +78,10 @@ interface NekoItem : Keyed {
     /**
      * Generates an [ItemStack] from this scheme.
      *
-     * @param crate the crate from which the item is generated
+     * This function is meant to be used for the case where the item generation
+     * is triggered directly by a [binary crate][BinaryCrate].
+     *
+     * @param crate the crate for which the item is generated
      * @return an once-off [NekoItemStack]
      */
     fun createItemStack(crate: BinaryCrate): NekoItemStack
@@ -94,7 +100,7 @@ interface NekoItem : Keyed {
  * corresponding class reference. You can use this function as the
  * following:
  * ```kotlin
- * val item: WakaItem = < ...... >
+ * val item: NekoItem = < ...... >
  * val meta: ElementMeta = wakaItem.getSchemeMeta<ElementMeta>()
  * ```
  *

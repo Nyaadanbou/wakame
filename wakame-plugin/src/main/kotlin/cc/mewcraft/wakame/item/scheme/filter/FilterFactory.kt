@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.item.scheme.filter
 
-import cc.mewcraft.spatula.utils.RangeParser
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.level.PlayerLevelType
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.requireKt
+import com.google.common.collect.Range
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -21,13 +22,23 @@ object FilterFactory {
         val type = type0.substringAfter(not) // the type string (after ~)
 
         val ret: Filter = when (type) {
+            "core" -> {
+                val coreKey = node.node("key").requireKt<Key>()
+                CoreFilter(invert, coreKey)
+            }
+
+            "crate_level" -> {
+                val level = node.node("level").requireKt<Range<Int>>()
+                CrateLevelFilter(invert, level)
+            }
+
             "element" -> {
                 val element = node.node("element").requireKt<Element>()
                 ElementFilter(invert, element)
             }
 
             "item_level" -> {
-                val level = node.node("level").requireKt<String>().let { RangeParser.parseIntRange(it) }
+                val level = node.node("level").requireKt<Range<Int>>()
                 ItemLevelFilter(invert, level)
             }
 
@@ -37,8 +48,9 @@ object FilterFactory {
             }
 
             "player_level" -> {
-                val level = node.node("level").requireKt<String>().let { RangeParser.parseIntRange(it) }
-                PlayerLevelFilter(invert, level)
+                val subtype = node.node("subtype").requireKt<PlayerLevelType>()
+                val level = node.node("level").requireKt<Range<Int>>()
+                PlayerLevelFilter(invert, subtype, level)
             }
 
             "rarity" -> {
@@ -46,10 +58,6 @@ object FilterFactory {
                 RarityFilter(invert, rarity)
             }
 
-            "core" -> {
-                val coreKey = node.node("key").requireKt<Key>()
-                CoreFilter(invert, coreKey)
-            }
 
             "toss" -> {
                 val chance = node.node("chance").requireKt<Float>()

@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.random
 /**
  * A simple [Mark] backed by a [String].
  */
-internal class StringMark(
+internal data class StringMark(
     override val value: String,
 ) : Mark<String> {
     override fun equals(other: Any?): Boolean {

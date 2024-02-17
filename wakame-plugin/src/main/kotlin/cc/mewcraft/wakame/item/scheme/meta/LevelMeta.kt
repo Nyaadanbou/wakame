@@ -2,10 +2,17 @@ package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.util.toStableInt
+import cc.mewcraft.wakame.level.CUSTOM_ADVENTURE_LEVEL
+import cc.mewcraft.wakame.level.PlayerLevelGetter
+import cc.mewcraft.wakame.level.VANILLA_EXPERIENCE_LEVEL
+import cc.mewcraft.wakame.util.EnumLookup
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 /**
@@ -18,35 +25,43 @@ class LevelMeta(
      * The item level held in this scheme.
      */
     private val level: Any = 1,
-) : SchemeMeta<Int> {
+) : KoinComponent, SchemeMeta<Int> {
+
+    private val adventureLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(CUSTOM_ADVENTURE_LEVEL))
+    private val experienceLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(VANILLA_EXPERIENCE_LEVEL))
+
     override fun generate(context: SchemeGenerationContext): Int {
-        return when (level) {
+        val ret: Int = when (level) {
             is Int -> {
-                return level.coerceAtLeast(1).toStableInt()
+                return level
             }
 
-            is String -> {
+            is LevelOption -> {
                 when (level) {
-                    EXPERIENCE_LEVEL_STRING -> context.playerLevel
-                    ADVENTURE_LEVEL_STRING -> context.playerLevel + 1 // TODO actually reads the player's adventure level
-                    else -> throw IllegalStateException("Impossible")
-                }
+                    LevelOption.CRATE_LEVEL -> context.crateObject?.level
+                    LevelOption.ADVENTURE_LEVEL -> context.playerObject?.let(adventureLevelGetter::get)
+                    LevelOption.EXPERIENCE_LEVEL -> context.playerObject?.let(experienceLevelGetter::get)
+                } ?: 1 // returns level 1 if we can't get the expected level
             }
 
-            else -> {
-                throw IllegalStateException("Impossible")
-            }
-        }.also {
-            context.itemLevel = it // leave trace to the context
+            else -> throw IllegalStateException("Something wrong with the ${LevelMetaSerializer::class.simpleName}")
         }
+
+        return ret
+            .coerceAtLeast(1) // by design, level never goes down below 1
+            .also {
+                context.itemLevel = it // leave trace to the context
+            }
+    }
+
+    enum class LevelOption {
+        CRATE_LEVEL,
+        ADVENTURE_LEVEL,
+        EXPERIENCE_LEVEL,
     }
 
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.META, "level")
-
-        const val ADVENTURE_LEVEL_STRING = "ADVENTURE_LEVEL"
-        const val EXPERIENCE_LEVEL_STRING = "EXPERIENCE_LEVEL"
-        val LEVEL_OPTIONS: Set<String> = setOf(ADVENTURE_LEVEL_STRING, EXPERIENCE_LEVEL_STRING)
     }
 }
 
@@ -54,10 +69,12 @@ internal class LevelMetaSerializer : SchemeMetaSerializer<LevelMeta> {
     override val emptyValue: LevelMeta = LevelMeta()
 
     override fun deserialize(type: Type, node: ConfigurationNode): LevelMeta {
-        val scalar = node.rawScalar()
-        require(
-            scalar is Int || (scalar is String && scalar in LevelMeta.LEVEL_OPTIONS)
-        )
-        return LevelMeta(scalar!!)
+        return when (val scalar = node.rawScalar()) {
+            is Int -> LevelMeta(scalar)
+
+            is String -> LevelMeta(EnumLookup.lookup<LevelMeta.LevelOption>(scalar).getOrThrow())
+
+            else -> throw SerializationException("Invalid value for ${LevelMeta::class.simpleName}")
+        }
     }
 }

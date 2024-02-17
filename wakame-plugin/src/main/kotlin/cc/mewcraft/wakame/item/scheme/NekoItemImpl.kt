@@ -23,16 +23,13 @@ internal class NekoItemImpl(
     override val schemeCells: Map<String, SchemeCell>,
 ) : NekoItem {
     override fun createItemStack(player: Player?): NekoItemStack {
-        // create a blank generation context
-        // TODO("actually reads the player's adventure level")
-        val context = SchemeGenerationContext(playerLevel = player?.level ?: 1, playerObject = player)
+        val context = SchemeGenerationContext(playerObject = player)
         val nekoStack = createItemStack0(context)
         return nekoStack
     }
 
     override fun createItemStack(crate: BinaryCrate): NekoItemStack {
-        // create a blank generation context
-        val context = SchemeGenerationContext(playerLevel = crate.level, playerObject = null)
+        val context = SchemeGenerationContext(crateObject = crate)
         val nekoStack = createItemStack0(context)
         return nekoStack
     }
