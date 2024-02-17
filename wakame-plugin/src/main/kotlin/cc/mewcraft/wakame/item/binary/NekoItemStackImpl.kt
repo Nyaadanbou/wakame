@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.cell.CellAccessor
 import cc.mewcraft.wakame.item.binary.cell.CellAccessorImpl
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
@@ -29,8 +28,15 @@ internal class NekoItemStackImpl(
     )
 
     // region WakaItemStack
-    @OptIn(InternalApi::class)
-    override val tags: CompoundShadowTag
+    /**
+     * The "wakame" [CompoundTag][CompoundShadowTag] of this item.
+     *
+     * This **does not** include any other tags which are **not** part of the
+     * wakame item NBT specifications, such as display name, enchantment and
+     * durability, which are already accessible via Paper API. To get access to
+     * these tags, just use the wrapped [handle].
+     */
+    internal val tags: CompoundShadowTag
         get() {
             if (isOneOff) {
                 // strictly-Bukkit ItemStack - the `wakame` compound is always available. If not, create one
@@ -68,15 +74,15 @@ internal class NekoItemStackImpl(
         get() = NekoItemRegistry.get(key)?.uuid
             ?: throw NullPointerException()
 
-    override val cellAccessor: CellAccessor by lazy(LazyThreadSafetyMode.NONE) {
+    override val cells: CellAccessor by lazy(LazyThreadSafetyMode.NONE) {
         CellAccessorImpl(this)
     }
 
-    override val metaAccessor: ItemMetaAccessor by lazy(LazyThreadSafetyMode.NONE) {
+    override val itemMeta: ItemMetaAccessor by lazy(LazyThreadSafetyMode.NONE) {
         ItemMetaAccessorImpl(this)
     }
 
-    override val statsAccessor: ItemStatsAccessor by lazy(LazyThreadSafetyMode.NONE) {
+    override val statistics: ItemStatsAccessor by lazy(LazyThreadSafetyMode.NONE) {
         ItemStatsAccessorImpl(this)
     }
 
@@ -90,34 +96,22 @@ internal class NekoItemStackImpl(
     // endregion
 
     // region WakaItemStackSetter
-    private fun edit(consumer: CompoundShadowTag.() -> Unit) {
-        tags.consumer()
-    }
-
     override fun putRoot(compoundTag: CompoundShadowTag) {
         handle.wakameCompound = compoundTag
     }
 
-    override fun putKey(key: Key) = edit {
-        putString(NekoTags.Root.NAMESPACE, key.namespace())
-        putString(NekoTags.Root.ID, key.value())
+    override fun putKey(key: Key) {
+        tags.putString(NekoTags.Root.NAMESPACE, key.namespace())
+        tags.putString(NekoTags.Root.ID, key.value())
     }
 
-    override fun putNamespace(namespace: String) = edit {
-        putString(NekoTags.Root.NAMESPACE, namespace)
+    override fun putNamespace(namespace: String) {
+        tags.putString(NekoTags.Root.NAMESPACE, namespace)
     }
 
-    override fun putId(id: String) = edit {
-        putString(NekoTags.Root.ID, id)
+    override fun putId(id: String) {
+        tags.putString(NekoTags.Root.ID, id)
     }
     // endregion
 
-    // region BinaryCurseContext
-    override val cellContext: CellAccessor
-        get() = cellAccessor
-    override val metaContext: ItemMetaAccessor
-        get() = metaAccessor
-    override val statsContext: ItemStatsAccessor
-        get() = statsAccessor
-    // endregion
 }

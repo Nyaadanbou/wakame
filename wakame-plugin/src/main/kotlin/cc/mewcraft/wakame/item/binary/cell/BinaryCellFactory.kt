@@ -43,9 +43,9 @@ object BinaryCellFactory {
         return BinaryCellImpl(
             canReforge = compoundTag.getBoolean(NekoTags.Cell.CAN_REFORGE),
             canOverride = compoundTag.getBoolean(NekoTags.Cell.CAN_OVERRIDE),
-            binaryCore = BinaryCoreFactory.decode(compoundTag.getCompound(NekoTags.Cell.CORE)),
-            binaryCurse = BinaryCurseFactory.decode(compoundTag.getCompound(NekoTags.Cell.CURSE)),
-            reforgeMeta = ReforgeMetaFactory.decode(compoundTag.getCompound(NekoTags.Cell.REFORGE))
+            binaryCore = BinaryCoreFactory.decode(compoundTag.getCompound(NekoTags.Cell.CORE)), // TODO optimization: avoid creating empty compound
+            binaryCurse = BinaryCurseFactory.decode(compoundTag.getCompound(NekoTags.Cell.CURSE)), // TODO optimization: avoid creating empty compound
+            reforgeMeta = ReforgeMetaFactory.decode(compoundTag.getCompound(NekoTags.Cell.REFORGE)) // TODO optimization: avoid creating empty compound
         )
     }
 

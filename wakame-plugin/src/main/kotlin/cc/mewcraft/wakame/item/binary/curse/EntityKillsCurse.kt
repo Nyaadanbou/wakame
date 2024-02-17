@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.binary.curse
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.item.BinaryData
 import cc.mewcraft.wakame.item.CurseKeys
+import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.reference.EntityReference
 import cc.mewcraft.wakame.util.compoundShadowTag
 import cc.mewcraft.wakame.util.toStableShort
@@ -32,10 +33,10 @@ class EntityKillsCurse(
      * Returns `true` if the number of entities killed by the item is greater
      * than [count]. Nota that the entity types are specified by [index].
      */
-    override fun test(context: BinaryCurseContext): Boolean {
+    override fun test(context: NekoItemStack): Boolean {
         var sum = 0
         for (k in index.keySet) {
-            sum += context.statsContext.entityKillsStats.get(k)
+            sum += context.statistics.entityKills.get(k)
         }
         return sum >= count
     }

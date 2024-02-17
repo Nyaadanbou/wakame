@@ -9,16 +9,16 @@ import java.util.UUID
 
 interface ItemMetaAccessor : ItemMetaSetter {
     /**
-     * 物品的名字。
+     * 物品的名字(MiniMessage).
      */
-    val name: Component?
-    val nameOrEmpty: Component
+    val name: String?
+    val nameOrEmpty: String
 
     /**
-     * 物品的额外描述。如果没有描述则返回空列表。
+     * 物品的额外描述(MiniMessage).
      */
-    val lore: List<Component>?
-    val loreOrEmpty: List<Component>
+    val lore: List<String>?
+    val loreOrEmpty: List<String>
 
     /**
      * 物品的等级。不是所有物品都有等级，因此可能为空。

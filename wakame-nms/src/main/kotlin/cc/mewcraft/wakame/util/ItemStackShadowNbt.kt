@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.shadow.inventory.ShadowCraftItemStack0
 import cc.mewcraft.wakame.shadow.inventory.ShadowCraftMetaItem0
 import cc.mewcraft.wakame.shadow.inventory.ShadowItemStack
@@ -18,12 +19,12 @@ import org.bukkit.inventory.meta.ItemMeta
 import org.jetbrains.annotations.Contract
 import net.minecraft.world.item.ItemStack as MojangStack
 
+private const val ROOT_COMPOUND_NAME = NekoTags.ROOT
+
 /**
  * Reads/writes the NBT tags from items as [ShadowTag].
  */
 object ItemStackShadowNbt {
-    private const val ROOT_COMPOUND_NAME = "wakame"
-
     /**
      * Gets the wakame compound tag from [itemStack]. If the `wakame` compound
      * tag does not already exist, a new compound tag will be created and
@@ -91,15 +92,15 @@ internal val ItemMeta.unhandledTags: MutableMap<String, Tag>
 
 internal var MojangStack.wakameCompound: CompoundShadowTag
     get() {
-        val compoundTag = this.orCreateTag.getOrPut("wakame") { CompoundTag() }
+        val compoundTag = this.orCreateTag.getOrPut(ROOT_COMPOUND_NAME) { CompoundTag() }
         return compoundTag.wrap
     }
     set(value) {
-        this.orCreateTag.put("wakame", value.unwrap)
+        this.orCreateTag.put(ROOT_COMPOUND_NAME, value.unwrap)
     }
 
 internal val MojangStack.wakameCompoundOrNull: CompoundShadowTag?
-    get() = this.tag?.getCompoundOrNull("wakame")?.wrap
+    get() = this.tag?.getCompoundOrNull(ROOT_COMPOUND_NAME)?.wrap
 
 //////
 

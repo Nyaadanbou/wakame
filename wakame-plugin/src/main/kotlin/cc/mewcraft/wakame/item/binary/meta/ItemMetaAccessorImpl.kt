@@ -31,19 +31,18 @@ internal class ItemMetaAccessorImpl(
     private val rootOrCreate: CompoundShadowTag
         get() = base.tags.getOrPut(NekoTags.Meta.ROOT, CompoundShadowTag::create)
 
-    override val name: Component?
+    override val name: String?
         get() = rootOrNull
             ?.getStringOrNull(NekoTags.Meta.NAME)
-            ?.let { gsonSerializer.deserialize(it) }
-    override val nameOrEmpty: Component
-        get() = name ?: Component.empty()
+    override val nameOrEmpty: String
+        get() = name.orEmpty()
 
-    override val lore: List<Component>?
+    override val lore: List<String>?
         get() = rootOrNull
             ?.getListOrNull(NekoTags.Meta.LORE, ShadowTagType.STRING)
-            ?.map { gsonSerializer.deserialize((it as StringShadowTag).value()) }
-    override val loreOrEmpty: List<Component>
-        get() = lore ?: emptyList()
+            ?.map { (it as StringShadowTag).value() }
+    override val loreOrEmpty: List<String>
+        get() = lore.orEmpty()
 
     override val level: Int?
         get() = rootOrNull?.getIntOrNull(NekoTags.Meta.LEVEL)

@@ -65,7 +65,6 @@ object AttributeRegistry : Initializable, Reloadable {
      * ## 参数: [type]
      * 词条在 NBT 中的数据类型。
      */
-
     private fun build(key: String, type: ShadowTagType): FormatSelection {
         return (@OptIn(InternalApi::class) FormatSelectionImpl(Key.key(NekoNamespaces.ATTRIBUTE, key), type))
     }
@@ -93,6 +92,10 @@ object AttributeRegistry : Initializable, Reloadable {
         build("movement_speed_rate", ShadowTagType.DOUBLE).single().bind(Attributes.MOVEMENT_SPEED_RATE)
     }
 
+    fun getMeta(key: Key): AttributeMeta {
+        TODO("implement attribute meta")
+    }
+
     override fun onPreWorld() {
         register()
     }
@@ -102,6 +105,20 @@ object AttributeRegistry : Initializable, Reloadable {
     }
 }
 
+data class AttributeMeta(
+    /**
+     * 数值的格式。
+     */
+    val format: Format,
+    /**
+     * 是否为元素属性。
+     */
+    val element: Boolean,
+) {
+    enum class Format { SINGLE, RANGED }
+}
+
+//<editor-fold desc="Builders">
 interface FormatSelection {
     fun ranged(): RangedSelection
     fun single(): SingleSelection
@@ -130,3 +147,4 @@ interface SingleElementAttributeBinder {
 interface RangedElementAttributeBinder {
     fun bind(component1: (Element) -> ElementAttribute, component2: (Element) -> ElementAttribute)
 }
+//</editor-fold>

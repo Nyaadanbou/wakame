@@ -15,15 +15,15 @@ interface ItemStatsAccessor {
     /**
      * 实体击杀数
      */
-    val entityKillsStats: EntityKillsStats
+    val entityKills: EntityKillsStats
 
     /**
      * 单次最高伤害
      */
-    val peakDamageStats: PeakDamageStats
+    val peakDamage: PeakDamageStats
 
     /**
      * 重铸相关统计
      */
-    val reforgeStats: ReforgeStats
+    val reforge: ReforgeStats
 }

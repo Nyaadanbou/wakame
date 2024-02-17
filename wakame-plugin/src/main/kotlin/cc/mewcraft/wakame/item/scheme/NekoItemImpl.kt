@@ -46,7 +46,7 @@ internal class NekoItemImpl(
         val material = materialMeta.generate(context)
         val nekoStack = NekoItemStackFactory.new(material)
 
-        with(nekoStack.metaAccessor) {
+        with(nekoStack.itemMeta) {
             // Side note:
             // the order of meta population is hardcoded currently
             // TODO make the order of meta population configurable
@@ -70,7 +70,7 @@ internal class NekoItemImpl(
                 // if it's non-null, then it's either:
                 // 1) a cell with some content, or
                 // 2) a cell with no content + keepEmpty is true
-                nekoStack.cellAccessor.put(id, binary)
+                nekoStack.cells.put(id, binary)
             }
             // if it's null, simply don't put the cell
         }

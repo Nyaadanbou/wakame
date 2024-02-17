@@ -20,8 +20,8 @@ internal class ItemStatsAccessorImpl(
         get() = base.tags.getOrPut(NekoTags.Stats.ROOT, CompoundShadowTag::create)
 
     //<editor-fold desc="Item Stats Instances">
-    override val entityKillsStats: EntityKillsStats = EntityKillsStats(this)
-    override val peakDamageStats: PeakDamageStats = PeakDamageStats(this)
-    override val reforgeStats: ReforgeStats = ReforgeStats(this)
+    override val entityKills: EntityKillsStats = EntityKillsStats(this)
+    override val peakDamage: PeakDamageStats = PeakDamageStats(this)
+    override val reforge: ReforgeStats = ReforgeStats(this)
     //</editor-fold>
 }

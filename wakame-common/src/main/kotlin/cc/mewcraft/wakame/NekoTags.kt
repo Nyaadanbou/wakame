@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame
 
 object NekoTags {
+    const val ROOT = "wakame"
+
     object Root {
         const val NAMESPACE = "ns"
         const val ID = "id"

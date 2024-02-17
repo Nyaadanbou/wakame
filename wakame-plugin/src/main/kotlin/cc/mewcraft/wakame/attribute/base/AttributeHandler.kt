@@ -123,7 +123,7 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
             return ImmutableMultimap.of()
         }
 
-        return neko.cellAccessor.getModifiers()
+        return neko.cells.getModifiers()
     }
 
     private fun addAttributeModifiers(bukkitItem: ItemStack?, player: Player) {

@@ -9,6 +9,7 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.IntShadowTag
 import me.lucko.helper.shadows.nbt.ListShadowTag
 import me.lucko.helper.shadows.nbt.ShortShadowTag
+import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.kyori.examination.string.StringExaminer
 import org.bukkit.Material
@@ -42,8 +43,8 @@ class TestListener : Listener {
         when (plainMessage) {
             "r1" -> {
                 val wrap = NekoItemStackFactory.wrap(inventory.itemInMainHand)
-                val lore = wrap.metaAccessor.loreOrEmpty
-                val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore) } }
+                val lore = wrap.itemMeta.loreOrEmpty
+                val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
             }
         }

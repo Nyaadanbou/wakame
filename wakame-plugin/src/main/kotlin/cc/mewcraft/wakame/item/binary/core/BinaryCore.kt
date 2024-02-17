@@ -19,5 +19,12 @@ interface BinaryCore : Core, ShadowTagLike {
  */
 fun emptyBinaryCore(): BinaryCore = @OptIn(InternalApi::class) EmptyBinaryCore
 
+/**
+ * Checks if the core is empty.
+ */
 val BinaryCore.isEmpty: Boolean get() = @OptIn(InternalApi::class) (this is EmptyBinaryCore)
+
+/**
+ * Checks if the core is not empty.
+ */
 val BinaryCore.isNotEmpty: Boolean get() = !isEmpty

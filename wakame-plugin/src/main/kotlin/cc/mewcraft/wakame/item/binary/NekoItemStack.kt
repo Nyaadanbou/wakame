@@ -1,12 +1,9 @@
 package cc.mewcraft.wakame.item.binary
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.cell.CellAccessor
-import cc.mewcraft.wakame.item.binary.curse.BinaryCurseContext
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessor
 import cc.mewcraft.wakame.item.scheme.NekoItem
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -22,7 +19,7 @@ import java.util.UUID
  * - getting the identifier of the wakame item
  * - retrieving the NBT tags of the bukkit item
  */
-interface NekoItemStack : NekoItemStackSetter, BinaryCurseContext {
+interface NekoItemStack : NekoItemStackSetter {
     /**
      * The wrapped [ItemStack].
      *
@@ -67,17 +64,6 @@ interface NekoItemStack : NekoItemStackSetter, BinaryCurseContext {
      * @see handle
      */
     val isOneOff: Boolean
-
-    /**
-     * The "wakame" [CompoundTag][CompoundShadowTag] of this item.
-     *
-     * This **does not** include any other tags which are **not** part of the
-     * wakame item NBT specifications, such as display name, enchantment and
-     * durability, which are already accessible via Paper API. To get access to
-     * these tags, just use the wrapped [handle].
-     */
-    @InternalApi
-    val tags: CompoundShadowTag // 外部不应该读取该变量
 
     /**
      * Returns `true` if this item is a wakame item.
@@ -135,7 +121,7 @@ interface NekoItemStack : NekoItemStackSetter, BinaryCurseContext {
      *
      * @throws NullPointerException if this is not a legal wakame item
      */
-    val cellAccessor: CellAccessor
+    val cells: CellAccessor
 
     /**
      * The ItemMetaMap of this item.
@@ -144,7 +130,7 @@ interface NekoItemStack : NekoItemStackSetter, BinaryCurseContext {
      *
      * @throws NullPointerException if this is not a legal wakame item
      */
-    val metaAccessor: ItemMetaAccessor
+    val itemMeta: ItemMetaAccessor
 
     /**
      * The ItemStatsMap of this item.
@@ -153,7 +139,7 @@ interface NekoItemStack : NekoItemStackSetter, BinaryCurseContext {
      *
      * @throws NullPointerException if this is not a legal wakame item
      */
-    val statsAccessor: ItemStatsAccessor
+    val statistics: ItemStatsAccessor
 
     override fun hashCode(): Int
     override fun equals(other: Any?): Boolean

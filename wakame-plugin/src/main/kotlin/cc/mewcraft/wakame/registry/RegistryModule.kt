@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.display.RENDERER_SERIALIZERS
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.scheme.CELL_SERIALIZERS
@@ -57,6 +58,9 @@ const val SKIN_CONFIG_LOADER = "skin_config_loader"
 
 const val ENTITY_CONFIG_FILE = "entities.yml"
 const val ENTITY_CONFIG_LOADER = "entity_config_loader"
+
+const val RENDERER_CONFIG_FILE = "renderer.yml"
+const val RENDERER_CONFIG_LOADER = "renderer_config_loader"
 
 fun registryModule(): Module = module {
 
@@ -117,6 +121,12 @@ fun registryModule(): Module = module {
     single<YamlConfigurationLoader>(named(LEVEL_CONFIG_LOADER)) {
         createRegistryConfigurationLoader(LEVEL_CONFIG_FILE) {
             registerAll(get(named(RARITY_SERIALIZERS)))
+        }
+    }
+
+    single<YamlConfigurationLoader>(named(RENDERER_CONFIG_LOADER)) {
+        createRegistryConfigurationLoader(RENDERER_CONFIG_FILE) {
+            registerAll(get(named(RENDERER_SERIALIZERS)))
         }
     }
     //</editor-fold>
