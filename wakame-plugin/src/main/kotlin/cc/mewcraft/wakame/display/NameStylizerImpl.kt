@@ -6,8 +6,8 @@ import net.kyori.adventure.text.Component
 internal class NameStylizerImpl(
     private val metaStylizer: MetaStylizer,
 ) : NameStylizer {
-    override fun stylize(nekoItemStack: NekoItemStack): Component {
-        val name = nekoItemStack.itemMeta.name
+    override fun stylize(item: NekoItemStack): Component {
+        val name = item.metadata.name
         return if (name != null) {
             metaStylizer.stylizeName(name)
         } else {

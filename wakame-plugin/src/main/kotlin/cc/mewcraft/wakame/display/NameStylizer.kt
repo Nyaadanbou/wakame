@@ -10,9 +10,9 @@ internal interface NameStylizer {
      *
      * 不像 [LoreStylizer]，该函数生成的名字可以直接用在物品上。
      *
-     * @param nekoItemStack 要生成名字的物品
+     * @param item 要生成名字的物品
      * @return 生成的物品名字
      */
-    fun stylize(nekoItemStack: NekoItemStack): Component
+    fun stylize(item: NekoItemStack): Component
 
 }

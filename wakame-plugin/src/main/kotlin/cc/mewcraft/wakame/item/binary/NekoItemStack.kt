@@ -130,7 +130,7 @@ interface NekoItemStack : NekoItemStackSetter {
      *
      * @throws NullPointerException if this is not a legal wakame item
      */
-    val itemMeta: ItemMetaAccessor
+    val metadata: ItemMetaAccessor
 
     /**
      * The ItemStatsMap of this item.

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
@@ -21,14 +22,14 @@ import java.util.UUID
 internal interface LoreStylizer {
 
     /**
-     * Generates [lore lines][LoreLine] for the given [nekoItemStack].
+     * Generates [lore lines][LoreLine] for the given [item].
      *
-     * This function won't modify the given [nekoItemStack].
+     * This function won't modify the given [item].
      *
-     * @param nekoItemStack the item to generate lore for
+     * @param item the item to generate lore for
      * @return the generated lore lines
      */
-    fun stylize(nekoItemStack: NekoItemStack): Collection<LoreLine>
+    fun stylize(item: NekoItemStack): Collection<LoreLine>
 
 }
 
@@ -43,20 +44,18 @@ internal interface AttributeStylizer {
 }
 
 internal interface OperationStylizer {
-    fun stylizeAddition(value: Double): String
-    fun stylizeMultiplyBase(value: Double): String
-    fun stylizeMultiplyTotal(value: Double): String
+    fun stylizeValue(value: Double, operation: AttributeModifier.Operation): String
 }
 
 internal interface MetaStylizer {
-    val nameStyle: String
-    val loreStyle: LoreStyle
-    val levelStyle: String
-    val rarityStyle: String
-    val elementStyle: ListStyle
-    val kizamiStyle: ListStyle
-    val skinStyle: String
-    val skinOwnerStyle: String
+    val nameFormat: String
+    val loreFormat: LoreFormat
+    val levelFormat: String
+    val rarityFormat: String
+    val elementFormat: ListFormat
+    val kizamiFormat: ListFormat
+    val skinFormat: String
+    val skinOwnerFormat: String
 
     fun stylizeName(name: String): Component
     fun stylizeLore(lore: List<String>): List<Component>
@@ -67,13 +66,13 @@ internal interface MetaStylizer {
     fun stylizeSkin(skin: ItemSkin): List<Component>
     fun stylizeSkinOwner(skinOwner: UUID): List<Component>
 
-    class LoreStyle(
+    class LoreFormat(
         val line: String,
         val header: List<String>?,
         val bottom: List<String>?,
     )
 
-    class ListStyle(
+    class ListFormat(
         val merged: String,
         val single: String,
         val separator: String,

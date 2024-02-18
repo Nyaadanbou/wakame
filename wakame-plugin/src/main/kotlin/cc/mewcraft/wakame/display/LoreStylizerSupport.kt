@@ -25,33 +25,39 @@ import org.koin.core.qualifier.named
 import java.util.UUID
 
 internal class LoreStylizerImpl(
+    /* stylizers */
     private val metaStylizer: MetaStylizer,
     private val abilityStylizer: AbilityStylizer,
     private val attributeStylizer: AttributeStylizer,
+
+    /* key suppliers */
+    private val metaLineKeySupplier: MetaLineKeySupplier,
+    private val abilityLineKeySupplier: AbilityLineKeySupplier,
+    private val attributeLineKeySupplier: AttributeLineKeySupplier,
 ) : LoreStylizer {
-    override fun stylize(nekoItemStack: NekoItemStack): Collection<LoreLine> {
+    override fun stylize(item: NekoItemStack): Collection<LoreLine> {
         val ret = ObjectArrayList<LoreLine>(8) // TODO estimate the capacity to reduce array copy operations
 
         // for each meta in neko
-        with(nekoItemStack.itemMeta) {
-            lore?.let { ret += MetaLoreLineImpl(LoreMeta.key().asString(), metaStylizer.stylizeLore(it)) }
-            level?.let { ret += MetaLoreLineImpl(LevelMeta.key().asString(), metaStylizer.stylizeLevel(it)) }
-            rarity?.let { ret += MetaLoreLineImpl(RarityMeta.key().asString(), metaStylizer.stylizeRarity(it)) }
-            element?.let { ret += MetaLoreLineImpl(ElementMeta.key().asString(), metaStylizer.stylizeElement(it)) }
-            kizami?.let { ret += MetaLoreLineImpl(KizamiMeta.key().asString(), metaStylizer.stylizeKizami(it)) }
-            skin?.let { ret += MetaLoreLineImpl(SkinMeta.key().asString(), metaStylizer.stylizeSkin(it)) }
-            skinOwner?.let { ret += MetaLoreLineImpl(SkinOwnerMeta.key().asString(), metaStylizer.stylizeSkinOwner(it)) }
+        with(item.metadata) {
+            lore?.let { ret += MetaLoreLineImpl(LoreMeta.key(), metaStylizer.stylizeLore(it)) }
+            level?.let { ret += MetaLoreLineImpl(LevelMeta.key(), metaStylizer.stylizeLevel(it)) }
+            rarity?.let { ret += MetaLoreLineImpl(RarityMeta.key(), metaStylizer.stylizeRarity(it)) }
+            element?.let { ret += MetaLoreLineImpl(ElementMeta.key(), metaStylizer.stylizeElement(it)) }
+            kizami?.let { ret += MetaLoreLineImpl(KizamiMeta.key(), metaStylizer.stylizeKizami(it)) }
+            skin?.let { ret += MetaLoreLineImpl(SkinMeta.key(), metaStylizer.stylizeSkin(it)) }
+            skinOwner?.let { ret += MetaLoreLineImpl(SkinOwnerMeta.key(), metaStylizer.stylizeSkinOwner(it)) }
         }
 
         // for each cell in neko
-        nekoItemStack.cells.asMap().values.forEach {
+        item.cells.asMap().values.forEach {
             val core = it.binaryCore
             if (core.isEmpty) {
                 // TODO 渲染空词条栏
             } else {
                 when (core) {
-                    is BinaryAbilityCore -> ret += AbilityLoreLineImpl(core.key.asString(), abilityStylizer.stylizeAbility(core))
-                    is BinaryAttributeCore -> ret += AttributeLoreLineImpl(core.key.asString(), attributeStylizer.stylizeAttribute(core))
+                    is BinaryAbilityCore -> ret += AbilityLoreLineImpl(abilityLineKeySupplier.getKey(core), abilityStylizer.stylizeAbility(core))
+                    is BinaryAttributeCore -> ret += AttributeLoreLineImpl(attributeLineKeySupplier.getKey(core), attributeStylizer.stylizeAttribute(core))
                     else -> throw UnsupportedOperationException("${core::class.simpleName} has not yet supported to be rendered")
                 }
             }
@@ -71,43 +77,47 @@ internal class AbilityStylizerImpl : AbilityStylizer {
 }
 
 internal class AttributeStylizerImpl(
-    private val map: Map<Key, String>,
+    private val attributeFormats: Map<Key, String>,
     private val operationStylizer: OperationStylizer,
 ) : AttributeStylizer {
     override fun stylizeAttribute(attribute: BinaryAttributeCore): List<Component> {
+        val value = attribute.value
+        val operation = value.operation
         TODO("Not yet implemented")
     }
 }
 
 internal class OperationStylizerImpl(
-    private val formats: Map<Operation, String>,
+    private val operationFormats: Map<Operation, String>,
 ) : OperationStylizer {
-    override fun stylizeAddition(value: Double): String = formats.getOrThrow(Operation.ADDITION).format(value)
-    override fun stylizeMultiplyBase(value: Double): String = formats.getOrThrow(Operation.MULTIPLY_BASE).format(value)
-    override fun stylizeMultiplyTotal(value: Double): String = formats.getOrThrow(Operation.MULTIPLY_TOTAL).format(value)
+    override fun stylizeValue(value: Double, operation: Operation): String = when (operation) {
+        Operation.ADDITION -> operationFormats.getOrThrow(Operation.ADDITION).format(value)
+        Operation.MULTIPLY_BASE -> operationFormats.getOrThrow(Operation.MULTIPLY_BASE).format(value)
+        Operation.MULTIPLY_TOTAL -> operationFormats.getOrThrow(Operation.MULTIPLY_TOTAL).format(value)
+    }
 }
 
 internal class MetaStylizerImpl(
-    override val nameStyle: String,
-    override val loreStyle: MetaStylizer.LoreStyle,
-    override val levelStyle: String,
-    override val rarityStyle: String,
-    override val elementStyle: MetaStylizer.ListStyle,
-    override val kizamiStyle: MetaStylizer.ListStyle,
-    override val skinStyle: String,
-    override val skinOwnerStyle: String,
+    override val nameFormat: String,
+    override val loreFormat: MetaStylizer.LoreFormat,
+    override val levelFormat: String,
+    override val rarityFormat: String,
+    override val elementFormat: MetaStylizer.ListFormat,
+    override val kizamiFormat: MetaStylizer.ListFormat,
+    override val skinFormat: String,
+    override val skinOwnerFormat: String,
 ) : KoinComponent, MetaStylizer {
 
     private val miniMessage: MiniMessage by inject(named(MINIMESSAGE_FULL))
 
     override fun stylizeName(name: String): Component {
-        return miniMessage.deserialize(nameStyle, Placeholder.parsed("name", name))
+        return miniMessage.deserialize(nameFormat, Placeholder.parsed("name", name))
     }
 
     override fun stylizeLore(lore: List<String>): List<Component> {
-        val header = loreStyle.header?.mapTo(ObjectArrayList(loreStyle.header.size)) { miniMessage.deserialize(it) }
-        val bottom = loreStyle.bottom?.mapTo(ObjectArrayList(loreStyle.bottom.size)) { miniMessage.deserialize(it) }
-        val lines = lore.mapTo(ObjectArrayList(lore.size)) { miniMessage.deserialize(loreStyle.line, Placeholder.parsed("line", it)) }
+        val header = loreFormat.header?.mapTo(ObjectArrayList(loreFormat.header.size)) { miniMessage.deserialize(it) }
+        val bottom = loreFormat.bottom?.mapTo(ObjectArrayList(loreFormat.bottom.size)) { miniMessage.deserialize(it) }
+        val lines = lore.mapTo(ObjectArrayList(lore.size)) { miniMessage.deserialize(loreFormat.line, Placeholder.parsed("line", it)) }
 
         return if (header == null && bottom == null) {
             lines
@@ -123,42 +133,44 @@ internal class MetaStylizerImpl(
     }
 
     override fun stylizeLevel(level: Int): List<Component> {
-        return listOf(miniMessage.deserialize(levelStyle, Formatter.number("level", level)))
+        return listOf(miniMessage.deserialize(levelFormat, Formatter.number("level", level)))
     }
 
     override fun stylizeRarity(rarity: Rarity): List<Component> {
-        return listOf(miniMessage.deserialize(rarityStyle, Placeholder.parsed("rarity", rarity.displayName)))
+        return listOf(miniMessage.deserialize(rarityFormat, Placeholder.parsed("rarity", rarity.displayName)))
     }
 
     override fun stylizeElement(elements: Set<Element>): List<Component> {
         val values = elements.mapTo(ObjectArrayList(elements.size)) {
-            miniMessage.deserialize(elementStyle.single, Placeholder.parsed("element", it.displayName))
+            miniMessage.deserialize(elementFormat.single, Placeholder.parsed("element", it.displayName))
         }
-        val merged = Component.join(
+        val joined = Component.join(
             JoinConfiguration.separator(
-                miniMessage.deserialize(elementStyle.separator)
+                miniMessage.deserialize(elementFormat.separator)
             ), values
         )
+        val merged = miniMessage.deserialize(elementFormat.merged, Placeholder.component("merged", joined))
         return listOf(merged)
     }
 
     override fun stylizeKizami(kizami: Set<Kizami>): List<Component> {
         val values = kizami.mapTo(ObjectArrayList(kizami.size)) {
-            miniMessage.deserialize(kizamiStyle.single, Placeholder.parsed("kizami", it.displayName))
+            miniMessage.deserialize(kizamiFormat.single, Placeholder.parsed("kizami", it.displayName))
         }
-        val merged = Component.join(
+        val joined = Component.join(
             JoinConfiguration.separator(
-                miniMessage.deserialize(kizamiStyle.separator)
+                miniMessage.deserialize(kizamiFormat.separator)
             ), values
         )
+        val merged = miniMessage.deserialize(kizamiFormat.merged, Placeholder.component("merged", joined))
         return listOf(merged)
     }
 
     override fun stylizeSkin(skin: ItemSkin): List<Component> {
-        return listOf(miniMessage.deserialize(skinStyle, Placeholder.parsed("skin", skin.displayName)))
+        return listOf(miniMessage.deserialize(skinFormat, Placeholder.parsed("skin", skin.displayName)))
     }
 
     override fun stylizeSkinOwner(skinOwner: UUID): List<Component> {
-        return listOf(miniMessage.deserialize(skinOwnerStyle, Placeholder.parsed("skin_owner", skinOwner.toString())))
+        return listOf(miniMessage.deserialize(skinOwnerFormat, Placeholder.parsed("skin_owner", skinOwner.toString())))
     }
 }

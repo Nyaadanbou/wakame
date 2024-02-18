@@ -43,7 +43,7 @@ class TestListener : Listener {
         when (plainMessage) {
             "r1" -> {
                 val wrap = NekoItemStackFactory.wrap(inventory.itemInMainHand)
-                val lore = wrap.itemMeta.loreOrEmpty
+                val lore = wrap.metadata.loreOrEmpty
                 val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
             }

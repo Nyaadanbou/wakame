@@ -46,7 +46,7 @@ internal class NekoItemImpl(
         val material = materialMeta.generate(context)
         val nekoStack = NekoItemStackFactory.new(material)
 
-        with(nekoStack.itemMeta) {
+        with(nekoStack.metadata) {
             // Side note:
             // the order of meta population is hardcoded currently
             // TODO make the order of meta population configurable

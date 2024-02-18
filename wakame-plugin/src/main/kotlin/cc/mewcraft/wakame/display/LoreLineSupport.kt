@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 
@@ -18,21 +19,21 @@ internal class LoreLineComparator(
 // TODO use flyweight pattern to reduce memory footprint
 
 internal data class FixedLoreLineImpl(
-    override val key: String,
+    override val key: Key,
     override val line: List<Component>,
 ) : FixedLoreLine
 
 internal data class MetaLoreLineImpl(
-    override val key: String,
+    override val key: Key,
     override val line: List<Component>,
 ) : MetaLoreLine
 
 internal data class AttributeLoreLineImpl(
-    override val key: String,
+    override val key: Key,
     override val line: List<Component>,
 ) : AttributeLoreLine
 
 internal data class AbilityLoreLineImpl(
-    override val key: String,
+    override val key: Key,
     override val line: List<Component>,
 ) : AbilityLoreLine

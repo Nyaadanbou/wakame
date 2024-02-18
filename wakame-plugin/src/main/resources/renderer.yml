@@ -139,13 +139,13 @@ lore_renderer_style:
     skin: "皮肤: <skin>"
     skin_owner: "皮肤所有者: <skin_owner>"
     lore:
-      header: [] # 空列表代表完全没有，不代表空行
+      header: [ ] # 空列表代表完全没有，不代表空行
       line: "<line>"
-      bottom: []
+      bottom: [ ]
 
   # To g22:
-  # 这个的解析需要运行在 meta 或 attribute 解析的“内部”，也就是用于实现 TagResolver
-  # 因此，这里用 JDK 的 String.format 就够了，不需要实现新的 TagResolver
+  # 这个的解析需要运行在 attribute 解析的“内部”，也就是*用于*实现 TagResolver
+  # 因此，这里用 Java 的 String.format() 就够了，不需要实现新的 TagResolver
   operation:
     addition: %s
     multiply_base: %s%% (base)

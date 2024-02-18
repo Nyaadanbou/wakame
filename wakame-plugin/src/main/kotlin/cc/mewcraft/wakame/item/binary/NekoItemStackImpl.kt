@@ -78,7 +78,7 @@ internal class NekoItemStackImpl(
         CellAccessorImpl(this)
     }
 
-    override val itemMeta: ItemMetaAccessor by lazy(LazyThreadSafetyMode.NONE) {
+    override val metadata: ItemMetaAccessor by lazy(LazyThreadSafetyMode.NONE) {
         ItemMetaAccessorImpl(this)
     }
 
