@@ -24,6 +24,8 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import java.util.UUID
 
+// TODO 所有的 stylizer 应该尽可能的实现缓存机制
+
 internal class LoreStylizerImpl(
     /* stylizers */
     private val metaStylizer: MetaStylizer,
@@ -40,13 +42,13 @@ internal class LoreStylizerImpl(
 
         // for each meta in neko
         with(item.metadata) {
-            lore?.let { ret += MetaLoreLineImpl(LoreMeta.key(), metaStylizer.stylizeLore(it)) }
-            level?.let { ret += MetaLoreLineImpl(LevelMeta.key(), metaStylizer.stylizeLevel(it)) }
-            rarity?.let { ret += MetaLoreLineImpl(RarityMeta.key(), metaStylizer.stylizeRarity(it)) }
-            element?.let { ret += MetaLoreLineImpl(ElementMeta.key(), metaStylizer.stylizeElement(it)) }
-            kizami?.let { ret += MetaLoreLineImpl(KizamiMeta.key(), metaStylizer.stylizeKizami(it)) }
-            skin?.let { ret += MetaLoreLineImpl(SkinMeta.key(), metaStylizer.stylizeSkin(it)) }
-            skinOwner?.let { ret += MetaLoreLineImpl(SkinOwnerMeta.key(), metaStylizer.stylizeSkinOwner(it)) }
+            lore?.let { ret += MetaLoreLineFactory.get(metaLineKeySupplier.getKey(LoreMeta::class), metaStylizer.stylizeLore(it)) }
+            level?.let { ret += MetaLoreLineFactory.get(metaLineKeySupplier.getKey(LevelMeta::class), metaStylizer.stylizeLevel(it)) }
+            rarity?.let { ret += MetaLoreLineFactory.get(metaLineKeySupplier.getKey(RarityMeta::class), metaStylizer.stylizeRarity(it)) }
+            element?.let { ret += MetaLoreLineFactory.get(metaLineKeySupplier.getKey(ElementMeta::class), metaStylizer.stylizeElement(it)) }
+            kizami?.let { ret += MetaLoreLineFactory.get(KizamiMeta.key(), metaStylizer.stylizeKizami(it)) }
+            skin?.let { ret += MetaLoreLineFactory.get(SkinMeta.key(), metaStylizer.stylizeSkin(it)) }
+            skinOwner?.let { ret += MetaLoreLineFactory.get(SkinOwnerMeta.key(), metaStylizer.stylizeSkinOwner(it)) }
         }
 
         // for each cell in neko

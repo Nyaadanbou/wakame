@@ -26,4 +26,4 @@ internal interface AbilityLineKeySupplier : LineKeySupplier<BinaryAbilityCore>
 internal interface AttributeLineKeySupplier : LineKeySupplier<BinaryAttributeCore>
 
 @OptIn(InternalApi::class)
-internal interface MetaLineKeySupplier : LineKeySupplier<KClass<SchemeMeta<*>>>
+internal interface MetaLineKeySupplier : LineKeySupplier<KClass<out SchemeMeta<*>>>

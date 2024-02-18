@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.display
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 
-//<editor-fold desc="Instances">
 /**
  * 代表 lore 中的一行。
  */
@@ -43,18 +42,3 @@ internal interface AttributeLoreLine : LoreLine
  * 代表 lore 中关于技能的一行。
  */
 internal interface AbilityLoreLine : LoreLine
-//</editor-fold>
-
-//<editor-fold desc="Factories">
-internal interface MetaLoreLineFactory {
-    fun create()
-}
-
-internal interface AttributeLoreLineFactory {
-    fun create()
-}
-
-internal interface AbilityLoreLineFactory {
-    fun create()
-}
-//</editor-fold>
