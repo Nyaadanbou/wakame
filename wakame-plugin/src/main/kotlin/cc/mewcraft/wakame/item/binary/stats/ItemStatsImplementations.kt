@@ -31,10 +31,10 @@ class PeakDamageStats(
     override val accessor: ItemStatsAccessor,
 ) : ItemStats, NumericMapLikeItemStats<Element, Int> {
     override val nbtPath: String = NekoTags.Stats.PEAK_DAMAGE
-    override fun get(key: Element): Int = rootOrNull?.getInt(key.name) ?: 0
-    override fun set(key: Element, value: Int) = rootOrCreate.putShort(key.name, value.toStableShort())
+    override fun get(key: Element): Int = rootOrNull?.getInt(key.key) ?: 0
+    override fun set(key: Element, value: Int) = rootOrCreate.putShort(key.key, value.toStableShort())
     override fun increment(key: Element, value: Int) {
-        val damageKey = key.name
+        val damageKey = key.key
         val oldValue = rootOrCreate.getShort(damageKey)
         val newValue = (oldValue + value).toStableShort()
         rootOrCreate.putShort(damageKey, newValue)

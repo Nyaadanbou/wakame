@@ -31,7 +31,7 @@ object ElementRegistry : KoinComponent, Initializable, Reloadable,
 
         root.node("elements").childrenMap().forEach { (_, n) ->
             val element = n.requireKt<Element>()
-            registerBothMapping(element.name, element)
+            registerBothMapping(element.key, element)
         }
     }
 

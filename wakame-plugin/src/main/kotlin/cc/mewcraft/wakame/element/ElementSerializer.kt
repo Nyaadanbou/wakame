@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.element
 
 import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.requireKt
@@ -34,7 +35,7 @@ internal class ElementSerializer : SchemeSerializer<Element> {
         val elementName = node.key().toString()
         val binaryIndex = node.node("binary_index").requireKt<Int>().toStableByte()
         val displayName = node.node("display_name").requireKt<String>()
-        val element = Element(elementName, binaryIndex, displayName)
+        val element = @OptIn(InternalApi::class) Element(elementName, binaryIndex, displayName)
         return element
     }
 }

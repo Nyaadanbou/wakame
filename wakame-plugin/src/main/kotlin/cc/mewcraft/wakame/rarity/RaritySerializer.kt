@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.requireKt
@@ -35,6 +36,6 @@ internal class RaritySerializer : SchemeSerializer<Rarity> {
         val name = node.key().toString()
         val binary = node.node("binary_index").requireKt<Int>().toStableByte()
         val displayName = node.node("display_name").requireKt<String>()
-        return Rarity(name, binary, displayName)
+        return (@OptIn(InternalApi::class) Rarity(name, binary, displayName))
     }
 }

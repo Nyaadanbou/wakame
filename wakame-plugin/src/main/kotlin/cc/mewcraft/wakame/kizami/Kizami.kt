@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.BiIdentified
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.KizamiRegistry
 
 // TODO add more properties to this class
@@ -11,8 +12,8 @@ import cc.mewcraft.wakame.registry.KizamiRegistry
  *
  * Use [KizamiRegistry] to get the instances instead.
  */
-data class Kizami internal constructor(
-    override val name: String,
+data class Kizami @InternalApi internal constructor(
+    override val key: String,
     override val binary: Byte,
     /**
      * The display name to players.
@@ -21,13 +22,13 @@ data class Kizami internal constructor(
 ) : BiIdentified<String, Byte> {
     override fun equals(other: Any?): Boolean {
         return if (other is Kizami) {
-            other.name == name
+            other.key == key
         } else {
             false
         }
     }
 
     override fun hashCode(): Int {
-        return name.hashCode()
+        return key.hashCode()
     }
 }

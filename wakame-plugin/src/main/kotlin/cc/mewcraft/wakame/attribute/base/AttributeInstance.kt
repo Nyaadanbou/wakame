@@ -42,7 +42,7 @@ class AttributeInstance(
 
     private fun calculateValue(): Double {
         var x: Double = getBaseValue()
-        getModifierOrEmpty(Operation.ADDITION).forEach { x += it.amount }
+        getModifierOrEmpty(Operation.ADD).forEach { x += it.amount }
         var y: Double = x
         getModifierOrEmpty(Operation.MULTIPLY_BASE).forEach { y += x * it.amount }
         getModifierOrEmpty(Operation.MULTIPLY_TOTAL).forEach { y *= 1.0 + it.amount }

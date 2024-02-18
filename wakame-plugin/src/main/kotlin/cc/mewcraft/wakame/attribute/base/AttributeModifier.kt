@@ -22,7 +22,7 @@ data class AttributeModifier(
         val key: String,
         val id: Int,
     ) {
-        ADDITION("add", 0),
+        ADD("add", 0),
         MULTIPLY_BASE("multiply_base", 1),
         MULTIPLY_TOTAL("multiply_total", 2);
 
@@ -30,12 +30,12 @@ data class AttributeModifier(
 
         companion object {
             private val OPERATIONS_ARRAY: Array<Operation> = arrayOf(
-                ADDITION,
+                ADD,
                 MULTIPLY_BASE,
                 MULTIPLY_TOTAL
             )
             private val OPERATIONS_MAP: Map<String, Operation> = mapOf(
-                ADDITION.key to ADDITION,
+                ADD.key to ADD,
                 MULTIPLY_BASE.key to MULTIPLY_BASE,
                 MULTIPLY_TOTAL.key to MULTIPLY_TOTAL
             )

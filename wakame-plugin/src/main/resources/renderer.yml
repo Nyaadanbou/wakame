@@ -6,9 +6,6 @@
 
 # To g22: 如果要创建其他语言的渲染器，复制一份本文件做修改即可
 
-# 物品 name 的样式
-name_renderer_style: "<name>"
-
 # To g22:
 # 整体架构的想法：
 # 对于 lore_renderer_style.X 下面的所有字符串都需要用特定的 MiniMessage 实例进行反序列化，以生成相应的 Component
@@ -16,13 +13,13 @@ name_renderer_style: "<name>"
 # 也就是对于 lore_renderer_order.X 中的任何一个占位符 X 和 Y，你必须可以直接知道到底是 X 在 Y 前面，还是 Y 在 X 前面
 # Java 中，关于 total order 的实现是 TreeMap，也就是红黑树，使用这个数据结构你可以在 O(log n) 的复杂度下知道顺序
 
-# 物品 lore 的占位符顺序 + 选择性空行 + 固定的自定义内容
-# 以 @ 开头表示当源数据不存在时用空行替代，而不是忽略；也可以用 @ 直接插入空行
+# 渲染顺序 + 选择性空行 + 固定的自定义内容
+# 以 / 开头表示当源数据不存在时用空行替代，而不是忽略；也可以用 / 直接插入空行
 # 以 ^ 开头可以插入自定义的固定内容，将用 MiniMessage 进行解析
 #
 # 这里不一定要写上所有的占位符，你可以省略任意的占位符
 # 如果没有指定占位符，则占位符对应的内容不会被渲染出来
-lore_renderer_order:
+renderer_order:
 
   # 元素排序
   # 所有带元素标识的同种属性都将按照此顺序渲染
@@ -38,11 +35,13 @@ lore_renderer_order:
   # 操作排序
   # 同种属性，不同 operation，都将按照此顺序渲染
   operation:
-    - addition
+    - add
     - multiply_base
     - multiply_total
 
   # 主体排序
+  # 除了 /（空行）和 ^（固定内容）可以重复出现外，其余都不能重复出现
+  # To g22: 如果其他内容重复出现，则抛出异常关闭插件
   primary:
     - ^<aqua><!i><b>元数据 # 以 ^ 开头以插入固定内容
     - meta:level
@@ -51,8 +50,10 @@ lore_renderer_order:
     - meta:kizami
     - meta:skin
     - meta:skin_owner
-    - @meta:lore # 以 @ 开头将在源数据不存在时用空行替代，而不是忽略
-    - @ # 以 @ 开头，后面不接内容，可以直接插入空行
+    - /meta:lore # 以 / 开头将在源数据不存在时用空行替代，而不是忽略
+    - / # 以 / 开头，后面不接内容，可以直接插入空行
+    - /
+    - /
 
     # 同种属性之间存在 operation 的区别
     # 例如在同一个物品上，
@@ -93,7 +94,7 @@ lore_renderer_order:
     - attribute:max_mana
 
     - attribute:movement_speed_rate
-    - @
+    - /
 
     # 这里指定每个技能应该显示在什么位置
     - ^<aqua><!i><b>技能
@@ -109,8 +110,8 @@ lore_renderer_order:
     - ability:stab
     - ability:waterball
 
-# 物品 lore 的样式
-lore_renderer_style:
+# 渲染的样式
+renderer_style:
 
   # To g22:
   # 首先是两个实现要求：
@@ -126,6 +127,7 @@ lore_renderer_style:
   # 则你需要对每一个 lore_renderer_style.X.Y 都创建一个 MiniMessage 实例
 
   meta:
+    name: "<name>"
     level: "等级: <level>"
     rarity: "稀有度: <rarity>"
     element:
@@ -147,32 +149,32 @@ lore_renderer_style:
   # 这个的解析需要运行在 attribute 解析的“内部”，也就是*用于*实现 TagResolver
   # 因此，这里用 Java 的 String.format() 就够了，不需要实现新的 TagResolver
   operation:
-    addition: %s
-    multiply_base: %s%% (base)
-    multiply_total: %s%% (total)
+    add: "%f"
+    multiply_base: "%f%% (base)"
+    multiply_total: "%f%% (total)"
 
   attribute:
-    attack_damage: "<element>元素攻击: <attack_damage>"
+    attack_damage: "<element>元素攻击: <min> - <max>"
 
     # To g22: 对于本身表示“率”的属性，不能直接显示小数，需要转换成百分制
     # 这一点在实现 TagResolver 的时候，特别考虑一下就可以了
-    attack_effect_chance: "元素叠加: <attack_effect_chance>"
+    attack_effect_chance: "元素叠加: <value>"
 
-    attack_speed_level: "攻击速度: <attack_speed_level>"
-    critical_strike_chance: "暴击概率: <critical_strike_chance>"
-    critical_strike_power: "暴击伤害: <critical_strike_power>"
-    damage_reduction_rate: "伤害承受: <damage_reduction_rate>"
-    defense: "<element>防御力: <defense>"
-    defense_penetration: "<element>防御穿透: <defense_penetration>"
-    defense_penetration_rate: "<element>防御穿透率: <defense_penetration_rate>"
-    health_regeneration: "生命恢复: <health_regeneration>"
-    lifesteal: "攻击吸血: <lifesteal>"
-    lifesteal_rate: "攻击吸血率: <lifesteal_rate>"
-    mana_consumption_rate: "魔法消耗: <mana_consumption_rate>"
-    mana_regeneration: "魔法恢复: <mana_regeneration>"
-    manasteal: "魔法汲取: <manasteal>"
-    manasteal_rate: "魔法汲取率: <manasteal_rate>"
-    max_absorption: "最大护盾: <max_absorption>"
-    max_health: "最大生命: <max_health>"
-    max_mana: "最大魔法: <max_mana>"
-    movement_speed_rate: "移动速率: <movement_speed_rate>"
+    attack_speed_level: "攻击速度: <value>"
+    critical_strike_chance: "暴击概率: <value>"
+    critical_strike_power: "暴击伤害: <value>"
+    damage_reduction_rate: "伤害承受: <value>"
+    defense: "<element>防御力: <value>"
+    defense_penetration: "<element>防御穿透: <value>"
+    defense_penetration_rate: "<element>防御穿透率: <value>"
+    health_regeneration: "生命恢复: <value>"
+    lifesteal: "攻击吸血: <value>"
+    lifesteal_rate: "攻击吸血率: <value>"
+    mana_consumption_rate: "魔法消耗: <value>"
+    mana_regeneration: "魔法恢复: <value>"
+    manasteal: "魔法汲取: <value>"
+    manasteal_rate: "魔法汲取率: <value>"
+    max_absorption: "最大护盾: <value>"
+    max_health: "最大生命: <value>"
+    max_mana: "最大魔法: <value>"
+    movement_speed_rate: "移动速率: <value>"

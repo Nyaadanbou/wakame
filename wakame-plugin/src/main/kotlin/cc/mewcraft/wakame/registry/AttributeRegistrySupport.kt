@@ -67,12 +67,12 @@ internal class FormatSelectionImpl(
     private val key: Key,
     private val shadowTagType: ShadowTagType,
 ) : FormatSelection {
-    override fun ranged(): RangedSelectionImpl {
-        return RangedSelectionImpl(key, shadowTagType)
-    }
-
     override fun single(): SingleSelectionImpl {
         return SingleSelectionImpl(key, shadowTagType)
+    }
+
+    override fun ranged(): RangedSelectionImpl {
+        return RangedSelectionImpl(key, shadowTagType)
     }
 }
 @InternalApi

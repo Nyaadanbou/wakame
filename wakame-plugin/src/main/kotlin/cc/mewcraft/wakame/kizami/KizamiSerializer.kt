@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.requireKt
@@ -35,6 +36,6 @@ internal class KizamiSerializer : SchemeSerializer<Kizami> {
         val name = node.key().toString()
         val binary = node.node("binary_index").requireKt<Int>().toStableByte()
         val displayName = node.node("display_name").requireKt<String>()
-        return Kizami(name, binary, displayName)
+        return (@OptIn(InternalApi::class) Kizami(name, binary, displayName))
     }
 }

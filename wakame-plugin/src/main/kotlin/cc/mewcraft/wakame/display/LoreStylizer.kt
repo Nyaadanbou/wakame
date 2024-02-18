@@ -11,8 +11,6 @@ import cc.mewcraft.wakame.skin.ItemSkin
 import net.kyori.adventure.text.Component
 import java.util.UUID
 
-/* 包含配置文件的抽象 */
-
 /**
  * 为给定的 [NekoItemStack] 生成 [lore lines][LoreLine].
  *
@@ -35,18 +33,30 @@ internal interface LoreStylizer {
 
 // To g22: 下面都是 LoreStylizer 需要用到的实现
 
+/**
+ * To be used by [LoreStylizer].
+ */
 internal interface AbilityStylizer {
-    fun stylizeAbility(ability: BinaryAbilityCore): List<Component>
+    fun stylizeAbility(core: BinaryAbilityCore): List<Component>
 }
 
+/**
+ * To be used by [LoreStylizer].
+ */
 internal interface AttributeStylizer {
-    fun stylizeAttribute(attribute: BinaryAttributeCore): List<Component>
+    fun stylizeAttribute(core: BinaryAttributeCore): List<Component>
 }
 
+/**
+ * To be used by [LoreStylizer].
+ */
 internal interface OperationStylizer {
     fun stylizeValue(value: Double, operation: AttributeModifier.Operation): String
 }
 
+/**
+ * To be used by [LoreStylizer].
+ */
 internal interface MetaStylizer {
     val nameFormat: String
     val loreFormat: LoreFormat
@@ -68,13 +78,27 @@ internal interface MetaStylizer {
 
     class LoreFormat(
         val line: String,
+        /**
+         * Never be an empty list. Use `null` to indicate "don't add header".
+         */
         val header: List<String>?,
+        /**
+         * Never be an empty list. Use `null` to indicate "don't add bottom".
+         */
         val bottom: List<String>?,
-    )
+    ){
+        override fun toString(): String {
+            return "LoreFormat(line='$line', header=${header?.joinToString()}, bottom=${bottom?.joinToString()})"
+        }
+    }
 
     class ListFormat(
         val merged: String,
         val single: String,
         val separator: String,
-    )
+    ) {
+        override fun toString(): String {
+            return "ListFormat(merged='$merged', single='$single', separator='$separator')"
+        }
+    }
 }

@@ -25,7 +25,7 @@ object KizamiRegistry : KoinComponent, Initializable, Reloadable,
 
         root.node("kizami").childrenMap().forEach { (_, n) ->
             val kizami = n.requireKt<Kizami>()
-            registerBothMapping(kizami.name, kizami)
+            registerBothMapping(kizami.key, kizami)
         }
     }
 

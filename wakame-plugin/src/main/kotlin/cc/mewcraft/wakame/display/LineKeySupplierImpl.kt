@@ -1,26 +1,136 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.facade.elementOrNull
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.scheme.meta.SchemeMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeMetaKeys
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import kotlin.reflect.KClass
 
 internal class AbilityLineKeySupplierImpl : AbilityLineKeySupplier {
-    override fun getKey(value: BinaryAbilityCore): Key {
-        return value.key // 技能的 key 就是它在 renderer 配置文件中的 key
+    override fun get(obj: BinaryAbilityCore): FullKey {
+        // 技能在 NBT 中的 key 就是它在 renderer 配置文件中的 key
+        return obj.key
     }
 }
 
 internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
-    override fun getKey(value: BinaryAttributeCore): Key {
-        TODO("Not yet implemented") // 属性的 key 需要根据 operation 和 element 来共同决定
+    /**
+     * Full Keys in this map are indexed by `key` + `operation`.
+     */
+    private val cachedFullKeys: Object2ObjectOpenHashMap<Key, Reference2ObjectOpenHashMap<AttributeModifier.Operation, FullKey>> = Object2ObjectOpenHashMap()
+
+    /**
+     * Full Keys in this map are indexed by `key` + `operation` + `element`.
+     */
+    private val cachedFullKeysWithElement: Object2ObjectOpenHashMap<Key, Reference2ObjectOpenHashMap<AttributeModifier.Operation, Reference2ObjectOpenHashMap<Element, FullKey>>> = Object2ObjectOpenHashMap()
+
+    /**
+     * Caches a full key from the given triple indexes.
+     */
+    private fun put(key: Key, operation: AttributeModifier.Operation, element: Element? = null, fullKey: FullKey) {
+        if (element == null) {
+            cachedFullKeys
+                .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) } // Operation 最多3个
+                .put(operation, fullKey)
+        } else {
+            cachedFullKeysWithElement
+                .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) }
+                .getOrPut(operation) { Reference2ObjectOpenHashMap(8, 0.9f) } // Element 一般最多8个
+                .put(element, fullKey)
+        }
+    }
+
+    /**
+     * Gets a full key from the given triple indexes.
+     */
+    private fun get(key: Key, operation: AttributeModifier.Operation, element: Element? = null): FullKey? {
+        return if (element == null) {
+            cachedFullKeys[key]?.get(operation)
+        } else {
+            cachedFullKeysWithElement[key]?.get(operation)?.get(element)
+        }
+    }
+
+    /**
+     * Returns the full key for the given triple indexes ([key], [operation], [element]) if the full key is cached and not `null`.
+     * Otherwise, calls the [defaultValue] function, puts its result into the cache under the given indexes and returns the call result.
+     *
+     * Note that the operation is not guaranteed to be atomic if the map is being modified concurrently.
+     */
+    private inline fun getOrPut(key: Key, operation: AttributeModifier.Operation, element: Element? = null, defaultValue: () -> Key): FullKey {
+        val value = get(key, operation, element)
+        return if (value == null) {
+            val answer = defaultValue()
+            put(key, operation, element, answer)
+            answer
+        } else {
+            value
+        }
+    }
+
+    /**
+     * Removes the cache from the given triple indexes.
+     *
+     * @return the old cache
+     */
+    private fun remove(key: Key, operation: AttributeModifier.Operation, element: Element? = null): FullKey? {
+        if (element == null) {
+            val map1 = cachedFullKeys[key] ?: return null
+            val value = map1.remove(operation)
+            if (map1.isEmpty()) {
+                cachedFullKeys.remove(key)
+            }
+            return value
+        } else {
+            val map1 = cachedFullKeysWithElement[key] ?: return null
+            val map2 = map1[operation] ?: return null
+            val value = map2[element]
+            if (map2.isEmpty()) {
+                map1.remove(operation)
+                if (map1.isEmpty()) {
+                    cachedFullKeysWithElement.remove(key)
+                }
+            }
+            return value
+        }
+    }
+
+    override fun get(obj: BinaryAttributeCore): FullKey {
+        // 属性的 full key 需要根据 id + operation + element 共同决定
+
+        // 我们用这里的参数构建一个 full key.
+        // 属性的 full key 的格式目前只有两种
+        // 1. attribute:_id_/_operation             也就是  id + operation
+        // 2. attribute:_id_/_operation_/_element_  也就是  id + operation + element
+
+        val key = obj.key
+        val operation = obj.value.operation
+        val element = obj.value.elementOrNull
+        val fullKey = getOrPut(key, operation, element) {
+            val newValue = buildString {
+                append(key.value())
+                append(".")
+                append(operation.key)
+                element?.let {
+                    append(".")
+                    append(it.key)
+                }
+            }
+            Key.key(key.namespace(), newValue)
+        }
+        return fullKey
     }
 }
 
 internal class MetaLineKeySupplierImpl : MetaLineKeySupplier {
-    override fun getKey(value: KClass<out SchemeMeta<*>>): Key {
-        return SchemeMetaKeys.get(value) // 元数据的 key 为它在模板中的 key
+    override fun get(obj: KClass<out SchemeMeta<*>>): FullKey {
+        // 模板元数据的 key 就是它在 renderer 配置文件中的 key
+        return SchemeMetaKeys.get(obj)
     }
 }

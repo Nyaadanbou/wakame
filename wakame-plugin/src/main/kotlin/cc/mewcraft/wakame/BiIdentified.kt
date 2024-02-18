@@ -10,7 +10,7 @@ interface BiIdentified<STRING, BINARY> {
     /**
      * The readable identifier of this object.
      */
-    val name: STRING
+    val key: STRING
 
     /**
      * The binary identifier of this object.

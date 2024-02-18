@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.item.SchemeCoreValue
 import cc.mewcraft.wakame.util.NumericValue
 import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 
 /**
  * 代表一个属性在模板中的数值。
@@ -106,4 +105,4 @@ private fun deserializeElement(node: ConfigurationNode): Element =
 private fun deserializeOperation(node: ConfigurationNode): AttributeModifier.Operation =
     node.node("operation").string
         ?.let { AttributeModifier.Operation.byKey(it) }
-        ?: AttributeModifier.Operation.ADDITION // ADDITION by default
+        ?: AttributeModifier.Operation.ADD // ADDITION by default

@@ -28,9 +28,15 @@ object NekoItemFactory : KoinComponent {
 
         // Deserialize item meta
         val schemeMeta: Map<Key, SchemeMeta<*>> = buildMap {
-            // Side note: buildMap preserves the insertion order
+            // Side note 1: buildMap preserves the insertion order
 
-            // (by alphabet order)
+            // Side note 2: always put all metadata for all `NekoItem`s
+            // even if the metadata contains "nothing".
+
+            // Side note 3: whether the data will be put on the item's NBT
+            // is decided by the item stack generation process, not here.
+
+            // (by alphabet order, in case you miss something)
             loadAndPutMeta<DisplayNameMeta>(node, "display_name")
             loadAndPutMeta<ElementMeta>(node, "elements")
             loadAndPutMeta<KizamiMeta>(node, "kizami")
@@ -64,12 +70,6 @@ object NekoItemFactory : KoinComponent {
         node: ConfigurationNode,
         vararg path: String,
     ) {
-        // always put all metadata for all `NekoItem`s
-        // even if the metadata contains "nothing".
-
-        // whether the data will be ultimately put on the item's NBT
-        // is decided by the item stack generation process, not here.
-
         val deserialized = requireNotNull(node.node(*path).get<T>()) { "Can't deserialize scheme meta from path ${path.contentToString()}" }
         put(SchemeMetaKeys.get<T>(), deserialized)
     }

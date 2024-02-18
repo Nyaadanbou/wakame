@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.attribute.facade
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.BinaryCoreValue
+import cc.mewcraft.wakame.registry.AttributeMeta
 
 /**
  * 代表一个属性在 NBT 中的数据。
@@ -15,20 +16,64 @@ sealed interface BinaryAttributeValue : BinaryCoreValue {
     var operation: AttributeModifier.Operation
 }
 
+/**
+ * Represents a "single-value" attribute.
+ */
+interface BinaryAttributeValueSingle<T> : BinaryAttributeValue {
+    var value: T
+}
+
+/**
+ * Represents a "ranged-value" attribute.
+ */
+interface BinaryAttributeValueRanged<T> : BinaryAttributeValue {
+    var lower: T
+    var upper: T
+}
+
+/**
+ * Represents an "elemental" attribute.
+ */
+interface BinaryAttributeValueElement : BinaryAttributeValue {
+    var element: Element
+}
+
+/**
+ * 快速查询属性数据的格式。
+ */
+internal val BinaryAttributeValue.format: AttributeMeta.Format
+    get() = when (this) {
+        is BinaryAttributeValueSingle<*> -> AttributeMeta.Format.SINGLE
+        is BinaryAttributeValueRanged<*> -> AttributeMeta.Format.RANGED
+        else -> error("Unknown format")
+    }
+
+/**
+ * 快速查询属性数据是否带元素。
+ */
+internal val BinaryAttributeValue.elemental: Boolean
+    get() = this is BinaryAttributeValueElement
+
+/**
+ * 快速获得属性数据的元素类型。
+ */
+internal val BinaryAttributeValue.elementOrNull: Element?
+    get() = (this as? BinaryAttributeValueElement)?.element
+
 ////// 以下实现考虑了属性可能拥有的全部数据结构
 
 data class BinaryAttributeValueS<T : Number>(
-    var value: T, override var operation: AttributeModifier.Operation,
-) : BinaryAttributeValue
+    override var value: T, override var operation: AttributeModifier.Operation,
+) : BinaryAttributeValueSingle<T>
 
 data class BinaryAttributeValueLU<T : Number>(
-    var lower: T, var upper: T, override var operation: AttributeModifier.Operation,
-) : BinaryAttributeValue
+    override var lower: T, override var upper: T, override var operation: AttributeModifier.Operation,
+) : BinaryAttributeValueRanged<T>
 
 data class BinaryAttributeValueSE<T : Number>(
-    var value: T, var element: Element, override var operation: AttributeModifier.Operation,
-) : BinaryAttributeValue
+    override var value: T, override var element: Element, override var operation: AttributeModifier.Operation,
+) : BinaryAttributeValueSingle<T>, BinaryAttributeValueElement
 
 data class BinaryAttributeValueLUE<T : Number>(
-    var lower: T, var upper: T, var element: Element, override var operation: AttributeModifier.Operation,
-) : BinaryAttributeValue
+    override var lower: T, override var upper: T, override var element: Element, override var operation: AttributeModifier.Operation,
+) : BinaryAttributeValueRanged<T>, BinaryAttributeValueElement

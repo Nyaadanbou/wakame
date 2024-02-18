@@ -120,8 +120,8 @@ data class AttributeMeta(
 
 //<editor-fold desc="Builders">
 interface FormatSelection {
-    fun ranged(): RangedSelection
     fun single(): SingleSelection
+    fun ranged(): RangedSelection
 }
 
 interface SingleSelection : SingleAttributeBinder {

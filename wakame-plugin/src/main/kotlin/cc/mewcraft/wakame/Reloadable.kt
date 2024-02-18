@@ -2,8 +2,6 @@ package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.util.listen
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -12,11 +10,15 @@ interface Reloadable {
 }
 
 fun <T> reloadable(loader: () -> T) = ReloadableProperty(loader)
-class ReloadableProperty<T>(private val loader: () -> T) : ReadOnlyProperty<Any?, T>, KoinComponent {
+
+class ReloadableProperty<T>(private val loader: () -> T) : ReadOnlyProperty<Any?, T> {
     private var value: T? = null
 
     init {
-        get<WakamePlugin>().listen<NekoReloadEvent> { reload() }
+        if (runCatching { Class.forName("net.minecraft.server.MinecraftServer") }.isSuccess) {
+            // only register listener if we are in a real server environment
+            NEKO_PLUGIN.listen<NekoReloadEvent> { reload() }
+        }
     }
 
     fun get(): T {

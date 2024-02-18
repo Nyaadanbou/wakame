@@ -59,9 +59,6 @@ const val SKIN_CONFIG_LOADER = "skin_config_loader"
 const val ENTITY_CONFIG_FILE = "entities.yml"
 const val ENTITY_CONFIG_LOADER = "entity_config_loader"
 
-const val RENDERER_CONFIG_FILE = "renderer.yml"
-const val RENDERER_CONFIG_LOADER = "renderer_config_loader"
-
 fun registryModule(): Module = module {
 
     // We need to explicitly declare these Initializable,
@@ -121,12 +118,6 @@ fun registryModule(): Module = module {
     single<YamlConfigurationLoader>(named(LEVEL_CONFIG_LOADER)) {
         createRegistryConfigurationLoader(LEVEL_CONFIG_FILE) {
             registerAll(get(named(RARITY_SERIALIZERS)))
-        }
-    }
-
-    single<YamlConfigurationLoader>(named(RENDERER_CONFIG_LOADER)) {
-        createRegistryConfigurationLoader(RENDERER_CONFIG_FILE) {
-            registerAll(get(named(RENDERER_SERIALIZERS)))
         }
     }
     //</editor-fold>

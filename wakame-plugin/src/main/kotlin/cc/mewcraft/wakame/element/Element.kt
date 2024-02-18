@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.element
 
 import cc.mewcraft.wakame.BiIdentified
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.ElementRegistry
 
 /**
@@ -8,8 +9,8 @@ import cc.mewcraft.wakame.registry.ElementRegistry
  *
  * Use [ElementRegistry] to get the instances instead.
  */
-data class Element internal constructor(
-    override val name: String,
+data class Element @InternalApi internal constructor(
+    override val key: String,
     override val binary: Byte,
     /**
      * The display name to players.
@@ -24,12 +25,12 @@ data class Element internal constructor(
     //  and no element instance will be created after that stage.
 
     override fun hashCode(): Int {
-        return name.hashCode()
+        return key.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
         if (other is Element) {
-            return other.name == name
+            return other.key == key
         }
         return false
     }

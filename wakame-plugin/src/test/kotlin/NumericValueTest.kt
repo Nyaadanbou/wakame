@@ -1,4 +1,5 @@
 import cc.mewcraft.wakame.util.NumericValue
+import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import kotlin.test.Test
 import kotlin.test.assertEquals

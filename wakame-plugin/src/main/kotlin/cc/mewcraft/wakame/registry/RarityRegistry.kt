@@ -30,7 +30,7 @@ object RarityRegistry : KoinComponent, Initializable, Reloadable,
 
         root.node("rarities").childrenMap().forEach { (_, n) ->
             val rarity = n.requireKt<Rarity>()
-            registerBothMapping(rarity.name, rarity)
+            registerBothMapping(rarity.key, rarity)
         }
     }
 

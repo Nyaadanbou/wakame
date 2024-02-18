@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.display
 
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 
 /**
@@ -10,12 +9,12 @@ internal sealed interface LoreLine {
     /**
      * 能够唯一识别这一行的标识。
      */
-    val key: Key // TODO 改用 net.kyori.adventure.key.Key
+    val key: FullKey
 
     /**
      * 最终生成的文本内容。
      */
-    val line: List<Component>
+    val lines: List<Component>
 }
 
 /**
@@ -23,9 +22,9 @@ internal sealed interface LoreLine {
  */
 internal interface FixedLoreLine : LoreLine {
     /**
-     * 这里的 [key] 就是固定内容本身。
+     * 这里的 [key] 就是固定内容的 index。
      */
-    override val key: Key
+    override val key: FullKey
 }
 
 /**
