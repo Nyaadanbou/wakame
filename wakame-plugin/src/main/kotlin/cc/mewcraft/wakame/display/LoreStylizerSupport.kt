@@ -2,8 +2,11 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.attribute.base.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.facade.elementOrNull
-import cc.mewcraft.wakame.attribute.facade.format
+import cc.mewcraft.wakame.attribute.base.Attributes
+import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueLU
+import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueLUE
+import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueS
+import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueSE
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
@@ -13,6 +16,7 @@ import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.AttributeStructType
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.util.getOrThrow
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
@@ -22,10 +26,11 @@ import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import java.util.*
+import java.util.UUID
 
 // TODO 所有的 stylizer 应该尽可能的实现缓存机制
 
@@ -61,8 +66,8 @@ internal class LoreStylizerImpl(
                 // TODO 渲染空词条栏
             } else {
                 when (core) {
-                    is BinaryAbilityCore -> ret += AbilityLoreLineImpl(abilityLineKeys.get(core), abilityStylizer.stylizeAbility(core))
-                    is BinaryAttributeCore -> ret += AttributeLoreLineImpl(attributeLineKeys.get(core), attributeStylizer.stylizeAttribute(core))
+                    is BinaryAbilityCore -> ret += AbilityLoreLineFactory.get(abilityLineKeys.get(core), abilityStylizer.stylizeAbility(core))
+                    is BinaryAttributeCore -> ret += AttributeLoreLineFactory.get(attributeLineKeys.get(core), attributeStylizer.stylizeAttribute(core))
                     else -> throw UnsupportedOperationException("${core::class.simpleName} has not yet supported to be rendered")
                 }
             }
@@ -84,28 +89,83 @@ internal class AbilityStylizerImpl : AbilityStylizer {
 
 internal class AttributeStylizerImpl(
     /**
-     * 这里的 `map key` 跟 [AttributeRegistry] 里的一致，不是 [FullKey]。
+     * ## Keys and values
+     * - 这里的 `map key` 跟 [AttributeRegistry] 里的一致，不是 [FullKey]。
+     * - 这里的 `map value` 就是配置文件里对应的字符串值，无需做任何处理。
      *
-     * 这里的 `map value` 就是配置文件里对应的字符串值，无需做任何处理。
+     * 请注意，该 map 不包含攻击速度！
      */
     private val attributeFormats: Map<Key, String>,
+    /**
+     * 攻击速度的渲染格式。
+     */
+    private val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat,
     private val operationStylizer: OperationStylizer,
-) : AttributeStylizer {
+) : KoinComponent, AttributeStylizer {
+
+    private val miniMessage: MiniMessage by inject(named(MINIMESSAGE_FULL))
+
     override fun stylizeAttribute(core: BinaryAttributeCore): List<Component> {
-        val key = core.key
-        val value = core.value
-
-        val format = value.format
-        val operation = value.operation
-        val element = value.elementOrNull
-
-        when {
-            // 要不直接在这一个一个判断好了
-        }
         // 先拿到 key，获取到对应的 format (String)
         // 把 format 当成 mini 然后反序列化，同时传入 tag resolvers
         // 注意这里的 tag resolvers 需要根据 format, operation, element 分情况添加
-        TODO("Not yet implemented")
+
+        val key = core.key
+        val value = core.value
+
+        // val format = value.format
+        val operation = value.operation // TODO consider modifier operation
+        // val element = value.elementOrNull
+
+        val tagResolvers = TagResolver.builder()
+
+        if (core.key == Attributes.ATTACK_SPEED_LEVEL.key()) {
+            /* 单独渲染攻击速度 */
+
+            value as BinaryAttributeValueS<*>
+            val level = attackSpeedFormat.levels[value.value.toInt()]
+            tagResolvers.resolver(Placeholder.parsed("value", level))
+            return listOf(miniMessage.deserialize(attackSpeedFormat.merged, tagResolvers.build()))
+
+        } else {
+            /* 其余按格式统一渲染 */
+
+            when (core.value.structType) {
+                AttributeStructType.SINGLE -> {
+                    value as BinaryAttributeValueS<*>
+                    tagResolvers.resolver(
+                        Formatter.number("value", value.value)
+                    )
+                }
+
+                AttributeStructType.RANGED -> {
+                    value as BinaryAttributeValueLU<*>
+                    tagResolvers.resolvers(
+                        Formatter.number("min", value.lower),
+                        Formatter.number("max", value.upper)
+                    )
+                }
+
+                AttributeStructType.SINGLE_ELEMENT -> {
+                    value as BinaryAttributeValueSE<*>
+                    tagResolvers.resolvers(
+                        Formatter.number("value", value.value),
+                        Placeholder.parsed("element", value.element.displayName)
+                    )
+                }
+
+                AttributeStructType.RANGED_ELEMENT -> {
+                    value as BinaryAttributeValueLUE<*>
+                    tagResolvers.resolvers(
+                        Formatter.number("min", value.lower),
+                        Formatter.number("max", value.upper),
+                        Placeholder.parsed("element", value.element.displayName)
+                    )
+                }
+            }
+
+            return listOf(miniMessage.deserialize(attributeFormats.getOrThrow(key), tagResolvers.build()))
+        }
     }
 }
 
@@ -165,7 +225,12 @@ internal class MetaStylizerImpl(
     /**
      * A generic function to stylize any list of objects.
      */
-    private fun <T> stylizeList(collection: Collection<T>, listFormat: MetaStylizer.ListFormat, placeholderKey: String, placeholderValue: (T) -> String): List<Component> {
+    private fun <T> stylizeList(
+        collection: Collection<T>,
+        listFormat: MetaStylizer.ListFormat,
+        placeholderKey: String,
+        placeholderValue: (T) -> String,
+    ): List<Component> {
         val values = collection.mapTo(ObjectArrayList(collection.size)) {
             miniMessage.deserialize(listFormat.single, Placeholder.parsed(placeholderKey, placeholderValue(it)))
         }

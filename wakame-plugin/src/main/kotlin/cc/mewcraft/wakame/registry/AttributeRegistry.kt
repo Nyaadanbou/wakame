@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.item.SchemeBaker
 import cc.mewcraft.wakame.item.SchemeBuilder
 import cc.mewcraft.wakame.item.ShadowTagDecoder
 import cc.mewcraft.wakame.item.ShadowTagEncoder
+import cc.mewcraft.wakame.registry.AttributeStructMeta.Format
 import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 
@@ -92,7 +93,7 @@ object AttributeRegistry : Initializable, Reloadable {
         build("movement_speed_rate", ShadowTagType.DOUBLE).single().bind(Attributes.MOVEMENT_SPEED_RATE)
     }
 
-    fun getMeta(key: Key): AttributeMeta {
+    fun getMeta(key: Key): AttributeStructMeta {
         TODO("implement attribute meta")
     }
 
@@ -105,7 +106,10 @@ object AttributeRegistry : Initializable, Reloadable {
     }
 }
 
-data class AttributeMeta(
+/**
+ * 属性结构体的元数据。
+ */
+data class AttributeStructMeta(
     /**
      * 数值的格式。
      */
@@ -116,6 +120,18 @@ data class AttributeMeta(
     val element: Boolean,
 ) {
     enum class Format { SINGLE, RANGED }
+}
+
+/**
+ * 属性结构体的所有类型。
+ */
+enum class AttributeStructType(
+    val meta: AttributeStructMeta,
+) {
+    SINGLE(AttributeStructMeta(Format.SINGLE, false)),
+    RANGED(AttributeStructMeta(Format.RANGED, false)),
+    SINGLE_ELEMENT(AttributeStructMeta(Format.SINGLE, true)),
+    RANGED_ELEMENT(AttributeStructMeta(Format.RANGED, true));
 }
 
 //<editor-fold desc="Builders">

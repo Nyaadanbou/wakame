@@ -12,6 +12,8 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import kotlin.reflect.KClass
 
+// TODO 统一 key 的生成实现
+
 internal class AbilityLineKeySupplierImpl : AbilityLineKeySupplier {
     override fun get(obj: BinaryAbilityCore): FullKey {
         // 技能在 NBT 中的 key 就是它在 renderer 配置文件中的 key

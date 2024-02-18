@@ -17,8 +17,6 @@ import java.io.File
 
 const val RENDERER_CONFIG_FILE = "renderer.yml"
 const val RENDERER_CONFIG_LOADER = "renderer_config_loader"
-const val RENDERER_SERIALIZERS = "renderer_serializers"
-const val FIXED_LORE_LINES = "fixed_lore_lines"
 
 fun displayModule(): Module = module {
 
@@ -26,17 +24,18 @@ fun displayModule(): Module = module {
     singleOf(::ItemRendererImpl) bind ItemRenderer::class
     singleOf(::ItemRendererListener)
 
-    // line index supplier
+    // line index lookup
     single<LineIndexLookup> {
         val loader = get<RendererConfiguration>()
         LineIndexLookupImpl(loader.loreLineIndexes)
     }
+
     // line key suppliers
     singleOf(::AbilityLineKeySupplierImpl) bind AbilityLineKeySupplier::class
     singleOf(::AttributeLineKeySupplierImpl) bind AttributeLineKeySupplier::class
     singleOf(::MetaLineKeySupplierImpl) bind MetaLineKeySupplier::class
 
-    // finalizer
+    // lore line finalizer
     single<LoreLineFinalizer> {
         val loader = get<RendererConfiguration>()
         LoreLineFinalizerImpl(get<LoreLineComparator>(), loader.fixedLoreLines)
@@ -56,21 +55,8 @@ fun displayModule(): Module = module {
         val loader = get<RendererConfiguration>()
         OperationStylizerImpl(loader.operationFormat)
     }
-    singleOf(::MetaStylizerImpl) bind MetaStylizer::class
-    singleOf(::NameStylizerImpl) bind NameStylizer::class
-
-    // configuration loader
-    single<NekoConfigurationLoader>(named(RENDERER_CONFIG_LOADER)) {
-        createRendererConfigurationLoader(RENDERER_CONFIG_FILE) {
-            // registerAll(get(named(RENDERER_SERIALIZERS)))
-        }
-    }
-
-    single<RendererConfiguration> { RendererConfiguration(get<NekoConfigurationLoader>(named(RENDERER_CONFIG_LOADER)), get()) }
-    
     single<MetaStylizer> {
         val loader = get<RendererConfiguration>()
-
         MetaStylizerImpl(
             nameFormat = loader.nameFormat,
             loreFormat = loader.loreFormat,
@@ -82,7 +68,19 @@ fun displayModule(): Module = module {
             skinOwnerFormat = loader.skinOwnerFormat,
         )
     }
+    singleOf(::NameStylizerImpl) bind NameStylizer::class
 
+    // configuration loader
+    single<NekoConfigurationLoader>(named(RENDERER_CONFIG_LOADER)) {
+        createRendererConfigurationLoader(RENDERER_CONFIG_FILE) {
+            // registerAll(get(named(RENDERER_SERIALIZERS)))
+        }
+    }
+
+    // configuration holder
+    single<RendererConfiguration> {
+        RendererConfiguration(get<NekoConfigurationLoader>(named(RENDERER_CONFIG_LOADER)), get())
+    }
 }
 
 private fun Scope.getConfigFileAsBufferedReader(path: String): BufferedReader {

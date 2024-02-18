@@ -45,6 +45,18 @@ internal interface AbilityStylizer {
  */
 internal interface AttributeStylizer {
     fun stylizeAttribute(core: BinaryAttributeCore): List<Component>
+
+    class AttackSpeedFormat(
+        val merged: String,
+        /**
+         * 必须包含9个元素，每个对应一个攻速等级，从慢到快按顺序排列。
+         */
+        val levels: List<String>,
+    ) {
+        override fun toString(): String {
+            return "AttackSpeedFormat(merged=$merged, levels=${levels.joinToString()})"
+        }
+    }
 }
 
 /**
@@ -86,9 +98,9 @@ internal interface MetaStylizer {
          * Never be an empty list. Use `null` to indicate "don't add bottom".
          */
         val bottom: List<String>?,
-    ){
+    ) {
         override fun toString(): String {
-            return "LoreFormat(line='$line', header=${header?.joinToString()}, bottom=${bottom?.joinToString()})"
+            return "LoreFormat(line=$line, header=${header?.joinToString()}, bottom=${bottom?.joinToString()})"
         }
     }
 
@@ -98,7 +110,7 @@ internal interface MetaStylizer {
         val separator: String,
     ) {
         override fun toString(): String {
-            return "ListFormat(merged='$merged', single='$single', separator='$separator')"
+            return "ListFormat(merged=$merged, single=$single, separator=$separator)"
         }
     }
 }

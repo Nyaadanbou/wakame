@@ -13,7 +13,7 @@ import org.slf4j.Logger
 
 internal class RendererConfiguration(
     loader: NekoConfigurationLoader,
-    private val logger: Logger
+    private val logger: Logger,
 ) : Reloadable {
     companion object {
         private const val RENDERER_ORDER = "renderer_order"
@@ -51,20 +51,25 @@ internal class RendererConfiguration(
     }
     //</editor-fold>
 
+    //<editor-fold desc="renderer_style.operation">
     val operationFormat by reloadable {
         val operationNode = root.node(RENDERER_STYLE, "operation")
         AttributeModifier.Operation.entries.associateWith { operation ->
             operationNode.node(operation.key).requireKt<String>()
         }
     }
+    //</editor-fold>
 
+    //<editor-fold desc="renderer_style.attribute">
     val attributeFormats by reloadable {
         val attributeNode = root.node(RENDERER_STYLE, "attribute")
         attributeNode.childrenMap()
             .mapKeys { (key, _) -> Key.key(key as String) }
             .mapValues { (_, node) -> node.requireKt<String>() }
     }
+    //</editor-fold>
 
+    //<editor-fold desc="renderer_order">
     private val _fixedLoreLines: MutableList<FixedLoreLine> = arrayListOf()
 
     val fixedLoreLines: List<FixedLoreLine>
@@ -128,15 +133,17 @@ internal class RendererConfiguration(
                 }
             }
 
-            val fullKeyList = loreIndex.computeFullKeys()
+            val fullKeys = loreIndex.computeFullKeys()
 
-            for ((fullKeyIndex, newKey) in fullKeyList.withIndex()){
+            for ((fullIndex, fullKey) in fullKeys.withIndex()) {
                 // 有添加失败 (例如不该重复的内容出现重复的了) 的情况就 throw
-                _loreLineIndexes.putIfAbsent(newKey, index + fullKeyIndex  /* 从0开始 */)
-                    ?.let { throw IllegalStateException("Key $newKey has already been added to orders, maybe your config is error?") }
+                require(_loreLineIndexes.putIfAbsent(fullKey, index /* rawIndex */ + fullIndex /* 从0开始 */) == null) {
+                    "Key $fullKey has already been added to index, maybe your config is wrong?"
+                }
             }
         }
     }
+    //</editor-fold>
 
     override fun onReload() {
         loadConfiguration()
