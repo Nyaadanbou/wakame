@@ -10,26 +10,21 @@ import net.kyori.examination.string.StringExaminer
 import org.intellij.lang.annotations.Pattern
 
 /**
- * A numerical value related to an entity such as a player or monster.
+ * An identifiable numerical value.
  *
- * This is also used to store an arbitrary value of an [Attribute]
- * type, which is often used in conjunction with the singleton object
- * [Attributes].
- *
- * For example, you can create a map, where the map keys are **constant**
- * instances from the singleton [Attributes] such as [Attributes.DEFENSE]
- * and [Attributes.MAX_HEALTH], and the map values are newly created
- * instances of [Attribute] by your own.
+ * By design, you should not create the instance yourself. Instead, use the singleton
+ * [Attributes] to get your expected instances. In most cases, instances of this class
+ * (and its subclasses, too) are solely used as references. The property values (such
+ * as [defaultValue]) do not matter for the code outside of this package.
  *
  * @see RangedAttribute
- * @see AttributeModifier
- * @see AttributeInstance
+ * @see ElementAttribute
  */
 open class Attribute @InternalApi constructor(
     /**
      * 属性的唯一标识。
      */
-    @Pattern("[a-z_]")
+    @Pattern("[a-z0-9_.]")
     val descriptionId: String,
     /**
      * 属性的默认数值。
@@ -59,8 +54,7 @@ open class Attribute @InternalApi constructor(
  * An [Attribute] with bounded values.
  */
 @OptIn(InternalApi::class)
-open class RangedAttribute
-@InternalApi constructor(
+open class RangedAttribute @InternalApi constructor(
     descriptionId: String,
     defaultValue: Double,
     /**
@@ -92,11 +86,10 @@ open class RangedAttribute
 }
 
 /**
- * An [Attribute] related to an element.
+ * An [Attribute] related to an [Element].
  */
 @OptIn(InternalApi::class)
-open class ElementAttribute
-@InternalApi constructor(
+open class ElementAttribute @InternalApi constructor(
     /**
      * 该属性所关联的元素种类。
      */

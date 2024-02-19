@@ -10,7 +10,7 @@ internal class LoreLineComparator(
         requireNotNull(o2)
         val o1Idx = loreIndexSupplier.get(o1.key)
         val o2Idx = loreIndexSupplier.get(o2.key)
-        return if (o1Idx < o2Idx) -1 else if (o1Idx > o2Idx) +1 else 0
+        return if (o1Idx < o2Idx) -1 else if (o1Idx > o2Idx) 1 else 0
     }
 }
 

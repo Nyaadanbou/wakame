@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
@@ -49,7 +50,7 @@ fun displayModule(): Module = module {
     singleOf(::AbilityStylizerImpl) bind AbilityStylizer::class
     single<AttributeStylizer> {
         val loader = get<RendererConfiguration>()
-        AttributeStylizerImpl(loader.attributeFormats, TODO("construct the Map of attack speed format"), get())
+        AttributeStylizerImpl(loader.attributeFormats, loader.attackSpeedFormat, get())
     }
     single<OperationStylizer> {
         val loader = get<RendererConfiguration>()
@@ -79,7 +80,10 @@ fun displayModule(): Module = module {
 
     // configuration holder
     single<RendererConfiguration> {
-        RendererConfiguration(get<NekoConfigurationLoader>(named(RENDERER_CONFIG_LOADER)), get())
+        RendererConfiguration(
+            get<NekoConfigurationLoader>(named(RENDERER_CONFIG_LOADER)),
+            get(named(MINIMESSAGE_FULL))
+        )
     }
 }
 

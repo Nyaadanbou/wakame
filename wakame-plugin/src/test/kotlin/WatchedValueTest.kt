@@ -1,8 +1,10 @@
 import cc.mewcraft.wakame.util.*
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,7 +14,7 @@ class WatchedValueTest {
     companion object {
         @JvmStatic
         @BeforeAll
-        fun setUp() {
+        fun setup() {
             startKoin {
                 modules(
                     module {
@@ -22,6 +24,12 @@ class WatchedValueTest {
                     }
                 )
             }
+        }
+
+        @JvmStatic
+        @AfterAll
+        fun tearDown() {
+            stopKoin()
         }
     }
 

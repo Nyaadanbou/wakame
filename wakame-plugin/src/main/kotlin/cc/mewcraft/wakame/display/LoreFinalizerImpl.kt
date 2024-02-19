@@ -6,7 +6,7 @@ import net.kyori.adventure.text.Component
 
 internal class LoreFinalizerImpl(
     private val comparator: LoreLineComparator,
-    private val fixedLines: List<FixedLoreLine>,
+    private val fixedLines: Collection<FixedLoreLine>,
 ) : LoreFinalizer {
     override fun finalize(loreLines: Collection<LoreLine>): List<Component> {
         val holder = ObjectRBTreeSet(comparator)

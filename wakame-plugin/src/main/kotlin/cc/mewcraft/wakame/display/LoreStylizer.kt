@@ -47,14 +47,17 @@ internal interface AttributeStylizer {
     fun stylizeAttribute(core: BinaryAttributeCore): List<Component>
 
     class AttackSpeedFormat(
+        /**
+         * 攻速的格式，里面应该有一个 "<value>" 的占位符。
+         */
         val merged: String,
         /**
          * 必须包含9个元素，每个对应一个攻速等级，从慢到快按顺序排列。
          */
-        val levels: List<String>,
+        val levels: Map<Int, String>,
     ) {
         override fun toString(): String {
-            return "AttackSpeedFormat(merged=$merged, levels=${levels.joinToString()})"
+            return "AttackSpeedFormat(merged=$merged, levels=${levels.entries.joinToString { it.toString() }})"
         }
     }
 }
@@ -63,7 +66,7 @@ internal interface AttributeStylizer {
  * To be used by [LoreStylizer].
  */
 internal interface OperationStylizer {
-    fun stylizeValue(value: Double, operation: AttributeModifier.Operation): String
+    fun stylizeValue(value: String, operation: AttributeModifier.Operation): String
 }
 
 /**

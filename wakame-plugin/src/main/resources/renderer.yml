@@ -127,43 +127,42 @@ renderer_style:
   # 则你需要对每一个 lore_renderer_style.X.Y 都创建一个 MiniMessage 实例
 
   meta:
-    name: "<name>"
-    level: "等级: <level>"
-    rarity: "稀有度: <rarity>"
+    name: "<value>"
+    level: "等级: <value>"
+    rarity: "稀有度: <value>"
     element:
       merged: "元素: <merged>"
-      single: "<element>"
+      single: "<single>"
       separator: "*"
     kizami:
       merged: "铭刻: <merged>"
-      single: "<kizami>"
+      single: "<single>"
       separator: "*"
-    skin: "皮肤: <skin>"
-    skin_owner: "皮肤所有者: <skin_owner>"
+    skin: "皮肤: <value>"
+    skin_owner: "皮肤所有者: <value>"
     lore:
       header: [ ] # 空列表代表完全没有，不代表空行
       line: "<line>"
       bottom: [ ]
 
+  cell:
+    empty: "空词条栏"
+
   # To g22:
   # 这个的解析需要运行在 attribute 解析的“内部”，也就是*用于*实现 TagResolver
   # 因此，这里用 Java 的 String.format() 就够了，不需要实现新的 TagResolver
   operation:
-    add: "%f"
-    multiply_base: "%f%% (base)"
-    multiply_total: "%f%% (total)"
+    add: "%s"
+    multiply_base: "%s%% (base)"
+    multiply_total: "%s%% (total)"
 
   attribute:
-    attack_damage: "<element>元素攻击: <min> - <max>"
-
-    # To g22: 对于本身表示“率”的属性，不能直接显示小数，需要转换成百分制
-    # 这一点在实现 TagResolver 的时候，特别考虑一下就可以了
-    attack_effect_chance: "元素叠加: <value:0%>"
-
+    attack_damage: "<element>元素攻击: <min:+#;-.> - <max:+#;-.>"
+    attack_effect_chance: "元素叠加: <value:+#.#%;-.%>"
     attack_speed_level:
       merged: "攻击速度: <value>"
       levels:
-        0: "究极慢"
+        0: "<red>究极慢"
         1: "超级慢"
         2: "很慢"
         3: "慢"
@@ -171,21 +170,28 @@ renderer_style:
         5: "快"
         6: "非常快"
         7: "超级快"
-        8: "究极快"
-    critical_strike_chance: "暴击概率: <value:0%>"
-    critical_strike_power: "暴击伤害: <value:0%>"
-    damage_reduction_rate: "伤害承受: <value:0%>"
-    defense: "<element>防御力: <value>"
-    defense_penetration: "<element>防御穿透: <value>"
-    defense_penetration_rate: "<element>防御穿透率: <value:0%>"
-    health_regeneration: "生命恢复: <value>"
-    lifesteal: "攻击吸血: <value>"
-    lifesteal_rate: "攻击吸血率: <value:0%>"
-    mana_consumption_rate: "魔法消耗: <value:0%>"
-    mana_regeneration: "魔法恢复: <value>"
-    manasteal: "魔法汲取: <value>"
-    manasteal_rate: "魔法汲取率: <value:0%>"
-    max_absorption: "最大护盾: <value>"
-    max_health: "最大生命: <value>"
-    max_mana: "最大魔法: <value>"
-    movement_speed_rate: "移动速率: <value:0%>"
+        8: "<green>究极快"
+    critical_strike_chance: "暴击概率: <value:+#.#%;-.%>"
+    critical_strike_power: "暴击伤害: <value:+#.#%;-.%>"
+    damage_reduction_rate: "伤害承受: <value:+#.#%;-.%>"
+    defense: "<element>防御力: <value:+#;-.>"
+    defense_penetration: "<element>防御穿透: <value:+#;-.>"
+    defense_penetration_rate: "<element>防御穿透率: <value:+#.#%;-.%>"
+    health_regeneration: "生命恢复: <value:+#;-.>"
+    lifesteal: "攻击吸血: <value:+#;-.>"
+    lifesteal_rate: "攻击吸血率: <value:+#.#%;-.%>"
+    mana_consumption_rate: "魔法消耗: <value:+#.#%;-.%>"
+    mana_regeneration: "魔法恢复: <value:+#;-.>"
+    manasteal: "魔法汲取: <value:+#;-.>"
+    manasteal_rate: "魔法汲取率: <value:+#.#%;-.%>"
+    max_absorption: "最大护盾: <value:+#;-.>"
+    max_health: "最大生命: <value:+#;-.>"
+    max_mana: "最大魔法: <value:+#;-.>"
+    movement_speed_rate: "移动速率: <value:+#.#%;-.%>"
+
+  ability:
+    base:
+      mana: "魔耗: <value>"
+      cooldown: "冷却: <value>"
+    blink:
+      distance: "距离: <value>"

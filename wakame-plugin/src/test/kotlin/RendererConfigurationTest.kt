@@ -1,9 +1,21 @@
+import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display.RendererConfiguration
 import cc.mewcraft.wakame.display.displayModule
+import cc.mewcraft.wakame.element.elementModule
+import cc.mewcraft.wakame.item.itemModule
+import cc.mewcraft.wakame.kizami.kizamiModule
+import cc.mewcraft.wakame.rarity.rarityModule
+import cc.mewcraft.wakame.reference.referenceModule
+import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.skin.skinModule
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.test.KoinTest
@@ -17,23 +29,50 @@ class RendererConfigurationTest : KoinTest {
     companion object {
         @JvmStatic
         @BeforeAll
-        fun setUp() {
+        fun setup() {
             startKoin {
                 modules(
                     module {
                         single<File>(named(PLUGIN_DATA_DIR)) {
-                            Path.of("src/main/resources").toFile().absoluteFile.also {
-                                println(it)
+                            Path.of("src/main/resources").toFile().absoluteFile.also { println(it)
                             }
                         }
 
                         single<Logger> {
                             LoggerFactory.getLogger("RendererConfigurationTest")
                         }
+
+                        single<MiniMessage>(named(MINIMESSAGE_FULL)) { MiniMessage.miniMessage() }
+                        single<GsonComponentSerializer> { GsonComponentSerializer.gson() }
                     },
-                    displayModule()
+                )
+
+                // this module
+                modules(displayModule())
+
+                // dependencies
+                modules(
+                    elementModule(),
+                    kizamiModule(),
+                    registryModule(),
+                    rarityModule(),
+                    skinModule()
                 )
             }
+
+            // initialize attribute facades
+            AttributeRegistry.onPreWorld()
+
+            // initialize necessary registry
+            ElementRegistry.onPreWorld()
+            KizamiRegistry.onPreWorld()
+            RarityRegistry.onPreWorld()
+        }
+
+        @JvmStatic
+        @AfterAll
+        fun tearDown() {
+            stopKoin()
         }
     }
 
@@ -42,6 +81,7 @@ class RendererConfigurationTest : KoinTest {
         val loader: RendererConfiguration by inject()
         loader.onReload()
 
+        val allLoreIndexes = loader.allLoreIndexes
         val loreLineIndexes = loader.loreLineIndexes
         val fixedLoreLines = loader.fixedLoreLines
 
@@ -54,9 +94,14 @@ class RendererConfigurationTest : KoinTest {
         val skinFormat = loader.skinFormat
         val skinOwnerFormat = loader.skinOwnerFormat
         val operationFormat = loader.operationFormat
+        val attributeFormats = loader.attributeFormats
+        val attackSpeedFormat = loader.attackSpeedFormat
 
+        println(allLoreIndexes)
         println(loreLineIndexes)
         println(fixedLoreLines)
+
+        println("=====================================")
 
         println(nameFormat)
         println(loreFormat)
@@ -67,5 +112,7 @@ class RendererConfigurationTest : KoinTest {
         println(skinFormat)
         println(skinOwnerFormat)
         println(operationFormat)
+        println(attributeFormats)
+        println(attackSpeedFormat)
     }
 }

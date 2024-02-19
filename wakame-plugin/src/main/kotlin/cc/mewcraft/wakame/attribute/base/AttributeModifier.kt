@@ -41,7 +41,11 @@ data class AttributeModifier(
             )
 
             fun byKey(key: String): Operation {
-                return requireNotNull(OPERATIONS_MAP[key]) { "No operation with key $key" }
+                return requireNotNull(byKeyOrNull(key)) { "No operation with key $key" }
+            }
+
+            fun byKeyOrNull(key: String): Operation? {
+                return OPERATIONS_MAP[key]
             }
 
             fun byId(id: Int): Operation {

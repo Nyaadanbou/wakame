@@ -16,19 +16,19 @@ import kotlin.reflect.KClass
 
 internal class AbilityLineKeySupplierImpl : AbilityLineKeySupplier {
     override fun get(obj: BinaryAbilityCore): FullKey {
-        // 技能在 NBT 中的 key 就是它在 renderer 配置文件中的 key
+        // 技能在 NBT 中的 key 就是它的 full key
         return obj.key
     }
 }
 
 internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     /**
-     * Full Keys in this map are indexed by `key` + `operation`.
+     * Full Keys in this map are double-indexed: `key` + `operation`.
      */
     private val cachedFullKeys: Object2ObjectOpenHashMap<Key, Reference2ObjectOpenHashMap<AttributeModifier.Operation, FullKey>> = Object2ObjectOpenHashMap()
 
     /**
-     * Full Keys in this map are indexed by `key` + `operation` + `element`.
+     * Full Keys in this map are triple-indexed: `key` + `operation` + `element`.
      */
     private val cachedFullKeysWithElement: Object2ObjectOpenHashMap<Key, Reference2ObjectOpenHashMap<AttributeModifier.Operation, Reference2ObjectOpenHashMap<Element, FullKey>>> = Object2ObjectOpenHashMap()
 
@@ -38,12 +38,12 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     private fun put(key: Key, operation: AttributeModifier.Operation, element: Element? = null, fullKey: FullKey) {
         if (element == null) {
             cachedFullKeys
-                .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) } // Operation 最多3个
+                .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) } // 运算模式最多3个
                 .put(operation, fullKey)
         } else {
             cachedFullKeysWithElement
                 .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) }
-                .getOrPut(operation) { Reference2ObjectOpenHashMap(8, 0.9f) } // Element 一般最多8个
+                .getOrPut(operation) { Reference2ObjectOpenHashMap(8, 0.9f) } // 元素一般最多8个
                 .put(element, fullKey)
         }
     }
@@ -104,12 +104,10 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     }
 
     override fun get(obj: BinaryAttributeCore): FullKey {
-        // 属性的 full key 需要根据 id + operation + element 共同决定
-
-        // 我们用这里的参数构建一个 full key.
-        // 属性的 full key 的格式目前只有两种
-        // 1. attribute:_id_/_operation             也就是  id + operation
-        // 2. attribute:_id_/_operation_/_element_  也就是  id + operation + element
+        // 属性的 full key 根据 id + operation + element 共同决定
+        // 属性的 full key 格式目前只有两种
+        // 1. attribute:_id_/_operation
+        // 2. attribute:_id_/_operation_/_element_
 
         val key = obj.key
         val operation = obj.value.operation
@@ -132,7 +130,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
 
 internal class MetaLineKeySupplierImpl : MetaLineKeySupplier {
     override fun get(obj: KClass<out SchemeMeta<*>>): FullKey {
-        // 模板元数据的 key 就是它在 renderer 配置文件中的 key
+        // 模板元数据的 key 就是它的 full key
         return SchemeMetaKeys.get(obj)
     }
 }

@@ -6,12 +6,15 @@ import org.jetbrains.annotations.NotNull;
 
 public class NekoReloadEvent extends Event {
 
-    public NekoReloadEvent() {super(false);}
-
     private static final @NotNull HandlerList HANDLERS = new HandlerList();
+
+    public static @NotNull HandlerList getHandlerList() {
+        return HANDLERS;
+    }
 
     @Override
     public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
+
 }

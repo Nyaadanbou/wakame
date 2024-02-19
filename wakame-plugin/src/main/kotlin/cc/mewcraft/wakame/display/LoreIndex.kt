@@ -34,15 +34,27 @@ internal sealed interface LoreIndex {
 }
 
 /**
- * 代表当源数据不存在时，改用空行替代的一行。
+ * 代表一个当源数据不存在时改用空行替代的顺序。
+ *
+ * @param loreIndex 原来的 loreIndex
  */
-// TODO 理论上除了固定内容(FixedLoreLine)，都需要继承这个接口
-internal sealed interface FallbackLoreIndex : LoreIndex {
-    val sourceFullKey: FullKey
+internal class FallbackLoreIndex(
+    private val loreIndex: LoreIndex,
+) : LoreIndex {
+    override val rawKey: RawKey = loreIndex.rawKey
+    override val rawIndex: Int = loreIndex.rawIndex
+    override fun computeFullKeys(): List<FullKey> = loreIndex.computeFullKeys()
+
+    fun fallback(): EmptyFixedLoreIndex {
+        return EmptyFixedLoreIndex(rawIndex)
+    }
 }
 
 /**
- * 代表其内容始终固定不变的一行的索引。
+ * 代表一个固定内容的顺序。
+ *
+ * @see CustomFixedLoreIndex
+ * @see EmptyFixedLoreIndex
  */
 internal sealed interface FixedLoreIndex : LoreIndex {
     override val rawKey: RawKey
@@ -58,47 +70,23 @@ internal sealed interface FixedLoreIndex : LoreIndex {
     }
 }
 
-internal data class AttributeLoreIndex(
-    override val rawKey: RawKey,
-    override val rawIndex: Int,
-) : LoreIndex {
-
-    override fun computeFullKeys(): List<FullKey> {
-        /*
-         * 根据以下衍生规则：
-         *    - attribute:id
-         *    - attribute:id:operation
-         *    - attribute:id:operation:element
-         * 为该属性生成所有的 full keys
-         */
-
-        val ret = mutableListOf<FullKey>()
-        val meta = AttributeRegistry.getMeta(rawKey)
-
-        for (operation in AttributeModifier.Operation.entries.map { it.key }) {
-            // FIXME 根据 renderer_order.operation 定义的顺序添加 运算模式
-            ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation"))
-
-            if (meta.element) {
-                // FIXME 根据 renderer_order.element 定义的顺序添加 元素
-                for (element in ElementRegistry.values) {
-                    ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation.${element.key}"))
-                }
-            }
-        }
-
-        return ret
-    }
-}
-
+/**
+ * 代表一个自定义的固定内容的顺序。
+ */
 internal data class CustomFixedLoreIndex(
     override val rawIndex: Int,
 ) : FixedLoreIndex
 
+/**
+ * 代表一个空的固定内容的顺序。
+ */
 internal data class EmptyFixedLoreIndex(
     override val rawIndex: Int,
 ) : FixedLoreIndex
 
+/**
+ * 代表一个元数据的顺序。
+ */
 internal data class MetaLoreIndex(
     override val rawKey: RawKey,
     override val rawIndex: Int,
@@ -108,11 +96,61 @@ internal data class MetaLoreIndex(
     }
 }
 
+/**
+ * 代表一个技能的顺序。
+ */
 internal data class AbilityLoreIndex(
     override val rawKey: RawKey,
     override val rawIndex: Int,
 ) : LoreIndex {
     override fun computeFullKeys(): List<FullKey> {
         return listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
+    }
+}
+
+/**
+ * 代表一个属性的顺序。
+ */
+internal data class AttributeLoreIndex(
+    override val rawKey: RawKey,
+    override val rawIndex: Int,
+    /**
+     * 表示配置文件内 operation 与 element 顺序的规则
+     */
+    val rule: Rule,
+) : LoreIndex {
+
+    data class Rule(
+        val operationIndex: List<String>,
+        val elementIndex: List<String>
+    )
+
+    /**
+     * 根据以下衍生规则:
+     *   - attribute:id
+     *   - attribute:id:operation
+     *   - attribute:id:operation:element
+     *
+     * 为该属性生成所有的 full keys
+     */
+    override fun computeFullKeys(): List<FullKey> {
+        val ret = mutableListOf<FullKey>()
+        val meta = AttributeRegistry.getMeta(rawKey)
+
+        for (operation in rule.operationIndex) {
+            if (AttributeModifier.Operation.byKeyOrNull(operation) == null) continue
+
+            ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation"))
+
+            if (meta.element) {
+                for (element in rule.elementIndex) {
+                    if (ElementRegistry.get(element) == null) continue
+
+                    ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation.$element"))
+                }
+            }
+        }
+
+        return ret
     }
 }

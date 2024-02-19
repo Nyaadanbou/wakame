@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.WakamePlugin
-import cc.mewcraft.wakame.display.RENDERER_SERIALIZERS
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.scheme.CELL_SERIALIZERS

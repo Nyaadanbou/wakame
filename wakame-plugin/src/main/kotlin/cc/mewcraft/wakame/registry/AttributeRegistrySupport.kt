@@ -16,10 +16,13 @@ import com.google.common.collect.ImmutableMap
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
+import java.lang.invoke.MethodHandle
+import java.lang.invoke.MethodHandles
 import java.util.EnumMap
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.primaryConstructor
 
+// TODO use MethodHandle for better reflection performance
 
 // Map Value's KFunction Type: Map<ShadowTagType, CompoundShadowTag.(String, Number) -> Unit>
 private val TAG_TYPE_2_TAG_SETTER_MAP: Map<ShadowTagType, KFunction<Unit>> = @Suppress("DuplicatedCode") buildMap {
@@ -96,7 +99,7 @@ internal class SingleSelectionImpl(
             scheme as SchemeAttributeValueS
             val value = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(shadowTagType).call(scheme.value.calculate(factor))
             val operation = scheme.operation
-            constructBinaryValue<BinaryAttributeValueS<Number>>(value, operation)
+            constructBinaryValue<BinaryAttributeValueS<*>>(value, operation)
         }
 
         // register shadow tag encoder
@@ -114,7 +117,7 @@ internal class SingleSelectionImpl(
             shadowTag as CompoundShadowTag
             val value = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(shadowTagType).call(shadowTag, NekoTags.Attribute.VAL)
             val operation = shadowTag.getOperation(NekoTags.Attribute.OPERATION)
-            constructBinaryValue<BinaryAttributeValueS<Number>>(value, operation)
+            constructBinaryValue<BinaryAttributeValueS<*>>(value, operation)
         }
 
         // register attribute factory
@@ -125,6 +128,9 @@ internal class SingleSelectionImpl(
                 AttributeModifier(uuid, value.value.toStableDouble(), value.operation)
             )
         }
+
+        // register attribute struct meta
+        AttributeRegistry.attributeStructRegistry[key] = AttributeStructMeta(AttributeStructMeta.Format.SINGLE, false)
     }
 }
 
@@ -153,7 +159,7 @@ internal class RangedSelectionImpl(
             val lower = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(shadowTagType).call(scheme.lower.calculate(factor))
             val upper = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(shadowTagType).call(scheme.upper.calculate(factor))
             val operation = scheme.operation
-            constructBinaryValue<BinaryAttributeValueLU<Number>>(lower, upper, operation)
+            constructBinaryValue<BinaryAttributeValueLU<*>>(lower, upper, operation)
         }
 
         // register shadow tag encoder
@@ -173,7 +179,7 @@ internal class RangedSelectionImpl(
             val lower = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(shadowTagType).call(shadowTag, NekoTags.Attribute.MIN)
             val upper = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(shadowTagType).call(shadowTag, NekoTags.Attribute.MAX)
             val operation = shadowTag.getOperation(NekoTags.Attribute.OPERATION)
-            constructBinaryValue<BinaryAttributeValueLU<Number>>(lower, upper, operation)
+            constructBinaryValue<BinaryAttributeValueLU<*>>(lower, upper, operation)
         }
 
         // register attribute factory
@@ -186,6 +192,9 @@ internal class RangedSelectionImpl(
                 AttributeModifier(uuid, value.upper.toStableDouble(), value.operation),
             )
         }
+
+        // register attribute struct meta
+        AttributeRegistry.attributeStructRegistry[key] = AttributeStructMeta(AttributeStructMeta.Format.RANGED, false)
     }
 }
 
@@ -210,7 +219,7 @@ internal class SingleElementAttributeBinderImpl(
             val value = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(shadowTagType).call(scheme.value.calculate(factor))
             val element = scheme.element
             val operation = scheme.operation
-            constructBinaryValue<BinaryAttributeValueSE<Number>>(value, element, operation)
+            constructBinaryValue<BinaryAttributeValueSE<*>>(value, element, operation)
         }
 
         // register shadow tag encoder
@@ -230,7 +239,7 @@ internal class SingleElementAttributeBinderImpl(
             val value = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(shadowTagType).call(shadowTag, NekoTags.Attribute.VAL)
             val element = shadowTag.getElement(NekoTags.Attribute.ELEMENT)
             val operation = shadowTag.getOperation(NekoTags.Attribute.OPERATION)
-            constructBinaryValue<BinaryAttributeValueSE<Number>>(value, element, operation)
+            constructBinaryValue<BinaryAttributeValueSE<*>>(value, element, operation)
         }
 
         // register attribute factory
@@ -241,6 +250,9 @@ internal class SingleElementAttributeBinderImpl(
                 AttributeModifier(uuid, value.value.toStableDouble(), value.operation)
             )
         }
+
+        // register attribute struct meta
+        AttributeRegistry.attributeStructRegistry[key] = AttributeStructMeta(AttributeStructMeta.Format.SINGLE, true)
     }
 }
 
@@ -267,7 +279,7 @@ internal class RangedElementAttributeBinderImpl(
             val upper = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(shadowTagType).call(scheme.upper.calculate(factor))
             val element = scheme.element
             val operation = scheme.operation
-            constructBinaryValue<BinaryAttributeValueLUE<Number>>(lower, upper, element, operation)
+            constructBinaryValue<BinaryAttributeValueLUE<*>>(lower, upper, element, operation)
         }
 
         // register shadow tag encoder
@@ -289,7 +301,7 @@ internal class RangedElementAttributeBinderImpl(
             val upper = TAG_TYPE_2_TAG_GETTER_MAP.getOrThrow(shadowTagType).call(shadowTag, NekoTags.Attribute.MAX)
             val element = shadowTag.getElement(NekoTags.Attribute.ELEMENT)
             val operation = shadowTag.getOperation(NekoTags.Attribute.OPERATION)
-            constructBinaryValue<BinaryAttributeValueLUE<Number>>(lower, upper, element, operation)
+            constructBinaryValue<BinaryAttributeValueLUE<*>>(lower, upper, element, operation)
         }
 
         // register attribute factory
@@ -302,5 +314,8 @@ internal class RangedElementAttributeBinderImpl(
                 AttributeModifier(uuid, value.upper.toStableDouble(), value.operation),
             )
         }
+
+        // register attribute struct meta
+        AttributeRegistry.attributeStructRegistry[key] = AttributeStructMeta(AttributeStructMeta.Format.RANGED, true)
     }
 }

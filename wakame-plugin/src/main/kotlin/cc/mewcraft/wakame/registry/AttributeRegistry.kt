@@ -28,6 +28,7 @@ import net.kyori.adventure.key.Key
  * - [ShadowTagEncoder]
  * - [ShadowTagDecoder]
  * - [AttributeModifierFactory]
+ * - [AttributeStructMeta]
  *
  * Check their kdoc for what they do.
  */
@@ -50,6 +51,9 @@ object AttributeRegistry : Initializable, Reloadable {
 
     @InternalApi
     val attributeFactoryRegistry: MutableMap<Key, AttributeModifierFactory> = hashMapOf()
+
+    @InternalApi
+    val attributeStructRegistry: MutableMap<Key, AttributeStructMeta> = hashMapOf()
 
     /**
      * Registers an attribute facade.
@@ -93,8 +97,9 @@ object AttributeRegistry : Initializable, Reloadable {
         build("movement_speed_rate", ShadowTagType.DOUBLE).single().bind(Attributes.MOVEMENT_SPEED_RATE)
     }
 
+    @OptIn(InternalApi::class)
     fun getMeta(key: Key): AttributeStructMeta {
-        TODO("implement attribute meta")
+        return attributeStructRegistry[key] ?: error("Attribute $key not found")
     }
 
     override fun onPreWorld() {
