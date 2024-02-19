@@ -23,13 +23,22 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.minimessage.Context
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.minimessage.tag.ParserDirective
+import net.kyori.adventure.text.minimessage.tag.Tag
+import net.kyori.adventure.text.minimessage.tag.TagPattern
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
+import java.util.Locale
 import java.util.UUID
 
 // TODO 所有的 stylizer 应该尽可能的实现缓存机制
@@ -100,10 +109,35 @@ internal class AttributeStylizerImpl(
      * 攻击速度的渲染格式。
      */
     private val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat,
+    /**
+     * 运算模式的渲染实现。
+     */
     private val operationStylizer: OperationStylizer,
 ) : KoinComponent, AttributeStylizer {
 
     private val miniMessage: MiniMessage by inject(named(MINIMESSAGE_FULL))
+
+    private fun number(@TagPattern key: String, number: Number, operation: Operation): TagResolver {
+        return TagResolver.resolver(key) { argumentQueue: ArgumentQueue, context: Context ->
+            val decimalFormat: NumberFormat
+            if (argumentQueue.hasNext()) {
+                val locale = argumentQueue.pop().value()
+                if (argumentQueue.hasNext()) {
+                    val format = argumentQueue.pop().value()
+                    decimalFormat = DecimalFormat(format, DecimalFormatSymbols(Locale.forLanguageTag(locale)))
+                } else {
+                    decimalFormat = if (locale.contains(".")) {
+                        DecimalFormat(locale, DecimalFormatSymbols.getInstance())
+                    } else {
+                        DecimalFormat.getInstance(Locale.forLanguageTag(locale))
+                    }
+                }
+            } else {
+                decimalFormat = DecimalFormat.getInstance()
+            }
+            Tag.inserting(context.deserialize(decimalFormat.format(number)))
+        }
+    }
 
     override fun stylizeAttribute(core: BinaryAttributeCore): List<Component> {
         // 先拿到 key，获取到对应的 format (String)
@@ -134,7 +168,7 @@ internal class AttributeStylizerImpl(
                 AttributeStructType.SINGLE -> {
                     value as BinaryAttributeValueS<*>
                     tagResolvers.resolver(
-                        Formatter.number("value", value.value)
+                        Formatter.number("value", value.value) // FIXME 用 Formatter.number 渲染的话，就没办法加百分号了，除非自己写个 TagResolver
                     )
                 }
 
@@ -225,7 +259,7 @@ internal class MetaStylizerImpl(
     /**
      * A generic function to stylize any list of objects.
      */
-    private fun <T> stylizeList(
+    private inline fun <T> stylizeList(
         collection: Collection<T>,
         listFormat: MetaStylizer.ListFormat,
         placeholderKey: String,

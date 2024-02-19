@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.display
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 
-internal interface LoreLineFinalizer {
+internal interface LoreFinalizer {
 
     /**
      * Finalizes the [lore lines][loreLines] so that it's converted to a list

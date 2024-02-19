@@ -106,6 +106,7 @@ object AttributeRegistry : Initializable, Reloadable {
     }
 }
 
+//<editor-fold desc="Struct">
 /**
  * 属性结构体的元数据。
  */
@@ -133,8 +134,9 @@ enum class AttributeStructType(
     SINGLE_ELEMENT(AttributeStructMeta(Format.SINGLE, true)),
     RANGED_ELEMENT(AttributeStructMeta(Format.RANGED, true));
 }
+//</editor-fold>
 
-//<editor-fold desc="Builders">
+//<editor-fold desc="Builder">
 interface FormatSelection {
     fun single(): SingleSelection
     fun ranged(): RangedSelection

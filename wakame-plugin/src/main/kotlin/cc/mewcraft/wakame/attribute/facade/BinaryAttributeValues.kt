@@ -43,7 +43,7 @@ interface BinaryAttributeValueElement : BinaryAttributeValue {
 /**
  * 快速查询属性数据的格式。
  */
-internal val BinaryAttributeValue.format: AttributeStructMeta.Format
+val BinaryAttributeValue.format: AttributeStructMeta.Format
     get() = when (this) {
         is BinaryAttributeValueSingle<*> -> AttributeStructMeta.Format.SINGLE
         is BinaryAttributeValueRanged<*> -> AttributeStructMeta.Format.RANGED
@@ -53,16 +53,17 @@ internal val BinaryAttributeValue.format: AttributeStructMeta.Format
 /**
  * 快速查询属性数据是否带元素。
  */
-internal val BinaryAttributeValue.elemental: Boolean
+val BinaryAttributeValue.elemental: Boolean
     get() = this is BinaryAttributeValueElement
 
 /**
  * 快速获得属性数据的元素类型。
  */
-internal val BinaryAttributeValue.elementOrNull: Element?
+val BinaryAttributeValue.elementOrNull: Element?
     get() = (this as? BinaryAttributeValueElement)?.element
 
-////// 以下实现考虑了属性可能拥有的全部数据结构
+//<editor-fold desc="Implementations">
+/* 以下实现考虑了属性可能拥有的全部数据结构 */
 
 data class BinaryAttributeValueS<T : Number>(
     override var value: T, override var operation: AttributeModifier.Operation,
@@ -87,3 +88,4 @@ data class BinaryAttributeValueLUE<T : Number>(
 ) : BinaryAttributeValueRanged<T>, BinaryAttributeValueElement {
     override val structType: AttributeStructType = AttributeStructType.RANGED_ELEMENT
 }
+//</editor-fold>

@@ -9,11 +9,9 @@ import kotlin.reflect.KClass
 @InternalApi("Use the subclasses instead")
 internal sealed interface LineKeySupplier<T> {
     /**
-     * 根据某种规则为 [obj] 生成唯一的标识。
+     * 根据某种规则为特定的 [obj] 生成唯一的标识。
      *
-     * 实现上，通过此标识就可以找到一行文本内容在 lore 中的顺序。
-     *
-     * @see LineIndexLookup.get
+     * 你可以用该函数所返回的 [FullKey] 配合 [LoreIndexLookup] 找到其在 Item Lore 中的顺序。
      */
     fun get(obj: T): FullKey
 }

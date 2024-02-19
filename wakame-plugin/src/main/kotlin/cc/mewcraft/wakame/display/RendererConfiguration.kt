@@ -84,52 +84,53 @@ internal class RendererConfiguration(
         _fixedLoreLines.clear()
         _loreLineIndexes.clear()
 
-        val loreOrderNode = root.node(RENDERER_ORDER)
+        val primaryList = root.node(RENDERER_ORDER).node("primary").requireKt<List<String>>()
 
-        val primaryList = loreOrderNode.node("primary").requireKt<List<String>>()
-
-        for ((index, key) in primaryList.withIndex()) {
+        for ((rawIndex, rawKey) in primaryList.withIndex()) {
             val loreIndex: LoreIndex = when {
-                key.startsWith(RENDERER_FIXED_LORE_SYMBOL) -> {
-                    _fixedLoreLines.add(FixedLoreLineImpl(RawKey.key(index.toString()), listOf(key.substringAfter(RENDERER_FIXED_LORE_SYMBOL).mini)))
-                    FixedLoreIndex(
-                        rawIndex = index,
-                        isEmptyLine = false
-                    )
+                rawKey.startsWith(RENDERER_FIXED_LORE_SYMBOL) -> {
+                    CustomFixedLoreIndex(
+                        rawIndex = rawIndex,
+                    ).also {
+                        _fixedLoreLines.add(FixedLoreLineImpl(it.computeFullKeys().first(), listOf(rawKey.substringAfter(RENDERER_FIXED_LORE_SYMBOL).mini)))
+                    }
                 }
 
-                key == RENDERER_CONDITION_LORE_SYMBOL -> {
-                    _fixedLoreLines.add(FixedLoreLineImpl(RawKey.key(index.toString()), listOf(Component.empty())))
-                    FixedLoreIndex(
-                        rawIndex = index,
-                        isEmptyLine = true
-                    )
+                rawKey.length > 1 && rawKey.startsWith(RENDERER_CONDITION_LORE_SYMBOL) -> {
+                    TODO("实现按条件插入的空行")
                 }
 
-                key.startsWith("meta:") -> {
+                rawKey == RENDERER_CONDITION_LORE_SYMBOL -> {
+                    EmptyFixedLoreIndex(
+                        rawIndex = rawIndex,
+                    ).also {
+                        _fixedLoreLines.add(FixedLoreLineImpl(it.computeFullKeys().first(), listOf(Component.empty())))
+                    }
+                }
+
+                rawKey.startsWith("meta:") -> {
                     MetaLoreIndex(
-                        rawKey = RawKey.key(key),
-                        rawIndex = index
+                        rawKey = RawKey.key(rawKey),
+                        rawIndex = rawIndex
                     )
                 }
 
-                key.startsWith("attribute:") -> {
+                rawKey.startsWith("attribute:") -> {
                     AttributeLoreIndex(
-                        rawKey = RawKey.key(key),
-                        rawIndex = index
+                        rawKey = RawKey.key(rawKey),
+                        rawIndex = rawIndex
                     )
                 }
 
-                key.startsWith("ability:") -> {
+                rawKey.startsWith("ability:") -> {
                     AbilityLoreIndex(
-                        rawKey = RawKey.key(key),
-                        rawIndex = index
+                        rawKey = RawKey.key(rawKey),
+                        rawIndex = rawIndex
                     )
                 }
 
                 else -> {
-                    logger.error("在加载 Renderer 配置时出现了错误", IllegalArgumentException("Unknown key: $key"))
-                    continue
+                    throw IllegalArgumentException("Unknown key '$rawKey' while loading $RENDERER_CONFIG_FILE")
                 }
             }
 
@@ -137,9 +138,8 @@ internal class RendererConfiguration(
 
             for ((fullIndex, fullKey) in fullKeys.withIndex()) {
                 // 有添加失败 (例如不该重复的内容出现重复的了) 的情况就 throw
-                require(_loreLineIndexes.putIfAbsent(fullKey, index /* rawIndex */ + fullIndex /* 从0开始 */) == null) {
-                    "Key $fullKey has already been added to index, maybe your config is wrong?"
-                }
+                val notContains = _loreLineIndexes.putIfAbsent(fullKey, rawIndex + fullIndex /* 从0开始 */) == null
+                require(notContains) { "Key $fullKey has already been added to indexes. Please remove the duplicates" }
             }
         }
     }

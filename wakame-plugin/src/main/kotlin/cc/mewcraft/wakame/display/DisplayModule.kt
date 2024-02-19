@@ -25,9 +25,9 @@ fun displayModule(): Module = module {
     singleOf(::ItemRendererListener)
 
     // line index lookup
-    single<LineIndexLookup> {
+    single<LoreIndexLookup> {
         val loader = get<RendererConfiguration>()
-        LineIndexLookupImpl(loader.loreLineIndexes)
+        LoreIndexLookupImpl(loader.loreLineIndexes)
     }
 
     // line key suppliers
@@ -36,9 +36,9 @@ fun displayModule(): Module = module {
     singleOf(::MetaLineKeySupplierImpl) bind MetaLineKeySupplier::class
 
     // lore line finalizer
-    single<LoreLineFinalizer> {
+    single<LoreFinalizer> {
         val loader = get<RendererConfiguration>()
-        LoreLineFinalizerImpl(get<LoreLineComparator>(), loader.fixedLoreLines)
+        LoreFinalizerImpl(get<LoreLineComparator>(), loader.fixedLoreLines)
     }
 
     // lore line comparator
@@ -49,7 +49,7 @@ fun displayModule(): Module = module {
     singleOf(::AbilityStylizerImpl) bind AbilityStylizer::class
     single<AttributeStylizer> {
         val loader = get<RendererConfiguration>()
-        AttributeStylizerImpl(loader.attributeFormats, get())
+        AttributeStylizerImpl(loader.attributeFormats, TODO("construct the Map of attack speed format"), get())
     }
     single<OperationStylizer> {
         val loader = get<RendererConfiguration>()

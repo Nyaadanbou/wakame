@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.display
 import net.kyori.adventure.text.Component
 
 internal class LoreLineComparator(
-    private val loreIndexSupplier: LineIndexLookup,
+    private val loreIndexSupplier: LoreIndexLookup,
 ) : Comparator<LoreLine> {
     override fun compare(o1: LoreLine?, o2: LoreLine?): Int {
         requireNotNull(o1)

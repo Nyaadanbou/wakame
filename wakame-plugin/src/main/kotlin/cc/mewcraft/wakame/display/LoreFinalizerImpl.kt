@@ -4,10 +4,10 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
 import net.kyori.adventure.text.Component
 
-internal class LoreLineFinalizerImpl(
+internal class LoreFinalizerImpl(
     private val comparator: LoreLineComparator,
     private val fixedLines: List<FixedLoreLine>,
-) : LoreLineFinalizer {
+) : LoreFinalizer {
     override fun finalize(loreLines: Collection<LoreLine>): List<Component> {
         val holder = ObjectRBTreeSet(comparator)
 

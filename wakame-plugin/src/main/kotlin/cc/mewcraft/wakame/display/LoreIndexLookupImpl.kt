@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.util.getOrThrow
 
-internal class LineIndexLookupImpl(
+internal class LoreIndexLookupImpl(
     private val indexes: Map<FullKey, Int>
-) : LineIndexLookup {
+) : LoreIndexLookup {
     override fun get(key: FullKey): Int {
         return indexes.getOrThrow(key)
     }
