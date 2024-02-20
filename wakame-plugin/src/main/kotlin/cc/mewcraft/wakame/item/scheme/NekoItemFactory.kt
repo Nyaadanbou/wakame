@@ -37,11 +37,11 @@ object NekoItemFactory : KoinComponent {
             // is decided by the item stack generation process, not here.
 
             // (by alphabet order, in case you miss something)
+            loadAndPutMeta<DisplayLoreMeta>(node, "lore")
             loadAndPutMeta<DisplayNameMeta>(node, "display_name")
             loadAndPutMeta<ElementMeta>(node, "elements")
             loadAndPutMeta<KizamiMeta>(node, "kizami")
             loadAndPutMeta<LevelMeta>(node, "level")
-            loadAndPutMeta<LoreMeta>(node, "lore")
             loadAndPutMeta<MaterialMeta>(node, "material")
             loadAndPutMeta<RarityMeta>(node, "rarity")
             loadAndPutMeta<SkinMeta>(node, "skin")

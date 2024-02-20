@@ -55,7 +55,7 @@ internal class LoreStylizerImpl(
 
         // for each meta in neko
         with(item.metadata) {
-            lore?.let { ret += MetaLoreLineFactory.get(metaLineKeys.get(LoreMeta::class), metaStylizer.stylizeLore(it)) }
+            lore?.let { ret += MetaLoreLineFactory.get(metaLineKeys.get(DisplayLoreMeta::class), metaStylizer.stylizeLore(it)) }
             level?.let { ret += MetaLoreLineFactory.get(metaLineKeys.get(LevelMeta::class), metaStylizer.stylizeLevel(it)) }
             rarity?.let { ret += MetaLoreLineFactory.get(metaLineKeys.get(RarityMeta::class), metaStylizer.stylizeRarity(it)) }
             element?.let { ret += MetaLoreLineFactory.get(metaLineKeys.get(ElementMeta::class), metaStylizer.stylizeElement(it)) }

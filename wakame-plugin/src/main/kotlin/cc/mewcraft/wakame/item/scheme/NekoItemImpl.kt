@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.skin.ItemSkin
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import java.util.UUID
 
@@ -52,7 +51,7 @@ internal class NekoItemImpl(
             // TODO make the order of meta population configurable
 
             generateAndSet<DisplayNameMeta, String>(context, ItemMetaSetter::putName)
-            generateAndSet<LoreMeta, List<String>>(context, ItemMetaSetter::putLore)
+            generateAndSet<DisplayLoreMeta, List<String>>(context, ItemMetaSetter::putLore)
             generateAndSet<LevelMeta, Int>(context, ItemMetaSetter::putLevel)
             generateAndSet<RarityMeta, Rarity>(context, ItemMetaSetter::putRarity)
             generateAndSet<ElementMeta, Set<Element>>(context, ItemMetaSetter::putElements)

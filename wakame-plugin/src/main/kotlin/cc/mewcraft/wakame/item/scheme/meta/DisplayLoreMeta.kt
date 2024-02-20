@@ -14,7 +14,7 @@ import java.lang.reflect.Type
  *
  * @property lore the item lore in the format of MiniMessage string
  */
-class LoreMeta(
+class DisplayLoreMeta(
     private val lore: List<String>? = null,
 ) : SchemeMeta<List<String>>, KoinComponent {
     override fun generate(context: SchemeGenerationContext): List<String>? {
@@ -26,10 +26,10 @@ class LoreMeta(
     }
 }
 
-internal class LoreMetaSerializer : SchemeMetaSerializer<LoreMeta> {
-    override val emptyValue: LoreMeta = LoreMeta()
+internal class LoreMetaSerializer : SchemeMetaSerializer<DisplayLoreMeta> {
+    override val emptyValue: DisplayLoreMeta = DisplayLoreMeta()
 
-    override fun deserialize(type: Type, node: ConfigurationNode): LoreMeta {
-        return LoreMeta(node.getList<String>(emptyList()))
+    override fun deserialize(type: Type, node: ConfigurationNode): DisplayLoreMeta {
+        return DisplayLoreMeta(node.getList<String>(emptyList()))
     }
 }
