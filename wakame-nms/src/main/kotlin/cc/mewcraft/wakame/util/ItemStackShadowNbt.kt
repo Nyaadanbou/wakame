@@ -19,22 +19,22 @@ import org.bukkit.inventory.meta.ItemMeta
 import org.jetbrains.annotations.Contract
 import net.minecraft.world.item.ItemStack as MojangStack
 
-private const val ROOT_COMPOUND_NAME = NekoTags.ROOT
+private const val ROOT_COMPOUND_NAME: String = NekoTags.ROOT
 
 /**
  * Reads/writes the NBT tags from items as [ShadowTag].
  */
 object ItemStackShadowNbt {
     /**
-     * Gets the wakame compound tag from [itemStack]. If the `wakame` compound
-     * tag does not already exist, a new compound tag will be created and
-     * **saved** to the [itemStack].
+     * Gets the [ROOT_COMPOUND_NAME] compound tag from the [itemStack]. If the
+     * [ROOT_COMPOUND_NAME] compound tag does not already exist, a new compound
+     * tag will be created and **saved** to the [itemStack].
      */
-    @Contract(mutates = "param")
-    fun getWakameCompound(itemStack: ItemStack): CompoundShadowTag {
+    @Contract(mutates = "itemStack")
+    fun getNekoCompound(itemStack: ItemStack): CompoundShadowTag {
         val handle = itemStack.handle
         if (handle != null) { // CraftItemStack
-            return handle.wakameCompound
+            return handle.nekoCompound
         } else { // strictly-Bukkit ItemStack
             val unhandledTags = itemStack.backingItemMeta!!.unhandledTags
             val tag = unhandledTags.getOrPut(ROOT_COMPOUND_NAME, ::CompoundTag) as CompoundTag
@@ -43,37 +43,51 @@ object ItemStackShadowNbt {
     }
 
     /**
-     * Sets the wakame compound tag as [value] for [itemStack], **overwriting**
-     * any existing `wakame` compound tag.
+     * Gets the `wakame` compound tag from [itemStack] or `null`, if it does
+     * not exist. Unlike [getNekoCompound], which possibly modifies the
+     * item's NBT tags, this function will leave the [itemStack] **intact**.
      */
-    @Contract(mutates = "param1")
-    fun setWakameCompound(itemStack: ItemStack, value: CompoundShadowTag) {
+    @Contract(pure = true)
+    fun getNekoCompoundOrNull(itemStack: ItemStack): CompoundShadowTag? {
+        val handle = itemStack.handle
+        return if (handle != null) { // CraftItemStack
+            handle.nekoCompoundOrNull
+        } else { // strictly-Bukkit ItemStack
+            (itemStack.backingItemMeta?.unhandledTags?.get(ROOT_COMPOUND_NAME) as? CompoundTag)?.wrap
+        }
+    }
+
+    /**
+     * Sets the [ROOT_COMPOUND_NAME] compound tag of the given [itemStack] to
+     * [value], **overwriting** any existing [ROOT_COMPOUND_NAME] compound tag
+     * on the [itemStack].
+     */
+    @Contract(mutates = "itemStack")
+    fun setNekoCompound(itemStack: ItemStack, value: CompoundShadowTag) {
         val handle = itemStack.handle
         if (handle != null) { // CraftItemStack
-            handle.wakameCompound = value
+            handle.nekoCompound = value
         } else { // strictly-Bukkit ItemStack
             itemStack.backingItemMeta!!.unhandledTags[ROOT_COMPOUND_NAME] = value.unwrap
         }
     }
 
     /**
-     * Gets the `wakame` compound tag from [itemStack] or null, if it does not
-     * exist. Unlike [getWakameCompound], which possibly modifies the item's
-     * NBT tags, this function will leave the [itemStack] **intact**.
+     * Removes the [ROOT_COMPOUND_NAME] compound tag from the [itemStack] if it
+     * already exists on the [itemStack].
      */
-    @Contract(pure = true)
-    fun getWakameCompoundOrNull(itemStack: ItemStack): CompoundShadowTag? {
+    @Contract(mutates = "itemStack")
+    fun removeNekoCompound(itemStack: ItemStack) {
         val handle = itemStack.handle
-        return if (handle != null) { // CraftItemStack
-            handle.wakameCompoundOrNull
+        if (handle != null) { // CraftItemStack
+            handle.removeTagKey(NekoTags.ROOT)
         } else { // strictly-Bukkit ItemStack
-            (itemStack.backingItemMeta?.unhandledTags?.get(ROOT_COMPOUND_NAME) as? CompoundTag)?.wrap
+            itemStack.backingItemMeta?.unhandledTags?.remove(NekoTags.ROOT)
         }
     }
 }
 
-////// Shadow un(wrappers) //////
-
+//<editor-fold desc="Shadow un(wrappers)">
 internal val Tag.wrap: ShadowTag
     get() = BukkitShadowFactory.global().shadow<ShadowTag>(this)
 internal val ShadowTag.unwrap: Tag
@@ -82,15 +96,49 @@ internal val CompoundTag.wrap: CompoundShadowTag
     get() = BukkitShadowFactory.global().shadow<CompoundShadowTag>(this)
 internal val CompoundShadowTag.unwrap: CompoundTag
     get() = this.shadowTarget as CompoundTag
-
-//////
+//</editor-fold>
 
 internal val ItemMeta.unhandledTags: MutableMap<String, Tag>
     get() = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this).getUnhandledTags()
 
-////// MojangStack - Wakame Compound
+/**
+ * Sets the display name through JSON string. You may pass a `null` to
+ * remove the name. This function will directly write the given JSON string
+ * to the NBT tag, so make sure that you pass a valid JSON string, or else
+ * the server will throw.
+ *
+ * Only works if `this` [ItemStack] is NMS-object backed.
+ */
+var ItemStack.displayNameNms: String?
+    get() = throw UnsupportedOperationException("Get operation is not supported")
+    set(value) {
+        if (value != null) {
+            this.handle?.getOrCreateTagElement("display")?.putString("Name", value)
+        } else {
+            this.handle?.getTagElement("display")?.remove("Name")
+        }
+    }
 
-internal var MojangStack.wakameCompound: CompoundShadowTag
+/**
+ * Sets the lore directly through JSON string. You may pass a `null` to
+ * remove the lore. This function will directly write the given JSON string
+ * list to the NBT tag, so make sure that you pass a valid JSON string, or
+ * else the server will throw.
+ *
+ * Only works if `this` [ItemStack] is NMS-object backed.
+ */
+var ItemStack.displayLoreNms: List<String>?
+    get() = throw UnsupportedOperationException("Get operation is not supported")
+    set(value) {
+        if (value != null) {
+            this.handle?.getOrCreateTagElement("display")?.put("Lore", NmsNbtUtils.createStringList(value))
+        } else {
+            this.handle?.getTagElement("display")?.remove("Lore")
+        }
+    }
+
+//<editor-fold desc="MojangStack - Neko Compound">
+internal var MojangStack.nekoCompound: CompoundShadowTag
     get() {
         val compoundTag = this.orCreateTag.getOrPut(ROOT_COMPOUND_NAME) { CompoundTag() }
         return compoundTag.wrap
@@ -99,20 +147,19 @@ internal var MojangStack.wakameCompound: CompoundShadowTag
         this.orCreateTag.put(ROOT_COMPOUND_NAME, value.unwrap)
     }
 
-internal val MojangStack.wakameCompoundOrNull: CompoundShadowTag?
+internal val MojangStack.nekoCompoundOrNull: CompoundShadowTag?
     get() = this.tag?.getCompoundOrNull(ROOT_COMPOUND_NAME)?.wrap
+//</editor-fold>
 
-//////
-
-////// BukkitStack - Wakame Compound
-
+//<editor-fold desc="BukkitStack - Neko Compound">
 // moved to singleton object - the gradle somehow doesn't know the re-obfuscated extensions functions
+//</editor-fold>
 
-//////
-
-////// Internals //////
-
-internal val ItemStack.backingItemMeta: ItemMeta?
+/**
+ * Gets the [ItemMeta] without cloning. If the item meta does not already
+ * exist, it will try to create one and then return.
+ */
+val ItemStack.backingItemMeta: ItemMeta?
     get() {
         val shadow = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
         var backingMeta = shadow.getMeta()

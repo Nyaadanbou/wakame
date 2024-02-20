@@ -93,17 +93,13 @@ internal class ItemMetaAccessorImpl(
         base.tags.put(NekoTags.Meta.ROOT, compoundTag)
     }
 
-    override fun putName(name: Component) {
-        gsonSerializer.serialize(name).let { rootOrCreate.putString(NekoTags.Meta.NAME, it) }
+    override fun putName(name: String) {
+        rootOrCreate.putString(NekoTags.Meta.NAME, name)
     }
 
-    override fun putLore(lore: List<Component>) {
+    override fun putLore(lore: List<String>) {
         val listBinaryTag = ListShadowTag.create(
-            lore.map {
-                val gsonString = gsonSerializer.serialize(it)
-                StringShadowTag.valueOf(gsonString)
-            },
-            ShadowTagType.STRING
+            lore.map(StringShadowTag::valueOf), ShadowTagType.STRING
         )
         rootOrCreate.put(NekoTags.Meta.LORE, listBinaryTag)
     }

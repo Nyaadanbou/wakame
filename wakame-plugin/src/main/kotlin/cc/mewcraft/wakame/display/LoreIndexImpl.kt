@@ -15,7 +15,7 @@ internal data class FallbackLoreIndex( // TODO unfinished
     private val sourceLoreIndex: LoreIndex,
 ) : LoreIndex {
     override val rawKey: RawKey = sourceLoreIndex.rawKey
-    override val rawIndex: Int = sourceLoreIndex.rawIndex
+    override val rawIndex: RawIndex = sourceLoreIndex.rawIndex
     override fun computeFullKeys(): List<FullKey> = sourceLoreIndex.computeFullKeys()
 
     fun fallback(): EmptyFixedLoreIndex {
@@ -27,14 +27,14 @@ internal data class FallbackLoreIndex( // TODO unfinished
  * 代表一个自定义的固定内容的顺序。
  */
 internal data class CustomFixedLoreIndex(
-    override val rawIndex: Int,
+    override val rawIndex: RawIndex,
 ) : FixedLoreIndex
 
 /**
  * 代表一个空的固定内容的顺序。
  */
 internal data class EmptyFixedLoreIndex(
-    override val rawIndex: Int,
+    override val rawIndex: RawIndex,
 ) : FixedLoreIndex
 
 /**
@@ -42,7 +42,7 @@ internal data class EmptyFixedLoreIndex(
  */
 internal data class MetaLoreIndex(
     override val rawKey: RawKey,
-    override val rawIndex: Int,
+    override val rawIndex: RawIndex,
 ) : LoreIndex {
     override fun computeFullKeys(): List<FullKey> {
         return listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
@@ -54,7 +54,7 @@ internal data class MetaLoreIndex(
  */
 internal data class AbilityLoreIndex(
     override val rawKey: RawKey,
-    override val rawIndex: Int,
+    override val rawIndex: RawIndex,
 ) : LoreIndex {
     override fun computeFullKeys(): List<FullKey> {
         return listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
@@ -66,7 +66,7 @@ internal data class AbilityLoreIndex(
  */
 internal data class AttributeLoreIndex(
     override val rawKey: RawKey,
-    override val rawIndex: Int,
+    override val rawIndex: RawIndex,
     /**
      * 表示配置文件内 operation 与 element 顺序的规则
      */

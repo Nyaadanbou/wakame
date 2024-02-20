@@ -58,17 +58,17 @@ class TestListener : Listener {
 
         when (plainMessage) {
             "s1" -> {
-                val nbt = inventory.itemInMainHand.wakameCompound
+                val nbt = inventory.itemInMainHand.nekoCompound
                 println("wakameCompound: " + nbt.asString())
             }
 
             "s2" -> {
-                val nbtOrNull = inventory.itemInMainHand.wakameCompoundOrNull
+                val nbtOrNull = inventory.itemInMainHand.nekoCompoundOrNull
                 println("wakameCompoundOrNull: " + nbtOrNull?.asString())
             }
 
             "s3" -> {
-                inventory.itemInMainHand.wakameCompound = compoundShadowTag {
+                inventory.itemInMainHand.nekoCompound = compoundShadowTag {
                     putString("ns", "short_sword")
                     putString("id", "demo")
                     putByte("sid", 0)
@@ -79,7 +79,7 @@ class TestListener : Listener {
                 val bukkitStack = ItemStack(Material.NETHERITE_SWORD)
 
                 // write
-                bukkitStack.wakameCompound = compoundShadowTag {
+                bukkitStack.nekoCompound = compoundShadowTag {
                     putString("ns", "short_sword")
                     putString("id", "demo")
                     putByte("sid", 18)
@@ -113,7 +113,7 @@ class TestListener : Listener {
                 }
 
                 // read
-                bukkitStack.wakameCompound.run {
+                bukkitStack.nekoCompound.run {
                     check(getString("ns") == "short_sword")
                     check(getString("id") == "demo")
                     check(getByte("sid") == 18.toByte())
@@ -148,7 +148,7 @@ class TestListener : Listener {
             }
 
             "s5" -> {
-                val nbtOrNull = inventory.itemInMainHand.wakameCompoundOrNull
+                val nbtOrNull = inventory.itemInMainHand.nekoCompoundOrNull
                 nbtOrNull?.run {
                     putInt("in_place", 233)
                 }

@@ -51,8 +51,8 @@ internal class NekoItemImpl(
             // the order of meta population is hardcoded currently
             // TODO make the order of meta population configurable
 
-            generateAndSet<DisplayNameMeta, Component>(context, ItemMetaSetter::putName)
-            generateAndSet<LoreMeta, List<Component>>(context, ItemMetaSetter::putLore)
+            generateAndSet<DisplayNameMeta, String>(context, ItemMetaSetter::putName)
+            generateAndSet<LoreMeta, List<String>>(context, ItemMetaSetter::putLore)
             generateAndSet<LevelMeta, Int>(context, ItemMetaSetter::putLevel)
             generateAndSet<RarityMeta, Rarity>(context, ItemMetaSetter::putRarity)
             generateAndSet<ElementMeta, Set<Element>>(context, ItemMetaSetter::putElements)

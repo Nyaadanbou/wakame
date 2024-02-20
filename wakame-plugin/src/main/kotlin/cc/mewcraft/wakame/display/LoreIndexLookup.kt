@@ -6,5 +6,5 @@ internal interface LoreIndexLookup {
      *
      * @see LineKeySupplier.get
      */
-    fun get(key: FullKey): Int
+    fun get(key: FullKey): FullIndex
 }

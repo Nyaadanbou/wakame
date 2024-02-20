@@ -20,9 +20,10 @@ import java.util.UUID
 internal interface LoreStylizer {
 
     /**
-     * Generates [lore lines][LoreLine] for the [item].
+     * Generates [lore lines][LoreLine] from the [item]. The returned
+     * collection should not contain any [fixed lore lines][FixedLoreLine].
      *
-     * Note that this function won't modify the given [item].
+     * This function won't modify the given [item].
      *
      * @param item the item to generate lore for
      * @return the generated lore lines
@@ -46,12 +47,12 @@ internal interface AttributeStylizer {
 
     interface AttackSpeedFormat {
         /**
-         * 攻速的格式，里面应该有一个 "<value>" 的占位符。
+         * 攻速的格式。
          */
         val merged: String
 
         /**
-         * 必须包含9个元素，每个对应一个攻速等级，从慢到快按顺序排列。
+         * 必须包含9个元素，每个对应一个攻速等级。
          */
         val levels: Map<Int, String>
     }
@@ -93,19 +94,30 @@ internal interface MetaStylizer {
         val line: String
 
         /**
-         * Never be an empty list. Use `null` to indicate "don't add header".
+         * **Never be an empty list.** Use `null` to indicate "don't add header".
          */
         val header: List<String>?
 
         /**
-         * Never be an empty list. Use `null` to indicate "don't add bottom".
+         * **Never be an empty list.** Use `null` to indicate "don't add bottom".
          */
         val bottom: List<String>?
     }
 
     interface ListFormat {
+        /**
+         * The format of all elements joined together.
+         */
         val merged: String
+
+        /**
+         * The format of a single element.
+         */
         val single: String
+
+        /**
+         * The format of the separator which separates the elements in the list.
+         */
         val separator: String
     }
 }

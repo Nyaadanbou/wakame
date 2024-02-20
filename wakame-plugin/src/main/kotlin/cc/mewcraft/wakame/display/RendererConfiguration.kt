@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.spongepowered.configurate.CommentedConfigurationNode
 
 internal class RendererConfiguration(
     loader: NekoConfigurationLoader,
@@ -25,25 +26,25 @@ internal class RendererConfiguration(
         private const val RENDERER_CONDITION_LORE_SYMBOL = "/"
     }
 
-    private val root by reloadable { loader.load() }
+    private val root: CommentedConfigurationNode by reloadable { loader.load() }
 
     //<editor-fold desc="renderer_style.meta">
-    val nameFormat by reloadable { root.node(RENDERER_STYLE, "meta", "name").requireKt<String>() }
-    val loreFormat by reloadable {
+    val nameFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "name").requireKt<String>() }
+    val loreFormat: MetaStylizerImpl.LoreFormatImpl by reloadable {
         with(root.node(RENDERER_STYLE, "meta", "lore")) {
             MetaStylizerImpl.LoreFormatImpl(
-                header = node("header").requireKt<List<String>>().takeIf(List<String>::isNotEmpty),
                 line = node("line").requireKt<String>(),
+                header = node("header").requireKt<List<String>>().takeIf(List<String>::isNotEmpty),
                 bottom = node("bottom").requireKt<List<String>>().takeIf(List<String>::isNotEmpty)
             )
         }
     }
-    val levelFormat by reloadable { root.node(RENDERER_STYLE, "meta", "level").requireKt<String>() }
-    val rarityFormat by reloadable { root.node(RENDERER_STYLE, "meta", "rarity").requireKt<String>() }
-    val elementFormat by reloadable { getListFormat(root.node(RENDERER_STYLE, "meta", "element")) }
-    val kizamiFormat by reloadable { getListFormat(root.node(RENDERER_STYLE, "meta", "kizami")) }
-    val skinFormat by reloadable { root.node(RENDERER_STYLE, "meta", "skin").requireKt<String>() }
-    val skinOwnerFormat by reloadable { root.node(RENDERER_STYLE, "meta", "skin_owner").requireKt<String>() }
+    val levelFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "level").requireKt<String>() }
+    val rarityFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "rarity").requireKt<String>() }
+    val elementFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE, "meta", "element")) }
+    val kizamiFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE, "meta", "kizami")) }
+    val skinFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "skin").requireKt<String>() }
+    val skinOwnerFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "skin_owner").requireKt<String>() }
 
     private fun getListFormat(node: NekoConfigurationNode): MetaStylizer.ListFormat {
         return MetaStylizerImpl.ListFormatImpl(
@@ -54,32 +55,41 @@ internal class RendererConfiguration(
     }
     //</editor-fold>
 
-    //<editor-fold desc="renderer_style.operation">
-    val operationFormat by reloadable {
+    //<editor-fold desc="renderer_style.attribute">
+    val emptyAttributeFormat: List<String> by reloadable {
+        root.node(RENDERER_STYLE, "attribute", "empty").requireKt<List<String>>()
+    }
+    val operationFormat: Map<AttributeModifier.Operation, String> by reloadable {
         AttributeModifier.Operation.entries.associateWith { operation ->
-            root.node(RENDERER_STYLE, "operation").node(operation.key).requireKt<String>()
+            root.node(RENDERER_STYLE, "attribute", "operation").node(operation.key).requireKt<String>()
         }
     }
-    //</editor-fold>
-
-    //<editor-fold desc="renderer_style.attribute">
-    val attributeFormats by reloadable {
-        root.node(RENDERER_STYLE, "attribute").childrenMap()
+    val attributeFormats: Map<Key, String> by reloadable {
+        root.node(RENDERER_STYLE, "attribute", "value").childrenMap()
             .mapKeys { (key, _) -> Key.key(NekoNamespaces.ATTRIBUTE, key as String) }
             .filter { (key, _) -> key != Attributes.ATTACK_SPEED_LEVEL.key() } // attack_speed_level is handled on its own
             .mapValues { (_, node) -> node.requireKt<String>() }
     }
-    val attackSpeedFormat by reloadable {
+    val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by reloadable {
         AttributeStylizerImpl.AttackSpeedFormatImpl(
-            merged = root.node(RENDERER_STYLE, "attribute", "attack_speed_level", "merged").requireKt<String>(),
-            levels = root.node(RENDERER_STYLE, "attribute", "attack_speed_level", "levels").childrenMap()
-                .map { (key, node) -> (key as String).toInt() to node.requireKt<String>() }.toMap()
+            merged = root.node(RENDERER_STYLE, "attribute", "value", "attack_speed_level", "merged").requireKt<String>(),
+            levels = root.node(RENDERER_STYLE, "attribute", "value", "attack_speed_level", "levels").childrenMap()
+                .map { (key, node) -> (key as String).toInt() to node.requireKt<String>() }
+                .toMap()
         )
     }
     //</editor-fold>
 
-    //<editor-fold desc="renderer_style.cell">
-    val emptyCellFormat by reloadable { root.node(RENDERER_STYLE, "cell").node("empty").requireKt<String>() }
+    //<editor-fold desc="renderer_style.ability">
+    val emptyAbilityFormat: List<String> by reloadable {
+        root.node(RENDERER_STYLE, "ability", "empty").requireKt<List<String>>()
+    }
+    val commonAbilityFormat: Unit by reloadable {
+        // TODO
+    }
+    val abilityFormats: Unit by reloadable {
+        // TODO
+    }
     //</editor-fold>
 
     //<editor-fold desc="renderer_order">
@@ -89,7 +99,7 @@ internal class RendererConfiguration(
     val fixedLoreLines: Collection<FixedLoreLine> get() = _fixedLoreLines
     private val _fixedLoreLines: MutableCollection<FixedLoreLine> = mutableListOf()
 
-    val loreLineIndexes: Map<FullKey, Int /* FullIndex */> get() = _loreLineIndexes
+    val loreLineIndexes: Map<FullKey, FullIndex> get() = _loreLineIndexes
     private val _loreLineIndexes: MutableMap<FullKey, Int> = mutableMapOf()
 
     private fun loadConfiguration() {
@@ -105,15 +115,14 @@ internal class RendererConfiguration(
             val loreIndex = getLoreIndex(rawKey, rawIndex, AttributeLoreIndex.Rule(operationIndex, elementIndex))
             val fullKeys = loreIndex.computeFullKeys()
 
-            for ((index, fullKey) in fullKeys.withIndex()) {
+            for ((localIndex, fullKey) in fullKeys.withIndex()) {
                 val absent = _allLoreIndexes.putIfAbsent(fullKey, loreIndex) == null
-                val newIndex = index + rawIndex
+                val newIndex = localIndex + rawIndex
                 _loreLineIndexes[fullKey] = newIndex
                 require(absent) { "Key $fullKey has already been added to indexes, please remove the duplicates" }
             }
         }
     }
-    //</editor-fold>
 
     private fun getLoreIndex(rawKey: String, rawIndex: Int, rule: AttributeLoreIndex.Rule, currentDepth: Int = 0): LoreIndex {
         if (currentDepth > 3) {
@@ -155,6 +164,7 @@ internal class RendererConfiguration(
             }
         }
     }
+    //</editor-fold>
 
     override fun onPostWorld() {
         loadConfiguration()

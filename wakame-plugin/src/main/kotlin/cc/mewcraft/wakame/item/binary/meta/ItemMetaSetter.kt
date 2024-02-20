@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.skin.ItemSkin
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import net.kyori.adventure.text.Component
 import java.util.UUID
 
 /**
@@ -19,17 +18,13 @@ interface ItemMetaSetter {
 
     /**
      * Sets name.
-     *
-     * @param name the name
      */
-    fun putName(name: Component)
+    fun putName(name: String)
 
     /**
      * Sets extra lore, overwriting any that are in `this`.
-     *
-     * @param lore the lore
      */
-    fun putLore(lore: List<Component>)
+    fun putLore(lore: List<String>)
 
     /**
      * Sets level or clears it.

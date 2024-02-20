@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.cell.CellAccessor
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessor
@@ -15,8 +16,8 @@ import java.util.UUID
  *
  * This class provides several properties to work with the underlying item
  * stack, mainly manipulating the non-vanilla NBT tags of it, such as:
- * - checking whether the item is a wakame item
- * - getting the identifier of the wakame item
+ * - checking whether the item is a neko item
+ * - getting the identifier of the neko item
  * - retrieving the NBT tags of the bukkit item
  */
 interface NekoItemStack : NekoItemStackSetter {
@@ -66,14 +67,22 @@ interface NekoItemStack : NekoItemStackSetter {
     val isOneOff: Boolean
 
     /**
-     * Returns `true` if this item is a wakame item.
+     * Erases all the custom tags from `this`.
+     *
+     * **Only to be used in certain special cases**.
+     */
+    @InternalApi
+    fun erase()
+
+    /**
+     * Returns `true` if this item is a neko item.
      *
      * In this case [isNotNeko] returns `false`.
      */
     val isNeko: Boolean
 
     /**
-     * Returns `true` if this item is not a wakame item.
+     * Returns `true` if this item is not a neko item.
      *
      * In this case [isNeko] returns `false`.
      */
@@ -82,35 +91,35 @@ interface NekoItemStack : NekoItemStackSetter {
     /**
      * The corresponding [NekoItem] scheme.
      *
-     * @throws NullPointerException if this is not a legal wakame item
+     * @throws NullPointerException if this is not a legal neko item
      */
     val scheme: NekoItem
 
     /**
      * The namespace of this item.
      *
-     * @throws NullPointerException if this is not a legal wakame item
+     * @throws NullPointerException if this is not a legal neko item
      */
     val namespace: String
 
     /**
      * The ID of this item.
      *
-     * @throws NullPointerException if this is not a legal wakame item
+     * @throws NullPointerException if this is not a legal neko item
      */
     val id: String
 
     /**
      * The [namespaced ID][Key] of this item.
      *
-     * @throws NullPointerException if this is not a legal wakame item
+     * @throws NullPointerException if this is not a legal neko item
      */
     val key: Key
 
     /**
      * The UUID of this item.
      *
-     * @throws NullPointerException if this is not a legal wakame item
+     * @throws NullPointerException if this is not a legal neko item
      */
     val uuid: UUID
 
@@ -119,7 +128,7 @@ interface NekoItemStack : NekoItemStackSetter {
      *
      * Used to manipulate the **cells** of this item.
      *
-     * @throws NullPointerException if this is not a legal wakame item
+     * @throws NullPointerException if this is not a legal neko item
      */
     val cells: CellAccessor
 
@@ -128,7 +137,7 @@ interface NekoItemStack : NekoItemStackSetter {
      *
      * Used to manipulate the **meta** of this item.
      *
-     * @throws NullPointerException if this is not a legal wakame item
+     * @throws NullPointerException if this is not a legal neko item
      */
     val metadata: ItemMetaAccessor
 
@@ -137,7 +146,7 @@ interface NekoItemStack : NekoItemStackSetter {
      *
      * Used to manipulate the **statistics** of this item.
      *
-     * @throws NullPointerException if this is not a legal wakame item
+     * @throws NullPointerException if this is not a legal neko item
      */
     val statistics: ItemStatsAccessor
 

@@ -1,68 +1,45 @@
 # 渲染器
 
 # 渲染器负责修改 ItemStack 的网络封包
-# 将其 NBT 的 `tags.display` 标签下的内容
+# 将其 NBT `tags.display` 下的内容
 # 根据此配置文件定义的格式进行修改
 
-# To g22: 如果要创建其他语言的渲染器，复制一份本文件做修改即可
-
-# To g22:
-# 整体架构的想法：
-# 对于 lore_renderer_style.X 下面的所有字符串都需要用特定的 MiniMessage 实例进行反序列化，以生成相应的 Component
-# 生成好对应的 Component 后，再从 lore_renderer_order.X 里找到相应的顺序 - 这里需要用到一个 total order 的数学概念
-# 也就是对于 lore_renderer_order.X 中的任何一个占位符 X 和 Y，你必须可以直接知道到底是 X 在 Y 前面，还是 Y 在 X 前面
-# Java 中，关于 total order 的实现是 TreeMap，也就是红黑树，使用这个数据结构你可以在 O(log n) 的复杂度下知道顺序
-
-# 渲染顺序 + 选择性空行 + 固定的自定义内容
-# 以 / 开头表示当源数据不存在时用空行替代，而不是忽略；也可以用 / 直接插入空行
-# 以 ^ 开头可以插入自定义的固定内容，将用 MiniMessage 进行解析
+# 渲染顺序
+# 定义什么内容应该出现在什么位置
+# 列表中的每一项，代表一个指定内容的顺序
+# 例如想让“攻击力”显示在“暴击概率”前面
+# 那么把“攻击力”排在“暴击概率”前面即可
 #
-# 这里不一定要写上所有的占位符，你可以省略任意的占位符
-# 如果没有指定占位符，则占位符对应的内容不会被渲染出来
+# 也可以在这里定义“有条件的空行”（当条件满足时添加一个空行）
+# 以及定义“固定的自定义内容”（永远显示，无论物品是什么）
+#
+# 这里不一定要指定所有的占位符，你可以省略任意的占位符
+# 如果一个占位符没有写在这里，则对应内容不会渲染出来
+#
+# 语法说明：
+# primary:
+#   以 ^ 开头可以直接插入固定的（始终显示的）自定义内容（^ 后面的所有字符串，都将被当成自定义内容）
+#   以 / 开头表示当源数据不存在时用空行替代，而不是忽略（例如 `/meta:skin` 就是当物品没有皮肤时）
+#   只写一个 / 表示直接插入固定的空行（始终显示的）
+#   除了 / 和 ^ 开头的行，其余都不允许重复出现
+#   剩下的必须写 命名空间 形式的内容标识
+# element:
+#   见内部的注释
+# operation:
+#   见内部的注释
 renderer_order:
 
-  # 元素排序
-  # 所有带元素标识的同种属性都将按照此顺序渲染
-  element:
-    - neutral
-    - fire
-    - water
-    - wind
-    - earth
-    - thunder
-    - universal
-
-  # 操作排序
-  # 同种属性，不同 operation，都将按照此顺序渲染
-  operation:
-    - add
-    - multiply_base
-    - multiply_total
-
   # 主体排序
-  # 除了 /（空行）和 ^（固定内容）可以重复出现外，其余都不能重复出现
-  # To g22: 如果其他内容重复出现，则抛出异常关闭插件
   primary:
-    - ^<aqua><!i><b>元数据 # 以 ^ 开头以插入固定内容
-    - meta:level
+    - ^<aqua><!i><b>元数据 # 以 ^ 开头以插入固定的自定义内容
+    - meta:level # 必须写命名空间形式的唯一标识 (namespace:value)
     - meta:rarity
     - meta:element
     - meta:kizami
-    - meta:skin
+    - /meta:skin # 以 / 开头将在源数据不存在时用空行替代，而不是忽略 # FIXME 这个没起作用
     - meta:skin_owner
-    - /meta:lore # 以 / 开头将在源数据不存在时用空行替代，而不是忽略
-    - / # 以 / 开头后面不接任何内容，可以直接插入空行
-    - /
-    - /
-
-    # 同种属性之间存在 operation 的区别
-    # 例如在同一个物品上，
-    # 可以同时合法存在 critical_strike_chance (value = 0.5, operation: addition)
-    # 和 critical_strike_chance (value = 0.1, operation: multiply_total)
-    #
-    # 对于同种属性，但不同 operation 的情况，我们统一指定它们的渲染顺序
-    # 例如，无论是什么属性，我们都先渲染 operation 0，再接着 1，最后 2
-    # 因此这里就不再单独为每种属性，分别指定它们的每种 operation 顺序了
+    - meta:lore
+    - / # 以 / 开头但后面不接任何内容，可以直接插入空行
 
     - ^<aqua><!i><b>属性
     - attribute:attack_damage
@@ -96,7 +73,6 @@ renderer_order:
     - attribute:movement_speed_rate
     - /
 
-    # 这里指定每个技能应该显示在什么位置
     - ^<aqua><!i><b>技能
     - ability:blink
     - ability:cyclone
@@ -110,88 +86,120 @@ renderer_order:
     - ability:stab
     - ability:waterball
 
-# 渲染的样式
+  # 元素排序
+  # 同种属性，不同元素标识，都将按照此顺序渲染
+  #
+  # 语法说明：
+  # 元素的唯一标识
+  element:
+    - neutral
+    - fire
+    - water
+    - wind
+    - earth
+    - thunder
+    - universal
+
+  # 运算模式排序
+  # 同种属性，不同运算模式，都将按照此顺序渲染
+  #
+  # 语法说明：
+  # 运算模式的唯一标识
+  operation:
+    - add
+    - multiply_base
+    - multiply_total
+
+# 渲染样式
+# 定义每个内容的具体样式
+# 具体语法说明见各自的注释
 renderer_style:
 
-  # To g22:
-  # 首先是两个实现要求：
-  # 对于缺失的 lore_renderer_style.X.Y，应该抛出异常提示所缺失的配置（例如少写了 lore_renderer_style.meta.level 就抛出异常）
-  # 对于每一个 lore_renderer_style.X，创建一个单独的 MiniMessage 实例来反序列化，这要求在 lore_renderer_style.X.Y 中的 tag 不存在重复键
-  # 其次是另一个实现方案：
-  # 如果你想允许 lore_renderer_style.X.Y 中的 tag 存在重复的，例如下面都写 value，而不是不同的 tag
-  # ```yaml
-  # attribute:
-  #   attack_effect_chance: "元素叠加: <value>"
-  #   attack_speed_level: "攻击速度: <value>"
-  # ```
-  # 则你需要对每一个 lore_renderer_style.X.Y 都创建一个 MiniMessage 实例
-
+  # 元数据样式
   meta:
-    name: "<value>"
-    level: "等级: <value>"
-    rarity: "稀有度: <value>"
+    name: "<!i><value>"
+    level: "<!i>等级: <value>"
+    rarity: "<!i>稀有度: <value>"
     element:
-      merged: "元素: <merged>"
+      merged: "<!i>元素: <merged>"
       single: "<single>"
-      separator: "*"
+      separator: ", "
     kizami:
-      merged: "铭刻: <merged>"
+      merged: "<!i>铭刻: <merged>"
       single: "<single>"
-      separator: "*"
-    skin: "皮肤: <value>"
-    skin_owner: "皮肤所有者: <value>"
+      separator: ", "
+    skin: "<!i>皮肤: <value>"
+    skin_owner: "<!i>皮肤所有者: <value>"
     lore:
+      line: "<!i><line>"
       header: [ ] # 空列表代表完全没有，不代表空行
-      line: "<line>"
       bottom: [ ]
 
-  cell:
-    empty: "空词条栏"
-
-  # To g22:
-  # 这个的解析需要运行在 attribute 解析的“内部”，也就是*用于*实现 TagResolver
-  # 因此，这里用 Java 的 String.format() 就够了，不需要实现新的 TagResolver
-  operation:
-    add: "%s"
-    multiply_base: "%s%% (base)"
-    multiply_total: "%s%% (total)"
-
+  # 属性词条栏的样式
   attribute:
-    attack_damage: "<element>元素攻击: <min:+#;-.> - <max:+#;-.>"
-    attack_effect_chance: "元素叠加: <value:+#.#%;-.%>"
-    attack_speed_level:
-      merged: "攻击速度: <value>"
-      levels:
-        0: "<red>究极慢"
-        1: "超级慢"
-        2: "很慢"
-        3: "慢"
-        4: "普通"
-        5: "快"
-        6: "非常快"
-        7: "超级快"
-        8: "<green>究极快"
-    critical_strike_chance: "暴击概率: <value:+#.#%;-.%>"
-    critical_strike_power: "暴击伤害: <value:+#.#%;-.%>"
-    damage_reduction_rate: "伤害承受: <value:+#.#%;-.%>"
-    defense: "<element>防御力: <value:+#;-.>"
-    defense_penetration: "<element>防御穿透: <value:+#;-.>"
-    defense_penetration_rate: "<element>防御穿透率: <value:+#.#%;-.%>"
-    health_regeneration: "生命恢复: <value:+#;-.>"
-    lifesteal: "攻击吸血: <value:+#;-.>"
-    lifesteal_rate: "攻击吸血率: <value:+#.#%;-.%>"
-    mana_consumption_rate: "魔法消耗: <value:+#.#%;-.%>"
-    mana_regeneration: "魔法恢复: <value:+#;-.>"
-    manasteal: "魔法汲取: <value:+#;-.>"
-    manasteal_rate: "魔法汲取率: <value:+#.#%;-.%>"
-    max_absorption: "最大护盾: <value:+#;-.>"
-    max_health: "最大生命: <value:+#;-.>"
-    max_mana: "最大魔法: <value:+#;-.>"
-    movement_speed_rate: "移动速率: <value:+#.#%;-.%>"
 
+    # 空的属性词条栏
+    empty:
+      - "<!i><gray>空词条栏"
+
+    # 在这里单独定义每个运算模式的格式
+    # '%s' 表示数值的字符串（已格式化）
+    operation:
+      add: "%s"
+      multiply_base: "%s%%"
+      multiply_total: "×%s%%"
+
+    # 每个属性的文本内容
+    # 以及数值的具体格式（小米会单独讲 `<value:_pattern_>`）
+    # 这里的数值格式将被*首先*渲染，然后依据运算模式进行二次渲染
+    value:
+      attack_damage: "<!i><element>攻击力: <min:#;-.> ⎓ <max:#;-.>"
+      attack_effect_chance: "<!i>元素叠加: <value:+#.#%;-.%>"
+      attack_speed_level:
+        merged: "<!i>攻击速度: <value>"
+        levels:
+          0: "<red>究极慢"
+          1: "超级慢"
+          2: "很慢"
+          3: "慢"
+          4: "普通"
+          5: "快"
+          6: "非常快"
+          7: "超级快"
+          8: "<green>究极快"
+      critical_strike_chance: "<!i>暴击概率: <value:+#.#%;-.%>"
+      critical_strike_power: "<!i>暴击伤害: <value:+#.#%;-.%>"
+      damage_reduction_rate: "<!i>伤害减免: <value:+#.#%;-.%>"
+      defense: "<!i><element>防御力: <value:+#;-.>"
+      defense_penetration: "<!i><element>防御穿透: <value:+#;-.>"
+      defense_penetration_rate: "<!i><element>防御穿透率: <value:+#.#%;-.%>"
+      health_regeneration: "<!i>生命恢复: <value:+#;-.>"
+      lifesteal: "<!i>攻击吸血: <value:+#;-.>"
+      lifesteal_rate: "<!i>攻击吸血率: <value:+#.#%;-.%>"
+      mana_consumption_rate: "<!i>魔法消耗: <value:+#.#%;-.%>"
+      mana_regeneration: "<!i>魔法恢复: <value:+#;-.>"
+      manasteal: "<!i>魔法汲取: <value:+#;-.>"
+      manasteal_rate: "<!i>魔法汲取率: <value:+#.#%;-.%>"
+      max_absorption: "<!i>最大护盾: <value:+#;-.>"
+      max_health: "<!i>最大生命: <value:+#;-.>"
+      max_mana: "<!i>最大魔法: <value:+#;-.>"
+      movement_speed_rate: "<!i>移动速率: <value:+#.#%;-.%>"
+
+  # 技能词条栏的样式
   ability:
-    base:
-      mana: "魔耗: <value>"
-      cooldown: "冷却: <value>"
-    blink:
-      distance: "距离: <value>"
+
+    # 空的技能词条栏
+    empty:
+      - "<!i><gray>空词条栏"
+
+    # 所有技能共有的样式
+    common:
+      mana: "<!i>魔耗: <value>"
+      cooldown: "<!i>冷却: <value>"
+
+    # 每个技能独有的样式
+    custom:
+      blink:
+        distance: "<!i>距离: <value>"
+      frost:
+        duration: "<!i>时长: <value>"

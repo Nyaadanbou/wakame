@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.cell.CellAccessor
 import cc.mewcraft.wakame.item.binary.cell.CellAccessorImpl
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
@@ -9,8 +10,9 @@ import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessorImpl
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.registry.NekoItemRegistry
-import cc.mewcraft.wakame.util.wakameCompound
-import cc.mewcraft.wakame.util.wakameCompoundOrNull
+import cc.mewcraft.wakame.util.nekoCompound
+import cc.mewcraft.wakame.util.nekoCompoundOrNull
+import cc.mewcraft.wakame.util.removeNekoCompound
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
@@ -27,6 +29,11 @@ internal class NekoItemStackImpl(
         isOneOff = true /* so, it's a one-off instance */
     )
 
+    @InternalApi
+    override fun erase() {
+        handle.removeNekoCompound()
+    }
+
     // region WakaItemStack
     /**
      * The "wakame" [CompoundTag][CompoundShadowTag] of this item.
@@ -40,10 +47,10 @@ internal class NekoItemStackImpl(
         get() {
             if (isOneOff) {
                 // strictly-Bukkit ItemStack - the `wakame` compound is always available. If not, create one
-                return handle.wakameCompound
+                return handle.nekoCompound
             }
             // NMS-backed ItemStack - reading/modifying is allowed only if it already has a `wakame` compound
-            return checkNotNull(handle.wakameCompoundOrNull) { "Can't read/modify the NBT of NMS-backed ItemStack which is not WakaItemStack" }
+            return checkNotNull(handle.nekoCompoundOrNull) { "Can't read/modify the NBT of NMS-backed ItemStack which is not WakaItemStack" }
         }
 
     override val isNeko: Boolean
@@ -52,7 +59,7 @@ internal class NekoItemStackImpl(
           1) a one-off `this` is always considered Wakame item
           2) a NMS-backed `this` is considered Wakame item iff it has a `wakame` compound tag
         */
-        get() = isOneOff || handle.wakameCompoundOrNull != null
+        get() = isOneOff || handle.nekoCompoundOrNull != null
 
     override val isNotNeko: Boolean
         get() = !isNeko
@@ -97,7 +104,7 @@ internal class NekoItemStackImpl(
 
     // region WakaItemStackSetter
     override fun putRoot(compoundTag: CompoundShadowTag) {
-        handle.wakameCompound = compoundTag
+        handle.nekoCompound = compoundTag
     }
 
     override fun putKey(key: Key) {

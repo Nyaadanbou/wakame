@@ -35,7 +35,8 @@ dependencies {
     implementation(project(":wakame:wakame-common"))
     implementation(project(":wakame:wakame-api"))
     implementation(project(":wakame:wakame-ext"))
-    implementation(project(":wakame:wakame-nms", configuration = "reobf"))
+    compileOnly(project(":wakame:wakame-nms")) // will it work?
+    runtimeOnly(project(":wakame:wakame-nms", configuration = "reobf"))
     implementation(project(":spatula:bukkit:utils"))
     implementation(libs.configurate.yaml) {
         exclude("com.google.errorprone")

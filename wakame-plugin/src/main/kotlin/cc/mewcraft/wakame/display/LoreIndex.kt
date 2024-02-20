@@ -15,9 +15,9 @@ internal sealed interface LoreIndex {
     val rawKey: RawKey
 
     /**
-     * 在配置文件内的原始 Index（即在配置文件中的 List 的位置）。
+     * 在配置文件内的原始 Index（即在配置文件中的 List 的索引，从0开始）。
      */
-    val rawIndex: Int
+    val rawIndex: RawIndex
 
     /**
      * 生成所有的“完整 Key”（注意区别于“原始 Key”）。完整 Key 将用于最终的顺序查询。
@@ -41,7 +41,7 @@ internal sealed interface FixedLoreIndex : LoreIndex {
         // 例如，这行固定内容位于列表中的第3个，那么其 raw key 就是 "fixed:3"
         get() = RawKey.key("fixed", rawIndex.toString())
 
-    override val rawIndex: Int
+    override val rawIndex: RawIndex
 
     override fun computeFullKeys(): List<FullKey> {
         // 首先要知道 full key 是用于最终的顺序查询
