@@ -68,7 +68,7 @@ internal class LoreStylizerImpl(
         item.cells.asMap().values.forEach {
             val core = it.binaryCore
             if (core.isEmpty) {
-                // TODO 渲染空词条栏
+                ret +=
             } else {
                 when (core) {
                     is BinaryAbilityCore -> ret += AbilityLoreLineFactory.get(abilityLineKeys.get(core), abilityStylizer.stylizeAbility(core))

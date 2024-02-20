@@ -7,43 +7,31 @@ import cc.mewcraft.wakame.registry.ElementRegistry
 // TODO 统一 key 的生成规则
 
 /**
- * 代表一个当源数据不存在时改用空行替代的顺序。
- *
- * @param sourceLoreIndex 原来的 loreIndex
- */
-internal data class FallbackLoreIndex( // TODO unfinished
-    private val sourceLoreIndex: LoreIndex,
-) : LoreIndex {
-    override val rawKey: RawKey = sourceLoreIndex.rawKey
-    override val rawIndex: RawIndex = sourceLoreIndex.rawIndex
-    override fun computeFullKeys(): List<FullKey> = sourceLoreIndex.computeFullKeys()
-
-    fun fallback(): EmptyFixedLoreIndex {
-        return EmptyFixedLoreIndex(rawIndex)
-    }
-}
-
-/**
  * 代表一个自定义的固定内容的顺序。
  */
-internal data class CustomFixedLoreIndex(
+internal data class CustomFixedLoreMeta(
     override val rawIndex: RawIndex,
-) : FixedLoreIndex
+    override val requiredNamespace: String?,
+    override val canBeEmptyLine: Boolean
+) : FixedLoreMeta
 
 /**
  * 代表一个空的固定内容的顺序。
  */
-internal data class EmptyFixedLoreIndex(
+internal data class EmptyFixedLoreMeta(
     override val rawIndex: RawIndex,
-) : FixedLoreIndex
+    override val requiredNamespace: String?,
+    override val canBeEmptyLine: Boolean
+) : FixedLoreMeta
 
 /**
  * 代表一个元数据的顺序。
  */
-internal data class MetaLoreIndex(
+internal data class MetaLoreMeta(
     override val rawKey: RawKey,
     override val rawIndex: RawIndex,
-) : LoreIndex {
+    override val canBeEmptyLine: Boolean = true,
+) : LoreMeta {
     override fun computeFullKeys(): List<FullKey> {
         return listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
     }
@@ -52,10 +40,11 @@ internal data class MetaLoreIndex(
 /**
  * 代表一个技能的顺序。
  */
-internal data class AbilityLoreIndex(
+internal data class AbilityLoreMeta(
     override val rawKey: RawKey,
     override val rawIndex: RawIndex,
-) : LoreIndex {
+    override val canBeEmptyLine: Boolean = true,
+) : LoreMeta {
     override fun computeFullKeys(): List<FullKey> {
         return listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
     }
@@ -64,14 +53,15 @@ internal data class AbilityLoreIndex(
 /**
  * 代表一个属性的顺序。
  */
-internal data class AttributeLoreIndex(
+internal data class AttributeLoreMeta(
     override val rawKey: RawKey,
     override val rawIndex: RawIndex,
     /**
      * 表示配置文件内 operation 与 element 顺序的规则
      */
     val rule: Rule,
-) : LoreIndex {
+    override val canBeEmptyLine: Boolean = true,
+) : LoreMeta {
 
     data class Rule(
         val operationIndex: List<String>,

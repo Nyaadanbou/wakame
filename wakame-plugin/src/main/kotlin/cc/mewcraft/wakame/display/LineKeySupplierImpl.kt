@@ -22,6 +22,7 @@ internal class AbilityLineKeySupplierImpl : AbilityLineKeySupplier {
 }
 
 internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
+    //<editor-fold desc="Implementation of a Map indexed by triple keys">
     /**
      * Full Keys in this map are double-indexed: `key` + `operation`.
      */
@@ -102,12 +103,13 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
             return value
         }
     }
+    //</editor-fold>
 
     override fun get(obj: BinaryAttributeCore): FullKey {
         // 属性的 full key 根据 id + operation + element 共同决定
         // 属性的 full key 格式目前只有两种
-        // 1. attribute:_id_/_operation
-        // 2. attribute:_id_/_operation_/_element_
+        // 1. attribute:_id_/_operation             <- 由运算模式衍生
+        // 2. attribute:_id_/_operation_/_element_  <- 由元素种类衍生
 
         val key = obj.key
         val operation = obj.value.operation

@@ -16,76 +16,9 @@ import net.minecraft.nbt.Tag
 import org.bukkit.Bukkit
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
-import org.jetbrains.annotations.Contract
 import net.minecraft.world.item.ItemStack as MojangStack
 
 private const val ROOT_COMPOUND_NAME: String = NekoTags.ROOT
-
-/**
- * Reads/writes the NBT tags from items as [ShadowTag].
- */
-object ItemStackShadowNbt {
-    /**
-     * Gets the [ROOT_COMPOUND_NAME] compound tag from the [itemStack]. If the
-     * [ROOT_COMPOUND_NAME] compound tag does not already exist, a new compound
-     * tag will be created and **saved** to the [itemStack].
-     */
-    @Contract(mutates = "itemStack")
-    fun getNekoCompound(itemStack: ItemStack): CompoundShadowTag {
-        val handle = itemStack.handle
-        if (handle != null) { // CraftItemStack
-            return handle.nekoCompound
-        } else { // strictly-Bukkit ItemStack
-            val unhandledTags = itemStack.backingItemMeta!!.unhandledTags
-            val tag = unhandledTags.getOrPut(ROOT_COMPOUND_NAME, ::CompoundTag) as CompoundTag
-            return tag.wrap
-        }
-    }
-
-    /**
-     * Gets the `wakame` compound tag from [itemStack] or `null`, if it does
-     * not exist. Unlike [getNekoCompound], which possibly modifies the
-     * item's NBT tags, this function will leave the [itemStack] **intact**.
-     */
-    @Contract(pure = true)
-    fun getNekoCompoundOrNull(itemStack: ItemStack): CompoundShadowTag? {
-        val handle = itemStack.handle
-        return if (handle != null) { // CraftItemStack
-            handle.nekoCompoundOrNull
-        } else { // strictly-Bukkit ItemStack
-            (itemStack.backingItemMeta?.unhandledTags?.get(ROOT_COMPOUND_NAME) as? CompoundTag)?.wrap
-        }
-    }
-
-    /**
-     * Sets the [ROOT_COMPOUND_NAME] compound tag of the given [itemStack] to
-     * [value], **overwriting** any existing [ROOT_COMPOUND_NAME] compound tag
-     * on the [itemStack].
-     */
-    @Contract(mutates = "itemStack")
-    fun setNekoCompound(itemStack: ItemStack, value: CompoundShadowTag) {
-        val handle = itemStack.handle
-        if (handle != null) { // CraftItemStack
-            handle.nekoCompound = value
-        } else { // strictly-Bukkit ItemStack
-            itemStack.backingItemMeta!!.unhandledTags[ROOT_COMPOUND_NAME] = value.unwrap
-        }
-    }
-
-    /**
-     * Removes the [ROOT_COMPOUND_NAME] compound tag from the [itemStack] if it
-     * already exists on the [itemStack].
-     */
-    @Contract(mutates = "itemStack")
-    fun removeNekoCompound(itemStack: ItemStack) {
-        val handle = itemStack.handle
-        if (handle != null) { // CraftItemStack
-            handle.removeTagKey(NekoTags.ROOT)
-        } else { // strictly-Bukkit ItemStack
-            itemStack.backingItemMeta?.unhandledTags?.remove(NekoTags.ROOT)
-        }
-    }
-}
 
 //<editor-fold desc="Shadow un(wrappers)">
 internal val Tag.wrap: ShadowTag
@@ -101,6 +34,7 @@ internal val CompoundShadowTag.unwrap: CompoundTag
 internal val ItemMeta.unhandledTags: MutableMap<String, Tag>
     get() = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this).getUnhandledTags()
 
+//<editor-fold desc="CraftItemStack - Direct Access to `tags.display`">
 /**
  * Sets the display name through JSON string. You may pass a `null` to
  * remove the name. This function will directly write the given JSON string
@@ -136,6 +70,7 @@ var ItemStack.displayLoreNms: List<String>?
             this.handle?.getTagElement("display")?.remove("Lore")
         }
     }
+//</editor-fold>
 
 //<editor-fold desc="MojangStack - Neko Compound">
 internal var MojangStack.nekoCompound: CompoundShadowTag
@@ -152,7 +87,68 @@ internal val MojangStack.nekoCompoundOrNull: CompoundShadowTag?
 //</editor-fold>
 
 //<editor-fold desc="BukkitStack - Neko Compound">
-// moved to singleton object - the gradle somehow doesn't know the re-obfuscated extensions functions
+/**
+ * ## Getter
+ *
+ * Gets the [ROOT_COMPOUND_NAME] compound tag from `this`. If the
+ * [ROOT_COMPOUND_NAME] compound tag does not already exist, a new compound
+ * tag will be created and **saved** to `this`.
+ *
+ * ## Setter
+ *
+ * Sets the [ROOT_COMPOUND_NAME] compound tag of `this` to given
+ * value, overwriting any existing [ROOT_COMPOUND_NAME] compound tag
+ * on the `this`.
+ *
+ * You can also set `this` to `null` to removes the [ROOT_COMPOUND_NAME]
+ * compound tag from `this`.
+ */
+var ItemStack.nekoCompound: CompoundShadowTag
+    get() {
+        val handle = this.handle
+        if (handle != null) { // CraftItemStack
+            return handle.nekoCompound
+        } else { // strictly-Bukkit ItemStack
+            val unhandledTags = this.backingItemMeta!!.unhandledTags
+            val tag = unhandledTags.getOrPut(ROOT_COMPOUND_NAME, ::CompoundTag) as CompoundTag
+            return tag.wrap
+        }
+    }
+    set(value) {
+        val handle = this.handle
+        if (handle != null) { // CraftItemStack
+            handle.nekoCompound = value
+        } else { // strictly-Bukkit ItemStack
+            this.backingItemMeta!!.unhandledTags[ROOT_COMPOUND_NAME] = value.unwrap
+        }
+    }
+
+/**
+ * Gets the [ROOT_COMPOUND_NAME] compound tag from `this` or `null`, if it does
+ * not exist. Unlike [ItemStack.nekoCompound], which possibly modifies the
+ * item's NBT tags, this function will not modify `this` at all.
+ */
+val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
+    get() {
+        val handle = this.handle
+        return if (handle != null) { // CraftItemStack
+            handle.nekoCompoundOrNull
+        } else { // strictly-Bukkit ItemStack
+            (this.backingItemMeta?.unhandledTags?.get(ROOT_COMPOUND_NAME) as? CompoundTag)?.wrap
+        }
+    }
+
+/**
+ * Removes the [ROOT_COMPOUND_NAME] compound tag from `this`.
+ */
+fun ItemStack.removeNekoCompound() {
+    val handle = this.handle
+    if (handle != null) { // CraftItemStack
+        handle.removeTagKey(NekoTags.ROOT)
+    } else { // strictly-Bukkit ItemStack
+        this.backingItemMeta?.unhandledTags?.remove(NekoTags.ROOT)
+    }
+}
 //</editor-fold>
 
 /**

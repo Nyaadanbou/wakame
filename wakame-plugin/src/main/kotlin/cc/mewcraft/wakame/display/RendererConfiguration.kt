@@ -19,7 +19,7 @@ internal class RendererConfiguration(
     private val miniMessage: MiniMessage,
 ) : Initializable, Reloadable {
     companion object {
-        private const val RENDERER_ORDER = "renderer_order"
+        private const val RENDERER_ORDER = "renderer_layout"
         private const val RENDERER_STYLE = "renderer_style"
 
         private const val RENDERER_FIXED_LORE_SYMBOL = '^'
@@ -93,70 +93,66 @@ internal class RendererConfiguration(
     //</editor-fold>
 
     //<editor-fold desc="renderer_order">
-    val allLoreIndexes: LinkedHashMap<FullKey, LoreIndex> get() = _allLoreIndexes
-    private val _allLoreIndexes: LinkedHashMap<FullKey, LoreIndex> = linkedMapOf()
+    private val _loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> = linkedMapOf()
+    val loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> get() = _loreMetaLookup
 
-    val fixedLoreLines: Collection<FixedLoreLine> get() = _fixedLoreLines
+    private val _fullIndexLookup: MutableMap<FullKey, FullIndex> = mutableMapOf()
+    val fullIndexLookup: Map<FullKey, FullIndex> get() = _fullIndexLookup
+
     private val _fixedLoreLines: MutableCollection<FixedLoreLine> = mutableListOf()
-
-    val loreLineIndexes: Map<FullKey, FullIndex> get() = _loreLineIndexes
-    private val _loreLineIndexes: MutableMap<FullKey, Int> = mutableMapOf()
+    val fixedLoreLines: Collection<FixedLoreLine> get() = _fixedLoreLines
 
     private fun loadConfiguration() {
         _fixedLoreLines.clear()
-        _loreLineIndexes.clear()
-        _allLoreIndexes.clear()
+        _fullIndexLookup.clear()
+        _loreMetaLookup.clear()
 
         val primaryIndex = root.node(RENDERER_ORDER).node("primary").requireKt<List<String>>()
         val operationIndex = root.node(RENDERER_ORDER).node("operation").requireKt<List<String>>()
         val elementIndex = root.node(RENDERER_ORDER).node("element").requireKt<List<String>>()
 
         for ((rawIndex, rawKey) in primaryIndex.withIndex()) {
-            val loreIndex = getLoreIndex(rawKey, rawIndex, AttributeLoreIndex.Rule(operationIndex, elementIndex))
+            val loreIndex = getLoreIndex(rawKey, rawIndex, AttributeLoreMeta.Rule(operationIndex, elementIndex))
             val fullKeys = loreIndex.computeFullKeys()
 
             for ((localIndex, fullKey) in fullKeys.withIndex()) {
-                val absent = _allLoreIndexes.putIfAbsent(fullKey, loreIndex) == null
+                val absent = _loreMetaLookup.putIfAbsent(fullKey, loreIndex) == null
                 val newIndex = localIndex + rawIndex
-                _loreLineIndexes[fullKey] = newIndex
+                _fullIndexLookup[fullKey] = newIndex
                 require(absent) { "Key $fullKey has already been added to indexes, please remove the duplicates" }
             }
         }
     }
 
-    private fun getLoreIndex(rawKey: String, rawIndex: Int, rule: AttributeLoreIndex.Rule, currentDepth: Int = 0): LoreIndex {
-        if (currentDepth > 3) {
-            throw IllegalArgumentException("Too deep recursion while loading $RENDERER_CONFIG_FILE, is your configuration file correct?")
-        }
-
+    private fun getLoreIndex(rawKey: String, rawIndex: Int, rule: AttributeLoreMeta.Rule, canBeEmptyLine: Boolean = false): LoreMeta {
         return when {
             rawKey.startsWith(RENDERER_CONDITION_LORE_SYMBOL) && rawKey.length > 1 -> {
                 val sourceKey = rawKey.substringAfter(RENDERER_CONDITION_LORE_SYMBOL)
-                FallbackLoreIndex(getLoreIndex(sourceKey, rawIndex, rule, currentDepth + 1))
+                getLoreIndex(sourceKey, rawIndex, rule, true)
             }
 
             rawKey == RENDERER_CONDITION_LORE_SYMBOL -> {
-                val emptyFixedLoreIndex = EmptyFixedLoreIndex(rawIndex)
+                val emptyFixedLoreIndex = EmptyFixedLoreMeta(rawIndex)
                 _fixedLoreLines.add(FixedLoreLineImpl(emptyFixedLoreIndex.computeFullKeys().first(), listOf(Component.empty())))
                 emptyFixedLoreIndex
             }
 
             rawKey.startsWith(RENDERER_FIXED_LORE_SYMBOL) -> {
-                val customFixedLoreIndex = CustomFixedLoreIndex(rawIndex)
+                val customFixedLoreIndex = CustomFixedLoreMeta(rawIndex)
                 _fixedLoreLines.add(FixedLoreLineImpl(customFixedLoreIndex.computeFullKeys().first(), listOf(miniMessage.deserialize(rawKey.substringAfter(RENDERER_FIXED_LORE_SYMBOL)))))
                 customFixedLoreIndex
             }
 
             rawKey.startsWith(NekoNamespaces.ABILITY + ":") -> {
-                AbilityLoreIndex(RawKey.key(rawKey), rawIndex)
+                AbilityLoreMeta(RawKey.key(rawKey), rawIndex, canBeEmptyLine)
             }
 
             rawKey.startsWith(NekoNamespaces.ATTRIBUTE + ":") -> {
-                AttributeLoreIndex(RawKey.key(rawKey), rawIndex, rule)
+                AttributeLoreMeta(RawKey.key(rawKey), rawIndex, rule, canBeEmptyLine)
             }
 
             rawKey.startsWith(NekoNamespaces.META + ":") -> {
-                MetaLoreIndex(RawKey.key(rawKey), rawIndex)
+                MetaLoreMeta(RawKey.key(rawKey), rawIndex, canBeEmptyLine)
             }
 
             else -> {

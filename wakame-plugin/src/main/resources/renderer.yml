@@ -4,9 +4,8 @@
 # 将其 NBT `tags.display` 下的内容
 # 根据此配置文件定义的格式进行修改
 
-# 渲染顺序
+# 渲染布局
 # 定义什么内容应该出现在什么位置
-# 列表中的每一项，代表一个指定内容的顺序
 # 例如想让“攻击力”显示在“暴击概率”前面
 # 那么把“攻击力”排在“暴击概率”前面即可
 #
@@ -27,11 +26,12 @@
 #   见内部的注释
 # operation:
 #   见内部的注释
-renderer_order:
+renderer_layout:
 
   # 主体排序
   primary:
     - ^<aqua><!i><b>元数据 # 以 ^ 开头以插入固定的自定义内容
+    - meta:empty
     - meta:level # 必须写命名空间形式的唯一标识 (namespace:value)
     - meta:rarity
     - meta:element
@@ -41,7 +41,10 @@ renderer_order:
     - meta:lore
     - / # 以 / 开头但后面不接任何内容，可以直接插入空行
 
-    - ^<aqua><!i><b>属性
+    - (fixed)<aqua><!i><b>属性
+    - (fixed;*)<aqua><!i><b>属性
+    - (fixed;attribute)<aqua><!i><b>属性
+    - attribute:empty
     - attribute:attack_damage
     - attribute:attack_effect_chance
     - attribute:attack_speed_level
@@ -73,7 +76,8 @@ renderer_order:
     - attribute:movement_speed_rate
     - /
 
-    - ^<aqua><!i><b>技能
+    - ^<aqua><!i><b>技能 # FIXME 当下面没有内容时，可以选择不显示该固定内容
+    - ability:empty
     - ability:blink
     - ability:cyclone
     - ability:dash

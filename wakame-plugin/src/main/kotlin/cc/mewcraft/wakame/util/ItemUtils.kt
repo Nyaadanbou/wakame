@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.shadow.inventory.ShadowCraftMetaItem
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
@@ -14,10 +13,9 @@ val ItemMeta.unhandledTags: MutableMap<String, ShadowTag>
     get() = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem>(this).unhandledTags()
 
 /**
- * Gets the custom model data or `0`, if the custom model data does not
- * exist.
+ * Gets the custom model data or `0`, if it does not exist.
  */
-val ItemStack.customModelData: Int
+val ItemStack.modelData: Int
     get() {
         if (hasItemMeta()) {
             val itemMeta = itemMeta!!
@@ -49,25 +47,6 @@ val ItemStack.adventureLore: List<Component>
         }
         return emptyList()
     }
-
-/**
- * Gets/sets the custom compound.
- */
-var ItemStack.nekoCompound: CompoundShadowTag
-    get() = ItemStackShadowNbt.getNekoCompound(this)
-    set(value) = ItemStackShadowNbt.setNekoCompound(this, value)
-
-/**
- * Gets the custom compound or null, if it does not exist.
- */
-val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
-    get() = ItemStackShadowNbt.getNekoCompoundOrNull(this)
-
-/**
- * Removes the custom compound.
- */
-fun ItemStack.removeNekoCompound() =
-    ItemStackShadowNbt.removeNekoCompound(this)
 
 //<editor-fold desc="Adventure NBT is for test only">
 fun ItemStack.getNbt(): CompoundBinaryTag =

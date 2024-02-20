@@ -71,8 +71,8 @@ class RendererConfigurationTest : KoinTest {
     fun `renderer config loader test`() {
         val loader = get<RendererConfiguration>().also { it.onReload() }
 
-        val allLoreIndexes = loader.allLoreIndexes
-        val loreLineIndexes = loader.loreLineIndexes
+        val allLoreIndexes = loader.loreMetaLookup
+        val loreLineIndexes = loader.fullIndexLookup
         val fixedLoreLines = loader.fixedLoreLines
 
         val nameFormat = loader.nameFormat

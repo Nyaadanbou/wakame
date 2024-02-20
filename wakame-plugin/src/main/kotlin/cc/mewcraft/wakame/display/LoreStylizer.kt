@@ -14,7 +14,7 @@ import java.util.UUID
 /**
  * 为给定的 [NekoItemStack] 生成 [lore lines][LoreLine].
  *
- * 注意，该接口所所生成的 [lore lines][LoreLine]
+ * 注意，该接口所生成的 [lore lines][LoreLine]
  * 不能直接用在物品上，需要做进一步处理才可以用在物品上。例如排序，拆包，加上固定内容。
  */
 internal interface LoreStylizer {
@@ -116,7 +116,7 @@ internal interface MetaStylizer {
         val single: String
 
         /**
-         * The format of the separator which separates the elements in the list.
+         * The format of the separator.
          */
         val separator: String
     }

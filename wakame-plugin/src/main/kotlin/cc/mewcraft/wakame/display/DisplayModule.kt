@@ -22,9 +22,9 @@ fun displayModule(): Module = module {
     singleOf(::ItemRendererListener)
 
     // line index lookup
-    single<LoreIndexLookup> {
+    single<LoreMetaLookup> {
         val loader = get<RendererConfiguration>()
-        LoreIndexLookupImpl(loader.loreLineIndexes)
+        LoreMetaLookupImpl(loader.fullIndexLookup)
     }
 
     // line key suppliers

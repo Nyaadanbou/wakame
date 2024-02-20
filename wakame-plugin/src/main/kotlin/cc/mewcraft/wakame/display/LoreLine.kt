@@ -5,10 +5,10 @@ import net.kyori.adventure.text.Component
 /**
  * 代表 Item Lore 中的任意内容。
  *
- * 注意与 [LoreIndex] 区别 - [LoreIndex] 代表顺序，而 [LoreLine] 代表内容。
+ * 注意与 [LoreLine] 区别 - [LoreMeta] 代表顺序及其他信息，而 [LoreLine] 仅代表内容。
  *
- * @see LoreIndex
- * @see LoreIndexLookup
+ * @see LoreMeta
+ * @see LoreMetaLookup
  */
 internal sealed interface LoreLine {
     /**

@@ -11,7 +11,7 @@ internal sealed interface LineKeySupplier<T> {
     /**
      * 根据某种规则为特定的 [obj] 生成唯一的标识。
      *
-     * 你可以用该函数所返回的 [FullKey] 配合 [LoreIndexLookup] 找到其在 Item Lore 中的顺序。
+     * 你可以用该函数所返回的 [FullKey] 配合 [LoreMetaLookup] 找到其在 Item Lore 中的顺序。
      */
     fun get(obj: T): FullKey
 }
