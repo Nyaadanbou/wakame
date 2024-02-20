@@ -6,27 +6,21 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
 data class ItemSkin @InternalApi internal constructor(
     override val key: String,
     override val binary: Short,
-    /**
-     * The display name (MiniMessage string).
-     */
-    val displayName: String,
+    override val displayName: String,
 ) : Skin, KoinComponent, BiIdentified<String, Short> {
 
-    private val mm: MiniMessage by inject(named(MINIMESSAGE_FULL))
-    val displayNameComponent: Component = mm.deserialize(displayName)
+    override val displayNameComponent: Component = get<MiniMessage>(named(MINIMESSAGE_FULL)).deserialize(displayName)
 
     override fun equals(other: Any?): Boolean {
-        return if (other is ItemSkin) {
-            other.key == key
-        } else {
-            false
-        }
+        if (this === other) return true
+        if (other is ItemSkin) return other.key == key
+        return false
     }
 
     override fun hashCode(): Int {

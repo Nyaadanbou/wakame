@@ -3,7 +3,9 @@ package cc.mewcraft.wakame.display
 import net.kyori.adventure.text.Component
 
 /**
- * 代表 Item Lore 中的**内容**。
+ * 代表 Item Lore 中的任意内容。
+ *
+ * 注意与 [LoreIndex] 区别 - [LoreIndex] 代表顺序，而 [LoreLine] 代表内容。
  *
  * @see LoreIndex
  * @see LoreIndexLookup
@@ -21,7 +23,7 @@ internal sealed interface LoreLine {
 }
 
 /**
- * 代表一个固定内容。
+ * 代表一个任意的固定内容。
  */
 internal interface FixedLoreLine : LoreLine
 

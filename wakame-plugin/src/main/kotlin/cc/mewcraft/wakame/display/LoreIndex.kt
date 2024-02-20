@@ -1,13 +1,9 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
-
-// TODO 统一 key 的生成规则
-
 /**
- * 代表 Item Lore 中的内容的**顺序**。
+ * 代表 Item Lore 中的任意内容的顺序。
+ *
+ * 注意与 [LoreLine] 区别 - [LoreIndex] 代表顺序，而 [LoreLine] 代表内容。
  *
  * @see LoreLine
  * @see LoreIndexLookup
@@ -34,123 +30,23 @@ internal sealed interface LoreIndex {
 }
 
 /**
- * 代表一个当源数据不存在时改用空行替代的顺序。
- *
- * @param loreIndex 原来的 loreIndex
- */
-internal class FallbackLoreIndex(
-    private val loreIndex: LoreIndex,
-) : LoreIndex {
-    override val rawKey: RawKey = loreIndex.rawKey
-    override val rawIndex: Int = loreIndex.rawIndex
-    override fun computeFullKeys(): List<FullKey> = loreIndex.computeFullKeys()
-
-    fun fallback(): EmptyFixedLoreIndex {
-        return EmptyFixedLoreIndex(rawIndex)
-    }
-}
-
-/**
- * 代表一个固定内容的顺序。
+ * 代表 Item Lore 中的固定内容的顺序。
  *
  * @see CustomFixedLoreIndex
  * @see EmptyFixedLoreIndex
  */
 internal sealed interface FixedLoreIndex : LoreIndex {
     override val rawKey: RawKey
-        // 实际上，固定内容的 raw key 就是其在配置文件中原始顺序的字符串形式
-        // 例如，这行固定内容配置文件列表中的第3个，那么它的 key 就是 "fixed:3"
+        // 实际上，固定内容的 raw key 就是其在配置文件中“原始顺序”的字符串形式
+        // 例如，这行固定内容位于列表中的第3个，那么其 raw key 就是 "fixed:3"
         get() = RawKey.key("fixed", rawIndex.toString())
 
     override val rawIndex: Int
 
     override fun computeFullKeys(): List<FullKey> {
-        // 固定内容的 full key 与其 raw key 的逻辑是一样的
+        // 首先要知道 full key 是用于最终的顺序查询
+        // 而逻辑上，固定内容的 full key 只需要与 raw key 一致
+        // 就可以达到我们的最终的目的 - 用于最终的顺序查询
         return listOf(rawKey)
-    }
-}
-
-/**
- * 代表一个自定义的固定内容的顺序。
- */
-internal data class CustomFixedLoreIndex(
-    override val rawIndex: Int,
-) : FixedLoreIndex
-
-/**
- * 代表一个空的固定内容的顺序。
- */
-internal data class EmptyFixedLoreIndex(
-    override val rawIndex: Int,
-) : FixedLoreIndex
-
-/**
- * 代表一个元数据的顺序。
- */
-internal data class MetaLoreIndex(
-    override val rawKey: RawKey,
-    override val rawIndex: Int,
-) : LoreIndex {
-    override fun computeFullKeys(): List<FullKey> {
-        return listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
-    }
-}
-
-/**
- * 代表一个技能的顺序。
- */
-internal data class AbilityLoreIndex(
-    override val rawKey: RawKey,
-    override val rawIndex: Int,
-) : LoreIndex {
-    override fun computeFullKeys(): List<FullKey> {
-        return listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
-    }
-}
-
-/**
- * 代表一个属性的顺序。
- */
-internal data class AttributeLoreIndex(
-    override val rawKey: RawKey,
-    override val rawIndex: Int,
-    /**
-     * 表示配置文件内 operation 与 element 顺序的规则
-     */
-    val rule: Rule,
-) : LoreIndex {
-
-    data class Rule(
-        val operationIndex: List<String>,
-        val elementIndex: List<String>
-    )
-
-    /**
-     * 根据以下衍生规则:
-     *   - attribute:id
-     *   - attribute:id:operation
-     *   - attribute:id:operation:element
-     *
-     * 为该属性生成所有的 full keys
-     */
-    override fun computeFullKeys(): List<FullKey> {
-        val ret = mutableListOf<FullKey>()
-        val meta = AttributeRegistry.getMeta(rawKey)
-
-        for (operation in rule.operationIndex) {
-            if (AttributeModifier.Operation.byKeyOrNull(operation) == null) continue
-
-            ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation"))
-
-            if (meta.element) {
-                for (element in rule.elementIndex) {
-                    if (ElementRegistry.get(element) == null) continue
-
-                    ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation.$element"))
-                }
-            }
-        }
-
-        return ret
     }
 }

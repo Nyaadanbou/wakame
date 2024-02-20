@@ -119,18 +119,21 @@ internal class AttributeStylizerImpl(
     private val defaultDecimalFormat: NumberFormat = DecimalFormat.getInstance()
 
     /**
-     * The cache of [DecimalFormat]. The `map key` are patterns for [DecimalFormat].
+     * The cache of [DecimalFormat]. The `map key` are patterns for
+     * [DecimalFormat].
      */
     private val customDecimalFormats: MutableMap<String, NumberFormat> = Object2ObjectOpenHashMap()
 
     /**
-     * Creates a replacement that inserts a number as a component. The component will be formatted by the provided [DecimalFormat].
+     * Creates a replacement that inserts a number as a component. The
+     * component will be formatted by the provided [DecimalFormat].
      *
      * This tag accepts a format pattern, or nothing as arguments.
      *
      * Refer to [DecimalFormat] for usable patterns.
      *
-     * This replacement is auto-closing, so its style will not influence the style of following components.
+     * This replacement is auto-closing, so its style will not influence the
+     * style of following components.
      *
      * @param key the key
      * @param number the number
@@ -205,6 +208,15 @@ internal class AttributeStylizerImpl(
             return listOf(miniMessage.deserialize(attributeFormats.getOrThrow(key), tagResolvers.build()))
         }
     }
+
+    class AttackSpeedFormatImpl(
+        override val merged: String,
+        override val levels: Map<Int, String>,
+    ) : AttributeStylizer.AttackSpeedFormat {
+        override fun toString(): String {
+            return "AttackSpeedFormat(merged=$merged, levels=${levels.entries.joinToString { it.toString() }})"
+        }
+    }
 }
 
 internal class OperationStylizerImpl(
@@ -235,8 +247,8 @@ internal class MetaStylizerImpl(
     }
 
     override fun stylizeLore(lore: List<String>): List<Component> {
-        val header = loreFormat.header?.mapTo(ObjectArrayList(loreFormat.header.size)) { miniMessage.deserialize(it) }
-        val bottom = loreFormat.bottom?.mapTo(ObjectArrayList(loreFormat.bottom.size)) { miniMessage.deserialize(it) }
+        val header = loreFormat.header?.let { it.mapTo(ObjectArrayList(it.size), miniMessage::deserialize) }
+        val bottom = loreFormat.bottom?.let { it.mapTo(ObjectArrayList(it.size), miniMessage::deserialize) }
         val lines = lore.mapTo(ObjectArrayList(lore.size)) { miniMessage.deserialize(loreFormat.line, parsed("line", it)) }
 
         return if (header == null && bottom == null) {
@@ -294,5 +306,25 @@ internal class MetaStylizerImpl(
 
     override fun stylizeSkinOwner(skinOwner: UUID): List<Component> {
         return listOf(miniMessage.deserialize(skinOwnerFormat, unparsed("value", skinOwner.toString())))
+    }
+
+    class LoreFormatImpl(
+        override val line: String,
+        override val header: List<String>?,
+        override val bottom: List<String>?,
+    ) : MetaStylizer.LoreFormat {
+        override fun toString(): String {
+            return "LoreFormat(line=$line, header=${header?.joinToString()}, bottom=${bottom?.joinToString()})"
+        }
+    }
+
+    class ListFormatImpl(
+        override val merged: String,
+        override val single: String,
+        override val separator: String,
+    ) : MetaStylizer.ListFormat {
+        override fun toString(): String {
+            return "ListFormat(merged=$merged, single=$single, separator=$separator)"
+        }
     }
 }

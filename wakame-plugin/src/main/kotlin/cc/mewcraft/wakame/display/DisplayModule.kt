@@ -1,20 +1,16 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.MINIMESSAGE_FULL
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.Reloadable
+import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
-import cc.mewcraft.wakame.util.applyCommons
+import cc.mewcraft.wakame.util.createBasicConfigurationLoader
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
-import org.koin.core.scope.Scope
 import org.koin.dsl.bind
+import org.koin.dsl.binds
 import org.koin.dsl.module
-import org.spongepowered.configurate.serialize.TypeSerializerCollection
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import java.io.BufferedReader
-import java.io.File
 
 const val RENDERER_CONFIG_FILE = "renderer.yml"
 const val RENDERER_CONFIG_LOADER = "renderer_config_loader"
@@ -73,40 +69,11 @@ fun displayModule(): Module = module {
 
     // configuration loader
     single<NekoConfigurationLoader>(named(RENDERER_CONFIG_LOADER)) {
-        createRendererConfigurationLoader(RENDERER_CONFIG_FILE) {
-            // registerAll(get(named(RENDERER_SERIALIZERS)))
-        }
+        createBasicConfigurationLoader(RENDERER_CONFIG_FILE)
     }
 
     // configuration holder
     single<RendererConfiguration> {
-        RendererConfiguration(
-            get<NekoConfigurationLoader>(named(RENDERER_CONFIG_LOADER)),
-            get(named(MINIMESSAGE_FULL))
-        )
-    }
-}
-
-private fun Scope.getConfigFileAsBufferedReader(path: String): BufferedReader {
-    val plugin = getOrNull<WakamePlugin>()
-    return if (plugin != null) {
-        // we are in a server environment
-        get<WakamePlugin>().getBundledFile(path).bufferedReader()
-    } else {
-        // we are in a testing environment
-        get<File>(named(PLUGIN_DATA_DIR)).resolve(path).bufferedReader()
-    }
-}
-
-private fun Scope.createRendererConfigurationLoader(
-    path: String,
-    builder: TypeSerializerCollection.Builder.() -> Unit,
-): YamlConfigurationLoader {
-    return YamlConfigurationLoader.builder()
-        .applyCommons()
-        .source { getConfigFileAsBufferedReader(path) }
-        .defaultOptions { options ->
-            options.serializers { it.builder() }
-        }
-        .build()
+        RendererConfiguration(get(named(RENDERER_CONFIG_LOADER)), get(named(MINIMESSAGE_FULL)))
+    } binds arrayOf(Initializable::class, Reloadable::class)
 }

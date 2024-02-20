@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Reloadable
-import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.scheme.CELL_SERIALIZERS
@@ -11,16 +9,14 @@ import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
-import cc.mewcraft.wakame.util.applyCommons
+import cc.mewcraft.wakame.util.buildBasicConfigurationLoader
+import cc.mewcraft.wakame.util.createBasicConfigurationLoader
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
-import org.koin.core.scope.Scope
 import org.koin.dsl.binds
 import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import java.io.BufferedReader
-import java.io.File
 
 const val CRATE_CONFIG_DIR = "crates"
 const val CRATE_CONFIG_LOADER = "crate_config_loader"
@@ -74,75 +70,47 @@ fun registryModule(): Module = module {
 
     //<editor-fold desc="Definitions of YamlConfigurationLoader">
     single<YamlConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)) {
-        createRegistryConfigurationLoader(ELEMENT_CONFIG_FILE) {
+        createBasicConfigurationLoader(ELEMENT_CONFIG_FILE) {
             registerAll(get(named(ELEMENT_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader>(named(ENTITY_CONFIG_LOADER)) {
-        createRegistryConfigurationLoader(ENTITY_CONFIG_FILE) {
+        createBasicConfigurationLoader(ENTITY_CONFIG_FILE) {
             registerAll(get(named(REFERENCE_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader>(named(SKIN_CONFIG_LOADER)) {
-        createRegistryConfigurationLoader(SKIN_CONFIG_FILE) {
+        createBasicConfigurationLoader(SKIN_CONFIG_FILE) {
             registerAll(get(named(SKIN_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader>(named(KIZAMI_CONFIG_LOADER)) {
-        createRegistryConfigurationLoader(KIZAMI_CONFIG_FILE) {
+        createBasicConfigurationLoader(KIZAMI_CONFIG_FILE) {
             registerAll(get(named(KIZAMI_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER)) {
-        YamlConfigurationLoader.builder()
-            .applyCommons()
-            .defaultOptions { options ->
-                options.serializers {
-                    it.registerAll(get<TypeSerializerCollection>(named(CELL_SERIALIZERS)))
-                    it.registerAll(get<TypeSerializerCollection>(named(META_SERIALIZERS)))
-                }
-            }
+        buildBasicConfigurationLoader {
+            registerAll(get<TypeSerializerCollection>(named(CELL_SERIALIZERS)))
+            registerAll(get<TypeSerializerCollection>(named(META_SERIALIZERS)))
+        }
     }
 
     single<YamlConfigurationLoader>(named(RARITY_CONFIG_LOADER)) {
-        createRegistryConfigurationLoader(RARITY_CONFIG_FILE) {
+        createBasicConfigurationLoader(RARITY_CONFIG_FILE) {
             registerAll(get(named(RARITY_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader>(named(LEVEL_CONFIG_LOADER)) {
-        createRegistryConfigurationLoader(LEVEL_CONFIG_FILE) {
+        createBasicConfigurationLoader(LEVEL_CONFIG_FILE) {
             registerAll(get(named(RARITY_SERIALIZERS)))
         }
     }
     //</editor-fold>
 
-}
-
-private fun Scope.getConfigFileAsBufferedReader(path: String): BufferedReader {
-    val plugin = getOrNull<WakamePlugin>()
-    return if (plugin != null) {
-        // we are in a server environment
-        get<WakamePlugin>().getBundledFile(path).bufferedReader()
-    } else {
-        // we are in a testing environment
-        get<File>(named(PLUGIN_DATA_DIR)).resolve(path).bufferedReader()
-    }
-}
-
-private fun Scope.createRegistryConfigurationLoader(
-    path: String,
-    builder: TypeSerializerCollection.Builder.() -> Unit,
-): YamlConfigurationLoader {
-    return YamlConfigurationLoader.builder()
-        .applyCommons()
-        .source { getConfigFileAsBufferedReader(path) }
-        .defaultOptions { options ->
-            options.serializers { it.builder() }
-        }
-        .build()
 }

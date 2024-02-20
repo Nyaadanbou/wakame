@@ -15,7 +15,7 @@ internal typealias NekoConfigurationLoader = YamlConfigurationLoader
 internal typealias NekoConfigurationNode = CommentedConfigurationNode
 
 /**
- * Apply common setup for the [YamlConfigurationLoader.Builder].
+ * Apply common settings for the [YamlConfigurationLoader.Builder].
  */
 internal fun YamlConfigurationLoader.Builder.applyCommons(): YamlConfigurationLoader.Builder {
     return this
@@ -26,7 +26,7 @@ internal fun YamlConfigurationLoader.Builder.applyCommons(): YamlConfigurationLo
         // register common serializers
         .defaultOptions { options ->
             options
-                // don't automatically write default values back to config files
+                // don't automatically write default values from serializers back to config files
                 .shouldCopyDefaults(false)
                 // add common serializers
                 .serializers {
@@ -38,19 +38,31 @@ internal fun YamlConfigurationLoader.Builder.applyCommons(): YamlConfigurationLo
 }
 
 /**
+ * Creates a basic builder of configuration loader.
+ */
+internal fun buildBasicConfigurationLoader(
+    builder: TypeSerializerCollection.Builder.() -> Unit = { },
+): YamlConfigurationLoader.Builder {
+    return YamlConfigurationLoader.builder()
+        .applyCommons()
+        .defaultOptions { options ->
+            options.serializers {
+                it.builder()
+            }
+        }
+}
+
+/**
  * @see TypeSerializerCollection.Builder.register
  */
-internal inline fun <reified T> TypeSerializerCollection.Builder.registerKt(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder {
+internal inline fun <reified T> TypeSerializerCollection.Builder.registerKt(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder =
     register({ javaTypeOf<T>() == it }, serializer)
-    return this
-}
 
 /**
  * @see ConfigurationNode.require
  */
-internal inline fun <reified T> ConfigurationNode.requireKt(): T {
-    return require(javaTypeOf<T>()) as T
-}
+internal inline fun <reified T> ConfigurationNode.requireKt(): T =
+    require(javaTypeOf<T>()) as T
 
 /**
  * The deserializer for [Key].
@@ -61,7 +73,7 @@ internal class KeySerializer : TypeSerializer<Key> {
 }
 
 /**
- * The deserializer for [Range].
+ * The deserializer for [IntRange][Range].
  */
 internal class IntRangeParser : TypeSerializer<Range<Int>> {
     override fun deserialize(type: Type, node: ConfigurationNode): Range<Int> = RangeParser.parseIntRange(node.requireKt<String>())

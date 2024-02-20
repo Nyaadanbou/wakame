@@ -20,9 +20,9 @@ import java.util.UUID
 internal interface LoreStylizer {
 
     /**
-     * Generates [lore lines][LoreLine] for the given [item].
+     * Generates [lore lines][LoreLine] for the [item].
      *
-     * This function won't modify the given [item].
+     * Note that this function won't modify the given [item].
      *
      * @param item the item to generate lore for
      * @return the generated lore lines
@@ -30,8 +30,6 @@ internal interface LoreStylizer {
     fun stylize(item: NekoItemStack): Collection<LoreLine>
 
 }
-
-// To g22: 下面都是 LoreStylizer 需要用到的实现
 
 /**
  * To be used by [LoreStylizer].
@@ -46,19 +44,16 @@ internal interface AbilityStylizer {
 internal interface AttributeStylizer {
     fun stylizeAttribute(core: BinaryAttributeCore): List<Component>
 
-    class AttackSpeedFormat(
+    interface AttackSpeedFormat {
         /**
          * 攻速的格式，里面应该有一个 "<value>" 的占位符。
          */
-        val merged: String,
+        val merged: String
+
         /**
          * 必须包含9个元素，每个对应一个攻速等级，从慢到快按顺序排列。
          */
-        val levels: Map<Int, String>,
-    ) {
-        override fun toString(): String {
-            return "AttackSpeedFormat(merged=$merged, levels=${levels.entries.joinToString { it.toString() }})"
-        }
+        val levels: Map<Int, String>
     }
 }
 
@@ -91,29 +86,26 @@ internal interface MetaStylizer {
     fun stylizeSkin(skin: ItemSkin): List<Component>
     fun stylizeSkinOwner(skinOwner: UUID): List<Component>
 
-    class LoreFormat(
-        val line: String,
+    interface LoreFormat {
+        /**
+         * The format of a single line.
+         */
+        val line: String
+
         /**
          * Never be an empty list. Use `null` to indicate "don't add header".
          */
-        val header: List<String>?,
+        val header: List<String>?
+
         /**
          * Never be an empty list. Use `null` to indicate "don't add bottom".
          */
-        val bottom: List<String>?,
-    ) {
-        override fun toString(): String {
-            return "LoreFormat(line=$line, header=${header?.joinToString()}, bottom=${bottom?.joinToString()})"
-        }
+        val bottom: List<String>?
     }
 
-    class ListFormat(
-        val merged: String,
-        val single: String,
-        val separator: String,
-    ) {
-        override fun toString(): String {
-            return "ListFormat(merged=$merged, single=$single, separator=$separator)"
-        }
+    interface ListFormat {
+        val merged: String
+        val single: String
+        val separator: String
     }
 }
