@@ -29,7 +29,8 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     private val cachedFullKeys: Object2ObjectOpenHashMap<Key, Reference2ObjectOpenHashMap<AttributeModifier.Operation, FullKey>> = Object2ObjectOpenHashMap()
 
     /**
-     * Full Keys in this map are triple-indexed: `key` + `operation` + `element`.
+     * Full Keys in this map are triple-indexed: `key` + `operation` +
+     * `element`.
      */
     private val cachedFullKeysWithElement: Object2ObjectOpenHashMap<Key, Reference2ObjectOpenHashMap<AttributeModifier.Operation, Reference2ObjectOpenHashMap<Element, FullKey>>> = Object2ObjectOpenHashMap()
 
@@ -61,12 +62,20 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     }
 
     /**
-     * Returns the full key for the given triple indexes ([key], [operation], [element]) if the full key is cached and not `null`.
-     * Otherwise, calls the [defaultValue] function, puts its result into the cache under the given indexes and returns the call result.
+     * Returns the full key for the given triple indexes ([key], [operation],
+     * [element]) if the full key is cached and not `null`. Otherwise, calls
+     * the [defaultValue] function, puts its result into the cache under the
+     * given indexes and returns the call result.
      *
-     * Note that the operation is not guaranteed to be atomic if the map is being modified concurrently.
+     * Note that the operation is not guaranteed to be atomic if the map is
+     * being modified concurrently.
      */
-    private inline fun getOrPut(key: Key, operation: AttributeModifier.Operation, element: Element? = null, defaultValue: () -> Key): FullKey {
+    private inline fun getOrPut(
+        key: Key,
+        operation: AttributeModifier.Operation,
+        element: Element? = null,
+        defaultValue: () -> Key,
+    ): FullKey {
         val value = get(key, operation, element)
         return if (value == null) {
             val answer = defaultValue()
