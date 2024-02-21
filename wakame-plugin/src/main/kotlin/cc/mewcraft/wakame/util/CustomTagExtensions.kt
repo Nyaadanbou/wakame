@@ -17,14 +17,13 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 /**
  * Gets the stored [rarity][Rarity] from the specified tag.
  *
- * Returns the [default rarity][RarityRegistry.DEFAULT_RARITY] if the tag
- * does not exist.
+ * Returns the [default][RarityRegistry.DEFAULT] if the tag does not exist.
  *
  * @throws IllegalArgumentException if the stored rarity is not registered
  */
 internal fun CompoundShadowTag.getRarity(key: String): Rarity {
     val byte = getByteOrNull(key)
-        ?: return RarityRegistry.DEFAULT_RARITY
+        ?: return RarityRegistry.DEFAULT
     return RarityRegistry.getByOrThrow(byte)
 }
 //</editor-fold>
@@ -34,19 +33,19 @@ internal fun CompoundShadowTag.getRarity(key: String): Rarity {
 /**
  * Gets the stored [element][Element] from the specified **Byte** tag.
  *
- * Returns the [default element][ElementRegistry.DEFAULT_ELEMENT] if the
- * tag does not exist.
+ * Returns the [default][ElementRegistry.DEFAULT] if the tag does not
+ * exist.
  *
  * @throws IllegalArgumentException if the stored element is not registered
  */
 internal fun CompoundShadowTag.getElement(key: String): Element {
     val byte = getByteOrNull(key)
-        ?: return ElementRegistry.DEFAULT_ELEMENT
+        ?: return ElementRegistry.DEFAULT
     return ElementRegistry.getByOrThrow(byte)
 }
 
 /**
- * Gets all the stored [elements][Element] from the specified **Byte Array** tag.
+ * Gets all [elements][Element] from the specified **Byte Array** tag.
  *
  * Returns empty set if the specified tag does not exist.
  *
@@ -79,7 +78,7 @@ internal fun CompoundShadowTag.putElement(key: String, elementCollection: Collec
 
 //<editor-fold desc="Kizami Getters/Setters">
 /**
- * Gets all the stored [kizami][Kizami] from the specified **Byte Array** tag.
+ * Gets all [kizami][Kizami] from the specified **Byte Array** tag.
  *
  * Returns an empty set if the specified tag does not exist.
  *

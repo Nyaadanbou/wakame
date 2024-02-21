@@ -18,7 +18,7 @@ object ElementRegistry : KoinComponent, Initializable, Reloadable,
     /**
      * The default element. By design, it should be the most common element.
      */
-    val DEFAULT_ELEMENT: Element by lazy { values.first() }
+    val DEFAULT: Element by lazy { values.first() }
 
     // configuration stuff
     private lateinit var root: NekoConfigurationNode

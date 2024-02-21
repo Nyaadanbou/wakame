@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.SchemeBaker
@@ -10,6 +11,11 @@ import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 
 object AbilityRegistry : Initializable {
+
+    /**
+     * The key of the empty ability.
+     */
+    val EMPTY_KEY: Key = Key.key(NekoNamespaces.ABILITY, "empty")
 
     @InternalApi
     val schemeBuilderRegistry: MutableMap<Key, SchemeBuilder> = hashMapOf()

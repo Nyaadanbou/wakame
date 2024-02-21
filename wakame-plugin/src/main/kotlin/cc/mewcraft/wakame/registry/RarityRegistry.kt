@@ -18,7 +18,7 @@ object RarityRegistry : KoinComponent, Initializable, Reloadable,
     /**
      * The default rarity. By design, it should be the most common rarity.
      */
-    val DEFAULT_RARITY: Rarity by lazy { values.first() }
+    val DEFAULT: Rarity by lazy { values.first() }
 
     // configuration stuff
     private lateinit var root: NekoConfigurationNode

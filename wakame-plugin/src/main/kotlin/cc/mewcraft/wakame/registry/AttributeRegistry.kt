@@ -37,6 +37,11 @@ import net.kyori.adventure.key.Key
 )
 object AttributeRegistry : Initializable, Reloadable {
 
+    /**
+     * The key of the empty attribute.
+     */
+    val EMPTY_KEY: Key = Key.key(NekoNamespaces.ABILITY, "empty")
+
     @InternalApi
     val schemeBuilderRegistry: MutableMap<Key, SchemeBuilder> = hashMapOf()
 
