@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.util.getOrThrow
 
 internal class LoreMetaLookupImpl(
     private val indexes: Map<FullKey, FullIndex>,
+    private val metadata: Map<FullKey, LoreMeta>,
 ) : LoreMetaLookup {
-    override fun get(key: FullKey): FullIndex {
-        return indexes.getOrThrow(key)
-    }
+    override fun getIndex(key: FullKey): FullIndex = indexes.getOrThrow(key)
+    override fun getMeta(key: FullKey): LoreMeta = metadata.getOrThrow(key)
 }

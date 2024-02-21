@@ -80,6 +80,10 @@ object AttributeRegistry : Initializable, Reloadable {
     }
 
     private fun register() {
+        // a special one for other system to use
+        build(EMPTY_KEY.value(), ShadowTagType.BYTE).single().bind(Attributes.EMPTY)
+
+        // register regular attributes
         build("attack_damage", ShadowTagType.SHORT).ranged().element().bind(Attributes.byElement { MIN_ATTACK_DAMAGE }, Attributes.byElement { MAX_ATTACK_DAMAGE })
         build("attack_effect_chance", ShadowTagType.DOUBLE).single().bind(Attributes.ATTACK_EFFECT_CHANCE)
         build("attack_speed_level", ShadowTagType.BYTE).single().bind(Attributes.ATTACK_SPEED_LEVEL)
@@ -104,7 +108,7 @@ object AttributeRegistry : Initializable, Reloadable {
 
     @OptIn(InternalApi::class)
     fun getMeta(key: Key): AttributeStructMeta {
-        return attributeStructRegistry[key] ?: error("Attribute $key not found")
+        return attributeStructRegistry[key] ?: error("Can't find attribute with key '$key'")
     }
 
     override fun onPreWorld() {

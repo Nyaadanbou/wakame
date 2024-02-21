@@ -82,7 +82,7 @@ internal data class AttributeLoreMeta(
         get() {
             val ret = ArrayList<FullKey>()
             val meta = AttributeRegistry.getMeta(rawKey)
-
+            // FIXME consider 'empty'; same for ability
             for (operation in derivation.operationIndex) {
                 if (AttributeModifier.Operation.byKeyOrNull(operation) == null) {
                     continue

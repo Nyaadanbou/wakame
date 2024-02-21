@@ -22,6 +22,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Path
+import kotlin.reflect.KVisibility
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.isAccessible
 
 class RendererConfigurationTest : KoinTest {
     companion object {
@@ -31,7 +34,7 @@ class RendererConfigurationTest : KoinTest {
             startKoin {
                 modules(
                     module {
-                        single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/main/resources").toFile().absoluteFile.also { println(it) } }
+                        single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/main/resources").toFile().absoluteFile }
                         single<Logger> { LoggerFactory.getLogger("RendererConfigurationTest") }
                         single<MiniMessage>(named(MINIMESSAGE_FULL)) { MiniMessage.miniMessage() }
                         single<GsonComponentSerializer> { GsonComponentSerializer.gson() }
@@ -69,40 +72,15 @@ class RendererConfigurationTest : KoinTest {
 
     @Test
     fun `renderer config loader test`() {
+        val logger = get<Logger>()
         val loader = get<RendererConfiguration>().also { it.onReload() }
 
-        val allLoreIndexes = loader.loreMetaLookup
-        val loreLineIndexes = loader.fullIndexLookup
-        val fixedLoreLines = loader.fixedLoreLines
-
-        val nameFormat = loader.nameFormat
-        val loreFormat = loader.loreFormat
-        val levelFormat = loader.levelFormat
-        val rarityFormat = loader.rarityFormat
-        val elementFormat = loader.elementFormat
-        val kizamiFormat = loader.kizamiFormat
-        val skinFormat = loader.skinFormat
-        val skinOwnerFormat = loader.skinOwnerFormat
-        val operationFormat = loader.operationFormat
-        val attributeFormats = loader.attributeFormats
-        val attackSpeedFormat = loader.attackSpeedFormat
-
-        println(allLoreIndexes)
-        println(loreLineIndexes)
-        println(fixedLoreLines)
-
-        println("=====================================")
-
-        println(nameFormat)
-        println(loreFormat)
-        println(levelFormat)
-        println(rarityFormat)
-        println(elementFormat)
-        println(kizamiFormat)
-        println(skinFormat)
-        println(skinOwnerFormat)
-        println(operationFormat)
-        println(attributeFormats)
-        println(attackSpeedFormat)
+        // some properties are lazy, we need to call them to trigger initialization
+        logger.debug("Calling all getters through reflection")
+        loader::class.declaredMemberProperties
+            .onEach { it.isAccessible = true }
+            .filter { it.visibility == KVisibility.PUBLIC }
+            .forEach { it.getter.call(loader) }
+        logger.debug("Done!")
     }
 }

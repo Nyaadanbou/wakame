@@ -16,6 +16,13 @@ import java.util.concurrent.ConcurrentHashMap
  */
 @OptIn(InternalApi::class)
 object Attributes {
+    /**
+     * An empty attribute that does nothing on its own.
+     *
+     * It only serves as a special value for other systems to use.
+     */
+    val EMPTY = Attribute("empty", 0.0)
+
     /*
        Vanilla-backed Attributes
 

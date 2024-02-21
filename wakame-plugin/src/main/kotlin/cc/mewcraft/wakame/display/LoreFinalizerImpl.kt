@@ -5,16 +5,22 @@ import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
 import net.kyori.adventure.text.Component
 
 internal class LoreFinalizerImpl(
-    private val comparator: LoreLineComparator,
-    private val fixedLines: Collection<FixedLoreLine>,
-    private val loreMetaLookup: Map<FullKey, LoreMeta>,
+    private val fixedLoreLines: Collection<FixedLoreLine>,
+    private val loreMetaLookup: LoreMetaLookup,
 ) : LoreFinalizer {
+
+    private val lineComparator: Comparator<LoreLine> = Comparator { o1, o2 ->
+        val o1Idx = loreMetaLookup.getIndex(o1.key)
+        val o2Idx = loreMetaLookup.getIndex(o2.key)
+        if (o1Idx < o2Idx) -1 else if (o1Idx > o2Idx) 1 else 0
+    }
+
     override fun finalize(loreLines: Collection<LoreLine>): List<Component> {
-        val holder = ObjectRBTreeSet(comparator)
+        val holder = ObjectRBTreeSet(lineComparator)
 
         // add lore lines and sort
         holder += loreLines
-        holder += fixedLines
+        holder += fixedLoreLines
 
         // if a lore line can't find a larger index
         // than it (w/ or w/o certain condition),
@@ -26,7 +32,7 @@ internal class LoreFinalizerImpl(
                 continue
             }
 
-            val meta = loreMetaLookup[next.key] as FixedLoreMeta
+            val meta = loreMetaLookup.getMeta(next.key) as FixedLoreMeta
             val namespaceBelow = meta.companionNamespace ?: continue // 此固定行没有指定 namespace 的要求
 
             // 找到比当前大的所有行
@@ -52,7 +58,6 @@ internal class LoreFinalizerImpl(
         }
 
         // unwrap the components
-        val ret = holder.flatMapTo(ObjectArrayList(holder.size * 2)) { it.lines }
-        return ret
+        return holder.flatMapTo(ObjectArrayList(holder.size * 2)) { it.lines }
     }
 }

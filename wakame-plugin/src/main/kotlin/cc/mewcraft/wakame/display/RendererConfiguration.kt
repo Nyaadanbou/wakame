@@ -20,20 +20,17 @@ internal class RendererConfiguration(
     private val miniMessage: MiniMessage,
 ) : Initializable, Reloadable {
     companion object {
-        private const val RENDERER_ORDER = "renderer_layout"
-        private const val RENDERER_STYLE = "renderer_style"
-
-        // private const val RENDERER_FIXED_LORE_SYMBOL = '^'
-        // private const val RENDERER_CONDITION_LORE_SYMBOL = "/"
         private const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
+        private const val RENDERER_LAYOUT_NODE = "renderer_layout"
+        private const val RENDERER_STYLE_NODE = "renderer_style"
     }
 
     private val root: CommentedConfigurationNode by reloadable { loader.load() }
 
     //<editor-fold desc="renderer_style.meta">
-    val nameFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "name").requireKt<String>() }
+    val nameFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "name").requireKt<String>() }
     val loreFormat: MetaStylizerImpl.LoreFormatImpl by reloadable {
-        with(root.node(RENDERER_STYLE, "meta", "lore")) {
+        with(root.node(RENDERER_STYLE_NODE, "meta", "lore")) {
             MetaStylizerImpl.LoreFormatImpl(
                 line = node("line").requireKt<String>(),
                 header = node("header").requireKt<List<String>>().takeIf(List<String>::isNotEmpty),
@@ -41,12 +38,12 @@ internal class RendererConfiguration(
             )
         }
     }
-    val levelFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "level").requireKt<String>() }
-    val rarityFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "rarity").requireKt<String>() }
-    val elementFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE, "meta", "element")) }
-    val kizamiFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE, "meta", "kizami")) }
-    val skinFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "skin").requireKt<String>() }
-    val skinOwnerFormat: String by reloadable { root.node(RENDERER_STYLE, "meta", "skin_owner").requireKt<String>() }
+    val levelFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "level").requireKt<String>() }
+    val rarityFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "rarity").requireKt<String>() }
+    val elementFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "element")) }
+    val kizamiFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "kizami")) }
+    val skinFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin").requireKt<String>() }
+    val skinOwnerFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin_owner").requireKt<String>() }
 
     private fun getListFormat(node: NekoConfigurationNode): MetaStylizer.ListFormat {
         return MetaStylizerImpl.ListFormatImpl(
@@ -58,33 +55,34 @@ internal class RendererConfiguration(
     //</editor-fold>
 
     //<editor-fold desc="renderer_style.attribute">
-    val emptyAttributeFormat: List<String> by reloadable {
-        root.node(RENDERER_STYLE, "attribute", "empty").requireKt<List<String>>()
-    }
-    val operationFormat: Map<AttributeModifier.Operation, String> by reloadable {
-        AttributeModifier.Operation.entries.associateWith { operation ->
-            root.node(RENDERER_STYLE, "attribute", "operation").node(operation.key).requireKt<String>()
-        }
+    val emptyAttributeText: List<String> by reloadable {
+        root.node(RENDERER_STYLE_NODE, "attribute", "empty").requireKt<List<String>>()
     }
     val attributeFormats: Map<Key, String> by reloadable {
-        root.node(RENDERER_STYLE, "attribute", "value").childrenMap()
-            .mapKeys { (key, _) -> Key.key(NekoNamespaces.ATTRIBUTE, key as String) }
-            .filter { (key, _) -> key != Attributes.ATTACK_SPEED_LEVEL.key() } // attack_speed_level is handled separately
-            .mapValues { (_, node) -> node.requireKt<String>() }
+        root.node(RENDERER_STYLE_NODE, "attribute", "value").childrenMap()
+            .mapKeys { (k, _) -> Key.key(NekoNamespaces.ATTRIBUTE, k as String) }
+            .filter { (k, _) -> k != Attributes.ATTACK_SPEED_LEVEL.key() } // attack_speed_level is handled separately
+            .mapValues { (_, v) -> v.requireKt<String>() }
     }
     val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by reloadable {
+        val node = root.node(RENDERER_STYLE_NODE, "attribute", "value", "attack_speed_level")
         AttributeStylizerImpl.AttackSpeedFormatImpl(
-            merged = root.node(RENDERER_STYLE, "attribute", "value", "attack_speed_level", "merged").requireKt<String>(),
-            levels = root.node(RENDERER_STYLE, "attribute", "value", "attack_speed_level", "levels").childrenMap()
+            merged = node.node("merged").requireKt<String>(),
+            levels = node.node("levels").childrenMap()
                 .map { (key, node) -> (key as String).toInt() to node.requireKt<String>() }
                 .toMap()
         )
     }
+    val operationFormat: Map<AttributeModifier.Operation, String> by reloadable {
+        AttributeModifier.Operation.entries.associateWith { operation ->
+            root.node(RENDERER_STYLE_NODE, "attribute", "operation", operation.key).requireKt<String>()
+        }
+    }
     //</editor-fold>
 
     //<editor-fold desc="renderer_style.ability">
-    val emptyAbilityFormat: List<String> by reloadable {
-        root.node(RENDERER_STYLE, "ability", "empty").requireKt<List<String>>()
+    val emptyAbilityText: List<String> by reloadable {
+        root.node(RENDERER_STYLE_NODE, "ability", "empty").requireKt<List<String>>()
     }
     val commonAbilityFormat: Unit by reloadable {
         // TODO
@@ -95,36 +93,37 @@ internal class RendererConfiguration(
     //</editor-fold>
 
     //<editor-fold desc="renderer_layout">
-    // val loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> get() = _loreMetaLookup
-    val fullIndexLookup: Map<FullKey, FullIndex> get() = _fullIndexLookup
+    val loreMetaLookup: Map<FullKey, LoreMeta> get() = _loreMetaLookup
+    val loreIndexLookup: Map<FullKey, FullIndex> get() = _loreIndexLookup
     val fixedLoreLines: Collection<FixedLoreLine> get() = _fixedLoreLines
 
-    // private val _loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> = linkedMapOf()
-    private val _fullIndexLookup: MutableMap<FullKey, FullIndex> = mutableMapOf()
-    private val _fixedLoreLines: MutableCollection<FixedLoreLine> = mutableListOf()
+    private val _loreMetaLookup: MutableMap<FullKey, LoreMeta> = HashMap()
+    private val _loreIndexLookup: MutableMap<FullKey, FullIndex> = HashMap()
+    private val _fixedLoreLines: MutableCollection<FixedLoreLine> = ArrayList()
 
     private fun loadConfiguration() {
         _fixedLoreLines.clear()
-        _fullIndexLookup.clear()
-        // _loreMetaLookup.clear()
+        _loreIndexLookup.clear()
+        _loreMetaLookup.clear()
 
-        val primaryIndex = root.node(RENDERER_ORDER).node("primary").requireKt<List<String>>()
+        val primaryLines = root.node(RENDERER_LAYOUT_NODE).node("primary").requireKt<List<String>>()
         val attDerivation = AttributeLoreMeta.Derivation(
-            operationIndex = root.node(RENDERER_ORDER).node("operation").requireKt<List<String>>(),
-            elementIndex = root.node(RENDERER_ORDER).node("element").requireKt<List<String>>()
+            operationIndex = root.node(RENDERER_LAYOUT_NODE).node("operation").requireKt<List<String>>(),
+            elementIndex = root.node(RENDERER_LAYOUT_NODE).node("element").requireKt<List<String>>()
         )
 
         val pattern = RENDERER_LAYOUT_LINE_PATTERN.toPattern()
 
+        //<editor-fold desc="Helper functions to create LoreMeta">
         /**
-         * Creates a dynamic lore meta from the config line.
+         * Creates a lore meta from the config line.
          *
          * @param rawIndex the raw index in the config, without any modification
          * @param rawLine the raw line in the config, without any modification
          * @param default see the specification of [DynamicLoreMeta.default]
          * @return a new instance
          */
-        fun createDynamicLoreMeta(rawIndex: Int, rawLine: String, default: List<Component>?): DynamicLoreMeta {
+        fun createLoreMeta0(rawIndex: Int, rawLine: String, default: List<Component>?): LoreMeta {
             val ret: DynamicLoreMeta
             when {
                 rawLine.startsWith(NekoNamespaces.ABILITY + ":") -> {
@@ -183,25 +182,30 @@ internal class RendererConfiguration(
                                 listOf(miniMessage.deserialize(it))
                             }
                         }
-                        loreMeta = createDynamicLoreMeta(rawIndex, rawLine, defaultText)
+                        loreMeta = createLoreMeta0(rawIndex, matcher.group(2), defaultText)
                     }
 
                     else -> error("Unknown option '$params' while loading config $RENDERER_CONFIG_FILE")
                 }
             } else {
                 // 无参数 '...'
-                loreMeta = createDynamicLoreMeta(rawIndex, rawLine, null)
+                loreMeta = createLoreMeta0(rawIndex, rawLine, null)
             }
             return loreMeta
         }
+        //</editor-fold>
 
-        for ((rawIndex, rawLine) in primaryIndex.withIndex()) {
+        // loop through each primary line and initialize LoreMeta
+        for ((rawIndex, rawLine) in primaryLines.withIndex()) {
             val loreMeta = createLoreMeta(rawIndex, rawLine)
 
-            // allow for global lookup for the indexes
             loreMeta.fullIndexes.forEach { (fullKey, fullIndex) ->
-                val absent = (_fullIndexLookup.putIfAbsent(fullKey, fullIndex) == null)
+                // allow for global lookup for indexes
+                val absent = (_loreIndexLookup.putIfAbsent(fullKey, fullIndex) == null)
                 require(absent) { "Key $fullKey has already been added to indexes" }
+
+                // allow for global lookup for metas
+                _loreMetaLookup[fullKey] = loreMeta
             }
 
             // allow for global access to all the fixed lore lines

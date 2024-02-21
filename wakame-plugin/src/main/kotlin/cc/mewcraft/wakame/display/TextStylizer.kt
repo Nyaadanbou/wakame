@@ -12,35 +12,46 @@ import net.kyori.adventure.text.Component
 import java.util.UUID
 
 /**
- * 为给定的 [NekoItemStack] 生成 [lore lines][LoreLine].
- *
- * 注意，该接口所生成的 [lore lines][LoreLine]
- * 不能直接用在物品上，需要做进一步处理才可以用在物品上。例如排序，拆包，加上固定内容。
+ * 为给定 [NekoItemStack] 的 Name 和 Lore 生成格式化后的内容。
  */
-internal interface LoreStylizer {
+internal interface TextStylizer {
+
+    /**
+     * 为给定的 [item] 生成名字。
+     *
+     * 不像 [stylizeLore]，该函数生成的内容可以直接用在物品上。
+     *
+     * 该函数不会修改给定的 [item].
+     *
+     * @param item 要生成名字的物品
+     * @return 生成的物品名字
+     */
+    fun stylizeName(item: NekoItemStack): Component
 
     /**
      * Generates [lore lines][LoreLine] from the [item]. The returned
-     * collection should not contain any [fixed lore lines][FixedLoreLine].
+     * [lore lines][LoreLine] need to be finalized before they are used
+     * on [item]. Also, the returned collection should not contain any
+     * [fixed lore lines][FixedLoreLine].
      *
      * This function won't modify the given [item].
      *
      * @param item the item to generate lore for
      * @return the generated lore lines
      */
-    fun stylize(item: NekoItemStack): Collection<LoreLine>
+    fun stylizeLore(item: NekoItemStack): Collection<LoreLine>
 
 }
 
 /**
- * To be used by [LoreStylizer].
+ * To be used by [TextStylizer].
  */
 internal interface AbilityStylizer {
     fun stylizeAbility(core: BinaryAbilityCore): List<Component>
 }
 
 /**
- * To be used by [LoreStylizer].
+ * To be used by [TextStylizer].
  */
 internal interface AttributeStylizer {
     fun stylizeAttribute(core: BinaryAttributeCore): List<Component>
@@ -59,14 +70,14 @@ internal interface AttributeStylizer {
 }
 
 /**
- * To be used by [LoreStylizer].
+ * To be used by [TextStylizer].
  */
 internal interface OperationStylizer {
     fun stylizeValue(value: String, operation: AttributeModifier.Operation): String
 }
 
 /**
- * To be used by [LoreStylizer].
+ * To be used by [TextStylizer].
  */
 internal interface MetaStylizer {
     val nameFormat: String

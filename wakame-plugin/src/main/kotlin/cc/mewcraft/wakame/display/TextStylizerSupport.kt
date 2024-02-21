@@ -39,8 +39,8 @@ import java.util.UUID
 
 // TODO 所有的 stylizer 应该尽可能的实现缓存机制
 
-internal class LoreStylizerImpl(
-    /* stylizers */
+internal class TextStylizerImpl(
+    /* sub stylizers */
     private val metaStylizer: MetaStylizer,
     private val abilityStylizer: AbilityStylizer,
     private val attributeStylizer: AttributeStylizer,
@@ -49,8 +49,17 @@ internal class LoreStylizerImpl(
     private val metaLineKeys: MetaLineKeySupplier,
     private val abilityLineKeys: AbilityLineKeySupplier,
     private val attributeLineKeys: AttributeLineKeySupplier,
-) : LoreStylizer {
-    override fun stylize(item: NekoItemStack): Collection<LoreLine> {
+) : TextStylizer {
+    override fun stylizeName(item: NekoItemStack): Component {
+        val name = item.metadata.name
+        return if (name != null) {
+            metaStylizer.stylizeName(name)
+        } else {
+            Component.empty()
+        }
+    }
+
+    override fun stylizeLore(item: NekoItemStack): Collection<LoreLine> {
         val ret = ObjectArrayList<LoreLine>(8) // TODO estimate the capacity to reduce array copy operations
 
         // for each meta in neko
@@ -68,7 +77,7 @@ internal class LoreStylizerImpl(
         item.cells.asMap().values.forEach {
             val core = it.binaryCore
             if (core.isEmpty) {
-                ret +=
+                ret += AttributeLoreLineFactory.empty() // TODO 词条栏应该限制可替换的核心类型
             } else {
                 when (core) {
                     is BinaryAbilityCore -> ret += AbilityLoreLineFactory.get(abilityLineKeys.get(core), abilityStylizer.stylizeAbility(core))
