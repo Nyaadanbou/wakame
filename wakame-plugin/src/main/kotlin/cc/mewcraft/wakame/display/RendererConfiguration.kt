@@ -67,7 +67,7 @@ internal class RendererConfiguration(
     val attributeFormats: Map<Key, String> by reloadable {
         root.node(RENDERER_STYLE, "attribute", "value").childrenMap()
             .mapKeys { (key, _) -> Key.key(NekoNamespaces.ATTRIBUTE, key as String) }
-            .filter { (key, _) -> key != Attributes.ATTACK_SPEED_LEVEL.key() } // attack_speed_level is handled on its own
+            .filter { (key, _) -> key != Attributes.ATTACK_SPEED_LEVEL.key() } // attack_speed_level is handled separately
             .mapValues { (_, node) -> node.requireKt<String>() }
     }
     val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by reloadable {
@@ -92,15 +92,14 @@ internal class RendererConfiguration(
     }
     //</editor-fold>
 
-    //<editor-fold desc="renderer_order">
-    private val _loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> = linkedMapOf()
+    //<editor-fold desc="renderer_layout">
     val loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> get() = _loreMetaLookup
-
-    private val _fullIndexLookup: MutableMap<FullKey, FullIndex> = mutableMapOf()
     val fullIndexLookup: Map<FullKey, FullIndex> get() = _fullIndexLookup
-
-    private val _fixedLoreLines: MutableCollection<FixedLoreLine> = mutableListOf()
     val fixedLoreLines: Collection<FixedLoreLine> get() = _fixedLoreLines
+
+    private val _loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> = linkedMapOf()
+    private val _fullIndexLookup: MutableMap<FullKey, FullIndex> = mutableMapOf()
+    private val _fixedLoreLines: MutableCollection<FixedLoreLine> = mutableListOf()
 
     private fun loadConfiguration() {
         _fixedLoreLines.clear()
@@ -112,7 +111,7 @@ internal class RendererConfiguration(
         val elementIndex = root.node(RENDERER_ORDER).node("element").requireKt<List<String>>()
 
         for ((rawIndex, rawKey) in primaryIndex.withIndex()) {
-            val loreIndex = getLoreIndex(rawKey, rawIndex, AttributeLoreMeta.Rule(operationIndex, elementIndex))
+            val loreIndex = getLoreIndex(rawKey, rawIndex, operationIndex, elementIndex)
             val fullKeys = loreIndex.computeFullKeys()
 
             for ((localIndex, fullKey) in fullKeys.withIndex()) {
@@ -124,7 +123,7 @@ internal class RendererConfiguration(
         }
     }
 
-    private fun getLoreIndex(rawKey: String, rawIndex: Int, rule: AttributeLoreMeta.Rule, canBeEmptyLine: Boolean = false): LoreMeta {
+    private fun getLoreIndex(rawKey: String, rawIndex: Int, operationIndex: List<String>, elementIndex: List<String>): LoreMeta {
         return when {
             rawKey.startsWith(RENDERER_CONDITION_LORE_SYMBOL) && rawKey.length > 1 -> {
                 val sourceKey = rawKey.substringAfter(RENDERER_CONDITION_LORE_SYMBOL)
@@ -148,7 +147,7 @@ internal class RendererConfiguration(
             }
 
             rawKey.startsWith(NekoNamespaces.ATTRIBUTE + ":") -> {
-                AttributeLoreMeta(RawKey.key(rawKey), rawIndex, rule, canBeEmptyLine)
+                AttributeLoreMeta(RawKey.key(rawKey), rawIndex, canBeEmptyLine, rule)
             }
 
             rawKey.startsWith(NekoNamespaces.META + ":") -> {

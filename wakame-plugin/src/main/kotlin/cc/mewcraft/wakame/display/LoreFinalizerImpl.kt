@@ -27,25 +27,27 @@ internal class LoreFinalizerImpl(
             }
 
             val meta = loreMetaLookup[next.key] as FixedLoreMeta
-            val requiredNamespace = meta.requiredNamespace ?: continue // 此固定行没有指定 namespace 的要求
+            val namespaceBelow = meta.companionNamespace ?: continue // 此固定行没有指定 namespace 的要求
 
-            // 找到比 it 大的所有行
-            val loreLine = runCatching { holder.tailSet(next).first() }.getOrNull()
+            // 找到比当前大的所有行
+            val higherLines = holder.tailSet(next)
+            val higherLine = runCatching { higherLines.first() }.getOrNull()
             // 既然对下面的行有需求，那么如果找不到下面的行，那么这个行就会被移除
-            if (loreLine == null) { // 如果找不到比它大的行, 那么它就是最后一行
+            if (higherLine == null) { // 如果找不到比它大的行, 那么它就是最后一行
                 iterator.remove()
                 continue
             }
 
-            if (requiredNamespace == "*") {
+            if (namespaceBelow == "*") {
                 continue
             }
 
             // 如果找到的比它大的行的 namespace 不符合要求，那么它也会被移除
-            if (loreLine.key.namespace() != requiredNamespace) {
+            if (higherLine.key.namespace() != namespaceBelow) {
                 iterator.remove()
                 continue
             }
+
             // 幸存者，不会被移除
         }
 

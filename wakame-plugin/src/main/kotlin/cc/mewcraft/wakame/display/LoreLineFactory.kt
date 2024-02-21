@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.display
 
 import net.kyori.adventure.text.Component
 
-// TODO use flyweight pattern to reduce memory footprint
-
 /**
  * 获取对象的工厂。
  */

@@ -6,22 +6,14 @@
 
 # 渲染布局
 # 定义什么内容应该出现在什么位置
-# 例如想让“攻击力”显示在“暴击概率”前面
-# 那么把“攻击力”排在“暴击概率”前面即可
-#
-# 也可以在这里定义“有条件的空行”（当条件满足时添加一个空行）
-# 以及定义“固定的自定义内容”（永远显示，无论物品是什么）
+# 例如想让“攻击力”在“暴击概率”前面
 #
 # 这里不一定要指定所有的占位符，你可以省略任意的占位符
 # 如果一个占位符没有写在这里，则对应内容不会渲染出来
 #
 # 语法说明：
 # primary:
-#   以 ^ 开头可以直接插入固定的（始终显示的）自定义内容（^ 后面的所有字符串，都将被当成自定义内容）
-#   以 / 开头表示当源数据不存在时用空行替代，而不是忽略（例如 `/meta:skin` 就是当物品没有皮肤时）
-#   只写一个 / 表示直接插入固定的空行（始终显示的）
-#   除了 / 和 ^ 开头的行，其余都不允许重复出现
-#   剩下的必须写 命名空间 形式的内容标识
+#   TODO 完成实现后再补充
 # element:
 #   见内部的注释
 # operation:
@@ -30,21 +22,22 @@ renderer_layout:
 
   # 主体排序
   primary:
-    - ^<aqua><!i><b>元数据 # 以 ^ 开头以插入固定的自定义内容
-    - meta:empty
+    - (fixed:meta)<!i><aqua><b>元数据 # 仅当下面存在 meta 命名空间的内容时才渲染
+    - meta:empty # 空的元数据（未定义）
     - meta:level # 必须写命名空间形式的唯一标识 (namespace:value)
     - meta:rarity
     - meta:element
     - meta:kizami
-    - /meta:skin # 以 / 开头将在源数据不存在时用空行替代，而不是忽略 # FIXME 这个没起作用
-    - meta:skin_owner
+    - (default:empty)meta:skin
+    - (default:empty)meta:skin_owner
     - meta:lore
-    - / # 以 / 开头但后面不接任何内容，可以直接插入空行
 
-    - (fixed)<aqua><!i><b>属性
-    - (fixed;*)<aqua><!i><b>属性
-    - (fixed;attribute)<aqua><!i><b>属性
-    - attribute:empty
+    - (fixed)
+    - (fixed)<!i><gray>---------------- # 这三行内容应该始终显示
+    - (fixed)
+
+    - (fixed:attribute)<!i><aqua><b>属性 # 仅当下面存在 attribute 命名空间的内容时才渲染
+    - attribute:empty # 空的属性（未定义）
     - attribute:attack_damage
     - attribute:attack_effect_chance
     - attribute:attack_speed_level
@@ -74,10 +67,12 @@ renderer_layout:
     - attribute:max_mana
 
     - attribute:movement_speed_rate
-    - /
 
-    - ^<aqua><!i><b>技能 # FIXME 当下面没有内容时，可以选择不显示该固定内容
-    - ability:empty
+    # FIXME 如果我想设置成当下面有内容时才渲染，那是不是得“往下看两行”才行？因为看一行只能看到一个 (fixed:ability)
+    - (fixed:ability:2) # 仅当下面第二个内容存在 ability 命名空间的内容时才渲染
+
+    - (fixed:ability)<!i><aqua><b>技能 # 仅当下面存在 ability 命名空间的内容时才渲染
+    - ability:empty # 空的技能（未定义）
     - ability:blink
     - ability:cyclone
     - ability:dash
@@ -89,6 +84,8 @@ renderer_layout:
     - ability:sproink
     - ability:stab
     - ability:waterball
+
+    - (fixed:*)<!i><gray>这行不应该渲染 # 仅当下面存在任意的内容时才渲染
 
   # 元素排序
   # 同种属性，不同元素标识，都将按照此顺序渲染
