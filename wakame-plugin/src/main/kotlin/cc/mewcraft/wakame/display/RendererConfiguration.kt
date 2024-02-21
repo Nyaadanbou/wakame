@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.Reloadable
+import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.attribute.base.Attributes
 import cc.mewcraft.wakame.initializer.Initializable
@@ -22,8 +23,9 @@ internal class RendererConfiguration(
         private const val RENDERER_ORDER = "renderer_layout"
         private const val RENDERER_STYLE = "renderer_style"
 
-        private const val RENDERER_FIXED_LORE_SYMBOL = '^'
-        private const val RENDERER_CONDITION_LORE_SYMBOL = "/"
+        // private const val RENDERER_FIXED_LORE_SYMBOL = '^'
+        // private const val RENDERER_CONDITION_LORE_SYMBOL = "/"
+        private const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
     }
 
     private val root: CommentedConfigurationNode by reloadable { loader.load() }
@@ -93,69 +95,118 @@ internal class RendererConfiguration(
     //</editor-fold>
 
     //<editor-fold desc="renderer_layout">
-    val loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> get() = _loreMetaLookup
+    // val loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> get() = _loreMetaLookup
     val fullIndexLookup: Map<FullKey, FullIndex> get() = _fullIndexLookup
     val fixedLoreLines: Collection<FixedLoreLine> get() = _fixedLoreLines
 
-    private val _loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> = linkedMapOf()
+    // private val _loreMetaLookup: LinkedHashMap<FullKey, LoreMeta> = linkedMapOf()
     private val _fullIndexLookup: MutableMap<FullKey, FullIndex> = mutableMapOf()
     private val _fixedLoreLines: MutableCollection<FixedLoreLine> = mutableListOf()
 
     private fun loadConfiguration() {
         _fixedLoreLines.clear()
         _fullIndexLookup.clear()
-        _loreMetaLookup.clear()
+        // _loreMetaLookup.clear()
 
         val primaryIndex = root.node(RENDERER_ORDER).node("primary").requireKt<List<String>>()
-        val operationIndex = root.node(RENDERER_ORDER).node("operation").requireKt<List<String>>()
-        val elementIndex = root.node(RENDERER_ORDER).node("element").requireKt<List<String>>()
+        val attDerivation = AttributeLoreMeta.Derivation(
+            operationIndex = root.node(RENDERER_ORDER).node("operation").requireKt<List<String>>(),
+            elementIndex = root.node(RENDERER_ORDER).node("element").requireKt<List<String>>()
+        )
 
-        for ((rawIndex, rawKey) in primaryIndex.withIndex()) {
-            val loreIndex = getLoreIndex(rawKey, rawIndex, operationIndex, elementIndex)
-            val fullKeys = loreIndex.computeFullKeys()
+        val pattern = RENDERER_LAYOUT_LINE_PATTERN.toPattern()
 
-            for ((localIndex, fullKey) in fullKeys.withIndex()) {
-                val absent = _loreMetaLookup.putIfAbsent(fullKey, loreIndex) == null
-                val newIndex = localIndex + rawIndex
-                _fullIndexLookup[fullKey] = newIndex
-                require(absent) { "Key $fullKey has already been added to indexes, please remove the duplicates" }
+        /**
+         * Creates a dynamic lore meta from the config line.
+         *
+         * @param rawIndex the raw index in the config, without any modification
+         * @param rawLine the raw line in the config, without any modification
+         * @param default see the specification of [DynamicLoreMeta.default]
+         * @return a new instance
+         */
+        fun createDynamicLoreMeta(rawIndex: Int, rawLine: String, default: List<Component>?): DynamicLoreMeta {
+            val ret: DynamicLoreMeta
+            when {
+                rawLine.startsWith(NekoNamespaces.ABILITY + ":") -> {
+                    ret = AbilityLoreMeta(RawKey.key(rawLine), rawIndex, default)
+                }
+
+                rawLine.startsWith(NekoNamespaces.ATTRIBUTE + ":") -> {
+                    ret = AttributeLoreMeta(RawKey.key(rawLine), rawIndex, default, attDerivation)
+                }
+
+                rawLine.startsWith(NekoNamespaces.META + ":") -> {
+                    ret = MetaLoreMeta(RawKey.key(rawLine), rawIndex, default)
+                }
+
+                else -> {
+                    throw IllegalArgumentException("Unknown key '$rawLine' while loading config $RENDERER_CONFIG_FILE")
+                }
             }
+            return ret
         }
-    }
 
-    private fun getLoreIndex(rawKey: String, rawIndex: Int, operationIndex: List<String>, elementIndex: List<String>): LoreMeta {
-        return when {
-            rawKey.startsWith(RENDERER_CONDITION_LORE_SYMBOL) && rawKey.length > 1 -> {
-                val sourceKey = rawKey.substringAfter(RENDERER_CONDITION_LORE_SYMBOL)
-                getLoreIndex(sourceKey, rawIndex, rule, true)
+        /**
+         * Creates a lore meta from the config line.
+         *
+         * @param rawIndex the raw index in the config, without any modification
+         * @param rawLine the raw line in the config, without any modification
+         * @return a new instance
+         */
+        fun createLoreMeta(rawIndex: Int, rawLine: String): LoreMeta {
+            val loreMeta: LoreMeta
+            val matcher = pattern.matcher(rawLine)
+            if (matcher.matches()) {
+                // 有参数 '(...)...'
+                val params = matcher.group(1)
+                val queue = StringArgumentQueue(params.split(':'))
+                when (queue.pop()) {
+                    // 解析为 '(fixed...)...'
+                    "fixed" -> {
+                        val companionNamespace = queue.peek() // nullable
+                        val customFixedText = matcher.group(2)
+                        loreMeta = if (customFixedText.isBlank()) {
+                            // 解析为 '(fixed)无内容' 或 '(fixed:...)无内容'
+                            EmptyFixedLoreMeta(rawIndex, companionNamespace)
+                        } else {
+                            // 解析为 '(fixed)有内容' 或 '(fixed:...)有内容'
+                            CustomFixedLoreMeta(rawIndex, companionNamespace, listOf(miniMessage.deserialize(customFixedText)))
+                        }
+                    }
+
+                    // 解析为 '(default:...)...'
+                    "default" -> {
+                        val defaultText = queue.popOr("Unknown syntax for 'default'. Correct syntax: '(default:_text_|empty)_key_'").let {
+                            if (it.isBlank() || it == "empty") {
+                                listOf(Component.empty())
+                            } else {
+                                listOf(miniMessage.deserialize(it))
+                            }
+                        }
+                        loreMeta = createDynamicLoreMeta(rawIndex, rawLine, defaultText)
+                    }
+
+                    else -> error("Unknown option '$params' while loading config $RENDERER_CONFIG_FILE")
+                }
+            } else {
+                // 无参数 '...'
+                loreMeta = createDynamicLoreMeta(rawIndex, rawLine, null)
+            }
+            return loreMeta
+        }
+
+        for ((rawIndex, rawLine) in primaryIndex.withIndex()) {
+            val loreMeta = createLoreMeta(rawIndex, rawLine)
+
+            // allow for global lookup for the indexes
+            loreMeta.fullIndexes.forEach { (fullKey, fullIndex) ->
+                val absent = (_fullIndexLookup.putIfAbsent(fullKey, fullIndex) == null)
+                require(absent) { "Key $fullKey has already been added to indexes" }
             }
 
-            rawKey == RENDERER_CONDITION_LORE_SYMBOL -> {
-                val emptyFixedLoreIndex = EmptyFixedLoreMeta(rawIndex)
-                _fixedLoreLines.add(FixedLoreLineImpl(emptyFixedLoreIndex.computeFullKeys().first(), listOf(Component.empty())))
-                emptyFixedLoreIndex
-            }
-
-            rawKey.startsWith(RENDERER_FIXED_LORE_SYMBOL) -> {
-                val customFixedLoreIndex = CustomFixedLoreMeta(rawIndex)
-                _fixedLoreLines.add(FixedLoreLineImpl(customFixedLoreIndex.computeFullKeys().first(), listOf(miniMessage.deserialize(rawKey.substringAfter(RENDERER_FIXED_LORE_SYMBOL)))))
-                customFixedLoreIndex
-            }
-
-            rawKey.startsWith(NekoNamespaces.ABILITY + ":") -> {
-                AbilityLoreMeta(RawKey.key(rawKey), rawIndex, canBeEmptyLine)
-            }
-
-            rawKey.startsWith(NekoNamespaces.ATTRIBUTE + ":") -> {
-                AttributeLoreMeta(RawKey.key(rawKey), rawIndex, canBeEmptyLine, rule)
-            }
-
-            rawKey.startsWith(NekoNamespaces.META + ":") -> {
-                MetaLoreMeta(RawKey.key(rawKey), rawIndex, canBeEmptyLine)
-            }
-
-            else -> {
-                throw IllegalArgumentException("Unknown key '$rawKey' while loading $RENDERER_CONFIG_FILE")
+            // allow for global access to all the fixed lore lines
+            if (loreMeta is FixedLoreMeta) {
+                _fixedLoreLines += FixedLoreLineImpl(loreMeta.fullKeys.first(), loreMeta.components)
             }
         }
     }

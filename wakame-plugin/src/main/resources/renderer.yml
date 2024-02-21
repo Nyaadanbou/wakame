@@ -23,13 +23,12 @@ renderer_layout:
   # 主体排序
   primary:
     - (fixed:meta)<!i><aqua><b>元数据 # 仅当下面存在 meta 命名空间的内容时才渲染
-    - meta:empty # 空的元数据（未定义）
     - meta:level # 必须写命名空间形式的唯一标识 (namespace:value)
     - meta:rarity
     - meta:element
     - meta:kizami
-    - (default:empty)meta:skin
-    - (default:empty)meta:skin_owner
+    - (default:<!i><gray>无皮肤所有者)meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
+    - (default:empty)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
     - meta:lore
 
     - (fixed)
@@ -37,7 +36,7 @@ renderer_layout:
     - (fixed)
 
     - (fixed:attribute)<!i><aqua><b>属性 # 仅当下面存在 attribute 命名空间的内容时才渲染
-    - attribute:empty # 空的属性（未定义）
+    - attribute:empty # 空的属性（用于标记空属性栏的相对位置）
     - attribute:attack_damage
     - attribute:attack_effect_chance
     - attribute:attack_speed_level
@@ -72,7 +71,7 @@ renderer_layout:
     - (fixed:ability:2) # 仅当下面第二个内容存在 ability 命名空间的内容时才渲染
 
     - (fixed:ability)<!i><aqua><b>技能 # 仅当下面存在 ability 命名空间的内容时才渲染
-    - ability:empty # 空的技能（未定义）
+    - ability:empty # 空的技能（用于标记空技能栏的相对位置）
     - ability:blink
     - ability:cyclone
     - ability:dash
@@ -85,7 +84,7 @@ renderer_layout:
     - ability:stab
     - ability:waterball
 
-    - (fixed:*)<!i><gray>这行不应该渲染 # 仅当下面存在任意的内容时才渲染
+    - (fixed:*)<!i><gray>这行不应该渲染 # 仅当下面存在任意但存在的内容时才渲染
 
   # 元素排序
   # 同种属性，不同元素标识，都将按照此顺序渲染

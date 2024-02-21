@@ -13,15 +13,18 @@ import net.kyori.adventure.text.Component
 internal data class CustomFixedLoreMeta(
     override val rawIndex: RawIndex,
     override val companionNamespace: String?,
+    override val components: List<Component>,
 ) : FixedLoreMeta
 
 /**
- * 代表一个“空”固定内容的 [LoreMeta].
+ * 代表一个“无字符”固定内容的 [LoreMeta].
  */
 internal data class EmptyFixedLoreMeta(
     override val rawIndex: RawIndex,
     override val companionNamespace: String?,
-) : FixedLoreMeta
+) : FixedLoreMeta {
+    override val components: List<Component> = listOf(Component.empty())
+}
 
 /**
  * 代表一个元数据的 [LoreMeta].
@@ -31,9 +34,8 @@ internal data class MetaLoreMeta(
     override val rawIndex: RawIndex,
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
-    override fun computeFullKeys(): List<FullKey> {
-        return listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
-    }
+    override val fullKeys: List<FullKey> =
+        listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
 }
 
 /**
@@ -44,9 +46,8 @@ internal data class AbilityLoreMeta(
     override val rawIndex: RawIndex,
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
-    override fun computeFullKeys(): List<FullKey> {
-        return listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
-    }
+    override val fullKeys: List<FullKey> =
+        listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
 }
 
 /**
@@ -56,45 +57,48 @@ internal data class AttributeLoreMeta(
     override val rawKey: RawKey,
     override val rawIndex: RawIndex,
     override val default: List<Component>?,
-    /**
-     * 运算模式的顺序。
-     */
-    private val operationIndex: List<String>,
-    /**
-     * 元素种类的顺序。
-     */
-    private val elementIndex: List<String>,
+    private val derivation: Derivation,
 ) : DynamicLoreMeta {
+    data class Derivation(
+        /**
+         * 运算模式的顺序。
+         */
+        val operationIndex: List<String>,
+        /**
+         * 元素种类的顺序。
+         */
+        val elementIndex: List<String>,
+    )
+
     /**
      * 根据以下衍生规则:
-     *   - attribute:id
-     *   - attribute:id:operation
-     *   - attribute:id:operation:element
+     * - attribute:id
+     * - attribute:id:operation
+     * - attribute:id:operation:element
      *
      * 为该属性生成所有的 full keys
      */
-    override fun computeFullKeys(): List<FullKey> {
-        val ret = mutableListOf<FullKey>()
-        val meta = AttributeRegistry.getMeta(rawKey)
+    override val fullKeys: List<FullKey>
+        get() {
+            val ret = ArrayList<FullKey>()
+            val meta = AttributeRegistry.getMeta(rawKey)
 
-        for (operation in operationIndex) {
-            if (AttributeModifier.Operation.byKeyOrNull(operation) == null) {
-                continue
-            }
+            for (operation in derivation.operationIndex) {
+                if (AttributeModifier.Operation.byKeyOrNull(operation) == null) {
+                    continue
+                }
 
-            ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation"))
+                ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation"))
+                if (meta.element) {
+                    for (element in derivation.elementIndex) {
+                        if (ElementRegistry.get(element) == null) {
+                            continue
+                        }
 
-            if (meta.element) {
-                for (element in elementIndex) {
-                    if (ElementRegistry.get(element) == null) {
-                        continue
+                        ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation.$element"))
                     }
-
-                    ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation.$element"))
                 }
             }
+            return ret
         }
-
-        return ret
-    }
 }

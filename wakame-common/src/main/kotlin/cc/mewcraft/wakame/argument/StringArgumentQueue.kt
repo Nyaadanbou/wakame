@@ -23,7 +23,7 @@
  */
 package cc.mewcraft.wakame.argument
 
-internal class StringArgumentQueue(
+class StringArgumentQueue(
     private val args: List<String>,
 ) : ArgumentQueue<String> {
     private var ptr = 0

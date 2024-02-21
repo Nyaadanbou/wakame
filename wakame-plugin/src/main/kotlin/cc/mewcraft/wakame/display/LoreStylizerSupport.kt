@@ -158,7 +158,7 @@ internal class AttributeStylizerImpl(
     }
     //</editor-fold>
 
-    //<editor-fold desc="Helper implementations for attack speed level attribute">
+    //<editor-fold desc="Helper implementations for attack_speed_level attribute">
     private val attackSpeedLevelTagResolvers: MutableMap<Int, TagResolver> = Int2ObjectOpenHashMap()
     private fun getAttackSpeedLevelTagResolver(levelIndex: Int): TagResolver {
         return attackSpeedLevelTagResolvers.getOrPut(levelIndex) {
