@@ -15,7 +15,7 @@ import org.koin.dsl.module
 const val RENDERER_CONFIG_FILE = "renderer.yml"
 const val RENDERER_CONFIG_LOADER = "renderer_config_loader"
 
-fun displayModule(): Module = module {
+internal fun displayModule(): Module = module {
 
     // non-internals
     singleOf(::ItemRendererImpl) bind ItemRenderer::class

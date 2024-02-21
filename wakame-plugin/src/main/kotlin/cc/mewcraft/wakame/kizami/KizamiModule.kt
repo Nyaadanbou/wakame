@@ -8,7 +8,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 const val KIZAMI_SERIALIZERS = "kizami_serializers"
 
-fun kizamiModule(): Module = module {
+internal fun kizamiModule(): Module = module {
 
     single<TypeSerializerCollection>(named(KIZAMI_SERIALIZERS)) {
         TypeSerializerCollection.builder()

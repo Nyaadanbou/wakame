@@ -6,7 +6,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-fun abilityModule(): Module = module {
+internal fun abilityModule(): Module = module {
 
     single { AbilityRegistry } bind Initializable::class
 

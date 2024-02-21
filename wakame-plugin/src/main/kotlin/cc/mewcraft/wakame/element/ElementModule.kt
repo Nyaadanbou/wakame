@@ -8,7 +8,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 const val ELEMENT_SERIALIZERS = "element_serializers"
 
-fun elementModule(): Module = module {
+internal fun elementModule(): Module = module {
 
     single<TypeSerializerCollection>(named(ELEMENT_SERIALIZERS)) {
         TypeSerializerCollection.builder()

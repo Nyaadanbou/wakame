@@ -13,7 +13,7 @@ import org.koin.dsl.module
 const val VANILLA_EXPERIENCE_LEVEL = "vanilla_experience_level"
 const val CUSTOM_ADVENTURE_LEVEL = "custom_adventure_level"
 
-fun levelModule(): Module = @OptIn(InternalApi::class) module {
+internal fun levelModule(): Module = @OptIn(InternalApi::class) module {
 
     singleOf<PlayerLevelGetter, Server>(::VanillaExperienceLevelGetter) {
         named(VANILLA_EXPERIENCE_LEVEL)

@@ -18,7 +18,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 const val CELL_SERIALIZERS = "cell_serializers"
 const val META_SERIALIZERS = "meta_serializers"
 
-fun schemeItemModule(): Module = module {
+internal fun schemeItemModule(): Module = module {
 
     // region Cells
     single<TypeSerializerCollection>(named(CELL_SERIALIZERS)) {

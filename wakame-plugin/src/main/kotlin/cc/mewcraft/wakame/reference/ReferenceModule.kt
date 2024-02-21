@@ -8,7 +8,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 const val REFERENCE_SERIALIZERS = "reference_serializers"
 
-fun referenceModule(): Module = module {
+internal fun referenceModule(): Module = module {
 
     single<TypeSerializerCollection>(named(REFERENCE_SERIALIZERS)) {
         TypeSerializerCollection.builder()

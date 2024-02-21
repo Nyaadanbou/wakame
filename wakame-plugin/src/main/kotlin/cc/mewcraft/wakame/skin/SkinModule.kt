@@ -7,7 +7,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 const val SKIN_SERIALIZERS = "skin_serializers"
 
-fun skinModule(): Module = module {
+internal fun skinModule(): Module = module {
 
     single<TypeSerializerCollection>(named(SKIN_SERIALIZERS)) {
         TypeSerializerCollection.builder()

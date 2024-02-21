@@ -8,7 +8,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 const val RARITY_SERIALIZERS = "rarity_serializers"
 
-fun rarityModule(): Module = module {
+internal fun rarityModule(): Module = module {
 
     single<TypeSerializerCollection>(named(RARITY_SERIALIZERS)) {
         TypeSerializerCollection.builder()

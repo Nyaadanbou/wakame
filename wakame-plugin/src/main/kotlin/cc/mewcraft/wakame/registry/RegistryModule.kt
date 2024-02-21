@@ -54,7 +54,7 @@ const val SKIN_CONFIG_LOADER = "skin_config_loader"
 const val ENTITY_CONFIG_FILE = "entities.yml"
 const val ENTITY_CONFIG_LOADER = "entity_config_loader"
 
-fun registryModule(): Module = module {
+internal fun registryModule(): Module = module {
 
     // We need to explicitly declare these Initializable,
     // so the functions can be called by the Initializer

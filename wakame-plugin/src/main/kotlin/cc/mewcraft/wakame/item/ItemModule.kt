@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.scheme.schemeItemModule
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-fun itemModule(): Module = module {
+internal fun itemModule(): Module = module {
     includes(binaryItemModule())
     includes(schemeItemModule())
 }

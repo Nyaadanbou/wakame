@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-fun entityModule(): Module = module {
+internal fun entityModule(): Module = module {
 
     @OptIn(InternalApi::class)
     single<EntityKeyLookup> {
