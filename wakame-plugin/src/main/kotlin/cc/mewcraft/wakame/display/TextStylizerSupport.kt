@@ -77,7 +77,7 @@ internal class TextStylizerImpl(
         item.cells.asMap().values.forEach {
             val core = it.binaryCore
             if (core.isEmpty) {
-                ret += AttributeLoreLineFactory.empty() // TODO 词条栏应该限制可替换的核心类型
+                ret += AttributeLoreLineFactory.empty() // TODO 词条栏系统应该限制可替换的核心类型
             } else {
                 when (core) {
                     is BinaryAbilityCore -> ret += AbilityLoreLineFactory.get(abilityLineKeys.get(core), abilityStylizer.stylizeAbility(core))
@@ -86,8 +86,6 @@ internal class TextStylizerImpl(
                 }
             }
         }
-
-        // TODO considering the lines starting with '/' (not including the lines with ONLY a '/')
 
         return ret
     }

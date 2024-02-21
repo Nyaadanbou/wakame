@@ -80,9 +80,12 @@ internal data class AttributeLoreMeta(
      */
     override val fullKeys: List<FullKey>
         get() {
+            if (rawKey == AttributeRegistry.EMPTY_KEY) {
+                return listOf(rawKey) // for `empty`, do not derive
+            }
+
             val ret = ArrayList<FullKey>()
             val meta = AttributeRegistry.getMeta(rawKey)
-            // FIXME consider 'empty'; same for ability
             for (operation in derivation.operationIndex) {
                 if (AttributeModifier.Operation.byKeyOrNull(operation) == null) {
                     continue

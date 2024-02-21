@@ -40,7 +40,7 @@ object AttributeRegistry : Initializable, Reloadable {
     /**
      * The key of the empty attribute.
      */
-    val EMPTY_KEY: Key = Key.key(NekoNamespaces.ABILITY, "empty")
+    val EMPTY_KEY: Key = Attributes.EMPTY.key()
 
     @InternalApi
     val schemeBuilderRegistry: MutableMap<Key, SchemeBuilder> = hashMapOf()
@@ -80,9 +80,6 @@ object AttributeRegistry : Initializable, Reloadable {
     }
 
     private fun register() {
-        // a special one for other system to use
-        build(EMPTY_KEY.value(), ShadowTagType.BYTE).single().bind(Attributes.EMPTY)
-
         // register regular attributes
         build("attack_damage", ShadowTagType.SHORT).ranged().element().bind(Attributes.byElement { MIN_ATTACK_DAMAGE }, Attributes.byElement { MAX_ATTACK_DAMAGE })
         build("attack_effect_chance", ShadowTagType.DOUBLE).single().bind(Attributes.ATTACK_EFFECT_CHANCE)

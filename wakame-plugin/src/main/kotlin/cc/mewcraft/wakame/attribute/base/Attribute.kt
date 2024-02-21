@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.attribute.base
 
+import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import net.kyori.adventure.key.Key
@@ -12,10 +13,11 @@ import org.intellij.lang.annotations.Pattern
 /**
  * An identifiable numerical value.
  *
- * By design, you should not create the instance yourself. Instead, use the singleton
- * [Attributes] to get your expected instances. In most cases, instances of this class
- * (and its subclasses, too) are solely used as references. The property values (such
- * as [defaultValue]) do not matter for the code outside of this package.
+ * By design, you should not create the instance yourself. Instead, use the
+ * singleton [Attributes] to get your expected instances. In most cases,
+ * instances of this class (and its subclasses, too) are solely used as
+ * references. The property values (such as [defaultValue]) do not matter
+ * for the code outside of this package.
  *
  * @see RangedAttribute
  * @see ElementAttribute
@@ -42,7 +44,7 @@ open class Attribute @InternalApi constructor(
     }
 
     override fun key(): Key {
-        return Key.key("attribute", descriptionId)
+        return Key.key(NekoNamespaces.ATTRIBUTE, descriptionId)
     }
 
     override fun toString(): String {

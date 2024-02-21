@@ -102,7 +102,6 @@ class LoreFinalizerTest : KoinTest {
             // AbilityLoreLineFactory.get(FullKey.key("ability:leapfrog"), listText("leapfrog 1 2 3")),
         )
         buildTest(loreLines)
-        assert(true)
     }
 
     @Test
@@ -121,7 +120,6 @@ class LoreFinalizerTest : KoinTest {
             // AbilityLoreLineFactory.get(FullKey.key("ability:leapfrog"), listText("leapfrog 1 2 3")),
         )
         buildTest(loreLines)
-        assert(true)
     }
 
     @Test
@@ -140,6 +138,17 @@ class LoreFinalizerTest : KoinTest {
             AbilityLoreLineFactory.get(FullKey.key("ability:leapfrog"), listText("leapfrog 1 2 3")),
         )
         buildTest(loreLines)
-        assert(true)
+    }
+
+    @Test
+    fun `test finalize lore lines 4`() {
+        val loreLines = listOf(
+            MetaLoreLineFactory.get(FullKey.key("meta:rarity"), listText("rarity 1 2 3")),
+            MetaLoreLineFactory.get(FullKey.key("attribute:empty"), listText("empty 1 2 3")),
+            MetaLoreLineFactory.get(FullKey.key("attribute:max_mana.add"), listText("max_mana 1 2 3")),
+            AbilityLoreLineFactory.get(FullKey.key("ability:empty"), listText("empty 1 2 3")),
+            AbilityLoreLineFactory.get(FullKey.key("ability:frost"), listText("frost 1 2 3")),
+        )
+        buildTest(loreLines)
     }
 }
