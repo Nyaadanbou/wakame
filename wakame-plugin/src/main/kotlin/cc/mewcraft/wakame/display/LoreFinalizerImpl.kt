@@ -5,7 +5,8 @@ import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
 import net.kyori.adventure.text.Component
 
 internal class LoreFinalizerImpl(
-    private val fixedLoreLines: Collection<FixedLoreLine>,
+    private val fixedLoreLines: Collection<LoreLine>,
+    private val defaultLoreLines: Collection<LoreLine>,
     private val loreMetaLookup: LoreMetaLookup,
 ) : LoreFinalizer {
 
@@ -21,40 +22,40 @@ internal class LoreFinalizerImpl(
         // add lore lines and sort
         holder += loreLines
         holder += fixedLoreLines
+        holder += defaultLoreLines
 
         // if a lore line can't find a larger index
         // than it (w/ or w/o certain condition),
         // it will be removed
-        val iterator = holder.iterator()
-        while (iterator.hasNext()) {
-            val next = iterator.next()
-            if (next !is FixedLoreLine) {
+        val mainIterator = holder.iterator()
+        while (mainIterator.hasNext()) {
+            val curr = mainIterator.next()
+            if (curr !is FixedLoreLine) {
+                // curr 不是固定内容 - continue
                 continue
             }
 
-            val meta = loreMetaLookup.getMeta(next.key) as FixedLoreMeta
-            val namespaceBelow = meta.companionNamespace ?: continue // 此固定行没有指定 namespace 的要求
+            val meta = loreMetaLookup.getMeta<FixedLoreMeta>(curr.key)
+            val companionNamespace = meta.companionNamespace
+                ?: continue // 对 companion namespace 没有要求，因此不考虑移除 - continue
 
-            // 找到比当前大的所有行
-            val higherLines = holder.tailSet(next)
-            val higherLine = runCatching { higherLines.first() }.getOrNull()
-            // 既然对下面的行有需求，那么如果找不到下面的行，那么这个行就会被移除
-            if (higherLine == null) { // 如果找不到比它大的行, 那么它就是最后一行
-                iterator.remove()
+            val subIterator = holder.iterator(curr)
+            if (!subIterator.hasNext()) {
+                mainIterator.remove() // 要求下面有内容，但下面没有 - remove curr and continue
                 continue
             }
 
-            if (namespaceBelow == "*") {
+            // 跑到这里，说明 curr 下面一定有内容
+
+            if (companionNamespace == "*") {
+                // 只要求下面有任意内容，无论 namespace - continue
                 continue
             }
 
-            // 如果找到的比它大的行的 namespace 不符合要求，那么它也会被移除
-            if (higherLine.key.namespace() != namespaceBelow) {
-                iterator.remove()
-                continue
+            val higher = subIterator.next() // 比 curr 大的最小元素 (紧贴着 curr 的下面一行)
+            if (higher.key.namespace() != companionNamespace) {
+                mainIterator.remove() // higher 不符合 curr 对 namespace 的要求，因此移除 curr
             }
-
-            // 幸存者，不会被移除
         }
 
         // unwrap the components

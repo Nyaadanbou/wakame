@@ -95,16 +95,18 @@ internal class RendererConfiguration(
     //<editor-fold desc="renderer_layout">
     val loreMetaLookup: Map<FullKey, LoreMeta> get() = _loreMetaLookup
     val loreIndexLookup: Map<FullKey, FullIndex> get() = _loreIndexLookup
-    val fixedLoreLines: Collection<FixedLoreLine> get() = _fixedLoreLines
+    val fixedLoreLines: Collection<LoreLine> get() = _fixedLoreLines
+    val defaultLoreLines: Collection<LoreLine> get() = _defaultLoreLines
 
     private val _loreMetaLookup: MutableMap<FullKey, LoreMeta> = HashMap()
     private val _loreIndexLookup: MutableMap<FullKey, FullIndex> = HashMap()
-    private val _fixedLoreLines: MutableCollection<FixedLoreLine> = ArrayList()
+    private val _fixedLoreLines: MutableCollection<LoreLine> = ArrayList()
+    private val _defaultLoreLines: MutableCollection<LoreLine> = ArrayList()
 
     private fun loadConfiguration() {
-        _fixedLoreLines.clear()
         _loreIndexLookup.clear()
         _loreMetaLookup.clear()
+        _fixedLoreLines.clear()
 
         val primaryLines = root.node(RENDERER_LAYOUT_NODE).node("primary").requireKt<List<String>>()
         val attDerivation = AttributeLoreMeta.Derivation(
@@ -145,6 +147,9 @@ internal class RendererConfiguration(
             return ret
         }
 
+        fun String.spiltAndDeserialize(): List<Component> =
+            this.split("\\r").map(miniMessage::deserialize)  // 以 '\r' 为分隔符，将文本分割为多行
+
         /**
          * Creates a lore meta from the config line.
          *
@@ -169,17 +174,18 @@ internal class RendererConfiguration(
                             EmptyFixedLoreMeta(rawIndex, companionNamespace)
                         } else {
                             // 解析为 '(fixed)有内容' 或 '(fixed:...)有内容'
-                            CustomFixedLoreMeta(rawIndex, companionNamespace, listOf(miniMessage.deserialize(customFixedText)))
+                            val fixedTexts = customFixedText.spiltAndDeserialize()
+                            CustomFixedLoreMeta(rawIndex, companionNamespace, fixedTexts)
                         }
                     }
 
                     // 解析为 '(default:...)...'
                     "default" -> {
-                        val defaultText = queue.popOr("Unknown syntax for 'default'. Correct syntax: '(default:_text_|empty)_key_'").let {
+                        val defaultText = queue.popOr("Unknown syntax for '(default...)' while load config $RENDERER_CONFIG_FILE. Correct syntax: '(default:_text_|empty)_key_'").let {
                             if (it.isBlank() || it == "empty") {
                                 listOf(Component.empty())
                             } else {
-                                listOf(miniMessage.deserialize(it))
+                                it.spiltAndDeserialize()
                             }
                         }
                         loreMeta = createLoreMeta0(rawIndex, matcher.group(2), defaultText)
@@ -200,17 +206,31 @@ internal class RendererConfiguration(
             val loreMeta = createLoreMeta(rawIndex, rawLine)
 
             loreMeta.fullIndexes.forEach { (fullKey, fullIndex) ->
-                // allow for global lookup for indexes
+                // populate the index lookup
                 val absent = (_loreIndexLookup.putIfAbsent(fullKey, fullIndex) == null)
                 require(absent) { "Key $fullKey has already been added to indexes" }
 
-                // allow for global lookup for metas
+                // populate the meta lookup
                 _loreMetaLookup[fullKey] = loreMeta
             }
 
-            // allow for global access to all the fixed lore lines
+            // populate the fixed lore lines
             if (loreMeta is FixedLoreMeta) {
                 _fixedLoreLines += FixedLoreLineImpl(loreMeta.fullKeys.first(), loreMeta.components)
+            }
+
+            // populate the default lore lines
+            if (loreMeta is DynamicLoreMeta) {
+                val default = loreMeta.default ?: continue
+
+                // if the lore meta has a default value, add it to the default lore lines
+                _defaultLoreLines += loreMeta.fullKeys.map { key ->
+                    when (loreMeta) {
+                        is AbilityLoreMeta -> AbilityLoreLineImpl(key, default)
+                        is AttributeLoreMeta -> AttributeLoreLineImpl(key, default)
+                        is MetaLoreMeta -> MetaLoreLineImpl(key, default)
+                    }
+                }
             }
         }
     }

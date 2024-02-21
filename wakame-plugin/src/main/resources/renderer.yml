@@ -22,7 +22,7 @@ renderer_layout:
 
   # 主体排序
   primary:
-    - (fixed:meta)<!i><aqua><b>元数据 # 仅当下面存在 meta 命名空间的内容时才渲染
+    - (fixed:meta)<!i><aqua><b>元数据 # 仅当下面存在 meta 命名空间下的内容时才渲染
     - meta:level # 必须写命名空间形式的唯一标识 (namespace:value)
     - meta:rarity
     - meta:element
@@ -30,47 +30,32 @@ renderer_layout:
     - (default:<!i><gray>无皮肤所有者)meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
     - (default:empty)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
     - meta:lore
-
     - (fixed)
     - (fixed)<!i><gray>---------------- # 这三行内容应该始终显示
     - (fixed)
-
-    - (fixed:attribute)<!i><aqua><b>属性 # 仅当下面存在 attribute 命名空间的内容时才渲染
+    - (fixed:attribute)<!i><aqua><b>属性\r第二行属性介绍awa # 仅当下面存在 attribute 命名空间下的内容时才渲染
     - attribute:empty # 空的属性（用于标记空属性栏的相对位置）
     - attribute:attack_damage
     - attribute:attack_effect_chance
     - attribute:attack_speed_level
-
     - attribute:critical_strike_chance
     - attribute:critical_strike_power
-
     - attribute:damage_reduction_rate
-
     - attribute:defense
     - attribute:defense_penetration
     - attribute:defense_penetration_rate
-
     - attribute:health_regeneration
-
     - attribute:lifesteal
     - attribute:lifesteal_rate
-
     - attribute:mana_consumption_rate
     - attribute:mana_regeneration
-
     - attribute:manasteal
     - attribute:manasteal_rate
-
     - attribute:max_absorption
     - attribute:max_health
     - attribute:max_mana
-
     - attribute:movement_speed_rate
-
-    # FIXME 如果我想设置成当下面有内容时才渲染，那是不是得“往下看两行”才行？因为看一行只能看到一个 (fixed:ability)
-    - (fixed:ability:2) # 仅当下面第二个内容存在 ability 命名空间的内容时才渲染
-
-    - (fixed:ability)<!i><aqua><b>技能 # 仅当下面存在 ability 命名空间的内容时才渲染
+    - (fixed:ability)<!i><aqua><b>技能 # 仅当下面存在 ability 命名空间下的内容时才渲染
     - ability:empty # 空的技能（用于标记空技能栏的相对位置）
     - ability:blink
     - ability:cyclone
@@ -83,8 +68,7 @@ renderer_layout:
     - ability:sproink
     - ability:stab
     - ability:waterball
-
-    - (fixed:*)<!i><gray>这行不应该渲染 # 仅当下面存在任意但存在的内容时才渲染
+    - (fixed:*)<!i><gray>这行将不会被渲染 # 仅当下面存在任意命名空间下的内容时才渲染（不包括“不存在内容”的情况）
 
   # 元素排序
   # 同种属性，不同元素标识，都将按照此顺序渲染
