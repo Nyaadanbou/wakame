@@ -45,6 +45,10 @@ internal class NekoItemImpl(
         val material = materialMeta.generate(context)
         val nekoStack = NekoItemStackFactory.new(material)
 
+        // put namespaced key
+        nekoStack.putKey(key)
+
+        // put metadata
         with(nekoStack.metadata) {
             // Side note:
             // the order of meta population is hardcoded currently
@@ -60,18 +64,21 @@ internal class NekoItemImpl(
             generateAndSet<SkinOwnerMeta, UUID>(context, ItemMetaSetter::putSkinOwner)
         }
 
-        // Side note:
-        // the order of cell population should be the same as
-        // that they are declared in the YAML list
+        // put cells
         schemeCells.forEach { (id, scheme) ->
+            // Side note:
+            // the order of cell population should be the same as
+            // that they are declared in the YAML list
+
             val binary = BinaryCellFactory.generate(context, scheme)
             if (binary != null) {
                 // if it's non-null, then it's either:
                 // 1) a cell with some content, or
                 // 2) a cell with no content + keepEmpty is true
                 nekoStack.cells.put(id, binary)
+            } else {
+                // if it's null, simply don't put the cell
             }
-            // if it's null, simply don't put the cell
         }
 
         return nekoStack
