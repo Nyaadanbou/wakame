@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.base.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.elementOrNull
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
@@ -21,23 +21,27 @@ internal class AbilityLineKeySupplierImpl : AbilityLineKeySupplier {
     }
 }
 
+// to clarify the table indexes
+private typealias AttributeKeyTable1<K1, K2, V> = Object2ObjectOpenHashMap<K1, Reference2ObjectOpenHashMap<K2, V>>
+private typealias AttributeKeyTable2<K1, K2, K3, V> = Object2ObjectOpenHashMap<K1, Reference2ObjectOpenHashMap<K2, Reference2ObjectOpenHashMap<K3, V>>>
+
 internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     //<editor-fold desc="Implementation of a Map indexed by triple keys">
     /**
      * Full Keys in this map are double-indexed: `key` + `operation`.
      */
-    private val cachedFullKeys: Object2ObjectOpenHashMap<Key, Reference2ObjectOpenHashMap<AttributeModifier.Operation, FullKey>> = Object2ObjectOpenHashMap()
+    private val cachedFullKeys: AttributeKeyTable1<Key, Operation, FullKey> = AttributeKeyTable1()
 
     /**
      * Full Keys in this map are triple-indexed: `key` + `operation` +
      * `element`.
      */
-    private val cachedFullKeysWithElement: Object2ObjectOpenHashMap<Key, Reference2ObjectOpenHashMap<AttributeModifier.Operation, Reference2ObjectOpenHashMap<Element, FullKey>>> = Object2ObjectOpenHashMap()
+    private val cachedFullKeysWithElement: AttributeKeyTable2<Key, Operation, Element, FullKey> = AttributeKeyTable2()
 
     /**
      * Caches a full key from the given triple indexes.
      */
-    private fun put(key: Key, operation: AttributeModifier.Operation, element: Element? = null, fullKey: FullKey) {
+    private fun put(key: Key, operation: Operation, element: Element? = null, fullKey: FullKey) {
         if (element == null) {
             cachedFullKeys
                 .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) } // 运算模式最多3个
@@ -53,7 +57,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     /**
      * Gets a full key from the given triple indexes.
      */
-    private fun get(key: Key, operation: AttributeModifier.Operation, element: Element? = null): FullKey? {
+    private fun get(key: Key, operation: Operation, element: Element? = null): FullKey? {
         return if (element == null) {
             cachedFullKeys[key]?.get(operation)
         } else {
@@ -72,7 +76,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
      */
     private inline fun getOrPut(
         key: Key,
-        operation: AttributeModifier.Operation,
+        operation: Operation,
         element: Element? = null,
         defaultValue: () -> Key,
     ): FullKey {
@@ -91,7 +95,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
      *
      * @return the old cache
      */
-    private fun remove(key: Key, operation: AttributeModifier.Operation, element: Element? = null): FullKey? {
+    private fun remove(key: Key, operation: Operation, element: Element? = null): FullKey? {
         if (element == null) {
             val map1 = cachedFullKeys[key] ?: return null
             val value = map1.remove(operation)
