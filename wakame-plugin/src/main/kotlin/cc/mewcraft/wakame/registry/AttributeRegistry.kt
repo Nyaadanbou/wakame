@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.attribute.facade.AttributeModifierFactory
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.SchemeBaker
 import cc.mewcraft.wakame.item.SchemeBuilder
 import cc.mewcraft.wakame.item.ShadowTagDecoder
@@ -32,6 +33,9 @@ import net.kyori.adventure.key.Key
  * Check their kdoc for what they do.
  */
 @PreWorldDependency(
+    runBefore = [ElementRegistry::class]
+)
+@ReloadDependency(
     runBefore = [ElementRegistry::class]
 )
 object AttributeRegistry : Initializable {

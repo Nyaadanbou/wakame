@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
@@ -15,6 +16,9 @@ import org.koin.core.qualifier.named
  * The registry of `level -> rarity` mappings.
  */
 @PreWorldDependency(
+    runBefore = [RarityRegistry::class]
+)
+@ReloadDependency(
     runBefore = [RarityRegistry::class]
 )
 object LevelMappingRegistry : KoinComponent, Initializable,

@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.item.scheme.NekoItemFactory
 import net.kyori.adventure.key.Key
@@ -19,11 +20,22 @@ import java.io.File
     runBefore = [
         AttributeRegistry::class,
         ElementRegistry::class,
-        KizamiRegistry::class,
-        RarityRegistry::class,
-        LevelMappingRegistry::class,
         EntityReferenceRegistry::class,
-        ItemSkinRegistry::class
+        ItemSkinRegistry::class,
+        KizamiRegistry::class,
+        LevelMappingRegistry::class,
+        RarityRegistry::class,
+    ]
+)
+@ReloadDependency(
+    runBefore = [
+        AttributeRegistry::class,
+        ElementRegistry::class,
+        EntityReferenceRegistry::class,
+        ItemSkinRegistry::class,
+        KizamiRegistry::class,
+        LevelMappingRegistry::class,
+        RarityRegistry::class,
     ]
 )
 object NekoItemRegistry : KoinComponent, Initializable,
