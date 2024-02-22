@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.display.ItemRendererListener
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
+import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.test.TestListener
 import cc.mewcraft.wakame.util.callEvent
@@ -41,6 +42,7 @@ object Initializer : KoinComponent, Listener {
     private val plugin: WakamePlugin by inject(mode = LazyThreadSafetyMode.NONE)
     private val terminables: CompositeTerminable = CompositeTerminable.create()
 
+    private val toReload: MutableList<Initializable> = ArrayList()
     private val toInitPreWorld: MutableList<Initializable> = ArrayList()
     private val toInitPostWorld: MutableList<Initializable> = ArrayList()
 
@@ -79,6 +81,26 @@ object Initializer : KoinComponent, Listener {
     private fun registerListeners() = with(plugin) {
         registerTerminableListener(get<TestListener>()).bindWith(this)
         registerTerminableListener(get<ItemRendererListener>()).bindWith(this)
+    }
+
+    private fun initReload(){
+        fun forEachReload(block: Initializable.() -> Unit): Result<Unit> {
+            toReload.forEach { initializable ->
+                try {
+                    logger.info("${initializable::class.simpleName} start")
+                    block(initializable)
+                    logger.info("${initializable::class.simpleName} done")
+                } catch (e: Exception) {
+                    logger.error("An exception occurred during reload initialization. Shutting down the server...", e)
+                    shutdown()
+                    return Result.failure(e)
+                }
+            }
+            return Result.success(Unit)
+        }
+        logger.info("[Initializer] onReload - Start")
+        forEachReload { onReload() }.onFailure { return }
+        logger.info("[Initializer] onReload - Complete")
     }
 
     /**
@@ -209,19 +231,30 @@ object Initializer : KoinComponent, Listener {
         } else logger.warn("Skipping post world initialization")
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private fun handlePluginReloaded(e: NekoReloadEvent) {
+        initReload()
+    }
+
     /**
      * @throws CircularDependencyException
      */
     private fun handleDependencies() {
+        val reloadComponents = getKoin().getAll<Initializable>().map { initializable -> ReloadDependencyComponent(initializable::class) }
         val preWorldComponents = getKoin().getAll<Initializable>().map { initializable -> PreWorldDependencyComponent(initializable::class) }
         val postWorldComponents = getKoin().getAll<Initializable>().map { initializable -> PostWorldDependencyComponent(initializable::class) }
 
         // Sort the initializables by their dependency config
+        val sortedReloadClasses = DependencyResolver.resolveDependencies(reloadComponents)
         val sortedPreWorldClasses = DependencyResolver.resolveDependencies(preWorldComponents)
         val sortedPostWorldClasses = DependencyResolver.resolveDependencies(postWorldComponents)
         // Add them to the lists
+        toReload.clear()
         toInitPreWorld.clear()
         toInitPostWorld.clear()
+        sortedReloadClasses.forEach { clazz ->
+            toReload.add(getKoin().get(clazz))
+        }
         sortedPreWorldClasses.forEach { clazz ->
             toInitPreWorld.add(getKoin().get(clazz))
         }
@@ -232,6 +265,7 @@ object Initializer : KoinComponent, Listener {
         // Side note:
         // CompositeTerminable 本来就会以 FILO 的顺序调用 Terminable.close()
         // 因此这里按照加载的顺序添加 Terminable 就好，不需要先 List.reverse()
+        terminables.withAll(toReload)
         terminables.withAll(toInitPreWorld)
         terminables.withAll(toInitPostWorld)
     }

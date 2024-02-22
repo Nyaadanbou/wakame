@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.rarity.Rarity
@@ -11,7 +10,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
-object RarityRegistry : KoinComponent, Initializable, Reloadable,
+object RarityRegistry : KoinComponent, Initializable,
     Registry<String, Rarity> by HashMapRegistry(),
     BiMapRegistry<String, Byte> by HashBiMapRegistry() {
 

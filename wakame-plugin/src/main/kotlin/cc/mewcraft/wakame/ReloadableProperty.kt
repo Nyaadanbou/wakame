@@ -5,10 +5,6 @@ import cc.mewcraft.wakame.util.listen
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-interface Reloadable {
-    fun onReload()
-}
-
 fun <T> reloadable(loader: () -> T) = ReloadableProperty(loader)
 
 class ReloadableProperty<T>(private val loader: () -> T) : ReadOnlyProperty<Any?, T> {

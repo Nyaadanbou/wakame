@@ -1,15 +1,14 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.base.Attribute
 import cc.mewcraft.wakame.attribute.base.Attributes
 import cc.mewcraft.wakame.attribute.base.ElementAttribute
 import cc.mewcraft.wakame.attribute.facade.AttributeModifierFactory
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.initializer.DependencyConfig
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.item.SchemeBaker
 import cc.mewcraft.wakame.item.SchemeBuilder
 import cc.mewcraft.wakame.item.ShadowTagDecoder
@@ -32,10 +31,10 @@ import net.kyori.adventure.key.Key
  *
  * Check their kdoc for what they do.
  */
-@DependencyConfig(
-    preWorldBefore = [ElementRegistry::class]
+@PreWorldDependency(
+    runBefore = [ElementRegistry::class]
 )
-object AttributeRegistry : Initializable, Reloadable {
+object AttributeRegistry : Initializable {
 
     /**
      * The key of the empty attribute.

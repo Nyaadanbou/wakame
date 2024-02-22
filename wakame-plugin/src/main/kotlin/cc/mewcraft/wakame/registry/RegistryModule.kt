@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.scheme.CELL_SERIALIZERS
@@ -13,7 +12,7 @@ import cc.mewcraft.wakame.util.buildBasicConfigurationLoader
 import cc.mewcraft.wakame.util.createBasicConfigurationLoader
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
-import org.koin.dsl.binds
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
@@ -58,15 +57,14 @@ internal fun registryModule(): Module = module {
 
     // We need to explicitly declare these Initializable,
     // so the functions can be called by the Initializer
-    val registryBindings = arrayOf(Initializable::class, Reloadable::class)
-    single { AttributeRegistry } binds registryBindings
-    single { ElementRegistry } binds registryBindings
-    single { EntityReferenceRegistry } binds registryBindings
-    single { ItemSkinRegistry } binds registryBindings
-    single { KizamiRegistry } binds registryBindings
-    single { NekoItemRegistry } binds registryBindings
-    single { LevelMappingRegistry } binds registryBindings
-    single { RarityRegistry } binds registryBindings
+    single { AttributeRegistry } bind Initializable::class
+    single { ElementRegistry } bind Initializable::class
+    single { EntityReferenceRegistry } bind Initializable::class
+    single { ItemSkinRegistry } bind Initializable::class
+    single { KizamiRegistry } bind Initializable::class
+    single { NekoItemRegistry } bind Initializable::class
+    single { LevelMappingRegistry } bind Initializable::class
+    single { RarityRegistry } bind Initializable::class
 
     //<editor-fold desc="Definitions of YamlConfigurationLoader">
     single<YamlConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)) {

@@ -8,6 +8,10 @@ public class NekoReloadEvent extends Event {
 
     private static final @NotNull HandlerList HANDLERS = new HandlerList();
 
+    public NekoReloadEvent() {
+        super(true);
+    }
+
     public static @NotNull HandlerList getHandlerList() {
         return HANDLERS;
     }

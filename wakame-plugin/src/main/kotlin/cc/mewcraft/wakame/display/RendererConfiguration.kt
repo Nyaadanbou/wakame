@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.attribute.base.Attributes
@@ -14,11 +13,13 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.spongepowered.configurate.CommentedConfigurationNode
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 
 internal class RendererConfiguration(
     loader: NekoConfigurationLoader,
     private val miniMessage: MiniMessage,
-) : Initializable, Reloadable {
+) : Initializable {
     companion object {
         private const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
         private const val RENDERER_LAYOUT_NODE = "renderer_layout"
@@ -98,15 +99,16 @@ internal class RendererConfiguration(
     val fixedLoreLines: Collection<LoreLine> get() = _fixedLoreLines
     val defaultLoreLines: Collection<LoreLine> get() = _defaultLoreLines
 
-    private val _loreMetaLookup: MutableMap<FullKey, LoreMeta> = HashMap()
-    private val _loreIndexLookup: MutableMap<FullKey, FullIndex> = HashMap()
-    private val _fixedLoreLines: MutableCollection<LoreLine> = ArrayList()
-    private val _defaultLoreLines: MutableCollection<LoreLine> = ArrayList()
+    private val _loreMetaLookup: MutableMap<FullKey, LoreMeta> = ConcurrentHashMap()
+    private val _loreIndexLookup: MutableMap<FullKey, FullIndex> = ConcurrentHashMap()
+    private val _fixedLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
+    private val _defaultLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
 
     private fun loadConfiguration() {
         _loreIndexLookup.clear()
         _loreMetaLookup.clear()
         _fixedLoreLines.clear()
+        _defaultLoreLines.clear()
 
         val primaryLines = root.node(RENDERER_LAYOUT_NODE).node("primary").requireKt<List<String>>()
         val attDerivation = AttributeLoreMeta.Derivation(

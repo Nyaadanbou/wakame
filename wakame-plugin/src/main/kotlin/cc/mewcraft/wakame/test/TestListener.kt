@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.test
 
+import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
@@ -16,7 +17,7 @@ import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
-import java.util.UUID
+import java.util.*
 
 class TestListener : Listener {
     @EventHandler
@@ -28,6 +29,21 @@ class TestListener : Listener {
         when (plainMessage) {
             "i1" -> {
                 val nekoItem = NekoItemRegistry.getOrThrow("short_sword:demo")
+                val nekoItemStack = nekoItem.createItemStack(player)
+                inventory.addItem(nekoItemStack.handle)
+            }
+        }
+    }
+
+    @EventHandler
+    fun testItemGeneration2(e: AsyncChatEvent) {
+        val player = e.player
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        val inventory = player.inventory
+
+        when {
+            plainMessage.startsWith("i-") -> {
+                val nekoItem = NekoItemRegistry.getOrThrow(plainMessage.substringAfter("i-"))
                 val nekoItemStack = nekoItem.createItemStack(player)
                 inventory.addItem(nekoItemStack.handle)
             }
@@ -194,6 +210,15 @@ class TestListener : Listener {
                     inventory.addItem(this)
                 }
             }
+        }
+    }
+
+    @EventHandler
+    fun testPluginReload(e: AsyncChatEvent) {
+        val player = e.player
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        if (plainMessage == "reload") {
+            NekoReloadEvent().callEvent()
         }
     }
 }

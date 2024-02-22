@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.MINIMESSAGE_FULL
-import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.util.createBasicConfigurationLoader
 import org.koin.core.module.Module
@@ -23,7 +22,7 @@ internal fun displayModule(): Module = module {
     // config holder
     single<RendererConfiguration> {
         RendererConfiguration(createBasicConfigurationLoader(RENDERER_CONFIG_FILE), get(named(MINIMESSAGE_FULL)))
-    } binds arrayOf(Initializable::class, Reloadable::class)
+    } binds arrayOf(Initializable::class)
 
     // meta lookup
     single<LoreMetaLookup> {

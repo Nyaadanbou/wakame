@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.initializer
 
+import cc.mewcraft.wakame.event.NekoReloadEvent
 import me.lucko.helper.terminable.Terminable
 
 /**
@@ -20,7 +21,7 @@ import me.lucko.helper.terminable.Terminable
  *   un-deterministic order. Suppose there are 2 initializables, X and Y.
  *   The [onPreWorld] of class X makes no guaranteed to be called before or
  *   after that of class Y. To enforce the invocation order, you need to
- *   add a [DependencyConfig] annotation on your
+ *   add a DependencyConfigurations annotation on your
  *   [initializable][Initializable] class.
  *
  * **Note for implementations**: you must also declare your implementation
@@ -65,6 +66,11 @@ interface Initializable : Terminable {
      * ("post-world") has finished, in an async thread.
      */
     suspend fun onPostPackAsync() {}
+
+    /**
+     * When [NekoReloadEvent] is fired.
+     */
+    fun onReload() {}
 
     /**
      * Closes this terminable.

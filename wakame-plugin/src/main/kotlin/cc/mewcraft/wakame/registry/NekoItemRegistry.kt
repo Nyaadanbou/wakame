@@ -1,10 +1,9 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.initializer.DependencyConfig
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.item.scheme.NekoItemFactory
 import net.kyori.adventure.key.Key
@@ -16,8 +15,8 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
-@DependencyConfig(
-    preWorldBefore = [
+@PreWorldDependency(
+    runBefore = [
         AttributeRegistry::class,
         ElementRegistry::class,
         KizamiRegistry::class,
@@ -27,7 +26,7 @@ import java.io.File
         ItemSkinRegistry::class
     ]
 )
-object NekoItemRegistry : KoinComponent, Initializable, Reloadable,
+object NekoItemRegistry : KoinComponent, Initializable,
     Registry<Key, NekoItem> by HashMapRegistry() {
 
     private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)

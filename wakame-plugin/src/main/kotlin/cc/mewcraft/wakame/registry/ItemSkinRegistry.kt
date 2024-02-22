@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.Reloadable
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.skin.ItemSkin
@@ -10,7 +9,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
-object ItemSkinRegistry : KoinComponent, Initializable, Reloadable,
+object ItemSkinRegistry : KoinComponent, Initializable,
     Registry<String, ItemSkin> by HashMapRegistry(),
     BiMapRegistry<String, Short> by HashBiMapRegistry() {
 
@@ -25,11 +24,11 @@ object ItemSkinRegistry : KoinComponent, Initializable, Reloadable,
         // TODO read config and populate values
     }
 
-    override fun onReload() {
+    override fun onPreWorld() {
         loadConfiguration()
     }
 
-    override fun onPreWorld() {
+    override fun onReload() {
         loadConfiguration()
     }
 }
