@@ -1,5 +1,3 @@
-import cc.mewcraft.wakame.MINIMESSAGE_FULL
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display.*
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.kizami.kizamiModule
@@ -7,22 +5,15 @@ import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skin.skinModule
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import java.io.File
-import java.nio.file.Path
 import kotlin.time.measureTimedValue
 
 class LoreFinalizerTest : KoinTest {
@@ -32,14 +23,7 @@ class LoreFinalizerTest : KoinTest {
         @BeforeAll
         fun setup() {
             val app = startKoin {
-                modules(
-                    module {
-                        single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/main/resources").toFile().absoluteFile }
-                        single<Logger> { LoggerFactory.getLogger("RendererConfigurationTest") }
-                        single<MiniMessage>(named(MINIMESSAGE_FULL)) { MiniMessage.miniMessage() }
-                        single<GsonComponentSerializer> { GsonComponentSerializer.gson() }
-                    },
-                )
+                modules(testEnvironment())
 
                 // this module
                 modules(displayModule())
@@ -68,12 +52,12 @@ class LoreFinalizerTest : KoinTest {
 
         @JvmStatic
         @AfterAll
-        fun tearDown() {
+        fun shutdown() {
             stopKoin()
         }
     }
 
-    private val Component.plain get() = PlainTextComponentSerializer.plainText().serialize(this)
+    private val Component.plain: String get() = PlainTextComponentSerializer.plainText().serialize(this)
 
     private fun buildTest(loreLines: Collection<LoreLine>) {
         val logger = get<Logger>()
