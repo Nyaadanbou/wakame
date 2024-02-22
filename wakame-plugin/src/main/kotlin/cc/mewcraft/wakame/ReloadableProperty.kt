@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.event.NekoReloadEvent
+import cc.mewcraft.wakame.util.TestEnvironment
 import cc.mewcraft.wakame.util.listen
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -11,8 +12,7 @@ class ReloadableProperty<T>(private val loader: () -> T) : ReadOnlyProperty<Any?
     private var value: T? = null
 
     init {
-        if (runCatching { Class.forName("net.minecraft.server.MinecraftServer") }.isSuccess) {
-            // only register listener if we are in a real server environment
+        if (!TestEnvironment.isRunningJUnit()) {
             NEKO_PLUGIN.listen<NekoReloadEvent> { reload() }
         }
     }
