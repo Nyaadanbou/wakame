@@ -24,24 +24,29 @@ internal class LoreFinalizerImpl(
         holder += fixedLoreLines
         holder += defaultLoreLines
 
-        // if a lore line can't find a larger index
-        // than it (w/ or w/o certain condition),
-        // it will be removed
+        // if a line can't find a larger index
+        // than it, under certain conditions,
+        // it will be removed from the lore
+
+        var realLoreSize = 0 // used to preallocate array
+
         val mainIterator = holder.iterator()
         while (mainIterator.hasNext()) {
             val curr = mainIterator.next()
+            realLoreSize += curr.lines.size
             if (curr !is FixedLoreLine) {
                 // curr 不是固定内容 - continue
                 continue
             }
 
-            val meta = loreMetaLookup.getMeta<FixedLoreMeta>(curr.key)
-            val companionNamespace = meta.companionNamespace
+            val loreMeta = loreMetaLookup.getMeta<FixedLoreMeta>(curr.key)
+            val companionNamespace = loreMeta.companionNamespace
                 ?: continue // 对 companion namespace 没有要求，因此不考虑移除 - continue
 
             val subIterator = holder.iterator(curr)
             if (!subIterator.hasNext()) {
                 mainIterator.remove() // 要求下面有内容，但下面没有 - remove curr and continue
+                realLoreSize -= curr.lines.size
                 continue
             }
 
@@ -55,10 +60,11 @@ internal class LoreFinalizerImpl(
             val higher = subIterator.next() // 比 curr 大的最小元素 (紧贴着 curr 的下面一行)
             if (higher.key.namespace() != companionNamespace) {
                 mainIterator.remove() // higher 不符合 curr 对 namespace 的要求，因此移除 curr
+                realLoreSize -= curr.lines.size
             }
         }
 
         // unwrap the components
-        return holder.flatMapTo(ObjectArrayList(holder.size * 2)) { it.lines }
+        return holder.flatMapTo(ObjectArrayList(realLoreSize)) { it.lines }
     }
 }
