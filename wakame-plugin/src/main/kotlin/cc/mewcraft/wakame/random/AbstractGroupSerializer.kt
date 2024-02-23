@@ -29,15 +29,19 @@ abstract class AbstractGroupSerializer<S, C : SelectionContext> : SchemeSerializ
 
     final override fun deserialize(type: Type, node: ConfigurationNode): Group<S, C> {
         return Group.build {
+            // can be omitted completely in config
             node.node("filters").childrenList().forEach {
                 this.conditions += conditionFactory(it)
             }
 
+            // can be omitted completely in config
             node.node("selectors").childrenMap().forEach { (poolName, poolNode) ->
                 this.pools[poolName.toString()] = poolFactory(poolNode)
             }
 
-            this.default = poolFactory(node.node("default"))
+            // can be omitted completely in config
+            val defaultNode = node.node("default")
+            this.default = if (defaultNode.virtual()) Pool.empty() else poolFactory(defaultNode)
         }
     }
 }
