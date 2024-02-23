@@ -87,12 +87,14 @@ object AttributeRegistry : Initializable {
         build("attack_damage", ShadowTagType.SHORT).ranged().element().bind(Attributes.byElement { MIN_ATTACK_DAMAGE }, Attributes.byElement { MAX_ATTACK_DAMAGE })
         build("attack_effect_chance", ShadowTagType.DOUBLE).single().bind(Attributes.ATTACK_EFFECT_CHANCE)
         build("attack_speed_level", ShadowTagType.BYTE).single().bind(Attributes.ATTACK_SPEED_LEVEL)
+        build("block_interaction_range", ShadowTagType.DOUBLE).single().bind(Attributes.BLOCK_INTERACTION_RANGE)
         build("critical_strike_chance", ShadowTagType.DOUBLE).single().bind(Attributes.CRITICAL_STRIKE_CHANCE)
         build("critical_strike_power", ShadowTagType.DOUBLE).single().bind(Attributes.CRITICAL_STRIKE_POWER)
         build("damage_reduction_rate", ShadowTagType.DOUBLE).single().bind(Attributes.DAMAGE_REDUCTION_RATE)
         build("defense", ShadowTagType.SHORT).single().element().bind(Attributes.byElement { DEFENSE })
         build("defense_penetration", ShadowTagType.SHORT).single().element().bind(Attributes.byElement { DEFENSE_PENETRATION })
         build("defense_penetration_rate", ShadowTagType.DOUBLE).single().element().bind(Attributes.byElement { DEFENSE_PENETRATION_RATE })
+        build("entity_interaction_range", ShadowTagType.DOUBLE).single().bind(Attributes.ENTITY_INTERACTION_RANGE)
         build("health_regeneration", ShadowTagType.SHORT).single().bind(Attributes.HEALTH_REGENERATION)
         build("lifesteal", ShadowTagType.SHORT).single().bind(Attributes.LIFESTEAL)
         build("lifesteal_rate", ShadowTagType.DOUBLE).single().bind(Attributes.LIFESTEAL_RATE)
@@ -106,9 +108,8 @@ object AttributeRegistry : Initializable {
         build("movement_speed_rate", ShadowTagType.DOUBLE).single().bind(Attributes.MOVEMENT_SPEED_RATE)
     }
 
-    @OptIn(InternalApi::class)
     fun getMeta(key: Key): AttributeStructMeta {
-        return attributeStructRegistry[key] ?: error("Can't find attribute with key '$key'")
+        return (@OptIn(InternalApi::class) attributeStructRegistry[key] ?: error("Can't find attribute with key '$key'"))
     }
 
     override fun onPreWorld() {
