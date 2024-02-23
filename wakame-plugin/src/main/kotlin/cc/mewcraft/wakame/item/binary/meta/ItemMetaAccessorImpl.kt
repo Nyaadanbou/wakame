@@ -13,7 +13,6 @@ import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ListShadowTag
 import me.lucko.helper.shadows.nbt.StringShadowTag
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
