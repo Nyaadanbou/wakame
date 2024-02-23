@@ -30,9 +30,9 @@ internal class LoreFinalizerImpl(
 
         var realLoreSize = 0 // used to preallocate array
 
-        val mainIterator = holder.iterator()
-        while (mainIterator.hasNext()) {
-            val curr = mainIterator.next()
+        val iterator = holder.iterator()
+        while (iterator.hasNext()) {
+            val curr = iterator.next()
             realLoreSize += curr.lines.size
             if (curr !is FixedLoreLine) {
                 // curr 不是固定内容 - continue
@@ -43,9 +43,8 @@ internal class LoreFinalizerImpl(
             val companionNamespace = loreMeta.companionNamespace
                 ?: continue // 对 companion namespace 没有要求，因此不考虑移除 - continue
 
-            val subIterator = holder.iterator(curr)
-            if (!subIterator.hasNext()) {
-                mainIterator.remove() // 要求下面有内容，但下面没有 - remove curr and continue
+            if (!iterator.hasNext()) {
+                iterator.remove() // 要求下面有内容，但下面没有 - remove curr and continue
                 realLoreSize -= curr.lines.size
                 continue
             }
@@ -57,9 +56,10 @@ internal class LoreFinalizerImpl(
                 continue
             }
 
-            val higher = subIterator.next() // 比 curr 大的最小元素 (紧贴着 curr 的下面一行)
+            val higher = iterator.next() // 比 curr 大的最小元素 (紧贴着 curr 的下面一行)
             if (higher.key.namespace() != companionNamespace) {
-                mainIterator.remove() // higher 不符合 curr 对 namespace 的要求，因此移除 curr
+                iterator.remove() // higher 不符合 curr 对 namespace 的要求，因此移除 curr
+                iterator.previous() // 使 iterator 指回 curr
                 realLoreSize -= curr.lines.size
             }
         }
