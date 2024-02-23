@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.display.ItemRendererListener
+import cc.mewcraft.wakame.display.RENDERER_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.registry.*
@@ -40,10 +41,28 @@ object Initializer : KoinComponent, Listener {
 
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
     private val plugin: WakamePlugin by inject(mode = LazyThreadSafetyMode.NONE)
+
+    /**
+     * A registry of Terminables.
+     */
     private val terminables: CompositeTerminable = CompositeTerminable.create()
 
-    private val toReload: MutableList<Initializable> = ArrayList()
+    /**
+     * A list containing all [Initializables][Initializable] instances for
+     * reload stage in the order by which they should be executed.
+     */
+    private val toLateReload: MutableList<Initializable> = ArrayList()
+
+    /**
+     * A list containing all [Initializables][Initializable] instances for
+     * pre-world stage in the order by which they should be executed.
+     */
     private val toInitPreWorld: MutableList<Initializable> = ArrayList()
+
+    /**
+     * A list containing all [Initializables][Initializable] instances for
+     * post-world stage in the order by which they should be executed.
+     */
     private val toInitPostWorld: MutableList<Initializable> = ArrayList()
 
     /**
@@ -51,6 +70,19 @@ object Initializer : KoinComponent, Listener {
      */
     private var preWorldInitialized = false
 
+    /**
+     * Returns `true` if this server is in "debug mode". The server **will**
+     * tolerate unhandled exceptions without shutting down if the debug mode is
+     * on. While the debug mode is off, the server will simply be shutdown upon
+     * unhandled exceptions to prevent further damage.
+     */
+    var isDebug: Boolean = false
+        private set
+
+    /**
+     * Returns `true` if this initializer finishes up all expected
+     * initialization.
+     */
     var isDone: Boolean = false
         private set
 
@@ -74,7 +106,7 @@ object Initializer : KoinComponent, Listener {
         saveResource(LEVEL_CONFIG_FILE)
         saveResource(PROJECTILE_CONFIG_FILE)
         saveResource(RARITY_CONFIG_FILE)
-        saveResource("renderer.yml")
+        saveResource(RENDERER_CONFIG_FILE)
         saveResource(SKIN_CONFIG_FILE)
     }
 
@@ -83,9 +115,9 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<ItemRendererListener>()).bindWith(this)
     }
 
-    private fun initReload(){
+    private fun executeReload() {
         fun forEachReload(block: Initializable.() -> Unit): Result<Unit> {
-            toReload.forEach { initializable ->
+            toLateReload.forEach { initializable ->
                 try {
                     logger.info("${initializable::class.simpleName} start")
                     block(initializable)
@@ -170,9 +202,7 @@ object Initializer : KoinComponent, Listener {
         val asyncContext = Dispatchers.IO + CoroutineName("Neko Initializer - Post World Async")
         val onPostWorldJobs = mutableListOf<Job>()
         val onPostWorldAsyncResult = forEachPostWorld {
-            onPostWorldJobs += NEKO_PLUGIN.launch(asyncContext) {
-                onPostWorldAsync()
-            }
+            onPostWorldJobs += NEKO_PLUGIN.launch(asyncContext) { onPostWorldAsync() }
         }
         logger.info("[Initializer] onPostWorldAsync - Waiting")
         onPostWorldJobs.joinAll() // wait for all async jobs
@@ -186,9 +216,7 @@ object Initializer : KoinComponent, Listener {
         logger.info("[Initializer] onPostPackAsync - Start")
         val onPostPackJobs = mutableListOf<Job>()
         val onPostPackAsyncResult = forEachPostWorld {
-            onPostPackJobs += NEKO_PLUGIN.launch(asyncContext) {
-                onPostPackAsync()
-            }
+            onPostPackJobs += NEKO_PLUGIN.launch(asyncContext) { onPostPackAsync() }
         }
         logger.info("[Initializer] onPostPackAsync - Waiting")
         onPostPackJobs.joinAll() // wait for all async jobs
@@ -200,7 +228,7 @@ object Initializer : KoinComponent, Listener {
             callEvent(NekoLoadDataEvent()) // call it async
         }
 
-        logger.info(Component.text("Done loading").color(NamedTextColor.AQUA))
+        logger.info(Component.text("Done loading", NamedTextColor.AQUA))
     }
 
     /**
@@ -219,7 +247,7 @@ object Initializer : KoinComponent, Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handleLogin(e: PlayerLoginEvent) {
-        if (!isDone) {
+        if (!isDone && !isDebug) {
             e.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("[Neko] Initialization not complete. Please wait."))
         }
     }
@@ -233,39 +261,35 @@ object Initializer : KoinComponent, Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handlePluginReloaded(e: NekoReloadEvent) {
-        initReload()
+        executeReload()
     }
 
     /**
      * @throws CircularDependencyException
      */
     private fun handleDependencies() {
-        val reloadComponents = getKoin().getAll<Initializable>().map { initializable -> ReloadDependencyComponent(initializable::class) }
-        val preWorldComponents = getKoin().getAll<Initializable>().map { initializable -> PreWorldDependencyComponent(initializable::class) }
-        val postWorldComponents = getKoin().getAll<Initializable>().map { initializable -> PostWorldDependencyComponent(initializable::class) }
+        // Get all initializes from the Koin container
+        val reloadComponents = getKoin().getAll<Initializable>().map { ReloadDependencyComponent(it::class) }
+        val preWorldComponents = getKoin().getAll<Initializable>().map { PreWorldDependencyComponent(it::class) }
+        val postWorldComponents = getKoin().getAll<Initializable>().map { PostWorldDependencyComponent(it::class) }
 
         // Sort the initializables by their dependency config
         val sortedReloadClasses = DependencyResolver.resolveDependencies(reloadComponents)
         val sortedPreWorldClasses = DependencyResolver.resolveDependencies(preWorldComponents)
         val sortedPostWorldClasses = DependencyResolver.resolveDependencies(postWorldComponents)
+
         // Add them to the lists
-        toReload.clear()
+        toLateReload.clear()
         toInitPreWorld.clear()
         toInitPostWorld.clear()
-        sortedReloadClasses.forEach { clazz ->
-            toReload.add(getKoin().get(clazz))
-        }
-        sortedPreWorldClasses.forEach { clazz ->
-            toInitPreWorld.add(getKoin().get(clazz))
-        }
-        sortedPostWorldClasses.forEach { clazz ->
-            toInitPostWorld.add(getKoin().get(clazz))
-        }
+        sortedReloadClasses.forEach { toLateReload.add(getKoin().get(it)) }
+        sortedPreWorldClasses.forEach { toInitPreWorld.add(getKoin().get(it)) }
+        sortedPostWorldClasses.forEach { toInitPostWorld.add(getKoin().get(it)) }
 
         // Side note:
         // CompositeTerminable 本来就会以 FILO 的顺序调用 Terminable.close()
         // 因此这里按照加载的顺序添加 Terminable 就好，不需要先 List.reverse()
-        terminables.withAll(toReload)
+        terminables.withAll(toLateReload)
         terminables.withAll(toInitPreWorld)
         terminables.withAll(toInitPostWorld)
     }

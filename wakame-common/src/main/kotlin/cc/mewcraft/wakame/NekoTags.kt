@@ -8,6 +8,10 @@ object NekoTags {
         const val ID = "id"
     }
 
+    object Ability {
+
+    }
+
     object Attribute {
         const val VAL = "val"
         const val MIN = "min"

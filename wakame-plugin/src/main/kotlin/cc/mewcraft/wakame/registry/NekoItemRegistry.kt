@@ -59,29 +59,32 @@ object NekoItemRegistry : KoinComponent, Initializable,
             .drop(1) // exclude the `dataDir` itself
             .filter { it.isDirectory }
             .forEach {
-                namespaceDirs += it
-                logger.info("Loaded namespace: {}", it)
+                namespaceDirs += it.also { logger.info("Loading namespace: {}", it.name) }
             }
 
         val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER)) // will be reused
 
         // then walk each file (i.e., each item) in each namespace
         namespaceDirs.forEach { namespaceDir ->
-            namespaceDir.walk()
+            for (itemFile in namespaceDir.walk()
                 .drop(1) // exclude the namespace directory itself
-                .forEach { itemFile ->
-                    val text = itemFile.bufferedReader().use { it.readText() }
-                    val node = loaderBuilder.buildAndLoadString(text)
+                .filter { it.extension == "yml" }) {
+                val text = itemFile.bufferedReader().use { it.readText() }
+                val node = loaderBuilder.buildAndLoadString(text)
 
-                    val namespace = namespaceDir.name
-                    val value = itemFile.nameWithoutExtension
-
-                    val key = Key.key(namespace, value)
-                    val item = NekoItemFactory.create(key, node)
-
-                    registerName2Object(key, item)
-                    logger.info("Loaded item: {}", key)
+                val namespace = namespaceDir.name
+                val value = itemFile.nameWithoutExtension
+                val key = Key.key(namespace, value).also {
+                    logger.info("Loading item: {}", it)
                 }
+                runCatching {
+                    NekoItemFactory.create(key, node)
+                }.onSuccess {
+                    registerName2Object(key, it)
+                }.onFailure {
+                    logger.error("Can't load item '$key': {}", it.message)
+                }
+            }
         }
     }
 
