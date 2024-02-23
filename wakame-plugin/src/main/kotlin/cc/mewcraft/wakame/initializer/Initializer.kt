@@ -12,9 +12,7 @@ import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.test.TestListener
-import cc.mewcraft.wakame.util.callEvent
-import cc.mewcraft.wakame.util.registerEvents
-import cc.mewcraft.wakame.util.unregisterEvents
+import cc.mewcraft.wakame.util.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +31,7 @@ import org.bukkit.event.server.ServerLoadEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
+import org.spongepowered.configurate.ConfigurationNode
 
 /**
  * @see Initializable
@@ -87,6 +86,11 @@ object Initializer : KoinComponent, Listener {
         private set
 
     /**
+     * The configuration node of "config.yml", a.k.a. the main configuration.
+     */
+    lateinit var config: ConfigurationNode
+
+    /**
      * Should be called before the world is loaded.
      */
     fun start() {
@@ -94,7 +98,7 @@ object Initializer : KoinComponent, Listener {
         initPreWorld()
     }
 
-    private fun initConfig() = with(plugin) {
+    private fun saveDefaultConfiguration() = with(plugin) {
         saveDefaultConfig() // config.yml
         saveResourceRecursively(CRATE_CONFIG_DIR)
         saveResourceRecursively(ITEM_CONFIG_DIR)
@@ -110,6 +114,15 @@ object Initializer : KoinComponent, Listener {
         saveResource(SKIN_CONFIG_FILE)
     }
 
+    private fun loadPrimaryConfiguration() {
+        val wholeText = plugin.getBundledFile("config.yml")
+            .bufferedReader()
+            .use { it.readText() }
+        config = buildBasicConfigurationLoader().buildAndLoadString(wholeText)
+
+        isDebug = config.node("debug").requireKt<Boolean>()
+    }
+
     private fun registerListeners() = with(plugin) {
         registerTerminableListener(get<TestListener>()).bindWith(this)
         registerTerminableListener(get<ItemRendererListener>()).bindWith(this)
@@ -123,8 +136,7 @@ object Initializer : KoinComponent, Listener {
                     block(initializable)
                     logger.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
-                    logger.error("An exception occurred during reload initialization. Shutting down the server...", e)
-                    shutdown()
+                    shutdown("An exception occurred during reload initialization.", e)
                     return Result.failure(e)
                 }
             }
@@ -139,7 +151,8 @@ object Initializer : KoinComponent, Listener {
      * Starts the pre-world initialization process.
      */
     private fun initPreWorld() {
-        initConfig()
+        saveDefaultConfiguration()
+        loadPrimaryConfiguration()
         registerEvents() // register `this` listener
         registerListeners()
 
@@ -150,8 +163,7 @@ object Initializer : KoinComponent, Listener {
                     block(initializable)
                     logger.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
-                    logger.error("An exception occurred during pre-world initialization. Shutting down the server...", e)
-                    shutdown()
+                    shutdown("An exception occurred during pre-world initialization.", e)
                     return Result.failure(e)
                 }
             }
@@ -186,8 +198,7 @@ object Initializer : KoinComponent, Listener {
                     block(initializable)
                     logger.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
-                    logger.error("An exception occurred during post-world initialization. Shutting down the server...", e)
-                    shutdown()
+                    shutdown("An exception occurred during post-world initialization.", e)
                     return Result.failure(e)
                 }
             }
@@ -240,9 +251,15 @@ object Initializer : KoinComponent, Listener {
         terminables.closeAndReportException()
     }
 
-    private fun shutdown() {
-        logger.warn("Shutting down the server...")
-        Bukkit.shutdown()
+    private fun shutdown(message: String, throwable: Throwable) {
+        if (!isDebug) {
+            logger.error(message, throwable)
+            logger.error("Shutting down the server to prevent further damage.")
+            Bukkit.shutdown()
+        } else {
+            logger.warn(message, throwable)
+            logger.warn("Scroll up to find the exception cause and check your configuration.")
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

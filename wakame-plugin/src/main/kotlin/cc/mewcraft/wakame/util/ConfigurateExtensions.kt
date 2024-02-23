@@ -70,6 +70,7 @@ internal inline fun <reified T> ConfigurationNode.requireKt(): T {
     return ret as T
 }
 
+//<editor-fold desc="Common Serializers">
 /**
  * The deserializer for [Key].
  */
@@ -85,3 +86,4 @@ internal class IntRangeParser : TypeSerializer<Range<Int>> {
     override fun deserialize(type: Type, node: ConfigurationNode): Range<Int> = RangeParser.parseIntRange(node.requireKt<String>())
     override fun serialize(type: Type, obj: Range<Int>?, node: ConfigurationNode): Nothing = throw UnsupportedOperationException()
 }
+//</editor-fold>
