@@ -35,106 +35,92 @@ object ShadowNbtUtils {
 
 }
 
-@Suppress("UNCHECKED_CAST")
 fun <T : ShadowTag> CompoundShadowTag.getOrPut(key: String, defaultValue: () -> T): T {
-    if (contains(key))
-        return get(key) as T
-
-    val value = defaultValue()
-    put(key, value)
-
-    return value
+    if (contains(key)) {
+        return (@Suppress("UNCHECKED_CAST") (get(key) as T))
+    } else {
+        val value = defaultValue()
+        put(key, value)
+        return value
+    }
 }
 
-@Suppress("UNCHECKED_CAST")
 fun <T : ShadowTag> CompoundShadowTag.getOrNull(key: String): T? {
     return if (contains(key)) {
-        get(key) as? T
+        @Suppress("UNCHECKED_CAST") (get(key) as? T)
     } else null
 }
 
 fun CompoundShadowTag.getByteOrNull(key: String): Byte? {
-    if (contains(key, ShadowTagType.BYTE))
-        return (get(key) as? NumberShadowTag)?.byteValue()
-
-    return null
+    return if (contains(key, ShadowTagType.BYTE)) {
+        (get(key) as NumberShadowTag).byteValue()
+    } else null
 }
 
 fun CompoundShadowTag.getShortOrNull(key: String): Short? {
-    if (contains(key, ShadowTagType.SHORT))
-        return (get(key) as? NumberShadowTag)?.shortValue()
-
-    return null
+    return if (contains(key, ShadowTagType.SHORT)) {
+        (get(key) as NumberShadowTag).shortValue()
+    } else null
 }
 
 fun CompoundShadowTag.getIntOrNull(key: String): Int? {
-    if (contains(key, ShadowTagType.INT))
-        return (get(key) as? NumberShadowTag)?.intValue()
-
-    return null
+    return if (contains(key, ShadowTagType.INT)) {
+        (get(key) as NumberShadowTag).intValue()
+    } else null
 }
 
 fun CompoundShadowTag.getLongOrNull(key: String): Long? {
-    if (contains(key, ShadowTagType.LONG))
-        return (get(key) as? NumberShadowTag)?.longValue()
-
-    return null
+    return if (contains(key, ShadowTagType.LONG)) {
+        (get(key) as NumberShadowTag).longValue()
+    } else null
 }
 
 fun CompoundShadowTag.getFloatOrNull(key: String): Float? {
-    if (contains(key, ShadowTagType.FLOAT))
-        return (get(key) as? NumberShadowTag)?.floatValue()
-
-    return null
+    return if (contains(key, ShadowTagType.FLOAT)) {
+        (get(key) as NumberShadowTag).floatValue()
+    } else null
 }
 
 fun CompoundShadowTag.getDoubleOrNull(key: String): Double? {
-    if (contains(key, ShadowTagType.DOUBLE))
-        return (get(key) as? NumberShadowTag)?.doubleValue()
-
-    return null
+    return if (contains(key, ShadowTagType.DOUBLE)) {
+        (get(key) as NumberShadowTag).doubleValue()
+    } else null
 }
 
 fun CompoundShadowTag.getStringOrNull(key: String): String? {
-    if (contains(key, ShadowTagType.STRING))
-        return (get(key) as? StringShadowTag)?.value()
-
-    return null
+    return if (contains(key, ShadowTagType.STRING)) {
+        (get(key) as StringShadowTag).value()
+    } else null
 }
 
 fun CompoundShadowTag.getByteArrayOrNull(key: String): ByteArray? {
-    if (contains(key, ShadowTagType.BYTE_ARRAY))
-        return (get(key) as? ByteArrayShadowTag)?.value()
-
-    return null
+    return if (contains(key, ShadowTagType.BYTE_ARRAY)) {
+        (get(key) as ByteArrayShadowTag).value()
+    } else null
 }
 
 fun CompoundShadowTag.getIntArrayOrNull(key: String): IntArray? {
-    if (contains(key, ShadowTagType.INT_ARRAY))
-        return (get(key) as? IntArrayShadowTag)?.value()
-
-    return null
+    return if (contains(key, ShadowTagType.INT_ARRAY)) {
+        (get(key) as IntArrayShadowTag).value()
+    } else null
 }
 
 fun CompoundShadowTag.getLongArrayOrNull(key: String): LongArray? {
-    if (contains(key, ShadowTagType.LONG_ARRAY))
-        return (get(key) as? LongArrayShadowTag)?.value()
-
-    return null
+    return if (contains(key, ShadowTagType.LONG_ARRAY)) {
+        (get(key) as LongArrayShadowTag).value()
+    } else null
 }
 
 fun CompoundShadowTag.getCompoundOrNull(key: String): CompoundShadowTag? {
-    if (contains(key, ShadowTagType.COMPOUND))
-        return get(key) as? CompoundShadowTag
-
-    return null
+    return if (contains(key, ShadowTagType.COMPOUND)) {
+        get(key) as CompoundShadowTag
+    } else null
 }
 
 fun CompoundShadowTag.getListOrNull(key: String): ListShadowTag? {
-    if (contains(key, ShadowTagType.LIST))
-        return get(key) as? ListShadowTag
-
-    return null
+    return if (contains(key, ShadowTagType.LIST)) {
+        get(key) as ListShadowTag
+    } else null
 }
 
 fun CompoundShadowTag.getListOrNull(key: String, type: ShadowTagType): ListShadowTag? {
