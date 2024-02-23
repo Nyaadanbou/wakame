@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.util
 
 import cc.mewcraft.spatula.utils.RangeParser
+import com.google.common.base.Throwables
 import com.google.common.collect.Range
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.CommentedConfigurationNode
@@ -61,8 +62,13 @@ internal inline fun <reified T> TypeSerializerCollection.Builder.registerKt(seri
 /**
  * @see ConfigurationNode.require
  */
-internal inline fun <reified T> ConfigurationNode.requireKt(): T =
-    require(javaTypeOf<T>()) as T
+internal inline fun <reified T> ConfigurationNode.requireKt(): T {
+    val ret = this.get(javaTypeOf<T>())
+        ?: throw NoSuchElementException(
+            "Missing value of type ${T::class.simpleName} at '${path().joinToString(" -> ")}'"
+        )
+    return ret as T
+}
 
 /**
  * The deserializer for [Key].
