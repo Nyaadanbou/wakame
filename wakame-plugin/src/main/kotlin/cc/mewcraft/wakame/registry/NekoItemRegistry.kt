@@ -66,25 +66,26 @@ object NekoItemRegistry : KoinComponent, Initializable,
 
         // then walk each file (i.e., each item) in each namespace
         namespaceDirs.forEach { namespaceDir ->
-            for (itemFile in namespaceDir.walk()
+            namespaceDir.walk()
                 .drop(1) // exclude the namespace directory itself
-                .filter { it.extension == "yml" }) {
-                val text = itemFile.bufferedReader().use { it.readText() }
-                val node = loaderBuilder.buildAndLoadString(text)
+                .filter { it.extension == "yml" }
+                .forEach { itemFile ->
+                    val text = itemFile.bufferedReader().use { it.readText() }
+                    val node = loaderBuilder.buildAndLoadString(text)
 
-                val namespace = namespaceDir.name
-                val value = itemFile.nameWithoutExtension
-                val key = Key.key(namespace, value).also {
-                    logger.info("Loading item: {}", it)
+                    val namespace = namespaceDir.name
+                    val value = itemFile.nameWithoutExtension
+                    val key = Key.key(namespace, value).also {
+                        logger.info("Loading item: {}", it)
+                    }
+                    runCatching {
+                        NekoItemFactory.create(key, node)
+                    }.onSuccess {
+                        registerName2Object(key, it)
+                    }.onFailure {
+                        logger.error("Can't load item '$key': {}", it.message)
+                    }
                 }
-                runCatching {
-                    NekoItemFactory.create(key, node)
-                }.onSuccess {
-                    registerName2Object(key, it)
-                }.onFailure {
-                    logger.error("Can't load item '$key': {}", it.message)
-                }
-            }
         }
     }
 
