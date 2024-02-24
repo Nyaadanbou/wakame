@@ -49,9 +49,6 @@ object AttributeRegistry : Initializable {
     val schemeBuilderRegistry: MutableMap<Key, SchemeBuilder> = hashMapOf()
 
     @InternalApi
-    val schemeBakerRegistry: MutableMap<Key, SchemeBaker> = hashMapOf()
-
-    @InternalApi
     val shadowTagEncoder: MutableMap<Key, ShadowTagEncoder> = hashMapOf()
 
     @InternalApi
@@ -109,7 +106,7 @@ object AttributeRegistry : Initializable {
     }
 
     fun getMeta(key: Key): AttributeStructMeta {
-        return (@OptIn(InternalApi::class) attributeStructRegistry[key] ?: error("Can't find attribute with key '$key'"))
+        return (@OptIn(InternalApi::class) attributeStructRegistry[key] ?: error("Can't find attribute struct meta with key '$key'"))
     }
 
     override fun onPreWorld() {

@@ -30,15 +30,15 @@ object SchemeCoreFactory {
         val key = node.node("key").requireKt<Key>()
         val ret: SchemeCore = when (key.namespace()) {
             NekoNamespaces.ABILITY -> {
-                val builder = @OptIn(InternalApi::class) AbilityRegistry.schemeBuilderRegistry.getOrThrow(key)
-                val value = builder.build(node) as SchemeAbilityValue
-                SchemeAbilityCore(key, value)
+                val schemeBuilder = @OptIn(InternalApi::class) AbilityRegistry.schemeBuilderRegistry.getOrThrow(key)
+                val schemeValue = schemeBuilder.build(node) as SchemeAbilityValue
+                SchemeAbilityCore(key, schemeValue)
             }
 
             NekoNamespaces.ATTRIBUTE -> {
-                val builder = @OptIn(InternalApi::class) AttributeRegistry.schemeBuilderRegistry.getOrThrow(key)
-                val value = builder.build(node) as SchemeAttributeValue
-                SchemeAttributeCore(key, value)
+                val schemeBuilder = @OptIn(InternalApi::class) AttributeRegistry.schemeBuilderRegistry.getOrThrow(key)
+                val schemeValue = schemeBuilder.build(node) as SchemeAttributeValue
+                SchemeAttributeCore(key, schemeValue)
             }
 
             else -> throw IllegalArgumentException()

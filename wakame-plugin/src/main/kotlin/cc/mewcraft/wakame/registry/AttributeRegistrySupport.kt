@@ -116,9 +116,6 @@ internal class SingleSelectionImpl(
         // register scheme builder
         AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerS::deserialize)
 
-        // register scheme baker
-        AttributeRegistry.schemeBakerRegistry[key] = SchemeBaker(SchemeCoreValue::realize)
-
         // register shadow tag encoder
         AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
             val compound = CompoundShadowTag.create()
@@ -167,9 +164,6 @@ internal class RangedSelectionImpl(
         // register scheme builder
         AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerLU::deserialize)
 
-        // register scheme baker
-        AttributeRegistry.schemeBakerRegistry[key] = SchemeBaker(SchemeCoreValue::realize)
-
         // register shadow tag encoder
         AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
             val compound = CompoundShadowTag.create()
@@ -217,9 +211,6 @@ internal class SingleElementAttributeBinderImpl(
         // register scheme builder
         AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerSE::deserialize)
 
-        // register scheme baker
-        AttributeRegistry.schemeBakerRegistry[key] = SchemeBaker(SchemeCoreValue::realize)
-
         // register shadow tag encoder
         AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
             val compound = CompoundShadowTag.create()
@@ -266,9 +257,6 @@ internal class RangedElementAttributeBinderImpl(
     ) {
         // register scheme builder
         AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerLUE::deserialize)
-
-        // register scheme baker
-        AttributeRegistry.schemeBakerRegistry[key] = SchemeBaker(SchemeCoreValue::realize)
 
         // register shadow tag encoder
         AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
