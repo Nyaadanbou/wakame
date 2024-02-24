@@ -20,7 +20,7 @@ typealias KizamiPool = Pool<Kizami, SchemeGenerationContext>
  *
  * @property kizamiPool 铭刻池
  */
-class KizamiMeta(
+data class KizamiMeta(
     private val kizamiPool: KizamiPool = Pool.empty(),
 ) : SchemeMeta<Set<Kizami>> {
     override fun generate(context: SchemeGenerationContext): Set<Kizami> {

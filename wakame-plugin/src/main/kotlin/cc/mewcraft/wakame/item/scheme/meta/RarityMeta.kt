@@ -19,7 +19,7 @@ import java.lang.reflect.Type
  * @property static the static item rarity
  * @property dynamic the dynamic item rarity
  */
-class RarityMeta(
+data class RarityMeta(
     /**
      * The default rarity held in this scheme.
      */

@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.util.compoundShadowTag
 import cc.mewcraft.wakame.util.toStableByte
 import me.lucko.helper.shadows.nbt.ShadowTag
 
-internal class ReforgeMetaImpl(
+internal data class ReforgeMetaImpl(
     override val successCount: Int,
     override val failureCount: Int,
 ) : ReforgeMeta {

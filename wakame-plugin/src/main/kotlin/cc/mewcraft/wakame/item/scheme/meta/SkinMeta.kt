@@ -13,7 +13,7 @@ import java.lang.reflect.Type
  *
  * @property itemSkin 物品的皮肤
  */
-class SkinMeta(
+data class SkinMeta(
     private val itemSkin: ItemSkin? = null,
 ) : SchemeMeta<ItemSkin> {
     override fun generate(context: SchemeGenerationContext): ItemSkin? {

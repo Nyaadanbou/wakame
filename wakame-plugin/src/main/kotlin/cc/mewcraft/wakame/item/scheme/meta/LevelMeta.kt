@@ -20,7 +20,7 @@ import java.lang.reflect.Type
  *
  * @property level the item level
  */
-class LevelMeta(
+data class LevelMeta(
     /**
      * The item level held in this scheme.
      */

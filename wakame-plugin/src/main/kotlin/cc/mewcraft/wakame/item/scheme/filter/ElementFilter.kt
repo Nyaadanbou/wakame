@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
  *
  * @property element the element to check with
  */
-class ElementFilter(
+data class ElementFilter(
     override val invert: Boolean,
     private val element: Element,
 ) : Filter {

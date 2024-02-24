@@ -17,7 +17,7 @@ import net.kyori.adventure.key.Key
  * @property amount the required amount of damage
  */
 @BinaryData
-class PeakDamageCurse(
+data class PeakDamageCurse(
     private val element: Element,
     private val amount: Int,
 ) : BinaryCurse {

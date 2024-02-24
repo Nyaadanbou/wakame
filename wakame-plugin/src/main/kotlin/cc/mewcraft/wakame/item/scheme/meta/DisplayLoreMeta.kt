@@ -14,7 +14,7 @@ import java.lang.reflect.Type
  *
  * @property lore the item lore in the format of MiniMessage string
  */
-class DisplayLoreMeta(
+data class DisplayLoreMeta(
     private val lore: List<String>? = null,
 ) : SchemeMeta<List<String>>, KoinComponent {
     override fun generate(context: SchemeGenerationContext): List<String>? {

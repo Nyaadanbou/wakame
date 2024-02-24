@@ -13,7 +13,7 @@ import java.util.UUID
  *
  * @property skinOwner 物品的皮肤的所有者的 UUID
  */
-class SkinOwnerMeta(
+data class SkinOwnerMeta(
     private val skinOwner: UUID? = null,
 ) : SchemeMeta<UUID> {
     override fun generate(context: SchemeGenerationContext): UUID? {

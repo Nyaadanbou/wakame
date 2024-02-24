@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.random.Mark
  *
  * @property mark the mark value in string to check with
  */
-class MarkFilter(
+data class MarkFilter(
     override val invert: Boolean,
     private val mark: String,
 ) : Filter {

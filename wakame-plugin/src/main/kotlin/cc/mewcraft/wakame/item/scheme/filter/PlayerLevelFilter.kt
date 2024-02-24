@@ -10,7 +10,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-class PlayerLevelFilter(
+data class PlayerLevelFilter(
     override val invert: Boolean,
     private val subtype: PlayerLevelType,
     private val level: Range<Int>,

@@ -15,7 +15,7 @@ import java.lang.reflect.Type
  *
  * @property material 原版物品类型
  */
-class MaterialMeta(
+data class MaterialMeta(
     private val material: Material = Material.STONE,
 ) : SchemeMeta<Material> {
     override fun generate(context: SchemeGenerationContext): Material {

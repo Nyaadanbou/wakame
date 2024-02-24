@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.scheme.filter
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import com.google.common.collect.Range
 
-class ItemLevelFilter(
+data class ItemLevelFilter(
     override val invert: Boolean,
     private val level: Range<Int>,
 ) : Filter {

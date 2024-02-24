@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.key.Key
 
 @SchemeData
-class PeakDamageCurse(
+data class PeakDamageCurse(
     private val amount: NumericValue,
     private val element: Element,
 ) : SchemeCurse {

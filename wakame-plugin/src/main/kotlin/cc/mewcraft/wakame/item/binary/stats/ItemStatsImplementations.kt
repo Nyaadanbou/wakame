@@ -13,7 +13,7 @@ import net.kyori.adventure.key.Key
 
 // TODO 可以进一步抽象，减少重复代码
 
-class EntityKillsStats(
+data class EntityKillsStats(
     override val accessor: ItemStatsAccessor,
 ) : ItemStats, NumericMapLikeItemStats<Key, Int> {
     override val nbtPath: String = NekoTags.Stats.ENTITY_KILLS
@@ -27,7 +27,7 @@ class EntityKillsStats(
     }
 }
 
-class PeakDamageStats(
+data class PeakDamageStats(
     override val accessor: ItemStatsAccessor,
 ) : ItemStats, NumericMapLikeItemStats<Element, Int> {
     override val nbtPath: String = NekoTags.Stats.PEAK_DAMAGE
@@ -41,7 +41,7 @@ class PeakDamageStats(
     }
 }
 
-class ReforgeStats(
+data class ReforgeStats(
     override val accessor: ItemStatsAccessor,
 ) : ItemStats {
     override val nbtPath: String = NekoTags.Stats.REFORGE

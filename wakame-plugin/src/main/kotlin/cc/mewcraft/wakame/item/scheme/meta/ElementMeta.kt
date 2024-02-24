@@ -20,7 +20,7 @@ typealias ElementPool = Pool<Element, SchemeGenerationContext>
  *
  * @property elementPool 元素池
  */
-class ElementMeta(
+data class ElementMeta(
     private val elementPool: ElementPool = Pool.empty(),
 ) : SchemeMeta<Set<Element>> {
     override fun generate(context: SchemeGenerationContext): Set<Element> {

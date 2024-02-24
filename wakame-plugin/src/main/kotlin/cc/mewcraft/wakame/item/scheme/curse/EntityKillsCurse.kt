@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.key.Key
 
 @SchemeData
-class EntityKillsCurse(
+data class EntityKillsCurse(
     private val count: NumericValue,
     private val index: EntityReference,
 ) : SchemeCurse {

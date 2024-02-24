@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.rarity.Rarity
  *
  * @property rarity the [Rarity] to check with
  */
-class RarityFilter(
+data class RarityFilter(
     override val invert: Boolean,
     private val rarity: Rarity,
 ) : Filter {

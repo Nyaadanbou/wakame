@@ -12,7 +12,7 @@ import net.kyori.adventure.key.Key
  *
  * @property key the key of the [core][Core] to check with
  */
-class CoreFilter(
+data class CoreFilter(
     override val invert: Boolean,
     private val key: Key,
 ) : Filter {

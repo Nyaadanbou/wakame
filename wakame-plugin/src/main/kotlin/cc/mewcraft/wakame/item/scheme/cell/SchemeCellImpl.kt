@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.cell
 
-internal class SchemeCellImpl(
+internal data class SchemeCellImpl(
     override val keepEmpty: Boolean,
     override val canReforge: Boolean,
     override val canOverride: Boolean,

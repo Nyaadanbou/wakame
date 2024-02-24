@@ -17,7 +17,7 @@ import net.kyori.adventure.key.Key
  * @property count the required number of entities to be killed
  */
 @BinaryData
-class EntityKillsCurse(
+data class EntityKillsCurse(
     private val index: EntityReference,
     private val count: Int,
 ) : BinaryCurse {

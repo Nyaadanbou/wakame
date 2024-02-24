@@ -109,7 +109,7 @@ class ItemDeserializationTest : KoinTest {
             self.schemeCells.forEach { (id, scheme) ->
                 val binary = BinaryCellFactory.generate(context, scheme)
                 if (binary != null) {
-                    logger.debug("Put cell {}: {}", id, binary)
+                    logger.debug("Put cell '{}': {}", id, binary)
                 }
             }
 
@@ -131,7 +131,7 @@ class ItemDeserializationTest : KoinTest {
         val value: T? = meta.generate(context)
         if (value != null) {
             // set the meta only if something is generated
-            logger.debug("Put meta {}: {}", S::class.simpleName, value.toString())
+            logger.debug("Put meta '{}': {}", S::class.simpleName, value.toString())
         }
     }
 

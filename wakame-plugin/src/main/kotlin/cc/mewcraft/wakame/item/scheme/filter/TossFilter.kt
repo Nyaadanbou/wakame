@@ -8,7 +8,7 @@ import kotlin.random.Random
  *
  * @property probability the probability of success for this toss
  */
-class TossFilter(
+data class TossFilter(
     override val invert: Boolean,
     private val probability: Float,
 ) : Filter {

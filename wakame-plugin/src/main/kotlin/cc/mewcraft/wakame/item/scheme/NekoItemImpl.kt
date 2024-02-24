@@ -15,7 +15,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import java.util.UUID
 
-internal class NekoItemImpl(
+internal data class NekoItemImpl(
     override val key: Key,
     override val uuid: UUID,
     override val schemeMeta: Map<Key, SchemeMeta<*>>,

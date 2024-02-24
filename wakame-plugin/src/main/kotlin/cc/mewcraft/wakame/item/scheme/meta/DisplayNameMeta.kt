@@ -14,7 +14,7 @@ import java.lang.reflect.Type
  *
  * @property displayName the item name in the format of MiniMessage string
  */
-class DisplayNameMeta(
+data class DisplayNameMeta(
     private val displayName: String = "Unnamed",
 ) : SchemeMeta<String>, KoinComponent {
     override fun generate(context: SchemeGenerationContext): String {
