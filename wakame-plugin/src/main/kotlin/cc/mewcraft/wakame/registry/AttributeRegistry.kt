@@ -22,8 +22,8 @@ import com.google.common.collect.ImmutableMap
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
+import java.lang.invoke.MethodHandle
 import java.util.EnumMap
-import kotlin.reflect.KFunction
 
 /**
  * This singleton holds various implementations for **each** attribute in
@@ -187,8 +187,6 @@ interface RangedElementAttributeBinder {
 //</editor-fold>
 
 //<editor-fold desc="Support">
-// TODO use MethodHandle for better reflection performance
-
 @InternalApi
 private class FormatSelectionImpl(
     private val key: Key,
@@ -396,40 +394,24 @@ private class RangedElementAttributeBinderImpl(
 }
 
 // Map Value's KFunction Type: Map<ShadowTagType, CompoundShadowTag.(String, Number) -> Unit>
-private val TAG_TYPE_2_TAG_SETTER_MAP: Map<ShadowTagType, KFunction<Unit>> = @Suppress("DuplicatedCode") buildMap {
+private val TAG_TYPE_2_TAG_SETTER_MAP: Map<ShadowTagType, MethodHandle> = @Suppress("DuplicatedCode") buildMap {
     this[ShadowTagType.BYTE] = CompoundShadowTag::putByte
     this[ShadowTagType.SHORT] = CompoundShadowTag::putShort
     this[ShadowTagType.INT] = CompoundShadowTag::putInt
     this[ShadowTagType.LONG] = CompoundShadowTag::putLong
     this[ShadowTagType.FLOAT] = CompoundShadowTag::putFloat
     this[ShadowTagType.DOUBLE] = CompoundShadowTag::putDouble
-}.let {
-    EnumMap(it)
-}
-
-// Map Value's KFunction Type: CompoundShadowTag.(String) -> Number
-private val TAG_TYPE_2_TAG_GETTER_MAP: Map<ShadowTagType, KFunction<Number>> = @Suppress("DuplicatedCode") buildMap {
-    this[ShadowTagType.BYTE] = CompoundShadowTag::getByte
-    this[ShadowTagType.SHORT] = CompoundShadowTag::getShort
-    this[ShadowTagType.INT] = CompoundShadowTag::getInt
-    this[ShadowTagType.LONG] = CompoundShadowTag::getLong
-    this[ShadowTagType.FLOAT] = CompoundShadowTag::getFloat
-    this[ShadowTagType.DOUBLE] = CompoundShadowTag::getDouble
-}.let {
-    EnumMap(it)
-}
+}.mapValues { it.value.toMethodHandle() }.let { EnumMap(it) }
 
 // Map Value's KFunction Type: (Number) -> Number
-private val TAG_TYPE_2_NUMBER_CONVERTER_MAP: Map<ShadowTagType, KFunction<Number>> = buildMap {
+private val TAG_TYPE_2_NUMBER_CONVERTER_MAP: Map<ShadowTagType, MethodHandle> = buildMap {
     this[ShadowTagType.BYTE] = Number::toStableByte
     this[ShadowTagType.SHORT] = Number::toStableShort
     this[ShadowTagType.INT] = Number::toStableInt
     this[ShadowTagType.LONG] = Number::toStableLong
     this[ShadowTagType.FLOAT] = Number::toStableFloat
     this[ShadowTagType.DOUBLE] = Number::toStableDouble
-}.let {
-    EnumMap(it)
-}
+}.mapValues { it.value.toMethodHandle() }.let { EnumMap(it) }
 
 //<editor-fold desc="Specialized Compound Operations">
 private fun CompoundShadowTag.getElement(): Element {
@@ -453,9 +435,9 @@ private fun CompoundShadowTag.getNumber(key: String): Double {
     return this.getDouble(key)
 }
 
-private fun CompoundShadowTag.putNumber(key: String, value: Number, shadowTagType: ShadowTagType) {
-    val converted = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(shadowTagType).call(value)
-    TAG_TYPE_2_TAG_SETTER_MAP.getOrThrow(shadowTagType).call(this, key, converted)
+private fun CompoundShadowTag.putNumber(key: String, value: Double, shadowTagType: ShadowTagType) {
+    val converted = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(shadowTagType).invoke(value)
+    TAG_TYPE_2_TAG_SETTER_MAP.getOrThrow(shadowTagType).invoke(this, key, converted)
 }
 
 private fun CompoundShadowTag.putId(id: Key) {
