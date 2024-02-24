@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute.facade
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.base.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.BinaryCoreValue
 import cc.mewcraft.wakame.registry.AttributeStructMeta
@@ -14,23 +14,23 @@ import cc.mewcraft.wakame.registry.AttributeStructType
  * 实现类应该将成员变量声明为 `var` 而不是 `val` 以实现复用。同时配合 [ThreadLocal] 高效解决并发问题。
  */
 sealed interface BinaryAttributeValue : BinaryCoreValue {
-    var operation: AttributeModifier.Operation
+    var operation: Operation
     val structType: AttributeStructType
 }
 
 /**
  * Represents a "single-value" attribute.
  */
-interface BinaryAttributeValueSingle<T> : BinaryAttributeValue {
-    var value: T
+interface BinaryAttributeValueSingle : BinaryAttributeValue {
+    var value: Double
 }
 
 /**
  * Represents a "ranged-value" attribute.
  */
-interface BinaryAttributeValueRanged<T> : BinaryAttributeValue {
-    var lower: T
-    var upper: T
+interface BinaryAttributeValueRanged : BinaryAttributeValue {
+    var lower: Double
+    var upper: Double
 }
 
 /**
@@ -45,9 +45,9 @@ interface BinaryAttributeValueElement : BinaryAttributeValue {
  */
 val BinaryAttributeValue.format: AttributeStructMeta.Format
     get() = when (this) {
-        is BinaryAttributeValueSingle<*> -> AttributeStructMeta.Format.SINGLE
-        is BinaryAttributeValueRanged<*> -> AttributeStructMeta.Format.RANGED
-        else -> error("Unknown format")
+        is BinaryAttributeValueSingle -> AttributeStructMeta.Format.SINGLE
+        is BinaryAttributeValueRanged -> AttributeStructMeta.Format.RANGED
+        else -> error("Unhandled format. Missing implementation?")
     }
 
 /**
@@ -65,27 +65,35 @@ val BinaryAttributeValue.elementOrNull: Element?
 //<editor-fold desc="Implementations">
 /* 以下实现考虑了属性可能拥有的全部数据结构 */
 
-data class BinaryAttributeValueS<T : Number>(
-    override var value: T, override var operation: AttributeModifier.Operation,
-) : BinaryAttributeValueSingle<T> {
+data class BinaryAttributeValueS(
+    override var value: Double,
+    override var operation: Operation,
+) : BinaryAttributeValueSingle {
     override val structType: AttributeStructType = AttributeStructType.SINGLE
 }
 
-data class BinaryAttributeValueLU<T : Number>(
-    override var lower: T, override var upper: T, override var operation: AttributeModifier.Operation,
-) : BinaryAttributeValueRanged<T> {
+data class BinaryAttributeValueLU(
+    override var lower: Double,
+    override var upper: Double,
+    override var operation: Operation,
+) : BinaryAttributeValueRanged {
     override val structType: AttributeStructType = AttributeStructType.RANGED
 }
 
-data class BinaryAttributeValueSE<T : Number>(
-    override var value: T, override var element: Element, override var operation: AttributeModifier.Operation,
-) : BinaryAttributeValueSingle<T>, BinaryAttributeValueElement {
+data class BinaryAttributeValueSE(
+    override var value: Double,
+    override var element: Element,
+    override var operation: Operation,
+) : BinaryAttributeValueSingle, BinaryAttributeValueElement {
     override val structType: AttributeStructType = AttributeStructType.SINGLE_ELEMENT
 }
 
-data class BinaryAttributeValueLUE<T : Number>(
-    override var lower: T, override var upper: T, override var element: Element, override var operation: AttributeModifier.Operation,
-) : BinaryAttributeValueRanged<T>, BinaryAttributeValueElement {
+data class BinaryAttributeValueLUE(
+    override var lower: Double,
+    override var upper: Double,
+    override var element: Element,
+    override var operation: Operation,
+) : BinaryAttributeValueRanged, BinaryAttributeValueElement {
     override val structType: AttributeStructType = AttributeStructType.RANGED_ELEMENT
 }
 //</editor-fold>

@@ -184,33 +184,33 @@ internal class AttributeStylizerImpl(
         val tagResolvers = TagResolver.builder()
         if (key == Attributes.ATTACK_SPEED_LEVEL.key()) {
             /* 单独处理攻击速度 */
-            value as BinaryAttributeValueS<*>
+            value as BinaryAttributeValueS
             tagResolvers.resolver(getAttackSpeedLevelTagResolver(value.value.toInt()))
             return listOf(miniMessage.deserialize(attackSpeedFormat.merged, tagResolvers.build()))
         } else {
             /* 其余按格式统一处理 */
             when (value) {
-                is BinaryAttributeValueS<*> -> tagResolvers.resolver(
+                is BinaryAttributeValueS -> tagResolvers.resolver(
                     number("value", value.value, value.operation)
                 )
 
-                is BinaryAttributeValueLU<*> -> tagResolvers.resolvers(
+                is BinaryAttributeValueLU -> tagResolvers.resolvers(
                     number("min", value.lower, value.operation),
                     number("max", value.upper, value.operation)
                 )
 
-                is BinaryAttributeValueSE<*> -> tagResolvers.resolvers(
+                is BinaryAttributeValueSE -> tagResolvers.resolvers(
                     number("value", value.value, value.operation),
                     component("element", value.element.displayNameComponent)
                 )
 
-                is BinaryAttributeValueLUE<*> -> tagResolvers.resolvers(
+                is BinaryAttributeValueLUE -> tagResolvers.resolvers(
                     number("min", value.lower, value.operation),
                     number("max", value.upper, value.operation),
                     component("element", value.element.displayNameComponent)
                 )
 
-                else -> error("Unhandled attribute struct")
+                else -> error("Unhandled attribute struct. Missing implementation?")
             }
             return listOf(miniMessage.deserialize(attributeFormats.getOrThrow(key), tagResolvers.build()))
         }

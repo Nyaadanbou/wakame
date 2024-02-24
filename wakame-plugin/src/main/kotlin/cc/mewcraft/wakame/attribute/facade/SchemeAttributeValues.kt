@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.attribute.facade
 
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item.BinaryCoreValue
 import cc.mewcraft.wakame.item.SchemeCoreValue
 import cc.mewcraft.wakame.util.NumericValue
 import cc.mewcraft.wakame.util.requireKt
@@ -17,6 +18,28 @@ sealed interface SchemeAttributeValue : SchemeCoreValue {
 }
 
 /**
+ * Represents a "single-value" attribute.
+ */
+sealed interface SchemeAttributeValueSingle : SchemeAttributeValue {
+    val value: NumericValue
+}
+
+/**
+ * Represents a "ranged-value" attribute.
+ */
+sealed interface SchemeAttributeValueRanged : SchemeAttributeValue {
+    val lower: NumericValue
+    val upper: NumericValue
+}
+
+/**
+ * Represents an "elemental" attribute.
+ */
+sealed interface SchemeAttributeValueElement : SchemeAttributeValue {
+    val element: Element
+}
+
+/**
  * 代表一个属性模板的序列化器。
  */
 sealed interface SchemeAttributeValueSerializer {
@@ -26,12 +49,15 @@ sealed interface SchemeAttributeValueSerializer {
 
 ////// 模板数据都支持随机数值
 
-/**
- * S = Single.
- */
+//<editor-fold desc="S = Single">
 data class SchemeAttributeValueS(
-    val value: NumericValue, override val operation: AttributeModifier.Operation,
-) : SchemeAttributeValue
+    override val value: NumericValue,
+    override val operation: AttributeModifier.Operation,
+) : SchemeAttributeValueSingle {
+    override fun realize(factor: Number): BinaryCoreValue {
+        return BinaryAttributeValueS(value.calculate(factor), operation)
+    }
+}
 
 data object SchemeAttributeValueSerializerS : SchemeAttributeValueSerializer {
     override fun deserialize(node: ConfigurationNode): SchemeAttributeValueS {
@@ -40,13 +66,18 @@ data object SchemeAttributeValueSerializerS : SchemeAttributeValueSerializer {
         return SchemeAttributeValueS(value, operation)
     }
 }
+//</editor-fold>
 
-/**
- * LU = Lower & Upper.
- */
+//<editor-fold desc="LU = Lower & Upper.">
 data class SchemeAttributeValueLU(
-    val lower: NumericValue, val upper: NumericValue, override val operation: AttributeModifier.Operation,
-) : SchemeAttributeValue
+    override val lower: NumericValue,
+    override val upper: NumericValue,
+    override val operation: AttributeModifier.Operation,
+) : SchemeAttributeValueRanged {
+    override fun realize(factor: Number): BinaryCoreValue {
+        return BinaryAttributeValueLU(lower.calculate(factor), upper.calculate(factor), operation)
+    }
+}
 
 data object SchemeAttributeValueSerializerLU : SchemeAttributeValueSerializer {
     override fun deserialize(node: ConfigurationNode): SchemeAttributeValueLU {
@@ -56,13 +87,20 @@ data object SchemeAttributeValueSerializerLU : SchemeAttributeValueSerializer {
         return SchemeAttributeValueLU(lower, upper, operation)
     }
 }
+//</editor-fold>
 
 /**
  * SE = Single & Element.
  */
 data class SchemeAttributeValueSE(
-    val value: NumericValue, val element: Element, override val operation: AttributeModifier.Operation,
-) : SchemeAttributeValue
+    override val value: NumericValue,
+    override val element: Element,
+    override val operation: AttributeModifier.Operation,
+) : SchemeAttributeValueSingle, SchemeAttributeValueElement {
+    override fun realize(factor: Number): BinaryCoreValue {
+        return BinaryAttributeValueSE(value.calculate(factor), element, operation)
+    }
+}
 
 data object SchemeAttributeValueSerializerSE : SchemeAttributeValueSerializer {
     override fun deserialize(node: ConfigurationNode): SchemeAttributeValueSE {
@@ -77,8 +115,15 @@ data object SchemeAttributeValueSerializerSE : SchemeAttributeValueSerializer {
  * LUE = Lower & Upper & Element.
  */
 data class SchemeAttributeValueLUE(
-    val lower: NumericValue, val upper: NumericValue, val element: Element, override val operation: AttributeModifier.Operation,
-) : SchemeAttributeValue
+    override val lower: NumericValue,
+    override val upper: NumericValue,
+    override val element: Element,
+    override val operation: AttributeModifier.Operation,
+) : SchemeAttributeValueRanged, SchemeAttributeValueElement {
+    override fun realize(factor: Number): BinaryCoreValue {
+        return BinaryAttributeValueLUE(lower.calculate(factor), upper.calculate(factor), element, operation)
+    }
+}
 
 data object SchemeAttributeValueSerializerLUE : SchemeAttributeValueSerializer {
     override fun deserialize(node: ConfigurationNode): SchemeAttributeValueLUE {

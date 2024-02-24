@@ -41,6 +41,8 @@ interface NekoItem : Keyed {
      *   file extension
      */
     val key: Key
+    override fun key(): Key = key
+
 
     /**
      * The map holds all the metadata of `this` item. Use your IDE to navigate
@@ -85,10 +87,6 @@ interface NekoItem : Keyed {
      * @return an once-off [NekoItemStack]
      */
     fun createItemStack(crate: BinaryCrate): NekoItemStack
-
-    // region Java interface overrides
-    override fun key(): Key = key
-    // endregion
 }
 
 ////// Extension functions //////

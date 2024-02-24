@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item
 
-import me.lucko.helper.shadows.nbt.ShadowTag
+import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
@@ -18,15 +18,15 @@ fun interface SchemeBaker {
 }
 
 /**
- * 将数据值 [BinaryCoreValue] 转换成一个 NBT [ShadowTag].
+ * 将数据值 [BinaryCoreValue] 转换成一个 NBT [CompoundShadowTag].
  */
 fun interface ShadowTagEncoder {
-    fun encode(value: BinaryCoreValue): ShadowTag
+    fun encode(value: BinaryCoreValue): CompoundShadowTag
 }
 
 /**
- * 将 NBT [ShadowTag] 转换成一个数据值 [BinaryCoreValue].
+ * 将 NBT [CompoundShadowTag] 转换成一个数据值 [BinaryCoreValue].
  */
 fun interface ShadowTagDecoder {
-    fun decode(tag: ShadowTag): BinaryCoreValue
+    fun decode(tag: CompoundShadowTag): BinaryCoreValue
 }

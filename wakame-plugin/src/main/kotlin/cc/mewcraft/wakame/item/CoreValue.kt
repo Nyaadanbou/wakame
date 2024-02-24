@@ -7,7 +7,7 @@ package cc.mewcraft.wakame.item
  *
  * See the subclasses for more details.
  */
-interface CoreValue
+sealed interface CoreValue
 
 /**
  * The value representation in NBT.
@@ -17,4 +17,9 @@ interface BinaryCoreValue : CoreValue
 /**
  * The value representation in scheme.
  */
-interface SchemeCoreValue : CoreValue
+interface SchemeCoreValue : CoreValue {
+    /**
+     * Realizes `this` scheme (i.e. generates a binary value from this).
+     */
+    fun realize(factor: Number): BinaryCoreValue
+}
