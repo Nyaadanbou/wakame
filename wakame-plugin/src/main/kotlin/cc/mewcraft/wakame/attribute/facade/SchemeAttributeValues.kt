@@ -68,7 +68,7 @@ data object SchemeAttributeValueSerializerS : SchemeAttributeValueSerializer {
 }
 //</editor-fold>
 
-//<editor-fold desc="LU = Lower & Upper.">
+//<editor-fold desc="LU = Lower & Upper">
 data class SchemeAttributeValueLU(
     override val lower: NumericValue,
     override val upper: NumericValue,
@@ -89,9 +89,7 @@ data object SchemeAttributeValueSerializerLU : SchemeAttributeValueSerializer {
 }
 //</editor-fold>
 
-/**
- * SE = Single & Element.
- */
+//<editor-fold desc="SE = Single & Element">
 data class SchemeAttributeValueSE(
     override val value: NumericValue,
     override val element: Element,
@@ -110,10 +108,9 @@ data object SchemeAttributeValueSerializerSE : SchemeAttributeValueSerializer {
         return SchemeAttributeValueSE(value, element, operation)
     }
 }
+//</editor-fold>
 
-/**
- * LUE = Lower & Upper & Element.
- */
+//<editor-fold desc="LUE = Lower & Upper & Element">
 data class SchemeAttributeValueLUE(
     override val lower: NumericValue,
     override val upper: NumericValue,
@@ -134,6 +131,7 @@ data object SchemeAttributeValueSerializerLUE : SchemeAttributeValueSerializer {
         return SchemeAttributeValueLUE(lower, upper, element, operation)
     }
 }
+//</editor-fold>
 
 private fun deserializeSingle(node: ConfigurationNode): NumericValue =
     node.node("value").requireKt<NumericValue>()
@@ -145,7 +143,7 @@ private fun deserializeUpper(node: ConfigurationNode): NumericValue =
     node.node("upper").requireKt<NumericValue>()
 
 private fun deserializeElement(node: ConfigurationNode): Element =
-    node.node("element").requireKt<Element>() // FIXME allow NullConfig
+    node.node("element").requireKt<Element>()
 
 private fun deserializeOperation(node: ConfigurationNode): AttributeModifier.Operation =
     node.node("operation").string
