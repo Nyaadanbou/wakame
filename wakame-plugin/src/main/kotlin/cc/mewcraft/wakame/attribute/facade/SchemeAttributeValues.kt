@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.SchemeCoreValue
 import cc.mewcraft.wakame.util.NumericValue
 import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
+import kotlin.math.max
 
 /**
  * 代表一个属性在模板中的数值。
@@ -75,7 +76,9 @@ data class SchemeAttributeValueLU(
     override val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValueRanged {
     override fun realize(factor: Number): BinaryCoreValue {
-        return BinaryAttributeValueLU(lower.calculate(factor), upper.calculate(factor), operation)
+        val lower1 = lower.calculate(factor)
+        val upper1 = upper.calculate(factor)
+        return BinaryAttributeValueLU(lower1, max(lower1, upper1), operation)
     }
 }
 
@@ -118,7 +121,9 @@ data class SchemeAttributeValueLUE(
     override val operation: AttributeModifier.Operation,
 ) : SchemeAttributeValueRanged, SchemeAttributeValueElement {
     override fun realize(factor: Number): BinaryCoreValue {
-        return BinaryAttributeValueLUE(lower.calculate(factor), upper.calculate(factor), element, operation)
+        val lower1 = lower.calculate(factor)
+        val upper1 = upper.calculate(factor)
+        return BinaryAttributeValueLUE(lower1, max(lower1, upper1), element, operation)
     }
 }
 
