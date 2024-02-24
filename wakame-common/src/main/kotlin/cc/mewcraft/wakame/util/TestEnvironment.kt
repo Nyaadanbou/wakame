@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.util
 
 object TestEnvironment {
 
-    private val isRunningJUnit: Boolean by lazy(LazyThreadSafetyMode.NONE) {
+    private val cache: Boolean by lazy(LazyThreadSafetyMode.NONE) {
         listOf(
             "org.junit.Test",
             "org.junit.jupiter.api.Test"
@@ -14,6 +14,6 @@ object TestEnvironment {
     /**
      * Returns `true` if we are in any JUnit environment.
      */
-    fun isRunningJUnit(): Boolean = isRunningJUnit
+    fun isRunningJUnit(): Boolean = cache
 
 }

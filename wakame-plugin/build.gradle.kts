@@ -70,13 +70,14 @@ dependencies {
     }
 
     // test
+    testImplementation(libs.mockk)
+    testImplementation(libs.logback.classic)
     testImplementation(libs.server.purpur)
     testImplementation(libs.helper)
     testImplementation(libs.helper.sql)
     testImplementation(libs.helper.profiles)
     testImplementation(libs.configurate.yaml)
     testImplementation(libs.configurate.extra.kotlin)
-    testImplementation(libs.logback.classic)
 }
 
 tasks.shadowJar {
