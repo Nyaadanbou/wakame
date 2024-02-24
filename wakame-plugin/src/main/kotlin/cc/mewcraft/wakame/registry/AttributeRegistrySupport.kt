@@ -16,8 +16,6 @@ import com.google.common.collect.ImmutableMap
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
-import java.lang.invoke.MethodHandle
-import java.lang.invoke.MethodHandles
 import java.util.EnumMap
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.primaryConstructor
@@ -78,6 +76,7 @@ internal class FormatSelectionImpl(
         return RangedSelectionImpl(key, shadowTagType)
     }
 }
+
 @InternalApi
 internal class SingleSelectionImpl(
     private val key: Key,
