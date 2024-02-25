@@ -5,9 +5,9 @@ import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
 import net.kyori.adventure.text.Component
 
 internal class LoreFinalizerImpl(
+    private val loreMetaLookup: LoreMetaLookup,
     private val fixedLoreLines: Collection<LoreLine>,
     private val defaultLoreLines: Collection<LoreLine>,
-    private val loreMetaLookup: LoreMetaLookup,
 ) : LoreFinalizer {
 
     private val lineComparator: Comparator<LoreLine> = Comparator { o1, o2 ->

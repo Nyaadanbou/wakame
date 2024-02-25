@@ -60,7 +60,7 @@ internal class TextStylizerImpl(
     }
 
     override fun stylizeLore(item: NekoItemStack): Collection<LoreLine> {
-        val ret = ObjectArrayList<LoreLine>(8) // TODO estimate the capacity to reduce array copy operations
+        val ret = ObjectArrayList<LoreLine>(16)
 
         // for each meta in neko
         with(item.metadata) {

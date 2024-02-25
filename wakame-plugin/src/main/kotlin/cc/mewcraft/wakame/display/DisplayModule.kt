@@ -59,6 +59,6 @@ internal fun displayModule(): Module = module {
     // lore finalizer
     single<LoreFinalizer> {
         val config = get<RendererConfiguration>()
-        LoreFinalizerImpl(config.fixedLoreLines, config.defaultLoreLines, get())
+        LoreFinalizerImpl(get(), config.fixedLoreLines, config.defaultLoreLines)
     }
 }
