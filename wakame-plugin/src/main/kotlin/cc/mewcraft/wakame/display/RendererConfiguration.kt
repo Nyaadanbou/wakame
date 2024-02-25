@@ -105,8 +105,8 @@ internal class RendererConfiguration(
     private val _defaultLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
 
     private fun loadConfiguration() {
-        _loreIndexLookup.clear()
         _loreMetaLookup.clear()
+        _loreIndexLookup.clear()
         _fixedLoreLines.clear()
         _defaultLoreLines.clear()
 
@@ -203,11 +203,14 @@ internal class RendererConfiguration(
         }
         //</editor-fold>
 
+        // *accumulative* offset of the full index
+        var accIndexOffset = 0
+
         // loop through each primary line and initialize LoreMeta
         for ((rawIndex, rawLine) in primaryLines.withIndex()) {
             val loreMeta = createLoreMeta(rawIndex, rawLine)
 
-            loreMeta.fullIndexes.forEach { (fullKey, fullIndex) ->
+            loreMeta.fullIndexes(accIndexOffset).forEach { (fullKey, fullIndex) ->
                 // populate the index lookup
                 val absent = (_loreIndexLookup.putIfAbsent(fullKey, fullIndex) == null)
                 require(absent) { "Key $fullKey has already been added to indexes" }
@@ -215,6 +218,8 @@ internal class RendererConfiguration(
                 // populate the meta lookup
                 _loreMetaLookup[fullKey] = loreMeta
             }
+
+            accIndexOffset += loreMeta.fullKeys.size - 1 // plus the number of derived lines
 
             // populate the fixed lore lines
             if (loreMeta is FixedLoreMeta) {

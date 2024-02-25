@@ -58,6 +58,10 @@ class LoreFinalizerTest : KoinTest {
     }
 
     private val Component.plain: String get() = PlainTextComponentSerializer.plainText().serialize(this)
+    private fun Component.contains(x: String): Boolean = this.plain.contains(x)
+    private fun MetaLoreLineFactory.get(x: String): MetaLoreLine = this.get(FullKey.key(x), listText(x))
+    private fun AbilityLoreLineFactory.get(x: String): AbilityLoreLine = this.get(FullKey.key(x), listText(x))
+    private fun AttributeLoreLineFactory.get(x: String): AttributeLoreLine = this.get(FullKey.key(x), listText(x))
 
     private fun buildTest(loreLines: Collection<LoreLine>) {
         val logger = get<Logger>()
@@ -73,18 +77,11 @@ class LoreFinalizerTest : KoinTest {
     @Test
     fun `test finalize lore lines 1`() {
         val loreLines = listOf(
-            MetaLoreLineFactory.get(FullKey.key("meta:level"), listText("level 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:rarity"), listText("rarity 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:element"), listText("element 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:kizami"), listText("kizami 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:lore"), listText("lore 1", "lore 2", "lore 3")),
-            // AttributeLoreLineFactory.get(FullKey.key("attribute:attack_effect_chance.add"), listText("attack_effect_chance 1 2 3")),
-            // AttributeLoreLineFactory.get(FullKey.key("attribute:attack_speed_level.add"), listText("attack_speed_level 1 2 3")),
-            // AttributeLoreLineFactory.get(FullKey.key("attribute:critical_strike_chance.add"), listText("critical_strike_chance 1 2 3")),
-            // AttributeLoreLineFactory.get(FullKey.key("attribute:max_mana.add"), listText("max_mana 1 2 3")),
-            // AbilityLoreLineFactory.get(FullKey.key("ability:blink"), listText("blink 1 2 3")),
-            // AbilityLoreLineFactory.get(FullKey.key("ability:frost"), listText("frost 1 2 3")),
-            // AbilityLoreLineFactory.get(FullKey.key("ability:leapfrog"), listText("leapfrog 1 2 3")),
+            MetaLoreLineFactory.get("meta:level"),
+            MetaLoreLineFactory.get("meta:rarity"),
+            MetaLoreLineFactory.get("meta:element"),
+            MetaLoreLineFactory.get("meta:kizami"),
+            MetaLoreLineFactory.get("meta:lore"),
         )
         buildTest(loreLines)
     }
@@ -92,18 +89,15 @@ class LoreFinalizerTest : KoinTest {
     @Test
     fun `test finalize lore lines 2`() {
         val loreLines = listOf(
-            MetaLoreLineFactory.get(FullKey.key("meta:level"), listText("level 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:rarity"), listText("rarity 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:element"), listText("element 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:kizami"), listText("kizami 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:lore"), listText("lore 1", "lore 2", "lore 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:attack_effect_chance.add"), listText("attack_effect_chance 1 2 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:attack_speed_level.add"), listText("attack_speed_level 1 2 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:critical_strike_chance.add"), listText("critical_strike_chance 1 2 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:max_mana.add"), listText("max_mana 1 2 3")),
-            // AbilityLoreLineFactory.get(FullKey.key("ability:blink"), listText("blink 1 2 3")),
-            // AbilityLoreLineFactory.get(FullKey.key("ability:frost"), listText("frost 1 2 3")),
-            // AbilityLoreLineFactory.get(FullKey.key("ability:leapfrog"), listText("leapfrog 1 2 3")),
+            MetaLoreLineFactory.get("meta:level"),
+            MetaLoreLineFactory.get("meta:rarity"),
+            MetaLoreLineFactory.get("meta:element"),
+            MetaLoreLineFactory.get("meta:kizami"),
+            MetaLoreLineFactory.get("meta:lore"),
+            AttributeLoreLineFactory.get("attribute:attack_effect_chance.add"),
+            AttributeLoreLineFactory.get("attribute:attack_speed_level.add"),
+            AttributeLoreLineFactory.get("attribute:critical_strike_chance.add"),
+            AttributeLoreLineFactory.get("attribute:max_mana.add"),
         )
         buildTest(loreLines)
     }
@@ -111,18 +105,18 @@ class LoreFinalizerTest : KoinTest {
     @Test
     fun `test finalize lore lines 3`() {
         val loreLines = listOf(
-            MetaLoreLineFactory.get(FullKey.key("meta:level"), listText("level 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:rarity"), listText("rarity 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:element"), listText("element 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:kizami"), listText("kizami 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:lore"), listText("lore 1", "lore 2", "lore 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:attack_effect_chance.add"), listText("attack_effect_chance 1 2 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:attack_speed_level.add"), listText("attack_speed_level 1 2 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:critical_strike_chance.add"), listText("critical_strike_chance 1 2 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:max_mana.add"), listText("max_mana 1 2 3")),
-            AbilityLoreLineFactory.get(FullKey.key("ability:blink"), listText("blink 1 2 3")),
-            AbilityLoreLineFactory.get(FullKey.key("ability:frost"), listText("frost 1 2 3")),
-            AbilityLoreLineFactory.get(FullKey.key("ability:leapfrog"), listText("leapfrog 1 2 3")),
+            MetaLoreLineFactory.get("meta:level"),
+            MetaLoreLineFactory.get("meta:rarity"),
+            MetaLoreLineFactory.get("meta:element"),
+            MetaLoreLineFactory.get("meta:kizami"),
+            MetaLoreLineFactory.get("meta:lore"),
+            AttributeLoreLineFactory.get("attribute:attack_effect_chance.add"),
+            AttributeLoreLineFactory.get("attribute:attack_speed_level.add"),
+            AttributeLoreLineFactory.get("attribute:critical_strike_chance.add"),
+            AttributeLoreLineFactory.get("attribute:max_mana.add"),
+            AbilityLoreLineFactory.get("ability:blink"),
+            AbilityLoreLineFactory.get("ability:frost"),
+            AbilityLoreLineFactory.get("ability:leapfrog"),
         )
         buildTest(loreLines)
     }
@@ -130,12 +124,29 @@ class LoreFinalizerTest : KoinTest {
     @Test
     fun `test finalize lore lines 4`() {
         val loreLines = listOf(
-            MetaLoreLineFactory.get(FullKey.key("meta:level"), listText("level 1 2 3")),
-            MetaLoreLineFactory.get(FullKey.key("meta:rarity"), listText("rarity 1 2 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:empty"), listText("empty 1 2 3")),
-            AttributeLoreLineFactory.get(FullKey.key("attribute:max_mana.add"), listText("max_mana 1 2 3")),
-            AbilityLoreLineFactory.get(FullKey.key("ability:empty"), listText("empty 1 2 3")),
-            AbilityLoreLineFactory.get(FullKey.key("ability:frost"), listText("frost 1 2 3")),
+            MetaLoreLineFactory.get("meta:level"),
+            MetaLoreLineFactory.get("meta:rarity"),
+            AttributeLoreLineFactory.get("attribute:empty"),
+            AttributeLoreLineFactory.get("attribute:max_mana.add"),
+            AbilityLoreLineFactory.get("ability:empty"),
+            AbilityLoreLineFactory.get("ability:frost"),
+        )
+        buildTest(loreLines)
+    }
+
+    @Test
+    fun `test finalize lore lines 5`() {
+        val loreLines = listOf(
+            MetaLoreLineFactory.get("meta:level"),
+            MetaLoreLineFactory.get("meta:rarity"),
+            AttributeLoreLineFactory.get("attribute:attack_damage.add.fire"),
+            AttributeLoreLineFactory.get("attribute:attack_damage.add.water"),
+            AttributeLoreLineFactory.get("attribute:attack_damage.multiply_base.fire"),
+            AttributeLoreLineFactory.get("attribute:attack_damage.multiply_base.water"),
+            AttributeLoreLineFactory.get("attribute:attack_effect_chance.add"),
+            AttributeLoreLineFactory.get("attribute:attack_speed_level.add"),
+            AbilityLoreLineFactory.get("ability:empty"),
+            AbilityLoreLineFactory.get("ability:frost"),
         )
         buildTest(loreLines)
     }
