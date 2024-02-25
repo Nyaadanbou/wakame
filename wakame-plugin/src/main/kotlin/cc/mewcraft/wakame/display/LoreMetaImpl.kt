@@ -86,19 +86,16 @@ internal data class AttributeLoreMeta(
 
             val ret = ArrayList<FullKey>()
             val meta = AttributeRegistry.getMeta(rawKey)
+            val namespace = rawKey.namespace()
+            val rawValue = StringBuilder(rawKey.value())
             for (operation in derivation.operationIndex) {
-                if (AttributeModifier.Operation.byKeyOrNull(operation) == null) {
-                    continue
-                }
-
-                ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation"))
-                if (meta.element) {
+                requireNotNull(AttributeModifier.Operation.byKeyOrNull(operation)) { "Unknown attribute modifier operation: '$operation'" }
+                if (!meta.element) {
+                    ret += FullKey.key(namespace, "$rawValue.$operation")
+                } else {
                     for (element in derivation.elementIndex) {
-                        if (ElementRegistry.get(element) == null) {
-                            continue
-                        }
-
-                        ret.add(FullKey.key(rawKey.namespace(), "${rawKey.value()}.$operation.$element"))
+                        requireNotNull(ElementRegistry.get(element)) { "Unknown element: '$element'" }
+                        ret += FullKey.key(namespace, "$rawValue.$operation.$element")
                     }
                 }
             }

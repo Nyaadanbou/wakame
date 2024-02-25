@@ -48,7 +48,7 @@ internal sealed interface LoreMeta {
      */
     val fullIndexes: Map<FullKey, FullIndex>
         get() {
-            val ret = HashMap<FullKey, FullIndex>()
+            val ret = LinkedHashMap<FullKey, FullIndex>() // use LinkedHashMap for debug inspection
             for ((localIndex, fullKey) in fullKeys.withIndex()) {
                 ret[fullKey] = rawIndex + localIndex
             }
