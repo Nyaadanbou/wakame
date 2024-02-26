@@ -150,6 +150,13 @@ interface NekoItemStack : NekoItemStackSetter {
      */
     val statistics: ItemStatsAccessor
 
+    /**
+     * The seed of this item.
+     *
+     * @throws NullPointerException if this is not a legal neko item
+     */
+    val seed: Long
+
     override fun hashCode(): Int
     override fun equals(other: Any?): Boolean
 }

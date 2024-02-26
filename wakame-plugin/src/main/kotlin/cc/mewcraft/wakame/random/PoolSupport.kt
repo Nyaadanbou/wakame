@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.random
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import me.lucko.helper.random.RandomSelector
+import java.util.*
 import java.util.stream.Stream
 import kotlin.jvm.optionals.getOrElse
 
@@ -49,9 +50,9 @@ internal class ImmutablePool<S, C : SelectionContext>(
 
         // 设置是否重置抽样，以及要选择的样本个数
         val stream = if (isReplacement) {
-            selector.stream().limit(pickCount)
+            selector.stream(Random.from { context.seed }).limit(pickCount)
         } else {
-            selector.stream().limit(pickCount).distinct()
+            selector.stream(Random.from { context.seed }).limit(pickCount).distinct()
         }
 
         return stream

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.rarity
 import cc.mewcraft.wakame.rarity.LevelMapping.Companion.build
 import com.google.common.collect.RangeMap
 import me.lucko.helper.random.RandomSelector
+import java.util.*
 
 /**
  * Represents a group of "level -> rarity" mappings.
@@ -33,10 +34,10 @@ class LevelMappings(
      * @return a random rarity
      * @throws IllegalArgumentException
      */
-    fun pick(lvl: Int): Rarity {
+    fun pick(lvl: Int, seed: Long): Rarity {
         require(mappings.span().contains(lvl)) { "$lvl is not within the span ${mappings.span()}" }
         val rarityMapping = mappings[lvl]!!
-        return rarityMapping.pick()
+        return rarityMapping.pick(seed)
     }
 }
 
@@ -59,8 +60,8 @@ class LevelMapping private constructor(
      * `this` is applicable to your input level, otherwise you might get a
      * rarity that does not apply to your input level.
      */
-    fun pick(): Rarity {
-        return selector.pick()
+    fun pick(seed: Long): Rarity {
+        return selector.pick(Random.from { seed })
     }
 
     /**
