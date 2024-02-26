@@ -5,12 +5,15 @@ import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.util.displayLoreNms
 import cc.mewcraft.wakame.util.displayNameNms
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 internal class ItemRendererImpl(
     private val textStylizer: TextStylizer,
     private val loreFinalizer: LoreFinalizer,
-    private val gsonComponentSerializer: GsonComponentSerializer,
-) : ItemRenderer {
+) : KoinComponent, ItemRenderer {
+    private val gsonSerial: GsonComponentSerializer by inject()
+
     override fun render(copy: NekoItemStack) {
         require(copy.isNeko) { "Can't render a non-neko ItemStack" }
 
@@ -20,8 +23,8 @@ internal class ItemRendererImpl(
 
         // directly edit the backing ItemMeta to avoid cloning
         copy.handle.let {
-            it.displayNameNms = gsonComponentSerializer.serialize(displayName)
-            it.displayLoreNms = displayLore.map(gsonComponentSerializer::serialize)
+            it.displayNameNms = gsonSerial.serialize(displayName)
+            it.displayLoreNms = displayLore.map(gsonSerial::serialize)
         }
 
         // 为了麦若，去掉物品的真实根标签

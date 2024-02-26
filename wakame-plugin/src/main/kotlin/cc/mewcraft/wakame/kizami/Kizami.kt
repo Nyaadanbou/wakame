@@ -2,14 +2,12 @@ package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.BiIdentified
 import cc.mewcraft.wakame.FriendlyNamed
-import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.qualifier.named
 
 // TODO add more properties to this class such as what effects `this` kizami provides
 
@@ -24,7 +22,7 @@ data class Kizami @InternalApi internal constructor(
     override val displayName: String,
 ) : KoinComponent, FriendlyNamed, BiIdentified<String, Byte> {
 
-    override val displayNameComponent: Component = get<MiniMessage>(named(MINIMESSAGE_FULL)).deserialize(displayName)
+    override val displayNameComponent: Component = get<MiniMessage>().deserialize(displayName)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

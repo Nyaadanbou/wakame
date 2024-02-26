@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.attribute.base.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.base.Attributes
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueLU
@@ -15,13 +14,12 @@ import cc.mewcraft.wakame.item.binary.core.isEmpty
 import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.util.getOrThrow
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.JoinConfiguration
@@ -32,7 +30,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.*
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.UUID
@@ -80,8 +77,8 @@ internal class TextStylizerImpl(
                 ret += AttributeLoreLineFactory.empty() // TODO 词条栏系统应该限制可替换的核心类型
             } else {
                 when (core) {
-                    is BinaryAbilityCore -> ret += AbilityLoreLineFactory.get(abilityLineKeys.get(core), abilityStylizer.stylizeAbility(core))
-                    is BinaryAttributeCore -> ret += AttributeLoreLineFactory.get(attributeLineKeys.get(core), attributeStylizer.stylizeAttribute(core))
+                    is BinaryAbilityCore -> ret += AbilityLoreLineFactory.get(abilityLineKeys.get(core), abilityStylizer.stylize(core))
+                    is BinaryAttributeCore -> ret += AttributeLoreLineFactory.get(attributeLineKeys.get(core), attributeStylizer.stylize(core))
                     else -> throw UnsupportedOperationException("${core::class.simpleName} has not yet supported to be rendered")
                 }
             }
@@ -92,32 +89,18 @@ internal class TextStylizerImpl(
 }
 
 internal class AbilityStylizerImpl : AbilityStylizer {
-    override fun stylizeAbility(core: BinaryAbilityCore): List<Component> {
+    override fun stylize(core: BinaryAbilityCore): List<Component> {
         // TODO("implement ability stylizer")
         return emptyList()
     }
 }
 
 internal class AttributeStylizerImpl(
-    /**
-     * ## Keys and values
-     * - 这里的 `map key` 跟 [AttributeRegistry] 里的一致，不是 [FullKey]
-     * - 这里的 `map value` 就是配置文件里对应的字符串值，无需做任何处理
-     *
-     * 注意该 map 不包含 `attack_speed_level` (攻击速度).
-     */
-    private val attributeFormats: Map<Key, String>,
-    /**
-     * 攻击速度的渲染格式。
-     */
-    private val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat,
-    /**
-     * 运算模式的渲染实现。
-     */
+    private val config: RendererConfiguration,
     private val operationStylizer: OperationStylizer,
 ) : KoinComponent, AttributeStylizer {
 
-    private val miniMessage: MiniMessage by inject(named(MINIMESSAGE_FULL))
+    private val mm: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
 
     //<editor-fold desc="Helper implementations for number replacement in attributes">
     /**
@@ -129,7 +112,7 @@ internal class AttributeStylizerImpl(
      * The cache of [DecimalFormat]. The `map key` are patterns for
      * [DecimalFormat].
      */
-    private val customDecimalFormats: MutableMap<String, NumberFormat> = Object2ObjectOpenHashMap()
+    private val customDecimalFormats: MutableMap<String, NumberFormat> by reloadable { Object2ObjectOpenHashMap() }
 
     /**
      * Creates a replacement that inserts a number as a component. The
@@ -158,7 +141,7 @@ internal class AttributeStylizerImpl(
             // format the number for provided DecimalFormat
             decimalFormat.format(number)
                 // format the string for provided Operation
-                .let { operationStylizer.stylizeValue(it, operation) }
+                .let { operationStylizer.stylize(it, operation) }
                 // create the placeholder
                 .let { Tag.inserting(context.deserialize(it)) }
         }
@@ -166,15 +149,15 @@ internal class AttributeStylizerImpl(
     //</editor-fold>
 
     //<editor-fold desc="Helper implementations for attack_speed_level attribute">
-    private val attackSpeedLevelTagResolvers: MutableMap<Int, TagResolver> = Int2ObjectOpenHashMap()
+    private val attackSpeedLevelTagResolvers: MutableMap<Int, TagResolver> by reloadable { Int2ObjectOpenHashMap() }
     private fun getAttackSpeedLevelTagResolver(levelIndex: Int): TagResolver {
         return attackSpeedLevelTagResolvers.getOrPut(levelIndex) {
-            component("value", miniMessage.deserialize(attackSpeedFormat.levels.getOrThrow(levelIndex)))
+            component("value", mm.deserialize(config.attackSpeedFormat.levels.getOrThrow(levelIndex)))
         }
     }
     //</editor-fold>
 
-    override fun stylizeAttribute(core: BinaryAttributeCore): List<Component> {
+    override fun stylize(core: BinaryAttributeCore): List<Component> {
         // 先拿到 key，获取到对应的 format (String)
         // 把 format 当成 mini 然后反序列化，同时传入 tag resolvers
         // 注意这里的 tag resolvers 需要根据 format, operation, element 分情况添加
@@ -186,7 +169,7 @@ internal class AttributeStylizerImpl(
             /* 单独处理攻击速度 */
             value as BinaryAttributeValueS
             tagResolvers.resolver(getAttackSpeedLevelTagResolver(value.value.toInt()))
-            return listOf(miniMessage.deserialize(attackSpeedFormat.merged, tagResolvers.build()))
+            return listOf(mm.deserialize(config.attackSpeedFormat.merged, tagResolvers.build()))
         } else {
             /* 其余按格式统一处理 */
             when (value) {
@@ -212,7 +195,7 @@ internal class AttributeStylizerImpl(
 
                 else -> error("Unhandled attribute struct. Missing implementation?")
             }
-            return listOf(miniMessage.deserialize(attributeFormats.getOrThrow(key), tagResolvers.build()))
+            return listOf(mm.deserialize(config.attributeFormats.getOrThrow(key), tagResolvers.build()))
         }
     }
 
@@ -227,36 +210,29 @@ internal class AttributeStylizerImpl(
 }
 
 internal class OperationStylizerImpl(
-    private val operationFormats: Map<Operation, String>,
+    private val config: RendererConfiguration,
 ) : OperationStylizer {
-    override fun stylizeValue(value: String, operation: Operation): String = when (operation) {
-        Operation.ADD -> operationFormats.getOrThrow(Operation.ADD).format(value)
-        Operation.MULTIPLY_BASE -> operationFormats.getOrThrow(Operation.MULTIPLY_BASE).format(value)
-        Operation.MULTIPLY_TOTAL -> operationFormats.getOrThrow(Operation.MULTIPLY_TOTAL).format(value)
+    override fun stylize(value: String, operation: Operation): String = when (operation) {
+        Operation.ADD -> config.operationFormats.getOrThrow(Operation.ADD).format(value)
+        Operation.MULTIPLY_BASE -> config.operationFormats.getOrThrow(Operation.MULTIPLY_BASE).format(value)
+        Operation.MULTIPLY_TOTAL -> config.operationFormats.getOrThrow(Operation.MULTIPLY_TOTAL).format(value)
     }
 }
 
 internal class MetaStylizerImpl(
-    override val nameFormat: String,
-    override val loreFormat: MetaStylizer.LoreFormat,
-    override val levelFormat: String,
-    override val rarityFormat: String,
-    override val elementFormat: MetaStylizer.ListFormat,
-    override val kizamiFormat: MetaStylizer.ListFormat,
-    override val skinFormat: String,
-    override val skinOwnerFormat: String,
+    private val config: RendererConfiguration,
 ) : KoinComponent, MetaStylizer {
 
-    private val miniMessage: MiniMessage by inject(named(MINIMESSAGE_FULL))
+    private val mm: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
 
     override fun stylizeName(name: String): Component {
-        return miniMessage.deserialize(nameFormat, parsed("value", name))
+        return mm.deserialize(config.nameFormat, parsed("value", name))
     }
 
     override fun stylizeLore(lore: List<String>): List<Component> {
-        val header = loreFormat.header?.let { it.mapTo(ObjectArrayList(it.size), miniMessage::deserialize) }
-        val bottom = loreFormat.bottom?.let { it.mapTo(ObjectArrayList(it.size), miniMessage::deserialize) }
-        val lines = lore.mapTo(ObjectArrayList(lore.size)) { miniMessage.deserialize(loreFormat.line, parsed("line", it)) }
+        val header = config.loreFormat.header?.let { it.mapTo(ObjectArrayList(it.size), mm::deserialize) }
+        val bottom = config.loreFormat.bottom?.let { it.mapTo(ObjectArrayList(it.size), mm::deserialize) }
+        val lines = lore.mapTo(ObjectArrayList(lore.size)) { mm.deserialize(config.loreFormat.line, parsed("line", it)) }
 
         return if (header == null && bottom == null) {
             lines
@@ -272,11 +248,11 @@ internal class MetaStylizerImpl(
     }
 
     override fun stylizeLevel(level: Int): List<Component> {
-        return listOf(miniMessage.deserialize(levelFormat, component("value", text(level))))
+        return listOf(mm.deserialize(config.levelFormat, component("value", text(level))))
     }
 
     override fun stylizeRarity(rarity: Rarity): List<Component> {
-        return listOf(miniMessage.deserialize(rarityFormat, component("value", rarity.displayNameComponent)))
+        return listOf(mm.deserialize(config.rarityFormat, component("value", rarity.displayNameComponent)))
     }
 
     /**
@@ -288,31 +264,31 @@ internal class MetaStylizerImpl(
         placeholderValue: (T) -> Component,
     ): List<Component> {
         val values = collection.mapTo(ObjectArrayList(collection.size)) {
-            miniMessage.deserialize(listFormat.single, component("single", placeholderValue(it)))
+            mm.deserialize(listFormat.single, component("single", placeholderValue(it)))
         }
         val joined = Component.join(
             JoinConfiguration.separator(
-                miniMessage.deserialize(listFormat.separator)
+                mm.deserialize(listFormat.separator)
             ), values
         )
-        val merged = miniMessage.deserialize(listFormat.merged, component("merged", joined))
+        val merged = mm.deserialize(listFormat.merged, component("merged", joined))
         return listOf(merged)
     }
 
     override fun stylizeElement(elements: Set<Element>): List<Component> {
-        return stylizeList(elements, elementFormat, Element::displayNameComponent)
+        return stylizeList(elements, config.elementFormat, Element::displayNameComponent)
     }
 
     override fun stylizeKizami(kizami: Set<Kizami>): List<Component> {
-        return stylizeList(kizami, kizamiFormat, Kizami::displayNameComponent)
+        return stylizeList(kizami, config.kizamiFormat, Kizami::displayNameComponent)
     }
 
     override fun stylizeSkin(skin: ItemSkin): List<Component> {
-        return listOf(miniMessage.deserialize(skinFormat, component("value", skin.displayNameComponent)))
+        return listOf(mm.deserialize(config.skinFormat, component("value", skin.displayNameComponent)))
     }
 
     override fun stylizeSkinOwner(skinOwner: UUID): List<Component> {
-        return listOf(miniMessage.deserialize(skinOwnerFormat, unparsed("value", skinOwner.toString())))
+        return listOf(mm.deserialize(config.skinOwnerFormat, unparsed("value", skinOwner.toString())))
     }
 
     class LoreFormatImpl(

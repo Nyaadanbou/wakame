@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.attribute.base.Attributes
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
@@ -12,24 +13,33 @@ import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.spongepowered.configurate.CommentedConfigurationNode
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 internal class RendererConfiguration(
     loader: NekoConfigurationLoader,
-    private val miniMessage: MiniMessage,
-) : Initializable {
+) : Initializable, KoinComponent {
     companion object {
         private const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
         private const val RENDERER_LAYOUT_NODE = "renderer_layout"
         private const val RENDERER_STYLE_NODE = "renderer_style"
     }
 
+    private val mm: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
     private val root: CommentedConfigurationNode by reloadable { loader.load() }
 
     //<editor-fold desc="renderer_style.meta">
+    /**
+     * 名字的渲染格式。
+     */
     val nameFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "name").requireKt<String>() }
+
+    /**
+     * 描述的渲染格式。
+     */
     val loreFormat: MetaStylizerImpl.LoreFormatImpl by reloadable {
         with(root.node(RENDERER_STYLE_NODE, "meta", "lore")) {
             MetaStylizerImpl.LoreFormatImpl(
@@ -39,11 +49,35 @@ internal class RendererConfiguration(
             )
         }
     }
+
+    /**
+     * 等级的渲染格式。
+     */
     val levelFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "level").requireKt<String>() }
+
+    /**
+     * 稀有度的渲染格式。
+     */
     val rarityFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "rarity").requireKt<String>() }
+
+    /**
+     * 元素的渲染格式。
+     */
     val elementFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "element")) }
+
+    /**
+     * 铭刻的渲染格式。
+     */
     val kizamiFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "kizami")) }
+
+    /**
+     * 皮肤的渲染格式。
+     */
     val skinFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin").requireKt<String>() }
+
+    /**
+     * 皮肤所有者的渲染格式。
+     */
     val skinOwnerFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin_owner").requireKt<String>() }
 
     private fun getListFormat(node: NekoConfigurationNode): MetaStylizer.ListFormat {
@@ -56,15 +90,32 @@ internal class RendererConfiguration(
     //</editor-fold>
 
     //<editor-fold desc="renderer_style.attribute">
+    /**
+     * 空词条栏（属性）的渲染格式。
+     */
     val emptyAttributeText: List<String> by reloadable {
         root.node(RENDERER_STYLE_NODE, "attribute", "empty").requireKt<List<String>>()
     }
+
+    /**
+     * 所有属性的渲染格式。
+     *
+     * ## 映射说明
+     * - `map key` 跟 [AttributeRegistry] 里的一致，不是 [FullKey]
+     * - `map value` 就是配置文件里对应的字符串值，无需做任何处理
+     *
+     * **注意该映射不包含 [Attributes.ATTACK_SPEED_LEVEL]**
+     */
     val attributeFormats: Map<Key, String> by reloadable {
         root.node(RENDERER_STYLE_NODE, "attribute", "value").childrenMap()
             .mapKeys { (k, _) -> Key.key(NekoNamespaces.ATTRIBUTE, k as String) }
-            .filter { (k, _) -> k != Attributes.ATTACK_SPEED_LEVEL.key() } // attack_speed_level is handled separately
+            .filter { (k, _) -> k != Attributes.ATTACK_SPEED_LEVEL.key() }
             .mapValues { (_, v) -> v.requireKt<String>() }
     }
+
+    /**
+     * 攻击速度的渲染格式。
+     */
     val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by reloadable {
         val node = root.node(RENDERER_STYLE_NODE, "attribute", "value", "attack_speed_level")
         AttributeStylizerImpl.AttackSpeedFormatImpl(
@@ -74,7 +125,11 @@ internal class RendererConfiguration(
                 .toMap()
         )
     }
-    val operationFormat: Map<AttributeModifier.Operation, String> by reloadable {
+
+    /**
+     * 运算模式的渲染格式。
+     */
+    val operationFormats: Map<AttributeModifier.Operation, String> by reloadable {
         AttributeModifier.Operation.entries.associateWith { operation ->
             root.node(RENDERER_STYLE_NODE, "attribute", "operation", operation.key).requireKt<String>()
         }
@@ -82,21 +137,47 @@ internal class RendererConfiguration(
     //</editor-fold>
 
     //<editor-fold desc="renderer_style.ability">
+    /**
+     * 空词条栏的渲染格式（技能）。
+     */
     val emptyAbilityText: List<String> by reloadable {
         root.node(RENDERER_STYLE_NODE, "ability", "empty").requireKt<List<String>>()
     }
+
+    /**
+     * 所有技能共用的渲染格式。
+     */
     val commonAbilityFormat: Unit by reloadable {
         // TODO
     }
+
+    /**
+     * 个别技能独有的渲染格式。
+     */
     val abilityFormats: Unit by reloadable {
         // TODO
     }
     //</editor-fold>
 
     //<editor-fold desc="renderer_layout">
+    /**
+     * 用于查询指定内容的 [LoreMeta]。
+     */
     val loreMetaLookup: Map<FullKey, LoreMeta> get() = _loreMetaLookup
+
+    /**
+     * 用于查询指定内容的 [FullIndex]。
+     */
     val loreIndexLookup: Map<FullKey, FullIndex> get() = _loreIndexLookup
+
+    /**
+     * 始终要渲染的内容。
+     */
     val fixedLoreLines: Collection<LoreLine> get() = _fixedLoreLines
+
+    /**
+     * 带有默认值的内容。当源数据不存在时将采用这里的默认值。
+     */
     val defaultLoreLines: Collection<LoreLine> get() = _defaultLoreLines
 
     private val _loreMetaLookup: MutableMap<FullKey, LoreMeta> = ConcurrentHashMap()
@@ -104,7 +185,7 @@ internal class RendererConfiguration(
     private val _fixedLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
     private val _defaultLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
 
-    private fun loadConfiguration() {
+    private fun loadLayout() {
         _loreMetaLookup.clear()
         _loreIndexLookup.clear()
         _fixedLoreLines.clear()
@@ -150,7 +231,7 @@ internal class RendererConfiguration(
         }
 
         fun String.spiltAndDeserialize(): List<Component> =
-            this.split("\\r").map(miniMessage::deserialize)  // 以 '\r' 为分隔符，将文本分割为多行
+            this.split("\\r").map(mm::deserialize)  // 以 '\r' 为分隔符，将文本分割为多行
 
         /**
          * Creates a lore meta from the config line.
@@ -244,10 +325,10 @@ internal class RendererConfiguration(
     //</editor-fold>
 
     override fun onPostWorld() {
-        loadConfiguration()
+        loadLayout()
     }
 
     override fun onReload() {
-        loadConfiguration()
+        loadLayout()
     }
 }

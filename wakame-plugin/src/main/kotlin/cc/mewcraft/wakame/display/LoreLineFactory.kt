@@ -1,13 +1,11 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.qualifier.named
 
 /**
  * 获取对象的工厂。
@@ -23,9 +21,9 @@ internal object MetaLoreLineFactory {
  */
 internal object AttributeLoreLineFactory : KoinComponent {
     private val EMPTY_LORE_LINE: AttributeLoreLineImpl by lazy(LazyThreadSafetyMode.NONE) {
+        val mm = get<MiniMessage>()
         val text = get<RendererConfiguration>().emptyAttributeText
-        val miniMessage = get<MiniMessage>(named(MINIMESSAGE_FULL))
-        AttributeLoreLineImpl(AttributeRegistry.EMPTY_KEY, text.map(miniMessage::deserialize))
+        AttributeLoreLineImpl(AttributeRegistry.EMPTY_KEY, text.map(mm::deserialize))
     }
 
     fun get(key: FullKey, lines: List<Component>): AttributeLoreLine {
@@ -42,9 +40,9 @@ internal object AttributeLoreLineFactory : KoinComponent {
  */
 internal object AbilityLoreLineFactory : KoinComponent {
     private val EMPTY_LORE_LINE: AbilityLoreLine by lazy(LazyThreadSafetyMode.NONE) {
+        val mm = get<MiniMessage>()
         val text = get<RendererConfiguration>().emptyAbilityText
-        val miniMessage = get<MiniMessage>(named(MINIMESSAGE_FULL))
-        AbilityLoreLineImpl(AbilityRegistry.EMPTY_KEY, text.map(miniMessage::deserialize))
+        AbilityLoreLineImpl(AbilityRegistry.EMPTY_KEY, text.map(mm::deserialize))
     }
 
     fun get(key: FullKey, lines: List<Component>): AbilityLoreLine {

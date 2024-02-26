@@ -5,9 +5,8 @@ import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
 import net.kyori.adventure.text.Component
 
 internal class LoreFinalizerImpl(
+    private val config: RendererConfiguration,
     private val loreMetaLookup: LoreMetaLookup,
-    private val fixedLoreLines: Collection<LoreLine>,
-    private val defaultLoreLines: Collection<LoreLine>,
 ) : LoreFinalizer {
 
     private val lineComparator: Comparator<LoreLine> = Comparator { o1, o2 ->
@@ -21,8 +20,8 @@ internal class LoreFinalizerImpl(
 
         // add lore lines and sort
         holder += loreLines
-        holder += fixedLoreLines
-        holder += defaultLoreLines
+        holder += config.fixedLoreLines
+        holder += config.defaultLoreLines
 
         // if a line can't find a larger index
         // than it, under certain conditions,

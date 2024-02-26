@@ -236,7 +236,7 @@ object Initializer : KoinComponent, Listener {
 
         isDone = true
         NEKO_PLUGIN.launch(asyncContext) {
-            callEvent(NekoLoadDataEvent()) // call it async
+            NekoLoadDataEvent().callEvent() // call it async
         }
 
         logger.info(Component.text("Done loading", NamedTextColor.AQUA))

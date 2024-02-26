@@ -1,4 +1,3 @@
-import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -14,8 +13,7 @@ import java.nio.file.Path
 
 fun testEnvironment(): Module = module {
     single<Logger> { LoggerFactory.getLogger("TestEnvironment") }
-    single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/main/resources").toFile().absoluteFile.also { println(it) } }
+    single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/main/resources").toFile().absoluteFile }
     single<MiniMessage> { MiniMessage.miniMessage() }
-    single<MiniMessage>(named(MINIMESSAGE_FULL)) { MiniMessage.miniMessage() }
     single<GsonComponentSerializer> { GsonComponentSerializer.gson() }
 }

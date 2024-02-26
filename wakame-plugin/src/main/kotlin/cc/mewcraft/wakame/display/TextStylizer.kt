@@ -47,14 +47,14 @@ internal interface TextStylizer {
  * To be used by [TextStylizer].
  */
 internal interface AbilityStylizer {
-    fun stylizeAbility(core: BinaryAbilityCore): List<Component>
+    fun stylize(core: BinaryAbilityCore): List<Component>
 }
 
 /**
  * To be used by [TextStylizer].
  */
 internal interface AttributeStylizer {
-    fun stylizeAttribute(core: BinaryAttributeCore): List<Component>
+    fun stylize(core: BinaryAttributeCore): List<Component>
 
     interface AttackSpeedFormat {
         /**
@@ -73,22 +73,13 @@ internal interface AttributeStylizer {
  * To be used by [TextStylizer].
  */
 internal interface OperationStylizer {
-    fun stylizeValue(value: String, operation: AttributeModifier.Operation): String
+    fun stylize(value: String, operation: AttributeModifier.Operation): String
 }
 
 /**
  * To be used by [TextStylizer].
  */
 internal interface MetaStylizer {
-    val nameFormat: String
-    val loreFormat: LoreFormat
-    val levelFormat: String
-    val rarityFormat: String
-    val elementFormat: ListFormat
-    val kizamiFormat: ListFormat
-    val skinFormat: String
-    val skinOwnerFormat: String
-
     fun stylizeName(name: String): Component
     fun stylizeLore(lore: List<String>): List<Component>
     fun stylizeLevel(level: Int): List<Component>

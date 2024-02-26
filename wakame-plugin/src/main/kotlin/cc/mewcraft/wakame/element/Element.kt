@@ -2,14 +2,12 @@ package cc.mewcraft.wakame.element
 
 import cc.mewcraft.wakame.BiIdentified
 import cc.mewcraft.wakame.FriendlyNamed
-import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.ElementRegistry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.qualifier.named
 
 /**
  * **DO NOT CONSTRUCT IT YOURSELF!**
@@ -22,7 +20,7 @@ data class Element @InternalApi internal constructor(
     override val displayName: String,
 ) : KoinComponent, FriendlyNamed, BiIdentified<String, Byte> {
 
-    override val displayNameComponent: Component = get<MiniMessage>(named(MINIMESSAGE_FULL)).deserialize(displayName)
+    override val displayNameComponent: Component = get<MiniMessage>().deserialize(displayName)
 
     // Instances of this class might be used as map keys
     // So we need to properly implement hashCode() and equals()

@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.MINIMESSAGE_FULL
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.util.createBasicConfigurationLoader
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.new
 import org.koin.core.module.dsl.singleOf
-import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.binds
 import org.koin.dsl.module
@@ -21,7 +19,7 @@ internal fun displayModule(): Module = module {
 
     // config holder
     single<RendererConfiguration> {
-        RendererConfiguration(createBasicConfigurationLoader(RENDERER_CONFIG_FILE), get(named(MINIMESSAGE_FULL)))
+        RendererConfiguration(createBasicConfigurationLoader(RENDERER_CONFIG_FILE))
     } binds arrayOf(Initializable::class)
 
     // meta lookup
@@ -32,24 +30,10 @@ internal fun displayModule(): Module = module {
 
     // text stylizers
     single<TextStylizer> {
-        val config = get<RendererConfiguration>()
         TextStylizerImpl(
-            metaStylizer = MetaStylizerImpl(
-                nameFormat = config.nameFormat,
-                loreFormat = config.loreFormat,
-                levelFormat = config.levelFormat,
-                rarityFormat = config.rarityFormat,
-                elementFormat = config.elementFormat,
-                kizamiFormat = config.kizamiFormat,
-                skinFormat = config.skinFormat,
-                skinOwnerFormat = config.skinOwnerFormat,
-            ),
+            metaStylizer = new(::MetaStylizerImpl),
             abilityStylizer = new(::AbilityStylizerImpl),
-            attributeStylizer = AttributeStylizerImpl(
-                attributeFormats = config.attributeFormats,
-                attackSpeedFormat = config.attackSpeedFormat,
-                operationStylizer = OperationStylizerImpl(config.operationFormat)
-            ),
+            attributeStylizer = AttributeStylizerImpl(get(), new(::OperationStylizerImpl)),
             metaLineKeys = new(::MetaLineKeySupplierImpl),
             abilityLineKeys = new(::AbilityLineKeySupplierImpl),
             attributeLineKeys = new(::AttributeLineKeySupplierImpl)
@@ -57,8 +41,5 @@ internal fun displayModule(): Module = module {
     }
 
     // lore finalizer
-    single<LoreFinalizer> {
-        val config = get<RendererConfiguration>()
-        LoreFinalizerImpl(get(), config.fixedLoreLines, config.defaultLoreLines)
-    }
+    singleOf(::LoreFinalizerImpl) bind LoreFinalizer::class
 }

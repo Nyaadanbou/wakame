@@ -13,16 +13,13 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.createdAtStart
 import org.koin.core.module.dsl.withOptions
 import org.koin.core.qualifier.named
-import org.koin.core.scope.Scope
 import org.koin.dsl.bind
 import org.koin.dsl.binds
 import org.koin.dsl.module
 import org.slf4j.Logger
-import java.io.BufferedReader
 import java.io.File
 
 const val PLUGIN_DATA_DIR = "plugin_data_dir"
-const val MINIMESSAGE_FULL = "minimessage_full"
 
 fun wakameModule(plugin: WakamePlugin): Module = module {
 
@@ -42,6 +39,6 @@ fun wakameModule(plugin: WakamePlugin): Module = module {
 
     ////// ComponentSerializer injections
 
+    single<MiniMessage> { MiniMessage.miniMessage() }
     single<GsonComponentSerializer> { GsonComponentSerializer.gson() }
-    single<MiniMessage>(named(MINIMESSAGE_FULL)) { MiniMessage.miniMessage() }
 }
