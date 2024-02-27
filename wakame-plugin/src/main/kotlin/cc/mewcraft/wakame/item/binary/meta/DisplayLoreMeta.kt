@@ -13,7 +13,7 @@ import net.kyori.adventure.key.Key
  */
 internal class DisplayLoreMeta(
     private val holder: ItemMetaHolderImpl,
-) : ItemMeta<List<String>> {
+) : BinaryItemMeta<List<String>> {
     override val key: Key = ItemMetaKeys.DISPLAY_LORE
     override val companion: ItemMetaCompanion = Companion
 

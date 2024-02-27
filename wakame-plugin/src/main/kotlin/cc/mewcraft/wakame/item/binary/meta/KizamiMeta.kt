@@ -15,7 +15,7 @@ import net.kyori.adventure.key.Key
  */
 internal class KizamiMeta(
     private val holder: ItemMetaHolderImpl,
-) : ItemMeta<Set<Kizami>> {
+) : BinaryItemMeta<Set<Kizami>> {
     override val key: Key = ItemMetaKeys.KIZAMI
     override val companion: ItemMetaCompanion = Companion
 

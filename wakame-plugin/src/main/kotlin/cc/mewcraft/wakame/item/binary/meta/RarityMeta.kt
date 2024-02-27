@@ -14,7 +14,7 @@ import net.kyori.adventure.key.Key
  */
 internal class RarityMeta(
     private val holder: ItemMetaHolderImpl,
-) : ItemMeta<Rarity> {
+) : BinaryItemMeta<Rarity> {
     override val key: Key = ItemMetaKeys.RARITY
     override val companion: ItemMetaCompanion = Companion
 

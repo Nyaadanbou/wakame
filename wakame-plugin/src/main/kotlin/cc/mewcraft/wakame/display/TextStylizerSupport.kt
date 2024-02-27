@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.core.isEmpty
-import cc.mewcraft.wakame.item.binary.meta.ItemMeta
+import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.reloadable
@@ -232,7 +232,7 @@ internal class ItemMetaStylizerImpl(
         return mm.deserialize(config.nameFormat, parsed("value", name))
     }
 
-    override val childStylizerMap: Map<KClass<out ItemMeta<*>>, ChildStylizer<*>> = buildMap {
+    override val childStylizerMap: Map<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>> = buildMap {
         // Side note: register each in alphabet order
 
         registerChildStylizer<BDisplayLoreMeta> { displayLoreMeta ->
@@ -254,12 +254,12 @@ internal class ItemMetaStylizerImpl(
         registerChildStylizer<BSkinOwnerMeta> { listOf(mm.deserialize(config.skinOwnerFormat, unparsed("value", it.get().toString()))) }
     }
 
-    override fun <I : ItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I> {
+    override fun <I : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I> {
         @Suppress("UNCHECKED_CAST")
         return childStylizerMap[clazz] as ChildStylizer<I>
     }
 
-    private inline fun <reified T : ItemMeta<*>> MutableMap<KClass<out ItemMeta<*>>, ChildStylizer<*>>.registerChildStylizer(stylizer: ChildStylizer<T>) {
+    private inline fun <reified T : BinaryItemMeta<*>> MutableMap<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>>.registerChildStylizer(stylizer: ChildStylizer<T>) {
         this[T::class] = stylizer
     }
 

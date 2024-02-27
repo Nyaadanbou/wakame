@@ -12,7 +12,7 @@ import net.kyori.adventure.key.Key
  */
 internal class LevelMeta(
     private val holder: ItemMetaHolderImpl,
-) : ItemMeta<Int> {
+) : BinaryItemMeta<Int> {
     override val key: Key = ItemMetaKeys.LEVEL
     override val companion: ItemMetaCompanion = Companion
 

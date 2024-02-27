@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.item.binary.meta.ItemMeta
+import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaCompanion
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import java.lang.invoke.MethodHandle
@@ -14,15 +14,15 @@ import kotlin.reflect.jvm.javaConstructor
 import kotlin.reflect.typeOf
 
 internal object ItemMetaRegistry {
-    private val itemMetaClasses: Collection<KClass<out ItemMeta<*>>> = ItemMeta::class.sealedSubclasses
+    private val binaryItemMetaClasses: Collection<KClass<out BinaryItemMeta<*>>> = BinaryItemMeta::class.sealedSubclasses
 
-    private val itemMetaCompanions: Map<KClass<out ItemMeta<*>>, ItemMetaCompanion> = itemMetaClasses.associateWith {
+    private val binaryItemMetaCompanions: Map<KClass<out BinaryItemMeta<*>>, ItemMetaCompanion> = binaryItemMetaClasses.associateWith {
         requireNotNull(it.companionObjectInstance as? ItemMetaCompanion) {
             "The class ${it.qualifiedName} does not have companion object that implements ${ItemMetaCompanion::class.qualifiedName}"
         }
     }
 
-    private val itemMetaConstructors: Map<KClass<out ItemMeta<*>>, MethodHandle> = itemMetaClasses.associateWith {
+    private val binaryItemMetaConstructors: Map<KClass<out BinaryItemMeta<*>>, MethodHandle> = binaryItemMetaClasses.associateWith {
         val primaryConstructor = requireNotNull(it.primaryConstructor) {
             "The class ${it.qualifiedName} does not have primary constructor"
         }
@@ -36,23 +36,23 @@ internal object ItemMetaRegistry {
         MethodHandles.publicLookup().unreflectConstructor(primaryConstructor.javaConstructor)
     }
 
-    private val itemMetaReflectionLookup: Map<KClass<out ItemMeta<*>>, ItemMetaReflection> = buildMap {
-        itemMetaClasses.associateWith { ItemMetaReflection(it, itemMetaCompanions[it]!!, itemMetaConstructors[it]!!) }
+    private val binaryItemMetaReflectionLookup: Map<KClass<out BinaryItemMeta<*>>, ItemMetaReflection> = buildMap {
+        binaryItemMetaClasses.associateWith { ItemMetaReflection(it, binaryItemMetaCompanions[it]!!, binaryItemMetaConstructors[it]!!) }
     }
 
-    private val itemMetaReflections: Collection<ItemMetaReflection> = itemMetaReflectionLookup.values
+    private val itemMetaReflections: Collection<ItemMetaReflection> = binaryItemMetaReflectionLookup.values
 
     fun reflections(): Collection<ItemMetaReflection> {
         return itemMetaReflections
     }
 
-    fun reflect(clazz: KClass<out ItemMeta<*>>): ItemMetaReflection {
-        return requireNotNull(itemMetaReflectionLookup[clazz]) { "The class ${clazz.qualifiedName} is not registered" }
+    fun reflect(clazz: KClass<out BinaryItemMeta<*>>): ItemMetaReflection {
+        return requireNotNull(binaryItemMetaReflectionLookup[clazz]) { "The class ${clazz.qualifiedName} is not registered" }
     }
 }
 
 internal data class ItemMetaReflection(
-    val clazz: KClass<out ItemMeta<*>>,
+    val clazz: KClass<out BinaryItemMeta<*>>,
     val companion: ItemMetaCompanion,
     val constructor: MethodHandle,
 )

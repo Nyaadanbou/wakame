@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.attribute.facade.elementOrNull
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
-import cc.mewcraft.wakame.item.binary.meta.ItemMeta
+import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -143,7 +143,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
 }
 
 internal class MetaLineKeySupplierImpl : MetaLineKeySupplier {
-    override fun get(obj: ItemMeta<*>): FullKey {
+    override fun get(obj: BinaryItemMeta<*>): FullKey {
         // 元数据的 key 就是它的 full key
         return obj.key
     }

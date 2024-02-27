@@ -10,7 +10,7 @@ import java.util.UUID
  */
 internal class SkinOwnerMeta(
     private val holder: ItemMetaHolderImpl,
-) : ItemMeta<UUID> {
+) : BinaryItemMeta<UUID> {
     override val key: Key = ItemMetaKeys.SKIN_OWNER
     override val companion: ItemMetaCompanion = Companion
 

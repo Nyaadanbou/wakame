@@ -5,8 +5,9 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
-import cc.mewcraft.wakame.item.binary.meta.ItemMeta
+import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
+import cc.mewcraft.wakame.item.binary.meta.set
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.MaterialMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
@@ -108,17 +109,17 @@ internal data class NekoItemImpl(
      * nothing to the item.
      *
      * @param context the context
-     * @param S the type of [SchemeItemMeta]
+     * @param ST the type of [SchemeItemMeta]
      * @param T the type of item meta value
      */
-    private inline fun <T, reified S : SchemeItemMeta<T>, reified B : ItemMeta<T>> ItemMetaHolder.generateAndSet(
+    private inline fun <T, reified ST : SchemeItemMeta<T>, reified BT : BinaryItemMeta<T>> ItemMetaHolder.generateAndSet(
         context: SchemeGenerationContext,
     ) {
-        val meta = getItemMetaByClass<S>()
+        val meta = getItemMetaByClass<ST>()
         val value = meta.generate(context)
         if (value != null) {
             // set the meta only if something is generated
-            set(B::class, value)
+            set<BT, T>(value)
         }
     }
 }

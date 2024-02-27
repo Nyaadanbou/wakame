@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
-import cc.mewcraft.wakame.item.binary.meta.ItemMeta
+import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import net.kyori.adventure.text.Component
 import kotlin.reflect.KClass
 
@@ -89,23 +89,23 @@ internal interface ItemMetaStylizer {
 
     /* Following are `lore` stylizers. */
 
-    fun interface ChildStylizer<I : ItemMeta<*>> {
+    fun interface ChildStylizer<I : BinaryItemMeta<*>> {
         fun stylize(input: I): List<Component>
     }
 
     /**
-     * To implementer: Every [ItemMeta] to be rendered should have a
+     * To implementer: Every [BinaryItemMeta] to be rendered should have a
      * corresponding [ChildStylizer] in this map.
      *
-     * Map specifications: `map key` is class of [ItemMeta] and `map value` is
+     * Map specifications: `map key` is class of [BinaryItemMeta] and `map value` is
      * corresponding [stylizer][ChildStylizer].
      */
-    val childStylizerMap: Map<KClass<out ItemMeta<*>>, ChildStylizer<*>>
+    val childStylizerMap: Map<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>>
 
     /**
      * Gets child stylizer by class.
      */
-    fun <I : ItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I>
+    fun <I : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I>
 
     interface LoreFormat {
         /**

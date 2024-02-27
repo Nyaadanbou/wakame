@@ -11,7 +11,7 @@ import net.kyori.adventure.key.Key
  */
 internal class DisplayNameMeta(
     private val holder: ItemMetaHolderImpl,
-) : ItemMeta<String> {
+) : BinaryItemMeta<String> {
     override val key: Key = ItemMetaKeys.DISPLAY_NAME
     override val companion: ItemMetaCompanion = Companion
 

@@ -17,7 +17,7 @@ import net.kyori.adventure.key.Key
  */
 internal class ElementMeta(
     private val holder: ItemMetaHolderImpl,
-) : ItemMeta<Set<Element>> {
+) : BinaryItemMeta<Set<Element>> {
     override val key: Key = ItemMetaKeys.ELEMENT
     override val companion: ItemMetaCompanion = Companion
 
