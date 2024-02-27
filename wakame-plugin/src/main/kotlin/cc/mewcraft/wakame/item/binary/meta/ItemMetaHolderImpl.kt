@@ -35,7 +35,7 @@ internal class ItemMetaHolderImpl(
 
     override fun <T : ItemMeta<*>> get(clazz: KClass<out T>): T? {
         val root = rootOrNull ?: return null
-        val (_, companion, constructor) = requireNotNull(ItemMetaRegistry.reflect(clazz)) { "The class ${clazz.qualifiedName} is not registered" }
+        val (_, companion, constructor) = ItemMetaRegistry.reflect(clazz)
         return if (companion.contains(root)) {
             @Suppress("UNCHECKED_CAST")
             constructor.invoke(this) as T
@@ -45,13 +45,13 @@ internal class ItemMetaHolderImpl(
     }
 
     override fun <T : ItemMeta<V>, V> set(clazz: KClass<out T>, value: V) {
-        val (_, _, constructor) = requireNotNull(ItemMetaRegistry.reflect(clazz)) { "The class ${clazz.qualifiedName} is not registered" }
+        val (_, _, constructor) = ItemMetaRegistry.reflect(clazz)
         val itemMeta = @Suppress("UNCHECKED_CAST") (constructor.invoke(this) as T)
         itemMeta.set(value)
     }
 
     override fun <T : ItemMeta<*>> remove(clazz: KClass<out T>) {
-        val (_, _, constructor) = requireNotNull(ItemMetaRegistry.reflect(clazz)) { "The class ${clazz.qualifiedName} is not registered" }
+        val (_, _, constructor) = ItemMetaRegistry.reflect(clazz)
         val itemMeta = @Suppress("UNCHECKED_CAST") (constructor.invoke(this) as T)
         itemMeta.remove()
     }
