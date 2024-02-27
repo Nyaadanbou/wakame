@@ -47,3 +47,7 @@ internal class KizamiMeta(
         }
     }
 }
+
+internal fun KizamiMeta?.orEmpty(): Set<Kizami> {
+    return this?.get() ?: emptySet()
+}

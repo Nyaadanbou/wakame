@@ -38,3 +38,7 @@ internal class RarityMeta(
         }
     }
 }
+
+internal fun RarityMeta?.orDefault(): Rarity {
+    return this?.get() ?: RarityRegistry.DEFAULT
+}

@@ -34,3 +34,7 @@ internal class LevelMeta(
         }
     }
 }
+
+internal fun LevelMeta?.orDefault(): Int {
+    return this?.get() ?: 1
+}

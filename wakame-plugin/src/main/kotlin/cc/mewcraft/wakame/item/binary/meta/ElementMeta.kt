@@ -49,3 +49,7 @@ internal class ElementMeta(
         }
     }
 }
+
+internal fun ElementMeta?.orEmpty(): Set<Element> {
+    return this?.get() ?: emptySet()
+}
