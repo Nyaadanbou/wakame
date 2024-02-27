@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.NekoItemStack
-import cc.mewcraft.wakame.util.displayLoreNms
-import cc.mewcraft.wakame.util.displayNameNms
+import cc.mewcraft.wakame.util.backingLore
+import cc.mewcraft.wakame.util.backingDisplayName
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -23,8 +22,8 @@ internal class ItemRendererImpl(
 
         // directly edit the backing ItemMeta to avoid cloning
         copy.handle.let {
-            it.displayNameNms = gsonSerial.serialize(displayName)
-            it.displayLoreNms = displayLore.map(gsonSerial::serialize)
+            it.backingDisplayName = gsonSerial.serialize(displayName)
+            it.backingLore = displayLore.map(gsonSerial::serialize)
         }
 
         // 为了麦若，去掉物品的真实根标签

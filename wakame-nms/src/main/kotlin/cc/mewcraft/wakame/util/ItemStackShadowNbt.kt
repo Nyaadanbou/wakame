@@ -43,7 +43,7 @@ internal val ItemMeta.unhandledTags: MutableMap<String, Tag>
  *
  * Only works if `this` [ItemStack] is NMS-object backed.
  */
-var ItemStack.displayNameNms: String?
+var ItemStack.backingDisplayName: String?
     get() = throw UnsupportedOperationException("Get operation is not supported")
     set(value) {
         if (value != null) {
@@ -61,7 +61,7 @@ var ItemStack.displayNameNms: String?
  *
  * Only works if `this` [ItemStack] is NMS-object backed.
  */
-var ItemStack.displayLoreNms: List<String>?
+var ItemStack.backingLore: List<String>?
     get() = throw UnsupportedOperationException("Get operation is not supported")
     set(value) {
         if (value != null) {
