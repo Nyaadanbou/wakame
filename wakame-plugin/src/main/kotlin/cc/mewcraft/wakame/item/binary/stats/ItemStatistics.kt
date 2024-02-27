@@ -8,23 +8,23 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 /**
  * 代表一个物品上的统计数据。
  */
-sealed interface ItemStats {
+sealed interface ItemStatistics {
     /**
-     * The [ItemStatsAccessor] encompassing `this`.
+     * The [ItemStatisticsHolder] encompassing `this`.
      */
-    val accessor: ItemStatsAccessor
+    val holder: ItemStatisticsHolder
 
     /**
-     * The path to the tags of this [ItemStats].
+     * The path to the tags of this [ItemStatistics].
      */
     @InternalApi
     val nbtPath: String
 
     @InternalApi
     val rootOrNull: CompoundShadowTag?
-        get() = accessor.rootOrNull?.getCompoundOrNull(nbtPath)
+        get() = holder.rootOrNull?.getCompoundOrNull(nbtPath)
 
     @InternalApi
     val rootOrCreate: CompoundShadowTag
-        get() = accessor.rootOrCreate.getOrPut(nbtPath, CompoundShadowTag::create)
+        get() = holder.rootOrCreate.getOrPut(nbtPath, CompoundShadowTag::create)
 }

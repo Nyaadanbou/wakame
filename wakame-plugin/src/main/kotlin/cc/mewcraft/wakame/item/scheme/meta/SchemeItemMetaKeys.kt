@@ -8,19 +8,19 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
 
 /**
- * A utility class to get the key of [SchemeMeta] by class reference.
+ * A utility class to get the key of [SchemeItemMeta] by class reference.
  */
-object SchemeMetaKeys : KoinComponent {
+object SchemeItemMetaKeys : KoinComponent {
 
-    private val metaKeys: MutableMap<KClass<out SchemeMeta<*>>, Key> = Reference2ObjectOpenHashMap(8) // simple cache
+    private val metaKeys: MutableMap<KClass<out SchemeItemMeta<*>>, Key> = Reference2ObjectOpenHashMap(8) // simple cache
 
     /**
      * Gets the key of SchemeMeta [K].
      *
-     * @param K the class of [SchemeMeta]
+     * @param K the class of [SchemeItemMeta]
      * @return the key of the scheme meta
      */
-    fun <K : SchemeMeta<*>> get(clazz: KClass<K>): Key {
+    fun <K : SchemeItemMeta<*>> get(clazz: KClass<K>): Key {
         return metaKeys.computeIfAbsent(clazz) {
             val obj = it.companionObjectInstance
                 ?: throw IllegalStateException("The class $it does not have a companion object")
@@ -33,10 +33,10 @@ object SchemeMetaKeys : KoinComponent {
     /**
      * Gets the key of SchemeMeta [K].
      *
-     * @param K the class of [SchemeMeta]
+     * @param K the class of [SchemeItemMeta]
      * @return the key of the scheme meta
      */
-    inline fun <reified K : SchemeMeta<*>> get(): Key {
+    inline fun <reified K : SchemeItemMeta<*>> get(): Key {
         return get(K::class)
     }
 

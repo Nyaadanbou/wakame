@@ -22,17 +22,17 @@ typealias ElementPool = Pool<Element, SchemeGenerationContext>
  */
 data class ElementMeta(
     private val elementPool: ElementPool = Pool.empty(),
-) : SchemeMeta<Set<Element>> {
+) : SchemeItemMeta<Set<Element>> {
     override fun generate(context: SchemeGenerationContext): Set<Element> {
         return elementPool.pick(context).toSet()
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.META, "element")
+        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "element")
     }
 }
 
-internal class ElementMetaSerializer : SchemeMetaSerializer<ElementMeta> {
+internal class ElementMetaSerializer : SchemeItemMetaSerializer<ElementMeta> {
     override val emptyValue: ElementMeta = ElementMeta()
 
     override fun deserialize(type: Type, node: ConfigurationNode): ElementMeta {

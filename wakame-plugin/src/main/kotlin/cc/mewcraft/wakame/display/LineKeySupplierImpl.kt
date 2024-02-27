@@ -5,12 +5,10 @@ import cc.mewcraft.wakame.attribute.facade.elementOrNull
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
-import cc.mewcraft.wakame.item.scheme.meta.SchemeMeta
-import cc.mewcraft.wakame.item.scheme.meta.SchemeMetaKeys
+import cc.mewcraft.wakame.item.binary.meta.ItemMeta
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
-import kotlin.reflect.KClass
 
 // TODO 统一 key 的生成实现
 
@@ -41,6 +39,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     /**
      * Caches a full key from the given triple indexes.
      */
+    @Suppress("ReplacePutWithAssignment")
     private fun put(key: Key, operation: Operation, element: Element? = null, fullKey: FullKey) {
         if (element == null) {
             cachedFullKeys
@@ -144,8 +143,8 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
 }
 
 internal class MetaLineKeySupplierImpl : MetaLineKeySupplier {
-    override fun get(obj: KClass<out SchemeMeta<*>>): FullKey {
-        // 模板元数据的 key 就是它的 full key
-        return SchemeMetaKeys.get(obj)
+    override fun get(obj: ItemMeta<*>): FullKey {
+        // 元数据的 key 就是它的 full key
+        return obj.key
     }
 }

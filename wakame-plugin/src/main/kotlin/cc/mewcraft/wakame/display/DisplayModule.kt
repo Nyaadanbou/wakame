@@ -31,12 +31,12 @@ internal fun displayModule(): Module = module {
     // text stylizers
     single<TextStylizer> {
         TextStylizerImpl(
-            metaStylizer = new(::MetaStylizerImpl),
+            itemMetaStylizer = new(::ItemMetaStylizerImpl),
             abilityStylizer = new(::AbilityStylizerImpl),
             attributeStylizer = AttributeStylizerImpl(get(), new(::OperationStylizerImpl)),
-            metaLineKeys = new(::MetaLineKeySupplierImpl),
-            abilityLineKeys = new(::AbilityLineKeySupplierImpl),
-            attributeLineKeys = new(::AttributeLineKeySupplierImpl)
+            itemMetaKeySupplier = new(::MetaLineKeySupplierImpl),
+            abilityKeySupplier = new(::AbilityLineKeySupplierImpl),
+            attributeKeySupplier = new(::AttributeLineKeySupplierImpl)
         )
     }
 

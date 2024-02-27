@@ -27,7 +27,7 @@ object NekoItemFactory : KoinComponent {
         val uuid = node.node("uuid").requireKt<UUID>()
 
         // Deserialize item meta
-        val schemeMeta: Map<Key, SchemeMeta<*>> = buildMap {
+        val schemeItemMeta: Map<Key, SchemeItemMeta<*>> = buildMap {
             // Side note 1: buildMap preserves the insertion order
 
             // Side note 2: always put all metadata for all `NekoItem`s
@@ -37,15 +37,15 @@ object NekoItemFactory : KoinComponent {
             // is decided by the item stack generation process, not here.
 
             // (by alphabet order, in case you miss something)
-            loadAndPutMeta<DisplayLoreMeta>(node, "lore")
-            loadAndPutMeta<DisplayNameMeta>(node, "display_name")
-            loadAndPutMeta<ElementMeta>(node, "elements")
-            loadAndPutMeta<KizamiMeta>(node, "kizami")
-            loadAndPutMeta<LevelMeta>(node, "level")
-            loadAndPutMeta<MaterialMeta>(node, "material")
-            loadAndPutMeta<RarityMeta>(node, "rarity")
-            loadAndPutMeta<SkinMeta>(node, "skin")
-            loadAndPutMeta<SkinOwnerMeta>(node, "skin_owner")
+            loadAndSave<DisplayLoreMeta>(node, "lore")
+            loadAndSave<DisplayNameMeta>(node, "display_name")
+            loadAndSave<ElementMeta>(node, "elements")
+            loadAndSave<KizamiMeta>(node, "kizami")
+            loadAndSave<LevelMeta>(node, "level")
+            loadAndSave<MaterialMeta>(node, "material")
+            loadAndSave<RarityMeta>(node, "rarity")
+            loadAndSave<SkinMeta>(node, "skin")
+            loadAndSave<SkinOwnerMeta>(node, "skin_owner")
         }
 
         // Deserialize item cells
@@ -62,15 +62,15 @@ object NekoItemFactory : KoinComponent {
             }
         }
 
-        val ret = NekoItemImpl(key, uuid, schemeMeta, schemeCells)
+        val ret = NekoItemImpl(key, uuid, schemeItemMeta, schemeCells)
         return ret
     }
 
-    private inline fun <reified T : SchemeMeta<*>> MutableMap<Key, SchemeMeta<*>>.loadAndPutMeta(
+    private inline fun <reified T : SchemeItemMeta<*>> MutableMap<Key, SchemeItemMeta<*>>.loadAndSave(
         node: ConfigurationNode,
         vararg path: String,
     ) {
         val deserialized = requireNotNull(node.node(*path).get<T>()) { "Can't deserialize scheme meta from path ${path.contentToString()}" }
-        put(SchemeMetaKeys.get<T>(), deserialized)
+        put(SchemeItemMetaKeys.get<T>(), deserialized)
     }
 }

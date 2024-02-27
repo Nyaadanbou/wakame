@@ -53,6 +53,14 @@ fun <R, B, K, V : BiIdentified<K, B>> R.registerBothMapping(name: K, value: V)
     registerBinary2Name(name, value.binary)
 }
 
+/**
+ * Clear both the base registry and bi-map registry.
+ *
+ * @param R the type of `this` registry
+ * @param B the type of binary
+ * @param K the type of name (key)
+ * @param V the type of value
+ */
 @InternalApi
 fun <R, B, K, V : BiIdentified<K, B>> R.clearBoth()
         where R : Registry<K, V>,

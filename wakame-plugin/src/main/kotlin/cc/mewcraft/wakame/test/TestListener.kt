@@ -2,6 +2,9 @@ package cc.mewcraft.wakame.test
 
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
+import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
+import cc.mewcraft.wakame.item.binary.meta.get
+import cc.mewcraft.wakame.item.binary.meta.orEmpty
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent
@@ -17,7 +20,7 @@ import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
-import java.util.*
+import java.util.UUID
 
 class TestListener : Listener {
     @EventHandler
@@ -59,7 +62,7 @@ class TestListener : Listener {
         when (plainMessage) {
             "r1" -> {
                 val wrap = NekoItemStackFactory.wrap(inventory.itemInMainHand)
-                val lore = wrap.metadata.loreOrEmpty
+                val lore = wrap.metadata.get<DisplayLoreMeta>().orEmpty()
                 val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
             }

@@ -28,6 +28,6 @@ internal class ItemRendererImpl(
         }
 
         // 为了麦若，去掉物品的真实根标签
-        @OptIn(InternalApi::class) copy.erase()
+        copy.erase()
     }
 }

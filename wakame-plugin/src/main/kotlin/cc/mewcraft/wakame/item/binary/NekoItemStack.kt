@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.item.binary.cell.CellAccessor
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
-import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessor
+import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
+import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolder
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
@@ -67,14 +67,6 @@ interface NekoItemStack : NekoItemStackSetter {
     val isOneOff: Boolean
 
     /**
-     * Erases all the custom tags from `this`.
-     *
-     * **Only to be used in certain special cases**.
-     */
-    @InternalApi
-    fun erase()
-
-    /**
      * Returns `true` if this item is a neko item.
      *
      * In this case [isNotNeko] returns `false`.
@@ -124,31 +116,31 @@ interface NekoItemStack : NekoItemStackSetter {
     val uuid: UUID
 
     /**
-     * The CellMap of this item.
+     * The [ItemCellHolder] of this item.
      *
      * Used to manipulate the **cells** of this item.
      *
      * @throws NullPointerException if this is not a legal neko item
      */
-    val cells: CellAccessor
+    val cells: ItemCellHolder
 
     /**
-     * The ItemMetaMap of this item.
+     * The [ItemMetaHolder] of this item.
      *
      * Used to manipulate the **meta** of this item.
      *
      * @throws NullPointerException if this is not a legal neko item
      */
-    val metadata: ItemMetaAccessor
+    val metadata: ItemMetaHolder
 
     /**
-     * The ItemStatsMap of this item.
+     * The [ItemStatisticsHolder] of this item.
      *
      * Used to manipulate the **statistics** of this item.
      *
      * @throws NullPointerException if this is not a legal neko item
      */
-    val statistics: ItemStatsAccessor
+    val statistics: ItemStatisticsHolder
 
     /**
      * The seed of this item.

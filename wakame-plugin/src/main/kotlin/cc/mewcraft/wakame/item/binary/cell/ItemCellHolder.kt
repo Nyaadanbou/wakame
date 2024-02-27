@@ -6,15 +6,18 @@ import cc.mewcraft.wakame.attribute.base.Attribute
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import com.google.common.collect.Multimap
 
-interface CellAccessor : CellSetter {
+interface ItemCellHolder {
+
+    /* Getters */
+
     /**
-     * Gets an immutable map describing the cells. This will call [get] for
-     * each available cell on the backed item.
+     * Gets an immutable map describing the cells in this holder. This will
+     * call [get] for each available cell on the backed item.
      *
      * Note that any changes on the item in the underlying game world **does
-     * not** reflect on the returned value.
+     * not** reflect on the returned map.
      */
-    fun asMap(): Map<String, BinaryCell>
+    val map: Map<String, BinaryCell>
 
     /**
      * Gets the specified [binary cell][BinaryCell].
@@ -53,5 +56,37 @@ interface CellAccessor : CellSetter {
      * Gets all abilities and corresponding values from `this` (cells).
      */
     fun getAbilities(): Map<out Ability, BinaryAbilityValue>
+
+    /* Setters */
+
+    /**
+     * Adds a cell.
+     *
+     * @param id the cell ID (case-sensitive)
+     * @param cell the cell to be added
+     */
+    fun put(id: String, cell: BinaryCell)
+
+    /**
+     * Edits a cell (i.e., replacing the existing one with the new cell
+     * returned by [setter]). If the specified cell does not exist,
+     * this function is effectively the same as the function [put].
+     *
+     * @param id the cell ID (case-sensitive)
+     * @param setter the cell setter function
+     * @receiver the existing cell or `null`, if the specified cell does not
+     *     already exist
+     */
+    fun edit(id: String, setter: BinaryCell?.() -> BinaryCell)
+
+    /**
+     * Removes the specified [binary cell][BinaryCell]. This will entirely
+     * remove the cell AND its core from the item NBT, leading to this item not
+     * aligned with the number of cells in its scheme.
+     *
+     * @param id the cell ID (case-sensitive)
+     */
+    fun remove(id: String)
+
 }
 

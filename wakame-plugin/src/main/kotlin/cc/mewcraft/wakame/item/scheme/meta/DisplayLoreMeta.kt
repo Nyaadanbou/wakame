@@ -16,17 +16,17 @@ import java.lang.reflect.Type
  */
 data class DisplayLoreMeta(
     private val lore: List<String>? = null,
-) : SchemeMeta<List<String>>, KoinComponent {
+) : SchemeItemMeta<List<String>>, KoinComponent {
     override fun generate(context: SchemeGenerationContext): List<String>? {
         return lore
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.META, "lore")
+        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "lore")
     }
 }
 
-internal class LoreMetaSerializer : SchemeMetaSerializer<DisplayLoreMeta> {
+internal class LoreMetaSerializer : SchemeItemMetaSerializer<DisplayLoreMeta> {
     override val emptyValue: DisplayLoreMeta = DisplayLoreMeta()
 
     override fun deserialize(type: Type, node: ConfigurationNode): DisplayLoreMeta {

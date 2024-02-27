@@ -15,10 +15,11 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
-internal class CellAccessorImpl(
+internal class ItemCellHolderImpl(
     private val base: NekoItemStackImpl,
-) : CellAccessor {
-    ////// CellAccessor //////
+) : ItemCellHolder {
+
+    /* Getters */
 
     // FIXME do we really need it?
     //  the caching mechanism should be implemented properly
@@ -31,10 +32,18 @@ internal class CellAccessorImpl(
     private val rootOrCreate: CompoundShadowTag
         get() = base.tags.getOrPut(NekoTags.Cell.ROOT, CompoundShadowTag::create)
 
+    override val map: Map<String, BinaryCell>
+        get() {
+            val tags = rootOrNull ?: return emptyMap()
+            val ret = Object2ObjectArrayMap<String, BinaryCell>(tags.size()) // pre-allocate
+            for (key in tags.keySet()) {
+                get(key)?.let { ret.put(key, it) }
+            }
+            return ret
+        }
+
     override fun get(id: String): BinaryCell? {
-        val compoundTag = rootOrNull
-            ?.getCompoundOrNull(id)
-            ?: return null
+        val compoundTag = rootOrNull?.getCompoundOrNull(id) ?: return null
         // don't use computeIfAbsent to avoid creating non-capturing lambda
         var cell = cache[id]
         if (cell == null) {
@@ -45,16 +54,6 @@ internal class CellAccessorImpl(
         return cell
     }
 
-    override fun asMap(): Map<String, BinaryCell> {
-        val tags = rootOrNull
-            ?: return emptyMap()
-        val ret = Object2ObjectArrayMap<String, BinaryCell>(tags.size()) // pre-allocate
-        for (key in tags.keySet()) {
-            get(key)?.let { ret.put(key, it) }
-        }
-        return ret
-    }
-
     override fun getModifiers(): Multimap<out Attribute, AttributeModifier> {
         // 注意这里不能用 Map，必须用 Multimap
         // 因为会存在同一个属性 Attribute
@@ -63,7 +62,7 @@ internal class CellAccessorImpl(
 
         val multimap = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
 
-        for (binaryCell in asMap().values) {
+        for (binaryCell in map.values) {
             if (!binaryCell.binaryCurse.test(base)) {
                 continue // curse has not been unlocked yet
             }
@@ -83,7 +82,7 @@ internal class CellAccessorImpl(
         TODO("Not yet implemented")
     }
 
-    ////// CellMapSetter //////
+    /* Setters */
 
     override fun put(id: String, cell: BinaryCell) {
         cache.remove(id) // remove cache

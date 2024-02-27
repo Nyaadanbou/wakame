@@ -15,17 +15,17 @@ import java.util.UUID
  */
 data class SkinOwnerMeta(
     private val skinOwner: UUID? = null,
-) : SchemeMeta<UUID> {
+) : SchemeItemMeta<UUID> {
     override fun generate(context: SchemeGenerationContext): UUID? {
         return skinOwner
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.META, "skin_owner")
+        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "skin_owner")
     }
 }
 
-internal class SkinOwnerMetaSerializer : SchemeMetaSerializer<SkinOwnerMeta> {
+internal class SkinOwnerMetaSerializer : SchemeItemMetaSerializer<SkinOwnerMeta> {
     override val emptyValue: SkinOwnerMeta = SkinOwnerMeta()
 
     override fun deserialize(type: Type, node: ConfigurationNode): SkinOwnerMeta {

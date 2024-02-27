@@ -106,7 +106,7 @@ class ItemDeserializationTest : KoinTest {
             generateAndSet<SkinOwnerMeta, UUID>(self, context)
 
             // generate cells
-            self.schemeCells.forEach { (id, scheme) ->
+            self.cells.forEach { (id, scheme) ->
                 val binary = BinaryCellFactory.generate(context, scheme)
                 if (binary != null) {
                     logger.debug("Put cell '{}': {}", id, binary)
@@ -123,23 +123,23 @@ class ItemDeserializationTest : KoinTest {
         verify { demo.createItemStack(null) }
     }
 
-    private inline fun <reified S : SchemeMeta<T>, T> generateAndSet(
+    private inline fun <reified S : SchemeItemMeta<T>, T> generateAndSet(
         self: NekoItem,
         context: SchemeGenerationContext,
     ) {
-        val meta: S = getSchemeMetaByClass<S>(self)
-        val value: T? = meta.generate(context)
+        val meta = getSchemeMetaByClass<S>(self)
+        val value = meta.generate(context)
         if (value != null) {
             // set the meta only if something is generated
             logger.debug("Put meta '{}': {}", S::class.simpleName, value.toString())
         }
     }
 
-    private inline fun <reified V : SchemeMeta<*>> getSchemeMetaByClass(
+    private inline fun <reified V : SchemeItemMeta<*>> getSchemeMetaByClass(
         self: NekoItem,
     ): V {
-        val key = SchemeMetaKeys.get<V>()
-        val meta = checkNotNull(self.schemeMeta[key])
+        val key = SchemeItemMetaKeys.get<V>()
+        val meta = checkNotNull(self.itemMeta[key])
         return meta as V
     }
 }

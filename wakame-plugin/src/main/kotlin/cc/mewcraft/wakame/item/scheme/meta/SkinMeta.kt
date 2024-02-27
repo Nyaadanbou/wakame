@@ -15,17 +15,17 @@ import java.lang.reflect.Type
  */
 data class SkinMeta(
     private val itemSkin: ItemSkin? = null,
-) : SchemeMeta<ItemSkin> {
+) : SchemeItemMeta<ItemSkin> {
     override fun generate(context: SchemeGenerationContext): ItemSkin? {
         return itemSkin
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.META, "skin")
+        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "skin")
     }
 }
 
-internal class SkinMetaSerializer : SchemeMetaSerializer<SkinMeta> {
+internal class SkinMetaSerializer : SchemeItemMetaSerializer<SkinMeta> {
     override val emptyValue: SkinMeta = SkinMeta()
 
     override fun deserialize(type: Type, node: ConfigurationNode): SkinMeta {

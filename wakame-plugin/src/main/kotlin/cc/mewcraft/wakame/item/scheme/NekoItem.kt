@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.MaterialMeta
-import cc.mewcraft.wakame.item.scheme.meta.SchemeMeta
-import cc.mewcraft.wakame.item.scheme.meta.SchemeMetaKeys
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.bukkit.entity.Player
@@ -18,7 +18,7 @@ import java.util.UUID
  * file.
  *
  * The design philosophy of `this` is, that you can use a [NekoItem] as
- * a **blueprint** to create as many [WakaItemStacks][NekoItemStack] as
+ * a **blueprint** to create as many [NekoItemStacks][NekoItemStack] as
  * you want by calling [NekoItem.createItemStack], where each of the
  * [ItemStack] will have the data of different values, and even have the
  * data of different types. This allows us to create more possibilities
@@ -43,19 +43,18 @@ interface NekoItem : Keyed {
     val key: Key
     override fun key(): Key = key
 
-
     /**
      * The map holds all the metadata of `this` item. Use your IDE to navigate
-     * the subclasses of [SchemeMeta] for all types of metadata.
+     * the subclasses of [SchemeItemMeta] for all types of metadata.
      *
      * It should be noted that only necessary metadata should be written to
      * the item's NBT while generating an [ItemStack] from `this` [NekoItem].
      * The data that can be derived from other metadata such as [MaterialMeta]
      * should not be written to the NBT.
      *
-     * @see getSchemeMetaByClass
+     * @see getItemMetaByClass
      */
-    val schemeMeta: Map<Key, SchemeMeta<*>> // TODO why not use the ClassToInstanceMap?
+    val itemMeta: Map<Key, SchemeItemMeta<*>> // TODO why not use the ClassToInstanceMap?
 
     /**
      * The map holds all the cell data about `this` item, where `map key` is
@@ -64,7 +63,7 @@ interface NekoItem : Keyed {
      * The underlying map is actually an ordered map, and the iteration order
      * is always the same as the insertion order.
      */
-    val schemeCells: Map<String, SchemeCell>
+    val cells: Map<String, SchemeCell>
 
     /**
      * Generates an [ItemStack] from this scheme.
@@ -92,21 +91,21 @@ interface NekoItem : Keyed {
 ////// Extension functions //////
 
 /**
- * Gets specified [SchemeMeta] from this [NekoItem].
+ * Gets specified [SchemeItemMeta] from this [NekoItem].
  *
- * This function allows you to quickly get specified [SchemeMeta] by
+ * This function allows you to quickly get specified [SchemeItemMeta] by
  * corresponding class reference. You can use this function as the
  * following:
  * ```kotlin
  * val item: NekoItem = < ...... >
- * val meta: ElementMeta = wakaItem.getSchemeMeta<ElementMeta>()
+ * val meta: ElementMeta = item.getItemMetaByClass<ElementMeta>()
  * ```
  *
- * @param V the subclass of [SchemeMeta]
+ * @param V the subclass of [SchemeItemMeta]
  * @return the instance of class [V] from this [NekoItem]
  */
-inline fun <reified V : SchemeMeta<*>> NekoItem.getSchemeMetaByClass(): V {
-    val key = SchemeMetaKeys.get<V>()
-    val meta = checkNotNull(schemeMeta[key])
+inline fun <reified V : SchemeItemMeta<*>> NekoItem.getItemMetaByClass(): V {
+    val key = SchemeItemMetaKeys.get<V>()
+    val meta = checkNotNull(itemMeta[key])
     return meta as V
 }

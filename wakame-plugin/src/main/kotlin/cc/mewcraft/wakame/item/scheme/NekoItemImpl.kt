@@ -5,21 +5,39 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaSetter
+import cc.mewcraft.wakame.item.binary.meta.ItemMeta
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
-import cc.mewcraft.wakame.item.scheme.meta.*
+import cc.mewcraft.wakame.item.scheme.meta.MaterialMeta
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.skin.ItemSkin
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import java.util.UUID
+import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
+import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta as BDisplayNameMeta
+import cc.mewcraft.wakame.item.binary.meta.ElementMeta as BElementMeta
+import cc.mewcraft.wakame.item.binary.meta.KizamiMeta as BKizamiMeta
+import cc.mewcraft.wakame.item.binary.meta.LevelMeta as BLevelMeta
+import cc.mewcraft.wakame.item.binary.meta.RarityMeta as BRarityMeta
+import cc.mewcraft.wakame.item.binary.meta.SkinMeta as BSkinMeta
+import cc.mewcraft.wakame.item.binary.meta.SkinOwnerMeta as BSkinOwnerMeta
+import cc.mewcraft.wakame.item.scheme.meta.DisplayLoreMeta as SDisplayLoreMeta
+import cc.mewcraft.wakame.item.scheme.meta.DisplayNameMeta as SDisplayNameMeta
+import cc.mewcraft.wakame.item.scheme.meta.ElementMeta as SElementMeta
+import cc.mewcraft.wakame.item.scheme.meta.KizamiMeta as SKizamiMeta
+import cc.mewcraft.wakame.item.scheme.meta.LevelMeta as SLevelMeta
+import cc.mewcraft.wakame.item.scheme.meta.RarityMeta as SRarityMeta
+import cc.mewcraft.wakame.item.scheme.meta.SkinMeta as SSkinMeta
+import cc.mewcraft.wakame.item.scheme.meta.SkinOwnerMeta as SSkinOwnerMeta
 
 internal data class NekoItemImpl(
     override val key: Key,
     override val uuid: UUID,
-    override val schemeMeta: Map<Key, SchemeMeta<*>>,
-    override val schemeCells: Map<String, SchemeCell>,
+    override val itemMeta: Map<Key, SchemeItemMeta<*>>,
+    override val cells: Map<String, SchemeCell>,
 ) : NekoItem {
     override fun createItemStack(player: Player?): NekoItemStack {
         val context = SchemeGenerationContext(playerObject = player)
@@ -40,32 +58,32 @@ internal data class NekoItemImpl(
      * @return a new NekoStack
      */
     private fun createItemStack0(context: SchemeGenerationContext): NekoItemStack {
-        // create a blank WakaItemStack
-        val materialMeta = getSchemeMetaByClass<MaterialMeta>()
+        // create a blank NekoItemStack
+        val materialMeta = getItemMetaByClass<MaterialMeta>()
         val material = materialMeta.generate(context)
         val nekoStack = NekoItemStackFactory.new(material)
 
-        // put namespaced key
+        // put key
         nekoStack.putKey(key)
 
-        // put metadata
+        // put item meta
         with(nekoStack.metadata) {
             // Side note:
             // the order of meta population is hardcoded currently
             // TODO make the order of meta population configurable
 
-            generateAndSet<DisplayNameMeta, String>(context, ItemMetaSetter::putName)
-            generateAndSet<DisplayLoreMeta, List<String>>(context, ItemMetaSetter::putLore)
-            generateAndSet<LevelMeta, Int>(context, ItemMetaSetter::putLevel)
-            generateAndSet<RarityMeta, Rarity>(context, ItemMetaSetter::putRarity)
-            generateAndSet<ElementMeta, Set<Element>>(context, ItemMetaSetter::putElements)
-            generateAndSet<KizamiMeta, Set<Kizami>>(context, ItemMetaSetter::putKizami)
-            generateAndSet<SkinMeta, ItemSkin>(context, ItemMetaSetter::putSkin)
-            generateAndSet<SkinOwnerMeta, UUID>(context, ItemMetaSetter::putSkinOwner)
+            generateAndSet<String, SDisplayNameMeta, BDisplayNameMeta>(context)
+            generateAndSet<List<String>, SDisplayLoreMeta, BDisplayLoreMeta>(context)
+            generateAndSet<Int, SLevelMeta, BLevelMeta>(context)
+            generateAndSet<Rarity, SRarityMeta, BRarityMeta>(context)
+            generateAndSet<Set<Element>, SElementMeta, BElementMeta>(context)
+            generateAndSet<Set<Kizami>, SKizamiMeta, BKizamiMeta>(context)
+            generateAndSet<ItemSkin, SSkinMeta, BSkinMeta>(context)
+            generateAndSet<UUID, SSkinOwnerMeta, BSkinOwnerMeta>(context)
         }
 
         // put cells
-        schemeCells.forEach { (id, scheme) ->
+        cells.forEach { (id, scheme) ->
             // Side note:
             // the order of cell population should be the same as
             // that they are declared in the YAML list
@@ -90,20 +108,17 @@ internal data class NekoItemImpl(
      * nothing to the item.
      *
      * @param context the context
-     * @param setter a member function of [ItemMetaSetter]
-     * @param S the type of [SchemeMeta]
+     * @param S the type of [SchemeItemMeta]
      * @param T the type of item meta value
-     * @receiver the [ItemMetaSetter] which the function executes on
      */
-    private inline fun <reified S : SchemeMeta<T>, T> ItemMetaSetter.generateAndSet(
+    private inline fun <T, reified S : SchemeItemMeta<T>, reified B : ItemMeta<T>> ItemMetaHolder.generateAndSet(
         context: SchemeGenerationContext,
-        setter: ItemMetaSetter.(T) -> Any,
     ) {
-        val meta: S = getSchemeMetaByClass<S>()
-        val value: T? = meta.generate(context)
+        val meta = getItemMetaByClass<S>()
+        val value = meta.generate(context)
         if (value != null) {
             // set the meta only if something is generated
-            setter(value)
+            set(B::class, value)
         }
     }
 }

@@ -17,17 +17,17 @@ import java.lang.reflect.Type
  */
 data class MaterialMeta(
     private val material: Material = Material.STONE,
-) : SchemeMeta<Material> {
+) : SchemeItemMeta<Material> {
     override fun generate(context: SchemeGenerationContext): Material {
         return material
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.META, "material")
+        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "material")
     }
 }
 
-internal class MaterialMetaSerializer : SchemeMetaSerializer<MaterialMeta> {
+internal class MaterialMetaSerializer : SchemeItemMetaSerializer<MaterialMeta> {
     override val emptyValue: MaterialMeta = MaterialMeta()
 
     override fun deserialize(type: Type, node: ConfigurationNode): MaterialMeta {

@@ -28,7 +28,7 @@ data class RarityMeta(
      * The mappings used to generate the rarity.
      */
     private val dynamic: LevelMappings? = null,
-) : SchemeMeta<Rarity> {
+) : SchemeItemMeta<Rarity> {
     override fun generate(context: SchemeGenerationContext): Rarity {
         @Suppress("IfThenToElvis") // FUNKY IDE
         return if (static != null) {
@@ -46,11 +46,11 @@ data class RarityMeta(
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.META, "rarity")
+        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "rarity")
     }
 }
 
-internal class RarityMetaSerializer : SchemeMetaSerializer<RarityMeta> {
+internal class RarityMetaSerializer : SchemeItemMetaSerializer<RarityMeta> {
     override val emptyValue: RarityMeta = RarityMeta()
 
     override fun deserialize(type: Type, node: ConfigurationNode): RarityMeta {

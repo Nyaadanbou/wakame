@@ -1,15 +1,12 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.attribute.base.AttributeModifier
-import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
-import cc.mewcraft.wakame.kizami.Kizami
-import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.skin.ItemSkin
+import cc.mewcraft.wakame.item.binary.meta.ItemMeta
 import net.kyori.adventure.text.Component
-import java.util.UUID
+import kotlin.reflect.KClass
 
 /**
  * 为给定 [NekoItemStack] 的 Name 和 Lore 生成格式化后的内容。
@@ -30,7 +27,7 @@ internal interface TextStylizer {
 
     /**
      * Generates [lore lines][LoreLine] from the [item]. The returned
-     * [lore lines][LoreLine] need to be finalized before they are used
+     * [lore lines][LoreLine] need to be **finalized** before they are used
      * on [item]. Also, the returned collection should not contain any
      * [fixed lore lines][FixedLoreLine].
      *
@@ -79,15 +76,36 @@ internal interface OperationStylizer {
 /**
  * To be used by [TextStylizer].
  */
-internal interface MetaStylizer {
+internal interface ItemMetaStylizer {
+
+    /* First is the `name` stylizer. */
+
+    /**
+     * Stylizes the given [name].
+     *
+     * This function is intentionally separated from the lore stylization.
+     */
     fun stylizeName(name: String): Component
-    fun stylizeLore(lore: List<String>): List<Component>
-    fun stylizeLevel(level: Int): List<Component>
-    fun stylizeRarity(rarity: Rarity): List<Component>
-    fun stylizeElement(elements: Set<Element>): List<Component>
-    fun stylizeKizami(kizami: Set<Kizami>): List<Component>
-    fun stylizeSkin(skin: ItemSkin): List<Component>
-    fun stylizeSkinOwner(skinOwner: UUID): List<Component>
+
+    /* Following are `lore` stylizers. */
+
+    fun interface ChildStylizer<I : ItemMeta<*>> {
+        fun stylize(input: I): List<Component>
+    }
+
+    /**
+     * To implementer: Every [ItemMeta] to be rendered should have a
+     * corresponding [ChildStylizer] in this map.
+     *
+     * Map specifications: `map key` is class of [ItemMeta] and `map value` is
+     * corresponding [stylizer][ChildStylizer].
+     */
+    val childStylizerMap: Map<KClass<out ItemMeta<*>>, ChildStylizer<*>>
+
+    /**
+     * Gets child stylizer by class.
+     */
+    fun <I : ItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I>
 
     interface LoreFormat {
         /**

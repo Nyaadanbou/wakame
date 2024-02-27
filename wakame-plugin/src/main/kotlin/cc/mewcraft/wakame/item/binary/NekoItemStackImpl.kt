@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.item.binary.cell.CellAccessor
-import cc.mewcraft.wakame.item.binary.cell.CellAccessorImpl
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorImpl
-import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessor
-import cc.mewcraft.wakame.item.binary.stats.ItemStatsAccessorImpl
+import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
+import cc.mewcraft.wakame.item.binary.cell.ItemCellHolderImpl
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolderImpl
+import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolder
+import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolderImpl
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.nekoCompound
@@ -29,12 +28,6 @@ internal class NekoItemStackImpl(
         isOneOff = true /* so, it's a one-off instance */
     )
 
-    @InternalApi
-    override fun erase() {
-        handle.removeNekoCompound()
-    }
-
-    // region WakaItemStack
     /**
      * The "wakame" [CompoundTag][CompoundShadowTag] of this item.
      *
@@ -81,16 +74,16 @@ internal class NekoItemStackImpl(
         get() = NekoItemRegistry.get(key)?.uuid
             ?: throw NullPointerException()
 
-    override val cells: CellAccessor by lazy(LazyThreadSafetyMode.NONE) {
-        CellAccessorImpl(this)
+    override val cells: ItemCellHolder by lazy(LazyThreadSafetyMode.NONE) {
+        ItemCellHolderImpl(this)
     }
 
-    override val metadata: ItemMetaAccessor by lazy(LazyThreadSafetyMode.NONE) {
-        ItemMetaAccessorImpl(this)
+    override val metadata: ItemMetaHolder by lazy(LazyThreadSafetyMode.NONE) {
+        ItemMetaHolderImpl(this)
     }
 
-    override val statistics: ItemStatsAccessor by lazy(LazyThreadSafetyMode.NONE) {
-        ItemStatsAccessorImpl(this)
+    override val statistics: ItemStatisticsHolder by lazy(LazyThreadSafetyMode.NONE) {
+        ItemStatisticsHolderImpl(this)
     }
 
     override fun hashCode(): Int {
@@ -100,9 +93,12 @@ internal class NekoItemStackImpl(
     override fun equals(other: Any?): Boolean {
         return handle == other
     }
-    // endregion
 
-    // region WakaItemStackSetter
+    //<editor-fold desc="Setters">
+    override fun erase() {
+        handle.removeNekoCompound()
+    }
+
     override fun putRoot(compoundTag: CompoundShadowTag) {
         handle.nekoCompound = compoundTag
     }
@@ -119,6 +115,6 @@ internal class NekoItemStackImpl(
     override fun putId(id: String) {
         tags.putString(NekoTags.Root.ID, id)
     }
-    // endregion
+    //</editor-fold>
 
 }

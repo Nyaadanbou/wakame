@@ -22,17 +22,17 @@ typealias KizamiPool = Pool<Kizami, SchemeGenerationContext>
  */
 data class KizamiMeta(
     private val kizamiPool: KizamiPool = Pool.empty(),
-) : SchemeMeta<Set<Kizami>> {
+) : SchemeItemMeta<Set<Kizami>> {
     override fun generate(context: SchemeGenerationContext): Set<Kizami> {
         return kizamiPool.pick(context).toSet()
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.META, "kizami")
+        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "kizami")
     }
 }
 
-internal class KizamiMetaSerializer : SchemeMetaSerializer<KizamiMeta> {
+internal class KizamiMetaSerializer : SchemeItemMetaSerializer<KizamiMeta> {
     override val emptyValue: KizamiMeta = KizamiMeta()
 
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiMeta {

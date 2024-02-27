@@ -3,8 +3,7 @@ package cc.mewcraft.wakame.display
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
-import cc.mewcraft.wakame.item.scheme.meta.SchemeMeta
-import kotlin.reflect.KClass
+import cc.mewcraft.wakame.item.binary.meta.ItemMeta
 
 @InternalApi("Use the subclasses instead")
 internal sealed interface LineKeySupplier<T> {
@@ -23,4 +22,4 @@ internal interface AbilityLineKeySupplier : LineKeySupplier<BinaryAbilityCore>
 internal interface AttributeLineKeySupplier : LineKeySupplier<BinaryAttributeCore>
 
 @OptIn(InternalApi::class)
-internal interface MetaLineKeySupplier : LineKeySupplier<KClass<out SchemeMeta<*>>>
+internal interface MetaLineKeySupplier : LineKeySupplier<ItemMeta<*>>

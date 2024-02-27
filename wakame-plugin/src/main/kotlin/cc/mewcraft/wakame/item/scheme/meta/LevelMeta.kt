@@ -25,7 +25,7 @@ data class LevelMeta(
      * The item level held in this scheme.
      */
     private val level: Any = 1,
-) : KoinComponent, SchemeMeta<Int> {
+) : KoinComponent, SchemeItemMeta<Int> {
 
     private val adventureLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(CUSTOM_ADVENTURE_LEVEL))
     private val experienceLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(VANILLA_EXPERIENCE_LEVEL))
@@ -61,11 +61,11 @@ data class LevelMeta(
     }
 
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.META, "level")
+        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "level")
     }
 }
 
-internal class LevelMetaSerializer : SchemeMetaSerializer<LevelMeta> {
+internal class LevelMetaSerializer : SchemeItemMetaSerializer<LevelMeta> {
     override val emptyValue: LevelMeta = LevelMeta()
 
     override fun deserialize(type: Type, node: ConfigurationNode): LevelMeta {

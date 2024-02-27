@@ -40,9 +40,9 @@ internal class RendererConfiguration(
     /**
      * 描述的渲染格式。
      */
-    val loreFormat: MetaStylizerImpl.LoreFormatImpl by reloadable {
+    val loreFormat: ItemMetaStylizer.LoreFormat by reloadable {
         with(root.node(RENDERER_STYLE_NODE, "meta", "lore")) {
-            MetaStylizerImpl.LoreFormatImpl(
+            ItemMetaStylizerImpl.LoreFormatImpl(
                 line = node("line").requireKt<String>(),
                 header = node("header").requireKt<List<String>>().takeIf(List<String>::isNotEmpty),
                 bottom = node("bottom").requireKt<List<String>>().takeIf(List<String>::isNotEmpty)
@@ -63,12 +63,12 @@ internal class RendererConfiguration(
     /**
      * 元素的渲染格式。
      */
-    val elementFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "element")) }
+    val elementFormat: ItemMetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "element")) }
 
     /**
      * 铭刻的渲染格式。
      */
-    val kizamiFormat: MetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "kizami")) }
+    val kizamiFormat: ItemMetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "kizami")) }
 
     /**
      * 皮肤的渲染格式。
@@ -80,8 +80,8 @@ internal class RendererConfiguration(
      */
     val skinOwnerFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin_owner").requireKt<String>() }
 
-    private fun getListFormat(node: NekoConfigurationNode): MetaStylizer.ListFormat {
-        return MetaStylizerImpl.ListFormatImpl(
+    private fun getListFormat(node: NekoConfigurationNode): ItemMetaStylizer.ListFormat {
+        return ItemMetaStylizerImpl.ListFormatImpl(
             merged = node.node("merged").requireKt<String>(),
             single = node.node("single").requireKt<String>(),
             separator = node.node("separator").requireKt<String>()
@@ -219,7 +219,7 @@ internal class RendererConfiguration(
                     ret = AttributeLoreMeta(RawKey.key(rawLine), rawIndex, default, attDerivation)
                 }
 
-                rawLine.startsWith(NekoNamespaces.META + ":") -> {
+                rawLine.startsWith(NekoNamespaces.ITEM_META + ":") -> {
                     ret = MetaLoreMeta(RawKey.key(rawLine), rawIndex, default)
                 }
 

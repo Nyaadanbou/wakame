@@ -9,13 +9,13 @@ import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.toStableShort
 import net.kyori.adventure.key.Key
 
-////// Use CMD-7 to navigate the whole file
+/* Use CMD-7 to navigate the whole file */
 
-// TODO 可以进一步抽象，减少重复代码
+// TODO 减少重复代码
 
-data class EntityKillsStats(
-    override val accessor: ItemStatsAccessor,
-) : ItemStats, NumericMapLikeItemStats<Key, Int> {
+data class EntityKillsStatistics(
+    override val holder: ItemStatisticsHolder,
+) : ItemStatistics, NumericMapLikeItemStats<Key, Int> {
     override val nbtPath: String = NekoTags.Stats.ENTITY_KILLS
     override fun get(key: Key): Int = rootOrNull?.getInt(key.asString()) ?: 0
     override fun set(key: Key, value: Int) = rootOrCreate.putShort(key.asString(), value.toStableShort())
@@ -27,9 +27,9 @@ data class EntityKillsStats(
     }
 }
 
-data class PeakDamageStats(
-    override val accessor: ItemStatsAccessor,
-) : ItemStats, NumericMapLikeItemStats<Element, Int> {
+data class PeakDamageStatistics(
+    override val holder: ItemStatisticsHolder,
+) : ItemStatistics, NumericMapLikeItemStats<Element, Int> {
     override val nbtPath: String = NekoTags.Stats.PEAK_DAMAGE
     override fun get(key: Element): Int = rootOrNull?.getInt(key.key) ?: 0
     override fun set(key: Element, value: Int) = rootOrCreate.putShort(key.key, value.toStableShort())
@@ -41,9 +41,9 @@ data class PeakDamageStats(
     }
 }
 
-data class ReforgeStats(
-    override val accessor: ItemStatsAccessor,
-) : ItemStats {
+data class ReforgeStatistics(
+    override val holder: ItemStatisticsHolder,
+) : ItemStatistics {
     override val nbtPath: String = NekoTags.Stats.REFORGE
     val count: NumericSingleItemStats<Int> = object : NumericSingleItemStats<Int> {
         override val nbtPath: String = "count"
