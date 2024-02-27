@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.get
-import cc.mewcraft.wakame.item.binary.meta.orEmpty
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent
@@ -62,7 +61,7 @@ class TestListener : Listener {
         when (plainMessage) {
             "r1" -> {
                 val wrap = NekoItemStackFactory.wrap(inventory.itemInMainHand)
-                val lore = wrap.metadata.get<DisplayLoreMeta>().orEmpty()
+                val lore = wrap.metadata.get<DisplayLoreMeta, _>().orEmpty()
                 val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
             }

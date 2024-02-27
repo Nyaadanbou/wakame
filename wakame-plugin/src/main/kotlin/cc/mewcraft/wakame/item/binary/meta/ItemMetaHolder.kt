@@ -12,13 +12,13 @@ interface ItemMetaHolder {
      */
     val map: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
 
-    fun <T : BinaryItemMeta<*>> get(clazz: KClass<out T>): T?
+    fun <T : BinaryItemMeta<V>, V> get(clazz: KClass<out T>): V?
     fun <T : BinaryItemMeta<V>, V> set(clazz: KClass<out T>, value: V)
     fun <T : BinaryItemMeta<*>> remove(clazz: KClass<out T>)
 
 }
 
-inline fun <reified T : BinaryItemMeta<*>> ItemMetaHolder.get(): T? {
+inline fun <reified T : BinaryItemMeta<V>, V> ItemMetaHolder.get(): V? {
     return this.get(T::class)
 }
 

@@ -8,11 +8,11 @@ import net.kyori.adventure.key.Keyed
  * An abstraction layer of an item meta. This interface defines
  * basic read and write operations for the underlying item NBT.
  *
- * @param T the value stored in this [BinaryItemMeta]
+ * @param V the value stored in this [BinaryItemMeta]
  * @constructor the primary constructor must have
  * a single parameter of type [ItemMetaHolder]
  */
-sealed interface BinaryItemMeta<T> : Keyed {
+sealed interface BinaryItemMeta<V> : Keyed {
 
     /**
      * The key of this [BinaryItemMeta].
@@ -40,18 +40,18 @@ sealed interface BinaryItemMeta<T> : Keyed {
      *
      * @throws IllegalStateException
      */
-    fun get(): T = checkNotNull(getOrNull()) { "Can't find tag for meta '$key'" }
+    fun get(): V = checkNotNull(getOrNull()) { "Can't find tag for meta '$key'" }
 
     /**
      * Gets the value of this item meta or null.
      */
-    fun getOrNull(): T?
+    fun getOrNull(): V?
 
     /**
      * Sets the value of this item meta.
      * This will write data into the underlying NBT.
      */
-    fun set(value: T)
+    fun set(value: V)
 
     /**
      * Remove this item meta.

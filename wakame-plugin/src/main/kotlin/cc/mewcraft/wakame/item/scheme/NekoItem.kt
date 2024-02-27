@@ -41,6 +41,8 @@ interface NekoItem : Keyed {
      *   file extension
      */
     val key: Key
+
+    // Overrides Java's getter
     override fun key(): Key = key
 
     /**
@@ -52,7 +54,7 @@ interface NekoItem : Keyed {
      * The data that can be derived from other metadata such as [MaterialMeta]
      * should not be written to the NBT.
      *
-     * @see getItemMetaByClass
+     * @see getItemMetaBy
      */
     val itemMeta: Map<Key, SchemeItemMeta<*>> // TODO why not use the ClassToInstanceMap?
 
@@ -98,13 +100,13 @@ interface NekoItem : Keyed {
  * following:
  * ```kotlin
  * val item: NekoItem = < ...... >
- * val meta: ElementMeta = item.getItemMetaByClass<ElementMeta>()
+ * val meta: ElementMeta = item.getItemMetaBy<ElementMeta>()
  * ```
  *
  * @param V the subclass of [SchemeItemMeta]
  * @return the instance of class [V] from this [NekoItem]
  */
-inline fun <reified V : SchemeItemMeta<*>> NekoItem.getItemMetaByClass(): V {
+inline fun <reified V : SchemeItemMeta<*>> NekoItem.getItemMetaBy(): V {
     val key = SchemeItemMetaKeys.get<V>()
     val meta = checkNotNull(itemMeta[key])
     return meta as V

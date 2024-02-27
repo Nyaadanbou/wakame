@@ -33,7 +33,6 @@ internal class DisplayNameMeta(
         }
     }
 }
-
 internal fun DisplayNameMeta?.orEmpty(): String {
     return this?.get() ?: ""
 }

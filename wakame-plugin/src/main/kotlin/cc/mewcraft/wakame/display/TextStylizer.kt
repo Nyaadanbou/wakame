@@ -89,6 +89,12 @@ internal interface ItemMetaStylizer {
 
     /* Following are `lore` stylizers. */
 
+    /**
+     * A child stylizer is simply a stylizer abstraction of a certain
+     * type of content in the lore. See the implementations for details.
+     *
+     * @param I the input type
+     */
     fun interface ChildStylizer<I : BinaryItemMeta<*>> {
         fun stylize(input: I): List<Component>
     }

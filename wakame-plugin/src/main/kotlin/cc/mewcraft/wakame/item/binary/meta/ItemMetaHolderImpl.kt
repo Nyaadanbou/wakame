@@ -33,12 +33,13 @@ internal class ItemMetaHolderImpl(
             return ret
         }
 
-    override fun <T : BinaryItemMeta<*>> get(clazz: KClass<out T>): T? {
+    override fun <T : BinaryItemMeta<V>, V> get(clazz: KClass<out T>): V? {
         val root = rootOrNull ?: return null
         val (_, companion, constructor) = ItemMetaRegistry.reflect(clazz)
         return if (companion.contains(root)) {
+            val itemMeta = constructor.invoke(this)
             @Suppress("UNCHECKED_CAST")
-            constructor.invoke(this) as T
+            (itemMeta as T).getOrNull()
         } else {
             null
         }
@@ -46,13 +47,15 @@ internal class ItemMetaHolderImpl(
 
     override fun <T : BinaryItemMeta<V>, V> set(clazz: KClass<out T>, value: V) {
         val (_, _, constructor) = ItemMetaRegistry.reflect(clazz)
-        val itemMeta = @Suppress("UNCHECKED_CAST") (constructor.invoke(this) as T)
-        itemMeta.set(value)
+        val itemMeta = constructor.invoke(this)
+        @Suppress("UNCHECKED_CAST")
+        (itemMeta as T).set(value)
     }
 
     override fun <T : BinaryItemMeta<*>> remove(clazz: KClass<out T>) {
         val (_, _, constructor) = ItemMetaRegistry.reflect(clazz)
-        val itemMeta = @Suppress("UNCHECKED_CAST") (constructor.invoke(this) as T)
-        itemMeta.remove()
+        val itemMeta = constructor.invoke(this)
+        @Suppress("UNCHECKED_CAST")
+        (itemMeta as T).remove()
     }
 }

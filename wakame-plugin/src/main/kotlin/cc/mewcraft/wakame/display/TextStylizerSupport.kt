@@ -55,9 +55,9 @@ internal class TextStylizerImpl(
     private val attributeKeySupplier: AttributeLineKeySupplier,
 ) : TextStylizer {
     override fun stylizeName(item: NekoItemStack): Component {
-        val displayNameMeta = item.metadata.get<BDisplayNameMeta>()
-        return if (displayNameMeta != null) {
-            itemMetaStylizer.stylizeName(displayNameMeta.get())
+        val displayName = item.metadata.get<BDisplayNameMeta, _>()
+        return if (displayName != null) {
+            itemMetaStylizer.stylizeName(displayName)
         } else {
             Component.empty()
         }
@@ -255,11 +255,13 @@ internal class ItemMetaStylizerImpl(
     }
 
     override fun <I : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I> {
-        @Suppress("UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST") // Generics suck
         return childStylizerMap[clazz] as ChildStylizer<I>
     }
 
-    private inline fun <reified T : BinaryItemMeta<*>> MutableMap<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>>.registerChildStylizer(stylizer: ChildStylizer<T>) {
+    private inline fun <reified T : BinaryItemMeta<*>> MutableMap<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>>.registerChildStylizer(
+        stylizer: ChildStylizer<T>,
+    ) {
         this[T::class] = stylizer
     }
 
