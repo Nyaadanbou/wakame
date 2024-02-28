@@ -29,7 +29,7 @@ internal interface TextStylizer {
      * Generates [lore lines][LoreLine] from the [item]. The returned
      * [lore lines][LoreLine] need to be **finalized** before they are used
      * on [item]. Also, the returned collection should not contain any
-     * [fixed lore lines][FixedLoreLine].
+     * [fixed lore lines][FixedLine].
      *
      * This function won't modify the given [item].
      *

@@ -34,9 +34,9 @@ internal fun displayModule(): Module = module {
             itemMetaStylizer = new(::ItemMetaStylizerImpl),
             abilityStylizer = new(::AbilityStylizerImpl),
             attributeStylizer = AttributeStylizerImpl(get(), new(::OperationStylizerImpl)),
-            itemMetaKeySupplier = new(::MetaLineKeySupplierImpl),
-            abilityKeySupplier = new(::AbilityLineKeySupplierImpl),
-            attributeKeySupplier = new(::AttributeLineKeySupplierImpl)
+            itemMetaKeySupplier = new(::ItemMetaKeySupplierImpl),
+            abilityKeySupplier = new(::AbilityKeySupplierImpl),
+            attributeKeySupplier = new(::AttributeKeySupplierImpl)
         )
     }
 

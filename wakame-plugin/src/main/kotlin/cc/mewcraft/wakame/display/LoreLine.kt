@@ -25,19 +25,19 @@ internal sealed interface LoreLine {
 /**
  * 代表一个任意的固定内容。
  */
-internal interface FixedLoreLine : LoreLine
+internal interface FixedLine : LoreLine
 
 /**
  * 代表一个描述元数据的内容。
  */
-internal interface MetaLoreLine : LoreLine
-
-/**
- * 代表一个描述属性的内容。
- */
-internal interface AttributeLoreLine : LoreLine
+internal interface ItemMetaLine : LoreLine
 
 /**
  * 代表一个描述技能的内容。
  */
-internal interface AbilityLoreLine : LoreLine
+internal interface AbilityLine : LoreLine
+
+/**
+ * 代表一个描述属性的内容。
+ */
+internal interface AttributeLine : LoreLine

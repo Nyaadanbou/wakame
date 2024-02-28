@@ -2,22 +2,22 @@ package cc.mewcraft.wakame.display
 
 import net.kyori.adventure.text.Component
 
-internal data class FixedLoreLineImpl(
+internal data class FixedLineImpl(
     override val key: FullKey,
     override val lines: List<Component>,
-) : FixedLoreLine
+) : FixedLine
 
-internal data class MetaLoreLineImpl(
+internal data class ItemMetaLineImpl(
     override val key: FullKey,
     override val lines: List<Component>,
-) : MetaLoreLine
+) : ItemMetaLine
 
-internal data class AttributeLoreLineImpl(
+internal data class AttributeLineImpl(
     override val key: FullKey,
     override val lines: List<Component>,
-) : AttributeLoreLine
+) : AttributeLine
 
-internal data class AbilityLoreLineImpl(
+internal data class AbilityLineImpl(
     override val key: FullKey,
     override val lines: List<Component>,
-) : AbilityLoreLine
+) : AbilityLine

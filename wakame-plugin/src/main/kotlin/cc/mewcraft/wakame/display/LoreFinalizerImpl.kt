@@ -17,10 +17,12 @@ internal class LoreFinalizerImpl(
 
     override fun finalize(loreLines: Collection<LoreLine>): List<Component> {
         val holder = ObjectRBTreeSet(lineComparator)
-
-        // add lore lines and sort
         holder += loreLines
         holder += config.fixedLoreLines
+        // Adding duplicates to RBTree set makes no difference to the set.
+        // Hence, we add in the default lines at the end so that
+        // the default lines won't be added in
+        // if these lines already exist.
         holder += config.defaultLoreLines
 
         // if a line can't find a larger index
@@ -32,7 +34,7 @@ internal class LoreFinalizerImpl(
         while (iterator.hasNext()) {
             val curr = iterator.next()
             realLoreSize += curr.lines.size
-            if (curr !is FixedLoreLine) {
+            if (curr !is FixedLine) {
                 // curr 不是固定内容 - continue
                 continue
             }

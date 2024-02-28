@@ -20,6 +20,7 @@ import cc.mewcraft.wakame.util.getOrThrow
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.empty
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -50,17 +51,13 @@ internal class TextStylizerImpl(
     private val attributeStylizer: AttributeStylizer,
 
     /* full key suppliers */
-    private val itemMetaKeySupplier: MetaLineKeySupplier,
-    private val abilityKeySupplier: AbilityLineKeySupplier,
-    private val attributeKeySupplier: AttributeLineKeySupplier,
+    private val itemMetaKeySupplier: ItemMetaKeySupplier,
+    private val abilityKeySupplier: AbilityKeySupplier,
+    private val attributeKeySupplier: AttributeKeySupplier,
 ) : TextStylizer {
     override fun stylizeName(item: NekoItemStack): Component {
         val displayName = item.metadata.get<BDisplayNameMeta, _>()
-        return if (displayName != null) {
-            itemMetaStylizer.stylizeName(displayName)
-        } else {
-            Component.empty()
-        }
+        return displayName?.let(itemMetaStylizer::stylizeName) ?: empty()
     }
 
     override fun stylizeLore(item: NekoItemStack): Collection<LoreLine> {
@@ -75,22 +72,36 @@ internal class TextStylizerImpl(
             }
 
             val key = itemMetaKeySupplier.get(itemMeta)
+            if (key === SKIP_RENDERING)
+                continue
             val lines = itemMetaStylizer.getChildStylizerBy(itemMetaKClass).stylize(itemMeta)
-            val wrapped = MetaLoreLineFactory.get(key, lines)
+            val wrapped = ItemMetaLineFactory.get(key, lines)
             ret += wrapped
         }
 
         // for each cell in the item
-        item.cells.map.values.forEach {
-            val core = it.binaryCore
+        for (cell in item.cells.map.values) {
+            val core = cell.binaryCore
             if (core.isEmpty) {
-                ret += AttributeLoreLineFactory.empty() // TODO 词条栏系统应该限制可替换的核心类型
-            } else {
-                when (core) {
-                    is BinaryAbilityCore -> ret += AbilityLoreLineFactory.get(abilityKeySupplier.get(core), abilityStylizer.stylize(core))
-                    is BinaryAttributeCore -> ret += AttributeLoreLineFactory.get(attributeKeySupplier.get(core), attributeStylizer.stylize(core))
-                    else -> throw UnsupportedOperationException("${core::class.simpleName} has not yet supported to be rendered")
+                ret += AttributeLineFactory.empty() // TODO 词条栏系统应该限制可替换的核心类型
+            } else when (core) {
+                is BinaryAbilityCore -> {
+                    val key = abilityKeySupplier.get(core)
+                    if (key === SKIP_RENDERING)
+                        continue
+                    val lines = abilityStylizer.stylize(core)
+                    ret += AbilityLineFactory.get(key, lines)
                 }
+
+                is BinaryAttributeCore -> {
+                    val key = attributeKeySupplier.get(core)
+                    if (key === SKIP_RENDERING)
+                        continue
+                    val lines = attributeStylizer.stylize(core)
+                    ret += AttributeLineFactory.get(key, lines)
+                }
+
+                else -> throw UnsupportedOperationException("${core::class.simpleName} has not yet supported to be rendered")
             }
         }
 
@@ -100,8 +111,7 @@ internal class TextStylizerImpl(
 
 internal class AbilityStylizerImpl : AbilityStylizer {
     override fun stylize(core: BinaryAbilityCore): List<Component> {
-        // TODO("implement ability stylizer")
-        return emptyList()
+        return emptyList() // TODO("implement ability stylizer")
     }
 }
 

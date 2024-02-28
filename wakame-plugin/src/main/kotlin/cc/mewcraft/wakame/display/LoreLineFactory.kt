@@ -10,27 +10,28 @@ import org.koin.core.component.get
 /**
  * 获取对象的工厂。
  */
-internal object MetaLoreLineFactory {
-    fun get(key: FullKey, lines: List<Component>): MetaLoreLine {
-        return MetaLoreLineImpl(key, lines)
+internal object ItemMetaLineFactory {
+    fun get(key: FullKey, lines: List<Component>): ItemMetaLine {
+        return ItemMetaLineImpl(key, lines)
     }
 }
+
 
 /**
  * 获取对象的工厂。
  */
-internal object AttributeLoreLineFactory : KoinComponent {
-    private val EMPTY_LORE_LINE: AttributeLoreLineImpl by lazy(LazyThreadSafetyMode.NONE) {
+internal object AbilityLineFactory : KoinComponent {
+    private val EMPTY_LORE_LINE: AbilityLine by lazy(LazyThreadSafetyMode.NONE) {
         val mm = get<MiniMessage>()
-        val text = get<RendererConfiguration>().emptyAttributeText
-        AttributeLoreLineImpl(AttributeRegistry.EMPTY_KEY, text.map(mm::deserialize))
+        val text = get<RendererConfiguration>().emptyAbilityText
+        AbilityLineImpl(AbilityRegistry.EMPTY_KEY, text.map(mm::deserialize))
     }
 
-    fun get(key: FullKey, lines: List<Component>): AttributeLoreLine {
-        return AttributeLoreLineImpl(key, lines)
+    fun get(key: FullKey, lines: List<Component>): AbilityLine {
+        return AbilityLineImpl(key, lines)
     }
 
-    fun empty(): AttributeLoreLine {
+    fun empty(): AbilityLine {
         return EMPTY_LORE_LINE
     }
 }
@@ -38,18 +39,18 @@ internal object AttributeLoreLineFactory : KoinComponent {
 /**
  * 获取对象的工厂。
  */
-internal object AbilityLoreLineFactory : KoinComponent {
-    private val EMPTY_LORE_LINE: AbilityLoreLine by lazy(LazyThreadSafetyMode.NONE) {
+internal object AttributeLineFactory : KoinComponent {
+    private val EMPTY_LORE_LINE: AttributeLineImpl by lazy(LazyThreadSafetyMode.NONE) {
         val mm = get<MiniMessage>()
-        val text = get<RendererConfiguration>().emptyAbilityText
-        AbilityLoreLineImpl(AbilityRegistry.EMPTY_KEY, text.map(mm::deserialize))
+        val text = get<RendererConfiguration>().emptyAttributeText
+        AttributeLineImpl(AttributeRegistry.EMPTY_KEY, text.map(mm::deserialize))
     }
 
-    fun get(key: FullKey, lines: List<Component>): AbilityLoreLine {
-        return AbilityLoreLineImpl(key, lines)
+    fun get(key: FullKey, lines: List<Component>): AttributeLine {
+        return AttributeLineImpl(key, lines)
     }
 
-    fun empty(): AbilityLoreLine {
+    fun empty(): AttributeLine {
         return EMPTY_LORE_LINE
     }
 }

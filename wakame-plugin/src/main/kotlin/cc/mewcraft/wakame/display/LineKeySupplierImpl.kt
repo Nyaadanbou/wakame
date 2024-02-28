@@ -12,10 +12,15 @@ import net.kyori.adventure.key.Key
 
 // TODO 统一 key 的生成实现
 
-internal class AbilityLineKeySupplierImpl : AbilityLineKeySupplier {
+internal class AbilityKeySupplierImpl(
+    private val config: RendererConfiguration,
+) : AbilityKeySupplier {
     override fun get(obj: BinaryAbilityCore): FullKey {
-        // 技能在 NBT 中的 key 就是它的 full key
-        return obj.key
+        val fullKey = obj.key // 技能的 Full Key 就是它在 NBT 中的 Key
+        val rawKey = fullKey // 技能的 Raw Key 跟它的 Full Key 一致
+        return if (rawKey !in config.rawKeys) {
+            SKIP_RENDERING
+        } else fullKey
     }
 }
 
@@ -23,7 +28,9 @@ internal class AbilityLineKeySupplierImpl : AbilityLineKeySupplier {
 private typealias AttributeKeyTable1<K1, K2, V> = Object2ObjectOpenHashMap<K1, Reference2ObjectOpenHashMap<K2, V>>
 private typealias AttributeKeyTable2<K1, K2, K3, V> = Object2ObjectOpenHashMap<K1, Reference2ObjectOpenHashMap<K2, Reference2ObjectOpenHashMap<K3, V>>>
 
-internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
+internal class AttributeKeySupplierImpl(
+    private val config: RendererConfiguration,
+) : AttributeKeySupplier {
     //<editor-fold desc="Implementation of a Map indexed by triple keys">
     /**
      * Full Keys in this map are double-indexed: `key` + `operation`.
@@ -40,7 +47,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
      * Caches a full key from the given triple indexes.
      */
     @Suppress("ReplacePutWithAssignment")
-    private fun put(key: Key, operation: Operation, element: Element? = null, fullKey: FullKey) {
+    private fun put(key: RawKey, operation: Operation, element: Element? = null, fullKey: FullKey) {
         if (element == null) {
             cachedFullKeys
                 .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) } // 运算模式最多3个
@@ -56,7 +63,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     /**
      * Gets a full key from the given triple indexes.
      */
-    private fun get(key: Key, operation: Operation, element: Element? = null): FullKey? {
+    private fun get(key: RawKey, operation: Operation, element: Element? = null): FullKey? {
         return if (element == null) {
             cachedFullKeys[key]?.get(operation)
         } else {
@@ -65,7 +72,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     }
 
     /**
-     * Returns the full key for the given triple indexes ([key], [operation],
+     * Returns the full key for the given triple indexes ([rawKey], [operation],
      * [element]) if the full key is cached and not `null`. Otherwise, calls
      * the [defaultValue] function, puts its result into the cache under the
      * given indexes and returns the call result.
@@ -74,15 +81,15 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
      * being modified concurrently.
      */
     private inline fun getOrPut(
-        key: Key,
+        rawKey: RawKey,
         operation: Operation,
         element: Element? = null,
-        defaultValue: () -> Key,
+        defaultValue: () -> FullKey,
     ): FullKey {
-        val value = get(key, operation, element)
+        val value = get(rawKey, operation, element)
         return if (value == null) {
             val answer = defaultValue()
-            put(key, operation, element, answer)
+            put(rawKey, operation, element, answer)
             answer
         } else {
             value
@@ -94,7 +101,7 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
      *
      * @return the old cache
      */
-    private fun remove(key: Key, operation: Operation, element: Element? = null): FullKey? {
+    private fun remove(key: RawKey, operation: Operation, element: Element? = null): FullKey? {
         if (element == null) {
             val map1 = cachedFullKeys[key] ?: return null
             val value = map1.remove(operation)
@@ -118,17 +125,19 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
     //</editor-fold>
 
     override fun get(obj: BinaryAttributeCore): FullKey {
-        // 属性的 full key 根据 id + operation + element 共同决定
-        // 属性的 full key 格式目前只有两种
-        // 1. attribute:_id_/_operation             <- 由运算模式衍生
-        // 2. attribute:_id_/_operation_/_element_  <- 由元素种类衍生
+        // 属性的 Full Key 目前有两种
+        //   attribute:_id_._operation             <- 由 运算模式 衍生
+        //   attribute:_id_._operation_._element_  <- 由 运算模式 & 元素种类 衍生
 
-        val key = obj.key
+        val rawKey = obj.key
+        if (rawKey !in config.rawKeys) {
+            return SKIP_RENDERING
+        }
         val operation = obj.value.operation
         val element = obj.value.elementOrNull
-        val fullKey = getOrPut(key, operation, element) {
+        val fullKey = getOrPut(rawKey, operation, element) {
             val newValue = buildString {
-                append(key.value())
+                append(rawKey.value())
                 append(".")
                 append(operation.key)
                 element?.let {
@@ -136,15 +145,20 @@ internal class AttributeLineKeySupplierImpl : AttributeLineKeySupplier {
                     append(it.key)
                 }
             }
-            Key.key(key.namespace(), newValue)
+            Key.key(rawKey.namespace(), newValue)
         }
         return fullKey
     }
 }
 
-internal class MetaLineKeySupplierImpl : MetaLineKeySupplier {
+internal class ItemMetaKeySupplierImpl(
+    private val config: RendererConfiguration,
+) : ItemMetaKeySupplier {
     override fun get(obj: BinaryItemMeta<*>): FullKey {
-        // 元数据的 key 就是它的 full key
-        return obj.key
+        val fullKey = obj.key // 元数据的 Full Key 就是它的 Key
+        val rawKey = fullKey // 元数据的 Raw Key 跟它的 Full Key 一致
+        return if (rawKey !in config.rawKeys) {
+            SKIP_RENDERING
+        } else fullKey
     }
 }

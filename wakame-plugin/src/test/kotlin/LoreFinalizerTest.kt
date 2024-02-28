@@ -59,9 +59,9 @@ class LoreFinalizerTest : KoinTest {
 
     private val Component.plain: String get() = PlainTextComponentSerializer.plainText().serialize(this)
     private fun Component.contains(x: String): Boolean = this.plain.contains(x)
-    private fun MetaLoreLineFactory.get(x: String): MetaLoreLine = this.get(FullKey.key(x), listText(x))
-    private fun AbilityLoreLineFactory.get(x: String): AbilityLoreLine = this.get(FullKey.key(x), listText(x))
-    private fun AttributeLoreLineFactory.get(x: String): AttributeLoreLine = this.get(FullKey.key(x), listText(x))
+    private fun ItemMetaLineFactory.get(x: String): ItemMetaLine = this.get(FullKey.key(x), listText(x))
+    private fun AbilityLineFactory.get(x: String): AbilityLine = this.get(FullKey.key(x), listText(x))
+    private fun AttributeLineFactory.get(x: String): AttributeLine = this.get(FullKey.key(x), listText(x))
 
     private fun buildTest(loreLines: Collection<LoreLine>) {
         val logger = get<Logger>()
@@ -77,11 +77,11 @@ class LoreFinalizerTest : KoinTest {
     @Test
     fun `test finalize lore lines 1`() {
         val loreLines = listOf(
-            MetaLoreLineFactory.get("meta:level"),
-            MetaLoreLineFactory.get("meta:rarity"),
-            MetaLoreLineFactory.get("meta:element"),
-            MetaLoreLineFactory.get("meta:kizami"),
-            MetaLoreLineFactory.get("meta:lore"),
+            ItemMetaLineFactory.get("meta:level"),
+            ItemMetaLineFactory.get("meta:rarity"),
+            ItemMetaLineFactory.get("meta:element"),
+            ItemMetaLineFactory.get("meta:kizami"),
+            ItemMetaLineFactory.get("meta:lore"),
         )
         buildTest(loreLines)
     }
@@ -89,15 +89,15 @@ class LoreFinalizerTest : KoinTest {
     @Test
     fun `test finalize lore lines 2`() {
         val loreLines = listOf(
-            MetaLoreLineFactory.get("meta:level"),
-            MetaLoreLineFactory.get("meta:rarity"),
-            MetaLoreLineFactory.get("meta:element"),
-            MetaLoreLineFactory.get("meta:kizami"),
-            MetaLoreLineFactory.get("meta:lore"),
-            AttributeLoreLineFactory.get("attribute:attack_effect_chance.add"),
-            AttributeLoreLineFactory.get("attribute:attack_speed_level.add"),
-            AttributeLoreLineFactory.get("attribute:critical_strike_chance.add"),
-            AttributeLoreLineFactory.get("attribute:max_mana.add"),
+            ItemMetaLineFactory.get("meta:level"),
+            ItemMetaLineFactory.get("meta:rarity"),
+            ItemMetaLineFactory.get("meta:element"),
+            ItemMetaLineFactory.get("meta:kizami"),
+            ItemMetaLineFactory.get("meta:lore"),
+            AttributeLineFactory.get("attribute:attack_effect_chance.add"),
+            AttributeLineFactory.get("attribute:attack_speed_level.add"),
+            AttributeLineFactory.get("attribute:critical_strike_chance.add"),
+            AttributeLineFactory.get("attribute:max_mana.add"),
         )
         buildTest(loreLines)
     }
@@ -105,18 +105,18 @@ class LoreFinalizerTest : KoinTest {
     @Test
     fun `test finalize lore lines 3`() {
         val loreLines = listOf(
-            MetaLoreLineFactory.get("meta:level"),
-            MetaLoreLineFactory.get("meta:rarity"),
-            MetaLoreLineFactory.get("meta:element"),
-            MetaLoreLineFactory.get("meta:kizami"),
-            MetaLoreLineFactory.get("meta:lore"),
-            AttributeLoreLineFactory.get("attribute:attack_effect_chance.add"),
-            AttributeLoreLineFactory.get("attribute:attack_speed_level.add"),
-            AttributeLoreLineFactory.get("attribute:critical_strike_chance.add"),
-            AttributeLoreLineFactory.get("attribute:max_mana.add"),
-            AbilityLoreLineFactory.get("ability:blink"),
-            AbilityLoreLineFactory.get("ability:frost"),
-            AbilityLoreLineFactory.get("ability:leapfrog"),
+            ItemMetaLineFactory.get("meta:level"),
+            ItemMetaLineFactory.get("meta:rarity"),
+            ItemMetaLineFactory.get("meta:element"),
+            ItemMetaLineFactory.get("meta:kizami"),
+            ItemMetaLineFactory.get("meta:lore"),
+            AttributeLineFactory.get("attribute:attack_effect_chance.add"),
+            AttributeLineFactory.get("attribute:attack_speed_level.add"),
+            AttributeLineFactory.get("attribute:critical_strike_chance.add"),
+            AttributeLineFactory.get("attribute:max_mana.add"),
+            AbilityLineFactory.get("ability:blink"),
+            AbilityLineFactory.get("ability:frost"),
+            AbilityLineFactory.get("ability:leapfrog"),
         )
         buildTest(loreLines)
     }
@@ -124,29 +124,29 @@ class LoreFinalizerTest : KoinTest {
     @Test
     fun `test finalize lore lines 4`() {
         val loreLines = listOf(
-            MetaLoreLineFactory.get("meta:level"),
-            MetaLoreLineFactory.get("meta:rarity"),
-            AttributeLoreLineFactory.get("attribute:empty"),
-            AttributeLoreLineFactory.get("attribute:max_mana.add"),
-            AbilityLoreLineFactory.get("ability:empty"),
-            AbilityLoreLineFactory.get("ability:frost"),
+            ItemMetaLineFactory.get("meta:level"),
+            ItemMetaLineFactory.get("meta:rarity"),
+            AttributeLineFactory.get("attribute:empty"),
+            AttributeLineFactory.get("attribute:max_mana.add"),
+            AbilityLineFactory.get("ability:empty"),
+            AbilityLineFactory.get("ability:frost"),
         )
         buildTest(loreLines)
     }
 
-    @Test
+    @Test // TODO mock NekoItemStack to allow for omitting certain content
     fun `test finalize lore lines 5`() {
         val loreLines = listOf(
-            MetaLoreLineFactory.get("meta:level"),
-            MetaLoreLineFactory.get("meta:rarity"),
-            AttributeLoreLineFactory.get("attribute:attack_damage.add.fire"),
-            AttributeLoreLineFactory.get("attribute:attack_damage.add.water"),
-            AttributeLoreLineFactory.get("attribute:attack_damage.multiply_base.fire"),
-            AttributeLoreLineFactory.get("attribute:attack_damage.multiply_base.water"),
-            AttributeLoreLineFactory.get("attribute:attack_effect_chance.add"),
-            AttributeLoreLineFactory.get("attribute:attack_speed_level.add"),
-            AbilityLoreLineFactory.get("ability:empty"),
-            AbilityLoreLineFactory.get("ability:frost"),
+            ItemMetaLineFactory.get("meta:level"),
+            ItemMetaLineFactory.get("meta:rarity"),
+            AttributeLineFactory.get("attribute:attack_damage.add.fire"),
+            AttributeLineFactory.get("attribute:attack_damage.add.water"),
+            AttributeLineFactory.get("attribute:attack_damage.multiply_base.fire"),
+            AttributeLineFactory.get("attribute:attack_damage.multiply_base.water"),
+            AttributeLineFactory.get("attribute:attack_effect_chance.add"),
+            AttributeLineFactory.get("attribute:attack_speed_level.add"),
+            AbilityLineFactory.get("ability:empty"),
+            AbilityLineFactory.get("ability:frost"),
         )
         buildTest(loreLines)
     }

@@ -161,6 +161,13 @@ internal class RendererConfiguration(
 
     //<editor-fold desc="renderer_layout">
     /**
+     * 所有的 [RawKey]，用于判断内容是否需要渲染。
+     *
+     * 如果一个 [RawKey] 不在该集合里，则说明不应该渲染。
+     */
+    val rawKeys: Set<RawKey> get() = _rawKeys
+
+    /**
      * 用于查询指定内容的 [LoreMeta]。
      */
     val loreMetaLookup: Map<FullKey, LoreMeta> get() = _loreMetaLookup
@@ -171,7 +178,7 @@ internal class RendererConfiguration(
     val loreIndexLookup: Map<FullKey, FullIndex> get() = _loreIndexLookup
 
     /**
-     * 始终要渲染的内容。
+     * 始终要渲染的内容。这些内容的文本在物品中始终不变。
      */
     val fixedLoreLines: Collection<LoreLine> get() = _fixedLoreLines
 
@@ -180,12 +187,14 @@ internal class RendererConfiguration(
      */
     val defaultLoreLines: Collection<LoreLine> get() = _defaultLoreLines
 
+    private val _rawKeys: MutableSet<RawKey> = ConcurrentHashMap.newKeySet()
     private val _loreMetaLookup: MutableMap<FullKey, LoreMeta> = ConcurrentHashMap()
     private val _loreIndexLookup: MutableMap<FullKey, FullIndex> = ConcurrentHashMap()
     private val _fixedLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
     private val _defaultLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
 
     private fun loadLayout() {
+        _rawKeys.clear()
         _loreMetaLookup.clear()
         _loreIndexLookup.clear()
         _fixedLoreLines.clear()
@@ -291,7 +300,10 @@ internal class RendererConfiguration(
         for ((rawIndex, rawLine) in primaryLines.withIndex()) {
             val loreMeta = createLoreMeta(rawIndex, rawLine)
 
-            loreMeta.fullIndexes(accIndexOffset).forEach { (fullKey, fullIndex) ->
+            // populate the raw keys
+            _rawKeys += loreMeta.rawKey
+
+            val fullIndexes = loreMeta.fullIndexes(accIndexOffset).onEach { (fullKey, fullIndex) ->
                 // populate the index lookup
                 val absent = (_loreIndexLookup.putIfAbsent(fullKey, fullIndex) == null)
                 require(absent) { "Key $fullKey has already been added to indexes" }
@@ -299,12 +311,13 @@ internal class RendererConfiguration(
                 // populate the meta lookup
                 _loreMetaLookup[fullKey] = loreMeta
             }
-
-            accIndexOffset += loreMeta.fullKeys.size - 1 // plus the number of derived lines
+            // Accumulate the number of derived lines.
+            // Minus one to neglect non-derived lines.
+            accIndexOffset += fullIndexes.size - 1
 
             // populate the fixed lore lines
             if (loreMeta is FixedLoreMeta) {
-                _fixedLoreLines += FixedLoreLineImpl(loreMeta.fullKeys.first(), loreMeta.components)
+                _fixedLoreLines += FixedLineImpl(loreMeta.fullKeys.first(), loreMeta.components)
             }
 
             // populate the default lore lines
@@ -314,9 +327,9 @@ internal class RendererConfiguration(
                 // if the lore meta has a default value, add it to the default lore lines
                 _defaultLoreLines += loreMeta.fullKeys.map { key ->
                     when (loreMeta) {
-                        is AbilityLoreMeta -> AbilityLoreLineImpl(key, default)
-                        is AttributeLoreMeta -> AttributeLoreLineImpl(key, default)
-                        is MetaLoreMeta -> MetaLoreLineImpl(key, default)
+                        is AbilityLoreMeta -> AbilityLineImpl(key, default)
+                        is AttributeLoreMeta -> AttributeLineImpl(key, default)
+                        is MetaLoreMeta -> ItemMetaLineImpl(key, default)
                     }
                 }
             }
