@@ -17,7 +17,7 @@ data class EntityKillsCurse(
 ) : SchemeCurse {
 
     override fun generate(context: SchemeGenerationContext): BinaryCurse {
-        val randomCount = count.calculate(context.itemLevel).toStableInt()
+        val randomCount = count.calculate(context.level).toStableInt()
         return EntityKillsCurse(index, randomCount)
     }
 

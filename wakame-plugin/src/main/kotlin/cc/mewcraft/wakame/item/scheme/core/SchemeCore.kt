@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.scheme.core
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.BinaryCoreValue
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.SchemeCoreValue
@@ -26,9 +25,3 @@ sealed interface SchemeCore : Core {
      */
     fun generate(context: SchemeGenerationContext): BinaryCoreValue
 }
-
-/**
- * Gets the empty core.
- */
-fun emptySchemeCore(): SchemeCore = @OptIn(InternalApi::class) EmptySchemeCore
-

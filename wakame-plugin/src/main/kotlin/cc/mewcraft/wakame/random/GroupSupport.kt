@@ -30,7 +30,7 @@ internal class ImmutableGroup<S, C : SelectionContext>(
         return default.pick(context)
     }
 
-    override fun pickOne(context: C): S? {
+    override fun pickSingle(context: C): S? {
         return pick(context).firstOrNull()
     }
 }
@@ -47,6 +47,6 @@ internal object EmptyGroup : Group<Nothing, SelectionContext> {
     override val conditions: List<Condition<SelectionContext>> = Collections.emptyList()
     override val default: Pool<Nothing, SelectionContext> = Pool.empty()
 
-    override fun pickOne(context: SelectionContext): Nothing? = null
+    override fun pickSingle(context: SelectionContext): Nothing? = null
     override fun pick(context: SelectionContext): List<Nothing> = Collections.emptyList()
 }

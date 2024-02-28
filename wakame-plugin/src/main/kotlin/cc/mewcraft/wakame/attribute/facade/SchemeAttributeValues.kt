@@ -138,19 +138,24 @@ data object SchemeAttributeValueSerializerLUE : SchemeAttributeValueSerializer {
 }
 //</editor-fold>
 
-private fun deserializeSingle(node: ConfigurationNode): NumericValue =
-    node.node("value").requireKt<NumericValue>()
+private fun deserializeSingle(node: ConfigurationNode): NumericValue {
+    return node.node("value").requireKt<NumericValue>()
+}
 
-private fun deserializeLower(node: ConfigurationNode): NumericValue =
-    node.node("lower").requireKt<NumericValue>()
+private fun deserializeLower(node: ConfigurationNode): NumericValue {
+    return node.node("lower").requireKt<NumericValue>()
+}
 
-private fun deserializeUpper(node: ConfigurationNode): NumericValue =
-    node.node("upper").requireKt<NumericValue>()
+private fun deserializeUpper(node: ConfigurationNode): NumericValue {
+    return node.node("upper").requireKt<NumericValue>()
+}
 
-private fun deserializeElement(node: ConfigurationNode): Element =
-    node.node("element").requireKt<Element>()
+private fun deserializeElement(node: ConfigurationNode): Element {
+    return node.node("element").requireKt<Element>()
+}
 
-private fun deserializeOperation(node: ConfigurationNode): AttributeModifier.Operation =
-    node.node("operation").string
+private fun deserializeOperation(node: ConfigurationNode): AttributeModifier.Operation {
+    return node.node("operation").string
         ?.let { AttributeModifier.Operation.byKey(it) }
         ?: AttributeModifier.Operation.ADD // ADDITION by default
+}

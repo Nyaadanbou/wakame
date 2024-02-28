@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValue
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.core.EmptySchemeCore
 import cc.mewcraft.wakame.item.scheme.core.SchemeAbilityCore
 import cc.mewcraft.wakame.item.scheme.core.SchemeAttributeCore
 import cc.mewcraft.wakame.item.scheme.core.SchemeCore
@@ -65,11 +64,7 @@ object BinaryCoreFactory {
     fun generate(context: SchemeGenerationContext, schemeCore: SchemeCore): BinaryCore {
         val ret: BinaryCore
 
-        @OptIn(InternalApi::class) when (schemeCore) {
-            is EmptySchemeCore -> {
-                ret = emptyBinaryCore()
-            }
-
+        when (schemeCore) {
             is SchemeAbilityCore -> {
                 // val value = schemeCore.generate(context.itemLevel)
                 // ret = BinaryAbilityCore(schemeCore.key(), value)

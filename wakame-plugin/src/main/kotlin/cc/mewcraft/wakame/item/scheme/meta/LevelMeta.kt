@@ -50,7 +50,7 @@ data class LevelMeta(
         return ret
             .coerceAtLeast(1) // by design, level never goes down below 1
             .also {
-                context.itemLevel = it // leave trace to the context
+                context.level = it // leave trace to the context
             }
     }
 

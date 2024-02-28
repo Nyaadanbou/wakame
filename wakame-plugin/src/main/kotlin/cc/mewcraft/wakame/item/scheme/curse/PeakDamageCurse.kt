@@ -17,7 +17,7 @@ data class PeakDamageCurse(
 ) : SchemeCurse {
 
     override fun generate(context: SchemeGenerationContext): BinaryCurse {
-        val randomAmount = amount.calculate(context.itemLevel).toStableInt()
+        val randomAmount = amount.calculate(context.level).toStableInt()
         return PeakDamageCurse(element, randomAmount)
     }
 

@@ -60,7 +60,7 @@ interface Pool<S, C : SelectionContext> {
             val builder = PoolBuilderImpl<S, C>().apply(block)
             val ret = ImmutablePool(
                 samples = builder.samples,
-                pickCount = builder.pickCount,
+                pickCount = builder.pickAmount,
                 isReplacement = builder.isReplacement,
                 conditions = builder.conditions,
             )
@@ -77,7 +77,7 @@ interface Pool<S, C : SelectionContext> {
  */
 interface PoolBuilder<S, C : SelectionContext> {
     val samples: MutableList<Sample<S, C>>
-    var pickCount: Long
+    var pickAmount: Long
     var isReplacement: Boolean
     val conditions: MutableList<Condition<C>>
 }

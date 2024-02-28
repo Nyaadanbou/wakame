@@ -51,7 +51,7 @@ interface Group<S, C : SelectionContext> {
      *
      * Use this function if you just want to pick a single [S].
      */
-    fun pickOne(context: C): S?
+    fun pickSingle(context: C): S?
 
     companion object Factory {
         fun <S, C : SelectionContext> empty(): Group<S, C> = @OptIn(InternalApi::class) @Suppress("UNCHECKED_CAST") (EmptyGroup as Group<S, C>)

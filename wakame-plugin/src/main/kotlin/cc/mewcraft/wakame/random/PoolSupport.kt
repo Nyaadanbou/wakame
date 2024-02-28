@@ -61,7 +61,7 @@ internal class ImmutablePool<S, C : SelectionContext>(
 
 internal class PoolBuilderImpl<S, C : SelectionContext> : PoolBuilder<S, C> {
     override val samples: MutableList<Sample<S, C>> = ArrayList()
-    override var pickCount: Long = 1
+    override var pickAmount: Long = 1
     override var isReplacement = false
     override val conditions: MutableList<Condition<C>> = ArrayList()
 }

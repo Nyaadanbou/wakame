@@ -166,7 +166,7 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
             return Pool.build {
                 samples += deserializeSampleList(node.node("entries"))
                 conditions += deserializeConditionList(node.node("filters"))
-                pickCount = node.node("sample").getLong(1)
+                pickAmount = node.node("sample").getLong(1)
                 isReplacement = node.node("replacement").getBoolean(false)
 
                 builderApply(this)

@@ -44,8 +44,8 @@ object BinaryCellFactory {
             canReforge = compoundTag.getBoolean(NekoTags.Cell.CAN_REFORGE),
             canOverride = compoundTag.getBoolean(NekoTags.Cell.CAN_OVERRIDE),
             binaryCore = BinaryCoreFactory.decode(compoundTag.getCompound(NekoTags.Cell.CORE)), // TODO optimization: avoid creating empty compound
-            binaryCurse = BinaryCurseFactory.decode(compoundTag.getCompound(NekoTags.Cell.CURSE)), // TODO optimization: avoid creating empty compound
-            reforgeMeta = ReforgeMetaFactory.decode(compoundTag.getCompound(NekoTags.Cell.REFORGE)) // TODO optimization: avoid creating empty compound
+            binaryCurse = BinaryCurseFactory.decode(compoundTag.getCompound(NekoTags.Cell.CURSE)),
+            reforgeMeta = ReforgeMetaFactory.decode(compoundTag.getCompound(NekoTags.Cell.REFORGE))
         )
     }
 
@@ -62,7 +62,7 @@ object BinaryCellFactory {
      */
     fun generate(context: SchemeGenerationContext, schemeCell: SchemeCell): BinaryCell? {
         // make a core
-        val schemeCore = schemeCell.coreSelector.pickOne(context)
+        val schemeCore = schemeCell.coreSelector.pickSingle(context)
         val binaryCore = if (schemeCore != null) {
             // something is drawn out
             BinaryCoreFactory.generate(context, schemeCore)
@@ -77,7 +77,7 @@ object BinaryCellFactory {
         }
 
         // make a curse
-        val schemeCurse = schemeCell.curseSelector.pickOne(context) ?: emptySchemeCurse()
+        val schemeCurse = schemeCell.curseSelector.pickSingle(context) ?: emptySchemeCurse()
         val binaryCurse = schemeCurse.generate(context)
 
         // make a reforge meta (empty for new cell)

@@ -34,7 +34,7 @@ data class SchemeAbilityCore(
         // 技能依赖的外部数值，目前包括属性数值，触发时才会知道。这部分取决于技能的具体实现
 
         val baker = @OptIn(InternalApi::class) AbilityRegistry.schemeBakerRegistry.getOrThrow(key)
-        val value = baker.bake(value, context.itemLevel) as BinaryAbilityValue
+        val value = baker.bake(value, context.level) as BinaryAbilityValue
         return value
     }
 }

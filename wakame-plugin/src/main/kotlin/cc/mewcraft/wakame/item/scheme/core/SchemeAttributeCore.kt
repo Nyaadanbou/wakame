@@ -27,6 +27,6 @@ data class SchemeAttributeCore(
      * @return a new instance
      */
     override fun generate(context: SchemeGenerationContext): BinaryCoreValue {
-        return value.realize(context.itemLevel)
+        return value.realize(context.level)
     }
 }

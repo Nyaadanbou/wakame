@@ -13,6 +13,6 @@ data class ItemLevelFilter(
      * [level].
      */
     override fun test0(context: SchemeGenerationContext): Boolean {
-        return context.itemLevel in level
+        return context.level in level
     }
 }
