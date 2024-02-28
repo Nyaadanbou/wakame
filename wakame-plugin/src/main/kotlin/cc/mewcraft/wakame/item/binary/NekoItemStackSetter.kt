@@ -20,6 +20,11 @@ interface NekoItemStackSetter {
     fun putRoot(compoundTag: CompoundShadowTag)
 
     /**
+     * Sets seed.
+     */
+    fun putSeed(seed: Long)
+
+    /**
      * Sets key.
      */
     fun putKey(key: Key)

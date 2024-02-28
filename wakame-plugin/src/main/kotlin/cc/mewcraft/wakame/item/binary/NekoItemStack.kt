@@ -87,6 +87,13 @@ interface NekoItemStack : NekoItemStackSetter {
     val scheme: NekoItem
 
     /**
+     * The random seed from which this item is generated.
+     *
+     * @throws NullPointerException if this is not a legal neko item
+     */
+    val seed: Long
+
+    /**
      * The namespace of this item.
      *
      * @throws NullPointerException if this is not a legal neko item
@@ -140,13 +147,6 @@ interface NekoItemStack : NekoItemStackSetter {
      * @throws NullPointerException if this is not a legal neko item
      */
     val statistics: ItemStatisticsHolder
-
-    /**
-     * The seed of this item.
-     *
-     * @throws NullPointerException if this is not a legal neko item
-     */
-    val seed: Long
 
     override fun hashCode(): Int
     override fun equals(other: Any?): Boolean

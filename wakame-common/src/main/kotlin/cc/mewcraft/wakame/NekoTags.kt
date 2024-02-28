@@ -6,6 +6,7 @@ object NekoTags {
     object Root {
         const val NAMESPACE = "ns"
         const val ID = "id"
+        const val SEED = "seed"
     }
 
     object Ability {

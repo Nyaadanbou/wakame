@@ -61,6 +61,9 @@ internal class NekoItemStackImpl(
         get() = NekoItemRegistry.get(key)
             ?: throw NullPointerException()
 
+    override val seed: Long
+        get() = tags.getLong(NekoTags.Root.SEED)
+
     override val namespace: String
         get() = tags.getString(NekoTags.Root.NAMESPACE)
 
@@ -101,6 +104,10 @@ internal class NekoItemStackImpl(
 
     override fun putRoot(compoundTag: CompoundShadowTag) {
         handle.nekoCompound = compoundTag
+    }
+
+    override fun putSeed(seed: Long) {
+        tags.putLong(NekoTags.Root.SEED, seed)
     }
 
     override fun putKey(key: Key) {
