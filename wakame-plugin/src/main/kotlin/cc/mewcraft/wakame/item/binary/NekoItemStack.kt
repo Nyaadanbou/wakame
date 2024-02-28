@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.binary
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolder
@@ -15,10 +14,9 @@ import java.util.UUID
  * To get an instance of [NekoItemStack], use [NekoItemStackFactory].
  *
  * This class provides several properties to work with the underlying item
- * stack, mainly manipulating the non-vanilla NBT tags of it, such as:
+ * stack, mainly manipulating the non-vanilla NBT tags, such as:
  * - checking whether the item is a neko item
- * - getting the identifier of the neko item
- * - retrieving the NBT tags of the bukkit item
+ * - look up the identifier of the neko item
  */
 interface NekoItemStack : NekoItemStackSetter {
     /**
@@ -28,13 +26,14 @@ interface NekoItemStack : NekoItemStackSetter {
      *
      * ## When it is backed by a NMS object
      *
-     * Any changes on `this` will be reflected on the underlying game world.
+     * Any changes on `this` will reflect on the underlying game world.
      *
      * ## When it is backed by a strictly-Bukkit object
      *
-     * Any changes on `this` will **not** be reflected on the underlying game
-     * world. In such case, `this` is primarily used to add a new [ItemStack]
-     * to the underlying game world, such as giving it to the player.
+     * Any changes on `this` will **not** reflect on the underlying game
+     * world (if you've already added this item to the world). In such case,
+     * `this` is primarily used to add a new [ItemStack] to the underlying
+     * game world, such as giving it to players and dropping it on the ground.
      *
      * @see isOneOff
      */
@@ -59,7 +58,7 @@ interface NekoItemStack : NekoItemStackSetter {
      * [Interface ItemStacks](https://github.com/orgs/PaperMC/projects/6#).
      * At that time, this property will probably no longer be needed.
      *
-     * Please keep an eye on this kdoc. I will add notes here as soon as
+     * Please keep an eye on this kdoc. I will add notes to here as soon as
      * anything has changed.
      *
      * @see handle

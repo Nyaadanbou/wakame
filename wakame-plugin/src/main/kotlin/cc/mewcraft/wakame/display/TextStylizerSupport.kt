@@ -67,9 +67,15 @@ internal class TextStylizerImpl(
         val ret = ObjectArrayList<LoreLine>(16)
 
         // for each meta in the item
-        item.metadata.map.forEach { (k, v) ->
-            val key = itemMetaKeySupplier.get(v)
-            val lines = itemMetaStylizer.getChildStylizerBy(k).stylize(v)
+        for ((itemMetaKClass, itemMeta) in item.metadata.map) {
+            // Somehow the `::class` on the same type can return different KClass references.
+            // We have to use the `.java` to compare references. Kotlin sucks this time :(
+            if (itemMetaKClass.java === BDisplayNameMeta::class.java) {
+                continue // displayName has been rendered separately
+            }
+
+            val key = itemMetaKeySupplier.get(itemMeta)
+            val lines = itemMetaStylizer.getChildStylizerBy(itemMetaKClass).stylize(itemMeta)
             val wrapped = MetaLoreLineFactory.get(key, lines)
             ret += wrapped
         }

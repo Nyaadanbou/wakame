@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaCompanion
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
@@ -13,7 +14,7 @@ import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.javaConstructor
 import kotlin.reflect.typeOf
 
-internal object ItemMetaRegistry {
+internal object ItemMetaRegistry : Initializable {
     private val binaryItemMetaClasses: Collection<KClass<out BinaryItemMeta<*>>> = BinaryItemMeta::class.sealedSubclasses
 
     private val binaryItemMetaCompanions: Map<KClass<out BinaryItemMeta<*>>, ItemMetaCompanion> = binaryItemMetaClasses.associateWith {
@@ -36,8 +37,8 @@ internal object ItemMetaRegistry {
         MethodHandles.publicLookup().unreflectConstructor(primaryConstructor.javaConstructor)
     }
 
-    private val binaryItemMetaReflectionLookup: Map<KClass<out BinaryItemMeta<*>>, ItemMetaReflection> = buildMap {
-        binaryItemMetaClasses.associateWith { ItemMetaReflection(it, binaryItemMetaCompanions[it]!!, binaryItemMetaConstructors[it]!!) }
+    private val binaryItemMetaReflectionLookup: Map<KClass<out BinaryItemMeta<*>>, ItemMetaReflection> = binaryItemMetaClasses.associateWith {
+        ItemMetaReflection(it, binaryItemMetaCompanions[it]!!, binaryItemMetaConstructors[it]!!)
     }
 
     private val itemMetaReflections: Collection<ItemMetaReflection> = binaryItemMetaReflectionLookup.values
@@ -48,6 +49,10 @@ internal object ItemMetaRegistry {
 
     fun reflect(clazz: KClass<out BinaryItemMeta<*>>): ItemMetaReflection {
         return requireNotNull(binaryItemMetaReflectionLookup[clazz]) { "The class ${clazz.qualifiedName} is not registered" }
+    }
+
+    override fun onPreWorld() {
+        // Nothing to specifically initialize here. The ClassLoader is enough to do the job.
     }
 }
 

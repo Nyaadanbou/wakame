@@ -25,7 +25,7 @@ internal class ItemCellHolderImpl(
     //  the caching mechanism should be implemented properly
     //  in a wider scope of the project to make it effective,
     //  not just here
-    private val cache: Object2ObjectMap<String, BinaryCell> by lazy(LazyThreadSafetyMode.NONE) { Object2ObjectArrayMap() } // cache binary cells
+    private val cache: Object2ObjectMap<String, BinaryCell> = Object2ObjectArrayMap() // cache binary cells
 
     private val rootOrNull: CompoundShadowTag?
         get() = base.tags.getCompoundOrNull(NekoTags.Cell.ROOT)
@@ -34,9 +34,9 @@ internal class ItemCellHolderImpl(
 
     override val map: Map<String, BinaryCell>
         get() {
-            val tags = rootOrNull ?: return emptyMap()
-            val ret = Object2ObjectArrayMap<String, BinaryCell>(tags.size()) // pre-allocate
-            for (key in tags.keySet()) {
+            val root = rootOrNull ?: return emptyMap()
+            val ret = Object2ObjectArrayMap<String, BinaryCell>(root.size())
+            for (key in root.keySet()) {
                 get(key)?.let { ret.put(key, it) }
             }
             return ret
@@ -44,14 +44,7 @@ internal class ItemCellHolderImpl(
 
     override fun get(id: String): BinaryCell? {
         val compoundTag = rootOrNull?.getCompoundOrNull(id) ?: return null
-        // don't use computeIfAbsent to avoid creating non-capturing lambda
-        var cell = cache[id]
-        if (cell == null) {
-            cell = BinaryCellFactory.decode(compoundTag)
-            cache[id] = cell
-            return cell
-        }
-        return cell
+        return cache.getOrPut(id) { BinaryCellFactory.decode(compoundTag) }
     }
 
     override fun getModifiers(): Multimap<out Attribute, AttributeModifier> {
@@ -61,7 +54,6 @@ internal class ItemCellHolderImpl(
         // 并且 Operation 不同的情况
 
         val multimap = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
-
         for (binaryCell in map.values) {
             if (!binaryCell.binaryCurse.test(base)) {
                 continue // curse has not been unlocked yet
@@ -74,7 +66,6 @@ internal class ItemCellHolderImpl(
                 multimap.putAll(modifiersEntries)
             }
         }
-
         return multimap.build()
     }
 
@@ -85,19 +76,19 @@ internal class ItemCellHolderImpl(
     /* Setters */
 
     override fun put(id: String, cell: BinaryCell) {
-        cache.remove(id) // remove cache
+        cache.remove(id) // invalidate cache
         rootOrCreate.put(id, cell.asShadowTag())
     }
 
     override fun edit(id: String, setter: BinaryCell?.() -> BinaryCell) {
-        cache.remove(id)
+        cache.remove(id) // invalidate cache
         val oldCell = get(id)
         val newCell = oldCell.setter()
         rootOrCreate.put(id, newCell.asShadowTag())
     }
 
     override fun remove(id: String) {
-        cache.remove(id) // remove cache
+        cache.remove(id) // invalidate cache
         rootOrNull?.remove(id)
     }
 }

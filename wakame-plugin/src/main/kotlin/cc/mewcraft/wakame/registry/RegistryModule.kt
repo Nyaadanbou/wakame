@@ -60,6 +60,7 @@ internal fun registryModule(): Module = module {
     single { AttributeRegistry } bind Initializable::class
     single { ElementRegistry } bind Initializable::class
     single { EntityReferenceRegistry } bind Initializable::class
+    single { ItemMetaRegistry } bind Initializable::class
     single { ItemSkinRegistry } bind Initializable::class
     single { KizamiRegistry } bind Initializable::class
     single { NekoItemRegistry } bind Initializable::class

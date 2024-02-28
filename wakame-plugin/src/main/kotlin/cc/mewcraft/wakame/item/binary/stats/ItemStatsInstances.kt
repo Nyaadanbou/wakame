@@ -16,7 +16,8 @@ import net.kyori.adventure.key.Key
 data class EntityKillsStatistics(
     override val holder: ItemStatisticsHolder,
 ) : ItemStatistics, NumericMapLikeItemStats<Key, Int> {
-    override val nbtPath: String = NekoTags.Stats.ENTITY_KILLS
+    override val nbtPath: String get() = NekoTags.Stats.ENTITY_KILLS
+
     override fun get(key: Key): Int = rootOrNull?.getInt(key.asString()) ?: 0
     override fun set(key: Key, value: Int) = rootOrCreate.putShort(key.asString(), value.toStableShort())
     override fun increment(key: Key, value: Int) {
@@ -30,7 +31,8 @@ data class EntityKillsStatistics(
 data class PeakDamageStatistics(
     override val holder: ItemStatisticsHolder,
 ) : ItemStatistics, NumericMapLikeItemStats<Element, Int> {
-    override val nbtPath: String = NekoTags.Stats.PEAK_DAMAGE
+    override val nbtPath: String get() = NekoTags.Stats.PEAK_DAMAGE
+
     override fun get(key: Element): Int = rootOrNull?.getInt(key.key) ?: 0
     override fun set(key: Element, value: Int) = rootOrCreate.putShort(key.key, value.toStableShort())
     override fun increment(key: Element, value: Int) {
@@ -44,7 +46,8 @@ data class PeakDamageStatistics(
 data class ReforgeStatistics(
     override val holder: ItemStatisticsHolder,
 ) : ItemStatistics {
-    override val nbtPath: String = NekoTags.Stats.REFORGE
+    override val nbtPath: String get() = NekoTags.Stats.REFORGE
+
     val count: NumericSingleItemStats<Int> = object : NumericSingleItemStats<Int> {
         override val nbtPath: String = "count"
         override fun get(): Int = rootOrNull?.getInt(nbtPath) ?: 0
