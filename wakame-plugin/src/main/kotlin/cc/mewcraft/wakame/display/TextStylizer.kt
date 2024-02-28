@@ -81,11 +81,9 @@ internal interface ItemMetaStylizer {
     /* First is the `name` stylizer. */
 
     /**
-     * Stylizes the given [name].
-     *
-     * This function is intentionally separated from the lore stylization.
+     * Stylizes the name of given [item] and returns the component.
      */
-    fun stylizeName(name: String): Component
+    fun stylizeName(item: NekoItemStack): Component
 
     /* Following are `lore` stylizers. */
 
@@ -96,12 +94,18 @@ internal interface ItemMetaStylizer {
      * @param I the input type
      */
     fun interface ChildStylizer<I : BinaryItemMeta<*>> {
+        /**
+         * Stylizes the item meta and returns a list of components.
+         *
+         * @param input the input
+         * @return stylized content
+         */
         fun stylize(input: I): List<Component>
     }
 
     /**
-     * To implementer: Every [BinaryItemMeta] to be rendered should have a
-     * corresponding [ChildStylizer] in this map.
+     * To implementer: Every [BinaryItemMeta] (except display name) to be rendered
+     * should have a corresponding [ChildStylizer] in this map.
      *
      * Map specifications: `map key` is class of [BinaryItemMeta] and `map value` is
      * corresponding [stylizer][ChildStylizer].

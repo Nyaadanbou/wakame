@@ -4,7 +4,6 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
-import java.text.DecimalFormat
 import java.util.concurrent.ThreadLocalRandom
 
 /**
@@ -87,9 +86,6 @@ data class NumericValue(
     }
 
     companion object Factory {
-        private val DECIMAL_FORMAT: DecimalFormat = DecimalFormat("0.####")
-        private val CONFIG_SERIALIZER: TypeSerializer<NumericValue> = NumericValueSerializer()
-
         /**
          * Creates an instance from a string.
          *
@@ -124,7 +120,7 @@ data class NumericValue(
          * @return an instance
          */
         fun create(node: ConfigurationNode): NumericValue {
-            return CONFIG_SERIALIZER.deserialize(NumericValue::class.java, node)
+            return NumericValueSerializer.deserialize(NumericValue::class.java, node)
         }
     }
 
@@ -196,7 +192,7 @@ data class NumericValue(
     }
 }
 
-internal class NumericValueSerializer : TypeSerializer<NumericValue> {
+internal object NumericValueSerializer : TypeSerializer<NumericValue> {
     override fun deserialize(type: Type, node: ConfigurationNode): NumericValue {
         val scalar = node.rawScalar()
         if (scalar != null) {

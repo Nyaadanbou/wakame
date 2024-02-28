@@ -13,7 +13,7 @@
 #
 # 语法说明：
 # primary:
-#   TODO 完成实现后再补充
+#   见内部的注释
 # element:
 #   见内部的注释
 # operation:
@@ -21,19 +21,28 @@
 renderer_layout:
 
   # 主体排序
+  # 定义各种内容的顺序
+  #
+  # 语法说明：
+  # (fixed)_文本内容或留空_
+  # (fixed:_namespace_)_文本内容或留空_
+  # (fixed:*)_文本内容或留空_
+  # (default:_文本内容_)_namespace:value_
+  # (default:empty)_namespace:value_
+  # _namespace:value_
   primary:
     - (fixed:meta)<!i><aqua><b>元数据 # 仅当下面存在 meta 命名空间下的内容时才渲染
-    - meta:level # 必须写命名空间形式的唯一标识 (namespace:value)
+    - meta:level # 必须写命名空间形式的唯一标识
     - meta:rarity
     - meta:element
     - meta:kizami
     - (default:<!i><gray>无皮肤所有者)meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
     - (default:empty)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
     - meta:lore
-    - (fixed)
-    - (fixed)<!i><gray>---------------- # 这三行内容应该始终显示
-    - (fixed)
-    - (fixed:attribute)<!i><aqua><b>属性\r第二行属性介绍awa # 仅当下面存在 attribute 命名空间下的内容时才渲染
+    - (fixed) # 这行始终显示
+    - (fixed)<!i><gray>---------------- # 这行始终显示
+    - (fixed) # 这行始终显示
+    - (fixed:attribute)<!i><aqua><b>属性\r第二行属性介绍awa
     - attribute:empty # 空的属性（用于标记空属性栏的相对位置）
     - attribute:attack_damage
     - attribute:attack_effect_chance
@@ -55,7 +64,7 @@ renderer_layout:
     - attribute:max_health
     - attribute:max_mana
     - attribute:movement_speed_rate
-    - (fixed:ability)<!i><aqua><b>技能 # 仅当下面存在 ability 命名空间下的内容时才渲染
+    - (fixed:ability)<!i><aqua><b>技能
     - ability:empty # 空的技能（用于标记空技能栏的相对位置）
     - ability:blink
     - ability:cyclone
@@ -68,7 +77,7 @@ renderer_layout:
     - ability:sproink
     - ability:stab
     - ability:waterball
-    - (fixed:*)<!i><gray>这行将不会被渲染 # 仅当下面存在任意命名空间下的内容时才渲染（不包括“不存在内容”的情况）
+    - (fixed:*)<!i><gray>这行将不会被渲染 # 仅当下面存在任意命名空间下的内容时才渲染（不包括“无内容”的情况）
 
   # 元素排序
   # 同种属性，不同元素标识，都将按照此顺序渲染
@@ -101,19 +110,38 @@ renderer_style:
 
   # 元数据样式
   meta:
-    name: "<!i><value>"
+
+    # 物品的名字
+    #
+    # 额外标签：
+    # <rarity_style>
+    name: "<!i><rarity_style><value>"
+
+    # 物品的等级
     level: "<!i>等级: <value>"
+
+    # 物品的稀有度
     rarity: "<!i>稀有度: <value>"
+
+    # 物品的元素
     element:
       merged: "<!i>元素: <merged>"
       single: "<single>"
       separator: ", "
+
+    # 物品的铭刻
     kizami:
       merged: "<!i>铭刻: <merged>"
       single: "<single>"
       separator: ", "
+
+    # 物品的皮肤
     skin: "<!i>皮肤: <value>"
+
+    # 物品的皮肤所有者
     skin_owner: "<!i>皮肤所有者: <value>"
+
+    # 物品的描述
     lore:
       line: "<!i><line>"
       header: [ ] # 空列表代表完全没有，不代表空行

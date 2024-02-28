@@ -13,8 +13,10 @@ import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.core.isEmpty
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
+import cc.mewcraft.wakame.item.binary.meta.RarityMeta
 import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.getOrThrow
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
@@ -32,6 +34,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 import kotlin.reflect.KClass
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta as BDisplayNameMeta
@@ -56,8 +61,7 @@ internal class TextStylizerImpl(
     private val attributeKeySupplier: AttributeKeySupplier,
 ) : TextStylizer {
     override fun stylizeName(item: NekoItemStack): Component {
-        val displayName = item.metadata.get<BDisplayNameMeta, _>()
-        return displayName?.let(itemMetaStylizer::stylizeName) ?: empty()
+        return itemMetaStylizer.stylizeName(item)
     }
 
     override fun stylizeLore(item: NekoItemStack): Collection<LoreLine> {
@@ -204,13 +208,13 @@ internal class AttributeStylizerImpl(
 
             is BinaryAttributeValueSE -> tagResolvers.resolvers(
                 number("value", value.value, value.operation),
-                component("element", value.element.displayNameComponent)
+                component("element", value.element.displayName)
             )
 
             is BinaryAttributeValueLUE -> tagResolvers.resolvers(
                 number("min", value.lower, value.operation),
                 number("max", value.upper, value.operation),
-                component("element", value.element.displayNameComponent)
+                component("element", value.element.displayName)
             )
 
             else -> error("Unhandled attribute struct. Missing implementation?")
@@ -243,9 +247,30 @@ internal class ItemMetaStylizerImpl(
 ) : KoinComponent, ItemMetaStylizer {
 
     private val mm: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
+    private val rarityStyleTagCache: MutableMap<Rarity, Tag> by reloadable { HashMap() }
 
-    override fun stylizeName(name: String): Component {
-        return mm.deserialize(config.nameFormat, parsed("value", name))
+    override fun stylizeName(item: NekoItemStack): Component {
+        val displayName = item.metadata.get<BDisplayNameMeta, _>()
+        return if (displayName != null) {
+            val resolvers = TagResolver.builder()
+
+            // resolve name
+            resolvers.resolver(parsed("value", displayName))
+
+            // resolve rarity style
+            val rarity = item.metadata.get<RarityMeta, _>()
+            if (rarity != null) {
+                rarityStyleTagCache.getOrPut(rarity) {
+                    Tag.styling(*rarity.styles)
+                }.let {
+                    resolvers.tag("rarity_style", it)
+                }
+            }
+
+            mm.deserialize(config.nameFormat, resolvers.build())
+        } else {
+            empty()
+        }
     }
 
     override val childStylizerMap: Map<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>> = buildMap {
@@ -263,10 +288,10 @@ internal class ItemMetaStylizerImpl(
             else error("Should not happen")
         }
         registerChildStylizer<BLevelMeta> { listOf(mm.deserialize(config.levelFormat, component("value", text(it.get())))) }
-        registerChildStylizer<BRarityMeta> { listOf(mm.deserialize(config.rarityFormat, component("value", it.get().displayNameComponent))) }
-        registerChildStylizer<BElementMeta> { stylizeList(it.get(), config.elementFormat, Element::displayNameComponent) }
-        registerChildStylizer<BKizamiMeta> { stylizeList(it.get(), config.kizamiFormat, Kizami::displayNameComponent) }
-        registerChildStylizer<BSkinMeta> { listOf(mm.deserialize(config.skinFormat, component("value", it.get().displayNameComponent))) }
+        registerChildStylizer<BRarityMeta> { listOf(mm.deserialize(config.rarityFormat, component("value", it.get().displayName))) }
+        registerChildStylizer<BElementMeta> { stylizeList(it.get(), config.elementFormat, Element::displayName) }
+        registerChildStylizer<BKizamiMeta> { stylizeList(it.get(), config.kizamiFormat, Kizami::displayName) }
+        registerChildStylizer<BSkinMeta> { listOf(mm.deserialize(config.skinFormat, component("value", it.get().displayName))) }
         registerChildStylizer<BSkinOwnerMeta> { listOf(mm.deserialize(config.skinOwnerFormat, unparsed("value", it.get().toString()))) }
     }
 

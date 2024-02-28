@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.FriendlyNamed
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.ElementRegistry
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.format.StyleBuilderApplicable
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 
 /**
  * **DO NOT CONSTRUCT IT YOURSELF!**
@@ -17,11 +17,9 @@ import org.koin.core.component.get
 data class Element @InternalApi internal constructor(
     override val key: String,
     override val binary: Byte,
-    override val displayName: String,
+    override val displayName: Component,
+    override val styles: Array<StyleBuilderApplicable>,
 ) : KoinComponent, FriendlyNamed, BiIdentified<String, Byte> {
-
-    override val displayNameComponent: Component = get<MiniMessage>().deserialize(displayName)
-
     // Instances of this class might be used as map keys
     // So we need to properly implement hashCode() and equals()
     // FIXME we might not need this because if we don't override hashCode/equals,
@@ -37,5 +35,9 @@ data class Element @InternalApi internal constructor(
 
     override fun hashCode(): Int {
         return key.hashCode()
+    }
+
+    override fun toString(): String {
+        return PlainTextComponentSerializer.plainText().serialize(displayName)
     }
 }

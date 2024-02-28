@@ -3,8 +3,10 @@ package cc.mewcraft.wakame.rarity
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.RarityRegistry
-import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.toStableByte
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -33,9 +35,10 @@ internal class RaritySerializer : SchemeSerializer<Rarity> {
         }
 
         // if it's structure 2
-        val name = node.key().toString()
+        val key = node.key().toString()
         val binary = node.node("binary_index").requireKt<Int>().toStableByte()
-        val displayName = node.node("display_name").requireKt<String>()
-        return (@OptIn(InternalApi::class) Rarity(name, binary, displayName))
+        val displayName = node.node("display_name").requireKt<Component>()
+        val styles = node.node("styles").requireKt<Array<StyleBuilderApplicable>>()
+        return (@OptIn(InternalApi::class) Rarity(key, binary, displayName, styles))
     }
 }

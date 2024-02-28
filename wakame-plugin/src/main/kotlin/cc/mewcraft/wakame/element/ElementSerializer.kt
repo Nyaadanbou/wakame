@@ -3,8 +3,10 @@ package cc.mewcraft.wakame.element
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.toStableByte
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -32,10 +34,10 @@ internal class ElementSerializer : SchemeSerializer<Element> {
         }
 
         // if it's structure 2
-        val elementName = node.key().toString()
-        val binaryIndex = node.node("binary_index").requireKt<Int>().toStableByte()
-        val displayName = node.node("display_name").requireKt<String>()
-        val element = @OptIn(InternalApi::class) Element(elementName, binaryIndex, displayName)
-        return element
+        val key = node.key().toString()
+        val binary = node.node("binary_index").requireKt<Int>().toStableByte()
+        val displayName = node.node("display_name").requireKt<Component>()
+        val styles = node.node("styles").requireKt<Array<StyleBuilderApplicable>>()
+        return (@OptIn(InternalApi::class) Element(key, binary, displayName, styles))
     }
 }

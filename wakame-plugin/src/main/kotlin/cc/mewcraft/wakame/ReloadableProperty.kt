@@ -8,6 +8,7 @@ import org.bukkit.event.Listener
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
+import kotlin.reflect.jvm.javaField
 
 fun <T> reloadable(loader: () -> T): ReloadableProperty<T> = ReloadableProperty(loader)
 
@@ -17,8 +18,8 @@ class ReloadableProperty<T>(
     private var value: T? = null
 
     // for debug purpose
-    private var property: KProperty<*>? = null
-    private var declaringClass: KClass<*>? = null
+    private var property: String? = null
+    private var declaringClass: String? = null
 
     init {
         if (!TestEnvironment.isRunningJUnit()) {
@@ -42,16 +43,16 @@ class ReloadableProperty<T>(
     }
 
     private fun reload() {
-        println("[ReloadableProperty] '${declaringClass?.simpleName}.${property?.name}' has been reloaded")
+        println("[ReloadableProperty] '${declaringClass}.${property}' has been reloaded")
         value = null
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         if (this.property == null) {
-            this.property = property
+            this.property = property.name
         }
-        if (this.declaringClass == null && thisRef != null) {
-            this.declaringClass = thisRef::class
+        if (this.declaringClass == null) {
+            this.declaringClass = property.javaField?.declaringClass?.name
         }
         return get()
     }

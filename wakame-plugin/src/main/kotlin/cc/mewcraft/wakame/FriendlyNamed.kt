@@ -1,21 +1,21 @@
 package cc.mewcraft.wakame
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.koin.core.component.KoinComponent
 
 interface FriendlyNamed : KoinComponent {
     /**
      * The display name that end-users can understand.
-     *
-     * It's a MiniMessage string, so it should not be sent directly to
-     * end-users.
      */
-    val displayName: String
+    val displayName: Component
 
     /**
-     * The display name that end-users can understand.
+     * The styles provided by this object.
      *
-     * It should be a [component][Component] deserialized from [displayName].
+     * Note that the style has nothing to do with [displayName].
+     * It solely serves the purpose of applying special styles
+     * to other components.
      */
-    val displayNameComponent: Component
+    val styles: Array<StyleBuilderApplicable>
 }

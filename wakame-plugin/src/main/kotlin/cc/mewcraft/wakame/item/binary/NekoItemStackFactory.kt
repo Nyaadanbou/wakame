@@ -21,7 +21,7 @@ object NekoItemStackFactory {
      *     backed by an NMS object
      */
     fun wrap(craftItemStack: ItemStack): NekoItemStack {
-        require(craftItemStack.isNmsObjectBacked) { "Can't wrap a non NMS-backed ItemStack as WakaItemStack" }
+        require(craftItemStack.isNmsObjectBacked) { "Can't wrap a non NMS-backed ItemStack as NekoItemStack" }
         return NekoItemStackImpl(craftItemStack)
     }
 

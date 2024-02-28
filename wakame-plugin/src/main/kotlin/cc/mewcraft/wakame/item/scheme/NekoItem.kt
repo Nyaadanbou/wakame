@@ -76,7 +76,7 @@ interface NekoItem : Keyed {
      * @param player the player for whom the item is generated
      * @return an once-off [NekoItemStack]
      */
-    fun createItemStack(player: Player?): NekoItemStack
+    fun createItemStack(player: Player?): NekoItemStack // TODO move to a separated interface
 
     /**
      * Generates an [ItemStack] from this scheme.
@@ -89,8 +89,6 @@ interface NekoItem : Keyed {
      */
     fun createItemStack(crate: BinaryCrate): NekoItemStack
 }
-
-////// Extension functions //////
 
 /**
  * Gets specified [SchemeItemMeta] from this [NekoItem].

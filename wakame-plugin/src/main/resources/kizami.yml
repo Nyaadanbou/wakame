@@ -6,19 +6,24 @@ kizami:
   wood: # 铭刻的唯一标识，一旦确定不要修改
     binary_index: 0 # 铭刻的二进制索引，一旦确定不要修改
     display_name: 木 # 铭刻的展示名字，也是玩家看到的铭刻名字
+    styles: "<white>" # 铭刻提供的风格样式，用于影响其他文本内容
 
   iron:
     binary_index: 1
     display_name: 铁
+    styles: "<white>"
 
   gold:
     binary_index: 2
     display_name: 金
+    styles: "<white>"
 
   diamond:
     binary_index: 3
     display_name: 钻石
+    styles: "<white>"
 
   netherite:
     binary_index: 4
     display_name: 下届合金
+    styles: "<white>"
