@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.Curse
+import cc.mewcraft.wakame.item.scheme.filter.AttributeContextHolder
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random.BasicSelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
@@ -34,7 +35,7 @@ class SchemeGenerationContext(
     /**
      * 已经生成的物品等级。
      */
-    var itemLevel: Int by WatchedPrimitive(1)
+    var level: Int by WatchedPrimitive(1)
 
     /**
      * 已经生成的 [Rarity].
@@ -60,4 +61,9 @@ class SchemeGenerationContext(
      * 已经生成的 [Curse].
      */
     val curseKeys: MutableCollection<Key> by WatchedSet(ObjectArraySet(8))
+
+    /**
+     * 已经生成的 [AttributeContextHolder].
+     */
+    val attributes: MutableCollection<AttributeContextHolder> by WatchedSet(ObjectArraySet(8))
 }

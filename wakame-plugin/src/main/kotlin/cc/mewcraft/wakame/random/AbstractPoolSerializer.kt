@@ -91,6 +91,13 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
 
     // region Subclasses may optionally override these members
     /**
+     * Defines the "intrinsic" conditions of each sample in the pool.
+     *
+     * @return the intrinsic conditions
+     */
+    protected open fun intrinsicConditions(content: S): Condition<C> = Condition.alwaysTrue()
+
+    /**
      * The factory to create [Condition] from a [ConfigurationNode]. The
      * structure of the passed-in node is as following:
      * ```yaml
@@ -138,6 +145,7 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
             Sample.build(content) {
                 weight = n.node("weight").requireKt<Double>()
                 conditions += deserializeConditionList(n.node("filters"))
+                conditions += intrinsicConditions(content)
                 mark = n.node("mark").string?.let { Mark.stringMarkOf(it) }
                 trace = {
                     // add the mark to the context

@@ -1,8 +1,11 @@
 package cc.mewcraft.wakame.item.scheme.core
 
+import cc.mewcraft.wakame.attribute.facade.elementOrNull
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCorePool
+import cc.mewcraft.wakame.item.scheme.filter.AttributeFilter
+import cc.mewcraft.wakame.item.scheme.filter.CoreFilter
 import cc.mewcraft.wakame.item.scheme.filter.FilterFactory
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
@@ -66,6 +69,15 @@ internal class SchemeCorePoolSerializer : AbstractPoolSerializer<SchemeCore, Sch
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemeGenerationContext> {
         return FilterFactory.create(node)
+    }
+
+    override fun intrinsicConditions(content: SchemeCore): Condition<SchemeGenerationContext> {
+        return when (content) {
+            // We need to compare key + operation + element for attributes
+            is SchemeAttributeCore -> AttributeFilter(true, content.key, content.value.operation, content.value.elementOrNull)
+            // We only need to compare key for abilities
+            is SchemeAbilityCore -> CoreFilter(true, content.key)
+        }
     }
 
     override fun traceApply(content: SchemeCore, context: SchemeGenerationContext) {

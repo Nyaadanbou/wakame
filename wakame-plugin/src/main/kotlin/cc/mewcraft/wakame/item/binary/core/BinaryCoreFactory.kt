@@ -4,10 +4,12 @@ import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValue
+import cc.mewcraft.wakame.attribute.facade.elementOrNull
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.core.SchemeAbilityCore
 import cc.mewcraft.wakame.item.scheme.core.SchemeAttributeCore
 import cc.mewcraft.wakame.item.scheme.core.SchemeCore
+import cc.mewcraft.wakame.item.scheme.filter.AttributeContextHolder
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.getOrThrow
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -74,6 +76,11 @@ object BinaryCoreFactory {
             is SchemeAttributeCore -> {
                 val value = schemeCore.generate(context) as BinaryAttributeValue
                 ret = BinaryAttributeCore(schemeCore.key(), value)
+
+                // add the generated result to the context
+                val attributeValue = ret.value
+                val attributeContextHolder = AttributeContextHolder(ret.key, attributeValue.operation, attributeValue.elementOrNull)
+                context.attributes += attributeContextHolder
             }
         }
 

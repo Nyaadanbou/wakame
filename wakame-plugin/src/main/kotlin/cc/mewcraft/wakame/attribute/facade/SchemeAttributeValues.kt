@@ -41,6 +41,12 @@ sealed interface SchemeAttributeValueElement : SchemeAttributeValue {
 }
 
 /**
+ * 快速获得属性数据的元素类型。
+ */
+val SchemeAttributeValue.elementOrNull: Element?
+    get() = (this as? SchemeAttributeValueElement)?.element
+
+/**
  * 代表一个属性模板的序列化器。
  */
 sealed interface SchemeAttributeValueSerializer {
