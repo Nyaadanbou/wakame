@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.attribute.base
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -11,25 +13,21 @@ import java.util.*
  * **Not thread-safe.**
  */
 sealed class AttributeAccessor<T : Entity> {
-    protected val cacheMap: MutableMap<UUID, AttributeMap> = HashMap()
-
-    /**
-     * Gets the [AttributeMap] for the entity specified by [uuid].
-     */
-    abstract fun getAttributeMap(uuid: UUID): AttributeMap
+    protected val cacheMap: Cache<UUID, AttributeMap> = CacheBuilder.newBuilder()
+        .weakValues()
+        .build()
 
     /**
      * Gets the [AttributeMap] for the [entity].
      */
-    fun getAttributeMap(entity: T): AttributeMap {
-        return getAttributeMap(entity.uniqueId)
-    }
+    abstract fun getAttributeMap(entity: T): AttributeMap
 
     /**
      * Removes the [AttributeMap] from memory for the [entity].
      */
     fun removeAttributeMap(entity: T) {
-        cacheMap.remove(entity.uniqueId)
+        cacheMap.getIfPresent(entity.uniqueId)?.clearAllModifiers()
+        cacheMap.invalidate(entity.uniqueId)
     }
 }
 
@@ -39,9 +37,9 @@ sealed class AttributeAccessor<T : Entity> {
  * **Not thread-safe.**
  */
 class PlayerAttributeAccessor : AttributeAccessor<Player>() {
-    override fun getAttributeMap(uuid: UUID): AttributeMap {
-        return cacheMap.computeIfAbsent(uuid) {
-            AttributeMap(DefaultAttributes.getSupplier(EntityType.PLAYER))
+    override fun getAttributeMap(entity: Player): AttributeMap {
+        return cacheMap.get(entity.uniqueId) {
+            AttributeMap(DefaultAttributes.getSupplier(EntityType.PLAYER), entity)
         }
     }
 }
@@ -52,7 +50,7 @@ class PlayerAttributeAccessor : AttributeAccessor<Player>() {
  * **Not thread-safe.**
  */
 class EntityAttributeAccessor : AttributeAccessor<Entity>() {
-    override fun getAttributeMap(uuid: UUID): AttributeMap {
+    override fun getAttributeMap(entity: Entity): AttributeMap {
         TODO("Read the NBT on the entity. Use cache if feasible")
     }
 }

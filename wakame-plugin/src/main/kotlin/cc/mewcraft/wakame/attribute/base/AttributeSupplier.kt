@@ -19,7 +19,7 @@ class AttributeSupplier(
 
     fun createAttributeInstance(attribute: Attribute): AttributeInstance? {
         val attributeInstance = instances[attribute] ?: return null
-        val attributeInstance2 = AttributeInstance(attribute)
+        val attributeInstance2 = WakameAttributeInstance(attribute)
         attributeInstance2.replace(attributeInstance)
         return attributeInstance2
     }
@@ -51,7 +51,7 @@ class AttributeSupplier(
         private val builder: MutableMap<Attribute, AttributeInstance> = HashMap()
 
         private fun create(attribute: Attribute): AttributeInstance {
-            val attributeInstance = AttributeInstance(attribute)
+            val attributeInstance = WakameAttributeInstance(attribute)
             builder[attribute] = attributeInstance
             return attributeInstance
         }

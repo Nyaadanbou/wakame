@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.initializer
 
 import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.attribute.base.AttributeHandler
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.display.ItemRendererListener
@@ -126,6 +127,7 @@ object Initializer : KoinComponent, Listener {
     private fun registerListeners() = with(plugin) {
         registerTerminableListener(get<TestListener>()).bindWith(this)
         registerTerminableListener(get<ItemRendererListener>()).bindWith(this)
+        registerTerminableListener(get<AttributeHandler>()).bindWith(this)
     }
 
     private fun executeReload() {

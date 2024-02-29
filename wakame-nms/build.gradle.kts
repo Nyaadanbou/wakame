@@ -12,6 +12,9 @@ dependencies {
     // server
     paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
 
+    // bytebuddy
+    implementation(libs.bytebuddy)
+
     // helper
     compileOnly(libs.helper)
 

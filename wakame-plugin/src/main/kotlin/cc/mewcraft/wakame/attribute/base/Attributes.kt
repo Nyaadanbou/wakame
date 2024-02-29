@@ -115,6 +115,16 @@ object Attributes {
     fun byElement(attribute: ElementAttributes.() -> ElementAttribute): (Element) -> ElementAttribute {
         return { element -> byElement(element).attribute() }
     }
+
+    fun isVanilla(attribute: Attribute): Boolean {
+        return attribute in setOf(
+            MAX_HEALTH,
+            MAX_ABSORPTION,
+            MOVEMENT_SPEED_RATE,
+            BLOCK_INTERACTION_RANGE,
+            ENTITY_INTERACTION_RANGE
+        )
+    }
 }
 
 /**

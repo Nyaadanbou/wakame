@@ -13,7 +13,6 @@ data class AttributeModifier(
     val amount: Double,
     val operation: Operation,
 ) {
-
     constructor(id: UUID, amount: Double, operation: Operation) : this(
         id, null, amount, operation
     )

@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.attribute.base
 
+import cc.mewcraft.wakame.util.toBukkit
 import com.google.common.collect.Multimap
-import org.koin.core.component.KoinComponent
-import java.util.UUID
+import org.bukkit.entity.LivingEntity
+import java.util.*
 
 /**
  * This class contains attribute information about a player.
@@ -14,7 +15,8 @@ import java.util.UUID
  */
 class AttributeMap(
     private val defaultSupplier: AttributeSupplier,
-) : KoinComponent {
+    private val entity: LivingEntity,
+) {
     private val attributes: MutableMap<Attribute, AttributeInstance> = HashMap()
 
     operator fun get(attribute: Attribute): AttributeInstance? {
@@ -27,6 +29,17 @@ class AttributeMap(
         // See: https://youtrack.jetbrains.com/issue/KT-10982
         val oldValue = attributes[attribute]
         if (oldValue == null) {
+            if (Attributes.isVanilla(attribute)) {
+                val bukkitAttribute = attribute.toBukkit()
+                val bukkitInstance = entity.getAttribute(bukkitAttribute)
+                if (bukkitInstance != null) {
+                    val instance = VanillaAttributeInstanceWrapper(bukkitInstance)
+                    attributes[attribute] = instance
+                    return instance
+                }
+                throw IllegalArgumentException("Can't find vanilla attribute instance for $attribute")
+            }
+
             val newValue = defaultSupplier.createAttributeInstance(attribute)
             if (newValue != null) {
                 attributes[attribute] = newValue
@@ -41,7 +54,14 @@ class AttributeMap(
     }
 
     fun registerAttribute(attributeBase: Attribute) {
-        val attributeModifiable = AttributeInstance(attributeBase)
+        if (Attributes.isVanilla(attributeBase)) {
+            val bukkitAttribute = attributeBase.toBukkit()
+            entity.registerAttribute(bukkitAttribute)
+            attributes[attributeBase] = VanillaAttributeInstanceWrapper(entity.getAttribute(bukkitAttribute)!!)
+            return
+        }
+
+        val attributeModifiable = WakameAttributeInstance(attributeBase)
         attributes[attributeBase] = attributeModifiable
     }
 
@@ -79,6 +99,12 @@ class AttributeMap(
                 instance.removeModifier(modifier)
                 instance.addModifier(modifier)
             }
+        }
+    }
+
+    fun clearAllModifiers() {
+        for (instance in attributes.values) {
+            instance.removeModifiers()
         }
     }
 

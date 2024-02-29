@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.attribute.base
 
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
-import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
+import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent
 import me.lucko.helper.Schedulers
 import me.lucko.helper.terminable.Terminable
 import me.lucko.helper.terminable.TerminableConsumer
@@ -64,24 +64,6 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
     }
 
     @EventHandler(ignoreCancelled = true)
-    fun onEquipArmor(e: PlayerArmorChangeEvent) {
-        val player = e.player
-        val oldItem = e.oldItem
-        val newItem = e.newItem
-        if (oldItem.isEmpty && !newItem.isEmpty) {
-            // 原本没穿，换了新的
-            addAttributeModifiers(newItem, player)
-        } else if (!oldItem.isEmpty && newItem.isEmpty) {
-            // 原本穿了，脱下来了
-            removeAttributeModifiers(oldItem, player)
-        } else if (!newItem.isEmpty && !oldItem.isEmpty) {
-            // 原本穿了，换了新的
-            removeAttributeModifiers(oldItem, player)
-            addAttributeModifiers(newItem, player)
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
     fun onHoldItem(e: PlayerItemHeldEvent) {
         val player = e.player
         val inventory = player.inventory
@@ -89,6 +71,13 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
         val currItem = inventory.getItem(e.newSlot)
         removeAttributeModifiers(prevItem, player)
         addAttributeModifiers(currItem, player)
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    fun onInventoryChange(e: PlayerInventorySlotChangeEvent) {
+        val player = e.player
+        removeAttributeModifiers(e.oldItemStack, player)
+        addAttributeModifiers(e.newItemStack, player)
     }
 
     ////// Private Func //////
