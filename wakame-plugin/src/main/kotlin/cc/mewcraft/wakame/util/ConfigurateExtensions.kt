@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.spatula.utils.RangeParser
 import com.google.common.collect.Range
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component

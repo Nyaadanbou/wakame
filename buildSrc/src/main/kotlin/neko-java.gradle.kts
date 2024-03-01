@@ -1,18 +1,11 @@
 plugins {
     `java-library`
-    id("neko.repositories") version "1.0"
     id("net.kyori.indra")
     id("com.github.johnrengelman.shadow")
 }
 
-group = "cc.mewcraft.wakame"
-version = "1.0.0"
-description = "Add custom stuff to server"
-
 dependencies {
-    compileOnly(project(":wakame-common"))
-    compileOnly(libs.server.purpur)
-    compileOnly(libs.checker.qual)
+    compileOnly("org.checkerframework", "checker-qual", Versions.CheckframeworkQual)
 }
 
 tasks {

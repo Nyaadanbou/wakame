@@ -1,6 +1,6 @@
 plugins {
-    id("cc.mewcraft.repo-conventions")
-    id("cc.mewcraft.kotlin-conventions")
+    id("neko.repositories") version "1.0"
+    id("neko-kotlin")
 }
 
 group = "cc.mewcraft.wakame"
@@ -15,9 +15,11 @@ dependencies {
     compileOnly(libs.helper)
 
     // internal
-    compileOnly(libs.caffeine)
-    compileOnly(project(":wakame:wakame-common"))
+    compileOnly(platform(libs.bom.caffeine))
+    compileOnly(project(":wakame-common"))
 
     // external
-    compileOnly(libs.mythicmobs) { isTransitive = false }
+    compileOnly(libs.mythicmobs) {
+        isTransitive = false
+    }
 }

@@ -1,6 +1,6 @@
 plugins {
-    id("cc.mewcraft.repo-conventions")
-    id("cc.mewcraft.kotlin-conventions")
+    id("neko-kotlin")
+    id("neko.repositories") version "1.0"
     alias(libs.plugins.paperdev)
 }
 
@@ -19,8 +19,8 @@ dependencies {
     compileOnly(libs.helper)
 
     // internal
-    compileOnly("net.kyori:adventure-nbt:4.15.0")
-    compileOnly(project(":wakame:wakame-common"))
+    compileOnly(project(":wakame-common"))
+    compileOnly(platform(libs.bom.adventure))
 }
 
 tasks {

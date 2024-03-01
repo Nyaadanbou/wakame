@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.rarity
 
-import cc.mewcraft.spatula.utils.RangeParser
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.util.RangeParser
 import cc.mewcraft.wakame.util.requireKt
 import com.google.common.collect.ImmutableRangeMap
 import org.spongepowered.configurate.ConfigurationNode

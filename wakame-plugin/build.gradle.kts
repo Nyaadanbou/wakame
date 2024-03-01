@@ -2,11 +2,9 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
 
 plugins {
-    id("cc.mewcraft.repo-conventions")
-    id("cc.mewcraft.kotlin-conventions")
-    id("cc.mewcraft.koin-conventions")
-    id("cc.mewcraft.koin-test-conventions")
-    id("cc.mewcraft.deploy-conventions")
+    id("neko.repositories") version "1.0"
+    id("neko-kotlin")
+    id("neko-koin")
     alias(libs.plugins.pluginyml.paper)
 }
 
@@ -15,10 +13,6 @@ project.ext.set("name", "Wakame")
 group = "cc.mewcraft.wakame"
 version = "1.0.0"
 description = "Add custom stuff to server"
-
-repositories {
-    maven("https://repo.unnamed.team/repository/unnamed-public/")
-}
 
 dependencies {
     // server
@@ -30,44 +24,17 @@ dependencies {
     compileOnly(libs.helper.profiles)
 
     // internal
-    compileOnly(libs.asm) // provided by Paper runtime
-    compileOnly(libs.asm.commons) // provided by Paper runtime
-    implementation(project(":wakame:wakame-common"))
-    implementation(project(":wakame:wakame-api"))
-    implementation(project(":wakame:wakame-ext"))
-    compileOnly(project(":wakame:wakame-nms")) // will it work?
-    runtimeOnly(project(":wakame:wakame-nms", configuration = "reobf"))
-    implementation(project(":spatula:bukkit:utils"))
-    implementation(libs.configurate.yaml) {
-        exclude("com.google.errorprone")
-    }
-    implementation(libs.configurate.extra.kotlin) {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
-        exclude("xyz.xenondevs.configurate")
-    }
-    implementation(libs.caffeine) {
-        exclude("com.google.errorprone")
-        exclude("org.checkerframework")
-    }
-    val adventureVersion = "4.15.0"
-    implementation("net.kyori", "adventure-nbt", adventureVersion) {
-        exclude("net.kyori") // provided by Paper runtime
-    }
-    val creativeVersion = "1.1.0"
-    implementation("team.unnamed", "creative-api", creativeVersion) {
-        exclude("net.kyori")
-        exclude("org.jetbrains", "annotations")
-    }
-    implementation("team.unnamed", "creative-serializer-minecraft", creativeVersion) {
-        exclude("net.kyori")
-        exclude("com.google.code.gson")
-        exclude("team.unnamed", "creative-api")
-    }
-    implementation("team.unnamed", "creative-server", creativeVersion) {
-        exclude("net.kyori")
-        exclude("team.unnamed", "creative-api")
-    }
+    implementation(project(":wakame-api"))
+    implementation(project(":wakame-common"))
+    implementation(project(":wakame-ext"))
+    compileOnly(project(":wakame-nms"))
+    runtimeOnly(project(":wakame-nms", configuration = "reobf"))
+    compileOnly(platform(libs.bom.asm)) // runtime is provided by paper
+    implementation(platform(libs.bom.adventure))
+    implementation(platform(libs.bom.caffeine))
+    implementation(platform(libs.bom.configurate.yaml))
+    implementation(platform(libs.bom.configurate.kotlin))
+    implementation(platform(libs.bom.creative))
 
     // test
     testImplementation(libs.mockk)
@@ -80,12 +47,34 @@ dependencies {
     testImplementation(libs.configurate.extra.kotlin)
 }
 
-tasks.shadowJar {
-    relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
-    relocate("io.leangen.geantyref", "cc.mewcraft.wakame.external.geantyref")
-    relocate("org.koin", "cc.mewcraft.wakame.external.koin")
-    relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
-    relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
+tasks {
+    shadowJar {
+        relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
+        relocate("io.leangen.geantyref", "cc.mewcraft.wakame.external.geantyref")
+        relocate("org.koin", "cc.mewcraft.wakame.external.koin")
+        relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
+        relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
+    }
+
+    val inputJarPath = lazy { shadowJar.get().archiveFile.get().asFile.absolutePath }
+    val finalJarName = lazy { "${ext.get("name")}-${project.version}.jar" }
+    val finalJarPath = lazy { layout.buildDirectory.file(finalJarName.value).get().asFile.absolutePath }
+    register<Copy>("copyJar") {
+        group = "mewcraft"
+        dependsOn(build)
+        from(inputJarPath.value)
+        into(layout.buildDirectory)
+        rename("(?i)${project.name}.*\\.jar", finalJarName.value)
+    }
+    register<Task>("deployJar") {
+        group = "mewcraft"
+        dependsOn(named("copyJar"))
+        doLast {
+            exec {
+                commandLine("rsync", finalJarPath.value, "dev:data/dev/jar")
+            }
+        }
+    }
 }
 
 paper {
