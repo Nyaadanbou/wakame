@@ -1,16 +1,18 @@
 package cc.mewcraft.wakame.item.scheme
 
+import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.Curse
+import cc.mewcraft.wakame.item.scheme.filter.AbilityContextHolder
 import cc.mewcraft.wakame.item.scheme.filter.AttributeContextHolder
+import cc.mewcraft.wakame.item.scheme.filter.CurseContextHolder
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random.BasicSelectionContext
+import cc.mewcraft.wakame.random.SelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.WatchedPrimitive
 import cc.mewcraft.wakame.util.WatchedSet
-import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import kotlin.random.Random
 
@@ -25,6 +27,8 @@ import kotlin.random.Random
 class SchemeGenerationContext(
     /**
      * 随机数生成器的种子。
+     *
+     * @see SelectionContext.seed
      */
     seed: Long = Random.nextLong(),
     /**
@@ -48,27 +52,27 @@ class SchemeGenerationContext(
     /**
      * 已经生成的 [Rarity].
      */
-    val rarities: MutableCollection<Rarity> by WatchedSet(HashSet()) // 一个物品有且只有一个稀有度，但我们依然用 Set
+    val rarities: MutableCollection<Rarity> by WatchedSet(HashSet())
 
     /**
      * 已经生成的 [Element].
      */
-    val elements: MutableCollection<Element> by WatchedSet(HashSet()) // 一个物品可以有多个元素，因此用 Set
+    val elements: MutableCollection<Element> by WatchedSet(HashSet())
 
     /**
      * 已经生成的 [Kizami].
      */
-    val kizamis: MutableCollection<Kizami> by WatchedSet(HashSet()) // 一个物品可以有多个铭刻，因此用 Set
-
-    /**
-     * 已经生成的 [Core].
-     */
-    val coreKeys: MutableCollection<Key> by WatchedSet(HashSet()) // 一个物品可以有多个词条（当然
+    val kizamis: MutableCollection<Kizami> by WatchedSet(HashSet())
 
     /**
      * 已经生成的 [Curse].
      */
-    val curseKeys: MutableCollection<Key> by WatchedSet(HashSet())
+    val curses: MutableCollection<CurseContextHolder> by WatchedSet(HashSet())
+
+    /**
+     * 已经生成的 [Ability].
+     */
+    val abilities: MutableCollection<AbilityContextHolder> by WatchedSet(HashSet())
 
     /**
      * 已经生成的 [AttributeContextHolder].

@@ -19,7 +19,7 @@ interface Pool<S, C : SelectionContext> {
     /**
      * 需要抽几个 [sample][Sample]。
      */
-    val pickCount: Long
+    val pickAmount: Long
 
     /**
      * 进入该 [pool][Pool] 需要满足的条件。多个条件为 Logic AND 的关系。
@@ -60,7 +60,7 @@ interface Pool<S, C : SelectionContext> {
             val builder = PoolBuilderImpl<S, C>().apply(block)
             val ret = ImmutablePool(
                 samples = builder.samples,
-                pickCount = builder.pickAmount,
+                pickAmount = builder.pickAmount,
                 isReplacement = builder.isReplacement,
                 conditions = builder.conditions,
             )

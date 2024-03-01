@@ -53,7 +53,9 @@ class LevelMapping private constructor(
      */
     private val weight: Map<Rarity, Double>,
 ) {
-    private val selector: RandomSelector<Rarity> = RandomSelector.weighted(weight.keys) { checkNotNull(weight[it]) }
+    private val selector: RandomSelector<Rarity> = RandomSelector.weighted(weight.keys) {
+        checkNotNull(weight[it]) { "Rarity '$it' does not have weight" }
+    }
 
     /**
      * Picks a random rarity from `this` mapping. You must first check if

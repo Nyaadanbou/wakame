@@ -67,7 +67,7 @@ internal class KizamiPoolSerializer : AbstractPoolSerializer<Kizami, SchemeGener
         return FilterFactory.create(node)
     }
 
-    override fun traceApply(content: Kizami, context: SchemeGenerationContext) {
+    override fun onPickSample(content: Kizami, context: SchemeGenerationContext) {
         context.kizamis += content
     }
 }

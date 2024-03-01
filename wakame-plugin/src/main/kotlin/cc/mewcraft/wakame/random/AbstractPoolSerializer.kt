@@ -63,7 +63,6 @@ import java.lang.reflect.Type
  */
 abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerializer<Pool<S, C>> {
 
-    // region Subclasses must implement this member
     /**
      * The factory to create content [S] from a [ConfigurationNode]. The
      * structure of the passed-in node is as following:
@@ -87,11 +86,14 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
      * @return the content
      */
     protected abstract fun contentFactory(node: ConfigurationNode): S
-    // endregion
 
     // region Subclasses may optionally override these members
     /**
-     * Defines the "intrinsic" conditions of each sample in the pool.
+     * Defines the "intrinsic conditions" of each sample in the pool.
+     *
+     * "Intrinsic conditions" can be thought as those which will be
+     * automatically added to the sample without specifically configuring
+     * it in the configuration.
      *
      * @return the intrinsic conditions
      */
@@ -113,30 +115,39 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
     protected open fun conditionFactory(node: ConfigurationNode): Condition<C> = Condition.alwaysTrue()
 
     /**
-     * This function will be applied to the context. You can override this
-     * function if your selection needs to leave some "traces" in the context.
+     * This function will be called upon the sample is picked.
+     *
+     * You can override this function if your selection needs
+     * to leave some "traces" in the context.
      *
      * @param content the content wrapped in the [sample][Sample]
      * @param context the context
      */
-    protected open fun traceApply(content: S, context: C) {}
+    protected open fun onPickSample(content: S, context: C) {}
 
     /**
-     * This function will be applied to the [pool builder][PoolBuilder]. You
-     * can override this function if you need to specifically tweak the built
-     * pool.
+     * This function will be called immediately before the pool is built.
+     *
+     * You can override this function if you need to specifically
+     * tweak the settings of the pool that is being built.
      *
      * @param builder the pool builder
      */
-    protected open fun builderApply(builder: PoolBuilder<S, C>) {}
+    protected open fun onBuildPool(builder: PoolBuilder<S, C>) {}
     // endregion
 
-    private fun deserializeConditionList(node: ConfigurationNode): List<Condition<C>> {
+    /**
+     * Deserializes a list of conditions from the node.
+     */
+    private fun deserializeConditions(node: ConfigurationNode): List<Condition<C>> {
         // if the node is virtual, the childrenList() will just be an empty list
         return node.childrenList().map(::conditionFactory)
     }
 
-    private fun deserializeSampleList(node: ConfigurationNode): List<Sample<S, C>> {
+    /**
+     * Deserializes a list of samples from the node.
+     */
+    private fun deserializeSamples(node: ConfigurationNode): List<Sample<S, C>> {
         return node.childrenList().map { n ->
             // create sample content from the node
             val content = contentFactory(n)
@@ -144,15 +155,15 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
             // wrap it into a sample
             Sample.build(content) {
                 weight = n.node("weight").requireKt<Double>()
-                conditions += deserializeConditionList(n.node("filters"))
-                conditions += intrinsicConditions(content)
+                conditions += intrinsicConditions(content) // add intrinsic conditions
+                conditions += deserializeConditions(n.node("filters"))
                 mark = n.node("mark").string?.let { Mark.stringMarkOf(it) }
                 trace = {
                     // add the mark to the context
                     mark?.run { it.marks += this }
 
                     // apply the given trace function
-                    traceApply(content, it)
+                    onPickSample(content, it)
                 }
             }
         }
@@ -163,21 +174,21 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
             // it's the structure 1
 
             return Pool.build {
-                samples += deserializeSampleList(node)
+                samples += deserializeSamples(node)
                 // other values are all default
 
-                builderApply(this)
+                onBuildPool(this)
             }
         } else if (node.isMap) {
             // it's the structure 2
 
             return Pool.build {
-                samples += deserializeSampleList(node.node("entries"))
-                conditions += deserializeConditionList(node.node("filters"))
+                samples += deserializeSamples(node.node("entries"))
+                conditions += deserializeConditions(node.node("filters"))
                 pickAmount = node.node("sample").getLong(1)
                 isReplacement = node.node("replacement").getBoolean(false)
 
-                builderApply(this)
+                onBuildPool(this)
             }
         } else {
             // it's an illegal structure

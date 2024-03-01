@@ -9,7 +9,7 @@ import kotlin.random.asJavaRandom
 
 internal class ImmutablePool<S, C : SelectionContext>(
     override val samples: List<Sample<S, C>>,
-    override val pickCount: Long,
+    override val pickAmount: Long,
     override val isReplacement: Boolean,
     override val conditions: List<Condition<C>>,
 ) : Pool<S, C> {
@@ -49,9 +49,9 @@ internal class ImmutablePool<S, C : SelectionContext>(
         val selector = RandomSelector.weighted(samples, SampleWeigher)
         // 设置是否重置抽样，以及要选择的样本个数
         val stream = if (isReplacement) {
-            selector.stream(context.random.asJavaRandom()).limit(pickCount)
+            selector.stream(context.random.asJavaRandom()).limit(pickAmount)
         } else {
-            selector.stream(context.random.asJavaRandom()).limit(pickCount).distinct()
+            selector.stream(context.random.asJavaRandom()).limit(pickAmount).distinct()
         }
 
         return stream
@@ -68,7 +68,7 @@ internal class PoolBuilderImpl<S, C : SelectionContext> : PoolBuilder<S, C> {
 @InternalApi
 internal object EmptyPool : Pool<Nothing, SelectionContext> {
     override val samples: List<Sample<Nothing, SelectionContext>> = emptyList()
-    override val pickCount: Long = 1
+    override val pickAmount: Long = 1
     override val isReplacement: Boolean = true
     override val conditions: List<Condition<SelectionContext>> = emptyList()
 

@@ -127,7 +127,7 @@ object Initializer : KoinComponent, Listener {
     private fun registerListeners() = with(plugin) {
         registerTerminableListener(get<TestListener>()).bindWith(this)
         registerTerminableListener(get<ItemRendererListener>()).bindWith(this)
-        registerTerminableListener(get<AttributeHandler>()).bindWith(this)
+        // registerTerminableListener(get<AttributeHandler>()).bindWith(this) // FIXME uncomment it when done
     }
 
     private fun executeReload() {

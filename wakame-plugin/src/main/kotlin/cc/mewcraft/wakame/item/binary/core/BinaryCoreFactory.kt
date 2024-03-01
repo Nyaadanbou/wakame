@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.core.SchemeAbilityCore
 import cc.mewcraft.wakame.item.scheme.core.SchemeAttributeCore
 import cc.mewcraft.wakame.item.scheme.core.SchemeCore
+import cc.mewcraft.wakame.item.scheme.filter.AbilityContextHolder
 import cc.mewcraft.wakame.item.scheme.filter.AttributeContextHolder
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.getOrThrow
@@ -38,8 +39,9 @@ object BinaryCoreFactory {
         val ret: BinaryCore
         when (key.namespace()) {
             NekoNamespaces.ABILITY -> {
+                // TODO finish ability facade
                 // val decoder = AbilityFacadeRegistry.shadowTagDecoder.getOrThrow(key)
-                // val value = decoder.decode(compoundTag) // TODO finish ability facade
+                // val value = decoder.decode(compoundTag)
                 ret = emptyBinaryCore()
             }
 
@@ -68,9 +70,15 @@ object BinaryCoreFactory {
 
         when (schemeCore) {
             is SchemeAbilityCore -> {
+                // TODO finish ability facade
                 // val value = schemeCore.generate(context.itemLevel)
                 // ret = BinaryAbilityCore(schemeCore.key(), value)
-                ret = emptyBinaryCore() // TODO finish ability facade
+                ret = emptyBinaryCore()
+
+                // add the generated result to the context
+                val abilityValue = ret.value
+                val abilityContextHolder = AbilityContextHolder(ret.key)
+                context.abilities += abilityContextHolder
             }
 
             is SchemeAttributeCore -> {

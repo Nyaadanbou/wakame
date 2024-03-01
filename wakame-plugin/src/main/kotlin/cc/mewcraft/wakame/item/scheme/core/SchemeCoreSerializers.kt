@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.attribute.facade.elementOrNull
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCorePool
+import cc.mewcraft.wakame.item.scheme.filter.AbilityFilter
 import cc.mewcraft.wakame.item.scheme.filter.AttributeFilter
-import cc.mewcraft.wakame.item.scheme.filter.CoreFilter
 import cc.mewcraft.wakame.item.scheme.filter.FilterFactory
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
@@ -73,14 +73,19 @@ internal class SchemeCorePoolSerializer : AbstractPoolSerializer<SchemeCore, Sch
 
     override fun intrinsicConditions(content: SchemeCore): Condition<SchemeGenerationContext> {
         return when (content) {
-            // We need to compare key + operation + element for attributes
+            // By design, an attribute is considered generated
+            // if there is already an attribute with all the same
+            // key, operation and element in the selection context.
             is SchemeAttributeCore -> AttributeFilter(true, content.key, content.value.operation, content.value.elementOrNull)
-            // We only need to compare key for abilities
-            is SchemeAbilityCore -> CoreFilter(true, content.key)
+
+            // By design, an ability is considered generated
+            // if there is already an ability with the same key
+            // in the selection context.
+            is SchemeAbilityCore -> AbilityFilter(true, content.key)
         }
     }
 
-    override fun traceApply(content: SchemeCore, context: SchemeGenerationContext) {
-        context.coreKeys += content.key
+    override fun onPickSample(content: SchemeCore, context: SchemeGenerationContext) {
+        // context writes are delayed after the scheme is realized
     }
 }

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.scheme.curse
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCursePool
+import cc.mewcraft.wakame.item.scheme.filter.CurseContextHolder
 import cc.mewcraft.wakame.item.scheme.filter.FilterFactory
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
@@ -61,7 +62,7 @@ internal class SchemeCursePoolSerializer : AbstractPoolSerializer<SchemeCurse, S
         return FilterFactory.create(node)
     }
 
-    override fun traceApply(content: SchemeCurse, context: SchemeGenerationContext) {
-        context.curseKeys += content.key
+    override fun onPickSample(content: SchemeCurse, context: SchemeGenerationContext) {
+        context.curses += CurseContextHolder(content.key)
     }
 }

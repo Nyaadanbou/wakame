@@ -67,7 +67,7 @@ internal class ElementPoolSerializer : AbstractPoolSerializer<Element, SchemeGen
         return FilterFactory.create(node)
     }
 
-    override fun traceApply(content: Element, context: SchemeGenerationContext) {
+    override fun onPickSample(content: Element, context: SchemeGenerationContext) {
         context.elements += content
     }
 }

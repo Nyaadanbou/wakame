@@ -11,7 +11,14 @@ import kotlin.random.Random
  */
 sealed interface SelectionContext {
     /**
-     * The random generator for the selection process.
+     * The seed used to create the random generator for the selection process.
+     *
+     * It is guaranteed that the selection result is the same for the same seed.
+     */
+    val seed: Long
+
+    /**
+     * The random generator to be used in the whole selection process.
      */
     val random: Random
 
@@ -25,12 +32,7 @@ sealed interface SelectionContext {
  * You can (and should) extend this class to create your own context.
  */
 open class BasicSelectionContext(
-    /**
-     * The seed used to create the random generator for the selection process.
-     *
-     * It is guaranteed that the selection result is the same for the same seed.
-     */
-    seed: Long,
+    final override val seed: Long,
 ) : SelectionContext {
     override val random: Random = Random(seed)
     override val marks: MutableSet<Mark<*>> by WatchedSet(HashSet())

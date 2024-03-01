@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.item.scheme.filter
 
+import cc.mewcraft.wakame.attribute.base.AttributeModifier
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.level.PlayerLevelType
 import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.requireKt
 import com.google.common.collect.Range
 import net.kyori.adventure.key.Key
@@ -22,14 +24,26 @@ object FilterFactory {
         val type = type0.substringAfter(not) // the type string (after ~)
 
         val ret: Filter = when (type) {
-            "core" -> {
-                val coreKey = node.node("key").requireKt<Key>()
-                CoreFilter(invert, coreKey)
+            "ability" -> {
+                val key = node.node("key").requireKt<Key>()
+                AbilityFilter(invert, key)
+            }
+
+            "attribute" -> {
+                val key = node.node("key").requireKt<Key>()
+                val operation = node.node("operation").requireKt<String>().let { EnumLookup.lookup<AttributeModifier.Operation>(it).getOrThrow() }
+                val element = node.node("element").requireKt<Element>()
+                AttributeFilter(invert, key, operation, element)
             }
 
             "crate_level" -> {
                 val level = node.node("level").requireKt<Range<Int>>()
                 CrateLevelFilter(invert, level)
+            }
+
+            "curse" -> {
+                val curse = node.node("key").requireKt<Key>()
+                CurseFilter(invert, curse)
             }
 
             "element" -> {
@@ -57,7 +71,6 @@ object FilterFactory {
                 val rarity = node.node("rarity").requireKt<Rarity>()
                 RarityFilter(invert, rarity)
             }
-
 
             "toss" -> {
                 val chance = node.node("chance").requireKt<Float>()

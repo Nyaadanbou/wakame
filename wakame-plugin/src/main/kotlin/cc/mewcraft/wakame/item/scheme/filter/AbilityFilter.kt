@@ -1,51 +1,47 @@
 package cc.mewcraft.wakame.item.scheme.filter
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
-import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import java.util.Objects
 import java.util.stream.Stream
 
 /**
- * Checks attribute population.
+ * Checks ability population.
+ *
+ * This could be, for example, used to check whether an ability
+ * with key `ability:blink` has been populated.
+ *
+ * @property key the key of the ability to check with
  */
-class AttributeFilter(
+data class AbilityFilter(
     override val invert: Boolean,
     private val key: Key,
-    private val operation: AttributeModifier.Operation,
-    private val element: Element?,
 ) : Filter {
 
     /**
-     * Returns `true` if the [context] already has the attribute with
+     * Returns `true` if the [context] already has the ability with
      * [key][key] populated.
      */
     override fun test0(context: SchemeGenerationContext): Boolean {
-        return AttributeContextHolder(key, operation, element) in context.attributes
+        return AbilityContextHolder(key) in context.abilities
     }
 }
 
-data class AttributeContextHolder(
+data class AbilityContextHolder(
     val key: Key,
-    val operation: AttributeModifier.Operation,
-    val element: Element?,
 ) : Examinable {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key.asString()),
-        ExaminableProperty.of("operation", operation.key),
-        ExaminableProperty.of("element", element?.key),
     )
 
     override fun toString(): String = toSimpleString()
-    override fun hashCode(): Int = Objects.hash(key, operation, element)
+    override fun hashCode(): Int = key.hashCode()
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other is AttributeContextHolder)
-            return key == other.key && operation == other.operation && element == other.element
+            return key == other.key
         return false
     }
 }
