@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.random
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import me.lucko.helper.random.RandomSelector
-import java.util.*
 import java.util.stream.Stream
 import kotlin.jvm.optionals.getOrElse
+import kotlin.random.asJavaRandom
 
 internal class ImmutablePool<S, C : SelectionContext>(
     override val samples: List<Sample<S, C>>,
@@ -47,12 +47,11 @@ internal class ImmutablePool<S, C : SelectionContext>(
         }
 
         val selector = RandomSelector.weighted(samples, SampleWeigher)
-
         // 设置是否重置抽样，以及要选择的样本个数
         val stream = if (isReplacement) {
-            selector.stream(Random.from { context.seed }).limit(pickCount)
+            selector.stream(context.random.asJavaRandom()).limit(pickCount)
         } else {
-            selector.stream(Random.from { context.seed }).limit(pickCount).distinct()
+            selector.stream(context.random.asJavaRandom()).limit(pickCount).distinct()
         }
 
         return stream

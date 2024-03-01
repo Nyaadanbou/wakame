@@ -36,10 +36,10 @@ data class RarityMeta(
             static
         } else if (dynamic != null) {
             // use dynamic rarity
-            dynamic.pick(context.level, context.seed)
+            dynamic.pick(context.level, context.random)
         } else {
             // fallback to the global rarity mappings
-            LevelMappingRegistry.getOrThrow(LevelMappingRegistry.GLOBAL_NAME).pick(context.level, context.seed)
+            LevelMappingRegistry.getOrThrow(LevelMappingRegistry.GLOBAL_NAME).pick(context.level, context.random)
         }.also {
             context.rarities += it // leave trace to the context
         }

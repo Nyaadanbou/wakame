@@ -10,9 +10,9 @@ import cc.mewcraft.wakame.random.BasicSelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.WatchedPrimitive
 import cc.mewcraft.wakame.util.WatchedSet
-import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
+import kotlin.random.Random
 
 /**
  * 代表一个物品生成过程的上下文。
@@ -24,14 +24,22 @@ import org.bukkit.entity.Player
  */
 class SchemeGenerationContext(
     /**
-     * 盲盒对象。如果是盲盒触发的物品生成，就把盲盒传进来。
+     * 随机数生成器的种子。
+     */
+    seed: Long = Random.nextLong(),
+    /**
+     * 触发本次生成的盲盒。
+     *
+     * 如果是盲盒触发的物品生成，该成员必须不为空。
      */
     val crateObject: BinaryCrate? = null,
     /**
-     * 玩家对象。如果是玩家触发的物品生成，就把玩家传进来。
+     * 触发本次生成的玩家。
+     *
+     * 如果是玩家触发的物品生成，该成员必须不为空。
      */
     val playerObject: Player? = null,
-) : BasicSelectionContext() {
+) : BasicSelectionContext(seed) {
     /**
      * 已经生成的物品等级。
      */
@@ -40,30 +48,30 @@ class SchemeGenerationContext(
     /**
      * 已经生成的 [Rarity].
      */
-    val rarities: MutableCollection<Rarity> by WatchedSet(ObjectArraySet(2)) // 一个物品有且只有一个稀有度，但我们依然用 Set
+    val rarities: MutableCollection<Rarity> by WatchedSet(HashSet()) // 一个物品有且只有一个稀有度，但我们依然用 Set
 
     /**
      * 已经生成的 [Element].
      */
-    val elements: MutableCollection<Element> by WatchedSet(ObjectArraySet(4)) // 一个物品可以有多个元素，因此用 Set
+    val elements: MutableCollection<Element> by WatchedSet(HashSet()) // 一个物品可以有多个元素，因此用 Set
 
     /**
      * 已经生成的 [Kizami].
      */
-    val kizamis: MutableCollection<Kizami> by WatchedSet(ObjectArraySet(4)) // 一个物品可以有多个铭刻，因此用 Set
+    val kizamis: MutableCollection<Kizami> by WatchedSet(HashSet()) // 一个物品可以有多个铭刻，因此用 Set
 
     /**
      * 已经生成的 [Core].
      */
-    val coreKeys: MutableCollection<Key> by WatchedSet(ObjectArraySet(8)) // 一个物品可以有多个词条（当然
+    val coreKeys: MutableCollection<Key> by WatchedSet(HashSet()) // 一个物品可以有多个词条（当然
 
     /**
      * 已经生成的 [Curse].
      */
-    val curseKeys: MutableCollection<Key> by WatchedSet(ObjectArraySet(8))
+    val curseKeys: MutableCollection<Key> by WatchedSet(HashSet())
 
     /**
      * 已经生成的 [AttributeContextHolder].
      */
-    val attributes: MutableCollection<AttributeContextHolder> by WatchedSet(ObjectArraySet(8))
+    val attributes: MutableCollection<AttributeContextHolder> by WatchedSet(HashSet())
 }
