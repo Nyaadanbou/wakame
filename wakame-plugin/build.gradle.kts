@@ -29,7 +29,9 @@ dependencies {
     implementation(project(":wakame-ext"))
     compileOnly(project(":wakame-nms"))
     runtimeOnly(project(":wakame-nms", configuration = "reobf"))
-    compileOnly(platform(libs.bom.asm)) // runtime is provided by paper
+    compileOnly(libs.asm) // runtime is provided by paper
+    compileOnly(libs.asm.commons) // ^
+    implementation(libs.bytebuddy)
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
