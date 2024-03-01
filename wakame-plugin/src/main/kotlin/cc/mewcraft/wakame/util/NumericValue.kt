@@ -39,6 +39,13 @@ data class NumericValue(
     val sigma: Double = .0,
 
     /**
+     * The minimum spread of the normal distribution.
+     *
+     * @see upperBound
+     */
+    val lowerBound: Double? = null,
+
+    /**
      * The maximum spread of the normal distribution.
      *
      * For normal distribution, there always is that INSANELY SMALL chance of
@@ -49,9 +56,11 @@ data class NumericValue(
      * - 99.7% of rolls will fall between 7 and 13;
      * - 1E-41% of rolls that will give you an epic 300 dmg sword
      *
-     * Whatever, this constrains to a minimum and maximum of output.
+     * Whatever, this constrains the maximum of output.
+     *
+     * @see lowerBound
      */
-    val threshold: Double? = null,
+    val upperBound: Double? = null,
 ) {
 
     /**
@@ -67,21 +76,37 @@ data class NumericValue(
         get() = sigma > .0
 
     /**
-     * Whether the random value is bounded by the [threshold].
+     * Whether the random value is bounded by the [lowerBound].
      */
-    val isBounded: Boolean
-        get() = threshold != null
+    val isLowerBounded: Boolean
+        get() = lowerBound != null
 
-    private constructor(base: Number, scale: Number = .0, sigma: Number = .0, threshold: Number? = null) : this(
-        base.toDouble(), scale.toDouble(), sigma.toDouble(), threshold?.toDouble()
+    /**
+     * Whether the random value is bounded by the [upperBound].
+     */
+    val isUpperBounded: Boolean
+        get() = upperBound != null
+
+    private constructor(
+        base: Number,
+        scale: Number = .0,
+        sigma: Number = .0,
+        lowerBound: Number? = null,
+        upperBound: Number? = null,
+    ) : this(
+        base = base.toDouble(), scale = scale.toDouble(), sigma = sigma.toDouble(), lowerBound = lowerBound?.toDouble(), upperBound = upperBound?.toDouble()
     )
 
     init {
         check(scale >= 0) { "scale must not be negative" }
         check(sigma >= 0) { "sigma must not be negative" }
-        if (threshold != null) {
-            check(threshold >= 0) { "threshold must not be negative" }
-            check(threshold >= sigma) { "threshold must be greater or equal to sigma" }
+        if (lowerBound != null) {
+            check(lowerBound <= 0) { "lowerBound must not be positive" }
+            check(lowerBound <= sigma) { "lowerBound must be less or equal to sigma" }
+        }
+        if (upperBound != null) {
+            check(upperBound >= 0) { "upperBound must not be negative" }
+            check(upperBound >= sigma) { "upperBound must be greater or equal to sigma" }
         }
     }
 
@@ -89,8 +114,9 @@ data class NumericValue(
         /**
          * Creates an instance from a string.
          *
-         * @param value a string in the format "base{,scale{,sigma{,threshold}}}",
-         *     where the values inside curly brackets can be omitted
+         * @param value a string in the format
+         * `base{,scale{,sigma{,lowerBound{,upperBound}}}}`,
+         * where the values inside curly brackets can be omitted
          * @return an instance
          */
         fun create(value: String): NumericValue {
@@ -98,8 +124,11 @@ data class NumericValue(
             val base = split[0].toDouble()
             val scale = if (split.size > 1) split[1].toDouble() else 0.0
             val sigma = if (split.size > 2) split[2].toDouble() else 0.0
-            val threshold = if (split.size > 3) split[3].toDouble() else 0.0
-            return NumericValue(base, scale, sigma, threshold)
+            val lowerBound = if (split.size > 3) split[3].toDoubleOrNull() else null
+            val upperBound = if (split.size > 4) split[4].toDoubleOrNull() else null
+            return NumericValue(
+                base = base, scale = scale, sigma = sigma, lowerBound = lowerBound, upperBound = upperBound
+            )
         }
 
         /**
@@ -120,7 +149,7 @@ data class NumericValue(
          * @return an instance
          */
         fun create(node: ConfigurationNode): NumericValue {
-            return NumericValueSerializer.deserialize(NumericValue::class.java, node)
+            return NumericValueSerializer.deserialize(javaTypeOf<NumericValue>(), node)
         }
     }
 
@@ -141,12 +170,11 @@ data class NumericValue(
                 z = (x - mu) / sigma
            where
                 z is Z-score,
-                x is standardized value
-                mu is mean (base)
-                sigma is standard deviation
-           and
                 x is the value before standardization,
-                also it's the value we want to calculate.
+                mu is mean,
+                sigma is standard deviation,
+           and
+                x is also the value we want to calculate.
 
            Transform the formula, we get:
                 x = z * sigma + mu
@@ -154,16 +182,22 @@ data class NumericValue(
                 z, sigma, mu
         */
 
-        // Calculate "z * sigma", where we call it "spread"
-        val spread = if (threshold != null) {
-            (randomVariable * sigma).coerceIn(-threshold, threshold)
-            // ^z-score        ^sigma          ^min spread ^max spread
+        // Calculate "z * sigma" (spread), applying thresholds as specified
+        var spread0 = randomVariable * sigma
+        if (isLowerBounded || isUpperBounded) {
+            if (lowerBound != null) {
+                spread0 = spread0.coerceAtLeast(lowerBound)
+            }
+            if (upperBound != null) {
+                spread0 = spread0.coerceAtMost(upperBound)
+            }
         } else {
-            (randomVariable * sigma).coerceIn(-sigma * 2, sigma * 2)
-            // ^z-score        ^sigma          ^min spread ^max spread
+            spread0 = spread0.coerceIn(-sigma * 3, sigma * 3)
+            // ^z-score  ^sigma         ^min spread ^max spread
         }
+        val spread = spread0
 
-        // Since the mean (mu) is already scaled,
+        // Since the mean (mu) might be scaled,
         // we can't simply do `x = z * sigma + mu`.
         // Instead, we calculate the relative value:
         return scaledBase * (1 + spread)
@@ -197,55 +231,25 @@ internal object NumericValueSerializer : TypeSerializer<NumericValue> {
         val scalar = node.rawScalar()
         if (scalar != null) {
             // if it's just a simple plain value like "value: 32"
-            return NumericValue(node.double, .0, .0, .0)
+            return NumericValue(node.double, .0, .0, upperBound = .0)
         }
 
         val base = node.node("base").requireKt<Double>()
         val scale = node.node("scale").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
         val sigma = node.node("spread").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-        val threshold = node.node("max").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+        val lowerBound = node.node("min").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+        val upperBound = node.node("max").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
 
-        return NumericValue(base, scale ?: .0, sigma ?: .0, threshold)
+        return NumericValue(
+            base = base, scale = scale ?: .0, sigma = sigma ?: .0, lowerBound = lowerBound, upperBound = upperBound
+        )
     }
 
     override fun serialize(type: Type, obj: NumericValue?, node: ConfigurationNode) {
         // throws if no value is provided
         obj ?: throw SerializationException()
 
-        /*
-           Possible config structures:
-
-           Case 1: (only base)
-               ```
-               node: <base>
-               ```
-           Case 2: (base + scale)
-               ```
-               node:
-                   base: <base>
-                   scale: <scale>
-               ```
-           Case 3: (base + normal dist)
-               ```
-               node:
-                   base: <base>
-                   spread: <sigma>
-                   max: <threshold>
-               ```
-           Case 4: (base + scale + normal dist)
-               ```
-               node:
-                   base: <base>
-                   scale: <scale>
-                   spread: <sigma>
-                   max: <threshold>
-               ```
-        */
-
         with(obj) {
-
-            // intentionally write the redundant boolean logic
-
             if (!isScaled && !isRandom) {
                 // case 1
                 node.set(base)
@@ -254,15 +258,19 @@ internal object NumericValueSerializer : TypeSerializer<NumericValue> {
                 with(node) {
                     node("base").set(base)
                     if (isScaled) {
-                        // if scale is on
+                        // if scale is set
                         node("scale").set(scale)
                     }
                     if (isRandom) {
-                        // if random is on
+                        // if spread is set
                         node("spread").set(sigma)
-                        if (isBounded) {
-                            // if threshold is set
-                            node("max").set(threshold)
+                        if (isLowerBounded) {
+                            // if lower bound is set
+                            node("min").set(lowerBound)
+                        }
+                        if (isUpperBounded) {
+                            // if upper bound is set
+                            node("max").set(upperBound)
                         }
                     }
                 }
