@@ -297,7 +297,7 @@ internal class ItemMetaStylizerImpl(
 
     override fun <I : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I> {
         @Suppress("UNCHECKED_CAST") // Generics suck
-        return childStylizerMap[clazz] as ChildStylizer<I>
+        return childStylizerMap[clazz] as ChildStylizer<I> // TODO add default implementation of ChildStylizer - do not throw
     }
 
     private inline fun <reified T : BinaryItemMeta<*>> MutableMap<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>>.registerChildStylizer(

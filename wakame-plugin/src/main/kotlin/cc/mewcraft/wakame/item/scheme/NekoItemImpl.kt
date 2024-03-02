@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.item.binary.meta.set
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.MaterialMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
-import net.bytebuddy.ByteBuddy
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import java.util.UUID
@@ -44,7 +43,6 @@ internal data class NekoItemImpl(
     }
 
     override fun createItemStack(crate: BinaryCrate): NekoItemStack {
-        ByteBuddy.DEFAULT_NAMING_PROPERTY
         val context = SchemeGenerationContext(crateObject = crate)
         val nekoStack = createItemStack0(context)
         return nekoStack

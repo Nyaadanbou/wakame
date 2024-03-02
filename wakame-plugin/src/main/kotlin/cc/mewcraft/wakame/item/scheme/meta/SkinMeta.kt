@@ -10,26 +10,31 @@ import java.lang.reflect.Type
 
 /**
  * 物品的皮肤。
- *
- * @property itemSkin 物品的皮肤
  */
-data class SkinMeta(
-    private val itemSkin: ItemSkin? = null,
-) : SchemeItemMeta<ItemSkin> {
-    override fun generate(context: SchemeGenerationContext): ItemSkin? {
-        return itemSkin
-    }
-
+interface SkinMeta : SchemeItemMeta<ItemSkin> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "skin")
     }
 }
 
+private class NonNullSkinMeta(
+    private val itemSkin: ItemSkin,
+) : SkinMeta {
+    override fun generate(context: SchemeGenerationContext): ItemSkin? {
+        return itemSkin
+    }
+}
+
+private object DefaultSkinMeta : SkinMeta {
+    override fun generate(context: SchemeGenerationContext): ItemSkin? {
+        return null
+    }
+}
+
 internal class SkinMetaSerializer : SchemeItemMetaSerializer<SkinMeta> {
-    override val emptyValue: SkinMeta = SkinMeta()
+    override val defaultValue: SkinMeta = DefaultSkinMeta
 
     override fun deserialize(type: Type, node: ConfigurationNode): SkinMeta {
-        // TODO("Not yet implemented")
-        return SkinMeta(null)
+        return DefaultSkinMeta // TODO returns a non-empty value
     }
 }

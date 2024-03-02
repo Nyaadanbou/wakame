@@ -4,32 +4,37 @@ import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
-import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.lang.reflect.Type
 
 /**
  * 物品的描述。
- *
- * @property lore the item lore in the format of MiniMessage string
  */
-data class DisplayLoreMeta(
-    private val lore: List<String>? = null,
-) : SchemeItemMeta<List<String>>, KoinComponent {
-    override fun generate(context: SchemeGenerationContext): List<String>? {
-        return lore
-    }
-
+interface DisplayLoreMeta : SchemeItemMeta<List<String>> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "lore")
     }
 }
 
-internal class LoreMetaSerializer : SchemeItemMetaSerializer<DisplayLoreMeta> {
-    override val emptyValue: DisplayLoreMeta = DisplayLoreMeta()
+private class NonNullDisplayLoreMeta(
+    /**
+     * The item lore in the format of MiniMessage string.
+     */
+    private val lore: List<String>,
+) : DisplayLoreMeta {
+    override fun generate(context: SchemeGenerationContext): List<String> {
+        return lore
+    }
+}
 
+private object DefaultDisplayLoreMeta : DisplayLoreMeta {
+    override fun generate(context: SchemeGenerationContext): List<String>? = null
+}
+
+internal class DisplayLoreMetaSerializer : SchemeItemMetaSerializer<DisplayLoreMeta> {
+    override val defaultValue: DisplayLoreMeta = DefaultDisplayLoreMeta
     override fun deserialize(type: Type, node: ConfigurationNode): DisplayLoreMeta {
-        return DisplayLoreMeta(node.getList<String>(emptyList()))
+        return NonNullDisplayLoreMeta(node.getList<String>(emptyList()))
     }
 }

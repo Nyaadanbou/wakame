@@ -10,26 +10,34 @@ import java.util.UUID
 
 /**
  * 物品的皮肤的所有者。
- *
- * @property skinOwner 物品的皮肤的所有者的 UUID
  */
-data class SkinOwnerMeta(
-    private val skinOwner: UUID? = null,
-) : SchemeItemMeta<UUID> {
-    override fun generate(context: SchemeGenerationContext): UUID? {
-        return skinOwner
-    }
-
+interface SkinOwnerMeta : SchemeItemMeta<UUID> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "skin_owner")
     }
 }
 
+private class NonNullSkinOwnerMeta(
+    /**
+     * 物品的皮肤的所有者的 UUID.
+     */
+    private val skinOwner: UUID,
+) : SkinOwnerMeta {
+    override fun generate(context: SchemeGenerationContext): UUID? {
+        return skinOwner
+    }
+}
+
+private object DefaultSkinOwnerMeta : SkinOwnerMeta {
+    override fun generate(context: SchemeGenerationContext): UUID? {
+        return null
+    }
+}
+
 internal class SkinOwnerMetaSerializer : SchemeItemMetaSerializer<SkinOwnerMeta> {
-    override val emptyValue: SkinOwnerMeta = SkinOwnerMeta()
+    override val defaultValue: SkinOwnerMeta = DefaultSkinOwnerMeta
 
     override fun deserialize(type: Type, node: ConfigurationNode): SkinOwnerMeta {
-        // TODO("Not yet implemented")
-        return SkinOwnerMeta(null)
+        return DefaultSkinOwnerMeta // TODO returns a non-empty value
     }
 }

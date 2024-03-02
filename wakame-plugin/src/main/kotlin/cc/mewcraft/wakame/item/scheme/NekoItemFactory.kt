@@ -70,7 +70,7 @@ object NekoItemFactory : KoinComponent {
         node: ConfigurationNode,
         vararg path: String,
     ) {
-        val deserialized = requireNotNull(node.node(*path).get<T>()) { "Can't deserialize scheme meta from path ${path.contentToString()}" }
-        put(SchemeItemMetaKeys.get<T>(), deserialized)
+        val deserialized = requireNotNull(node.node(*path).get<T>()) { "Can't deserialize item meta from path ${path.contentToString()}" }
+        this[SchemeItemMetaKeys.get<T>()] = deserialized
     }
 }

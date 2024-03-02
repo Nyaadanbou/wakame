@@ -12,7 +12,7 @@ internal interface SchemeItemMetaSerializer<T : SchemeItemMeta<*>> : TypeSeriali
      * In other words, the scheme item meta is not optional if this property
      * always returns `null`.
      */
-    val emptyValue: T? get() = null
+    val defaultValue: T? get() = null
 
     /**
      * Deserializes the scheme item meta from [node].
@@ -29,6 +29,6 @@ internal interface SchemeItemMetaSerializer<T : SchemeItemMeta<*>> : TypeSeriali
      * DO NOT OVERRIDE THIS.
      */
     override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): T? {
-        return emptyValue
+        return defaultValue
     }
 }

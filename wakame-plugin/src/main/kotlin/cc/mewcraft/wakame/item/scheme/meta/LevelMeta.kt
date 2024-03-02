@@ -17,18 +17,31 @@ import java.lang.reflect.Type
 
 /**
  * 物品的等级。
- *
- * @property level the item level
  */
-data class LevelMeta(
+interface LevelMeta : SchemeItemMeta<Int> {
+    companion object : Keyed {
+        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "level")
+    }
+
+    enum class Option {
+        CRATE_LEVEL,
+        ADVENTURE_LEVEL,
+        EXPERIENCE_LEVEL,
+    }
+}
+
+/**
+ * 物品的等级。
+ */
+private class NonNullLevelMeta(
     /**
      * The item level held in this scheme.
      */
-    private val level: Any = 1,
-) : KoinComponent, SchemeItemMeta<Int> {
+    private val level: Any,
+) : KoinComponent, LevelMeta {
 
-    private val adventureLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(CUSTOM_ADVENTURE_LEVEL))
-    private val experienceLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(VANILLA_EXPERIENCE_LEVEL))
+    private val customLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(CUSTOM_ADVENTURE_LEVEL))
+    private val vanillaLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(VANILLA_EXPERIENCE_LEVEL))
 
     override fun generate(context: SchemeGenerationContext): Int {
         val ret: Int = when (level) {
@@ -36,11 +49,11 @@ data class LevelMeta(
                 return level
             }
 
-            is LevelOption -> {
+            is LevelMeta.Option -> {
                 when (level) {
-                    LevelOption.CRATE_LEVEL -> context.crateObject?.level
-                    LevelOption.ADVENTURE_LEVEL -> context.playerObject?.let(adventureLevelGetter::get)
-                    LevelOption.EXPERIENCE_LEVEL -> context.playerObject?.let(experienceLevelGetter::get)
+                    LevelMeta.Option.CRATE_LEVEL -> context.crateObject?.level
+                    LevelMeta.Option.ADVENTURE_LEVEL -> context.playerObject?.let(customLevelGetter::get)
+                    LevelMeta.Option.EXPERIENCE_LEVEL -> context.playerObject?.let(vanillaLevelGetter::get)
                 } ?: 1 // returns level 1 if we can't get the expected level
             }
 
@@ -53,28 +66,21 @@ data class LevelMeta(
                 context.level = it // leave trace to the context
             }
     }
+}
 
-    enum class LevelOption {
-        CRATE_LEVEL,
-        ADVENTURE_LEVEL,
-        EXPERIENCE_LEVEL,
-    }
-
-    companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "level")
-    }
+private object DefaultLevelMeta : LevelMeta {
+    override fun generate(context: SchemeGenerationContext): Int? = null // default not to write level at all
 }
 
 internal class LevelMetaSerializer : SchemeItemMetaSerializer<LevelMeta> {
-    override val emptyValue: LevelMeta = LevelMeta()
-
+    override val defaultValue: LevelMeta = DefaultLevelMeta
     override fun deserialize(type: Type, node: ConfigurationNode): LevelMeta {
         return when (val scalar = node.rawScalar()) {
-            is Int -> LevelMeta(scalar)
+            is Int -> NonNullLevelMeta(scalar)
 
-            is String -> LevelMeta(EnumLookup.lookup<LevelMeta.LevelOption>(scalar).getOrThrow())
+            is String -> NonNullLevelMeta(EnumLookup.lookup<LevelMeta.Option>(scalar).getOrThrow())
 
-            else -> throw SerializationException("Invalid value for ${LevelMeta::class.simpleName}")
+            else -> throw SerializationException("Invalid value type for ${LevelMeta::class.simpleName}")
         }
     }
 }

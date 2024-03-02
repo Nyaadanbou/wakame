@@ -41,5 +41,5 @@ internal class DisplayLoreMeta(
 }
 
 internal fun DisplayLoreMeta?.orEmpty(): List<String> {
-    return this?.get() ?: emptyList()
+    return this?.getOrNull() ?: emptyList()
 }

@@ -12,27 +12,35 @@ import java.lang.reflect.Type
 
 /**
  * 物品的原版物品类型。
- *
- * @property material 原版物品类型
  */
-data class MaterialMeta(
-    private val material: Material = Material.STONE,
-) : SchemeItemMeta<Material> {
-    override fun generate(context: SchemeGenerationContext): Material {
-        return material
-    }
+interface MaterialMeta : SchemeItemMeta<Material> {
+    override fun generate(context: SchemeGenerationContext): Material // never null
 
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "material")
     }
 }
 
+private class NonNullMaterialMeta(
+    private val material: Material,
+) : MaterialMeta {
+    override fun generate(context: SchemeGenerationContext): Material {
+        return material
+    }
+}
+
+private object DefaultMaterialMeta : MaterialMeta {
+    override fun generate(context: SchemeGenerationContext): Material {
+        return Material.STONE
+    }
+}
+
 internal class MaterialMetaSerializer : SchemeItemMetaSerializer<MaterialMeta> {
-    override val emptyValue: MaterialMeta = MaterialMeta()
+    override val defaultValue: MaterialMeta = DefaultMaterialMeta
 
     override fun deserialize(type: Type, node: ConfigurationNode): MaterialMeta {
         val name = node.requireKt<String>()
         val material = Material.matchMaterial(name) ?: throw SerializationException("Can't parse material name $name")
-        return MaterialMeta(material)
+        return NonNullMaterialMeta(material)
     }
 }

@@ -49,11 +49,11 @@ internal fun schemeItemModule(): Module = module {
             .registerKt(ElementPoolSerializer())
             .registerKt(KizamiPoolSerializer())
 
+            .registerKt(DisplayLoreMetaSerializer())
             .registerKt(DisplayNameMetaSerializer())
             .registerKt(ElementMetaSerializer())
             .registerKt(KizamiMetaSerializer())
             .registerKt(LevelMetaSerializer())
-            .registerKt(LoreMetaSerializer())
             .registerKt(MaterialMetaSerializer())
             .registerKt(RarityMetaSerializer())
             .registerKt(SkinMetaSerializer())

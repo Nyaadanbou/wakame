@@ -17,26 +17,29 @@ typealias KizamiPool = Pool<Kizami, SchemeGenerationContext>
 
 /**
  * 物品的铭刻标识。
- *
- * @property kizamiPool 铭刻池
  */
-data class KizamiMeta(
-    private val kizamiPool: KizamiPool = Pool.empty(),
-) : SchemeItemMeta<Set<Kizami>> {
-    override fun generate(context: SchemeGenerationContext): Set<Kizami> {
-        return kizamiPool.pick(context).toSet()
-    }
-
+interface KizamiMeta : SchemeItemMeta<Set<Kizami>> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "kizami")
     }
 }
 
-internal class KizamiMetaSerializer : SchemeItemMetaSerializer<KizamiMeta> {
-    override val emptyValue: KizamiMeta = KizamiMeta()
+private class NonNullKizamiMeta(
+    private val kizamiPool: KizamiPool,
+) : KizamiMeta {
+    override fun generate(context: SchemeGenerationContext): Set<Kizami> {
+        return kizamiPool.pick(context).toSet()
+    }
+}
 
+private object DefaultKizamiMeta : KizamiMeta {
+    override fun generate(context: SchemeGenerationContext): Set<Kizami>? = null
+}
+
+internal class KizamiMetaSerializer : SchemeItemMetaSerializer<KizamiMeta> {
+    override val defaultValue: KizamiMeta = DefaultKizamiMeta
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiMeta {
-        return KizamiMeta(node.requireKt<KizamiPool>())
+        return NonNullKizamiMeta(node.requireKt<KizamiPool>())
     }
 }
 
