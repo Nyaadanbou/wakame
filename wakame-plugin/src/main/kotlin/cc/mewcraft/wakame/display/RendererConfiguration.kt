@@ -71,6 +71,11 @@ internal class RendererConfiguration(
     val kizamiFormat: ItemMetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "kizami")) }
 
     /**
+     * 保养度的渲染格式。
+     */
+    val durabilityFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "durability").requireKt<String>() }
+
+    /**
      * 皮肤的渲染格式。
      */
     val skinFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin").requireKt<String>() }

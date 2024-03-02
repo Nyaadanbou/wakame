@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
+import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta
 import net.kyori.adventure.text.Component
 import kotlin.reflect.KClass
 
@@ -104,16 +105,14 @@ internal interface ItemMetaStylizer {
     }
 
     /**
-     * To implementer: Every [BinaryItemMeta] (except display name) to be rendered
-     * should have a corresponding [ChildStylizer] in this map.
+     * Gets child stylizer by the class of [BinaryItemMeta].
      *
-     * Map specifications: `map key` is class of [BinaryItemMeta] and `map value` is
-     * corresponding [stylizer][ChildStylizer].
-     */
-    val childStylizerMap: Map<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>>
-
-    /**
-     * Gets child stylizer by class.
+     * To implementer: Every [BinaryItemMeta] (except [DisplayNameMeta]) to be rendered
+     * should have a corresponding [ChildStylizer] in this map. In the case where no
+     * implementation is found for the [clazz], a default [ChildStylizer] indicating
+     * a missing implementation should be returned.
+     *
+     * This function never throws.
      */
     fun <I : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I>
 

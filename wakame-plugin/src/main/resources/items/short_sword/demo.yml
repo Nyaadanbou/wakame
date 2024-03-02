@@ -19,6 +19,16 @@ lore:
   - "<gold>Demo Lore 1"
   - "<gold>Demo Lore 2"
 
+# 保养度
+# 可选，默认 无
+durability:
+  # 临界值
+  # 必填
+  threshold: 512
+  # 初始损耗
+  # 可选，默认 0
+  damage: 0
+
 # 皮肤
 # 可选，默认 无
 # 如有设置，则物品自带预设的皮肤
@@ -139,7 +149,7 @@ core_selectors:
       - type: rarity
         rarity: common
     selectors:
-      pool_1: # 该词条组的一个候选池，取值必须在本堆中不重复
+      pool_1: # 该词条组的一个候选池，取值必须在本池中不重复
         filters: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
           - type: rarity
             rarity: rare

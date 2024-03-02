@@ -39,6 +39,7 @@ object NekoItemFactory : KoinComponent {
             // (by alphabet order, in case you miss something)
             loadAndSave<DisplayLoreMeta>(node, "lore")
             loadAndSave<DisplayNameMeta>(node, "display_name")
+            loadAndSave<DurabilityMeta>(node, "durability")
             loadAndSave<ElementMeta>(node, "elements")
             loadAndSave<KizamiMeta>(node, "kizami")
             loadAndSave<LevelMeta>(node, "level")

@@ -15,6 +15,7 @@ import org.bukkit.entity.Player
 import java.util.UUID
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta as BDisplayNameMeta
+import cc.mewcraft.wakame.item.binary.meta.DurabilityMeta as BDurabilityMeta
 import cc.mewcraft.wakame.item.binary.meta.ElementMeta as BElementMeta
 import cc.mewcraft.wakame.item.binary.meta.KizamiMeta as BKizamiMeta
 import cc.mewcraft.wakame.item.binary.meta.LevelMeta as BLevelMeta
@@ -23,6 +24,7 @@ import cc.mewcraft.wakame.item.binary.meta.SkinMeta as BSkinMeta
 import cc.mewcraft.wakame.item.binary.meta.SkinOwnerMeta as BSkinOwnerMeta
 import cc.mewcraft.wakame.item.scheme.meta.DisplayLoreMeta as SDisplayLoreMeta
 import cc.mewcraft.wakame.item.scheme.meta.DisplayNameMeta as SDisplayNameMeta
+import cc.mewcraft.wakame.item.scheme.meta.DurabilityMeta as SDurabilityMeta
 import cc.mewcraft.wakame.item.scheme.meta.ElementMeta as SElementMeta
 import cc.mewcraft.wakame.item.scheme.meta.KizamiMeta as SKizamiMeta
 import cc.mewcraft.wakame.item.scheme.meta.LevelMeta as SLevelMeta
@@ -71,6 +73,7 @@ internal data class NekoItemImpl(
 
             generateAndSet<_, SDisplayNameMeta, BDisplayNameMeta>(context)
             generateAndSet<_, SDisplayLoreMeta, BDisplayLoreMeta>(context)
+            generateAndSet<_, SDurabilityMeta, BDurabilityMeta>(context)
             generateAndSet<_, SLevelMeta, BLevelMeta>(context)
             generateAndSet<_, SRarityMeta, BRarityMeta>(context)
             generateAndSet<_, SElementMeta, BElementMeta>(context)

@@ -10,6 +10,7 @@ object ItemMetaKeys {
 
     val DISPLAY_LORE = createKey("lore")
     val DISPLAY_NAME = createKey("name")
+    val DURABILITY = createKey("durability")
     val ELEMENT = createKey("element")
     val KIZAMI = createKey("kizami")
     val LEVEL = createKey("level")

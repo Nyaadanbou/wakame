@@ -38,10 +38,9 @@ renderer_layout:
     - meta:kizami
     - (default:<!i><gray>无皮肤所有者)meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
     - (default:empty)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
+    - meta:durability
     - meta:lore
-    - (fixed) # 这行始终显示
     - (fixed)<!i><gray>---------------- # 这行始终显示
-    - (fixed) # 这行始终显示
     - (fixed:attribute)<!i><aqua><b>属性\r第二行属性介绍awa
     - attribute:empty # 空的属性（用于标记空属性栏的相对位置）
     - attribute:attack_damage
@@ -140,6 +139,14 @@ renderer_style:
 
     # 物品的皮肤所有者
     skin_owner: "<!i>皮肤所有者: <value>"
+
+    # 物品的保养度
+    #
+    # 可用标签：
+    # <damage>
+    # <threshold>
+    # <percent>
+    durability: "<!i>保养度: <damage> / <threshold>"
 
     # 物品的描述
     lore:

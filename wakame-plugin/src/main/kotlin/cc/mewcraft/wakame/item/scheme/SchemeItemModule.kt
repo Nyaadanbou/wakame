@@ -51,6 +51,7 @@ internal fun schemeItemModule(): Module = module {
 
             .registerKt(DisplayLoreMetaSerializer())
             .registerKt(DisplayNameMetaSerializer())
+            .registerKt(DurabilityMetaSerializer())
             .registerKt(ElementMetaSerializer())
             .registerKt(KizamiMetaSerializer())
             .registerKt(LevelMetaSerializer())

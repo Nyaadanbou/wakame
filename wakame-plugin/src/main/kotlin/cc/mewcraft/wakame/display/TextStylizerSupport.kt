@@ -21,6 +21,8 @@ import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.getOrThrow
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
+import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.empty
 import net.kyori.adventure.text.Component.text
@@ -40,6 +42,7 @@ import kotlin.collections.set
 import kotlin.reflect.KClass
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta as BDisplayNameMeta
+import cc.mewcraft.wakame.item.binary.meta.DurabilityMeta as BDurabilityMeta
 import cc.mewcraft.wakame.item.binary.meta.ElementMeta as BElementMeta
 import cc.mewcraft.wakame.item.binary.meta.KizamiMeta as BKizamiMeta
 import cc.mewcraft.wakame.item.binary.meta.LevelMeta as BLevelMeta
@@ -76,8 +79,7 @@ internal class TextStylizerImpl(
             }
 
             val key = itemMetaKeySupplier.get(itemMeta)
-            if (key === SKIP_RENDERING)
-                continue
+            if (key === SKIP_RENDERING) continue
             val lines = itemMetaStylizer.getChildStylizerBy(itemMetaKClass).stylize(itemMeta)
             val wrapped = ItemMetaLineFactory.get(key, lines)
             ret += wrapped
@@ -87,29 +89,40 @@ internal class TextStylizerImpl(
         for (cell in item.cells.map.values) {
             val core = cell.binaryCore
             if (core.isEmpty) {
+                // it's an empty core - add the pre-defined placeholder lines
+
                 ret += AttributeLineFactory.empty() // TODO 词条栏系统应该限制可替换的核心类型
             } else when (core) {
+                // it's a non-empty core - dynamically generate the lines
+
                 is BinaryAbilityCore -> {
                     val key = abilityKeySupplier.get(core)
-                    if (key === SKIP_RENDERING)
-                        continue
+                    if (key === SKIP_RENDERING) continue
                     val lines = abilityStylizer.stylize(core)
                     ret += AbilityLineFactory.get(key, lines)
                 }
 
                 is BinaryAttributeCore -> {
                     val key = attributeKeySupplier.get(core)
-                    if (key === SKIP_RENDERING)
-                        continue
+                    if (key === SKIP_RENDERING) continue
                     val lines = attributeStylizer.stylize(core)
                     ret += AttributeLineFactory.get(key, lines)
                 }
 
-                else -> throw UnsupportedOperationException("${core::class.simpleName} has not yet supported to be rendered")
+                else -> {
+                    throw UnsupportedOperationException("${core::class.simpleName} has not yet supported to be rendered")
+                }
             }
         }
 
         return ret
+    }
+
+    private inline fun FullKey.onSkipRendering(block: () -> Unit) {
+        // TODO use it when kotlin support non-local continue/break
+        if (this === SKIP_RENDERING) {
+            block()
+        }
     }
 }
 
@@ -273,7 +286,7 @@ internal class ItemMetaStylizerImpl(
         }
     }
 
-    override val childStylizerMap: Map<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>> = buildMap {
+    private val childStylizerMap: Map<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>> = buildMap {
         // Side note: register each in alphabet order
 
         registerChildStylizer<BDisplayLoreMeta> { displayLoreMeta ->
@@ -287,17 +300,22 @@ internal class ItemMetaStylizerImpl(
             else if (header != null && bottom != null) header.apply { this += lines; this += bottom }
             else error("Should not happen")
         }
+        registerChildStylizer<BDurabilityMeta> {
+            val durability = it.get()
+            val text = mm.deserialize(
+                config.durabilityFormat,
+                component("threshold", text(durability.threshold)),
+                component("damage", text(durability.damage)),
+                component("percent", text(durability.damagePercent))
+            )
+            listOf(text)
+        }
         registerChildStylizer<BLevelMeta> { listOf(mm.deserialize(config.levelFormat, component("value", text(it.get())))) }
         registerChildStylizer<BRarityMeta> { listOf(mm.deserialize(config.rarityFormat, component("value", it.get().displayName))) }
         registerChildStylizer<BElementMeta> { stylizeList(it.get(), config.elementFormat, Element::displayName) }
         registerChildStylizer<BKizamiMeta> { stylizeList(it.get(), config.kizamiFormat, Kizami::displayName) }
         registerChildStylizer<BSkinMeta> { listOf(mm.deserialize(config.skinFormat, component("value", it.get().displayName))) }
         registerChildStylizer<BSkinOwnerMeta> { listOf(mm.deserialize(config.skinOwnerFormat, unparsed("value", it.get().toString()))) }
-    }
-
-    override fun <I : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I> {
-        @Suppress("UNCHECKED_CAST") // Generics suck
-        return childStylizerMap[clazz] as ChildStylizer<I> // TODO add default implementation of ChildStylizer - do not throw
     }
 
     private inline fun <reified T : BinaryItemMeta<*>> MutableMap<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>>.registerChildStylizer(
@@ -315,16 +333,24 @@ internal class ItemMetaStylizerImpl(
         listFormat: ItemMetaStylizer.ListFormat,
         placeholderValue: (T) -> Component,
     ): List<Component> {
-        val values = collection.mapTo(ObjectArrayList(collection.size)) {
-            mm.deserialize(listFormat.single, component("single", placeholderValue(it)))
-        }
-        val joined = Component.join(
-            JoinConfiguration.separator(
-                mm.deserialize(listFormat.separator)
-            ), values
-        )
-        val merged = mm.deserialize(listFormat.merged, component("merged", joined))
+        val merged = collection
+            .mapTo(ObjectArrayList(collection.size)) { mm.deserialize(listFormat.single, component("single", placeholderValue(it))) }
+            .join(JoinConfiguration.separator(mm.deserialize(listFormat.separator)))
+            .let { mm.deserialize(listFormat.merged, component("merged", it)) }
         return listOf(merged)
+    }
+
+    private object DefaultChildStylizer : ChildStylizer<BinaryItemMeta<*>> {
+        private val NO_IMPLEMENTATION: MutableMap<KClass<out BinaryItemMeta<*>>, List<Component>> by reloadable { Reference2ObjectLinkedOpenHashMap() }
+
+        override fun stylize(input: BinaryItemMeta<*>): List<Component> {
+            return NO_IMPLEMENTATION.getOrPut(input::class) { listOf(text(input::class.simpleName ?: "???")) }
+        }
+    }
+
+    override fun <I : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I> {
+        @Suppress("UNCHECKED_CAST") // Generics suck
+        return (childStylizerMap[clazz] ?: DefaultChildStylizer) as ChildStylizer<I>
     }
 
     class LoreFormatImpl(
