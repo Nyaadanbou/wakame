@@ -24,7 +24,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.empty
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -282,7 +281,7 @@ internal class ItemMetaStylizerImpl(
 
             mm.deserialize(config.nameFormat, resolvers.build())
         } else {
-            empty()
+            text("Unnamed")
         }
     }
 

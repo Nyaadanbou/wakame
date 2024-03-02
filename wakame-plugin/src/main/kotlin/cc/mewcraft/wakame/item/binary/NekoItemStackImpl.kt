@@ -9,12 +9,14 @@ import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolder
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolderImpl
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.registry.NekoItemRegistry
+import cc.mewcraft.wakame.util.TestEnvironment
 import cc.mewcraft.wakame.util.nekoCompound
 import cc.mewcraft.wakame.util.nekoCompoundOrNull
 import cc.mewcraft.wakame.util.removeNekoCompound
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import java.util.UUID
@@ -26,7 +28,12 @@ internal class NekoItemStackImpl(
     constructor(mat: Material) : this(
         handle = ItemStack(mat) /* strictly-Bukkit ItemStack */,
         isOneOff = true /* so, it's a one-off instance */
-    )
+    ) {
+        // FIXME remove it when the dedicated API is finished
+        if (!TestEnvironment.isRunningJUnit()) {
+            handle.addItemFlags(*ItemFlag.entries.toTypedArray())
+        }
+    }
 
     /**
      * The "wakame" [CompoundTag][CompoundShadowTag] of this item.

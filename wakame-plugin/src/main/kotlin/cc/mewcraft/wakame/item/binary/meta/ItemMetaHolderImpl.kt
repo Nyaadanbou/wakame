@@ -11,7 +11,7 @@ import org.koin.core.component.KoinComponent
 import kotlin.reflect.KClass
 
 internal class ItemMetaHolderImpl(
-    private val base: NekoItemStackImpl,
+    val base: NekoItemStackImpl,
 ) : KoinComponent, ItemMetaHolder {
     val rootOrNull: CompoundShadowTag?
         get() = base.tags.getCompoundOrNull(NekoNamespaces.ITEM_META)

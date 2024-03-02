@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 /**
@@ -20,7 +19,7 @@ import java.util.UUID
  * The design philosophy of `this` is, that you can use a [NekoItem] as
  * a **blueprint** to create as many [NekoItemStacks][NekoItemStack] as
  * you want by calling [NekoItem.createItemStack], where each of the
- * [ItemStack] will have the data of different values, and even have the
+ * ItemStack will have the data of different values, and even have the
  * data of different types. This allows us to create more possibilities
  * for items, achieving better game experience by randomizing the item
  * generation and hence reducing duplication.
@@ -46,12 +45,12 @@ interface NekoItem : Keyed {
     override fun key(): Key = key
 
     /**
-     * The map holds all the metadata of `this` item. Use your IDE to navigate
-     * the subclasses of [SchemeItemMeta] for all types of metadata.
+     * The map holds all the item meta of `this` item. You may navigate
+     * the subclasses of [SchemeItemMeta] for all types of item meta.
      *
-     * It should be noted that only necessary metadata should be written to
-     * the item's NBT while generating an [ItemStack] from `this` [NekoItem].
-     * The data that can be derived from other metadata such as [MaterialMeta]
+     * It should be noted that only necessary item meta should be written to
+     * the item's NBT while generating an ItemStack from `this` [NekoItem].
+     * The data that can be derived from other data such as [MaterialMeta]
      * should not be written to the NBT.
      *
      * @see getItemMetaBy
@@ -68,7 +67,7 @@ interface NekoItem : Keyed {
     val cells: Map<String, SchemeCell>
 
     /**
-     * Generates an [ItemStack] from this scheme.
+     * Generates an ItemStack from this scheme.
      *
      * This function is meant to be used for the case where the item generation
      * is triggered directly by a [player][Player].
@@ -79,7 +78,7 @@ interface NekoItem : Keyed {
     fun createItemStack(player: Player?): NekoItemStack // TODO move to a separated interface
 
     /**
-     * Generates an [ItemStack] from this scheme.
+     * Generates an ItemStack from this scheme.
      *
      * This function is meant to be used for the case where the item generation
      * is triggered directly by a [binary crate][BinaryCrate].
