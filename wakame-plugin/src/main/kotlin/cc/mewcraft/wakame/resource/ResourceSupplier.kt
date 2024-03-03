@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.resource
 
-import cc.mewcraft.wakame.attribute.base.AttributeMap
+import cc.mewcraft.wakame.attribute.base.PlayerAttributeMap
 import cc.mewcraft.wakame.attribute.base.Attributes
 import cc.mewcraft.wakame.util.toStableInt
 
 class ResourceSupplier(
-    private val attributeMap: AttributeMap,
+    private val playerAttributeMap: PlayerAttributeMap,
 ) {
     fun initialValue(type: ResourceType): Int {
         return 0 // always return 0
@@ -15,7 +15,7 @@ class ResourceSupplier(
         return when (type) {
             /* FIXME Register new resource here */
 
-            ResourceType.MANA -> attributeMap.getValue(Attributes.MAX_MANA)
+            ResourceType.MANA -> playerAttributeMap.getValue(Attributes.MAX_MANA)
 
         }.toStableInt()
     }

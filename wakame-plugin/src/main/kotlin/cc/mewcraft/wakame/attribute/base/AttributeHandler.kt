@@ -1,22 +1,22 @@
 package cc.mewcraft.wakame.attribute.base
 
+import cc.mewcraft.wakame.event.WakameSlotChangedEvent
+import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
-import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent
-import me.lucko.helper.Schedulers
 import me.lucko.helper.terminable.Terminable
 import me.lucko.helper.terminable.TerminableConsumer
 import me.lucko.helper.terminable.composite.CompositeTerminable
-import org.bukkit.Bukkit
+import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerItemHeldEvent
-import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.component.inject
 
 // TODO this class is something to be heavily optimized in the future
@@ -34,28 +34,7 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
     private val playerAttributeAccessor: PlayerAttributeAccessor by inject()
     private val compositeTerminable: CompositeTerminable = CompositeTerminable.create()
 
-    /**
-     * Starts a background task which periodically reads [AttributeModifier]s
-     * from the items in online players' inventories and adds these modifiers
-     * to their [AttributeMap]s.
-     */
-    fun startUpdateTask() { // TODO 可能不需要???
-        Schedulers.builder().sync().every(20).run {
-            for (player in Bukkit.getOnlinePlayers()) {
-                applyArmorAttributeModifiers(player)
-                applyMainHandAttributeModifiers(player)
-            }
-        }.bindWith(this)
-    }
-
     ////// Listeners //////
-
-    @EventHandler
-    fun onJoin(e: PlayerJoinEvent) {
-        val player = e.player
-        applyArmorAttributeModifiers(player)
-        applyMainHandAttributeModifiers(player)
-    }
 
     @EventHandler
     fun onQuit(e: PlayerQuitEvent) {
@@ -66,68 +45,85 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
     @EventHandler(ignoreCancelled = true)
     fun onHoldItem(e: PlayerItemHeldEvent) {
         val player = e.player
-        val inventory = player.inventory
-        val prevItem = inventory.getItem(e.previousSlot)
-        val currItem = inventory.getItem(e.newSlot)
-        removeAttributeModifiers(prevItem, player)
-        addAttributeModifiers(currItem, player)
+        val oldItem = player.inventory.getItem(e.previousSlot)
+        val newItem = player.inventory.getItem(e.newSlot)
+        removeAttributeModifiers(oldItem, player)
+        addAttributeModifiers(newItem, player)
     }
 
-    @EventHandler(ignoreCancelled = true)
-    fun onInventoryChange(e: PlayerInventorySlotChangeEvent) {
+    @EventHandler
+    fun onInventoryChange(e: WakameSlotChangedEvent) {
         val player = e.player
-        removeAttributeModifiers(e.oldItemStack, player)
-        addAttributeModifiers(e.newItemStack, player)
+        val slot = e.slot
+        val oldItem = e.oldItem
+        val newItem = e.newItem
+        if (slot in getEffectiveNmsSlot(player)) {
+            removeAttributeModifiers(oldItem, player)
+            addAttributeModifiers(newItem, player)
+        }
     }
 
     ////// Private Func //////
 
-    /**
-     * Applies attributes from armor contents.
-     */
-    private fun applyArmorAttributeModifiers(player: Player) {
-        for (armor in player.inventory.armorContents) {
-            armor ?: continue // skip AIR
-            val attributeModifiers = getAttributeModifiers(armor)
-            val attributeMap = playerAttributeAccessor.getAttributeMap(player)
-            attributeMap.addAttributeModifiers(attributeModifiers)
-        }
+    private fun getEffectiveNmsSlot(player: Player): Set<Int> {
+        return setOf(
+            1, // Crafting grid 1 (top-left)
+            5, // Player helmet
+            6, // Player chestplate
+            7, // Player leggings
+            8, // Player boots
+            player.inventory.heldItemSlot + 36 // Player held item
+        )
     }
 
-    /**
-     * Applies attributes from the item in main hand.
-     */
-    private fun applyMainHandAttributeModifiers(player: Player) {
-        val bukkitItem = player.inventory.itemInMainHand
-        addAttributeModifiers(bukkitItem, player)
-    }
-
-    private fun getAttributeModifiers(bukkitItem: ItemStack?): Multimap<out Attribute, AttributeModifier> {
-        if (bukkitItem == null || bukkitItem.isEmpty || !bukkitItem.hasItemMeta()) {
-            return ImmutableMultimap.of()
+    private fun getNekoItemStack(bukkitItem: ItemStack?): NekoItemStack? {
+        if (bukkitItem == null || bukkitItem.isEmpty) {
+            return null
         }
 
         val neko = NekoItemStackFactory.wrap(bukkitItem)
         if (neko.isNotNeko) {
+            return null
+        }
+
+        return neko
+    }
+
+    private fun getAttributeModifiers(bukkitItem: ItemStack?): Multimap<out Attribute, AttributeModifier> {
+        if (bukkitItem == null || bukkitItem.isEmpty) {
+            throw IllegalArgumentException("ItemStack must not be null, empty, or have no item meta.")
+        }
+
+        if (!bukkitItem.hasItemMeta()) {
             return ImmutableMultimap.of()
         }
 
+        val neko = getNekoItemStack(bukkitItem)
+            ?: return ImmutableMultimap.of()
         return neko.cells.getModifiers()
     }
 
     private fun addAttributeModifiers(bukkitItem: ItemStack?, player: Player) {
+        if (bukkitItem == null || bukkitItem.isEmpty) {
+            return
+        }
         val attributeModifiers = getAttributeModifiers(bukkitItem)
         val attributeMap = playerAttributeAccessor.getAttributeMap(player)
         attributeMap.addAttributeModifiers(attributeModifiers)
     }
 
     private fun removeAttributeModifiers(bukkitItem: ItemStack?, player: Player) {
-        val attributeModifiers = getAttributeModifiers(bukkitItem)
+        if (bukkitItem == null || bukkitItem.isEmpty) {
+            return
+        }
         val attributeMap = playerAttributeAccessor.getAttributeMap(player)
-        attributeMap.removeAttributeModifiers(attributeModifiers)
+        val neko = getNekoItemStack(bukkitItem) ?: return
+
+        attributeMap.clearModifiers(neko.uuid)
     }
 
     override fun close() {
+        get<Server>().onlinePlayers.forEach { playerAttributeAccessor.removeAttributeMap(it) }
         compositeTerminable.close()
     }
 

@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.attribute.base
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -13,9 +11,7 @@ import java.util.*
  * **Not thread-safe.**
  */
 sealed class AttributeAccessor<T : Entity> {
-    protected val cacheMap: Cache<UUID, AttributeMap> = CacheBuilder.newBuilder()
-        .weakValues()
-        .build()
+    protected val cacheMap: MutableMap<UUID, AttributeMap> = hashMapOf()
 
     /**
      * Gets the [AttributeMap] for the [entity].
@@ -26,20 +22,20 @@ sealed class AttributeAccessor<T : Entity> {
      * Removes the [AttributeMap] from memory for the [entity].
      */
     fun removeAttributeMap(entity: T) {
-        cacheMap.getIfPresent(entity.uniqueId)?.clearAllModifiers()
-        cacheMap.invalidate(entity.uniqueId)
+        cacheMap[entity.uniqueId]?.clearAllModifiers()
+        cacheMap.remove(entity.uniqueId)
     }
 }
 
 /**
- * Provides the access to the [AttributeMap] of all online players.
+ * Provides the access to the [PlayerAttributeMap] of all online players.
  *
  * **Not thread-safe.**
  */
 class PlayerAttributeAccessor : AttributeAccessor<Player>() {
     override fun getAttributeMap(entity: Player): AttributeMap {
-        return cacheMap.get(entity.uniqueId) {
-            AttributeMap(DefaultAttributes.getSupplier(EntityType.PLAYER), entity)
+        return cacheMap.computeIfAbsent(entity.uniqueId) {
+            PlayerAttributeMap(DefaultAttributes.getSupplier(EntityType.PLAYER), entity)
         }
     }
 }
@@ -50,7 +46,7 @@ class PlayerAttributeAccessor : AttributeAccessor<Player>() {
  * **Not thread-safe.**
  */
 class EntityAttributeAccessor : AttributeAccessor<Entity>() {
-    override fun getAttributeMap(entity: Entity): AttributeMap {
+    override fun getAttributeMap(entity: Entity): PlayerAttributeMap {
         TODO("Read the NBT on the entity. Use cache if feasible")
     }
 }

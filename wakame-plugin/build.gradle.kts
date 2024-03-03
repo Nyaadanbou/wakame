@@ -32,6 +32,7 @@ dependencies {
     compileOnly(libs.asm) // runtime is provided by paper
     compileOnly(libs.asm.commons) // ^
     implementation(libs.bytebuddy)
+    implementation(libs.bytebuddy.agent)
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
@@ -87,6 +88,7 @@ paper {
     apiVersion = "1.19"
     author = "Nailm"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
+    bootstrapper = "cc.mewcraft.wakame.loader.WakameBootstrapper"
     serverDependencies {
         register("Kotlin") {
             required = true

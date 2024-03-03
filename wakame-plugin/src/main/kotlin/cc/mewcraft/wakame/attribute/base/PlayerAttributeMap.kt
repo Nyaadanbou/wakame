@@ -2,8 +2,40 @@ package cc.mewcraft.wakame.attribute.base
 
 import cc.mewcraft.wakame.util.toBukkit
 import com.google.common.collect.Multimap
-import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import java.util.*
+
+sealed interface AttributeMap {
+    fun getAttributeInstance(attribute: Attribute): AttributeInstance?
+
+    fun getAttributeInstanceOrThrow(attribute: Attribute): AttributeInstance
+
+    fun registerAttribute(attributeBase: Attribute)
+
+    fun hasAttribute(attribute: Attribute): Boolean
+
+    fun hasModifier(attribute: Attribute, uuid: UUID): Boolean
+
+    fun getValue(attribute: Attribute): Double
+
+    fun getBaseValue(attribute: Attribute): Double
+
+    fun getModifierValue(attribute: Attribute, uuid: UUID): Double
+
+    fun addAttributeModifiers(attributeModifiers: Multimap<out Attribute, AttributeModifier>)
+
+    fun removeAttributeModifiers(attributeModifiers: Multimap<out Attribute, AttributeModifier>)
+
+    fun clearModifiers(uuid: UUID)
+
+    fun clearAllModifiers()
+
+    fun assignValues(other: AttributeMap)
+
+    operator fun get(attribute: Attribute): AttributeInstance? {
+        return getAttributeInstance(attribute)
+    }
+}
 
 /**
  * This class contains attribute information about a player.
@@ -13,17 +45,13 @@ import java.util.*
  *
  * Not thread-safe.
  */
-class AttributeMap(
+class PlayerAttributeMap(
     private val defaultSupplier: AttributeSupplier,
-    private val entity: LivingEntity,
-) {
+    private val entity: Player,
+) : AttributeMap {
     private val attributes: MutableMap<Attribute, AttributeInstance> = HashMap()
 
-    operator fun get(attribute: Attribute): AttributeInstance? {
-        return getAttributeInstance(attribute)
-    }
-
-    fun getAttributeInstance(attribute: Attribute): AttributeInstance? {
+    override fun getAttributeInstance(attribute: Attribute): AttributeInstance? {
         // Kotlin 对于 Map.computeIfAbsent 中 lambda 的返回值做了非空要求
         // 因此这里手动实现了一遍 computeIfAbsent 以还原在 Java 下的行为
         // See: https://youtrack.jetbrains.com/issue/KT-10982
@@ -32,12 +60,11 @@ class AttributeMap(
             if (Attributes.isVanilla(attribute)) {
                 val bukkitAttribute = attribute.toBukkit()
                 val bukkitInstance = entity.getAttribute(bukkitAttribute)
-                if (bukkitInstance != null) {
-                    val instance = VanillaAttributeInstanceWrapper(bukkitInstance)
-                    attributes[attribute] = instance
-                    return instance
-                }
-                throw IllegalArgumentException("Can't find vanilla attribute instance for $attribute")
+                requireNotNull(bukkitInstance) { "Can't find vanilla attribute instance for $attribute" }
+
+                val instance = VanillaAttributeInstanceWrapper(bukkitInstance)
+                attributes[attribute] = instance
+                return instance
             }
 
             val newValue = defaultSupplier.createAttributeInstance(attribute)
@@ -49,11 +76,11 @@ class AttributeMap(
         return oldValue
     }
 
-    fun getAttributeInstanceOrThrow(attribute: Attribute): AttributeInstance {
+    override fun getAttributeInstanceOrThrow(attribute: Attribute): AttributeInstance {
         return requireNotNull(getAttributeInstance(attribute)) { "Can't find attribute instance for attribute $attribute" }
     }
 
-    fun registerAttribute(attributeBase: Attribute) {
+    override fun registerAttribute(attributeBase: Attribute) {
         if (Attributes.isVanilla(attributeBase)) {
             val bukkitAttribute = attributeBase.toBukkit()
             entity.registerAttribute(bukkitAttribute)
@@ -65,27 +92,27 @@ class AttributeMap(
         attributes[attributeBase] = attributeModifiable
     }
 
-    fun hasAttribute(attribute: Attribute): Boolean {
+    override fun hasAttribute(attribute: Attribute): Boolean {
         return attributes.containsKey(attribute)
     }
 
-    fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
+    override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
         return attributes[attribute]?.getModifier(uuid) != null || defaultSupplier.hasModifier(attribute, uuid)
     }
 
-    fun getValue(attribute: Attribute): Double {
+    override fun getValue(attribute: Attribute): Double {
         return attributes[attribute]?.getValue() ?: defaultSupplier.getValue(attribute)
     }
 
-    fun getBaseValue(attribute: Attribute): Double {
+    override fun getBaseValue(attribute: Attribute): Double {
         return attributes[attribute]?.getBaseValue() ?: defaultSupplier.getBaseValue(attribute)
     }
 
-    fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
+    override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
         return attributes[attribute]?.getModifier(uuid)?.amount ?: defaultSupplier.getModifierValue(attribute, uuid)
     }
 
-    fun removeAttributeModifiers(attributeModifiers: Multimap<out Attribute, AttributeModifier>) {
+    override fun removeAttributeModifiers(attributeModifiers: Multimap<out Attribute, AttributeModifier>) {
         for ((attribute, modifiers) in attributeModifiers.asMap()) {
             attributes[attribute]?.let {
                 modifiers.forEach(it::removeModifier)
@@ -93,7 +120,7 @@ class AttributeMap(
         }
     }
 
-    fun addAttributeModifiers(attributeModifiers: Multimap<out Attribute, AttributeModifier>) {
+    override fun addAttributeModifiers(attributeModifiers: Multimap<out Attribute, AttributeModifier>) {
         attributeModifiers.forEach { attribute, modifier ->
             getAttributeInstance(attribute)?.let { instance ->
                 instance.removeModifier(modifier)
@@ -102,13 +129,20 @@ class AttributeMap(
         }
     }
 
-    fun clearAllModifiers() {
+    override fun clearModifiers(uuid: UUID) {
+        for (instance in attributes.values) {
+            instance.removeModifier(uuid)
+        }
+    }
+
+    override fun clearAllModifiers() {
         for (instance in attributes.values) {
             instance.removeModifiers()
         }
     }
 
-    fun assignValues(other: AttributeMap) {
+    override fun assignValues(other: AttributeMap) {
+        require(other is PlayerAttributeMap) { "Can't assign values from non-PlayerAttributeMap" }
         for (instance in other.attributes.values) {
             getAttributeInstance(instance.attribute)?.replace(instance)
         }

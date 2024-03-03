@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.resource
 
 import cc.mewcraft.wakame.attribute.base.PlayerAttributeAccessor
+import cc.mewcraft.wakame.attribute.base.PlayerAttributeMap
 import org.bukkit.Bukkit
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -18,7 +19,7 @@ class ResourceAccessor : KoinComponent {
     fun getResourceMap(uuid: UUID): ResourceMap {
         return cacheMap.computeIfAbsent(uuid) {
             val attributeMap = playerAttributeAccessor.getAttributeMap(Bukkit.getPlayer(it)!!)
-            val resourceSupplier = ResourceSupplier(attributeMap)
+            val resourceSupplier = ResourceSupplier(attributeMap as PlayerAttributeMap)
             ResourceMap(resourceSupplier)
         }
     }

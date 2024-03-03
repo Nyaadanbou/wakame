@@ -27,7 +27,7 @@ fun WakaAttributeModifier.toBukkit() = BukkitAttributeModifier(
 
 fun BukkitAttributeModifier.toWaka() = WakaAttributeModifier(
     uniqueId,
-    name,
+    name.takeIf { it.isNotEmpty() },
     amount,
     operation.toWaka(),
 )

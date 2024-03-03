@@ -47,6 +47,16 @@ open class Attribute @InternalApi constructor(
         return Key.key(NekoNamespaces.ATTRIBUTE, descriptionId)
     }
 
+    override fun hashCode(): Int {
+        return descriptionId.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Attribute) return false
+        return descriptionId == other.descriptionId
+    }
+
     override fun toString(): String {
         return key().examine(StringExaminer.simpleEscaping())
     }
