@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute.base
+package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.event.NekoPlayerSlotChangeEvent
 import cc.mewcraft.wakame.item.binary.NekoItemStack
@@ -19,8 +19,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
 
-// TODO this class is something to be heavily optimized in the future
-//  ATM, we just make it work
 /**
  * Handles the update process of [AttributeMap].
  *
@@ -91,7 +89,7 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
 
     private fun getAttributeModifiers(bukkitItem: ItemStack?): Multimap<out Attribute, AttributeModifier> {
         if (bukkitItem == null || bukkitItem.isEmpty) {
-            throw IllegalArgumentException("ItemStack must not be null, empty, or have no item meta.")
+            throw IllegalArgumentException("ItemStack must not be null, empty, or it has no item meta")
         }
 
         if (!bukkitItem.hasItemMeta()) {
@@ -118,7 +116,6 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
         }
         val attributeMap = playerAttributeAccessor.getAttributeMap(player)
         val neko = getNekoItemStack(bukkitItem) ?: return
-
         attributeMap.clearModifiers(neko.uuid)
     }
 

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.base.Attributes
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueLU
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueLUE
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueS

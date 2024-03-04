@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.filter
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.level.PlayerLevelType
 import cc.mewcraft.wakame.rarity.Rarity

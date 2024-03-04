@@ -1,6 +1,6 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package cc.mewcraft.wakame.attribute.base
+package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.annotation.InternalApi

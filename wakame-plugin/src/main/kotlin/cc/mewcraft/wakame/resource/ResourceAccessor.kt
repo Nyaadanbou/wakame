@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.resource
 
-import cc.mewcraft.wakame.attribute.base.PlayerAttributeAccessor
-import cc.mewcraft.wakame.attribute.base.PlayerAttributeMap
+import cc.mewcraft.wakame.attribute.PlayerAttributeAccessor
+import cc.mewcraft.wakame.attribute.PlayerAttributeMap
 import org.bukkit.Bukkit
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

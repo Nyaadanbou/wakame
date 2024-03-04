@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.elementOrNull
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore

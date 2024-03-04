@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute.facade
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.BinaryCoreValue
 import cc.mewcraft.wakame.registry.AttributeStructMeta

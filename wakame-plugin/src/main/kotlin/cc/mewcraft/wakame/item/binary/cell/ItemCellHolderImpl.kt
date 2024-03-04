@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.item.binary.cell
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.BinaryAbilityValue
-import cc.mewcraft.wakame.attribute.base.Attribute
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.NekoItemStackImpl
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.util.getCompoundOrNull

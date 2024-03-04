@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.initializer
 
 import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
-import cc.mewcraft.wakame.attribute.base.AttributeHandler
+import cc.mewcraft.wakame.attribute.AttributeHandler
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.display.ItemRendererListener

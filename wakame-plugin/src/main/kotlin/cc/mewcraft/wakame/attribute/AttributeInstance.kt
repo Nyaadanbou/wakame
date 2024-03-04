@@ -1,6 +1,6 @@
-package cc.mewcraft.wakame.attribute.base
+package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.util.toBukkit
 import cc.mewcraft.wakame.util.toWaka
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap

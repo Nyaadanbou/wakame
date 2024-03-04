@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute.base
+package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.util.toBukkit
 import com.google.common.collect.Multimap
@@ -60,7 +60,7 @@ class PlayerAttributeMap(
             if (Attributes.isVanilla(attribute)) {
                 val bukkitAttribute = attribute.toBukkit()
                 val bukkitInstance = entity.getAttribute(bukkitAttribute)
-                requireNotNull(bukkitInstance) { "Can't find vanilla attribute instance for $attribute" }
+                requireNotNull(bukkitInstance) { "Can't find vanilla attribute instance for attribute $attribute" }
 
                 val instance = VanillaAttributeInstanceWrapper(bukkitInstance)
                 attributes[attribute] = instance

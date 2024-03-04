@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute.base
+package cc.mewcraft.wakame.attribute
 
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType

@@ -1,6 +1,6 @@
 @file:Suppress("PropertyName")
 
-package cc.mewcraft.wakame.attribute.base
+package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element

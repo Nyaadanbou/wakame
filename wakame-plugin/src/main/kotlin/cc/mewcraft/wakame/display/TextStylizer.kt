@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore

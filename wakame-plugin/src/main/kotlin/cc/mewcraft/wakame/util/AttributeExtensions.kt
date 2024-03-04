@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.attribute.base.Attributes
-import cc.mewcraft.wakame.attribute.base.Attribute as WakaAttribute
-import cc.mewcraft.wakame.attribute.base.AttributeModifier as WakaAttributeModifier
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.Attribute as WakaAttribute
+import cc.mewcraft.wakame.attribute.AttributeModifier as WakaAttributeModifier
 import org.bukkit.attribute.Attribute as BukkitAttribute
 import org.bukkit.attribute.AttributeModifier as BukkitAttributeModifier
 
@@ -33,7 +33,7 @@ fun BukkitAttributeModifier.toWaka() = WakaAttributeModifier(
 )
 
 fun WakaAttribute.toBukkit(): BukkitAttribute {
-    require(Attributes.isVanilla(this)) { "Can't convert non-vanilla attribute to Bukkit" }
+    require(cc.mewcraft.wakame.attribute.Attributes.isVanilla(this)) { "Can't convert non-vanilla attribute to Bukkit" }
 
     return when (this) {
         Attributes.MAX_HEALTH -> BukkitAttribute.GENERIC_MAX_HEALTH

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.attribute.base.Attribute
+import cc.mewcraft.wakame.attribute.Attribute
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 
