@@ -11,6 +11,8 @@ import cc.mewcraft.wakame.display.ItemRendererListener
 import cc.mewcraft.wakame.display.RENDERER_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.event.NekoReloadEvent
+import cc.mewcraft.wakame.pack.ResourcePackListener
+import cc.mewcraft.wakame.pack.generate.ResourcePackManager
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.test.TestListener
 import cc.mewcraft.wakame.util.*
@@ -127,7 +129,8 @@ object Initializer : KoinComponent, Listener {
     private fun registerListeners() = with(plugin) {
         registerTerminableListener(get<TestListener>()).bindWith(this)
         registerTerminableListener(get<ItemRendererListener>()).bindWith(this)
-        registerTerminableListener(get<AttributeHandler>()).bindWith(this) // FIXME uncomment it when done
+        registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
+        registerTerminableListener(get<AttributeHandler>()).bindWith(this)
     }
 
     private fun executeReload() {
@@ -180,7 +183,10 @@ object Initializer : KoinComponent, Listener {
         forEachPreWorld { onPrePack() }.onFailure { return }
         logger.info("[Initializer] onPrePack - Complete")
 
-        // TODO generate resource pack
+        get<ResourcePackManager>().generate().onFailure {
+            shutdown("An exception occurred during resource pack generation.", it)
+            return
+        }
 
         logger.info("[Initializer] onPostPackPreWorld - Start")
         forEachPreWorld { onPostPackPreWorld() }.onFailure { return }
