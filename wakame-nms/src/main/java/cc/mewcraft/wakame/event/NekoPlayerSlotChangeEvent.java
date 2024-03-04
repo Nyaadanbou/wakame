@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class WakameSlotChangedEvent extends Event {
+public class NekoPlayerSlotChangeEvent extends Event {
     private static final @NotNull HandlerList HANDLERS = new HandlerList();
 
     private final Player player;
@@ -14,7 +14,7 @@ public class WakameSlotChangedEvent extends Event {
     private final ItemStack oldItem;
     private final ItemStack newItem;
 
-    public WakameSlotChangedEvent(Player player, int slot, ItemStack oldItem, ItemStack newItem) {
+    public NekoPlayerSlotChangeEvent(Player player, int slot, ItemStack oldItem, ItemStack newItem) {
         this.player = player;
         this.slot = slot;
         this.oldItem = oldItem;

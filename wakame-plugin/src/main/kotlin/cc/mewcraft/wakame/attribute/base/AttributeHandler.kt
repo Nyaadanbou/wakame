@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute.base
 
-import cc.mewcraft.wakame.event.WakameSlotChangedEvent
+import cc.mewcraft.wakame.event.NekoPlayerSlotChangeEvent
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import com.google.common.collect.ImmutableMultimap
@@ -52,7 +52,7 @@ class AttributeHandler : KoinComponent, Terminable, TerminableConsumer,
     }
 
     @EventHandler
-    fun onInventoryChange(e: WakameSlotChangedEvent) {
+    fun onInventoryChange(e: NekoPlayerSlotChangeEvent) {
         val player = e.player
         val slot = e.slot
         val oldItem = e.oldItem

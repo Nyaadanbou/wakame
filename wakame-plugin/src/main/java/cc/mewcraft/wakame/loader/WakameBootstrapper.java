@@ -21,7 +21,6 @@ public class WakameBootstrapper implements PluginBootstrap {
     public @NotNull JavaPlugin createPlugin(@NotNull PluginProviderContext context) {
         InventoryTransformer.transform();
         context.getLogger().info("InventoryTransformer transformed");
-
         return ProviderUtil.loadClass(context.getConfiguration().getMainClass(), JavaPlugin.class, this.getClass().getClassLoader());
     }
 }

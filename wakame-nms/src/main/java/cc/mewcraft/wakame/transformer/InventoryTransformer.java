@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.ContainerListener;
 import org.bukkit.Bukkit;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class InventoryTransformer {
@@ -31,15 +32,14 @@ public class InventoryTransformer {
                 ClassLoader pluginClassLoader = Bukkit.getPluginManager().getPlugin("Wakame").getClass().getClassLoader();
 
                 // originalListener = new InventoryListenerProxy(serverPlayer, originalListener);
-                originalListener = (ContainerListener) Class.forName(
-                                "cc.mewcraft.wakame.transformer.InventoryListenerProxy",
-                                false,
-                                pluginClassLoader
-                        )
-                        .getConstructor(ServerPlayer.class, ContainerListener.class)
-                        .newInstance(serverPlayer, originalListener);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                     NoSuchMethodException | ClassNotFoundException e) {
+                Class<?> inventoryListenerProxyClass = Class.forName(
+                        "cc.mewcraft.wakame.transformer.InventoryListenerProxy",
+                        false,
+                        pluginClassLoader
+                );
+                Constructor<?> constructor = inventoryListenerProxyClass.getConstructor(ServerPlayer.class, ContainerListener.class);
+                constructor.newInstance(serverPlayer, originalListener);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
