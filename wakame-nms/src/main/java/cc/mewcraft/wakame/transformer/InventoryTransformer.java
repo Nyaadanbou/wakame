@@ -31,14 +31,14 @@ public class InventoryTransformer {
             try {
                 ClassLoader pluginClassLoader = Bukkit.getPluginManager().getPlugin("Wakame").getClass().getClassLoader();
 
-                // originalListener = new InventoryListenerProxy(serverPlayer, originalListener);
                 Class<?> inventoryListenerProxyClass = Class.forName(
                         "cc.mewcraft.wakame.transformer.InventoryListenerProxy",
                         false,
                         pluginClassLoader
                 );
                 Constructor<?> constructor = inventoryListenerProxyClass.getConstructor(ServerPlayer.class, ContainerListener.class);
-                constructor.newInstance(serverPlayer, originalListener);
+                //noinspection UnusedAssignment
+                originalListener = (ContainerListener) constructor.newInstance(serverPlayer, originalListener);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
