@@ -70,14 +70,14 @@ object NekoItemRegistry : KoinComponent, Initializable,
                 .drop(1) // exclude the namespace directory itself
                 .filter { it.extension == "yml" }
                 .forEach { itemFile ->
-                    val text = itemFile.bufferedReader().use { it.readText() }
-                    val node = loaderBuilder.buildAndLoadString(text)
-
                     val namespace = namespaceDir.name
                     val value = itemFile.nameWithoutExtension
                     val key = Key.key(namespace, value).also {
                         logger.info("Loading item: {}", it)
                     }
+
+                    val text = itemFile.bufferedReader().use { it.readText() }
+                    val node = loaderBuilder.buildAndLoadString(text)
                     runCatching {
                         NekoItemFactory.create(key, node)
                     }.onSuccess {

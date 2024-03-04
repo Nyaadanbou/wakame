@@ -30,10 +30,8 @@ object SchemeCellFactory {
      * construct a complete [SchemeCell].
      *
      * @param cellNode the node holding the cell itself
-     * @param coreNode the node holding the core for the cell or `null`, if it
-     *     should be an empty core
-     * @param curseNode the node holding the curse for the cell or `null`, if
-     *     it should be an empty curse
+     * @param coreNode the node holding the core for the cell or `null`, if it should be an empty core
+     * @param curseNode the node holding the curse for the cell or `null`, if it should be an empty curse
      * @return a new [SchemeCell]
      */
     fun schemeOf(
@@ -46,15 +44,15 @@ object SchemeCellFactory {
         val reforgeable = cellNode.node("can_reforge").boolean
         val overridable = cellNode.node("can_override").boolean
 
-        val coreSelector = coreNode?.requireKt<SchemeCoreGroup>() ?: Group.empty()
-        val curseSelector = curseNode?.requireKt<SchemeCurseGroup>() ?: Group.empty()
+        val coreGroup = coreNode?.requireKt<SchemeCoreGroup>() ?: Group.empty()
+        val curseGroup = curseNode?.requireKt<SchemeCurseGroup>() ?: Group.empty()
 
         return SchemeCellImpl(
             keepEmpty = keepEmpty,
             canReforge = reforgeable,
             canOverride = overridable,
-            coreSelector = coreSelector,
-            curseSelector = curseSelector
+            coreSelector = coreGroup,
+            curseSelector = curseGroup
         )
     }
 }

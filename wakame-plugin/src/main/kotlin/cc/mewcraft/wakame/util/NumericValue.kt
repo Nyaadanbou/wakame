@@ -101,12 +101,10 @@ data class NumericValue(
         check(scale >= 0) { "scale must not be negative" }
         check(sigma >= 0) { "sigma must not be negative" }
         if (lowerBound != null) {
-            check(lowerBound <= 0) { "lowerBound must not be positive" }
-            check(lowerBound <= sigma) { "lowerBound must be less or equal to sigma" }
+            check(lowerBound <= 0) { "lowerBound must be negative or zero" }
         }
         if (upperBound != null) {
-            check(upperBound >= 0) { "upperBound must not be negative" }
-            check(upperBound >= sigma) { "upperBound must be greater or equal to sigma" }
+            check(upperBound >= 0) { "upperBound must be positive or zero" }
         }
     }
 

@@ -46,8 +46,3 @@ sealed interface Filter : Condition<SchemeGenerationContext> {
         return test0(context) xor invert
     }
 }
-
-/**
- * Gets an empty filter.
- */
-fun emptyFilter(): Filter = @OptIn(InternalApi::class) EmptyFilter

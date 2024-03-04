@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.scheme
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCellFactory
 import cc.mewcraft.wakame.item.scheme.meta.*
+import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -20,11 +21,11 @@ object NekoItemFactory : KoinComponent {
      * Creates a [NekoItem] from a [configuration node][ConfigurationNode].
      *
      * @param key the key of the item
-     * @param node the configuration node holding the data of the item
+     * @param root the configuration node holding the data of the item
      * @return a new [NekoItem]
      */
-    fun create(key: Key, node: ConfigurationNode): NekoItem {
-        val uuid = node.node("uuid").requireKt<UUID>()
+    fun create(key: Key, root: ConfigurationNode): NekoItem {
+        val uuid = root.node("uuid").requireKt<UUID>()
 
         // Deserialize item meta
         val schemeItemMeta: Map<Key, SchemeItemMeta<*>> = buildMap {
@@ -37,29 +38,37 @@ object NekoItemFactory : KoinComponent {
             // is decided by the item stack generation process, not here.
 
             // (by alphabet order, in case you miss something)
-            loadAndSave<DisplayLoreMeta>(node, "lore")
-            loadAndSave<DisplayNameMeta>(node, "display_name")
-            loadAndSave<DurabilityMeta>(node, "durability")
-            loadAndSave<ElementMeta>(node, "elements")
-            loadAndSave<KizamiMeta>(node, "kizami")
-            loadAndSave<LevelMeta>(node, "level")
-            loadAndSave<MaterialMeta>(node, "material")
-            loadAndSave<RarityMeta>(node, "rarity")
-            loadAndSave<SkinMeta>(node, "skin")
-            loadAndSave<SkinOwnerMeta>(node, "skin_owner")
+            loadAndSave<DisplayLoreMeta>(root, "lore")
+            loadAndSave<DisplayNameMeta>(root, "display_name")
+            loadAndSave<DurabilityMeta>(root, "durability")
+            loadAndSave<ElementMeta>(root, "elements")
+            loadAndSave<KizamiMeta>(root, "kizami")
+            loadAndSave<LevelMeta>(root, "level")
+            loadAndSave<MaterialMeta>(root, "material")
+            loadAndSave<RarityMeta>(root, "rarity")
+            loadAndSave<SkinMeta>(root, "skin")
+            loadAndSave<SkinOwnerMeta>(root, "skin_owner")
         }
 
         // Deserialize item cells
         val schemeCells: Map<String, SchemeCell> = buildMap {
             // Side note: buildMap preserves the insertion order
 
-            node.node("cells").childrenList().forEach { n ->
+            root.node("cells").childrenList().forEach { n ->
                 val id = n.node("id").requireKt<String>()
-                val coreN = n.node("core").string?.let { groupId -> node.node("core_selectors", groupId) }
-                val curseN = n.node("curse").string?.let { groupId -> node.node("curse_selectors", groupId) }
-                val cell = SchemeCellFactory.schemeOf(n, coreN, curseN)
 
-                put(id, cell)
+                val coreNode: ConfigurationNode? = n.node("core")
+                    .string
+                    ?.let { root.node("core_groups", it) }
+                    ?.also { it.hint(AbstractGroupSerializer.SHARED_POOLS, root.node("core_pools")) } // inject `shared pools` node as hint
+                val curseNode: ConfigurationNode? = n.node("curse")
+                    .string
+                    ?.let { root.node("curse_groups", it) }
+                    ?.also { it.hint(AbstractGroupSerializer.SHARED_POOLS, root.node("curse_pools")) } // ^ same
+
+                val cell = SchemeCellFactory.schemeOf(n, coreNode, curseNode)
+
+                this[id] = cell
             }
         }
 

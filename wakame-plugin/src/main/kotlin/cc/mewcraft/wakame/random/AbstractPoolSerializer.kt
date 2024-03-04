@@ -156,7 +156,7 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
             Sample.build(content) {
                 weight = n.node("weight").requireKt<Double>()
                 conditions += intrinsicConditions(content) // add intrinsic conditions
-                conditions += deserializeConditions(n.node("filters"))
+                conditions += deserializeConditions(n.node("filters")) // add configured conditions
                 mark = n.node("mark").string?.let { Mark.stringMarkOf(it) }
                 trace = {
                     // add the mark to the context
@@ -170,29 +170,35 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
     }
 
     final override fun deserialize(type: Type, node: ConfigurationNode): Pool<S, C> {
-        if (node.isList) {
-            // it's the structure 1
+        when {
+            node.isList -> {
+                // it's the structure 1
 
-            return Pool.build {
-                samples += deserializeSamples(node)
-                // other values are all default
+                return Pool.build {
+                    samples += deserializeSamples(node)
+                    // other values are all default
 
-                onBuildPool(this)
+                    onBuildPool(this)
+                }
             }
-        } else if (node.isMap) {
-            // it's the structure 2
 
-            return Pool.build {
-                samples += deserializeSamples(node.node("entries"))
-                conditions += deserializeConditions(node.node("filters"))
-                pickAmount = node.node("sample").getLong(1)
-                isReplacement = node.node("replacement").getBoolean(false)
+            node.isMap -> {
+                // it's the structure 2
 
-                onBuildPool(this)
+                return Pool.build {
+                    samples += deserializeSamples(node.node("entries"))
+                    conditions += deserializeConditions(node.node("filters"))
+                    pickAmount = node.node("sample").getLong(1)
+                    isReplacement = node.node("replacement").getBoolean(false)
+
+                    onBuildPool(this)
+                }
             }
-        } else {
-            // it's an illegal structure
-            throw SerializationException("Can't serialize pool ${node.path()} due to illegal structure")
+
+            else -> {
+                // it's an illegal structure
+                throw SerializationException("Can't serialize pool ${node.path()} due to illegal structure")
+            }
         }
     }
 }

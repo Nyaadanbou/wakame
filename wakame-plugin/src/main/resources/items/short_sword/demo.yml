@@ -24,9 +24,11 @@ lore:
 durability:
   # 临界值
   # 必填
+  # 可写成正态分布的形式
   threshold: 512
   # 初始损耗
   # 可选，默认 0
+  # 可写成正态分布的形式
   damage: 0
 
 # 皮肤
@@ -66,9 +68,15 @@ rarity: mapping:demo_1
 # 元素标识
 # 可选，默认 无
 elements:
-  sample: 2 # 抽选 n 个元素作为该物品的元素标识
-  filters: [ ] # 条件，可用于实现特定条件下完全不生成元素
-  entries: # 候选的元素标识，以及它们各自的权重
+
+  # 抽选 n 个元素作为该物品的元素标识
+  sample: 2
+
+  # 条件，可用于实现特定条件下完全不生成元素
+  filters: [ ]
+
+  # 候选的元素标识，以及它们各自的权重
+  entries:
     - value: neutral
       weight: 2
     - value: water
@@ -77,16 +85,19 @@ elements:
       weight: 1
     - value: wind
       weight: 1
-      filters: # 这里支持写筛选的条件
-        - type: element
-          element: water
 
 # 铭刻标识
 # 可选，默认 无
 kizami:
-  sample: 2 # 抽选 n 个铭刻作为该物品的铭刻标识
-  filters: [ ] # 条件，可用于实现特定条件下完全不生成铭刻
-  entries: # 候选的铭刻标识，以及它们各自的权重
+
+  # 抽选 n 个铭刻作为该物品的铭刻标识
+  sample: 2
+
+  # 条件，可用于实现特定条件下完全不生成铭刻
+  filters: [ ]
+
+  # 候选的铭刻标识，以及它们各自的权重
+  entries:
     - value: iron
       weight: 2
     - value: gold
@@ -95,7 +106,7 @@ kizami:
       weight: 1
     - value: netherite
       weight: 1
-      filters: # 这里支持写筛选的条件
+      filters:
         - type: element
           element: water
 
@@ -104,11 +115,12 @@ kizami:
 # 生成将按照该列表的顺序进行
 cells:
   - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
-    core: core_a # 该词条栏所使用的核心选择器 id，从 core_selectors 中选择
-    curse: curse_a # 该词条栏所使用的诅咒选择器 id，从 curse_selectors 中选择
+    core: core_a # 该词条栏所使用的核心组 id，必须在 core_groups 有定义
+    curse: curse_a # 该词条栏所使用的诅咒组 id，必须在 curse_groups 有定义
     keep_empty: false # 该词条栏在生成时如果没有核心被选中的话，是否在物品上保留空的词条栏
+    # TODO 以下选项的具体用途等待开始写重铸系统时再决定，目前没有任何作用
     can_reforge: true # 该词条栏是否可重铸
-    can_override: false # 该词条栏是否可以被玩家自由修改和覆盖 TODO 具体用途等待开始写重铸时再决定
+    can_override: false # 该词条栏是否可以被玩家自由修改和覆盖
   - id: b
     core: core_b
     curse: curse_b
@@ -122,74 +134,135 @@ cells:
     can_reforge: true
     can_override: false
   - id: d
-    # core: core_d # 核心选择器可以省略不写，表示该词条栏没有核心
-    # curse: curse_d # 诅咒选择器可以省略不写，表示该词条栏没有诅咒
-    keep_empty: false
+    # core: core_d # 核心组可以省略不写，表示该词条栏没有核心
+    # curse: curse_d # ^^^
+    keep_empty: true
     can_reforge: false
     can_override: false
   - id: e
     core: core_e
-    # curse: curse_e # 也可以只省略诅咒
+    curse: curse_e
     keep_empty: false
     can_reforge: false
     can_override: false
   - id: f
-    # core: core_f # 或者只省略核心
+    core: core_f
     curse: curse_f
-    keep_empty: false
+    keep_empty: true
     can_reforge: false
     can_override: false
 
-# 词条栏的核心
-core_selectors:
+# 核心池
+#
+# 这里定义的核心池只是数据，仅供核心组引用，单独自己没有实际作用（不会在物品上出现）
+# 这些核心池需要在 core_groups.<group>.selects.<pool> 被引用才会产生实际作用
+#
+# 池也可以直接定义在组里，这里主要用来定义会反复使用的池，以避免写大量重复的配置
+core_pools:
 
-  # 核心组：group_a
-  core_a: # 该词条组的 id
-    filters:
-      - type: rarity
-        rarity: common
-    selectors:
-      pool_1: # 该词条组的一个候选池，取值必须在本池中不重复
-        filters: # 进入该池需要满足的条件，如果有多个条件 c1,c2,cn 意思是 AND(c1,c2,cn)
+  # 这里定义了一个核心池
+  # 其 id 为 shared_pool_1
+  # 可以被 core_groups.<group>.selects.<pool> 引用
+  shared_pool_1:
+
+    # 进入该池需要满足的条件
+    # 如果有多个条件 c1,c2,...,cn 意思是 AND(c1,c2,...,cn)
+    # 写成 `[ ]` 或直接删除该节点，表示没有条件，也就是始终满足
+    #
+    # 如果条件不满足，则进入下一个满足条件的核心池
+    #
+    # 所有可用的条件将做单独说明，这里不再赘述
+    filters: [ ]
+
+    # 该池包含的所有核心
+    entries:
+      - key: attribute:max_health
+        value: 20
+        weight: 1
+
+  # 定义的另一个核心池
+  # 其 id 为 shared_pool_2
+  shared_pool_2:
+    filters: [ ]
+    entries:
+      - key: attribute:max_mana
+        value: 100
+        weight: 1
+        filters: [ ]
+
+# 核心组
+core_groups:
+
+  # 核心组：core_a
+  # 这也是该核心组的 id，将被 cells.[].core 调用
+  core_a:
+
+    # 进入该核心组需要满足的条件
+    # 如果有多个条件 c1,c2,...,cn 意思是 AND(c1,c2,...,cn)
+    # 写成 `[ ]` 或直接删除该节点，表示没有条件，也就是始终满足
+    #
+    # 如果条件不满足，则没有核心生成
+    filters: [ ]
+
+    # 该核心组包含的所有核心池
+    # 生成时，将进入第一个满足条件的池，然后生成内容
+    # 这也意味着，条件越难的池应该写在越前面的位置
+    #
+    # 一旦进入一个池，将不会再退出然后再进入其他的池
+    # 这意味着如果一个池内没有生成内容（例如由于核心自己的条件不满足），那么对应的词条栏也将没有内容
+    selects:
+
+      # 该核心组的一个候选池
+      pool_1:
+        filters:
           - type: rarity
             rarity: rare
-          - type: ~rarity # 如果 type 以 ~ 开头，则反转原本的布尔值
-            rarity: epic
-        entries: # 该池拥有的所有词条
+        entries:
           - key: attribute:attack_damage
-            lower: 15 # 固定数值
-            upper: # 随机数值
-              base: 20 # 正态分布的平均值
-              scale: 0 # 等级加成，数值为 scale * level，可省略，默认为 0
-              spread: 0.2 # 正态分布的标准差
-              max: 0.3 # 正态分布的最大标准差，可省略，默认为 spread * 2
+
+            # 修饰符的运算模式，可省略，默认为 add，可用值 multiply_base, multiply_total
+            operation: add
+
+            # 属性的元素
             element: neutral
-            operation: add # 属性支持自定义操作模式 add(默认值), multiply_base, multiply_total
+
+            # 这是一个固定数值的写法，节点后直接跟数值
+            lower: 15
+
+            # 这是一个正态分布的写法，节点下需要创建新的缩进然后按格式编写
+            upper:
+              base: 30 # 正态分布的平均值
+              scale: 0 # 等级加成，数值为 scale * level，可省略，默认为 0
+              spread: 0.2 # 正态分布的标准差的“比例”
+              min: -0.4 # 正态分布的最小“浮动比例”，可省略，默认为 -spread * 3
+              max: 0.4 # 正态分布的最大“浮动比例，可省略，默认为 spread * 3
+
+            # 该样本的权重
             weight: 1
           - key: attribute:critical_strike_chance
-            value: # 随机数值
+            value:
               base: 0.75
               spread: 0.1
-              max: 0.2
-            operation: add
+              min: -0.2
+              max: 0.3
             weight: 1
           - key: attribute:critical_strike_power
-            value: 0.52 # 固定数值
-            operation: add
+            value: 0.52
             weight: 1
-            filters: # 单独设置该词条的筛选条件，条件不满足则相当于该词条不存在于该池里
-              - type: item_level # 这是一个关于物品等级要求的条件
-                level: "[20,)" # 写整型范围，支持格式 (2,5], (2..5], (2,), [2..), [2..∞), [2,∞)
+            filters:
+              - type: item_level
+                level: "[20,)"
+
+      # 该核心组的第二个候选池
       pool_2:
         filters:
           - type: rarity
             rarity: common
         entries:
           - key: attribute:attack_damage
+            element: neutral
             lower: 10
             upper: 15
-            element: neutral
-            operation: add
             weight: 1
           - key: attribute:critical_strike_chance
             value: 0.5
@@ -200,80 +273,43 @@ core_selectors:
             filters:
               - type: item_level
                 level: "[10,)"
-    default: # 备用池，固定写成 default，如果 pools 中没有满足条件的 pool，将使用备用池
+
+    # 备用池，如果 selects 中没有满足条件的池，将使用备用池
+    # 写成 `[ ]` 或直接删除该节点，表示没有备用池
+    default:
       - key: attribute:attack_damage
-        lower: 5 # 固定数值
-        upper: 8 # 固定数值
         element: neutral
+        lower: 5
+        upper: 8
         weight: 1
       - key: attribute:critical_strike_chance
-        value: # 随机数值
+        value:
           base: 0.3
           scale: 0.1
         weight: 1
 
   # 核心组：core_b
   core_b:
-    filters: [ ]
-    selectors:
-      pool_1:
-        filters:
-          - type: rarity
-            rarity: rare
-        entries:
-          - key: attribute:attack_speed_level
-            value: 4
-            weight: 1
-          - key: attribute:movement_speed_rate
-            value: 0.4
-            weight: 1
-          - key: attribute:defense
-            value: 23
-            element: universal
-            weight: 1
-            mark: x1y1z1 # 为该项指定一个印记（string），当该项被选中时，指定的印记将被加入到上下文中
-    default:
-      - key: attribute:attack_speed_level
-        value: 2
-        weight: 1
-      - key: attribute:movement_speed_rate
-        value: 0.2
-        weight: 1
+    filters:
+      - type: rarity
+        rarity: common
+    selects:
+      pool_1: shared_pool_1 # 这里使用了 core_pools.shared_pool_1
+    default: [ ]
 
   # 核心组：core_c
   core_c:
     filters: [ ]
-    selectors:
-      pool_1:
-        filters:
-          - type: rarity
-            rarity: rare
-        entries:
-          - key: attribute:max_health
-            value: 40
-            weight: 1
-          - key: attribute:max_mana
-            value: 10
-            weight: 1
-          - key: attribute:damage_reduction_rate
-            value: 0.25
-            weight: 99
-            filters:
-              - type: mark # 该类型条件将检查物品生成的上下文中是否有指定的印记存在
-                mark: x1y1z1 # 如果已经存在值为 "x1y1z1" 的印记，则该项会在随机选择开始前被排除掉
-    default:
-      - key: attribute:max_health
-        value: 20
-        weight: 1
-      - key: attribute:max_mana
-        value: 5
-        weight: 1
+    selects:
+      pool_1: shared_pool_2 # 这里使用了 cire_pools.shared_pool_2
+    default: [ ]
 
   # 核心组：core_d
+  # 这是一个只有固定内容的词条栏的基本写法
   core_d:
     filters: [ ]
-    selectors: { }
-    default: # 这是一个只有固定内容的词条栏的基本写法
+    selects: { }
+    default:
       - key: attribute:lifesteal
         value: 0.2
         weight: 10
@@ -284,26 +320,26 @@ core_selectors:
   # 核心组：core_e
   core_e:
     filters: [ ]
-    selectors:
+    selects:
       fire:
         filters:
           - type: element
             element: fire
         entries:
           - key: attribute:attack_damage
+            element: fire
             lower: 10
             upper: 16
-            element: fire
             weight: 8
           - key: attribute:attack_damage
+            element: fire
             lower: 0.1
             upper: 0.1
-            element: fire
             operation: multiply_base
             weight: 8
           - key: attribute:attack_effect_chance
-            value: 0.38
             element: fire
+            value: 0.38
             weight: 8
       water:
         filters:
@@ -311,19 +347,19 @@ core_selectors:
             element: water
         entries:
           - key: attribute:attack_damage
+            element: water
             lower: 10
             upper: 17
-            element: water
             weight: 8
           - key: attribute:attack_damage
+            element: water
             lower: 0.2
             upper: 0.2
-            element: water
             operation: multiply_base
             weight: 8
           - key: attribute:attack_effect_chance
-            value: 0.42
             element: water
+            value: 0.42
             weight: 8
       wind:
         filters:
@@ -331,64 +367,82 @@ core_selectors:
             element: wind
         entries:
           - key: attribute:attack_damage
+            element: wind
             lower: 10
             upper: 18
-            element: wind
             weight: 8
           - key: attribute:attack_damage
+            element: wind
             lower: 0.3
             upper: 0.3
-            element: wind
             operation: multiply_base
             weight: 8
           - key: attribute:attack_effect_chance
-            value: 0.56
             element: wind
+            value: 0.56
             weight: 8
     default: [ ] # 这里没有定义 fallback
 
   # 核心组：core_f
   core_f:
     filters: [ ]
-    selectors:
-      ability: # 这个池的 id
-        entries:
-          - key: ability:blink
-            mana: 12
-            cooldown: 10
-            distance: 16
-            weight: 1
-          - key: ability:dash
-            mana: 12
-            cooldown: 4
-            damage: 8 * damage # 技能伤害为 8 倍的玩家所有元素伤害之和
-            weight: 1
+    # TODO 技能数据还未完成，暂时注释掉
+    # selects:
+    #  ability:
+    #    entries:
+    #      - key: ability:blink
+    #        mana: 12
+    #        cooldown: 10
+    #        distance: 16
+    #        weight: 1
+    #      - key: ability:dash
+    #        mana: 12
+    #        cooldown: 4
+    #        damage: 8 * damage
+    #        weight: 1
     default: [ ]
 
-# 词条栏的诅咒
-curse_selectors:
+# 诅咒池
+#
+# 这里定义的诅咒池只是数据，仅供诅咒组引用，而无实际作用
+# 这些诅咒池需要在 curse_groups.<group>.selects.<pool>
+# 被引用才会产生实际作用（在物品上出现）
+curse_pools:
+  shared_pool_1:
+    filters: [ ]
+    entries:
+      - key: curse:entity_kills
+        index: demo_bosses_1
+        count: 2
+        weight: 1
+      - key: curse:entity_kills
+        index: demo_bosses_2
+        count: 2
+        weight: 1
+      - key: curse:entity_kills
+        index: demo_bosses_3
+        count: 2
+        weight: 1
+  shared_pool_2:
+    filters: [ ]
+    entries:
+      - key: curse:peak_damage
+        amount: 20
+        element: fire
+        weight: 1
+      - key: curse:peak_damage
+        amount: 32
+        element: water
+        weight: 1
+
+# 诅咒组
+curse_groups:
 
   # 诅咒组：curse_a
-  curse_a:
+  curse_a: # 该诅咒组的 id，将被 cells.[].curse 调用
     filters: [ ]
-    selectors:
-      common:
-        filters:
-          - type: rarity
-            rarity: common
-        entries:
-          - key: curse:entity_kills
-            index: demo_bosses_1
-            count: 2
-            weight: 1
-          - key: curse:entity_kills
-            index: demo_bosses_2
-            count: 2
-            weight: 1
-          - key: curse:entity_kills
-            index: demo_bosses_3
-            count: 2
-            weight: 1
+    selects:
+      pool_1: shared_pool_1 # 这里引用了 curse_pools.shared_pool_1
     default:
       - key: curse:entity_kills
         index: demo_creeps_1
@@ -406,20 +460,8 @@ curse_selectors:
   # 诅咒组：curse_b
   curse_b:
     filters: [ ]
-    selectors:
-      common:
-        filters:
-          - type: rarity
-            rarity: common
-        entries:
-          - key: curse:peak_damage
-            amount: 20
-            element: fire
-            weight: 1
-          - key: curse:peak_damage
-            amount: 32
-            element: water
-            weight: 1
+    selects:
+      pool_1: shared_pool_2 # 这里引用了 curse_pools.shared_pool_2
     default:
       - key: curse:peak_damage
         amount: 10
@@ -433,7 +475,7 @@ curse_selectors:
   # 诅咒组：curse_c
   curse_c:
     filters: [ ]
-    selectors: { }
+    selects: { }
     default:
       - key: curse:peak_damage
         amount: 20
@@ -443,7 +485,7 @@ curse_selectors:
   # 诅咒组：curse_d
   curse_d:
     filters: [ ]
-    selectors: { }
+    selects: { }
     default:
       - key: curse:peak_damage
         amount: 30
@@ -453,7 +495,7 @@ curse_selectors:
   # 诅咒组：curse_e
   curse_e:
     filters: [ ]
-    selectors: { }
+    selects: { }
     default:
       - key: curse:peak_damage
         amount: 40
@@ -463,7 +505,7 @@ curse_selectors:
   # 诅咒组：curse_f
   curse_f:
     filters: [ ]
-    selectors: { }
+    selects: { }
     default:
       - key: curse:peak_damage
         amount: 50
