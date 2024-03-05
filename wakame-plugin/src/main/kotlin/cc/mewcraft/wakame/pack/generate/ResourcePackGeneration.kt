@@ -4,11 +4,14 @@ import cc.mewcraft.wakame.item.scheme.NekoItem
 import me.lucko.helper.text3.mini
 import org.jetbrains.annotations.Contract
 import team.unnamed.creative.ResourcePack
+import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackMeta
+import java.io.File
 
 data class GenerationArgs(
     val resourcePack: ResourcePack,
     val allItems: Set<NekoItem>,
+    val assetsDir: File,
 )
 
 sealed class ResourcePackGeneration(
@@ -47,10 +50,22 @@ internal class ResourcePackMetaGeneration(
     override fun generate(): Result<Unit> {
         runCatching {
             val packMeta = PackMeta.of(
-                26,
+                22,
                 "<rainbow>Nyaadanbou Resource Pack".mini,
             )
             args.resourcePack.packMeta(packMeta)
+        }.onFailure { return Result.failure(it) }
+
+        return generateNext()
+    }
+}
+
+internal class ResourcePackIconGeneration(
+    args: GenerationArgs,
+) : ResourcePackGeneration(args) {
+    override fun generate(): Result<Unit> {
+        runCatching {
+            args.resourcePack.icon(Writable.file(args.assetsDir.resolve("logo.png")))
         }.onFailure { return Result.failure(it) }
 
         return generateNext()

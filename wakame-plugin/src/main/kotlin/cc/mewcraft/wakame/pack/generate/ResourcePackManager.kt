@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.registry.NekoItemRegistry
+import com.google.common.base.Throwables
 import me.lucko.helper.scheduler.HelperExecutors
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
@@ -17,17 +19,21 @@ import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import team.unnamed.creative.BuiltResourcePack
+import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import team.unnamed.creative.server.ResourcePackServer
 import java.io.File
 import java.io.IOException
+import java.util.zip.ZipException
 import kotlin.math.log10
 import kotlin.math.pow
 
 private const val RESOURCE_PACK_NAME = "wakame.zip"
 
-private const val RESOURCE_PACK_PATH = "resource_packs/$RESOURCE_PACK_NAME"
+private const val PLUGIN_ASSETS_DIR = "assets"
+
+private const val GENERATED_RESOURCE_PACK_FILE = "generated/$RESOURCE_PACK_NAME"
 
 @ReloadDependency(
     runBefore = [NekoItemRegistry::class]
@@ -35,6 +41,7 @@ private const val RESOURCE_PACK_PATH = "resource_packs/$RESOURCE_PACK_NAME"
 class ResourcePackManager : Initializable, KoinComponent {
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
     private val logger: ComponentLogger by inject()
+    private val plugin: WakamePlugin by inject()
 
     private var server: ResourcePackServer? = null
 
@@ -47,25 +54,36 @@ class ResourcePackManager : Initializable, KoinComponent {
      * @return a result encapsulating whether the generation succeeds or not
      */
     fun generate(reGenerate: Boolean = false): Result<Unit> {
+        var regen = reGenerate
+        plugin.saveResourceRecursively(PLUGIN_ASSETS_DIR)
+
         val resourceFile = initFile().getOrElse { return Result.failure(it) }.also { logger.info("Resource pack path initialized") }
 
         // Read the resource pack from the file
-        // The resource pack may be empty if it's the first time to generate
-        val resourcePack = MinecraftResourcePackReader.minecraft()
-            .readFromZipFile(resourceFile)
-            .also { logger.info("Resource pack read") }
+        // The resource pack may be empty if it's the first time to generate, so we need to handle the exception
+        val resourcePack = runCatching {
+            MinecraftResourcePackReader.minecraft()
+                .readFromZipFile(resourceFile)
+                .also { logger.info("Resource pack read") }
+        }.getOrElse {
+            if (reGenerate || Throwables.getRootCause(it) !is ZipException) return Result.failure(it)
+            logger.info("<yellow>Resource pack is empty, re-generating...".mini)
+            ResourcePack.resourcePack().also { regen = true }
+        }
 
-        if (reGenerate) {
+        if (regen) {
             val allItems: Set<NekoItem> = NekoItemRegistry.values
 
             val generationArgs = GenerationArgs(
                 resourcePack = resourcePack,
-                allItems = allItems
+                allItems = allItems,
+                assetsDir = pluginDataDir.resolve(PLUGIN_ASSETS_DIR),
             )
 
             // Generate the resource pack
             ResourcePackGeneration.chain(
                 ResourcePackMetaGeneration(generationArgs),
+                ResourcePackIconGeneration(generationArgs),
             ).generate().getOrElse { return Result.failure(it) }
 
             // Write the resource pack to the file
@@ -73,12 +91,14 @@ class ResourcePackManager : Initializable, KoinComponent {
                 MinecraftResourcePackWriter.minecraft()
                     .writeToZipFile(resourceFile, resourcePack)
             }.getOrElse { return Result.failure(it) }
+            logger.info("<green>Resource pack generated".mini)
         }
 
         // Build the resource pack
         val builtResourcePack = runCatching { MinecraftResourcePackWriter.minecraft().build(resourcePack) }
             .getOrElse { return Result.failure(it) }
         runCatching { startServer(builtResourcePack) }.getOrElse { return Result.failure(it) }
+
         pack = builtResourcePack
             .also { logger.info("<green>Resource pack built. File size: <yellow>${resourceFile.formatSize()}".mini) }
 
@@ -87,7 +107,7 @@ class ResourcePackManager : Initializable, KoinComponent {
 
     //<editor-fold desc="Init resource pack file">
     private fun initFile(): Result<File> {
-        val resourcePackPath = pluginDataDir.resolve(RESOURCE_PACK_PATH)
+        val resourcePackPath = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_FILE)
         if (resourcePackPath.isDirectory) {
             return Result.failure(IOException("Resource pack path is a directory"))
         }
@@ -152,6 +172,14 @@ class ResourcePackManager : Initializable, KoinComponent {
     //</editor-fold>
 
     fun sendToPlayer(player: Player) {
+        if (!this::pack.isInitialized || !this::downloadAddress.isInitialized) {
+            player.takeIf { !it.hasPermission("wakame.admin") && it.isOnline }
+                ?.let {
+                    player.kick("<red>Resource pack is not ready. Please wait a moment.".mini)
+                    return
+                }
+        }
+
         player.setResourcePack(
             downloadAddress,
             pack.hash(),
@@ -167,7 +195,7 @@ class ResourcePackManager : Initializable, KoinComponent {
 
     override fun onReload() {
         stopServer()
-        generate()
+        generate(true) // TODO: Only for development. When the resource pack is stable, remove 'true'
         get<Server>().onlinePlayers.forEach { sendToPlayer(it) }
     }
     //</editor-fold>
