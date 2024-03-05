@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme
 
+import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCellFactory
 import cc.mewcraft.wakame.item.scheme.meta.*
@@ -8,14 +9,17 @@ import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
-import java.util.UUID
-
+import java.io.File
+import java.nio.file.Path
+import java.util.*
 
 object NekoItemFactory : KoinComponent {
     private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
+    private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
     /**
      * Creates a [NekoItem] from a [configuration node][ConfigurationNode].
@@ -26,6 +30,12 @@ object NekoItemFactory : KoinComponent {
      */
     fun create(key: Key, root: ConfigurationNode): NekoItem {
         val uuid = root.node("uuid").requireKt<UUID>()
+        val modelPathString = root.node("model_path").string ?: ""
+        val modelPath = if (modelPathString.isNotBlank()) {
+            validateModelPathString(modelPathString)
+        } else {
+            null
+        }
 
         // Deserialize item meta
         val schemeItemMeta: Map<Key, SchemeItemMeta<*>> = buildMap {
@@ -71,9 +81,15 @@ object NekoItemFactory : KoinComponent {
                 this[id] = cell
             }
         }
-
-        val ret = NekoItemImpl(key, uuid, schemeItemMeta, schemeCells)
+        val ret = NekoItemImpl(key, uuid, schemeItemMeta, schemeCells, modelPath)
         return ret
+    }
+
+    private fun validateModelPathString(modelPath: String): Path {
+        val modelFile = assetsDir.resolve(modelPath)
+        require(modelFile.exists()) { "Model path $modelPath does not exist" }
+        require(modelFile.name.endsWith(".json")) { "Model path $modelPath does not end with .json" }
+        return modelFile.toPath()
     }
 
     private inline fun <reified T : SchemeItemMeta<*>> MutableMap<Key, SchemeItemMeta<*>>.loadAndSave(

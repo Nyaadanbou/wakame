@@ -21,6 +21,8 @@ import java.io.File
 
 const val PLUGIN_DATA_DIR = "plugin_data_dir"
 
+const val PLUGIN_ASSETS_DIR = "assets"
+
 fun wakameModule(plugin: WakamePlugin): Module = module {
 
     ////// Plugin injections
@@ -36,6 +38,7 @@ fun wakameModule(plugin: WakamePlugin): Module = module {
     single<ComponentLogger> { plugin.componentLogger } bind Logger::class
     single<Server> { plugin.server }
     single<File>(named(PLUGIN_DATA_DIR)) { plugin.dataFolder }
+    single<File>(named(PLUGIN_ASSETS_DIR)) { get<File>(named(PLUGIN_DATA_DIR)).resolve("assets") }
 
     ////// ComponentSerializer injections
 

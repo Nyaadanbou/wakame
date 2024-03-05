@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.pack.generate
 
+import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.initializer.Initializable
@@ -26,12 +27,11 @@ import team.unnamed.creative.server.ResourcePackServer
 import java.io.File
 import java.io.IOException
 import java.util.zip.ZipException
+import javax.net.ssl.SSLContext
 import kotlin.math.log10
 import kotlin.math.pow
 
 private const val RESOURCE_PACK_NAME = "wakame.zip"
-
-private const val PLUGIN_ASSETS_DIR = "assets"
 
 private const val GENERATED_RESOURCE_PACK_FILE = "generated/$RESOURCE_PACK_NAME"
 
@@ -40,7 +40,7 @@ private const val GENERATED_RESOURCE_PACK_FILE = "generated/$RESOURCE_PACK_NAME"
 )
 class ResourcePackManager : Initializable, KoinComponent {
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
-    private val logger: ComponentLogger by inject()
+    private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
     private val plugin: WakamePlugin by inject()
 
     private var server: ResourcePackServer? = null
@@ -77,13 +77,13 @@ class ResourcePackManager : Initializable, KoinComponent {
             val generationArgs = GenerationArgs(
                 resourcePack = resourcePack,
                 allItems = allItems,
-                assetsDir = pluginDataDir.resolve(PLUGIN_ASSETS_DIR),
             )
 
             // Generate the resource pack
             ResourcePackGeneration.chain(
                 ResourcePackMetaGeneration(generationArgs),
                 ResourcePackIconGeneration(generationArgs),
+                ResourcePackModelGeneration(generationArgs),
             ).generate().getOrElse { return Result.failure(it) }
 
             // Write the resource pack to the file

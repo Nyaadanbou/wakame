@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.bukkit.entity.Player
+import java.nio.file.Path
 import java.util.UUID
 
 /**
@@ -65,6 +66,21 @@ interface NekoItem : Keyed {
      * is always the same as the insertion order.
      */
     val cells: Map<String, SchemeCell>
+
+    /**
+     * The path to the model of this item. Empty string if the item model
+     * is not specified.
+     *
+     * The model path is relative to the texture directory of the resource
+     * pack.
+     *
+     * For example, if the model path is `items/nyan_cat.json`, then
+     * the actual model file should be located at `assets/items/nyan_cat.json`.
+     *
+     * The model file should be in the format of Minecraft's model file.
+     * You can refer to the [official Minecraft documentation](https://minecraft.wiki/w/Model) for more information.
+     */
+    val modelPath: Path?
 
     /**
      * Generates an ItemStack from this scheme.
