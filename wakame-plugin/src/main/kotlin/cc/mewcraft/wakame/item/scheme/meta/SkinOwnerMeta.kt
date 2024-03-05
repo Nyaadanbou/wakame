@@ -11,7 +11,7 @@ import java.util.UUID
 /**
  * 物品的皮肤的所有者。
  */
-interface SkinOwnerMeta : SchemeItemMeta<UUID> {
+sealed interface SkinOwnerMeta : SchemeItemMeta<UUID> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "skin_owner")
     }
@@ -28,7 +28,7 @@ private class NonNullSkinOwnerMeta(
     }
 }
 
-private object DefaultSkinOwnerMeta : SkinOwnerMeta {
+private data object DefaultSkinOwnerMeta : SkinOwnerMeta {
     override fun generate(context: SchemeGenerationContext): UUID? {
         return null
     }

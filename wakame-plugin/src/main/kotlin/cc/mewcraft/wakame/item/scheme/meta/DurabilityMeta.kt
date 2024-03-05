@@ -35,7 +35,7 @@ data class Durability(
     override fun toString(): String = toSimpleString()
 }
 
-interface DurabilityMeta : SchemeItemMeta<Durability> {
+sealed interface DurabilityMeta : SchemeItemMeta<Durability> {
     companion object : Keyed {
         override fun key(): Key = ItemMetaKeys.DURABILITY
     }
@@ -58,7 +58,7 @@ private class NonNullDurabilityMeta(
     }
 }
 
-private object DefaultDurabilityMeta : DurabilityMeta {
+private data object DefaultDurabilityMeta : DurabilityMeta {
     override fun generate(context: SchemeGenerationContext): Durability? = null
 }
 

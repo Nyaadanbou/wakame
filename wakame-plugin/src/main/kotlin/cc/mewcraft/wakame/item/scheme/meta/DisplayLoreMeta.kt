@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 /**
  * 物品的描述。
  */
-interface DisplayLoreMeta : SchemeItemMeta<List<String>> {
+sealed interface DisplayLoreMeta : SchemeItemMeta<List<String>> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "lore")
     }

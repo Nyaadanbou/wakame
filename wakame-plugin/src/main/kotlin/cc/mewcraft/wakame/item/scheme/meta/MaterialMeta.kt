@@ -13,7 +13,7 @@ import java.lang.reflect.Type
 /**
  * 物品的原版物品类型。
  */
-interface MaterialMeta : SchemeItemMeta<Material> {
+sealed interface MaterialMeta : SchemeItemMeta<Material> {
     override fun generate(context: SchemeGenerationContext): Material // never null
 
     companion object : Keyed {
@@ -29,7 +29,7 @@ private class NonNullMaterialMeta(
     }
 }
 
-private object DefaultMaterialMeta : MaterialMeta {
+private data object DefaultMaterialMeta : MaterialMeta {
     override fun generate(context: SchemeGenerationContext): Material {
         return Material.STONE
     }

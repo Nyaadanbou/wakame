@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
  *
  * @param T 模板最终产生的数据类型
  */
-interface SchemeItemMeta<T : Any?> {
+sealed interface SchemeItemMeta<T : Any?> {
     /**
      * Generate a value [T] from this scheme.
      *
