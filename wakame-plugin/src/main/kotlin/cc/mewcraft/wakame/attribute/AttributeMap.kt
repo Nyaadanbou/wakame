@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.util.toBukkit
 import com.google.common.collect.Multimap
 import org.bukkit.entity.Player
-import java.util.*
+import java.util.UUID
 
 sealed interface AttributeMap {
     fun getAttributeInstance(attribute: Attribute): AttributeInstance?
@@ -57,14 +57,14 @@ class PlayerAttributeMap(
         // See: https://youtrack.jetbrains.com/issue/KT-10982
         val oldValue = attributes[attribute]
         if (oldValue == null) {
-            if (Attributes.isVanilla(attribute)) {
+            if (attribute.vanilla) {
                 val bukkitAttribute = attribute.toBukkit()
-                val bukkitInstance = entity.getAttribute(bukkitAttribute)
-                requireNotNull(bukkitInstance) { "Can't find vanilla attribute instance for attribute $attribute" }
+                val bukkitAttributeInstance = entity.getAttribute(bukkitAttribute)
+                requireNotNull(bukkitAttributeInstance) { "Can't find vanilla attribute instance for attribute $attribute" }
 
-                val instance = VanillaAttributeInstanceWrapper(bukkitInstance)
-                attributes[attribute] = instance
-                return instance
+                val attributeInstance = VanillaAttributeInstance(bukkitAttributeInstance)
+                attributes[attribute] = attributeInstance
+                return attributeInstance
             }
 
             val newValue = defaultSupplier.createAttributeInstance(attribute)
@@ -81,10 +81,10 @@ class PlayerAttributeMap(
     }
 
     override fun registerAttribute(attributeBase: Attribute) {
-        if (Attributes.isVanilla(attributeBase)) {
+        if (attributeBase.vanilla) {
             val bukkitAttribute = attributeBase.toBukkit()
             entity.registerAttribute(bukkitAttribute)
-            attributes[attributeBase] = VanillaAttributeInstanceWrapper(entity.getAttribute(bukkitAttribute)!!)
+            attributes[attributeBase] = VanillaAttributeInstance(entity.getAttribute(bukkitAttribute)!!)
             return
         }
 

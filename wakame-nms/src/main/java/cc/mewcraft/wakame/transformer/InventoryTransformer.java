@@ -30,7 +30,6 @@ public class InventoryTransformer {
         ) {
             try {
                 ClassLoader pluginClassLoader = Bukkit.getPluginManager().getPlugin("Wakame").getClass().getClassLoader();
-
                 Class<?> inventoryListenerProxyClass = Class.forName(
                         "cc.mewcraft.wakame.transformer.InventoryListenerProxy",
                         false,

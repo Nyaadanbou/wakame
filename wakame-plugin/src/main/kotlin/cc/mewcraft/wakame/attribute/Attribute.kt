@@ -32,6 +32,10 @@ open class Attribute @InternalApi constructor(
      * 属性的默认数值。
      */
     val defaultValue: Double,
+    /**
+     * 属性是否由原版属性实现。
+     */
+    val vanilla: Boolean = false,
 ) : Keyed {
     /**
      * 清理给定的数值，使其落在该属性的合理数值范围内。
@@ -66,9 +70,12 @@ open class Attribute @InternalApi constructor(
  * An [Attribute] with bounded values.
  */
 @OptIn(InternalApi::class)
-open class RangedAttribute @InternalApi constructor(
+open class RangedAttribute
+@InternalApi
+constructor(
     descriptionId: String,
     defaultValue: Double,
+    vanilla: Boolean,
     /**
      * 该属性允许的最小数值。
      */
@@ -77,7 +84,15 @@ open class RangedAttribute @InternalApi constructor(
      * 该属性允许的最大数值。
      */
     val maxValue: Double,
-) : Attribute(descriptionId, defaultValue) {
+) : Attribute(descriptionId, defaultValue, vanilla) {
+    @InternalApi
+    constructor(
+        descriptionId: String,
+        defaultValue: Double,
+        minValue: Double,
+        maxValue: Double,
+    ) : this(descriptionId, defaultValue, false, minValue, maxValue)
+
     init {
         if (minValue > maxValue) {
             throw IllegalArgumentException("Minimum value cannot be bigger than maximum value!")
@@ -101,18 +116,33 @@ open class RangedAttribute @InternalApi constructor(
  * An [Attribute] related to an [Element].
  */
 @OptIn(InternalApi::class)
-open class ElementAttribute @InternalApi constructor(
+open class ElementAttribute
+@InternalApi
+constructor(
+    descriptionId: String,
+    defaultValue: Double,
+    vanilla: Boolean,
+    minValue: Double,
+    maxValue: Double,
     /**
      * 该属性所关联的元素种类。
      */
     val element: Element,
-    descriptionId: String,
-    defaultValue: Double,
-    minValue: Double,
-    maxValue: Double,
 ) : RangedAttribute(
     descriptionId,
     defaultValue,
+    vanilla,
     minValue,
-    maxValue
-)
+    maxValue,
+) {
+    @InternalApi
+    constructor(
+        descriptionId: String,
+        defaultValue: Double,
+        minValue: Double,
+        maxValue: Double,
+        element: Element,
+    ) : this(
+        descriptionId, defaultValue, false, minValue, maxValue, element
+    )
+}
