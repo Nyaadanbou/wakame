@@ -70,6 +70,16 @@ var ItemStack.backingLore: List<String>?
             this.handle?.getTagElement("display")?.remove("Lore")
         }
     }
+
+var ItemStack.backingCustomModelData: Int?
+    get() = throw UnsupportedOperationException("Get operation is not supported")
+    set(value) {
+        if (value != null) {
+            this.handle?.tag?.putInt("CustomModelData", value)
+        } else {
+            this.handle?.tag?.remove("CustomModelData")
+        }
+    }
 //</editor-fold>
 
 //<editor-fold desc="MojangStack - Neko Compound">

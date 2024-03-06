@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.util.createBasicConfigurationLoader
+import cc.mewcraft.wakame.util.createYamlConfigurationLoader
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.new
 import org.koin.core.module.dsl.singleOf
@@ -19,7 +19,7 @@ internal fun displayModule(): Module = module {
 
     // config holder
     single<RendererConfiguration> {
-        RendererConfiguration(createBasicConfigurationLoader(RENDERER_CONFIG_FILE))
+        RendererConfiguration(createYamlConfigurationLoader(RENDERER_CONFIG_FILE))
     } binds arrayOf(Initializable::class)
 
     // meta lookup

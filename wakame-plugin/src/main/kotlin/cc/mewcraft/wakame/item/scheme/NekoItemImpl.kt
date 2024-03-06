@@ -12,8 +12,7 @@ import cc.mewcraft.wakame.item.scheme.meta.MaterialMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
-import java.nio.file.Path
-import java.util.UUID
+import java.util.*
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta as BDisplayNameMeta
 import cc.mewcraft.wakame.item.binary.meta.DurabilityMeta as BDurabilityMeta
@@ -38,7 +37,6 @@ internal data class NekoItemImpl(
     override val uuid: UUID,
     override val itemMeta: Map<Key, SchemeItemMeta<*>>,
     override val cells: Map<String, SchemeCell>,
-    override val modelPath: Path?
 ) : NekoItem {
     override fun createItemStack(player: Player?): NekoItemStack {
         val context = SchemeGenerationContext(playerObject = player)

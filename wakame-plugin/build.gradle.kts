@@ -36,6 +36,7 @@ dependencies {
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
+    implementation(platform(libs.bom.configurate.gson))
     implementation(platform(libs.bom.configurate.kotlin))
     implementation(platform(libs.bom.creative))
 

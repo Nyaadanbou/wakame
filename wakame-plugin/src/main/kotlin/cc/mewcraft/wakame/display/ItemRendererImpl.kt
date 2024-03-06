@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.pack.CustomModelDataConfiguration
+import cc.mewcraft.wakame.util.backingCustomModelData
 import cc.mewcraft.wakame.util.backingLore
 import cc.mewcraft.wakame.util.backingDisplayName
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -12,6 +14,7 @@ internal class ItemRendererImpl(
     private val loreFinalizer: LoreFinalizer,
 ) : KoinComponent, ItemRenderer {
     private val gsonSerial: GsonComponentSerializer by inject()
+    private val cmdConfig: CustomModelDataConfiguration by inject()
 
     override fun render(copy: NekoItemStack) {
         require(copy.isNeko) { "Can't render a non-neko ItemStack" }
@@ -24,6 +27,7 @@ internal class ItemRendererImpl(
         copy.handle.let {
             it.backingDisplayName = gsonSerial.serialize(displayName)
             it.backingLore = displayLore.map(gsonSerial::serialize)
+            it.backingCustomModelData = cmdConfig.customModelDataMap[copy.key]
         }
 
         // 为了麦若，去掉物品的真实根标签

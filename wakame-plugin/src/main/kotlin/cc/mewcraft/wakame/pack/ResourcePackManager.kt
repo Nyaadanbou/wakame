@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.pack.generate
+package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
@@ -6,6 +6,10 @@ import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.scheme.NekoItem
+import cc.mewcraft.wakame.pack.generate.*
+import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackModelGeneration
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import com.google.common.base.Throwables
 import me.lucko.helper.scheduler.HelperExecutors
@@ -27,7 +31,6 @@ import team.unnamed.creative.server.ResourcePackServer
 import java.io.File
 import java.io.IOException
 import java.util.zip.ZipException
-import javax.net.ssl.SSLContext
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -38,7 +41,7 @@ private const val GENERATED_RESOURCE_PACK_FILE = "generated/$RESOURCE_PACK_NAME"
 @ReloadDependency(
     runBefore = [NekoItemRegistry::class]
 )
-class ResourcePackManager : Initializable, KoinComponent {
+internal class ResourcePackManager : Initializable, KoinComponent {
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
     private val plugin: WakamePlugin by inject()
@@ -58,17 +61,23 @@ class ResourcePackManager : Initializable, KoinComponent {
         plugin.saveResourceRecursively(PLUGIN_ASSETS_DIR)
 
         val resourceFile = initFile().getOrElse { return Result.failure(it) }.also { logger.info("Resource pack path initialized") }
+        val resourcePackResult = runCatching {
+            if (regen) return@runCatching ResourcePack.resourcePack()
 
-        // Read the resource pack from the file
-        // The resource pack may be empty if it's the first time to generate, so we need to handle the exception
-        val resourcePack = runCatching {
             MinecraftResourcePackReader.minecraft()
                 .readFromZipFile(resourceFile)
                 .also { logger.info("Resource pack read") }
-        }.getOrElse {
-            if (reGenerate || Throwables.getRootCause(it) !is ZipException) return Result.failure(it)
-            logger.info("<yellow>Resource pack is empty, re-generating...".mini)
-            ResourcePack.resourcePack().also { regen = true }
+        }
+
+        // Read the resource pack from the file
+        // The resource pack may be empty if it's the first time to generate, so we need to handle the exception
+        val resourcePack = when {
+            resourcePackResult.isSuccess -> resourcePackResult.getOrThrow()
+            reGenerate || Throwables.getRootCause(resourcePackResult.exceptionOrNull()!!) !is ZipException -> return Result.failure(resourcePackResult.exceptionOrNull()!!)
+            else -> {
+                logger.info("<yellow>Resource pack is empty, re-generating...".mini)
+                ResourcePack.resourcePack().also { regen = true }
+            }
         }
 
         if (regen) {
@@ -76,7 +85,7 @@ class ResourcePackManager : Initializable, KoinComponent {
 
             val generationArgs = GenerationArgs(
                 resourcePack = resourcePack,
-                allItems = allItems,
+                allItems = allItems
             )
 
             // Generate the resource pack
@@ -101,7 +110,6 @@ class ResourcePackManager : Initializable, KoinComponent {
 
         pack = builtResourcePack
             .also { logger.info("<green>Resource pack built. File size: <yellow>${resourceFile.formatSize()}".mini) }
-
         return Result.success(Unit)
     }
 
@@ -195,7 +203,7 @@ class ResourcePackManager : Initializable, KoinComponent {
 
     override fun onReload() {
         stopServer()
-        generate(true) // TODO: Only for development. When the resource pack is stable, remove 'true'
+        generate(true).getOrElse { logger.error("Failed to re-generate resource pack", it) } // TODO: Only for development. When the resource pack is stable, remove 'true'
         get<Server>().onlinePlayers.forEach { sendToPlayer(it) }
     }
     //</editor-fold>

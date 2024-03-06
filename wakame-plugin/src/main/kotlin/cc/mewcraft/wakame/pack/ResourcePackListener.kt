@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.pack.generate.ResourcePackManager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent

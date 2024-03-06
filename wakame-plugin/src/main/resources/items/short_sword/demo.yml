@@ -19,10 +19,6 @@ lore:
   - "<gold>Demo Lore 1"
   - "<gold>Demo Lore 2"
 
-# 自定义模型
-# 可选，默认 空字符串
-model_path: "models/item/short_sword/demo.json"
-
 # 保养度
 # 可选，默认 无
 durability:

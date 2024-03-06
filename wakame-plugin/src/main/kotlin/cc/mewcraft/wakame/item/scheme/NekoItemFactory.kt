@@ -30,12 +30,6 @@ object NekoItemFactory : KoinComponent {
      */
     fun create(key: Key, root: ConfigurationNode): NekoItem {
         val uuid = root.node("uuid").requireKt<UUID>()
-        val modelPathString = root.node("model_path").string ?: ""
-        val modelPath = if (modelPathString.isNotBlank()) {
-            validateModelPathString(modelPathString)
-        } else {
-            null
-        }
 
         // Deserialize item meta
         val schemeItemMeta: Map<Key, SchemeItemMeta<*>> = buildMap {
@@ -81,15 +75,21 @@ object NekoItemFactory : KoinComponent {
                 this[id] = cell
             }
         }
-        val ret = NekoItemImpl(key, uuid, schemeItemMeta, schemeCells, modelPath)
+        val ret = NekoItemImpl(key, uuid, schemeItemMeta, schemeCells)
         return ret
     }
 
-    private fun validateModelPathString(modelPath: String): Path {
-        val modelFile = assetsDir.resolve(modelPath)
-        require(modelFile.exists()) { "Model path $modelPath does not exist" }
-        require(modelFile.name.endsWith(".json")) { "Model path $modelPath does not end with .json" }
-        return modelFile.toPath()
+    fun validatePathStringOrNull(path: String, extension: String): Path? {
+        val file = assetsDir.resolve(path)
+        if (!file.exists())
+            return null
+        if (file.extension != extension)
+            return null
+        return file.toPath()
+    }
+
+    fun validatePathString(path: String, extension: String): Path {
+        return requireNotNull(validatePathStringOrNull(path, extension)) { "Path $path is invalid" }
     }
 
     private inline fun <reified T : SchemeItemMeta<*>> MutableMap<Key, SchemeItemMeta<*>>.loadAndSave(

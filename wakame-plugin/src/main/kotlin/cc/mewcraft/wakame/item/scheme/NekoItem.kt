@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.scheme.NekoItemFactory.validatePathStringOrNull
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.MaterialMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
@@ -10,7 +11,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.bukkit.entity.Player
 import java.nio.file.Path
-import java.util.UUID
+import java.util.*
 
 /**
  * Represents an **item template**, or a "blueprint" in other words.
@@ -68,21 +69,6 @@ interface NekoItem : Keyed {
     val cells: Map<String, SchemeCell>
 
     /**
-     * The path to the model of this item. Empty string if the item model
-     * is not specified.
-     *
-     * The model path is relative to the texture directory of the resource
-     * pack.
-     *
-     * For example, if the model path is `items/nyan_cat.json`, then
-     * the actual model file should be located at `assets/items/nyan_cat.json`.
-     *
-     * The model file should be in the format of Minecraft's model file.
-     * You can refer to the [official Minecraft documentation](https://minecraft.wiki/w/Model) for more information.
-     */
-    val modelPath: Path?
-
-    /**
      * Generates an ItemStack from this scheme.
      *
      * This function is meant to be used for the case where the item generation
@@ -124,3 +110,18 @@ inline fun <reified V : SchemeItemMeta<*>> NekoItem.getItemMetaBy(): V {
     val meta = checkNotNull(itemMeta[key])
     return meta as V
 }
+
+/**
+ * Gets the model path of this [NekoItem].
+ *
+ * The model path rules are:
+ *  - The model file should exist.
+ *  - The model path should be a relative path to the assets directory.
+ *  (e.g. "models/item/short_sword/neko_item.json")
+ *  - The model path should end with ".json".
+ */
+val NekoItem.modelPath: Path?
+    get() = validatePathStringOrNull("models/item/${key.namespace()}/${key.value()}.json", "json")
+
+val NekoItem.texturePath: Path?
+    get() = validatePathStringOrNull("textures/item/${key.namespace()}/${key.value()}.png", "png")
