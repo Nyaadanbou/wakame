@@ -68,7 +68,7 @@ class AttributeHandler : KoinComponent, Listener {
     )
 
     private fun shouldHandle(slot: Int, player: Player): Boolean {
-        return slot in effectiveNmsActiveSlots || slot == (player.inventory.heldItemSlot + 36) /* player held item */
+        return slot == (player.inventory.heldItemSlot + 36) /* player held item */ || slot in effectiveNmsActiveSlots
     }
 
     private fun getAttributeModifiers(bukkitItem: ItemStack?): Multimap<out Attribute, AttributeModifier> {
