@@ -8,9 +8,9 @@ import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.binary.meta.set
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
-import cc.mewcraft.wakame.item.scheme.meta.MaterialMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import net.kyori.adventure.key.Key
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import java.util.*
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
@@ -35,6 +35,7 @@ import cc.mewcraft.wakame.item.scheme.meta.SkinOwnerMeta as SSkinOwnerMeta
 internal data class NekoItemImpl(
     override val key: Key,
     override val uuid: UUID,
+    override val material: Material,
     override val itemMeta: Map<Key, SchemeItemMeta<*>>,
     override val cells: Map<String, SchemeCell>,
 ) : NekoItem {
@@ -58,10 +59,9 @@ internal data class NekoItemImpl(
      */
     private fun createItemStack0(context: SchemeGenerationContext): NekoItemStack {
         // create a blank NekoItemStack
-        val materialMeta = getItemMetaBy<MaterialMeta>()
-        val material = materialMeta.generate(context)
         val nekoStack = NekoItemStackFactory.new(material)
 
+        // put base data
         nekoStack.putKey(key)
         nekoStack.putSeed(context.seed)
 
@@ -82,7 +82,7 @@ internal data class NekoItemImpl(
             generateAndSet<_, SSkinOwnerMeta, BSkinOwnerMeta>(context)
         }
 
-        // put cells
+        // put item cells
         cells.forEach { (id, scheme) ->
             // Side note:
             // the order of cell population should be the same as

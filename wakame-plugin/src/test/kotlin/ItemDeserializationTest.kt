@@ -113,9 +113,7 @@ class ItemDeserializationTest : KoinTest {
                 }
             }
 
-            val materialMeta = getSchemeMetaByClass<MaterialMeta>(self)
-            val material = materialMeta.generate(context)
-            NekoItemStackFactory.new(material) // just return an empty item
+            NekoItemStackFactory.new(self.material) // just return an empty item
         }
 
         demo.createItemStack(null)

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute.base
+package cc.mewcraft.wakame.attribute
 
 import java.util.*
 

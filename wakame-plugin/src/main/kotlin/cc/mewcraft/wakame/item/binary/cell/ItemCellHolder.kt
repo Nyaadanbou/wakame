@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.BinaryAbilityValue
-import cc.mewcraft.wakame.attribute.base.Attribute
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
 import com.google.common.collect.Multimap
 
 interface ItemCellHolder {

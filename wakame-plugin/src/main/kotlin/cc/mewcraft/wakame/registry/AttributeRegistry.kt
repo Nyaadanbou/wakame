@@ -3,10 +3,10 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.attribute.base.Attribute
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
-import cc.mewcraft.wakame.attribute.base.Attributes
-import cc.mewcraft.wakame.attribute.base.ElementAttribute
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.attribute.facade.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable

@@ -18,7 +18,7 @@ typealias ElementPool = Pool<Element, SchemeGenerationContext>
 /**
  * 物品的元素标识。
  */
-interface ElementMeta : SchemeItemMeta<Set<Element>> {
+sealed interface ElementMeta : SchemeItemMeta<Set<Element>> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "element")
     }
@@ -32,7 +32,7 @@ private class NonNullElementMeta(
     }
 }
 
-private object DefaultElementMeta : ElementMeta {
+private data object DefaultElementMeta : ElementMeta {
     override fun generate(context: SchemeGenerationContext): Set<Element>? = null
 }
 

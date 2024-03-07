@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 /**
  * 物品的名字。
  */
-interface DisplayNameMeta : SchemeItemMeta<String> {
+sealed interface DisplayNameMeta : SchemeItemMeta<String> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "display_name")
     }
@@ -28,7 +28,7 @@ private class NonNullDisplayNameMeta(
     }
 }
 
-private object DefaultDisplayNameMeta : DisplayNameMeta {
+private data object DefaultDisplayNameMeta : DisplayNameMeta {
     override fun generate(context: SchemeGenerationContext): String? = null
 }
 

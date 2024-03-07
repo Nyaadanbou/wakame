@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.attribute.facade
 
-import cc.mewcraft.wakame.attribute.base.Attribute
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
 import java.util.UUID
 
 /**

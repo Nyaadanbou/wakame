@@ -18,7 +18,7 @@ typealias KizamiPool = Pool<Kizami, SchemeGenerationContext>
 /**
  * 物品的铭刻标识。
  */
-interface KizamiMeta : SchemeItemMeta<Set<Kizami>> {
+sealed interface KizamiMeta : SchemeItemMeta<Set<Kizami>> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "kizami")
     }
@@ -32,7 +32,7 @@ private class NonNullKizamiMeta(
     }
 }
 
-private object DefaultKizamiMeta : KizamiMeta {
+private data object DefaultKizamiMeta : KizamiMeta {
     override fun generate(context: SchemeGenerationContext): Set<Kizami>? = null
 }
 

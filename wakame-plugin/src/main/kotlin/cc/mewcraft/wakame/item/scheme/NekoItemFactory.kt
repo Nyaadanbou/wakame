@@ -7,10 +7,10 @@ import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
+import org.bukkit.Material
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.io.File
@@ -18,7 +18,6 @@ import java.nio.file.Path
 import java.util.*
 
 object NekoItemFactory : KoinComponent {
-    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
     /**
@@ -30,6 +29,7 @@ object NekoItemFactory : KoinComponent {
      */
     fun create(key: Key, root: ConfigurationNode): NekoItem {
         val uuid = root.node("uuid").requireKt<UUID>()
+        val material = root.node("material").requireKt<Material>()
 
         // Deserialize item meta
         val schemeItemMeta: Map<Key, SchemeItemMeta<*>> = buildMap {
@@ -48,7 +48,6 @@ object NekoItemFactory : KoinComponent {
             loadAndSave<ElementMeta>(root, "elements")
             loadAndSave<KizamiMeta>(root, "kizami")
             loadAndSave<LevelMeta>(root, "level")
-            loadAndSave<MaterialMeta>(root, "material")
             loadAndSave<RarityMeta>(root, "rarity")
             loadAndSave<SkinMeta>(root, "skin")
             loadAndSave<SkinOwnerMeta>(root, "skin_owner")
@@ -75,7 +74,8 @@ object NekoItemFactory : KoinComponent {
                 this[id] = cell
             }
         }
-        val ret = NekoItemImpl(key, uuid, schemeItemMeta, schemeCells)
+
+        val ret = NekoItemImpl(key, uuid, material, schemeItemMeta, schemeCells)
         return ret
     }
 

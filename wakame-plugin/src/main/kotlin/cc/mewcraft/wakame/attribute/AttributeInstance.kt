@@ -1,10 +1,13 @@
-package cc.mewcraft.wakame.attribute.base
+package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.attribute.base.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.util.toBukkit
-import cc.mewcraft.wakame.util.toWaka
+import cc.mewcraft.wakame.util.toNeko
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
-import java.util.*
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+import java.util.Collections
+import java.util.EnumMap
+import java.util.UUID
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
 
 /**
@@ -44,13 +47,15 @@ interface AttributeInstance {
     fun replace(other: AttributeInstance)
 }
 
-internal class VanillaAttributeInstanceWrapper(
+internal class VanillaAttributeInstance(
     private val handle: BukkitAttributeInstance,
 ) : AttributeInstance {
 
-    override val attribute: Attribute = handle.attribute.toWaka()
+    override val attribute: Attribute = handle.attribute.toNeko()
 
-    override fun getDescriptionId(): String = attribute.descriptionId
+    override fun getDescriptionId(): String {
+        return attribute.descriptionId
+    }
 
     override fun getValue(): Double {
         return handle.value
@@ -65,32 +70,29 @@ internal class VanillaAttributeInstanceWrapper(
     }
 
     override fun getModifier(uuid: UUID): AttributeModifier? {
-        return handle.modifiers.firstOrNull { it.uniqueId == uuid }?.let {
-            AttributeModifier(
-                it.uniqueId,
-                it.name,
-                it.amount,
-                it.operation.toWaka()
-            )
-        }
+        return handle.modifiers
+            .firstOrNull { it.uniqueId == uuid }
+            ?.let { AttributeModifier(it.uniqueId, it.name, it.amount, it.operation.toNeko()) }
     }
 
     override fun getModifierOrEmpty(operation: Operation): Set<AttributeModifier> {
-        return handle.modifiers.filter { it.operation == operation.toBukkit() }
-            .mapTo(HashSet()) { it.toWaka() }
+        return handle.modifiers
+            .filter { it.operation == operation.toBukkit() }
+            .mapTo(ObjectOpenHashSet()) { it.toNeko() }
     }
 
     override fun getModifiers(): Set<AttributeModifier> {
-        return handle.modifiers.mapTo(HashSet()) { it.toWaka() }
+        return handle.modifiers.mapTo(HashSet()) { it.toNeko() }
     }
 
     override fun getModifiers(operation: Operation): Set<AttributeModifier> {
-        return handle.modifiers.filter { it.operation == operation.toBukkit() }
-            .mapTo(HashSet()) { it.toWaka() }
+        return handle.modifiers
+            .filter { it.operation == operation.toBukkit() }
+            .mapTo(ObjectOpenHashSet()) { it.toNeko() }
     }
 
     override fun hasModifier(modifier: AttributeModifier): Boolean {
-        return handle.modifiers.any { it.toWaka() == modifier }
+        return handle.modifiers.any { it.toNeko() == modifier }
     }
 
     override fun addModifier(modifier: AttributeModifier) {
@@ -102,9 +104,9 @@ internal class VanillaAttributeInstanceWrapper(
     }
 
     override fun removeModifier(uuid: UUID) {
-        handle.modifiers.firstOrNull { it.uniqueId == uuid }?.let {
-            handle.removeModifier(it)
-        }
+        handle.modifiers
+            .firstOrNull { it.uniqueId == uuid }
+            ?.let { handle.removeModifier(it) }
     }
 
     override fun removeModifiers() {
@@ -112,7 +114,7 @@ internal class VanillaAttributeInstanceWrapper(
     }
 
     override fun replace(other: AttributeInstance) {
-        require(other is VanillaAttributeInstanceWrapper) { "Can't replace with a different type of AttributeInstance" }
+        require(other is VanillaAttributeInstance) { "Can't replace with a different type of AttributeInstance" }
         handle.baseValue = other.getBaseValue()
         handle.modifiers.forEach { handle.removeModifier(it) }
         other.handle.modifiers.forEach { handle.addModifier(it) }
@@ -128,9 +130,14 @@ internal class WakameAttributeInstance(
     private var baseValue: Double = attribute.defaultValue
     private var cachedValue: Double = 0.0
 
-    override fun getDescriptionId(): String = attribute.descriptionId
+    override fun getDescriptionId(): String {
+        return attribute.descriptionId
+    }
 
-    override fun getBaseValue(): Double = baseValue
+    override fun getBaseValue(): Double {
+        return baseValue
+    }
+
     override fun setBaseValue(baseValue: Double) {
         if (baseValue != this.baseValue) {
             this.baseValue = baseValue

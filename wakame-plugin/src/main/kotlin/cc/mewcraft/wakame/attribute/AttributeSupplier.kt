@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute.base
+package cc.mewcraft.wakame.attribute
 
 import java.util.*
 
@@ -13,7 +13,7 @@ class AttributeSupplier(
 
     fun getAttributeInstance(attribute: Attribute): AttributeInstance {
         val attributeInstance = instances[attribute]
-            ?: throw IllegalArgumentException("Can't find attribute ${attribute.descriptionId}")
+            ?: throw IllegalArgumentException("Can't find attribute '${attribute.descriptionId}'")
         return attributeInstance
     }
 
@@ -34,7 +34,7 @@ class AttributeSupplier(
 
     fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
         val modifier = getAttributeInstance(attribute).getModifier(uuid)
-            ?: throw IllegalArgumentException("Can't find modifier $uuid on attribute ${attribute.descriptionId}")
+            ?: throw IllegalArgumentException("Can't find modifier '$uuid' on attribute '${attribute.descriptionId}'")
         return modifier.amount
     }
 

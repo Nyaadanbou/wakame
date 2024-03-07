@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.binary.core
 
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.attribute.base.Attribute
-import cc.mewcraft.wakame.attribute.base.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValue
 import cc.mewcraft.wakame.registry.AttributeRegistry

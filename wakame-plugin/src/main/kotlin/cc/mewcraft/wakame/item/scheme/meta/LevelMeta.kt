@@ -18,7 +18,7 @@ import java.lang.reflect.Type
 /**
  * 物品的等级。
  */
-interface LevelMeta : SchemeItemMeta<Int> {
+sealed interface LevelMeta : SchemeItemMeta<Int> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "level")
     }
@@ -68,7 +68,7 @@ private class NonNullLevelMeta(
     }
 }
 
-private object DefaultLevelMeta : LevelMeta {
+private data object DefaultLevelMeta : LevelMeta {
     override fun generate(context: SchemeGenerationContext): Int? = null // default not to write level at all
 }
 

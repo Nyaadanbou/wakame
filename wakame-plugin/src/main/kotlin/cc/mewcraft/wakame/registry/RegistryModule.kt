@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.configurate.MaterialSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.scheme.CELL_SERIALIZERS
@@ -8,6 +9,7 @@ import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
+import cc.mewcraft.wakame.util.registerKt
 import cc.mewcraft.wakame.util.buildYamlConfigurationLoader
 import cc.mewcraft.wakame.util.createYamlConfigurationLoader
 import org.koin.core.module.Module
@@ -94,6 +96,7 @@ internal fun registryModule(): Module = module {
 
     single<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER)) {
         buildYamlConfigurationLoader {
+            registerKt(MaterialSerializer)
             registerAll(get<TypeSerializerCollection>(named(CELL_SERIALIZERS)))
             registerAll(get<TypeSerializerCollection>(named(META_SERIALIZERS)))
         }

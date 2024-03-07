@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 /**
  * 物品的皮肤。
  */
-interface SkinMeta : SchemeItemMeta<ItemSkin> {
+sealed interface SkinMeta : SchemeItemMeta<ItemSkin> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "skin")
     }
@@ -25,7 +25,7 @@ private class NonNullSkinMeta(
     }
 }
 
-private object DefaultSkinMeta : SkinMeta {
+private data object DefaultSkinMeta : SkinMeta {
     override fun generate(context: SchemeGenerationContext): ItemSkin? {
         return null
     }

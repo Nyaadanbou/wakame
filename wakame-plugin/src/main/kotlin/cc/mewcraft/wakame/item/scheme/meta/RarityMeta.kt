@@ -16,7 +16,7 @@ import java.lang.reflect.Type
 /**
  * 物品的稀有度。
  */
-interface RarityMeta : SchemeItemMeta<Rarity> {
+sealed interface RarityMeta : SchemeItemMeta<Rarity> {
     companion object : Keyed {
         override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "rarity")
     }
@@ -53,7 +53,7 @@ private class NonNullRarityMeta(
     }
 }
 
-private object DefaultRarityMeta : RarityMeta {
+private data object DefaultRarityMeta : RarityMeta {
     override fun generate(context: SchemeGenerationContext): Rarity? {
         return null
     }

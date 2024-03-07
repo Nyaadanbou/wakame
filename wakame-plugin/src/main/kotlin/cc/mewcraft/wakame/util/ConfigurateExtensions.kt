@@ -72,7 +72,7 @@ internal inline fun <reified T> TypeSerializerCollection.Builder.registerKt(seri
 internal inline fun <reified T> ConfigurationNode.requireKt(): T {
     val ret = this.get(javaTypeOf<T>())
         ?: throw NoSuchElementException(
-            "Missing value of type '${T::class.simpleName}' at '${path().joinToString(" -> ")}'"
+            "Missing value of type '${T::class.simpleName}' at '${path().joinToString(".")}'"
         )
     return ret as T
 }

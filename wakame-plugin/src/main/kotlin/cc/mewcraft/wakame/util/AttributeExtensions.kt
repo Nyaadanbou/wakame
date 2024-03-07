@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.attribute.base.Attributes
-import cc.mewcraft.wakame.attribute.base.Attribute as WakaAttribute
-import cc.mewcraft.wakame.attribute.base.AttributeModifier as WakaAttributeModifier
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.Attribute as WakaAttribute
+import cc.mewcraft.wakame.attribute.AttributeModifier as WakaAttributeModifier
 import org.bukkit.attribute.Attribute as BukkitAttribute
 import org.bukkit.attribute.AttributeModifier as BukkitAttributeModifier
 
@@ -12,7 +12,7 @@ fun WakaAttributeModifier.Operation.toBukkit() = when (this) {
     WakaAttributeModifier.Operation.MULTIPLY_TOTAL -> BukkitAttributeModifier.Operation.MULTIPLY_SCALAR_1
 }
 
-fun BukkitAttributeModifier.Operation.toWaka() = when (this) {
+fun BukkitAttributeModifier.Operation.toNeko() = when (this) {
     BukkitAttributeModifier.Operation.ADD_NUMBER -> WakaAttributeModifier.Operation.ADD
     BukkitAttributeModifier.Operation.ADD_SCALAR -> WakaAttributeModifier.Operation.MULTIPLY_BASE
     BukkitAttributeModifier.Operation.MULTIPLY_SCALAR_1 -> WakaAttributeModifier.Operation.MULTIPLY_TOTAL
@@ -25,15 +25,15 @@ fun WakaAttributeModifier.toBukkit() = BukkitAttributeModifier(
     operation.toBukkit(),
 )
 
-fun BukkitAttributeModifier.toWaka() = WakaAttributeModifier(
+fun BukkitAttributeModifier.toNeko() = WakaAttributeModifier(
     uniqueId,
     name.takeIf { it.isNotEmpty() },
     amount,
-    operation.toWaka(),
+    operation.toNeko(),
 )
 
 fun WakaAttribute.toBukkit(): BukkitAttribute {
-    require(Attributes.isVanilla(this)) { "Can't convert non-vanilla attribute to Bukkit" }
+    require(this.vanilla) { "Can't convert non-vanilla attribute to Bukkit" }
 
     return when (this) {
         Attributes.MAX_HEALTH -> BukkitAttribute.GENERIC_MAX_HEALTH
@@ -45,7 +45,7 @@ fun WakaAttribute.toBukkit(): BukkitAttribute {
     }
 }
 
-fun BukkitAttribute.toWaka(): WakaAttribute {
+fun BukkitAttribute.toNeko(): WakaAttribute {
     return when (this) {
         BukkitAttribute.GENERIC_MAX_HEALTH -> Attributes.MAX_HEALTH
         BukkitAttribute.GENERIC_MAX_ABSORPTION -> Attributes.MAX_ABSORPTION

@@ -7,8 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class NekoPlayerSlotChangeEvent extends Event {
-    private static final @NotNull HandlerList HANDLERS = new HandlerList();
-
     private final Player player;
     private final int slot;
     private final ItemStack oldItem;
@@ -20,6 +18,7 @@ public class NekoPlayerSlotChangeEvent extends Event {
         this.oldItem = oldItem;
         this.newItem = newItem;
     }
+
     @NotNull
     public Player getPlayer() {
         return player;
@@ -28,21 +27,24 @@ public class NekoPlayerSlotChangeEvent extends Event {
     public int getSlot() {
         return slot;
     }
+
     @NotNull
     public ItemStack getOldItem() {
         return oldItem;
     }
+
     @NotNull
     public ItemStack getNewItem() {
         return newItem;
     }
 
-    public static @NotNull HandlerList getHandlerList() {
+    @Override
+    public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
+    public static final @NotNull HandlerList HANDLERS = new HandlerList();
+    public static @NotNull HandlerList getHandlerList() {
         return HANDLERS;
     }
 }
