@@ -55,7 +55,6 @@ internal fun schemeItemModule(): Module = module {
             .registerKt(ElementMetaSerializer())
             .registerKt(KizamiMetaSerializer())
             .registerKt(LevelMetaSerializer())
-            .registerKt(MaterialMetaSerializer())
             .registerKt(RarityMetaSerializer())
             .registerKt(SkinMetaSerializer())
             .registerKt(SkinOwnerMetaSerializer())

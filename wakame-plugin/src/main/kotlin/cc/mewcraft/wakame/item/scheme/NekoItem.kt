@@ -3,11 +3,11 @@ package cc.mewcraft.wakame.item.scheme
 import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
-import cc.mewcraft.wakame.item.scheme.meta.MaterialMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import java.util.UUID
 
@@ -45,13 +45,16 @@ interface NekoItem : Keyed {
     override fun key(): Key = key
 
     /**
+     * Material type.
+     */
+    val material: Material
+
+    /**
      * The map holds all the item meta of `this` item. You may navigate
      * the subclasses of [SchemeItemMeta] for all types of item meta.
      *
      * It should be noted that only necessary item meta should be written to
      * the item's NBT while generating an ItemStack from `this` [NekoItem].
-     * The data that can be derived from other data such as [MaterialMeta]
-     * should not be written to the NBT.
      *
      * @see getItemMetaBy
      */
