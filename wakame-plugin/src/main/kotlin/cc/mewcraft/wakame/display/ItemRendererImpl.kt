@@ -24,10 +24,10 @@ internal class ItemRendererImpl(
         val displayLore = textStylizer.stylizeLore(copy).let(loreFinalizer::finalize)
 
         // directly edit the backing ItemMeta to avoid cloning
-        copy.handle.let {
-            it.backingDisplayName = gsonSerial.serialize(displayName)
-            it.backingLore = displayLore.map(gsonSerial::serialize)
-            it.backingCustomModelData = cmdConfig.customModelDataMap[copy.key]
+        copy.handle.apply {
+            backingDisplayName = gsonSerial.serialize(displayName)
+            backingLore = displayLore.map(gsonSerial::serialize)
+            backingCustomModelData = cmdConfig.customModelDataMap[copy.key]
         }
 
         // 为了麦若，去掉物品的真实根标签
