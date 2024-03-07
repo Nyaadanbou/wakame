@@ -2,15 +2,14 @@ package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.item.binary.NekoItemStack
-import cc.mewcraft.wakame.item.scheme.NekoItemFactory.validatePathStringOrNull
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
+import cc.mewcraft.wakame.pack.Model
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import java.nio.file.Path
 import java.util.*
 
 /**
@@ -28,7 +27,7 @@ import java.util.*
  *
  * @see NekoItemStack
  */
-interface NekoItem : Keyed {
+interface NekoItem : Model {
     /**
      * The UUID of this item.
      */
@@ -41,10 +40,7 @@ interface NekoItem : Keyed {
      * - [value][Key.value] is the name of the config file itself without the
      *   file extension
      */
-    val key: Key
-
-    // Overrides Java's getter
-    override fun key(): Key = key
+    override val key: Key
 
     /**
      * Material type.
@@ -113,18 +109,3 @@ inline fun <reified V : SchemeItemMeta<*>> NekoItem.getItemMetaBy(): V {
     val meta = checkNotNull(itemMeta[key])
     return meta as V
 }
-
-/**
- * Gets the model path of this [NekoItem].
- *
- * The model path rules are:
- *  - The model file should exist.
- *  - The model path should be a relative path to the assets directory.
- *  (e.g. "models/item/short_sword/neko_item.json")
- *  - The model path should end with ".json".
- */
-val NekoItem.modelPath: Path?
-    get() = validatePathStringOrNull("models/item/${key.namespace()}/${key.value()}.json", "json")
-
-val NekoItem.texturePath: Path?
-    get() = validatePathStringOrNull("textures/item/${key.namespace()}/${key.value()}.png", "png")

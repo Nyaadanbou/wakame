@@ -9,9 +9,11 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.binary.meta.set
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
+import cc.mewcraft.wakame.util.validatePathStringOrNull
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import java.io.File
 import java.util.*
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta as BDisplayNameMeta
@@ -39,6 +41,11 @@ internal data class NekoItemImpl(
     override val itemMeta: Map<Key, SchemeItemMeta<*>>,
     override val cells: Map<String, SchemeCell>,
 ) : NekoItem {
+
+    override val originalModelMaterial: Material = material
+    override val modelFile: File?
+        get() = validatePathStringOrNull("models/item/${key.namespace()}/${key.value()}.json")
+
     override fun createItemStack(player: Player?): NekoItemStack {
         val context = SchemeGenerationContext(playerObject = player)
         val nekoStack = createItemStack0(context)

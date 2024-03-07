@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.scheme
 
-import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCellFactory
 import cc.mewcraft.wakame.item.scheme.meta.*
@@ -9,16 +8,11 @@ import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
-import java.io.File
-import java.nio.file.Path
 import java.util.*
 
 object NekoItemFactory : KoinComponent {
-    private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
     /**
      * Creates a [NekoItem] from a [configuration node][ConfigurationNode].
@@ -77,19 +71,6 @@ object NekoItemFactory : KoinComponent {
 
         val ret = NekoItemImpl(key, uuid, material, schemeItemMeta, schemeCells)
         return ret
-    }
-
-    fun validatePathStringOrNull(path: String, extension: String): Path? {
-        val file = assetsDir.resolve(path)
-        if (!file.exists())
-            return null
-        if (file.extension != extension)
-            return null
-        return file.toPath()
-    }
-
-    fun validatePathString(path: String, extension: String): Path {
-        return requireNotNull(validatePathStringOrNull(path, extension)) { "Path $path is invalid" }
     }
 
     private inline fun <reified T : SchemeItemMeta<*>> MutableMap<Key, SchemeItemMeta<*>>.loadAndSave(
