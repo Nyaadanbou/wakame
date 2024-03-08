@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.pack.generate
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.pack.CustomModelDataConfiguration
 import cc.mewcraft.wakame.pack.Model
-import cc.mewcraft.wakame.pack.bfsTraversal
-import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.validatePathString
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
@@ -16,8 +14,6 @@ import org.koin.core.qualifier.named
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
-import team.unnamed.creative.metadata.Metadata
-import team.unnamed.creative.metadata.animation.AnimationMeta
 import team.unnamed.creative.metadata.pack.PackMeta
 import team.unnamed.creative.model.ItemOverride
 import team.unnamed.creative.model.ItemPredicate
@@ -126,20 +122,10 @@ internal class ResourcePackModelGeneration(
                     Texture.texture()
                         .key(model.modelKey("png"))
                         .data(it)
-                        .meta(
-                            Metadata.metadata()
-                                .addPart(AnimationMeta.animation().height(16).build())
-                                .build()
-                        )
                         .build()
                 }
 
                 for (materialKey in model.materialKeys()) {
-                    // Model textures from the vanilla model
-                    val vanillaModelTextures = ModelTextures.builder()
-                        .layers(ModelTexture.ofKey(materialKey))
-                        .build()
-
                     // Override for custom model data
                     // TODO: Add other predicate for custom model data
                     val override = ItemOverride.of(
@@ -148,10 +134,22 @@ internal class ResourcePackModelGeneration(
                     )
 
                     // Override for vanilla model
-                    val vanillaCmdOverride = CreativeModel.model()
-                        .key(materialKey)
-                        .parent(configModel.parent()) // Use the same parent as the original model
-                        .textures(vanillaModelTextures)
+                    val vanillaModelInResourcePack = resourcePack.model(materialKey)
+
+                    val vanillaCmdOverrideBuilder = if (vanillaModelInResourcePack != null) {
+                        vanillaModelInResourcePack.toBuilder()
+                    } else {
+                        // Model textures from the vanilla model
+                        val vanillaModelTextures = ModelTextures.builder()
+                            .layers(ModelTexture.ofKey(materialKey))
+                            .build()
+                        CreativeModel.model()
+                            .key(materialKey)
+                            .parent(configModel.parent()) // Use the same parent as the original model
+                            .textures(vanillaModelTextures)
+                    }
+
+                    val vanillaCmdOverride = vanillaCmdOverrideBuilder
                         .addOverride(override)
                         .build()
 
