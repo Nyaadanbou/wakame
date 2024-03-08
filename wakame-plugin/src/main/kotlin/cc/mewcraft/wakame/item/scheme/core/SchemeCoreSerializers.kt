@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
- * 栏位内容组的序列化实现。
+ * @see AbstractGroupSerializer
  */
 internal class SchemeCoreGroupSerializer : AbstractGroupSerializer<SchemeCore, SchemeGenerationContext>() {
     override fun poolFactory(node: ConfigurationNode): SchemeCorePool {

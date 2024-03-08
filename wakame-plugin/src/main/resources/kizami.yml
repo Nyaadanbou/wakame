@@ -3,27 +3,110 @@
 # 所有的铭刻
 kizami:
 
-  wood: # 铭刻的唯一标识，一旦确定不要修改
-    binary_index: 0 # 铭刻的二进制索引，一旦确定不要修改
-    display_name: 木 # 铭刻的展示名字，也是玩家看到的铭刻名字
-    styles: "<white>" # 铭刻提供的风格样式，用于影响其他文本内容
+  # 铭刻的唯一标识，一旦确定不要修改
+  wood:
+
+    # 铭刻的 UUID，必须与其他 UUID 不同
+    uuid: d301ab77-4159-4466-ada3-d892bce883cd
+
+    # 铭刻的二进制索引，一旦确定不要修改
+    binary_index: 0
+
+    # 铭刻的展示名字，也是玩家看到的铭刻名字
+    display_name: 木
+
+    # 铭刻提供的风格样式，用于影响其他文本内容
+    styles: "<white>"
+
+    # 铭刻的效果
+    # 铭刻的数值均为固定数值，不能写正态分布
+    effects:
+      1:
+        - key: attribute:attack_damage
+          operation: multiply_base
+          element: universal
+          lower: 0.03
+          upper: 0.03
+      2:
+        - key: attribute:attack_damage
+          operation: multiply_base
+          element: universal
+          lower: 0.06
+          upper: 0.06
+        - key: attribute:defense
+          operation: multiply_base
+          element: universal
+          lower: -0.03
+          upper: -0.03
+      3:
+        - key: attribute:attack_damage
+          operation: multiply_base
+          element: universal
+          lower: 0.09
+          upper: 0.09
+        - key: attribute:defense
+          operation: multiply_base
+          element: universal
+          lower: -0.06
+          upper: -0.06
+      4:
+        - key: attribute:attack_damage
+          operation: multiply_base
+          element: universal
+          lower: 0.12
+          upper: 0.12
+        - key: attribute:defense
+          operation: multiply_base
+          element: universal
+          lower: -0.09
+          upper: -0.09
+        - key: attribute:attack_speed_level
+          operation: add
+          value: 1
 
   iron:
+    uuid: 506afa07-d56d-489d-9482-e3213a5667eb
     binary_index: 1
     display_name: 铁
     styles: "<white>"
+    effects:
+      1:
+        - # 铭刻也可提供技能
+          key: ability:blink
+          mana: 12
+          cooldown: 10
+          distance: 16
+          weight: 1
 
   gold:
+    uuid: 0b7fab70-32fb-4511-83d1-17d9e3efa1fc
     binary_index: 2
     display_name: 金
     styles: "<white>"
+    effects:
+      1:
+        - key: attribute:attack_damage
+          operation: multiply_base
+          element: universal
+          lower: 0.24
+          upper: 0.24
 
   diamond:
+    uuid: 2f5b6478-f12f-4eb1-9b3b-bceb341adf75
     binary_index: 3
     display_name: 钻石
     styles: "<white>"
+    effects:
+      1:
+        - key: attribute:attack_damage
+          operation: multiply_base
+          element: universal
+          lower: 0.36
+          upper: 0.36
 
   netherite:
+    uuid: 46079978-3649-4287-ae46-7b2fc0092b22
     binary_index: 4
     display_name: 下届合金
     styles: "<white>"
+    effects: { } # 无效果
