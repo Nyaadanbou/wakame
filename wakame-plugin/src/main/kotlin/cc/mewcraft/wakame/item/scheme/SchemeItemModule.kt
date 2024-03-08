@@ -48,6 +48,7 @@ internal fun schemeItemModule(): Module = module {
 
             .registerKt(ElementPoolSerializer())
             .registerKt(KizamiPoolSerializer())
+            .registerKt(KizamiGroupSerializer())
 
             .registerKt(DisplayLoreMetaSerializer())
             .registerKt(DisplayNameMetaSerializer())

@@ -89,26 +89,54 @@ elements:
 # 铭刻标识
 # 可选，默认 无
 kizami:
-
-  # 抽选 n 个铭刻作为该物品的铭刻标识
-  sample: 2
-
-  # 条件，可用于实现特定条件下完全不生成铭刻
-  filters: [ ]
-
-  # 候选的铭刻标识，以及它们各自的权重
-  entries:
-    - value: iron
-      weight: 2
-    - value: gold
-      weight: 1
-    - value: diamond
-      weight: 1
-    - value: netherite
-      weight: 1
-      filters:
-        - type: element
-          element: water
+  pool_a:
+    sample: 3
+    filters:
+      - type: rarity
+        rarity: rare
+    entries:
+      - value: wood
+        weight: 5
+      - value: iron
+        weight: 4
+      - value: gold
+        weight: 3
+      - value: diamond
+        weight: 2
+      - value: netherite
+        weight: 1
+  pool_b:
+    sample: 2
+    filters:
+      - type: rarity
+        rarity: uncommon
+    entries:
+      - value: wood
+        weight: 5
+      - value: iron
+        weight: 4
+      - value: gold
+        weight: 3
+      - value: diamond
+        weight: 2
+      - value: netherite
+        weight: 1
+  pool_c:
+    sample: 1
+    filters:
+      - type: rarity
+        rarity: common
+    entries:
+      - value: wood
+        weight: 5
+      - value: iron
+        weight: 4
+      - value: gold
+        weight: 3
+      - value: diamond
+        weight: 2
+      - value: netherite
+        weight: 1
 
 # 词条栏
 # 可选，默认 无

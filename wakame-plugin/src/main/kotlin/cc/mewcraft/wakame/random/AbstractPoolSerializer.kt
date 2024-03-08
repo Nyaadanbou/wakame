@@ -70,14 +70,13 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
      * <node>:
      *   <impl_defined>: <impl_defined>
      *   ...
-     *   <impl_defined>: <impl_defined>
      *   weight: 1
+     *   mark: x1y1z1 # optional
      *   filters: # optional
      *     - type: <condition_type>
      *       <impl_defined>: <impl_defined>
      *     - <node with the same format as above>
      *     - ...
-     *   mark: x1y1z1 # optional
      * ```
      *
      * The `<impl_defined>` is what you need to take care of.
@@ -155,14 +154,21 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
             // wrap it into a sample
             Sample.build(content) {
                 weight = n.node("weight").requireKt<Double>()
-                conditions += intrinsicConditions(content) // add intrinsic conditions
-                conditions += deserializeConditions(n.node("filters")) // add configured conditions
+
+                // add intrinsic conditions
+                conditions += intrinsicConditions(content)
+                // add configured conditions
+                conditions += deserializeConditions(n.node("filters"))
+
+                // add mark if there is any
                 mark = n.node("mark").string?.let { Mark.stringMarkOf(it) }
+
+                // define trace function
                 trace = {
-                    // add the mark to the context
+                    // add the mark to context
                     mark?.run { it.marks += this }
 
-                    // apply the given trace function
+                    // apply given trace function
                     onPickSample(content, it)
                 }
             }
@@ -171,26 +177,25 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerialize
 
     final override fun deserialize(type: Type, node: ConfigurationNode): Pool<S, C> {
         when {
+            // Node structure 1
             node.isList -> {
-                // it's the structure 1
-
                 return Pool.build {
                     samples += deserializeSamples(node)
-                    // other values are all default
 
+                    // apply builder overrides
                     onBuildPool(this)
                 }
             }
 
+            // Node structure 2
             node.isMap -> {
-                // it's the structure 2
-
                 return Pool.build {
                     samples += deserializeSamples(node.node("entries"))
                     conditions += deserializeConditions(node.node("filters"))
                     pickAmount = node.node("sample").getLong(1)
                     isReplacement = node.node("replacement").getBoolean(false)
 
+                    // apply builder overrides
                     onBuildPool(this)
                 }
             }

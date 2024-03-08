@@ -10,6 +10,9 @@ import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
 
+/**
+ * @see AbstractGroupSerializer
+ */
 internal class SchemeCurseGroupSerializer : AbstractGroupSerializer<SchemeCurse, SchemeGenerationContext>() {
     override fun poolFactory(node: ConfigurationNode): SchemeCursePool {
         return node.requireKt<SchemeCursePool>()
