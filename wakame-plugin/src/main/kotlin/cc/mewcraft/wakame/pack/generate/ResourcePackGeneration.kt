@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.pack.generate
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.pack.CustomModelDataConfiguration
 import cc.mewcraft.wakame.pack.Model
+import cc.mewcraft.wakame.pack.bfsTraversal
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.validatePathString
 import me.lucko.helper.text3.mini
@@ -31,7 +32,7 @@ private const val RESOURCE_NAME = "wakame"
 
 data class GenerationArgs(
     val resourcePack: ResourcePack,
-    val allModels: Set<Model>,
+    val allModels: Collection<Model>,
 )
 
 sealed class ResourcePackGeneration(
@@ -103,18 +104,19 @@ internal class ResourcePackModelGeneration(
     @Suppress("UnstableApiUsage")
     override fun generate(): Result<Unit> {
         val models = args.allModels
+
         runCatching {
             for (model in models) {
                 val modelFile = model.modelFile ?: continue
 
-                logger.info("<aqua>Generating model for ${model.key}... (Path: $modelFile)".mini)
-                val customModelData = config.saveCustomModelData(model.key)
+                logger.info("<aqua>Generating model for ${model.modelKey}... (Path: $modelFile)".mini)
+                val customModelData = config.saveCustomModelData(model.modelKey)
                 val resourcePack = args.resourcePack
                 // Original model from config
-                val originModel = ModelSerializer.INSTANCE
+                val configModel = ModelSerializer.INSTANCE
                     .deserialize(Readable.file(modelFile), model.modelKey())
 
-                val textureData = originModel.textures().layers()
+                val textureData = configModel.textures().layers()
                     .mapNotNull { it.key() }
                     .map { validatePathString("textures/${it.value()}.png") }
                     .map { Writable.file(it) }
@@ -132,53 +134,49 @@ internal class ResourcePackModelGeneration(
                         .build()
                 }
 
-                // Model textures from the vanilla model
-                val vanillaModelTextures = ModelTextures.builder()
-                    .layers(ModelTexture.ofKey(model.materialKey()))
-                    .build()
+                for (materialKey in model.materialKeys()) {
+                    // Model textures from the vanilla model
+                    val vanillaModelTextures = ModelTextures.builder()
+                        .layers(ModelTexture.ofKey(materialKey))
+                        .build()
 
-                // Override for custom model data
-                val override = ItemOverride.of(
-                    model.modelKey(),
-                    ItemPredicate.customModelData(customModelData)
-                )
+                    // Override for custom model data
+                    // TODO: Add other predicate for custom model data
+                    val override = ItemOverride.of(
+                        model.modelKey(),
+                        ItemPredicate.customModelData(customModelData)
+                    )
 
-                // Override for vanilla model
-                val vanillaCmdOverride = CreativeModel.model()
-                    .key(model.materialKey())
-                    .parent(originModel.parent()) // Use the same parent as the original model
-                    .textures(vanillaModelTextures)
-                    .addOverride(override)
-                    .build()
+                    // Override for vanilla model
+                    val vanillaCmdOverride = CreativeModel.model()
+                        .key(materialKey)
+                        .parent(configModel.parent()) // Use the same parent as the original model
+                        .textures(vanillaModelTextures)
+                        .addOverride(override)
+                        .build()
+
+                    resourcePack.model(configModel.toMinecraftFormat())
+                    resourcePack.model(vanillaCmdOverride).also {
+                        logger.info("<green>Model for ${model.modelKey} generated. CustomModelData: $customModelData".mini)
+                    }
+                }
 
                 customTextures.forEach {
                     resourcePack.texture(it).also {
-                        logger.info("<green>Texture for ${model.key} generated.".mini)
+                        logger.info("<green>Texture for ${model.modelKey} generated.".mini)
                     }
-                }
-                resourcePack.model(originModel.toMinecraftFormat())
-                resourcePack.model(vanillaCmdOverride).also {
-                    logger.info("<green>Model for ${model.key} generated. CustomModelData: $customModelData".mini)
                 }
             }
 
             // Remove unused custom model data
 
-            // 1. All custom model data that was used by items but the items are removed
-            val unUsedItemKeys = config.customModelDataMap
-                .filter { NekoItemRegistry.get(it.key) == null }
-                .map { it.key }
-            val result1 = config.removeCustomModelData(*unUsedItemKeys.toTypedArray())
-            // 2. All custom model data that was used by items but the items' model path is removed
+            // 1. All custom model data that was used by items but the items' model path is removed
             val unUsedModelCustomModelData = models
                 .filter { it.modelFile == null }
-                .mapNotNull { config.customModelDataMap[it.key] }
-            val result2 = config.removeCustomModelData(*unUsedModelCustomModelData.toIntArray())
+                .mapNotNull { config.customModelDataMap[it.modelKey] }
+            val result1 = config.removeCustomModelData(*unUsedModelCustomModelData.toIntArray())
 
             if (result1) {
-                logger.info("<yellow>Removed unused custom model data from items: $unUsedItemKeys".mini)
-            }
-            if (result2) {
                 logger.info("<yellow>Removed unused custom model data from items with no model path: $unUsedModelCustomModelData".mini)
             }
         }.onFailure { return Result.failure(it) }
@@ -188,15 +186,15 @@ internal class ResourcePackModelGeneration(
 
     private fun Model.modelKey(extension: String = ""): Key {
         return if (extension.isBlank()) {
-            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}")
+            Key.key(RESOURCE_NAME, "item/${modelKey.namespace()}/${modelKey.value()}")
         } else {
-            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}.$extension")
+            Key.key(RESOURCE_NAME, "item/${modelKey.namespace()}/${modelKey.value()}.$extension")
         }
     }
 
-    private fun Model.materialKey(): Key {
-        val materialKey = originalModelMaterial.key()
-        return Key.key("item/${materialKey.value()}")
+    private fun Model.materialKeys(): Set<Key> {
+        val materialKey = overriddenMaterials
+        return materialKey.map { Key.key("item/${it.name.lowercase()}") }.toSet()
     }
 
     private fun CreativeModel.toMinecraftFormat(): CreativeModel {

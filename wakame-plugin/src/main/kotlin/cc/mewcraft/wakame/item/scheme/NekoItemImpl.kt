@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.binary.meta.set
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
+import cc.mewcraft.wakame.pack.Model
 import cc.mewcraft.wakame.util.validatePathStringOrNull
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
@@ -35,16 +36,31 @@ import cc.mewcraft.wakame.item.scheme.meta.SkinMeta as SSkinMeta
 import cc.mewcraft.wakame.item.scheme.meta.SkinOwnerMeta as SSkinOwnerMeta
 
 internal data class NekoItemImpl(
-    override val key: Key,
+    override val modelKey: Key,
     override val uuid: UUID,
     override val material: Material,
     override val itemMeta: Map<Key, SchemeItemMeta<*>>,
     override val cells: Map<String, SchemeCell>,
 ) : NekoItem {
 
-    override val originalModelMaterial: Material = material
+    override val overriddenMaterials: Set<Material>
+        get() = setOf(material)
+
+    override val subModels: List<Model>
+        get() = listOf(
+            this,
+            object : Model {  // TODO: Use item skin
+                override val modelKey: Key
+                    get() = Key.key(this@NekoItemImpl.modelKey.namespace(), this@NekoItemImpl.modelKey.value() + "_skin")
+                override val overriddenMaterials: Set<Material>
+                    get() = setOf(material)
+                override val modelFile: File?
+                    get() = this@NekoItemImpl.modelFile
+            }
+        )
+
     override val modelFile: File?
-        get() = validatePathStringOrNull("models/item/${key.namespace()}/${key.value()}.json")
+        get() = validatePathStringOrNull("models/item/${modelKey.namespace()}/${modelKey.value()}.json")
 
     override fun createItemStack(player: Player?): NekoItemStack {
         val context = SchemeGenerationContext(playerObject = player)
@@ -69,7 +85,7 @@ internal data class NekoItemImpl(
         val nekoStack = NekoItemStackFactory.new(material)
 
         // put base data
-        nekoStack.putKey(key)
+        nekoStack.putKey(modelKey)
         nekoStack.putSeed(context.seed)
 
         // put item meta

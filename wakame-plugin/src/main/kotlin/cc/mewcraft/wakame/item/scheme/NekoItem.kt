@@ -40,7 +40,7 @@ interface NekoItem : Model {
      * - [value][Key.value] is the name of the config file itself without the
      *   file extension
      */
-    override val key: Key
+    override val modelKey: Key
 
     /**
      * Material type.

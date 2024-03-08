@@ -85,7 +85,7 @@ internal class ResourcePackManager : Initializable, KoinComponent {
 
             val generationArgs = GenerationArgs(
                 resourcePack = resourcePack,
-                allModels = allItems.map { it }.toSet(),
+                allModels = allItems.flatMap { it.bfsTraversal() },
             )
 
             // Generate the resource pack

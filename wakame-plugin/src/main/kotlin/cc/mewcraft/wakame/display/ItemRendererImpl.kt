@@ -18,6 +18,7 @@ internal class ItemRendererImpl(
 
     override fun render(copy: NekoItemStack) {
         require(copy.isNeko) { "Can't render a non-neko ItemStack" }
+        val scheme = copy.scheme
 
         // 因为对这里的 itemStack 进行修改不会影响原始的 itemStack，所以我们可以放心地修改它
         val displayName = textStylizer.stylizeName(copy)
@@ -27,7 +28,7 @@ internal class ItemRendererImpl(
         copy.handle.apply {
             backingDisplayName = gsonSerial.serialize(displayName)
             backingLore = displayLore.map(gsonSerial::serialize)
-            backingCustomModelData = cmdConfig.customModelDataMap[copy.key]
+            backingCustomModelData = cmdConfig.customModelDataMap[scheme.getSubModelWithSubId()?.modelKey]
         }
 
         // 为了麦若，去掉物品的真实根标签
