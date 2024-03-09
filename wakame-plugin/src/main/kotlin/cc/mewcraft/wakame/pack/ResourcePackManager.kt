@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.pack
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
 import cc.mewcraft.wakame.registry.NekoItemRegistry
@@ -118,10 +117,6 @@ internal class ResourcePackManager : Initializable, KoinComponent {
             if (!resourcePackPath.createNewFile()) {
                 return Result.failure(IOException("Failed to create resource pack file"))
             }
-        }
-
-        if (!resourcePackPath.name.endsWith(".zip")) {
-            return Result.failure(IOException("Resource pack file name must end with '.zip'"))
         }
 
         return Result.success(resourcePackPath)
