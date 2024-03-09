@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
-import cc.mewcraft.wakame.pack.CustomModelDataConfiguration
-import cc.mewcraft.wakame.pack.Model
-import cc.mewcraft.wakame.util.validatePathString
+import cc.mewcraft.wakame.lookup.Assets
+import cc.mewcraft.wakame.lookup.ItemModelDataLookup
+import cc.mewcraft.wakame.lookup.material
+import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
@@ -28,7 +29,7 @@ private const val RESOURCE_NAME = "wakame"
 
 data class GenerationArgs(
     val resourcePack: ResourcePack,
-    val allModels: Collection<Model>,
+    val allAssets: Collection<Assets>,
 )
 
 sealed class ResourcePackGeneration(
@@ -95,73 +96,74 @@ internal class ResourcePackModelGeneration(
     args: GenerationArgs,
 ) : ResourcePackGeneration(args), KoinComponent {
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
-    private val config: CustomModelDataConfiguration by inject()
+    private val config: ItemModelDataLookup by inject()
 
     @Suppress("UnstableApiUsage")
     override fun generate(): Result<Unit> {
-        val models = args.allModels
+        val assets = args.allAssets
 
         runCatching {
-            for (model in models) {
-                val modelFile = model.modelFile ?: continue
+            for (asset in assets) {
+                // TODO: Support multiple model files
+                val modelFile = asset.modelFiles.firstOrNull() ?: continue
 
-                logger.info("<aqua>Generating model for ${model.modelKey}... (Path: $modelFile)".mini)
-                val customModelData = config.saveCustomModelData(model.modelKey)
+                logger.info("<aqua>Generating asset for ${asset.key}, SID ${asset.sid}... (Path: $modelFile)".mini)
+                val customModelData = config.saveCustomModelData(asset.key, asset.sid)
                 val resourcePack = args.resourcePack
-                // Original model from config
+
+                // Original asset from config
                 val configModel = ModelSerializer.INSTANCE
-                    .deserialize(Readable.file(modelFile), model.modelKey())
+                    .deserialize(Readable.file(modelFile), asset.modelKey())
 
                 val textureData = configModel.textures().layers()
                     .mapNotNull { it.key() }
-                    .map { validatePathString("textures/${it.value()}.png") }
+                    .map { validateAssetsPathStringOrThrow("textures/${it.value()}.png") }
                     .map { Writable.file(it) }
 
-                // Texture file used by custom model
+                // Texture file used by custom asset
                 val customTextures = textureData.map {
                     Texture.texture()
-                        .key(model.modelKey("png"))
+                        .key(asset.modelKey("png"))
                         .data(it)
                         .build()
                 }
 
-                for (materialKey in model.materialKeys()) {
-                    // Override for custom model data
-                    // TODO: Add other predicate for custom model data
-                    val override = ItemOverride.of(
-                        model.modelKey(),
-                        ItemPredicate.customModelData(customModelData)
-                    )
+                val materialKey = asset.materialKeys()
 
-                    // Override for vanilla model
-                    val vanillaModelInResourcePack = resourcePack.model(materialKey)
+                // Override for custom asset data
+                // TODO: Add other predicate for custom asset data
+                val override = ItemOverride.of(
+                    asset.modelKey(),
+                    ItemPredicate.customModelData(customModelData)
+                )
 
-                    val vanillaCmdOverrideBuilder = if (vanillaModelInResourcePack != null) {
-                        vanillaModelInResourcePack.toBuilder()
-                    } else {
-                        // Model textures from the vanilla model
-                        val vanillaModelTextures = ModelTextures.builder()
-                            .layers(ModelTexture.ofKey(materialKey))
-                            .build()
-                        CreativeModel.model()
-                            .key(materialKey)
-                            .parent(configModel.parent()) // Use the same parent as the original model
-                            .textures(vanillaModelTextures)
-                    }
+                // Override for vanilla asset
+                val vanillaModelInResourcePack = resourcePack.model(materialKey)
 
-                    val vanillaCmdOverride = vanillaCmdOverrideBuilder
-                        .addOverride(override)
+                val vanillaCmdOverrideBuilder = if (vanillaModelInResourcePack != null) {
+                    vanillaModelInResourcePack.toBuilder()
+                } else {
+                    // Model textures from the vanilla asset
+                    val vanillaModelTextures = ModelTextures.builder()
+                        .layers(ModelTexture.ofKey(materialKey))
                         .build()
-
-                    resourcePack.model(configModel.toMinecraftFormat())
-                    resourcePack.model(vanillaCmdOverride).also {
-                        logger.info("<green>Model for ${model.modelKey} generated. CustomModelData: $customModelData".mini)
-                    }
+                    CreativeModel.model()
+                        .key(materialKey)
+                        .parent(configModel.parent()) // Use the same parent as the original asset
+                        .textures(vanillaModelTextures)
                 }
 
+                val vanillaCmdOverride = vanillaCmdOverrideBuilder
+                    .addOverride(override)
+                    .build()
+
+                resourcePack.model(configModel.toMinecraftFormat())
+                resourcePack.model(vanillaCmdOverride).also {
+                    logger.info("<green>Model for ${asset.key}, SID ${asset.sid} generated. CustomModelData: $customModelData".mini)
+                }
                 customTextures.forEach {
                     resourcePack.texture(it).also {
-                        logger.info("<green>Texture for ${model.modelKey} generated.".mini)
+                        logger.info("<green>Texture for ${asset.key}, SID ${asset.sid} generated.".mini)
                     }
                 }
             }
@@ -169,9 +171,9 @@ internal class ResourcePackModelGeneration(
             // Remove unused custom model data
 
             // 1. All custom model data that was used by items but the items' model path is removed
-            val unUsedModelCustomModelData = models
-                .filter { it.modelFile == null }
-                .mapNotNull { config.customModelDataMap[it.modelKey] }
+            val unUsedModelCustomModelData = assets
+                .filter { it.modelFiles.isEmpty() }
+                .map { config[it.key, it.sid] }
             val result1 = config.removeCustomModelData(*unUsedModelCustomModelData.toIntArray())
 
             if (result1) {
@@ -182,17 +184,16 @@ internal class ResourcePackModelGeneration(
         return generateNext()
     }
 
-    private fun Model.modelKey(extension: String = ""): Key {
-        return if (extension.isBlank()) {
-            Key.key(RESOURCE_NAME, "item/${modelKey.namespace()}/${modelKey.value()}")
+    private fun Assets.modelKey(additionExtension: String = ""): Key {
+        return if (additionExtension.isBlank()) {
+            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}")
         } else {
-            Key.key(RESOURCE_NAME, "item/${modelKey.namespace()}/${modelKey.value()}.$extension")
+            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}.$additionExtension")
         }
     }
 
-    private fun Model.materialKeys(): Set<Key> {
-        val materialKey = overriddenMaterials
-        return materialKey.map { Key.key("item/${it.name.lowercase()}") }.toSet()
+    private fun Assets.materialKeys(): Key {
+        return Key.key("item/${material.name.lowercase()}")
     }
 
     private fun CreativeModel.toMinecraftFormat(): CreativeModel {

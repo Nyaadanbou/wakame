@@ -31,11 +31,27 @@ durability:
   # 可写成正态分布的形式
   damage: 0
 
+assets:
+  - sid: 0
+    path: "models/item/short_sword/demo.json"
+
 # 皮肤
 # 可选，默认 无
 # 如有设置，则物品自带预设的皮肤
 # 这种情况下，皮肤的所有者为无
-skin: demo_1
+skin:
+  - name: <red>demo_1
+    predicate:
+      open: 0
+      close: 1
+    permission: ads
+    cost: 123
+  - name: <red>demo_2
+    predicate:
+      open: 2
+      close: 3
+    permission: qwe
+    cost: 123
 
 # 皮肤所有者
 # 可选，默认 无

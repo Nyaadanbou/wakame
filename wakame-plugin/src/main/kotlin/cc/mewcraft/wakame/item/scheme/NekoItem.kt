@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
-import cc.mewcraft.wakame.pack.Model
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.bukkit.Material
@@ -27,7 +26,7 @@ import java.util.*
  *
  * @see NekoItemStack
  */
-interface NekoItem : Model {
+interface NekoItem : Keyed {
     /**
      * The UUID of this item.
      */
@@ -40,7 +39,9 @@ interface NekoItem : Model {
      * - [value][Key.value] is the name of the config file itself without the
      *   file extension
      */
-    override val modelKey: Key
+    val key: Key
+
+    override fun key(): Key = key
 
     /**
      * Material type.

@@ -6,16 +6,16 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import java.io.File
 
-fun validatePathStringOrNull(path: String, extension: String = ""): File? {
+fun validateAssetsPathString(path: String, extension: String = ""): File? {
+    return runCatching { validateAssetsPathStringOrThrow(path, extension) }.getOrNull()
+}
+
+fun validateAssetsPathStringOrThrow(path: String, extension: String = ""): File {
     val assetsDir: File = NEKO_PLUGIN.get(named(PLUGIN_ASSETS_DIR))
     val file = assetsDir.resolve(path)
     if (!file.exists())
-        return null
+        throw IllegalArgumentException("No such file: $file")
     if (extension.isNotEmpty() && file.extension != extension)
-        return null
+        throw IllegalArgumentException("Invalid file extension: $file")
     return file
-}
-
-fun validatePathString(path: String, extension: String = ""): File {
-    return requireNotNull(validatePathStringOrNull(path, extension)) { "Path $path is invalid" }
 }

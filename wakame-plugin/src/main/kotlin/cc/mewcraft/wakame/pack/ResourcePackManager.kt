@@ -1,15 +1,11 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.scheme.NekoItem
+import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
-import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackModelGeneration
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import com.google.common.base.Throwables
 import me.lucko.helper.scheduler.HelperExecutors
@@ -44,7 +40,6 @@ private const val GENERATED_RESOURCE_PACK_FILE = "generated/$RESOURCE_PACK_NAME"
 internal class ResourcePackManager : Initializable, KoinComponent {
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
-    private val plugin: WakamePlugin by inject()
 
     private var server: ResourcePackServer? = null
 
@@ -58,7 +53,6 @@ internal class ResourcePackManager : Initializable, KoinComponent {
      */
     fun generate(reGenerate: Boolean = false): Result<Unit> {
         var regen = reGenerate
-        plugin.saveResourceRecursively(PLUGIN_ASSETS_DIR)
 
         val resourceFile = initFile().getOrElse { return Result.failure(it) }.also { logger.info("Resource pack path initialized") }
         val resourcePackResult = runCatching {
@@ -81,11 +75,9 @@ internal class ResourcePackManager : Initializable, KoinComponent {
         }
 
         if (regen) {
-            val allItems: Set<NekoItem> = NekoItemRegistry.values
-
             val generationArgs = GenerationArgs(
                 resourcePack = resourcePack,
-                allModels = allItems.flatMap { it.bfsTraversal() },
+                allAssets = AssetsLookup.allAssets
             )
 
             // Generate the resource pack
@@ -155,7 +147,7 @@ internal class ResourcePackManager : Initializable, KoinComponent {
     }
     //</editor-fold>
 
-    //<editor-fold desc="Resource pack server">
+    //<editor-fold desc="Resource pack server test">
     @Contract(pure = true)
     private fun startServer(resourcePack: BuiltResourcePack) {
         val host = "localhost" // TODO: Configurable

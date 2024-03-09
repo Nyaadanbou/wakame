@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.item.binary.NekoItemStack
-import cc.mewcraft.wakame.pack.CustomModelDataConfiguration
+import cc.mewcraft.wakame.lookup.AssetsLookup
+import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.util.backingCustomModelData
 import cc.mewcraft.wakame.util.backingLore
 import cc.mewcraft.wakame.util.backingDisplayName
@@ -14,7 +15,7 @@ internal class ItemRendererImpl(
     private val loreFinalizer: LoreFinalizer,
 ) : KoinComponent, ItemRenderer {
     private val gsonSerial: GsonComponentSerializer by inject()
-    private val cmdConfig: CustomModelDataConfiguration by inject()
+    private val cmdLookup: ItemModelDataLookup by inject()
 
     override fun render(copy: NekoItemStack) {
         require(copy.isNeko) { "Can't render a non-neko ItemStack" }
@@ -24,11 +25,14 @@ internal class ItemRendererImpl(
         val displayName = textStylizer.stylizeName(copy)
         val displayLore = textStylizer.stylizeLore(copy).let(loreFinalizer::finalize)
 
+        val sid = AssetsLookup.getAssets(scheme.key)?.sid ?: 0
+        val cmd = cmdLookup[scheme.key, sid]
+
         // directly edit the backing ItemMeta to avoid cloning
         copy.handle.apply {
             backingDisplayName = gsonSerial.serialize(displayName)
             backingLore = displayLore.map(gsonSerial::serialize)
-            backingCustomModelData = cmdConfig.customModelDataMap[scheme.getSubModelWithSubId()?.modelKey]
+            backingCustomModelData = cmd
         }
 
         // 为了麦若，去掉物品的真实根标签
