@@ -73,9 +73,8 @@ internal data class AttributeLoreMeta(
 
     /**
      * 根据以下衍生规则:
-     * - attribute:id
-     * - attribute:id:operation
-     * - attribute:id:operation:element
+     * - attribute:id:operation         <-- 第一种
+     * - attribute:id:operation:element <-- 第二种
      *
      * 为该属性生成所有的 full keys
      */
@@ -86,7 +85,7 @@ internal data class AttributeLoreMeta(
             }
 
             val ret = ArrayList<FullKey>()
-            val meta = AttributeRegistry.attributeStructMetadata.getOrThrow(rawKey)
+            val meta = AttributeRegistry.structMetadata.getOrThrow(rawKey)
             val namespace = rawKey.namespace()
             val rawValue = StringBuilder(rawKey.value())
             for (operation in derivation.operationIndex) {

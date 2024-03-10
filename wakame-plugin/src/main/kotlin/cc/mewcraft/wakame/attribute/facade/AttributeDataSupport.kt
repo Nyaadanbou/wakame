@@ -4,16 +4,16 @@ package cc.mewcraft.wakame.attribute.facade
 
 属性数据抽象。
 
-这些类描述了属性数值的所有结构，详细用途参见实现。
+这些类描述了属性数值的所有可能的结构，详细用途参见实现。
 
 */
 
 /**
- * Represents the components of attribute values.
+ * Represents possible components of attribute values.
  *
- * **Do not directly implement these interfaces!**
- *
- * @see AttributeData and its subtypes
+ * These interfaces serve as clarifying class hierarchy. You should
+ * not directly implement these interfaces. Check the subtypes of
+ * [AttributeData] instead.
  */
 sealed interface AttributeComponent {
     /**
@@ -47,11 +47,11 @@ sealed interface AttributeComponent {
 }
 
 /**
- * A mark interface for the purpose of clarifying hierarchy.
+ * A mark interface for clarifying class hierarchy.
  *
  * **Do not implement this interface!**
  *
- * Implement the following instead:
+ * Instead, implement the following:
  * - [AttributeDataS]
  * - [AttributeDataR]
  * - [AttributeDataSE]
@@ -105,10 +105,20 @@ interface AttributeDataRE<OP, R, E> : AttributeData,
     override val element: E
 }
 
+/*
+   Below are top-level interfaces.
+
+   You should not directly implement them.
+
+   Instead, you create your own interfaces extending them,
+   so that you can get rid of the generic parameters
+   in your implementations and call sites.
+*/
+
 /**
  * An encoder.
  *
- * Data flow: Arbitrary Object -> Attribute Value.
+ * Data flow: [Arbitrary Object][E] -> [Attribute Value][V]
  */
 interface AttributeDataEncoder<E, V : AttributeData> {
     fun encode(e: E): V
@@ -117,7 +127,7 @@ interface AttributeDataEncoder<E, V : AttributeData> {
 /**
  * A decoder.
  *
- * Data flow: Attribute Value -> Arbitrary Object
+ * Data flow: [Attribute Value][V] -> [Arbitrary Object][E]
  */
 interface AttributeDataDecoder<E, V : AttributeData> {
     fun decode(e: V): E

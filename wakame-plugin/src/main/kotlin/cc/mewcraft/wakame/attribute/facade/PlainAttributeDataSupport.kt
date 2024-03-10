@@ -54,25 +54,16 @@ sealed interface PlainAttributeData : AttributeData, AttributeComponent.Op<Opera
 }
 
 /**
- * Attribute Value Encoder: [ConfigurationNode] -> [PlainAttributeData].
+ * Data conversion: [ConfigurationNode] -> [PlainAttributeData].
  */
 fun interface PlainAttributeDataNodeEncoder : AttributeDataEncoder<ConfigurationNode, PlainAttributeData>
 
-// TODO see below
-// 把 NBT 转换成 value 最好需要知道 NBT 的结构是什么，
-// 从而最终推断出需要创建什么类型的 value。
-// 虽然可以直接用 Compound#contains 来推断结构，
-// 但这样不够效率，而且判断逻辑会随着格式种类的增多而增多。
 /**
- * Attribute Value Encoder: [CompoundShadowTag] -> [PlainAttributeData].
+ * Data conversion: [CompoundShadowTag] -> [PlainAttributeData].
  */
 fun interface PlainAttributeDataNbtEncoder : AttributeDataEncoder<CompoundShadowTag, PlainAttributeData>
 
-// TODO see below
-// 把 value 转成 NBT 需要知道 NBT 具体的数值类型是什么，
-// 例如有些是 Short，有些是 Int，有些是 Double，
-// 这些数值类型需要根据该 value 所绑定的属性来得知。
 /**
- * Attribute Value Encoder: [PlainAttributeData] -> [CompoundShadowTag].
+ * Data conversion: [PlainAttributeData] -> [CompoundShadowTag].
  */
 fun interface PlainAttributeDataNbtDecoder : AttributeDataDecoder<CompoundShadowTag, PlainAttributeData>

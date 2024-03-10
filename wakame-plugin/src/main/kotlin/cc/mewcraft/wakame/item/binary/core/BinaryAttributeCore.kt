@@ -14,17 +14,15 @@ data class BinaryAttributeCore(
     override val key: Key,
     val data: PlainAttributeData,
 ) : BinaryCore, AttributeModifierProvider {
-
     override fun provideAttributeModifiers(uuid: UUID): Map<out Attribute, AttributeModifier> {
-        val factory = AttributeRegistry.attributeModifierFactory.getOrThrow(key)
+        val factory = AttributeRegistry.modifierFactory.getOrThrow(key)
         val modifiers = factory.createAttributeModifiers(uuid, data)
         return modifiers
     }
 
     override fun asShadowTag(): ShadowTag {
         val decoder = AttributeRegistry.plainNbtDecoder.getOrThrow(key)
-        val nbt = decoder.decode(data)
-        return nbt
+        val compound = decoder.decode(data)
+        return compound
     }
-
 }

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.core
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.getOrThrow
 import cc.mewcraft.wakame.util.requireKt
@@ -27,9 +26,7 @@ object SchemeCoreFactory {
         val key = node.node("key").requireKt<Key>()
         val ret = when (key.namespace()) {
             NekoNamespaces.ABILITY -> {
-                val schemeBuilder = AbilityRegistry.schemaCoreDataBuilder.getOrThrow(key)
-                val schemeData = schemeBuilder.build(node)
-                SchemeAbilityCore(key, schemeData)
+                SchemeAbilityCore(key)
             }
 
             NekoNamespaces.ATTRIBUTE -> {

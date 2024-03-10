@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.scheme.core
 
-import cc.mewcraft.wakame.attribute.facade.PlainAttributeData
 import cc.mewcraft.wakame.attribute.facade.SchemaAttributeData
 import cc.mewcraft.wakame.item.BinaryCoreData
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
@@ -13,25 +12,12 @@ import net.kyori.adventure.key.Key
  */
 data class SchemeAttributeCore(
     override val key: Key,
-    override val value: SchemaAttributeData,
+    override val data: SchemaAttributeData,
 ) : SchemeCore {
-
-    /**
-     * Generates a [PlainAttributeData] with the [value] and the given
-     * [context].
-     *
-     * Note that the returned value entirely depends on the [value] and the
-     * [context]. Even if the given [context] is the same, each call of
-     * this function may return a different value due to the randomness of
-     * [SchemaAttributeData].
-     *
-     * @param context the generation context
-     * @return a new instance
-     */
     override fun generate(context: SchemeGenerationContext): BinaryCoreData {
         val baker = AttributeRegistry.schemaDataBaker.getOrThrow(key)
-        val factor = context.level
-        val ret = baker.bake(value, factor)
-        return ret
+        val fact = context.level
+        val data = baker.bake(data, fact)
+        return data
     }
 }

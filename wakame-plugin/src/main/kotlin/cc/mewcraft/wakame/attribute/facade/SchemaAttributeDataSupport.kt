@@ -45,11 +45,11 @@ sealed interface SchemaAttributeData : SchemaCoreData, AttributeData, AttributeC
 }
 
 /**
- * Attribute Value Encoder: [ConfigurationNode] -> [SchemaAttributeData].
+ * Data conversion: [ConfigurationNode] -> [SchemaAttributeData].
  */
 fun interface SchemaAttributeDataNodeEncoder : AttributeDataEncoder<ConfigurationNode, SchemaAttributeData>
 
 /**
- * Attribute Value Encoder: [SchemaAttributeData] -> [ConfigurationNode].
+ * Data conversion: [SchemaAttributeData] -> [ConfigurationNode].
  */
 fun interface SchemaAttributeDataNodeDecoder : AttributeDataDecoder<ConfigurationNode, SchemaAttributeData>

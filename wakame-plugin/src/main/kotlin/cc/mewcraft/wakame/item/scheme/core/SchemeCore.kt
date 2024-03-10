@@ -13,12 +13,12 @@ import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
  */
 sealed interface SchemeCore : Core {
     /**
-     * The scheme value.
+     * The scheme data.
      */
-    val value: SchemaCoreData
+    val data: SchemaCoreData
 
     /**
-     * Generates a binary core value from `this`.
+     * Generates a binary core data from `this`.
      *
      * @param context the context
      * @return a new instance

@@ -414,14 +414,13 @@ core_groups:
   # 核心组：core_f
   core_f:
     filters: [ ]
-    # TODO 技能数据还未完成，暂时注释掉
-    # selects:
-    #  ability:
-    #    entries:
-    #      - key: ability:blink
-    #        weight: 1
-    #      - key: ability:dash
-    #        weight: 1
+    selects:
+      ability:
+        entries:
+          - key: ability:blink
+            weight: 1
+          - key: ability:dash
+            weight: 1
     default: [ ]
 
 # 诅咒池

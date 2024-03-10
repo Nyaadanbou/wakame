@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability
 
-import net.kyori.adventure.key.Keyed
+import cc.mewcraft.wakame.adventure.Keyed
 
 /**
  * Represents an ability "attached" to a player.

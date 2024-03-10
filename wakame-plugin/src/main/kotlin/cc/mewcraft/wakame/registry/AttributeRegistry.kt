@@ -11,10 +11,6 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.NbtCoreDataDecoder
-import cc.mewcraft.wakame.item.NbtCoreDataEncoder
-import cc.mewcraft.wakame.item.SchemaCoreDataBaker
-import cc.mewcraft.wakame.item.SchemaCoreDataBuilder
 import cc.mewcraft.wakame.util.*
 import com.google.common.collect.ImmutableMap
 import me.lucko.helper.nbt.ShadowTagType
@@ -29,10 +25,10 @@ import kotlin.math.max
  * This singleton holds various implementations for **each** attribute.
  *
  * Currently, the types of implementations are the following:
- * - [SchemaCoreDataBuilder]
- * - [SchemaCoreDataBaker]
- * - [NbtCoreDataEncoder]
- * - [NbtCoreDataDecoder]
+ * - [SchemaAttributeDataBaker]
+ * - [SchemaAttributeDataNodeEncoder]
+ * - [PlainAttributeDataNbtEncoder]
+ * - [PlainAttributeDataNbtDecoder]
  * - [AttributeModifierFactory]
  * - [AttributeStructMetadata]
  *
@@ -47,19 +43,13 @@ object AttributeRegistry : Initializable {
      */
     val EMPTY_KEY: Key = Attributes.EMPTY.key()
 
-    // val schemaCoreDataBuilder: MutableMap<Key, AttributeSchemaCoreDataBuilder> = HashMap()
-    // val schemaCoreDataBaker: MutableMap<Key, AttributeSchemaCoreDataBaker> = HashMap()
-    // val nbtCoreDataEncoder: MutableMap<Key, AttributeNbtCoreDataEncoder> = HashMap()
-    // val nbtCoreDataDecoder: MutableMap<Key, AttributeNbtCoreDataDecoder> = HashMap()
-
-    val attributeModifierFactory: MutableMap<Key, AttributeModifierFactory> = HashMap()
-    val attributeStructMetadata: MutableMap<Key, AttributeStructMetadata> = HashMap()
-
     val schemaDataBaker: MutableMap<Key, SchemaAttributeDataBaker> = HashMap()
     val schemaNodeEncoder: MutableMap<Key, SchemaAttributeDataNodeEncoder> = HashMap()
     val plainNodeEncoder: MutableMap<Key, PlainAttributeDataNodeEncoder> = HashMap()
     val plainNbtEncoder: MutableMap<Key, PlainAttributeDataNbtEncoder> = HashMap()
     val plainNbtDecoder: MutableMap<Key, PlainAttributeDataNbtDecoder> = HashMap()
+    val modifierFactory: MutableMap<Key, AttributeModifierFactory> = HashMap()
+    val structMetadata: MutableMap<Key, AttributeStructMetadata> = HashMap()
 
     /**
      * Registers an attribute facade.
@@ -195,17 +185,17 @@ private class SingleSelectionImpl(
      * Components: Op, Single
      */
     override fun bind(component: Attribute) {
-        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
-            val operation = node.operation()
-            val value = node.schemaSingle()
-            SchemaAttributeData.S(operation, value)
-        }
-
         AttributeRegistry.schemaDataBaker[key] = SchemaAttributeDataBaker { schema, factor ->
             schema as SchemaAttributeData.S
             val operation = schema.operation
             val value = schema.value.calculate(factor)
             PlainAttributeData.S(operation, value)
+        }
+
+        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val value = node.schemaSingle()
+            SchemaAttributeData.S(operation, value)
         }
 
         AttributeRegistry.plainNbtEncoder[key] = PlainAttributeDataNbtEncoder { compound ->
@@ -229,13 +219,13 @@ private class SingleSelectionImpl(
             PlainAttributeData.S(operation, value)
         }
 
-        AttributeRegistry.attributeModifierFactory[key] = AttributeModifierFactory { uuid, value ->
+        AttributeRegistry.modifierFactory[key] = AttributeModifierFactory { uuid, value ->
             value as PlainAttributeData.S
             val modifier = AttributeModifier(uuid, value.value.toStableDouble(), value.operation)
             ImmutableMap.of(component, modifier)
         }
 
-        AttributeRegistry.attributeStructMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.SINGLE, false)
+        AttributeRegistry.structMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.SINGLE, false)
     }
 }
 
@@ -254,19 +244,19 @@ private class RangedSelectionImpl(
         component1: Attribute,
         component2: Attribute,
     ) {
-        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
-            val operation = node.operation()
-            val lower = node.schemaLower()
-            val upper = node.schemaUpper()
-            SchemaAttributeData.R(operation, lower, upper)
-        }
-
         AttributeRegistry.schemaDataBaker[key] = SchemaAttributeDataBaker { schema, factor ->
             schema as SchemaAttributeData.R
             val operation = schema.operation
             val lower = schema.lower.calculate(factor)
             val upper = schema.upper.calculate(factor)
             PlainAttributeData.R(operation, lower, max(lower, upper))
+        }
+
+        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val lower = node.schemaLower()
+            val upper = node.schemaUpper()
+            SchemaAttributeData.R(operation, lower, upper)
         }
 
         AttributeRegistry.plainNbtEncoder[key] = PlainAttributeDataNbtEncoder { compound ->
@@ -293,14 +283,14 @@ private class RangedSelectionImpl(
             PlainAttributeData.R(operation, lower, upper)
         }
 
-        AttributeRegistry.attributeModifierFactory[key] = AttributeModifierFactory { uuid, value ->
+        AttributeRegistry.modifierFactory[key] = AttributeModifierFactory { uuid, value ->
             value as PlainAttributeData.R
             val modifier1 = AttributeModifier(uuid, value.lower.toStableDouble(), value.operation)
             val modifier2 = AttributeModifier(uuid, value.upper.toStableDouble(), value.operation)
             ImmutableMap.of(component1, modifier1, component2, modifier2)
         }
 
-        AttributeRegistry.attributeStructMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.RANGED, false)
+        AttributeRegistry.structMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.RANGED, false)
     }
 }
 
@@ -315,19 +305,19 @@ private class SingleElementAttributeBinderImpl(
     override fun bind(
         component: (Element) -> ElementAttribute,
     ) {
-        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
-            val operation = node.operation()
-            val value = node.schemaSingle()
-            val element = node.element()
-            SchemaAttributeData.SE(operation, value, element)
-        }
-
         AttributeRegistry.schemaDataBaker[key] = SchemaAttributeDataBaker { schema, factor ->
             schema as SchemaAttributeData.SE
             val operation = schema.operation
             val value = schema.value.calculate(factor)
             val element = schema.element
             PlainAttributeData.SE(operation, value, element)
+        }
+
+        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val value = node.schemaSingle()
+            val element = node.element()
+            SchemaAttributeData.SE(operation, value, element)
         }
 
         AttributeRegistry.plainNbtEncoder[key] = PlainAttributeDataNbtEncoder { compound ->
@@ -354,13 +344,13 @@ private class SingleElementAttributeBinderImpl(
             PlainAttributeData.SE(operation, value, element)
         }
 
-        AttributeRegistry.attributeModifierFactory[key] = AttributeModifierFactory { uuid, value ->
+        AttributeRegistry.modifierFactory[key] = AttributeModifierFactory { uuid, value ->
             value as PlainAttributeData.SE
             val modifier = AttributeModifier(uuid, value.value.toStableDouble(), value.operation)
             ImmutableMap.of(component(value.element), modifier)
         }
 
-        AttributeRegistry.attributeStructMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.SINGLE, true)
+        AttributeRegistry.structMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.SINGLE, true)
     }
 }
 
@@ -376,14 +366,6 @@ private class RangedElementAttributeBinderImpl(
         component1: (Element) -> ElementAttribute,
         component2: (Element) -> ElementAttribute,
     ) {
-        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
-            val operation = node.operation()
-            val lower = node.schemaLower()
-            val upper = node.schemaUpper()
-            val element = node.element()
-            SchemaAttributeData.RE(operation, lower, upper, element)
-        }
-
         AttributeRegistry.schemaDataBaker[key] = SchemaAttributeDataBaker { schema, factor ->
             schema as SchemaAttributeData.RE
             val operation = schema.operation
@@ -391,6 +373,14 @@ private class RangedElementAttributeBinderImpl(
             val upper = schema.upper.calculate(factor)
             val element = schema.element
             PlainAttributeData.RE(operation, lower, max(lower, upper), element)
+        }
+
+        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val lower = node.schemaLower()
+            val upper = node.schemaUpper()
+            val element = node.element()
+            SchemaAttributeData.RE(operation, lower, upper, element)
         }
 
         AttributeRegistry.plainNbtEncoder[key] = PlainAttributeDataNbtEncoder { compound ->
@@ -420,43 +410,43 @@ private class RangedElementAttributeBinderImpl(
             PlainAttributeData.RE(operation, lower, upper, element)
         }
 
-        AttributeRegistry.attributeModifierFactory[key] = AttributeModifierFactory { uuid, value ->
+        AttributeRegistry.modifierFactory[key] = AttributeModifierFactory { uuid, value ->
             value as PlainAttributeData.RE
             val modifier1 = AttributeModifier(uuid, value.lower.toStableDouble(), value.operation)
             val modifier2 = AttributeModifier(uuid, value.upper.toStableDouble(), value.operation)
             ImmutableMap.of(component1(value.element), modifier1, component2(value.element), modifier2)
         }
 
-        AttributeRegistry.attributeStructMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.RANGED, true)
+        AttributeRegistry.structMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.RANGED, true)
     }
 }
 
 // Map Value's KFunction Type: Map<ShadowTagType, CompoundShadowTag.(String, Number) -> Unit>
-private val TAG_TYPE_2_TAG_SETTER_MAP: Map<ShadowTagType, MethodHandle> = buildMap {
-    this[ShadowTagType.BYTE] = CompoundShadowTag::putByte
-    this[ShadowTagType.SHORT] = CompoundShadowTag::putShort
-    this[ShadowTagType.INT] = CompoundShadowTag::putInt
-    this[ShadowTagType.LONG] = CompoundShadowTag::putLong
-    this[ShadowTagType.FLOAT] = CompoundShadowTag::putFloat
-    this[ShadowTagType.DOUBLE] = CompoundShadowTag::putDouble
-}.mapValues { it.value.toMethodHandle() }.let { EnumMap(it) }
+private val TAG_TYPE_2_TAG_SETTER_MAP: Map<ShadowTagType, MethodHandle> =
+    buildMap {
+        this[ShadowTagType.BYTE] = CompoundShadowTag::putByte
+        this[ShadowTagType.SHORT] = CompoundShadowTag::putShort
+        this[ShadowTagType.INT] = CompoundShadowTag::putInt
+        this[ShadowTagType.LONG] = CompoundShadowTag::putLong
+        this[ShadowTagType.FLOAT] = CompoundShadowTag::putFloat
+        this[ShadowTagType.DOUBLE] = CompoundShadowTag::putDouble
+    }.mapValues { it.value.toMethodHandle() }.let { EnumMap(it) }
 
 // Map Value's KFunction Type: (Number) -> Number
-private val TAG_TYPE_2_NUMBER_CONVERTER_MAP: Map<ShadowTagType, MethodHandle> = buildMap {
-    this[ShadowTagType.BYTE] = Number::toStableByte
-    this[ShadowTagType.SHORT] = Number::toStableShort
-    this[ShadowTagType.INT] = Number::toStableInt
-    this[ShadowTagType.LONG] = Number::toStableLong
-    this[ShadowTagType.FLOAT] = Number::toStableFloat
-    this[ShadowTagType.DOUBLE] = Number::toStableDouble
-}.mapValues { it.value.toMethodHandle() }.let { EnumMap(it) }
+private val TAG_TYPE_2_NUMBER_CONVERTER_MAP: Map<ShadowTagType, MethodHandle> =
+    buildMap {
+        this[ShadowTagType.BYTE] = Number::toStableByte
+        this[ShadowTagType.SHORT] = Number::toStableShort
+        this[ShadowTagType.INT] = Number::toStableInt
+        this[ShadowTagType.LONG] = Number::toStableLong
+        this[ShadowTagType.FLOAT] = Number::toStableFloat
+        this[ShadowTagType.DOUBLE] = Number::toStableDouble
+    }.mapValues { it.value.toMethodHandle() }.let { EnumMap(it) }
 
 /* Specialized Compound Operations */
 
 private fun CompoundShadowTag.getElement(): Element {
-    return this.getByteOrNull(NekoTags.Attribute.ELEMENT)
-        ?.let { ElementRegistry.getByOrThrow(it) }
-        ?: ElementRegistry.DEFAULT
+    return this.getByteOrNull(NekoTags.Attribute.ELEMENT)?.let { ElementRegistry.getByOrThrow(it) } ?: ElementRegistry.DEFAULT
 }
 
 private fun CompoundShadowTag.putElement(element: Element) {
@@ -486,27 +476,35 @@ private fun CompoundShadowTag.putId(id: Key) {
 
 /* Specialized Configuration Operations */
 
-private fun ConfigurationNode.plainSingle(): Double =
-    node("value").requireKt<Double>()
+private fun ConfigurationNode.plainSingle(): Double {
+    return node("value").requireKt<Double>()
+}
 
-private fun ConfigurationNode.plainLower(): Double =
-    node("lower").requireKt<Double>()
+private fun ConfigurationNode.plainLower(): Double {
+    return node("lower").requireKt<Double>()
+}
 
-private fun ConfigurationNode.plainUpper(): Double =
-    node("upper").requireKt<Double>()
+private fun ConfigurationNode.plainUpper(): Double {
+    return node("upper").requireKt<Double>()
+}
 
-private fun ConfigurationNode.schemaSingle(): RandomizedValue =
-    node("value").requireKt<RandomizedValue>()
+private fun ConfigurationNode.schemaSingle(): RandomizedValue {
+    return node("value").requireKt<RandomizedValue>()
+}
 
-private fun ConfigurationNode.schemaLower(): RandomizedValue =
-    node("lower").requireKt<RandomizedValue>()
+private fun ConfigurationNode.schemaLower(): RandomizedValue {
+    return node("lower").requireKt<RandomizedValue>()
+}
 
-private fun ConfigurationNode.schemaUpper(): RandomizedValue =
-    node("upper").requireKt<RandomizedValue>()
+private fun ConfigurationNode.schemaUpper(): RandomizedValue {
+    return node("upper").requireKt<RandomizedValue>()
+}
 
-private fun ConfigurationNode.element(): Element =
-    node("element").requireKt<Element>()
+private fun ConfigurationNode.element(): Element {
+    return node("element").requireKt<Element>()
+}
 
-private fun ConfigurationNode.operation(): AttributeModifier.Operation =
-    node("operation").string?.let { AttributeModifier.Operation.byKey(it) } ?: AttributeModifier.Operation.ADD // ADDITION by default
+private fun ConfigurationNode.operation(): AttributeModifier.Operation {
+    return node("operation").string?.let { AttributeModifier.Operation.byKey(it) } ?: AttributeModifier.Operation.ADD
+}
 //</editor-fold>
