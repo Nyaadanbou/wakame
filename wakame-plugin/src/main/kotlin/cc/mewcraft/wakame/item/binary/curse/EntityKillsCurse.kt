@@ -43,7 +43,7 @@ data class EntityKillsCurse(
 
     override fun asShadowTag(): ShadowTag {
         return compoundShadowTag {
-            putString(NekoTags.Cell.CURSE_ID, key.asString())
+            putString(NekoTags.Cell.CURSE_KEY, key.asString())
             putString(INDEX_TAG_NAME, index.name)
             putShort(COUNT_TAG_NAME, count.toStableShort())
         }

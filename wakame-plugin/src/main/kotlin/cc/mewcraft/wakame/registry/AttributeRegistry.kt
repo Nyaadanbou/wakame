@@ -481,7 +481,7 @@ private fun CompoundShadowTag.putNumber(key: String, value: Double, shadowTagTyp
 }
 
 private fun CompoundShadowTag.putId(id: Key) {
-    this.putString(NekoTags.Cell.CORE_ID, id.asString())
+    this.putString(NekoTags.Cell.CORE_KEY, id.asString())
 }
 
 /* Specialized Configuration Operations */

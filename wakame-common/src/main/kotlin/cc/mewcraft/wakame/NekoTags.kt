@@ -4,8 +4,7 @@ object NekoTags {
     const val ROOT = "wakame"
 
     object Root {
-        const val NAMESPACE = "ns"
-        const val ID = "id"
+        const val KEY = "key"
         const val SEED = "seed"
     }
 
@@ -26,9 +25,9 @@ object NekoTags {
         const val CAN_REFORGE = "can_reforge"
         const val CAN_OVERRIDE = "can_override"
         const val CORE = "core"
-        const val CORE_ID = "id"
+        const val CORE_KEY = "id"
         const val CURSE = "curse"
-        const val CURSE_ID = "id"
+        const val CURSE_KEY = "id"
         const val REFORGE = "reforge"
     }
 

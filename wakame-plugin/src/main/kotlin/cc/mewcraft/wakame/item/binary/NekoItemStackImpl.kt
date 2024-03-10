@@ -71,14 +71,8 @@ internal class NekoItemStackImpl(
     override val seed: Long
         get() = tags.getLong(NekoTags.Root.SEED)
 
-    override val namespace: String
-        get() = tags.getString(NekoTags.Root.NAMESPACE)
-
-    override val id: String
-        get() = tags.getString(NekoTags.Root.ID)
-
     override val key: Key
-        get() = Key.key(namespace, id)
+        get() = Key.key(tags.getString(NekoTags.Root.KEY))
 
     override val uuid: UUID
         get() = NekoItemRegistry.get(key)?.uuid
@@ -118,16 +112,7 @@ internal class NekoItemStackImpl(
     }
 
     override fun putKey(key: Key) {
-        tags.putString(NekoTags.Root.NAMESPACE, key.namespace())
-        tags.putString(NekoTags.Root.ID, key.value())
-    }
-
-    override fun putNamespace(namespace: String) {
-        tags.putString(NekoTags.Root.NAMESPACE, namespace)
-    }
-
-    override fun putId(id: String) {
-        tags.putString(NekoTags.Root.ID, id)
+        tags.putString(NekoTags.Root.KEY, key.asString())
     }
     //</editor-fold>
 

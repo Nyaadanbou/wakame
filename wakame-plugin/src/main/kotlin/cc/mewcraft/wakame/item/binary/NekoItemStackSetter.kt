@@ -28,14 +28,4 @@ interface NekoItemStackSetter {
      * Sets key.
      */
     fun putKey(key: Key)
-
-    /**
-     * Sets namespace.
-     */
-    fun putNamespace(namespace: String)
-
-    /**
-     * Sets ID.
-     */
-    fun putId(id: String)
 }

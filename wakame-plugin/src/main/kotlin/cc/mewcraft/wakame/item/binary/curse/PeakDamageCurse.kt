@@ -38,7 +38,7 @@ data class PeakDamageCurse(
 
     override fun asShadowTag(): ShadowTag {
         return compoundShadowTag {
-            putString(NekoTags.Cell.CURSE_ID, key.asString())
+            putString(NekoTags.Cell.CURSE_KEY, key.asString())
             putShort(AMOUNT_TAG_NAME, amount.toStableShort())
             putByte(ELEMENT_TAG_NAME, element.binary)
         }

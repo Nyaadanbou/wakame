@@ -32,7 +32,7 @@ object BinaryCoreFactory {
             return emptyBinaryCore()
         }
 
-        val key = Key.key(compound.getString(NekoTags.Cell.CORE_ID))
+        val key = Key.key(compound.getString(NekoTags.Cell.CORE_KEY))
         val ret = when (key.namespace()) {
             NekoNamespaces.ABILITY -> {
                 BinaryAbilityCore(key)
@@ -62,17 +62,21 @@ object BinaryCoreFactory {
         val key = schemeCore.key
         val ret = when (schemeCore) {
             is SchemeAbilityCore -> {
+                // populate context
                 val contextHolder = AbilityContextHolder(key)
                 context.abilities += contextHolder
 
+                // construct core
                 BinaryAbilityCore(key)
             }
 
             is SchemeAttributeCore -> {
+                // populate context
                 val attributeData = schemeCore.generate(context) as PlainAttributeData
                 val contextHolder = AttributeContextHolder(key, attributeData.operation, attributeData.element)
                 context.attributes += contextHolder
 
+                // construct core
                 BinaryAttributeCore(key, attributeData)
             }
         }

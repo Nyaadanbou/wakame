@@ -94,20 +94,6 @@ interface NekoItemStack : NekoItemStackSetter {
     val seed: Long
 
     /**
-     * The namespace of this item.
-     *
-     * @throws NullPointerException if this is not a legal neko item
-     */
-    val namespace: String
-
-    /**
-     * The ID of this item.
-     *
-     * @throws NullPointerException if this is not a legal neko item
-     */
-    val id: String
-
-    /**
      * The [namespaced ID][Key] of this item.
      *
      * @throws NullPointerException if this is not a legal neko item
