@@ -34,6 +34,8 @@ durability:
 assets:
   - sid: 0
     path: "models/item/short_sword/demo.json"
+  - sid: 1
+    path: "models/item/bow/demo.json"
 
 # 皮肤
 # 可选，默认 无

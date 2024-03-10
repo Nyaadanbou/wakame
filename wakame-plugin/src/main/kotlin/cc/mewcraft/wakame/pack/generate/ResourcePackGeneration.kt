@@ -104,96 +104,107 @@ internal class ResourcePackModelGeneration(
 
         runCatching {
             for (asset in assets) {
-                // TODO: Support multiple model files
-                val modelFile = asset.modelFiles.firstOrNull() ?: continue
+                val modelFiles = asset.modelFiles.takeIf { it.isNotEmpty() } ?: continue
+                for ((index, modelFile) in modelFiles.withIndex()) {
+                    logger.info("<aqua>Generating $index model for ${asset.key}, SID ${asset.sid}... (Path: $modelFile)".mini)
+                    val customModelData = config.saveCustomModelData(asset.key, asset.sid)
+                    val resourcePack = args.resourcePack
 
-                logger.info("<aqua>Generating asset for ${asset.key}, SID ${asset.sid}... (Path: $modelFile)".mini)
-                val customModelData = config.saveCustomModelData(asset.key, asset.sid)
-                val resourcePack = args.resourcePack
+                    //<editor-fold desc="Custom Model generation">
+                    // Original asset from config
+                    val modelKey = asset.modelKey(index + asset.sid)
+                    val configModelTemplate = ModelSerializer.INSTANCE
+                        .deserialize(Readable.file(modelFile), modelKey)
 
-                // Original asset from config
-                val configModel = ModelSerializer.INSTANCE
-                    .deserialize(Readable.file(modelFile), asset.modelKey())
+                    val textureData = configModelTemplate.textures().layers()
+                        .mapNotNull { it.key() }
+                        .map { validateAssetsPathStringOrThrow("textures/${it.value()}.png") }
+                        .map { Writable.file(it) }
 
-                val textureData = configModel.textures().layers()
-                    .mapNotNull { it.key() }
-                    .map { validateAssetsPathStringOrThrow("textures/${it.value()}.png") }
-                    .map { Writable.file(it) }
-
-                // Texture file used by custom asset
-                val customTextures = textureData.map {
-                    Texture.texture()
-                        .key(asset.modelKey("png"))
-                        .data(it)
+                    // Texture file used by custom asset
+                    val customTextures = textureData.map {
+                        Texture.texture()
+                            .key(asset.modelKey(index + asset.sid, "png"))
+                            .data(it)
+                            .build()
+                    }
+                    // Replace the texture key with the custom texture key
+                    val configModel = configModelTemplate.toBuilder()
+                        .textures(ModelTextures.builder().layers(customTextures.map { ModelTexture.ofKey(it.key().removeExtension()) }).build())
                         .build()
-                }
+                    //</editor-fold>
 
-                val materialKey = asset.materialKeys()
+                    val materialKey = asset.materialKeys()
 
-                // Override for custom asset data
-                // TODO: Add other predicate for custom asset data
-                val override = ItemOverride.of(
-                    asset.modelKey(),
-                    ItemPredicate.customModelData(customModelData)
-                )
+                    // Override for custom asset data
+                    // TODO: Add other predicate for custom asset data
+                    val override = ItemOverride.of(
+                        modelKey,
+                        ItemPredicate.customModelData(customModelData)
+                    )
 
-                // Override for vanilla asset
-                val vanillaModelInResourcePack = resourcePack.model(materialKey)
+                    // Override for vanilla asset
+                    val vanillaModelInResourcePack = resourcePack.model(materialKey)
 
-                val vanillaCmdOverrideBuilder = if (vanillaModelInResourcePack != null) {
-                    vanillaModelInResourcePack.toBuilder()
-                } else {
-                    // Model textures from the vanilla asset
-                    val vanillaModelTextures = ModelTextures.builder()
-                        .layers(ModelTexture.ofKey(materialKey))
+                    val vanillaCmdOverrideBuilder = if (vanillaModelInResourcePack != null) {
+                        vanillaModelInResourcePack.toBuilder()
+                    } else {
+                        // Model textures from the vanilla asset
+                        val vanillaModelTextures = ModelTextures.builder()
+                            .layers(ModelTexture.ofKey(materialKey))
+                            .build()
+                        CreativeModel.model()
+                            .key(materialKey)
+                            .parent(configModel.parent()) // Use the same parent as the original asset
+                            .textures(vanillaModelTextures)
+                    }
+
+                    val vanillaCmdOverride = vanillaCmdOverrideBuilder
+                        .addOverride(override)
                         .build()
-                    CreativeModel.model()
-                        .key(materialKey)
-                        .parent(configModel.parent()) // Use the same parent as the original asset
-                        .textures(vanillaModelTextures)
-                }
 
-                val vanillaCmdOverride = vanillaCmdOverrideBuilder
-                    .addOverride(override)
-                    .build()
-
-                resourcePack.model(configModel.toMinecraftFormat())
-                resourcePack.model(vanillaCmdOverride).also {
-                    logger.info("<green>Model for ${asset.key}, SID ${asset.sid} generated. CustomModelData: $customModelData".mini)
-                }
-                customTextures.forEach {
-                    resourcePack.texture(it).also {
-                        logger.info("<green>Texture for ${asset.key}, SID ${asset.sid} generated.".mini)
+                    resourcePack.model(configModel.toMinecraftFormat())
+                    resourcePack.model(vanillaCmdOverride).also {
+                        logger.info("<green>Model for ${asset.key}, SID ${asset.sid} generated. CustomModelData: $customModelData".mini)
+                    }
+                    customTextures.forEach {
+                        resourcePack.texture(it).also {
+                            logger.info("<green>Texture for ${asset.key}, SID ${asset.sid} generated.".mini)
+                        }
                     }
                 }
-            }
 
-            // Remove unused custom model data
+                // Remove unused custom model data
 
-            // 1. All custom model data that was used by items but the items' model path is removed
-            val unUsedModelCustomModelData = assets
-                .filter { it.modelFiles.isEmpty() }
-                .map { config[it.key, it.sid] }
-            val result1 = config.removeCustomModelData(*unUsedModelCustomModelData.toIntArray())
+                // 1. All custom model data that was used by items but the items' model path is removed
+                val unUsedModelCustomModelData = assets
+                    .filter { it.modelFiles.isEmpty() }
+                    .map { config[it.key, it.sid] }
+                val result1 = config.removeCustomModelData(*unUsedModelCustomModelData.toIntArray())
 
-            if (result1) {
-                logger.info("<yellow>Removed unused custom model data from items with no model path: $unUsedModelCustomModelData".mini)
+                if (result1) {
+                    logger.info("<yellow>Removed unused custom model data from items with no model path: $unUsedModelCustomModelData".mini)
+                }
             }
         }.onFailure { return Result.failure(it) }
 
         return generateNext()
     }
 
-    private fun Assets.modelKey(additionExtension: String = ""): Key {
+    private fun Assets.modelKey(order: Int, additionExtension: String = ""): Key {
         return if (additionExtension.isBlank()) {
-            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}")
+            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}_$order")
         } else {
-            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}.$additionExtension")
+            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}_$order.$additionExtension")
         }
     }
 
     private fun Assets.materialKeys(): Key {
         return Key.key("item/${material.name.lowercase()}")
+    }
+
+    private fun Key.removeExtension(): Key {
+        return Key.key(namespace(), value().substringBeforeLast('.'))
     }
 
     private fun CreativeModel.toMinecraftFormat(): CreativeModel {

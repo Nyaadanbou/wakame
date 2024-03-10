@@ -14,7 +14,7 @@ sealed interface Assets : Keyed {
 
     val sid: Int
 
-    val modelFiles: List<File>
+    val modelFiles: Collection<File>
 }
 
 data class ItemAssets(
@@ -22,7 +22,7 @@ data class ItemAssets(
     override val sid: Int,
     val modelFileStrings: List<String>,
 ) : Assets {
-    override val modelFiles: List<File> = modelFileStrings.map { validateAssetsPathStringOrThrow(it, "json") }
+    override val modelFiles: Collection<File> = modelFileStrings.map { validateAssetsPathStringOrThrow(it, "json") }
 }
 
 val Assets.material: Material

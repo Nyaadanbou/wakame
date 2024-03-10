@@ -2,12 +2,14 @@ package cc.mewcraft.wakame.lookup
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.WakamePlugin
-import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.requireKt
+import com.google.common.collect.Multimap
+import com.google.common.collect.MultimapBuilder
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -25,7 +27,11 @@ import org.koin.core.component.inject
 object AssetsLookup : Initializable, KoinComponent {
     // K - NekoItem key
     // V - Assets
-    private val assets: MutableMap<Key, Assets> = mutableMapOf()
+    private val assets: Multimap<Key, Assets> = MultimapBuilder
+        .hashKeys()
+        .treeSetValues<Assets> { o1, o2 -> o1.sid.compareTo(o2.sid) }
+        .build()
+
     private val plugin: WakamePlugin by inject()
 
     private fun loadConfiguration() {
@@ -42,18 +48,23 @@ object AssetsLookup : Initializable, KoinComponent {
                 } else {
                     pathNode.requireKt<List<String>>()
                 }
-                assets[key] = ItemAssets(key, sid, path)
+                assets.put(key, ItemAssets(key, sid, path))
             }
         }
     }
 
-    fun getAssets(key: Key): Assets? {
+    fun getAssets(key: Key): List<Assets> {
         require(NekoItemRegistry.get(key) != null) { "No such NekoItem: $key" }
-        return assets[key]
+        return assets[key].toList()
+    }
+
+    fun getAssets(key: Key, sid: Int): Assets {
+        require(NekoItemRegistry.get(key) != null) { "No such NekoItem: $key" }
+        return assets[key].firstOrNull { it.sid == sid } ?: throw NoSuchElementException("No such sid: $sid")
     }
 
     val allAssets: Collection<Assets>
-        get() = assets.values
+        get() = assets.values()
 
     override fun onPreWorld() {
         loadConfiguration()
