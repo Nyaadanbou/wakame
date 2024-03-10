@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.scheme
 
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import java.util.UUID
@@ -34,15 +34,10 @@ interface NekoItem : Keyed {
 
     /**
      * The [key][Key] of this item, where:
-     * - [namespace][Key.namespace] is the name of the directory which contains
-     *   the config file
-     * - [value][Key.value] is the name of the config file itself without the
-     *   file extension
+     * - [namespace][Key.namespace] is the name of the directory which contains the config file
+     * - [value][Key.value] is the name of the config file itself (without the file extension)
      */
-    val key: Key
-
-    // Overrides Java's getter
-    override fun key(): Key = key
+    override val key: Key
 
     /**
      * Material type.

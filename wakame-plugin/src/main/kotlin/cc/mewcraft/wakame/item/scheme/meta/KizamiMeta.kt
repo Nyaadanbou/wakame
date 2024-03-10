@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.filter.FilterFactory
@@ -11,7 +12,6 @@ import cc.mewcraft.wakame.random.Group
 import cc.mewcraft.wakame.random.Pool
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -23,7 +23,7 @@ typealias KizamiGroup = Group<Kizami, SchemeGenerationContext>
  */
 sealed interface KizamiMeta : SchemeItemMeta<Set<Kizami>> {
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "kizami")
+        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "kizami")
     }
 }
 

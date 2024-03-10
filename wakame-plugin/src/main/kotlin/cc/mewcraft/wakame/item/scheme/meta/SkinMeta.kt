@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.skin.ItemSkin
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -13,7 +13,7 @@ import java.lang.reflect.Type
  */
 sealed interface SkinMeta : SchemeItemMeta<ItemSkin> {
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "skin")
+        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "skin")
     }
 }
 

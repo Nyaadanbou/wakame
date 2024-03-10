@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.util.RandomizedValue
@@ -7,7 +8,6 @@ import cc.mewcraft.wakame.util.requireKt
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
@@ -37,7 +37,7 @@ data class Durability(
 
 sealed interface DurabilityMeta : SchemeItemMeta<Durability> {
     companion object : Keyed {
-        override fun key(): Key = ItemMetaKeys.DURABILITY
+        override val key: Key = ItemMetaKeys.DURABILITY
     }
 }
 

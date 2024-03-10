@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.lang.reflect.Type
@@ -13,7 +13,7 @@ import java.lang.reflect.Type
  */
 sealed interface DisplayLoreMeta : SchemeItemMeta<List<String>> {
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "lore")
+        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "lore")
     }
 }
 
@@ -28,7 +28,7 @@ private class NonNullDisplayLoreMeta(
     }
 }
 
-private object DefaultDisplayLoreMeta : DisplayLoreMeta {
+private data object DefaultDisplayLoreMeta : DisplayLoreMeta {
     override fun generate(context: SchemeGenerationContext): List<String>? = null
 }
 

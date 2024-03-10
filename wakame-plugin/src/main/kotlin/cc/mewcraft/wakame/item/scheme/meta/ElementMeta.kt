@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
@@ -9,7 +10,6 @@ import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.random.Pool
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -20,7 +20,7 @@ typealias ElementPool = Pool<Element, SchemeGenerationContext>
  */
 sealed interface ElementMeta : SchemeItemMeta<Set<Element>> {
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "element")
+        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "element")
     }
 }
 

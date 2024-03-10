@@ -3,11 +3,11 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
-import net.kyori.examination.string.StringExaminer
 import org.intellij.lang.annotations.Pattern
 
 /**
@@ -37,6 +37,8 @@ open class Attribute @InternalApi constructor(
      */
     val vanilla: Boolean = false,
 ) : Keyed {
+    override val key: Key = Key.key(NekoNamespaces.ATTRIBUTE, descriptionId)
+
     /**
      * 清理给定的数值，使其落在该属性的合理数值范围内。
      *
@@ -45,10 +47,6 @@ open class Attribute @InternalApi constructor(
      */
     open fun sanitizeValue(value: Double): Double {
         return value
-    }
-
-    override fun key(): Key {
-        return Key.key(NekoNamespaces.ATTRIBUTE, descriptionId)
     }
 
     override fun hashCode(): Int {
@@ -62,7 +60,7 @@ open class Attribute @InternalApi constructor(
     }
 
     override fun toString(): String {
-        return key().examine(StringExaminer.simpleEscaping())
+        return key.toSimpleString()
     }
 }
 

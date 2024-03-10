@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.rarity.Rarity
@@ -8,7 +9,6 @@ import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -18,7 +18,7 @@ import java.lang.reflect.Type
  */
 sealed interface RarityMeta : SchemeItemMeta<Rarity> {
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "rarity")
+        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "rarity")
     }
 }
 

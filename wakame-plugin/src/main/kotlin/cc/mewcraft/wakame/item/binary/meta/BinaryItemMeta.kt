@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.adventure.Keyed
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 
 /**
  * An abstraction layer of an item meta. This interface defines
@@ -17,10 +17,7 @@ sealed interface BinaryItemMeta<V> : Keyed {
     /**
      * The key of this [BinaryItemMeta].
      */
-    val key: Key
-
-    // Overrides Java's getter
-    override fun key(): Key = key
+    override val key: Key
 
     /**
      * Gets the companion object.

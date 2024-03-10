@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.level.CUSTOM_ADVENTURE_LEVEL
 import cc.mewcraft.wakame.level.PlayerLevelGetter
 import cc.mewcraft.wakame.level.VANILLA_EXPERIENCE_LEVEL
 import cc.mewcraft.wakame.util.EnumLookup
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -20,7 +20,7 @@ import java.lang.reflect.Type
  */
 sealed interface LevelMeta : SchemeItemMeta<Int> {
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "level")
+        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "level")
     }
 
     enum class Option {

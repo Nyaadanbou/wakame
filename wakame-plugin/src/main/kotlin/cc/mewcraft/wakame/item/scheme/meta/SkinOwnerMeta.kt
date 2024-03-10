@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import java.util.UUID
@@ -13,7 +13,7 @@ import java.util.UUID
  */
 sealed interface SkinOwnerMeta : SchemeItemMeta<UUID> {
     companion object : Keyed {
-        override fun key(): Key = Key.key(NekoNamespaces.ITEM_META, "skin_owner")
+        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "skin_owner")
     }
 }
 

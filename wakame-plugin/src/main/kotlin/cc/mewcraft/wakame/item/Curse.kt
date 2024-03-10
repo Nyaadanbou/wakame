@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Keyed
 
 /**
  * Represents a condition testing whether a [cell][Cell] in a
@@ -15,9 +15,7 @@ interface Curse : Keyed {
      * The key of this lock condition. Used to identify the condition in the
      * context of binary and scheme item.
      */
-    val key: Key
-
-    override fun key(): Key = key
+    override val key: Key
 }
 
 /**
