@@ -6,13 +6,13 @@ import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
 import cc.mewcraft.wakame.item.binary.curse.EntityKillsCurse
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.reference.EntityReference
-import cc.mewcraft.wakame.util.NumericValue
+import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.key.Key
 
 @SchemeData
 data class EntityKillsCurse(
-    private val count: NumericValue,
+    private val count: RandomizedValue,
     private val index: EntityReference,
 ) : SchemeCurse {
 

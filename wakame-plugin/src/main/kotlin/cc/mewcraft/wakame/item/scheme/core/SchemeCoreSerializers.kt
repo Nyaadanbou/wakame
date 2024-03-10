@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.core
 
-import cc.mewcraft.wakame.attribute.facade.elementOrNull
+import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCorePool
@@ -76,7 +76,7 @@ internal class SchemeCorePoolSerializer : AbstractPoolSerializer<SchemeCore, Sch
             // By design, an attribute is considered generated
             // if there is already an attribute with all the same
             // key, operation and element in the selection context.
-            is SchemeAttributeCore -> AttributeFilter(true, content.key, content.value.operation, content.value.elementOrNull)
+            is SchemeAttributeCore -> AttributeFilter(true, content.key, content.value.operation, content.value.element)
 
             // By design, an ability is considered generated
             // if there is already an ability with the same key

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.binary.core
 
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.item.BinaryCoreValue
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.ShadowTagLike
 
@@ -10,9 +9,7 @@ import cc.mewcraft.wakame.item.ShadowTagLike
  * [core][Core] being a representation in the game world. Currently, it
  * simply reflects the NBT structure in items.
  */
-interface BinaryCore : Core, ShadowTagLike {
-    val value: BinaryCoreValue
-}
+interface BinaryCore : Core, ShadowTagLike
 
 /**
  * Gets the empty core.

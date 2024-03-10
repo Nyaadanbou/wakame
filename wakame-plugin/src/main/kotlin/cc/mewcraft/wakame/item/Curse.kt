@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
@@ -17,4 +18,12 @@ interface Curse : Keyed {
     val key: Key
 
     override fun key(): Key = key
+}
+
+/**
+ * The keys of [curses][Curse].
+ */
+object CurseKeys {
+    val ENTITY_KILLS: Key = Key.key(NekoNamespaces.CURSE, "entity_kills")
+    val PEAK_DAMAGE: Key = Key.key(NekoNamespaces.CURSE, "peak_damage")
 }

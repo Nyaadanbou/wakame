@@ -10,7 +10,7 @@ object NekoTags {
     }
 
     object Ability {
-
+        // placeholder constants
     }
 
     object Attribute {

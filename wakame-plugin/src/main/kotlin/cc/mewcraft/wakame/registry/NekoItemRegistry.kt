@@ -83,7 +83,7 @@ object NekoItemRegistry : KoinComponent, Initializable,
                     }.onSuccess {
                         registerName2Object(key, it)
                     }.onFailure {
-                        logger.error("Can't load item '$key': {}", it.message)
+                        logger.error("Can't load item '$key'", it)
                     }
                 }
         }

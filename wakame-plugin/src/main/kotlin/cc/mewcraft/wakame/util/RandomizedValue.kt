@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom
  * - follows the normal distribution, and/or
  * - scales with a given scaling factor
  */
-data class NumericValue(
+data class RandomizedValue(
     /**
      * The base value.
      */
@@ -117,14 +117,14 @@ data class NumericValue(
          * where the values inside curly brackets can be omitted
          * @return an instance
          */
-        fun create(value: String): NumericValue {
+        fun create(value: String): RandomizedValue {
             val split = value.split(",").dropLastWhile { it.isEmpty() }.toTypedArray()
             val base = split[0].toDouble()
             val scale = if (split.size > 1) split[1].toDouble() else 0.0
             val sigma = if (split.size > 2) split[2].toDouble() else 0.0
             val lowerBound = if (split.size > 3) split[3].toDoubleOrNull() else null
             val upperBound = if (split.size > 4) split[4].toDoubleOrNull() else null
-            return NumericValue(
+            return RandomizedValue(
                 base = base, scale = scale, sigma = sigma, lowerBound = lowerBound, upperBound = upperBound
             )
         }
@@ -135,8 +135,8 @@ data class NumericValue(
          * @param base a base value
          * @return an instance
          */
-        fun create(base: Number): NumericValue {
-            return NumericValue(base)
+        fun create(base: Number): RandomizedValue {
+            return RandomizedValue(base)
         }
 
         /**
@@ -146,8 +146,8 @@ data class NumericValue(
          *     [ConfigSerializer] for the supported structures
          * @return an instance
          */
-        fun create(node: ConfigurationNode): NumericValue {
-            return NumericValueSerializer.deserialize(javaTypeOf<NumericValue>(), node)
+        fun create(node: ConfigurationNode): RandomizedValue {
+            return NumericValueSerializer.deserialize(javaTypeOf<RandomizedValue>(), node)
         }
     }
 
@@ -224,12 +224,12 @@ data class NumericValue(
     }
 }
 
-internal object NumericValueSerializer : TypeSerializer<NumericValue> {
-    override fun deserialize(type: Type, node: ConfigurationNode): NumericValue {
+internal object NumericValueSerializer : TypeSerializer<RandomizedValue> {
+    override fun deserialize(type: Type, node: ConfigurationNode): RandomizedValue {
         val scalar = node.rawScalar()
         if (scalar != null) {
             // if it's just a simple plain value like "value: 32"
-            return NumericValue(node.double, .0, .0, upperBound = .0)
+            return RandomizedValue(node.double, .0, .0, upperBound = .0)
         }
 
         val base = node.node("base").requireKt<Double>()
@@ -238,12 +238,12 @@ internal object NumericValueSerializer : TypeSerializer<NumericValue> {
         val lowerBound = node.node("min").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
         val upperBound = node.node("max").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
 
-        return NumericValue(
+        return RandomizedValue(
             base = base, scale = scale ?: .0, sigma = sigma ?: .0, lowerBound = lowerBound, upperBound = upperBound
         )
     }
 
-    override fun serialize(type: Type, obj: NumericValue?, node: ConfigurationNode) {
+    override fun serialize(type: Type, obj: RandomizedValue?, node: ConfigurationNode) {
         // throws if no value is provided
         obj ?: throw SerializationException()
 

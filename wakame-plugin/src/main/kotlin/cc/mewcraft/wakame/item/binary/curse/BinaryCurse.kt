@@ -6,13 +6,13 @@ import cc.mewcraft.wakame.item.Curse
 import cc.mewcraft.wakame.item.ShadowTagLike
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.scheme.curse.SchemeCurse
-import cc.mewcraft.wakame.util.NumericValue
+import cc.mewcraft.wakame.util.RandomizedValue
 
 /**
  * Represents a curse in binary form.
  *
  * The name "binary" is used to distinguish from [SchemeCurse] which stores
- * numeric values as [NumericValue]. In contrast, [BinaryCurse] simply
+ * numeric values as [RandomizedValue]. In contrast, [BinaryCurse] simply
  * stores numeric values as primitives since it's a reflection on NBT data.
  */
 sealed interface BinaryCurse : Curse, ShadowTagLike, Condition<NekoItemStack>

@@ -2,9 +2,8 @@ package cc.mewcraft.wakame.item.binary.core
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValue
-import cc.mewcraft.wakame.attribute.facade.elementOrNull
+import cc.mewcraft.wakame.attribute.facade.PlainAttributeData
+import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.core.SchemeAbilityCore
 import cc.mewcraft.wakame.item.scheme.core.SchemeAttributeCore
@@ -24,34 +23,28 @@ object BinaryCoreFactory {
     /**
      * Creates an [BinaryCore] from a NBT source.
      *
-     * @param compoundTag the tag
+     * @param compound the tag
      * @return an [BinaryCore] or [emptyBinaryCore]
      * @throws IllegalArgumentException if the NBT is malformed
      */
-    fun decode(compoundTag: CompoundShadowTag): BinaryCore {
-        if (compoundTag.isEmpty) {
+    fun decode(compound: CompoundShadowTag): BinaryCore {
+        if (compound.isEmpty) {
             return emptyBinaryCore()
         }
 
-        val id = compoundTag.getString(NekoTags.Cell.CORE_ID)
-        val key = Key.key(id)
-
-        val ret: BinaryCore
-        when (key.namespace()) {
+        val key = Key.key(compound.getString(NekoTags.Cell.CORE_ID))
+        val ret = when (key.namespace()) {
             NekoNamespaces.ABILITY -> {
-                // TODO finish ability facade
-                // val decoder = AbilityFacadeRegistry.shadowTagDecoder.getOrThrow(key)
-                // val value = decoder.decode(compoundTag)
-                ret = emptyBinaryCore()
+                BinaryAbilityCore(key)
             }
 
             NekoNamespaces.ATTRIBUTE -> {
-                val decoder = @OptIn(InternalApi::class) AttributeRegistry.shadowTagDecoder.getOrThrow(key)
-                val value = decoder.decode(compoundTag) as BinaryAttributeValue
-                ret = BinaryAttributeCore(key, value)
+                val encoder = AttributeRegistry.plainNbtEncoder.getOrThrow(key)
+                val data = encoder.encode(compound)
+                BinaryAttributeCore(key, data)
             }
 
-            else -> throw IllegalArgumentException("Failed to parse binary tag ${compoundTag.asString()}")
+            else -> throw IllegalArgumentException("Failed to parse binary tag ${compound.asString()}")
         }
 
         return ret
@@ -66,29 +59,21 @@ object BinaryCoreFactory {
      * @throws IllegalArgumentException
      */
     fun generate(context: SchemeGenerationContext, schemeCore: SchemeCore): BinaryCore {
-        val ret: BinaryCore
-
-        when (schemeCore) {
+        val key = schemeCore.key
+        val ret = when (schemeCore) {
             is SchemeAbilityCore -> {
-                // TODO finish ability facade
-                // val value = schemeCore.generate(context.itemLevel)
-                // ret = BinaryAbilityCore(schemeCore.key(), value)
-                ret = emptyBinaryCore()
+                val contextHolder = AbilityContextHolder(key)
+                context.abilities += contextHolder
 
-                // add the generated result to the context
-                val abilityValue = ret.value
-                val abilityContextHolder = AbilityContextHolder(ret.key)
-                context.abilities += abilityContextHolder
+                BinaryAbilityCore(key)
             }
 
             is SchemeAttributeCore -> {
-                val value = schemeCore.generate(context) as BinaryAttributeValue
-                ret = BinaryAttributeCore(schemeCore.key(), value)
+                val attributeData = schemeCore.generate(context) as PlainAttributeData
+                val contextHolder = AttributeContextHolder(key, attributeData.operation, attributeData.element)
+                context.attributes += contextHolder
 
-                // add the generated result to the context
-                val attributeValue = ret.value
-                val attributeContextHolder = AttributeContextHolder(ret.key, attributeValue.operation, attributeValue.elementOrNull)
-                context.attributes += attributeContextHolder
+                BinaryAttributeCore(key, attributeData)
             }
         }
 

@@ -6,7 +6,7 @@ import java.util.UUID
 
 /**
  * A factory to create [AttributeModifier] from given [UUID] and
- * [BinaryAttributeValue].
+ * [PlainAttributeData].
  */
 fun interface AttributeModifierFactory {
     /**
@@ -18,5 +18,5 @@ fun interface AttributeModifierFactory {
      * @throws IllegalArgumentException if this factory can't create such
      *     attribute modifier(s) from given parameters
      */
-    fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeValue): Map<out Attribute, AttributeModifier>
+    fun createAttributeModifiers(uuid: UUID, value: PlainAttributeData): Map<out Attribute, AttributeModifier>
 }

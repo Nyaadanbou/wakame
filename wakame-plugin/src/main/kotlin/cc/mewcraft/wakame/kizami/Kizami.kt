@@ -16,6 +16,7 @@ import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
+import java.util.UUID
 import java.util.stream.Stream
 
 /**
@@ -24,6 +25,7 @@ import java.util.stream.Stream
  * **DO NOT CONSTRUCT IT YOURSELF!** Use [KizamiRegistry] to get the instances instead.
  */
 data class Kizami @InternalApi internal constructor(
+    val uuid: UUID,
     override val key: String,
     override val binary: Byte,
     override val displayName: Component,
@@ -72,10 +74,11 @@ internal class KizamiSerializer : SchemeSerializer<Kizami> {
         }
 
         // if it's structure 2
+        val uuid = node.node("uuid").requireKt<UUID>()
         val key = node.key().toString()
         val binary = node.node("binary_index").requireKt<Int>().toStableByte()
         val displayName = node.node("display_name").requireKt<Component>()
         val styles = node.node("styles").requireKt<Array<StyleBuilderApplicable>>()
-        return (@OptIn(InternalApi::class) Kizami(key, binary, displayName, styles))
+        return (@OptIn(InternalApi::class) Kizami(uuid, key, binary, displayName, styles))
     }
 }

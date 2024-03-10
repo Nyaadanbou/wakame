@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.core
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.ability.SchemeAbilityValue
-import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.attribute.facade.SchemeAttributeValue
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.getOrThrow
@@ -28,19 +25,17 @@ object SchemeCoreFactory {
      */
     fun schemeOf(node: ConfigurationNode): SchemeCore {
         val key = node.node("key").requireKt<Key>()
-        val ret: SchemeCore = when (key.namespace()) {
+        val ret = when (key.namespace()) {
             NekoNamespaces.ABILITY -> {
-                @OptIn(InternalApi::class)
-                val schemeBuilder = AbilityRegistry.schemeBuilderRegistry.getOrThrow(key)
-                val schemeValue = schemeBuilder.build(node) as SchemeAbilityValue
-                SchemeAbilityCore(key, schemeValue)
+                val schemeBuilder = AbilityRegistry.schemaCoreDataBuilder.getOrThrow(key)
+                val schemeData = schemeBuilder.build(node)
+                SchemeAbilityCore(key, schemeData)
             }
 
             NekoNamespaces.ATTRIBUTE -> {
-                @OptIn(InternalApi::class)
-                val schemeBuilder = AttributeRegistry.schemeBuilderRegistry.getOrThrow(key)
-                val schemeValue = schemeBuilder.build(node) as SchemeAttributeValue
-                SchemeAttributeCore(key, schemeValue)
+                val schemeBuilder = AttributeRegistry.schemaNodeEncoder.getOrThrow(key)
+                val schemeData = schemeBuilder.encode(node)
+                SchemeAttributeCore(key, schemeData)
             }
 
             else -> throw IllegalArgumentException()

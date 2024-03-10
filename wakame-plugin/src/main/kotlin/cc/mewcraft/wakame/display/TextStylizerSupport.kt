@@ -2,10 +2,7 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueLU
-import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueLUE
-import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueS
-import cc.mewcraft.wakame.attribute.facade.BinaryAttributeValueSE
+import cc.mewcraft.wakame.attribute.facade.*
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoItemStack
@@ -199,9 +196,9 @@ internal class AttributeStylizerImpl(
         // 注意这里的 tag resolvers 需要根据 format, operation, element 分情况添加
 
         val key = core.key
-        val value = core.value
+        val value = core.data
         val tagResolvers = TagResolver.builder()
-        if (key == Attributes.ATTACK_SPEED_LEVEL.key() && value is BinaryAttributeValueS) {
+        if (key == Attributes.ATTACK_SPEED_LEVEL.key() && value is PlainAttributeData.S) {
             // 单独处理攻击速度
             // 因为攻击速度需要显示为文字
             tagResolvers.resolver(getAttackSpeedLevelTagResolver(value.value.toInt()))
@@ -209,27 +206,25 @@ internal class AttributeStylizerImpl(
         } else when (value) {
             // 其余按格式统一处理
             // 因为其余的都直接显示为数字
-            is BinaryAttributeValueS -> tagResolvers.resolver(
+            is PlainAttributeData.S -> tagResolvers.resolver(
                 number("value", value.value, value.operation)
             )
 
-            is BinaryAttributeValueLU -> tagResolvers.resolvers(
+            is PlainAttributeData.R -> tagResolvers.resolvers(
                 number("min", value.lower, value.operation),
                 number("max", value.upper, value.operation)
             )
 
-            is BinaryAttributeValueSE -> tagResolvers.resolvers(
+            is PlainAttributeData.SE -> tagResolvers.resolvers(
                 number("value", value.value, value.operation),
                 component("element", value.element.displayName)
             )
 
-            is BinaryAttributeValueLUE -> tagResolvers.resolvers(
+            is PlainAttributeData.RE -> tagResolvers.resolvers(
                 number("min", value.lower, value.operation),
                 number("max", value.upper, value.operation),
                 component("element", value.element.displayName)
             )
-
-            else -> error("Unhandled attribute struct. Missing implementation?")
         }
         return listOf(mm.deserialize(config.attributeFormats.getOrThrow(key), tagResolvers.build()))
     }

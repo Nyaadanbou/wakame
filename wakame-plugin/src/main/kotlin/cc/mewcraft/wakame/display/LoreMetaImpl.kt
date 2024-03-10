@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.display
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.util.getOrThrow
 import net.kyori.adventure.text.Component
 
 // TODO 统一 key 的生成规则
@@ -85,7 +86,7 @@ internal data class AttributeLoreMeta(
             }
 
             val ret = ArrayList<FullKey>()
-            val meta = AttributeRegistry.getMeta(rawKey)
+            val meta = AttributeRegistry.attributeStructMetadata.getOrThrow(rawKey)
             val namespace = rawKey.namespace()
             val rawValue = StringBuilder(rawKey.value())
             for (operation in derivation.operationIndex) {

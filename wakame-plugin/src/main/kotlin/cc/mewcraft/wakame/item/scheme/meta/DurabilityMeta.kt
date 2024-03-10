@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.scheme.meta
 
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.util.NumericValue
+import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.requireKt
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
@@ -42,8 +42,8 @@ sealed interface DurabilityMeta : SchemeItemMeta<Durability> {
 }
 
 private class NonNullDurabilityMeta(
-    private val threshold: NumericValue,
-    private val damage: NumericValue? = null,
+    private val threshold: RandomizedValue,
+    private val damage: RandomizedValue? = null,
 ) : DurabilityMeta {
     init {
         require(threshold.base > 0) { "threshold.base > 0" }
@@ -65,8 +65,8 @@ private data object DefaultDurabilityMeta : DurabilityMeta {
 internal class DurabilityMetaSerializer : SchemeItemMetaSerializer<DurabilityMeta> {
     override val defaultValue: DurabilityMeta = DefaultDurabilityMeta
     override fun deserialize(type: Type, node: ConfigurationNode): DurabilityMeta {
-        val threshold = node.node("threshold").requireKt<NumericValue>()
-        val damage = node.node("damage").takeUnless { it.virtual() }?.requireKt<NumericValue>() // nullable
+        val threshold = node.node("threshold").requireKt<RandomizedValue>()
+        val damage = node.node("damage").takeUnless { it.virtual() }?.requireKt<RandomizedValue>() // nullable
         return NonNullDurabilityMeta(threshold, damage)
     }
 }

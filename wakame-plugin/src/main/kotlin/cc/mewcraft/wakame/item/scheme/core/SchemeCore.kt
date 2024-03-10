@@ -1,21 +1,21 @@
 package cc.mewcraft.wakame.item.scheme.core
 
-import cc.mewcraft.wakame.item.BinaryCoreValue
+import cc.mewcraft.wakame.item.BinaryCoreData
 import cc.mewcraft.wakame.item.Core
-import cc.mewcraft.wakame.item.SchemeCoreValue
+import cc.mewcraft.wakame.item.SchemaCoreData
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 
 /**
- * Represents a **scheme** [Core].
+ * Represents a **schema core**.
  *
- * The name "scheme" implies that this [core][Core] is a config
- * representation; that is, what it looks like in the configuration.
+ * The name "schema" implies that this [core][Core] is a config
+ * representation, i.e., what it looks like in the configuration.
  */
 sealed interface SchemeCore : Core {
     /**
      * The scheme value.
      */
-    val value: SchemeCoreValue
+    val value: SchemaCoreData
 
     /**
      * Generates a binary core value from `this`.
@@ -23,5 +23,5 @@ sealed interface SchemeCore : Core {
      * @param context the context
      * @return a new instance
      */
-    fun generate(context: SchemeGenerationContext): BinaryCoreValue
+    fun generate(context: SchemeGenerationContext): BinaryCoreData
 }

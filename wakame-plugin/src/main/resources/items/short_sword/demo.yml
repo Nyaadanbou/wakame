@@ -419,14 +419,8 @@ core_groups:
     #  ability:
     #    entries:
     #      - key: ability:blink
-    #        mana: 12
-    #        cooldown: 10
-    #        distance: 16
     #        weight: 1
     #      - key: ability:dash
-    #        mana: 12
-    #        cooldown: 4
-    #        damage: 8 * damage
     #        weight: 1
     default: [ ]
 

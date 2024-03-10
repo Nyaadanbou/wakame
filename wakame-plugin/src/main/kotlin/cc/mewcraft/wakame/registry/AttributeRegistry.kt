@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.Attributes
@@ -12,39 +11,35 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.SchemeBaker
-import cc.mewcraft.wakame.item.SchemeBuilder
-import cc.mewcraft.wakame.item.ShadowTagDecoder
-import cc.mewcraft.wakame.item.ShadowTagEncoder
-import cc.mewcraft.wakame.registry.AttributeStructMeta.Format
+import cc.mewcraft.wakame.item.NbtCoreDataDecoder
+import cc.mewcraft.wakame.item.NbtCoreDataEncoder
+import cc.mewcraft.wakame.item.SchemaCoreDataBaker
+import cc.mewcraft.wakame.item.SchemaCoreDataBuilder
 import cc.mewcraft.wakame.util.*
 import com.google.common.collect.ImmutableMap
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
+import org.spongepowered.configurate.ConfigurationNode
 import java.lang.invoke.MethodHandle
 import java.util.EnumMap
+import kotlin.math.max
 
 /**
- * This singleton holds various implementations for **each** attribute in
- * the server.
+ * This singleton holds various implementations for **each** attribute.
  *
  * Currently, the types of implementations are the following:
- * - [SchemeBuilder]
- * - [SchemeBaker]
- * - [ShadowTagEncoder]
- * - [ShadowTagDecoder]
+ * - [SchemaCoreDataBuilder]
+ * - [SchemaCoreDataBaker]
+ * - [NbtCoreDataEncoder]
+ * - [NbtCoreDataDecoder]
  * - [AttributeModifierFactory]
- * - [AttributeStructMeta]
+ * - [AttributeStructMetadata]
  *
  * Check their kdoc for what they do.
  */
-@PreWorldDependency(
-    runBefore = [ElementRegistry::class]
-)
-@ReloadDependency(
-    runBefore = [ElementRegistry::class]
-)
+@PreWorldDependency(runBefore = [ElementRegistry::class])
+@ReloadDependency(runBefore = [ElementRegistry::class])
 object AttributeRegistry : Initializable {
 
     /**
@@ -52,20 +47,19 @@ object AttributeRegistry : Initializable {
      */
     val EMPTY_KEY: Key = Attributes.EMPTY.key()
 
-    @InternalApi
-    val schemeBuilderRegistry: MutableMap<Key, SchemeBuilder> = hashMapOf()
+    // val schemaCoreDataBuilder: MutableMap<Key, AttributeSchemaCoreDataBuilder> = HashMap()
+    // val schemaCoreDataBaker: MutableMap<Key, AttributeSchemaCoreDataBaker> = HashMap()
+    // val nbtCoreDataEncoder: MutableMap<Key, AttributeNbtCoreDataEncoder> = HashMap()
+    // val nbtCoreDataDecoder: MutableMap<Key, AttributeNbtCoreDataDecoder> = HashMap()
 
-    @InternalApi
-    val shadowTagEncoder: MutableMap<Key, ShadowTagEncoder> = hashMapOf()
+    val attributeModifierFactory: MutableMap<Key, AttributeModifierFactory> = HashMap()
+    val attributeStructMetadata: MutableMap<Key, AttributeStructMetadata> = HashMap()
 
-    @InternalApi
-    val shadowTagDecoder: MutableMap<Key, ShadowTagDecoder> = hashMapOf()
-
-    @InternalApi
-    val attributeFactoryRegistry: MutableMap<Key, AttributeModifierFactory> = hashMapOf()
-
-    @InternalApi
-    val attributeStructRegistry: MutableMap<Key, AttributeStructMeta> = hashMapOf()
+    val schemaDataBaker: MutableMap<Key, SchemaAttributeDataBaker> = HashMap()
+    val schemaNodeEncoder: MutableMap<Key, SchemaAttributeDataNodeEncoder> = HashMap()
+    val plainNodeEncoder: MutableMap<Key, PlainAttributeDataNodeEncoder> = HashMap()
+    val plainNbtEncoder: MutableMap<Key, PlainAttributeDataNbtEncoder> = HashMap()
+    val plainNbtDecoder: MutableMap<Key, PlainAttributeDataNbtDecoder> = HashMap()
 
     /**
      * Registers an attribute facade.
@@ -83,7 +77,7 @@ object AttributeRegistry : Initializable {
      * 词条在 NBT 中的数据类型。
      */
     private fun build(key: String, type: ShadowTagType): FormatSelection {
-        return (@OptIn(InternalApi::class) FormatSelectionImpl(Key.key(NekoNamespaces.ATTRIBUTE, key), type))
+        return FormatSelectionImpl(Key.key(NekoNamespaces.ATTRIBUTE, key), type)
     }
 
     private fun register() {
@@ -112,10 +106,6 @@ object AttributeRegistry : Initializable {
         build("movement_speed_rate", ShadowTagType.DOUBLE).single().bind(Attributes.MOVEMENT_SPEED_RATE)
     }
 
-    fun getMeta(key: Key): AttributeStructMeta {
-        return (@OptIn(InternalApi::class) attributeStructRegistry[key] ?: error("Can't find attribute struct meta with key '$key'"))
-    }
-
     override fun onPreWorld() {
         register()
     }
@@ -129,7 +119,7 @@ object AttributeRegistry : Initializable {
 /**
  * 属性结构体的元数据。
  */
-data class AttributeStructMeta(
+data class AttributeStructMetadata(
     /**
      * 数值的格式。
      */
@@ -140,18 +130,6 @@ data class AttributeStructMeta(
     val element: Boolean,
 ) {
     enum class Format { SINGLE, RANGED }
-}
-
-/**
- * 属性结构体的所有类型。
- */
-enum class AttributeStructType(
-    val meta: AttributeStructMeta,
-) {
-    SINGLE(AttributeStructMeta(Format.SINGLE, false)),
-    RANGED(AttributeStructMeta(Format.RANGED, false)),
-    SINGLE_ELEMENT(AttributeStructMeta(Format.SINGLE, true)),
-    RANGED_ELEMENT(AttributeStructMeta(Format.RANGED, true));
 }
 //</editor-fold>
 
@@ -186,215 +164,275 @@ interface RangedElementAttributeBinder {
 }
 //</editor-fold>
 
+// fun interface AttributeSchemaCoreDataBuilder : SchemaCoreDataBuilder<ConfigurationNode, SchemaAttributeData>
+// fun interface AttributeSchemaCoreDataBaker : SchemaCoreDataBaker<SchemaAttributeData, PlainAttributeData>
+// fun interface AttributeNbtCoreDataEncoder : NbtCoreDataEncoder<PlainAttributeData, CompoundShadowTag>
+// fun interface AttributeNbtCoreDataDecoder : NbtCoreDataDecoder<CompoundShadowTag, PlainAttributeData>
+
 //<editor-fold desc="Support">
-@InternalApi
 private class FormatSelectionImpl(
     private val key: Key,
-    private val shadowTagType: ShadowTagType,
+    private val type: ShadowTagType,
 ) : FormatSelection {
     override fun single(): SingleSelectionImpl {
-        return SingleSelectionImpl(key, shadowTagType)
+        return SingleSelectionImpl(key, type)
     }
 
     override fun ranged(): RangedSelectionImpl {
-        return RangedSelectionImpl(key, shadowTagType)
+        return RangedSelectionImpl(key, type)
     }
 }
 
-@InternalApi
 private class SingleSelectionImpl(
     private val key: Key,
-    private val shadowTagType: ShadowTagType,
+    private val type: ShadowTagType,
 ) : SingleSelection {
     override fun element(): SingleElementAttributeBinderImpl {
-        return SingleElementAttributeBinderImpl(key, shadowTagType)
+        return SingleElementAttributeBinderImpl(key, type)
     }
 
     /**
-     * Format: S
+     * Components: Op, Single
      */
     override fun bind(component: Attribute) {
-        // register scheme builder
-        AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerS::deserialize)
+        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val value = node.schemaSingle()
+            SchemaAttributeData.S(operation, value)
+        }
 
-        // register shadow tag encoder
-        AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
+        AttributeRegistry.schemaDataBaker[key] = SchemaAttributeDataBaker { schema, factor ->
+            schema as SchemaAttributeData.S
+            val operation = schema.operation
+            val value = schema.value.calculate(factor)
+            PlainAttributeData.S(operation, value)
+        }
+
+        AttributeRegistry.plainNbtEncoder[key] = PlainAttributeDataNbtEncoder { compound ->
+            val operation = compound.getOperation()
+            val value = compound.getNumber(NekoTags.Attribute.VAL)
+            PlainAttributeData.S(operation, value)
+        }
+
+        AttributeRegistry.plainNbtDecoder[key] = PlainAttributeDataNbtDecoder { value ->
+            value as PlainAttributeData.S
             val compound = CompoundShadowTag.create()
-            binaryValue as BinaryAttributeValueS
             compound.putId(key)
-            compound.putNumber(NekoTags.Attribute.VAL, binaryValue.value, shadowTagType)
-            compound.putOperation(binaryValue.operation)
+            compound.putNumber(NekoTags.Attribute.VAL, value.value, type)
+            compound.putOperation(value.operation)
             compound
         }
 
-        // register shadow tag decoder
-        AttributeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
-            val value = shadowTag.getNumber(NekoTags.Attribute.VAL)
-            val operation = shadowTag.getOperation()
-            BinaryAttributeValueS(value, operation)
+        AttributeRegistry.plainNodeEncoder[key] = PlainAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val value = node.plainSingle()
+            PlainAttributeData.S(operation, value)
         }
 
-        // register attribute factory
-        AttributeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
-            value as BinaryAttributeValueS
+        AttributeRegistry.attributeModifierFactory[key] = AttributeModifierFactory { uuid, value ->
+            value as PlainAttributeData.S
             val modifier = AttributeModifier(uuid, value.value.toStableDouble(), value.operation)
             ImmutableMap.of(component, modifier)
         }
 
-        // register attribute struct meta
-        AttributeRegistry.attributeStructRegistry[key] = AttributeStructMeta(AttributeStructMeta.Format.SINGLE, false)
+        AttributeRegistry.attributeStructMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.SINGLE, false)
     }
 }
 
-@InternalApi
 private class RangedSelectionImpl(
     private val key: Key,
-    private val shadowTagType: ShadowTagType,
+    private val type: ShadowTagType,
 ) : RangedSelection {
     override fun element(): RangedElementAttributeBinderImpl {
-        return RangedElementAttributeBinderImpl(key, shadowTagType)
+        return RangedElementAttributeBinderImpl(key, type)
     }
 
     /**
-     * Format: LU
+     * Components: Op, Ranged
      */
     override fun bind(
         component1: Attribute,
         component2: Attribute,
     ) {
-        // register scheme builder
-        AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerLU::deserialize)
+        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val lower = node.schemaLower()
+            val upper = node.schemaUpper()
+            SchemaAttributeData.R(operation, lower, upper)
+        }
 
-        // register shadow tag encoder
-        AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
+        AttributeRegistry.schemaDataBaker[key] = SchemaAttributeDataBaker { schema, factor ->
+            schema as SchemaAttributeData.R
+            val operation = schema.operation
+            val lower = schema.lower.calculate(factor)
+            val upper = schema.upper.calculate(factor)
+            PlainAttributeData.R(operation, lower, max(lower, upper))
+        }
+
+        AttributeRegistry.plainNbtEncoder[key] = PlainAttributeDataNbtEncoder { compound ->
+            val lower = compound.getNumber(NekoTags.Attribute.MIN)
+            val upper = compound.getNumber(NekoTags.Attribute.MAX)
+            val operation = compound.getOperation()
+            PlainAttributeData.R(operation, lower, upper)
+        }
+
+        AttributeRegistry.plainNbtDecoder[key] = PlainAttributeDataNbtDecoder { value ->
+            value as PlainAttributeData.R
             val compound = CompoundShadowTag.create()
-            binaryValue as BinaryAttributeValueLU
             compound.putId(key)
-            compound.putNumber(NekoTags.Attribute.MIN, binaryValue.lower, shadowTagType)
-            compound.putNumber(NekoTags.Attribute.MAX, binaryValue.upper, shadowTagType)
-            compound.putOperation(binaryValue.operation)
+            compound.putNumber(NekoTags.Attribute.MIN, value.lower, type)
+            compound.putNumber(NekoTags.Attribute.MAX, value.upper, type)
+            compound.putOperation(value.operation)
             compound
         }
 
-        // register shadow tag decoder
-        AttributeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
-            val lower = shadowTag.getNumber(NekoTags.Attribute.MIN)
-            val upper = shadowTag.getNumber(NekoTags.Attribute.MAX)
-            val operation = shadowTag.getOperation()
-            BinaryAttributeValueLU(lower, upper, operation)
+        AttributeRegistry.plainNodeEncoder[key] = PlainAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val lower = node.plainLower()
+            val upper = node.plainUpper()
+            PlainAttributeData.R(operation, lower, upper)
         }
 
-        // register attribute factory
-        AttributeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
-            value as BinaryAttributeValueLU
+        AttributeRegistry.attributeModifierFactory[key] = AttributeModifierFactory { uuid, value ->
+            value as PlainAttributeData.R
             val modifier1 = AttributeModifier(uuid, value.lower.toStableDouble(), value.operation)
             val modifier2 = AttributeModifier(uuid, value.upper.toStableDouble(), value.operation)
             ImmutableMap.of(component1, modifier1, component2, modifier2)
         }
 
-        // register attribute struct meta
-        AttributeRegistry.attributeStructRegistry[key] = AttributeStructMeta(AttributeStructMeta.Format.RANGED, false)
+        AttributeRegistry.attributeStructMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.RANGED, false)
     }
 }
 
-@InternalApi
 private class SingleElementAttributeBinderImpl(
     private val key: Key,
-    private val shadowTagType: ShadowTagType,
+    private val type: ShadowTagType,
 ) : SingleElementAttributeBinder {
 
     /**
-     * Format: SE
+     * Components: Op, Single, Element
      */
     override fun bind(
         component: (Element) -> ElementAttribute,
     ) {
-        // register scheme builder
-        AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerSE::deserialize)
+        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val value = node.schemaSingle()
+            val element = node.element()
+            SchemaAttributeData.SE(operation, value, element)
+        }
 
-        // register shadow tag encoder
-        AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
+        AttributeRegistry.schemaDataBaker[key] = SchemaAttributeDataBaker { schema, factor ->
+            schema as SchemaAttributeData.SE
+            val operation = schema.operation
+            val value = schema.value.calculate(factor)
+            val element = schema.element
+            PlainAttributeData.SE(operation, value, element)
+        }
+
+        AttributeRegistry.plainNbtEncoder[key] = PlainAttributeDataNbtEncoder { compound ->
+            val value = compound.getNumber(NekoTags.Attribute.VAL)
+            val element = compound.getElement()
+            val operation = compound.getOperation()
+            PlainAttributeData.SE(operation, value, element)
+        }
+
+        AttributeRegistry.plainNbtDecoder[key] = PlainAttributeDataNbtDecoder { value ->
+            value as PlainAttributeData.SE
             val compound = CompoundShadowTag.create()
-            binaryValue as BinaryAttributeValueSE
             compound.putId(key)
-            compound.putNumber(NekoTags.Attribute.VAL, binaryValue.value, shadowTagType)
-            compound.putElement(binaryValue.element)
-            compound.putOperation(binaryValue.operation)
+            compound.putNumber(NekoTags.Attribute.VAL, value.value, type)
+            compound.putElement(value.element)
+            compound.putOperation(value.operation)
             compound
         }
 
-        // register shadow tag decoder
-        AttributeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
-            val value = shadowTag.getNumber(NekoTags.Attribute.VAL)
-            val element = shadowTag.getElement()
-            val operation = shadowTag.getOperation()
-            BinaryAttributeValueSE(value, element, operation)
+        AttributeRegistry.plainNodeEncoder[key] = PlainAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val value = node.plainSingle()
+            val element = node.element()
+            PlainAttributeData.SE(operation, value, element)
         }
 
-        // register attribute factory
-        AttributeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
-            value as BinaryAttributeValueSE
+        AttributeRegistry.attributeModifierFactory[key] = AttributeModifierFactory { uuid, value ->
+            value as PlainAttributeData.SE
             val modifier = AttributeModifier(uuid, value.value.toStableDouble(), value.operation)
             ImmutableMap.of(component(value.element), modifier)
         }
 
-        // register attribute struct meta
-        AttributeRegistry.attributeStructRegistry[key] = AttributeStructMeta(AttributeStructMeta.Format.SINGLE, true)
+        AttributeRegistry.attributeStructMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.SINGLE, true)
     }
 }
 
-@InternalApi
 private class RangedElementAttributeBinderImpl(
     private val key: Key,
-    private val shadowTagType: ShadowTagType,
+    private val type: ShadowTagType,
 ) : RangedElementAttributeBinder {
 
     /**
-     * Format: LUE
+     * Components: Op, Ranged, Element
      */
     override fun bind(
         component1: (Element) -> ElementAttribute,
         component2: (Element) -> ElementAttribute,
     ) {
-        // register scheme builder
-        AttributeRegistry.schemeBuilderRegistry[key] = SchemeBuilder(SchemeAttributeValueSerializerLUE::deserialize)
+        AttributeRegistry.schemaNodeEncoder[key] = SchemaAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val lower = node.schemaLower()
+            val upper = node.schemaUpper()
+            val element = node.element()
+            SchemaAttributeData.RE(operation, lower, upper, element)
+        }
 
-        // register shadow tag encoder
-        AttributeRegistry.shadowTagEncoder[key] = ShadowTagEncoder { binaryValue ->
+        AttributeRegistry.schemaDataBaker[key] = SchemaAttributeDataBaker { schema, factor ->
+            schema as SchemaAttributeData.RE
+            val operation = schema.operation
+            val lower = schema.lower.calculate(factor)
+            val upper = schema.upper.calculate(factor)
+            val element = schema.element
+            PlainAttributeData.RE(operation, lower, max(lower, upper), element)
+        }
+
+        AttributeRegistry.plainNbtEncoder[key] = PlainAttributeDataNbtEncoder { compound ->
+            val lower = compound.getNumber(NekoTags.Attribute.MIN)
+            val upper = compound.getNumber(NekoTags.Attribute.MAX)
+            val element = compound.getElement()
+            val operation = compound.getOperation()
+            PlainAttributeData.RE(operation, lower, upper, element)
+        }
+
+        AttributeRegistry.plainNbtDecoder[key] = PlainAttributeDataNbtDecoder { value ->
+            value as PlainAttributeData.RE
             val compound = CompoundShadowTag.create()
-            binaryValue as BinaryAttributeValueLUE
             compound.putId(key)
-            compound.putNumber(NekoTags.Attribute.MIN, binaryValue.lower, shadowTagType)
-            compound.putNumber(NekoTags.Attribute.MAX, binaryValue.upper, shadowTagType)
-            compound.putElement(binaryValue.element)
-            compound.putOperation(binaryValue.operation)
+            compound.putNumber(NekoTags.Attribute.MIN, value.lower, type)
+            compound.putNumber(NekoTags.Attribute.MAX, value.upper, type)
+            compound.putElement(value.element)
+            compound.putOperation(value.operation)
             compound
         }
 
-        // register shadow tag decoder
-        AttributeRegistry.shadowTagDecoder[key] = ShadowTagDecoder { shadowTag ->
-            val lower = shadowTag.getNumber(NekoTags.Attribute.MIN)
-            val upper = shadowTag.getNumber(NekoTags.Attribute.MAX)
-            val element = shadowTag.getElement()
-            val operation = shadowTag.getOperation()
-            BinaryAttributeValueLUE(lower, upper, element, operation)
+        AttributeRegistry.plainNodeEncoder[key] = PlainAttributeDataNodeEncoder { node ->
+            val operation = node.operation()
+            val lower = node.plainLower()
+            val upper = node.plainUpper()
+            val element = node.element()
+            PlainAttributeData.RE(operation, lower, upper, element)
         }
 
-        // register attribute factory
-        AttributeRegistry.attributeFactoryRegistry[key] = AttributeModifierFactory { uuid, value ->
-            value as BinaryAttributeValueLUE
+        AttributeRegistry.attributeModifierFactory[key] = AttributeModifierFactory { uuid, value ->
+            value as PlainAttributeData.RE
             val modifier1 = AttributeModifier(uuid, value.lower.toStableDouble(), value.operation)
             val modifier2 = AttributeModifier(uuid, value.upper.toStableDouble(), value.operation)
             ImmutableMap.of(component1(value.element), modifier1, component2(value.element), modifier2)
         }
 
-        // register attribute struct meta
-        AttributeRegistry.attributeStructRegistry[key] = AttributeStructMeta(AttributeStructMeta.Format.RANGED, true)
+        AttributeRegistry.attributeStructMetadata[key] = AttributeStructMetadata(AttributeStructMetadata.Format.RANGED, true)
     }
 }
 
 // Map Value's KFunction Type: Map<ShadowTagType, CompoundShadowTag.(String, Number) -> Unit>
-private val TAG_TYPE_2_TAG_SETTER_MAP: Map<ShadowTagType, MethodHandle> = @Suppress("DuplicatedCode") buildMap {
+private val TAG_TYPE_2_TAG_SETTER_MAP: Map<ShadowTagType, MethodHandle> = buildMap {
     this[ShadowTagType.BYTE] = CompoundShadowTag::putByte
     this[ShadowTagType.SHORT] = CompoundShadowTag::putShort
     this[ShadowTagType.INT] = CompoundShadowTag::putInt
@@ -413,10 +451,12 @@ private val TAG_TYPE_2_NUMBER_CONVERTER_MAP: Map<ShadowTagType, MethodHandle> = 
     this[ShadowTagType.DOUBLE] = Number::toStableDouble
 }.mapValues { it.value.toMethodHandle() }.let { EnumMap(it) }
 
-//<editor-fold desc="Specialized Compound Operations">
+/* Specialized Compound Operations */
+
 private fun CompoundShadowTag.getElement(): Element {
-    val byte = this.getByteOrNull(NekoTags.Attribute.ELEMENT) ?: return ElementRegistry.DEFAULT
-    return ElementRegistry.getByOrThrow(byte)
+    return this.getByteOrNull(NekoTags.Attribute.ELEMENT)
+        ?.let { ElementRegistry.getByOrThrow(it) }
+        ?: ElementRegistry.DEFAULT
 }
 
 private fun CompoundShadowTag.putElement(element: Element) {
@@ -443,5 +483,30 @@ private fun CompoundShadowTag.putNumber(key: String, value: Double, shadowTagTyp
 private fun CompoundShadowTag.putId(id: Key) {
     this.putString(NekoTags.Cell.CORE_ID, id.asString())
 }
-//</editor-fold>
+
+/* Specialized Configuration Operations */
+
+private fun ConfigurationNode.plainSingle(): Double =
+    node("value").requireKt<Double>()
+
+private fun ConfigurationNode.plainLower(): Double =
+    node("lower").requireKt<Double>()
+
+private fun ConfigurationNode.plainUpper(): Double =
+    node("upper").requireKt<Double>()
+
+private fun ConfigurationNode.schemaSingle(): RandomizedValue =
+    node("value").requireKt<RandomizedValue>()
+
+private fun ConfigurationNode.schemaLower(): RandomizedValue =
+    node("lower").requireKt<RandomizedValue>()
+
+private fun ConfigurationNode.schemaUpper(): RandomizedValue =
+    node("upper").requireKt<RandomizedValue>()
+
+private fun ConfigurationNode.element(): Element =
+    node("element").requireKt<Element>()
+
+private fun ConfigurationNode.operation(): AttributeModifier.Operation =
+    node("operation").string?.let { AttributeModifier.Operation.byKey(it) } ?: AttributeModifier.Operation.ADD // ADDITION by default
 //</editor-fold>

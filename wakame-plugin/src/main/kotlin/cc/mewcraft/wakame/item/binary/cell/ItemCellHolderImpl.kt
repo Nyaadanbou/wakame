@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.BinaryAbilityValue
+import cc.mewcraft.wakame.ability.PlainAbilityData
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.NekoItemStackImpl
@@ -69,7 +69,7 @@ internal class ItemCellHolderImpl(
         return multimap.build()
     }
 
-    override fun getAbilities(): Map<out Ability, BinaryAbilityValue> {
+    override fun getAbilities(): Map<out Ability, PlainAbilityData> {
         TODO("Not yet implemented")
     }
 
