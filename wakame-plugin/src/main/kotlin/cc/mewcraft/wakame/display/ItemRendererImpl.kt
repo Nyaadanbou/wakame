@@ -25,7 +25,7 @@ internal class ItemRendererImpl(
         val displayName = textStylizer.stylizeName(copy)
         val displayLore = textStylizer.stylizeLore(copy).let(loreFinalizer::finalize)
 
-        val sid = AssetsLookup.getAssets(scheme.key, 1).sid
+        val sid = AssetsLookup.getAssets(scheme.key, 0).sid // TODO: 获取 sid
         val cmd = cmdLookup[scheme.key, sid]
 
         // directly edit the backing ItemMeta to avoid cloning

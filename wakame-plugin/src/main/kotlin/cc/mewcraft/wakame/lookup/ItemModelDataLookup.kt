@@ -52,6 +52,7 @@ internal class ItemModelDataLookup(
     }
 
     fun removeCustomModelData(vararg values: Int): Boolean {
+        if (values.isEmpty()) return false
         return values.map { customModelDataTable.values().remove(it) }.any { it }.also { saveCustomModelData(root) }
     }
 

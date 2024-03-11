@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.lookup.Assets
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.material
+import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
@@ -16,8 +17,6 @@ import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackMeta
-import team.unnamed.creative.model.ItemOverride
-import team.unnamed.creative.model.ItemPredicate
 import team.unnamed.creative.model.ModelTexture
 import team.unnamed.creative.model.ModelTextures
 import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
@@ -84,9 +83,8 @@ internal class ResourcePackIconGeneration(
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
     override fun generate(): Result<Unit> {
-        runCatching {
-            args.resourcePack.icon(Writable.file(assetsDir.resolve("logo.png")))
-        }.onFailure { return Result.failure(it) }
+        runCatching { args.resourcePack.icon(Writable.file(assetsDir.resolve("logo.png"))) }
+            .onFailure { return Result.failure(it) }
 
         return generateNext()
     }
@@ -97,12 +95,13 @@ internal class ResourcePackModelGeneration(
 ) : ResourcePackGeneration(args), KoinComponent {
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
     private val config: ItemModelDataLookup by inject()
+    private val vanillaResourcePack: VanillaResourcePack by inject()
 
     @Suppress("UnstableApiUsage")
     override fun generate(): Result<Unit> {
         val assets = args.allAssets
 
-        runCatching {
+        try {
             for (asset in assets) {
                 val modelFiles = asset.modelFiles.takeIf { it.isNotEmpty() } ?: continue
                 for ((index, modelFile) in modelFiles.withIndex()) {
@@ -134,33 +133,27 @@ internal class ResourcePackModelGeneration(
                         .build()
                     //</editor-fold>
 
-                    val materialKey = asset.materialKeys()
+                    val materialKey = asset.materialKey()
 
                     // Override for custom asset data
                     // TODO: Add other predicate for custom asset data
-                    val override = ItemOverride.of(
-                        modelKey,
-                        ItemPredicate.customModelData(customModelData)
+                    val overrideGenerator = ItemOverrideGeneratorProxy(
+                        ItemModelData(
+                            key = modelKey,
+                            material = asset.material,
+                            index = index,
+                            customModelData = customModelData
+                        )
                     )
 
                     // Override for vanilla asset
-                    val vanillaModelInResourcePack = resourcePack.model(materialKey)
+                    val vanillaModelInCustomResourcePack = resourcePack.model(materialKey)
 
-                    val vanillaCmdOverrideBuilder = if (vanillaModelInResourcePack != null) {
-                        vanillaModelInResourcePack.toBuilder()
-                    } else {
-                        // Model textures from the vanilla asset
-                        val vanillaModelTextures = ModelTextures.builder()
-                            .layers(ModelTexture.ofKey(materialKey))
-                            .build()
-                        CreativeModel.model()
-                            .key(materialKey)
-                            .parent(configModel.parent()) // Use the same parent as the original asset
-                            .textures(vanillaModelTextures)
-                    }
+                    val vanillaCmdOverrideBuilder = vanillaModelInCustomResourcePack?.toBuilder()
+                        ?: vanillaResourcePack.model(materialKey).toBuilder() /* Generate the vanilla model if it doesn't exist */
 
                     val vanillaCmdOverride = vanillaCmdOverrideBuilder
-                        .addOverride(override)
+                        .addOverride(overrideGenerator.generate())
                         .build()
 
                     resourcePack.model(configModel.toMinecraftFormat())
@@ -174,8 +167,7 @@ internal class ResourcePackModelGeneration(
                     }
                 }
 
-                // Remove unused custom model data
-
+                //<editor-fold desc="Remove unused custom model data">
                 // 1. All custom model data that was used by items but the items' model path is removed
                 val unUsedModelCustomModelData = assets
                     .filter { it.modelFiles.isEmpty() }
@@ -185,8 +177,11 @@ internal class ResourcePackModelGeneration(
                 if (result1) {
                     logger.info("<yellow>Removed unused custom model data from items with no model path: $unUsedModelCustomModelData".mini)
                 }
+                //</editor-fold>
             }
-        }.onFailure { return Result.failure(it) }
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
 
         return generateNext()
     }
@@ -199,7 +194,7 @@ internal class ResourcePackModelGeneration(
         }
     }
 
-    private fun Assets.materialKeys(): Key {
+    private fun Assets.materialKey(): Key {
         return Key.key("item/${material.name.lowercase()}")
     }
 
