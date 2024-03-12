@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.initializer
 
 import cc.mewcraft.wakame.WakamePlugin
-import cc.mewcraft.wakame.util.buildBasicConfigurationLoader
+import cc.mewcraft.wakame.util.buildYamlConfigurationLoader
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.named
 import org.koin.core.module.dsl.withOptions
@@ -15,7 +15,7 @@ internal fun initializerModule(): Module = module {
         val plugin = get<WakamePlugin>()
         val configFile = plugin.getBundledFile("config.yml")
         val configText = configFile.bufferedReader().use { it.readText() }
-        buildBasicConfigurationLoader().buildAndLoadString(configText)
+        buildYamlConfigurationLoader().buildAndLoadString(configText)
     } withOptions {
         named(MAIN_CONFIG_NODE)
     }

@@ -1,2 +1,10 @@
 uuid: c6bbbe7a-1d05-42a8-859c-c697811ad98a
 material: bow
+
+assets:
+  - variant: 0
+    path:
+      - "models/item/bow/demo.json"
+      - "models/item/bow/demo_pulling_0.json"
+      - "models/item/bow/demo_pulling_1.json"
+      - "models/item/bow/demo_pulling_2.json"

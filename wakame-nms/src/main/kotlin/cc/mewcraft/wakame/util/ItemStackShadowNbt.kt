@@ -70,6 +70,23 @@ var ItemStack.backingLore: List<String>?
             this.handle?.getTagElement("display")?.remove("Lore")
         }
     }
+
+/**
+ * Sets the custom model data.
+ * You may pass a `null` to remove the custom model data.
+ * This function will directly write the given integer to the NBT tag.
+ *
+ * Only works if `this` [ItemStack] is NMS-object backed.
+ */
+var ItemStack.backingCustomModelData: Int?
+    get() = throw UnsupportedOperationException("Get operation is not supported")
+    set(value) {
+        if (value != null) {
+            this.handle?.tag?.putInt("CustomModelData", value)
+        } else {
+            this.handle?.tag?.remove("CustomModelData")
+        }
+    }
 //</editor-fold>
 
 //<editor-fold desc="MojangStack - Neko Compound">

@@ -101,6 +101,13 @@ interface NekoItemStack : NekoItemStackSetter {
     val key: Key
 
     /**
+     * The variant of this item.
+     *
+     * @throws NullPointerException if this is not a legal neko item
+     */
+    val variant: Int
+
+    /**
      * The UUID of this item.
      *
      * @throws NullPointerException if this is not a legal neko item

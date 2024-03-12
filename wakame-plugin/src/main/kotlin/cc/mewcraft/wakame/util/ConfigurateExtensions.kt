@@ -48,7 +48,7 @@ internal fun YamlConfigurationLoader.Builder.applyCommons(): YamlConfigurationLo
 /**
  * Creates a basic builder of configuration loader.
  */
-internal fun buildBasicConfigurationLoader(
+internal fun buildYamlConfigurationLoader(
     builder: TypeSerializerCollection.Builder.() -> Unit = { },
 ): YamlConfigurationLoader.Builder {
     return YamlConfigurationLoader.builder()
