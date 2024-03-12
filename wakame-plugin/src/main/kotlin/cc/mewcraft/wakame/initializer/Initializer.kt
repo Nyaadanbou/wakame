@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.display.RENDERER_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.pack.ResourcePackListener
-import cc.mewcraft.wakame.pack.generate.ResourcePackManager
+import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.test.TestListener
 import cc.mewcraft.wakame.util.registerEvents
