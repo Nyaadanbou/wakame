@@ -53,7 +53,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         }
 
         // write base data
-        nekoStack.putKey(nekoStack.key)
+        nekoStack.putKey(nekoItem.key)
         nekoStack.putSeed(context.seed)
 
         // write item meta

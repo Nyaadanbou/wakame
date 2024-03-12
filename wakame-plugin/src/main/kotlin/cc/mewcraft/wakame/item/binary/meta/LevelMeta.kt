@@ -25,7 +25,7 @@ internal class LevelMeta(
     }
 
     override fun set(value: Int) {
-        require(value > 0) { "level > 0" }
+        require(value >= 0) { "level >= 0" }
         holder.rootOrCreate.putByte(key.value(), value.toStableByte())
     }
 
@@ -37,5 +37,5 @@ internal class LevelMeta(
 }
 
 internal fun LevelMeta?.orDefault(): Int {
-    return this?.getOrNull() ?: 1
+    return this?.getOrNull() ?: 0
 }
