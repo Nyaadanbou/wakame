@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.level
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import org.bukkit.Server
 import java.util.UUID
 
@@ -8,11 +7,9 @@ import java.util.UUID
  * Gets the [vanilla experience level](https://minecraft.wiki/w/Experience)
  * from specific player.
  */
-@InternalApi
-class VanillaExperienceLevelGetter(
+class VanillaLevelProvider(
     private val server: Server,
-) : PlayerLevelGetter {
-
+) : PlayerLevelProvider {
     override fun get(uuid: UUID): Int? {
         return server.getPlayer(uuid)?.level
     }

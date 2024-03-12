@@ -154,11 +154,6 @@ interface RangedElementAttributeBinder {
 }
 //</editor-fold>
 
-// fun interface AttributeSchemaCoreDataBuilder : SchemaCoreDataBuilder<ConfigurationNode, SchemaAttributeData>
-// fun interface AttributeSchemaCoreDataBaker : SchemaCoreDataBaker<SchemaAttributeData, PlainAttributeData>
-// fun interface AttributeNbtCoreDataEncoder : NbtCoreDataEncoder<PlainAttributeData, CompoundShadowTag>
-// fun interface AttributeNbtCoreDataDecoder : NbtCoreDataDecoder<CompoundShadowTag, PlainAttributeData>
-
 //<editor-fold desc="Support">
 private class FormatSelectionImpl(
     private val key: Key,

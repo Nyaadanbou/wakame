@@ -13,7 +13,7 @@ package cc.mewcraft.wakame.attribute.facade
  *
  * These interfaces serve as clarifying class hierarchy. You should
  * not directly implement these interfaces. Check the subtypes of
- * [AttributeData] instead.
+ * [AttributeData] for details.
  */
 sealed interface AttributeComponent {
     /**
@@ -65,6 +65,7 @@ sealed interface AttributeData
 interface AttributeDataS<OP, S> : AttributeData,
     AttributeComponent.Op<OP>,
     AttributeComponent.Single<S> {
+
     override val operation: OP
     override val value: S
 }
@@ -75,6 +76,7 @@ interface AttributeDataS<OP, S> : AttributeData,
 interface AttributeDataR<OP, R> : AttributeData,
     AttributeComponent.Op<OP>,
     AttributeComponent.Ranged<R> {
+
     override val operation: OP
     override val lower: R
     override val upper: R
@@ -87,6 +89,7 @@ interface AttributeDataSE<OP, S, E> : AttributeData,
     AttributeComponent.Op<OP>,
     AttributeComponent.Single<S>,
     AttributeComponent.Element<E> {
+
     override val operation: OP
     override val value: S
     override val element: E
@@ -99,6 +102,7 @@ interface AttributeDataRE<OP, R, E> : AttributeData,
     AttributeComponent.Op<OP>,
     AttributeComponent.Ranged<R>,
     AttributeComponent.Element<E> {
+
     override val operation: OP
     override val lower: R
     override val upper: R

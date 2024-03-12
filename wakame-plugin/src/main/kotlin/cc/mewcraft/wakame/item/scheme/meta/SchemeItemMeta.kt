@@ -16,8 +16,8 @@ sealed interface SchemeItemMeta<T : Any?> {
      * **A `null` value indicates that nothing is generated, which is used
      * to instruct that the item meta should not be written to the item.**
      *
-     * The implementation must populate relevant information about the
-     * generated result into the [context].
+     * The implementation must populate the [context] with relevant
+     * information about the generation result.
      *
      * @param context the generation context
      * @return the generated [T]

@@ -15,7 +15,9 @@ import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.generate.ResourcePackManager
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.test.TestListener
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.unregisterEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +36,7 @@ import org.bukkit.event.server.ServerLoadEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
@@ -118,10 +121,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun loadPrimaryConfiguration() {
-        val wholeText = plugin.getBundledFile("config.yml")
-            .bufferedReader()
-            .use { it.readText() }
-        config = buildBasicConfigurationLoader().buildAndLoadString(wholeText)
+        config = get(named(MAIN_CONFIG_NODE))
 
         isDebug = config.node("debug").requireKt<Boolean>()
     }

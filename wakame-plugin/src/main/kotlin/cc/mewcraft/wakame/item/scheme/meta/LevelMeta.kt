@@ -3,14 +3,9 @@ package cc.mewcraft.wakame.item.scheme.meta
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.level.CUSTOM_ADVENTURE_LEVEL
-import cc.mewcraft.wakame.level.PlayerLevelGetter
-import cc.mewcraft.wakame.level.VANILLA_EXPERIENCE_LEVEL
 import cc.mewcraft.wakame.util.EnumLookup
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -24,14 +19,20 @@ sealed interface LevelMeta : SchemeItemMeta<Int> {
     }
 
     enum class Option {
-        CRATE_LEVEL,
-        ADVENTURE_LEVEL,
-        EXPERIENCE_LEVEL,
+        CONTEXT
     }
 }
 
 /**
  * 物品的等级。
+ *
+ * 物品等级目前支持两种：固定等级，动态等级。
+ *
+ * # 固定等级
+ * 直接在配置文件中指定好一个常数，然后每次都按照该常数生成等级。
+ *
+ * # 动态等级
+ * 由生成的上下文决定要生成的等级。
  */
 private class NonNullLevelMeta(
     /**
@@ -39,10 +40,6 @@ private class NonNullLevelMeta(
      */
     private val level: Any,
 ) : KoinComponent, LevelMeta {
-
-    private val customLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(CUSTOM_ADVENTURE_LEVEL))
-    private val vanillaLevelGetter: PlayerLevelGetter by inject<PlayerLevelGetter>(named(VANILLA_EXPERIENCE_LEVEL))
-
     override fun generate(context: SchemeGenerationContext): Int {
         val ret: Int = when (level) {
             is Int -> {
@@ -51,20 +48,16 @@ private class NonNullLevelMeta(
 
             is LevelMeta.Option -> {
                 when (level) {
-                    LevelMeta.Option.CRATE_LEVEL -> context.crateObject?.level
-                    LevelMeta.Option.ADVENTURE_LEVEL -> context.playerObject?.let(customLevelGetter::get)
-                    LevelMeta.Option.EXPERIENCE_LEVEL -> context.playerObject?.let(vanillaLevelGetter::get)
-                } ?: 1 // returns level 1 if we can't get the expected level
+                    LevelMeta.Option.CONTEXT -> context.trigger.level
+                }
             }
 
             else -> throw IllegalStateException("Something wrong with the ${LevelMetaSerializer::class.simpleName}")
         }
 
         return ret
-            .coerceAtLeast(1) // by design, level never goes down below 1
-            .also {
-                context.level = it // leave trace to the context
-            }
+            .coerceAtLeast(0) // by design, level never goes down below 0
+            .also { context.level = it } // populate the context with generated level
     }
 }
 

@@ -54,9 +54,7 @@ private class NonNullRarityMeta(
 }
 
 private data object DefaultRarityMeta : RarityMeta {
-    override fun generate(context: SchemeGenerationContext): Rarity? {
-        return null
-    }
+    override fun generate(context: SchemeGenerationContext): Rarity? = null
 }
 
 internal class RarityMetaSerializer : SchemeItemMetaSerializer<RarityMeta> {

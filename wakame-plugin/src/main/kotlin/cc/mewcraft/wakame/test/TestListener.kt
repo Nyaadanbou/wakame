@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.get
+import cc.mewcraft.wakame.item.scheme.PaperNekoItemRealizer
+import cc.mewcraft.wakame.player.asNeko
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent
@@ -31,8 +33,8 @@ class TestListener : Listener {
         when (plainMessage) {
             "i1" -> {
                 val nekoItem = NekoItemRegistry.getOrThrow("short_sword:demo")
-                val nekoItemStack = nekoItem.createItemStack(player)
-                inventory.addItem(nekoItemStack.handle)
+                val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.asNeko())
+                inventory.addItem(nekoStack.handle)
             }
         }
     }
@@ -46,8 +48,8 @@ class TestListener : Listener {
         when {
             plainMessage.startsWith("i-") -> {
                 val nekoItem = NekoItemRegistry.getOrThrow(plainMessage.substringAfter("i-"))
-                val nekoItemStack = nekoItem.createItemStack(player)
-                inventory.addItem(nekoItemStack.handle)
+                val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.asNeko())
+                inventory.addItem(nekoStack.handle)
             }
         }
     }

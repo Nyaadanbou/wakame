@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.Curse
 import cc.mewcraft.wakame.item.scheme.filter.AbilityContextHolder
@@ -13,7 +12,6 @@ import cc.mewcraft.wakame.random.SelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.WatchedPrimitive
 import cc.mewcraft.wakame.util.WatchedSet
-import org.bukkit.entity.Player
 import kotlin.random.Random
 
 /**
@@ -26,23 +24,16 @@ import kotlin.random.Random
  */
 class SchemeGenerationContext(
     /**
+     * 触发本次物品生成的对象。
+     */
+    val trigger: SchemaGenerationTrigger,
+
+    /**
      * 随机数生成器的种子。
      *
      * @see SelectionContext.seed
      */
     seed: Long = Random.nextLong(),
-    /**
-     * 触发本次生成的盲盒。
-     *
-     * 如果是盲盒触发的物品生成，该成员必须不为空。
-     */
-    val crateObject: BinaryCrate? = null,
-    /**
-     * 触发本次生成的玩家。
-     *
-     * 如果是玩家触发的物品生成，该成员必须不为空。
-     */
-    val playerObject: Player? = null,
 ) : BasicSelectionContext(seed) {
     /**
      * 已经生成的物品等级。

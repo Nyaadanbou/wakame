@@ -21,7 +21,7 @@ import me.lucko.helper.terminable.Terminable
  *   un-deterministic order. Suppose there are 2 initializables, X and Y.
  *   The [onPreWorld] of class X makes no guaranteed to be called before or
  *   after that of class Y. To enforce the invocation order, you need to
- *   add a DependencyConfigurations annotation on your
+ *   add a DependencyConfiguration annotation on your
  *   [initializable][Initializable] class.
  *
  * **Note for implementations**: you must also declare your implementation

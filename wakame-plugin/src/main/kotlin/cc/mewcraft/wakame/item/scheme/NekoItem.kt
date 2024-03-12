@@ -1,14 +1,12 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.crate.BinaryCrate
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import java.util.UUID
 
 /**
@@ -18,7 +16,7 @@ import java.util.UUID
  *
  * The design philosophy of `this` is, that you can use a [NekoItem] as
  * a **blueprint** to create as many [NekoItemStacks][NekoItemStack] as
- * you want by calling [NekoItem.createItemStack], where each of the
+ * you want by calling [NekoItemRealizer.realize], where each of the
  * ItemStack will have the data of different values, and even have the
  * data of different types. This allows us to create more possibilities
  * for items, achieving better game experience by randomizing the item
@@ -63,28 +61,6 @@ interface NekoItem : Keyed {
      * is always the same as the insertion order.
      */
     val cells: Map<String, SchemeCell>
-
-    /**
-     * Generates an ItemStack from this scheme.
-     *
-     * This function is meant to be used for the case where the item generation
-     * is triggered directly by a [player][Player].
-     *
-     * @param player the player for whom the item is generated
-     * @return an once-off [NekoItemStack]
-     */
-    fun createItemStack(player: Player?): NekoItemStack // TODO move to a separated interface
-
-    /**
-     * Generates an ItemStack from this scheme.
-     *
-     * This function is meant to be used for the case where the item generation
-     * is triggered directly by a [binary crate][BinaryCrate].
-     *
-     * @param crate the crate for which the item is generated
-     * @return an once-off [NekoItemStack]
-     */
-    fun createItemStack(crate: BinaryCrate): NekoItemStack
 }
 
 /**

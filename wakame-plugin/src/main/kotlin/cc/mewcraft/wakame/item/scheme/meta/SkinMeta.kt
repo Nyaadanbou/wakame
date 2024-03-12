@@ -20,15 +20,13 @@ sealed interface SkinMeta : SchemeItemMeta<ItemSkin> {
 private class NonNullSkinMeta(
     private val itemSkin: ItemSkin,
 ) : SkinMeta {
-    override fun generate(context: SchemeGenerationContext): ItemSkin? {
+    override fun generate(context: SchemeGenerationContext): ItemSkin {
         return itemSkin
     }
 }
 
 private data object DefaultSkinMeta : SkinMeta {
-    override fun generate(context: SchemeGenerationContext): ItemSkin? {
-        return null
-    }
+    override fun generate(context: SchemeGenerationContext): ItemSkin? = null
 }
 
 internal class SkinMetaSerializer : SchemeItemMetaSerializer<SkinMeta> {

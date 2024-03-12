@@ -18,9 +18,9 @@ import org.koin.core.component.inject
 /**
  * Handles the update process of [AttributeMap].
  *
- * Specifically, it handles custom attributes from neko items:
- * - which should be reflected in [AttributeMap] in real-time.
- * - which must be applied to players as real vanilla attribute modifiers.
+ * Specifically, it handles custom attributes from neko items, which
+ * - should be updated in [AttributeMap] in real-time.
+ * - must be applied to players as vanilla attribute modifiers.
  */
 class AttributeHandler : KoinComponent, Listener {
 

@@ -4,10 +4,13 @@ import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.item.scheme.NekoItem
+import cc.mewcraft.wakame.item.scheme.NekoItemRealizer
+import cc.mewcraft.wakame.item.scheme.SchemaGenerationTrigger
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.kizamiModule
+import cc.mewcraft.wakame.player.Player
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.reference.referenceModule
@@ -15,7 +18,7 @@ import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.skin.skinModule
 import io.mockk.every
-import io.mockk.spyk
+import io.mockk.mockk
 import io.mockk.verify
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
@@ -82,62 +85,63 @@ class ItemDeserializationTest : KoinTest {
     @Test
     fun `binary item construction`() {
         val key = Key.key("short_sword:demo")
-        val original = NekoItemRegistry.get(key)
-        assertNotNull(original, "The item '$key' is not loaded correctly")
+        val demo = NekoItemRegistry.get(key)
+        assertNotNull(demo, "The item '$key' is not loaded correctly")
 
-        val demo = spyk<NekoItem>(original)
+        val player = mockk<Player>()
+        val realizer = mockk<NekoItemRealizer>()
 
-        // mock the createItemStack() function
-        // to avoid call on the Bukkit internals
-        every { demo.createItemStack(null) } answers {
-            val self = self as NekoItem
+        // mock player
+        every { player.level } returns 1
+        // mock realizer (to avoid call on the Bukkit internals)
+        every { realizer.realize(demo, player) } answers {
+            val context = SchemeGenerationContext(SchemaGenerationTrigger.wrap(player))
 
-            // create context
-            val context = SchemeGenerationContext()
+            generateAndSet<DisplayNameMeta, String>(demo, context)
+            generateAndSet<DisplayLoreMeta, List<String>>(demo, context)
+            generateAndSet<DurabilityMeta, Durability>(demo, context)
+            generateAndSet<LevelMeta, Int>(demo, context)
+            generateAndSet<RarityMeta, Rarity>(demo, context)
+            generateAndSet<ElementMeta, Set<Element>>(demo, context)
+            generateAndSet<KizamiMeta, Set<Kizami>>(demo, context)
+            generateAndSet<SkinMeta, ItemSkin>(demo, context)
+            generateAndSet<SkinOwnerMeta, UUID>(demo, context)
 
-            // generate meta
-            generateAndSet<DisplayNameMeta, String>(self, context)
-            generateAndSet<DisplayLoreMeta, List<String>>(self, context)
-            generateAndSet<LevelMeta, Int>(self, context)
-            generateAndSet<RarityMeta, Rarity>(self, context)
-            generateAndSet<ElementMeta, Set<Element>>(self, context)
-            generateAndSet<KizamiMeta, Set<Kizami>>(self, context)
-            generateAndSet<SkinMeta, ItemSkin>(self, context)
-            generateAndSet<SkinOwnerMeta, UUID>(self, context)
-
-            // generate cells
-            self.cells.forEach { (id, scheme) ->
+            demo.cells.forEach { (id, scheme) ->
                 val binary = BinaryCellFactory.generate(context, scheme)
                 if (binary != null) {
-                    logger.debug("Put cell '{}': {}", id, binary)
+                    logger.debug("write cell '{}': {}", id, binary)
                 }
             }
 
-            NekoItemStackFactory.new(self.material) // just return an empty item
+            // just return an empty item
+            NekoItemStackFactory.new(demo.material)
         }
 
-        demo.createItemStack(null)
+        // call
+        realizer.realize(demo, player)
 
-        verify { demo.createItemStack(null) }
+        // verify
+        verify { realizer.realize(demo, player) }
     }
 
     private inline fun <reified S : SchemeItemMeta<T>, T> generateAndSet(
-        self: NekoItem,
+        item: NekoItem,
         context: SchemeGenerationContext,
     ) {
-        val meta = getSchemeMetaByClass<S>(self)
+        val meta = getSchemeMetaByClass<S>(item)
         val value = meta.generate(context)
         if (value != null) {
             // set the meta only if something is generated
-            logger.debug("Put meta '{}': {}", S::class.simpleName, value.toString())
+            logger.debug("write meta '{}': {}", S::class.simpleName, value.toString())
         }
     }
 
     private inline fun <reified V : SchemeItemMeta<*>> getSchemeMetaByClass(
-        self: NekoItem,
+        item: NekoItem,
     ): V {
         val key = SchemeItemMetaKeys.get<V>()
-        val meta = checkNotNull(self.itemMeta[key])
+        val meta = checkNotNull(item.itemMeta[key])
         return meta as V
     }
 }

@@ -23,15 +23,13 @@ private class NonNullSkinOwnerMeta(
      */
     private val skinOwner: UUID,
 ) : SkinOwnerMeta {
-    override fun generate(context: SchemeGenerationContext): UUID? {
+    override fun generate(context: SchemeGenerationContext): UUID {
         return skinOwner
     }
 }
 
 private data object DefaultSkinOwnerMeta : SkinOwnerMeta {
-    override fun generate(context: SchemeGenerationContext): UUID? {
-        return null
-    }
+    override fun generate(context: SchemeGenerationContext): UUID? = null
 }
 
 internal class SkinOwnerMetaSerializer : SchemeItemMetaSerializer<SkinOwnerMeta> {
