@@ -15,7 +15,7 @@ import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
 import java.io.File
 import java.net.URI
 
-private const val VANILLA_RESOURCE_CACHE = "cache/"
+private const val VANILLA_RESOURCE_CACHE = "generated/cache/"
 
 private const val DOWNLOAD_URL = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/<version>/"
 

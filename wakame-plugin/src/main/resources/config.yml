@@ -17,8 +17,8 @@ resource_pack:
   auto_upload:
     enabled: true
     service: self_host
-    host: 127.0.0.1
-    port: 8164
+    host: "play.mewcraft.cc"
+    port: 7270
     append_port: true
   prompt:
     force: false

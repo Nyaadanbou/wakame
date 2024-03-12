@@ -25,11 +25,11 @@ internal class ItemModelDataLookup(
 
     private fun loadLayout() {
         customModelDataTable.clear()
-        val map: Map<String, Int> = root.requireKt()
-
-        map.forEach { (key, value) ->
-            val (row, column) = key.split("-")
-            customModelDataTable.put(Key.key(row), column.toInt(), value)
+        root.childrenList().forEach { node ->
+            val key = Key.key(node.key().toString())
+            node.childrenMap().forEach { (variant, value) ->
+                customModelDataTable.put(key, variant as Int, value.int)
+            }
         }
     }
 
@@ -66,7 +66,7 @@ internal class ItemModelDataLookup(
             val k = it.rowKey.asString()
             val s = it.columnKey
             val v = it.value
-            node.node("$k-$s").set(v)
+            node.node(k, s.toString()).set(v)
         }
 
         loader.save(node)

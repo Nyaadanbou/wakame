@@ -27,6 +27,7 @@ import team.unnamed.creative.model.Model as CreativeModel
 private const val RESOURCE_NAME = "wakame"
 
 data class GenerationArgs(
+    val description: String,
     val resourcePack: ResourcePack,
     val allAssets: Collection<Assets>,
 )
@@ -68,7 +69,7 @@ internal class ResourcePackMetaGeneration(
         runCatching {
             val packMeta = PackMeta.of(
                 22,
-                "<rainbow>Nyaadanbou Resource Pack".mini,
+                args.description.mini,
             )
             args.resourcePack.packMeta(packMeta)
         }.onFailure { return Result.failure(it) }

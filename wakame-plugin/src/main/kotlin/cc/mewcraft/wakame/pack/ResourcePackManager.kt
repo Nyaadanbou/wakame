@@ -2,11 +2,13 @@ package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.MAIN_CONFIG_NODE
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.formatSize
+import cc.mewcraft.wakame.util.requireKt
 import com.google.common.base.Throwables
 import me.lucko.helper.scheduler.HelperExecutors
 import me.lucko.helper.text3.mini
@@ -19,6 +21,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
+import org.spongepowered.configurate.ConfigurationNode
 import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
@@ -35,7 +38,9 @@ private const val GENERATED_RESOURCE_PACK_FILE = "generated/$RESOURCE_PACK_NAME"
 @ReloadDependency(
     runBefore = [NekoItemRegistry::class]
 )
-internal class ResourcePackManager : Initializable, KoinComponent {
+internal class ResourcePackManager(
+    private val config: ResourcePackConfiguration
+) : Initializable, KoinComponent {
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
 
@@ -74,6 +79,7 @@ internal class ResourcePackManager : Initializable, KoinComponent {
 
         if (regen) {
             val generationArgs = GenerationArgs(
+                description = config.description,
                 resourcePack = resourcePack,
                 allAssets = AssetsLookup.allAssets
             )
@@ -125,19 +131,32 @@ internal class ResourcePackManager : Initializable, KoinComponent {
     //<editor-fold desc="Resource pack server test">
     @Contract(pure = true)
     private fun startServer(resourcePack: BuiltResourcePack) {
-        val host = "localhost" // TODO: Configurable
-        val port = 7270
+        if (!config.enabled) {
+            logger.info("<red>Resource pack server is disabled".mini)
+            return
+        }
 
-        server = ResourcePackServer.server()
-            .address(host, port) // (required) address and port
-            .pack(resourcePack) // (required) pack to serve
-            .executor(HelperExecutors.asyncHelper()) // (optional) request executor (IMPORTANT!)
-            .path("/get/${resourcePack.hash()}")
-            .build()
+        when (config.service) {
+            "self_host" -> {
+                val host = config.host
+                val port = config.port
 
-        downloadAddress = "http://$host:$port/get/${resourcePack.hash()}/$RESOURCE_PACK_NAME"
+                server = ResourcePackServer.server()
+                    .address("0.0.0.0", port) // (required) address and port
+                    .pack(resourcePack) // (required) pack to serve
+                    .executor(HelperExecutors.asyncHelper()) // (optional) request executor (IMPORTANT!)
+                    .path("/get/${resourcePack.hash()}")
+                    .build()
 
-        server?.start().also { logger.info("Resource pack server started") }
+                downloadAddress = if (config.appendPort) {
+                    "http://$host:$port/get/${resourcePack.hash()}/$RESOURCE_PACK_NAME"
+                } else {
+                    "http://$host/get/${resourcePack.hash()}/$RESOURCE_PACK_NAME"
+                }
+
+                server?.start().also { logger.info("Resource pack server started") }
+            }
+        }
     }
 
     @Blocking
