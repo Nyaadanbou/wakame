@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.scheme.core
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.util.getOrThrow
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -30,7 +29,7 @@ object SchemeCoreFactory {
             }
 
             NekoNamespaces.ATTRIBUTE -> {
-                val schemeBuilder = AttributeRegistry.schemaNodeEncoder.getOrThrow(key)
+                val schemeBuilder = AttributeRegistry.schemaNodeEncoder.getValue(key)
                 val schemeData = schemeBuilder.encode(node)
                 SchemeAttributeCore(key, schemeData)
             }

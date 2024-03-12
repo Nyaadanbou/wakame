@@ -461,8 +461,8 @@ private fun CompoundShadowTag.getNumber(key: String): Double {
 }
 
 private fun CompoundShadowTag.putNumber(key: String, value: Double, shadowTagType: ShadowTagType) {
-    val converted = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(shadowTagType).invoke(value)
-    TAG_TYPE_2_TAG_SETTER_MAP.getOrThrow(shadowTagType).invoke(this, key, converted)
+    val converted = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getValue(shadowTagType).invoke(value)
+    TAG_TYPE_2_TAG_SETTER_MAP.getValue(shadowTagType).invoke(this, key, converted)
 }
 
 private fun CompoundShadowTag.putId(id: Key) {

@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.attribute.facade.SchemaAttributeData
 import cc.mewcraft.wakame.item.BinaryCoreData
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.util.getOrThrow
 import net.kyori.adventure.key.Key
 
 /**
@@ -15,7 +14,7 @@ data class SchemeAttributeCore(
     override val data: SchemaAttributeData,
 ) : SchemeCore {
     override fun generate(context: SchemeGenerationContext): BinaryCoreData {
-        val baker = AttributeRegistry.schemaDataBaker.getOrThrow(key)
+        val baker = AttributeRegistry.schemaDataBaker.getValue(key)
         val fact = context.level
         val data = baker.bake(data, fact)
         return data

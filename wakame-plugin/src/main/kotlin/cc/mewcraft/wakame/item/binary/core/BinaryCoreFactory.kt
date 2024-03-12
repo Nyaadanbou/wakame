@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.item.scheme.core.SchemeCore
 import cc.mewcraft.wakame.item.scheme.filter.AbilityContextHolder
 import cc.mewcraft.wakame.item.scheme.filter.AttributeContextHolder
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.util.getOrThrow
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
@@ -39,7 +38,7 @@ object BinaryCoreFactory {
             }
 
             NekoNamespaces.ATTRIBUTE -> {
-                val encoder = AttributeRegistry.plainNbtEncoder.getOrThrow(key)
+                val encoder = AttributeRegistry.plainNbtEncoder.getValue(key)
                 val data = encoder.encode(compound)
                 BinaryAttributeCore(key, data)
             }

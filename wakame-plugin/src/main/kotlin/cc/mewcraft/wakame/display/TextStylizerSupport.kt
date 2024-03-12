@@ -15,7 +15,6 @@ import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reloadable
-import cc.mewcraft.wakame.util.getOrThrow
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
@@ -185,7 +184,7 @@ internal class AttributeStylizerImpl(
     private val attackSpeedLevelTagResolvers: MutableMap<Int, TagResolver> by reloadable { Int2ObjectOpenHashMap() }
     private fun getAttackSpeedLevelTagResolver(levelIndex: Int): TagResolver {
         return attackSpeedLevelTagResolvers.getOrPut(levelIndex) {
-            component("value", mm.deserialize(config.attackSpeedFormat.levels.getOrThrow(levelIndex)))
+            component("value", mm.deserialize(config.attackSpeedFormat.levels.getValue(levelIndex)))
         }
     }
     //</editor-fold>
@@ -226,7 +225,7 @@ internal class AttributeStylizerImpl(
                 component("element", value.element.displayName)
             )
         }
-        return listOf(mm.deserialize(config.attributeFormats.getOrThrow(key), tagResolvers.build()))
+        return listOf(mm.deserialize(config.attributeFormats.getValue(key), tagResolvers.build()))
     }
 
     class AttackSpeedFormatImpl(
@@ -243,9 +242,9 @@ internal class OperationStylizerImpl(
     private val config: RendererConfiguration,
 ) : OperationStylizer {
     override fun stylize(value: String, operation: Operation): String = when (operation) {
-        Operation.ADD -> config.operationFormats.getOrThrow(Operation.ADD).format(value)
-        Operation.MULTIPLY_BASE -> config.operationFormats.getOrThrow(Operation.MULTIPLY_BASE).format(value)
-        Operation.MULTIPLY_TOTAL -> config.operationFormats.getOrThrow(Operation.MULTIPLY_TOTAL).format(value)
+        Operation.ADD -> config.operationFormats.getValue(Operation.ADD).format(value)
+        Operation.MULTIPLY_BASE -> config.operationFormats.getValue(Operation.MULTIPLY_BASE).format(value)
+        Operation.MULTIPLY_TOTAL -> config.operationFormats.getValue(Operation.MULTIPLY_TOTAL).format(value)
     }
 }
 

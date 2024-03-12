@@ -26,7 +26,7 @@ class ReflectionTest {
             ShadowTagType.FLOAT,
             ShadowTagType.DOUBLE
         ).forEach {
-            val converted = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getOrThrow(it).invoke(3.0)
+            val converted = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getValue(it).invoke(3.0)
             val expected = converted::class.simpleName?.lowercase()
             val actual = it.name.lowercase()
             assertEquals(expected, actual)
