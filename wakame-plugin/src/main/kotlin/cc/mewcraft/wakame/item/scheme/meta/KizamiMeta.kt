@@ -30,8 +30,8 @@ sealed interface KizamiMeta : SchemeItemMeta<Set<Kizami>> {
 private class NonNullKizamiMeta(
     private val kizamiGroup: KizamiGroup,
 ) : KizamiMeta {
-    override fun generate(context: SchemeGenerationContext): Set<Kizami> {
-        return kizamiGroup.pick(context).toSet()
+    override fun generate(context: SchemeGenerationContext): Set<Kizami>? {
+        return kizamiGroup.pick(context).toSet().takeIf { it.isNotEmpty() }
     }
 }
 
