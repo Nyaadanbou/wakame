@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
-import org.bukkit.Material
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.util.UUID
@@ -22,16 +21,16 @@ object NekoItemFactory {
      */
     fun create(key: Key, root: ConfigurationNode): NekoItem {
         val uuid = root.node("uuid").requireKt<UUID>()
-        val material = root.node("material").requireKt<Material>()
+        val material = root.node("material").requireKt<Key>()
 
         // Deserialize item meta
         val schemeItemMeta: Map<Key, SchemeItemMeta<*>> = buildMap {
             // Side note 1: buildMap preserves the insertion order
 
-            // Side note 2: always put all metadata for all `NekoItem`s
-            // even if the metadata contains "nothing".
+            // Side note 2: always put all schema metadata for a `NekoItem`
+            // even if the schema metadata contains "nothing".
 
-            // Side note 3: whether the data will be put on the item's NBT
+            // Side note 3: whether the data will be written to the item's NBT
             // is decided by the item stack generation process, not here.
 
             // (by alphabet order, in case you miss something)
@@ -53,11 +52,11 @@ object NekoItemFactory {
             root.node("cells").childrenList().forEach { n ->
                 val id = n.node("id").requireKt<String>()
 
-                val coreNode: ConfigurationNode? = n.node("core")
+                val coreNode = n.node("core")
                     .string
                     ?.let { root.node("core_groups", it) }
                     ?.also { it.hint(AbstractGroupSerializer.SHARED_POOLS, root.node("core_pools")) } // inject `shared pools` node as hint
-                val curseNode: ConfigurationNode? = n.node("curse")
+                val curseNode = n.node("curse")
                     .string
                     ?.let { root.node("curse_groups", it) }
                     ?.also { it.hint(AbstractGroupSerializer.SHARED_POOLS, root.node("curse_pools")) } // ^ same

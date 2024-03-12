@@ -21,6 +21,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import net.kyori.adventure.key.Key
+import org.bukkit.Material
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -115,7 +116,7 @@ class ItemDeserializationTest : KoinTest {
             }
 
             // just return an empty item
-            NekoItemStackFactory.new(demo.material)
+            NekoItemStackFactory.new(Material.AIR)
         }
 
         // call

@@ -7,6 +7,8 @@ import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.player.Player
+import cc.mewcraft.wakame.util.asNamespacedKey
+import org.bukkit.Registry
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta as BDisplayNameMeta
 import cc.mewcraft.wakame.item.binary.meta.DurabilityMeta as BDurabilityMeta
@@ -44,7 +46,11 @@ object PaperNekoItemRealizer : NekoItemRealizer {
      * @return a new once-off NekoStack
      */
     private fun createItemStack0(nekoItem: NekoItem, context: SchemeGenerationContext): NekoItemStack {
-        val nekoStack = NekoItemStackFactory.new(nekoItem.material)
+        val nekoStack = run {
+            val namespacedKey = nekoItem.material.asNamespacedKey
+            val material = requireNotNull(Registry.MATERIAL.get(namespacedKey)) { "Can't find material with key '{${nekoItem.material}'" }
+            NekoItemStackFactory.new(material)
+        }
 
         // write base data
         nekoStack.putKey(nekoStack.key)

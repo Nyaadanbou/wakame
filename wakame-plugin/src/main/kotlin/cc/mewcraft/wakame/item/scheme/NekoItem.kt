@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
 import net.kyori.adventure.key.Key
-import org.bukkit.Material
 import java.util.UUID
 
 /**
@@ -38,9 +37,9 @@ interface NekoItem : Keyed {
     override val key: Key
 
     /**
-     * Material type.
+     * The [key][Key] to the Material of this item.
      */
-    val material: Material
+    val material: Key
 
     /**
      * The map holds all the item meta of `this` item. You may navigate
