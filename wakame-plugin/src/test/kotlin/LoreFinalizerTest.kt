@@ -134,7 +134,7 @@ class LoreFinalizerTest : KoinTest {
         buildTest(loreLines)
     }
 
-    @Test // TODO mock NekoItemStack to allow for omitting certain content
+    @Test
     fun `test finalize lore lines 5`() {
         val loreLines = listOf(
             ItemMetaLineFactory.get("meta:level"),

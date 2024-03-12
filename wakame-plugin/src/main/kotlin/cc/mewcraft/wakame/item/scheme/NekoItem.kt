@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMetaKeys
+import com.google.common.collect.ClassToInstanceMap
 import net.kyori.adventure.key.Key
 import java.util.UUID
 
@@ -50,7 +50,7 @@ interface NekoItem : Keyed {
      *
      * @see getItemMetaBy
      */
-    val itemMeta: Map<Key, SchemeItemMeta<*>> // TODO why not use the ClassToInstanceMap?
+    val itemMeta: ClassToInstanceMap<SchemeItemMeta<*>>
 
     /**
      * The map holds all the cell data about `this` item, where `map key` is
@@ -77,7 +77,5 @@ interface NekoItem : Keyed {
  * @return the instance of class [V] from this [NekoItem]
  */
 inline fun <reified V : SchemeItemMeta<*>> NekoItem.getItemMetaBy(): V {
-    val key = SchemeItemMetaKeys.get<V>()
-    val meta = checkNotNull(itemMeta[key])
-    return meta as V
+    return requireNotNull(itemMeta.getInstance(V::class.java)) { "Can't find item meta '${V::class.simpleName}'. Incomplete implementation?" }
 }

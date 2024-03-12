@@ -3,10 +3,7 @@ import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.item.scheme.NekoItem
-import cc.mewcraft.wakame.item.scheme.NekoItemRealizer
-import cc.mewcraft.wakame.item.scheme.SchemaGenerationTrigger
-import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
+import cc.mewcraft.wakame.item.scheme.*
 import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.kizamiModule
@@ -130,19 +127,11 @@ class ItemDeserializationTest : KoinTest {
         item: NekoItem,
         context: SchemeGenerationContext,
     ) {
-        val meta = getSchemeMetaByClass<S>(item)
+        val meta = item.getItemMetaBy<S>()
         val value = meta.generate(context)
         if (value != null) {
             // set the meta only if something is generated
             logger.debug("write meta '{}': {}", S::class.simpleName, value.toString())
         }
-    }
-
-    private inline fun <reified V : SchemeItemMeta<*>> getSchemeMetaByClass(
-        item: NekoItem,
-    ): V {
-        val key = SchemeItemMetaKeys.get<V>()
-        val meta = checkNotNull(item.itemMeta[key])
-        return meta as V
     }
 }

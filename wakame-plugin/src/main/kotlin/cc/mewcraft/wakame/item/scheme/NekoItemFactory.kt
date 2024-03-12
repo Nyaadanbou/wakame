@@ -5,11 +5,14 @@ import cc.mewcraft.wakame.item.scheme.cell.SchemeCellFactory
 import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.util.requireKt
+import com.google.common.collect.ImmutableClassToInstanceMap
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import java.util.UUID
-
+import kotlin.collections.Map
+import kotlin.collections.buildMap
+import kotlin.collections.forEach
+import kotlin.collections.set
 
 object NekoItemFactory {
     /**
@@ -24,7 +27,7 @@ object NekoItemFactory {
         val material = root.node("material").requireKt<Key>()
 
         // Deserialize item meta
-        val schemeItemMeta: Map<Key, SchemeItemMeta<*>> = buildMap {
+        val schemeItemMeta = ImmutableClassToInstanceMap.builder<SchemeItemMeta<*>>().apply {
             // Side note 1: buildMap preserves the insertion order
 
             // Side note 2: always put all schema metadata for a `NekoItem`
@@ -43,7 +46,7 @@ object NekoItemFactory {
             loadAndSave<RarityMeta>(root, "rarity")
             loadAndSave<SkinMeta>(root, "skin")
             loadAndSave<SkinOwnerMeta>(root, "skin_owner")
-        }
+        }.build()
 
         // Deserialize item cells
         val schemeCells: Map<String, SchemeCell> = buildMap {
@@ -51,18 +54,13 @@ object NekoItemFactory {
 
             root.node("cells").childrenList().forEach { n ->
                 val id = n.node("id").requireKt<String>()
-
-                val coreNode = n.node("core")
-                    .string
+                val coreNode = n.node("core").string
                     ?.let { root.node("core_groups", it) }
                     ?.also { it.hint(AbstractGroupSerializer.SHARED_POOLS, root.node("core_pools")) } // inject `shared pools` node as hint
-                val curseNode = n.node("curse")
-                    .string
+                val curseNode = n.node("curse").string
                     ?.let { root.node("curse_groups", it) }
                     ?.also { it.hint(AbstractGroupSerializer.SHARED_POOLS, root.node("curse_pools")) } // ^ same
-
                 val cell = SchemeCellFactory.schemeOf(n, coreNode, curseNode)
-
                 this[id] = cell
             }
         }
@@ -71,11 +69,11 @@ object NekoItemFactory {
         return ret
     }
 
-    private inline fun <reified T : SchemeItemMeta<*>> MutableMap<Key, SchemeItemMeta<*>>.loadAndSave(
+    private inline fun <reified T : SchemeItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemeItemMeta<*>>.loadAndSave(
         node: ConfigurationNode,
         vararg path: String,
     ) {
-        val deserialized = requireNotNull(node.node(*path).get<T>()) { "Can't deserialize item meta from path ${path.contentToString()}" }
-        this[SchemeItemMetaKeys.get<T>()] = deserialized
+        val schemaItemMeta = node.node(*path).requireKt<T>()
+        this.put(T::class.java, schemaItemMeta)
     }
 }
