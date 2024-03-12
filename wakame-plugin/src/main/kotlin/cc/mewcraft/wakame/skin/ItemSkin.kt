@@ -12,6 +12,11 @@ data class ItemSkin @InternalApi internal constructor(
     override val binary: Short,
     override val displayName: Component,
     override val styles: Array<StyleBuilderApplicable>,
+    /**
+     * K - predicate name
+     * V - variant
+     */
+    val predicates: Map<String, Int>
 ) : Skin, KoinComponent, BiIdentified<String, Short> {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

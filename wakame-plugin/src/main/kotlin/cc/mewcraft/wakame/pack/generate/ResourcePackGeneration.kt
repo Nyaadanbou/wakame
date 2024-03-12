@@ -105,13 +105,13 @@ internal class ResourcePackModelGeneration(
             for (asset in assets) {
                 val modelFiles = asset.modelFiles.takeIf { it.isNotEmpty() } ?: continue
                 for ((index, modelFile) in modelFiles.withIndex()) {
-                    logger.info("<aqua>Generating $index model for ${asset.key}, SID ${asset.sid}... (Path: $modelFile)".mini)
-                    val customModelData = config.saveCustomModelData(asset.key, asset.sid)
+                    logger.info("<aqua>Generating $index model for ${asset.key}, SID ${asset.variant}... (Path: $modelFile)".mini)
+                    val customModelData = config.saveCustomModelData(asset.key, asset.variant)
                     val resourcePack = args.resourcePack
 
                     //<editor-fold desc="Custom Model generation">
                     // Original asset from config
-                    val modelKey = asset.modelKey(index + asset.sid)
+                    val modelKey = asset.modelKey(index + asset.variant)
                     val configModelTemplate = ModelSerializer.INSTANCE
                         .deserialize(Readable.file(modelFile), modelKey)
 
@@ -123,7 +123,7 @@ internal class ResourcePackModelGeneration(
                     // Texture file used by custom asset
                     val customTextures = textureData.map {
                         Texture.texture()
-                            .key(asset.modelKey(index + asset.sid, "png"))
+                            .key(asset.modelKey(index + asset.variant, "png"))
                             .data(it)
                             .build()
                     }
@@ -158,11 +158,11 @@ internal class ResourcePackModelGeneration(
 
                     resourcePack.model(configModel.toMinecraftFormat())
                     resourcePack.model(vanillaCmdOverride).also {
-                        logger.info("<green>Model for ${asset.key}, SID ${asset.sid} generated. CustomModelData: $customModelData".mini)
+                        logger.info("<green>Model for ${asset.key}, SID ${asset.variant} generated. CustomModelData: $customModelData".mini)
                     }
                     customTextures.forEach {
                         resourcePack.texture(it).also {
-                            logger.info("<green>Texture for ${asset.key}, SID ${asset.sid} generated.".mini)
+                            logger.info("<green>Texture for ${asset.key}, SID ${asset.variant} generated.".mini)
                         }
                     }
                 }
@@ -171,7 +171,7 @@ internal class ResourcePackModelGeneration(
                 // 1. All custom model data that was used by items but the items' model path is removed
                 val unUsedModelCustomModelData = assets
                     .filter { it.modelFiles.isEmpty() }
-                    .map { config[it.key, it.sid] }
+                    .map { config[it.key, it.variant] }
                 val result1 = config.removeCustomModelData(*unUsedModelCustomModelData.toIntArray())
 
                 if (result1) {

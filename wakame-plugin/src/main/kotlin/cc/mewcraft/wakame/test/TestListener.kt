@@ -89,7 +89,7 @@ class TestListener : Listener {
                 inventory.itemInMainHand.nekoCompound = compoundShadowTag {
                     putString("ns", "short_sword")
                     putString("id", "demo")
-                    putByte("sid", 0)
+                    putByte("variant", 0)
                 }
             }
 
@@ -100,7 +100,7 @@ class TestListener : Listener {
                 bukkitStack.nekoCompound = compoundShadowTag {
                     putString("ns", "short_sword")
                     putString("id", "demo")
-                    putByte("sid", 18)
+                    putByte("variant", 18)
                     putShort("short", Short.MAX_VALUE)
                     putInt("int", Int.MAX_VALUE)
                     putLong("long", Long.MAX_VALUE)
@@ -134,7 +134,7 @@ class TestListener : Listener {
                 bukkitStack.nekoCompound.run {
                     check(getString("ns") == "short_sword")
                     check(getString("id") == "demo")
-                    check(getByte("sid") == 18.toByte())
+                    check(getByte("variant") == 18.toByte())
                     check(getShort("short") == Short.MAX_VALUE)
                     check(getInt("int") == Int.MAX_VALUE)
                     check(getLong("long") == Long.MAX_VALUE)
@@ -196,7 +196,7 @@ class TestListener : Listener {
                     put("wakame", compoundBinaryTag {
                         putString("ns", "short_sword")
                         putString("id", "demo")
-                        putByte("sid", 0)
+                        putByte("variant", 0)
                     })
                 }
             }
@@ -206,12 +206,26 @@ class TestListener : Listener {
                     put("wakame", compoundBinaryTag {
                         putString("ns", "long_sword")
                         putString("id", "demo")
-                        putByte("sid", 0)
+                        putByte("variant", 0)
                     })
                 }.apply {
                     inventory.addItem(this)
                 }
             }
+        }
+    }
+
+    @EventHandler
+    fun testVariantChange(e: AsyncChatEvent) {
+        val player = e.player
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        val inventory = player.inventory
+
+        if (plainMessage.startsWith("v-")) {
+            val nekoItemStack = NekoItemStackFactory.wrap(inventory.itemInMainHand)
+            val variant = plainMessage.substringAfter("v-").toInt()
+            nekoItemStack.putVariant(variant)
+            inventory.setItemInMainHand(nekoItemStack.handle)
         }
     }
 

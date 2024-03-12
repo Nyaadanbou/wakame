@@ -38,4 +38,9 @@ interface NekoItemStackSetter {
      * Sets ID.
      */
     fun putId(id: String)
+
+    /**
+     * Sets variant.
+     */
+    fun putVariant(sid: Int)
 }

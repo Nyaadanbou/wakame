@@ -80,6 +80,9 @@ internal class NekoItemStackImpl(
     override val key: Key
         get() = Key.key(namespace, id)
 
+    override val variant: Int
+        get() = tags.getInt(NekoTags.Root.SID)
+
     override val uuid: UUID
         get() = NekoItemRegistry.get(key)?.uuid
             ?: throw NullPointerException()
@@ -128,6 +131,10 @@ internal class NekoItemStackImpl(
 
     override fun putId(id: String) {
         tags.putString(NekoTags.Root.ID, id)
+    }
+
+    override fun putVariant(sid: Int) {
+        tags.putInt(NekoTags.Root.SID, sid)
     }
     //</editor-fold>
 

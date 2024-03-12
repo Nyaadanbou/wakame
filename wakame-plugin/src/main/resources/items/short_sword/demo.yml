@@ -32,8 +32,10 @@ durability:
   damage: 0
 
 assets:
-  - sid: 0
+  - variant: 0 # 0 为默认变种
     path: "models/item/short_sword/demo.json"
+  - variant: 1
+    path: "models/item/short_sword/demo_1.json"
 
 # 皮肤
 # 可选，默认 无

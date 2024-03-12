@@ -29,7 +29,7 @@ object AssetsLookup : Initializable, KoinComponent {
     // V - Assets
     private val assets: Multimap<Key, Assets> = MultimapBuilder
         .hashKeys()
-        .treeSetValues<Assets> { o1, o2 -> o1.sid.compareTo(o2.sid) }
+        .treeSetValues<Assets> { o1, o2 -> o1.variant.compareTo(o2.variant) }
         .build()
 
     private val plugin: WakamePlugin by inject()
@@ -41,7 +41,7 @@ object AssetsLookup : Initializable, KoinComponent {
         NekoItemNodeIterator.execute { key, root ->
             val assetsNodes = root.node("assets").childrenList()
             for (assetsNode in assetsNodes) {
-                val sid = assetsNode.node("sid").requireKt<Int>()
+                val sid = assetsNode.node("variant").requireKt<Int>()
                 val pathNode = assetsNode.node("path")
                 val path = if (pathNode.rawScalar() != null) {
                     listOf(pathNode.requireKt<String>())
@@ -60,7 +60,7 @@ object AssetsLookup : Initializable, KoinComponent {
 
     fun getAssets(key: Key, sid: Int): Assets {
         require(NekoItemRegistry.get(key) != null) { "No such NekoItem: $key" }
-        return assets[key].firstOrNull { it.sid == sid } ?: throw NoSuchElementException("No such sid: $sid")
+        return assets[key].firstOrNull { it.variant == sid } ?: throw NoSuchElementException("No such variant: $sid")
     }
 
     val allAssets: Collection<Assets>

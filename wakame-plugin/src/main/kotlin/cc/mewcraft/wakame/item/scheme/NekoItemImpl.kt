@@ -64,6 +64,7 @@ internal data class NekoItemImpl(
 
         // put base data
         nekoStack.putKey(key)
+        nekoStack.putVariant(0)
         nekoStack.putSeed(context.seed)
 
         // put item meta

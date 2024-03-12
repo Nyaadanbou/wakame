@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.util.formatSize
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
@@ -54,6 +55,7 @@ class VanillaResourcePack : KoinComponent {
 
         try {
             input.copyTo(output, 1024)
+                .also { logger.info("Downloaded vanilla resource pack file from $versionDownloadUrl to $modelFile. Size: ${modelFile.formatSize()}") }
         } catch (e: Exception) {
             logger.error("Failed to download vanilla resource pack file from $versionDownloadUrl")
             throw e
@@ -64,9 +66,6 @@ class VanillaResourcePack : KoinComponent {
             input.close()
         }
 
-        return modelFile.takeIf { it.exists() }
-            ?.also {
-                logger.info("Downloaded vanilla resource pack file from $versionDownloadUrl to $it")
-            } ?: throw IllegalStateException("Failed to download vanilla resource pack file from $versionDownloadUrl")
+        return modelFile.takeIf { it.exists() } ?: throw IllegalStateException("Failed to download vanilla resource pack file from $versionDownloadUrl")
     }
 }

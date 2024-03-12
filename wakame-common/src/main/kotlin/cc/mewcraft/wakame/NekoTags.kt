@@ -7,6 +7,7 @@ object NekoTags {
         const val NAMESPACE = "ns"
         const val ID = "id"
         const val SEED = "seed"
+        const val SID = "sid"
     }
 
     object Ability {

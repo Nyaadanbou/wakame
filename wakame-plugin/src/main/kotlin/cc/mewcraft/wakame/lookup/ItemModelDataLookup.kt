@@ -33,22 +33,22 @@ internal class ItemModelDataLookup(
         }
     }
 
-    operator fun get(key: Key, sid: Int): Int {
-        return customModelDataTable.get(key, sid) ?: throw NullPointerException(key.asString())
+    operator fun get(key: Key, variant: Int): Int {
+        return customModelDataTable.get(key, variant) ?: throw NullPointerException(key.asString())
     }
 
-    fun saveCustomModelData(key: Key, sid: Int): Int {
-        val oldValue = customModelDataTable.get(key, sid)
+    fun saveCustomModelData(key: Key, variant: Int): Int {
+        val oldValue = customModelDataTable.get(key, variant)
         if (oldValue != null) return oldValue
 
         // 如果不存在则创建一个新的
         val maxVal = customModelDataTable.values().maxOrNull()
-        val newVal = if (maxVal == null) 10000 else maxVal + 1
-        return customModelDataTable.put(key, sid, newVal).also { saveCustomModelData(root) } ?: newVal
+        val newVal = maxVal?.plus(1) ?: 10000
+        return customModelDataTable.put(key, variant, newVal).also { saveCustomModelData(root) } ?: newVal
     }
 
-    fun removeCustomModelData(key: Key, sid: Int): Int? {
-        return customModelDataTable.remove(key, sid).also { saveCustomModelData(root) }
+    fun removeCustomModelData(key: Key, variant: Int): Int? {
+        return customModelDataTable.remove(key, variant).also { saveCustomModelData(root) }
     }
 
     fun removeCustomModelData(vararg values: Int): Boolean {

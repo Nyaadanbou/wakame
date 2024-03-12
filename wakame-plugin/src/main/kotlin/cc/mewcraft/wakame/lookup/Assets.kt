@@ -12,14 +12,14 @@ sealed interface Assets : Keyed {
 
     override fun key(): Key = key
 
-    val sid: Int
+    val variant: Int
 
     val modelFiles: Collection<File>
 }
 
 data class ItemAssets(
     override val key: Key,
-    override val sid: Int,
+    override val variant: Int,
     val modelFileStrings: List<String>,
 ) : Assets {
     override val modelFiles: Collection<File> = modelFileStrings.map { validateAssetsPathStringOrThrow(it, "json") }
