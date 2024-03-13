@@ -2,15 +2,16 @@ package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.MAIN_CONFIG_NODE
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
+import cc.mewcraft.wakame.pack.service.GithubService
+import cc.mewcraft.wakame.pack.service.NoneService
+import cc.mewcraft.wakame.pack.service.ResourcePackService
+import cc.mewcraft.wakame.pack.service.Service
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.formatSize
-import cc.mewcraft.wakame.util.requireKt
 import com.google.common.base.Throwables
-import me.lucko.helper.scheduler.HelperExecutors
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Server
@@ -21,33 +22,51 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import org.spongepowered.configurate.ConfigurationNode
 import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
-import team.unnamed.creative.server.ResourcePackServer
 import java.io.File
 import java.io.IOException
 import java.util.zip.ZipException
-
-private const val RESOURCE_PACK_NAME = "wakame.zip"
-
-private const val GENERATED_RESOURCE_PACK_FILE = "generated/$RESOURCE_PACK_NAME"
 
 @ReloadDependency(
     runBefore = [NekoItemRegistry::class]
 )
 internal class ResourcePackManager(
-    private val config: ResourcePackConfiguration
+    private val config: ResourcePackConfiguration,
 ) : Initializable, KoinComponent {
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
 
-    private var server: ResourcePackServer? = null
-
     private lateinit var pack: BuiltResourcePack
-    private lateinit var downloadAddress: String
+
+    private val service: Service
+        get() = when (val service = config.service) {
+            "self_host" -> {
+                val host = config.host
+                val port = config.port
+                ResourcePackService(pack, host, port, config.appendPort)
+            }
+
+            "none" -> NoneService
+
+            "github" -> {
+                val username = config.githubUsername
+                val repo = config.githubRepo
+                val token = config.githubToken
+                val path = config.githubPath
+                val branch = config.githubBranch
+                val commitMessage = config.githubCommitMessage
+                GithubService(pluginDataDir, repo, username, token, path, branch, commitMessage)
+            }
+
+            else -> {
+                logger.error("Unknown resource pack service: $service")
+                NoneService
+            }
+        }
+
 
     /**
      * Generates the resource pack to predefined directory.
@@ -95,6 +114,8 @@ internal class ResourcePackManager(
             runCatching {
                 MinecraftResourcePackWriter.minecraft()
                     .writeToZipFile(resourceFile, resourcePack)
+                MinecraftResourcePackWriter.minecraft()
+                    .writeToDirectory(pluginDataDir.resolve(GENERATED_RESOURCE_PACK_DIR), resourcePack)
             }.getOrElse { return Result.failure(it) }
             logger.info("<green>Resource pack generated".mini)
         }
@@ -102,16 +123,18 @@ internal class ResourcePackManager(
         // Build the resource pack
         val builtResourcePack = runCatching { MinecraftResourcePackWriter.minecraft().build(resourcePack) }
             .getOrElse { return Result.failure(it) }
-        runCatching { startServer(builtResourcePack) }.getOrElse { return Result.failure(it) }
-
         pack = builtResourcePack
             .also { logger.info("<green>Resource pack built. File size: <yellow>${resourceFile.formatSize()}".mini) }
+
+        // Start the resource pack server
+        runCatching { startServer(regen) }.getOrElse { return Result.failure(it) }
+
         return Result.success(Unit)
     }
 
     //<editor-fold desc="Init resource pack file">
     private fun initFile(): Result<File> {
-        val resourcePackPath = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_FILE)
+        val resourcePackPath = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
         if (resourcePackPath.isDirectory) {
             return Result.failure(IOException("Resource pack path is a directory"))
         }
@@ -130,49 +153,30 @@ internal class ResourcePackManager(
 
     //<editor-fold desc="Resource pack server test">
     @Contract(pure = true)
-    private fun startServer(resourcePack: BuiltResourcePack) {
+    private fun startServer(reGenerate: Boolean) {
         if (!config.enabled) {
             logger.info("<red>Resource pack server is disabled".mini)
             return
         }
-
-        when (config.service) {
-            "self_host" -> {
-                val host = config.host
-                val port = config.port
-
-                server = ResourcePackServer.server()
-                    .address("0.0.0.0", port) // (required) address and port
-                    .pack(resourcePack) // (required) pack to serve
-                    .executor(HelperExecutors.asyncHelper()) // (optional) request executor (IMPORTANT!)
-                    .path("/get/${resourcePack.hash()}")
-                    .build()
-
-                downloadAddress = if (config.appendPort) {
-                    "http://$host:$port/get/${resourcePack.hash()}/$RESOURCE_PACK_NAME"
-                } else {
-                    "http://$host/get/${resourcePack.hash()}/$RESOURCE_PACK_NAME"
-                }
-
-                server?.start().also { logger.info("Resource pack server started") }
-            }
-        }
+        service.start(reGenerate)
     }
 
     @Blocking
     private fun stopServer() {
-        server?.stop(0).also { logger.info("Resource pack server stopped") }
+        service.stop()
     }
     //</editor-fold>
 
     fun sendToPlayer(player: Player) {
-        if (!this::pack.isInitialized || !this::downloadAddress.isInitialized) {
+        if (!this::pack.isInitialized) {
             player.takeIf { !it.hasPermission("wakame.admin") && it.isOnline }
                 ?.let {
                     player.kick("<red>Resource pack is not ready. Please wait a moment.".mini)
                     return
                 }
         }
+        val downloadAddress = service.downloadAddress
+            ?: return
 
         player.setResourcePack(
             downloadAddress,

@@ -22,5 +22,12 @@ class ResourcePackConfiguration : KoinComponent {
     val host: String by reloadable { mainConfigNode.node("resource_pack", "auto_upload", "host").requireKt() }
     val port: Int by reloadable { mainConfigNode.node("resource_pack", "auto_upload", "port").requireKt() }
     val appendPort: Boolean by reloadable { mainConfigNode.node("resource_pack", "auto_upload", "append_port").requireKt() }
+
+    val githubUsername: String by reloadable { mainConfigNode.node("resource_pack", "auto_upload", "github", "username").requireKt() }
+    val githubToken: String by reloadable { mainConfigNode.node("resource_pack", "auto_upload", "github", "token").requireKt() }
+    val githubRepo: String by reloadable { mainConfigNode.node("resource_pack", "auto_upload", "github", "repo").requireKt() }
+    val githubBranch: String by reloadable { mainConfigNode.node("resource_pack", "auto_upload", "github", "branch").requireKt() }
+    val githubPath: String by reloadable { mainConfigNode.node("resource_pack", "auto_upload", "github", "path").requireKt() }
+    val githubCommitMessage: String by reloadable { mainConfigNode.node("resource_pack", "auto_upload", "github", "commit_message").requireKt() }
     //</editor-fold>
 }

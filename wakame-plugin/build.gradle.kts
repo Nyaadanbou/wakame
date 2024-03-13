@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":wakame-api"))
     implementation(project(":wakame-common"))
     implementation(project(":wakame-ext"))
+    implementation(project(":wakame-git"))
     compileOnly(project(":wakame-nms"))
     runtimeOnly(project(":wakame-nms", configuration = "reobf"))
     compileOnly(libs.asm) // runtime is provided by paper

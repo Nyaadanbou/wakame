@@ -19,6 +19,7 @@ dependencies {
     compileOnly(project(":wakame-common"))
 
     // external
+    compileOnly(libs.jgit)
     compileOnly(libs.mythicmobs) {
         isTransitive = false
     }
