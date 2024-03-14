@@ -6,6 +6,7 @@ pluginManagement {
         maven(uri("${System.getProperty("user.home")}/MewcraftRepository"))
     }
 }
+
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
 }
@@ -26,6 +27,6 @@ rootProject.name = "wakame"
 include(":wakame-api")
 include(":wakame-common")
 include(":wakame-ext")
+include(":wakame-git")
 include(":wakame-nms")
 include(":wakame-plugin")
-include("wakame-git")
