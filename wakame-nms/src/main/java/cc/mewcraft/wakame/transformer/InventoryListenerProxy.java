@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.transformer;
 
-import cc.mewcraft.wakame.event.NekoPlayerSlotChangeEvent;
+import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
@@ -23,12 +23,14 @@ public class InventoryListenerProxy implements ContainerListener {
 
     @Override
     public void slotChanged(@NotNull AbstractContainerMenu handler, int slotId, @NotNull ItemStack oldStack, @NotNull ItemStack stack) {
-        new NekoPlayerSlotChangeEvent(
+        // injected code - start
+        new PlayerInventorySlotChangeEvent(
                 serverPlayer.getBukkitEntity(),
                 slotId,
                 oldStack.asBukkitMirror(),
                 stack.asBukkitMirror()
         ).callEvent();
+        // injected code - end
         originalListener.slotChanged(handler, slotId, oldStack, stack);
     }
 
