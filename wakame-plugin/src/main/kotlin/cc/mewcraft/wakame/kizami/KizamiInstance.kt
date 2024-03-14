@@ -3,10 +3,11 @@ package cc.mewcraft.wakame.kizami
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 /**
- * A [Kizami] instance.
+ * A [Kizami] instance, the full representation of a kizami.
  *
  * The object is essentially a mapping from [Int] to [KizamiEffect].
  */
@@ -14,61 +15,43 @@ class KizamiInstance(
     /**
      * The kizami to which the [effect] corresponds.
      */
-    private val kizami: Kizami,
+    val kizami: Kizami,
     /**
      * The effect of [kizami].
      */
-    private val effect: Map<Int, KizamiEffect<*>>,
+    val effect: Map<Int, KizamiEffect>,
 ) {
     /**
      * Gets the effect by [amount].
      *
-     * Returns [KizamiEmptyEffect] if the [amount] has no corresponding effect.
+     * Returns [EmptyKizamiEffect] if the [amount] has no defined effect.
      */
-    fun getEffectBy(amount: Int): KizamiEffect<*> {
-        return effect[amount] ?: KizamiEmptyEffect
+    fun getEffectBy(amount: Int): KizamiEffect {
+        return effect[amount] ?: EmptyKizamiEffect
     }
 
     /**
      * Gets the effect by [amount].
      *
-     * Returns `null` if the [amount] has no corresponding effect.
+     * Returns `null` if the [amount] has no defined effect.
      */
-    fun getEffectByOrNull(amount: Int): KizamiEffect<*>? {
+    fun getEffectByOrNull(amount: Int): KizamiEffect? {
         return effect[amount]
     }
-
-    companion object Builder {
-        fun builder(kizami: Kizami, block: KizamiInstanceBuilder.() -> Unit): KizamiInstance {
-            return KizamiInstanceBuilder(kizami).apply(block).build()
-        }
-    }
 }
 
-class KizamiInstanceBuilder(
-    private val kizami: Kizami,
-) {
-    private val effect: MutableMap<Int, KizamiEffect<*>> = HashMap()
-
-    private fun entry(amount: Int, effect: KizamiEffect<*>) {
-        this.effect[amount] = effect
-    }
-
-    infix fun Int.mapTo(effect: KizamiEffect<*>) {
-        entry(this, effect)
-    }
-
-    fun build(): KizamiInstance {
-        return KizamiInstance(kizami, effect)
-    }
-}
-
-class KizamiInstanceSerializer : SchemeSerializer<KizamiInstance> {
+object KizamiInstanceSerializer : SchemeSerializer<KizamiInstance> {
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiInstance {
         val kizami = node.requireKt<Kizami>()
-        node.node("effects").run {
-
+        val effect = buildMap {
+            node.node("effects")
+                .childrenMap() // Int -> KizamiEffect
+                .mapKeys { it.key.toString().toIntOrNull()?.takeIf { amount -> amount > 0 } ?: throw SerializationException(node, type, "The node key must be a positive integer") }
+                .forEach { (amount, childNode) ->
+                    childNode.hint(KizamiSerializer.UUID_HINT, kizami.uuid) // add kizami UUID hint
+                    this[amount] = childNode.requireKt<KizamiEffect>() // add effect mapping
+                }
         }
-        TODO()
+        return KizamiInstance(kizami, effect)
     }
 }

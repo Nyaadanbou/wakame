@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
+import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.util.registerKt
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
@@ -12,7 +13,10 @@ internal fun kizamiModule(): Module = module {
 
     single<TypeSerializerCollection>(named(KIZAMI_SERIALIZERS)) {
         TypeSerializerCollection.builder()
-            .registerKt(KizamiSerializer())
+            .registerAll(get(named(ELEMENT_SERIALIZERS)))
+            .registerKt(KizamiSerializer)
+            .registerKt(KizamiEffectSerializer)
+            .registerKt(KizamiInstanceSerializer)
             .build()
     }
 

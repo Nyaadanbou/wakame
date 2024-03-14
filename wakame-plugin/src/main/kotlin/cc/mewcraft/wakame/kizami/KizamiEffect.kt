@@ -3,55 +3,96 @@ package cc.mewcraft.wakame.kizami
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.SchemeSerializer
 import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.NoopAbility
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.requireKt
-import com.google.common.collect.Multimap
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 /**
- * Represents a collection of effects provided by a kizami.
+ * A collection of effects provided by a kizami.
  *
  * See the subtypes for implementation details.
  */
-sealed interface KizamiEffect<T> {
-    // /**
-    //  * The kizami.
-    //  */
-    // val kizami: Kizami
+sealed interface KizamiEffect {
+    /**
+     * The collection of effects, such as attributes (modifiers) and skills.
+     */
+    val effects: List<Single<*>>
 
     /**
-     * The effects, such as attributes (modifiers) and skills.
+     * Applies the collection of [kizami effects][Single] to the [map].
      */
-    val effects: T
+    fun apply(kizami: Kizami, map: KizamiMap) {
+        effects
+    }
 
     /**
-     * Applies the [kizami effects][effects] to the [map].
+     * A single effect.
+     *
+     * @param T the effect type
      */
-    fun apply(kizami: Kizami, map: KizamiMap)
+    interface Single<T> {
+        /**
+         * A single effect.
+         */
+        val effect: T
+
+        /**
+         * Applies the single effect.
+         */
+        fun apply(kizami: Kizami, map: KizamiMap)
+    }
 }
+
+/**
+ * The empty kizami effect.
+ */
+data object EmptyKizamiEffect : KizamiEffect {
+    override val effects: List<KizamiEffect.Single<*>> = emptyList()
+    override fun apply(kizami: Kizami, map: KizamiMap): Unit = Unit
+}
+
+/**
+ * An immutable kizami effect.
+ *
+ * @property effects
+ */
+data class ImmutableKizamiEffect(
+    override val effects: List<KizamiEffect.Single<*>>,
+) : KizamiEffect
 
 /**
  * The serializer of kizami effect.
  */
-object KizamiEffectSerializer : SchemeSerializer<KizamiEffect<*>> {
-    override fun deserialize(type: Type, node: ConfigurationNode): KizamiEffect<*> {
+object KizamiEffectSerializer : SchemeSerializer<KizamiEffect> {
+    override fun deserialize(type: Type, node: ConfigurationNode): KizamiEffect {
         if (!node.isList) {
-            throw SerializationException(node, type, "Node is not a list")
+            throw SerializationException(node, type, "Node must be a list")
         }
 
-        node.childrenList().forEach { effectNode ->
-            val key = node.node("key").requireKt<Key>()
+        // get the kizami UUID we are dealing with
+        val uuid = node.ownHint(KizamiSerializer.UUID_HINT) ?: throw SerializationException(node, type, "No provided hint for UUID")
+
+        // the collection of effects we are going to deserialize
+        val collection = mutableListOf<KizamiEffect.Single<*>>()
+
+        // add each single effect to the collection
+        node.childrenList().forEach { childNode ->
+            val key = childNode.node("key").requireKt<Key>()
             when {
                 key.namespace() == NekoNamespaces.ABILITY -> {
-
+                    collection += KizamiSkill(NoopAbility)
                 }
 
                 key.namespace() == NekoNamespaces.ATTRIBUTE -> {
-
+                    val plainData = AttributeRegistry.plainNodeEncoder.getValue(key).encode(childNode)
+                    val modifiers = AttributeRegistry.modifierFactory.getValue(key).createAttributeModifiers(uuid, plainData)
+                    collection += KizamiAttribute(modifiers)
                 }
 
                 else -> {
@@ -60,38 +101,27 @@ object KizamiEffectSerializer : SchemeSerializer<KizamiEffect<*>> {
             }
         }
 
-        TODO()
+        return ImmutableKizamiEffect(collection)
     }
 }
 
 /**
- * The effects of nothing.
- */
-data object KizamiEmptyEffect : KizamiEffect<Nothing> {
-    // override val kizami: Kizami get() = error("KizamiEmptyEffect has no specified effects")
-    override val effects: Nothing get() = error("KizamiEmptyEffect has no specified effects")
-    override fun apply(kizami: Kizami, map: KizamiMap) = Unit
-}
-
-/**
- * The [skills][Ability] provided by kizami.
+ * A [skill][Ability] provided by a kizami.
  */
 data class KizamiSkill(
-    // override val kizami: Kizami,
-    override val effects: Set<Ability>,
-) : KizamiEffect<Set<Ability>> {
+    override val effect: Ability,
+) : KizamiEffect.Single<Ability> {
     override fun apply(kizami: Kizami, map: KizamiMap) {
-        TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 }
 
 /**
- * The [attribute modifiers][AttributeModifier] provided by kizami.
+ * An [attribute modifier][AttributeModifier] provided by a kizami.
  */
 data class KizamiAttribute(
-    // override val kizami: Kizami,
-    override val effects: Multimap<out Attribute, AttributeModifier>,
-) : KizamiEffect<Multimap<out Attribute, AttributeModifier>> {
+    override val effect: Map<Attribute, AttributeModifier>,
+) : KizamiEffect.Single<Map<Attribute, AttributeModifier>> {
     override fun apply(kizami: Kizami, map: KizamiMap) {
         TODO("Not yet implemented")
     }

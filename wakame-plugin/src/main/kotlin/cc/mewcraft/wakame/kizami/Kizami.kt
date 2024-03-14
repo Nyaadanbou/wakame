@@ -15,12 +15,13 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.RepresentationHint
 import java.lang.reflect.Type
 import java.util.UUID
 import java.util.stream.Stream
 
 /**
- * This class solely serves the purpose of identifying kizamis.
+ * This class solely serves the purpose of identifying kizami.
  *
  * **DO NOT CONSTRUCT IT YOURSELF!** Use [KizamiRegistry] to get the instances instead.
  */
@@ -65,7 +66,13 @@ data class Kizami @InternalApi internal constructor(
  *   ...
  * ```
  */
-internal class KizamiSerializer : SchemeSerializer<Kizami> {
+internal object KizamiSerializer : SchemeSerializer<Kizami> {
+    /**
+     * The UUID hint is used to pass the kizami UUID to the child
+     * node deserialization, such as the deserialization of `effects`.
+     */
+    val UUID_HINT: RepresentationHint<UUID> = RepresentationHint.of("uuid", UUID::class.java)
+
     override fun deserialize(type: Type, node: ConfigurationNode): Kizami {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {
