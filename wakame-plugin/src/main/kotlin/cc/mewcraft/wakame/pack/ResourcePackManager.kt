@@ -41,30 +41,40 @@ internal class ResourcePackManager(
 
     private lateinit var pack: BuiltResourcePack
 
+    /**
+     * The resource pack service.
+     */
     private val service: Service
-        get() = when (val service = config.service) {
-            "self_host" -> {
-                val host = config.host
-                val port = config.port
-                ResourcePackService(pack, host, port, config.appendPort)
+        get() {
+            if (!this::pack.isInitialized) {
+                logger.error("Resource pack can not be initialized. Please check the configuration.", IllegalStateException("Resource pack is not initialized"))
+                return NoneService
             }
 
-            "none" -> NoneService
+            return when (val service = config.service) {
+                "none" -> NoneService
 
-            "github" -> {
-                val username = config.githubUsername
-                val repo = config.githubRepo
-                val token = config.githubToken
-                val path = config.githubPath
-                val branch = config.githubBranch
-                val commitMessage = config.githubCommitMessage
-                GithubService(pluginDataDir, repo, username, token, path, branch, commitMessage)
-            }
+                "self_host" -> {
+                    val host = config.host
+                    val port = config.port
+                    ResourcePackService(pack, host, port, config.appendPort)
+                }
 
-            else -> {
-                logger.error("Unknown resource pack service: $service")
-                NoneService
-            }
+                "github" -> {
+                    val username = config.githubUsername
+                    val repo = config.githubRepo
+                    val token = config.githubToken
+                    val path = config.githubPath
+                    val branch = config.githubBranch
+                    val commitMessage = config.githubCommitMessage
+                    GithubService(pluginDataDir, repo, username, token, path, branch, commitMessage)
+                }
+
+                else -> {
+                    logger.error("Unknown resource pack service: $service", IllegalStateException("Unknown resource pack service"))
+                    NoneService
+                }
+            }.also { logger.info("Resource pack service: ${it::class.simpleName}") }
         }
 
 
@@ -74,9 +84,10 @@ internal class ResourcePackManager(
      * @return a result encapsulating whether the generation succeeds or not
      */
     fun generate(reGenerate: Boolean = false): Result<Unit> {
-        var regen = reGenerate
+        var regen = reGenerate || !this::pack.isInitialized
 
-        val resourceFile = initFile().getOrElse { return Result.failure(it) }.also { logger.info("Resource pack path initialized") }
+        val resourceFile = initFile()
+            .getOrElse { return Result.failure(it) }
         val resourcePackResult = runCatching {
             if (regen) return@runCatching ResourcePack.resourcePack()
 
@@ -172,8 +183,8 @@ internal class ResourcePackManager(
             player.takeIf { !it.hasPermission("wakame.admin") && it.isOnline }
                 ?.let {
                     player.kick("<red>Resource pack is not ready. Please wait a moment.".mini)
-                    return
                 }
+            return
         }
         val downloadAddress = service.downloadAddress
             ?: return
