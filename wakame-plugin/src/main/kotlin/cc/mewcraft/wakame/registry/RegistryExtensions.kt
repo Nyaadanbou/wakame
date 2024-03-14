@@ -61,7 +61,6 @@ fun <R, B, K, V : BiIdentified<K, B>> R.registerBothMapping(name: K, value: V)
  * @param K the type of name (key)
  * @param V the type of value
  */
-@InternalApi
 fun <R, B, K, V : BiIdentified<K, B>> R.clearBoth()
         where R : Registry<K, V>,
               R : BiMapRegistry<K, B> {

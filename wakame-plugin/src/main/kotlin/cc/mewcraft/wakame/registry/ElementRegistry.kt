@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
@@ -24,7 +23,7 @@ object ElementRegistry : KoinComponent, Initializable,
 
 
     private fun loadConfiguration() {
-        @OptIn(InternalApi::class) clearBoth()
+        clearBoth()
 
         root = get<NekoConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)).load()
 

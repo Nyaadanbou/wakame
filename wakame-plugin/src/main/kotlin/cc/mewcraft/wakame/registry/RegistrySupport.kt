@@ -48,7 +48,6 @@ interface Registry<K, V> {
     /**
      * Clears all entries.
      */
-    @InternalApi
     fun clearName2Object()
 }
 
@@ -68,7 +67,6 @@ interface BiMapRegistry<STRING, BINARY> {
     /**
      * Clears all entries.
      */
-    @InternalApi
     fun clearBinary2Name()
 }
 

@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
@@ -17,7 +16,7 @@ object ItemSkinRegistry : KoinComponent, Initializable,
     private lateinit var root: NekoConfigurationNode
 
     private fun loadConfiguration() {
-        @OptIn(InternalApi::class) clearBoth()
+        clearBoth()
 
         root = get<NekoConfigurationLoader>(named(SKIN_CONFIG_LOADER)).load()
 

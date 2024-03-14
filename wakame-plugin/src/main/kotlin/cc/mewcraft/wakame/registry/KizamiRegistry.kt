@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -36,7 +35,6 @@ object KizamiRegistry : KoinComponent, Initializable,
     private val table: Table<Kizami, Int, KizamiEffect> = Tables.newCustomTable(Reference2ObjectOpenHashMap<Kizami, Map<Int, KizamiEffect>>()) { Int2ObjectOpenHashMap() }
 
     private fun loadConfiguration() {
-        @OptIn(InternalApi::class)
         clearBoth()
 
         root.node("kizami").childrenMap().forEach { (_, childNode) ->

@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
@@ -23,7 +22,7 @@ object RarityRegistry : KoinComponent, Initializable,
     private lateinit var root: NekoConfigurationNode
 
     private fun loadConfiguration() {
-        @OptIn(InternalApi::class) clearBoth()
+        clearBoth()
 
         root = get<NekoConfigurationLoader>(named(RARITY_CONFIG_LOADER)).load()
 
