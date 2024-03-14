@@ -71,7 +71,7 @@ class AttributeHandler : KoinComponent, Listener {
         return slot == (player.inventory.heldItemSlot + 36) /* player held item */ || slot in effectiveNmsActiveSlots
     }
 
-    private fun getAttributeModifiers(bukkitItem: ItemStack?): Multimap<out Attribute, AttributeModifier> {
+    private fun getAttributeModifiers(bukkitItem: ItemStack?): Multimap<Attribute, AttributeModifier> {
         if (bukkitItem == null || bukkitItem.isEmpty) {
             throw IllegalArgumentException("ItemStack must not be null, empty, or it has no item meta")
         }

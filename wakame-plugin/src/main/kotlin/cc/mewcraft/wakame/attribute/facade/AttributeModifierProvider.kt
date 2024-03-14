@@ -23,5 +23,5 @@ interface AttributeModifierProvider {
      * @throws IllegalArgumentException if this provider can't provide such
      *     attribute modifiers
      */
-    fun provideAttributeModifiers(uuid: UUID): Map<out Attribute, AttributeModifier>
+    fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier>
 }

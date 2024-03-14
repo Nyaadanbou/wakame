@@ -50,12 +50,12 @@ interface ItemCellHolder {
     /**
      * Gets all attribute modifiers from `this` (cells).
      */
-    fun getModifiers(): Multimap<out Attribute, AttributeModifier>
+    fun getModifiers(): Multimap<Attribute, AttributeModifier>
 
     /**
      * Gets all abilities and corresponding values from `this` (cells).
      */
-    fun getAbilities(): Map<out Ability, PlainAbilityData>
+    fun getAbilities(): Map<Ability, PlainAbilityData>
 
     /* Setters */
 

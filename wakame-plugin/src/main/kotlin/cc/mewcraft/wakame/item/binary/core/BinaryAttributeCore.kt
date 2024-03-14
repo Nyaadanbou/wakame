@@ -13,7 +13,7 @@ data class BinaryAttributeCore(
     override val key: Key,
     val data: PlainAttributeData,
 ) : BinaryCore, AttributeModifierProvider {
-    override fun provideAttributeModifiers(uuid: UUID): Map<out Attribute, AttributeModifier> {
+    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
         val factory = AttributeRegistry.modifierFactory.getValue(key)
         val modifiers = factory.createAttributeModifiers(uuid, data)
         return modifiers
