@@ -1,12 +1,11 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.item.scheme.NekoItemFactory
+import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -43,7 +42,7 @@ object NekoItemRegistry : KoinComponent, Initializable,
     fun getOrThrow(key: String): NekoItem = getOrThrow(Key.key(key))
 
     private fun loadConfiguration() {
-        @OptIn(InternalApi::class) clearName2Object()
+        clearName2Object()
 
         NekoItemNodeIterator.execute { key, node ->
             runCatching {

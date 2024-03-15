@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -31,7 +30,7 @@ object LevelMappingRegistry : KoinComponent, Initializable,
     private lateinit var root: NekoConfigurationNode
 
     private fun loadConfiguration() {
-        @OptIn(InternalApi::class) clearName2Object()
+        clearName2Object()
 
         root = get<NekoConfigurationLoader>(named(LEVEL_CONFIG_LOADER)).load()
 

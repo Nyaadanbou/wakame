@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.reference.EntityReference
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
@@ -17,7 +16,7 @@ object EntityReferenceRegistry : KoinComponent, Initializable,
     private lateinit var root: NekoConfigurationNode
 
     private fun loadConfiguration() {
-        @OptIn(InternalApi::class) clearName2Object()
+        clearName2Object()
 
         root = get<NekoConfigurationLoader>(named(ENTITY_CONFIG_LOADER)).load()
 
