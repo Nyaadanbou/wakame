@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.resource
 
+import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.user.User
 
 /**
@@ -13,13 +14,25 @@ sealed interface ResourceMap {
 }
 
 /**
+ * Creates a new [PlayerResourceMap].
+ */
+fun PlayerResourceMap(user: User): PlayerResourceMap {
+    return PlayerResourceMap(user.attributeMap)
+}
+
+/**
  * A Resource Map owned by a player.
  */
 class PlayerResourceMap(
-    private val user: User,
+    private val attributeMap: AttributeMap,
 ) : ResourceMap {
     private val data: Map<ResourceType, Resource> = buildMap {
-        this[ResourceTypeRegistry.MANA] = Resource(user, ResourceTypeRegistry.MANA)
+        // Here, you define the available resource types for the player.
+
+        // Side note: we better NOT to make it configurable in file as a new
+        // resource type not only is a bunch of states, but it also involves
+        // other mechanism to update and use the states of the resource.
+        this[ResourceTypeRegistry.MANA] = Resource(ResourceTypeRegistry.MANA, attributeMap)
     }
 
     override fun current(type: ResourceType): Int {
@@ -47,13 +60,13 @@ class PlayerResourceMap(
  * The object stores the amount of resource of a specific type.
  */
 private class Resource(
-    private val user: User,
-    private val type: ResourceType,
+    private val resourceType: ResourceType,
+    private val attributeMap: AttributeMap,
 ) {
     private var current: Int = initial()
 
     fun initial(): Int {
-        return type.initialAmount(user)
+        return resourceType.initialAmount(attributeMap)
     }
 
     fun current(): Int {
@@ -61,7 +74,7 @@ private class Resource(
     }
 
     fun maximum(): Int {
-        return type.maximumAmount(user)
+        return resourceType.maximumAmount(attributeMap)
     }
 
     fun add(value: Int): Boolean {
