@@ -1,62 +1,59 @@
 package cc.mewcraft.wakame.resource
 
-import java.util.EnumMap
+import cc.mewcraft.wakame.user.User
 
 /**
- * Stores all types of resource states for a player.
- *
- * Not thread-safe.
+ * Represents a ResourceMap owned by a subject.
  */
-class ResourceMap internal constructor(
-    private val supplier: ResourceSupplier,
-) {
-    private val resourceMap: EnumMap<ResourceType, Resource> = buildMap {
-        /* FIXME Register new resource here */
+sealed interface ResourceMap {
+    fun current(type: ResourceType): Int
+    fun maximum(type: ResourceType): Int
+    fun add(type: ResourceType, value: Int): Boolean
+    fun take(type: ResourceType, value: Int): Boolean
+}
 
-        registerResource(ResourceType.MANA, supplier)
-
-    }.let {
-        EnumMap(it)
+/**
+ * A Resource Map owned by a player.
+ */
+class PlayerResourceMap(
+    private val user: User,
+) : ResourceMap {
+    private val data: Map<ResourceType, Resource> = buildMap {
+        this[ResourceTypeRegistry.MANA] = Resource(user, ResourceTypeRegistry.MANA)
     }
 
-    fun current(type: ResourceType): Int {
+    override fun current(type: ResourceType): Int {
         return getResource(type).current()
     }
 
-    fun maximum(type: ResourceType): Int {
+    override fun maximum(type: ResourceType): Int {
         return getResource(type).maximum()
     }
 
-    fun add(type: ResourceType, value: Int): Boolean {
+    override fun add(type: ResourceType, value: Int): Boolean {
         return getResource(type).add(value)
     }
 
-    fun take(type: ResourceType, value: Int): Boolean {
+    override fun take(type: ResourceType, value: Int): Boolean {
         return getResource(type).take(value)
     }
 
     private fun getResource(type: ResourceType): Resource {
-        return requireNotNull(resourceMap[type]) { "Cannot find resource type $type" }
-    }
-
-    private fun MutableMap<ResourceType, Resource>.registerResource(type: ResourceType, supplier: ResourceSupplier) {
-        put(type, Resource(type, supplier))
+        return requireNotNull(data[type]) { "The resource type $type" }
     }
 }
 
 /**
- * Represents a resource of some type, such as stamina and mana.
- *
- * Not thread-safe!
+ * The object stores the amount of resource of a specific type.
  */
-internal class Resource(
+private class Resource(
+    private val user: User,
     private val type: ResourceType,
-    private val supplier: ResourceSupplier,
 ) {
-    private var current: Int = initial().coerceIn(0, maximum())
+    private var current: Int = initial()
 
     fun initial(): Int {
-        return supplier.initialValue(type)
+        return type.initialAmount(user)
     }
 
     fun current(): Int {
@@ -64,7 +61,7 @@ internal class Resource(
     }
 
     fun maximum(): Int {
-        return supplier.maximumValue(type)
+        return type.maximumAmount(user)
     }
 
     fun add(value: Int): Boolean {
@@ -74,9 +71,9 @@ internal class Resource(
     }
 
     fun take(value: Int): Boolean {
-        if (value > current) return false // resource value never goes to negative
+        if (value > current) return false // insufficient resource - return false
         current -= value
-        current = current.coerceAtLeast(0) // minimum is ZERO for all resource types
+        current = current.coerceAtLeast(0) // minimum should be ZERO for all resource types
         return true
     }
 }
