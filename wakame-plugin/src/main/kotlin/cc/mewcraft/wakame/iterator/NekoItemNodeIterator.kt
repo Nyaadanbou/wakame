@@ -13,25 +13,29 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
+/**
+ * NekoItem 物品配置文件的遍历器。
+ */
 object NekoItemNodeIterator : KoinComponent {
     private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
 
-    // configuration stuff
-    private val dataDir: File by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_CONFIG_DIR) }
-
     /**
-     * 这里的 [block] 会被多次调用
-     * 每次调用时会传入一个配置文件的 [Key] 和一个访问配置文件的根 [ConfigurationNode]。
+     * 这里的 [block] 会被多次调用。
+     *
+     * 每次调用时会传入一个物品的 [Key] 和对应文件的根 [ConfigurationNode]。
      */
-    fun execute(block: (Key, ConfigurationNode) -> Unit) {
+    fun forEach(block: (Key, ConfigurationNode) -> Unit) {
+        val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_CONFIG_DIR)
         val namespaceDirs = mutableListOf<File>()
 
         // first walk each directory, i.e., each namespace
-        dataDir.walk().maxDepth(1)
-            .drop(1) // exclude the `dataDir` itself
+        dataDirectory.walk().maxDepth(1)
+            .drop(1) // exclude the `dataDirectory` itself
             .filter { it.isDirectory }
             .forEach {
-                namespaceDirs += it.also { logger.info("Loading namespace: {}", it.name) }
+                namespaceDirs += it.also {
+                    logger.info("Loading namespace: {}", it.name)
+                }
             }
 
         val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER)) // will be reused

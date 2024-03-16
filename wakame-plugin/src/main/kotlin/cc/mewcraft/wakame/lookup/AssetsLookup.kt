@@ -38,7 +38,7 @@ object AssetsLookup : Initializable, KoinComponent {
         assets.clear()
         plugin.saveResourceRecursively(PLUGIN_ASSETS_DIR)
 
-        NekoItemNodeIterator.execute { key, root ->
+        NekoItemNodeIterator.forEach { key, root ->
             val assetsNodes = root.node("assets").childrenList()
             for (assetsNode in assetsNodes) {
                 val sid = assetsNode.node("variant").requireKt<Int>()
