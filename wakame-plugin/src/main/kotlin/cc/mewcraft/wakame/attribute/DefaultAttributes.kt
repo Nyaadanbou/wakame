@@ -7,6 +7,7 @@ import org.bukkit.entity.EntityType
  * Provides default [AttributeInstance]s for various entity types.
  */
 object DefaultAttributes {
+    //qwqwqwqwqwqwqwqwq
     private val DEFAULT_SUPPLIERS: Map<EntityType, AttributeSupplier> = buildMap {
         put(EntityType.PLAYER, AttributeSupplier {
             //
