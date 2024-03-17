@@ -14,6 +14,7 @@ object DefaultAttributes {
             //
             // Mechanics of these attributes are backed by vanilla game.
 
+            // add random comment
             add(Attributes.MAX_HEALTH)
             add(Attributes.MAX_ABSORPTION)
             add(Attributes.MOVEMENT_SPEED_RATE)
