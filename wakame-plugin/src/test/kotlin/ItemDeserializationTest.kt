@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.scheme.*
 import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.kizamiModule
-import cc.mewcraft.wakame.player.Player
+import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.reference.referenceModule
@@ -86,14 +86,14 @@ class ItemDeserializationTest : KoinTest {
         val demo = NekoItemRegistry.get(key)
         assertNotNull(demo, "The item '$key' is not loaded correctly")
 
-        val player = mockk<Player>()
+        val user = mockk<User>()
         val realizer = mockk<NekoItemRealizer>()
 
         // mock player
-        every { player.level } returns 1
+        every { user.level } returns 1
         // mock realizer (to avoid call on the Bukkit internals)
-        every { realizer.realize(demo, player) } answers {
-            val context = SchemeGenerationContext(SchemaGenerationTrigger.wrap(player))
+        every { realizer.realize(demo, user) } answers {
+            val context = SchemeGenerationContext(SchemaGenerationTrigger.wrap(user))
 
             generateAndSet<DisplayNameMeta, String>(demo, context)
             generateAndSet<DisplayLoreMeta, List<String>>(demo, context)
@@ -117,10 +117,10 @@ class ItemDeserializationTest : KoinTest {
         }
 
         // call
-        realizer.realize(demo, player)
+        realizer.realize(demo, user)
 
         // verify
-        verify { realizer.realize(demo, player) }
+        verify { realizer.realize(demo, user) }
     }
 
     private inline fun <reified S : SchemeItemMeta<T>, T> generateAndSet(

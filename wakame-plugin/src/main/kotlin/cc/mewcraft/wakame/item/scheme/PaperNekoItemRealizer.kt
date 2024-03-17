@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.item.scheme.meta.*
-import cc.mewcraft.wakame.player.Player
+import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.asNamespacedKey
 import org.bukkit.Registry
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
@@ -30,7 +30,7 @@ import cc.mewcraft.wakame.item.scheme.meta.SkinOwnerMeta as SSkinOwnerMeta
 
 object PaperNekoItemRealizer : NekoItemRealizer {
 
-    override fun realize(nekoItem: NekoItem, player: Player): NekoItemStack = realize0(nekoItem, player)
+    override fun realize(nekoItem: NekoItem, user: User): NekoItemStack = realize0(nekoItem, user)
     override fun realize(nekoItem: NekoItem, crate: Crate): NekoItemStack = realize0(nekoItem, crate)
 
     private fun realize0(nekoItem: NekoItem, any: Any): NekoItemStack {
@@ -55,7 +55,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         // write base data
         nekoStack.putKey(nekoItem.key)
         nekoStack.putVariant(0)
-        nekoStack.putSeed(context.seed)
+        nekoStack.putSeed(context.seed) // TODO 对于没有随机元素的物品（例如材料类物品），不应该写入带有随机元素的数据
 
         // write item meta
         with(nekoStack.metadata) {

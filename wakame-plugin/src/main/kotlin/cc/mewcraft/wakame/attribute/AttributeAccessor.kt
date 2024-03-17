@@ -1,52 +1,46 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.user.PlayerAdapter
+import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.user.UserManager
 import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import java.util.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /**
- * Provides the access to [AttributeMap] of various objects.
+ * Provides the access to [AttributeMap] of various subjects.
  *
- * **Not thread-safe.**
+ * See the document of the subtypes for more details of usage.
  */
-sealed class AttributeAccessor<T : Entity> {
-    protected val cacheMap: MutableMap<UUID, AttributeMap> = hashMapOf()
-
+sealed class AttributeAccessor<T> {
     /**
-     * Gets the [AttributeMap] for the [entity].
+     * Gets the [AttributeMap] for the [subject].
      */
-    abstract fun getAttributeMap(entity: T): AttributeMap
-
-    /**
-     * Removes the [AttributeMap] from memory for the [entity].
-     */
-    fun removeAttributeMap(entity: T) {
-        cacheMap[entity.uniqueId]?.clearAllModifiers()
-        cacheMap.remove(entity.uniqueId)
-    }
+    abstract fun getAttributeMap(subject: T): AttributeMap
 }
 
 /**
- * Provides the access to the [PlayerAttributeMap] of all online players.
+ * Provides the access to the [PlayerAttributeMap] of all (online) players.
  *
- * **Not thread-safe.**
+ * To get the [AttributeMap] of a player, it's recommended using the
+ * [PlayerAdapter] (instead of [PlayerAttributeAccessor]) to get the [User]
+ * instance, from which you can get the [AttributeMap] for that player.
  */
-class PlayerAttributeAccessor : AttributeAccessor<Player>() {
-    override fun getAttributeMap(entity: Player): AttributeMap {
-        return cacheMap.computeIfAbsent(entity.uniqueId) {
-            PlayerAttributeMap(DefaultAttributes.getSupplier(EntityType.PLAYER), entity)
-        }
+data object PlayerAttributeAccessor : KoinComponent, AttributeAccessor<Player>() {
+    private val userManager: UserManager<Player> by inject()
+
+    override fun getAttributeMap(subject: Player): AttributeMap {
+        // the implementation simply redirect calls to the UserManager
+        return userManager.getPlayer(subject).attributeMap
     }
 }
 
 /**
  * Provides the access to [AttributeMap] of all non-player entities.
- *
- * **Not thread-safe.**
  */
-class EntityAttributeAccessor : AttributeAccessor<Entity>() {
-    override fun getAttributeMap(entity: Entity): PlayerAttributeMap {
-        TODO("Read the NBT on the entity. Use cache if feasible")
+data object EntityAttributeAccessor : AttributeAccessor<Entity>() {
+    override fun getAttributeMap(subject: Entity): AttributeMap {
+        return EntityAttributeMap(DefaultAttributes.getSupplier(subject.type), subject)
     }
 }

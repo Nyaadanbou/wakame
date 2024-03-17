@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.item.scheme.PaperNekoItemRealizer
-import cc.mewcraft.wakame.player.asNeko
+import cc.mewcraft.wakame.user.asNeko
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent

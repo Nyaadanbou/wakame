@@ -8,60 +8,51 @@ import org.bukkit.entity.EntityType
  */
 object DefaultAttributes {
     private val DEFAULT_SUPPLIERS: Map<EntityType, AttributeSupplier> = buildMap {
-        ////// PLAYER //////
-        put(
-            EntityType.PLAYER,
-            attributeSupplier {
-                /*
-                  ////// Vanilla-backed Attributes //////
+        put(EntityType.PLAYER, AttributeSupplier {
+            //
+            // Vanilla-backed Attributes
+            //
+            // Mechanics of these attributes are backed by vanilla game.
 
-                  Mechanics of these attributes are backed by vanilla game.
-                */
+            add(Attributes.MAX_HEALTH)
+            add(Attributes.MAX_ABSORPTION)
+            add(Attributes.MOVEMENT_SPEED_RATE)
+            add(Attributes.BLOCK_INTERACTION_RANGE)
+            add(Attributes.ENTITY_INTERACTION_RANGE)
 
-                add(Attributes.MAX_HEALTH)
-                add(Attributes.MAX_ABSORPTION)
-                add(Attributes.MOVEMENT_SPEED_RATE)
-                add(Attributes.BLOCK_INTERACTION_RANGE)
-                add(Attributes.ENTITY_INTERACTION_RANGE)
+            //
+            // Independent Attributes
+            //
+            // Mechanics of these attributes are implemented by ourselves.
 
-                /*
-                  ////// Independent Attributes //////
+            add(Attributes.ATTACK_EFFECT_CHANCE)
+            add(Attributes.ATTACK_SPEED_LEVEL)
+            add(Attributes.CRITICAL_STRIKE_CHANCE)
+            add(Attributes.CRITICAL_STRIKE_POWER)
+            add(Attributes.DAMAGE_REDUCTION_RATE)
+            add(Attributes.LIFESTEAL)
+            add(Attributes.LIFESTEAL_RATE)
+            add(Attributes.MANASTEAL)
+            add(Attributes.MANASTEAL_RATE)
+            add(Attributes.MANA_REGENERATION)
+            add(Attributes.HEALTH_REGENERATION)
+            add(Attributes.MANA_CONSUMPTION_RATE)
+            add(Attributes.MAX_MANA)
 
-                  Mechanics of these attributes are implemented by ourselves.
-                */
+            //
+            // Elemental Attributes
+            //
+            // Each of these attributes is associated with a certain element.
+            // Mechanics of these attributes are implementation-defined.
 
-                add(Attributes.ATTACK_EFFECT_CHANCE)
-                add(Attributes.ATTACK_SPEED_LEVEL)
-                add(Attributes.CRITICAL_STRIKE_CHANCE)
-                add(Attributes.CRITICAL_STRIKE_POWER)
-                add(Attributes.DAMAGE_REDUCTION_RATE)
-                add(Attributes.LIFESTEAL)
-                add(Attributes.LIFESTEAL_RATE)
-                add(Attributes.MANASTEAL)
-                add(Attributes.MANASTEAL_RATE)
-                add(Attributes.MANA_REGENERATION)
-                add(Attributes.HEALTH_REGENERATION)
-                add(Attributes.MANA_CONSUMPTION_RATE)
-                add(Attributes.MAX_MANA)
-
-                /*
-                  ////// Elemental Attributes //////
-
-                  Each of these attributes is associated with a certain element.
-                  Mechanics of these attributes are implementation-defined.
-                */
-
-                ElementRegistry.values.forEach {
-                    add(Attributes.byElement(it).DEFENSE)
-                    add(Attributes.byElement(it).DEFENSE_PENETRATION)
-                    add(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
-                    add(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
-                    add(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
-                }
+            ElementRegistry.values.forEach {
+                add(Attributes.byElement(it).DEFENSE)
+                add(Attributes.byElement(it).DEFENSE_PENETRATION)
+                add(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
+                add(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
+                add(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
             }
-        )
-
-        // TODO MONSTER
+        })
     }
 
     /**

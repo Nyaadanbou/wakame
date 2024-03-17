@@ -3,17 +3,15 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.item.binary.NekoItemStack
 import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
+import cc.mewcraft.wakame.user.asNeko
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryType.SlotType
 import org.bukkit.event.player.PlayerItemHeldEvent
-import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Handles the update process of [AttributeMap].
@@ -22,20 +20,14 @@ import org.koin.core.component.inject
  * - should be updated in [AttributeMap] in real-time.
  * - must be applied to players as vanilla attribute modifiers.
  */
-class AttributeHandler : KoinComponent, Listener {
-
-    private val playerAttributeAccessor: PlayerAttributeAccessor by inject()
+class AttributeEventHandler : KoinComponent, Listener {
 
     ////// Listeners //////
 
-    @EventHandler
-    fun onQuit(e: PlayerQuitEvent) {
-        val player = e.player
-        playerAttributeAccessor.removeAttributeMap(player)
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    fun onHoldItem(e: PlayerItemHeldEvent) {
+    /**
+     * Updates attributes when the player switches their held item.
+     */
+    fun handlePlayerItemHeld(e: PlayerItemHeldEvent) {
         val player = e.player
         val oldItem = player.inventory.getItem(e.previousSlot)
         val newItem = player.inventory.getItem(e.newSlot)
@@ -43,8 +35,10 @@ class AttributeHandler : KoinComponent, Listener {
         newItem.addAttributeModifiers(player)
     }
 
-    @EventHandler
-    fun onInventoryChange(e: PlayerInventorySlotChangeEvent) {
+    /**
+     * Updates attributes when an ItemStack is changed in the player's inventory.
+     */
+    fun handlePlayerInventorySlotChange(e: PlayerInventorySlotChangeEvent) {
         val player = e.player
         val slot = e.slot
         val rawSlot = e.rawSlot
@@ -90,7 +84,7 @@ class AttributeHandler : KoinComponent, Listener {
         }
 
         val attributeModifiers = this.nekoAttributeModifiers
-        val attributeMap = playerAttributeAccessor.getAttributeMap(player)
+        val attributeMap = player.asNeko().attributeMap
         attributeMap.addAttributeModifiers(attributeModifiers)
     }
 
@@ -108,7 +102,7 @@ class AttributeHandler : KoinComponent, Listener {
         // and by design, the UUID of an attribute modifier is the UUID of the item
         // that provides the attribute modifier. Thus, we only need to get the UUID
         // of the item to clear the attribute modifier.
-        val attributeMap = playerAttributeAccessor.getAttributeMap(player)
+        val attributeMap = player.asNeko().attributeMap
         val nekoStack = this.toNekoStack() ?: return
         attributeMap.clearModifiers(nekoStack.uuid)
     }

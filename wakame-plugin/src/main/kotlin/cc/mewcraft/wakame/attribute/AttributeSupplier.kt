@@ -1,16 +1,19 @@
 package cc.mewcraft.wakame.attribute
 
-import java.util.*
+import java.util.UUID
 
-class AttributeSupplier(
+fun AttributeSupplier(builder: AttributeSupplier.Builder.() -> Unit): AttributeSupplier {
+    return AttributeSupplier.Builder().apply(builder).build()
+}
+
+/**
+ * Responsible to provide default attribute values.
+ *
+ * @property instances
+ */
+class AttributeSupplier internal constructor(
     private val instances: Map<Attribute, AttributeInstance>,
 ) {
-    companion object {
-        fun builder(): Builder {
-            return Builder()
-        }
-    }
-
     fun getAttributeInstance(attribute: Attribute): AttributeInstance {
         val attributeInstance = instances[attribute]
             ?: throw IllegalArgumentException("Can't find attribute '${attribute.descriptionId}'")
@@ -72,6 +75,3 @@ class AttributeSupplier(
         }
     }
 }
-
-fun attributeSupplier(builder: AttributeSupplier.Builder.() -> Unit): AttributeSupplier =
-    AttributeSupplier.Builder().apply(builder).build()

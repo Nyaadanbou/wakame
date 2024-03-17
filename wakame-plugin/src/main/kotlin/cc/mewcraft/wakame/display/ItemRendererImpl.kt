@@ -19,7 +19,6 @@ internal class ItemRendererImpl(
     override fun render(copy: NekoItemStack) {
         require(copy.isNeko) { "Can't render a non-neko ItemStack" }
 
-        // 因为对这里的 itemStack 进行修改不会影响原始的 itemStack，所以我们可以放心地修改它
         val displayName = textStylizer.stylizeName(copy)
         val displayLore = textStylizer.stylizeLore(copy).let(loreFinalizer::finalize)
 

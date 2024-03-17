@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.crate.Crate
-import cc.mewcraft.wakame.player.Player
+import cc.mewcraft.wakame.user.User
 import kotlin.reflect.KClass
 
 /**
@@ -14,8 +14,8 @@ class SchemaGenerationTrigger private constructor(
 ) {
     companion object {
         private val supportedSources: Set<KClass<*>> = setOf(
+            User::class,
             Crate::class,
-            Player::class,
         )
 
         /**
@@ -35,8 +35,8 @@ class SchemaGenerationTrigger private constructor(
      */
     val level: Int
         get() = when (source) {
+            is User -> source.level
             is Crate -> source.level
-            is Player -> source.level
             else -> error("Unknown level getter")
         }
 }

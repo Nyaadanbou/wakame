@@ -5,6 +5,5 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 internal fun attributeModule(): Module = module {
-    singleOf(::AttributeHandler)
-    singleOf(::PlayerAttributeAccessor)
+    singleOf(::AttributeEventHandler)
 }

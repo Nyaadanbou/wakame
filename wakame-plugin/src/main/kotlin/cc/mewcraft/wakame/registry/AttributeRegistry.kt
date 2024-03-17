@@ -43,6 +43,7 @@ object AttributeRegistry : Initializable {
      */
     val EMPTY_KEY: Key = Attributes.EMPTY.key()
 
+    // TODO 也许应该把这些都存放在一个叫做 AttributeFacade 的类里，而不是摊成几个 Map
     val schemaDataBaker: MutableMap<Key, SchemaAttributeDataBaker> = HashMap()
     val schemaNodeEncoder: MutableMap<Key, SchemaAttributeDataNodeEncoder> = HashMap()
     val plainNodeEncoder: MutableMap<Key, PlainAttributeDataNodeEncoder> = HashMap()

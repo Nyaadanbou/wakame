@@ -1,13 +1,15 @@
-package cc.mewcraft.wakame.player
+package cc.mewcraft.wakame.user
 
+import cc.mewcraft.wakame.ability.AbilityMap
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
+import cc.mewcraft.wakame.resource.ResourceMap
 import java.util.UUID
 
 /**
  * Represents a player in wakame system.
  */
-interface Player {
+interface User {
 
     /**
      * The backing player.
@@ -33,5 +35,15 @@ interface Player {
      * Attribute Map of the player.
      */
     val attributeMap: AttributeMap
+
+    /**
+     * Ability Map of the player.
+     */
+    val abilityMap: AbilityMap
+
+    /**
+     * Resource Map of the player.
+     */
+    val resourceMap: ResourceMap
 
 }

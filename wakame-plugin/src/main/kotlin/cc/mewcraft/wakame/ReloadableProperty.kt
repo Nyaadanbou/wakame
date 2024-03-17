@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.util.registerEvents
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.jvm.javaField
 
