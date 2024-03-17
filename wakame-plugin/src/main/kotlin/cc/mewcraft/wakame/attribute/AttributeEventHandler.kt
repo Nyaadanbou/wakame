@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.user.asNeko
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
 import org.bukkit.entity.Player
-import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryType.SlotType
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.inventory.ItemStack
@@ -20,7 +19,7 @@ import org.koin.core.component.KoinComponent
  * - should be updated in [AttributeMap] in real-time.
  * - must be applied to players as vanilla attribute modifiers.
  */
-class AttributeEventHandler : KoinComponent, Listener {
+class AttributeEventHandler : KoinComponent {
 
     ////// Listeners //////
 
