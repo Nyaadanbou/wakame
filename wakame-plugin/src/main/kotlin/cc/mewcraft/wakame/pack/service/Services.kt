@@ -44,28 +44,26 @@ data class ResourcePackService(
     private val port: Int,
     private val appendPort: Boolean,
 ) : Service {
-    private var server: ResourcePackServer? = null
-    override var downloadAddress: String? = null
+    private val server: ResourcePackServer = ResourcePackServer.server()
+        .address("0.0.0.0", port) // (required) address and port
+        .pack(resourcePack) // (required) pack to serve
+        .executor(HelperExecutors.asyncHelper()) // (optional) request executor (IMPORTANT!)
+        .path("/get/${resourcePack.hash()}")
+        .build()
+
+    override val downloadAddress: String = if (appendPort) {
+        "http://$host:$port/get/${resourcePack.hash()}/$RESOURCE_PACK_ZIP_NAME"
+    } else {
+        "http://$host/get/${resourcePack.hash()}/$RESOURCE_PACK_ZIP_NAME"
+    }
 
     override fun start(reGenerate: Boolean) {
-        // start server
-        server = ResourcePackServer.server()
-            .address("0.0.0.0", port) // (required) address and port
-            .pack(resourcePack) // (required) pack to serve
-            .executor(HelperExecutors.asyncHelper()) // (optional) request executor (IMPORTANT!)
-            .path("/get/${resourcePack.hash()}")
-            .build()
-
-        downloadAddress = if (appendPort) {
-            "http://$host:$port/get/${resourcePack.hash()}/$RESOURCE_PACK_ZIP_NAME"
-        } else {
-            "http://$host/get/${resourcePack.hash()}/$RESOURCE_PACK_ZIP_NAME"
-        }
+        server.start()
     }
 
     @Blocking
     override fun stop() {
-        server?.stop(0)
+        server.stop(0)
     }
 }
 
@@ -80,7 +78,7 @@ data class GithubService(
 ) : Service, KoinComponent {
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
 
-    override var downloadAddress: String? = null // TODO: implement this
+    override val downloadAddress: String? = null // Not supported
 
     override fun start(reGenerate: Boolean) {
         if (!reGenerate) return
@@ -97,7 +95,6 @@ data class GithubService(
 
         manager.updatePack().onFailure {
             logger.error("Failed to update resource pack", it)
-            downloadAddress = null
         }
     }
 

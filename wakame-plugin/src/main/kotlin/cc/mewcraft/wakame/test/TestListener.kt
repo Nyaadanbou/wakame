@@ -5,25 +5,36 @@ import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.item.scheme.PaperNekoItemRealizer
-import cc.mewcraft.wakame.user.asNeko
+import cc.mewcraft.wakame.pack.ModelRegistry
 import cc.mewcraft.wakame.registry.NekoItemRegistry
+import cc.mewcraft.wakame.user.asNeko
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent
+import me.lucko.helper.Schedulers
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.IntShadowTag
 import me.lucko.helper.shadows.nbt.ListShadowTag
 import me.lucko.helper.shadows.nbt.ShortShadowTag
 import me.lucko.helper.text3.mini
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.kyori.examination.string.StringExaminer
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
-import java.util.UUID
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import team.unnamed.hephaestus.Model
+import team.unnamed.hephaestus.bukkit.BukkitModelEngine
+import team.unnamed.hephaestus.bukkit.ModelEntity
+import java.util.*
 
-class TestListener : Listener {
+
+class TestListener : KoinComponent, Listener {
     @EventHandler
     fun testItemGeneration(e: AsyncChatEvent) {
         val player = e.player
@@ -229,6 +240,28 @@ class TestListener : Listener {
             nekoItemStack.putVariant(variant)
             inventory.setItemInMainHand(nekoItemStack.handle)
         }
+    }
+
+    private val engine: BukkitModelEngine by inject()
+
+    @EventHandler
+    fun testModel(e: AsyncChatEvent) {
+        val player = e.player
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+
+        if (plainMessage == "m1") {
+            val model = ModelRegistry.getModel("test")!!
+            Schedulers.sync().run {
+                spawn(player, model)
+            }
+        }
+    }
+
+    private fun spawn(source: Player, model: Model): ModelEntity {
+        val view: ModelEntity = engine.createViewAndTrack(model, source.location)
+        Schedulers.async().runRepeating(view::tickAnimations, 0L, 1L)
+        source.sendActionBar(Component.text("Model spawned", NamedTextColor.GREEN))
+        return view
     }
 
     @EventHandler

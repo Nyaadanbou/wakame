@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
+import cc.mewcraft.wakame.event.ResourcePackGeneratingEvent
 import cc.mewcraft.wakame.lookup.Assets
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.material
 import cc.mewcraft.wakame.pack.VanillaResourcePack
+import cc.mewcraft.wakame.pack.ModelRegistry
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
@@ -13,7 +15,6 @@ import org.jetbrains.annotations.Contract
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackMeta
@@ -21,16 +22,11 @@ import team.unnamed.creative.model.ModelTexture
 import team.unnamed.creative.model.ModelTextures
 import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
 import team.unnamed.creative.texture.Texture
+import team.unnamed.hephaestus.writer.ModelWriter
 import java.io.File
 import team.unnamed.creative.model.Model as CreativeModel
 
 private const val RESOURCE_NAME = "wakame"
-
-data class GenerationArgs(
-    val description: String,
-    val resourcePack: ResourcePack,
-    val allAssets: Collection<Assets>,
-)
 
 sealed class ResourcePackGeneration(
     protected val args: GenerationArgs,
@@ -91,7 +87,34 @@ internal class ResourcePackIconGeneration(
     }
 }
 
-internal class ResourcePackModelGeneration(
+internal class ResourcePackExternalGeneration(
+    args: GenerationArgs,
+) : ResourcePackGeneration(args) {
+    class GenerationCancelledException : Throwable() {
+        override val message: String = "Resource pack generation is cancelled"
+    }
+
+    override fun generate(): Result<Unit> {
+        runCatching {
+            val isCancelled = ResourcePackGeneratingEvent(args).callEvent()
+            if (isCancelled)
+                return Result.failure(GenerationCancelledException())
+        }.onFailure { return Result.failure(it) }
+
+        return generateNext()
+    }
+}
+
+internal class ResourcePackRegistryModelGeneration(
+    args: GenerationArgs,
+) : ResourcePackGeneration(args) {
+    override fun generate(): Result<Unit> {
+        ModelWriter.resource(RESOURCE_NAME).write(args.resourcePack, ModelRegistry.values)
+        return generateNext()
+    }
+}
+
+internal class ResourcePackCustomModelGeneration(
     args: GenerationArgs,
 ) : ResourcePackGeneration(args), KoinComponent {
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
@@ -137,7 +160,6 @@ internal class ResourcePackModelGeneration(
                     val materialKey = asset.materialKey()
 
                     // Override for custom asset data
-                    // TODO: Add other predicate for custom asset data
                     val overrideGenerator = ItemOverrideGeneratorProxy(
                         ItemModelData(
                             key = modelKey,

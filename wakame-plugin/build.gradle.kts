@@ -40,6 +40,7 @@ dependencies {
     implementation(platform(libs.bom.configurate.gson))
     implementation(platform(libs.bom.configurate.kotlin))
     implementation(platform(libs.bom.creative))
+    implementation(platform(libs.bom.hephaestus))
 
     // test
     testImplementation(libs.mockk)
@@ -59,6 +60,7 @@ tasks {
         relocate("org.koin", "cc.mewcraft.wakame.external.koin")
         relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
         relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
+        relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
     }
 
     val inputJarPath = lazy { shadowJar.get().archiveFile.get().asFile.absolutePath }

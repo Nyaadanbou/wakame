@@ -44,39 +44,7 @@ internal class ResourcePackManager(
     /**
      * The resource pack service.
      */
-    private val service: Service
-        get() {
-            if (!this::pack.isInitialized) {
-                logger.error("Resource pack can not be initialized. Please check the configuration.", IllegalStateException("Resource pack is not initialized"))
-                return NoneService
-            }
-
-            return when (val service = config.service) {
-                "none" -> NoneService
-
-                "self_host" -> {
-                    val host = config.host
-                    val port = config.port
-                    ResourcePackService(pack, host, port, config.appendPort)
-                }
-
-                "github" -> {
-                    val username = config.githubUsername
-                    val repo = config.githubRepo
-                    val token = config.githubToken
-                    val path = config.githubPath
-                    val branch = config.githubBranch
-                    val commitMessage = config.githubCommitMessage
-                    GithubService(pluginDataDir, repo, username, token, path, branch, commitMessage)
-                }
-
-                else -> {
-                    logger.error("Unknown resource pack service: $service", IllegalStateException("Unknown resource pack service"))
-                    NoneService
-                }
-            }.also { logger.info("Resource pack service: ${it::class.simpleName}") }
-        }
-
+    private lateinit var service: Service
 
     /**
      * Generates the resource pack to predefined directory.
@@ -118,8 +86,14 @@ internal class ResourcePackManager(
             ResourcePackGeneration.chain(
                 ResourcePackMetaGeneration(generationArgs),
                 ResourcePackIconGeneration(generationArgs),
-                ResourcePackModelGeneration(generationArgs),
-            ).generate().getOrElse { return Result.failure(it) }
+                ResourcePackRegistryModelGeneration(generationArgs),
+                ResourcePackCustomModelGeneration(generationArgs),
+                ResourcePackExternalGeneration(generationArgs)
+            ).generate().getOrElse {
+                if (it !is ResourcePackExternalGeneration.GenerationCancelledException) {
+                    return Result.failure(it)
+                }
+            }
 
             // Write the resource pack to the file
             runCatching {
@@ -136,7 +110,7 @@ internal class ResourcePackManager(
             .getOrElse { return Result.failure(it) }
         pack = builtResourcePack
             .also { logger.info("<green>Resource pack built. File size: <yellow>${resourceFile.formatSize()}".mini) }
-
+        service = loadService()
         // Start the resource pack server
         runCatching { startServer(regen) }.getOrElse { return Result.failure(it) }
 
@@ -161,6 +135,42 @@ internal class ResourcePackManager(
         return Result.success(resourcePackPath)
     }
     //</editor-fold>
+
+    private fun loadService(): Service {
+        if (this::service.isInitialized) {
+            stopServer()
+        }
+
+        if (!this::pack.isInitialized) {
+            logger.error("Resource pack can not be initialized. Please check the configuration.", IllegalStateException("Resource pack is not initialized"))
+            return NoneService
+        }
+
+        return when (val service = config.service) {
+            "none" -> NoneService
+
+            "self_host" -> {
+                val host = config.host
+                val port = config.port
+                ResourcePackService(pack, host, port, config.appendPort)
+            }
+
+            "github" -> {
+                val username = config.githubUsername
+                val repo = config.githubRepo
+                val token = config.githubToken
+                val path = config.githubPath
+                val branch = config.githubBranch
+                val commitMessage = config.githubCommitMessage
+                GithubService(pluginDataDir, repo, username, token, path, branch, commitMessage)
+            }
+
+            else -> {
+                logger.error("Unknown resource pack service: $service", IllegalStateException("Unknown resource pack service"))
+                NoneService
+            }
+        }.also { logger.info("Resource pack service: ${it::class.simpleName}") }
+    }
 
     //<editor-fold desc="Resource pack server test">
     @Contract(pure = true)
