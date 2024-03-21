@@ -5,7 +5,8 @@ import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.item.scheme.PaperNekoItemRealizer
-import cc.mewcraft.wakame.pack.ModelRegistry
+import cc.mewcraft.wakame.pack.model.ModelRegistry
+import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.user.asNeko
 import cc.mewcraft.wakame.util.*
@@ -17,11 +18,10 @@ import me.lucko.helper.shadows.nbt.IntShadowTag
 import me.lucko.helper.shadows.nbt.ListShadowTag
 import me.lucko.helper.shadows.nbt.ShortShadowTag
 import me.lucko.helper.text3.mini
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.kyori.examination.string.StringExaminer
 import org.bukkit.Material
+import org.bukkit.entity.Pig
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -30,7 +30,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import team.unnamed.hephaestus.Model
 import team.unnamed.hephaestus.bukkit.BukkitModelEngine
-import team.unnamed.hephaestus.bukkit.ModelEntity
+import team.unnamed.hephaestus.bukkit.ModelView
 import java.util.*
 
 
@@ -250,18 +250,25 @@ class TestListener : KoinComponent, Listener {
         val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
 
         if (plainMessage == "m1") {
-            val model = ModelRegistry.getModel("test")!!
+            val model = ModelRegistry.models().first()
             Schedulers.sync().run {
                 spawn(player, model)
             }
         }
     }
 
-    private fun spawn(source: Player, model: Model): ModelEntity {
-        val view: ModelEntity = engine.createViewAndTrack(model, source.location)
-        Schedulers.async().runRepeating(view::tickAnimations, 0L, 1L)
-        source.sendActionBar(Component.text("Model spawned", NamedTextColor.GREEN))
-        return view
+    private fun spawn(player: Player, model: Model) {
+        // Spawn base entity
+        val pig: Pig = player.world.spawn(player.location, Pig::class.java)
+        pig.isInvisible = true
+        // Create the model view on the pig
+        val view: ModelView = engine.spawn(model, pig)
+        // Make the model bones be on the ground
+        OnGroundBoneModifier(pig).apply(view)
+        // Save the created view so it's animated
+        ModelRegistry.view(view)
+
+        player.sendPlainMessage("Summoned " + model.name())
     }
 
     @EventHandler

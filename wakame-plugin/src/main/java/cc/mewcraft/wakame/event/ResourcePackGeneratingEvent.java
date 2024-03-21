@@ -21,6 +21,7 @@ public class ResourcePackGeneratingEvent extends Event implements Cancellable {
     private boolean cancelled;
 
     public ResourcePackGeneratingEvent(GenerationArgs args) {
+        super(true);
         this.args = args;
     }
 

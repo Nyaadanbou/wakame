@@ -1,30 +1,39 @@
-package cc.mewcraft.wakame.pack
+package cc.mewcraft.wakame.pack.model
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.pack.ResourcePackManager
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import team.unnamed.hephaestus.Model
 import team.unnamed.hephaestus.ModelDataCursor
+import team.unnamed.hephaestus.bukkit.ModelView
 import team.unnamed.hephaestus.reader.blockbench.BBModelReader
 import java.io.File
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 private const val BBMODELS_DIR = "bbmodels"
 
+@PreWorldDependency(
+    runAfter = [ResourcePackManager::class]
+)
 @ReloadDependency(
     runAfter = [ResourcePackManager::class]
 )
 object ModelRegistry : Initializable, KoinComponent {
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
-    private val modelRegistry: MutableMap<String, Model> = hashMapOf()
+    private val models: MutableMap<String, Model> = ConcurrentHashMap()
+    private val views: MutableMap<UUID, ModelView> = ConcurrentHashMap()
 
     private fun loadModels() {
-        modelRegistry.clear()
+        models.clear()
 
-        registerModel("test", loadModel("test.bbmodel"))
+        register(loadModel("test.bbmodel"))
     }
 
     private fun loadModel(fileName: String): Model {
@@ -42,20 +51,29 @@ object ModelRegistry : Initializable, KoinComponent {
         return model
     }
 
-    fun registerModel(name: String, model: Model) {
-        modelRegistry[name] = model
+    private fun register(model: Model) {
+        models[model.name()] = model
     }
 
-    fun getModel(name: String): Model? {
-        return modelRegistry[name]
+    fun model(name: String): Model? {
+        return models[name]
     }
 
-    fun clear() {
-        modelRegistry.clear()
+    fun view(uuid: UUID): ModelView? {
+        return views[uuid]
     }
 
-    val values: Collection<Model>
-        get() = modelRegistry.values
+    fun view(view: ModelView) {
+        views[view.uniqueId] = view
+    }
+
+    fun views(): Collection<ModelView> {
+        return views.values
+    }
+
+    fun models(): Collection<Model> {
+        return models.values
+    }
 
     override fun onPreWorld() {
         loadModels()

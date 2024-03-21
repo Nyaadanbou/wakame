@@ -1,12 +1,14 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
-import cc.mewcraft.wakame.event.ResourcePackGeneratingEvent
 import cc.mewcraft.wakame.lookup.Assets
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.material
 import cc.mewcraft.wakame.pack.VanillaResourcePack
-import cc.mewcraft.wakame.pack.ModelRegistry
+import cc.mewcraft.wakame.pack.model.ModelRegistry
+import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
@@ -25,8 +27,6 @@ import team.unnamed.creative.texture.Texture
 import team.unnamed.hephaestus.writer.ModelWriter
 import java.io.File
 import team.unnamed.creative.model.Model as CreativeModel
-
-private const val RESOURCE_NAME = "wakame"
 
 sealed class ResourcePackGeneration(
     protected val args: GenerationArgs,
@@ -95,11 +95,12 @@ internal class ResourcePackExternalGeneration(
     }
 
     override fun generate(): Result<Unit> {
-        runCatching {
-            val isCancelled = ResourcePackGeneratingEvent(args).callEvent()
-            if (isCancelled)
-                return Result.failure(GenerationCancelledException())
-        }.onFailure { return Result.failure(it) }
+        // runCatching {
+        //     // TODO: 异步触发事件
+        //     val isCancelled = ResourcePackGeneratingEvent(args).callEvent()
+        //     if (isCancelled)
+        //         return Result.failure(GenerationCancelledException())
+        // }.onFailure { return Result.failure(it) }
 
         return generateNext()
     }
@@ -109,7 +110,10 @@ internal class ResourcePackRegistryModelGeneration(
     args: GenerationArgs,
 ) : ResourcePackGeneration(args) {
     override fun generate(): Result<Unit> {
-        ModelWriter.resource(RESOURCE_NAME).write(args.resourcePack, ModelRegistry.values)
+        runCatching {
+            ModelWriter.resource(RESOURCE_NAMESPACE)
+                .write(args.resourcePack, ModelRegistry.models())
+        }.onFailure { return Result.failure(it) }
         return generateNext()
     }
 }
@@ -121,7 +125,6 @@ internal class ResourcePackCustomModelGeneration(
     private val config: ItemModelDataLookup by inject()
     private val vanillaResourcePack: VanillaResourcePack by inject()
 
-    @Suppress("UnstableApiUsage")
     override fun generate(): Result<Unit> {
         val assets = args.allAssets
 
@@ -211,9 +214,9 @@ internal class ResourcePackCustomModelGeneration(
 
     private fun Assets.modelKey(order: Int, additionExtension: String = ""): Key {
         return if (additionExtension.isBlank()) {
-            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}_$order")
+            Key.key(RESOURCE_NAMESPACE, "item/${key.namespace()}/${key.value()}_$order")
         } else {
-            Key.key(RESOURCE_NAME, "item/${key.namespace()}/${key.value()}_$order.$additionExtension")
+            Key.key(RESOURCE_NAMESPACE, "item/${key.namespace()}/${key.value()}_$order.$additionExtension")
         }
     }
 
@@ -229,8 +232,8 @@ internal class ResourcePackCustomModelGeneration(
         val layers = textures().layers()
         if (layers.isEmpty()) return this
         val newTextures = layers.map {
-            val key = it.key()!!
-            val newKey = Key.key(RESOURCE_NAME, key.value())
+            val key = requireNotNull(it.key()) { "Texture key is null" }
+            val newKey = Key.key(RESOURCE_NAMESPACE, key.value())
             ModelTexture.ofKey(newKey)
         }
 
