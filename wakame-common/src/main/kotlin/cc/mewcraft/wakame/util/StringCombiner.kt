@@ -45,9 +45,8 @@ class StringCombiner(
      * whether the list should be included in the combination process.
      *
      * @param list The list of strings to be added.
-     * @param condition A lambda function that takes a List<String> and returns a Boolean. This condition
-     * determines if the list should be included in the combination. The default condition always returns true,
-     * meaning the list is always included.
+     * @param condition This condition determines if the list should be included in the combination.
+     * The default condition always returns true, meaning the list is always included.
      * @return Returns the current instance of [StringCombiner] to support fluent API style.
      */
     fun addList(list: List<String>, condition: Boolean = true): StringCombiner {
