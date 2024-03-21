@@ -4,9 +4,9 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 /**
- * 提供函数来修改一个 NekoItemStack 的状态。改动将直接应用到底层物品上。
+ * 提供函数来修改一个 NekoStack 的状态。改动将直接应用到底层物品上。
  */
-interface NekoItemStackSetter {
+interface NekoStackSetter {
     /**
      * Erases all the custom tags from `this`.
      *

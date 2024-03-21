@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import com.google.common.collect.ClassToInstanceMap
@@ -14,14 +14,14 @@ import java.util.UUID
  * file.
  *
  * The design philosophy of `this` is, that you can use a [NekoItem] as
- * a **blueprint** to create as many [NekoItemStacks][NekoItemStack] as
+ * a **blueprint** to create as many [NekoStacks][NekoStack] as
  * you want by calling [NekoItemRealizer.realize], where each of the
  * ItemStack will have the data of different values, and even have the
  * data of different types. This allows us to create more possibilities
  * for items, achieving better game experience by randomizing the item
  * generation and hence reducing duplication.
  *
- * @see NekoItemStack
+ * @see NekoStack
  */
 interface NekoItem : Keyed {
     /**

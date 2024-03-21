@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.PlainAbilityData
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.item.binary.NekoItemStackImpl
+import cc.mewcraft.wakame.item.binary.NekoStackImpl
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
@@ -16,7 +16,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 internal class ItemCellHolderImpl(
-    private val base: NekoItemStackImpl,
+    private val base: NekoStackImpl,
 ) : ItemCellHolder {
 
     /* Getters */

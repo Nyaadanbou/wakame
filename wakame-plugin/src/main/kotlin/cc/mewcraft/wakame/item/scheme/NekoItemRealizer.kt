@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.crate.Crate
-import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.user.User
 
 // TODO create a mock for it
@@ -18,7 +18,7 @@ interface NekoItemRealizer {
      * @param user the player on which the realization is based
      * @return a once-off NekoStack
      */
-    fun realize(nekoItem: NekoItem, user: User): NekoItemStack
+    fun realize(nekoItem: NekoItem, user: User): NekoStack
 
     /**
      * Realizes an item template against a crate.
@@ -27,6 +27,6 @@ interface NekoItemRealizer {
      * @param crate the crate on which the realization is based
      * @return a once-off NekoStack
      */
-    fun realize(nekoItem: NekoItem, crate: Crate): NekoItemStack
+    fun realize(nekoItem: NekoItem, crate: Crate): NekoStack
 
 }

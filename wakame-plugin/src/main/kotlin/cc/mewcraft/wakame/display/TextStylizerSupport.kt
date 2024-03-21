@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.facade.*
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.core.isEmpty
@@ -58,11 +58,11 @@ internal class TextStylizerImpl(
     private val abilityKeySupplier: AbilityKeySupplier,
     private val attributeKeySupplier: AttributeKeySupplier,
 ) : TextStylizer {
-    override fun stylizeName(item: NekoItemStack): Component {
+    override fun stylizeName(item: NekoStack): Component {
         return itemMetaStylizer.stylizeName(item)
     }
 
-    override fun stylizeLore(item: NekoItemStack): Collection<LoreLine> {
+    override fun stylizeLore(item: NekoStack): Collection<LoreLine> {
         val ret = ObjectArrayList<LoreLine>(16)
 
         // for each meta in the item
@@ -255,7 +255,7 @@ internal class ItemMetaStylizerImpl(
     private val mm: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
     private val rarityStyleTagCache: MutableMap<Rarity, Tag> by reloadable { HashMap() }
 
-    override fun stylizeName(item: NekoItemStack): Component {
+    override fun stylizeName(item: NekoStack): Component {
         val displayName = item.metadata.get<BDisplayNameMeta, _>()
         return if (displayName != null) {
             val resolvers = TagResolver.builder()

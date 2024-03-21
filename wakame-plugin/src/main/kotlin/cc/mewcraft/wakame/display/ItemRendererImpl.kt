@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.util.backingCustomModelData
 import cc.mewcraft.wakame.util.backingDisplayName
@@ -16,7 +16,7 @@ internal class ItemRendererImpl(
     private val gsonSerial: GsonComponentSerializer by inject()
     private val modelLookup: ItemModelDataLookup by inject()
 
-    override fun render(copy: NekoItemStack) {
+    override fun render(copy: NekoStack) {
         require(copy.isNeko) { "Can't render a non-neko ItemStack" }
 
         val displayName = textStylizer.stylizeName(copy)

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.test
 
 import cc.mewcraft.wakame.event.NekoReloadEvent
-import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
+import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.item.scheme.PaperNekoItemRealizer
@@ -73,7 +73,7 @@ class TestListener : KoinComponent, Listener {
 
         when (plainMessage) {
             "r1" -> {
-                val wrap = NekoItemStackFactory.wrap(inventory.itemInMainHand)
+                val wrap = NekoStackFactory.wrap(inventory.itemInMainHand)
                 val lore = wrap.metadata.get<DisplayLoreMeta, _>().orEmpty()
                 val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
@@ -235,10 +235,10 @@ class TestListener : KoinComponent, Listener {
         val inventory = player.inventory
 
         if (plainMessage.startsWith("v-")) {
-            val nekoItemStack = NekoItemStackFactory.wrap(inventory.itemInMainHand)
+            val nekoStack = NekoStackFactory.wrap(inventory.itemInMainHand)
             val variant = plainMessage.substringAfter("v-").toInt()
-            nekoItemStack.putVariant(variant)
-            inventory.setItemInMainHand(nekoItemStack.handle)
+            nekoStack.putVariant(variant)
+            inventory.setItemInMainHand(nekoStack.handle)
         }
     }
 

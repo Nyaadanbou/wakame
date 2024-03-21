@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
 
 /**
- * A renderer that renders name and lore for an [NekoItemStack].
+ * A renderer that renders name and lore for an [NekoStack].
  */
 interface ItemRenderer {
 
@@ -17,16 +17,16 @@ interface ItemRenderer {
      * ### Caution!
      *
      * **The caller must ensure the following:**
-     * - The [copy] is truly "neko" (that is, [NekoItemStack.isNeko] returns
+     * - The [copy] is truly "neko" (that is, [NekoStack.isNeko] returns
      *   `true`), or else it will throw.
      * - The [copy] is a copy of the original item, or else the original one
      *   will be affected as being rendered
      *
-     * @param copy a copy of original [NekoItemStack] from the server side to
+     * @param copy a copy of original [NekoStack] from the server side to
      *     be rendered
      * @throws IllegalArgumentException if the [copy] is not "neko"
      */
     @Contract(pure = false)
-    fun render(copy: NekoItemStack)
+    fun render(copy: NekoStack)
 
 }

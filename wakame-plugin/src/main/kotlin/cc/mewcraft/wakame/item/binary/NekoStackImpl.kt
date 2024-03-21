@@ -21,10 +21,10 @@ import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import java.util.UUID
 
-internal class NekoItemStackImpl(
+internal class NekoStackImpl(
     override val handle: ItemStack,
     override val isOneOff: Boolean = false,
-) : KoinComponent, NekoItemStack {
+) : KoinComponent, NekoStack {
     constructor(mat: Material) : this(
         handle = ItemStack(mat) /* strictly-Bukkit ItemStack */,
         isOneOff = true /* so, it's a one-off instance */

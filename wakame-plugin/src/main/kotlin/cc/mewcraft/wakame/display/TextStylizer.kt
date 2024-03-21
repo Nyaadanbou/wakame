@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
@@ -10,7 +10,7 @@ import net.kyori.adventure.text.Component
 import kotlin.reflect.KClass
 
 /**
- * 为给定 [NekoItemStack] 的 Name 和 Lore 生成格式化后的内容。
+ * 为给定 [NekoStack] 的 Name 和 Lore 生成格式化后的内容。
  */
 internal interface TextStylizer {
 
@@ -24,7 +24,7 @@ internal interface TextStylizer {
      * @param item 要生成名字的物品
      * @return 生成的物品名字
      */
-    fun stylizeName(item: NekoItemStack): Component
+    fun stylizeName(item: NekoStack): Component
 
     /**
      * Generates [lore lines][LoreLine] from the [item]. The returned
@@ -37,7 +37,7 @@ internal interface TextStylizer {
      * @param item the item to generate lore for
      * @return the generated lore lines
      */
-    fun stylizeLore(item: NekoItemStack): Collection<LoreLine>
+    fun stylizeLore(item: NekoStack): Collection<LoreLine>
 
 }
 
@@ -84,7 +84,7 @@ internal interface ItemMetaStylizer {
     /**
      * Stylizes the name of given [item] and returns the component.
      */
-    fun stylizeName(item: NekoItemStack): Component
+    fun stylizeName(item: NekoStack): Component
 
     /* Following are `lore` stylizers. */
 

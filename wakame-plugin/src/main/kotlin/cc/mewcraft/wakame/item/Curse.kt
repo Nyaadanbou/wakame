@@ -2,12 +2,12 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import net.kyori.adventure.key.Key
 
 /**
  * Represents a condition testing whether a [cell][Cell] in a
- * [NekoItemStack] should be enabled or not. If a [cell][Cell] is
+ * [NekoStack] should be enabled or not. If a [cell][Cell] is
  * not enabled, it won't provide any effects as if it doesn't exist.
  */
 interface Curse : Keyed {

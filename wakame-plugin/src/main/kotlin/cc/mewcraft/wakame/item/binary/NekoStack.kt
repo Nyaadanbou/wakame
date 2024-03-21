@@ -11,14 +11,14 @@ import java.util.UUID
 /**
  * A wrapper of [ItemStack] which is created from a [NekoItem].
  *
- * To get an instance of [NekoItemStack], use [NekoItemStackFactory].
+ * To get an instance of [NekoStack], use [NekoStackFactory].
  *
  * This class provides several properties to work with the underlying item
  * stack, mainly manipulating the non-vanilla NBT tags, such as:
  * - checking whether the item is a neko item
  * - look up the identifier of the neko item
  */
-interface NekoItemStack : NekoItemStackSetter {
+interface NekoStack : NekoStackSetter {
     /**
      * The wrapped [ItemStack].
      *
@@ -40,15 +40,15 @@ interface NekoItemStack : NekoItemStackSetter {
     val handle: ItemStack // TODO use `Any` to directly store a NMS object?
 
     /**
-     * Records whether `this` is a one-off [NekoItemStack] instance.
+     * Records whether `this` is a one-off [NekoStack] instance.
      *
-     * A one-off [NekoItemStack] instance is effectively backed by a
+     * A one-off [NekoStack] instance is effectively backed by a
      * strictly-Bukkit [ItemStack]. That is, the [handle] is a strictly-Bukkit
      * [ItemStack].
      *
-     * It should be noted, once the [handle] of a one-off [NekoItemStack] has
+     * It should be noted, once the [handle] of a one-off [NekoStack] has
      * been added to the underlying game world, any changes to the one-off
-     * [NekoItemStack] **will not** reflect to that one in the underlying game
+     * [NekoStack] **will not** reflect to that one in the underlying game
      * world. This is because the server implementation always makes a NMS copy
      * out of the strictly-Bukkit [ItemStack] when the item is being added to
      * the underlying game world.

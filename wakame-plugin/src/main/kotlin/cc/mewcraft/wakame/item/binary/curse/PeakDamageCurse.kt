@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.BinaryData
 import cc.mewcraft.wakame.item.CurseKeys
-import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.util.compoundShadowTag
 import cc.mewcraft.wakame.util.toStableShort
 import me.lucko.helper.shadows.nbt.ShadowTag
@@ -33,7 +33,7 @@ data class PeakDamageCurse(
      * Returns `true` if the highest damage from [element] dealt by the item is
      * greater than [amount].
      */
-    override fun test(context: NekoItemStack): Boolean =
+    override fun test(context: NekoStack): Boolean =
         context.statistics.peakDamage.get(element) >= amount
 
     override fun asShadowTag(): ShadowTag {

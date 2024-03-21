@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.Curse
 import cc.mewcraft.wakame.item.ShadowTagLike
-import cc.mewcraft.wakame.item.binary.NekoItemStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.scheme.curse.SchemeCurse
 import cc.mewcraft.wakame.util.RandomizedValue
 
@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.util.RandomizedValue
  * numeric values as [RandomizedValue]. In contrast, [BinaryCurse] simply
  * stores numeric values as primitives since it's a reflection on NBT data.
  */
-sealed interface BinaryCurse : Curse, ShadowTagLike, Condition<NekoItemStack>
+sealed interface BinaryCurse : Curse, ShadowTagLike, Condition<NekoStack>
 
 /**
  * Gets the empty condition.

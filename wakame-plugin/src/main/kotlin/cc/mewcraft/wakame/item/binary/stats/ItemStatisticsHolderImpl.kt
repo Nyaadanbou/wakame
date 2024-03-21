@@ -2,13 +2,13 @@ package cc.mewcraft.wakame.item.binary.stats
 
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.item.binary.NekoItemStackImpl
+import cc.mewcraft.wakame.item.binary.NekoStackImpl
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 internal class ItemStatisticsHolderImpl(
-    private val base: NekoItemStackImpl,
+    private val base: NekoStackImpl,
 ) : ItemStatisticsHolder {
 
     @InternalApi

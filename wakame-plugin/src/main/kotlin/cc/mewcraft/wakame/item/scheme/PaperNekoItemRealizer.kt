@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.crate.Crate
-import cc.mewcraft.wakame.item.binary.NekoItemStack
-import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
+import cc.mewcraft.wakame.item.binary.NekoStack
+import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.item.scheme.meta.*
@@ -30,10 +30,10 @@ import cc.mewcraft.wakame.item.scheme.meta.SkinOwnerMeta as SSkinOwnerMeta
 
 object PaperNekoItemRealizer : NekoItemRealizer {
 
-    override fun realize(nekoItem: NekoItem, user: User): NekoItemStack = realize0(nekoItem, user)
-    override fun realize(nekoItem: NekoItem, crate: Crate): NekoItemStack = realize0(nekoItem, crate)
+    override fun realize(nekoItem: NekoItem, user: User): NekoStack = realize0(nekoItem, user)
+    override fun realize(nekoItem: NekoItem, crate: Crate): NekoStack = realize0(nekoItem, crate)
 
-    private fun realize0(nekoItem: NekoItem, any: Any): NekoItemStack {
+    private fun realize0(nekoItem: NekoItem, any: Any): NekoStack {
         val context = SchemeGenerationContext(SchemaGenerationTrigger.wrap(any))
         val nekoStack = createItemStack0(nekoItem, context)
         return nekoStack
@@ -45,11 +45,11 @@ object PaperNekoItemRealizer : NekoItemRealizer {
      * @param context the input context
      * @return a new once-off NekoStack
      */
-    private fun createItemStack0(nekoItem: NekoItem, context: SchemeGenerationContext): NekoItemStack {
+    private fun createItemStack0(nekoItem: NekoItem, context: SchemeGenerationContext): NekoStack {
         val nekoStack = run {
             val namespacedKey = nekoItem.material.asNamespacedKey
             val material = requireNotNull(Registry.MATERIAL.get(namespacedKey)) { "Can't find material with key '{${nekoItem.material}'" }
-            NekoItemStackFactory.new(material)
+            NekoStackFactory.new(material)
         }
 
         // write base data

@@ -1,6 +1,6 @@
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
+import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.item.scheme.*
@@ -113,7 +113,7 @@ class ItemDeserializationTest : KoinTest {
             }
 
             // just return an empty item
-            NekoItemStackFactory.new(Material.AIR)
+            NekoStackFactory.new(Material.AIR)
         }
 
         // call

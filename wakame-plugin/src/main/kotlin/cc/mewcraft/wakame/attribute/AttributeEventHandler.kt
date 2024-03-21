@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
-import cc.mewcraft.wakame.item.binary.NekoItemStack
-import cc.mewcraft.wakame.item.binary.NekoItemStackFactory
+import cc.mewcraft.wakame.item.binary.NekoStack
+import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.user.asNeko
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
@@ -106,12 +106,12 @@ class AttributeEventHandler : KoinComponent {
         attributeMap.clearModifiers(nekoStack.uuid)
     }
 
-    private fun ItemStack?.toNekoStack(): NekoItemStack? {
+    private fun ItemStack?.toNekoStack(): NekoStack? {
         if (this == null || this.isEmpty) {
             return null
         }
 
-        val nekoStack = NekoItemStackFactory.wrap(this)
+        val nekoStack = NekoStackFactory.wrap(this)
         if (nekoStack.isNotNeko) {
             return null
         }
