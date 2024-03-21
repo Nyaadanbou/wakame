@@ -68,6 +68,17 @@ data class ImmutableKizamiEffect(
 
 /**
  * The serializer of kizami effect.
+ *
+ * ## Node structure
+ *
+ * ```yaml
+ * <node>:
+ *   - <key>
+ *     <impl_defined>
+ *   ...
+ *   - <key>
+ *     <impl_defined>
+ * ```
  */
 object KizamiEffectSerializer : SchemeSerializer<KizamiEffect> {
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiEffect {

@@ -46,7 +46,7 @@ private class NonNullRarityMeta(
             dynamic.pick(context.level, context.random)
         } else {
             // fallback to the global rarity mappings
-            LevelMappingRegistry.getOrThrow(LevelMappingRegistry.GLOBAL_NAME).pick(context.level, context.random)
+            LevelMappingRegistry.INSTANCES.get(LevelMappingRegistry.GLOBAL_NAME).pick(context.level, context.random)
         }.also {
             context.rarities += it // leave trace to the context
         }
@@ -66,13 +66,13 @@ internal class RarityMetaSerializer : SchemeItemMetaSerializer<RarityMeta> {
         when {
             string.startsWith(mappingPrefix) -> {
                 return NonNullRarityMeta(
-                    dynamic = LevelMappingRegistry.getOrThrow(string.substringAfter(mappingPrefix)),
+                    dynamic = LevelMappingRegistry.INSTANCES.get(string.substringAfter(mappingPrefix)),
                 )
             }
 
             string.startsWith(rarityPrefix) -> {
                 return NonNullRarityMeta(
-                    static = RarityRegistry.getOrThrow(string.substringAfter(rarityPrefix))
+                    static = RarityRegistry.INSTANCES.get(string.substringAfter(rarityPrefix))
                 )
             }
 

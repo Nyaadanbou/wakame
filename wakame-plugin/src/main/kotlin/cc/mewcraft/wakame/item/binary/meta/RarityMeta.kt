@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
-import cc.mewcraft.wakame.registry.getBy
 import cc.mewcraft.wakame.util.getByteOrNull
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -21,7 +20,7 @@ internal class RarityMeta(
     override fun getOrNull(): Rarity? {
         return holder.rootOrNull
             ?.getByteOrNull(key.value())
-            ?.let { RarityRegistry.getBy(it) }
+            ?.let { RarityRegistry.findBy(it) }
     }
 
     override fun remove() {
@@ -29,7 +28,7 @@ internal class RarityMeta(
     }
 
     override fun set(value: Rarity) {
-        holder.rootOrCreate.putByte(key.value(), value.binary)
+        holder.rootOrCreate.putByte(key.value(), value.binaryId)
     }
 
     companion object : ItemMetaCompanion {

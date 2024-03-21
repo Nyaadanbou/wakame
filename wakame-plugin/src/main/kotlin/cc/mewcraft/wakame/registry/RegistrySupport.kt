@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableSet
@@ -8,111 +7,158 @@ import com.google.common.collect.ImmutableSet
 // Side note: use CMD-7 to navigate this file
 
 /**
- * An abstract registry.
+ * An abstract key-value registry.
  */
 interface Registry<K, V> {
-    @InternalApi
-    val name2ObjectMapping: MutableMap<K, V>
-
     /**
-     * All the values in this registry.
+     * All the [instances][V] in this registry.
      */
-    val values: Set<V>
+    val objects: Set<V>
 
     /**
      * Gets specified value in this registry.
      *
-     * @param name the name from which value you want to retrieve
+     * @param uniqueId the name from which value you want to retrieve
      * @return the specified value or `null` if not existing
      */
-    fun get(name: K?): V?
+    fun find(uniqueId: K?): V?
 
     /**
      * Gets specified value in this registry.
      *
-     * @param name the name from which value you want to retrieve
+     * @param uniqueId the name from which value you want to retrieve
      * @return the specified value
      * @throws IllegalStateException if the specified value does not exist
      */
-    fun getOrThrow(name: K): V =
-        requireNotNull(get(name)) { "Can't find object for name $name" }
+    fun get(uniqueId: K): V =
+        requireNotNull(find(uniqueId)) { "Can't find object for uniqueId '$uniqueId'" }
 
     /**
      * Registers a new entry into this registry.
      *
-     * @param name the name of the new entry
-     * @param value the new value
+     * @param uniqueId the unique identifier of the new entry
+     * @param value the value to which the unique identifier maps
      */
-    fun registerName2Object(name: K, value: V)
+    fun register(uniqueId: K, value: V)
 
     /**
-     * Clears all entries.
+     * Clears all registered entries.
      */
-    fun clearName2Object()
+    fun clear()
 }
 
 /**
- * Operations of mapping [STRING] to [BINARY], and the reversed way.
+ * Operations of mapping [K] to [B], and the reversed way.
  */
-interface BiMapRegistry<STRING, BINARY> {
-    @InternalApi
-    val binary2NameMapping: BiMap<STRING, BINARY>
-
-    fun getBinaryBy(name: STRING?): BINARY?
-    fun getBinaryByOrThrow(name: STRING): BINARY
-    fun getNameBy(binary: BINARY?): STRING?
-    fun getNameByOrThrow(binary: BINARY): STRING
-    fun registerBinary2Name(name: STRING, binary: BINARY)
+interface BiRegistry<K, B> {
+    /**
+     * Gets binary identifier by unique identifier.
+     */
+    fun findBinaryIdBy(uniqueId: K?): B?
 
     /**
-     * Clears all entries.
+     * Gets binary identifier by unique identifier.
      */
-    fun clearBinary2Name()
+    fun getBinaryIdBy(uniqueId: K): B
+
+    /**
+     * Gets unique identifier by binary identifier.
+     */
+    fun findUniqueIdBy(binaryId: B?): K?
+
+    /**
+     * Gets unique identifier by binary identifier.
+     */
+    fun getUniqueIdBy(binaryId: B): K
+
+    /**
+     * Registers a bi mapping.
+     */
+    fun register(uniqueId: K, binaryId: B)
+
+    /**
+     * Clears all registered bi entries.
+     */
+    fun clear()
+}
+
+/**
+ * Operations of directly mapping binary identifier to object.
+ *
+ * Side note: the name of this interface is bad, never mind.
+ */
+@Suppress("PropertyName")
+interface BiKnot<K, V, B> {
+    val INSTANCES: Registry<K, V>
+    val BI_LOOKUP: BiRegistry<K, B>
+
+    /**
+     * Gets an object by its binary identifier.
+     *
+     * @param binary the binary identifier
+     * @return the specified object or `null`
+     */
+    fun findBy(binary: B): V? {
+        return INSTANCES.find(BI_LOOKUP.findUniqueIdBy(binary))
+    }
+
+    /**
+     * Gets an object by its binary identifier.
+     *
+     * @param binary the binary identifier
+     * @return the specified element
+     * @throws IllegalStateException if the object you look for does not exist
+     */
+    fun getBy(binary: B): V {
+        return INSTANCES.get(BI_LOOKUP.getUniqueIdBy(binary))
+    }
 }
 
 //<editor-fold desc="Internal Implementations">
-@OptIn(InternalApi::class)
-internal class HashMapRegistry<K, V> : Registry<K, V> {
-    override val name2ObjectMapping: MutableMap<K, V> = LinkedHashMap() // order matters
+internal class SimpleRegistry<K, V> : Registry<K, V> {
+    private val uniqueId2ObjectMap: MutableMap<K, V> = LinkedHashMap() // order matters
 
-    override val values: Set<V>
-        get() = ImmutableSet.copyOf(name2ObjectMapping.values)
+    override val objects: Set<V>
+        get() = ImmutableSet.copyOf(uniqueId2ObjectMap.values)
 
-    override fun get(name: K?): V? {
-        return if (name == null) null else name2ObjectMapping[name]
+    override fun find(uniqueId: K?): V? {
+        return if (uniqueId == null) null else uniqueId2ObjectMap[uniqueId]
     }
 
-    override fun registerName2Object(name: K, value: V) {
-        name2ObjectMapping[name] = value
+    override fun register(uniqueId: K, value: V) {
+        uniqueId2ObjectMap[uniqueId] = value
     }
 
-    override fun clearName2Object() {
-        name2ObjectMapping.clear()
+    override fun clear() {
+        uniqueId2ObjectMap.clear()
     }
 }
 
-@OptIn(InternalApi::class)
-internal class HashBiMapRegistry<STRING, BINARY> : BiMapRegistry<STRING, BINARY> {
-    override val binary2NameMapping: BiMap<STRING, BINARY> = HashBiMap.create()
+internal class SimpleBiRegistry<K, B> : BiRegistry<K, B> {
+    private val uniqueId2BinaryIdMap: BiMap<K, B> = HashBiMap.create()
 
-    override fun getBinaryBy(name: STRING?): BINARY? =
-        if (name == null) null else binary2NameMapping[name]
-
-    override fun getBinaryByOrThrow(name: STRING): BINARY =
-        requireNotNull(binary2NameMapping[name]) { "Can't find binary by name $name" }
-
-    override fun getNameBy(binary: BINARY?): STRING? =
-        if (binary == null) null else binary2NameMapping.inverse()[binary]
-
-    override fun getNameByOrThrow(binary: BINARY): STRING =
-        requireNotNull(binary2NameMapping.inverse()[binary]) { "Can't find name by binary $binary" }
-
-    override fun registerBinary2Name(name: STRING, binary: BINARY) {
-        binary2NameMapping[name] = binary
+    override fun findBinaryIdBy(uniqueId: K?): B? {
+        return if (uniqueId == null) null else uniqueId2BinaryIdMap[uniqueId]
     }
 
-    override fun clearBinary2Name() {
-        binary2NameMapping.clear()
+    override fun getBinaryIdBy(uniqueId: K): B {
+        return requireNotNull(uniqueId2BinaryIdMap[uniqueId]) { "Can't find binary by name $uniqueId" }
+    }
+
+    override fun findUniqueIdBy(binaryId: B?): K? {
+        return if (binaryId == null) null else uniqueId2BinaryIdMap.inverse()[binaryId]
+    }
+
+    override fun getUniqueIdBy(binaryId: B): K {
+        return requireNotNull(uniqueId2BinaryIdMap.inverse()[binaryId]) { "Can't find name by binary $binaryId" }
+    }
+
+    override fun register(uniqueId: K, binaryId: B) {
+        uniqueId2BinaryIdMap[uniqueId] = binaryId
+    }
+
+    override fun clear() {
+        uniqueId2BinaryIdMap.clear()
     }
 }
 //</editor-fold>

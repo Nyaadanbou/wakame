@@ -37,7 +37,7 @@ data class AttributeContextHolder(
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key.asString()),
         ExaminableProperty.of("operation", operation.key),
-        ExaminableProperty.of("element", element?.key),
+        ExaminableProperty.of("element", element?.uniqueId),
     )
 
     override fun toString(): String = toSimpleString()

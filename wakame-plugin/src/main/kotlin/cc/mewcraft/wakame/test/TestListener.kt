@@ -43,7 +43,7 @@ class TestListener : KoinComponent, Listener {
 
         when (plainMessage) {
             "i1" -> {
-                val nekoItem = NekoItemRegistry.getOrThrow("short_sword:demo")
+                val nekoItem = NekoItemRegistry.get("short_sword:demo")
                 val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.asNeko())
                 inventory.addItem(nekoStack.handle)
             }
@@ -58,7 +58,7 @@ class TestListener : KoinComponent, Listener {
 
         when {
             plainMessage.startsWith("i-") -> {
-                val nekoItem = NekoItemRegistry.getOrThrow(plainMessage.substringAfter("i-"))
+                val nekoItem = NekoItemRegistry.get(plainMessage.substringAfter("i-"))
                 val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.asNeko())
                 inventory.addItem(nekoStack.handle)
             }

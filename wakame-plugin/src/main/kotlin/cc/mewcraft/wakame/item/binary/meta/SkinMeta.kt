@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.registry.ItemSkinRegistry
-import cc.mewcraft.wakame.registry.getBy
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.util.getShortOrNull
 import me.lucko.helper.nbt.ShadowTagType
@@ -21,7 +20,7 @@ internal class SkinMeta(
     override fun getOrNull(): ItemSkin? {
         return holder.rootOrNull
             ?.getShortOrNull(key.value())
-            ?.let { ItemSkinRegistry.getBy(it) }
+            ?.let { ItemSkinRegistry.findBy(it) }
     }
 
     override fun remove() {
@@ -29,7 +28,7 @@ internal class SkinMeta(
     }
 
     override fun set(value: ItemSkin) {
-        holder.rootOrCreate.putShort(key.value(), value.binary)
+        holder.rootOrCreate.putShort(key.value(), value.binaryId)
     }
 
     companion object : ItemMetaCompanion {

@@ -11,7 +11,7 @@ import java.lang.reflect.Type
  *
  * The object is essentially a mapping from [Int] to [KizamiEffect].
  */
-class KizamiInstance(
+data class KizamiInstance(
     /**
      * The kizami to which the [effect] corresponds.
      */
@@ -40,6 +40,23 @@ class KizamiInstance(
     }
 }
 
+/**
+ * The serializer of kizami instance.
+ *
+ * ## Node structure
+ *
+ * ```yaml
+ * <node>:
+ *   uuid: <UUID>
+ *   binary_index: <Byte>
+ *   display_name: <MiniMessage String>
+ *   styles: <MiniMessage String>
+ *   effects:
+ *     <Int>: <List of KizamiEffect>
+ *     ...
+ *     <Int>: <List of KizamiEffect>
+ * ```
+ */
 object KizamiInstanceSerializer : SchemeSerializer<KizamiInstance> {
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiInstance {
         val kizami = node.requireKt<Kizami>()

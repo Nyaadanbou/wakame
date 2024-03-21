@@ -2,9 +2,8 @@ package cc.mewcraft.wakame
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
-import org.koin.core.component.KoinComponent
 
-interface FriendlyNamed : KoinComponent {
+interface FriendlyNamed {
     /**
      * The display name that end-users can understand.
      */

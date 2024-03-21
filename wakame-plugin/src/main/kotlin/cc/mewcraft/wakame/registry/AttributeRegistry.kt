@@ -442,11 +442,11 @@ private val TAG_TYPE_2_NUMBER_CONVERTER_MAP: Map<ShadowTagType, MethodHandle> =
 /* Specialized Compound Operations */
 
 private fun CompoundShadowTag.getElement(): Element {
-    return this.getByteOrNull(NekoTags.Attribute.ELEMENT)?.let { ElementRegistry.getByOrThrow(it) } ?: ElementRegistry.DEFAULT
+    return this.getByteOrNull(NekoTags.Attribute.ELEMENT)?.let { ElementRegistry.getBy(it) } ?: ElementRegistry.DEFAULT
 }
 
 private fun CompoundShadowTag.putElement(element: Element) {
-    this.putByte(NekoTags.Attribute.ELEMENT, element.binary)
+    this.putByte(NekoTags.Attribute.ELEMENT, element.binaryId)
 }
 
 private fun CompoundShadowTag.getOperation(): AttributeModifier.Operation {

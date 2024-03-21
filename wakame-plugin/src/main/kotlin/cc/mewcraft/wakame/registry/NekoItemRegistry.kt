@@ -33,27 +33,11 @@ import org.slf4j.Logger
         RarityRegistry::class,
     ]
 )
-object NekoItemRegistry : KoinComponent, Initializable,
-    Registry<Key, NekoItem> by HashMapRegistry() {
+object NekoItemRegistry : KoinComponent, Initializable {
+    val INSTANCES: Registry<Key, NekoItem> = SimpleRegistry()
 
-    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
-
-    fun get(key: String): NekoItem? = get(Key.key(key))
-    fun getOrThrow(key: String): NekoItem = getOrThrow(Key.key(key))
-
-    private fun loadConfiguration() {
-        clearName2Object()
-
-        NekoItemNodeIterator.forEach { key, node ->
-            runCatching {
-                NekoItemFactory.create(key, node)
-            }.onSuccess {
-                registerName2Object(key, it)
-            }.onFailure {
-                logger.error("Can't load item '$key'", it)
-            }
-        }
-    }
+    fun get(key: String): NekoItem = INSTANCES.get(Key.key(key))
+    fun find(key: String): NekoItem? = INSTANCES.find(Key.key(key))
 
     override fun onPreWorld() {
         loadConfiguration()
@@ -61,5 +45,21 @@ object NekoItemRegistry : KoinComponent, Initializable,
 
     override fun onReload() {
         loadConfiguration()
+    }
+
+    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
+
+    private fun loadConfiguration() {
+        INSTANCES.clear()
+
+        NekoItemNodeIterator.forEach { key, node ->
+            runCatching {
+                NekoItemFactory.create(key, node)
+            }.onSuccess {
+                INSTANCES.register(key, it)
+            }.onFailure {
+                logger.error("Can't load item '$key'", it)
+            }
+        }
     }
 }

@@ -40,7 +40,7 @@ data class PeakDamageCurse(
         return compoundShadowTag {
             putString(NekoTags.Cell.CURSE_KEY, key.asString())
             putShort(AMOUNT_TAG_NAME, amount.toStableShort())
-            putByte(ELEMENT_TAG_NAME, element.binary)
+            putByte(ELEMENT_TAG_NAME, element.binaryId)
         }
     }
 }

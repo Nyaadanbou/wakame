@@ -7,13 +7,13 @@ import cc.mewcraft.wakame.item.scheme.*
 import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.kizamiModule
-import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.reference.referenceModule
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.skin.skinModule
+import cc.mewcraft.wakame.user.User
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -76,14 +76,14 @@ class ItemDeserializationTest : KoinTest {
     @Test
     fun `scheme item construction`() {
         val key = Key.key("short_sword:demo")
-        val demo = NekoItemRegistry.get(key)
+        val demo = NekoItemRegistry.INSTANCES.find(key)
         assertNotNull(demo, "The item '$key' is not loaded correctly")
     }
 
     @Test
     fun `binary item construction`() {
         val key = Key.key("short_sword:demo")
-        val demo = NekoItemRegistry.get(key)
+        val demo = NekoItemRegistry.INSTANCES.find(key)
         assertNotNull(demo, "The item '$key' is not loaded correctly")
 
         val user = mockk<User>()

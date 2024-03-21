@@ -54,12 +54,12 @@ object AssetsLookup : Initializable, KoinComponent {
     }
 
     fun getAssets(key: Key): List<Assets> {
-        require(NekoItemRegistry.get(key) != null) { "No such NekoItem: $key" }
+        require(NekoItemRegistry.INSTANCES.find(key) != null) { "No such NekoItem: $key" }
         return assets[key].toList()
     }
 
     fun getAssets(key: Key, sid: Int): Assets {
-        require(NekoItemRegistry.get(key) != null) { "No such NekoItem: $key" }
+        require(NekoItemRegistry.INSTANCES.find(key) != null) { "No such NekoItem: $key" }
         return assets[key].firstOrNull { it.variant == sid } ?: throw NoSuchElementException("No such variant: $sid")
     }
 

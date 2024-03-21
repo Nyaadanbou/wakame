@@ -350,6 +350,7 @@ core_groups:
     filters: [ ]
     selects: { }
     default:
+      # TODO 支持添加空词条栏核心
       - key: attribute:lifesteal
         value: 0.2
         weight: 10

@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.registry.getByOrThrow
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import me.lucko.helper.nbt.ShadowTagType
@@ -23,13 +22,13 @@ internal class KizamiMeta(
         return holder.rootOrNull
             ?.getByteArrayOrNull(key.value())
             ?.mapTo(ObjectArraySet(4)) {
-                KizamiRegistry.getByOrThrow(it)
+                KizamiRegistry.getBy(it)
             }
     }
 
     override fun set(value: Set<Kizami>) {
         require(value.isNotEmpty()) { "Set<Kizami> must be not empty" }
-        val byteArray = value.map { it.binary }.toByteArray()
+        val byteArray = value.map { it.binaryId }.toByteArray()
         holder.rootOrCreate.putByteArray(key.value(), byteArray)
     }
 

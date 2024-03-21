@@ -44,7 +44,7 @@ internal class LevelMappingSerializer : SchemeSerializer<LevelMappings> {
                 weightN.childrenMap().forEach { (k, n2) ->
                     val rarityName = k.toString()
                     val rarityWeight = n2.requireKt<Double>()
-                    weight[RarityRegistry.getOrThrow(rarityName)] = rarityWeight
+                    weight[RarityRegistry.INSTANCES.get(rarityName)] = rarityWeight
                 }
             }
 

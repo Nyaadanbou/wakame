@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import java.util.*
+import java.util.UUID
 
 /**
  * An [AttributeModifier] is responsible to modify an [Attribute]. By
@@ -40,7 +40,7 @@ data class AttributeModifier(
             )
 
             fun byKey(key: String): Operation {
-                return requireNotNull(byKeyOrNull(key)) { "No operation with key $key" }
+                return requireNotNull(byKeyOrNull(key)) { "No operation with key '$key'" }
             }
 
             fun byKeyOrNull(key: String): Operation? {
@@ -51,7 +51,7 @@ data class AttributeModifier(
                 return if (id >= 0 && id < OPERATIONS_ARRAY.size) {
                     OPERATIONS_ARRAY[id]
                 } else {
-                    throw IllegalArgumentException("No operation with id $id")
+                    throw IllegalArgumentException("No operation with id '$id'")
                 }
             }
         }

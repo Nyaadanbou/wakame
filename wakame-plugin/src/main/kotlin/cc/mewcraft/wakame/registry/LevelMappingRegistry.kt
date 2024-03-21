@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
-import cc.mewcraft.wakame.util.NekoConfigurationNode
 import cc.mewcraft.wakame.util.requireKt
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -14,37 +13,13 @@ import org.koin.core.qualifier.named
 /**
  * The registry of `level -> rarity` mappings.
  */
-@PreWorldDependency(
-    runBefore = [RarityRegistry::class]
-)
-@ReloadDependency(
-    runBefore = [RarityRegistry::class]
-)
-object LevelMappingRegistry : KoinComponent, Initializable,
-    Registry<String, LevelMappings> by HashMapRegistry() {
+@PreWorldDependency(runBefore = [RarityRegistry::class])
+@ReloadDependency(runBefore = [RarityRegistry::class])
+object LevelMappingRegistry : KoinComponent, Initializable {
+    const val GLOBAL_NAME = "global"
+    const val CUSTOM_NAME = "custom"
 
-    // constants
-    const val GLOBAL_NAME: String = "global"
-
-    // configuration stuff
-    private lateinit var root: NekoConfigurationNode
-
-    private fun loadConfiguration() {
-        clearName2Object()
-
-        root = get<NekoConfigurationLoader>(named(LEVEL_CONFIG_LOADER)).load()
-
-        // deserialize the `global` mappings
-        val globalLevelMappings = root.node("global").requireKt<LevelMappings>()
-        registerName2Object(GLOBAL_NAME, globalLevelMappings)
-
-        // deserialize all custom mappings
-        root.node("custom").childrenMap().forEach { (k, n) ->
-            val rarityMappingsName = k.toString()
-            val levelMappings = n.requireKt<LevelMappings>()
-            registerName2Object(rarityMappingsName, levelMappings)
-        }
-    }
+    val INSTANCES: Registry<String, LevelMappings> = SimpleRegistry()
 
     override fun onPreWorld() {
         loadConfiguration()
@@ -52,5 +27,24 @@ object LevelMappingRegistry : KoinComponent, Initializable,
 
     override fun onReload() {
         loadConfiguration()
+    }
+
+    private fun loadConfiguration() {
+        INSTANCES.clear()
+
+        val root = get<NekoConfigurationLoader>(named(LEVEL_CONFIG_LOADER)).load()
+
+        // deserialize the `global` mappings
+        val globalLevelMappings = root.node(GLOBAL_NAME).requireKt<LevelMappings>()
+        // register the `global` mappings
+        INSTANCES.register(GLOBAL_NAME, globalLevelMappings)
+
+        // deserialize all custom mappings
+        root.node(CUSTOM_NAME).childrenMap().forEach { (k, n) ->
+            val rarityMappingsName = k.toString()
+            val levelMappings = n.requireKt<LevelMappings>()
+            // register each custom mappings
+            INSTANCES.register(rarityMappingsName, levelMappings)
+        }
     }
 }

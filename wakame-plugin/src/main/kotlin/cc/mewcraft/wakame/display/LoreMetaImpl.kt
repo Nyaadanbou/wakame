@@ -3,9 +3,8 @@ package cc.mewcraft.wakame.display
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.util.StringCombiner
 import net.kyori.adventure.text.Component
-
-// TODO 统一 key 的生成规则
 
 /**
  * 代表一个自定义固定内容的 [LoreMeta].
@@ -68,7 +67,13 @@ internal data class AttributeLoreMeta(
          * 元素种类的顺序。
          */
         val elementIndex: List<String>,
-    )
+    ) {
+        init {
+            // validate values
+            operationIndex.forEach { AttributeModifier.Operation.byKey(it) }
+            elementIndex.forEach { ElementRegistry.INSTANCES.get(it) }
+        }
+    }
 
     /**
      * 根据以下衍生规则:
@@ -83,21 +88,12 @@ internal data class AttributeLoreMeta(
                 return listOf(rawKey) // for `empty`, do not derive
             }
 
-            val ret = ArrayList<FullKey>()
-            val meta = AttributeRegistry.structMetadata.getValue(rawKey)
             val namespace = rawKey.namespace()
-            val rawValue = StringBuilder(rawKey.value())
-            for (operation in derivation.operationIndex) {
-                requireNotNull(AttributeModifier.Operation.byKeyOrNull(operation)) { "Unknown attribute modifier operation: '$operation'" }
-                if (!meta.element) {
-                    ret += FullKey.key(namespace, "$rawValue.$operation")
-                } else {
-                    for (element in derivation.elementIndex) {
-                        requireNotNull(ElementRegistry.get(element)) { "Unknown element: '$element'" }
-                        ret += FullKey.key(namespace, "$rawValue.$operation.$element")
-                    }
-                }
-            }
-            return ret
+            val values = StringCombiner(rawKey.value(), ".") {
+                addList(derivation.operationIndex)
+                addList(derivation.elementIndex, AttributeRegistry.structMetadata.getValue(rawKey).element)
+            }.combine()
+
+            return values.map { FullKey.key(namespace, it) }
         }
 }

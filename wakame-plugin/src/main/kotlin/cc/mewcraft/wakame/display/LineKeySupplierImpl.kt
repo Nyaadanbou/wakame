@@ -10,8 +10,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 
-// TODO 统一 key 的生成实现
-
 internal class AbilityKeySupplierImpl(
     private val config: RendererConfiguration,
 ) : AbilityKeySupplier {
@@ -142,7 +140,7 @@ internal class AttributeKeySupplierImpl(
                 append(operation.key)
                 element?.let {
                     append(".")
-                    append(it.key)
+                    append(it.uniqueId)
                 }
             }
             Key.key(rawKey.namespace(), newValue)

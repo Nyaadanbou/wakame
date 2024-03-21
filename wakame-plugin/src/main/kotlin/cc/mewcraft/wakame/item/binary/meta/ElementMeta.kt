@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.getByOrThrow
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import me.lucko.helper.nbt.ShadowTagType
@@ -25,7 +24,7 @@ internal class ElementMeta(
         return holder.rootOrNull
             ?.getByteArrayOrNull(key.value())
             ?.mapTo(ObjectArraySet(2)) {
-                ElementRegistry.getByOrThrow(it)
+                ElementRegistry.getBy(it)
             }
     }
 
@@ -35,7 +34,7 @@ internal class ElementMeta(
 
     override fun set(value: Set<Element>) {
         require(value.isNotEmpty()) { "Set<Element> must be not empty" }
-        val byteArray = value.map { it.binary }.toByteArray()
+        val byteArray = value.map { it.binaryId }.toByteArray()
         holder.rootOrCreate.putByteArray(key.value(), byteArray)
     }
 

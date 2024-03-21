@@ -45,7 +45,7 @@ object DefaultAttributes {
             // Each of these attributes is associated with a certain element.
             // Mechanics of these attributes are implementation-defined.
 
-            ElementRegistry.values.forEach {
+            ElementRegistry.INSTANCES.objects.forEach {
                 add(Attributes.byElement(it).DEFENSE)
                 add(Attributes.byElement(it).DEFENSE_PENETRATION)
                 add(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
