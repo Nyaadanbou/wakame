@@ -6,14 +6,12 @@ import team.unnamed.hephaestus.bukkit.BoneView
 import team.unnamed.hephaestus.bukkit.ModelView
 import team.unnamed.hephaestus.modifier.BoneModifier
 import java.lang.ref.WeakReference
-import java.util.*
 
 class OnGroundBoneModifier(base: Entity) : BoneModifier {
-    private val base = WeakReference(Objects.requireNonNull(base, "base"))
+    private val base: WeakReference<Entity> = WeakReference(base)
 
     override fun modifyPosition(original: Vector3Float): Vector3Float {
-        val base = base.get() ?: // base removed?
-            return original
+        val base = base.get() ?: return original // base removed?
         return original.y(original.y() - base.height.toFloat())
     }
 

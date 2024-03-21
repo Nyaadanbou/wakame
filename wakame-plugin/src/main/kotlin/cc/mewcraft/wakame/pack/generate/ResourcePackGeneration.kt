@@ -6,9 +6,9 @@ import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.lookup.Assets
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.material
+import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.model.ModelRegistry
-import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
@@ -97,7 +97,7 @@ internal class ResourcePackExternalGeneration(
     override fun generate(): Result<Unit> {
         // runCatching {
         //     // TODO: 异步触发事件
-        //     val isCancelled = ResourcePackGeneratingEvent(args).callEvent()
+        //     val isCancelled = ResourcePackGenerateEvent(args).callEvent()
         //     if (isCancelled)
         //         return Result.failure(GenerationCancelledException())
         // }.onFailure { return Result.failure(it) }
@@ -176,7 +176,7 @@ internal class ResourcePackCustomModelGeneration(
                     val vanillaModelInCustomResourcePack = resourcePack.model(materialKey)
 
                     val vanillaCmdOverrideBuilder = vanillaModelInCustomResourcePack?.toBuilder()
-                        ?: vanillaResourcePack.model(materialKey).toBuilder() /* Generate the vanilla model if it doesn't exist */
+                        ?: vanillaResourcePack.model(materialKey).toBuilder() // Generate the vanilla model if it doesn't exist
 
                     val vanillaCmdOverride = vanillaCmdOverrideBuilder
                         .addOverride(overrideGenerator.generate())

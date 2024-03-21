@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.lookup.AssetsLookup
@@ -12,12 +11,7 @@ import cc.mewcraft.wakame.pack.service.ResourcePackService
 import cc.mewcraft.wakame.pack.service.Service
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.formatSize
-import com.github.shynixn.mccoroutine.bukkit.launch
-import com.github.shynixn.mccoroutine.bukkit.scope
 import com.google.common.base.Throwables
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Server

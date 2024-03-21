@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.pack.generate.GenerationArgs;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,32 +11,24 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * You can use this event to change {@link GenerationArgs} to modify the resource pack.
  * <p>
- * If you want to cancel the generation, you can use {@link #setCancelled(boolean)}.
- * <p>
- * If you want to
+ * To cancel the generation, use {@link #setCancelled(boolean)}.
  */
-public class ResourcePackGeneratingEvent extends Event implements Cancellable {
+public class ResourcePackGenerateEvent extends Event implements Cancellable {
+    private static final @NotNull HandlerList HANDLERS = new HandlerList();
+    public static @NotNull HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     private final GenerationArgs args;
     private boolean cancelled;
 
-    public ResourcePackGeneratingEvent(GenerationArgs args) {
+    public ResourcePackGenerateEvent(GenerationArgs args) {
         super(true);
         this.args = args;
     }
 
     public GenerationArgs getArgs() {
         return args;
-    }
-
-    private static final @NotNull HandlerList HANDLERS = new HandlerList();
-
-    public static @NotNull HandlerList getHandlerList() {
-        return HANDLERS;
-    }
-
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return HANDLERS;
     }
 
     @Override
@@ -48,5 +39,10 @@ public class ResourcePackGeneratingEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancel) {
         cancelled = cancel;
+    }
+
+    @Override
+    public @NotNull HandlerList getHandlers() {
+        return HANDLERS;
     }
 }

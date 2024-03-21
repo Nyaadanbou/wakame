@@ -13,7 +13,9 @@ import team.unnamed.hephaestus.bukkit.BoneView
 import team.unnamed.hephaestus.bukkit.ModelView
 import team.unnamed.hephaestus.modifier.BoneModifier
 import team.unnamed.hephaestus.util.Quaternion
-import java.util.*
+import java.util.Collections
+import java.util.UUID
+import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentHashMap
 
 class ModelAnimateTask : Runnable, Initializable, KoinComponent {
