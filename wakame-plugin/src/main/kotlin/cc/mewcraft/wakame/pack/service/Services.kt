@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.pack.service
 import cc.mewcraft.wakame.github.GithubRepoManager
 import cc.mewcraft.wakame.pack.GENERATED_RESOURCE_PACK_DIR
 import cc.mewcraft.wakame.pack.RESOURCE_PACK_ZIP_NAME
-import me.lucko.helper.scheduler.HelperExecutors
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.jetbrains.annotations.Blocking
 import org.koin.core.component.KoinComponent
@@ -11,6 +10,8 @@ import org.koin.core.component.inject
 import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.server.ResourcePackServer
 import java.io.File
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 
 sealed interface Service {
@@ -45,6 +46,7 @@ data class ResourcePackService(
     private val appendPort: Boolean,
 ) : Service, KoinComponent {
     private val logger: ComponentLogger by inject()
+    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
 
     init {
         logger.info("Starting resource pack server. Port: $port")
@@ -53,7 +55,7 @@ data class ResourcePackService(
     private val server: ResourcePackServer = ResourcePackServer.server()
         .address(port) // (required) port
         .pack(resourcePack) // (required) pack to serve
-        .executor(HelperExecutors.asyncHelper())
+        .executor(executor)
         .path("/get/${resourcePack.hash()}")
         .build()
 
