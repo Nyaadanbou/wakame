@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
 import cc.mewcraft.wakame.pack.initializer.DirPackInitializer
@@ -13,18 +11,15 @@ import cc.mewcraft.wakame.pack.service.GithubService
 import cc.mewcraft.wakame.pack.service.NoneService
 import cc.mewcraft.wakame.pack.service.ResourcePackService
 import cc.mewcraft.wakame.pack.service.Service
-import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.formatSize
 import com.google.common.base.Throwables
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
-import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.Blocking
 import org.jetbrains.annotations.Contract
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import team.unnamed.creative.BuiltResourcePack
@@ -33,12 +28,9 @@ import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import java.io.File
 import java.util.zip.ZipException
 
-@ReloadDependency(
-    runBefore = [NekoItemRegistry::class]
-)
 internal class ResourcePackManager(
     private val config: ResourcePackConfiguration,
-) : Initializable, KoinComponent {
+) : KoinComponent {
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
 
@@ -187,16 +179,4 @@ internal class ResourcePackManager(
             "<red>WA-KA-ME Resource Pack!!!!!!!!!".mini
         )
     }
-
-    //<editor-fold desc="Initializable">
-    override fun close() {
-        stopServer()
-    }
-
-    override fun onReload() {
-        stopServer()
-        generate(true).getOrElse { logger.error("Failed to re-generate resource pack", it) } // TODO: Only for development. When the resource pack is stable, remove 'true'
-        get<Server>().onlinePlayers.forEach { sendToPlayer(it) }
-    }
-    //</editor-fold>
 }

@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.lookup
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.reloadable
-import cc.mewcraft.wakame.util.requireKt
 import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
 import com.google.common.collect.Tables
@@ -12,10 +9,6 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 
-
-@ReloadDependency(
-    runAfter = [ResourcePackManager::class]
-)
 internal class ItemModelDataLookup(
     private val loader: GsonConfigurationLoader,
 ) : Initializable {

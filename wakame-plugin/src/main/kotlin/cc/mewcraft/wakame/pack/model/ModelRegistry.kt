@@ -2,9 +2,6 @@ package cc.mewcraft.wakame.pack.model
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.pack.ResourcePackManager
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -18,12 +15,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 private const val BBMODELS_DIR = "bbmodels"
 
-@PreWorldDependency(
-    runAfter = [ResourcePackManager::class]
-)
-@ReloadDependency(
-    runAfter = [ResourcePackManager::class]
-)
 object ModelRegistry : Initializable, KoinComponent {
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
@@ -75,7 +66,7 @@ object ModelRegistry : Initializable, KoinComponent {
         return models.values
     }
 
-    override fun onPreWorld() {
+    override fun onPrePack() {
         loadModels().onFailure { it.printStackTrace() }
     }
 

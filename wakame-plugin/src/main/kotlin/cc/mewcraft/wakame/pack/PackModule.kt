@@ -30,7 +30,7 @@ internal fun packModule(): Module = module {
 
     single<ResourcePackManager> {
         ResourcePackManager(new(::ResourcePackConfiguration))
-    } binds arrayOf(Initializable::class)
+    }
 
     single<BukkitModelEngine> {
         BukkitModelEngine_v1_20_R3.create(get(), new(::ModelViewPersistenceHandlerImpl))

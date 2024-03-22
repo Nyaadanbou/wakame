@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.item.scheme.PaperNekoItemRealizer
+import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.pack.model.ModelRegistry
 import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
 import cc.mewcraft.wakame.registry.NekoItemRegistry
@@ -277,6 +278,19 @@ class TestListener : KoinComponent, Listener {
         val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
         if (plainMessage == "reload") {
             NekoReloadEvent().callEvent()
+        }
+    }
+
+    private val resourcePackManager: ResourcePackManager by inject()
+
+    @EventHandler
+    fun testResourcePackReGenerate(e: AsyncChatEvent) {
+        val player = e.player
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        if (plainMessage == "regenpack") {
+            resourcePackManager.generate(reGenerate = true)
+                .onSuccess { player.sendPlainMessage("Resource pack has been re-generated") }
+                .onFailure { player.sendPlainMessage("Failed to re-generate resource pack: $it") }
         }
     }
 }
