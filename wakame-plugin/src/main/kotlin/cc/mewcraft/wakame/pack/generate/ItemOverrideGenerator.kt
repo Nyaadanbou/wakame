@@ -39,7 +39,7 @@ data class ItemModelData(
     val customModelData: Int,
 )
 
-interface ItemOverrideGenerator {
+sealed interface ItemOverrideGenerator {
     val data: ItemModelData
 
     fun generate(): ItemOverride

@@ -52,7 +52,8 @@ class AttributeEventHandler : KoinComponent {
     ////// Private Func //////
 
     private fun shouldHandle(slot: Int, rawSlot: Int, player: Player): Boolean {
-        return (slot == (player.inventory.heldItemSlot)) || (player.openInventory.getSlotType(rawSlot) == SlotType.ARMOR)
+        return (slot == (player.inventory.heldItemSlot) && player.openInventory.getSlotType(rawSlot) == SlotType.QUICKBAR) ||
+                (player.openInventory.getSlotType(rawSlot) == SlotType.ARMOR)
     }
 
     /**

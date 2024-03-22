@@ -5,11 +5,16 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
+import cc.mewcraft.wakame.pack.initializer.DirPackInitializer
+import cc.mewcraft.wakame.pack.initializer.InitializerArg
+import cc.mewcraft.wakame.pack.initializer.PackInitializer
+import cc.mewcraft.wakame.pack.initializer.ZipPackInitializer
 import cc.mewcraft.wakame.pack.service.GithubService
 import cc.mewcraft.wakame.pack.service.NoneService
 import cc.mewcraft.wakame.pack.service.ResourcePackService
 import cc.mewcraft.wakame.pack.service.Service
 import cc.mewcraft.wakame.registry.NekoItemRegistry
+import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.formatSize
 import com.google.common.base.Throwables
 import me.lucko.helper.text3.mini
@@ -24,10 +29,8 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.ResourcePack
-import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import java.io.File
-import java.io.IOException
 import java.util.zip.ZipException
 
 @ReloadDependency(
@@ -44,7 +47,7 @@ internal class ResourcePackManager(
     /**
      * The resource pack service.
      */
-    private lateinit var service: Service
+    private val service: Service by reloadable { loadService() }
 
     /**
      * Generates the resource pack to predefined directory.
@@ -53,26 +56,28 @@ internal class ResourcePackManager(
      */
     fun generate(reGenerate: Boolean = false): Result<Unit> {
         var regen = reGenerate || !this::pack.isInitialized
+        val resourceFile = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+        val resourcePackDir = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_DIR)
+        val initArg = InitializerArg(resourceFile, resourcePackDir)
 
-        val resourceFile = initFile()
-            .getOrElse { return Result.failure(it) }
-        val resourcePackResult = runCatching {
-            if (regen) return@runCatching ResourcePack.resourcePack()
+        val resourcePackResult = PackInitializer.chain(
+            ZipPackInitializer(initArg),
+            DirPackInitializer(initArg)
+        ).init()
 
-            MinecraftResourcePackReader.minecraft()
-                .readFromZipFile(resourceFile)
-                .also { logger.info("Resource pack read") }
-        }
+        val isNoPack = resourcePackResult.exceptionOrNull()
+            ?.let { Throwables.getRootCause(it) } is ZipException
 
         // Read the resource pack from the file
         // The resource pack may be empty if it's the first time to generate, so we need to handle the exception
         val resourcePack = when {
             resourcePackResult.isSuccess -> resourcePackResult.getOrThrow()
-            reGenerate || Throwables.getRootCause(resourcePackResult.exceptionOrNull()!!) !is ZipException -> return Result.failure(resourcePackResult.exceptionOrNull()!!)
-            else -> {
+            isNoPack -> {
                 logger.info("<yellow>Resource pack is empty, re-generating...".mini)
                 ResourcePack.resourcePack().also { regen = true }
             }
+
+            else -> return Result.failure(resourcePackResult.exceptionOrNull()!!)
         }
 
         if (regen) {
@@ -87,7 +92,7 @@ internal class ResourcePackManager(
                 ResourcePackMetaGeneration(generationArgs),
                 ResourcePackIconGeneration(generationArgs),
                 ResourcePackRegistryModelGeneration(generationArgs),
-                // ResourcePackCustomModelGeneration(generationArgs),
+                ResourcePackCustomModelGeneration(generationArgs),
                 ResourcePackExternalGeneration(generationArgs)
             ).generate().getOrElse {
                 if (it !is ResourcePackExternalGeneration.GenerationCancelledException) {
@@ -100,7 +105,7 @@ internal class ResourcePackManager(
                 MinecraftResourcePackWriter.minecraft()
                     .writeToZipFile(resourceFile, resourcePack)
                 MinecraftResourcePackWriter.minecraft()
-                    .writeToDirectory(pluginDataDir.resolve(GENERATED_RESOURCE_PACK_DIR), resourcePack)
+                    .writeToDirectory(resourcePackDir, resourcePack)
             }.getOrElse { return Result.failure(it) }
             logger.info("<green>Resource pack generated".mini)
         }
@@ -110,37 +115,13 @@ internal class ResourcePackManager(
             .getOrElse { return Result.failure(it) }
         pack = builtResourcePack
             .also { logger.info("<green>Resource pack built. File size: <yellow>${resourceFile.formatSize()}".mini) }
-        service = loadService()
         // Start the resource pack server
         runCatching { startServer(regen) }.getOrElse { return Result.failure(it) }
 
         return Result.success(Unit)
     }
 
-    //<editor-fold desc="Init resource pack file">
-    private fun initFile(): Result<File> {
-        val resourcePackPath = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
-        if (resourcePackPath.isDirectory) {
-            return Result.failure(IOException("Resource pack path is a directory"))
-        }
-
-        if (!resourcePackPath.exists()) {
-            // Create the resource pack file if it doesn't exist
-            resourcePackPath.parentFile.mkdirs()
-            if (!resourcePackPath.createNewFile()) {
-                return Result.failure(IOException("Failed to create resource pack file"))
-            }
-        }
-
-        return Result.success(resourcePackPath)
-    }
-    //</editor-fold>
-
     private fun loadService(): Service {
-        if (this::service.isInitialized) {
-            stopServer()
-        }
-
         if (!this::pack.isInitialized) {
             logger.error("Resource pack can not be initialized. Please check the configuration.", IllegalStateException("Resource pack is not initialized"))
             return NoneService

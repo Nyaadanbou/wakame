@@ -43,11 +43,17 @@ data class ResourcePackService(
     private val host: String,
     private val port: Int,
     private val appendPort: Boolean,
-) : Service {
+) : Service, KoinComponent {
+    private val logger: ComponentLogger by inject()
+
+    init {
+        logger.info("Starting resource pack server. Port: $port")
+    }
+
     private val server: ResourcePackServer = ResourcePackServer.server()
-        .address("0.0.0.0", port) // (required) address and port
+        .address(port) // (required) port
         .pack(resourcePack) // (required) pack to serve
-        .executor(HelperExecutors.asyncHelper()) // (optional) request executor (IMPORTANT!)
+        .executor(HelperExecutors.asyncHelper())
         .path("/get/${resourcePack.hash()}")
         .build()
 
@@ -82,6 +88,7 @@ data class GithubService(
 
     override fun start(reGenerate: Boolean) {
         if (!reGenerate) return
+        logger.info("Publishing resource pack to Github")
         val manager = GithubRepoManager(
             localRepoPath = pluginDataDir.resolve("cache").resolve("repo"),
             resourcePackDirPath = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_DIR),
@@ -93,8 +100,8 @@ data class GithubService(
             commitMessage = commitMessage,
         )
 
-        manager.updatePack().onFailure {
-            logger.error("Failed to update resource pack", it)
+        manager.publishPack().onFailure {
+            logger.error("Failed to publish resource pack", it)
         }
     }
 

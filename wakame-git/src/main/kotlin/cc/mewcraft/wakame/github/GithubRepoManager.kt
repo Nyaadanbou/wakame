@@ -30,12 +30,12 @@ class GithubRepoManager(
         } else git = Git.open(localRepoPath)
     }
 
-    fun updatePack(): Result<Unit> {
+    fun publishPack(): Result<Unit> {
         try {
             // 删除远程仓库中指定文件夹下的所有文件
             git.rm().addFilepattern(remotePath).call()
 
-            // 将本地的一个文件夹下的所有文件添加到仓库
+            // 将本地的资源文件夹下的所有文件添加到仓库
             resourcePackDirPath.copyRecursively(localRepoPath.resolve(remotePath), true)
             git.add().addFilepattern(remotePath).call()
 

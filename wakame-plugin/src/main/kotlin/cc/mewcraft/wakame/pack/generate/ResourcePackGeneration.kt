@@ -13,7 +13,6 @@ import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
-import org.jetbrains.annotations.Contract
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -50,7 +49,6 @@ sealed class ResourcePackGeneration(
      *
      * @return a result encapsulating whether the generation succeeds or not
      */
-    @Contract(pure = false)
     abstract fun generate(): Result<Unit>
 
     protected fun generateNext(): Result<Unit> {

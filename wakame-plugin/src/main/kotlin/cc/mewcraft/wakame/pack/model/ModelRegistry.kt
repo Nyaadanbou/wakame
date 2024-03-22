@@ -30,10 +30,10 @@ object ModelRegistry : Initializable, KoinComponent {
     private val models: MutableMap<String, Model> = ConcurrentHashMap()
     private val views: MutableMap<UUID, ModelView> = ConcurrentHashMap()
 
-    private fun loadModels() {
+    private fun loadModels(): Result<Unit> {
         models.clear()
 
-        register(loadModel("test.bbmodel"))
+        return runCatching { register(loadModel("test.bbmodel")) }
     }
 
     private fun loadModel(fileName: String): Model {
@@ -76,10 +76,10 @@ object ModelRegistry : Initializable, KoinComponent {
     }
 
     override fun onPreWorld() {
-        loadModels()
+        loadModels().onFailure { it.printStackTrace() }
     }
 
     override fun onReload() {
-        loadModels()
+        loadModels().onFailure { it.printStackTrace() }
     }
 }
