@@ -30,6 +30,7 @@ class AttributeEventHandler : KoinComponent {
         val player = e.player
         val oldItem = player.inventory.getItem(e.previousSlot)
         val newItem = player.inventory.getItem(e.newSlot)
+
         oldItem.removeAttributeModifiers(player)
         newItem.addAttributeModifiers(player)
     }
@@ -43,6 +44,7 @@ class AttributeEventHandler : KoinComponent {
         val rawSlot = e.rawSlot
         val oldItem = e.oldItemStack
         val newItem = e.newItemStack
+
         if (shouldHandle(slot, rawSlot, player)) {
             oldItem.removeAttributeModifiers(player)
             newItem.addAttributeModifiers(player)
@@ -83,8 +85,8 @@ class AttributeEventHandler : KoinComponent {
             return
         }
 
-        val attributeModifiers = this.nekoAttributeModifiers
         val attributeMap = player.asNeko().attributeMap
+        val attributeModifiers = this.nekoAttributeModifiers
         attributeMap.addAttributeModifiers(attributeModifiers)
     }
 
@@ -102,8 +104,8 @@ class AttributeEventHandler : KoinComponent {
         // and by design, the UUID of an attribute modifier is the UUID of the item
         // that provides the attribute modifier. Thus, we only need to get the UUID
         // of the item to clear the attribute modifier.
-        val attributeMap = player.asNeko().attributeMap
         val nekoStack = this.toNekoStack() ?: return
+        val attributeMap = player.asNeko().attributeMap
         attributeMap.clearModifiers(nekoStack.uuid)
     }
 

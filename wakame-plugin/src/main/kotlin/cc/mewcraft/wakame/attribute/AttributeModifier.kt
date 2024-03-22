@@ -59,9 +59,8 @@ data class AttributeModifier(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as AttributeModifier
-        return id == other.id
+        if (other is AttributeModifier) return id == other.id
+        return false
     }
 
     override fun hashCode(): Int {

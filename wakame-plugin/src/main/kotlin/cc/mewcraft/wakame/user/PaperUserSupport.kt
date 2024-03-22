@@ -41,7 +41,6 @@ class PaperUser(
         get() = player.uniqueId
     override val level: Int
         get() = playerLevelProvider.getOrDefault(uniqueId, 1)
-
     override val kizamiMap: KizamiMap = PlayerKizamiMap(this)
     override val attributeMap: AttributeMap = PlayerAttributeMap(this)
     override val abilityMap: AbilityMap = PlayerAbilityMap(this)
@@ -82,24 +81,26 @@ class PaperUserManager : KoinComponent, Listener, UserManager<PaperPlayer> {
 
     @EventHandler
     private fun onQuit(e: PlayerQuitEvent) {
-        // cleanup user data for player
+        // cleanup user data for the player
         userRepository.invalidate(e.player.uniqueId)
     }
 
     @EventHandler
     private fun onJoin(e: PlayerJoinEvent) {
-        // create user data for player
+        // create user data for the player
         getPlayer(e.player)
     }
 
     @EventHandler
     private fun onHoldItem(e: PlayerItemHeldEvent) {
         attributeEventHandler.handlePlayerItemHeld(e)
+        kizamiEventHandler.handlePlayerItemHeld(e)
     }
 
     @EventHandler
     private fun onSlotChange(e: PlayerInventorySlotChangeEvent) {
         attributeEventHandler.handlePlayerInventorySlotChange(e)
+        kizamiEventHandler.handlePlayerInventorySlotChange(e)
     }
 
     override fun getPlayer(uniqueId: UUID): User {

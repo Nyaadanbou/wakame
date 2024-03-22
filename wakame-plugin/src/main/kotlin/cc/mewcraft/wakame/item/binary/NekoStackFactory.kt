@@ -13,16 +13,16 @@ object NekoStackFactory {
         .build { key: ItemStack -> NekoStackImpl(key) }
 
     /**
-     * Gets a [NekoStack] wrapper for the [craftItemStack]. Then, you can
+     * Gets a [NekoStack] wrapper for the [itemStack]. Then, you can
      * use the returned [NekoStack] wrapper to directly read/modify the
      * item in the underlying game world.
      *
-     * @throws IllegalArgumentException if the [craftItemStack] instance is not
+     * @throws IllegalArgumentException if the [itemStack] instance is not
      *     backed by an NMS object
      */
-    fun wrap(craftItemStack: ItemStack): NekoStack {
-        require(craftItemStack.isNmsObjectBacked) { "Can't wrap a non NMS-backed ItemStack as NekoStack" }
-        return NekoStackImpl(craftItemStack)
+    fun wrap(itemStack: ItemStack): NekoStack {
+        require(itemStack.isNmsObjectBacked) { "Can't wrap a non NMS-backed ItemStack as NekoStack" }
+        return NekoStackImpl(itemStack)
     }
 
     /**

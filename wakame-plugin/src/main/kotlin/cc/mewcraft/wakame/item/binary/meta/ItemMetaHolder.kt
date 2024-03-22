@@ -12,6 +12,7 @@ interface ItemMetaHolder {
      */
     val map: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
 
+    // TODO 试试省略V吗
     fun <T : BinaryItemMeta<V>, V> get(clazz: KClass<out T>): V?
     fun <T : BinaryItemMeta<V>, V> set(clazz: KClass<out T>, value: V)
     fun <T : BinaryItemMeta<*>> remove(clazz: KClass<out T>)

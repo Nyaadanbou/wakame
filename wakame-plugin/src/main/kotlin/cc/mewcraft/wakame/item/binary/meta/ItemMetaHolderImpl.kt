@@ -21,13 +21,13 @@ internal class ItemMetaHolderImpl(
     override val map: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
         get() {
             val root = rootOrNull ?: return emptyMap()
+            val ret = Reference2ObjectArrayMap<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>()
+
             // check the existence of each item meta
             // if one exists, we add it to the map
-
-            val ret = Reference2ObjectArrayMap<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>()
             ItemMetaRegistry.reflections().forEach { (clazz, companion, constructor) ->
                 if (companion.contains(root)) {
-                    ret[clazz] = constructor.invoke(this) as BinaryItemMeta<*>?
+                    ret[clazz] = constructor.invoke(this) as BinaryItemMeta<*>
                 }
             }
             return ret

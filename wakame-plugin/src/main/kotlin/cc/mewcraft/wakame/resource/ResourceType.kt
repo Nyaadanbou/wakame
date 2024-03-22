@@ -7,6 +7,10 @@ import net.kyori.examination.Examinable
 
 /**
  * The registry of all resource types.
+ *
+ * You can use it to get an instance of [ResourceType].
+ *
+ * @see ResourceType
  */
 object ResourceTypeRegistry {
     val MANA = object : ResourceType {
@@ -18,8 +22,6 @@ object ResourceTypeRegistry {
 
 /**
  * Represents a resource type.
- *
- * You can get the instance by [ResourceTypeRegistry].
  */
 interface ResourceType : Examinable {
     /**

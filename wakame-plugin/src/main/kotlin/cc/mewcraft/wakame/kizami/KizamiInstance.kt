@@ -9,17 +9,19 @@ import java.lang.reflect.Type
 /**
  * A [Kizami] instance, the full representation of a kizami.
  *
- * The object is essentially a mapping from [Int] to [KizamiEffect].
+ * The object is essentially a mapping from [amount][Int] to
+ * [effect][KizamiEffect] for a [kizami][Kizami].
  */
 data class KizamiInstance(
     /**
-     * The kizami to which the [effect] corresponds.
+     * The kizami to which the [effectMap] corresponds.
      */
     val kizami: Kizami,
     /**
-     * The effect of [kizami].
+     * The effect map of [kizami], which is essentially a mapping
+     * from amount to certain effects.
      */
-    val effect: Map<Int, KizamiEffect>,
+    val effectMap: Map<Int, KizamiEffect>,
 ) {
     /**
      * Gets the effect by [amount].
@@ -27,7 +29,7 @@ data class KizamiInstance(
      * Returns [EmptyKizamiEffect] if the [amount] has no defined effect.
      */
     fun getEffectBy(amount: Int): KizamiEffect {
-        return effect[amount] ?: EmptyKizamiEffect
+        return effectMap[amount] ?: EmptyKizamiEffect
     }
 
     /**
@@ -35,8 +37,8 @@ data class KizamiInstance(
      *
      * Returns `null` if the [amount] has no defined effect.
      */
-    fun getEffectByOrNull(amount: Int): KizamiEffect? {
-        return effect[amount]
+    fun findEffectBy(amount: Int): KizamiEffect? {
+        return effectMap[amount]
     }
 }
 
@@ -52,23 +54,28 @@ data class KizamiInstance(
  *   display_name: <MiniMessage String>
  *   styles: <MiniMessage String>
  *   effects:
- *     <Int>: <List of KizamiEffect>
+ *     1: <List of KizamiEffect>
+ *     2: <List of KizamiEffect>
  *     ...
- *     <Int>: <List of KizamiEffect>
+ *     N: <List of KizamiEffect>
  * ```
  */
 object KizamiInstanceSerializer : SchemeSerializer<KizamiInstance> {
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiInstance {
         val kizami = node.requireKt<Kizami>()
-        val effect = buildMap {
+        val effectMap = buildMap {
+            // Add entries: <amount> to <effect list>
             node.node("effects")
                 .childrenMap() // Int -> KizamiEffect
                 .mapKeys { it.key.toString().toIntOrNull()?.takeIf { amount -> amount > 0 } ?: throw SerializationException(node, type, "The node key must be a positive integer") }
                 .forEach { (amount, childNode) ->
-                    childNode.hint(KizamiSerializer.UUID_HINT, kizami.uuid) // add kizami UUID hint
-                    this[amount] = childNode.requireKt<KizamiEffect>() // add effect mapping
+                    // add kizami UUID hint
+                    childNode.hint(KizamiSerializer.UUID_HINT, kizami.uuid)
+                    // add effect mapping
+                    val kizamiEffect = childNode.requireKt<KizamiEffect>()
+                    this[amount] = kizamiEffect
                 }
         }
-        return KizamiInstance(kizami, effect)
+        return KizamiInstance(kizami, effectMap)
     }
 }

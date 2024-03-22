@@ -13,6 +13,7 @@ const val KIZAMI_SERIALIZERS = "kizami_serializers"
 internal fun kizamiModule(): Module = module {
 
     singleOf(::KizamiEventHandler)
+
     single<TypeSerializerCollection>(named(KIZAMI_SERIALIZERS)) {
         TypeSerializerCollection.builder()
             .registerAll(get(named(ELEMENT_SERIALIZERS)))

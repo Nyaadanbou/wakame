@@ -8,7 +8,10 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
 import org.intellij.lang.annotations.Pattern
+import java.util.stream.Stream
 
 /**
  * An identifiable numerical value.
@@ -36,7 +39,7 @@ open class Attribute @InternalApi constructor(
      * 属性是否由原版属性实现。
      */
     val vanilla: Boolean = false,
-) : Keyed {
+) : Keyed, Examinable {
     override val key: Key = Key.key(NekoNamespaces.ATTRIBUTE, descriptionId)
 
     /**
@@ -55,13 +58,19 @@ open class Attribute @InternalApi constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Attribute) return false
-        return descriptionId == other.descriptionId
+        if (other is Attribute) return descriptionId == other.descriptionId
+        return false
     }
 
     override fun toString(): String {
-        return key.toSimpleString()
+        return toSimpleString()
     }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("descriptionId", descriptionId),
+        ExaminableProperty.of("defaultValue", defaultValue),
+        ExaminableProperty.of("vanilla", vanilla),
+    )
 }
 
 /**
@@ -108,6 +117,14 @@ constructor(
             value.coerceIn(minValue, maxValue)
         }
     }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.concat(
+        super.examinableProperties(),
+        Stream.of(
+            ExaminableProperty.of("minValue", minValue),
+            ExaminableProperty.of("maxValue", maxValue),
+        ),
+    )
 }
 
 /**
@@ -142,5 +159,24 @@ constructor(
         element: Element,
     ) : this(
         descriptionId, defaultValue, false, minValue, maxValue, element
+    )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other is ElementAttribute) return descriptionId == other.descriptionId && element == other.element
+        return false
+    }
+
+    override fun hashCode(): Int {
+        var result = descriptionId.hashCode()
+        result = (31 * result) + element.hashCode()
+        return result
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.concat(
+        super.examinableProperties(),
+        Stream.of(
+            ExaminableProperty.of("element", element),
+        )
     )
 }
