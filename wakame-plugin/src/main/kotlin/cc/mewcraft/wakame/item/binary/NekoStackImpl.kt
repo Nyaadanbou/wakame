@@ -65,7 +65,7 @@ internal class NekoStackImpl(
         get() = !isNeko
 
     override val scheme: NekoItem
-        get() = NekoItemRegistry.INSTANCES.find(key) ?: throw NullPointerException()
+        get() = NekoItemRegistry.INSTANCES.get(key)
 
     override val seed: Long
         get() = tags.getLong(NekoTags.Root.SEED)
@@ -77,19 +77,13 @@ internal class NekoStackImpl(
         get() = tags.getInt(NekoTags.Root.SID)
 
     override val uuid: UUID
-        get() = NekoItemRegistry.INSTANCES.find(key)?.uuid ?: throw NullPointerException()
+        get() = NekoItemRegistry.INSTANCES.get(key).uuid
 
-    override val cells: ItemCellHolder by lazy(LazyThreadSafetyMode.NONE) {
-        ItemCellHolderImpl(this)
-    }
+    override val cell: ItemCellHolder = ItemCellHolderImpl(this)
 
-    override val metadata: ItemMetaHolder by lazy(LazyThreadSafetyMode.NONE) {
-        ItemMetaHolderImpl(this)
-    }
+    override val meta: ItemMetaHolder = ItemMetaHolderImpl(this)
 
-    override val statistics: ItemStatisticsHolder by lazy(LazyThreadSafetyMode.NONE) {
-        ItemStatisticsHolderImpl(this)
-    }
+    override val statistics: ItemStatisticsHolder = ItemStatisticsHolderImpl(this)
 
     override fun hashCode(): Int {
         return handle.hashCode()

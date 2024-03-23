@@ -72,7 +72,7 @@ class AttributeEventHandler : KoinComponent {
             }
 
             val nekoStack = this.toNekoStack() ?: return ImmutableMultimap.of()
-            return nekoStack.cells.getModifiers()
+            return nekoStack.cell.getModifiers()
         }
 
     /**

@@ -121,7 +121,7 @@ interface NekoStack : NekoStackSetter {
      *
      * @throws NullPointerException if this is not a legal neko item
      */
-    val cells: ItemCellHolder
+    val cell: ItemCellHolder
 
     /**
      * The [ItemMetaHolder] of this item.
@@ -130,7 +130,7 @@ interface NekoStack : NekoStackSetter {
      *
      * @throws NullPointerException if this is not a legal neko item
      */
-    val metadata: ItemMetaHolder
+    val meta: ItemMetaHolder
 
     /**
      * The [ItemStatisticsHolder] of this item.

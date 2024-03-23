@@ -58,7 +58,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         nekoStack.putSeed(context.seed) // TODO 对于没有随机元素的物品（例如材料类物品），不应该写入带有随机元素的数据
 
         // write item meta
-        with(nekoStack.metadata) {
+        with(nekoStack.meta) {
             // the order of meta population is hardcoded currently
             // TODO configurable order of meta population
 
@@ -83,7 +83,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
                 // if the binary cell is non-null, it's either:
                 // 1) a cell with some content, or
                 // 2) a cell with no content + keepEmpty is true
-                nekoStack.cells.put(id, cell)
+                nekoStack.cell.put(id, cell)
             }
             // if it's null, simply don't put the cell
         }

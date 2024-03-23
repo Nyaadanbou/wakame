@@ -106,7 +106,7 @@ class KizamiEventHandler {
         }
 
         val nekoStack = this.toNekoStack() ?: return emptySet()
-        val kizamiSet = nekoStack.metadata.get<KizamiMeta, _>().orEmpty()
+        val kizamiSet = nekoStack.meta.get<KizamiMeta, _>().orEmpty()
         return kizamiSet
     }
 

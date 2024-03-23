@@ -66,7 +66,7 @@ internal class TextStylizerImpl(
         val ret = ObjectArrayList<LoreLine>(16)
 
         // for each meta in the item
-        for ((itemMetaKClass, itemMeta) in item.metadata.map) {
+        for ((itemMetaKClass, itemMeta) in item.meta.map) {
             // Somehow the `::class` on the same type can return different KClass references.
             // We have to use the `.java` to compare references. Kotlin sucks this time :(
             if (itemMetaKClass.java === BDisplayNameMeta::class.java) {
@@ -81,7 +81,7 @@ internal class TextStylizerImpl(
         }
 
         // for each cell in the item
-        for (cell in item.cells.map.values) {
+        for (cell in item.cell.map.values) {
             val core = cell.binaryCore
             if (core.isEmpty) {
                 // it's an empty core - add the pre-defined placeholder lines
@@ -256,7 +256,7 @@ internal class ItemMetaStylizerImpl(
     private val rarityStyleTagCache: MutableMap<Rarity, Tag> by reloadable { HashMap() }
 
     override fun stylizeName(item: NekoStack): Component {
-        val displayName = item.metadata.get<BDisplayNameMeta, _>()
+        val displayName = item.meta.get<BDisplayNameMeta, _>()
         return if (displayName != null) {
             val resolvers = TagResolver.builder()
 
@@ -264,7 +264,7 @@ internal class ItemMetaStylizerImpl(
             resolvers.resolver(parsed("value", displayName))
 
             // resolve rarity style
-            val rarity = item.metadata.get<RarityMeta, _>()
+            val rarity = item.meta.get<RarityMeta, _>()
             if (rarity != null) {
                 rarityStyleTagCache.getOrPut(rarity) {
                     Tag.styling(*rarity.styles)

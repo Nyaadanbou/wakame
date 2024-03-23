@@ -75,7 +75,7 @@ class TestListener : KoinComponent, Listener {
         when (plainMessage) {
             "r1" -> {
                 val wrap = NekoStackFactory.wrap(inventory.itemInMainHand)
-                val lore = wrap.metadata.get<DisplayLoreMeta, _>().orEmpty()
+                val lore = wrap.meta.get<DisplayLoreMeta, _>().orEmpty()
                 val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
             }

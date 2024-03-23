@@ -10,7 +10,6 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 internal class ItemStatisticsHolderImpl(
     private val base: NekoStackImpl,
 ) : ItemStatisticsHolder {
-
     @InternalApi
     override val rootOrNull: CompoundShadowTag?
         get() = base.tags.getCompoundOrNull(NekoTags.Stats.ROOT)
