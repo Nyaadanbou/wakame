@@ -31,7 +31,7 @@ interface Registry<K, V> {
      * @throws IllegalStateException if the specified value does not exist
      */
     fun get(uniqueId: K): V =
-        requireNotNull(find(uniqueId)) { "Can't find object for uniqueId '$uniqueId'" }
+        requireNotNull(find(uniqueId)) { "Can't find object for unique id: $uniqueId" }
 
     /**
      * Registers a new entry into this registry.
@@ -142,7 +142,7 @@ internal class SimpleBiRegistry<K, B> : BiRegistry<K, B> {
     }
 
     override fun getBinaryIdBy(uniqueId: K): B {
-        return requireNotNull(uniqueId2BinaryIdMap[uniqueId]) { "Can't find binary by name $uniqueId" }
+        return requireNotNull(uniqueId2BinaryIdMap[uniqueId]) { "Can't find binary by unique id: $uniqueId" }
     }
 
     override fun findUniqueIdBy(binaryId: B?): K? {
@@ -150,7 +150,7 @@ internal class SimpleBiRegistry<K, B> : BiRegistry<K, B> {
     }
 
     override fun getUniqueIdBy(binaryId: B): K {
-        return requireNotNull(uniqueId2BinaryIdMap.inverse()[binaryId]) { "Can't find name by binary $binaryId" }
+        return requireNotNull(uniqueId2BinaryIdMap.inverse()[binaryId]) { "Can't find name by binary id: $binaryId" }
     }
 
     override fun register(uniqueId: K, binaryId: B) {

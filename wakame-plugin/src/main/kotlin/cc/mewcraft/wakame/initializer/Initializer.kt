@@ -44,8 +44,13 @@ import org.spongepowered.configurate.ConfigurationNode
  */
 object Initializer : KoinComponent, Listener {
 
-    private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
-    private val plugin: WakamePlugin by inject(mode = LazyThreadSafetyMode.NONE)
+    private val LOGGER: ComponentLogger by inject()
+    private val PLUGIN: WakamePlugin by inject()
+
+    /**
+     * The configuration node of "config.yml", a.k.a. the main configuration.
+     */
+    lateinit var CONFIG: ConfigurationNode
 
     /**
      * A registry of Terminables.
@@ -92,11 +97,6 @@ object Initializer : KoinComponent, Listener {
         private set
 
     /**
-     * The configuration node of "config.yml", a.k.a. the main configuration.
-     */
-    lateinit var config: ConfigurationNode
-
-    /**
      * Should be called before the world is loaded.
      */
     fun start() {
@@ -104,7 +104,7 @@ object Initializer : KoinComponent, Listener {
         initPreWorld()
     }
 
-    private fun saveDefaultConfiguration() = with(plugin) {
+    private fun saveDefaultConfiguration() = with(PLUGIN) {
         saveDefaultConfig() // config.yml
         saveResourceRecursively(CRATE_CONFIG_DIR)
         saveResourceRecursively(ITEM_CONFIG_DIR)
@@ -121,12 +121,12 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun loadPrimaryConfiguration() {
-        config = get(named(MAIN_CONFIG_NODE))
+        CONFIG = get(named(MAIN_CONFIG_NODE))
 
-        isDebug = config.node("debug").requireKt<Boolean>()
+        isDebug = CONFIG.node("debug").requireKt<Boolean>()
     }
 
-    private fun registerListeners() = with(plugin) {
+    private fun registerListeners() = with(PLUGIN) {
         registerTerminableListener(get<ItemRendererListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
@@ -137,9 +137,9 @@ object Initializer : KoinComponent, Listener {
         fun forEachReload(block: Initializable.() -> Unit): Result<Unit> {
             toLateReload.forEach { initializable ->
                 try {
-                    logger.info("${initializable::class.simpleName} start")
+                    LOGGER.info("${initializable::class.simpleName} start")
                     block(initializable)
-                    logger.info("${initializable::class.simpleName} done")
+                    LOGGER.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
                     shutdown("An exception occurred during reload initialization.", e)
                     return Result.failure(e)
@@ -147,9 +147,9 @@ object Initializer : KoinComponent, Listener {
             }
             return Result.success(Unit)
         }
-        logger.info("[Initializer] onReload - Start")
+        LOGGER.info("[Initializer] onReload - Start")
         forEachReload { onReload() }.onFailure { return }
-        logger.info("[Initializer] onReload - Complete")
+        LOGGER.info("[Initializer] onReload - Complete")
     }
 
     /**
@@ -164,9 +164,9 @@ object Initializer : KoinComponent, Listener {
         fun forEachPreWorld(block: Initializable.() -> Unit): Result<Unit> {
             toInitPreWorld.forEach { initializable ->
                 try {
-                    logger.info("${initializable::class.simpleName} start")
+                    LOGGER.info("${initializable::class.simpleName} start")
                     block(initializable)
-                    logger.info("${initializable::class.simpleName} done")
+                    LOGGER.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
                     shutdown("An exception occurred during pre-world initialization.", e)
                     return Result.failure(e)
@@ -175,22 +175,22 @@ object Initializer : KoinComponent, Listener {
             return Result.success(Unit)
         }
 
-        logger.info("[Initializer] onPreWorld - Start")
+        LOGGER.info("[Initializer] onPreWorld - Start")
         forEachPreWorld { onPreWorld() }.onFailure { return }
-        logger.info("[Initializer] onPreWorld - Complete")
+        LOGGER.info("[Initializer] onPreWorld - Complete")
 
-        logger.info("[Initializer] onPrePack - Start")
+        LOGGER.info("[Initializer] onPrePack - Start")
         forEachPreWorld { onPrePack() }.onFailure { return }
-        logger.info("[Initializer] onPrePack - Complete")
+        LOGGER.info("[Initializer] onPrePack - Complete")
 
         get<ResourcePackManager>().generate().onFailure {
             shutdown("An exception occurred during resource pack generation.", it)
             return
         }
 
-        logger.info("[Initializer] onPostPackPreWorld - Start")
+        LOGGER.info("[Initializer] onPostPackPreWorld - Start")
         forEachPreWorld { onPostPackPreWorld() }.onFailure { return }
-        logger.info("[Initializer] onPostPackPreWorld - Complete")
+        LOGGER.info("[Initializer] onPostPackPreWorld - Complete")
 
         preWorldInitialized = true
     }
@@ -202,9 +202,9 @@ object Initializer : KoinComponent, Listener {
         fun forEachPostWorld(block: Initializable.() -> Unit): Result<Unit> {
             toInitPostWorld.forEach { initializable ->
                 try {
-                    logger.info("${initializable::class.simpleName} start")
+                    LOGGER.info("${initializable::class.simpleName} start")
                     block(initializable)
-                    logger.info("${initializable::class.simpleName} done")
+                    LOGGER.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
                     shutdown("An exception occurred during post-world initialization.", e)
                     return Result.failure(e)
@@ -213,41 +213,41 @@ object Initializer : KoinComponent, Listener {
             return Result.success(Unit)
         }
 
-        logger.info("[Initializer] onPostWorld - Start")
+        LOGGER.info("[Initializer] onPostWorld - Start")
         forEachPostWorld { onPostWorld() }.onFailure { return }
-        logger.info("[Initializer] onPostWorld - Complete")
+        LOGGER.info("[Initializer] onPostWorld - Complete")
 
-        logger.info("[Initializer] onPostWorldAsync - Start")
+        LOGGER.info("[Initializer] onPostWorldAsync - Start")
         val asyncContext = Dispatchers.IO + CoroutineName("Neko Initializer - Post World Async")
         val onPostWorldJobs = mutableListOf<Job>()
         val onPostWorldAsyncResult = forEachPostWorld {
             onPostWorldJobs += NEKO_PLUGIN.launch(asyncContext) { onPostWorldAsync() }
         }
-        logger.info("[Initializer] onPostWorldAsync - Waiting")
+        LOGGER.info("[Initializer] onPostWorldAsync - Waiting")
         onPostWorldJobs.joinAll() // wait for all async jobs
         onPostWorldAsyncResult.onFailure { return }
-        logger.info("[Initializer] onPostWorldAsync - Complete")
+        LOGGER.info("[Initializer] onPostWorldAsync - Complete")
 
-        logger.info("[Initializer] onPostPack - Start")
+        LOGGER.info("[Initializer] onPostPack - Start")
         forEachPostWorld { onPostPack() }.onFailure { return }
-        logger.info("[Initializer] onPostPack - Complete")
+        LOGGER.info("[Initializer] onPostPack - Complete")
 
-        logger.info("[Initializer] onPostPackAsync - Start")
+        LOGGER.info("[Initializer] onPostPackAsync - Start")
         val onPostPackJobs = mutableListOf<Job>()
         val onPostPackAsyncResult = forEachPostWorld {
             onPostPackJobs += NEKO_PLUGIN.launch(asyncContext) { onPostPackAsync() }
         }
-        logger.info("[Initializer] onPostPackAsync - Waiting")
+        LOGGER.info("[Initializer] onPostPackAsync - Waiting")
         onPostPackJobs.joinAll() // wait for all async jobs
         onPostPackAsyncResult.onFailure { return }
-        logger.info("[Initializer] onPostPackAsync - Complete")
+        LOGGER.info("[Initializer] onPostPackAsync - Complete")
 
         isDone = true
         NEKO_PLUGIN.launch(asyncContext) {
             NekoLoadDataEvent().callEvent() // call it async
         }
 
-        logger.info(Component.text("Done loading", NamedTextColor.AQUA))
+        LOGGER.info(Component.text("Done loading", NamedTextColor.AQUA))
     }
 
     /**
@@ -261,12 +261,12 @@ object Initializer : KoinComponent, Listener {
 
     private fun shutdown(message: String, throwable: Throwable) {
         if (!isDebug) {
-            logger.error(message, throwable)
-            logger.error("Shutting down the server to prevent further damage.")
+            LOGGER.error(message, throwable)
+            LOGGER.error("Shutting down the server to prevent further damage.")
             Bukkit.shutdown()
         } else {
-            logger.warn(message, throwable)
-            logger.warn("Scroll up to find the exception cause and check your configuration.")
+            LOGGER.warn(message, throwable)
+            LOGGER.warn("Scroll up to find the exception cause and check your configuration.")
         }
     }
 
@@ -281,7 +281,7 @@ object Initializer : KoinComponent, Listener {
     private suspend fun handleServerStarted(e: ServerLoadEvent) {
         if (preWorldInitialized) {
             initPostWorld()
-        } else logger.warn("Skipping post world initialization")
+        } else LOGGER.warn("Skipping post world initialization")
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
