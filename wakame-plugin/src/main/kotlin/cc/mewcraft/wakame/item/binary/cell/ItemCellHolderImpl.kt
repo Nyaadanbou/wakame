@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.util.getOrPut
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 internal class ItemCellHolderImpl(
@@ -20,12 +19,6 @@ internal class ItemCellHolderImpl(
 ) : ItemCellHolder {
 
     /* Getters */
-
-    // FIXME do we really need it?
-    //  the caching mechanism should be implemented properly
-    //  in a wider scope of the project to make it effective,
-    //  not just here
-    private val cache: Object2ObjectMap<String, BinaryCell> = Object2ObjectArrayMap() // cache binary cells
 
     private val rootOrNull: CompoundShadowTag?
         get() = base.tags.getCompoundOrNull(NekoTags.Cell.ROOT)
@@ -44,7 +37,7 @@ internal class ItemCellHolderImpl(
 
     override fun get(id: String): BinaryCell? {
         val compoundTag = rootOrNull?.getCompoundOrNull(id) ?: return null
-        return cache.getOrPut(id) { BinaryCellFactory.decode(compoundTag) }
+        return BinaryCellFactory.decode(compoundTag)
     }
 
     override fun getModifiers(): Multimap<Attribute, AttributeModifier> {
@@ -76,19 +69,16 @@ internal class ItemCellHolderImpl(
     /* Setters */
 
     override fun put(id: String, cell: BinaryCell) {
-        cache.remove(id) // invalidate cache
         rootOrCreate.put(id, cell.asShadowTag())
     }
 
     override fun edit(id: String, setter: BinaryCell?.() -> BinaryCell) {
-        cache.remove(id) // invalidate cache
         val oldCell = get(id)
         val newCell = oldCell.setter()
         rootOrCreate.put(id, newCell.asShadowTag())
     }
 
     override fun remove(id: String) {
-        cache.remove(id) // invalidate cache
         rootOrNull?.remove(id)
     }
 }
