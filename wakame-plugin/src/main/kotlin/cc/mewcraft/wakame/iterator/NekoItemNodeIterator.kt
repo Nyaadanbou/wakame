@@ -20,9 +20,10 @@ object NekoItemNodeIterator : KoinComponent {
     private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
 
     /**
-     * 这里的 [block] 会被多次调用。
-     *
+     * 根据配置文件的目录结构，遍历所有物品配置文件，并对每个物品配置文件执行 [block]。
      * 每次调用时会传入一个物品的 [Key] 和对应文件的根 [ConfigurationNode]。
+     *
+     * @param block 需要执行的代码块，会被多次调用。
      */
     fun forEach(block: (Key, ConfigurationNode) -> Unit) {
         val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_CONFIG_DIR)
