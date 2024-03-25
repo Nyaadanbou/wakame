@@ -10,6 +10,8 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.koin.core.component.KoinComponent
 import kotlin.reflect.KClass
 
+// TODO Make it a value class
+//  To achieve this, we need to get rid of the reflection
 internal class ItemMetaHolderImpl(
     val base: NekoStackImpl,
 ) : KoinComponent, ItemMetaHolder {

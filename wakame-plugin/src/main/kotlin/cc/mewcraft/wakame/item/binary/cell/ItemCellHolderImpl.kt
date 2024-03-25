@@ -14,7 +14,8 @@ import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
-internal class ItemCellHolderImpl(
+@JvmInline
+internal value class ItemCellHolderImpl(
     private val base: NekoStackImpl,
 ) : ItemCellHolder {
 

@@ -1,9 +1,6 @@
-@file:OptIn(InternalApi::class)
-
 package cc.mewcraft.wakame.item.binary.stats
 
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.toStableShort
@@ -13,7 +10,8 @@ import net.kyori.adventure.key.Key
 
 // TODO 减少重复代码
 
-data class EntityKillsStatistics(
+@JvmInline
+value class EntityKillsStatistics(
     override val holder: ItemStatisticsHolder,
 ) : ItemStatistics, NumericMapLikeItemStats<Key, Int> {
     override val nbtPath: String get() = NekoTags.Stats.ENTITY_KILLS
@@ -28,7 +26,8 @@ data class EntityKillsStatistics(
     }
 }
 
-data class PeakDamageStatistics(
+@JvmInline
+value class PeakDamageStatistics(
     override val holder: ItemStatisticsHolder,
 ) : ItemStatistics, NumericMapLikeItemStats<Element, Int> {
     override val nbtPath: String get() = NekoTags.Stats.PEAK_DAMAGE

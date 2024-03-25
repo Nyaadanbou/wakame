@@ -1,6 +1,6 @@
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.item.binary.NekoStackFactory
+import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.item.scheme.*
@@ -18,7 +18,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import net.kyori.adventure.key.Key
-import org.bukkit.Material
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -86,8 +85,8 @@ class ItemDeserializationTest : KoinTest {
         val demo = NekoItemRegistry.INSTANCES.find(key)
         assertNotNull(demo, "The item '$key' is not loaded correctly")
 
-        val user = mockk<User<Nothing>>()
-        val realizer = mockk<NekoItemRealizer>()
+        val user = mockk<User<Nothing>>(relaxed = true)
+        val realizer = mockk<NekoItemRealizer>(relaxed = true)
 
         // mock player
         every { user.level } returns 1
@@ -113,7 +112,7 @@ class ItemDeserializationTest : KoinTest {
             }
 
             // just return an empty item
-            NekoStackFactory.new(Material.AIR)
+            mockk<NekoStack>()
         }
 
         // call

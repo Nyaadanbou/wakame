@@ -1,13 +1,16 @@
 package cc.mewcraft.wakame.item.binary.stats
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 interface ItemStatisticsHolder {
-    @InternalApi
+    /**
+     * Gets the root tag of statistics or `null`, if it does not exist.
+     */
     val rootOrNull: CompoundShadowTag?
 
-    @InternalApi
+    /**
+     * Gets the root tag of statistics or create one, if it does not exist.
+     */
     val rootOrCreate: CompoundShadowTag
 
     /**

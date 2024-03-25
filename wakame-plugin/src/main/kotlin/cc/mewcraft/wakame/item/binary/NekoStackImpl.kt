@@ -10,10 +10,7 @@ import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolder
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolderImpl
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.registry.NekoItemRegistry
-import cc.mewcraft.wakame.util.TestEnvironment
-import cc.mewcraft.wakame.util.nekoCompound
-import cc.mewcraft.wakame.util.nekoCompoundOrNull
-import cc.mewcraft.wakame.util.removeNekoCompound
+import cc.mewcraft.wakame.util.*
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
@@ -22,13 +19,14 @@ import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import java.util.UUID
 
-internal class NekoStackImpl(
+@JvmInline
+internal value class NekoStackImpl(
     override val handle: ItemStack,
-    override val isOneOff: Boolean = false,
 ) : KoinComponent, NekoStack {
+
+    // The second constructor is used to create the impl from org.bukkit.Material
     constructor(mat: Material) : this(
-        handle = ItemStack(mat) /* strictly-Bukkit ItemStack */,
-        isOneOff = true /* so, it's a one-off instance */
+        handle = ItemStack(mat), /* strictly-Bukkit ItemStack */
     ) {
         // FIXME remove it when the dedicated API is finished
         if (!TestEnvironment.isRunningJUnit()) {
@@ -36,17 +34,20 @@ internal class NekoStackImpl(
         }
     }
 
+    override val isNmsBacked: Boolean
+        get() = handle.isNmsObjectBacked
+
     /**
-     * The "wakame" [CompoundTag][CompoundShadowTag] of this item.
+     * Gets the "wakame" [CompoundTag][CompoundShadowTag] of this item.
      *
      * This **does not** include any other tags which are **not** part of the
-     * wakame item NBT specifications, such as display name, enchantment and
-     * durability, which are already accessible via Paper API. To get access to
+     * wakame item NBT specifications, such as display name, lore, enchantment and
+     * durability, which are already accessible via Server API. To get access to
      * these tags, just use the wrapped [handle].
      */
     internal val tags: CompoundShadowTag
         get() {
-            if (isOneOff) {
+            if (!isNmsBacked) {
                 // strictly-Bukkit ItemStack - the `wakame` compound is always available. If not, create one
                 return handle.nekoCompound
             }
@@ -55,12 +56,7 @@ internal class NekoStackImpl(
         }
 
     override val isNeko: Boolean
-        /*
-        Implementation Notes:
-          1) a one-off `this` is always considered Wakame item
-          2) a NMS-backed `this` is considered Wakame item iff it has a `wakame` compound tag
-        */
-        get() = isOneOff || handle.nekoCompoundOrNull != null
+        get() = handle.nekoCompoundOrNull != null
 
     override val isNotNeko: Boolean
         get() = !isNeko
@@ -83,19 +79,14 @@ internal class NekoStackImpl(
     override val effectiveSlot: EffectiveSlot
         get() = NekoItemRegistry.INSTANCES.get(key).effectiveSlot
 
-    override val cell: ItemCellHolder = ItemCellHolderImpl(this)
+    override val cell: ItemCellHolder
+        get() = ItemCellHolderImpl(this)
 
-    override val meta: ItemMetaHolder = ItemMetaHolderImpl(this)
+    override val meta: ItemMetaHolder
+        get() = ItemMetaHolderImpl(this)
 
-    override val statistics: ItemStatisticsHolder = ItemStatisticsHolderImpl(this)
-
-    override fun hashCode(): Int {
-        return handle.hashCode()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return handle == other
-    }
+    override val statistics: ItemStatisticsHolder
+        get() = ItemStatisticsHolderImpl(this)
 
     //<editor-fold desc="Setters">
     override fun erase() {

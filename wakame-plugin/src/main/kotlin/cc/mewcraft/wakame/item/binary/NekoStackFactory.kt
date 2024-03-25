@@ -1,22 +1,14 @@
 package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.util.isNmsObjectBacked
-import com.github.benmanes.caffeine.cache.Caffeine
-import com.github.benmanes.caffeine.cache.LoadingCache
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 object NekoStackFactory {
-    // TODO implement a efficient cache
-    private val cache: LoadingCache<ItemStack, NekoStack> = Caffeine.newBuilder()
-        .maximumSize(1000)
-        .weakKeys()
-        .build { key: ItemStack -> NekoStackImpl(key) }
-
     /**
-     * Gets a [NekoStack] wrapper for the [itemStack]. Then, you can
-     * use the returned [NekoStack] wrapper to directly read/modify the
-     * item in the underlying game world.
+     * Gets a [NekoStack] representation for the [itemStack]. Then, you can
+     * use the returned [NekoStack] object to directly read/modify the
+     * ItemStack in the underlying world state.
      *
      * @throws IllegalArgumentException if the [itemStack] instance is not
      *     backed by an NMS object
@@ -28,13 +20,13 @@ object NekoStackFactory {
 
     /**
      * This function is meant to be used to create an **one-off**
-     * [NekoStack] and then immediately add it to the underlying game
-     * world (such as adding it to a player's inventory and dropping it on
-     * the ground). Once the [NekoStack] is added to the game world, any
-     * changes to it **will not** reflect to that one in the game world.
+     * [NekoStack] and then immediately add it to the underlying world
+     * state (such as adding it to a player's inventory and dropping it on
+     * the ground). Once the [NekoStack] is added to the world state, any
+     * changes to it **will not** reflect to that one in the world state.
      *
-     * If you want to modify the [NekoStack]s that are already in the game
-     * world (such as modifying the item in a player's inventory), use the
+     * If you want to modify the [NekoStack]s that are already in the world
+     * state (such as modifying the item in a player's inventory), use the
      * function [wrap] instead.
      */
     fun new(material: Material): NekoStack {

@@ -36,23 +36,20 @@ interface NekoStack : NekoStackSetter {
      * `this` is primarily used to add a new [ItemStack] to the underlying
      * game world, such as giving it to players and dropping it on the ground.
      *
-     * @see isOneOff
+     * @see isNmsBacked
      */
-    val handle: ItemStack // TODO use `Any` to directly store a NMS object?
+    val handle: ItemStack
 
     /**
-     * Records whether `this` is a one-off [NekoStack] instance.
+     * Checks if `this` NekoStack is backed by an NMS object.
      *
-     * A one-off [NekoStack] instance is effectively backed by a
-     * strictly-Bukkit [ItemStack]. That is, the [handle] is a strictly-Bukkit
-     * [ItemStack].
+     * If this returns `true`, that means the [handle] is backed by an NMS object.
      *
-     * It should be noted, once the [handle] of a one-off [NekoStack] has
-     * been added to the underlying game world, any changes to the one-off
-     * [NekoStack] **will not** reflect to that one in the underlying game
-     * world. This is because the server implementation always makes a NMS copy
+     * If this returns `false`, that means the [handle] is a strictly-Bukkit [ItemStack].
+     *
+     * It should be noted that the server implementation always makes a NMS copy
      * out of the strictly-Bukkit [ItemStack] when the item is being added to
-     * the underlying game world.
+     * the underlying world states.
      *
      * However, this may not hold if the Paper
      * team finish up the ItemStack overhaul:
@@ -64,7 +61,7 @@ interface NekoStack : NekoStackSetter {
      *
      * @see handle
      */
-    val isOneOff: Boolean
+    val isNmsBacked: Boolean
 
     /**
      * Returns `true` if this item is a neko item.
@@ -146,7 +143,4 @@ interface NekoStack : NekoStackSetter {
      * @throws NullPointerException if this is not a legal neko item
      */
     val statistics: ItemStatisticsHolder
-
-    override fun hashCode(): Int
-    override fun equals(other: Any?): Boolean
 }
