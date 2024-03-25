@@ -34,6 +34,7 @@ dependencies {
     compileOnly(libs.asm.commons) // ^
     implementation(libs.bytebuddy)
     implementation(libs.bytebuddy.agent)
+    implementation(libs.packetevents.spigot)
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
@@ -61,6 +62,9 @@ tasks {
         relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
         relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
         relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
+        relocate("com.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.api")
+        relocate("io.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.impl")
+        // relocate("net.kyori", "cc.mewcraft.wakame.external.packetevents.kyori")
     }
 
     val inputJarPath = lazy { shadowJar.get().archiveFile.get().asFile.absolutePath }

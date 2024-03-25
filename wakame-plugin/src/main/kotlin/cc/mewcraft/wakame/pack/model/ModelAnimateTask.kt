@@ -11,11 +11,9 @@ import org.koin.core.component.inject
 import team.unnamed.hephaestus.animation.Animation
 import team.unnamed.hephaestus.bukkit.BoneView
 import team.unnamed.hephaestus.bukkit.ModelView
-import team.unnamed.hephaestus.modifier.BoneModifier
 import team.unnamed.hephaestus.util.Quaternion
-import java.util.Collections
-import java.util.UUID
-import java.util.WeakHashMap
+import team.unnamed.hephaestus.view.modifier.BoneModifier
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class ModelAnimateTask : Runnable, Initializable, KoinComponent {
@@ -71,7 +69,7 @@ class ModelAnimateTask : Runnable, Initializable, KoinComponent {
                     view.bones()
                         .filter { bone: BoneView -> bone.bone().name().startsWith("head") }
                         .forEach { bone: BoneView ->
-                            bone.modifying(object : BoneModifier {
+                            bone.andThen(object : BoneModifier {
                                 override fun modifyRotation(original: Quaternion): Quaternion {
                                     return Quaternion.fromEulerRadians(0.0, Math.toRadians((base.bodyYaw - base.getYaw()).toDouble()), 0.0)
                                         .multiply(Quaternion.fromEulerRadians(-Math.toRadians(base.getPitch().toDouble()), 0.0, 0.0))

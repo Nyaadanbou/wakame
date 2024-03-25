@@ -4,7 +4,7 @@ import org.bukkit.entity.Entity
 import team.unnamed.creative.base.Vector3Float
 import team.unnamed.hephaestus.bukkit.BoneView
 import team.unnamed.hephaestus.bukkit.ModelView
-import team.unnamed.hephaestus.modifier.BoneModifier
+import team.unnamed.hephaestus.view.modifier.BoneModifier
 import java.lang.ref.WeakReference
 
 class OnGroundBoneModifier(base: Entity) : BoneModifier {
@@ -16,6 +16,6 @@ class OnGroundBoneModifier(base: Entity) : BoneModifier {
     }
 
     fun apply(view: ModelView) {
-        view.bones().forEach { bone: BoneView -> bone.modifying(this) }
+        view.bones().forEach { bone: BoneView -> bone.andThen(this) }
     }
 }
