@@ -3,11 +3,8 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
-import cc.mewcraft.wakame.user.asNeko
-import com.google.common.collect.ImmutableMultimap
-import com.google.common.collect.Multimap
+import cc.mewcraft.wakame.user.asNekoUser
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryType.SlotType
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
@@ -28,11 +25,13 @@ class AttributeEventHandler : KoinComponent {
      */
     fun handlePlayerItemHeld(e: PlayerItemHeldEvent) {
         val player = e.player
-        val oldItem = player.inventory.getItem(e.previousSlot)
-        val newItem = player.inventory.getItem(e.newSlot)
+        val previousSlot = e.previousSlot
+        val newSlot = e.newSlot
+        val oldItem = player.inventory.getItem(previousSlot)
+        val newItem = player.inventory.getItem(newSlot)
 
-        oldItem.removeAttributeModifiers(player)
-        newItem.addAttributeModifiers(player)
+        oldItem.removeAttributeModifiers(player) { effectiveSlot.testItemHeld(player, previousSlot, newSlot) }
+        newItem.addAttributeModifiers(player) { effectiveSlot.testItemHeld(player, previousSlot, newSlot) }
     }
 
     /**
@@ -45,48 +44,46 @@ class AttributeEventHandler : KoinComponent {
         val oldItem = e.oldItemStack
         val newItem = e.newItemStack
 
-        if (shouldHandle(slot, rawSlot, player)) {
-            oldItem.removeAttributeModifiers(player)
-            newItem.addAttributeModifiers(player)
-        }
+        oldItem.removeAttributeModifiers(player) { effectiveSlot.testInventorySlotChange(player, slot, rawSlot) }
+        newItem.addAttributeModifiers(player) { effectiveSlot.testInventorySlotChange(player, slot, rawSlot) }
     }
 
     ////// Private Func //////
 
-    private fun shouldHandle(slot: Int, rawSlot: Int, player: Player): Boolean {
-        return (slot == (player.inventory.heldItemSlot) && player.openInventory.getSlotType(rawSlot) == SlotType.QUICKBAR) ||
-                (player.openInventory.getSlotType(rawSlot) == SlotType.ARMOR)
-    }
-
     /**
-     * Gets attribute modifiers on the ItemStack.
+     * Wrap the ItemStack as a NekoStack.
      */
-    private val ItemStack?.nekoAttributeModifiers: Multimap<Attribute, AttributeModifier>
-        get() {
-            if (this == null || this.isEmpty) {
-                throw IllegalArgumentException("ItemStack must not be null, empty, or it has no item meta")
-            }
-
-            if (!this.hasItemMeta()) {
-                return ImmutableMultimap.of()
-            }
-
-            val nekoStack = this.toNekoStack() ?: return ImmutableMultimap.of()
-            return nekoStack.cell.getModifiers()
+    private fun ItemStack.asNekoStack(): NekoStack? {
+        val nekoStack = NekoStackFactory.wrap(this)
+        if (nekoStack.isNotNeko) {
+            return null
         }
+
+        return nekoStack
+    }
 
     /**
      * Add the attribute modifiers of [this] for the [player].
      *
      * @param player the player we add attribute modifiers to
      */
-    private fun ItemStack?.addAttributeModifiers(player: Player) {
+    private inline fun ItemStack?.addAttributeModifiers(player: Player, testSlot: NekoStack.() -> Boolean) {
         if (this == null || this.isEmpty) {
             return
         }
 
-        val attributeMap = player.asNeko().attributeMap
-        val attributeModifiers = this.nekoAttributeModifiers
+        val attributeMap = player.asNekoUser().attributeMap
+        if (!this.hasItemMeta()) {
+            return
+        }
+
+        val nekoStack = this.asNekoStack() ?: return
+
+        if (!nekoStack.testSlot()) {
+            return
+        }
+
+        val attributeModifiers = nekoStack.cell.getAttributeModifiers()
         attributeMap.addAttributeModifiers(attributeModifiers)
     }
 
@@ -95,7 +92,7 @@ class AttributeEventHandler : KoinComponent {
      *
      * @param player the player we remove attribute modifiers from
      */
-    private fun ItemStack?.removeAttributeModifiers(player: Player) {
+    private inline fun ItemStack?.removeAttributeModifiers(player: Player, testSlot: NekoStack.() -> Boolean) {
         if (this == null || this.isEmpty) {
             return
         }
@@ -104,21 +101,13 @@ class AttributeEventHandler : KoinComponent {
         // and by design, the UUID of an attribute modifier is the UUID of the item
         // that provides the attribute modifier. Thus, we only need to get the UUID
         // of the item to clear the attribute modifier.
-        val nekoStack = this.toNekoStack() ?: return
-        val attributeMap = player.asNeko().attributeMap
+        val nekoStack = this.asNekoStack() ?: return
+
+        if (!nekoStack.testSlot()) {
+            return
+        }
+
+        val attributeMap = player.asNekoUser().attributeMap
         attributeMap.clearModifiers(nekoStack.uuid)
-    }
-
-    private fun ItemStack?.toNekoStack(): NekoStack? {
-        if (this == null || this.isEmpty) {
-            return null
-        }
-
-        val nekoStack = NekoStackFactory.wrap(this)
-        if (nekoStack.isNotNeko) {
-            return null
-        }
-
-        return nekoStack
     }
 }

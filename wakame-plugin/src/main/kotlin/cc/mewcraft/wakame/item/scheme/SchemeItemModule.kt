@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item.scheme
 
+import cc.mewcraft.wakame.configurate.MaterialSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
+import cc.mewcraft.wakame.item.EffectiveSlotSerializer
 import cc.mewcraft.wakame.item.scheme.core.SchemeCoreGroupSerializer
 import cc.mewcraft.wakame.item.scheme.core.SchemeCorePoolSerializer
 import cc.mewcraft.wakame.item.scheme.curse.SchemeCurseGroupSerializer
@@ -15,12 +17,21 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
+const val BASE_SERIALIZERS = "base_serializers"
 const val CELL_SERIALIZERS = "cell_serializers"
 const val META_SERIALIZERS = "meta_serializers"
 
 internal fun schemeItemModule(): Module = module {
 
-    // region Cells
+    single<TypeSerializerCollection>(named(BASE_SERIALIZERS)) {
+        TypeSerializerCollection.builder()
+
+            .registerKt(MaterialSerializer)
+            .registerKt(EffectiveSlotSerializer)
+
+            .build()
+    }
+
     single<TypeSerializerCollection>(named(CELL_SERIALIZERS)) {
         TypeSerializerCollection.builder()
 
@@ -37,9 +48,7 @@ internal fun schemeItemModule(): Module = module {
 
             .build()
     }
-    // endregion
 
-    // region Metas
     single<TypeSerializerCollection>(named(META_SERIALIZERS)) {
         TypeSerializerCollection.builder()
             .registerAll(get(named(ELEMENT_SERIALIZERS)))
@@ -62,6 +71,5 @@ internal fun schemeItemModule(): Module = module {
 
             .build()
     }
-    // endregion
 
 }

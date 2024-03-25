@@ -86,7 +86,7 @@ class ItemDeserializationTest : KoinTest {
         val demo = NekoItemRegistry.INSTANCES.find(key)
         assertNotNull(demo, "The item '$key' is not loaded correctly")
 
-        val user = mockk<User>()
+        val user = mockk<User<Nothing>>()
         val realizer = mockk<NekoItemRealizer>()
 
         // mock player
@@ -105,7 +105,7 @@ class ItemDeserializationTest : KoinTest {
             generateAndSet<SkinMeta, ItemSkin>(demo, context)
             generateAndSet<SkinOwnerMeta, UUID>(demo, context)
 
-            demo.cells.forEach { (id, scheme) ->
+            demo.cell.forEach { (id, scheme) ->
                 val binary = BinaryCellFactory.generate(context, scheme)
                 if (binary != null) {
                     logger.debug("write cell '{}': {}", id, binary)

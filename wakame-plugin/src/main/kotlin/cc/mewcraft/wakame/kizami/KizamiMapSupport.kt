@@ -17,7 +17,7 @@ import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
  * This class records the number of kizami each owned by a player.
  */
 class PlayerKizamiMap(
-    private val user: User,
+    private val user: User<*>,
 ) : KizamiMap {
     private val amountMap: MutableMap<Kizami, Int> = Reference2IntOpenHashMap()
 

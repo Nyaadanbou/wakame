@@ -12,7 +12,7 @@ import org.bukkit.entity.Player as PaperPlayer
  * @param P the platform player type
  */
 interface PlayerAdapter<P> {
-    fun adapt(player: P): User
+    fun adapt(player: P): User<P>
 }
 
 /**

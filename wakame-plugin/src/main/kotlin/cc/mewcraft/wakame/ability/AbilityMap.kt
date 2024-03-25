@@ -15,7 +15,7 @@ object NoopAbilityMap : AbilityMap
 /**
  * Creates a new [PlayerAbilityMap].
  */
-fun PlayerAbilityMap(user: User): PlayerAbilityMap {
+fun PlayerAbilityMap(user: User<*>): PlayerAbilityMap {
     return PlayerAbilityMap()
 }
 

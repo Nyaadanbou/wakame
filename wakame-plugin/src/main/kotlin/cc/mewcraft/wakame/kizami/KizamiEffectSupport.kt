@@ -20,8 +20,8 @@ import java.lang.reflect.Type
  */
 data object EmptyKizamiEffect : KizamiEffect {
     override val effects: List<KizamiEffect.Single<*>> = emptyList()
-    override fun apply(kizami: Kizami, user: User) {}
-    override fun remove(kizami: Kizami, user: User) {}
+    override fun apply(kizami: Kizami, user: User<*>) {}
+    override fun remove(kizami: Kizami, user: User<*>) {}
 }
 
 /**
@@ -90,11 +90,11 @@ object KizamiEffectSerializer : SchemeSerializer<KizamiEffect> {
 data class KizamiSkill(
     override val effect: Ability,
 ) : KizamiEffect.Single<Ability> {
-    override fun apply(kizami: Kizami, user: User) {
+    override fun apply(kizami: Kizami, user: User<*>) {
         println("applied ability kizami effect to ${user.uniqueId}") // TODO actually implement it when ability module is done
     }
 
-    override fun remove(kizami: Kizami, user: User) {
+    override fun remove(kizami: Kizami, user: User<*>) {
         println("removed ability kizami effect from ${user.uniqueId}")
     }
 }
@@ -105,11 +105,11 @@ data class KizamiSkill(
 data class KizamiAttribute(
     override val effect: Map<Attribute, AttributeModifier>,
 ) : KizamiEffect.Single<Map<Attribute, AttributeModifier>> {
-    override fun apply(kizami: Kizami, user: User) {
+    override fun apply(kizami: Kizami, user: User<*>) {
         user.attributeMap.addAttributeModifiers(ImmutableMultimap.copyOf(effect.entries))
     }
 
-    override fun remove(kizami: Kizami, user: User) {
+    override fun remove(kizami: Kizami, user: User<*>) {
         // To remove the attribute modifiers provided by the kizami,
         // we simply remove the attribute modifiers by the UUID of the kizami.
         user.attributeMap.clearModifiers(kizami.uuid)

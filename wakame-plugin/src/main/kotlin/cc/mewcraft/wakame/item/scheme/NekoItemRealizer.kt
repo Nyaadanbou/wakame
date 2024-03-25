@@ -18,7 +18,7 @@ interface NekoItemRealizer {
      * @param user the player on which the realization is based
      * @return a once-off NekoStack
      */
-    fun realize(nekoItem: NekoItem, user: User): NekoStack
+    fun realize(nekoItem: NekoItem, user: User<*>): NekoStack
 
     /**
      * Realizes an item template against a crate.

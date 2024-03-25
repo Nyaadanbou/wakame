@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
 import cc.mewcraft.wakame.item.binary.cell.ItemCellHolderImpl
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
@@ -78,6 +79,9 @@ internal class NekoStackImpl(
 
     override val uuid: UUID
         get() = NekoItemRegistry.INSTANCES.get(key).uuid
+
+    override val effectiveSlot: EffectiveSlot
+        get() = NekoItemRegistry.INSTANCES.get(key).effectiveSlot
 
     override val cell: ItemCellHolder = ItemCellHolderImpl(this)
 

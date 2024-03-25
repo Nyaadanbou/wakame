@@ -2,6 +2,10 @@ package cc.mewcraft.wakame.kizami
 
 /**
  * Represents a KizamiMap owned by a subject.
+ *
+ * This object solely holds the amount of each kizami which is currently owned by the user,
+ * and does not involve any operations of the effects provided by kizami. The operations of
+ * kizami effects, such as "apply" and "remove", are defined by [KizamiEffect].
  */
 interface KizamiMap {
     /**

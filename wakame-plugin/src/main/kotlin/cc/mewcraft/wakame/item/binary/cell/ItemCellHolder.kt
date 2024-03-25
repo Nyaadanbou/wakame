@@ -12,7 +12,7 @@ interface ItemCellHolder {
 
     /**
      * Gets an immutable map describing the cells in this holder. This will
-     * call [get] for each available cell on the backed item.
+     * call [find] for each available cell on the backed item.
      *
      * Note that any changes on the item in the underlying game world **does
      * not** reflect on the returned map.
@@ -28,7 +28,7 @@ interface ItemCellHolder {
      * @param id the ID of the cell (case-sensitive)
      * @return the specified binary cell or `null`, if not found
      */
-    fun get(id: String): BinaryCell?
+    fun find(id: String): BinaryCell?
 
     /**
      * Gets the specified [binary cell][BinaryCell].
@@ -37,7 +37,7 @@ interface ItemCellHolder {
      * @return the specified binary cell
      * @throws NullPointerException if the specified binary cell is not found
      */
-    fun getOrThrow(id: String): BinaryCell = requireNotNull(get(id)) { "Can't find binary cell for $id" }
+    fun get(id: String): BinaryCell = requireNotNull(find(id)) { "Can't find binary cell for $id" }
 
     /**
      * Returns `true` if the specified cell exists.
@@ -45,17 +45,17 @@ interface ItemCellHolder {
      * @param id the identifier of the cell (case-sensitive)
      * @return true if the specified cell exists
      */
-    fun contains(id: String): Boolean = get(id) != null
+    fun contains(id: String): Boolean = find(id) != null
 
     /**
-     * Gets all attribute modifiers from `this` (cells).
+     * Gets all attribute modifiers from the cell holder.
      */
-    fun getModifiers(): Multimap<Attribute, AttributeModifier>
+    fun getAttributeModifiers(): Multimap<Attribute, AttributeModifier>
 
     /**
-     * Gets all abilities and corresponding values from `this` (cells).
+     * Gets all active abilities from the cell holder.
      */
-    fun getAbilities(): Map<Ability, PlainAbilityData>
+    fun getActiveAbilities(): Map<Ability, PlainAbilityData>
 
     /* Setters */
 

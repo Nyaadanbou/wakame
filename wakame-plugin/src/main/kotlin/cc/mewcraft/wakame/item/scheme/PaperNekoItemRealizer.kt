@@ -30,7 +30,7 @@ import cc.mewcraft.wakame.item.scheme.meta.SkinOwnerMeta as SSkinOwnerMeta
 
 object PaperNekoItemRealizer : NekoItemRealizer {
 
-    override fun realize(nekoItem: NekoItem, user: User): NekoStack = realize0(nekoItem, user)
+    override fun realize(nekoItem: NekoItem, user: User<*>): NekoStack = realize0(nekoItem, user)
     override fun realize(nekoItem: NekoItem, crate: Crate): NekoStack = realize0(nekoItem, crate)
 
     private fun realize0(nekoItem: NekoItem, any: Any): NekoStack {
@@ -74,7 +74,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         }
 
         // write item cells
-        nekoItem.cells.forEach { (id, schema) ->
+        nekoItem.cell.forEach { (id, schema) ->
             // the order of cell population should be the same as
             // that they are declared in the configuration list
 

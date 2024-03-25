@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolder
@@ -113,6 +114,11 @@ interface NekoStack : NekoStackSetter {
      * @throws NullPointerException if this is not a legal neko item
      */
     val uuid: UUID
+
+    /**
+     * The inventory slot where this item becomes effective.
+     */
+    val effectiveSlot: EffectiveSlot
 
     /**
      * The [ItemCellHolder] of this item.

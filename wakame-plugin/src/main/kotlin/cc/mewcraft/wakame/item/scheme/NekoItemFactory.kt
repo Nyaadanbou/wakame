@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.scheme
 
+import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCellFactory
 import cc.mewcraft.wakame.item.scheme.meta.*
@@ -9,9 +10,6 @@ import com.google.common.collect.ImmutableClassToInstanceMap
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.UUID
-import kotlin.collections.Map
-import kotlin.collections.buildMap
-import kotlin.collections.forEach
 import kotlin.collections.set
 
 object NekoItemFactory {
@@ -25,9 +23,10 @@ object NekoItemFactory {
     fun create(key: Key, root: ConfigurationNode): NekoItem {
         val uuid = root.node("uuid").requireKt<UUID>()
         val material = root.node("material").requireKt<Key>()
+        val effectiveSlot = root.node("effective_slot").requireKt<EffectiveSlot>()
 
         // Deserialize item meta
-        val schemeItemMeta = ImmutableClassToInstanceMap.builder<SchemeItemMeta<*>>().apply {
+        val schemeMeta = ImmutableClassToInstanceMap.builder<SchemeItemMeta<*>>().apply {
             // Side note 1: buildMap preserves the insertion order
 
             // Side note 2: always put all schema metadata for a `NekoItem`
@@ -49,7 +48,7 @@ object NekoItemFactory {
         }.build()
 
         // Deserialize item cells
-        val schemeCells: Map<String, SchemeCell> = buildMap {
+        val schemeCell: Map<String, SchemeCell> = buildMap {
             // Side note: buildMap preserves the insertion order
 
             root.node("cells").childrenList().forEach { n ->
@@ -65,7 +64,7 @@ object NekoItemFactory {
             }
         }
 
-        val ret = NekoItemImpl(key, uuid, material, schemeItemMeta, schemeCells)
+        val ret = NekoItemImpl(key, uuid, material, effectiveSlot, schemeMeta, schemeCell)
         return ret
     }
 

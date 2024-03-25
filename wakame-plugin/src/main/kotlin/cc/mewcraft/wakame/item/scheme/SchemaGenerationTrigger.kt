@@ -35,7 +35,7 @@ class SchemaGenerationTrigger private constructor(
      */
     val level: Int
         get() = when (source) {
-            is User -> source.level
+            is User<*> -> source.level
             is Crate -> source.level
             else -> error("Unknown level getter")
         }

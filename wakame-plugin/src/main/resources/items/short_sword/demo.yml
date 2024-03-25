@@ -9,6 +9,28 @@ uuid: cfee549f-e4d7-4574-b104-92d8251ebee4
 # 可选，默认 "stone"
 material: wooden_sword
 
+# 生效栏位
+# 可选，默认 无
+# 可用选项：
+# - MAIN_HAND
+# - OFF_HAND
+# - HELMET
+# - CHESTPLATE
+# - LEGGINGS
+# - BOOTS
+# - SLOT_1 (仅测试用)
+# - SLOT_2 (仅测试用)
+# - SLOT_3 (仅测试用)
+# - SLOT_4 (仅测试用)
+effective_slot: MAIN_HAND
+
+# 物品行为
+# 可选，默认 无
+behaviors:
+  castable: { }
+  damageable: { }
+  enchantable: { }
+
 # 名字
 # 可选，默认 "Unnamed"
 display_name: "<red>Demo Short Sword"

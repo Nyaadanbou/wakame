@@ -7,6 +7,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 object NekoStackFactory {
+    // TODO implement a efficient cache
     private val cache: LoadingCache<ItemStack, NekoStack> = Caffeine.newBuilder()
         .maximumSize(1000)
         .weakKeys()

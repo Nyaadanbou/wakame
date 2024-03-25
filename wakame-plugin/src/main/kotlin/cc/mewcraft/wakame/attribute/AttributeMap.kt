@@ -44,8 +44,8 @@ sealed interface AttributeMap {
 /**
  * Creates a new Player Attribute Map.
  */
-fun PlayerAttributeMap(user: User): PlayerAttributeMap {
-    return PlayerAttributeMap(DefaultAttributes.getSupplier(EntityType.PLAYER), user.player as Player)
+fun PlayerAttributeMap(user: User<Player>): PlayerAttributeMap {
+    return PlayerAttributeMap(DefaultAttributes.getSupplier(EntityType.PLAYER), user.player)
 }
 
 /**

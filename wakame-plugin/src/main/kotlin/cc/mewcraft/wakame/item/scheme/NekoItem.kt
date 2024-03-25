@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.adventure.Keyed
+import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
@@ -42,6 +43,11 @@ interface NekoItem : Keyed {
     val material: Key
 
     /**
+     * The inventory slot where this item can take effect.
+     */
+    val effectiveSlot: EffectiveSlot
+
+    /**
      * The map holds all the item meta of `this` item. You may navigate
      * the subclasses of [SchemeItemMeta] for all types of item meta.
      *
@@ -50,7 +56,7 @@ interface NekoItem : Keyed {
      *
      * @see getItemMetaBy
      */
-    val itemMeta: ClassToInstanceMap<SchemeItemMeta<*>>
+    val meta: ClassToInstanceMap<SchemeItemMeta<*>>
 
     /**
      * The map holds all the cell data about `this` item, where `map key` is
@@ -59,7 +65,7 @@ interface NekoItem : Keyed {
      * The underlying map is actually an ordered map, and the iteration order
      * is always the same as the insertion order.
      */
-    val cells: Map<String, SchemeCell>
+    val cell: Map<String, SchemeCell>
 }
 
 /**
@@ -77,5 +83,5 @@ interface NekoItem : Keyed {
  * @return the instance of class [V] from this [NekoItem]
  */
 inline fun <reified V : SchemeItemMeta<*>> NekoItem.getItemMetaBy(): V {
-    return requireNotNull(itemMeta.getInstance(V::class.java)) { "Can't find item meta '${V::class.simpleName}'. Incomplete implementation?" }
+    return requireNotNull(meta.getInstance(V::class.java)) { "Can't find item meta '${V::class.simpleName}'. Incomplete implementation?" }
 }

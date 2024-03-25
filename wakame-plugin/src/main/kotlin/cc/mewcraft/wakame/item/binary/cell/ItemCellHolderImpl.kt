@@ -30,17 +30,17 @@ internal class ItemCellHolderImpl(
             val root = rootOrNull ?: return emptyMap()
             val ret = Object2ObjectArrayMap<String, BinaryCell>(root.size())
             for (key in root.keySet()) {
-                get(key)?.let { ret.put(key, it) }
+                find(key)?.let { ret.put(key, it) }
             }
             return ret
         }
 
-    override fun get(id: String): BinaryCell? {
+    override fun find(id: String): BinaryCell? {
         val compoundTag = rootOrNull?.getCompoundOrNull(id) ?: return null
         return BinaryCellFactory.decode(compoundTag)
     }
 
-    override fun getModifiers(): Multimap<Attribute, AttributeModifier> {
+    override fun getAttributeModifiers(): Multimap<Attribute, AttributeModifier> {
         // 注意这里不能用 Map，必须用 Multimap
         // 因为会存在同一个属性 Attribute
         // 但有多个 AttributeModifier
@@ -62,7 +62,7 @@ internal class ItemCellHolderImpl(
         return multimap.build()
     }
 
-    override fun getAbilities(): Map<Ability, PlainAbilityData> {
+    override fun getActiveAbilities(): Map<Ability, PlainAbilityData> {
         TODO("Not yet implemented")
     }
 
@@ -73,7 +73,7 @@ internal class ItemCellHolderImpl(
     }
 
     override fun edit(id: String, setter: BinaryCell?.() -> BinaryCell) {
-        val oldCell = get(id)
+        val oldCell = find(id)
         val newCell = oldCell.setter()
         rootOrCreate.put(id, newCell.asShadowTag())
     }

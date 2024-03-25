@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.user.User
 /**
  * Creates a new [PlayerResourceMap].
  */
-fun PlayerResourceMap(user: User): PlayerResourceMap {
+fun PlayerResourceMap(user: User<*>): PlayerResourceMap {
     return PlayerResourceMap(user.attributeMap)
 }
 

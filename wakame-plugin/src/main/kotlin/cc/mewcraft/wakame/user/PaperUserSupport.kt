@@ -25,7 +25,6 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.UUID
-import org.bukkit.entity.Player as PaperPlayer
 
 /**
  * A wakame player in Paper platform.
@@ -33,8 +32,8 @@ import org.bukkit.entity.Player as PaperPlayer
  * @property player the [paper player][PaperPlayer]
  */
 class PaperUser(
-    override val player: PaperPlayer,
-) : User, KoinComponent {
+    override val player: Player,
+) : User<Player>, KoinComponent {
     private val playerLevelProvider: PlayerLevelProvider by inject(mode = LazyThreadSafetyMode.NONE)
 
     override val uniqueId: UUID
@@ -48,19 +47,19 @@ class PaperUser(
 }
 
 /**
- * Adapts the [PaperPlayer] into [NekoPlayer][User].
+ * Adapts the [Player] into [NekoPlayer][User].
  */
-fun PaperPlayer.asNeko(): User {
-    return PlayerAdapters.get<PaperPlayer>().adapt(this)
+fun Player.asNekoUser(): User<Player> {
+    return PlayerAdapters.get<Player>().adapt(this)
 }
 
 /**
- * The adapter for [PaperPlayer].
+ * The adapter for [Player].
  */
-class PaperPlayerAdapter : KoinComponent, Listener, PlayerAdapter<PaperPlayer> {
+class PaperPlayerAdapter : KoinComponent, Listener, PlayerAdapter<Player> {
     private val userManager: UserManager<Player> by inject()
 
-    override fun adapt(player: PaperPlayer): User {
+    override fun adapt(player: Player): User<Player> {
         return userManager.getPlayer(player)
     }
 }
@@ -68,7 +67,7 @@ class PaperPlayerAdapter : KoinComponent, Listener, PlayerAdapter<PaperPlayer> {
 /**
  * The User Manager on Paper platform.
  */
-class PaperUserManager : KoinComponent, Listener, UserManager<PaperPlayer> {
+class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     private val server: Server by inject()
 
     // handlers
@@ -77,7 +76,7 @@ class PaperUserManager : KoinComponent, Listener, UserManager<PaperPlayer> {
     private val kizamiEventHandler: KizamiEventHandler by inject(mode = LazyThreadSafetyMode.NONE)
 
     // holds the live data of users
-    private val userRepository: Cache<UUID, User> = Caffeine.newBuilder().build()
+    private val userRepository: Cache<UUID, User<Player>> = Caffeine.newBuilder().build()
 
     @EventHandler
     private fun onQuit(e: PlayerQuitEvent) {
@@ -103,12 +102,12 @@ class PaperUserManager : KoinComponent, Listener, UserManager<PaperPlayer> {
         kizamiEventHandler.handlePlayerInventorySlotChange(e)
     }
 
-    override fun getPlayer(uniqueId: UUID): User {
+    override fun getPlayer(uniqueId: UUID): User<Player> {
         val player = requireNotNull(server.getPlayer(uniqueId)) { "Player '$uniqueId' is not online" }
         return getPlayer(player)
     }
 
-    override fun getPlayer(player: Player): User {
+    override fun getPlayer(player: Player): User<Player> {
         return userRepository.get(player.uniqueId) { _ -> PaperUser(player) }
     }
 }

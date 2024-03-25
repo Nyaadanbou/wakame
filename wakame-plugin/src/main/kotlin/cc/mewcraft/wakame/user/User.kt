@@ -8,13 +8,15 @@ import java.util.UUID
 
 /**
  * Represents a player in wakame system.
+ *
+ * @param P the player type
  */
-interface User {
+interface User<P> {
 
     /**
      * The backing player.
      */
-    val player: Any
+    val player: P
 
     /**
      * Unique identifier of the player.
