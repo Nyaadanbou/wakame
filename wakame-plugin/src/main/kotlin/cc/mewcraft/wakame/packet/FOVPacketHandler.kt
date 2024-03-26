@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.packet
 
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.user.asNekoUser
 import cc.mewcraft.wakame.util.toStableFloat
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerAbilities
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes
 import org.bukkit.GameMode
-import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 
 private const val DEFAULT_FOV_MODIFIER = 0.1f
@@ -17,14 +17,20 @@ private const val SETTING_MAX_SPEED = 0.15f // TODO: 玩家可设置
 class FOVPacketHandler : PacketListenerAbstract() {
 
     override fun onPacketSend(event: PacketSendEvent) {
+        if (event.isCancelled)
+            return
+        val bukkitPlayer = event.player as? Player ?: return // 不是玩家
+        val nekoUser = bukkitPlayer.asNekoUser()
         if (event.packetType != PacketType.Play.Server.UPDATE_ATTRIBUTES)
             return
-        val originPack = WrapperPlayServerUpdateAttributes(event)
-        val currentSpeed = originPack.properties.firstOrNull { it.key == Attribute.GENERIC_MOVEMENT_SPEED.key.asString() }?.value?.toStableFloat() ?: return
+        val currentSpeed = nekoUser.attributeMap.getAttributeInstance(Attributes.MOVEMENT_SPEED_RATE)?.getValue()?.toStableFloat() ?: return
+        println("Player ${bukkitPlayer.name} speed: $currentSpeed")
 
-        val bukkitPlayer = event.player as? Player ?: return // 不是玩家
         val flying = bukkitPlayer.isFlying
-        val defaultSpeed = if (flying) 1.1f else 1.0f
+        val sprinting = bukkitPlayer.isSprinting
+        var defaultSpeed = 1.0f
+        if (sprinting) defaultSpeed *= 1.3f
+        if (flying) defaultSpeed *= 1.1f
         val maxFov = defaultSpeed * (SETTING_MAX_SPEED / DEFAULT_FOV_MODIFIER) /* 原始公式：defaultSpeed * (SETTING_MAX_SPEED / BASE_SPEED + 1.0f) / 2.0f */
 
         // 计算 FovModifier
