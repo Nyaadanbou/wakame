@@ -3,7 +3,9 @@ package cc.mewcraft.wakame.pack.service
 import cc.mewcraft.wakame.github.GithubRepoManager
 import cc.mewcraft.wakame.pack.GENERATED_RESOURCE_PACK_DIR
 import cc.mewcraft.wakame.pack.RESOURCE_PACK_ZIP_NAME
+import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.Blocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -25,18 +27,21 @@ sealed interface Service {
     /**
      * Start the service.
      */
-    fun start(reGenerate: Boolean = false)
+    fun start(isNoPack: Boolean)
 
     /**
      * Stop the service.
      */
     fun stop()
+
+    fun sendToPlayer(player: Player)
 }
 
 data object NoneService : Service {
     override val downloadAddress = null
-    override fun start(reGenerate: Boolean) = Unit // do nothing
+    override fun start(isNoPack: Boolean) = Unit // do nothing
     override fun stop() = Unit // do nothing
+    override fun sendToPlayer(player: Player) = Unit // do nothing
 }
 
 data class ResourcePackService(
@@ -65,13 +70,22 @@ data class ResourcePackService(
         "http://$host/get/${resourcePack.hash()}/$RESOURCE_PACK_ZIP_NAME"
     }
 
-    override fun start(reGenerate: Boolean) {
+    override fun start(isNoPack: Boolean) {
         server.start()
     }
 
     @Blocking
     override fun stop() {
         server.stop(0)
+    }
+
+    override fun sendToPlayer(player: Player) {
+        player.setResourcePack(
+            downloadAddress,
+            resourcePack.hash(),
+            true,
+            "<red>WA-KA-ME Resource Pack!!!!!!!!!".mini
+        )
     }
 }
 
@@ -88,8 +102,8 @@ data class GithubService(
 
     override val downloadAddress: String? = null // Not supported
 
-    override fun start(reGenerate: Boolean) {
-        if (!reGenerate) return
+    override fun start(isNoPack: Boolean) {
+        if (!isNoPack) return
         logger.info("Publishing resource pack to Github")
         val manager = GithubRepoManager(
             localRepoPath = pluginDataDir.resolve("cache").resolve("repo"),
@@ -108,4 +122,5 @@ data class GithubService(
     }
 
     override fun stop() = Unit // do nothing
+    override fun sendToPlayer(player: Player) = Unit // do nothing
 }

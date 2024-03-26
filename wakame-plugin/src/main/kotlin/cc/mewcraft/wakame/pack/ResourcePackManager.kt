@@ -18,7 +18,6 @@ import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.Blocking
-import org.jetbrains.annotations.Contract
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -46,8 +45,7 @@ internal class ResourcePackManager(
      *
      * @return a result encapsulating whether the generation succeeds or not
      */
-    fun generate(reGenerate: Boolean = false): Result<Unit> {
-        var regen = reGenerate || !this::pack.isInitialized
+    fun generate(reGenerate: Boolean): Result<Unit> {
         val resourceFile = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
         val resourcePackDir = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_DIR)
         val initArg = InitializerArg(resourceFile, resourcePackDir)
@@ -66,13 +64,13 @@ internal class ResourcePackManager(
             resourcePackResult.isSuccess -> resourcePackResult.getOrThrow()
             isNoPack -> {
                 logger.info("<yellow>Resource pack is empty, re-generating...".mini)
-                ResourcePack.resourcePack().also { regen = true }
+                ResourcePack.resourcePack()
             }
 
             else -> return Result.failure(resourcePackResult.exceptionOrNull()!!)
         }
 
-        if (regen) {
+        if (reGenerate || isNoPack) {
             val generationArgs = GenerationArgs(
                 description = config.description,
                 resourcePack = resourcePack,
@@ -108,7 +106,7 @@ internal class ResourcePackManager(
         pack = builtResourcePack
             .also { logger.info("<green>Resource pack built. File size: <yellow>${resourceFile.formatSize()}".mini) }
         // Start the resource pack server
-        runCatching { startServer(regen) }.getOrElse { return Result.failure(it) }
+        runCatching { startServer(reGenerate || isNoPack) }.getOrElse { return Result.failure(it) }
 
         return Result.success(Unit)
     }
@@ -146,13 +144,12 @@ internal class ResourcePackManager(
     }
 
     //<editor-fold desc="Resource pack server test">
-    @Contract(pure = true)
-    private fun startServer(reGenerate: Boolean) {
+    private fun startServer(isNoPack: Boolean) {
         if (!config.enabled) {
             logger.info("<red>Resource pack server is disabled".mini)
             return
         }
-        service.start(reGenerate)
+        service.start(isNoPack)
     }
 
     @Blocking
@@ -162,21 +159,10 @@ internal class ResourcePackManager(
     //</editor-fold>
 
     fun sendToPlayer(player: Player) {
-        if (!this::pack.isInitialized) {
-            player.takeIf { !it.hasPermission("wakame.admin") && it.isOnline }
-                ?.let {
-                    player.kick("<red>Resource pack is not ready. Please wait a moment.".mini)
-                }
-            return
-        }
-        val downloadAddress = service.downloadAddress
-            ?: return
+        service.sendToPlayer(player)
+    }
 
-        player.setResourcePack(
-            downloadAddress,
-            pack.hash(),
-            true,
-            "<red>WA-KA-ME Resource Pack!!!!!!!!!".mini
-        )
+    fun close() {
+        stopServer()
     }
 }

@@ -183,7 +183,7 @@ object Initializer : KoinComponent, Listener {
         forEachPreWorld { onPrePack() }.onFailure { return }
         LOGGER.info("[Initializer] onPrePack - Complete")
 
-        get<ResourcePackManager>().generate().onFailure {
+        get<ResourcePackManager>().generate(false).onFailure {
             shutdown("An exception occurred during resource pack generation.", it)
             return
         }
@@ -257,6 +257,7 @@ object Initializer : KoinComponent, Listener {
     fun disable() {
         unregisterEvents()
         terminables.closeAndReportException()
+        get<ResourcePackManager>().close()
     }
 
     private fun shutdown(message: String, throwable: Throwable) {
