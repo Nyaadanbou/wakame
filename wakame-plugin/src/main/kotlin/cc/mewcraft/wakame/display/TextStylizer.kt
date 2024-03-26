@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta
 import net.kyori.adventure.text.Component
+import net.kyori.examination.Examinable
 import kotlin.reflect.KClass
 
 /**
@@ -92,16 +93,16 @@ internal interface ItemMetaStylizer {
      * A child stylizer is simply a stylizer abstraction of a certain
      * type of content in the lore. See the implementations for details.
      *
-     * @param I the input type
+     * @param M the input binary item meta
      */
-    fun interface ChildStylizer<I : BinaryItemMeta<*>> {
+    fun interface ChildStylizer<M : BinaryItemMeta<*>> {
         /**
          * Stylizes the item meta and returns a list of components.
          *
          * @param input the input
          * @return stylized content
          */
-        fun stylize(input: I): List<Component>
+        fun stylize(input: M): List<Component>
     }
 
     /**
@@ -114,9 +115,9 @@ internal interface ItemMetaStylizer {
      *
      * This function never throws.
      */
-    fun <I : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out I>): ChildStylizer<I>
+    fun <M : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out M>): ChildStylizer<M>
 
-    interface LoreFormat {
+    interface LoreFormat : Examinable {
         /**
          * The format of a single line.
          */
@@ -133,7 +134,7 @@ internal interface ItemMetaStylizer {
         val bottom: List<String>?
     }
 
-    interface ListFormat {
+    interface ListFormat : Examinable {
         /**
          * The format of all elements joined together.
          */

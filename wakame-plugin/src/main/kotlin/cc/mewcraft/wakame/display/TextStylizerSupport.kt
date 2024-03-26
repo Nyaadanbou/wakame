@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reloadable
+import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
@@ -27,10 +28,12 @@ import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.TagPattern
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.*
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.util.stream.Stream
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -132,7 +135,7 @@ internal class AttributeStylizerImpl(
     private val operationStylizer: OperationStylizer,
 ) : KoinComponent, AttributeStylizer {
 
-    private val mm: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
+    private val mm: MiniMessage by inject()
 
     //<editor-fold desc="Helper implementations for number replacement in attributes">
     /**
@@ -252,7 +255,7 @@ internal class ItemMetaStylizerImpl(
     private val config: RendererConfiguration,
 ) : KoinComponent, ItemMetaStylizer {
 
-    private val mm: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
+    private val mm: MiniMessage by inject()
     private val rarityStyleTagCache: MutableMap<Rarity, Tag> by reloadable { HashMap() }
 
     override fun stylizeName(item: NekoStack): Component {
@@ -280,10 +283,12 @@ internal class ItemMetaStylizerImpl(
     }
 
     private val childStylizerMap: Map<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>> = buildMap {
-        // Side note: register each in alphabet order
+        // Side note: register each child stylizer in alphabet order
 
-        registerChildStylizer<BDisplayLoreMeta> { displayLoreMeta ->
-            val lore = displayLoreMeta.get()
+        // Add more child stylizer here ...
+
+        registerChildStylizer<BDisplayLoreMeta> {
+            val lore = this.get()
             val header = config.loreFormat.header?.let { it.mapTo(ObjectArrayList(it.size), mm::deserialize) }
             val bottom = config.loreFormat.bottom?.let { it.mapTo(ObjectArrayList(it.size), mm::deserialize) }
             val lines = lore.mapTo(ObjectArrayList(lore.size)) { mm.deserialize(config.loreFormat.line, parsed("line", it)) }
@@ -294,7 +299,7 @@ internal class ItemMetaStylizerImpl(
             else error("Should not happen")
         }
         registerChildStylizer<BDurabilityMeta> {
-            val durability = it.get()
+            val durability = this.get()
             val text = mm.deserialize(
                 config.durabilityFormat,
                 component("threshold", text(durability.threshold)),
@@ -303,18 +308,30 @@ internal class ItemMetaStylizerImpl(
             )
             listOf(text)
         }
-        registerChildStylizer<BLevelMeta> { listOf(mm.deserialize(config.levelFormat, component("value", text(it.get())))) }
-        registerChildStylizer<BRarityMeta> { listOf(mm.deserialize(config.rarityFormat, component("value", it.get().displayName))) }
-        registerChildStylizer<BElementMeta> { stylizeList(it.get(), config.elementFormat, Element::displayName) }
-        registerChildStylizer<BKizamiMeta> { stylizeList(it.get(), config.kizamiFormat, Kizami::displayName) }
-        registerChildStylizer<BSkinMeta> { listOf(mm.deserialize(config.skinFormat, component("value", it.get().displayName))) }
-        registerChildStylizer<BSkinOwnerMeta> { listOf(mm.deserialize(config.skinOwnerFormat, unparsed("value", it.get().toString()))) }
+        registerChildStylizer<BLevelMeta> {
+            listOf(mm.deserialize(config.levelFormat, component("value", text(get()))))
+        }
+        registerChildStylizer<BRarityMeta> {
+            listOf(mm.deserialize(config.rarityFormat, component("value", get().displayName)))
+        }
+        registerChildStylizer<BElementMeta> {
+            stylizeList(get(), config.elementFormat, Element::displayName)
+        }
+        registerChildStylizer<BKizamiMeta> {
+            stylizeList(get(), config.kizamiFormat, Kizami::displayName)
+        }
+        registerChildStylizer<BSkinMeta> {
+            listOf(mm.deserialize(config.skinFormat, component("value", get().displayName)))
+        }
+        registerChildStylizer<BSkinOwnerMeta> {
+            listOf(mm.deserialize(config.skinOwnerFormat, unparsed("value", get().toString())))
+        }
     }
 
     private inline fun <reified T : BinaryItemMeta<*>> MutableMap<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>>.registerChildStylizer(
-        stylizer: ChildStylizer<T>,
+        crossinline stylizer: T.() -> List<Component>,
     ) {
-        this[T::class] = stylizer
+        this[T::class] = ChildStylizer<T> { stylizer.invoke(it) }
     }
 
     /**
@@ -334,10 +351,10 @@ internal class ItemMetaStylizerImpl(
     }
 
     private object DefaultChildStylizer : ChildStylizer<BinaryItemMeta<*>> {
-        private val NO_IMPLEMENTATION: MutableMap<KClass<out BinaryItemMeta<*>>, List<Component>> by reloadable { Reference2ObjectLinkedOpenHashMap() }
+        private val NOOP_IMPLEMENTATION: MutableMap<KClass<out BinaryItemMeta<*>>, List<Component>> by reloadable { Reference2ObjectLinkedOpenHashMap() }
 
         override fun stylize(input: BinaryItemMeta<*>): List<Component> {
-            return NO_IMPLEMENTATION.getOrPut(input::class) { listOf(text(input::class.simpleName ?: "???")) }
+            return NOOP_IMPLEMENTATION.getOrPut(input::class) { listOf(text(input::class.simpleName ?: "???")) }
         }
     }
 
@@ -352,7 +369,15 @@ internal class ItemMetaStylizerImpl(
         override val bottom: List<String>?,
     ) : ItemMetaStylizer.LoreFormat {
         override fun toString(): String {
-            return "LoreFormat(line=$line, header=${header?.joinToString()}, bottom=${bottom?.joinToString()})"
+            return toSimpleString()
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> {
+            return Stream.of(
+                ExaminableProperty.of("line", line),
+                ExaminableProperty.of("header", header),
+                ExaminableProperty.of("bottom", bottom)
+            )
         }
     }
 
@@ -362,7 +387,15 @@ internal class ItemMetaStylizerImpl(
         override val separator: String,
     ) : ItemMetaStylizer.ListFormat {
         override fun toString(): String {
-            return "ListFormat(merged=$merged, single=$single, separator=$separator)"
+            return toSimpleString()
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> {
+            return Stream.of(
+                ExaminableProperty.of("merged", merged),
+                ExaminableProperty.of("single", single),
+                ExaminableProperty.of("separator", separator)
+            )
         }
     }
 }
