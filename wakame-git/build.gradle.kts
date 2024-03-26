@@ -9,5 +9,5 @@ description = "Add custom stuff to server"
 
 dependencies {
     // jgit
-    implementation(libs.jgit)
+    implementation(platform(libs.bom.jgit))
 }
