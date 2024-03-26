@@ -47,11 +47,13 @@ interface AttributeInstance {
     fun replace(other: AttributeInstance)
 }
 
-internal class VanillaAttributeInstance(
+@JvmInline
+internal value class VanillaAttributeInstance(
     private val handle: BukkitAttributeInstance,
 ) : AttributeInstance {
 
-    override val attribute: Attribute = handle.attribute.toNeko()
+    override val attribute: Attribute
+        get() = handle.attribute.toNeko()
 
     override fun getDescriptionId(): String {
         return attribute.descriptionId
