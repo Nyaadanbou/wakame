@@ -104,33 +104,54 @@ class PlayerAttributeMap internal constructor(
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
+        if (attribute.vanilla) {
+            return entity.getAttribute(attribute.toBukkit()) != null
+        }
         return data.containsKey(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
+        if (attribute.vanilla) {
+            return entity.getAttribute(attribute.toBukkit())?.getModifier(uuid) != null
+        }
         return data[attribute]?.getModifier(uuid) != null || default.hasModifier(attribute, uuid)
     }
 
     override fun getValue(attribute: Attribute): Double {
+        if (attribute.vanilla) {
+            getAttributeInstance(attribute) // ensure the attribute is registered
+        }
         return data[attribute]?.getValue() ?: default.getValue(attribute)
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
+        if (attribute.vanilla) {
+            getAttributeInstance(attribute)
+        }
         return data[attribute]?.getBaseValue() ?: default.getBaseValue(attribute)
     }
 
     override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
+        if (attribute.vanilla) {
+            getAttributeInstance(attribute)
+        }
         return data[attribute]?.getModifier(uuid)?.amount ?: default.getModifierValue(attribute, uuid)
     }
 
     override fun removeAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>) {
         for ((attribute, modifiers) in attributeModifiers.asMap()) {
+            if (attribute.vanilla) {
+                getAttributeInstance(attribute)
+            }
             data[attribute]?.let { modifiers.forEach(it::removeModifier) }
         }
     }
 
     override fun addAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>) {
         attributeModifiers.forEach { attribute, modifier ->
+            if (attribute.vanilla) {
+                getAttributeInstance(attribute)
+            }
             getAttributeInstance(attribute)?.let { attributeInstance ->
                 attributeInstance.removeModifier(modifier)
                 attributeInstance.addModifier(modifier)
