@@ -12,8 +12,7 @@ import com.google.common.collect.ImmutableClassToInstanceMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
-import java.util.*
+import java.util.UUID
 import kotlin.collections.set
 
 object NekoItemFactory {

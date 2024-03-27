@@ -13,7 +13,7 @@ interface ItemMetaHolder {
     val snapshot: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
 
     /**
-     * Gets the specific holder of binary item meta.
+     * Gets the holder of specific binary item meta.
      *
      * @param M the binary item meta type
      * @param clazz the binary item meta clazz
@@ -22,7 +22,7 @@ interface ItemMetaHolder {
     fun <M : BinaryItemMeta<*>> get(clazz: KClass<out M>): M?
 
     /**
-     * Gets the specific holder of binary item meta or create it, if it does not exist.
+     * Gets the holder of specific binary item meta or create it, if it does not exist.
      *
      * @param M the binary item meta type
      * @param clazz the binary item meta clazz
