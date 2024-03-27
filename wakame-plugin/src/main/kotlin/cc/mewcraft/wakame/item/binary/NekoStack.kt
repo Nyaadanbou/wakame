@@ -2,7 +2,10 @@ package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
+import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
+import cc.mewcraft.wakame.item.binary.meta.get
+import cc.mewcraft.wakame.item.binary.meta.getOrCreate
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolder
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import net.kyori.adventure.key.Key
@@ -143,4 +146,22 @@ interface NekoStack : NekoStackSetter {
      * @throws NullPointerException if this is not a legal neko item
      */
     val statistics: ItemStatisticsHolder
+}
+
+/**
+ * Gets the holder of binary item meta.
+ *
+ * @see ItemMetaHolder.get
+ */
+inline fun <reified M : BinaryItemMeta<*>> NekoStack.meta(): M? {
+    return this.meta.get<M>()
+}
+
+/**
+ * Gets the holder of binary item meta or create it, if it does not exist.
+ *
+ * @see ItemMetaHolder.getOrCreate
+ */
+inline fun <reified M : BinaryItemMeta<*>> NekoStack.createMeta(): M {
+    return this.meta.getOrCreate<M>()
 }

@@ -54,7 +54,7 @@ interface NekoItem : Keyed {
      * It should be noted that only necessary item meta should be written to
      * the item's NBT while generating an ItemStack from `this` [NekoItem].
      *
-     * @see getItemMetaBy
+     * @see meta
      */
     val meta: ClassToInstanceMap<SchemeItemMeta<*>>
 
@@ -79,9 +79,9 @@ interface NekoItem : Keyed {
  * val meta: ElementMeta = item.getItemMetaBy<ElementMeta>()
  * ```
  *
- * @param V the subclass of [SchemeItemMeta]
- * @return the instance of class [V] from this [NekoItem]
+ * @param M the subclass of [SchemeItemMeta]
+ * @return the instance of class [M] from this [NekoItem]
  */
-inline fun <reified V : SchemeItemMeta<*>> NekoItem.getItemMetaBy(): V {
-    return requireNotNull(meta.getInstance(V::class.java)) { "Can't find item meta '${V::class.simpleName}'. Incomplete implementation?" }
+inline fun <reified M : SchemeItemMeta<*>> NekoItem.meta(): M {
+    return requireNotNull(meta.getInstance(M::class.java)) { "Can't find item meta '${M::class.simpleName}'. Incomplete implementation?" }
 }

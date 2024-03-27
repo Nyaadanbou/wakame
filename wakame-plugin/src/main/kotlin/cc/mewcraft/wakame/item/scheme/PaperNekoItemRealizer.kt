@@ -107,11 +107,11 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         nekoItem: NekoItem,
         context: SchemeGenerationContext,
     ) {
-        val meta = nekoItem.getItemMetaBy<S>()
+        val meta = nekoItem.meta<S>()
         val value = meta.generate(context)
         if (value != null) {
             // write the item meta only if something is generated
-            set<B, V>(value)
+            getOrCreate<B>().set(value)
         }
     }
 

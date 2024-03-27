@@ -5,28 +5,43 @@ import kotlin.reflect.KClass
 interface ItemMetaHolder {
 
     /**
-     * The map is a **snapshot** which, at the time you called this function,
+     * Gets a **snapshot** which, at the time you called this function,
      * contains all the existing [BinaryItemMeta] on the item, which means that it is safe
      * to call [BinaryItemMeta.get] on the entry values ([BinaryItemMeta]) without throwing
      * (except that you have called [BinaryItemMeta.remove] before [BinaryItemMeta.get]).
      */
-    val map: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
+    val snapshot: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
 
-    // TODO 试试省略V吗
-    fun <T : BinaryItemMeta<V>, V> get(clazz: KClass<out T>): V?
-    fun <T : BinaryItemMeta<V>, V> set(clazz: KClass<out T>, value: V)
-    fun <T : BinaryItemMeta<*>> remove(clazz: KClass<out T>)
+    /**
+     * Gets the specific holder of binary item meta.
+     *
+     * @param M the binary item meta type
+     * @param clazz the binary item meta clazz
+     * @return the binary item meta instance
+     */
+    fun <M : BinaryItemMeta<*>> get(clazz: KClass<out M>): M?
+
+    /**
+     * Gets the specific holder of binary item meta or create it, if it does not exist.
+     *
+     * @param M the binary item meta type
+     * @param clazz the binary item meta clazz
+     * @return the binary item meta instance
+     */
+    fun <M : BinaryItemMeta<*>> getOrCreate(clazz: KClass<out M>): M
 
 }
 
-inline fun <reified T : BinaryItemMeta<V>, V> ItemMetaHolder.get(): V? {
-    return this.get(T::class)
+/**
+ * @see ItemMetaHolder.get
+ */
+inline fun <reified M : BinaryItemMeta<*>> ItemMetaHolder.get(): M? {
+    return this.get(M::class)
 }
 
-inline fun <reified T : BinaryItemMeta<V>, V> ItemMetaHolder.set(value: V) {
-    this.set(T::class, value)
-}
-
-inline fun <reified T : BinaryItemMeta<*>> ItemMetaHolder.remove() {
-    this.remove(T::class)
+/**
+ * @see ItemMetaHolder.getOrCreate
+ */
+inline fun <reified M : BinaryItemMeta<*>> ItemMetaHolder.getOrCreate(): M {
+    return this.getOrCreate(M::class)
 }
