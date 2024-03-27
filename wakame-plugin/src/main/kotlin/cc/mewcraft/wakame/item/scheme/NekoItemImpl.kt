@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.item.EffectiveSlot
+import cc.mewcraft.wakame.item.scheme.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import com.google.common.collect.ClassToInstanceMap
@@ -14,4 +15,5 @@ internal data class NekoItemImpl(
     override val effectiveSlot: EffectiveSlot,
     override val meta: ClassToInstanceMap<SchemeItemMeta<*>>,
     override val cell: Map<String, SchemeCell>,
+    override val behaviors: List<ItemBehavior>,
 ) : NekoItem

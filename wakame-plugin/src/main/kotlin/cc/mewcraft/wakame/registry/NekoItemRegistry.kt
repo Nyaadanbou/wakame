@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.item.scheme.NekoItemFactory
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
+import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -36,8 +37,8 @@ import org.slf4j.Logger
 object NekoItemRegistry : KoinComponent, Initializable {
     val INSTANCES: Registry<Key, NekoItem> = SimpleRegistry()
 
-    fun get(key: String): NekoItem = INSTANCES.get(Key.key(key))
-    fun find(key: String): NekoItem? = INSTANCES.find(Key.key(key))
+    fun get(key: String): NekoItem = INSTANCES.get(Key(key))
+    fun find(key: String): NekoItem? = INSTANCES.find(Key(key))
 
     override fun onPreWorld() {
         loadConfiguration()

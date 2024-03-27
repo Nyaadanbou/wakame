@@ -1,6 +1,10 @@
 package cc.mewcraft.wakame.item.scheme.behavior
 
+import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.scheme.NekoItem
+import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.player.equipment.ArmorEquipEvent
 import cc.mewcraft.wakame.world.block.event.BlockBreakActionEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
@@ -20,6 +24,8 @@ sealed interface ItemBehaviorHolder
 
 interface ItemBehavior : ItemBehaviorHolder {
 
+    /* Event handlers */
+
     fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) = Unit
     fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
     fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) = Unit
@@ -32,6 +38,18 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
+
+    /* Item generation */
+
+    /**
+     * 生成该 ItemBehavior 的 Cell 并应用到物品上。
+     */
+    fun generateAndSet(holder: ItemCellHolder, context: SchemeGenerationContext) = Unit
+
+    /**
+     * 生成该 ItemBehavior 的 Meta 并应用到物品上。
+     */
+    fun generateAndSet(holder: ItemMetaHolder, context: SchemeGenerationContext) = Unit
 
 }
 

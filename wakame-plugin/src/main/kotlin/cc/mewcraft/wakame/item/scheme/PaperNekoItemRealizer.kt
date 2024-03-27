@@ -62,57 +62,62 @@ object PaperNekoItemRealizer : NekoItemRealizer {
             // the order of meta population is hardcoded currently
             // TODO configurable order of meta population
 
+            // write "standalone" item meta
             generateAndSet<_, SDisplayNameMeta, BDisplayNameMeta>(nekoItem, context)
             generateAndSet<_, SDisplayLoreMeta, BDisplayLoreMeta>(nekoItem, context)
-            generateAndSet<_, SDurabilityMeta, BDurabilityMeta>(nekoItem, context)
             generateAndSet<_, SLevelMeta, BLevelMeta>(nekoItem, context)
             generateAndSet<_, SRarityMeta, BRarityMeta>(nekoItem, context)
             generateAndSet<_, SElementMeta, BElementMeta>(nekoItem, context)
             generateAndSet<_, SKizamiMeta, BKizamiMeta>(nekoItem, context)
             generateAndSet<_, SSkinMeta, BSkinMeta>(nekoItem, context)
             generateAndSet<_, SSkinOwnerMeta, BSkinOwnerMeta>(nekoItem, context)
+
+            // write "behavior-bound" item meta
+            nekoItem.behaviors.forEach { it.generateAndSet(this, context) }
         }
 
         // write item cells
-        nekoItem.cell.forEach { (id, schema) ->
-            // the order of cell population should be the same as
-            // that they are declared in the configuration list
+        with(nekoStack.cell) {
+            nekoItem.cell.forEach { (id, schema) ->
+                // the order of cell population should be the same as
+                // that they are declared in the configuration list
 
-            val cell = BinaryCellFactory.generate(context, schema)
-            if (cell != null) {
-                // if the binary cell is non-null, it's either:
-                // 1) a cell with some content, or
-                // 2) a cell with no content + keepEmpty is true
-                nekoStack.cell.put(id, cell)
+                val cell = BinaryCellFactory.generate(context, schema)
+                if (cell != null) {
+                    // if the binary cell is non-null, it's either:
+                    // 1) a cell with some content, or
+                    // 2) a cell with no content + keepEmpty is true
+                    put(id, cell)
+                }
+                // if it's null, simply don't put the cell
             }
-            // if it's null, simply don't put the cell
+            nekoItem.behaviors.forEach { it.generateAndSet(this, context) }
         }
 
         return nekoStack
     }
+}
 
-    /**
-     * Generates meta from [nekoItem] and [context]
-     * and then writes it to [ItemMetaHolder].
-     *
-     * **Only if something is generated will the item meta be written out.**
-     *
-     * @param nekoItem the item
-     * @param context the context
-     * @param V the type of item meta value, shared by [S] and [B]
-     * @param S the type of [SchemeItemMeta]
-     * @param B the type of [BinaryItemMeta]
-     */
-    private inline fun <V, reified S : SchemeItemMeta<V>, reified B : BinaryItemMeta<V>> ItemMetaHolder.generateAndSet(
-        nekoItem: NekoItem,
-        context: SchemeGenerationContext,
-    ) {
-        val meta = nekoItem.meta<S>()
-        val value = meta.generate(context)
-        if (value != null) {
-            // write the item meta only if something is generated
-            getOrCreate<B>().set(value)
-        }
+/**
+ * Generates meta from [item] and [context]
+ * and then writes it to [ItemMetaHolder].
+ *
+ * **Only if something is generated will the item meta be written out.**
+ *
+ * @param item the item
+ * @param context the context
+ * @param V the type of item meta value, shared by [S] and [B]
+ * @param S the type of [SchemeItemMeta]
+ * @param B the type of [BinaryItemMeta]
+ */
+private inline fun <V, reified S : SchemeItemMeta<V>, reified B : BinaryItemMeta<V>> ItemMetaHolder.generateAndSet(
+    item: NekoItem,
+    context: SchemeGenerationContext,
+) {
+    val meta = item.meta<S>()
+    val value = meta.generate(context)
+    if (value != null) {
+        // write the item meta only if something is generated
+        getOrCreate<B>().set(value)
     }
-
 }

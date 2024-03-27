@@ -1,15 +1,19 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.item.EffectiveSlot
+import cc.mewcraft.wakame.item.scheme.behavior.Damageable
+import cc.mewcraft.wakame.item.scheme.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCellFactory
 import cc.mewcraft.wakame.item.scheme.meta.*
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.util.requireKt
 import com.google.common.collect.ImmutableClassToInstanceMap
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.UUID
+import org.spongepowered.configurate.kotlin.extensions.get
+import java.util.*
 import kotlin.collections.set
 
 object NekoItemFactory {
@@ -21,11 +25,15 @@ object NekoItemFactory {
      * @return a new [NekoItem]
      */
     fun create(key: Key, root: ConfigurationNode): NekoItem {
+        // Deserialize basic data
         val uuid = root.node("uuid").requireKt<UUID>()
         val material = root.node("material").requireKt<Key>()
         val effectiveSlot = root.node("effective_slot").requireKt<EffectiveSlot>()
 
-        // Deserialize item meta
+        // Deserialize item behaviors
+        val behaviors: List<ItemBehavior> = loadBehaviors(root.node("behaviors"))
+
+        // Deserialize standalone item meta
         val schemeMeta = ImmutableClassToInstanceMap.builder<SchemeItemMeta<*>>().apply {
             // Side note 1: buildMap preserves the insertion order
 
@@ -38,7 +46,6 @@ object NekoItemFactory {
             // (by alphabet order, in case you miss something)
             loadAndSave<DisplayLoreMeta>(root, "lore")
             loadAndSave<DisplayNameMeta>(root, "display_name")
-            loadAndSave<DurabilityMeta>(root, "durability")
             loadAndSave<ElementMeta>(root, "elements")
             loadAndSave<KizamiMeta>(root, "kizami")
             loadAndSave<LevelMeta>(root, "level")
@@ -64,15 +71,29 @@ object NekoItemFactory {
             }
         }
 
-        val ret = NekoItemImpl(key, uuid, material, effectiveSlot, schemeMeta, schemeCell)
+        val ret = NekoItemImpl(key, uuid, material, effectiveSlot, schemeMeta, schemeCell, behaviors)
         return ret
     }
 
-    private inline fun <reified T : SchemeItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemeItemMeta<*>>.loadAndSave(
-        node: ConfigurationNode,
-        vararg path: String,
-    ) {
-        val schemaItemMeta = node.node(*path).requireKt<T>()
-        this.put(T::class.java, schemaItemMeta)
+    private fun loadBehaviors(node: ConfigurationNode): List<ItemBehavior> {
+        return ObjectArrayList<ItemBehavior>().apply {
+            loadAndSave<Damageable>(node, "damageable")
+        }
     }
+}
+
+private inline fun <reified T : ItemBehavior> MutableList<ItemBehavior>.loadAndSave(
+    node: ConfigurationNode,
+    vararg path: String,
+) {
+    val schemeItemMeta = node.node(*path).requireKt<T>()
+    this.add(schemeItemMeta)
+}
+
+private inline fun <reified T : SchemeItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemeItemMeta<*>>.loadAndSave(
+    node: ConfigurationNode,
+    vararg path: String,
+) {
+    val schemaItemMeta = node.node(*path).requireKt<T>()
+    this.put(T::class.java, schemaItemMeta)
 }

@@ -96,7 +96,7 @@ class ItemDeserializationTest : KoinTest {
 
             generateAndSet<DisplayNameMeta, String>(demo, context)
             generateAndSet<DisplayLoreMeta, List<String>>(demo, context)
-            generateAndSet<DurabilityMeta, Durability>(demo, context)
+            // generateAndSet<DurabilityMeta, Durability>(demo, context)
             generateAndSet<LevelMeta, Int>(demo, context)
             generateAndSet<RarityMeta, Rarity>(demo, context)
             generateAndSet<ElementMeta, Set<Element>>(demo, context)

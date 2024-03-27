@@ -28,7 +28,20 @@ effective_slot: MAIN_HAND
 # 可选，默认 无
 behaviors:
   castable: { }
-  damageable: { }
+  damageable:
+    repair_materials:
+      - minecraft:iron_ingot
+    # 保养度
+    # 可选，默认 无
+    durability:
+      # 临界值
+      # 必填
+      # 可写成正态分布的形式
+      threshold: 512
+      # 初始损耗
+      # 可选，默认 0
+      # 可写成正态分布的形式
+      damage: 0
   enchantable: { }
 
 # 名字
@@ -40,18 +53,6 @@ display_name: "<red>Demo Short Sword"
 lore:
   - "<gold>Demo Lore 1"
   - "<gold>Demo Lore 2"
-
-# 保养度
-# 可选，默认 无
-durability:
-  # 临界值
-  # 必填
-  # 可写成正态分布的形式
-  threshold: 512
-  # 初始损耗
-  # 可选，默认 0
-  # 可写成正态分布的形式
-  damage: 0
 
 assets:
   - variant: 0 # 0 为默认变种

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.scheme
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.binary.NekoStack
+import cc.mewcraft.wakame.item.scheme.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import com.google.common.collect.ClassToInstanceMap
@@ -48,24 +49,32 @@ interface NekoItem : Keyed {
     val effectiveSlot: EffectiveSlot
 
     /**
-     * The map holds all the item meta of `this` item. You may navigate
-     * the subclasses of [SchemeItemMeta] for all types of item meta.
+     * The map holds all the "standalone" scheme item meta of this item.
      *
-     * It should be noted that only necessary item meta should be written to
-     * the item's NBT while generating an ItemStack from `this` [NekoItem].
+     * Note that the scheme item metas bound with [behaviors] are not accessible
+     * through this property. To get access to them, check the [ItemBehavior].
      *
      * @see meta
      */
     val meta: ClassToInstanceMap<SchemeItemMeta<*>>
 
     /**
-     * The map holds all the cell data about `this` item, where `map key` is
+     * The map holds all the scheme cells about this item, where `map key` is
      * cell ID and `map value` is [SchemeCell].
      *
      * The underlying map is actually an ordered map, and the iteration order
      * is always the same as the insertion order.
      */
     val cell: Map<String, SchemeCell>
+
+    /**
+     * The list of behaviors of `this` item.
+     *
+     * The behaviors may have any number of self-contained scheme item metas that only makes sense
+     * when presented together with certain behaviors. These scheme item metas are not accessible
+     * through the [meta] property.
+     */
+    val behaviors: List<ItemBehavior>
 }
 
 /**
