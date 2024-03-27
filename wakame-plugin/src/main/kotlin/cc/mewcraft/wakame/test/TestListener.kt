@@ -2,8 +2,9 @@ package cc.mewcraft.wakame.test
 
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
+import cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
-import cc.mewcraft.wakame.item.binary.meta.get
+import cc.mewcraft.wakame.item.binary.meta.orEmpty
 import cc.mewcraft.wakame.item.scheme.PaperNekoItemRealizer
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.pack.model.ModelRegistry
@@ -32,7 +33,7 @@ import org.koin.core.component.inject
 import team.unnamed.hephaestus.Model
 import team.unnamed.hephaestus.bukkit.BukkitModelEngine
 import team.unnamed.hephaestus.bukkit.ModelView
-import java.util.*
+import java.util.UUID
 
 
 class TestListener : KoinComponent, Listener {
@@ -75,7 +76,7 @@ class TestListener : KoinComponent, Listener {
         when (plainMessage) {
             "r1" -> {
                 val wrap = NekoStackFactory.wrap(inventory.itemInMainHand)
-                val lore = wrap.meta.get<DisplayLoreMeta, _>().orEmpty()
+                val lore = wrap.meta<DisplayLoreMeta>().orEmpty()
                 val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
             }

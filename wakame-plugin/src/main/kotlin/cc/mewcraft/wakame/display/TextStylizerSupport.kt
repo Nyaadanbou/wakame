@@ -2,20 +2,22 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.facade.*
+import cc.mewcraft.wakame.attribute.facade.PlainAttributeData
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.core.isEmpty
+import cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.RarityMeta
-import cc.mewcraft.wakame.item.binary.meta.get
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.toSimpleString
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
@@ -69,7 +71,7 @@ internal class TextStylizerImpl(
         val ret = ObjectArrayList<LoreLine>(16)
 
         // for each meta in the item
-        for ((itemMetaKClass, itemMeta) in item.meta.map) {
+        for ((itemMetaKClass, itemMeta) in item.meta.snapshot) {
             // Somehow the `::class` on the same type can return different KClass references.
             // We have to use the `.java` to compare references. Kotlin sucks this time :(
             if (itemMetaKClass.java === BDisplayNameMeta::class.java) {
@@ -256,30 +258,23 @@ internal class ItemMetaStylizerImpl(
 ) : KoinComponent, ItemMetaStylizer {
 
     private val mm: MiniMessage by inject()
-    private val rarityStyleTagCache: MutableMap<Rarity, Tag> by reloadable { HashMap() }
+    private val rarityStyleMap: LoadingCache<Rarity, Tag> by reloadable {
+        Caffeine.newBuilder().build { rarity -> Tag.styling(*rarity.styles) }
+    }
 
     override fun stylizeName(item: NekoStack): Component {
-        val displayName = item.meta.get<BDisplayNameMeta, _>()
-        return if (displayName != null) {
-            val resolvers = TagResolver.builder()
+        val displayName = item.meta<BDisplayNameMeta>()?.getOrNull() ?: return text("Unnamed")
 
+        val resolvers = TagResolver.builder().apply {
             // resolve name
-            resolvers.resolver(parsed("value", displayName))
-
+            resolver(parsed("value", displayName))
             // resolve rarity style
-            val rarity = item.meta.get<RarityMeta, _>()
-            if (rarity != null) {
-                rarityStyleTagCache.getOrPut(rarity) {
-                    Tag.styling(*rarity.styles)
-                }.let {
-                    resolvers.tag("rarity_style", it)
-                }
+            item.meta<RarityMeta>()?.getOrNull()?.run {
+                tag("rarity_style", rarityStyleMap[this])
             }
-
-            mm.deserialize(config.nameFormat, resolvers.build())
-        } else {
-            text("Unnamed")
         }
+
+        return mm.deserialize(config.nameFormat, resolvers.build())
     }
 
     private val childStylizerMap: Map<KClass<out BinaryItemMeta<*>>, ChildStylizer<*>> = buildMap {
@@ -288,7 +283,7 @@ internal class ItemMetaStylizerImpl(
         // Add more child stylizer here ...
 
         registerChildStylizer<BDisplayLoreMeta> {
-            val lore = this.get()
+            val lore = get()
             val header = config.loreFormat.header?.let { it.mapTo(ObjectArrayList(it.size), mm::deserialize) }
             val bottom = config.loreFormat.bottom?.let { it.mapTo(ObjectArrayList(it.size), mm::deserialize) }
             val lines = lore.mapTo(ObjectArrayList(lore.size)) { mm.deserialize(config.loreFormat.line, parsed("line", it)) }
@@ -299,7 +294,7 @@ internal class ItemMetaStylizerImpl(
             else error("Should not happen")
         }
         registerChildStylizer<BDurabilityMeta> {
-            val durability = this.get()
+            val durability = get()
             val text = mm.deserialize(
                 config.durabilityFormat,
                 component("threshold", text(durability.threshold)),

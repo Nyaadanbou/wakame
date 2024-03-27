@@ -126,7 +126,7 @@ class ItemDeserializationTest : KoinTest {
         item: NekoItem,
         context: SchemeGenerationContext,
     ) {
-        val meta = item.getItemMetaBy<S>()
+        val meta = item.meta<S>()
         val value = meta.generate(context)
         if (value != null) {
             // set the meta only if something is generated

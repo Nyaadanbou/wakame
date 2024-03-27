@@ -8,9 +8,8 @@ import net.kyori.adventure.key.Key
  * An abstraction layer of an item meta. This interface defines
  * basic read and write operations for the underlying item NBT.
  *
- * @param V the value stored in this [BinaryItemMeta]
- * @constructor the primary constructor must have
- * a single parameter of type [ItemMetaHolder]
+ * @param V the value "stored" in this [BinaryItemMeta]
+ * @constructor the primary constructor must have a single parameter of type [ItemMetaHolder]
  */
 sealed interface BinaryItemMeta<V> : Keyed {
 

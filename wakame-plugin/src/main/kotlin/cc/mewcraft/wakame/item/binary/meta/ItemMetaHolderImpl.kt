@@ -20,7 +20,7 @@ internal class ItemMetaHolderImpl(
     val rootOrCreate: CompoundShadowTag
         get() = base.tags.getOrPut(NekoNamespaces.ITEM_META, CompoundShadowTag::create)
 
-    override val map: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
+    override val snapshot: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
         get() {
             val root = rootOrNull ?: return emptyMap()
             val ret = Reference2ObjectArrayMap<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>()
@@ -35,29 +35,20 @@ internal class ItemMetaHolderImpl(
             return ret
         }
 
-    override fun <T : BinaryItemMeta<V>, V> get(clazz: KClass<out T>): V? {
+    override fun <M : BinaryItemMeta<*>> get(clazz: KClass<out M>): M? {
         val root = rootOrNull ?: return null
         val (_, companion, constructor) = ItemMetaRegistry.reflect(clazz)
         return if (companion.contains(root)) {
             val itemMeta = constructor.invoke(this)
             @Suppress("UNCHECKED_CAST")
-            (itemMeta as T).getOrNull()
-        } else {
-            null
-        }
+            (itemMeta as M)
+        } else null
     }
 
-    override fun <T : BinaryItemMeta<V>, V> set(clazz: KClass<out T>, value: V) {
+    override fun <M : BinaryItemMeta<*>> getOrCreate(clazz: KClass<out M>): M {
         val (_, _, constructor) = ItemMetaRegistry.reflect(clazz)
         val itemMeta = constructor.invoke(this)
         @Suppress("UNCHECKED_CAST")
-        (itemMeta as T).set(value)
-    }
-
-    override fun <T : BinaryItemMeta<*>> remove(clazz: KClass<out T>) {
-        val (_, _, constructor) = ItemMetaRegistry.reflect(clazz)
-        val itemMeta = constructor.invoke(this)
-        @Suppress("UNCHECKED_CAST")
-        (itemMeta as T).remove()
+        return (itemMeta as M)
     }
 }
