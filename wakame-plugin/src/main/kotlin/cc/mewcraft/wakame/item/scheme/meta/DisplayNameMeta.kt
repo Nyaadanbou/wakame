@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.item.scheme.meta
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.nonGenerate
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.toMetaResult
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -23,13 +25,13 @@ private class NonNullDisplayNameMeta(
      */
     private val displayName: String,
 ) : DisplayNameMeta {
-    override fun generate(context: SchemeGenerationContext): String {
-        return displayName
+    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<String> {
+        return displayName.toMetaResult()
     }
 }
 
 private data object DefaultDisplayNameMeta : DisplayNameMeta {
-    override fun generate(context: SchemeGenerationContext): String? = null
+    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<String> = nonGenerate()
 }
 
 internal class DisplayNameMetaSerializer : SchemeItemMetaSerializer<DisplayNameMeta> {

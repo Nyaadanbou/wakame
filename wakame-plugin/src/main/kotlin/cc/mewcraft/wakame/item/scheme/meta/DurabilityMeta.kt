@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.item.scheme.meta
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.nonGenerate
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.toMetaResult
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.requireKt
 import cc.mewcraft.wakame.util.toSimpleString
@@ -51,15 +53,15 @@ private class NonNullDurabilityMeta(
         damage?.run { require(damage.base < threshold.base) { "damage.base < threshold.base" } }
     }
 
-    override fun generate(context: SchemeGenerationContext): Durability {
+    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Durability> {
         val threshold = threshold.calculate(context.level)
         val damage = damage?.calculate(context.level) ?: 0 // if damage is null, simply generate 0
-        return Durability(threshold.toStableInt(), damage.toStableInt())
+        return Durability(threshold.toStableInt(), damage.toStableInt()).toMetaResult()
     }
 }
 
-private data object DefaultDurabilityMeta : DurabilityMeta {
-    override fun generate(context: SchemeGenerationContext): Durability? = null
+data object DefaultDurabilityMeta : DurabilityMeta {
+    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Durability> = nonGenerate()
 }
 
 internal class DurabilityMetaSerializer : SchemeItemMetaSerializer<DurabilityMeta> {

@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.binary.meta.getOrCreate
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
+import cc.mewcraft.wakame.item.scheme.meta.DefaultDurabilityMeta
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -36,8 +38,8 @@ interface Damageable : ItemBehavior {
 
         override fun generateAndSet(holder: ItemMetaHolder, context: SchemeGenerationContext) {
             val value = durabilityMeta.generate(context)
-            if (value != null) {
-                holder.getOrCreate<BDurabilityMeta>().set(value)
+            if (value is SchemeItemMeta.Result.NonEmptyResult) {
+                holder.getOrCreate<BDurabilityMeta>().set(value.value)
             }
         }
 
@@ -48,7 +50,13 @@ interface Damageable : ItemBehavior {
     }
 }
 
+private data object EmptyDamageable : Damageable {
+    override val repairMaterials: List<Key> = emptyList()
+    override val durabilityMeta: SDurabilityMeta = DefaultDurabilityMeta
+}
+
 internal class DamageableSerializer : ItemBehaviorSerializer<Damageable> {
+    override val defaultValue: Damageable = EmptyDamageable
     override fun deserialize(type: Type, node: ConfigurationNode): Damageable {
         return Damageable.Default(
             repairMaterials = node.node("repair_materials").requireKt<List<String>>().map(Key::key),

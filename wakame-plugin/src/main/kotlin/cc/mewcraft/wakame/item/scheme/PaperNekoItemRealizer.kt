@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.util.asNamespacedKey
 import org.bukkit.Registry
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta as BDisplayNameMeta
-import cc.mewcraft.wakame.item.binary.meta.DurabilityMeta as BDurabilityMeta
 import cc.mewcraft.wakame.item.binary.meta.ElementMeta as BElementMeta
 import cc.mewcraft.wakame.item.binary.meta.KizamiMeta as BKizamiMeta
 import cc.mewcraft.wakame.item.binary.meta.LevelMeta as BLevelMeta
@@ -20,7 +19,6 @@ import cc.mewcraft.wakame.item.binary.meta.SkinMeta as BSkinMeta
 import cc.mewcraft.wakame.item.binary.meta.SkinOwnerMeta as BSkinOwnerMeta
 import cc.mewcraft.wakame.item.scheme.meta.DisplayLoreMeta as SDisplayLoreMeta
 import cc.mewcraft.wakame.item.scheme.meta.DisplayNameMeta as SDisplayNameMeta
-import cc.mewcraft.wakame.item.scheme.meta.DurabilityMeta as SDurabilityMeta
 import cc.mewcraft.wakame.item.scheme.meta.ElementMeta as SElementMeta
 import cc.mewcraft.wakame.item.scheme.meta.KizamiMeta as SKizamiMeta
 import cc.mewcraft.wakame.item.scheme.meta.LevelMeta as SLevelMeta
@@ -116,8 +114,8 @@ private inline fun <V, reified S : SchemeItemMeta<V>, reified B : BinaryItemMeta
 ) {
     val meta = item.meta<S>()
     val value = meta.generate(context)
-    if (value != null) {
+    if (value is SchemeItemMeta.Result.NonEmptyResult) {
         // write the item meta only if something is generated
-        getOrCreate<B>().set(value)
+        getOrCreate<B>().set(value.value)
     }
 }

@@ -7,6 +7,14 @@ import java.lang.reflect.Type
 
 internal interface ItemBehaviorSerializer<T : ItemBehavior> : TypeSerializer<T> {
     /**
+     * You must override this property to provide a non-null empty value **if
+     * and only if** `this` scheme item meta is optional in the configuration.
+     * In other words, the scheme item meta is not optional if this property
+     * always returns `null`.
+     */
+    val defaultValue: T? get() = null
+
+    /**
      * Deserializes the scheme item meta from [node].
      */
     override fun deserialize(type: Type, node: ConfigurationNode): T
@@ -21,6 +29,6 @@ internal interface ItemBehaviorSerializer<T : ItemBehavior> : TypeSerializer<T> 
      * DO NOT OVERRIDE THIS.
      */
     override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): T? {
-        return null
+        return defaultValue
     }
 }

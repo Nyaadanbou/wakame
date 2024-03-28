@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.item.scheme.meta
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.nonGenerate
+import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.toMetaResult
 import cc.mewcraft.wakame.util.EnumLookup
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -40,10 +42,10 @@ private class NonNullLevelMeta(
      */
     private val level: Any,
 ) : KoinComponent, LevelMeta {
-    override fun generate(context: SchemeGenerationContext): Int {
+    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Int> {
         val ret: Int = when (level) {
             is Int -> {
-                return level
+                return level.toMetaResult()
             }
 
             is LevelMeta.Option -> {
@@ -58,11 +60,12 @@ private class NonNullLevelMeta(
         return ret
             .coerceAtLeast(0) // by design, level never goes down below 0
             .also { context.level = it } // populate the context with generated level
+            .toMetaResult()
     }
 }
 
 private data object DefaultLevelMeta : LevelMeta {
-    override fun generate(context: SchemeGenerationContext): Int? = null // default not to write level at all
+    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Int> = nonGenerate() // default not to write level at all
 }
 
 internal class LevelMetaSerializer : SchemeItemMetaSerializer<LevelMeta> {

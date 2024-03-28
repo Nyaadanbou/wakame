@@ -25,7 +25,7 @@ import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.slf4j.Logger
-import java.util.UUID
+import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
@@ -128,7 +128,7 @@ class ItemDeserializationTest : KoinTest {
     ) {
         val meta = item.meta<S>()
         val value = meta.generate(context)
-        if (value != null) {
+        if (value is SchemeItemMeta.Result.NonEmptyResult) {
             // set the meta only if something is generated
             logger.debug("write meta '{}': {}", S::class.simpleName, value.toString())
         }

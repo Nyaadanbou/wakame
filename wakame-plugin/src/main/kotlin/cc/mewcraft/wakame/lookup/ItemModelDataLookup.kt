@@ -2,14 +2,18 @@ package cc.mewcraft.wakame.lookup
 
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.reloadable
+import cc.mewcraft.wakame.util.requireKt
 import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
 import com.google.common.collect.Tables
 import net.kyori.adventure.key.Key
+import org.slf4j.Logger
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 
+
 internal class ItemModelDataLookup(
+    private val logger: Logger,
     private val loader: GsonConfigurationLoader,
 ) : Initializable {
     private val root: BasicConfigurationNode by reloadable { loader.load() }
@@ -18,12 +22,16 @@ internal class ItemModelDataLookup(
 
     private fun loadLayout() {
         customModelDataTable.clear()
-        root.childrenList().forEach { node ->
-            val key = Key.key(node.key().toString())
-            node.childrenMap().forEach { (variant, value) ->
-                customModelDataTable.put(key, variant as Int, value.int)
+        for (entry in root.childrenMap()) {
+            val key: String = entry.key.toString()
+            val valueNode = entry.value
+            for (variant in valueNode.childrenMap()) {
+                val variantKey = variant.key.toString().toInt()
+                val variantValue = variant.value.requireKt<Int>()
+                customModelDataTable.put(Key.key(key), variantKey, variantValue)
             }
         }
+        customModelDataTable.rowKeySet().forEach { logger.info("<gold>Loaded custom model data for $it") }
     }
 
     operator fun get(key: Key, variant: Int): Int? {

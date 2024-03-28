@@ -16,7 +16,7 @@ internal fun lookupModule(): Module = module {
             .file(getConfigFile(CUSTOM_MODEL_DATA_CONFIG_FILE))
             .build()
 
-        ItemModelDataLookup(loader)
+        ItemModelDataLookup(get(), loader)
     } binds arrayOf(Initializable::class)
 
     single { AssetsLookup } binds arrayOf(Initializable::class)
