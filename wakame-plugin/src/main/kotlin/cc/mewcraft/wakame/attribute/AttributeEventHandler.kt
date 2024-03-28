@@ -51,18 +51,6 @@ class AttributeEventHandler : KoinComponent {
     ////// Private Func //////
 
     /**
-     * Wrap the ItemStack as a NekoStack.
-     */
-    private fun ItemStack.asNekoStack(): NekoStack? {
-        val nekoStack = NekoStackFactory.wrap(this)
-        if (nekoStack.isNotNeko) {
-            return null
-        }
-
-        return nekoStack
-    }
-
-    /**
      * Add the attribute modifiers of [this] for the [player].
      *
      * @param player the player we add attribute modifiers to
@@ -77,7 +65,7 @@ class AttributeEventHandler : KoinComponent {
             return
         }
 
-        val nekoStack = this.asNekoStack() ?: return
+        val nekoStack = NekoStackFactory.by(this) ?: return
 
         if (!nekoStack.testSlot()) {
             return
@@ -101,7 +89,7 @@ class AttributeEventHandler : KoinComponent {
         // and by design, the UUID of an attribute modifier is the UUID of the item
         // that provides the attribute modifier. Thus, we only need to get the UUID
         // of the item to clear the attribute modifier.
-        val nekoStack = this.asNekoStack() ?: return
+        val nekoStack = NekoStackFactory.by(this) ?: return
 
         if (!nekoStack.testSlot()) {
             return

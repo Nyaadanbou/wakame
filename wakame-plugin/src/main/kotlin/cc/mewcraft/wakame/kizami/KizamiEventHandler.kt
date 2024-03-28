@@ -92,19 +92,6 @@ class KizamiEventHandler {
         }
     }
 
-    private fun ItemStack?.asNekoStack(): NekoStack? {
-        if (this == null || this.isEmpty) {
-            return null
-        }
-
-        val nekoStack = NekoStackFactory.wrap(this)
-        if (nekoStack.isNotNeko) {
-            return null
-        }
-
-        return nekoStack
-    }
-
     /**
      * Gets attribute modifiers on the ItemStack, considering the item's effective slot.
      */
@@ -113,7 +100,7 @@ class KizamiEventHandler {
             return emptySet()
         }
 
-        val nekoStack = this.asNekoStack() ?: return emptySet()
+        val nekoStack = NekoStackFactory.by(this) ?: return emptySet()
 
         if (!nekoStack.testEffectiveness()) {
             return emptySet()
