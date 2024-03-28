@@ -52,7 +52,7 @@ internal value class NekoStackImpl(
                 return handle.nekoCompound
             }
             // NMS-backed ItemStack - reading/modifying is allowed only if it already has a `wakame` compound
-            return checkNotNull(handle.nekoCompoundOrNull) { "Can't read/modify the NBT of NMS-backed ItemStack which is not NekoStack" }
+            return handle.nekoCompoundOrNull ?: throw NullPointerException("Can't read/modify the NBT of NMS-backed ItemStack which is not NekoStack")
         }
 
     override val isNeko: Boolean

@@ -117,6 +117,8 @@ interface NekoStack : NekoStackSetter {
 
     /**
      * The inventory slot where this item becomes effective.
+     *
+     * @throws NullPointerException if this is not a legal neko item
      */
     val effectiveSlot: EffectiveSlot
 
