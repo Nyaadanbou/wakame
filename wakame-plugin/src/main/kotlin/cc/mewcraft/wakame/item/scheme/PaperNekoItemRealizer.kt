@@ -27,12 +27,20 @@ import cc.mewcraft.wakame.item.scheme.meta.SkinMeta as SSkinMeta
 import cc.mewcraft.wakame.item.scheme.meta.SkinOwnerMeta as SSkinOwnerMeta
 
 object PaperNekoItemRealizer : NekoItemRealizer {
+    override fun realize(nekoItem: NekoItem, context: SchemeGenerationContext): NekoStack {
+        return createItemStack0(nekoItem, context)
+    }
 
-    override fun realize(nekoItem: NekoItem, user: User<*>): NekoStack = realize0(nekoItem, user)
-    override fun realize(nekoItem: NekoItem, crate: Crate): NekoStack = realize0(nekoItem, crate)
+    override fun realize(nekoItem: NekoItem, user: User<*>): NekoStack {
+        return realize0(nekoItem, user)
+    }
 
-    private fun realize0(nekoItem: NekoItem, any: Any): NekoStack {
-        val context = SchemeGenerationContext(SchemaGenerationTrigger.wrap(any))
+    override fun realize(nekoItem: NekoItem, crate: Crate): NekoStack {
+        return realize0(nekoItem, crate)
+    }
+
+    private fun realize0(nekoItem: NekoItem, source: Any): NekoStack {
+        val context = SchemeGenerationContext(SchemaGenerationTrigger.wrap(source))
         val nekoStack = createItemStack0(nekoItem, context)
         return nekoStack
     }
@@ -40,6 +48,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
     /**
      * Creates a NekoStack with the [context].
      *
+     * @param nekoItem the item blueprint
      * @param context the input context
      * @return a new once-off NekoStack
      */
@@ -55,12 +64,10 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         nekoStack.putVariant(0)
         nekoStack.putSeed(context.seed) // TODO 对于没有随机元素的物品（例如材料类物品），不应该写入带有随机元素的数据
 
-        // write item meta
+        // write meta
         with(nekoStack.meta) {
-            // the order of meta population is hardcoded currently
-            // TODO configurable order of meta population
 
-            // write "standalone" item meta
+            // write "standalone" meta
             generateAndSet<_, SDisplayNameMeta, BDisplayNameMeta>(nekoItem, context)
             generateAndSet<_, SDisplayLoreMeta, BDisplayLoreMeta>(nekoItem, context)
             generateAndSet<_, SLevelMeta, BLevelMeta>(nekoItem, context)
@@ -70,12 +77,14 @@ object PaperNekoItemRealizer : NekoItemRealizer {
             generateAndSet<_, SSkinMeta, BSkinMeta>(nekoItem, context)
             generateAndSet<_, SSkinOwnerMeta, BSkinOwnerMeta>(nekoItem, context)
 
-            // write "behavior-bound" item meta
+            // write "behavior-bound" meta
             nekoItem.behaviors.forEach { it.generateAndSet(this, context) }
         }
 
-        // write item cells
+        // write cells
         with(nekoStack.cell) {
+
+            // write "standalone" cells
             nekoItem.cell.forEach { (id, schema) ->
                 // the order of cell population should be the same as
                 // that they are declared in the configuration list
@@ -89,6 +98,8 @@ object PaperNekoItemRealizer : NekoItemRealizer {
                 }
                 // if it's null, simply don't put the cell
             }
+
+            // write "behavior-bound" cells
             nekoItem.behaviors.forEach { it.generateAndSet(this, context) }
         }
 
@@ -97,8 +108,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
 }
 
 /**
- * Generates meta from [item] and [context]
- * and then writes it to [ItemMetaHolder].
+ * Generates meta from [item] and [context] and then writes it to [ItemMetaHolder].
  *
  * **Only if something is generated will the item meta be written out.**
  *

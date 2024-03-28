@@ -12,11 +12,20 @@ import cc.mewcraft.wakame.user.User
 interface NekoItemRealizer {
 
     /**
+     * Realizes an item template against a custom trigger.
+     *
+     * @param nekoItem the item template
+     * @param context the context on which the realization is based
+     * @return a one-off NekoStack
+     */
+    fun realize(nekoItem: NekoItem, context: SchemeGenerationContext): NekoStack
+
+    /**
      * Realizes an item template against a player.
      *
      * @param nekoItem the item template
      * @param user the player on which the realization is based
-     * @return a once-off NekoStack
+     * @return a one-off NekoStack
      */
     fun realize(nekoItem: NekoItem, user: User<*>): NekoStack
 
@@ -25,7 +34,7 @@ interface NekoItemRealizer {
      *
      * @param nekoItem the item template
      * @param crate the crate on which the realization is based
-     * @return a once-off NekoStack
+     * @return a one-off NekoStack
      */
     fun realize(nekoItem: NekoItem, crate: Crate): NekoStack
 
