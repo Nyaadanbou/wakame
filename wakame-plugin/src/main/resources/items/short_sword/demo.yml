@@ -29,18 +29,10 @@ effective_slot: MAIN_HAND
 behaviors:
   castable: { }
   damageable:
-    repair_materials:
+    repair:
       - minecraft:iron_ingot
-    # 保养度
-    # 可选，默认 无
     durability:
-      # 临界值
-      # 必填
-      # 可写成正态分布的形式
       threshold: 512
-      # 初始损耗
-      # 可选，默认 0
-      # 可写成正态分布的形式
       damage: 0
   enchantable: { }
 

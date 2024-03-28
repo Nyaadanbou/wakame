@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.binary.meta.getOrCreate
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.meta.DefaultDurabilityMeta
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
+import cc.mewcraft.wakame.item.scheme.meta.GenerationResult
 import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -31,14 +31,14 @@ interface Damageable : ItemBehavior {
      */
     val durabilityMeta: SDurabilityMeta
 
-    class Default(
+    class Impl(
         override val repairMaterials: List<Key>,
         override val durabilityMeta: SDurabilityMeta,
     ) : Damageable {
 
         override fun generateAndSet(holder: ItemMetaHolder, context: SchemeGenerationContext) {
             val value = durabilityMeta.generate(context)
-            if (value is SchemeItemMeta.Result.NonEmptyResult) {
+            if (value is GenerationResult.Thing) {
                 holder.getOrCreate<BDurabilityMeta>().set(value.value)
             }
         }
@@ -50,16 +50,16 @@ interface Damageable : ItemBehavior {
     }
 }
 
-private data object EmptyDamageable : Damageable {
+private data object DefaultDamageable : Damageable {
     override val repairMaterials: List<Key> = emptyList()
     override val durabilityMeta: SDurabilityMeta = DefaultDurabilityMeta
 }
 
 internal class DamageableSerializer : ItemBehaviorSerializer<Damageable> {
-    override val defaultValue: Damageable = EmptyDamageable
+    override val defaultValue: Damageable = DefaultDamageable
     override fun deserialize(type: Type, node: ConfigurationNode): Damageable {
-        return Damageable.Default(
-            repairMaterials = node.node("repair_materials").requireKt<List<String>>().map(Key::key),
+        return Damageable.Impl(
+            repairMaterials = node.node("repair").requireKt<List<String>>().map(Key::key),
             durabilityMeta = node.node("durability").requireKt<SDurabilityMeta>()
         )
     }

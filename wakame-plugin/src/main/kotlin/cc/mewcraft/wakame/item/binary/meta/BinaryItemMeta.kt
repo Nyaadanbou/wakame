@@ -5,8 +5,8 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 /**
- * An abstraction layer of an item meta. This interface defines
- * basic read and write operations for the underlying item NBT.
+ * An abstraction layer of an item meta. This is an interface
+ * to read/write/remove certain item meta for the ItemStack.
  *
  * @param V the value "stored" in this [BinaryItemMeta]
  * @constructor the primary constructor must have a single parameter of type [ItemMetaHolder]

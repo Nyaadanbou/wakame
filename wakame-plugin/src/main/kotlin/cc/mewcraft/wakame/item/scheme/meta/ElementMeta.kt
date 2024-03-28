@@ -6,8 +6,6 @@ import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.filter.FilterFactory
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.nonGenerate
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.toMetaResult
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.random.Pool
 import cc.mewcraft.wakame.util.requireKt
@@ -29,13 +27,13 @@ sealed interface ElementMeta : SchemeItemMeta<Set<Element>> {
 private class NonNullElementMeta(
     private val elementPool: ElementPool,
 ) : ElementMeta {
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Set<Element>> {
-        return elementPool.pick(context).toSet().toMetaResult()
+    override fun generate(context: SchemeGenerationContext): GenerationResult<Set<Element>> {
+        return GenerationResult(elementPool.pick(context).toSet())
     }
 }
 
 private data object DefaultElementMeta : ElementMeta {
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Set<Element>> = nonGenerate()
+    override fun generate(context: SchemeGenerationContext): GenerationResult<Set<Element>> = GenerationResult.empty()
 }
 
 internal class ElementMetaSerializer : SchemeItemMetaSerializer<ElementMeta> {

@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.item.scheme.meta
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.nonGenerate
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.toMetaResult
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.LevelMappingRegistry
@@ -38,25 +36,27 @@ private class NonNullRarityMeta(
         require(static != null || dynamic != null) { "static != null || dynamic != null" }
     }
 
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Rarity> {
-        @Suppress("IfThenToElvis") // FUNKY IDE
-        return if (static != null) {
+    override fun generate(context: SchemeGenerationContext): GenerationResult<Rarity> {
+        @Suppress("IfThenToElvis")
+        val rarity = if (static != null) {
             // use static rarity
-            static.toMetaResult()
+            static
         } else if (dynamic != null) {
             // use dynamic rarity
-            dynamic.pick(context.level, context.random).toMetaResult()
+            dynamic.pick(context.level, context.random)
         } else {
             // fallback to the global rarity mappings
-            LevelMappingRegistry.INSTANCES.get(LevelMappingRegistry.GLOBAL_NAME).pick(context.level, context.random).toMetaResult()
+            LevelMappingRegistry.INSTANCES.get(LevelMappingRegistry.GLOBAL_NAME).pick(context.level, context.random)
         }.also {
-            context.rarities += it.value // leave trace to the context
+            // leave trace to the context
+            context.rarities += it
         }
+        return GenerationResult(rarity)
     }
 }
 
 private data object DefaultRarityMeta : RarityMeta {
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Rarity> = nonGenerate()
+    override fun generate(context: SchemeGenerationContext): GenerationResult<Rarity> = GenerationResult.empty()
 }
 
 internal class RarityMetaSerializer : SchemeItemMetaSerializer<RarityMeta> {

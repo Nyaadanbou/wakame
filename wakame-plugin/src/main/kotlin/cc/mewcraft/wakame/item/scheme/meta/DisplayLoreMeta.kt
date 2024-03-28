@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.item.scheme.meta
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.nonGenerate
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.toMetaResult
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -25,13 +23,13 @@ private class NonNullDisplayLoreMeta(
      */
     private val lore: List<String>,
 ) : DisplayLoreMeta {
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<List<String>> {
-        return lore.toMetaResult()
+    override fun generate(context: SchemeGenerationContext): GenerationResult<List<String>> {
+        return GenerationResult(lore)
     }
 }
 
 private data object DefaultDisplayLoreMeta : DisplayLoreMeta {
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<List<String>> = nonGenerate()
+    override fun generate(context: SchemeGenerationContext): GenerationResult<List<String>> = GenerationResult.empty()
 }
 
 internal class DisplayLoreMetaSerializer : SchemeItemMetaSerializer<DisplayLoreMeta> {

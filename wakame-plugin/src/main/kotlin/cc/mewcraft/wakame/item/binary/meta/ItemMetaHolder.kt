@@ -2,6 +2,9 @@ package cc.mewcraft.wakame.item.binary.meta
 
 import kotlin.reflect.KClass
 
+/**
+ * This is an interface to get the [item meta holder][BinaryItemMeta] for the ItemStack.
+ */
 interface ItemMetaHolder {
 
     /**

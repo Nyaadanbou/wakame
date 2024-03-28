@@ -6,6 +6,9 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import com.google.common.collect.Multimap
 
+/**
+ * This is an interface to get the [cell holder][BinaryCell] for the ItemStack.
+ */
 interface ItemCellHolder {
 
     /* Getters */

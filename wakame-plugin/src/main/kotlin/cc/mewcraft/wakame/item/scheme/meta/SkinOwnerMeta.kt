@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.item.scheme.meta
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.nonGenerate
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.toMetaResult
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -25,13 +23,13 @@ private class NonNullSkinOwnerMeta(
      */
     private val skinOwner: UUID,
 ) : SkinOwnerMeta {
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<UUID> {
-        return skinOwner.toMetaResult()
+    override fun generate(context: SchemeGenerationContext): GenerationResult<UUID> {
+        return GenerationResult(skinOwner)
     }
 }
 
 private data object DefaultSkinOwnerMeta : SkinOwnerMeta {
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<UUID> = nonGenerate()
+    override fun generate(context: SchemeGenerationContext): GenerationResult<UUID> = GenerationResult.empty()
 }
 
 internal class SkinOwnerMetaSerializer : SchemeItemMetaSerializer<SkinOwnerMeta> {

@@ -5,8 +5,6 @@ import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.filter.FilterFactory
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.nonGenerate
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta.ResultUtil.toMetaResult
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
@@ -32,13 +30,18 @@ sealed interface KizamiMeta : SchemeItemMeta<Set<Kizami>> {
 private class NonNullKizamiMeta(
     private val kizamiGroup: KizamiGroup,
 ) : KizamiMeta {
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Set<Kizami>> {
-        return kizamiGroup.pick(context).toSet().takeIf { it.isNotEmpty() }?.toMetaResult() ?: nonGenerate()
+    override fun generate(context: SchemeGenerationContext): GenerationResult<Set<Kizami>> {
+        val value = kizamiGroup.pick(context).toSet()
+        return if (value.isNotEmpty()) {
+            GenerationResult(value)
+        } else {
+            GenerationResult.empty()
+        }
     }
 }
 
 private data object DefaultKizamiMeta : KizamiMeta {
-    override fun generate(context: SchemeGenerationContext): SchemeItemMeta.Result<Set<Kizami>> = nonGenerate()
+    override fun generate(context: SchemeGenerationContext): GenerationResult<Set<Kizami>> = GenerationResult.empty()
 }
 
 internal class KizamiMetaSerializer : SchemeItemMetaSerializer<KizamiMeta> {

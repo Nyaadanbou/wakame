@@ -124,8 +124,7 @@ private inline fun <V, reified S : SchemeItemMeta<V>, reified B : BinaryItemMeta
 ) {
     val meta = item.meta<S>()
     val value = meta.generate(context)
-    if (value is SchemeItemMeta.Result.NonEmptyResult) {
-        // write the item meta only if something is generated
+    if (value is GenerationResult.Thing) {
         getOrCreate<B>().set(value.value)
     }
 }
