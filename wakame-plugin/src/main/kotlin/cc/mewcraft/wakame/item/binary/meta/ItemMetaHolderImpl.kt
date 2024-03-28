@@ -25,6 +25,10 @@ internal class ItemMetaHolderImpl(
             val root = rootOrNull ?: return emptyMap()
             val ret = Reference2ObjectArrayMap<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>()
 
+            // TODO optimize the efficiency
+            //  solution: loop through the root tag, then use the tag key to get implementation,
+            //  instead of looping through the whole meta registry and call contains()
+
             // check the existence of each item meta
             // if one exists, we add it to the map
             ItemMetaRegistry.reflections().forEach { (clazz, companion, constructor) ->
