@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.scheme
 import cc.mewcraft.wakame.configurate.MaterialSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.item.EffectiveSlotSerializer
-import cc.mewcraft.wakame.item.scheme.behavior.DamageableSerializer
 import cc.mewcraft.wakame.item.scheme.core.SchemeCoreGroupSerializer
 import cc.mewcraft.wakame.item.scheme.core.SchemeCorePoolSerializer
 import cc.mewcraft.wakame.item.scheme.curse.SchemeCurseGroupSerializer
@@ -69,8 +68,6 @@ internal fun schemeItemModule(): Module = module {
             .registerKt(RarityMetaSerializer())
             .registerKt(SkinMetaSerializer())
             .registerKt(SkinOwnerMetaSerializer())
-
-            .registerKt(DamageableSerializer())
 
             .build()
     }

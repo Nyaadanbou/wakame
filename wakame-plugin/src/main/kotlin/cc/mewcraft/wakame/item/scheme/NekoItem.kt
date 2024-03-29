@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import com.google.common.collect.ClassToInstanceMap
 import net.kyori.adventure.key.Key
+import xyz.xenondevs.nova.data.config.ConfigProvider
 import java.util.UUID
 
 /**
@@ -37,6 +38,11 @@ interface NekoItem : Keyed {
      * - [value][Key.value] is the name of the config file itself (without the file extension)
      */
     override val key: Key
+
+    /**
+     * The [config provider][ConfigProvider] of this item.
+     */
+    val config: ConfigProvider
 
     /**
      * The [key][Key] to the Material of this item.

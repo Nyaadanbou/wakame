@@ -9,9 +9,10 @@ import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
-import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
+import java.io.StringReader
 
 /**
  * NekoItem 物品配置文件的遍历器。
@@ -21,11 +22,11 @@ object NekoItemNodeIterator : KoinComponent {
 
     /**
      * 根据配置文件的目录结构，遍历所有物品配置文件，并对每个物品配置文件执行 [block]。
-     * 每次调用时会传入一个物品的 [Key] 和对应文件的根 [ConfigurationNode]。
+     * 每次调用时会传入一个物品的 [Key] 和对应文件的根 [CommentedConfigurationNode]。
      *
      * @param block 需要执行的代码块，会被多次调用。
      */
-    fun forEach(block: (Key, ConfigurationNode) -> Unit) {
+    fun forEach(block: (Key, CommentedConfigurationNode) -> Unit) {
         val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_CONFIG_DIR)
         val namespaceDirs = mutableListOf<File>()
 
@@ -54,7 +55,7 @@ object NekoItemNodeIterator : KoinComponent {
                     }
 
                     val text = itemFile.bufferedReader().use { it.readText() }
-                    val node = loaderBuilder.buildAndLoadString(text)
+                    val node = loaderBuilder.source { StringReader(text).buffered() }.build().load()
                     block(key, node)
                 }
         }

@@ -1,19 +1,20 @@
 package cc.mewcraft.wakame.item.scheme.behavior
 
+import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.binary.meta.getOrCreate
+import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.meta.DefaultDurabilityMeta
+import cc.mewcraft.wakame.item.scheme.meta.DurabilityMeta
 import cc.mewcraft.wakame.item.scheme.meta.GenerationResult
-import cc.mewcraft.wakame.util.requireKt
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
+import xyz.xenondevs.nova.data.config.entry
 import cc.mewcraft.wakame.item.binary.meta.DurabilityMeta as BDurabilityMeta
 import cc.mewcraft.wakame.item.scheme.meta.DurabilityMeta as SDurabilityMeta
 
@@ -31,10 +32,24 @@ interface Damageable : ItemBehavior {
      */
     val durabilityMeta: SDurabilityMeta
 
-    class Impl(
-        override val repairMaterials: List<Key>,
-        override val durabilityMeta: SDurabilityMeta,
+    companion object Impl : ItemBehaviorFactory<Damageable> {
+        const val KEY = "damageable"
+
+        override fun create(item: NekoItem): Damageable {
+            val cfg = item.config
+            val repairMaterials = cfg.entry<List<String>>("behaviors", KEY, "repair")
+            val durabilityMeta = cfg.entry<SDurabilityMeta>("behaviors", KEY, "durability")
+            return Default(repairMaterials, durabilityMeta)
+        }
+    }
+
+    class Default(
+        repairMaterialsProvider: Provider<List<String>>,
+        durabilityMetaProvider: Provider<SDurabilityMeta>,
     ) : Damageable {
+
+        override val repairMaterials: List<Key> by repairMaterialsProvider.map { it.map(Key::key) }
+        override val durabilityMeta: DurabilityMeta by durabilityMetaProvider
 
         override fun generateAndSet(holder: ItemMetaHolder, context: SchemeGenerationContext) {
             val value = durabilityMeta.generate(context)
@@ -47,20 +62,5 @@ interface Damageable : ItemBehavior {
             val nekoStack = NekoStackFactory.wrap(itemStack)
             player.sendMessage("Seed: ${nekoStack.seed}")
         }
-    }
-}
-
-private data object DefaultDamageable : Damageable {
-    override val repairMaterials: List<Key> = emptyList()
-    override val durabilityMeta: SDurabilityMeta = DefaultDurabilityMeta
-}
-
-internal class DamageableSerializer : ItemBehaviorSerializer<Damageable> {
-    override val defaultValue: Damageable = DefaultDamageable
-    override fun deserialize(type: Type, node: ConfigurationNode): Damageable {
-        return Damageable.Impl(
-            repairMaterials = node.node("repair").requireKt<List<String>>().map(Key::key),
-            durabilityMeta = node.node("durability").requireKt<SDurabilityMeta>()
-        )
     }
 }
