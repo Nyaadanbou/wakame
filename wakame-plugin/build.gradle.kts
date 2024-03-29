@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":wakame-git"))
     compileOnly(project(":wakame-nms"))
     runtimeOnly(project(":wakame-nms", configuration = "reobf"))
+    implementation(libs.commons.provider)
     compileOnly(libs.asm) // runtime is provided by paper
     compileOnly(libs.asm.commons) // ^
     implementation(libs.bytebuddy)
