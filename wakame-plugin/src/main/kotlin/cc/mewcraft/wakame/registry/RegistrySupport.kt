@@ -30,7 +30,7 @@ interface Registry<K, V> {
      * @return the specified value
      * @throws IllegalStateException if the specified value does not exist
      */
-    fun get(uniqueId: K): V =
+    operator fun get(uniqueId: K): V =
         requireNotNull(find(uniqueId)) { "Can't find object for unique id: $uniqueId" }
 
     /**
@@ -40,6 +40,13 @@ interface Registry<K, V> {
      * @param value the value to which the unique identifier maps
      */
     fun register(uniqueId: K, value: V)
+
+    /**
+     * @see register
+     */
+    operator fun plusAssign(pair: Pair<K, V>) {
+        register(pair.first, pair.second)
+    }
 
     /**
      * Clears all registered entries.

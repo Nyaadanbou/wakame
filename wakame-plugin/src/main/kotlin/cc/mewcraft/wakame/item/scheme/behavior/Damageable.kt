@@ -10,12 +10,12 @@ import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.meta.DurabilityMeta
 import cc.mewcraft.wakame.item.scheme.meta.GenerationResult
 import cc.mewcraft.wakame.provider.ConfigProvider
+import cc.mewcraft.wakame.provider.entry
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import cc.mewcraft.wakame.provider.entry
 import cc.mewcraft.wakame.item.binary.meta.DurabilityMeta as BDurabilityMeta
 import cc.mewcraft.wakame.item.scheme.meta.DurabilityMeta as SDurabilityMeta
 
@@ -33,17 +33,18 @@ interface Damageable : ItemBehavior {
      */
     val durabilityMeta: SDurabilityMeta
 
-    companion object Impl : ItemBehaviorFactory<Damageable> {
-        const val KEY = "damageable"
-
-        override fun create(item: NekoItem, provider: ConfigProvider): Damageable {
-            val repairMaterials = provider.entry<List<String>>("repair")
-            val durabilityMeta = provider.entry<SDurabilityMeta>("durability")
+    companion object Factory : ItemBehaviorFactory<Damageable> {
+        override fun create(item: NekoItem, config: ConfigProvider): Damageable {
+            val repairMaterials = config.entry<List<String>>("repair")
+            val durabilityMeta = config.entry<SDurabilityMeta>("durability")
             return Default(repairMaterials, durabilityMeta)
         }
     }
 
-    class Default(
+    /**
+     * 默认实现。理论上还可以有其他实现。
+     */
+    private class Default(
         repairMaterialsProvider: Provider<List<String>>,
         durabilityMetaProvider: Provider<SDurabilityMeta>,
     ) : Damageable {

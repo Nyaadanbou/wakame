@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableClassToInstanceMap
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.nio.file.Path
-import java.util.*
+import java.util.UUID
 import kotlin.collections.set
 
 object NekoItemFactory {
@@ -24,7 +24,8 @@ object NekoItemFactory {
      * @return a new [NekoItem]
      */
     fun create(key: Key, root: ConfigurationNode, relPath: Path): NekoItem {
-        val provider = NodeConfigProvider(root, relPath.toString()) { !root.virtual() }
+        val provider = NodeConfigProvider(root, relPath.toString())
+
         // Deserialize basic data
         val uuid = root.node("uuid").requireKt<UUID>()
         val material = root.node("material").requireKt<Key>()
@@ -76,7 +77,6 @@ object NekoItemFactory {
         return ret
     }
 }
-
 
 private inline fun <reified T : SchemeItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemeItemMeta<*>>.loadAndSave(
     node: ConfigurationNode,

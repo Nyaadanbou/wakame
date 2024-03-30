@@ -9,7 +9,7 @@ interface ItemMetaHolder {
 
     /**
      * Gets a **snapshot** set which, at the time you called this function,
-     * contains all the existing [BinaryItemMeta] on the item, which means that it is safe
+     * contains all the **existing** [BinaryItemMeta] on the item, which means that it is safe
      * to call [BinaryItemMeta.get] on every element in the set without throwing an exception
      * (except that you have called [BinaryItemMeta.remove] before [BinaryItemMeta.get]).
      */

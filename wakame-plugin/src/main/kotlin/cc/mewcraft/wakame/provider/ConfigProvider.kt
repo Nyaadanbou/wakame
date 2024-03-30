@@ -98,12 +98,10 @@ abstract class ConfigProvider(
 class FileConfigProvider internal constructor(
     path: Path,
     relPath: String,
-    loadValidation: () -> Boolean,
+    loadValidation: () -> Boolean = { true },
 ) : ConfigProvider(relPath, loadValidation) {
     override fun loadValue(): ConfigurationNode {
-        if (!loadValidation()) {
-            throw NoSuchElementException("Missing config '$relPath'")
-        }
+        require(loadValidation()) { "Load validation failed" }
         TODO("Not yet implemented")
     }
 }
@@ -111,11 +109,10 @@ class FileConfigProvider internal constructor(
 class NodeConfigProvider internal constructor(
     private val node: ConfigurationNode,
     relPath: String,
-    loadValidation: () -> Boolean,
+    loadValidation: () -> Boolean = { true },
 ) : ConfigProvider(relPath, loadValidation) {
-    override fun loadValue(): ConfigurationNode = if (!loadValidation()) {
-        throw NoSuchElementException("Missing config '$relPath'")
-    } else {
-        node
+    override fun loadValue(): ConfigurationNode {
+        require(loadValidation()) { "Load validation failed" }
+        return node
     }
 }

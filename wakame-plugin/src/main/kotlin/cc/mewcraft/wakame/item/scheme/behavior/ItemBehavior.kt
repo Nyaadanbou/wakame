@@ -54,5 +54,5 @@ interface ItemBehavior : ItemBehaviorHolder {
 }
 
 interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
-    fun create(item: NekoItem, provider: ConfigProvider): T
+    fun create(item: NekoItem, config: ConfigProvider): T
 }
