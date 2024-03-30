@@ -117,6 +117,13 @@ internal interface ItemMetaStylizer {
      */
     fun <M : BinaryItemMeta<*>> getChildStylizerBy(clazz: KClass<out M>): ChildStylizer<M>
 
+    /**
+     * The same as [getChildStylizerBy] but accepts an instance of [BinaryItemMeta].
+     */
+    fun <M : BinaryItemMeta<*>> getChildStylizerBy(itemMeta: M): ChildStylizer<M> {
+        return getChildStylizerBy(itemMeta::class)
+    }
+
     interface LoreFormat : Examinable {
         /**
          * The format of a single line.

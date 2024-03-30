@@ -12,7 +12,6 @@ internal class SkinOwnerMeta(
     private val holder: ItemMetaHolderImpl,
 ) : BinaryItemMeta<UUID> {
     override val key: Key = ItemMetaKeys.SKIN_OWNER
-    override val companion: ItemMetaCompanion = Companion
 
     override fun getOrNull(): UUID? {
         val rootOrNull = holder.rootOrNull

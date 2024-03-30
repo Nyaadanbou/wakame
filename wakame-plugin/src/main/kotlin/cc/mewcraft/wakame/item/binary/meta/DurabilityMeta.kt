@@ -13,7 +13,6 @@ internal class DurabilityMeta(
     private val holder: ItemMetaHolderImpl,
 ) : BinaryItemMeta<Durability> {
     override val key: Key = ItemMetaKeys.DURABILITY
-    override val companion: ItemMetaCompanion = Companion
 
     /**
      * Gets damage.

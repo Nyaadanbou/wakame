@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.binary.NekoStackImpl
 import cc.mewcraft.wakame.registry.ItemMetaRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
+import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.koin.core.component.KoinComponent
 import kotlin.reflect.KClass
@@ -20,10 +20,10 @@ internal class ItemMetaHolderImpl(
     val rootOrCreate: CompoundShadowTag
         get() = base.tags.getOrPut(NekoNamespaces.ITEM_META, CompoundShadowTag::create)
 
-    override val snapshot: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
+    override val snapshot: Set<BinaryItemMeta<*>>
         get() {
-            val root = rootOrNull ?: return emptyMap()
-            val ret = Reference2ObjectArrayMap<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>()
+            val root = rootOrNull ?: return emptySet()
+            val ret = ObjectArraySet<BinaryItemMeta<*>>()
 
             // TODO optimize the efficiency
             //  solution: loop through the root tag, then use the tag key to get implementation,
@@ -31,11 +31,12 @@ internal class ItemMetaHolderImpl(
 
             // check the existence of each item meta
             // if one exists, we add it to the map
-            ItemMetaRegistry.reflections().forEach { (clazz, companion, constructor) ->
+            ItemMetaRegistry.reflections().forEach { (_, companion, constructor) ->
                 if (companion.contains(root)) {
-                    ret[clazz] = constructor.invoke(this) as BinaryItemMeta<*>
+                    ret += constructor.invoke(this) as BinaryItemMeta<*>
                 }
             }
+
             return ret
         }
 

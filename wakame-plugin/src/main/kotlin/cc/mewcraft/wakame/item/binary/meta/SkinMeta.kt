@@ -15,7 +15,6 @@ internal class SkinMeta(
     private val holder: ItemMetaHolderImpl,
 ) : BinaryItemMeta<ItemSkin> {
     override val key: Key = ItemMetaKeys.SKIN
-    override val companion: ItemMetaCompanion = Companion
 
     override fun getOrNull(): ItemSkin? {
         return holder.rootOrNull

@@ -15,7 +15,6 @@ internal class RarityMeta(
     private val holder: ItemMetaHolderImpl,
 ) : BinaryItemMeta<Rarity> {
     override val key: Key = ItemMetaKeys.RARITY
-    override val companion: ItemMetaCompanion = Companion
 
     override fun getOrNull(): Rarity? {
         return holder.rootOrNull

@@ -15,7 +15,6 @@ internal class DisplayLoreMeta(
     private val holder: ItemMetaHolderImpl,
 ) : BinaryItemMeta<List<String>> {
     override val key: Key = ItemMetaKeys.DISPLAY_LORE
-    override val companion: ItemMetaCompanion = Companion
 
     override fun getOrNull(): List<String>? {
         return holder.rootOrNull
@@ -32,6 +31,8 @@ internal class DisplayLoreMeta(
     override fun remove() {
         holder.rootOrNull?.remove(key.value())
     }
+
+
 
     companion object : ItemMetaCompanion {
         override operator fun contains(compound: CompoundShadowTag): Boolean {

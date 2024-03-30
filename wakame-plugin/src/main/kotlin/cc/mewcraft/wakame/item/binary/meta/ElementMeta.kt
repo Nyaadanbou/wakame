@@ -18,7 +18,6 @@ internal class ElementMeta(
     private val holder: ItemMetaHolderImpl,
 ) : BinaryItemMeta<Set<Element>> {
     override val key: Key = ItemMetaKeys.ELEMENT
-    override val companion: ItemMetaCompanion = Companion
 
     override fun getOrNull(): Set<Element>? {
         return holder.rootOrNull

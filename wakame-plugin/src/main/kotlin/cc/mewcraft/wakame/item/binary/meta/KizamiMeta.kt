@@ -16,7 +16,6 @@ internal class KizamiMeta(
     private val holder: ItemMetaHolderImpl,
 ) : BinaryItemMeta<Set<Kizami>> {
     override val key: Key = ItemMetaKeys.KIZAMI
-    override val companion: ItemMetaCompanion = Companion
 
     override fun getOrNull(): Set<Kizami>? {
         return holder.rootOrNull

@@ -14,7 +14,6 @@ internal class LevelMeta(
     private val holder: ItemMetaHolderImpl,
 ) : BinaryItemMeta<Int> {
     override val key: Key = ItemMetaKeys.LEVEL
-    override val companion: ItemMetaCompanion = Companion
 
     override fun getOrNull(): Int? {
         return holder.rootOrNull?.getIntOrNull(key.value())

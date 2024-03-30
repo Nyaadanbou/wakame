@@ -13,7 +13,6 @@ internal class DisplayNameMeta(
     private val holder: ItemMetaHolderImpl,
 ) : BinaryItemMeta<String> {
     override val key: Key = ItemMetaKeys.DISPLAY_NAME
-    override val companion: ItemMetaCompanion = Companion
 
     override fun getOrNull(): String? {
         return holder.rootOrNull?.getStringOrNull(key.value())
@@ -33,6 +32,7 @@ internal class DisplayNameMeta(
         }
     }
 }
+
 internal fun DisplayNameMeta?.orEmpty(): String {
     return this?.getOrNull() ?: ""
 }

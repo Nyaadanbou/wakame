@@ -8,12 +8,12 @@ import kotlin.reflect.KClass
 interface ItemMetaHolder {
 
     /**
-     * Gets a **snapshot** which, at the time you called this function,
+     * Gets a **snapshot** set which, at the time you called this function,
      * contains all the existing [BinaryItemMeta] on the item, which means that it is safe
-     * to call [BinaryItemMeta.get] on the entry values ([BinaryItemMeta]) without throwing
+     * to call [BinaryItemMeta.get] on every element in the set without throwing an exception
      * (except that you have called [BinaryItemMeta.remove] before [BinaryItemMeta.get]).
      */
-    val snapshot: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMeta<*>>
+    val snapshot: Set<BinaryItemMeta<*>>
 
     /**
      * Gets the holder of specific binary item meta.

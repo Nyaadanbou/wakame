@@ -8,6 +8,10 @@ import net.kyori.adventure.key.Key
  * An abstraction layer of an item meta. This is an interface
  * to read/write/remove certain item meta for the ItemStack.
  *
+ * ## Notes to implementer
+ * The implementation of [BinaryItemMeta] must create a companion object
+ * which implements [ItemMetaCompanion] interface.
+ *
  * @param V the value "stored" in this [BinaryItemMeta]
  * @constructor the primary constructor must have a single parameter of type [ItemMetaHolder]
  */
@@ -17,15 +21,6 @@ sealed interface BinaryItemMeta<V> : Keyed {
      * The key of this [BinaryItemMeta].
      */
     override val key: Key
-
-    /**
-     * Gets the companion object.
-     *
-     * **Caution: To correctly implement this function, you must declare a companion
-     * object that implements [ItemMetaCompanion] and make this function return
-     * that companion object.**
-     */
-    val companion: ItemMetaCompanion
 
     /**
      * Gets the value of this item meta.

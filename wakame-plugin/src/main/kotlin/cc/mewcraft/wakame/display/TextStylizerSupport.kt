@@ -36,8 +36,6 @@ import org.koin.core.component.inject
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.stream.Stream
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.reflect.KClass
 import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
@@ -71,16 +69,16 @@ internal class TextStylizerImpl(
         val ret = ObjectArrayList<LoreLine>(16)
 
         // for each meta in the item
-        for ((itemMetaKClass, itemMeta) in item.meta.snapshot) {
+        for (itemMeta in item.meta.snapshot) {
             // Somehow the `::class` on the same type can return different KClass references.
             // We have to use the `.java` to compare references. Kotlin sucks this time :(
-            if (itemMetaKClass.java === BDisplayNameMeta::class.java) {
+            if (itemMeta is BDisplayNameMeta) {
                 continue // displayName has been rendered separately
             }
 
             val key = itemMetaKeySupplier.get(itemMeta)
             if (key === SKIP_RENDERING) continue
-            val lines = itemMetaStylizer.getChildStylizerBy(itemMetaKClass).stylize(itemMeta)
+            val lines = itemMetaStylizer.getChildStylizerBy(itemMeta).stylize(itemMeta)
             val wrapped = ItemMetaLineFactory.get(key, lines)
             ret += wrapped
         }
