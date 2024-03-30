@@ -1,22 +1,17 @@
 package cc.mewcraft.wakame.item.scheme
 
 import cc.mewcraft.wakame.item.EffectiveSlot
-import cc.mewcraft.wakame.item.scheme.behavior.BehaviorRegistry
-import cc.mewcraft.wakame.item.scheme.behavior.Damageable
-import cc.mewcraft.wakame.item.scheme.behavior.ItemBehavior
-import cc.mewcraft.wakame.item.scheme.behavior.ItemBehaviorHolder
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.cell.SchemeCellFactory
 import cc.mewcraft.wakame.item.scheme.meta.*
+import cc.mewcraft.wakame.provider.NodeConfigProvider
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.util.requireKt
 import com.google.common.collect.ImmutableClassToInstanceMap
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
-import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
-import xyz.xenondevs.nova.data.config.ConfigProvider
-import java.util.UUID
+import java.nio.file.Path
+import java.util.*
 import kotlin.collections.set
 
 object NekoItemFactory {
@@ -25,21 +20,19 @@ object NekoItemFactory {
      *
      * @param key the key of the item
      * @param root the configuration node holding the data of the item
+     * @param relPath the relative path of the item in the configuration
      * @return a new [NekoItem]
      */
-    fun create(key: Key, root: CommentedConfigurationNode): NekoItem {
-        val provider = ConfigProvider(root, key)
+    fun create(key: Key, root: ConfigurationNode, relPath: Path): NekoItem {
+        val provider = NodeConfigProvider(root, relPath.toString()) { !root.virtual() }
         // Deserialize basic data
         val uuid = root.node("uuid").requireKt<UUID>()
         val material = root.node("material").requireKt<Key>()
         val effectiveSlot = root.node("effective_slot").requireKt<EffectiveSlot>()
 
         // Deserialize item behaviors
-        val behaviors: List<ItemBehaviorHolder> = root.node("behaviors").childrenMap()
-            .mapNotNull { (key, _) ->
-                val behaviorName = key?.toString() ?: return@mapNotNull null
-                BehaviorRegistry[behaviorName] ?: return@mapNotNull null
-            }
+        val behaviors: List<String> = root.node("behaviors").childrenMap()
+            .mapNotNull { (key, _) -> key?.toString() }
 
         // Deserialize standalone item meta
         val schemeMeta = ImmutableClassToInstanceMap.builder<SchemeItemMeta<*>>().apply {

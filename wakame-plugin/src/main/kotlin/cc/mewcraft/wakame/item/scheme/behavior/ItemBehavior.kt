@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import cc.mewcraft.wakame.player.equipment.ArmorEquipEvent
+import cc.mewcraft.wakame.provider.ConfigProvider
 import cc.mewcraft.wakame.world.block.event.BlockBreakActionEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
@@ -54,5 +54,5 @@ interface ItemBehavior : ItemBehaviorHolder {
 }
 
 interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
-    fun create(item: NekoItem): T
+    fun create(item: NekoItem, provider: ConfigProvider): T
 }

@@ -27,14 +27,14 @@ effective_slot: MAIN_HAND
 # 物品行为
 # 可选，默认 无
 behaviors:
-  castable: { }
+#  castable: { }
   damageable:
     repair:
       - minecraft:iron_ingot
     durability:
       threshold: 512
       damage: 0
-  enchantable: { }
+#  enchantable: { }
 
 # 名字
 # 可选，默认 "Unnamed"

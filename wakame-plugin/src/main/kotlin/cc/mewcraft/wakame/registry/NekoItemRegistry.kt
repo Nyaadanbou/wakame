@@ -53,9 +53,9 @@ object NekoItemRegistry : KoinComponent, Initializable {
     private fun loadConfiguration() {
         INSTANCES.clear()
 
-        NekoItemNodeIterator.forEach { key, node ->
+        NekoItemNodeIterator.forEach { key, node, path ->
             runCatching {
-                NekoItemFactory.create(key, node)
+                NekoItemFactory.create(key, node, path)
             }.onSuccess {
                 INSTANCES.register(key, it)
             }.onFailure {

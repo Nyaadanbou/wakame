@@ -9,12 +9,13 @@ import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.item.scheme.meta.DurabilityMeta
 import cc.mewcraft.wakame.item.scheme.meta.GenerationResult
+import cc.mewcraft.wakame.provider.ConfigProvider
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.config.entry
+import cc.mewcraft.wakame.provider.entry
 import cc.mewcraft.wakame.item.binary.meta.DurabilityMeta as BDurabilityMeta
 import cc.mewcraft.wakame.item.scheme.meta.DurabilityMeta as SDurabilityMeta
 
@@ -35,10 +36,9 @@ interface Damageable : ItemBehavior {
     companion object Impl : ItemBehaviorFactory<Damageable> {
         const val KEY = "damageable"
 
-        override fun create(item: NekoItem): Damageable {
-            val cfg = item.config
-            val repairMaterials = cfg.entry<List<String>>("behaviors", KEY, "repair")
-            val durabilityMeta = cfg.entry<SDurabilityMeta>("behaviors", KEY, "durability")
+        override fun create(item: NekoItem, provider: ConfigProvider): Damageable {
+            val repairMaterials = provider.entry<List<String>>("repair")
+            val durabilityMeta = provider.entry<SDurabilityMeta>("durability")
             return Default(repairMaterials, durabilityMeta)
         }
     }

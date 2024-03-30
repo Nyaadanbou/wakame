@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
 import cc.mewcraft.wakame.item.scheme.meta.SchemeItemMeta
 import com.google.common.collect.ClassToInstanceMap
 import net.kyori.adventure.key.Key
-import xyz.xenondevs.nova.data.config.ConfigProvider
+import cc.mewcraft.wakame.provider.ConfigProvider
 import java.util.UUID
 
 /**
