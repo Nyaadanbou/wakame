@@ -58,7 +58,7 @@ private class NonNullDurabilityMeta(
     }
 }
 
-data object DefaultDurabilityMeta : SDurabilityMeta {
+private data object DefaultDurabilityMeta : SDurabilityMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<Durability> = GenerationResult.empty()
 }
 

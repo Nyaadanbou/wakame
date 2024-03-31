@@ -54,15 +54,13 @@ object PaperNekoItemRealizer : NekoItemRealizer {
             // write "standalone" meta
             generateAndSet<_, SDisplayNameMeta, BDisplayNameMeta>(nekoItem, context)
             generateAndSet<_, SDisplayLoreMeta, BDisplayLoreMeta>(nekoItem, context)
+            generateAndSet<_, SDurabilityMeta, BDurabilityMeta>(nekoItem, context)
             generateAndSet<_, SLevelMeta, BLevelMeta>(nekoItem, context)
             generateAndSet<_, SRarityMeta, BRarityMeta>(nekoItem, context)
             generateAndSet<_, SElementMeta, BElementMeta>(nekoItem, context)
             generateAndSet<_, SKizamiMeta, BKizamiMeta>(nekoItem, context)
             generateAndSet<_, SSkinMeta, BSkinMeta>(nekoItem, context)
             generateAndSet<_, SSkinOwnerMeta, BSkinOwnerMeta>(nekoItem, context)
-
-            // write "behavior-bound" meta
-            nekoItem.behaviors.forEach { it.generateAndSet(this, context) }
         }
 
         // write cells
@@ -82,9 +80,6 @@ object PaperNekoItemRealizer : NekoItemRealizer {
                 }
                 // if it's null, simply don't put the cell
             }
-
-            // write "behavior-bound" cells
-            nekoItem.behaviors.forEach { it.generateAndSet(this, context) }
         }
 
         return nekoStack

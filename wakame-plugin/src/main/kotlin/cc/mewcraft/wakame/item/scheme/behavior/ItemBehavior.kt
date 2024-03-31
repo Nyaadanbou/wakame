@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.item.scheme.behavior
 
-import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.scheme.NekoItem
-import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
 import cc.mewcraft.wakame.player.equipment.ArmorEquipEvent
 import cc.mewcraft.wakame.provider.ConfigProvider
 import cc.mewcraft.wakame.world.block.event.BlockBreakActionEvent
@@ -39,20 +36,8 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
 
-    /* Item generation */
-
-    /**
-     * 生成该 ItemBehavior 的 Cell 并应用到物品上。
-     */
-    fun generateAndSet(holder: ItemCellAccessor, context: SchemeGenerationContext) = Unit
-
-    /**
-     * 生成该 ItemBehavior 的 Meta 并应用到物品上。
-     */
-    fun generateAndSet(holder: ItemMetaAccessor, context: SchemeGenerationContext) = Unit
-
 }
 
 interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
-    fun create(item: NekoItem, config: ConfigProvider): T
+    fun create(item: NekoItem, behaviorConfig: ConfigProvider): T
 }

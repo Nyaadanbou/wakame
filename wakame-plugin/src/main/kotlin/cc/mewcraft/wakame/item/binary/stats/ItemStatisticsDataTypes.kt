@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.binary.stats
 
 interface MapLikeItemStats<K, V> {
-    fun get(key: K): V
-    fun set(key: K, value: V)
+    operator fun get(key: K): V
+    operator fun set(key: K, value: V)
 }
 
 interface NumericMapLikeItemStats<K, V : Number> : MapLikeItemStats<K, V> {

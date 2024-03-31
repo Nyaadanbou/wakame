@@ -2,21 +2,21 @@ package cc.mewcraft.wakame.item.scheme.behavior
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.map
+import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
-import cc.mewcraft.wakame.item.binary.meta.getAccessorOrCreate
+import cc.mewcraft.wakame.item.binary.meta.getAccessor
 import cc.mewcraft.wakame.item.scheme.NekoItem
-import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.meta.GenerationResult
-import cc.mewcraft.wakame.item.scheme.meta.SDurabilityMeta
 import cc.mewcraft.wakame.provider.ConfigProvider
-import cc.mewcraft.wakame.provider.entry
+import cc.mewcraft.wakame.provider.optionalEntry
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 
 /**
  * 可以受损的物品。
@@ -27,16 +27,10 @@ interface Damageable : ItemBehavior {
      */
     val repairMaterials: List<Key>
 
-    /**
-     * 耐久度的设置。
-     */
-    val durabilityMeta: SDurabilityMeta
-
     companion object Factory : ItemBehaviorFactory<Damageable> {
-        override fun create(item: NekoItem, config: ConfigProvider): Damageable {
-            val repairMaterials = config.entry<List<String>>("repair")
-            val durabilityMeta = config.entry<SDurabilityMeta>("durability")
-            return Default(repairMaterials, durabilityMeta)
+        override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Damageable {
+            val repairMaterials = behaviorConfig.optionalEntry<List<String>>("repair").orElse(emptyList())
+            return Default(repairMaterials)
         }
     }
 
@@ -44,23 +38,19 @@ interface Damageable : ItemBehavior {
      * 默认实现。理论上还可以有其他实现。
      */
     private class Default(
-        repairMaterialsProvider: Provider<List<String>>,
-        durabilityMetaProvider: Provider<SDurabilityMeta>,
-    ) : Damageable {
-
+        repairMaterialsProvider: Provider<List<String>>
+    ) : Damageable, KoinComponent {
+        private val logger: Logger by inject()
         override val repairMaterials: List<Key> by repairMaterialsProvider.map { it.map(Key::key) }
-        override val durabilityMeta: SDurabilityMeta by durabilityMetaProvider
-
-        override fun generateAndSet(holder: ItemMetaAccessor, context: SchemeGenerationContext) {
-            val value = durabilityMeta.generate(context)
-            if (value is GenerationResult.Thing) {
-                holder.getAccessorOrCreate<BDurabilityMeta>().set(value.value)
-            }
-        }
 
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
             val nekoStack = NekoStackFactory.wrap(itemStack)
-            player.sendMessage("Seed: ${nekoStack.seed}")
+            val durabilityMeta = nekoStack.meta.getAccessor<BDurabilityMeta>()
+            if (durabilityMeta == null) {
+                logger.warn("物品 ${nekoStack.scheme.key} 拥有行为 Damageable, 但是没有耐久度元数据")
+                return
+            }
+            player.sendMessage("当前耐久度：${durabilityMeta.damage()}/${durabilityMeta.threshold()}")
         }
     }
 }

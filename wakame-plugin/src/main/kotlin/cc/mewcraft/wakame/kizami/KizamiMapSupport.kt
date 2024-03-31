@@ -19,7 +19,7 @@ import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 class PlayerKizamiMap(
     private val user: User<*>,
 ) : KizamiMap {
-    private val amountMap: MutableMap<Kizami, Int> = Reference2IntOpenHashMap()
+    private val amountMap: MutableMap<Kizami, Int> = Reference2IntOpenHashMap() // FIXME: 重载会构建新的 Kizami 对象，导致无法正确比较 key
 
     override fun getMutableAmountMap(): MutableMap<Kizami, Int> {
         return amountMap

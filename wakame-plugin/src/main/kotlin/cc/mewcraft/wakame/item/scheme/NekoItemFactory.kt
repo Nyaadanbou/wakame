@@ -48,6 +48,7 @@ object NekoItemFactory {
             // (by alphabet order, in case you miss something)
             loadAndSave<SDisplayLoreMeta>(root, "lore")
             loadAndSave<SDisplayNameMeta>(root, "display_name")
+            loadAndSave<SDurabilityMeta>(root, "durability")
             loadAndSave<SElementMeta>(root, "elements")
             loadAndSave<SKizamiMeta>(root, "kizami")
             loadAndSave<SLevelMeta>(root, "level")
