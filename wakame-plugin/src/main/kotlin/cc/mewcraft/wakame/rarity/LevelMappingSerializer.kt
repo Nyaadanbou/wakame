@@ -34,17 +34,17 @@ internal class LevelMappingSerializer : SchemeSerializer<LevelMappings> {
     override fun deserialize(type: Type, node: ConfigurationNode): LevelMappings {
         val rangeMapBuilder = ImmutableRangeMap.builder<Int, LevelMapping>()
         node.childrenMap().forEach { (_, n1) ->
-            val levelN = n1.node("level").requireKt<String>()
-            val weightN = n1.node("weight").takeIf { it.isMap }
+            val levelNode = n1.node("level").requireKt<String>()
+            val weightNode = n1.node("weight").takeIf { it.isMap }
                 ?: throw SerializationException("`weight` node must be a map")
 
             // deserialize weight for each rarity
-            val levelRange = RangeParser.parseIntRange(levelN)
+            val levelRange = RangeParser.parseIntRange(levelNode)
             val levelMapping = LevelMapping.build {
-                weightN.childrenMap().forEach { (k, n2) ->
+                weightNode.childrenMap().forEach { (k, n2) ->
                     val rarityName = k.toString()
                     val rarityWeight = n2.requireKt<Double>()
-                    weight[RarityRegistry.INSTANCES.get(rarityName)] = rarityWeight
+                    weight[RarityRegistry.INSTANCES[rarityName]] = rarityWeight
                 }
             }
 

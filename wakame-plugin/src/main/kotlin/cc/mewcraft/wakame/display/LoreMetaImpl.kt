@@ -71,7 +71,7 @@ internal data class AttributeLoreMeta(
         init {
             // validate values
             operationIndex.forEach { AttributeModifier.Operation.byKey(it) }
-            elementIndex.forEach { ElementRegistry.INSTANCES.get(it) }
+            elementIndex.forEach { ElementRegistry.INSTANCES[it] }
         }
     }
 

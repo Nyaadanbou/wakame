@@ -9,9 +9,9 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
  */
 sealed interface ItemStatistics {
     /**
-     * The [ItemStatisticsHolder] encompassing `this`.
+     * The [ItemStatisticsAccessor] encompassing `this`.
      */
-    val holder: ItemStatisticsHolder
+    val holder: ItemStatisticsAccessor
 
     /**
      * The path to the tags of this [ItemStatistics].

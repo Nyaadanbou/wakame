@@ -10,8 +10,7 @@ import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.core.isEmpty
 import cc.mewcraft.wakame.item.binary.meta
-import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
-import cc.mewcraft.wakame.item.binary.meta.RarityMeta
+import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reloadable
@@ -22,9 +21,12 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
+import net.kyori.adventure.extra.kotlin.style
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.TagPattern
@@ -38,15 +40,6 @@ import java.text.NumberFormat
 import java.util.stream.Stream
 import kotlin.collections.set
 import kotlin.reflect.KClass
-import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta as BDisplayLoreMeta
-import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta as BDisplayNameMeta
-import cc.mewcraft.wakame.item.binary.meta.DurabilityMeta as BDurabilityMeta
-import cc.mewcraft.wakame.item.binary.meta.ElementMeta as BElementMeta
-import cc.mewcraft.wakame.item.binary.meta.KizamiMeta as BKizamiMeta
-import cc.mewcraft.wakame.item.binary.meta.LevelMeta as BLevelMeta
-import cc.mewcraft.wakame.item.binary.meta.RarityMeta as BRarityMeta
-import cc.mewcraft.wakame.item.binary.meta.SkinMeta as BSkinMeta
-import cc.mewcraft.wakame.item.binary.meta.SkinOwnerMeta as BSkinOwnerMeta
 
 // TODO 所有的 stylizer 应该尽可能的实现缓存机制
 
@@ -70,10 +63,8 @@ internal class TextStylizerImpl(
 
         // for each meta in the item
         for (itemMeta in item.meta.snapshot) {
-            // Somehow the `::class` on the same type can return different KClass references.
-            // We have to use the `.java` to compare references. Kotlin sucks this time :(
             if (itemMeta is BDisplayNameMeta) {
-                continue // displayName has been rendered separately
+                continue // skipping as displayName has been rendered separately
             }
 
             val key = itemMetaKeySupplier.get(itemMeta)
@@ -84,7 +75,7 @@ internal class TextStylizerImpl(
         }
 
         // for each cell in the item
-        for (cell in item.cell.map.values) {
+        for (cell in item.cell.snapshot.values) {
             val core = cell.binaryCore
             if (core.isEmpty) {
                 // it's an empty core - add the pre-defined placeholder lines
@@ -267,7 +258,7 @@ internal class ItemMetaStylizerImpl(
             // resolve name
             resolver(parsed("value", displayName))
             // resolve rarity style
-            item.meta<RarityMeta>()?.getOrNull()?.run {
+            item.meta<BRarityMeta>()?.getOrNull()?.run {
                 tag("rarity_style", rarityStyleMap[this])
             }
         }
@@ -347,7 +338,14 @@ internal class ItemMetaStylizerImpl(
         private val NOOP_IMPLEMENTATION: MutableMap<KClass<out BinaryItemMeta<*>>, List<Component>> by reloadable { Reference2ObjectLinkedOpenHashMap() }
 
         override fun stylize(input: BinaryItemMeta<*>): List<Component> {
-            return NOOP_IMPLEMENTATION.getOrPut(input::class) { listOf(text(input::class.simpleName ?: "???")) }
+            return NOOP_IMPLEMENTATION.getOrPut(input::class) {
+                listOf(
+                    text(input::class.simpleName ?: "???", style {
+                        color(NamedTextColor.WHITE)
+                        decoration(TextDecoration.ITALIC, false)
+                    })
+                )
+            }
         }
     }
 

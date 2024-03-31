@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.item.binary.meta
 import kotlin.reflect.KClass
 
 /**
- * This is an interface to get the [item meta holder][BinaryItemMeta] for the ItemStack.
+ * This is an interface to get specific [item meta accessor][BinaryItemMeta] for the ItemStack.
  */
-interface ItemMetaHolder {
+interface ItemMetaAccessor {
 
     /**
      * Gets a **snapshot** set which, at the time you called this function,
@@ -16,35 +16,37 @@ interface ItemMetaHolder {
     val snapshot: Set<BinaryItemMeta<*>>
 
     /**
-     * Gets the holder of specific binary item meta.
+     * Gets the accessor of specific binary item meta.
+     *
+     * If the meta does not exist in the item, this will return `null`.
      *
      * @param M the binary item meta type
      * @param clazz the binary item meta clazz
      * @return the binary item meta instance
      */
-    fun <M : BinaryItemMeta<*>> get(clazz: KClass<out M>): M?
+    fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M?
 
     /**
-     * Gets the holder of specific binary item meta or create it, if it does not exist.
+     * Gets the accessor of specific binary item meta or create it, if it does not exist.
      *
      * @param M the binary item meta type
      * @param clazz the binary item meta clazz
      * @return the binary item meta instance
      */
-    fun <M : BinaryItemMeta<*>> getOrCreate(clazz: KClass<out M>): M
+    fun <M : BinaryItemMeta<*>> getAccessorOrCreate(clazz: KClass<out M>): M
 
 }
 
 /**
- * @see ItemMetaHolder.get
+ * @see ItemMetaAccessor.getAccessor
  */
-inline fun <reified M : BinaryItemMeta<*>> ItemMetaHolder.get(): M? {
-    return this.get(M::class)
+inline fun <reified M : BinaryItemMeta<*>> ItemMetaAccessor.getAccessor(): M? {
+    return this.getAccessor(M::class)
 }
 
 /**
- * @see ItemMetaHolder.getOrCreate
+ * @see ItemMetaAccessor.getAccessorOrCreate
  */
-inline fun <reified M : BinaryItemMeta<*>> ItemMetaHolder.getOrCreate(): M {
-    return this.getOrCreate(M::class)
+inline fun <reified M : BinaryItemMeta<*>> ItemMetaAccessor.getAccessorOrCreate(): M {
+    return this.getAccessorOrCreate(M::class)
 }

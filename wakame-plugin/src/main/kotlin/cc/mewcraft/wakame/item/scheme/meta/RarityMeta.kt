@@ -16,7 +16,7 @@ import java.lang.reflect.Type
 /**
  * 物品的稀有度。
  */
-sealed interface RarityMeta : SchemeItemMeta<Rarity> {
+sealed interface SRarityMeta : SchemeItemMeta<Rarity> {
     companion object : Keyed {
         override val key: Key = Key.key(NekoNamespaces.ITEM_META, "rarity")
     }
@@ -31,7 +31,7 @@ private class NonNullRarityMeta(
      * The mappings used to generate the rarity.
      */
     private val dynamic: LevelMappings? = null,
-) : RarityMeta {
+) : SRarityMeta {
     init {
         require(static != null || dynamic != null) { "static != null || dynamic != null" }
     }
@@ -46,7 +46,7 @@ private class NonNullRarityMeta(
             dynamic.pick(context.level, context.random)
         } else {
             // fallback to the global rarity mappings
-            LevelMappingRegistry.INSTANCES.get(LevelMappingRegistry.GLOBAL_NAME).pick(context.level, context.random)
+            LevelMappingRegistry.INSTANCES[LevelMappingRegistry.GLOBAL_NAME].pick(context.level, context.random)
         }.also {
             // leave trace to the context
             context.rarities += it
@@ -55,26 +55,26 @@ private class NonNullRarityMeta(
     }
 }
 
-private data object DefaultRarityMeta : RarityMeta {
+private data object DefaultRarityMeta : SRarityMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<Rarity> = GenerationResult.empty()
 }
 
-internal class RarityMetaSerializer : SchemeItemMetaSerializer<RarityMeta> {
-    override val defaultValue: RarityMeta = DefaultRarityMeta
-    override fun deserialize(type: Type, node: ConfigurationNode): RarityMeta {
+internal class RarityMetaSerializer : SchemeItemMetaSerializer<SRarityMeta> {
+    override val defaultValue: SRarityMeta = DefaultRarityMeta
+    override fun deserialize(type: Type, node: ConfigurationNode): SRarityMeta {
         val string = node.requireKt<String>()
         val mappingPrefix = "mapping:"
         val rarityPrefix = "rarity:"
         when {
             string.startsWith(mappingPrefix) -> {
                 return NonNullRarityMeta(
-                    dynamic = LevelMappingRegistry.INSTANCES.get(string.substringAfter(mappingPrefix)),
+                    dynamic = LevelMappingRegistry.INSTANCES[string.substringAfter(mappingPrefix)],
                 )
             }
 
             string.startsWith(rarityPrefix) -> {
                 return NonNullRarityMeta(
-                    static = RarityRegistry.INSTANCES.get(string.substringAfter(rarityPrefix))
+                    static = RarityRegistry.INSTANCES[string.substringAfter(rarityPrefix)]
                 )
             }
 

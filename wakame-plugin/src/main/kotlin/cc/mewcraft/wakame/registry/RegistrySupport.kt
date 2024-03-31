@@ -117,7 +117,7 @@ interface BiKnot<K, V, B> {
      * @throws IllegalStateException if the object you look for does not exist
      */
     fun getBy(binary: B): V {
-        return INSTANCES.get(BI_LOOKUP.getUniqueIdBy(binary))
+        return INSTANCES[BI_LOOKUP.getUniqueIdBy(binary)]
     }
 }
 

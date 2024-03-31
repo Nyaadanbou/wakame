@@ -107,14 +107,14 @@ fun CompoundBinaryTag.getLongArrayOrThrow(key: String): LongArray =
 
 /* Kotlin-style builders */
 
-fun compoundBinaryTag(base: CompoundBinaryTag, builder: CompoundBinaryTag.Builder.() -> Unit): CompoundBinaryTag =
+fun CompoundBinaryTag(base: CompoundBinaryTag, builder: CompoundBinaryTag.Builder.() -> Unit): CompoundBinaryTag =
     CompoundBinaryTag.builder().put(base).apply(builder).build()
 
-fun compoundBinaryTag(builder: CompoundBinaryTag.Builder.() -> Unit): CompoundBinaryTag =
+fun CompoundBinaryTag(builder: CompoundBinaryTag.Builder.() -> Unit): CompoundBinaryTag =
     CompoundBinaryTag.builder().apply(builder).build()
 
-fun listBinaryTag(builder: ListBinaryTag.Builder<BinaryTag>.() -> Unit): ListBinaryTag =
+fun ListBinaryTag(builder: ListBinaryTag.Builder<BinaryTag>.() -> Unit): ListBinaryTag =
     ListBinaryTag.builder().apply(builder).build()
 
-fun listBinaryTag(vararg tags: BinaryTag): ListBinaryTag =
-    listBinaryTag { tags.forEach(this::add) }
+fun ListBinaryTag(vararg tags: BinaryTag): ListBinaryTag =
+    ListBinaryTag { tags.forEach(this::add) }

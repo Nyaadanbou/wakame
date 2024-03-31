@@ -15,9 +15,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 @JvmInline
-internal value class ItemCellHolderImpl(
+internal value class ItemCellAccessorImpl(
     private val base: NekoStackImpl,
-) : ItemCellHolder {
+) : ItemCellAccessor {
 
     /* Getters */
 
@@ -26,7 +26,7 @@ internal value class ItemCellHolderImpl(
     private val rootOrCreate: CompoundShadowTag
         get() = base.tags.getOrPut(NekoTags.Cell.ROOT, CompoundShadowTag::create)
 
-    override val map: Map<String, BinaryCell>
+    override val snapshot: Map<String, BinaryCell>
         get() {
             val root = rootOrNull ?: return emptyMap()
             val ret = Object2ObjectArrayMap<String, BinaryCell>(root.size())
@@ -48,7 +48,7 @@ internal value class ItemCellHolderImpl(
         // 并且 Operation 不同的情况
 
         val multimap = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
-        for (binaryCell in map.values) {
+        for (binaryCell in snapshot.values) {
             if (!binaryCell.binaryCurse.test(base)) {
                 continue // curse has not been unlocked yet
             }

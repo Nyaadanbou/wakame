@@ -46,14 +46,14 @@ object NekoItemFactory {
             // is decided by the item stack generation process, not here.
 
             // (by alphabet order, in case you miss something)
-            loadAndSave<DisplayLoreMeta>(root, "lore")
-            loadAndSave<DisplayNameMeta>(root, "display_name")
-            loadAndSave<ElementMeta>(root, "elements")
-            loadAndSave<KizamiMeta>(root, "kizami")
-            loadAndSave<LevelMeta>(root, "level")
-            loadAndSave<RarityMeta>(root, "rarity")
-            loadAndSave<SkinMeta>(root, "skin")
-            loadAndSave<SkinOwnerMeta>(root, "skin_owner")
+            loadAndSave<SDisplayLoreMeta>(root, "lore")
+            loadAndSave<SDisplayNameMeta>(root, "display_name")
+            loadAndSave<SElementMeta>(root, "elements")
+            loadAndSave<SKizamiMeta>(root, "kizami")
+            loadAndSave<SLevelMeta>(root, "level")
+            loadAndSave<SRarityMeta>(root, "rarity")
+            loadAndSave<SSkinMeta>(root, "skin")
+            loadAndSave<SSkinOwnerMeta>(root, "skin_owner")
         }.build()
 
         // Deserialize item cells

@@ -2,15 +2,15 @@ package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.scheme.meta.Durability
-import cc.mewcraft.wakame.util.compoundShadowTag
+import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.toStableShort
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
-internal class DurabilityMeta(
-    private val holder: ItemMetaHolderImpl,
+internal class BDurabilityMeta(
+    private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<Durability> {
     override val key: Key = ItemMetaKeys.DURABILITY
 
@@ -65,7 +65,7 @@ internal class DurabilityMeta(
     }
 
     override fun set(value: Durability) {
-        holder.rootOrCreate.put(key.value(), compoundShadowTag {
+        holder.rootOrCreate.put(key.value(), CompoundShadowTag {
             putShort(THRESHOLD_TAG, value.threshold.toStableShort())
             putShort(DAMAGE_TAG, value.damage.toStableShort())
         })

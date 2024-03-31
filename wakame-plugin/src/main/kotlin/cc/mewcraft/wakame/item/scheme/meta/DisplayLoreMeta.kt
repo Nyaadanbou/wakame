@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 /**
  * 物品的描述。
  */
-sealed interface DisplayLoreMeta : SchemeItemMeta<List<String>> {
+sealed interface SDisplayLoreMeta : SchemeItemMeta<List<String>> {
     companion object : Keyed {
         override val key: Key = Key.key(NekoNamespaces.ITEM_META, "lore")
     }
@@ -22,19 +22,19 @@ private class NonNullDisplayLoreMeta(
      * The item lore in the format of MiniMessage string.
      */
     private val lore: List<String>,
-) : DisplayLoreMeta {
+) : SDisplayLoreMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<List<String>> {
         return GenerationResult(lore)
     }
 }
 
-private data object DefaultDisplayLoreMeta : DisplayLoreMeta {
+private data object DefaultDisplayLoreMeta : SDisplayLoreMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<List<String>> = GenerationResult.empty()
 }
 
-internal class DisplayLoreMetaSerializer : SchemeItemMetaSerializer<DisplayLoreMeta> {
-    override val defaultValue: DisplayLoreMeta = DefaultDisplayLoreMeta
-    override fun deserialize(type: Type, node: ConfigurationNode): DisplayLoreMeta {
+internal class DisplayLoreMetaSerializer : SchemeItemMetaSerializer<SDisplayLoreMeta> {
+    override val defaultValue: SDisplayLoreMeta = DefaultDisplayLoreMeta
+    override fun deserialize(type: Type, node: ConfigurationNode): SDisplayLoreMeta {
         return NonNullDisplayLoreMeta(node.getList<String>(emptyList()))
     }
 }

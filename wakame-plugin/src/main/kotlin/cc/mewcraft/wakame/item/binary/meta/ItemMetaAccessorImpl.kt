@@ -12,9 +12,9 @@ import kotlin.reflect.KClass
 
 // TODO Make it a value class
 //  To achieve this, we need to get rid of the reflection
-internal class ItemMetaHolderImpl(
+internal class ItemMetaAccessorImpl(
     val base: NekoStackImpl,
-) : KoinComponent, ItemMetaHolder {
+) : KoinComponent, ItemMetaAccessor {
     val rootOrNull: CompoundShadowTag?
         get() = base.tags.getCompoundOrNull(NekoNamespaces.ITEM_META)
     val rootOrCreate: CompoundShadowTag
@@ -40,7 +40,7 @@ internal class ItemMetaHolderImpl(
             return ret
         }
 
-    override fun <M : BinaryItemMeta<*>> get(clazz: KClass<out M>): M? {
+    override fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M? {
         val root = rootOrNull ?: return null
         val (_, companion, constructor) = ItemMetaRegistry.reflect(clazz)
         return if (companion.contains(root)) {
@@ -50,7 +50,7 @@ internal class ItemMetaHolderImpl(
         } else null
     }
 
-    override fun <M : BinaryItemMeta<*>> getOrCreate(clazz: KClass<out M>): M {
+    override fun <M : BinaryItemMeta<*>> getAccessorOrCreate(clazz: KClass<out M>): M {
         val (_, _, constructor) = ItemMetaRegistry.reflect(clazz)
         val itemMeta = constructor.invoke(this)
         @Suppress("UNCHECKED_CAST")

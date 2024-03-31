@@ -11,8 +11,8 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的稀有度。不是所有物品都有稀有度，因此可能为空。
  */
-internal class RarityMeta(
-    private val holder: ItemMetaHolderImpl,
+internal class BRarityMeta(
+    private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<Rarity> {
     override val key: Key = ItemMetaKeys.RARITY
 
@@ -37,6 +37,6 @@ internal class RarityMeta(
     }
 }
 
-internal fun RarityMeta?.orDefault(): Rarity {
+internal fun BRarityMeta?.orDefault(): Rarity {
     return this?.getOrNull() ?: RarityRegistry.DEFAULT
 }

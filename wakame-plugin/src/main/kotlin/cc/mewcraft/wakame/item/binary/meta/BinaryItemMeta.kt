@@ -5,15 +5,17 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 /**
- * An abstraction layer of an item meta. This is an interface
- * to read/write/remove certain item meta for the ItemStack.
+ * A data accessor of an item meta on the ItemStack.
+ *
+ * This is an interface to read/write/remove the item meta for the ItemStack.
  *
  * ## Notes to implementer
- * The implementation of [BinaryItemMeta] must create a companion object
- * which implements [ItemMetaCompanion] interface.
+ * The implementation of [BinaryItemMeta] must create a companion object which
+ * implements [ItemMetaCompanion] interface. Not implementing the interface will
+ * result in a runtime exception.
  *
  * @param V the value "stored" in this [BinaryItemMeta]
- * @constructor the primary constructor must have a single parameter of type [ItemMetaHolder]
+ * @constructor the primary constructor must have a single parameter of type [ItemMetaAccessor]
  */
 sealed interface BinaryItemMeta<V> : Keyed {
 

@@ -31,7 +31,7 @@ internal class RaritySerializer : SchemeSerializer<Rarity> {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {
             // if it's structure 1
-            return RarityRegistry.INSTANCES.get(scalar)
+            return RarityRegistry.INSTANCES[scalar]
         }
 
         // if it's structure 2

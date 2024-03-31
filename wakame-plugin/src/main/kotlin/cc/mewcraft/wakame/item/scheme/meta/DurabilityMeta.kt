@@ -35,7 +35,7 @@ data class Durability(
     override fun toString(): String = toSimpleString()
 }
 
-sealed interface DurabilityMeta : SchemeItemMeta<Durability> {
+sealed interface SDurabilityMeta : SchemeItemMeta<Durability> {
     companion object : Keyed {
         override val key: Key = ItemMetaKeys.DURABILITY
     }
@@ -44,7 +44,7 @@ sealed interface DurabilityMeta : SchemeItemMeta<Durability> {
 private class NonNullDurabilityMeta(
     private val threshold: RandomizedValue,
     private val damage: RandomizedValue? = null,
-) : DurabilityMeta {
+) : SDurabilityMeta {
     init {
         require(threshold.base > 0) { "threshold.base > 0" }
         damage?.run { require(damage.base >= 0) { "damage.base >= 0" } }
@@ -58,13 +58,13 @@ private class NonNullDurabilityMeta(
     }
 }
 
-data object DefaultDurabilityMeta : DurabilityMeta {
+data object DefaultDurabilityMeta : SDurabilityMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<Durability> = GenerationResult.empty()
 }
 
-internal class DurabilityMetaSerializer : SchemeItemMetaSerializer<DurabilityMeta> {
-    override val defaultValue: DurabilityMeta = DefaultDurabilityMeta
-    override fun deserialize(type: Type, node: ConfigurationNode): DurabilityMeta {
+internal class DurabilityMetaSerializer : SchemeItemMetaSerializer<SDurabilityMeta> {
+    override val defaultValue: SDurabilityMeta = DefaultDurabilityMeta
+    override fun deserialize(type: Type, node: ConfigurationNode): SDurabilityMeta {
         val threshold = node.node("threshold").requireKt<RandomizedValue>()
         val damage = node.node("damage").takeUnless { it.virtual() }?.requireKt<RandomizedValue>() // nullable
         return NonNullDurabilityMeta(threshold, damage)

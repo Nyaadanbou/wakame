@@ -7,18 +7,18 @@ import cc.mewcraft.wakame.util.getOrPut
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 @JvmInline
-internal value class ItemStatisticsHolderImpl(
+internal value class ItemStatisticsAccessorImpl(
     private val base: NekoStackImpl,
-) : ItemStatisticsHolder {
+) : ItemStatisticsAccessor {
     override val rootOrNull: CompoundShadowTag?
         get() = base.tags.getCompoundOrNull(NekoTags.Stats.ROOT)
     override val rootOrCreate: CompoundShadowTag
         get() = base.tags.getOrPut(NekoTags.Stats.ROOT, CompoundShadowTag::create)
 
-    override val entityKills: EntityKillsStatistics
+    override val ENTITY_KILLS: EntityKillsStatistics
         get() = EntityKillsStatistics(this)
-    override val peakDamage: PeakDamageStatistics
+    override val PEAK_DAMAGE: PeakDamageStatistics
         get() = PeakDamageStatistics(this)
-    override val reforge: ReforgeStatistics
+    override val REFORGE: ReforgeStatistics
         get() = ReforgeStatistics(this)
 }

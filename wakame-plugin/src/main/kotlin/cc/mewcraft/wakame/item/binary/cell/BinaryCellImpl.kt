@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.binary.core.BinaryCore
 import cc.mewcraft.wakame.item.binary.core.isNotEmpty
 import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
 import cc.mewcraft.wakame.item.binary.curse.isNotEmpty
-import cc.mewcraft.wakame.util.compoundShadowTag
+import cc.mewcraft.wakame.util.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 
@@ -17,7 +17,7 @@ internal data class BinaryCellImpl(
     override val reforgeMeta: ReforgeMeta,
 ) : BinaryCell {
 
-    override fun asShadowTag(): ShadowTag = compoundShadowTag {
+    override fun asShadowTag(): ShadowTag = CompoundShadowTag {
         putBoolean(NekoTags.Cell.CAN_REFORGE, canReforge)
         putBoolean(NekoTags.Cell.CAN_OVERRIDE, canOverride)
 

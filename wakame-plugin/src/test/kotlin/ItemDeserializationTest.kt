@@ -94,15 +94,15 @@ class ItemDeserializationTest : KoinTest {
         every { realizer.realize(demo, user) } answers {
             val context = SchemeGenerationContext(SchemaGenerationTrigger.wrap(user))
 
-            generateAndSet<DisplayNameMeta, String>(demo, context)
-            generateAndSet<DisplayLoreMeta, List<String>>(demo, context)
-            // generateAndSet<DurabilityMeta, Durability>(demo, context)
-            generateAndSet<LevelMeta, Int>(demo, context)
-            generateAndSet<RarityMeta, Rarity>(demo, context)
-            generateAndSet<ElementMeta, Set<Element>>(demo, context)
-            generateAndSet<KizamiMeta, Set<Kizami>>(demo, context)
-            generateAndSet<SkinMeta, ItemSkin>(demo, context)
-            generateAndSet<SkinOwnerMeta, UUID>(demo, context)
+            generateAndSet<SDisplayNameMeta, String>(demo, context)
+            generateAndSet<SDisplayLoreMeta, List<String>>(demo, context)
+            // generateAndSet<SDurabilityMeta, Durability>(demo, context)
+            generateAndSet<SLevelMeta, Int>(demo, context)
+            generateAndSet<SRarityMeta, Rarity>(demo, context)
+            generateAndSet<SElementMeta, Set<Element>>(demo, context)
+            generateAndSet<SKizamiMeta, Set<Kizami>>(demo, context)
+            generateAndSet<SSkinMeta, ItemSkin>(demo, context)
+            generateAndSet<SSkinOwnerMeta, UUID>(demo, context)
 
             demo.cell.forEach { (id, scheme) ->
                 val binary = BinaryCellFactory.generate(context, scheme)

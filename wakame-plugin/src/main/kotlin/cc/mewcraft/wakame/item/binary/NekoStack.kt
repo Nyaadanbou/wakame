@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.item.EffectiveSlot
-import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
+import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
-import cc.mewcraft.wakame.item.binary.meta.get
-import cc.mewcraft.wakame.item.binary.meta.getOrCreate
-import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolder
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
+import cc.mewcraft.wakame.item.binary.meta.getAccessor
+import cc.mewcraft.wakame.item.binary.meta.getAccessorOrCreate
+import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
@@ -123,47 +123,47 @@ interface NekoStack : NekoStackSetter {
     val effectiveSlot: EffectiveSlot
 
     /**
-     * The [ItemCellHolder] of this item.
+     * The [ItemCellAccessor] of this item.
      *
      * Used to manipulate the **cells** of this item.
      *
      * @throws NullPointerException if this is not a legal neko item
      */
-    val cell: ItemCellHolder
+    val cell: ItemCellAccessor
 
     /**
-     * The [ItemMetaHolder] of this item.
+     * The [ItemMetaAccessor] of this item.
      *
      * Used to manipulate the **meta** of this item.
      *
      * @throws NullPointerException if this is not a legal neko item
      */
-    val meta: ItemMetaHolder
+    val meta: ItemMetaAccessor
 
     /**
-     * The [ItemStatisticsHolder] of this item.
+     * The [ItemStatisticsAccessor] of this item.
      *
      * Used to manipulate the **statistics** of this item.
      *
      * @throws NullPointerException if this is not a legal neko item
      */
-    val statistics: ItemStatisticsHolder
+    val statistics: ItemStatisticsAccessor
 }
 
 /**
- * Gets the holder of binary item meta.
+ * Gets the accessor of specific item meta.
  *
- * @see ItemMetaHolder.get
+ * @see ItemMetaAccessor.getAccessor
  */
 inline fun <reified M : BinaryItemMeta<*>> NekoStack.meta(): M? {
-    return this.meta.get<M>()
+    return this.meta.getAccessor<M>()
 }
 
 /**
- * Gets the holder of binary item meta or create it, if it does not exist.
+ * Gets the accessor of specific item meta or create it, if it does not exist.
  *
- * @see ItemMetaHolder.getOrCreate
+ * @see ItemMetaAccessor.getAccessorOrCreate
  */
 inline fun <reified M : BinaryItemMeta<*>> NekoStack.createMeta(): M {
-    return this.meta.getOrCreate<M>()
+    return this.meta.getAccessorOrCreate<M>()
 }

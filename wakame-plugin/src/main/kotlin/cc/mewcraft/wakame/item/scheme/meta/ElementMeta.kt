@@ -18,7 +18,7 @@ typealias ElementPool = Pool<Element, SchemeGenerationContext>
 /**
  * 物品的元素标识。
  */
-sealed interface ElementMeta : SchemeItemMeta<Set<Element>> {
+sealed interface SElementMeta : SchemeItemMeta<Set<Element>> {
     companion object : Keyed {
         override val key: Key = Key.key(NekoNamespaces.ITEM_META, "element")
     }
@@ -26,20 +26,20 @@ sealed interface ElementMeta : SchemeItemMeta<Set<Element>> {
 
 private class NonNullElementMeta(
     private val elementPool: ElementPool,
-) : ElementMeta {
+) : SElementMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<Set<Element>> {
         return GenerationResult(elementPool.pick(context).toSet())
     }
 }
 
-private data object DefaultElementMeta : ElementMeta {
+private data object DefaultElementMeta : SElementMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<Set<Element>> = GenerationResult.empty()
 }
 
-internal class ElementMetaSerializer : SchemeItemMetaSerializer<ElementMeta> {
-    override val defaultValue: ElementMeta = DefaultElementMeta
+internal class ElementMetaSerializer : SchemeItemMetaSerializer<SElementMeta> {
+    override val defaultValue: SElementMeta = DefaultElementMeta
 
-    override fun deserialize(type: Type, node: ConfigurationNode): ElementMeta {
+    override fun deserialize(type: Type, node: ConfigurationNode): SElementMeta {
         return NonNullElementMeta(node.requireKt<ElementPool>())
     }
 }

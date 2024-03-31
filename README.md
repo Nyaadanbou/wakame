@@ -144,9 +144,6 @@ Compound('wakame')
       Boolean('can_override'): false
       Compound('core')
         String('id'): 'ability:dash'
-        Byte('mana'): 12b
-        Byte('cooldown'): 4b
-        Byte('damage'): 8b
       Compound('reforge')
       Compound('curse')
     Compound('e')
@@ -154,9 +151,6 @@ Compound('wakame')
       Boolean('can_override'): false
       Compound('core')
         String('id'): 'ability:blink'
-        Byte('mana'): 12b
-        Byte('cooldown'): 10b
-        Byte('distance'): 16b
       Compound('reforge')
       Compound('curse')
     Compound('f')

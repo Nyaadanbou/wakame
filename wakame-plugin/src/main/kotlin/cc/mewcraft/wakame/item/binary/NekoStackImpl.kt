@@ -2,12 +2,12 @@ package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.item.EffectiveSlot
-import cc.mewcraft.wakame.item.binary.cell.ItemCellHolder
-import cc.mewcraft.wakame.item.binary.cell.ItemCellHolderImpl
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolderImpl
-import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolder
-import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsHolderImpl
+import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
+import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessorImpl
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorImpl
+import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
+import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessorImpl
 import cc.mewcraft.wakame.item.scheme.NekoItem
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
@@ -62,7 +62,7 @@ internal value class NekoStackImpl(
         get() = !isNeko
 
     override val scheme: NekoItem
-        get() = NekoItemRegistry.INSTANCES.get(key)
+        get() = NekoItemRegistry.INSTANCES[key]
 
     override val seed: Long
         get() = tags.getLong(NekoTags.Root.SEED)
@@ -74,19 +74,19 @@ internal value class NekoStackImpl(
         get() = tags.getInt(NekoTags.Root.SID)
 
     override val uuid: UUID
-        get() = NekoItemRegistry.INSTANCES.get(key).uuid
+        get() = NekoItemRegistry.INSTANCES[key].uuid
 
     override val effectiveSlot: EffectiveSlot
-        get() = NekoItemRegistry.INSTANCES.get(key).effectiveSlot
+        get() = NekoItemRegistry.INSTANCES[key].effectiveSlot
 
-    override val cell: ItemCellHolder
-        get() = ItemCellHolderImpl(this)
+    override val cell: ItemCellAccessor
+        get() = ItemCellAccessorImpl(this)
 
-    override val meta: ItemMetaHolder
-        get() = ItemMetaHolderImpl(this)
+    override val meta: ItemMetaAccessor
+        get() = ItemMetaAccessorImpl(this)
 
-    override val statistics: ItemStatisticsHolder
-        get() = ItemStatisticsHolderImpl(this)
+    override val statistics: ItemStatisticsAccessor
+        get() = ItemStatisticsAccessorImpl(this)
 
     //<editor-fold desc="Setters">
     override fun erase() {

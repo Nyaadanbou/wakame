@@ -12,7 +12,7 @@ import net.kyori.adventure.key.Key
 
 @JvmInline
 value class EntityKillsStatistics(
-    override val holder: ItemStatisticsHolder,
+    override val holder: ItemStatisticsAccessor,
 ) : ItemStatistics, NumericMapLikeItemStats<Key, Int> {
     override val nbtPath: String get() = NekoTags.Stats.ENTITY_KILLS
 
@@ -28,7 +28,7 @@ value class EntityKillsStatistics(
 
 @JvmInline
 value class PeakDamageStatistics(
-    override val holder: ItemStatisticsHolder,
+    override val holder: ItemStatisticsAccessor,
 ) : ItemStatistics, NumericMapLikeItemStats<Element, Int> {
     override val nbtPath: String get() = NekoTags.Stats.PEAK_DAMAGE
 
@@ -43,7 +43,7 @@ value class PeakDamageStatistics(
 }
 
 data class ReforgeStatistics(
-    override val holder: ItemStatisticsHolder,
+    override val holder: ItemStatisticsAccessor,
 ) : ItemStatistics {
     override val nbtPath: String get() = NekoTags.Stats.REFORGE
 

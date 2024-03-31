@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 /**
  * 物品的名字。
  */
-sealed interface DisplayNameMeta : SchemeItemMeta<String> {
+sealed interface SDisplayNameMeta : SchemeItemMeta<String> {
     companion object : Keyed {
         override val key: Key = Key.key(NekoNamespaces.ITEM_META, "display_name")
     }
@@ -22,19 +22,19 @@ private class NonNullDisplayNameMeta(
      * The item name in the format of MiniMessage string
      */
     private val displayName: String,
-) : DisplayNameMeta {
+) : SDisplayNameMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<String> {
         return GenerationResult(displayName)
     }
 }
 
-private data object DefaultDisplayNameMeta : DisplayNameMeta {
+private data object DefaultDisplayNameMeta : SDisplayNameMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<String> = GenerationResult.empty()
 }
 
-internal class DisplayNameMetaSerializer : SchemeItemMetaSerializer<DisplayNameMeta> {
-    override val defaultValue: DisplayNameMeta = DefaultDisplayNameMeta
-    override fun deserialize(type: Type, node: ConfigurationNode): DisplayNameMeta {
+internal class DisplayNameMetaSerializer : SchemeItemMetaSerializer<SDisplayNameMeta> {
+    override val defaultValue: SDisplayNameMeta = DefaultDisplayNameMeta
+    override fun deserialize(type: Type, node: ConfigurationNode): SDisplayNameMeta {
         return NonNullDisplayNameMeta(node.requireKt<String>())
     }
 }

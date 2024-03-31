@@ -11,8 +11,8 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的描述(MiniMessage).
  */
-internal class DisplayLoreMeta(
-    private val holder: ItemMetaHolderImpl,
+internal class BDisplayLoreMeta(
+    private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<List<String>> {
     override val key: Key = ItemMetaKeys.DISPLAY_LORE
 
@@ -41,6 +41,6 @@ internal class DisplayLoreMeta(
     }
 }
 
-internal fun DisplayLoreMeta?.orEmpty(): List<String> {
+internal fun BDisplayLoreMeta?.getOrEmpty(): List<String> {
     return this?.getOrNull() ?: emptyList()
 }

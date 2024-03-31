@@ -18,7 +18,7 @@ object BinaryCurseFactory {
         val id = compoundTag.getString(NekoTags.Cell.CURSE_KEY)
         val ret: BinaryCurse = when (id) {
             CurseKeys.ENTITY_KILLS.value() -> {
-                val index = EntityReferenceRegistry.INSTANCES.get(compoundTag.getString(BEntityKillsCurse.INDEX_TAG_NAME))
+                val index = EntityReferenceRegistry.INSTANCES[compoundTag.getString(BEntityKillsCurse.INDEX_TAG_NAME)]
                 val count = compoundTag.getInt(BEntityKillsCurse.COUNT_TAG_NAME)
                 BEntityKillsCurse(index, count)
             }

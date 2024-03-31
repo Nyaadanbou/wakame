@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.BinaryData
 import cc.mewcraft.wakame.item.CurseKeys
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.util.compoundShadowTag
+import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.toStableShort
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
@@ -34,10 +34,10 @@ data class PeakDamageCurse(
      * greater than [amount].
      */
     override fun test(context: NekoStack): Boolean =
-        context.statistics.peakDamage.get(element) >= amount
+        context.statistics.PEAK_DAMAGE.get(element) >= amount
 
     override fun asShadowTag(): ShadowTag {
-        return compoundShadowTag {
+        return CompoundShadowTag {
             putString(NekoTags.Cell.CURSE_KEY, key.asString())
             putShort(AMOUNT_TAG_NAME, amount.toStableShort())
             putByte(ELEMENT_TAG_NAME, element.binaryId)

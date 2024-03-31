@@ -8,8 +8,8 @@ import java.util.UUID
 /**
  * 物品的皮肤的所有者。
  */
-internal class SkinOwnerMeta(
-    private val holder: ItemMetaHolderImpl,
+internal class BSkinOwnerMeta(
+    private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<UUID> {
     override val key: Key = ItemMetaKeys.SKIN_OWNER
 

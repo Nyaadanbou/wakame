@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaCompanion
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaHolder
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import kotlin.reflect.KClass
@@ -31,8 +31,8 @@ internal object ItemMetaRegistry : Initializable {
         require(valueParameters.size == 1) {
             "The primary constructor of class ${it.qualifiedName} has more than one parameter"
         }
-        require(valueParameters.first().type.isSubtypeOf(typeOf<ItemMetaHolder>())) {
-            "The first parameter of class ${it.qualifiedName} is not a subtype of ${ItemMetaHolder::class.qualifiedName}"
+        require(valueParameters.first().type.isSubtypeOf(typeOf<ItemMetaAccessor>())) {
+            "The first parameter of class ${it.qualifiedName} is not a subtype of ${ItemMetaAccessor::class.qualifiedName}"
         }
         MethodHandles.publicLookup().unreflectConstructor(primaryConstructor.javaConstructor)
     }

@@ -21,7 +21,7 @@ typealias KizamiGroup = Group<Kizami, SchemeGenerationContext>
 /**
  * 物品的铭刻标识。
  */
-sealed interface KizamiMeta : SchemeItemMeta<Set<Kizami>> {
+sealed interface SKizamiMeta : SchemeItemMeta<Set<Kizami>> {
     companion object : Keyed {
         override val key: Key = Key.key(NekoNamespaces.ITEM_META, "kizami")
     }
@@ -29,7 +29,7 @@ sealed interface KizamiMeta : SchemeItemMeta<Set<Kizami>> {
 
 private class NonNullKizamiMeta(
     private val kizamiGroup: KizamiGroup,
-) : KizamiMeta {
+) : SKizamiMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<Set<Kizami>> {
         val value = kizamiGroup.pick(context).toSet()
         return if (value.isNotEmpty()) {
@@ -40,13 +40,13 @@ private class NonNullKizamiMeta(
     }
 }
 
-private data object DefaultKizamiMeta : KizamiMeta {
+private data object DefaultKizamiMeta : SKizamiMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<Set<Kizami>> = GenerationResult.empty()
 }
 
-internal class KizamiMetaSerializer : SchemeItemMetaSerializer<KizamiMeta> {
-    override val defaultValue: KizamiMeta = DefaultKizamiMeta
-    override fun deserialize(type: Type, node: ConfigurationNode): KizamiMeta {
+internal class KizamiMetaSerializer : SchemeItemMetaSerializer<SKizamiMeta> {
+    override val defaultValue: SKizamiMeta = DefaultKizamiMeta
+    override fun deserialize(type: Type, node: ConfigurationNode): SKizamiMeta {
         return NonNullKizamiMeta(node.requireKt<KizamiGroup>())
     }
 }

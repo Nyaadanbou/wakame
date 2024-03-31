@@ -23,4 +23,4 @@ data class ItemAssets(
 }
 
 val Assets.material: Material
-    get() = requireNotNull(Registry.MATERIAL.get(NekoItemRegistry.INSTANCES.get(key).material.asNamespacedKey)) { "Can not use $key to get material" }
+    get() = requireNotNull(Registry.MATERIAL.get(NekoItemRegistry.INSTANCES[key].material.asNamespacedKey)) { "Can not use $key to get material" }

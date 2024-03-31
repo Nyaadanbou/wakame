@@ -136,13 +136,13 @@ fun CompoundShadowTag.getListOrNull(key: String, type: ShadowTagType): ListShado
 
 /* Kotlin-style builders */
 
-fun compoundShadowTag(builder: CompoundShadowTag.() -> Unit): CompoundShadowTag =
+fun CompoundShadowTag(builder: CompoundShadowTag.() -> Unit): CompoundShadowTag =
     CompoundShadowTag.create().apply(builder)
 
-fun listShadowTag(builder: ListShadowTag.() -> Unit): ListShadowTag =
+fun ListShadowTag(builder: ListShadowTag.() -> Unit): ListShadowTag =
     ListShadowTag.create().apply(builder)
 
-fun listShadowTag(vararg tags: ShadowTag): ListShadowTag {
+fun ListShadowTag(vararg tags: ShadowTag): ListShadowTag {
     val list = tags.asList()
     val type = list.first().type
     return ListShadowTag.create(list, type)

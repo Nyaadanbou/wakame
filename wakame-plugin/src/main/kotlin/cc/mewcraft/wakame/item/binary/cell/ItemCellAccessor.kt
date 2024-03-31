@@ -9,7 +9,7 @@ import com.google.common.collect.Multimap
 /**
  * This is an interface to get the [cell holder][BinaryCell] for the ItemStack.
  */
-interface ItemCellHolder {
+interface ItemCellAccessor {
 
     /* Getters */
 
@@ -20,7 +20,7 @@ interface ItemCellHolder {
      * Note that any changes on the item in the underlying game world **does
      * not** reflect on the returned map.
      */
-    val map: Map<String, BinaryCell>
+    val snapshot: Map<String, BinaryCell>
 
     /**
      * Gets the specified [binary cell][BinaryCell].
@@ -92,4 +92,3 @@ interface ItemCellHolder {
     fun remove(id: String)
 
 }
-

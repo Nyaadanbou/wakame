@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 /**
  * 物品的皮肤。
  */
-sealed interface SkinMeta : SchemeItemMeta<ItemSkin> {
+sealed interface SSkinMeta : SchemeItemMeta<ItemSkin> {
     companion object : Keyed {
         override val key: Key = Key.key(NekoNamespaces.ITEM_META, "skin")
     }
@@ -19,20 +19,20 @@ sealed interface SkinMeta : SchemeItemMeta<ItemSkin> {
 
 private class NonNullSkinMeta(
     private val itemSkin: ItemSkin,
-) : SkinMeta {
+) : SSkinMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<ItemSkin> {
         return GenerationResult(itemSkin)
     }
 }
 
-private data object DefaultSkinMeta : SkinMeta {
+private data object DefaultSkinMeta : SSkinMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<ItemSkin> = GenerationResult.empty()
 }
 
-internal class SkinMetaSerializer : SchemeItemMetaSerializer<SkinMeta> {
-    override val defaultValue: SkinMeta = DefaultSkinMeta
+internal class SkinMetaSerializer : SchemeItemMetaSerializer<SSkinMeta> {
+    override val defaultValue: SSkinMeta = DefaultSkinMeta
 
-    override fun deserialize(type: Type, node: ConfigurationNode): SkinMeta {
+    override fun deserialize(type: Type, node: ConfigurationNode): SSkinMeta {
         return DefaultSkinMeta // TODO returns a non-empty value
     }
 }

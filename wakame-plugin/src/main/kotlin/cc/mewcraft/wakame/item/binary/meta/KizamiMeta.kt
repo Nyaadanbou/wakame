@@ -12,8 +12,8 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的铭刻。
  */
-internal class KizamiMeta(
-    private val holder: ItemMetaHolderImpl,
+internal class BKizamiMeta(
+    private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<Set<Kizami>> {
     override val key: Key = ItemMetaKeys.KIZAMI
 
@@ -46,6 +46,6 @@ internal class KizamiMeta(
     }
 }
 
-internal fun KizamiMeta?.orEmpty(): Set<Kizami> {
+internal fun BKizamiMeta?.getOrEmpty(): Set<Kizami> {
     return this?.getOrNull() ?: emptySet()
 }

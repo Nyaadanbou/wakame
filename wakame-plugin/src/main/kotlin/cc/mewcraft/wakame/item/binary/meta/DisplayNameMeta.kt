@@ -9,8 +9,8 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的名字(MiniMessage).
  */
-internal class DisplayNameMeta(
-    private val holder: ItemMetaHolderImpl,
+internal class BDisplayNameMeta(
+    private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<String> {
     override val key: Key = ItemMetaKeys.DISPLAY_NAME
 
@@ -33,6 +33,6 @@ internal class DisplayNameMeta(
     }
 }
 
-internal fun DisplayNameMeta?.orEmpty(): String {
+internal fun BDisplayNameMeta?.getOrEmpty(): String {
     return this?.getOrNull() ?: ""
 }

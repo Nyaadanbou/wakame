@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.BinaryData
 import cc.mewcraft.wakame.item.CurseKeys
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.reference.EntityReference
-import cc.mewcraft.wakame.util.compoundShadowTag
+import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.toStableShort
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
@@ -36,13 +36,13 @@ data class EntityKillsCurse(
     override fun test(context: NekoStack): Boolean {
         var sum = 0
         for (k in index.keySet) {
-            sum += context.statistics.entityKills.get(k)
+            sum += context.statistics.ENTITY_KILLS.get(k)
         }
         return sum >= count
     }
 
     override fun asShadowTag(): ShadowTag {
-        return compoundShadowTag {
+        return CompoundShadowTag {
             putString(NekoTags.Cell.CURSE_KEY, key.asString())
             putString(INDEX_TAG_NAME, index.name)
             putShort(COUNT_TAG_NAME, count.toStableShort())

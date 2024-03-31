@@ -13,7 +13,7 @@ import java.lang.reflect.Type
 /**
  * 物品的等级。
  */
-sealed interface LevelMeta : SchemeItemMeta<Int> {
+sealed interface SLevelMeta : SchemeItemMeta<Int> {
     companion object : Keyed {
         override val key: Key = Key.key(NekoNamespaces.ITEM_META, "level")
     }
@@ -39,16 +39,16 @@ private class NonNullLevelMeta(
      * The item level held in this scheme.
      */
     private val level: Any,
-) : KoinComponent, LevelMeta {
+) : KoinComponent, SLevelMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<Int> {
         val ret: Int = when (level) {
             is Int -> {
                 return GenerationResult(level)
             }
 
-            is LevelMeta.Option -> {
+            is SLevelMeta.Option -> {
                 when (level) {
-                    LevelMeta.Option.CONTEXT -> context.trigger.level
+                    SLevelMeta.Option.CONTEXT -> context.trigger.level
                 }
             }
 
@@ -62,19 +62,19 @@ private class NonNullLevelMeta(
     }
 }
 
-private data object DefaultLevelMeta : LevelMeta {
+private data object DefaultLevelMeta : SLevelMeta {
     override fun generate(context: SchemeGenerationContext): GenerationResult<Int> = GenerationResult.empty() // default not to write level at all
 }
 
-internal class LevelMetaSerializer : SchemeItemMetaSerializer<LevelMeta> {
-    override val defaultValue: LevelMeta = DefaultLevelMeta
-    override fun deserialize(type: Type, node: ConfigurationNode): LevelMeta {
+internal class LevelMetaSerializer : SchemeItemMetaSerializer<SLevelMeta> {
+    override val defaultValue: SLevelMeta = DefaultLevelMeta
+    override fun deserialize(type: Type, node: ConfigurationNode): SLevelMeta {
         return when (val scalar = node.rawScalar()) {
             is Int -> NonNullLevelMeta(scalar)
 
-            is String -> NonNullLevelMeta(EnumLookup.lookup<LevelMeta.Option>(scalar).getOrThrow())
+            is String -> NonNullLevelMeta(EnumLookup.lookup<SLevelMeta.Option>(scalar).getOrThrow())
 
-            else -> throw SerializationException("Invalid value type for ${LevelMeta::class.simpleName}")
+            else -> throw SerializationException("Invalid value type for ${SLevelMeta::class.simpleName}")
         }
     }
 }

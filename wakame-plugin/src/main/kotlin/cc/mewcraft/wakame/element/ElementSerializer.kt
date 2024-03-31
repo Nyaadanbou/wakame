@@ -30,7 +30,7 @@ internal class ElementSerializer : SchemeSerializer<Element> {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {
             // if it's structure 1
-            return ElementRegistry.INSTANCES.get(scalar)
+            return ElementRegistry.INSTANCES[scalar]
         }
 
         // if it's structure 2

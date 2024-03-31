@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.meta.BDisplayNameMeta
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
-import cc.mewcraft.wakame.item.binary.meta.DisplayNameMeta
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import kotlin.reflect.KClass
@@ -108,7 +108,7 @@ internal interface ItemMetaStylizer {
     /**
      * Gets child stylizer by the class of [BinaryItemMeta].
      *
-     * To implementer: Every [BinaryItemMeta] (except [DisplayNameMeta]) to be rendered
+     * To implementer: Every [BinaryItemMeta] (except [BDisplayNameMeta]) to be rendered
      * should have a corresponding [ChildStylizer] in this map. In the case where no
      * implementation is found for the [clazz], a default [ChildStylizer] indicating
      * a missing implementation should be returned.

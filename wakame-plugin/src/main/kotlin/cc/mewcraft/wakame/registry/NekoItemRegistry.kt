@@ -37,7 +37,7 @@ import org.slf4j.Logger
 object NekoItemRegistry : KoinComponent, Initializable {
     val INSTANCES: Registry<Key, NekoItem> = SimpleRegistry()
 
-    fun get(key: String): NekoItem = INSTANCES.get(Key(key))
+    fun get(key: String): NekoItem = INSTANCES[Key(key)]
     fun find(key: String): NekoItem? = INSTANCES.find(Key(key))
 
     override fun onPreWorld() {

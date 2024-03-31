@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.test
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.meta
-import cc.mewcraft.wakame.item.binary.meta.DisplayLoreMeta
-import cc.mewcraft.wakame.item.binary.meta.orEmpty
+import cc.mewcraft.wakame.item.binary.meta.BDisplayLoreMeta
+import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
 import cc.mewcraft.wakame.item.scheme.PaperNekoItemRealizer
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.pack.model.ModelRegistry
@@ -76,7 +76,7 @@ class TestListener : KoinComponent, Listener {
         when (plainMessage) {
             "r1" -> {
                 val wrap = NekoStackFactory.wrap(inventory.itemInMainHand)
-                val lore = wrap.meta<DisplayLoreMeta>().orEmpty()
+                val lore = wrap.meta<BDisplayLoreMeta>().getOrEmpty()
                 val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
             }
@@ -101,7 +101,7 @@ class TestListener : KoinComponent, Listener {
             }
 
             "s3" -> {
-                inventory.itemInMainHand.nekoCompound = compoundShadowTag {
+                inventory.itemInMainHand.nekoCompound = CompoundShadowTag {
                     putString("ns", "short_sword")
                     putString("id", "demo")
                     putByte("variant", 0)
@@ -112,7 +112,7 @@ class TestListener : KoinComponent, Listener {
                 val bukkitStack = ItemStack(Material.NETHERITE_SWORD)
 
                 // write
-                bukkitStack.nekoCompound = compoundShadowTag {
+                bukkitStack.nekoCompound = CompoundShadowTag {
                     putString("ns", "short_sword")
                     putString("id", "demo")
                     putByte("variant", 18)
@@ -127,19 +127,19 @@ class TestListener : KoinComponent, Listener {
                     putLongArray("long_array", longArrayOf(1, 2, 3))
                     putBoolean("boolean", true)
 
-                    val listShadowTag1: ListShadowTag = listShadowTag(
+                    val listShadowTag1: ListShadowTag = ListShadowTag(
                         IntShadowTag.valueOf(1),
                     )
                     put("list1", listShadowTag1)
 
-                    val listShadowTag2 = listShadowTag {
+                    val listShadowTag2 = ListShadowTag {
                         add(ShortShadowTag.valueOf(1))
                         add(ShortShadowTag.valueOf(2))
                         add(ShortShadowTag.valueOf(3))
                     }
                     put("list2", listShadowTag2)
 
-                    val compoundShadowTag: CompoundShadowTag = compoundShadowTag {
+                    val compoundShadowTag: CompoundShadowTag = CompoundShadowTag {
                         putByte("k1", 31)
                     }
                     put("stats", compoundShadowTag)
@@ -208,7 +208,7 @@ class TestListener : KoinComponent, Listener {
 
             "a3" -> {
                 inventory.itemInMainHand.setNbt {
-                    put("wakame", compoundBinaryTag {
+                    put("wakame", CompoundBinaryTag {
                         putString("ns", "short_sword")
                         putString("id", "demo")
                         putByte("variant", 0)
@@ -218,7 +218,7 @@ class TestListener : KoinComponent, Listener {
 
             "a4" -> {
                 inventory.itemInMainHand.copyWriteNbt {
-                    put("wakame", compoundBinaryTag {
+                    put("wakame", CompoundBinaryTag {
                         putString("ns", "long_sword")
                         putString("id", "demo")
                         putByte("variant", 0)

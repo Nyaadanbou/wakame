@@ -77,7 +77,7 @@ internal object KizamiSerializer : SchemeSerializer<Kizami> {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {
             // if it's structure 1
-            return KizamiRegistry.INSTANCES.get(scalar)
+            return KizamiRegistry.INSTANCES[scalar]
         }
 
         // if it's structure 2

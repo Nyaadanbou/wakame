@@ -10,8 +10,8 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的等级。不是所有物品都有等级，因此可能为空。
  */
-internal class LevelMeta(
-    private val holder: ItemMetaHolderImpl,
+internal class BLevelMeta(
+    private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<Int> {
     override val key: Key = ItemMetaKeys.LEVEL
 
@@ -35,6 +35,6 @@ internal class LevelMeta(
     }
 }
 
-internal fun LevelMeta?.orDefault(): Int {
+internal fun BLevelMeta?.orDefault(): Int {
     return this?.getOrNull() ?: 0
 }
