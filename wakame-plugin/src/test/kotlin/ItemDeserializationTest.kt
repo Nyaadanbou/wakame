@@ -58,6 +58,7 @@ class ItemDeserializationTest : KoinTest {
             AttributeRegistry.onPreWorld()
 
             // initialize necessary registry
+            BehaviorRegistry.onPreWorld()
             ElementRegistry.onPreWorld()
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()

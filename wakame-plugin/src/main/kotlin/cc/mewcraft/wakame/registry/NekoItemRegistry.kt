@@ -15,6 +15,7 @@ import org.slf4j.Logger
 @PreWorldDependency(
     runBefore = [
         AttributeRegistry::class,
+        BehaviorRegistry::class,
         ElementRegistry::class,
         EntityReferenceRegistry::class,
         ItemSkinRegistry::class,
