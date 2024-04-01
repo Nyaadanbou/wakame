@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item.schema.core
+package cc.mewcraft.wakame.item.schema.cell.core
 
 import cc.mewcraft.wakame.item.BinaryCoreData
 import cc.mewcraft.wakame.item.Core

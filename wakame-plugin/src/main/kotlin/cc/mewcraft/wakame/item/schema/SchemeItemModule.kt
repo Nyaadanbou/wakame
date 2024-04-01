@@ -3,10 +3,10 @@ package cc.mewcraft.wakame.item.schema
 import cc.mewcraft.wakame.configurate.MaterialSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.item.EffectiveSlotSerializer
-import cc.mewcraft.wakame.item.schema.core.SchemaCoreGroupSerializer
-import cc.mewcraft.wakame.item.schema.core.SchemaCorePoolSerializer
-import cc.mewcraft.wakame.item.schema.curse.SchemaCurseGroupSerializer
-import cc.mewcraft.wakame.item.schema.curse.SchemaCursePoolSerializer
+import cc.mewcraft.wakame.item.schema.cell.core.SchemaCoreGroupSerializer
+import cc.mewcraft.wakame.item.schema.cell.core.SchemaCorePoolSerializer
+import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCurseGroupSerializer
+import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCursePoolSerializer
 import cc.mewcraft.wakame.item.schema.meta.*
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS

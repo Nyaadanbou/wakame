@@ -1,8 +1,7 @@
-package cc.mewcraft.wakame.item.schema.curse
+package cc.mewcraft.wakame.item.schema.cell.curse
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.Curse
-import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
+import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 
 /**
@@ -10,15 +9,10 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
  */
 sealed interface SchemaCurse : Curse {
     /**
-     * Generates a binary course from `this`.
+     * Generates a binary curse from this schema.
      *
      * @param context the context
      * @return a new instance
      */
     fun generate(context: SchemaGenerationContext): BinaryCurse
 }
-
-/**
- * Gets the empty condition.
- */
-fun emptySchemaCurse(): SchemaCurse = @OptIn(InternalApi::class) EmptySchemaCurse

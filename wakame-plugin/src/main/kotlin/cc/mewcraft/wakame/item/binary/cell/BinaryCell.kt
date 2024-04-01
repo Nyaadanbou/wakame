@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.item.Cell
 import cc.mewcraft.wakame.item.ShadowTagLike
-import cc.mewcraft.wakame.item.binary.core.BinaryCore
-import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
+import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
+import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 
 /**

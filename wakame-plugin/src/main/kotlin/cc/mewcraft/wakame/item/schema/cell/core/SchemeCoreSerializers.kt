@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item.schema.core
+package cc.mewcraft.wakame.item.schema.cell.core
 
 import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.condition.Condition

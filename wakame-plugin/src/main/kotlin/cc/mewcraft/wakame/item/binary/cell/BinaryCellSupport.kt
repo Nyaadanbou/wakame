@@ -1,15 +1,15 @@
 package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.item.binary.core.BinaryCore
-import cc.mewcraft.wakame.item.binary.core.isNotEmpty
-import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
-import cc.mewcraft.wakame.item.binary.curse.isNotEmpty
+import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
+import cc.mewcraft.wakame.item.binary.cell.core.isNotEmpty
+import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
+import cc.mewcraft.wakame.item.binary.cell.curse.isNotEmpty
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 
-internal data class BinaryCellImpl(
+data class ImmutableBinaryCell(
     override val canReforge: Boolean,
     override val canOverride: Boolean,
     override val binaryCore: BinaryCore,

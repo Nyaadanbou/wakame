@@ -1,6 +1,5 @@
-package cc.mewcraft.wakame.item.binary.core
+package cc.mewcraft.wakame.item.binary.cell.core
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.ShadowTagLike
 
@@ -12,14 +11,9 @@ import cc.mewcraft.wakame.item.ShadowTagLike
 interface BinaryCore : Core, ShadowTagLike
 
 /**
- * Gets the empty core.
- */
-fun emptyBinaryCore(): BinaryCore = @OptIn(InternalApi::class) EmptyBinaryCore
-
-/**
  * Checks if the core is empty.
  */
-val BinaryCore.isEmpty: Boolean get() = @OptIn(InternalApi::class) (this is EmptyBinaryCore)
+val BinaryCore.isEmpty: Boolean get() = (this is EmptyBinaryCore)
 
 /**
  * Checks if the core is not empty.

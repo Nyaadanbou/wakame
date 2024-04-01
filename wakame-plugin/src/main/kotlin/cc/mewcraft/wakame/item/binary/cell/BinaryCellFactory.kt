@@ -1,12 +1,11 @@
 package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.item.binary.core.BinaryCoreFactory
-import cc.mewcraft.wakame.item.binary.core.emptyBinaryCore
-import cc.mewcraft.wakame.item.binary.curse.BinaryCurseFactory
+import cc.mewcraft.wakame.item.binary.cell.core.BinaryCoreFactory
+import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurseFactory
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
-import cc.mewcraft.wakame.item.schema.curse.emptySchemaCurse
+import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCurseFactory
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 /**
@@ -14,7 +13,7 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
  */
 object BinaryCellFactory {
     /**
-     * Creates a [BinaryCell] from the [compoundTag].
+     * Creates a [BinaryCell] from a NBT source.
      *
      * The [compoundTag] structure is like this:
      * ```
@@ -30,7 +29,7 @@ object BinaryCellFactory {
      *   Compound('reforge')
      *     Byte('success'): 5b
      *     Byte('failure'): 1b
-     *   Compound('condition')
+     *   Compound('curse')
      *     String('id'): 'condition:entity_kills'
      *     String('index'): 'demo_bosses_1'
      *     Short('count'): 18s
@@ -40,19 +39,20 @@ object BinaryCellFactory {
      * @return a new [BinaryCell]
      */
     fun decode(compoundTag: CompoundShadowTag): BinaryCell {
-        return BinaryCellImpl(
+        return ImmutableBinaryCell(
             canReforge = compoundTag.getBoolean(NekoTags.Cell.CAN_REFORGE),
             canOverride = compoundTag.getBoolean(NekoTags.Cell.CAN_OVERRIDE),
-            binaryCore = BinaryCoreFactory.decode(compoundTag.getCompound(NekoTags.Cell.CORE)), // TODO optimization: avoid creating empty compound
+            binaryCore = BinaryCoreFactory.decode(compoundTag.getCompound(NekoTags.Cell.CORE)),
             binaryCurse = BinaryCurseFactory.decode(compoundTag.getCompound(NekoTags.Cell.CURSE)),
             reforgeMeta = ReforgeMetaFactory.decode(compoundTag.getCompound(NekoTags.Cell.REFORGE))
         )
     }
 
     /**
-     * Creates a [BinaryCell] from the [context] and [schemaCell]. **Note that
-     * the return value can be nullable.** A `null` value indicates that the
-     * binary cell should not exist at all on the item (due to the fact that,
+     * Creates a [BinaryCell] from a schema source.
+     *
+     * **Note that the return value can be nullable.** A `null` value indicates
+     * that the binary cell should not exist at all on the item (due to the fact that,
      * for example, nothing is drawn out from the samples **and** the property
      * [SchemaCell.keepEmpty] is configured as `false`).
      *
@@ -62,34 +62,39 @@ object BinaryCellFactory {
      */
     fun generate(context: SchemaGenerationContext, schemaCell: SchemaCell): BinaryCell? {
         // make a core
-        val schemaCore = schemaCell.coreSelector.pickSingle(context)
-        val binaryCore = if (schemaCore != null) {
-            // something is drawn out
-            BinaryCoreFactory.generate(context, schemaCore)
-        } else {
-            // nothing is drawn out
-            if (!schemaCell.keepEmpty) {
-                // the `keepEmpty` is configured as `false`
-                return null
+        val binaryCore = run {
+            val schemaCore = schemaCell.coreSelector.pickSingle(context)
+            if (schemaCore != null) {
+                // something is drawn out
+                BinaryCoreFactory.generate(context, schemaCore)
+            } else {
+                // nothing is drawn out
+                if (!schemaCell.keepEmpty) {
+                    // the `keepEmpty` is configured as `false`
+                    return null
+                }
+                // the `keepEmpty` is configured as `true`
+                BinaryCoreFactory.empty()
             }
-            // the `keepEmpty` is configured as `true`
-            emptyBinaryCore()
         }
 
         // make a curse
-        val schemaCurse = schemaCell.curseSelector.pickSingle(context) ?: emptySchemaCurse()
-        val binaryCurse = schemaCurse.generate(context)
+        val binaryCurse = run {
+            val schema = schemaCell.curseSelector.pickSingle(context) ?: SchemaCurseFactory.empty()
+            val binary = BinaryCurseFactory.generate(context, schema)
+            binary
+        }
 
-        // make a reforge meta (empty for new cell)
-        val reforgeMeta = emptyReforgeMeta()
+        // make a reforge meta
+        val reforgeMeta = ReforgeMetaFactory.empty()
 
-        val ret = BinaryCellImpl(
+        // collect all and return
+        return ImmutableBinaryCell(
             canReforge = schemaCell.canReforge,
             canOverride = schemaCell.canOverride,
             binaryCore = binaryCore,
             binaryCurse = binaryCurse,
             reforgeMeta = reforgeMeta
         )
-        return ret
     }
 }

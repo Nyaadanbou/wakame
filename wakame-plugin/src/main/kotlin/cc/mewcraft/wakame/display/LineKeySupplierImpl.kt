@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.display
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
-import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.BinaryAbilityCore
+import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.util.Key
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap

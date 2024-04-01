@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item.schema.curse
+package cc.mewcraft.wakame.item.schema.cell.curse
 
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext

@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.item.schema.cell
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.Cell
 import cc.mewcraft.wakame.item.binary.cell.BinaryCell
-import cc.mewcraft.wakame.item.binary.core.BinaryCore
-import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
+import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
+import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
-import cc.mewcraft.wakame.item.schema.core.SchemaCore
-import cc.mewcraft.wakame.item.schema.curse.SchemaCurse
+import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
+import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCurse
 import cc.mewcraft.wakame.random.Group
 import cc.mewcraft.wakame.random.Pool
 
@@ -34,8 +33,6 @@ typealias SchemaCurseGroup = Group<SchemaCurse, SchemaGenerationContext>
  * randomly generated data to create a [binary cell][BinaryCell].
  */
 interface SchemaCell : Cell {
-
-    // region Invariant Data
     /**
      * Returns `true` if the cell is configured as "reforgeable".
      */
@@ -51,9 +48,7 @@ interface SchemaCell : Cell {
      * nothing is picked from the [coreSelector].
      */
     val keepEmpty: Boolean
-    // endregion
 
-    // region Variant Data
     /**
      * The [group][Group] of [cores][SchemaCore] owned by the cell.
      */
@@ -63,10 +58,4 @@ interface SchemaCell : Cell {
      * The [group][Group] of [curses][SchemaCurse] owned by ths cell.
      */
     val curseSelector: SchemaCurseGroup
-    // endregion
 }
-
-/**
- * Gets the empty cell.
- */
-fun emptySchemaCell(): SchemaCell = @OptIn(InternalApi::class) EmptySchemaCell

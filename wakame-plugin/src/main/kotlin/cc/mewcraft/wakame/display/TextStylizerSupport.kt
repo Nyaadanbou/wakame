@@ -6,9 +6,9 @@ import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
-import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
-import cc.mewcraft.wakame.item.binary.core.isEmpty
+import cc.mewcraft.wakame.item.binary.cell.core.BinaryAbilityCore
+import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.isEmpty
 import cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.kizami.Kizami

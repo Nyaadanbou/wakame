@@ -6,6 +6,11 @@ import org.spongepowered.configurate.ConfigurationNode
 
 object SchemaCellFactory {
     /**
+     * Creates an empty cell.
+     */
+    fun empty(): SchemaCell = EmptySchemaCell
+
+    /**
      * Creates a [SchemaCell] from given configuration nodes.
      *
      * Note that some information about a [SchemaCell] in the configuration
@@ -47,7 +52,7 @@ object SchemaCellFactory {
         val coreGroup = coreNode?.requireKt<SchemaCoreGroup>() ?: Group.empty()
         val curseGroup = curseNode?.requireKt<SchemaCurseGroup>() ?: Group.empty()
 
-        return SchemaCellImpl(
+        return ImmutableSchemaCell(
             keepEmpty = keepEmpty,
             canReforge = reforgeable,
             canOverride = overridable,

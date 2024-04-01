@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item.schema.curse
+package cc.mewcraft.wakame.item.schema.cell.curse
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.CurseKeys
@@ -9,6 +9,14 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
 object SchemaCurseFactory {
+    /**
+     * Creates an empty schema curse.
+     */
+    fun empty(): SchemaCurse = EmptySchemaCurse
+
+    /**
+     * Creates a [SchemaCurse] from given configuration nodes.
+     */
     fun schemaOf(node: ConfigurationNode): SchemaCurse {
         val ret: SchemaCurse = when (val key = node.node("key").requireKt<Key>()) {
             CurseKeys.ENTITY_KILLS -> {

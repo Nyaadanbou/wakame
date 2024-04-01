@@ -7,11 +7,9 @@ import cc.mewcraft.wakame.util.RandomizedValue
 import org.spongepowered.configurate.ConfigurationNode
 
 /*
+   属性数据抽象的实现，其数据类型为复合类型。
 
-属性数据抽象的实现，其数据类型为复合类型。
-
-这些类用于储存属性的“模板数值”，也就是用于产生数值的数值。
-
+   这些类用于储存属性的“模板数值”，也就是用于产生数值的数值。
 */
 
 val SchemaAttributeData.element: Element?

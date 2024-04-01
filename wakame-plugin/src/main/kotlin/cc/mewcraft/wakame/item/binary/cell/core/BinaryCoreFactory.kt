@@ -1,13 +1,13 @@
-package cc.mewcraft.wakame.item.binary.core
+package cc.mewcraft.wakame.item.binary.cell.core
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
 import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
-import cc.mewcraft.wakame.item.schema.core.SchemaAbilityCore
-import cc.mewcraft.wakame.item.schema.core.SchemaAttributeCore
-import cc.mewcraft.wakame.item.schema.core.SchemaCore
+import cc.mewcraft.wakame.item.schema.cell.core.SchemaAbilityCore
+import cc.mewcraft.wakame.item.schema.cell.core.SchemaAttributeCore
+import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
 import cc.mewcraft.wakame.item.schema.filter.AbilityContextHolder
 import cc.mewcraft.wakame.item.schema.filter.AttributeContextHolder
 import cc.mewcraft.wakame.registry.AttributeRegistry
@@ -20,15 +20,22 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 object BinaryCoreFactory {
 
     /**
+     * Creates an empty binary core.
+     */
+    fun empty(): BinaryCore {
+        return EmptyBinaryCore
+    }
+
+    /**
      * Creates an [BinaryCore] from a NBT source.
      *
      * @param compound the tag
-     * @return an [BinaryCore] or [emptyBinaryCore]
+     * @return a non-empty [BinaryCore] or [EmptyBinaryCore]
      * @throws IllegalArgumentException if the NBT is malformed
      */
     fun decode(compound: CompoundShadowTag): BinaryCore {
         if (compound.isEmpty) {
-            return emptyBinaryCore()
+            return empty()
         }
 
         val key = Key(compound.getString(NekoTags.Cell.CORE_KEY))
