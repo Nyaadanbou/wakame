@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 
 object ItemMetaKeys {
     private fun createKey(value: String): Key {
-        return Key.key(NekoNamespaces.ITEM_META, value)
+        return Key(NekoNamespaces.ITEM_META, value)
     }
 
     val DISPLAY_LORE = createKey("lore")

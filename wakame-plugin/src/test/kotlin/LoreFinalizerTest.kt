@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skin.skinModule
+import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.junit.jupiter.api.AfterAll
@@ -59,9 +60,9 @@ class LoreFinalizerTest : KoinTest {
 
     private val Component.plain: String get() = PlainTextComponentSerializer.plainText().serialize(this)
     private fun Component.contains(x: String): Boolean = this.plain.contains(x)
-    private fun ItemMetaLineFactory.get(x: String): ItemMetaLine = this.get(FullKey.key(x), listText(x))
-    private fun AbilityLineFactory.get(x: String): AbilityLine = this.get(FullKey.key(x), listText(x))
-    private fun AttributeLineFactory.get(x: String): AttributeLine = this.get(FullKey.key(x), listText(x))
+    private fun ItemMetaLineFactory.get(x: String): ItemMetaLine = this.get(Key(x), listText(x))
+    private fun AbilityLineFactory.get(x: String): AbilityLine = this.get(Key(x), listText(x))
+    private fun AttributeLineFactory.get(x: String): AttributeLine = this.get(Key(x), listText(x))
 
     private fun buildTest(loreLines: Collection<LoreLine>) {
         val logger = get<Logger>()

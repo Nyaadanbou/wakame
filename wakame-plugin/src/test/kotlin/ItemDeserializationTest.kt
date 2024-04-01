@@ -14,10 +14,10 @@ import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.util.Key
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -75,14 +75,14 @@ class ItemDeserializationTest : KoinTest {
 
     @Test
     fun `schema item construction`() {
-        val key = Key.key("short_sword:demo")
+        val key = Key("short_sword:demo")
         val demo = NekoItemRegistry.INSTANCES.find(key)
         assertNotNull(demo, "The item '$key' is not loaded correctly")
     }
 
     @Test
     fun `binary item construction`() {
-        val key = Key.key("short_sword:demo")
+        val key = Key("short_sword:demo")
         val demo = NekoItemRegistry.INSTANCES.find(key)
         assertNotNull(demo, "The item '$key' is not loaded correctly")
 

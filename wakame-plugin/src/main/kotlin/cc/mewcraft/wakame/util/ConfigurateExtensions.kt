@@ -79,7 +79,7 @@ internal inline fun <reified T> ConfigurationNode.requireKt(): T {
 
 //<editor-fold desc="Basic Serializers">
 internal object KeySerializer : TypeSerializer<Key> {
-    override fun deserialize(type: Type, node: ConfigurationNode): Key = Key.key(node.requireKt<String>())
+    override fun deserialize(type: Type, node: ConfigurationNode): Key = Key(node.requireKt<String>())
     override fun serialize(type: Type?, obj: Key?, node: ConfigurationNode?): Nothing = throw UnsupportedOperationException()
 }
 

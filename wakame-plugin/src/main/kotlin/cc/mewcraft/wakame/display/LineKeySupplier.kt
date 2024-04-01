@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
+import cc.mewcraft.wakame.util.Key
 
 @InternalApi("Use the subclasses instead")
 internal sealed interface LineKeySupplier<T> {
@@ -24,7 +25,7 @@ internal sealed interface LineKeySupplier<T> {
  *
  * It is to be used to compare by reference.
  */
-val SKIP_RENDERING: FullKey = FullKey.key("renderer", "noop")
+val SKIP_RENDERING: FullKey = Key("renderer", "noop")
 
 @OptIn(InternalApi::class)
 internal interface AbilityKeySupplier : LineKeySupplier<BinaryAbilityCore>

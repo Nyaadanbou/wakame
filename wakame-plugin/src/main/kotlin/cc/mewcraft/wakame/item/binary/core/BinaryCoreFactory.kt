@@ -11,8 +11,8 @@ import cc.mewcraft.wakame.item.schema.core.SchemaCore
 import cc.mewcraft.wakame.item.schema.filter.AbilityContextHolder
 import cc.mewcraft.wakame.item.schema.filter.AttributeContextHolder
 import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.util.Key
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import net.kyori.adventure.key.Key
 
 /**
  * A factory used to create [BinaryCore] from schema and binary sources.
@@ -31,7 +31,7 @@ object BinaryCoreFactory {
             return emptyBinaryCore()
         }
 
-        val key = Key.key(compound.getString(NekoTags.Cell.CORE_KEY))
+        val key = Key(compound.getString(NekoTags.Cell.CORE_KEY))
         val ret = when (key.namespace()) {
             NekoNamespaces.ABILITY -> {
                 BinaryAbilityCore(key)

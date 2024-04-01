@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.binary.NekoStack
+import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 
 /**
@@ -22,6 +23,6 @@ interface Curse : Keyed {
  * The keys of [curses][Curse].
  */
 object CurseKeys {
-    val ENTITY_KILLS: Key = Key.key(NekoNamespaces.CURSE, "entity_kills")
-    val PEAK_DAMAGE: Key = Key.key(NekoNamespaces.CURSE, "peak_damage")
+    val ENTITY_KILLS: Key = Key(NekoNamespaces.CURSE, "entity_kills")
+    val PEAK_DAMAGE: Key = Key(NekoNamespaces.CURSE, "peak_damage")
 }

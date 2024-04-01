@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.reloadable
+import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
 import cc.mewcraft.wakame.util.requireKt
@@ -113,7 +114,7 @@ internal class RendererConfiguration(
      */
     val attributeFormats: Map<Key, String> by reloadable {
         root.node(RENDERER_STYLE_NODE, "attribute", "value").childrenMap()
-            .mapKeys { (k, _) -> Key.key(NekoNamespaces.ATTRIBUTE, k as String) }
+            .mapKeys { (k, _) -> Key(NekoNamespaces.ATTRIBUTE, k as String) }
             .filter { (k, _) -> k != Attributes.ATTACK_SPEED_LEVEL.key() }
             .mapValues { (_, v) -> v.requireKt<String>() }
     }
@@ -226,15 +227,15 @@ internal class RendererConfiguration(
             val ret: DynamicLoreMeta
             when {
                 rawLine.startsWith(NekoNamespaces.ABILITY + ":") -> {
-                    ret = AbilityLoreMeta(RawKey.key(rawLine), rawIndex, default)
+                    ret = AbilityLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
                 }
 
                 rawLine.startsWith(NekoNamespaces.ATTRIBUTE + ":") -> {
-                    ret = AttributeLoreMeta(RawKey.key(rawLine), rawIndex, default, attDerivation)
+                    ret = AttributeLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default, attDerivation)
                 }
 
                 rawLine.startsWith(NekoNamespaces.ITEM_META + ":") -> {
-                    ret = MetaLoreMeta(RawKey.key(rawLine), rawIndex, default)
+                    ret = MetaLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
                 }
 
                 else -> {

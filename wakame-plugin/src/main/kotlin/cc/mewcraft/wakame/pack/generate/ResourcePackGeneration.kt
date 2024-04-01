@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.lookup.material
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.model.ModelRegistry
+import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
@@ -212,18 +213,18 @@ internal class ResourcePackCustomModelGeneration(
 
     private fun Assets.modelKey(order: Int, additionExtension: String = ""): Key {
         return if (additionExtension.isBlank()) {
-            Key.key(RESOURCE_NAMESPACE, "item/${key.namespace()}/${key.value()}_$order")
+            Key(RESOURCE_NAMESPACE, "item/${key.namespace()}/${key.value()}_$order")
         } else {
-            Key.key(RESOURCE_NAMESPACE, "item/${key.namespace()}/${key.value()}_$order.$additionExtension")
+            Key(RESOURCE_NAMESPACE, "item/${key.namespace()}/${key.value()}_$order.$additionExtension")
         }
     }
 
     private fun Assets.materialKey(): Key {
-        return Key.key("item/${material.name.lowercase()}")
+        return Key("item/${material.name.lowercase()}")
     }
 
     private fun Key.removeExtension(): Key {
-        return Key.key(namespace(), value().substringBeforeLast('.'))
+        return Key(value().substringBeforeLast('.'))
     }
 
     private fun CreativeModel.toMinecraftFormat(): CreativeModel {
@@ -231,7 +232,7 @@ internal class ResourcePackCustomModelGeneration(
         if (layers.isEmpty()) return this
         val newTextures = layers.map {
             val key = requireNotNull(it.key()) { "Texture key is null" }
-            val newKey = Key.key(RESOURCE_NAMESPACE, key.value())
+            val newKey = Key(RESOURCE_NAMESPACE, key.value())
             ModelTexture.ofKey(newKey)
         }
 

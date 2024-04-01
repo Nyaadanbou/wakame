@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
+import cc.mewcraft.wakame.util.Key
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -143,7 +144,7 @@ internal class AttributeKeySupplierImpl(
                     append(it.uniqueId)
                 }
             }
-            Key.key(rawKey.namespace(), newValue)
+            Key(rawKey.namespace(), newValue)
         }
         return fullKey
     }

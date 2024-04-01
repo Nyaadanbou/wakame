@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.iterator
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.registry.ITEM_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ITEM_CONFIG_LOADER
+import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -54,7 +55,7 @@ object NekoItemNodeIterator : KoinComponent {
                 .forEach { itemFile ->
                     val namespace = namespaceDir.name
                     val value = itemFile.nameWithoutExtension
-                    val key = Key.key(namespace, value).also {
+                    val key = Key(namespace, value).also {
                         logger.info("Loading item: {}", it)
                     }
 

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.display
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.StringCombiner
 import net.kyori.adventure.text.Component
 
@@ -34,7 +35,7 @@ internal data class MetaLoreMeta(
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
     override val fullKeys: List<FullKey> =
-        listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
+        listOf(Key(rawKey.namespace(), rawKey.value()))
 }
 
 /**
@@ -46,7 +47,7 @@ internal data class AbilityLoreMeta(
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
     override val fullKeys: List<FullKey> =
-        listOf(FullKey.key(rawKey.namespace(), rawKey.value()))
+        listOf(Key(rawKey.namespace(), rawKey.value()))
 }
 
 /**
@@ -94,6 +95,6 @@ internal data class AttributeLoreMeta(
                 addList(derivation.elementIndex, AttributeRegistry.FACADES[rawKey].STRUCT_METADATA.element)
             }.combine()
 
-            return values.map { FullKey.key(namespace, it) }
+            return values.map { Key(namespace, it) }
         }
 }

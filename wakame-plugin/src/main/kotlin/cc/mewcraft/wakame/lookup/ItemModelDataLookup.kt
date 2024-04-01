@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.lookup
 
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.reloadable
+import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.requireKt
 import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
@@ -28,7 +29,7 @@ internal class ItemModelDataLookup(
             for (variant in valueNode.childrenMap()) {
                 val variantKey = variant.key.toString().toInt()
                 val variantValue = variant.value.requireKt<Int>()
-                customModelDataTable.put(Key.key(key), variantKey, variantValue)
+                customModelDataTable.put(Key(key), variantKey, variantValue)
             }
         }
         customModelDataTable.rowKeySet().forEach { logger.info("<gold>Loaded custom model data for $it") }
