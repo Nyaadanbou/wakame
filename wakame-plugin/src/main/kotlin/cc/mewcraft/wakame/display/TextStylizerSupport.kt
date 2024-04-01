@@ -190,45 +190,65 @@ internal class AttributeStylizerImpl(
 
         val key = core.key
         val value = core.data
-        val tagResolvers = TagResolver.builder()
-        if (key == Attributes.ATTACK_SPEED_LEVEL.key() && value is BinaryAttributeData.S) {
-            // 单独处理攻击速度
-            // 因为攻击速度需要显示为文字
-            tagResolvers.resolver(getAttackSpeedLevelTagResolver(value.value.toInt()))
-            return listOf(mm.deserialize(config.attackSpeedFormat.merged, tagResolvers.build()))
-        } else when (value) {
-            // 其余按格式统一处理
-            // 因为其余的都直接显示为数字
-            is BinaryAttributeData.S -> tagResolvers.resolver(
-                number("value", value.value, value.operation)
-            )
+        val resolvers = TagResolver.builder()
 
-            is BinaryAttributeData.R -> tagResolvers.resolvers(
-                number("min", value.lower, value.operation),
-                number("max", value.upper, value.operation)
-            )
+        when {
+            // 单独处理攻击速度，因为需要显示为文字
+            key == Attributes.ATTACK_SPEED_LEVEL.key() && value is BinaryAttributeData.S -> {
+                resolvers.resolver(getAttackSpeedLevelTagResolver(value.value.toInt()))
+                return listOf(mm.deserialize(config.attackSpeedFormat.merged, resolvers.build()))
+            }
 
-            is BinaryAttributeData.SE -> tagResolvers.resolvers(
-                number("value", value.value, value.operation),
-                component("element", value.element.displayName)
-            )
+            // 其他需要单独处理的属性继续写在这里 ...
+            // ... -> {
+            //     ...
+            // }
 
-            is BinaryAttributeData.RE -> tagResolvers.resolvers(
-                number("min", value.lower, value.operation),
-                number("max", value.upper, value.operation),
-                component("element", value.element.displayName)
-            )
+            // 其余属性都是数字形式，因此统一处理
+            else -> when (value) {
+                is BinaryAttributeData.S -> {
+                    resolvers.resolver(
+                        number("value", value.value, value.operation)
+                    )
+                }
+
+                is BinaryAttributeData.R -> {
+                    resolvers.resolvers(
+                        number("min", value.lower, value.operation),
+                        number("max", value.upper, value.operation)
+                    )
+                }
+
+                is BinaryAttributeData.SE -> {
+                    resolvers.resolvers(
+                        number("value", value.value, value.operation),
+                        component("element", value.element.displayName)
+                    )
+                }
+
+                is BinaryAttributeData.RE -> {
+                    resolvers.resolvers(
+                        number("min", value.lower, value.operation),
+                        number("max", value.upper, value.operation),
+                        component("element", value.element.displayName)
+                    )
+                }
+            }
         }
-        return listOf(mm.deserialize(config.attributeFormats.getValue(key), tagResolvers.build()))
+
+        return listOf(mm.deserialize(config.attributeFormats.getValue(key), resolvers.build()))
     }
 
     class AttackSpeedFormatImpl(
         override val merged: String,
         override val levels: Map<Int, String>,
     ) : AttributeStylizer.AttackSpeedFormat {
-        override fun toString(): String {
-            return "AttackSpeedFormat(merged=$merged, levels=${levels.entries.joinToString { it.toString() }})"
-        }
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("merged", merged),
+            ExaminableProperty.of("levels", levels)
+        )
+
+        override fun toString(): String = toSimpleString()
     }
 }
 

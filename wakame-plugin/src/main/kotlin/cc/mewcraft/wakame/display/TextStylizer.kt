@@ -55,7 +55,7 @@ internal interface AbilityStylizer {
 internal interface AttributeStylizer {
     fun stylize(core: BinaryAttributeCore): List<Component>
 
-    interface AttackSpeedFormat {
+    interface AttackSpeedFormat : Examinable {
         /**
          * 攻速的格式。
          */
