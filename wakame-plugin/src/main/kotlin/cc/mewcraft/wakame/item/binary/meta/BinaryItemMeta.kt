@@ -25,11 +25,19 @@ sealed interface BinaryItemMeta<V> : Keyed {
     override val key: Key
 
     /**
+     * Checks whether the item meta exists in the underlying data.
+     *
+     * If [BinaryItemMeta.exists] returns `true`, it is guaranteed that
+     * [BinaryItemMeta.get] will return without throwing an exception.
+     */
+    val exists: Boolean
+
+    /**
      * Gets the value of this item meta.
      *
-     * If you have already called [remove], that means the underlying data has
-     * been removed from the NBT, then calling this function will definitely
-     * throw exception.
+     * If you have already called [BinaryItemMeta.remove], that means the
+     * underlying data has been removed from the NBT, then calling this
+     * function will definitely throw exception.
      *
      * @throws IllegalStateException
      */

@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
@@ -11,7 +9,6 @@ import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.random.Group
 import cc.mewcraft.wakame.random.Pool
 import cc.mewcraft.wakame.util.requireKt
-import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -21,11 +18,7 @@ typealias KizamiGroup = Group<Kizami, SchemaGenerationContext>
 /**
  * 物品的铭刻标识。
  */
-sealed interface SKizamiMeta : SchemaItemMeta<Set<Kizami>> {
-    companion object : Keyed {
-        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "kizami")
-    }
-}
+sealed interface SKizamiMeta : SchemaItemMeta<Set<Kizami>>
 
 private class NonNullKizamiMeta(
     private val kizamiGroup: KizamiGroup,
@@ -44,7 +37,7 @@ private data object DefaultKizamiMeta : SKizamiMeta {
     override fun generate(context: SchemaGenerationContext): GenerationResult<Set<Kizami>> = GenerationResult.empty()
 }
 
-internal class KizamiMetaSerializer : SchemaItemMetaSerializer<SKizamiMeta> {
+internal data object KizamiMetaSerializer : SchemaItemMetaSerializer<SKizamiMeta> {
     override val defaultValue: SKizamiMeta = DefaultKizamiMeta
     override fun deserialize(type: Type, node: ConfigurationNode): SKizamiMeta {
         return NonNullKizamiMeta(node.requireKt<KizamiGroup>())
@@ -54,7 +47,7 @@ internal class KizamiMetaSerializer : SchemaItemMetaSerializer<SKizamiMeta> {
 /**
  * @see AbstractGroupSerializer
  */
-internal class KizamiGroupSerializer : AbstractGroupSerializer<Kizami, SchemaGenerationContext>() {
+internal data object KizamiGroupSerializer : AbstractGroupSerializer<Kizami, SchemaGenerationContext>() {
     override fun poolFactory(node: ConfigurationNode): Pool<Kizami, SchemaGenerationContext> {
         return node.requireKt<KizamiPool>()
     }
@@ -84,7 +77,7 @@ internal class KizamiGroupSerializer : AbstractGroupSerializer<Kizami, SchemaGen
  *       weight: 1
  * ```
  */
-internal class KizamiPoolSerializer : AbstractPoolSerializer<Kizami, SchemaGenerationContext>() {
+internal data object KizamiPoolSerializer : AbstractPoolSerializer<Kizami, SchemaGenerationContext>() {
     override fun contentFactory(node: ConfigurationNode): Kizami {
         return node.node("value").requireKt<Kizami>()
     }

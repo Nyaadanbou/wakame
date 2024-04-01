@@ -1,21 +1,14 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.skin.ItemSkin
-import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
 /**
  * 物品的皮肤。
  */
-sealed interface SSkinMeta : SchemaItemMeta<ItemSkin> {
-    companion object : Keyed {
-        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "skin")
-    }
-}
+sealed interface SSkinMeta : SchemaItemMeta<ItemSkin>
 
 private class NonNullSkinMeta(
     private val itemSkin: ItemSkin,
@@ -29,7 +22,7 @@ private data object DefaultSkinMeta : SSkinMeta {
     override fun generate(context: SchemaGenerationContext): GenerationResult<ItemSkin> = GenerationResult.empty()
 }
 
-internal class SkinMetaSerializer : SchemaItemMetaSerializer<SSkinMeta> {
+internal data object SkinMetaSerializer : SchemaItemMetaSerializer<SSkinMeta> {
     override val defaultValue: SSkinMeta = DefaultSkinMeta
 
     override fun deserialize(type: Type, node: ConfigurationNode): SSkinMeta {

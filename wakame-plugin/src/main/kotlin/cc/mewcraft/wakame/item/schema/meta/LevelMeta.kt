@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.EnumLookup
-import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -14,10 +11,6 @@ import java.lang.reflect.Type
  * 物品的等级。
  */
 sealed interface SLevelMeta : SchemaItemMeta<Int> {
-    companion object : Keyed {
-        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "level")
-    }
-
     enum class Option {
         CONTEXT
     }
@@ -66,7 +59,7 @@ private data object DefaultLevelMeta : SLevelMeta {
     override fun generate(context: SchemaGenerationContext): GenerationResult<Int> = GenerationResult.empty() // default not to write level at all
 }
 
-internal class LevelMetaSerializer : SchemaItemMetaSerializer<SLevelMeta> {
+internal data object LevelMetaSerializer : SchemaItemMetaSerializer<SLevelMeta> {
     override val defaultValue: SLevelMeta = DefaultLevelMeta
     override fun deserialize(type: Type, node: ConfigurationNode): SLevelMeta {
         return when (val scalar = node.rawScalar()) {

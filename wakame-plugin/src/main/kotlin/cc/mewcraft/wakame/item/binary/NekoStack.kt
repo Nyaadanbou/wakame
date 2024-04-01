@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.getAccessor
-import cc.mewcraft.wakame.item.binary.meta.getAccessorOrCreate
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.schema.NekoItem
 import net.kyori.adventure.key.Key
@@ -151,19 +150,10 @@ interface NekoStack : NekoStackSetter {
 }
 
 /**
- * Gets the accessor of specific item meta.
+ * Gets the data accessor of specific item meta.
  *
  * @see ItemMetaAccessor.getAccessor
  */
-inline fun <reified M : BinaryItemMeta<*>> NekoStack.meta(): M? {
+inline fun <reified M : BinaryItemMeta<*>> NekoStack.meta(): M {
     return this.meta.getAccessor<M>()
-}
-
-/**
- * Gets the accessor of specific item meta or create it, if it does not exist.
- *
- * @see ItemMetaAccessor.getAccessorOrCreate
- */
-inline fun <reified M : BinaryItemMeta<*>> NekoStack.createMeta(): M {
-    return this.meta.getAccessorOrCreate<M>()
 }

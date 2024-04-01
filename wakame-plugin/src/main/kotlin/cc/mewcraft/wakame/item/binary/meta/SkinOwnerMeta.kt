@@ -11,7 +11,10 @@ import java.util.UUID
 internal class BSkinOwnerMeta(
     private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<UUID> {
-    override val key: Key = ItemMetaKeys.SKIN_OWNER
+    override val key: Key
+        get() = ItemMetaKeys.SKIN_OWNER
+    override val exists: Boolean
+        get() = holder.rootOrNull?.contains(ItemMetaKeys.SKIN_OWNER.value()) ?: false
 
     override fun getOrNull(): UUID? {
         val rootOrNull = holder.rootOrNull

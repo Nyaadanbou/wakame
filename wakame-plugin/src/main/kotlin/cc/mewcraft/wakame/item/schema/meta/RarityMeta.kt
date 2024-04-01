@@ -1,14 +1,11 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.requireKt
-import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -16,11 +13,7 @@ import java.lang.reflect.Type
 /**
  * 物品的稀有度。
  */
-sealed interface SRarityMeta : SchemaItemMeta<Rarity> {
-    companion object : Keyed {
-        override val key: Key = Key.key(NekoNamespaces.ITEM_META, "rarity")
-    }
-}
+sealed interface SRarityMeta : SchemaItemMeta<Rarity>
 
 private class NonNullRarityMeta(
     /**
@@ -59,7 +52,7 @@ private data object DefaultRarityMeta : SRarityMeta {
     override fun generate(context: SchemaGenerationContext): GenerationResult<Rarity> = GenerationResult.empty()
 }
 
-internal class RarityMetaSerializer : SchemaItemMetaSerializer<SRarityMeta> {
+internal data object RarityMetaSerializer : SchemaItemMetaSerializer<SRarityMeta> {
     override val defaultValue: SRarityMeta = DefaultRarityMeta
     override fun deserialize(type: Type, node: ConfigurationNode): SRarityMeta {
         val string = node.requireKt<String>()

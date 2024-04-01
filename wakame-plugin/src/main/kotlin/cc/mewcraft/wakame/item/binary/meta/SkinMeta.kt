@@ -14,7 +14,10 @@ import net.kyori.adventure.key.Key
 internal class BSkinMeta(
     private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<ItemSkin> {
-    override val key: Key = ItemMetaKeys.SKIN
+    override val key: Key
+        get() = ItemMetaKeys.SKIN
+    override val exists: Boolean
+        get() = holder.rootOrNull?.contains(ItemMetaKeys.SKIN.value(), ShadowTagType.SHORT) ?: false
 
     override fun getOrNull(): ItemSkin? {
         return holder.rootOrNull

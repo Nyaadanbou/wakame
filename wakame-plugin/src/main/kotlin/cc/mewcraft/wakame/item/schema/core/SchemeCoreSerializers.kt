@@ -15,7 +15,7 @@ import org.spongepowered.configurate.ConfigurationNode
 /**
  * @see AbstractGroupSerializer
  */
-internal class SchemaCoreGroupSerializer : AbstractGroupSerializer<SchemaCore, SchemaGenerationContext>() {
+internal data object SchemaCoreGroupSerializer : AbstractGroupSerializer<SchemaCore, SchemaGenerationContext>() {
     override fun poolFactory(node: ConfigurationNode): SchemaCorePool {
         return node.requireKt<SchemaCorePool>()
     }
@@ -62,7 +62,7 @@ internal class SchemaCoreGroupSerializer : AbstractGroupSerializer<SchemaCore, S
  *       meta: x1
  * ```
  */
-internal class SchemaCorePoolSerializer : AbstractPoolSerializer<SchemaCore, SchemaGenerationContext>() {
+internal data object SchemaCorePoolSerializer : AbstractPoolSerializer<SchemaCore, SchemaGenerationContext>() {
     override fun contentFactory(node: ConfigurationNode): SchemaCore {
         return SchemaCoreFactory.schemaOf(node)
     }

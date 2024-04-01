@@ -104,6 +104,6 @@ private inline fun <V, reified S : SchemaItemMeta<V>, reified B : BinaryItemMeta
     val meta = item.meta<S>()
     val value = meta.generate(context)
     if (value is GenerationResult.Thing) {
-        getAccessorOrCreate<B>().set(value.value)
+        getAccessor<B>().set(value.value)
     }
 }

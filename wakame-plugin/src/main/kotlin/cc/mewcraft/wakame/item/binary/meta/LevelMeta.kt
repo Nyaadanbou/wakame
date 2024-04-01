@@ -13,7 +13,10 @@ import net.kyori.adventure.key.Key
 internal class BLevelMeta(
     private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<Int> {
-    override val key: Key = ItemMetaKeys.LEVEL
+    override val key: Key
+        get() = ItemMetaKeys.LEVEL
+    override val exists: Boolean
+        get() = holder.rootOrNull?.contains(ItemMetaKeys.LEVEL.value(), ShadowTagType.BYTE) ?: false
 
     override fun getOrNull(): Int? {
         return holder.rootOrNull?.getIntOrNull(key.value())

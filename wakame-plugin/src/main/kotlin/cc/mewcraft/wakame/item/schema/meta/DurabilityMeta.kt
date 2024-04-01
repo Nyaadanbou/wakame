@@ -1,13 +1,10 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.requireKt
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
@@ -35,11 +32,7 @@ data class Durability(
     override fun toString(): String = toSimpleString()
 }
 
-sealed interface SDurabilityMeta : SchemaItemMeta<Durability> {
-    companion object : Keyed {
-        override val key: Key = ItemMetaKeys.DURABILITY
-    }
-}
+sealed interface SDurabilityMeta : SchemaItemMeta<Durability>
 
 private class NonNullDurabilityMeta(
     private val threshold: RandomizedValue,
@@ -62,7 +55,7 @@ private data object DefaultDurabilityMeta : SDurabilityMeta {
     override fun generate(context: SchemaGenerationContext): GenerationResult<Durability> = GenerationResult.empty()
 }
 
-internal class DurabilityMetaSerializer : SchemaItemMetaSerializer<SDurabilityMeta> {
+internal data object DurabilityMetaSerializer : SchemaItemMetaSerializer<SDurabilityMeta> {
     override val defaultValue: SDurabilityMeta = DefaultDurabilityMeta
     override fun deserialize(type: Type, node: ConfigurationNode): SDurabilityMeta {
         val threshold = node.node("threshold").requireKt<RandomizedValue>()

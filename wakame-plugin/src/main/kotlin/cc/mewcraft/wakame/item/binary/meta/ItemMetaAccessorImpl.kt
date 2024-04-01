@@ -40,17 +40,7 @@ internal class ItemMetaAccessorImpl(
             return ret
         }
 
-    override fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M? {
-        val root = rootOrNull ?: return null
-        val (_, companion, constructor) = ItemMetaRegistry.reflect(clazz)
-        return if (companion.contains(root)) {
-            val itemMeta = constructor.invoke(this)
-            @Suppress("UNCHECKED_CAST")
-            (itemMeta as M)
-        } else null
-    }
-
-    override fun <M : BinaryItemMeta<*>> getAccessorOrCreate(clazz: KClass<out M>): M {
+    override fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M {
         val (_, _, constructor) = ItemMetaRegistry.reflect(clazz)
         val itemMeta = constructor.invoke(this)
         @Suppress("UNCHECKED_CAST")

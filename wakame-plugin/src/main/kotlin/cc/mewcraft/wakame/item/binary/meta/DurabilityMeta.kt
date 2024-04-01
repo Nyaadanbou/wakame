@@ -12,7 +12,10 @@ import net.kyori.adventure.key.Key
 internal class BDurabilityMeta(
     private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<Durability> {
-    override val key: Key = ItemMetaKeys.DURABILITY
+    override val key: Key
+        get() = ItemMetaKeys.DURABILITY
+    override val exists: Boolean
+        get() = holder.rootOrNull?.contains(ItemMetaKeys.DURABILITY.value(), ShadowTagType.COMPOUND) ?: false
 
     /**
      * Gets damage.

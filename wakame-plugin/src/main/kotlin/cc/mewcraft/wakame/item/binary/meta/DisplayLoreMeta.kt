@@ -14,7 +14,10 @@ import net.kyori.adventure.key.Key
 internal class BDisplayLoreMeta(
     private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<List<String>> {
-    override val key: Key = ItemMetaKeys.DISPLAY_LORE
+    override val key: Key
+        get() = ItemMetaKeys.DISPLAY_LORE
+    override val exists: Boolean
+        get() = holder.rootOrNull?.contains(ItemMetaKeys.DISPLAY_LORE.value(), ShadowTagType.LIST) ?: false
 
     override fun getOrNull(): List<String>? {
         return holder.rootOrNull
@@ -31,8 +34,6 @@ internal class BDisplayLoreMeta(
     override fun remove() {
         holder.rootOrNull?.remove(key.value())
     }
-
-
 
     companion object : ItemMetaCompanion {
         override operator fun contains(compound: CompoundShadowTag): Boolean {

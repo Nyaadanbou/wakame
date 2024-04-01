@@ -36,12 +36,12 @@ internal fun schemaItemModule(): Module = module {
         TypeSerializerCollection.builder()
 
             // cores
-            .registerKt(SchemaCorePoolSerializer())
-            .registerKt(SchemaCoreGroupSerializer())
+            .registerKt(SchemaCorePoolSerializer)
+            .registerKt(SchemaCoreGroupSerializer)
 
             // curses
-            .registerKt(SchemaCursePoolSerializer())
-            .registerKt(SchemaCurseGroupSerializer())
+            .registerKt(SchemaCursePoolSerializer)
+            .registerKt(SchemaCurseGroupSerializer)
 
             // curse contents
             .registerAll(get<TypeSerializerCollection>(named(REFERENCE_SERIALIZERS)))
@@ -55,19 +55,19 @@ internal fun schemaItemModule(): Module = module {
             .registerAll(get(named(KIZAMI_SERIALIZERS)))
             .registerAll(get(named(RARITY_SERIALIZERS)))
 
-            .registerKt(ElementPoolSerializer())
-            .registerKt(KizamiPoolSerializer())
-            .registerKt(KizamiGroupSerializer())
+            .registerKt(ElementPoolSerializer)
+            .registerKt(KizamiPoolSerializer)
+            .registerKt(KizamiGroupSerializer)
 
-            .registerKt(DisplayLoreMetaSerializer())
-            .registerKt(DisplayNameMetaSerializer())
-            .registerKt(DurabilityMetaSerializer())
-            .registerKt(ElementMetaSerializer())
-            .registerKt(KizamiMetaSerializer())
-            .registerKt(LevelMetaSerializer())
-            .registerKt(RarityMetaSerializer())
-            .registerKt(SkinMetaSerializer())
-            .registerKt(SkinOwnerMetaSerializer())
+            .registerKt(DisplayLoreMetaSerializer)
+            .registerKt(DisplayNameMetaSerializer)
+            .registerKt(DurabilityMetaSerializer)
+            .registerKt(ElementMetaSerializer)
+            .registerKt(KizamiMetaSerializer)
+            .registerKt(LevelMetaSerializer)
+            .registerKt(RarityMetaSerializer)
+            .registerKt(SkinMetaSerializer)
+            .registerKt(SkinOwnerMetaSerializer)
 
             .build()
     }

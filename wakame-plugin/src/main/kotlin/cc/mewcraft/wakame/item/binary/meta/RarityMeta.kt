@@ -14,7 +14,10 @@ import net.kyori.adventure.key.Key
 internal class BRarityMeta(
     private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<Rarity> {
-    override val key: Key = ItemMetaKeys.RARITY
+    override val key: Key
+        get() = ItemMetaKeys.RARITY
+    override val exists: Boolean
+        get() = holder.rootOrNull?.contains(ItemMetaKeys.RARITY.value(), ShadowTagType.BYTE) ?: false
 
     override fun getOrNull(): Rarity? {
         return holder.rootOrNull

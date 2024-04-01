@@ -12,7 +12,10 @@ import net.kyori.adventure.key.Key
 internal class BDisplayNameMeta(
     private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<String> {
-    override val key: Key = ItemMetaKeys.DISPLAY_NAME
+    override val key: Key
+        get() = ItemMetaKeys.DISPLAY_NAME
+    override val exists: Boolean
+        get() = holder.rootOrNull?.contains(ItemMetaKeys.DISPLAY_NAME.value(), ShadowTagType.STRING) ?: false
 
     override fun getOrNull(): String? {
         return holder.rootOrNull?.getStringOrNull(key.value())

@@ -15,7 +15,10 @@ import net.kyori.adventure.key.Key
 internal class BKizamiMeta(
     private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<Set<Kizami>> {
-    override val key: Key = ItemMetaKeys.KIZAMI
+    override val key: Key
+        get() = ItemMetaKeys.KIZAMI
+    override val exists: Boolean
+        get() = holder.rootOrNull?.contains(ItemMetaKeys.KIZAMI.value(), ShadowTagType.BYTE_ARRAY) ?: false
 
     override fun getOrNull(): Set<Kizami>? {
         return holder.rootOrNull

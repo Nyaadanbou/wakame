@@ -17,7 +17,10 @@ import net.kyori.adventure.key.Key
 internal class BElementMeta(
     private val holder: ItemMetaAccessorImpl,
 ) : BinaryItemMeta<Set<Element>> {
-    override val key: Key = ItemMetaKeys.ELEMENT
+    override val key: Key
+        get() = ItemMetaKeys.ELEMENT
+    override val exists: Boolean
+        get() = holder.rootOrNull?.contains(ItemMetaKeys.ELEMENT.value(), ShadowTagType.BYTE_ARRAY) ?: false
 
     override fun getOrNull(): Set<Element>? {
         return holder.rootOrNull

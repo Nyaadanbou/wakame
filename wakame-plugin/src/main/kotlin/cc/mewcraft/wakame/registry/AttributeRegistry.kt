@@ -25,15 +25,7 @@ import kotlin.math.max
 /**
  * This singleton holds various implementations for **each** attribute.
  *
- * Currently, the types of implementations are the following:
- * - [SchemaAttributeDataRealizer]
- * - [SchemaAttributeDataNodeEncoder]
- * - [BinaryAttributeDataNbtEncoder]
- * - [BinaryAttributeDataNbtDecoder]
- * - [AttributeModifierFactory]
- * - [AttributeStructMetadata]
- *
- * Check their kdoc for what they do.
+ * Check the [AttributeFacade] for implementation details.
  */
 @PreWorldDependency(runBefore = [ElementRegistry::class])
 @ReloadDependency(runBefore = [ElementRegistry::class])
@@ -173,7 +165,7 @@ object AttributeRegistry : Initializable {
 }
 
 /**
- * 一个属性相关的所有操作。
+ * 关于一个属性的各种操作。
  */
 @Suppress("PropertyName")
 interface AttributeFacade {
@@ -190,7 +182,7 @@ interface AttributeFacade {
 }
 
 /**
- * 一个属性结构体的元数据。
+ * 关于一个属性的结构信息。
  */
 data class AttributeStructMetadata(
     val format: Format,

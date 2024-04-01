@@ -252,13 +252,13 @@ internal class ItemMetaStylizerImpl(
     }
 
     override fun stylizeName(item: NekoStack): Component {
-        val displayName = item.meta<BDisplayNameMeta>()?.getOrNull() ?: return text("Unnamed")
+        val displayName = item.meta<BDisplayNameMeta>().getOrNull() ?: return text("Unnamed")
 
         val resolvers = TagResolver.builder().apply {
             // resolve name
             resolver(parsed("value", displayName))
             // resolve rarity style
-            item.meta<BRarityMeta>()?.getOrNull()?.run {
+            item.meta<BRarityMeta>().getOrNull()?.run {
                 tag("rarity_style", rarityStyleMap[this])
             }
         }
