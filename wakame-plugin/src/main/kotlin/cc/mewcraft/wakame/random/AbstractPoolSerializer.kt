@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.random
 
-import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
@@ -61,7 +61,7 @@ import java.lang.reflect.Type
  * @param S the type of content
  * @param C the type of context
  */
-abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemeSerializer<Pool<S, C>> {
+abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemaSerializer<Pool<S, C>> {
 
     /**
      * The factory to create content [S] from a [ConfigurationNode]. The

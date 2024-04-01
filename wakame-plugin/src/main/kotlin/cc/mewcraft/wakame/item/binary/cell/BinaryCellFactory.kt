@@ -4,13 +4,13 @@ import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.item.binary.core.BinaryCoreFactory
 import cc.mewcraft.wakame.item.binary.core.emptyBinaryCore
 import cc.mewcraft.wakame.item.binary.curse.BinaryCurseFactory
-import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
-import cc.mewcraft.wakame.item.scheme.curse.emptySchemeCurse
+import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
+import cc.mewcraft.wakame.item.schema.cell.SchemaCell
+import cc.mewcraft.wakame.item.schema.curse.emptySchemaCurse
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 /**
- * A factory used to create [BinaryCell] from scheme and binary sources.
+ * A factory used to create [BinaryCell] from schema and binary sources.
  */
 object BinaryCellFactory {
     /**
@@ -50,25 +50,25 @@ object BinaryCellFactory {
     }
 
     /**
-     * Creates a [BinaryCell] from the [context] and [schemeCell]. **Note that
+     * Creates a [BinaryCell] from the [context] and [schemaCell]. **Note that
      * the return value can be nullable.** A `null` value indicates that the
      * binary cell should not exist at all on the item (due to the fact that,
      * for example, nothing is drawn out from the samples **and** the property
-     * [SchemeCell.keepEmpty] is configured as `false`).
+     * [SchemaCell.keepEmpty] is configured as `false`).
      *
      * @param context the context
-     * @param schemeCell the scheme cell
+     * @param schemaCell the schema cell
      * @return a new instance or `null`
      */
-    fun generate(context: SchemeGenerationContext, schemeCell: SchemeCell): BinaryCell? {
+    fun generate(context: SchemaGenerationContext, schemaCell: SchemaCell): BinaryCell? {
         // make a core
-        val schemeCore = schemeCell.coreSelector.pickSingle(context)
-        val binaryCore = if (schemeCore != null) {
+        val schemaCore = schemaCell.coreSelector.pickSingle(context)
+        val binaryCore = if (schemaCore != null) {
             // something is drawn out
-            BinaryCoreFactory.generate(context, schemeCore)
+            BinaryCoreFactory.generate(context, schemaCore)
         } else {
             // nothing is drawn out
-            if (!schemeCell.keepEmpty) {
+            if (!schemaCell.keepEmpty) {
                 // the `keepEmpty` is configured as `false`
                 return null
             }
@@ -77,15 +77,15 @@ object BinaryCellFactory {
         }
 
         // make a curse
-        val schemeCurse = schemeCell.curseSelector.pickSingle(context) ?: emptySchemeCurse()
-        val binaryCurse = schemeCurse.generate(context)
+        val schemaCurse = schemaCell.curseSelector.pickSingle(context) ?: emptySchemaCurse()
+        val binaryCurse = schemaCurse.generate(context)
 
         // make a reforge meta (empty for new cell)
         val reforgeMeta = emptyReforgeMeta()
 
         val ret = BinaryCellImpl(
-            canReforge = schemeCell.canReforge,
-            canOverride = schemeCell.canOverride,
+            canReforge = schemaCell.canReforge,
+            canOverride = schemaCell.canOverride,
             binaryCore = binaryCore,
             binaryCurse = binaryCurse,
             reforgeMeta = reforgeMeta

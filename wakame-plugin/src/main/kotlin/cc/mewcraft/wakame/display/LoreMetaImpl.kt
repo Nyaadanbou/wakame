@@ -91,7 +91,7 @@ internal data class AttributeLoreMeta(
             val namespace = rawKey.namespace()
             val values = StringCombiner(rawKey.value(), ".") {
                 addList(derivation.operationIndex)
-                addList(derivation.elementIndex, AttributeRegistry.structMetadata.getValue(rawKey).element)
+                addList(derivation.elementIndex, AttributeRegistry.FACADES[rawKey].STRUCT_METADATA.element)
             }.combine()
 
             return values.map { FullKey.key(namespace, it) }

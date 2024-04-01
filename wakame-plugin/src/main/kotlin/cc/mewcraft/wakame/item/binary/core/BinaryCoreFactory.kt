@@ -2,20 +2,20 @@ package cc.mewcraft.wakame.item.binary.core
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.attribute.facade.PlainAttributeData
+import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
 import cc.mewcraft.wakame.attribute.facade.element
-import cc.mewcraft.wakame.item.scheme.SchemeGenerationContext
-import cc.mewcraft.wakame.item.scheme.core.SchemeAbilityCore
-import cc.mewcraft.wakame.item.scheme.core.SchemeAttributeCore
-import cc.mewcraft.wakame.item.scheme.core.SchemeCore
-import cc.mewcraft.wakame.item.scheme.filter.AbilityContextHolder
-import cc.mewcraft.wakame.item.scheme.filter.AttributeContextHolder
+import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
+import cc.mewcraft.wakame.item.schema.core.SchemaAbilityCore
+import cc.mewcraft.wakame.item.schema.core.SchemaAttributeCore
+import cc.mewcraft.wakame.item.schema.core.SchemaCore
+import cc.mewcraft.wakame.item.schema.filter.AbilityContextHolder
+import cc.mewcraft.wakame.item.schema.filter.AttributeContextHolder
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 /**
- * A factory used to create [BinaryCore] from scheme and binary sources.
+ * A factory used to create [BinaryCore] from schema and binary sources.
  */
 object BinaryCoreFactory {
 
@@ -38,7 +38,7 @@ object BinaryCoreFactory {
             }
 
             NekoNamespaces.ATTRIBUTE -> {
-                val encoder = AttributeRegistry.plainNbtEncoder.getValue(key)
+                val encoder = AttributeRegistry.FACADES[key].BINARY_DATA_NBT_ENCODER
                 val data = encoder.encode(compound)
                 BinaryAttributeCore(key, data)
             }
@@ -50,17 +50,17 @@ object BinaryCoreFactory {
     }
 
     /**
-     * Creates an [BinaryCore] from a scheme source.
+     * Creates an [BinaryCore] from a schema source.
      *
      * @param context the context
-     * @param schemeCore the scheme core
+     * @param schemaCore the schema core
      * @return a new instance
      * @throws IllegalArgumentException
      */
-    fun generate(context: SchemeGenerationContext, schemeCore: SchemeCore): BinaryCore {
-        val key = schemeCore.key
-        val ret = when (schemeCore) {
-            is SchemeAbilityCore -> {
+    fun generate(context: SchemaGenerationContext, schemaCore: SchemaCore): BinaryCore {
+        val key = schemaCore.key
+        val ret = when (schemaCore) {
+            is SchemaAbilityCore -> {
                 // populate context
                 val contextHolder = AbilityContextHolder(key)
                 context.abilities += contextHolder
@@ -69,9 +69,9 @@ object BinaryCoreFactory {
                 BinaryAbilityCore(key)
             }
 
-            is SchemeAttributeCore -> {
+            is SchemaAttributeCore -> {
                 // populate context
-                val attributeData = schemeCore.generate(context) as PlainAttributeData
+                val attributeData = schemaCore.generate(context) as BinaryAttributeData
                 val contextHolder = AttributeContextHolder(key, attributeData.operation, attributeData.element)
                 context.attributes += contextHolder
 

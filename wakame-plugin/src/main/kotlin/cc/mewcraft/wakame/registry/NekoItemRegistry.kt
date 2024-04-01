@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.scheme.NekoItem
-import cc.mewcraft.wakame.item.scheme.NekoItemFactory
+import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.item.schema.NekoItemFactory
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key

@@ -2,11 +2,12 @@ package cc.mewcraft.wakame.attribute.facade
 
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attributes
 import java.util.UUID
 
 /**
  * A factory to create [AttributeModifier] from given [UUID] and
- * [PlainAttributeData].
+ * [BinaryAttributeData].
  */
 fun interface AttributeModifierFactory {
     /**
@@ -18,5 +19,5 @@ fun interface AttributeModifierFactory {
      * @throws IllegalArgumentException if this factory can't create such
      *     attribute modifier(s) from given parameters
      */
-    fun createAttributeModifiers(uuid: UUID, value: PlainAttributeData): Map<Attribute, AttributeModifier>
+    fun createAttributeModifiers(uuid: UUID, value: BinaryAttributeData): Map<Attribute, AttributeModifier>
 }

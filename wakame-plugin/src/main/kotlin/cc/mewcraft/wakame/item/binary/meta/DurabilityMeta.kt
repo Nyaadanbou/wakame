@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.item.ItemMetaKeys
-import cc.mewcraft.wakame.item.scheme.meta.Durability
+import cc.mewcraft.wakame.item.schema.meta.Durability
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.toStableShort

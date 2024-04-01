@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.requireKt
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -60,7 +60,7 @@ data class KizamiInstance(
  *     N: <List of KizamiEffect>
  * ```
  */
-object KizamiInstanceSerializer : SchemeSerializer<KizamiInstance> {
+object KizamiInstanceSerializer : SchemaSerializer<KizamiInstance> {
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiInstance {
         val kizami = node.requireKt<Kizami>()
         val effectMap = buildMap {

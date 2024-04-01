@@ -1,0 +1,72 @@
+package cc.mewcraft.wakame.item.schema.cell
+
+import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.item.Cell
+import cc.mewcraft.wakame.item.binary.cell.BinaryCell
+import cc.mewcraft.wakame.item.binary.core.BinaryCore
+import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
+import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
+import cc.mewcraft.wakame.item.schema.core.SchemaCore
+import cc.mewcraft.wakame.item.schema.curse.SchemaCurse
+import cc.mewcraft.wakame.random.Group
+import cc.mewcraft.wakame.random.Pool
+
+typealias SchemaCorePool = Pool<SchemaCore, SchemaGenerationContext>
+typealias SchemaCoreGroup = Group<SchemaCore, SchemaGenerationContext>
+
+typealias SchemaCursePool = Pool<SchemaCurse, SchemaGenerationContext>
+typealias SchemaCurseGroup = Group<SchemaCurse, SchemaGenerationContext>
+
+/**
+ * Represents all possible states that may put into a [BinaryCell]. There
+ * are two types of data in a [schema cell][SchemaCell]: invariant data and
+ * variant data.
+ *
+ * ## Invariant data
+ *
+ * Invariant data should be put into a [binary cell][BinaryCell] "as-is".
+ *
+ * ## Variant data
+ *
+ * Variant data are intended to be randomized. That is, you should generate
+ * a random [core][BinaryCore] and a random [curse][BinaryCurse], using
+ * [coreSelector] and [curseSelector] respectively. Then, you use the
+ * randomly generated data to create a [binary cell][BinaryCell].
+ */
+interface SchemaCell : Cell {
+
+    // region Invariant Data
+    /**
+     * Returns `true` if the cell is configured as "reforgeable".
+     */
+    val canReforge: Boolean
+
+    /**
+     * Returns `true` if the cell is configured as "overridable".
+     */
+    val canOverride: Boolean
+
+    /**
+     * Returns `true` if the cell should be removed from the item stack when
+     * nothing is picked from the [coreSelector].
+     */
+    val keepEmpty: Boolean
+    // endregion
+
+    // region Variant Data
+    /**
+     * The [group][Group] of [cores][SchemaCore] owned by the cell.
+     */
+    val coreSelector: SchemaCoreGroup
+
+    /**
+     * The [group][Group] of [curses][SchemaCurse] owned by ths cell.
+     */
+    val curseSelector: SchemaCurseGroup
+    // endregion
+}
+
+/**
+ * Gets the empty cell.
+ */
+fun emptySchemaCell(): SchemaCell = @OptIn(InternalApi::class) EmptySchemaCell

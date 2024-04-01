@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.item.Cell
 import cc.mewcraft.wakame.item.ShadowTagLike
 import cc.mewcraft.wakame.item.binary.core.BinaryCore
 import cc.mewcraft.wakame.item.binary.curse.BinaryCurse
-import cc.mewcraft.wakame.item.scheme.cell.SchemeCell
+import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 
 /**
- * Represents a certain state from a [SchemeCell].
+ * Represents a certain state from a [SchemaCell].
  *
  * The implementation should all be **immutable**.
  *

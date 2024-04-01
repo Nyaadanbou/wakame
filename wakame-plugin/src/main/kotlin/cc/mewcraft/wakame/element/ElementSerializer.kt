@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.element
 
-import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.requireKt
@@ -25,7 +25,7 @@ import java.lang.reflect.Type
  *   display_name: 中立
  * ```
  */
-internal class ElementSerializer : SchemeSerializer<Element> {
+internal class ElementSerializer : SchemaSerializer<Element> {
     override fun deserialize(type: Type, node: ConfigurationNode): Element {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {

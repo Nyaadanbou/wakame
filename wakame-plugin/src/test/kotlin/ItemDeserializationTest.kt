@@ -3,8 +3,8 @@ import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.item.scheme.*
-import cc.mewcraft.wakame.item.scheme.meta.*
+import cc.mewcraft.wakame.item.schema.*
+import cc.mewcraft.wakame.item.schema.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.rarity.Rarity
@@ -74,7 +74,7 @@ class ItemDeserializationTest : KoinTest {
     }
 
     @Test
-    fun `scheme item construction`() {
+    fun `schema item construction`() {
         val key = Key.key("short_sword:demo")
         val demo = NekoItemRegistry.INSTANCES.find(key)
         assertNotNull(demo, "The item '$key' is not loaded correctly")
@@ -93,7 +93,7 @@ class ItemDeserializationTest : KoinTest {
         every { user.level } returns 1
         // mock realizer (to avoid call on the Bukkit internals)
         every { realizer.realize(demo, user) } answers {
-            val context = SchemeGenerationContext(SchemaGenerationTrigger.wrap(user))
+            val context = SchemaGenerationContext(SchemaGenerationTrigger.wrap(user))
 
             generateAndSet<SDisplayNameMeta, String>(demo, context)
             generateAndSet<SDisplayLoreMeta, List<String>>(demo, context)
@@ -105,8 +105,8 @@ class ItemDeserializationTest : KoinTest {
             generateAndSet<SSkinMeta, ItemSkin>(demo, context)
             generateAndSet<SSkinOwnerMeta, UUID>(demo, context)
 
-            demo.cell.forEach { (id, scheme) ->
-                val binary = BinaryCellFactory.generate(context, scheme)
+            demo.cell.forEach { (id, schema) ->
+                val binary = BinaryCellFactory.generate(context, schema)
                 if (binary != null) {
                     logger.debug("write cell '{}': {}", id, binary)
                 }
@@ -123,9 +123,9 @@ class ItemDeserializationTest : KoinTest {
         verify { realizer.realize(demo, user) }
     }
 
-    private inline fun <reified S : SchemeItemMeta<T>, T> generateAndSet(
+    private inline fun <reified S : SchemaItemMeta<T>, T> generateAndSet(
         item: NekoItem,
-        context: SchemeGenerationContext,
+        context: SchemaGenerationContext,
     ) {
         val meta = item.meta<S>()
         val value = meta.generate(context)

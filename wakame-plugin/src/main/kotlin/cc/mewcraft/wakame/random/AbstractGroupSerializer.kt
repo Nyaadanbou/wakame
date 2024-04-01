@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.random
 
-import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.util.javaTypeOf
 import org.spongepowered.configurate.ConfigurationNode
@@ -39,7 +39,7 @@ import java.lang.reflect.Type
  * @param S the type of content
  * @param C the type of context
  */
-abstract class AbstractGroupSerializer<S, C : SelectionContext> : SchemeSerializer<Group<S, C>> {
+abstract class AbstractGroupSerializer<S, C : SelectionContext> : SchemaSerializer<Group<S, C>> {
     companion object Constants {
         val SHARED_POOLS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("shared_pools", ConfigurationNode::class.java)
 

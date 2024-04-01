@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorImpl
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessorImpl
-import cc.mewcraft.wakame.item.scheme.NekoItem
+import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -61,7 +61,7 @@ internal value class NekoStackImpl(
     override val isNotNeko: Boolean
         get() = !isNeko
 
-    override val scheme: NekoItem
+    override val schema: NekoItem
         get() = NekoItemRegistry.INSTANCES[key]
 
     override val seed: Long

@@ -85,7 +85,7 @@ interface ItemCellAccessor {
     /**
      * Removes the specified [binary cell][BinaryCell]. This will entirely
      * remove the cell AND its core from the item NBT, leading to this item not
-     * aligned with the number of cells in its scheme.
+     * aligned with the number of cells in its schema.
      *
      * @param id the cell ID (case-sensitive)
      */

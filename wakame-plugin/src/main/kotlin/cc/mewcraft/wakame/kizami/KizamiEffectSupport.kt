@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.NoopAbility
 import cc.mewcraft.wakame.attribute.Attribute
@@ -47,7 +47,7 @@ data class ImmutableKizamiEffect(
  *     <impl_defined>
  * ```
  */
-object KizamiEffectSerializer : SchemeSerializer<KizamiEffect> {
+object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiEffect {
         if (!node.isList) {
             throw SerializationException(node, type, "Node must be a list")
@@ -69,9 +69,10 @@ object KizamiEffectSerializer : SchemeSerializer<KizamiEffect> {
                 }
 
                 NekoNamespaces.ATTRIBUTE -> {
-                    val plainData = AttributeRegistry.plainNodeEncoder.getValue(key).encode(childNode)
-                    val modifiers = AttributeRegistry.modifierFactory.getValue(key).createAttributeModifiers(uuid, plainData)
-                    collection += KizamiAttribute(modifiers)
+                    val facade = AttributeRegistry.FACADES[key]
+                    val binaryData = facade.BINARY_DATA_NODE_ENCODER.encode(childNode)
+                    val attributeModifiers = facade.MODIFIER_FACTORY.createAttributeModifiers(uuid, binaryData)
+                    collection += KizamiAttribute(attributeModifiers)
                 }
 
                 else -> {

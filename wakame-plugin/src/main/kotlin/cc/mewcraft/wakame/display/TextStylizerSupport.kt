@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.facade.PlainAttributeData
+import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoStack
@@ -191,7 +191,7 @@ internal class AttributeStylizerImpl(
         val key = core.key
         val value = core.data
         val tagResolvers = TagResolver.builder()
-        if (key == Attributes.ATTACK_SPEED_LEVEL.key() && value is PlainAttributeData.S) {
+        if (key == Attributes.ATTACK_SPEED_LEVEL.key() && value is BinaryAttributeData.S) {
             // 单独处理攻击速度
             // 因为攻击速度需要显示为文字
             tagResolvers.resolver(getAttackSpeedLevelTagResolver(value.value.toInt()))
@@ -199,21 +199,21 @@ internal class AttributeStylizerImpl(
         } else when (value) {
             // 其余按格式统一处理
             // 因为其余的都直接显示为数字
-            is PlainAttributeData.S -> tagResolvers.resolver(
+            is BinaryAttributeData.S -> tagResolvers.resolver(
                 number("value", value.value, value.operation)
             )
 
-            is PlainAttributeData.R -> tagResolvers.resolvers(
+            is BinaryAttributeData.R -> tagResolvers.resolvers(
                 number("min", value.lower, value.operation),
                 number("max", value.upper, value.operation)
             )
 
-            is PlainAttributeData.SE -> tagResolvers.resolvers(
+            is BinaryAttributeData.SE -> tagResolvers.resolvers(
                 number("value", value.value, value.operation),
                 component("element", value.element.displayName)
             )
 
-            is PlainAttributeData.RE -> tagResolvers.resolvers(
+            is BinaryAttributeData.RE -> tagResolvers.resolvers(
                 number("min", value.lower, value.operation),
                 number("max", value.upper, value.operation),
                 component("element", value.element.displayName)

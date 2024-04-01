@@ -13,7 +13,7 @@ import net.kyori.adventure.key.Key
 interface Curse : Keyed {
     /**
      * The key of this lock condition. Used to identify the condition in the
-     * context of binary and scheme item.
+     * context of binary and schema item.
      */
     override val key: Key
 }

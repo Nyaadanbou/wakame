@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.BiIdentifiable
 import cc.mewcraft.wakame.FriendlyNamed
-import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.requireKt
@@ -66,7 +66,7 @@ data class Kizami @InternalApi internal constructor(
  *   ...
  * ```
  */
-internal object KizamiSerializer : SchemeSerializer<Kizami> {
+internal object KizamiSerializer : SchemaSerializer<Kizami> {
     /**
      * The UUID hint is used to pass the kizami UUID to the child
      * node deserialization, such as the deserialization of `effects`.

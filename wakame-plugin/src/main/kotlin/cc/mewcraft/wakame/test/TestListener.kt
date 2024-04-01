@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.binary.meta.BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
-import cc.mewcraft.wakame.item.scheme.PaperNekoItemRealizer
+import cc.mewcraft.wakame.item.schema.PaperNekoItemRealizer
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.pack.model.ModelRegistry
 import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier

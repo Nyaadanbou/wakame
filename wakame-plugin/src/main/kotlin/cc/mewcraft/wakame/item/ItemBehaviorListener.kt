@@ -12,7 +12,7 @@ class ItemBehaviorListener : Listener {
     fun onItemInteract(event: PlayerInteractEvent) {
         val item = event.item ?: return
         val nekoStack = NekoStackFactory.wrap(item).takeIf { it.isNeko } ?: return
-        nekoStack.scheme.behaviors.forEach { behavior ->
+        nekoStack.schema.behaviors.forEach { behavior ->
             behavior.handleInteract(event.player, item, event.action, event)
         }
     }
@@ -23,7 +23,7 @@ class ItemBehaviorListener : Listener {
         val damager = event.damager as? Player ?: return
         val item = damager.inventory.itemInMainHand
         val nekoStack = NekoStackFactory.by(item) ?: return
-        nekoStack.scheme.behaviors.forEach { behavior ->
+        nekoStack.schema.behaviors.forEach { behavior ->
             behavior.handleAttackEntity(damager, item, event.entity, event)
         }
     }

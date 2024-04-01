@@ -16,4 +16,4 @@ annotation class BinaryData
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class SchemeData
+annotation class SchemaData

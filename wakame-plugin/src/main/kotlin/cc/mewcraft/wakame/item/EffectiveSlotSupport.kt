@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.requireKt
 import org.bukkit.entity.Player
@@ -91,7 +91,7 @@ data object AccessoryEffectiveSlot {
 /**
  * The serializer of [EffectiveSlot].
  */
-data object EffectiveSlotSerializer : SchemeSerializer<EffectiveSlot> {
+data object EffectiveSlotSerializer : SchemaSerializer<EffectiveSlot> {
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): EffectiveSlot {
         return NoopEffectiveSlot
     }

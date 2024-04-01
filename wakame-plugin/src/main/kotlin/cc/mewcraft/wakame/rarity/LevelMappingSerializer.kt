@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.rarity
 
-import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.RangeParser
 import cc.mewcraft.wakame.util.requireKt
@@ -30,7 +30,7 @@ import java.lang.reflect.Type
  *     ...
  * ```
  */
-internal class LevelMappingSerializer : SchemeSerializer<LevelMappings> {
+internal class LevelMappingSerializer : SchemaSerializer<LevelMappings> {
     override fun deserialize(type: Type, node: ConfigurationNode): LevelMappings {
         val rangeMapBuilder = ImmutableRangeMap.builder<Int, LevelMapping>()
         node.childrenMap().forEach { (_, n1) ->

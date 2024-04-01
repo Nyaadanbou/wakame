@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.rarity
 
-import cc.mewcraft.wakame.SchemeSerializer
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.requireKt
@@ -26,7 +26,7 @@ import java.lang.reflect.Type
  *   ...
  * ```
  */
-internal class RaritySerializer : SchemeSerializer<Rarity> {
+internal class RaritySerializer : SchemaSerializer<Rarity> {
     override fun deserialize(type: Type, node: ConfigurationNode): Rarity {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {

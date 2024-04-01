@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.getAccessor
 import cc.mewcraft.wakame.item.binary.meta.getAccessorOrCreate
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
-import cc.mewcraft.wakame.item.scheme.NekoItem
+import cc.mewcraft.wakame.item.schema.NekoItem
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -81,11 +81,11 @@ interface NekoStack : NekoStackSetter {
     val isNotNeko: Boolean
 
     /**
-     * The corresponding [NekoItem] scheme.
+     * The corresponding [NekoItem] schema.
      *
      * @throws NullPointerException if this is not a legal neko item
      */
-    val scheme: NekoItem
+    val schema: NekoItem
 
     /**
      * The random seed from which this item is generated.
