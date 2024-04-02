@@ -44,7 +44,8 @@ sealed interface BinaryItemMeta<V> : Keyed {
     fun get(): V = checkNotNull(getOrNull()) { "Can't find tag for meta '$key'" }
 
     /**
-     * Gets the value of this item meta or null.
+     * Gets the value of this item meta or `null`, if the underlying NBT
+     * data does not exist.
      */
     fun getOrNull(): V?
 

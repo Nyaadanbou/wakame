@@ -15,15 +15,15 @@ import net.kyori.adventure.key.Key
  * 如果该物品上有X元素的属性或技能，那么该集合一定会包含X元素。
  */
 internal class BElementMeta(
-    private val holder: ItemMetaAccessorImpl,
+    private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Set<Element>> {
     override val key: Key
         get() = ItemMetaKeys.ELEMENT
     override val exists: Boolean
-        get() = holder.rootOrNull?.contains(ItemMetaKeys.ELEMENT.value(), ShadowTagType.BYTE_ARRAY) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaKeys.ELEMENT.value(), ShadowTagType.BYTE_ARRAY) ?: false
 
     override fun getOrNull(): Set<Element>? {
-        return holder.rootOrNull
+        return accessor.rootOrNull
             ?.getByteArrayOrNull(key.value())
             ?.mapTo(ObjectArraySet(2)) {
                 ElementRegistry.getBy(it)
@@ -31,13 +31,13 @@ internal class BElementMeta(
     }
 
     override fun remove() {
-        holder.rootOrNull?.remove(key.value())
+        accessor.rootOrNull?.remove(key.value())
     }
 
     override fun set(value: Set<Element>) {
         require(value.isNotEmpty()) { "Set<Element> must be not empty" }
         val byteArray = value.map { it.binaryId }.toByteArray()
-        holder.rootOrCreate.putByteArray(key.value(), byteArray)
+        accessor.rootOrCreate.putByteArray(key.value(), byteArray)
     }
 
     fun set(value: Collection<Element>) {

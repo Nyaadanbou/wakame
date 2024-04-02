@@ -9,26 +9,26 @@ import java.util.UUID
  * 物品的皮肤的所有者。
  */
 internal class BSkinOwnerMeta(
-    private val holder: ItemMetaAccessorImpl,
+    private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<UUID> {
     override val key: Key
         get() = ItemMetaKeys.SKIN_OWNER
     override val exists: Boolean
-        get() = holder.rootOrNull?.contains(ItemMetaKeys.SKIN_OWNER.value()) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaKeys.SKIN_OWNER.value()) ?: false
 
     override fun getOrNull(): UUID? {
-        val rootOrNull = holder.rootOrNull
+        val rootOrNull = accessor.rootOrNull
         if (rootOrNull == null || !rootOrNull.hasUUID(key.value()))
             return null
         return rootOrNull.getUUID(key.value())
     }
 
     override fun remove() {
-        holder.rootOrNull?.remove(key.value())
+        accessor.rootOrNull?.remove(key.value())
     }
 
     override fun set(value: UUID) {
-        holder.rootOrCreate.putUUID(key.value(), value)
+        accessor.rootOrCreate.putUUID(key.value(), value)
     }
 
     companion object : ItemMetaCompanion {

@@ -11,7 +11,7 @@ sealed interface ItemStatistics {
     /**
      * The [ItemStatisticsAccessor] encompassing `this`.
      */
-    val holder: ItemStatisticsAccessor
+    val accessor: ItemStatisticsAccessor
 
     /**
      * The path to the tags of this [ItemStatistics].
@@ -22,11 +22,11 @@ sealed interface ItemStatistics {
      * Gets the root tag or `null` if it does not exist.
      */
     val rootOrNull: CompoundShadowTag?
-        get() = holder.rootOrNull?.getCompoundOrNull(nbtPath)
+        get() = accessor.rootOrNull?.getCompoundOrNull(nbtPath)
 
     /**
      * Gets the root tag or create it if it does not exist.
      */
     val rootOrCreate: CompoundShadowTag
-        get() = holder.rootOrCreate.getOrPut(nbtPath, CompoundShadowTag::create)
+        get() = accessor.rootOrCreate.getOrPut(nbtPath, CompoundShadowTag::create)
 }

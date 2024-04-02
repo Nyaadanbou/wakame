@@ -10,23 +10,23 @@ import net.kyori.adventure.key.Key
  * 物品的名字(MiniMessage).
  */
 internal class BDisplayNameMeta(
-    private val holder: ItemMetaAccessorImpl,
+    private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<String> {
     override val key: Key
         get() = ItemMetaKeys.DISPLAY_NAME
     override val exists: Boolean
-        get() = holder.rootOrNull?.contains(ItemMetaKeys.DISPLAY_NAME.value(), ShadowTagType.STRING) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaKeys.DISPLAY_NAME.value(), ShadowTagType.STRING) ?: false
 
     override fun getOrNull(): String? {
-        return holder.rootOrNull?.getStringOrNull(key.value())
+        return accessor.rootOrNull?.getStringOrNull(key.value())
     }
 
     override fun set(value: String) {
-        holder.rootOrCreate.putString(key.value(), value)
+        accessor.rootOrCreate.putString(key.value(), value)
     }
 
     override fun remove() {
-        holder.rootOrNull?.remove(key.value())
+        accessor.rootOrNull?.remove(key.value())
     }
 
     companion object : ItemMetaCompanion {

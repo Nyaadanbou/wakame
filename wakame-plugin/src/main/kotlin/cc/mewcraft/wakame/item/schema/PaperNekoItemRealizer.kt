@@ -91,8 +91,8 @@ object PaperNekoItemRealizer : NekoItemRealizer {
  *
  * **Only if something is generated will the item meta be written out.**
  *
- * @param item the item
- * @param context the context
+ * @param item the neko item
+ * @param context the generation context
  * @param V the type of item meta value, shared by [S] and [B]
  * @param S the type of [SchemaItemMeta]
  * @param B the type of [BinaryItemMeta]

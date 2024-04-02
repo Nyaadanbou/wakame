@@ -15,9 +15,9 @@ import kotlin.reflect.KClass
 internal class ItemMetaAccessorImpl(
     val base: NekoStackImpl,
 ) : KoinComponent, ItemMetaAccessor {
-    val rootOrNull: CompoundShadowTag?
+    override val rootOrNull: CompoundShadowTag?
         get() = base.tags.getCompoundOrNull(NekoNamespaces.ITEM_META)
-    val rootOrCreate: CompoundShadowTag
+    override val rootOrCreate: CompoundShadowTag
         get() = base.tags.getOrPut(NekoNamespaces.ITEM_META, CompoundShadowTag::create)
 
     override val snapshot: Set<BinaryItemMeta<*>>

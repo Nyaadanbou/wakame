@@ -10,18 +10,18 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 internal class BDurabilityMeta(
-    private val holder: ItemMetaAccessorImpl,
+    private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Durability> {
     override val key: Key
         get() = ItemMetaKeys.DURABILITY
     override val exists: Boolean
-        get() = holder.rootOrNull?.contains(ItemMetaKeys.DURABILITY.value(), ShadowTagType.COMPOUND) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaKeys.DURABILITY.value(), ShadowTagType.COMPOUND) ?: false
 
     /**
      * Gets damage.
      */
     fun damage(): Int {
-        return holder.rootOrNull?.getCompoundOrNull(key.value())?.getInt(DAMAGE_TAG) ?: 0
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getInt(DAMAGE_TAG) ?: 0
     }
 
     /**
@@ -30,7 +30,7 @@ internal class BDurabilityMeta(
      * @throws IllegalStateException
      */
     fun damage(value: Int) {
-        val compound = holder.rootOrNull?.getCompoundOrNull(key.value())
+        val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
         if (compound != null) {
             compound.putShort(DAMAGE_TAG, value.toStableShort())
         } else throw IllegalStateException("Can't set 'damage' for empty durability")
@@ -42,7 +42,7 @@ internal class BDurabilityMeta(
      * @throws IllegalStateException
      */
     fun threshold(): Int {
-        return holder.rootOrNull?.getCompoundOrNull(key.value())?.getInt(THRESHOLD_TAG) ?: throw IllegalStateException("Can't get 'threshold' for empty durability")
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getInt(THRESHOLD_TAG) ?: throw IllegalStateException("Can't get 'threshold' for empty durability")
     }
 
     /**
@@ -51,7 +51,7 @@ internal class BDurabilityMeta(
      * @throws IllegalStateException
      */
     fun threshold(value: Int) {
-        val compound = holder.rootOrNull?.getCompoundOrNull(key.value())
+        val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
         if (compound != null) {
             compound.putShort(THRESHOLD_TAG, value.toStableShort())
         } else {
@@ -60,7 +60,7 @@ internal class BDurabilityMeta(
     }
 
     override fun getOrNull(): Durability? {
-        return holder.rootOrNull?.getCompoundOrNull(key.value())?.let { compound ->
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.let { compound ->
             val threshold = compound.getInt(THRESHOLD_TAG)
             val damage = compound.getInt(DAMAGE_TAG)
             Durability(threshold, damage)
@@ -68,14 +68,14 @@ internal class BDurabilityMeta(
     }
 
     override fun set(value: Durability) {
-        holder.rootOrCreate.put(key.value(), CompoundShadowTag {
+        accessor.rootOrCreate.put(key.value(), CompoundShadowTag {
             putShort(THRESHOLD_TAG, value.threshold.toStableShort())
             putShort(DAMAGE_TAG, value.damage.toStableShort())
         })
     }
 
     override fun remove() {
-        holder.rootOrNull?.remove(key.value())
+        accessor.rootOrNull?.remove(key.value())
     }
 
     companion object : ItemMetaCompanion {

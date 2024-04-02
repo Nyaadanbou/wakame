@@ -12,15 +12,15 @@ import net.kyori.adventure.key.Key
  * 物品的描述(MiniMessage).
  */
 internal class BDisplayLoreMeta(
-    private val holder: ItemMetaAccessorImpl,
+    private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<List<String>> {
     override val key: Key
         get() = ItemMetaKeys.DISPLAY_LORE
     override val exists: Boolean
-        get() = holder.rootOrNull?.contains(ItemMetaKeys.DISPLAY_LORE.value(), ShadowTagType.LIST) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaKeys.DISPLAY_LORE.value(), ShadowTagType.LIST) ?: false
 
     override fun getOrNull(): List<String>? {
-        return holder.rootOrNull
+        return accessor.rootOrNull
             ?.getListOrNull(key.value(), ShadowTagType.STRING)
             ?.map { (it as StringShadowTag).value() }
     }
@@ -28,11 +28,11 @@ internal class BDisplayLoreMeta(
     override fun set(value: List<String>) {
         val stringTags = value.map(StringShadowTag::valueOf)
         val listShadowTag = ListShadowTag.create(stringTags, ShadowTagType.STRING)
-        holder.rootOrCreate.put(key.value(), listShadowTag)
+        accessor.rootOrCreate.put(key.value(), listShadowTag)
     }
 
     override fun remove() {
-        holder.rootOrNull?.remove(key.value())
+        accessor.rootOrNull?.remove(key.value())
     }
 
     companion object : ItemMetaCompanion {

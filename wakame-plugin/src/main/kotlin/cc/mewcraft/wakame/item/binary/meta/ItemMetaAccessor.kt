@@ -1,11 +1,26 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import kotlin.reflect.KClass
 
 /**
  * This is an interface to get specific [item meta accessor][BinaryItemMeta] for the ItemStack.
  */
 interface ItemMetaAccessor {
+
+    /**
+     * Gets the root tag containing all the item meta or `null`, if it does not exist.
+     *
+     * Notes: You generally do not need to use it directly.
+     */
+    val rootOrNull: CompoundShadowTag?
+
+    /**
+     * Gets the root tag containing all the item meta or create it, if it does not exist.
+     *
+     * Notes: You generally do not need to use it directly.
+     */
+    val rootOrCreate: CompoundShadowTag
 
     /**
      * Gets an immutable set of **snapshot** which, at the time you called this function,

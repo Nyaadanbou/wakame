@@ -12,25 +12,25 @@ import net.kyori.adventure.key.Key
  * 物品的皮肤。
  */
 internal class BSkinMeta(
-    private val holder: ItemMetaAccessorImpl,
+    private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<ItemSkin> {
     override val key: Key
         get() = ItemMetaKeys.SKIN
     override val exists: Boolean
-        get() = holder.rootOrNull?.contains(ItemMetaKeys.SKIN.value(), ShadowTagType.SHORT) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaKeys.SKIN.value(), ShadowTagType.SHORT) ?: false
 
     override fun getOrNull(): ItemSkin? {
-        return holder.rootOrNull
+        return accessor.rootOrNull
             ?.getShortOrNull(key.value())
             ?.let { ItemSkinRegistry.findBy(it) }
     }
 
     override fun remove() {
-        holder.rootOrNull?.remove(key.value())
+        accessor.rootOrNull?.remove(key.value())
     }
 
     override fun set(value: ItemSkin) {
-        holder.rootOrCreate.putShort(key.value(), value.binaryId)
+        accessor.rootOrCreate.putShort(key.value(), value.binaryId)
     }
 
     companion object : ItemMetaCompanion {
