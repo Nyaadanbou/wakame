@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item.schema.meta
 
+import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
+import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import java.util.UUID
@@ -8,7 +10,9 @@ import java.util.UUID
 /**
  * 物品的皮肤的所有者。
  */
-sealed interface SSkinOwnerMeta : SchemaItemMeta<UUID>
+sealed interface SSkinOwnerMeta : SchemaItemMeta<UUID> {
+    override val key: Key get() = ItemMetaKeys.SKIN_OWNER
+}
 
 private class NonNullSkinOwnerMeta(
     /**

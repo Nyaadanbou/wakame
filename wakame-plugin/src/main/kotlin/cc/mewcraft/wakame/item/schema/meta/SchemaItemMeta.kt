@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.schema.meta
 
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 
 /**
@@ -9,7 +10,7 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
  *
  * @param T 模板最终产生的数据类型
  */
-sealed interface SchemaItemMeta<T> {
+sealed interface SchemaItemMeta<T> : Keyed {
     /**
      * Generate a value [T] from this schema.
      *

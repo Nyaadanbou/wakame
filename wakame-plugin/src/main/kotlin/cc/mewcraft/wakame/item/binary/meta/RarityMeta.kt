@@ -11,7 +11,8 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的稀有度。不是所有物品都有稀有度，因此可能为空。
  */
-class BRarityMeta(
+@JvmInline
+value class BRarityMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Rarity> {
     override val key: Key

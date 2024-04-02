@@ -10,7 +10,8 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的等级。不是所有物品都有等级，因此可能为空。
  */
-class BLevelMeta(
+@JvmInline
+value class BLevelMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Int> {
     override val key: Key

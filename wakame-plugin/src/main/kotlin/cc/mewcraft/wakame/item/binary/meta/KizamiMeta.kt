@@ -12,7 +12,8 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的铭刻。
  */
-internal class BKizamiMeta(
+@JvmInline
+value class BKizamiMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Set<Kizami>> {
     override val key: Key

@@ -41,15 +41,17 @@ object NekoItemFactory {
             // Side note 3: whether the data will be written to the item's NBT is decided by the realization process, not here.
 
             // Write it in alphabet order, in case you miss something
-            loadAndSave<SDisplayLoreMeta>(root, ItemMetaKeys.DISPLAY_LORE)
-            loadAndSave<SDisplayNameMeta>(root, ItemMetaKeys.DISPLAY_NAME)
-            loadAndSave<SDurabilityMeta>(root, ItemMetaKeys.DURABILITY)
-            loadAndSave<SElementMeta>(root, ItemMetaKeys.ELEMENT)
-            loadAndSave<SKizamiMeta>(root, ItemMetaKeys.KIZAMI)
-            loadAndSave<SLevelMeta>(root, ItemMetaKeys.LEVEL)
-            loadAndSave<SRarityMeta>(root, ItemMetaKeys.RARITY)
-            loadAndSave<SSkinMeta>(root, ItemMetaKeys.SKIN)
-            loadAndSave<SSkinOwnerMeta>(root, ItemMetaKeys.SKIN_OWNER)
+            // TODO generalize it so that we don't need to
+            //  manually write each SchemaItemMeta here
+            deserializeMeta<SDisplayLoreMeta>(root, ItemMetaKeys.DISPLAY_LORE)
+            deserializeMeta<SDisplayNameMeta>(root, ItemMetaKeys.DISPLAY_NAME)
+            deserializeMeta<SDurabilityMeta>(root, ItemMetaKeys.DURABILITY)
+            deserializeMeta<SElementMeta>(root, ItemMetaKeys.ELEMENT)
+            deserializeMeta<SKizamiMeta>(root, ItemMetaKeys.KIZAMI)
+            deserializeMeta<SLevelMeta>(root, ItemMetaKeys.LEVEL)
+            deserializeMeta<SRarityMeta>(root, ItemMetaKeys.RARITY)
+            deserializeMeta<SSkinMeta>(root, ItemMetaKeys.SKIN)
+            deserializeMeta<SSkinOwnerMeta>(root, ItemMetaKeys.SKIN_OWNER)
         }.build()
 
         // Deserialize item cells
@@ -82,11 +84,13 @@ object NekoItemFactory {
     }
 }
 
-private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemaItemMeta<*>>.loadAndSave(
+private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemaItemMeta<*>>.deserializeMeta(
     node: ConfigurationNode, key: Key,
-) = loadAndSave<T>(node, key.value())
+) {
+    this.deserializeMeta<T>(node, key.value())
+}
 
-private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemaItemMeta<*>>.loadAndSave(
+private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemaItemMeta<*>>.deserializeMeta(
     node: ConfigurationNode, vararg path: String,
 ) {
     val schemaItemMeta = node.node(*path).requireKt<T>()

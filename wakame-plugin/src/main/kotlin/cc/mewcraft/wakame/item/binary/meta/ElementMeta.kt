@@ -14,7 +14,8 @@ import net.kyori.adventure.key.Key
  *
  * 如果该物品上有X元素的属性或技能，那么该集合一定会包含X元素。
  */
-class BElementMeta(
+@JvmInline
+value class BElementMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Set<Element>> {
     override val key: Key

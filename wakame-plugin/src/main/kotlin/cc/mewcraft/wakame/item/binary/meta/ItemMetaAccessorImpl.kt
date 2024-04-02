@@ -10,9 +10,8 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.koin.core.component.KoinComponent
 import kotlin.reflect.KClass
 
-// TODO Make it a value class
-//  To achieve this, we need to get rid of the reflection
-internal class ItemMetaAccessorImpl(
+@JvmInline
+internal value class ItemMetaAccessorImpl(
     val base: NekoStackImpl,
 ) : KoinComponent, ItemMetaAccessor {
     override val rootOrNull: CompoundShadowTag?
@@ -23,7 +22,7 @@ internal class ItemMetaAccessorImpl(
     override val snapshot: Set<BinaryItemMeta<*>>
         get() {
             val root = rootOrNull ?: return emptySet()
-            val ret = ObjectArraySet<BinaryItemMeta<*>>()
+            val ret = ObjectArraySet<BinaryItemMeta<*>>(8)
 
             // TODO optimize the efficiency
             //  solution: loop through the root tag, then use the tag key to get implementation,
@@ -31,19 +30,39 @@ internal class ItemMetaAccessorImpl(
 
             // check the existence of each item meta
             // if one exists, we add it to the map
-            ItemMetaRegistry.reflections().forEach { (_, companion, constructor) ->
+            /*
+            ItemMetaRegistry.Binary.reflections().forEach { (_, companion, constructor) ->
                 if (companion.contains(root)) {
                     ret += constructor(this)
                 }
+            }
+            */
+
+            // loop through the keySet of the root compound tag,
+            // then use the tag key to get corresponding accessor
+            root.keySet().forEach { key ->
+                val constructor = ItemMetaRegistry.Binary.reflectionLookup(key).constructor
+                val itemMeta = constructor(this)
+                ret += itemMeta
             }
 
             return ret
         }
 
     override fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M {
-        val (_, _, constructor) = ItemMetaRegistry.reflectionLookup(clazz)
+        val (_, _, constructor) = ItemMetaRegistry.Binary.reflectionLookup(clazz)
         val itemMeta = constructor(this)
         @Suppress("UNCHECKED_CAST")
         return (itemMeta as M)
     }
+}
+
+/**
+ * 该实现仅用来创建“空的” [BinaryItemMeta]，没有任何其他作用。
+ */
+internal object ItemMetaAccessorNoop : ItemMetaAccessor {
+    override val rootOrNull: CompoundShadowTag get() = throw UnsupportedOperationException()
+    override val rootOrCreate: CompoundShadowTag get() = throw UnsupportedOperationException()
+    override val snapshot: Set<BinaryItemMeta<*>> get() = throw UnsupportedOperationException()
+    override fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M = throw UnsupportedOperationException()
 }

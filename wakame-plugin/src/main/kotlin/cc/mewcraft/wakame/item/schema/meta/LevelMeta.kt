@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.item.schema.meta
 
+import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.EnumLookup
+import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -11,6 +13,8 @@ import java.lang.reflect.Type
  * 物品的等级。
  */
 sealed interface SLevelMeta : SchemaItemMeta<Int> {
+    override val key: Key get() = ItemMetaKeys.LEVEL
+
     enum class Option {
         CONTEXT
     }

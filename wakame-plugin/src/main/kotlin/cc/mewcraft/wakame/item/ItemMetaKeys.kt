@@ -4,6 +4,11 @@ import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 
+/**
+ * ItemMeta 的资源路径。
+ *
+ * 这些资源路径被广泛用于配置序列化，NBT序列化，以及任何需要唯一识别 ItemMeta 的地方。
+ */
 object ItemMetaKeys {
     val DISPLAY_LORE: Key = createKey("lore")
     val DISPLAY_NAME: Key = createKey("name")

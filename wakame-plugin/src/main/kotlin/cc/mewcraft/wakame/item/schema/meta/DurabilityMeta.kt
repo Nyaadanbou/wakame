@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.item.schema.meta
 
+import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.requireKt
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
+import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
@@ -32,7 +34,9 @@ data class Durability(
     override fun toString(): String = toSimpleString()
 }
 
-sealed interface SDurabilityMeta : SchemaItemMeta<Durability>
+sealed interface SDurabilityMeta : SchemaItemMeta<Durability> {
+    override val key: Key get() = ItemMetaKeys.DURABILITY
+}
 
 private class NonNullDurabilityMeta(
     private val threshold: RandomizedValue,

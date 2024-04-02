@@ -1,11 +1,13 @@
 package cc.mewcraft.wakame.item.schema.meta
 
+import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.requireKt
+import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -13,7 +15,9 @@ import java.lang.reflect.Type
 /**
  * 物品的稀有度。
  */
-sealed interface SRarityMeta : SchemaItemMeta<Rarity>
+sealed interface SRarityMeta : SchemaItemMeta<Rarity> {
+    override val key: Key get() = ItemMetaKeys.RARITY
+}
 
 private class NonNullRarityMeta(
     /**

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.schema.meta
 
 import cc.mewcraft.wakame.condition.Condition
+import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
 import cc.mewcraft.wakame.kizami.Kizami
@@ -9,6 +10,7 @@ import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.random.Group
 import cc.mewcraft.wakame.random.Pool
 import cc.mewcraft.wakame.util.requireKt
+import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -18,7 +20,9 @@ typealias KizamiGroup = Group<Kizami, SchemaGenerationContext>
 /**
  * 物品的铭刻标识。
  */
-sealed interface SKizamiMeta : SchemaItemMeta<Set<Kizami>>
+sealed interface SKizamiMeta : SchemaItemMeta<Set<Kizami>> {
+    override val key: Key get() = ItemMetaKeys.KIZAMI
+}
 
 private class NonNullKizamiMeta(
     private val kizamiGroup: KizamiGroup,

@@ -1,14 +1,18 @@
 package cc.mewcraft.wakame.item.schema.meta
 
+import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.requireKt
+import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
 /**
  * 物品的名字。
  */
-sealed interface SDisplayNameMeta : SchemaItemMeta<String>
+sealed interface SDisplayNameMeta : SchemaItemMeta<String> {
+    override val key: Key get() = ItemMetaKeys.DISPLAY_NAME
+}
 
 private class NonNullDisplayNameMeta(
     /**

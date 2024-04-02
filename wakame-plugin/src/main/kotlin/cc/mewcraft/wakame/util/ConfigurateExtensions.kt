@@ -16,6 +16,9 @@ import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.lang.reflect.Type
 import java.util.function.Predicate
+import kotlin.reflect.KType
+import kotlin.reflect.jvm.javaType
+import kotlin.reflect.typeOf
 
 internal typealias NekoConfigurationLoader = YamlConfigurationLoader
 internal typealias NekoConfigurationNode = CommentedConfigurationNode
@@ -63,18 +66,25 @@ internal fun buildYamlConfigurationLoader(
 /**
  * @see TypeSerializerCollection.Builder.register
  */
-internal inline fun <reified T> TypeSerializerCollection.Builder.registerKt(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder =
-    register({ javaTypeOf<T>() == it }, serializer)
+internal inline fun <reified T> TypeSerializerCollection.Builder.registerKt(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder {
+    return register({ javaTypeOf<T>() == it }, serializer)
+}
 
 /**
  * @see ConfigurationNode.require
  */
 internal inline fun <reified T> ConfigurationNode.requireKt(): T {
-    val ret = this.get(javaTypeOf<T>())
-        ?: throw NoSuchElementException(
-            "Missing value of type '${T::class.simpleName}' at '${path().joinToString(".")}'"
-        )
-    return ret as T
+    return requireKt(typeOf<T>())
+}
+
+/**
+ * @see ConfigurationNode.require
+ */
+internal fun <T> ConfigurationNode.requireKt(type: KType): T {
+    val ret = this.get(type.javaType) ?: throw NoSuchElementException(
+        "Missing value of type '${type}' at '${path().joinToString(".")}'"
+    )
+    return (@Suppress("UNCHECKED_CAST") (ret as T))
 }
 
 //<editor-fold desc="Basic Serializers">

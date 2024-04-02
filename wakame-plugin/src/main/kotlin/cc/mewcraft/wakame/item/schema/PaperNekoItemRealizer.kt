@@ -50,23 +50,22 @@ object PaperNekoItemRealizer : NekoItemRealizer {
 
         // write meta
         with(nekoStack.meta) {
+            // Caution: the order of generation matters here!
 
-            // write "standalone" meta
-            generateAndSet<_, SDisplayNameMeta, BDisplayNameMeta>(nekoItem, context)
-            generateAndSet<_, SDisplayLoreMeta, BDisplayLoreMeta>(nekoItem, context)
-            generateAndSet<_, SDurabilityMeta, BDurabilityMeta>(nekoItem, context)
-            generateAndSet<_, SLevelMeta, BLevelMeta>(nekoItem, context)
-            generateAndSet<_, SRarityMeta, BRarityMeta>(nekoItem, context)
-            generateAndSet<_, SElementMeta, BElementMeta>(nekoItem, context)
-            generateAndSet<_, SKizamiMeta, BKizamiMeta>(nekoItem, context)
-            generateAndSet<_, SSkinMeta, BSkinMeta>(nekoItem, context)
-            generateAndSet<_, SSkinOwnerMeta, BSkinOwnerMeta>(nekoItem, context)
+            generateMeta<_, SDisplayNameMeta, BDisplayNameMeta>(nekoItem, context)
+            generateMeta<_, SDisplayLoreMeta, BDisplayLoreMeta>(nekoItem, context)
+            generateMeta<_, SDurabilityMeta, BDurabilityMeta>(nekoItem, context)
+            generateMeta<_, SLevelMeta, BLevelMeta>(nekoItem, context)
+            generateMeta<_, SRarityMeta, BRarityMeta>(nekoItem, context)
+            generateMeta<_, SElementMeta, BElementMeta>(nekoItem, context)
+            generateMeta<_, SKizamiMeta, BKizamiMeta>(nekoItem, context)
+            generateMeta<_, SSkinMeta, BSkinMeta>(nekoItem, context)
+            generateMeta<_, SSkinOwnerMeta, BSkinOwnerMeta>(nekoItem, context)
         }
 
         // write cells
         with(nekoStack.cell) {
 
-            // write "standalone" cells
             nekoItem.cell.forEach { (id, schema) ->
                 // the order of cell population should be the same as
                 // that they are declared in the configuration list
@@ -97,7 +96,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
  * @param S the type of [SchemaItemMeta]
  * @param B the type of [BinaryItemMeta]
  */
-private inline fun <V, reified S : SchemaItemMeta<V>, reified B : BinaryItemMeta<V>> ItemMetaAccessor.generateAndSet(
+private inline fun <V, reified S : SchemaItemMeta<V>, reified B : BinaryItemMeta<V>> ItemMetaAccessor.generateMeta(
     item: NekoItem,
     context: SchemaGenerationContext,
 ) {
