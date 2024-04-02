@@ -23,7 +23,7 @@ object NekoItemFactory {
      * @param relPath the relative path of the item in the configuration
      * @return a new [NekoItem]
      */
-    fun create(key: Key, root: ConfigurationNode, relPath: Path): NekoItem {
+    fun create(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
         val provider = NodeConfigProvider(root, relPath.toString())
 
         // Deserialize basic data

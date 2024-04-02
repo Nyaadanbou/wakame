@@ -26,12 +26,11 @@ object NekoItemNodeIterator : KoinComponent {
      * 每次调用时会传入一个物品的 [Key] 和对应文件的根 [ConfigurationNode]。
      *
      * @param block 需要执行的代码块，会被多次调用。
-     *
-     *            - 参数 [key] 为物品的 [Key]。
-     *            - 参数 [node] 为物品的根 [ConfigurationNode]。
-     *            - 参数 [path] 为物品配置文件的路径。
+     * - 参数 [Key] 为物品的唯一标识
+     * - 参数 [ConfigurationNode] 为物品的根配置
+     * - 参数 [Path] 为物品配置文件的路径
      */
-    fun forEach(block: (Key, ConfigurationNode, Path) -> Unit) {
+    fun forEach(block: (Key, Path, ConfigurationNode) -> Unit) {
         val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_CONFIG_DIR)
         val namespaceDirs = mutableListOf<File>()
 
@@ -60,8 +59,9 @@ object NekoItemNodeIterator : KoinComponent {
                     }
 
                     val text = itemFile.bufferedReader().use { it.readText() }
+                    val path = itemFile.toPath()
                     val node = loaderBuilder.buildAndLoadString(text)
-                    block(key, node, itemFile.toPath())
+                    block(key, path, node)
                 }
         }
     }
