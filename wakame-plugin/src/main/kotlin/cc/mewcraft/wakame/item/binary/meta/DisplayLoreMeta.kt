@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.util.getListOrNull
 import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ListShadowTag
 import me.lucko.helper.shadows.nbt.StringShadowTag
 import net.kyori.adventure.key.Key
@@ -34,12 +33,6 @@ value class BDisplayLoreMeta(
 
     override fun remove() {
         accessor.rootOrNull?.remove(key.value())
-    }
-
-    companion object : ItemMetaCompanion {
-        override operator fun contains(compound: CompoundShadowTag): Boolean {
-            return compound.contains(ItemMetaKeys.DISPLAY_LORE.value(), ShadowTagType.LIST)
-        }
     }
 }
 

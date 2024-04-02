@@ -4,9 +4,7 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorNoop
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaCompanion
 import kotlin.reflect.KClass
-import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.full.valueParameters
@@ -17,10 +15,6 @@ internal object ItemMetaRegistry : Initializable {
         private val binaryItemMetaReflectionLookupByClass: Map<KClass<out BinaryItemMeta<*>>, ItemMetaReflection> = run {
             // Get all subclasses of BinaryItemMeta
             val classes: Collection<KClass<out BinaryItemMeta<*>>> = BinaryItemMeta::class.sealedSubclasses
-            // Get the companion object of each subclass of BinaryItemMeta
-            val companions: Map<KClass<out BinaryItemMeta<*>>, ItemMetaCompanion> = classes.associateWith {
-                requireNotNull(it.companionObjectInstance as? ItemMetaCompanion) { "The class ${it.qualifiedName} does not have companion object that implements ${ItemMetaCompanion::class.qualifiedName}" }
-            }
             // Get the primary constructor of each subclass of BinaryItemMeta
             val constructors: Map<KClass<out BinaryItemMeta<*>>, (ItemMetaAccessor) -> BinaryItemMeta<*>> = classes.associateWith {
                 val primaryConstructor = requireNotNull(it.primaryConstructor) { "The class ${it.qualifiedName} does not have primary constructor" }
@@ -31,7 +25,7 @@ internal object ItemMetaRegistry : Initializable {
                 primaryConstructor as (ItemMetaAccessor) -> BinaryItemMeta<*>
             }
             // Collect all and put them into the lookup registry
-            classes.associateWith { ItemMetaReflection(it, companions[it]!!, constructors[it]!!) }
+            classes.associateWith { ItemMetaReflection(it, constructors.getValue(it)) }
         }
         private val binaryItemMetaReflectionLookupByString: Map<String, ItemMetaReflection> = run {
             reflections().associateBy { it.constructor.invoke(ItemMetaAccessorNoop).key.value() }
@@ -61,6 +55,5 @@ internal object ItemMetaRegistry : Initializable {
 
 internal data class ItemMetaReflection(
     val clazz: KClass<out BinaryItemMeta<*>>,
-    val companion: ItemMetaCompanion,
     val constructor: (ItemMetaAccessor) -> BinaryItemMeta<*>,
 )

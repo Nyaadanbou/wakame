@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.provider.ConfigProvider
 import cc.mewcraft.wakame.provider.optionalEntry
+import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -38,10 +39,10 @@ interface Damageable : ItemBehavior {
      * 默认实现。理论上还可以有其他实现。
      */
     private class Default(
-        repairMaterialsProvider: Provider<List<String>>,
+        repairMaterials: Provider<List<String>>,
     ) : Damageable, KoinComponent {
         private val logger: Logger by inject()
-        override val repairMaterials: List<Key> by repairMaterialsProvider.map { it.map(Key::key) }
+        override val repairMaterials: List<Key> by repairMaterials.map { it.map(::Key) }
 
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
             val nekoStack = NekoStackFactory.wrap(itemStack)

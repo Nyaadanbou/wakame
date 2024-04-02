@@ -1,18 +1,12 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.adventure.Keyed
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 /**
  * Represents a data accessor of an item meta on the ItemStack.
  *
  * This is an interface to read/write/remove the item meta for the ItemStack.
- *
- * ## Notes to implementer
- * The implementation of [BinaryItemMeta] must create a companion object which
- * implements [ItemMetaCompanion] interface. Not implementing the interface will
- * result in a runtime exception.
  *
  * @param V the value "stored" in this [BinaryItemMeta]
  * @constructor the primary constructor must have a single parameter of type [ItemMetaAccessor]
@@ -61,14 +55,4 @@ sealed interface BinaryItemMeta<V> : Keyed {
      */
     fun remove()
 
-}
-
-interface ItemMetaCompanion {
-    /**
-     * Checks if this item meta exists in the given compound.
-     * Returns `true` if the compound contains the ItemMeta.
-     *
-     * @param compound the compound that may include the ItemMeta
-     */
-    fun contains(compound: CompoundShadowTag): Boolean
 }

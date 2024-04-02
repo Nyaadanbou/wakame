@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.getByteOrNull
 import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 /**
@@ -32,12 +31,6 @@ value class BRarityMeta(
 
     override fun set(value: Rarity) {
         accessor.rootOrCreate.putByte(key.value(), value.binaryId)
-    }
-
-    companion object : ItemMetaCompanion {
-        override fun contains(compound: CompoundShadowTag): Boolean {
-            return compound.contains(ItemMetaKeys.RARITY.value(), ShadowTagType.BYTE)
-        }
     }
 }
 

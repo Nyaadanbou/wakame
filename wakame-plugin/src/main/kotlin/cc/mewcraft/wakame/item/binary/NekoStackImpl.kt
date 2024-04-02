@@ -68,7 +68,7 @@ internal value class NekoStackImpl(
         get() = tags.getLong(NekoTags.Root.SEED)
 
     override val key: Key
-        get() = Key(tags.getString(NekoTags.Root.KEY))
+        get() = Key(tags.getString(NekoTags.Root.KEY)) // TODO 分离 namespace 和 value
 
     override val variant: Int
         get() = tags.getInt(NekoTags.Root.SID)

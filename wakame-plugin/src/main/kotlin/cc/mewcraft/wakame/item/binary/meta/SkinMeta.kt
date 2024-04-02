@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.registry.ItemSkinRegistry
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.util.getShortOrNull
 import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 /**
@@ -32,11 +31,5 @@ value class BSkinMeta(
 
     override fun set(value: ItemSkin) {
         accessor.rootOrCreate.putShort(key.value(), value.binaryId)
-    }
-
-    companion object : ItemMetaCompanion {
-        override fun contains(compound: CompoundShadowTag): Boolean {
-            return compound.contains(ItemMetaKeys.SKIN.value(), ShadowTagType.SHORT)
-        }
     }
 }

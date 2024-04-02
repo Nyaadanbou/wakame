@@ -24,20 +24,6 @@ internal value class ItemMetaAccessorImpl(
             val root = rootOrNull ?: return emptySet()
             val ret = ObjectArraySet<BinaryItemMeta<*>>(8)
 
-            // TODO optimize the efficiency
-            //  solution: loop through the root tag, then use the tag key to get implementation,
-            //  instead of looping through the whole meta registry and call contains()
-
-            // check the existence of each item meta
-            // if one exists, we add it to the map
-            /*
-            ItemMetaRegistry.Binary.reflections().forEach { (_, companion, constructor) ->
-                if (companion.contains(root)) {
-                    ret += constructor(this)
-                }
-            }
-            */
-
             // loop through the keySet of the root compound tag,
             // then use the tag key to get corresponding accessor
             root.keySet().forEach { key ->
@@ -50,7 +36,7 @@ internal value class ItemMetaAccessorImpl(
         }
 
     override fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M {
-        val (_, _, constructor) = ItemMetaRegistry.Binary.reflectionLookup(clazz)
+        val (_, constructor) = ItemMetaRegistry.Binary.reflectionLookup(clazz)
         val itemMeta = constructor(this)
         @Suppress("UNCHECKED_CAST")
         return (itemMeta as M)

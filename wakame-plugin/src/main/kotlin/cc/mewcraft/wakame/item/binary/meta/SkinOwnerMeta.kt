@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.item.ItemMetaKeys
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import java.util.UUID
 
@@ -30,11 +29,5 @@ value class BSkinOwnerMeta(
 
     override fun set(value: UUID) {
         accessor.rootOrCreate.putUUID(key.value(), value)
-    }
-
-    companion object : ItemMetaCompanion {
-        override fun contains(compound: CompoundShadowTag): Boolean {
-            return compound.contains(ItemMetaKeys.SKIN_OWNER.value())
-        }
     }
 }

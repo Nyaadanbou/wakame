@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 /**
@@ -43,12 +42,6 @@ value class BElementMeta(
 
     fun set(value: Collection<Element>) {
         set(value.toHashSet())
-    }
-
-    companion object : ItemMetaCompanion {
-        override fun contains(compound: CompoundShadowTag): Boolean {
-            return compound.contains(ItemMetaKeys.ELEMENT.value(), ShadowTagType.BYTE_ARRAY)
-        }
     }
 }
 

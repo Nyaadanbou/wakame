@@ -6,13 +6,17 @@ import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.toStableShort
 import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 @JvmInline
 value class BDurabilityMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Durability> {
+    companion object {
+        private const val THRESHOLD_TAG = "threshold"
+        private const val DAMAGE_TAG = "damage"
+    }
+
     override val key: Key
         get() = ItemMetaKeys.DURABILITY
     override val exists: Boolean
@@ -77,14 +81,5 @@ value class BDurabilityMeta(
 
     override fun remove() {
         accessor.rootOrNull?.remove(key.value())
-    }
-
-    companion object : ItemMetaCompanion {
-        private const val THRESHOLD_TAG = "threshold"
-        private const val DAMAGE_TAG = "damage"
-
-        override operator fun contains(compound: CompoundShadowTag): Boolean {
-            return compound.contains(ItemMetaKeys.DURABILITY.value(), ShadowTagType.COMPOUND)
-        }
     }
 }
