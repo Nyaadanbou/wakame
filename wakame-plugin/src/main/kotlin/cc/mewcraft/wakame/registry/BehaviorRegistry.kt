@@ -9,6 +9,8 @@ object BehaviorRegistry : Initializable {
     val INSTANCES: Registry<String, ItemBehaviorHolder> = SimpleRegistry()
 
     override fun onPreWorld() {
+        // Register more behaviors here ...
+        
         INSTANCES += "damageable" to Damageable
         INSTANCES += "statistical" to Statistical
     }

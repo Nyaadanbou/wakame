@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.schema
 
 import cc.mewcraft.wakame.item.EffectiveSlot
+import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.cell.SchemaCellFactory
 import cc.mewcraft.wakame.item.schema.meta.*
@@ -12,7 +13,6 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.nio.file.Path
 import java.util.UUID
-import kotlin.collections.set
 
 object NekoItemFactory {
     /**
@@ -32,56 +32,62 @@ object NekoItemFactory {
         val effectiveSlot = root.node("effective_slot").requireKt<EffectiveSlot>()
 
         // Deserialize item behaviors
-        val behaviors: List<String> = root.node("behaviors").childrenMap()
-            .mapNotNull { (key, _) -> key?.toString() }
+        val behaviors: List<String> = root.node("behaviors").childrenMap().mapNotNull { (key, _) -> key?.toString() }
 
         // Deserialize standalone item meta
-        val schemaMeta = ImmutableClassToInstanceMap.builder<SchemaItemMeta<*>>().apply {
+        val schemaMeta: ImmutableClassToInstanceMap<SchemaItemMeta<*>> = ImmutableClassToInstanceMap.builder<SchemaItemMeta<*>>().apply {
             // Side note 1: buildMap preserves the insertion order
+            // Side note 2: always put all schema metadata for a `NekoItem` even if the schema meta contains "nothing".
+            // Side note 3: whether the data will be written to the item's NBT is decided by the realization process, not here.
 
-            // Side note 2: always put all schema metadata for a `NekoItem`
-            // even if the schema metadata contains "nothing".
-
-            // Side note 3: whether the data will be written to the item's NBT
-            // is decided by the item stack generation process, not here.
-
-            // (by alphabet order, in case you miss something)
-            loadAndSave<SDisplayLoreMeta>(root, "lore")
-            loadAndSave<SDisplayNameMeta>(root, "display_name")
-            loadAndSave<SDurabilityMeta>(root, "durability")
-            loadAndSave<SElementMeta>(root, "elements")
-            loadAndSave<SKizamiMeta>(root, "kizami")
-            loadAndSave<SLevelMeta>(root, "level")
-            loadAndSave<SRarityMeta>(root, "rarity")
-            loadAndSave<SSkinMeta>(root, "skin")
-            loadAndSave<SSkinOwnerMeta>(root, "skin_owner")
+            // Write it in alphabet order, in case you miss something
+            loadAndSave<SDisplayLoreMeta>(root, ItemMetaKeys.DISPLAY_LORE)
+            loadAndSave<SDisplayNameMeta>(root, ItemMetaKeys.DISPLAY_NAME)
+            loadAndSave<SDurabilityMeta>(root, ItemMetaKeys.DURABILITY)
+            loadAndSave<SElementMeta>(root, ItemMetaKeys.ELEMENT)
+            loadAndSave<SKizamiMeta>(root, ItemMetaKeys.KIZAMI)
+            loadAndSave<SLevelMeta>(root, ItemMetaKeys.LEVEL)
+            loadAndSave<SRarityMeta>(root, ItemMetaKeys.RARITY)
+            loadAndSave<SSkinMeta>(root, ItemMetaKeys.SKIN)
+            loadAndSave<SSkinOwnerMeta>(root, ItemMetaKeys.SKIN_OWNER)
         }.build()
 
         // Deserialize item cells
         val schemaCell: Map<String, SchemaCell> = buildMap {
             // Side note: buildMap preserves the insertion order
 
-            root.node("cells").childrenList().forEach { n ->
-                val id = n.node("id").requireKt<String>()
-                val coreNode = n.node("core").string
-                    ?.let { root.node("core_groups", it) }
-                    ?.also { it.hint(AbstractGroupSerializer.SHARED_POOLS, root.node("core_pools")) } // inject `shared pools` node as hint
-                val curseNode = n.node("curse").string
-                    ?.let { root.node("curse_groups", it) }
-                    ?.also { it.hint(AbstractGroupSerializer.SHARED_POOLS, root.node("curse_pools")) } // ^ same
-                val cell = SchemaCellFactory.schemaOf(n, coreNode, curseNode)
-                this[id] = cell
+            // A convenient local func
+            fun constructNode(path: String, sourceNode: ConfigurationNode): ConfigurationNode? {
+                return sourceNode.node(path).string
+                    // get the "... groups" node
+                    ?.let { root.node("${path}_groups", it) }
+                    // inject `shared pools` node as hint
+                    ?.also { it.hint(AbstractGroupSerializer.SHARED_POOLS, root.node("${path}_pools")) }
+            }
+
+            // Construct schema cells
+            root.node("cells").childrenList().forEach { childNode ->
+                val id = childNode.node("id").requireKt<String>()
+                val cell = run {
+                    val coreNode = constructNode("core", childNode)
+                    val curseNode = constructNode("curse", childNode)
+                    SchemaCellFactory.schemaOf(childNode, coreNode, curseNode)
+                }
+
+                this += id to cell // add it to the result map
             }
         }
 
-        val ret = NekoItemImpl(key, uuid, provider, material, effectiveSlot, schemaMeta, schemaCell, behaviors)
-        return ret
+        return NekoItemImpl(key, uuid, provider, material, effectiveSlot, schemaMeta, schemaCell, behaviors)
     }
 }
 
 private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemaItemMeta<*>>.loadAndSave(
-    node: ConfigurationNode,
-    vararg path: String,
+    node: ConfigurationNode, key: Key,
+) = loadAndSave<T>(node, key.value())
+
+private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemaItemMeta<*>>.loadAndSave(
+    node: ConfigurationNode, vararg path: String,
 ) {
     val schemaItemMeta = node.node(*path).requireKt<T>()
     this.put(T::class.java, schemaItemMeta)

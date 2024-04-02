@@ -36,7 +36,7 @@ behaviors:
 
 # 名字
 # 可选，默认 "Unnamed"
-display_name: "<red>Demo Short Sword"
+name: "<red>Demo Short Sword"
 
 # 描述
 # 可选，默认 无
@@ -104,7 +104,7 @@ rarity: mapping:demo_1
 
 # 元素标识
 # 可选，默认 无
-elements:
+element:
 
   # 抽选 n 个元素作为该物品的元素标识
   sample: 2

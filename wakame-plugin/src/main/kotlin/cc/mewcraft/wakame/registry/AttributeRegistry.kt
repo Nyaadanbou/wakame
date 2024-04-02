@@ -63,96 +63,30 @@ object AttributeRegistry : Initializable {
     }
 
     private fun registerFacades() {
-        +buildFacade("attack_damage", ShadowTagType.SHORT).ranged().element().bind(
-            Attributes.byElement { MIN_ATTACK_DAMAGE },
-            Attributes.byElement { MAX_ATTACK_DAMAGE }
-        )
-
-        +buildFacade("attack_effect_chance", ShadowTagType.DOUBLE).single().bind(
-            Attributes.ATTACK_EFFECT_CHANCE
-        )
-
-        +buildFacade("attack_speed_level", ShadowTagType.BYTE).single().bind(
-            Attributes.ATTACK_SPEED_LEVEL
-        )
-
-        +buildFacade("block_interaction_range", ShadowTagType.DOUBLE).single().bind(
-            Attributes.BLOCK_INTERACTION_RANGE
-        )
-
-        +buildFacade("critical_strike_chance", ShadowTagType.DOUBLE).single().bind(
-            Attributes.CRITICAL_STRIKE_CHANCE
-        )
-
-        +buildFacade("critical_strike_power", ShadowTagType.DOUBLE).single().bind(
-            Attributes.CRITICAL_STRIKE_POWER
-        )
-
-        +buildFacade("damage_reduction_rate", ShadowTagType.DOUBLE).single().bind(
-            Attributes.DAMAGE_REDUCTION_RATE
-        )
-
-        +buildFacade("defense", ShadowTagType.SHORT).single().element().bind(
-            Attributes.byElement { DEFENSE }
-        )
-
-        +buildFacade("defense_penetration", ShadowTagType.SHORT).single().element().bind(
-            Attributes.byElement { DEFENSE_PENETRATION }
-        )
-
-        +buildFacade("defense_penetration_rate", ShadowTagType.DOUBLE).single().element().bind(
-            Attributes.byElement { DEFENSE_PENETRATION_RATE }
-        )
-
-        +buildFacade("entity_interaction_range", ShadowTagType.DOUBLE).single().bind(
-            Attributes.ENTITY_INTERACTION_RANGE
-        )
-
-        +buildFacade("health_regeneration", ShadowTagType.SHORT).single().bind(
-            Attributes.HEALTH_REGENERATION
-        )
-
-        +buildFacade("lifesteal", ShadowTagType.SHORT).single().bind(
-            Attributes.LIFESTEAL
-        )
-
-        +buildFacade("lifesteal_rate", ShadowTagType.DOUBLE).single().bind(
-            Attributes.LIFESTEAL_RATE
-        )
-
-        +buildFacade("mana_consumption_rate", ShadowTagType.DOUBLE).single().bind(
-            Attributes.MANA_CONSUMPTION_RATE
-        )
-
-        +buildFacade("mana_regeneration", ShadowTagType.SHORT).single().bind(
-            Attributes.MANA_REGENERATION
-        )
-
-        +buildFacade("manasteal", ShadowTagType.SHORT).single().bind(
-            Attributes.MANASTEAL
-        )
-
-        +buildFacade("manasteal_rate", ShadowTagType.DOUBLE).single().bind(
-            Attributes.MANASTEAL_RATE
-        )
-
-        +buildFacade("max_absorption", ShadowTagType.SHORT).single().bind(
-            Attributes.MAX_ABSORPTION
-        )
-
-        +buildFacade("max_health", ShadowTagType.SHORT).single().bind(
-            Attributes.MAX_HEALTH
-        )
-
-        +buildFacade("max_mana", ShadowTagType.SHORT).single().bind(
-            Attributes.MAX_MANA
-        )
-
-        +buildFacade("movement_speed_rate", ShadowTagType.DOUBLE).single().bind(
-            Attributes.MOVEMENT_SPEED_RATE
-        )
-
         // Registry more attribute facade here ...
+
+        +buildFacade("attack_damage", ShadowTagType.SHORT).ranged().element().bind(Attributes.byElement { MIN_ATTACK_DAMAGE }, Attributes.byElement { MAX_ATTACK_DAMAGE })
+        +buildFacade("attack_effect_chance", ShadowTagType.DOUBLE).single().bind(Attributes.ATTACK_EFFECT_CHANCE)
+        +buildFacade("attack_speed_level", ShadowTagType.BYTE).single().bind(Attributes.ATTACK_SPEED_LEVEL)
+        +buildFacade("block_interaction_range", ShadowTagType.DOUBLE).single().bind(Attributes.BLOCK_INTERACTION_RANGE)
+        +buildFacade("critical_strike_chance", ShadowTagType.DOUBLE).single().bind(Attributes.CRITICAL_STRIKE_CHANCE)
+        +buildFacade("critical_strike_power", ShadowTagType.DOUBLE).single().bind(Attributes.CRITICAL_STRIKE_POWER)
+        +buildFacade("damage_reduction_rate", ShadowTagType.DOUBLE).single().bind(Attributes.DAMAGE_REDUCTION_RATE)
+        +buildFacade("defense", ShadowTagType.SHORT).single().element().bind(Attributes.byElement { DEFENSE })
+        +buildFacade("defense_penetration", ShadowTagType.SHORT).single().element().bind(Attributes.byElement { DEFENSE_PENETRATION })
+        +buildFacade("defense_penetration_rate", ShadowTagType.DOUBLE).single().element().bind(Attributes.byElement { DEFENSE_PENETRATION_RATE })
+        +buildFacade("entity_interaction_range", ShadowTagType.DOUBLE).single().bind(Attributes.ENTITY_INTERACTION_RANGE)
+        +buildFacade("health_regeneration", ShadowTagType.SHORT).single().bind(Attributes.HEALTH_REGENERATION)
+        +buildFacade("lifesteal", ShadowTagType.SHORT).single().bind(Attributes.LIFESTEAL)
+        +buildFacade("lifesteal_rate", ShadowTagType.DOUBLE).single().bind(Attributes.LIFESTEAL_RATE)
+        +buildFacade("mana_consumption_rate", ShadowTagType.DOUBLE).single().bind(Attributes.MANA_CONSUMPTION_RATE)
+        +buildFacade("mana_regeneration", ShadowTagType.SHORT).single().bind(Attributes.MANA_REGENERATION)
+        +buildFacade("manasteal", ShadowTagType.SHORT).single().bind(Attributes.MANASTEAL)
+        +buildFacade("manasteal_rate", ShadowTagType.DOUBLE).single().bind(Attributes.MANASTEAL_RATE)
+        +buildFacade("max_absorption", ShadowTagType.SHORT).single().bind(Attributes.MAX_ABSORPTION)
+        +buildFacade("max_health", ShadowTagType.SHORT).single().bind(Attributes.MAX_HEALTH)
+        +buildFacade("max_mana", ShadowTagType.SHORT).single().bind(Attributes.MAX_MANA)
+        +buildFacade("movement_speed_rate", ShadowTagType.DOUBLE).single().bind(Attributes.MOVEMENT_SPEED_RATE)
     }
 
     override fun onPreWorld() {
@@ -172,8 +106,8 @@ interface AttributeFacade {
     /** 属性的 facade 的 key. */
     val KEY: Key
 
-    val MODIFIER_FACTORY: AttributeModifierFactory
     val STRUCT_METADATA: AttributeStructMetadata
+    val MODIFIER_FACTORY: AttributeModifierFactory
     val SCHEMA_DATA_REALIZER: SchemaAttributeDataRealizer
     val SCHEMA_DATA_NODE_ENCODER: SchemaAttributeDataNodeEncoder
     val BINARY_DATA_NODE_ENCODER: BinaryAttributeDataNodeEncoder

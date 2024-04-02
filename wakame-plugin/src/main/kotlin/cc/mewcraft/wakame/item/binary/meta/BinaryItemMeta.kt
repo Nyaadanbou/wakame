@@ -5,7 +5,7 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
 /**
- * A data accessor of an item meta on the ItemStack.
+ * Represents a data accessor of an item meta on the ItemStack.
  *
  * This is an interface to read/write/remove the item meta for the ItemStack.
  *

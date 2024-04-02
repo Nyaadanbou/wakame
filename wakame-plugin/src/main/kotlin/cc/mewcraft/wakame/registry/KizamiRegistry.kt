@@ -29,7 +29,7 @@ object KizamiRegistry : KoinComponent, Initializable, BiKnot<String, Kizami, Byt
     private val EFFECTS: Registry<Kizami, KizamiInstance> = SimpleRegistry()
 
     fun getEffect(kizami: Kizami, amount: Int): KizamiEffect {
-        return EFFECTS.get(kizami).getEffectBy(amount)
+        return EFFECTS[kizami].getEffectBy(amount)
     }
 
     private fun loadConfiguration() {
