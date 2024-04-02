@@ -33,7 +33,7 @@ internal class ItemMetaAccessorImpl(
             // if one exists, we add it to the map
             ItemMetaRegistry.reflections().forEach { (_, companion, constructor) ->
                 if (companion.contains(root)) {
-                    ret += constructor.invoke(this) as BinaryItemMeta<*>
+                    ret += constructor(this)
                 }
             }
 
@@ -41,8 +41,8 @@ internal class ItemMetaAccessorImpl(
         }
 
     override fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M {
-        val (_, _, constructor) = ItemMetaRegistry.reflect(clazz)
-        val itemMeta = constructor.invoke(this)
+        val (_, _, constructor) = ItemMetaRegistry.reflectionLookup(clazz)
+        val itemMeta = constructor(this)
         @Suppress("UNCHECKED_CAST")
         return (itemMeta as M)
     }
