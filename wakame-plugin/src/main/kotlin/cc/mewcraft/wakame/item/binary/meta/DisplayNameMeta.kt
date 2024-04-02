@@ -9,7 +9,7 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的名字(MiniMessage).
  */
-internal class BDisplayNameMeta(
+class BDisplayNameMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<String> {
     override val key: Key

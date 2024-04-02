@@ -9,7 +9,7 @@ import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 
-internal class BDurabilityMeta(
+class BDurabilityMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Durability> {
     override val key: Key

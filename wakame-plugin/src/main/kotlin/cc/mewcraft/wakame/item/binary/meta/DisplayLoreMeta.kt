@@ -11,7 +11,7 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的描述(MiniMessage).
  */
-internal class BDisplayLoreMeta(
+class BDisplayLoreMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<List<String>> {
     override val key: Key

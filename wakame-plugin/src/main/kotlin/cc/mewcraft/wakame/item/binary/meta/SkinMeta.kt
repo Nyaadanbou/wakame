@@ -11,7 +11,7 @@ import net.kyori.adventure.key.Key
 /**
  * 物品的皮肤。
  */
-internal class BSkinMeta(
+class BSkinMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<ItemSkin> {
     override val key: Key
