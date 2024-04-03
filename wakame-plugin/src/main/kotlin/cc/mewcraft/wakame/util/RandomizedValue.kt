@@ -232,7 +232,7 @@ internal object NumericValueSerializer : TypeSerializer<RandomizedValue> {
             return RandomizedValue(node.double, .0, .0, upperBound = .0)
         }
 
-        val base = node.node("base").requireKt<Double>()
+        val base = node.node("base").krequire<Double>()
         val scale = node.node("scale").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
         val sigma = node.node("spread").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
         val lowerBound = node.node("min").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double

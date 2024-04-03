@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.ImmutableMultimap
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -61,7 +61,7 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
 
         // add each single effect to the collection
         node.childrenList().forEach { childNode ->
-            val key = childNode.node("key").requireKt<Key>()
+            val key = childNode.node("key").krequire<Key>()
             val namespace = key.namespace()
             when (namespace) {
                 NekoNamespaces.ABILITY -> {

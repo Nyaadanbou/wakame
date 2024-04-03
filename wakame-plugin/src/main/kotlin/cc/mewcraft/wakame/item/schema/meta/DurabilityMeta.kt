@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.schema.meta
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.RandomizedValue
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.key.Key
@@ -62,8 +62,8 @@ private data object DefaultDurabilityMeta : SDurabilityMeta {
 internal data object DurabilityMetaSerializer : SchemaItemMetaSerializer<SDurabilityMeta> {
     override val defaultValue: SDurabilityMeta = DefaultDurabilityMeta
     override fun deserialize(type: Type, node: ConfigurationNode): SDurabilityMeta {
-        val threshold = node.node("threshold").requireKt<RandomizedValue>()
-        val damage = node.node("damage").takeUnless { it.virtual() }?.requireKt<RandomizedValue>() // nullable
+        val threshold = node.node("threshold").krequire<RandomizedValue>()
+        val damage = node.node("damage").takeUnless { it.virtual() }?.krequire<RandomizedValue>() // nullable
         return NonNullDurabilityMeta(threshold, damage)
     }
 }

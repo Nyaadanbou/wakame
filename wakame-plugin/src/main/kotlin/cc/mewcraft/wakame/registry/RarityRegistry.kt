@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -33,7 +33,7 @@ object RarityRegistry : KoinComponent, Initializable, BiKnot<String, Rarity, Byt
 
         val root = get<NekoConfigurationLoader>(named(RARITY_CONFIG_LOADER)).load()
         root.node("rarities").childrenMap().forEach { (_, n) ->
-            val rarity = n.requireKt<Rarity>()
+            val rarity = n.krequire<Rarity>()
             INSTANCES.register(rarity.uniqueId, rarity)
             BI_LOOKUP.register(rarity.uniqueId, rarity.binaryId)
         }

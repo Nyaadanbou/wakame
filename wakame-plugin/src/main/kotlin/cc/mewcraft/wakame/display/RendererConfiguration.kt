@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.NekoConfigurationNode
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -19,6 +19,8 @@ import org.koin.core.component.inject
 import org.spongepowered.configurate.CommentedConfigurationNode
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+
+// TODO use ConfigProvider where possible
 
 internal class RendererConfiguration(
     loader: NekoConfigurationLoader,
@@ -36,7 +38,7 @@ internal class RendererConfiguration(
     /**
      * 名字的渲染格式。
      */
-    val nameFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "name").requireKt<String>() }
+    val nameFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "name").krequire<String>() }
 
     /**
      * 描述的渲染格式。
@@ -44,9 +46,9 @@ internal class RendererConfiguration(
     val loreFormat: ItemMetaStylizer.LoreFormat by reloadable {
         with(root.node(RENDERER_STYLE_NODE, "meta", "lore")) {
             ItemMetaStylizerImpl.LoreFormatImpl(
-                line = node("line").requireKt<String>(),
-                header = node("header").requireKt<List<String>>().takeIf(List<String>::isNotEmpty),
-                bottom = node("bottom").requireKt<List<String>>().takeIf(List<String>::isNotEmpty)
+                line = node("line").krequire<String>(),
+                header = node("header").krequire<List<String>>().takeIf(List<String>::isNotEmpty),
+                bottom = node("bottom").krequire<List<String>>().takeIf(List<String>::isNotEmpty)
             )
         }
     }
@@ -54,12 +56,12 @@ internal class RendererConfiguration(
     /**
      * 等级的渲染格式。
      */
-    val levelFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "level").requireKt<String>() }
+    val levelFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "level").krequire<String>() }
 
     /**
      * 稀有度的渲染格式。
      */
-    val rarityFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "rarity").requireKt<String>() }
+    val rarityFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "rarity").krequire<String>() }
 
     /**
      * 元素的渲染格式。
@@ -74,23 +76,23 @@ internal class RendererConfiguration(
     /**
      * 保养度的渲染格式。
      */
-    val durabilityFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "durability").requireKt<String>() }
+    val durabilityFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "durability").krequire<String>() }
 
     /**
      * 皮肤的渲染格式。
      */
-    val skinFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin").requireKt<String>() }
+    val skinFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin").krequire<String>() }
 
     /**
      * 皮肤所有者的渲染格式。
      */
-    val skinOwnerFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin_owner").requireKt<String>() }
+    val skinOwnerFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin_owner").krequire<String>() }
 
     private fun getListFormat(node: NekoConfigurationNode): ItemMetaStylizer.ListFormat {
         return ItemMetaStylizerImpl.ListFormatImpl(
-            merged = node.node("merged").requireKt<String>(),
-            single = node.node("single").requireKt<String>(),
-            separator = node.node("separator").requireKt<String>()
+            merged = node.node("merged").krequire<String>(),
+            single = node.node("single").krequire<String>(),
+            separator = node.node("separator").krequire<String>()
         )
     }
     //</editor-fold>
@@ -100,7 +102,7 @@ internal class RendererConfiguration(
      * 空词条栏（属性）的渲染格式。
      */
     val emptyAttributeText: List<String> by reloadable {
-        root.node(RENDERER_STYLE_NODE, "attribute", "empty").requireKt<List<String>>()
+        root.node(RENDERER_STYLE_NODE, "attribute", "empty").krequire<List<String>>()
     }
 
     /**
@@ -116,7 +118,7 @@ internal class RendererConfiguration(
         root.node(RENDERER_STYLE_NODE, "attribute", "value").childrenMap()
             .mapKeys { (k, _) -> Key(NekoNamespaces.ATTRIBUTE, k as String) }
             .filter { (k, _) -> k != Attributes.ATTACK_SPEED_LEVEL.key() }
-            .mapValues { (_, v) -> v.requireKt<String>() }
+            .mapValues { (_, v) -> v.krequire<String>() }
     }
 
     /**
@@ -125,9 +127,9 @@ internal class RendererConfiguration(
     val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by reloadable {
         val node = root.node(RENDERER_STYLE_NODE, "attribute", "value", "attack_speed_level")
         AttributeStylizerImpl.AttackSpeedFormatImpl(
-            merged = node.node("merged").requireKt<String>(),
+            merged = node.node("merged").krequire<String>(),
             levels = node.node("levels").childrenMap()
-                .map { (key, node) -> (key as String).toInt() to node.requireKt<String>() }
+                .map { (key, node) -> (key as String).toInt() to node.krequire<String>() }
                 .toMap()
         )
     }
@@ -137,7 +139,7 @@ internal class RendererConfiguration(
      */
     val operationFormats: Map<AttributeModifier.Operation, String> by reloadable {
         AttributeModifier.Operation.entries.associateWith { operation ->
-            root.node(RENDERER_STYLE_NODE, "attribute", "operation", operation.key).requireKt<String>()
+            root.node(RENDERER_STYLE_NODE, "attribute", "operation", operation.key).krequire<String>()
         }
     }
     //</editor-fold>
@@ -147,7 +149,7 @@ internal class RendererConfiguration(
      * 空词条栏的渲染格式（技能）。
      */
     val emptyAbilityText: List<String> by reloadable {
-        root.node(RENDERER_STYLE_NODE, "ability", "empty").requireKt<List<String>>()
+        root.node(RENDERER_STYLE_NODE, "ability", "empty").krequire<List<String>>()
     }
 
     /**
@@ -206,10 +208,10 @@ internal class RendererConfiguration(
         _fixedLoreLines.clear()
         _defaultLoreLines.clear()
 
-        val primaryLines = root.node(RENDERER_LAYOUT_NODE).node("primary").requireKt<List<String>>()
+        val primaryLines = root.node(RENDERER_LAYOUT_NODE).node("primary").krequire<List<String>>()
         val attDerivation = AttributeLoreMeta.Derivation(
-            operationIndex = root.node(RENDERER_LAYOUT_NODE).node("operation").requireKt<List<String>>(),
-            elementIndex = root.node(RENDERER_LAYOUT_NODE).node("element").requireKt<List<String>>()
+            operationIndex = root.node(RENDERER_LAYOUT_NODE).node("operation").krequire<List<String>>(),
+            elementIndex = root.node(RENDERER_LAYOUT_NODE).node("element").krequire<List<String>>()
         )
 
         val pattern = RENDERER_LAYOUT_LINE_PATTERN.toPattern()

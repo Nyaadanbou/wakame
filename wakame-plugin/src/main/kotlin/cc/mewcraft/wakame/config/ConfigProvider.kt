@@ -1,6 +1,6 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package cc.mewcraft.wakame.provider
+package cc.mewcraft.wakame.config
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.map

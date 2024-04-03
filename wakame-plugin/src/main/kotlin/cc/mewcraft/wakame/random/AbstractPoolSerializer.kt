@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.random
 
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.condition.Condition
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -153,7 +153,7 @@ abstract class AbstractPoolSerializer<S, C : SelectionContext> : SchemaSerialize
 
             // wrap it into a sample
             Sample.build(content) {
-                weight = n.node("weight").requireKt<Double>()
+                weight = n.node("weight").krequire<Double>()
 
                 // add intrinsic conditions
                 conditions += intrinsicConditions(content)

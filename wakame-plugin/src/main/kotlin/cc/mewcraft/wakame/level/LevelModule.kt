@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.level
 
 import cc.mewcraft.wakame.initializer.MAIN_CONFIG_NODE
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.bukkit.plugin.PluginManager
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.new
@@ -23,7 +23,7 @@ internal fun levelModule(): Module = module {
             }
         }
 
-        val type = config.node("player_level_provider").requireKt<PlayerLevelType>()
+        val type = config.node("player_level_provider").krequire<PlayerLevelType>()
         when (type) {
             PlayerLevelType.ADVENTURE_LEVEL -> {
                 takeIfPresent("AdventureLevel") { new(::AdventureLevelProvider) }

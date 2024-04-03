@@ -7,16 +7,11 @@ import org.koin.core.scope.Scope
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import java.io.BufferedReader
 import java.io.File
 
 fun Scope.getConfigFile(path: String): File {
     return getOrNull<WakamePlugin>()?.getBundledFile(path) // we're in a server environment
         ?: get<File>(named(PLUGIN_DATA_DIR)).resolve(path) // we're in a test environment
-}
-
-fun Scope.getConfigFileAsBufferedReader(path: String): BufferedReader {
-    return getConfigFile(path).bufferedReader()
 }
 
 /**
@@ -26,24 +21,24 @@ fun Scope.getConfigFileAsBufferedReader(path: String): BufferedReader {
  * @param builder the function to modify the type serializer collection
  * @return a builder with basic configuration populated
  */
-fun Scope.buildYamlConfigurationLoader(
+fun Scope.buildYamlLoader(
     path: String,
     builder: TypeSerializerCollection.Builder.() -> Unit = { },
 ): YamlConfigurationLoader.Builder {
-    return buildYamlConfigurationLoader()
-        .source { getConfigFileAsBufferedReader(path) }
+    return buildYamlLoader()
+        .source { getConfigFile(path).bufferedReader() }
         .defaultOptions { options -> options.serializers { it.builder() } }
 }
 
 /**
- * The same as [buildYamlConfigurationLoader] but you don't need to call
+ * The same as [buildYamlLoader] but you don't need to call
  * `build()` on this.
  */
-fun Scope.createYamlConfigurationLoader(
+fun Scope.createYamlLoader(
     path: String,
     builder: TypeSerializerCollection.Builder.() -> Unit = { },
 ): YamlConfigurationLoader {
-    return buildYamlConfigurationLoader(path, builder).build()
+    return buildYamlLoader(path, builder).build()
 }
 
 /**
@@ -53,22 +48,22 @@ fun Scope.createYamlConfigurationLoader(
  * @param builder the function to modify the type serializer collection
  * @return a builder with basic configuration populated
  */
-fun Scope.buildGsonConfigurationLoader(
+fun Scope.buildGsonLoader(
     path: String,
     builder: TypeSerializerCollection.Builder.() -> Unit = { },
 ): GsonConfigurationLoader.Builder {
     return GsonConfigurationLoader.builder()
-        .source { getConfigFileAsBufferedReader(path) }
+        .source { getConfigFile(path).bufferedReader() }
         .defaultOptions { options -> options.serializers { it.builder() } }
 }
 
 /**
- * The same as [buildGsonConfigurationLoader] but you don't need to call
+ * The same as [buildGsonLoader] but you don't need to call
  * `build()` on this.
  */
-fun Scope.createGsonConfigurationLoader(
+fun Scope.createGsonLoader(
     path: String,
     builder: TypeSerializerCollection.Builder.() -> Unit = { },
 ): GsonConfigurationLoader {
-    return buildGsonConfigurationLoader(path, builder).build()
+    return buildGsonLoader(path, builder).build()
 }

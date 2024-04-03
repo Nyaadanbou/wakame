@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.schema.cell
 
 import cc.mewcraft.wakame.random.Group
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 
 object SchemaCellFactory {
@@ -49,8 +49,8 @@ object SchemaCellFactory {
         val reforgeable = cellNode.node("can_reforge").boolean
         val overridable = cellNode.node("can_override").boolean
 
-        val coreGroup = coreNode?.requireKt<SchemaCoreGroup>() ?: Group.empty()
-        val curseGroup = curseNode?.requireKt<SchemaCurseGroup>() ?: Group.empty()
+        val coreGroup = coreNode?.krequire<SchemaCoreGroup>() ?: Group.empty()
+        val curseGroup = curseNode?.krequire<SchemaCurseGroup>() ?: Group.empty()
 
         return ImmutableSchemaCell(
             keepEmpty = keepEmpty,

@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -33,7 +33,7 @@ object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, B
 
         val root = get<NekoConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)).load()
         root.node("elements").childrenMap().forEach { (_, n) ->
-            val element = n.requireKt<Element>()
+            val element = n.krequire<Element>()
             // register element
             INSTANCES.register(element.uniqueId, element)
             // register element bi lookup

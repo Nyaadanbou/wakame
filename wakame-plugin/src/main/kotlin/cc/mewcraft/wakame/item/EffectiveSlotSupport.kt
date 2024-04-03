@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.EnumLookup
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.spongepowered.configurate.ConfigurationNode
@@ -97,7 +97,7 @@ data object EffectiveSlotSerializer : SchemaSerializer<EffectiveSlot> {
     }
 
     override fun deserialize(type: Type, node: ConfigurationNode): EffectiveSlot {
-        val rawString = node.requireKt<String>()
+        val rawString = node.krequire<String>()
 
         // check VanillaEffectiveSlot
         val lookupResult = EnumLookup.lookup<VanillaEffectiveSlot>(rawString)

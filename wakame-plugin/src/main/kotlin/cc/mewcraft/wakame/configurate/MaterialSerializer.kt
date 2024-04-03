@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.configurate
 
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.bukkit.Material
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
@@ -15,7 +15,7 @@ internal object MaterialSerializer : SchemaSerializer<Material> {
     }
 
     override fun deserialize(type: Type, node: ConfigurationNode): Material {
-        val name = node.requireKt<String>()
+        val name = node.krequire<String>()
         val material = Material.matchMaterial(name) ?: throw SerializationException(node.path(), javaTypeOf<Material>(), "Can't parse material '$name'")
         return material
     }

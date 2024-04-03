@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.schema.filter.CurseContextHolder
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
@@ -15,7 +15,7 @@ import org.spongepowered.configurate.ConfigurationNode
  */
 internal data object SchemaCurseGroupSerializer : AbstractGroupSerializer<SchemaCurse, SchemaGenerationContext>() {
     override fun poolFactory(node: ConfigurationNode): SchemaCursePool {
-        return node.requireKt<SchemaCursePool>()
+        return node.krequire<SchemaCursePool>()
     }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemaGenerationContext> {

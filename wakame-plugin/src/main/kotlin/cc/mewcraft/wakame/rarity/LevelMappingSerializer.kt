@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.rarity
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.RangeParser
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.ImmutableRangeMap
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -34,7 +34,7 @@ internal class LevelMappingSerializer : SchemaSerializer<LevelMappings> {
     override fun deserialize(type: Type, node: ConfigurationNode): LevelMappings {
         val rangeMapBuilder = ImmutableRangeMap.builder<Int, LevelMapping>()
         node.childrenMap().forEach { (_, n1) ->
-            val levelNode = n1.node("level").requireKt<String>()
+            val levelNode = n1.node("level").krequire<String>()
             val weightNode = n1.node("weight").takeIf { it.isMap }
                 ?: throw SerializationException("`weight` node must be a map")
 
@@ -43,7 +43,7 @@ internal class LevelMappingSerializer : SchemaSerializer<LevelMappings> {
             val levelMapping = LevelMapping.build {
                 weightNode.childrenMap().forEach { (k, n2) ->
                     val rarityName = k.toString()
-                    val rarityWeight = n2.requireKt<Double>()
+                    val rarityWeight = n2.krequire<Double>()
                     weight[RarityRegistry.INSTANCES[rarityName]] = rarityWeight
                 }
             }

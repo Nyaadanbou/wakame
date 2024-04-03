@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.schema.cell.core
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -25,7 +25,7 @@ object SchemaCoreFactory {
      * 最后通过 Namespace + Value 我们可以唯一确定用什么实现来反序列化该 [ConfigurationNode].
      */
     fun schemaOf(node: ConfigurationNode): SchemaCore {
-        val key = node.node("key").requireKt<Key>()
+        val key = node.node("key").krequire<Key>()
         val ret = when (key.namespace()) {
             NekoNamespaces.ABILITY -> {
                 SchemaAbilityCore(key)

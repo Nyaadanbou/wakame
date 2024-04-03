@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -62,7 +62,7 @@ data class KizamiInstance(
  */
 object KizamiInstanceSerializer : SchemaSerializer<KizamiInstance> {
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiInstance {
-        val kizami = node.requireKt<Kizami>()
+        val kizami = node.krequire<Kizami>()
         val effectMap = buildMap {
             // Add entries: <amount> to <effect list>
             node.node("effects")
@@ -72,7 +72,7 @@ object KizamiInstanceSerializer : SchemaSerializer<KizamiInstance> {
                     // add kizami UUID hint
                     childNode.hint(KizamiSerializer.UUID_HINT, kizami.uuid)
                     // add effect mapping
-                    val kizamiEffect = childNode.requireKt<KizamiEffect>()
+                    val kizamiEffect = childNode.krequire<KizamiEffect>()
                     this[amount] = kizamiEffect
                 }
         }

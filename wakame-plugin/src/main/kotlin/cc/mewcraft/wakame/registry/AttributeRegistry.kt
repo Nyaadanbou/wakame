@@ -522,31 +522,31 @@ private fun CompoundShadowTag.putId(id: Key) {
 /* Specialized Configuration Operations */
 
 private fun ConfigurationNode.getBinarySingle(): Double {
-    return node("value").requireKt<Double>()
+    return node("value").krequire<Double>()
 }
 
 private fun ConfigurationNode.getBinaryLower(): Double {
-    return node("lower").requireKt<Double>()
+    return node("lower").krequire<Double>()
 }
 
 private fun ConfigurationNode.getBinaryUpper(): Double {
-    return node("upper").requireKt<Double>()
+    return node("upper").krequire<Double>()
 }
 
 private fun ConfigurationNode.getSchemaSingle(): RandomizedValue {
-    return node("value").requireKt<RandomizedValue>()
+    return node("value").krequire<RandomizedValue>()
 }
 
 private fun ConfigurationNode.getSchemaLower(): RandomizedValue {
-    return node("lower").requireKt<RandomizedValue>()
+    return node("lower").krequire<RandomizedValue>()
 }
 
 private fun ConfigurationNode.getSchemaUpper(): RandomizedValue {
-    return node("upper").requireKt<RandomizedValue>()
+    return node("upper").krequire<RandomizedValue>()
 }
 
 private fun ConfigurationNode.getElement(): Element {
-    return node("element").requireKt<Element>()
+    return node("element").krequire<Element>()
 }
 
 private fun ConfigurationNode.getOperation(): AttributeModifier.Operation {

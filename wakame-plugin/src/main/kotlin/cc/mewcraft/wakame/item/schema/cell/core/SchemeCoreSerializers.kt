@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.item.schema.filter.AttributeFilter
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
@@ -17,7 +17,7 @@ import org.spongepowered.configurate.ConfigurationNode
  */
 internal data object SchemaCoreGroupSerializer : AbstractGroupSerializer<SchemaCore, SchemaGenerationContext>() {
     override fun poolFactory(node: ConfigurationNode): SchemaCorePool {
-        return node.requireKt<SchemaCorePool>()
+        return node.krequire<SchemaCorePool>()
     }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemaGenerationContext> {

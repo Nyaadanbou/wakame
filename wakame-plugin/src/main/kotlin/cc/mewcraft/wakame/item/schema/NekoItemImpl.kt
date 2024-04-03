@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.schema
 
+import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehaviorFactory
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
-import cc.mewcraft.wakame.provider.ConfigProvider
-import cc.mewcraft.wakame.provider.node
 import cc.mewcraft.wakame.registry.BehaviorRegistry
 import com.google.common.collect.ClassToInstanceMap
 import net.kyori.adventure.key.Key

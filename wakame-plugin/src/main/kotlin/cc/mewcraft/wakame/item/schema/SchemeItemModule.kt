@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.item.schema.meta.*
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
-import cc.mewcraft.wakame.util.registerKt
+import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -26,8 +26,8 @@ internal fun schemaItemModule(): Module = module {
     single<TypeSerializerCollection>(named(BASE_SERIALIZERS)) {
         TypeSerializerCollection.builder()
 
-            .registerKt(MaterialSerializer)
-            .registerKt(EffectiveSlotSerializer)
+            .kregister(MaterialSerializer)
+            .kregister(EffectiveSlotSerializer)
 
             .build()
     }
@@ -36,12 +36,12 @@ internal fun schemaItemModule(): Module = module {
         TypeSerializerCollection.builder()
 
             // cores
-            .registerKt(SchemaCorePoolSerializer)
-            .registerKt(SchemaCoreGroupSerializer)
+            .kregister(SchemaCorePoolSerializer)
+            .kregister(SchemaCoreGroupSerializer)
 
             // curses
-            .registerKt(SchemaCursePoolSerializer)
-            .registerKt(SchemaCurseGroupSerializer)
+            .kregister(SchemaCursePoolSerializer)
+            .kregister(SchemaCurseGroupSerializer)
 
             // curse contents
             .registerAll(get<TypeSerializerCollection>(named(REFERENCE_SERIALIZERS)))
@@ -55,19 +55,19 @@ internal fun schemaItemModule(): Module = module {
             .registerAll(get(named(KIZAMI_SERIALIZERS)))
             .registerAll(get(named(RARITY_SERIALIZERS)))
 
-            .registerKt(ElementPoolSerializer)
-            .registerKt(KizamiPoolSerializer)
-            .registerKt(KizamiGroupSerializer)
+            .kregister(ElementPoolSerializer)
+            .kregister(KizamiPoolSerializer)
+            .kregister(KizamiGroupSerializer)
 
-            .registerKt(DisplayLoreMetaSerializer)
-            .registerKt(DisplayNameMetaSerializer)
-            .registerKt(DurabilityMetaSerializer)
-            .registerKt(ElementMetaSerializer)
-            .registerKt(KizamiMetaSerializer)
-            .registerKt(LevelMetaSerializer)
-            .registerKt(RarityMetaSerializer)
-            .registerKt(SkinMetaSerializer)
-            .registerKt(SkinOwnerMetaSerializer)
+            .kregister(DisplayLoreMetaSerializer)
+            .kregister(DisplayNameMetaSerializer)
+            .kregister(DurabilityMetaSerializer)
+            .kregister(ElementMetaSerializer)
+            .kregister(KizamiMetaSerializer)
+            .kregister(LevelMetaSerializer)
+            .kregister(RarityMetaSerializer)
+            .kregister(SkinMetaSerializer)
+            .kregister(SkinOwnerMetaSerializer)
 
             .build()
     }

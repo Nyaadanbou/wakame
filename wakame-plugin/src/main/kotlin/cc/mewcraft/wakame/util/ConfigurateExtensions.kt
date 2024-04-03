@@ -26,7 +26,7 @@ internal typealias NekoConfigurationNode = CommentedConfigurationNode
 /**
  * Apply common settings for the [YamlConfigurationLoader.Builder].
  */
-internal fun YamlConfigurationLoader.Builder.applyCommons(): YamlConfigurationLoader.Builder {
+internal fun YamlConfigurationLoader.Builder.withDefaultSettings(): YamlConfigurationLoader.Builder {
     return this
         // use 2 spaces indent
         .indent(2)
@@ -39,9 +39,9 @@ internal fun YamlConfigurationLoader.Builder.applyCommons(): YamlConfigurationLo
                 .shouldCopyDefaults(false)
                 // add common serializers
                 .serializers {
-                    it.registerKt(KeySerializer)
-                    it.registerKt(IntRangeParser)
-                    it.registerKt(NumericValueSerializer)
+                    it.kregister(KeySerializer)
+                    it.kregister(IntRangeSerializer)
+                    it.kregister(NumericValueSerializer)
                     it.register(ComponentSerializer)
                     it.register(StyleBuilderApplicableSerializer)
                 }
@@ -51,11 +51,11 @@ internal fun YamlConfigurationLoader.Builder.applyCommons(): YamlConfigurationLo
 /**
  * Creates a basic builder of configuration loader.
  */
-internal fun buildYamlConfigurationLoader(
+internal fun buildYamlLoader(
     builder: TypeSerializerCollection.Builder.() -> Unit = { },
 ): YamlConfigurationLoader.Builder {
     return YamlConfigurationLoader.builder()
-        .applyCommons()
+        .withDefaultSettings()
         .defaultOptions { options ->
             options.serializers {
                 it.builder()
@@ -66,21 +66,21 @@ internal fun buildYamlConfigurationLoader(
 /**
  * @see TypeSerializerCollection.Builder.register
  */
-internal inline fun <reified T> TypeSerializerCollection.Builder.registerKt(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder {
-    return register({ javaTypeOf<T>() == it }, serializer)
+internal inline fun <reified T> TypeSerializerCollection.Builder.kregister(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder {
+    return this.register({ javaTypeOf<T>() == it }, serializer)
 }
 
 /**
  * @see ConfigurationNode.require
  */
-internal inline fun <reified T> ConfigurationNode.requireKt(): T {
-    return requireKt(typeOf<T>())
+internal inline fun <reified T> ConfigurationNode.krequire(): T {
+    return this.krequire(typeOf<T>())
 }
 
 /**
  * @see ConfigurationNode.require
  */
-internal fun <T> ConfigurationNode.requireKt(type: KType): T {
+internal fun <T> ConfigurationNode.krequire(type: KType): T {
     val ret = this.get(type.javaType) ?: throw NoSuchElementException(
         "Missing value of type '${type}' at '${path().joinToString(".")}'"
     )
@@ -88,17 +88,17 @@ internal fun <T> ConfigurationNode.requireKt(type: KType): T {
 }
 
 //<editor-fold desc="Basic Serializers">
-internal object KeySerializer : TypeSerializer<Key> {
-    override fun deserialize(type: Type, node: ConfigurationNode): Key = Key(node.requireKt<String>())
-    override fun serialize(type: Type?, obj: Key?, node: ConfigurationNode?): Nothing = throw UnsupportedOperationException()
+internal object KeySerializer : ScalarSerializer<Key>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): Key = Key(obj.toString())
+    override fun serialize(item: Key, typeSupported: Predicate<Class<*>>?): Any = item.toString()
 }
 
-internal object IntRangeParser : TypeSerializer<Range<Int>> {
-    override fun deserialize(type: Type, node: ConfigurationNode): Range<Int> = RangeParser.parseIntRange(node.requireKt<String>())
-    override fun serialize(type: Type, obj: Range<Int>?, node: ConfigurationNode): Nothing = throw UnsupportedOperationException()
+internal object IntRangeSerializer : ScalarSerializer<Range<Int>>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): Range<Int> = RangeParser.parseIntRange(obj.toString())
+    override fun serialize(item: Range<Int>?, typeSupported: Predicate<Class<*>>?): Any = throw UnsupportedOperationException()
 }
 
-internal object ComponentSerializer : ScalarSerializer<Component>(Component::class.java) {
+internal object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
         val message = obj.toString().replace("§", "")
         return GlobalContext.get().get<MiniMessage>().deserialize(message)
@@ -109,24 +109,19 @@ internal object ComponentSerializer : ScalarSerializer<Component>(Component::cla
     }
 }
 
-internal object StyleBuilderApplicableSerializer :
-    ScalarSerializer<Array<StyleBuilderApplicable>>(typeTokenOf<Array<StyleBuilderApplicable>>()) {
+internal object StyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleBuilderApplicable>>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Array<StyleBuilderApplicable> {
         val component = ComponentSerializer.deserialize(type, obj)
         val styleList = ArrayList<StyleBuilderApplicable>()
 
         with(component) {
             // font()?.let { font -> styleList += StyleBuilderApplicable { it.font(font) } }
-
             color()?.let { styleList += it }
-
             TextDecoration.entries
                 .filter { decoration(it) == TextDecoration.State.TRUE }
                 .map { it.withState(decoration(it)) }
                 .forEach { styleList += it }
-
             // clickEvent()?.let { styleList += it }
-
             // hoverEvent()?.let { styleList += it }
         }
 

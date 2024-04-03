@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.schema
 
+import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.cell.SchemaCellFactory
 import cc.mewcraft.wakame.item.schema.meta.*
-import cc.mewcraft.wakame.provider.NodeConfigProvider
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.ImmutableClassToInstanceMap
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -27,9 +27,9 @@ object NekoItemFactory {
         val provider = NodeConfigProvider(root, relPath.toString())
 
         // Deserialize basic data
-        val uuid = root.node("uuid").requireKt<UUID>()
-        val material = root.node("material").requireKt<Key>()
-        val effectiveSlot = root.node("effective_slot").requireKt<EffectiveSlot>()
+        val uuid = root.node("uuid").krequire<UUID>()
+        val material = root.node("material").krequire<Key>()
+        val effectiveSlot = root.node("effective_slot").krequire<EffectiveSlot>()
 
         // Deserialize item behaviors
         val behaviors: List<String> = root.node("behaviors").childrenMap().mapNotNull { (key, _) -> key?.toString() }
@@ -69,7 +69,7 @@ object NekoItemFactory {
 
             // Construct schema cells
             root.node("cells").childrenList().forEach { childNode ->
-                val id = childNode.node("id").requireKt<String>()
+                val id = childNode.node("id").krequire<String>()
                 val cell = run {
                     val coreNode = constructNode("core", childNode)
                     val curseNode = constructNode("curse", childNode)
@@ -93,6 +93,6 @@ private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.B
 private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemaItemMeta<*>>.deserializeMeta(
     node: ConfigurationNode, vararg path: String,
 ) {
-    val schemaItemMeta = node.node(*path).requireKt<T>()
+    val schemaItemMeta = node.node(*path).krequire<T>()
     this.put(T::class.java, schemaItemMeta)
 }

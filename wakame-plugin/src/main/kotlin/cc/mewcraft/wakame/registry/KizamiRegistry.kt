@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.KizamiEffect
 import cc.mewcraft.wakame.kizami.KizamiInstance
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -38,7 +38,7 @@ object KizamiRegistry : KoinComponent, Initializable, BiKnot<String, Kizami, Byt
 
         val root = get<NekoConfigurationLoader>(named(KIZAMI_CONFIG_LOADER)).load()
         root.node("kizami").childrenMap().forEach { (_, childNode) ->
-            val kizamiInstance = childNode.requireKt<KizamiInstance>()
+            val kizamiInstance = childNode.krequire<KizamiInstance>()
             val kizami = kizamiInstance.kizami
 
             // register kizami

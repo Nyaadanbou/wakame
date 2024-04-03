@@ -16,8 +16,8 @@ import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.test.TestListener
 import cc.mewcraft.wakame.user.PaperUserManager
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.registerEvents
-import cc.mewcraft.wakame.util.requireKt
 import cc.mewcraft.wakame.util.unregisterEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.CoroutineName
@@ -124,7 +124,7 @@ object Initializer : KoinComponent, Listener {
     private fun loadPrimaryConfiguration() {
         CONFIG = get(named(MAIN_CONFIG_NODE))
 
-        isDebug = CONFIG.node("debug").requireKt<Boolean>()
+        isDebug = CONFIG.node("debug").krequire<Boolean>()
     }
 
     private fun registerListeners() = with(PLUGIN) {

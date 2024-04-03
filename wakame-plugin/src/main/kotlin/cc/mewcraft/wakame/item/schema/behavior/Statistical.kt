@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.schema.behavior
 
+import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.schema.NekoItem
-import cc.mewcraft.wakame.provider.ConfigProvider
 import cc.mewcraft.wakame.registry.ElementRegistry
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity

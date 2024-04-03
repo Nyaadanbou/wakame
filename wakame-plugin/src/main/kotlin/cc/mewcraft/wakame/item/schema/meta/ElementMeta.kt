@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.random.Pool
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -37,7 +37,7 @@ internal data object ElementMetaSerializer : SchemaItemMetaSerializer<SElementMe
     override val defaultValue: SElementMeta = DefaultElementMeta
 
     override fun deserialize(type: Type, node: ConfigurationNode): SElementMeta {
-        return NonNullElementMeta(node.requireKt<ElementPool>())
+        return NonNullElementMeta(node.krequire<ElementPool>())
     }
 }
 
@@ -61,7 +61,7 @@ internal data object ElementMetaSerializer : SchemaItemMetaSerializer<SElementMe
  */
 internal data object ElementPoolSerializer : AbstractPoolSerializer<Element, SchemaGenerationContext>() {
     override fun contentFactory(node: ConfigurationNode): Element {
-        return node.node("value").requireKt<Element>()
+        return node.node("value").krequire<Element>()
     }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemaGenerationContext> {

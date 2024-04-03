@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.random.Group
 import cc.mewcraft.wakame.random.Pool
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -44,7 +44,7 @@ private data object DefaultKizamiMeta : SKizamiMeta {
 internal data object KizamiMetaSerializer : SchemaItemMetaSerializer<SKizamiMeta> {
     override val defaultValue: SKizamiMeta = DefaultKizamiMeta
     override fun deserialize(type: Type, node: ConfigurationNode): SKizamiMeta {
-        return NonNullKizamiMeta(node.requireKt<KizamiGroup>())
+        return NonNullKizamiMeta(node.krequire<KizamiGroup>())
     }
 }
 
@@ -53,7 +53,7 @@ internal data object KizamiMetaSerializer : SchemaItemMetaSerializer<SKizamiMeta
  */
 internal data object KizamiGroupSerializer : AbstractGroupSerializer<Kizami, SchemaGenerationContext>() {
     override fun poolFactory(node: ConfigurationNode): Pool<Kizami, SchemaGenerationContext> {
-        return node.requireKt<KizamiPool>()
+        return node.krequire<KizamiPool>()
     }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemaGenerationContext> {
@@ -83,7 +83,7 @@ internal data object KizamiGroupSerializer : AbstractGroupSerializer<Kizami, Sch
  */
 internal data object KizamiPoolSerializer : AbstractPoolSerializer<Kizami, SchemaGenerationContext>() {
     override fun contentFactory(node: ConfigurationNode): Kizami {
-        return node.node("value").requireKt<Kizami>()
+        return node.node("value").krequire<Kizami>()
     }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemaGenerationContext> {

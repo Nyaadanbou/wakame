@@ -3,12 +3,12 @@ package cc.mewcraft.wakame.item.schema.behavior
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.commons.provider.immutable.orElse
+import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
 import cc.mewcraft.wakame.item.schema.NekoItem
-import cc.mewcraft.wakame.provider.ConfigProvider
-import cc.mewcraft.wakame.provider.optionalEntry
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player

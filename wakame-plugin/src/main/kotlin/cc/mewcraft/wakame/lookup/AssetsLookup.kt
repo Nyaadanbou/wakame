@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.registry.NekoItemRegistry
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.Multimap
 import com.google.common.collect.MultimapBuilder
 import net.kyori.adventure.key.Key
@@ -41,12 +41,12 @@ object AssetsLookup : Initializable, KoinComponent {
         NekoItemNodeIterator.forEach { key, _, root ->
             val assetsNodes = root.node("assets").childrenList()
             for (assetsNode in assetsNodes) {
-                val sid = assetsNode.node("variant").requireKt<Int>()
+                val sid = assetsNode.node("variant").krequire<Int>()
                 val pathNode = assetsNode.node("path")
                 val path = if (pathNode.rawScalar() != null) {
-                    listOf(pathNode.requireKt<String>())
+                    listOf(pathNode.krequire<String>())
                 } else {
-                    pathNode.requireKt<List<String>>()
+                    pathNode.krequire<List<String>>()
                 }
                 assets.put(key, ItemAssets(key, sid, path))
             }

@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
-import cc.mewcraft.wakame.util.buildYamlConfigurationLoader
-import cc.mewcraft.wakame.util.createYamlConfigurationLoader
+import cc.mewcraft.wakame.util.buildYamlLoader
+import cc.mewcraft.wakame.util.createYamlLoader
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -71,31 +71,31 @@ internal fun registryModule(): Module = module {
 
     //<editor-fold desc="Definitions of YamlConfigurationLoader">
     single<YamlConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)) {
-        createYamlConfigurationLoader(ELEMENT_CONFIG_FILE) {
+        createYamlLoader(ELEMENT_CONFIG_FILE) {
             registerAll(get(named(ELEMENT_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader>(named(ENTITY_CONFIG_LOADER)) {
-        createYamlConfigurationLoader(ENTITY_CONFIG_FILE) {
+        createYamlLoader(ENTITY_CONFIG_FILE) {
             registerAll(get(named(REFERENCE_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader>(named(SKIN_CONFIG_LOADER)) {
-        createYamlConfigurationLoader(SKIN_CONFIG_FILE) {
+        createYamlLoader(SKIN_CONFIG_FILE) {
             registerAll(get(named(SKIN_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader>(named(KIZAMI_CONFIG_LOADER)) {
-        createYamlConfigurationLoader(KIZAMI_CONFIG_FILE) {
+        createYamlLoader(KIZAMI_CONFIG_FILE) {
             registerAll(get(named(KIZAMI_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER)) {
-        buildYamlConfigurationLoader {
+        buildYamlLoader {
             registerAll(get<TypeSerializerCollection>(named(BASE_SERIALIZERS)))
             registerAll(get<TypeSerializerCollection>(named(CELL_SERIALIZERS)))
             registerAll(get<TypeSerializerCollection>(named(META_SERIALIZERS)))
@@ -103,13 +103,13 @@ internal fun registryModule(): Module = module {
     }
 
     single<YamlConfigurationLoader>(named(RARITY_CONFIG_LOADER)) {
-        createYamlConfigurationLoader(RARITY_CONFIG_FILE) {
+        createYamlLoader(RARITY_CONFIG_FILE) {
             registerAll(get(named(RARITY_SERIALIZERS)))
         }
     }
 
     single<YamlConfigurationLoader>(named(LEVEL_CONFIG_LOADER)) {
-        createYamlConfigurationLoader(LEVEL_CONFIG_FILE) {
+        createYamlLoader(LEVEL_CONFIG_FILE) {
             registerAll(get(named(RARITY_SERIALIZERS)))
         }
     }

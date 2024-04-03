@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.schema.behavior
 
+import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.player.equipment.ArmorEquipEvent
-import cc.mewcraft.wakame.provider.ConfigProvider
 import cc.mewcraft.wakame.world.block.event.BlockBreakActionEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity

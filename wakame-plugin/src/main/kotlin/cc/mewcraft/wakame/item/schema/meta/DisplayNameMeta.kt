@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.schema.meta
 
 import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
-import cc.mewcraft.wakame.util.requireKt
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -32,6 +32,6 @@ private data object DefaultDisplayNameMeta : SDisplayNameMeta {
 internal data object DisplayNameMetaSerializer : SchemaItemMetaSerializer<SDisplayNameMeta> {
     override val defaultValue: SDisplayNameMeta = DefaultDisplayNameMeta
     override fun deserialize(type: Type, node: ConfigurationNode): SDisplayNameMeta {
-        return NonNullDisplayNameMeta(node.requireKt<String>())
+        return NonNullDisplayNameMeta(node.krequire<String>())
     }
 }
