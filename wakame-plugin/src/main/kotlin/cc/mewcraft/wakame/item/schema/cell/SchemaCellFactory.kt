@@ -40,6 +40,7 @@ object SchemaCellFactory {
      * @return a new [SchemaCell]
      */
     fun schemaOf(
+        id: String,
         cellNode: ConfigurationNode,
         coreNode: ConfigurationNode?,
         curseNode: ConfigurationNode?,
@@ -53,6 +54,7 @@ object SchemaCellFactory {
         val curseGroup = curseNode?.krequire<SchemaCurseGroup>() ?: Group.empty()
 
         return ImmutableSchemaCell(
+            id = id,
             keepEmpty = keepEmpty,
             canReforge = reforgeable,
             canOverride = overridable,

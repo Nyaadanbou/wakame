@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.random.Group
  * 空的蓝图词条栏。
  */
 data object EmptySchemaCell : SchemaCell {
+    override val id: String = "empty"
     override val canReforge: Boolean = false
     override val canOverride: Boolean = false
     override val keepEmpty: Boolean = false
@@ -20,6 +21,7 @@ data object EmptySchemaCell : SchemaCell {
  * 不可变的蓝图词条栏。
  */
 data class ImmutableSchemaCell(
+    override val id: String,
     override val keepEmpty: Boolean,
     override val canReforge: Boolean,
     override val canOverride: Boolean,

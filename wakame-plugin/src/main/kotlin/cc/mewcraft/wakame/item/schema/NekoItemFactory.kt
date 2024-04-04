@@ -73,7 +73,7 @@ object NekoItemFactory {
                 val cell = run {
                     val coreNode = constructNode("core", childNode)
                     val curseNode = constructNode("curse", childNode)
-                    SchemaCellFactory.schemaOf(childNode, coreNode, curseNode)
+                    SchemaCellFactory.schemaOf(id, childNode, coreNode, curseNode)
                 }
 
                 this += id to cell // add it to the result map

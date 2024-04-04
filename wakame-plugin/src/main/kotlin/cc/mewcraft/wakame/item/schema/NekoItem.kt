@@ -7,9 +7,10 @@ import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
-import com.google.common.collect.ClassToInstanceMap
 import net.kyori.adventure.key.Key
 import java.util.UUID
+import kotlin.reflect.KClass
+import kotlin.reflect.full.isSuperclassOf
 
 /**
  * Represents an **item template**, or a "blueprint" in other words.
@@ -28,16 +29,16 @@ import java.util.UUID
  */
 interface NekoItem : Keyed {
     /**
-     * The UUID of this item.
-     */
-    val uuid: UUID
-
-    /**
      * The [key][Key] of this item, where:
      * - [namespace][Key.namespace] is the name of the directory which contains the config file
      * - [value][Key.value] is the name of the config file itself (without the file extension)
      */
     override val key: Key
+
+    /**
+     * The UUID of this item.
+     */
+    val uuid: UUID
 
     /**
      * The [config provider][ConfigProvider] of this item.
@@ -55,32 +56,63 @@ interface NekoItem : Keyed {
     val effectiveSlot: EffectiveSlot
 
     /**
-     * The map holds all the "standalone" schema item meta of this item.
-     *
-     * Note that the schema item metas bound with [behaviors] are not accessible
-     * through this property. To get access to them, check the [ItemBehavior].
-     *
-     * @see meta
+     * The set holds all the schema item meta of this item.
      */
-    val meta: ClassToInstanceMap<SchemaItemMeta<*>> // TODO use normal Map in interface (impl leaves intact)
+    val meta: Set<SchemaItemMeta<*>>
 
     /**
-     * The map holds all the schema cells about this item, where `map key` is
-     * cell ID and `map value` is [SchemaCell].
+     * Gets specific schema item meta by class.
      *
-     * The underlying map is actually an ordered map, and the iteration order
-     * is always the same as the insertion order.
+     * It should be noted that this function will always return a non-null
+     * schema item meta, no matter whether the schema item meta will generate
+     * a data or not. To check the generation result without passing a context,
+     * use [SchemaItemMeta.isEmpty].
+     *
+     * @param T the type of schema item meta
+     * @param metaClass the class of schema item meta
+     * @return the specific schema item meta
      */
-    val cell: Map<String, SchemaCell>
+    fun <T : SchemaItemMeta<*>> getMeta(metaClass: KClass<T>): T
 
     /**
-     * The list of behaviors of `this` item.
+     * The set holds all the schema cells of this item.
+     */
+    val cell: Set<SchemaCell>
+
+    /**
+     * Gets specific schema cell by unique identifier.
      *
-     * The behaviors may have any number of self-contained schema item metas that only makes sense
-     * when presented together with certain behaviors. These schema item metas are not accessible
-     * through the [meta] property.
+     * @param id the unique identifier of schema cell
+     * @return the schema cell
+     */
+    fun getCell(id: String): SchemaCell?
+
+    /**
+     * The list of behaviors of this item.
      */
     val behaviors: List<ItemBehavior>
+
+    /**
+     * Checks whether this [NekoItem] has an [ItemBehavior] of the specified class [behaviorClass], or a subclass of it.
+     */
+    fun <T : ItemBehavior> hasBehavior(behaviorClass: KClass<T>): Boolean {
+        return behaviors.any { behaviorClass.isSuperclassOf(it::class) }
+    }
+
+    /**
+     * Gets the first [ItemBehavior] that is an instance of [behaviorClass], or null if there is none.
+     */
+    fun <T : ItemBehavior> getBehaviorOrNull(behaviorClass: KClass<T>): T? {
+        @Suppress("UNCHECKED_CAST")
+        return behaviors.firstOrNull { behaviorClass.isSuperclassOf(it::class) } as T?
+    }
+
+    /**
+     * Gets the first [ItemBehavior] that is an instance of [behaviorClass], or throws an [IllegalStateException] if there is none.
+     */
+    fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
+        return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
+    }
 }
 
 /**
@@ -89,14 +121,36 @@ interface NekoItem : Keyed {
  * This function allows you to quickly get specified [SchemaItemMeta] by
  * corresponding class reference. You can use this function as the
  * following:
+ *
  * ```kotlin
- * val item: NekoItem = < ...... >
- * val meta: ElementMeta = item.getItemMetaBy<ElementMeta>()
+ * val item: NekoItem = (get the item from somewhere)
+ * val meta: ElementMeta = item.getMeta<ElementMeta>()
  * ```
  *
  * @param M the subclass of [SchemaItemMeta]
  * @return the instance of class [M] from this [NekoItem]
  */
-inline fun <reified M : SchemaItemMeta<*>> NekoItem.meta(): M {
-    return requireNotNull(meta.getInstance(M::class.java)) { "Can't find item meta '${M::class.simpleName}'. Incomplete implementation?" }
+inline fun <reified M : SchemaItemMeta<*>> NekoItem.getMeta(): M {
+    return getMeta(M::class)
+}
+
+/**
+ * Checks whether this [NekoItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
+ */
+inline fun <reified T : ItemBehavior> NekoItem.hasBehavior(): Boolean {
+    return hasBehavior(T::class)
+}
+
+/**
+ * Gets the first [ItemBehavior] that is an instance of [T], or null if there is none.
+ */
+inline fun <reified T : ItemBehavior> NekoItem.getBehaviorOrNull(): T? {
+    return getBehaviorOrNull(T::class)
+}
+
+/**
+ * Gets the first [ItemBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
+ */
+inline fun <reified T : ItemBehavior> NekoItem.getBehavior(): T {
+    return getBehavior(T::class)
 }

@@ -105,10 +105,10 @@ class ItemDeserializationTest : KoinTest {
             generateAndSet<SSkinMeta, ItemSkin>(demo, context)
             generateAndSet<SSkinOwnerMeta, UUID>(demo, context)
 
-            demo.cell.forEach { (id, schema) ->
-                val binary = BinaryCellFactory.generate(context, schema)
-                if (binary != null) {
-                    logger.debug("write cell '{}': {}", id, binary)
+            demo.cell.forEach { schemaCell ->
+                val binaryCell = BinaryCellFactory.generate(context, schemaCell)
+                if (binaryCell != null) {
+                    logger.debug("write cell '{}': {}", binaryCell.id, binaryCell)
                 }
             }
 
@@ -127,7 +127,7 @@ class ItemDeserializationTest : KoinTest {
         item: NekoItem,
         context: SchemaGenerationContext,
     ) {
-        val meta = item.meta<S>()
+        val meta = item.getMeta<S>()
         val value = meta.generate(context)
         if (value is GenerationResult.Thing) {
             logger.debug("write meta '{}': {}", S::class.simpleName, value.toString())

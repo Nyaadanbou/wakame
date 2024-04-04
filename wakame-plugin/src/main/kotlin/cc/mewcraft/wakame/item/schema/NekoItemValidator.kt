@@ -1,50 +1,65 @@
 package cc.mewcraft.wakame.item.schema
 
+import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import kotlin.reflect.KClass
 
+/**
+ * Verifies the correctness of NekoItem configuration.
+ */
 sealed class NekoItemValidator {
+    data class Args(val item: NekoItem)
+
     companion object {
-        fun chain(vararg initializers: NekoItemValidator): NekoItemValidator {
-            initializers.reduce { acc, initializer ->
-                initializer.also { acc.next = it }
+        /**
+         * Chains the given validators, in order.
+         *
+         * @param validators the validators to be chained
+         * @return the head of the validator
+         */
+        fun chain(vararg validators: NekoItemValidator): NekoItemValidator {
+            validators.reduce { acc, validator ->
+                validator.also { acc.next = it }
             }
-            return initializers.first()
+            return validators.first()
         }
     }
 
-    protected abstract val item: NekoItem
+    abstract fun validate(args: Args)
 
     protected var next: NekoItemValidator? = null
-
-    abstract fun init(): Result<Unit>
-
-    protected fun initNext(): Result<Unit> {
-        return next?.init() ?: Result.success(Unit)
+    protected fun validateNext(args: Args) {
+        next?.validate(args)
     }
 }
 
 /**
  * Validate the required data by behaviors
  */
-class BehaviorValidator(
-    override val item: NekoItem,
-) : NekoItemValidator() {
-    override fun init(): Result<Unit> {
-        val itemMetaMap = item.meta
-        val missingMetaTypes = mutableListOf<KClass<out SchemaItemMeta<*>>>()
+class BehaviorValidator : NekoItemValidator() {
+    override fun validate(args: Args) {
+        val item = args.item
+
+        // Creates a map recording the missing meta types.
+        // If it's empty in the end, then nothing is missing.
+        val missingMetaTypes = mutableMapOf<KClass<out ItemBehavior>, MutableList<KClass<out SchemaItemMeta<*>>>>()
+
         for (behavior in item.behaviors) {
-            val requiredMetaTypes = behavior.requiredMetaTypes
-            val missingMetaTypes = requiredMetaTypes.filter { itemMetaMap[it.java]?.isEmpty == true }
-            if (missingMetaTypes.isNotEmpty()) {
-                "The behavior ${behavior::class.qualifiedName} requires the meta"
-                return Result.failure(
-                    IllegalArgumentException(
-                        "Can't find metas ${requiredMetaTypes.map { it.simpleName }} being required by the behavior ${behavior::class.qualifiedName} in the item ${item.key}"
-                    )
-                )
-            }
+            behavior.requiredMetaTypes
+                .filter { metaClass -> item.getMeta(metaClass).isEmpty }
+                .forEach { metaClass -> missingMetaTypes.getOrPut(behavior::class) { mutableListOf() } += metaClass }
         }
-        return initNext()
+
+        if (missingMetaTypes.isNotEmpty()) {
+            val exceptionMessage = buildString {
+                missingMetaTypes.forEach { (k, v) ->
+                    append("The behavior '${k.simpleName}' requires the schema meta '${v.joinToString(", ", transform = { it.simpleName!! })}' but it does present in the config")
+                    append("\n")
+                }
+            }
+            throw IllegalArgumentException(exceptionMessage)
+        }
+
+        return validateNext(args)
     }
 }

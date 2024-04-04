@@ -38,7 +38,7 @@ internal value class ItemCellAccessorImpl(
 
     override fun find(id: String): BinaryCell? {
         val compoundTag = rootOrNull?.getCompoundOrNull(id) ?: return null
-        return BinaryCellFactory.decode(compoundTag)
+        return BinaryCellFactory.decode(id, compoundTag)
     }
 
     override fun getAttributeModifiers(): Multimap<Attribute, AttributeModifier> {

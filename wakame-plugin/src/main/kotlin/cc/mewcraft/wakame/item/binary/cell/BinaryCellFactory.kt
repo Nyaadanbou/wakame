@@ -15,7 +15,7 @@ object BinaryCellFactory {
     /**
      * Creates a [BinaryCell] from a NBT source.
      *
-     * The [compoundTag] structure is like this:
+     * The [compound] structure is like this:
      * ```
      * Compound('...')
      *   Boolean('can_reforge'): true
@@ -35,16 +35,18 @@ object BinaryCellFactory {
      *     Short('count'): 18s
      * ```
      *
-     * @param compoundTag the tag
+     * @param id the ID of the cell
+     * @param compound the compound tag containing the cell
      * @return a new [BinaryCell]
      */
-    fun decode(compoundTag: CompoundShadowTag): BinaryCell {
+    fun decode(id: String, compound: CompoundShadowTag): BinaryCell {
         return ImmutableBinaryCell(
-            canReforge = compoundTag.getBoolean(NekoTags.Cell.CAN_REFORGE),
-            canOverride = compoundTag.getBoolean(NekoTags.Cell.CAN_OVERRIDE),
-            binaryCore = BinaryCoreFactory.decode(compoundTag.getCompound(NekoTags.Cell.CORE)),
-            binaryCurse = BinaryCurseFactory.decode(compoundTag.getCompound(NekoTags.Cell.CURSE)),
-            reforgeMeta = ReforgeMetaFactory.decode(compoundTag.getCompound(NekoTags.Cell.REFORGE))
+            id = id,
+            canReforge = compound.getBoolean(NekoTags.Cell.CAN_REFORGE),
+            canOverride = compound.getBoolean(NekoTags.Cell.CAN_OVERRIDE),
+            binaryCore = BinaryCoreFactory.decode(compound.getCompound(NekoTags.Cell.CORE)),
+            binaryCurse = BinaryCurseFactory.decode(compound.getCompound(NekoTags.Cell.CURSE)),
+            reforgeMeta = ReforgeMetaFactory.decode(compound.getCompound(NekoTags.Cell.REFORGE))
         )
     }
 
@@ -90,6 +92,7 @@ object BinaryCellFactory {
 
         // collect all and return
         return ImmutableBinaryCell(
+            id = schemaCell.id,
             canReforge = schemaCell.canReforge,
             canOverride = schemaCell.canOverride,
             binaryCore = binaryCore,

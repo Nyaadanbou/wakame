@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.registry.BehaviorRegistry
 import com.google.common.collect.ClassToInstanceMap
 import net.kyori.adventure.key.Key
 import java.util.UUID
+import kotlin.reflect.KClass
 
 internal data class NekoItemImpl(
     override val key: Key,
@@ -18,10 +19,12 @@ internal data class NekoItemImpl(
     override val config: ConfigProvider,
     override val material: Key,
     override val effectiveSlot: EffectiveSlot,
-    override val meta: ClassToInstanceMap<SchemaItemMeta<*>>,
-    override val cell: Map<String, SchemaCell>,
+    private val metaMap: ClassToInstanceMap<SchemaItemMeta<*>>,
+    private val cellMap: Map<String, SchemaCell>,
     private val behaviorHolders: List<String>,
 ) : NekoItem {
+    override val meta: Set<SchemaItemMeta<*>> = metaMap.values.toSet()
+    override val cell: Set<SchemaCell> = cellMap.values.toSet()
     override val behaviors: List<ItemBehavior> = behaviorHolders
         .map { BehaviorRegistry.INSTANCES[it] to it }
         .map { (behavior, behaviorName) ->
@@ -31,9 +34,17 @@ internal data class NekoItemImpl(
             }
         }
 
+    override fun <T : SchemaItemMeta<*>> getMeta(metaClass: KClass<T>): T {
+        return requireNotNull(metaMap.getInstance(metaClass.java)) { "Can't find schema item meta '$metaClass' for item '$key'" }
+    }
+
+    override fun getCell(id: String): SchemaCell? {
+        return cellMap[id]
+    }
+
     init {
         NekoItemValidator.chain(
-            BehaviorValidator(this)
-        ).init().getOrThrow()
+            BehaviorValidator(),
+        ).validate(NekoItemValidator.Args(this))
     }
 }

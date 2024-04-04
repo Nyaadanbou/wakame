@@ -10,6 +10,7 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 
 data class ImmutableBinaryCell(
+    override val id: String,
     override val canReforge: Boolean,
     override val canOverride: Boolean,
     override val binaryCore: BinaryCore,

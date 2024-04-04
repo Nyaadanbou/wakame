@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.item.schema.cell
 
 import cc.mewcraft.wakame.item.Cell
 import cc.mewcraft.wakame.item.binary.cell.BinaryCell
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
-import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
 import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCurse
@@ -27,12 +25,16 @@ typealias SchemaCurseGroup = Group<SchemaCurse, SchemaGenerationContext>
  *
  * ## Variant data
  *
- * Variant data are intended to be randomized. That is, you should generate
- * a random [core][BinaryCore] and a random [curse][BinaryCurse], using
- * [coreSelector] and [curseSelector] respectively. Then, you use the
- * randomly generated data to create a [binary cell][BinaryCell].
+ * Variant data are intended to be randomized in a [binary cell][BinaryCell].
  */
 interface SchemaCell : Cell {
+    /**
+     * The ID of this cell.
+     *
+     * No cells with identical ID on a single item.
+     */
+    val id: String
+
     /**
      * Returns `true` if the cell is configured as "reforgeable".
      */

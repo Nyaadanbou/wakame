@@ -66,16 +66,16 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         // write cells
         with(nekoStack.cell) {
 
-            nekoItem.cell.forEach { (id, schema) ->
+            nekoItem.cell.forEach { schemaCell ->
                 // the order of cell population should be the same as
                 // that they are declared in the configuration list
 
-                val cell = BinaryCellFactory.generate(context, schema)
-                if (cell != null) {
+                val binaryCell = BinaryCellFactory.generate(context, schemaCell)
+                if (binaryCell != null) {
                     // if the binary cell is non-null, it's either:
                     // 1) a cell with some content, or
                     // 2) a cell with no content + keepEmpty is true
-                    put(id, cell)
+                    put(binaryCell.id, binaryCell)
                 }
                 // if it's null, simply don't put the cell
             }
@@ -100,7 +100,7 @@ private inline fun <V, reified S : SchemaItemMeta<V>, reified B : BinaryItemMeta
     item: NekoItem,
     context: SchemaGenerationContext,
 ) {
-    val meta = item.meta<S>()
+    val meta = item.getMeta<S>()
     val value = meta.generate(context)
     if (value is GenerationResult.Thing) {
         getAccessor<B>().set(value.value)

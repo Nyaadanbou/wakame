@@ -5,12 +5,17 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.skill.Skill
+import kotlin.reflect.KClass
 
 /**
  * 可以食用的物品。
  */
 interface Food : ItemBehavior {
+
+    override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>>
+        get() = emptyArray()
 
     // 原版组建实现 - start
 
@@ -64,7 +69,7 @@ interface Food : ItemBehavior {
         eatSeconds: Provider<Float>,
         canAlwaysEat: Provider<Boolean>,
         eatCostType: Provider<EatCost>,
-        abilities: Provider<List<Skill>>
+        abilities: Provider<List<Skill>>,
     ) : Food {
         override val nutrition: Int by nutrition
         override val saturation: Float by saturation
