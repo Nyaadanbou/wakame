@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability
+package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.user.User
 import org.bukkit.Location
@@ -6,9 +6,11 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.LivingEntity as BukkitLivingEntity
 
 sealed interface Target {
-    interface Void : Target
+    interface Void : Target {
 
-    interface Location: Target {
+    }
+
+    interface Location : Target {
 
     }
 

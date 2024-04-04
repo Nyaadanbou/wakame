@@ -1,8 +1,5 @@
 package cc.mewcraft.wakame.user
 
-import cc.mewcraft.wakame.ability.AbilityEventHandler
-import cc.mewcraft.wakame.ability.AbilityMap
-import cc.mewcraft.wakame.ability.PlayerAbilityMap
 import cc.mewcraft.wakame.attribute.AttributeEventHandler
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.PlayerAttributeMap
@@ -13,6 +10,9 @@ import cc.mewcraft.wakame.kizami.PlayerKizamiMap
 import cc.mewcraft.wakame.level.PlayerLevelProvider
 import cc.mewcraft.wakame.resource.PlayerResourceMap
 import cc.mewcraft.wakame.resource.ResourceMap
+import cc.mewcraft.wakame.skill.PlayerSkillMap
+import cc.mewcraft.wakame.skill.SkillEventHandler
+import cc.mewcraft.wakame.skill.SkillMap
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Server
@@ -42,7 +42,7 @@ class PaperUser(
         get() = playerLevelProvider.getOrDefault(uniqueId, 1)
     override val kizamiMap: KizamiMap = PlayerKizamiMap(this)
     override val attributeMap: AttributeMap = PlayerAttributeMap(this)
-    override val abilityMap: AbilityMap = PlayerAbilityMap(this)
+    override val skillMap: SkillMap = PlayerSkillMap(this)
     override val resourceMap: ResourceMap = PlayerResourceMap(this)
 }
 
@@ -71,7 +71,7 @@ class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     private val server: Server by inject()
 
     // handlers
-    private val abilityEventHandler: AbilityEventHandler by inject(mode = LazyThreadSafetyMode.NONE)
+    private val skillEventHandler: SkillEventHandler by inject(mode = LazyThreadSafetyMode.NONE)
     private val attributeEventHandler: AttributeEventHandler by inject(mode = LazyThreadSafetyMode.NONE)
     private val kizamiEventHandler: KizamiEventHandler by inject(mode = LazyThreadSafetyMode.NONE)
 

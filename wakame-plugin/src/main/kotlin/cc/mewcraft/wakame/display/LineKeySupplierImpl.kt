@@ -3,18 +3,18 @@ package cc.mewcraft.wakame.display
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.util.Key
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 
-internal class AbilityKeySupplierImpl(
+internal class SkillKeySupplierImpl(
     private val config: RendererConfiguration,
-) : AbilityKeySupplier {
-    override fun get(obj: BinaryAbilityCore): FullKey {
+) : SkillKeySupplier {
+    override fun get(obj: BinarySkillCore): FullKey {
         val fullKey = obj.key // 技能的 Full Key 就是它在 NBT 中的 Key
         val rawKey = fullKey // 技能的 Raw Key 跟它的 Full Key 一致
         return if (rawKey !in config.rawKeys) {

@@ -91,7 +91,7 @@ internal sealed interface LoreMeta {
  * 动态内容将在发包时根据物品的数据动态生成。
  *
  * @see MetaLoreMeta
- * @see AbilityLoreMeta
+ * @see SkillLoreMeta
  * @see AttributeLoreMeta
  */
 internal sealed interface DynamicLoreMeta : LoreMeta {

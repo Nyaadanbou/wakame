@@ -32,10 +32,10 @@ internal fun displayModule(): Module = module {
     single<TextStylizer> {
         TextStylizerImpl(
             itemMetaStylizer = new(::ItemMetaStylizerImpl),
-            abilityStylizer = new(::AbilityStylizerImpl),
+            skillStylizer = new(::SkillStylizerImpl),
             attributeStylizer = AttributeStylizerImpl(get(), new(::OperationStylizerImpl)),
             itemMetaKeySupplier = new(::ItemMetaKeySupplierImpl),
-            abilityKeySupplier = new(::AbilityKeySupplierImpl),
+            skillKeySupplier = new(::SkillKeySupplierImpl),
             attributeKeySupplier = new(::AttributeKeySupplierImpl)
         )
     }

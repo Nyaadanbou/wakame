@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.facade
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.SchemaCoreData
+import cc.mewcraft.wakame.item.CoreData
 import cc.mewcraft.wakame.util.RandomizedValue
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -16,7 +16,7 @@ val SchemaAttributeData.element: Element?
     @Suppress("UNCHECKED_CAST")
     get() = (this as? AttributeComponent.Element<Element>)?.element
 
-sealed interface SchemaAttributeData : SchemaCoreData, AttributeData, AttributeComponent.Op<Operation> {
+sealed interface SchemaAttributeData : CoreData.Schema, AttributeData, AttributeComponent.Op<Operation> {
     data class S(
         override val operation: Operation,
         override val value: RandomizedValue,

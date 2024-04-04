@@ -17,7 +17,7 @@ internal data class AttributeLineImpl(
     override val lines: List<Component>,
 ) : AttributeLine
 
-internal data class AbilityLineImpl(
+internal data class SkillLineImpl(
     override val key: FullKey,
     override val lines: List<Component>,
-) : AbilityLine
+) : SkillLine

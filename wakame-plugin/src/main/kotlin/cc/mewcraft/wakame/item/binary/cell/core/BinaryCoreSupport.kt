@@ -22,11 +22,11 @@ data object EmptyBinaryCore : BinaryCore {
 }
 
 /**
- * A binary core of an ability.
+ * A binary core of a skill.
  *
- * @property key the key of the ability
+ * @property key the key of the skill
  */
-data class BinaryAbilityCore(
+data class BinarySkillCore(
     override val key: Key,
 ) : BinaryCore {
     override fun asShadowTag(): ShadowTag = CompoundShadowTag {

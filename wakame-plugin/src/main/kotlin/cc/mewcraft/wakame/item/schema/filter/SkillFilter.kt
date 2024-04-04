@@ -8,28 +8,28 @@ import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
 /**
- * Checks ability population.
+ * Checks skill population.
  *
- * This could be, for example, used to check whether an ability
- * with key `ability:blink` has been populated.
+ * This could be, for example, used to check whether a skill
+ * with key `skill:blink` has been populated.
  *
- * @property key the key of the ability to check with
+ * @property key the key of the skill to check with
  */
-data class AbilityFilter(
+data class SkillFilter(
     override val invert: Boolean,
     private val key: Key,
 ) : Filter {
 
     /**
-     * Returns `true` if the [context] already has the ability with
+     * Returns `true` if the [context] already has the skill with
      * [key][key] populated.
      */
     override fun test0(context: SchemaGenerationContext): Boolean {
-        return AbilityContextHolder(key) in context.abilities
+        return SkillContextHolder(key) in context.abilities
     }
 }
 
-data class AbilityContextHolder(
+data class SkillContextHolder(
     val key: Key,
 ) : Examinable {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

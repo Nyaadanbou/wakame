@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.PlainAbilityData
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.NekoStackImpl
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
+import cc.mewcraft.wakame.skill.BinarySkillData
+import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
 import com.google.common.collect.ImmutableListMultimap
@@ -63,7 +63,7 @@ internal value class ItemCellAccessorImpl(
         return multimap.build()
     }
 
-    override fun getActiveAbilities(): Map<Ability, PlainAbilityData> {
+    override fun getActiveAbilities(): Map<Skill, BinarySkillData> {
         TODO("Not yet implemented")
     }
 

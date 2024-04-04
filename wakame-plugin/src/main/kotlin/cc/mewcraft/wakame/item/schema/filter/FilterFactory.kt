@@ -23,9 +23,9 @@ object FilterFactory {
         val type = type0.substringAfter(NOT) // the type string (after ~)
 
         val ret: Filter = when (type) {
-            "ability" -> {
+            "skill" -> {
                 val key = node.node("key").krequire<Key>()
-                AbilityFilter(invert, key)
+                SkillFilter(invert, key)
             }
 
             "attribute" -> {

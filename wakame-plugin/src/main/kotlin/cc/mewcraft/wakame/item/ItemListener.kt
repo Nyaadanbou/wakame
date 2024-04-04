@@ -7,7 +7,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 
-class ItemBehaviorListener : Listener {
+class ItemListener : Listener {
     @EventHandler
     fun onItemInteract(event: PlayerInteractEvent) {
         val item = event.item ?: return

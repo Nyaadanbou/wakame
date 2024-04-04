@@ -1,15 +1,15 @@
 package cc.mewcraft.wakame.item.schema
 
-import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.Curse
-import cc.mewcraft.wakame.item.schema.filter.AbilityContextHolder
 import cc.mewcraft.wakame.item.schema.filter.AttributeContextHolder
 import cc.mewcraft.wakame.item.schema.filter.CurseContextHolder
+import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random.BasicSelectionContext
 import cc.mewcraft.wakame.random.SelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.util.WatchedPrimitive
 import cc.mewcraft.wakame.util.WatchedSet
 import kotlin.random.Random
@@ -61,9 +61,9 @@ class SchemaGenerationContext(
     val curses: MutableCollection<CurseContextHolder> by WatchedSet(HashSet())
 
     /**
-     * 已经生成的 [Ability].
+     * 已经生成的 [Skill].
      */
-    val abilities: MutableCollection<AbilityContextHolder> by WatchedSet(HashSet())
+    val abilities: MutableCollection<SkillContextHolder> by WatchedSet(HashSet())
 
     /**
      * 已经生成的 [AttributeContextHolder].

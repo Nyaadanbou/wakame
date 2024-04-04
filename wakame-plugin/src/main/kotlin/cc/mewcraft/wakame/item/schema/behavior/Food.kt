@@ -2,10 +2,10 @@ package cc.mewcraft.wakame.item.schema.behavior
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.skill.Skill
 
 /**
  * 可以食用的物品。
@@ -44,7 +44,7 @@ interface Food : ItemBehavior {
     /**
      * 食用后玩家将会执行的操作。
      */
-    val abilities: List<Ability>
+    val skills: List<Skill>
 
     companion object Factory : ItemBehaviorFactory<Food> {
         override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Food {
@@ -53,7 +53,7 @@ interface Food : ItemBehavior {
             val eatSeconds = behaviorConfig.optionalEntry<Float>("eat_seconds").orElse(1.6F)
             val canAlwaysEat = behaviorConfig.optionalEntry<Boolean>("can_always_eat").orElse(false)
             val eatCostType = behaviorConfig.optionalEntry<EatCost>("eat_cost").orElse(EatCost.ShrinkAmount(1))
-            val abilities = behaviorConfig.optionalEntry<List<Ability>>("ability").orElse(emptyList())
+            val abilities = behaviorConfig.optionalEntry<List<Skill>>("skills").orElse(emptyList())
             return Default(nutrition, saturation, eatSeconds, canAlwaysEat, eatCostType, abilities)
         }
     }
@@ -64,14 +64,14 @@ interface Food : ItemBehavior {
         eatSeconds: Provider<Float>,
         canAlwaysEat: Provider<Boolean>,
         eatCostType: Provider<EatCost>,
-        abilities: Provider<List<Ability>>
+        abilities: Provider<List<Skill>>
     ) : Food {
         override val nutrition: Int by nutrition
         override val saturation: Float by saturation
         override val eatSeconds: Float by eatSeconds
         override val canAlwaysEat: Boolean by canAlwaysEat
         override val eatCostType: EatCost by eatCostType
-        override val abilities: List<Ability> by abilities
+        override val skills: List<Skill> by abilities
     }
 }
 

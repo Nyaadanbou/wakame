@@ -31,7 +31,7 @@ return sortedLore
 # key 的所有种类
 
 - 技能 
-  - ability:技能名称
+  - skill:技能名称
 - 属性
   - attribute:属性
   - attribute:属性:operation
@@ -106,7 +106,7 @@ for each line X in config: {
     }
   }
   
-  ability class impl class {
+  skill class impl class {
     构造函数：
     override key
     override index

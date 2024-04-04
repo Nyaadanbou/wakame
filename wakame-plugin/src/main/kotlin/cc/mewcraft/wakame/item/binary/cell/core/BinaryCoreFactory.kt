@@ -5,11 +5,11 @@ import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
 import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
-import cc.mewcraft.wakame.item.schema.cell.core.SchemaAbilityCore
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaAttributeCore
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
-import cc.mewcraft.wakame.item.schema.filter.AbilityContextHolder
+import cc.mewcraft.wakame.item.schema.cell.core.SchemaSkillCore
 import cc.mewcraft.wakame.item.schema.filter.AttributeContextHolder
+import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.Key
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -40,8 +40,8 @@ object BinaryCoreFactory {
 
         val key = Key(compound.getString(NekoTags.Cell.CORE_KEY))
         val ret = when (key.namespace()) {
-            NekoNamespaces.ABILITY -> {
-                BinaryAbilityCore(key)
+            NekoNamespaces.SKILL -> {
+                BinarySkillCore(key)
             }
 
             NekoNamespaces.ATTRIBUTE -> {
@@ -67,13 +67,13 @@ object BinaryCoreFactory {
     fun generate(context: SchemaGenerationContext, schemaCore: SchemaCore): BinaryCore {
         val key = schemaCore.key
         val ret = when (schemaCore) {
-            is SchemaAbilityCore -> {
+            is SchemaSkillCore -> {
                 // populate context
-                val contextHolder = AbilityContextHolder(key)
+                val contextHolder = SkillContextHolder(key)
                 context.abilities += contextHolder
 
                 // construct core
-                BinaryAbilityCore(key)
+                BinarySkillCore(key)
             }
 
             is SchemaAttributeCore -> {

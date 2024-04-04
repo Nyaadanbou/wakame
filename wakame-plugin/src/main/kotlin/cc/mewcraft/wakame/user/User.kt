@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.user
 
-import cc.mewcraft.wakame.ability.AbilityMap
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.resource.ResourceMap
+import cc.mewcraft.wakame.skill.SkillMap
 import java.util.UUID
 
 /**
@@ -39,9 +39,9 @@ interface User<P> {
     val attributeMap: AttributeMap
 
     /**
-     * Ability Map of the player.
+     * Skill Map of the player.
      */
-    val abilityMap: AbilityMap
+    val skillMap: SkillMap
 
     /**
      * Resource Map of the player.

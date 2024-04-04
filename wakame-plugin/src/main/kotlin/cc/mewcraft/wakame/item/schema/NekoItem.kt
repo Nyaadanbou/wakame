@@ -62,7 +62,7 @@ interface NekoItem : Keyed {
      *
      * @see meta
      */
-    val meta: ClassToInstanceMap<SchemaItemMeta<*>>
+    val meta: ClassToInstanceMap<SchemaItemMeta<*>> // TODO use normal Map in interface (impl leaves intact)
 
     /**
      * The map holds all the schema cells about this item, where `map key` is

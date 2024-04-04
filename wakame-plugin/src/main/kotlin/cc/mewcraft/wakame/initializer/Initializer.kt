@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.display.ItemRendererListener
 import cc.mewcraft.wakame.display.RENDERER_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.event.NekoReloadEvent
-import cc.mewcraft.wakame.item.ItemBehaviorListener
+import cc.mewcraft.wakame.item.ItemListener
 import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.registry.*
@@ -128,7 +128,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun registerListeners() = with(PLUGIN) {
-        registerTerminableListener(get<ItemBehaviorListener>()).bindWith(this)
+        registerTerminableListener(get<ItemListener>()).bindWith(this)
         registerTerminableListener(get<ItemRendererListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)

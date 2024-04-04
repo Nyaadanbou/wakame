@@ -41,7 +41,7 @@ internal data class MetaLoreMeta(
 /**
  * 代表一个技能的 [LoreMeta].
  */
-internal data class AbilityLoreMeta(
+internal data class SkillLoreMeta(
     override val rawKey: RawKey,
     override val rawIndex: RawIndex,
     override val default: List<Component>?,

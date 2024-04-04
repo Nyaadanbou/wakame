@@ -453,11 +453,11 @@ core_groups:
   core_f:
     filters: [ ]
     selects:
-      ability:
+      skill:
         entries:
-          - key: ability:blink
+          - key: skill:blink
             weight: 1
-          - key: ability:dash
+          - key: skill:dash
             weight: 1
     default: [ ]
 

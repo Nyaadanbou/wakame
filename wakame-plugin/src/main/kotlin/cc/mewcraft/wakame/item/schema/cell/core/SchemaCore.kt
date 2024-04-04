@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.item.schema.cell.core
 
-import cc.mewcraft.wakame.item.BinaryCoreData
 import cc.mewcraft.wakame.item.Core
-import cc.mewcraft.wakame.item.SchemaCoreData
+import cc.mewcraft.wakame.item.CoreData
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 
 /**
@@ -15,7 +14,7 @@ sealed interface SchemaCore : Core {
     /**
      * The schema data.
      */
-    val data: SchemaCoreData
+    val data: CoreData.Schema
 
     /**
      * Generates a binary core data from `this`.
@@ -23,5 +22,5 @@ sealed interface SchemaCore : Core {
      * @param context the context
      * @return a new instance
      */
-    fun generate(context: SchemaGenerationContext): BinaryCoreData
+    fun generate(context: SchemaGenerationContext): CoreData.Binary
 }

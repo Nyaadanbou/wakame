@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.SchemaCorePool
-import cc.mewcraft.wakame.item.schema.filter.AbilityFilter
 import cc.mewcraft.wakame.item.schema.filter.AttributeFilter
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
+import cc.mewcraft.wakame.item.schema.filter.SkillFilter
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.util.krequire
@@ -78,10 +78,10 @@ internal data object SchemaCorePoolSerializer : AbstractPoolSerializer<SchemaCor
             // key, operation and element in the selection context.
             is SchemaAttributeCore -> AttributeFilter(true, content.key, content.data.operation, content.data.element)
 
-            // By design, an ability is considered generated
-            // if there is already an ability with the same key
+            // By design, a skill is considered generated
+            // if there is already a skill with the same key
             // in the selection context.
-            is SchemaAbilityCore -> AbilityFilter(true, content.key)
+            is SchemaSkillCore -> SkillFilter(true, content.key)
         }
     }
 

@@ -61,8 +61,8 @@ class LoreFinalizerTest : KoinTest {
     private val Component.plain: String get() = PlainTextComponentSerializer.plainText().serialize(this)
     private fun Component.contains(x: String): Boolean = this.plain.contains(x)
     private fun ItemMetaLineFactory.get(x: String): ItemMetaLine = this.get(Key(x), listText(x))
-    private fun AbilityLineFactory.get(x: String): AbilityLine = this.get(Key(x), listText(x))
     private fun AttributeLineFactory.get(x: String): AttributeLine = this.get(Key(x), listText(x))
+    private fun SkillLineFactory.get(x: String): SkillLine = this.get(Key(x), listText(x))
 
     private fun buildTest(loreLines: Collection<LoreLine>) {
         val logger = get<Logger>()
@@ -115,9 +115,9 @@ class LoreFinalizerTest : KoinTest {
             AttributeLineFactory.get("attribute:attack_speed_level.add"),
             AttributeLineFactory.get("attribute:critical_strike_chance.add"),
             AttributeLineFactory.get("attribute:max_mana.add"),
-            AbilityLineFactory.get("ability:blink"),
-            AbilityLineFactory.get("ability:frost"),
-            AbilityLineFactory.get("ability:leapfrog"),
+            SkillLineFactory.get("skill:blink"),
+            SkillLineFactory.get("skill:frost"),
+            SkillLineFactory.get("skill:leapfrog"),
         )
         buildTest(loreLines)
     }
@@ -129,8 +129,8 @@ class LoreFinalizerTest : KoinTest {
             ItemMetaLineFactory.get("meta:rarity"),
             AttributeLineFactory.get("attribute:empty"),
             AttributeLineFactory.get("attribute:max_mana.add"),
-            AbilityLineFactory.get("ability:empty"),
-            AbilityLineFactory.get("ability:frost"),
+            SkillLineFactory.get("skill:empty"),
+            SkillLineFactory.get("skill:frost"),
         )
         buildTest(loreLines)
     }
@@ -146,8 +146,8 @@ class LoreFinalizerTest : KoinTest {
             AttributeLineFactory.get("attribute:attack_damage.multiply_base.water"),
             AttributeLineFactory.get("attribute:attack_effect_chance.add"),
             AttributeLineFactory.get("attribute:attack_speed_level.add"),
-            AbilityLineFactory.get("ability:empty"),
-            AbilityLineFactory.get("ability:frost"),
+            SkillLineFactory.get("skill:empty"),
+            SkillLineFactory.get("skill:frost"),
         )
         buildTest(loreLines)
     }

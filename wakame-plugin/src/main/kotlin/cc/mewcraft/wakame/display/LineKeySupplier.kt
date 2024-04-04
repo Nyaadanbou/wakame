@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.util.Key
 
@@ -28,10 +28,10 @@ internal sealed interface LineKeySupplier<T> {
 val SKIP_RENDERING: FullKey = Key("renderer", "noop")
 
 @OptIn(InternalApi::class)
-internal interface AbilityKeySupplier : LineKeySupplier<BinaryAbilityCore>
+internal interface ItemMetaKeySupplier : LineKeySupplier<BinaryItemMeta<*>>
 
 @OptIn(InternalApi::class)
 internal interface AttributeKeySupplier : LineKeySupplier<BinaryAttributeCore>
 
 @OptIn(InternalApi::class)
-internal interface ItemMetaKeySupplier : LineKeySupplier<BinaryItemMeta<*>>
+internal interface SkillKeySupplier : LineKeySupplier<BinarySkillCore>

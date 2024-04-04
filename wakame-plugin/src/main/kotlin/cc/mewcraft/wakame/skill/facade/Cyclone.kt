@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability.facade
+package cc.mewcraft.wakame.skill.facade
 
 /**
  * 召风元素异常。

@@ -63,19 +63,19 @@ renderer_layout:
     - attribute:max_health
     - attribute:max_mana
     - attribute:movement_speed_rate
-    - (fixed:ability)<!i><aqua><b>技能
-    - ability:empty # 空的技能（用于标记空技能栏的相对位置）
-    - ability:blink
-    - ability:cyclone
-    - ability:dash
-    - ability:fireblade
-    - ability:flood
-    - ability:frost
-    - ability:leapfrog
-    - ability:meteorite
-    - ability:sproink
-    - ability:stab
-    - ability:waterball
+    - (fixed:skill)<!i><aqua><b>技能
+    - skill:empty # 空的技能（用于标记空技能栏的相对位置）
+    - skill:blink
+    - skill:cyclone
+    - skill:dash
+    - skill:fireblade
+    - skill:flood
+    - skill:frost
+    - skill:leapfrog
+    - skill:meteorite
+    - skill:sproink
+    - skill:stab
+    - skill:waterball
     - (fixed:*)<!i><gray>这行将不会被渲染 # 仅当下面存在任意命名空间下的内容时才渲染（不包括“无内容”的情况）
 
   # 元素排序
@@ -207,7 +207,7 @@ renderer_style:
       movement_speed_rate: "<!i>移动速率: <value:+#.#%;-.%>"
 
   # 技能词条栏的样式
-  ability:
+  skill:
 
     # 空的技能词条栏
     empty:

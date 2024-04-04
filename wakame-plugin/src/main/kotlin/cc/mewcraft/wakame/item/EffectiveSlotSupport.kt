@@ -12,6 +12,13 @@ import java.lang.reflect.Type
 
 
 /**
+ * This is the effective slot that never takes effect.
+ *
+ * Used for items that provides no effects for players, such as materials.
+ */
+data object NoopEffectiveSlot : EffectiveSlot
+
+/**
  * The vanilla slots that are potentially effective for an item.
  */
 enum class VanillaEffectiveSlot : EffectiveSlot {
@@ -51,13 +58,6 @@ enum class VanillaEffectiveSlot : EffectiveSlot {
     },
     ;
 }
-
-/**
- * This is the effective slot that never takes effect.
- *
- * Used for items that provides no effects for players, such as materials.
- */
-data object NoopEffectiveSlot : EffectiveSlot
 
 /**
  * The accessory slots that are potentially effective for an item.

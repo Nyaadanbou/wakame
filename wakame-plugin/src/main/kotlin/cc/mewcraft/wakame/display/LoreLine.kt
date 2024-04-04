@@ -33,11 +33,11 @@ internal interface FixedLine : LoreLine
 internal interface ItemMetaLine : LoreLine
 
 /**
- * 代表一个描述技能的内容。
- */
-internal interface AbilityLine : LoreLine
-
-/**
  * 代表一个描述属性的内容。
  */
 internal interface AttributeLine : LoreLine
+
+/**
+ * 代表一个描述技能的内容。
+ */
+internal interface SkillLine : LoreLine

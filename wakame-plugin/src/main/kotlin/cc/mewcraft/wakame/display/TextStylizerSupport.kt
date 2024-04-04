@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.cell.core.isEmpty
 import cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.binary.meta.*
@@ -46,12 +46,12 @@ import kotlin.reflect.KClass
 internal class TextStylizerImpl(
     /* sub stylizers */
     private val itemMetaStylizer: ItemMetaStylizer,
-    private val abilityStylizer: AbilityStylizer,
+    private val skillStylizer: SkillStylizer,
     private val attributeStylizer: AttributeStylizer,
 
     /* full key suppliers */
     private val itemMetaKeySupplier: ItemMetaKeySupplier,
-    private val abilityKeySupplier: AbilityKeySupplier,
+    private val skillKeySupplier: SkillKeySupplier,
     private val attributeKeySupplier: AttributeKeySupplier,
 ) : TextStylizer {
     override fun stylizeName(item: NekoStack): Component {
@@ -84,11 +84,11 @@ internal class TextStylizerImpl(
             } else when (core) {
                 // it's a non-empty core - dynamically generate the lines
 
-                is BinaryAbilityCore -> {
-                    val key = abilityKeySupplier.get(core)
+                is BinarySkillCore -> {
+                    val key = skillKeySupplier.get(core)
                     if (key === SKIP_RENDERING) continue
-                    val lines = abilityStylizer.stylize(core)
-                    ret += AbilityLineFactory.get(key, lines)
+                    val lines = skillStylizer.stylize(core)
+                    ret += SkillLineFactory.get(key, lines)
                 }
 
                 is BinaryAttributeCore -> {
@@ -115,9 +115,9 @@ internal class TextStylizerImpl(
     }
 }
 
-internal class AbilityStylizerImpl : AbilityStylizer {
-    override fun stylize(core: BinaryAbilityCore): List<Component> {
-        return emptyList() // TODO("implement ability stylizer")
+internal class SkillStylizerImpl : SkillStylizer {
+    override fun stylize(core: BinarySkillCore): List<Component> {
+        return emptyList() // TODO("implement skill stylizer")
     }
 }
 

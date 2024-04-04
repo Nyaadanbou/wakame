@@ -1,17 +1,19 @@
 package cc.mewcraft.wakame.item.schema
 
-sealed class NekoItemValidator {
-    protected abstract val item: NekoItem
+import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
+import kotlin.reflect.KClass
 
+sealed class NekoItemValidator {
     companion object {
         fun chain(vararg initializers: NekoItemValidator): NekoItemValidator {
             initializers.reduce { acc, initializer ->
-                acc.next = initializer
-                initializer
+                initializer.also { acc.next = it }
             }
             return initializers.first()
         }
     }
+
+    protected abstract val item: NekoItem
 
     protected var next: NekoItemValidator? = null
 
@@ -29,12 +31,18 @@ class BehaviorValidator(
     override val item: NekoItem,
 ) : NekoItemValidator() {
     override fun init(): Result<Unit> {
-        val allMeta = item.meta
+        val itemMetaMap = item.meta
+        val missingMetaTypes = mutableListOf<KClass<out SchemaItemMeta<*>>>()
         for (behavior in item.behaviors) {
             val requiredMetaTypes = behavior.requiredMetaTypes
-            val missingMetaTypes = requiredMetaTypes.filter { allMeta[it.java]?.isEmpty == true }
+            val missingMetaTypes = requiredMetaTypes.filter { itemMetaMap[it.java]?.isEmpty == true }
             if (missingMetaTypes.isNotEmpty()) {
-                return Result.failure(IllegalArgumentException("Can't find metas ${requiredMetaTypes.map { it.simpleName }} being required by the behavior ${behavior::class.qualifiedName} in the item ${item.key}"))
+                "The behavior ${behavior::class.qualifiedName} requires the meta"
+                return Result.failure(
+                    IllegalArgumentException(
+                        "Can't find metas ${requiredMetaTypes.map { it.simpleName }} being required by the behavior ${behavior::class.qualifiedName} in the item ${item.key}"
+                    )
+                )
             }
         }
         return initNext()

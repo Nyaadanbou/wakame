@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.PlainAbilityData
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.skill.BinarySkillData
+import cc.mewcraft.wakame.skill.Skill
 import com.google.common.collect.Multimap
 
 /**
@@ -58,7 +58,7 @@ interface ItemCellAccessor {
     /**
      * Gets all active abilities from the cell holder.
      */
-    fun getActiveAbilities(): Map<Ability, PlainAbilityData>
+    fun getActiveAbilities(): Map<Skill, BinarySkillData>
 
     /* Setters */
 

@@ -11,5 +11,5 @@ internal fun itemModule(): Module = module {
     includes(binaryItemModule())
     includes(schemaItemModule())
 
-    single { ItemBehaviorListener() } bind Listener::class
+    single { ItemListener() } bind Listener::class
 }

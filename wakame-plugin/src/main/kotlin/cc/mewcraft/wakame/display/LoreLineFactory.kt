@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.SkillRegistry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
@@ -20,18 +20,18 @@ internal object ItemMetaLineFactory {
 /**
  * 获取对象的工厂。
  */
-internal object AbilityLineFactory : KoinComponent {
-    private val EMPTY_LORE_LINE: AbilityLine by lazy(LazyThreadSafetyMode.NONE) {
+internal object SkillLineFactory : KoinComponent {
+    private val EMPTY_LORE_LINE: SkillLine by lazy(LazyThreadSafetyMode.NONE) {
         val mm = get<MiniMessage>()
-        val text = get<RendererConfiguration>().emptyAbilityText
-        AbilityLineImpl(AbilityRegistry.EMPTY_KEY, text.map(mm::deserialize))
+        val text = get<RendererConfiguration>().emptySkillText
+        SkillLineImpl(SkillRegistry.EMPTY_KEY, text.map(mm::deserialize))
     }
 
-    fun get(key: FullKey, lines: List<Component>): AbilityLine {
-        return AbilityLineImpl(key, lines)
+    fun get(key: FullKey, lines: List<Component>): SkillLine {
+        return SkillLineImpl(key, lines)
     }
 
-    fun empty(): AbilityLine {
+    fun empty(): SkillLine {
         return EMPTY_LORE_LINE
     }
 }

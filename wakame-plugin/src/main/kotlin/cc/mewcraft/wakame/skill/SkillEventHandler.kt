@@ -1,11 +1,11 @@
-package cc.mewcraft.wakame.ability
+package cc.mewcraft.wakame.skill
 
 import org.bukkit.event.Event
 
 /**
  * Handles skill triggers for players.
  */
-class AbilityEventHandler {
+class SkillEventHandler {
     fun onMeleeAttack(e: Event) {
         TODO("Not yet implemented")
     }

@@ -144,25 +144,25 @@ internal class RendererConfiguration(
     }
     //</editor-fold>
 
-    //<editor-fold desc="renderer_style.ability">
+    //<editor-fold desc="renderer_style.skill">
     /**
      * 空词条栏的渲染格式（技能）。
      */
-    val emptyAbilityText: List<String> by reloadable {
-        root.node(RENDERER_STYLE_NODE, "ability", "empty").krequire<List<String>>()
+    val emptySkillText: List<String> by reloadable {
+        root.node(RENDERER_STYLE_NODE, "skill", "empty").krequire<List<String>>()
     }
 
     /**
      * 所有技能共用的渲染格式。
      */
-    val commonAbilityFormat: Unit by reloadable {
+    val commonSkillFormat: Unit by reloadable {
         // TODO
     }
 
     /**
      * 个别技能独有的渲染格式。
      */
-    val abilityFormats: Unit by reloadable {
+    val skillFormats: Unit by reloadable {
         // TODO
     }
     //</editor-fold>
@@ -228,8 +228,8 @@ internal class RendererConfiguration(
         fun createLoreMeta0(rawIndex: Int, rawLine: String, default: List<Component>?): LoreMeta {
             val ret: DynamicLoreMeta
             when {
-                rawLine.startsWith(NekoNamespaces.ABILITY + ":") -> {
-                    ret = AbilityLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
+                rawLine.startsWith(NekoNamespaces.SKILL + ":") -> {
+                    ret = SkillLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
                 }
 
                 rawLine.startsWith(NekoNamespaces.ATTRIBUTE + ":") -> {
@@ -335,9 +335,9 @@ internal class RendererConfiguration(
                 // if the lore meta has a default value, add it to the default lore lines
                 _defaultLoreLines += loreMeta.fullKeys.map { key ->
                     when (loreMeta) {
-                        is AbilityLoreMeta -> AbilityLineImpl(key, default)
-                        is AttributeLoreMeta -> AttributeLineImpl(key, default)
                         is MetaLoreMeta -> ItemMetaLineImpl(key, default)
+                        is AttributeLoreMeta -> AttributeLineImpl(key, default)
+                        is SkillLoreMeta -> SkillLineImpl(key, default)
                     }
                 }
             }

@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAbilityCore
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.meta.BDisplayNameMeta
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import net.kyori.adventure.text.Component
@@ -45,8 +45,8 @@ internal interface TextStylizer {
 /**
  * To be used by [TextStylizer].
  */
-internal interface AbilityStylizer {
-    fun stylize(core: BinaryAbilityCore): List<Component>
+internal interface SkillStylizer {
+    fun stylize(core: BinarySkillCore): List<Component>
 }
 
 /**

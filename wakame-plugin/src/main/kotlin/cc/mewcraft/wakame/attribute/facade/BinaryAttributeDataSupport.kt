@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.facade
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.BinaryCoreData
+import cc.mewcraft.wakame.item.CoreData
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -25,7 +25,7 @@ val BinaryAttributeData.element: Element?
  *
  * We especially extend [AttributeComponent.Op] as it's common among all subtypes.
  */
-sealed interface BinaryAttributeData : AttributeData, AttributeComponent.Op<Operation>, BinaryCoreData {
+sealed interface BinaryAttributeData : AttributeData, AttributeComponent.Op<Operation>, CoreData.Binary {
     data class S(
         override val operation: Operation,
         override val value: Double,

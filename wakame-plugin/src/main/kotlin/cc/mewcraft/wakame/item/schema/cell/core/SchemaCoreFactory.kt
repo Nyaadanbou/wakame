@@ -27,8 +27,8 @@ object SchemaCoreFactory {
     fun schemaOf(node: ConfigurationNode): SchemaCore {
         val key = node.node("key").krequire<Key>()
         val ret = when (key.namespace()) {
-            NekoNamespaces.ABILITY -> {
-                SchemaAbilityCore(key)
+            NekoNamespaces.SKILL -> {
+                SchemaSkillCore(key)
             }
 
             NekoNamespaces.ATTRIBUTE -> {
