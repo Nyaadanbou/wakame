@@ -11,7 +11,11 @@ import net.kyori.adventure.key.Key
  * player; By contrast, if the player has no ability, we say that the player
  * has no ability attached.
  */
-interface Ability : Keyed
+interface Ability : Keyed {
+    fun castAt(target: Target.Void) {}
+    fun castAt(target: Target.Location) {}
+    fun castAt(target: Target.LivingEntity) {}
+}
 
 /**
  * A no-op ability. Used as placeholder object.

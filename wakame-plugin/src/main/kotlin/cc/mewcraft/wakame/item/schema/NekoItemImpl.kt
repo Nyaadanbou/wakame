@@ -30,4 +30,10 @@ internal data class NekoItemImpl(
                 is ItemBehaviorFactory<*> -> behavior.create(this, config.node("behaviors", behaviorName))
             }
         }
+
+    init {
+        NekoItemValidator.chain(
+            BehaviorValidator(this)
+        ).init().getOrThrow()
+    }
 }

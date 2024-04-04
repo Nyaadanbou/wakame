@@ -11,6 +11,8 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
  * @param T 模板最终产生的数据类型
  */
 sealed interface SchemaItemMeta<T> : Keyed {
+    val isEmpty: Boolean
+
     /**
      * Generate a value [T] from this schema.
      *

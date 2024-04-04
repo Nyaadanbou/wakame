@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.schema.behavior
 
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.player.equipment.ArmorEquipEvent
 import cc.mewcraft.wakame.world.block.event.BlockBreakActionEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
@@ -16,10 +17,14 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
+import kotlin.reflect.KClass
 
 sealed interface ItemBehaviorHolder
 
 interface ItemBehavior : ItemBehaviorHolder {
+
+    val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>>
+        get() = emptyArray()
 
     /* Event handlers */
 

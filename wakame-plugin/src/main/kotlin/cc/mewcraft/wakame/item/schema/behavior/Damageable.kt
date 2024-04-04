@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
 import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
+import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -18,11 +20,15 @@ import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
+import kotlin.reflect.KClass
 
 /**
  * 可以受损的物品。
  */
 interface Damageable : ItemBehavior {
+    override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>>
+        get() = arrayOf(SDurabilityMeta::class)
+
     /**
      * 可以用于修复的材料类型。
      */

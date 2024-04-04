@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.schema
 
+import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
+import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.configurate.MaterialSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.item.EffectiveSlotSerializer
@@ -26,8 +28,10 @@ internal fun schemaItemModule(): Module = module {
     single<TypeSerializerCollection>(named(BASE_SERIALIZERS)) {
         TypeSerializerCollection.builder()
 
-            .kregister(MaterialSerializer)
             .kregister(EffectiveSlotSerializer)
+            .kregister(MaterialSerializer)
+            .kregister(PotionEffectSerializer)
+            .kregister(PotionEffectTypeSerializer)
 
             .build()
     }

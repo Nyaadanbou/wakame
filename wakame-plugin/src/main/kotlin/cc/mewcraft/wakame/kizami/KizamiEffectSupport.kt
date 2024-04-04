@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.NoopAbility
+import cc.mewcraft.wakame.ability.TargetAdapter
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry.AttributeRegistry
@@ -92,6 +93,7 @@ data class KizamiSkill(
     override val effect: Ability,
 ) : KizamiEffect.Single<Ability> {
     override fun apply(kizami: Kizami, user: User<*>) {
+        effect.castAt(TargetAdapter.adapt(user))
         println("applied ability kizami effect to ${user.uniqueId}") // TODO actually implement it when ability module is done
     }
 

@@ -27,6 +27,7 @@ sealed interface SKizamiMeta : SchemaItemMeta<Set<Kizami>> {
 private class NonNullKizamiMeta(
     private val kizamiGroup: KizamiGroup,
 ) : SKizamiMeta {
+    override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<Set<Kizami>> {
         val value = kizamiGroup.pick(context).toSet()
         return if (value.isNotEmpty()) {
@@ -38,6 +39,7 @@ private class NonNullKizamiMeta(
 }
 
 private data object DefaultKizamiMeta : SKizamiMeta {
+    override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<Set<Kizami>> = GenerationResult.empty()
 }
 
