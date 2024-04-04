@@ -20,12 +20,14 @@ private class NonNullDisplayLoreMeta(
      */
     private val lore: List<String>,
 ) : SDisplayLoreMeta {
+    override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<List<String>> {
         return GenerationResult(lore)
     }
 }
 
 private data object DefaultDisplayLoreMeta : SDisplayLoreMeta {
+    override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<List<String>> = GenerationResult.empty()
 }
 

@@ -20,12 +20,14 @@ private class NonNullDisplayNameMeta(
      */
     private val displayName: String,
 ) : SDisplayNameMeta {
+    override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<String> {
         return GenerationResult(displayName)
     }
 }
 
 private data object DefaultDisplayNameMeta : SDisplayNameMeta {
+    override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<String> = GenerationResult.empty()
 }
 

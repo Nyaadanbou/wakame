@@ -24,12 +24,14 @@ sealed interface SElementMeta : SchemaItemMeta<Set<Element>> {
 private class NonNullElementMeta(
     private val elementPool: ElementPool,
 ) : SElementMeta {
+    override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<Set<Element>> {
         return GenerationResult(elementPool.pick(context).toSet())
     }
 }
 
 private data object DefaultElementMeta : SElementMeta {
+    override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<Set<Element>> = GenerationResult.empty()
 }
 

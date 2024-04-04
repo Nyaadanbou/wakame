@@ -20,12 +20,14 @@ private class NonNullSkinOwnerMeta(
      */
     private val skinOwner: UUID,
 ) : SSkinOwnerMeta {
+    override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<UUID> {
         return GenerationResult(skinOwner)
     }
 }
 
 private data object DefaultSkinOwnerMeta : SSkinOwnerMeta {
+    override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<UUID> = GenerationResult.empty()
 }
 

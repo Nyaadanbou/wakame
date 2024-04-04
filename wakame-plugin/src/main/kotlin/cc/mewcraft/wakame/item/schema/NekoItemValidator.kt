@@ -23,18 +23,18 @@ sealed class NekoItemValidator {
 }
 
 /**
- * Validate the required data by behaviours
+ * Validate the required data by behaviors
  */
 class BehaviorValidator(
-    override val item: NekoItem
+    override val item: NekoItem,
 ) : NekoItemValidator() {
     override fun init(): Result<Unit> {
-        val allMetaTypes = item.meta.keys
+        val allMeta = item.meta
         for (behavior in item.behaviors) {
             val requiredMetaTypes = behavior.requiredMetaTypes
-            val missingMetaTypes = requiredMetaTypes.filter { it.java !in allMetaTypes }
+            val missingMetaTypes = requiredMetaTypes.filter { allMeta[it.java]?.isEmpty == true }
             if (missingMetaTypes.isNotEmpty()) {
-                return Result.failure(IllegalArgumentException("Can't find metas ${requiredMetaTypes.map { it.simpleName }} being required by the behavior ${behavior::class.simpleName} in the item ${item.key}"))
+                return Result.failure(IllegalArgumentException("Can't find metas ${requiredMetaTypes.map { it.simpleName }} being required by the behavior ${behavior::class.qualifiedName} in the item ${item.key}"))
             }
         }
         return initNext()

@@ -37,6 +37,7 @@ private class NonNullLevelMeta(
      */
     private val level: Any,
 ) : KoinComponent, SLevelMeta {
+    override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<Int> {
         val ret: Int = when (level) {
             is Int -> {
@@ -60,6 +61,7 @@ private class NonNullLevelMeta(
 }
 
 private data object DefaultLevelMeta : SLevelMeta {
+    override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<Int> = GenerationResult.empty() // default not to write level at all
 }
 

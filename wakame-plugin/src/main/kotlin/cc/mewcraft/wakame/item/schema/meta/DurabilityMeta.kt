@@ -42,6 +42,7 @@ private class NonNullDurabilityMeta(
     private val threshold: RandomizedValue,
     private val damage: RandomizedValue? = null,
 ) : SDurabilityMeta {
+    override val isEmpty: Boolean = false
     init {
         require(threshold.base > 0) { "threshold.base > 0" }
         damage?.run { require(damage.base >= 0) { "damage.base >= 0" } }
@@ -56,6 +57,7 @@ private class NonNullDurabilityMeta(
 }
 
 private data object DefaultDurabilityMeta : SDurabilityMeta {
+    override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<Durability> = GenerationResult.empty()
 }
 

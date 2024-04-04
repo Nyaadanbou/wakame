@@ -29,6 +29,7 @@ private class NonNullRarityMeta(
      */
     private val dynamic: LevelMappings? = null,
 ) : SRarityMeta {
+    override val isEmpty: Boolean = false
     init {
         require(static != null || dynamic != null) { "static != null || dynamic != null" }
     }
@@ -53,6 +54,7 @@ private class NonNullRarityMeta(
 }
 
 private data object DefaultRarityMeta : SRarityMeta {
+    override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<Rarity> = GenerationResult.empty()
 }
 

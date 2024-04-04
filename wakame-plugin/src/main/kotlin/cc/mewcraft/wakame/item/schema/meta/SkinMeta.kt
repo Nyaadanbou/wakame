@@ -17,12 +17,14 @@ sealed interface SSkinMeta : SchemaItemMeta<ItemSkin> {
 private class NonNullSkinMeta(
     private val itemSkin: ItemSkin,
 ) : SSkinMeta {
+    override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<ItemSkin> {
         return GenerationResult(itemSkin)
     }
 }
 
 private data object DefaultSkinMeta : SSkinMeta {
+    override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<ItemSkin> = GenerationResult.empty()
 }
 
