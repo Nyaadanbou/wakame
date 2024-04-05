@@ -9,11 +9,9 @@ import cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
 import cc.mewcraft.wakame.item.binary.meta.BFoodMeta
 import cc.mewcraft.wakame.item.schema.NekoItem
-import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
 import cc.mewcraft.wakame.item.schema.meta.SFoodMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.TargetAdapter
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
@@ -67,9 +65,8 @@ interface Food : ItemBehavior {
                     val foodMeta = nekoStack.meta<BFoodMeta>()
                     player.foodLevel += foodMeta.nutrition()
                     player.saturation += foodMeta.saturationModifier() * foodMeta.nutrition() * 2
-                    val random = Random
                     foodMeta.effects().forEach { (potionEffect, possibility) ->
-                        if (random.nextDouble() < possibility) {
+                        if (Random.nextDouble() < possibility) {
                             potionEffect.apply(player)
                         }
                     }

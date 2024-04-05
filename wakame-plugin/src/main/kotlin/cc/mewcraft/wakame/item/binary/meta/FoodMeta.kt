@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.item.ItemMetaKeys
-import cc.mewcraft.wakame.item.schema.meta.Durability
 import cc.mewcraft.wakame.item.schema.meta.Food
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.CompoundShadowTag
+import cc.mewcraft.wakame.util.getCompoundOrNull
+import cc.mewcraft.wakame.util.toStableFloat
+import cc.mewcraft.wakame.util.toStableInt
 import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 import org.bukkit.potion.PotionEffect
@@ -27,14 +29,14 @@ value class BFoodMeta(
         get() = accessor.rootOrNull?.contains(ItemMetaKeys.FOOD.value(), ShadowTagType.COMPOUND) ?: false
 
     /**
-     * Gets nutrition.
+     * Gets the value of `nutrition`.
      */
     fun nutrition(): Int {
         return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getInt(NUTRITION_TAG) ?: 0
     }
 
     /**
-     * Sets nutrition.
+     * Sets the value of `nutrition`.
      *
      * @throws IllegalStateException
      */
@@ -46,14 +48,14 @@ value class BFoodMeta(
     }
 
     /**
-     * Gets saturation modifier.
+     * Gets the value of `saturation modifier`.
      */
     fun saturationModifier(): Float {
         return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getFloat(SATURATION_MODIFIER_TAG) ?: 0F
     }
 
     /**
-     * Sets saturation modifier.
+     * Sets the value of `saturation modifier`.
      *
      * @throws IllegalStateException
      */
@@ -65,14 +67,14 @@ value class BFoodMeta(
     }
 
     /**
-     * Gets is meat.
+     * Gets the value of `is meat`.
      */
     fun isMeat(): Boolean {
         return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getBoolean(IS_MEAT_TAG) ?: false
     }
 
     /**
-     * Sets is meat.
+     * Sets the value of `is meat`.
      *
      * @throws IllegalStateException
      */
@@ -84,14 +86,14 @@ value class BFoodMeta(
     }
 
     /**
-     * Gets can always eat.
+     * Gets the value of `can always eat`.
      */
     fun canAlwaysEat(): Boolean {
         return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getBoolean(CAN_ALWAYS_EAT_TAG) ?: false
     }
 
     /**
-     * Sets can always eat.
+     * Sets the value of `can always eat`.
      *
      * @throws IllegalStateException
      */
@@ -103,14 +105,14 @@ value class BFoodMeta(
     }
 
     /**
-     * Gets eat seconds.
+     * Gets the value of `eat seconds`.
      */
     fun eatSeconds(): Float {
         return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getFloat(EAT_SECONDS_TAG) ?: 0F
     }
 
     /**
-     * Sets eat seconds.
+     * Sets the value of `eat seconds`.
      *
      * @throws IllegalStateException
      */
@@ -122,27 +124,27 @@ value class BFoodMeta(
     }
 
     /**
-     * Gets effects.
+     * Gets the value of `effects`.
      */
     fun effects(): Map<PotionEffect, Float> {
-        //TODO() 等待组件相关api的到来
+        // TODO 等待组件相关API的到来
         return emptyMap()
     }
 
     /**
-     * Sets effects.
+     * Sets the value of `effects`.
      *
      * @throws IllegalStateException
      */
     fun effects(value: Map<PotionEffect, Float>) {
         val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
         if (compound != null) {
-            //TODO() 等待组件相关api的到来
+            // TODO 等待组件相关API的到来
         } else throw IllegalStateException("Can't set 'effects' for empty food")
     }
 
     override fun getOrNull(): Food? {
-        //TODO() 等待组件相关api的到来
+        // TODO 等待组件相关API的到来
         return accessor.rootOrNull?.getCompoundOrNull(key.value())?.let { compound ->
             val nutrition = compound.getInt(NUTRITION_TAG)
             val saturationModifier = compound.getFloat(SATURATION_MODIFIER_TAG)
@@ -155,14 +157,14 @@ value class BFoodMeta(
     }
 
     override fun set(value: Food) {
-        //TODO() 等待组件相关api的到来
+        // TODO 等待组件相关API的到来
         accessor.rootOrCreate.put(key.value(), CompoundShadowTag {
             putInt(NUTRITION_TAG, value.nutrition.toStableInt())
             putFloat(SATURATION_MODIFIER_TAG, value.saturationModifier.toStableFloat())
             putBoolean(IS_MEAT_TAG, value.isMeat)
             putBoolean(CAN_ALWAYS_EAT_TAG, value.canAlwaysEat)
             putFloat(EAT_SECONDS_TAG, value.eatSeconds)
-            //putMap effects
+            // putMap effects
         })
     }
 

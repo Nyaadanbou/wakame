@@ -37,7 +37,7 @@ interface Damageable : ItemBehavior {
     /**
      * 耐久归零时，物品是否消失。
      */
-    val isLostWhenBreak: Boolean
+    val disappearWhenBroken: Boolean
 
     companion object Factory : ItemBehaviorFactory<Damageable> {
         override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Damageable {
@@ -56,7 +56,7 @@ interface Damageable : ItemBehavior {
     ) : Damageable, KoinComponent {
         private val logger: Logger by inject()
         override val repairMaterials: List<Key> by repairMaterials.map { it.map(::Key) }
-        override val isLostWhenBreak: Boolean by isLostWhenBreak
+        override val disappearWhenBroken: Boolean by isLostWhenBreak
 
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
             val nekoStack = NekoStackFactory.wrap(itemStack)
