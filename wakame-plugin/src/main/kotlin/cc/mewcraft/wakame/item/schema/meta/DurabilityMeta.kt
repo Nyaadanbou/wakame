@@ -23,7 +23,7 @@ data class Durability(
 
     init {
         require(threshold > 0) { "threshold > 0" }
-        require(threshold > damage) { "threshold > damage" }
+        require(threshold >= damage) { "threshold >= damage" }
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

@@ -1,0 +1,172 @@
+package cc.mewcraft.wakame.item.binary.meta
+
+import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.schema.meta.Durability
+import cc.mewcraft.wakame.item.schema.meta.Food
+import cc.mewcraft.wakame.util.*
+import me.lucko.helper.nbt.ShadowTagType
+import net.kyori.adventure.key.Key
+import org.bukkit.potion.PotionEffect
+
+@JvmInline
+value class BFoodMeta(
+    private val accessor: ItemMetaAccessor,
+) : BinaryItemMeta<Food> {
+    companion object {
+        private const val NUTRITION_TAG = "nutrition"
+        private const val SATURATION_MODIFIER_TAG = "saturation_modifier"
+        private const val IS_MEAT_TAG = "is_meat"
+        private const val CAN_ALWAYS_EAT_TAG = "can_always_eat"
+        private const val EAT_SECONDS_TAG = "eat_seconds"
+        private const val EFFECTS_TAG = "effects"
+    }
+
+    override val key: Key
+        get() = ItemMetaKeys.FOOD
+    override val exists: Boolean
+        get() = accessor.rootOrNull?.contains(ItemMetaKeys.FOOD.value(), ShadowTagType.COMPOUND) ?: false
+
+    /**
+     * Gets nutrition.
+     */
+    fun nutrition(): Int {
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getInt(NUTRITION_TAG) ?: 0
+    }
+
+    /**
+     * Sets nutrition.
+     *
+     * @throws IllegalStateException
+     */
+    fun nutrition(value: Int) {
+        val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
+        if (compound != null) {
+            compound.putInt(NUTRITION_TAG, value)
+        } else throw IllegalStateException("Can't set 'nutrition' for empty food")
+    }
+
+    /**
+     * Gets saturation modifier.
+     */
+    fun saturationModifier(): Float {
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getFloat(SATURATION_MODIFIER_TAG) ?: 0F
+    }
+
+    /**
+     * Sets saturation modifier.
+     *
+     * @throws IllegalStateException
+     */
+    fun saturationModifier(value: Float) {
+        val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
+        if (compound != null) {
+            compound.putFloat(SATURATION_MODIFIER_TAG, value)
+        } else throw IllegalStateException("Can't set 'saturationModifier' for empty food")
+    }
+
+    /**
+     * Gets is meat.
+     */
+    fun isMeat(): Boolean {
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getBoolean(IS_MEAT_TAG) ?: false
+    }
+
+    /**
+     * Sets is meat.
+     *
+     * @throws IllegalStateException
+     */
+    fun isMeat(value: Boolean) {
+        val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
+        if (compound != null) {
+            compound.putBoolean(IS_MEAT_TAG, value)
+        } else throw IllegalStateException("Can't set 'isMeat' for empty food")
+    }
+
+    /**
+     * Gets can always eat.
+     */
+    fun canAlwaysEat(): Boolean {
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getBoolean(CAN_ALWAYS_EAT_TAG) ?: false
+    }
+
+    /**
+     * Sets can always eat.
+     *
+     * @throws IllegalStateException
+     */
+    fun canAlwaysEat(value: Boolean) {
+        val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
+        if (compound != null) {
+            compound.putBoolean(CAN_ALWAYS_EAT_TAG, value)
+        } else throw IllegalStateException("Can't set 'canAlwaysEat' for empty food")
+    }
+
+    /**
+     * Gets eat seconds.
+     */
+    fun eatSeconds(): Float {
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getFloat(EAT_SECONDS_TAG) ?: 0F
+    }
+
+    /**
+     * Sets eat seconds.
+     *
+     * @throws IllegalStateException
+     */
+    fun eatSeconds(value: Float) {
+        val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
+        if (compound != null) {
+            compound.putFloat(EAT_SECONDS_TAG, value)
+        } else throw IllegalStateException("Can't set 'eatSeconds' for empty food")
+    }
+
+    /**
+     * Gets effects.
+     */
+    fun effects(): Map<PotionEffect, Float> {
+        //TODO() 等待组件相关api的到来
+        return emptyMap()
+    }
+
+    /**
+     * Sets effects.
+     *
+     * @throws IllegalStateException
+     */
+    fun effects(value: Map<PotionEffect, Float>) {
+        val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
+        if (compound != null) {
+            //TODO() 等待组件相关api的到来
+        } else throw IllegalStateException("Can't set 'effects' for empty food")
+    }
+
+    override fun getOrNull(): Food? {
+        //TODO() 等待组件相关api的到来
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.let { compound ->
+            val nutrition = compound.getInt(NUTRITION_TAG)
+            val saturationModifier = compound.getFloat(SATURATION_MODIFIER_TAG)
+            val isMeat = compound.getBoolean(IS_MEAT_TAG)
+            val canAlwaysEat = compound.getBoolean(CAN_ALWAYS_EAT_TAG)
+            val eatSeconds = compound.getFloat(EAT_SECONDS_TAG)
+            val effects: Map<PotionEffect, Float> = emptyMap()
+            Food(nutrition, saturationModifier, isMeat, canAlwaysEat, eatSeconds, effects)
+        }
+    }
+
+    override fun set(value: Food) {
+        //TODO() 等待组件相关api的到来
+        accessor.rootOrCreate.put(key.value(), CompoundShadowTag {
+            putInt(NUTRITION_TAG, value.nutrition.toStableInt())
+            putFloat(SATURATION_MODIFIER_TAG, value.saturationModifier.toStableFloat())
+            putBoolean(IS_MEAT_TAG, value.isMeat)
+            putBoolean(CAN_ALWAYS_EAT_TAG, value.canAlwaysEat)
+            putFloat(EAT_SECONDS_TAG, value.eatSeconds)
+            //putMap effects
+        })
+    }
+
+    override fun remove() {
+        accessor.rootOrNull?.remove(key.value())
+    }
+}

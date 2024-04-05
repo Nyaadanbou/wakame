@@ -34,10 +34,16 @@ interface Damageable : ItemBehavior {
      */
     val repairMaterials: List<Key>
 
+    /**
+     * 耐久归零时，物品是否消失。
+     */
+    val isLostWhenBreak: Boolean
+
     companion object Factory : ItemBehaviorFactory<Damageable> {
         override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Damageable {
             val repairMaterials = behaviorConfig.optionalEntry<List<String>>("repair").orElse(emptyList())
-            return Default(repairMaterials)
+            val isLostWhenBreak = behaviorConfig.optionalEntry<Boolean>("will_lost").orElse(true)
+            return Default(repairMaterials, isLostWhenBreak)
         }
     }
 
@@ -46,9 +52,11 @@ interface Damageable : ItemBehavior {
      */
     private class Default(
         repairMaterials: Provider<List<String>>,
+        isLostWhenBreak: Provider<Boolean>
     ) : Damageable, KoinComponent {
         private val logger: Logger by inject()
         override val repairMaterials: List<Key> by repairMaterials.map { it.map(::Key) }
+        override val isLostWhenBreak: Boolean by isLostWhenBreak
 
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
             val nekoStack = NekoStackFactory.wrap(itemStack)

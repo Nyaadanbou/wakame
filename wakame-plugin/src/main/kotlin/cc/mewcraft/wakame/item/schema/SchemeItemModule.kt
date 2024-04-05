@@ -67,6 +67,7 @@ internal fun schemaItemModule(): Module = module {
             .kregister(DisplayNameMetaSerializer)
             .kregister(DurabilityMetaSerializer)
             .kregister(ElementMetaSerializer)
+            .kregister(FoodMetaSerializer)
             .kregister(KizamiMetaSerializer)
             .kregister(LevelMetaSerializer)
             .kregister(RarityMetaSerializer)

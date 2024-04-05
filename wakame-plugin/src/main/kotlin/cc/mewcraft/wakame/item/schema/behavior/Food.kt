@@ -4,9 +4,24 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.wakame.item.binary.NekoStackFactory
+import cc.mewcraft.wakame.item.binary.meta
+import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
+import cc.mewcraft.wakame.item.binary.meta.BFoodMeta
 import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
+import cc.mewcraft.wakame.item.schema.meta.SFoodMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.Target
+import cc.mewcraft.wakame.skill.TargetAdapter
+import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.inventory.ItemStack
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
+import kotlin.random.Random
 import kotlin.reflect.KClass
 
 /**
@@ -15,31 +30,7 @@ import kotlin.reflect.KClass
 interface Food : ItemBehavior {
 
     override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>>
-        get() = emptyArray()
-
-    // 原版组件实现 - start
-
-    /**
-     * 食用后回复的饱食度。
-     */
-    val nutrition: Int
-
-    /**
-     * 食用后回复的饱和度。
-     */
-    val saturation: Float
-
-    /**
-     * 食用所需的时间，单位秒。
-     */
-    val eatSeconds: Float
-
-    /**
-     * 满饱食度时是否可以食用。
-     */
-    val canAlwaysEat: Boolean
-
-    // 原版组件实现 - end
+        get() = arrayOf(SFoodMeta::class)
 
     /**
      * 食用所需的代价。
@@ -53,30 +44,50 @@ interface Food : ItemBehavior {
 
     companion object Factory : ItemBehaviorFactory<Food> {
         override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Food {
-            val nutrition = behaviorConfig.optionalEntry<Int>("nutrition").orElse(0)
-            val saturation = behaviorConfig.optionalEntry<Float>("saturation").orElse(0F)
-            val eatSeconds = behaviorConfig.optionalEntry<Float>("eat_seconds").orElse(1.6F)
-            val canAlwaysEat = behaviorConfig.optionalEntry<Boolean>("can_always_eat").orElse(false)
-            val eatCostType = behaviorConfig.optionalEntry<EatCost>("eat_cost").orElse(EatCost.ShrinkAmount(1))
+            val eatCostType = behaviorConfig.optionalEntry<EatCost>("eat_cost").orElse(EatCost.ShrinkAmount)
             val abilities = behaviorConfig.optionalEntry<List<Skill>>("skills").orElse(emptyList())
-            return Default(nutrition, saturation, eatSeconds, canAlwaysEat, eatCostType, abilities)
+            return Default(eatCostType, abilities)
         }
     }
 
     private class Default(
-        nutrition: Provider<Int>,
-        saturation: Provider<Float>,
-        eatSeconds: Provider<Float>,
-        canAlwaysEat: Provider<Boolean>,
         eatCostType: Provider<EatCost>,
         skills: Provider<List<Skill>>,
-    ) : Food {
-        override val nutrition: Int by nutrition
-        override val saturation: Float by saturation
-        override val eatSeconds: Float by eatSeconds
-        override val canAlwaysEat: Boolean by canAlwaysEat
+    ) : Food, KoinComponent {
+        private val logger: Logger by inject()
         override val eatCostType: EatCost by eatCostType
         override val skills: List<Skill> by skills
+
+        override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
+            val nekoStack = NekoStackFactory.wrap(itemStack)
+            when (eatCostType) {
+                EatCost.ShrinkAmount -> {}
+                EatCost.Nothing -> {
+                    event.isCancelled = true
+                    val foodMeta = nekoStack.meta<BFoodMeta>()
+                    player.foodLevel += foodMeta.nutrition()
+                    player.saturation += foodMeta.saturationModifier() * foodMeta.nutrition() * 2
+                    val random = Random
+                    foodMeta.effects().forEach { (potionEffect, possibility) ->
+                        if (random.nextDouble() < possibility) {
+                            potionEffect.apply(player)
+                        }
+                    }
+                }
+
+                is EatCost.ReduceDurability -> {
+                    val durabilityMeta = nekoStack.meta<BDurabilityMeta>()
+                    if (!durabilityMeta.exists) {
+                        logger.warn("物品 ${nekoStack.schema.key} 没有耐久度元数据，无法扣除耐久") //TODO 改为直接加上元数据
+                        return
+                    }
+                    durabilityMeta.changeDurabilityNaturally((eatCostType as EatCost.ReduceDurability).amount)
+                }
+            }
+            skills.forEach { skill ->
+                skill.castAt(TargetAdapter.adapt(player))
+            }
+        }
     }
 }
 
@@ -87,9 +98,9 @@ sealed interface EatCost {
     data object Nothing : EatCost
 
     /**
-     * 食用后物品数量减少 [amount]。
+     * 食用后物品数量减少 1。
      */
-    data class ShrinkAmount(val amount: Int) : EatCost
+    data object ShrinkAmount : EatCost
 
     /**
      * 食用后物品耐久度减少 [amount]。

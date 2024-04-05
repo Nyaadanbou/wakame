@@ -27,6 +27,7 @@ object ItemMetaKeys {
     val RARITY: Key = createKey("rarity")
     val SKIN: Key = createKey("skin")
     val SKIN_OWNER: Key = createKey("skin_owner")
+    val FOOD: Key = createKey("food")
 
     private fun createKey(value: String): Key {
         return Key(NekoNamespaces.ITEM_META, value)
