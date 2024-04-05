@@ -42,11 +42,11 @@ object BinaryCellFactory {
     fun decode(id: String, compound: CompoundShadowTag): BinaryCell {
         return ImmutableBinaryCell(
             id = id,
-            canReforge = compound.getBoolean(NekoTags.Cell.CAN_REFORGE),
-            canOverride = compound.getBoolean(NekoTags.Cell.CAN_OVERRIDE),
-            binaryCore = BinaryCoreFactory.decode(compound.getCompound(NekoTags.Cell.CORE)),
-            binaryCurse = BinaryCurseFactory.decode(compound.getCompound(NekoTags.Cell.CURSE)),
-            reforgeMeta = ReforgeMetaFactory.decode(compound.getCompound(NekoTags.Cell.REFORGE))
+            isReforgeable = compound.getBoolean(NekoTags.Cell.CAN_REFORGE),
+            isOverridable = compound.getBoolean(NekoTags.Cell.CAN_OVERRIDE),
+            core = BinaryCoreFactory.decode(compound.getCompound(NekoTags.Cell.CORE)),
+            curse = BinaryCurseFactory.decode(compound.getCompound(NekoTags.Cell.CURSE)),
+            reforgeData = ReforgeDataFactory.decode(compound.getCompound(NekoTags.Cell.REFORGE))
         )
     }
 
@@ -63,8 +63,12 @@ object BinaryCellFactory {
      * @return a new instance or `null`
      */
     fun generate(context: SchemaGenerationContext, schemaCell: SchemaCell): BinaryCell? {
+        val id = schemaCell.id
+        val isReforgeable = schemaCell.isReforgeable
+        val isOverridable = schemaCell.isOverridable
+
         // make a core
-        val binaryCore = run {
+        val core = run {
             val schemaCore = schemaCell.coreSelector.pickSingle(context)
             if (schemaCore != null) {
                 // something is drawn out
@@ -81,23 +85,22 @@ object BinaryCellFactory {
         }
 
         // make a curse
-        val binaryCurse = run {
-            val schema = schemaCell.curseSelector.pickSingle(context) ?: SchemaCurseFactory.empty()
-            val binary = BinaryCurseFactory.generate(context, schema)
-            binary
+        val curse = run {
+            val schemaCurse = schemaCell.curseSelector.pickSingle(context) ?: SchemaCurseFactory.empty()
+            BinaryCurseFactory.generate(context, schemaCurse)
         }
 
         // make a reforge meta
-        val reforgeMeta = ReforgeMetaFactory.empty()
+        val reforgeData = ReforgeDataFactory.empty()
 
         // collect all and return
         return ImmutableBinaryCell(
-            id = schemaCell.id,
-            canReforge = schemaCell.canReforge,
-            canOverride = schemaCell.canOverride,
-            binaryCore = binaryCore,
-            binaryCurse = binaryCurse,
-            reforgeMeta = reforgeMeta
+            id = id,
+            isReforgeable = isReforgeable,
+            isOverridable = isOverridable,
+            core = core,
+            curse = curse,
+            reforgeData = reforgeData
         )
     }
 }

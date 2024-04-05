@@ -53,7 +53,7 @@ class BehaviorValidator : NekoItemValidator() {
         if (missingMetaTypes.isNotEmpty()) {
             val exceptionMessage = buildString {
                 missingMetaTypes.forEach { (k, v) ->
-                    append("The behavior '${k.qualifiedName}' requires the schema meta '${v.joinToString(", ", transform = { it.simpleName!! })}' but it does present in the config")
+                    append("The behavior '${k.qualifiedName}' requires the item meta '${v.joinToString(", ", transform = { it.simpleName!! })}' but it does present in the config")
                     append("\n")
                 }
             }

@@ -3,11 +3,11 @@ package cc.mewcraft.wakame.item.binary.cell
 import cc.mewcraft.wakame.NekoTags
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
-object ReforgeMetaFactory {
+object ReforgeDataFactory {
     /**
      * Creates an empty reforge meta.
      */
-    fun empty(): ReforgeMeta = EmptyReforgeMeta
+    fun empty(): ReforgeData = EmptyReforgeData
 
     /**
      * Creates a reforge meta from a NBT source.
@@ -15,12 +15,12 @@ object ReforgeMetaFactory {
      * @param compound the compound
      * @return a new instance
      */
-    fun decode(compound: CompoundShadowTag): ReforgeMeta {
+    fun decode(compound: CompoundShadowTag): ReforgeData {
         if (compound.isEmpty) {
             return empty()
         }
 
-        return ImmutableReforgeMeta(
+        return ImmutableReforgeData(
             successCount = compound.getInt(NekoTags.Reforge.SUCCESS),
             failureCount = compound.getInt(NekoTags.Reforge.FAILURE)
         )

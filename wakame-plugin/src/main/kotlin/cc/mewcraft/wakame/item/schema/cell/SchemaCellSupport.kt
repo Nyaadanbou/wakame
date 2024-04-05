@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.random.Group
  */
 data object EmptySchemaCell : SchemaCell {
     override val id: String = "empty"
-    override val canReforge: Boolean = false
-    override val canOverride: Boolean = false
+    override val isReforgeable: Boolean = false
+    override val isOverridable: Boolean = false
     override val keepEmpty: Boolean = false
     override val coreSelector: Group<SchemaCore, SchemaGenerationContext> = Group.empty()
     override val curseSelector: Group<SchemaCurse, SchemaGenerationContext> = Group.empty()
@@ -23,8 +23,8 @@ data object EmptySchemaCell : SchemaCell {
 data class ImmutableSchemaCell(
     override val id: String,
     override val keepEmpty: Boolean,
-    override val canReforge: Boolean,
-    override val canOverride: Boolean,
+    override val isReforgeable: Boolean,
+    override val isOverridable: Boolean,
     override val coreSelector: SchemaCoreGroup,
     override val curseSelector: SchemaCurseGroup,
 ) : SchemaCell

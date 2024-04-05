@@ -16,27 +16,27 @@ import cc.mewcraft.wakame.item.schema.cell.SchemaCell
  */
 interface BinaryCell : Cell, ShadowTagLike {
     /**
-     * Returns `true` if the cell is reforgeable.
+     * Returns `true` if this cell is reforgeable.
      */
-    val canReforge: Boolean
+    val isReforgeable: Boolean
 
     /**
-     * Returns `true` if the cell is allowed to be modified by players.
+     * Returns `true` if this cell is allowed to be modified by players.
      */
-    val canOverride: Boolean
+    val isOverridable: Boolean
 
     /**
-     * The binary core of the cell.
+     * The core stored in this cell.
      */
-    val binaryCore: BinaryCore
+    val core: BinaryCore
 
     /**
-     * The binary lock condition of the cell.
+     * The curse stored in this cell.
      */
-    val binaryCurse: BinaryCurse
+    val curse: BinaryCurse
 
     /**
-     * The reforge metadata of the cell.
+     * The reforge data stored in this cell.
      */
-    val reforgeMeta: ReforgeMeta
+    val reforgeData: ReforgeData
 }

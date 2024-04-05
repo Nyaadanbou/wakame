@@ -6,10 +6,10 @@ import cc.mewcraft.wakame.item.ShadowTagLike
 /**
  * Metadata of reforging.
  *
- * @see ReforgeMetaFactory
+ * @see ReforgeDataFactory
  * @see NekoTags.Reforge
  */
-interface ReforgeMeta : ShadowTagLike {
+interface ReforgeData : ShadowTagLike {
     /**
      * 重铸成功的次数。
      */
@@ -24,9 +24,9 @@ interface ReforgeMeta : ShadowTagLike {
 /**
  * Check if the meta is empty.
  */
-val ReforgeMeta.isEmpty: Boolean get() = (this is EmptyReforgeMeta)
+val ReforgeData.isEmpty: Boolean get() = (this is EmptyReforgeData)
 
 /**
  * Check if the meta is not empty.
  */
-val ReforgeMeta.isNotEmpty: Boolean get() = !isEmpty
+val ReforgeData.isNotEmpty: Boolean get() = !isEmpty

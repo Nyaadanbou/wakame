@@ -47,12 +47,12 @@ internal value class ItemCellAccessorImpl(
         // 并且 Operation 不同的情况
 
         val multimap = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
-        for (binaryCell in snapshot.values) {
-            if (!binaryCell.binaryCurse.test(base)) {
+        for (cell in snapshot.values) {
+            if (!cell.curse.test(base)) {
                 continue // curse has not been unlocked yet
             }
 
-            val core = binaryCell.binaryCore
+            val core = cell.core
             if (core is BinaryAttributeCore) {
                 val modifiers = core.makeAttributeModifiers(base.uuid)
                 val modifiersEntries = modifiers.entries

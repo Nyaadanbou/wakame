@@ -75,7 +75,7 @@ internal class TextStylizerImpl(
 
         // for each cell in the item
         for (cell in item.cell.snapshot.values) {
-            val core = cell.binaryCore
+            val core = cell.core
             if (core.isEmpty) {
                 // it's an empty core - add the pre-defined placeholder lines
 

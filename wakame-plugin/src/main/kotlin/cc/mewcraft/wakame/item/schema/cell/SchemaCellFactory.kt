@@ -47,17 +47,19 @@ object SchemaCellFactory {
     ): SchemaCell {
         // all are `false` by default if `null`
         val keepEmpty = cellNode.node("keep_empty").boolean
-        val reforgeable = cellNode.node("can_reforge").boolean
-        val overridable = cellNode.node("can_override").boolean
+        val isReforgeable = cellNode.node("can_reforge").boolean
+        val isOverridable = cellNode.node("can_override").boolean
 
+        // get selectors for core & curse, or null if the nodes are empty
         val coreGroup = coreNode?.krequire<SchemaCoreGroup>() ?: Group.empty()
         val curseGroup = curseNode?.krequire<SchemaCurseGroup>() ?: Group.empty()
 
+        // collect all and return
         return ImmutableSchemaCell(
             id = id,
             keepEmpty = keepEmpty,
-            canReforge = reforgeable,
-            canOverride = overridable,
+            isReforgeable = isReforgeable,
+            isOverridable = isOverridable,
             coreSelector = coreGroup,
             curseSelector = curseGroup
         )

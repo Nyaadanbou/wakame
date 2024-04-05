@@ -31,12 +31,12 @@ interface SchemaCell : Cell {
     /**
      * Returns `true` if the cell is configured as "reforgeable".
      */
-    val canReforge: Boolean
+    val isReforgeable: Boolean
 
     /**
      * Returns `true` if the cell is configured as "overridable".
      */
-    val canOverride: Boolean
+    val isOverridable: Boolean
 
     /**
      * Returns `true` if the cell should be removed from the item stack when
