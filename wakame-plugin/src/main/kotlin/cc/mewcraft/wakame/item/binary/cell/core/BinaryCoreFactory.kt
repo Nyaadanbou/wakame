@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.item.binary.cell.core
 
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
-import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaAttributeCore
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
@@ -39,15 +37,16 @@ object BinaryCoreFactory {
         }
 
         val key = Key(compound.getString(NekoTags.Cell.CORE_KEY))
-        val ret = when (key.namespace()) {
+        val ret: BinaryCore
+        when (key.namespace()) {
             NekoNamespaces.SKILL -> {
-                BinarySkillCore(key)
+                ret = BinarySkillCore(key)
             }
 
             NekoNamespaces.ATTRIBUTE -> {
-                val encoder = AttributeRegistry.FACADES[key].BINARY_DATA_NBT_ENCODER
-                val data = encoder.encode(compound)
-                BinaryAttributeCore(key, data)
+                val encoder = AttributeRegistry.FACADES[key].BINARY_CORE_NBT_ENCODER
+                val attributeCore = encoder.encode(compound)
+                ret = attributeCore
             }
 
             else -> throw IllegalArgumentException("Failed to parse binary tag ${compound.asString()}")
@@ -66,24 +65,18 @@ object BinaryCoreFactory {
      */
     fun generate(context: SchemaGenerationContext, schemaCore: SchemaCore): BinaryCore {
         val key = schemaCore.key
-        val ret = when (schemaCore) {
-            is SchemaSkillCore -> {
-                // populate context
-                val contextHolder = SkillContextHolder(key)
-                context.abilities += contextHolder
-
-                // construct core
-                BinarySkillCore(key)
+        val ret: BinaryCore
+        when (schemaCore) {
+            is SchemaAttributeCore -> {
+                val attributeCore = schemaCore.generate(context)
+                context.attributes += AttributeContextHolder(key, attributeCore.operation, attributeCore.elementOrNull)
+                ret = attributeCore
             }
 
-            is SchemaAttributeCore -> {
-                // populate context
-                val attributeData = schemaCore.generate(context) as BinaryAttributeData
-                val contextHolder = AttributeContextHolder(key, attributeData.operation, attributeData.element)
-                context.attributes += contextHolder
-
-                // construct core
-                BinaryAttributeCore(key, attributeData)
+            is SchemaSkillCore -> {
+                val skillCore = BinarySkillCore(key)
+                context.abilities += SkillContextHolder(key)
+                ret = skillCore
             }
         }
 

@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.skill.BinarySkillData
 import cc.mewcraft.wakame.skill.Skill
 import com.google.common.collect.Multimap
 
@@ -51,14 +50,14 @@ interface ItemCellAccessor {
     fun contains(id: String): Boolean = find(id) != null
 
     /**
-     * Gets all attribute modifiers from the cell holder.
+     * Gets all attribute modifiers from all the cells.
      */
     fun getAttributeModifiers(): Multimap<Attribute, AttributeModifier>
 
     /**
-     * Gets all active abilities from the cell holder.
+     * Gets all active abilities from all the cells.
      */
-    fun getActiveAbilities(): Map<Skill, BinarySkillData>
+    fun getActiveAbilities(): List<Skill>
 
     /* Setters */
 

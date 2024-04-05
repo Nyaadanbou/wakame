@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.facade
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.CoreData
+import cc.mewcraft.wakame.item.schema.cell.core.SchemaAttributeCore
 import cc.mewcraft.wakame.util.RandomizedValue
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -12,42 +12,22 @@ import org.spongepowered.configurate.ConfigurationNode
    这些类用于储存属性的“模板数值”，也就是用于产生数值的数值。
 */
 
-val SchemaAttributeData.element: Element?
-    @Suppress("UNCHECKED_CAST")
-    get() = (this as? AttributeComponent.Element<Element>)?.element
-
-sealed interface SchemaAttributeData : CoreData.Schema, AttributeData, AttributeComponent.Op<Operation> {
-    data class S(
-        override val operation: Operation,
-        override val value: RandomizedValue,
-    ) : SchemaAttributeData, AttributeDataS<Operation, RandomizedValue>
-
-    data class R(
-        override val operation: Operation,
-        override val lower: RandomizedValue,
-        override val upper: RandomizedValue,
-    ) : SchemaAttributeData, AttributeDataR<Operation, RandomizedValue>
-
-    data class SE(
-        override val operation: Operation,
-        override val value: RandomizedValue,
-        override val element: Element,
-    ) : SchemaAttributeData, AttributeDataSE<Operation, RandomizedValue, Element>
-
-    data class RE(
-        override val operation: Operation,
-        override val lower: RandomizedValue,
-        override val upper: RandomizedValue,
-        override val element: Element,
-    ) : SchemaAttributeData, AttributeDataRE<Operation, RandomizedValue, Element>
+/**
+ * Represents the data of **randomized** attribute values.
+ */
+sealed interface SchemaAttributeData {
+    interface S : SchemaAttributeData, AttributeDataS<Operation, RandomizedValue>
+    interface R : SchemaAttributeData, AttributeDataR<Operation, RandomizedValue>
+    interface SE : SchemaAttributeData, AttributeDataSE<Operation, RandomizedValue, Element>
+    interface RE : SchemaAttributeData, AttributeDataRE<Operation, RandomizedValue, Element>
 }
 
 /**
- * Data conversion: [ConfigurationNode] -> [SchemaAttributeData].
+ * Data conversion: [ConfigurationNode] -> [SchemaAttributeCore].
  */
-fun interface SchemaAttributeDataNodeEncoder : AttributeDataEncoder<ConfigurationNode, SchemaAttributeData>
+fun interface SchemaAttributeCoreNodeEncoder : AttributeDataEncoder<ConfigurationNode, SchemaAttributeCore>
 
 /**
- * Data conversion: [SchemaAttributeData] -> [ConfigurationNode].
+ * Data conversion: [SchemaAttributeCore] -> [ConfigurationNode].
  */
-fun interface SchemaAttributeDataNodeDecoder : AttributeDataDecoder<ConfigurationNode, SchemaAttributeData>
+fun interface SchemaAttributeDataNodeDecoder : AttributeDataDecoder<ConfigurationNode, SchemaAttributeCore>

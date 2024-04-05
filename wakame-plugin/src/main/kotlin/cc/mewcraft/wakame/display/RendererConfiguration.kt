@@ -115,10 +115,13 @@ internal class RendererConfiguration(
      * **注意该映射不包含 [Attributes.ATTACK_SPEED_LEVEL]**
      */
     val attributeFormats: Map<Key, String> by reloadable {
-        root.node(RENDERER_STYLE_NODE, "attribute", "value").childrenMap()
-            .mapKeys { (k, _) -> Key(NekoNamespaces.ATTRIBUTE, k as String) }
-            .filter { (k, _) -> k != Attributes.ATTACK_SPEED_LEVEL.key() }
-            .mapValues { (_, v) -> v.krequire<String>() }
+        root.node(RENDERER_STYLE_NODE, "attribute", "value")
+            .childrenMap()
+            .mapKeys { (key, _) -> key.toString() }
+            .filter { (key, _) -> key != Attributes.ATTACK_SPEED_LEVEL.key.value() }
+            .mapKeys { (key, _) -> Key(NekoNamespaces.ATTRIBUTE, key) }
+            .mapValues { (_, value) -> value.krequire<String>() }
+            .withDefault { value -> "${value.asString()} (missing config)" }
     }
 
     /**
@@ -128,9 +131,11 @@ internal class RendererConfiguration(
         val node = root.node(RENDERER_STYLE_NODE, "attribute", "value", "attack_speed_level")
         AttributeStylizerImpl.AttackSpeedFormatImpl(
             merged = node.node("merged").krequire<String>(),
-            levels = node.node("levels").childrenMap()
-                .map { (key, node) -> (key as String).toInt() to node.krequire<String>() }
-                .toMap()
+            levels = node.node("levels")
+                .childrenMap()
+                .mapKeys { (key, _) -> key.toString().toInt() }
+                .mapValues { (_, value) -> value.krequire<String>() }
+                .withDefault { key -> "$key (missing config)" }
         )
     }
 

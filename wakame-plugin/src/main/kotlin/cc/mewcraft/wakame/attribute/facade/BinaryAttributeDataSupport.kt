@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.facade
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.CoreData
+import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -16,52 +16,27 @@ import org.spongepowered.configurate.ConfigurationNode
    而不用在测试环境中构建一个真的 NBT。
 */
 
-val BinaryAttributeData.element: Element?
-    @Suppress("UNCHECKED_CAST")
-    get() = (this as? AttributeComponent.Element<Element>)?.element
-
 /**
  * Represents the data of **fixed** attribute values.
- *
- * We especially extend [AttributeComponent.Op] as it's common among all subtypes.
  */
-sealed interface BinaryAttributeData : AttributeData, AttributeComponent.Op<Operation>, CoreData.Binary {
-    data class S(
-        override val operation: Operation,
-        override val value: Double,
-    ) : BinaryAttributeData, AttributeDataS<Operation, Double>
-
-    data class R(
-        override val operation: Operation,
-        override val lower: Double,
-        override val upper: Double,
-    ) : BinaryAttributeData, AttributeDataR<Operation, Double>
-
-    data class SE(
-        override val operation: Operation,
-        override val value: Double,
-        override val element: Element,
-    ) : BinaryAttributeData, AttributeDataSE<Operation, Double, Element>
-
-    data class RE(
-        override val operation: Operation,
-        override val lower: Double,
-        override val upper: Double,
-        override val element: Element,
-    ) : BinaryAttributeData, AttributeDataRE<Operation, Double, Element>
+sealed interface BinaryAttributeData : AttributeData {
+    interface S : BinaryAttributeData, AttributeDataS<Operation, Double>
+    interface R : BinaryAttributeData, AttributeDataR<Operation, Double>
+    interface SE : BinaryAttributeData, AttributeDataSE<Operation, Double, Element>
+    interface RE : BinaryAttributeData, AttributeDataRE<Operation, Double, Element>
 }
 
 /**
- * Data conversion: [ConfigurationNode] -> [BinaryAttributeData].
+ * Data conversion: [ConfigurationNode] -> [BinaryAttributeCore].
  */
-fun interface BinaryAttributeDataNodeEncoder : AttributeDataEncoder<ConfigurationNode, BinaryAttributeData>
+fun interface BinaryAttributeCoreNodeEncoder : AttributeDataEncoder<ConfigurationNode, BinaryAttributeCore>
 
 /**
- * Data conversion: [CompoundShadowTag] -> [BinaryAttributeData].
+ * Data conversion: [CompoundShadowTag] -> [BinaryAttributeCore].
  */
-fun interface BinaryAttributeDataNbtEncoder : AttributeDataEncoder<CompoundShadowTag, BinaryAttributeData>
+fun interface BinaryAttributeCoreNbtEncoder : AttributeDataEncoder<CompoundShadowTag, BinaryAttributeCore>
 
 /**
- * Data conversion: [BinaryAttributeData] -> [CompoundShadowTag].
+ * Data conversion: [BinaryAttributeCore] -> [CompoundShadowTag].
  */
-fun interface BinaryAttributeDataNbtDecoder : AttributeDataDecoder<CompoundShadowTag, BinaryAttributeData>
+fun interface BinaryAttributeCoreNbtDecoder : AttributeDataDecoder<CompoundShadowTag, BinaryAttributeCore>

@@ -29,13 +29,6 @@ typealias SchemaCurseGroup = Group<SchemaCurse, SchemaGenerationContext>
  */
 interface SchemaCell : Cell {
     /**
-     * The ID of this cell.
-     *
-     * No cells with identical ID on a single item.
-     */
-    val id: String
-
-    /**
      * Returns `true` if the cell is configured as "reforgeable".
      */
     val canReforge: Boolean

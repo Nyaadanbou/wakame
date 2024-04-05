@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.config.configurate
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.potion.PotionEffect
@@ -12,6 +13,18 @@ import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.function.Predicate
+
+internal object MaterialSerializer : ScalarSerializer<Material>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): Material {
+        val name = obj.toString()
+        val material = Material.matchMaterial(name) ?: throw SerializationException(type, "Can't parse material '$name'")
+        return material
+    }
+
+    override fun serialize(item: Material, typeSupported: Predicate<Class<*>>?): Any {
+        return item.key().asString()
+    }
+}
 
 internal object PotionEffectTypeSerializer : ScalarSerializer<PotionEffectType>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): PotionEffectType {

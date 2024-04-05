@@ -17,28 +17,28 @@ sealed interface AttributeComponent {
     /**
      * The `operation` component.
      */
-    interface Op<OP> {
+    interface Op<OP> : AttributeComponent {
         val operation: OP
     }
 
     /**
      * The `element` component.
      */
-    interface Element<E> {
+    interface Element<E> : AttributeComponent {
         val element: E
     }
 
     /**
      * The `single` value component.
      */
-    interface Single<S> {
+    interface Single<S> : AttributeComponent {
         val value: S
     }
 
     /**
      * The `ranged` value component.
      */
-    interface Ranged<R> {
+    interface Ranged<R> : AttributeComponent {
         val lower: R
         val upper: R
     }
@@ -55,12 +55,13 @@ sealed interface AttributeComponent {
  * - [AttributeDataSE]
  * - [AttributeDataRE]
  */
-sealed interface AttributeData
+interface AttributeData
 
 /**
  * Components: [AttributeComponent.Op], [AttributeComponent.Single]
  */
-interface AttributeDataS<OP, S> : AttributeData,
+interface AttributeDataS<OP, S> :
+    AttributeData,
     AttributeComponent.Op<OP>,
     AttributeComponent.Single<S> {
 
@@ -71,7 +72,8 @@ interface AttributeDataS<OP, S> : AttributeData,
 /**
  * Components: [AttributeComponent.Op], [AttributeComponent.Single]
  */
-interface AttributeDataR<OP, R> : AttributeData,
+interface AttributeDataR<OP, R> :
+    AttributeData,
     AttributeComponent.Op<OP>,
     AttributeComponent.Ranged<R> {
 
@@ -83,7 +85,8 @@ interface AttributeDataR<OP, R> : AttributeData,
 /**
  * Components: [AttributeComponent.Op], [AttributeComponent.Single], [AttributeComponent.Element]
  */
-interface AttributeDataSE<OP, S, E> : AttributeData,
+interface AttributeDataSE<OP, S, E> :
+    AttributeData,
     AttributeComponent.Op<OP>,
     AttributeComponent.Single<S>,
     AttributeComponent.Element<E> {
@@ -96,7 +99,8 @@ interface AttributeDataSE<OP, S, E> : AttributeData,
 /**
  * Components: [AttributeComponent.Op], [AttributeComponent.Ranged], [AttributeComponent.Element]
  */
-interface AttributeDataRE<OP, R, E> : AttributeData,
+interface AttributeDataRE<OP, R, E> :
+    AttributeData,
     AttributeComponent.Op<OP>,
     AttributeComponent.Ranged<R>,
     AttributeComponent.Element<E> {

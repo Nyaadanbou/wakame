@@ -13,7 +13,14 @@ import net.kyori.adventure.key.Key
 /**
  * A [cell][Cell] is conceptually a container which contains zero or more [cores][Core].
  */
-interface Cell
+interface Cell {
+    /**
+     * The ID of this cell.
+     *
+     * No cells with identical ID on a single item.
+     */
+    val id: String
+}
 
 /**
  * A [core][Core] is a functional thing stored in a [cell][Cell].
@@ -23,21 +30,6 @@ interface Core : Keyed {
      * The key of the core, which must be unique among all other [cores][Core].
      */
     override val key: Key
-}
-
-/**
- * Represents the data of a [core][Core].
- */
-sealed interface CoreData {
-    /**
-     * Represents the data of a plain [core][Core].
-     */
-    interface Binary : CoreData
-
-    /**
-     * Represents the data of a schema [core][Core].
-     */
-    interface Schema : CoreData
 }
 
 /**

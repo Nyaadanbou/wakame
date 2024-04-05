@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.skill.NoopSkill
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.TargetAdapter
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.ImmutableMultimap
@@ -70,9 +69,9 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
                 }
 
                 NekoNamespaces.ATTRIBUTE -> {
-                    val facade = AttributeRegistry.FACADES[key]
-                    val binaryData = facade.BINARY_DATA_NODE_ENCODER.encode(childNode)
-                    val attributeModifiers = facade.MODIFIER_FACTORY.createAttributeModifiers(uuid, binaryData)
+                    val attributeFacade = AttributeRegistry.FACADES[key]
+                    val attributeCore = attributeFacade.BINARY_CORE_NODE_ENCODER.encode(childNode)
+                    val attributeModifiers = attributeCore.makeAttributeModifiers(uuid)
                     collection += KizamiAttribute(attributeModifiers)
                 }
 
@@ -93,7 +92,6 @@ data class KizamiSkill(
     override val effect: Skill,
 ) : KizamiEffect.Single<Skill> {
     override fun apply(kizami: Kizami, user: User<*>) {
-        effect.castAt(TargetAdapter.adapt(user))
         println("applied skill kizami effect to ${user.uniqueId}") // TODO actually implement it when skill module is done
     }
 

@@ -26,15 +26,16 @@ object SchemaCoreFactory {
      */
     fun schemaOf(node: ConfigurationNode): SchemaCore {
         val key = node.node("key").krequire<Key>()
-        val ret = when (key.namespace()) {
+        val ret: SchemaCore
+        when (key.namespace()) {
             NekoNamespaces.SKILL -> {
-                SchemaSkillCore(key)
+                ret = SchemaSkillCore(key)
             }
 
             NekoNamespaces.ATTRIBUTE -> {
-                val schemaEncoder = AttributeRegistry.FACADES[key].SCHEMA_DATA_NODE_ENCODER
-                val schemaData = schemaEncoder.encode(node)
-                SchemaAttributeCore(key, schemaData)
+                val schemaEncoder = AttributeRegistry.FACADES[key].SCHEMA_CORE_NODE_ENCODER
+                val schemaAttributeCore = schemaEncoder.encode(node)
+                ret = schemaAttributeCore
             }
 
             else -> throw IllegalArgumentException()

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.Key
@@ -92,7 +93,7 @@ internal data class AttributeLoreMeta(
             val namespace = rawKey.namespace()
             val values = StringCombiner(rawKey.value(), ".") {
                 addList(derivation.operationIndex)
-                addList(derivation.elementIndex, AttributeRegistry.FACADES[rawKey].STRUCT_METADATA.element)
+                addList(derivation.elementIndex, AttributeRegistry.FACADES[rawKey].STRUCTURE_METADATA.hasComponent<AttributeComponent.Element<*>>())
             }.combine()
 
             return values.map { Key(namespace, it) }

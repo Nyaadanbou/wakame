@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.NekoStackImpl
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
-import cc.mewcraft.wakame.skill.BinarySkillData
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
@@ -55,7 +54,7 @@ internal value class ItemCellAccessorImpl(
 
             val core = binaryCell.binaryCore
             if (core is BinaryAttributeCore) {
-                val modifiers = core.provideAttributeModifiers(base.uuid)
+                val modifiers = core.makeAttributeModifiers(base.uuid)
                 val modifiersEntries = modifiers.entries
                 multimap.putAll(modifiersEntries)
             }
@@ -63,7 +62,7 @@ internal value class ItemCellAccessorImpl(
         return multimap.build()
     }
 
-    override fun getActiveAbilities(): Map<Skill, BinarySkillData> {
+    override fun getActiveAbilities(): List<Skill> {
         TODO("Not yet implemented")
     }
 

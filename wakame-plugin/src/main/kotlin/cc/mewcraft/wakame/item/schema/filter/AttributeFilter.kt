@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.schema.filter
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.toSimpleString
@@ -16,7 +16,7 @@ import java.util.stream.Stream
 class AttributeFilter(
     override val invert: Boolean,
     private val key: Key,
-    private val operation: AttributeModifier.Operation,
+    private val operation: Operation?,
     private val element: Element?,
 ) : Filter {
 
@@ -31,12 +31,12 @@ class AttributeFilter(
 
 data class AttributeContextHolder(
     val key: Key,
-    val operation: AttributeModifier.Operation,
+    val operation: Operation?,
     val element: Element?,
 ) : Examinable {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key.asString()),
-        ExaminableProperty.of("operation", operation.key),
+        ExaminableProperty.of("operation", operation?.key),
         ExaminableProperty.of("element", element?.uniqueId),
     )
 

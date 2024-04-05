@@ -16,13 +16,6 @@ import cc.mewcraft.wakame.item.schema.cell.SchemaCell
  */
 interface BinaryCell : Cell, ShadowTagLike {
     /**
-     * The ID of this cell.
-     *
-     * No cells with identical ID on a single item.
-     */
-    val id: String
-
-    /**
      * Returns `true` if the cell is reforgeable.
      */
     val canReforge: Boolean

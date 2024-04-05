@@ -9,7 +9,7 @@ object NekoTags {
         const val SID = "sid"
     }
 
-    object Ability {
+    object Skill {
         // placeholder constants
     }
 

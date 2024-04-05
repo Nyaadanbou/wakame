@@ -8,12 +8,10 @@ import java.util.UUID
  * Something that can provide [AttributeModifiers][AttributeModifier].
  *
  * The implementation should own the necessary values used to create the
- * [AttributeModifier]s. That's why the function [provideAttributeModifiers] only
+ * [AttributeModifier]s. That's why the function [makeAttributeModifiers] only
  * accepts a [UUID].
- *
- * @see AttributeModifierFactory
  */
-interface AttributeModifierProvider {
+fun interface AttributeModifierProvider {
     /**
      * Provides one or more [AttributeModifiers][AttributeModifier] from this
      * object with the given [uuid] being the modifiers' identifier. The
@@ -23,5 +21,5 @@ interface AttributeModifierProvider {
      * @throws IllegalArgumentException if this provider can't provide such
      *     attribute modifiers
      */
-    fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier>
+    fun makeAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier>
 }

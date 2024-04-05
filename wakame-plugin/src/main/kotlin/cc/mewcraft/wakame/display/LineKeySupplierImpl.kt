@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.facade.element
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
+import cc.mewcraft.wakame.item.binary.cell.core.elementOrNull
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.util.Key
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
@@ -132,14 +132,15 @@ internal class AttributeKeySupplierImpl(
         if (rawKey !in config.rawKeys) {
             return SKIP_RENDERING
         }
-        val operation = obj.data.operation
-        val element = obj.data.element
-        val fullKey = getOrPut(rawKey, operation, element) {
+
+        val operation = obj.operation
+        val elementOrNull = obj.elementOrNull
+        val fullKey = getOrPut(rawKey, operation, elementOrNull) {
             val newValue = buildString {
                 append(rawKey.value())
                 append(".")
                 append(operation.key)
-                element?.let {
+                elementOrNull?.let {
                     append(".")
                     append(it.uniqueId)
                 }
