@@ -17,7 +17,7 @@ interface Food : ItemBehavior {
     override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>>
         get() = emptyArray()
 
-    // 原版组建实现 - start
+    // 原版组件实现 - start
 
     /**
      * 食用后回复的饱食度。
@@ -39,7 +39,7 @@ interface Food : ItemBehavior {
      */
     val canAlwaysEat: Boolean
 
-    // 原版组建实现 - end
+    // 原版组件实现 - end
 
     /**
      * 食用所需的代价。
@@ -69,14 +69,14 @@ interface Food : ItemBehavior {
         eatSeconds: Provider<Float>,
         canAlwaysEat: Provider<Boolean>,
         eatCostType: Provider<EatCost>,
-        abilities: Provider<List<Skill>>,
+        skills: Provider<List<Skill>>,
     ) : Food {
         override val nutrition: Int by nutrition
         override val saturation: Float by saturation
         override val eatSeconds: Float by eatSeconds
         override val canAlwaysEat: Boolean by canAlwaysEat
         override val eatCostType: EatCost by eatCostType
-        override val skills: List<Skill> by abilities
+        override val skills: List<Skill> by skills
     }
 }
 

@@ -6,12 +6,13 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
 
 class ItemListener : Listener {
     @EventHandler
     fun onItemInteract(event: PlayerInteractEvent) {
         val item = event.item ?: return
-        val nekoStack = NekoStackFactory.wrap(item).takeIf { it.isNeko } ?: return
+        val nekoStack = NekoStackFactory.by(item) ?: return
         nekoStack.schema.behaviors.forEach { behavior ->
             behavior.handleInteract(event.player, item, event.action, event)
         }
@@ -25,6 +26,15 @@ class ItemListener : Listener {
         val nekoStack = NekoStackFactory.by(item) ?: return
         nekoStack.schema.behaviors.forEach { behavior ->
             behavior.handleAttackEntity(damager, item, event.entity, event)
+        }
+    }
+
+    @EventHandler
+    fun onItemConsume(event: PlayerItemConsumeEvent) {
+        val item = event.item
+        val nekoStack = NekoStackFactory.by(item) ?: return
+        nekoStack.schema.behaviors.forEach { behavior ->
+            behavior.handleConsume(event.player, item, event)
         }
     }
 }
