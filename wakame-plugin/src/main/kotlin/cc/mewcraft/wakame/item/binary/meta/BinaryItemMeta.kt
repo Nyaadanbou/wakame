@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.adventure.Keyed
-import net.kyori.adventure.key.Key
+import cc.mewcraft.wakame.item.ItemMeta
 
 /**
  * Represents a data accessor of an item meta on the ItemStack.
@@ -11,12 +10,7 @@ import net.kyori.adventure.key.Key
  * @param T the value "stored" in this [BinaryItemMeta]
  * @constructor the primary constructor must have a single parameter of type [ItemMetaAccessor]
  */
-sealed interface BinaryItemMeta<T> : Keyed {
-
-    /**
-     * The key of this [BinaryItemMeta].
-     */
-    override val key: Key
+sealed interface BinaryItemMeta<T> : ItemMeta {
 
     /**
      * Checks whether the item meta exists in the underlying data.
