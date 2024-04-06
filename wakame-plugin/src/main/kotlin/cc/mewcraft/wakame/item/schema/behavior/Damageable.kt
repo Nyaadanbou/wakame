@@ -52,11 +52,11 @@ interface Damageable : ItemBehavior {
      */
     private class Default(
         repairMaterials: Provider<List<String>>,
-        isLostWhenBreak: Provider<Boolean>
+        disappearWhenBroken: Provider<Boolean>
     ) : Damageable, KoinComponent {
         private val logger: Logger by inject()
         override val repairMaterials: List<Key> by repairMaterials.map { it.map(::Key) }
-        override val disappearWhenBroken: Boolean by isLostWhenBreak
+        override val disappearWhenBroken: Boolean by disappearWhenBroken
 
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
             val nekoStack = NekoStackFactory.wrap(itemStack)

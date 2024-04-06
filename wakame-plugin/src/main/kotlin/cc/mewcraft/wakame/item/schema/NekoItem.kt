@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.schema
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.item.EffectiveSlot
+import cc.mewcraft.wakame.item.ItemBehaviorAccessor
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
@@ -27,7 +28,7 @@ import kotlin.reflect.full.isSuperclassOf
  *
  * @see NekoStack
  */
-interface NekoItem : Keyed {
+interface NekoItem : Keyed, ItemBehaviorAccessor {
     /**
      * The [key][Key] of this item, where:
      * - [namespace][Key.namespace] is the name of the directory which contains the config file
@@ -92,25 +93,16 @@ interface NekoItem : Keyed {
      */
     val behaviors: List<ItemBehavior>
 
-    /**
-     * Checks whether this [NekoItem] has an [ItemBehavior] of the specified class [behaviorClass], or a subclass of it.
-     */
-    fun <T : ItemBehavior> hasBehavior(behaviorClass: KClass<T>): Boolean {
+    override fun <T : ItemBehavior> hasBehavior(behaviorClass: KClass<T>): Boolean {
         return behaviors.any { behaviorClass.isSuperclassOf(it::class) }
     }
 
-    /**
-     * Gets the first [ItemBehavior] that is an instance of [behaviorClass], or null if there is none.
-     */
-    fun <T : ItemBehavior> getBehaviorOrNull(behaviorClass: KClass<T>): T? {
+    override fun <T : ItemBehavior> getBehaviorOrNull(behaviorClass: KClass<T>): T? {
         @Suppress("UNCHECKED_CAST")
         return behaviors.firstOrNull { behaviorClass.isSuperclassOf(it::class) } as T?
     }
 
-    /**
-     * Gets the first [ItemBehavior] that is an instance of [behaviorClass], or throws an [IllegalStateException] if there is none.
-     */
-    fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
+    override fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
         return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
     }
 }
@@ -134,23 +126,3 @@ inline fun <reified M : SchemaItemMeta<*>> NekoItem.getMeta(): M {
     return getMeta(M::class)
 }
 
-/**
- * Checks whether this [NekoItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
- */
-inline fun <reified T : ItemBehavior> NekoItem.hasBehavior(): Boolean {
-    return hasBehavior(T::class)
-}
-
-/**
- * Gets the first [ItemBehavior] that is an instance of [T], or null if there is none.
- */
-inline fun <reified T : ItemBehavior> NekoItem.getBehaviorOrNull(): T? {
-    return getBehaviorOrNull(T::class)
-}
-
-/**
- * Gets the first [ItemBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
- */
-inline fun <reified T : ItemBehavior> NekoItem.getBehavior(): T {
-    return getBehavior(T::class)
-}

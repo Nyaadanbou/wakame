@@ -31,56 +31,23 @@ interface Food : ItemBehavior {
         get() = arrayOf(SFoodMeta::class)
 
     /**
-     * 食用所需的代价。
-     */
-    val eatCostType: EatCost
-
-    /**
-     * 食用后玩家将会执行的操作。
+     * 食用后玩家将会执行的技能。
      */
     val skills: List<Skill>
 
     companion object Factory : ItemBehaviorFactory<Food> {
         override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Food {
-            val eatCostType = behaviorConfig.optionalEntry<EatCost>("eat_cost").orElse(EatCost.ShrinkAmount)
             val abilities = behaviorConfig.optionalEntry<List<Skill>>("skills").orElse(emptyList())
-            return Default(eatCostType, abilities)
+            return Default(abilities)
         }
     }
 
     private class Default(
-        eatCostType: Provider<EatCost>,
         skills: Provider<List<Skill>>,
-    ) : Food, KoinComponent {
-        private val logger: Logger by inject()
-        override val eatCostType: EatCost by eatCostType
+    ) : Food {
         override val skills: List<Skill> by skills
 
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
-            val nekoStack = NekoStackFactory.wrap(itemStack)
-            when (eatCostType) {
-                EatCost.ShrinkAmount -> {}
-                EatCost.Nothing -> {
-                    event.isCancelled = true
-                    val foodMeta = nekoStack.meta<BFoodMeta>()
-                    player.foodLevel += foodMeta.nutrition()
-                    player.saturation += foodMeta.saturationModifier() * foodMeta.nutrition() * 2
-                    foodMeta.effects().forEach { (potionEffect, possibility) ->
-                        if (Random.nextDouble() < possibility) {
-                            potionEffect.apply(player)
-                        }
-                    }
-                }
-
-                is EatCost.ReduceDurability -> {
-                    val durabilityMeta = nekoStack.meta<BDurabilityMeta>()
-                    if (!durabilityMeta.exists) {
-                        logger.warn("物品 ${nekoStack.schema.key} 没有耐久度元数据，无法扣除耐久") //TODO 改为直接加上元数据
-                        return
-                    }
-                    durabilityMeta.changeDurabilityNaturally((eatCostType as EatCost.ReduceDurability).amount)
-                }
-            }
             skills.forEach { skill ->
                 skill.castAt(TargetAdapter.adapt(player))
             }
@@ -88,20 +55,4 @@ interface Food : ItemBehavior {
     }
 }
 
-sealed interface EatCost {
-    /**
-     * 无代价，即可以无限食用。
-     */
-    data object Nothing : EatCost
-
-    /**
-     * 食用后物品数量减少 1。
-     */
-    data object ShrinkAmount : EatCost
-
-    /**
-     * 食用后物品耐久度减少 [amount]。
-     */
-    data class ReduceDurability(val amount: Int) : EatCost
-}
 

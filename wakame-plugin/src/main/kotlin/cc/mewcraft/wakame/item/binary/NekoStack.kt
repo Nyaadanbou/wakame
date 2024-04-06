@@ -1,15 +1,19 @@
 package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.item.EffectiveSlot
+import cc.mewcraft.wakame.item.ItemBehaviorAccessor
 import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.getAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
+import kotlin.reflect.KClass
+import kotlin.reflect.full.isSuperclassOf
 
 /**
  * A wrapper of [ItemStack] which is created from a [NekoItem].
@@ -21,7 +25,7 @@ import java.util.UUID
  * - checking whether the item is a neko item
  * - look up the identifier of the neko item
  */
-interface NekoStack : NekoStackSetter {
+interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
     /**
      * The wrapped [ItemStack].
      *
@@ -147,6 +151,19 @@ interface NekoStack : NekoStackSetter {
      * @throws NullPointerException if this is not a legal neko item
      */
     val statistics: ItemStatisticsAccessor
+
+    override fun <T : ItemBehavior> hasBehavior(behaviorClass: KClass<T>): Boolean {
+        return schema.behaviors.any { behaviorClass.isSuperclassOf(it::class) }
+    }
+
+    override fun <T : ItemBehavior> getBehaviorOrNull(behaviorClass: KClass<T>): T? {
+        @Suppress("UNCHECKED_CAST")
+        return schema.behaviors.firstOrNull { behaviorClass.isSuperclassOf(it::class) } as T?
+    }
+
+    override fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
+        return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
+    }
 }
 
 /**
