@@ -14,11 +14,8 @@ import org.jetbrains.annotations.NotNull;
  * To cancel the generation, use {@link #setCancelled(boolean)}.
  */
 public class ResourcePackGenerateEvent extends Event implements Cancellable {
-    private static final @NotNull HandlerList HANDLERS = new HandlerList();
-    public static @NotNull HandlerList getHandlerList() {
-        return HANDLERS;
-    }
 
+    private static final @NotNull HandlerList HANDLERS = new HandlerList();
     private final GenerationArgs args;
     private boolean cancelled;
 
@@ -45,4 +42,9 @@ public class ResourcePackGenerateEvent extends Event implements Cancellable {
     public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
+
+    public static @NotNull HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
 }

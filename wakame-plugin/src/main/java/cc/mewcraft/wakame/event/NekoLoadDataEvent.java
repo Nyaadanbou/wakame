@@ -12,12 +12,12 @@ public class NekoLoadDataEvent extends Event {
         super(true);
     }
 
-    public static @NotNull HandlerList getHandlerList() {
+    @Override
+    public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
+    public static @NotNull HandlerList getHandlerList() {
         return HANDLERS;
     }
 
