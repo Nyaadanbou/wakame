@@ -25,14 +25,6 @@ internal data class NekoItemImpl(
 ) : NekoItem {
     override val meta: Set<SchemaItemMeta<*>> = metaMap.values.toSet()
     override val cell: Set<SchemaCell> = cellMap.values.toSet()
-    override val behaviors: List<ItemBehavior> = behaviorHolders
-        .map { BehaviorRegistry.INSTANCES[it] to it }
-        .map { (behavior, behaviorName) ->
-            when (behavior) {
-                is ItemBehavior -> behavior
-                is ItemBehaviorFactory<*> -> behavior.create(this, config.node("behaviors", behaviorName))
-            }
-        }
 
     override fun <T : SchemaItemMeta<*>> getMeta(metaClass: KClass<T>): T {
         return requireNotNull(metaMap.getInstance(metaClass.java)) { "Can't find schema item meta '$metaClass' for item '$key'" }
@@ -42,6 +34,20 @@ internal data class NekoItemImpl(
         return cellMap[id]
     }
 
+    override val behaviors: List<ItemBehavior> = behaviorHolders
+        .map { BehaviorRegistry.INSTANCES[it] to it }
+        .map { (behavior, behaviorName) ->
+            when (behavior) {
+                is ItemBehavior -> behavior
+                is ItemBehaviorFactory<*> -> behavior.create(this, config.node("behaviors", behaviorName))
+            }
+        }
+
+    override fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
+        return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
+    }
+
+    // 必须最后执行验证，以保证所有 member properties 已经初始化
     init {
         NekoItemValidator.chain(
             BehaviorValidator(),

@@ -8,12 +8,9 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.getAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.schema.NekoItem
-import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
-import kotlin.reflect.KClass
-import kotlin.reflect.full.isSuperclassOf
 
 /**
  * A wrapper of [ItemStack] which is created from a [NekoItem].

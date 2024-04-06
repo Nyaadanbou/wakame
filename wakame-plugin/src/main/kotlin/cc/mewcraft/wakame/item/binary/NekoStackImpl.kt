@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorImpl
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessorImpl
 import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import java.util.UUID
+import kotlin.reflect.KClass
 
 @JvmInline
 internal value class NekoStackImpl(
@@ -107,6 +109,15 @@ internal value class NekoStackImpl(
 
     override fun putVariant(sid: Int) {
         tags.putInt(NekoTags.Root.SID, sid)
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Behaviors">
+    override val behaviors: List<ItemBehavior>
+        get() = schema.behaviors
+
+    override fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
+        return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
     }
     //</editor-fold>
 

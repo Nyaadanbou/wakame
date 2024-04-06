@@ -5,13 +5,11 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.ItemBehaviorAccessor
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import net.kyori.adventure.key.Key
 import java.util.UUID
 import kotlin.reflect.KClass
-import kotlin.reflect.full.isSuperclassOf
 
 /**
  * Represents an **item template**, or a "blueprint" in other words.
@@ -87,12 +85,6 @@ interface NekoItem : Keyed, ItemBehaviorAccessor {
      * @return the schema cell
      */
     fun getCell(id: String): SchemaCell?
-
-    override val behaviors: List<ItemBehavior>
-
-    override fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
-        return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
-    }
 }
 
 /**
