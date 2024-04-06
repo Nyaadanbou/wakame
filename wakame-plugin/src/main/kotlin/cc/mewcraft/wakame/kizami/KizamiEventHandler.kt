@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.kizami
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
-import cc.mewcraft.wakame.item.binary.meta
+import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BKizamiMeta
 import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
 import cc.mewcraft.wakame.registry.KizamiRegistry
@@ -106,7 +106,7 @@ class KizamiEventHandler {
             return emptySet()
         }
 
-        val kizamiSet = nekoStack.meta<BKizamiMeta>().getOrEmpty()
+        val kizamiSet = nekoStack.getMetaAccessor<BKizamiMeta>().getOrEmpty()
         return kizamiSet
     }
 

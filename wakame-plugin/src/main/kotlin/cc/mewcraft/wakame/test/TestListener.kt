@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.test
 
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
-import cc.mewcraft.wakame.item.binary.meta
+import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
 import cc.mewcraft.wakame.item.schema.PaperNekoItemRealizer
@@ -76,7 +76,7 @@ class TestListener : KoinComponent, Listener {
         when (plainMessage) {
             "r1" -> {
                 val wrap = NekoStackFactory.wrap(inventory.itemInMainHand)
-                val lore = wrap.meta<BDisplayLoreMeta>().getOrEmpty()
+                val lore = wrap.getMetaAccessor<BDisplayLoreMeta>().getOrEmpty()
                 val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
             }

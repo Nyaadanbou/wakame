@@ -6,7 +6,7 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
-import cc.mewcraft.wakame.item.binary.meta
+import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
@@ -60,7 +60,7 @@ interface Damageable : ItemBehavior {
 
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
             val nekoStack = NekoStackFactory.wrap(itemStack)
-            val durabilityMeta = nekoStack.meta<BDurabilityMeta>()
+            val durabilityMeta = nekoStack.getMetaAccessor<BDurabilityMeta>()
             if (!durabilityMeta.exists) {
                 logger.warn("物品 ${nekoStack.schema.key} 拥有行为 Damageable, 但是没有耐久度元数据")
                 return

@@ -165,6 +165,6 @@ interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
  *
  * @see ItemMetaAccessor.getAccessor
  */
-inline fun <reified M : BinaryItemMeta<*>> NekoStack.meta(): M {
+inline fun <reified M : BinaryItemMeta<*>> NekoStack.getMetaAccessor(): M {
     return this.meta.getAccessor<M>()
 }

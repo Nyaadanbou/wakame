@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.cell.core.isEmpty
-import cc.mewcraft.wakame.item.binary.meta
+import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
@@ -272,13 +272,13 @@ internal class ItemMetaStylizerImpl(
     }
 
     override fun stylizeName(item: NekoStack): Component {
-        val displayName = item.meta<BDisplayNameMeta>().getOrNull() ?: return text("Unnamed")
+        val displayName = item.getMetaAccessor<BDisplayNameMeta>().getOrNull() ?: return text("Unnamed")
 
         val resolvers = TagResolver.builder().apply {
             // resolve name
             resolver(parsed("value", displayName))
             // resolve rarity style
-            item.meta<BRarityMeta>().getOrNull()?.run {
+            item.getMetaAccessor<BRarityMeta>().getOrNull()?.run {
                 tag("rarity_style", rarityStyleMap[this])
             }
         }
