@@ -204,7 +204,7 @@ internal class ResourcePackCustomModelGeneration(
                 }
                 //</editor-fold>
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             return Result.failure(e)
         }
 

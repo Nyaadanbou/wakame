@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
@@ -256,9 +257,9 @@ internal class OperationStylizerImpl(
     private val config: RendererConfiguration,
 ) : OperationStylizer {
     override fun stylize(value: String, operation: Operation): String = when (operation) {
-        Operation.ADD -> config.operationFormats.getValue(Operation.ADD).format(value)
-        Operation.MULTIPLY_BASE -> config.operationFormats.getValue(Operation.MULTIPLY_BASE).format(value)
-        Operation.MULTIPLY_TOTAL -> config.operationFormats.getValue(Operation.MULTIPLY_TOTAL).format(value)
+        Operation.ADD -> config.operationFormats.getValue(Operation.ADD).get().format(value)
+        Operation.MULTIPLY_BASE -> config.operationFormats.getValue(Operation.MULTIPLY_BASE).get().format(value)
+        Operation.MULTIPLY_TOTAL -> config.operationFormats.getValue(Operation.MULTIPLY_TOTAL).get().format(value)
     }
 }
 
@@ -375,10 +376,14 @@ internal class ItemMetaStylizerImpl(
     }
 
     class LoreFormatImpl(
-        override val line: String,
-        override val header: List<String>?,
-        override val bottom: List<String>?,
+        lineProvider: Provider<String>,
+        headerProvider: Provider<List<String>?>,
+        bottomProvider: Provider<List<String>?>,
     ) : ItemMetaStylizer.LoreFormat {
+        override val line: String by lineProvider
+        override val header: List<String>? by headerProvider
+        override val bottom: List<String>? by bottomProvider
+
         override fun toString(): String {
             return toSimpleString()
         }
@@ -393,10 +398,14 @@ internal class ItemMetaStylizerImpl(
     }
 
     class ListFormatImpl(
-        override val merged: String,
-        override val single: String,
-        override val separator: String,
+        mergedProvider: Provider<String>,
+        singleProvider: Provider<String>,
+        separatorProvider: Provider<String>,
     ) : ItemMetaStylizer.ListFormat {
+        override val merged: String by mergedProvider
+        override val single: String by singleProvider
+        override val separator: String by separatorProvider
+
         override fun toString(): String {
             return toSimpleString()
         }

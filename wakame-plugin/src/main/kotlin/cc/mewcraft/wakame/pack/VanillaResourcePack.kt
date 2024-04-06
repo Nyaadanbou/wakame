@@ -19,6 +19,11 @@ private const val VANILLA_RESOURCE_CACHE = "generated/cache/"
 
 private const val DOWNLOAD_URL = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/<version>/"
 
+data class CannotDownloadVanillaResourcePackException(
+    override val message: String = "Cannot download vanilla resource pack file.",
+    override val cause: Throwable? = null
+) : PackException()
+
 class VanillaResourcePack : KoinComponent {
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
     private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
@@ -33,16 +38,12 @@ class VanillaResourcePack : KoinComponent {
 
         if (!modelFile.exists()) {
             modelFile.parentFile.mkdirs()
-            val file = downloadPackFile(downloadModelUrl, modelFile)
+            val file = runCatching { downloadPackFile(downloadModelUrl, modelFile) }
+                .getOrElse { throw CannotDownloadVanillaResourcePackException(cause = it) }
             return ModelSerializer.INSTANCE.deserialize(file.inputStream().buffered(), key)
         }
 
-        return runCatching { ModelSerializer.INSTANCE.deserialize(modelFile.inputStream().buffered(), key) }
-            .getOrElse {
-                logger.warn("Failed to deserialize model file from $modelFile, downloading again.")
-                val file = downloadPackFile(downloadModelUrl, modelFile)
-                ModelSerializer.INSTANCE.deserialize(file.inputStream().buffered(), key)
-            }
+        return ModelSerializer.INSTANCE.deserialize(modelFile.inputStream().buffered(), key)
     }
 
     private fun downloadPackFile(downloadUrl: String, modelFile: File): File {
@@ -56,9 +57,6 @@ class VanillaResourcePack : KoinComponent {
         try {
             input.copyTo(output, 1024)
                 .also { logger.info("Downloaded vanilla resource pack file from $versionDownloadUrl to $modelFile. Size: ${modelFile.formatSize()}") }
-        } catch (e: Exception) {
-            logger.error("Failed to download vanilla resource pack file from $versionDownloadUrl")
-            throw e
         } finally {
             // Close the input and output streams
             output.flush()

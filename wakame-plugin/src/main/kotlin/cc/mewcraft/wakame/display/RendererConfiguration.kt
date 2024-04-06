@@ -1,29 +1,32 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.NekoConfigurationLoader
-import cc.mewcraft.wakame.util.NekoConfigurationNode
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.spongepowered.configurate.CommentedConfigurationNode
+import org.spongepowered.configurate.ConfigurationNode
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 // TODO use ConfigProvider where possible
 
 internal class RendererConfiguration(
-    loader: NekoConfigurationLoader,
+    private val config: ConfigProvider,
 ) : Initializable, KoinComponent {
     companion object {
         private const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
@@ -32,78 +35,75 @@ internal class RendererConfiguration(
     }
 
     private val mm: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
-    private val root: CommentedConfigurationNode by reloadable { loader.load() }
 
     //<editor-fold desc="renderer_style.meta">
     /**
      * 名字的渲染格式。
      */
-    val nameFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "name").krequire<String>() }
+    val nameFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "name")
 
     /**
      * 描述的渲染格式。
      */
-    val loreFormat: ItemMetaStylizer.LoreFormat by reloadable {
-        with(root.node(RENDERER_STYLE_NODE, "meta", "lore")) {
-            ItemMetaStylizerImpl.LoreFormatImpl(
-                line = node("line").krequire<String>(),
-                header = node("header").krequire<List<String>>().takeIf(List<String>::isNotEmpty),
-                bottom = node("bottom").krequire<List<String>>().takeIf(List<String>::isNotEmpty)
-            )
-        }
+    val loreFormat: ItemMetaStylizer.LoreFormat = with(config.node(RENDERER_STYLE_NODE, "meta", "lore")) {
+        ItemMetaStylizerImpl.LoreFormatImpl(
+            lineProvider = entry<String>("line"),
+            headerProvider = entry<List<String>>("header").map { it.takeIf(List<String>::isNotEmpty) },
+            bottomProvider = entry<List<String>>("bottom").map { it.takeIf(List<String>::isNotEmpty) }
+        )
     }
+
 
     /**
      * 等级的渲染格式。
      */
-    val levelFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "level").krequire<String>() }
+    val levelFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "level")
 
     /**
      * 稀有度的渲染格式。
      */
-    val rarityFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "rarity").krequire<String>() }
+    val rarityFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "rarity")
 
     /**
      * 元素的渲染格式。
      */
-    val elementFormat: ItemMetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "element")) }
+    val elementFormat: ItemMetaStylizer.ListFormat = getListFormat(config.node(RENDERER_STYLE_NODE, "meta", "element"))
 
     /**
      * 铭刻的渲染格式。
      */
-    val kizamiFormat: ItemMetaStylizer.ListFormat by reloadable { getListFormat(root.node(RENDERER_STYLE_NODE, "meta", "kizami")) }
+    val kizamiFormat: ItemMetaStylizer.ListFormat = getListFormat(config.node(RENDERER_STYLE_NODE, "meta", "kizami"))
 
     /**
      * 保养度的渲染格式。
      */
-    val durabilityFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "durability").krequire<String>() }
+    val durabilityFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "durability")
 
     /**
      * 皮肤的渲染格式。
      */
-    val skinFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin").krequire<String>() }
+    val skinFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "skin")
 
     /**
      * 皮肤所有者的渲染格式。
      */
-    val skinOwnerFormat: String by reloadable { root.node(RENDERER_STYLE_NODE, "meta", "skin_owner").krequire<String>() }
+    val skinOwnerFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "skin_owner")
 
-    private fun getListFormat(node: NekoConfigurationNode): ItemMetaStylizer.ListFormat {
+    private fun getListFormat(provider: ConfigProvider): ItemMetaStylizer.ListFormat {
         return ItemMetaStylizerImpl.ListFormatImpl(
-            merged = node.node("merged").krequire<String>(),
-            single = node.node("single").krequire<String>(),
-            separator = node.node("separator").krequire<String>()
+            mergedProvider = provider.entry<String>("merged"),
+            singleProvider = provider.entry<String>("single"),
+            separatorProvider = provider.entry<String>("separator")
         )
     }
     //</editor-fold>
 
-    //<editor-fold desc="renderer_style.attribute">
+    //<editor-fold desc="renderer_style.attsribute">
     /**
      * 空词条栏（属性）的渲染格式。
      */
-    val emptyAttributeText: List<String> by reloadable {
-        root.node(RENDERER_STYLE_NODE, "attribute", "empty").krequire<List<String>>()
-    }
+    val emptyAttributeText: List<String> by config.entry<List<String>>(RENDERER_STYLE_NODE, "attribute", "empty")
+
 
     /**
      * 所有属性的渲染格式。
@@ -114,38 +114,36 @@ internal class RendererConfiguration(
      *
      * **注意该映射不包含 [Attributes.ATTACK_SPEED_LEVEL]**
      */
-    val attributeFormats: Map<Key, String> by reloadable {
-        root.node(RENDERER_STYLE_NODE, "attribute", "value")
-            .childrenMap()
-            .mapKeys { (key, _) -> key.toString() }
-            .filter { (key, _) -> key != Attributes.ATTACK_SPEED_LEVEL.key.value() }
-            .mapKeys { (key, _) -> Key(NekoNamespaces.ATTRIBUTE, key) }
-            .mapValues { (_, value) -> value.krequire<String>() }
-            .withDefault { value -> "${value.asString()} (missing config)" }
-    }
+    val attributeFormats: Map<Key, String> by config.entry<Map<String, ConfigurationNode>>(RENDERER_STYLE_NODE, "attribute", "value")
+        .map {
+            it.mapKeys { (key, _) -> key }
+                .filter { (key, _) -> key != Attributes.ATTACK_SPEED_LEVEL.key.value() }
+                .mapKeys { (key, _) -> Key(NekoNamespaces.ATTRIBUTE, key) }
+                .mapValues { (_, value) -> value.krequire<String>() }
+                .withDefault { value -> "${value.asString()} (missing config)" }
+        }
 
     /**
      * 攻击速度的渲染格式。
      */
-    val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by reloadable {
-        val node = root.node(RENDERER_STYLE_NODE, "attribute", "value", "attack_speed_level")
-        AttributeStylizerImpl.AttackSpeedFormatImpl(
-            merged = node.node("merged").krequire<String>(),
-            levels = node.node("levels")
-                .childrenMap()
-                .mapKeys { (key, _) -> key.toString().toInt() }
-                .mapValues { (_, value) -> value.krequire<String>() }
-                .withDefault { key -> "$key (missing config)" }
-        )
-    }
+    val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by config.node(RENDERER_STYLE_NODE, "attribute", "value", "attack_speed_level")
+        .map {
+            AttributeStylizerImpl.AttackSpeedFormatImpl(
+                merged = it.node("merged").krequire<String>(),
+                levels = it.node("levels")
+                    .childrenMap()
+                    .mapKeys { (key, _) -> key.toString().toInt() }
+                    .mapValues { (_, value) -> value.krequire<String>() }
+                    .withDefault { key -> "$key (missing config)" }
+            )
+        }
+
 
     /**
      * 运算模式的渲染格式。
      */
-    val operationFormats: Map<AttributeModifier.Operation, String> by reloadable {
-        AttributeModifier.Operation.entries.associateWith { operation ->
-            root.node(RENDERER_STYLE_NODE, "attribute", "operation", operation.key).krequire<String>()
-        }
+    val operationFormats: Map<AttributeModifier.Operation, Provider<String>> = AttributeModifier.Operation.entries.associateWith { operation ->
+        config.entry<String>(RENDERER_STYLE_NODE, "attribute", "operation", operation.key)
     }
     //</editor-fold>
 
@@ -153,9 +151,8 @@ internal class RendererConfiguration(
     /**
      * 空词条栏的渲染格式（技能）。
      */
-    val emptySkillText: List<String> by reloadable {
-        root.node(RENDERER_STYLE_NODE, "skill", "empty").krequire<List<String>>()
-    }
+    val emptySkillText: List<String> by config.entry<List<String>>(RENDERER_STYLE_NODE, "skill", "empty")
+
 
     /**
      * 所有技能共用的渲染格式。
@@ -213,10 +210,10 @@ internal class RendererConfiguration(
         _fixedLoreLines.clear()
         _defaultLoreLines.clear()
 
-        val primaryLines = root.node(RENDERER_LAYOUT_NODE).node("primary").krequire<List<String>>()
+        val primaryLines by config.entry<List<String>>(RENDERER_LAYOUT_NODE, "primary")
         val attDerivation = AttributeLoreMeta.Derivation(
-            operationIndex = root.node(RENDERER_LAYOUT_NODE).node("operation").krequire<List<String>>(),
-            elementIndex = root.node(RENDERER_LAYOUT_NODE).node("element").krequire<List<String>>()
+            operationIndexProvider = config.entry<List<String>>(RENDERER_LAYOUT_NODE, "operation"),
+            elementIndexProvider = config.entry<List<String>>(RENDERER_LAYOUT_NODE, "element")
         )
 
         val pattern = RENDERER_LAYOUT_LINE_PATTERN.toPattern()

@@ -10,6 +10,11 @@ data class InitializerArg(
     val resourcePackDir: File,
 )
 
+data class NoPackException(
+    override val message: String,
+    override val cause: Throwable? = null,
+) : Throwable(message, cause)
+
 sealed class PackInitializer {
     abstract val arg: InitializerArg
 
@@ -28,7 +33,9 @@ sealed class PackInitializer {
     abstract fun init(): Result<ResourcePack>
 
     protected fun initNext(e: Throwable): Result<ResourcePack> {
-        return next?.init() ?: Result.failure(IOException("Cannot find next initializer", e))
+        if (e !is NoPackException)
+            return Result.failure(e)
+        return next?.init() ?: Result.failure(e)
     }
 }
 
@@ -41,7 +48,7 @@ internal class ZipPackInitializer(
         val pack = runCatching {
             MinecraftResourcePackReader.minecraft()
                 .readFromZipFile(resourceFile)
-        }.getOrElse { return initNext(it) }
+        }.getOrElse { return initNext(NoPackException("No pack", it)) }
         return Result.success(pack)
     }
 
@@ -69,10 +76,11 @@ internal class DirPackInitializer(
     override val arg: InitializerArg
 ) : PackInitializer() {
     override fun init(): Result<ResourcePack> {
+        val resourcePackDir = arg.resourcePackDir
         val pack = runCatching {
             MinecraftResourcePackReader.minecraft()
-                .readFromDirectory(arg.resourcePackDir)
-        }.getOrElse { return initNext(it) }
+                .readFromDirectory(resourcePackDir)
+        }.getOrElse { return initNext(NoPackException("No pack", it)) }
         return Result.success(pack)
     }
 }

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.registry.AttributeRegistry
@@ -60,20 +61,27 @@ internal data class AttributeLoreMeta(
     override val default: List<Component>?,
     private val derivation: Derivation,
 ) : DynamicLoreMeta {
-    data class Derivation(
+    class Derivation(
         /**
          * 运算模式的顺序。
          */
-        val operationIndex: List<String>,
+        operationIndexProvider: Provider<List<String>>,
         /**
          * 元素种类的顺序。
          */
-        val elementIndex: List<String>,
+        elementIndexProvider: Provider<List<String>>,
     ) {
+        val operationIndex: List<String> by operationIndexProvider
+        val elementIndex: List<String> by elementIndexProvider
+
         init {
             // validate values
             operationIndex.forEach { AttributeModifier.Operation.byKey(it) }
             elementIndex.forEach { ElementRegistry.INSTANCES[it] }
+        }
+
+        override fun toString(): String {
+            return "Derivation(operationIndex=$operationIndex, elementIndex=$elementIndex)"
         }
     }
 

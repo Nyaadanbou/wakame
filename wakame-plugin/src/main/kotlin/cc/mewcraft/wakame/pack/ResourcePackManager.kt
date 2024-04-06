@@ -3,17 +3,13 @@ package cc.mewcraft.wakame.pack
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
-import cc.mewcraft.wakame.pack.initializer.DirPackInitializer
-import cc.mewcraft.wakame.pack.initializer.InitializerArg
-import cc.mewcraft.wakame.pack.initializer.PackInitializer
-import cc.mewcraft.wakame.pack.initializer.ZipPackInitializer
+import cc.mewcraft.wakame.pack.initializer.*
 import cc.mewcraft.wakame.pack.service.GithubService
 import cc.mewcraft.wakame.pack.service.NoneService
 import cc.mewcraft.wakame.pack.service.ResourcePackService
 import cc.mewcraft.wakame.pack.service.Service
 import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.formatSize
-import com.google.common.base.Throwables
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.entity.Player
@@ -25,7 +21,6 @@ import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import java.io.File
-import java.util.zip.ZipException
 
 internal class ResourcePackManager(
     private val config: ResourcePackConfiguration,
@@ -55,8 +50,7 @@ internal class ResourcePackManager(
             DirPackInitializer(initArg)
         ).init()
 
-        val isNoPack = resourcePackResult.exceptionOrNull()
-            ?.let { Throwables.getRootCause(it) } is ZipException
+        val isNoPack = resourcePackResult.exceptionOrNull() is NoPackException
 
         // Read the resource pack from the file
         // The resource pack may be empty if it's the first time to generate, so we need to handle the exception
@@ -112,8 +106,8 @@ internal class ResourcePackManager(
     }
 
     private fun loadService(): Service {
-        if (!this::pack.isInitialized) {
-            logger.error("Resource pack can not be initialized. Please check the configuration.", IllegalStateException("Resource pack is not initialized"))
+        if (!::pack.isInitialized) {
+            logger.error("Resource pack can not be initialized. Please check the configuration.")
             return NoneService
         }
 

@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.initializer
 
 import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.display.ItemRendererListener
@@ -11,6 +12,7 @@ import cc.mewcraft.wakame.display.RENDERER_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.item.ItemListener
+import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.registry.*
@@ -186,8 +188,12 @@ object Initializer : KoinComponent, Listener {
         LOGGER.info("[Initializer] onPrePack - Complete")
 
         get<ResourcePackManager>().generate(false).onFailure {
-            shutdown("An exception occurred during resource pack generation.", it)
-            return
+            if (it is PackException) {
+                LOGGER.warn("Failed to generate pack. This is not a critical issue.", it)
+            } else {
+                shutdown("An exception occurred during resource pack generation.", it)
+                return
+            }
         }
 
         LOGGER.info("[Initializer] onPostPackPreWorld - Start")
@@ -289,6 +295,7 @@ object Initializer : KoinComponent, Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handlePluginReloaded(e: NekoReloadEvent) {
+        Configs.onReload()
         executeReload()
     }
 

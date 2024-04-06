@@ -6,6 +6,7 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.map
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.lang.reflect.Type
 import java.nio.file.Path
 import kotlin.reflect.KType
@@ -85,34 +86,34 @@ inline fun <reified T : Any> ConfigProvider.optionalEntry(vararg paths: Array<St
     }
 
 fun ConfigProvider.node(vararg path: String): ConfigProvider {
-    return NodeConfigProvider(loadValue().node(*path), relPath, loadValidation)
+    val provider = NodeConfigProvider(loadValue().node(*path), relPath)
+    addChild(provider)
+    return provider
 }
 
 abstract class ConfigProvider(
     val relPath: String,
-    val loadValidation: () -> Boolean,
 ) : Provider<ConfigurationNode>() {
     public abstract override fun loadValue(): ConfigurationNode
 }
 
 class FileConfigProvider internal constructor(
-    path: Path,
+    private val path: Path,
     relPath: String,
-    loadValidation: () -> Boolean = { true },
-) : ConfigProvider(relPath, loadValidation) {
+) : ConfigProvider(relPath) {
     override fun loadValue(): ConfigurationNode {
-        require(loadValidation()) { "Load validation failed" }
-        TODO("Not yet implemented")
+        return YamlConfigurationLoader.builder()
+            .source { path.toFile().bufferedReader() }
+            .build()
+            .load()
     }
 }
 
 class NodeConfigProvider internal constructor(
     private val node: ConfigurationNode,
     relPath: String,
-    loadValidation: () -> Boolean = { true },
-) : ConfigProvider(relPath, loadValidation) {
+) : ConfigProvider(relPath) {
     override fun loadValue(): ConfigurationNode {
-        require(loadValidation()) { "Load validation failed" }
         return node
     }
 }
