@@ -88,19 +88,7 @@ interface NekoItem : Keyed, ItemBehaviorAccessor {
      */
     fun getCell(id: String): SchemaCell?
 
-    /**
-     * The list of behaviors of this item.
-     */
-    val behaviors: List<ItemBehavior>
-
-    override fun <T : ItemBehavior> hasBehavior(behaviorClass: KClass<T>): Boolean {
-        return behaviors.any { behaviorClass.isSuperclassOf(it::class) }
-    }
-
-    override fun <T : ItemBehavior> getBehaviorOrNull(behaviorClass: KClass<T>): T? {
-        @Suppress("UNCHECKED_CAST")
-        return behaviors.firstOrNull { behaviorClass.isSuperclassOf(it::class) } as T?
-    }
+    override val behaviors: List<ItemBehavior>
 
     override fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
         return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")

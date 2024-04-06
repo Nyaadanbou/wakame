@@ -3,21 +3,23 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import kotlin.reflect.KClass
+import kotlin.reflect.full.isSuperclassOf
 
 interface ItemBehaviorAccessor {
     /**
-     * Checks whether this [NekoItem] has an [ItemBehavior] of the specified class [behaviorClass], or a subclass of it.
+     * The list of behaviors of this item.
      */
-    fun <T : ItemBehavior> hasBehavior(behaviorClass: KClass<T>): Boolean
+    val behaviors: List<ItemBehavior>
 
-    /**
-     * Gets the first [ItemBehavior] that is an instance of [behaviorClass], or null if there is none.
-     */
-    fun <T : ItemBehavior> getBehaviorOrNull(behaviorClass: KClass<T>): T?
+    fun <T : ItemBehavior> hasBehavior(behaviorClass: KClass<T>): Boolean {
+        return behaviors.any { behaviorClass.isSuperclassOf(it::class) }
+    }
 
-    /**
-     * Gets the first [ItemBehavior] that is an instance of [behaviorClass], or throws an [IllegalStateException] if there is none.
-     */
+    fun <T : ItemBehavior> getBehaviorOrNull(behaviorClass: KClass<T>): T? {
+        @Suppress("UNCHECKED_CAST")
+        return behaviors.firstOrNull { behaviorClass.isSuperclassOf(it::class) } as T?
+    }
+
     fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T
 }
 
