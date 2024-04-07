@@ -9,13 +9,14 @@ internal class ItemRendererListener(
     private val renderer: ItemRenderer,
 ) : Listener {
 
+    // Side notes: this event runs on the Netty Thread,
+    // but the Server Thread will wait before next tick.
     @EventHandler
-    private fun onSerializeItem(e: NetworkItemSerializeEvent) { // this event runs on Netty thread
-        val wrap = NekoStackFactory.wrap(e.itemStack) // the wrapped item is already a copy
-        if (wrap.isNotNeko)
-            return
-
-        renderer.render(wrap) // render it in-place
+    private fun onSerializeItem(e: NetworkItemSerializeEvent) {
+        val wrap = NekoStackFactory.by(e.itemStack) ?: return
+        // render it in-place
+        renderer.render(wrap)
+        // set it to the new item
         e.setItemStack(wrap.handle)
     }
 

@@ -196,9 +196,6 @@ internal class RendererConfiguration(
             return ret
         }
 
-        fun String.spiltAndDeserialize(): List<Component> =
-            this.split("\\r").map(mm::deserialize)  // 以 '\r' 为分隔符，将文本分割为多行
-
         /**
          * Creates a lore meta from the config line.
          *
@@ -207,6 +204,9 @@ internal class RendererConfiguration(
          * @return a new instance
          */
         fun createLoreMeta(rawIndex: Int, rawLine: String): LoreMeta {
+
+            fun String.spiltAndDeserialize(): List<Component> = this.split("\\r").map(mm::deserialize)  // 以 '\r' 为分隔符，将文本分割为多行
+
             val loreMeta: LoreMeta
             val matcher = pattern.matcher(rawLine)
             if (matcher.matches()) {
