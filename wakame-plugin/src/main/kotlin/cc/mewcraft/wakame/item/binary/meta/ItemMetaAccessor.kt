@@ -4,7 +4,7 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import kotlin.reflect.KClass
 
 /**
- * This is an interface to get specific [item meta accessor][BinaryItemMeta] for the ItemStack.
+ * This is the interface to get specific [item meta accessor][BinaryItemMeta] on the ItemStack.
  */
 interface ItemMetaAccessor {
 

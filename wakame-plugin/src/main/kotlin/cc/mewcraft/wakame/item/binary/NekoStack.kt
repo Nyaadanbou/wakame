@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.getAccessor
+import cc.mewcraft.wakame.item.binary.show.CustomDataAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.schema.NekoItem
 import net.kyori.adventure.key.Key
@@ -13,16 +14,14 @@ import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 /**
- * A wrapper of [ItemStack] which is created from a [NekoItem].
+ * A wrapper of [ItemStack], which adds additional properties and
+ * functions to work with the wakame data on the [itemStack], such as:
+ * - checking whether the item is of a neko item or not
+ * - looking up the unique identifier of the neko item (if it is)
  *
  * To get an instance of [NekoStack], use [NekoStackFactory].
- *
- * This class provides several properties to work with the underlying item
- * stack, mainly manipulating the non-vanilla NBT tags, such as:
- * - checking whether the item is a neko item
- * - look up the identifier of the neko item
  */
-interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
+sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
     /**
      * The wrapped [ItemStack].
      *
@@ -30,29 +29,32 @@ interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      *
      * ## When it is backed by a NMS object
      *
-     * Any changes on `this` will reflect on the underlying game world.
+     * Any changes on `this` will reflect on the underlying game state, which
+     * means: you may freely modify `this` and it will make sure that your
+     * modifications will be directly and instantly applied to the world state.
      *
      * ## When it is backed by a strictly-Bukkit object
      *
-     * Any changes on `this` will **not** reflect on the underlying game
-     * world (if you've already added this item to the world). In such case,
-     * `this` is primarily used to add a new [ItemStack] to the underlying
-     * game world, such as giving it to players and dropping it on the ground.
+     * Any changes on `this` will **NOT** apply to the underlying world state,
+     * which means: you should only use `this` to add a new [ItemStack] to the
+     * world state, such as giving it to players and dropping it on the ground.
+     * In other words, if you have already added `this` to the world state, **DO
+     * NOT** modify `this` and then expect that your changes will apply to the
+     * world state. Why is that? See [isNmsBacked].
      *
      * @see isNmsBacked
      */
-    val handle: ItemStack
+    val itemStack: ItemStack
 
     /**
      * Checks if `this` NekoStack is backed by an NMS object.
      *
-     * If this returns `true`, that means the [handle] is backed by an NMS object.
+     * - Returning `true` means the [itemStack] is backed by an NMS object.
+     * - Returning `false` means the [itemStack] is a strictly-Bukkit [ItemStack].
      *
-     * If this returns `false`, that means the [handle] is a strictly-Bukkit [ItemStack].
-     *
-     * It should be noted that the server implementation always makes a NMS copy
-     * out of the strictly-Bukkit [ItemStack] when the item is being added to
-     * the underlying world states.
+     * So what's so important about it? It should be noted that the server implementation
+     * always makes a **NMS copy** out of a strictly-Bukkit [ItemStack] when the item
+     * is being added to the underlying world state.
      *
      * However, this may not hold if the Paper
      * team finish up the ItemStack overhaul:
@@ -62,23 +64,33 @@ interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      * Please keep an eye on this kdoc. I will add notes to here as soon as
      * anything has changed.
      *
-     * @see handle
+     * @see itemStack
      */
     val isNmsBacked: Boolean
 
     /**
-     * Returns `true` if this item is a neko item.
+     * Returns `true` if this item is a legal neko item.
      *
-     * In this case [isNotNeko] returns `false`.
+     * When this returns `true`, you can then access the wakame data on the
+     * [itemStack] without throwing NPE exceptions.
      */
     val isNeko: Boolean
 
     /**
-     * Returns `true` if this item is not a neko item.
+     * Returns `true` if this item is a [PlayNekoStack].
      *
-     * In this case [isNeko] returns `false`.
+     * @throws NullPointerException if this is not a legal neko item
+     * @see PlayNekoStack
      */
-    val isNotNeko: Boolean
+    val isPlayStack: Boolean
+
+    /**
+     * Returns `true` if this item is a [ShowNekoStack].
+     *
+     * @throws NullPointerException if this is not a legal neko item
+     * @see ShowNekoStack
+     */
+    val isShowStack: Boolean
 
     /**
      * The corresponding [NekoItem] schema.
@@ -148,6 +160,38 @@ interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      * @throws NullPointerException if this is not a legal neko item
      */
     val statistics: ItemStatisticsAccessor
+}
+
+/**
+ * Represents a [NekoStack] which will ultimately be used by players.
+ *
+ * For example, a [PlayNekoStack] may:
+ * - be given to players
+ * - be kept by players
+ */
+interface PlayNekoStack : NekoStack {
+    // TDB 暂时和 NekoStack 一样
+}
+
+/**
+ * Represents a [NekoStack] which is **solely** used to build showcases.
+ *
+ * A [ShowNekoStack] differs from [PlayNekoStack] in that it provides interfaces
+ * to conveniently modify the name and lore of the [itemStack].
+ *
+ * For example, a [ShowNekoStack] may:
+ * - be stored in a display item
+ * - be placed in a virtual inventory
+ */
+interface ShowNekoStack : NekoStack {
+    /**
+     * The [CustomDataAccessor] of this item.
+     *
+     * Used to manipulate the **custom data** of this item.
+     *
+     * @throws NullPointerException if this is not a legal neko item
+     */
+    val customData: CustomDataAccessor
 }
 
 /**

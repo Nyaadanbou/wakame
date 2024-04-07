@@ -16,7 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
@@ -32,7 +32,7 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
             PacketType.Play.Server.ENTITY_METADATA -> {
                 val origin = WrapperPlayServerEntityMetadata(event)
                 val entity = NmsEntityUtils.getEntity(origin.entityId) as? Item ?: return
-                val nekoStack = NekoStackFactory.by(entity.itemStack) ?: return
+                val nekoStack = NekoStackFactory.PLAY.by(entity.itemStack) ?: return
 
                 val metadataPacket = WrapperPlayServerEntityMetadata(
                     entity.entityId,

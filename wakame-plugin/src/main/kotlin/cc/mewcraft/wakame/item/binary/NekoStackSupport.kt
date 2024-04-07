@@ -6,62 +6,52 @@ import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
 import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessorImpl
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorImpl
+import cc.mewcraft.wakame.item.binary.show.CustomDataAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessorImpl
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.registry.NekoItemRegistry
 import cc.mewcraft.wakame.util.*
+import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
 import java.util.UUID
 import kotlin.reflect.KClass
 
-@JvmInline
-internal value class NekoStackImpl(
-    override val handle: ItemStack,
-) : KoinComponent, NekoStack {
-
-    // The second constructor is used to create the impl from org.bukkit.Material
-    constructor(mat: Material) : this(
-        handle = ItemStack(mat), /* strictly-Bukkit ItemStack */
-    ) {
-        // FIXME remove it when the dedicated API is finished
-        if (!TestEnvironment.isRunningJUnit()) {
-            handle.addItemFlags(*ItemFlag.entries.toTypedArray())
-        }
-    }
-
+internal interface BaseNekoStack : NekoStack {
     override val isNmsBacked: Boolean
-        get() = handle.isNmsObjectBacked
+        get() = itemStack.isNmsObjectBacked
 
     /**
      * Gets the "wakame" [CompoundTag][CompoundShadowTag] of this item.
      *
      * This **does not** include any other tags which are **not** part of the
      * wakame item NBT specifications, such as display name, lore, enchantment and
-     * durability, which are already accessible via Server API. To get access to
-     * these tags, just use the wrapped [handle].
+     * durability, which are already accessible via the Bukkit API. To get access to
+     * those tags, just use the wrapped [itemStack].
      */
-    internal val tags: CompoundShadowTag
+    val tags: CompoundShadowTag
         get() {
             if (!isNmsBacked) {
                 // strictly-Bukkit ItemStack - the `wakame` compound is always available. If not, create one
-                return handle.nekoCompound
+                return itemStack.nekoCompound
             }
             // NMS-backed ItemStack - reading/modifying is allowed only if it already has a `wakame` compound
-            return handle.nekoCompoundOrNull ?: throw NullPointerException("Can't read/modify the NBT of NMS-backed ItemStack which is not NekoStack")
+            return itemStack.nekoCompoundOrNull ?: throw NullPointerException("Can't read/modify the NBT of NMS-backed ItemStack which is not NekoStack")
         }
 
     override val isNeko: Boolean
-        get() = handle.nekoCompoundOrNull != null
+        get() = itemStack.nekoCompoundOrNull != null
 
-    override val isNotNeko: Boolean
-        get() = !isNeko
+    override val isPlayStack: Boolean
+        get() = !isShowStack // an NS is either PNS or SNS
+
+    override val isShowStack: Boolean
+        get() = tags.contains(NekoTags.Root.SHOW, ShadowTagType.BYTE)
 
     override val schema: NekoItem
         get() = NekoItemRegistry.INSTANCES[key]
@@ -92,11 +82,11 @@ internal value class NekoStackImpl(
 
     //<editor-fold desc="Setters">
     override fun erase() {
-        handle.removeNekoCompound()
+        itemStack.removeNekoCompound()
     }
 
     override fun putRoot(compoundTag: CompoundShadowTag) {
-        handle.nekoCompound = compoundTag
+        itemStack.nekoCompound = compoundTag
     }
 
     override fun putSeed(seed: Long) {
@@ -120,5 +110,31 @@ internal value class NekoStackImpl(
         return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
     }
     //</editor-fold>
+}
 
+@JvmInline
+internal value class PlayNekoStackImpl(
+    override val itemStack: ItemStack,
+) : BaseNekoStack, PlayNekoStack {
+    companion object {
+        private val ALL_FLAGS = ItemFlag.entries.toTypedArray()
+    }
+
+    constructor(mat: Material) : this(
+        itemStack = ItemStack(mat), // strictly-Bukkit ItemStack
+    )
+    // FIXME remove it when the dedicated API is finished
+    {
+        if (!TestEnvironment.isRunningJUnit()) {
+            itemStack.addItemFlags(*ALL_FLAGS)
+        }
+    }
+}
+
+@JvmInline
+internal value class ShowNekoStackImpl(
+    override val itemStack: ItemStack,
+) : BaseNekoStack, ShowNekoStack {
+    override val customData: CustomDataAccessor
+        get() = TODO("Not yet implemented")
 }

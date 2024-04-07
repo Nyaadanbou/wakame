@@ -18,7 +18,7 @@ class ItemListener : Listener {
     @EventHandler
     fun onItemInteract(event: PlayerInteractEvent) {
         val item = event.item ?: return
-        val nekoStack = NekoStackFactory.by(item) ?: return
+        val nekoStack = NekoStackFactory.PLAY.by(item) ?: return
         nekoStack.schema.behaviors.forEach { behavior ->
             behavior.handleInteract(event.player, item, event.action, event)
         }
@@ -29,7 +29,7 @@ class ItemListener : Listener {
         // TODO: 这是一个 POC，可能需要考虑背包内的所有 Neko 物品
         val damager = event.damager as? Player ?: return
         val item = damager.inventory.itemInMainHand
-        val nekoStack = NekoStackFactory.by(item) ?: return
+        val nekoStack = NekoStackFactory.PLAY.by(item) ?: return
         nekoStack.schema.behaviors.forEach { behavior ->
             behavior.handleAttackEntity(damager, item, event.entity, event)
         }
@@ -110,7 +110,7 @@ class ItemListener : Listener {
     @EventHandler
     fun onItemConsume(event: PlayerItemConsumeEvent) {
         val item = event.item
-        val nekoStack = NekoStackFactory.by(item) ?: return
+        val nekoStack = NekoStackFactory.PLAY.by(item) ?: return
         nekoStack.schema.behaviors.forEach { behavior ->
             behavior.handleConsume(event.player, item, event)
         }

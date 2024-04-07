@@ -7,6 +7,7 @@ object NekoTags {
         const val KEY = "key"
         const val SEED = "seed"
         const val SID = "sid"
+        const val SHOW = "show"
     }
 
     object Skill {

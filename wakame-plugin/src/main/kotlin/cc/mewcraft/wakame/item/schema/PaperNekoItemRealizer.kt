@@ -40,7 +40,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         val nekoStack = run {
             val namespacedKey = nekoItem.material.asNamespacedKey
             val material = requireNotNull(Registry.MATERIAL.get(namespacedKey)) { "Can't find material with key '{${nekoItem.material}'" }
-            NekoStackFactory.new(material)
+            NekoStackFactory.PLAY.new(material)
         }
 
         // write base data

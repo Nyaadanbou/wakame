@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.event.SkillCastEvent
-import cc.mewcraft.wakame.item.binary.NekoStackFactory
+import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
 import cc.mewcraft.wakame.item.schema.NekoItem
@@ -71,7 +71,7 @@ interface Damageable : ItemBehavior {
 
         override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
             val damage = event.damage
-            val nekoStack = NekoStackFactory.wrap(itemStack)
+            val nekoStack = PlayNekoStackFactory.require(itemStack)
             val durabilityMeta = nekoStack.getMetaAccessor<BDurabilityMeta>()
             if (!durabilityMeta.exists) {
                 logger.warn("物品 ${nekoStack.schema.key} 拥有行为 Damageable, 但是没有耐久度元数据")
@@ -93,7 +93,7 @@ interface Damageable : ItemBehavior {
         }
 
         override fun handleSkillCast(caster: Caster, itemStack: ItemStack, skill: Skill, event: SkillCastEvent) {
-            val nekoStack = NekoStackFactory.wrap(itemStack)
+            val nekoStack = PlayNekoStackFactory.require(itemStack)
             val durabilityMeta = nekoStack.getMetaAccessor<BDurabilityMeta>()
             if (!durabilityMeta.exists) {
                 logger.warn("物品 ${nekoStack.schema.key} 拥有行为 Damageable, 但是没有耐久度元数据")

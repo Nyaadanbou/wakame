@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.skill.Skill
 import com.google.common.collect.Multimap
 
 /**
- * This is an interface to get the [cell holder][BinaryCell] for the ItemStack.
+ * This is the interface to get the [cell holder][BinaryCell] on the ItemStack.
  */
 interface ItemCellAccessor {
 

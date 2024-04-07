@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.item.binary.NekoStackImpl
+import cc.mewcraft.wakame.item.binary.BaseNekoStack
 import cc.mewcraft.wakame.registry.ItemMetaRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 
 @JvmInline
 internal value class ItemMetaAccessorImpl(
-    val base: NekoStackImpl,
+    val base: BaseNekoStack,
 ) : KoinComponent, ItemMetaAccessor {
     override val rootOrNull: CompoundShadowTag?
         get() = base.tags.getCompoundOrNull(NekoNamespaces.ITEM_META)

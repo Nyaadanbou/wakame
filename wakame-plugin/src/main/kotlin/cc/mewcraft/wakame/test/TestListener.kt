@@ -47,7 +47,7 @@ class TestListener : KoinComponent, Listener {
             "i1" -> {
                 val nekoItem = NekoItemRegistry.get("short_sword:demo")
                 val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.asNekoUser())
-                inventory.addItem(nekoStack.handle)
+                inventory.addItem(nekoStack.itemStack)
             }
         }
     }
@@ -62,7 +62,7 @@ class TestListener : KoinComponent, Listener {
             plainMessage.startsWith("i-") -> {
                 val nekoItem = NekoItemRegistry.get(plainMessage.substringAfter("i-"))
                 val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.asNekoUser())
-                inventory.addItem(nekoStack.handle)
+                inventory.addItem(nekoStack.itemStack)
             }
         }
     }
@@ -75,7 +75,7 @@ class TestListener : KoinComponent, Listener {
 
         when (plainMessage) {
             "r1" -> {
-                val wrap = NekoStackFactory.wrap(inventory.itemInMainHand)
+                val wrap = NekoStackFactory.PLAY.wrap(inventory.itemInMainHand)
                 val lore = wrap.getMetaAccessor<BDisplayLoreMeta>().getOrEmpty()
                 val preview = ItemStack(Material.STONE).apply { editMeta { it.lore(lore.mini) } }
                 inventory.addItem(preview)
@@ -237,10 +237,10 @@ class TestListener : KoinComponent, Listener {
         val inventory = player.inventory
 
         if (plainMessage.startsWith("v-")) {
-            val nekoStack = NekoStackFactory.wrap(inventory.itemInMainHand)
+            val nekoStack = NekoStackFactory.PLAY.wrap(inventory.itemInMainHand)
             val variant = plainMessage.substringAfter("v-").toInt()
             nekoStack.putVariant(variant)
-            inventory.setItemInMainHand(nekoStack.handle)
+            inventory.setItemInMainHand(nekoStack.itemStack)
         }
     }
 
