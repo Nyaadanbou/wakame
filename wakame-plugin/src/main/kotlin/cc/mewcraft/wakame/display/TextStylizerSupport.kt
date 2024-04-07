@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
@@ -22,6 +21,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.extra.kotlin.style
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.JoinConfiguration
@@ -237,7 +237,17 @@ internal class AttributeStylizerImpl(
             }
         }
 
-        return listOf(mm.deserialize(config.attributeFormats.getValue(core.key), resolvers.build()))
+        return listOf(mm.deserialize(config.attributeFormat.values.getValue(core.key), resolvers.build()))
+    }
+
+    class AttributeFormatImpl(
+        override val values: Map<Key, String>
+    ) : AttributeStylizer.AttributeFormat {
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("values", values)
+        )
+
+        override fun toString(): String = toSimpleString()
     }
 
     class AttackSpeedFormatImpl(
@@ -251,15 +261,25 @@ internal class AttributeStylizerImpl(
 
         override fun toString(): String = toSimpleString()
     }
+
+    class OperationFormatImpl(
+        override val values: Map<Operation, String>
+    ) : AttributeStylizer.OperationFormat {
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("values", values)
+        )
+
+        override fun toString(): String = toSimpleString()
+    }
 }
 
 internal class OperationStylizerImpl(
     private val config: RendererConfiguration,
 ) : OperationStylizer {
     override fun stylize(value: String, operation: Operation): String = when (operation) {
-        Operation.ADD -> config.operationFormats.getValue(Operation.ADD).get().format(value)
-        Operation.MULTIPLY_BASE -> config.operationFormats.getValue(Operation.MULTIPLY_BASE).get().format(value)
-        Operation.MULTIPLY_TOTAL -> config.operationFormats.getValue(Operation.MULTIPLY_TOTAL).get().format(value)
+        Operation.ADD -> config.operationFormats.values.getValue(Operation.ADD).format(value)
+        Operation.MULTIPLY_BASE -> config.operationFormats.values.getValue(Operation.MULTIPLY_BASE).format(value)
+        Operation.MULTIPLY_TOTAL -> config.operationFormats.values.getValue(Operation.MULTIPLY_TOTAL).format(value)
     }
 }
 
@@ -376,13 +396,10 @@ internal class ItemMetaStylizerImpl(
     }
 
     class LoreFormatImpl(
-        lineProvider: Provider<String>,
-        headerProvider: Provider<List<String>?>,
-        bottomProvider: Provider<List<String>?>,
+        override val line: String,
+        override val header: List<String>?,
+        override val bottom: List<String>?,
     ) : ItemMetaStylizer.LoreFormat {
-        override val line: String by lineProvider
-        override val header: List<String>? by headerProvider
-        override val bottom: List<String>? by bottomProvider
 
         override fun toString(): String {
             return toSimpleString()
@@ -398,14 +415,10 @@ internal class ItemMetaStylizerImpl(
     }
 
     class ListFormatImpl(
-        mergedProvider: Provider<String>,
-        singleProvider: Provider<String>,
-        separatorProvider: Provider<String>,
+        override val merged: String,
+        override val single: String,
+        override val separator: String,
     ) : ItemMetaStylizer.ListFormat {
-        override val merged: String by mergedProvider
-        override val single: String by singleProvider
-        override val separator: String by separatorProvider
-
         override fun toString(): String {
             return toSimpleString()
         }

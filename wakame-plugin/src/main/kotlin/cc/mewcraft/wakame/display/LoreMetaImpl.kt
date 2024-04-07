@@ -7,7 +7,11 @@ import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.StringCombiner
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
+import java.util.stream.Stream
 
 /**
  * 代表一个自定义固定内容的 [LoreMeta].
@@ -65,23 +69,30 @@ internal data class AttributeLoreMeta(
         /**
          * 运算模式的顺序。
          */
-        operationIndexProvider: Provider<List<String>>,
+        operationIndex: Provider<List<String>>,
         /**
          * 元素种类的顺序。
          */
-        elementIndexProvider: Provider<List<String>>,
-    ) {
-        val operationIndex: List<String> by operationIndexProvider
-        val elementIndex: List<String> by elementIndexProvider
+        elementIndex: Provider<List<String>>,
+    ) : Examinable {
+        val operationIndex: List<String> by operationIndex
+        val elementIndex: List<String> by elementIndex
 
         init {
             // validate values
-            operationIndex.forEach { AttributeModifier.Operation.byKey(it) }
-            elementIndex.forEach { ElementRegistry.INSTANCES[it] }
+            this.operationIndex.forEach { AttributeModifier.Operation.byKey(it) }
+            this.elementIndex.forEach { ElementRegistry.INSTANCES[it] }
         }
 
         override fun toString(): String {
-            return "Derivation(operationIndex=$operationIndex, elementIndex=$elementIndex)"
+            return toSimpleString()
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> {
+            return Stream.of(
+                ExaminableProperty.of("operationIndex", operationIndex),
+                ExaminableProperty.of("elementIndex", elementIndex),
+            )
         }
     }
 

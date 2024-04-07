@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.new
 import org.koin.core.module.dsl.singleOf
@@ -19,7 +20,15 @@ internal fun displayModule(): Module = module {
 
     // config holder
     single<RendererConfiguration> {
-        RendererConfiguration(Configs[RENDERER_CONFIG_FILE])
+        RendererConfiguration(Configs.get(RENDERER_CONFIG_FILE) {
+            serializers {
+                it.kregister(LoreFormatSerializer)
+                it.kregister(ListFormatSerializer)
+                it.kregister(AttributeFormatSerializer)
+                it.kregister(AttackSpeedFormatSerializer)
+                it.kregister(OperationFormatSerializer)
+            }
+        })
     } binds arrayOf(Initializable::class)
 
     // meta lookup

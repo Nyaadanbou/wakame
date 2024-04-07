@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.pack.initializer
 
+import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.util.readFromDirectory
 import cc.mewcraft.wakame.util.readFromZipFile
 import team.unnamed.creative.ResourcePack
@@ -17,11 +18,9 @@ data class InitializerArg(
 data class NoPackException(
     override val message: String,
     override val cause: Throwable? = null,
-) : Throwable(message, cause)
+) : PackException()
 
 sealed class PackInitializer {
-    abstract val arg: InitializerArg
-
     companion object {
         fun chain(vararg initializers: PackInitializer): PackInitializer {
             initializers.reduce { acc, initializer ->
@@ -32,45 +31,49 @@ sealed class PackInitializer {
         }
     }
 
-    protected var next: PackInitializer? = null
-
-    abstract fun init(): Result<ResourcePack>
-
-    protected fun initNext(e: Throwable): Result<ResourcePack> {
-        if (e !is NoPackException)
-            return Result.failure(e)
-        return next?.init() ?: Result.failure(e)
+    fun initialize(): ResourcePack {
+        return try {
+            init()
+        } catch (e: Throwable) {
+            if (e is IOException) {
+                throw e
+            }
+            next?.init() ?: throw NoPackException("No resource pack found", e)
+        }
     }
+
+    abstract val arg: InitializerArg
+    protected abstract fun init(): ResourcePack
+
+    protected var next: PackInitializer? = null
 }
 
 internal class ZipPackInitializer(
     override val arg: InitializerArg
 ) : PackInitializer() {
-    override fun init(): Result<ResourcePack> {
+    override fun init(): ResourcePack {
         val resourceFile = initFile()
-            .getOrElse { return initNext(it) }
-        val pack = runCatching {
-            arg.packReader.readFromZipFile(resourceFile)
-        }.getOrElse { return initNext(NoPackException("No pack", it)) }
-        return Result.success(pack)
+        val pack = arg.packReader.readFromZipFile(resourceFile)
+
+        return pack
     }
 
     //<editor-fold desc="Init resource pack file">
-    private fun initFile(): Result<File> {
+    private fun initFile(): File {
         val resourcePackPath = arg.zipFilePath
         if (resourcePackPath.isDirectory) {
-            return Result.failure(IOException("Resource pack path is a directory"))
+            throw IOException("Resource pack path is a directory")
         }
 
         if (!resourcePackPath.exists()) {
             // Create the resource pack file if it doesn't exist
             resourcePackPath.parentFile.mkdirs()
             if (!resourcePackPath.createNewFile()) {
-                return Result.failure(IOException("Failed to create resource pack file"))
+                throw IOException("Failed to create resource pack file")
             }
         }
 
-        return Result.success(resourcePackPath)
+        return resourcePackPath
     }
     //</editor-fold>
 }
@@ -78,11 +81,15 @@ internal class ZipPackInitializer(
 internal class DirPackInitializer(
     override val arg: InitializerArg
 ) : PackInitializer() {
-    override fun init(): Result<ResourcePack> {
+    override fun init(): ResourcePack {
         val resourcePackDir = arg.resourcePackDir
-        val pack = runCatching {
-            arg.packReader.readFromDirectory(resourcePackDir)
-        }.getOrElse { return initNext(NoPackException("No pack", it)) }
-        return Result.success(pack)
+        if (!resourcePackDir.exists()) {
+            throw NoPackException("Resource pack directory does not exist")
+        }
+        if (!resourcePackDir.list().isNullOrEmpty()) {
+            throw NoPackException("Resource pack directory is not empty")
+        }
+        val pack = arg.packReader.readFromDirectory(resourcePackDir)
+        return pack
     }
 }

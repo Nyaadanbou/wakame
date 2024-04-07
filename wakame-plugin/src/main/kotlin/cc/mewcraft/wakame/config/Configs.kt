@@ -9,23 +9,17 @@ import com.google.common.collect.Table
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.ConfigurationOptions
 import java.io.File
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 
 /**
  * The object that manages the configuration providers.
- *
- * This object is **thread-safe**.
  */
 object Configs : KoinComponent {
     enum class Type {
         YAML,
         GSON
     }
-
-    private val lock = ReentrantReadWriteLock()
 
     /**
      * The map of config providers.
@@ -37,22 +31,30 @@ object Configs : KoinComponent {
     private val configProviders: Table<String, Type, ConfigProvider> = HashBasedTable.create()
 
     fun reload() {
-        lock.read { configProviders.values().forEach(ConfigProvider::update) }
+        configProviders.values().forEach(ConfigProvider::update)
     }
 
-    operator fun get(relPath: String, type: Type = Type.YAML): ConfigProvider {
-        return configProviders.safeGetOrPut(relPath, type) { createConfigProvider(relPath, type) }
+    operator fun get(
+        relPath: String,
+        type: Type = Type.YAML,
+        options: ConfigurationOptions.() -> ConfigurationOptions = { ConfigurationOptions.defaults() }
+    ): ConfigProvider {
+        return configProviders.getOrPut(relPath, type) { createConfigProvider(relPath, type, options) }
     }
 
-    private fun <R, C, V> Table<R, C, V>.safeGetOrPut(row: R, column: C, defaultValue: () -> V): V {
-        return lock.read { get(row, column) } ?: lock.write { defaultValue().also { put(row, column, it) } }
+    private fun <R, C, V> Table<R, C, V>.getOrPut(row: R, column: C, defaultValue: () -> V): V {
+        return get(row, column) ?: defaultValue().also { put(row, column, it) }
     }
 
-    private fun createConfigProvider(relPath: String, type: Type): ConfigProvider {
+    private fun createConfigProvider(
+        relPath: String,
+        type: Type,
+        options: ConfigurationOptions.() -> ConfigurationOptions
+    ): ConfigProvider {
         val file = getConfigFile(relPath).toPath()
         return when (type) {
-            Type.YAML -> YamlFileConfigProvider(file, relPath)
-            Type.GSON -> GsonFileConfigProvider(file, relPath)
+            Type.YAML -> YamlFileConfigProvider(file, relPath, options)
+            Type.GSON -> GsonFileConfigProvider(file, relPath, options)
         }
     }
 

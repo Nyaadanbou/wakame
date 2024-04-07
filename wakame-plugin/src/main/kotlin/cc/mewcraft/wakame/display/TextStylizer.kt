@@ -1,11 +1,14 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.meta.BDisplayNameMeta
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import kotlin.reflect.KClass
@@ -55,6 +58,19 @@ internal interface SkillStylizer {
 internal interface AttributeStylizer {
     fun stylize(core: BinaryAttributeCore): List<Component>
 
+    /**
+     * 所有属性的渲染格式。
+     *
+     * ## 映射说明
+     * - `map key` 跟 [AttributeRegistry] 里的一致，不是 [FullKey]
+     * - `map value` 就是配置文件里对应的字符串值，无需做任何处理
+     *
+     * **注意该映射不包含 [Attributes.ATTACK_SPEED_LEVEL]**
+     */
+    interface AttributeFormat : Examinable {
+        val values: Map<Key, String>
+    }
+
     interface AttackSpeedFormat : Examinable {
         /**
          * 攻速的格式。
@@ -65,6 +81,10 @@ internal interface AttributeStylizer {
          * 必须包含9个元素，每个对应一个攻速等级。
          */
         val levels: Map<Int, String>
+    }
+
+    interface OperationFormat : Examinable {
+        val values: Map<AttributeModifier.Operation, String>
     }
 }
 

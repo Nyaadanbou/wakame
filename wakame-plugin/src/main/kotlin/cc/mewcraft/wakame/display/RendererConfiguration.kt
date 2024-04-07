@@ -1,25 +1,16 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.argument.StringArgumentQueue
-import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.krequire
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.spongepowered.configurate.ConfigurationNode
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -43,14 +34,7 @@ internal class RendererConfiguration(
     /**
      * 描述的渲染格式。
      */
-    val loreFormat: ItemMetaStylizer.LoreFormat = with(config.node(RENDERER_STYLE_NODE, "meta", "lore")) {
-        ItemMetaStylizerImpl.LoreFormatImpl(
-            lineProvider = entry<String>("line"),
-            headerProvider = entry<List<String>>("header").map { it.takeIf(List<String>::isNotEmpty) },
-            bottomProvider = entry<List<String>>("bottom").map { it.takeIf(List<String>::isNotEmpty) }
-        )
-    }
-
+    val loreFormat: ItemMetaStylizer.LoreFormat by config.entry<ItemMetaStylizer.LoreFormat>(RENDERER_STYLE_NODE, "meta", "lore")
 
     /**
      * 等级的渲染格式。
@@ -65,12 +49,12 @@ internal class RendererConfiguration(
     /**
      * 元素的渲染格式。
      */
-    val elementFormat: ItemMetaStylizer.ListFormat = getListFormat(config.node(RENDERER_STYLE_NODE, "meta", "element"))
+    val elementFormat: ItemMetaStylizer.ListFormat by config.entry<ItemMetaStylizer.ListFormat>(RENDERER_STYLE_NODE, "meta", "element")
 
     /**
      * 铭刻的渲染格式。
      */
-    val kizamiFormat: ItemMetaStylizer.ListFormat = getListFormat(config.node(RENDERER_STYLE_NODE, "meta", "kizami"))
+    val kizamiFormat: ItemMetaStylizer.ListFormat by config.entry<ItemMetaStylizer.ListFormat>(RENDERER_STYLE_NODE, "meta", "kizami")
 
     /**
      * 保养度的渲染格式。
@@ -86,14 +70,6 @@ internal class RendererConfiguration(
      * 皮肤所有者的渲染格式。
      */
     val skinOwnerFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "skin_owner")
-
-    private fun getListFormat(provider: ConfigProvider): ItemMetaStylizer.ListFormat {
-        return ItemMetaStylizerImpl.ListFormatImpl(
-            mergedProvider = provider.entry<String>("merged"),
-            singleProvider = provider.entry<String>("single"),
-            separatorProvider = provider.entry<String>("separator")
-        )
-    }
     //</editor-fold>
 
     //<editor-fold desc="renderer_style.attsribute">
@@ -102,47 +78,20 @@ internal class RendererConfiguration(
      */
     val emptyAttributeText: List<String> by config.entry<List<String>>(RENDERER_STYLE_NODE, "attribute", "empty")
 
-
     /**
-     * 所有属性的渲染格式。
-     *
-     * ## 映射说明
-     * - `map key` 跟 [AttributeRegistry] 里的一致，不是 [FullKey]
-     * - `map value` 就是配置文件里对应的字符串值，无需做任何处理
-     *
-     * **注意该映射不包含 [Attributes.ATTACK_SPEED_LEVEL]**
+     * 属性的渲染格式。
      */
-    val attributeFormats: Map<Key, String> by config.entry<Map<String, ConfigurationNode>>(RENDERER_STYLE_NODE, "attribute", "value")
-        .map {
-            it.mapKeys { (key, _) -> key }
-                .filter { (key, _) -> key != Attributes.ATTACK_SPEED_LEVEL.key.value() }
-                .mapKeys { (key, _) -> Key(NekoNamespaces.ATTRIBUTE, key) }
-                .mapValues { (_, value) -> value.krequire<String>() }
-                .withDefault { value -> "${value.asString()} (missing config)" }
-        }
+    val attributeFormat: AttributeStylizer.AttributeFormat by config.entry<AttributeStylizer.AttributeFormat>(RENDERER_STYLE_NODE, "attribute", "value")
 
     /**
      * 攻击速度的渲染格式。
      */
-    val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by config.node(RENDERER_STYLE_NODE, "attribute", "value", "attack_speed_level")
-        .map {
-            AttributeStylizerImpl.AttackSpeedFormatImpl(
-                merged = it.node("merged").krequire<String>(),
-                levels = it.node("levels")
-                    .childrenMap()
-                    .mapKeys { (key, _) -> key.toString().toInt() }
-                    .mapValues { (_, value) -> value.krequire<String>() }
-                    .withDefault { key -> "$key (missing config)" }
-            )
-        }
-
+    val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by config.entry<AttributeStylizer.AttackSpeedFormat>(RENDERER_STYLE_NODE, "attribute", "value", "attack_speed_level")
 
     /**
      * 运算模式的渲染格式。
      */
-    val operationFormats: Map<AttributeModifier.Operation, Provider<String>> = AttributeModifier.Operation.entries.associateWith { operation ->
-        config.entry<String>(RENDERER_STYLE_NODE, "attribute", "operation", operation.key)
-    }
+    val operationFormats: AttributeStylizer.OperationFormat by config.entry<AttributeStylizer.OperationFormat>(RENDERER_STYLE_NODE, "attribute", "operation")
     //</editor-fold>
 
     //<editor-fold desc="renderer_style.skill">
@@ -210,8 +159,8 @@ internal class RendererConfiguration(
 
         val primaryLines by config.entry<List<String>>(RENDERER_LAYOUT_NODE, "primary")
         val attDerivation = AttributeLoreMeta.Derivation(
-            operationIndexProvider = config.entry<List<String>>(RENDERER_LAYOUT_NODE, "operation"),
-            elementIndexProvider = config.entry<List<String>>(RENDERER_LAYOUT_NODE, "element")
+            operationIndex = config.entry<List<String>>(RENDERER_LAYOUT_NODE, "operation"),
+            elementIndex = config.entry<List<String>>(RENDERER_LAYOUT_NODE, "element")
         )
 
         val pattern = RENDERER_LAYOUT_LINE_PATTERN.toPattern()

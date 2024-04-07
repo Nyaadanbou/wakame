@@ -52,10 +52,12 @@ internal class ResourcePackManager(
         val resourcePackDir = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_DIR)
         val initArg = InitializerArg(resourceFile, resourcePackDir, packReader)
 
-        val resourcePackResult = PackInitializer.chain(
-            ZipPackInitializer(initArg),
-            DirPackInitializer(initArg)
-        ).init()
+        val resourcePackResult = runCatching {
+            PackInitializer.chain(
+                ZipPackInitializer(initArg),
+                DirPackInitializer(initArg)
+            ).initialize()
+        }
 
         val isNoPack = resourcePackResult.exceptionOrNull() is NoPackException
 
