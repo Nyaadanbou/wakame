@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.config
 
+import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.WakamePlugin
 import com.google.common.collect.HashBasedTable
@@ -42,6 +44,10 @@ object Configs : KoinComponent {
         return configProviders.safeGetOrPut(relPath, type) { createConfigProvider(relPath, type) }
     }
 
+    private fun <R, C, V> Table<R, C, V>.safeGetOrPut(row: R, column: C, defaultValue: () -> V): V {
+        return lock.read { get(row, column) } ?: lock.write { defaultValue().also { put(row, column, it) } }
+    }
+
     private fun createConfigProvider(relPath: String, type: Type): ConfigProvider {
         val file = getConfigFile(relPath).toPath()
         return when (type) {
@@ -54,10 +60,6 @@ object Configs : KoinComponent {
         return getKoin().getOrNull<WakamePlugin>()?.getBundledFile(path) // we're in a server environment
             ?: getKoin().get<File>(named(PLUGIN_DATA_DIR)).resolve(path) // we're in a test environment
     }
-
-    private fun <R, C, V> Table<R, C, V>.safeGetOrPut(row: R, column: C, defaultValue: () -> V): V {
-        return lock.read { get(row, column) } ?: lock.write { defaultValue().also { put(row, column, it) } }
-    }
 }
 
 /**
@@ -67,6 +69,6 @@ object Configs : KoinComponent {
  * @param transform the transformation of the config node
  * @return the deserialized value
  */
-fun <T> config(vararg path: String, transform: ConfigurationNode.() -> T): Lazy<T> {
-    return lazy { Configs["config.yml"].node(*path).get().transform() }
+fun <T> config(vararg path: String, transform: ConfigurationNode.() -> T): Provider<T> {
+    return Configs["config.yml"].node(*path).map(transform)
 }

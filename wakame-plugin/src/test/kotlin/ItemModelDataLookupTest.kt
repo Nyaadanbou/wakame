@@ -68,7 +68,7 @@ class ItemModelDataLookupTest : KoinTest {
         itemModelDataLookup.onPrePack()
 
         val demo = NekoItemRegistry.get("short_sword:demo")
-        val itemModelData = itemModelDataLookup.get(demo.key, 0)
+        val itemModelData = itemModelDataLookup[demo.key, 0]
 
         assertEquals(10000, itemModelData)
     }

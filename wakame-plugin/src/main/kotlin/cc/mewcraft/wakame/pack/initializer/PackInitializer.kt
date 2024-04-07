@@ -1,13 +1,17 @@
 package cc.mewcraft.wakame.pack.initializer
 
+import cc.mewcraft.wakame.util.readFromDirectory
+import cc.mewcraft.wakame.util.readFromZipFile
 import team.unnamed.creative.ResourcePack
-import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
+import team.unnamed.creative.serialize.ResourcePackReader
+import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import java.io.File
 import java.io.IOException
 
 data class InitializerArg(
     val zipFilePath: File,
     val resourcePackDir: File,
+    val packReader: ResourcePackReader<FileTreeReader>
 )
 
 data class NoPackException(
@@ -46,8 +50,7 @@ internal class ZipPackInitializer(
         val resourceFile = initFile()
             .getOrElse { return initNext(it) }
         val pack = runCatching {
-            MinecraftResourcePackReader.minecraft()
-                .readFromZipFile(resourceFile)
+            arg.packReader.readFromZipFile(resourceFile)
         }.getOrElse { return initNext(NoPackException("No pack", it)) }
         return Result.success(pack)
     }
@@ -78,8 +81,7 @@ internal class DirPackInitializer(
     override fun init(): Result<ResourcePack> {
         val resourcePackDir = arg.resourcePackDir
         val pack = runCatching {
-            MinecraftResourcePackReader.minecraft()
-                .readFromDirectory(resourcePackDir)
+            arg.packReader.readFromDirectory(resourcePackDir)
         }.getOrElse { return initNext(NoPackException("No pack", it)) }
         return Result.success(pack)
     }

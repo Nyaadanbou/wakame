@@ -9,6 +9,12 @@ import org.koin.core.module.dsl.new
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.binds
 import org.koin.dsl.module
+import team.unnamed.creative.serialize.ResourcePackReader
+import team.unnamed.creative.serialize.ResourcePackWriter
+import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
+import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
+import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
+import team.unnamed.creative.serialize.minecraft.fs.FileTreeWriter
 import team.unnamed.hephaestus.bukkit.BukkitModelEngine
 import team.unnamed.hephaestus.bukkit.v1_20_R3.BukkitModelEngine_v1_20_R3
 
@@ -29,8 +35,11 @@ internal fun packModule(): Module = module {
     single { ModelAnimateTask() } binds arrayOf(Initializable::class)
 
     single<ResourcePackManager> {
-        ResourcePackManager(new(::ResourcePackConfiguration))
+        ResourcePackManager(new(::ResourcePackConfiguration), get(), get())
     }
+
+    single<ResourcePackReader<FileTreeReader>> { MinecraftResourcePackReader.minecraft() }
+    single<ResourcePackWriter<FileTreeWriter>> { MinecraftResourcePackWriter.minecraft() }
 
     single<BukkitModelEngine> {
         BukkitModelEngine_v1_20_R3.create(get(), new(::ModelViewPersistenceHandlerImpl))

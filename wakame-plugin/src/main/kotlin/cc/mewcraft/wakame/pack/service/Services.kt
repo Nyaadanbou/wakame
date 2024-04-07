@@ -4,11 +4,11 @@ import cc.mewcraft.wakame.github.GithubRepoManager
 import cc.mewcraft.wakame.pack.GENERATED_RESOURCE_PACK_DIR
 import cc.mewcraft.wakame.pack.RESOURCE_PACK_ZIP_NAME
 import me.lucko.helper.text3.mini
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.Blocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.slf4j.Logger
 import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.server.ResourcePackServer
 import java.io.File
@@ -50,7 +50,7 @@ data class ResourcePackService(
     private val port: Int,
     private val appendPort: Boolean,
 ) : Service, KoinComponent {
-    private val logger: ComponentLogger by inject()
+    private val logger: Logger by inject()
     private val executor: ExecutorService = Executors.newSingleThreadExecutor()
 
     init {
@@ -98,7 +98,7 @@ data class GithubService(
     private val branch: String,
     private val commitMessage: String,
 ) : Service, KoinComponent {
-    private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
+    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
 
     override val downloadAddress: String? = null // Not supported
 

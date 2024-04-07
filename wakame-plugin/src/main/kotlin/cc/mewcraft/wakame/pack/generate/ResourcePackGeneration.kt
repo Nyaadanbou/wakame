@@ -13,10 +13,10 @@ import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
+import org.slf4j.Logger
 import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackMeta
@@ -120,7 +120,7 @@ internal class ResourcePackRegistryModelGeneration(
 internal class ResourcePackCustomModelGeneration(
     args: GenerationArgs,
 ) : ResourcePackGeneration(args), KoinComponent {
-    private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
+    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
     private val config: ItemModelDataLookup by inject()
     private val vanillaResourcePack: VanillaResourcePack by inject()
 
@@ -131,7 +131,7 @@ internal class ResourcePackCustomModelGeneration(
             for (asset in assets) {
                 val modelFiles = asset.modelFiles.takeIf { it.isNotEmpty() } ?: continue
                 for ((index, modelFile) in modelFiles.withIndex()) {
-                    logger.info("<aqua>Generating $index model for ${asset.key}, SID ${asset.variant}... (Path: $modelFile)".mini)
+                    logger.info("<aqua>Generating $index model for ${asset.key}, SID ${asset.variant}... (Path: $modelFile)")
                     val customModelData = config.saveCustomModelData(asset.key, asset.variant)
                     val resourcePack = args.resourcePack
 
@@ -183,11 +183,11 @@ internal class ResourcePackCustomModelGeneration(
 
                     resourcePack.model(configModel.toMinecraftFormat())
                     resourcePack.model(vanillaCmdOverride).also {
-                        logger.info("<green>Model for ${asset.key}, SID ${asset.variant} generated. CustomModelData: $customModelData".mini)
+                        logger.info("<green>Model for ${asset.key}, SID ${asset.variant} generated. CustomModelData: $customModelData")
                     }
                     customTextures.forEach {
                         resourcePack.texture(it).also {
-                            logger.info("<green>Texture for ${asset.key}, SID ${asset.variant} generated.".mini)
+                            logger.info("<green>Texture for ${asset.key}, SID ${asset.variant} generated.")
                         }
                     }
                 }
@@ -200,7 +200,7 @@ internal class ResourcePackCustomModelGeneration(
                 val result1 = config.removeCustomModelData(*unUsedModelCustomModelData.toIntArray())
 
                 if (result1) {
-                    logger.info("<yellow>Removed unused custom model data from items with no model path: $unUsedModelCustomModelData".mini)
+                    logger.info("<yellow>Removed unused custom model data from items with no model path: $unUsedModelCustomModelData")
                 }
                 //</editor-fold>
             }
