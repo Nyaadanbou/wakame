@@ -148,13 +148,6 @@ interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      * @throws NullPointerException if this is not a legal neko item
      */
     val statistics: ItemStatisticsAccessor
-
-    override val behaviors: List<ItemBehavior>
-        get() = schema.behaviors
-
-    override fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
-        return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
-    }
 }
 
 /**
