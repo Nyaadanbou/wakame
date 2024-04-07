@@ -23,8 +23,6 @@ import org.spongepowered.configurate.ConfigurationNode
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
-// TODO use ConfigProvider where possible
-
 internal class RendererConfiguration(
     private val config: ConfigProvider,
 ) : Initializable, KoinComponent {

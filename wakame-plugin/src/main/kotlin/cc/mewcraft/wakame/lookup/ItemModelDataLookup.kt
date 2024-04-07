@@ -24,7 +24,7 @@ internal class ItemModelDataLookup(
     private fun loadLayout() {
         customModelDataTable.clear()
         for (entry in root.childrenMap()) {
-            val key: String = entry.key.toString()
+            val key = entry.key.toString()
             val valueNode = entry.value
             for (variant in valueNode.childrenMap()) {
                 val variantKey = variant.key.toString().toInt()
@@ -43,8 +43,8 @@ internal class ItemModelDataLookup(
         val oldValue = customModelDataTable.get(key, variant)
         if (oldValue != null) return oldValue
 
-        // 如果不存在则创建一个新的
         val maxVal = customModelDataTable.values().maxOrNull()
+        // 如果存在最大值则取其并加一，否则从 10000 开始
         val newVal = maxVal?.plus(1) ?: 10000
         return customModelDataTable.put(key, variant, newVal).also { saveCustomModelData(root) } ?: newVal
     }
@@ -55,7 +55,7 @@ internal class ItemModelDataLookup(
 
     fun removeCustomModelData(vararg values: Int): Boolean {
         if (values.isEmpty()) return false
-        return values.map { customModelDataTable.values().remove(it) }.any { it }.also { saveCustomModelData(root) }
+        return values.any { customModelDataTable.values().remove(it) }.also { saveCustomModelData(root) }
     }
 
     /**
@@ -64,10 +64,10 @@ internal class ItemModelDataLookup(
     private fun saveCustomModelData(node: BasicConfigurationNode) {
         node.set(null)
 
-        customModelDataTable.cellSet().forEach {
-            val k = it.rowKey.asString()
-            val s = it.columnKey
-            val v = it.value
+        for (cell in customModelDataTable.cellSet()) {
+            val k = cell.rowKey.asString()
+            val s = cell.columnKey
+            val v = cell.value
             node.node(k, s.toString()).set(v)
         }
 

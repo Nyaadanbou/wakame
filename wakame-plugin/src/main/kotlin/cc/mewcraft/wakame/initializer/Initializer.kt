@@ -295,7 +295,7 @@ object Initializer : KoinComponent, Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handlePluginReloaded(e: NekoReloadEvent) {
-        Configs.onReload()
+        Configs.reload()
         executeReload()
     }
 

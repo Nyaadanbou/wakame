@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.config
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.map
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.lang.reflect.Type
@@ -97,12 +98,24 @@ abstract class ConfigProvider(
     public abstract override fun loadValue(): ConfigurationNode
 }
 
-class FileConfigProvider internal constructor(
+class YamlFileConfigProvider internal constructor(
     private val path: Path,
     relPath: String,
 ) : ConfigProvider(relPath) {
     override fun loadValue(): ConfigurationNode {
         return YamlConfigurationLoader.builder()
+            .source { path.toFile().bufferedReader() }
+            .build()
+            .load()
+    }
+}
+
+class GsonFileConfigProvider internal constructor(
+    private val path: Path,
+    relPath: String,
+) : ConfigProvider(relPath) {
+    override fun loadValue(): ConfigurationNode {
+        return GsonConfigurationLoader.builder()
             .source { path.toFile().bufferedReader() }
             .build()
             .load()
