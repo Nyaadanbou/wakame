@@ -12,7 +12,7 @@ import java.io.IOException
 data class InitializerArg(
     val zipFilePath: File,
     val resourcePackDir: File,
-    val packReader: ResourcePackReader<FileTreeReader>
+    val packReader: ResourcePackReader<FileTreeReader>,
 )
 
 data class NoPackException(
@@ -24,8 +24,7 @@ sealed class PackInitializer {
     companion object {
         fun chain(vararg initializers: PackInitializer): PackInitializer {
             initializers.reduce { acc, initializer ->
-                acc.next = initializer
-                initializer
+                initializer.also { acc.next = initializer }
             }
             return initializers.first()
         }
@@ -42,19 +41,17 @@ sealed class PackInitializer {
         }
     }
 
-    abstract val arg: InitializerArg
-    protected abstract fun init(): ResourcePack
-
     protected var next: PackInitializer? = null
+    protected abstract val arg: InitializerArg
+    protected abstract fun init(): ResourcePack
 }
 
 internal class ZipPackInitializer(
-    override val arg: InitializerArg
+    override val arg: InitializerArg,
 ) : PackInitializer() {
     override fun init(): ResourcePack {
         val resourceFile = initFile()
         val pack = arg.packReader.readFromZipFile(resourceFile)
-
         return pack
     }
 
@@ -79,7 +76,7 @@ internal class ZipPackInitializer(
 }
 
 internal class DirPackInitializer(
-    override val arg: InitializerArg
+    override val arg: InitializerArg,
 ) : PackInitializer() {
     override fun init(): ResourcePack {
         val resourcePackDir = arg.resourcePackDir

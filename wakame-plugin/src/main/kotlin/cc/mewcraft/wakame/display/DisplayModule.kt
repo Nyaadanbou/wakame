@@ -20,7 +20,7 @@ internal fun displayModule(): Module = module {
 
     // config holder
     single<RendererConfiguration> {
-        RendererConfiguration(Configs.get(RENDERER_CONFIG_FILE) {
+        RendererConfiguration(Configs.YAML.build(RENDERER_CONFIG_FILE) {
             serializers {
                 it.kregister(LoreFormatSerializer)
                 it.kregister(ListFormatSerializer)

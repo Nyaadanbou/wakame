@@ -1,26 +1,29 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.config.config
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
 import org.koin.core.component.KoinComponent
 
 class ResourcePackConfiguration : KoinComponent {
+    private val config = MAIN_CONFIG.node("resource_pack")
+
     //<editor-fold desc="Resource Pack Generation">
-    val description: String by config("resource_pack", "generation", "description") { krequire() }
+    val description: String by config.entry("generation", "description")
     //</editor-fold>
 
     //<editor-fold desc="Resource Pack Auto Upload">
-    val enabled: Boolean by config("resource_pack", "auto_upload", "enabled") { krequire() }
-    val service: String by config("resource_pack", "auto_upload", "service") { krequire() }
-    val host: String by config("resource_pack", "auto_upload", "host") { krequire() }
-    val port: Int by config("resource_pack", "auto_upload", "port") { krequire() }
-    val appendPort: Boolean by config("resource_pack", "auto_upload", "append_port") { krequire() }
+    val enabled: Boolean by config.entry("auto_upload", "enabled")
+    val service: String by config.entry("auto_upload", "service")
+    val host: String by config.entry("auto_upload", "host")
+    val port: Int by config.entry("auto_upload", "port")
+    val appendPort: Boolean by config.entry("auto_upload", "append_port")
 
-    val githubUsername: String by config("resource_pack", "auto_upload", "github", "username") { krequire() }
-    val githubToken: String by config("resource_pack", "auto_upload", "github", "token") { krequire() }
-    val githubRepo: String by config("resource_pack", "auto_upload", "github", "repo") { krequire() }
-    val githubBranch: String by config("resource_pack", "auto_upload", "github", "branch") { krequire() }
-    val githubPath: String by config("resource_pack", "auto_upload", "github", "path") { krequire() }
-    val githubCommitMessage: String by config("resource_pack", "auto_upload", "github", "commit_message") { krequire() }
+    val githubUsername: String by config.entry("auto_upload", "github", "username")
+    val githubToken: String by config.entry("auto_upload", "github", "token")
+    val githubRepo: String by config.entry("auto_upload", "github", "repo")
+    val githubBranch: String by config.entry("auto_upload", "github", "branch")
+    val githubPath: String by config.entry("auto_upload", "github", "path")
+    val githubCommitMessage: String by config.entry("auto_upload", "github", "commit_message")
     //</editor-fold>
 }

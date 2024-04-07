@@ -72,7 +72,7 @@ internal class RendererConfiguration(
     val skinOwnerFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "skin_owner")
     //</editor-fold>
 
-    //<editor-fold desc="renderer_style.attsribute">
+    //<editor-fold desc="renderer_style.attribute">
     /**
      * 空词条栏（属性）的渲染格式。
      */

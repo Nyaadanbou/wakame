@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.NEKO_PLUGIN
-import cc.mewcraft.wakame.config.config
+import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.util.concurrent.ObservableLock
 import cc.mewcraft.wakame.util.concurrent.lockAndRun
 import cc.mewcraft.wakame.util.concurrent.tryLockAndRun
@@ -12,7 +13,7 @@ import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.util.concurrent.*
 
-val USE_NEKO_SCHEDULER: Boolean by config("performance", "neko_executor", "enabled") { boolean }
+val USE_NEKO_SCHEDULER: Boolean by MAIN_CONFIG.entry("performance", "neko_executor", "enabled")
 
 fun runTaskLater(delay: Long, run: () -> Unit) =
     Bukkit.getScheduler().runTaskLater(NEKO_PLUGIN, run, delay)
@@ -66,7 +67,7 @@ fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit) =
 
 internal object AsyncExecutor : KoinComponent {
 
-    private val THREADS: Int by config("performance", "neko_executor", "threads") { int }
+    private val THREADS: Int by MAIN_CONFIG.entry("performance", "neko_executor", "threads")
     private val LOGGER: Logger by inject()
 
     private lateinit var threadFactory: ThreadFactory
