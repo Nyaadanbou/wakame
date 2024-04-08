@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.schema.BASE_SERIALIZERS
 import cc.mewcraft.wakame.item.schema.CELL_SERIALIZERS
 import cc.mewcraft.wakame.item.schema.META_SERIALIZERS
+import cc.mewcraft.wakame.item.schema.SKILL_SERIALIZERS
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
@@ -99,6 +100,13 @@ internal fun registryModule(): Module = module {
             registerAll(get<TypeSerializerCollection>(named(BASE_SERIALIZERS)))
             registerAll(get<TypeSerializerCollection>(named(CELL_SERIALIZERS)))
             registerAll(get<TypeSerializerCollection>(named(META_SERIALIZERS)))
+        }
+    }
+
+    single<YamlConfigurationLoader.Builder>(named(SKILL_CONFIG_LOADER)) {
+        buildYamlLoader {
+            registerAll(get<TypeSerializerCollection>(named(BASE_SERIALIZERS)))
+            registerAll(get<TypeSerializerCollection>(named(SKILL_SERIALIZERS)))
         }
     }
 

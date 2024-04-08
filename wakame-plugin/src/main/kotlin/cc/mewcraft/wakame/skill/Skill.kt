@@ -2,7 +2,10 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
+import org.spongepowered.configurate.ConfigurationNode
+import java.util.UUID
 
 /**
  * Represents a skill "attached" to a player.
@@ -12,6 +15,13 @@ import net.kyori.adventure.key.Key
  * has no skill attached.
  */
 interface Skill : Keyed {
+    /**
+     * The unique identifier of this skill.
+     */
+    val uniqueId: UUID
+
+    val costDurability: Int get() = 0
+
     fun castAt(target: Target.Void) {}
     fun castAt(target: Target.Location) {}
     fun castAt(target: Target.LivingEntity) {}
@@ -21,6 +31,7 @@ interface Skill : Keyed {
  * A no-op skill. Used as placeholder object.
  */
 object NoopSkill : Skill {
+    override val uniqueId: UUID = UUID.fromString("1826a767-d424-4024-8b8f-4e66157e35de")
     override val key: Key = SkillRegistry.EMPTY_KEY
 }
 
@@ -38,3 +49,8 @@ interface ActiveSkill : Skill
  * casting a spell or even getting attacked.
  */
 interface PassiveSkill : Skill
+
+fun Skill(node: ConfigurationNode) : Skill {
+    val type = node.node("type").krequire<String>()
+    return node.krequire(SkillTemplates.INSTANCE[type])
+}

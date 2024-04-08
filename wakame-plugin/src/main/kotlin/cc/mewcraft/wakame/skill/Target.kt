@@ -26,7 +26,9 @@ object TargetAdapter {
     }
 
     fun adapt(entity: LivingEntity): Target.LivingEntity {
-        TODO()
+        return object : Target.LivingEntity {
+            override val bukkitEntity: BukkitLivingEntity = entity
+        }
     }
 
     fun adapt(location: Location): Target.Location {

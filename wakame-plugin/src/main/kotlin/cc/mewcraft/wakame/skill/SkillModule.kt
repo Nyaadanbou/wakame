@@ -11,5 +11,5 @@ internal fun skillModule(): Module = module {
 
     singleOf(::SkillEventHandler)
     single { SkillRegistry } bind Initializable::class
-
+    single { SkillTemplates } bind Initializable::class
 }

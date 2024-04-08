@@ -1,0 +1,9 @@
+uuid: 0645a376-be2f-48ed-9d14-56dcb28fd126
+
+# 技能模板的 type
+type: remove_potion_effect
+
+# 下面的是此技能的属性
+effect_types:
+  - speed
+  - jump_boost

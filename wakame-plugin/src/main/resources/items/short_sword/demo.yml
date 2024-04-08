@@ -30,6 +30,7 @@ behaviors:
 #  castable: { }
   statistical: { }
   damageable:
+    will_lost: false
     repair:
       - minecraft:iron_ingot
 #  enchantable: { }
