@@ -22,12 +22,15 @@ import org.bukkit.inventory.ItemStack
 import java.util.UUID
 import kotlin.reflect.KClass
 
+/**
+ * Common code shared by [PlayNekoStack] and [ShowNekoStack].
+ *
+ * This could be used if it does not require the specific code of
+ * [PlayNekoStack] and [ShowNekoStack].
+ */
 internal interface BaseNekoStack : NekoStack {
-    override val isNmsBacked: Boolean
-        get() = itemStack.isNmsObjectBacked
-
     /**
-     * Gets the "wakame" [CompoundTag][CompoundShadowTag] of this item.
+     * Gets the "wakame" [Compound][CompoundShadowTag] of this item.
      *
      * This **does not** include any other tags which are **not** part of the
      * wakame item NBT specifications, such as display name, lore, enchantment and
@@ -35,22 +38,18 @@ internal interface BaseNekoStack : NekoStack {
      * those tags, just use the wrapped [itemStack].
      */
     val tags: CompoundShadowTag
-        get() {
-            if (!isNmsBacked) {
-                // strictly-Bukkit ItemStack - the `wakame` compound is always available. If not, create one
-                return itemStack.nekoCompound
-            }
-            // NMS-backed ItemStack - reading/modifying is allowed only if it already has a `wakame` compound
-            return itemStack.nekoCompoundOrNull ?: throw NullPointerException("Can't read/modify the NBT of NMS-backed ItemStack which is not NekoStack")
-        }
+
+    //<editor-fold desc="Getters">
+    override val isNmsBacked: Boolean
+        get() = itemStack.isNmsObjectBacked
 
     override val isNeko: Boolean
         get() = itemStack.nekoCompoundOrNull != null
 
-    override val isPlayStack: Boolean
-        get() = !isShowStack // an NS is either PNS or SNS
+    override val isPlay: Boolean
+        get() = !isShow // an NS is either PNS or SNS
 
-    override val isShowStack: Boolean
+    override val isShow: Boolean
         get() = tags.contains(NekoTags.Root.SHOW, ShadowTagType.BYTE)
 
     override val schema: NekoItem
@@ -79,6 +78,7 @@ internal interface BaseNekoStack : NekoStack {
 
     override val statistics: ItemStatisticsAccessor
         get() = ItemStatisticsAccessorImpl(this)
+    //</editor-fold>
 
     //<editor-fold desc="Setters">
     override fun erase() {
@@ -129,12 +129,36 @@ internal value class PlayNekoStackImpl(
             itemStack.addItemFlags(*ALL_FLAGS)
         }
     }
+
+    override val tags: CompoundShadowTag
+        get() {
+            if (!isNmsBacked) {
+                // If this is a strictly-Bukkit ItemStack,
+                // the `wakame` compound should always be available (if not, create it)
+                // as we need to create a NekoItem realization from an empty ItemStack.
+                return itemStack.nekoCompound
+            }
+            // If this is a NMS-backed ItemStack,
+            // reading/modifying is allowed only if it already has a `wakame` compound.
+            // We explicitly prohibit modifying the ItemStacks, which are not already
+            // NekoItem realization, in the world state because we want to avoid
+            // undefined behaviors. Just imagine that a random code modifies a
+            // vanilla item and make it an incomplete realization of NekoItem.
+            return itemStack.nekoCompoundOrNull ?: throw NullPointerException("Can't read/modify the tags of NMS-backed ItemStack which is not NekoItem realization")
+        }
 }
 
 @JvmInline
 internal value class ShowNekoStackImpl(
     override val itemStack: ItemStack,
 ) : BaseNekoStack, ShowNekoStack {
+    // The `wakame` compound should always be available (if not, create it)
+    // as the ItemStack is solely used for the purpose of display, not for
+    // the purpose of being used by players. Therefore, we can relax the
+    // restrictions a little.
+    override val tags: CompoundShadowTag
+        get() = itemStack.nekoCompound
+
     override val customData: CustomDataAccessor
         get() = TODO("Not yet implemented")
 }

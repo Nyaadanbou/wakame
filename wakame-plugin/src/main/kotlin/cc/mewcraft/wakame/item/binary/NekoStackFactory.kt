@@ -1,66 +1,78 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.util.isNmsObjectBacked
+import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
 
-/**
- * The factory used to create various [NekoStacks][NekoStack].
- */
-object NekoStackFactory {
-    /**
-     * Gets the factory for [PlayNekoStack].
-     */
-    val PLAY = PlayNekoStackFactory
-
-    /**
-     * Gets the factory for [ShowNekoStack].
-     */
-    val SHOW = ShowNekoStackFactory
-}
-
 object PlayNekoStackFactory {
     /**
-     * The same as [wrap] but it will return `null` if the [itemStack] is not
-     * a legal neko item (that is, [NekoStack.isNeko] returns `false`).
+     * Wraps the [itemStack] as a [PlayNekoStack] object. Then, you can use
+     * it to directly read/modify the wrapped [itemStack] in the world state.
+     *
+     * This function requires the [itemStack] to fulfill all the requirements:
+     * 1. The [itemStack] is backed by an NMS object;
+     * 2. The [itemStack] is a NekoItem realization;
+     * 3. The [itemStack] is of legal PlayNekoStack.
+     *
+     * If any of the requirements are not fulfilled, this function will simply
+     * return a `null`.
      *
      * @throws IllegalArgumentException if the [itemStack] instance is not
      *     backed by an NMS object
      */
-    @Contract(pure = false)
-    fun by(itemStack: ItemStack): PlayNekoStack? {
-        return wrap(itemStack).takeIf { it.isPlayStack }
+    @Contract(pure = true)
+    fun maybe(itemStack: ItemStack): PlayNekoStack? {
+        require(itemStack.isNmsObjectBacked) { "The ItemStack is not backed by an NMS object" }
+        val playNekoStack = PlayNekoStackImpl(itemStack).takeIf { it.isNeko && it.isPlay }
+        return playNekoStack
     }
 
     /**
      * Wraps the [itemStack] as a [PlayNekoStack] object. Then, you can use
-     * it to directly read/modify the wrapped [itemStack] in the world state
-     * at your will.
+     * it to directly read/modify the wrapped [itemStack] in the world state.
      *
-     * Note that the returned [PlayNekoStack] is not guaranteed to have the
-     * [NekoStack.isNeko] be `true`. You should check the flag before you
-     * further access the wakame data on the [itemStack].
+     * This function requires the [itemStack] to fulfill all the requirements:
+     * 1. The [itemStack] is backed by an NMS object;
+     * 2. The [itemStack] is a NekoItem realization;
+     * 3. The [itemStack] is of legal PlayNekoStack.
      *
-     * @throws IllegalArgumentException if the [itemStack] instance is not
-     *     backed by an NMS object
+     * If any of the requirements are not fulfilled, this function will throw
+     * an [IllegalArgumentException].
+     *
+     * @throws IllegalArgumentException if the [itemStack] does not fulfill
+     * the requirements
      */
-    @Contract(pure = false)
-    fun wrap(itemStack: ItemStack): PlayNekoStack {
-        require(itemStack.isNmsObjectBacked) { "Can't wrap a non NMS-backed ItemStack as NekoStack" }
-        return PlayNekoStackImpl(itemStack)
+    @Contract(pure = true)
+    fun require(itemStack: ItemStack): PlayNekoStack {
+        require(itemStack.isNmsObjectBacked) { "The ItemStack is not backed by an NMS object" }
+        val playNekoStack = PlayNekoStackImpl(itemStack)
+        require(playNekoStack.isNeko) { "The ItemStack is not a NekoItem realization" }
+        require(playNekoStack.isPlay) { "The ItemStack is not a legal PlayNekoStack" }
+        return playNekoStack
     }
 
     /**
      * This function is meant to be used to create a new [PlayNekoStack]
      * which will ultimately be added to the world state (such as adding
-     * it to a player's inventory and dropping it on the ground). Once
-     * the [PlayNekoStack] has been added to the world state, any changes
-     * to it **will not** reflect on that one in the world state.
+     * it to a player's inventory and dropping it on the ground).
+     *
+     * ## Caution!!!
+     *
+     * 1. It is the caller's responsibility to modify the returned [PlayNekoStack]
+     * so that it becomes a legal realization of NekoItem. Fail to fulfill the
+     * requirement will result in undefined behaviors.
+     * 2. Once the returned [PlayNekoStack] has been added to the world state,
+     * any subsequent changes to it **will not** reflect on that [PlayNekoStack]
+     * in the world state. See [NekoStack.isNmsBacked] for the reasons.
+     *
+     * ## Tips
      *
      * If you want to modify the [PlayNekoStack]s that are already in the world
      * state (such as modifying the item in a player's inventory), use the
-     * functions [by] or [wrap] to get a new wrapper object.
+     * functions [maybe] or [require] to get a new wrapper object.
      */
     fun new(material: Material): PlayNekoStack {
         return PlayNekoStackImpl(material)
@@ -68,29 +80,70 @@ object PlayNekoStackFactory {
 }
 
 object ShowNekoStackFactory {
-    // 尝试把一个 ItemStack 封装成 ShowNekoStack
-    // 如果这个 ItemStack 原本不是 ShowNekoStack，那么直接返回 null
-    // 使用场景：修改 GUI Inventory 里的 ItemStack
-    @Contract(pure = false)
-    fun by(itemStack: ItemStack): ShowNekoStack? {
-        TODO()
+    /**
+     * Wraps the [itemStack] as a [ShowNekoStack] object.
+     *
+     * This function will return `null` if the [itemStack] is not of a
+     * legal [ShowNekoStack].
+     *
+     * The [itemStack] will leave intact.
+     */
+    @Contract(pure = true)
+    fun maybe(itemStack: ItemStack): ShowNekoStack? {
+        val itemStackCopy = itemStack.clone()
+        val showNekoStack = ShowNekoStackImpl(itemStackCopy).takeIf { it.isNeko && it.isShow }
+        return showNekoStack
     }
 
-    // 把一个已经是 ShowNekoStack 的 ItemStack 封装成 ShowNekoStack
-    // 如果这个 ItemStack 不是 ShowNekoStack，将抛出异常
-    // 使用场景：修改 GUI Inventory 里的 ItemStack
-    @Contract(pure = false)
-    fun wrap(itemStack: ItemStack): ShowNekoStack {
-        TODO()
+    /**
+     * Wraps the [itemStack] as a [ShowNekoStack] object.
+     *
+     * This function will throw an exception if the [itemStack] is not of a
+     * legal [ShowNekoStack].
+     *
+     * The [itemStack] will leave intact.
+     *
+     * @throws IllegalArgumentException
+     */
+    @Contract(pure = true)
+    fun require(itemStack: ItemStack): ShowNekoStack {
+        val itemStackCopy = itemStack.clone()
+        val showNekoStack = ShowNekoStackImpl(itemStackCopy)
+        require(showNekoStack.isNeko) { "The ItemStack is not a NekoItem realization" }
+        require(showNekoStack.isShow) { "The ItemStack is not a legal ShowNekoStack" }
+        return showNekoStack
     }
 
-    // 把一个 PlayNekoStack 转换成 ShowNekoStack
-    // 实际上只是写入一个特定的 NBT，标记其为 ShowNekoStack
-    // 该标记直接影响一个物品的name/lore是否会被发包系统修改
-    // 我们不想一个SNS被发包系统修改name/lore，对吧？
+    /**
+     * Converts the [playStack] to a [ShowNekoStack].
+     *
+     * The [playStack] will leave intact.
+     */
     @Contract(pure = true) // 标记该函数不会修改传进来的 playStack
     fun convert(playStack: PlayNekoStack): ShowNekoStack {
-        TODO()
-        // 在 wakame 下写入 byte('show'): 0b
+        val itemStackCopy = playStack.itemStack.clone()
+        val showNekoStack = ShowNekoStackImpl(itemStackCopy)
+        showNekoStack.tags.writeSNSMark()
+        return showNekoStack
+    }
+
+    /**
+     * Converts the [itemStack] to a [ShowNekoStack].
+     *
+     * The [itemStack] will leave intact.
+     *
+     * @throws IllegalArgumentException if the [itemStack] is not a NekoItem realization
+     */
+    @Contract(pure = true)
+    fun convert(itemStack: ItemStack): ShowNekoStack {
+        val itemStackCopy = itemStack.clone()
+        val showNekoStack = ShowNekoStackImpl(itemStackCopy)
+        require(showNekoStack.isNeko) { "The ItemStack is not a NekoItem realization" }
+        showNekoStack.tags.writeSNSMark()
+        return showNekoStack
+    }
+
+    private fun CompoundShadowTag.writeSNSMark() {
+        putByte(NekoTags.Root.SHOW, 0) // 写入 SNS mark，告知发包系统不要修改此物品
     }
 }

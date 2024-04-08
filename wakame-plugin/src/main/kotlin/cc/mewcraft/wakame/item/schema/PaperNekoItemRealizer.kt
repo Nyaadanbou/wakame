@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.schema
 
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.NekoStackFactory
+import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.item.schema.meta.*
@@ -40,7 +40,7 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         val nekoStack = run {
             val namespacedKey = nekoItem.material.asNamespacedKey
             val material = requireNotNull(Registry.MATERIAL.get(namespacedKey)) { "Can't find material with key '{${nekoItem.material}'" }
-            NekoStackFactory.PLAY.new(material)
+            PlayNekoStackFactory.new(material)
         }
 
         // write base data

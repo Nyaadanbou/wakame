@@ -58,7 +58,7 @@ interface Damageable : ItemBehavior {
      */
     private class Default(
         repairMaterials: Provider<List<String>>,
-        disappearWhenBroken: Provider<Boolean>
+        disappearWhenBroken: Provider<Boolean>,
     ) : Damageable, KoinComponent {
         private val logger: Logger by inject()
         override val repairMaterials: List<Key> by repairMaterials.map { it.map(::Key) }

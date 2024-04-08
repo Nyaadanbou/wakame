@@ -16,6 +16,7 @@ import java.util.UUID
 /**
  * A wrapper of [ItemStack], which adds additional properties and
  * functions to work with the wakame data on the [itemStack], such as:
+ *
  * - checking whether the item is of a neko item or not
  * - looking up the unique identifier of the neko item (if it is)
  *
@@ -52,9 +53,13 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      * - Returning `true` means the [itemStack] is backed by an NMS object.
      * - Returning `false` means the [itemStack] is a strictly-Bukkit [ItemStack].
      *
-     * So what's so important about it? It should be noted that the server implementation
-     * always makes a **NMS copy** out of a strictly-Bukkit [ItemStack] when the item
-     * is being added to the underlying world state.
+     * So what's so important about it? It should be noted that the server
+     * implementation always makes a **NMS copy** out of a strictly-Bukkit
+     * [ItemStack] when the item is being added to the underlying world state.
+     *
+     * This will lead to the case in which any changes to the strictly-Bukkit
+     * ItemStack will not apply to that corresponding NMS ItemStack in the world
+     * state, which pretty makes sense as they are different objects!
      *
      * However, this may not hold if the Paper
      * team finish up the ItemStack overhaul:
@@ -69,7 +74,7 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
     val isNmsBacked: Boolean
 
     /**
-     * Returns `true` if this item is a legal neko item.
+     * Returns `true` if this item is a [NekoItem] realization.
      *
      * When this returns `true`, you can then access the wakame data on the
      * [itemStack] without throwing NPE exceptions.
@@ -77,60 +82,60 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
     val isNeko: Boolean
 
     /**
-     * Returns `true` if this item is a [PlayNekoStack].
+     * Returns `true` if this item is a legal [PlayNekoStack].
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      * @see PlayNekoStack
      */
-    val isPlayStack: Boolean
+    val isPlay: Boolean
 
     /**
-     * Returns `true` if this item is a [ShowNekoStack].
+     * Returns `true` if this item is a legal [ShowNekoStack].
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      * @see ShowNekoStack
      */
-    val isShowStack: Boolean
+    val isShow: Boolean
 
     /**
      * The corresponding [NekoItem] schema.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val schema: NekoItem
 
     /**
      * The random seed from which this item is generated.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val seed: Long
 
     /**
      * The [namespaced ID][Key] of this item.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val key: Key
 
     /**
      * The variant of this item.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val variant: Int
 
     /**
      * The UUID of this item.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val uuid: UUID
 
     /**
      * The inventory slot where this item becomes effective.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val effectiveSlot: EffectiveSlot
 
@@ -139,7 +144,7 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      *
      * Used to manipulate the **cells** of this item.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val cell: ItemCellAccessor
 
@@ -148,7 +153,7 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      *
      * Used to manipulate the **meta** of this item.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val meta: ItemMetaAccessor
 
@@ -157,7 +162,7 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      *
      * Used to manipulate the **statistics** of this item.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val statistics: ItemStatisticsAccessor
 }
@@ -189,7 +194,7 @@ interface ShowNekoStack : NekoStack {
      *
      * Used to manipulate the **custom data** of this item.
      *
-     * @throws NullPointerException if this is not a legal neko item
+     * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val customData: CustomDataAccessor
 }
