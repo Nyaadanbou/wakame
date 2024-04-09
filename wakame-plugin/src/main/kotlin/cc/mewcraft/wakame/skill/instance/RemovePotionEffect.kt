@@ -15,6 +15,7 @@ import java.util.*
 
 class RemovePotionEffect(
     override val uniqueId: UUID,
+    override val trigger: Skill.Trigger,
     private val effectType: List<PotionEffectType>
 ) : Skill {
     override val key: Key = Key(NekoNamespaces.SKILL, "remove_potion_effect")
@@ -26,7 +27,8 @@ class RemovePotionEffect(
 internal object RemovePotionEffectSerializer : SkillSerializer<RemovePotionEffect> {
     override fun deserialize(type: Type?, node: ConfigurationNode): RemovePotionEffect {
         val uuid = node.node("uuid").krequire<UUID>()
+        val trigger = node.node("trigger").get<Skill.Trigger>() ?: Skill.Trigger.NONE
         val effectTypes = node.node("effect_types").get<List<PotionEffectType>>().orEmpty()
-        return RemovePotionEffect(uuid, effectTypes)
+        return RemovePotionEffect(uuid, trigger, effectTypes)
     }
 }

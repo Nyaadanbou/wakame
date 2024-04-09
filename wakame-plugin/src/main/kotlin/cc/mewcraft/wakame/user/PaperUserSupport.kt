@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.user
 
-import cc.mewcraft.wakame.attribute.AttributeEventHandler
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.PlayerAttributeMap
-import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
-import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.kizami.PlayerKizamiMap
 import cc.mewcraft.wakame.level.PlayerLevelProvider
@@ -19,12 +16,11 @@ import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.UUID
+import java.util.*
 
 /**
  * A wakame player in Paper platform.
@@ -72,8 +68,6 @@ class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
 
     // handlers
     private val skillEventHandler: SkillEventHandler by inject(mode = LazyThreadSafetyMode.NONE)
-    private val attributeEventHandler: AttributeEventHandler by inject(mode = LazyThreadSafetyMode.NONE)
-    private val kizamiEventHandler: KizamiEventHandler by inject(mode = LazyThreadSafetyMode.NONE)
 
     // holds the live data of users
     private val userRepository: Cache<UUID, User<Player>> = Caffeine.newBuilder().build()
@@ -88,18 +82,6 @@ class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     private fun onJoin(e: PlayerJoinEvent) {
         // create user data for the player
         getPlayer(e.player)
-    }
-
-    @EventHandler
-    private fun onHoldItem(e: PlayerItemHeldEvent) {
-        attributeEventHandler.handlePlayerItemHeld(e)
-        kizamiEventHandler.handlePlayerItemHeld(e)
-    }
-
-    @EventHandler
-    private fun onSlotChange(e: PlayerInventorySlotChangeEvent) {
-        attributeEventHandler.handlePlayerInventorySlotChange(e)
-        kizamiEventHandler.handlePlayerInventorySlotChange(e)
     }
 
     override fun getPlayer(uniqueId: UUID): User<Player> {

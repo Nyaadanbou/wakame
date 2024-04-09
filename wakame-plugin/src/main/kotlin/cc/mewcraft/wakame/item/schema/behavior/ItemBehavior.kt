@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.schema.behavior
 
 import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.event.SkillCastEvent
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
@@ -20,6 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
 
@@ -38,11 +40,15 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
     fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
     fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) = Unit
+    fun handleItemHeld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) = Unit
+    fun handleItemUnHeld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) = Unit
     fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
+    fun handleSlotChangeNew(player: Player, itemStack: ItemStack, event: PlayerInventorySlotChangeEvent) = Unit
+    fun handleSlotChangeOld(player: Player, itemStack: ItemStack, event: PlayerInventorySlotChangeEvent) = Unit
     fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) = Unit
     fun handleSkillCast(caster: Caster, itemStack: ItemStack, skill: Skill, event: SkillCastEvent) = Unit
 }

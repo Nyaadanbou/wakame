@@ -28,6 +28,8 @@ effective_slot: MAIN_HAND
 # 可选，默认 无
 behaviors:
 #  castable: { }
+  attribute_provider: { }
+  kizami_provider: { }
   statistical: { }
   damageable:
     will_lost: false

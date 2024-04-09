@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.event.SkillCastEvent
 import cc.mewcraft.wakame.item.binary.NekoStackFactory
 import org.bukkit.entity.Player
@@ -11,6 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.PlayerItemHeldEvent
 
 class ItemListener : Listener {
     @EventHandler
@@ -36,7 +38,7 @@ class ItemListener : Listener {
     @EventHandler
     fun onItemBreakBlock(event: BlockBreakEvent) {
         val player = event.player
-        val item = player.inventory.itemInMainHand
+        val item = player.inventory.itemInMainHand.takeIf { !it.isEmpty } ?: return
         val nekoStack = NekoStackFactory.by(item) ?: return
         nekoStack.schema.behaviors.forEach { behavior ->
             behavior.handleBreakBlock(player, item, event)
@@ -58,6 +60,50 @@ class ItemListener : Listener {
         val nekoStack = NekoStackFactory.by(item) ?: return
         nekoStack.schema.behaviors.forEach { behavior ->
             behavior.handleBreak(event.player, item, event)
+        }
+    }
+
+    @EventHandler
+    fun onItemHeld(event: PlayerItemHeldEvent) {
+        val player = event.player
+        val previousSlot = event.previousSlot
+        val newSlot = event.newSlot
+        val oldItem = player.inventory.getItem(previousSlot)
+        val newItem = player.inventory.getItem(newSlot)
+
+        if (oldItem != null) {
+            val oldNekoStack = NekoStackFactory.by(oldItem)
+            oldNekoStack?.schema?.behaviors?.forEach { behavior ->
+                behavior.handleItemUnHeld(player, oldItem, event)
+            }
+        }
+
+        if (newItem != null) {
+            val newNekoStack = NekoStackFactory.by(newItem)
+            newNekoStack?.schema?.behaviors?.forEach { behavior ->
+                behavior.handleItemHeld(player, newItem, event)
+            }
+        }
+    }
+
+    @EventHandler
+    fun onSlotChange(event: PlayerInventorySlotChangeEvent) {
+        val player = event.player
+        val oldItem = event.oldItemStack.takeIf { !it.isEmpty }
+        val newItem = event.newItemStack.takeIf { !it.isEmpty }
+
+        if (oldItem != null) {
+            val oldNekoStack = NekoStackFactory.by(oldItem)
+            oldNekoStack?.schema?.behaviors?.forEach { behavior ->
+                behavior.handleSlotChangeOld(player, oldItem, event)
+            }
+        }
+
+        if (newItem != null) {
+            val newNekoStack = NekoStackFactory.by(newItem)
+            newNekoStack?.schema?.behaviors?.forEach { behavior ->
+                behavior.handleSlotChangeNew(player, newItem, event)
+            }
         }
     }
 
