@@ -37,21 +37,31 @@ import org.slf4j.Logger
     ]
 )
 object NekoItemRegistry : KoinComponent, Initializable {
+    /**
+     * The registry has all loaded [NekoItem]s.
+     */
     val INSTANCES: Registry<Key, NekoItem> = SimpleRegistry()
 
-    fun get(key: String): NekoItem = INSTANCES[Key(key)]
-    fun find(key: String): NekoItem? = INSTANCES.find(Key(key))
+    /**
+     * Gets specific [NekoItem] from the registry.
+     *
+     * @param key the key in string representation
+     * @return the specific [NekoItem]
+     */
+    fun Registry<Key, NekoItem>.get(key: String): NekoItem = this[Key(key)]
 
-    override fun onPreWorld() {
-        loadConfiguration()
-    }
+    /**
+     * Gets specific [NekoItem] from the registry if there is one.
+     *
+     * @param key the key in string representation
+     * @return the specific [NekoItem] or `null` if not found
+     */
+    fun Registry<Key, NekoItem>.find(key: String): NekoItem? = this.find(Key(key))
 
-    override fun onReload() {
-        loadConfiguration()
-    }
+    override fun onPreWorld() = loadConfiguration()
+    override fun onReload() = loadConfiguration()
 
     private val LOGGER: Logger by inject()
-
     private fun loadConfiguration() {
         INSTANCES.clear()
 

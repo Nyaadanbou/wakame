@@ -11,13 +11,8 @@ object ItemSkinRegistry : KoinComponent, Initializable, BiKnot<String, ItemSkin,
     override val INSTANCES: Registry<String, ItemSkin> = SimpleRegistry()
     override val BI_LOOKUP: BiRegistry<String, Short> = SimpleBiRegistry()
 
-    override fun onPreWorld() {
-        loadConfiguration()
-    }
-
-    override fun onReload() {
-        loadConfiguration()
-    }
+    override fun onPreWorld() = loadConfiguration()
+    override fun onReload() = loadConfiguration()
 
     private fun loadConfiguration() {
         INSTANCES.clear()

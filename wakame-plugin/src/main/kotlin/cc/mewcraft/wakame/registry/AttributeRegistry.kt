@@ -16,7 +16,6 @@ import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaAttributeCore
-import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
 import cc.mewcraft.wakame.util.*
 import com.google.common.collect.ImmutableMap
 import me.lucko.helper.nbt.ShadowTagType
@@ -63,8 +62,10 @@ object AttributeRegistry : Initializable {
     }
 
     private fun registerFacades() {
-        // Registry more attribute facade here ...
+        // 快速注册此 facade
+        operator fun AttributeFacade<*>.unaryPlus() = FACADES.register(KEY, this)
 
+        // Registry more attribute facade here ...
         +buildFacade("attack_damage", ShadowTagType.SHORT).ranged().element().bind(Attributes.byElement { MIN_ATTACK_DAMAGE }, Attributes.byElement { MAX_ATTACK_DAMAGE })
         +buildFacade("attack_effect_chance", ShadowTagType.DOUBLE).single().bind(Attributes.ATTACK_EFFECT_CHANCE)
         +buildFacade("attack_speed_level", ShadowTagType.BYTE).single().bind(Attributes.ATTACK_SPEED_LEVEL)
@@ -107,14 +108,6 @@ object AttributeRegistry : Initializable {
  */
 @Suppress("PropertyName")
 interface AttributeFacade<out A : BinaryAttributeCore> {
-
-    /**
-     * 注册此对象。
-     */
-    operator fun unaryPlus() {
-        FACADES.register(KEY, this)
-    }
-
     /**
      * 属性 facade 的唯一标识。
      *
@@ -163,11 +156,7 @@ fun interface AttributeModifierCreator<in T : BinaryAttributeCore> {
 /**
  * 一个属性的组件相关信息。
  */
-class AttributeStructureMetadata private constructor(
-    private val components: Set<KClass<out AttributeComponent>>,
-) {
-    constructor(vararg components: KClass<out AttributeComponent>) : this(components.toSet())
-
+interface AttributeStructureMetadata {
     /**
      * 查询该属性是否有指定的组件。
      *
@@ -175,16 +164,14 @@ class AttributeStructureMetadata private constructor(
      * @param componentClass 组件的接口类
      * @return 如果该属性拥有该组件，则返回 `true`
      */
-    fun <T : AttributeComponent> hasComponent(componentClass: KClass<T>): Boolean {
-        return components.any { it == componentClass }
-    }
+    fun <T : AttributeComponent> hasComponent(componentClass: KClass<T>): Boolean
+}
 
-    /**
-     * @see hasComponent
-     */
-    inline fun <reified T : AttributeComponent> hasComponent(): Boolean {
-        return hasComponent(T::class)
-    }
+/**
+ * @see AttributeStructureMetadata.hasComponent
+ */
+inline fun <reified T : AttributeComponent> AttributeStructureMetadata.hasComponent(): Boolean {
+    return hasComponent(T::class)
 }
 
 /**
@@ -247,15 +234,27 @@ private class AttributeFacadeImpl<T : BinaryAttributeCore>(
     override val BINARY_CORE_NBT_ENCODER: BinaryAttributeCoreNbtEncoder,
 ) : AttributeFacade<T>
 
+private class AttributeStructureMetadataImpl private constructor(
+    components: Set<KClass<out AttributeComponent>>,
+) : AttributeStructureMetadata {
+    constructor(vararg components: KClass<out AttributeComponent>) : this(components.toHashSet())
+
+    private val components: Set<KClass<out AttributeComponent>> = components.toHashSet()
+
+    override fun <T : AttributeComponent> hasComponent(componentClass: KClass<T>): Boolean {
+        return componentClass in components
+    }
+}
+
 private class FormatSelectionImpl(
     private val facadeKey: Key,
     private val tagType: ShadowTagType,
 ) : FormatSelection {
-    override fun single(): SingleSelectionImpl {
+    override fun single(): SingleSelection {
         return SingleSelectionImpl(facadeKey, tagType)
     }
 
-    override fun ranged(): RangedSelectionImpl {
+    override fun ranged(): RangedSelection {
         return RangedSelectionImpl(facadeKey, tagType)
     }
 }
@@ -264,7 +263,7 @@ private class SingleSelectionImpl(
     private val facadeKey: Key,
     private val tagType: ShadowTagType,
 ) : SingleSelection {
-    override fun element(): SingleElementAttributeBinderImpl {
+    override fun element(): SingleElementAttributeBinder {
         return SingleElementAttributeBinderImpl(facadeKey, tagType)
     }
 
@@ -282,7 +281,7 @@ private class SingleSelectionImpl(
             )
         },
 
-        STRUCTURE_METADATA = AttributeStructureMetadata(
+        STRUCTURE_METADATA = AttributeStructureMetadataImpl(
             AttributeComponent.Op::class, AttributeComponent.Single::class
         ),
 
@@ -310,7 +309,7 @@ private class RangedSelectionImpl(
     private val facadeKey: Key,
     private val tagType: ShadowTagType,
 ) : RangedSelection {
-    override fun element(): RangedElementAttributeBinderImpl {
+    override fun element(): RangedElementAttributeBinder {
         return RangedElementAttributeBinderImpl(facadeKey, tagType)
     }
 
@@ -330,7 +329,7 @@ private class RangedSelectionImpl(
             )
         },
 
-        STRUCTURE_METADATA = AttributeStructureMetadata(
+        STRUCTURE_METADATA = AttributeStructureMetadataImpl(
             AttributeComponent.Op::class, AttributeComponent.Ranged::class
         ),
 
@@ -376,7 +375,7 @@ private class SingleElementAttributeBinderImpl(
             )
         },
 
-        STRUCTURE_METADATA = AttributeStructureMetadata(
+        STRUCTURE_METADATA = AttributeStructureMetadataImpl(
             AttributeComponent.Op::class, AttributeComponent.Single::class, AttributeComponent.Element::class
         ),
 
@@ -424,7 +423,7 @@ private class RangedElementAttributeBinderImpl(
             )
         },
 
-        STRUCTURE_METADATA = AttributeStructureMetadata(
+        STRUCTURE_METADATA = AttributeStructureMetadataImpl(
             AttributeComponent.Op::class, AttributeComponent.Ranged::class, AttributeComponent.Element::class
         ),
 

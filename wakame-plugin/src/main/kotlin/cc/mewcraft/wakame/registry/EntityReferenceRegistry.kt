@@ -11,13 +11,8 @@ import org.koin.core.qualifier.named
 object EntityReferenceRegistry : KoinComponent, Initializable {
     val INSTANCES: Registry<String, EntityReference> = SimpleRegistry()
 
-    override fun onPreWorld() {
-        loadConfiguration()
-    }
-
-    override fun onReload() {
-        loadConfiguration()
-    }
+    override fun onPreWorld() = loadConfiguration()
+    override fun onReload() = loadConfiguration()
 
     private fun loadConfiguration() {
         val root = get<NekoConfigurationLoader>(named(ENTITY_CONFIG_LOADER)).load()

@@ -18,18 +18,14 @@ object KizamiRegistry : KoinComponent, Initializable, BiKnot<String, Kizami, Byt
     override val INSTANCES: Registry<String, Kizami> = SimpleRegistry()
     override val BI_LOOKUP: BiRegistry<String, Byte> = SimpleBiRegistry()
 
-    override fun onPreWorld() {
-        loadConfiguration()
-    }
+    override fun onPreWorld() = loadConfiguration()
+    override fun onReload() = loadConfiguration()
 
-    override fun onReload() {
-        loadConfiguration()
-    }
+    val EFFECTS: Registry<Kizami, KizamiInstance> = SimpleRegistry()
 
-    private val EFFECTS: Registry<Kizami, KizamiInstance> = SimpleRegistry()
-
-    fun getEffect(kizami: Kizami, amount: Int): KizamiEffect {
-        return EFFECTS[kizami].getEffectBy(amount)
+    // create extensions for the EFFECTS registry
+    fun Registry<Kizami, KizamiInstance>.getBy(kizami: Kizami, amount: Int): KizamiEffect {
+        return this[kizami].getEffectBy(amount)
     }
 
     private fun loadConfiguration() {

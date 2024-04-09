@@ -8,11 +8,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
-import org.bukkit.event.player.PlayerItemHeldEvent
+import org.bukkit.event.player.*
 
 class ItemListener : Listener {
     @EventHandler
@@ -74,7 +70,7 @@ class ItemListener : Listener {
         if (oldItem != null) {
             val oldNekoStack = PlayNekoStackFactory.maybe(oldItem)
             oldNekoStack?.schema?.behaviors?.forEach { behavior ->
-                behavior.handleItemUnHeld(player, oldItem, event)
+                behavior.handleItemUnheld(player, oldItem, event)
             }
         }
 

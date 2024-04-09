@@ -12,20 +12,13 @@ object RarityRegistry : KoinComponent, Initializable, BiKnot<String, Rarity, Byt
     override val INSTANCES: Registry<String, Rarity> = SimpleRegistry()
     override val BI_LOOKUP: BiRegistry<String, Byte> = SimpleBiRegistry()
 
+    override fun onPreWorld() = loadConfiguration()
+    override fun onReload() = loadConfiguration()
+
     /**
      * The default rarity. By design, it should be the most common rarity.
      */
-    val DEFAULT: Rarity by lazy(
-        LazyThreadSafetyMode.NONE // harmless race condition
-    ) { INSTANCES.objects.first() }
-
-    override fun onPreWorld() {
-        loadConfiguration()
-    }
-
-    override fun onReload() {
-        loadConfiguration()
-    }
+    val DEFAULT: Rarity by lazy { INSTANCES.objects.first() }
 
     private fun loadConfiguration() {
         INSTANCES.clear()

@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.schema.behavior
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.NekoStackFactory
+import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.user.asNekoUser
@@ -28,7 +28,7 @@ interface AttributeProvider : ItemBehavior {
             itemStack.addAttributeModifiers(player) { effectiveSlot.testItemHeld(player, previousSlot, newSlot) }
         }
 
-        override fun handleItemUnHeld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) {
+        override fun handleItemUnheld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) {
             val previousSlot = event.previousSlot
             val newSlot = event.newSlot
             itemStack.removeAttributeModifiers(player) { effectiveSlot.testItemHeld(player, previousSlot, newSlot) }
@@ -54,7 +54,7 @@ interface AttributeProvider : ItemBehavior {
          * @param player the player we add attribute modifiers to
          */
         private inline fun ItemStack.addAttributeModifiers(player: Player, testSlot: NekoStack.() -> Boolean) {
-            val nekoStack = NekoStackFactory.wrap(this)
+            val nekoStack = PlayNekoStackFactory.require(this)
 
             if (!nekoStack.testSlot()) {
                 return
@@ -75,7 +75,7 @@ interface AttributeProvider : ItemBehavior {
             // and by design, the UUID of an attribute modifier is the UUID of the item
             // that provides the attribute modifier. Thus, we only need to get the UUID
             // of the item to clear the attribute modifier.
-            val nekoStack = NekoStackFactory.wrap(this)
+            val nekoStack = PlayNekoStackFactory.require(this)
 
             if (!nekoStack.testSlot()) {
                 return

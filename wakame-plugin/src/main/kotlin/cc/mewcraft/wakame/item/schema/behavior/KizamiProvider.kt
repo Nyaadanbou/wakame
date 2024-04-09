@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.schema.behavior
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.NekoStackFactory
+import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BKizamiMeta
 import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.asNekoUser
 import org.bukkit.entity.Player
@@ -37,7 +38,7 @@ interface KizamiProvider : ItemBehavior {
             applyKizamiEffects(user)
         }
 
-        override fun handleItemUnHeld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) {
+        override fun handleItemUnheld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) {
             val previousSlot = event.previousSlot
             val newSlot = event.newSlot
             val user = player.asNekoUser()
@@ -71,7 +72,7 @@ interface KizamiProvider : ItemBehavior {
 
             // remove all the old kizami effects from the player
             kizamiMap.getImmutableAmountMap().forEach { (kizami, amount) ->
-                KizamiRegistry.getEffect(kizami, amount).remove(kizami, user)
+                KizamiRegistry.EFFECTS.getBy(kizami, amount).remove(kizami, user)
             }
         }
 
@@ -92,7 +93,7 @@ interface KizamiProvider : ItemBehavior {
                 val (kizami, amount) = iterator.next()
                 if (amount > 0) {
                     // apply new kizami effects to the player
-                    KizamiRegistry.getEffect(kizami, amount).apply(kizami, user)
+                    KizamiRegistry.EFFECTS.getBy(kizami, amount).apply(kizami, user)
                 } else if (amount == 0) {
                     // remove zero amount kizami so it won't be iterated again
                     iterator.remove()
@@ -111,7 +112,7 @@ interface KizamiProvider : ItemBehavior {
          * Gets attribute modifiers on the ItemStack, considering the item's effective slot.
          */
         private inline fun ItemStack.getKizamiSet(testEffectiveness: NekoStack.() -> Boolean): Set<Kizami> {
-            val nekoStack = NekoStackFactory.by(this) ?: return emptySet()
+            val nekoStack = PlayNekoStackFactory.maybe(this) ?: return emptySet()
 
             if (!nekoStack.testEffectiveness()) {
                 return emptySet()

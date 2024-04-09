@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.pack.model.ModelRegistry
 import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
 import cc.mewcraft.wakame.registry.NekoItemRegistry
+import cc.mewcraft.wakame.registry.NekoItemRegistry.get
 import cc.mewcraft.wakame.user.asNekoUser
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.event.player.AsyncChatEvent
@@ -45,7 +46,7 @@ class TestListener : KoinComponent, Listener {
 
         when (plainMessage) {
             "i1" -> {
-                val nekoItem = NekoItemRegistry.get("short_sword:demo")
+                val nekoItem = NekoItemRegistry.INSTANCES.get("short_sword:demo")
                 val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.asNekoUser())
                 inventory.addItem(nekoStack.itemStack)
             }
@@ -60,7 +61,7 @@ class TestListener : KoinComponent, Listener {
 
         when {
             plainMessage.startsWith("i-") -> {
-                val nekoItem = NekoItemRegistry.get(plainMessage.substringAfter("i-"))
+                val nekoItem = NekoItemRegistry.INSTANCES.get(plainMessage.substringAfter("i-"))
                 val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.asNekoUser())
                 inventory.addItem(nekoStack.itemStack)
             }

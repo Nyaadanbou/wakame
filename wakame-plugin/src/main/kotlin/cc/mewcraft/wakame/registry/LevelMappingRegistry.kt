@@ -21,13 +21,8 @@ object LevelMappingRegistry : KoinComponent, Initializable {
 
     val INSTANCES: Registry<String, LevelMappings> = SimpleRegistry()
 
-    override fun onPreWorld() {
-        loadConfiguration()
-    }
-
-    override fun onReload() {
-        loadConfiguration()
-    }
+    override fun onPreWorld() = loadConfiguration()
+    override fun onReload() = loadConfiguration()
 
     private fun loadConfiguration() {
         INSTANCES.clear()

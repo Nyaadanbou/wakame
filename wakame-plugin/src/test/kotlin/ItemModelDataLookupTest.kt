@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.lookup.lookupModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.reference.referenceModule
 import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.NekoItemRegistry.get
 import cc.mewcraft.wakame.skin.skinModule
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -14,13 +15,9 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
-import org.slf4j.Logger
 import kotlin.test.assertEquals
 
 class ItemModelDataLookupTest : KoinTest {
-
-    private val logger: Logger by inject()
-
     companion object {
         @JvmStatic
         @BeforeAll
@@ -65,9 +62,10 @@ class ItemModelDataLookupTest : KoinTest {
     @Test
     fun `test get item model data`() {
         val itemModelDataLookup: ItemModelDataLookup by inject()
+
         itemModelDataLookup.onPrePack()
 
-        val demo = NekoItemRegistry.get("short_sword:demo")
+        val demo = NekoItemRegistry.INSTANCES.get("short_sword:demo")
         val itemModelData = itemModelDataLookup[demo.key, 0]
 
         assertEquals(10000, itemModelData)

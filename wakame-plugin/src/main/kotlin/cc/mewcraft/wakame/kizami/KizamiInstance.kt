@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.krequire
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -75,6 +76,9 @@ object KizamiInstanceSerializer : SchemaSerializer<KizamiInstance> {
                     val kizamiEffect = childNode.krequire<KizamiEffect>()
                     this[amount] = kizamiEffect
                 }
+        }.let {
+            // optimize read performance
+            Int2ObjectOpenHashMap(it)
         }
         return KizamiInstance(kizami, effectMap)
     }

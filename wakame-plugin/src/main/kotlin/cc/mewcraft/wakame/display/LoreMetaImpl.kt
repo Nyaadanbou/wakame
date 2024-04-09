@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry.hasComponent
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.StringCombiner
 import cc.mewcraft.wakame.util.toSimpleString
