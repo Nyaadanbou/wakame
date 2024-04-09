@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.cell.core.elementOrNull
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
+import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.Key
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -34,13 +35,13 @@ internal class AttributeKeySupplierImpl(
     /**
      * Full Keys in this map are double-indexed: `key` + `operation`.
      */
-    private val cachedFullKeys: AttributeKeyTable1<Key, Operation, FullKey> = AttributeKeyTable1()
+    private val cachedFullKeys: AttributeKeyTable1<Key, Operation, FullKey> by reloadable { AttributeKeyTable1() }
 
     /**
      * Full Keys in this map are triple-indexed: `key` + `operation` +
      * `element`.
      */
-    private val cachedFullKeysWithElement: AttributeKeyTable2<Key, Operation, Element, FullKey> = AttributeKeyTable2()
+    private val cachedFullKeysWithElement: AttributeKeyTable2<Key, Operation, Element, FullKey> by reloadable { AttributeKeyTable2() }
 
     /**
      * Caches a full key from the given triple indexes.
