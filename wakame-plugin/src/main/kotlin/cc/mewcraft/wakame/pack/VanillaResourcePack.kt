@@ -21,12 +21,12 @@ private const val DOWNLOAD_URL = "https://raw.githubusercontent.com/Inventivetal
 
 data class CannotDownloadVanillaResourcePackException(
     override val message: String = "Cannot download vanilla resource pack file.",
-    override val cause: Throwable? = null
+    override val cause: Throwable? = null,
 ) : PackException()
 
 class VanillaResourcePack : KoinComponent {
+    private val logger: ComponentLogger by inject()
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
-    private val logger: ComponentLogger by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val packDictionary: File = pluginDataDir.resolve(VANILLA_RESOURCE_CACHE)
     private val downloadUrl: String = DOWNLOAD_URL.replace("<version>", Bukkit.getMinecraftVersion())

@@ -98,7 +98,7 @@ data class GithubService(
     private val branch: String,
     private val commitMessage: String,
 ) : Service, KoinComponent {
-    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
+    private val logger: Logger by inject()
 
     override val downloadAddress: String? = null // Not supported
 

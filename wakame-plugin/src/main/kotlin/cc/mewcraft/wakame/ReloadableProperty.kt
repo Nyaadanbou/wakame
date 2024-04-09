@@ -8,8 +8,13 @@ import org.bukkit.event.Listener
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-fun <T> reloadable(loader: () -> T): ReloadableProperty<T> = ReloadableProperty(loader)
-
+/**
+ * A property that will be reset using [loader] upon [NekoReloadEvent] being fired.
+ *
+ * @param T the property type
+ * @property loader the loader to load the value
+ * @property value the cached value
+ */
 class ReloadableProperty<T>(
     private val loader: () -> T,
 ) : ReadOnlyProperty<Any?, T>, Listener {

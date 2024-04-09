@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.cell.core.elementOrNull
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
-import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.Key
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -25,35 +25,36 @@ internal class SkillKeySupplierImpl(
 }
 
 // to clarify the table indexes
-private typealias AttributeKeyTable1<K1, K2, V> = Object2ObjectOpenHashMap<K1, Reference2ObjectOpenHashMap<K2, V>>
-private typealias AttributeKeyTable2<K1, K2, K3, V> = Object2ObjectOpenHashMap<K1, Reference2ObjectOpenHashMap<K2, Reference2ObjectOpenHashMap<K3, V>>>
+private typealias AttributeDoubleKeyTable<K1, K2, V> = Object2ObjectOpenHashMap<K1, Reference2ObjectOpenHashMap<K2, V>>
+private typealias AttributeTripleKeyTable<K1, K2, K3, V> = Object2ObjectOpenHashMap<K1, Reference2ObjectOpenHashMap<K2, Reference2ObjectOpenHashMap<K3, V>>>
 
 internal class AttributeKeySupplierImpl(
     private val config: RendererConfiguration,
 ) : AttributeKeySupplier {
     //<editor-fold desc="Implementation of a Map indexed by triple keys">
-    /**
-     * Full Keys in this map are double-indexed: `key` + `operation`.
-     */
-    private val cachedFullKeys: AttributeKeyTable1<Key, Operation, FullKey> by reloadable { AttributeKeyTable1() }
+    private companion object {
+        /**
+         * The full keys in this map are double-indexed by `key` + `operation`.
+         */
+        private val KEY_OPERATION_POOL: AttributeDoubleKeyTable<Key, Operation, FullKey> by ReloadableProperty { AttributeDoubleKeyTable() }
 
-    /**
-     * Full Keys in this map are triple-indexed: `key` + `operation` +
-     * `element`.
-     */
-    private val cachedFullKeysWithElement: AttributeKeyTable2<Key, Operation, Element, FullKey> by reloadable { AttributeKeyTable2() }
+        /**
+         * The full keys in this map are triple-indexed by `key` + `operation` + `element`.
+         */
+        private val KEY_OPERATION_ELEMENT_POOL: AttributeTripleKeyTable<Key, Operation, Element, FullKey> by ReloadableProperty { AttributeTripleKeyTable() }
+    }
 
     /**
      * Caches a full key from the given triple indexes.
      */
     @Suppress("ReplacePutWithAssignment")
-    private fun put(key: RawKey, operation: Operation, element: Element? = null, fullKey: FullKey) {
+    private fun put(key: RawKey, operation: Operation, element: Element?, fullKey: FullKey) {
         if (element == null) {
-            cachedFullKeys
+            KEY_OPERATION_POOL
                 .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) } // 运算模式最多3个
                 .put(operation, fullKey)
         } else {
-            cachedFullKeysWithElement
+            KEY_OPERATION_ELEMENT_POOL
                 .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) }
                 .getOrPut(operation) { Reference2ObjectOpenHashMap(8, 0.9f) } // 元素一般最多8个
                 .put(element, fullKey)
@@ -63,11 +64,11 @@ internal class AttributeKeySupplierImpl(
     /**
      * Gets a full key from the given triple indexes.
      */
-    private fun get(key: RawKey, operation: Operation, element: Element? = null): FullKey? {
+    private fun get(key: RawKey, operation: Operation, element: Element?): FullKey? {
         return if (element == null) {
-            cachedFullKeys[key]?.get(operation)
+            KEY_OPERATION_POOL[key]?.get(operation)
         } else {
-            cachedFullKeysWithElement[key]?.get(operation)?.get(element)
+            KEY_OPERATION_ELEMENT_POOL[key]?.get(operation)?.get(element)
         }
     }
 
@@ -83,7 +84,7 @@ internal class AttributeKeySupplierImpl(
     private inline fun getOrPut(
         rawKey: RawKey,
         operation: Operation,
-        element: Element? = null,
+        element: Element?,
         defaultValue: () -> FullKey,
     ): FullKey {
         val value = get(rawKey, operation, element)
@@ -103,20 +104,20 @@ internal class AttributeKeySupplierImpl(
      */
     private fun remove(key: RawKey, operation: Operation, element: Element? = null): FullKey? {
         if (element == null) {
-            val map1 = cachedFullKeys[key] ?: return null
+            val map1 = KEY_OPERATION_POOL[key] ?: return null
             val value = map1.remove(operation)
             if (map1.isEmpty()) {
-                cachedFullKeys.remove(key)
+                KEY_OPERATION_POOL.remove(key)
             }
             return value
         } else {
-            val map1 = cachedFullKeysWithElement[key] ?: return null
+            val map1 = KEY_OPERATION_ELEMENT_POOL[key] ?: return null
             val map2 = map1[operation] ?: return null
             val value = map2[element]
             if (map2.isEmpty()) {
                 map1.remove(operation)
                 if (map1.isEmpty()) {
-                    cachedFullKeysWithElement.remove(key)
+                    KEY_OPERATION_ELEMENT_POOL.remove(key)
                 }
             }
             return value
@@ -135,19 +136,24 @@ internal class AttributeKeySupplierImpl(
         }
 
         val operation = obj.operation
-        val elementOrNull = obj.elementOrNull
-        val fullKey = getOrPut(rawKey, operation, elementOrNull) {
-            val newValue = buildString {
+        val element = obj.elementOrNull
+        val fullKey = getOrPut(rawKey, operation, element) {
+            Key(rawKey.namespace(), buildString {
+                // append raw key
                 append(rawKey.value())
+
+                // append operation
                 append(".")
                 append(operation.key)
-                elementOrNull?.let {
+
+                // append element if it presents
+                element?.let {
                     append(".")
                     append(it.uniqueId)
                 }
-            }
-            Key(rawKey.namespace(), newValue)
+            })
         }
+
         return fullKey
     }
 }

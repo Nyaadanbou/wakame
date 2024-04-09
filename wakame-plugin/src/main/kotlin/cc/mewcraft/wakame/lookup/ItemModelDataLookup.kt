@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.lookup
 
+import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.HashBasedTable
@@ -17,7 +17,7 @@ internal class ItemModelDataLookup(
     private val logger: Logger,
     private val loader: GsonConfigurationLoader,
 ) : Initializable {
-    private val root: BasicConfigurationNode by reloadable { loader.load() }
+    private val root: BasicConfigurationNode by ReloadableProperty { loader.load() }
 
     private val customModelDataTable: Table<Key, Int, Int> = Tables.synchronizedTable(HashBasedTable.create())
 

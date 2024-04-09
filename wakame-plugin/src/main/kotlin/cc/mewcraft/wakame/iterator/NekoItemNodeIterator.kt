@@ -19,7 +19,7 @@ import java.nio.file.Path
  * NekoItem 物品配置文件的遍历器。
  */
 object NekoItemNodeIterator : KoinComponent {
-    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
+    private val LOGGER: Logger by inject()
 
     /**
      * 根据配置文件的目录结构，遍历所有物品配置文件，并对每个物品配置文件执行 [block]。
@@ -40,7 +40,7 @@ object NekoItemNodeIterator : KoinComponent {
             .filter { it.isDirectory }
             .forEach {
                 namespaceDirs += it.also {
-                    logger.info("Loading namespace: {}", it.name)
+                    LOGGER.info("Loading namespace: {}", it.name)
                 }
             }
 
@@ -55,7 +55,7 @@ object NekoItemNodeIterator : KoinComponent {
                     val namespace = namespaceDir.name
                     val value = itemFile.nameWithoutExtension
                     val key = Key(namespace, value).also {
-                        logger.info("Loading item: {}", it)
+                        LOGGER.info("Loading item: {}", it)
                     }
 
                     val text = itemFile.bufferedReader().use { it.readText() }

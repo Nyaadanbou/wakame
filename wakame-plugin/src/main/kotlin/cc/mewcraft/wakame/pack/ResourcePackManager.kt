@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
 import cc.mewcraft.wakame.pack.initializer.*
@@ -8,7 +9,6 @@ import cc.mewcraft.wakame.pack.service.GithubService
 import cc.mewcraft.wakame.pack.service.NoneService
 import cc.mewcraft.wakame.pack.service.ResourcePackService
 import cc.mewcraft.wakame.pack.service.Service
-import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.formatSize
 import cc.mewcraft.wakame.util.writeToDirectory
 import cc.mewcraft.wakame.util.writeToZipFile
@@ -30,17 +30,17 @@ import java.io.File
 internal class ResourcePackManager(
     private val config: ResourcePackConfiguration,
     private val packReader: ResourcePackReader<FileTreeReader>,
-    private val packWriter: ResourcePackWriter<FileTreeWriter>
+    private val packWriter: ResourcePackWriter<FileTreeWriter>,
 ) : KoinComponent {
+    private val logger: Logger by inject()
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
-    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
 
     private lateinit var pack: BuiltResourcePack
 
     /**
      * The resource pack service.
      */
-    private val service: Service by reloadable { loadService() }
+    private val service: Service by ReloadableProperty { loadService() }
 
     /**
      * Generates the resource pack to predefined directory.

@@ -50,7 +50,7 @@ object NekoItemRegistry : KoinComponent, Initializable {
         loadConfiguration()
     }
 
-    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
+    private val LOGGER: Logger by inject()
 
     private fun loadConfiguration() {
         INSTANCES.clear()
@@ -61,7 +61,7 @@ object NekoItemRegistry : KoinComponent, Initializable {
             }.onSuccess {
                 INSTANCES.register(key, it)
             }.onFailure {
-                logger.error("Can't load item '$key'", it)
+                LOGGER.error("Can't load item '$key': (${it.cause.toString()}) ${it.message}")
             }
         }
     }

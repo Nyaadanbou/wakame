@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -17,13 +17,13 @@ import java.util.concurrent.CopyOnWriteArrayList
 internal class RendererConfiguration(
     private val config: ConfigProvider,
 ) : Initializable, KoinComponent {
-    companion object {
+    private companion object {
         private const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
         private const val RENDERER_LAYOUT_NODE = "renderer_layout"
         private const val RENDERER_STYLE_NODE = "renderer_style"
     }
 
-    private val mm: MiniMessage by inject(mode = LazyThreadSafetyMode.NONE)
+    private val mm: MiniMessage by inject()
 
     //<editor-fold desc="renderer_style.meta">
     /**
@@ -100,18 +100,17 @@ internal class RendererConfiguration(
      */
     val emptySkillText: List<String> by config.entry<List<String>>(RENDERER_STYLE_NODE, "skill", "empty")
 
-
     /**
      * 所有技能共用的渲染格式。
      */
-    val commonSkillFormat: Unit by reloadable {
+    val commonSkillFormat: Unit by ReloadableProperty {
         // TODO
     }
 
     /**
      * 个别技能独有的渲染格式。
      */
-    val skillFormats: Unit by reloadable {
+    val skillFormats: Unit by ReloadableProperty {
         // TODO
     }
     //</editor-fold>

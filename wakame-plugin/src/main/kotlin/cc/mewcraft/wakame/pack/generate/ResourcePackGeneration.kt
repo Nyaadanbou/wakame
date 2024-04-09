@@ -120,7 +120,7 @@ internal class ResourcePackRegistryModelGeneration(
 internal class ResourcePackCustomModelGeneration(
     args: GenerationArgs,
 ) : ResourcePackGeneration(args), KoinComponent {
-    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
+    private val logger: Logger by inject()
     private val config: ItemModelDataLookup by inject()
     private val vanillaResourcePack: VanillaResourcePack by inject()
 

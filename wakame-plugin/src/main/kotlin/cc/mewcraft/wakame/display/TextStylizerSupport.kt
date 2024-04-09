@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
@@ -12,11 +13,11 @@ import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.reloadable
 import cc.mewcraft.wakame.util.toSimpleString
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
@@ -40,8 +41,6 @@ import java.text.NumberFormat
 import java.util.stream.Stream
 import kotlin.collections.set
 import kotlin.reflect.KClass
-
-// TODO 所有的 stylizer 应该尽可能的实现缓存机制
 
 internal class TextStylizerImpl(
     /* sub stylizers */
@@ -128,17 +127,17 @@ internal class AttributeStylizerImpl(
 
     private val mm: MiniMessage by inject()
 
-    //<editor-fold desc="Helper implementations for number replacement in attributes">
+    //<editor-fold desc="Helper implementations">
     /**
      * The default [DecimalFormat] to be used if no one is provided.
      */
-    private val defaultDecimalFormat: NumberFormat by lazy { DecimalFormat.getInstance() }
+    private val defaultNumberFormat: NumberFormat by lazy { DecimalFormat.getInstance() }
 
     /**
      * The cache of [DecimalFormat]. The `map key` are patterns for
      * [DecimalFormat].
      */
-    private val customDecimalFormats: MutableMap<String, NumberFormat> by reloadable { HashMap() }
+    private val customNumberFormatMap: MutableMap<String, NumberFormat> by ReloadableProperty { Object2ObjectOpenHashMap(4) }
 
     /**
      * Creates a replacement that inserts a number as a component. The
@@ -160,9 +159,9 @@ internal class AttributeStylizerImpl(
         return TagResolver.resolver(key) { args, context ->
             // try to get provided DecimalFormat
             val decimalFormat = if (args.hasNext()) {
-                args.pop().value().let { customDecimalFormats.getOrPut(it) { DecimalFormat(it) } }
+                args.pop().value().let { customNumberFormatMap.getOrPut(it) { DecimalFormat(it) } }
             } else {
-                defaultDecimalFormat
+                defaultNumberFormat
             }
             // format the number for provided DecimalFormat
             decimalFormat.format(number)
@@ -172,10 +171,8 @@ internal class AttributeStylizerImpl(
                 .let { Tag.inserting(context.deserialize(it)) }
         }
     }
-    //</editor-fold>
 
-    //<editor-fold desc="Helper implementations for attack_speed_level attribute">
-    private val attackSpeedLevelTagResolvers: MutableMap<Int, TagResolver> by reloadable { Int2ObjectOpenHashMap() }
+    private val attackSpeedLevelTagResolvers: MutableMap<Int, TagResolver> by ReloadableProperty { Int2ObjectOpenHashMap() }
 
     private fun getAttackSpeedLevelTagResolver(levelIndex: Int): TagResolver {
         return attackSpeedLevelTagResolvers.getOrPut(levelIndex) {
@@ -241,7 +238,7 @@ internal class AttributeStylizerImpl(
     }
 
     class AttributeFormatImpl(
-        override val values: Map<Key, String>
+        override val values: Map<Key, String>,
     ) : AttributeStylizer.AttributeFormat {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("values", values)
@@ -263,7 +260,7 @@ internal class AttributeStylizerImpl(
     }
 
     class OperationFormatImpl(
-        override val values: Map<Operation, String>
+        override val values: Map<Operation, String>,
     ) : AttributeStylizer.OperationFormat {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("values", values)
@@ -288,7 +285,7 @@ internal class ItemMetaStylizerImpl(
 ) : KoinComponent, ItemMetaStylizer {
 
     private val mm: MiniMessage by inject()
-    private val rarityStyleMap: LoadingCache<Rarity, Tag> by reloadable {
+    private val rarityStyleMap: LoadingCache<Rarity, Tag> by ReloadableProperty {
         Caffeine.newBuilder().build { rarity -> Tag.styling(*rarity.styles) }
     }
 
@@ -376,7 +373,7 @@ internal class ItemMetaStylizerImpl(
     }
 
     private object DefaultChildStylizer : ChildStylizer<BinaryItemMeta<*>> {
-        private val NOOP_IMPLEMENTATION: MutableMap<KClass<out BinaryItemMeta<*>>, List<Component>> by reloadable { Reference2ObjectLinkedOpenHashMap() }
+        private val NOOP_IMPLEMENTATION: MutableMap<KClass<out BinaryItemMeta<*>>, List<Component>> by ReloadableProperty { Reference2ObjectLinkedOpenHashMap() }
 
         override fun stylize(input: BinaryItemMeta<*>): List<Component> {
             return NOOP_IMPLEMENTATION.getOrPut(input::class) {

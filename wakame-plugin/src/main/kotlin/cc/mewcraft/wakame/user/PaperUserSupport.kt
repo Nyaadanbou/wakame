@@ -25,21 +25,21 @@ import java.util.*
 /**
  * A wakame player in Paper platform.
  *
- * @property player the [paper player][PaperPlayer]
+ * @property player the [paper player][Player]
  */
 class PaperUser(
     override val player: Player,
 ) : User<Player>, KoinComponent {
-    private val playerLevelProvider: PlayerLevelProvider by inject(mode = LazyThreadSafetyMode.NONE)
-
     override val uniqueId: UUID
         get() = player.uniqueId
     override val level: Int
-        get() = playerLevelProvider.getOrDefault(uniqueId, 1)
+        get() = levelProvider.getOrDefault(uniqueId, 1)
     override val kizamiMap: KizamiMap = PlayerKizamiMap(this)
     override val attributeMap: AttributeMap = PlayerAttributeMap(this)
     override val skillMap: SkillMap = PlayerSkillMap(this)
     override val resourceMap: ResourceMap = PlayerResourceMap(this)
+
+    private val levelProvider: PlayerLevelProvider by inject()
 }
 
 /**
@@ -67,7 +67,7 @@ class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     private val server: Server by inject()
 
     // handlers
-    private val skillEventHandler: SkillEventHandler by inject(mode = LazyThreadSafetyMode.NONE)
+    private val skillEventHandler: SkillEventHandler by inject()
 
     // holds the live data of users
     private val userRepository: Cache<UUID, User<Player>> = Caffeine.newBuilder().build()
