@@ -125,9 +125,7 @@ internal value class PlayNekoStackImpl(
     )
     // FIXME remove it when the dedicated API is finished
     {
-        if (!TestEnvironment.isRunningJUnit()) {
-            itemStack.addItemFlags(*ALL_FLAGS)
-        }
+        RunningEnvironment.PRODUCTION.run { itemStack.addItemFlags(*ALL_FLAGS) }
     }
 
     override val tags: CompoundShadowTag
