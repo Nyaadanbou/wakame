@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.user.User
 import com.google.common.collect.ImmutableMap
-import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 
 // /**
 //  * Creates a new [PlayerKizamiMap].
@@ -19,7 +19,7 @@ import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 class PlayerKizamiMap(
     private val user: User<*>,
 ) : KizamiMap {
-    private val amountMap: MutableMap<Kizami, Int> = Reference2IntOpenHashMap() // FIXME: 重载会构建新的 Kizami 对象，导致无法正确比较 key
+    private val amountMap: Object2IntOpenHashMap<Kizami> = Object2IntOpenHashMap<Kizami>().apply { defaultReturnValue(0) }
 
     override fun getMutableAmountMap(): MutableMap<Kizami, Int> {
         return amountMap
@@ -30,7 +30,7 @@ class PlayerKizamiMap(
     }
 
     override fun getAmount(kizami: Kizami): Int {
-        return amountMap[kizami] ?: 0
+        return amountMap.getInt(kizami)
     }
 
     override fun addOneEach(kizami: Iterable<Kizami>) {
@@ -38,11 +38,11 @@ class PlayerKizamiMap(
     }
 
     override fun addOne(kizami: Kizami) {
-        amountMap.merge(kizami, 1) { oldAmount, _ -> oldAmount + 1 }
+        amountMap.mergeInt(kizami, 1) { oldAmount, _ -> oldAmount + 1 }
     }
 
     override fun add(kizami: Kizami, amount: Int) {
-        amountMap.merge(kizami, amount) { oldAmount, givenAmount -> oldAmount + givenAmount }
+        amountMap.mergeInt(kizami, amount) { oldAmount: Int, givenAmount: Int -> oldAmount + givenAmount }
     }
 
     override fun subtractOneEach(kizami: Iterable<Kizami>) {
@@ -50,10 +50,10 @@ class PlayerKizamiMap(
     }
 
     override fun subtractOne(kizami: Kizami) {
-        amountMap.merge(kizami, 0) { oldAmount, _ -> (oldAmount - 1).coerceAtLeast(0) }
+        amountMap.mergeInt(kizami, 0) { oldAmount, _ -> (oldAmount - 1).coerceAtLeast(0) }
     }
 
     override fun subtract(kizami: Kizami, amount: Int) {
-        amountMap.merge(kizami, 0) { oldAmount, givenAmount -> (oldAmount - givenAmount).coerceAtLeast(0) }
+        amountMap.mergeInt(kizami, 0) { oldAmount, givenAmount -> (oldAmount - givenAmount).coerceAtLeast(0) }
     }
 }
