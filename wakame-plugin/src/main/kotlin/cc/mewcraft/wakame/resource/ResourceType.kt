@@ -9,10 +9,9 @@ import net.kyori.examination.Examinable
  * The registry of all resource types.
  *
  * You can use it to get an instance of [ResourceType].
- *
- * @see ResourceType
  */
 object ResourceTypeRegistry {
+    // Add more ResourceType here ...
     val MANA = object : ResourceType {
         override fun initialAmount(attributeMap: AttributeMap): Int = 0
         override fun maximumAmount(attributeMap: AttributeMap): Int = attributeMap.getValue(Attributes.MAX_MANA).toInt()
@@ -21,7 +20,11 @@ object ResourceTypeRegistry {
 }
 
 /**
- * Represents a resource type.
+ * Represents a type of resource owned by a subject.
+ *
+ * You can use [ResourceTypeRegistry] to get an instance of [ResourceType].
+ *
+ * @see ResourceTypeRegistry
  */
 interface ResourceType : Examinable {
     /**
