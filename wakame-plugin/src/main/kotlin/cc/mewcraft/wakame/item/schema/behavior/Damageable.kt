@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.schema.behavior
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
@@ -15,19 +14,15 @@ import cc.mewcraft.wakame.item.getBehaviorOrNull
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
-import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.TargetAdapter
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
+import cc.mewcraft.wakame.skill.condition.DurabilityContext
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import kotlin.reflect.KClass
 
 /**
@@ -62,14 +57,13 @@ interface Damageable : ItemBehavior {
     private class Default(
         repairMaterials: Provider<List<String>>,
         disappearWhenBroken: Provider<Boolean>,
-    ) : Damageable, KoinComponent {
-        private val logger: Logger by inject()
+    ) : Damageable {
         override val repairMaterials: List<Key> by repairMaterials.map { it.map(::Key) }
         override val disappearWhenBroken: Boolean by disappearWhenBroken
 
         override fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
-            itemStack.damage(10, player)
-            SkillRegistry.INSTANCE[Key(NekoNamespaces.SKILL, "buff_potion_remove")].castAt(TargetAdapter.adapt(player))
+            val nekoStack = PlayNekoStackFactory.require(itemStack)
+            nekoStack.decreaseDurabilityNaturally(100)
         }
 
         //对于原版掉耐久事件的处理，应该写在对应的Item Behavior中
@@ -82,11 +76,13 @@ interface Damageable : ItemBehavior {
 //        }
 
         override fun handleSkillPrepareCast(caster: Caster.Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
-            val condition = event.conditionMap[DurabilityCondition::class.java] ?: return
-            if (event.isAllowCast) {
-                condition.cost()
-            } else if (condition.test()) { //TODO 用isPass缓存条件的判定结果，减少这次test
-                logger.info("物品耐久不足，无法释放技能")
+            val condition = event.getCondition(DurabilityCondition::class.java) ?: return
+            val context = DurabilityContext(itemStack, 1)
+            if (condition.test(context)) {
+                condition.cost(context)
+            } else { //TODO 用isPass缓存条件的判定结果，减少这次test
+                event.isAllowCast = false
+                caster.bukkitPlayer.sendMessage("物品耐久不足，无法释放技能")
             }
         }
     }

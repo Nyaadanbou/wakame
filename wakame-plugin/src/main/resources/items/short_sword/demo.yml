@@ -27,7 +27,7 @@ effective_slot: MAIN_HAND
 # 物品行为
 # 可选，默认 无
 behaviors:
-#  castable: { }
+  castable: { }
   attribute_provider: { }
   kizami_provider: { }
   statistical: { }

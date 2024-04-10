@@ -1,14 +1,17 @@
 package cc.mewcraft.wakame.event;
 
+import cc.mewcraft.wakame.condition.Condition;
 import cc.mewcraft.wakame.skill.Caster;
 import cc.mewcraft.wakame.skill.Skill;
-import cc.mewcraft.wakame.skill.condition.Condition;
+import com.google.common.collect.ImmutableList;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.koin.java.KoinJavaComponent;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * player will try to cast a skill when this event called.
@@ -19,23 +22,17 @@ public class PlayerSkillPrepareCastEvent extends SkillEvent {
     private final Caster.Player caster;
     private final ItemStack item;
 
-    private final Map<Class<?>, Condition> conditionMap = new HashMap<>();
+    private final ImmutableList<Class<? extends Condition<?>>> conditionClazzes;
 
     private boolean isAllowCast = true;
 
-
-    public PlayerSkillPrepareCastEvent(@NotNull Skill skill, @NotNull Caster.Player caster, @NotNull ItemStack itemStack, Condition... conditions) {
+    @SafeVarargs
+    public PlayerSkillPrepareCastEvent(@NotNull Skill skill, @NotNull Caster.Player caster, @NotNull ItemStack itemStack, @NotNull Class<? extends Condition<?>>... conditions) {
         super(skill, false);
         this.caster = caster;
         this.item = itemStack;
-        for (Condition condition : conditions) {
-            if (!condition.test()) {
-                isAllowCast = false;
-            }
-            conditionMap.put(condition.getClass(), condition);
-        }
+        conditionClazzes = ImmutableList.copyOf(conditions);
     }
-
 
     @NotNull
     public Caster.Player getPlayerCaster() {
@@ -47,15 +44,31 @@ public class PlayerSkillPrepareCastEvent extends SkillEvent {
         return item;
     }
 
-    @NotNull
-    public Map<Class<?>, Condition> getConditionMap() {
-        return conditionMap;
+    @Nullable
+    public <T extends Condition<?>> T getCondition(Class<T> clazz) {
+        if (conditionClazzes.contains(clazz)) {
+            return KoinJavaComponent.get(clazz);
+        }
+        return null;
+    }
+
+    public List<? extends Condition<?>> getConditions() {
+        List<Condition<?>> conditions = new ArrayList<>();
+        for (Class<? extends Condition<?>> clazz : conditionClazzes) {
+            conditions.add(KoinJavaComponent.get(clazz));
+        }
+        return conditions;
     }
 
     public boolean isAllowCast() {
         return isAllowCast;
     }
 
+    public void setAllowCast(boolean allowCast) {
+        if (!allowCast && isAllowCast) {
+            isAllowCast = false;
+        }
+    }
 
     @Override
     public @NotNull HandlerList getHandlers() {

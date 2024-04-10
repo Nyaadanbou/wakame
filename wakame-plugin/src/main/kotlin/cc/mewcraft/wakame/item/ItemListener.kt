@@ -16,7 +16,7 @@ class ItemListener : Listener {
     fun onItemInteract(event: PlayerInteractEvent) {
         val item = event.item ?: return
         val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
-        nekoStack.schema.behaviors.forEach { behavior ->
+        nekoStack.behaviors.forEach { behavior ->
             behavior.handleInteract(event.player, item, event.action, event)
         }
     }
@@ -27,7 +27,7 @@ class ItemListener : Listener {
         val damager = event.damager as? Player ?: return
         val item = damager.inventory.itemInMainHand
         val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
-        nekoStack.schema.behaviors.forEach { behavior ->
+        nekoStack.behaviors.forEach { behavior ->
             behavior.handleAttackEntity(damager, item, event.entity, event)
         }
     }
@@ -37,7 +37,7 @@ class ItemListener : Listener {
         val player = event.player
         val item = player.inventory.itemInMainHand.takeIf { !it.isEmpty } ?: return
         val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
-        nekoStack.schema.behaviors.forEach { behavior ->
+        nekoStack.behaviors.forEach { behavior ->
             behavior.handleBreakBlock(player, item, event)
         }
     }
@@ -46,7 +46,7 @@ class ItemListener : Listener {
     fun onItemDamage(event: PlayerItemDamageEvent) {
         val item = event.item
         val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
-        nekoStack.schema.behaviors.forEach { behavior ->
+        nekoStack.behaviors.forEach { behavior ->
             behavior.handleDamage(event.player, item, event)
         }
     }
@@ -55,7 +55,7 @@ class ItemListener : Listener {
     fun onItemBreak(event: PlayerItemBreakEvent) {
         val item = event.brokenItem
         val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
-        nekoStack.schema.behaviors.forEach { behavior ->
+        nekoStack.behaviors.forEach { behavior ->
             behavior.handleBreak(event.player, item, event)
         }
     }
@@ -70,14 +70,14 @@ class ItemListener : Listener {
 
         if (oldItem != null) {
             val oldNekoStack = PlayNekoStackFactory.maybe(oldItem)
-            oldNekoStack?.schema?.behaviors?.forEach { behavior ->
+            oldNekoStack?.behaviors?.forEach { behavior ->
                 behavior.handleItemUnheld(player, oldItem, event)
             }
         }
 
         if (newItem != null) {
             val newNekoStack = PlayNekoStackFactory.maybe(newItem)
-            newNekoStack?.schema?.behaviors?.forEach { behavior ->
+            newNekoStack?.behaviors?.forEach { behavior ->
                 behavior.handleItemHeld(player, newItem, event)
             }
         }
@@ -91,14 +91,14 @@ class ItemListener : Listener {
 
         if (oldItem != null) {
             val oldNekoStack = PlayNekoStackFactory.maybe(oldItem)
-            oldNekoStack?.schema?.behaviors?.forEach { behavior ->
+            oldNekoStack?.behaviors?.forEach { behavior ->
                 behavior.handleSlotChangeOld(player, oldItem, event)
             }
         }
 
         if (newItem != null) {
             val newNekoStack = PlayNekoStackFactory.maybe(newItem)
-            newNekoStack?.schema?.behaviors?.forEach { behavior ->
+            newNekoStack?.behaviors?.forEach { behavior ->
                 behavior.handleSlotChangeNew(player, newItem, event)
             }
         }
@@ -108,7 +108,7 @@ class ItemListener : Listener {
     fun onItemConsume(event: PlayerItemConsumeEvent) {
         val item = event.item
         val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
-        nekoStack.schema.behaviors.forEach { behavior ->
+        nekoStack.behaviors.forEach { behavior ->
             behavior.handleConsume(event.player, item, event)
         }
     }
@@ -117,7 +117,7 @@ class ItemListener : Listener {
     fun onSkillPrepareCast(event: PlayerSkillPrepareCastEvent) {
         val item = event.item
         val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
-        nekoStack.schema.behaviors.forEach { behavior ->
+        nekoStack.behaviors.forEach { behavior ->
             behavior.handleSkillPrepareCast(event.playerCaster, item, event.skill, event)
         }
     }
