@@ -3,12 +3,15 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toSimpleString
+import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.stream.Stream
 
 
 /**
@@ -70,20 +73,52 @@ data object AccessoryEffectiveSlot {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 9
         }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> {
+            return Stream.of(ExaminableProperty.of("name", "slot_1"))
+        }
+
+        override fun toString(): String {
+            return toSimpleString()
+        }
     }
     val SLOT_2: EffectiveSlot = object : EffectiveSlot {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 10
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> {
+            return Stream.of(ExaminableProperty.of("name", "slot_2"))
+        }
+
+        override fun toString(): String {
+            return toSimpleString()
         }
     }
     val SLOT_3: EffectiveSlot = object : EffectiveSlot {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 11
         }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> {
+            return Stream.of(ExaminableProperty.of("name", "slot_3"))
+        }
+
+        override fun toString(): String {
+            return toSimpleString()
+        }
     }
     val SLOT_4: EffectiveSlot = object : EffectiveSlot {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 12
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> {
+            return Stream.of(ExaminableProperty.of("name", "slot_4"))
+        }
+
+        override fun toString(): String {
+            return toSimpleString()
         }
     }
 }

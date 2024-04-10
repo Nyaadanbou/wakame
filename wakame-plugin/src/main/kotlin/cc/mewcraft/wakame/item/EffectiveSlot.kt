@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item
 
+import net.kyori.examination.Examinable
 import org.bukkit.entity.Player
 
 
@@ -12,7 +13,7 @@ import org.bukkit.entity.Player
  *
  * If an item has no effective slot, use the [NoopEffectiveSlot] singleton.
  */
-interface EffectiveSlot {
+interface EffectiveSlot : Examinable {
     /*
      * Raw Slots:
      *

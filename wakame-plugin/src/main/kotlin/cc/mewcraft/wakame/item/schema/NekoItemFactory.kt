@@ -26,15 +26,21 @@ object NekoItemFactory {
     fun create(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
         val provider = NodeConfigProvider(root, relPath.toString())
 
+        //
         // Deserialize basic data
+        //
         val uuid = root.node("uuid").krequire<UUID>()
         val material = root.node("material").krequire<Key>()
         val effectiveSlot = root.node("effective_slot").krequire<EffectiveSlot>()
 
+        //
         // Deserialize item behaviors
+        //
         val behaviors: List<String> = root.node("behaviors").childrenMap().mapNotNull { (key, _) -> key?.toString() }
 
-        // Deserialize standalone item meta
+        //
+        // Deserialize item meta
+        //
         val schemaMeta: ImmutableClassToInstanceMap<SchemaItemMeta<*>> = ImmutableClassToInstanceMap.builder<SchemaItemMeta<*>>().apply {
             // Side note 1: buildMap preserves the insertion order
             // Side note 2: always put all schema metadata for a `NekoItem` even if the schema meta contains "nothing".
@@ -54,7 +60,9 @@ object NekoItemFactory {
             deserializeMeta<SSkinOwnerMeta>(root, ItemMetaKeys.SKIN_OWNER)
         }.build()
 
+        //
         // Deserialize item cells
+        //
         val schemaCell: Map<String, SchemaCell> = buildMap {
             // Side note: buildMap preserves the insertion order
 
@@ -80,7 +88,16 @@ object NekoItemFactory {
             }
         }
 
-        return NekoItemImpl(key, uuid, provider, material, effectiveSlot, schemaMeta, schemaCell, behaviors)
+        return NekoItemImpl(
+            key = key,
+            uuid = uuid,
+            config = provider,
+            material = material,
+            effectiveSlot = effectiveSlot,
+            metaMap = schemaMeta,
+            cellMap = schemaCell,
+            behaviorHolders = behaviors
+        )
     }
 }
 
