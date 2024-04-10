@@ -13,7 +13,8 @@ import cc.mewcraft.wakame.display.NetworkItemSerializeListener
 import cc.mewcraft.wakame.display.RENDERER_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.event.NekoReloadEvent
-import cc.mewcraft.wakame.item.ItemListener
+import cc.mewcraft.wakame.item.MultipleItemListener
+import cc.mewcraft.wakame.item.SingleItemListener
 import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
@@ -117,10 +118,11 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun registerListeners() = with(PLUGIN) {
-        registerTerminableListener(get<ItemListener>()).bindWith(this)
+        registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
         registerTerminableListener(get<NetworkItemSerializeListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
+        registerTerminableListener(get<SingleItemListener>()).bindWith(this)
         registerTerminableListener(get<TestListener>()).bindWith(this)
     }
 

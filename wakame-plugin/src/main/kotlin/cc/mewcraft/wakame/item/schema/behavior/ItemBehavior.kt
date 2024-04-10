@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.schema.behavior
 
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
@@ -28,6 +27,8 @@ interface ItemBehavior : ItemBehaviorHolder {
 
     /* Event handlers */
 
+    // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 NekoItem
+
     fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) = Unit
     fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
     fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) = Unit
@@ -35,10 +36,6 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
     fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
     fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) = Unit
-    fun handleItemHeld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) = Unit
-    fun handleItemUnheld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) = Unit
-    fun handleSlotChangeNew(player: Player, itemStack: ItemStack, event: PlayerInventorySlotChangeEvent) = Unit
-    fun handleSlotChangeOld(player: Player, itemStack: ItemStack, event: PlayerInventorySlotChangeEvent) = Unit
     fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit

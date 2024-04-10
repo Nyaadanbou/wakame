@@ -16,3 +16,9 @@ val ItemStack.isNmsObjectBacked: Boolean
 
         return false
     }
+
+fun ItemStack.takeUnlessEmpty(): ItemStack? =
+    if (type.isAir || amount <= 0) null else this
+
+fun ItemStack?.isEmpty(): Boolean =
+    this == null || type.isAir || amount <= 0

@@ -9,21 +9,19 @@ package cc.mewcraft.wakame.kizami
  */
 interface KizamiMap {
     /**
+     * This is a live object, which means the entries in the map will
+     * vary at any time.
+     *
      * Gets the mutable amount map, where the `map key` is kizami
      * and the `map value` is corresponding amount.
-     *
-     * @return the mutable amount map
-     * @see getAmount
      */
-    fun getMutableAmountMap(): MutableMap<Kizami, Int>
+    val mutableAmountMap: MutableMap<Kizami, Int>
 
     /**
-     * Gets the copy of amount map, where the `map key` is kizami
+     * Gets a copy of current amount map, where the `map key` is kizami
      * and the `map value` is corresponding amount.
-     *
-     * @return the copy of amount map
      */
-    fun getImmutableAmountMap(): Map<Kizami, Int>
+    val immutableAmountMap: Map<Kizami, Int>
 
     /**
      * Get the amount of specific kizami the player owns.

@@ -45,8 +45,8 @@ interface Damageable : ItemBehavior {
     companion object Factory : ItemBehaviorFactory<Damageable> {
         override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Damageable {
             val repairMaterials = behaviorConfig.optionalEntry<List<String>>("repair").orElse(emptyList())
-            val isLostWhenBreak = behaviorConfig.optionalEntry<Boolean>("will_lost").orElse(true)
-            return Default(repairMaterials, isLostWhenBreak)
+            val disappearWhenBroken = behaviorConfig.optionalEntry<Boolean>("disappear_when_broken").orElse(true)
+            return Default(repairMaterials, disappearWhenBroken)
         }
     }
 

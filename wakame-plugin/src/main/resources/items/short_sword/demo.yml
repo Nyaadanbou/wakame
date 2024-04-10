@@ -27,15 +27,14 @@ effective_slot: MAIN_HAND
 # 物品行为
 # 可选，默认 无
 behaviors:
-  castable: { }
   attribute_provider: { }
-  kizami_provider: { }
-  statistical: { }
+  castable: { }
   damageable:
     will_lost: false
     repair:
       - minecraft:iron_ingot
-#  enchantable: { }
+  kizami_provider: { }
+  statistical: { }
 
 # 名字
 # 可选，默认 "Unnamed"

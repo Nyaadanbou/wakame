@@ -4,30 +4,25 @@ import cc.mewcraft.wakame.user.User
 import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 
-// /**
-//  * Creates a new [PlayerKizamiMap].
-//  */
-// fun PlayerKizamiMap(user: User): PlayerKizamiMap {
-//     return PlayerKizamiMap(user)
-// }
+/**
+ * Creates a new [PlayerKizamiMap].
+ */
+fun PlayerKizamiMap(user: User<*>): PlayerKizamiMap {
+    return PlayerKizamiMap()
+}
 
 /**
  * Each player will be associated with an instance of [KizamiMap].
  *
  * This class records the number of kizami each owned by a player.
  */
-class PlayerKizamiMap(
-    private val user: User<*>,
-) : KizamiMap {
+class PlayerKizamiMap : KizamiMap {
     private val amountMap: Object2IntOpenHashMap<Kizami> = Object2IntOpenHashMap<Kizami>().apply { defaultReturnValue(0) }
 
-    override fun getMutableAmountMap(): MutableMap<Kizami, Int> {
-        return amountMap
-    }
-
-    override fun getImmutableAmountMap(): Map<Kizami, Int> {
-        return ImmutableMap.copyOf(amountMap)
-    }
+    override val mutableAmountMap: MutableMap<Kizami, Int>
+        get() = amountMap
+    override val immutableAmountMap: Map<Kizami, Int>
+        get() = ImmutableMap.copyOf(amountMap)
 
     override fun getAmount(kizami: Kizami): Int {
         return amountMap.getInt(kizami)

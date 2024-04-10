@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.schema.NekoItem
@@ -71,7 +72,11 @@ object NekoItemRegistry : KoinComponent, Initializable {
             }.onSuccess {
                 INSTANCES.register(key, it)
             }.onFailure {
-                LOGGER.error("Can't load item '$key': (${it.cause.toString()}) ${it.message}")
+                if (Initializer.isDebug) {
+                    LOGGER.error("Can't load item '$key'", it)
+                } else {
+                    LOGGER.error("Can't load item '$key': ${it.message}")
+                }
             }
         }
     }
