@@ -5,6 +5,8 @@ package cc.mewcraft.wakame.initializer
 import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.display.NetworkItemSerializeListener
@@ -18,7 +20,6 @@ import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.test.TestListener
 import cc.mewcraft.wakame.user.PaperUserManager
-import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
@@ -39,8 +40,6 @@ import org.bukkit.event.server.ServerLoadEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
-import org.spongepowered.configurate.ConfigurationNode
 
 /**
  * @see Initializable
@@ -49,11 +48,6 @@ object Initializer : KoinComponent, Listener {
 
     private val LOGGER: ComponentLogger by inject()
     private val PLUGIN: WakamePlugin by inject()
-
-    /**
-     * The configuration node of "config.yml", a.k.a. the main configuration.
-     */
-    lateinit var CONFIG: ConfigurationNode // TODO 直接使用 Configs.kt
 
     /**
      * A registry of Terminables.
@@ -89,8 +83,7 @@ object Initializer : KoinComponent, Listener {
      * on. While the debug mode is off, the server will simply be shutdown upon
      * unhandled exceptions to prevent further damage.
      */
-    var isDebug: Boolean = false
-        private set
+    val isDebug: Boolean by MAIN_CONFIG.entry<Boolean>("debug")
 
     /**
      * Returns `true` if this initializer finishes up all expected
@@ -121,12 +114,6 @@ object Initializer : KoinComponent, Listener {
         saveResource(RARITY_CONFIG_FILE)
         saveResource(RENDERER_CONFIG_FILE)
         saveResource(SKIN_CONFIG_FILE)
-    }
-
-    private fun loadPrimaryConfiguration() {
-        CONFIG = get(named(MAIN_CONFIG_NODE))
-
-        isDebug = CONFIG.node("debug").krequire<Boolean>()
     }
 
     private fun registerListeners() = with(PLUGIN) {
@@ -161,7 +148,6 @@ object Initializer : KoinComponent, Listener {
      */
     private fun initPreWorld() {
         saveDefaultConfiguration()
-        loadPrimaryConfiguration()
         registerEvents() // register `this` listener
         registerListeners()
 
