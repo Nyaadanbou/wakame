@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
-import cc.mewcraft.wakame.event.SkillCastEvent
+import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
+import cc.mewcraft.wakame.skill.CasterAdapter
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -113,11 +114,11 @@ class ItemListener : Listener {
     }
 
     @EventHandler
-    fun onSkillCast(event: SkillCastEvent) {
+    fun onSkillPrepareCast(event: PlayerSkillPrepareCastEvent) {
         val item = event.item
         val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
         nekoStack.schema.behaviors.forEach { behavior ->
-            behavior.handleSkillCast(event.caster, item, event.skill, event)
+            behavior.handleSkillPrepareCast(event.playerCaster, item, event.skill, event)
         }
     }
 }

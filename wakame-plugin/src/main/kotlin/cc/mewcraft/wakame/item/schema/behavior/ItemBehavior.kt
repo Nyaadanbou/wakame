@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.schema.behavior
 
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
-import cc.mewcraft.wakame.event.SkillCastEvent
+import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.player.equipment.ArmorEquipEvent
@@ -45,7 +45,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
     fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) = Unit
-    fun handleSkillCast(caster: Caster, itemStack: ItemStack, skill: Skill, event: SkillCastEvent) = Unit
+    fun handleSkillPrepareCast(caster: Caster.Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) = Unit
 }
 
 interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {

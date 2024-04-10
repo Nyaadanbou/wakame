@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.toStableShort
 import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
+import org.bukkit.event.player.PlayerItemDamageEvent
 
 @JvmInline
 value class BDurabilityMeta(
@@ -83,12 +84,4 @@ value class BDurabilityMeta(
         accessor.rootOrNull?.remove(key.value())
     }
 
-    /**
-     * 修改耐久度。
-     *
-     * [value] 为正数时物品耐久增加，为负数时减少。物品耐久归零时将触发消失判定。
-     */
-    fun changeDurabilityNaturally(value: Int) {
-        TODO("need to call bukkit event")
-    }
 }

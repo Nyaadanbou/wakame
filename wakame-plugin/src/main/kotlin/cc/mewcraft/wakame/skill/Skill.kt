@@ -25,7 +25,6 @@ interface Skill : Keyed {
      */
     val trigger: Trigger
 
-    val costDurability: Int get() = 0
 
     enum class Trigger {
         NONE,
