@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
-import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.registry.SkillRegistry
@@ -31,7 +30,7 @@ interface Castable : ItemBehavior {
     }
 
     private class Default : Castable {
-        override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>> = emptyArray()
+        override val requiredItemMeta: Array<KClass<out SchemaItemMeta<*>>> = emptyArray()
 
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
             if (action != Action.RIGHT_CLICK_AIR)
