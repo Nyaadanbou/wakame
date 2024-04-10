@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.user.asNekoUser
+import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.toStableFloat
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
@@ -20,7 +20,7 @@ class FOVPacketHandler : PacketListenerAbstract() {
         if (event.isCancelled)
             return
         val bukkitPlayer = event.player as? Player ?: return // 不是玩家
-        val nekoUser = bukkitPlayer.asNekoUser()
+        val nekoUser = bukkitPlayer.toUser()
         if (event.packetType != PacketType.Play.Server.UPDATE_ATTRIBUTES)
             return
         val currentSpeed = nekoUser.attributeMap.getValue(Attributes.MOVEMENT_SPEED_RATE).toStableFloat()

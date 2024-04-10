@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.*
+import java.util.UUID
 
 /**
  * A wakame player in Paper platform.
@@ -45,7 +45,7 @@ class PaperUser(
 /**
  * Adapts the [Player] into [NekoPlayer][User].
  */
-fun Player.asNekoUser(): User<Player> {
+fun Player.toUser(): User<Player> {
     return PlayerAdapters.get<Player>().adapt(this)
 }
 
