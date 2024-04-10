@@ -60,8 +60,7 @@ public class PlayerInventorySlotChangeEvent extends PlayerEvent {
      *
      * @return The old ItemStack in the slot.
      */
-    @NotNull
-    public ItemStack getOldItemStack() {
+    public @NotNull ItemStack getOldItemStack() {
         return oldItemStack;
     }
 
@@ -70,8 +69,7 @@ public class PlayerInventorySlotChangeEvent extends PlayerEvent {
      *
      * @return The new ItemStack in the slot.
      */
-    @NotNull
-    public ItemStack getNewItemStack() {
+    public @NotNull ItemStack getNewItemStack() {
         return newItemStack;
     }
 
