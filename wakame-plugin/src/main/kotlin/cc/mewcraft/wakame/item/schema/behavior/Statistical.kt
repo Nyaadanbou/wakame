@@ -16,7 +16,7 @@ import org.koin.core.component.inject
 import kotlin.reflect.KClass
 
 interface Statistical : ItemBehavior {
-    override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>>
+    override val requiredItemMeta: Array<KClass<out SchemaItemMeta<*>>>
         get() = emptyArray()
 
     companion object Factory : ItemBehaviorFactory<Statistical> {

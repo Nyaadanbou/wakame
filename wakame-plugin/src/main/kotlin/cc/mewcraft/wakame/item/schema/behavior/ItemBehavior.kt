@@ -24,7 +24,7 @@ sealed interface ItemBehaviorHolder
 
 interface ItemBehavior : ItemBehaviorHolder {
 
-    val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>>
+    val requiredItemMeta: Array<KClass<out SchemaItemMeta<*>>>
 
     /* Event handlers */
 

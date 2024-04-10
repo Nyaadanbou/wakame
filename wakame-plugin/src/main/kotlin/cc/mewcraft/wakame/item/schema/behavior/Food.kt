@@ -19,7 +19,7 @@ import kotlin.reflect.KClass
  */
 interface Food : ItemBehavior {
 
-    override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>>
+    override val requiredItemMeta: Array<KClass<out SchemaItemMeta<*>>>
         get() = arrayOf(SFoodMeta::class)
 
     /**

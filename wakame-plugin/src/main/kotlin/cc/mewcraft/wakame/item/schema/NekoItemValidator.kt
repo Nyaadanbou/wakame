@@ -45,7 +45,7 @@ class BehaviorValidator : NekoItemValidator() {
         val missingMetaTypes = mutableMapOf<KClass<out ItemBehavior>, MutableList<KClass<out SchemaItemMeta<*>>>>()
 
         for (behavior in item.behaviors) {
-            behavior.requiredMetaTypes
+            behavior.requiredItemMeta
                 .filter { metaClass -> item.getMeta(metaClass).isEmpty }
                 .forEach { metaClass -> missingMetaTypes.getOrPut(behavior::class) { mutableListOf() } += metaClass }
         }

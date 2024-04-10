@@ -20,7 +20,6 @@ interface AttributeProvider : ItemBehavior {
     }
 
     private class Default : AttributeProvider {
-        override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>> = emptyArray()
 
         override fun handleItemHeld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) {
             val previousSlot = event.previousSlot
@@ -84,5 +83,6 @@ interface AttributeProvider : ItemBehavior {
             val attributeMap = player.asNekoUser().attributeMap
             attributeMap.clearModifiers(nekoStack.uuid)
         }
+        override val requiredItemMeta: Array<KClass<out SchemaItemMeta<*>>> = emptyArray()
     }
 }

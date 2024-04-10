@@ -27,7 +27,6 @@ interface KizamiProvider : ItemBehavior {
     }
 
     private class Default : KizamiProvider {
-        override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>> = emptyArray()
 
         override fun handleItemHeld(player: Player, itemStack: ItemStack, event: PlayerItemHeldEvent) {
             val previousSlot = event.previousSlot
@@ -147,5 +146,6 @@ interface KizamiProvider : ItemBehavior {
             val kizamiMap = user.kizamiMap
             kizamiMap.subtractOneEach(kizamiSet)
         }
+        override val requiredItemMeta: Array<KClass<out SchemaItemMeta<*>>> = emptyArray()
     }
 }

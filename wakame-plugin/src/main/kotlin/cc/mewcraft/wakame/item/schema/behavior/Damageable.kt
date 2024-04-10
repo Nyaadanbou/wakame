@@ -29,7 +29,7 @@ import kotlin.reflect.KClass
  * 可以受损的物品。
  */
 interface Damageable : ItemBehavior {
-    override val requiredMetaTypes: Array<KClass<out SchemaItemMeta<*>>>
+    override val requiredItemMeta: Array<KClass<out SchemaItemMeta<*>>>
         get() = arrayOf(SDurabilityMeta::class)
 
     /**
