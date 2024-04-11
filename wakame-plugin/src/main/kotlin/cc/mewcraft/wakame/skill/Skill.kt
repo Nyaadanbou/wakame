@@ -69,5 +69,5 @@ interface PassiveSkill : Skill
  */
 fun Skill(node: ConfigurationNode): Skill {
     val type = node.node("type").krequire<String>()
-    return node.krequire(SkillTemplates.INSTANCE[type])
+    return node.krequire(SkillTypes.INSTANCE[type])
 }

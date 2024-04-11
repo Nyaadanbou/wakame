@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillTemplates
+import cc.mewcraft.wakame.skill.SkillTypes
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -17,7 +17,7 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
 @PreWorldDependency(
-    runBefore = [SkillTemplates::class]
+    runBefore = [SkillTypes::class]
 )
 object SkillRegistry : Initializable, KoinComponent {
     private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
