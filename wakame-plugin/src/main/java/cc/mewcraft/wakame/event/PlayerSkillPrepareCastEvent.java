@@ -1,17 +1,11 @@
 package cc.mewcraft.wakame.event;
 
-import cc.mewcraft.wakame.condition.Condition;
 import cc.mewcraft.wakame.skill.Caster;
 import cc.mewcraft.wakame.skill.Skill;
-import com.google.common.collect.ImmutableList;
+import cc.mewcraft.wakame.skill.condition.SkillConditionResult;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.koin.java.KoinJavaComponent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * player will try to cast a skill when this event called.
@@ -21,17 +15,13 @@ public class PlayerSkillPrepareCastEvent extends SkillEvent {
 
     private final Caster.Player caster;
     private final ItemStack item;
+    private final SkillConditionResult result;
 
-    private final ImmutableList<Class<? extends Condition<?>>> conditionClazzes;
-
-    private boolean isAllowCast = true;
-
-    @SafeVarargs
-    public PlayerSkillPrepareCastEvent(@NotNull Skill skill, @NotNull Caster.Player caster, @NotNull ItemStack itemStack, @NotNull Class<? extends Condition<?>>... conditions) {
+    public PlayerSkillPrepareCastEvent(@NotNull Skill skill, @NotNull Caster.Player caster, @NotNull ItemStack itemStack) {
         super(skill, false);
         this.caster = caster;
         this.item = itemStack;
-        conditionClazzes = ImmutableList.copyOf(conditions);
+        this.result = new SkillConditionResult(skill.getConditions());
     }
 
     @NotNull
@@ -44,30 +34,8 @@ public class PlayerSkillPrepareCastEvent extends SkillEvent {
         return item;
     }
 
-    @Nullable
-    public <T extends Condition<?>> T getCondition(Class<T> clazz) {
-        if (conditionClazzes.contains(clazz)) {
-            return KoinJavaComponent.get(clazz);
-        }
-        return null;
-    }
-
-    public List<? extends Condition<?>> getConditions() {
-        List<Condition<?>> conditions = new ArrayList<>();
-        for (Class<? extends Condition<?>> clazz : conditionClazzes) {
-            conditions.add(KoinJavaComponent.get(clazz));
-        }
-        return conditions;
-    }
-
-    public boolean isAllowCast() {
-        return isAllowCast;
-    }
-
-    public void setAllowCast(boolean allowCast) {
-        if (!allowCast && isAllowCast) {
-            isAllowCast = false;
-        }
+    public SkillConditionResult getResult() {
+        return result;
     }
 
     @Override

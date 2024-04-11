@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.CasterAdapter
 import cc.mewcraft.wakame.skill.TargetAdapter
-import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.util.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -41,16 +40,16 @@ interface Castable : ItemBehavior {
             val event = PlayerSkillPrepareCastEvent(
                 skill,
                 CasterAdapter.adapt(player),
-                itemStack,
-                DurabilityCondition::class.java
+                itemStack
             )
             event.callEvent()
+            val result = event.result
 
-            if (event.isAllowCast) {
+            if (result.test()) {
+                result.cost()
                 skill.castAt(TargetAdapter.adapt(player))
-                player.sendMessage("施放移除效果技能")
             } else {
-                player.sendMessage("无法施放移除效果技能")
+                result.notifyFailure(player)
             }
         }
     }

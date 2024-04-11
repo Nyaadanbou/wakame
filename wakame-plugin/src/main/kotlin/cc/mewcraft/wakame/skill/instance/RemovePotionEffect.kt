@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillSerializer
 import cc.mewcraft.wakame.skill.Target
+import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -16,6 +17,7 @@ import java.util.*
 class RemovePotionEffect(
     override val uniqueId: UUID,
     override val trigger: Skill.Trigger,
+    override val conditions: List<SkillCondition<*>>,
     private val effectType: List<PotionEffectType>
 ) : Skill {
     override val key: Key = Key(NekoNamespaces.SKILL, "remove_potion_effect")
@@ -28,7 +30,8 @@ internal object RemovePotionEffectSerializer : SkillSerializer<RemovePotionEffec
     override fun deserialize(type: Type?, node: ConfigurationNode): RemovePotionEffect {
         val uuid = node.node("uuid").krequire<UUID>()
         val trigger = node.node("trigger").get<Skill.Trigger>() ?: Skill.Trigger.NONE
+        val conditions = node.node("conditions").get<List<SkillCondition<*>>>().orEmpty()
         val effectTypes = node.node("effect_types").get<List<PotionEffectType>>().orEmpty()
-        return RemovePotionEffect(uuid, trigger, effectTypes)
+        return RemovePotionEffect(uuid, trigger, conditions, effectTypes)
     }
 }

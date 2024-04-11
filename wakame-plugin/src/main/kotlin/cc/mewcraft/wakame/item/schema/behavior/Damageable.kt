@@ -16,9 +16,11 @@ import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.condition.Condition
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.skill.condition.DurabilityContext
 import cc.mewcraft.wakame.util.Key
+import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -76,17 +78,17 @@ interface Damageable : ItemBehavior {
 //        }
 
         override fun handleSkillPrepareCast(caster: Caster.Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
-            val condition = event.getCondition(DurabilityCondition::class.java) ?: return
             val context = DurabilityContext(itemStack, 1)
-            if (condition.test(context)) {
-                condition.cost(context)
-            } else { //TODO 用isPass缓存条件的判定结果，减少这次test
-                event.isAllowCast = false
-                caster.bukkitPlayer.sendMessage("物品耐久不足，无法释放技能")
-            }
+            event.result.builder()
+                .requireConditions(DurabilityCondition::class)
+                .createCondition { DurabilityCondition.test(context) }
+                .next()
+                .withFailureNotification { it.sendMessage("物品耐久不足，无法释放技能".mini) }
+                .withPriority(Condition.Priority.HIGH)
+                .addConditionSideEffect { DurabilityCondition.cost(context) }
+                .build()
         }
     }
-
 
 }
 

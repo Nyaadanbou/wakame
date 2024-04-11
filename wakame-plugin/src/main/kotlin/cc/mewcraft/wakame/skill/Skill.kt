@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -25,6 +26,7 @@ interface Skill : Keyed {
      */
     val trigger: Trigger
 
+    val conditions: List<SkillCondition<*>>
 
     enum class Trigger {
         NONE,
@@ -42,6 +44,7 @@ interface Skill : Keyed {
 object NoopSkill : Skill {
     override val uniqueId: UUID = UUID.fromString("1826a767-d424-4024-8b8f-4e66157e35de")
     override val trigger: Skill.Trigger = Skill.Trigger.NONE
+    override val conditions: List<SkillCondition<*>> = emptyList()
     override val key: Key = SkillRegistry.EMPTY_KEY
 }
 
