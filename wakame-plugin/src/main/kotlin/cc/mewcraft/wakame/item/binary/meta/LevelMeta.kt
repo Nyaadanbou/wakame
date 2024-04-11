@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.util.getIntOrNull
 import cc.mewcraft.wakame.util.toStableByte
 import me.lucko.helper.nbt.ShadowTagType
@@ -14,9 +14,9 @@ value class BLevelMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Int> {
     override val key: Key
-        get() = ItemMetaKeys.LEVEL
+        get() = ItemMetaConstants.createKey { LEVEL }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaKeys.LEVEL.value(), ShadowTagType.BYTE) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.LEVEL, ShadowTagType.BYTE) ?: false
 
     override fun getOrNull(): Int? {
         return accessor.rootOrNull?.getIntOrNull(key.value())

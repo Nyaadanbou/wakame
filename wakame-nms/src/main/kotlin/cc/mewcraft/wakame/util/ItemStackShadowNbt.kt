@@ -2,7 +2,6 @@
 
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.shadow.inventory.ShadowCraftItemStack0
 import cc.mewcraft.wakame.shadow.inventory.ShadowCraftMetaItem0
 import cc.mewcraft.wakame.shadow.inventory.ShadowItemStack
@@ -18,7 +17,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import net.minecraft.world.item.ItemStack as MojangStack
 
-private const val ROOT_COMPOUND_NAME: String = NekoTags.ROOT
+const val WAKAME_COMPOUND_NAME: String = "wakame"
 
 //<editor-fold desc="Shadow un(wrappers)">
 internal val Tag.wrap: ShadowTag
@@ -92,32 +91,32 @@ var ItemStack.backingCustomModelData: Int?
 //<editor-fold desc="MojangStack - Neko Compound">
 internal var MojangStack.nekoCompound: CompoundShadowTag
     get() {
-        val compoundTag = this.orCreateTag.getOrPut(ROOT_COMPOUND_NAME) { CompoundTag() }
+        val compoundTag = this.orCreateTag.getOrPut(WAKAME_COMPOUND_NAME) { CompoundTag() }
         return compoundTag.wrap
     }
     set(value) {
-        this.orCreateTag.put(ROOT_COMPOUND_NAME, value.unwrap)
+        this.orCreateTag.put(WAKAME_COMPOUND_NAME, value.unwrap)
     }
 
 internal val MojangStack.nekoCompoundOrNull: CompoundShadowTag?
-    get() = this.tag?.getCompoundOrNull(ROOT_COMPOUND_NAME)?.wrap
+    get() = this.tag?.getCompoundOrNull(WAKAME_COMPOUND_NAME)?.wrap
 //</editor-fold>
 
 //<editor-fold desc="BukkitStack - Neko Compound">
 /**
  * ## Getter
  *
- * Gets the [ROOT_COMPOUND_NAME] compound tag from `this`. If the
- * [ROOT_COMPOUND_NAME] compound tag does not already exist, a new compound
+ * Gets the [WAKAME_COMPOUND_NAME] compound tag from `this`. If the
+ * [WAKAME_COMPOUND_NAME] compound tag does not already exist, a new compound
  * tag will be created and **saved** to `this`.
  *
  * ## Setter
  *
- * Sets the [ROOT_COMPOUND_NAME] compound tag of `this` to given
- * value, overwriting any existing [ROOT_COMPOUND_NAME] compound tag
+ * Sets the [WAKAME_COMPOUND_NAME] compound tag of `this` to given
+ * value, overwriting any existing [WAKAME_COMPOUND_NAME] compound tag
  * on the `this`.
  *
- * You can also set `this` to `null` to removes the [ROOT_COMPOUND_NAME]
+ * You can also set `this` to `null` to removes the [WAKAME_COMPOUND_NAME]
  * compound tag from `this`.
  */
 var ItemStack.nekoCompound: CompoundShadowTag
@@ -127,7 +126,7 @@ var ItemStack.nekoCompound: CompoundShadowTag
             return handle.nekoCompound
         } else { // strictly-Bukkit ItemStack
             val unhandledTags = this.backingItemMeta!!.unhandledTags
-            val tag = unhandledTags.getOrPut(ROOT_COMPOUND_NAME, ::CompoundTag) as CompoundTag
+            val tag = unhandledTags.getOrPut(WAKAME_COMPOUND_NAME, ::CompoundTag) as CompoundTag
             return tag.wrap
         }
     }
@@ -136,12 +135,12 @@ var ItemStack.nekoCompound: CompoundShadowTag
         if (handle != null) { // CraftItemStack
             handle.nekoCompound = value
         } else { // strictly-Bukkit ItemStack
-            this.backingItemMeta!!.unhandledTags[ROOT_COMPOUND_NAME] = value.unwrap
+            this.backingItemMeta!!.unhandledTags[WAKAME_COMPOUND_NAME] = value.unwrap
         }
     }
 
 /**
- * Gets the [ROOT_COMPOUND_NAME] compound tag from `this` or `null`, if it does
+ * Gets the [WAKAME_COMPOUND_NAME] compound tag from `this` or `null`, if it does
  * not exist. Unlike [ItemStack.nekoCompound], which possibly modifies the
  * item's NBT tags, this function will not modify `this` at all.
  */
@@ -151,19 +150,19 @@ val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
         return if (handle != null) { // CraftItemStack
             handle.nekoCompoundOrNull
         } else { // strictly-Bukkit ItemStack
-            (this.backingItemMeta?.unhandledTags?.get(ROOT_COMPOUND_NAME) as? CompoundTag)?.wrap
+            (this.backingItemMeta?.unhandledTags?.get(WAKAME_COMPOUND_NAME) as? CompoundTag)?.wrap
         }
     }
 
 /**
- * Removes the [ROOT_COMPOUND_NAME] compound tag from `this`.
+ * Removes the [WAKAME_COMPOUND_NAME] compound tag from `this`.
  */
 fun ItemStack.removeNekoCompound() {
     val handle = this.handle
     if (handle != null) { // CraftItemStack
-        handle.removeTagKey(NekoTags.ROOT)
+        handle.removeTagKey(WAKAME_COMPOUND_NAME)
     } else { // strictly-Bukkit ItemStack
-        this.backingItemMeta?.unhandledTags?.remove(NekoTags.ROOT)
+        this.backingItemMeta?.unhandledTags?.remove(WAKAME_COMPOUND_NAME)
     }
 }
 //</editor-fold>

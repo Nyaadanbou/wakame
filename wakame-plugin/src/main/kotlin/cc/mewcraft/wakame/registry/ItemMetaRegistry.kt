@@ -1,51 +1,69 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.annotation.ConfigPath
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorNoop
+import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import kotlin.reflect.KClass
-import kotlin.reflect.full.isSubtypeOf
-import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.full.valueParameters
+import kotlin.reflect.full.*
 import kotlin.reflect.typeOf
 
 internal object ItemMetaRegistry : Initializable {
     internal object Binary {
-        private val binaryItemMetaReflectionLookupByClass: Map<KClass<out BinaryItemMeta<*>>, ItemMetaReflection> = run {
+        private val itemMetaReflectionLookupByClass: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMetaReflection> = run {
             // Get all subclasses of BinaryItemMeta
             val classes: Collection<KClass<out BinaryItemMeta<*>>> = BinaryItemMeta::class.sealedSubclasses
+
             // Get the primary constructor of each subclass of BinaryItemMeta
-            val constructors: Map<KClass<out BinaryItemMeta<*>>, (ItemMetaAccessor) -> BinaryItemMeta<*>> = classes.associateWith {
-                val primaryConstructor = requireNotNull(it.primaryConstructor) { "The class ${it.qualifiedName} does not have primary constructor" }
+            val constructors: Map<KClass<out BinaryItemMeta<*>>, (ItemMetaAccessor) -> BinaryItemMeta<*>> = classes.associateWith { clazz ->
+                val primaryConstructor = requireNotNull(clazz.primaryConstructor) { "The class ${clazz.qualifiedName} does not have primary constructor" }
                 val valueParameters = primaryConstructor.valueParameters
-                require(valueParameters.size == 1) { "The primary constructor of class ${it.qualifiedName} has more than one parameter" }
-                require(valueParameters.first().type.isSubtypeOf(typeOf<ItemMetaAccessor>())) { "The first parameter of class ${it.qualifiedName} is not a subtype of ${ItemMetaAccessor::class.qualifiedName}" }
+                require(valueParameters.size == 1) { "The primary constructor of class ${clazz.qualifiedName} has more than one parameter" }
+                require(valueParameters.first().type.isSubtypeOf(typeOf<ItemMetaAccessor>())) { "The first parameter of class ${clazz.qualifiedName} is not a subtype of ${ItemMetaAccessor::class.qualifiedName}" }
                 @Suppress("UNCHECKED_CAST")
                 primaryConstructor as (ItemMetaAccessor) -> BinaryItemMeta<*>
             }
-            // Collect all and put them into the lookup registry
-            classes.associateWith { ItemMetaReflection(it, constructors.getValue(it)) }
-        }
-        private val binaryItemMetaReflectionLookupByString: Map<String, ItemMetaReflection> = run {
-            reflections().associateBy { it.constructor.invoke(ItemMetaAccessorNoop).key.value() }
+
+            // Collect all results
+            classes.associateWith { clazz -> BinaryItemMetaReflection(clazz, constructors[clazz]!!) }
         }
 
-        fun reflections(): Collection<ItemMetaReflection> {
-            return binaryItemMetaReflectionLookupByClass.values
+        private val itemMetaReflectionLookupByString: Map<String, BinaryItemMetaReflection> =
+            itemMetaReflectionLookupByClass.values.associateBy { reflect -> reflect.constructor.invoke(ItemMetaAccessorNoop).key.value() }
+
+        fun reflectionLookup(clazz: KClass<out BinaryItemMeta<*>>): BinaryItemMetaReflection {
+            return requireNotNull(itemMetaReflectionLookupByClass[clazz]) { "The class '${clazz.qualifiedName}' is not registered" }
         }
 
-        fun reflectionLookup(clazz: KClass<out BinaryItemMeta<*>>): ItemMetaReflection {
-            return requireNotNull(binaryItemMetaReflectionLookupByClass[clazz]) { "The class '${clazz.qualifiedName}' is not registered" }
-        }
-
-        fun reflectionLookup(key: String): ItemMetaReflection {
-            return requireNotNull(binaryItemMetaReflectionLookupByString[key]) { "The class specific by '$key' is not registered" }
+        fun reflectionLookup(key: String): BinaryItemMetaReflection {
+            return requireNotNull(itemMetaReflectionLookupByString[key]) { "The class specific by '$key' is not registered" }
         }
     }
 
     internal object Schema {
-        // TODO implement it when we need reflection for SchemaItemMeta
+        private val itemMetaReflectionLookupByClass: Map<KClass<out SchemaItemMeta<*>>, SchemaItemMetaReflection> = run {
+            // Get all subclasses of SchemaItemMeta
+            val classes: Collection<KClass<out SchemaItemMeta<*>>> = SchemaItemMeta::class.sealedSubclasses
+                // We only need direct subclasses of the SchemaItemMeta
+                .filter { clazz -> clazz.superclasses.first() == SchemaItemMeta::class }
+
+            // Get the path of each schema item meta
+            val paths: Map<KClass<out SchemaItemMeta<*>>, String> = classes.associateWith { clazz ->
+                // Try to get the `path` value defined in the interface
+                clazz.findAnnotation<ConfigPath>()?.path ?: error("The clazz does not have ConfigurationPath annotation")
+            }
+
+            // Collect all results
+            classes.associateWith { clazz ->
+                SchemaItemMetaReflection(clazz, paths[clazz]!!)
+            }
+        }
+
+        fun reflections(): Collection<SchemaItemMetaReflection> {
+            return itemMetaReflectionLookupByClass.values
+        }
     }
 
     override fun onPreWorld() {
@@ -53,7 +71,25 @@ internal object ItemMetaRegistry : Initializable {
     }
 }
 
-internal data class ItemMetaReflection(
+/**
+ * A class which stores reflection data about target [BinaryItemMeta].
+ *
+ * @property clazz the class of target [BinaryItemMeta]
+ * @property constructor the constructor function of target [BinaryItemMeta]
+ */
+internal data class BinaryItemMetaReflection(
     val clazz: KClass<out BinaryItemMeta<*>>,
     val constructor: (ItemMetaAccessor) -> BinaryItemMeta<*>,
 )
+
+/**
+ * A class which stores reflection data about target [SchemaItemMeta].
+ *
+ * @property clazz the class of target [SchemaItemMeta]
+ * @property path
+ */
+internal data class SchemaItemMetaReflection(
+    val clazz: KClass<out SchemaItemMeta<*>>,
+    val path: String,
+)
+

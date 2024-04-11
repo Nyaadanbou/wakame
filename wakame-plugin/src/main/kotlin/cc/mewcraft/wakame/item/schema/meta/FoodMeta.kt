@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.annotation.ConfigPath
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -18,7 +19,7 @@ data class Food(
     val isMeat: Boolean = false,
     val canAlwaysEat: Boolean = false,
     val eatSeconds: Float = 1.6F,
-    val effects: Map<PotionEffect, Float>
+    val effects: Map<PotionEffect, Float>,
 ) : Examinable {
     init {
         require(nutrition >= 0) { "nutrition >= 0" }
@@ -38,8 +39,9 @@ data class Food(
     override fun toString(): String = toSimpleString()
 }
 
+@ConfigPath(ItemMetaConstants.FOOD)
 sealed interface SFoodMeta : SchemaItemMeta<Food> {
-    override val key: Key get() = ItemMetaKeys.FOOD
+    override val key: Key get() = ItemMetaConstants.createKey { FOOD }
 }
 
 private class NonNullFoodMeta(
@@ -48,7 +50,7 @@ private class NonNullFoodMeta(
     private val isMeat: Boolean = false,
     private val canAlwaysEat: Boolean = false,
     private val eatSeconds: Float = 1.6F,
-    private val effects: Map<PotionEffect, Float>
+    private val effects: Map<PotionEffect, Float>,
 ) : SFoodMeta {
     override val isEmpty: Boolean = false
 
@@ -76,7 +78,7 @@ internal data object FoodMetaSerializer : SchemaItemMetaSerializer<SFoodMeta> {
         val isMeat = node.node("is_meat").getBoolean(false)
         val canAlwaysEat = node.node("can_always_eat").getBoolean(false)
         val eatSeconds = node.node("eat_seconds").getFloat(1.6F)
-        val effects= node.node("effects").get<Map<PotionEffect, Float>>(emptyMap())
+        val effects = node.node("effects").get<Map<PotionEffect, Float>>(emptyMap())
         return NonNullFoodMeta(nutrition, saturationModifier, isMeat, canAlwaysEat, eatSeconds, effects)
     }
 }

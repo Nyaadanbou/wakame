@@ -1,14 +1,19 @@
 package cc.mewcraft.wakame.item.schema
 
 import cc.mewcraft.wakame.crate.Crate
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.item.schema.meta.*
+import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.asNamespacedKey
 import org.bukkit.Registry
+import java.util.UUID
 
 object PaperNekoItemRealizer : NekoItemRealizer {
     override fun realize(nekoItem: NekoItem, context: SchemaGenerationContext): NekoStack {
@@ -43,29 +48,36 @@ object PaperNekoItemRealizer : NekoItemRealizer {
             PlayNekoStackFactory.new(material)
         }
 
-        // write base data
-        nekoStack.putKey(nekoItem.key)
-        nekoStack.putVariant(0)
-        nekoStack.putSeed(context.seed) // TODO 对于没有随机元素的物品（例如材料类物品），不应该写入带有随机元素的数据
+        //
+        // Write base data
+        //
+        with(nekoStack) {
+            putKey(nekoItem.key)
+            putVariant(0)
+            putSeed(context.seed) // TODO 对于没有随机元素的物品（例如材料类物品），不应该写入带有随机元素的数据
+        }
 
-        // write meta
+        //
+        // Write item meta
+        //
         with(nekoStack.meta) {
             // Caution: the order of generation matters here!
 
-            generateMeta<_, SDisplayNameMeta, BDisplayNameMeta>(nekoItem, context)
-            generateMeta<_, SDisplayLoreMeta, BDisplayLoreMeta>(nekoItem, context)
-            generateMeta<_, SDurabilityMeta, BDurabilityMeta>(nekoItem, context)
-            generateMeta<_, SLevelMeta, BLevelMeta>(nekoItem, context)
-            generateMeta<_, SRarityMeta, BRarityMeta>(nekoItem, context)
-            generateMeta<_, SElementMeta, BElementMeta>(nekoItem, context)
-            generateMeta<_, SKizamiMeta, BKizamiMeta>(nekoItem, context)
-            generateMeta<_, SSkinMeta, BSkinMeta>(nekoItem, context)
-            generateMeta<_, SSkinOwnerMeta, BSkinOwnerMeta>(nekoItem, context)
+            generateMeta<String, SDisplayNameMeta, BDisplayNameMeta>(nekoItem, context)
+            generateMeta<List<String>, SDisplayLoreMeta, BDisplayLoreMeta>(nekoItem, context)
+            generateMeta<Durability, SDurabilityMeta, BDurabilityMeta>(nekoItem, context)
+            generateMeta<Int, SLevelMeta, BLevelMeta>(nekoItem, context)
+            generateMeta<Rarity, SRarityMeta, BRarityMeta>(nekoItem, context)
+            generateMeta<Set<Element>, SElementMeta, BElementMeta>(nekoItem, context)
+            generateMeta<Set<Kizami>, SKizamiMeta, BKizamiMeta>(nekoItem, context)
+            generateMeta<ItemSkin, SSkinMeta, BSkinMeta>(nekoItem, context)
+            generateMeta<UUID, SSkinOwnerMeta, BSkinOwnerMeta>(nekoItem, context)
         }
 
-        // write cells
+        //
+        // Write item cell
+        //
         with(nekoStack.cell) {
-
             nekoItem.cell.forEach { schemaCell ->
                 // the order of cell population should be the same as
                 // that they are declared in the configuration list
@@ -76,8 +88,9 @@ object PaperNekoItemRealizer : NekoItemRealizer {
                     // 1) a cell with some content, or
                     // 2) a cell with no content + keepEmpty is true
                     put(binaryCell.id, binaryCell)
+                } else {
+                    // if it's null, simply don't put the cell
                 }
-                // if it's null, simply don't put the cell
             }
         }
 

@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Durability
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.toStableShort
 import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
-import org.bukkit.event.player.PlayerItemDamageEvent
 
 @JvmInline
 value class BDurabilityMeta(
@@ -19,9 +18,9 @@ value class BDurabilityMeta(
     }
 
     override val key: Key
-        get() = ItemMetaKeys.DURABILITY
+        get() = ItemMetaConstants.createKey { DURABILITY }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaKeys.DURABILITY.value(), ShadowTagType.COMPOUND) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.DURABILITY, ShadowTagType.COMPOUND) ?: false
 
     /**
      * Gets damage.

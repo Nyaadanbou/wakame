@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.item.schema.meta
 
+import cc.mewcraft.wakame.annotation.ConfigPath
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
@@ -17,8 +18,9 @@ typealias ElementPool = Pool<Element, SchemaGenerationContext>
 /**
  * 物品的元素标识。
  */
+@ConfigPath(ItemMetaConstants.ELEMENT)
 sealed interface SElementMeta : SchemaItemMeta<Set<Element>> {
-    override val key: Key get() = ItemMetaKeys.ELEMENT
+    override val key: Key get() = ItemMetaConstants.createKey { ELEMENT }
 }
 
 private class NonNullElementMeta(

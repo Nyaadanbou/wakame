@@ -2,8 +2,8 @@
 
 package cc.mewcraft.wakame.item.binary.cell.core
 
-import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.attribute.facade.AttributeData
 import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.nbt.ShadowTagType
@@ -77,7 +78,7 @@ interface BinaryAttributeCore : BinaryCore, AttributeData, AttributeComponent.Op
     ) : BinaryAttributeCore, BinaryAttributeData.S {
         override fun asShadowTag(): ShadowTag = CompoundShadowTag {
             putId(key)
-            putNumber(NekoTags.Attribute.VAL, value, tagType)
+            putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
             putOperation(operation)
         }
     }
@@ -94,8 +95,8 @@ interface BinaryAttributeCore : BinaryCore, AttributeData, AttributeComponent.Op
     ) : BinaryAttributeCore, BinaryAttributeData.R {
         override fun asShadowTag(): ShadowTag = CompoundShadowTag {
             putId(key)
-            putNumber(NekoTags.Attribute.MIN, lower, tagType)
-            putNumber(NekoTags.Attribute.MAX, upper, tagType)
+            putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower, tagType)
+            putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)
             putOperation(operation)
         }
     }
@@ -112,7 +113,7 @@ interface BinaryAttributeCore : BinaryCore, AttributeData, AttributeComponent.Op
     ) : BinaryAttributeCore, BinaryAttributeData.SE {
         override fun asShadowTag(): ShadowTag = CompoundShadowTag {
             putId(key)
-            putNumber(NekoTags.Attribute.VAL, value, tagType)
+            putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
             putElement(element)
             putOperation(operation)
         }
@@ -131,8 +132,8 @@ interface BinaryAttributeCore : BinaryCore, AttributeData, AttributeComponent.Op
     ) : BinaryAttributeCore, BinaryAttributeData.RE {
         override fun asShadowTag(): ShadowTag = CompoundShadowTag {
             putId(key)
-            putNumber(NekoTags.Attribute.MIN, lower, tagType)
-            putNumber(NekoTags.Attribute.MAX, upper, tagType)
+            putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower, tagType)
+            putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)
             putElement(element)
             putOperation(operation)
         }
@@ -142,11 +143,11 @@ interface BinaryAttributeCore : BinaryCore, AttributeData, AttributeComponent.Op
 /* Specialized Compound Operations */
 
 private fun CompoundShadowTag.putElement(element: Element) {
-    this.putByte(NekoTags.Attribute.ELEMENT, element.binaryId)
+    this.putByte(AttributeBinaryKeys.ELEMENT_TYPE, element.binaryId)
 }
 
 private fun CompoundShadowTag.putOperation(operation: Operation) {
-    this.putByte(NekoTags.Attribute.OPERATION, operation.binary)
+    this.putByte(AttributeBinaryKeys.OPERATION_TYPE, operation.binary)
 }
 
 // Map Value's KFunction Type: CompoundShadowTag.(String, Number) -> Unit
@@ -185,7 +186,7 @@ private fun CompoundShadowTag.putNumber(key: String, value: Double, shadowTagTyp
 }
 
 private fun CompoundShadowTag.putId(id: Key) {
-    this.putString(NekoTags.Cell.CORE_KEY, id.asString())
+    this.putString(CoreBinaryKeys.CORE_IDENTIFIER, id.asString())
 }
 //</editor-fold>
 
@@ -199,7 +200,7 @@ data class BinarySkillCore(
     override val key: Key,
 ) : BinaryCore {
     override fun asShadowTag(): ShadowTag = CompoundShadowTag {
-        putString(NekoTags.Cell.CORE_KEY, key.asString())
+        putId(key)
     }
 }
 //</editor-fold>

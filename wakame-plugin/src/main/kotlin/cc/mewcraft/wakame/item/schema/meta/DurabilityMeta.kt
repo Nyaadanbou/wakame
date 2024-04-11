@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.annotation.ConfigPath
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
@@ -34,8 +35,9 @@ data class Durability(
     override fun toString(): String = toSimpleString()
 }
 
+@ConfigPath(ItemMetaConstants.DURABILITY)
 sealed interface SDurabilityMeta : SchemaItemMeta<Durability> {
-    override val key: Key get() = ItemMetaKeys.DURABILITY
+    override val key: Key get() = ItemMetaConstants.createKey { DURABILITY }
 }
 
 private class NonNullDurabilityMeta(
@@ -43,6 +45,7 @@ private class NonNullDurabilityMeta(
     private val damage: RandomizedValue? = null,
 ) : SDurabilityMeta {
     override val isEmpty: Boolean = false
+
     init {
         require(threshold.base > 0) { "threshold.base > 0" }
         damage?.run { require(damage.base >= 0) { "damage.base >= 0" } }

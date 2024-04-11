@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.annotation.ConfigPath
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -10,8 +11,9 @@ import java.lang.reflect.Type
 /**
  * 物品的描述。
  */
+@ConfigPath(ItemMetaConstants.DISPLAY_LORE)
 sealed interface SDisplayLoreMeta : SchemaItemMeta<List<String>> {
-    override val key: Key get() = ItemMetaKeys.DISPLAY_LORE
+    override val key: Key get() = ItemMetaConstants.createKey { DISPLAY_LORE }
 }
 
 private class NonNullDisplayLoreMeta(

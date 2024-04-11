@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.item.CellBinaryKeys
 import cc.mewcraft.wakame.item.binary.BaseNekoStack
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
 import cc.mewcraft.wakame.skill.Skill
@@ -21,9 +21,9 @@ internal value class ItemCellAccessorImpl(
     /* Getters */
 
     private val rootOrNull: CompoundShadowTag?
-        get() = base.tags.getCompoundOrNull(NekoTags.Cell.ROOT)
+        get() = base.tags.getCompoundOrNull(CellBinaryKeys.BASE)
     private val rootOrCreate: CompoundShadowTag
-        get() = base.tags.getOrPut(NekoTags.Cell.ROOT, CompoundShadowTag::create)
+        get() = base.tags.getOrPut(CellBinaryKeys.BASE, CompoundShadowTag::create)
 
     override val snapshot: Map<String, BinaryCell>
         get() {

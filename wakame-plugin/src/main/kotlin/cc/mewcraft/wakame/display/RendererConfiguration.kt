@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.config.ConfigProvider
@@ -176,15 +176,15 @@ internal class RendererConfiguration(
         fun createLoreMeta0(rawIndex: Int, rawLine: String, default: List<Component>?): LoreMeta {
             val ret: DynamicLoreMeta
             when {
-                rawLine.startsWith(NekoNamespaces.SKILL + ":") -> {
+                rawLine.startsWith(Namespaces.SKILL + ":") -> {
                     ret = SkillLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
                 }
 
-                rawLine.startsWith(NekoNamespaces.ATTRIBUTE + ":") -> {
+                rawLine.startsWith(Namespaces.ATTRIBUTE + ":") -> {
                     ret = AttributeLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default, attDerivation)
                 }
 
-                rawLine.startsWith(NekoNamespaces.ITEM_META + ":") -> {
+                rawLine.startsWith(Namespaces.ITEM_META + ":") -> {
                     ret = MetaLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
                 }
 

@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.item.schema
 
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.item.EffectiveSlot
-import cc.mewcraft.wakame.item.ItemMetaKeys
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.cell.SchemaCellFactory
-import cc.mewcraft.wakame.item.schema.meta.*
+import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.random.AbstractGroupSerializer
+import cc.mewcraft.wakame.registry.ItemMetaRegistry
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.ImmutableClassToInstanceMap
 import net.kyori.adventure.key.Key
@@ -46,20 +46,16 @@ object NekoItemFactory {
             // Side note 2: always put all schema metadata for a `NekoItem` even if the schema meta contains "nothing".
             // Side note 3: whether the data will be written to the item's NBT is decided by the realization process, not here.
 
-            // Write it in alphabet order, in case you miss something
-            // TODO generalize it so that we don't need to
-            //  manually write each SchemaItemMeta here
-            deserializeMeta<SDisplayLoreMeta>(root, ItemMetaKeys.DISPLAY_LORE)
-            deserializeMeta<SDisplayNameMeta>(root, ItemMetaKeys.DISPLAY_NAME)
-            deserializeMeta<SDurabilityMeta>(root, ItemMetaKeys.DURABILITY)
-            deserializeMeta<SElementMeta>(root, ItemMetaKeys.ELEMENT)
-            deserializeMeta<SKizamiMeta>(root, ItemMetaKeys.KIZAMI)
-            deserializeMeta<SLevelMeta>(root, ItemMetaKeys.LEVEL)
-            deserializeMeta<SRarityMeta>(root, ItemMetaKeys.RARITY)
-            deserializeMeta<SSkinMeta>(root, ItemMetaKeys.SKIN)
-            deserializeMeta<SSkinOwnerMeta>(root, ItemMetaKeys.SKIN_OWNER)
+            ItemMetaRegistry.Schema.reflections().forEach { reflect ->
+                @Suppress("UNCHECKED_CAST")
+                val clazz = reflect.clazz.java as Class<SchemaItemMeta<*>>
+                val path = reflect.path
+                val itemMeta = root.node(path).require(clazz)
+                put(clazz, itemMeta)
+            }
         }.build()
 
+        // TODO 写个 SchemaCellSerializer
         //
         // Deserialize item cells
         //
@@ -99,17 +95,4 @@ object NekoItemFactory {
             behaviorHolders = behaviors
         )
     }
-}
-
-private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemaItemMeta<*>>.deserializeMeta(
-    node: ConfigurationNode, key: Key,
-) {
-    this.deserializeMeta<T>(node, key.value())
-}
-
-private inline fun <reified T : SchemaItemMeta<*>> ImmutableClassToInstanceMap.Builder<SchemaItemMeta<*>>.deserializeMeta(
-    node: ConfigurationNode, vararg path: String,
-) {
-    val schemaItemMeta = node.node(*path).krequire<T>()
-    this.put(T::class.java, schemaItemMeta)
 }

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary.stats
 
-import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.toStableShort
 import net.kyori.adventure.key.Key
@@ -15,7 +15,7 @@ value class EntityKillsStatistics(
     override val accessor: ItemStatisticsAccessor,
 ) : ItemStatistics, NumericMapLikeItemStats<Key, Int> {
     override val nbtPath: String
-        get() = NekoTags.Stats.ENTITY_KILLS
+        get() = StatisticsConstants.ENTITY_KILLS
 
     override fun get(key: Key): Int = rootOrNull?.getInt(key.asString()) ?: 0
     override fun set(key: Key, value: Int) = rootOrCreate.putShort(key.asString(), value.toStableShort())
@@ -32,7 +32,7 @@ value class PeakDamageStatistics(
     override val accessor: ItemStatisticsAccessor,
 ) : ItemStatistics, NumericMapLikeItemStats<Element, Int> {
     override val nbtPath: String
-        get() = NekoTags.Stats.PEAK_DAMAGE
+        get() = StatisticsConstants.PEAK_DAMAGE
 
     override fun get(key: Element): Int = rootOrNull?.getInt(key.uniqueId) ?: 0
     override fun set(key: Element, value: Int) = rootOrCreate.putShort(key.uniqueId, value.toStableShort())
@@ -49,7 +49,7 @@ value class ReforgeStatistics(
     override val accessor: ItemStatisticsAccessor,
 ) : ItemStatistics {
     override val nbtPath: String
-        get() = NekoTags.Stats.REFORGE
+        get() = StatisticsConstants.REFORGE
 
     val count: NumericSingleItemStats<Int>
         get() = object : NumericSingleItemStats<Int> {

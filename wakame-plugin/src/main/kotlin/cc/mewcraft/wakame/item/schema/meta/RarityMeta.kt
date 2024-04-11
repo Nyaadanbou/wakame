@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.annotation.ConfigPath
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.rarity.Rarity
@@ -15,8 +16,9 @@ import java.lang.reflect.Type
 /**
  * 物品的稀有度。
  */
+@ConfigPath(ItemMetaConstants.RARITY)
 sealed interface SRarityMeta : SchemaItemMeta<Rarity> {
-    override val key: Key get() = ItemMetaKeys.RARITY
+    override val key: Key get() = ItemMetaConstants.createKey { RARITY }
 }
 
 private class NonNullRarityMeta(
@@ -30,6 +32,7 @@ private class NonNullRarityMeta(
     private val dynamic: LevelMappings? = null,
 ) : SRarityMeta {
     override val isEmpty: Boolean = false
+
     init {
         require(static != null || dynamic != null) { "static != null || dynamic != null" }
     }

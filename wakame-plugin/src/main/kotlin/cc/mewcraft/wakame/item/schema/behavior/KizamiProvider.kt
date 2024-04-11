@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 
 interface KizamiProvider : ItemBehavior {
     companion object Factory : ItemBehaviorFactory<KizamiProvider> {
-        override fun create(item: NekoItem, behaviorConfig: ConfigProvider): KizamiProvider {
+        override fun create(item: NekoItem, config: ConfigProvider): KizamiProvider {
             return Default()
         }
     }

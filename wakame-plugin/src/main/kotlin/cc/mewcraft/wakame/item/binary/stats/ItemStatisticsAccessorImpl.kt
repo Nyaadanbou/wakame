@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.stats
 
-import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.item.StatisticsBinaryKeys
 import cc.mewcraft.wakame.item.binary.BaseNekoStack
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
@@ -11,9 +11,9 @@ internal value class ItemStatisticsAccessorImpl(
     private val base: BaseNekoStack,
 ) : ItemStatisticsAccessor {
     override val rootOrNull: CompoundShadowTag?
-        get() = base.tags.getCompoundOrNull(NekoTags.Stats.ROOT)
+        get() = base.tags.getCompoundOrNull(StatisticsBinaryKeys.BASE)
     override val rootOrCreate: CompoundShadowTag
-        get() = base.tags.getOrPut(NekoTags.Stats.ROOT, CompoundShadowTag::create)
+        get() = base.tags.getOrPut(StatisticsBinaryKeys.BASE, CompoundShadowTag::create)
 
     override val ENTITY_KILLS: EntityKillsStatistics
         get() = EntityKillsStatistics(this)

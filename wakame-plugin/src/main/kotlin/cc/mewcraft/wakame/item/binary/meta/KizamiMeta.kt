@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
@@ -16,9 +16,9 @@ value class BKizamiMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Set<Kizami>> {
     override val key: Key
-        get() = ItemMetaKeys.KIZAMI
+        get() = ItemMetaConstants.createKey { KIZAMI }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaKeys.KIZAMI.value(), ShadowTagType.BYTE_ARRAY) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.KIZAMI, ShadowTagType.BYTE_ARRAY) ?: false
 
     override fun getOrNull(): Set<Kizami>? {
         return accessor.rootOrNull

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.item.ReforgeBinaryKeys
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 object ReforgeDataFactory {
@@ -21,8 +21,8 @@ object ReforgeDataFactory {
         }
 
         return ImmutableReforgeData(
-            successCount = compound.getInt(NekoTags.Reforge.SUCCESS),
-            failureCount = compound.getInt(NekoTags.Reforge.FAILURE)
+            successCount = compound.getInt(ReforgeBinaryKeys.SUCCESS_COUNT),
+            failureCount = compound.getInt(ReforgeBinaryKeys.FAILURE_COUNT),
         )
     }
 }

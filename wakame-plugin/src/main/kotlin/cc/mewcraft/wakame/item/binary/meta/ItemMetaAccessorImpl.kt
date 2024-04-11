@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.item.binary.BaseNekoStack
 import cc.mewcraft.wakame.registry.ItemMetaRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
@@ -15,9 +15,9 @@ internal value class ItemMetaAccessorImpl(
     val base: BaseNekoStack,
 ) : KoinComponent, ItemMetaAccessor {
     override val rootOrNull: CompoundShadowTag?
-        get() = base.tags.getCompoundOrNull(NekoNamespaces.ITEM_META)
+        get() = base.tags.getCompoundOrNull(Namespaces.ITEM_META)
     override val rootOrCreate: CompoundShadowTag
-        get() = base.tags.getOrPut(NekoNamespaces.ITEM_META, CompoundShadowTag::create)
+        get() = base.tags.getOrPut(Namespaces.ITEM_META, CompoundShadowTag::create)
 
     override val snapshot: Set<BinaryItemMeta<*>>
         get() {

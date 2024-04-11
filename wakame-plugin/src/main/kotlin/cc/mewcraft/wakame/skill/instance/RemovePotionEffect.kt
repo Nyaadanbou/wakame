@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.skill.instance
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillSerializer
 import cc.mewcraft.wakame.skill.Target
@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffectType
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.lang.reflect.Type
-import java.util.*
+import java.util.UUID
 
 class RemovePotionEffect(
     override val uniqueId: UUID,
@@ -21,7 +21,7 @@ class RemovePotionEffect(
     override val conditions: List<SkillCondition<*>>,
     private val effectType: List<PotionEffectType>
 ) : Skill {
-    override val key: Key = Key(NekoNamespaces.SKILL, "remove_potion_effect")
+    override val key: Key = Key(Namespaces.SKILL, "remove_potion_effect")
     override fun castAt(target: Target.LivingEntity) {
         effectType.forEach { target.bukkitEntity.removePotionEffect(it) }
     }

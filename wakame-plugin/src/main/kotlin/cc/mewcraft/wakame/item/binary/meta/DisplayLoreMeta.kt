@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.util.getListOrNull
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.ListShadowTag
@@ -15,9 +15,9 @@ value class BDisplayLoreMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<List<String>> {
     override val key: Key
-        get() = ItemMetaKeys.DISPLAY_LORE
+        get() = ItemMetaConstants.createKey { DISPLAY_LORE }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaKeys.DISPLAY_LORE.value(), ShadowTagType.LIST) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.DISPLAY_LORE, ShadowTagType.LIST) ?: false
 
     override fun getOrNull(): List<String>? {
         return accessor.rootOrNull

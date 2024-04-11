@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 
 interface AttributeProvider : ItemBehavior {
     companion object Factory : ItemBehaviorFactory<AttributeProvider> {
-        override fun create(item: NekoItem, behaviorConfig: ConfigProvider): AttributeProvider {
+        override fun create(item: NekoItem, config: ConfigProvider): AttributeProvider {
             return Default()
         }
     }

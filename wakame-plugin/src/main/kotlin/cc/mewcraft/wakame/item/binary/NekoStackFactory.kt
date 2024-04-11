@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
-import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.item.BaseBinaryKeys
 import cc.mewcraft.wakame.util.isNmsObjectBacked
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.Material
@@ -144,6 +144,6 @@ object ShowNekoStackFactory {
     }
 
     private fun CompoundShadowTag.writeSNSMark() {
-        putByte(NekoTags.Root.SHOW, 0) // 写入 SNS mark，告知发包系统不要修改此物品
+        putByte(BaseBinaryKeys.SHOW, 0) // 写入 SNS mark，告知发包系统不要修改此物品
     }
 }

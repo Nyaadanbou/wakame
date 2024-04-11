@@ -1,13 +1,11 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.NekoTags
 import cc.mewcraft.wakame.item.ShadowTagLike
 
 /**
  * Metadata of reforging.
  *
  * @see ReforgeDataFactory
- * @see NekoTags.Reforge
  */
 interface ReforgeData : ShadowTagLike {
     /**

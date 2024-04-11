@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.schema.cell.core
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -28,11 +28,11 @@ object SchemaCoreFactory {
         val key = node.node("key").krequire<Key>()
         val ret: SchemaCore
         when (key.namespace()) {
-            NekoNamespaces.SKILL -> {
+            Namespaces.SKILL -> {
                 ret = SchemaSkillCore(key)
             }
 
-            NekoNamespaces.ATTRIBUTE -> {
+            Namespaces.ATTRIBUTE -> {
                 val schemaEncoder = AttributeRegistry.FACADES[key].SCHEMA_CORE_NODE_ENCODER
                 val schemaAttributeCore = schemaEncoder.encode(node)
                 ret = schemaAttributeCore

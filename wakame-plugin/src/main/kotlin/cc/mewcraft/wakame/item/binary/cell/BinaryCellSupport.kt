@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.item.CellBinaryKeys
+import cc.mewcraft.wakame.item.CoreBinaryKeys
+import cc.mewcraft.wakame.item.CurseBinaryKeys
+import cc.mewcraft.wakame.item.ReforgeBinaryKeys
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.item.binary.cell.core.isNotEmpty
 import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
@@ -19,13 +22,13 @@ data class ImmutableBinaryCell(
 ) : BinaryCell {
 
     override fun asShadowTag(): ShadowTag = CompoundShadowTag {
-        putBoolean(NekoTags.Cell.CAN_REFORGE, isReforgeable)
-        putBoolean(NekoTags.Cell.CAN_OVERRIDE, isOverridable)
+        putBoolean(CellBinaryKeys.REFORGEABLE, isReforgeable)
+        putBoolean(CellBinaryKeys.OVERRIDABLE, isOverridable)
 
         // If those instances are empty, we simply don't write them into the NBT
-        putIfTrue(NekoTags.Cell.CORE, core.asShadowTag()) { core.isNotEmpty }
-        putIfTrue(NekoTags.Cell.CURSE, curse.asShadowTag()) { curse.isNotEmpty }
-        putIfTrue(NekoTags.Cell.REFORGE, reforgeData.asShadowTag()) { reforgeData.isNotEmpty }
+        putIfTrue(CoreBinaryKeys.BASE, core.asShadowTag()) { core.isNotEmpty }
+        putIfTrue(CurseBinaryKeys.BASE, curse.asShadowTag()) { curse.isNotEmpty }
+        putIfTrue(ReforgeBinaryKeys.BASE, reforgeData.asShadowTag()) { reforgeData.isNotEmpty }
     }
 
     private fun CompoundShadowTag.putIfTrue(key: String, value: ShadowTag, predicate: () -> Boolean) {

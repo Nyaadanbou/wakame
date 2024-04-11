@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Food
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
@@ -24,9 +24,9 @@ value class BFoodMeta(
     }
 
     override val key: Key
-        get() = ItemMetaKeys.FOOD
+        get() = ItemMetaConstants.createKey { FOOD }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaKeys.FOOD.value(), ShadowTagType.COMPOUND) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.FOOD, ShadowTagType.COMPOUND) ?: false
 
     /**
      * Gets the value of `nutrition`.

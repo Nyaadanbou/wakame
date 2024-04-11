@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.getByteOrNull
@@ -15,9 +15,9 @@ value class BRarityMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Rarity> {
     override val key: Key
-        get() = ItemMetaKeys.RARITY
+        get() = ItemMetaConstants.createKey { RARITY }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaKeys.RARITY.value(), ShadowTagType.BYTE) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.RARITY, ShadowTagType.BYTE) ?: false
 
     override fun getOrNull(): Rarity? {
         return accessor.rootOrNull

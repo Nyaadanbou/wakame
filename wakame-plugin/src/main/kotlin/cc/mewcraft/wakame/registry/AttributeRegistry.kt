@@ -1,11 +1,7 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ElementAttribute
+import cc.mewcraft.wakame.Namespaces
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeCoreNbtEncoder
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeCoreNodeEncoder
@@ -58,7 +54,7 @@ object AttributeRegistry : Initializable {
      * @param type 词条在 NBT 中的数据类型。
      */
     private fun buildFacade(key: String, type: ShadowTagType): FormatSelection {
-        return FormatSelectionImpl(Key(NekoNamespaces.ATTRIBUTE, key), type)
+        return FormatSelectionImpl(Key(Namespaces.ATTRIBUTE, key), type)
     }
 
     private fun registerFacades() {
@@ -299,7 +295,7 @@ private class SingleSelectionImpl(
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
             val operation = compound.getOperation()
-            val value = compound.getNumber(NekoTags.Attribute.VAL)
+            val value = compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE)
             BinaryAttributeCore.S(facadeKey, tagType, operation, value)
         },
     )
@@ -348,8 +344,8 @@ private class RangedSelectionImpl(
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            val lower = compound.getNumber(NekoTags.Attribute.MIN)
-            val upper = compound.getNumber(NekoTags.Attribute.MAX)
+            val lower = compound.getNumber(AttributeBinaryKeys.RANGED_MIN_VALUE)
+            val upper = compound.getNumber(AttributeBinaryKeys.RANGED_MAX_VALUE)
             val operation = compound.getOperation()
             BinaryAttributeCore.R(facadeKey, tagType, operation, lower, upper)
         },
@@ -394,7 +390,7 @@ private class SingleElementAttributeBinderImpl(
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            val value = compound.getNumber(NekoTags.Attribute.VAL)
+            val value = compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE)
             val element = compound.getElement()
             val operation = compound.getOperation()
             BinaryAttributeCore.SE(facadeKey, tagType, operation, value, element)
@@ -444,8 +440,8 @@ private class RangedElementAttributeBinderImpl(
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            val lower = compound.getNumber(NekoTags.Attribute.MIN)
-            val upper = compound.getNumber(NekoTags.Attribute.MAX)
+            val lower = compound.getNumber(AttributeBinaryKeys.RANGED_MIN_VALUE)
+            val upper = compound.getNumber(AttributeBinaryKeys.RANGED_MAX_VALUE)
             val element = compound.getElement()
             val operation = compound.getOperation()
             BinaryAttributeCore.RE(facadeKey, tagType, operation, lower, upper, element)
@@ -456,11 +452,11 @@ private class RangedElementAttributeBinderImpl(
 /* Specialized Compound Operations */
 
 private fun CompoundShadowTag.getElement(): Element {
-    return this.getByteOrNull(NekoTags.Attribute.ELEMENT)?.let { ElementRegistry.getBy(it) } ?: ElementRegistry.DEFAULT
+    return this.getByteOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { ElementRegistry.getBy(it) } ?: ElementRegistry.DEFAULT
 }
 
 private fun CompoundShadowTag.getOperation(): AttributeModifier.Operation {
-    return AttributeModifier.Operation.byId(this.getInt(NekoTags.Attribute.OPERATION))
+    return AttributeModifier.Operation.byId(this.getInt(AttributeBinaryKeys.OPERATION_TYPE))
 }
 
 private fun CompoundShadowTag.getNumber(key: String): Double {

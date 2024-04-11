@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.util.Key
@@ -40,7 +40,7 @@ internal object AttributeFormatSerializer : DisplaySerializer<AttributeStylizer.
         return AttributeStylizerImpl.AttributeFormatImpl(
             values = node.childrenMap().mapKeys { (key, _) -> key.toString() }
                 .filter { (key, _) -> key != Attributes.ATTACK_SPEED_LEVEL.key.value() }
-                .mapKeys { (key, _) -> Key(NekoNamespaces.ATTRIBUTE, key) }
+                .mapKeys { (key, _) -> Key(Namespaces.ATTRIBUTE, key) }
                 .mapValues { (_, value) -> value.krequire<String>() }
                 .withDefault { value -> "${value.asString()} (missing config)" }
         )

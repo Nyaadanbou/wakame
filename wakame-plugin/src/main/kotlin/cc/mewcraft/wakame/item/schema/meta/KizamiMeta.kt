@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.item.schema.meta
 
+import cc.mewcraft.wakame.annotation.ConfigPath
 import cc.mewcraft.wakame.condition.Condition
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
 import cc.mewcraft.wakame.kizami.Kizami
@@ -20,8 +21,9 @@ typealias KizamiGroup = Group<Kizami, SchemaGenerationContext>
 /**
  * 物品的铭刻标识。
  */
+@ConfigPath(ItemMetaConstants.KIZAMI)
 sealed interface SKizamiMeta : SchemaItemMeta<Set<Kizami>> {
-    override val key: Key get() = ItemMetaKeys.KIZAMI
+    override val key: Key get() = ItemMetaConstants.createKey { KIZAMI }
 }
 
 private class NonNullKizamiMeta(

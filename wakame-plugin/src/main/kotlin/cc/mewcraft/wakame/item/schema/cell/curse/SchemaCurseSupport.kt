@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.schema.cell.curse
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.CurseKeys
+import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurseFactory
 import cc.mewcraft.wakame.item.binary.cell.curse.EntityKillsCurse
@@ -19,8 +19,7 @@ import net.kyori.adventure.key.Key
  */
 data object EmptySchemaCurse : SchemaCurse {
     override fun generate(context: SchemaGenerationContext): BinaryCurse = BinaryCurseFactory.empty()
-
-    override val key: Key = Key(NekoNamespaces.CURSE, "empty")
+    override val key: Key = Key(Namespaces.CURSE, "empty")
 }
 
 /**
@@ -38,7 +37,7 @@ data class EntityKillsCurse(
         return EntityKillsCurse(index, randomCount)
     }
 
-    override val key: Key = CurseKeys.ENTITY_KILLS
+    override val key: Key = CurseConstants.createKey { ENTITY_KILLS }
 }
 
 /**
@@ -56,5 +55,5 @@ data class PeakDamageCurse(
         return PeakDamageCurse(element, randomAmount)
     }
 
-    override val key: Key = CurseKeys.PEAK_DAMAGE
+    override val key: Key = CurseConstants.createKey { PEAK_DAMAGE }
 }

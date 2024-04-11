@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.annotation.ConfigPath
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -10,8 +11,9 @@ import java.lang.reflect.Type
 /**
  * 物品的名字。
  */
+@ConfigPath(ItemMetaConstants.DISPLAY_NAME)
 sealed interface SDisplayNameMeta : SchemaItemMeta<String> {
-    override val key: Key get() = ItemMetaKeys.DISPLAY_NAME
+    override val key: Key get() = ItemMetaConstants.createKey { DISPLAY_NAME }
 }
 
 private class NonNullDisplayNameMeta(

@@ -46,5 +46,12 @@ interface ItemBehavior : ItemBehaviorHolder {
 }
 
 interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
-    fun create(item: NekoItem, behaviorConfig: ConfigProvider): T
+    /**
+     * Creates a [ItemBehavior] with given [item] and [config].
+     *
+     * @param item the neko item
+     * @param config the behavior config
+     * @return an instance of [T]
+     */
+    fun create(item: NekoItem, config: ConfigProvider): T
 }

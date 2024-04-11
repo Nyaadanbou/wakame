@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
-import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.item.BaseBinaryKeys
 import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
 import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessorImpl
@@ -50,19 +50,19 @@ internal interface BaseNekoStack : NekoStack {
         get() = !isShow // an NS is either PNS or SNS
 
     override val isShow: Boolean
-        get() = tags.contains(NekoTags.Root.SHOW, ShadowTagType.BYTE)
+        get() = tags.contains(BaseBinaryKeys.SHOW, ShadowTagType.BYTE)
 
     override val schema: NekoItem
         get() = NekoItemRegistry.INSTANCES[key]
 
     override val seed: Long
-        get() = tags.getLong(NekoTags.Root.SEED)
+        get() = tags.getLong(BaseBinaryKeys.SEED)
 
     override val key: Key
-        get() = Key(tags.getString(NekoTags.Root.KEY)) // TODO 分离 namespace 和 value
+        get() = Key(tags.getString(BaseBinaryKeys.KEY)) // TODO 分离 namespace 和 value
 
     override val variant: Int
-        get() = tags.getInt(NekoTags.Root.SID)
+        get() = tags.getInt(BaseBinaryKeys.VARIANT)
 
     override val uuid: UUID
         get() = NekoItemRegistry.INSTANCES[key].uuid
@@ -90,15 +90,15 @@ internal interface BaseNekoStack : NekoStack {
     }
 
     override fun putSeed(seed: Long) {
-        tags.putLong(NekoTags.Root.SEED, seed)
+        tags.putLong(BaseBinaryKeys.SEED, seed)
     }
 
     override fun putKey(key: Key) {
-        tags.putString(NekoTags.Root.KEY, key.asString())
+        tags.putString(BaseBinaryKeys.KEY, key.asString())
     }
 
     override fun putVariant(sid: Int) {
-        tags.putInt(NekoTags.Root.SID, sid)
+        tags.putInt(BaseBinaryKeys.VARIANT, sid)
     }
     //</editor-fold>
 

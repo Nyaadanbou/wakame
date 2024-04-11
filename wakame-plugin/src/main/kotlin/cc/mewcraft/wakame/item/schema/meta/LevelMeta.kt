@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.schema.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.annotation.ConfigPath
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.util.EnumLookup
 import net.kyori.adventure.key.Key
@@ -12,8 +13,9 @@ import java.lang.reflect.Type
 /**
  * 物品的等级。
  */
+@ConfigPath(ItemMetaConstants.LEVEL)
 sealed interface SLevelMeta : SchemaItemMeta<Int> {
-    override val key: Key get() = ItemMetaKeys.LEVEL
+    override val key: Key get() = ItemMetaConstants.createKey { LEVEL }
 
     enum class Option {
         CONTEXT

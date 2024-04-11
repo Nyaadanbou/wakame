@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.binary.cell.curse
 
-import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.CurseKeys
+import cc.mewcraft.wakame.item.CurseBinaryKeys
+import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.reference.EntityReference
 import cc.mewcraft.wakame.util.CompoundShadowTag
@@ -17,7 +17,7 @@ import net.kyori.adventure.key.Key
  * Represents an empty binary curse.
  */
 data object EmptyBinaryCurse : BinaryCurse {
-    override val key: Key = Key(NekoNamespaces.CURSE, "empty")
+    override val key: Key = Key(Namespaces.CURSE, "empty")
     override fun test(context: NekoStack): Boolean = true
     override fun asShadowTag(): ShadowTag = CompoundShadowTag.create()
 }
@@ -38,7 +38,7 @@ data class EntityKillsCurse(
         const val COUNT_TAG_NAME = "count"
     }
 
-    override val key: Key = CurseKeys.ENTITY_KILLS
+    override val key: Key = CurseConstants.createKey { ENTITY_KILLS }
 
     /**
      * Returns `true` if the number of entities killed by the item is greater
@@ -54,7 +54,7 @@ data class EntityKillsCurse(
 
     override fun asShadowTag(): ShadowTag {
         return CompoundShadowTag {
-            putString(NekoTags.Cell.CURSE_KEY, key.asString())
+            putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
             putString(INDEX_TAG_NAME, index.name)
             putShort(COUNT_TAG_NAME, count.toStableShort())
         }
@@ -74,10 +74,10 @@ data class PeakDamageCurse(
 
     companion object Constants {
         const val AMOUNT_TAG_NAME = "amount"
-        const val ELEMENT_TAG_NAME = "elem"
+        const val ELEMENT_TAG_NAME = "element"
     }
 
-    override val key: Key = CurseKeys.PEAK_DAMAGE
+    override val key: Key = CurseConstants.createKey { PEAK_DAMAGE }
 
     /**
      * Returns `true` if the highest damage from [element] dealt by the item is
@@ -88,7 +88,7 @@ data class PeakDamageCurse(
 
     override fun asShadowTag(): ShadowTag {
         return CompoundShadowTag {
-            putString(NekoTags.Cell.CURSE_KEY, key.asString())
+            putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
             putShort(AMOUNT_TAG_NAME, amount.toStableShort())
             putByte(ELEMENT_TAG_NAME, element.binaryId)
         }

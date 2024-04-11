@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.schema.behavior
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
@@ -23,7 +23,7 @@ import kotlin.reflect.KClass
  */
 interface Castable : ItemBehavior {
     companion object Factory : ItemBehaviorFactory<Castable> {
-        override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Castable {
+        override fun create(item: NekoItem, config: ConfigProvider): Castable {
             return Default()
         }
     }
@@ -36,7 +36,7 @@ interface Castable : ItemBehavior {
                 return
             val nekoStack = PlayNekoStackFactory.require(itemStack)
 //            nekoStack.getMetaAccessor<Skill>()
-            val skill = SkillRegistry.INSTANCE[Key(NekoNamespaces.SKILL, "buff_potion_remove")]
+            val skill = SkillRegistry.INSTANCE[Key(Namespaces.SKILL, "buff_potion_remove")]
             val event = PlayerSkillPrepareCastEvent(
                 skill,
                 CasterAdapter.adapt(player),

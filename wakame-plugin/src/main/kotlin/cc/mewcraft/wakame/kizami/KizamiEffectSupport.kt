@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
@@ -64,11 +64,11 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             val key = childNode.node("key").krequire<Key>()
             val namespace = key.namespace()
             when (namespace) {
-                NekoNamespaces.SKILL -> {
+                Namespaces.SKILL -> {
                     collection += KizamiSkill(NoopSkill)
                 }
 
-                NekoNamespaces.ATTRIBUTE -> {
+                Namespaces.ATTRIBUTE -> {
                     val attributeFacade = AttributeRegistry.FACADES[key]
                     val attributeCore = attributeFacade.BINARY_CORE_NODE_ENCODER.encode(childNode)
                     val attributeModifiers = attributeCore.makeAttributeModifiers(uuid)

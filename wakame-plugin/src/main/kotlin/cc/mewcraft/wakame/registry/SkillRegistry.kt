@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
@@ -25,7 +25,7 @@ object SkillRegistry : Initializable, KoinComponent {
     /**
      * The key of the empty skill.
      */
-    val EMPTY_KEY: Key = Key(NekoNamespaces.SKILL, "empty")
+    val EMPTY_KEY: Key = Key(Namespaces.SKILL, "empty")
 
     val INSTANCE: Registry<Key, Skill> = SimpleRegistry()
 
@@ -55,7 +55,7 @@ object SkillRegistry : Initializable, KoinComponent {
                 .forEach { skillFile ->
                     val namespace = namespaceDir.name
                     val value = skillFile.nameWithoutExtension
-                    val skillKey = Key(NekoNamespaces.SKILL, "${namespace}_$value")
+                    val skillKey = Key(Namespaces.SKILL, "${namespace}_$value")
 
                     val text = skillFile.bufferedReader().use { it.readText() }
                     val node = loaderBuilder.buildAndLoadString(text)

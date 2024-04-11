@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.item.ReforgeBinaryKeys
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.toStableByte
 import me.lucko.helper.shadows.nbt.ShadowTag
@@ -23,8 +23,8 @@ data class ImmutableReforgeData(
 ) : ReforgeData {
     override fun asShadowTag(): ShadowTag {
         return CompoundShadowTag {
-            putByte(NekoTags.Reforge.SUCCESS, successCount.toStableByte())
-            putByte(NekoTags.Reforge.FAILURE, failureCount.toStableByte())
+            putByte(ReforgeBinaryKeys.SUCCESS_COUNT, successCount.toStableByte())
+            putByte(ReforgeBinaryKeys.FAILURE_COUNT, failureCount.toStableByte())
         }
     }
 }

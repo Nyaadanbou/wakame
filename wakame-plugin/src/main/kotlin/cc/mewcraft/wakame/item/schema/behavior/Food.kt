@@ -28,8 +28,8 @@ interface Food : ItemBehavior {
     val skills: List<Skill>
 
     companion object Factory : ItemBehaviorFactory<Food> {
-        override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Food {
-            val abilities = behaviorConfig.optionalEntry<List<Skill>>("skills").orElse(emptyList())
+        override fun create(item: NekoItem, config: ConfigProvider): Food {
+            val abilities = config.optionalEntry<List<Skill>>("skills").orElse(emptyList())
             return Default(abilities)
         }
     }

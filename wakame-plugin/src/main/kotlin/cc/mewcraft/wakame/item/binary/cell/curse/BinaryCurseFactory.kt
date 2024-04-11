@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.curse
 
-import cc.mewcraft.wakame.NekoTags
-import cc.mewcraft.wakame.item.CurseKeys
+import cc.mewcraft.wakame.item.CurseBinaryKeys
+import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.binary.cell.curse.EntityKillsCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.PeakDamageCurse
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
@@ -30,15 +30,15 @@ object BinaryCurseFactory {
             return empty()
         }
 
-        val id = compound.getString(NekoTags.Cell.CURSE_KEY)
+        val id = compound.getString(CurseBinaryKeys.CURSE_IDENTIFIER)
         val ret: BinaryCurse = when (id) {
-            CurseKeys.ENTITY_KILLS.value() -> {
+            CurseConstants.ENTITY_KILLS -> {
                 val index = EntityReferenceRegistry.INSTANCES[compound.getString(EntityKillsCurse.INDEX_TAG_NAME)]
                 val count = compound.getInt(EntityKillsCurse.COUNT_TAG_NAME)
                 BEntityKillsCurse(index, count)
             }
 
-            CurseKeys.PEAK_DAMAGE.value() -> {
+            CurseConstants.PEAK_DAMAGE -> {
                 val element = ElementRegistry.getBy(compound.getByte(PeakDamageCurse.ELEMENT_TAG_NAME))
                 val amount = compound.getInt(PeakDamageCurse.AMOUNT_TAG_NAME)
                 BPeakDamageCurse(element, amount)

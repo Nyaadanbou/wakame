@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import net.kyori.adventure.key.Key
 import java.util.UUID
 
@@ -12,9 +12,9 @@ value class BSkinOwnerMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<UUID> {
     override val key: Key
-        get() = ItemMetaKeys.SKIN_OWNER
+        get() = ItemMetaConstants.createKey { SKIN_OWNER }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaKeys.SKIN_OWNER.value()) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.SKIN_OWNER) ?: false
 
     override fun getOrNull(): UUID? {
         val rootOrNull = accessor.rootOrNull

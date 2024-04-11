@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.item.CellBinaryKeys
+import cc.mewcraft.wakame.item.CoreBinaryKeys
+import cc.mewcraft.wakame.item.CurseBinaryKeys
+import cc.mewcraft.wakame.item.ReforgeBinaryKeys
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCoreFactory
 import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurseFactory
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
@@ -42,11 +45,11 @@ object BinaryCellFactory {
     fun decode(id: String, compound: CompoundShadowTag): BinaryCell {
         return ImmutableBinaryCell(
             id = id,
-            isReforgeable = compound.getBoolean(NekoTags.Cell.CAN_REFORGE),
-            isOverridable = compound.getBoolean(NekoTags.Cell.CAN_OVERRIDE),
-            core = BinaryCoreFactory.decode(compound.getCompound(NekoTags.Cell.CORE)),
-            curse = BinaryCurseFactory.decode(compound.getCompound(NekoTags.Cell.CURSE)),
-            reforgeData = ReforgeDataFactory.decode(compound.getCompound(NekoTags.Cell.REFORGE))
+            isReforgeable = compound.getBoolean(CellBinaryKeys.REFORGEABLE),
+            isOverridable = compound.getBoolean(CellBinaryKeys.OVERRIDABLE),
+            core = BinaryCoreFactory.decode(compound.getCompound(CoreBinaryKeys.BASE)),
+            curse = BinaryCurseFactory.decode(compound.getCompound(CurseBinaryKeys.BASE)),
+            reforgeData = ReforgeDataFactory.decode(compound.getCompound(ReforgeBinaryKeys.BASE))
         )
     }
 

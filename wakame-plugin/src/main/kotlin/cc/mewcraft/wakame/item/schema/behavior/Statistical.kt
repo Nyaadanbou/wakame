@@ -20,7 +20,7 @@ interface Statistical : ItemBehavior {
         get() = emptyArray()
 
     companion object Factory : ItemBehaviorFactory<Statistical> {
-        override fun create(item: NekoItem, behaviorConfig: ConfigProvider): Statistical {
+        override fun create(item: NekoItem, config: ConfigProvider): Statistical {
             return Default()
         }
     }

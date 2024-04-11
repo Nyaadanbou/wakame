@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
@@ -18,9 +18,9 @@ value class BElementMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Set<Element>> {
     override val key: Key
-        get() = ItemMetaKeys.ELEMENT
+        get() = ItemMetaConstants.createKey { ELEMENT }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaKeys.ELEMENT.value(), ShadowTagType.BYTE_ARRAY) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.ELEMENT, ShadowTagType.BYTE_ARRAY) ?: false
 
     override fun getOrNull(): Set<Element>? {
         return accessor.rootOrNull

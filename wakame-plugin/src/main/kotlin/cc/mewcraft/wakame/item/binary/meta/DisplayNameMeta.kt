@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.item.ItemMetaKeys
+import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.util.getStringOrNull
 import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
@@ -13,9 +13,9 @@ value class BDisplayNameMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<String> {
     override val key: Key
-        get() = ItemMetaKeys.DISPLAY_NAME
+        get() = ItemMetaConstants.createKey { DISPLAY_NAME }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaKeys.DISPLAY_NAME.value(), ShadowTagType.STRING) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.DISPLAY_NAME, ShadowTagType.STRING) ?: false
 
     override fun getOrNull(): String? {
         return accessor.rootOrNull?.getStringOrNull(key.value())

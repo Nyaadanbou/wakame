@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.core
 
-import cc.mewcraft.wakame.NekoNamespaces
-import cc.mewcraft.wakame.NekoTags
+import cc.mewcraft.wakame.Namespaces
+import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaAttributeCore
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
@@ -36,14 +36,14 @@ object BinaryCoreFactory {
             return empty()
         }
 
-        val key = Key(compound.getString(NekoTags.Cell.CORE_KEY))
+        val key = Key(compound.getString(CoreBinaryKeys.CORE_IDENTIFIER))
         val ret: BinaryCore
         when (key.namespace()) {
-            NekoNamespaces.SKILL -> {
+            Namespaces.SKILL -> {
                 ret = BinarySkillCore(key)
             }
 
-            NekoNamespaces.ATTRIBUTE -> {
+            Namespaces.ATTRIBUTE -> {
                 val encoder = AttributeRegistry.FACADES[key].BINARY_CORE_NBT_ENCODER
                 val attributeCore = encoder.encode(compound)
                 ret = attributeCore

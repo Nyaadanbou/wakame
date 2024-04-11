@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.NekoNamespaces
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
@@ -41,7 +41,7 @@ open class Attribute @InternalApi constructor(
      */
     val vanilla: Boolean = false,
 ) : Keyed, Examinable {
-    override val key: Key = Key(NekoNamespaces.ATTRIBUTE, descriptionId)
+    override val key: Key = Key(Namespaces.ATTRIBUTE, descriptionId)
 
     /**
      * 清理给定的数值，使其落在该属性的合理数值范围内。
