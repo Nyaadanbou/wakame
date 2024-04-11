@@ -1,41 +1,40 @@
 package cc.mewcraft.wakame.skill.condition
 
 import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
 import cc.mewcraft.wakame.item.getBehaviorOrNull
 import cc.mewcraft.wakame.item.schema.behavior.Damageable
 import cc.mewcraft.wakame.item.schema.behavior.decreaseDurabilityNaturally
-import cc.mewcraft.wakame.skill.SkillContext
-import org.bukkit.inventory.ItemStack
-
-data class DurabilityContext(
-    val itemStack: ItemStack,
-) : SkillContext
 
 /**
  * 技能释放需要物品耐久度。
  */
-interface DurabilityCondition : SkillCondition<DurabilityContext> {
+interface DurabilityCondition : SkillCondition {
     val requireDurability: Int
 
-    companion object Factory : SkillConditionFactory<DurabilityContext, DurabilityCondition> {
+    companion object Factory : SkillConditionFactory<DurabilityCondition> {
         override fun provide(config: ConfigProvider): DurabilityCondition {
+            val priority = config.optionalEntry<SkillCondition.Priority>("priority").orElse(SkillCondition.Priority.NORMAL)
             val requireDurability = config.entry<Int>("require_durability")
-            return Default(requireDurability)
+            return Default(priority, requireDurability)
         }
     }
 
-    private class Default(
+    class Default(
+        priority: Provider<SkillCondition.Priority>,
         requireDurability: Provider<Int>,
     ) : DurabilityCondition {
+        override val priority: SkillCondition.Priority by priority
         override val requireDurability: Int by requireDurability
 
-        override fun test(context: DurabilityContext): Boolean {
-            val (itemStack) = context
+        override fun test(context: SkillCastContext): Boolean {
+            val itemStack = context.itemStack
             val nekoStack = PlayNekoStackFactory.maybe(itemStack)
             val damageable = nekoStack?.getBehaviorOrNull<Damageable>()
             if (damageable == null) {
@@ -50,8 +49,8 @@ interface DurabilityCondition : SkillCondition<DurabilityContext> {
             }
         }
 
-        override fun cost(context: DurabilityContext) {
-            val (itemStack) = context
+        override fun cost(context: SkillCastContext) {
+            val itemStack = context.itemStack
             val nekoStack = PlayNekoStackFactory.maybe(itemStack)
             val damageable = nekoStack?.getBehaviorOrNull<Damageable>()
             if (damageable == null) {
@@ -59,6 +58,11 @@ interface DurabilityCondition : SkillCondition<DurabilityContext> {
             } else {
                 nekoStack.decreaseDurabilityNaturally(requireDurability)
             }
+        }
+
+        override fun notifyFailure(context: SkillCastContext) {
+            // TODO 通知玩家物品耐久度不足
+            context.player.sendMessage("物品耐久度不足")
         }
     }
 }

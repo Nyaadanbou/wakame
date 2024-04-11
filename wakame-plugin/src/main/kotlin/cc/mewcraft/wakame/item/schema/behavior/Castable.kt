@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.CasterAdapter
 import cc.mewcraft.wakame.skill.TargetAdapter
+import cc.mewcraft.wakame.skill.condition.SkillCastContextImpl
 import cc.mewcraft.wakame.util.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -43,13 +44,18 @@ interface Castable : ItemBehavior {
                 itemStack
             )
             event.callEvent()
-            val result = event.result
+            val conditionGroup = skill.conditions
+            val skillCastContext = SkillCastContextImpl(
+                CasterAdapter.adapt(player),
+                player,
+                itemStack
+            )
 
-            if (result.test()) {
-                result.cost()
+            if (conditionGroup.test(skillCastContext)) {
+                conditionGroup.cost(skillCastContext)
                 skill.castAt(TargetAdapter.adapt(player))
             } else {
-                result.notifyFailure(player)
+                conditionGroup.notifyFailure(skillCastContext)
             }
         }
     }

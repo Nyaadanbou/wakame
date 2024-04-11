@@ -28,7 +28,7 @@ object SkillRegistry : Initializable, KoinComponent {
 
     val INSTANCE: Registry<Key, Skill> = SimpleRegistry()
     val SKILL_TYPES: Registry<String, SkillFactory<*>> = SimpleRegistry()
-    val CONDITIONS: Registry<String, SkillConditionFactory<*, *>> = SimpleRegistry()
+    val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
 
     private fun loadCondition(){
         CONDITIONS += "durability" to DurabilityCondition

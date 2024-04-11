@@ -1,32 +1,28 @@
 package cc.mewcraft.wakame.skill.type
 
 import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.Target
-import cc.mewcraft.wakame.skill.condition.SkillCondition
+import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
+import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import net.kyori.adventure.key.Key
 import org.bukkit.potion.PotionEffectType
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import java.util.*
 
 class RemovePotionEffect(
     override val key: Key,
     uniqueId: Provider<UUID>,
     trigger: Provider<Skill.Trigger>,
-    conditionContexts: Provider<List<SkillCondition<*>>>,
+    conditions: Provider<SkillConditionGroup>,
     effectType: Provider<List<PotionEffectType>>
 ) : Skill {
     override val uniqueId: UUID by uniqueId
     override val trigger: Skill.Trigger by trigger
-    override val conditions: List<SkillCondition<*>> by conditionContexts
+    override val conditions: SkillConditionGroup by conditions
     private val effectType: List<PotionEffectType> by effectType
 
     companion object Factory : SkillFactory<RemovePotionEffect> {
@@ -34,17 +30,9 @@ class RemovePotionEffect(
             val uuid = config.entry<UUID>("uuid")
             val trigger = config.optionalEntry<Skill.Trigger>("trigger").orElse(Skill.Trigger.NONE)
             val effectTypes = config.optionalEntry<List<PotionEffectType>>("effect_types").orElse(emptyList())
+            val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
 
-            val conditionsClasses = config.entry<List<ConfigurationNode>>("conditions")
-                .map { nodes ->
-                    nodes.mapNotNull nodes@{ node ->
-                        val type = node.node("type").get<String>() ?: return@nodes null
-                        val provider = SkillRegistry.CONDITIONS[type]
-                        provider.provide(NodeConfigProvider(node, config.relPath))
-                    }
-                }
-
-            return RemovePotionEffect(key, uuid, trigger, conditionsClasses, effectTypes)
+            return RemovePotionEffect(key, uuid, trigger, conditions, effectTypes)
         }
     }
 

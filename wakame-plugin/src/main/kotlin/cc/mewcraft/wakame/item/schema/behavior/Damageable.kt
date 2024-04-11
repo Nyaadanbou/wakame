@@ -5,7 +5,6 @@ import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
@@ -14,13 +13,7 @@ import cc.mewcraft.wakame.item.getBehaviorOrNull
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
-import cc.mewcraft.wakame.skill.Caster
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.condition.Condition
-import cc.mewcraft.wakame.skill.condition.DurabilityCondition
-import cc.mewcraft.wakame.skill.condition.DurabilityContext
 import cc.mewcraft.wakame.util.Key
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -77,20 +70,6 @@ interface Damageable : ItemBehavior {
 //            event.isCancelled = true
 //            nekoStack.decreaseDurabilityNaturally(damage)
 //        }
-
-        override fun handleSkillPrepareCast(caster: Caster.Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
-            val context = DurabilityContext(itemStack)
-            event.result.builder()
-                .typedConditions<DurabilityCondition> { test(context) }
-                .next()
-                .withFailureNotification { it.sendMessage("物品耐久不足，无法释放技能".mini) }
-                .withPriority(Condition.Priority.HIGH)
-                .addConditionSideEffect<DurabilityCondition> {
-                    caster.bukkitPlayer.sendMessage("物品耐久消耗 1 点")
-                    it.cost(context)
-                }
-                .build()
-        }
     }
 
 }
