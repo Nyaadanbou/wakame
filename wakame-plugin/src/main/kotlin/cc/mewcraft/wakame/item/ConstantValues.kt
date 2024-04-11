@@ -80,7 +80,7 @@ object StatisticsConstants {
     const val REFORGE = "reforge"
 
     inline fun createKey(block: StatisticsConstants.() -> String): Key {
-        return Key(Namespaces.CURSE, block(this))
+        return Key(Namespaces.STATISTICS, block(this))
     }
 }
 
