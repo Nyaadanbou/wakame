@@ -3,8 +3,11 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.condition.DurabilityCondition
+import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
+import cc.mewcraft.wakame.skill.type.RemovePotionEffect
+import cc.mewcraft.wakame.skill.type.SkillFactory
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -15,10 +18,7 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
-@PreWorldDependency(
-    runBefore = [SkillTypeRegistry::class, SkillConditionRegistry::class]
-)
-object SkillInstanceRegistry : Initializable, KoinComponent {
+object SkillRegistry : Initializable, KoinComponent {
     private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
 
     /**
@@ -27,6 +27,16 @@ object SkillInstanceRegistry : Initializable, KoinComponent {
     val EMPTY_KEY: Key = Key(Namespaces.SKILL, "empty")
 
     val INSTANCE: Registry<Key, Skill> = SimpleRegistry()
+    val SKILL_TYPES: Registry<String, SkillFactory<*>> = SimpleRegistry()
+    val CONDITIONS: Registry<String, SkillConditionFactory<*, *>> = SimpleRegistry()
+
+    private fun loadCondition(){
+        CONDITIONS += "durability" to DurabilityCondition
+    }
+
+    private fun loadType() {
+        SKILL_TYPES += "remove_potion_effect" to RemovePotionEffect
+    }
 
     private fun loadConfiguration() {
         INSTANCE.clear()
@@ -67,6 +77,8 @@ object SkillInstanceRegistry : Initializable, KoinComponent {
     }
 
     override fun onPreWorld() {
+        loadType()
+        loadCondition()
         loadConfiguration()
     }
 

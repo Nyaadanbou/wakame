@@ -2,8 +2,7 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.config.NodeConfigProvider
-import cc.mewcraft.wakame.registry.SkillInstanceRegistry
-import cc.mewcraft.wakame.registry.SkillTypeRegistry
+import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -49,7 +48,7 @@ object NoopSkill : Skill {
     override val uniqueId: UUID = UUID.fromString("1826a767-d424-4024-8b8f-4e66157e35de")
     override val trigger: Skill.Trigger = Skill.Trigger.NONE
     override val conditions: List<SkillCondition<*>> = emptyList()
-    override val key: Key = SkillInstanceRegistry.EMPTY_KEY
+    override val key: Key = SkillRegistry.EMPTY_KEY
 }
 
 /**
@@ -73,5 +72,5 @@ interface PassiveSkill : Skill
  */
 fun Skill(node: ConfigurationNode, key: Key, relPath: String): Skill {
     val type = node.node("type").krequire<String>()
-    return SkillTypeRegistry.INSTANCE[type].create(NodeConfigProvider(node, relPath), key)
+    return SkillRegistry.SKILL_TYPES[type].create(NodeConfigProvider(node, relPath), key)
 }

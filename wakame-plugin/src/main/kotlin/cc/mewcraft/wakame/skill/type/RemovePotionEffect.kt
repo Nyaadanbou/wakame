@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.registry.SkillConditionRegistry
+import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.SkillCondition
@@ -39,7 +39,7 @@ class RemovePotionEffect(
                 .map { nodes ->
                     nodes.mapNotNull nodes@{ node ->
                         val type = node.node("type").get<String>() ?: return@nodes null
-                        val provider = SkillConditionRegistry.INSTANCE[type]
+                        val provider = SkillRegistry.CONDITIONS[type]
                         provider.provide(NodeConfigProvider(node, config.relPath))
                     }
                 }
