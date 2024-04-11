@@ -64,6 +64,7 @@ interface Damageable : ItemBehavior {
         override val disappearWhenBroken: Boolean by disappearWhenBroken
 
         override fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
+            // TODO: Test
             val nekoStack = PlayNekoStackFactory.require(itemStack)
             nekoStack.decreaseDurabilityNaturally(100)
         }
@@ -85,7 +86,10 @@ interface Damageable : ItemBehavior {
                 .next()
                 .withFailureNotification { it.sendMessage("物品耐久不足，无法释放技能".mini) }
                 .withPriority(Condition.Priority.HIGH)
-                .addConditionSideEffect { DurabilityCondition.cost(context) }
+                .addConditionSideEffect {
+                    caster.bukkitPlayer.sendMessage("物品耐久消耗 1 点")
+                    DurabilityCondition.cost(context)
+                }
                 .build()
         }
     }

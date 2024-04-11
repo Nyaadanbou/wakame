@@ -14,7 +14,10 @@ class SkillConditionResult(
     private val conditionPriority: Multimap<Condition.Priority, Condition> = TreeMultimap.create(Comparator.reverseOrder(), Comparator.naturalOrder())
     private val conditionSideEffects: MutableSet<ConditionSideEffect> = linkedSetOf()
 
-    private val testFailedList: MutableList<Condition> = mutableListOf()
+    private val testFailedList: MutableSet<Condition> = hashSetOf()
+
+    val isTestPassed: Boolean
+        get() = testFailedList.isEmpty()
 
     fun test(): Boolean {
         conditions.forEach { (condition, _) ->
@@ -23,7 +26,7 @@ class SkillConditionResult(
             }
         }
 
-        return testFailedList.isEmpty()
+        return isTestPassed
     }
 
     fun notifyFailure(audience: Audience, notifyCount: Int = 1) {
@@ -35,8 +38,10 @@ class SkillConditionResult(
         while (iterator.hasNext() && count > 0) {
             val condition = iterator.next()
             if (testFailedList.contains(condition)) {
-                checkNotNull(conditions[condition]) { "Condition $condition is not registered" }
-                    .notify(audience)
+                val notification = checkNotNull(conditions[condition]) { "Condition $condition is not registered" }
+                if (notification == EmptyFailureNotification)
+                    continue
+                notification.notify(audience)
                 count--
             }
         }
@@ -51,11 +56,20 @@ class SkillConditionResult(
         return Builder()
     }
 
+    private fun addCondition(condition: Condition, failureNotification: FailureNotification, priority: Condition.Priority) {
+        conditions[condition] = failureNotification
+        conditionPriority.put(priority, condition)
+    }
+
     inner class Builder {
         private var condition = Condition { true }
 
-        fun requireConditions(vararg requiredCondition: KClass<out SkillCondition<*>>): Builder {
-            return createCondition { requiredCondition.all { clazz -> skillConditions.any { clazz.isInstance(it) } } }
+        fun requireConditions(
+            vararg requiredCondition: KClass<out SkillCondition<*>>
+        ): Builder {
+            val condition = Condition { requiredCondition.all { clazz -> skillConditions.any { clazz.isInstance(it) } } }
+            addCondition(condition, EmptyFailureNotification, Condition.Priority.LOW)
+            return this
         }
 
         fun createCondition(condition: Condition): Builder {
@@ -77,8 +91,7 @@ class SkillConditionResult(
 
         init {
             // Set default options
-            conditions[condition] = FailureNotification { }
-            conditionPriority.put(Condition.Priority.NORMAL, condition)
+            addCondition(condition, EmptyFailureNotification, Condition.Priority.NORMAL)
         }
 
         fun withFailureNotification(failureNotification: FailureNotification): ConditionBuilder {
@@ -141,4 +154,8 @@ fun interface ConditionSideEffect {
 
 fun interface FailureNotification {
     fun notify(audience: Audience)
+}
+
+object EmptyFailureNotification : FailureNotification {
+    override fun notify(audience: Audience) = Unit
 }

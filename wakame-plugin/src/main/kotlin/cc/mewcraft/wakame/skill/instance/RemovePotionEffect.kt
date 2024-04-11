@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.NekoNamespaces
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillSerializer
 import cc.mewcraft.wakame.skill.Target
+import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
@@ -32,6 +33,7 @@ internal object RemovePotionEffectSerializer : SkillSerializer<RemovePotionEffec
         val trigger = node.node("trigger").get<Skill.Trigger>() ?: Skill.Trigger.NONE
         val conditions = node.node("conditions").get<List<SkillCondition<*>>>().orEmpty()
         val effectTypes = node.node("effect_types").get<List<PotionEffectType>>().orEmpty()
-        return RemovePotionEffect(uuid, trigger, conditions, effectTypes)
+        // TODO: implement conditions serializer
+        return RemovePotionEffect(uuid, trigger, listOf(DurabilityCondition), effectTypes)
     }
 }
