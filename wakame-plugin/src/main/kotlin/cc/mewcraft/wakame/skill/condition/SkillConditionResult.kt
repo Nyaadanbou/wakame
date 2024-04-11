@@ -8,16 +8,13 @@ import java.util.*
 import kotlin.reflect.KClass
 
 class SkillConditionResult(
-    private val skillConditions: List<SkillCondition<*>>
+    private val skillConditions: Collection<SkillCondition<*>>
 ) {
     private val conditions: MutableMap<Condition, FailureNotification> = HashMap()
+    private val conditionSideEffects: MutableMap<KClass<out SkillCondition<*>>, ConditionSideEffect<*>> = HashMap()
     private val conditionPriority: Multimap<Condition.Priority, Condition> = TreeMultimap.create(Comparator.reverseOrder(), Comparator.naturalOrder())
-    private val conditionSideEffects: MutableSet<ConditionSideEffect> = linkedSetOf()
 
     private val testFailedList: MutableSet<Condition> = hashSetOf()
-
-    val isTestPassed: Boolean
-        get() = testFailedList.isEmpty()
 
     fun test(): Boolean {
         conditions.forEach { (condition, _) ->
@@ -26,7 +23,7 @@ class SkillConditionResult(
             }
         }
 
-        return isTestPassed
+        return testFailedList.isEmpty()
     }
 
     fun notifyFailure(audience: Audience, notifyCount: Int = 1) {
@@ -49,7 +46,10 @@ class SkillConditionResult(
 
     // 执行所有条件所附带的副作用
     fun cost() {
-        conditionSideEffects.forEach { it.apply() }
+        for ((type, sideEffect) in conditionSideEffects) {
+            val condition = skillConditions.firstOrNull { type.isInstance(it) } ?: continue
+            @Suppress("UNCHECKED_CAST") (sideEffect as ConditionSideEffect<SkillCondition<*>>).apply(condition)
+        }
     }
 
     fun builder(): Builder {
@@ -62,14 +62,25 @@ class SkillConditionResult(
     }
 
     inner class Builder {
-        private var condition = Condition { true }
+        private var condition: Condition = Condition.AlwaysTrue
 
-        fun requireConditions(
-            vararg requiredCondition: KClass<out SkillCondition<*>>
+        fun <T : SkillCondition<*>> typedConditions(
+            requiredCondition: KClass<T>,
+            block: T.() -> Boolean
         ): Builder {
-            val condition = Condition { requiredCondition.all { clazz -> skillConditions.any { clazz.isInstance(it) } } }
-            addCondition(condition, EmptyFailureNotification, Condition.Priority.LOW)
+            @Suppress("UNCHECKED_CAST") val skillCondition = skillConditions.firstOrNull { requiredCondition.isInstance(it) } as T?
+            if (skillCondition == null) {
+                addCondition(Condition.AlwaysFalse, EmptyFailureNotification, Condition.Priority.HIGH)
+                return this
+            } else {
+                addCondition(Condition.AlwaysTrue, EmptyFailureNotification, Condition.Priority.LOW)
+            }
+            this.condition += Condition { skillCondition.block() }
             return this
+        }
+
+        inline fun <reified T : SkillCondition<*>> typedConditions(noinline block: T.() -> Boolean): Builder {
+            return typedConditions(T::class, block)
         }
 
         fun createCondition(condition: Condition): Builder {
@@ -86,8 +97,8 @@ class SkillConditionResult(
         private val condition: Condition
     ) {
         private val conditions: MutableMap<Condition, FailureNotification> = hashMapOf()
+        private val conditionSideEffects: MutableMap<KClass<out SkillCondition<*>>, ConditionSideEffect<*>> = hashMapOf()
         private val conditionPriority: Multimap<Condition.Priority, Condition> = HashMultimap.create()
-        private val conditionSideEffects: MutableSet<ConditionSideEffect> = linkedSetOf()
 
         init {
             // Set default options
@@ -104,9 +115,13 @@ class SkillConditionResult(
             return this
         }
 
-        fun addConditionSideEffect(conditionSideEffect: ConditionSideEffect): ConditionBuilder {
-            conditionSideEffects.add(conditionSideEffect)
+        fun <T : SkillCondition<*>> addConditionSideEffect(clazz: KClass<T>, conditionSideEffect: ConditionSideEffect<T>): ConditionBuilder {
+            conditionSideEffects[clazz] = conditionSideEffect
             return this
+        }
+
+        inline fun <reified T : SkillCondition<*>> addConditionSideEffect(conditionSideEffect: ConditionSideEffect<T>): ConditionBuilder {
+            return addConditionSideEffect(T::class, conditionSideEffect)
         }
 
         fun build() {
@@ -129,6 +144,14 @@ fun interface Condition : Comparable<Condition> {
         return this.hashCode().compareTo(other.hashCode())
     }
 
+    object AlwaysTrue : Condition {
+        override fun check(): Boolean = true
+    }
+
+    object AlwaysFalse : Condition {
+        override fun check(): Boolean = false
+    }
+
     enum class Priority : Comparable<Priority> {
         LOW, NORMAL, HIGH;
     }
@@ -148,8 +171,8 @@ operator fun Condition.plus(other: Condition): Condition {
     return this.merge(other)
 }
 
-fun interface ConditionSideEffect {
-    fun apply()
+fun interface ConditionSideEffect<T : SkillCondition<*>> {
+    fun apply(condition: T)
 }
 
 fun interface FailureNotification {

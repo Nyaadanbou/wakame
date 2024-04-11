@@ -7,3 +7,7 @@ type: remove_potion_effect
 effect_types:
   - speed
   - jump_boost
+
+conditions:
+  - type: durability
+    require_durability: 10

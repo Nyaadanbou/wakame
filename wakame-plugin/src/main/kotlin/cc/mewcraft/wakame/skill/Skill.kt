@@ -1,12 +1,14 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.config.NodeConfigProvider
+import cc.mewcraft.wakame.registry.SkillInstanceRegistry
+import cc.mewcraft.wakame.registry.SkillTypeRegistry
 import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.UUID
+import java.util.*
 
 /**
  * Represents a skill "attached" to a player.
@@ -38,6 +40,8 @@ interface Skill : Keyed {
     fun castAt(target: Target.LivingEntity) {}
 }
 
+interface SkillContext
+
 /**
  * A no-op skill. Used as placeholder object.
  */
@@ -45,7 +49,7 @@ object NoopSkill : Skill {
     override val uniqueId: UUID = UUID.fromString("1826a767-d424-4024-8b8f-4e66157e35de")
     override val trigger: Skill.Trigger = Skill.Trigger.NONE
     override val conditions: List<SkillCondition<*>> = emptyList()
-    override val key: Key = SkillRegistry.EMPTY_KEY
+    override val key: Key = SkillInstanceRegistry.EMPTY_KEY
 }
 
 /**
@@ -67,7 +71,7 @@ interface PassiveSkill : Skill
  * Creates a skill from the given configuration node. The node must contain
  * a key `type` that specifies the type of the skill template to use.
  */
-fun Skill(node: ConfigurationNode): Skill {
+fun Skill(node: ConfigurationNode, key: Key, relPath: String): Skill {
     val type = node.node("type").krequire<String>()
-    return node.krequire(SkillTypes.INSTANCE[type])
+    return SkillTypeRegistry.INSTANCE[type].create(NodeConfigProvider(node, relPath), key)
 }

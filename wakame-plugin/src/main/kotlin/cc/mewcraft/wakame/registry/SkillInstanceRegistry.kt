@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillTypes
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -17,9 +16,9 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
 @PreWorldDependency(
-    runBefore = [SkillTypes::class]
+    runBefore = [SkillTypeRegistry::class, SkillConditionRegistry::class]
 )
-object SkillRegistry : Initializable, KoinComponent {
+object SkillInstanceRegistry : Initializable, KoinComponent {
     private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
 
     /**
@@ -55,11 +54,11 @@ object SkillRegistry : Initializable, KoinComponent {
                 .forEach { skillFile ->
                     val namespace = namespaceDir.name
                     val value = skillFile.nameWithoutExtension
-                    val skillKey = Key(Namespaces.SKILL, "${namespace}_$value")
+                    val skillKey = Key(Namespaces.SKILL, "${namespace}/$value")
 
                     val text = skillFile.bufferedReader().use { it.readText() }
                     val node = loaderBuilder.buildAndLoadString(text)
-                    val skill = Skill(node)
+                    val skill = Skill(node, skillKey, skillFile.path)
 
                     INSTANCE.register(skillKey, skill)
                     logger.info("Loaded skill: {}", skillKey)

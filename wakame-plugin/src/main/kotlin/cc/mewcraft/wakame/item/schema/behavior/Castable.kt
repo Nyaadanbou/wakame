@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
-import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.SkillInstanceRegistry
 import cc.mewcraft.wakame.skill.CasterAdapter
 import cc.mewcraft.wakame.skill.TargetAdapter
 import cc.mewcraft.wakame.util.Key
@@ -36,7 +36,7 @@ interface Castable : ItemBehavior {
                 return
             val nekoStack = PlayNekoStackFactory.require(itemStack)
 //            nekoStack.getMetaAccessor<Skill>()
-            val skill = SkillRegistry.INSTANCE[Key(Namespaces.SKILL, "buff_potion_remove")]
+            val skill = SkillInstanceRegistry.INSTANCE[Key(Namespaces.SKILL, "buff/potion_remove")]
             val event = PlayerSkillPrepareCastEvent(
                 skill,
                 CasterAdapter.adapt(player),

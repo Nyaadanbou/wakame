@@ -12,8 +12,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
-@PreWorldDependency(runBefore = [SkillRegistry::class, AttributeRegistry::class])
-@ReloadDependency(runBefore = [SkillRegistry::class, AttributeRegistry::class])
+@PreWorldDependency(runBefore = [SkillInstanceRegistry::class, AttributeRegistry::class])
+@ReloadDependency(runBefore = [SkillInstanceRegistry::class, AttributeRegistry::class])
 object KizamiRegistry : KoinComponent, Initializable, BiKnot<String, Kizami, Byte> {
     override val INSTANCES: Registry<String, Kizami> = SimpleRegistry()
     override val BI_LOOKUP: BiRegistry<String, Byte> = SimpleBiRegistry()

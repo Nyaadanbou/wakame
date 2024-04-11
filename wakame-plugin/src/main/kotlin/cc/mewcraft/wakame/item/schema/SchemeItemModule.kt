@@ -13,7 +13,6 @@ import cc.mewcraft.wakame.item.schema.meta.*
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
-import cc.mewcraft.wakame.skill.type.RemovePotionEffectSerializer
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
@@ -81,7 +80,6 @@ internal fun schemaItemModule(): Module = module {
 
     single<TypeSerializerCollection>(named(SKILL_SERIALIZERS)) {
         TypeSerializerCollection.builder()
-            .kregister(RemovePotionEffectSerializer)
             .build()
     }
 }

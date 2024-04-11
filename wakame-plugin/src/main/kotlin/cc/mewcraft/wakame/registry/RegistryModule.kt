@@ -69,6 +69,9 @@ internal fun registryModule(): Module = module {
     single { NekoItemRegistry } bind Initializable::class
     single { LevelMappingRegistry } bind Initializable::class
     single { RarityRegistry } bind Initializable::class
+    single { SkillConditionRegistry } bind Initializable::class
+    single { SkillInstanceRegistry } bind Initializable::class
+    single { SkillTypeRegistry } bind Initializable::class
 
     //<editor-fold desc="Definitions of YamlConfigurationLoader">
     single<YamlConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)) {

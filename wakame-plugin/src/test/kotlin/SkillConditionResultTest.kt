@@ -1,7 +1,7 @@
+import cc.mewcraft.wakame.skill.SkillContext
 import cc.mewcraft.wakame.skill.condition.Condition
 import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionResult
-import cc.mewcraft.wakame.skill.condition.SkillContext
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.audience.MessageType
@@ -56,12 +56,11 @@ class SkillConditionResultTest : KoinTest {
         val context = AnySkillContext("a")
 
         result.builder()
-            .requireConditions(AlwaysTrueDummySkillCondition::class)
-            .createCondition { AlwaysTrueDummySkillCondition.test(context) }
+            .typedConditions<AlwaysTrueDummySkillCondition> { test(context) }
             .next()
             .withPriority(Condition.Priority.NORMAL)
             .withFailureNotification { it.sendMessage("AWA".mini) }
-            .addConditionSideEffect { AlwaysTrueDummySkillCondition.cost(context) }
+            .addConditionSideEffect<AlwaysTrueDummySkillCondition> { it.cost(context) }
             .build()
 
         assert(testResult(result))
@@ -78,18 +77,18 @@ class SkillConditionResultTest : KoinTest {
         val context = AnySkillContext("a")
 
         result.builder()
-            .requireConditions(AlwaysTrueDummySkillCondition::class, AlwaysFalseDummySkillCondition::class)
-            .createCondition { AlwaysTrueDummySkillCondition.test(context) }
+            .typedConditions(AlwaysTrueDummySkillCondition::class) { test(context) }
+            .typedConditions(AlwaysFalseDummySkillCondition::class) { test(context) }
             .next()
             .withPriority(Condition.Priority.HIGH)
             .withFailureNotification { it.sendMessage("AWA1".mini) }
-            .addConditionSideEffect { AlwaysTrueDummySkillCondition.cost(context) }
+            .addConditionSideEffect<AlwaysTrueDummySkillCondition> { it.cost(context) }
             .buildAndNext()
             .createCondition { AlwaysFalseDummySkillCondition.test(context) }
             .next()
             .withPriority(Condition.Priority.LOW)
             .withFailureNotification { it.sendMessage("AWA2".mini) }
-            .addConditionSideEffect { AlwaysFalseDummySkillCondition.cost(context) }
+            .addConditionSideEffect(AlwaysFalseDummySkillCondition::class) { it.cost(context) }
             .build()
 
         assert(!testResult(result))

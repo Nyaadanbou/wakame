@@ -79,16 +79,15 @@ interface Damageable : ItemBehavior {
 //        }
 
         override fun handleSkillPrepareCast(caster: Caster.Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
-            val context = DurabilityContext(itemStack, 1)
+            val context = DurabilityContext(itemStack)
             event.result.builder()
-                .requireConditions(DurabilityCondition::class)
-                .createCondition { DurabilityCondition.test(context) }
+                .typedConditions<DurabilityCondition> { test(context) }
                 .next()
                 .withFailureNotification { it.sendMessage("物品耐久不足，无法释放技能".mini) }
                 .withPriority(Condition.Priority.HIGH)
-                .addConditionSideEffect {
+                .addConditionSideEffect<DurabilityCondition> {
                     caster.bukkitPlayer.sendMessage("物品耐久消耗 1 点")
-                    DurabilityCondition.cost(context)
+                    it.cost(context)
                 }
                 .build()
         }

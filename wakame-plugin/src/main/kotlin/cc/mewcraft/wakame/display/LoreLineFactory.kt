@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.SkillInstanceRegistry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
@@ -24,7 +24,7 @@ internal object SkillLineFactory : KoinComponent {
     private val EMPTY_LORE_LINE: SkillLine by lazy(LazyThreadSafetyMode.NONE) {
         val mm = get<MiniMessage>()
         val text = get<RendererConfiguration>().emptySkillText
-        SkillLineImpl(SkillRegistry.EMPTY_KEY, text.map(mm::deserialize))
+        SkillLineImpl(SkillInstanceRegistry.EMPTY_KEY, text.map(mm::deserialize))
     }
 
     fun get(key: FullKey, lines: List<Component>): SkillLine {
