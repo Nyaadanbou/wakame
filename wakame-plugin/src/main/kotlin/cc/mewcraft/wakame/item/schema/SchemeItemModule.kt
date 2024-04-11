@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.item.EffectiveSlotSerializer
+import cc.mewcraft.wakame.item.schema.cell.SchemaCellSerializer
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCoreGroupSerializer
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCorePoolSerializer
 import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCurseGroupSerializer
@@ -40,6 +41,9 @@ internal fun schemaItemModule(): Module = module {
 
     single<TypeSerializerCollection>(named(CELL_SERIALIZERS)) {
         TypeSerializerCollection.builder()
+
+            // cells
+            .kregister(SchemaCellSerializer)
 
             // cores
             .kregister(SchemaCorePoolSerializer)

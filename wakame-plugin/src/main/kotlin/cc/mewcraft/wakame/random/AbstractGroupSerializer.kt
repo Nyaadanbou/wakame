@@ -41,7 +41,7 @@ import java.lang.reflect.Type
  */
 abstract class AbstractGroupSerializer<S, C : SelectionContext> : SchemaSerializer<Group<S, C>> {
     companion object Constants {
-        val SHARED_POOLS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("shared_pools", ConfigurationNode::class.java)
+        val SHARED_POOL_NODE_HINT: RepresentationHint<ConfigurationNode> = RepresentationHint.of("shared_pool_node_hint", ConfigurationNode::class.java)
 
         private const val FILTERS_PATH = "filters"
         private const val SELECTS_PATH = "selects"
@@ -88,14 +88,16 @@ abstract class AbstractGroupSerializer<S, C : SelectionContext> : SchemaSerializ
         }
     }
 
-    private fun GroupBuilder<S, C>.deserializeSelects(groupNode: ConfigurationNode, selectsNode: ConfigurationNode) {
-        selectsNode.childrenMap().mapKeys { it.key.toString() }.forEach { (poolName, localPoolNode) ->
+    private fun GroupBuilder<S, C>.deserializeSelects(groupNode: ConfigurationNode, selectNode: ConfigurationNode) {
+        selectNode.childrenMap().mapKeys { it.key.toString() }.forEach { (poolName, localPoolNode) ->
             val rawScalar = localPoolNode.rawScalar()
             if (rawScalar != null) {
                 // it's a raw string, meaning it's referencing a node in shared pools,
                 // so we need to pass the external node to the factory function
-                val sharedPoolsNode = groupNode.ownHint(SHARED_POOLS) ?: throw SerializationException(selectsNode, javaTypeOf<Group<S, C>>(), "No hint is provided for node '${selectsNode.key()}'")
-                val externalPoolNode = sharedPoolsNode.node(rawScalar)
+                val sharePoolNode = groupNode.hint(SHARED_POOL_NODE_HINT) ?: throw SerializationException(
+                    selectNode, javaTypeOf<Group<S, C>>(), "Can't find hint ${SHARED_POOL_NODE_HINT.identifier()}"
+                )
+                val externalPoolNode = sharePoolNode.node(rawScalar)
                 this.pools[poolName] = poolFactory(externalPoolNode)
             } else {
                 // it's not a raw string - we just pass the local node

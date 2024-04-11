@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorNoop
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
 import kotlin.reflect.typeOf
@@ -20,18 +21,28 @@ internal object ItemMetaRegistry : Initializable {
             val constructors: Map<KClass<out BinaryItemMeta<*>>, (ItemMetaAccessor) -> BinaryItemMeta<*>> = classes.associateWith { clazz ->
                 val primaryConstructor = requireNotNull(clazz.primaryConstructor) { "The class ${clazz.qualifiedName} does not have primary constructor" }
                 val valueParameters = primaryConstructor.valueParameters
+
+                // Validate the primary constructor
                 require(valueParameters.size == 1) { "The primary constructor of class ${clazz.qualifiedName} has more than one parameter" }
-                require(valueParameters.first().type.isSubtypeOf(typeOf<ItemMetaAccessor>())) { "The first parameter of class ${clazz.qualifiedName} is not a subtype of ${ItemMetaAccessor::class.qualifiedName}" }
+                require(valueParameters.first().type.isSubtypeOf(typeOf<ItemMetaAccessor>())) { "The constructor's 1st parameter of the class ${clazz.qualifiedName} is not a subtype of ${ItemMetaAccessor::class.qualifiedName}" }
+
                 @Suppress("UNCHECKED_CAST")
                 primaryConstructor as (ItemMetaAccessor) -> BinaryItemMeta<*>
             }
 
             // Collect all results
-            classes.associateWith { clazz -> BinaryItemMetaReflection(clazz, constructors[clazz]!!) }
+            classes.associateWith { clazz ->
+                @Suppress("UNCHECKED_CAST")
+                BinaryItemMetaReflection(clazz as KClass<BinaryItemMeta<*>>, constructors[clazz]!!)
+            }.let(::Object2ObjectOpenHashMap)
         }
 
         private val itemMetaReflectionLookupByString: Map<String, BinaryItemMetaReflection> =
             itemMetaReflectionLookupByClass.values.associateBy { reflect -> reflect.constructor.invoke(ItemMetaAccessorNoop).key.value() }
+
+        fun reflections(): Collection<BinaryItemMetaReflection> {
+            return itemMetaReflectionLookupByClass.values
+        }
 
         fun reflectionLookup(clazz: KClass<out BinaryItemMeta<*>>): BinaryItemMetaReflection {
             return requireNotNull(itemMetaReflectionLookupByClass[clazz]) { "The class '${clazz.qualifiedName}' is not registered" }
@@ -46,19 +57,22 @@ internal object ItemMetaRegistry : Initializable {
         private val itemMetaReflectionLookupByClass: Map<KClass<out SchemaItemMeta<*>>, SchemaItemMetaReflection> = run {
             // Get all subclasses of SchemaItemMeta
             val classes: Collection<KClass<out SchemaItemMeta<*>>> = SchemaItemMeta::class.sealedSubclasses
-                // We only need direct subclasses of the SchemaItemMeta
+                // We only look for direct subclasses of the SchemaItemMeta
                 .filter { clazz -> clazz.superclasses.first() == SchemaItemMeta::class }
+                // Check whether the subclasses are implemented correctly
+                .onEach { clazz -> clazz.findAnnotation<ConfigPath>() ?: error("The class ${clazz::class.simpleName} does not have ${ConfigPath::class.simpleName} annotation") }
 
             // Get the path of each schema item meta
             val paths: Map<KClass<out SchemaItemMeta<*>>, String> = classes.associateWith { clazz ->
                 // Try to get the `path` value defined in the interface
-                clazz.findAnnotation<ConfigPath>()?.path ?: error("The clazz does not have ConfigurationPath annotation")
+                clazz.findAnnotation<ConfigPath>()!!.path
             }
 
             // Collect all results
             classes.associateWith { clazz ->
-                SchemaItemMetaReflection(clazz, paths[clazz]!!)
-            }
+                @Suppress("UNCHECKED_CAST")
+                SchemaItemMetaReflection(clazz as KClass<SchemaItemMeta<*>>, paths[clazz]!!)
+            }.let(::Object2ObjectOpenHashMap)
         }
 
         fun reflections(): Collection<SchemaItemMetaReflection> {
@@ -78,7 +92,7 @@ internal object ItemMetaRegistry : Initializable {
  * @property constructor the constructor function of target [BinaryItemMeta]
  */
 internal data class BinaryItemMetaReflection(
-    val clazz: KClass<out BinaryItemMeta<*>>,
+    val clazz: KClass<BinaryItemMeta<*>>,
     val constructor: (ItemMetaAccessor) -> BinaryItemMeta<*>,
 )
 
@@ -86,10 +100,10 @@ internal data class BinaryItemMetaReflection(
  * A class which stores reflection data about target [SchemaItemMeta].
  *
  * @property clazz the class of target [SchemaItemMeta]
- * @property path
+ * @property path the path to the configuration node
  */
 internal data class SchemaItemMetaReflection(
-    val clazz: KClass<out SchemaItemMeta<*>>,
+    val clazz: KClass<SchemaItemMeta<*>>,
     val path: String,
 )
 
