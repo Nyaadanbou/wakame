@@ -59,7 +59,13 @@ internal interface BaseNekoStack : NekoStack {
         get() = tags.getLong(BaseBinaryKeys.SEED)
 
     override val key: Key
-        get() = Key(tags.getString(BaseBinaryKeys.KEY)) // TODO 分离 namespace 和 value
+        get() = Key(namespace, path)
+
+    override val namespace: String
+        get() = tags.getString(BaseBinaryKeys.NAMESPACE)
+
+    override val path: String
+        get() = tags.getString(BaseBinaryKeys.PATH)
 
     override val variant: Int
         get() = tags.getInt(BaseBinaryKeys.VARIANT)
@@ -94,7 +100,16 @@ internal interface BaseNekoStack : NekoStack {
     }
 
     override fun putKey(key: Key) {
-        tags.putString(BaseBinaryKeys.KEY, key.asString())
+        putNamespace(key.namespace())
+        putPath(key.value())
+    }
+
+    override fun putNamespace(namespace: String) {
+        tags.putString(BaseBinaryKeys.NAMESPACE, namespace)
+    }
+
+    override fun putPath(path: String) {
+        tags.putString(BaseBinaryKeys.PATH, path)
     }
 
     override fun putVariant(sid: Int) {

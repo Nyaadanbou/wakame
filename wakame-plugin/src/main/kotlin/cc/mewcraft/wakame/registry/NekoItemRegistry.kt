@@ -59,6 +59,24 @@ object NekoItemRegistry : KoinComponent, Initializable {
      */
     fun Registry<Key, NekoItem>.find(key: String): NekoItem? = this.find(Key(key))
 
+    /**
+     * Gets specific [NekoItem] from the registry.
+     *
+     * @param namespace the namespace
+     * @param path the path
+     * @return the specific [NekoItem]
+     */
+    fun Registry<Key, NekoItem>.get(namespace: String, path: String): NekoItem = this[Key(namespace, path)]
+
+    /**
+     * Gets specific [NekoItem] from the registry if there is one.
+     *
+     * @param namespace the namespace
+     * @param path the path
+     * @return the specific [NekoItem] or `null` if not found
+     */
+    fun Registry<Key, NekoItem>.find(namespace: String, path: String): NekoItem? = this.find(Key(namespace, path))
+
     override fun onPreWorld() = loadConfiguration()
     override fun onReload() = loadConfiguration()
 

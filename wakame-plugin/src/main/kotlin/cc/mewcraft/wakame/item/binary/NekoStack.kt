@@ -20,7 +20,8 @@ import java.util.UUID
  * - checking whether the item is of a neko item or not
  * - looking up the unique identifier of the neko item (if it is)
  *
- * To get an instance of [NekoStack], use [NekoStackFactory].
+ * To get an instance of [NekoStack], use [PlayNekoStackFactory] or
+ * [ShowNekoStackFactory].
  */
 sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
     /**
@@ -117,6 +118,20 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val key: Key
+
+    /**
+     * The namespace of this item.
+     *
+     * @throws NullPointerException if this is not a [NekoItem] realization
+     */
+    val namespace: String
+
+    /**
+     * The path of this item.
+     *
+     * @throws NullPointerException if this is not a [NekoItem] realization
+     */
+    val path: String
 
     /**
      * The variant of this item.

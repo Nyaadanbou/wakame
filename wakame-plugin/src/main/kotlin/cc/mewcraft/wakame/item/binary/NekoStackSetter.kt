@@ -8,29 +8,42 @@ import net.kyori.adventure.key.Key
  */
 interface NekoStackSetter {
     /**
-     * Erases all the custom tags from `this`.
+     * Removes all the custom tags from the item.
      *
-     * **Only to be used in certain special cases**.
+     * **Only to be used in certain special cases!**
      */
     fun erase()
 
     /**
-     * Sets tags, overwriting any that are in `this`.
+     * Sets the tags, overwriting any that are in the item.
      */
     fun putRoot(compoundTag: CompoundShadowTag)
 
     /**
-     * Sets seed.
+     * Sets the seed.
      */
     fun putSeed(seed: Long)
 
     /**
-     * Sets key.
+     * Sets the key.
+     *
+     * It's equivalent to call both [putNamespace] and [putPath] at
+     * the same time under the hood.
      */
     fun putKey(key: Key)
 
     /**
-     * Sets variant.
+     * Sets the namespace.
+     */
+    fun putNamespace(namespace: String)
+
+    /**
+     * Sets the path.
+     */
+    fun putPath(path: String)
+
+    /**
+     * Sets the variant.
      */
     fun putVariant(sid: Int)
 }
