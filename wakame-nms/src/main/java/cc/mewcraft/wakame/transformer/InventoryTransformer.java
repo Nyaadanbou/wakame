@@ -9,7 +9,6 @@ import net.minecraft.world.inventory.ContainerListener;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class InventoryTransformer {
     private static final ClassLoader BUKKIT_CLASS_LOADER = Bukkit.class.getClassLoader();
@@ -27,20 +26,16 @@ public class InventoryTransformer {
         public static void onExit(
                 @Advice.This ServerPlayer serverPlayer,
                 @Advice.FieldValue(value = "dd" /* containerListener */, readOnly = false) ContainerListener originalListener
-        ) {
-            try {
-                ClassLoader pluginClassLoader = Bukkit.getPluginManager().getPlugin("Wakame").getClass().getClassLoader();
-                Class<?> inventoryListenerProxyClass = Class.forName(
-                        "cc.mewcraft.wakame.transformer.InventoryListenerProxy",
-                        false,
-                        pluginClassLoader
-                );
-                Constructor<?> constructor = inventoryListenerProxyClass.getConstructor(ServerPlayer.class, ContainerListener.class);
-                //noinspection UnusedAssignment
-                originalListener = (ContainerListener) constructor.newInstance(serverPlayer, originalListener);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+        ) throws Exception {
+            ClassLoader pluginClassLoader = Bukkit.getPluginManager().getPlugin("Wakame").getClass().getClassLoader();
+            Class<?> inventoryListenerProxyClass = Class.forName(
+                    "cc.mewcraft.wakame.transformer.InventoryListenerProxy",
+                    false,
+                    pluginClassLoader
+            );
+            Constructor<?> constructor = inventoryListenerProxyClass.getConstructor(ServerPlayer.class, ContainerListener.class);
+            //noinspection UnusedAssignment
+            originalListener = (ContainerListener) constructor.newInstance(serverPlayer, originalListener);
         }
     }
 }
