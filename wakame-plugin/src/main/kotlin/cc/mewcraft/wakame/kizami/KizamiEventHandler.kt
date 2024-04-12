@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
+import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BKizamiMeta
 import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
@@ -63,7 +64,7 @@ class KizamiEventHandler {
         player: Player,
         oldItem: ItemStack?,
         newItem: ItemStack?,
-        predicate: PlayNekoStack.() -> Boolean,
+        predicate: PlayNekoStackPredicate,
     ) {
         val oldNekoStack = oldItem?.playNekoStackOrNull
         val newNekoStack = newItem?.playNekoStackOrNull
@@ -94,7 +95,7 @@ class KizamiEventHandler {
         // The algorithm is simple:
         // subtract kizami amount, based on the old item,
         // then add kizami amount, based on the new item.
-        oldNekoStack?.subtractKizamiAmount(user, predicate) // TODO directly handle PlayNekoStack
+        oldNekoStack?.subtractKizamiAmount(user, predicate)
         newNekoStack?.addKizamiAmount(user, predicate)
 
         val mutableAmountMap = kizamiMap.mutableAmountMap
@@ -122,7 +123,7 @@ class KizamiEventHandler {
      * @param user the user we remove kizami from
      * @param predicate
      */
-    private inline fun PlayNekoStack.addKizamiAmount(user: User<Player>, predicate: PlayNekoStack.() -> Boolean) {
+    private inline fun PlayNekoStack.addKizamiAmount(user: User<Player>, predicate: PlayNekoStackPredicate) {
         val kizamiSet = this.getKizamiSet(predicate)
         val kizamiMap = user.kizamiMap
         kizamiMap.addOneEach(kizamiSet)
@@ -135,7 +136,7 @@ class KizamiEventHandler {
      * @param user the user we remove kizami from
      * @param predicate
      */
-    private inline fun PlayNekoStack.subtractKizamiAmount(user: User<Player>, predicate: PlayNekoStack.() -> Boolean) {
+    private inline fun PlayNekoStack.subtractKizamiAmount(user: User<Player>, predicate: PlayNekoStackPredicate) {
         val kizamiSet = this.getKizamiSet(predicate)
         val kizamiMap = user.kizamiMap
         kizamiMap.subtractOneEach(kizamiSet)
@@ -148,7 +149,7 @@ class KizamiEventHandler {
      * @param predicate
      * @return all kizami on the ItemStack
      */
-    private inline fun PlayNekoStack.getKizamiSet(predicate: PlayNekoStack.() -> Boolean): Set<Kizami> {
+    private inline fun PlayNekoStack.getKizamiSet(predicate: PlayNekoStackPredicate): Set<Kizami> {
         if (!this.predicate()) {
             return emptySet()
         }

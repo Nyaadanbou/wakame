@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
+import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
 import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.AttributeProvider
@@ -70,11 +71,11 @@ class AttributeEventHandler : KoinComponent {
      * @param newItem the new item to check with, or `null` if it's empty
      * @param predicate a function to test whether the item can provide attribute modifiers
      */
-    private fun updateAttributeModifiers(
+    private inline fun updateAttributeModifiers(
         player: Player,
         oldItem: ItemStack?,
         newItem: ItemStack?,
-        predicate: PlayNekoStack.() -> Boolean, // TODO create an functional interface for this function type
+        predicate: PlayNekoStackPredicate,
     ) {
         oldItem?.playNekoStackOrNull?.removeAttributeModifiers(player, predicate)
         newItem?.playNekoStackOrNull?.addAttributeModifiers(player, predicate)
@@ -87,7 +88,7 @@ class AttributeEventHandler : KoinComponent {
      * @param predicate
      * @receiver the ItemStack which may provide attribute modifiers
      */
-    private inline fun PlayNekoStack.addAttributeModifiers(player: Player, predicate: PlayNekoStack.() -> Boolean) {
+    private inline fun PlayNekoStack.addAttributeModifiers(player: Player, predicate: PlayNekoStackPredicate) {
         if (!this.predicate()) {
             return
         }
@@ -104,7 +105,7 @@ class AttributeEventHandler : KoinComponent {
      * @param predicate
      * @receiver the ItemStack which may provide attribute modifiers
      */
-    private inline fun PlayNekoStack.removeAttributeModifiers(player: Player, predicate: PlayNekoStack.() -> Boolean) {
+    private inline fun PlayNekoStack.removeAttributeModifiers(player: Player, predicate: PlayNekoStackPredicate) {
         // To remove an attribute modifier, we only need to know the UUID of it
         // and by design, the UUID of an attribute modifier is the UUID of the item
         // that provides the attribute modifier. Thus, we only need to get the UUID

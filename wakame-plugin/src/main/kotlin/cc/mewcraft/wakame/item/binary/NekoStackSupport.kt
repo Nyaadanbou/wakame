@@ -23,6 +23,19 @@ import java.util.UUID
 import kotlin.reflect.KClass
 
 /**
+ * This type alias is used to verify whether a PlayNekoStack should be considered
+ * "effective" for the player. By "effective", we mean, for example, whether the item
+ * is in an effective slot and whether the item has certain behavior enabled in the
+ * config.
+ */
+typealias PlayNekoStackPredicate = PlayNekoStack.() -> Boolean
+
+/**
+ * The same as [PlayNekoStackPredicate] but for [ShowNekoStack].
+ */
+typealias ShowNekoStackPredicate = ShowNekoStack.() -> Boolean
+
+/**
  * Common code shared by [PlayNekoStack] and [ShowNekoStack].
  *
  * This could be used if it does not require the specific code of
