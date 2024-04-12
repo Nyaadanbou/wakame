@@ -93,6 +93,7 @@ object ItemMetaConstants {
     const val DURABILITY = "durability"
     const val ELEMENT = "element"
     const val FOOD = "food"
+    const val TOOL = "tool"
     const val KIZAMI = "kizami"
     const val LEVEL = "level"
     const val RARITY = "rarity"

@@ -16,7 +16,7 @@ value class BFoodMeta(
 ) : BinaryItemMeta<Food> {
     companion object {
         private const val NUTRITION_TAG = "nutrition"
-        private const val SATURATION_MODIFIER_TAG = "saturation_modifier"
+        private const val SATURATION_TAG = "saturation"
         private const val IS_MEAT_TAG = "is_meat"
         private const val CAN_ALWAYS_EAT_TAG = "can_always_eat"
         private const val EAT_SECONDS_TAG = "eat_seconds"
@@ -48,22 +48,22 @@ value class BFoodMeta(
     }
 
     /**
-     * Gets the value of `saturation modifier`.
+     * Gets the value of `saturation`.
      */
-    fun saturationModifier(): Float {
-        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getFloat(SATURATION_MODIFIER_TAG) ?: 0F
+    fun saturation(): Float {
+        return accessor.rootOrNull?.getCompoundOrNull(key.value())?.getFloat(SATURATION_TAG) ?: 0F
     }
 
     /**
-     * Sets the value of `saturation modifier`.
+     * Sets the value of `saturation`.
      *
      * @throws IllegalStateException
      */
-    fun saturationModifier(value: Float) {
+    fun saturation(value: Float) {
         val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
         if (compound != null) {
-            compound.putFloat(SATURATION_MODIFIER_TAG, value)
-        } else throw IllegalStateException("Can't set 'saturationModifier' for empty food")
+            compound.putFloat(SATURATION_TAG, value)
+        } else throw IllegalStateException("Can't set 'saturation' for empty food")
     }
 
     /**
@@ -147,12 +147,12 @@ value class BFoodMeta(
         // TODO 等待组件相关API的到来
         return accessor.rootOrNull?.getCompoundOrNull(key.value())?.let { compound ->
             val nutrition = compound.getInt(NUTRITION_TAG)
-            val saturationModifier = compound.getFloat(SATURATION_MODIFIER_TAG)
+            val saturation = compound.getFloat(SATURATION_TAG)
             val isMeat = compound.getBoolean(IS_MEAT_TAG)
             val canAlwaysEat = compound.getBoolean(CAN_ALWAYS_EAT_TAG)
             val eatSeconds = compound.getFloat(EAT_SECONDS_TAG)
             val effects: Map<PotionEffect, Float> = emptyMap()
-            Food(nutrition, saturationModifier, isMeat, canAlwaysEat, eatSeconds, effects)
+            Food(nutrition, saturation, isMeat, canAlwaysEat, eatSeconds, effects)
         }
     }
 
@@ -160,7 +160,7 @@ value class BFoodMeta(
         // TODO 等待组件相关API的到来
         accessor.rootOrCreate.put(key.value(), CompoundShadowTag {
             putInt(NUTRITION_TAG, value.nutrition.toStableInt())
-            putFloat(SATURATION_MODIFIER_TAG, value.saturationModifier.toStableFloat())
+            putFloat(SATURATION_TAG, value.saturation.toStableFloat())
             putBoolean(IS_MEAT_TAG, value.isMeat)
             putBoolean(CAN_ALWAYS_EAT_TAG, value.canAlwaysEat)
             putFloat(EAT_SECONDS_TAG, value.eatSeconds)
