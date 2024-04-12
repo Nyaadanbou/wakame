@@ -79,6 +79,8 @@ internal fun schemaItemModule(): Module = module {
             .kregister(RarityMetaSerializer)
             .kregister(SkinMetaSerializer)
             .kregister(SkinOwnerMetaSerializer)
+            .kregister(ToolMetaSerializer)
+            .kregister(ToolRuleSerializer)
 
             .build()
     }

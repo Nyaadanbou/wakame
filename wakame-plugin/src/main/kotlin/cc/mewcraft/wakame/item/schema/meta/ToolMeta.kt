@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.item.schema.meta
 
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.annotation.ConfigPath
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -14,17 +16,36 @@ import java.util.stream.Stream
 
 data class Tool(
     val rules: List<ToolRule>,
-    val defaultMiningSpeed: Float = 1F,
-    val damagePerBlock: Int = 1,
+    val defaultMiningSpeed: Float? = null,
+    val damagePerBlock: Int? = null,
 ) : Examinable {
     init {
-        require(defaultMiningSpeed >= 0) { "defaultMiningSpeed >= 0" }
-        require(damagePerBlock >= 0) { "damagePerBlock >= 0" }
+        defaultMiningSpeed?.run { require(this >= 0) { "defaultMiningSpeed >= 0" } }
+        damagePerBlock?.run { require(this >= 0) { "damagePerBlock >= 0" } }
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("defaultMiningSpeed", defaultMiningSpeed),
         ExaminableProperty.of("damagePerBlock", damagePerBlock),
+        ExaminableProperty.of("rules", rules)
+    )
+
+    override fun toString(): String = toSimpleString()
+}
+
+data class ToolRule(
+    val blocks: List<String>,
+    val speed: Float? = null,
+    val correctForDrops: Boolean? = null,
+) : Examinable {
+    init {
+        speed?.run { require(this >= 0F) { "speed >= 0" } }
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("blocks", blocks),
+        ExaminableProperty.of("speed", speed),
+        ExaminableProperty.of("correctForDrops", correctForDrops),
     )
 
     override fun toString(): String = toSimpleString()
@@ -37,15 +58,15 @@ sealed interface SToolMeta : SchemaItemMeta<Tool> {
 
 private class NonNullToolMeta(
     private val rules: List<ToolRule>,
-    private val defaultMiningSpeed: Float = 1F,
-    private val damagePerBlock: Int = 1,
+    private val defaultMiningSpeed: Float? = null,
+    private val damagePerBlock: Int? = null,
 ) : SToolMeta {
-    override val isEmpty: Boolean = false
-
     init {
-        require(defaultMiningSpeed >= 0) { "defaultMiningSpeed >= 0" }
-        require(damagePerBlock >= 0) { "damagePerBlock >= 0" }
+        defaultMiningSpeed?.run { require(this >= 0) { "defaultMiningSpeed >= 0" } }
+        damagePerBlock?.run { require(this >= 0) { "damagePerBlock >= 0" } }
     }
+
+    override val isEmpty: Boolean = false
 
     override fun generate(context: SchemaGenerationContext): GenerationResult<Tool> {
         return GenerationResult(Tool(rules, defaultMiningSpeed, damagePerBlock))
@@ -61,14 +82,17 @@ internal data object ToolMetaSerializer : SchemaItemMetaSerializer<SToolMeta> {
     override val defaultValue: SToolMeta = DefaultToolMeta
     override fun deserialize(type: Type, node: ConfigurationNode): SToolMeta {
         val rules = node.node("rules").get<List<ToolRule>>(emptyList())
-        val defaultMiningSpeed = node.node("default_mining_speed").getFloat(1F)
-        val damagePerBlock = node.node("damage_per_block").getInt(1)
+        val defaultMiningSpeed = node.node("default_mining_speed").get<Float>()
+        val damagePerBlock = node.node("damage_per_block").get<Int>()
         return NonNullToolMeta(rules, defaultMiningSpeed, damagePerBlock)
     }
 }
 
-data class ToolRule(
-    val blocks: List<String>,
-    val speed: Float,
-    val correctForDrops: Boolean
-)
+internal data object ToolRuleSerializer : SchemaSerializer<ToolRule> {
+    override fun deserialize(type: Type, node: ConfigurationNode): ToolRule {
+        val blocks = node.node("blocks").krequire<List<String>>()
+        val speed = node.node("speed").get<Float>()
+        val correctForDrops = node.node("correctForDrops").get<Boolean>()
+        return ToolRule(blocks, speed, correctForDrops)
+    }
+}
