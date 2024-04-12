@@ -47,12 +47,15 @@ object NekoItemFactory {
             // Side note 1: always put all schema metadata for a `NekoItem` even if the schema meta contains "nothing".
             // Side note 2: whether the data will be written to the item's NBT is decided by the realization process, not here.
 
-            ItemMetaRegistry.Schema.reflections().forEach { reflect ->
-                val clazz = reflect.clazz.java
-                val path = reflect.path
-                val itemMeta = root.node(path).require(clazz)
-                put(clazz, itemMeta)
-            }
+            ItemMetaRegistry.Schema.reflections()
+                .associate { reflect ->
+                    reflect.clazz to reflect.path
+                }
+                .forEach { (clazz, path) ->
+                    val javaClass = clazz.java
+                    val itemMeta = root.node(path).krequire(clazz)
+                    put(javaClass, itemMeta)
+                }
         }.build()
 
         //

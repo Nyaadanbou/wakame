@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BKizamiMeta
 import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
+import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.KizamiProvider
 import cc.mewcraft.wakame.registry.KizamiRegistry
@@ -27,7 +27,8 @@ class KizamiEventHandler {
      */
     fun handlePlayerItemHeld(player: Player, previousSlot: Int, newSlot: Int, oldItem: ItemStack?, newItem: ItemStack?) {
         updateKizamiEffects(player, oldItem, newItem) {
-            this.effectiveSlot.testItemHeld(player, previousSlot, newSlot) && this.hasBehavior<KizamiProvider>()
+            this.effectiveSlot.testItemHeld(player, previousSlot, newSlot) &&
+            this.hasBehavior<KizamiProvider>()
         }
     }
 
@@ -42,7 +43,8 @@ class KizamiEventHandler {
      */
     fun handlePlayerInventorySlotChange(player: Player, rawSlot: Int, slot: Int, oldItem: ItemStack?, newItem: ItemStack?) {
         updateKizamiEffects(player, oldItem, newItem) {
-            this.effectiveSlot.testInventorySlotChange(player, slot, rawSlot) && this.hasBehavior<KizamiProvider>()
+            this.effectiveSlot.testInventorySlotChange(player, slot, rawSlot) &&
+            this.hasBehavior<KizamiProvider>()
         }
     }
 
@@ -63,10 +65,13 @@ class KizamiEventHandler {
         newItem: ItemStack?,
         predicate: PlayNekoStack.() -> Boolean,
     ) {
+        val oldNekoStack = oldItem?.playNekoStackOrNull
+        val newNekoStack = newItem?.playNekoStackOrNull
+
         // Optimization:
         // if old item and new item are both null,
         // we can fast return.
-        if (oldItem == null && newItem == null) {
+        if (oldNekoStack == null && newNekoStack == null) {
             return
         }
 
@@ -89,8 +94,8 @@ class KizamiEventHandler {
         // The algorithm is simple:
         // subtract kizami amount, based on the old item,
         // then add kizami amount, based on the new item.
-        oldItem?.subtractKizamiAmount(user, predicate)
-        newItem?.addKizamiAmount(user, predicate)
+        oldNekoStack?.subtractKizamiAmount(user, predicate) // TODO directly handle PlayNekoStack
+        newNekoStack?.addKizamiAmount(user, predicate)
 
         val mutableAmountMap = kizamiMap.mutableAmountMap
         val iterator = mutableAmountMap.iterator()
@@ -117,7 +122,7 @@ class KizamiEventHandler {
      * @param user the user we remove kizami from
      * @param predicate
      */
-    private inline fun ItemStack.addKizamiAmount(user: User<Player>, predicate: PlayNekoStack.() -> Boolean) {
+    private inline fun PlayNekoStack.addKizamiAmount(user: User<Player>, predicate: PlayNekoStack.() -> Boolean) {
         val kizamiSet = this.getKizamiSet(predicate)
         val kizamiMap = user.kizamiMap
         kizamiMap.addOneEach(kizamiSet)
@@ -130,7 +135,7 @@ class KizamiEventHandler {
      * @param user the user we remove kizami from
      * @param predicate
      */
-    private inline fun ItemStack.subtractKizamiAmount(user: User<Player>, predicate: PlayNekoStack.() -> Boolean) {
+    private inline fun PlayNekoStack.subtractKizamiAmount(user: User<Player>, predicate: PlayNekoStack.() -> Boolean) {
         val kizamiSet = this.getKizamiSet(predicate)
         val kizamiMap = user.kizamiMap
         kizamiMap.subtractOneEach(kizamiSet)
@@ -143,18 +148,12 @@ class KizamiEventHandler {
      * @param predicate
      * @return all kizami on the ItemStack
      */
-    private inline fun ItemStack.getKizamiSet(predicate: PlayNekoStack.() -> Boolean): Set<Kizami> {
-        if (!this.hasItemMeta()) {
+    private inline fun PlayNekoStack.getKizamiSet(predicate: PlayNekoStack.() -> Boolean): Set<Kizami> {
+        if (!this.predicate()) {
             return emptySet()
         }
 
-        val nekoStack = PlayNekoStackFactory.maybe(this) ?: return emptySet()
-
-        if (!nekoStack.predicate()) {
-            return emptySet()
-        }
-
-        val kizamiSet = nekoStack.getMetaAccessor<BKizamiMeta>().getOrEmpty()
+        val kizamiSet = this.getMetaAccessor<BKizamiMeta>().getOrEmpty()
         return kizamiSet
     }
 }

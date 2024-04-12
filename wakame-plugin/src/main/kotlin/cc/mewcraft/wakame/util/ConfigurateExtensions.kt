@@ -10,6 +10,7 @@ import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
+import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -72,9 +73,20 @@ internal inline fun <reified T> ConfigurationNode.krequire(): T {
 /**
  * @see ConfigurationNode.require
  */
+internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T {
+    val ret = this.get(clazz) ?: throw NoSuchElementException(
+        "Missing value of type '${clazz}' at '${path().joinToString(".")}'"
+    )
+    return ret
+}
+
+/**
+ * @see ConfigurationNode.require
+ */
 internal fun <T> ConfigurationNode.krequire(type: KType): T {
     val ret = this.get(type) ?: throw NoSuchElementException(
         "Missing value of type '${type}' at '${path().joinToString(".")}'"
     )
-    return (@Suppress("UNCHECKED_CAST") (ret as T))
+    @Suppress("UNCHECKED_CAST")
+    return ret as T
 }

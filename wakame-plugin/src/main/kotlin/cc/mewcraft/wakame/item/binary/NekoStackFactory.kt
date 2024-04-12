@@ -7,6 +7,24 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
 
+val ItemStack.playNekoStackOrNull: PlayNekoStack?
+    get() = PlayNekoStackFactory.maybe(this)
+
+val ItemStack.playNekoStack: PlayNekoStack
+    get() = PlayNekoStackFactory.require(this)
+
+val ItemStack.showNekoStackOrNull: ShowNekoStack?
+    get() = ShowNekoStackFactory.maybe(this)
+
+val ItemStack.showNekoStack: ShowNekoStack
+    get() = ShowNekoStackFactory.require(this)
+
+fun ItemStack.convertShow(): ShowNekoStack =
+    ShowNekoStackFactory.convert(this)
+
+fun PlayNekoStack.convertShow(): ShowNekoStack =
+    ShowNekoStackFactory.convert(this)
+
 object PlayNekoStackFactory {
     /**
      * Wraps the [itemStack] as a [PlayNekoStack] object. Then, you can use
@@ -25,6 +43,7 @@ object PlayNekoStackFactory {
      */
     @Contract(pure = true)
     fun maybe(itemStack: ItemStack): PlayNekoStack? {
+        if (!itemStack.hasItemMeta()) return null // Optimization - fast return
         require(itemStack.isNmsObjectBacked) { "The ItemStack is not backed by an NMS object" }
         val playNekoStack = PlayNekoStackImpl(itemStack).takeIf { it.isNeko && it.isPlay }
         return playNekoStack
@@ -47,6 +66,7 @@ object PlayNekoStackFactory {
      */
     @Contract(pure = true)
     fun require(itemStack: ItemStack): PlayNekoStack {
+        require(itemStack.hasItemMeta()) { "The ItemStack has no ItemMeta" } // Optimization - fast fail
         require(itemStack.isNmsObjectBacked) { "The ItemStack is not backed by an NMS object" }
         val playNekoStack = PlayNekoStackImpl(itemStack)
         require(playNekoStack.isNeko) { "The ItemStack is not a NekoItem realization" }
@@ -83,10 +103,10 @@ object ShowNekoStackFactory {
     /**
      * Wraps the [itemStack] as a [ShowNekoStack] object.
      *
-     * This function will return `null` if the [itemStack] is not of a
-     * legal [ShowNekoStack].
+     * This function will return `null` if the [itemStack] is not already
+     * of legal [ShowNekoStack].
      *
-     * The [itemStack] will leave intact.
+     * **The given [itemStack] will leave intact.**
      */
     @Contract(pure = true)
     fun maybe(itemStack: ItemStack): ShowNekoStack? {
@@ -98,10 +118,10 @@ object ShowNekoStackFactory {
     /**
      * Wraps the [itemStack] as a [ShowNekoStack] object.
      *
-     * This function will throw an exception if the [itemStack] is not of a
-     * legal [ShowNekoStack].
+     * This function will throw an exception if the [itemStack] is not already
+     * of legal [ShowNekoStack].
      *
-     * The [itemStack] will leave intact.
+     * **The given [itemStack] will leave intact.**
      *
      * @throws IllegalArgumentException
      */
@@ -117,7 +137,7 @@ object ShowNekoStackFactory {
     /**
      * Converts the [playStack] to a [ShowNekoStack].
      *
-     * The [playStack] will leave intact.
+     * **The given [playStack] will leave intact.**
      */
     @Contract(pure = true) // 标记该函数不会修改传进来的 playStack
     fun convert(playStack: PlayNekoStack): ShowNekoStack {
@@ -130,7 +150,7 @@ object ShowNekoStackFactory {
     /**
      * Converts the [itemStack] to a [ShowNekoStack].
      *
-     * The [itemStack] will leave intact.
+     * **The given [itemStack] will leave intact.**
      *
      * @throws IllegalArgumentException if the [itemStack] is not a NekoItem realization
      */

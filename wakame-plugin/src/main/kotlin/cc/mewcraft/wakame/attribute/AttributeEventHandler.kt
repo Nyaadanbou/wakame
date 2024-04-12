@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
+import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.AttributeProvider
 import cc.mewcraft.wakame.user.toUser
@@ -35,7 +35,8 @@ class AttributeEventHandler : KoinComponent {
         newItem: ItemStack?,
     ) {
         updateAttributeModifiers(player, oldItem, newItem) {
-            this.effectiveSlot.testItemHeld(player, previousSlot, newSlot) && this.hasBehavior<AttributeProvider>()
+            this.effectiveSlot.testItemHeld(player, previousSlot, newSlot) &&
+            this.hasBehavior<AttributeProvider>()
         }
     }
 
@@ -56,7 +57,8 @@ class AttributeEventHandler : KoinComponent {
         newItem: ItemStack?,
     ) {
         updateAttributeModifiers(player, oldItem, newItem) {
-            this.effectiveSlot.testInventorySlotChange(player, slot, rawSlot) && this.hasBehavior<AttributeProvider>()
+            this.effectiveSlot.testInventorySlotChange(player, slot, rawSlot) &&
+            this.hasBehavior<AttributeProvider>()
         }
     }
 
@@ -74,8 +76,8 @@ class AttributeEventHandler : KoinComponent {
         newItem: ItemStack?,
         predicate: PlayNekoStack.() -> Boolean, // TODO create an functional interface for this function type
     ) {
-        oldItem?.removeAttributeModifiers(player, predicate)
-        newItem?.addAttributeModifiers(player, predicate)
+        oldItem?.playNekoStackOrNull?.removeAttributeModifiers(player, predicate)
+        newItem?.playNekoStackOrNull?.addAttributeModifiers(player, predicate)
     }
 
     /**
@@ -85,19 +87,13 @@ class AttributeEventHandler : KoinComponent {
      * @param predicate
      * @receiver the ItemStack which may provide attribute modifiers
      */
-    private inline fun ItemStack.addAttributeModifiers(player: Player, predicate: PlayNekoStack.() -> Boolean) {
-        if (!this.hasItemMeta()) {
-            return
-        }
-
-        val nekoStack = PlayNekoStackFactory.maybe(this) ?: return
-
-        if (!nekoStack.predicate()) {
+    private inline fun PlayNekoStack.addAttributeModifiers(player: Player, predicate: PlayNekoStack.() -> Boolean) {
+        if (!this.predicate()) {
             return
         }
 
         val attributeMap = player.toUser().attributeMap
-        val attributeModifiers = nekoStack.cell.getAttributeModifiers()
+        val attributeModifiers = this.cell.getAttributeModifiers()
         attributeMap.addAttributeModifiers(attributeModifiers)
     }
 
@@ -108,19 +104,17 @@ class AttributeEventHandler : KoinComponent {
      * @param predicate
      * @receiver the ItemStack which may provide attribute modifiers
      */
-    private inline fun ItemStack.removeAttributeModifiers(player: Player, predicate: PlayNekoStack.() -> Boolean) {
+    private inline fun PlayNekoStack.removeAttributeModifiers(player: Player, predicate: PlayNekoStack.() -> Boolean) {
         // To remove an attribute modifier, we only need to know the UUID of it
         // and by design, the UUID of an attribute modifier is the UUID of the item
         // that provides the attribute modifier. Thus, we only need to get the UUID
         // of the item to clear the attribute modifier.
 
-        val nekoStack = PlayNekoStackFactory.maybe(this) ?: return
-
-        if (!nekoStack.predicate()) {
+        if (!this.predicate()) {
             return
         }
 
         val attributeMap = player.toUser().attributeMap
-        attributeMap.clearModifiers(nekoStack.uuid)
+        attributeMap.clearModifiers(this.uuid)
     }
 }
