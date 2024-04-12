@@ -32,7 +32,7 @@ object Attributes {
 
     val MAX_HEALTH = RangedAttribute("max_health", 20.0, true, 1.0, 16384.0)
     val MAX_ABSORPTION = RangedAttribute("max_absorption", .0, true, .0, 2048.0)
-    val MOVEMENT_SPEED = RangedAttribute("movement_speed", .0, true, -1.0, +4.0) // FIXME 应该叫做 MOVEMENT_SPEED 1
+    val MOVEMENT_SPEED = RangedAttribute("movement_speed", .0, true, -1.0, +4.0)
     val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", 4.5, true, 1.0, 64.0)
     val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", 3.0, true, 1.0, 64.0)
 
