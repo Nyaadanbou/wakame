@@ -16,7 +16,7 @@ object DefaultAttributes {
 
             add(Attributes.MAX_HEALTH)
             add(Attributes.MAX_ABSORPTION)
-            add(Attributes.MOVEMENT_SPEED_RATE)
+            add(Attributes.MOVEMENT_SPEED)
             add(Attributes.BLOCK_INTERACTION_RANGE)
             add(Attributes.ENTITY_INTERACTION_RANGE)
 

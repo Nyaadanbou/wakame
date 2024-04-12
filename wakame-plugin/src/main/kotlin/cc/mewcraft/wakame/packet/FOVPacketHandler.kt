@@ -23,7 +23,7 @@ class FOVPacketHandler : PacketListenerAbstract() {
         val nekoUser = bukkitPlayer.toUser()
         if (event.packetType != PacketType.Play.Server.UPDATE_ATTRIBUTES)
             return
-        val currentSpeed = nekoUser.attributeMap.getValue(Attributes.MOVEMENT_SPEED_RATE).toStableFloat()
+        val currentSpeed = nekoUser.attributeMap.getValue(Attributes.MOVEMENT_SPEED).toStableFloat()
 
         val flying = bukkitPlayer.isFlying
         val sprinting = bukkitPlayer.isSprinting

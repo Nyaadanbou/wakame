@@ -83,7 +83,7 @@ object AttributeRegistry : Initializable {
         +buildFacade("max_absorption", ShadowTagType.SHORT).single().bind(Attributes.MAX_ABSORPTION)
         +buildFacade("max_health", ShadowTagType.SHORT).single().bind(Attributes.MAX_HEALTH)
         +buildFacade("max_mana", ShadowTagType.SHORT).single().bind(Attributes.MAX_MANA)
-        +buildFacade("movement_speed_rate", ShadowTagType.DOUBLE).single().bind(Attributes.MOVEMENT_SPEED_RATE)
+        +buildFacade("movement_speed", ShadowTagType.DOUBLE).single().bind(Attributes.MOVEMENT_SPEED)
     }
 
     override fun onPreWorld() {

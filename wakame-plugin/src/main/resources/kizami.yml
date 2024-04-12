@@ -22,19 +22,19 @@ kizami:
     # 铭刻的数值均为固定数值，不能写正态分布
     effects:
       1:
-        - key: attribute:movement_speed_rate
+        - key: attribute:movement_speed
           operation: multiply_base
           value: 0.2
       2:
-        - key: attribute:movement_speed_rate
+        - key: attribute:movement_speed
           operation: multiply_base
           value: 0.4
       3:
-        - key: attribute:movement_speed_rate
+        - key: attribute:movement_speed
           operation: multiply_base
           value: 0.6
       4:
-        - key: attribute:movement_speed_rate
+        - key: attribute:movement_speed
           operation: multiply_base
           value: 0.8
 

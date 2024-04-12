@@ -62,7 +62,7 @@ renderer_layout:
     - attribute:max_absorption
     - attribute:max_health
     - attribute:max_mana
-    - attribute:movement_speed_rate
+    - attribute:movement_speed
     - (fixed:skill)<!i><aqua><b>技能
     - skill:empty # 空的技能（用于标记空技能栏的相对位置）
     - skill:blink
@@ -204,7 +204,7 @@ renderer_style:
       max_absorption: "<!i>最大护盾: <value:+#;-.>"
       max_health: "<!i>最大生命: <value:+#;-.>"
       max_mana: "<!i>最大魔法: <value:+#;-.>"
-      movement_speed_rate: "<!i>移动速率: <value:+#.#%;-.%>"
+      movement_speed: "<!i>移动速率: <value:+#.#%;-.%>"
 
   # 技能词条栏的样式
   skill:

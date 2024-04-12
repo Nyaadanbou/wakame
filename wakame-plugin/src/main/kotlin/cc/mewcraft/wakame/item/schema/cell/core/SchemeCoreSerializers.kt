@@ -32,7 +32,7 @@ internal data object SchemaCoreGroupSerializer : AbstractGroupSerializer<SchemaC
  *   - key: attribute:attack_speed_level
  *     weight: 1
  *     value: 4
- *   - key: attribute:movement_speed_rate
+ *   - key: attribute:movement_speed
  *     weight: 1
  *     value: 0.4
  *   - key: attribute:defense
@@ -52,7 +52,7 @@ internal data object SchemaCoreGroupSerializer : AbstractGroupSerializer<SchemaC
  *     - key: attribute:attack_speed_level
  *       weight: 1
  *       value: 4
- *     - key: attribute:movement_speed_rate
+ *     - key: attribute:movement_speed
  *       weight: 1
  *       value: 0.4
  *     - key: attribute:defense
