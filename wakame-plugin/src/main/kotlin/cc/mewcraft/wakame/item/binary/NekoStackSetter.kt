@@ -20,11 +20,6 @@ interface NekoStackSetter {
     fun putRoot(compoundTag: CompoundShadowTag)
 
     /**
-     * Sets the seed.
-     */
-    fun putSeed(seed: Long)
-
-    /**
      * Sets the key.
      *
      * It's equivalent to call both [putNamespace] and [putPath] at

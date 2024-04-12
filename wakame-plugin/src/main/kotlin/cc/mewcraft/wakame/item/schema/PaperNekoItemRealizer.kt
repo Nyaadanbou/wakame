@@ -54,7 +54,6 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         with(nekoStack) {
             putKey(nekoItem.key)
             putVariant(0)
-            putSeed(context.seed) // TODO 对于没有随机元素的物品（例如材料类物品），不应该写入带有随机元素的数据
         }
 
         //

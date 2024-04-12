@@ -55,9 +55,6 @@ internal interface BaseNekoStack : NekoStack {
     override val schema: NekoItem
         get() = NekoItemRegistry.INSTANCES[key]
 
-    override val seed: Long
-        get() = tags.getLong(BaseBinaryKeys.SEED)
-
     override val key: Key
         get() = Key(namespace, path)
 
@@ -93,10 +90,6 @@ internal interface BaseNekoStack : NekoStack {
 
     override fun putRoot(compoundTag: CompoundShadowTag) {
         itemStack.nekoCompound = compoundTag
-    }
-
-    override fun putSeed(seed: Long) {
-        tags.putLong(BaseBinaryKeys.SEED, seed)
     }
 
     override fun putKey(key: Key) {

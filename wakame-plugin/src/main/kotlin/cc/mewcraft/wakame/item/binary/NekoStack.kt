@@ -106,13 +106,6 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
     val schema: NekoItem
 
     /**
-     * The random seed from which this item is generated.
-     *
-     * @throws NullPointerException if this is not a [NekoItem] realization
-     */
-    val seed: Long
-
-    /**
      * The [namespaced ID][Key] of this item.
      *
      * @throws NullPointerException if this is not a [NekoItem] realization
