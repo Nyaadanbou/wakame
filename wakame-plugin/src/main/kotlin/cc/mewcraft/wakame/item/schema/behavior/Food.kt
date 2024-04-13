@@ -7,8 +7,11 @@ import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SFoodMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
+import cc.mewcraft.wakame.skill.CasterAdapter
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.TargetAdapter
+import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
+import cc.mewcraft.wakame.skill.tryCast
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
@@ -29,8 +32,8 @@ interface Food : ItemBehavior {
 
     companion object Factory : ItemBehaviorFactory<Food> {
         override fun create(item: NekoItem, config: ConfigProvider): Food {
-            val abilities = config.optionalEntry<List<Skill>>("skills").orElse(emptyList())
-            return Default(abilities)
+            val skills = config.optionalEntry<List<Skill>>("skills").orElse(emptyList())
+            return Default(skills)
         }
     }
 
@@ -41,7 +44,13 @@ interface Food : ItemBehavior {
 
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
             skills.forEach { skill ->
-                skill.castAt(TargetAdapter.adapt(player))
+                skill.tryCast(
+                    PlayerSkillCastContext(
+                        CasterAdapter.adapt(player),
+                        TargetAdapter.adapt(player),
+                        itemStack
+                    )
+                )
             }
         }
     }

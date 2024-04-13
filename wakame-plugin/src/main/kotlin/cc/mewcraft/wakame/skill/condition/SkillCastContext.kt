@@ -1,17 +1,23 @@
 package cc.mewcraft.wakame.skill.condition
 
 import cc.mewcraft.wakame.skill.Caster
-import org.bukkit.entity.Player
+import cc.mewcraft.wakame.skill.Target
 import org.bukkit.inventory.ItemStack
 
-interface SkillCastContext {
+sealed interface SkillCastContext {
     val caster: Caster
-    val player: Player
-    val itemStack: ItemStack
+    val target: Target
+    val itemStack: ItemStack?
 }
 
-data class SkillCastContextImpl(
-    override val caster: Caster,
-    override val player: Player,
+data class VoidSkillCastContext(
+    override val caster: Caster.Void,
+    override val target: Target,
+    override val itemStack: ItemStack? = null
+) : SkillCastContext
+
+data class PlayerSkillCastContext(
+    override val caster: Caster.Player,
+    override val target: Target,
     override val itemStack: ItemStack
 ) : SkillCastContext

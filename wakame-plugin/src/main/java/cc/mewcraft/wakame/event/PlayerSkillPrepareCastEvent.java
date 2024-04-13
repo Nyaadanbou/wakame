@@ -2,23 +2,27 @@ package cc.mewcraft.wakame.event;
 
 import cc.mewcraft.wakame.skill.Caster;
 import cc.mewcraft.wakame.skill.Skill;
+import cc.mewcraft.wakame.skill.Target;
+import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * player will try to cast a skill when this event called.
+ * 当玩家将要释放技能时触发此事件
  */
-public class PlayerSkillPrepareCastEvent extends SkillEvent {
+public class PlayerSkillPrepareCastEvent extends SkillPrepareCastEvent {
     private static final @NotNull HandlerList HANDLERS = new HandlerList();
 
     private final Caster.Player caster;
+    private final Target target;
     private final ItemStack item;
 
-    public PlayerSkillPrepareCastEvent(@NotNull Skill skill, @NotNull Caster.Player caster, @NotNull ItemStack itemStack) {
-        super(skill, false);
-        this.caster = caster;
-        this.item = itemStack;
+    public PlayerSkillPrepareCastEvent(Skill skill, PlayerSkillCastContext playerSkillCastContext) {
+        super(skill, playerSkillCastContext);
+        this.caster = playerSkillCastContext.getCaster();
+        this.target = playerSkillCastContext.getTarget();
+        this.item = playerSkillCastContext.getItemStack();
     }
 
     @NotNull
@@ -29,6 +33,11 @@ public class PlayerSkillPrepareCastEvent extends SkillEvent {
     @NotNull
     public ItemStack getItem() {
         return item;
+    }
+
+    @NotNull
+    public Target getTarget() {
+        return target;
     }
 
     @Override

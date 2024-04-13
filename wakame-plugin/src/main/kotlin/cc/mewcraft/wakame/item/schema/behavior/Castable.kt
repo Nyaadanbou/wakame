@@ -2,14 +2,14 @@ package cc.mewcraft.wakame.item.schema.behavior
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.CasterAdapter
 import cc.mewcraft.wakame.skill.TargetAdapter
-import cc.mewcraft.wakame.skill.condition.SkillCastContextImpl
+import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
+import cc.mewcraft.wakame.skill.tryCast
 import cc.mewcraft.wakame.util.Key
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -38,25 +38,13 @@ interface Castable : ItemBehavior {
             val nekoStack = PlayNekoStackFactory.require(itemStack)
 //            nekoStack.getMetaAccessor<Skill>()
             val skill = SkillRegistry.INSTANCE[Key(Namespaces.SKILL, "buff/potion_remove")]
-            val event = PlayerSkillPrepareCastEvent(
-                skill,
-                CasterAdapter.adapt(player),
-                itemStack
+            skill.tryCast(
+                PlayerSkillCastContext(
+                    CasterAdapter.adapt(player),
+                    TargetAdapter.adapt(player),
+                    itemStack
+                )
             )
-            event.callEvent()
-            val conditionGroup = skill.conditions
-            val skillCastContext = SkillCastContextImpl(
-                CasterAdapter.adapt(player),
-                player,
-                itemStack
-            )
-
-            if (conditionGroup.test(skillCastContext)) {
-                conditionGroup.cost(skillCastContext)
-                skill.castAt(TargetAdapter.adapt(player))
-            } else {
-                conditionGroup.notifyFailure(skillCastContext)
-            }
         }
     }
 }
