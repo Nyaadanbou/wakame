@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.facade
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.schema.cell.core.SchemaAttributeCore
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCore
 import cc.mewcraft.wakame.util.RandomizedValue
 import org.spongepowered.configurate.ConfigurationNode
 

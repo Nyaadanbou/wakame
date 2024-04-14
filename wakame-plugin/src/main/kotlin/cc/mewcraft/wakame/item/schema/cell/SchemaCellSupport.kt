@@ -20,8 +20,8 @@ internal data object EmptySchemaCell : SchemaCell {
     override val isReforgeable: Boolean = false
     override val isOverridable: Boolean = false
     override val keepEmpty: Boolean = false
-    override val coreSelector: Group<SchemaCore, SchemaGenerationContext> = Group.empty()
-    override val curseSelector: Group<SchemaCurse, SchemaGenerationContext> = Group.empty()
+    override val core: Group<SchemaCore, SchemaGenerationContext> = Group.empty()
+    override val curse: Group<SchemaCurse, SchemaGenerationContext> = Group.empty()
 }
 
 /**
@@ -32,8 +32,8 @@ internal data class ImmutableSchemaCell(
     override val keepEmpty: Boolean,
     override val isReforgeable: Boolean,
     override val isOverridable: Boolean,
-    override val coreSelector: SchemaCoreGroup,
-    override val curseSelector: SchemaCurseGroup,
+    override val core: SchemaCoreGroup,
+    override val curse: SchemaCurseGroup,
 ) : SchemaCell
 
 /**
@@ -93,8 +93,8 @@ internal data object SchemaCellSerializer : SchemaSerializer<SchemaCell> {
                 keepEmpty = keepEmpty,
                 isReforgeable = isReforgeable,
                 isOverridable = isOverridable,
-                coreSelector = coreGroup,
-                curseSelector = curseGroup
+                core = coreGroup,
+                curse = curseGroup
             )
         }
 

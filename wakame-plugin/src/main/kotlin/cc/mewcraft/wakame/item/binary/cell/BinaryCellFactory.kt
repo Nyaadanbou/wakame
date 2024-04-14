@@ -72,7 +72,7 @@ object BinaryCellFactory {
 
         // make a core
         val core = run {
-            val schemaCore = schemaCell.coreSelector.pickSingle(context)
+            val schemaCore = schemaCell.core.pickSingle(context)
             if (schemaCore != null) {
                 // something is drawn out
                 BinaryCoreFactory.generate(context, schemaCore)
@@ -89,7 +89,7 @@ object BinaryCellFactory {
 
         // make a curse
         val curse = run {
-            val schemaCurse = schemaCell.curseSelector.pickSingle(context) ?: SchemaCurseFactory.empty()
+            val schemaCurse = schemaCell.curse.pickSingle(context) ?: SchemaCurseFactory.empty()
             BinaryCurseFactory.generate(context, schemaCurse)
         }
 

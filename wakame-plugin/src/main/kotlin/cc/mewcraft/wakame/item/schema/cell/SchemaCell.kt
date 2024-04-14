@@ -40,17 +40,17 @@ interface SchemaCell : Cell {
 
     /**
      * Returns `true` if the cell should be removed from the item stack when
-     * nothing is picked from the [coreSelector].
+     * nothing is picked from the [core].
      */
     val keepEmpty: Boolean
 
     /**
      * The [group][Group] of [cores][SchemaCore] owned by the cell.
      */
-    val coreSelector: SchemaCoreGroup
+    val core: SchemaCoreGroup
 
     /**
      * The [group][Group] of [curses][SchemaCurse] owned by ths cell.
      */
-    val curseSelector: SchemaCurseGroup
+    val curse: SchemaCurseGroup
 }

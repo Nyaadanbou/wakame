@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
  * The name "schema" implies that this [core][Core] is a config
  * representation, i.e., what it looks like in the configuration.
  */
-sealed interface SchemaCore : Core {
+interface SchemaCore : Core {
     /**
      * Generates a binary core data from this schema.
      *

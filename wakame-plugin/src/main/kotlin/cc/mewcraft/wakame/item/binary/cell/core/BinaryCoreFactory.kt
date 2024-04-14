@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.item.binary.cell.core
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
-import cc.mewcraft.wakame.item.schema.cell.core.SchemaAttributeCore
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
-import cc.mewcraft.wakame.item.schema.cell.core.SchemaSkillCore
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCore
+import cc.mewcraft.wakame.item.schema.cell.core.skill.SchemaSkillCore
 import cc.mewcraft.wakame.item.schema.filter.AttributeContextHolder
 import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
 import cc.mewcraft.wakame.registry.AttributeRegistry
@@ -78,6 +78,8 @@ object BinaryCoreFactory {
                 context.abilities += SkillContextHolder(key)
                 ret = skillCore
             }
+
+            else -> throw IllegalArgumentException("Failed to generate binary tag ${schemaCore.key.asString()}")
         }
 
         return ret

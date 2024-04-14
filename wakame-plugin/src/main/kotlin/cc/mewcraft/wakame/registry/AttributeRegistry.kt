@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
-import cc.mewcraft.wakame.item.schema.cell.core.SchemaAttributeCore
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.*
 import cc.mewcraft.wakame.util.*
 import com.google.common.collect.ImmutableMap
 import me.lucko.helper.nbt.ShadowTagType
@@ -284,7 +284,7 @@ private class SingleSelectionImpl(
         SCHEMA_CORE_NODE_ENCODER = { node: ConfigurationNode ->
             val operation = node.getOperation()
             val value = node.getSchemaSingle()
-            SchemaAttributeCore.S(facadeKey, tagType, operation, value)
+            SchemaAttributeCoreS(facadeKey, tagType, operation, value)
         },
 
         BINARY_CORE_NODE_ENCODER = { node: ConfigurationNode ->
@@ -333,7 +333,7 @@ private class RangedSelectionImpl(
             val operation = node.getOperation()
             val lower = node.getSchemaLower()
             val upper = node.getSchemaUpper()
-            SchemaAttributeCore.R(facadeKey, tagType, operation, lower, upper)
+            SchemaAttributeCoreR(facadeKey, tagType, operation, lower, upper)
         },
 
         BINARY_CORE_NODE_ENCODER = { node: ConfigurationNode ->
@@ -379,7 +379,7 @@ private class SingleElementAttributeBinderImpl(
             val operation = node.getOperation()
             val value = node.getSchemaSingle()
             val element = node.getElement()
-            SchemaAttributeCore.SE(facadeKey, tagType, operation, value, element)
+            SchemaAttributeCoreSE(facadeKey, tagType, operation, value, element)
         },
 
         BINARY_CORE_NODE_ENCODER = { node: ConfigurationNode ->
@@ -428,7 +428,7 @@ private class RangedElementAttributeBinderImpl(
             val lower = node.getSchemaLower()
             val upper = node.getSchemaUpper()
             val element = node.getElement()
-            SchemaAttributeCore.RE(facadeKey, tagType, operation, lower, upper, element)
+            SchemaAttributeCoreRE(facadeKey, tagType, operation, lower, upper, element)
         },
 
         BINARY_CORE_NODE_ENCODER = { node: ConfigurationNode ->

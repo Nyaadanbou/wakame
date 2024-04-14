@@ -3,6 +3,9 @@ package cc.mewcraft.wakame.item.schema.cell.core
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.SchemaCorePool
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCore
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.elementOrNull
+import cc.mewcraft.wakame.item.schema.cell.core.skill.SchemaSkillCore
 import cc.mewcraft.wakame.item.schema.filter.AttributeFilter
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
 import cc.mewcraft.wakame.item.schema.filter.SkillFilter
@@ -10,6 +13,7 @@ import cc.mewcraft.wakame.random.AbstractGroupSerializer
 import cc.mewcraft.wakame.random.AbstractPoolSerializer
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.SerializationException
 
 /**
  * @see AbstractGroupSerializer
@@ -81,6 +85,9 @@ internal data object SchemaCorePoolSerializer : AbstractPoolSerializer<SchemaCor
             // if there is already a skill with the same key
             // in the selection context.
             is SchemaSkillCore -> SkillFilter(true, content.key)
+
+            // Throw if we see an unknown schema core type
+            else -> throw SerializationException("Can't create intrinsic conditions for unknown schema core type: ${content::class.qualifiedName}")
         }
     }
 
