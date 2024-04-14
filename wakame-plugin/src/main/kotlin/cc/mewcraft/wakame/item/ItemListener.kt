@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
+import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -23,6 +24,7 @@ import org.koin.core.component.inject
 class MultipleItemListener : KoinComponent, Listener {
     private val attributeEventHandler: AttributeEventHandler by inject()
     private val kizamiEventHandler: KizamiEventHandler by inject()
+    private val skillEventHandler: SkillEventHandler by inject()
 
     @EventHandler
     fun onItemHeld(event: PlayerItemHeldEvent) {

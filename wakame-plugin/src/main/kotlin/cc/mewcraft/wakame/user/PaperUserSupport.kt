@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.level.PlayerLevelProvider
 import cc.mewcraft.wakame.resource.PlayerResourceMap
 import cc.mewcraft.wakame.resource.ResourceMap
 import cc.mewcraft.wakame.skill.PlayerSkillMap
-import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.skill.SkillMap
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -65,9 +64,6 @@ class PaperPlayerAdapter : KoinComponent, Listener, PlayerAdapter<Player> {
  */
 class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     private val server: Server by inject()
-
-    // handlers
-    private val skillEventHandler: SkillEventHandler by inject()
 
     // holds the live data of users
     private val userRepository: Cache<UUID, User<Player>> = Caffeine.newBuilder().build()
