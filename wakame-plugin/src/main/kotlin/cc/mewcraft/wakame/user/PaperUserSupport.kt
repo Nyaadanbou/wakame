@@ -77,7 +77,11 @@ class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     @EventHandler
     private fun onJoin(e: PlayerJoinEvent) {
         // create user data for the player
-        getPlayer(e.player)
+        val user = getPlayer(e.player)
+        val attributeMap = user.attributeMap
+        if (attributeMap is PlayerAttributeMap) {
+            attributeMap.initVanillaAttributes()
+        }
     }
 
     override fun getPlayer(uniqueId: UUID): User<Player> {

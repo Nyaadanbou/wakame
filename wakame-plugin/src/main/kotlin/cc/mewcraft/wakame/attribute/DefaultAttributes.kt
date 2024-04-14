@@ -1,7 +1,12 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.node
+import cc.mewcraft.wakame.registry.ATTRIBUTE_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ElementRegistry
 import org.bukkit.entity.EntityType
+
+private val ATTRIBUTE_CONFIG by lazy { Configs.YAML[ATTRIBUTE_CONFIG_FILE] }
 
 /**
  * Provides default [AttributeInstance]s for various entity types.
@@ -9,6 +14,8 @@ import org.bukkit.entity.EntityType
 object DefaultAttributes {
     private val DEFAULT_SUPPLIERS: Map<EntityType, AttributeSupplier> = buildMap {
         put(EntityType.PLAYER, AttributeSupplier {
+            withConfig(ATTRIBUTE_CONFIG.node("default_attributes", EntityType.PLAYER.name))
+
             //
             // Vanilla-backed Attributes
             //

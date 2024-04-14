@@ -1,3 +1,19 @@
 # 属性
 
+# 属性的全局设置
+max_health:
+  default_value: 30.0
+  min_value: 1.0
+  max_value: 16384.0
+movement_speed:
+  default_value: 0.1
+  min_value: -1.0
+  max_value: 4.0
+
+
 # 玩家属性的默认值（即没有任何属性修饰符时的属性值）
+default_attributes:
+  PLAYER:
+    max_health: 80.0
+    fire:
+      defence: 3.0

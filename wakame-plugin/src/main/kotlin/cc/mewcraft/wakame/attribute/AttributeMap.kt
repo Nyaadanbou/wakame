@@ -63,23 +63,25 @@ class PlayerAttributeMap internal constructor(
 ) : AttributeMap {
     private val data: MutableMap<Attribute, AttributeInstance> = HashMap()
 
+    fun initVanillaAttributes() {
+        for (attribute in default.attributes) {
+            if (attribute.vanilla) {
+                getAttributeInstance(attribute)
+            }
+        }
+    }
+
     override fun getAttributeInstance(attribute: Attribute): AttributeInstance? {
         // Kotlin 对于 Map.computeIfAbsent 中 lambda 的返回值做了非空要求
         // 因此这里手动实现了一遍 computeIfAbsent 以还原在 Java 下的行为
         // See: https://youtrack.jetbrains.com/issue/KT-10982
         val oldValue = data[attribute]
         if (oldValue == null) {
-            if (attribute.vanilla) {
-                val bukkitAttribute = attribute.toBukkit()
-                val bukkitAttributeInstance = entity.getAttribute(bukkitAttribute)
-                requireNotNull(bukkitAttributeInstance) { "Can't find vanilla attribute instance for attribute $attribute" }
-
-                val attributeInstance = VanillaAttributeInstance(bukkitAttributeInstance)
-                data[attribute] = attributeInstance
-                return attributeInstance
+            val newValue = if (attribute.vanilla) {
+                default.createAttributeInstance(attribute)?.buildToVanilla(entity)
+            } else {
+                default.createAttributeInstance(attribute)?.buildToWakame()
             }
-
-            val newValue = default.createAttributeInstance(attribute)
             if (newValue != null) {
                 data[attribute] = newValue
                 return newValue
@@ -96,11 +98,11 @@ class PlayerAttributeMap internal constructor(
         if (attributeBase.vanilla) {
             val bukkitAttribute = attributeBase.toBukkit()
             entity.registerAttribute(bukkitAttribute)
-            data[attributeBase] = VanillaAttributeInstance(entity.getAttribute(bukkitAttribute)!!)
+            data[attributeBase] = AttributeInstanceProxy(attributeBase).buildToVanilla(entity)
             return
         }
 
-        data[attributeBase] = WakameAttributeInstance(attributeBase)
+        data[attributeBase] = AttributeInstanceProxy(attributeBase).buildToWakame()
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
@@ -149,9 +151,6 @@ class PlayerAttributeMap internal constructor(
 
     override fun addAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>) {
         attributeModifiers.forEach { attribute, modifier ->
-            if (attribute.vanilla) {
-                getAttributeInstance(attribute)
-            }
             getAttributeInstance(attribute)?.let { attributeInstance ->
                 attributeInstance.removeModifier(modifier)
                 attributeInstance.addModifier(modifier)
