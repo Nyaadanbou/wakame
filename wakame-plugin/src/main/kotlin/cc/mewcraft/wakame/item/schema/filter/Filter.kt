@@ -25,9 +25,11 @@ sealed interface Filter : Condition<SchemaGenerationContext> {
     val invert: Boolean
 
     /**
+     * Returns the original test result before [invert] is applied.
+     *
      * The semantics of the returned `boolean` is **implementation-defined**.
      */
-    fun test0(context: SchemaGenerationContext): Boolean
+    fun testRaw(context: SchemaGenerationContext): Boolean
 
     /**
      * Returns the test result after [invert] is applied.
@@ -42,6 +44,6 @@ sealed interface Filter : Condition<SchemaGenerationContext> {
         // f, t -> t
         // f, f -> f
         // it's exactly a XOR operation
-        return test0(context) xor invert
+        return testRaw(context) xor invert
     }
 }

@@ -16,7 +16,7 @@ data class MarkFilter(
     /**
      * Returns `true` if the [context] already has the [mark] populated.
      */
-    override fun test0(context: SchemaGenerationContext): Boolean {
+    override fun testRaw(context: SchemaGenerationContext): Boolean {
         return Mark.stringMarkOf(mark) in context.marks
     }
 }

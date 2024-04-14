@@ -16,7 +16,7 @@ data class RarityFilter(
     /**
      * Returns `true` if the [context] already has the [rarity] populated.
      */
-    override fun test0(context: SchemaGenerationContext): Boolean {
+    override fun testRaw(context: SchemaGenerationContext): Boolean {
         return rarity in context.rarities
     }
 }

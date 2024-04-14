@@ -16,7 +16,7 @@ data class TossFilter(
     /**
      * Returns `true` if the toss is success.
      */
-    override fun test0(context: SchemaGenerationContext): Boolean {
+    override fun testRaw(context: SchemaGenerationContext): Boolean {
         return Random.nextFloat() < probability
     }
 }

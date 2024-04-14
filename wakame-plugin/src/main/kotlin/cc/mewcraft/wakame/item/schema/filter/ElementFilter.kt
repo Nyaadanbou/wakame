@@ -24,7 +24,7 @@ data class ElementFilter(
     /**
      * Returns `true` if the [context] already has the [element] populated.
      */
-    override fun test0(context: SchemaGenerationContext): Boolean {
+    override fun testRaw(context: SchemaGenerationContext): Boolean {
         return element in context.elements
     }
 }

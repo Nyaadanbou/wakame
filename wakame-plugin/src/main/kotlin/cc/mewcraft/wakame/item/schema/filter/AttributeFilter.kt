@@ -24,7 +24,7 @@ class AttributeFilter(
      * Returns `true` if the [context] already has the attribute with
      * [key][key] populated.
      */
-    override fun test0(context: SchemaGenerationContext): Boolean {
+    override fun testRaw(context: SchemaGenerationContext): Boolean {
         return AttributeContextHolder(key, operation, element) in context.attributes
     }
 }

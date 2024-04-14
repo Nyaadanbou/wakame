@@ -18,7 +18,7 @@ data class SourceLevelFilter(
      * Returns `true` if the source level in the [context] is in the range of
      * [level].
      */
-    override fun test0(context: SchemaGenerationContext): Boolean {
+    override fun testRaw(context: SchemaGenerationContext): Boolean {
         return (context.trigger.level) in level
     }
 }

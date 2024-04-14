@@ -12,7 +12,7 @@ data class ItemLevelFilter(
      * Returns `true` if the item level in the [context] is in the range of
      * [level].
      */
-    override fun test0(context: SchemaGenerationContext): Boolean {
+    override fun testRaw(context: SchemaGenerationContext): Boolean {
         return context.level in level
     }
 }

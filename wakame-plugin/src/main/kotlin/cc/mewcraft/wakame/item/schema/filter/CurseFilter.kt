@@ -19,7 +19,7 @@ class CurseFilter(
      * Returns `true` if the [context] already has the curse with
      * [key][key] populated.
      */
-    override fun test0(context: SchemaGenerationContext): Boolean {
+    override fun testRaw(context: SchemaGenerationContext): Boolean {
         return CurseContextHolder(key) in context.curses
     }
 }

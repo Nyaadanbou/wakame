@@ -24,7 +24,7 @@ data class SkillFilter(
      * Returns `true` if the [context] already has the skill with
      * [key][key] populated.
      */
-    override fun test0(context: SchemaGenerationContext): Boolean {
+    override fun testRaw(context: SchemaGenerationContext): Boolean {
         return SkillContextHolder(key) in context.abilities
     }
 }
