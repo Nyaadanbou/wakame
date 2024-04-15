@@ -132,7 +132,7 @@
 
 该词条栏所使用的核心选择器的唯一标识，必须在根路径下的 `curse_groups` 中有定义。
 
-#### 节点: `modify_options`
+---
 
 * path: `modify_options`
 * type: `map`
@@ -150,10 +150,10 @@
 
 ---
 
-注意！经讨论，该选项已经移至 **重铸系统** 的配置文件，而不是在物品配置文件里。
-
 * path: `modify_options.accepted_cores`
 * type: `list(string)`
+
+> 注意！经讨论，该选项已经移至 **重铸系统** 的配置文件，而不是在物品配置文件里。
 
 该词条栏接受的核心类型。
 
