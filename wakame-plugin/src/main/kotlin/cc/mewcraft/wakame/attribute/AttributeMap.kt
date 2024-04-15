@@ -64,10 +64,8 @@ class PlayerAttributeMap internal constructor(
     private val data: MutableMap<Attribute, AttributeInstance> = HashMap()
 
     fun initVanillaAttributes() {
-        for (attribute in default.attributes) {
-            if (attribute.vanilla) {
-                getAttributeInstance(attribute)
-            }
+        for (attribute in default.vanillaAttributes) {
+            getAttributeInstance(attribute)
         }
     }
 
@@ -98,23 +96,23 @@ class PlayerAttributeMap internal constructor(
         if (attributeBase.vanilla) {
             val bukkitAttribute = attributeBase.toBukkit()
             entity.registerAttribute(bukkitAttribute)
-            data[attributeBase] = AttributeInstanceProxy(attributeBase).buildToVanilla(entity)
+            data[attributeBase] = AttributeInstanceBuilder(attributeBase).buildToVanilla(entity)
             return
         }
 
-        data[attributeBase] = AttributeInstanceProxy(attributeBase).buildToWakame()
+        data[attributeBase] = AttributeInstanceBuilder(attributeBase).buildToWakame()
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
         if (attribute.vanilla) {
-            return entity.getAttribute(attribute.toBukkit()) != null
+            return getAttributeInstance(attribute) != null
         }
         return data.containsKey(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
         if (attribute.vanilla) {
-            return entity.getAttribute(attribute.toBukkit())?.getModifier(uuid) != null
+            return getAttributeInstance(attribute)?.getModifier(uuid) != null
         }
         return data[attribute]?.getModifier(uuid) != null || default.hasModifier(attribute, uuid)
     }

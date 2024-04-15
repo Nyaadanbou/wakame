@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.provider
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.util.toBukkit
 import cc.mewcraft.wakame.util.toNeko
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import org.bukkit.attribute.Attributable
-import java.util.Collections
-import java.util.EnumMap
-import java.util.UUID
+import java.util.*
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
 
 /**
@@ -48,10 +48,10 @@ interface AttributeInstance {
     fun replace(other: AttributeInstance)
 }
 
-class AttributeInstanceProxy(
+class AttributeInstanceBuilder(
     val attribute: Attribute
 ) {
-    private val actions: MutableList<AttributeInstance.() -> Unit> = ArrayList()
+    var baseValue: Provider<Double> = provider(attribute.defaultValue)
 
     fun buildToVanilla(attributable: Attributable): AttributeInstance {
         require(attribute.vanilla) { "Can't convert a non-vanilla attribute instance to vanilla" }
@@ -69,16 +69,12 @@ class AttributeInstanceProxy(
     }
 
     private fun AttributeInstance.applyActions() {
-        actions.forEach { it() }
-        actions.clear()
+        setBaseValue(baseValue.get())
     }
 
-    fun setBaseValue(baseValue: Double) {
-        actions += { setBaseValue(baseValue) }
-    }
-
-    fun replace(other: AttributeInstanceProxy) {
-        actions += { replace(other.buildToWakame()) }
+    fun replace(other: AttributeInstanceBuilder) {
+        require(attribute == other.attribute) { "Can't replace with a different attribute" }
+        baseValue = other.baseValue
     }
 }
 
@@ -89,6 +85,10 @@ private value class VanillaAttributeInstance(
 
     override val attribute: Attribute
         get() = handle.attribute.toNeko()
+
+    init {
+        setBaseValue(attribute.defaultValue)
+    }
 
     override fun getDescriptionId(): String {
         return attribute.descriptionId
@@ -152,9 +152,9 @@ private value class VanillaAttributeInstance(
 
     override fun replace(other: AttributeInstance) {
         require(other.attribute.vanilla) { "Can't replace with a non-vanilla attribute instance" }
-        handle.baseValue = other.getBaseValue()
-        handle.modifiers.forEach { handle.removeModifier(it) }
-        other.getModifiers().forEach { handle.addModifier(it.toBukkit()) }
+        setBaseValue(other.getBaseValue())
+        getModifiers().forEach { removeModifier(it) }
+        other.getModifiers().forEach { addModifier(it) }
     }
 }
 

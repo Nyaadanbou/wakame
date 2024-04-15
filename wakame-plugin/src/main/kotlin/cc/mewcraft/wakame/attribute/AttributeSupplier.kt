@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.provider
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.optionalEntry
 import java.util.*
 
 fun AttributeSupplier(builder: AttributeSupplier.Builder.() -> Unit): AttributeSupplier {
@@ -16,22 +14,18 @@ fun AttributeSupplier(builder: AttributeSupplier.Builder.() -> Unit): AttributeS
  * @property instances
  */
 class AttributeSupplier internal constructor(
-    private val instances: Map<Attribute, AttributeInstanceProxy>,
+    private val instances: Map<Attribute, AttributeInstanceBuilder>,
 ) {
-    val attributes: Set<Attribute>
-        get() = instances.keys
+    val vanillaAttributes: Set<Attribute> = instances.keys.filter { it.vanilla }.toSet()
 
-    fun getAttributeInstance(attribute: Attribute): AttributeInstanceProxy {
+    fun getAttributeInstance(attribute: Attribute): AttributeInstanceBuilder {
         val attributeInstance = instances[attribute]
             ?: throw IllegalArgumentException("Can't find attribute '${attribute.descriptionId}'")
         return attributeInstance
     }
 
-    fun createAttributeInstance(attribute: Attribute): AttributeInstanceProxy? {
-        val attributeInstance = instances[attribute] ?: return null
-        val attributeInstance2 = AttributeInstanceProxy(attribute)
-        attributeInstance2.replace(attributeInstance)
-        return attributeInstance2
+    fun createAttributeInstance(attribute: Attribute): AttributeInstanceBuilder? {
+        return instances[attribute]
     }
 
     fun getValue(attribute: Attribute): Double {
@@ -58,23 +52,20 @@ class AttributeSupplier internal constructor(
     }
 
     class Builder {
-        private val builder: MutableMap<Attribute, AttributeInstanceProxy> = HashMap()
-        private var config: ConfigProvider? = null
+        private val builder: MutableMap<Attribute, AttributeInstanceBuilder> = HashMap()
 
-        private fun create(attribute: Attribute): AttributeInstanceProxy {
-            val attributeInstance = AttributeInstanceProxy(attribute)
+        private fun create(attribute: Attribute): AttributeInstanceBuilder {
+            val attributeInstance = AttributeInstanceBuilder(attribute)
             builder[attribute] = attributeInstance
             return attributeInstance
         }
 
-        fun withConfig(config: ConfigProvider): Builder {
-            this.config = config
-            return this
+        fun add(attribute: Attribute): Builder {
+            return add(attribute, attribute.defaultValue)
         }
 
-        fun add(attribute: Attribute): Builder {
-            create(attribute)
-            return this
+        fun add(attribute: Attribute, value: Attribute.() -> Provider<Double>): Builder {
+            return add(attribute, value(attribute))
         }
 
         fun add(attribute: Attribute, value: Double): Builder {
@@ -83,24 +74,11 @@ class AttributeSupplier internal constructor(
 
         fun add(attribute: Attribute, value: Provider<Double>): Builder {
             val attributeInstance = create(attribute)
-            attributeInstance.setBaseValue(value.get())
+            attributeInstance.baseValue = value
             return this
         }
 
         fun build(): AttributeSupplier {
-            if (config != null) {
-                for (instance in builder) {
-                    val attribute = instance.value.attribute
-                    val baseValue = if (attribute is ElementAttribute) {
-                        config!!.optionalEntry<Double>(attribute.element.uniqueId, attribute.descriptionId)
-                    } else {
-                        config!!.optionalEntry<Double>(attribute.descriptionId)
-                    }.get()
-                    if (baseValue == null)
-                        continue
-                    instance.value.setBaseValue(baseValue)
-                }
-            }
             return AttributeSupplier(builder)
         }
     }
