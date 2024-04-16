@@ -30,8 +30,8 @@ private val ATTRIBUTE_CONFIG by lazy { Configs.YAML[ATTRIBUTE_CONFIG_FILE] }
  * references. The property values (such as [defaultValue]) do not matter
  * for the code outside of this package.
  *
- * @see createRangedAttribute
- * @see createElementAttribute
+ * @see RangedAttribute
+ * @see ElementAttribute
  */
 open class Attribute @InternalApi constructor(
     /**
@@ -44,13 +44,16 @@ open class Attribute @InternalApi constructor(
      */
     val vanilla: Boolean = false,
     /**
-     * 属性的默认数值。
+     * 属性的默认数值 [Provider], 重载时会更新数值。
      */
-    defaultValue: Provider<Double>,
+    val defaultValueProvider: Provider<Double>,
 ) : Keyed, Examinable {
     override val key: Key = Key(Namespaces.ATTRIBUTE, descriptionId)
 
-    val defaultValue: Double by defaultValue
+    /**
+     * 属性的默认数值, 获取的值不会随着重载而更新。
+     */
+    val defaultValue: Double by defaultValueProvider
 
     /**
      * 清理给定的数值，使其落在该属性的合理数值范围内。
@@ -103,24 +106,23 @@ constructor(
     vanilla: Boolean,
     defaultValue: Provider<Double>,
     /**
-     * 该属性允许的最小数值。
+     * 该属性允许的最小数值, 重载时会更新数值。
      */
-    minValue: Provider<Double>,
+    val minValueProvider: Provider<Double>,
     /**
-     * 该属性允许的最大数值。
+     * 该属性允许的最大数值, 重载时会更新数值。
      */
-    maxValue: Provider<Double>,
+    val maxValueProvider: Provider<Double>,
 ) : Attribute(descriptionId, vanilla, defaultValue) {
-    @InternalApi
-    constructor(
-        descriptionId: String,
-        defaultValue: Provider<Double>,
-        minValue: Provider<Double>,
-        maxValue: Provider<Double>,
-    ) : this(descriptionId, false, defaultValue, minValue, maxValue)
+    /**
+     * 该属性允许的最小数值, 获取的值不会随着重载而更新。
+     */
+    val minValue: Double by minValueProvider
 
-    val minValue: Double by minValue
-    val maxValue: Double by maxValue
+    /**
+     * 该属性允许的最大数值, 获取的值不会随着重载而更新。
+     */
+    val maxValue: Double by maxValueProvider
 
     init {
         if (this.minValue > this.maxValue) {
@@ -150,35 +152,30 @@ constructor(
 }
 
 @InternalApi
-fun createRangedAttribute(
+fun RangedAttribute(
     descriptionId: String,
     vanilla: Boolean,
     defaultValue: Double,
     minValue: Double,
     maxValue: Double
-): Provider<RangedAttribute> {
-    val config = ATTRIBUTE_CONFIG.node(descriptionId)
-    val provider = provider {
-        RangedAttribute(
-            descriptionId,
-            vanilla,
-            config.optionalEntry<Double>("default_value").orElse(defaultValue),
-            config.optionalEntry<Double>("min_value").orElse(minValue),
-            config.optionalEntry<Double>("max_value").orElse(maxValue)
-        )
-    }
-    config.addUpdateHandler { provider.update() }
-    return provider
+): RangedAttribute {
+    return RangedAttribute(
+        descriptionId,
+        vanilla,
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "default_value").orElse(defaultValue),
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "min_value").orElse(minValue),
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "max_value").orElse(maxValue)
+    )
 }
 
 @InternalApi
-fun createRangedAttribute(
+fun RangedAttribute(
     descriptionId: String,
     defaultValue: Double,
     minValue: Double,
     maxValue: Double
-): Provider<RangedAttribute> {
-    return createRangedAttribute(descriptionId, false, defaultValue, minValue, maxValue)
+): RangedAttribute {
+    return RangedAttribute(descriptionId, false, defaultValue, minValue, maxValue)
 }
 
 /**
@@ -204,17 +201,6 @@ constructor(
     minValue,
     maxValue,
 ) {
-    @InternalApi
-    constructor(
-        descriptionId: String,
-        defaultValue: Provider<Double>,
-        minValue: Provider<Double>,
-        maxValue: Provider<Double>,
-        element: Element,
-    ) : this(
-        descriptionId, false, defaultValue, minValue, maxValue, element
-    )
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other is ElementAttribute) return descriptionId == other.descriptionId && element == other.element
@@ -236,36 +222,31 @@ constructor(
 }
 
 @InternalApi
-fun createElementAttribute(
+fun ElementAttribute(
     descriptionId: String,
     vanilla: Boolean,
     defaultValue: Double,
     minValue: Double,
     maxValue: Double,
     element: Element
-): Provider<ElementAttribute> {
-    val config = ATTRIBUTE_CONFIG.node(descriptionId, element.uniqueId)
-    val provider = provider {
-        ElementAttribute(
-            descriptionId,
-            vanilla,
-            config.optionalEntry<Double>("default_value").orElse(defaultValue),
-            config.optionalEntry<Double>("min_value").orElse(minValue),
-            config.optionalEntry<Double>("max_value").orElse(maxValue),
-            element
-        )
-    }
-    config.addUpdateHandler { provider.update() }
-    return provider
+): ElementAttribute {
+    return ElementAttribute(
+        descriptionId,
+        vanilla,
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "default_value").orElse(defaultValue),
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "min_value").orElse(minValue),
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "max_value").orElse(maxValue),
+        element
+    )
 }
 
 @InternalApi
-fun createElementAttribute(
+fun ElementAttribute(
     descriptionId: String,
     defaultValue: Double,
     minValue: Double,
     maxValue: Double,
     element: Element
-): Provider<ElementAttribute> {
-    return createElementAttribute(descriptionId, false, defaultValue, minValue, maxValue, element)
+): ElementAttribute {
+    return ElementAttribute(descriptionId, false, defaultValue, minValue, maxValue, element)
 }

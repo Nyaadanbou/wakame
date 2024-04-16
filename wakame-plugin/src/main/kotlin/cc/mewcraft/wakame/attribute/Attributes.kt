@@ -30,11 +30,11 @@ object Attributes {
        as backend to make them effective in game.
      */
 
-    val MAX_HEALTH by createRangedAttribute("max_health", true, 20.0, 1.0, 16384.0)
-    val MAX_ABSORPTION by createRangedAttribute("max_absorption", true, .0, .0, 2048.0)
-    val MOVEMENT_SPEED by createRangedAttribute("movement_speed", true, .0, -1.0, +4.0)
-    val BLOCK_INTERACTION_RANGE by createRangedAttribute("block_interaction_range", true, 4.5, 1.0, 64.0)
-    val ENTITY_INTERACTION_RANGE by createRangedAttribute("entity_interaction_range", true, 3.0, 1.0, 64.0)
+    val MAX_HEALTH = RangedAttribute("max_health", true, 20.0, 1.0, 16384.0)
+    val MAX_ABSORPTION = RangedAttribute("max_absorption", true, .0, .0, 2048.0)
+    val MOVEMENT_SPEED = RangedAttribute("movement_speed", true, .0, -1.0, +4.0)
+    val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", true, 4.5, 1.0, 64.0)
+    val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", true, 3.0, 1.0, 64.0)
 
     /*
        Independent Attributes
@@ -44,19 +44,19 @@ object Attributes {
        we mean that we will implement them by listeners or schedulers.
      */
 
-    val DAMAGE_REDUCTION_RATE by createRangedAttribute("damage_reduction_rate", .0, .0, 1.0)
-    val ATTACK_SPEED_LEVEL by createRangedAttribute("attack_speed_level", .0, .0, 8.0) // !!! can only take integers
-    val ATTACK_EFFECT_CHANCE by createRangedAttribute("attack_effect_chance", 0.01, .0, 1.0)
-    val CRITICAL_STRIKE_CHANCE by createRangedAttribute("critical_strike_chance", 0.01, .0, 1.0)
-    val CRITICAL_STRIKE_POWER by createRangedAttribute("critical_strike_power", 1.0, .0, 5.0)
-    val LIFESTEAL by createRangedAttribute("lifesteal", .0, .0, 1.0)
-    val LIFESTEAL_RATE by createRangedAttribute("lifesteal_rate", .0, .0, 16384.0)
-    val MANASTEAL by createRangedAttribute("manasteal", .0, .0, 1.0)
-    val MANASTEAL_RATE by createRangedAttribute("manasteal_rate", .0, .0, 16384.0)
-    val HEALTH_REGENERATION by createRangedAttribute("health_regeneration", 1.0, 0.0, 16384.0)
-    val MANA_CONSUMPTION_RATE by createRangedAttribute("mana_consumption_rate", 1.0, .0, 5.0)
-    val MANA_REGENERATION by createRangedAttribute("mana_regeneration", 1.0, .0, 16384.0)
-    val MAX_MANA by createRangedAttribute("max_mana", 100.0, 0.0, 16384.0)
+    val DAMAGE_REDUCTION_RATE = RangedAttribute("damage_reduction_rate", .0, .0, 1.0)
+    val ATTACK_SPEED_LEVEL = RangedAttribute("attack_speed_level", .0, .0, 8.0) // !!! can only take integers
+    val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0)
+    val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", 0.01, .0, 1.0)
+    val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, .0, 5.0)
+    val LIFESTEAL = RangedAttribute("lifesteal", .0, .0, 1.0)
+    val LIFESTEAL_RATE = RangedAttribute("lifesteal_rate", .0, .0, 16384.0)
+    val MANASTEAL = RangedAttribute("manasteal", .0, .0, 1.0)
+    val MANASTEAL_RATE = RangedAttribute("manasteal_rate", .0, .0, 16384.0)
+    val HEALTH_REGENERATION = RangedAttribute("health_regeneration", 1.0, 0.0, 16384.0)
+    val MANA_CONSUMPTION_RATE = RangedAttribute("mana_consumption_rate", 1.0, .0, 5.0)
+    val MANA_REGENERATION = RangedAttribute("mana_regeneration", 1.0, .0, 16384.0)
+    val MAX_MANA = RangedAttribute("max_mana", 100.0, 0.0, 16384.0)
 
     /*
        Element-backed Attributes
@@ -68,13 +68,13 @@ object Attributes {
     private val elementAttributeMap: ConcurrentHashMap<Element, ElementAttributes> = ConcurrentHashMap()
 
     /**
-     * Gets an [element attribute][createElementAttribute] by the specific [element].
+     * Gets an [element attribute][ElementAttribute] by the specific [element].
      *
      * Note that this function does not directly give you a
      * [element attribute]. Instead, you first get a "holder" that holds all
-     * the [element attribute][createElementAttribute] instances for the specific
-     * [element]. Then, you get the [element attribute][createElementAttribute]
-     * by accessing the properties of the [createElementAttribute].
+     * the [element attribute][ElementAttribute] instances for the specific
+     * [element]. Then, you get the [element attribute][ElementAttribute]
+     * by accessing the properties of the [ElementAttribute].
      *
      * Example usage:
      * ```kotlin
@@ -92,9 +92,9 @@ object Attributes {
     }
 
     /**
-     * Lazily gets an [element attribute][createElementAttribute]. You can use
+     * Lazily gets an [element attribute][ElementAttribute]. You can use
      * this function at the time when you are required to specify an
-     * [createElementAttribute] but the specific element is unknown.
+     * [ElementAttribute] but the specific element is unknown.
      *
      * Example usage:
      * ```
@@ -114,7 +114,7 @@ object Attributes {
 }
 
 /**
- * A holder that holds all default [createElementAttribute] instances for an
+ * A holder that holds all default [ElementAttribute] instances for an
  * [Element].
  */
 @OptIn(InternalApi::class)
@@ -122,9 +122,9 @@ class ElementAttributes
 @InternalApi internal constructor(
     element: Element,
 ) {
-    val DEFENSE by createElementAttribute("defense", .0, -16384.0, +16384.0, element)
-    val DEFENSE_PENETRATION by createElementAttribute("defense_penetration", .0, -16384.0, +16384.0, element)
-    val DEFENSE_PENETRATION_RATE by createElementAttribute("defense_penetration_rate", .0, -1.0, +1.0, element)
-    val MIN_ATTACK_DAMAGE by createElementAttribute("min_attack_damage", .0, .0, 16384.0, element)
-    val MAX_ATTACK_DAMAGE by createElementAttribute("max_attack_damage", .0, .0, 16384.0, element)
+    val DEFENSE = ElementAttribute("defense", .0, -16384.0, +16384.0, element)
+    val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, +16384.0, element)
+    val DEFENSE_PENETRATION_RATE = ElementAttribute("defense_penetration_rate", .0, -1.0, +1.0, element)
+    val MIN_ATTACK_DAMAGE = ElementAttribute("min_attack_damage", .0, .0, 16384.0, element)
+    val MAX_ATTACK_DAMAGE = ElementAttribute("max_attack_damage", .0, .0, 16384.0, element)
 }

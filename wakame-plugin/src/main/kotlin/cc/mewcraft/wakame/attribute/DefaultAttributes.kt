@@ -1,50 +1,43 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.registry.ATTRIBUTE_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ElementRegistry
 import org.bukkit.entity.EntityType
-
-private val ATTRIBUTE_CONFIG by lazy { Configs.YAML[ATTRIBUTE_CONFIG_FILE] }
 
 /**
  * Provides default [AttributeInstance]s for various entity types.
  */
 object DefaultAttributes {
     private val DEFAULT_SUPPLIERS: Map<EntityType, AttributeSupplier> = buildMap {
-        put(EntityType.PLAYER, AttributeSupplier {
+        putSupplier(EntityType.PLAYER) {
             //
             // Vanilla-backed Attributes
             //
             // Mechanics of these attributes are backed by vanilla game.
 
-            add(Attributes.MAX_HEALTH) { configValue(EntityType.PLAYER) }
-            add(Attributes.MAX_ABSORPTION) { configValue(EntityType.PLAYER) }
-            add(Attributes.MOVEMENT_SPEED) { configValue(EntityType.PLAYER) }
-            add(Attributes.BLOCK_INTERACTION_RANGE) { configValue(EntityType.PLAYER) }
-            add(Attributes.ENTITY_INTERACTION_RANGE) { configValue(EntityType.PLAYER) }
+            addByConfig(Attributes.MAX_HEALTH)
+            addByConfig(Attributes.MAX_ABSORPTION)
+            addByConfig(Attributes.MOVEMENT_SPEED)
+            addByConfig(Attributes.BLOCK_INTERACTION_RANGE)
+            addByConfig(Attributes.ENTITY_INTERACTION_RANGE)
 
             //
             // Independent Attributes
             //
             // Mechanics of these attributes are implemented by ourselves.
 
-            add(Attributes.ATTACK_EFFECT_CHANCE) { configValue(EntityType.PLAYER) }
-            add(Attributes.ATTACK_SPEED_LEVEL) { configValue(EntityType.PLAYER) }
-            add(Attributes.CRITICAL_STRIKE_CHANCE) { configValue(EntityType.PLAYER) }
-            add(Attributes.CRITICAL_STRIKE_POWER) { configValue(EntityType.PLAYER) }
-            add(Attributes.DAMAGE_REDUCTION_RATE) { configValue(EntityType.PLAYER) }
-            add(Attributes.LIFESTEAL) { configValue(EntityType.PLAYER) }
-            add(Attributes.LIFESTEAL_RATE) { configValue(EntityType.PLAYER) }
-            add(Attributes.MANASTEAL) { configValue(EntityType.PLAYER) }
-            add(Attributes.MANASTEAL_RATE) { configValue(EntityType.PLAYER) }
-            add(Attributes.MANA_REGENERATION) { configValue(EntityType.PLAYER) }
-            add(Attributes.HEALTH_REGENERATION) { configValue(EntityType.PLAYER) }
-            add(Attributes.MANA_CONSUMPTION_RATE) { configValue(EntityType.PLAYER) }
-            add(Attributes.MAX_MANA) { configValue(EntityType.PLAYER) }
+            addByConfig(Attributes.ATTACK_EFFECT_CHANCE)
+            addByConfig(Attributes.ATTACK_SPEED_LEVEL)
+            addByConfig(Attributes.CRITICAL_STRIKE_CHANCE)
+            addByConfig(Attributes.CRITICAL_STRIKE_POWER)
+            addByConfig(Attributes.DAMAGE_REDUCTION_RATE)
+            addByConfig(Attributes.LIFESTEAL)
+            addByConfig(Attributes.LIFESTEAL_RATE)
+            addByConfig(Attributes.MANASTEAL)
+            addByConfig(Attributes.MANASTEAL_RATE)
+            addByConfig(Attributes.MANA_REGENERATION)
+            addByConfig(Attributes.HEALTH_REGENERATION)
+            addByConfig(Attributes.MANA_CONSUMPTION_RATE)
+            addByConfig(Attributes.MAX_MANA)
 
             //
             // Elemental Attributes
@@ -53,13 +46,13 @@ object DefaultAttributes {
             // Mechanics of these attributes are implementation-defined.
 
             ElementRegistry.INSTANCES.objects.forEach {
-                add(Attributes.byElement(it).DEFENSE) { configValue(EntityType.PLAYER) }
-                add(Attributes.byElement(it).DEFENSE_PENETRATION) { configValue(EntityType.PLAYER) }
-                add(Attributes.byElement(it).DEFENSE_PENETRATION_RATE) { configValue(EntityType.PLAYER) }
-                add(Attributes.byElement(it).MIN_ATTACK_DAMAGE) { configValue(EntityType.PLAYER) }
-                add(Attributes.byElement(it).MAX_ATTACK_DAMAGE) { configValue(EntityType.PLAYER) }
+                addByConfig(Attributes.byElement(it).DEFENSE)
+                addByConfig(Attributes.byElement(it).DEFENSE_PENETRATION)
+                addByConfig(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
+                addByConfig(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
+                addByConfig(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
             }
-        })
+        }
     }
 
     /**
@@ -76,15 +69,19 @@ object DefaultAttributes {
         return requireNotNull(DEFAULT_SUPPLIERS[type]) { "Can't find attribute supplier for type $type" }
     }
 
+    /**
+     * Checks if the [type] entity has a default [AttributeSupplier].
+     *
+     * @param type the entity type to check
+     * @return true if the entity type has a default supplier, false otherwise
+     */
     fun hasSupplier(type: EntityType): Boolean {
         return DEFAULT_SUPPLIERS.containsKey(type)
     }
 
-    private fun Attribute.configValue(type: EntityType): Provider<Double> {
-        return if (this is ElementAttribute) {
-            ATTRIBUTE_CONFIG.optionalEntry<Double>("default_attributes", type.name, element.uniqueId, descriptionId).orElse(defaultValue)
-        } else {
-            ATTRIBUTE_CONFIG.optionalEntry<Double>("default_attributes", type.name, descriptionId).orElse(defaultValue)
-        }
+    /* Private Functions */
+
+    private fun MutableMap<EntityType, AttributeSupplier>.putSupplier(entityType: EntityType, builder: AttributeSupplier.Builder.() -> Unit) {
+        put(entityType, AttributeSupplier(entityType, builder))
     }
 }

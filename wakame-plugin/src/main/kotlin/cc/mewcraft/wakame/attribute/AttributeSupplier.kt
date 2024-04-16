@@ -1,11 +1,18 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.commons.provider.immutable.provider
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.wakame.registry.ATTRIBUTE_CONFIG_FILE
+import org.bukkit.entity.EntityType
 import java.util.*
 
-fun AttributeSupplier(builder: AttributeSupplier.Builder.() -> Unit): AttributeSupplier {
-    return AttributeSupplier.Builder().apply(builder).build()
+private val ATTRIBUTE_CONFIG by lazy { Configs.YAML[ATTRIBUTE_CONFIG_FILE] }
+
+fun AttributeSupplier(entityType: EntityType, builder: AttributeSupplier.Builder.() -> Unit): AttributeSupplier {
+    return AttributeSupplier.Builder(entityType).apply(builder).build()
 }
 
 /**
@@ -51,7 +58,9 @@ class AttributeSupplier internal constructor(
         return attributeInstance?.buildToWakame()?.getModifier(uuid) != null
     }
 
-    class Builder {
+    class Builder(
+        private val entityType: EntityType,
+    ) {
         private val builder: MutableMap<Attribute, AttributeInstanceBuilder> = HashMap()
 
         private fun create(attribute: Attribute): AttributeInstanceBuilder {
@@ -60,19 +69,31 @@ class AttributeSupplier internal constructor(
             return attributeInstance
         }
 
+        /**
+         * 添加一个属性，其 [AttributeInstance] 的 [AttributeInstance.getBaseValue] 的值将与 [Attribute.defaultValue] 相同。
+         */
         fun add(attribute: Attribute): Builder {
-            return add(attribute, attribute.defaultValue)
+            return addByStatic(attribute, attribute.defaultValue)
         }
 
-        fun add(attribute: Attribute, value: Attribute.() -> Provider<Double>): Builder {
-            return add(attribute, value(attribute))
+        /**
+         * 添加一个属性，其 [AttributeInstance] 的 [AttributeInstance.getBaseValue] 的值将与 [Attribute.configValue] 相同。
+         */
+        fun addByConfig(attribute: Attribute): Builder {
+            return addByProvider(attribute, attribute.configValue())
         }
 
-        fun add(attribute: Attribute, value: Double): Builder {
-            return add(attribute, provider(value))
+        /**
+         * 添加一个属性，其 [AttributeInstance.getBaseValue] 的值由一个 [Double] 类型常量提供。
+         */
+        fun addByStatic(attribute: Attribute, value: Double): Builder {
+            return addByProvider(attribute, provider(value))
         }
 
-        fun add(attribute: Attribute, value: Provider<Double>): Builder {
+        /**
+         * 添加一个属性，其 [AttributeInstance.getBaseValue] 的值由一个 [Double] 类型的 [Provider] 提供。
+         */
+        fun addByProvider(attribute: Attribute, value: Provider<Double>): Builder {
             val attributeInstance = create(attribute)
             attributeInstance.baseValue = value
             return this
@@ -80,6 +101,14 @@ class AttributeSupplier internal constructor(
 
         fun build(): AttributeSupplier {
             return AttributeSupplier(builder)
+        }
+
+        private fun Attribute.configValue(): Provider<Double> {
+            return if (this is ElementAttribute) {
+                ATTRIBUTE_CONFIG.optionalEntry<Double>("default_attributes", entityType.name, element.uniqueId, descriptionId).orElse(defaultValueProvider)
+            } else {
+                ATTRIBUTE_CONFIG.optionalEntry<Double>("default_attributes", entityType.name, descriptionId).orElse(defaultValueProvider)
+            }
         }
     }
 }

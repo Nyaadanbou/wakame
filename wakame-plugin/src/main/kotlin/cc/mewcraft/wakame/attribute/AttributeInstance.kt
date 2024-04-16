@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.provider
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.util.toBukkit
 import cc.mewcraft.wakame.util.toNeko
@@ -51,7 +50,7 @@ interface AttributeInstance {
 class AttributeInstanceBuilder(
     val attribute: Attribute
 ) {
-    var baseValue: Provider<Double> = provider(attribute.defaultValue)
+    var baseValue: Provider<Double> = attribute.defaultValueProvider
 
     fun buildToVanilla(attributable: Attributable): AttributeInstance {
         require(attribute.vanilla) { "Can't convert a non-vanilla attribute instance to vanilla" }
