@@ -12,7 +12,7 @@ internal fun referenceModule(): Module = module {
 
     single<TypeSerializerCollection>(named(REFERENCE_SERIALIZERS)) {
         TypeSerializerCollection.builder()
-            .kregister(EntityReferenceSerializer())
+            .kregister(EntityReferenceSerializer)
             .build()
     }
 

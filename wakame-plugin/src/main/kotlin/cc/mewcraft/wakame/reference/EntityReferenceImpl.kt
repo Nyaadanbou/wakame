@@ -6,11 +6,10 @@ import org.bukkit.entity.Entity
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-internal class ImmutableEntityReference(
+internal data class EntityReferenceImpl(
     override val name: String,
     override val keySet: Set<Key>,
 ) : KoinComponent, EntityReference {
-
     private val entityKeyLookup: EntityKeyLookup by inject()
 
     override fun contains(entity: Entity): Boolean {
@@ -20,5 +19,4 @@ internal class ImmutableEntityReference(
     override fun contains(key: Key): Boolean {
         return key in keySet
     }
-
 }
