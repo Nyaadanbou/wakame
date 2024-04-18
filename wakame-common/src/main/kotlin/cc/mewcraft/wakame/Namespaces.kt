@@ -17,6 +17,11 @@ object Namespaces {
     const val CURSE = "curse"
 
     /**
+     * The namespace of all types of generic things.
+     */
+    const val GENERIC = "generic"
+
+    /**
      * The namespace of all types of ItemMeta.
      */
     const val ITEM_META = "meta"
