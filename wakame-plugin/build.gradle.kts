@@ -2,7 +2,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
 
 plugins {
-    id("neko.repositories") version "1.0"
+    id("neko.repositories") version "1.1"
     id("neko-kotlin")
     id("neko-koin")
     alias(libs.plugins.pluginyml.paper)

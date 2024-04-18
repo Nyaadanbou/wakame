@@ -3,7 +3,13 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven(uri("${System.getProperty("user.home")}/MewcraftRepository"))
+        maven("https://repo.mewcraft.cc/releases")
+        maven("https://repo.mewcraft.cc/private") {
+            credentials {
+                username = providers.gradleProperty("mewcraftRepositoryUsername").getOrElse("")
+                password = providers.gradleProperty("mewcraftRepositoryPassword").getOrElse("")
+            }
+        }
     }
 }
 
@@ -13,7 +19,13 @@ plugins {
 
 dependencyResolutionManagement {
     repositories {
-        maven(uri("${System.getProperty("user.home")}/MewcraftRepository"))
+        maven("https://repo.mewcraft.cc/releases")
+        maven("https://repo.mewcraft.cc/private") {
+            credentials {
+                username = providers.gradleProperty("mewcraftRepositoryUsername").getOrElse("")
+                password = providers.gradleProperty("mewcraftRepositoryPassword").getOrElse("")
+            }
+        }
     }
     versionCatalogs {
         create("libs") {

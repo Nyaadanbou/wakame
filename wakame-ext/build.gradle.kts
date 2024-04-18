@@ -1,5 +1,5 @@
 plugins {
-    id("neko.repositories") version "1.0"
+    id("neko.repositories") version "1.1"
     id("neko-kotlin")
 }
 

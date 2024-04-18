@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("neko.repositories") version "1.0"
+    id("neko.repositories") version "1.1"
     id("net.kyori.indra")
     id("com.github.johnrengelman.shadow")
 }
