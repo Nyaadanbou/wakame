@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.reference.referenceModule
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.registry.NekoItemRegistry.get
+import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -35,6 +36,7 @@ class ItemModelDataLookupTest : KoinTest {
                     referenceModule(),
                     registryModule(),
                     rarityModule(),
+                    skillModule(),
                     skinModule(),
                     lookupModule()
                 )

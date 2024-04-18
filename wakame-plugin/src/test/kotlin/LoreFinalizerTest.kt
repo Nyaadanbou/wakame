@@ -3,6 +3,7 @@ import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
@@ -35,7 +36,8 @@ class LoreFinalizerTest : KoinTest {
                     kizamiModule(),
                     registryModule(),
                     rarityModule(),
-                    skinModule()
+                    skillModule(),
+                    skinModule(),
                 )
             }
 

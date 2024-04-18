@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.reference.referenceModule
 import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.user.User
@@ -50,6 +51,7 @@ class ItemDeserializationTest : KoinTest {
                     referenceModule(),
                     registryModule(),
                     rarityModule(),
+                    skillModule(),
                     skinModule()
                 )
             }

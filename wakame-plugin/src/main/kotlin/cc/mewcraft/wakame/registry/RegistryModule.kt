@@ -93,6 +93,7 @@ internal fun registryModule(): Module = module {
     single<YamlConfigurationLoader>(named(KIZAMI_CONFIG_LOADER)) {
         createYamlLoader(KIZAMI_CONFIG_FILE) {
             registerAll(get(named(KIZAMI_SERIALIZERS)))
+            registerAll(get(named(SKILL_SERIALIZERS)))
         }
     }
 
@@ -106,8 +107,8 @@ internal fun registryModule(): Module = module {
 
     single<YamlConfigurationLoader.Builder>(named(SKILL_CONFIG_LOADER)) {
         buildYamlLoader {
-            registerAll(get<TypeSerializerCollection>(named(BASE_SERIALIZERS)))
-            registerAll(get<TypeSerializerCollection>(named(SKILL_SERIALIZERS)))
+            registerAll(get(named(BASE_SERIALIZERS)))
+            registerAll(get(named(SKILL_SERIALIZERS)))
         }
     }
 

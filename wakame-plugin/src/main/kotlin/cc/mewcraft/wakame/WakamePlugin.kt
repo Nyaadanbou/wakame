@@ -45,7 +45,6 @@ class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
                 wakameModule(this@WakamePlugin),
 
                 // sub modules (by alphabet order)
-                skillModule(),
                 attackModule(),
                 attributeModule(),
                 crateModule(),
@@ -67,6 +66,7 @@ class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
                 reforgeModule(),
                 registryModule(),
                 skinModule(),
+                skillModule(),
                 testModule(),
                 userModule(),
             )

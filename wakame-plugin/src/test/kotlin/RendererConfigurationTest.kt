@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.skill.skillModule
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -32,7 +33,8 @@ class RendererConfigurationTest : KoinTest {
                     elementModule(),
                     kizamiModule(),
                     rarityModule(),
-                    registryModule()
+                    registryModule(),
+                    skillModule()
                 )
             }
 
