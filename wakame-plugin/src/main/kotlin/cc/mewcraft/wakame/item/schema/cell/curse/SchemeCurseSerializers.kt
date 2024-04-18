@@ -58,7 +58,7 @@ internal data object SchemaCurseGroupSerializer : AbstractGroupSerializer<Schema
  */
 internal data object SchemaCursePoolSerializer : AbstractPoolSerializer<SchemaCurse, SchemaGenerationContext>() {
     override fun contentFactory(node: ConfigurationNode): SchemaCurse {
-        return SchemaCurseFactory.schemaOf(node)
+        return SchemaCurseFactory.create(node)
     }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemaGenerationContext> {

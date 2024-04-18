@@ -46,13 +46,12 @@ internal fun schemaItemModule(): Module = module {
             // cores
             .kregister(SchemaCorePoolSerializer)
             .kregister(SchemaCoreGroupSerializer)
+            .registerAll(get(named(SKILL_SERIALIZERS)))
 
             // curses
             .kregister(SchemaCursePoolSerializer)
             .kregister(SchemaCurseGroupSerializer)
-
-            // curse contents
-            .registerAll(get<TypeSerializerCollection>(named(REFERENCE_SERIALIZERS)))
+            .registerAll(get(named(REFERENCE_SERIALIZERS)))
 
             .build()
     }

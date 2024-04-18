@@ -6,14 +6,14 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.attribute.facade.AttributeData
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
+import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
@@ -34,23 +34,11 @@ fun SchemaAttributeCore(node: ConfigurationNode): SchemaAttributeCore {
  * This interface specifically extends [AttributeComponent.Op] because the `operation` property
  * is, by design, shared by all subclasses of [SchemaAttributeCore] without any exceptions.
  */
-sealed interface SchemaAttributeCore : SchemaCore, AttributeData, AttributeComponent.Op<AttributeModifier.Operation> {
-    /**
-     * The numeric value's tag type.
-     *
-     * It's used to generate most optimized numeric values for NBT data.
-     */
-    val tagType: ShadowTagType
-
-    /**
-     * Specifically overrides the return type as [BinaryAttributeCore].
-     */
-    override fun generate(context: SchemaGenerationContext): BinaryAttributeCore
+sealed interface SchemaAttributeCore : SchemaCore, AttributeData, AttributeComponent.Op<AttributeModifier.Operation>, Examinable {
+    override fun reify(context: SchemaGenerationContext): BinaryAttributeCore
 }
 
-//
-// 下面是可能会用到的扩展函数
-//
+/* Some useful extension functions */
 
 val SchemaAttributeCore.element: Element
     get() = requireNotNull(elementOrNull) { "The 'element' component is not present" }

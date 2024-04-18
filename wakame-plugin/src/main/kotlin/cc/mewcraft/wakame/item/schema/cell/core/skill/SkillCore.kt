@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item.schema.cell.core.skill
 
-import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
+import cc.mewcraft.wakame.item.SkillInstance
+import cc.mewcraft.wakame.item.SkillTrigger
+import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
 import cc.mewcraft.wakame.util.krequire
@@ -14,7 +16,8 @@ import org.spongepowered.configurate.ConfigurationNode
  */
 fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
     val key = node.node("key").krequire<Key>()
-    val schemaSkillCore = SchemaSkillCoreSimple(key)
+    val trigger = node.node("trigger").krequire<SkillTrigger>()
+    val schemaSkillCore = SchemaSkillCoreImpl(key, trigger)
     return schemaSkillCore
 }
 
@@ -22,6 +25,9 @@ fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
  * Represents a [SchemaCore] of a skill.
  */
 interface SchemaSkillCore : SchemaCore {
-    override val key: Key
-    override fun generate(context: SchemaGenerationContext): BinarySkillCore
+    val instance: SkillInstance
+    val trigger: SkillTrigger
+    override fun reify(context: SchemaGenerationContext): BinarySkillCore
 }
+
+/* Some useful extension functions */

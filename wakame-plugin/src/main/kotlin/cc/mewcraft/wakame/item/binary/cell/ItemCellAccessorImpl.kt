@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.CellBinaryKeys
 import cc.mewcraft.wakame.item.binary.BaseNekoStack
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
@@ -37,7 +37,7 @@ internal value class ItemCellAccessorImpl(
 
     override fun find(id: String): BinaryCell? {
         val compoundTag = rootOrNull?.getCompoundOrNull(id) ?: return null
-        return BinaryCellFactory.decode(id, compoundTag)
+        return BinaryCellFactory.wrap(compoundTag)
     }
 
     override fun getAttributeModifiers(): Multimap<Attribute, AttributeModifier> {
@@ -54,7 +54,7 @@ internal value class ItemCellAccessorImpl(
 
             val core = cell.core
             if (core is BinaryAttributeCore) {
-                val modifiers = core.makeAttributeModifiers(base.uuid)
+                val modifiers = core.provideAttributeModifiers(base.uuid)
                 val modifiersEntries = modifiers.entries
                 multimap.putAll(modifiersEntries)
             }
@@ -62,7 +62,7 @@ internal value class ItemCellAccessorImpl(
         return multimap.build()
     }
 
-    override fun getActiveAbilities(): List<Skill> {
+    override fun getSkillInstances(): List<Skill> {
         TODO("Not yet implemented")
     }
 

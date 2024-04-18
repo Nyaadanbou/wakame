@@ -5,6 +5,8 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.SchemaCorePool
 import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCore
 import cc.mewcraft.wakame.item.schema.cell.core.attribute.elementOrNull
+import cc.mewcraft.wakame.item.schema.cell.core.empty.SchemaEmptyCore
+import cc.mewcraft.wakame.item.schema.cell.core.noop.SchemaNoopCore
 import cc.mewcraft.wakame.item.schema.cell.core.skill.SchemaSkillCore
 import cc.mewcraft.wakame.item.schema.filter.AttributeFilter
 import cc.mewcraft.wakame.item.schema.filter.FilterFactory
@@ -67,7 +69,7 @@ internal data object SchemaCoreGroupSerializer : AbstractGroupSerializer<SchemaC
  */
 internal data object SchemaCorePoolSerializer : AbstractPoolSerializer<SchemaCore, SchemaGenerationContext>() {
     override fun contentFactory(node: ConfigurationNode): SchemaCore {
-        return SchemaCoreFactory.schemaOf(node)
+        return SchemaCoreFactory.create(node)
     }
 
     override fun conditionFactory(node: ConfigurationNode): Condition<SchemaGenerationContext> {
@@ -76,6 +78,12 @@ internal data object SchemaCorePoolSerializer : AbstractPoolSerializer<SchemaCor
 
     override fun intrinsicConditions(content: SchemaCore): Condition<SchemaGenerationContext> {
         return when (content) {
+            // A noop core should always return true
+            is SchemaNoopCore -> Condition.alwaysTrue()
+
+            // An empty core should always return true
+            is SchemaEmptyCore -> Condition.alwaysTrue()
+
             // By design, an attribute is considered generated
             // if there is already an attribute with all the same
             // key, operation and element in the selection context.
@@ -83,7 +91,7 @@ internal data object SchemaCorePoolSerializer : AbstractPoolSerializer<SchemaCor
 
             // By design, a skill is considered generated
             // if there is already a skill with the same key
-            // in the selection context.
+            // in the selection context, neglecting the trigger.
             is SchemaSkillCore -> SkillFilter(true, content.key)
 
             // Throw if we see an unknown schema core type

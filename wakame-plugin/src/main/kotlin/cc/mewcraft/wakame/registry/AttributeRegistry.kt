@@ -2,16 +2,16 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.attribute.facade.AttributeComponent
-import cc.mewcraft.wakame.attribute.facade.BinaryAttributeCoreNbtEncoder
-import cc.mewcraft.wakame.attribute.facade.BinaryAttributeCoreNodeEncoder
-import cc.mewcraft.wakame.attribute.facade.SchemaAttributeCoreNodeEncoder
+import cc.mewcraft.wakame.attribute.facade.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
-import cc.mewcraft.wakame.item.schema.cell.core.attribute.*
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.*
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreR
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreRE
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreS
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreSE
 import cc.mewcraft.wakame.util.*
 import com.google.common.collect.ImmutableMap
 import me.lucko.helper.nbt.ShadowTagType
@@ -38,7 +38,7 @@ object AttributeRegistry : Initializable {
     /**
      * The facades of all attributes.
      */
-    val FACADES: Registry<Key, AttributeFacade<BinaryAttributeCore>> = SimpleRegistry()
+    val FACADES: Registry<Key, AttributeFacade<BinaryAttributeData>> = SimpleRegistry()
 
     /**
      * Build an attribute facade.
@@ -103,7 +103,7 @@ object AttributeRegistry : Initializable {
  * @param A the type parameter of [AttributeModifierCreator]
  */
 @Suppress("PropertyName")
-interface AttributeFacade<out A : BinaryAttributeCore> {
+interface AttributeFacade<out A : BinaryAttributeData> {
     /**
      * 属性 facade 的唯一标识。
      *
@@ -145,7 +145,8 @@ interface AttributeFacade<out A : BinaryAttributeCore> {
  * @param T the type of [BinaryAttributeCore] which this creator
  *          creates attribute modifier out of
  */
-fun interface AttributeModifierCreator<in T : BinaryAttributeCore> {
+fun interface AttributeModifierCreator<in T : BinaryAttributeData> {
+    // TODO 这里可以用范型吗？
     fun makeAttributeModifiers(uuid: UUID, core: T): Map<Attribute, AttributeModifier>
 }
 
@@ -196,32 +197,42 @@ interface RangedSelection : RangedAttributeBinder {
  * 已选择 single，然后最终绑定到属性上。
  */
 interface SingleAttributeBinder {
-    fun bind(component: Attribute): AttributeFacade<BinaryAttributeCore.S>
+    fun bind(
+        component: Attribute,
+    ): AttributeFacade<BinaryAttributeData.S>
 }
 
 /**
  * 已选择 ranged，然后最终绑定到属性上。
  */
 interface RangedAttributeBinder {
-    fun bind(component1: Attribute, component2: Attribute): AttributeFacade<BinaryAttributeCore.R>
+    fun bind(
+        component1: Attribute,
+        component2: Attribute,
+    ): AttributeFacade<BinaryAttributeData.R>
 }
 
 /**
  * 已选择 single + element，然后最终绑定到属性上。
  */
 interface SingleElementAttributeBinder {
-    fun bind(component: (Element) -> ElementAttribute): AttributeFacade<BinaryAttributeCore.SE>
+    fun bind(
+        component: (Element) -> ElementAttribute,
+    ): AttributeFacade<BinaryAttributeData.SE>
 }
 
 /**
  * 已选择 ranged + element，然后最终绑定到属性上。
  */
 interface RangedElementAttributeBinder {
-    fun bind(component1: (Element) -> ElementAttribute, component2: (Element) -> ElementAttribute): AttributeFacade<BinaryAttributeCore.RE>
+    fun bind(
+        component1: (Element) -> ElementAttribute,
+        component2: (Element) -> ElementAttribute,
+    ): AttributeFacade<BinaryAttributeData.RE>
 }
 
 //<editor-fold desc="Implementation">
-private class AttributeFacadeImpl<T : BinaryAttributeCore>(
+private class AttributeFacadeImpl<T : BinaryAttributeData>(
     override val KEY: Key,
     override val MODIFIER_FACTORY: AttributeModifierCreator<T>,
     override val STRUCTURE_METADATA: AttributeStructureMetadata,
@@ -268,10 +279,10 @@ private class SingleSelectionImpl(
      */
     override fun bind(
         component: Attribute,
-    ): AttributeFacade<BinaryAttributeCore.S> = AttributeFacadeImpl(
+    ): AttributeFacade<BinaryAttributeCoreDataHolderS> = AttributeFacadeImpl(
         KEY = facadeKey,
 
-        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCore.S ->
+        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreDataHolderS ->
             ImmutableMap.of(
                 component, AttributeModifier(uuid, core.value.toStableDouble(), core.operation),
             )
@@ -290,13 +301,11 @@ private class SingleSelectionImpl(
         BINARY_CORE_NODE_ENCODER = { node: ConfigurationNode ->
             val operation = node.getOperation()
             val value = node.getBinarySingle()
-            BinaryAttributeCore.S(facadeKey, tagType, operation, value)
+            BinaryAttributeCoreDataHolderS(facadeKey, tagType, operation, value)
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            val operation = compound.getOperation()
-            val value = compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE)
-            BinaryAttributeCore.S(facadeKey, tagType, operation, value)
+            BinaryAttributeCoreNBTWrapperS(compound)
         },
     )
 }
@@ -315,10 +324,10 @@ private class RangedSelectionImpl(
     override fun bind(
         component1: Attribute,
         component2: Attribute,
-    ): AttributeFacade<BinaryAttributeCore.R> = AttributeFacadeImpl(
+    ): AttributeFacade<BinaryAttributeCoreDataHolderR> = AttributeFacadeImpl(
         KEY = facadeKey,
 
-        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCore.R ->
+        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreDataHolderR ->
             ImmutableMap.of(
                 component1, AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
                 component2, AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
@@ -340,14 +349,11 @@ private class RangedSelectionImpl(
             val operation = node.getOperation()
             val lower = node.getBinaryLower()
             val upper = node.getBinaryUpper()
-            BinaryAttributeCore.R(facadeKey, tagType, operation, lower, upper)
+            BinaryAttributeCoreDataHolderR(facadeKey, tagType, operation, lower, upper)
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            val lower = compound.getNumber(AttributeBinaryKeys.RANGED_MIN_VALUE)
-            val upper = compound.getNumber(AttributeBinaryKeys.RANGED_MAX_VALUE)
-            val operation = compound.getOperation()
-            BinaryAttributeCore.R(facadeKey, tagType, operation, lower, upper)
+            BinaryAttributeCoreNBTWrapperR(compound)
         },
     )
 }
@@ -362,10 +368,10 @@ private class SingleElementAttributeBinderImpl(
      */
     override fun bind(
         component: (Element) -> ElementAttribute,
-    ): AttributeFacade<BinaryAttributeCore.SE> = AttributeFacadeImpl(
+    ): AttributeFacade<BinaryAttributeCoreDataHolderSE> = AttributeFacadeImpl(
         KEY = facadeKey,
 
-        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCore.SE ->
+        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreDataHolderSE ->
             ImmutableMap.of(
                 component(core.element), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
             )
@@ -386,14 +392,11 @@ private class SingleElementAttributeBinderImpl(
             val operation = node.getOperation()
             val value = node.getBinarySingle()
             val element = node.getElement()
-            BinaryAttributeCore.SE(facadeKey, tagType, operation, value, element)
+            BinaryAttributeCoreDataHolderSE(facadeKey, tagType, operation, value, element)
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            val value = compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE)
-            val element = compound.getElement()
-            val operation = compound.getOperation()
-            BinaryAttributeCore.SE(facadeKey, tagType, operation, value, element)
+            BinaryAttributeCoreNBTWrapperSE(compound)
         },
     )
 }
@@ -409,10 +412,10 @@ private class RangedElementAttributeBinderImpl(
     override fun bind(
         component1: (Element) -> ElementAttribute,
         component2: (Element) -> ElementAttribute,
-    ): AttributeFacade<BinaryAttributeCore.RE> = AttributeFacadeImpl(
+    ): AttributeFacade<BinaryAttributeCoreDataHolderRE> = AttributeFacadeImpl(
         KEY = facadeKey,
 
-        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCore.RE ->
+        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreDataHolderRE ->
             ImmutableMap.of(
                 component1(core.element), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
                 component2(core.element), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
@@ -436,31 +439,13 @@ private class RangedElementAttributeBinderImpl(
             val lower = node.getBinaryLower()
             val upper = node.getBinaryUpper()
             val element = node.getElement()
-            BinaryAttributeCore.RE(facadeKey, tagType, operation, lower, upper, element)
+            BinaryAttributeCoreDataHolderRE(facadeKey, tagType, operation, lower, upper, element)
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            val lower = compound.getNumber(AttributeBinaryKeys.RANGED_MIN_VALUE)
-            val upper = compound.getNumber(AttributeBinaryKeys.RANGED_MAX_VALUE)
-            val element = compound.getElement()
-            val operation = compound.getOperation()
-            BinaryAttributeCore.RE(facadeKey, tagType, operation, lower, upper, element)
+            BinaryAttributeCoreNBTWrapperRE(compound)
         },
     )
-}
-
-/* Specialized Compound Operations */
-
-private fun CompoundShadowTag.getElement(): Element {
-    return this.getByteOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { ElementRegistry.getBy(it) } ?: ElementRegistry.DEFAULT
-}
-
-private fun CompoundShadowTag.getOperation(): AttributeModifier.Operation {
-    return AttributeModifier.Operation.byId(this.getInt(AttributeBinaryKeys.OPERATION_TYPE))
-}
-
-private fun CompoundShadowTag.getNumber(key: String): Double {
-    return this.getDouble(key)
 }
 
 /* Specialized Configuration Operations */

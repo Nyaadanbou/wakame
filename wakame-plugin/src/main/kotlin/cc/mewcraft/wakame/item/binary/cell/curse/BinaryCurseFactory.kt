@@ -2,22 +2,19 @@ package cc.mewcraft.wakame.item.binary.cell.curse
 
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
-import cc.mewcraft.wakame.item.binary.cell.curse.EntityKillsCurse
-import cc.mewcraft.wakame.item.binary.cell.curse.PeakDamageCurse
+import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEmptyCurse
+import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEntityKillsCurse
+import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryPeakDamageCurse
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCurse
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.EntityReferenceRegistry
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import cc.mewcraft.wakame.item.binary.cell.curse.EntityKillsCurse as BEntityKillsCurse
-import cc.mewcraft.wakame.item.binary.cell.curse.PeakDamageCurse as BPeakDamageCurse
 
 object BinaryCurseFactory {
 
     /**
      * Creates an empty curse.
      */
-    fun empty(): BinaryCurse = EmptyBinaryCurse
+    fun empty(): BinaryCurse = BinaryEmptyCurse()
 
     /**
      * Creates a curse from a NBT source.
@@ -25,36 +22,28 @@ object BinaryCurseFactory {
      * @param compound the compound tag
      * @return a new instance
      */
-    fun decode(compound: CompoundShadowTag): BinaryCurse {
+    fun wrap(compound: CompoundShadowTag): BinaryCurse {
         if (compound.isEmpty) {
+            // It's an empty binary curse,
+            // just return the singleton.
             return empty()
         }
 
         val id = compound.getString(CurseBinaryKeys.CURSE_IDENTIFIER)
-        val ret: BinaryCurse = when (id) {
-            CurseConstants.ENTITY_KILLS -> {
-                val index = EntityReferenceRegistry.INSTANCES[compound.getString(EntityKillsCurse.INDEX_TAG_NAME)]
-                val count = compound.getInt(EntityKillsCurse.COUNT_TAG_NAME)
-                BEntityKillsCurse(index, count)
-            }
-
-            CurseConstants.PEAK_DAMAGE -> {
-                val element = ElementRegistry.getBy(compound.getByte(PeakDamageCurse.ELEMENT_TAG_NAME))
-                val amount = compound.getInt(PeakDamageCurse.AMOUNT_TAG_NAME)
-                BPeakDamageCurse(element, amount)
-            }
-
-            else -> empty()
+        val ret = when (id) {
+            CurseConstants.ENTITY_KILLS -> BinaryEntityKillsCurse(compound)
+            CurseConstants.PEAK_DAMAGE -> BinaryPeakDamageCurse(compound)
+            else -> throw IllegalArgumentException("Failed to parse NBT tag: ${compound.asString()}")
         }
 
         return ret
     }
 
     /**
-     * Creates a curse from a schema source.
+     * Reifies a [SchemaCurse] with given [context].
      */
-    fun generate(context: SchemaGenerationContext, schemaCurse: SchemaCurse): BinaryCurse {
-        return schemaCurse.generate(context)
+    fun reify(schema: SchemaCurse, context: SchemaGenerationContext): BinaryCurse {
+        return schema.reify(context)
     }
 
 }

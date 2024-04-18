@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.facade
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -35,8 +35,3 @@ fun interface BinaryAttributeCoreNodeEncoder : AttributeDataEncoder<Configuratio
  * Data conversion: [CompoundShadowTag] -> [BinaryAttributeCore].
  */
 fun interface BinaryAttributeCoreNbtEncoder : AttributeDataEncoder<CompoundShadowTag, BinaryAttributeCore>
-
-/**
- * Data conversion: [BinaryAttributeCore] -> [CompoundShadowTag].
- */
-fun interface BinaryAttributeCoreNbtDecoder : AttributeDataDecoder<CompoundShadowTag, BinaryAttributeCore>

@@ -1,14 +1,21 @@
 package cc.mewcraft.wakame.item.binary.cell.core
 
+import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.item.CoreBinaryKeys
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.elementOrNull
+import cc.mewcraft.wakame.item.binary.cell.core.empty.BinaryEmptyCore
+import cc.mewcraft.wakame.item.binary.cell.core.noop.BinaryNoopCore
+import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
 import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCore
+import cc.mewcraft.wakame.item.schema.cell.core.empty.SchemaEmptyCore
+import cc.mewcraft.wakame.item.schema.cell.core.noop.SchemaNoopCore
 import cc.mewcraft.wakame.item.schema.cell.core.skill.SchemaSkillCore
 import cc.mewcraft.wakame.item.schema.filter.AttributeContextHolder
 import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.Key
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
@@ -18,68 +25,62 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 object BinaryCoreFactory {
 
     /**
-     * Creates an empty binary core.
-     */
-    fun empty(): BinaryCore {
-        return EmptyBinaryCore
-    }
-
-    /**
-     * Creates an [BinaryCore] from a NBT source.
+     * Wraps a NBT tag as [BinaryCore].
      *
-     * @param compound the tag
-     * @return a non-empty [BinaryCore] or [EmptyBinaryCore]
+     * @param compound the compound
+     * @return a new instance of [BinaryCore]
      * @throws IllegalArgumentException if the NBT is malformed
      */
-    fun decode(compound: CompoundShadowTag): BinaryCore {
+    fun wrap(compound: CompoundShadowTag): BinaryCore {
         if (compound.isEmpty) {
-            return empty()
+            // There's nothing in the compound,
+            // so we consider it an empty core.
+            return BinaryEmptyCore()
         }
 
         val key = Key(compound.getString(CoreBinaryKeys.CORE_IDENTIFIER))
-        val ret: BinaryCore
-        when (key.namespace()) {
-            Namespaces.SKILL -> {
-                ret = BinarySkillCore(key)
-            }
 
-            Namespaces.ATTRIBUTE -> {
-                val encoder = AttributeRegistry.FACADES[key].BINARY_CORE_NBT_ENCODER
-                val attributeCore = encoder.encode(compound)
-                ret = attributeCore
-            }
-
-            else -> throw IllegalArgumentException("Failed to parse binary tag ${compound.asString()}")
+        val ret = when {
+            key == GenericKeys.NOOP -> BinaryNoopCore()
+            key == GenericKeys.EMPTY -> BinaryEmptyCore()
+            key.namespace() == Namespaces.ATTRIBUTE -> BinaryAttributeCore(compound)
+            key.namespace() == Namespaces.SKILL -> BinarySkillCore(compound)
+            else -> throw IllegalArgumentException("Failed to parse NBT tag ${compound.asString()}")
         }
 
         return ret
     }
 
     /**
-     * Creates an [BinaryCore] from a schema source.
+     * Reifies a [SchemaCore] with given [context].
      *
      * @param context the context
-     * @param schemaCore the schema core
-     * @return a new instance
+     * @param schema the schema core
+     * @return a new instance of [BinaryCore]
      * @throws IllegalArgumentException
      */
-    fun generate(context: SchemaGenerationContext, schemaCore: SchemaCore): BinaryCore {
-        val key = schemaCore.key
+    fun reify(schema: SchemaCore, context: SchemaGenerationContext): BinaryCore {
+        val key = schema.key
         val ret: BinaryCore
-        when (schemaCore) {
+        when (schema) {
+            is SchemaNoopCore, is SchemaEmptyCore -> {
+                val virtualCore = schema.reify(context)
+                ret = virtualCore
+            }
+
             is SchemaAttributeCore -> {
-                val attributeCore = schemaCore.generate(context)
+                val attributeCore = schema.reify(context)
                 context.attributes += AttributeContextHolder(key, attributeCore.operation, attributeCore.elementOrNull)
                 ret = attributeCore
             }
 
             is SchemaSkillCore -> {
-                val skillCore = BinarySkillCore(key)
-                context.abilities += SkillContextHolder(key)
+                val skillCore = schema.reify(context)
+                context.skills += SkillContextHolder(key)
                 ret = skillCore
             }
 
-            else -> throw IllegalArgumentException("Failed to generate binary tag ${schemaCore.key.asString()}")
+            else -> throw IllegalArgumentException("Failed to generate NBT tag from $schema")
         }
 
         return ret

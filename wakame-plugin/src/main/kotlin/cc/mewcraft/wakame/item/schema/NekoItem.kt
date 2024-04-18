@@ -79,12 +79,9 @@ interface NekoItem : Keyed, ItemBehaviorAccessor {
     val cell: Set<SchemaCell>
 
     /**
-     * Gets specific schema cell by unique identifier.
-     *
-     * @param id the unique identifier of schema cell
-     * @return the schema cell
+     * The map holds a mapping from the identifier to schema cell.
      */
-    fun getCell(id: String): SchemaCell?
+    val cellMap: Map<String, SchemaCell>
 }
 
 /**
@@ -105,4 +102,3 @@ interface NekoItem : Keyed, ItemBehaviorAccessor {
 inline fun <reified M : SchemaItemMeta<*>> NekoItem.getMeta(): M {
     return getMeta(M::class)
 }
-

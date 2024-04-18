@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
-import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.util.Key
 

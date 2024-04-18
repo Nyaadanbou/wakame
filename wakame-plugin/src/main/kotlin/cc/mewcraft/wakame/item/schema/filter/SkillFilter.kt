@@ -25,7 +25,7 @@ data class SkillFilter(
      * [key][key] populated.
      */
     override fun testRaw(context: SchemaGenerationContext): Boolean {
-        return SkillContextHolder(key) in context.abilities
+        return SkillContextHolder(key) in context.skills
     }
 }
 

@@ -63,14 +63,16 @@ object NekoItemFactory {
         //
         val schemaCell: Map<String, SchemaCell> = buildMap {
             // loop through each cell node
-            root.node("cells").childrenList().forEach { childNode ->
-                // inject required hints
-                childNode.hint(ITEM_ROOT_NODE_HINT, root)
-                // deserialize the cell node
-                val singleCell = childNode.krequire<SchemaCell>()
-                // add it to the result map
-                this += singleCell.id to singleCell
-            }
+            root.node("cells").childrenMap()
+                .mapKeys { it.key.toString() }
+                .forEach { (id, childNode) ->
+                    // inject required hints
+                    childNode.hint(ITEM_ROOT_NODE_HINT, root)
+                    // deserialize the cell node
+                    val cell = childNode.krequire<SchemaCell>()
+                    // add it to the result map
+                    this += (id to cell)
+                }
         }
 
         return NekoItemImpl(

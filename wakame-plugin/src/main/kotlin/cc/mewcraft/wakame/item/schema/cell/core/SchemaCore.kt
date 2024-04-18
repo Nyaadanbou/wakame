@@ -12,10 +12,10 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
  */
 interface SchemaCore : Core {
     /**
-     * Generates a binary core data from this schema.
+     * Reifies the schema.
      *
      * @param context the generation context
-     * @return a new instance
+     * @return a new instance of [BinaryCore]
      */
-    fun generate(context: SchemaGenerationContext): BinaryCore
+    fun reify(context: SchemaGenerationContext): BinaryCore
 }

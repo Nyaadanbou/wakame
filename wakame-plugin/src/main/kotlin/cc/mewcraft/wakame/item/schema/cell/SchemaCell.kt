@@ -15,42 +15,36 @@ typealias SchemaCursePool = Pool<SchemaCurse, SchemaGenerationContext>
 typealias SchemaCurseGroup = Group<SchemaCurse, SchemaGenerationContext>
 
 /**
- * Represents all possible states that may put into a [BinaryCell]. There
- * are two types of data in a [schema cell][SchemaCell]: invariant data and
- * variant data.
- *
- * ## Invariant data
- *
- * Invariant data should be put into a [binary cell][BinaryCell] "as-is".
- *
- * ## Variant data
- *
- * Variant data are intended to be randomized in a [binary cell][BinaryCell].
+ * Represents all possible states of a [BinaryCell].
  */
 interface SchemaCell : Cell {
-    /**
-     * Returns `true` if the cell is configured as "reforgeable".
-     */
-    val isReforgeable: Boolean
+
+    val createOptions: CreateOptions
+
+    val modifyOptions: ModifyOptions
 
     /**
-     * Returns `true` if the cell is configured as "overridable".
+     * Options applied upon the cell being generated.
      */
-    val isOverridable: Boolean
+    interface CreateOptions {
+        /**
+         * The [group][Group] of [cores][SchemaCore] owned by the cell.
+         */
+        val core: SchemaCoreGroup
+
+        /**
+         * The [group][Group] of [curses][SchemaCurse] owned by ths cell.
+         */
+        val curse: SchemaCurseGroup
+    }
 
     /**
-     * Returns `true` if the cell should be removed from the item stack when
-     * nothing is picked from the [core].
+     * Options applied upon the cell being reforged.
      */
-    val keepEmpty: Boolean
-
-    /**
-     * The [group][Group] of [cores][SchemaCore] owned by the cell.
-     */
-    val core: SchemaCoreGroup
-
-    /**
-     * The [group][Group] of [curses][SchemaCurse] owned by ths cell.
-     */
-    val curse: SchemaCurseGroup
+    interface ModifyOptions {
+        /**
+         * Returns `true` if the cell is configured as "reforgeable".
+         */
+        val isReforgeable: Boolean
+    }
 }

@@ -14,6 +14,10 @@ interface ItemStatisticsAccessor {
      */
     val rootOrCreate: CompoundShadowTag
 
+    //
+    // Statistics Accessors
+    //
+
     /**
      * 实体击杀数
      */

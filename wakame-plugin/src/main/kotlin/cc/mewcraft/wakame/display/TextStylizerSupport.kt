@@ -3,12 +3,14 @@ package cc.mewcraft.wakame.display
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
 import cc.mewcraft.wakame.display.ItemMetaStylizer.ChildStylizer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryAttributeCore
-import cc.mewcraft.wakame.item.binary.cell.core.BinarySkillCore
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.value
 import cc.mewcraft.wakame.item.binary.cell.core.isEmpty
+import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.kizami.Kizami
@@ -79,7 +81,7 @@ internal class TextStylizerImpl(
             if (core.isEmpty) {
                 // it's an empty core - add the pre-defined placeholder lines
 
-                ret += AttributeLineFactory.empty() // TODO 词条栏系统应该限制可替换的核心类型
+                ret += AttributeLineFactory.empty() // TODO 词条栏系统应该限制可替换的核心类型 1
             } else when (core) {
                 // it's a non-empty core - dynamically generate the lines
 
@@ -187,10 +189,9 @@ internal class AttributeStylizerImpl(
         // 注意这里的 tag resolvers 需要根据 format, operation, element 分情况添加
 
         val resolvers = TagResolver.builder()
-
         when {
             // 单独处理攻击速度，因为需要显示为文字
-            core.key == Attributes.ATTACK_SPEED_LEVEL.key() && core is BinaryAttributeCore.S -> {
+            core.key == Attributes.ATTACK_SPEED_LEVEL.key -> {
                 resolvers.resolver(getAttackSpeedLevelTagResolver(core.value.toInt()))
                 return listOf(mm.deserialize(config.attackSpeedFormat.merged, resolvers.build()))
             }
@@ -202,27 +203,27 @@ internal class AttributeStylizerImpl(
 
             // 其余属性都是数字形式，因此统一处理
             else -> when (core) {
-                is BinaryAttributeCore.S -> {
+                is BinaryAttributeData.S -> {
                     resolvers.resolver(
                         number("value", core.value, core.operation)
                     )
                 }
 
-                is BinaryAttributeCore.R -> {
+                is BinaryAttributeData.R -> {
                     resolvers.resolvers(
                         number("min", core.lower, core.operation),
                         number("max", core.upper, core.operation)
                     )
                 }
 
-                is BinaryAttributeCore.SE -> {
+                is BinaryAttributeData.SE -> {
                     resolvers.resolvers(
                         number("value", core.value, core.operation),
                         component("element", core.element.displayName)
                     )
                 }
 
-                is BinaryAttributeCore.RE -> {
+                is BinaryAttributeData.RE -> {
                     resolvers.resolvers(
                         number("min", core.lower, core.operation),
                         number("max", core.upper, core.operation),

@@ -55,9 +55,9 @@ interface ItemCellAccessor {
     fun getAttributeModifiers(): Multimap<Attribute, AttributeModifier>
 
     /**
-     * Gets all active abilities from all the cells.
+     * Gets all active skill instances from all the cells.
      */
-    fun getActiveAbilities(): List<Skill>
+    fun getSkillInstances(): List<Skill>
 
     /* Setters */
 

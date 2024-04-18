@@ -4,8 +4,9 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.skill.NoopSkill
+import cc.mewcraft.wakame.item.SkillInstance
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
@@ -65,13 +66,14 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             val namespace = key.namespace()
             when (namespace) {
                 Namespaces.SKILL -> {
-                    collection += KizamiSkill(NoopSkill)
+                    val skillCore = BinarySkillCore(childNode)
+                    val skillInstance = skillCore.instance
+                    collection += KizamiSkill(skillInstance)
                 }
 
                 Namespaces.ATTRIBUTE -> {
-                    val attributeFacade = AttributeRegistry.FACADES[key]
-                    val attributeCore = attributeFacade.BINARY_CORE_NODE_ENCODER.encode(childNode)
-                    val attributeModifiers = attributeCore.makeAttributeModifiers(uuid)
+                    val attributeCore = BinaryAttributeCore(childNode)
+                    val attributeModifiers = attributeCore.provideAttributeModifiers(uuid)
                     collection += KizamiAttribute(attributeModifiers)
                 }
 
@@ -89,8 +91,8 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
  * A [skill][Skill] provided by a kizami.
  */
 data class KizamiSkill(
-    override val effect: Skill,
-) : KizamiEffect.Single<Skill> {
+    override val effect: SkillInstance,
+) : KizamiEffect.Single<SkillInstance> {
     override fun apply(kizami: Kizami, user: User<*>) {
         println("applied skill kizami effect to ${user.uniqueId}") // TODO actually implement it when skill module is done
     }

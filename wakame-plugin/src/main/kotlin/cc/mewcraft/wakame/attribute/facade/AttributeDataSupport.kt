@@ -47,7 +47,7 @@ sealed interface AttributeComponent {
 /**
  * A mark interface for clarifying class hierarchy.
  *
- * **Do not implement this interface!**
+ * **Do not directly implement this interface!**
  *
  * Instead, implement the following:
  * - [AttributeDataS]
@@ -128,13 +128,4 @@ interface AttributeDataRE<OP, R, E> :
  */
 interface AttributeDataEncoder<E, V : AttributeData> {
     fun encode(e: E): V
-}
-
-/**
- * A decoder.
- *
- * Data flow: [Attribute Value][V] -> [Arbitrary Object][E]
- */
-interface AttributeDataDecoder<E, V : AttributeData> {
-    fun decode(e: V): E
 }

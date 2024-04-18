@@ -26,8 +26,3 @@ sealed interface SchemaAttributeData {
  * Data conversion: [ConfigurationNode] -> [SchemaAttributeCore].
  */
 fun interface SchemaAttributeCoreNodeEncoder : AttributeDataEncoder<ConfigurationNode, SchemaAttributeCore>
-
-/**
- * Data conversion: [SchemaAttributeCore] -> [ConfigurationNode].
- */
-fun interface SchemaAttributeDataNodeDecoder : AttributeDataDecoder<ConfigurationNode, SchemaAttributeCore>

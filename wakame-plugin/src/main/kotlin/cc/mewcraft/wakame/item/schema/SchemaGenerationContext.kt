@@ -63,7 +63,7 @@ class SchemaGenerationContext(
     /**
      * 已经生成的 [Skill].
      */
-    val abilities: MutableCollection<SkillContextHolder> by WatchedSet(HashSet())
+    val skills: MutableCollection<SkillContextHolder> by WatchedSet(HashSet())
 
     /**
      * 已经生成的 [AttributeContextHolder].

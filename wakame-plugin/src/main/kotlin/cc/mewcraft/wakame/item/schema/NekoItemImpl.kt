@@ -24,7 +24,7 @@ internal class NekoItemImpl(
     override val material: Key,
     override val effectiveSlot: EffectiveSlot,
     private val metaMap: ClassToInstanceMap<SchemaItemMeta<*>>,
-    private val cellMap: Map<String, SchemaCell>,
+    override val cellMap: Map<String, SchemaCell>,
     behaviorHolders: List<String>,
 ) : Examinable, NekoItem {
     override val meta: Set<SchemaItemMeta<*>> = metaMap.values.toSet()
@@ -32,10 +32,6 @@ internal class NekoItemImpl(
 
     override fun <T : SchemaItemMeta<*>> getMeta(metaClass: KClass<T>): T {
         return requireNotNull(metaMap.getInstance(metaClass.java)) { "Can't find schema item meta '$metaClass' for item '$key'" }
-    }
-
-    override fun getCell(id: String): SchemaCell? {
-        return cellMap[id]
     }
 
     override val behaviors: List<ItemBehavior> = behaviorHolders

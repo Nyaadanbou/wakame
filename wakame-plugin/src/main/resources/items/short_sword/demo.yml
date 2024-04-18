@@ -30,7 +30,7 @@ behaviors:
   attribute_provider: { }
   castable: { }
   damageable:
-    will_lost: false
+    disappear_when_broken: false
     repair:
       - minecraft:iron_ingot
   kizami_provider: { }
@@ -181,43 +181,42 @@ kizami:
 # 可选，默认 无
 # 生成将按照该列表的顺序进行
 cells:
-  - id: a # 该词条栏的 id，在该物品的词条栏中必须唯一
-    core: core_a # 该词条栏所使用的核心组 id，必须在 core_groups 有定义
-    curse: curse_a # 该词条栏所使用的诅咒组 id，必须在 curse_groups 有定义
-    keep_empty: false # 该词条栏在生成时如果没有核心被选中的话，是否在物品上保留空的词条栏
-    # TODO 以下选项的具体用途等待开始写重铸系统时再决定，目前没有任何作用
-    can_reforge: true # 该词条栏是否可重铸
-    can_override: false # 该词条栏是否可以被玩家自由修改和覆盖
-  - id: b
-    core: core_b
-    curse: curse_b
-    keep_empty: false
-    can_reforge: true
-    can_override: false
-  - id: c
-    core: core_c
-    curse: curse_c
-    keep_empty: false
-    can_reforge: true
-    can_override: false
-  - id: d
-    # core: core_d # 核心组可以省略不写，表示该词条栏没有核心
-    # curse: curse_d # ^^^
-    keep_empty: true
-    can_reforge: false
-    can_override: false
-  - id: e
-    core: core_e
-    curse: curse_e
-    keep_empty: false
-    can_reforge: false
-    can_override: false
-  - id: f
-    core: core_f
-    curse: curse_f
-    keep_empty: true
-    can_reforge: false
-    can_override: false
+  a:
+    create_options:
+      core: core_a
+      curse: curse_a
+    modify_options:
+      reforgeable: true
+  b:
+    create_options:
+      core: core_b
+      curse: curse_b
+    modify_options:
+      reforgeable: true
+  c:
+    create_options:
+      core: core_c
+      curse: curse_c
+    modify_options:
+      reforgeable: true
+  d:
+    create_options:
+      core: core_d
+      curse: curse_d
+    modify_options:
+      reforgeable: false
+  e:
+    create_options:
+      core: core_e
+      curse: curse_e
+    modify_options:
+      reforgeable: false
+  f:
+    create_options:
+      core: core_f
+      curse: curse_f
+    modify_options:
+      reforgeable: false
 
 # 核心池
 #
@@ -377,7 +376,10 @@ core_groups:
     filters: [ ]
     selects: { }
     default:
-      # TODO 支持添加空词条栏核心
+      - key: generic:noop
+        weight: 10
+      - key: generic:empty
+        weight: 10
       - key: attribute:lifesteal
         value: 0.2
         weight: 10
@@ -458,8 +460,10 @@ core_groups:
       skill:
         entries:
           - key: skill:blink
+            trigger: xyz
             weight: 1
           - key: skill:dash
+            trigger: xyz
             weight: 1
     default: [ ]
 
@@ -517,6 +521,8 @@ curse_groups:
         index: demo_creeps_3
         count: 2
         weight: 1
+      - key: generic:empty
+        weight: 2
 
   # 诅咒组：curse_b
   curse_b:
@@ -532,6 +538,8 @@ curse_groups:
         amount: 16
         element: water
         weight: 1
+      - key: generic:empty
+        weight: 3
 
   # 诅咒组：curse_c
   curse_c:
@@ -542,6 +550,8 @@ curse_groups:
         amount: 20
         element: fire
         weight: 1
+      - key: generic:empty
+        weight: 3
 
   # 诅咒组：curse_d
   curse_d:

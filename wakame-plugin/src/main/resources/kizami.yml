@@ -47,6 +47,7 @@ kizami:
       1:
         - # 铭刻也可提供技能
           key: skill:blink
+          trigger: xyz
 
   gold:
     uuid: 0b7fab70-32fb-4511-83d1-17d9e3efa1fc
