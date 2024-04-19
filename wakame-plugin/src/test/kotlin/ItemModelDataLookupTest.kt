@@ -51,6 +51,7 @@ class ItemModelDataLookupTest : KoinTest {
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()
             LevelMappingRegistry.onPreWorld()
+            EntityReferenceRegistry.onPreWorld()
             NekoItemRegistry.onPreWorld()
         }
 

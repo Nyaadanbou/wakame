@@ -69,6 +69,7 @@ class ItemDeserializationTest : KoinTest {
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()
             LevelMappingRegistry.onPreWorld()
+            EntityReferenceRegistry.onPreWorld()
             NekoItemRegistry.onPreWorld()
         }
 
@@ -83,14 +84,14 @@ class ItemDeserializationTest : KoinTest {
     fun `schema item construction`() {
         val itemKey = Key("short_sword:demo")
         val demoItem = NekoItemRegistry.INSTANCES.find(itemKey)
-        assertNotNull(demoItem, "The item '$itemKey' is not loaded correctly")
+        assertNotNull(demoItem)
     }
 
     @Test
     fun `binary item construction`() {
         val itemKey = Key("short_sword:demo")
         val demoItem = NekoItemRegistry.INSTANCES.find(itemKey)
-        assertNotNull(demoItem, "The item '$itemKey' is not loaded correctly")
+        assertNotNull(demoItem)
 
         // mock NBT
         mockkStatic(

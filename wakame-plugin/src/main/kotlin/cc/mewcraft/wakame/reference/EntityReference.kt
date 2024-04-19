@@ -6,7 +6,7 @@ import org.bukkit.entity.Entity
 /**
  * Just a simple data structure holding a set of entity [keys][Key].
  */
-interface EntityReference {
+interface EntityReference { // TODO 应该改名叫做 EntityList
     /**
      * The unique name of this entity reference.
      */
