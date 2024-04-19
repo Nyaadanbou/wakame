@@ -14,7 +14,6 @@ import cc.mewcraft.wakame.item.schema.meta.*
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
-import cc.mewcraft.wakame.skill.condition.SkillConditionGroupSerializer
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
@@ -24,7 +23,6 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 const val BASE_SERIALIZERS = "base_serializers"
 const val CELL_SERIALIZERS = "cell_serializers"
 const val META_SERIALIZERS = "meta_serializers"
-const val SKILL_SERIALIZERS = "skill_serializers"
 
 internal fun schemaItemModule(): Module = module {
 
@@ -82,12 +80,6 @@ internal fun schemaItemModule(): Module = module {
             .kregister(ToolMetaSerializer)
             .kregister(ToolRuleSerializer)
 
-            .build()
-    }
-
-    single<TypeSerializerCollection>(named(SKILL_SERIALIZERS)) {
-        TypeSerializerCollection.builder()
-            .kregister(SkillConditionGroupSerializer)
             .build()
     }
 }
