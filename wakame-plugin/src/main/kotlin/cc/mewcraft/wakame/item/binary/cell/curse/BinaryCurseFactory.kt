@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell.curse
 
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEmptyCurse
@@ -7,6 +8,7 @@ import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEntityKillsCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryPeakDamageCurse
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCurse
+import cc.mewcraft.wakame.util.Key
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 object BinaryCurseFactory {
@@ -30,7 +32,9 @@ object BinaryCurseFactory {
         }
 
         val id = compound.getString(CurseBinaryKeys.CURSE_IDENTIFIER)
-        val ret = when (id) {
+        val key = Key(id)
+        require(key.namespace() == Namespaces.CURSE)
+        val ret = when (key.value()) {
             CurseConstants.ENTITY_KILLS -> BinaryEntityKillsCurse(compound)
             CurseConstants.PEAK_DAMAGE -> BinaryPeakDamageCurse(compound)
             else -> throw IllegalArgumentException("Failed to parse NBT tag: ${compound.asString()}")
