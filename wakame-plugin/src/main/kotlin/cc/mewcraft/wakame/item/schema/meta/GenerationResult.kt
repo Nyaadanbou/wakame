@@ -19,9 +19,16 @@ fun <T> GenerationResult(value: T): GenerationResult<T> {
 sealed interface GenerationResult<T> {
 
     /**
+     * 检查生成的结果是否为空。如果为空，则结果不应该写入物品。
+     */
+    val isEmpty: Boolean
+
+    /**
      * Represents a generated data which should be written to the ItemStack.
      */
-    data class Thing<T>(val value: T) : GenerationResult<T>
+    data class Thing<T>(val value: T) : GenerationResult<T> {
+        override val isEmpty: Boolean = false
+    }
 
     /**
      * Represents a result indicating that no data should be written to the ItemStack.
@@ -33,7 +40,9 @@ sealed interface GenerationResult<T> {
      * That is, the use site code should not write the data to the ItemStack
      * if the [GenerationResult] is the [Empty] instance.
      */
-    private data object Empty : GenerationResult<Nothing>
+    private data object Empty : GenerationResult<Nothing> {
+        override val isEmpty: Boolean = true
+    }
 
     /**
      * Companion object for [GenerationResult] class that contains its constructor function [empty].
