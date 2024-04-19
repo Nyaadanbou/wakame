@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
+import cc.mewcraft.wakame.skill.condition.MoLangCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
 import cc.mewcraft.wakame.skill.type.RemovePotionEffect
 import cc.mewcraft.wakame.skill.type.SkillFactory
@@ -32,6 +33,7 @@ object SkillRegistry : Initializable, KoinComponent {
 
     private fun loadCondition(){
         CONDITIONS += "durability" to DurabilityCondition
+        CONDITIONS += "molang" to MoLangCondition
     }
 
     private fun loadType() {

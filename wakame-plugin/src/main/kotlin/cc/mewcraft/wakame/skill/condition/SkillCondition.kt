@@ -28,6 +28,13 @@ interface SkillCondition : Condition<SkillCastContext> {
     }
 }
 
+/**
+ * 代表一个无消耗的技能条件。(也就是只有判断功能)
+ */
+interface NoCostSkillCondition : SkillCondition {
+    override fun cost(context: SkillCastContext) = Unit
+}
+
 interface SkillConditionFactory<C : SkillCondition> {
     fun provide(config: ConfigProvider): C
 }

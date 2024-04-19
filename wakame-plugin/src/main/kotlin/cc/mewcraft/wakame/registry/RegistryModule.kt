@@ -5,10 +5,10 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.schema.BASE_SERIALIZERS
 import cc.mewcraft.wakame.item.schema.CELL_SERIALIZERS
 import cc.mewcraft.wakame.item.schema.META_SERIALIZERS
-import cc.mewcraft.wakame.item.schema.SKILL_SERIALIZERS
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
+import cc.mewcraft.wakame.skill.SKILL_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
 import cc.mewcraft.wakame.util.buildYamlLoader
 import cc.mewcraft.wakame.util.createYamlLoader

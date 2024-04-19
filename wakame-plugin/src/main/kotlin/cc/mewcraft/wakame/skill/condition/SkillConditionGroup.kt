@@ -1,15 +1,13 @@
 package cc.mewcraft.wakame.skill.condition
 
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.condition.ConditionGroup
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.TypeSerializer
-import java.lang.UnsupportedOperationException
 import java.lang.reflect.Type
-import java.util.PriorityQueue
-import java.util.Queue
+import java.util.*
 
 interface SkillConditionGroup : ConditionGroup<SkillCastContext> {
     override fun test(context: SkillCastContext): Boolean
@@ -50,7 +48,7 @@ class SortedSkillConditionGroup(
     }
 }
 
-internal object SkillConditionGroupSerializer : TypeSerializer<SkillConditionGroup> {
+internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionGroup> {
     override fun deserialize(type: Type, node: ConfigurationNode): SkillConditionGroup {
         val skillConditions = node.krequire<List<ConfigurationNode>>()
             .map { listNode ->
@@ -60,9 +58,5 @@ internal object SkillConditionGroupSerializer : TypeSerializer<SkillConditionGro
             }
 
         return SortedSkillConditionGroup(skillConditions)
-    }
-
-    override fun serialize(type: Type, obj: SkillConditionGroup?, node: ConfigurationNode) {
-        throw UnsupportedOperationException("Serialization is not supported for SkillConditionGroup.")
     }
 }
