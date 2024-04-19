@@ -1,7 +1,10 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.attribute.facade.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
@@ -12,7 +15,10 @@ import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreR
 import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreRE
 import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreS
 import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreSE
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.RandomizedValue
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toStableDouble
 import com.google.common.collect.ImmutableMap
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -279,10 +285,10 @@ private class SingleSelectionImpl(
      */
     override fun bind(
         component: Attribute,
-    ): AttributeFacade<BinaryAttributeCoreDataHolderS> = AttributeFacadeImpl(
+    ): AttributeFacade<BinaryAttributeCoreS> = AttributeFacadeImpl(
         KEY = facadeKey,
 
-        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreDataHolderS ->
+        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreS ->
             ImmutableMap.of(
                 component, AttributeModifier(uuid, core.value.toStableDouble(), core.operation),
             )
@@ -324,10 +330,10 @@ private class RangedSelectionImpl(
     override fun bind(
         component1: Attribute,
         component2: Attribute,
-    ): AttributeFacade<BinaryAttributeCoreDataHolderR> = AttributeFacadeImpl(
+    ): AttributeFacade<BinaryAttributeCoreR> = AttributeFacadeImpl(
         KEY = facadeKey,
 
-        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreDataHolderR ->
+        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreR ->
             ImmutableMap.of(
                 component1, AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
                 component2, AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
@@ -368,10 +374,10 @@ private class SingleElementAttributeBinderImpl(
      */
     override fun bind(
         component: (Element) -> ElementAttribute,
-    ): AttributeFacade<BinaryAttributeCoreDataHolderSE> = AttributeFacadeImpl(
+    ): AttributeFacade<BinaryAttributeCoreSE> = AttributeFacadeImpl(
         KEY = facadeKey,
 
-        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreDataHolderSE ->
+        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreSE ->
             ImmutableMap.of(
                 component(core.element), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
             )
@@ -412,10 +418,10 @@ private class RangedElementAttributeBinderImpl(
     override fun bind(
         component1: (Element) -> ElementAttribute,
         component2: (Element) -> ElementAttribute,
-    ): AttributeFacade<BinaryAttributeCoreDataHolderRE> = AttributeFacadeImpl(
+    ): AttributeFacade<BinaryAttributeCoreRE> = AttributeFacadeImpl(
         KEY = facadeKey,
 
-        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreDataHolderRE ->
+        MODIFIER_FACTORY = { uuid: UUID, core: BinaryAttributeCoreRE ->
             ImmutableMap.of(
                 component1(core.element), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
                 component2(core.element), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
