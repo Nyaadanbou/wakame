@@ -50,3 +50,25 @@ sealed interface BinaryItemMeta<T> : ItemMeta {
     fun remove()
 
 }
+
+/**
+ * Sets the value of this item meta.
+ *
+ * **This function accepts any type of value to avoid writing nagging source code, but it will
+ * still do the type check at the runtime!**
+ *
+ * @throws IllegalArgumentException if the given [value] is not compatible with this item meta
+ */
+fun <T> BinaryItemMeta<T>.set(value: Any?) {
+    requireNotNull(value) { "Can't set null value for meta: ${this::class.simpleName}" }
+
+    @Suppress("UNCHECKED_CAST")
+    val maybe = value as? T
+    if (maybe != null) {
+        this.set(maybe)
+    } else {
+        throw IllegalArgumentException(
+            "The given value (type: ${value::class.simpleName}) is not compatible with this meta: ${this::class.simpleName}"
+        )
+    }
+}

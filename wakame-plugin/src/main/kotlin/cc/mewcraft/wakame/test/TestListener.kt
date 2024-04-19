@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BDisplayLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
-import cc.mewcraft.wakame.item.schema.PaperNekoItemRealizer
+import cc.mewcraft.wakame.item.schema.reify
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.pack.model.ModelRegistry
 import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
@@ -47,7 +47,7 @@ class TestListener : KoinComponent, Listener {
         when (plainMessage) {
             "i1" -> {
                 val nekoItem = NekoItemRegistry.INSTANCES.get("short_sword:demo")
-                val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.toUser())
+                val nekoStack = nekoItem.reify(player.toUser())
                 inventory.addItem(nekoStack.itemStack)
             }
         }
@@ -62,7 +62,7 @@ class TestListener : KoinComponent, Listener {
         when {
             plainMessage.startsWith("i-") -> {
                 val nekoItem = NekoItemRegistry.INSTANCES.get(plainMessage.substringAfter("i-"))
-                val nekoStack = PaperNekoItemRealizer.realize(nekoItem, player.toUser())
+                val nekoStack = nekoItem.reify(player.toUser())
                 inventory.addItem(nekoStack.itemStack)
             }
         }

@@ -2,12 +2,15 @@ package cc.mewcraft.wakame.item.schema
 
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.ItemBehaviorAccessor
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
+import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
+import org.koin.mp.KoinPlatform
 import java.util.UUID
 import kotlin.reflect.KClass
 
@@ -84,21 +87,20 @@ interface NekoItem : Keyed, ItemBehaviorAccessor {
     val cellMap: Map<String, SchemaCell>
 }
 
-/**
- * Gets specified [SchemaItemMeta] from this [NekoItem].
- *
- * This function allows you to quickly get specified [SchemaItemMeta] by
- * corresponding class reference. You can use this function as the
- * following:
- *
- * ```kotlin
- * val item: NekoItem = (get the item from somewhere)
- * val meta: ElementMeta = item.getMeta<ElementMeta>()
- * ```
- *
- * @param M the subclass of [SchemaItemMeta]
- * @return the instance of class [M] from this [NekoItem]
- */
 inline fun <reified M : SchemaItemMeta<*>> NekoItem.getMeta(): M {
     return getMeta(M::class)
 }
+
+fun NekoItem.reify(context: SchemaGenerationContext): NekoStack {
+    return realizer.realize(this, context)
+}
+
+fun NekoItem.reify(user: User<*>): NekoStack {
+    return realizer.realize(this, user)
+}
+
+fun NekoItem.reify(crate: Crate): NekoStack {
+    return realizer.realize(this, crate)
+}
+
+private val realizer: NekoItemRealizer by KoinPlatform.getKoin().inject()

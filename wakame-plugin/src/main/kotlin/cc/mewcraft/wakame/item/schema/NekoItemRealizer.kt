@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.user.User
 interface NekoItemRealizer {
 
     /**
-     * Realizes an item template against a custom trigger.
+     * Realizes an item template from a custom trigger.
      *
      * @param item the item template
      * @param context the context on which the realization is based
@@ -21,7 +21,7 @@ interface NekoItemRealizer {
     fun realize(item: NekoItem, context: SchemaGenerationContext): NekoStack // TODO 我们需要针对 SNS,PNS 创建不同的 Realizer 吗？
 
     /**
-     * Realizes an item template against a player.
+     * Realizes an item template from a player.
      *
      * @param item the item template
      * @param user the player on which the realization is based
@@ -30,7 +30,7 @@ interface NekoItemRealizer {
     fun realize(item: NekoItem, user: User<*>): NekoStack
 
     /**
-     * Realizes an item template against a crate.
+     * Realizes an item template from a crate.
      *
      * @param item the item template
      * @param crate the crate on which the realization is based

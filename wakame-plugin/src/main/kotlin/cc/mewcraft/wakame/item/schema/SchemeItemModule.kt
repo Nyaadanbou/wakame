@@ -16,6 +16,7 @@ import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -25,6 +26,8 @@ const val CELL_SERIALIZERS = "cell_serializers"
 const val META_SERIALIZERS = "meta_serializers"
 
 internal fun schemaItemModule(): Module = module {
+
+    singleOf<NekoItemRealizer>(::NekoItemRealizerImpl)
 
     single<TypeSerializerCollection>(named(BASE_SERIALIZERS)) {
         TypeSerializerCollection.builder()

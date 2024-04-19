@@ -31,7 +31,7 @@ internal class NekoItemImpl(
     override val cell: Set<SchemaCell> = cellMap.values.toSet()
 
     override fun <T : SchemaItemMeta<*>> getMeta(metaClass: KClass<T>): T {
-        return requireNotNull(metaMap.getInstance(metaClass.java)) { "Can't find schema item meta '$metaClass' for item '$key'" }
+        return requireNotNull(metaMap.getInstance(metaClass.java)) { "Can't find schema item meta '${metaClass.simpleName}' for item '$key'" }
     }
 
     override val behaviors: List<ItemBehavior> = behaviorHolders
