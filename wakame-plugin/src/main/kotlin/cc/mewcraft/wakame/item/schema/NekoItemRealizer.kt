@@ -14,28 +14,28 @@ interface NekoItemRealizer {
     /**
      * Realizes an item template against a custom trigger.
      *
-     * @param nekoItem the item template
+     * @param item the item template
      * @param context the context on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(nekoItem: NekoItem, context: SchemaGenerationContext): NekoStack // TODO 我们需要针对 SNS,PNS 创建不同的 Realizer 吗？
+    fun realize(item: NekoItem, context: SchemaGenerationContext): NekoStack // TODO 我们需要针对 SNS,PNS 创建不同的 Realizer 吗？
 
     /**
      * Realizes an item template against a player.
      *
-     * @param nekoItem the item template
+     * @param item the item template
      * @param user the player on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(nekoItem: NekoItem, user: User<*>): NekoStack
+    fun realize(item: NekoItem, user: User<*>): NekoStack
 
     /**
      * Realizes an item template against a crate.
      *
-     * @param nekoItem the item template
+     * @param item the item template
      * @param crate the crate on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(nekoItem: NekoItem, crate: Crate): NekoStack
+    fun realize(item: NekoItem, crate: Crate): NekoStack
 
 }

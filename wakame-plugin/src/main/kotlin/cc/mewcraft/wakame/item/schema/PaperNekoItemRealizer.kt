@@ -8,47 +8,47 @@ import cc.mewcraft.wakame.item.binary.cell.isNoop
 import cc.mewcraft.wakame.item.binary.meta.*
 import cc.mewcraft.wakame.item.schema.meta.*
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.asNamespacedKey
+import cc.mewcraft.wakame.util.asBukkit
 import org.bukkit.Registry
 
 object PaperNekoItemRealizer : NekoItemRealizer {
-    override fun realize(nekoItem: NekoItem, context: SchemaGenerationContext): NekoStack {
-        return createItemStack0(nekoItem, context)
+    override fun realize(item: NekoItem, context: SchemaGenerationContext): NekoStack {
+        return createItemStack0(item, context)
     }
 
-    override fun realize(nekoItem: NekoItem, user: User<*>): NekoStack {
-        return realize0(nekoItem, user)
+    override fun realize(item: NekoItem, user: User<*>): NekoStack {
+        return realize0(item, user)
     }
 
-    override fun realize(nekoItem: NekoItem, crate: Crate): NekoStack {
-        return realize0(nekoItem, crate)
+    override fun realize(item: NekoItem, crate: Crate): NekoStack {
+        return realize0(item, crate)
     }
 
-    private fun realize0(nekoItem: NekoItem, source: Any): NekoStack {
+    private fun realize0(item: NekoItem, source: Any): NekoStack {
         val context = SchemaGenerationContext(SchemaGenerationTrigger.wrap(source))
-        val nekoStack = createItemStack0(nekoItem, context)
+        val nekoStack = createItemStack0(item, context)
         return nekoStack
     }
 
     /**
      * Creates a NekoStack with the [context].
      *
-     * @param nekoItem the item blueprint
+     * @param item the item blueprint
      * @param context the input context
      * @return a new once-off NekoStack
      */
-    private fun createItemStack0(nekoItem: NekoItem, context: SchemaGenerationContext): NekoStack {
+    private fun createItemStack0(item: NekoItem, context: SchemaGenerationContext): NekoStack {
         val nekoStack = run {
-            val namespacedKey = nekoItem.material.asNamespacedKey
-            val material = requireNotNull(Registry.MATERIAL.get(namespacedKey)) { "Can't find material with key '{${nekoItem.material}'" }
-            PlayNekoStackFactory.new(material)
+            val key = item.material.asBukkit
+            val mat = requireNotNull(Registry.MATERIAL.get(key)) { "Can't find material by key '${item.material}'" }
+            PlayNekoStackFactory.new(mat)
         }
 
         //
         // Write base data
         //
         with(nekoStack) {
-            putKey(nekoItem.key)
+            putKey(item.key)
             putVariant(0)
         }
 
@@ -58,22 +58,22 @@ object PaperNekoItemRealizer : NekoItemRealizer {
         with(nekoStack.meta) {
             // Caution: the order of generation matters here!
 
-            generateMeta<_, SDisplayNameMeta, BDisplayNameMeta>(nekoItem, context)
-            generateMeta<_, SDisplayLoreMeta, BDisplayLoreMeta>(nekoItem, context)
-            generateMeta<_, SDurabilityMeta, BDurabilityMeta>(nekoItem, context)
-            generateMeta<_, SLevelMeta, BLevelMeta>(nekoItem, context)
-            generateMeta<_, SRarityMeta, BRarityMeta>(nekoItem, context)
-            generateMeta<_, SElementMeta, BElementMeta>(nekoItem, context)
-            generateMeta<_, SKizamiMeta, BKizamiMeta>(nekoItem, context)
-            generateMeta<_, SSkinMeta, BSkinMeta>(nekoItem, context)
-            generateMeta<_, SSkinOwnerMeta, BSkinOwnerMeta>(nekoItem, context)
+            generateMeta<_, SDisplayNameMeta, BDisplayNameMeta>(item, context)
+            generateMeta<_, SDisplayLoreMeta, BDisplayLoreMeta>(item, context)
+            generateMeta<_, SDurabilityMeta, BDurabilityMeta>(item, context)
+            generateMeta<_, SLevelMeta, BLevelMeta>(item, context)
+            generateMeta<_, SRarityMeta, BRarityMeta>(item, context)
+            generateMeta<_, SElementMeta, BElementMeta>(item, context)
+            generateMeta<_, SKizamiMeta, BKizamiMeta>(item, context)
+            generateMeta<_, SSkinMeta, BSkinMeta>(item, context)
+            generateMeta<_, SSkinOwnerMeta, BSkinOwnerMeta>(item, context)
         }
 
         //
         // Write item cell
         //
         with(nekoStack.cell) {
-            nekoItem.cellMap.forEach { (id, schemaCell) ->
+            item.cellMap.forEach { (id, schemaCell) ->
                 // the order of cell population should be the same as
                 // that they are declared in the configuration list
 
