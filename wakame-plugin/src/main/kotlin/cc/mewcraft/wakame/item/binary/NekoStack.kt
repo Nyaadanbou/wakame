@@ -18,12 +18,16 @@ import java.util.UUID
  * functions to work with the wakame data on the [itemStack], such as:
  *
  * - checking whether the item is of a neko item or not
- * - looking up the unique identifier of the neko item (if it is)
+ * - looking up the unique id of the neko item (if it is)
  *
- * To get an instance of [NekoStack], use [PlayNekoStackFactory] or
- * [ShowNekoStackFactory].
+ * Except some generic use cases, you will probably not directly work
+ * with this interface. Instead, you will likely work with its subclasses:
+ * [PlayNekoStack] and [ShowNekoStack].
+ *
+ * To get an instance of [NekoStack], use a factory:
+ * [PlayNekoStackFactory] and [ShowNekoStackFactory].
  */
-sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
+sealed interface NekoStack : PlayNekoStackLike, ShowNekoStackLike, ItemBehaviorAccessor {
     /**
      * The wrapped [ItemStack].
      *
@@ -110,28 +114,28 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      *
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
-    val key: Key
+    var key: Key
 
     /**
      * The namespace of this item.
      *
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
-    val namespace: String
+    var namespace: String
 
     /**
      * The path of this item.
      *
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
-    val path: String
+    var path: String
 
     /**
      * The variant of this item.
      *
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
-    val variant: Int
+    var variant: Int
 
     /**
      * The UUID of this item.
@@ -173,6 +177,14 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val statistics: ItemStatisticsAccessor
+
+    /**
+     * Removes all the custom tags from the item.
+     *
+     * **Only to be used in certain special cases!**
+     */
+    fun erase()
+
 }
 
 /**
@@ -184,6 +196,18 @@ sealed interface NekoStack : NekoStackSetter, ItemBehaviorAccessor {
  */
 interface PlayNekoStack : NekoStack {
     // TDB 暂时和 NekoStack 一样
+}
+
+/**
+ * Something that can be represented as a [PlayNekoStack].
+ */
+interface PlayNekoStackLike {
+    /**
+     * Gets a [PlayNekoStack] representation.
+     *
+     * @throws NullPointerException if this is not a [NekoItem] realization
+     */
+    val play: PlayNekoStack
 }
 
 /**
@@ -205,6 +229,18 @@ interface ShowNekoStack : NekoStack {
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val customData: CustomDataAccessor
+}
+
+/**
+ * Something that can be represented as a [ShowNekoStack].
+ */
+interface ShowNekoStackLike {
+    /**
+     * Gets a [ShowNekoStack] representation.
+     *
+     * @throws NullPointerException if this is not a [NekoItem] realization
+     */
+    val show: ShowNekoStack
 }
 
 /**

@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
-import cc.mewcraft.wakame.item.BaseBinaryKeys
 import cc.mewcraft.wakame.util.isNmsObjectBacked
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
@@ -18,12 +16,6 @@ val ItemStack.showNekoStackOrNull: ShowNekoStack?
 
 val ItemStack.showNekoStack: ShowNekoStack
     get() = ShowNekoStackFactory.require(this)
-
-fun ItemStack.convertShow(): ShowNekoStack =
-    ShowNekoStackFactory.convert(this)
-
-fun PlayNekoStack.convertShow(): ShowNekoStack =
-    ShowNekoStackFactory.convert(this)
 
 object PlayNekoStackFactory {
     /**
@@ -69,7 +61,7 @@ object PlayNekoStackFactory {
         require(itemStack.hasItemMeta()) { "The ItemStack has no ItemMeta" } // Optimization - fast fail
         require(itemStack.isNmsObjectBacked) { "The ItemStack is not backed by an NMS object" }
         val playNekoStack = PlayNekoStackImpl(itemStack)
-        require(playNekoStack.isNeko) { "The ItemStack is not a NekoItem realization" }
+        require(playNekoStack.isNeko) { "The ItemStack is not a legal NekoItem" }
         require(playNekoStack.isPlay) { "The ItemStack is not a legal PlayNekoStack" }
         return playNekoStack
     }
@@ -129,41 +121,8 @@ object ShowNekoStackFactory {
     fun require(itemStack: ItemStack): ShowNekoStack {
         val itemStackCopy = itemStack.clone()
         val showNekoStack = ShowNekoStackImpl(itemStackCopy)
-        require(showNekoStack.isNeko) { "The ItemStack is not a NekoItem realization" }
+        require(showNekoStack.isNeko) { "The ItemStack is not a legal NekoItem" }
         require(showNekoStack.isShow) { "The ItemStack is not a legal ShowNekoStack" }
         return showNekoStack
-    }
-
-    /**
-     * Converts the [playStack] to a [ShowNekoStack].
-     *
-     * **The given [playStack] will leave intact.**
-     */
-    @Contract(pure = true) // 标记该函数不会修改传进来的 playStack
-    fun convert(playStack: PlayNekoStack): ShowNekoStack {
-        val itemStackCopy = playStack.itemStack.clone()
-        val showNekoStack = ShowNekoStackImpl(itemStackCopy)
-        showNekoStack.tags.writeSNSMark()
-        return showNekoStack
-    }
-
-    /**
-     * Converts the [itemStack] to a [ShowNekoStack].
-     *
-     * **The given [itemStack] will leave intact.**
-     *
-     * @throws IllegalArgumentException if the [itemStack] is not a NekoItem realization
-     */
-    @Contract(pure = true)
-    fun convert(itemStack: ItemStack): ShowNekoStack {
-        val itemStackCopy = itemStack.clone()
-        val showNekoStack = ShowNekoStackImpl(itemStackCopy)
-        require(showNekoStack.isNeko) { "The ItemStack is not a NekoItem realization" }
-        showNekoStack.tags.writeSNSMark()
-        return showNekoStack
-    }
-
-    private fun CompoundShadowTag.writeSNSMark() {
-        putByte(BaseBinaryKeys.SHOW, 0) // 写入 SNS mark，告知发包系统不要修改此物品
     }
 }

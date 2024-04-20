@@ -24,9 +24,10 @@ import kotlin.reflect.KClass
 
 /**
  * This type alias is used to verify whether a PlayNekoStack should be considered
- * "effective" for the player. By "effective", we mean, for example, whether the item
- * is in an effective slot and whether the item has certain behavior enabled in the
- * config.
+ * "effective" for the player. By "effective", we mean, for example:
+ * - whether the item is in an effective slot, or
+ * - whether the item has certain behavior enabled
+ * - etc.
  */
 typealias PlayNekoStackPredicate = PlayNekoStack.() -> Boolean
 
@@ -68,17 +69,24 @@ internal interface BaseNekoStack : NekoStack {
     override val schema: NekoItem
         get() = NekoItemRegistry.INSTANCES[key]
 
-    override val key: Key
+    override var key: Key
         get() = Key(namespace, path)
+        set(value) {
+            namespace = value.namespace()
+            path = value.value()
+        }
 
-    override val namespace: String
+    override var namespace: String
         get() = tags.getString(BaseBinaryKeys.NAMESPACE)
+        set(value) = tags.putString(BaseBinaryKeys.NAMESPACE, value)
 
-    override val path: String
+    override var path: String
         get() = tags.getString(BaseBinaryKeys.PATH)
+        set(value) = tags.putString(BaseBinaryKeys.PATH, value)
 
-    override val variant: Int
+    override var variant: Int
         get() = tags.getInt(BaseBinaryKeys.VARIANT)
+        set(value) = tags.putInt(BaseBinaryKeys.VARIANT, value)
 
     override val uuid: UUID
         get() = NekoItemRegistry.INSTANCES[key].uuid
@@ -99,27 +107,6 @@ internal interface BaseNekoStack : NekoStack {
     //<editor-fold desc="Setters">
     override fun erase() {
         itemStack.removeNekoCompound()
-    }
-
-    override fun putRoot(compoundTag: CompoundShadowTag) {
-        itemStack.nekoCompound = compoundTag
-    }
-
-    override fun putKey(key: Key) {
-        putNamespace(key.namespace())
-        putPath(key.value())
-    }
-
-    override fun putNamespace(namespace: String) {
-        tags.putString(BaseBinaryKeys.NAMESPACE, namespace)
-    }
-
-    override fun putPath(path: String) {
-        tags.putString(BaseBinaryKeys.PATH, path)
-    }
-
-    override fun putVariant(sid: Int) {
-        tags.putInt(BaseBinaryKeys.VARIANT, sid)
     }
     //</editor-fold>
 
@@ -165,13 +152,25 @@ internal value class PlayNekoStackImpl(
             // vanilla item and make it an incomplete realization of NekoItem.
             return itemStack.nekoCompoundOrNull ?: throw NullPointerException("Can't read/modify the tags of NMS-backed ItemStack which is not NekoItem realization")
         }
+
+    override val show: ShowNekoStack
+        get() {
+            // Always make a copy
+            val stackCopy = this.itemStack.clone()
+            val showStack = ShowNekoStackImpl(stackCopy)
+            showStack.tags.writeSNSMark()
+            return showStack
+        }
+
+    override val play: PlayNekoStack
+        get() = this
 }
 
 @JvmInline
 internal value class ShowNekoStackImpl(
     override val itemStack: ItemStack,
 ) : BaseNekoStack, ShowNekoStack {
-    // The `wakame` compound should always be available (if not, create it)
+    // The `wakame` compound can always be available (if not, create it)
     // as the ItemStack is solely used for the purpose of display, not for
     // the purpose of being used by players. Therefore, we can relax the
     // restrictions a little.
@@ -180,4 +179,36 @@ internal value class ShowNekoStackImpl(
 
     override val customData: CustomDataAccessor
         get() = TODO("Not yet implemented")
+
+    override val show: ShowNekoStack
+        get() = this
+
+    override val play: PlayNekoStack
+        get() {
+            // Always make a copy
+            val stackCopy = this.itemStack.clone()
+
+            // Remove custom name and lore as they are handled by the packet system
+            stackCopy.backingDisplayName = null
+            stackCopy.backingLore = null
+
+            // Create a new PlayNekoStack wrapping the stack
+            val playStack = PlayNekoStackImpl(stackCopy)
+            // Side note:
+            // The stack should already be a legal neko item.
+            // We don't need to check the legality here.
+
+            // Remove SNS mark
+            playStack.tags.removeSNSMark()
+
+            return playStack
+        }
+}
+
+private fun CompoundShadowTag.writeSNSMark() {
+    putByte(BaseBinaryKeys.SHOW, 0) // 写入 SNS mark，告知发包系统不要修改此物品
+}
+
+private fun CompoundShadowTag.removeSNSMark() {
+    remove(BaseBinaryKeys.SHOW) // 移除 SNS mark
 }

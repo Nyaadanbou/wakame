@@ -240,7 +240,7 @@ class TestListener : KoinComponent, Listener {
         if (plainMessage.startsWith("v-")) {
             val nekoStack = PlayNekoStackFactory.require(inventory.itemInMainHand)
             val variant = plainMessage.substringAfter("v-").toInt()
-            nekoStack.putVariant(variant)
+            nekoStack.variant = variant
             inventory.setItemInMainHand(nekoStack.itemStack)
         }
     }

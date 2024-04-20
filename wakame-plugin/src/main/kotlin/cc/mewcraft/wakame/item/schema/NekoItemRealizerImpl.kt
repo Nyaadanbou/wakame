@@ -48,8 +48,8 @@ internal class NekoItemRealizerImpl : NekoItemRealizer {
         //
         // Write base data
         //
-        stack.putKey(item.key)
-        stack.putVariant(0)
+        stack.key = item.key
+        stack.variant = 0
 
         //
         // Write item meta
@@ -73,16 +73,7 @@ internal class NekoItemRealizerImpl : NekoItemRealizer {
         //
         // Write item cell
         //
-        item.cellMap.forEach { (id, schemaCell) ->
-            // the order of cell population should be the same as
-            // that they are declared in the configuration list
-
-            val binaryCell = BinaryCellFactory.reify(schemaCell, context)
-            if (!binaryCell.isNoop) {
-                // we only write cell if it's not a noop
-                stack.cell.put(id, binaryCell)
-            }
-        }
+        ItemCellWriter.write(item, stack, context)
 
         return stack
     }
@@ -155,4 +146,22 @@ private class ItemMetaWriter {
         val schemaItemMetaKClass: KClass<S>,
         val binaryItemMetaKClass: KClass<B>,
     )
+}
+
+/**
+ * Responsible to write item cells to an item.
+ */
+private object ItemCellWriter {
+    fun write(item: NekoItem, stack: NekoStack, context: SchemaGenerationContext) {
+        item.cellMap.forEach { (id, schemaCell) ->
+            // The order of cell population should be the same as
+            // that they are declared in the configuration file.
+
+            val binaryCell = BinaryCellFactory.reify(schemaCell, context)
+            if (!binaryCell.isNoop) {
+                // We only write the cell if it's not a noop.
+                stack.cell.put(id, binaryCell)
+            }
+        }
+    }
 }
