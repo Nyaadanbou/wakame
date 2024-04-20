@@ -68,6 +68,10 @@ interface PassiveSkill : Skill
 /**
  * Creates a skill from the given configuration node. The node must contain
  * a key `type` that specifies the type of the skill template to use.
+ *
+ * @param node The configuration node to create the skill from.
+ * @param key The key of the skill.
+ * @param relPath The relative path of the configuration node.
  */
 fun Skill(node: ConfigurationNode, key: Key, relPath: String): Skill {
     val type = node.node("type").krequire<String>()
