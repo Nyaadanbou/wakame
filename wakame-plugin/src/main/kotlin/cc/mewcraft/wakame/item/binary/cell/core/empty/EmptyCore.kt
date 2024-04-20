@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.core.empty
 
 import cc.mewcraft.wakame.GenericKeys
-import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
-import cc.mewcraft.wakame.util.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
@@ -32,14 +30,10 @@ sealed interface BinaryEmptyCore : BinaryCore
 //
 
 private data object BinaryEmptyCoreImpl : BinaryEmptyCore {
-    private val EMPTY_COMPOUND = CompoundShadowTag { putId(key) }
+    private val EMPTY_COMPOUND = CompoundShadowTag.create()
     override val key: Key = GenericKeys.EMPTY
     override fun asShadowTag(): ShadowTag = EMPTY_COMPOUND
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key)
     )
-}
-
-private fun CompoundShadowTag.putId(id: Key) {
-    this.putString(CoreBinaryKeys.CORE_IDENTIFIER, id.asString())
 }
