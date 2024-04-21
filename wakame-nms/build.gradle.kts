@@ -1,6 +1,6 @@
 plugins {
     id("neko-kotlin")
-    id("neko.repositories") version "1.1.1-SNAPSHOT"
+    id("neko.repositories") version "1.0-SNAPSHOT"
     alias(libs.plugins.paperdev)
 }
 

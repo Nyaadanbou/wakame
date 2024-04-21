@@ -6,8 +6,8 @@ pluginManagement {
         maven("https://repo.mewcraft.cc/releases")
         maven("https://repo.mewcraft.cc/private") {
             credentials {
-                username = providers.gradleProperty("mewcraftRepositoryUsername").getOrElse("")
-                password = providers.gradleProperty("mewcraftRepositoryPassword").getOrElse("")
+                username = providers.gradleProperty("nyaadanbouUsername").getOrElse("")
+                password = providers.gradleProperty("nyaadanbouPassword").getOrElse("")
             }
         }
     }
@@ -22,14 +22,14 @@ dependencyResolutionManagement {
         maven("https://repo.mewcraft.cc/releases")
         maven("https://repo.mewcraft.cc/private") {
             credentials {
-                username = providers.gradleProperty("mewcraftRepositoryUsername").getOrElse("")
-                password = providers.gradleProperty("mewcraftRepositoryPassword").getOrElse("")
+                username = providers.gradleProperty("nyaadanbouUsername").getOrElse("")
+                password = providers.gradleProperty("nyaadanbouPassword").getOrElse("")
             }
         }
     }
     versionCatalogs {
         create("libs") {
-            from("cc.mewcraft.gradle:catalog:1.0")
+            from("cc.mewcraft.gradle:catalog:1.0-SNAPSHOT")
         }
     }
 }
