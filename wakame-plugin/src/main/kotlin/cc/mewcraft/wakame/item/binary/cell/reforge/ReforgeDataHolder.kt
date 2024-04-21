@@ -22,6 +22,11 @@ interface ReforgeDataHolder : ShadowTagLike {
      * @return an data accessor
      */
     fun <T : ReforgeDataAccess<*>> access(clazz: KClass<T>): T
+
+    /**
+     * Clears the reforge data so that it becomes empty.
+     */
+    fun clear()
 }
 
 /**

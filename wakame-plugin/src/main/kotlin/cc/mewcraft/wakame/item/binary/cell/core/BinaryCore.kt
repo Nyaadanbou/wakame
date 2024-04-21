@@ -31,6 +31,13 @@ interface BinaryCore : Core, ShadowTagLike {
      * @return a new instance of [TagResolver]
      */
     fun provideTagResolvers(): TagResolver = TagResolver.empty()
+
+    /**
+     * Clears the core so that it becomes empty.
+     *
+     * The actual behavior of this function is implementation-defined!
+     */
+    fun clear() = Unit
 }
 
 /**

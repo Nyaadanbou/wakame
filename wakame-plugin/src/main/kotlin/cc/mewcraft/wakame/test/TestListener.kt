@@ -295,4 +295,18 @@ class TestListener : KoinComponent, Listener {
                 .onFailure { player.sendPlainMessage("Failed to re-generate resource pack: $it") }
         }
     }
+
+    @EventHandler
+    fun testShadowNbtCompoundClear(e: AsyncChatEvent) {
+        val player = e.player
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        if (plainMessage == "tags-clear") {
+            val compound = CompoundShadowTag.create()
+            compound.putString("k1", "1")
+            compound.putInt("k2", 2)
+            player.sendPlainMessage("Old: " + compound.asString())
+            compound.tags().clear()
+            player.sendPlainMessage("New: " + compound.asString())
+        }
+    }
 }

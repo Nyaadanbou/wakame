@@ -9,7 +9,12 @@ import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEmptyCurse
 /**
  * Represents a [Curse] in binary form.
  */
-interface BinaryCurse : Curse, ShadowTagLike, Condition<NekoStack>
+interface BinaryCurse : Curse, ShadowTagLike, Condition<NekoStack> {
+    /**
+     * Clears the curse so that it becomes empty.
+     */
+    fun clear() = Unit
+}
 
 /**
  * Checks if the curse is empty.

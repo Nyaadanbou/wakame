@@ -29,6 +29,10 @@ internal class BinaryAttributeCoreNBTWrapperS(
     override val value: Double
         get() = compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE)
 
+    override fun clear() {
+        compound.tags().clear()
+    }
+
     override fun asShadowTag(): ShadowTag = compound
 
     override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> =
@@ -53,6 +57,10 @@ internal class BinaryAttributeCoreNBTWrapperR(
     override val upper: Double
         get() = compound.getNumber(AttributeBinaryKeys.RANGED_MAX_VALUE)
 
+    override fun clear() {
+        compound.tags().clear()
+    }
+
     override fun asShadowTag(): ShadowTag = compound
 
     override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> =
@@ -76,6 +84,10 @@ internal class BinaryAttributeCoreNBTWrapperSE(
         get() = compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE)
     override val element: Element
         get() = compound.getElement()
+
+    override fun clear() {
+        compound.tags().clear()
+    }
 
     override fun asShadowTag(): ShadowTag = compound
 
@@ -102,6 +114,10 @@ internal class BinaryAttributeCoreNBTWrapperRE(
         get() = compound.getNumber(AttributeBinaryKeys.RANGED_MAX_VALUE)
     override val element: Element
         get() = compound.getElement()
+
+    override fun clear() {
+        compound.tags().clear()
+    }
 
     override fun asShadowTag(): ShadowTag = compound
 

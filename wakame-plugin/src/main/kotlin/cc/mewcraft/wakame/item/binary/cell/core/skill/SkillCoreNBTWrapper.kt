@@ -22,6 +22,10 @@ internal class BinarySkillCoreNBTWrapper(
     override val trigger: SkillTrigger
         get() = SkillTrigger.Noop // TODO cell-overhaul: 实现 SkillTrigger 相关的代码
 
+    override fun clear() {
+        compound.tags().clear()
+    }
+
     override fun asShadowTag(): ShadowTag = compound
     override fun toString(): String = compound.asString()
 }

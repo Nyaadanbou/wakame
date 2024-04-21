@@ -25,6 +25,10 @@ internal class ReforgeDataHolderImpl(
         return ret as T
     }
 
+    override fun clear() {
+        root.tags().clear()
+    }
+
     override fun asShadowTag(): ShadowTag = root
     override fun toString(): String = root.asString()
 }

@@ -81,6 +81,10 @@ internal class BinaryEntityKillsCurseNBTWrapper(
     override val count: Int
         get() = compound.getInt(COUNT_TAG_KEY)
 
+    override fun clear() {
+        compound.tags().clear()
+    }
+
     override fun asShadowTag(): ShadowTag = compound
     override fun toString(): String = compound.asString()
 }

@@ -77,6 +77,10 @@ internal class BinaryPeakDamageCurseNBTWrapper(
     override val amount: Int
         get() = compound.getInt(AMOUNT_TAG_KEY)
 
+    override fun clear() {
+        compound.tags().clear()
+    }
+
     override fun asShadowTag(): ShadowTag = compound
     override fun toString(): String = compound.asString()
 }
