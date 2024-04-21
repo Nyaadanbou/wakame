@@ -45,7 +45,7 @@ interface MoLangCondition : NoCostSkillCondition {
         }
 
         override fun notifyFailure(context: SkillCastContext) {
-            context.player.sendMessage(failureMessage)
+            println(failureMessage)
         }
     }
 }

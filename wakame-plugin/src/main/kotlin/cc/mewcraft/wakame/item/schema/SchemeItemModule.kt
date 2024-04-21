@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.item.schema.meta.*
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
+import cc.mewcraft.wakame.skill.SKILL_SERIALIZERS
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
