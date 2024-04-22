@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.binary.cell.reforge.ReforgeDataHolder
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import net.kyori.examination.Examinable
+import kotlin.reflect.KClass
 
 //
 // BinaryCell 接口是相对简单的，但实现上有很大不同。
@@ -37,6 +38,30 @@ interface BinaryCell : Cell, ShadowTagLike, Examinable {
      * The reforge data stored in this cell.
      */
     var reforge: ReforgeDataHolder
+
+    /**
+     * Gets the core if it matches the specific [type][clazz].
+     */
+    fun <T : BinaryCore> typedCore(clazz: KClass<T>): T?
+
+    /**
+     * Gets the curse if it matches the specific [type][clazz].
+     */
+    fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T?
+}
+
+/**
+ * @see typedCore
+ */
+inline fun <reified T : BinaryCore> BinaryCell.typedCore(): T? {
+    return this.typedCore(T::class)
+}
+
+/**
+ * @see typedCurse
+ */
+inline fun <reified T : BinaryCurse> BinaryCell.typedCurse(): T? {
+    return this.typedCurse(T::class)
 }
 
 /**

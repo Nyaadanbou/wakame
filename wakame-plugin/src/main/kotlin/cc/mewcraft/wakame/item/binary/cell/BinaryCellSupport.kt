@@ -12,12 +12,27 @@ import cc.mewcraft.wakame.item.binary.cell.reforge.ReforgeDataHolder
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
+import kotlin.reflect.KClass
+import kotlin.reflect.full.safeCast
+
+private object Impl {
+    fun <T : BinaryCore> typedCore(instance: BinaryCell, clazz: KClass<T>): T? {
+        return clazz.safeCast(instance.core)
+    }
+
+    fun <T : BinaryCurse> typedCurse(instance: BinaryCell, clazz: KClass<T>): T? {
+        return clazz.safeCast(instance.curse)
+    }
+}
 
 internal data class BinaryCellDataHolder(
     override var core: BinaryCore,
     override var curse: BinaryCurse,
     override var reforge: ReforgeDataHolder,
 ) : BinaryCell {
+    override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? = Impl.typedCore(this, clazz)
+    override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? = Impl.typedCurse(this, clazz)
+
     override fun asShadowTag(): ShadowTag = CompoundShadowTag {
         // 当对应的数据不存在时，这里的每个 asShadowTag()
         // 应该返回一个没有内容的空 Compound（不是 null）
@@ -54,11 +69,8 @@ internal data class BinaryCellNBTWrapper(
             compound.put(ReforgeBinaryKeys.BASE, value.asShadowTag())
         }
 
-    override fun asShadowTag(): ShadowTag {
-        return compound
-    }
-
-    override fun toString(): String {
-        return compound.asString()
-    }
+    override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? = Impl.typedCore(this, clazz)
+    override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? = Impl.typedCurse(this, clazz)
+    override fun asShadowTag(): ShadowTag = compound
+    override fun toString(): String = compound.asString()
 }
