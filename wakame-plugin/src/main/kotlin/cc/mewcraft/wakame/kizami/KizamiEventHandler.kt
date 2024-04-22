@@ -12,11 +12,23 @@ import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
+import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 class KizamiEventHandler {
+
+    /**
+     * 用于保证玩家身上的槽位只会应用一次特定的物品效果。
+     *
+     * Key: 玩家 UUID
+     * Value: 物品 Key
+     */
+    private val itemCheck: Multimap<Player, Key> = HashMultimap.create()
+
     /**
      * Updates kizami effects when the player switches their held item.
      *
@@ -124,9 +136,13 @@ class KizamiEventHandler {
      * @param predicate
      */
     private inline fun PlayNekoStack.addKizamiAmount(user: User<Player>, predicate: PlayNekoStackPredicate) {
+        if (itemCheck[user.player].contains(this.key)) {
+            return
+        }
         val kizamiSet = this.getKizamiSet(predicate)
         val kizamiMap = user.kizamiMap
         kizamiMap.addOneEach(kizamiSet)
+        itemCheck.put(user.player, this.key)
     }
 
     /**
@@ -140,6 +156,7 @@ class KizamiEventHandler {
         val kizamiSet = this.getKizamiSet(predicate)
         val kizamiMap = user.kizamiMap
         kizamiMap.subtractOneEach(kizamiSet)
+        itemCheck.remove(user.player, this.key)
     }
 
     /**

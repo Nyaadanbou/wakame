@@ -6,6 +6,9 @@ import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.AttributeProvider
 import cc.mewcraft.wakame.user.toUser
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
+import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
@@ -18,6 +21,13 @@ import org.koin.core.component.KoinComponent
  * - must be applied to players as vanilla attribute modifiers.
  */
 class AttributeEventHandler : KoinComponent {
+    /**
+     * 用于保证玩家身上的槽位只会应用一次特定的物品效果。
+     *
+     * Key: 玩家 UUID
+     * Value: 物品 Key
+     */
+    private val itemCheck: Multimap<Player, Key> = HashMultimap.create()
 
     /**
      * Updates attributes when the player switches their held item.
@@ -37,7 +47,7 @@ class AttributeEventHandler : KoinComponent {
     ) {
         updateAttributeModifiers(player, oldItem, newItem) {
             this.effectiveSlot.testItemHeld(player, previousSlot, newSlot) &&
-            this.hasBehavior<AttributeProvider>()
+                    this.hasBehavior<AttributeProvider>()
         }
     }
 
@@ -59,7 +69,7 @@ class AttributeEventHandler : KoinComponent {
     ) {
         updateAttributeModifiers(player, oldItem, newItem) {
             this.effectiveSlot.testInventorySlotChange(player, slot, rawSlot) &&
-            this.hasBehavior<AttributeProvider>()
+                    this.hasBehavior<AttributeProvider>()
         }
     }
 
@@ -92,10 +102,14 @@ class AttributeEventHandler : KoinComponent {
         if (!this.predicate()) {
             return
         }
+        if (itemCheck[player].contains(this.key)) {
+            return
+        }
 
         val attributeMap = player.toUser().attributeMap
         val attributeModifiers = this.cell.getAttributeModifiers()
         attributeMap.addAttributeModifiers(attributeModifiers)
+        itemCheck.put(player, this.key)
     }
 
     /**
@@ -117,5 +131,6 @@ class AttributeEventHandler : KoinComponent {
 
         val attributeMap = player.toUser().attributeMap
         attributeMap.clearModifiers(this.uuid)
+        itemCheck.remove(player, this.key)
     }
 }

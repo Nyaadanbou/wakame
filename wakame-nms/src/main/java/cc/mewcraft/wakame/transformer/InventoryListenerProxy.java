@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
+import net.minecraft.world.inventory.ResultSlot;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,12 +26,16 @@ public class InventoryListenerProxy implements ContainerListener {
     @Override
     public void slotChanged(@NotNull AbstractContainerMenu handler, int slotId, @NotNull ItemStack oldStack, @NotNull ItemStack stack) {
         // injected code - start
-        new PlayerInventorySlotChangeEvent(
-                serverPlayer.getBukkitEntity(),
-                slotId,
-                oldStack.asBukkitMirror(),
-                stack.asBukkitMirror()
-        ).callEvent();
+        Slot slot = handler.getSlot(slotId);
+        if (!(slot instanceof ResultSlot) && slot.container == serverPlayer.getInventory()) {
+            PlayerInventorySlotChangeEvent event = new PlayerInventorySlotChangeEvent(
+                    serverPlayer.getBukkitEntity(),
+                    slotId,
+                    oldStack.asBukkitMirror(),
+                    stack.asBukkitMirror()
+            );
+            event.callEvent();
+        }
         // injected code - end
         originalListener.slotChanged(handler, slotId, oldStack, stack);
     }
