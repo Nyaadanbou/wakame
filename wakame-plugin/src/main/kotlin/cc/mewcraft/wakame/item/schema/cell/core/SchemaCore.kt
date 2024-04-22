@@ -14,6 +14,8 @@ interface SchemaCore : Core {
     /**
      * Reifies the schema.
      *
+     * **The implementation must populate the [context] with correct information!**
+     *
      * @param context the generation context
      * @return a new instance of [BinaryCore]
      */

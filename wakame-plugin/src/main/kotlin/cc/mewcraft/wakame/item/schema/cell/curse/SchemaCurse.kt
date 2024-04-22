@@ -9,10 +9,12 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
  */
 interface SchemaCurse : Curse {
     /**
-     * Generates a binary curse from this schema.
+     * Reifies the schema.
      *
-     * @param context the context
-     * @return a new instance
+     * **The implementation must populate the [context] with correct information!**
+     *
+     * @param context the generation context
+     * @return a new instance of [BinaryCurse]
      */
     fun reify(context: SchemaGenerationContext): BinaryCurse
 }

@@ -29,6 +29,8 @@ interface SchemaEmptyCore : SchemaCore
 private data object SchemaEmptyCoreImpl : SchemaEmptyCore {
     override val key: Key = GenericKeys.EMPTY
     override fun reify(context: SchemaGenerationContext): BinaryCore {
+        // Implementation notes:
+        // There is nothing to populate into the context
         return BinaryEmptyCore()
     }
 

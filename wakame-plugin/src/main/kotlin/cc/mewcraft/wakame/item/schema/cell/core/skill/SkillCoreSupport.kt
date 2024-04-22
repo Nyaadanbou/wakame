@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.SkillTrigger
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCoreDataHolder
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
+import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
 import net.kyori.adventure.key.Key
 
 //
@@ -30,6 +31,7 @@ internal data class SchemaSkillCoreImpl(
         // 技能依赖的外部数值，例如属性，魔法值，技能触发时便知道
         // 综上，物品上的技能无需储存除 key 以外的任何数据
 
+        context.skills += SkillContextHolder(key)
         return BinarySkillCoreDataHolder(key, trigger)
     }
 }

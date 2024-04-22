@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.attribute.facade.SchemaAttributeData
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.*
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
+import cc.mewcraft.wakame.item.schema.filter.AttributeContextHolder
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.nbt.ShadowTagType
@@ -13,6 +14,9 @@ import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 import kotlin.math.max
 
+private fun SchemaAttributeCore.populateGenerationContext(context: SchemaGenerationContext) {
+    context.attributes += AttributeContextHolder(key, operation, elementOrNull)
+}
 
 internal data class SchemaAttributeCoreR(
     override val key: Key,
@@ -22,6 +26,8 @@ internal data class SchemaAttributeCoreR(
     override val upper: RandomizedValue,
 ) : SchemaAttributeCore, SchemaAttributeData.R {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
+        populateGenerationContext(context)
+
         val factor = context.level
         val lower = lower.calculate(factor)
         val upper = upper.calculate(factor)
@@ -48,6 +54,8 @@ internal data class SchemaAttributeCoreRE(
     override val element: Element,
 ) : SchemaAttributeCore, SchemaAttributeData.RE {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
+        populateGenerationContext(context)
+
         val factor = context.level
         val lower = lower.calculate(factor)
         val upper = upper.calculate(factor)
@@ -73,6 +81,8 @@ internal data class SchemaAttributeCoreS(
     override val value: RandomizedValue,
 ) : SchemaAttributeCore, SchemaAttributeData.S {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
+        populateGenerationContext(context)
+
         val factor = context.level
         val value = value.calculate(factor)
         return BinaryAttributeCoreDataHolderS(key, tagType, operation, value)
@@ -96,6 +106,8 @@ internal data class SchemaAttributeCoreSE(
     override val element: Element,
 ) : SchemaAttributeCore, SchemaAttributeData.SE {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
+        populateGenerationContext(context)
+
         val factor = context.level
         val value = value.calculate(factor)
         return BinaryAttributeCoreDataHolderSE(key, tagType, operation, value, element)

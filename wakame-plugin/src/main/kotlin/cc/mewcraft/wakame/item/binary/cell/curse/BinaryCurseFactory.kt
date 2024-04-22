@@ -6,17 +6,10 @@ import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEmptyCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEntityKillsCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryPeakDamageCurse
-import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
-import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCurse
 import cc.mewcraft.wakame.util.Key
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 object BinaryCurseFactory {
-
-    /**
-     * Creates an empty curse.
-     */
-    fun empty(): BinaryCurse = BinaryEmptyCurse()
 
     /**
      * Creates a curse from a NBT source.
@@ -28,7 +21,7 @@ object BinaryCurseFactory {
         if (compound.isEmpty) {
             // It's an empty binary curse,
             // just return the singleton.
-            return empty()
+            return BinaryEmptyCurse()
         }
 
         val id = compound.getString(CurseBinaryKeys.CURSE_IDENTIFIER)
@@ -41,13 +34,6 @@ object BinaryCurseFactory {
         }
 
         return ret
-    }
-
-    /**
-     * Reifies a [SchemaCurse] with given [context].
-     */
-    fun reify(schema: SchemaCurse, context: SchemaGenerationContext): BinaryCurse {
-        return schema.reify(context)
     }
 
 }

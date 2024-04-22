@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.item.binary.cell.core.BinaryCoreFactory
-import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurseFactory
 import cc.mewcraft.wakame.item.binary.cell.reforge.ReforgeDataFactory
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
@@ -58,14 +56,14 @@ object BinaryCellFactory {
         // make a core
         val core = run {
             val schemaCore = schema.createOptions.core.pickSingle(context) ?: SchemaNoopCore()
-            val binaryCore = BinaryCoreFactory.reify(schemaCore, context)
+            val binaryCore = schemaCore.reify(context)
             binaryCore
         }
 
         // make a curse
         val curse = run {
             val schemaCurse = schema.createOptions.curse.pickSingle(context) ?: SchemaEmptyCurse()
-            val binaryCurse = BinaryCurseFactory.reify(schemaCurse, context)
+            val binaryCurse = schemaCurse.reify(context)
             binaryCurse
         }
 

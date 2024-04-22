@@ -27,5 +27,9 @@ interface SchemaNoopCore : SchemaCore
 
 private data object SchemaNoopCoreImpl : SchemaNoopCore {
     override val key: Key = GenericKeys.NOOP
-    override fun reify(context: SchemaGenerationContext) = BinaryNoopCore()
+    override fun reify(context: SchemaGenerationContext): BinaryNoopCore {
+        // Implementation notes:
+        // There is nothing to populate into the context
+        return BinaryNoopCore()
+    }
 }
