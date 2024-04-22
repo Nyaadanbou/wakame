@@ -18,23 +18,13 @@ import java.util.*
  * player; By contrast, if the player has no skill, we say that the player
  * has no skill attached.
  */
-interface Skill : Keyed {
+interface ConfiguredSkill : Keyed {
     /**
      * The unique identifier of this skill.
      */
     val uniqueId: UUID
 
-    /**
-     * The trigger of this skill.
-     */
-    val trigger: Trigger
-
     val conditions: SkillConditionGroup
-
-    enum class Trigger {
-        NONE,
-        BREAK_BLOCK,
-    }
 
     fun castAt(target: Target.Void) {}
     fun castAt(target: Target.Location) {}
@@ -52,9 +42,8 @@ interface Skill : Keyed {
 /**
  * A no-op skill. Used as placeholder object.
  */
-object NoopSkill : Skill {
+object NoopConfiguredSkill : ConfiguredSkill {
     override val uniqueId: UUID = UUID.fromString("1826a767-d424-4024-8b8f-4e66157e35de")
-    override val trigger: Skill.Trigger = Skill.Trigger.NONE
     override val conditions: SkillConditionGroup = EmptySkillConditionGroup
     override val key: Key = SkillRegistry.EMPTY_KEY
 }
@@ -64,7 +53,7 @@ object NoopSkill : Skill {
  * The key combinations currently include the alternations of Mouse Left (L)
  * and Mouse Right (R), such as "RRL" and "LLR".
  */
-interface ActiveSkill : Skill
+interface ActiveConfiguredSkill : ConfiguredSkill
 
 /**
  * A skill that applies its effects either permanently as soon as it is
@@ -72,7 +61,7 @@ interface ActiveSkill : Skill
  * requirements met. These requirements can range from attacking a monster,
  * casting a spell or even getting attacked.
  */
-interface PassiveSkill : Skill
+interface PassiveConfiguredSkill : ConfiguredSkill
 
 /**
  * Creates a skill from the given configuration node. The node must contain
@@ -82,12 +71,12 @@ interface PassiveSkill : Skill
  * @param key The key of the skill.
  * @param relPath The relative path of the configuration node.
  */
-fun Skill(node: ConfigurationNode, key: Key, relPath: String): Skill {
+fun ConfiguredSkill(node: ConfigurationNode, key: Key, relPath: String): ConfiguredSkill {
     val type = node.node("type").krequire<String>()
     return SkillRegistry.SKILL_TYPES[type].create(NodeConfigProvider(node, relPath), key)
 }
 
-fun Skill.tryCast(skillCastContext: SkillCastContext) {
+fun ConfiguredSkill.tryCast(skillCastContext: SkillCastContext) {
     val event: SkillPrepareCastEvent
     when (skillCastContext) {
         is PlayerSkillCastContext -> {

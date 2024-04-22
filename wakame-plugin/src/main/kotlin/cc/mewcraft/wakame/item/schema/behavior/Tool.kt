@@ -1,18 +1,9 @@
 package cc.mewcraft.wakame.item.schema.behavior
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SToolMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.TargetAdapter
-import org.bukkit.entity.Player
-import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
 
 /**

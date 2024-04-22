@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random.BasicSelectionContext
 import cc.mewcraft.wakame.random.SelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.WatchedPrimitive
 import cc.mewcraft.wakame.util.WatchedSet
 import kotlin.random.Random
@@ -61,7 +61,7 @@ class SchemaGenerationContext(
     val curses: MutableCollection<CurseContextHolder> by WatchedSet(HashSet())
 
     /**
-     * 已经生成的 [Skill].
+     * 已经生成的 [ConfiguredSkill].
      */
     val skills: MutableCollection<SkillContextHolder> by WatchedSet(HashSet())
 

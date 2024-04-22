@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.player.equipment.ArmorEquipEvent
 import cc.mewcraft.wakame.skill.Caster
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.world.block.event.BlockBreakActionEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
@@ -42,7 +42,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
     fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) = Unit
-    fun handleSkillPrepareCast(caster: Caster.Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) = Unit
+    fun handleSkillPrepareCast(caster: Caster.Player, itemStack: ItemStack, skill: ConfiguredSkill, event: PlayerSkillPrepareCastEvent) = Unit
 }
 
 interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {

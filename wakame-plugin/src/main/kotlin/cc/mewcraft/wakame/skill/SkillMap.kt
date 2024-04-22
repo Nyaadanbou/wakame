@@ -12,19 +12,19 @@ import java.util.UUID
  * for the subject.
  */
 interface SkillMap {
-    fun setSkill(key: Key, skill: Skill)
-    fun getSkill(key: Key): Skill?
+    fun setSkill(key: Key, skill: ConfiguredSkill)
+    fun getSkill(key: Key): ConfiguredSkill?
 
-    operator fun set(key: Key, skill: Skill) = setSkill(key, skill)
-    operator fun get(key: Key): Skill? = getSkill(key)
+    operator fun set(key: Key, skill: ConfiguredSkill) = setSkill(key, skill)
+    operator fun get(key: Key): ConfiguredSkill? = getSkill(key)
 }
 
 /**
  * The no-op SkillMap. Used as placeholder code.
  */
 object NoopSkillMap : SkillMap {
-    override fun setSkill(key: Key, skill: Skill) = Unit
-    override fun getSkill(key: Key): Skill? = null
+    override fun setSkill(key: Key, skill: ConfiguredSkill) = Unit
+    override fun getSkill(key: Key): ConfiguredSkill? = null
 }
 
 /**
@@ -43,13 +43,13 @@ fun PlayerSkillMap(user: User<*>): PlayerSkillMap {
 class PlayerSkillMap(
     private val uniqueId: UUID
 ) : SkillMap {
-    private val skills: MutableMap<Key, Skill> = Reference2ReferenceOpenHashMap()
+    private val skills: MutableMap<Key, ConfiguredSkill> = Reference2ReferenceOpenHashMap()
 
-    override fun setSkill(key: Key, skill: Skill) {
+    override fun setSkill(key: Key, skill: ConfiguredSkill) {
         skills[key] = skill
     }
 
-    override fun getSkill(key: Key): Skill? {
+    override fun getSkill(key: Key): ConfiguredSkill? {
         return skills[key]
     }
 

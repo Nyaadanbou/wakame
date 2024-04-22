@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SFoodMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.skill.CasterAdapter
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.TargetAdapter
 import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
 import cc.mewcraft.wakame.skill.tryCast
@@ -28,19 +28,19 @@ interface Food : ItemBehavior {
     /**
      * 食用后玩家将会执行的技能。
      */
-    val skills: List<Skill>
+    val skills: List<ConfiguredSkill>
 
     companion object Factory : ItemBehaviorFactory<Food> {
         override fun create(item: NekoItem, config: ConfigProvider): Food {
-            val skills = config.optionalEntry<List<Skill>>("skills").orElse(emptyList())
+            val skills = config.optionalEntry<List<ConfiguredSkill>>("skills").orElse(emptyList())
             return Default(skills)
         }
     }
 
     private class Default(
-        skills: Provider<List<Skill>>,
+        skills: Provider<List<ConfiguredSkill>>,
     ) : Food {
-        override val skills: List<Skill> by skills
+        override val skills: List<ConfiguredSkill> by skills
 
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
             skills.forEach { skill ->

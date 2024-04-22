@@ -3,12 +3,12 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.skill.condition.MoLangCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
 import cc.mewcraft.wakame.skill.type.RemovePotionEffect
-import cc.mewcraft.wakame.skill.type.SkillFactory
+import cc.mewcraft.wakame.skill.type.SkillType
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -27,8 +27,8 @@ object SkillRegistry : Initializable, KoinComponent {
      */
     val EMPTY_KEY: Key = Key(Namespaces.SKILL, "empty")
 
-    val INSTANCE: Registry<Key, Skill> = SimpleRegistry()
-    val SKILL_TYPES: Registry<String, SkillFactory<*>> = SimpleRegistry()
+    val INSTANCE: Registry<Key, ConfiguredSkill> = SimpleRegistry()
+    val SKILL_TYPES: Registry<String, SkillType<*>> = SimpleRegistry()
     val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
 
     private fun loadCondition(){
@@ -70,7 +70,7 @@ object SkillRegistry : Initializable, KoinComponent {
 
                     val text = skillFile.bufferedReader().use { it.readText() }
                     val node = loaderBuilder.buildAndLoadString(text)
-                    val skill = Skill(node, skillKey, skillFile.path)
+                    val skill = ConfiguredSkill(node, skillKey, skillFile.path)
 
                     INSTANCE.register(skillKey, skill)
                     logger.info("Loaded skill: {}", skillKey)

@@ -12,7 +12,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 
-class SkillConditionResultTest : KoinTest {
+class ConfiguredSkillConditionResultTest : KoinTest {
     companion object {
         @JvmStatic
         @BeforeAll

@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.SkillInstance
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.ImmutableMultimap
@@ -88,7 +88,7 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
 }
 
 /**
- * A [skill][Skill] provided by a kizami.
+ * A [skill][ConfiguredSkill] provided by a kizami.
  */
 data class KizamiSkill(
     override val effect: SkillInstance,
