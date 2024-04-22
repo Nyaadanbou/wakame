@@ -69,16 +69,16 @@ tasks {
         // relocate("net.kyori", "cc.mewcraft.wakame.external.packetevents.kyori")
     }
 
-    val inputJarPath = lazy { shadowJar.get().archiveFile.get().asFile.absolutePath }
-    val finalJarName = lazy { "${ext.get("name")}-${project.version}.jar" }
-    val finalJarPath = lazy { layout.buildDirectory.file(finalJarName.value).get().asFile.absolutePath }
+    val inputJarPath by lazy { shadowJar.get().archiveFile.get().asFile.absolutePath }
+    val finalJarName by lazy { "${ext.get("name")}-${project.version}.jar" }
+    val finalJarPath by lazy { layout.buildDirectory.file(finalJarName).get().asFile.absolutePath }
     val deployTargetPath = rootProject.file(".deploy_config").takeIf { it.exists() }?.readText()?.takeIf { it.isNotBlank() }
     register<Copy>("copyJar") {
         group = "mewcraft"
         dependsOn(build)
-        from(inputJarPath.value)
+        from(inputJarPath)
         into(layout.buildDirectory)
-        rename("(?i)${project.name}.*\\.jar", finalJarName.value)
+        rename("(?i)${project.name}.*\\.jar", finalJarName)
     }
     register<Task>("deployJar") {
         group = "mewcraft"
@@ -90,7 +90,7 @@ tasks {
             }
 
             exec {
-                commandLine("rsync", finalJarPath.value, deployTargetPath)
+                commandLine("rsync", finalJarPath, deployTargetPath)
             }
         }
     }
