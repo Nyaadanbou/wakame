@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.binary.cell
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.SkillTrigger
 import com.google.common.collect.Multimap
 
 /**
@@ -57,7 +58,7 @@ interface ItemCellAccessor {
     /**
      * Gets all active skill instances from all the cells.
      */
-    fun getSkillInstances(): List<ConfiguredSkill>
+    fun getConfiguredSkills(): Multimap<SkillTrigger, ConfiguredSkill>
 
     /* Setters */
 

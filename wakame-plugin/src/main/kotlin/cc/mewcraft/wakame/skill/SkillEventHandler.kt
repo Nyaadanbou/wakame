@@ -1,15 +1,12 @@
 package cc.mewcraft.wakame.skill
 
-import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
 import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.Castable
-import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
 import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.Key
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -75,7 +72,7 @@ class SkillEventHandler {
      * @param player
      * @param oldItem the old item to check with, or `null` if it's empty
      * @param newItem the new item to check with, or `null` if it's empty
-     * @param predicate a function to test whether the item can provide attribute modifiers
+     * @param predicate a function to test whether the item can provide skills
      */
     private inline fun updateSkills(
         player: Player,
@@ -83,8 +80,8 @@ class SkillEventHandler {
         newItem: ItemStack?,
         predicate: PlayNekoStackPredicate,
     ) {
-        oldItem?.playNekoStackOrNull?.removeAttributeModifiers(player, predicate)
-        newItem?.playNekoStackOrNull?.addAttributeModifiers(player, predicate)
+        oldItem?.playNekoStackOrNull?.removeConfiguredSkills(player, predicate)
+        newItem?.playNekoStackOrNull?.addConfiguredSkills(player, predicate)
     }
 
     /**
@@ -94,31 +91,29 @@ class SkillEventHandler {
      * @param predicate
      * @receiver the ItemStack which may provide skills
      */
-    private inline fun PlayNekoStack.addAttributeModifiers(player: Player, predicate: PlayNekoStackPredicate) {
+    private inline fun PlayNekoStack.addConfiguredSkills(player: Player, predicate: PlayNekoStackPredicate) {
         if (!this.predicate()) {
             return
         }
-
         val skillMap = player.toUser().skillMap
-        // TODO: 从物品获得需要添加的技能
-        val skill = SkillRegistry.INSTANCE[Key(Namespaces.SKILL, "buff/potion_remove")]
-        skillMap.setSkill(SkillTrigger.Jump, skill)
+        val skills = this.cell.getConfiguredSkills()
+        skillMap.setAllSkills(skills)
     }
 
     /**
      * Remove the skills of [this] for the [player].
      *
-     * @param player the player we remove attribute modifiers from
+     * @param player the player we remove skills from
      * @param predicate
      * @receiver the ItemStack which may provide skills
      */
-    private inline fun PlayNekoStack.removeAttributeModifiers(player: Player, predicate: PlayNekoStackPredicate) {
+    private inline fun PlayNekoStack.removeConfiguredSkills(player: Player, predicate: PlayNekoStackPredicate) {
         if (!this.predicate()) {
             return
         }
 
         val skillMap = player.toUser().skillMap
-        // TODO: 从物品获得需要移除的技能 key
-        skillMap.removeSkill(Key(Namespaces.SKILL, "buff/potion_remove"))
+        val skillKeys = this.cell.getConfiguredSkills().values().map { it.key }
+        skillMap.removeSkills(skillKeys)
     }
 }

@@ -5,7 +5,9 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.CellBinaryKeys
 import cc.mewcraft.wakame.item.binary.BaseNekoStack
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
 import com.google.common.collect.ImmutableListMultimap
@@ -62,8 +64,21 @@ internal value class ItemCellAccessorImpl(
         return multimap.build()
     }
 
-    override fun getSkillInstances(): List<ConfiguredSkill> {
-        TODO("Not yet implemented")
+    override fun getConfiguredSkills(): Multimap<SkillTrigger, ConfiguredSkill> {
+        val ret = ImmutableListMultimap.builder<SkillTrigger, ConfiguredSkill>()
+        for (cell in snapshot.values) {
+            if (!cell.curse.test(base)) {
+                continue
+            }
+
+            val core = cell.core
+            if (core is BinarySkillCore) {
+                val skill = core.instance
+                val trigger = core.trigger
+                ret.put(trigger, skill)
+            }
+        }
+        return ret.build()
     }
 
     /* Setters */

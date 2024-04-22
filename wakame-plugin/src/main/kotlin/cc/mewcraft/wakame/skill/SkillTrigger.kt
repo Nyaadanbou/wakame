@@ -11,6 +11,7 @@ import java.lang.reflect.Type
 interface SkillTrigger : Keyed {
     companion object {
         private val TRIGGERS: Map<Key, SkillTrigger> = mapOf(
+            Attack.key to Attack,
             Jump.key to Jump,
             Noop.key to Noop
         )
@@ -27,7 +28,9 @@ interface SkillTrigger : Keyed {
             return TRIGGERS.values
         }
     }
-
+    data object Attack : SkillTrigger {
+        override val key: Key = Key(Namespaces.TRIGGER, "generic/attack")
+    }
     data object Jump : SkillTrigger {
         override val key: Key = Key(Namespaces.TRIGGER, "generic/jump")
     }

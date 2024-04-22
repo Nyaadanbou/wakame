@@ -23,6 +23,7 @@ import org.slf4j.Logger
         KizamiRegistry::class,
         LevelMappingRegistry::class,
         RarityRegistry::class,
+        SkillRegistry::class,
     ]
 )
 @ReloadDependency(
@@ -35,6 +36,7 @@ import org.slf4j.Logger
         KizamiRegistry::class,
         LevelMappingRegistry::class,
         RarityRegistry::class,
+        SkillRegistry::class,
     ]
 )
 object NekoItemRegistry : KoinComponent, Initializable {

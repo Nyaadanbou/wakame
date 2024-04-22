@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
 import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.ConfiguredSkillWithTrigger
 import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.util.krequire
-import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
@@ -15,8 +15,9 @@ import org.spongepowered.configurate.ConfigurationNode
  * @return a new instance of [SchemaSkillCore]
  */
 fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
-    val key = node.node("key").krequire<Key>()
-    val trigger = node.node("trigger").krequire<SkillTrigger>()
+    val configuredSkillWithTrigger = node.krequire<ConfiguredSkillWithTrigger>()
+    val key = configuredSkillWithTrigger.key
+    val trigger = configuredSkillWithTrigger.trigger
     val schemaSkillCore = SchemaSkillCoreImpl(key, trigger)
     return schemaSkillCore
 }

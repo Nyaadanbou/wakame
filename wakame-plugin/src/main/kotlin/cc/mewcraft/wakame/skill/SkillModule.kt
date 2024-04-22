@@ -19,8 +19,8 @@ internal fun skillModule(): Module = module {
         TypeSerializerCollection.builder()
             .kregister(SkillConditionGroupSerializer)
             .kregister(EvaluableSerializer)
-            .kregister(SkillInstanceSerializer) // TODO cell-overhaul: 等技能框架确定后移除
-            .kregister(SkillTriggerSerializer) // TODO cell-overhaul: 等技能框架确定后移除
+            .kregister(ConfiguredSkillWithTriggerSerializer)
+            .kregister(SkillTriggerSerializer)
             .build()
     }
 }

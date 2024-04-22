@@ -459,11 +459,11 @@ core_groups:
     selects:
       skill:
         entries:
-          - key: skill:blink
-            trigger: xyz
+          - key: skill:buff/potion_remove
+            trigger: trigger:generic/attack
             weight: 1
-          - key: skill:dash
-            trigger: xyz
+          - key: skill:buff/potion_remove
+            trigger: trigger:generic/attack
             weight: 1
     default: [ ]
 

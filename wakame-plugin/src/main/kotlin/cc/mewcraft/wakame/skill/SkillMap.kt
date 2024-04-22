@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.user.User
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import net.kyori.adventure.key.Key
-import java.util.*
+import java.util.UUID
 
 /**
  * Represents a skill map owned by a subject.
@@ -14,13 +14,11 @@ import java.util.*
  */
 interface SkillMap {
     fun setSkill(skillWithTrigger: ConfiguredSkillWithTrigger)
-    fun setSkill(trigger: SkillTrigger, skill: ConfiguredSkill) = setSkill(ConfiguredSkillWithTrigger(skill, trigger))
-    fun setAllSkills(skillWithTriggers: Collection<ConfiguredSkillWithTrigger>) = skillWithTriggers.forEach { setSkill(it) }
+    fun setAllSkills(skillWithTriggers: Multimap<SkillTrigger, ConfiguredSkill>)
     fun getSkills(trigger: SkillTrigger): Collection<ConfiguredSkill>
     fun removeSkill(skillKey: Key)
     fun removeSkills(skillKeys: Collection<Key>) = skillKeys.forEach { removeSkill(it) }
 
-    operator fun set(trigger: SkillTrigger, skill: ConfiguredSkill) = setSkill(ConfiguredSkillWithTrigger(skill, trigger))
     operator fun get(uniqueId: UUID, trigger: SkillTrigger): Collection<ConfiguredSkill> = getSkills(trigger)
 }
 
@@ -29,7 +27,7 @@ interface SkillMap {
  */
 object NoopSkillMap : SkillMap {
     override fun setSkill(skillWithTrigger: ConfiguredSkillWithTrigger) = Unit
-    override fun setAllSkills(skillWithTriggers: Collection<ConfiguredSkillWithTrigger>) = Unit
+    override fun setAllSkills(skillWithTriggers: Multimap<SkillTrigger, ConfiguredSkill>) = Unit
     override fun getSkills(trigger: SkillTrigger): Collection<ConfiguredSkill> = emptyList()
     override fun removeSkill(skillKey: Key) = Unit
     override fun removeSkills(skillKeys: Collection<Key>) = Unit
@@ -49,12 +47,16 @@ fun PlayerSkillMap(user: User<*>): PlayerSkillMap {
  * then check whether the input has triggered a skill or not.
  */
 class PlayerSkillMap(
-    private val uniqueId: UUID
+    private val uniqueId: UUID,
 ) : SkillMap {
     private val skills: Multimap<SkillTrigger, ConfiguredSkill> = HashMultimap.create()
 
     override fun setSkill(skillWithTrigger: ConfiguredSkillWithTrigger) {
         skills.put(skillWithTrigger.trigger, skillWithTrigger.skill)
+    }
+
+    override fun setAllSkills(skillWithTriggers: Multimap<SkillTrigger, ConfiguredSkill>) {
+        skills.putAll(skillWithTriggers)
     }
 
     override fun getSkills(trigger: SkillTrigger): Collection<ConfiguredSkill> {
