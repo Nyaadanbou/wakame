@@ -53,7 +53,6 @@ internal interface BaseNekoStack : NekoStack {
      */
     val tags: CompoundShadowTag
 
-    //<editor-fold desc="Getters">
     override val isNmsBacked: Boolean
         get() = itemStack.isNmsObjectBacked
 
@@ -102,22 +101,17 @@ internal interface BaseNekoStack : NekoStack {
 
     override val statistics: ItemStatisticsAccessor
         get() = ItemStatisticsAccessorImpl(this)
-    //</editor-fold>
 
-    //<editor-fold desc="Setters">
     override fun erase() {
         itemStack.removeNekoCompound()
     }
-    //</editor-fold>
 
-    //<editor-fold desc="Behaviors">
     override val behaviors: List<ItemBehavior>
         get() = schema.behaviors
 
     override fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
         return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
     }
-    //</editor-fold>
 }
 
 @JvmInline
