@@ -10,6 +10,11 @@ tasks {
     compileTestJava {
         options.encoding = "UTF-8"
     }
+    compileKotlin {
+        compilerOptions {
+            suppressWarnings.set(true) // we rely on IDE analysis
+        }
+    }
     assemble {
         dependsOn(shadowJar)
     }
