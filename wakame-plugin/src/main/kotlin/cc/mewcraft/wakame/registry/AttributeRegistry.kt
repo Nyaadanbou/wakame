@@ -152,7 +152,6 @@ interface AttributeFacade<out A : BinaryAttributeData> {
  *          creates attribute modifier out of
  */
 fun interface AttributeModifierCreator<in T : BinaryAttributeData> {
-    // TODO 这里可以用范型吗？
     fun makeAttributeModifiers(uuid: UUID, core: T): Map<Attribute, AttributeModifier>
 }
 
