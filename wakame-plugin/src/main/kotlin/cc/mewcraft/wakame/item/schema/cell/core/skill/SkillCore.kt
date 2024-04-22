@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.schema.cell.core.skill
 
 import cc.mewcraft.wakame.item.SkillInstance
-import cc.mewcraft.wakame.item.SkillTrigger
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
+import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode

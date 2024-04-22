@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.event.SkillPrepareCastEvent
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.condition.*
+import cc.mewcraft.wakame.skill.type.SkillType
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -24,6 +25,21 @@ interface ConfiguredSkill : Keyed {
      */
     val uniqueId: UUID
 
+    /**
+     * The key of this skill.
+     *
+     * **Note that the [key] here is specified by the location of the skill configuration file, not the [SkillRegistry.SKILL_TYPES]'s key**,
+     * which means that a [SkillType] can have multiple [ConfiguredSkill].
+     *
+     * [ConfiguredSkill] will be stored in the SkillRegistry, and the corresponding [ConfiguredSkill] will be found by the [key].
+     */
+    override val key: Key
+
+    /**
+     * The conditions that must be met in order to cast this skill.
+     *
+     * @see SkillConditionGroup
+     */
     val conditions: SkillConditionGroup
 
     fun castAt(target: Target.Void) {}

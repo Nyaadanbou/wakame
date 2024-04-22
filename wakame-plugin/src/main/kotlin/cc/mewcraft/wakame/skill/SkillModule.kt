@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.item.SkillInstanceSerializer
-import cc.mewcraft.wakame.item.SkillTriggerSerializer
 import cc.mewcraft.wakame.molang.EvaluableSerializer
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroupSerializer
 import cc.mewcraft.wakame.util.kregister

@@ -12,7 +12,7 @@
 包含一个 Key (下面称之为 ConfiguredKey) 来查找对应的 ConfiguredSkill。
 
 **注意这里的 ConfiguredKey 是由技能配置文件的位置指定的，而不是 Skill 的 Key**，
-这也就代表了一个 Skill 可以有多个 ConfiguredSkill。
+这也就代表了一个 SkillType 可以有多个 ConfiguredSkill。
 ConfiguredSkill 会存储在 SkillRegistry 中，通过 ConfiguredKey 来查找对应的 ConfiguredSkill。
 
 ### SkillConditions

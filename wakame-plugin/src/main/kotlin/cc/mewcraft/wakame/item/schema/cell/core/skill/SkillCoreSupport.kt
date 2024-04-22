@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.schema.cell.core.skill
 
 import cc.mewcraft.wakame.item.SkillInstance
-import cc.mewcraft.wakame.item.SkillTrigger
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCoreDataHolder
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
+import cc.mewcraft.wakame.skill.SkillTrigger
 import net.kyori.adventure.key.Key
 
 //

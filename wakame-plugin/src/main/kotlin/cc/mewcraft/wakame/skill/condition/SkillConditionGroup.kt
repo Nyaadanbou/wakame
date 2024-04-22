@@ -4,18 +4,29 @@ import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.condition.ConditionGroup
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import java.util.*
 
+/**
+ * Represents a skill condition group, which contains conditions and costs.
+ * It will be initialized when creating [ConfiguredSkill].
+ *
+ * When triggering a skill, it will check if the conditions are met.
+ * If so, the [ConfiguredSkill] will be executed, and all costs inside will be executed as well. Otherwise, it will not be executed.
+ */
 interface SkillConditionGroup : ConditionGroup<SkillCastContext> {
+    /**
+     * Test if all conditions are met.
+     */
     override fun test(context: SkillCastContext): Boolean
     fun cost(context: SkillCastContext)
     fun notifyFailure(context: SkillCastContext, notifyCount: Int = 1)
 }
 
-object EmptySkillConditionGroup : SkillConditionGroup {
+data object EmptySkillConditionGroup : SkillConditionGroup {
     override fun test(context: SkillCastContext): Boolean = true
     override fun cost(context: SkillCastContext) = Unit
     override fun notifyFailure(context: SkillCastContext, notifyCount: Int) = Unit

@@ -10,18 +10,8 @@ interface SkillInstance {
     data object Noop : SkillInstance
 }
 
-interface SkillTrigger {
-    data object Noop : SkillTrigger
-}
-
 object SkillInstanceSerializer : SchemaSerializer<SkillInstance> {
     override fun deserialize(type: Type, node: ConfigurationNode): SkillInstance {
         return SkillInstance.Noop
-    }
-}
-
-object SkillTriggerSerializer : SchemaSerializer<SkillTrigger> {
-    override fun deserialize(type: Type, node: ConfigurationNode): SkillTrigger {
-        return SkillTrigger.Noop
     }
 }

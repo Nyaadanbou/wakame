@@ -25,4 +25,9 @@ object CasterAdapter {
             override val bukkitPlayer: Player = player
         }
     }
+
+    fun adapt(): Caster.Void {
+        return object : Caster.Void {
+        }
+    }
 }

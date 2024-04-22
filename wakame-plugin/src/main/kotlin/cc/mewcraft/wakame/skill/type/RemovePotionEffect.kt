@@ -34,6 +34,7 @@ class RemovePotionEffect(
     }
 
     override fun castAt(target: Target.LivingEntity) {
-        effectType.forEach { target.bukkitEntity.removePotionEffect(it) }
+        val entity = target.bukkitEntity
+        effectType.forEach { entity.removePotionEffect(it) }
     }
 }

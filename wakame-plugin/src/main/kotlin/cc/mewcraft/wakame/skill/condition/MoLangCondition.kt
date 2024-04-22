@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.molang.Evaluable
+import cc.mewcraft.wakame.skill.Caster
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -45,7 +46,8 @@ interface MoLangCondition : NoCostSkillCondition {
         }
 
         override fun notifyFailure(context: SkillCastContext) {
-            println(failureMessage)
+            val caster = context.caster as? Caster.Player ?: return
+            caster.bukkitPlayer.sendMessage(failureMessage)
         }
     }
 }

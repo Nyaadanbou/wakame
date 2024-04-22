@@ -5,6 +5,13 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.wakame.item.binary.getMetaAccessor
+import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
+import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
+import cc.mewcraft.wakame.item.getBehaviorOrNull
+import cc.mewcraft.wakame.item.schema.behavior.Damageable
+import cc.mewcraft.wakame.item.schema.behavior.decreaseDurabilityNaturally
+import cc.mewcraft.wakame.skill.Caster
 
 /**
  * 技能释放需要物品耐久度。
@@ -28,8 +35,7 @@ interface DurabilityCondition : SkillCondition {
         override val requireDurability: Int by requireDurability
 
         override fun test(context: SkillCastContext): Boolean {
-            /* val itemStack = context.itemStack FIXME 修复编译错误
-            val nekoStack = PlayNekoStackFactory.maybe(itemStack)
+            val nekoStack = context.itemStack?.playNekoStackOrNull
             val damageable = nekoStack?.getBehaviorOrNull<Damageable>()
             if (damageable == null) {
                 // TODO 原版物品耐久检测
@@ -40,24 +46,23 @@ interface DurabilityCondition : SkillCondition {
                     return false
                 }
                 return requireDurability + durabilityMeta.damage() <= durabilityMeta.threshold()
-            } */
-            return false
+            }
         }
 
         override fun cost(context: SkillCastContext) {
-            /* val itemStack = context.itemStack FIXME 修复编译错误
-            val nekoStack = PlayNekoStackFactory.maybe(itemStack)
+            val nekoStack = context.itemStack?.playNekoStackOrNull
             val damageable = nekoStack?.getBehaviorOrNull<Damageable>()
             if (damageable == null) {
                 // TODO 原版物品失去耐久
             } else {
                 nekoStack.decreaseDurabilityNaturally(requireDurability)
-            } */
+            }
         }
 
         override fun notifyFailure(context: SkillCastContext) {
             // TODO 通知玩家物品耐久度不足
-            // context.player.sendMessage("物品耐久度不足") FIXME 修复编译错误
+            val player = context.caster as? Caster.Player ?: return
+            player.bukkitPlayer.sendMessage("物品耐久度不足")
         }
     }
 }

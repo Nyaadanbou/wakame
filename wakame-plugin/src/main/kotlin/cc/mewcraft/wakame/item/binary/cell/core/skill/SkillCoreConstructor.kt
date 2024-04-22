@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
-import cc.mewcraft.wakame.item.SkillTrigger
+import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.util.krequire
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key

@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.user.User
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import net.kyori.adventure.key.Key
-import java.util.UUID
+import java.util.*
 
 /**
  * Represents a skill map owned by a subject.
@@ -12,19 +13,26 @@ import java.util.UUID
  * for the subject.
  */
 interface SkillMap {
-    fun setSkill(key: Key, skill: ConfiguredSkill)
-    fun getSkill(key: Key): ConfiguredSkill?
+    fun setSkill(skillWithTrigger: ConfiguredSkillWithTrigger)
+    fun setSkill(trigger: SkillTrigger, skill: ConfiguredSkill) = setSkill(ConfiguredSkillWithTrigger(skill, trigger))
+    fun setAllSkills(skillWithTriggers: Collection<ConfiguredSkillWithTrigger>) = skillWithTriggers.forEach { setSkill(it) }
+    fun getSkills(trigger: SkillTrigger): Collection<ConfiguredSkill>
+    fun removeSkill(skillKey: Key)
+    fun removeSkills(skillKeys: Collection<Key>) = skillKeys.forEach { removeSkill(it) }
 
-    operator fun set(key: Key, skill: ConfiguredSkill) = setSkill(key, skill)
-    operator fun get(key: Key): ConfiguredSkill? = getSkill(key)
+    operator fun set(trigger: SkillTrigger, skill: ConfiguredSkill) = setSkill(ConfiguredSkillWithTrigger(skill, trigger))
+    operator fun get(uniqueId: UUID, trigger: SkillTrigger): Collection<ConfiguredSkill> = getSkills(trigger)
 }
 
 /**
  * The no-op SkillMap. Used as placeholder code.
  */
 object NoopSkillMap : SkillMap {
-    override fun setSkill(key: Key, skill: ConfiguredSkill) = Unit
-    override fun getSkill(key: Key): ConfiguredSkill? = null
+    override fun setSkill(skillWithTrigger: ConfiguredSkillWithTrigger) = Unit
+    override fun setAllSkills(skillWithTriggers: Collection<ConfiguredSkillWithTrigger>) = Unit
+    override fun getSkills(trigger: SkillTrigger): Collection<ConfiguredSkill> = emptyList()
+    override fun removeSkill(skillKey: Key) = Unit
+    override fun removeSkills(skillKeys: Collection<Key>) = Unit
 }
 
 /**
@@ -43,14 +51,22 @@ fun PlayerSkillMap(user: User<*>): PlayerSkillMap {
 class PlayerSkillMap(
     private val uniqueId: UUID
 ) : SkillMap {
-    private val skills: MutableMap<Key, ConfiguredSkill> = Reference2ReferenceOpenHashMap()
+    private val skills: Multimap<SkillTrigger, ConfiguredSkill> = HashMultimap.create()
 
-    override fun setSkill(key: Key, skill: ConfiguredSkill) {
-        skills[key] = skill
+    override fun setSkill(skillWithTrigger: ConfiguredSkillWithTrigger) {
+        skills.put(skillWithTrigger.trigger, skillWithTrigger.skill)
     }
 
-    override fun getSkill(key: Key): ConfiguredSkill? {
-        return skills[key]
+    override fun getSkills(trigger: SkillTrigger): Collection<ConfiguredSkill> {
+        return skills[trigger]
+    }
+
+    override fun removeSkill(skillKey: Key) {
+        skills.values().removeIf { it.key == skillKey }
+    }
+
+    override fun removeSkills(skillKeys: Collection<Key>) {
+        skills.values().removeIf { skillKeys.contains(it.key) }
     }
 
     override fun hashCode(): Int {

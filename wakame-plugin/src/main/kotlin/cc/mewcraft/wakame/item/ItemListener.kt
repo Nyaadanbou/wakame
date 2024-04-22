@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
+import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -36,6 +37,7 @@ class MultipleItemListener : KoinComponent, Listener {
 
         attributeEventHandler.handlePlayerItemHeld(player, previousSlot, newSlot, oldItem, newItem)
         kizamiEventHandler.handlePlayerItemHeld(player, previousSlot, newSlot, oldItem, newItem)
+        skillEventHandler.handlePlayerItemHeld(player, previousSlot, newSlot, oldItem, newItem)
     }
 
     @EventHandler
@@ -48,6 +50,15 @@ class MultipleItemListener : KoinComponent, Listener {
 
         attributeEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
         kizamiEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
+        skillEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
+    }
+
+    @EventHandler
+    fun onJump(event: PlayerJumpEvent) {
+        val player = event.player
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+
+        skillEventHandler.onJump(player, item)
     }
 }
 
