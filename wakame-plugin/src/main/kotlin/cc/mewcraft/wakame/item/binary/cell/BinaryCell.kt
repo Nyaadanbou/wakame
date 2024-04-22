@@ -26,17 +26,17 @@ interface BinaryCell : Cell, ShadowTagLike, Examinable {
     /**
      * The core stored in this cell.
      */
-    val core: BinaryCore
+    var core: BinaryCore
 
     /**
      * The curse stored in this cell.
      */
-    val curse: BinaryCurse
+    var curse: BinaryCurse
 
     /**
      * The reforge data stored in this cell.
      */
-    val reforge: ReforgeDataHolder
+    var reforge: ReforgeDataHolder
 }
 
 /**

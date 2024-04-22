@@ -14,30 +14,51 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 
 internal data class BinaryCellDataHolder(
-    override val core: BinaryCore,
-    override val curse: BinaryCurse,
-    override val reforge: ReforgeDataHolder,
+    override var core: BinaryCore,
+    override var curse: BinaryCurse,
+    override var reforge: ReforgeDataHolder,
 ) : BinaryCell {
-    override fun asShadowTag(): ShadowTag =
-        CompoundShadowTag {
-            // 当对应的数据不存在时，这里的每个 asShadowTag()
-            // 应该返回一个没有内容的空 Compound（不是 null）
-            put(CoreBinaryKeys.BASE, core.asShadowTag())
-            put(CurseBinaryKeys.BASE, curse.asShadowTag())
-            put(ReforgeBinaryKeys.BASE, reforge.asShadowTag())
-        }
+    override fun asShadowTag(): ShadowTag = CompoundShadowTag {
+        // 当对应的数据不存在时，这里的每个 asShadowTag()
+        // 应该返回一个没有内容的空 Compound（不是 null）
+        put(CoreBinaryKeys.BASE, core.asShadowTag())
+        put(CurseBinaryKeys.BASE, curse.asShadowTag())
+        put(ReforgeBinaryKeys.BASE, reforge.asShadowTag())
+    }
 }
 
 internal data class BinaryCellNBTWrapper(
     private val compound: CompoundShadowTag,
 ) : BinaryCell {
-    override val core: BinaryCore
-        get() = BinaryCoreFactory.wrap(compound.getCompound(CoreBinaryKeys.BASE))
-    override val curse: BinaryCurse
-        get() = BinaryCurseFactory.wrap(compound.getCompound(CurseBinaryKeys.BASE))
-    override val reforge: ReforgeDataHolder
-        get() = ReforgeDataFactory.wrap(compound.getCompound(ReforgeBinaryKeys.BASE))
+    override var core: BinaryCore
+        get() {
+            return BinaryCoreFactory.wrap(compound.getCompound(CoreBinaryKeys.BASE))
+        }
+        set(value) {
+            compound.put(CoreBinaryKeys.BASE, value.asShadowTag())
+        }
 
-    override fun asShadowTag(): ShadowTag = compound
-    override fun toString(): String = compound.asString()
+    override var curse: BinaryCurse
+        get() {
+            return BinaryCurseFactory.wrap(compound.getCompound(CurseBinaryKeys.BASE))
+        }
+        set(value) {
+            compound.put(CurseBinaryKeys.BASE, value.asShadowTag())
+        }
+
+    override var reforge: ReforgeDataHolder
+        get() {
+            return ReforgeDataFactory.wrap(compound.getCompound(ReforgeBinaryKeys.BASE))
+        }
+        set(value) {
+            compound.put(ReforgeBinaryKeys.BASE, value.asShadowTag())
+        }
+
+    override fun asShadowTag(): ShadowTag {
+        return compound
+    }
+
+    override fun toString(): String {
+        return compound.asString()
+    }
 }
