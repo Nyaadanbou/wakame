@@ -1,7 +1,7 @@
 # 实体 Entities
 
 # 实体索引表（目前仅用于条件判断）
-entity_references:
+entity_type_holders:
 
   demo_bosses_1: # 索引的唯一标识
     - minecraft:ender_dragon # 原版怪物 minecraft:_value_（必须小写）

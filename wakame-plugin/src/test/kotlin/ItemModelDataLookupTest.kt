@@ -1,10 +1,10 @@
 import cc.mewcraft.wakame.element.elementModule
+import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.lookupModule
 import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.reference.referenceModule
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.registry.NekoItemRegistry.get
 import cc.mewcraft.wakame.skill.skillModule
@@ -32,8 +32,8 @@ class ItemModelDataLookupTest : KoinTest {
                 // dependencies
                 modules(
                     elementModule(),
+                    entityModule(),
                     kizamiModule(),
-                    referenceModule(),
                     registryModule(),
                     rarityModule(),
                     skillModule(),
@@ -51,7 +51,7 @@ class ItemModelDataLookupTest : KoinTest {
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()
             LevelMappingRegistry.onPreWorld()
-            EntityReferenceRegistry.onPreWorld()
+            EntityRegistry.onPreWorld()
             NekoItemRegistry.onPreWorld()
         }
 

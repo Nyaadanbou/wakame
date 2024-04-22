@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.entity
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
 import io.lumine.mythic.bukkit.MythicBukkit
@@ -8,7 +7,6 @@ import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 import kotlin.jvm.optionals.getOrElse
 
-@InternalApi
 class MythicMobsEntityKeyLookup : EntityKeyLookup {
 
     private val mythicApi: MythicBukkit by lazy { MythicBukkit.inst() }

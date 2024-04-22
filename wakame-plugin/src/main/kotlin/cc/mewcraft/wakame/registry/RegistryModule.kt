@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
+import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.schema.BASE_SERIALIZERS
 import cc.mewcraft.wakame.item.schema.CELL_SERIALIZERS
 import cc.mewcraft.wakame.item.schema.META_SERIALIZERS
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
-import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
 import cc.mewcraft.wakame.skill.SKILL_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
 import cc.mewcraft.wakame.util.buildYamlLoader
@@ -62,7 +62,7 @@ internal fun registryModule(): Module = module {
     single { AttributeRegistry } bind Initializable::class
     single { BehaviorRegistry } bind Initializable::class
     single { ElementRegistry } bind Initializable::class
-    single { EntityReferenceRegistry } bind Initializable::class
+    single { EntityRegistry } bind Initializable::class
     single { ItemMetaRegistry } bind Initializable::class
     single { ItemSkinRegistry } bind Initializable::class
     single { KizamiRegistry } bind Initializable::class
@@ -80,7 +80,7 @@ internal fun registryModule(): Module = module {
 
     single<YamlConfigurationLoader>(named(ENTITY_CONFIG_LOADER)) {
         createYamlLoader(ENTITY_CONFIG_FILE) {
-            registerAll(get(named(REFERENCE_SERIALIZERS)))
+            registerAll(get(named(ENTITY_TYPE_HOLDER_SERIALIZER)))
         }
     }
 

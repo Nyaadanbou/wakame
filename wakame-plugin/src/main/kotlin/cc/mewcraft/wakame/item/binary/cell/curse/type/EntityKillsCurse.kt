@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.binary.cell.curse.type
 
+import cc.mewcraft.wakame.entity.EntityTypeHolder
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEntityKillsCurse.Constants.COUNT_TAG_KEY
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEntityKillsCurse.Constants.INDEX_TAG_KEY
-import cc.mewcraft.wakame.reference.EntityReference
-import cc.mewcraft.wakame.registry.EntityReferenceRegistry
+import cc.mewcraft.wakame.registry.EntityRegistry
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.toStableShort
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -21,7 +21,7 @@ import net.kyori.adventure.key.Key
  * @property count the required number of entities to be killed
  */
 interface BinaryEntityKillsCurse : BinaryCurse {
-    val index: EntityReference
+    val index: EntityTypeHolder
     val count: Int
 
     companion object Constants {
@@ -52,7 +52,7 @@ fun BinaryEntityKillsCurse(
 }
 
 fun BinaryEntityKillsCurse(
-    index: EntityReference,
+    index: EntityTypeHolder,
     count: Int,
 ): BinaryEntityKillsCurse {
     return BinaryEntityKillsCurseDataHolder(index, count)
@@ -63,7 +63,7 @@ fun BinaryEntityKillsCurse(
 //
 
 internal data class BinaryEntityKillsCurseDataHolder(
-    override val index: EntityReference,
+    override val index: EntityTypeHolder,
     override val count: Int,
 ) : BinaryEntityKillsCurse {
     override fun asShadowTag(): ShadowTag = CompoundShadowTag {
@@ -76,7 +76,7 @@ internal data class BinaryEntityKillsCurseDataHolder(
 internal class BinaryEntityKillsCurseNBTWrapper(
     private val compound: CompoundShadowTag,
 ) : BinaryEntityKillsCurse {
-    override val index: EntityReference
+    override val index: EntityTypeHolder
         get() = compound.getEntityReference(INDEX_TAG_KEY)
     override val count: Int
         get() = compound.getInt(COUNT_TAG_KEY)
@@ -89,6 +89,6 @@ internal class BinaryEntityKillsCurseNBTWrapper(
     override fun toString(): String = compound.asString()
 }
 
-private fun CompoundShadowTag.getEntityReference(key: String): EntityReference {
-    return EntityReferenceRegistry.INSTANCES[this.getString(key)]
+private fun CompoundShadowTag.getEntityReference(key: String): EntityTypeHolder {
+    return EntityRegistry.TYPES[this.getString(key)]
 }

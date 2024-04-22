@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.config.configurate.MaterialSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
+import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.item.EffectiveSlotSerializer
 import cc.mewcraft.wakame.item.schema.cell.SchemaCellSerializer
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCoreGroupSerializer
@@ -13,7 +14,6 @@ import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCursePoolSerializer
 import cc.mewcraft.wakame.item.schema.meta.*
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
-import cc.mewcraft.wakame.reference.REFERENCE_SERIALIZERS
 import cc.mewcraft.wakame.skill.SKILL_SERIALIZERS
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
@@ -55,7 +55,7 @@ internal fun schemaItemModule(): Module = module {
             // curses
             .kregister(SchemaCursePoolSerializer)
             .kregister(SchemaCurseGroupSerializer)
-            .registerAll(get(named(REFERENCE_SERIALIZERS)))
+            .registerAll(get(named(ENTITY_TYPE_HOLDER_SERIALIZER)))
 
             .build()
     }

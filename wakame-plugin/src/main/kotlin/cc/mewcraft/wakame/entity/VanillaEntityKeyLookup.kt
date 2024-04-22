@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.entity
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 
@@ -12,7 +11,6 @@ import org.bukkit.entity.Entity
  * So, you should call other implementation first, and this implementation
  * should always be the last to be called.
  */
-@InternalApi
 class VanillaEntityKeyLookup : EntityKeyLookup {
 
     override fun getKey(entity: Entity): Key {

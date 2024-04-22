@@ -1,14 +1,12 @@
 package cc.mewcraft.wakame.entity
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.createScope
 import org.koin.core.scope.Scope
 
-@InternalApi
-class CompositedEntityKeyLookup(
+internal class CompositedEntityKeyLookup(
     private val lookupList: List<EntityKeyLookup>,
 ) : KoinScopeComponent, EntityKeyLookup {
 

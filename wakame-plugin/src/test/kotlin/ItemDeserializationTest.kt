@@ -1,5 +1,6 @@
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.elementModule
+import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.cell.isNoop
@@ -10,7 +11,6 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.reference.referenceModule
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.ItemSkin
@@ -51,8 +51,8 @@ class ItemDeserializationTest : KoinTest {
                 // dependencies
                 modules(
                     elementModule(),
+                    entityModule(),
                     kizamiModule(),
-                    referenceModule(),
                     registryModule(),
                     rarityModule(),
                     skillModule(),
@@ -70,7 +70,7 @@ class ItemDeserializationTest : KoinTest {
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()
             LevelMappingRegistry.onPreWorld()
-            EntityReferenceRegistry.onPreWorld()
+            EntityRegistry.onPreWorld()
             NekoItemRegistry.onPreWorld()
         }
 
