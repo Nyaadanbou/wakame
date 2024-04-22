@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.item.SkillInstance
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.skill.ConfiguredSkill
@@ -91,8 +90,8 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
  * A [skill][ConfiguredSkill] provided by a kizami.
  */
 data class KizamiSkill(
-    override val effect: SkillInstance,
-) : KizamiEffect.Single<SkillInstance> {
+    override val effect: ConfiguredSkill,
+) : KizamiEffect.Single<ConfiguredSkill> {
     override fun apply(kizami: Kizami, user: User<*>) {
         println("applied skill kizami effect to ${user.uniqueId}") // TODO actually implement it when skill module is done
     }

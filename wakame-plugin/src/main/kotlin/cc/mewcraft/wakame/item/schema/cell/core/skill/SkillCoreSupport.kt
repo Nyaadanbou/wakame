@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.item.schema.cell.core.skill
 
-import cc.mewcraft.wakame.item.SkillInstance
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCoreDataHolder
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
+import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.SkillTrigger
 import net.kyori.adventure.key.Key
 
@@ -16,8 +17,8 @@ internal data class SchemaSkillCoreImpl(
     override val key: Key, // the key will be used to get the Skill instance
     override val trigger: SkillTrigger,
 ) : SchemaSkillCore {
-    override val instance: SkillInstance
-        get() = SkillInstance.Noop
+    override val instance: ConfiguredSkill
+        get() = SkillRegistry.INSTANCE[key]
 
     override fun reify(context: SchemaGenerationContext): BinarySkillCore {
         // 根据设计，技能的数值分为两类：

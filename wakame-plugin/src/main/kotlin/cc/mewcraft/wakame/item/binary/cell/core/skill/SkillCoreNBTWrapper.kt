@@ -1,9 +1,12 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
 import cc.mewcraft.wakame.item.CoreBinaryKeys
-import cc.mewcraft.wakame.item.SkillInstance
+import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.SkillBinaryKeys
 import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.getStringOrNull
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
@@ -17,10 +20,10 @@ internal class BinarySkillCoreNBTWrapper(
 ) : BinarySkillCore {
     override val key: Key
         get() = compound.getIdentifier()
-    override val instance: SkillInstance
-        get() = SkillInstance.Noop // TODO cell-overhaul: 从 key 获取技能
+    override val instance: ConfiguredSkill
+        get() = SkillRegistry.INSTANCE[key]
     override val trigger: SkillTrigger
-        get() = SkillTrigger.Noop // TODO cell-overhaul: 实现 SkillTrigger 相关的代码
+        get() = compound.getTrigger()
 
     override fun clear() {
         compound.tags().clear()
@@ -32,4 +35,8 @@ internal class BinarySkillCoreNBTWrapper(
 
 private fun CompoundShadowTag.getIdentifier(): Key {
     return Key(this.getString(CoreBinaryKeys.CORE_IDENTIFIER))
+}
+
+private fun CompoundShadowTag.getTrigger(): SkillTrigger {
+    return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillTrigger.fromStringOrNull(it) } ?: SkillTrigger.Noop
 }
