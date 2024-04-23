@@ -22,6 +22,10 @@ import kotlin.reflect.KClass
 
 /**
  * Represents a certain state from a [SchemaCell].
+ *
+ * This is a live object, which means the states of the object can change
+ * externally at any time. You should not assume that the states of the object
+ * will remain unchanged.
  */
 interface BinaryCell : Cell, ShadowTagLike, Examinable {
     /**

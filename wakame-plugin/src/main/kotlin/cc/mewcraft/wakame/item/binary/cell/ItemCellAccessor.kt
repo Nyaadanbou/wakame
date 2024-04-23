@@ -14,11 +14,12 @@ interface ItemCellAccessor {
     /* Getters */
 
     /**
-     * Gets an immutable map describing the cells in this holder. This will
-     * call [find] for each available cell on the backed item.
+     * Gets an immutable map describing **all** the cells in this holder, neglecting
+     * what curses the cells own.
      *
-     * Note that any changes on the item in the underlying game world **does
-     * not** reflect on the returned map.
+     * Note that although the map is immutable, the entries in the map is not!
+     *
+     * @see BinaryCell
      */
     val snapshot: Map<String, BinaryCell>
 
@@ -38,7 +39,7 @@ interface ItemCellAccessor {
      *
      * @param id the ID of the cell (case-sensitive)
      * @return the specified binary cell
-     * @throws NullPointerException if the specified binary cell is not found
+     * @throws IllegalArgumentException if the specified binary cell is not found
      */
     fun get(id: String): BinaryCell = requireNotNull(find(id)) { "Can't find binary cell for $id" }
 
@@ -53,12 +54,12 @@ interface ItemCellAccessor {
     /**
      * Gets all attribute modifiers from all the cells.
      */
-    fun getAttributeModifiers(): Multimap<Attribute, AttributeModifier>
+    fun getAttributeModifiers(neglectCurse: Boolean = false): Multimap<Attribute, AttributeModifier>
 
     /**
-     * Gets all active skill instances from all the cells.
+     * Gets all configured skills from all the cells.
      */
-    fun getConfiguredSkills(): Multimap<SkillTrigger, ConfiguredSkill>
+    fun getConfiguredSkills(neglectCurse: Boolean = false): Multimap<SkillTrigger, ConfiguredSkill>
 
     /* Setters */
 

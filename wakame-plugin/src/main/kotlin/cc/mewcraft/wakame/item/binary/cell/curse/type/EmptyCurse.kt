@@ -10,9 +10,7 @@ import net.kyori.adventure.key.Key
 /**
  * A special curse that always returns `true`.
  */
-interface BinaryEmptyCurse : BinaryCurse {
-    override fun test(context: NekoStack): Boolean = true
-}
+interface BinaryEmptyCurse : BinaryCurse
 
 fun BinaryEmptyCurse(): BinaryEmptyCurse {
     return BinaryEmptyCurseImpl
@@ -27,6 +25,7 @@ fun BinaryEmptyCurse(): BinaryEmptyCurse {
 // 那么返回空对象即可！
 internal data object BinaryEmptyCurseImpl : BinaryEmptyCurse {
     override val key: Key = GenericKeys.EMPTY
+    override fun test(context: NekoStack): Boolean = true
     override fun clear() = Unit
     override fun asShadowTag(): ShadowTag = EMPTY_COMPOUND
     private val EMPTY_COMPOUND = CompoundShadowTag.create()

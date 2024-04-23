@@ -42,32 +42,38 @@ internal value class ItemCellAccessorImpl(
         return BinaryCellFactory.wrap(compoundTag)
     }
 
-    override fun getAttributeModifiers(): Multimap<Attribute, AttributeModifier> {
-        // 注意这里不能用 Map，必须用 Multimap
-        // 因为会存在同一个属性 Attribute
-        // 但有多个 AttributeModifier
-        // 并且 Operation 不同的情况
+    override fun getAttributeModifiers(neglectCurse: Boolean): Multimap<Attribute, AttributeModifier> {
+        // 注意这里不能用 Map 必须用 Multimap
+        // 因为会存在同一个属性 Attribute 下的 AttributeModifier
+        // 有不同 Operation 的情况
 
-        val multimap = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
+        val ret = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
         for (cell in snapshot.values) {
-            if (!cell.curse.test(base)) {
-                continue // curse has not been unlocked yet
+            // Truth Table
+            //   a = curse is neglected
+            //   b = test is passed
+            //     a,b -> f
+            //     !a,b -> f
+            //     a,!b -> f
+            //     !a,!b -> t
+            if (!neglectCurse && !cell.curse.test(base)) {
+                continue // the curse has not been unlocked yet
             }
 
             val core = cell.core
             if (core is BinaryAttributeCore) {
                 val modifiers = core.provideAttributeModifiers(base.uuid)
                 val modifiersEntries = modifiers.entries
-                multimap.putAll(modifiersEntries)
+                ret.putAll(modifiersEntries)
             }
         }
-        return multimap.build()
+        return ret.build()
     }
 
-    override fun getConfiguredSkills(): Multimap<SkillTrigger, ConfiguredSkill> {
+    override fun getConfiguredSkills(neglectCurse: Boolean): Multimap<SkillTrigger, ConfiguredSkill> {
         val ret = ImmutableListMultimap.builder<SkillTrigger, ConfiguredSkill>()
         for (cell in snapshot.values) {
-            if (!cell.curse.test(base)) {
+            if (!neglectCurse && !cell.curse.test(base)) {
                 continue
             }
 
