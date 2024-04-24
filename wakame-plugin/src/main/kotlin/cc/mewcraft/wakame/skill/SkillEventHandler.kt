@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.Castable
 import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
 import cc.mewcraft.wakame.user.toUser
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -17,8 +18,15 @@ class SkillEventHandler {
 
     fun onJump(player: Player, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
-        skillMap.getSkills(SkillTrigger.Jump).forEach {
+        skillMap.getConfiguredSkills(SkillTrigger.Jump).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), itemStack))
+        }
+    }
+
+    fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack) {
+        val skillMap = player.toUser().skillMap
+        skillMap.getConfiguredSkills(SkillTrigger.Attack).forEach {
+            it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), itemStack))
         }
     }
 
@@ -96,7 +104,7 @@ class SkillEventHandler {
             return
         }
         val skillMap = player.toUser().skillMap
-        val skills = this.cell.getConfiguredSkills()
+        val skills = this.cell.getConfiguredSkills(true) // TODO: remove if skill module is complete
         skillMap.setAllSkills(skills)
     }
 
@@ -113,7 +121,7 @@ class SkillEventHandler {
         }
 
         val skillMap = player.toUser().skillMap
-        val skillKeys = this.cell.getConfiguredSkills().values().map { it.key }
+        val skillKeys = this.cell.getConfiguredSkills(true).values()  // TODO: remove if skill module is complete
         skillMap.removeSkills(skillKeys)
     }
 }

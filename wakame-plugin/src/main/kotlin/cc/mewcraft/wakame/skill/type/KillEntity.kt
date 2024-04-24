@@ -9,31 +9,24 @@ import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
-import org.bukkit.potion.PotionEffectType
 
-interface RemovePotionEffect : ConfiguredSkill {
-    val effectType: List<PotionEffectType>
-
-    companion object Factory : SkillFactory<RemovePotionEffect> {
-        override fun create(config: ConfigProvider): RemovePotionEffect {
+interface KillEntity : ConfiguredSkill {
+    companion object Factory : SkillFactory<KillEntity> {
+        override fun create(config: ConfigProvider): KillEntity {
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
-            val effectTypes = config.optionalEntry<List<PotionEffectType>>("effect_types").orElse(emptyList())
 
-            return Default(conditions, effectTypes)
+            return Default(conditions)
         }
     }
 
     private class Default(
-        conditions: Provider<SkillConditionGroup>,
-        effectType: Provider<List<PotionEffectType>>
-    ) : RemovePotionEffect {
+        conditions: Provider<SkillConditionGroup>
+    ) : KillEntity {
         override val conditions: SkillConditionGroup by conditions
-        override val effectType: List<PotionEffectType> by effectType
 
         override fun cast(context: SkillCastContext) {
             val target = context.target as Target.LivingEntity
-            val entity = target.bukkitEntity
-            effectType.forEach { entity.removePotionEffect(it) }
+            target.bukkitEntity.health = 0.0
         }
     }
 }

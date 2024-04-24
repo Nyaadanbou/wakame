@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -59,6 +60,15 @@ class MultipleItemListener : KoinComponent, Listener {
         val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
 
         skillEventHandler.onJump(player, item)
+    }
+
+    @EventHandler
+    fun onAttack(event: EntityDamageByEntityEvent) {
+        val damager = event.damager as? Player ?: return
+        val entity = event.entity as? LivingEntity ?: return
+        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+
+        skillEventHandler.onAttack(damager, entity, item)
     }
 }
 

@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.item.CellBinaryKeys
 import cc.mewcraft.wakame.item.binary.BaseNekoStack
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
-import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
@@ -14,6 +13,7 @@ import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
+import net.kyori.adventure.key.Key
 
 @JvmInline
 internal value class ItemCellAccessorImpl(
@@ -70,8 +70,8 @@ internal value class ItemCellAccessorImpl(
         return ret.build()
     }
 
-    override fun getConfiguredSkills(neglectCurse: Boolean): Multimap<SkillTrigger, ConfiguredSkill> {
-        val ret = ImmutableListMultimap.builder<SkillTrigger, ConfiguredSkill>()
+    override fun getConfiguredSkills(neglectCurse: Boolean): Multimap<SkillTrigger, Key> {
+        val ret = ImmutableListMultimap.builder<SkillTrigger, Key>()
         for (cell in snapshot.values) {
             if (!neglectCurse && !cell.curse.test(base)) {
                 continue
@@ -79,8 +79,8 @@ internal value class ItemCellAccessorImpl(
 
             val core = cell.core
             if (core is BinarySkillCore) {
-                val skill = core.instance
                 val trigger = core.trigger
+                val skill = core.instance
                 ret.put(trigger, skill)
             }
         }

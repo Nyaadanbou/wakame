@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
+import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
@@ -65,7 +66,7 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             when (namespace) {
                 Namespaces.SKILL -> {
                     val skillCore = BinarySkillCore(childNode)
-                    val skillInstance = skillCore.instance
+                    val skillInstance = SkillRegistry.INSTANCE[skillCore.instance]
                     collection += KizamiSkill(skillInstance)
                 }
 

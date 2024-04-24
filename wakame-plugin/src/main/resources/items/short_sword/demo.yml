@@ -460,9 +460,9 @@ core_groups:
       skill:
         entries:
           - key: skill:buff/potion_remove
-            trigger: trigger:generic/attack
+            trigger: trigger:generic/jump
             weight: 1
-          - key: skill:buff/potion_remove
+          - key: skill:melee/kill_entity
             trigger: trigger:generic/attack
             weight: 1
     default: [ ]

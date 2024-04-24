@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.skill
 
-import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.event.SkillPrepareCastEvent
@@ -9,11 +8,13 @@ import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
+import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
+import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
+import cc.mewcraft.wakame.skill.condition.SkillCastContext
+import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.type.SkillType
 import cc.mewcraft.wakame.util.krequire
-import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.UUID
 
 /**
  * Represents a skill "attached" to a player.
@@ -22,22 +23,7 @@ import java.util.UUID
  * player; By contrast, if the player has no skill, we say that the player
  * has no skill attached.
  */
-interface ConfiguredSkill : Keyed {
-    /**
-     * The unique identifier of this skill.
-     */
-    val uniqueId: UUID
-
-    /**
-     * The key of this skill.
-     *
-     * **Note that the [key] here is specified by the location of the skill configuration file, not the [SkillRegistry.SKILL_TYPES]'s key**,
-     * which means that a [SkillType] can have multiple [ConfiguredSkill].
-     *
-     * [ConfiguredSkill] will be stored in the SkillRegistry, and the corresponding [ConfiguredSkill] will be found by the [key].
-     */
-    override val key: Key
-
+interface ConfiguredSkill {
     /**
      * The conditions that must be met in order to cast this skill.
      *
@@ -45,26 +31,14 @@ interface ConfiguredSkill : Keyed {
      */
     val conditions: SkillConditionGroup
 
-    fun castAt(target: Target.Void) {}
-    fun castAt(target: Target.Location) {}
-    fun castAt(target: Target.LivingEntity) {}
-
-    fun castAt(target: Target) {
-        when (target) {
-            is Target.Void -> castAt(target)
-            is Target.LivingEntity -> castAt(target)
-            is Target.Location -> castAt(target)
-        }
-    }
+    fun cast(context: SkillCastContext) = Unit
 }
 
 /**
  * A no-op skill. Used as placeholder object.
  */
 object NoopConfiguredSkill : ConfiguredSkill {
-    override val uniqueId: UUID = UUID.fromString("1826a767-d424-4024-8b8f-4e66157e35de")
     override val conditions: SkillConditionGroup = EmptySkillConditionGroup
-    override val key: Key = SkillRegistry.EMPTY_KEY
 }
 
 /**
@@ -87,12 +61,12 @@ interface PassiveConfiguredSkill : ConfiguredSkill
  * a key `type` that specifies the type of the skill template to use.
  *
  * @param node The configuration node to create the skill from.
- * @param key The key of the skill.
  * @param relPath The relative path of the configuration node.
  */
-fun ConfiguredSkill(node: ConfigurationNode, key: Key, relPath: String): ConfiguredSkill {
+fun ConfiguredSkill(node: ConfigurationNode, relPath: String): ConfiguredSkill {
     val type = node.node("type").krequire<String>()
-    return SkillRegistry.SKILL_TYPES[type].create(NodeConfigProvider(node, relPath), key)
+    val provider = NodeConfigProvider(node, relPath)
+    return SkillRegistry.SKILL_TYPES[type].create(provider)
 }
 
 fun ConfiguredSkill.tryCast(skillCastContext: SkillCastContext) {
@@ -115,8 +89,11 @@ fun ConfiguredSkill.tryCast(skillCastContext: SkillCastContext) {
     val conditionGroup = this.conditions
     val context = event.skillCastContext
     if (conditionGroup.test(context)) {
+        try {
+            this.cast(context)
+        } catch (_: Throwable) {
+        }
         conditionGroup.cost(context)
-        this.castAt(context.target)
     } else {
         conditionGroup.notifyFailure(context)
     }

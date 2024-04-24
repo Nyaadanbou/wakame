@@ -3,14 +3,13 @@ package cc.mewcraft.wakame.skill.type
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.ConfiguredSkill
-import net.kyori.adventure.key.Key
 
 /**
- * Represents a skill type, which is a factory of a certain skill.
+ * Represents a factory of a certain skill.
  *
  * How to create a new skill type:
  * 1. Create a new interface that extends [ConfiguredSkill] interface.
- * 2. Create a companion object that implements [SkillType] interface with the type of the skill.
+ * 2. Create a companion object that implements [SkillFactory] interface with the type of the skill.
  * 3. Implement the [create] method to create a new instance of the skill.
  * 4. Register the skill type in the [SkillRegistry.SKILL_TYPES]
  *
@@ -20,7 +19,7 @@ import net.kyori.adventure.key.Key
  * interface MySkill : Skill {
  *    val myProperty: String
  *
- *    companion object Type : SkillType<MySkill> {
+ *    companion object Factory : SkillType<MySkill> {
  *        override fun create(config: ConfigProvider, key: Key): MySkill {
  *            return DefaultMySkill(config.entry("myProperty"))
  *        }
@@ -32,9 +31,9 @@ import net.kyori.adventure.key.Key
  *
  * @param T The type of the skill that this skill type creates.
  */
-interface SkillType<T : ConfiguredSkill> {
+interface SkillFactory<T : ConfiguredSkill> {
     /**
      * Create a new instance of the skill base on a certain skill type
      */
-    fun create(config: ConfigProvider, key: Key): T
+    fun create(config: ConfigProvider): T
 }

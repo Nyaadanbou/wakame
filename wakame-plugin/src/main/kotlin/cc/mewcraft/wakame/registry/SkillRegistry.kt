@@ -7,8 +7,7 @@ import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.skill.condition.MoLangCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
-import cc.mewcraft.wakame.skill.type.RemovePotionEffect
-import cc.mewcraft.wakame.skill.type.SkillType
+import cc.mewcraft.wakame.skill.type.*
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -27,17 +26,24 @@ object SkillRegistry : Initializable, KoinComponent {
      */
     val EMPTY_KEY: Key = Key(Namespaces.SKILL, "empty")
 
-    val INSTANCE: Registry<Key, ConfiguredSkill> = SimpleRegistry() // TODO rename it to INSTANCES
-    val SKILL_TYPES: Registry<String, SkillType<*>> = SimpleRegistry() // TODO rename it to TYPES
+    val INSTANCE: Registry<Key, ConfiguredSkill> = SimpleRegistry()
+    val SKILL_TYPES: Registry<String, SkillFactory<*>> = SimpleRegistry()
     val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
 
-    private fun loadCondition(){
-        CONDITIONS += "durability" to DurabilityCondition
-        CONDITIONS += "molang" to MoLangCondition
+    private fun loadCondition() {
+        operator fun Pair<String, SkillConditionFactory<*>>.unaryPlus() = CONDITIONS.register(first, second)
+
+        +("durability" to DurabilityCondition)
+        +("molang" to MoLangCondition)
     }
 
     private fun loadType() {
-        SKILL_TYPES += "remove_potion_effect" to RemovePotionEffect
+        operator fun Pair<String, SkillFactory<*>>.unaryPlus() = SKILL_TYPES.register(first, second)
+
+        +("command_execute" to CommandExecute)
+        +("kill_entity" to KillEntity)
+        +("remove_potion_effect" to RemovePotionEffect)
+        +("teleport" to Teleport)
     }
 
     private fun loadConfiguration() {
@@ -70,10 +76,10 @@ object SkillRegistry : Initializable, KoinComponent {
 
                     val text = skillFile.bufferedReader().use { it.readText() }
                     val node = loaderBuilder.buildAndLoadString(text)
-                    val skill = ConfiguredSkill(node, skillKey, skillFile.path)
+                    val skill = ConfiguredSkill(node, skillFile.path)
 
                     INSTANCE.register(skillKey, skill)
-                    logger.info("Loaded skill: {}", skillKey)
+                    logger.info("Loaded configured skill: {}", skillKey)
                 }
         }
     }

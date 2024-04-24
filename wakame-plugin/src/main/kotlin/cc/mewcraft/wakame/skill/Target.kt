@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.user.User
-import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
+import org.bukkit.Location as BukkitLocation
 import org.bukkit.entity.LivingEntity as BukkitLivingEntity
 
 sealed interface Target {
@@ -11,7 +11,7 @@ sealed interface Target {
     }
 
     interface Location : Target {
-
+        val bukkitLocation: BukkitLocation
     }
 
     interface LivingEntity : Target {
@@ -31,7 +31,9 @@ object TargetAdapter {
         }
     }
 
-    fun adapt(location: Location): Target.Location {
-        TODO()
+    fun adapt(location: BukkitLocation): Target.Location {
+        return object : Target.Location {
+            override val bukkitLocation: BukkitLocation = location
+        }
     }
 }

@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.SkillTrigger
 import com.google.common.collect.Multimap
+import net.kyori.adventure.key.Key
 
 /**
  * This is the interface to get the [cell holder][BinaryCell] on the ItemStack.
@@ -59,7 +59,7 @@ interface ItemCellAccessor {
     /**
      * Gets all configured skills from all the cells.
      */
-    fun getConfiguredSkills(neglectCurse: Boolean = false): Multimap<SkillTrigger, ConfiguredSkill>
+    fun getConfiguredSkills(neglectCurse: Boolean = false): Multimap<SkillTrigger, Key>
 
     /* Setters */
 
