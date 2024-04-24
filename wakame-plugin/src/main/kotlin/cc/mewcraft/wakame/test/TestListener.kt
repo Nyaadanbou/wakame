@@ -297,6 +297,14 @@ class TestListener : KoinComponent, Listener {
     }
 
     @EventHandler
+    fun testStartPackService(e: AsyncChatEvent) {
+        val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }
+        if (plainMessage == "startpack") {
+            resourcePackManager.startServer()
+        }
+    }
+
+    @EventHandler
     fun testShadowNbtCompoundClear(e: AsyncChatEvent) {
         val player = e.player
         val plainMessage = e.message().let { PlainTextComponentSerializer.plainText().serialize(it) }

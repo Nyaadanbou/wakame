@@ -27,7 +27,7 @@ sealed interface Service {
     /**
      * Start the service.
      */
-    fun start(isNoPack: Boolean)
+    fun start()
 
     /**
      * Stop the service.
@@ -39,7 +39,7 @@ sealed interface Service {
 
 data object NoneService : Service {
     override val downloadAddress = null
-    override fun start(isNoPack: Boolean) = Unit // do nothing
+    override fun start() = Unit // do nothing
     override fun stop() = Unit // do nothing
     override fun sendToPlayer(player: Player) = Unit // do nothing
 }
@@ -70,7 +70,7 @@ data class ResourcePackService(
         "http://$host/get/${resourcePack.hash()}/$RESOURCE_PACK_ZIP_NAME"
     }
 
-    override fun start(isNoPack: Boolean) {
+    override fun start() {
         server.start()
     }
 
@@ -102,8 +102,7 @@ data class GithubService(
 
     override val downloadAddress: String? = null // Not supported
 
-    override fun start(isNoPack: Boolean) {
-        if (!isNoPack) return
+    override fun start() {
         logger.info("Publishing resource pack to Github")
         val manager = GithubRepoManager(
             localRepoPath = pluginDataDir.resolve("cache").resolve("repo"),

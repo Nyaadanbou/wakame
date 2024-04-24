@@ -106,8 +106,6 @@ internal class ResourcePackManager(
             .getOrElse { return Result.failure(it) }
         pack = builtResourcePack
             .also { logger.info("<green>Resource pack built. File size: <yellow>${resourceFile.formatSize()}") }
-        // Start the resource pack server
-        runCatching { startServer(reGenerate || isNoPack) }.getOrElse { return Result.failure(it) }
 
         return Result.success(Unit)
     }
@@ -145,16 +143,16 @@ internal class ResourcePackManager(
     }
 
     //<editor-fold desc="Resource pack server test">
-    private fun startServer(isNoPack: Boolean) {
+    fun startServer() {
         if (!config.enabled) {
             logger.info("<red>Resource pack server is disabled")
             return
         }
-        service.start(isNoPack)
+        service.start()
     }
 
     @Blocking
-    private fun stopServer() {
+    fun stopServer() {
         service.stop()
     }
     //</editor-fold>
