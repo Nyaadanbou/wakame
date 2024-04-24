@@ -4,11 +4,13 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.skill.condition.MoLangCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
 import cc.mewcraft.wakame.skill.type.*
 import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.SkillTriggerUtil
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -27,8 +29,9 @@ object SkillRegistry : Initializable, KoinComponent {
     val EMPTY_KEY: Key = Key(Namespaces.SKILL, "empty")
 
     val INSTANCE: Registry<Key, ConfiguredSkill> = SimpleRegistry()
-    val SKILL_TYPES: Registry<String, SkillFactory<*>> = SimpleRegistry()
     val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
+    val SKILL_TYPES: Registry<String, SkillFactory<*>> = SimpleRegistry()
+    val TRIGGERS: BiRegistry<Key, SkillTrigger> = SimpleBiRegistry()
 
     private fun loadCondition() {
         operator fun Pair<String, SkillConditionFactory<*>>.unaryPlus() = CONDITIONS.register(first, second)
@@ -44,6 +47,15 @@ object SkillRegistry : Initializable, KoinComponent {
         +("kill_entity" to KillEntity)
         +("remove_potion_effect" to RemovePotionEffect)
         +("teleport" to Teleport)
+    }
+
+    private fun loadTriggers() {
+        val triggers = SkillTrigger.GENERIC
+        // Register Static Triggers
+        triggers.forEach { TRIGGERS.register(it.key, it) }
+        // Register Combo Triggers
+        val combos = SkillTriggerUtil.generateCombinations(SkillTrigger.COMBO, 3)
+        combos.forEach { TRIGGERS.register(it.key, it) }
     }
 
     private fun loadConfiguration() {
@@ -86,6 +98,7 @@ object SkillRegistry : Initializable, KoinComponent {
 
     override fun onPreWorld() {
         loadType()
+        loadTriggers()
         loadCondition()
         loadConfiguration()
     }

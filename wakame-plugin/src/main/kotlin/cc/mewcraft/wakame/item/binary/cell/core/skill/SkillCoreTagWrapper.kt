@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
 import cc.mewcraft.wakame.item.CoreBinaryKeys
+import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.SkillBinaryKeys
 import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.util.Key
@@ -40,5 +41,5 @@ private fun CompoundShadowTag.getIdentifier(): Key {
 }
 
 private fun CompoundShadowTag.getTrigger(): SkillTrigger {
-    return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillTrigger.fromStringOrNull(it) } ?: SkillTrigger.Noop
+    return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillRegistry.TRIGGERS.getBinaryIdBy(Key(it)) } ?: SkillTrigger.Noop
 }
