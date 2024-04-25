@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer.PreWorldDependency
@@ -39,11 +40,31 @@ import org.slf4j.Logger
         SkillRegistry::class,
     ]
 )
-object NekoItemRegistry : KoinComponent, Initializable {
+object NekoItemRegistry : KoinComponent, Initializable { // TODO 重命名为 ItemRegistry
     /**
-     * The registry has all loaded [NekoItem]s.
+     * All loaded [NekoItem]s.
      */
     val INSTANCES: Registry<Key, NekoItem> = SimpleRegistry()
+
+    /**
+     * All namespaces of loaded items.
+     */
+    val NAMESPACES: List<String> by ReloadableProperty {
+        INSTANCES.objects.map { it.key.namespace() }.distinct().sorted()
+    }
+
+    /**
+     * All paths of each available namespace.
+     */
+    val PATHS_BY_NAMESPACE: Map<String, List<String>> by ReloadableProperty {
+        val ret = hashMapOf<String, MutableList<String>>()
+        INSTANCES.objects.forEach {
+            val namespace = it.key.namespace()
+            val path = it.key.value()
+            ret.getOrPut(namespace, ::ArrayList).add(path)
+        }
+        ret
+    }
 
     /**
      * Gets specific [NekoItem] from the registry.

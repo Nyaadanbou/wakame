@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.initializer
 
 import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.command.CommandManager
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
@@ -126,6 +127,10 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<TestListener>()).bindWith(this)
     }
 
+    private fun registerCommands() {
+        CommandManager(PLUGIN).init()
+    }
+
     private fun executeReload() {
         fun forEachReload(block: Initializable.() -> Unit): Result<Unit> {
             toLateReload.forEach { initializable ->
@@ -152,6 +157,7 @@ object Initializer : KoinComponent, Listener {
         saveDefaultConfiguration()
         registerEvents() // register `this` listener
         registerListeners()
+        registerCommands()
 
         fun forEachPreWorld(block: Initializable.() -> Unit): Result<Unit> {
             toInitPreWorld.forEach { initializable ->

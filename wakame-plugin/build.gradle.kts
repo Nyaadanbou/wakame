@@ -30,43 +30,58 @@ dependencies {
     implementation(project(":wakame-git"))
     compileOnly(project(":wakame-nms"))
     runtimeOnly(project(":wakame-nms", configuration = "reobf"))
-    implementation(libs.commons.provider)
+
+    // libraries
     compileOnly(libs.asm) // runtime is provided by paper
     compileOnly(libs.asm.commons) // ^
     implementation(libs.bytebuddy)
     implementation(libs.bytebuddy.agent)
+    implementation(libs.commons.provider)
     implementation(libs.mocha)
-    implementation(platform(libs.bom.packetevents.spigot))
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))
     implementation(platform(libs.bom.configurate.kotlin))
     implementation(platform(libs.bom.creative))
+    implementation(platform(libs.bom.cloud.paper))
+    implementation(platform(libs.bom.cloud.kotlin)) {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
     implementation(platform(libs.bom.hephaestus))
+    implementation(platform(libs.bom.packetevents.spigot))
 
     // test
-    testImplementation(libs.mockk)
-    testImplementation(libs.logback.classic)
-    testImplementation(libs.server.purpur)
+    testImplementation(libs.configurate.yaml)
+    testImplementation(libs.configurate.extra.kotlin)
     testImplementation(libs.helper)
     testImplementation(libs.helper.sql)
     testImplementation(libs.helper.profiles)
-    testImplementation(libs.configurate.yaml)
-    testImplementation(libs.configurate.extra.kotlin)
+    testImplementation(libs.logback.classic)
+    testImplementation(libs.mockk)
+    testImplementation(libs.server.purpur)
 }
 
 tasks {
     shadowJar {
         relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
-        relocate("io.leangen.geantyref", "cc.mewcraft.wakame.external.geantyref")
         relocate("org.koin", "cc.mewcraft.wakame.external.koin")
         relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
         relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
         relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
         relocate("com.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.api")
         relocate("io.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.impl")
-        // relocate("net.kyori", "cc.mewcraft.wakame.external.packetevents.kyori")
+
+        // cloud
+        relocate("org.incendo.cloud", "cc.mewcraft.wakame.external.cloud") // We don't relocate cloud itself in this example, but you still should
+
+        // cloud & configurate dependency
+        relocate("io.leangen.geantyref", "cc.mewcraft.wakame.external.geantyref")
+
+        // cloud-paper dependencies
+        relocate("xyz.jpenilla.reflectionremapper", "cc.mewcraft.wakame.external.reflectionremapper")
+        relocate("net.fabricmc.mappingio", "cc.mewcraft.wakame.external.mappingio")
     }
 
     val inputJarPath by lazy { shadowJar.get().archiveFile.get().asFile.absolutePath }

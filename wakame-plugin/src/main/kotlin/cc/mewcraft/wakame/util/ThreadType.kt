@@ -1,9 +1,14 @@
 package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.NEKO_PLUGIN
+import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import org.bukkit.Bukkit
 
 enum class ThreadType {
     SYNC,
@@ -23,8 +28,8 @@ enum class ThreadType {
         return withContext(
             when (this) {
                 SYNC -> NEKO_PLUGIN.minecraftDispatcher
-                ASYNC -> NEKO_PLUGIN.minecraftDispatcher
-                DISPATCHERS_ASYNC -> Dispatchers.IO + CoroutineName("Neko IO")
+                ASYNC -> NEKO_PLUGIN.asyncDispatcher
+                DISPATCHERS_ASYNC -> Dispatchers.IO
                 else -> throw IllegalStateException("Unknown thread type: $this")
             }
         ) {
@@ -39,18 +44,13 @@ enum class ThreadType {
             }
             return Job()
         }
-        if (this == REMAIN) {
-            return NEKO_PLUGIN.launch {
-                block()
-            }
-        }
 
         return NEKO_PLUGIN.launch(
             when (this) {
                 SYNC -> NEKO_PLUGIN.minecraftDispatcher
                 ASYNC -> NEKO_PLUGIN.minecraftDispatcher
-                DISPATCHERS_ASYNC -> Dispatchers.IO + CoroutineName("Neko IO")
-                else -> throw IllegalStateException("Unknown thread type: $this")
+                DISPATCHERS_ASYNC -> Dispatchers.IO
+                REMAIN -> if (Bukkit.getServer().isPrimaryThread) NEKO_PLUGIN.minecraftDispatcher else NEKO_PLUGIN.asyncDispatcher
             }
         ) {
             block()
