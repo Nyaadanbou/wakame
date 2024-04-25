@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.registerEvents
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -24,7 +25,7 @@ class ReloadableProperty<T>(
         RunningEnvironment.PRODUCTION.run { registerEvents() }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST) // properties are reloaded the latest because some of them depend on configs
     private fun onNekoReload(e: NekoReloadEvent) {
         reload()
     }

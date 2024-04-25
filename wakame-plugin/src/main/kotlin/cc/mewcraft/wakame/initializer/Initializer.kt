@@ -267,21 +267,21 @@ object Initializer : KoinComponent, Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST) // we want to have final say, so handle it the latest
     private fun handleLogin(e: PlayerLoginEvent) {
         if (!isDone && !isDebug) {
             e.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("[Neko] Initialization not complete. Please wait."))
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST) // resourcepack is reloaded the earliest
     private suspend fun handleServerStarted(e: ServerLoadEvent) {
         if (preWorldInitialized) {
             initPostWorld()
         } else LOGGER.warn("Skipping post world initialization")
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST) // configs are reloaded the earliest
     private fun handlePluginReloaded(e: NekoReloadEvent) {
         Configs.reload()
         executeReload()
