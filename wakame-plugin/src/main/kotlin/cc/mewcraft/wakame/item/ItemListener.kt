@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.attribute.AttributeEventHandler
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
+import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
@@ -12,6 +13,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.*
@@ -55,9 +57,31 @@ class MultipleItemListener : KoinComponent, Listener {
     }
 
     @EventHandler
+    fun onClick(event: PlayerInteractEvent) {
+        val player = event.player
+        val slot = event.hand ?: return
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val nekoStack = item.playNekoStackOrNull ?: return
+        if (!nekoStack.effectiveSlot.testEquipmentSlotChange(slot))
+            return
+
+        when (event.action) {
+            Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR -> {
+                skillEventHandler.onLeftClick(player, item, event.clickedBlock?.location)
+            }
+            Action.RIGHT_CLICK_BLOCK, Action.LEFT_CLICK_AIR -> {
+                skillEventHandler.onRightClick(player, item, event.clickedBlock?.location)
+            }
+
+            else -> return
+        }
+    }
+
+    @EventHandler
     fun onJump(event: PlayerJumpEvent) {
         val player = event.player
         val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val nekoStack = item.playNekoStackOrNull ?: return
 
         skillEventHandler.onJump(player, item)
     }
@@ -67,6 +91,7 @@ class MultipleItemListener : KoinComponent, Listener {
         val damager = event.damager as? Player ?: return
         val entity = event.entity as? LivingEntity ?: return
         val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val nekoStack = item.playNekoStackOrNull ?: return
 
         skillEventHandler.onAttack(damager, entity, item)
     }

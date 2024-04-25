@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
+import org.bukkit.inventory.EquipmentSlot
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.SerializationException
@@ -33,30 +34,54 @@ enum class VanillaEffectiveSlot : EffectiveSlot {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return player.inventory.heldItemSlot == slot && player.openInventory.getSlotType(rawSlot) == InventoryType.SlotType.QUICKBAR
         }
+
+        override fun testEquipmentSlotChange(slot: EquipmentSlot): Boolean {
+            return slot == EquipmentSlot.HAND
+        }
     },
     OFF_HAND {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 45
+        }
+
+        override fun testEquipmentSlotChange(slot: EquipmentSlot): Boolean {
+            return slot == EquipmentSlot.OFF_HAND
         }
     },
     HELMET {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 5
         }
+
+        override fun testEquipmentSlotChange(slot: EquipmentSlot): Boolean {
+            return slot == EquipmentSlot.HEAD
+        }
     },
     CHESTPLATE {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 6
+        }
+
+        override fun testEquipmentSlotChange(slot: EquipmentSlot): Boolean {
+            return slot == EquipmentSlot.CHEST
         }
     },
     LEGGINGS {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 7
         }
+
+        override fun testEquipmentSlotChange(slot: EquipmentSlot): Boolean {
+            return slot == EquipmentSlot.LEGS
+        }
     },
     BOOTS {
         override fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 8
+        }
+
+        override fun testEquipmentSlotChange(slot: EquipmentSlot): Boolean {
+            return slot == EquipmentSlot.FEET
         }
     },
     ;

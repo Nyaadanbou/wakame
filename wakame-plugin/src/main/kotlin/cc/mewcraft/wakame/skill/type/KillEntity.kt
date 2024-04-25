@@ -5,6 +5,7 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.NoTargetException
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
@@ -25,7 +26,7 @@ interface KillEntity : ConfiguredSkill {
         override val conditions: SkillConditionGroup by conditions
 
         override fun cast(context: SkillCastContext) {
-            val target = context.target as Target.LivingEntity
+            val target = context.target as? Target.LivingEntity ?: throw NoTargetException()
             target.bukkitEntity.health = 0.0
         }
     }

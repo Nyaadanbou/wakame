@@ -56,6 +56,6 @@ interface SkillTrigger : Keyed {
 object SkillTriggerSerializer : SchemaSerializer<SkillTrigger> {
     override fun deserialize(type: Type, node: ConfigurationNode): SkillTrigger {
         val key = Key(node.string.orEmpty())
-        return SkillRegistry.TRIGGERS.getBinaryIdBy(key)
+        return SkillRegistry.TRIGGERS[key]
     }
 }

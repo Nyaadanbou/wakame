@@ -91,9 +91,14 @@ fun ConfiguredSkill.tryCast(skillCastContext: SkillCastContext) {
     if (conditionGroup.test(context)) {
         try {
             this.cast(context)
-        } catch (_: Throwable) {
+            conditionGroup.cost(context)
+        } catch (e: Throwable) {
+            if (e is SkillCannotCastException) {
+                event.skillCastContext.caster.sendMessage(e.beautify())
+            } else {
+                throw e
+            }
         }
-        conditionGroup.cost(context)
     } else {
         conditionGroup.notifyFailure(context)
     }

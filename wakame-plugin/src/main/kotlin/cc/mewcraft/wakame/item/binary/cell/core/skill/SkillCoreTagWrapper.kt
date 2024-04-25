@@ -41,5 +41,5 @@ private fun CompoundShadowTag.getIdentifier(): Key {
 }
 
 private fun CompoundShadowTag.getTrigger(): SkillTrigger {
-    return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillRegistry.TRIGGERS.getBinaryIdBy(Key(it)) } ?: SkillTrigger.Noop
+    return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillRegistry.TRIGGERS[Key(it)] } ?: SkillTrigger.Noop
 }

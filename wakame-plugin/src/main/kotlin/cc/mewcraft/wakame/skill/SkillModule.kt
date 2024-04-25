@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.molang.EvaluableSerializer
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroupSerializer
+import cc.mewcraft.wakame.skill.type.TeleportationSerializer
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -21,6 +22,7 @@ internal fun skillModule(): Module = module {
             .kregister(EvaluableSerializer)
             .kregister(ConfiguredSkillWithTriggerSerializer)
             .kregister(SkillTriggerSerializer)
+            .kregister(TeleportationSerializer)
             .build()
     }
 }

@@ -465,6 +465,9 @@ core_groups:
           - key: skill:melee/kill_entity
             trigger: trigger:generic/attack
             weight: 1
+          - key: skill:buff/teleport
+            trigger: trigger:generic/right_click
+            weight: 1
     default: [ ]
 
 # 诅咒池

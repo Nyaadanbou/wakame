@@ -31,7 +31,7 @@ object SkillRegistry : Initializable, KoinComponent {
     val INSTANCE: Registry<Key, ConfiguredSkill> = SimpleRegistry()
     val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
     val SKILL_TYPES: Registry<String, SkillFactory<*>> = SimpleRegistry()
-    val TRIGGERS: BiRegistry<Key, SkillTrigger> = SimpleBiRegistry()
+    val TRIGGERS: Registry<Key, SkillTrigger> = SimpleRegistry()
 
     private fun loadCondition() {
         operator fun Pair<String, SkillConditionFactory<*>>.unaryPlus() = CONDITIONS.register(first, second)

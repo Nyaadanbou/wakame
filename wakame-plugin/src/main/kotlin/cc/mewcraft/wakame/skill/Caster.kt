@@ -1,10 +1,14 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.user.User
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.audience.MessageType
+import net.kyori.adventure.identity.Identity
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.entity.Player as BukkitPlayer
 
-sealed interface Caster {
+sealed interface Caster : Audience {
     interface Void : Caster {
 
     }
@@ -16,18 +20,25 @@ sealed interface Caster {
 
 object CasterAdapter {
     fun adapt(user: User<Player>): Caster.Player {
-        return object : Caster.Player {
-            override val bukkitPlayer: Player = user.player
-        }
+        return PlayerCaster(user.player)
     }
+
     fun adapt(player: Player): Caster.Player {
-        return object : Caster.Player {
-            override val bukkitPlayer: Player = player
-        }
+        return PlayerCaster(player)
     }
 
     fun adapt(): Caster.Void {
         return object : Caster.Void {
         }
+    }
+}
+
+private data class PlayerCaster(
+    override val bukkitPlayer: BukkitPlayer
+) : Caster.Player {
+    @Deprecated("Deprecated in Java", ReplaceWith("bukkitPlayer.sendMessage(source, message, type)"))
+    @Suppress("UnstableApiUsage")
+    override fun sendMessage(source: Identity, message: Component, type: MessageType) {
+        bukkitPlayer.sendMessage(source, message, type)
     }
 }

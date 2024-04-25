@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item
 
 import net.kyori.examination.Examinable
 import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
 
 
 /**
@@ -53,4 +54,9 @@ interface EffectiveSlot : Examinable {
      * This function should be called when the slot contents changes.
      */
     fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean = false // default returns false
+
+    /**
+     * Checks if the given parameters is referring to the effective slot.
+     */
+    fun testEquipmentSlotChange(slot: EquipmentSlot): Boolean = false // default returns false
 }

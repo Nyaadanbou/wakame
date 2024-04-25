@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.Castable
 import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
 import cc.mewcraft.wakame.user.toUser
+import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -15,6 +16,23 @@ import org.bukkit.inventory.ItemStack
  * Handles skill triggers for players.
  */
 class SkillEventHandler {
+    /* Handles skill triggers for players. */
+    fun onLeftClick(player: Player, itemStack: ItemStack, location: Location?) {
+        val skillMap = player.toUser().skillMap
+        val target = location?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(player)
+        skillMap.getConfiguredSkills(SkillTrigger.LeftClick).forEach {
+            it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+        }
+    }
+
+    fun onRightClick(player: Player, itemStack: ItemStack, location: Location?) {
+        val skillMap = player.toUser().skillMap
+        val target = location?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(player)
+
+        skillMap.getConfiguredSkills(SkillTrigger.RightClick).forEach {
+            it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+        }
+    }
 
     fun onJump(player: Player, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
@@ -30,6 +48,7 @@ class SkillEventHandler {
         }
     }
 
+    /* Handles skill triggers for players. */
     /**
      * Updates skills when the player switches their held item.
      *
