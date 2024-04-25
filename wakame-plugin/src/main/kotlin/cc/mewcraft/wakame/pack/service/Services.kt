@@ -15,7 +15,9 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-
+/**
+ * A service that provides a download address for the resource pack.
+ */
 sealed interface Service {
     /**
      * Get the download address of the service.
@@ -34,9 +36,15 @@ sealed interface Service {
      */
     fun stop()
 
+    /**
+     * Send the resource pack to the player.
+     */
     fun sendToPlayer(player: Player)
 }
 
+/**
+ * Represents a service that does nothing.
+ */
 data object NoneService : Service {
     override val downloadAddress = null
     override fun start() = Unit // do nothing
@@ -44,6 +52,9 @@ data object NoneService : Service {
     override fun sendToPlayer(player: Player) = Unit // do nothing
 }
 
+/**
+ * Represents a service that serves the resource pack using a built-in server.
+ */
 data class ResourcePackService(
     private val resourcePack: BuiltResourcePack,
     private val host: String,
@@ -89,6 +100,9 @@ data class ResourcePackService(
     }
 }
 
+/**
+ * Represents a service that serves the resource pack using a Github repository.
+ */
 data class GithubService(
     private val pluginDataDir: File,
     private val repo: String,
@@ -121,5 +135,9 @@ data class GithubService(
     }
 
     override fun stop() = Unit // do nothing
+
+    /**
+     * GithubService does not support sending the resource pack to the player.
+     */
     override fun sendToPlayer(player: Player) = Unit // do nothing
 }
