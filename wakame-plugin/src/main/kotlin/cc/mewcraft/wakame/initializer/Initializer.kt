@@ -20,7 +20,6 @@ import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.registry.*
-import cc.mewcraft.wakame.test.TestListener
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
@@ -124,7 +123,6 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
         registerTerminableListener(get<SingleItemListener>()).bindWith(this)
-        registerTerminableListener(get<TestListener>()).bindWith(this)
     }
 
     private fun registerCommands() {
