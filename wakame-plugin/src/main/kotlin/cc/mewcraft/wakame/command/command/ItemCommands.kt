@@ -39,8 +39,10 @@ object ItemCommands : CommandFactory<CommandSender> {
                     val amount = context.get<Int>("amount")
                     val multiplePlayerSelector = context.get<MultiplePlayerSelector>("player")
                     multiplePlayerSelector.values().forEach { player ->
-                        val stack = item.reify(player.toUser())
-                        repeat(amount) { player.inventory.addItem(stack.itemStack) }
+                        repeat(amount) {
+                            val stack = item.reify(player.toUser())
+                            player.inventory.addItem(stack.itemStack)
+                        }
                         player.sendPlainMessage("You received $amount item(s): ${item.key}")
                     }
                 }
