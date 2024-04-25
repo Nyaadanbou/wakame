@@ -49,7 +49,12 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
-    implementation(platform(libs.bom.hephaestus))
+    implementation(platform(libs.bom.hephaestus)) {
+        exclude("com.google.code.gson")
+        exclude("net.kyori")
+        exclude("org.jetbrains")
+    }
+    implementation(platform(libs.bom.jgit))
     implementation(platform(libs.bom.packetevents.spigot))
 
     // test

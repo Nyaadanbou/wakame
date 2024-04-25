@@ -1,16 +1,11 @@
 plugins {
-    id("neko.repositories") version "1.0-SNAPSHOT"
     id("neko-kotlin")
+    id("neko.repositories") version "1.0-SNAPSHOT"
 }
-
-group = "cc.mewcraft.wakame"
-version = "1.0.0"
-description = "Add custom stuff to server"
 
 dependencies {
     // server
     compileOnly(libs.server.purpur)
-
     // helper
     compileOnly(libs.helper)
 }
