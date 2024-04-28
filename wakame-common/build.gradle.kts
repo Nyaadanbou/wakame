@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     // server
-    compileOnly(libs.server.purpur)
+    compileOnly(libs.server.paper) // TODO 1.20.5 - revert it when purpur is out
     // helper
     compileOnly(libs.helper)
 }

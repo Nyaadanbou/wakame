@@ -1,3 +1,5 @@
+import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
+
 plugins {
     id("neko-kotlin")
     id("neko.repositories") version "1.0-SNAPSHOT"
@@ -10,7 +12,7 @@ description = "Add custom stuff to server"
 
 dependencies {
     // server
-    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.20.5-R0.1-SNAPSHOT")
 
     // helper
     compileOnly(libs.helper)
@@ -21,8 +23,6 @@ dependencies {
     compileOnly(libs.bytebuddy)
 }
 
-tasks {
-    reobfJar {
-        dependsOn(sourcesJar)
-    }
+paperweight {
+    reobfArtifactConfiguration = ReobfArtifactConfiguration.MOJANG_PRODUCTION
 }

@@ -16,7 +16,7 @@ description = "Add custom stuff to server"
 
 dependencies {
     // server
-    compileOnly(libs.server.purpur)
+    compileOnly(libs.server.paper) // TODO 1.20.5 - revert it when purpur is out
 
     // helper
     compileOnly(libs.helper)
@@ -65,7 +65,7 @@ dependencies {
     testImplementation(libs.helper.profiles)
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
-    testImplementation(libs.server.purpur)
+    testImplementation(libs.server.paper) // TODO 1.20.5 - revert it when purpur is out
 }
 
 tasks {
