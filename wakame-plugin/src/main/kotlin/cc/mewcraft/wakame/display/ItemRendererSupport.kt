@@ -4,9 +4,8 @@ import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.ShowNekoStack
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.util.backingCustomModelData
-import cc.mewcraft.wakame.util.backingDisplayName
+import cc.mewcraft.wakame.util.backingCustomName
 import cc.mewcraft.wakame.util.backingLore
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -20,7 +19,6 @@ internal class PlayItemRenderer(
     private val textStylizer: TextStylizer,
     private val loreFinalizer: LoreFinalizer,
 ) : KoinComponent, ItemRenderer<PlayNekoStack> {
-    private val gsonSerial: GsonComponentSerializer by inject()
     private val modelLookup: ItemModelDataLookup by inject()
 
     override fun render(nekoStack: PlayNekoStack) {
@@ -32,8 +30,8 @@ internal class PlayItemRenderer(
 
         // directly edit the backing ItemMeta to avoid cloning
         nekoStack.itemStack.apply {
-            backingDisplayName = gsonSerial.serialize(displayName)
-            backingLore = displayLore.map(gsonSerial::serialize)
+            backingCustomName = displayName
+            backingLore = displayLore
             backingCustomModelData = cmd
         }
 

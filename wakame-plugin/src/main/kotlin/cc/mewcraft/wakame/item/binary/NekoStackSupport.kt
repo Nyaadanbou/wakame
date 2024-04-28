@@ -183,7 +183,7 @@ internal value class ShowNekoStackImpl(
             val stackCopy = this.itemStack.clone()
 
             // Remove custom name and lore as they are handled by the packet system
-            stackCopy.backingDisplayName = null
+            stackCopy.backingCustomName = null
             stackCopy.backingLore = null
 
             // Create a new PlayNekoStack wrapping the stack

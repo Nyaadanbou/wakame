@@ -2,17 +2,22 @@
 
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.shadow.inventory.ShadowCraftItemStack0
 import cc.mewcraft.wakame.shadow.inventory.ShadowCraftMetaItem0
 import cc.mewcraft.wakame.shadow.inventory.ShadowItemStack
+import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
-import me.lucko.shadow.targetClass
+import net.kyori.adventure.text.Component
+import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.CustomModelData
+import net.minecraft.world.item.component.ItemLore
 import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -30,25 +35,41 @@ internal val CompoundShadowTag.unwrap: CompoundTag
     get() = this.shadowTarget as CompoundTag
 //</editor-fold>
 
-internal val ItemMeta.unhandledTags: MutableMap<String, Tag>
-    get() = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this).getUnhandledTags()
+internal val ItemMeta.customTag: CompoundTag
+    get() = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this).getCustomTag()
 
 //<editor-fold desc="CraftItemStack - Direct Access to `tags.display`">
 /**
- * Sets the display name through JSON string. You may pass a `null` to
- * remove the name. This function will directly write the given JSON string
- * to the NBT tag, so make sure that you pass a valid JSON string, or else
- * the server will throw.
+ * Sets the custom name. You may pass a `null` to remove the name.
  *
  * Only works if `this` [ItemStack] is NMS-object backed.
  */
-var ItemStack.backingDisplayName: String?
-    get() = throw UnsupportedOperationException("Get operation is not supported")
+var ItemStack.backingCustomName: Component?
+    get() {
+        return PaperAdventure.asAdventure(this.handle?.get(DataComponents.CUSTOM_NAME))
+    }
     set(value) {
         if (value != null) {
-            this.handle?.getOrCreateTagElement("display")?.putString("Name", value)
+            this.handle?.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
         } else {
-            this.handle?.getTagElement("display")?.remove("Name")
+            this.handle?.remove(DataComponents.CUSTOM_NAME)
+        }
+    }
+
+/**
+ * Sets the item name. You may pass a `null` to remove the name.
+ *
+ * Only works if `this` [ItemStack] is NMS-object backed.
+ */
+var ItemStack.backingItemName: Component?
+    get() {
+        return PaperAdventure.asAdventure(this.handle?.get(DataComponents.CUSTOM_NAME))
+    }
+    set(value) {
+        if (value != null) {
+            this.handle?.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
+        } else {
+            this.handle?.remove(DataComponents.CUSTOM_NAME)
         }
     }
 
@@ -60,13 +81,15 @@ var ItemStack.backingDisplayName: String?
  *
  * Only works if `this` [ItemStack] is NMS-object backed.
  */
-var ItemStack.backingLore: List<String>?
-    get() = throw UnsupportedOperationException("Get operation is not supported")
+var ItemStack.backingLore: List<Component>?
+    get() {
+        return this.handle?.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
+    }
     set(value) {
         if (value != null) {
-            this.handle?.getOrCreateTagElement("display")?.put("Lore", NmsNbtUtils.createStringList(value))
+            this.handle?.set(DataComponents.LORE, ItemLore(value.map(PaperAdventure::asVanilla)))
         } else {
-            this.handle?.getTagElement("display")?.remove("Lore")
+            this.handle?.remove(DataComponents.LORE)
         }
     }
 
@@ -78,28 +101,56 @@ var ItemStack.backingLore: List<String>?
  * Only works if `this` [ItemStack] is NMS-object backed.
  */
 var ItemStack.backingCustomModelData: Int?
-    get() = throw UnsupportedOperationException("Get operation is not supported")
+    get() {
+        return this.handle?.get(DataComponents.CUSTOM_MODEL_DATA)?.value
+    }
     set(value) {
         if (value != null) {
-            this.handle?.tag?.putInt("CustomModelData", value)
+            this.handle?.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(value))
         } else {
-            this.handle?.tag?.remove("CustomModelData")
+            this.handle?.remove(DataComponents.CUSTOM_MODEL_DATA)
         }
     }
 //</editor-fold>
 
+private fun MojangStack.getCustomData(): CompoundTag? {
+    val customData = this.get(DataComponents.CUSTOM_DATA)
+
+    @Suppress("DEPRECATION")
+    val compoundTag = customData?.unsafe // this returns the backing CompoundTag for us
+    return compoundTag
+}
+
+private fun MojangStack.getCustomDataOrCreate(): CompoundTag {
+    val customData = this.get(DataComponents.CUSTOM_DATA) ?: run {
+        val empty = CustomData.of(CompoundTag())
+        this.set(DataComponents.CUSTOM_DATA, empty)
+        return@run empty
+    }
+
+    @Suppress("DEPRECATION")
+    val compoundTag = customData.unsafe // this returns the backing CompoundTag for us
+    return compoundTag
+}
+
 //<editor-fold desc="MojangStack - Neko Compound">
 internal var MojangStack.nekoCompound: CompoundShadowTag
     get() {
-        val compoundTag = this.orCreateTag.getOrPut(WAKAME_COMPOUND_NAME) { CompoundTag() }
-        return compoundTag.wrap
+        val customData = this.getCustomDataOrCreate()
+        val wakameTag = customData.getOrPut(WAKAME_COMPOUND_NAME, ::CompoundTag)
+        return wakameTag.wrap
     }
     set(value) {
-        this.orCreateTag.put(WAKAME_COMPOUND_NAME, value.unwrap)
+        val customData = this.getCustomDataOrCreate()
+        customData.put(WAKAME_COMPOUND_NAME, value.unwrap)
     }
 
 internal val MojangStack.nekoCompoundOrNull: CompoundShadowTag?
-    get() = this.tag?.getCompoundOrNull(WAKAME_COMPOUND_NAME)?.wrap
+    get() {
+        val customData = this.getCustomData()
+        val wakameTag = customData?.getCompoundOrNull(WAKAME_COMPOUND_NAME)
+        return wakameTag?.wrap
+    }
 //</editor-fold>
 
 //<editor-fold desc="BukkitStack - Neko Compound">
@@ -125,8 +176,8 @@ var ItemStack.nekoCompound: CompoundShadowTag
         if (handle != null) { // CraftItemStack
             return handle.nekoCompound
         } else { // strictly-Bukkit ItemStack
-            val unhandledTags = this.backingItemMeta!!.unhandledTags
-            val tag = unhandledTags.getOrPut(WAKAME_COMPOUND_NAME, ::CompoundTag) as CompoundTag
+            val customTag = this.backingItemMeta!!.customTag
+            val tag = customTag.getOrPut(WAKAME_COMPOUND_NAME, ::CompoundTag) as CompoundTag
             return tag.wrap
         }
     }
@@ -135,7 +186,7 @@ var ItemStack.nekoCompound: CompoundShadowTag
         if (handle != null) { // CraftItemStack
             handle.nekoCompound = value
         } else { // strictly-Bukkit ItemStack
-            this.backingItemMeta!!.unhandledTags[WAKAME_COMPOUND_NAME] = value.unwrap
+            this.backingItemMeta!!.customTag.put(WAKAME_COMPOUND_NAME, value.unwrap)
         }
     }
 
@@ -150,7 +201,7 @@ val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
         return if (handle != null) { // CraftItemStack
             handle.nekoCompoundOrNull
         } else { // strictly-Bukkit ItemStack
-            (this.backingItemMeta?.unhandledTags?.get(WAKAME_COMPOUND_NAME) as? CompoundTag)?.wrap
+            (this.backingItemMeta?.customTag?.get(WAKAME_COMPOUND_NAME) as? CompoundTag)?.wrap
         }
     }
 
@@ -160,9 +211,9 @@ val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
 fun ItemStack.removeNekoCompound() {
     val handle = this.handle
     if (handle != null) { // CraftItemStack
-        handle.removeTagKey(WAKAME_COMPOUND_NAME)
+        handle.getCustomData()?.remove(WAKAME_COMPOUND_NAME)
     } else { // strictly-Bukkit ItemStack
-        this.backingItemMeta?.unhandledTags?.remove(WAKAME_COMPOUND_NAME)
+        this.backingItemMeta?.customTag?.remove(WAKAME_COMPOUND_NAME)
     }
 }
 //</editor-fold>
@@ -185,12 +236,4 @@ val ItemStack.backingItemMeta: ItemMeta?
     }
 
 internal val ItemStack.handle: MojangStack?
-    get() {
-        val obcClass = BukkitShadowFactory.global().targetClass<ShadowCraftItemStack0>()
-        if (obcClass.isInstance(this)) { // Use shadow to avoid versioned CB package import
-            val shadow = BukkitShadowFactory.global().shadow<ShadowCraftItemStack0>(this)
-            return shadow.getHandle()
-        }
-
-        return null
-    }
+    get() = (this as? CraftItemStack)?.handle
