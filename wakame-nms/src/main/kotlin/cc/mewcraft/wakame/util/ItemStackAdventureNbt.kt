@@ -5,9 +5,11 @@ import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import net.kyori.adventure.nbt.BinaryTag
 import net.kyori.adventure.nbt.BinaryTagIO
 import net.kyori.adventure.nbt.CompoundBinaryTag
+import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
+import net.minecraft.world.item.component.CustomData
+import org.bukkit.craftbukkit.inventory.CraftItemStack
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.InputStream
@@ -24,12 +26,7 @@ object ItemStackAdventureNbt {
      */
     fun getNbt(bukkitStack: BukkitStack): CompoundBinaryTag {
         val mojangStack: MojangStack = CraftItemStack.unwrap(bukkitStack)
-        if (mojangStack.hasTag()) {
-            return mojangStack
-                .tag!!
-                .asAdventureCompound
-        }
-        return CompoundBinaryTag.empty()
+        return mojangStack.getCustomData()?.asAdventureCompound ?: CompoundBinaryTag.empty()
     }
 
     /**
@@ -44,10 +41,7 @@ object ItemStackAdventureNbt {
         if (bukkitStack is CraftItemStack) {
             // If handle is null, that means this Bukkit item is not backed by an NMS item
             // If tag is null, that means this item simply does not have any NBT tags
-            return bukkitStack
-                .handle
-                ?.tag
-                ?.asAdventureCompound
+            return bukkitStack.handle.getCustomData()?.asAdventureCompound
         }
         return null // The item is a strictly-Bukkit stack
     }
@@ -65,14 +59,18 @@ object ItemStackAdventureNbt {
         if (bukkitStack is CraftItemStack && !bukkitStack.isEmpty) {
             val adventureCompound = bukkitStack
                 .handle
-                .orCreateTag
+                .getCustomDataOrCreate()
                 .asAdventureCompound
             val adventureCompoundBuilder = CompoundBinaryTag.builder()
                 .put(adventureCompound)
                 .apply(setter)
-            bukkitStack.handle.tag = adventureCompoundBuilder
-                .build()
-                .asMojangCompound
+            bukkitStack.handle.set(
+                DataComponents.CUSTOM_DATA, CustomData.of(
+                    adventureCompoundBuilder
+                        .build()
+                        .asMojangCompound
+                )
+            )
         }
     }
 
@@ -86,14 +84,18 @@ object ItemStackAdventureNbt {
     ): BukkitStack {
         val mojangStack: MojangStack = CraftItemStack.asNMSCopy(bukkitStack)
         val adventureCompound = mojangStack
-            .orCreateTag
+            .getCustomDataOrCreate()
             .asAdventureCompound
         val adventureCompoundBuilder = CompoundBinaryTag.builder()
             .put(adventureCompound)
             .apply(setter)
-        mojangStack.tag = adventureCompoundBuilder
-            .build()
-            .asMojangCompound
+        mojangStack.set(
+            DataComponents.CUSTOM_DATA, CustomData.of(
+                adventureCompoundBuilder
+                    .build()
+                    .asMojangCompound
+            )
+        )
         return mojangStack.asBukkitMirror()
     }
 }

@@ -13,7 +13,6 @@ import net.kyori.adventure.text.Component
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
-import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.CustomModelData
 import net.minecraft.world.item.component.ItemLore
 import org.bukkit.Bukkit
@@ -112,26 +111,6 @@ var ItemStack.backingCustomModelData: Int?
         }
     }
 //</editor-fold>
-
-private fun MojangStack.getCustomData(): CompoundTag? {
-    val customData = this.get(DataComponents.CUSTOM_DATA)
-
-    @Suppress("DEPRECATION")
-    val compoundTag = customData?.unsafe // this returns the backing CompoundTag for us
-    return compoundTag
-}
-
-private fun MojangStack.getCustomDataOrCreate(): CompoundTag {
-    val customData = this.get(DataComponents.CUSTOM_DATA) ?: run {
-        val empty = CustomData.of(CompoundTag())
-        this.set(DataComponents.CUSTOM_DATA, empty)
-        return@run empty
-    }
-
-    @Suppress("DEPRECATION")
-    val compoundTag = customData.unsafe // this returns the backing CompoundTag for us
-    return compoundTag
-}
 
 //<editor-fold desc="MojangStack - Neko Compound">
 internal var MojangStack.nekoCompound: CompoundShadowTag

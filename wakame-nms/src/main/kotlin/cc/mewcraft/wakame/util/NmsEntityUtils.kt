@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.shadow.world.ShadowCraftWorld0
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
 import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_20_R3.CraftServer
+import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.entity.Entity
 import java.util.UUID
 

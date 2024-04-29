@@ -10,6 +10,8 @@ import net.minecraft.nbt.LongArrayTag
 import net.minecraft.nbt.NumericTag
 import net.minecraft.nbt.StringTag
 import net.minecraft.nbt.Tag
+import org.bukkit.World
+import org.bukkit.craftbukkit.CraftWorld
 import java.util.stream.Stream
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -57,9 +59,10 @@ object NmsNbtUtils {
         
         return tag
     }
-    
-    fun convertListToStream(tag: ListTag): Stream<MojangStack> {
-        return tag.stream().map { MojangStack.of(it as CompoundTag) }
+
+    fun convertListToStream(tag: ListTag, world: World): Stream<MojangStack> {
+        val craftWorld = world as CraftWorld
+        return tag.stream().map { MojangStack.parseOptional(craftWorld.handle.registryAccess(), it as CompoundTag) }
     }
     
 }
