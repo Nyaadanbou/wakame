@@ -16,7 +16,7 @@ description = "Add custom stuff to server"
 
 dependencies {
     // server
-    compileOnly(libs.server.purpur)
+    compileOnly(libs.server.paper)
 
     // helper
     compileOnly(libs.helper)
@@ -29,7 +29,7 @@ dependencies {
     implementation(project(":wakame-ext"))
     implementation(project(":wakame-git"))
     compileOnly(project(":wakame-nms"))
-    runtimeOnly(project(":wakame-nms", configuration = "reobf"))
+    runtimeOnly(project(":wakame-nms"))
 
     // libraries
     compileOnly(libs.asm) // runtime is provided by paper
@@ -65,7 +65,7 @@ dependencies {
     testImplementation(libs.helper.profiles)
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
-    testImplementation(libs.server.paper) // TODO 1.20.5 - revert it when purpur is out
+    testImplementation(libs.server.paper)
 }
 
 tasks {

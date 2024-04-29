@@ -39,8 +39,8 @@ fun WakaAttribute.toBukkit(): BukkitAttribute {
         Attributes.MAX_HEALTH -> BukkitAttribute.GENERIC_MAX_HEALTH
         Attributes.MAX_ABSORPTION -> BukkitAttribute.GENERIC_MAX_ABSORPTION
         Attributes.MOVEMENT_SPEED -> BukkitAttribute.GENERIC_MOVEMENT_SPEED
-        Attributes.BLOCK_INTERACTION_RANGE -> return BukkitAttribute.GENERIC_ARMOR // TODO: 等新版本支持后修改
-        Attributes.ENTITY_INTERACTION_RANGE -> return BukkitAttribute.GENERIC_ARMOR_TOUGHNESS // TODO: 等新版本支持后修改
+        Attributes.BLOCK_INTERACTION_RANGE -> return BukkitAttribute.PLAYER_BLOCK_INTERACTION_RANGE
+        Attributes.ENTITY_INTERACTION_RANGE -> return BukkitAttribute.PLAYER_ENTITY_INTERACTION_RANGE
         else -> throw IllegalArgumentException("Can't find Bukkit attribute for $this")
     }
 }
@@ -50,8 +50,8 @@ fun BukkitAttribute.toNeko(): WakaAttribute {
         BukkitAttribute.GENERIC_MAX_HEALTH -> Attributes.MAX_HEALTH
         BukkitAttribute.GENERIC_MAX_ABSORPTION -> Attributes.MAX_ABSORPTION
         BukkitAttribute.GENERIC_MOVEMENT_SPEED -> Attributes.MOVEMENT_SPEED
-        BukkitAttribute.GENERIC_ARMOR -> return Attributes.BLOCK_INTERACTION_RANGE // TODO: 等新版本支持后修改
-        BukkitAttribute.GENERIC_ARMOR_TOUGHNESS -> return Attributes.ENTITY_INTERACTION_RANGE // TODO: 等新版本支持后修改
+        BukkitAttribute.PLAYER_BLOCK_INTERACTION_RANGE -> return Attributes.BLOCK_INTERACTION_RANGE
+        BukkitAttribute.PLAYER_ENTITY_INTERACTION_RANGE -> return Attributes.ENTITY_INTERACTION_RANGE
         else -> throw IllegalArgumentException("Can't find Waka attribute for $this")
     }
 }
