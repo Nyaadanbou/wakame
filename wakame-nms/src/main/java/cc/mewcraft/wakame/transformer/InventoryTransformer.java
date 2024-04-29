@@ -25,7 +25,7 @@ public class InventoryTransformer {
         @Advice.OnMethodExit
         public static void onExit(
                 @Advice.This ServerPlayer serverPlayer,
-                @Advice.FieldValue(value = "dd" /* containerListener */, readOnly = false) ContainerListener originalListener
+                @Advice.FieldValue(value = "containerListener", readOnly = false) ContainerListener originalListener
         ) throws Exception {
             ClassLoader pluginClassLoader = Bukkit.getPluginManager().getPlugin("Wakame").getClass().getClassLoader();
             Class<?> inventoryListenerProxyClass = Class.forName(

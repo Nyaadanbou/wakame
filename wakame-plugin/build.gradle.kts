@@ -16,7 +16,7 @@ description = "Add custom stuff to server"
 
 dependencies {
     // server
-    compileOnly(libs.server.paper) // TODO 1.20.5 - revert it when purpur is out
+    compileOnly(libs.server.purpur)
 
     // helper
     compileOnly(libs.helper)

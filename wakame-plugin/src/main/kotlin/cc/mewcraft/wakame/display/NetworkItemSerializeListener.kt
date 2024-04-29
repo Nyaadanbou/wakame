@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.purpurmc.purpur.event.packet.NetworkItemSerializeEvent
 
 internal class NetworkItemSerializeListener(
     private val renderer: ItemRenderer<PlayNekoStack>,
