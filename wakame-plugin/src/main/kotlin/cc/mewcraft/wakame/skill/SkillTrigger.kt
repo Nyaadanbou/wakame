@@ -9,53 +9,49 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface SkillTrigger : Keyed {
-    companion object {
-        val GENERIC: List<SkillTrigger> = listOf(LeftClick, RightClick, Attack, Jump)
-        val COMBO: List<SkillTrigger> = listOf(LeftClick, RightClick)
-    }
-
+sealed interface SkillTrigger : Keyed {
     /**
      * The identifier of the trigger. This is used for concatenation of triggers in a combo.
      */
-    val id: String
+    val id: Char
 
     data object LeftClick : SkillTrigger {
-        override val id: String = '0'.toString()
+        override val id: Char = '0'
         override val key: Key = Key(Namespaces.TRIGGER, "generic/left_click")
     }
 
     data object RightClick : SkillTrigger {
-        override val id: String = '1'.toString()
+        override val id: Char = '1'
         override val key: Key = Key(Namespaces.TRIGGER, "generic/right_click")
     }
 
     data object Attack : SkillTrigger {
-        override val id: String = '2'.toString()
+        override val id: Char = '2'
         override val key: Key = Key(Namespaces.TRIGGER, "generic/attack")
     }
 
     data object Jump : SkillTrigger {
-        override val id: String = '3'.toString()
+        override val id: Char = '3'
         override val key: Key = Key(Namespaces.TRIGGER, "generic/jump")
     }
 
     data object Noop : SkillTrigger {
-        override val id: String = '4'.toString()
+        override val id: Char = '4'
         override val key: Key = Key(Namespaces.TRIGGER, "generic/noop")
     }
 
     data class Combo(
         val triggers: List<SkillTrigger>,
     ) : SkillTrigger {
-        override val id: String = triggers.joinToString("") { it.id }
-        override val key: Key = Key(Namespaces.TRIGGER, "combo/$id")
+        private val idString: String = triggers.joinToString("") { it.id.toString() }
+        override val id: Char = Char.MIN_VALUE
+        override val key: Key = Key(Namespaces.TRIGGER, "combo/$idString")
     }
 }
 
-object SkillTriggerSerializer : SchemaSerializer<SkillTrigger> {
+internal object SkillTriggerSerializer : SchemaSerializer<SkillTrigger> {
     override fun deserialize(type: Type, node: ConfigurationNode): SkillTrigger {
         val key = Key(node.string.orEmpty())
-        return SkillRegistry.TRIGGERS[key]
+        return SkillRegistry.TRIGGER_INSTANCES[key]
     }
 }

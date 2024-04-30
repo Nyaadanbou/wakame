@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.skill.SkillTrigger.Combo
 
 object SkillTriggerUtil {
-    fun generateCombinations(triggers: List<SkillTrigger>, combinationLength: Int): List<Combo> {
+    fun List<SkillTrigger>.generateCombinations(combinationLength: Int): List<Combo> {
         val results = mutableListOf<Combo>()
 
         fun generate(currentCombo: List<SkillTrigger>) {
@@ -13,8 +13,8 @@ object SkillTriggerUtil {
                 return
             }
 
-            for (i in triggers.indices) {
-                generate(currentCombo + triggers[i])
+            for (i in indices) {
+                generate(currentCombo + this[i])
             }
         }
 
