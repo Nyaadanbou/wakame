@@ -12,7 +12,7 @@ description = "Add custom stuff to server"
 
 dependencies {
     // server
-    paperweight.paperDevBundle("1.20.5-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT")
 
     // helper
     compileOnly(libs.helper)

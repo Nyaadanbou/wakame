@@ -13,7 +13,6 @@ import org.incendo.cloud.parser.ArgumentParseResult
 import org.incendo.cloud.parser.ParserDescriptor
 import org.incendo.cloud.parser.aggregate.AggregateParser
 import org.incendo.cloud.parser.aggregate.AggregateResultMapper
-import org.incendo.cloud.parser.aggregate.AggregateResultMapper.DirectAggregateResultMapper
 
 /**
  * The aggregate parser for items.
@@ -43,14 +42,14 @@ class ItemParser<C : Any> : AggregateParser<C, NekoItem> {
     }
 
     override fun mapper(): AggregateResultMapper<C, NekoItem> {
-        return DirectAggregateResultMapper agg@{ commandContext, aggregateCommandContext ->
+        return AggregateResultMapper agg@{ commandContext, aggregateCommandContext ->
             val namespace = aggregateCommandContext.get<String>("namespace")
             val path = aggregateCommandContext.get<String>("path")
             val item = NekoItemRegistry.INSTANCES.find(namespace, path)
             if (item == null) {
-                ArgumentParseResult.failure(ItemParseException(commandContext))
+                ArgumentParseResult.failureFuture(ItemParseException(commandContext))
             } else {
-                ArgumentParseResult.success(item)
+                ArgumentParseResult.successFuture(item)
             }
         }
     }
