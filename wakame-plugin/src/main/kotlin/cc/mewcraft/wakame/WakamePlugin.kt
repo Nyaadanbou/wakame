@@ -25,6 +25,7 @@ import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.test.testModule
 import cc.mewcraft.wakame.user.userModule
+import cc.mewcraft.wakame.world.worldModule
 import me.lucko.helper.plugin.KExtendedJavaPlugin
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.stopKoin
@@ -73,6 +74,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 skillModule(),
                 testModule(),
                 userModule(),
+                worldModule(),
             )
         }
     }

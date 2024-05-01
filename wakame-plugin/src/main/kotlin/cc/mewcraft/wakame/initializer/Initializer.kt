@@ -35,6 +35,7 @@ import cc.mewcraft.wakame.skill.SkillTickerListener
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
+import cc.mewcraft.wakame.world.attribute.damage.DamageListener
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
@@ -137,6 +138,7 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
         registerTerminableListener(get<SingleItemListener>()).bindWith(this)
+        registerTerminableListener(get<DamageListener>()).bindWith(this)
         registerTerminableListener(get<SkillTickerListener>()).bindWith(this)
     }
 
