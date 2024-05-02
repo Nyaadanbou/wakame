@@ -48,4 +48,20 @@ object DamageManager {
         //TODO 对一些原版伤害进行修饰，比如加强溺水伤害
         return VanillaDamageMetaData(event.damage)
     }
+
+    fun generateDefenseMetaData(event: EntityDamageEvent, damageMetaData: DamageMetaData, damageModifierPackets: List<DamageModifierPacket>): DefenseMetaData {
+        when (val damagee = event.entity) {
+            is Player -> {
+                return PlayerDefenseMetaData(damageMetaData, damageModifierPackets, damagee.toUser())
+            }
+
+            is LivingEntity -> {
+                TODO()
+            }
+
+            else -> {
+                throw RuntimeException("damagee must be LivingEntity")
+            }
+        }
+    }
 }

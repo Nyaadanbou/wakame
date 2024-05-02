@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.event;
 
 import cc.mewcraft.wakame.world.attribute.damage.DamageMetaData;
+import cc.mewcraft.wakame.world.attribute.damage.DefenseMetaData;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -13,10 +14,12 @@ public class WakameEntityDamageEvent extends Event implements Cancellable {
 
     private final EntityDamageEvent event;
     private final DamageMetaData damageMetaData;
+    private final DefenseMetaData defenseMetaData;
 
-    public WakameEntityDamageEvent(EntityDamageEvent event, DamageMetaData damageMetaData) {
+    public WakameEntityDamageEvent(EntityDamageEvent event, DamageMetaData damageMetaData, DefenseMetaData defenseMetaData) {
         this.event = event;
         this.damageMetaData = damageMetaData;
+        this.defenseMetaData = defenseMetaData;
     }
 
     public EntityDamageEvent getBukkitEvent() {
@@ -25,6 +28,10 @@ public class WakameEntityDamageEvent extends Event implements Cancellable {
 
     public DamageMetaData getDamageMetaData() {
         return damageMetaData;
+    }
+
+    public DefenseMetaData getDefenseMetaData() {
+        return defenseMetaData;
     }
 
     @Override

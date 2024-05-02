@@ -33,7 +33,7 @@ class VanillaDamageMetaData(
 class PlayerMeleeAttackMetaData(
     val user: User<Player>,
 ) : DamageMetaData {
-    private val packets: List<ElementDamagePacket> = generatePackets()
+    val packets: List<ElementDamagePacket> = generatePackets()
     override val damageValue: Double = calculateDamageValue()
 
     /**
@@ -66,7 +66,7 @@ class PlayerMeleeAttackMetaData(
     private fun calculateDamageValue(): Double {
         var finalDamage = 0.0
         packets.forEach {
-            finalDamage += it.value * (1 + it.rate) * (1.0 + if (it.isCritical) it.criticalPower else 0.0)
+            finalDamage += it.finalDamage
         }
         return finalDamage
     }
@@ -111,4 +111,5 @@ data class ElementDamagePacket(
     val isCritical: Boolean
 ) {
     val value: Double = VariableAmount.range(max, min).amount
+    val finalDamage: Double = value * (1 + rate) * (1.0 + if (isCritical) criticalPower else 0.0)
 }

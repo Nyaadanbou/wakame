@@ -26,7 +26,9 @@ class VanillaDefenseMetaData(
     override val damageMetaData: DamageMetaData,
     override val damageModifierPackets: List<DamageModifierPacket>
 ) : DefenseMetaData {
-    constructor() : this(damageMetaData, emptyList())
+    constructor(
+        damageMetaData: DamageMetaData,
+    ) : this(damageMetaData, emptyList())
 
     override val finalDamage: Double = calculateFinalDamage()
 
@@ -53,13 +55,27 @@ class PlayerDefenseMetaData(
              * 使用默认元素进行减伤
              */
             is VanillaDamageMetaData -> {
-                return damageMetaData.damageValue*user.attributeMap.getValue(Attributes.byElement(ElementRegistry.DEFAULT).DEFENSE)
+                return DefenseUtils.getDamageAfterDefense(
+                    damageMetaData.damageValue,
+                    user.attributeMap.getValue(Attributes.byElement(ElementRegistry.DEFAULT).DEFENSE)
+                )
             }
+
+            is PlayerMeleeAttackMetaData -> {
+                var damage = 0.0
+                damageMetaData.packets.forEach {
+                    damage += DefenseUtils.getDamageAfterDefense(
+                        it.finalDamage,
+                        user.attributeMap.getValue(Attributes.byElement(it.element).DEFENSE)
+                    )
+                }
+                return damage
+            }
+
+            is PlayerProjectileMetaData -> TODO()
 
             is EntityMeleeAttackMetaData -> TODO()
             is EntityProjectileMetaData -> TODO()
-            is PlayerMeleeAttackMetaData -> TODO()
-            is PlayerProjectileMetaData -> TODO()
         }
     }
 }
@@ -68,3 +84,13 @@ data class DamageModifierPacket(
     val damageModifier: DamageModifier,
     val rate: Double
 )
+
+/**
+ * 防御的工具类
+ * 可以添加从配置文件载入的防御计算公式
+ */
+object DefenseUtils {
+    fun getDamageAfterDefense(originalDamage: Double, defense: Double): Double {
+        return originalDamage * (1 - (defense / 1 * originalDamage + defense))
+    }
+}
