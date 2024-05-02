@@ -34,7 +34,7 @@ class PlayerMeleeAttackMetaData(
     val user: User<Player>,
 ) : DamageMetaData {
     val packets: List<ElementDamagePacket> = generatePackets()
-    override val damageValue: Double = calculateDamageValue()
+    override val damageValue: Double = packets.sumOf { it.finalDamage }
 
     /**
      * 在元素伤害包生成时，所有的随机就已经确定了，包括：
@@ -57,18 +57,6 @@ class PlayerMeleeAttackMetaData(
             )
         }
         return list
-    }
-
-    /**
-     * 玩家近战伤害的计算
-     * 最终伤害 = Σ random(MIN_ATTACK_DAMAGE, MAX_ATTACK_DAMAGE) * (1 + ATTACK_DAMAGE_RATE) * (1 + CRITICAL_STRIKE_POWER)
-     */
-    private fun calculateDamageValue(): Double {
-        var finalDamage = 0.0
-        packets.forEach {
-            finalDamage += it.finalDamage
-        }
-        return finalDamage
     }
 }
 
@@ -111,5 +99,10 @@ data class ElementDamagePacket(
     val isCritical: Boolean
 ) {
     val value: Double = VariableAmount.range(max, min).amount
+
+    /**
+     * 玩家近战伤害的计算
+     * 最终伤害 = Σ random(MIN_ATTACK_DAMAGE, MAX_ATTACK_DAMAGE) * (1 + ATTACK_DAMAGE_RATE) * (1 + CRITICAL_STRIKE_POWER)
+     */
     val finalDamage: Double = value * (1 + rate) * (1.0 + if (isCritical) criticalPower else 0.0)
 }

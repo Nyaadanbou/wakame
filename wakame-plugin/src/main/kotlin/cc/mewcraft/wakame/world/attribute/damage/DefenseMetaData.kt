@@ -9,11 +9,15 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageModifier
 /**
  * 防御元数据
  * 包含了一次伤害中“防御阶段”的有关信息
- * 其中 [damageModifierPackets] 用于修改原版的伤害修饰器，可空集
- * 具体见 damage_system.md
  */
 sealed interface DefenseMetaData {
     val damageMetaData: DamageMetaData
+
+    /**
+     * 用于修改原版的伤害修饰器，可空集。
+     *
+     * 具体见 damage_system.md
+     */
     val damageModifierPackets: List<DamageModifierPacket>
     val finalDamage: Double
 }
@@ -24,12 +28,8 @@ sealed interface DefenseMetaData {
  */
 class VanillaDefenseMetaData(
     override val damageMetaData: DamageMetaData,
-    override val damageModifierPackets: List<DamageModifierPacket>
+    override val damageModifierPackets: List<DamageModifierPacket> = emptyList()
 ) : DefenseMetaData {
-    constructor(
-        damageMetaData: DamageMetaData,
-    ) : this(damageMetaData, emptyList())
-
     override val finalDamage: Double = calculateFinalDamage()
 
     private fun calculateFinalDamage(): Double {
