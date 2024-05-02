@@ -48,6 +48,14 @@ open class Attribute @InternalApi constructor(
      */
     val defaultValueProvider: Provider<Double>,
 ) : Keyed, Examinable {
+
+    @InternalApi
+    constructor(
+        descriptionId: String,
+        vanilla: Boolean = false,
+        defaultValue: Double
+    ) : this(descriptionId, vanilla, provider(defaultValue))
+
     override val key: Key = Key(Namespaces.ATTRIBUTE, descriptionId)
 
     /**
@@ -86,15 +94,6 @@ open class Attribute @InternalApi constructor(
     )
 }
 
-@InternalApi
-fun Attribute(
-    descriptionId: String,
-    vanilla: Boolean = false,
-    defaultValue: Double
-): Attribute {
-    return Attribute(descriptionId, vanilla, provider(defaultValue))
-}
-
 /**
  * An [Attribute] with bounded values.
  */
@@ -108,21 +107,45 @@ constructor(
     /**
      * 该属性允许的最小数值, 重载时会更新数值。
      */
-    val minValueProvider: Provider<Double>,
+    minValue: Provider<Double>,
     /**
      * 该属性允许的最大数值, 重载时会更新数值。
      */
-    val maxValueProvider: Provider<Double>,
+    maxValue: Provider<Double>,
 ) : Attribute(descriptionId, vanilla, defaultValue) {
+
+    @InternalApi
+    constructor(
+        descriptionId: String,
+        vanilla: Boolean,
+        defaultValue: Double,
+        minValue: Double,
+        maxValue: Double
+    ) : this(
+        descriptionId,
+        vanilla,
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "default_value").orElse(defaultValue),
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "min_value").orElse(minValue),
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "max_value").orElse(maxValue)
+    )
+
+    @InternalApi
+    constructor(
+        descriptionId: String,
+        defaultValue: Double,
+        minValue: Double,
+        maxValue: Double
+    ) : this(descriptionId, false, defaultValue, minValue, maxValue)
+
     /**
      * 该属性允许的最小数值, 获取的值不会随着重载而更新。
      */
-    val minValue: Double by minValueProvider
+    val minValue: Double by minValue
 
     /**
      * 该属性允许的最大数值, 获取的值不会随着重载而更新。
      */
-    val maxValue: Double by maxValueProvider
+    val maxValue: Double by maxValue
 
     init {
         if (this.minValue > this.maxValue) {
@@ -151,33 +174,6 @@ constructor(
     )
 }
 
-@InternalApi
-fun RangedAttribute(
-    descriptionId: String,
-    vanilla: Boolean,
-    defaultValue: Double,
-    minValue: Double,
-    maxValue: Double
-): RangedAttribute {
-    return RangedAttribute(
-        descriptionId,
-        vanilla,
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "default_value").orElse(defaultValue),
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "min_value").orElse(minValue),
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "max_value").orElse(maxValue)
-    )
-}
-
-@InternalApi
-fun RangedAttribute(
-    descriptionId: String,
-    defaultValue: Double,
-    minValue: Double,
-    maxValue: Double
-): RangedAttribute {
-    return RangedAttribute(descriptionId, false, defaultValue, minValue, maxValue)
-}
-
 /**
  * An [Attribute] related to an [Element].
  */
@@ -201,6 +197,33 @@ constructor(
     minValue,
     maxValue,
 ) {
+
+    @InternalApi
+    constructor(
+        descriptionId: String,
+        vanilla: Boolean,
+        defaultValue: Double,
+        minValue: Double,
+        maxValue: Double,
+        element: Element
+    ) : this(
+        descriptionId,
+        vanilla,
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "default_value").orElse(defaultValue),
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "min_value").orElse(minValue),
+        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "max_value").orElse(maxValue),
+        element
+    )
+
+    @InternalApi
+    constructor(
+        descriptionId: String,
+        defaultValue: Double,
+        minValue: Double,
+        maxValue: Double,
+        element: Element
+    ) : this(descriptionId, false, defaultValue, minValue, maxValue, element)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other is ElementAttribute) return descriptionId == other.descriptionId && element == other.element
@@ -219,34 +242,4 @@ constructor(
             ExaminableProperty.of("element", element),
         )
     )
-}
-
-@InternalApi
-fun ElementAttribute(
-    descriptionId: String,
-    vanilla: Boolean,
-    defaultValue: Double,
-    minValue: Double,
-    maxValue: Double,
-    element: Element
-): ElementAttribute {
-    return ElementAttribute(
-        descriptionId,
-        vanilla,
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "default_value").orElse(defaultValue),
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "min_value").orElse(minValue),
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "max_value").orElse(maxValue),
-        element
-    )
-}
-
-@InternalApi
-fun ElementAttribute(
-    descriptionId: String,
-    defaultValue: Double,
-    minValue: Double,
-    maxValue: Double,
-    element: Element
-): ElementAttribute {
-    return ElementAttribute(descriptionId, false, defaultValue, minValue, maxValue, element)
 }
