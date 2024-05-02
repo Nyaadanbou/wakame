@@ -11,9 +11,9 @@ import kotlin.random.Random
 
 /**
  * 伤害元数据
- * 包含了一次伤害中的有关信息
+ * 包含了一次伤害中“攻击阶段”的有关信息
  */
-interface DamageMetaData {
+sealed interface DamageMetaData {
     val damageValue: Double
 }
 
@@ -24,8 +24,7 @@ interface DamageMetaData {
  */
 class VanillaDamageMetaData(
     override val damageValue: Double
-) : DamageMetaData {
-}
+) : DamageMetaData
 
 /**
  * 玩家近战攻击造成的伤害元数据
@@ -73,10 +72,34 @@ class PlayerMeleeAttackMetaData(
     }
 }
 
+/**
+ * 非玩家实体近战攻击造成的伤害元数据
+ * 如：僵尸近战攻击、河豚接触伤害
+ */
 class EntityMeleeAttackMetaData(
     entity: LivingEntity
-): DamageMetaData{
+) : DamageMetaData {
     override val damageValue: Double = TODO("实体伤害的获取和计算")
+}
+
+/**
+ * 玩家使用弹射物造成伤害的元数据
+ * 如：玩家射出的箭矢、三叉戟、雪球击中实体
+ */
+class PlayerProjectileMetaData(
+    val user: User<Player>,
+) : DamageMetaData {
+    override val damageValue: Double = TODO("玩家弹射物攻击的获取和计算")
+}
+
+/**
+ * 非玩家实体使用弹射物造成伤害的元数据
+ * 如：骷髅射出的箭矢、溺尸射出的三叉戟、监守者的音爆击中实体
+ */
+class EntityProjectileMetaData(
+    entity: LivingEntity
+) : DamageMetaData {
+    override val damageValue: Double = TODO("实体弹射物攻击的获取和计算")
 }
 
 data class ElementDamagePacket(
