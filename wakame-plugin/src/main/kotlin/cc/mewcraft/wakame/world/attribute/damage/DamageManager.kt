@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
+import cc.mewcraft.wakame.item.binary.playNekoStack
+import cc.mewcraft.wakame.item.hasBehavior
+import cc.mewcraft.wakame.item.schema.behavior.Attack
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -14,21 +17,32 @@ object DamageManager {
         if (event is EntityDamageByEntityEvent) {
             when (val damager = event.damager) {
                 is Player -> {
-                    //纯原版的情况下，理论上玩家能够产生的伤害类型只有：
-                    //ENTITY_ATTACK
-                    //ENTITY_SWEEP_ATTACK
-                    //MAGIC
-                    return when (event.cause) {
-                        DamageCause.ENTITY_ATTACK -> {
-                            PlayerMeleeAttackMetaData(damager.toUser())
-                        }
+                    val nekoStack = damager.inventory.itemInMainHand.playNekoStack
+                    //玩家手中的物品是Attack
+                    if (nekoStack.isNeko && nekoStack.hasBehavior<Attack>()) {
+                        return when (event.cause) {
+                            DamageCause.ENTITY_ATTACK -> {
+                                PlayerMeleeAttackMetaData(damager.toUser(), false)
+                            }
 
-                        DamageCause.ENTITY_SWEEP_ATTACK -> TODO("横扫伤害，可能存在额外伤害衰减")
+                            DamageCause.ENTITY_SWEEP_ATTACK -> {
+                                PlayerMeleeAttackMetaData(damager.toUser(), true)
+                            }
 
-                        //其他伤害类型均视为原版伤害
-                        else -> {
-                            VanillaDamageMetaData(event.damage)
+                            /**
+                             * 纯原版的情况下，理论上玩家能够产生的伤害类型只有：
+                             * ENTITY_ATTACK
+                             * ENTITY_SWEEP_ATTACK
+                             * MAGIC
+                             * 其他伤害类型均视为原版伤害
+                             */
+                            else -> {
+                                VanillaDamageMetaData(event.damage)
+                            }
                         }
+                        //玩家手中的物品不是Attack，甚至不是Neko
+                    } else {
+                        return VanillaDamageMetaData(event.damage)
                     }
                 }
 
@@ -37,7 +51,19 @@ object DamageManager {
                 }
 
                 is Projectile -> {
-                    TODO()
+                    return when (val damager = event.damageSource.directEntity) {
+                        is Player -> {
+                            PlayerProjectileMetaData(damager.toUser())
+                        }
+
+                        is LivingEntity -> {
+                            EntityProjectileMetaData(damager)
+                        }
+
+                        else -> {
+                            VanillaDamageMetaData(event.damage)
+                        }
+                    }
                 }
             }
             //如果造成伤害的实体不是LivingEntity也不是弹射物
@@ -49,10 +75,10 @@ object DamageManager {
         return VanillaDamageMetaData(event.damage)
     }
 
-    fun generateDefenseMetaData(event: EntityDamageEvent, damageMetaData: DamageMetaData, damageModifierPackets: List<DamageModifierPacket>): DefenseMetaData {
+    fun generateDefenseMetaData(event: EntityDamageEvent, damageModifiers: Map<EntityDamageEvent.DamageModifier, Double>): DefenseMetaData {
         when (val damagee = event.entity) {
             is Player -> {
-                return PlayerDefenseMetaData(damageMetaData, damageModifierPackets, damagee.toUser())
+                return PlayerDefenseMetaData(damageModifiers, damagee.toUser())
             }
 
             is LivingEntity -> {

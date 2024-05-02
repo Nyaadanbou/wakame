@@ -14,6 +14,7 @@ import kotlin.random.Random
  * 包含了一次伤害中“攻击阶段”的有关信息
  */
 sealed interface DamageMetaData {
+    val packets: List<ElementDamagePacket>
     val damageValue: Double
 }
 
@@ -24,16 +25,33 @@ sealed interface DamageMetaData {
  */
 class VanillaDamageMetaData(
     override val damageValue: Double
-) : DamageMetaData
+) : DamageMetaData {
+    override val packets: List<ElementDamagePacket> = listOf(generateVanillaPacket())
+
+    private fun generateVanillaPacket(): ElementDamagePacket {
+        return ElementDamagePacket(
+            ElementRegistry.DEFAULT,
+            damageValue,
+            damageValue,
+            0.0,
+            0.0,
+            false,
+            0.0
+        )
+    }
+}
 
 /**
  * 玩家近战攻击造成的伤害元数据
  * 如：玩家使用剑攻击生物
+ * [isSweep] 表示这次伤害是否是横扫造成的
+ * 会根据横扫的逻辑削弱伤害
  */
 class PlayerMeleeAttackMetaData(
     val user: User<Player>,
+    val isSweep: Boolean
 ) : DamageMetaData {
-    val packets: List<ElementDamagePacket> = generatePackets()
+    override val packets: List<ElementDamagePacket> = generatePackets(isSweep)
     override val damageValue: Double = packets.sumOf { it.finalDamage }
 
     /**
@@ -41,18 +59,19 @@ class PlayerMeleeAttackMetaData(
      * 伤害值 value 在范围 [max,min] 的随机
      * 该元素伤害是否暴击的随机
      */
-    private fun generatePackets(): List<ElementDamagePacket> {
+    private fun generatePackets(isSweep: Boolean): List<ElementDamagePacket> {
         val attributeMap = user.attributeMap
         val list = arrayListOf<ElementDamagePacket>()
         for (it in ElementRegistry.INSTANCES.objects) {
             list.add(
                 ElementDamagePacket(
                     it,
-                    attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE),
-                    attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE),
+                    if (isSweep) 1.0 else attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE),
+                    if (isSweep) 1.0 else attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE),
                     attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE),
                     attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
-                    Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+                    Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
+                    attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
                 )
             )
         }
@@ -67,6 +86,8 @@ class PlayerMeleeAttackMetaData(
 class EntityMeleeAttackMetaData(
     entity: LivingEntity
 ) : DamageMetaData {
+    override val packets: List<ElementDamagePacket>
+        get() = TODO("Not yet implemented")
     override val damageValue: Double = TODO("实体伤害的获取和计算")
 }
 
@@ -77,6 +98,8 @@ class EntityMeleeAttackMetaData(
 class PlayerProjectileMetaData(
     val user: User<Player>,
 ) : DamageMetaData {
+    override val packets: List<ElementDamagePacket>
+        get() = TODO("Not yet implemented")
     override val damageValue: Double = TODO("玩家弹射物攻击的获取和计算")
 }
 
@@ -87,6 +110,8 @@ class PlayerProjectileMetaData(
 class EntityProjectileMetaData(
     entity: LivingEntity
 ) : DamageMetaData {
+    override val packets: List<ElementDamagePacket>
+        get() = TODO("Not yet implemented")
     override val damageValue: Double = TODO("实体弹射物攻击的获取和计算")
 }
 
@@ -96,12 +121,12 @@ data class ElementDamagePacket(
     val max: Double,
     val rate: Double,
     val criticalPower: Double,
-    val isCritical: Boolean
+    val isCritical: Boolean,
+    val defensePenetration: Double,
 ) {
-    val value: Double = VariableAmount.range(max, min).amount
+    val value: Double = if (min >= max) max else VariableAmount.range(min, max).amount
 
     /**
-     * 玩家近战伤害的计算
      * 最终伤害 = Σ random(MIN_ATTACK_DAMAGE, MAX_ATTACK_DAMAGE) * (1 + ATTACK_DAMAGE_RATE) * (1 + CRITICAL_STRIKE_POWER)
      */
     val finalDamage: Double = value * (1 + rate) * (1.0 + if (isCritical) criticalPower else 0.0)
