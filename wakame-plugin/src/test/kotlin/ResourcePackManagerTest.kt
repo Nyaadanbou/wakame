@@ -53,7 +53,7 @@ class ResourcePackManagerTest : KoinTest {
     }
 
     @Test
-    fun `test generate`() {
+    fun `test generate pack`() {
         // Create mocks
         val mockResourceReader = mockk<ResourcePackReader<FileTreeReader>>()
         val mockResourceWriter = mockk<ResourcePackWriter<FileTreeWriter>>()
