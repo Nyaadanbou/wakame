@@ -310,7 +310,7 @@ private class SingleSelectionImpl(
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            BinaryAttributeCoreNBTWrapperS(compound)
+            BinaryAttributeCoreTagWrapperS(compound)
         },
     )
 }
@@ -358,7 +358,7 @@ private class RangedSelectionImpl(
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            BinaryAttributeCoreNBTWrapperR(compound)
+            BinaryAttributeCoreTagWrapperR(compound)
         },
     )
 }
@@ -401,7 +401,7 @@ private class SingleElementAttributeBinderImpl(
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            BinaryAttributeCoreNBTWrapperSE(compound)
+            BinaryAttributeCoreTagWrapperSE(compound)
         },
     )
 }
@@ -448,7 +448,7 @@ private class RangedElementAttributeBinderImpl(
         },
 
         BINARY_CORE_NBT_ENCODER = { compound: CompoundShadowTag ->
-            BinaryAttributeCoreNBTWrapperRE(compound)
+            BinaryAttributeCoreTagWrapperRE(compound)
         },
     )
 }

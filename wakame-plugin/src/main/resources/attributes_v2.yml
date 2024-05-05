@@ -1,0 +1,193 @@
+empty:
+  enabled: true
+  display: "无属性"
+  tooltips:
+    add: "<!i>无属性"
+    multiply_base: "<!i>无属性"
+    multiply_total: "<!i>无属性"
+
+attack_damage:
+  enabled: true
+  display: "<element>攻击力"
+  tooltips:
+    add: "<!i><element>攻击力 <min:#;-.> ⎓ <max:#;-.>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+
+attack_damage_rate:
+  enabled: true
+  display: "<element>攻击力"
+  tooltips:
+    add: "<!i><element>攻击力 <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+
+attack_effect_chance:
+  enabled: true
+  display: "元素叠加"
+  tooltips:
+    add: "<!i>元素叠加 <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+
+attack_speed_level:
+  enabled: true
+  display: "攻击速度"
+  tooltips:
+    add: "<!i>攻击速度 <value>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  levels:
+    0: "<red>究极慢"
+    1: "超级慢"
+    2: "很慢"
+    3: "慢"
+    4: "普通"
+    5: "快"
+    6: "非常快"
+    7: "超级快"
+    8: "<green>究极快"
+
+block_interaction_range:
+  enabled: true
+  display: "方块交互距离"
+  tooltips:
+    add: "<!i>方块交互距离 <value:+#.#;-.>"
+    multiply_base: "<!i>方块交互距离 <value:+#%;-.%>"
+    multiply_total: "<!i>方块交互距离 ×<value:+#%;-.%>"
+
+critical_strike_chance:
+  enabled: true
+  display: "暴击概率"
+  tooltips:
+    add: "<!i>暴击概率 <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+
+critical_strike_power:
+  enabled: true
+  display: "暴击伤害"
+  tooltips:
+    add: "<!i>暴击伤害 <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+
+damage_reduction_rate:
+  enabled: true
+  display: "伤害减免"
+  tooltips:
+    add: "<!i>伤害减免 <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+
+defense:
+  enabled: true
+  display: "<element>防御力"
+  tooltips:
+    add: "<!i><element>防御力 <value:+#;-.>"
+    multiply_base: "<!i><element>防御力 <value:+#%;-.%>"
+    multiply_total: "<!i><element>防御力 ×<value:+#%;-.%>"
+
+defense_penetration:
+  enabled: true
+  display: "<element>防御穿透"
+  tooltips:
+    add: "<!i><element>防御穿透 <value:+#;-.>"
+    multiply_base: "<!i><element>防御穿透 <value:+#%;-.%>"
+    multiply_total: "<!i><element>防御穿透 ×<value:+#%;-.%>"
+
+entity_interaction_range:
+  enabled: true
+  display: "实体交互距离"
+  tooltips:
+    add: "<!i>实体交互距离 <value:+#.#;-.>"
+    multiply_base: "<!i>实体交互距离 <value:+#%;-.%>"
+    multiply_total: "<!i>实体交互距离 ×<value:+#%;-.%>"
+
+health_regeneration:
+  enabled: true
+  display: "生命恢复"
+  tooltips:
+    add: "<!i>生命恢复 <value:+#;-.>"
+    multiply_base: "<!i>生命恢复 <value:+#%;-.%>"
+    multiply_total: "<!i>生命恢复 ×<value:+#%;-.%>"
+
+lifesteal:
+  enabled: true
+  display: "攻击吸血"
+  tooltips:
+    add: "<!i>攻击吸血 <value:+#;-.>"
+    multiply_base: "<!i>攻击吸血 <value:+#%;-.%>"
+    multiply_total: "<!i>攻击吸血 ×<value:+#%;-.%>"
+
+lifesteal_rate:
+  enabled: true
+  display: "攻击吸血百分比"
+  tooltips:
+    add: "<!i>攻击吸血率 <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+
+mana_consumption_rate:
+  enabled: true
+  display: "魔法消耗百分比"
+  tooltips:
+    add: "<!i>魔法消耗率 <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+
+mana_regeneration:
+  enabled: true
+  display: "魔法恢复"
+  tooltips:
+    add: "<!i>魔法恢复 <value:+#;-.>"
+    multiply_base: "<!i>魔法恢复 <value:+#%;-.%>"
+    multiply_total: "<!i>魔法恢复 ×<value:+#%;-.%>"
+
+manasteal:
+  enabled: true
+  display: "魔法汲取"
+  tooltips:
+    add: "<!i>魔法汲取 <value:+#;-.>"
+    multiply_base: "<!i>魔法汲取 <value:+#%;-.%>"
+    multiply_total: "<!i>魔法汲取 ×<value:+#%;-.%>"
+
+manasteal_rate:
+  enabled: true
+  display: "魔法汲取百分比"
+  tooltips:
+    add: "<!i>魔法汲取率 <value:+#;-.>%"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+
+max_absorption:
+  enabled: true
+  display: "最大护盾"
+  tooltips:
+    add: "<!i>最大护盾 <value:+#;-.>"
+    multiply_base: "<!i>最大护盾 <value:+#%;-.%>"
+    multiply_total: "<!i>最大护盾 ×<value:+#%;-.%>"
+
+max_health:
+  enabled: true
+  display: "最大生命"
+  tooltips:
+    add: "<!i>最大生命 <value:+#;-.>"
+    multiply_base: "<!i>最大生命 <value:+#%;-.%>"
+    multiply_total: "<!i>最大生命 ×<value:+#%;-.%>"
+
+max_mana:
+  enabled: true
+  display: "最大魔法"
+  tooltips:
+    add: "<!i>最大魔法 <value:+#;-.>"
+    multiply_base: "<!i>最大魔法 <value:+#%;-.%>"
+    multiply_total: "<!i>最大魔法 ×<value:+#%;-.%>"
+
+movement_speed:
+  enabled: true
+  display: "移动速度"
+  tooltips:
+    add: "<!i>移动速度 <value:+#.#;-.>"
+    multiply_base: "<!i>移动速度 <value:+#%;-.%>"
+    multiply_total: "<!i>移动速度 ×<value:+#%;-.%>"

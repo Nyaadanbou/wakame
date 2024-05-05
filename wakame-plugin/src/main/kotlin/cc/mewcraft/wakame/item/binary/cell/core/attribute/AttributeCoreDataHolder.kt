@@ -12,6 +12,7 @@ import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import java.lang.invoke.MethodHandle
 import java.util.EnumMap
 import java.util.UUID
@@ -25,8 +26,8 @@ internal data class BinaryAttributeCoreDataHolderS(
     private val tagType: ShadowTagType,
     override val operation: Operation,
     override val value: Double,
-) : BinaryAttributeCoreS {
-    override fun asShadowTag(): ShadowTag = CompoundShadowTag {
+) : BinaryAttributeCoreS() {
+    override fun asTag(): ShadowTag = CompoundShadowTag {
         putId(key)
         putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
         putOperation(operation)
@@ -36,7 +37,13 @@ internal data class BinaryAttributeCoreDataHolderS(
         return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
     }
 
-    override fun toString(): String = toSimpleString()
+    override fun provideTagResolverForPlay(): TagResolver {
+        throw UnsupportedOperationException()
+    }
+
+    override fun provideTagResolverForShow(): TagResolver {
+        throw UnsupportedOperationException()
+    }
 }
 
 internal data class BinaryAttributeCoreDataHolderR(
@@ -45,8 +52,8 @@ internal data class BinaryAttributeCoreDataHolderR(
     override val operation: Operation,
     override val lower: Double,
     override val upper: Double,
-) : BinaryAttributeCoreR {
-    override fun asShadowTag(): ShadowTag = CompoundShadowTag {
+) : BinaryAttributeCoreR() {
+    override fun asTag(): ShadowTag = CompoundShadowTag {
         putId(key)
         putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower, tagType)
         putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)
@@ -57,7 +64,13 @@ internal data class BinaryAttributeCoreDataHolderR(
         return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
     }
 
-    override fun toString(): String = toSimpleString()
+    override fun provideTagResolverForPlay(): TagResolver {
+        throw UnsupportedOperationException()
+    }
+
+    override fun provideTagResolverForShow(): TagResolver {
+        throw UnsupportedOperationException()
+    }
 }
 
 internal data class BinaryAttributeCoreDataHolderSE(
@@ -66,8 +79,8 @@ internal data class BinaryAttributeCoreDataHolderSE(
     override val operation: Operation,
     override val value: Double,
     override val element: Element,
-) : BinaryAttributeCoreSE {
-    override fun asShadowTag(): ShadowTag = CompoundShadowTag {
+) : BinaryAttributeCoreSE() {
+    override fun asTag(): ShadowTag = CompoundShadowTag {
         putId(key)
         putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
         putElement(element)
@@ -78,7 +91,13 @@ internal data class BinaryAttributeCoreDataHolderSE(
         return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
     }
 
-    override fun toString(): String = toSimpleString()
+    override fun provideTagResolverForPlay(): TagResolver {
+        throw UnsupportedOperationException()
+    }
+
+    override fun provideTagResolverForShow(): TagResolver {
+        throw UnsupportedOperationException()
+    }
 }
 
 internal data class BinaryAttributeCoreDataHolderRE(
@@ -88,8 +107,8 @@ internal data class BinaryAttributeCoreDataHolderRE(
     override val lower: Double,
     override val upper: Double,
     override val element: Element,
-) : BinaryAttributeCoreRE {
-    override fun asShadowTag(): ShadowTag = CompoundShadowTag {
+) : BinaryAttributeCoreRE() {
+    override fun asTag(): ShadowTag = CompoundShadowTag {
         putId(key)
         putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower, tagType)
         putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)
@@ -101,7 +120,13 @@ internal data class BinaryAttributeCoreDataHolderRE(
         return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
     }
 
-    override fun toString(): String = toSimpleString()
+    override fun provideTagResolverForPlay(): TagResolver {
+        throw UnsupportedOperationException()
+    }
+
+    override fun provideTagResolverForShow(): TagResolver {
+        throw UnsupportedOperationException()
+    }
 }
 
 //<editor-fold desc="Convenient extension functions">

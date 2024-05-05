@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.binary.cell.core
 
+import cc.mewcraft.wakame.display.TagResolverProvider
 import cc.mewcraft.wakame.item.Core
-import cc.mewcraft.wakame.item.ShadowTagLike
+import cc.mewcraft.wakame.item.TagLike
 import cc.mewcraft.wakame.item.binary.cell.core.empty.BinaryEmptyCore
 import cc.mewcraft.wakame.item.binary.cell.core.noop.BinaryNoopCore
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
 //
 // BinaryCore 分为两类
@@ -24,14 +24,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
  * [core][Core] being a data representation that could be directly
  * used in the world state.
  */
-interface BinaryCore : Core, ShadowTagLike {
-    /**
-     * Generates [TagResolver] for the core.
-     *
-     * @return a new instance of [TagResolver]
-     */
-    fun provideTagResolvers(): TagResolver = TagResolver.empty()
-
+interface BinaryCore : Core, TagResolverProvider, TagLike {
     /**
      * Clears the core so that it becomes empty.
      *

@@ -29,7 +29,7 @@ internal class ReforgeDataHolderImpl(
         root.tags().clear()
     }
 
-    override fun asShadowTag(): ShadowTag = root
+    override fun asTag(): ShadowTag = root
     override fun toString(): String = root.asString()
 }
 

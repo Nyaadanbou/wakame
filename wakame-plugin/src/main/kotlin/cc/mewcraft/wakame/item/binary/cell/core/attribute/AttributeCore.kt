@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
 import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
@@ -21,33 +22,39 @@ sealed interface BinaryAttributeCore : BinaryCore, AttributeData, AttributeCompo
 
 /* Specific types of BinaryAttributeCore */
 
-sealed interface BinaryAttributeCoreS : BinaryAttributeCore, BinaryAttributeData.S {
+sealed class BinaryAttributeCoreS : BinaryAttributeCore, BinaryAttributeData.S {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("value", value),
     )
+
+    override fun toString(): String = toSimpleString()
 }
 
-sealed interface BinaryAttributeCoreR : BinaryAttributeCore, BinaryAttributeData.R {
+sealed class BinaryAttributeCoreR : BinaryAttributeCore, BinaryAttributeData.R {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("lower", lower),
         ExaminableProperty.of("upper", upper),
     )
+
+    override fun toString(): String = toSimpleString()
 }
 
-sealed interface BinaryAttributeCoreSE : BinaryAttributeCore, BinaryAttributeData.SE {
+sealed class BinaryAttributeCoreSE : BinaryAttributeCore, BinaryAttributeData.SE {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("value", value),
         ExaminableProperty.of("element", element),
     )
+
+    override fun toString(): String = toSimpleString()
 }
 
-sealed interface BinaryAttributeCoreRE : BinaryAttributeCore, BinaryAttributeData.RE {
+sealed class BinaryAttributeCoreRE : BinaryAttributeCore, BinaryAttributeData.RE {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
@@ -55,6 +62,8 @@ sealed interface BinaryAttributeCoreRE : BinaryAttributeCore, BinaryAttributeDat
         ExaminableProperty.of("upper", upper),
         ExaminableProperty.of("element", element),
     )
+
+    override fun toString(): String = toSimpleString()
 }
 
 /* Some useful extension functions */

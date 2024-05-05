@@ -66,7 +66,7 @@ internal data class BinaryEntityKillsCurseDataHolder(
     override val index: EntityTypeHolder,
     override val count: Int,
 ) : BinaryEntityKillsCurse {
-    override fun asShadowTag(): ShadowTag = CompoundShadowTag {
+    override fun asTag(): ShadowTag = CompoundShadowTag {
         putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
         putString(INDEX_TAG_KEY, index.name)
         putShort(COUNT_TAG_KEY, count.toStableShort())
@@ -85,8 +85,13 @@ internal class BinaryEntityKillsCurseNBTWrapper(
         compound.tags().clear()
     }
 
-    override fun asShadowTag(): ShadowTag = compound
-    override fun toString(): String = compound.asString()
+    override fun asTag(): ShadowTag {
+        return compound
+    }
+
+    override fun toString(): String {
+        return compound.asString()
+    }
 }
 
 private fun CompoundShadowTag.getEntityReference(key: String): EntityTypeHolder {

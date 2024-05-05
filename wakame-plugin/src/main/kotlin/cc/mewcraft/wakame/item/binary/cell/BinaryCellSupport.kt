@@ -33,12 +33,12 @@ internal data class BinaryCellDataHolder(
     override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? = Impl.typedCore(this, clazz)
     override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? = Impl.typedCurse(this, clazz)
 
-    override fun asShadowTag(): ShadowTag = CompoundShadowTag {
+    override fun asTag(): ShadowTag = CompoundShadowTag {
         // 当对应的数据不存在时，这里的每个 asShadowTag()
         // 应该返回一个没有内容的空 Compound（不是 null）
-        put(CoreBinaryKeys.BASE, core.asShadowTag())
-        put(CurseBinaryKeys.BASE, curse.asShadowTag())
-        put(ReforgeBinaryKeys.BASE, reforge.asShadowTag())
+        put(CoreBinaryKeys.BASE, core.asTag())
+        put(CurseBinaryKeys.BASE, curse.asTag())
+        put(ReforgeBinaryKeys.BASE, reforge.asTag())
     }
 }
 
@@ -50,7 +50,7 @@ internal data class BinaryCellNBTWrapper(
             return BinaryCoreFactory.wrap(compound.getCompound(CoreBinaryKeys.BASE))
         }
         set(value) {
-            compound.put(CoreBinaryKeys.BASE, value.asShadowTag())
+            compound.put(CoreBinaryKeys.BASE, value.asTag())
         }
 
     override var curse: BinaryCurse
@@ -58,7 +58,7 @@ internal data class BinaryCellNBTWrapper(
             return BinaryCurseFactory.wrap(compound.getCompound(CurseBinaryKeys.BASE))
         }
         set(value) {
-            compound.put(CurseBinaryKeys.BASE, value.asShadowTag())
+            compound.put(CurseBinaryKeys.BASE, value.asTag())
         }
 
     override var reforge: ReforgeDataHolder
@@ -66,11 +66,11 @@ internal data class BinaryCellNBTWrapper(
             return ReforgeDataFactory.wrap(compound.getCompound(ReforgeBinaryKeys.BASE))
         }
         set(value) {
-            compound.put(ReforgeBinaryKeys.BASE, value.asShadowTag())
+            compound.put(ReforgeBinaryKeys.BASE, value.asTag())
         }
 
     override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? = Impl.typedCore(this, clazz)
     override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? = Impl.typedCurse(this, clazz)
-    override fun asShadowTag(): ShadowTag = compound
+    override fun asTag(): ShadowTag = compound
     override fun toString(): String = compound.asString()
 }

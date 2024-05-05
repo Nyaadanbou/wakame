@@ -19,9 +19,9 @@ import java.util.UUID
 // 封装类（封装 NBT 对象），本身不储存数据
 //
 
-internal class BinaryAttributeCoreNBTWrapperS(
+internal class BinaryAttributeCoreTagWrapperS(
     val compound: CompoundShadowTag,
-) : BinaryAttributeCoreS {
+) : BinaryAttributeCoreS() {
     override val key: Key
         get() = compound.getIdentifier()
     override val operation: AttributeModifier.Operation
@@ -33,21 +33,30 @@ internal class BinaryAttributeCoreNBTWrapperS(
         compound.tags().clear()
     }
 
-    override fun asShadowTag(): ShadowTag = compound
+    override fun asTag(): ShadowTag {
+        return compound
+    }
 
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> =
-        AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
+    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
+        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
+    }
 
-    override fun provideTagResolvers(): TagResolver {
+    override fun provideTagResolverForPlay(): TagResolver {
         TODO("Not yet implemented")
     }
 
-    override fun toString(): String = compound.asString()
+    override fun provideTagResolverForShow(): TagResolver {
+        TODO("Not yet implemented")
+    }
+
+    override fun toString(): String {
+        return compound.asString()
+    }
 }
 
-internal class BinaryAttributeCoreNBTWrapperR(
+internal class BinaryAttributeCoreTagWrapperR(
     val compound: CompoundShadowTag,
-) : BinaryAttributeCoreR {
+) : BinaryAttributeCoreR() {
     override val key: Key
         get() = compound.getIdentifier()
     override val operation: AttributeModifier.Operation
@@ -61,21 +70,30 @@ internal class BinaryAttributeCoreNBTWrapperR(
         compound.tags().clear()
     }
 
-    override fun asShadowTag(): ShadowTag = compound
+    override fun asTag(): ShadowTag {
+        return compound
+    }
 
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> =
-        AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
+    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
+        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
+    }
 
-    override fun provideTagResolvers(): TagResolver {
+    override fun provideTagResolverForPlay(): TagResolver {
         TODO("Not yet implemented")
     }
 
-    override fun toString(): String = compound.asString()
+    override fun provideTagResolverForShow(): TagResolver {
+        TODO("Not yet implemented")
+    }
+
+    override fun toString(): String {
+        return compound.asString()
+    }
 }
 
-internal class BinaryAttributeCoreNBTWrapperSE(
+internal class BinaryAttributeCoreTagWrapperSE(
     val compound: CompoundShadowTag,
-) : BinaryAttributeCoreSE {
+) : BinaryAttributeCoreSE() {
     override val key: Key
         get() = compound.getIdentifier()
     override val operation: AttributeModifier.Operation
@@ -89,21 +107,30 @@ internal class BinaryAttributeCoreNBTWrapperSE(
         compound.tags().clear()
     }
 
-    override fun asShadowTag(): ShadowTag = compound
+    override fun asTag(): ShadowTag {
+        return compound
+    }
 
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> =
-        AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
+    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
+        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
+    }
 
-    override fun provideTagResolvers(): TagResolver {
+    override fun provideTagResolverForPlay(): TagResolver {
         TODO("Not yet implemented")
     }
 
-    override fun toString(): String = compound.asString()
+    override fun provideTagResolverForShow(): TagResolver {
+        TODO("Not yet implemented")
+    }
+
+    override fun toString(): String {
+        return compound.asString()
+    }
 }
 
-internal class BinaryAttributeCoreNBTWrapperRE(
+internal class BinaryAttributeCoreTagWrapperRE(
     val compound: CompoundShadowTag,
-) : BinaryAttributeCoreRE {
+) : BinaryAttributeCoreRE() {
     override val key: Key
         get() = compound.getIdentifier()
     override val operation: AttributeModifier.Operation
@@ -119,16 +146,25 @@ internal class BinaryAttributeCoreNBTWrapperRE(
         compound.tags().clear()
     }
 
-    override fun asShadowTag(): ShadowTag = compound
+    override fun asTag(): ShadowTag {
+        return compound
+    }
 
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> =
-        AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
+    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
+        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
+    }
 
-    override fun provideTagResolvers(): TagResolver {
+    override fun provideTagResolverForPlay(): TagResolver {
         TODO("Not yet implemented")
     }
 
-    override fun toString(): String = compound.asString()
+    override fun provideTagResolverForShow(): TagResolver {
+        TODO("Not yet implemented")
+    }
+
+    override fun toString(): String {
+        return compound.asString()
+    }
 }
 
 private fun CompoundShadowTag.getIdentifier(): Key {

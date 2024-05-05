@@ -13,7 +13,7 @@ import org.spongepowered.configurate.ConfigurationNode
  * A constructor function to create [BinarySkillCore].
  */
 fun BinarySkillCore(compound: CompoundShadowTag): BinarySkillCore {
-    return BinarySkillCoreNBTWrapper(compound)
+    return BinarySkillCoreTagWrapper(compound)
 }
 
 /**

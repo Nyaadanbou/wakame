@@ -10,14 +10,15 @@ import cc.mewcraft.wakame.util.getStringOrNull
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
 //
 // 封装类（封装 NBT 对象），本身不储存数据
 //
 
-internal class BinarySkillCoreNBTWrapper(
+internal class BinarySkillCoreTagWrapper(
     private val compound: CompoundShadowTag,
-) : BinarySkillCore {
+) : BinarySkillCore() {
     override val key: Key
         get() = compound.getIdentifier()
     override val instance: ConfiguredSkill
@@ -29,8 +30,21 @@ internal class BinarySkillCoreNBTWrapper(
         compound.tags().clear()
     }
 
-    override fun asShadowTag(): ShadowTag = compound
-    override fun toString(): String = compound.asString()
+    override fun asTag(): ShadowTag {
+        return compound
+    }
+
+    override fun provideTagResolverForPlay(): TagResolver {
+        TODO("Not yet implemented")
+    }
+
+    override fun provideTagResolverForShow(): TagResolver {
+        TODO("Not yet implemented")
+    }
+
+    override fun toString(): String {
+        return compound.asString()
+    }
 }
 
 private fun CompoundShadowTag.getIdentifier(): Key {

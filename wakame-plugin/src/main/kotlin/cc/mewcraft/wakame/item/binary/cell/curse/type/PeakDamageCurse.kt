@@ -62,7 +62,7 @@ internal data class BinaryPeakDamageCurseDataHolder(
     override val element: Element,
     override val amount: Int,
 ) : BinaryPeakDamageCurse {
-    override fun asShadowTag(): ShadowTag = CompoundShadowTag {
+    override fun asTag(): ShadowTag = CompoundShadowTag {
         putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
         putShort(AMOUNT_TAG_KEY, amount.toStableShort())
         putByte(ELEMENT_TAG_KEY, element.binaryId)
@@ -81,8 +81,13 @@ internal class BinaryPeakDamageCurseNBTWrapper(
         compound.tags().clear()
     }
 
-    override fun asShadowTag(): ShadowTag = compound
-    override fun toString(): String = compound.asString()
+    override fun asTag(): ShadowTag {
+        return compound
+    }
+
+    override fun toString(): String {
+        return compound.asString()
+    }
 }
 
 private fun CompoundShadowTag.getElement(key: String): Element {

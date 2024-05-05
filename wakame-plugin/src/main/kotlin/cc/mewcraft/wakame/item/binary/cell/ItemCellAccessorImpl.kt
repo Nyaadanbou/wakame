@@ -90,13 +90,13 @@ internal value class ItemCellAccessorImpl(
     /* Setters */
 
     override fun put(id: String, cell: BinaryCell) {
-        rootOrCreate.put(id, cell.asShadowTag())
+        rootOrCreate.put(id, cell.asTag())
     }
 
     override fun edit(id: String, setter: BinaryCell?.() -> BinaryCell) {
         val oldCell = find(id)
         val newCell = oldCell.setter()
-        rootOrCreate.put(id, newCell.asShadowTag())
+        rootOrCreate.put(id, newCell.asTag())
     }
 
     override fun remove(id: String) {

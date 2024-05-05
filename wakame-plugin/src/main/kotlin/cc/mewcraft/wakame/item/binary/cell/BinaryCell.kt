@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell
 
 import cc.mewcraft.wakame.item.Cell
-import cc.mewcraft.wakame.item.ShadowTagLike
+import cc.mewcraft.wakame.item.TagLike
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.item.binary.cell.core.isEmpty
 import cc.mewcraft.wakame.item.binary.cell.core.isNoop
@@ -27,7 +27,7 @@ import kotlin.reflect.KClass
  * externally at any time. You should not assume that the states of the object
  * will remain unchanged.
  */
-interface BinaryCell : Cell, ShadowTagLike, Examinable {
+interface BinaryCell : Cell, TagLike, Examinable {
     /**
      * The core stored in this cell.
      */
