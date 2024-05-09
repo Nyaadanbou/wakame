@@ -43,7 +43,7 @@ object SkillRegistry : Initializable, KoinComponent {
     private fun loadConfiguration() {
         INSTANCE.clear()
 
-        val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(SKILL_CONFIG_DIR)
+        val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(SKILL_PROTO_CONFIG_DIR)
         val namespaceDirs = mutableListOf<File>()
 
         // first walk each directory, i.e., each namespace
@@ -56,7 +56,7 @@ object SkillRegistry : Initializable, KoinComponent {
                 }
             }
 
-        val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(SKILL_CONFIG_LOADER))
+        val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(SKILL_PROTO_CONFIG_LOADER))
 
         // then walk each file, i.e., each skill
         namespaceDirs.forEach { namespaceDir ->

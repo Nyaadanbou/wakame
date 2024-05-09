@@ -103,9 +103,9 @@ object Initializer : KoinComponent, Listener {
 
     private fun saveDefaultConfiguration() = with(PLUGIN) {
         saveDefaultConfig() // config.yml
-        saveResourceRecursively(CRATE_CONFIG_DIR)
-        saveResourceRecursively(ITEM_CONFIG_DIR)
-        saveResourceRecursively(SKILL_CONFIG_DIR)
+        saveResourceRecursively(CRATE_PROTO_CONFIG_DIR)
+        saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
+        saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_CONFIG_FILE)
         saveResource(ELEMENT_CONFIG_FILE)
         saveResource(CATEGORY_CONFIG_FILE)

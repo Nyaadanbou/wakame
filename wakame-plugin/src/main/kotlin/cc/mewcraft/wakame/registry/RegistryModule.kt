@@ -19,14 +19,17 @@ import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
-const val CRATE_CONFIG_DIR = "crates"
-const val CRATE_CONFIG_LOADER = "crate_config_loader"
+const val CRATE_PROTO_CONFIG_DIR = "crates"
+const val CRATE_PROTO_CONFIG_LOADER = "crate_config_loader"
 
-const val ITEM_CONFIG_DIR = "items"
+const val ITEM_PROTO_CONFIG_DIR = "items"
+const val ITEM_PROTO_CONFIG_LOADER = "item_proto_config_loader"
+
+const val ITEM_CONFIG = "items.yml"
 const val ITEM_CONFIG_LOADER = "item_config_loader"
 
-const val SKILL_CONFIG_DIR = "skills"
-const val SKILL_CONFIG_LOADER = "skill_config_loader"
+const val SKILL_PROTO_CONFIG_DIR = "skills"
+const val SKILL_PROTO_CONFIG_LOADER = "skill_config_loader"
 
 const val ATTRIBUTE_CONFIG_FILE = "attributes.yml"
 const val ATTRIBUTE_CONFIG_LOADER = "attribute_config_loader"
@@ -97,7 +100,7 @@ internal fun registryModule(): Module = module {
         }
     }
 
-    single<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER)) {
+    single<YamlConfigurationLoader.Builder>(named(ITEM_PROTO_CONFIG_LOADER)) {
         buildYamlLoader {
             registerAll(get<TypeSerializerCollection>(named(BASE_SERIALIZERS)))
             registerAll(get<TypeSerializerCollection>(named(CELL_SERIALIZERS)))
@@ -105,7 +108,7 @@ internal fun registryModule(): Module = module {
         }
     }
 
-    single<YamlConfigurationLoader.Builder>(named(SKILL_CONFIG_LOADER)) {
+    single<YamlConfigurationLoader.Builder>(named(SKILL_PROTO_CONFIG_LOADER)) {
         buildYamlLoader {
             registerAll(get(named(BASE_SERIALIZERS)))
             registerAll(get(named(SKILL_SERIALIZERS)))

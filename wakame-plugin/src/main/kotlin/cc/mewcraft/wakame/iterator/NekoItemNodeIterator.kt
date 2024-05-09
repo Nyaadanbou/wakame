@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.iterator
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.registry.ITEM_CONFIG_DIR
-import cc.mewcraft.wakame.registry.ITEM_CONFIG_LOADER
+import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -31,7 +31,7 @@ object NekoItemNodeIterator : KoinComponent {
      * - 参数 [Path] 为物品配置文件的路径
      */
     fun forEach(block: (Key, Path, ConfigurationNode) -> Unit) {
-        val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_CONFIG_DIR)
+        val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_PROTO_CONFIG_DIR)
         val namespaceDirs = mutableListOf<File>()
 
         // first walk each directory, i.e., each namespace
@@ -44,7 +44,7 @@ object NekoItemNodeIterator : KoinComponent {
                 }
             }
 
-        val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(ITEM_CONFIG_LOADER)) // will be reused
+        val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(ITEM_PROTO_CONFIG_LOADER)) // will be reused
 
         // then walk each file (i.e., each item) in each namespace
         namespaceDirs.forEach { namespaceDir ->
