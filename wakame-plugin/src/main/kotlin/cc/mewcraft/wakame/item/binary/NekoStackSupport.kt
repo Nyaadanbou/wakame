@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessorImpl
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
-import cc.mewcraft.wakame.registry.NekoItemRegistry
+import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -66,7 +66,7 @@ internal interface BaseNekoStack : NekoStack {
         get() = tags.contains(BaseBinaryKeys.SHOW, ShadowTagType.BYTE)
 
     override val schema: NekoItem
-        get() = NekoItemRegistry.INSTANCES[key]
+        get() = ItemRegistry.INSTANCES[key]
 
     override var key: Key
         get() = Key(namespace, path)
@@ -88,10 +88,10 @@ internal interface BaseNekoStack : NekoStack {
         set(value) = tags.putInt(BaseBinaryKeys.VARIANT, value)
 
     override val uuid: UUID
-        get() = NekoItemRegistry.INSTANCES[key].uuid
+        get() = ItemRegistry.INSTANCES[key].uuid
 
     override val effectiveSlot: EffectiveSlot
-        get() = NekoItemRegistry.INSTANCES[key].effectiveSlot
+        get() = ItemRegistry.INSTANCES[key].effectiveSlot
 
     override val cell: ItemCellAccessor
         get() = ItemCellAccessorImpl(this)

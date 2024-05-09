@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
-import cc.mewcraft.wakame.registry.NekoItemRegistry
+import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.Multimap
 import com.google.common.collect.MultimapBuilder
@@ -16,12 +16,12 @@ import org.koin.core.component.inject
 
 @PreWorldDependency(
     runBefore = [
-        NekoItemRegistry::class
+        ItemRegistry::class
     ]
 )
 @ReloadDependency(
     runBefore = [
-        NekoItemRegistry::class
+        ItemRegistry::class
     ]
 )
 object AssetsLookup : Initializable, KoinComponent {
@@ -54,12 +54,12 @@ object AssetsLookup : Initializable, KoinComponent {
     }
 
     fun getAssets(key: Key): List<Assets> {
-        require(NekoItemRegistry.INSTANCES.find(key) != null) { "No such NekoItem: $key" }
+        require(ItemRegistry.INSTANCES.find(key) != null) { "No such NekoItem: $key" }
         return assets[key].toList()
     }
 
     fun getAssets(key: Key, sid: Int): Assets {
-        require(NekoItemRegistry.INSTANCES.find(key) != null) { "No such NekoItem: $key" }
+        require(ItemRegistry.INSTANCES.find(key) != null) { "No such NekoItem: $key" }
         return assets[key].firstOrNull { it.variant == sid } ?: throw NoSuchElementException("No such variant: $sid")
     }
 

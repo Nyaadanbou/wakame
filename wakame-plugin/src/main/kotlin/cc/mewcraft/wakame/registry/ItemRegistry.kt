@@ -40,7 +40,7 @@ import org.slf4j.Logger
         SkillRegistry::class,
     ]
 )
-object NekoItemRegistry : KoinComponent, Initializable { // TODO 重命名为 ItemRegistry
+object ItemRegistry : KoinComponent, Initializable {
     /**
      * All loaded [NekoItem]s.
      */

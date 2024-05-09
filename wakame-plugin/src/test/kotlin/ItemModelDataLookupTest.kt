@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.lookupModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.*
-import cc.mewcraft.wakame.registry.NekoItemRegistry.get
+import cc.mewcraft.wakame.registry.ItemRegistry.get
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
 import org.junit.jupiter.api.AfterAll
@@ -52,7 +52,7 @@ class ItemModelDataLookupTest : KoinTest {
             RarityRegistry.onPreWorld()
             LevelMappingRegistry.onPreWorld()
             EntityRegistry.onPreWorld()
-            NekoItemRegistry.onPreWorld()
+            ItemRegistry.onPreWorld()
         }
 
         @JvmStatic
@@ -68,7 +68,7 @@ class ItemModelDataLookupTest : KoinTest {
 
         itemModelDataLookup.onPrePack()
 
-        val demo = NekoItemRegistry.INSTANCES.get("short_sword:demo")
+        val demo = ItemRegistry.INSTANCES.get("short_sword:demo")
         val itemModelData = itemModelDataLookup[demo.key, 0]
 
         assertEquals(10000, itemModelData)

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.lookup
 
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.registry.NekoItemRegistry
+import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.asBukkit
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import net.kyori.adventure.key.Key
@@ -23,4 +23,4 @@ data class ItemAssets(
 }
 
 val Assets.material: Material
-    get() = requireNotNull(Registry.MATERIAL.get(NekoItemRegistry.INSTANCES[key].material.asBukkit)) { "Can't find material by key: $key" }
+    get() = requireNotNull(Registry.MATERIAL.get(ItemRegistry.INSTANCES[key].material.asBukkit)) { "Can't find material by key: $key" }
