@@ -4,11 +4,8 @@ import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
@@ -94,14 +91,23 @@ object AttributeRegistry : Initializable {
      */
     private fun registerFacades() {
         // Register special attribute
-        +buildFacade("empty", BYTE).single().bind(Attributes.EMPTY)
+        +buildFacade("empty", BYTE).single().bind {
+            EMPTY
+        }
 
-        // Registry more attribute facade here ...
-        +buildFacade("attack_damage", SHORT).ranged().element().bind(Attributes.byElement { MIN_ATTACK_DAMAGE }, Attributes.byElement { MAX_ATTACK_DAMAGE })
-        +buildFacade("attack_effect_chance", DOUBLE).single().bind(Attributes.ATTACK_EFFECT_CHANCE)
-        +buildFacade("attack_speed_level", BYTE).single().bind(Attributes.ATTACK_SPEED_LEVEL).override {
+        // Registry more attribute facades here ...
+        +buildFacade("attack_damage", SHORT).ranged().element().bind(
+            { MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE }
+        )
+
+        +buildFacade("attack_effect_chance", DOUBLE).single().bind { ATTACK_EFFECT_CHANCE }
+
+        +buildFacade("attack_speed_level", BYTE).single().bind {
+            ATTACK_SPEED_LEVEL
+        }.override {
             // create closures
             val tooltips = DiscreteTooltips(config)
+
             // override it
             displayTextCreator = { core: BinaryAttributeCoreS ->
                 val lines = tooltips.line(core.operation)
@@ -109,25 +115,44 @@ object AttributeRegistry : Initializable {
                 listOf(AttributeRegistrySupport.mini().deserialize(lines, resolver))
             }
         }
-        +buildFacade("block_interaction_range", DOUBLE).single().bind(Attributes.BLOCK_INTERACTION_RANGE)
-        +buildFacade("critical_strike_chance", DOUBLE).single().bind(Attributes.CRITICAL_STRIKE_CHANCE)
-        +buildFacade("critical_strike_power", DOUBLE).single().bind(Attributes.CRITICAL_STRIKE_POWER)
-        +buildFacade("damage_reduction_rate", DOUBLE).single().bind(Attributes.DAMAGE_REDUCTION_RATE)
-        +buildFacade("defense", SHORT).single().element().bind(Attributes.byElement { DEFENSE })
-        +buildFacade("defense_penetration", SHORT).single().element().bind(Attributes.byElement { DEFENSE_PENETRATION })
-        +buildFacade("defense_penetration_rate", DOUBLE).single().element().bind(Attributes.byElement { DEFENSE_PENETRATION_RATE })
-        +buildFacade("entity_interaction_range", DOUBLE).single().bind(Attributes.ENTITY_INTERACTION_RANGE)
-        +buildFacade("health_regeneration", SHORT).single().bind(Attributes.HEALTH_REGENERATION)
-        +buildFacade("lifesteal", SHORT).single().bind(Attributes.LIFESTEAL)
-        +buildFacade("lifesteal_rate", DOUBLE).single().bind(Attributes.LIFESTEAL_RATE)
-        +buildFacade("mana_consumption_rate", DOUBLE).single().bind(Attributes.MANA_CONSUMPTION_RATE)
-        +buildFacade("mana_regeneration", SHORT).single().bind(Attributes.MANA_REGENERATION)
-        +buildFacade("manasteal", SHORT).single().bind(Attributes.MANASTEAL)
-        +buildFacade("manasteal_rate", DOUBLE).single().bind(Attributes.MANASTEAL_RATE)
-        +buildFacade("max_absorption", SHORT).single().bind(Attributes.MAX_ABSORPTION)
-        +buildFacade("max_health", SHORT).single().bind(Attributes.MAX_HEALTH)
-        +buildFacade("max_mana", SHORT).single().bind(Attributes.MAX_MANA)
-        +buildFacade("movement_speed", DOUBLE).single().bind(Attributes.MOVEMENT_SPEED)
+
+        +buildFacade("block_interaction_range", DOUBLE).single().bind { BLOCK_INTERACTION_RANGE }
+
+        +buildFacade("critical_strike_chance", DOUBLE).single().bind { CRITICAL_STRIKE_CHANCE }
+
+        +buildFacade("critical_strike_power", DOUBLE).single().bind { CRITICAL_STRIKE_POWER }
+
+        +buildFacade("damage_reduction_rate", DOUBLE).single().bind { DAMAGE_REDUCTION_RATE }
+
+        +buildFacade("defense", SHORT).single().element().bind { DEFENSE }
+
+        +buildFacade("defense_penetration", SHORT).single().element().bind { DEFENSE_PENETRATION }
+
+        +buildFacade("defense_penetration_rate", DOUBLE).single().element().bind { DEFENSE_PENETRATION_RATE }
+
+        +buildFacade("entity_interaction_range", DOUBLE).single().bind { ENTITY_INTERACTION_RANGE }
+
+        +buildFacade("health_regeneration", SHORT).single().bind { HEALTH_REGENERATION }
+
+        +buildFacade("lifesteal", SHORT).single().bind { LIFESTEAL }
+
+        +buildFacade("lifesteal_rate", DOUBLE).single().bind { LIFESTEAL_RATE }
+
+        +buildFacade("mana_consumption_rate", DOUBLE).single().bind { MANA_CONSUMPTION_RATE }
+
+        +buildFacade("mana_regeneration", SHORT).single().bind { MANA_REGENERATION }
+
+        +buildFacade("manasteal", SHORT).single().bind { MANASTEAL }
+
+        +buildFacade("manasteal_rate", DOUBLE).single().bind { MANASTEAL_RATE }
+
+        +buildFacade("max_absorption", SHORT).single().bind { MAX_ABSORPTION }
+
+        +buildFacade("max_health", SHORT).single().bind { MAX_HEALTH }
+
+        +buildFacade("max_mana", SHORT).single().bind { MAX_MANA }
+
+        +buildFacade("movement_speed", DOUBLE).single().bind { MOVEMENT_SPEED }
     }
 
     override fun onPreWorld() {
@@ -271,7 +296,7 @@ private interface RangedSelection : RangedAttributeBinder {
  */
 private interface SingleAttributeBinder {
     fun bind(
-        component: Attribute,
+        component: Attributes.() -> Attribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreS, SchemaAttributeCoreS>
 }
 
@@ -280,8 +305,8 @@ private interface SingleAttributeBinder {
  */
 private interface RangedAttributeBinder {
     fun bind(
-        component1: Attribute,
-        component2: Attribute,
+        component1: Attributes.() -> Attribute,
+        component2: Attributes.() -> Attribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreR, SchemaAttributeCoreR>
 }
 
@@ -290,7 +315,7 @@ private interface RangedAttributeBinder {
  */
 private interface SingleElementAttributeBinder {
     fun bind(
-        component: (Element) -> ElementAttribute,
+        component: ElementAttributes.() -> ElementAttribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreSE, SchemaAttributeCoreSE>
 }
 
@@ -299,8 +324,8 @@ private interface SingleElementAttributeBinder {
  */
 private interface RangedElementAttributeBinder {
     fun bind(
-        component1: (Element) -> ElementAttribute,
-        component2: (Element) -> ElementAttribute,
+        component1: ElementAttributes.() -> ElementAttribute,
+        component2: ElementAttributes.() -> ElementAttribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreRE, SchemaAttributeCoreRE>
 }
 
@@ -325,8 +350,8 @@ private object AttributeRegistrySupport : KoinComponent {
 private class MutableAttributeFacadeImpl<A : BinaryAttributeCore, B : SchemaAttributeCore>(
     override val key: Key,
     override val config: ConfigProvider,
-    override var attributeModifierCreator: (UUID, A) -> Map<Attribute, AttributeModifier>,
     override var attributeComponentMetadata: AttributeComponentMetadata,
+    override var attributeModifierCreator: (UUID, A) -> Map<Attribute, AttributeModifier>,
     override var schemaCoreCreatorByConfig: (ConfigurationNode) -> B,
     override var binaryCoreCreatorByConfig: (ConfigurationNode) -> A,
     override var binaryCoreCreatorByTag: (CompoundShadowTag) -> A,
@@ -481,14 +506,14 @@ private class SingleSelectionImpl(
     /**
      * Components: Operation, Single
      */
-    override fun bind(
-        component: Attribute,
-    ): AttributeFacadeOverride<BinaryAttributeCoreS, SchemaAttributeCoreS> {
+    override fun bind(component: Attributes.() -> Attribute): AttributeFacadeOverride<BinaryAttributeCoreS, SchemaAttributeCoreS> {
         val facade = MutableAttributeFacadeImpl(
             key = id,
             config = config,
             attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreS ->
-                ImmutableMap.of(component, AttributeModifier(uuid, core.value.toStableDouble(), core.operation))
+                ImmutableMap.of(
+                    Attributes.component(), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
+                )
             },
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Single::class
@@ -534,21 +559,21 @@ private class RangedSelectionImpl(
      * Components: Operation, Ranged
      */
     override fun bind(
-        component1: Attribute,
-        component2: Attribute,
+        component1: Attributes.() -> Attribute,
+        component2: Attributes.() -> Attribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreR, SchemaAttributeCoreR> {
         val facade = MutableAttributeFacadeImpl(
             key = id,
             config = config,
-            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreR ->
-                ImmutableMap.of(
-                    component1, AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
-                    component2, AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
-                )
-            },
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class
             ),
+            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreR ->
+                ImmutableMap.of(
+                    Attributes.component1(), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
+                    Attributes.component2(), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
+                )
+            },
             schemaCoreCreatorByConfig = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getSchemaLower()
@@ -588,18 +613,18 @@ private class SingleElementAttributeBinderImpl(
     /**
      * Components: Operation, Single, Element
      */
-    override fun bind(
-        component: (Element) -> ElementAttribute,
-    ): AttributeFacadeOverride<BinaryAttributeCoreSE, SchemaAttributeCoreSE> {
+    override fun bind(component: ElementAttributes.() -> ElementAttribute): AttributeFacadeOverride<BinaryAttributeCoreSE, SchemaAttributeCoreSE> {
         val facade = MutableAttributeFacadeImpl(
             key = id,
             config = config,
-            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreSE ->
-                ImmutableMap.of(component(core.element), AttributeModifier(uuid, core.value.toStableDouble(), core.operation))
-            },
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Single::class, AttributeComponent.Element::class
             ),
+            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreSE ->
+                ImmutableMap.of(
+                    Attributes.byElement(core.element).component(), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
+                )
+            },
             schemaCoreCreatorByConfig = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getSchemaSingle()
@@ -612,9 +637,7 @@ private class SingleElementAttributeBinderImpl(
                 val element = node.getElement()
                 BinaryAttributeCoreDataHolderSE(id, tagType, operation, value, element)
             },
-            binaryCoreCreatorByTag = { tag: CompoundShadowTag ->
-                BinaryAttributeCoreTagWrapperSE(tag)
-            },
+            binaryCoreCreatorByTag = { tag: CompoundShadowTag -> BinaryAttributeCoreTagWrapperSE(tag) },
             displayTextCreator = { core: BinaryAttributeCoreSE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("value", core.value)
@@ -640,21 +663,21 @@ private class RangedElementAttributeBinderImpl(
      * Components: Operation, Ranged, Element
      */
     override fun bind(
-        component1: (Element) -> ElementAttribute,
-        component2: (Element) -> ElementAttribute,
+        component1: ElementAttributes.() -> ElementAttribute,
+        component2: ElementAttributes.() -> ElementAttribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreRE, SchemaAttributeCoreRE> {
         val facade = MutableAttributeFacadeImpl(
             key = id,
             config = config,
-            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreRE ->
-                ImmutableMap.of(
-                    component1(core.element), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
-                    component2(core.element), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
-                )
-            },
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class, AttributeComponent.Element::class
             ),
+            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreRE ->
+                ImmutableMap.of(
+                    Attributes.byElement(core.element).component1(), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
+                    Attributes.byElement(core.element).component2(), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
+                )
+            },
             schemaCoreCreatorByConfig = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getSchemaLower()
