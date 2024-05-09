@@ -1,3 +1,24 @@
+# 属性
+
+# 属性的标识符
+# empty:
+#
+#   是否启用属性
+#   enabled: true
+#
+#   属性的名字，展示给玩家看的
+#   display: "无属性"
+#
+#   属性在提示框里的样式
+#   tooltips:
+#     add: "Empty"
+#     multiply_base: "Empty"
+#     multiply_total: "Empty"
+#
+#   属性的各项数值，仅对于玩家，以及其他实体生物所缺省的
+#   根据属性的具体种类（例如有无元素），有不同的设置可用
+#   values: { }
+
 empty:
   enabled: true
   display: "无属性"
@@ -15,10 +36,10 @@ attack_damage:
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
-    neutral:
-      default: .0
-      min: -16384.0
-      max: 16384.0
+    neutral: # 如果属性是带元素的，这一级缩进为元素的标识符，然后下一级缩进才是属性的默认/最小/最大
+      default: .0 # 默认值
+      min: -16384.0 # 最小值
+      max: 16384.0 # 最大值
     fire:
       default: .0
       min: -16384.0
@@ -89,9 +110,9 @@ attack_effect_chance:
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
-    default: .01
-    min: .0
-    max: 1.0
+    default: .01 # 默认值（这个属性不带元素，所以这一级缩进就是属性的默认/最小/最大）
+    min: .0 # 最小值
+    max: 1.0 # 最大值
 
 attack_speed_level:
   enabled: true
