@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.display
 /**
  * Represents something that can provide a [LoreLine] for the object.
  *
- * The [LoreLine] is essentially a description of the `display lore`.
+ * The provided [LoreLine] is essentially a description of the `display lore`.
  */
 interface DisplayLoreProvider {
     /**

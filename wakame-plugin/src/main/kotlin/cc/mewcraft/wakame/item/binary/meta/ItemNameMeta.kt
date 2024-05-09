@@ -63,7 +63,7 @@ value class BItemNameMeta(
             resolvers(ItemNameImplementations.CACHE[rarityOrDefault])
         }
 
-        return Implementations.mini().deserialize(tooltips.single, resolvers.build())
+        return ItemMetaSupport.mini().deserialize(tooltips.single, resolvers.build())
     }
 
     private companion object : ItemMetaConfig(

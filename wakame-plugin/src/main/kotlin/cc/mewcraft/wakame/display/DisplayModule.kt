@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.ShowNekoStack
-import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.named
@@ -34,15 +33,7 @@ internal fun displayModule(): Module = module {
 
     // config holder
     single<RendererConfiguration> {
-        RendererConfiguration(Configs.YAML.build(RENDERER_CONFIG_FILE) {
-            serializers {
-                it.kregister(LoreFormatSerializer)
-                it.kregister(ListFormatSerializer)
-                it.kregister(AttributeFormatSerializer)
-                it.kregister(AttackSpeedFormatSerializer)
-                it.kregister(OperationFormatSerializer)
-            }
-        })
+        RendererConfiguration(Configs.YAML[RENDERER_CONFIG_FILE])
     } bind Initializable::class
 
     // meta lookup

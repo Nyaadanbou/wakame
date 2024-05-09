@@ -9,7 +9,7 @@ import org.koin.core.component.inject
  * This singleton holds the necessary objects to implement
  * the subclasses of [BinaryItemMeta].
  */
-internal object Implementations : KoinComponent {
+internal object ItemMetaSupport : KoinComponent {
     private val MINI: MiniMessage by inject()
     private val LINE_KEY_FACTORY: ItemMetaLineKeyFactory by inject()
 

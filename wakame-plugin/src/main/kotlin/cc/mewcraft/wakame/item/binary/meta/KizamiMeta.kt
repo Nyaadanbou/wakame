@@ -45,7 +45,7 @@ value class BKizamiMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val kizami = get()
-        val key = Implementations.getLineKey(this)
+        val key = ItemMetaSupport.getLineKey(this)
         val lines = tooltips.render(kizami, Kizami::displayName)
         return ItemMetaLoreLine(key, lines)
     }

@@ -36,8 +36,8 @@ value class BSkinOwnerMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val skinOwner = get()
-        val key = Implementations.getLineKey(this)
-        val lines = Implementations.mini().deserialize(tooltips.single, Placeholder.component("value", Component.text(skinOwner.toString())))
+        val key = ItemMetaSupport.getLineKey(this)
+        val lines = ItemMetaSupport.mini().deserialize(tooltips.single, Placeholder.component("value", Component.text(skinOwner.toString())))
         return ItemMetaLoreLine(key, listOf(lines))
     }
 

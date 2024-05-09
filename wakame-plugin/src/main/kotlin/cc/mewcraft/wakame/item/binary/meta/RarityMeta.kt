@@ -37,8 +37,8 @@ value class BRarityMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val rarity = get()
-        val key = Implementations.getLineKey(this)
-        val lines = Implementations.mini().deserialize(tooltips.single, Placeholder.component("value", rarity.displayName))
+        val key = ItemMetaSupport.getLineKey(this)
+        val lines = ItemMetaSupport.mini().deserialize(tooltips.single, Placeholder.component("value", rarity.displayName))
         return ItemMetaLoreLine(key, listOf(lines))
     }
 

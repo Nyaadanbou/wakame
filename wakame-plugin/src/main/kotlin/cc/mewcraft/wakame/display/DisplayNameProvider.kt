@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component
 /**
  * Represents something that can provide a `display name` for the object.
  *
- * The `display name` is essentially a single text [Component].
+ * The provided `display name` is essentially a single text [Component].
  */
 interface DisplayNameProvider {
     /**

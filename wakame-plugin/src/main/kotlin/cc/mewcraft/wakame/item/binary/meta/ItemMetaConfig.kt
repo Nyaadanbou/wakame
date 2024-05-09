@@ -26,7 +26,7 @@ internal abstract class ItemMetaConfig(
      * @property single The format of the single text.
      */
     inner class SingleTooltips : Tooltips, Examinable {
-        val single: String by config.entry("single")
+        val single: String by config.entry("tooltips", "single")
 
         override fun examinableProperties(): Stream<out ExaminableProperty> {
             return Stream.of(ExaminableProperty.of("single", single))
@@ -45,9 +45,9 @@ internal abstract class ItemMetaConfig(
      * @property separator The format of the separator.
      */
     inner class MergedTooltips : Tooltips, Examinable {
-        val merged: String by config.entry("merged")
-        val single: String by config.entry("single")
-        val separator: String by config.entry("separator")
+        val merged: String by config.entry("tooltips", "merged")
+        val single: String by config.entry("tooltips", "single")
+        val separator: String by config.entry("tooltips", "separator")
 
         /**
          * A convenience function to stylize a list of objects.
@@ -57,9 +57,9 @@ internal abstract class ItemMetaConfig(
             extractor: (T) -> Component,
         ): List<Component> {
             val merged = collection
-                .mapTo(ObjectArrayList(collection.size)) { Implementations.mini().deserialize(single, component("single", extractor(it))) }
-                .join(JoinConfiguration.separator(Implementations.mini().deserialize(separator)))
-                .let { Implementations.mini().deserialize(merged, component("merged", it)) }
+                .mapTo(ObjectArrayList(collection.size)) { ItemMetaSupport.mini().deserialize(single, component("single", extractor(it))) }
+                .join(JoinConfiguration.separator(ItemMetaSupport.mini().deserialize(separator)))
+                .let { ItemMetaSupport.mini().deserialize(merged, component("merged", it)) }
             return listOf(merged)
         }
 
@@ -84,11 +84,10 @@ internal abstract class ItemMetaConfig(
      * @property bottom The bottom list. `null` indicates not adding the bottom.
      */
     inner class LoreTooltips : Tooltips, Examinable {
-        val line: String by config.entry("line")
+        val line: String by config.entry("tooltips", "line")
+        val header: List<String>? by config.entry("tooltips", "header")
+        val bottom: List<String>? by config.entry("tooltips", "bottom")
 
-        val header: List<String>? by config.entry("header")
-
-        val bottom: List<String>? by config.entry("bottom")
         override fun examinableProperties(): Stream<out ExaminableProperty> {
             return Stream.of(
                 ExaminableProperty.of("line", line),

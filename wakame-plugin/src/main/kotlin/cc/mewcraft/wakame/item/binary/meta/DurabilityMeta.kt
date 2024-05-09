@@ -84,8 +84,8 @@ value class BDurabilityMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val durability = get()
-        val key = Implementations.getLineKey(this)
-        val text = Implementations.mini().deserialize(
+        val key = ItemMetaSupport.getLineKey(this)
+        val text = ItemMetaSupport.mini().deserialize(
             tooltips.single,
             Placeholder.component("threshold", text(durability.threshold)),
             Placeholder.component("damage", text(durability.damage)),

@@ -37,8 +37,8 @@ value class BSkinMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val skin = get()
-        val key = Implementations.getLineKey(this)
-        val lines = Implementations.mini().deserialize(tooltips.single, Placeholder.component("value", skin.displayName))
+        val key = ItemMetaSupport.getLineKey(this)
+        val lines = ItemMetaSupport.mini().deserialize(tooltips.single, Placeholder.component("value", skin.displayName))
         return ItemMetaLoreLine(key, listOf(lines))
     }
 

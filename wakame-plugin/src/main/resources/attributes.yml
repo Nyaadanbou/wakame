@@ -100,7 +100,7 @@ attack_speed_level:
     add: "<!i>攻击速度 <value>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
-  levels:
+  mappings:
     0: "<red>究极慢"
     1: "超级慢"
     2: "很慢"

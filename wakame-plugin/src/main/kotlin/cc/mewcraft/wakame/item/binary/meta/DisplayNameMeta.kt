@@ -47,7 +47,7 @@ value class BDisplayNameMeta(
     }
 
     override fun provideDisplayName(): Component {
-        val displayName = getOrNull() ?: return DisplayNameImplementations.EMPTY
+        val displayName = getOrNull() ?: return DisplayNameSupport.EMPTY
 
         val resolvers = TagResolver.builder().apply {
 
@@ -56,10 +56,10 @@ value class BDisplayNameMeta(
 
             // create <rarity_name> & <rarity_style> tags
             val rarityOrDefault = accessor.item.getMetaAccessor<BRarityMeta>().getOrDefault()
-            resolvers(DisplayNameImplementations.CACHE[rarityOrDefault])
+            resolvers(DisplayNameSupport.CACHE[rarityOrDefault])
         }
 
-        return Implementations.mini().deserialize(tooltips.single, resolvers.build())
+        return ItemMetaSupport.mini().deserialize(tooltips.single, resolvers.build())
     }
 
     private companion object : ItemMetaConfig(
@@ -73,7 +73,7 @@ fun BDisplayNameMeta?.getOrEmpty(): String {
     return this?.getOrNull() ?: ""
 }
 
-private object DisplayNameImplementations {
+private object DisplayNameSupport {
     val EMPTY: Component = text("Unnamed")
     val CACHE: LoadingCache<Rarity, TagResolver> by ReloadableProperty {
         Caffeine.newBuilder().build { rarity ->

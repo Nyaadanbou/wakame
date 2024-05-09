@@ -46,7 +46,7 @@ value class BElementMeta(
     }
 
     override fun provideDisplayLore(): LoreLine {
-        val key = Implementations.getLineKey(this)
+        val key = ItemMetaSupport.getLineKey(this)
         val lines = tooltips.render(get(), Element::displayName)
         return ItemMetaLoreLine(key, lines)
     }

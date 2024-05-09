@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.*
+import cc.mewcraft.wakame.display.FullKey
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
@@ -28,7 +29,7 @@ sealed class BinaryAttributeCore : BinaryCore, AttributeComponent.Op<Operation>,
     }
 
     override fun provideDisplayLore(): LoreLine {
-        val lineKey = Implementations.DISPLAY_KEY_FACTORY.get(this)
+        val lineKey = AttributeSupport.getLineKey(this)
         val lineText = AttributeRegistry.FACADES[key].displayTextCreator(this)
         return AttributeLoreLine(lineKey, lineText)
     }
@@ -96,6 +97,10 @@ val BinaryAttributeCore.upper: Double
 val BinaryAttributeCore.upperOrNull: Double?
     get() = (this as? AttributeComponent.Ranged<Double>)?.upper
 
-private object Implementations : KoinComponent {
-    val DISPLAY_KEY_FACTORY: AttributeLineKeyFactory by inject()
+private object AttributeSupport : KoinComponent {
+    private val DISPLAY_KEY_FACTORY: AttributeLineKeyFactory by inject()
+
+    fun getLineKey(core: BinaryAttributeCore): FullKey {
+        return DISPLAY_KEY_FACTORY.get(core)
+    }
 }

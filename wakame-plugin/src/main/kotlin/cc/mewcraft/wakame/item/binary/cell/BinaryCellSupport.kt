@@ -16,7 +16,7 @@ import me.lucko.helper.shadows.nbt.ShadowTag
 import kotlin.reflect.KClass
 import kotlin.reflect.full.safeCast
 
-private object Implementations {
+private object CellSupport {
     fun <T : BinaryCore> typedCore(instance: BinaryCell, clazz: KClass<T>): T? {
         return clazz.safeCast(instance.core)
     }
@@ -32,11 +32,11 @@ internal data class BinaryCellDataHolder(
     override var reforge: ReforgeDataHolder,
 ) : BinaryCell {
     override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? {
-        return Implementations.typedCore(this, clazz)
+        return CellSupport.typedCore(this, clazz)
     }
 
     override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? {
-        return Implementations.typedCurse(this, clazz)
+        return CellSupport.typedCurse(this, clazz)
     }
 
     override fun asTag(): ShadowTag = CompoundShadowTag {
@@ -80,11 +80,11 @@ internal data class BinaryCellTagWrapper(
         }
 
     override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? {
-        return Implementations.typedCore(this, clazz)
+        return CellSupport.typedCore(this, clazz)
     }
 
     override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? {
-        return Implementations.typedCurse(this, clazz)
+        return CellSupport.typedCurse(this, clazz)
     }
 
     override fun asTag(): ShadowTag {

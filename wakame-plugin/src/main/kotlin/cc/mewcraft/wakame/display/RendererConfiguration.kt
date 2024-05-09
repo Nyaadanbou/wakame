@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
@@ -14,153 +13,69 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaLoreLine
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaLoreMeta
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 internal class RendererConfiguration(
     private val config: ConfigProvider,
-) : Initializable, KoinComponent {
+) : Initializable {
     private companion object {
         private const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
         private const val RENDERER_LAYOUT_NODE = "renderer_layout"
-        private const val RENDERER_STYLE_NODE = "renderer_style"
     }
 
-    private val mm: MiniMessage by inject()
-
-    //<editor-fold desc="renderer_style.meta">
-    /**
-     * 名字的渲染格式。
-     */
-    val nameFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "name")
-
-    /**
-     * 描述的渲染格式。
-     */
-    val loreFormat: ItemMetaStylizer.LoreFormat by config.entry<ItemMetaStylizer.LoreFormat>(RENDERER_STYLE_NODE, "meta", "lore")
-
-    /**
-     * 等级的渲染格式。
-     */
-    val levelFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "level")
-
-    /**
-     * 稀有度的渲染格式。
-     */
-    val rarityFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "rarity")
-
-    /**
-     * 元素的渲染格式。
-     */
-    val elementFormat: ItemMetaStylizer.ListFormat by config.entry<ItemMetaStylizer.ListFormat>(RENDERER_STYLE_NODE, "meta", "element")
-
-    /**
-     * 铭刻的渲染格式。
-     */
-    val kizamiFormat: ItemMetaStylizer.ListFormat by config.entry<ItemMetaStylizer.ListFormat>(RENDERER_STYLE_NODE, "meta", "kizami")
-
-    /**
-     * 保养度的渲染格式。
-     */
-    val durabilityFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "durability")
-
-    /**
-     * 皮肤的渲染格式。
-     */
-    val skinFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "skin")
-
-    /**
-     * 皮肤所有者的渲染格式。
-     */
-    val skinOwnerFormat: String by config.entry<String>(RENDERER_STYLE_NODE, "meta", "skin_owner")
-    //</editor-fold>
-
-    //<editor-fold desc="renderer_style.attribute">
-    /**
-     * 空词条栏（属性）的渲染格式。
-     */
-    val emptyAttributeText: List<String> by config.entry<List<String>>(RENDERER_STYLE_NODE, "attribute", "empty")
-
-    /**
-     * 属性的渲染格式。
-     */
-    val attributeFormat: AttributeStylizer.AttributeFormat by config.entry<AttributeStylizer.AttributeFormat>(RENDERER_STYLE_NODE, "attribute", "value")
-
-    /**
-     * 攻击速度的渲染格式。
-     */
-    val attackSpeedFormat: AttributeStylizer.AttackSpeedFormat by config.entry<AttributeStylizer.AttackSpeedFormat>(RENDERER_STYLE_NODE, "attribute", "value", "attack_speed_level")
-
-    /**
-     * 运算模式的渲染格式。
-     */
-    val operationFormats: AttributeStylizer.OperationFormat by config.entry<AttributeStylizer.OperationFormat>(RENDERER_STYLE_NODE, "attribute", "operation")
-    //</editor-fold>
-
-    //<editor-fold desc="renderer_style.skill">
-    /**
-     * 空词条栏的渲染格式（技能）。
-     */
-    val emptySkillText: List<String> by config.entry<List<String>>(RENDERER_STYLE_NODE, "skill", "empty")
-
-    /**
-     * 所有技能共用的渲染格式。
-     */
-    val commonSkillFormat: Unit by ReloadableProperty {
-        // TODO
-    }
-
-    /**
-     * 个别技能独有的渲染格式。
-     */
-    val skillFormats: Unit by ReloadableProperty {
-        // TODO
-    }
-    //</editor-fold>
-
-    //<editor-fold desc="renderer_layout">
     /**
      * 所有的 [RawKey]，用于判断内容是否需要渲染。
      *
      * 如果一个 [RawKey] 不在该集合里，则说明不应该渲染。
      */
-    val rawKeys: Set<RawKey> get() = _rawKeys
+    val rawKeys: Set<RawKey>
+        get() = rawKeys0
 
     /**
      * 用于查询指定内容的 [LoreMeta]。
      */
-    val loreMetaLookup: Map<FullKey, LoreMeta> get() = _loreMetaLookup
+    val loreMetaLookup: Map<FullKey, LoreMeta>
+        get() = loreMetaLookup0
 
     /**
      * 用于查询指定内容的 [FullIndex]。
      */
-    val loreIndexLookup: Map<FullKey, FullIndex> get() = _loreIndexLookup
+    val loreIndexLookup: Map<FullKey, FullIndex>
+        get() = loreIndexLookup0
 
     /**
      * 始终要渲染的内容。这些内容的文本在物品中始终不变。
      */
-    val constantLoreLines: Collection<LoreLine> get() = _constantLoreLines
+    val constantLoreLines: Collection<LoreLine>
+        get() = constantLoreLines0
 
     /**
      * 带有默认值的内容。当源数据不存在时将采用这里的默认值。
      */
-    val defaultLoreLines: Collection<LoreLine> get() = _defaultLoreLines
+    val defaultLoreLines: Collection<LoreLine>
+        get() = defaultLoreLines0
 
-    private val _rawKeys: MutableSet<RawKey> = ConcurrentHashMap.newKeySet()
-    private val _loreMetaLookup: MutableMap<FullKey, LoreMeta> = ConcurrentHashMap()
-    private val _loreIndexLookup: MutableMap<FullKey, FullIndex> = ConcurrentHashMap()
-    private val _constantLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
-    private val _defaultLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
+    override fun onPostWorld() {
+        loadLayout()
+    }
+
+    override fun onReload() {
+        loadLayout()
+    }
+
+    private val rawKeys0: MutableSet<RawKey> = ConcurrentHashMap.newKeySet()
+    private val loreMetaLookup0: MutableMap<FullKey, LoreMeta> = ConcurrentHashMap()
+    private val loreIndexLookup0: MutableMap<FullKey, FullIndex> = ConcurrentHashMap()
+    private val constantLoreLines0: MutableCollection<LoreLine> = CopyOnWriteArrayList()
+    private val defaultLoreLines0: MutableCollection<LoreLine> = CopyOnWriteArrayList()
 
     private fun loadLayout() {
-        _rawKeys.clear()
-        _loreMetaLookup.clear()
-        _loreIndexLookup.clear()
-        _constantLoreLines.clear()
-        _defaultLoreLines.clear()
+        rawKeys0.clear()
+        loreMetaLookup0.clear()
+        loreIndexLookup0.clear()
+        constantLoreLines0.clear()
+        defaultLoreLines0.clear()
 
         val primaryLines by config.entry<List<String>>(RENDERER_LAYOUT_NODE, "primary")
         val attDerivation = AttributeLoreMeta.Derivation(
@@ -183,15 +98,15 @@ internal class RendererConfiguration(
             val ret: DynamicLoreMeta
             when {
                 rawLine.startsWith(Namespaces.SKILL + ":") -> {
-                    ret = SkillLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
+                    ret = SkillLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default)
                 }
 
                 rawLine.startsWith(Namespaces.ATTRIBUTE + ":") -> {
-                    ret = AttributeLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default, attDerivation)
+                    ret = AttributeLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default, derivation = attDerivation)
                 }
 
                 rawLine.startsWith(Namespaces.ITEM_META + ":") -> {
-                    ret = ItemMetaLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
+                    ret = ItemMetaLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default)
                 }
 
                 else -> {
@@ -209,8 +124,9 @@ internal class RendererConfiguration(
          * @return a new instance
          */
         fun createLoreMeta(rawIndex: Int, rawLine: String): LoreMeta {
-
-            fun String.spiltAndDeserialize(): List<Component> = this.split("\\r").map(mm::deserialize)  // 以 '\r' 为分隔符，将文本分割为多行
+            fun String.spiltAndDeserialize(): List<Component> {
+                return this.split("\\r").map(DisplaySupport.mini()::deserialize)  // 以 '\r' 为分隔符，将文本分割为多行
+            }
 
             val loreMeta: LoreMeta
             val matcher = pattern.matcher(rawLine)
@@ -235,7 +151,9 @@ internal class RendererConfiguration(
 
                     // 解析为 '(default:...)...'
                     "default" -> {
-                        val defaultText = queue.popOr("Unknown syntax for '(default...)' while load config $RENDERER_CONFIG_FILE. Correct syntax: '(default:_text_|empty)_key_'").let {
+                        val defaultText = queue.popOr(
+                            "Unknown syntax for '(default...)' while load config $RENDERER_CONFIG_FILE. Correct syntax: '(default:_text_|empty)_key_'"
+                        ).let {
                             if (it.isBlank() || it == "empty") {
                                 listOf(Component.empty())
                             } else {
@@ -263,15 +181,15 @@ internal class RendererConfiguration(
             val loreMeta = createLoreMeta(rawIndex, rawLine)
 
             // populate the raw keys
-            _rawKeys += loreMeta.rawKey
+            rawKeys0 += loreMeta.rawKey
 
             val fullIndexes = loreMeta.fullIndexes(accIndexOffset).onEach { (fullKey, fullIndex) ->
                 // populate the index lookup
-                val absent = (_loreIndexLookup.putIfAbsent(fullKey, fullIndex) == null)
+                val absent = (loreIndexLookup0.putIfAbsent(fullKey, fullIndex) == null)
                 require(absent) { "Key $fullKey has already been added to indexes" }
 
                 // populate the meta lookup
-                _loreMetaLookup[fullKey] = loreMeta
+                loreMetaLookup0[fullKey] = loreMeta
             }
             // Accumulate the number of derived lines.
             // Minus one to neglect non-derived lines.
@@ -279,7 +197,7 @@ internal class RendererConfiguration(
 
             // populate the constant lore lines
             if (loreMeta is ConstantLoreMeta) {
-                _constantLoreLines += ConstantLoreLine(loreMeta.fullKeys.first(), loreMeta.components)
+                constantLoreLines0 += ConstantLoreLine(loreMeta.fullKeys.first(), loreMeta.components)
             }
 
             // populate the default lore lines
@@ -287,7 +205,7 @@ internal class RendererConfiguration(
                 val default = loreMeta.default ?: continue
 
                 // if the lore meta has a default value, add it to the default lore lines
-                _defaultLoreLines += loreMeta.fullKeys.map { key ->
+                defaultLoreLines0 += loreMeta.fullKeys.map { key ->
                     when (loreMeta) {
                         is AttributeLoreMeta -> AttributeLoreLine(key, default)
                         is ItemMetaLoreMeta -> ItemMetaLoreLine(key, default)
@@ -297,14 +215,5 @@ internal class RendererConfiguration(
                 }
             }
         }
-    }
-    //</editor-fold>
-
-    override fun onPostWorld() {
-        loadLayout()
-    }
-
-    override fun onReload() {
-        loadLayout()
     }
 }

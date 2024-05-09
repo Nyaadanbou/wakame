@@ -36,8 +36,8 @@ value class BLevelMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val level = get()
-        val key = Implementations.getLineKey(this)
-        val lines = Implementations.mini().deserialize(tooltips.single, Placeholder.component("value", Component.text(level)))
+        val key = ItemMetaSupport.getLineKey(this)
+        val lines = ItemMetaSupport.mini().deserialize(tooltips.single, Placeholder.component("value", Component.text(level)))
         return ItemMetaLoreLine(key, listOf(lines))
     }
 

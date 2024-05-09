@@ -43,11 +43,11 @@ value class BDisplayLoreMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val lore = get()
-        val key = Implementations.getLineKey(this)
-        val lines = lore.mapTo(ObjectArrayList(lore.size)) { Implementations.mini().deserialize(tooltips.line, Placeholder.parsed("line", it)) }
+        val key = ItemMetaSupport.getLineKey(this)
+        val lines = lore.mapTo(ObjectArrayList(lore.size)) { ItemMetaSupport.mini().deserialize(tooltips.line, Placeholder.parsed("line", it)) }
 
-        val header = tooltips.header?.map(Implementations.mini()::deserialize).orEmpty()
-        val bottom = tooltips.bottom?.map(Implementations.mini()::deserialize).orEmpty()
+        val header = tooltips.header?.map(ItemMetaSupport.mini()::deserialize).orEmpty()
+        val bottom = tooltips.bottom?.map(ItemMetaSupport.mini()::deserialize).orEmpty()
         lines.addAll(0, header)
         lines.addAll(bottom)
 
