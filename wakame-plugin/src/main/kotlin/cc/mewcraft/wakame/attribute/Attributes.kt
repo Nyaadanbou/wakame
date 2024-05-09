@@ -21,7 +21,7 @@ object Attributes {
      *
      * It only serves as a special value for other systems to use.
      */
-    val EMPTY = Attribute("empty", defaultValue = 0.0)
+    val EMPTY = Attribute("empty", false, 0.0)
 
     /*
        Vanilla-backed Attributes
@@ -49,8 +49,8 @@ object Attributes {
     val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0)
     val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", 0.01, .0, 1.0)
     val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, .0, 5.0)
-    val LIFESTEAL = RangedAttribute("lifesteal", .0, .0, 1.0)
-    val LIFESTEAL_RATE = RangedAttribute("lifesteal_rate", .0, .0, 16384.0)
+    val LIFESTEAL = RangedAttribute("lifesteal", .0, .0, 16384.0)
+    val LIFESTEAL_RATE = RangedAttribute("lifesteal_rate", .0, .0, 1.0)
     val MANASTEAL = RangedAttribute("manasteal", .0, .0, 1.0)
     val MANASTEAL_RATE = RangedAttribute("manasteal_rate", .0, .0, 16384.0)
     val HEALTH_REGENERATION = RangedAttribute("health_regeneration", 1.0, 0.0, 16384.0)

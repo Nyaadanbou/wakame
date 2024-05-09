@@ -1,12 +1,18 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.item.binary.NekoStack
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import kotlin.reflect.KClass
 
 /**
- * This is the interface to get specific [item meta accessor][BinaryItemMeta] on the ItemStack.
+ * This is the interface to get specific [item meta][BinaryItemMeta] on the [item].
  */
 interface ItemMetaAccessor {
+
+    /**
+     * The item which owns this accessor.
+     */
+    val item: NekoStack
 
     /**
      * Gets the root tag containing all the item meta or `null`, if it does not exist.

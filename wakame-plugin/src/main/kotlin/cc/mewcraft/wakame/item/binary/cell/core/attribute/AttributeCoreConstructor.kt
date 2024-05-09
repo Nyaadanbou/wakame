@@ -28,7 +28,7 @@ fun BinaryAttributeCore(
 ): BinaryAttributeCore {
     val key = Key(compound.getString(CoreBinaryKeys.CORE_IDENTIFIER))
     val facade = AttributeRegistry.FACADES[key]
-    val core = facade.BINARY_CORE_NBT_ENCODER.encode(compound)
+    val core = facade.binaryCoreCreatorByTag(compound)
     return core
 }
 
@@ -52,6 +52,6 @@ fun BinaryAttributeCore(
 ): BinaryAttributeCore {
     val key = node.node("key").krequire<Key>()
     val facade = AttributeRegistry.FACADES[key]
-    val core = facade.BINARY_CORE_NODE_ENCODER.encode(node)
+    val core = facade.binaryCoreCreatorByConfig(node)
     return core
 }

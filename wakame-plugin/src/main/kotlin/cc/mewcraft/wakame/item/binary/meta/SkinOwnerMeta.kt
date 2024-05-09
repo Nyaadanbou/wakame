@@ -1,7 +1,10 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import java.util.UUID
 
 /**
@@ -29,5 +32,18 @@ value class BSkinOwnerMeta(
 
     override fun set(value: UUID) {
         accessor.rootOrCreate.putUUID(key.value(), value)
+    }
+
+    override fun provideDisplayLore(): LoreLine {
+        val skinOwner = get()
+        val key = Implementations.getLineKey(this)
+        val lines = Implementations.mini().deserialize(tooltips.single, Placeholder.component("value", Component.text(skinOwner.toString())))
+        return ItemMetaLoreLine(key, listOf(lines))
+    }
+
+    private companion object : ItemMetaConfig(
+        ItemMetaConstants.SKIN_OWNER
+    ) {
+        val tooltips: SingleTooltips = SingleTooltips()
     }
 }

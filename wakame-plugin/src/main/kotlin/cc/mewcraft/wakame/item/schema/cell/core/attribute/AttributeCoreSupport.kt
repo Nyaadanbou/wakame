@@ -1,7 +1,10 @@
 package cc.mewcraft.wakame.item.schema.cell.core.attribute
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.attribute.facade.SchemaAttributeData
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.facade.AttributeDataR
+import cc.mewcraft.wakame.attribute.facade.AttributeDataRE
+import cc.mewcraft.wakame.attribute.facade.AttributeDataS
+import cc.mewcraft.wakame.attribute.facade.AttributeDataSE
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.*
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
@@ -18,13 +21,13 @@ private fun SchemaAttributeCore.populateGenerationContext(context: SchemaGenerat
     context.attributes += AttributeContextHolder(key, operation, elementOrNull)
 }
 
-internal data class SchemaAttributeCoreR(
+data class SchemaAttributeCoreR(
     override val key: Key,
     private val tagType: ShadowTagType,
-    override val operation: AttributeModifier.Operation,
+    override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
-) : SchemaAttributeCore, SchemaAttributeData.R {
+) : SchemaAttributeCore, AttributeDataR<Operation, RandomizedValue> {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
         populateGenerationContext(context)
 
@@ -45,14 +48,14 @@ internal data class SchemaAttributeCoreR(
     override fun toString(): String = toSimpleString()
 }
 
-internal data class SchemaAttributeCoreRE(
+data class SchemaAttributeCoreRE(
     override val key: Key,
     private val tagType: ShadowTagType,
-    override val operation: AttributeModifier.Operation,
+    override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
     override val element: Element,
-) : SchemaAttributeCore, SchemaAttributeData.RE {
+) : SchemaAttributeCore, AttributeDataRE<Operation, RandomizedValue, Element> {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
         populateGenerationContext(context)
 
@@ -74,12 +77,12 @@ internal data class SchemaAttributeCoreRE(
     override fun toString(): String = toSimpleString()
 }
 
-internal data class SchemaAttributeCoreS(
+data class SchemaAttributeCoreS(
     override val key: Key,
     private val tagType: ShadowTagType,
-    override val operation: AttributeModifier.Operation,
+    override val operation: Operation,
     override val value: RandomizedValue,
-) : SchemaAttributeCore, SchemaAttributeData.S {
+) : SchemaAttributeCore, AttributeDataS<Operation, RandomizedValue> {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
         populateGenerationContext(context)
 
@@ -98,13 +101,13 @@ internal data class SchemaAttributeCoreS(
     override fun toString(): String = toSimpleString()
 }
 
-internal data class SchemaAttributeCoreSE(
+data class SchemaAttributeCoreSE(
     override val key: Key,
     private val tagType: ShadowTagType,
-    override val operation: AttributeModifier.Operation,
+    override val operation: Operation,
     override val value: RandomizedValue,
     override val element: Element,
-) : SchemaAttributeCore, SchemaAttributeData.SE {
+) : SchemaAttributeCore, AttributeDataSE<Operation, RandomizedValue, Element> {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
         populateGenerationContext(context)
 

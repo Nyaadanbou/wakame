@@ -18,7 +18,7 @@ internal class LoreFinalizerImpl(
     override fun finalize(loreLines: Collection<LoreLine>): List<Component> {
         val holder = ObjectRBTreeSet(lineComparator)
         holder += loreLines
-        holder += config.fixedLoreLines
+        holder += config.constantLoreLines
         // Adding duplicates to RBTree set makes no difference to the set.
         // Hence, we add in the default lines at the end so that
         // the default lines won't be added in
@@ -34,12 +34,12 @@ internal class LoreFinalizerImpl(
         while (iterator.hasNext()) {
             val curr = iterator.next()
             realLoreSize += curr.lines.size
-            if (curr !is FixedLine) {
+            if (curr !is ConstantLoreLine) {
                 // curr 不是固定内容 - continue
                 continue
             }
 
-            val loreMeta = loreMetaLookup.getMeta<FixedLoreMeta>(curr.key)
+            val loreMeta = loreMetaLookup.getMeta<ConstantLoreMeta>(curr.key)
             val companionNamespace = loreMeta.companionNamespace
                 ?: continue // curr 对 companion namespace 没有要求，因此不考虑移除 - continue
 

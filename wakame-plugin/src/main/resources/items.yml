@@ -1,0 +1,92 @@
+# 物品
+
+# 一般
+general:
+  empty_cell_tooltips:
+    - "<!i><gray>空词条栏"
+
+# 元数据
+meta:
+  custom_name:
+    enabled: true
+    display_name: "自定义名字"
+    # 额外标签
+    # <rarity_name> 稀有度名字
+    # <rarity_style> 稀有度样式
+    tooltips:
+      single: "<!i><rarity_style><value>"
+
+  durability:
+    enabled: true
+    display_name: "耐久度"
+    # 额外标签
+    # <damage> 损耗值
+    # <max_damage> 最大损耗值
+    # <percent> 剩余耐久百分比
+    tooltips:
+      single: "<!i>保养度: <damage> / <max_damage>"
+
+  element:
+    enabled: true
+    display_name: "元素"
+    # 额外标签
+    # <merged> 多个元素合并后的文本
+    # <single> 单个元素
+    tooltips:
+      merged: "<!i>元素: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  item_name:
+    enabled: true
+    display_name: "物品名字"
+    # 额外标签
+    # <rarity_name> 稀有度名字
+    # <rarity_style> 稀有度样式
+    tooltips:
+      single: "<rarity_style><rarity_name> <value>"
+
+  kizami:
+    enabled: true
+    display_name: "铭刻"
+    # 额外标签
+    # <merged> 多个铭刻合并后的文本
+    # <single> 单个铭刻
+    tooltips:
+      merged: "<!i>铭刻: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  level:
+    enabled: true
+    display_name: "等级"
+    tooltips:
+      single: "<!i>等级: <value>"
+
+  lore:
+    enabled: true
+    display_name: "描述"
+    # 额外标签：
+    # <line> 描述内容
+    tooltips:
+      line: "<!i><line>"
+      header: [ ] # 空列表代表完全没有，不代表空行
+      bottom: [ ]
+
+  rarity:
+    enabled: true
+    display_name: "稀有度"
+    tooltips:
+      single: "<!i>稀有度: <value>"
+
+  skin:
+    enabled: true
+    display_name: "皮肤"
+    tooltips:
+      single: "<!i>皮肤: <value>"
+
+  skin_owner:
+    enabled: true
+    display_name: "皮肤所有者"
+    tooltips:
+      single: "<!i>皮肤所有者: <value>"

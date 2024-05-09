@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.registry.KizamiRegistry
@@ -41,8 +42,21 @@ value class BKizamiMeta(
     override fun remove() {
         accessor.rootOrNull?.remove(key.value())
     }
+
+    override fun provideDisplayLore(): LoreLine {
+        val kizami = get()
+        val key = Implementations.getLineKey(this)
+        val lines = tooltips.render(kizami, Kizami::displayName)
+        return ItemMetaLoreLine(key, lines)
+    }
+
+    private companion object : ItemMetaConfig(
+        ItemMetaConstants.KIZAMI
+    ) {
+        val tooltips: MergedTooltips = MergedTooltips()
+    }
 }
 
-internal fun BKizamiMeta?.getOrEmpty(): Set<Kizami> {
+fun BKizamiMeta?.getOrEmpty(): Set<Kizami> {
     return this?.getOrNull() ?: emptySet()
 }

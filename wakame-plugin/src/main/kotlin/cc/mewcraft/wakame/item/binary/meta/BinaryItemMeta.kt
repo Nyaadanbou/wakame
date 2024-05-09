@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.display.DisplayLoreProvider
 import cc.mewcraft.wakame.item.ItemMeta
 
 /**
@@ -10,7 +11,7 @@ import cc.mewcraft.wakame.item.ItemMeta
  * @param T the value "stored" in this [BinaryItemMeta]
  * @constructor the primary constructor must have a single parameter of type [ItemMetaAccessor]
  */
-sealed interface BinaryItemMeta<T> : ItemMeta {
+sealed interface BinaryItemMeta<T> : ItemMeta, DisplayLoreProvider {
 
     /**
      * Checks whether the item meta exists in the underlying data.

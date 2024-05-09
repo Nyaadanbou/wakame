@@ -6,6 +6,12 @@ import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.AttributeLoreLine
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.AttributeLoreMeta
+import cc.mewcraft.wakame.item.binary.cell.core.skill.SkillLoreLine
+import cc.mewcraft.wakame.item.binary.cell.core.skill.SkillLoreMeta
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaLoreLine
+import cc.mewcraft.wakame.item.binary.meta.ItemMetaLoreMeta
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -136,7 +142,7 @@ internal class RendererConfiguration(
     /**
      * 始终要渲染的内容。这些内容的文本在物品中始终不变。
      */
-    val fixedLoreLines: Collection<LoreLine> get() = _fixedLoreLines
+    val constantLoreLines: Collection<LoreLine> get() = _constantLoreLines
 
     /**
      * 带有默认值的内容。当源数据不存在时将采用这里的默认值。
@@ -146,14 +152,14 @@ internal class RendererConfiguration(
     private val _rawKeys: MutableSet<RawKey> = ConcurrentHashMap.newKeySet()
     private val _loreMetaLookup: MutableMap<FullKey, LoreMeta> = ConcurrentHashMap()
     private val _loreIndexLookup: MutableMap<FullKey, FullIndex> = ConcurrentHashMap()
-    private val _fixedLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
+    private val _constantLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
     private val _defaultLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
 
     private fun loadLayout() {
         _rawKeys.clear()
         _loreMetaLookup.clear()
         _loreIndexLookup.clear()
-        _fixedLoreLines.clear()
+        _constantLoreLines.clear()
         _defaultLoreLines.clear()
 
         val primaryLines by config.entry<List<String>>(RENDERER_LAYOUT_NODE, "primary")
@@ -185,7 +191,7 @@ internal class RendererConfiguration(
                 }
 
                 rawLine.startsWith(Namespaces.ITEM_META + ":") -> {
-                    ret = MetaLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
+                    ret = ItemMetaLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default)
                 }
 
                 else -> {
@@ -216,14 +222,14 @@ internal class RendererConfiguration(
                     // 解析为 '(fixed...)...'
                     "fixed" -> {
                         val companionNamespace = queue.peek() // nullable
-                        val customFixedText = matcher.group(2)
-                        loreMeta = if (customFixedText.isBlank()) {
+                        val customConstantText = matcher.group(2)
+                        loreMeta = if (customConstantText.isBlank()) {
                             // 解析为 '(fixed)无内容' 或 '(fixed:...)无内容'
-                            EmptyFixedLoreMeta(rawIndex, companionNamespace)
+                            EmptyConstantLoreMeta(rawIndex, companionNamespace)
                         } else {
                             // 解析为 '(fixed)有内容' 或 '(fixed:...)有内容'
-                            val fixedTexts = customFixedText.spiltAndDeserialize()
-                            CustomFixedLoreMeta(rawIndex, companionNamespace, fixedTexts)
+                            val constantText = customConstantText.spiltAndDeserialize()
+                            CustomConstantLoreMeta(rawIndex, companionNamespace, constantText)
                         }
                     }
 
@@ -271,9 +277,9 @@ internal class RendererConfiguration(
             // Minus one to neglect non-derived lines.
             accIndexOffset += fullIndexes.size - 1
 
-            // populate the fixed lore lines
-            if (loreMeta is FixedLoreMeta) {
-                _fixedLoreLines += FixedLineImpl(loreMeta.fullKeys.first(), loreMeta.components)
+            // populate the constant lore lines
+            if (loreMeta is ConstantLoreMeta) {
+                _constantLoreLines += ConstantLoreLine(loreMeta.fullKeys.first(), loreMeta.components)
             }
 
             // populate the default lore lines
@@ -283,9 +289,10 @@ internal class RendererConfiguration(
                 // if the lore meta has a default value, add it to the default lore lines
                 _defaultLoreLines += loreMeta.fullKeys.map { key ->
                     when (loreMeta) {
-                        is MetaLoreMeta -> ItemMetaLineImpl(key, default)
-                        is AttributeLoreMeta -> AttributeLineImpl(key, default)
-                        is SkillLoreMeta -> SkillLineImpl(key, default)
+                        is AttributeLoreMeta -> AttributeLoreLine(key, default)
+                        is ItemMetaLoreMeta -> ItemMetaLoreLine(key, default)
+                        is SkillLoreMeta -> SkillLoreLine(key, default)
+                        else -> error("Unknown option '$key'")
                     }
                 }
             }

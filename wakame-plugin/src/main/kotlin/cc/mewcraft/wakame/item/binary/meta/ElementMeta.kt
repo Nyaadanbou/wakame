@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -43,8 +44,20 @@ value class BElementMeta(
     fun set(value: Collection<Element>) {
         set(value.toHashSet())
     }
+
+    override fun provideDisplayLore(): LoreLine {
+        val key = Implementations.getLineKey(this)
+        val lines = tooltips.render(get(), Element::displayName)
+        return ItemMetaLoreLine(key, lines)
+    }
+
+    private companion object : ItemMetaConfig(
+        ItemMetaConstants.ELEMENT
+    ) {
+        val tooltips: MergedTooltips = MergedTooltips()
+    }
 }
 
-internal fun BElementMeta?.getOrEmpty(): Set<Element> {
+fun BElementMeta?.getOrEmpty(): Set<Element> {
     return this?.getOrNull() ?: emptySet()
 }

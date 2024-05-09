@@ -1,21 +1,16 @@
 package cc.mewcraft.wakame.item.binary.cell.core.attribute
 
-import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
-import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.CoreBinaryKeys
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import java.lang.invoke.MethodHandle
 import java.util.EnumMap
-import java.util.UUID
 
 //
 // 数据类，本身储存数据
@@ -32,18 +27,6 @@ internal data class BinaryAttributeCoreDataHolderS(
         putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
         putOperation(operation)
     }
-
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
-    }
-
-    override fun provideTagResolverForPlay(): TagResolver {
-        throw UnsupportedOperationException()
-    }
-
-    override fun provideTagResolverForShow(): TagResolver {
-        throw UnsupportedOperationException()
-    }
 }
 
 internal data class BinaryAttributeCoreDataHolderR(
@@ -59,18 +42,6 @@ internal data class BinaryAttributeCoreDataHolderR(
         putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)
         putOperation(operation)
     }
-
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
-    }
-
-    override fun provideTagResolverForPlay(): TagResolver {
-        throw UnsupportedOperationException()
-    }
-
-    override fun provideTagResolverForShow(): TagResolver {
-        throw UnsupportedOperationException()
-    }
 }
 
 internal data class BinaryAttributeCoreDataHolderSE(
@@ -85,18 +56,6 @@ internal data class BinaryAttributeCoreDataHolderSE(
         putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
         putElement(element)
         putOperation(operation)
-    }
-
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
-    }
-
-    override fun provideTagResolverForPlay(): TagResolver {
-        throw UnsupportedOperationException()
-    }
-
-    override fun provideTagResolverForShow(): TagResolver {
-        throw UnsupportedOperationException()
     }
 }
 
@@ -114,18 +73,6 @@ internal data class BinaryAttributeCoreDataHolderRE(
         putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)
         putElement(element)
         putOperation(operation)
-    }
-
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
-    }
-
-    override fun provideTagResolverForPlay(): TagResolver {
-        throw UnsupportedOperationException()
-    }
-
-    override fun provideTagResolverForShow(): TagResolver {
-        throw UnsupportedOperationException()
     }
 }
 

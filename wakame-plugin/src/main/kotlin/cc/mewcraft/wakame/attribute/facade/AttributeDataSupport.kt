@@ -7,7 +7,7 @@ package cc.mewcraft.wakame.attribute.facade
 */
 
 /**
- * Represents possible components of attribute values.
+ * Represents possible components of the attribute values.
  *
  * These interfaces serve as clarifying class hierarchy. You should
  * not directly implement these interfaces. Check the subtypes of
@@ -109,23 +109,4 @@ interface AttributeDataRE<OP, R, E> :
     override val lower: R
     override val upper: R
     override val element: E
-}
-
-/*
-   Below are top-level interfaces.
-
-   You should not directly implement them.
-
-   Instead, you create your own interfaces extending them,
-   so that you can get rid of the generic parameters
-   in your implementations and call sites.
-*/
-
-/**
- * An encoder.
- *
- * Data flow: [Arbitrary Object][E] -> [Attribute Value][V]
- */
-interface AttributeDataEncoder<E, V : AttributeData> {
-    fun encode(e: E): V
 }

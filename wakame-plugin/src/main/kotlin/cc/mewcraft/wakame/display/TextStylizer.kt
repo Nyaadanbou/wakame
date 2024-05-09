@@ -14,27 +14,28 @@ import net.kyori.examination.Examinable
 import kotlin.reflect.KClass
 
 /**
- * 为给定 [NekoStack] 的 Name 和 Lore 生成格式化后的内容。
+ * Generates stylized name and lore for a [NekoStack].
  */
 internal interface TextStylizer {
 
     /**
-     * 为给定的 [item] 生成名字。
+     * Generates a custom name for the [item]。
      *
-     * 不像 [stylizeLore]，该函数生成的内容可以直接用在物品上。
+     * Unlike [stylizeLore], the returned component is ready to be used
+     * on the item.
      *
-     * 该函数不会修改给定的 [item].
+     * This function won't modify the given [item].
      *
-     * @param item 要生成名字的物品
-     * @return 生成的物品名字
+     * @param item the item to generate name for
+     * @return the generated name
      */
     fun stylizeName(item: NekoStack): Component
 
     /**
-     * Generates [lore lines][LoreLine] from the [item]. The returned
+     * Generates [lore lines][LoreLine] for the [item]. The returned
      * [lore lines][LoreLine] need to be **finalized** before they are used
      * on [item]. Also, the returned collection should not contain any
-     * [fixed lore lines][FixedLine].
+     * [constant lore lines][ConstantLoreLine].
      *
      * This function won't modify the given [item].
      *

@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Tool
 import cc.mewcraft.wakame.item.schema.meta.ToolRule
@@ -12,12 +14,6 @@ import net.kyori.adventure.key.Key
 value class BToolMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Tool> {
-    companion object {
-        private const val RULES_TAG = "rules"
-        private const val DEFAULT_MINING_SPEED_TAG = "default_mining_speed"
-        private const val DAMAGE_PER_BLOCK_TAG = "damage_per_block"
-    }
-
     override val key: Key
         get() = ItemMetaConstants.createKey { TOOL }
     override val exists: Boolean
@@ -99,5 +95,20 @@ value class BToolMeta(
 
     override fun remove() {
         accessor.rootOrNull?.remove(key.value())
+    }
+
+    override fun provideDisplayLore(): LoreLine {
+        // TODO 等待组件相关API的到来
+        return NoopLoreLine
+    }
+
+    private companion object : ItemMetaConfig(
+        ItemMetaConstants.SKIN
+    ) {
+        const val RULES_TAG = "rules"
+        const val DEFAULT_MINING_SPEED_TAG = "default_mining_speed"
+        const val DAMAGE_PER_BLOCK_TAG = "damage_per_block"
+
+        val tooltips: SingleTooltips = SingleTooltips()
     }
 }

@@ -1,26 +1,22 @@
 package cc.mewcraft.wakame.item.binary.cell.core.attribute
 
-import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.CoreBinaryKeys
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.getByteOrNull
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import java.util.UUID
 
 //
 // 封装类（封装 NBT 对象），本身不储存数据
 //
 
 internal class BinaryAttributeCoreTagWrapperS(
-    val compound: CompoundShadowTag,
+    private val compound: CompoundShadowTag,
 ) : BinaryAttributeCoreS() {
     override val key: Key
         get() = compound.getIdentifier()
@@ -37,25 +33,13 @@ internal class BinaryAttributeCoreTagWrapperS(
         return compound
     }
 
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
-    }
-
-    override fun provideTagResolverForPlay(): TagResolver {
-        TODO("Not yet implemented")
-    }
-
-    override fun provideTagResolverForShow(): TagResolver {
-        TODO("Not yet implemented")
-    }
-
     override fun toString(): String {
         return compound.asString()
     }
 }
 
 internal class BinaryAttributeCoreTagWrapperR(
-    val compound: CompoundShadowTag,
+    private val compound: CompoundShadowTag,
 ) : BinaryAttributeCoreR() {
     override val key: Key
         get() = compound.getIdentifier()
@@ -74,25 +58,13 @@ internal class BinaryAttributeCoreTagWrapperR(
         return compound
     }
 
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
-    }
-
-    override fun provideTagResolverForPlay(): TagResolver {
-        TODO("Not yet implemented")
-    }
-
-    override fun provideTagResolverForShow(): TagResolver {
-        TODO("Not yet implemented")
-    }
-
     override fun toString(): String {
         return compound.asString()
     }
 }
 
 internal class BinaryAttributeCoreTagWrapperSE(
-    val compound: CompoundShadowTag,
+    private val compound: CompoundShadowTag,
 ) : BinaryAttributeCoreSE() {
     override val key: Key
         get() = compound.getIdentifier()
@@ -111,25 +83,13 @@ internal class BinaryAttributeCoreTagWrapperSE(
         return compound
     }
 
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
-    }
-
-    override fun provideTagResolverForPlay(): TagResolver {
-        TODO("Not yet implemented")
-    }
-
-    override fun provideTagResolverForShow(): TagResolver {
-        TODO("Not yet implemented")
-    }
-
     override fun toString(): String {
         return compound.asString()
     }
 }
 
 internal class BinaryAttributeCoreTagWrapperRE(
-    val compound: CompoundShadowTag,
+    private val compound: CompoundShadowTag,
 ) : BinaryAttributeCoreRE() {
     override val key: Key
         get() = compound.getIdentifier()
@@ -148,18 +108,6 @@ internal class BinaryAttributeCoreTagWrapperRE(
 
     override fun asTag(): ShadowTag {
         return compound
-    }
-
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].MODIFIER_FACTORY.makeAttributeModifiers(uuid, this)
-    }
-
-    override fun provideTagResolverForPlay(): TagResolver {
-        TODO("Not yet implemented")
-    }
-
-    override fun provideTagResolverForShow(): TagResolver {
-        TODO("Not yet implemented")
     }
 
     override fun toString(): String {

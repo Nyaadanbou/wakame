@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.util.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
 //
 // 数据类，本身储存数据
@@ -26,15 +25,6 @@ internal data class BinarySkillCoreDataHolder(
         putIdentifier(key)
         putTrigger(trigger)
     }
-
-    override fun provideTagResolverForPlay(): TagResolver {
-        TODO("Not yet implemented")
-    }
-
-    override fun provideTagResolverForShow(): TagResolver {
-        TODO("Not yet implemented")
-    }
-
 }
 
 private fun CompoundShadowTag.putIdentifier(id: Key) {

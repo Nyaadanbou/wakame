@@ -39,7 +39,7 @@ object BinaryCellFactory {
      * @return a new [BinaryCell]
      */
     fun wrap(compound: CompoundShadowTag): BinaryCell {
-        return BinaryCellNBTWrapper(compound)
+        return BinaryCellTagWrapper(compound)
     }
 
     /**

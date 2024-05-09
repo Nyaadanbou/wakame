@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Durability
 import cc.mewcraft.wakame.util.CompoundShadowTag
@@ -7,18 +8,16 @@ import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.toStableShort
 import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 
 @JvmInline
 value class BDurabilityMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<Durability> {
-    companion object {
-        private const val THRESHOLD_TAG = "threshold"
-        private const val DAMAGE_TAG = "damage"
-    }
-
     override val key: Key
         get() = ItemMetaConstants.createKey { DURABILITY }
+
     override val exists: Boolean
         get() = accessor.rootOrNull?.contains(ItemMetaConstants.DURABILITY, ShadowTagType.COMPOUND) ?: false
 
@@ -83,4 +82,24 @@ value class BDurabilityMeta(
         accessor.rootOrNull?.remove(key.value())
     }
 
+    override fun provideDisplayLore(): LoreLine {
+        val durability = get()
+        val key = Implementations.getLineKey(this)
+        val text = Implementations.mini().deserialize(
+            tooltips.single,
+            Placeholder.component("threshold", text(durability.threshold)),
+            Placeholder.component("damage", text(durability.damage)),
+            Placeholder.component("percent", text(durability.damagePercent))
+        )
+        return ItemMetaLoreLine(key, listOf(text))
+    }
+
+    private companion object : ItemMetaConfig(
+        ItemMetaConstants.DURABILITY
+    ) {
+        const val THRESHOLD_TAG = "threshold"
+        const val DAMAGE_TAG = "damage"
+
+        val tooltips: SingleTooltips = SingleTooltips()
+    }
 }

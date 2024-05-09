@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell.core
 
-import cc.mewcraft.wakame.display.TagResolverProvider
+import cc.mewcraft.wakame.display.DisplayLoreProvider
 import cc.mewcraft.wakame.item.Core
 import cc.mewcraft.wakame.item.TagLike
 import cc.mewcraft.wakame.item.binary.cell.core.empty.BinaryEmptyCore
@@ -24,7 +24,7 @@ import cc.mewcraft.wakame.item.binary.cell.core.noop.BinaryNoopCore
  * [core][Core] being a data representation that could be directly
  * used in the world state.
  */
-interface BinaryCore : Core, TagResolverProvider, TagLike {
+interface BinaryCore : Core, TagLike, DisplayLoreProvider {
     /**
      * Clears the core so that it becomes empty.
      *

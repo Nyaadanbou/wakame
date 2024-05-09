@@ -4,14 +4,14 @@ import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 
 /**
- * 代表 Item Lore 中的顺序和相关信息。这是一个顶层接口。
+ * 代表 [Item Lore](https://minecraft.wiki/w/Data_component_format#lore) 中的顺序，以及相关信息。这是一个顶层接口。
  *
- * 注意与 [LoreLine] 区别 - [LoreMeta] 代表顺序和其他信息，而 [LoreLine] 仅代表内容。
+ * 注意与 [LoreLine] 区别 - [LoreMeta] 描述的是顺序及其他信息，而 [LoreLine] 仅代表内容。
  *
  * @see LoreLine
  * @see LoreMetaLookup
  */
-internal sealed interface LoreMeta {
+internal interface LoreMeta {
     /**
      * 在配置文件内的“原始 Key”（即配置文件的列表中，未经衍生的字符串值）。
      */
@@ -86,15 +86,11 @@ internal sealed interface LoreMeta {
 }
 
 /**
- * 代表**动态内容**的 [LoreMeta].
+ * 代表内容动态变化的 [LoreMeta].
  *
- * 动态内容将在发包时根据物品的数据动态生成。
- *
- * @see MetaLoreMeta
- * @see SkillLoreMeta
- * @see AttributeLoreMeta
+ * 动态内容将根据物品的具体数据动态生成。
  */
-internal sealed interface DynamicLoreMeta : LoreMeta {
+internal interface DynamicLoreMeta : LoreMeta {
     /**
      * 内容的默认值。如果源数据不存在，将渲染默认值，而不是跳过渲染。
      *
@@ -104,14 +100,14 @@ internal sealed interface DynamicLoreMeta : LoreMeta {
 }
 
 /**
- * 代表**固定内容**的 [LoreMeta].
+ * 代表内容始终不变的 [LoreMeta].
  *
  * 固定内容在配置文件中就早已经定义好。
  *
- * @see CustomFixedLoreMeta
- * @see EmptyFixedLoreMeta
+ * @see CustomConstantLoreMeta
+ * @see EmptyConstantLoreMeta
  */
-internal sealed interface FixedLoreMeta : LoreMeta {
+internal interface ConstantLoreMeta : LoreMeta {
     /**
      * 该固定内容的文本。
      */

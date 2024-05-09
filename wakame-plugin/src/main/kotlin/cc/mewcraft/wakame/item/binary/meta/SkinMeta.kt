@@ -1,11 +1,13 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.registry.ItemSkinRegistry
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.util.getShortOrNull
 import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 
 /**
  * 物品的皮肤。
@@ -31,5 +33,18 @@ value class BSkinMeta(
 
     override fun set(value: ItemSkin) {
         accessor.rootOrCreate.putShort(key.value(), value.binaryId)
+    }
+
+    override fun provideDisplayLore(): LoreLine {
+        val skin = get()
+        val key = Implementations.getLineKey(this)
+        val lines = Implementations.mini().deserialize(tooltips.single, Placeholder.component("value", skin.displayName))
+        return ItemMetaLoreLine(key, listOf(lines))
+    }
+
+    private companion object : ItemMetaConfig(
+        ItemMetaConstants.SKIN
+    ) {
+        val tooltips: SingleTooltips = SingleTooltips()
     }
 }

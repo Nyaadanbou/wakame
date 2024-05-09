@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Food
 import cc.mewcraft.wakame.util.CompoundShadowTag
@@ -170,5 +172,10 @@ value class BFoodMeta(
 
     override fun remove() {
         accessor.rootOrNull?.remove(key.value())
+    }
+
+    override fun provideDisplayLore(): LoreLine {
+        // TODO("等待组件相关API的到来")
+        return NoopLoreLine
     }
 }

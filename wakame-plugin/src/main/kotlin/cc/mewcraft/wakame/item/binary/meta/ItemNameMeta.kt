@@ -18,17 +18,19 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
 /**
- * 物品的自定义名字(MiniMessage).
+ * 物品的名字。
+ *
+ * 注意区别于 [BDisplayNameMeta]。
  */
 @JvmInline
-value class BDisplayNameMeta(
+value class BItemNameMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<String>, DisplayNameProvider {
     override val key: Key
-        get() = ItemMetaConstants.createKey { DISPLAY_NAME }
+        get() = ItemMetaConstants.createKey { ITEM_NAME }
 
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.DISPLAY_NAME, ShadowTagType.STRING) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.ITEM_NAME, ShadowTagType.STRING) ?: false
 
     override fun getOrNull(): String? {
         return accessor.rootOrNull?.getStringOrNull(key.value())
@@ -47,7 +49,9 @@ value class BDisplayNameMeta(
     }
 
     override fun provideDisplayName(): Component {
-        val displayName = getOrNull() ?: return DisplayNameImplementations.EMPTY
+        // 代码复制于 DisplayNameMeta
+
+        val displayName = getOrNull() ?: return ItemNameImplementations.EMPTY
 
         val resolvers = TagResolver.builder().apply {
 
@@ -56,24 +60,24 @@ value class BDisplayNameMeta(
 
             // create <rarity_name> & <rarity_style> tags
             val rarityOrDefault = accessor.item.getMetaAccessor<BRarityMeta>().getOrDefault()
-            resolvers(DisplayNameImplementations.CACHE[rarityOrDefault])
+            resolvers(ItemNameImplementations.CACHE[rarityOrDefault])
         }
 
         return Implementations.mini().deserialize(tooltips.single, resolvers.build())
     }
 
     private companion object : ItemMetaConfig(
-        ItemMetaConstants.DISPLAY_NAME
+        ItemMetaConstants.ITEM_NAME
     ) {
         val tooltips: SingleTooltips = SingleTooltips()
     }
 }
 
-fun BDisplayNameMeta?.getOrEmpty(): String {
+fun BItemNameMeta?.getOrEmpty(): String {
     return this?.getOrNull() ?: ""
 }
 
-private object DisplayNameImplementations {
+private object ItemNameImplementations {
     val EMPTY: Component = text("Unnamed")
     val CACHE: LoadingCache<Rarity, TagResolver> by ReloadableProperty {
         Caffeine.newBuilder().build { rarity ->

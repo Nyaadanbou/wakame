@@ -6,10 +6,12 @@ import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.ShowNekoStack
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.*
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.named
+import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.withOptions
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
-import org.koin.dsl.binds
 import org.koin.dsl.module
 
 const val RENDERER_CONFIG_FILE = "renderer.yml"
@@ -41,26 +43,16 @@ internal fun displayModule(): Module = module {
                 it.kregister(OperationFormatSerializer)
             }
         })
-    } binds arrayOf(Initializable::class)
+    } bind Initializable::class
 
     // meta lookup
     single<LoreMetaLookup> {
-        val config = get<RendererConfiguration>()
-        LoreMetaLookupImpl(config.loreIndexLookup, config.loreMetaLookup)
+        get<RendererConfiguration>().let { LoreMetaLookupImpl(it.loreIndexLookup, it.loreMetaLookup) }
     }
 
     // text stylizers
-    single<TextStylizer> {
-        TextStylizerImpl(
-            itemMetaStylizer = new(::ItemMetaStylizerImpl),
-            skillStylizer = new(::SkillStylizerImpl),
-            attributeStylizer = AttributeStylizerImpl(get(), new(::OperationStylizerImpl)),
-            itemMetaKeySupplier = new(::ItemMetaKeySupplierImpl),
-            skillKeySupplier = new(::SkillKeySupplierImpl),
-            attributeKeySupplier = new(::AttributeKeySupplierImpl)
-        )
-    }
+    single<TextStylizer> { TextStylizerImpl() }
 
     // lore finalizer
-    singleOf(::LoreFinalizerImpl) bind LoreFinalizer::class
+    single<LoreFinalizer> { LoreFinalizerImpl(get(), get()) }
 }

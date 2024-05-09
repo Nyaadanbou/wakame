@@ -5,7 +5,7 @@ internal interface LoreMetaLookup {
      * 获取指定的 [key] 在 Item Lore 中的顺序。数值越小，越靠前面。
      *
      * @throws IllegalArgumentException
-     * @see LineKeySupplier.get
+     * @see LineKeyFactory.get
      */
     fun getIndex(key: FullKey): FullIndex =
         requireNotNull(getIndexOrNull(key)) { "Can't find full index with key '$key'" }

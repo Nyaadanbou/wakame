@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.item.binary.BaseNekoStack
+import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.registry.ItemMetaRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
@@ -12,12 +13,12 @@ import kotlin.reflect.KClass
 
 @JvmInline
 internal value class ItemMetaAccessorImpl(
-    val base: BaseNekoStack,
+    override val item: BaseNekoStack,
 ) : KoinComponent, ItemMetaAccessor {
     override val rootOrNull: CompoundShadowTag?
-        get() = base.tags.getCompoundOrNull(Namespaces.ITEM_META)
+        get() = item.tags.getCompoundOrNull(Namespaces.ITEM_META)
     override val rootOrCreate: CompoundShadowTag
-        get() = base.tags.getOrPut(Namespaces.ITEM_META, CompoundShadowTag::create)
+        get() = item.tags.getOrPut(Namespaces.ITEM_META, CompoundShadowTag::create)
 
     override val snapshot: Set<BinaryItemMeta<*>>
         get() {
@@ -47,6 +48,7 @@ internal value class ItemMetaAccessorImpl(
  * 该实现仅用来创建“空的” [BinaryItemMeta]，没有任何其他作用。
  */
 internal object ItemMetaAccessorNoop : ItemMetaAccessor {
+    override val item: NekoStack get() = throw UnsupportedOperationException()
     override val rootOrNull: CompoundShadowTag get() = throw UnsupportedOperationException()
     override val rootOrCreate: CompoundShadowTag get() = throw UnsupportedOperationException()
     override val snapshot: Set<BinaryItemMeta<*>> get() = throw UnsupportedOperationException()

@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.annotation.ConfigPath
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
@@ -11,7 +13,9 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.*
 import kotlin.reflect.typeOf
 
-internal object ItemMetaRegistry : Initializable {
+object ItemMetaRegistry : Initializable {
+    internal val CONFIG by lazy { Configs.YAML["items.yml"].node("meta") }
+
     internal object Binary {
         private val itemMetaReflectionLookupByClass: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMetaReflection> = run {
             // Get all subclasses of BinaryItemMeta
@@ -36,9 +40,9 @@ internal object ItemMetaRegistry : Initializable {
                 BinaryItemMetaReflection(clazz as KClass<BinaryItemMeta<*>>, constructors[clazz]!!)
             }.let(::Object2ObjectOpenHashMap)
         }
-
-        private val itemMetaReflectionLookupByString: Map<String, BinaryItemMetaReflection> =
+        private val itemMetaReflectionLookupByString: Map<String, BinaryItemMetaReflection> = run {
             itemMetaReflectionLookupByClass.values.associateBy { reflect -> reflect.constructor.invoke(ItemMetaAccessorNoop).key.value() }
+        }
 
         fun reflections(): Collection<BinaryItemMetaReflection> {
             return itemMetaReflectionLookupByClass.values

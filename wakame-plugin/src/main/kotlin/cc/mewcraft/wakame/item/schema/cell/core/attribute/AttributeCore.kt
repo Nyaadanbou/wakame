@@ -23,8 +23,7 @@ import org.spongepowered.configurate.ConfigurationNode
  */
 fun SchemaAttributeCore(node: ConfigurationNode): SchemaAttributeCore {
     val key = node.node("key").krequire<Key>()
-    val schemaEncoder = AttributeRegistry.FACADES[key].SCHEMA_CORE_NODE_ENCODER
-    val schemaAttributeCore = schemaEncoder.encode(node)
+    val schemaAttributeCore = AttributeRegistry.FACADES[key].schemaCoreCreatorByConfig(node)
     return schemaAttributeCore
 }
 

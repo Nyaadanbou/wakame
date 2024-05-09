@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell
 
+import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.ReforgeBinaryKeys
@@ -15,7 +16,7 @@ import me.lucko.helper.shadows.nbt.ShadowTag
 import kotlin.reflect.KClass
 import kotlin.reflect.full.safeCast
 
-private object Impl {
+private object Implementations {
     fun <T : BinaryCore> typedCore(instance: BinaryCell, clazz: KClass<T>): T? {
         return clazz.safeCast(instance.core)
     }
@@ -30,8 +31,13 @@ internal data class BinaryCellDataHolder(
     override var curse: BinaryCurse,
     override var reforge: ReforgeDataHolder,
 ) : BinaryCell {
-    override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? = Impl.typedCore(this, clazz)
-    override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? = Impl.typedCurse(this, clazz)
+    override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? {
+        return Implementations.typedCore(this, clazz)
+    }
+
+    override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? {
+        return Implementations.typedCurse(this, clazz)
+    }
 
     override fun asTag(): ShadowTag = CompoundShadowTag {
         // 当对应的数据不存在时，这里的每个 asShadowTag()
@@ -40,9 +46,13 @@ internal data class BinaryCellDataHolder(
         put(CurseBinaryKeys.BASE, curse.asTag())
         put(ReforgeBinaryKeys.BASE, reforge.asTag())
     }
+
+    override fun provideDisplayLore(): LoreLine {
+        throw UnsupportedOperationException()
+    }
 }
 
-internal data class BinaryCellNBTWrapper(
+internal data class BinaryCellTagWrapper(
     private val compound: CompoundShadowTag,
 ) : BinaryCell {
     override var core: BinaryCore
@@ -69,8 +79,23 @@ internal data class BinaryCellNBTWrapper(
             compound.put(ReforgeBinaryKeys.BASE, value.asTag())
         }
 
-    override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? = Impl.typedCore(this, clazz)
-    override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? = Impl.typedCurse(this, clazz)
-    override fun asTag(): ShadowTag = compound
-    override fun toString(): String = compound.asString()
+    override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? {
+        return Implementations.typedCore(this, clazz)
+    }
+
+    override fun <T : BinaryCurse> typedCurse(clazz: KClass<T>): T? {
+        return Implementations.typedCurse(this, clazz)
+    }
+
+    override fun asTag(): ShadowTag {
+        return compound
+    }
+
+    override fun provideDisplayLore(): LoreLine {
+        return core.provideDisplayLore()
+    }
+
+    override fun toString(): String {
+        return compound.asString()
+    }
 }

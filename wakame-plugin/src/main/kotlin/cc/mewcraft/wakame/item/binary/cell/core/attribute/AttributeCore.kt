@@ -2,59 +2,69 @@
 
 package cc.mewcraft.wakame.item.binary.cell.core.attribute
 
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.facade.AttributeComponent
-import cc.mewcraft.wakame.attribute.facade.AttributeData
-import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
-import cc.mewcraft.wakame.attribute.facade.BinaryAttributeData
+import cc.mewcraft.wakame.attribute.facade.*
+import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
+import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.ExaminableProperty
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import java.util.UUID
 import java.util.stream.Stream
 
 /**
  * A binary core of an attribute.
  *
- * This is a top-level interface.
+ * This is the base class of binary attribute core.
  */
-sealed interface BinaryAttributeCore : BinaryCore, AttributeData, AttributeComponent.Op<Operation>, AttributeModifierProvider
+sealed class BinaryAttributeCore : BinaryCore, AttributeComponent.Op<Operation>, AttributeModifierProvider {
+    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
+        return AttributeRegistry.FACADES[key].attributeModifierCreator(uuid, this)
+    }
+
+    override fun provideDisplayLore(): LoreLine {
+        val lineKey = Implementations.DISPLAY_KEY_FACTORY.get(this)
+        val lineText = AttributeRegistry.FACADES[key].displayTextCreator(this)
+        return AttributeLoreLine(lineKey, lineText)
+    }
+
+    override fun toString(): String = toSimpleString()
+}
 
 /* Specific types of BinaryAttributeCore */
 
-sealed class BinaryAttributeCoreS : BinaryAttributeCore, BinaryAttributeData.S {
+sealed class BinaryAttributeCoreS : BinaryAttributeCore(), AttributeDataS<Operation, Double> {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("value", value),
     )
-
-    override fun toString(): String = toSimpleString()
 }
 
-sealed class BinaryAttributeCoreR : BinaryAttributeCore, BinaryAttributeData.R {
+sealed class BinaryAttributeCoreR : BinaryAttributeCore(), AttributeDataR<Operation, Double> {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("lower", lower),
         ExaminableProperty.of("upper", upper),
     )
-
-    override fun toString(): String = toSimpleString()
 }
 
-sealed class BinaryAttributeCoreSE : BinaryAttributeCore, BinaryAttributeData.SE {
+sealed class BinaryAttributeCoreSE : BinaryAttributeCore(), AttributeDataSE<Operation, Double, Element> {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("value", value),
         ExaminableProperty.of("element", element),
     )
-
-    override fun toString(): String = toSimpleString()
 }
 
-sealed class BinaryAttributeCoreRE : BinaryAttributeCore, BinaryAttributeData.RE {
+sealed class BinaryAttributeCoreRE : BinaryAttributeCore(), AttributeDataRE<Operation, Double, Element> {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
@@ -62,8 +72,6 @@ sealed class BinaryAttributeCoreRE : BinaryAttributeCore, BinaryAttributeData.RE
         ExaminableProperty.of("upper", upper),
         ExaminableProperty.of("element", element),
     )
-
-    override fun toString(): String = toSimpleString()
 }
 
 /* Some useful extension functions */
@@ -87,3 +95,7 @@ val BinaryAttributeCore.upper: Double
     get() = requireNotNull(upperOrNull) { "The 'upper' component is not present" }
 val BinaryAttributeCore.upperOrNull: Double?
     get() = (this as? AttributeComponent.Ranged<Double>)?.upper
+
+private object Implementations : KoinComponent {
+    val DISPLAY_KEY_FACTORY: AttributeLineKeyFactory by inject()
+}
