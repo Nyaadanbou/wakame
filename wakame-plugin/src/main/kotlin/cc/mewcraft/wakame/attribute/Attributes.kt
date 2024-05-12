@@ -2,7 +2,6 @@
 
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.element.Element
 import java.util.concurrent.ConcurrentHashMap
 
@@ -14,14 +13,13 @@ import java.util.concurrent.ConcurrentHashMap
  * of a certain attribute are decided by the most common default values
  * among all the attributes of the same type.
  */
-@OptIn(InternalApi::class)
 object Attributes {
     /**
      * An empty attribute that does nothing on its own.
      *
      * It only serves as a special value for other systems to use.
      */
-    val EMPTY = Attribute("empty", false, 0.0)
+    val EMPTY = Attribute("empty", 0.0)
 
     /*
        Vanilla-backed Attributes
@@ -30,11 +28,11 @@ object Attributes {
        as backend to make them effective in game.
      */
 
-    val MAX_HEALTH = RangedAttribute("max_health", true, 20.0, 1.0, 16384.0)
-    val MAX_ABSORPTION = RangedAttribute("max_absorption", true, .0, .0, 2048.0)
-    val MOVEMENT_SPEED = RangedAttribute("movement_speed", true, .0, -1.0, +4.0)
-    val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", true, 4.5, 1.0, 64.0)
-    val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", true, 3.0, 1.0, 64.0)
+    val MAX_HEALTH = RangedAttribute("max_health", 20.0, 1.0, 16384.0, true)
+    val MAX_ABSORPTION = RangedAttribute("max_absorption", .0, .0, 2048.0, true)
+    val MOVEMENT_SPEED = RangedAttribute("movement_speed", .0, -1.0, 4.0, true)
+    val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", 4.5, 1.0, 64.0, true)
+    val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", 3.0, 1.0, 64.0, true)
 
     /*
        Independent Attributes
@@ -65,7 +63,7 @@ object Attributes {
        Each of these attribute is associated with a certain element.
      */
 
-    private val elementAttributeMap: ConcurrentHashMap<Element, ElementAttributes> = ConcurrentHashMap()
+    private val ELEMENT_ATTRIBUTES: ConcurrentHashMap<Element, ElementAttributes> = ConcurrentHashMap()
 
     /**
      * Gets an [element attribute][ElementAttribute] by the specific [element].
@@ -86,7 +84,7 @@ object Attributes {
      * @return the holder of the specific element attribute you want
      */
     fun byElement(element: Element): ElementAttributes {
-        return elementAttributeMap.computeIfAbsent(element) {
+        return ELEMENT_ATTRIBUTES.computeIfAbsent(element) {
             ElementAttributes(element)
         }
     }
@@ -117,14 +115,12 @@ object Attributes {
  * A holder that holds all default [ElementAttribute] instances for an
  * [Element].
  */
-@OptIn(InternalApi::class)
-class ElementAttributes
-@InternalApi internal constructor(
+class ElementAttributes internal constructor(
     element: Element,
 ) {
     val DEFENSE = ElementAttribute("defense", .0, -16384.0, 16384.0, element)
     val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element)
     val DEFENSE_PENETRATION_RATE = ElementAttribute("defense_penetration_rate", .0, -1.0, 1.0, element)
-    val MIN_ATTACK_DAMAGE = ElementAttribute("min_attack_damage", .0, .0, 16384.0, element)
-    val MAX_ATTACK_DAMAGE = ElementAttribute("max_attack_damage", .0, .0, 16384.0, element)
+    val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element)
+    val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element)
 }

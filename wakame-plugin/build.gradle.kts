@@ -36,6 +36,7 @@ dependencies {
     compileOnly(libs.asm.commons) // ^
     implementation(libs.bytebuddy)
     implementation(libs.bytebuddy.agent)
+    implementation(libs.commons.collections)
     implementation(libs.commons.provider)
     implementation(libs.mocha)
     implementation(platform(libs.bom.adventure))

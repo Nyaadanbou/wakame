@@ -91,9 +91,7 @@ object AttributeRegistry : Initializable {
      */
     private fun registerFacades() {
         // Register special attribute
-        +buildFacade("empty", BYTE).single().bind {
-            EMPTY
-        }
+        +buildFacade("empty", BYTE).single().bind { EMPTY }
 
         // Registry more attribute facades here ...
         +buildFacade("attack_damage", SHORT).ranged().element().bind(
@@ -465,7 +463,7 @@ private class DiscreteTooltips(
         .entry<Map<Int, String>>("mappings")
         .map { map ->
             map.withDefault { int ->
-                "??? ($int)"
+                "??? ($int)" // fallback for unknown discrete values
             }.mapValues { (_, v) ->
                 AttributeRegistrySupport.mini().deserialize(v)
             }
@@ -510,14 +508,14 @@ private class SingleSelectionImpl(
         val facade = MutableAttributeFacadeImpl(
             key = id,
             config = config,
+            attributeComponentMetadata = AttributeComponentMetadataImpl(
+                AttributeComponent.Op::class, AttributeComponent.Single::class
+            ),
             attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreS ->
                 ImmutableMap.of(
                     Attributes.component(), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
                 )
             },
-            attributeComponentMetadata = AttributeComponentMetadataImpl(
-                AttributeComponent.Op::class, AttributeComponent.Single::class
-            ),
             schemaCoreCreatorByConfig = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getSchemaSingle()
@@ -637,7 +635,9 @@ private class SingleElementAttributeBinderImpl(
                 val element = node.getElement()
                 BinaryAttributeCoreDataHolderSE(id, tagType, operation, value, element)
             },
-            binaryCoreCreatorByTag = { tag: CompoundShadowTag -> BinaryAttributeCoreTagWrapperSE(tag) },
+            binaryCoreCreatorByTag = { tag: CompoundShadowTag ->
+                BinaryAttributeCoreTagWrapperSE(tag)
+            },
             displayTextCreator = { core: BinaryAttributeCoreSE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("value", core.value)

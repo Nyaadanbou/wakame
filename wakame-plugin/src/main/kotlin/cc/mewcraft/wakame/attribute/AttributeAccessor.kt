@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.user.PlayerAdapter
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.UserManager
-import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -39,8 +39,9 @@ data object PlayerAttributeAccessor : KoinComponent, AttributeAccessor<Player>()
 /**
  * Provides the access to [AttributeMap] of all non-player entities.
  */
-data object EntityAttributeAccessor : AttributeAccessor<Entity>() {
-    override fun getAttributeMap(subject: Entity): AttributeMap {
-        return EntityAttributeMap(DefaultAttributes.getSupplier(subject.type), subject)
+data object EntityAttributeAccessor : AttributeAccessor<LivingEntity>() {
+    override fun getAttributeMap(subject: LivingEntity): AttributeMap {
+        // TODO add support for MythicMobs mobs
+        return EntityAttributeMap(subject)
     }
 }

@@ -4,11 +4,10 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.commons.provider.immutable.provider
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.annotation.InternalApi
-import cc.mewcraft.wakame.config.*
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.ATTRIBUTE_CONFIG_FILE
 import cc.mewcraft.wakame.util.Key
@@ -24,44 +23,70 @@ private val ATTRIBUTE_CONFIG by lazy { Configs.YAML[ATTRIBUTE_CONFIG_FILE] }
 /**
  * An identifiable numerical value.
  *
- * By design, you should not create the instance yourself. Instead, use the
- * singleton [Attributes] to get your expected instances. In most cases,
- * instances of this class (and its subclasses, too) are solely used as
- * references. The property values (such as [defaultValue]) do not matter
- * for the code outside of this package.
+ * ## Notes to users of the code
+ *
+ * By design, you should not create the instance yourself. Instead,
+ * use the singleton [Attributes] to get the instances.
+ *
+ * @property facadeId
+ * @property descriptionId 属性的唯一标识
+ * @property defaultValue 属性的默认数值 (非 [Provider])
+ * @property vanilla 属性是否由原版属性实现
  *
  * @see RangedAttribute
  * @see ElementAttribute
  */
-open class Attribute @InternalApi constructor(
-    /**
-     * 属性的唯一标识。
-     */
+open class Attribute
+/**
+ * @param defaultValue 属性的默认数值 ([Provider])
+ */
+protected constructor(
+    @Pattern("[a-z0-9_.]")
+    val facadeId: String,
     @Pattern("[a-z0-9_.]")
     val descriptionId: String,
-    /**
-     * 属性是否由原版属性实现。
-     */
+    defaultValue: Provider<Double>,
     val vanilla: Boolean = false,
-    /**
-     * 属性的默认数值 [Provider], 重载时会更新数值。
-     */
-    val defaultValueProvider: Provider<Double>,
 ) : Keyed, Examinable {
-
-    @InternalApi
-    constructor(
-        descriptionId: String,
-        vanilla: Boolean = false,
-        defaultValue: Double
-    ) : this(descriptionId, vanilla, provider(defaultValue))
-
-    override val key: Key = Key(Namespaces.ATTRIBUTE, descriptionId)
-
     /**
-     * 属性的默认数值, 获取的值不会随着重载而更新。
+     * This constructor is used if the [facadeId] is different from the [descriptionId].
+     *
+     * @param facadeId the ID of the attribute facade to which this attribute is related
      */
-    val defaultValue: Double by defaultValueProvider
+    internal constructor(
+        facadeId: String,
+        descriptionId: String,
+        defaultValue: Double,
+        vanilla: Boolean = false,
+    ) : this(
+        facadeId = facadeId,
+        descriptionId = descriptionId,
+        defaultValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
+        vanilla = vanilla
+    )
+
+    internal constructor(
+        descriptionId: String,
+        defaultValue: Double,
+        vanilla: Boolean = false,
+    ) : this(
+        facadeId = descriptionId,
+        descriptionId = descriptionId,
+        defaultValue = defaultValue,
+        vanilla = vanilla,
+    )
+
+    // 需要注意 (kotlin 基础科普)
+    // 当一个 property 将值委托给 provider 时，其返回的是 provider 的值，而不是 provider
+    // 也就是说，从 defaultValue 拿到的值它是常量，是不会自动更新的
+    // 或者，你也可以简单的理解成因为 double 是常量，所以不会自动更新
+    //
+    // 所以说，当你想要 AttributeInstance#getBaseValue 的值能自动更新，
+    // 你应该直接返回 Attribute#defaultValue 的值，而不是赋值给其他 val 然后返回那个 val
+    // 这也意味着，我们也不需要再写一个 defaultValueProvider 的 property
+    //
+    // 这里说的同样也适用于该文件其他用到 by 的地方
+    val defaultValue: Double by defaultValue
 
     /**
      * 清理给定的数值，使其落在该属性的合理数值范围内。
@@ -71,6 +96,16 @@ open class Attribute @InternalApi constructor(
      */
     open fun sanitizeValue(value: Double): Double {
         return value
+    }
+
+    override val key: Key = Key(Namespaces.ATTRIBUTE, descriptionId)
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(
+            ExaminableProperty.of("descriptionId", descriptionId),
+            ExaminableProperty.of("defaultValue", defaultValue),
+            ExaminableProperty.of("vanilla", vanilla),
+        )
     }
 
     override fun hashCode(): Int {
@@ -86,74 +121,72 @@ open class Attribute @InternalApi constructor(
     override fun toString(): String {
         return toSimpleString()
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("descriptionId", descriptionId),
-        ExaminableProperty.of("defaultValue", defaultValue),
-        ExaminableProperty.of("vanilla", vanilla),
-    )
 }
 
 /**
  * An [Attribute] with bounded values.
+ *
+ * The [minValue] and [maxValue] put a threshold on the final value of this attribute
+ * after all [AttributeModifier]s have been applied.
+ *
+ * @param minValue 该属性允许的最小数值（[Provider]）
+ * @param maxValue 该属性允许的最大数值（[Provider]）
  */
-@OptIn(InternalApi::class)
 open class RangedAttribute
-@InternalApi
-constructor(
+protected constructor(
+    facadeId: String,
     descriptionId: String,
-    vanilla: Boolean,
     defaultValue: Provider<Double>,
-    /**
-     * 该属性允许的最小数值, 重载时会更新数值。
-     */
     minValue: Provider<Double>,
-    /**
-     * 该属性允许的最大数值, 重载时会更新数值。
-     */
     maxValue: Provider<Double>,
-) : Attribute(descriptionId, vanilla, defaultValue) {
+    vanilla: Boolean = false,
+) : Attribute(facadeId, descriptionId, defaultValue, vanilla) {
+    val minValue: Double by minValue
+    val maxValue: Double by maxValue
 
-    @InternalApi
-    constructor(
+    /**
+     * This constructor is used if the [facadeId] is different from the [descriptionId].
+     *
+     * @param facadeId the ID of the attribute facade to which this attribute is related
+     */
+    internal constructor(
+        facadeId: String,
         descriptionId: String,
-        vanilla: Boolean,
         defaultValue: Double,
         minValue: Double,
-        maxValue: Double
+        maxValue: Double,
+        vanilla: Boolean = false,
     ) : this(
-        descriptionId,
-        vanilla,
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "default_value").orElse(defaultValue),
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "min_value").orElse(minValue),
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, "max_value").orElse(maxValue)
+        facadeId = facadeId,
+        descriptionId = descriptionId,
+        defaultValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
+        minValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "min").orElse(minValue),
+        maxValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "max").orElse(maxValue),
+        vanilla = vanilla
     )
 
-    @InternalApi
-    constructor(
+    internal constructor(
         descriptionId: String,
         defaultValue: Double,
         minValue: Double,
-        maxValue: Double
-    ) : this(descriptionId, false, defaultValue, minValue, maxValue)
-
-    /**
-     * 该属性允许的最小数值, 获取的值不会随着重载而更新。
-     */
-    val minValue: Double by minValue
-
-    /**
-     * 该属性允许的最大数值, 获取的值不会随着重载而更新。
-     */
-    val maxValue: Double by maxValue
+        maxValue: Double,
+        vanilla: Boolean = false,
+    ) : this(
+        facadeId = descriptionId,
+        descriptionId = descriptionId,
+        defaultValue = defaultValue,
+        minValue = minValue,
+        maxValue = maxValue,
+        vanilla = vanilla
+    )
 
     init {
         if (this.minValue > this.maxValue) {
-            throw IllegalArgumentException("Minimum value cannot be bigger than maximum value!")
+            throw IllegalArgumentException("Minimum value cannot be higher than maximum value!")
         } else if (this.defaultValue < this.minValue) {
             throw IllegalArgumentException("Default value cannot be lower than minimum value!")
         } else if (this.defaultValue > this.maxValue) {
-            throw IllegalArgumentException("Default value cannot be bigger than maximum value!")
+            throw IllegalArgumentException("Default value cannot be higher than maximum value!")
         }
     }
 
@@ -165,64 +198,86 @@ constructor(
         }
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.concat(
-        super.examinableProperties(),
-        Stream.of(
-            ExaminableProperty.of("minValue", minValue),
-            ExaminableProperty.of("maxValue", maxValue),
-        ),
-    )
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.concat(
+            super.examinableProperties(),
+            Stream.of(
+                ExaminableProperty.of("minValue", minValue),
+                ExaminableProperty.of("maxValue", maxValue),
+            ),
+        )
+    }
 }
 
 /**
- * An [Attribute] related to an [Element].
+ * An [Attribute] with an [Element].
  */
-@OptIn(InternalApi::class)
 open class ElementAttribute
-@InternalApi
-constructor(
+protected constructor(
+    facadeId: String,
     descriptionId: String,
-    vanilla: Boolean,
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
-    /**
-     * 该属性所关联的元素种类。
-     */
     val element: Element,
+    vanilla: Boolean = false,
 ) : RangedAttribute(
+    facadeId,
     descriptionId,
-    vanilla,
     defaultValue,
     minValue,
     maxValue,
+    vanilla,
 ) {
 
-    @InternalApi
-    constructor(
+    /**
+     * This constructor is used if the [facadeId] is different from the [descriptionId].
+     *
+     * @param facadeId the ID of the attribute facade to which this attribute is related
+     */
+    internal constructor(
+        facadeId: String,
         descriptionId: String,
-        vanilla: Boolean,
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: Element
+        element: Element,
+        vanilla: Boolean = false,
     ) : this(
-        descriptionId,
-        vanilla,
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "default_value").orElse(defaultValue),
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "min_value").orElse(minValue),
-        ATTRIBUTE_CONFIG.optionalEntry<Double>(descriptionId, element.uniqueId, "max_value").orElse(maxValue),
-        element
+        facadeId = facadeId,
+        descriptionId = descriptionId,
+        defaultValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "default").orElse(defaultValue),
+        minValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "min").orElse(minValue),
+        maxValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "max").orElse(maxValue),
+        element = element,
+        vanilla = vanilla
     )
 
-    @InternalApi
-    constructor(
+    internal constructor(
         descriptionId: String,
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: Element
-    ) : this(descriptionId, false, defaultValue, minValue, maxValue, element)
+        element: Element,
+        vanilla: Boolean = false,
+    ) : this(
+        facadeId = descriptionId,
+        descriptionId = descriptionId,
+        defaultValue = defaultValue,
+        minValue = minValue,
+        maxValue = maxValue,
+        element = element,
+        vanilla = vanilla
+    )
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.concat(
+            super.examinableProperties(),
+            Stream.of(
+                ExaminableProperty.of("element", element)
+            )
+        )
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -235,11 +290,4 @@ constructor(
         result = (31 * result) + element.hashCode()
         return result
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.concat(
-        super.examinableProperties(),
-        Stream.of(
-            ExaminableProperty.of("element", element),
-        )
-    )
 }

@@ -1,28 +1,20 @@
 # 实体 Entities
 
-# 实体的属性（不包含玩家）
-# 如果未指定，则沿用玩家的属性设置
+# 实体的属性值
+# 对于所缺省的值，将沿用 attributes.yml 的设置
 entity_attributes:
-  minecraft:spider: # 生物的唯一标识
-    max_health: # 属性的唯一标识
-      default: 20.0
-      min: .0
-      max: 20.0
+
+  minecraft:player: { } # 玩家的属性全部沿用默认值
+
+  minecraft:spider: # 生物的唯一标识，参考 https://minecraft.wiki/w/Mob
+    max_health: 20.0
     defense:
-      neutral: # 如果属性是带元素的，这一级缩进为元素的唯一标识，然后下一级缩进照常写属性的默认/最小/最大
-        default: 2.0
-        min: .0
-        max: 4.0
+      neutral: 2.0 # 如果属性是带元素的，这一级缩进为元素的唯一标识，然后下一级缩进照常写属性的默认/最小/最大
+
   minecraft:zombie:
-    max_health:
-      default: 40.0
-      min: .0
-      max: 40.0
+    max_health: 40.0
     defense:
-      neutral:
-        default: 4.0
-        min: .0
-        max: 10.0
+      neutral: 4.0
 
 # 实体索引表（目前仅用于条件判断）
 entity_type_holders:

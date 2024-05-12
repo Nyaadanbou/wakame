@@ -1,39 +1,26 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.toBukkit
 import com.google.common.collect.Multimap
-import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.persistence.PersistentDataContainer
 import java.lang.ref.WeakReference
 import java.util.UUID
 
 sealed interface AttributeMap {
     fun getAttributeInstance(attribute: Attribute): AttributeInstance?
-
-    fun getAttributeInstanceOrThrow(attribute: Attribute): AttributeInstance
-
-    fun registerAttribute(attributeBase: Attribute)
-
+    fun registerAttribute(attribute: Attribute)
     fun hasAttribute(attribute: Attribute): Boolean
-
     fun hasModifier(attribute: Attribute, uuid: UUID): Boolean
-
     fun getValue(attribute: Attribute): Double
-
     fun getBaseValue(attribute: Attribute): Double
-
     fun getModifierValue(attribute: Attribute, uuid: UUID): Double
-
     fun addAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>)
-
     fun removeAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>)
-
     fun clearModifiers(uuid: UUID)
-
     fun clearAllModifiers()
-
     fun assignValues(other: AttributeMap)
 
     operator fun get(attribute: Attribute): AttributeInstance? {
@@ -59,48 +46,27 @@ fun PlayerAttributeMap(user: User<Player>): PlayerAttributeMap {
  */
 class PlayerAttributeMap internal constructor(
     private val default: AttributeSupplier,
-    private val entity: Player,
+    private val player: Player,
 ) : AttributeMap {
     private val data: MutableMap<Attribute, AttributeInstance> = HashMap()
 
-    fun initVanillaAttributes() {
-        for (attribute in default.vanillaAttributes) {
-            getAttributeInstance(attribute)
-        }
+    init {
+        // vanilla attribute instances must be "initialized"
+        default.attributeTypes.filter(Attribute::vanilla).forEach(::getAttributeInstance)
     }
 
     override fun getAttributeInstance(attribute: Attribute): AttributeInstance? {
-        // Kotlin 对于 Map.computeIfAbsent 中 lambda 的返回值做了非空要求
-        // 因此这里手动实现了一遍 computeIfAbsent 以还原在 Java 下的行为
-        // See: https://youtrack.jetbrains.com/issue/KT-10982
-        val oldValue = data[attribute]
-        if (oldValue == null) {
-            val newValue = if (attribute.vanilla) {
-                default.createAttributeInstance(attribute)?.buildToVanilla(entity)
-            } else {
-                default.createAttributeInstance(attribute)?.buildToWakame()
-            }
-            if (newValue != null) {
-                data[attribute] = newValue
-                return newValue
-            }
+        return data.getNullableOrPut(attribute) {
+            default.createAttributeInstance(attribute, player)
         }
-        return oldValue
     }
 
-    override fun getAttributeInstanceOrThrow(attribute: Attribute): AttributeInstance {
-        return requireNotNull(getAttributeInstance(attribute)) { "Can't find attribute instance for attribute $attribute" }
-    }
-
-    override fun registerAttribute(attributeBase: Attribute) {
-        if (attributeBase.vanilla) {
-            val bukkitAttribute = attributeBase.toBukkit()
-            entity.registerAttribute(bukkitAttribute)
-            data[attributeBase] = AttributeInstanceBuilder(attributeBase).buildToVanilla(entity)
-            return
+    override fun registerAttribute(attribute: Attribute) {
+        if (attribute.vanilla) {
+            data[attribute] = AttributeInstanceFactory.createInstance(attribute, player)
+        } else {
+            data[attribute] = AttributeInstanceFactory.createInstance(attribute, player)
         }
-
-        data[attributeBase] = AttributeInstanceBuilder(attributeBase).buildToWakame()
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
@@ -157,21 +123,40 @@ class PlayerAttributeMap internal constructor(
     }
 
     override fun clearModifiers(uuid: UUID) {
-        data.values.forEach { instance -> instance.removeModifier(uuid) }
+        data.values.forEach { it.removeModifier(uuid) }
     }
 
     override fun clearAllModifiers() {
-        data.values.forEach { instance -> instance.removeModifiers() }
+        data.values.forEach { it.removeModifiers() }
     }
 
     override fun assignValues(other: AttributeMap) {
-        require(other is PlayerAttributeMap) { "Can't assign values from non-PlayerAttributeMap" }
-        other.data.values.forEach { instance -> getAttributeInstance(instance.attribute)?.replace(instance) }
+        require(other is PlayerAttributeMap) { "Can't assign values from for non-player AttributeMap" }
+        other.data.values.forEach { getAttributeInstance(it.attribute)?.replace(it) }
+    }
+
+    /**
+     * A modified version of [MutableMap.getOrPut] with the difference in that
+     * the lambda [defaultValue] can return `null`. Furthermore, if the [defaultValue]
+     * returns `null`, the [receiver map][this] will remain unchanged and `null` will
+     * be returned for this function.
+     */
+    private inline fun <K, V> MutableMap<K, V>.getNullableOrPut(key: K, defaultValue: () -> V?): V? {
+        val value = get(key)
+        return if (value == null) {
+            val answer = defaultValue()
+            if (answer != null) {
+                put(key, answer)
+            }
+            answer
+        } else {
+            value
+        }
     }
 }
 
-fun EntityAttributeMap(entity: Entity): EntityAttributeMap {
-    return EntityAttributeMap(entity)
+fun EntityAttributeMap(entity: LivingEntity): EntityAttributeMap {
+    return EntityAttributeMap(DefaultAttributes.getSupplier(entity.type), entity)
 }
 
 /**
@@ -181,14 +166,17 @@ fun EntityAttributeMap(entity: Entity): EntityAttributeMap {
  * Instead, it works as an "accessor" to the underlying attribute data about an entity.
  * By design, the underlying attribute data is actually stored in the entity's NBT storage.
  */
-class EntityAttributeMap(
+class EntityAttributeMap internal constructor(
     private val default: AttributeSupplier,
-    entity: Entity,
+    entity: LivingEntity,
 ) : AttributeMap {
-    private val entity: WeakReference<Entity> = WeakReference(entity) // use WeakRef to prevent memory leak
+    private val entity: WeakReference<LivingEntity> =
+        WeakReference(entity) // use WeakRef to prevent memory leak
+    private val data: PersistentDataContainer
+        get() = entity.get()?.persistentDataContainer ?: error("The entity reference object no longer exists")
 
     init {
-        require(entity.type != EntityType.PLAYER) { "EntityAttributeMap can only be used for non-player entities" }
+        require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
     }
 
     // TODO Some thoughts about implementation:
@@ -206,11 +194,7 @@ class EntityAttributeMap(
         TODO("Not yet implemented")
     }
 
-    override fun getAttributeInstanceOrThrow(attribute: Attribute): AttributeInstance {
-        TODO("Not yet implemented")
-    }
-
-    override fun registerAttribute(attributeBase: Attribute) {
+    override fun registerAttribute(attribute: Attribute) {
         TODO("Not yet implemented")
     }
 
