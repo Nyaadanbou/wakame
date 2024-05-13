@@ -93,9 +93,9 @@ class AttributeEventHandler : KoinComponent {
             return
         }
 
-        val attributeMap = player.toUser().attributeMap
-        val attributeModifiers = this.cell.getAttributeModifiers()
-        attributeMap.addAttributeModifiers(attributeModifiers)
+        val userAttributes = player.toUser().attributeMap
+        val itemAttributes = this.cell.getAttributeModifiers()
+        itemAttributes.forEach { attribute, modifier -> userAttributes[attribute]?.addModifier(modifier) }
     }
 
     /**
@@ -106,16 +106,12 @@ class AttributeEventHandler : KoinComponent {
      * @receiver the ItemStack which may provide attribute modifiers
      */
     private inline fun PlayNekoStack.removeAttributeModifiers(player: Player, predicate: PlayNekoStackPredicate) {
-        // To remove an attribute modifier, we only need to know the UUID of it
-        // and by design, the UUID of an attribute modifier is the UUID of the item
-        // that provides the attribute modifier. Thus, we only need to get the UUID
-        // of the item to clear the attribute modifier.
-
         if (!this.predicate()) {
             return
         }
 
-        val attributeMap = player.toUser().attributeMap
-        attributeMap.clearModifiers(this.uuid)
+        val userAttributes = player.toUser().attributeMap
+        val itemAttributes = this.cell.getAttributeModifiers()
+        itemAttributes.forEach { attribute, modifier -> userAttributes[attribute]?.removeModifier(modifier) }
     }
 }

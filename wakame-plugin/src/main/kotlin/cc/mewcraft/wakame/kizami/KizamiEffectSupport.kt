@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
-import com.google.common.collect.ImmutableMultimap
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -108,12 +107,10 @@ data class KizamiAttribute(
     override val effect: Map<Attribute, AttributeModifier>,
 ) : KizamiEffect.Single<Map<Attribute, AttributeModifier>> {
     override fun apply(kizami: Kizami, user: User<*>) {
-        user.attributeMap.addAttributeModifiers(ImmutableMultimap.copyOf(effect.entries))
+        effect.forEach { (attribute, modifier) -> user.attributeMap[attribute]?.addModifier(modifier) }
     }
 
     override fun remove(kizami: Kizami, user: User<*>) {
-        // To remove the attribute modifiers provided by the kizami,
-        // we simply remove the attribute modifiers by the UUID of the kizami.
-        user.attributeMap.clearModifiers(kizami.uuid)
+        effect.forEach { (attribute, modifier) -> user.attributeMap[attribute]?.removeModifier(modifier) }
     }
 }

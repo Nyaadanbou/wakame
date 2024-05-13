@@ -56,12 +56,10 @@ internal object AttributeInstanceFactory {
     /**
      * 用于创建实例。实例必须反映在世界状态里。
      *
-     * ## 副作用
-     *
-     * 会依据情况修改 [attributable] 的状态。
+     * **副作用** - 会依据情况修改 [attributable] 的状态。
      *
      * @param attribute
-     * @param attributable 实例的状态源
+     * @param attributable 世界状态里的对象
      */
     fun createInstance(attribute: Attribute, attributable: Attributable): AttributeInstance {
         return if (attribute.vanilla) {
@@ -70,7 +68,7 @@ internal object AttributeInstanceFactory {
             // AttributeInstance 的封装 —— 也就是说，函数的调用
             // 会重定向到原版 AttributeInstance 对应的函数上
 
-            // 需要注册一下 AttributeInstance
+            // 副作用 - 注册一下 AttributeInstance
             attributable.registerAttribute(attribute.toBukkit())
 
             // 从 Attributable 中获取要被封装的 AttributeInstance
@@ -93,81 +91,8 @@ internal object AttributeInstanceFactory {
 private class ProtoAttributeInstance(
     override val attribute: Attribute,
 ) : AttributeInstance {
-    private val modifiers: MutableMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
-    private var baseValue: Double = attribute.defaultValue
 
-    override fun getDescriptionId(): String {
-        return attribute.descriptionId
-    }
-
-    override fun getBaseValue(): Double {
-        return baseValue
-    }
-
-    override fun setBaseValue(baseValue: Double) {
-        if (baseValue != this.baseValue) {
-            this.baseValue = baseValue
-        }
-    }
-
-    override fun getValue(): Double {
-        // Here throws UOE because the value after all modifiers
-        // have been applied is not useful for a prototype
-        throw UnsupportedOperationException()
-    }
-
-    override fun getModifiers(): Set<AttributeModifier> {
-        return ImmutableSet.copyOf(modifiers.values)
-    }
-
-    override fun getModifier(uuid: UUID): AttributeModifier? {
-        return modifiers[uuid]
-    }
-
-    override fun hasModifier(modifier: AttributeModifier): Boolean {
-        return modifiers.containsKey(modifier.id)
-    }
-
-    override fun addModifier(modifier: AttributeModifier) {
-        require(modifiers.putIfAbsent(modifier.id, modifier) == null) {
-            "$modifier is already applied on this attribute!"
-        }
-    }
-
-    override fun removeModifier(modifier: AttributeModifier) {
-        modifiers.remove(modifier.id)
-    }
-
-    override fun removeModifier(uuid: UUID) {
-        modifiers.remove(uuid)
-    }
-
-    override fun removeModifiers() {
-        modifiers.clear()
-    }
-
-    override fun replace(other: AttributeInstance) {
-        // Optimizations: save several instructions for known types
-        if (other is ProtoAttributeInstance) {
-            baseValue = other.baseValue
-            modifiers.clear()
-            modifiers.putAll(other.modifiers)
-        } else {
-            setBaseValue(other.getBaseValue())
-            getModifiers().forEach { removeModifier(it) }
-            other.getModifiers().forEach { addModifier(it) }
-        }
-    }
-}
-
-/**
- * A wakame [AttributeInstance].
- */
-private class WakameAttributeInstance(
-    override val attribute: Attribute,
-) : AttributeInstance {
-
-    private val modifiersByUUID: MutableMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
+    private val modifiersByUuid: MutableMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
     private val modifiersByOperation: MutableMap<Operation, MutableSet<AttributeModifier>> = enumMap()
     private var dirty: Boolean = true
     private var baseValue: Double = attribute.defaultValue
@@ -197,26 +122,26 @@ private class WakameAttributeInstance(
     }
 
     override fun getModifiers(): Set<AttributeModifier> {
-        return ImmutableSet.copyOf(modifiersByUUID.values)
+        return ImmutableSet.copyOf(modifiersByUuid.values)
     }
 
     override fun getModifier(uuid: UUID): AttributeModifier? {
-        return modifiersByUUID[uuid]
+        return modifiersByUuid[uuid]
     }
 
     override fun hasModifier(modifier: AttributeModifier): Boolean {
-        return modifiersByUUID.containsKey(modifier.id)
+        return modifiersByUuid.containsKey(modifier.id)
     }
 
     override fun addModifier(modifier: AttributeModifier) {
-        requireNotNull(modifiersByUUID.putIfAbsent(modifier.id, modifier)) { "$modifier is already applied on this attribute!" }
+        requireNotNull(modifiersByUuid.putIfAbsent(modifier.id, modifier)) { "$modifier is already applied on this attribute!" }
         getModifiers0(modifier.operation).add(modifier)
         setDirty()
     }
 
     override fun removeModifier(modifier: AttributeModifier) {
+        modifiersByUuid.remove(modifier.id)
         getModifiers0(modifier.operation).remove(modifier)
-        modifiersByUUID.remove(modifier.id)
         setDirty()
     }
 
@@ -226,17 +151,17 @@ private class WakameAttributeInstance(
     }
 
     override fun removeModifiers() {
-        modifiersByUUID.clear()
+        modifiersByUuid.clear()
         modifiersByOperation.clear()
         setDirty()
     }
 
     override fun replace(other: AttributeInstance) {
-        // Optimizations: save several instructions for known types
-        if (other is WakameAttributeInstance) {
+        if (other is ProtoAttributeInstance) {
+            // Optimizations: save several instructions for known types
             baseValue = other.getBaseValue()
-            modifiersByUUID.clear()
-            modifiersByUUID.putAll(other.modifiersByUUID)
+            modifiersByUuid.clear()
+            modifiersByUuid.putAll(other.modifiersByUuid)
             modifiersByOperation.clear()
             modifiersByOperation.putAll(other.modifiersByOperation)
             setDirty()
@@ -268,6 +193,13 @@ private class WakameAttributeInstance(
         return modifiersByOperation.computeIfAbsent(operation) { ObjectOpenHashSet() }
     }
 }
+
+/**
+ * A wakame [AttributeInstance].
+ */
+private class WakameAttributeInstance(
+    override val attribute: Attribute,
+) : AttributeInstance by ProtoAttributeInstance(attribute)
 
 /**
  * A special [AttributeInstance] that wraps an object of [BukkitAttributeInstance].

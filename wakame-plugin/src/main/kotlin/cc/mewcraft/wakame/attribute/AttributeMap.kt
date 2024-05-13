@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.user.User
-import com.google.common.collect.Multimap
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -10,21 +9,34 @@ import java.lang.ref.WeakReference
 import java.util.UUID
 
 sealed interface AttributeMap {
-    fun getAttributeInstance(attribute: Attribute): AttributeInstance?
-    fun registerAttribute(attribute: Attribute)
+    /**
+     * Registers an [attribute] to this map. This will overwrite any existing instance.
+     */
+    fun register(attribute: Attribute)
+
+    /**
+     * Gets an [AttributeInstance] specified by the [attribute].
+     *
+     * Returns `null` if the specified instance does not exist in this map.
+     */
+    fun getInstance(attribute: Attribute): AttributeInstance?
+
+    /**
+     * Checks whether this map has the [attribute].
+     */
     fun hasAttribute(attribute: Attribute): Boolean
     fun hasModifier(attribute: Attribute, uuid: UUID): Boolean
     fun getValue(attribute: Attribute): Double
     fun getBaseValue(attribute: Attribute): Double
     fun getModifierValue(attribute: Attribute, uuid: UUID): Double
-    fun addAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>)
-    fun removeAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>)
-    fun clearModifiers(uuid: UUID)
-    fun clearAllModifiers()
+
+    /**
+     * Assigns all the data from [other] to this map.
+     */
     fun assignValues(other: AttributeMap)
 
     operator fun get(attribute: Attribute): AttributeInstance? {
-        return getAttributeInstance(attribute)
+        return getInstance(attribute)
     }
 }
 
@@ -44,7 +56,8 @@ fun PlayerAttributeMap(user: User<Player>): PlayerAttributeMap {
  * is created when the player joins the server and destroyed after the player
  * quits the server.
  */
-class PlayerAttributeMap internal constructor(
+class PlayerAttributeMap
+internal constructor(
     private val default: AttributeSupplier,
     private val player: Player,
 ) : AttributeMap {
@@ -52,87 +65,43 @@ class PlayerAttributeMap internal constructor(
 
     init {
         // vanilla attribute instances must be "initialized"
-        default.attributes.filter(Attribute::vanilla).forEach(::getAttributeInstance)
+        // otherwise, if we have changed the value of a vanilla attribute,
+        // the value would not be actually applied to the world state.
+        default.attributes.filter(Attribute::vanilla).forEach(::getInstance)
     }
 
-    override fun getAttributeInstance(attribute: Attribute): AttributeInstance? {
-        return data.getNullableOrPut(attribute) {
-            default.createAttributeInstance(attribute, player)
-        }
+    override fun getInstance(attribute: Attribute): AttributeInstance? {
+        // the implementation has side effect to the player
+        return data.getNullableOrPut(attribute) { default.createAttributeInstance(attribute, player) }
     }
 
-    override fun registerAttribute(attribute: Attribute) {
-        if (attribute.vanilla) {
-            data[attribute] = AttributeInstanceFactory.createInstance(attribute, player)
-        } else {
-            data[attribute] = AttributeInstanceFactory.createInstance(attribute, player)
-        }
+    override fun register(attribute: Attribute) {
+        data[attribute] = AttributeInstanceFactory.createInstance(attribute, player)
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
-        if (attribute.vanilla) {
-            return getAttributeInstance(attribute) != null
-        }
-        return data.containsKey(attribute)
+        return data[attribute] != null || default.hasAttribute(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
-        if (attribute.vanilla) {
-            return getAttributeInstance(attribute)?.getModifier(uuid) != null
-        }
         return data[attribute]?.getModifier(uuid) != null || default.hasModifier(attribute, uuid)
     }
 
     override fun getValue(attribute: Attribute): Double {
-        if (attribute.vanilla) {
-            getAttributeInstance(attribute) // ensure the attribute is registered
-        }
         return data[attribute]?.getValue() ?: default.getValue(attribute)
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        if (attribute.vanilla) {
-            getAttributeInstance(attribute)
-        }
         return data[attribute]?.getBaseValue() ?: default.getBaseValue(attribute)
     }
 
     override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        if (attribute.vanilla) {
-            getAttributeInstance(attribute)
-        }
         return data[attribute]?.getModifier(uuid)?.amount ?: default.getModifierValue(attribute, uuid)
-    }
-
-    override fun removeAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>) {
-        for ((attribute, modifiers) in attributeModifiers.asMap()) {
-            if (attribute.vanilla) {
-                getAttributeInstance(attribute)
-            }
-            data[attribute]?.let { modifiers.forEach(it::removeModifier) }
-        }
-    }
-
-    override fun addAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>) {
-        attributeModifiers.forEach { attribute, modifier ->
-            getAttributeInstance(attribute)?.let { attributeInstance ->
-                attributeInstance.removeModifier(modifier)
-                attributeInstance.addModifier(modifier)
-            }
-        }
-    }
-
-    override fun clearModifiers(uuid: UUID) {
-        data.values.forEach { it.removeModifier(uuid) }
-    }
-
-    override fun clearAllModifiers() {
-        data.values.forEach { it.removeModifiers() }
     }
 
     override fun assignValues(other: AttributeMap) {
         require(other is PlayerAttributeMap) { "Can't assign values from for non-player AttributeMap" }
-        other.data.values.forEach { getAttributeInstance(it.attribute)?.replace(it) }
+        other.data.values.forEach { getInstance(it.attribute)?.replace(it) }
     }
 
     /**
@@ -166,7 +135,8 @@ fun EntityAttributeMap(entity: LivingEntity): EntityAttributeMap {
  * Instead, it works as an "accessor" to the underlying attribute data about an entity.
  * By design, the underlying attribute data is actually stored in the entity's NBT storage.
  */
-class EntityAttributeMap internal constructor(
+class EntityAttributeMap
+internal constructor(
     private val default: AttributeSupplier,
     entity: LivingEntity,
 ) : AttributeMap {
@@ -190,11 +160,11 @@ class EntityAttributeMap internal constructor(
     //  usually upon the entity is spawned. As a result, the attributes data
     //  must be persistent.
 
-    override fun getAttributeInstance(attribute: Attribute): AttributeInstance? {
+    override fun getInstance(attribute: Attribute): AttributeInstance? {
         TODO("Not yet implemented")
     }
 
-    override fun registerAttribute(attribute: Attribute) {
+    override fun register(attribute: Attribute) {
         TODO("Not yet implemented")
     }
 
@@ -215,22 +185,6 @@ class EntityAttributeMap internal constructor(
     }
 
     override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        TODO("Not yet implemented")
-    }
-
-    override fun addAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeAttributeModifiers(attributeModifiers: Multimap<Attribute, AttributeModifier>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun clearModifiers(uuid: UUID) {
-        TODO("Not yet implemented")
-    }
-
-    override fun clearAllModifiers() {
         TODO("Not yet implemented")
     }
 
