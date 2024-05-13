@@ -92,11 +92,11 @@ data class KizamiSkill(
     override val effect: ConfiguredSkill,
 ) : KizamiEffect.Single<ConfiguredSkill> {
     override fun apply(kizami: Kizami, user: User<*>) {
-        println("applied skill kizami effect to ${user.uniqueId}") // TODO actually implement it when skill module is done
+        println("applied kizami (skill) to ${user.uniqueId}") // TODO actually implement it when skill module is done
     }
 
     override fun remove(kizami: Kizami, user: User<*>) {
-        println("removed skill kizami effect from ${user.uniqueId}")
+        println("removed kizami (skill) from ${user.uniqueId}")
     }
 }
 

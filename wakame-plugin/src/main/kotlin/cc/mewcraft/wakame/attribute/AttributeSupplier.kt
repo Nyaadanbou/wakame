@@ -20,6 +20,8 @@ fun AttributeSupplier(entityType: EntityType, builder: AttributeSupplierBuilder.
 /**
  * Responsible to provide default attribute values.
  *
+ * It may **not** provide default values for every attribute type!
+ *
  * @property prototypes The available [AttributeInstance]s in this supplier.
  * @property attributes The available [Attribute]s in this supplier.
  */
@@ -28,6 +30,17 @@ class AttributeSupplier internal constructor(
 ) {
     val attributes: Collection<Attribute> = prototypes.keys
 
+    /**
+     * Creates a new [AttributeInstance] from this supplier.
+     *
+     * Returns `null` if the [attribute] is not present in this supplier.
+     *
+     * This function may have **side effect** to the [attributable].
+
+     * @param attribute the attribute type
+     * @param attributable the object which holds the vanilla attribute instances in the world state
+     * @return a new instance of [AttributeInstance].
+     */
     fun createAttributeInstance(attribute: Attribute, attributable: Attributable): AttributeInstance? {
         val prototype = prototypes[attribute] ?: return null
         val product = AttributeInstanceFactory.createInstance(attribute, attributable)
@@ -35,25 +48,60 @@ class AttributeSupplier internal constructor(
         return product
     }
 
+    /**
+     * Gets the value for the [attribute] after all modifiers have been applied.
+     *
+     * @param attribute the attribute type
+     * @return the value for the attribute
+     * @throws IllegalArgumentException if the [type] is not present in this supplier
+     */
     fun getValue(attribute: Attribute): Double {
         return getPrototypeOrThrow(attribute).getValue()
     }
 
+    /**
+     * Gets the base value for the [attribute].
+     *
+     * @param attribute the attribute type
+     * @return the base value for the attribute
+     * @throws IllegalArgumentException if the [type] is not present in this supplier
+     */
     fun getBaseValue(attribute: Attribute): Double {
         return getPrototypeOrThrow(attribute).getBaseValue()
     }
 
+    /**
+     * Gets the modifier value specified by [attribute] and [uuid].
+     *
+     * @param attribute the attribute type
+     * @param uuid the uuid
+     * @return the modifier value
+     * @throws IllegalArgumentException if the [type] is not present in this supplier
+     */
     fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        val modifier = requireNotNull(getPrototypeOrThrow(attribute).getModifier(uuid)) {
+        return requireNotNull(getPrototypeOrThrow(attribute).getModifier(uuid)) {
             "Can't find attribute modifier '$uuid' on attribute '${attribute.descriptionId}'"
-        }
-        return modifier.amount
+        }.amount
     }
 
+    /**
+     * Checks whether this supplier has the [type].
+     *
+     * @param type the attribute type
+     * @return `true` if this supplier has the [type]
+     * @throws IllegalArgumentException if the [type] is not present in this supplier
+     */
     fun hasAttribute(type: Attribute): Boolean {
         return prototypes.containsKey(type)
     }
 
+    /**
+     * Checks whether this supplier has the modifier specified by [type] and [uuid].
+     *
+     * @param type the attribute type
+     * @param uuid the uuid
+     * @return `true` if this supplier has the modifier
+     */
     fun hasModifier(type: Attribute, uuid: UUID): Boolean {
         return prototypes[type]?.getModifier(uuid) != null
     }
@@ -65,6 +113,11 @@ class AttributeSupplier internal constructor(
     }
 }
 
+/**
+ * The builder of [AttributeSupplier].
+ *
+ * @property entityType the living entity for the builder
+ */
 class AttributeSupplierBuilder(
     private val entityType: EntityType,
 ) {
@@ -99,7 +152,7 @@ class AttributeSupplierBuilder(
      */
     fun addByProvider(attribute: Attribute, value: Provider<Double>): AttributeSupplierBuilder {
         val prototype = AttributeInstanceFactory.createPrototype(attribute)
-        prototype.setBaseValue(value.get())
+        prototype.setBaseValue(value.get()) // FIXME 这个实际上会导致数值无法重载
         prototypes[attribute] = prototype
         return this
     }

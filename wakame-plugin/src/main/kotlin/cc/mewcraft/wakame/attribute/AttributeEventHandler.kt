@@ -20,7 +20,7 @@ import org.koin.core.component.KoinComponent
 class AttributeEventHandler : KoinComponent {
 
     /**
-     * Updates attributes when the player switches their held item.
+     * Handles the attribute update when the player switches their held item.
      *
      * @param player
      * @param previousSlot
@@ -42,7 +42,7 @@ class AttributeEventHandler : KoinComponent {
     }
 
     /**
-     * Updates attributes when an ItemStack is changed in the player's inventory.
+     * Handles the attribute update when an ItemStack is changed in the player's inventory.
      *
      * @param player
      * @param rawSlot
@@ -64,7 +64,7 @@ class AttributeEventHandler : KoinComponent {
     }
 
     /**
-     * Updates attribute modifiers.
+     * Updates attribute modifiers for the player.
      *
      * @param player
      * @param oldItem the old item to check with, or `null` if it's empty
@@ -82,7 +82,7 @@ class AttributeEventHandler : KoinComponent {
     }
 
     /**
-     * Add the attribute modifiers of [this] for the [player].
+     * Adds the attribute modifiers of [this] to the [player].
      *
      * @param player the player we add attribute modifiers to
      * @param predicate
@@ -99,7 +99,7 @@ class AttributeEventHandler : KoinComponent {
     }
 
     /**
-     * Remove the attribute modifiers of [this] for the [player].
+     * Removes the attribute modifiers of [this] from the [player].
      *
      * @param player the player we remove attribute modifiers from
      * @param predicate

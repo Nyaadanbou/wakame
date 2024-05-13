@@ -25,9 +25,25 @@ sealed interface AttributeMap {
      * Checks whether this map has the [attribute].
      */
     fun hasAttribute(attribute: Attribute): Boolean
+
+    /**
+     * Checks whether this map has the modifier specified by [attribute] and [uuid].
+     */
     fun hasModifier(attribute: Attribute, uuid: UUID): Boolean
+
+    /**
+     * Gets the value for the [attribute] after all modifiers have been applied.
+     */
     fun getValue(attribute: Attribute): Double
+
+    /**
+     * Gets the base value for the [attribute].
+     */
     fun getBaseValue(attribute: Attribute): Double
+
+    /**
+     * Gets the modifier value specified by [attribute] and [uuid].
+     */
     fun getModifierValue(attribute: Attribute, uuid: UUID): Double
 
     /**
@@ -35,13 +51,19 @@ sealed interface AttributeMap {
      */
     fun assignValues(other: AttributeMap)
 
+    /**
+     * @see getInstance
+     */
     operator fun get(attribute: Attribute): AttributeInstance? {
         return getInstance(attribute)
     }
 }
 
 /**
- * Creates a new Player Attribute Map.
+ * A constructor function of [PlayerAttributeMap].
+ *
+ * @param user the user to which this map is bound
+ * @return a new instance of [PlayerAttributeMap]
  */
 fun PlayerAttributeMap(user: User<Player>): PlayerAttributeMap {
     return PlayerAttributeMap(DefaultAttributes.getSupplier(EntityType.PLAYER), user.player)
@@ -50,17 +72,34 @@ fun PlayerAttributeMap(user: User<Player>): PlayerAttributeMap {
 /**
  * This is a live object.
  *
- * The object contains attribute data about a player.
+ * The object contains all attribute data about the [player].
  *
- * By design, the object's lifecycle is the same as [Player]. That is, the object
- * is created when the player joins the server and destroyed after the player
- * quits the server.
+ * By design, the object's lifecycle is the same as the [player]. That is, the
+ * object is created when the player joins the server and "destroyed" after the
+ * player quits the server.
+ *
+ * ## Implementation Notes
+ *
+ * The [default] is the fallback data to **read** if the requested data is not present
+ * in the [data] map. This saves us a lot of memory for the object. However, if we need
+ * to write data, for example adding a modifier, we write it into the [data] map.
  */
 class PlayerAttributeMap
 internal constructor(
+    /**
+     * The fallback values if an attribute is not present in the [data] map.
+     */
     private val default: AttributeSupplier,
+    /**
+     * The underlying player.
+     */
     private val player: Player,
 ) : AttributeMap {
+    /**
+     * The data values.
+     *
+     * The values that are the same as the default should not store in this map.
+     */
     private val data: MutableMap<Attribute, AttributeInstance> = HashMap()
 
     init {
@@ -124,6 +163,12 @@ internal constructor(
     }
 }
 
+/**
+ * A constructor function of [EntityAttributeMap].
+ *
+ * @param entity the living entity to which this map is bound
+ * @return a new instance of [EntityAttributeMap]
+ */
 fun EntityAttributeMap(entity: LivingEntity): EntityAttributeMap {
     return EntityAttributeMap(DefaultAttributes.getSupplier(entity.type), entity)
 }
