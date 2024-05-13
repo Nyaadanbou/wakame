@@ -52,7 +52,7 @@ class PlayerAttributeMap internal constructor(
 
     init {
         // vanilla attribute instances must be "initialized"
-        default.attributeTypes.filter(Attribute::vanilla).forEach(::getAttributeInstance)
+        default.attributes.filter(Attribute::vanilla).forEach(::getAttributeInstance)
     }
 
     override fun getAttributeInstance(attribute: Attribute): AttributeInstance? {

@@ -8,12 +8,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance as MojangAttri
 
 object AttributeInstanceSupplier {
     /**
-     * 所返回的 [AttributeInstance] 应该仅作为原型对象。
+     * 所返回的 [AttributeInstance] 对象是独立的，不与任何世界状态所关联。
+     *
+     * 因此，该 [AttributeInstance] 应该仅作为 `原型对象` 使用。
      *
      * @param attribute 所基于的 [Attribute]
      * @return 新的 [AttributeInstance]
      */
-    fun createInstance(attribute: Attribute): AttributeInstance {
+    fun createPrototype(attribute: Attribute): AttributeInstance {
         val mojangAttribute = CraftAttribute.bukkitToMinecraftHolder(attribute)
         val mojangAttributeInstance = MojangAttributeInstance(mojangAttribute) {}
         return CraftAttributeInstance(mojangAttributeInstance, attribute)

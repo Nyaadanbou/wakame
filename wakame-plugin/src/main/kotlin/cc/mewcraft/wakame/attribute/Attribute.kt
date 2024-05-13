@@ -76,7 +76,7 @@ protected constructor(
         vanilla = vanilla,
     )
 
-    // 需要注意 (kotlin 基础科普)
+    // 需要注意 (kotlin 委托基础)
     // 当一个 property 将值委托给 provider 时，其返回的是 provider 的值，而不是 provider
     // 也就是说，从 defaultValue 拿到的值它是常量，是不会自动更新的
     // 或者，你也可以简单的理解成因为 double 是常量，所以不会自动更新
@@ -85,7 +85,7 @@ protected constructor(
     // 你应该直接返回 Attribute#defaultValue 的值，而不是赋值给其他 val 然后返回那个 val
     // 这也意味着，我们也不需要再写一个 defaultValueProvider 的 property
     //
-    // 这里说的同样也适用于该文件其他用到 by 的地方
+    // 这里说的同样也适用于该文件其他用到 `by` 的地方
     val defaultValue: Double by defaultValue
 
     /**

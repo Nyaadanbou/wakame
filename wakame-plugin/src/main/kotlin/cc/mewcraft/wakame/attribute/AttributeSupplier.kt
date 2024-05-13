@@ -20,13 +20,13 @@ fun AttributeSupplier(entityType: EntityType, builder: AttributeSupplierBuilder.
 /**
  * Responsible to provide default attribute values.
  *
- * @property prototypes The available attribute instances in this supplier.
- * @property attributeTypes The available attribute types in this supplier.
+ * @property prototypes The available [AttributeInstance]s in this supplier.
+ * @property attributes The available [Attribute]s in this supplier.
  */
 class AttributeSupplier internal constructor(
     private val prototypes: Map<Attribute, AttributeInstance>,
 ) {
-    val attributeTypes: Collection<Attribute> = prototypes.keys
+    val attributes: Collection<Attribute> = prototypes.keys
 
     fun createAttributeInstance(attribute: Attribute, attributable: Attributable): AttributeInstance? {
         val prototype = prototypes[attribute] ?: return null

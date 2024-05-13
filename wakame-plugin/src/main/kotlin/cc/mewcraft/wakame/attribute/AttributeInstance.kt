@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.commons.collections.enumMap
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.util.AttributeInstanceSupplier
 import com.google.common.collect.ImmutableSet
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
@@ -27,6 +26,7 @@ interface AttributeInstance {
      * the [AttributeInstance] object.
      */
     val attribute: Attribute
+
     fun getDescriptionId(): String
     fun getValue(): Double
     fun getBaseValue(): Double
@@ -38,6 +38,10 @@ interface AttributeInstance {
     fun removeModifier(modifier: AttributeModifier)
     fun removeModifier(uuid: UUID)
     fun removeModifiers()
+
+    /**
+     * Replace the states of this instance with the [other]'s.
+     */
     fun replace(other: AttributeInstance)
 }
 
@@ -46,11 +50,7 @@ internal object AttributeInstanceFactory {
      * 用于创建原型。原型不应该放在世界状态里。
      */
     fun createPrototype(attribute: Attribute): AttributeInstance {
-        return if (attribute.vanilla) {
-            VanillaAttributeInstance(attribute)
-        } else {
-            WakameAttributeInstance(attribute)
-        }
+        return ProtoAttributeInstance(attribute)
     }
 
     /**
@@ -85,26 +85,210 @@ internal object AttributeInstanceFactory {
     }
 }
 
-internal class VanillaAttributeInstance : AttributeInstance {
+/**
+ * A prototype of [AttributeInstance].
+ *
+ * It's used to create new instances of [VanillaAttributeInstance] and [WakameAttributeInstance].
+ */
+private class ProtoAttributeInstance(
+    override val attribute: Attribute,
+) : AttributeInstance {
+    private val modifiers: MutableMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
+    private var baseValue: Double = attribute.defaultValue
+
+    override fun getDescriptionId(): String {
+        return attribute.descriptionId
+    }
+
+    override fun getBaseValue(): Double {
+        return baseValue
+    }
+
+    override fun setBaseValue(baseValue: Double) {
+        if (baseValue != this.baseValue) {
+            this.baseValue = baseValue
+        }
+    }
+
+    override fun getValue(): Double {
+        // Here throws UOE because the value after all modifiers
+        // have been applied is not useful for a prototype
+        throw UnsupportedOperationException()
+    }
+
+    override fun getModifiers(): Set<AttributeModifier> {
+        return ImmutableSet.copyOf(modifiers.values)
+    }
+
+    override fun getModifier(uuid: UUID): AttributeModifier? {
+        return modifiers[uuid]
+    }
+
+    override fun hasModifier(modifier: AttributeModifier): Boolean {
+        return modifiers.containsKey(modifier.id)
+    }
+
+    override fun addModifier(modifier: AttributeModifier) {
+        require(modifiers.putIfAbsent(modifier.id, modifier) == null) {
+            "$modifier is already applied on this attribute!"
+        }
+    }
+
+    override fun removeModifier(modifier: AttributeModifier) {
+        modifiers.remove(modifier.id)
+    }
+
+    override fun removeModifier(uuid: UUID) {
+        modifiers.remove(uuid)
+    }
+
+    override fun removeModifiers() {
+        modifiers.clear()
+    }
+
+    override fun replace(other: AttributeInstance) {
+        // Optimizations: save several instructions for known types
+        if (other is ProtoAttributeInstance) {
+            baseValue = other.baseValue
+            modifiers.clear()
+            modifiers.putAll(other.modifiers)
+        } else {
+            setBaseValue(other.getBaseValue())
+            getModifiers().forEach { removeModifier(it) }
+            other.getModifiers().forEach { addModifier(it) }
+        }
+    }
+}
+
+/**
+ * A wakame [AttributeInstance].
+ */
+private class WakameAttributeInstance(
+    override val attribute: Attribute,
+) : AttributeInstance {
+
+    private val modifiersByUUID: MutableMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
+    private val modifiersByOperation: MutableMap<Operation, MutableSet<AttributeModifier>> = enumMap()
+    private var dirty: Boolean = true
+    private var baseValue: Double = attribute.defaultValue
+    private var cachedValue: Double = 0.0
+
+    override fun getDescriptionId(): String {
+        return attribute.descriptionId
+    }
+
+    override fun getBaseValue(): Double {
+        return baseValue
+    }
+
+    override fun setBaseValue(baseValue: Double) {
+        if (baseValue != this.baseValue) {
+            this.baseValue = baseValue
+            setDirty()
+        }
+    }
+
+    override fun getValue(): Double {
+        if (dirty) {
+            cachedValue = calculateValue()
+            dirty = false
+        }
+        return cachedValue
+    }
+
+    override fun getModifiers(): Set<AttributeModifier> {
+        return ImmutableSet.copyOf(modifiersByUUID.values)
+    }
+
+    override fun getModifier(uuid: UUID): AttributeModifier? {
+        return modifiersByUUID[uuid]
+    }
+
+    override fun hasModifier(modifier: AttributeModifier): Boolean {
+        return modifiersByUUID.containsKey(modifier.id)
+    }
+
+    override fun addModifier(modifier: AttributeModifier) {
+        requireNotNull(modifiersByUUID.putIfAbsent(modifier.id, modifier)) { "$modifier is already applied on this attribute!" }
+        getModifiers0(modifier.operation).add(modifier)
+        setDirty()
+    }
+
+    override fun removeModifier(modifier: AttributeModifier) {
+        getModifiers0(modifier.operation).remove(modifier)
+        modifiersByUUID.remove(modifier.id)
+        setDirty()
+    }
+
+    override fun removeModifier(uuid: UUID) {
+        getModifier(uuid)?.let { removeModifier(it) }
+        setDirty()
+    }
+
+    override fun removeModifiers() {
+        modifiersByUUID.clear()
+        modifiersByOperation.clear()
+        setDirty()
+    }
+
+    override fun replace(other: AttributeInstance) {
+        // Optimizations: save several instructions for known types
+        if (other is WakameAttributeInstance) {
+            baseValue = other.getBaseValue()
+            modifiersByUUID.clear()
+            modifiersByUUID.putAll(other.modifiersByUUID)
+            modifiersByOperation.clear()
+            modifiersByOperation.putAll(other.modifiersByOperation)
+            setDirty()
+        } else {
+            setBaseValue(other.getBaseValue())
+            getModifiers().forEach { removeModifier(it) }
+            other.getModifiers().forEach { addModifier(it) }
+        }
+    }
+
+    private fun setDirty() {
+        dirty = true
+    }
+
+    private fun calculateValue(): Double {
+        fun getModifierOrEmpty(operation: Operation): MutableSet<AttributeModifier> {
+            return modifiersByOperation.getOrDefault(operation, Collections.emptySet())
+        }
+
+        var x: Double = getBaseValue()
+        getModifierOrEmpty(Operation.ADD).forEach { x += it.amount }
+        var y: Double = x
+        getModifierOrEmpty(Operation.MULTIPLY_BASE).forEach { y += x * it.amount }
+        getModifierOrEmpty(Operation.MULTIPLY_TOTAL).forEach { y *= 1.0 + it.amount }
+        return this.attribute.sanitizeValue(y)
+    }
+
+    private fun getModifiers0(operation: Operation): MutableSet<AttributeModifier> {
+        return modifiersByOperation.computeIfAbsent(operation) { ObjectOpenHashSet() }
+    }
+}
+
+/**
+ * A special [AttributeInstance] that wraps an object of [BukkitAttributeInstance].
+ *
+ * All the function calls are redirected to the wrapped [BukkitAttributeInstance].
+ */
+private class VanillaAttributeInstance : AttributeInstance {
     /**
      * 封装的对象。
      */
     private val handle: BukkitAttributeInstance
 
     /**
-     * 主构造器用于封装玩家的状态。
+     * 该构造器用于封装世界状态。
      */
-    internal constructor(handle: BukkitAttributeInstance) {
+    constructor(handle: BukkitAttributeInstance) {
         this.handle = handle
+
+        // also set the value in the world state
         setBaseValue(attribute.defaultValue)
     }
-
-    /**
-     * 该构造器仅用于构建原型，不要用于封装玩家的状态！
-     */
-    internal constructor(attribute: Attribute) : this(
-        AttributeInstanceSupplier.createInstance(attribute.toBukkit())
-    )
 
     override val attribute: Attribute
         get() = handle.attribute.toNeko()
@@ -154,119 +338,8 @@ internal class VanillaAttributeInstance : AttributeInstance {
     }
 
     override fun replace(other: AttributeInstance) {
-        require(other.attribute.vanilla) { "Can't replace with a non-vanilla AttributeInstance" }
         setBaseValue(other.getBaseValue())
         getModifiers().forEach { removeModifier(it) }
         other.getModifiers().forEach { addModifier(it) }
-    }
-}
-
-internal class WakameAttributeInstance : AttributeInstance {
-    constructor(attribute: Attribute) {
-        this.attribute = attribute
-        this.modifiersById = Object2ObjectArrayMap()
-        this.modifiersByOperation = enumMap()
-        this.baseValue = attribute.defaultValue
-    }
-
-    private val modifiersById: MutableMap<UUID, AttributeModifier>
-    private val modifiersByOperation: MutableMap<Operation, MutableSet<AttributeModifier>>
-    private var dirty: Boolean = true
-    private var baseValue: Double
-    private var cachedValue: Double = 0.0
-
-    private fun setDirty() {
-        dirty = true
-    }
-
-    private fun calculateValue(): Double {
-        fun getModifierOrEmpty(operation: Operation): MutableSet<AttributeModifier> {
-            return modifiersByOperation.getOrDefault(operation, Collections.emptySet())
-        }
-
-        var x: Double = getBaseValue()
-        getModifierOrEmpty(Operation.ADD).forEach { x += it.amount }
-        var y: Double = x
-        getModifierOrEmpty(Operation.MULTIPLY_BASE).forEach { y += x * it.amount }
-        getModifierOrEmpty(Operation.MULTIPLY_TOTAL).forEach { y *= 1.0 + it.amount }
-        return this.attribute.sanitizeValue(y)
-    }
-
-    private fun getModifiers(operation: Operation): MutableSet<AttributeModifier> {
-        return modifiersByOperation.computeIfAbsent(operation) { ObjectOpenHashSet() }
-    }
-
-    override val attribute: Attribute
-
-    override fun getDescriptionId(): String {
-        return attribute.descriptionId
-    }
-
-    override fun getBaseValue(): Double {
-        return baseValue
-    }
-
-    override fun setBaseValue(baseValue: Double) {
-        if (baseValue != this.baseValue) {
-            this.baseValue = baseValue
-            setDirty()
-        }
-    }
-
-    override fun getValue(): Double {
-        if (dirty) {
-            cachedValue = calculateValue()
-            dirty = false
-        }
-        return cachedValue
-    }
-
-    override fun getModifiers(): Set<AttributeModifier> {
-        return ImmutableSet.copyOf(modifiersById.values)
-    }
-
-    override fun getModifier(uuid: UUID): AttributeModifier? {
-        return modifiersById[uuid]
-    }
-
-    override fun hasModifier(modifier: AttributeModifier): Boolean {
-        return modifiersById.containsKey(modifier.id)
-    }
-
-    override fun addModifier(modifier: AttributeModifier) {
-        val attributeModifier = modifiersById.putIfAbsent(modifier.id, modifier)
-        require(attributeModifier == null) { "$modifier is already applied on this attribute!" }
-        getModifiers(modifier.operation).add(modifier)
-        setDirty()
-    }
-
-    override fun removeModifier(modifier: AttributeModifier) {
-        getModifiers(modifier.operation).remove(modifier)
-        modifiersById.remove(modifier.id)
-        setDirty()
-    }
-
-    override fun removeModifier(uuid: UUID) {
-        getModifier(uuid)?.let { removeModifier(it) }
-        setDirty()
-    }
-
-    override fun removeModifiers() {
-        modifiersById.clear()
-        modifiersByOperation.clear()
-        setDirty()
-    }
-
-    /**
-     * Replace the states of this instance with the [other]'s.
-     */
-    override fun replace(other: AttributeInstance) {
-        require(other is WakameAttributeInstance) { "Can't replace with a different type of AttributeInstance" }
-        baseValue = other.getBaseValue()
-        modifiersById.clear()
-        modifiersById.putAll(other.modifiersById)
-        modifiersByOperation.clear()
-        modifiersByOperation.putAll(other.modifiersByOperation)
-        setDirty()
     }
 }
