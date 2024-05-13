@@ -33,54 +33,54 @@ class AttributeSupplier internal constructor(
     /**
      * Creates a new [AttributeInstance] from this supplier.
      *
-     * Returns `null` if the [attribute] is not present in this supplier.
+     * Returns `null` if the [type] is not present in this supplier.
      *
      * This function may have **side effect** to the [attributable].
 
-     * @param attribute the attribute type
+     * @param type the attribute type
      * @param attributable the object which holds the vanilla attribute instances in the world state
      * @return a new instance of [AttributeInstance].
      */
-    fun createAttributeInstance(attribute: Attribute, attributable: Attributable): AttributeInstance? {
-        val prototype = prototypes[attribute] ?: return null
-        val product = AttributeInstanceFactory.createInstance(attribute, attributable)
+    fun createAttributeInstance(type: Attribute, attributable: Attributable): AttributeInstance? {
+        val prototype = prototypes[type] ?: return null
+        val product = AttributeInstanceFactory.createInstance(type, attributable)
         product.replace(prototype)
         return product
     }
 
     /**
-     * Gets the value for the [attribute] after all modifiers have been applied.
+     * Gets the value for the [type] after all modifiers have been applied.
      *
-     * @param attribute the attribute type
+     * @param type the attribute type
      * @return the value for the attribute
      * @throws IllegalArgumentException if the [type] is not present in this supplier
      */
-    fun getValue(attribute: Attribute): Double {
-        return getPrototypeOrThrow(attribute).getValue()
+    fun getValue(type: Attribute): Double {
+        return getPrototypeOrThrow(type).getValue()
     }
 
     /**
-     * Gets the base value for the [attribute].
+     * Gets the base value for the [type].
      *
-     * @param attribute the attribute type
+     * @param type the attribute type
      * @return the base value for the attribute
      * @throws IllegalArgumentException if the [type] is not present in this supplier
      */
-    fun getBaseValue(attribute: Attribute): Double {
-        return getPrototypeOrThrow(attribute).getBaseValue()
+    fun getBaseValue(type: Attribute): Double {
+        return getPrototypeOrThrow(type).getBaseValue()
     }
 
     /**
-     * Gets the modifier value specified by [attribute] and [uuid].
+     * Gets the modifier value specified by [type] and [uuid].
      *
-     * @param attribute the attribute type
+     * @param type the attribute type
      * @param uuid the uuid
      * @return the modifier value
      * @throws IllegalArgumentException if the [type] is not present in this supplier
      */
-    fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        return requireNotNull(getPrototypeOrThrow(attribute).getModifier(uuid)) {
-            "Can't find attribute modifier '$uuid' on attribute '${attribute.descriptionId}'"
+    fun getModifierValue(type: Attribute, uuid: UUID): Double {
+        return requireNotNull(getPrototypeOrThrow(type).getModifier(uuid)) {
+            "Can't find attribute modifier '$uuid' on attribute '${type.descriptionId}'"
         }.amount
     }
 
