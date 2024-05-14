@@ -126,23 +126,17 @@ object AttributeRegistry : Initializable {
 
         +buildFacade("defense_penetration", SHORT).single().element().bind { DEFENSE_PENETRATION }
 
-        +buildFacade("defense_penetration_rate", DOUBLE).single().element().bind { DEFENSE_PENETRATION_RATE }
-
         +buildFacade("entity_interaction_range", DOUBLE).single().bind { ENTITY_INTERACTION_RANGE }
 
         +buildFacade("health_regeneration", SHORT).single().bind { HEALTH_REGENERATION }
 
         +buildFacade("lifesteal", SHORT).single().bind { LIFESTEAL }
 
-        +buildFacade("lifesteal_rate", DOUBLE).single().bind { LIFESTEAL_RATE }
-
         +buildFacade("mana_consumption_rate", DOUBLE).single().bind { MANA_CONSUMPTION_RATE }
 
         +buildFacade("mana_regeneration", SHORT).single().bind { MANA_REGENERATION }
 
         +buildFacade("manasteal", SHORT).single().bind { MANASTEAL }
-
-        +buildFacade("manasteal_rate", DOUBLE).single().bind { MANASTEAL_RATE }
 
         +buildFacade("max_absorption", SHORT).single().bind { MAX_ABSORPTION }
 

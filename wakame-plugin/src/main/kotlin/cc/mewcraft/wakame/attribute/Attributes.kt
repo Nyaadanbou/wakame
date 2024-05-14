@@ -28,11 +28,11 @@ object Attributes {
        as backend to make them effective in game.
      */
 
-    val MAX_HEALTH = RangedAttribute("max_health", 20.0, 1.0, 16384.0, true)
-    val MAX_ABSORPTION = RangedAttribute("max_absorption", .0, .0, 2048.0, true)
-    val MOVEMENT_SPEED = RangedAttribute("movement_speed", .0, -1.0, 4.0, true)
     val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", 4.5, 1.0, 64.0, true)
     val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", 3.0, 1.0, 64.0, true)
+    val MAX_ABSORPTION = RangedAttribute("max_absorption", .0, .0, 2048.0, true)
+    val MAX_HEALTH = RangedAttribute("max_health", 20.0, 1.0, 16384.0, true)
+    val MOVEMENT_SPEED = RangedAttribute("movement_speed", .0, -1.0, 4.0, true)
 
     /*
        Independent Attributes
@@ -42,16 +42,14 @@ object Attributes {
        we mean that we will implement them by listeners or schedulers.
      */
 
-    val DAMAGE_REDUCTION_RATE = RangedAttribute("damage_reduction_rate", .0, .0, 1.0)
-    val ATTACK_SPEED_LEVEL = RangedAttribute("attack_speed_level", .0, .0, 8.0) // !!! can only take integers
     val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0)
+    val ATTACK_SPEED_LEVEL = RangedAttribute("attack_speed_level", .0, .0, 8.0) // !!! can only take integers
     val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", 0.01, .0, 1.0)
     val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, .0, 5.0)
-    val LIFESTEAL = RangedAttribute("lifesteal", .0, .0, 16384.0)
-    val LIFESTEAL_RATE = RangedAttribute("lifesteal_rate", .0, .0, 1.0)
-    val MANASTEAL = RangedAttribute("manasteal", .0, .0, 16384.0)
-    val MANASTEAL_RATE = RangedAttribute("manasteal_rate", .0, .0, 1.0)
+    val DAMAGE_REDUCTION_RATE = RangedAttribute("damage_reduction_rate", .0, .0, 1.0)
     val HEALTH_REGENERATION = RangedAttribute("health_regeneration", 1.0, 0.0, 16384.0)
+    val LIFESTEAL = RangedAttribute("lifesteal", .0, .0, 16384.0)
+    val MANASTEAL = RangedAttribute("manasteal", .0, .0, 16384.0)
     val MANA_CONSUMPTION_RATE = RangedAttribute("mana_consumption_rate", 1.0, .0, 5.0)
     val MANA_REGENERATION = RangedAttribute("mana_regeneration", 1.0, .0, 16384.0)
     val MAX_MANA = RangedAttribute("max_mana", 100.0, 0.0, 16384.0)
@@ -120,7 +118,6 @@ class ElementAttributes internal constructor(
 ) {
     val DEFENSE = ElementAttribute("defense", .0, -16384.0, 16384.0, element)
     val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element)
-    val DEFENSE_PENETRATION_RATE = ElementAttribute("defense_penetration_rate", .0, -1.0, 1.0, element)
-    val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element)
     val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element)
+    val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element)
 }

@@ -294,18 +294,6 @@ lifesteal:
     min: .0
     max: 16384.0
 
-lifesteal_rate:
-  enabled: true
-  display: "攻击吸血百分比"
-  tooltips:
-    add: "<!i>攻击吸血率 <value:+#%;-.%>"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
-  values:
-    default: .0
-    min: .0
-    max: 1.0
-
 mana_consumption_rate:
   enabled: true
   display: "魔法消耗百分比"
@@ -341,18 +329,6 @@ manasteal:
     default: .0
     min: .0
     max: 64.0
-
-manasteal_rate:
-  enabled: true
-  display: "魔法汲取百分比"
-  tooltips:
-    add: "<!i>魔法汲取率 <value:+#;-.>%"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
-  values:
-    default: .0
-    min: .0
-    max: 1.0
 
 max_absorption:
   enabled: true
