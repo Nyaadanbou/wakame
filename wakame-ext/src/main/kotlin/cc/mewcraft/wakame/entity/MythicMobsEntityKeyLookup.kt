@@ -7,19 +7,19 @@ import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 import kotlin.jvm.optionals.getOrElse
 
-class MythicMobsEntityKeyLookup : EntityKeyLookup {
+class MythicMobsEntityKeyLookup : EntityKeyLookupPart {
 
     private val mythicApi: MythicBukkit by lazy { MythicBukkit.inst() }
     private val keyCache: LoadingCache<String, Key> = Caffeine.newBuilder()
         .maximumSize(128)
         .build { name ->
-            Key.key(MM_NAMESPACE, name)
+            Key.key(EntitySupport.NAMESPACE_MYTHIC_MOBS, name)
         }
 
     /**
      * Returns `null` if the [entity] is not an MM entity.
      */
-    override fun getKey(entity: Entity): Key? {
+    override fun get(entity: Entity): Key? {
         val activeMob = mythicApi.mobManager.getActiveMob(entity.uniqueId).getOrElse {
             return null
         }
@@ -27,8 +27,8 @@ class MythicMobsEntityKeyLookup : EntityKeyLookup {
         return keyCache[activeMob.name]
     }
 
-    companion object Constants {
-        const val MM_NAMESPACE = "mythicmobs"
-    }
+}
 
+private object EntitySupport {
+    const val NAMESPACE_MYTHIC_MOBS = "mythicmobs"
 }

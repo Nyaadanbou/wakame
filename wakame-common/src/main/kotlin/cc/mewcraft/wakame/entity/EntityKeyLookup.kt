@@ -6,12 +6,14 @@ import org.bukkit.entity.Entity
 interface EntityKeyLookup {
 
     /**
-     * Gets the key of [entity]. If the implementation can't find a proper key
-     * for the [entity], this function should return `null`.
+     * Gets the key of [entity].
+     *
+     * This function always returns a non-null value. In the case where we
+     * can't find a key for the entity, the vanilla key will be returned.
      *
      * @param entity the entity from which you look up the key
      * @return the key of the entity
      */
-    fun getKey(entity: Entity): Key?
+    fun get(entity: Entity): Key
 
 }

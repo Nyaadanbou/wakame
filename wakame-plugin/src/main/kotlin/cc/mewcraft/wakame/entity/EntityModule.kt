@@ -12,18 +12,19 @@ const val ENTITY_TYPE_HOLDER_SERIALIZER = "entity_type_holder_serializer"
 internal fun entityModule(): Module = module {
 
     single<EntityKeyLookup> {
-        val lookupList = mutableListOf<EntityKeyLookup>()
-
-        // optionally add MM lookup
-        val pl = get<WakamePlugin>()
-        if (pl.isPluginPresent("MythicMobs")) {
-            lookupList += MythicMobsEntityKeyLookup()
+        fun registerImplementation(
+            requiredPlugin: String,
+            implementations: MutableList<EntityKeyLookupPart>,
+            implementationCreator: () -> EntityKeyLookupPart,
+        ) {
+            if (get<WakamePlugin>().isPluginPresent(requiredPlugin)) {
+                implementations.add(implementationCreator())
+            }
         }
 
-        // always add vanilla lookup
-        lookupList += VanillaEntityKeyLookup()
-
-        CompositedEntityKeyLookup(lookupList)
+        EntityKeyLookupImpl(buildList {
+            registerImplementation("MythicMobs", this, ::MythicMobsEntityKeyLookup)
+        })
     }
 
     single<TypeSerializerCollection>(named(ENTITY_TYPE_HOLDER_SERIALIZER)) {

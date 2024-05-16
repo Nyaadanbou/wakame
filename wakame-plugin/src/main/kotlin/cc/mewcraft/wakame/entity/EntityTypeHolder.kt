@@ -46,7 +46,7 @@ private data class EntityTypeHolderImpl(
     private val entityKeyLookup: EntityKeyLookup by inject()
 
     override fun contains(obj: Entity): Boolean {
-        return entityKeyLookup.getKey(obj) in keySet
+        return entityKeyLookup.get(obj) in keySet
     }
 
     override fun contains(key: Key): Boolean {

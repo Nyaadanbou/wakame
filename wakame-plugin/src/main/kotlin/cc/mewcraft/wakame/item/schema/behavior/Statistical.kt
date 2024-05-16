@@ -31,7 +31,7 @@ interface Statistical : ItemBehavior {
         override fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) {
             // TODO: 这个只是一个 POC，要判断一个生物是否被一个物品击杀需要考虑很多情况（比如法杖的间接伤害统计）
             if (attacked !is LivingEntity) return
-            val key = lookup.getKey(attacked) ?: return
+            val key = lookup.get(attacked)
             val nekoStack = PlayNekoStackFactory.require(itemStack)
 
             val statistics = nekoStack.statistics
