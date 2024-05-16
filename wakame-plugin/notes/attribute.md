@@ -1,76 +1,76 @@
-# 目标
-根据一些事件的触发为实体 Entity 添加 Attribute，并将 Attribute 的具体效果应用到游戏内实体上
+## 架构
 
-## 事件的种类
-- PlayerJoinEvent （初始化玩家的属性）
-- PlayerQuitEvent （仅作移除）
-- PlayerArmorChangeEvent （更新玩家的属性）
-- PlayerItemHeldEvent （更新玩家的属性）
-- TODO: 生物的事件
-
-## 一些类的定义
-- AttributeHandler
-  - 监听事件，根据事件的种类来调用更新属性的方法
+- AttributeEventHandler
+    - 监听事件，根据事件的种类来调用更新属性的方法
 - AttributeAccessor
-  - 用于获取实体的 AttributeMap
-  - 提供修改实体属性的方法，修改完成后触发一个事件，表示
+    - 用于获取实体的 AttributeMap
 - AttributeMap
-  - 根据属性的类别来存储与获取属性的 AttributeInstance
+    - 根据属性的类别来存储与获取属性的 AttributeInstance
 - AttributeInstance
-  - 一个属性的类别
-  - 用于存储与获取**一个**属性的所有的计算操作(即 AttributeModifier), 并且可以返回计算的最终的值
+    - 用于存储与获取**一个**属性的所有的计算操作 (即 AttributeModifier), 并且可以返回计算的最终的值
 - AttributeModifier
-  - 一个UUID，表示提供此计算操作的来源的唯一标识 
-  - 一个Double，表示提供的计算操作的值
-  - 一个属性的计算操作，包括了操作的类型（加算，乘算，最终乘算）
+    - 属性的修饰器，包括数值和对应的操作类型（加算，乘算，最终乘算）
 
-## 伪代码
-```kotlin
-interface AttributeAccessor<T : Entity> {
-    fun getAttributeMap(): AttributeMap
-    
-    fun 各种修改 AttributeMap 的方法() {
-        修改完成
-    
-        触发修改事件
-    }
-}
+## 关于配置文件的思考
 
-class 修改事件(
-  val uuid: 触发此事件的生物UUID,
-  val type: 触发此事件的生物类型,
-): Cancelable
+我的架构中，属性的类别是硬编码，但是属性的数值是需要支持通过配置文件定义的。
 
-/**
- * 将代码内的属性应用到游戏世界内的实体上
- */
-abstract class AttributeApplier<T: Entity> {
-    // 通用生物的属性
-    fun applyAttribute(attributeMap: AttributeMap) {
-        // 根据属性的类别来获取 AttributeInstance
-        val instance = attributeMap[属性的类别]
-        
-      instance.获得计算结果()
-      
-      根据计算结果来修改实体的属性
-        
-    }
-}
+如果要通过配置文件定义，那么就要保证下面几个类的成员变量要跟配置文件里的一致：
 
-class PlayerAttributeApplier : AttributeApplier<Player> {
-    // 重写 applyAttribute 方法
-}
+1. `Attribute`
+2. `AttributeInstance`
+3. `AttributeMap`
+4. `AttributeSupplier`
+5. `DefaultAttributes`
 
+*包含上面几个类的类不在讨论范围内。
 
-class AttributeApplierListener {
-    val registery :可以通过生物类型获得不同的 AttributeApplier
-    
-    @EventHandler(ingoreCancelled = true, priority = EventPriority.LOWEST)
-    fun 监听事件(e) {
-        根据生物类型来调用
-        registery[e.type].applyAttribute(e.attributeMap)
-    }
-}
+要实现配置文件这个系统，本身又分为两个部分：
 
+- 类在首次实例化时
+    - 需要读取配置文件里的值
+- 配置文件重载之后
+    - 已经存在的对象需要反映最新的配置文件，或者
+    - 至少让新创建的对象反映最新的配置文件
 
-```
+然后我们依照上面的思路，分别讨论下各个类的配置文件方案。
+
+#### `Attribute`
+
+`Attribute` 作为“类型”，它的值应该由 provider 来实现配置文件的机制。
+
+这是因为 `Attribute` 作为类型，在很多时候我们是通过引用来比较对象，而非值来比较。
+
+这也意味着我们不能随意的创建一个新的 `Attribute` 然后拿去当类型用，这势必会在比较对象上出现问题。
+
+因此，`Attribute` 的方案就是为所有需要支持配置文件的成员变量套上一个 `Provider`。
+
+这样就能够在不重新实例化 `Attribute` 的基础上，让其数值能够反映最新的配置文件。
+
+#### `AttributeInstance`
+
+这是最为复杂的一个类。
+
+关于 `baseValue` 直接存值还是套个 provider 的思考。
+
+先说结论 - 直接储存值，不储存 provider。
+
+1. 直接储存值 -
+   意味着无法直接支持重载，除非特意去 `setBaseValue`，
+   或直接重新构建一个新的 `AttributeInstance`
+2. 使用 provider -
+   意味着支持重载，并且是立马生效的，这种方案只支持
+   已有的 `AttributeInstance` 的值自动更新，而无法支持
+   新的 `AttributeInstance`
+
+#### `AttributeSupplier`
+
+其本身不需要支持重载，而是让获取到的 `AttributeSupplier` 实例能够反映最新的配置文件即可。
+
+#### `DefaultAttributes`
+
+这是一个单例，里面包含了一个容器，存有每种生物类型所对应的默认属性 (即每种生物类型都有它自己的一个 `AttributeSupplier` 对象)。
+
+因此，要重载这个单例，就是要使得这个容器所返回的对象能够反映最新的配置文件。
+
+这一点通过实现 `Initializable` 使其接入 `Initializer` 的生态即可。
