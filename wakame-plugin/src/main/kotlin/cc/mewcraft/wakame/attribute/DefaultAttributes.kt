@@ -1,91 +1,88 @@
 package cc.mewcraft.wakame.attribute
 
-import org.bukkit.entity.EntityType
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.registry.Registry
+import cc.mewcraft.wakame.registry.SimpleRegistry
+import cc.mewcraft.wakame.util.Key
+import net.kyori.adventure.key.Key
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 
 /**
  * Provides default [AttributeInstance]s for various entity types.
  */
-object DefaultAttributes {
-    /**
-     * This map stores Attribute Suppliers for each supported [EntityType].
-     */
-    private val ATTRIBUTE_SUPPLIERS: Map<EntityType, AttributeSupplier> = createSuppliers()
+object DefaultAttributes : KoinComponent, Initializable {
 
-    private fun createSuppliers(): Map<EntityType, AttributeSupplier> {
-        return emptyMap() // TODO 每个生物的属性的默认值现在由配置文件提供，这里应该是读取配置文件的逻辑
+    private val LOGGER: Logger by inject()
+
+    /**
+     * This registry holds the attribute suppliers for all entity types.
+     *
+     * ## Notes
+     *
+     * Using [Key] to identify the "type" of living entities because we want the whole
+     * attribute system to be compatible with 3rd party mob system such as MythicMobs,
+     * in which case the enum type is not enough to express all types.
+     */
+    private val SUPPLIERS: Registry<Key, AttributeSupplier> = SimpleRegistry()
+
+    /**
+     * Loads all attribute suppliers from config.
+     */
+    private fun deserializeSuppliers(): Map<Key, AttributeSupplier> {
+        val node = AttributeSupport.ENTITY_ATTRIBUTE_CONFIG.get()
+        val map = AttributeSupplierDeserializer(node).deserialize()
+        return map
     }
 
     /**
-     * Gets the [AttributeSupplier] for the [type] entity.
+     * Gets the [AttributeSupplier] for the [key].
      *
      * **Currently, only limited entity types are supported.** Getting an
      * unsupported entity type will throw an [IllegalArgumentException].
      *
-     * @param type the entity type to get AttributeSupplier
+     * @param key the entity key
      * @return the attribute supplier
      * @throws IllegalArgumentException
      */
-    fun getSupplier(type: EntityType): AttributeSupplier {
-        return requireNotNull(ATTRIBUTE_SUPPLIERS[type]) { "Can't find attribute supplier for type $type" }
+    fun getSupplier(key: Key): AttributeSupplier {
+        return requireNotNull(SUPPLIERS.find(key)) { "Can't find attribute supplier for entity $key" }
     }
 
     /**
-     * Checks if the [type] entity has a default [AttributeSupplier].
+     * Checks if the [key] entity has a [AttributeSupplier].
      *
-     * @param type the entity type to check
+     * @param key the entity key
      * @return true if the entity type has a default supplier, false otherwise
      */
-    fun hasSupplier(type: EntityType): Boolean {
-        return ATTRIBUTE_SUPPLIERS.containsKey(type)
+    fun hasSupplier(key: Key): Boolean {
+        return SUPPLIERS.has(key)
+    }
+
+    /**
+     * Registers a [AttributeSupplier] for the [key].
+     *
+     * @param key the entity key
+     * @param supplier the attribute supplier
+     */
+    fun addSupplier(key: Key, supplier: AttributeSupplier) {
+        SUPPLIERS.register(key, supplier)
+    }
+
+    /**
+     * Clears all suppliers.
+     */
+    fun clear() {
+        SUPPLIERS.clear()
+    }
+
+    override fun onPostWorld() {
+        clear()
+
+        deserializeSuppliers().forEach { (k, v) ->
+            addSupplier(k, v)
+            LOGGER.info("Registered attribute supplier: {}", k)
+        }
     }
 }
-
-class AttributeSupplierCreator {
-
-}
-
-/*
-    //
-    // Vanilla-backed Attributes
-    //
-    // Mechanics of these attributes are backed by vanilla game.
-
-    addByConfig(Attributes.MAX_HEALTH)
-    addByConfig(Attributes.MAX_ABSORPTION)
-    addByConfig(Attributes.MOVEMENT_SPEED)
-    addByConfig(Attributes.BLOCK_INTERACTION_RANGE)
-    addByConfig(Attributes.ENTITY_INTERACTION_RANGE)
-
-    //
-    // Independent Attributes
-    //
-    // Mechanics of these attributes are implemented by ourselves.
-
-    addByConfig(Attributes.ATTACK_EFFECT_CHANCE)
-    addByConfig(Attributes.ATTACK_SPEED_LEVEL)
-    addByConfig(Attributes.CRITICAL_STRIKE_CHANCE)
-    addByConfig(Attributes.CRITICAL_STRIKE_POWER)
-    addByConfig(Attributes.DAMAGE_REDUCTION_RATE)
-    addByConfig(Attributes.LIFESTEAL)
-    addByConfig(Attributes.LIFESTEAL_RATE)
-    addByConfig(Attributes.MANASTEAL)
-    addByConfig(Attributes.MANASTEAL_RATE)
-    addByConfig(Attributes.MANA_REGENERATION)
-    addByConfig(Attributes.HEALTH_REGENERATION)
-    addByConfig(Attributes.MANA_CONSUMPTION_RATE)
-    addByConfig(Attributes.MAX_MANA)
-
-    //
-    // Elemental Attributes
-    //
-    // Each of these attributes is associated with a certain element.
-    // Mechanics of these attributes are implementation-defined.
-
-    ElementRegistry.INSTANCES.objects.forEach {
-        addByConfig(Attributes.byElement(it).DEFENSE)
-        addByConfig(Attributes.byElement(it).DEFENSE_PENETRATION)
-        addByConfig(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
-        addByConfig(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
-        addByConfig(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
-    }
- */

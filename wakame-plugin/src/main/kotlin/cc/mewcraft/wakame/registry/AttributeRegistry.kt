@@ -307,7 +307,7 @@ private interface RangedAttributeBinder {
  */
 private interface SingleElementAttributeBinder {
     fun bind(
-        component: ElementAttributes.() -> ElementAttribute,
+        component: ElementAttributeContainer.() -> ElementAttribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreSE, SchemaAttributeCoreSE>
 }
 
@@ -316,8 +316,8 @@ private interface SingleElementAttributeBinder {
  */
 private interface RangedElementAttributeBinder {
     fun bind(
-        component1: ElementAttributes.() -> ElementAttribute,
-        component2: ElementAttributes.() -> ElementAttribute,
+        component1: ElementAttributeContainer.() -> ElementAttribute,
+        component2: ElementAttributeContainer.() -> ElementAttribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreRE, SchemaAttributeCoreRE>
 }
 
@@ -607,7 +607,7 @@ private class SingleElementAttributeBinderImpl(
     /**
      * Components: Operation, Single, Element
      */
-    override fun bind(component: ElementAttributes.() -> ElementAttribute): AttributeFacadeOverride<BinaryAttributeCoreSE, SchemaAttributeCoreSE> {
+    override fun bind(component: ElementAttributeContainer.() -> ElementAttribute): AttributeFacadeOverride<BinaryAttributeCoreSE, SchemaAttributeCoreSE> {
         val facade = MutableAttributeFacadeImpl(
             facadeId = id,
             configuration = config,
@@ -659,8 +659,8 @@ private class RangedElementAttributeBinderImpl(
      * Components: Operation, Ranged, Element
      */
     override fun bind(
-        component1: ElementAttributes.() -> ElementAttribute,
-        component2: ElementAttributes.() -> ElementAttribute,
+        component1: ElementAttributeContainer.() -> ElementAttribute,
+        component2: ElementAttributeContainer.() -> ElementAttribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreRE, SchemaAttributeCoreRE> {
         val facade = MutableAttributeFacadeImpl(
             facadeId = id,

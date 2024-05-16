@@ -6,10 +6,8 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registry.ATTRIBUTE_CONFIG_FILE
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -18,15 +16,14 @@ import net.kyori.examination.ExaminableProperty
 import org.intellij.lang.annotations.Pattern
 import java.util.stream.Stream
 
-private val ATTRIBUTE_CONFIG by lazy { Configs.YAML[ATTRIBUTE_CONFIG_FILE] }
-
 /**
- * An identifiable numerical value.
+ * An attribute type with a numerical default value.
  *
  * ## Notes to users of the code
  *
- * By design, you should not create the instance yourself. Instead,
- * use the singleton [Attributes] to get the instances.
+ * By design, you should not create the instance yourself because the objects
+ * are generally used as conceptual types. Instead, use the singleton [Attributes]
+ * to get the instances. The same also applies to its subtypes.
  *
  * @property facadeId
  * @property descriptionId 属性的唯一标识
@@ -41,14 +38,14 @@ open class Attribute
  * @param defaultValue 属性的默认数值 ([Provider])
  */
 protected constructor(
-    @Pattern("[a-z0-9_.]")
-    val facadeId: String,
-    @Pattern("[a-z0-9_.]")
-    val descriptionId: String,
+    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) val facadeId: String,
+    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) val descriptionId: String,
     defaultValue: Provider<Double>,
     val vanilla: Boolean = false,
 ) : Keyed, Examinable {
     /**
+     * Instantiates the type using the global attribute config as value providers.
+     *
      * This constructor is used if the [facadeId] is different from the [descriptionId].
      *
      * @param facadeId the ID of the attribute facade to which this attribute is related
@@ -61,7 +58,7 @@ protected constructor(
     ) : this(
         facadeId = facadeId,
         descriptionId = descriptionId,
-        defaultValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
         vanilla = vanilla
     )
 
@@ -124,15 +121,16 @@ protected constructor(
 }
 
 /**
- * An [Attribute] with bounded values.
+ * An [Attribute] type with bounded values.
  *
  * The [minValue] and [maxValue] put a threshold on the final value of this attribute
  * after all [AttributeModifier]s have been applied.
- *
+ */
+open class RangedAttribute
+/**
  * @param minValue 该属性允许的最小数值（[Provider]）
  * @param maxValue 该属性允许的最大数值（[Provider]）
  */
-open class RangedAttribute
 protected constructor(
     facadeId: String,
     descriptionId: String,
@@ -145,6 +143,8 @@ protected constructor(
     val maxValue: Double by maxValue
 
     /**
+     * Instantiates the type using the global attribute config as value providers.
+     *
      * This constructor is used if the [facadeId] is different from the [descriptionId].
      *
      * @param facadeId the ID of the attribute facade to which this attribute is related
@@ -159,9 +159,9 @@ protected constructor(
     ) : this(
         facadeId = facadeId,
         descriptionId = descriptionId,
-        defaultValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
-        minValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "min").orElse(minValue),
-        maxValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "max").orElse(maxValue),
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
+        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "min").orElse(minValue),
+        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "max").orElse(maxValue),
         vanilla = vanilla
     )
 
@@ -210,7 +210,7 @@ protected constructor(
 }
 
 /**
- * An [Attribute] with an [Element].
+ * An [Attribute] type with an [Element].
  */
 open class ElementAttribute
 protected constructor(
@@ -231,6 +231,8 @@ protected constructor(
 ) {
 
     /**
+     * Instantiates the type using the global attribute config as value providers.
+     *
      * This constructor is used if the [facadeId] is different from the [descriptionId].
      *
      * @param facadeId the ID of the attribute facade to which this attribute is related
@@ -246,9 +248,9 @@ protected constructor(
     ) : this(
         facadeId = facadeId,
         descriptionId = descriptionId,
-        defaultValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "default").orElse(defaultValue),
-        minValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "min").orElse(minValue),
-        maxValue = ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "max").orElse(maxValue),
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "default").orElse(defaultValue),
+        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "min").orElse(minValue),
+        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "max").orElse(maxValue),
         element = element,
         vanilla = vanilla
     )

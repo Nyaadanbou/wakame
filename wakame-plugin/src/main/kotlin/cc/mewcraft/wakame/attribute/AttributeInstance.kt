@@ -54,29 +54,37 @@ internal object AttributeInstanceFactory {
     }
 
     /**
-     * 用于创建实例。实例必须反映在世界状态里。
+     * 用于创建实例。实例将绑定到 [attributable].
      *
      * **副作用** - 会依据情况修改 [attributable] 的状态。
      *
      * @param attribute
-     * @param attributable 世界状态里的对象
+     * @param attributable 世界状态中需要创建 [AttributeInstance] 的对象
+     * @param registerVanilla 是否在世界状态中为 [attributable] 注册属性
      */
-    fun createInstance(attribute: Attribute, attributable: Attributable): AttributeInstance {
+    fun createInstance(attribute: Attribute, attributable: Attributable, registerVanilla: Boolean): AttributeInstance {
         return if (attribute.vanilla) {
+            // 关于 Attribute#vanilla 的解释 -
             // 设计上，如果这个 Attribute 是原版的（例如移动速度），
             // 那么我们的 AttributeInstance 在实现上则是对应原版
             // AttributeInstance 的封装 —— 也就是说，函数的调用
             // 会重定向到原版 AttributeInstance 对应的函数上
 
-            // 副作用 - 注册一下 AttributeInstance
-            attributable.registerAttribute(attribute.toBukkit())
-
             // 从 Attributable 中获取要被封装的 AttributeInstance
-            val handle = requireNotNull(attributable.getAttribute(attribute.toBukkit())) {
+            val bukkitInstance = requireNotNull(attributable.getAttribute(attribute.toBukkit())) {
                 "Can't find vanilla attribute instance for attribute $attribute"
             }
 
-            VanillaAttributeInstance(handle)
+            if (registerVanilla) {
+                // 在 Bukkit 中为该 Attributable 注册该 Attribute
+
+                // 这将产生副作用，会直接改变 Attributable 的世界状态
+                // 这部分没有详细的 API 文档，但我们自己总结一下
+                // - 当该属性本来就存在时，它会覆盖原有的
+                attributable.registerAttribute(attribute.toBukkit())
+            }
+
+            VanillaAttributeInstance(bukkitInstance)
         } else {
             WakameAttributeInstance(attribute)
         }
@@ -84,19 +92,18 @@ internal object AttributeInstanceFactory {
 }
 
 /**
- * A prototype of [AttributeInstance].
- *
- * It's used to create new instances of [VanillaAttributeInstance] and [WakameAttributeInstance].
+ * This class shares common code to implement [AttributeInstance].
  */
-private class ProtoAttributeInstance(
-    override val attribute: Attribute,
-) : AttributeInstance {
-
+private sealed class SimpleAttributeInstance : AttributeInstance {
     private val modifiersByUuid: MutableMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
     private val modifiersByOperation: MutableMap<Operation, MutableSet<AttributeModifier>> = enumMap()
     private var dirty: Boolean = true
-    private var baseValue: Double = attribute.defaultValue
+    private var baseValue: Double
     private var cachedValue: Double = 0.0
+
+    constructor(attribute: Attribute) {
+        baseValue = attribute.defaultValue // initially set the baseValue to the attribute.defaultValue
+    }
 
     override fun getDescriptionId(): String {
         return attribute.descriptionId
@@ -157,9 +164,9 @@ private class ProtoAttributeInstance(
     }
 
     override fun replace(other: AttributeInstance) {
-        if (other is ProtoAttributeInstance) {
+        if (other is SimpleAttributeInstance) {
             // Optimizations: save several instructions for known types
-            baseValue = other.getBaseValue()
+            baseValue = other.baseValue
             modifiersByUuid.clear()
             modifiersByUuid.putAll(other.modifiersByUuid)
             modifiersByOperation.clear()
@@ -195,33 +202,38 @@ private class ProtoAttributeInstance(
 }
 
 /**
+ * A prototype of [AttributeInstance].
+ *
+ * It's used to create new instances of [VanillaAttributeInstance] and
+ * [WakameAttributeInstance].
+ */
+private class ProtoAttributeInstance(
+    override val attribute: Attribute,
+) : SimpleAttributeInstance(attribute)
+
+/**
  * A wakame [AttributeInstance].
+ *
+ * This class represents the concrete attribute instance in our own system.
  */
 private class WakameAttributeInstance(
     override val attribute: Attribute,
-) : AttributeInstance by ProtoAttributeInstance(attribute)
+) : SimpleAttributeInstance(attribute)
 
 /**
- * A special [AttributeInstance] that wraps an object of [BukkitAttributeInstance].
+ * A vanilla [AttributeInstance].
  *
- * All the function calls are redirected to the wrapped [BukkitAttributeInstance].
+ * This class essentially wraps an object of [BukkitAttributeInstance] and
+ * redirects all the function calls to corresponding those of
+ * [BukkitAttributeInstance].
  */
-private class VanillaAttributeInstance : AttributeInstance {
-    /**
-     * 封装的对象。
-     */
-    private val handle: BukkitAttributeInstance
-
-    /**
-     * 该构造器用于封装世界状态。
-     */
-    constructor(handle: BukkitAttributeInstance) {
-        this.handle = handle
-
-        // also set the value in the world state
-        setBaseValue(attribute.defaultValue)
-    }
-
+private class VanillaAttributeInstance
+/**
+ * 该构造器用于封装世界状态。
+ */
+constructor(
+    private val handle: BukkitAttributeInstance, // 封装的对象
+) : AttributeInstance {
     override val attribute: Attribute
         get() = handle.attribute.toNeko()
 

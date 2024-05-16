@@ -1,10 +1,15 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.user.User
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import net.kyori.adventure.key.Key
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataContainer
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.lang.ref.WeakReference
 import java.util.UUID
 
@@ -66,7 +71,9 @@ sealed interface AttributeMap {
  * @return a new instance of [PlayerAttributeMap]
  */
 fun PlayerAttributeMap(user: User<Player>): PlayerAttributeMap {
-    return PlayerAttributeMap(DefaultAttributes.getSupplier(EntityType.PLAYER), user.player)
+    val key = AttributeMapSupport.PLAYER_KEY
+    val default = DefaultAttributes.getSupplier(key)
+    return PlayerAttributeMap(default, user.player)
 }
 
 /**
@@ -100,22 +107,22 @@ internal constructor(
      *
      * The values that are the same as the default should not store in this map.
      */
-    private val data: MutableMap<Attribute, AttributeInstance> = HashMap()
+    private val data: MutableMap<Attribute, AttributeInstance> = Object2ObjectOpenHashMap()
 
     init {
         // vanilla attribute instances must be "initialized"
         // otherwise, if we have changed the value of a vanilla attribute,
         // the value would not be actually applied to the world state.
-        default.attributes.filter(Attribute::vanilla).forEach(::getInstance)
+        default.attributes.filter(Attribute::vanilla).forEach(::getInstance) // FIXME 如果 default 会直接返回原版属性的值（data 里缺省时），那这个初始化也不需要了
     }
 
     override fun getInstance(attribute: Attribute): AttributeInstance? {
         // the implementation has side effect to the player
-        return data.getNullableOrPut(attribute) { default.createAttributeInstance(attribute, player) }
+        return data.getNullableOrPut(attribute) { default.createInstance(attribute, player) }
     }
 
     override fun register(attribute: Attribute) {
-        data[attribute] = AttributeInstanceFactory.createInstance(attribute, player)
+        data[attribute] = AttributeInstanceFactory.createInstance(attribute, player, true)
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
@@ -127,15 +134,15 @@ internal constructor(
     }
 
     override fun getValue(attribute: Attribute): Double {
-        return data[attribute]?.getValue() ?: default.getValue(attribute)
+        return data[attribute]?.getValue() ?: default.getValue(attribute, player)
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        return data[attribute]?.getBaseValue() ?: default.getBaseValue(attribute)
+        return data[attribute]?.getBaseValue() ?: default.getBaseValue(attribute, player)
     }
 
     override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        return data[attribute]?.getModifier(uuid)?.amount ?: default.getModifierValue(attribute, uuid)
+        return data[attribute]?.getModifier(uuid)?.amount ?: default.getModifierValue(attribute, uuid, player)
     }
 
     override fun assignValues(other: AttributeMap) {
@@ -170,7 +177,9 @@ internal constructor(
  * @return a new instance of [EntityAttributeMap]
  */
 fun EntityAttributeMap(entity: LivingEntity): EntityAttributeMap {
-    return EntityAttributeMap(DefaultAttributes.getSupplier(entity.type), entity)
+    val key = AttributeMapSupport.ENTITY_KEY_LOOKUP.get(entity)
+    val default = DefaultAttributes.getSupplier(key)
+    return EntityAttributeMap(default, entity)
 }
 
 /**
@@ -185,8 +194,15 @@ internal constructor(
     private val default: AttributeSupplier,
     entity: LivingEntity,
 ) : AttributeMap {
+    /**
+     * The underlying entity.
+     */
     private val entity: WeakReference<LivingEntity> =
         WeakReference(entity) // use WeakRef to prevent memory leak
+
+    /**
+     * The data values.
+     */
     private val data: PersistentDataContainer
         get() = entity.get()?.persistentDataContainer ?: error("The entity reference object no longer exists")
 
@@ -236,4 +252,9 @@ internal constructor(
     override fun assignValues(other: AttributeMap) {
         TODO("Not yet implemented")
     }
+}
+
+private object AttributeMapSupport : KoinComponent {
+    val PLAYER_KEY: Key = EntityType.PLAYER.key()
+    val ENTITY_KEY_LOOKUP: EntityKeyLookup by inject()
 }
