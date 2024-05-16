@@ -15,7 +15,7 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
-internal abstract class ItemMetaConfig(
+internal sealed class ItemMetaConfig(
     path: String,
 ) {
     val config: ConfigProvider by lazy { ItemMetaRegistry.CONFIG.node(path) }
