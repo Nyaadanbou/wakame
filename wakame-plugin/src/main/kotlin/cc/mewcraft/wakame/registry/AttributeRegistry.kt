@@ -104,7 +104,7 @@ object AttributeRegistry : Initializable {
             ATTACK_SPEED_LEVEL
         }.override {
             // create closures
-            val tooltips = DiscreteTooltips(config)
+            val tooltips = DiscreteTooltips(configuration)
 
             // override it
             displayTextCreator = { core: BinaryAttributeCoreS ->
@@ -172,7 +172,7 @@ interface AttributeFacade<BC : BinaryAttributeCore, SC : SchemaAttributeCore> : 
      * 当一个属性的 facade 是由多个属性构成时（例如攻击力），
      * 它们的唯一标识就略微不同。
      */
-    override val key: Key
+    val facadeId: Key
 
     /**
      * Holds metadata about the attribute components.
@@ -206,16 +206,16 @@ interface AttributeFacade<BC : BinaryAttributeCore, SC : SchemaAttributeCore> : 
 }
 
 /**
- * A mutable [AttributeFacade] (except the property [key]).
+ * A mutable [AttributeFacade] (except the property [facadeId]).
  */
 private interface MutableAttributeFacade<BC : BinaryAttributeCore, SC : SchemaAttributeCore> : AttributeFacade<BC, SC> {
     /**
      * The config of the attribute facade.
      */
-    val config: ConfigProvider
+    val configuration: ConfigProvider
 
     // this should be immutable
-    override val key: Key
+    override val facadeId: Key
 
     // these are mutable through override() in DSL
     override var attributeComponentMetadata: AttributeComponentMetadata
@@ -253,12 +253,12 @@ inline fun <reified T : AttributeComponent> AttributeComponentMetadata.hasCompon
 
 private operator fun AttributeFacade<*, *>.unaryPlus() {
     @Suppress("UNCHECKED_CAST")
-    FACADES.register(this.key, this as AttributeFacade<BinaryAttributeCore, SchemaAttributeCore>)
+    FACADES.register(this.facadeId, this as AttributeFacade<BinaryAttributeCore, SchemaAttributeCore>)
 }
 
 private operator fun AttributeFacadeOverride<*, *>.unaryPlus() {
     @Suppress("UNCHECKED_CAST")
-    FACADES.register(this.prototype.key, this as AttributeFacade<BinaryAttributeCore, SchemaAttributeCore>)
+    FACADES.register(this.prototype.facadeId, this as AttributeFacade<BinaryAttributeCore, SchemaAttributeCore>)
 }
 
 /**
@@ -340,15 +340,17 @@ private object AttributeRegistrySupport : KoinComponent {
 }
 
 private class MutableAttributeFacadeImpl<A : BinaryAttributeCore, B : SchemaAttributeCore>(
-    override val key: Key,
-    override val config: ConfigProvider,
+    override val facadeId: Key,
+    override val configuration: ConfigProvider,
     override var attributeComponentMetadata: AttributeComponentMetadata,
     override var attributeModifierCreator: (UUID, A) -> Map<Attribute, AttributeModifier>,
     override var schemaCoreCreatorByConfig: (ConfigurationNode) -> B,
     override var binaryCoreCreatorByConfig: (ConfigurationNode) -> A,
     override var binaryCoreCreatorByTag: (CompoundShadowTag) -> A,
     override var displayTextCreator: (A) -> List<Component>,
-) : MutableAttributeFacade<A, B>
+) : MutableAttributeFacade<A, B> {
+    override val key: Key = facadeId
+}
 
 private class AttributeComponentMetadataImpl private constructor(
     components: Set<KClass<out AttributeComponent>>,
@@ -500,8 +502,8 @@ private class SingleSelectionImpl(
      */
     override fun bind(component: Attributes.() -> Attribute): AttributeFacadeOverride<BinaryAttributeCoreS, SchemaAttributeCoreS> {
         val facade = MutableAttributeFacadeImpl(
-            key = id,
-            config = config,
+            facadeId = id,
+            configuration = config,
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Single::class
             ),
@@ -555,8 +557,8 @@ private class RangedSelectionImpl(
         component2: Attributes.() -> Attribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreR, SchemaAttributeCoreR> {
         val facade = MutableAttributeFacadeImpl(
-            key = id,
-            config = config,
+            facadeId = id,
+            configuration = config,
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class
             ),
@@ -607,8 +609,8 @@ private class SingleElementAttributeBinderImpl(
      */
     override fun bind(component: ElementAttributes.() -> ElementAttribute): AttributeFacadeOverride<BinaryAttributeCoreSE, SchemaAttributeCoreSE> {
         val facade = MutableAttributeFacadeImpl(
-            key = id,
-            config = config,
+            facadeId = id,
+            configuration = config,
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Single::class, AttributeComponent.Element::class
             ),
@@ -661,8 +663,8 @@ private class RangedElementAttributeBinderImpl(
         component2: ElementAttributes.() -> ElementAttribute,
     ): AttributeFacadeOverride<BinaryAttributeCoreRE, SchemaAttributeCoreRE> {
         val facade = MutableAttributeFacadeImpl(
-            key = id,
-            config = config,
+            facadeId = id,
+            configuration = config,
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class, AttributeComponent.Element::class
             ),
