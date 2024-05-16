@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableSet
 /**
  * An abstract key-value registry.
  */
-interface Registry<K, V> {
+interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
     /**
      * All the [instances][V] in this registry.
      */
@@ -24,14 +24,25 @@ interface Registry<K, V> {
     fun find(uniqueId: K?): V?
 
     /**
+     * Checks whether the specific value is present in this registry.
+     *
+     * @param uniqueId the name to be checked
+     * @return `true` if the specific value is present in this registry
+     */
+    fun has(uniqueId: K): Boolean {
+        return find(uniqueId) != null
+    }
+
+    /**
      * Gets specified value in this registry.
      *
      * @param uniqueId the name from which value you want to retrieve
      * @return the specified value
      * @throws IllegalStateException if the specified value does not exist
      */
-    operator fun get(uniqueId: K): V =
-        requireNotNull(find(uniqueId)) { "Can't find object for unique id: $uniqueId" }
+    operator fun get(uniqueId: K): V {
+        return requireNotNull(find(uniqueId)) { "Can't find object for unique id: $uniqueId" }
+    }
 
     /**
      * Registers a new entry into this registry.
@@ -138,6 +149,10 @@ internal class SimpleRegistry<K, V> : Registry<K, V> {
 
     override fun clear() {
         uniqueId2ObjectMap.clear()
+    }
+
+    override fun iterator(): Iterator<Map.Entry<K, V>> {
+        return uniqueId2ObjectMap.iterator()
     }
 }
 
