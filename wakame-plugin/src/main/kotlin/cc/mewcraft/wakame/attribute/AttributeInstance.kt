@@ -141,7 +141,7 @@ private sealed class SimpleAttributeInstance : AttributeInstance {
     }
 
     override fun addModifier(modifier: AttributeModifier) {
-        requireNotNull(modifiersByUuid.putIfAbsent(modifier.id, modifier)) { "$modifier is already applied on this attribute!" }
+        require(modifiersByUuid.putIfAbsent(modifier.id, modifier) == null) { "$modifier is already applied on this attribute!" }
         getModifiers0(modifier.operation).add(modifier)
         setDirty()
     }
