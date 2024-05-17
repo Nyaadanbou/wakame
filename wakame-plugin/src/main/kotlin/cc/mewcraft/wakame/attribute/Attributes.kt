@@ -39,6 +39,19 @@ interface AttributeContainer<T : Attribute> {
  * attribute constructors are just fallback values when the config provides nothing.
  */
 object Attributes : AttributeContainer<Attribute> {
+    private val ELEMENT_ATTRIBUTE_CONTAINERS: ConcurrentHashMap<Element, ElementAttributeContainer> = ConcurrentHashMap()
+    private val BY_FACADE_ID: Multimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
+    private fun register(attribute: Attribute): Attribute {
+        BY_FACADE_ID.put(attribute.facadeId, attribute)
+
+        if (attribute.vanilla) {
+            AttributeContainerSupport.VANILLA_ATTRIBUTE_NAMES += attribute.facadeId
+        }
+
+        return attribute
+    }
+
+    //<editor-fold desc="Types">
     /**
      * An empty attribute that does nothing on its own.
      *
@@ -79,6 +92,7 @@ object Attributes : AttributeContainer<Attribute> {
     val MANA_CONSUMPTION_RATE = RangedAttribute("mana_consumption_rate", 1.0, .0, 5.0).apply(::register)
     val MANA_REGENERATION = RangedAttribute("mana_regeneration", 1.0, .0, 16384.0).apply(::register)
     val MAX_MANA = RangedAttribute("max_mana", 100.0, .0, 16384.0).apply(::register)
+    //</editor-fold>
 
     // The returned collect does NOT include any elemental attributes!
     // Use the function Attributes.byElement to get a container first.
@@ -141,19 +155,6 @@ object Attributes : AttributeContainer<Attribute> {
      * Gets all [Attribute.facadeId] of the element attributes.
      */
     val ELEMENT_ATTRIBUTE_NAMES: Collection<String> = AttributeContainerSupport.ELEMENT_ATTRIBUTE_NAMES
-
-    private val ELEMENT_ATTRIBUTE_CONTAINERS: ConcurrentHashMap<Element, ElementAttributeContainer> = ConcurrentHashMap()
-    private val BY_FACADE_ID: Multimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
-
-    private fun register(attribute: Attribute): Attribute {
-        BY_FACADE_ID.put(attribute.facadeId, attribute)
-
-        if (attribute.vanilla) {
-            AttributeContainerSupport.VANILLA_ATTRIBUTE_NAMES += attribute.facadeId
-        }
-
-        return attribute
-    }
 }
 
 /**
@@ -166,15 +167,7 @@ internal constructor(
      */
     element: Element,
 ) : AttributeContainer<ElementAttribute> {
-    val DEFENSE = ElementAttribute("defense", .0, -16384.0, 16384.0, element).apply(::register)
-    val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element).apply(::register)
-    val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element).apply(::register)
-    val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element).apply(::register)
-
-    override fun byFacade(facadeId: String): Collection<ElementAttribute> {
-        return BY_FACADE_ID.get(facadeId)
-    }
-
+    private val BY_FACADE_ID: Multimap<String, ElementAttribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
     private fun register(attribute: ElementAttribute): ElementAttribute {
         BY_FACADE_ID.put(attribute.facadeId, attribute)
 
@@ -187,7 +180,16 @@ internal constructor(
         return attribute
     }
 
-    private val BY_FACADE_ID: Multimap<String, ElementAttribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
+    override fun byFacade(facadeId: String): Collection<ElementAttribute> {
+        return BY_FACADE_ID.get(facadeId)
+    }
+
+    //<editor-fold desc="Types">
+    val DEFENSE = ElementAttribute("defense", .0, -16384.0, 16384.0, element).apply(::register)
+    val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element).apply(::register)
+    val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element).apply(::register)
+    val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element).apply(::register)
+    //</editor-fold>
 }
 
 /**
