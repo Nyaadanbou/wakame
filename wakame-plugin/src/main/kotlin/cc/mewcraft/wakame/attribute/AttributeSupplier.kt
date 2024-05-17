@@ -157,7 +157,7 @@ class AttributeSupplierBuilder(
      * @param attribute the attribute type
      * @return the created prototype
      */
-    private fun createInstance(attribute: Attribute): AttributeInstance {
+    private fun createPrototype(attribute: Attribute): AttributeInstance {
         val prototype = AttributeInstanceFactory.createPrototype(attribute)
         prototypes.put(attribute, prototype)
         return prototype
@@ -167,7 +167,7 @@ class AttributeSupplierBuilder(
      * 添加一个供应者，其 [AttributeInstance.getBaseValue] 的值将基于 [attribute]。
      */
     fun add(attribute: Attribute): AttributeSupplierBuilder {
-        createInstance(attribute)
+        createPrototype(attribute)
         return this
     }
 
@@ -175,7 +175,7 @@ class AttributeSupplierBuilder(
      * 添加一个供应者，其 [AttributeInstance.getBaseValue] 的值将基于给定的常量。
      */
     fun add(attribute: Attribute, value: Double): AttributeSupplierBuilder {
-        val prototype = createInstance(attribute)
+        val prototype = createPrototype(attribute)
         prototype.setBaseValue(value)
         return this
     }
@@ -348,7 +348,7 @@ internal class AttributeSupplierDeserializer(
      */
     fun deserialize(): Map<Key, AttributeSupplier> {
         if (isFrozen) {
-            throw IllegalStateException("The function deserialize() can be invoked only once for a deserializer")
+            throw IllegalStateException("The function deserialize() can be invoked at most once for the instance")
         }
 
         val nodeMap = this.node.childrenMap().mapKeys { (key, _) -> Key(key.toString()) }
@@ -359,9 +359,7 @@ internal class AttributeSupplierDeserializer(
 
             val parentKey = parentNode.get<Key>()
             val valuesMap = valuesNode.childrenMap().mapKeys { (key, _) -> key.toString() }.run(::validateValuesMap)
-            this.builders[entityKey] = IntermediateBuilder(
-                parentKey, valuesMap
-            ).build()
+            this.builders[entityKey] = IntermediateBuilder(parentKey, valuesMap).build()
         }
 
         return this.builders
