@@ -1,23 +1,24 @@
 # 实体 Entities
 
-# 实体的属性值
+# 实体的默认属性
 # 你必须在这里定义每种实体所拥有的属性及其数值
 # 如果一个实体没有定义属性X，则该实体没有属性X
 #
-# 没有定义 = 不存在节点(node)
-# 没有数值 = 存在节点但值为空(~)
-#
 # 例外：
 # 如果一个属性X它是基于原版属性，并且
-# - 在这里没有节点，那么最终将返回X所对应原版属性的数值，而非没有属性
-# - 在这里存在节点，那么最终将返回这里指定的值，或全局默认值，如果值为空
+# - 在这里没有节点，那么最终将返回X所对应原版属性的数值，而非没有属性X
+# - 在这里存在节点，那么最终将返回这里X指定的值，或X的全局默认值，如果值为空
+#
+# 解释：
+# 没有定义 = 不存在节点(node)
+# 没有数值 = 存在节点但值为空(~)
 entity_attributes:
 
   minecraft:living: # 这里写实体的 key，也可以是符合命名空间规范的任意值
     parent: ~ # 父属性配置的 key，必须出现在该属性配置之前。可为空
     values:
-      defense: ~ # 如果一个属性带元素，并且没有写 map 结构，则相当于给该属性的每个元素都指定了一个值
-      max_mana: ~ # 如果一个属性不带元素，则其值就是该属性的值
+      defense: ~ # 如果一个属性带元素，并且没有 map 结构，则相当于给该属性的每个元素都指定了一个值
+      max_mana: 100.0 # 如果一个属性不带元素，则直接写标量来指定其数值
 
   minecraft:mob:
     parent: minecraft:living
@@ -26,7 +27,7 @@ entity_attributes:
   minecraft:monster:
     parent: minecraft:mob
     values:
-      defense: # 如果一个属性带元素，并且其内容是一个 map 结构，意思是给该属性的特定元素指定一个值。未指定的元素相当于没有
+      defense: # 如果一个属性带元素，并且该节点是一个 map 结构，意思是给该属性的特定元素指定一个值。未指定的元素相当于没有该元素的属性
         neutral: .0
 
   minecraft:player:
@@ -70,11 +71,11 @@ entity_attributes:
 entity_type_holders:
 
   demo_bosses_1: # 索引的唯一标识
-    - minecraft:ender_dragon # 原版怪物 minecraft:_value_（必须小写）
+    - minecraft:ender_dragon # 原版怪物 minecraft:{value}（必须小写）
     - minecraft:wither # 可用值参考 https://jd.papermc.io/paper/1.20/org/bukkit/entity/EntityType.html
 
   demo_bosses_2:
-    - mythicmobs:soul_knight # MM 怪物 mythicmobs:_value_（必须小写）
+    - mythicmobs:soul_knight # MM 怪物 mythicmobs:{value}（必须小写）
     - mythicmobs:nature_golem
 
   demo_bosses_3:
