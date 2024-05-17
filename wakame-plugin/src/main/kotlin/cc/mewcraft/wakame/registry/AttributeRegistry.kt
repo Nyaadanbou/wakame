@@ -258,7 +258,7 @@ private operator fun AttributeFacade<*, *>.unaryPlus() {
 
 private operator fun AttributeFacadeOverride<*, *>.unaryPlus() {
     @Suppress("UNCHECKED_CAST")
-    FACADES.register(this.prototype.facadeId, this as AttributeFacade<BinaryAttributeCore, SchemaAttributeCore>)
+    FACADES.register(this.prototype.facadeId, this.prototype as AttributeFacade<BinaryAttributeCore, SchemaAttributeCore>)
 }
 
 /**
