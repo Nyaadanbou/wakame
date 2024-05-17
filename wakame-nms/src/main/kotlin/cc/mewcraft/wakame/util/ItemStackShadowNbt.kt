@@ -35,7 +35,16 @@ internal val CompoundShadowTag.unwrap: CompoundTag
 //</editor-fold>
 
 internal val ItemMeta.customTag: CompoundTag
-    get() = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this).getCustomTag()
+    get() {
+        val shadow = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this)
+        val customTag = shadow.getCustomTag()
+        if (customTag === null) {
+            val newCustomTag = CompoundTag()
+            shadow.setCustomTag(newCustomTag)
+            return newCustomTag
+        }
+        return customTag
+    }
 
 //<editor-fold desc="CraftItemStack - Direct Access to `tags.display`">
 /**

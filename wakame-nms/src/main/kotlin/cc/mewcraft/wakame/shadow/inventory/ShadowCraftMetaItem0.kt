@@ -8,5 +8,8 @@ import net.minecraft.nbt.CompoundTag
 @ObcClassTarget("inventory.CraftMetaItem")
 interface ShadowCraftMetaItem0 : Shadow {
     @Field
-    fun getCustomTag(): CompoundTag
+    fun getCustomTag(): CompoundTag?
+
+    @Field
+    fun setCustomTag(customTag: CompoundTag?)
 }
