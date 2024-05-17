@@ -25,7 +25,7 @@ const val CRATE_PROTO_CONFIG_LOADER = "crate_config_loader"
 const val ITEM_PROTO_CONFIG_DIR = "items"
 const val ITEM_PROTO_CONFIG_LOADER = "item_proto_config_loader"
 
-const val ITEM_CONFIG = "items.yml"
+const val ITEM_CONFIG_FILE = "items.yml"
 const val ITEM_CONFIG_LOADER = "item_config_loader"
 
 const val SKILL_PROTO_CONFIG_DIR = "skills"

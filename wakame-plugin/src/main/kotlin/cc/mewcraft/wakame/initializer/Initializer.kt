@@ -107,8 +107,10 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
         saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_CONFIG_FILE)
-        saveResource(ELEMENT_CONFIG_FILE)
         saveResource(CATEGORY_CONFIG_FILE)
+        saveResource(ELEMENT_CONFIG_FILE)
+        saveResource(ENTITY_CONFIG_FILE)
+        saveResource(ITEM_CONFIG_FILE)
         saveResource(KIZAMI_CONFIG_FILE)
         saveResource(LEVEL_CONFIG_FILE)
         saveResource(PROJECTILE_CONFIG_FILE)
@@ -133,9 +135,7 @@ object Initializer : KoinComponent, Listener {
         fun forEachReload(block: Initializable.() -> Unit): Result<Unit> {
             toLateReload.forEach { initializable ->
                 try {
-                    LOGGER.info("${initializable::class.simpleName} start")
                     block(initializable)
-                    LOGGER.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
                     shutdown("An exception occurred during reload initialization.", e)
                     return Result.failure(e)
@@ -143,6 +143,7 @@ object Initializer : KoinComponent, Listener {
             }
             return Result.success(Unit)
         }
+
         LOGGER.info("[Initializer] onReload - Start")
         forEachReload { onReload() }.onFailure { return }
         LOGGER.info("[Initializer] onReload - Complete")
@@ -160,9 +161,7 @@ object Initializer : KoinComponent, Listener {
         fun forEachPreWorld(block: Initializable.() -> Unit): Result<Unit> {
             toInitPreWorld.forEach { initializable ->
                 try {
-                    LOGGER.info("${initializable::class.simpleName} start")
                     block(initializable)
-                    LOGGER.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
                     shutdown("An exception occurred during pre-world initialization.", e)
                     return Result.failure(e)
@@ -202,9 +201,7 @@ object Initializer : KoinComponent, Listener {
         fun forEachPostWorld(block: Initializable.() -> Unit): Result<Unit> {
             toInitPostWorld.forEach { initializable ->
                 try {
-                    LOGGER.info("${initializable::class.simpleName} start")
                     block(initializable)
-                    LOGGER.info("${initializable::class.simpleName} done")
                 } catch (e: Exception) {
                     shutdown("An exception occurred during post-world initialization.", e)
                     return Result.failure(e)

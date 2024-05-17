@@ -32,7 +32,7 @@ internal class ItemModelDataLookup(
                 customModelDataTable.put(Key(key), variantKey, variantValue)
             }
         }
-        customModelDataTable.rowKeySet().forEach { logger.info("<gold>Loaded custom model data for $it") }
+        customModelDataTable.rowKeySet().forEach { logger.info("Loaded custom model data for $it") }
     }
 
     operator fun get(key: Key, variant: Int): Int? {

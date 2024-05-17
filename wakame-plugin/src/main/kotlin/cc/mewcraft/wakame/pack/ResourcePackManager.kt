@@ -66,7 +66,7 @@ internal class ResourcePackManager(
         val resourcePack = when {
             resourcePackResult.isSuccess -> resourcePackResult.getOrThrow()
             isNoPack -> {
-                logger.info("<yellow>Resource pack is empty, re-generating...")
+                logger.info("Resource pack is empty, re-generating...")
                 ResourcePack.resourcePack()
             }
 
@@ -98,14 +98,14 @@ internal class ResourcePackManager(
                 packWriter.writeToZipFile(resourceFile.toPath(), resourcePack)
                 packWriter.writeToDirectory(resourcePackDir, resourcePack)
             }.getOrElse { return Result.failure(it) }
-            logger.info("<green>Resource pack generated")
+            logger.info("Resource pack generated")
         }
 
         // Build the resource pack
         val builtResourcePack = runCatching { MinecraftResourcePackWriter.minecraft().build(resourcePack) }
             .getOrElse { return Result.failure(it) }
         pack = builtResourcePack
-            .also { logger.info("<green>Resource pack built. File size: <yellow>${resourceFile.formatSize()}") }
+            .also { logger.info("Resource pack built. File size: ${resourceFile.formatSize()}") }
 
         return Result.success(Unit)
     }

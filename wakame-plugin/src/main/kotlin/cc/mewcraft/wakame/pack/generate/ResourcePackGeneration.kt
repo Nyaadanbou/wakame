@@ -183,11 +183,11 @@ internal class ResourcePackCustomModelGeneration(
 
                     resourcePack.model(configModel.toMinecraftFormat())
                     resourcePack.model(vanillaCmdOverride).also {
-                        logger.info("<green>Model for ${asset.key}, SID ${asset.variant} generated. CustomModelData: $customModelData")
+                        logger.info("Model for ${asset.key}, SID ${asset.variant} generated. CustomModelData: $customModelData")
                     }
                     customTextures.forEach {
                         resourcePack.texture(it).also {
-                            logger.info("<green>Texture for ${asset.key}, SID ${asset.variant} generated.")
+                            logger.info("Texture for ${asset.key}, SID ${asset.variant} generated.")
                         }
                     }
                 }
@@ -200,7 +200,7 @@ internal class ResourcePackCustomModelGeneration(
                 val result1 = config.removeCustomModelData(*unUsedModelCustomModelData.toIntArray())
 
                 if (result1) {
-                    logger.info("<yellow>Removed unused custom model data from items with no model path: $unUsedModelCustomModelData")
+                    logger.info("Removed unused custom model data from items with no model path: $unUsedModelCustomModelData")
                 }
                 //</editor-fold>
             }
