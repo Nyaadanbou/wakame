@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.schema
 
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.node
+import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehaviorFactory
@@ -39,7 +39,7 @@ internal class NekoItemImpl(
         .map { (behavior, behaviorName) ->
             when (behavior) {
                 is ItemBehavior -> behavior
-                is ItemBehaviorFactory<*> -> behavior.create(this, config.node("behaviors", behaviorName))
+                is ItemBehaviorFactory<*> -> behavior.create(this, config.derive("behaviors", behaviorName))
             }
         }
 

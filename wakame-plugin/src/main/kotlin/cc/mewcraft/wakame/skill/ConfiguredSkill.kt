@@ -5,12 +5,15 @@ import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.event.SkillPrepareCastEvent
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.condition.*
+import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
+import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
+import cc.mewcraft.wakame.skill.condition.SkillCastContext
+import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.type.SkillType
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.*
+import java.util.UUID
 
 /**
  * Represents a skill "attached" to a player.
@@ -103,10 +106,10 @@ fun ConfiguredSkill.tryCast(skillCastContext: SkillCastContext) {
         }
 
         else -> {
-            return //TODO 其他释放技能的情况
+            return // TODO 其他释放技能的情况
         }
     }
-    //这里允许其他模块监听事件，修改上下文，从而对技能的释放产生影响
+    // 这里允许其他模块监听事件，修改上下文，从而对技能的释放产生影响
     event.callEvent()
     if (event.isCancelled) return
     val conditionGroup = this.conditions

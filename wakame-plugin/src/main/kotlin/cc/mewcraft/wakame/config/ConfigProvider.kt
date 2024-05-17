@@ -89,17 +89,29 @@ inline fun <reified T : Any> ConfigProvider.optionalEntry(vararg paths: Array<St
     }
 
 fun ConfigProvider.node(vararg path: String): ConfigProvider {
-    val provider = NodeConfigProvider(loadValue().node(*path), relPath)
-    addChild(provider)
+    return NodeConfigProvider(loadValue().node(*path))
+}
+
+fun ConfigProvider.derive(vararg path: String): ConfigProvider {
+    val provider = DerivedConfigProvider(this, arrayOf(*path))
+    this.addChild(provider) // to support reload
     return provider
 }
 
-abstract class ConfigProvider(
+sealed class ConfigProvider(
     val relPath: String,
 ) : Provider<ConfigurationNode>() {
     public abstract override fun loadValue(): ConfigurationNode
 }
 
+/**
+ * A [ConfigProvider] with a YAML file being its data source.
+ *
+ * @property path the file path to the YAML
+ * @property options the configuration options
+ *
+ * @param relPath the relative file path
+ */
 class YamlFileConfigProvider internal constructor(
     private val path: Path,
     relPath: String,
@@ -115,6 +127,14 @@ class YamlFileConfigProvider internal constructor(
     }
 }
 
+/**
+ * A [ConfigProvider] with a JSON file being its data source.
+ *
+ * @property path the file path to the JSON
+ * @property options the configuration options
+ *
+ * @param relPath the relative file path
+ */
 class GsonFileConfigProvider internal constructor(
     private val path: Path,
     relPath: String,
@@ -129,11 +149,35 @@ class GsonFileConfigProvider internal constructor(
     }
 }
 
+/**
+ * A [ConfigProvider] of a wrapped node.
+ *
+ * **This provider is immutable and never updates!**
+ *
+ * @property node the underlying node
+ *
+ * @param relPath the relative file path
+ */
 class NodeConfigProvider internal constructor(
     private val node: ConfigurationNode,
-    relPath: String,
+    relPath: String = "",
 ) : ConfigProvider(relPath) {
     override fun loadValue(): ConfigurationNode {
         return node
+    }
+}
+
+/**
+ * A [ConfigProvider] derived from another one.
+ *
+ * @property configProvider the provider from which this provider is derived
+ * @property path the node path
+ */
+class DerivedConfigProvider internal constructor(
+    private val configProvider: ConfigProvider,
+    private val path: Array<String>,
+) : ConfigProvider(configProvider.relPath) {
+    override fun loadValue(): ConfigurationNode {
+        return configProvider.get().node(*path)
     }
 }

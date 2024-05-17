@@ -8,7 +8,8 @@ import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
-import java.util.*
+import java.util.PriorityQueue
+import java.util.Queue
 
 /**
  * Represents a skill condition group, which contains conditions and costs.
@@ -65,7 +66,7 @@ internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionG
             .map { listNode ->
                 val conditionType = listNode.node("type").krequire<String>()
                 val factory = SkillRegistry.CONDITIONS[conditionType]
-                factory.provide(NodeConfigProvider(listNode, ""))
+                factory.provide(NodeConfigProvider(listNode))
             }
 
         return SortedSkillConditionGroup(skillConditions)

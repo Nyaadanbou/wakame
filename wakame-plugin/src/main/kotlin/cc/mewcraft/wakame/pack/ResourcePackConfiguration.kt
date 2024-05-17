@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.node
 import org.koin.core.component.KoinComponent
 
 class ResourcePackConfiguration : KoinComponent {
-    private val config = MAIN_CONFIG.node("resource_pack")
+    private val config = MAIN_CONFIG.derive("resource_pack")
 
     //<editor-fold desc="Resource Pack Generation">
     val description: String by config.entry("generation", "description")

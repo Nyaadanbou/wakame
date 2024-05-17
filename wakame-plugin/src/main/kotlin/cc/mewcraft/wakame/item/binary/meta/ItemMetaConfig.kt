@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.display.Tooltips
 import cc.mewcraft.wakame.registry.ItemMetaRegistry
 import cc.mewcraft.wakame.util.toSimpleString
@@ -18,7 +18,7 @@ import java.util.stream.Stream
 internal sealed class ItemMetaConfig(
     path: String,
 ) {
-    val config: ConfigProvider by lazy { ItemMetaRegistry.CONFIG.node(path) }
+    val config: ConfigProvider by lazy { ItemMetaRegistry.CONFIG.derive(path) }
 
     /**
      * Tooltips for single text.

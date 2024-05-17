@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.annotation.ConfigPath
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.node
+import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
@@ -14,7 +14,7 @@ import kotlin.reflect.full.*
 import kotlin.reflect.typeOf
 
 object ItemMetaRegistry : Initializable {
-    internal val CONFIG by lazy { Configs.YAML[ITEM_CONFIG_FILE].node("meta") }
+    internal val CONFIG by lazy { Configs.YAML[ITEM_CONFIG_FILE].derive("meta") }
 
     internal object Binary {
         private val itemMetaReflectionLookupByClass: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMetaReflection> = run {

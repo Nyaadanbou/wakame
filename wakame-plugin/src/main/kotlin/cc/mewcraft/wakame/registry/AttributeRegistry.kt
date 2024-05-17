@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
@@ -490,7 +490,7 @@ private class SingleSelectionImpl(
     private val id: Key,
     private val tagType: ShadowTagType,
 ) : SingleSelection {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): SingleElementAttributeBinder {
@@ -542,7 +542,7 @@ private class RangedSelectionImpl(
     private val id: Key,
     private val tagType: ShadowTagType,
 ) : RangedSelection {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): RangedElementAttributeBinder {
@@ -601,7 +601,7 @@ private class SingleElementAttributeBinderImpl(
     private val id: Key,
     private val tagType: ShadowTagType,
 ) : SingleElementAttributeBinder {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     /**
@@ -652,7 +652,7 @@ private class RangedElementAttributeBinderImpl(
     private val id: Key,
     private val tagType: ShadowTagType,
 ) : RangedElementAttributeBinder {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     /**
