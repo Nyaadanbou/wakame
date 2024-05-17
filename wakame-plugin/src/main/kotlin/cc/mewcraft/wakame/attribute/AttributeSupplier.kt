@@ -275,7 +275,7 @@ internal class AttributeSupplierDeserializer(
 
             for ((facadeId, valueNode) in valuesMap) {
                 if (facadeId in Attributes.ELEMENT_ATTRIBUTE_NAMES) {
-                    // it's attribute types with elements
+                    // it's a node for elemental attributes
 
                     if (valueNode.isMap) {
                         // it's a map - there are possibly individual definitions for each element
@@ -304,7 +304,7 @@ internal class AttributeSupplierDeserializer(
                     }
 
                 } else {
-                    // any other types of attributes
+                    // it's a node for any other attributes
 
                     val attributeTypes = Attributes.byFacade(facadeId)
                     val doubleValue = valueNode.get<Double>()

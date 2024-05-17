@@ -27,13 +27,15 @@ object DefaultAttributes : KoinComponent, Initializable {
      */
     private val SUPPLIERS: Registry<Key, AttributeSupplier> = SimpleRegistry()
 
-    /**
-     * Loads all attribute suppliers from config.
-     */
-    private fun deserializeSuppliers(): Map<Key, AttributeSupplier> {
+    private fun loadConfiguration() {
+        SUPPLIERS.clear()
+
         val node = AttributeSupport.ENTITY_ATTRIBUTE_CONFIG.get()
         val map = AttributeSupplierDeserializer(node).deserialize()
-        return map
+        map.forEach { (k, v) ->
+            addSupplier(k, v)
+            LOGGER.info("Registered attribute supplier: {}", k)
+        }
     }
 
     /**
@@ -70,19 +72,11 @@ object DefaultAttributes : KoinComponent, Initializable {
         SUPPLIERS.register(key, supplier)
     }
 
-    /**
-     * Clears all suppliers.
-     */
-    fun clear() {
-        SUPPLIERS.clear()
+    override fun onPostWorld() {
+        loadConfiguration()
     }
 
-    override fun onPostWorld() {
-        clear()
-
-        deserializeSuppliers().forEach { (k, v) ->
-            addSupplier(k, v)
-            LOGGER.info("Registered attribute supplier: {}", k)
-        }
+    override fun onReload() {
+        loadConfiguration()
     }
 }
