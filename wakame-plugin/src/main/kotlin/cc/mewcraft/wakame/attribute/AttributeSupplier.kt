@@ -332,8 +332,8 @@ internal class AttributeSupplierDeserializer(
             if (!AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(facadeId)) {
                 error("The facade ID '$facadeId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")
             }
-            if (facadeId in Attributes.ELEMENT_ATTRIBUTE_NAMES && !valueNode.isMap) {
-                error("The attribute '$facadeId' does not have a map structure")
+            if (facadeId in Attributes.ELEMENT_ATTRIBUTE_NAMES && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
+                error("The attribute '$facadeId' has neither a map structure, nor a scalar value, nor a null")
             }
         }
 
