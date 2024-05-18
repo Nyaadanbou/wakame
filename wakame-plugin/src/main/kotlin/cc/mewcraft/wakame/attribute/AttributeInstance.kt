@@ -266,7 +266,11 @@ constructor(
     }
 
     override fun addModifier(modifier: AttributeModifier) {
-        handle.addModifier(modifier.toBukkit())
+        // 如果玩家手持 wakame 物品，并且 wakame 物品上有增加最大生命值的属性（原版属性），
+        // 那么当玩家先离线，然后再上线，后台会抛异常：Modifier is already applied on this attribute!
+        // 这是因为玩家下线时，并不会触发移除物品属性的逻辑，导致属性被永久保存到 NBT 了
+        // 解决办法：addTransientModifier
+        handle.addTransientModifier(modifier.toBukkit())
     }
 
     override fun removeModifier(modifier: AttributeModifier) {
