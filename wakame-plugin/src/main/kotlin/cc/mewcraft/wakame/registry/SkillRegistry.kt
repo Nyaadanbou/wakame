@@ -27,8 +27,8 @@ object SkillRegistry : Initializable, KoinComponent {
      */
     val EMPTY_KEY: Key = Key(Namespaces.SKILL, "empty")
 
-    val INSTANCE: Registry<Key, ConfiguredSkill> = SimpleRegistry()
-    val SKILL_TYPES: Registry<String, SkillType<*>> = SimpleRegistry()
+    val INSTANCE: Registry<Key, ConfiguredSkill> = SimpleRegistry() // TODO rename it to INSTANCES
+    val SKILL_TYPES: Registry<String, SkillType<*>> = SimpleRegistry() // TODO rename it to TYPES
     val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
 
     private fun loadCondition(){
