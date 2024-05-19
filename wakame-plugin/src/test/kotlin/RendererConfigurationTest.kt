@@ -1,6 +1,7 @@
 import cc.mewcraft.wakame.display.RendererConfiguration
 import cc.mewcraft.wakame.display.displayModule
 import cc.mewcraft.wakame.element.elementModule
+import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.*
@@ -31,6 +32,7 @@ class RendererConfigurationTest : KoinTest {
                 // dependencies
                 modules(
                     elementModule(),
+                    itemModule(),
                     kizamiModule(),
                     rarityModule(),
                     registryModule(),
@@ -43,6 +45,7 @@ class RendererConfigurationTest : KoinTest {
 
             // initialize necessary registry
             ElementRegistry.onPreWorld()
+            SkillRegistry.onPreWorld()
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()
         }

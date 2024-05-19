@@ -42,7 +42,6 @@ renderer_layout:
     - meta:lore
     - (fixed)<!i><gray>---------------- # 这行始终显示
     - (fixed:attribute)<!i><aqua><b>属性\r第二行属性介绍awa
-    - attribute:empty # 空的属性（用于标记空属性栏的相对位置）
     - attribute:attack_damage
     - attribute:attack_effect_chance
     - attribute:attack_speed_level
@@ -61,7 +60,6 @@ renderer_layout:
     - attribute:max_mana
     - attribute:movement_speed
     - (fixed:skill)<!i><aqua><b>技能
-    - skill:empty # 空的技能（用于标记空技能栏的相对位置）
     - skill:blink
     - skill:cyclone
     - skill:dash
@@ -73,6 +71,7 @@ renderer_layout:
     - skill:sproink
     - skill:stab
     - skill:waterball
+    - generic:empty # 空词条栏（用于标记空属性栏的相对位置）
     - (fixed:*)<!i><gray>这行将不会被渲染 # 仅当下面存在任意命名空间下的内容时才渲染（不包括“无内容”的情况）
 
   # 元素排序

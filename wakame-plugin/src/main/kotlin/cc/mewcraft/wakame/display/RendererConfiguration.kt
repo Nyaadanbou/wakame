@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.config.ConfigProvider
@@ -7,6 +8,7 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.AttributeLoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.AttributeLoreMeta
+import cc.mewcraft.wakame.item.binary.cell.core.empty.EmptyLoreMeta
 import cc.mewcraft.wakame.item.binary.cell.core.skill.SkillLoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.skill.SkillLoreMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaLoreLine
@@ -77,8 +79,8 @@ internal class RendererConfiguration(
         constantLoreLines0.clear()
         defaultLoreLines0.clear()
 
-        val primaryLines by config.entry<List<String>>(RENDERER_LAYOUT_NODE, "primary")
-        val attDerivation = AttributeLoreMeta.Derivation(
+        val mainPrimitiveLines by config.entry<List<String>>(RENDERER_LAYOUT_NODE, "primary")
+        val attributeDerivation = AttributeLoreMeta.Derivation(
             operationIndex = config.entry<List<String>>(RENDERER_LAYOUT_NODE, "operation"),
             elementIndex = config.entry<List<String>>(RENDERER_LAYOUT_NODE, "element")
         )
@@ -97,16 +99,22 @@ internal class RendererConfiguration(
         fun createLoreMeta0(rawIndex: Int, rawLine: String, default: List<Component>?): LoreMeta {
             val ret: DynamicLoreMeta
             when {
+                // TODO 这里应该用一个 registry，把实际的创建逻辑分散到各自模块的内部
+
                 rawLine.startsWith(Namespaces.SKILL + ":") -> {
                     ret = SkillLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default)
                 }
 
                 rawLine.startsWith(Namespaces.ATTRIBUTE + ":") -> {
-                    ret = AttributeLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default, derivation = attDerivation)
+                    ret = AttributeLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default, derivation = attributeDerivation)
                 }
 
                 rawLine.startsWith(Namespaces.ITEM_META + ":") -> {
                     ret = ItemMetaLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default)
+                }
+
+                rawLine == GenericKeys.EMPTY.asString() -> {
+                    ret = EmptyLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default)
                 }
 
                 else -> {
@@ -177,7 +185,7 @@ internal class RendererConfiguration(
         var accIndexOffset = 0
 
         // loop through each primary line and initialize LoreMeta
-        for ((rawIndex, rawLine) in primaryLines.withIndex()) {
+        for ((rawIndex, rawLine) in mainPrimitiveLines.withIndex()) {
             val loreMeta = createLoreMeta(rawIndex, rawLine)
 
             // populate the raw keys

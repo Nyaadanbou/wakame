@@ -1,8 +1,17 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+internal object SkillDisplaySupport : KoinComponent {
+    private val DISPLAY_KEY_FACTORY: SkillLineKeyFactory by inject()
+
+    fun getLineKey(core: BinarySkillCore): FullKey {
+        return DISPLAY_KEY_FACTORY.get(core)
+    }
+}
 
 internal data class SkillLoreLine(
     override val key: FullKey,
@@ -14,8 +23,7 @@ internal data class SkillLoreMeta(
     override val rawIndex: RawIndex,
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
-    override val fullKeys: List<FullKey> =
-        listOf(Key(rawKey.namespace(), rawKey.value()))
+    override val fullKeys: List<FullKey> = listOf(rawKey)
 }
 
 internal class SkillLineKeyFactory(

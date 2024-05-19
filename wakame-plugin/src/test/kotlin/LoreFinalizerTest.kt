@@ -4,8 +4,10 @@ import cc.mewcraft.wakame.display.RendererConfiguration
 import cc.mewcraft.wakame.display.displayModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.AttributeLoreLine
+import cc.mewcraft.wakame.item.binary.cell.core.empty.EmptyLoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.skill.SkillLoreLine
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaLoreLine
+import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.*
@@ -26,10 +28,12 @@ import kotlin.time.measureTimedValue
 
 private val Component.plain: String get() = PlainTextComponentSerializer.plainText().serialize(this)
 private fun Component.contains(x: String): Boolean = this.plain.contains(x)
-private fun createMetaLine(x: String): ItemMetaLoreLine = ItemMetaLoreLine(Key(x), listText(x))
-private fun createAttributeLine(x: String): AttributeLoreLine = AttributeLoreLine(Key(x), listText(x))
-private fun createSkillLine(x: String): SkillLoreLine = SkillLoreLine(Key(x), listText(x))
+
 private fun listText(vararg text: String): List<Component> = text.map { Component.text(it) }
+private fun createAttributeLine(x: String): LoreLine = AttributeLoreLine(Key(x), listText(x))
+private fun createEmptyLine(): LoreLine = EmptyLoreLine
+private fun createMetaLine(x: String): LoreLine = ItemMetaLoreLine(Key(x), listText(x))
+private fun createSkillLine(x: String): LoreLine = SkillLoreLine(Key(x), listText(x))
 
 class LoreFinalizerTest : KoinTest {
 
@@ -46,6 +50,7 @@ class LoreFinalizerTest : KoinTest {
                 // dependencies
                 modules(
                     elementModule(),
+                    itemModule(),
                     kizamiModule(),
                     registryModule(),
                     rarityModule(),
@@ -59,6 +64,7 @@ class LoreFinalizerTest : KoinTest {
 
             // initialize necessary registry
             ElementRegistry.onPreWorld()
+            SkillRegistry.onPreWorld()
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()
 
@@ -84,78 +90,86 @@ class LoreFinalizerTest : KoinTest {
 
     @Test
     fun `test finalize lore lines 1`() {
-        val loreLines = listOf(
-            createMetaLine("meta:level"),
-            createMetaLine("meta:rarity"),
-            createMetaLine("meta:element"),
-            createMetaLine("meta:kizami"),
-            createMetaLine("meta:lore"),
+        buildTest(
+            listOf(
+                createMetaLine("meta:level"),
+                createMetaLine("meta:rarity"),
+                createMetaLine("meta:element"),
+                createMetaLine("meta:kizami"),
+                createMetaLine("meta:lore"),
+            )
         )
-        buildTest(loreLines)
     }
 
     @Test
     fun `test finalize lore lines 2`() {
-        val loreLines = listOf(
-            createMetaLine("meta:level"),
-            createMetaLine("meta:rarity"),
-            createMetaLine("meta:element"),
-            createMetaLine("meta:kizami"),
-            createMetaLine("meta:lore"),
-            createAttributeLine("attribute:attack_effect_chance.add"),
-            createAttributeLine("attribute:attack_speed_level.add"),
-            createAttributeLine("attribute:critical_strike_chance.add"),
-            createAttributeLine("attribute:max_mana.add"),
+        buildTest(
+            listOf(
+                createMetaLine("meta:level"),
+                createMetaLine("meta:rarity"),
+                createMetaLine("meta:element"),
+                createMetaLine("meta:kizami"),
+                createMetaLine("meta:lore"),
+                createAttributeLine("attribute:attack_effect_chance.add"),
+                createAttributeLine("attribute:attack_speed_level.add"),
+                createAttributeLine("attribute:critical_strike_chance.add"),
+                createAttributeLine("attribute:max_mana.add"),
+                createEmptyLine(),
+                createEmptyLine(),
+            )
         )
-        buildTest(loreLines)
     }
 
     @Test
     fun `test finalize lore lines 3`() {
-        val loreLines = listOf(
-            createMetaLine("meta:level"),
-            createMetaLine("meta:rarity"),
-            createMetaLine("meta:element"),
-            createMetaLine("meta:kizami"),
-            createMetaLine("meta:lore"),
-            createAttributeLine("attribute:attack_effect_chance.add"),
-            createAttributeLine("attribute:attack_speed_level.add"),
-            createAttributeLine("attribute:critical_strike_chance.add"),
-            createAttributeLine("attribute:max_mana.add"),
-            createSkillLine("skill:blink"),
-            createSkillLine("skill:frost"),
-            createSkillLine("skill:leapfrog"),
+        buildTest(
+            listOf(
+                createMetaLine("meta:level"),
+                createMetaLine("meta:rarity"),
+                createMetaLine("meta:element"),
+                createMetaLine("meta:kizami"),
+                createMetaLine("meta:lore"),
+                createAttributeLine("attribute:attack_effect_chance.add"),
+                createAttributeLine("attribute:attack_speed_level.add"),
+                createAttributeLine("attribute:critical_strike_chance.add"),
+                createAttributeLine("attribute:max_mana.add"),
+                createSkillLine("skill:blink"),
+                createSkillLine("skill:frost"),
+                createSkillLine("skill:leapfrog"),
+                createEmptyLine(),
+            )
         )
-        buildTest(loreLines)
     }
 
     @Test
     fun `test finalize lore lines 4`() {
-        val loreLines = listOf(
-            createMetaLine("meta:level"),
-            createMetaLine("meta:rarity"),
-            createAttributeLine("attribute:empty"),
-            createAttributeLine("attribute:max_mana.add"),
-            createSkillLine("skill:empty"),
-            createSkillLine("skill:frost"),
+        buildTest(
+            listOf(
+                createMetaLine("meta:level"),
+                createMetaLine("meta:rarity"),
+                createAttributeLine("attribute:max_health.add"),
+                createAttributeLine("attribute:max_mana.add"),
+                createSkillLine("skill:frost"),
+                createEmptyLine(),
+            )
         )
-        buildTest(loreLines)
     }
 
     @Test
     fun `test finalize lore lines 5`() {
-        val loreLines = listOf(
-            createMetaLine("meta:level"),
-            createMetaLine("meta:rarity"),
-            createAttributeLine("attribute:attack_damage.add.fire"),
-            createAttributeLine("attribute:attack_damage.add.water"),
-            createAttributeLine("attribute:attack_damage.multiply_base.fire"),
-            createAttributeLine("attribute:attack_damage.multiply_base.water"),
-            createAttributeLine("attribute:attack_effect_chance.add"),
-            createAttributeLine("attribute:attack_speed_level.add"),
-            createSkillLine("skill:empty"),
-            createSkillLine("skill:frost"),
+        buildTest(
+            listOf(
+                createMetaLine("meta:level"),
+                createMetaLine("meta:rarity"),
+                createAttributeLine("attribute:attack_damage.add.fire"),
+                createAttributeLine("attribute:attack_damage.add.water"),
+                createAttributeLine("attribute:attack_damage.multiply_base.fire"),
+                createAttributeLine("attribute:attack_damage.multiply_base.water"),
+                createAttributeLine("attribute:attack_effect_chance.add"),
+                createAttributeLine("attribute:attack_speed_level.add"),
+                createSkillLine("skill:frost"),
+                createEmptyLine(),
+            )
         )
-        buildTest(loreLines)
     }
 }

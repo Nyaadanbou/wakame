@@ -32,7 +32,7 @@ data object NoopLoreLine : LoreLine {
 }
 
 /**
- * 代表一个始终不变的内容。
+ * 代表一个始终不变的内容（位置也不变）。
  */
 data class ConstantLoreLine(
     override val key: FullKey,

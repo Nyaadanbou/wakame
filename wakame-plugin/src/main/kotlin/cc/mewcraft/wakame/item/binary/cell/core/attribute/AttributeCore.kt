@@ -6,15 +6,12 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.*
-import cc.mewcraft.wakame.display.FullKey
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.ExaminableProperty
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.UUID
 import java.util.stream.Stream
 
@@ -29,7 +26,7 @@ sealed class BinaryAttributeCore : BinaryCore, AttributeComponent.Op<Operation>,
     }
 
     override fun provideDisplayLore(): LoreLine {
-        val lineKey = AttributeSupport.getLineKey(this)
+        val lineKey = AttributeDisplaySupport.getLineKey(this)
         val lineText = AttributeRegistry.FACADES[key].displayTextCreator(this)
         return AttributeLoreLine(lineKey, lineText)
     }
@@ -96,11 +93,3 @@ val BinaryAttributeCore.upper: Double
     get() = requireNotNull(upperOrNull) { "The 'upper' component is not present" }
 val BinaryAttributeCore.upperOrNull: Double?
     get() = (this as? AttributeComponent.Ranged<Double>)?.upper
-
-private object AttributeSupport : KoinComponent {
-    private val DISPLAY_KEY_FACTORY: AttributeLineKeyFactory by inject()
-
-    fun getLineKey(core: BinaryAttributeCore): FullKey {
-        return DISPLAY_KEY_FACTORY.get(core)
-    }
-}

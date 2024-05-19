@@ -18,7 +18,17 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.util.stream.Stream
+
+internal object AttributeDisplaySupport : KoinComponent {
+    private val DISPLAY_KEY_FACTORY: AttributeLineKeyFactory by inject()
+
+    fun getLineKey(core: BinaryAttributeCore): FullKey {
+        return DISPLAY_KEY_FACTORY.get(core)
+    }
+}
 
 internal data class AttributeLoreLine(
     override val key: FullKey,

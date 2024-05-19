@@ -32,10 +32,11 @@ sealed interface BinaryEmptyCore : BinaryCore
 //
 
 private data object BinaryEmptyCoreImpl : BinaryEmptyCore {
-    private val EMPTY_COMPOUND = CompoundShadowTag.create()
+    private val EMPTY_COMPOUND: CompoundShadowTag = CompoundShadowTag.create()
+
     override val key: Key = GenericKeys.EMPTY
     override fun asTag(): ShadowTag = EMPTY_COMPOUND
-    override fun provideDisplayLore(): LoreLine = TODO("cell-overhaul")
+    override fun provideDisplayLore(): LoreLine = EmptyLoreLine
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(ExaminableProperty.of("key", key))
     override fun toString(): String = toSimpleString()
 }
