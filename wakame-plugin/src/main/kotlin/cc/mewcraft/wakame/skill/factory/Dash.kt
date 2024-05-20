@@ -1,0 +1,42 @@
+package cc.mewcraft.wakame.skill.factory
+
+import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.orElse
+import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.wakame.skill.Caster
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
+import cc.mewcraft.wakame.skill.condition.SkillCastContext
+import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
+
+interface Dash : Skill {
+    val distance: Double
+
+    companion object Factory: SkillFactory<Dash> {
+        override fun create(config: ConfigProvider): Dash {
+            val distance = config.entry<Double>("distance")
+            val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
+
+            return Default(distance, conditions)
+        }
+    }
+
+    private class Default(
+        distance: Provider<Double>,
+        conditions: Provider<SkillConditionGroup>,
+    ) : Dash {
+        override val distance: Double by distance
+        override val conditions: SkillConditionGroup by conditions
+
+        override fun cast(context: SkillCastContext) {
+            val caster = context.caster as Caster.Player
+            val player = caster.bukkitPlayer
+
+            val direction = player.location.direction.normalize()
+            val velocity = direction.multiply(distance)
+            player.velocity = velocity
+        }
+    }
+}

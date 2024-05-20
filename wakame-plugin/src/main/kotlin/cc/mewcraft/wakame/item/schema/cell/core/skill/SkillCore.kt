@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.schema.cell.core.skill
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
-import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.ConfiguredSkillWithTrigger
 import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.util.krequire
@@ -26,7 +26,7 @@ fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
  * Represents a [SchemaCore] of a skill.
  */
 interface SchemaSkillCore : SchemaCore {
-    val instance: ConfiguredSkill
+    val instance: Skill
     val trigger: SkillTrigger
     override fun reify(context: SchemaGenerationContext): BinarySkillCore
 }

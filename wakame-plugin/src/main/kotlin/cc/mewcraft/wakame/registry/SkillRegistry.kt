@@ -2,16 +2,18 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillTrigger
 import cc.mewcraft.wakame.skill.SkillTrigger.*
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.skill.condition.MoLangCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
-import cc.mewcraft.wakame.skill.type.*
+import cc.mewcraft.wakame.skill.factory.*
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.SkillTriggerUtil.generateCombinations
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -33,9 +35,9 @@ object SkillRegistry : Initializable, KoinComponent {
      */
     val EMPTY_KEY: Key = Key(Namespaces.SKILL, "empty")
 
-    val INSTANCE: Registry<Key, ConfiguredSkill> = SimpleRegistry()
+    val INSTANCE: Registry<Key, Skill> = SimpleRegistry()
     val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
-    val SKILL_TYPES: Registry<String, SkillFactory<*>> = SimpleRegistry()
+    val SKILL_FACTORIES: Registry<String, SkillFactory<*>> = SimpleRegistry()
     val TRIGGER_INSTANCES: Registry<Key, SkillTrigger> = SimpleRegistry()
 
     private fun loadCondition() {
@@ -46,9 +48,10 @@ object SkillRegistry : Initializable, KoinComponent {
     }
 
     private fun loadType() {
-        operator fun Pair<String, SkillFactory<*>>.unaryPlus() = SKILL_TYPES.register(first, second)
+        operator fun Pair<String, SkillFactory<*>>.unaryPlus() = SKILL_FACTORIES.register(first, second)
 
         +("command_execute" to CommandExecute)
+        +("dash" to Dash)
         +("kill_entity" to KillEntity)
         +("remove_potion_effect" to RemovePotionEffect)
         +("teleport" to Teleport)
@@ -92,7 +95,10 @@ object SkillRegistry : Initializable, KoinComponent {
 
                     val text = skillFile.bufferedReader().use { it.readText() }
                     val node = loaderBuilder.buildAndLoadString(text)
-                    val skill = ConfiguredSkill(node, skillFile.path)
+
+                    val type = node.node("type").krequire<String>()
+                    val provider = NodeConfigProvider(node, skillFile.path)
+                    val skill = SKILL_FACTORIES[type].create(provider)
 
                     INSTANCE.register(skillKey, skill)
                     logger.info("Loaded configured skill: {}", skillKey)

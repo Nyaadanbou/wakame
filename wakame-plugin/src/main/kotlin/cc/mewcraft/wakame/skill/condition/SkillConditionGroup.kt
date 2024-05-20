@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.condition.ConditionGroup
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -13,10 +13,10 @@ import java.util.Queue
 
 /**
  * Represents a skill condition group, which contains conditions and costs.
- * It will be initialized when creating [ConfiguredSkill].
+ * It will be initialized when creating [Skill].
  *
  * When triggering a skill, it will check if the conditions are met.
- * If so, the [ConfiguredSkill] will be executed, and all costs inside will be executed as well. Otherwise, it will not be executed.
+ * If so, the [Skill] will be executed, and all costs inside will be executed as well. Otherwise, it will not be executed.
  */
 interface SkillConditionGroup : ConditionGroup<SkillCastContext> {
     /**

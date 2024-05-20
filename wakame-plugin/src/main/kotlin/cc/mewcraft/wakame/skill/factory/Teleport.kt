@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.skill.type
+package cc.mewcraft.wakame.skill.factory
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.Caster
-import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.NoTargetException
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
@@ -19,7 +19,7 @@ import io.papermc.paper.math.Position
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Teleport : ConfiguredSkill {
+interface Teleport : Skill {
     val type: Teleportation
 
     companion object Factory : SkillFactory<Teleport> {

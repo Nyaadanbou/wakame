@@ -1,17 +1,17 @@
-package cc.mewcraft.wakame.skill.type
+package cc.mewcraft.wakame.skill.factory
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 
-interface CommandExecute : ConfiguredSkill {
+interface CommandExecute : Skill {
     val commands: List<String>
 
     companion object Factory : SkillFactory<CommandExecute> {

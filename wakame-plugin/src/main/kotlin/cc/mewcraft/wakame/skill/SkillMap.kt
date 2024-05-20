@@ -23,7 +23,7 @@ interface SkillMap {
     operator fun get(uniqueId: UUID, trigger: SkillTrigger): Collection<Key> = getSkills(trigger)
 }
 
-fun SkillMap.getConfiguredSkills(trigger: SkillTrigger): Collection<ConfiguredSkill> = getSkills(trigger).map { SkillRegistry.INSTANCE[it] }
+fun SkillMap.getConfiguredSkills(trigger: SkillTrigger): Collection<Skill> = getSkills(trigger).map { SkillRegistry.INSTANCE[it] }
 
 /**
  * The no-op SkillMap. Used as placeholder code.

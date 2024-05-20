@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.event;
 
 import cc.mewcraft.wakame.skill.Caster;
-import cc.mewcraft.wakame.skill.ConfiguredSkill;
+import cc.mewcraft.wakame.skill.Skill;
 import cc.mewcraft.wakame.skill.Target;
 import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext;
 import org.bukkit.event.HandlerList;
@@ -18,7 +18,7 @@ public class PlayerSkillPrepareCastEvent extends SkillPrepareCastEvent {
     private final Target target;
     private final ItemStack item;
 
-    public PlayerSkillPrepareCastEvent(ConfiguredSkill skill, PlayerSkillCastContext playerSkillCastContext) {
+    public PlayerSkillPrepareCastEvent(Skill skill, PlayerSkillCastContext playerSkillCastContext) {
         super(skill, playerSkillCastContext);
         this.caster = playerSkillCastContext.getCaster();
         this.target = playerSkillCastContext.getTarget();
