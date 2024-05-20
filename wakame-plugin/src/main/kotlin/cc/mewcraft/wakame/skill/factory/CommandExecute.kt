@@ -10,20 +10,22 @@ import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
+import net.kyori.adventure.key.Key
 
 interface CommandExecute : Skill {
     val commands: List<String>
 
     companion object Factory : SkillFactory<CommandExecute> {
-        override fun create(config: ConfigProvider): CommandExecute {
+        override fun create(key: Key, config: ConfigProvider): CommandExecute {
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
             val command = config.entry<List<String>>("commands")
 
-            return Default(conditions, command)
+            return Default(key, conditions, command)
         }
     }
 
     private class Default(
+        override val key: Key,
         conditions: Provider<SkillConditionGroup>,
         command: Provider<List<String>>
     ) : CommandExecute {

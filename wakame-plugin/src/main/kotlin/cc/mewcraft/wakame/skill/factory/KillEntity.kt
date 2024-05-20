@@ -10,17 +10,19 @@ import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
+import net.kyori.adventure.key.Key
 
 interface KillEntity : Skill {
     companion object Factory : SkillFactory<KillEntity> {
-        override fun create(config: ConfigProvider): KillEntity {
+        override fun create(key: Key, config: ConfigProvider): KillEntity {
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
 
-            return Default(conditions)
+            return Default(key, conditions)
         }
     }
 
     private class Default(
+        override val key: Key,
         conditions: Provider<SkillConditionGroup>
     ) : KillEntity {
         override val conditions: SkillConditionGroup by conditions

@@ -20,7 +20,7 @@ internal fun skillModule(): Module = module {
         TypeSerializerCollection.builder()
             .kregister(SkillConditionGroupSerializer)
             .kregister(EvaluableSerializer)
-            .kregister(ConfiguredSkillWithTriggerSerializer)
+            .kregister(SkillWithTriggerSerializer)
             .kregister(SkillTriggerSerializer)
             .kregister(TeleportationSerializer)
             .build()

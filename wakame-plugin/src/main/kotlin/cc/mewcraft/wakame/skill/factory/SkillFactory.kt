@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.skill.factory
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
+import net.kyori.adventure.key.Key
 
 /**
  * Represents a factory of a certain skill.
@@ -34,6 +35,9 @@ import cc.mewcraft.wakame.skill.Skill
 interface SkillFactory<T : Skill> {
     /**
      * Create a new instance of the skill base on a certain skill type
+     *
+     * @param key The key of the skill. See [Skill.key]
+     * @param config The configuration provider of the skill.
      */
-    fun create(config: ConfigProvider): T
+    fun create(key: Key, config: ConfigProvider): T
 }

@@ -16,11 +16,13 @@ import org.bukkit.inventory.ItemStack
  * Handles skill triggers for players.
  */
 class SkillEventHandler {
+
     /* Handles skill triggers for players. */
+
     fun onLeftClick(player: Player, itemStack: ItemStack, location: Location?) {
         val skillMap = player.toUser().skillMap
         val target = location?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(player)
-        skillMap.getConfiguredSkills(SkillTrigger.LeftClick).forEach {
+        skillMap.getSkill(SkillTrigger.LeftClick).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
         }
     }
@@ -29,26 +31,27 @@ class SkillEventHandler {
         val skillMap = player.toUser().skillMap
         val target = location?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(player)
 
-        skillMap.getConfiguredSkills(SkillTrigger.RightClick).forEach {
+        skillMap.getSkill(SkillTrigger.RightClick).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
         }
     }
 
     fun onJump(player: Player, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
-        skillMap.getConfiguredSkills(SkillTrigger.Jump).forEach {
+        skillMap.getSkill(SkillTrigger.Jump).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), itemStack))
         }
     }
 
     fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
-        skillMap.getConfiguredSkills(SkillTrigger.Attack).forEach {
+        skillMap.getSkill(SkillTrigger.Attack).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), itemStack))
         }
     }
 
     /* Handles skill triggers for players. */
+
     /**
      * Updates skills when the player switches their held item.
      *
@@ -107,8 +110,8 @@ class SkillEventHandler {
         newItem: ItemStack?,
         predicate: PlayNekoStackPredicate,
     ) {
-        oldItem?.playNekoStackOrNull?.removeConfiguredSkills(player, predicate)
-        newItem?.playNekoStackOrNull?.addConfiguredSkills(player, predicate)
+        oldItem?.playNekoStackOrNull?.removeSkills(player, predicate)
+        newItem?.playNekoStackOrNull?.addSkills(player, predicate)
     }
 
     /**
@@ -118,13 +121,13 @@ class SkillEventHandler {
      * @param predicate
      * @receiver the ItemStack which may provide skills
      */
-    private inline fun PlayNekoStack.addConfiguredSkills(player: Player, predicate: PlayNekoStackPredicate) {
+    private inline fun PlayNekoStack.addSkills(player: Player, predicate: PlayNekoStackPredicate) {
         if (!this.predicate()) {
             return
         }
         val skillMap = player.toUser().skillMap
-        val skills = this.cell.getConfiguredSkills(true) // TODO: remove if skill module is complete
-        skillMap.setAllSkills(skills)
+        val skills = this.cell.getSkills(true) // TODO: remove if skill module is complete
+        skillMap.addSkillsByInstance(skills)
     }
 
     /**
@@ -134,13 +137,13 @@ class SkillEventHandler {
      * @param predicate
      * @receiver the ItemStack which may provide skills
      */
-    private inline fun PlayNekoStack.removeConfiguredSkills(player: Player, predicate: PlayNekoStackPredicate) {
+    private inline fun PlayNekoStack.removeSkills(player: Player, predicate: PlayNekoStackPredicate) {
         if (!this.predicate()) {
             return
         }
 
         val skillMap = player.toUser().skillMap
-        val skillKeys = this.cell.getConfiguredSkills(true).values()  // TODO: remove if skill module is complete
-        skillMap.removeSkills(skillKeys)
+        val skills = this.cell.getSkills(true)  // TODO: remove if skill module is complete
+        skillMap.removeSkill(skills)
     }
 }

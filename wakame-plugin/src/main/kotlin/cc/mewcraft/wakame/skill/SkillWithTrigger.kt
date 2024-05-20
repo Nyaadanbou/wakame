@@ -6,15 +6,15 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-data class ConfiguredSkillWithTrigger(
+data class SkillWithTrigger(
     val key: Key,
     val trigger: SkillTrigger
 )
 
-internal object ConfiguredSkillWithTriggerSerializer : SchemaSerializer<ConfiguredSkillWithTrigger> {
-    override fun deserialize(type: Type, node: ConfigurationNode): ConfiguredSkillWithTrigger {
+internal object SkillWithTriggerSerializer : SchemaSerializer<SkillWithTrigger> {
+    override fun deserialize(type: Type, node: ConfigurationNode): SkillWithTrigger {
         val key = node.node("key").krequire<Key>()
         val trigger = node.node("trigger").krequire<SkillTrigger>()
-        return ConfiguredSkillWithTrigger(key, trigger)
+        return SkillWithTrigger(key, trigger)
     }
 }

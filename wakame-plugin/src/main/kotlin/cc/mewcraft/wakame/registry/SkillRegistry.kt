@@ -98,7 +98,7 @@ object SkillRegistry : Initializable, KoinComponent {
 
                     val type = node.node("type").krequire<String>()
                     val provider = NodeConfigProvider(node, skillFile.path)
-                    val skill = SKILL_FACTORIES[type].create(provider)
+                    val skill = SKILL_FACTORIES[type].create(skillKey, provider)
 
                     INSTANCE.register(skillKey, skill)
                     logger.info("Loaded configured skill: {}", skillKey)

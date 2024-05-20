@@ -19,7 +19,6 @@ internal class BinarySkillCoreTagWrapper(
 ) : BinarySkillCore() {
     override val key: Key
         get() = compound.getIdentifier()
-    override val instance: Key = key
     override val trigger: SkillTrigger
         get() = compound.getTrigger()
 

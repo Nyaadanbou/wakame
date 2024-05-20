@@ -10,20 +10,22 @@ import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
+import net.kyori.adventure.key.Key
 
 interface Dash : Skill {
     val distance: Double
 
     companion object Factory: SkillFactory<Dash> {
-        override fun create(config: ConfigProvider): Dash {
+        override fun create(key: Key, config: ConfigProvider): Dash {
             val distance = config.entry<Double>("distance")
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
 
-            return Default(distance, conditions)
+            return Default(key, distance, conditions)
         }
     }
 
     private class Default(
+        override val key: Key,
         distance: Provider<Double>,
         conditions: Provider<SkillConditionGroup>,
     ) : Dash {

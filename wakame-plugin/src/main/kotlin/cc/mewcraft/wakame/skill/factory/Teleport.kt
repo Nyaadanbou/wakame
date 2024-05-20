@@ -16,6 +16,7 @@ import cc.mewcraft.wakame.skill.condition.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.util.krequire
 import io.papermc.paper.math.Position
+import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -23,16 +24,17 @@ interface Teleport : Skill {
     val type: Teleportation
 
     companion object Factory : SkillFactory<Teleport> {
-        override fun create(config: ConfigProvider): Teleport {
+        override fun create(key: Key, config: ConfigProvider): Teleport {
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
             val type = config.optionalEntry<Teleportation>("teleportation")
                 .orElse(Teleportation.FIXED(Position.block(0, 0, 0)))
 
-            return Default(conditions, type)
+            return Default(key, conditions, type)
         }
     }
 
     private class Default(
+        override val key: Key,
         conditions: Provider<SkillConditionGroup>,
         type: Provider<Teleportation>
     ) : Teleport {

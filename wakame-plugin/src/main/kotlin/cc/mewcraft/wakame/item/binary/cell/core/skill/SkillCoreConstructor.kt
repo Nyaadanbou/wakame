@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
-import cc.mewcraft.wakame.skill.ConfiguredSkillWithTrigger
+import cc.mewcraft.wakame.skill.SkillWithTrigger
 import cc.mewcraft.wakame.util.krequire
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.spongepowered.configurate.ConfigurationNode
@@ -22,8 +22,8 @@ fun BinarySkillCore(compound: CompoundShadowTag): BinarySkillCore {
 fun BinarySkillCore(
     node: ConfigurationNode,
 ): BinarySkillCore {
-    val configuredSkillWithTrigger = node.krequire<ConfiguredSkillWithTrigger>()
-    val key = configuredSkillWithTrigger.key
-    val trigger = configuredSkillWithTrigger.trigger
+    val skillWithTrigger = node.krequire<SkillWithTrigger>()
+    val key = skillWithTrigger.key
+    val trigger = skillWithTrigger.trigger
     return BinarySkillCoreDataHolder(key, trigger)
 }

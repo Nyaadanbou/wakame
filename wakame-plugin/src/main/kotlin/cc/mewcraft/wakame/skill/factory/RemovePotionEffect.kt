@@ -10,21 +10,23 @@ import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
+import net.kyori.adventure.key.Key
 import org.bukkit.potion.PotionEffectType
 
 interface RemovePotionEffect : Skill {
     val effectType: List<PotionEffectType>
 
     companion object Factory : SkillFactory<RemovePotionEffect> {
-        override fun create(config: ConfigProvider): RemovePotionEffect {
+        override fun create(key: Key, config: ConfigProvider): RemovePotionEffect {
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
             val effectTypes = config.optionalEntry<List<PotionEffectType>>("effect_types").orElse(emptyList())
 
-            return Default(conditions, effectTypes)
+            return Default(key, conditions, effectTypes)
         }
     }
 
     private class Default(
+        override val key: Key,
         conditions: Provider<SkillConditionGroup>,
         effectType: Provider<List<PotionEffectType>>
     ) : RemovePotionEffect {
