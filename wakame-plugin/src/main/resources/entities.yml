@@ -17,7 +17,7 @@ entity_attributes:
   minecraft:living: # 这里写实体的 key，也可以是符合命名空间规范的任意值
     parent: ~ # 父属性配置的 key，必须出现在该属性配置之前。可为空
     values:
-      defense: ~ # 如果一个属性带元素，并且没有 map 结构，则相当于给该属性的每个元素都指定了一个值
+      defense: default # 如果一个属性带元素，并且没有 map 结构，则相当于给该属性的每个元素都指定了一个值
       max_mana: 100.0 # 如果一个属性不带元素，则直接写标量来指定其数值
 
   minecraft:mob:
@@ -33,25 +33,25 @@ entity_attributes:
   minecraft:player:
     parent: minecraft:living
     values:
-      attack_damage: ~
-      attack_effect_chance: ~
-      attack_speed_level: ~
-      block_interaction_range: ~
-      critical_strike_chance: ~
-      critical_strike_power: ~
-      damage_reduction_rate: ~
-      # defense: ~ # 这里被注释了，但 player 依然拥有 defense 属性。这因为其继承了 living，而 living 拥有 defense 属性
-      defense_penetration: ~
-      entity_interaction_range: ~
-      health_regeneration: ~
-      lifesteal: ~
-      manasteal: ~
-      mana_consumption_rate: ~
-      mana_regeneration: ~
-      max_absorption: ~
-      max_health: ~
+      attack_damage: default # default 意为采用全局默认值
+      attack_effect_chance: default
+      attack_speed_level: default
+      block_interaction_range: default
+      critical_strike_chance: default
+      critical_strike_power: default
+      damage_reduction_rate: default
+      # defense: default # 这里被注释了，但 player 依然拥有 defense 属性。这因为其继承了 living，而 living 拥有 defense 属性
+      defense_penetration: default
+      entity_interaction_range: default
+      health_regeneration: default
+      lifesteal: default
+      manasteal: default
+      mana_consumption_rate: default
+      mana_regeneration: default
+      max_absorption: default
+      max_health: default
       max_mana: 200.0
-      movement_speed: ~
+      movement_speed: default
 
   minecraft:spider: # 生物的唯一标识，参考 https://minecraft.wiki/w/Mob
     parent: minecraft:monster

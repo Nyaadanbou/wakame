@@ -253,7 +253,9 @@ internal class AttributeSupplierDeserializer(
         private val valuesMap: Map<String, ConfigurationNode>,
     ) {
         // Just an extension to reduce duplicates
-        private fun AttributeSupplierBuilder.add(attribute: Attribute, value: Double?): AttributeSupplierBuilder {
+        private fun AttributeSupplierBuilder.add(
+            attribute: Attribute, value: Double?,
+        ): AttributeSupplierBuilder {
             if (value != null) {
                 add(attribute, value)
             } else {
@@ -262,58 +264,77 @@ internal class AttributeSupplierDeserializer(
             return this
         }
 
+        // Just an extension to reduce duplicates
+        private fun AttributeSupplierBuilder.add(
+            /* all from the same facade */ attributes: Collection<Attribute>,
+            /* the node holding the value */ valueNode: ConfigurationNode,
+        ): AttributeSupplierBuilder {
+            for (attribute in attributes) {
+                val value: Double? = run {
+                    if (valueNode.string == "default") {
+                        null// we use null to indicate default value
+                    } else {
+                        valueNode.get<Double>()
+                    }
+                }
+
+                this.add(attribute, value)
+            }
+            return this
+        }
+
         fun build(): AttributeSupplierBuilder {
             // TODO add support for MythicMobs entities
 
+            // Create the builder. Inherit the parent builder if specified
             val builder = if (parentKey != null) {
-                requireNotNull(builders[parentKey]?.copy()) {
+                requireNotNull(
+                    builders[parentKey]?.copy()
+                ) {
                     "Can't find parent '$parentKey'. Make sure you have defined the parent before \"this\" in the configuration!"
                 }
             } else {
                 AttributeSupplierBuilder()
             }
 
+            // Put data into the builder
             for ((facadeId, valueNode) in valuesMap) {
                 if (facadeId in Attributes.ELEMENT_ATTRIBUTE_NAMES) {
                     // it's a node for elemental attributes
 
                     if (valueNode.isMap) {
-                        // it's a map - there are possibly individual definitions for each element
+                        // it's a map - there are possibly individual definition for each specified element
+                        // caution!!! the implementation, by design, does not add the elements that are not
+                        // specified in the map.
 
-                        val valueMap = valueNode.childrenMap()
-                            .mapKeys { (key, _) -> key.toString() }
-                            .mapValues { (_, value) -> value.get<Double>() /* this will give us a `Double?` */ }
-
-                        for ((elementId, doubleValue) in valueMap) {
-                            val elementType = ElementRegistry.INSTANCES[elementId]
-                            val elementAttributeHolder = Attributes.byElement(elementType)
-                            for (elementAttributeType in elementAttributeHolder.byFacade(facadeId)) {
-                                builder.add(elementAttributeType, doubleValue)
-                            }
+                        val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
+                        for ((elementId, valueNodeInMap) in valueNodeMap) {
+                            val attributes = Attributes
+                                .byElement(ElementRegistry.INSTANCES[elementId])
+                                .byFacade(facadeId)
+                            builder.add(attributes, valueNodeInMap)
                         }
                     } else {
-                        // not a map - then we assume it's a scalar
+                        // not a map - then we assume it's a scalar -
+                        // the value node is used for every single element available in the system
 
-                        val doubleValue = valueNode.get<Double>()
                         for ((_, elementType) in ElementRegistry.INSTANCES) {
-                            val elementAttributeHolder = Attributes.byElement(elementType)
-                            for (elementAttributeType in elementAttributeHolder.byFacade(facadeId)) {
-                                builder.add(elementAttributeType, doubleValue)
-                            }
+                            val attributes = Attributes
+                                .byElement(elementType)
+                                .byFacade(facadeId)
+                            builder.add(attributes, valueNode)
                         }
                     }
 
                 } else {
                     // it's a node for any other attributes
 
-                    val attributeTypes = Attributes.byFacade(facadeId)
-                    val doubleValue = valueNode.get<Double>()
-                    for (attributeType in attributeTypes) {
-                        builder.add(attributeType, doubleValue)
-                    }
+                    val attributes = Attributes.byFacade(facadeId)
+                    builder.add(attributes, valueNode)
                 }
             }
 
+            // Return the builder
             return builder
         }
     }
