@@ -118,7 +118,7 @@ internal constructor(
      */
     private fun getDefault(type: Attribute, attributable: Attributable): AttributeInstance {
         return if (isAbsoluteVanilla(type)) {
-            AttributeInstanceFactory.createInstance(type, attributable, false) // TODO 优化这部分，避免频繁的新对象开销
+            AttributeInstanceFactory.createInstance(type, attributable, false)
         } else {
             requireNotNull(prototypes[type]) { "Can't find attribute instance for attribute '${type.descriptionId}'" }
         }
