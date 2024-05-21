@@ -4,5 +4,5 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 internal fun reforgeModule(): Module = module {
-    // TODO setup it
+    // placeholder code
 }

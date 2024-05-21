@@ -150,10 +150,6 @@ object AttributeRegistry : Initializable {
     override fun onPreWorld() {
         registerFacades()
     }
-
-    override fun onReload() {
-        // TODO("Not yet implemented") // what to reload?
-    }
 }
 
 /**

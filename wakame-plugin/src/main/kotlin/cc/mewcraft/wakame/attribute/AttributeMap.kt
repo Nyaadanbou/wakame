@@ -210,11 +210,11 @@ internal constructor(
         require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
     }
 
-    // TODO Some thoughts about implementation:
+    // Some thoughts about implementation:
     //  The AttributeMap data should be stored in the entity's NBT storage,
     //  not in a property of `this`, since we want the data to be persistent
     //  on server restart.
-    //  The root reason for this is because the items equipped on non-player
+    //  The root reason for this is that the items equipped on non-player
     //  entities are purely visual by design - they do not provide any effects. As such
     //  the attribute data are therefore provided by external sources, such as
     //  scripts and configs. That is, the attribute data are provided only ONCE,

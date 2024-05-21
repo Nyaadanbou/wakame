@@ -11,7 +11,7 @@ internal fun skinModule(): Module = module {
 
     single<TypeSerializerCollection>(named(SKIN_SERIALIZERS)) {
         TypeSerializerCollection.builder()
-            // TODO set it up
+            // placeholder code: register serializers
             .build()
     }
 

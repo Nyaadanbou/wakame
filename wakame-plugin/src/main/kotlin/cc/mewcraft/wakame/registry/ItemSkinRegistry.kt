@@ -20,6 +20,6 @@ object ItemSkinRegistry : KoinComponent, Initializable, BiKnot<String, ItemSkin,
 
         val root = get<NekoConfigurationLoader>(named(SKIN_CONFIG_LOADER)).load()
 
-        // TODO read config and populate values
+        // placeholder code: read config and populate values
     }
 }

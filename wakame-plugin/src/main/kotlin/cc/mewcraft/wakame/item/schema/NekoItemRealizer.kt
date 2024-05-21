@@ -4,8 +4,6 @@ import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.user.User
 
-// TODO create a mock for it
-
 /**
  * Realizes [NekoItem] into an item which then can be added to the game world.
  */
