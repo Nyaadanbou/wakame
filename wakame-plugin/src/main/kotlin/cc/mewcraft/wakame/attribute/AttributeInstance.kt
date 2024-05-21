@@ -65,26 +65,39 @@ internal object AttributeInstanceFactory {
     fun createInstance(attribute: Attribute, attributable: Attributable, registerVanilla: Boolean): AttributeInstance {
         return if (attribute.vanilla) {
             // 关于 Attribute#vanilla 的解释 -
-            // 设计上，如果这个 Attribute 是原版的（例如移动速度），
+            // 设计上，如果这个 Attribute 是基于原版的（例如移速），
             // 那么我们的 AttributeInstance 在实现上则是对应原版
-            // AttributeInstance 的封装 —— 也就是说，函数的调用
+            // AttributeInstance 的代理 —— 也就是说，函数的调用
             // 会重定向到原版 AttributeInstance 对应的函数上
 
-            // 从 Attributable 中获取要被封装的 AttributeInstance
-            val bukkitInstance = requireNotNull(attributable.getAttribute(attribute.toBukkit())) {
-                "Can't find vanilla attribute instance for attribute $attribute"
+            // 从 Attributable 中获取要被封装的 BukkitAttributeInstance
+            val bukkitInst = run {
+                val ret: BukkitAttributeInstance?
+                val instanceOrNull = attributable.getAttribute(attribute.toBukkit())
+                if (instanceOrNull == null) {
+                    if (registerVanilla) {
+                        // 仅当该 Attributable 没有该属性，
+                        // 并且 registerVanilla 为 true 时
+                        // 我们才真的新注册该属性
+
+                        // 这将产生副作用，会直接改变 Attributable 的世界状态
+                        // 这部分没有详细的 API 文档，但我们自己总结一下，就是
+                        // - 当该属性本来就存在时，它会覆盖原有的
+                        attributable.registerAttribute(attribute.toBukkit())
+                    } else {
+                        // 该 Attributable 不存在该原版属性，
+                        // 然而用户并没有指定允许注册新的属性
+                        throw IllegalArgumentException("Can't find vanilla attribute instance for attribute $attribute")
+                    }
+                    ret = attributable.getAttribute(attribute.toBukkit())!!
+                } else {
+                    ret = instanceOrNull
+                }
+
+                ret
             }
 
-            if (registerVanilla) {
-                // 在 Bukkit 中为该 Attributable 注册该 Attribute
-
-                // 这将产生副作用，会直接改变 Attributable 的世界状态
-                // 这部分没有详细的 API 文档，但我们自己总结一下
-                // - 当该属性本来就存在时，它会覆盖原有的
-                attributable.registerAttribute(attribute.toBukkit())
-            }
-
-            VanillaAttributeInstance(bukkitInstance)
+            VanillaAttributeInstance(bukkitInst)
         } else {
             WakameAttributeInstance(attribute)
         }
@@ -287,7 +300,7 @@ constructor(
 
     override fun replace(other: AttributeInstance) {
         setBaseValue(other.getBaseValue())
-        getModifiers().forEach { removeModifier(it) }
+        this.getModifiers().forEach { removeModifier(it) }
         other.getModifiers().forEach { addModifier(it) }
     }
 }

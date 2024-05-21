@@ -110,10 +110,14 @@ internal constructor(
     private val data: MutableMap<Attribute, AttributeInstance> = Object2ObjectOpenHashMap()
 
     init {
-        // vanilla attribute instances must be "initialized"
-        // otherwise, if we have changed the value of a vanilla attribute,
-        // the value would not be actually applied to the world state.
-        default.attributes.filter(Attribute::vanilla).forEach(::getInstance) // FIXME 如果 default 会直接返回原版属性的值（data 里缺省时），那这个初始化也不需要了
+        // VanillaAttributeInstance must synchronize with the world state.
+        //
+        // Otherwise, if wakame has changed the value of a vanilla attribute,
+        // the value would not be actually applied to the world state
+        // unless the getInstance() is specifically invoked.
+        //
+        // The following code performs the synchronization logic.
+        default.attributes.filter(Attribute::vanilla).forEach(::getInstance)
     }
 
     override fun getInstance(attribute: Attribute): AttributeInstance? {
