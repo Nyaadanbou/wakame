@@ -12,6 +12,9 @@ import cc.mewcraft.wakame.item.getBehaviorOrNull
 import cc.mewcraft.wakame.item.schema.behavior.Damageable
 import cc.mewcraft.wakame.item.schema.behavior.decreaseDurabilityNaturally
 import cc.mewcraft.wakame.skill.Caster
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
 /**
  * 技能释放需要物品耐久度。
@@ -21,18 +24,22 @@ interface DurabilityCondition : SkillCondition {
 
     companion object Factory : SkillConditionFactory<DurabilityCondition> {
         override fun provide(config: ConfigProvider): DurabilityCondition {
-            val priority = config.optionalEntry<SkillCondition.Priority>("priority").orElse(SkillCondition.Priority.NORMAL)
+            val id = config.entry<String>("id")
             val requireDurability = config.entry<Int>("require_durability")
-            return Default(priority, requireDurability)
+            val priority = config.optionalEntry<SkillCondition.Priority>("priority").orElse(SkillCondition.Priority.NORMAL)
+            return Default(id, requireDurability, priority)
         }
     }
 
     class Default(
-        priority: Provider<SkillCondition.Priority>,
+        id: Provider<String>,
         requireDurability: Provider<Int>,
+        priority: Provider<SkillCondition.Priority>,
     ) : DurabilityCondition {
+        override val id: String by id
         override val priority: SkillCondition.Priority by priority
         override val requireDurability: Int by requireDurability
+        override val tagResolver: TagResolver = Placeholder.component(this.id, Component.text(this.requireDurability))
 
         override fun test(context: SkillCastContext): Boolean {
             val nekoStack = context.itemStack?.playNekoStackOrNull

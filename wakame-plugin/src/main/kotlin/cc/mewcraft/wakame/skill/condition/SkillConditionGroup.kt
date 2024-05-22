@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.util.krequire
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import java.util.PriorityQueue
@@ -19,6 +20,8 @@ import java.util.Queue
  * If so, the [Skill] will be executed, and all costs inside will be executed as well. Otherwise, it will not be executed.
  */
 interface SkillConditionGroup : ConditionGroup<SkillCastContext> {
+    val tagResolvers: Array<TagResolver>
+
     /**
      * Test if all conditions are met.
      */
@@ -28,6 +31,7 @@ interface SkillConditionGroup : ConditionGroup<SkillCastContext> {
 }
 
 data object EmptySkillConditionGroup : SkillConditionGroup {
+    override val tagResolvers: Array<TagResolver> = emptyArray()
     override fun test(context: SkillCastContext): Boolean = true
     override fun cost(context: SkillCastContext) = Unit
     override fun notifyFailure(context: SkillCastContext, notifyCount: Int) = Unit
@@ -36,6 +40,7 @@ data object EmptySkillConditionGroup : SkillConditionGroup {
 class SortedSkillConditionGroup(
     private val conditions: List<SkillCondition>,
 ) : SkillConditionGroup {
+    override val tagResolvers: Array<TagResolver> = conditions.map { it.tagResolver }.toTypedArray()
     private val failureConditions: Queue<SkillCondition> = PriorityQueue(compareBy { it.priority })
 
     override fun test(context: SkillCastContext): Boolean {

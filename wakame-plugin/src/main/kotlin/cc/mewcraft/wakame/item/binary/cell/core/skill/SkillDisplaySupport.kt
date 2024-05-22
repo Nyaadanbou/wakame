@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -31,9 +32,14 @@ internal class SkillLoreMetaCreator : DynamicLoreMetaCreator {
 
 internal object SkillDisplaySupport : KoinComponent {
     private val DISPLAY_KEY_FACTORY: SkillLineKeyFactory by inject()
+    private val MINI: MiniMessage by inject()
 
     fun getLineKey(core: BinarySkillCore): FullKey? {
         return DISPLAY_KEY_FACTORY.get(core)
+    }
+
+    fun mini(): MiniMessage {
+        return MINI
     }
 }
 

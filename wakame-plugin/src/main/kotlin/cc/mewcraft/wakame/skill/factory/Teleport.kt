@@ -6,10 +6,9 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.Caster
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.NoTargetException
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
@@ -25,19 +24,22 @@ interface Teleport : Skill {
 
     companion object Factory : SkillFactory<Teleport> {
         override fun create(key: Key, config: ConfigProvider): Teleport {
+            val display = config.entry<SkillDisplay>("")
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
             val type = config.optionalEntry<Teleportation>("teleportation")
                 .orElse(Teleportation.FIXED(Position.block(0, 0, 0)))
 
-            return Default(key, conditions, type)
+            return Default(key, display, conditions, type)
         }
     }
 
     private class Default(
         override val key: Key,
+        display: Provider<SkillDisplay>,
         conditions: Provider<SkillConditionGroup>,
         type: Provider<Teleportation>
     ) : Teleport {
+        override val display: SkillDisplay by display
         override val conditions: SkillConditionGroup by conditions
         override val type: Teleportation by type
 

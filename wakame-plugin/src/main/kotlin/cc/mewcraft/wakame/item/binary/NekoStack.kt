@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.item.schema.NekoItem
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
+import com.github.retrooper.packetevents.protocol.item.ItemStack as PacketStack
 
 /**
  * A wrapper of [ItemStack], which adds additional properties and
@@ -241,6 +242,10 @@ interface ShowNekoStackLike {
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
     val show: ShowNekoStack
+}
+
+interface PacketNekoStack : NekoStack {
+    val packetStack: PacketStack
 }
 
 /**

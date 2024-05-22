@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.item.binary.PacketNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.ShowNekoStack
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
@@ -52,5 +53,14 @@ internal class ShowItemRenderer(
 ) : ItemRenderer<ShowNekoStack> {
     override fun render(nekoStack: ShowNekoStack) {
         TODO("Not yet implemented")
+    }
+}
+
+internal class PacketItemRenderer(
+    private val textStylizer: TextStylizer,
+    private val loreFinalizer: LoreFinalizer,
+) : ItemRenderer<PacketNekoStack> {
+    override fun render(nekoStack: PacketNekoStack) {
+        println(nekoStack)
     }
 }

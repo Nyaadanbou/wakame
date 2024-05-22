@@ -37,6 +37,11 @@ interface Skill : Keyed {
      */
     val conditions: SkillConditionGroup
 
+    /**
+     * The display infos of this skill.
+     */
+    val display: SkillDisplay
+
     fun cast(context: SkillCastContext) = Unit
 }
 

@@ -8,6 +8,8 @@ import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.skill.Caster
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import team.unnamed.mocha.MochaEngine
@@ -21,24 +23,28 @@ interface MoLangCondition : NoCostSkillCondition {
 
     companion object Factory : SkillConditionFactory<NoCostSkillCondition> {
         override fun provide(config: ConfigProvider): NoCostSkillCondition {
-            val priority = config.optionalEntry<SkillCondition.Priority>("priority").orElse(SkillCondition.Priority.NORMAL)
+            val id = config.entry<String>("id")
             val eval = config.entry<Evaluable<*>>("eval")
+            val priority = config.optionalEntry<SkillCondition.Priority>("priority").orElse(SkillCondition.Priority.NORMAL)
             val failureMessage = config.optionalEntry<Component>("failure_message").orElse(Component.empty())
 
-            return Default(priority, eval, failureMessage)
+            return Default(id, eval, priority, failureMessage)
         }
     }
 
     private class Default(
-        priority: Provider<SkillCondition.Priority>,
+        id: Provider<String>,
         eval: Provider<Evaluable<*>>,
+        priority: Provider<SkillCondition.Priority>,
         failureMessage: Provider<Component>
     ) : MoLangCondition, KoinComponent {
         private val engine: MochaEngine<*> by inject()
 
+        override val id: String by id
         override val priority: SkillCondition.Priority by priority
         override val eval: Evaluable<*> by eval
         override val failureMessage: Component by failureMessage
+        override val tagResolver: TagResolver = Placeholder.component(this.id, Component.text(this.eval.evaluate(engine)))
 
         override fun test(context: SkillCastContext): Boolean {
             val result = eval.evaluate(engine)

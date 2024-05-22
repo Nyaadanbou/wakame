@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
-import cc.mewcraft.wakame.display.NetworkItemSerializeListener
 import cc.mewcraft.wakame.display.RENDERER_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.event.NekoReloadEvent
@@ -121,7 +120,6 @@ object Initializer : KoinComponent, Listener {
 
     private fun registerListeners() = with(PLUGIN) {
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
-        registerTerminableListener(get<NetworkItemSerializeListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
         registerTerminableListener(get<SingleItemListener>()).bindWith(this)
