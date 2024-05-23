@@ -1,8 +1,31 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.display.*
+import cc.mewcraft.wakame.display.DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PostWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
+
+@PostWorldDependency(runAfter = [RendererConfiguration::class])
+@ReloadDependency(runAfter = [RendererConfiguration::class])
+internal object ItemMetaInitializer : Initializable {
+    override fun onPostWorld() {
+        DYNAMIC_LORE_META_CREATOR_REGISTRY.register(ItemMetaLoreMetaCreator())
+    }
+}
+
+internal class ItemMetaLoreMetaCreator : DynamicLoreMetaCreator {
+    override fun test(rawLine: String): Boolean {
+        return Key(rawLine).namespace() == Namespaces.ITEM_META
+    }
+
+    override fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
+        return ItemMetaLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default)
+    }
+}
 
 internal data class ItemMetaLoreLine(
     override val key: FullKey,
@@ -14,7 +37,16 @@ internal data class ItemMetaLoreMeta(
     override val rawIndex: RawIndex,
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
-    override val fullKeys: List<FullKey> = listOf(Key(rawKey.namespace(), rawKey.value()))
+    override fun generateFullKeys(): List<FullKey> {
+        return listOf(rawKey)
+    }
+
+    override fun createDefault(): List<LoreLine>? {
+        if (default.isNullOrEmpty()) {
+            return null
+        }
+        return generateFullKeys().map { key -> ItemMetaLoreLine(key, default) }
+    }
 }
 
 internal class ItemMetaLineKeyFactory(

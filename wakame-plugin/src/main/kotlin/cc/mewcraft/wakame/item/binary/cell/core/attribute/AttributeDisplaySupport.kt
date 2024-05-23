@@ -1,11 +1,19 @@
 package cc.mewcraft.wakame.item.binary.cell.core.attribute
 
 import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.*
+import cc.mewcraft.wakame.display.DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY
+import cc.mewcraft.wakame.display.DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME
+import cc.mewcraft.wakame.display.DisplaySupport.RENDERER_CONFIG_PROVIDER
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PostWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.hasComponent
@@ -21,6 +29,28 @@ import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.stream.Stream
+
+@PostWorldDependency(runAfter = [RendererConfiguration::class])
+@ReloadDependency(runAfter = [RendererConfiguration::class])
+internal object AttributeCoreInitializer : Initializable {
+    override fun onPostWorld() {
+        DYNAMIC_LORE_META_CREATOR_REGISTRY.register(AttributeLoreMetaCreator())
+    }
+}
+
+internal class AttributeLoreMetaCreator : DynamicLoreMetaCreator {
+    private val operationRawLines = RENDERER_CONFIG_PROVIDER.entry<List<String>>(RENDERER_CONFIG_LAYOUT_NODE_NAME, "operation")
+    private val elementRawLines = RENDERER_CONFIG_PROVIDER.entry<List<String>>(RENDERER_CONFIG_LAYOUT_NODE_NAME, "element")
+
+    override fun test(rawLine: String): Boolean {
+        return Key(rawLine).namespace() == Namespaces.ATTRIBUTE
+    }
+
+    override fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
+        val derivationRule = AttributeLoreMeta.Derivation(operationIndex = operationRawLines, elementIndex = elementRawLines)
+        return AttributeLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default, derivation = derivationRule)
+    }
+}
 
 internal object AttributeDisplaySupport : KoinComponent {
     private val DISPLAY_KEY_FACTORY: AttributeLineKeyFactory by inject()
@@ -48,20 +78,26 @@ internal data class AttributeLoreMeta(
      *
      * 为该属性生成所有的 full keys
      */
-    override val fullKeys: List<FullKey>
-        get() {
-            if (rawKey == AttributeRegistry.EMPTY_KEY) {
-                return listOf(rawKey) // for `empty`, do not derive
-            }
-
-            val namespace = rawKey.namespace()
-            val values = StringCombiner(rawKey.value(), ".") {
-                addList(derivation.operationIndex)
-                addList(derivation.elementIndex, AttributeRegistry.FACADES[rawKey].attributeComponentMetadata.hasComponent<AttributeComponent.Element<*>>())
-            }.combine()
-
-            return values.map { Key(namespace, it) }
+    override fun generateFullKeys(): List<FullKey> {
+        if (rawKey == AttributeRegistry.EMPTY_KEY) {
+            return listOf(rawKey) // for `empty`, do not derive
         }
+
+        val namespace = rawKey.namespace()
+        val values = StringCombiner(rawKey.value(), ".") {
+            addList(derivation.operationIndex)
+            addList(derivation.elementIndex, AttributeRegistry.FACADES[rawKey].attributeComponentMetadata.hasComponent<AttributeComponent.Element<*>>())
+        }.combine()
+
+        return values.map { Key(namespace, it) }
+    }
+
+    override fun createDefault(): List<LoreLine>? {
+        if (default.isNullOrEmpty()) {
+            return null
+        }
+        return generateFullKeys().map { key -> AttributeLoreLine(key, default) }
+    }
 
     class Derivation(
         operationIndex: Provider<List<String>>,

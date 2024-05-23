@@ -4,9 +4,31 @@ import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.*
+import cc.mewcraft.wakame.display.DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PostWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.ITEM_CONFIG_FILE
+import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 
+@PostWorldDependency(runAfter = [RendererConfiguration::class])
+@ReloadDependency(runAfter = [RendererConfiguration::class])
+internal object EmptyCoreInitializer : Initializable {
+    override fun onPostWorld() {
+        DYNAMIC_LORE_META_CREATOR_REGISTRY.register(EmptyCoreLoreMetaCreator())
+    }
+}
+
+internal class EmptyCoreLoreMetaCreator : DynamicLoreMetaCreator {
+    override fun test(rawLine: String): Boolean {
+        return Key(rawLine) == GenericKeys.EMPTY
+    }
+
+    override fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
+        return EmptyLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default)
+    }
+}
 
 internal data object EmptyLoreLine : LoreLine {
     override val key: FullKey = GenericKeys.EMPTY
@@ -18,5 +40,6 @@ internal data class EmptyLoreMeta(
     override val rawIndex: RawIndex,
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
-    override val fullKeys: List<FullKey> = listOf(rawKey)
+    override fun generateFullKeys(): List<FullKey> = listOf(rawKey)
+    override fun createDefault(): List<LoreLine>? = null
 }

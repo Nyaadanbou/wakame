@@ -4,6 +4,63 @@ import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 
 /**
+ * A creator of a [LoreMeta].
+ */
+internal interface DynamicLoreMetaCreator {
+    /**
+     * Checks whether this creator is capable of creating a [LoreMeta]
+     * from the given [rawLine].
+     *
+     * @param rawLine the raw line text
+     * @return `true` if the [rawLine] is "legal" for this creator
+     */
+    fun test(rawLine: String): Boolean
+
+    /**
+     * Creates the [DynamicLoreMeta].
+     *
+     * @param rawIndex the raw index
+     * @param rawLine the raw line text
+     * @param default the default text if there is any
+     * @return the created [LoreMeta]
+     *
+     * @throws IllegalArgumentException if the raw line text is unrecognized
+     */
+    fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta
+}
+
+/**
+ * The registry of [DynamicLoreMetaCreator].
+ *
+ * Use it to register [DynamicLoreMetaCreator].
+ */
+internal interface DynamicLoreMetaCreatorRegistry {
+    /**
+     * Gets all creators in this registry.
+     *
+     * @return all the creators in this registry
+     */
+    fun entries(): List<DynamicLoreMetaCreator>
+
+    /**
+     * Registers a [DynamicLoreMetaCreator].
+     *
+     * Duplicate creators are allowed (for now).
+     *
+     * @param creator the creator
+     */
+    fun register(creator: DynamicLoreMetaCreator)
+
+    /**
+     * Gets an applicable [DynamicLoreMetaCreator] for the [rawLine].
+     *
+     * @param rawLine the raw line in the config, without any modification
+     * @return an applicable [DynamicLoreMetaCreator] if there is one
+     */
+    fun getApplicableCreator(rawLine: String): DynamicLoreMetaCreator?
+}
+
+/**
  * 代表 [Item Lore](https://minecraft.wiki/w/Data_component_format#lore) 中的顺序，以及相关信息。这是一个顶层接口。
  *
  * 注意与 [LoreLine] 区别 - [LoreMeta] 描述的是顺序及其他信息，而 [LoreLine] 仅代表内容。
@@ -13,72 +70,74 @@ import net.kyori.adventure.text.Component
  */
 internal interface LoreMeta {
     /**
-     * 在配置文件内的“原始 Key”（即配置文件的列表中，未经衍生的字符串值）。
+     * 在配置文件内的 `Raw Key`（即配置文件的列表中，未经衍生的字符串值）。
      */
     val rawKey: RawKey
 
     /**
-     * 在配置文件内的“原始 Index”（即配置文件中，列表元素的索引，从0开始）。
+     * 在配置文件内的 `Raw Index`（即配置文件中，列表元素的索引，从0开始）。
      */
     val rawIndex: RawIndex
 
     /**
-     * 生成“完整 Key”（注意区别于“原始 Key”）。
+     * 生成全部的 `Full Key`。
      *
-     * “完整 Key”将被直接用于查询 Lore Line 的顺序。
+     * ## 用途
+     * `Full Key` 将被直接用于查询 [LoreLine] 的顺序。
      *
-     * [Full Keys][fullKeys] 是由 [Raw Key][rawKey] 经过一系列规则衍生出来的一个或多个键。
+     * ## 来源
+     * `Full Key` 是由 `Raw Key` 经过一系列规则衍生出来的一个或多个值。
      *
-     * 某些 [Raw Key][rawKey] 没有衍生规则，因此这些 [Raw Key][rawKey] 与
-     * [Full Keys][fullKeys] 完全一致；这种情况下 [Full Keys][fullKeys]
-     * 只是个单例列表。而有些 [Raw Key][rawKey] 存在衍生规则，因此它们的
-     * [Raw Key][rawKey] 就与 [Full Keys][fullKeys] 不一致。
+     * ## 性质
+     * 某些 `Raw Key` 没有衍生规则，因此这些 `Raw Key` 在结果上与 `Full Key`
+     * 完全一致。这种情况下 `Full Key` 只是个单例列表。而有些 `Raw Key`
+     * 存在衍生规则，因此它们的 `Raw Key` 就与 `Full Key` 不一致。
      */
-    val fullKeys: List<FullKey> /* 必须按规定的按顺序排列 */
+    fun generateFullKeys(): List<FullKey> /* 必须按规定的按顺序排列 */
 
     /**
-     * 生成“完整 Index”（注意区别于“原始 Index”）。
+     * 生成从 `Full Key` 到 `Full Index` 的映射。
      *
-     * “完整 Index”将被直接用于查询 Lore Line 的顺序。
+     * 该映射将被直接用于查询 [LoreLine] 在物品提示框中的顺序。
      *
-     * 该函数的参数 [offset] 为索引的偏移量。你必须传入正确的 [offset]，否则该函数生成的“完整 Index”将是错的。
+     * 该函数的参数 [offset] 为索引的偏移量。你必须传入正确的 [offset]，否则该函数生成的`Full Index` 将是错的。
      *
-     * 为了更好的理解 [offset] 的取值，这里举个例子。假设配置文件中有以下三行内容，我们标记好各自的 Raw Index：
-     * - a (Raw Index = 1)
-     * - b (Raw Index = 2)
-     * - c (Raw Index = 3)
+     * 为了更好的理解 [offset] 的取值，这里举个例子。假设配置文件中有以下三行内容，我们标记好各自的 `Raw Index`：
+     * - a (`Raw Index` = 1)
+     * - b (`Raw Index` = 2)
+     * - c (`Raw Index` = 3)
      *
      * 经过衍生后的内容如下：
-     * - a.1 (Raw Index = 1)
-     * - a.2 (Raw Index = 1)
-     * - b.1 (Raw Index = 2)
-     * - b.2 (Raw Index = 2)
-     * - c (Raw Index = 3)
+     * - a.1 (`Raw Index` = 1)
+     * - a.2 (`Raw Index` = 1)
+     * - b.1 (`Raw Index` = 2)
+     * - b.2 (`Raw Index` = 2)
+     * - c (`Raw Index` = 3)
      *
-     * Full Index 的计算方式为 `Raw Index + Local Index + Offset`. 其中 Local Index 是
-     * [fullKeys] 的索引值。假设 [offset] 为 0；现在基于 Raw Index，为每个内容生成 Full Index：
-     * - a.1 (Raw Index = 1, Offset = 0 -> Full Index = 1)
-     * - a.2 (Raw Index = 1, Offset = 0 -> Full Index = 2)
-     * - b.1 (Raw Index = 2, Offset = 0 -> Full Index = 2)
-     * - b.2 (Raw Index = 2, Offset = 0 -> Full Index = 3)
-     * - c (Raw Index = 3, Offset = 0 -> Full Index = 3)
+     * Full Index 的计算方式为 `Raw Index` + `Local Index` + `Offset`. 其中 `Local Index` 是
+     * `Full Key` 的索引值。假设 [offset] 为 0；现在基于 `Raw Index`，为每个内容生成 `Full Index`：
+     * - a.1 (`Raw Index` = 1, `Offset` = 0 -> `Full Index` = 1)
+     * - a.2 (`Raw Index` = 1, `Offset` = 0 -> `Full Index` = 2)
+     * - b.1 (`Raw Index` = 2, `Offset` = 0 -> `Full Index` = 2)
+     * - b.2 (`Raw Index` = 2, `Offset` = 0 -> `Full Index` = 3)
+     * - c (`Raw Index` = 3, `Offset` = 0 -> `Full Index` = 3)
      *
-     * 可以看到这里重复的 Full Index，而这显然是错的。导致该问题的原因是每一个内容的生成都假设它之前**不存在**衍生的内容。
+     * 可以看到这里重复的 `Full Index`，而这显然是错的。导致该问题的原因是每一个内容的生成都假设它之前**不存在**衍生的内容。
      *
-     * 为了解决这个问题，我们引入 [offset] 的概念，用来对生成的 Full Index 进行偏移，以实现整体上的正确性。
+     * 为了解决这个问题，我们引入 [offset] 的概念，用来对生成的 `Full Index` 进行偏移，以实现整体上的正确性。
      *
      * 假设给定的 [offset] 都是正确的，那么重新生成以上内容应该得到：
-     * - a.1 (Raw Index = 1, Offset = 0 -> Full Index = 1)
-     * - a.2 (Raw Index = 1, Offset = 0 -> Full Index = 2)
-     * - b.1 (Raw Index = 2, Offset = 1 -> Full Index = 3)
-     * - b.2 (Raw Index = 2, Offset = 1 -> Full Index = 4)
-     * - c (Raw Index = 3, Offset = 2 -> Full Index = 5)
+     * - a.1 (`Raw Index` = 1, `Offset` = 0 -> `Full Index` = 1)
+     * - a.2 (`Raw Index` = 1, `Offset` = 0 -> `Full Index` = 2)
+     * - b.1 (`Raw Index` = 2, `Offset` = 1 -> `Full Index` = 3)
+     * - b.2 (`Raw Index` = 2, `Offset` = 1 -> `Full Index` = 4)
+     * - c (`Raw Index` = 3, `Offset` = 2 -> `Full Index` = 5)
      *
-     * @param offset Full Index 的偏移量
+     * @param offset `Full Index` 的偏移量
      */
-    fun fullIndexes(offset: Int): Map<FullKey, FullIndex> {
+    fun generateFullIndexMappings(offset: Int): Map<FullKey, FullIndex> {
         val key2IndexMap = LinkedHashMap<FullKey, FullIndex>() // for debug inspection
-        for ((localIndex, fullKey) in fullKeys.withIndex()) {
+        for ((localIndex, fullKey) in generateFullKeys().withIndex()) {
             key2IndexMap[fullKey] = rawIndex + localIndex + offset
         }
         return key2IndexMap
@@ -92,11 +151,20 @@ internal interface LoreMeta {
  */
 internal interface DynamicLoreMeta : LoreMeta {
     /**
-     * 内容的默认值。如果源数据不存在，将渲染默认值，而不是跳过渲染。
+     * 内容的默认值。
      *
-     * 为 `null` 表示内容没有默认值，也就是当源数据不存在时，将跳过渲染。
+     * ## 用途
+     * 如果源数据不存在，将显示默认值，而不是直接跳过显示。
+     *
+     * ## 空值约定
+     * 为 `null` 表示内容没有默认值。也就是当源数据不存在时，将直接跳过显示。
      */
     val default: List<Component>?
+
+    /**
+     * Creates default lore line (if the [default] is not `null`).
+     */
+    fun createDefault(): List<LoreLine>?
 }
 
 /**
@@ -131,10 +199,11 @@ internal interface ConstantLoreMeta : LoreMeta {
         // 这样刚好能保证不同的固定内容行都有唯一的 Full Key
         get() = Key("fixed", rawIndex.toString())
 
-    override val fullKeys: List<FullKey>
-        get() = listOf(rawKey)
+    override fun generateFullKeys(): List<FullKey> {
+        return listOf(rawKey)
+    }
 
-    override fun fullIndexes(offset: Int): Map<FullKey, FullIndex> {
+    override fun generateFullIndexMappings(offset: Int): Map<FullKey, FullIndex> {
         return mapOf(rawKey to rawIndex + offset)
     }
 }

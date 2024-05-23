@@ -28,10 +28,8 @@ sealed interface BinaryNoopCore : BinaryCore
 
 private data object BinaryNoopCoreImpl : BinaryNoopCore {
     override val key: Key = GenericKeys.NOOP
-    override fun asTag(): ShadowTag = error()
-    override fun provideDisplayLore(): LoreLine = error()
+    override fun asTag(): ShadowTag = error("No-op core does not support this operation")
+    override fun provideDisplayLore(): LoreLine = error("No-op core does not support this operation")
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(ExaminableProperty.of("key", key))
     override fun toString(): String = toSimpleString()
-
-    private fun error(): Nothing = throw UnsupportedOperationException("${toString()} does not support this operation")
 }
