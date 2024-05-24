@@ -12,38 +12,45 @@ import org.koin.core.component.inject
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
-internal interface RendererConfiguration : Initializable {
+internal class RendererConfiguration(
+    private val config: ConfigProvider,
+) : Initializable, KoinComponent {
     /**
      * 所有的 [RawKey]，用于判断内容是否需要渲染。
      *
      * 如果一个 [RawKey] 不在该集合里，则说明不应该渲染。
      */
     val rawKeys: Set<RawKey>
+        get() = _rawKeys
 
     /**
      * 用于查询指定内容的 [LoreMeta]。
      */
     val loreMetaLookup: Map<FullKey, LoreMeta>
+        get() = _loreMetaLookup
 
     /**
      * 用于查询指定内容的 [FullIndex]。
      */
     val loreIndexLookup: Map<FullKey, FullIndex>
+        get() = _loreIndexLookup
 
     /**
      * 始终要渲染的内容。这些内容的文本在物品中始终不变。
      */
     val constantLoreLines: Collection<LoreLine>
+        get() = _constantLoreLines
 
     /**
      * 带有默认值的内容。当源数据不存在时将采用这里的默认值。
      */
     val defaultLoreLines: Collection<LoreLine>
-}
+        get() = _defaultLoreLines
 
-internal class RendererConfigurationImpl(
-    private val config: ConfigProvider,
-) : RendererConfiguration, KoinComponent {
+    //
+    // Internal implementations
+    //
+
     private val dynamicLoreMetaCreatorRegistry: DynamicLoreMetaCreatorRegistry by inject()
 
     private val _rawKeys: MutableSet<RawKey> = ConcurrentHashMap.newKeySet()
@@ -53,6 +60,8 @@ internal class RendererConfigurationImpl(
     private val _defaultLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
 
     private fun loadLayout() {
+        DisplaySupport.LOGGER.info("Loading renderer layout")
+
         // Clear all data first
         _rawKeys.clear()
         _loreMetaLookup.clear()
@@ -106,7 +115,7 @@ internal class RendererConfigurationImpl(
                     // 具体解析为 "(default:{}){}"
                     "default" -> {
                         val defaultText = queue.popOr(
-                            "Unknown syntax for '(default...)' while load config $RENDERER_CONFIG_FILE. Correct syntax: '(default:_text_|empty)_key_'"
+                            "Unknown syntax for '(default...)' while load config $RENDERER_CONFIG_FILE. Correct syntax: '(default:{text}|empty){key}'"
                         ).let {
                             if (it.isBlank() || it == "empty") {
                                 listOf(Component.empty())
@@ -163,12 +172,6 @@ internal class RendererConfigurationImpl(
         }
         //</editor-fold>
     }
-
-    override val rawKeys: Set<RawKey> = _rawKeys
-    override val loreMetaLookup: Map<FullKey, LoreMeta> = _loreMetaLookup
-    override val loreIndexLookup: Map<FullKey, FullIndex> = _loreIndexLookup
-    override val constantLoreLines: Collection<LoreLine> = _constantLoreLines
-    override val defaultLoreLines: Collection<LoreLine> = _defaultLoreLines
 
     override fun onPostWorld() {
         this.loadLayout()

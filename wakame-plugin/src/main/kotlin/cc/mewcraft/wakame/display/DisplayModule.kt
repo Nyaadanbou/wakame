@@ -26,7 +26,11 @@ internal fun displayModule(): Module = module {
     single<NetworkItemSerializeListener> { NetworkItemSerializeListener(get(named(PLAY_ITEM_RENDERER))) }
 
     // config holder
-    single<RendererConfiguration> { RendererConfigurationImpl(Configs.YAML[RENDERER_CONFIG_FILE]) } withOptions { bind<Initializable>() }
+    single {
+        RendererConfiguration(Configs.YAML[RENDERER_CONFIG_FILE])
+    } withOptions {
+        bind<Initializable>()
+    }
 
     // meta lookup
     single<LoreMetaLookup> { get<RendererConfiguration>().let { LoreMetaLookupImpl(it.loreIndexLookup, it.loreMetaLookup) } }
