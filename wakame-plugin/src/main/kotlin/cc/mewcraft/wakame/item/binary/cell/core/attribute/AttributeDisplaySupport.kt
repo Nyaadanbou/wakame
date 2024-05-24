@@ -7,9 +7,6 @@ import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display.DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY
-import cc.mewcraft.wakame.display.DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME
-import cc.mewcraft.wakame.display.DisplaySupport.RENDERER_CONFIG_PROVIDER
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
@@ -30,17 +27,18 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.stream.Stream
 
-@PostWorldDependency(runAfter = [RendererConfiguration::class])
 @ReloadDependency(runAfter = [RendererConfiguration::class])
+@PostWorldDependency(runAfter = [RendererConfiguration::class])
 internal object AttributeCoreInitializer : Initializable {
     override fun onPostWorld() {
-        DYNAMIC_LORE_META_CREATOR_REGISTRY.register(AttributeLoreMetaCreator())
+        DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY.register(AttributeLoreMetaCreator())
+        DisplaySupport.LOGGER.info("Registered DynamicLoreMetaCreator for attribute cores")
     }
 }
 
 internal class AttributeLoreMetaCreator : DynamicLoreMetaCreator {
-    private val operationRawLines = RENDERER_CONFIG_PROVIDER.entry<List<String>>(RENDERER_CONFIG_LAYOUT_NODE_NAME, "operation")
-    private val elementRawLines = RENDERER_CONFIG_PROVIDER.entry<List<String>>(RENDERER_CONFIG_LAYOUT_NODE_NAME, "element")
+    private val operationRawLines = DisplaySupport.RENDERER_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME, "operation")
+    private val elementRawLines = DisplaySupport.RENDERER_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME, "element")
 
     override fun test(rawLine: String): Boolean {
         return Key(rawLine).namespace() == Namespaces.ATTRIBUTE

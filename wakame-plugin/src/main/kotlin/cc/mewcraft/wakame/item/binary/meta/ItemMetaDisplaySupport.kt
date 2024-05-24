@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display.DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -13,7 +12,8 @@ import net.kyori.adventure.text.Component
 @ReloadDependency(runAfter = [RendererConfiguration::class])
 internal object ItemMetaInitializer : Initializable {
     override fun onPostWorld() {
-        DYNAMIC_LORE_META_CREATOR_REGISTRY.register(ItemMetaLoreMetaCreator())
+        DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY.register(ItemMetaLoreMetaCreator())
+        DisplaySupport.LOGGER.info("Registered DynamicLoreMetaCreator for item meta")
     }
 }
 

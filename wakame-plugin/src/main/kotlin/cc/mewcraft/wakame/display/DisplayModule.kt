@@ -20,10 +20,16 @@ const val SHOW_ITEM_RENDERER = "show_item_renderer"
 internal fun displayModule(): Module = module {
 
     // non-internals
-    single<DynamicLoreMetaCreatorRegistry> { DynamicLoreMetaCreatorRegistryImpl() }
-    singleOf(::PlayItemRenderer) withOptions { named(PLAY_ITEM_RENDERER); bind<ItemRenderer<PlayNekoStack>>() }
-    singleOf(::ShowItemRenderer) withOptions { named(SHOW_ITEM_RENDERER); bind<ItemRenderer<ShowNekoStack>>() }
+    singleOf(::PlayItemRenderer) withOptions {
+        named(PLAY_ITEM_RENDERER)
+        bind<ItemRenderer<PlayNekoStack>>()
+    }
+    singleOf(::ShowItemRenderer) withOptions {
+        named(SHOW_ITEM_RENDERER)
+        bind<ItemRenderer<ShowNekoStack>>()
+    }
     single<NetworkItemSerializeListener> { NetworkItemSerializeListener(get(named(PLAY_ITEM_RENDERER))) }
+    single<DynamicLoreMetaCreatorRegistry> { DynamicLoreMetaCreatorRegistryImpl() }
 
     // config holder
     single {

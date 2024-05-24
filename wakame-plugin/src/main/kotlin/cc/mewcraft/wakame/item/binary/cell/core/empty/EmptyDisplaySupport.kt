@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display.DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -12,11 +11,12 @@ import cc.mewcraft.wakame.registry.ITEM_CONFIG_FILE
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 
-@PostWorldDependency(runAfter = [RendererConfiguration::class])
 @ReloadDependency(runAfter = [RendererConfiguration::class])
+@PostWorldDependency(runAfter = [RendererConfiguration::class])
 internal object EmptyCoreInitializer : Initializable {
     override fun onPostWorld() {
-        DYNAMIC_LORE_META_CREATOR_REGISTRY.register(EmptyCoreLoreMetaCreator())
+        DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY.register(EmptyCoreLoreMetaCreator())
+        DisplaySupport.LOGGER.info("Registered DynamicLoreMetaCreator for empty cores")
     }
 }
 

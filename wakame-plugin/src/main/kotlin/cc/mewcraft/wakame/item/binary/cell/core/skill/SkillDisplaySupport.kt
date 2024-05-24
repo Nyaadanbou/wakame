@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.binary.cell.core.skill
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display.DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -11,11 +10,12 @@ import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-@PostWorldDependency(runAfter = [RendererConfiguration::class])
 @ReloadDependency(runAfter = [RendererConfiguration::class])
+@PostWorldDependency(runAfter = [RendererConfiguration::class])
 internal object SkillCoreInitializer : Initializable {
     override fun onPostWorld() {
-        DYNAMIC_LORE_META_CREATOR_REGISTRY.register(SkillLoreMetaCreator())
+        DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY.register(SkillLoreMetaCreator())
+        DisplaySupport.LOGGER.info("Registered DynamicLoreMetaCreator for skill cores")
     }
 }
 
