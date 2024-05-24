@@ -25,6 +25,6 @@ interface LineKeyFactory<T> {
          *
          * It is to be used to compare by reference.
          */
-        val SKIP_DISPLAY: FullKey = GenericKeys.NOOP
+        val SKIP_DISPLAY: FullKey = GenericKeys.EMPTY
     }
 }
