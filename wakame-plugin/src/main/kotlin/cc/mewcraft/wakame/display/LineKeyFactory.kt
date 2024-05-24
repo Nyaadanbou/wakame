@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.GenericKeys
 
 interface LineKeyFactory<T> {
     /**
@@ -25,6 +25,6 @@ interface LineKeyFactory<T> {
          *
          * It is to be used to compare by reference.
          */
-        val SKIP_DISPLAY: FullKey = Key("renderer", "noop")
+        val SKIP_DISPLAY: FullKey = GenericKeys.NOOP
     }
 }
