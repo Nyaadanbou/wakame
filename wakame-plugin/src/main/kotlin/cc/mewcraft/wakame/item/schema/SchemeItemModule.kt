@@ -70,7 +70,6 @@ internal fun schemaItemModule(): Module = module {
             .kregister(KizamiPoolSerializer)
             .kregister(KizamiGroupSerializer)
 
-            .kregister(DisplayLoreMetaSerializer)
             .kregister(DisplayNameMetaSerializer)
             .kregister(DurabilityMetaSerializer)
             .kregister(ElementMetaSerializer)
@@ -78,6 +77,7 @@ internal fun schemaItemModule(): Module = module {
             .kregister(ItemNameMetaSerializer)
             .kregister(KizamiMetaSerializer)
             .kregister(LevelMetaSerializer)
+            .kregister(LoreMetaSerializer)
             .kregister(RarityMetaSerializer)
             .kregister(SkinMetaSerializer)
             .kregister(SkinOwnerMetaSerializer)

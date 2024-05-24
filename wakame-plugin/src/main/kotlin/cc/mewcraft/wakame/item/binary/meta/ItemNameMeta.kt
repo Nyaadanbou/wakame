@@ -20,7 +20,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 /**
  * 物品的名字。
  *
- * 注意区别于 [BDisplayNameMeta]。
+ * 注意区别于 [BCustomNameMeta]。
  */
 @JvmInline
 value class BItemNameMeta(
@@ -51,12 +51,12 @@ value class BItemNameMeta(
     override fun provideDisplayName(): Component {
         // 代码复制于 DisplayNameMeta
 
-        val displayName = getOrNull() ?: return ItemNameImplementations.EMPTY
+        val customName = getOrNull() ?: return ItemNameImplementations.EMPTY
 
         val resolvers = TagResolver.builder().apply {
 
             // create <value> tag
-            resolver(Placeholder.parsed("value", displayName))
+            resolver(Placeholder.parsed("value", customName))
 
             // create <rarity_name> & <rarity_style> tags
             val rarityOrDefault = accessor.item.getMetaAccessor<BRarityMeta>().getOrDefault()

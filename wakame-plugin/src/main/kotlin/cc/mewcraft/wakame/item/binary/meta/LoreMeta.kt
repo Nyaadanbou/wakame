@@ -16,14 +16,14 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 // TODO cell-overhaul: 类名不需要以 "B" 开头
 // TODO cell-overhaul: 类的选择应该有个单例持有所有类型，类似原版的 DataComponent，继而弃用 reified class
 @JvmInline
-value class BDisplayLoreMeta(
+value class BLoreMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<List<String>> {
     override val key: Key
-        get() = ItemMetaConstants.createKey { DISPLAY_LORE }
+        get() = ItemMetaConstants.createKey { LORE }
 
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.DISPLAY_LORE, ShadowTagType.LIST) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.LORE, ShadowTagType.LIST) ?: false
 
     override fun getOrNull(): List<String>? {
         return accessor.rootOrNull
@@ -55,12 +55,12 @@ value class BDisplayLoreMeta(
     }
 
     private companion object : ItemMetaConfig(
-        ItemMetaConstants.DISPLAY_LORE
+        ItemMetaConstants.LORE
     ) {
         val tooltips: LoreTooltips = LoreTooltips()
     }
 }
 
-fun BDisplayLoreMeta?.getOrEmpty(): List<String> {
+fun BLoreMeta?.getOrEmpty(): List<String> {
     return this?.getOrNull() ?: emptyList()
 }

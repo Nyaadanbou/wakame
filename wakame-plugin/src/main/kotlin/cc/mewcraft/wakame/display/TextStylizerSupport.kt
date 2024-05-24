@@ -2,13 +2,13 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
-import cc.mewcraft.wakame.item.binary.meta.BDisplayNameMeta
+import cc.mewcraft.wakame.item.binary.meta.BCustomNameMeta
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.text.Component
 
 internal class TextStylizerImpl : TextStylizer {
     override fun stylizeName(item: NekoStack): Component {
-        return item.getMetaAccessor<BDisplayNameMeta>().provideDisplayName()
+        return item.getMetaAccessor<BCustomNameMeta>().provideDisplayName()
     }
 
     override fun stylizeLore(item: NekoStack): Collection<LoreLine> {

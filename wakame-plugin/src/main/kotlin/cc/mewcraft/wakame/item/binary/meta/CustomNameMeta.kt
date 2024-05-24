@@ -21,14 +21,14 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
  * 物品的自定义名字(MiniMessage).
  */
 @JvmInline
-value class BDisplayNameMeta(
+value class BCustomNameMeta(
     private val accessor: ItemMetaAccessor,
 ) : BinaryItemMeta<String>, DisplayNameProvider {
     override val key: Key
-        get() = ItemMetaConstants.createKey { DISPLAY_NAME }
+        get() = ItemMetaConstants.createKey { CUSTOM_NAME }
 
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.DISPLAY_NAME, ShadowTagType.STRING) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.CUSTOM_NAME, ShadowTagType.STRING) ?: false
 
     override fun getOrNull(): String? {
         return accessor.rootOrNull?.getStringOrNull(key.value())
@@ -47,12 +47,12 @@ value class BDisplayNameMeta(
     }
 
     override fun provideDisplayName(): Component {
-        val displayName = getOrNull() ?: return DisplayNameSupport.EMPTY
+        val customName = getOrNull() ?: return DisplayNameSupport.EMPTY
 
         val resolvers = TagResolver.builder().apply {
 
             // create <value> tag
-            resolver(Placeholder.parsed("value", displayName))
+            resolver(Placeholder.parsed("value", customName))
 
             // create <rarity_name> & <rarity_style> tags
             val rarityOrDefault = accessor.item.getMetaAccessor<BRarityMeta>().getOrDefault()
@@ -63,13 +63,13 @@ value class BDisplayNameMeta(
     }
 
     private companion object : ItemMetaConfig(
-        ItemMetaConstants.DISPLAY_NAME
+        ItemMetaConstants.CUSTOM_NAME
     ) {
         val tooltips: SingleTooltips = SingleTooltips()
     }
 }
 
-fun BDisplayNameMeta?.getOrEmpty(): String {
+fun BCustomNameMeta?.getOrEmpty(): String {
     return this?.getOrNull() ?: ""
 }
 

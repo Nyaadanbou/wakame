@@ -58,8 +58,8 @@ internal class NekoItemRealizerImpl : NekoItemRealizer {
             // Caution: the order of the generation matters here!!!
             // Caution: 这里每个 statement 的执行顺序很重要，存在依赖关系!!!
 
-            bind<SDisplayNameMeta, BDisplayNameMeta>()
-            bind<SDisplayLoreMeta, BDisplayLoreMeta>()
+            bind<SCustomNameMeta, BCustomNameMeta>()
+            bind<SLoreMeta, BLoreMeta>()
             bind<SDurabilityMeta, BDurabilityMeta>()
             bind<SLevelMeta, BLevelMeta>()
             bind<SRarityMeta, BRarityMeta>()

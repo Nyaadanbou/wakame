@@ -22,17 +22,17 @@ internal class PlayItemRenderer(
     private val modelLookup: ItemModelDataLookup by inject()
 
     override fun render(nekoStack: PlayNekoStack) {
-        val displayName = textStylizer.stylizeName(nekoStack)
-        val displayLore = textStylizer.stylizeLore(nekoStack).let(loreFinalizer::finalize)
+        val customName = textStylizer.stylizeName(nekoStack)
+        val lore = textStylizer.stylizeLore(nekoStack).let(loreFinalizer::finalize)
 
         val variant = nekoStack.variant
-        val cmd = modelLookup[nekoStack.key, variant]
+        val customModelData = modelLookup[nekoStack.key, variant]
 
         // directly edit the backing ItemMeta to avoid cloning
         nekoStack.itemStack.apply {
-            backingCustomName = displayName
-            backingLore = displayLore
-            backingCustomModelData = cmd
+            backingCustomName = customName
+            backingLore = lore
+            backingCustomModelData = customModelData
         }
 
         // 为了麦若，去掉物品的真实根标签

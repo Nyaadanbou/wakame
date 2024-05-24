@@ -11,31 +11,31 @@ import java.lang.reflect.Type
 /**
  * 物品的描述。
  */
-@ConfigPath(ItemMetaConstants.DISPLAY_LORE)
-sealed interface SDisplayLoreMeta : SchemaItemMeta<List<String>> {
-    override val key: Key get() = ItemMetaConstants.createKey { DISPLAY_LORE }
+@ConfigPath(ItemMetaConstants.LORE)
+sealed interface SLoreMeta : SchemaItemMeta<List<String>> {
+    override val key: Key get() = ItemMetaConstants.createKey { LORE }
 }
 
-private class NonNullDisplayLoreMeta(
+private class NonNullLoreMeta(
     /**
      * The item lore in the format of MiniMessage string.
      */
     private val lore: List<String>,
-) : SDisplayLoreMeta {
+) : SLoreMeta {
     override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<List<String>> {
         return GenerationResult(lore)
     }
 }
 
-private data object DefaultDisplayLoreMeta : SDisplayLoreMeta {
+private data object DefaultLoreMeta : SLoreMeta {
     override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<List<String>> = GenerationResult.empty()
 }
 
-internal data object DisplayLoreMetaSerializer : SchemaItemMetaSerializer<SDisplayLoreMeta> {
-    override val defaultValue: SDisplayLoreMeta = DefaultDisplayLoreMeta
-    override fun deserialize(type: Type, node: ConfigurationNode): SDisplayLoreMeta {
-        return NonNullDisplayLoreMeta(node.getList<String>(emptyList()))
+internal data object LoreMetaSerializer : SchemaItemMetaSerializer<SLoreMeta> {
+    override val defaultValue: SLoreMeta = DefaultLoreMeta
+    override fun deserialize(type: Type, node: ConfigurationNode): SLoreMeta {
+        return NonNullLoreMeta(node.getList<String>(emptyList()))
     }
 }

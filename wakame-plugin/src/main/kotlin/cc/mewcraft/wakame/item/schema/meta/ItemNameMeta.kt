@@ -20,11 +20,11 @@ private class NonNullItemNameMeta(
     /**
      * The item name in the format of MiniMessage string
      */
-    private val displayName: String,
+    private val itemName: String,
 ) : SItemNameMeta {
     override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<String> {
-        return GenerationResult(displayName)
+        return GenerationResult(itemName)
     }
 }
 

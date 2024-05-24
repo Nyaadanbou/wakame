@@ -153,8 +153,8 @@ class ItemDeserializationTest : KoinTest {
         every { mockRealizer.realize(demoItem, mockUser) } answers {
             val context = SchemaGenerationContext(SchemaGenerationTrigger.wrap(mockUser))
 
-            generateAndSet<SDisplayNameMeta, String>(demoItem, context)
-            generateAndSet<SDisplayLoreMeta, List<String>>(demoItem, context)
+            generateAndSet<SCustomNameMeta, String>(demoItem, context)
+            generateAndSet<SLoreMeta, List<String>>(demoItem, context)
             generateAndSet<SDurabilityMeta, Durability>(demoItem, context)
             generateAndSet<SFoodMeta, Food>(demoItem, context)
             generateAndSet<SLevelMeta, Int>(demoItem, context)

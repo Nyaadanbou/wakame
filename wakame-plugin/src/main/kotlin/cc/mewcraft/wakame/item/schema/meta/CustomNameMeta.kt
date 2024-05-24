@@ -11,31 +11,31 @@ import java.lang.reflect.Type
 /**
  * 物品的名字。
  */
-@ConfigPath(ItemMetaConstants.DISPLAY_NAME)
-sealed interface SDisplayNameMeta : SchemaItemMeta<String> {
-    override val key: Key get() = ItemMetaConstants.createKey { DISPLAY_NAME }
+@ConfigPath(ItemMetaConstants.CUSTOM_NAME)
+sealed interface SCustomNameMeta : SchemaItemMeta<String> {
+    override val key: Key get() = ItemMetaConstants.createKey { CUSTOM_NAME }
 }
 
-private class NonNullDisplayNameMeta(
+private class NonNullCustomNameMeta(
     /**
      * The item name in the format of MiniMessage string
      */
-    private val displayName: String,
-) : SDisplayNameMeta {
+    private val customName: String,
+) : SCustomNameMeta {
     override val isEmpty: Boolean = false
     override fun generate(context: SchemaGenerationContext): GenerationResult<String> {
-        return GenerationResult(displayName)
+        return GenerationResult(customName)
     }
 }
 
-private data object DefaultDisplayNameMeta : SDisplayNameMeta {
+private data object DefaultCustomNameMeta : SCustomNameMeta {
     override val isEmpty: Boolean = true
     override fun generate(context: SchemaGenerationContext): GenerationResult<String> = GenerationResult.empty()
 }
 
-internal data object DisplayNameMetaSerializer : SchemaItemMetaSerializer<SDisplayNameMeta> {
-    override val defaultValue: SDisplayNameMeta = DefaultDisplayNameMeta
-    override fun deserialize(type: Type, node: ConfigurationNode): SDisplayNameMeta {
-        return NonNullDisplayNameMeta(node.krequire<String>())
+internal data object DisplayNameMetaSerializer : SchemaItemMetaSerializer<SCustomNameMeta> {
+    override val defaultValue: SCustomNameMeta = DefaultCustomNameMeta
+    override fun deserialize(type: Type, node: ConfigurationNode): SCustomNameMeta {
+        return NonNullCustomNameMeta(node.krequire<String>())
     }
 }

@@ -88,8 +88,7 @@ object StatisticsConstants {
  * Constant values of ItemMeta.
  */
 object ItemMetaConstants {
-    const val DISPLAY_LORE = "lore"
-    const val DISPLAY_NAME = "name"
+    const val CUSTOM_NAME = "custom_name"
     const val DURABILITY = "durability"
     const val ELEMENT = "element"
     const val FOOD = "food"
@@ -97,6 +96,7 @@ object ItemMetaConstants {
     const val ITEM_NAME = "item_name"
     const val KIZAMI = "kizami"
     const val LEVEL = "level"
+    const val LORE = "lore"
     const val RARITY = "rarity"
     const val SKIN = "skin"
     const val SKIN_OWNER = "skin_owner"
