@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
@@ -18,7 +19,7 @@ sealed class BinarySkillCore : BinaryCore {
 
     override fun provideDisplayLore(): LoreLine {
         // TODO 支持渲染技能描述
-        val lineKey = SkillDisplaySupport.getLineKey(this)
+        val lineKey = SkillDisplaySupport.getLineKey(this) ?: return NoopLoreLine
         val lineText = listOf(Component.text(key.toString()))
         return SkillLoreLine(lineKey, lineText)
     }

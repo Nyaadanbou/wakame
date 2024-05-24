@@ -53,7 +53,7 @@ internal class AttributeLoreMetaCreator : DynamicLoreMetaCreator {
 internal object AttributeDisplaySupport : KoinComponent {
     private val DISPLAY_KEY_FACTORY: AttributeLineKeyFactory by inject()
 
-    fun getLineKey(core: BinaryAttributeCore): FullKey {
+    fun getLineKey(core: BinaryAttributeCore): FullKey?{
         return DISPLAY_KEY_FACTORY.get(core)
     }
 }
@@ -133,14 +133,14 @@ internal data class AttributeLoreMeta(
 internal class AttributeLineKeyFactory(
     private val config: RendererConfiguration,
 ) : LineKeyFactory<BinaryAttributeCore> {
-    override fun get(obj: BinaryAttributeCore): FullKey {
+    override fun get(obj: BinaryAttributeCore): FullKey? {
         // 属性的 full key 目前有两种
         //   attribute:{facade_id}.{operation}
         //   attribute:{facade_id}.{operation}.{element}
 
         val rawKey = obj.key
         if (rawKey !in config.rawKeys) {
-            return LineKeyFactory.SKIP_DISPLAY
+            return null
         }
 
         val operation = obj.operation

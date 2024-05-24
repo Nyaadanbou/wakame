@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -46,7 +47,7 @@ value class BElementMeta(
     }
 
     override fun provideDisplayLore(): LoreLine {
-        val key = ItemMetaSupport.getLineKey(this)
+        val key = ItemMetaSupport.getLineKey(this) ?: return NoopLoreLine
         val lines = tooltips.render(get(), Element::displayName)
         return ItemMetaLoreLine(key, lines)
     }

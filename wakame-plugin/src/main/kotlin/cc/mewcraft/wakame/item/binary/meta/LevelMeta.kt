@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.util.getIntOrNull
 import cc.mewcraft.wakame.util.toStableByte
@@ -36,7 +37,7 @@ value class BLevelMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val level = get()
-        val key = ItemMetaSupport.getLineKey(this)
+        val key = ItemMetaSupport.getLineKey(this) ?: return NoopLoreLine
         val lines = ItemMetaSupport.mini().deserialize(tooltips.single, Placeholder.component("value", Component.text(level)))
         return ItemMetaLoreLine(key, listOf(lines))
     }

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.util.getListOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
@@ -43,7 +44,7 @@ value class BLoreMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val lore = get()
-        val key = ItemMetaSupport.getLineKey(this)
+        val key = ItemMetaSupport.getLineKey(this) ?: return NoopLoreLine
         val lines = lore.mapTo(ObjectArrayList(lore.size)) { ItemMetaSupport.mini().deserialize(tooltips.line, Placeholder.parsed("line", it)) }
 
         val header = tooltips.header?.map(ItemMetaSupport.mini()::deserialize).orEmpty()

@@ -52,13 +52,12 @@ internal data class ItemMetaLoreMeta(
 internal class ItemMetaLineKeyFactory(
     private val config: RendererConfiguration,
 ) : LineKeyFactory<BinaryItemMeta<*>> {
-    override fun get(obj: BinaryItemMeta<*>): FullKey {
+    override fun get(obj: BinaryItemMeta<*>): FullKey? {
         val fullKey = obj.key // 元数据的 full key 就是 BinaryItemMeta#key
         val rawKey = fullKey // 元数据的 raw key 跟它的 full key 设计上一致
-        return if (rawKey !in config.rawKeys) {
-            LineKeyFactory.SKIP_DISPLAY
-        } else {
-            fullKey
+        if (rawKey !in config.rawKeys) {
+            return null
         }
+        return fullKey
     }
 }

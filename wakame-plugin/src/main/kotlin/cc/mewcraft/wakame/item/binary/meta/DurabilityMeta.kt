@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Durability
 import cc.mewcraft.wakame.util.CompoundShadowTag
@@ -84,7 +85,7 @@ value class BDurabilityMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val durability = get()
-        val key = ItemMetaSupport.getLineKey(this)
+        val key = ItemMetaSupport.getLineKey(this) ?: return NoopLoreLine
         val text = ItemMetaSupport.mini().deserialize(
             tooltips.single,
             Placeholder.component("threshold", text(durability.threshold)),

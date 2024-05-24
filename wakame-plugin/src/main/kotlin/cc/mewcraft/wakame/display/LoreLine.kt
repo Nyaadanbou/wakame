@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.GenericKeys
 import net.kyori.adventure.text.Component
 
 /**
@@ -26,7 +27,7 @@ interface LoreLine {
  * 代表一个不会显示的内容。
  */
 data object NoopLoreLine : LoreLine {
-    override val key: FullKey = LineKeyFactory.SKIP_DISPLAY
+    override val key: FullKey = GenericKeys.NOOP
     override val lines: List<Component> = emptyList()
     override fun toString(): String = "NOOP"
 }

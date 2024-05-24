@@ -17,7 +17,7 @@ internal object ItemMetaSupport : KoinComponent {
         return MINI
     }
 
-    fun getLineKey(itemMeta: BinaryItemMeta<*>): FullKey {
+    fun getLineKey(itemMeta: BinaryItemMeta<*>): FullKey? {
         return LINE_KEY_FACTORY.get(itemMeta)
     }
 }
