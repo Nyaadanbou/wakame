@@ -9,7 +9,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.protocol.player.User
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 
-class PlayNekoStackRenderListener(
+class PacketNekoStackRenderListener(
     private val renderer: ItemRenderer<PacketNekoStack>
 ) : PacketListenerAbstract() {
     override fun onPacketSend(event: PacketSendEvent) {

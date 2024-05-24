@@ -59,8 +59,24 @@ internal class ShowItemRenderer(
 internal class PacketItemRenderer(
     private val textStylizer: TextStylizer,
     private val loreFinalizer: LoreFinalizer,
-) : ItemRenderer<PacketNekoStack> {
+) : KoinComponent, ItemRenderer<PacketNekoStack> {
+    private val modelLookup: ItemModelDataLookup by inject()
+
     override fun render(nekoStack: PacketNekoStack) {
-        println(nekoStack)
+        val displayName = textStylizer.stylizeName(nekoStack)
+        val displayLore = textStylizer.stylizeLore(nekoStack).let(loreFinalizer::finalize)
+
+        val variant = nekoStack.variant
+        val cmd = modelLookup[nekoStack.key, variant]
+
+        // directly edit the backing ItemMeta to avoid cloning
+        nekoStack.itemStack.apply {
+            backingCustomName = displayName
+            backingLore = displayLore
+            backingCustomModelData = cmd
+        }
+
+        // 为了麦若，去掉物品的真实根标签
+        nekoStack.erase()
     }
 }

@@ -14,7 +14,7 @@ import org.koin.dsl.module
 internal fun packetModule() = module {
 
     single<PacketEventsAPI<*>> {
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(get()));
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(get()))
         PacketEvents.getAPI()
     }
 
@@ -22,5 +22,5 @@ internal fun packetModule() = module {
 
     singleOf(::FOVPacketHandler) bind PacketListenerCommon::class
     singleOf(::GlowingItemPacketHandler) bind PacketListenerCommon::class
-    single<PlayNekoStackRenderListener> { PlayNekoStackRenderListener(get(named(PACKET_ITEM_RENDERER))) } bind PacketListenerCommon::class
+    single<PacketNekoStackRenderListener> { PacketNekoStackRenderListener(get(named(PACKET_ITEM_RENDERER))) } bind PacketListenerCommon::class
 }
