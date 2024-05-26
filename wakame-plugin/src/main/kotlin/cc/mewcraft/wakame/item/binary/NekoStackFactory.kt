@@ -147,7 +147,7 @@ object PacketNekoStackFactory {
     @Contract(pure = true)
     fun maybe(itemStack: PacketStack): PacketNekoStack? {
         val itemStackCopy = itemStack.copy()
-        val packetNekoStack = PacketNekoStackImpl(itemStackCopy).takeIf { it.isNeko}
+        val packetNekoStack = PacketNekoStackImpl(itemStackCopy).takeIf { it.isNeko }
         return packetNekoStack
     }
 
