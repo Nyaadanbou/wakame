@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.display.ItemRenderer
 import cc.mewcraft.wakame.item.binary.PacketNekoStack
+import cc.mewcraft.wakame.item.binary.packetNekoStackOrNull
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
@@ -23,7 +24,7 @@ class PacketNekoStackRenderListener(
 
     private fun handleSetSlot(user: User, packet: WrapperPlayServerSetSlot): Boolean {
         val item = packet.item.takeUnlessEmpty() ?: return false
-        val nekoStack = PacketNekoStackImpl(item)
+        val nekoStack = item.packetNekoStackOrNull ?: return false
         renderer.render(nekoStack)
         val newPacket = WrapperPlayServerSetSlot(
             packet.windowId,

@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.binary.PacketNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.ShowNekoStack
 import cc.mewcraft.wakame.util.nekoCompound
+import cc.mewcraft.wakame.util.nekoCompoundOrNull
 import cc.mewcraft.wakame.util.removeNekoCompound
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -20,7 +21,7 @@ internal value class PacketNekoStackImpl(
         get() = true
 
     override val isNeko: Boolean
-        get() = true
+        get() = itemStack.nekoCompoundOrNull != null
 
     override val play: PlayNekoStack
         get() = TODO("Not yet implemented")

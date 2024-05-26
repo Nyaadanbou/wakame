@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.wakame.packet.PacketNekoStackImpl
 import cc.mewcraft.wakame.util.isNmsObjectBacked
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
+import com.github.retrooper.packetevents.protocol.item.ItemStack as PacketStack
 
 val ItemStack.playNekoStackOrNull: PlayNekoStack?
     get() = PlayNekoStackFactory.maybe(this)
@@ -16,6 +18,12 @@ val ItemStack.showNekoStackOrNull: ShowNekoStack?
 
 val ItemStack.showNekoStack: ShowNekoStack
     get() = ShowNekoStackFactory.require(this)
+
+val PacketStack.packetNekoStackOrNull: PacketNekoStack?
+    get() = PacketNekoStackFactory.maybe(this)
+
+val PacketStack.packetNekoStack: PacketNekoStack
+    get() = PacketNekoStackFactory.require(this)
 
 object PlayNekoStackFactory {
     /**
@@ -124,5 +132,40 @@ object ShowNekoStackFactory {
         require(showNekoStack.isNeko) { "The ItemStack is not a legal NekoItem" }
         require(showNekoStack.isShow) { "The ItemStack is not a legal ShowNekoStack" }
         return showNekoStack
+    }
+}
+
+object PacketNekoStackFactory {
+    /**
+     * Wraps the [itemStack] as a [PacketNekoStack] object.
+     *
+     * This function will return `null` if the [itemStack] is not already
+     * of legal [PacketNekoStack].
+     *
+     * **The given [itemStack] will leave intact.**
+     */
+    @Contract(pure = true)
+    fun maybe(itemStack: PacketStack): PacketNekoStack? {
+        val itemStackCopy = itemStack.copy()
+        val packetNekoStack = PacketNekoStackImpl(itemStackCopy).takeIf { it.isNeko}
+        return packetNekoStack
+    }
+
+    /**
+     * Wraps the [itemStack] as a [PacketNekoStack] object.
+     *
+     * This function will throw an exception if the [itemStack] is not already
+     * of legal [PacketNekoStack].
+     *
+     * **The given [itemStack] will leave intact.**
+     *
+     * @throws IllegalArgumentException
+     */
+    @Contract(pure = true)
+    fun require(itemStack: PacketStack): PacketNekoStack {
+        val itemStackCopy = itemStack.copy()
+        val packetNekoStack = PacketNekoStackImpl(itemStackCopy)
+        require(packetNekoStack.isNeko) { "The ItemStack is not a legal NekoItem" }
+        return packetNekoStack
     }
 }
