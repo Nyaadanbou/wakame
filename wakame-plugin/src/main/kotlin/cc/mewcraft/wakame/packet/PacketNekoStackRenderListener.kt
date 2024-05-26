@@ -29,7 +29,7 @@ class PacketNekoStackRenderListener(
             packet.windowId,
             packet.stateId,
             packet.slot,
-            nekoStack.packetStack
+            nekoStack.itemStack
         )
 
         user.sendPacketSilently(newPacket)

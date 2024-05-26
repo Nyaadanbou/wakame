@@ -10,22 +10,23 @@ import cc.mewcraft.wakame.item.schema.meta.*
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.asBukkit
 import org.bukkit.Registry
+import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
 
 internal class NekoItemRealizerImpl : NekoItemRealizer {
-    override fun realize(item: NekoItem, context: SchemaGenerationContext): NekoStack {
+    override fun realize(item: NekoItem, context: SchemaGenerationContext): NekoStack<ItemStack> {
         return createItemStack0(item, context)
     }
 
-    override fun realize(item: NekoItem, user: User<*>): NekoStack {
+    override fun realize(item: NekoItem, user: User<*>): NekoStack<ItemStack> {
         return realize0(item, user)
     }
 
-    override fun realize(item: NekoItem, crate: Crate): NekoStack {
+    override fun realize(item: NekoItem, crate: Crate): NekoStack<ItemStack> {
         return realize0(item, crate)
     }
 
-    private fun realize0(item: NekoItem, source: Any): NekoStack {
+    private fun realize0(item: NekoItem, source: Any): NekoStack<ItemStack> {
         val context = SchemaGenerationContext(SchemaGenerationTrigger.wrap(source))
         val nekoStack = createItemStack0(item, context)
         return nekoStack
@@ -38,7 +39,7 @@ internal class NekoItemRealizerImpl : NekoItemRealizer {
      * @param context the input context
      * @return a new once-off NekoStack
      */
-    private fun createItemStack0(item: NekoItem, context: SchemaGenerationContext): NekoStack {
+    private fun createItemStack0(item: NekoItem, context: SchemaGenerationContext): NekoStack<ItemStack> {
         val stack = run {
             val key = item.material.asBukkit
             val mat = requireNotNull(Registry.MATERIAL.get(key)) { "Can't find material by key '${item.material}'" }
@@ -117,7 +118,7 @@ private class ItemMetaWriter {
      * @param stack the world-state item
      * @param context the generation context
      */
-    fun write(item: NekoItem, stack: NekoStack, context: SchemaGenerationContext) {
+    fun write(item: NekoItem, stack: NekoStack<*>, context: SchemaGenerationContext) {
         bindings.forEach {
             val schemaItemMetaKClass = it.schemaItemMetaKClass
             val binaryItemMetaKClass = it.binaryItemMetaKClass
@@ -152,7 +153,7 @@ private class ItemMetaWriter {
  * Responsible to write item cells to an item.
  */
 private object ItemCellWriter {
-    fun write(item: NekoItem, stack: NekoStack, context: SchemaGenerationContext) {
+    fun write(item: NekoItem, stack: NekoStack<*>, context: SchemaGenerationContext) {
         item.cellMap.forEach { (id, schemaCell) ->
             // The order of cell population should be the same as
             // that they are declared in the configuration file.

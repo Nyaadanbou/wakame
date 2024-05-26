@@ -28,7 +28,7 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack as PacketStack
  * To get an instance of [NekoStack], use a factory:
  * [PlayNekoStackFactory] and [ShowNekoStackFactory].
  */
-sealed interface NekoStack : PlayNekoStackLike, ShowNekoStackLike, ItemBehaviorAccessor {
+sealed interface NekoStack<I> : PlayNekoStackLike, ShowNekoStackLike, ItemBehaviorAccessor {
     /**
      * The wrapped [ItemStack].
      *
@@ -51,7 +51,7 @@ sealed interface NekoStack : PlayNekoStackLike, ShowNekoStackLike, ItemBehaviorA
      *
      * @see isNmsBacked
      */
-    val itemStack: ItemStack
+    val itemStack: I
 
     /**
      * Checks if `this` NekoStack is backed by an NMS object.
@@ -195,7 +195,7 @@ sealed interface NekoStack : PlayNekoStackLike, ShowNekoStackLike, ItemBehaviorA
  * - be given to players
  * - be kept by players
  */
-interface PlayNekoStack : NekoStack {
+interface PlayNekoStack : NekoStack<ItemStack> {
     // TDB 暂时和 NekoStack 一样
 }
 
@@ -221,7 +221,7 @@ interface PlayNekoStackLike {
  * - be stored in a display item
  * - be placed in a virtual inventory
  */
-interface ShowNekoStack : NekoStack {
+interface ShowNekoStack : NekoStack<ItemStack> {
     /**
      * The [CustomDataAccessor] of this item.
      *
@@ -244,15 +244,13 @@ interface ShowNekoStackLike {
     val show: ShowNekoStack
 }
 
-interface PacketNekoStack : NekoStack {
-    val packetStack: PacketStack
-}
+interface PacketNekoStack : NekoStack<PacketStack>
 
 /**
  * Gets the data accessor of specific item meta.
  *
  * @see ItemMetaAccessor.getAccessor
  */
-inline fun <reified M : BinaryItemMeta<*>> NekoStack.getMetaAccessor(): M {
+inline fun <reified M : BinaryItemMeta<*>> NekoStack<*>.getMetaAccessor(): M {
     return this.meta.getAccessor<M>()
 }

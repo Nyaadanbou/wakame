@@ -58,7 +58,7 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
         }
     }
 
-    private fun createTeamPacket(itemEntity: Item, nekoStack: NekoStack): WrapperPlayServerTeams {
+    private fun createTeamPacket(itemEntity: Item, nekoStack: NekoStack<*>): WrapperPlayServerTeams {
         val entityUniqueId = itemEntity.uniqueId
         // TODO: 根据 NekoStack 设置颜色
         val color = NamedTextColor.nearestTo(TextColor.color(Random(nekoStack.variant).nextInt(0xFFFFFF)))

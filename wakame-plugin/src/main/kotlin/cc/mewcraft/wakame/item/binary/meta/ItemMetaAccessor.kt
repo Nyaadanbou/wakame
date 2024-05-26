@@ -12,7 +12,7 @@ interface ItemMetaAccessor {
     /**
      * The item which owns this accessor.
      */
-    val item: NekoStack
+    val item: NekoStack<*>
 
     /**
      * Gets the root tag containing all the item meta or `null`, if it does not exist.

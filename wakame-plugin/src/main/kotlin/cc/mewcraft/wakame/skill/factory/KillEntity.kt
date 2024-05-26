@@ -3,11 +3,8 @@ package cc.mewcraft.wakame.skill.factory
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.NoTargetException
-import cc.mewcraft.wakame.skill.SkillDisplay
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillCastContext
@@ -17,7 +14,7 @@ import net.kyori.adventure.key.Key
 interface KillEntity : Skill {
     companion object Factory : SkillFactory<KillEntity> {
         override fun create(key: Key, config: ConfigProvider): KillEntity {
-            val display = config.entry<SkillDisplay>("")
+            val display = config.optionalEntry<SkillDisplay>("").orElse(EmptySkillDisplay)
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
 
             return Default(key, display, conditions)

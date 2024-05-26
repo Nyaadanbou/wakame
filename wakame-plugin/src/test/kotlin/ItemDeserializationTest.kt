@@ -23,6 +23,7 @@ import io.mockk.mockkStatic
 import io.mockk.verify
 import it.unimi.dsi.fastutil.longs.LongSet
 import me.lucko.helper.shadows.nbt.*
+import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -174,7 +175,7 @@ class ItemDeserializationTest : KoinTest {
             }
 
             // just return an empty item
-            mockk<NekoStack>()
+            mockk<NekoStack<ItemStack>>()
         }
 
         // call

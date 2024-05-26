@@ -71,13 +71,13 @@ var ItemStack.backingCustomName: Component?
  */
 var ItemStack.backingItemName: Component?
     get() {
-        return PaperAdventure.asAdventure(this.handle?.get(DataComponents.CUSTOM_NAME))
+        return PaperAdventure.asAdventure(this.handle?.get(DataComponents.ITEM_NAME))
     }
     set(value) {
         if (value != null) {
-            this.handle?.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
+            this.handle?.set(DataComponents.ITEM_NAME, PaperAdventure.asVanilla(value))
         } else {
-            this.handle?.remove(DataComponents.CUSTOM_NAME)
+            this.handle?.remove(DataComponents.ITEM_NAME)
         }
     }
 

@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
+import org.bukkit.inventory.ItemStack
 import org.koin.mp.KoinPlatform
 import java.util.UUID
 import kotlin.reflect.KClass
@@ -91,15 +92,15 @@ inline fun <reified M : SchemaItemMeta<*>> NekoItem.getMeta(): M {
     return getMeta(M::class)
 }
 
-fun NekoItem.reify(context: SchemaGenerationContext): NekoStack {
+fun NekoItem.reify(context: SchemaGenerationContext): NekoStack<ItemStack> {
     return realizer.realize(this, context)
 }
 
-fun NekoItem.reify(user: User<*>): NekoStack {
+fun NekoItem.reify(user: User<*>): NekoStack<ItemStack> {
     return realizer.realize(this, user)
 }
 
-fun NekoItem.reify(crate: Crate): NekoStack {
+fun NekoItem.reify(crate: Crate): NekoStack<ItemStack> {
     return realizer.realize(this, crate)
 }
 

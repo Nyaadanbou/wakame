@@ -17,7 +17,7 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 @JvmInline
 internal value class ItemCellAccessorImpl(
-    private val base: BaseNekoStack,
+    private val base: BaseNekoStack<*>,
 ) : ItemCellAccessor {
 
     /* Getters */

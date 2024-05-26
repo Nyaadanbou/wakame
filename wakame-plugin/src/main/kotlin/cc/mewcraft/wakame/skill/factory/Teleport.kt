@@ -6,7 +6,6 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.Target
@@ -24,7 +23,7 @@ interface Teleport : Skill {
 
     companion object Factory : SkillFactory<Teleport> {
         override fun create(key: Key, config: ConfigProvider): Teleport {
-            val display = config.entry<SkillDisplay>("")
+            val display = config.optionalEntry<SkillDisplay>("").orElse(EmptySkillDisplay)
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
             val type = config.optionalEntry<Teleportation>("teleportation")
                 .orElse(Teleportation.FIXED(Position.block(0, 0, 0)))

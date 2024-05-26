@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.Caster
+import cc.mewcraft.wakame.skill.EmptySkillDisplay
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillDisplay
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
@@ -18,7 +19,7 @@ interface Dash : Skill {
 
     companion object Factory: SkillFactory<Dash> {
         override fun create(key: Key, config: ConfigProvider): Dash {
-            val display = config.entry<SkillDisplay>("")
+            val display = config.optionalEntry<SkillDisplay>("").orElse(EmptySkillDisplay)
             val distance = config.entry<Double>("distance")
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
 

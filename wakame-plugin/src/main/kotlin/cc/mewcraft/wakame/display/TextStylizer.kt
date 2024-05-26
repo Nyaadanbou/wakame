@@ -19,7 +19,7 @@ internal interface TextStylizer {
      * @param item the item to generate name for
      * @return the generated name
      */
-    fun stylizeName(item: NekoStack): Component
+    fun stylizeName(item: NekoStack<*>): Component
 
     /**
      * Generates [lore lines][LoreLine] for the [item]. The returned
@@ -32,6 +32,6 @@ internal interface TextStylizer {
      * @param item the item to generate lore for
      * @return the generated lore lines
      */
-    fun stylizeLore(item: NekoStack): Collection<LoreLine>
+    fun stylizeLore(item: NekoStack<*>): Collection<LoreLine>
 
 }

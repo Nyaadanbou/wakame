@@ -36,13 +36,12 @@ typealias PlayNekoStackPredicate = PlayNekoStack.() -> Boolean
  */
 typealias ShowNekoStackPredicate = ShowNekoStack.() -> Boolean
 
+typealias PacketNekoStackPredicate = PacketNekoStack.() -> Boolean
+
 /**
- * Common code shared by [PlayNekoStack] and [ShowNekoStack].
- *
- * This could be used if it does not require the specific code of
- * [PlayNekoStack] and [ShowNekoStack].
+ * Common code shared by all [NekoStack] implementations.
  */
-internal interface BaseNekoStack : NekoStack {
+internal interface BaseNekoStack<I> : NekoStack<I> {
     /**
      * Gets the "wakame" [Compound][CompoundShadowTag] of this item.
      *
@@ -52,12 +51,6 @@ internal interface BaseNekoStack : NekoStack {
      * those tags, just use the wrapped [itemStack].
      */
     val tags: CompoundShadowTag
-
-    override val isNmsBacked: Boolean
-        get() = itemStack.isNmsObjectBacked
-
-    override val isNeko: Boolean
-        get() = itemStack.nekoCompoundOrNull != null
 
     override val isPlay: Boolean
         get() = !isShow // an NS is either PNS or SNS
@@ -102,22 +95,37 @@ internal interface BaseNekoStack : NekoStack {
     override val statistics: ItemStatisticsAccessor
         get() = ItemStatisticsAccessorImpl(this)
 
-    override fun erase() {
-        itemStack.removeNekoCompound()
-    }
-
     override val behaviors: List<ItemBehavior>
         get() = schema.behaviors
 
     override fun <T : ItemBehavior> getBehavior(behaviorClass: KClass<T>): T {
-        return getBehaviorOrNull(behaviorClass) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
+        return getBehaviorOrNull(behaviorClass)
+            ?: throw IllegalStateException("Item $key does not have a behavior of type ${behaviorClass.simpleName}")
+    }
+}
+
+/**
+ * Common code shared by [PlayNekoStack] and [ShowNekoStack].
+ *
+ * This could be used if it does not require the specific code of
+ * [PlayNekoStack] and [ShowNekoStack].
+ */
+internal interface BukkitBaseNekoStack : BaseNekoStack<ItemStack> {
+    override val isNmsBacked: Boolean
+        get() = itemStack.isNmsObjectBacked
+
+    override val isNeko: Boolean
+        get() = itemStack.nekoCompoundOrNull != null
+
+    override fun erase() {
+        itemStack.removeNekoCompound()
     }
 }
 
 @JvmInline
 internal value class PlayNekoStackImpl(
     override val itemStack: ItemStack,
-) : BaseNekoStack, PlayNekoStack {
+) : BukkitBaseNekoStack, PlayNekoStack {
     companion object {
         private val ALL_FLAGS = ItemFlag.entries.toTypedArray()
     }
@@ -144,7 +152,8 @@ internal value class PlayNekoStackImpl(
             // NekoItem realization, in the world state because we want to avoid
             // undefined behaviors. Just imagine that a random code modifies a
             // vanilla item and make it an incomplete realization of NekoItem.
-            return itemStack.nekoCompoundOrNull ?: throw NullPointerException("Can't read/modify the tags of NMS-backed ItemStack which is not NekoItem realization")
+            return itemStack.nekoCompoundOrNull
+                ?: throw NullPointerException("Can't read/modify the tags of NMS-backed ItemStack which is not NekoItem realization")
         }
 
     override val show: ShowNekoStack
@@ -163,7 +172,7 @@ internal value class PlayNekoStackImpl(
 @JvmInline
 internal value class ShowNekoStackImpl(
     override val itemStack: ItemStack,
-) : BaseNekoStack, ShowNekoStack {
+) : BukkitBaseNekoStack, ShowNekoStack {
     // The `wakame` compound can always be available (if not, create it)
     // as the ItemStack is solely used for the purpose of display, not for
     // the purpose of being used by players. Therefore, we can relax the

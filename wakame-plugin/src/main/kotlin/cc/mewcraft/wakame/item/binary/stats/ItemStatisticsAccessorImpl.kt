@@ -8,7 +8,7 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 @JvmInline
 internal value class ItemStatisticsAccessorImpl(
-    private val base: BaseNekoStack,
+    private val base: BaseNekoStack<*>,
 ) : ItemStatisticsAccessor {
     override val rootOrNull: CompoundShadowTag?
         get() = base.tags.getCompoundOrNull(StatisticsBinaryKeys.BASE)
