@@ -3,12 +3,11 @@ package cc.mewcraft.wakame.item.schema
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.user.User
-import org.bukkit.inventory.ItemStack
 
 /**
  * Realizes [NekoItem] into an item which then can be added to the game world.
  */
-interface NekoItemRealizer {
+interface NekoItemRealizer<I> {
 
     /**
      * Realizes an item template from a custom trigger.
@@ -17,7 +16,7 @@ interface NekoItemRealizer {
      * @param context the context on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, context: SchemaGenerationContext): NekoStack<ItemStack> // TODO 我们需要针对 SNS,PNS 创建不同的 Realizer 吗？
+    fun realize(item: NekoItem, context: SchemaGenerationContext): NekoStack<I> // TODO 我们需要针对 SNS,PNS 创建不同的 Realizer 吗？
 
     /**
      * Realizes an item template from a player.
@@ -26,7 +25,7 @@ interface NekoItemRealizer {
      * @param user the player on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, user: User<*>): NekoStack<ItemStack>
+    fun realize(item: NekoItem, user: User<*>): NekoStack<I>
 
     /**
      * Realizes an item template from a crate.
@@ -35,6 +34,6 @@ interface NekoItemRealizer {
      * @param crate the crate on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, crate: Crate): NekoStack<ItemStack>
+    fun realize(item: NekoItem, crate: Crate): NekoStack<I>
 
 }

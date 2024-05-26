@@ -104,4 +104,4 @@ fun NekoItem.reify(crate: Crate): NekoStack<ItemStack> {
     return realizer.realize(this, crate)
 }
 
-private val realizer: NekoItemRealizer by KoinPlatform.getKoin().inject()
+private val realizer: NekoItemRealizer<ItemStack> by KoinPlatform.getKoin().inject()

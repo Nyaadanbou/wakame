@@ -13,7 +13,7 @@ import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
 
-internal class NekoItemRealizerImpl : NekoItemRealizer {
+internal class NekoItemRealizerImpl : NekoItemRealizer<ItemStack> {
     override fun realize(item: NekoItem, context: SchemaGenerationContext): NekoStack<ItemStack> {
         return createItemStack0(item, context)
     }
@@ -153,7 +153,7 @@ private class ItemMetaWriter {
  * Responsible to write item cells to an item.
  */
 private object ItemCellWriter {
-    fun write(item: NekoItem, stack: NekoStack<*>, context: SchemaGenerationContext) {
+    fun write(item: NekoItem, stack: NekoStack<ItemStack>, context: SchemaGenerationContext) {
         item.cellMap.forEach { (id, schemaCell) ->
             // The order of cell population should be the same as
             // that they are declared in the configuration file.

@@ -41,7 +41,10 @@ val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
 
 fun ItemStack.removeNekoCompound() {
     val customData = this.getCustomData()
-    customData?.remove(WAKAME_COMPOUND_NAME)
+    if (customData != null) {
+        customData.remove(WAKAME_COMPOUND_NAME)
+        this.setComponent(ComponentTypes.CUSTOM_DATA, customData.asPacketNBT)
+    }
 }
 
 //<editor-fold desc="Direct Access to `tags.display">

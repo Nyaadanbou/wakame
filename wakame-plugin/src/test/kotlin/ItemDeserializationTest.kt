@@ -150,7 +150,7 @@ class ItemDeserializationTest : KoinTest {
         every { mockUser.level } returns 50
 
         // mock realizer (to avoid call on the Bukkit internals)
-        val mockRealizer = mockk<NekoItemRealizer>(relaxed = true)
+        val mockRealizer = mockk<NekoItemRealizer<ItemStack>>(relaxed = true)
         every { mockRealizer.realize(demoItem, mockUser) } answers {
             val context = SchemaGenerationContext(SchemaGenerationTrigger.wrap(mockUser))
 
