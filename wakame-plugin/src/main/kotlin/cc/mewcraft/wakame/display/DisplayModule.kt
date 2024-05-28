@@ -5,13 +5,11 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.binary.PacketNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.ShowNekoStack
-import cc.mewcraft.wakame.packet.PacketNekoStackRenderListener
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.named
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.withOptions
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 const val RENDERER_CONFIG_FILE = "renderer.yml"
@@ -35,7 +33,6 @@ internal fun displayModule(): Module = module {
         named(PACKET_ITEM_RENDERER)
         bind<ItemRenderer<PacketNekoStack>>()
     }
-    single<PacketNekoStackRenderListener> { PacketNekoStackRenderListener(get(named(PACKET_ITEM_RENDERER))) }
     single<DynamicLoreMetaCreatorRegistry> { DynamicLoreMetaCreatorRegistryImpl() }
 
     // config holder

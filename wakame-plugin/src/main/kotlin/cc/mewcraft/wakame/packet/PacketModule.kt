@@ -1,13 +1,11 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.display.PACKET_ITEM_RENDERER
 import cc.mewcraft.wakame.initializer.Initializable
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.PacketEventsAPI
 import com.github.retrooper.packetevents.event.PacketListenerCommon
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import org.koin.core.module.dsl.singleOf
-import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -22,5 +20,5 @@ internal fun packetModule() = module {
 
     singleOf(::FOVPacketHandler) bind PacketListenerCommon::class
     singleOf(::GlowingItemPacketHandler) bind PacketListenerCommon::class
-    single<PacketNekoStackRenderListener> { PacketNekoStackRenderListener(get(named(PACKET_ITEM_RENDERER))) } bind PacketListenerCommon::class
+    singleOf(::PacketNekoStackRenderListener) bind PacketListenerCommon::class
 }
