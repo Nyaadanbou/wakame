@@ -60,6 +60,7 @@ renderer_layout:
     - attribute:max_mana
     - attribute:movement_speed
     - (fixed:skill)<!i><aqua><b>技能
+    - skill:buff/potion_remove
     - skill:blink
     - skill:cyclone
     - skill:dash

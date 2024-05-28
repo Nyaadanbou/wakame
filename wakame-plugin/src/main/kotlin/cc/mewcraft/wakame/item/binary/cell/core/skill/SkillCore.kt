@@ -19,7 +19,7 @@ sealed class BinarySkillCore : BinaryCore {
 
     override fun provideDisplayLore(): LoreLine {
         val lineKey = SkillDisplaySupport.getLineKey(this) ?: return NoopLoreLine
-        val display = instance.display
+        val display = instance.displays
         val tooltips = display.tooltips
         val tagResolvers = instance.conditions.tagResolvers
         val lineText = tooltips.mapTo(ObjectArrayList(tooltips.size)) { SkillDisplaySupport.mini().deserialize(it, *tagResolvers) }

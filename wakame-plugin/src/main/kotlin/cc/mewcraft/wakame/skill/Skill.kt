@@ -40,7 +40,7 @@ interface Skill : Keyed {
     /**
      * The display infos of this skill.
      */
-    val display: SkillDisplay
+    val displays: SkillDisplay
 
     fun cast(context: SkillCastContext) = Unit
 }

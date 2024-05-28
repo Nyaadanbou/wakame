@@ -14,7 +14,7 @@ import net.kyori.adventure.key.Key
 interface KillEntity : Skill {
     companion object Factory : SkillFactory<KillEntity> {
         override fun create(key: Key, config: ConfigProvider): KillEntity {
-            val display = config.optionalEntry<SkillDisplay>("").orElse(EmptySkillDisplay)
+            val display = config.optionalEntry<SkillDisplay>("displays").orElse(EmptySkillDisplay)
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
 
             return Default(key, display, conditions)
@@ -26,7 +26,7 @@ interface KillEntity : Skill {
         display: Provider<SkillDisplay>,
         conditions: Provider<SkillConditionGroup>
     ) : KillEntity {
-        override val display: SkillDisplay by display
+        override val displays: SkillDisplay by display
         override val conditions: SkillConditionGroup by conditions
 
         override fun cast(context: SkillCastContext) {

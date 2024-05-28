@@ -19,7 +19,7 @@ interface CommandExecute : Skill {
 
     companion object Factory : SkillFactory<CommandExecute> {
         override fun create(key: Key, config: ConfigProvider): CommandExecute {
-            val display = config.optionalEntry<SkillDisplay>("").orElse(EmptySkillDisplay)
+            val display = config.optionalEntry<SkillDisplay>("displays").orElse(EmptySkillDisplay)
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
             val command = config.entry<List<String>>("commands")
 
@@ -33,7 +33,7 @@ interface CommandExecute : Skill {
         conditions: Provider<SkillConditionGroup>,
         command: Provider<List<String>>
     ) : CommandExecute {
-        override val display: SkillDisplay by display
+        override val displays: SkillDisplay by display
         override val conditions: SkillConditionGroup by conditions
         override val commands: List<String> by command
         override fun cast(context: SkillCastContext) {

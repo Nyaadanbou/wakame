@@ -23,7 +23,7 @@ interface Teleport : Skill {
 
     companion object Factory : SkillFactory<Teleport> {
         override fun create(key: Key, config: ConfigProvider): Teleport {
-            val display = config.optionalEntry<SkillDisplay>("").orElse(EmptySkillDisplay)
+            val display = config.optionalEntry<SkillDisplay>("displays").orElse(EmptySkillDisplay)
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
             val type = config.optionalEntry<Teleportation>("teleportation")
                 .orElse(Teleportation.FIXED(Position.block(0, 0, 0)))
@@ -38,7 +38,7 @@ interface Teleport : Skill {
         conditions: Provider<SkillConditionGroup>,
         type: Provider<Teleportation>
     ) : Teleport {
-        override val display: SkillDisplay by display
+        override val displays: SkillDisplay by display
         override val conditions: SkillConditionGroup by conditions
         override val type: Teleportation by type
 

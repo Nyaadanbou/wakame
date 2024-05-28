@@ -19,7 +19,7 @@ interface Dash : Skill {
 
     companion object Factory: SkillFactory<Dash> {
         override fun create(key: Key, config: ConfigProvider): Dash {
-            val display = config.optionalEntry<SkillDisplay>("").orElse(EmptySkillDisplay)
+            val display = config.optionalEntry<SkillDisplay>("displays").orElse(EmptySkillDisplay)
             val distance = config.entry<Double>("distance")
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
 
@@ -33,7 +33,7 @@ interface Dash : Skill {
         distance: Provider<Double>,
         conditions: Provider<SkillConditionGroup>,
     ) : Dash {
-        override val display: SkillDisplay by display
+        override val displays: SkillDisplay by display
         override val distance: Double by distance
         override val conditions: SkillConditionGroup by conditions
 

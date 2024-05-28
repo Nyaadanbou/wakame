@@ -17,7 +17,7 @@ interface RemovePotionEffect : Skill {
 
     companion object Factory : SkillFactory<RemovePotionEffect> {
         override fun create(key: Key, config: ConfigProvider): RemovePotionEffect {
-            val display = config.optionalEntry<SkillDisplay>("").orElse(EmptySkillDisplay)
+            val display = config.optionalEntry<SkillDisplay>("displays").orElse(EmptySkillDisplay)
             val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
             val effectTypes = config.optionalEntry<List<PotionEffectType>>("effect_types").orElse(emptyList())
 
@@ -31,7 +31,7 @@ interface RemovePotionEffect : Skill {
         conditions: Provider<SkillConditionGroup>,
         effectType: Provider<List<PotionEffectType>>
     ) : RemovePotionEffect {
-        override val display: SkillDisplay by display
+        override val displays: SkillDisplay by display
         override val conditions: SkillConditionGroup by conditions
         override val effectType: List<PotionEffectType> by effectType
 
