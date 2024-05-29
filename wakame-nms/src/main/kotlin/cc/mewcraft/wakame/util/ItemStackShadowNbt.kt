@@ -48,7 +48,7 @@ internal val ItemMeta.customTag: CompoundTag
 
 //<editor-fold desc="CraftItemStack - Direct Access to `tags.display`">
 /**
- * Sets the custom name. You may pass a `null` to remove the name.
+ * Sets the custom name. You may pass a `null` to remove it.
  *
  * Only works if `this` [ItemStack] is NMS-object backed.
  */
@@ -65,7 +65,7 @@ var ItemStack.backingCustomName: Component?
     }
 
 /**
- * Sets the item name. You may pass a `null` to remove the name.
+ * Sets the item name. You may pass a `null` to remove it.
  *
  * Only works if `this` [ItemStack] is NMS-object backed.
  */
@@ -82,10 +82,7 @@ var ItemStack.backingItemName: Component?
     }
 
 /**
- * Sets the lore directly through JSON string. You may pass a `null` to
- * remove the lore. This function will directly write the given JSON string
- * list to the NBT tag, so make sure that you pass a valid JSON string, or
- * else the server will throw.
+ * Sets the item lore. You may pass a `null` to remove it.
  *
  * Only works if `this` [ItemStack] is NMS-object backed.
  */
@@ -102,9 +99,7 @@ var ItemStack.backingLore: List<Component>?
     }
 
 /**
- * Sets the custom model data.
- * You may pass a `null` to remove the custom model data.
- * This function will directly write the given integer to the NBT tag.
+ * Sets the custom model data. You may pass a `null` to remove it.
  *
  * Only works if `this` [ItemStack] is NMS-object backed.
  */

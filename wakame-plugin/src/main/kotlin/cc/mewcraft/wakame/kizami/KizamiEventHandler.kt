@@ -28,7 +28,7 @@ class KizamiEventHandler {
      */
     fun handlePlayerItemHeld(player: Player, previousSlot: Int, newSlot: Int, oldItem: ItemStack?, newItem: ItemStack?) {
         updateKizamiEffects(player, oldItem, newItem) {
-            this.effectiveSlot.testItemHeld(player, previousSlot, newSlot) &&
+            this.slot.testItemHeld(player, previousSlot, newSlot) &&
             this.hasBehavior<KizamiProvider>()
         }
     }
@@ -44,7 +44,7 @@ class KizamiEventHandler {
      */
     fun handlePlayerInventorySlotChange(player: Player, rawSlot: Int, slot: Int, oldItem: ItemStack?, newItem: ItemStack?) {
         updateKizamiEffects(player, oldItem, newItem) {
-            this.effectiveSlot.testInventorySlotChange(player, slot, rawSlot) &&
+            this.slot.testInventorySlotChange(player, slot, rawSlot) &&
             this.hasBehavior<KizamiProvider>()
         }
     }

@@ -11,22 +11,17 @@ import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
-import org.bukkit.inventory.ItemStack
-import java.util.*
+import java.util.UUID
 
 /**
- * A wrapper of [ItemStack], which adds additional properties and
- * functions to work with the wakame data on the [itemStack], such as:
+ * A wrapper of an ItemStack, which provides dedicated properties and
+ * functions to manipulate wakame data on the ItemStack.
  *
- * - checking whether the item is of a neko item or not
- * - looking up the unique id of the neko item (if it is)
+ * Except some generic use cases, you probably will not directly work
+ * with this interface. Instead, you will likely use the subclasses.
+ * Use your IDE to navigate them.
  *
- * Except some generic use cases, you will probably not directly work
- * with this interface. Instead, you will likely work with its subclasses:
- * [PlayNekoStack] and [ShowNekoStack].
- *
- * To get an instance of [NekoStack], use a factory:
- * [PlayNekoStackFactory] and [ShowNekoStackFactory].
+ * To get an instance of [NekoStack], use a corresponding factory.
  */
 interface NekoStack : ItemBehaviorAccessor {
 
@@ -36,7 +31,7 @@ interface NekoStack : ItemBehaviorAccessor {
      * This **does not** include any other tags which are **not** part of the
      * wakame item NBT specifications, such as display name, lore, enchantment and
      * durability, which are already accessible via the Bukkit API. To get access to
-     * those tags, just use the wrapped [itemStack].
+     * those tags, just use the wrapped ItemStack.
      */
     val tags: CompoundShadowTag
 
@@ -87,7 +82,7 @@ interface NekoStack : ItemBehaviorAccessor {
      *
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
-    val effectiveSlot: EffectiveSlot
+    val slot: EffectiveSlot
 
     /**
      * The [ItemCellAccessor] of this item.

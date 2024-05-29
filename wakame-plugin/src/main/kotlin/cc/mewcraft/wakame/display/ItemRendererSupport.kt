@@ -7,6 +7,9 @@ import cc.mewcraft.wakame.packet.PacketNekoStack
 import cc.mewcraft.wakame.util.backingCustomModelData
 import cc.mewcraft.wakame.util.backingCustomName
 import cc.mewcraft.wakame.util.backingLore
+import cc.mewcraft.wakame.util.packetevents.backingCustomModelData
+import cc.mewcraft.wakame.util.packetevents.backingCustomName
+import cc.mewcraft.wakame.util.packetevents.backingLore
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -16,7 +19,7 @@ import org.koin.core.component.inject
  * @property textStylizer
  * @property loreFinalizer
  */
-internal class PlayItemRenderer(
+internal class PlayItemRenderer( // FIXME 不再使用
     private val textStylizer: TextStylizer,
     private val loreFinalizer: LoreFinalizer,
 ) : KoinComponent, ItemRenderer<PlayNekoStack> {
@@ -25,9 +28,7 @@ internal class PlayItemRenderer(
     override fun render(nekoStack: PlayNekoStack) {
         val customName = textStylizer.stylizeName(nekoStack)
         val lore = textStylizer.stylizeLore(nekoStack).let(loreFinalizer::finalize)
-
-        val variant = nekoStack.variant
-        val customModelData = modelLookup[nekoStack.key, variant]
+        val customModelData = modelLookup[nekoStack.key, nekoStack.variant]
 
         // directly edit the backing ItemMeta to avoid cloning
         nekoStack.itemStack.apply {
@@ -56,6 +57,12 @@ internal class ShowItemRenderer(
     }
 }
 
+/**
+ * The [ItemRenderer] used to render [PacketNekoStacks][PacketNekoStack].
+ *
+ * @property textStylizer
+ * @property loreFinalizer
+ */
 internal class PacketItemRenderer(
     private val textStylizer: TextStylizer,
     private val loreFinalizer: LoreFinalizer,
@@ -63,17 +70,14 @@ internal class PacketItemRenderer(
     private val modelLookup: ItemModelDataLookup by inject()
 
     override fun render(nekoStack: PacketNekoStack) {
-        val displayName = textStylizer.stylizeName(nekoStack)
-        val displayLore = textStylizer.stylizeLore(nekoStack).let(loreFinalizer::finalize)
+        val customName = textStylizer.stylizeName(nekoStack)
+        val lore = textStylizer.stylizeLore(nekoStack).let(loreFinalizer::finalize)
+        val customModelData = modelLookup[nekoStack.key, nekoStack.variant]
 
-        val variant = nekoStack.variant
-        val cmd = modelLookup[nekoStack.key, variant]
-
-        // directly edit the backing ItemMeta to avoid cloning
         nekoStack.itemStack.apply {
-            backingCustomName = displayName
-            backingLore = displayLore
-            backingCustomModelData = cmd
+            backingCustomName = customName
+            backingLore = lore
+            backingCustomModelData = customModelData
         }
 
         // 为了麦若，去掉物品的真实根标签

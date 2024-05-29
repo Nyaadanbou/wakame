@@ -2,12 +2,11 @@ package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.display.ItemRenderer
 import cc.mewcraft.wakame.display.PACKET_ITEM_RENDERER
-import cc.mewcraft.wakame.item.binary.packetNekoStackOrNull
 import cc.mewcraft.wakame.packet.PacketSupport.handleMerchantOffers
 import cc.mewcraft.wakame.packet.PacketSupport.handleSetSlot
 import cc.mewcraft.wakame.packet.PacketSupport.handleWindowItems
 import cc.mewcraft.wakame.util.bukkitPlayer
-import cc.mewcraft.wakame.util.takeUnlessEmpty
+import cc.mewcraft.wakame.util.packetevents.takeUnlessEmpty
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType

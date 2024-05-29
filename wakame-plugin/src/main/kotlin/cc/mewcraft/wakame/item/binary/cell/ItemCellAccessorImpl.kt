@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.binary.cell
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.CellBinaryKeys
-import cc.mewcraft.wakame.item.binary.BaseNekoStack
+import cc.mewcraft.wakame.item.binary.NekoStackBase
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.skill.Skill
@@ -17,7 +17,7 @@ import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 @JvmInline
 internal value class ItemCellAccessorImpl(
-    private val base: BaseNekoStack,
+    private val base: NekoStackBase,
 ) : ItemCellAccessor {
 
     /* Getters */

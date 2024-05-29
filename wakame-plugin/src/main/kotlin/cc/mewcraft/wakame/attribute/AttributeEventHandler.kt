@@ -36,7 +36,7 @@ class AttributeEventHandler : KoinComponent {
         newItem: ItemStack?,
     ) {
         updateAttributeModifiers(player, oldItem, newItem) {
-            this.effectiveSlot.testItemHeld(player, previousSlot, newSlot) &&
+            this.slot.testItemHeld(player, previousSlot, newSlot) &&
             this.hasBehavior<AttributeProvider>()
         }
     }
@@ -58,7 +58,7 @@ class AttributeEventHandler : KoinComponent {
         newItem: ItemStack?,
     ) {
         updateAttributeModifiers(player, oldItem, newItem) {
-            this.effectiveSlot.testInventorySlotChange(player, slot, rawSlot) &&
+            this.slot.testInventorySlotChange(player, slot, rawSlot) &&
             this.hasBehavior<AttributeProvider>()
         }
     }

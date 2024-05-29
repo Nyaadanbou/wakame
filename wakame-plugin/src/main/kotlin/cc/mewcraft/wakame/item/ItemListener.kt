@@ -16,7 +16,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.PlayerItemHeldEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -62,7 +66,7 @@ class MultipleItemListener : KoinComponent, Listener {
         val slot = event.hand ?: return
         val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         val nekoStack = item.playNekoStackOrNull ?: return
-        if (!nekoStack.effectiveSlot.testEquipmentSlotChange(slot))
+        if (!nekoStack.slot.testEquipmentSlotChange(slot))
             return
 
         when (event.action) {
