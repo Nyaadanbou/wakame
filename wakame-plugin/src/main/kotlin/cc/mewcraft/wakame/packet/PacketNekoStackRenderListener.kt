@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.display.ItemRenderer
 import cc.mewcraft.wakame.display.PACKET_ITEM_RENDERER
-import cc.mewcraft.wakame.item.binary.PacketNekoStack
 import cc.mewcraft.wakame.item.binary.packetNekoStackOrNull
 import cc.mewcraft.wakame.packet.PacketSupport.handleMerchantOffers
 import cc.mewcraft.wakame.packet.PacketSupport.handleSetSlot

@@ -36,28 +36,10 @@ typealias PlayNekoStackPredicate = PlayNekoStack.() -> Boolean
  */
 typealias ShowNekoStackPredicate = ShowNekoStack.() -> Boolean
 
-typealias PacketNekoStackPredicate = PacketNekoStack.() -> Boolean
-
 /**
  * Common code shared by all [NekoStack] implementations.
  */
-internal interface BaseNekoStack<I> : NekoStack<I> {
-    /**
-     * Gets the "wakame" [Compound][CompoundShadowTag] of this item.
-     *
-     * This **does not** include any other tags which are **not** part of the
-     * wakame item NBT specifications, such as display name, lore, enchantment and
-     * durability, which are already accessible via the Bukkit API. To get access to
-     * those tags, just use the wrapped [itemStack].
-     */
-    val tags: CompoundShadowTag
-
-    override val isPlay: Boolean
-        get() = !isShow // an NS is either PNS or SNS
-
-    override val isShow: Boolean
-        get() = tags.contains(BaseBinaryKeys.SHOW, ShadowTagType.BYTE)
-
+internal interface BaseNekoStack : NekoStack {
     override val schema: NekoItem
         get() = ItemRegistry.INSTANCES[key]
 
@@ -110,12 +92,18 @@ internal interface BaseNekoStack<I> : NekoStack<I> {
  * This could be used if it does not require the specific code of
  * [PlayNekoStack] and [ShowNekoStack].
  */
-internal interface BukkitBaseNekoStack : BaseNekoStack<ItemStack> {
+internal interface BukkitBaseNekoStack : BaseNekoStack, BukkitNekoStack {
     override val isNmsBacked: Boolean
         get() = itemStack.isNmsObjectBacked
 
     override val isNeko: Boolean
         get() = itemStack.nekoCompoundOrNull != null
+
+    override val isPlay: Boolean
+        get() = !isShow // an NS is either PNS or SNS
+
+    override val isShow: Boolean
+        get() = tags.contains(BaseBinaryKeys.SHOW, ShadowTagType.BYTE)
 
     override fun erase() {
         itemStack.removeNekoCompound()

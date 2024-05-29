@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.item.binary.PacketNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.ShowNekoStack
+import cc.mewcraft.wakame.packet.PacketNekoStack
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.named

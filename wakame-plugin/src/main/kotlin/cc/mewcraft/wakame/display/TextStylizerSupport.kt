@@ -7,11 +7,11 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.text.Component
 
 internal class TextStylizerImpl : TextStylizer {
-    override fun stylizeName(item: NekoStack<*>): Component {
+    override fun stylizeName(item: NekoStack): Component {
         return item.getMetaAccessor<BCustomNameMeta>().provideDisplayName()
     }
 
-    override fun stylizeLore(item: NekoStack<*>): Collection<LoreLine> {
+    override fun stylizeLore(item: NekoStack): Collection<LoreLine> {
         val ret = ObjectArrayList<LoreLine>(16)
 
         // for each meta in the item

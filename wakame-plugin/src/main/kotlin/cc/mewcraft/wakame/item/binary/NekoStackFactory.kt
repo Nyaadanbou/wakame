@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.wakame.packet.PacketNekoStack
 import cc.mewcraft.wakame.packet.PacketNekoStackImpl
 import cc.mewcraft.wakame.util.isNmsObjectBacked
 import org.bukkit.Material

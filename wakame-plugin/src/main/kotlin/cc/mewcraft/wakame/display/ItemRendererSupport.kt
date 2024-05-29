@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.item.binary.PacketNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.ShowNekoStack
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
+import cc.mewcraft.wakame.packet.PacketNekoStack
 import cc.mewcraft.wakame.util.backingCustomModelData
 import cc.mewcraft.wakame.util.backingCustomName
 import cc.mewcraft.wakame.util.backingLore

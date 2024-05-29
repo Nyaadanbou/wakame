@@ -16,7 +16,6 @@ import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.skill.SKILL_SERIALIZERS
 import cc.mewcraft.wakame.util.kregister
-import org.bukkit.inventory.ItemStack
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
@@ -29,7 +28,7 @@ const val META_SERIALIZERS = "meta_serializers"
 
 internal fun schemaItemModule(): Module = module {
 
-    singleOf<NekoItemRealizer<ItemStack>>(::NekoItemRealizerImpl)
+    singleOf<NekoItemRealizer>(::NekoItemRealizerImpl)
 
     single<TypeSerializerCollection>(named(BASE_SERIALIZERS)) {
         TypeSerializerCollection.builder()

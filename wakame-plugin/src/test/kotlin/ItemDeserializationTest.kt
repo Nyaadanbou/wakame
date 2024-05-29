@@ -1,7 +1,7 @@
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.entity.entityModule
-import cc.mewcraft.wakame.item.binary.NekoStack
+import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.cell.isNoop
 import cc.mewcraft.wakame.item.itemModule
@@ -23,7 +23,6 @@ import io.mockk.mockkStatic
 import io.mockk.verify
 import it.unimi.dsi.fastutil.longs.LongSet
 import me.lucko.helper.shadows.nbt.*
-import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -31,7 +30,7 @@ import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.slf4j.Logger
-import java.util.UUID
+import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
@@ -150,7 +149,7 @@ class ItemDeserializationTest : KoinTest {
         every { mockUser.level } returns 50
 
         // mock realizer (to avoid call on the Bukkit internals)
-        val mockRealizer = mockk<NekoItemRealizer<ItemStack>>(relaxed = true)
+        val mockRealizer = mockk<NekoItemRealizer>(relaxed = true)
         every { mockRealizer.realize(demoItem, mockUser) } answers {
             val context = SchemaGenerationContext(SchemaGenerationTrigger.wrap(mockUser))
 
@@ -175,7 +174,7 @@ class ItemDeserializationTest : KoinTest {
             }
 
             // just return an empty item
-            mockk<NekoStack<ItemStack>>()
+            mockk<PlayNekoStack>()
         }
 
         // call

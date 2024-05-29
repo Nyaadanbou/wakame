@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Contract
 /**
  * A renderer that renders name and lore for an [NekoStack].
  */
-interface ItemRenderer<T : NekoStack<*>> {
+interface ItemRenderer<T : NekoStack> {
 
     /**
      * Edits the [nekoStack] **in-place** so that the item name and item lore

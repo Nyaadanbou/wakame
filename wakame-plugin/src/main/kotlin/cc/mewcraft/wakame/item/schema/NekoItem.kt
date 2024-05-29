@@ -6,13 +6,13 @@ import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.ItemBehaviorAccessor
 import cc.mewcraft.wakame.item.binary.NekoStack
+import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
-import org.bukkit.inventory.ItemStack
 import org.koin.mp.KoinPlatform
-import java.util.UUID
+import java.util.*
 import kotlin.reflect.KClass
 
 /**
@@ -92,16 +92,16 @@ inline fun <reified M : SchemaItemMeta<*>> NekoItem.getMeta(): M {
     return getMeta(M::class)
 }
 
-fun NekoItem.reify(context: SchemaGenerationContext): NekoStack<ItemStack> {
+fun NekoItem.reify(context: SchemaGenerationContext): PlayNekoStack {
     return realizer.realize(this, context)
 }
 
-fun NekoItem.reify(user: User<*>): NekoStack<ItemStack> {
+fun NekoItem.reify(user: User<*>): PlayNekoStack {
     return realizer.realize(this, user)
 }
 
-fun NekoItem.reify(crate: Crate): NekoStack<ItemStack> {
+fun NekoItem.reify(crate: Crate): PlayNekoStack {
     return realizer.realize(this, crate)
 }
 
-private val realizer: NekoItemRealizer<ItemStack> by KoinPlatform.getKoin().inject()
+private val realizer: NekoItemRealizer by KoinPlatform.getKoin().inject()

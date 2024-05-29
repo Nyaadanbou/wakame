@@ -36,7 +36,7 @@ interface BinaryEntityKillsCurse : BinaryCurse {
      * Returns `true` if the number of entities killed by the item is greater
      * than [count]. Nota that the entity types are specified by [index].
      */
-    override fun test(context: NekoStack<*>): Boolean {
+    override fun test(context: NekoStack): Boolean {
         var sum = 0
         for (k in index.keySet) {
             sum += context.statistics.ENTITY_KILLS[k]

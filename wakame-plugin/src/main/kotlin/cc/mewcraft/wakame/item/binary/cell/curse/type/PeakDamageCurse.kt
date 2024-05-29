@@ -36,7 +36,7 @@ interface BinaryPeakDamageCurse : BinaryCurse {
      * Returns `true` if the highest damage from [element] dealt by the item is
      * greater than [amount].
      */
-    override fun test(context: NekoStack<*>): Boolean {
+    override fun test(context: NekoStack): Boolean {
         return context.statistics.PEAK_DAMAGE[element] >= amount
     }
 }

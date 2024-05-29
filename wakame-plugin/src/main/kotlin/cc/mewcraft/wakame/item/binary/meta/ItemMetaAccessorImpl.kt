@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
 
 @JvmInline
 internal value class ItemMetaAccessorImpl(
-    override val item: BaseNekoStack<*>,
+    override val item: BaseNekoStack,
 ) : KoinComponent, ItemMetaAccessor {
     override val rootOrNull: CompoundShadowTag?
         get() = item.tags.getCompoundOrNull(Namespaces.ITEM_META)
@@ -48,7 +48,7 @@ internal value class ItemMetaAccessorImpl(
  * 该实现仅用来创建“空的” [BinaryItemMeta]，没有任何其他作用。
  */
 internal object ItemMetaAccessorNoop : ItemMetaAccessor {
-    override val item: NekoStack<*> get() = throw UnsupportedOperationException()
+    override val item: NekoStack get() = throw UnsupportedOperationException()
     override val rootOrNull: CompoundShadowTag get() = throw UnsupportedOperationException()
     override val rootOrCreate: CompoundShadowTag get() = throw UnsupportedOperationException()
     override val snapshot: Set<BinaryItemMeta<*>> get() = throw UnsupportedOperationException()

@@ -74,7 +74,7 @@ interface Damageable : ItemBehavior {
 
 }
 
-fun NekoStack<*>.decreaseDurabilityNaturally(loss: Int) {
+fun NekoStack.decreaseDurabilityNaturally(loss: Int) {
     if (loss == 0) return
     require(loss > 0) { "自然减少的耐久不能是负数" }
     val damageable = this.getBehaviorOrNull<Damageable>()
@@ -97,7 +97,7 @@ fun NekoStack<*>.decreaseDurabilityNaturally(loss: Int) {
     }
 }
 
-fun NekoStack<*>.increaseDurabilityNaturally(add: Int) {
+fun NekoStack.increaseDurabilityNaturally(add: Int) {
     if (add == 0) return
     require(add > 0) { "自然增加的耐久不能是负数" }
     val damageable = this.getBehaviorOrNull<Damageable>()
