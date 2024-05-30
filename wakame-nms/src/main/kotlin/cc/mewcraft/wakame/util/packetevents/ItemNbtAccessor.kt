@@ -27,15 +27,11 @@ val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
         return wakameTag?.wrap
     }
 
+// Removes the wakame tag if there exists
 fun ItemStack.removeNekoCompound() {
-    val customData = this.getCustomData()
-    if (customData !== null) {
-        customData.remove(WAKAME_COMPOUND_NAME)
-        this.setComponent(ComponentTypes.CUSTOM_DATA, customData.toPacket)
-    }
+    this.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.removeTag(WAKAME_COMPOUND_NAME)
 }
 
-// This allows you to get the custom data from packet ItemStack
 private fun ItemStack.getCustomData(): CompoundTag? {
     val customData = this.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()
     return customData?.toNms
