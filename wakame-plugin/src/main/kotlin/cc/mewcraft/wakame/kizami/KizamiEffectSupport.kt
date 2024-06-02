@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillWithTrigger
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -65,7 +66,7 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             when (namespace) {
                 Namespaces.SKILL -> {
                     val skillCore = BinarySkillCore(childNode)
-                    collection += KizamiSkill(skillCore.instance)
+                    collection += KizamiSkill(SkillWithTrigger(skillCore))
                 }
 
                 Namespaces.ATTRIBUTE -> {
@@ -88,14 +89,14 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
  * A [skill][Skill] provided by a kizami.
  */
 data class KizamiSkill(
-    override val effect: Skill,
-) : KizamiEffect.Single<Skill> {
+    override val effect: SkillWithTrigger,
+) : KizamiEffect.Single<SkillWithTrigger> {
     override fun apply(kizami: Kizami, user: User<*>) {
-        println("applied kizami (skill) to ${user.uniqueId}") // TODO actually implement it when skill module is done
+        user.skillMap.addSkill(effect)
     }
 
     override fun remove(kizami: Kizami, user: User<*>) {
-        println("removed kizami (skill) from ${user.uniqueId}")
+        user.skillMap.removeSkill(effect.key)
     }
 }
 
