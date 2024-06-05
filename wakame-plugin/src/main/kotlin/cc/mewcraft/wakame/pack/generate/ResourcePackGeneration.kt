@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.material
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
-import cc.mewcraft.wakame.pack.model.ModelRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
@@ -24,7 +23,6 @@ import team.unnamed.creative.model.ModelTexture
 import team.unnamed.creative.model.ModelTextures
 import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
 import team.unnamed.creative.texture.Texture
-import team.unnamed.hephaestus.writer.ModelWriter
 import java.io.File
 import team.unnamed.creative.model.Model as CreativeModel
 
@@ -109,11 +107,12 @@ internal class ResourcePackRegistryModelGeneration(
     args: GenerationArgs,
 ) : ResourcePackGeneration(args) {
     override fun generate(): Result<Unit> {
-        runCatching {
-            ModelWriter.resource(RESOURCE_NAMESPACE)
-                .write(args.resourcePack, ModelRegistry.models())
-        }.onFailure { return Result.failure(it) }
         return generateNext()
+//        runCatching {
+//            ModelWriter.resource(RESOURCE_NAMESPACE)
+//                .write(args.resourcePack, ModelRegistry.models())
+//        }.onFailure { return Result.failure(it) }
+//        return generateNext()
     }
 }
 

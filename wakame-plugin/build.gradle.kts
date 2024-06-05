@@ -50,11 +50,13 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
-    implementation(platform(libs.bom.hephaestus)) {
-        exclude("com.google.code.gson")
-        exclude("net.kyori")
-        exclude("org.jetbrains")
-    }
+    compileOnly(libs.modelengine.api)
+    // TODO: 等 hephaestus 完善后再使用
+//    implementation(platform(libs.bom.hephaestus)) {
+//        exclude("com.google.code.gson")
+//        exclude("net.kyori")
+//        exclude("org.jetbrains")
+//    }
     implementation(platform(libs.bom.jgit))
     implementation(platform(libs.bom.packetevents.spigot))
 
@@ -134,6 +136,10 @@ paper {
         register("helper") {
             required = true
             load = RelativeLoadOrder.BEFORE
+        }
+        register("ModelEngine") {
+            required = true
+            load = RelativeLoadOrder.OMIT
         }
         register("MythicMobs") {
             required = false

@@ -5,8 +5,9 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.suspendingHandler
 import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
+import cc.mewcraft.wakame.pack.model.Model
 import cc.mewcraft.wakame.pack.model.ModelRegistry
-import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
+import cc.mewcraft.wakame.pack.model.WakameModelEngine
 import cc.mewcraft.wakame.util.*
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
@@ -27,9 +28,7 @@ import org.incendo.cloud.kotlin.extension.commandBuilder
 import org.incendo.cloud.parser.standard.IntegerParser
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import team.unnamed.hephaestus.Model
-import team.unnamed.hephaestus.bukkit.BukkitModelEngine
-import java.util.UUID
+import java.util.*
 
 
 object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
@@ -272,18 +271,16 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                     val sender = context.sender() as Player
 
                     fun spawn(player: Player, model: Model) {
-                        val engine = get<BukkitModelEngine>()
+                        val engine = get<WakameModelEngine>()
                         // Spawn base entity
                         val pig = player.world.spawn(player.location, Pig::class.java)
                         pig.isInvisible = true
                         // Create the model view on the pig
                         val view = engine.spawn(model, pig)
-                        // Make the model bones be on the ground
-                        OnGroundBoneModifier(pig).apply(view)
                         // Save the created view so it's animated
-                        ModelRegistry.view(view)
+                        view.playAnimation(model, "idle")
 
-                        player.sendPlainMessage("Summoned " + model.name())
+                        player.sendPlainMessage("Summoned " + model.name)
                     }
 
                     ThreadType.SYNC.switchContext {
