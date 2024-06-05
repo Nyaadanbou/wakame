@@ -5,9 +5,13 @@ package cc.mewcraft.wakame.item.binary.cell.core.attribute
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.facade.*
+import cc.mewcraft.wakame.attribute.facade.AttributeComponent
+import cc.mewcraft.wakame.attribute.facade.AttributeDataR
+import cc.mewcraft.wakame.attribute.facade.AttributeDataRE
+import cc.mewcraft.wakame.attribute.facade.AttributeDataS
+import cc.mewcraft.wakame.attribute.facade.AttributeDataSE
+import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
 import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.registry.AttributeRegistry
@@ -27,9 +31,9 @@ sealed class BinaryAttributeCore : BinaryCore, AttributeComponent.Op<Operation>,
     }
 
     override fun provideDisplayLore(): LoreLine {
-        val lineKey = AttributeDisplaySupport.getLineKey(this) ?: return NoopLoreLine
+        val lineKey = AttributeDisplaySupport.getLineKey(this) ?: return LoreLine.noop()
         val lineText = AttributeRegistry.FACADES[key].displayTextCreator(this)
-        return AttributeLoreLine(lineKey, lineText)
+        return LoreLine.simple(lineKey, lineText)
     }
 
     override fun toString(): String = toSimpleString()

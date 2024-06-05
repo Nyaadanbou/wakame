@@ -8,6 +8,11 @@ import net.kyori.adventure.text.Component
  */
 internal interface DynamicLoreMetaCreator {
     /**
+     * The namespace of this creator. Used to identify different creators.
+     */
+    val namespace: String
+
+    /**
      * Checks whether this creator is capable of creating a [LoreMeta]
      * from the given [rawLine].
      *
@@ -40,7 +45,7 @@ internal interface DynamicLoreMetaCreatorRegistry {
      *
      * @return all the creators in this registry
      */
-    fun entries(): List<DynamicLoreMetaCreator>
+    fun entries(): Map<String, DynamicLoreMetaCreator>
 
     /**
      * Registers a [DynamicLoreMetaCreator].
@@ -173,7 +178,7 @@ internal interface DynamicLoreMeta : LoreMeta {
  * 固定内容在配置文件中就早已经定义好。
  *
  * @see CustomConstantLoreMeta
- * @see EmptyConstantLoreMeta
+ * @see BlankConstantLoreMeta
  */
 internal interface ConstantLoreMeta : LoreMeta {
     /**

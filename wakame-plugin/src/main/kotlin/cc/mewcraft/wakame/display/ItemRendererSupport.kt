@@ -19,14 +19,15 @@ import org.koin.core.component.inject
  * @property textStylizer
  * @property loreFinalizer
  */
-internal class PlayItemRenderer( // FIXME 不再使用
+internal class PlayItemRenderer(
+    // FIXME 不再使用
     private val textStylizer: TextStylizer,
     private val loreFinalizer: LoreFinalizer,
 ) : KoinComponent, ItemRenderer<PlayNekoStack> {
     private val modelLookup: ItemModelDataLookup by inject()
 
     override fun render(nekoStack: PlayNekoStack) {
-        val customName = textStylizer.stylizeName(nekoStack)
+        val customName = textStylizer.stylizeName(nekoStack).content
         val lore = textStylizer.stylizeLore(nekoStack).let(loreFinalizer::finalize)
         val customModelData = modelLookup[nekoStack.key, nekoStack.variant]
 
@@ -70,7 +71,7 @@ internal class PacketItemRenderer(
     private val modelLookup: ItemModelDataLookup by inject()
 
     override fun render(nekoStack: PacketNekoStack) {
-        val customName = textStylizer.stylizeName(nekoStack)
+        val customName = textStylizer.stylizeName(nekoStack).content
         val lore = textStylizer.stylizeLore(nekoStack).let(loreFinalizer::finalize)
         val customModelData = modelLookup[nekoStack.key, nekoStack.variant]
 

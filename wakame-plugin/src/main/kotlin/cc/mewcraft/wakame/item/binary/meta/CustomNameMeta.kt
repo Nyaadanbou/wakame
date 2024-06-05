@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.display.DisplayNameProvider
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.NoopLoreLine
+import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.rarity.Rarity
@@ -12,7 +10,6 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
 import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -23,7 +20,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 @JvmInline
 value class BCustomNameMeta(
     private val accessor: ItemMetaAccessor,
-) : BinaryItemMeta<String>, DisplayNameProvider {
+) : BinaryItemMeta<String> {
     override val key: Key
         get() = ItemMetaConstants.createKey { CUSTOM_NAME }
 
@@ -42,12 +39,8 @@ value class BCustomNameMeta(
         accessor.rootOrNull?.remove(key.value())
     }
 
-    override fun provideDisplayLore(): LoreLine {
-        return NoopLoreLine // The name item meta never has lore line
-    }
-
-    override fun provideDisplayName(): Component {
-        val customName = getOrNull() ?: return DisplayNameSupport.EMPTY
+    override fun provideDisplayName(): NameLine {
+        val customName = getOrNull() ?: return CustomNameSupport.EMPTY
 
         val resolvers = TagResolver.builder().apply {
 
@@ -56,10 +49,10 @@ value class BCustomNameMeta(
 
             // create <rarity_name> & <rarity_style> tags
             val rarityOrDefault = accessor.item.getMetaAccessor<BRarityMeta>().getOrDefault()
-            resolvers(DisplayNameSupport.CACHE[rarityOrDefault])
+            resolvers(CustomNameSupport.CACHE[rarityOrDefault])
         }
 
-        return ItemMetaSupport.mini().deserialize(tooltips.single, resolvers.build())
+        return NameLine.simple(ItemMetaSupport.mini().deserialize(tooltips.single, resolvers.build()))
     }
 
     private companion object : ItemMetaConfig(
@@ -73,8 +66,8 @@ fun BCustomNameMeta?.getOrEmpty(): String {
     return this?.getOrNull() ?: ""
 }
 
-private object DisplayNameSupport {
-    val EMPTY: Component = text("Unnamed")
+private object CustomNameSupport {
+    val EMPTY: NameLine = NameLine.simple(text("Unnamed"))
     val CACHE: LoadingCache<Rarity, TagResolver> by ReloadableProperty {
         Caffeine.newBuilder().build { rarity ->
             TagResolver.resolver(

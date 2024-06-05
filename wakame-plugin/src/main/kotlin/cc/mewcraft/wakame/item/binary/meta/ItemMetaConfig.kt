@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.binary.meta
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.display.Tooltips
 import cc.mewcraft.wakame.registry.ItemMetaRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
@@ -25,7 +24,7 @@ internal sealed class ItemMetaConfig(
      *
      * @property single The format of the single text.
      */
-    inner class SingleTooltips : Tooltips, Examinable {
+    inner class SingleTooltips : Examinable {
         val single: String by config.entry("tooltips", "single")
 
         override fun examinableProperties(): Stream<out ExaminableProperty> {
@@ -44,7 +43,7 @@ internal sealed class ItemMetaConfig(
      * @property single The format of a single element.
      * @property separator The format of the separator.
      */
-    inner class MergedTooltips : Tooltips, Examinable {
+    inner class MergedTooltips : Examinable {
         val merged: String by config.entry("tooltips", "merged")
         val single: String by config.entry("tooltips", "single")
         val separator: String by config.entry("tooltips", "separator")
@@ -83,7 +82,7 @@ internal sealed class ItemMetaConfig(
      * @property header The header list. `null` indicates not adding the header.
      * @property bottom The bottom list. `null` indicates not adding the bottom.
      */
-    inner class LoreTooltips : Tooltips, Examinable {
+    inner class LoreTooltips : Examinable {
         val line: String by config.entry("tooltips", "line")
         val header: List<String>? by config.entry("tooltips", "header")
         val bottom: List<String>? by config.entry("tooltips", "bottom")

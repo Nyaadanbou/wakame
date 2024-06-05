@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.display.DisplayNameProvider
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.NoopLoreLine
+import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.rarity.Rarity
@@ -12,7 +10,6 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
 import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -25,7 +22,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 @JvmInline
 value class BItemNameMeta(
     private val accessor: ItemMetaAccessor,
-) : BinaryItemMeta<String>, DisplayNameProvider {
+) : BinaryItemMeta<String> {
     override val key: Key
         get() = ItemMetaConstants.createKey { ITEM_NAME }
 
@@ -44,11 +41,7 @@ value class BItemNameMeta(
         accessor.rootOrNull?.remove(key.value())
     }
 
-    override fun provideDisplayLore(): LoreLine {
-        return NoopLoreLine // The name item meta never has lore line
-    }
-
-    override fun provideDisplayName(): Component {
+    override fun provideDisplayName(): NameLine {
         // 代码复制于 DisplayNameMeta
 
         val customName = getOrNull() ?: return ItemNameImplementations.EMPTY
@@ -63,7 +56,7 @@ value class BItemNameMeta(
             resolvers(ItemNameImplementations.CACHE[rarityOrDefault])
         }
 
-        return ItemMetaSupport.mini().deserialize(tooltips.single, resolvers.build())
+        return NameLine.simple(ItemMetaSupport.mini().deserialize(tooltips.single, resolvers.build()))
     }
 
     private companion object : ItemMetaConfig(
@@ -78,7 +71,7 @@ fun BItemNameMeta?.getOrEmpty(): String {
 }
 
 private object ItemNameImplementations {
-    val EMPTY: Component = text("Unnamed")
+    val EMPTY: NameLine = NameLine.simple(text("Unnamed"))
     val CACHE: LoadingCache<Rarity, TagResolver> by ReloadableProperty {
         Caffeine.newBuilder().build { rarity ->
             TagResolver.resolver(

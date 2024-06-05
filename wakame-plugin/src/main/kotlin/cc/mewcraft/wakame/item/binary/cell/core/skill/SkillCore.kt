@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
 import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
@@ -18,12 +17,12 @@ sealed class BinarySkillCore : BinaryCore {
     abstract val trigger: SkillTrigger
 
     override fun provideDisplayLore(): LoreLine {
-        val lineKey = SkillDisplaySupport.getLineKey(this) ?: return NoopLoreLine
+        val lineKey = SkillDisplaySupport.getLineKey(this) ?: return LoreLine.noop()
         val display = instance.displays
         val tooltips = display.tooltips
         val tagResolvers = instance.conditions.tagResolvers
         val lineText = tooltips.mapTo(ObjectArrayList(tooltips.size)) { SkillDisplaySupport.mini().deserialize(it, *tagResolvers) }
-        return SkillLoreLine(lineKey, lineText)
+        return LoreLine.simple(lineKey, lineText)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -37,9 +36,9 @@ value class BSkinOwnerMeta(
 
     override fun provideDisplayLore(): LoreLine {
         val skinOwner = get()
-        val key = ItemMetaSupport.getLineKey(this) ?: return NoopLoreLine
+        val key = ItemMetaSupport.getLineKey(this) ?: return LoreLine.noop()
         val lines = ItemMetaSupport.mini().deserialize(tooltips.single, Placeholder.component("value", Component.text(skinOwner.toString())))
-        return ItemMetaLoreLine(key, listOf(lines))
+        return LoreLine.simple(key, listOf(lines))
     }
 
     private companion object : ItemMetaConfig(

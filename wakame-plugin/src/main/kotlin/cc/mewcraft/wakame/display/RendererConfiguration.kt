@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME
 import cc.mewcraft.wakame.display.DisplaySupport.RENDERER_LAYOUT_LINE_PATTERN
 import cc.mewcraft.wakame.initializer.Initializable
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -104,7 +105,7 @@ internal class RendererConfiguration(
                         val customConstantText = matcher.group(2)
                         ret = if (customConstantText.isBlank()) {
                             // 解析为 '(fixed){空}' 或 '(fixed:{}){空}'
-                            EmptyConstantLoreMeta(rawIndex, companionNamespace)
+                            BlankConstantLoreMeta(rawIndex, companionNamespace)
                         } else {
                             // 解析为 '(fixed){}' 或 '(fixed:{}){}'
                             val constantText = customConstantText.deserializeMini()
@@ -115,9 +116,9 @@ internal class RendererConfiguration(
                     // 具体解析为 "(default:{}){}"
                     "default" -> {
                         val defaultText = queue.popOr(
-                            "Unknown syntax for '(default...)' while load config $RENDERER_CONFIG_FILE. Correct syntax: '(default:{text}|empty){key}'"
+                            "Unknown syntax for '(default...)' while load config $RENDERER_CONFIG_FILE. Correct syntax: '(default:{text}|blank|empty){key}'"
                         ).let {
-                            if (it.isBlank() || it == "empty") {
+                            if (it.isBlank() || it == "blank" || it == "empty") {
                                 listOf(Component.empty())
                             } else {
                                 it.deserializeMini()
@@ -159,7 +160,7 @@ internal class RendererConfiguration(
 
             // populate the constant lore lines
             if (loreMeta is ConstantLoreMeta) {
-                _constantLoreLines += ConstantLoreLine(loreMeta.generateFullKeys().first(), loreMeta.components)
+                _constantLoreLines += LoreLine.constant(loreMeta.generateFullKeys().first(), loreMeta.components)
             }
 
             // populate the default lore lines
@@ -183,17 +184,17 @@ internal class RendererConfiguration(
 }
 
 internal class DynamicLoreMetaCreatorRegistryImpl : DynamicLoreMetaCreatorRegistry {
-    private val creators: MutableList<DynamicLoreMetaCreator> = arrayListOf()
+    private val creators: MutableMap<String, DynamicLoreMetaCreator> = Object2ObjectArrayMap()
 
-    override fun entries(): List<DynamicLoreMetaCreator> {
+    override fun entries(): Map<String, DynamicLoreMetaCreator> {
         return this.creators
     }
 
     override fun register(creator: DynamicLoreMetaCreator) {
-        this.creators += creator
+        this.creators += creator.namespace to creator
     }
 
     override fun getApplicableCreator(rawLine: String): DynamicLoreMetaCreator? {
-        return this.creators.firstOrNull { creator -> creator.test(rawLine) }
+        return this.creators.values.firstOrNull { creator -> creator.test(rawLine) }
     }
 }

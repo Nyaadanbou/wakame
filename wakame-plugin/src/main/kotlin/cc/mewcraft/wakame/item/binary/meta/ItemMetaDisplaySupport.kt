@@ -1,7 +1,15 @@
 package cc.mewcraft.wakame.item.binary.meta
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.display.*
+import cc.mewcraft.wakame.display.DisplaySupport
+import cc.mewcraft.wakame.display.DynamicLoreMeta
+import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
+import cc.mewcraft.wakame.display.FullKey
+import cc.mewcraft.wakame.display.LineKeyFactory
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.RawIndex
+import cc.mewcraft.wakame.display.RawKey
+import cc.mewcraft.wakame.display.RendererConfiguration
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -18,19 +26,16 @@ internal object ItemMetaInitializer : Initializable {
 }
 
 internal class ItemMetaLoreMetaCreator : DynamicLoreMetaCreator {
+    override val namespace: String = Namespaces.ITEM_META
+
     override fun test(rawLine: String): Boolean {
-        return Key(rawLine).namespace() == Namespaces.ITEM_META
+        return Key(rawLine).namespace() == namespace
     }
 
     override fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
         return ItemMetaLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default)
     }
 }
-
-internal data class ItemMetaLoreLine(
-    override val key: FullKey,
-    override val lines: List<Component>,
-) : LoreLine
 
 internal data class ItemMetaLoreMeta(
     override val rawKey: RawKey,
@@ -45,7 +50,7 @@ internal data class ItemMetaLoreMeta(
         if (default.isNullOrEmpty()) {
             return null
         }
-        return generateFullKeys().map { key -> ItemMetaLoreLine(key, default) }
+        return generateFullKeys().map { key -> LoreLine.simple(key, default) }
     }
 }
 

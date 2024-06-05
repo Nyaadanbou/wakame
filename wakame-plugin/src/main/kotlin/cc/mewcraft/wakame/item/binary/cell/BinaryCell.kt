@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell
 
-import cc.mewcraft.wakame.display.DisplayLoreProvider
+import cc.mewcraft.wakame.display.TooltipsProvider
 import cc.mewcraft.wakame.item.Cell
 import cc.mewcraft.wakame.item.TagLike
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
@@ -28,7 +28,7 @@ import kotlin.reflect.KClass
  * externally at any time. You should not assume that the states of the object
  * will remain unchanged.
  */
-interface BinaryCell : Cell, TagLike, DisplayLoreProvider, Examinable {
+interface BinaryCell : Cell, TagLike, TooltipsProvider, Examinable {
     /**
      * The core stored in this cell.
      */

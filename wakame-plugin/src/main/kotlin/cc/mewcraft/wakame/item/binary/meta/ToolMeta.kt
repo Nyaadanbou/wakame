@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.NoopLoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Tool
 import cc.mewcraft.wakame.item.schema.meta.ToolRule
@@ -97,18 +95,12 @@ value class BToolMeta(
         accessor.rootOrNull?.remove(key.value())
     }
 
-    override fun provideDisplayLore(): LoreLine {
-        // TODO 等待组件相关API的到来
-        return NoopLoreLine
-    }
-
     private companion object : ItemMetaConfig(
         ItemMetaConstants.SKIN
     ) {
         const val RULES_TAG = "rules"
         const val DEFAULT_MINING_SPEED_TAG = "default_mining_speed"
         const val DAMAGE_PER_BLOCK_TAG = "damage_per_block"
-
         val tooltips: SingleTooltips = SingleTooltips()
     }
 }

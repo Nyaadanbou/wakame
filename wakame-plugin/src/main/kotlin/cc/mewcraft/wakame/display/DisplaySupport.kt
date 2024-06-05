@@ -19,6 +19,6 @@ internal object DisplaySupport : KoinComponent {
     val RENDERER_CONFIG_PROVIDER by lazy { Configs.YAML[RENDERER_CONFIG_FILE] }
     val DYNAMIC_LORE_META_CREATOR_REGISTRY by inject<DynamicLoreMetaCreatorRegistry>()
 
-    // mini message
+    // mini message instance
     val MINI: MiniMessage by inject()
 }

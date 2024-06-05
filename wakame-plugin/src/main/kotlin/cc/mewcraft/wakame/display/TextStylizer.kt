@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.item.binary.NekoStack
-import net.kyori.adventure.text.Component
 
 /**
  * Generates stylized name and lore for a [NekoStack].
@@ -19,7 +18,7 @@ internal interface TextStylizer {
      * @param item the item to generate name for
      * @return the generated name
      */
-    fun stylizeName(item: NekoStack): Component
+    fun stylizeName(item: NekoStack): NameLine
 
     /**
      * Generates [lore lines][LoreLine] for the [item]. The returned

@@ -6,7 +6,15 @@ import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.display.*
+import cc.mewcraft.wakame.display.DisplaySupport
+import cc.mewcraft.wakame.display.DynamicLoreMeta
+import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
+import cc.mewcraft.wakame.display.FullKey
+import cc.mewcraft.wakame.display.LineKeyFactory
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.RawIndex
+import cc.mewcraft.wakame.display.RawKey
+import cc.mewcraft.wakame.display.RendererConfiguration
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
@@ -40,8 +48,10 @@ internal class AttributeLoreMetaCreator : DynamicLoreMetaCreator {
     private val operationRawLines = DisplaySupport.RENDERER_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME, "operation")
     private val elementRawLines = DisplaySupport.RENDERER_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME, "element")
 
+    override val namespace: String = Namespaces.ATTRIBUTE
+
     override fun test(rawLine: String): Boolean {
-        return Key(rawLine).namespace() == Namespaces.ATTRIBUTE
+        return Key(rawLine).namespace() == namespace
     }
 
     override fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
@@ -53,15 +63,10 @@ internal class AttributeLoreMetaCreator : DynamicLoreMetaCreator {
 internal object AttributeDisplaySupport : KoinComponent {
     private val DISPLAY_KEY_FACTORY: AttributeLineKeyFactory by inject()
 
-    fun getLineKey(core: BinaryAttributeCore): FullKey?{
+    fun getLineKey(core: BinaryAttributeCore): FullKey? {
         return DISPLAY_KEY_FACTORY.get(core)
     }
 }
-
-internal data class AttributeLoreLine(
-    override val key: FullKey,
-    override val lines: List<Component>,
-) : LoreLine
 
 internal data class AttributeLoreMeta(
     override val rawKey: RawKey,
@@ -94,7 +99,7 @@ internal data class AttributeLoreMeta(
         if (default.isNullOrEmpty()) {
             return null
         }
-        return generateFullKeys().map { key -> AttributeLoreLine(key, default) }
+        return generateFullKeys().map { key -> LoreLine.simple(key, default) }
     }
 
     class Derivation(

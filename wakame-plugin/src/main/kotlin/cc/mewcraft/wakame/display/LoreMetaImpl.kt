@@ -12,9 +12,9 @@ internal data class CustomConstantLoreMeta(
 ) : ConstantLoreMeta
 
 /**
- * 代表一个“无字符”固定内容的 [LoreMeta].
+ * 代表一个“空白的”固定内容的 [LoreMeta].
  */
-internal data class EmptyConstantLoreMeta(
+internal data class BlankConstantLoreMeta(
     override val rawIndex: RawIndex,
     override val companionNamespace: String?,
 ) : ConstantLoreMeta {

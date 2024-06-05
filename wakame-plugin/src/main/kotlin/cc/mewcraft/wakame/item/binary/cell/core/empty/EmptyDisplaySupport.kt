@@ -3,7 +3,14 @@ package cc.mewcraft.wakame.item.binary.cell.core.empty
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.display.*
+import cc.mewcraft.wakame.display.DisplaySupport
+import cc.mewcraft.wakame.display.DynamicLoreMeta
+import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
+import cc.mewcraft.wakame.display.FullKey
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.RawIndex
+import cc.mewcraft.wakame.display.RawKey
+import cc.mewcraft.wakame.display.RendererConfiguration
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -21,6 +28,8 @@ internal object EmptyCoreInitializer : Initializable {
 }
 
 internal class EmptyCoreLoreMetaCreator : DynamicLoreMetaCreator {
+    override val namespace: String = GenericKeys.EMPTY.namespace()
+
     override fun test(rawLine: String): Boolean {
         return Key(rawLine) == GenericKeys.EMPTY
     }
@@ -32,7 +41,7 @@ internal class EmptyCoreLoreMetaCreator : DynamicLoreMetaCreator {
 
 internal data object EmptyLoreLine : LoreLine {
     override val key: FullKey = GenericKeys.EMPTY
-    override val lines: List<Component> by Configs.YAML[ITEM_CONFIG_FILE].entry<List<Component>>("general", "empty_cell_tooltips")
+    override val content: List<Component> by Configs.YAML[ITEM_CONFIG_FILE].entry<List<Component>>("general", "empty_cell_tooltips")
 }
 
 internal data class EmptyLoreMeta(

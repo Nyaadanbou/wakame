@@ -33,23 +33,25 @@ internal class LoreFinalizerImpl(
         val iterator = holder.iterator()
         while (iterator.hasNext()) {
             val curr = iterator.next()
-            realLoreSize += curr.lines.size
-            if (curr !is ConstantLoreLine) {
-                // curr 不是固定内容 - continue
+            realLoreSize += curr.content.size
+            if (!curr.isConstant) {
                 continue
             }
 
             val loreMeta = loreMetaLookup.getMeta<ConstantLoreMeta>(curr.key)
             val companionNamespace = loreMeta.companionNamespace
-                ?: continue // curr 对 companion namespace 没有要求，因此不考虑移除 - continue
-
-            if (!iterator.hasNext()) {
-                iterator.remove() // curr 要求下面有内容，但下面没有 - remove curr and continue
-                realLoreSize -= curr.lines.size
+            if (companionNamespace == null) {
+                // curr 对 companion namespace 没有要求，因此不考虑移除 - continue
                 continue
             }
 
-            // 跑到这里说明 curr 下面一定有内容
+            if (!iterator.hasNext()) {
+                iterator.remove() // curr 要求下面有内容，但下面没有 - remove curr and continue
+                realLoreSize -= curr.content.size
+                continue
+            }
+
+            // 如果跑到这里，则说明 curr 下面一定有内容
 
             if (companionNamespace == "*") {
                 // curr 只要求下面有任意内容，无论 namespace - continue
@@ -61,7 +63,7 @@ internal class LoreFinalizerImpl(
                 // higher 不符合 curr 对 namespace 的要求
                 iterator.back(2) // 回到 curr
                 iterator.remove() // 移除 curr
-                realLoreSize -= curr.lines.size
+                realLoreSize -= curr.content.size
             } else {
                 // higher 符合 curr 对 namespace 的要求
                 iterator.back(1) // 回到 curr
@@ -69,6 +71,6 @@ internal class LoreFinalizerImpl(
         }
 
         // unwrap the components
-        return holder.flatMapTo(ObjectArrayList(realLoreSize)) { it.lines }
+        return holder.flatMapTo(ObjectArrayList(realLoreSize)) { it.content }
     }
 }

@@ -4,17 +4,19 @@ import cc.mewcraft.wakame.display.RendererConfiguration
 import cc.mewcraft.wakame.display.displayModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.AttributeCoreInitializer
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.AttributeLoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.empty.EmptyCoreInitializer
 import cc.mewcraft.wakame.item.binary.cell.core.empty.EmptyLoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.skill.SkillCoreInitializer
-import cc.mewcraft.wakame.item.binary.cell.core.skill.SkillLoreLine
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaInitializer
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaLoreLine
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.util.Key
@@ -34,10 +36,10 @@ private val Component.plain: String get() = PlainTextComponentSerializer.plainTe
 private fun Component.contains(x: String): Boolean = this.plain.contains(x)
 
 private fun listText(vararg text: String): List<Component> = text.map { Component.text(it) }
-private fun createAttributeLine(x: String): LoreLine = AttributeLoreLine(Key(x), listText(x))
 private fun createEmptyLine(): LoreLine = EmptyLoreLine
-private fun createMetaLine(x: String): LoreLine = ItemMetaLoreLine(Key(x), listText(x))
-private fun createSkillLine(x: String): LoreLine = SkillLoreLine(Key(x), listText(x))
+private fun createAttributeLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
+private fun createMetaLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
+private fun createSkillLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
 
 class LoreFinalizerTest : KoinTest {
 
