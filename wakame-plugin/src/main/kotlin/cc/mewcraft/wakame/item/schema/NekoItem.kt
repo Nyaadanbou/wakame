@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.item.schema
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.crate.Crate
-import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.ItemBehaviorAccessor
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
 import org.koin.mp.KoinPlatform
-import java.util.*
+import java.util.UUID
 import kotlin.reflect.KClass
 
 /**
@@ -56,7 +56,7 @@ interface NekoItem : Keyed, ItemBehaviorAccessor {
     /**
      * The inventory slot where this item can take effect.
      */
-    val effectiveSlot: EffectiveSlot
+    val slot: ItemSlot
 
     /**
      * The set holds all the schema item meta of this item.

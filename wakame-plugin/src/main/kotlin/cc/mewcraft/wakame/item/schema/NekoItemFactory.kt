@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.schema
 
 import cc.mewcraft.wakame.config.NodeConfigProvider
-import cc.mewcraft.wakame.item.EffectiveSlot
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.registry.ItemMetaRegistry
@@ -33,7 +33,7 @@ object NekoItemFactory {
         //
         val uuid = root.node("uuid").krequire<UUID>()
         val material = root.node("material").krequire<Key>()
-        val effectiveSlot = root.node("effective_slot").krequire<EffectiveSlot>()
+        val slot = root.node("slot").krequire<ItemSlot>()
 
         //
         // Deserialize item behaviors
@@ -80,7 +80,7 @@ object NekoItemFactory {
             uuid = uuid,
             config = provider,
             material = material,
-            effectiveSlot = effectiveSlot,
+            slot = slot,
             metaMap = schemaMeta,
             cellMap = schemaCell,
             behaviorHolders = behaviors

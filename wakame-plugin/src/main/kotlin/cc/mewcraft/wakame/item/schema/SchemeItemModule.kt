@@ -5,13 +5,28 @@ import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
-import cc.mewcraft.wakame.item.EffectiveSlotSerializer
+import cc.mewcraft.wakame.item.ItemSlotSerializer
 import cc.mewcraft.wakame.item.schema.cell.SchemaCellSerializer
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCoreGroupSerializer
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCorePoolSerializer
 import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCurseGroupSerializer
 import cc.mewcraft.wakame.item.schema.cell.curse.SchemaCursePoolSerializer
-import cc.mewcraft.wakame.item.schema.meta.*
+import cc.mewcraft.wakame.item.schema.meta.DisplayNameMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.DurabilityMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.ElementMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.ElementPoolSerializer
+import cc.mewcraft.wakame.item.schema.meta.FoodMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.ItemNameMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.KizamiGroupSerializer
+import cc.mewcraft.wakame.item.schema.meta.KizamiMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.KizamiPoolSerializer
+import cc.mewcraft.wakame.item.schema.meta.LevelMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.LoreMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.RarityMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.SkinMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.SkinOwnerMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.ToolMetaSerializer
+import cc.mewcraft.wakame.item.schema.meta.ToolRuleSerializer
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.skill.SKILL_SERIALIZERS
@@ -33,7 +48,7 @@ internal fun schemaItemModule(): Module = module {
     single<TypeSerializerCollection>(named(BASE_SERIALIZERS)) {
         TypeSerializerCollection.builder()
 
-            .kregister(EffectiveSlotSerializer)
+            .kregister(ItemSlotSerializer)
             .register(MaterialSerializer)
             .kregister(PotionEffectSerializer)
             .register(PotionEffectTypeSerializer)

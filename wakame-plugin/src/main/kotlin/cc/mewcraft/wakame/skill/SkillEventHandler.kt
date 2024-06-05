@@ -69,7 +69,7 @@ class SkillEventHandler {
         newItem: ItemStack?,
     ) {
         updateSkills(player, oldItem, newItem) {
-            this.slot.testItemHeld(player, previousSlot, newSlot) &&
+            this.slot.testItemHeldEvent(player, previousSlot, newSlot) &&
             this.hasBehavior<Castable>()
         }
     }
@@ -91,7 +91,7 @@ class SkillEventHandler {
         newItem: ItemStack?,
     ) {
         updateSkills(player, oldItem, newItem) {
-            this.slot.testInventorySlotChange(player, slot, rawSlot) &&
+            this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) &&
             this.hasBehavior<Castable>()
         }
     }

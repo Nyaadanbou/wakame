@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary
 
-import cc.mewcraft.wakame.item.EffectiveSlot
 import cc.mewcraft.wakame.item.ItemBehaviorAccessor
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
 import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
@@ -82,7 +82,7 @@ interface NekoStack : ItemBehaviorAccessor {
      *
      * @throws NullPointerException if this is not a [NekoItem] realization
      */
-    val slot: EffectiveSlot
+    val slot: ItemSlot
 
     /**
      * The [ItemCellAccessor] of this item.

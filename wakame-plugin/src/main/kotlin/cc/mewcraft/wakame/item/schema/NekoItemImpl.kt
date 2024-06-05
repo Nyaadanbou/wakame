@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.schema
 
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.derive
-import cc.mewcraft.wakame.item.EffectiveSlot
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehaviorFactory
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
@@ -22,7 +22,7 @@ internal class NekoItemImpl(
     override val uuid: UUID,
     override val config: ConfigProvider,
     override val material: Key,
-    override val effectiveSlot: EffectiveSlot,
+    override val slot: ItemSlot,
     private val metaMap: ClassToInstanceMap<SchemaItemMeta<*>>,
     override val cellMap: Map<String, SchemaCell>,
     behaviorHolders: List<String>,
@@ -52,7 +52,7 @@ internal class NekoItemImpl(
         ExaminableProperty.of("uuid", uuid),
         ExaminableProperty.of("material", material),
         ExaminableProperty.of("behavior", behaviors),
-        ExaminableProperty.of("effectiveSlot", effectiveSlot),
+        ExaminableProperty.of("effectiveSlot", slot),
         ExaminableProperty.of("cell", cell),
         ExaminableProperty.of("meta", meta),
     )

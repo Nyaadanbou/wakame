@@ -12,9 +12,9 @@ import org.bukkit.inventory.EquipmentSlot
  * so that all the attributes, abilities, kizamis, etc. should become effective
  * for the current item holder, i.e., the player.
  *
- * If an item has no effective slot, use the [NoopEffectiveSlot] singleton.
+ * If an item has no effective slot, use the [NoopItemSlot] singleton.
  */
-interface EffectiveSlot : Examinable {
+interface ItemSlot : Examinable {
     /*
      * Raw Slots:
      *
@@ -44,19 +44,21 @@ interface EffectiveSlot : Examinable {
     /**
      * Checks if the given parameters is referring to the effective slot.
      *
-     * This function should be called when the held item slot changes.
+     * This function is used to check whether the event leads to an effective slot for the item.
      */
-    fun testItemHeld(player: Player, previousSlot: Int, newSlot: Int): Boolean = false // default returns false
+    fun testItemHeldEvent(player: Player, previousSlot: Int, newSlot: Int): Boolean = false // default returns false
 
     /**
      * Checks if the given parameters is referring to the effective slot.
      *
-     * This function should be called when the slot contents changes.
+     * This function is used to check whether the event leads to an effective slot for the item.
      */
-    fun testInventorySlotChange(player: Player, slot: Int, rawSlot: Int): Boolean = false // default returns false
+    fun testInventorySlotChangeEvent(player: Player, slot: Int, rawSlot: Int): Boolean = false // default returns false
 
     /**
      * Checks if the given parameters is referring to the effective slot.
+     *
+     * This function is used to check whether the equipment slot is an effective slot for the item.
      */
-    fun testEquipmentSlotChange(slot: EquipmentSlot): Boolean = false // default returns false
+    fun testEquipmentSlot(slot: EquipmentSlot): Boolean = false // default returns false
 }

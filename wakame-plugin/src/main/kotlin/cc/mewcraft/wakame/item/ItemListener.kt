@@ -66,7 +66,7 @@ class MultipleItemListener : KoinComponent, Listener {
         val slot = event.hand ?: return
         val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         val nekoStack = item.playNekoStackOrNull ?: return
-        if (!nekoStack.slot.testEquipmentSlotChange(slot))
+        if (!nekoStack.slot.testEquipmentSlot(slot))
             return
 
         when (event.action) {

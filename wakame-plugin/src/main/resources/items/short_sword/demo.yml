@@ -22,7 +22,7 @@ material: wooden_sword
 # - SLOT_2 (仅测试用)
 # - SLOT_3 (仅测试用)
 # - SLOT_4 (仅测试用)
-effective_slot: MAIN_HAND
+slot: MAIN_HAND
 
 # 物品行为
 # 可选，默认 无

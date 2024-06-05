@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.item.BaseBinaryKeys
-import cc.mewcraft.wakame.item.EffectiveSlot
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
 import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessorImpl
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
@@ -45,8 +45,8 @@ internal interface NekoStackBase : NekoStack {
     override val uuid: UUID
         get() = ItemRegistry.INSTANCES[key].uuid
 
-    override val slot: EffectiveSlot
-        get() = ItemRegistry.INSTANCES[key].effectiveSlot
+    override val slot: ItemSlot
+        get() = ItemRegistry.INSTANCES[key].slot
 
     override val cell: ItemCellAccessor
         get() = ItemCellAccessorImpl(this)
