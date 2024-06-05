@@ -74,7 +74,7 @@ class PlayerSkillMap(
 
     override fun removeSkill(skills: Multimap<SkillTrigger, Skill>) {
         for ((trigger, skill) in skills.entries()) {
-            this.skills.remove(trigger, skill)
+            this.skills.remove(trigger, skill.key)
         }
     }
 }

@@ -1,6 +1,7 @@
 type: "kill_entity"
 
 conditions:
-  - type: molang
+  - id: "chance"
+    type: molang
     eval: "math.random(0.0, 1.0) < 0.5"
     failure_message: "Failed to kill entity"
