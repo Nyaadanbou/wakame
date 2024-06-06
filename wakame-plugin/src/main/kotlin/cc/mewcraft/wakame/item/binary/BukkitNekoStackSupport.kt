@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.item.BaseBinaryKeys
 import cc.mewcraft.wakame.item.binary.show.CustomDataAccessor
-import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.backingCustomModelData
 import cc.mewcraft.wakame.util.backingCustomName
 import cc.mewcraft.wakame.util.backingLore
@@ -13,7 +12,6 @@ import cc.mewcraft.wakame.util.removeNekoCompound
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.Material
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -176,17 +174,9 @@ private interface BukkitNekoStackBase : NekoStackBase, BukkitNekoStack {
 private class PlayNekoStackImpl(
     override val itemStack: ItemStack,
 ) : BukkitNekoStackBase, PlayNekoStack {
-    companion object {
-        val ALL_FLAGS = ItemFlag.entries.toTypedArray()
-    }
-
     constructor(mat: Material) : this(
         itemStack = ItemStack(mat), // strictly-Bukkit ItemStack
     )
-    // FIXME remove it when the dedicated API is finished
-    {
-        RunningEnvironment.PRODUCTION.run { itemStack.addItemFlags(*ALL_FLAGS) }
-    }
 
     override val tags: CompoundShadowTag
         get() {
