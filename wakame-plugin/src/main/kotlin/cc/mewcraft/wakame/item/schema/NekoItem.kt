@@ -54,6 +54,21 @@ interface NekoItem : Keyed, ItemBehaviorAccessor {
     val material: Key
 
     /**
+     * If `true`, it will completely hide this item's tooltip, including its name.
+     */
+    val hideTooltip: Boolean
+
+    /**
+     * If `true`, it will hide additional info on this item's tooltip.
+     */
+    val hideAdditionalTooltip: Boolean
+
+    /**
+     * The shown-in-tooltip applicator.
+     */
+    val shownInTooltipApplicator: ShownInTooltipApplicator
+
+    /**
      * The inventory slot where this item can take effect.
      */
     val slot: ItemSlot

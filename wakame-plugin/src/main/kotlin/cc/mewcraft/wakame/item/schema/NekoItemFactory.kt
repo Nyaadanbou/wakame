@@ -33,17 +33,20 @@ object NekoItemFactory {
         //
         val uuid = root.node("uuid").krequire<UUID>()
         val material = root.node("material").krequire<Key>()
+        val hideTooltip = root.node("hide_tooltip").getBoolean(false)
+        val hideAdditionalTooltip = root.node("hide_additional_tooltip").getBoolean(false)
+        val shownInTooltipApplicator = root.node("shown_in_tooltip").krequire<ShownInTooltipApplicator>()
         val slot = root.node("slot").krequire<ItemSlot>()
 
         //
         // Deserialize item behaviors
         //
-        val behaviors: List<String> = root.node("behaviors").childrenMap().mapNotNull { (key, _) -> key?.toString() }
+        val behaviors = root.node("behaviors").childrenMap().mapNotNull { (key, _) -> key?.toString() }
 
         //
         // Deserialize item meta
         //
-        val schemaMeta: ImmutableClassToInstanceMap<SchemaItemMeta<*>> = ImmutableClassToInstanceMap.builder<SchemaItemMeta<*>>().apply {
+        val schemaMeta = ImmutableClassToInstanceMap.builder<SchemaItemMeta<*>>().apply {
             // Side note 1: always put all schema metadata for a `NekoItem` even if the schema meta contains "nothing".
             // Side note 2: whether the data will be written to the item's NBT is decided by the realization process, not here.
 
@@ -61,7 +64,7 @@ object NekoItemFactory {
         //
         // Deserialize item cells
         //
-        val schemaCell: Map<String, SchemaCell> = buildMap {
+        val schemaCell = buildMap {
             // loop through each cell node
             root.node("cells").childrenMap()
                 .mapKeys { it.key.toString() }
@@ -80,6 +83,9 @@ object NekoItemFactory {
             uuid = uuid,
             config = provider,
             material = material,
+            hideTooltip = hideTooltip,
+            hideAdditionalTooltip = hideAdditionalTooltip,
+            shownInTooltipApplicator = shownInTooltipApplicator,
             slot = slot,
             metaMap = schemaMeta,
             cellMap = schemaCell,

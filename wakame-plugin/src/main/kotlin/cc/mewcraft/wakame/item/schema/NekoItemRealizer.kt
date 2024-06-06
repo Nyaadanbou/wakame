@@ -16,7 +16,7 @@ interface NekoItemRealizer {
      * @param context the context on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, context: SchemaGenerationContext): PlayNekoStack // TODO 我们需要针对 SNS,PNS 创建不同的 Realizer 吗？
+    fun realize(item: NekoItem, context: SchemaGenerationContext): PlayNekoStack
 
     /**
      * Realizes an item template from a player.

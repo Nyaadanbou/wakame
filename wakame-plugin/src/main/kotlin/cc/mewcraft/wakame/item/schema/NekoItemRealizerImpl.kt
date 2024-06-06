@@ -6,11 +6,32 @@ import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.cell.isNoop
-import cc.mewcraft.wakame.item.binary.meta.*
-import cc.mewcraft.wakame.item.schema.meta.*
+import cc.mewcraft.wakame.item.binary.meta.BCustomNameMeta
+import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
+import cc.mewcraft.wakame.item.binary.meta.BElementMeta
+import cc.mewcraft.wakame.item.binary.meta.BKizamiMeta
+import cc.mewcraft.wakame.item.binary.meta.BLevelMeta
+import cc.mewcraft.wakame.item.binary.meta.BLoreMeta
+import cc.mewcraft.wakame.item.binary.meta.BRarityMeta
+import cc.mewcraft.wakame.item.binary.meta.BSkinMeta
+import cc.mewcraft.wakame.item.binary.meta.BSkinOwnerMeta
+import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
+import cc.mewcraft.wakame.item.binary.meta.set
+import cc.mewcraft.wakame.item.schema.meta.GenerationResult
+import cc.mewcraft.wakame.item.schema.meta.SCustomNameMeta
+import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
+import cc.mewcraft.wakame.item.schema.meta.SElementMeta
+import cc.mewcraft.wakame.item.schema.meta.SKizamiMeta
+import cc.mewcraft.wakame.item.schema.meta.SLevelMeta
+import cc.mewcraft.wakame.item.schema.meta.SLoreMeta
+import cc.mewcraft.wakame.item.schema.meta.SRarityMeta
+import cc.mewcraft.wakame.item.schema.meta.SSkinMeta
+import cc.mewcraft.wakame.item.schema.meta.SSkinOwnerMeta
+import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.asBukkit
 import org.bukkit.Registry
+import org.bukkit.inventory.ItemFlag
 import kotlin.reflect.KClass
 
 internal class NekoItemRealizerImpl : NekoItemRealizer {
@@ -40,7 +61,7 @@ internal class NekoItemRealizerImpl : NekoItemRealizer {
      * @return a new once-off NekoStack
      */
     private fun createItemStack0(item: NekoItem, context: SchemaGenerationContext): PlayNekoStack {
-        val stack = run {
+        val nekoStack = run {
             val key = item.material.asBukkit
             val mat = requireNotNull(Registry.MATERIAL.get(key)) { "Can't find material by key '${item.material}'" }
             PlayNekoStackFactory.new(mat)
@@ -49,13 +70,24 @@ internal class NekoItemRealizerImpl : NekoItemRealizer {
         //
         // Write base data
         //
-        stack.key = item.key
-        stack.variant = 0
+        nekoStack.key = item.key
+        nekoStack.variant = 0
+        nekoStack.itemStack.apply {
+            editMeta {
+                if (item.hideTooltip) {
+                    it.isHideTooltip = true
+                }
+                if (item.hideAdditionalTooltip) {
+                    it.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                }
+            }
+            item.shownInTooltipApplicator.applyToItem(this)
+        }
 
         //
         // Write item meta
         //
-        ItemMetaWriter {
+        ItemMetaApplicator {
             // Caution: the order of the generation matters here!!!
             // Caution: 这里每个 statement 的执行顺序很重要，存在依赖关系!!!
 
@@ -69,28 +101,30 @@ internal class NekoItemRealizerImpl : NekoItemRealizer {
             bind<SSkinMeta, BSkinMeta>()
             bind<SSkinOwnerMeta, BSkinOwnerMeta>()
 
-        }.write(item, stack, context)
+        }.write(item, nekoStack, context)
 
         //
         // Write item cell
         //
-        ItemCellWriter.write(item, stack, context)
+        ItemCellApplicator.write(item, nekoStack, context)
 
-        return stack
+        return nekoStack
     }
 }
 
-/**
- * A constructor function to create [ItemMetaWriter].
- */
-private fun ItemMetaWriter(block: ItemMetaWriter.() -> Unit): ItemMetaWriter {
-    return ItemMetaWriter().apply(block)
-}
 
 /**
  * Responsible to write item meta to an item.
  */
-private class ItemMetaWriter {
+private class ItemMetaApplicator {
+
+    /**
+     * A constructor function to create [ItemMetaApplicator].
+     */
+    constructor(block: ItemMetaApplicator.() -> Unit) {
+        this.apply(block)
+    }
+
     // We have to use a list to store the bindings, as
     // the schema item meta have to be generated in a
     // predictable order, and therefore they follow the
@@ -152,7 +186,7 @@ private class ItemMetaWriter {
 /**
  * Responsible to write item cells to an item.
  */
-private object ItemCellWriter {
+private object ItemCellApplicator {
     fun write(item: NekoItem, stack: NekoStack, context: SchemaGenerationContext) {
         item.cellMap.forEach { (id, schemaCell) ->
             // The order of cell population should be the same as

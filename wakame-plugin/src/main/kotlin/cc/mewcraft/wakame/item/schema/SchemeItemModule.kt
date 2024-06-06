@@ -48,6 +48,7 @@ internal fun schemaItemModule(): Module = module {
     single<TypeSerializerCollection>(named(BASE_SERIALIZERS)) {
         TypeSerializerCollection.builder()
 
+            .kregister(BukkitShownInTooltipApplicatorSerializer)
             .kregister(ItemSlotSerializer)
             .register(MaterialSerializer)
             .kregister(PotionEffectSerializer)
