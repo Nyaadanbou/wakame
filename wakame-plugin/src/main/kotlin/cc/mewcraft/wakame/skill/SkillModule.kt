@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.skill
 import cc.mewcraft.wakame.molang.EvaluableSerializer
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroupSerializer
 import cc.mewcraft.wakame.skill.factory.TeleportationSerializer
+import cc.mewcraft.wakame.skill.trigger.SkillWithTriggerSerializer
+import cc.mewcraft.wakame.skill.trigger.TriggerSerializer
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf

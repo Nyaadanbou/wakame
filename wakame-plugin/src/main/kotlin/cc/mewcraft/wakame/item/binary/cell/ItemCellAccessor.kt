@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.binary.cell
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.Trigger
+import cc.mewcraft.wakame.skill.trigger.Trigger
 import com.google.common.collect.Multimap
 
 /**

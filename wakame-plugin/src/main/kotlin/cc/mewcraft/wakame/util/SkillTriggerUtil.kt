@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.skill.Trigger
-import cc.mewcraft.wakame.skill.Trigger.Combo
+import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.Trigger.Combo
 
 object SkillTriggerUtil {
     fun List<Trigger>.generateCombinations(combinationLength: Int): List<Combo> {

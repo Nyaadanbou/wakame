@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.binary.cell.core.skill
 
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.skill.SkillBinaryKeys
-import cc.mewcraft.wakame.skill.Trigger
+import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.ShadowTag

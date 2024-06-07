@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.Trigger
-import cc.mewcraft.wakame.skill.Trigger.*
+import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.Trigger.*
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.skill.condition.MoLangCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory

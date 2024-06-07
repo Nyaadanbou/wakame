@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.Trigger
+import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.examination.ExaminableProperty

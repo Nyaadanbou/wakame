@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.binary.NekoStackBase
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.Trigger
+import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
 import com.google.common.collect.ImmutableListMultimap

@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillWithTrigger
-import cc.mewcraft.wakame.skill.Trigger
+import cc.mewcraft.wakame.skill.trigger.SkillWithTrigger
+import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 

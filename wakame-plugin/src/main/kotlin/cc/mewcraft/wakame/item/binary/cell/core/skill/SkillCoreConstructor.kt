@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
-import cc.mewcraft.wakame.skill.SkillWithTrigger
+import cc.mewcraft.wakame.skill.trigger.SkillWithTrigger
 import cc.mewcraft.wakame.util.krequire
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.spongepowered.configurate.ConfigurationNode

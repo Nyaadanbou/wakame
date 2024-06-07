@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill
+package cc.mewcraft.wakame.skill.trigger
 
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore

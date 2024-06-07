@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.Castable
 import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
+import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity

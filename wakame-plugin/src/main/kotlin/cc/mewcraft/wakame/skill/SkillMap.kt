@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill.trigger.SkillWithTrigger
+import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.user.User
 import com.google.common.collect.Multimap
 import com.google.common.collect.MultimapBuilder
