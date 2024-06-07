@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.binary.cell
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillTrigger
+import cc.mewcraft.wakame.skill.Trigger
 import com.google.common.collect.Multimap
 
 /**
@@ -59,7 +59,7 @@ interface ItemCellAccessor {
     /**
      * Gets all skills from all the cells.
      */
-    fun getSkills(neglectCurse: Boolean = false): Multimap<SkillTrigger, Skill>
+    fun getSkills(neglectCurse: Boolean = false): Multimap<Trigger, Skill>
 
     /* Setters */
 

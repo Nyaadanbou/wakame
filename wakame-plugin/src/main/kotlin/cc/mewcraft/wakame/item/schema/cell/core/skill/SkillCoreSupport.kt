@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillTrigger
+import cc.mewcraft.wakame.skill.Trigger
 import net.kyori.adventure.key.Key
 
 //
@@ -15,7 +15,7 @@ import net.kyori.adventure.key.Key
 
 internal data class SchemaSkillCoreImpl(
     override val key: Key, // the key will be used to get the Skill instance
-    override val trigger: SkillTrigger,
+    override val trigger: Trigger,
 ) : SchemaSkillCore {
     override val instance: Skill
         get() = SkillRegistry.INSTANCE[key]

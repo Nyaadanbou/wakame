@@ -44,7 +44,7 @@ interface MoLangCondition : NoCostSkillCondition {
         override val priority: SkillCondition.Priority by priority
         override val eval: Evaluable<*> by eval
         override val failureMessage: Component by failureMessage
-        override val tagResolver: TagResolver = Placeholder.component(this.id, Component.text(this.eval.evaluate(engine)))
+        override val tagResolver: TagResolver = Placeholder.component(this.id, Component.text(this.eval.evaluate(engine))) // TODO: Support MoLang tag resolver
 
         override fun test(context: SkillCastContext): Boolean {
             val result = eval.evaluate(engine)

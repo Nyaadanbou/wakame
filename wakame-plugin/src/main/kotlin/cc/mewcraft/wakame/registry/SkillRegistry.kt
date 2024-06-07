@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillTrigger
-import cc.mewcraft.wakame.skill.SkillTrigger.*
+import cc.mewcraft.wakame.skill.Trigger
+import cc.mewcraft.wakame.skill.Trigger.*
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.skill.condition.MoLangCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
@@ -27,8 +27,8 @@ object SkillRegistry : Initializable, KoinComponent {
     private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
 
     /* Trigger Constants */
-    val GENERIC_TRIGGERS: List<SkillTrigger> = listOf(LeftClick, RightClick, Attack, Jump)
-    val COMBO_TRIGGERS: List<SkillTrigger> = listOf(LeftClick, RightClick)
+    val GENERIC_TRIGGERS: List<Trigger> = listOf(LeftClick, RightClick, Attack, Jump)
+    val COMBO_TRIGGERS: List<Trigger> = listOf(LeftClick, RightClick)
 
     /**
      * The key of the empty skill.
@@ -38,7 +38,7 @@ object SkillRegistry : Initializable, KoinComponent {
     val INSTANCE: Registry<Key, Skill> = SimpleRegistry()
     val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
     val SKILL_FACTORIES: Registry<String, SkillFactory<*>> = SimpleRegistry()
-    val TRIGGER_INSTANCES: Registry<Key, SkillTrigger> = SimpleRegistry()
+    val TRIGGER_INSTANCES: Registry<Key, Trigger> = SimpleRegistry()
 
     private fun loadCondition() {
         operator fun Pair<String, SkillConditionFactory<*>>.unaryPlus() = CONDITIONS.register(first, second)

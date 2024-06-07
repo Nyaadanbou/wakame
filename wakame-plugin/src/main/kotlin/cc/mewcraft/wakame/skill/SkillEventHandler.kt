@@ -22,7 +22,7 @@ class SkillEventHandler {
     fun onLeftClick(player: Player, itemStack: ItemStack, location: Location?) {
         val skillMap = player.toUser().skillMap
         val target = location?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(player)
-        skillMap.getSkill(SkillTrigger.LeftClick).forEach {
+        skillMap.getSkill(Trigger.LeftClick).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
         }
     }
@@ -31,21 +31,21 @@ class SkillEventHandler {
         val skillMap = player.toUser().skillMap
         val target = location?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(player)
 
-        skillMap.getSkill(SkillTrigger.RightClick).forEach {
+        skillMap.getSkill(Trigger.RightClick).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
         }
     }
 
     fun onJump(player: Player, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
-        skillMap.getSkill(SkillTrigger.Jump).forEach {
+        skillMap.getSkill(Trigger.Jump).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), itemStack))
         }
     }
 
     fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
-        skillMap.getSkill(SkillTrigger.Attack).forEach {
+        skillMap.getSkill(Trigger.Attack).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), itemStack))
         }
     }

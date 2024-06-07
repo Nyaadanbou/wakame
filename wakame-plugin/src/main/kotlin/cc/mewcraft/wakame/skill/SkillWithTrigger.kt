@@ -9,7 +9,7 @@ import java.lang.reflect.Type
 
 data class SkillWithTrigger(
     val key: Key,
-    val trigger: SkillTrigger
+    val trigger: Trigger
 )
 
 fun SkillWithTrigger(core: BinarySkillCore): SkillWithTrigger {
@@ -19,7 +19,7 @@ fun SkillWithTrigger(core: BinarySkillCore): SkillWithTrigger {
 internal object SkillWithTriggerSerializer : SchemaSerializer<SkillWithTrigger> {
     override fun deserialize(type: Type, node: ConfigurationNode): SkillWithTrigger {
         val key = node.node("key").krequire<Key>()
-        val trigger = node.node("trigger").krequire<SkillTrigger>()
+        val trigger = node.node("trigger").krequire<Trigger>()
         return SkillWithTrigger(key, trigger)
     }
 }

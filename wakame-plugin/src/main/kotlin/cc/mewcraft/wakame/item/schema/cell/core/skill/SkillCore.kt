@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillWithTrigger
-import cc.mewcraft.wakame.skill.SkillTrigger
+import cc.mewcraft.wakame.skill.Trigger
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -27,7 +27,7 @@ fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
  */
 interface SchemaSkillCore : SchemaCore {
     val instance: Skill
-    val trigger: SkillTrigger
+    val trigger: Trigger
     override fun reify(context: SchemaGenerationContext): BinarySkillCore
 }
 

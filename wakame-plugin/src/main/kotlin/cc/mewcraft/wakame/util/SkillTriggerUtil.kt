@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.skill.SkillTrigger
-import cc.mewcraft.wakame.skill.SkillTrigger.Combo
+import cc.mewcraft.wakame.skill.Trigger
+import cc.mewcraft.wakame.skill.Trigger.Combo
 
 object SkillTriggerUtil {
-    fun List<SkillTrigger>.generateCombinations(combinationLength: Int): List<Combo> {
+    fun List<Trigger>.generateCombinations(combinationLength: Int): List<Combo> {
         val results = mutableListOf<Combo>()
 
-        fun generate(currentCombo: List<SkillTrigger>) {
+        fun generate(currentCombo: List<Trigger>) {
             if (currentCombo.size == combinationLength) {
                 results.add(Combo(currentCombo))
                 return

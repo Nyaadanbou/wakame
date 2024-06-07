@@ -15,14 +15,14 @@ import java.util.*
  */
 interface SkillMap {
     fun addSkill(skill: SkillWithTrigger)
-    fun addSkillsByKey(skills: Multimap<SkillTrigger, Key>)
-    fun addSkillsByInstance(skills: Multimap<SkillTrigger, Skill>)
-    fun getSkill(trigger: SkillTrigger): Collection<Skill>
+    fun addSkillsByKey(skills: Multimap<Trigger, Key>)
+    fun addSkillsByInstance(skills: Multimap<Trigger, Skill>)
+    fun getSkill(trigger: Trigger): Collection<Skill>
     fun removeSkill(key: Key)
     fun removeSkill(skill: Skill)
-    fun removeSkill(skills: Multimap<SkillTrigger, Skill>)
+    fun removeSkill(skills: Multimap<Trigger, Skill>)
 
-    operator fun get(uniqueId: UUID, trigger: SkillTrigger): Collection<Skill> = getSkill(trigger)
+    operator fun get(uniqueId: UUID, trigger: Trigger): Collection<Skill> = getSkill(trigger)
 }
 
 /**
@@ -41,7 +41,7 @@ fun PlayerSkillMap(user: User<*>): PlayerSkillMap {
 class PlayerSkillMap(
     private val uniqueId: UUID,
 ) : SkillMap {
-    private val skills: Multimap<SkillTrigger, Key> = MultimapBuilder
+    private val skills: Multimap<Trigger, Key> = MultimapBuilder
         .hashKeys(8)
         .arrayListValues(5)
         .build()
@@ -50,17 +50,17 @@ class PlayerSkillMap(
         this.skills.put(skill.trigger, skill.key)
     }
 
-    override fun addSkillsByKey(skills: Multimap<SkillTrigger, Key>) {
+    override fun addSkillsByKey(skills: Multimap<Trigger, Key>) {
         this.skills.putAll(skills)
     }
 
-    override fun addSkillsByInstance(skills: Multimap<SkillTrigger, Skill>) {
+    override fun addSkillsByInstance(skills: Multimap<Trigger, Skill>) {
         for ((trigger, skill) in skills.entries()) {
             this.skills.put(trigger, skill.key)
         }
     }
 
-    override fun getSkill(trigger: SkillTrigger): Collection<Skill> {
+    override fun getSkill(trigger: Trigger): Collection<Skill> {
         return this.skills[trigger].map { SkillRegistry.INSTANCE[it] }
     }
 
@@ -72,7 +72,7 @@ class PlayerSkillMap(
         this.skills.entries().removeIf { it.value == skill.key }
     }
 
-    override fun removeSkill(skills: Multimap<SkillTrigger, Skill>) {
+    override fun removeSkill(skills: Multimap<Trigger, Skill>) {
         for ((trigger, skill) in skills.entries()) {
             this.skills.remove(trigger, skill.key)
         }

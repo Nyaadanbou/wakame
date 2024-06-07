@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.binary.cell.core.skill
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.SkillBinaryKeys
-import cc.mewcraft.wakame.skill.SkillTrigger
+import cc.mewcraft.wakame.skill.Trigger
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.getStringOrNull
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -19,7 +19,7 @@ internal class BinarySkillCoreTagWrapper(
 ) : BinarySkillCore() {
     override val key: Key
         get() = compound.getIdentifier()
-    override val trigger: SkillTrigger
+    override val trigger: Trigger
         get() = compound.getTrigger()
 
     override fun clear() {
@@ -39,6 +39,6 @@ private fun CompoundShadowTag.getIdentifier(): Key {
     return Key(this.getString(CoreBinaryKeys.CORE_IDENTIFIER))
 }
 
-private fun CompoundShadowTag.getTrigger(): SkillTrigger {
-    return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillRegistry.TRIGGER_INSTANCES[Key(it)] } ?: SkillTrigger.Noop
+private fun CompoundShadowTag.getTrigger(): Trigger {
+    return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillRegistry.TRIGGER_INSTANCES[Key(it)] } ?: Trigger.Noop
 }
