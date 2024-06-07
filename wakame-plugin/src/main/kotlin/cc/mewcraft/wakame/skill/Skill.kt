@@ -45,7 +45,7 @@ interface Skill : Keyed {
     fun cast(context: SkillCastContext) = Unit
 }
 
-fun Skill.tryCast(skillCastContext: SkillCastContext) {
+fun Skill.tryCast(skillCastContext: SkillCastContext): Result<Unit> {
     val event: SkillPrepareCastEvent
     when (skillCastContext) {
         is PlayerSkillCastContext -> {
@@ -56,26 +56,29 @@ fun Skill.tryCast(skillCastContext: SkillCastContext) {
         }
 
         else -> {
-            return // TODO 其他释放技能的情况
+            return Result.success(Unit) // TODO 其他释放技能的情况
         }
     }
     // 这里允许其他模块监听事件，修改上下文，从而对技能的释放产生影响
     event.callEvent()
-    if (event.isCancelled) return
+    if (event.isCancelled) return Result.failure(SkillCastCancelledException())
     val conditionGroup = this.conditions
     val context = event.skillCastContext
     if (conditionGroup.test(context)) {
         try {
             this.cast(context)
             conditionGroup.cost(context)
+            return Result.success(Unit)
         } catch (e: Throwable) {
             if (e is SkillCannotCastException) {
                 event.skillCastContext.caster.sendMessage(e.beautify())
             } else {
                 throw e
             }
+            return Result.failure(e)
         }
     } else {
         conditionGroup.notifyFailure(context)
+        return Result.failure(ConditionNotMetException())
     }
 }

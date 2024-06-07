@@ -477,14 +477,11 @@ core_groups:
     selects:
       skill:
         entries:
-          - key: skill:buff/potion_remove
-            trigger: trigger:combo/010
+          - key: skill:melee/dash
+            trigger: trigger:combo/110
             weight: 2
           - key: skill:melee/kill_entity
             trigger: trigger:generic/attack
-            weight: 1
-          - key: skill:buff/teleport
-            trigger: trigger:generic/right_click
             weight: 1
     default: [ ]
 

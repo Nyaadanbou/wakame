@@ -47,7 +47,7 @@ kizami:
       1:
         - # 铭刻也可提供技能
           key: skill:buff/potion_remove
-          trigger: trigger:generic/jump
+          trigger: trigger:combo/101
 
   gold:
     uuid: 0b7fab70-32fb-4511-83d1-17d9e3efa1fc

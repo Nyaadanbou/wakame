@@ -46,7 +46,22 @@ sealed interface Trigger : Keyed {
         private val idString: String = triggers.joinToString("") { it.id.toString() }
         override val id: Char = Char.MIN_VALUE
         override val key: Key = Key(Namespaces.TRIGGER, "combo/$idString")
+
+        fun isStartWith(vararg trigger: Trigger): Boolean {
+            return triggers.take(trigger.size) == trigger.toList()
+        }
     }
+}
+
+fun Iterable<Trigger>.toCombo(count: Int = 3): Trigger.Combo {
+    val iterator = this.iterator()
+    val triggers = mutableListOf<Trigger>()
+    var counter = 0
+    while (iterator.hasNext() && counter < count) {
+        triggers.add(iterator.next())
+        counter++
+    }
+    return Trigger.Combo(triggers)
 }
 
 internal object TriggerSerializer : SchemaSerializer<Trigger> {

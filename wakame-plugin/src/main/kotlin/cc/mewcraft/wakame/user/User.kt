@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.resource.ResourceMap
 import cc.mewcraft.wakame.skill.SkillMap
+import cc.mewcraft.wakame.skill.state.SkillStateManager
 import java.util.UUID
 
 /**
@@ -48,4 +49,8 @@ interface User<P> {
      */
     val resourceMap: ResourceMap
 
+    /**
+     * Skill State Manager of the player.
+     */
+    val skillStateManager: SkillStateManager
 }

@@ -52,7 +52,8 @@ class MultipleItemListener : KoinComponent, Listener {
         val player = event.player
         val rawSlot = event.rawSlot
         val slot = event.slot
-        val oldItem = event.oldItemStack.takeUnlessEmpty() // it always returns a non-null ItemStack - it uses AIR to represent emptiness
+        val oldItem =
+            event.oldItemStack.takeUnlessEmpty() // it always returns a non-null ItemStack - it uses AIR to represent emptiness
         val newItem = event.newItemStack.takeUnlessEmpty() // same as above
 
         attributeEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
@@ -70,11 +71,20 @@ class MultipleItemListener : KoinComponent, Listener {
             return
 
         when (event.action) {
-            Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR -> {
-                skillEventHandler.onLeftClick(player, item, event.clickedBlock?.location)
+            Action.LEFT_CLICK_BLOCK -> {
+                skillEventHandler.onLeftClickBlock(player, item, event.clickedBlock?.location!!)
             }
-            Action.RIGHT_CLICK_BLOCK, Action.LEFT_CLICK_AIR -> {
-                skillEventHandler.onRightClick(player, item, event.clickedBlock?.location)
+
+            Action.LEFT_CLICK_AIR -> {
+                skillEventHandler.onLeftClickAir(player, item)
+            }
+
+            Action.RIGHT_CLICK_BLOCK -> {
+                skillEventHandler.onRightClickBlock(player, item, event.clickedBlock?.location!!)
+            }
+
+            Action.RIGHT_CLICK_AIR -> {
+                skillEventHandler.onRightClickAir(player, item)
             }
 
             else -> return

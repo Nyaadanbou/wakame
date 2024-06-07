@@ -20,18 +20,45 @@ class SkillEventHandler {
 
     /* Handles skill triggers for players. */
 
-    fun onLeftClick(player: Player, itemStack: ItemStack, location: Location?) {
-        val skillMap = player.toUser().skillMap
-        val target = location?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(player)
+    fun onLeftClickBlock(player: Player, itemStack: ItemStack, location: Location) {
+        onLeftClick(player, itemStack) { TargetAdapter.adapt(location) }
+    }
+
+    fun onLeftClickAir(player: Player, itemStack: ItemStack) {
+        val user = player.toUser()
+        val target = TargetAdapter.adapt(player)
+        onLeftClick(player, itemStack) { target }
+        user.skillStateManager.addTrigger(Trigger.LeftClick) { skill ->
+            skill.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack)).isSuccess
+        }
+    }
+
+    private fun onLeftClick(player: Player, itemStack: ItemStack, targetProvider: () -> Target) {
+        val user = player.toUser()
+        val skillMap = user.skillMap
+        val target = targetProvider()
         skillMap.getSkill(Trigger.LeftClick).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
         }
     }
 
-    fun onRightClick(player: Player, itemStack: ItemStack, location: Location?) {
-        val skillMap = player.toUser().skillMap
-        val target = location?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(player)
+    fun onRightClickBlock(player: Player, itemStack: ItemStack, location: Location) {
+        onRightClick(player, itemStack) { TargetAdapter.adapt(location) }
+    }
 
+    fun onRightClickAir(player: Player, itemStack: ItemStack) {
+        val user = player.toUser()
+        val target = TargetAdapter.adapt(player)
+        onRightClick(player, itemStack) { target }
+        user.skillStateManager.addTrigger(Trigger.RightClick) { skill ->
+            skill.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack)).isSuccess
+        }
+    }
+
+    private fun onRightClick(player: Player, itemStack: ItemStack, targetProvider: () -> Target) {
+        val user = player.toUser()
+        val skillMap = user.skillMap
+        val target = targetProvider()
         skillMap.getSkill(Trigger.RightClick).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
         }
@@ -71,7 +98,7 @@ class SkillEventHandler {
     ) {
         updateSkills(player, oldItem, newItem) {
             this.slot.testItemHeldEvent(player, previousSlot, newSlot) &&
-            this.hasBehavior<Castable>()
+                    this.hasBehavior<Castable>()
         }
     }
 
@@ -93,7 +120,7 @@ class SkillEventHandler {
     ) {
         updateSkills(player, oldItem, newItem) {
             this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) &&
-            this.hasBehavior<Castable>()
+                    this.hasBehavior<Castable>()
         }
     }
 

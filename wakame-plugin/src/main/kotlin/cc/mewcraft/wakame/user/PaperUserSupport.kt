@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.resource.PlayerResourceMap
 import cc.mewcraft.wakame.resource.ResourceMap
 import cc.mewcraft.wakame.skill.PlayerSkillMap
 import cc.mewcraft.wakame.skill.SkillMap
+import cc.mewcraft.wakame.skill.state.PlayerSkillStateManager
+import cc.mewcraft.wakame.skill.state.SkillStateManager
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Server
@@ -37,6 +39,7 @@ class PaperUser(
     override val attributeMap: AttributeMap = PlayerAttributeMap(this)
     override val skillMap: SkillMap = PlayerSkillMap(this)
     override val resourceMap: ResourceMap = PlayerResourceMap(this)
+    override val skillStateManager: SkillStateManager = PlayerSkillStateManager(this)
 
     private val levelProvider: PlayerLevelProvider by inject()
 }
