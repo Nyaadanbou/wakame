@@ -1,7 +1,7 @@
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.Trigger.LeftClick
 import cc.mewcraft.wakame.skill.trigger.Trigger.RightClick
-import cc.mewcraft.wakame.util.SkillTriggerUtil.generateCombinations
+import cc.mewcraft.wakame.util.generateCombinations
 import org.junit.jupiter.api.Test
 
 class TriggerUtilTest {

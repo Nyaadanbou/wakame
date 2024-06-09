@@ -3,15 +3,17 @@ package cc.mewcraft.wakame.skill.state
 import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.trigger.Trigger
-import cc.mewcraft.wakame.skill.trigger.toCombo
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.RingBuffer
+import cc.mewcraft.wakame.util.toCombo
+import me.lucko.helper.cooldown.Cooldown
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 interface SkillStateManager {
     fun addTrigger(trigger: Trigger, skillCastFunction: (Skill) -> Boolean)
+    fun clear()
 }
 
 class PlayerSkillStateManager(
@@ -19,9 +21,14 @@ class PlayerSkillStateManager(
 ) : SkillStateManager, KoinComponent {
     private val skillStateShower: SkillStateShower<Player> by inject()
 
+    private val cooldown: Cooldown = Cooldown.ofTicks(2)
     private val triggers: RingBuffer<Trigger> = RingBuffer(3)
 
     override fun addTrigger(trigger: Trigger, skillCastFunction: (Skill) -> Boolean) {
+        // To make sure the player is not spamming the skill
+        if (!cooldown.test())
+            return
+
         triggers.write(trigger)
         val bufferTriggers = triggers.readAll()
         skillStateShower.displayProgress(bufferTriggers, user)
@@ -43,8 +50,13 @@ class PlayerSkillStateManager(
         clearAndRun { skillStateShower.displaySuccess(bufferTriggers, user) }
     }
 
-    private fun clearAndRun(block: () -> Unit) {
+    override fun clear() {
         triggers.clear()
+        cooldown.reset()
+    }
+
+    private fun clearAndRun(block: () -> Unit) {
+        clear()
         block()
     }
 }

@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.item.schema.behavior.Castable
 import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.hasCombo
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -25,20 +26,19 @@ class SkillEventHandler {
     }
 
     fun onLeftClickAir(player: Player, itemStack: ItemStack) {
-        val user = player.toUser()
-        val target = TargetAdapter.adapt(player)
-        onLeftClick(player, itemStack) { target }
-        user.skillStateManager.addTrigger(Trigger.LeftClick) { skill ->
-            skill.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack)).isSuccess
-        }
+        onLeftClick(player, itemStack) { TargetAdapter.adapt(player) }
     }
 
     private fun onLeftClick(player: Player, itemStack: ItemStack, targetProvider: () -> Target) {
         val user = player.toUser()
         val skillMap = user.skillMap
-        val target = targetProvider()
+        val target = targetProvider.invoke()
         skillMap.getSkill(Trigger.LeftClick).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+        }
+        if (!skillMap.getTriggers().hasCombo()) return
+        user.skillStateManager.addTrigger(Trigger.LeftClick) { skill ->
+            skill.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack)).isSuccess
         }
     }
 
@@ -47,20 +47,19 @@ class SkillEventHandler {
     }
 
     fun onRightClickAir(player: Player, itemStack: ItemStack) {
-        val user = player.toUser()
-        val target = TargetAdapter.adapt(player)
-        onRightClick(player, itemStack) { target }
-        user.skillStateManager.addTrigger(Trigger.RightClick) { skill ->
-            skill.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack)).isSuccess
-        }
+        onRightClick(player, itemStack) { TargetAdapter.adapt(player) }
     }
 
     private fun onRightClick(player: Player, itemStack: ItemStack, targetProvider: () -> Target) {
         val user = player.toUser()
         val skillMap = user.skillMap
-        val target = targetProvider()
+        val target = targetProvider.invoke()
         skillMap.getSkill(Trigger.RightClick).forEach {
             it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+        }
+        if (!skillMap.getTriggers().hasCombo()) return
+        user.skillStateManager.addTrigger(Trigger.RightClick) { skill ->
+            skill.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack)).isSuccess
         }
     }
 
@@ -100,6 +99,7 @@ class SkillEventHandler {
             this.slot.testItemHeldEvent(player, previousSlot, newSlot) &&
                     this.hasBehavior<Castable>()
         }
+        player.toUser().skillStateManager.clear()
     }
 
     /**
@@ -122,6 +122,7 @@ class SkillEventHandler {
             this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) &&
                     this.hasBehavior<Castable>()
         }
+        player.toUser().skillStateManager.clear()
     }
 
     /**

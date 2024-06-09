@@ -5,14 +5,14 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.Trigger
-import cc.mewcraft.wakame.skill.trigger.Trigger.*
 import cc.mewcraft.wakame.skill.condition.DurabilityCondition
 import cc.mewcraft.wakame.skill.condition.MoLangCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
 import cc.mewcraft.wakame.skill.factory.*
+import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.Trigger.*
 import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.SkillTriggerUtil.generateCombinations
+import cc.mewcraft.wakame.util.generateCombinations
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent

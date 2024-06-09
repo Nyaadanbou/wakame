@@ -23,6 +23,7 @@ interface SkillMap {
     fun removeSkill(key: Key)
     fun removeSkill(skill: Skill)
     fun removeSkill(skills: Multimap<Trigger, Skill>)
+    fun getTriggers(): Set<Trigger>
 
     operator fun get(uniqueId: UUID, trigger: Trigger): Collection<Skill> = getSkill(trigger)
 }
@@ -78,5 +79,9 @@ class PlayerSkillMap(
         for ((trigger, skill) in skills.entries()) {
             this.skills.remove(trigger, skill.key)
         }
+    }
+
+    override fun getTriggers(): Set<Trigger> {
+        return skills.keySet()
     }
 }

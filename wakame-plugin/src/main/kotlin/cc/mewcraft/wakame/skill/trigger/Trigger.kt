@@ -53,17 +53,6 @@ sealed interface Trigger : Keyed {
     }
 }
 
-fun Iterable<Trigger>.toCombo(count: Int = 3): Trigger.Combo {
-    val iterator = this.iterator()
-    val triggers = mutableListOf<Trigger>()
-    var counter = 0
-    while (iterator.hasNext() && counter < count) {
-        triggers.add(iterator.next())
-        counter++
-    }
-    return Trigger.Combo(triggers)
-}
-
 internal object TriggerSerializer : SchemaSerializer<Trigger> {
     override fun deserialize(type: Type, node: ConfigurationNode): Trigger {
         val key = Key(node.string.orEmpty())
