@@ -131,7 +131,7 @@ internal class ResourcePackCustomModelGeneration(
             for (asset in assets) {
                 val modelFiles = asset.modelFiles.takeIf { it.isNotEmpty() } ?: continue
                 for ((index, modelFile) in modelFiles.withIndex()) {
-                    logger.info("<aqua>Generating $index model for ${asset.key}, SID ${asset.variant}... (Path: $modelFile)")
+                    logger.info("Generating $index model for ${asset.key}, variant ${asset.variant}, path: $modelFile")
                     val customModelData = config.saveCustomModelData(asset.key, asset.variant)
                     val resourcePack = args.resourcePack
 
@@ -183,11 +183,11 @@ internal class ResourcePackCustomModelGeneration(
 
                     resourcePack.model(configModel.toMinecraftFormat())
                     resourcePack.model(vanillaCmdOverride).also {
-                        logger.info("Model for ${asset.key}, SID ${asset.variant} generated. CustomModelData: $customModelData")
+                        logger.info("Model for ${asset.key}, variant ${asset.variant} generated. CustomModelData: $customModelData")
                     }
                     customTextures.forEach {
                         resourcePack.texture(it).also {
-                            logger.info("Texture for ${asset.key}, SID ${asset.variant} generated.")
+                            logger.info("Texture for ${asset.key}, variant ${asset.variant} generated.")
                         }
                     }
                 }
