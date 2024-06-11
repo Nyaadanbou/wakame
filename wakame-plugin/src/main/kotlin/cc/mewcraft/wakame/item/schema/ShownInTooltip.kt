@@ -14,7 +14,9 @@ import java.util.stream.Stream
  */
 interface ShownInTooltip : Examinable {
     /**
-     * 对应的物品组件名字。取值参考 [Minecraft Wiki](https://minecraft.wiki/w/Data_component_format)。
+     * 对应的物品组件名字。
+     *
+     * 取值参考 [Minecraft Wiki](https://minecraft.wiki/w/Data_component_format)。
      */
     val component: Key
 
