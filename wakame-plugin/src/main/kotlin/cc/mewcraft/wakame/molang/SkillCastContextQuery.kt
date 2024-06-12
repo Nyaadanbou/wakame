@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.molang
 
-import cc.mewcraft.wakame.skill.Caster
-import cc.mewcraft.wakame.skill.condition.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillCastContextKeys
 import team.unnamed.mocha.runtime.binding.Binding
 
 class SkillCastContextQuery(
@@ -9,6 +9,6 @@ class SkillCastContextQuery(
 ) {
     @Binding("is_player")
     fun isPlayer(): Boolean {
-        return context.caster is Caster.Player
+        return context.has(SkillCastContextKeys.CASTER_PLAYER)
     }
 }

@@ -1,4 +1,4 @@
-import cc.mewcraft.wakame.skill.condition.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SortedSkillConditionGroup

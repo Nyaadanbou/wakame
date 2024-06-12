@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.condition.ConditionGroup
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.spongepowered.configurate.ConfigurationNode

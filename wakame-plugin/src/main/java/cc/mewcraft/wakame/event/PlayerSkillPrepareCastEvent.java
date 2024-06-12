@@ -3,7 +3,8 @@ package cc.mewcraft.wakame.event;
 import cc.mewcraft.wakame.skill.Caster;
 import cc.mewcraft.wakame.skill.Skill;
 import cc.mewcraft.wakame.skill.Target;
-import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext;
+import cc.mewcraft.wakame.skill.context.SkillCastContext;
+import cc.mewcraft.wakame.skill.context.SkillCastContextKeys;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -18,11 +19,11 @@ public class PlayerSkillPrepareCastEvent extends SkillPrepareCastEvent {
     private final Target target;
     private final ItemStack item;
 
-    public PlayerSkillPrepareCastEvent(Skill skill, PlayerSkillCastContext playerSkillCastContext) {
+    public PlayerSkillPrepareCastEvent(Skill skill, SkillCastContext playerSkillCastContext) {
         super(skill, playerSkillCastContext);
-        this.caster = playerSkillCastContext.getCaster();
-        this.target = playerSkillCastContext.getTarget();
-        this.item = playerSkillCastContext.getItemStack();
+        this.caster = playerSkillCastContext.get(SkillCastContextKeys.INSTANCE.getCASTER_PLAYER());
+        this.target = playerSkillCastContext.get(SkillCastContextKeys.INSTANCE.getTARGET());
+        this.item = playerSkillCastContext.get(SkillCastContextKeys.INSTANCE.getITEM_STACK());
     }
 
     @NotNull

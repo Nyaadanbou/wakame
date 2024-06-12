@@ -7,10 +7,13 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.Target
+import cc.mewcraft.wakame.skill.EmptySkillDisplay
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillCastResult
+import cc.mewcraft.wakame.skill.SkillDisplay
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
-import cc.mewcraft.wakame.skill.condition.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillCastContextKeys
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.util.krequire
 import io.papermc.paper.math.Position
@@ -42,25 +45,24 @@ interface Teleport : Skill {
         override val conditions: SkillConditionGroup by conditions
         override val type: Teleportation by type
 
-        override fun cast(context: SkillCastContext) {
-            val caster = context.caster as? Caster.Player ?: throw NoTargetException()
+        override fun cast(context: SkillCastContext): SkillCastResult {
+            val player = context.optional(SkillCastContextKeys.CASTER_PLAYER) ?: return SkillCastResult.NONE_CASTER
+            val location = context.optional(SkillCastContextKeys.TARGET_LOCATION)?.bukkitLocation ?: return SkillCastResult.NONE_TARGET
             when (val type = type) {
                 is Teleportation.FIXED -> {
-                    val player = caster.bukkitPlayer
                     val position = type.position
-                    player.teleport(position.toLocation(player.world))
+                    player.bukkitPlayer.teleport(position.toLocation(player.bukkitPlayer.world))
                 }
 
                 is Teleportation.TARGET -> {
-                    val target = context.target as? Target.Location ?: throw NoTargetException()
-                    val player = caster.bukkitPlayer
-                    val bukkitLocation = target.bukkitLocation.apply {
-                        pitch = player.location.pitch
-                        yaw = player.location.yaw
+                    val bukkitLocation = location.apply {
+                        pitch = player.bukkitPlayer.location.pitch
+                        yaw = player.bukkitPlayer.location.yaw
                     }
-                    player.teleport(bukkitLocation)
+                    player.bukkitPlayer.teleport(bukkitLocation)
                 }
             }
+            return SkillCastResult.SUCCESS
         }
     }
 }

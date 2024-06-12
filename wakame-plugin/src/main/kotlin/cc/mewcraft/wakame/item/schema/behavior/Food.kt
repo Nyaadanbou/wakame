@@ -7,14 +7,16 @@ import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SFoodMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
-import cc.mewcraft.wakame.skill.CasterAdapter
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.TargetAdapter
-import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
-import cc.mewcraft.wakame.skill.tryCast
+import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.context.SkillCastContextBuilder
+import cc.mewcraft.wakame.skill.context.setCaster
+import cc.mewcraft.wakame.skill.context.setItemStack
+import cc.mewcraft.wakame.skill.context.setTarget
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.reflect.KClass
 
 /**
@@ -39,17 +41,19 @@ interface Food : ItemBehavior {
 
     private class Default(
         skills: Provider<List<Skill>>,
-    ) : Food {
+    ) : Food, KoinComponent {
+        private val skillCastManager: SkillCastManager by inject()
+
         override val skills: List<Skill> by skills
 
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
             skills.forEach { skill ->
-                skill.tryCast(
-                    PlayerSkillCastContext(
-                        CasterAdapter.adapt(player),
-                        TargetAdapter.adapt(player),
-                        itemStack
-                    )
+                skillCastManager.tryCast(skill,
+                    SkillCastContextBuilder.create {
+                        setCaster(CasterAdapter.adapt(player))
+                        setTarget(TargetAdapter.adapt(player))
+                        setItemStack(itemStack)
+                    }
                 )
             }
         }

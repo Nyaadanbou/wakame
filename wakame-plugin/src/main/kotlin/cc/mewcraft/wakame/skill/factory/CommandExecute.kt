@@ -7,10 +7,11 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.EmptySkillDisplay
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillCastResult
 import cc.mewcraft.wakame.skill.SkillDisplay
-import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
-import cc.mewcraft.wakame.skill.condition.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillCastContextKeys
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import net.kyori.adventure.key.Key
 
@@ -36,12 +37,13 @@ interface CommandExecute : Skill {
         override val displays: SkillDisplay by display
         override val conditions: SkillConditionGroup by conditions
         override val commands: List<String> by command
-        override fun cast(context: SkillCastContext) {
-            val target = context.target as Target.LivingEntity
+
+        override fun cast(context: SkillCastContext): SkillCastResult {
+            val entity = context.optional(SkillCastContextKeys.CASTER_ENTITY)?.bukkitEntity ?: return SkillCastResult.NONE_TARGET
             for (command in commands) {
-                val entity = target.bukkitEntity
-                command.replace("{target}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }
+                command.replace("{caster}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }
             }
+            return SkillCastResult.SUCCESS
         }
     }
 }

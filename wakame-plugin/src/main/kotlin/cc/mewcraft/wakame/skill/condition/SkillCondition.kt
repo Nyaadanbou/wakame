@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill.condition
 
 import cc.mewcraft.wakame.condition.Condition
 import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.skill.context.SkillCastContext
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
 /**

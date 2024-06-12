@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
 import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.Castable
-import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillCastContextBuilder
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.hasCombo
@@ -17,7 +17,9 @@ import org.bukkit.inventory.ItemStack
 /**
  * Handles skill triggers for players.
  */
-class SkillEventHandler {
+class SkillEventHandler(
+    private val skillCastManager: SkillCastManager
+) {
 
     /* Handles skill triggers for players. */
 
@@ -33,12 +35,13 @@ class SkillEventHandler {
         val user = player.toUser()
         val skillMap = user.skillMap
         val target = targetProvider.invoke()
-        skillMap.getSkill(Trigger.LeftClick).forEach {
-            it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+        skillMap.getSkill(Trigger.LeftClick).forEach { skill: Skill ->
+            skillCastManager.tryCast(skill, SkillCastContextBuilder.createPlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
         }
         if (!skillMap.getTriggers().hasCombo()) return
         user.skillStateManager.addTrigger(Trigger.LeftClick) { skill ->
-            skill.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack)).isSuccess
+            skillCastManager.tryCast(skill, SkillCastContextBuilder.createPlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+                .isSuccessful()
         }
     }
 
@@ -54,26 +57,31 @@ class SkillEventHandler {
         val user = player.toUser()
         val skillMap = user.skillMap
         val target = targetProvider.invoke()
-        skillMap.getSkill(Trigger.RightClick).forEach {
-            it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+        skillMap.getSkill(Trigger.RightClick).forEach { skill ->
+            skillCastManager.tryCast(skill, SkillCastContextBuilder.createPlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
         }
         if (!skillMap.getTriggers().hasCombo()) return
         user.skillStateManager.addTrigger(Trigger.RightClick) { skill ->
-            skill.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack)).isSuccess
+            skillCastManager.tryCast(skill, SkillCastContextBuilder.createPlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+                .isSuccessful()
         }
     }
 
     fun onJump(player: Player, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
-        skillMap.getSkill(Trigger.Jump).forEach {
-            it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), itemStack))
+        skillMap.getSkill(Trigger.Jump).forEach { skill ->
+            skillCastManager.tryCast(skill, SkillCastContextBuilder
+                .createPlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), itemStack)
+            )
         }
     }
 
     fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
-        skillMap.getSkill(Trigger.Attack).forEach {
-            it.tryCast(PlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), itemStack))
+        skillMap.getSkill(Trigger.Attack).forEach { skill ->
+            skillCastManager.tryCast(skill, SkillCastContextBuilder
+                .createPlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), itemStack)
+            )
         }
     }
 

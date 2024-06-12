@@ -6,9 +6,7 @@ import org.bukkit.Location as BukkitLocation
 import org.bukkit.entity.LivingEntity as BukkitLivingEntity
 
 sealed interface Target {
-    interface Void : Target {
-
-    }
+    data object Void : Target
 
     interface Location : Target {
         val bukkitLocation: BukkitLocation
@@ -26,14 +24,10 @@ object TargetAdapter {
     }
 
     fun adapt(entity: LivingEntity): Target.LivingEntity {
-        return object : Target.LivingEntity {
-            override val bukkitEntity: BukkitLivingEntity = entity
-        }
+        return BukkitLivingEntityTarget(entity)
     }
 
     fun adapt(location: BukkitLocation): Target.Location {
-        return object : Target.Location {
-            override val bukkitLocation: BukkitLocation = location
-        }
+        return BukkitLocationTarget(location)
     }
 }

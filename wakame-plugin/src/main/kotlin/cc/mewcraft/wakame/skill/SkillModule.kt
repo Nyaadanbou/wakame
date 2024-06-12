@@ -22,6 +22,8 @@ internal fun skillModule(): Module = module {
     singleOf(::SkillEventHandler)
     singleOf(::PlayerSkillStateShower) bind SkillStateShower::class
 
+    singleOf(::SkillCastManagerImpl) bind SkillCastManager::class
+
     single<TypeSerializerCollection>(named(SKILL_SERIALIZERS)) {
         TypeSerializerCollection.builder()
             .kregister(SkillConditionGroupSerializer)

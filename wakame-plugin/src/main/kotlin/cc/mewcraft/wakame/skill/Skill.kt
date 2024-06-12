@@ -1,12 +1,9 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
-import cc.mewcraft.wakame.event.SkillPrepareCastEvent
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.condition.PlayerSkillCastContext
-import cc.mewcraft.wakame.skill.condition.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
+import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.factory.SkillFactory
 import net.kyori.adventure.key.Key
 
@@ -42,43 +39,5 @@ interface Skill : Keyed {
      */
     val displays: SkillDisplay
 
-    fun cast(context: SkillCastContext) = Unit
-}
-
-fun Skill.tryCast(skillCastContext: SkillCastContext): Result<Unit> {
-    val event: SkillPrepareCastEvent
-    when (skillCastContext) {
-        is PlayerSkillCastContext -> {
-            event = PlayerSkillPrepareCastEvent(
-                this,
-                skillCastContext
-            )
-        }
-
-        else -> {
-            return Result.success(Unit) // TODO 其他释放技能的情况
-        }
-    }
-    // 这里允许其他模块监听事件，修改上下文，从而对技能的释放产生影响
-    event.callEvent()
-    if (event.isCancelled) return Result.failure(SkillCastCancelledException())
-    val conditionGroup = this.conditions
-    val context = event.skillCastContext
-    if (conditionGroup.test(context)) {
-        try {
-            this.cast(context)
-            conditionGroup.cost(context)
-            return Result.success(Unit)
-        } catch (e: Throwable) {
-            if (e is SkillCannotCastException) {
-                event.skillCastContext.caster.sendMessage(e.beautify())
-            } else {
-                throw e
-            }
-            return Result.failure(e)
-        }
-    } else {
-        conditionGroup.notifyFailure(context)
-        return Result.failure(ConditionNotMetException())
-    }
+    fun cast(context: SkillCastContext): SkillCastResult = SkillCastResult.NOOP
 }

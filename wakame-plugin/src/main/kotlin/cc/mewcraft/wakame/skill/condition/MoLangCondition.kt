@@ -6,7 +6,8 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.skill.Caster
+import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillCastContextKeys
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -25,7 +26,8 @@ interface MoLangCondition : NoCostSkillCondition {
         override fun provide(config: ConfigProvider): NoCostSkillCondition {
             val id = config.entry<String>("id")
             val eval = config.entry<Evaluable<*>>("eval")
-            val priority = config.optionalEntry<SkillCondition.Priority>("priority").orElse(SkillCondition.Priority.NORMAL)
+            val priority =
+                config.optionalEntry<SkillCondition.Priority>("priority").orElse(SkillCondition.Priority.NORMAL)
             val failureMessage = config.optionalEntry<Component>("failure_message").orElse(Component.empty())
 
             return Default(id, eval, priority, failureMessage)
@@ -44,7 +46,10 @@ interface MoLangCondition : NoCostSkillCondition {
         override val priority: SkillCondition.Priority by priority
         override val eval: Evaluable<*> by eval
         override val failureMessage: Component by failureMessage
-        override val tagResolver: TagResolver = Placeholder.component(this.id, Component.text(this.eval.evaluate(engine))) // TODO: Support MoLang tag resolver
+        override val tagResolver: TagResolver = Placeholder.component(
+            this.id,
+            Component.text(this.eval.evaluate(engine))
+        ) // TODO: Support MoLang tag resolver
 
         override fun test(context: SkillCastContext): Boolean {
             val result = eval.evaluate(engine)
@@ -52,7 +57,7 @@ interface MoLangCondition : NoCostSkillCondition {
         }
 
         override fun notifyFailure(context: SkillCastContext) {
-            val caster = context.caster as? Caster.Player ?: return
+            val caster = context.optional(SkillCastContextKeys.CASTER_PLAYER) ?: return
             caster.bukkitPlayer.sendMessage(failureMessage)
         }
     }

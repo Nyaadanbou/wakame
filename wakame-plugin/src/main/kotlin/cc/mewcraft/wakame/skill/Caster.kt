@@ -6,15 +6,16 @@ import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
+import org.bukkit.entity.Entity as BukkitEntity
 import org.bukkit.entity.Player as BukkitPlayer
 
 sealed interface Caster : Audience {
-    interface Void : Caster {
-
-    }
-
     interface Player : Caster {
         val bukkitPlayer: BukkitPlayer
+    }
+
+    interface Entity : Caster {
+        val bukkitEntity: BukkitEntity
     }
 }
 
@@ -25,11 +26,6 @@ object CasterAdapter {
 
     fun adapt(player: Player): Caster.Player {
         return PlayerCaster(player)
-    }
-
-    fun adapt(): Caster.Void {
-        return object : Caster.Void {
-        }
     }
 }
 
