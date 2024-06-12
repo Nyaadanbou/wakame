@@ -16,6 +16,7 @@ import net.kyori.adventure.key.Key
 internal data class SchemaSkillCoreImpl(
     override val key: Key, // the key will be used to get the Skill instance
     override val trigger: Trigger,
+    override val effectiveVariant: Int
 ) : SchemaSkillCore {
     override val instance: Skill
         get() = SkillRegistry.INSTANCE[key]
@@ -33,6 +34,6 @@ internal data class SchemaSkillCoreImpl(
         // 综上，物品上的技能无需储存除 key 以外的任何数据
 
         context.skills += SkillContextHolder(key)
-        return BinarySkillCoreDataHolder(key, trigger)
+        return BinarySkillCoreDataHolder(key, trigger, effectiveVariant)
     }
 }

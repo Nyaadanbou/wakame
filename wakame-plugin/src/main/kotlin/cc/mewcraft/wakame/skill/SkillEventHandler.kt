@@ -163,7 +163,7 @@ class SkillEventHandler(
             return
         }
         val skillMap = player.toUser().skillMap
-        val skills = this.cell.getSkills(true) // TODO: remove if skill module is complete
+        val skills = this.cell.getSkills(neglectCurse = true, neglectVariant = true) // TODO: remove if skill module is complete
         skillMap.addSkillsByInstance(skills)
     }
 
@@ -180,7 +180,7 @@ class SkillEventHandler(
         }
 
         val skillMap = player.toUser().skillMap
-        val skills = this.cell.getSkills(true)  // TODO: remove if skill module is complete
+        val skills = this.cell.getSkills(neglectCurse = true, neglectVariant = true)  // TODO: remove if skill module is complete
         skillMap.removeSkill(skills)
     }
 }

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.trigger.SkillWithTrigger
+import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.user.User
 import com.google.common.collect.Multimap
@@ -16,7 +16,7 @@ import java.util.*
  * for the subject.
  */
 interface SkillMap {
-    fun addSkill(skill: SkillWithTrigger)
+    fun addSkill(skill: ConfiguredSkill)
     fun addSkillsByKey(skills: Multimap<Trigger, Key>)
     fun addSkillsByInstance(skills: Multimap<Trigger, Skill>)
     fun getSkill(trigger: Trigger): Collection<Skill>
@@ -49,7 +49,7 @@ class PlayerSkillMap(
         .arrayListValues(5)
         .build()
 
-    override fun addSkill(skill: SkillWithTrigger) {
+    override fun addSkill(skill: ConfiguredSkill) {
         this.skills.put(skill.trigger, skill.key)
     }
 

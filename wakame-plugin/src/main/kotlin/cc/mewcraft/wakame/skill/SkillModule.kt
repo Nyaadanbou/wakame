@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.skill.condition.SkillConditionGroupSerializer
 import cc.mewcraft.wakame.skill.factory.TeleportationSerializer
 import cc.mewcraft.wakame.skill.state.PlayerSkillStateShower
 import cc.mewcraft.wakame.skill.state.SkillStateShower
-import cc.mewcraft.wakame.skill.trigger.SkillWithTriggerSerializer
+import cc.mewcraft.wakame.skill.trigger.ConfiguredSkillSerializer
 import cc.mewcraft.wakame.skill.trigger.TriggerSerializer
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
@@ -28,7 +28,7 @@ internal fun skillModule(): Module = module {
         TypeSerializerCollection.builder()
             .kregister(SkillConditionGroupSerializer)
             .kregister(EvaluableSerializer)
-            .kregister(SkillWithTriggerSerializer)
+            .kregister(ConfiguredSkillSerializer)
             .kregister(TriggerSerializer)
             .kregister(SkillDisplaySerializer)
             .kregister(TeleportationSerializer)

@@ -59,7 +59,7 @@ interface ItemCellAccessor {
     /**
      * Gets all skills from all the cells.
      */
-    fun getSkills(neglectCurse: Boolean = false): Multimap<Trigger, Skill>
+    fun getSkills(neglectCurse: Boolean = false, neglectVariant: Boolean = false): Multimap<Trigger, Skill>
 
     /* Setters */
 

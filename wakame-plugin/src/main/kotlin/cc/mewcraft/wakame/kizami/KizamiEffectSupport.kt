@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.SkillWithTrigger
+import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -66,7 +66,7 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             when (namespace) {
                 Namespaces.SKILL -> {
                     val skillCore = BinarySkillCore(childNode)
-                    collection += KizamiSkill(SkillWithTrigger(skillCore))
+                    collection += KizamiSkill(ConfiguredSkill(skillCore))
                 }
 
                 Namespaces.ATTRIBUTE -> {
@@ -89,8 +89,8 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
  * A [skill][Skill] provided by a kizami.
  */
 data class KizamiSkill(
-    override val effect: SkillWithTrigger,
-) : KizamiEffect.Single<SkillWithTrigger> {
+    override val effect: ConfiguredSkill,
+) : KizamiEffect.Single<ConfiguredSkill> {
     override fun apply(kizami: Kizami, user: User<*>) {
         user.skillMap.addSkill(effect)
     }

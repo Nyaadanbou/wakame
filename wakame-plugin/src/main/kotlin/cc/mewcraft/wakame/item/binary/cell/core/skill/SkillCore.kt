@@ -15,6 +15,7 @@ sealed class BinarySkillCore : BinaryCore {
         get() = SkillRegistry.INSTANCE[key]
 
     abstract val trigger: Trigger
+    abstract val effectiveVariant: Int
 
     override fun provideDisplayLore(): LoreLine {
         val lineKey = SkillDisplaySupport.getLineKey(this) ?: return LoreLine.noop()

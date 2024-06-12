@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.SkillWithTrigger
+import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
@@ -15,10 +15,11 @@ import org.spongepowered.configurate.ConfigurationNode
  * @return a new instance of [SchemaSkillCore]
  */
 fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
-    val skillWithTrigger = node.krequire<SkillWithTrigger>()
-    val key = skillWithTrigger.key
-    val trigger = skillWithTrigger.trigger
-    val schemaSkillCore = SchemaSkillCoreImpl(key, trigger)
+    val configuredSkill = node.krequire<ConfiguredSkill>()
+    val key = configuredSkill.key
+    val trigger = configuredSkill.trigger
+    val effectiveVariant = configuredSkill.effectiveVariant
+    val schemaSkillCore = SchemaSkillCoreImpl(key, trigger, effectiveVariant)
     return schemaSkillCore
 }
 
@@ -28,6 +29,7 @@ fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
 interface SchemaSkillCore : SchemaCore {
     val instance: Skill
     val trigger: Trigger
+    val effectiveVariant: Int
     override fun reify(context: SchemaGenerationContext): BinarySkillCore
 }
 

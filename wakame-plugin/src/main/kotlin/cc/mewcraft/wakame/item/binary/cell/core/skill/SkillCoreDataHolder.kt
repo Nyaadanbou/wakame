@@ -15,10 +15,12 @@ import net.kyori.adventure.key.Key
 internal data class BinarySkillCoreDataHolder(
     override val key: Key,
     override val trigger: Trigger,
+    override val effectiveVariant: Int
 ) : BinarySkillCore() {
     override fun asTag(): ShadowTag = CompoundShadowTag {
         putIdentifier(key)
         putTrigger(trigger)
+        putEffectiveVariant(effectiveVariant)
     }
 }
 
@@ -28,4 +30,10 @@ private fun CompoundShadowTag.putIdentifier(id: Key) {
 
 private fun CompoundShadowTag.putTrigger(trigger: Trigger) {
     this.putString(SkillBinaryKeys.SKILL_TRIGGER, trigger.key.asString())
+}
+
+private fun CompoundShadowTag.putEffectiveVariant(variant: Int) {
+    if (variant < 0)
+        return
+    this.putInt(SkillBinaryKeys.EFFECTIVE_VARIANT, variant)
 }

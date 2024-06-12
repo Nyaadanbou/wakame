@@ -70,7 +70,7 @@ internal value class ItemCellAccessorImpl(
         return ret.build()
     }
 
-    override fun getSkills(neglectCurse: Boolean): Multimap<Trigger, Skill> {
+    override fun getSkills(neglectCurse: Boolean, neglectVariant: Boolean): Multimap<Trigger, Skill> {
         val ret = ImmutableListMultimap.builder<Trigger, Skill>()
         for (cell in snapshot.values) {
             if (!neglectCurse && !cell.curse.test(base)) {
@@ -81,6 +81,10 @@ internal value class ItemCellAccessorImpl(
             if (core is BinarySkillCore) {
                 val trigger = core.trigger
                 val skill = core.instance
+                val effectiveVariant = core.effectiveVariant
+                if (!neglectVariant && effectiveVariant >= 0 && base.variant != effectiveVariant) {
+                    continue
+                }
                 ret.put(trigger, skill)
             }
         }
