@@ -10,7 +10,11 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorNoop
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import kotlin.reflect.KClass
-import kotlin.reflect.full.*
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.full.superclasses
+import kotlin.reflect.full.valueParameters
 import kotlin.reflect.typeOf
 
 object ItemMetaRegistry : Initializable {
@@ -54,6 +58,14 @@ object ItemMetaRegistry : Initializable {
 
         fun reflectionLookup(key: String): BinaryItemMetaReflection {
             return requireNotNull(itemMetaReflectionLookupByString[key]) { "The class specific by '$key' is not registered" }
+        }
+
+        fun reflectionLookupOrNull(key: String): BinaryItemMetaReflection? {
+            return itemMetaReflectionLookupByString[key]
+        }
+
+        fun reflectionLookupOrNull(clazz: KClass<out BinaryItemMeta<*>>): BinaryItemMetaReflection? {
+            return itemMetaReflectionLookupByClass[clazz]
         }
     }
 

@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.util.getOrPut
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import kotlin.reflect.KClass
 
 @JvmInline
@@ -27,9 +29,12 @@ internal value class ItemMetaAccessorImpl(
 
             // loop through the keySet of the root compound tag,
             // then use the tag key to get corresponding accessor
-            root.keySet().forEach { key ->
-                val constructor = ItemMetaRegistry.Binary.reflectionLookup(key).constructor
-                val itemMeta = constructor(this)
+            for (key in root.keySet()) {
+                val itemMeta = ItemMetaRegistry.Binary.reflectionLookupOrNull(key)?.constructor?.invoke(this)
+                if (itemMeta == null) {
+                    ItemMetaAccessorSupport.LOGGER.warn("Unknown item meta key: `$key`. Skipped.")
+                    break
+                }
                 ret += itemMeta
             }
 
@@ -53,4 +58,8 @@ internal object ItemMetaAccessorNoop : ItemMetaAccessor {
     override val rootOrCreate: CompoundShadowTag get() = throw UnsupportedOperationException()
     override val snapshot: Set<BinaryItemMeta<*>> get() = throw UnsupportedOperationException()
     override fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M = throw UnsupportedOperationException()
+}
+
+private object ItemMetaAccessorSupport : KoinComponent {
+    val LOGGER: Logger by inject()
 }
