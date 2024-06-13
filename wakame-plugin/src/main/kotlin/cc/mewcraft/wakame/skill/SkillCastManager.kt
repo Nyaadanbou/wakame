@@ -18,17 +18,17 @@ internal class SkillCastManagerImpl : SkillCastManager {
             }
 
             else -> {
-                return SkillCastResult.SUCCESS // TODO 其他释放技能的情况
+                return FixedSkillCastResult.SUCCESS // TODO 其他释放技能的情况
             }
         }
         // 这里允许其他模块监听事件，修改上下文，从而对技能的释放产生影响
         event.callEvent()
-        if (event.isCancelled) return SkillCastResult.CANCELED
+        if (event.isCancelled) return FixedSkillCastResult.CANCELED
         val conditionGroup = skill.conditions
         val context = event.skillCastContext
         if (!conditionGroup.test(context)) {
             conditionGroup.notifyFailure(context)
-            return SkillCastResult.CONDITION_CANNOT_MEET
+            return FixedSkillCastResult.CONDITION_CANNOT_MEET
         }
 
         try {
@@ -36,10 +36,10 @@ internal class SkillCastManagerImpl : SkillCastManager {
             if (!result.isSuccessful())
                 return result
             conditionGroup.cost(context)
-            return SkillCastResult.SUCCESS
+            return FixedSkillCastResult.SUCCESS
         } catch (e: Throwable) {
             e.printStackTrace()
-            return SkillCastResult.UNKNOWN_FAILURE
+            return FixedSkillCastResult.UNKNOWN_FAILURE
         }
     }
 }

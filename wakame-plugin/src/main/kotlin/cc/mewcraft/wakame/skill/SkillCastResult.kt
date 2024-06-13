@@ -2,9 +2,13 @@ package cc.mewcraft.wakame.skill
 
 import net.kyori.adventure.translation.Translatable
 
-enum class SkillCastResult(
+interface SkillCastResult : Translatable {
+    fun isSuccessful(): Boolean
+}
+
+enum class FixedSkillCastResult(
     private val translateKey: String,
-) : Translatable {
+) : SkillCastResult {
     SUCCESS("skill.result.success"),
     NONE_CASTER("skill.result.none_caster"),
     NONE_TARGET("skill.result.none_target"),
@@ -15,7 +19,7 @@ enum class SkillCastResult(
 
     override fun translationKey(): String = translateKey
 
-    fun isSuccessful(): Boolean {
+    override fun isSuccessful(): Boolean {
         return this == SUCCESS
     }
 }

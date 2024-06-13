@@ -5,10 +5,7 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.EmptySkillDisplay
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillCastResult
-import cc.mewcraft.wakame.skill.SkillDisplay
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKeys
@@ -39,11 +36,11 @@ interface Dash : Skill {
         override val conditions: SkillConditionGroup by conditions
 
         override fun cast(context: SkillCastContext): SkillCastResult {
-            val player = context.optional(SkillCastContextKeys.CASTER_PLAYER)?.bukkitPlayer ?: return SkillCastResult.NONE_CASTER
+            val player = context.optional(SkillCastContextKeys.CASTER_PLAYER)?.bukkitPlayer ?: return FixedSkillCastResult.NONE_CASTER
             val direction = player.location.direction.normalize()
             val velocity = direction.multiply(distance)
             player.velocity = velocity
-            return SkillCastResult.SUCCESS
+            return FixedSkillCastResult.SUCCESS
         }
     }
 }

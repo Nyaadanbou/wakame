@@ -7,10 +7,7 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.EmptySkillDisplay
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillCastResult
-import cc.mewcraft.wakame.skill.SkillDisplay
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKeys
@@ -46,8 +43,8 @@ interface Teleport : Skill {
         override val type: Teleportation by type
 
         override fun cast(context: SkillCastContext): SkillCastResult {
-            val player = context.optional(SkillCastContextKeys.CASTER_PLAYER) ?: return SkillCastResult.NONE_CASTER
-            val location = context.optional(SkillCastContextKeys.TARGET_LOCATION)?.bukkitLocation ?: return SkillCastResult.NONE_TARGET
+            val player = context.optional(SkillCastContextKeys.CASTER_PLAYER) ?: return FixedSkillCastResult.NONE_CASTER
+            val location = context.optional(SkillCastContextKeys.TARGET_LOCATION)?.bukkitLocation ?: return FixedSkillCastResult.NONE_TARGET
             when (val type = type) {
                 is Teleportation.FIXED -> {
                     val position = type.position
@@ -62,7 +59,7 @@ interface Teleport : Skill {
                     player.bukkitPlayer.teleport(bukkitLocation)
                 }
             }
-            return SkillCastResult.SUCCESS
+            return FixedSkillCastResult.SUCCESS
         }
     }
 }

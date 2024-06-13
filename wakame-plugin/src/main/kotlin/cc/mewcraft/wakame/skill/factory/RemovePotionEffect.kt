@@ -4,10 +4,7 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.EmptySkillDisplay
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillCastResult
-import cc.mewcraft.wakame.skill.SkillDisplay
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKeys
@@ -40,11 +37,11 @@ interface RemovePotionEffect : Skill {
         override val effectType: List<PotionEffectType> by effectType
 
         override fun cast(context: SkillCastContext): SkillCastResult {
-            val entity = context.optional(SkillCastContextKeys.CASTER_ENTITY)?.bukkitEntity ?: return SkillCastResult.NONE_CASTER
+            val entity = context.optional(SkillCastContextKeys.CASTER_ENTITY)?.bukkitEntity ?: return FixedSkillCastResult.NONE_CASTER
             if (entity is LivingEntity) {
                 effectType.forEach { entity.removePotionEffect(it) }
             }
-            return SkillCastResult.SUCCESS
+            return FixedSkillCastResult.SUCCESS
         }
     }
 }

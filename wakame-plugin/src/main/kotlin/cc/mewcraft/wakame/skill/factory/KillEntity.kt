@@ -4,10 +4,7 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.EmptySkillDisplay
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillCastResult
-import cc.mewcraft.wakame.skill.SkillDisplay
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.context.SkillCastContext
@@ -33,9 +30,9 @@ interface KillEntity : Skill {
         override val conditions: SkillConditionGroup by conditions
 
         override fun cast(context: SkillCastContext): SkillCastResult {
-            val entity = context.optional(SkillCastContextKeys.TARGET_LIVING_ENTITY)?.bukkitEntity ?: return SkillCastResult.NONE_TARGET
+            val entity = context.optional(SkillCastContextKeys.TARGET_LIVING_ENTITY)?.bukkitEntity ?: return FixedSkillCastResult.NONE_TARGET
             entity.health = 0.0
-            return SkillCastResult.SUCCESS
+            return FixedSkillCastResult.SUCCESS
         }
     }
 }

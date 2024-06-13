@@ -39,5 +39,5 @@ interface Skill : Keyed {
      */
     val displays: SkillDisplay
 
-    fun cast(context: SkillCastContext): SkillCastResult = SkillCastResult.NOOP
+    fun cast(context: SkillCastContext): SkillCastResult = FixedSkillCastResult.NOOP
 }
