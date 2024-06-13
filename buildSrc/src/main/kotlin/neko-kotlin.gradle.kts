@@ -52,7 +52,7 @@ kotlin {
                 // Basic runtime are shipped with: https://github.com/GamerCoder215/KotlinMC
                 compileOnly(kotlin("stdlib"))
                 compileOnly(kotlin("reflect"))
-                compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.KotlinxCoroutines}")
+                compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.KOTLINX_COROUTINES}")
             }
         }
         val test by getting {
@@ -60,7 +60,7 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation(kotlin("stdlib"))
                 implementation(kotlin("reflect"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.KotlinxCoroutines}")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.KOTLINX_COROUTINES}")
             }
         }
     }
