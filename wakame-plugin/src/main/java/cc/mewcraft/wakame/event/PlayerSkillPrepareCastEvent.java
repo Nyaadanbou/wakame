@@ -21,9 +21,9 @@ public class PlayerSkillPrepareCastEvent extends SkillPrepareCastEvent {
 
     public PlayerSkillPrepareCastEvent(Skill skill, SkillCastContext playerSkillCastContext) {
         super(skill, playerSkillCastContext);
-        this.caster = playerSkillCastContext.get(SkillCastContextKeys.INSTANCE.getCASTER_PLAYER());
-        this.target = playerSkillCastContext.get(SkillCastContextKeys.INSTANCE.getTARGET());
-        this.item = playerSkillCastContext.get(SkillCastContextKeys.INSTANCE.getITEM_STACK());
+        this.caster = playerSkillCastContext.get(SkillCastContextKeys.CASTER_PLAYER);
+        this.target = playerSkillCastContext.get(SkillCastContextKeys.TARGET);
+        this.item = playerSkillCastContext.get(SkillCastContextKeys.ITEM_STACK);
     }
 
     @NotNull

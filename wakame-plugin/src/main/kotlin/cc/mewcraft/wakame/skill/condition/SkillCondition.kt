@@ -12,7 +12,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
  *
  * 在配置文件里代表列表中的一个条件。
  */
-interface SkillCondition : Condition<SkillCastContext> {
+interface SkillCondition : Condition<SkillCastContext>, Comparable<SkillCondition> {
     val id: String
     val priority: Priority
 
@@ -25,11 +25,18 @@ interface SkillCondition : Condition<SkillCastContext> {
     fun notifyFailure(context: SkillCastContext)
 
     enum class Priority {
-        HIGHEST,
-        HIGH,
-        NORMAL,
+        LOWEST,
         LOW,
-        LOWEST
+        NORMAL,
+        HIGH,
+        HIGHEST;
+    }
+
+    override fun compareTo(other: SkillCondition): Int {
+        if (priority == other.priority) {
+            return id.compareTo(other.id)
+        }
+        return priority.compareTo(other.priority)
     }
 }
 

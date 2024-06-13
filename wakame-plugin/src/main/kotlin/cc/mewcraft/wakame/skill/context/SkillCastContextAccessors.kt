@@ -1,3 +1,5 @@
+@file:JvmName("SkillCastContextAccessors")
+
 package cc.mewcraft.wakame.skill.context
 
 import cc.mewcraft.wakame.skill.Caster

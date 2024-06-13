@@ -1,10 +1,8 @@
-import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SortedSkillConditionGroup
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import cc.mewcraft.wakame.skill.context.SkillCastContext
+import io.mockk.*
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -82,11 +80,13 @@ class SkillConditionResultTest : KoinTest {
         val mockCondition3 = mockk<SkillCondition>(relaxed = true)
 
         every { mockCondition1.test(mockContext) } returns false
-        every { mockCondition1.priority } returns SkillCondition.Priority.LOWEST
+        every { mockCondition1.compareTo(any()) } returns -1 // Lower priority
+
         every { mockCondition2.test(mockContext) } returns false
-        every { mockCondition2.priority } returns SkillCondition.Priority.HIGH
+        every { mockCondition2.compareTo(any()) } returns 1 // Higher priority
+
         every { mockCondition3.test(mockContext) } returns true
-        every { mockCondition3.priority } returns SkillCondition.Priority.HIGHEST
+        every { mockCondition3.compareTo(any()) } returns 1 // Higher priority
 
         val skillConditions = SortedSkillConditionGroup(
             listOf(mockCondition1, mockCondition2, mockCondition3)
@@ -98,9 +98,11 @@ class SkillConditionResultTest : KoinTest {
         verify(exactly = 1) { mockCondition1.test(mockContext) }
         verify(exactly = 0) { mockCondition1.cost(mockContext) }
         verify(exactly = 0) { mockCondition1.notifyFailure(mockContext) }
+
         verify(exactly = 1) { mockCondition2.test(mockContext) }
         verify(exactly = 0) { mockCondition2.cost(mockContext) }
         verify(exactly = 1) { mockCondition2.notifyFailure(mockContext) }
+
         verify(exactly = 1) { mockCondition3.test(mockContext) }
         verify(exactly = 0) { mockCondition3.cost(mockContext) }
         verify(exactly = 0) { mockCondition3.notifyFailure(mockContext) }

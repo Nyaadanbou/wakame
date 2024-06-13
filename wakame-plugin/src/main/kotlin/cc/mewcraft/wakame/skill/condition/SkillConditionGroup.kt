@@ -10,8 +10,7 @@ import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
-import java.util.PriorityQueue
-import java.util.Queue
+import java.util.*
 
 /**
  * Represents a skill condition group, which contains conditions and costs.
@@ -38,13 +37,16 @@ data object EmptySkillConditionGroup : SkillConditionGroup {
     override fun notifyFailure(context: SkillCastContext, notifyCount: Int) = Unit
 }
 
-class SortedSkillConditionGroup(
+data class SortedSkillConditionGroup(
     private val conditions: List<SkillCondition>,
 ) : SkillConditionGroup {
     override val tagResolvers: Array<TagResolver> = conditions.map { it.tagResolver }.toTypedArray()
-    private val failureConditions: Queue<SkillCondition> = PriorityQueue(compareBy { it.priority })
+    private val failureConditions: TreeSet<SkillCondition> = TreeSet(reverseOrder())
 
     override fun test(context: SkillCastContext): Boolean {
+        if (failureConditions.isNotEmpty())
+            failureConditions.clear()
+
         for (condition in conditions) {
             if (!condition.test(context))
                 failureConditions.add(condition)
@@ -57,12 +59,12 @@ class SortedSkillConditionGroup(
         conditions.forEach { it.cost(context) }
     }
 
-    override tailrec fun notifyFailure(context: SkillCastContext, notifyCount: Int) {
-        if (notifyCount == 0 || failureConditions.isEmpty())
-            return
-        val condition = failureConditions.poll()
-        condition.notifyFailure(context)
-        notifyFailure(context, notifyCount - 1)
+    override fun notifyFailure(context: SkillCastContext, notifyCount: Int) {
+        var count = notifyCount
+        while (count-- > 0 && failureConditions.isNotEmpty()) {
+            val condition = failureConditions.pollFirst() ?: break
+            condition.notifyFailure(context)
+        }
     }
 }
 

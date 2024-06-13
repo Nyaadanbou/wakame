@@ -6,18 +6,25 @@ import org.bukkit.inventory.ItemStack
 import java.util.HashMap
 
 object SkillCastContextKeys {
+    @JvmField
     val CASTER: SkillCastContextKey<Caster> =
         SkillCastContextKey("caster", Caster::class.java)
+    @JvmField
     val CASTER_PLAYER: SkillCastContextKey<Caster.Player> =
         SkillCastContextKey("caster_player", Caster.Player::class.java)
+    @JvmField
     val CASTER_ENTITY: SkillCastContextKey<Caster.Entity> =
         SkillCastContextKey("caster_entity", Caster.Entity::class.java)
+    @JvmField
     val TARGET: SkillCastContextKey<Target> =
         SkillCastContextKey("target_living_entity", Target::class.java)
+    @JvmField
     val TARGET_LIVING_ENTITY: SkillCastContextKey<Target.LivingEntity> =
         SkillCastContextKey("target_living_entity", Target.LivingEntity::class.java)
+    @JvmField
     val TARGET_LOCATION: SkillCastContextKey<Target.Location> =
         SkillCastContextKey("target_location", Target.Location::class.java)
+    @JvmField
     val ITEM_STACK: SkillCastContextKey<ItemStack> =
         SkillCastContextKey("item_stack", ItemStack::class.java)
 }
