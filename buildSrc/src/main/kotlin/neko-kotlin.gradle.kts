@@ -13,6 +13,7 @@ tasks {
     compileKotlin {
         compilerOptions {
             suppressWarnings.set(true) // we rely on IDE analysis
+            freeCompilerArgs.add("-Xjvm-default=all")
         }
     }
     assemble {
