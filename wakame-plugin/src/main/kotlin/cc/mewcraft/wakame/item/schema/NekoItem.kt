@@ -66,7 +66,7 @@ interface NekoItem : Keyed, ItemBehaviorAccessor {
     /**
      * The shown-in-tooltip applicator.
      */
-    val shownInTooltipApplicator: ShownInTooltipApplicator
+    val shownInTooltip: ShownInTooltipApplicator
 
     /**
      * The inventory slot where this item can take effect.

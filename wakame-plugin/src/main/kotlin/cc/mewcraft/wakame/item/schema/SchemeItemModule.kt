@@ -43,7 +43,7 @@ const val META_SERIALIZERS = "meta_serializers"
 
 internal fun schemaItemModule(): Module = module {
 
-    singleOf<NekoItemRealizer>(::NekoItemRealizerImpl)
+    singleOf<NekoItemRealizer>(::BukkitNekoItemRealizer)
 
     single<TypeSerializerCollection>(named(BASE_SERIALIZERS)) {
         TypeSerializerCollection.builder()

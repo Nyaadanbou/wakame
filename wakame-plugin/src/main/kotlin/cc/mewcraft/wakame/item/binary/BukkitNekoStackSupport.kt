@@ -2,175 +2,97 @@ package cc.mewcraft.wakame.item.binary
 
 import cc.mewcraft.wakame.item.BaseBinaryKeys
 import cc.mewcraft.wakame.item.binary.show.CustomDataAccessor
+import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.backingCustomModelData
 import cc.mewcraft.wakame.util.backingCustomName
 import cc.mewcraft.wakame.util.backingLore
-import cc.mewcraft.wakame.util.isNmsObjectBacked
+import cc.mewcraft.wakame.util.isNms
 import cc.mewcraft.wakame.util.nekoCompound
 import cc.mewcraft.wakame.util.nekoCompoundOrNull
 import cc.mewcraft.wakame.util.removeNekoCompound
-import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 
-/**
- * This type alias is used to verify whether a PlayNekoStack should be considered
- * "effective" for the player. By "effective", we mean for example:
- * - whether the item is in an effective slot, or
- * - whether the item has certain behavior enabled
- * - etc.
- */
 typealias PlayNekoStackPredicate = PlayNekoStack.() -> Boolean
-
-/**
- * The same as [PlayNekoStackPredicate] but for [ShowNekoStack].
- */
 typealias ShowNekoStackPredicate = ShowNekoStack.() -> Boolean
 
-/**
- * Wraps the [ItemStack] as a [PlayNekoStack].
- */
-val ItemStack.playNekoStackOrNull: PlayNekoStack?
-    get() = PlayNekoStackFactory.maybe(this)
+val ItemStack.isNeko: Boolean
+    get() = ItemRegistry.INSTANCES.find(NekoStackImplementation.getKey(nekoCompoundOrNull)) != null
 
-/**
- * Wraps the [ItemStack] as a [PlayNekoStack].
- *
- * @throws IllegalArgumentException
- */
-val ItemStack.playNekoStack: PlayNekoStack
-    get() = PlayNekoStackFactory.require(this)
-
-/**
- * Wraps the [ItemStack] as a [ShowNekoStack].
- */
-val ItemStack.showNekoStackOrNull: ShowNekoStack?
-    get() = ShowNekoStackFactory.maybe(this)
-
-/**
- * Wraps the [ItemStack] as a [ShowNekoStack].
- *
- * @throws IllegalArgumentException
- */
-val ItemStack.showNekoStack: ShowNekoStack
-    get() = ShowNekoStackFactory.require(this)
-
-/**
- * The factory of [PlayNekoStack].
- */
-object PlayNekoStackFactory {
-    /**
-     * Wraps the [itemStack] as a [PlayNekoStack] object. Then, you can use
-     * it to directly read/modify the wrapped [itemStack] in the world state.
-     *
-     * This function requires the [itemStack] to fulfill all the requirements:
-     * 1. The [itemStack] is backed by an NMS object
-     * 2. The [itemStack] is a NekoItem realization
-     * 3. The [itemStack] is a legal PlayNekoStack
-     *
-     * If any of the requirements are not fulfilled, this function will return `null`.
-     *
-     * @throws IllegalArgumentException if the [itemStack] instance is not
-     *     backed by an NMS object
-     */
-    fun maybe(itemStack: ItemStack): PlayNekoStack? {
-        if (!itemStack.hasItemMeta()) return null // Optimization - fast return
-        require(itemStack.isNmsObjectBacked) { "The ItemStack is not backed by an NMS object" }
-        val playNekoStack = PlayNekoStackImpl(itemStack).takeIf { it.isNeko && it.isPlay }
-        return playNekoStack
+val ItemStack.tryNekoStack: PlayNekoStack?
+    get() {
+        if (!this.hasItemMeta()) return null
+        if (!this.isNms) return null
+        if (!this.isNeko) return null
+        if (!BukkitNekoStackImplementation.isPlay(this.nekoCompound)) return null
+        return PlayNekoStackImpl(this)
     }
 
-    /**
-     * Wraps the [itemStack] as a [PlayNekoStack] object. Then, you can use
-     * it to directly read/modify the wrapped [itemStack] in the world state.
-     *
-     * This function requires the [itemStack] to fulfill all the requirements:
-     * 1. The [itemStack] is backed by an NMS object
-     * 2. The [itemStack] is a NekoItem realization
-     * 3. The [itemStack] is a legal PlayNekoStack
-     *
-     * If any of the requirements are not fulfilled, this function will throw [IllegalArgumentException].
-     *
-     * @throws IllegalArgumentException if the [itemStack] does not fulfill
-     * the requirements
-     */
-    fun require(itemStack: ItemStack): PlayNekoStack {
-        require(itemStack.hasItemMeta()) { "The ItemStack has no ItemMeta" } // Optimization - fast fail
-        require(itemStack.isNmsObjectBacked) { "The ItemStack is not backed by an NMS object" }
-        val playNekoStack = PlayNekoStackImpl(itemStack)
-        require(playNekoStack.isNeko) { "The ItemStack is not a legal NekoItem" }
-        require(playNekoStack.isPlay) { "The ItemStack is not a legal PlayNekoStack" }
-        return playNekoStack
+val ItemStack.toNekoStack: PlayNekoStack
+    get() {
+        require(this.hasItemMeta()) { "The ItemStack has no ItemMeta" }
+        require(this.isNms) { "The ItemStack is not an NMS object" }
+        require(this.isNeko) { "The itemStack is not from Wakame" }
+        require(BukkitNekoStackImplementation.isPlay(this.nekoCompound)) { "The ItemStack is not a play NekoStack" }
+        return PlayNekoStackImpl(this)
     }
 
-    /**
-     * This function is meant to be used to create a new [PlayNekoStack]
-     * which will ultimately be added to the world state (such as adding
-     * it to a player's inventory and dropping it on the ground).
-     *
-     * ## Caution
-     *
-     * It is the caller's responsibility to modify the returned [PlayNekoStack]
-     * before it's added to the world state so that it becomes a legal realization
-     * of NekoItem. Otherwise, undefined behaviors can occur.
-     */
-    fun new(material: Material): PlayNekoStack {
-        return PlayNekoStackImpl(material)
+val ItemStack.tryShowNekoStack: ShowNekoStack?
+    get() {
+        if (!this.hasItemMeta()) return null
+        if (!this.isNeko) return null
+        return ShowNekoStackImpl(this.clone())
+    }
+
+val ItemStack.toShowNekoStack: ShowNekoStack
+    get() {
+        require(this.hasItemMeta()) { "The ItemStack has no ItemMeta" }
+        require(this.isNeko) { "The itemStack is not from Wakame" }
+        return ShowNekoStackImpl(this.clone())
+    }
+
+/**
+ * This function is meant to be used to create a new [PlayNekoStack]
+ * **from scratch** which will ultimately be added to the world state,
+ * such as adding it to a player's inventory.
+ *
+ * ## Caution
+ *
+ * It is the caller's responsibility to modify the returned [PlayNekoStack]
+ * before it's added to the world state so that it becomes a legal NekoItem.
+ * Otherwise, undefined behaviors can occur.
+ */
+fun Material.createNekoStack(): PlayNekoStack {
+    return PlayNekoStackImpl(this)
+}
+
+internal object BukkitNekoStackImplementation {
+    fun isPlay(nekoCompound: CompoundShadowTag): Boolean {
+        return !isShow(nekoCompound) // an NS is either PNS or SNS
+    }
+
+    fun isShow(nekoCompound: CompoundShadowTag): Boolean {
+        return nekoCompound.contains(BaseBinaryKeys.SHOW)
     }
 }
 
-/**
- * The factory of [PlayNekoStack].
- */
-object ShowNekoStackFactory {
-    /**
-     * Wraps the [itemStack] as a [ShowNekoStack] object.
-     *
-     * Returns `null` if the [itemStack] is not already of legal [ShowNekoStack].
-     *
-     * **The given [itemStack] will leave intact.**
-     */
-    fun maybe(itemStack: ItemStack): ShowNekoStack? {
-        val showNekoStack = ShowNekoStackImpl(itemStack.clone()).takeIf { it.isNeko && it.isShow }
-        return showNekoStack
-    }
-
-    /**
-     * Wraps the [itemStack] as a [ShowNekoStack] object.
-     *
-     * Throws an exception if the [itemStack] is not already of legal [ShowNekoStack].
-     *
-     * **The given [itemStack] will leave intact.**
-     *
-     * @throws IllegalArgumentException
-     */
-    fun require(itemStack: ItemStack): ShowNekoStack {
-        val showNekoStack = ShowNekoStackImpl(itemStack.clone())
-        require(showNekoStack.isNeko) { "The ItemStack is not a legal NekoItem" }
-        require(showNekoStack.isShow) { "The ItemStack is not a legal ShowNekoStack" }
-        return showNekoStack
-    }
+// Injected dependencies
+private object BukkitNekoStackDependencies : KoinComponent {
+    val LOGGER: Logger by inject()
 }
 
+// Common code shared by BukkitNekoStack implementations
 private interface BukkitNekoStackBase : NekoStackBase, BukkitNekoStack {
-    override val isNmsBacked: Boolean
-        get() = itemStack.isNmsObjectBacked
-
-    override val isNeko: Boolean
-        get() = itemStack.nekoCompoundOrNull != null
-
-    override val isPlay: Boolean
-        get() = !isShow // an NS is either PNS or SNS
-
-    override val isShow: Boolean
-        get() = tags.contains(BaseBinaryKeys.SHOW, ShadowTagType.BYTE)
-
     override fun erase() {
         itemStack.removeNekoCompound()
     }
 }
 
+// PlayNekoStack impl
 private class PlayNekoStackImpl(
     override val itemStack: ItemStack,
 ) : BukkitNekoStackBase, PlayNekoStack {
@@ -180,7 +102,7 @@ private class PlayNekoStackImpl(
 
     override val tags: CompoundShadowTag
         get() {
-            if (!isNmsBacked) {
+            if (!itemStack.isNms) {
                 // If this is a strictly-Bukkit ItemStack,
                 // the `wakame` compound should always be available (if not, create it)
                 // as we need to create a NekoItem realization from an empty ItemStack.
@@ -200,9 +122,9 @@ private class PlayNekoStackImpl(
     override val show: ShowNekoStack
         get() {
             // Always make a copy
-            val stackCopy = this.itemStack.clone()
-            val showStack = ShowNekoStackImpl(stackCopy)
-            showStack.tags.writeSNSMark()
+            val copy: ItemStack = this.itemStack.clone()
+            val showStack = ShowNekoStackImpl(copy)
+            ShowNekoStackImplementation.writeSNSMark(showStack.tags)
             return showStack
         }
 
@@ -210,6 +132,7 @@ private class PlayNekoStackImpl(
         get() = this
 }
 
+// ShowNekoStack impl
 private class ShowNekoStackImpl(
     override val itemStack: ItemStack,
 ) : BukkitNekoStackBase, ShowNekoStack {
@@ -229,30 +152,32 @@ private class ShowNekoStackImpl(
     override val play: PlayNekoStack
         get() {
             // Always make a copy
-            val stackCopy = this.itemStack.clone()
+            val copy: ItemStack = this.itemStack.clone()
 
             // Remove custom name and lore as they are handled by the packet system
-            stackCopy.backingCustomName = null
-            stackCopy.backingLore = null
-            stackCopy.backingCustomModelData = null
+            copy.backingCustomName = null
+            copy.backingLore = null
+            copy.backingCustomModelData = null
 
             // Create a new PlayNekoStack wrapping the stack
-            val playStack = PlayNekoStackImpl(stackCopy)
+            val playStack = PlayNekoStackImpl(copy)
             // Side note:
             // The stack should already be a legal neko item.
             // We don't need to check the legality here.
 
             // Remove SNS mark
-            playStack.tags.removeSNSMark()
+            ShowNekoStackImplementation.removeSNSMark(playStack.tags)
 
             return playStack
         }
 }
 
-private fun CompoundShadowTag.writeSNSMark() {
-    putByte(BaseBinaryKeys.SHOW, 0) // 写入 SNS mark，告知发包系统不要修改此物品
-}
+private object ShowNekoStackImplementation {
+    fun writeSNSMark(compoundTag: CompoundShadowTag) {
+        compoundTag.putByte(BaseBinaryKeys.SHOW, 0) // 写入 SNS mark，告知发包系统不要修改此物品
+    }
 
-private fun CompoundShadowTag.removeSNSMark() {
-    remove(BaseBinaryKeys.SHOW) // 移除 SNS mark
+    fun removeSNSMark(compoundTag: CompoundShadowTag) {
+        compoundTag.remove(BaseBinaryKeys.SHOW) // 移除 SNS mark
+    }
 }

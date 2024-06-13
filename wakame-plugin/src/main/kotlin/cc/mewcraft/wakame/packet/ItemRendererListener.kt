@@ -21,7 +21,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import kotlin.jvm.optionals.getOrNull
 
-internal class PacketNekoStackRenderListener : PacketListenerAbstract() {
+internal class ItemRendererListener : PacketListenerAbstract() {
 
     override fun onPacketSend(event: PacketSendEvent) {
         val user = event.user
@@ -44,7 +44,7 @@ private object PacketSupport : KoinComponent {
 
     fun handleSetSlot(user: User, packet: WrapperPlayServerSetSlot): PacketWrapper<*>? {
         val item = packet.item.takeUnlessEmpty() ?: return null
-        val nekoStack = item.packetNekoStackOrNull ?: return null
+        val nekoStack = item.tryPacketNekoStack ?: return null
         updateItem(nekoStack, user)
         return WrapperPlayServerSetSlot(
             packet.windowId,
@@ -57,7 +57,7 @@ private object PacketSupport : KoinComponent {
     fun handleWindowItems(user: User, packet: WrapperPlayServerWindowItems): PacketWrapper<*> {
         val items = packet.items
         val newItems = items.map mapItems@{ item ->
-            val nekoStack = item.takeUnlessEmpty()?.packetNekoStackOrNull ?: return@mapItems item
+            val nekoStack = item.takeUnlessEmpty()?.tryPacketNekoStack ?: return@mapItems item
             updateItem(nekoStack, user)
             nekoStack.itemStack
         }
@@ -74,7 +74,7 @@ private object PacketSupport : KoinComponent {
         val offers = packet.merchantOffers
         val newOffers = offers.map mapItems@{ offer ->
             val result = offer.outputItem.takeUnlessEmpty() ?: return@mapItems offer
-            val nekoStack = result.packetNekoStackOrNull ?: return@mapItems offer
+            val nekoStack = result.tryPacketNekoStack ?: return@mapItems offer
             updateItem(nekoStack, user)
             offer
         }
@@ -92,8 +92,7 @@ private object PacketSupport : KoinComponent {
     private fun updateItem(nekoStack: PacketNekoStack, user: User) {
         // TODO: 有需要可做创造模式兼容等
         val player = user.bukkitPlayer
-        if (player.gameMode == GameMode.CREATIVE)
-            return
+        if (player.gameMode == GameMode.CREATIVE) return
         renderer.render(nekoStack)
     }
 }

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
-import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
+import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.AttributeProvider
 import cc.mewcraft.wakame.user.toUser
@@ -77,8 +77,8 @@ class AttributeEventHandler : KoinComponent {
         newItem: ItemStack?,
         predicate: PlayNekoStackPredicate,
     ) {
-        oldItem?.playNekoStackOrNull?.removeAttributeModifiers(player, predicate)
-        newItem?.playNekoStackOrNull?.addAttributeModifiers(player, predicate)
+        oldItem?.tryNekoStack?.removeAttributeModifiers(player, predicate)
+        newItem?.tryNekoStack?.addAttributeModifiers(player, predicate)
     }
 
     /**

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.schema.behavior
 
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.entity.EntityKeyLookup
-import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
+import cc.mewcraft.wakame.item.binary.toNekoStack
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -32,7 +32,7 @@ interface Statistical : ItemBehavior {
             // TODO: 这个只是一个 POC，要判断一个生物是否被一个物品击杀需要考虑很多情况（比如法杖的间接伤害统计）
             if (attacked !is LivingEntity) return
             val key = lookup.get(attacked)
-            val nekoStack = PlayNekoStackFactory.require(itemStack)
+            val nekoStack = itemStack.toNekoStack
 
             val statistics = nekoStack.statistics
             val finalDamage = event.finalDamage

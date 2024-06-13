@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
-import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
+import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.item.getBehaviorOrNull
 import cc.mewcraft.wakame.item.schema.behavior.Damageable
 import cc.mewcraft.wakame.item.schema.behavior.decreaseDurabilityNaturally
@@ -43,7 +43,7 @@ interface DurabilityCondition : SkillCondition {
         override val tagResolver: TagResolver = Placeholder.component(this.id, Component.text(this.requireDurability))
 
         override fun test(context: SkillCastContext): Boolean {
-            val nekoStack = context.optional(SkillCastContextKeys.ITEM_STACK)?.playNekoStackOrNull
+            val nekoStack = context.optional(SkillCastContextKeys.ITEM_STACK)?.tryNekoStack
             val damageable = nekoStack?.getBehaviorOrNull<Damageable>()
             if (damageable == null) {
                 // TODO 原版物品耐久检测
@@ -58,7 +58,7 @@ interface DurabilityCondition : SkillCondition {
         }
 
         override fun cost(context: SkillCastContext) {
-            val nekoStack = context.optional(SkillCastContextKeys.ITEM_STACK)?.playNekoStackOrNull
+            val nekoStack = context.optional(SkillCastContextKeys.ITEM_STACK)?.tryNekoStack
             val damageable = nekoStack?.getBehaviorOrNull<Damageable>()
             if (damageable == null) {
                 // TODO 原版物品失去耐久

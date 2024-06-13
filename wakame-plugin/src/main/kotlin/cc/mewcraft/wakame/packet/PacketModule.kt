@@ -20,5 +20,5 @@ internal fun packetModule() = module {
 
     singleOf(::FOVPacketHandler) bind PacketListenerCommon::class
     singleOf(::GlowingItemPacketHandler) bind PacketListenerCommon::class
-    singleOf(::PacketNekoStackRenderListener) bind PacketListenerCommon::class
+    singleOf(::ItemRendererListener) bind PacketListenerCommon::class
 }

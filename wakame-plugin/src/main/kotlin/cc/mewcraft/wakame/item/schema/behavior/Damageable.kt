@@ -6,9 +6,9 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
+import cc.mewcraft.wakame.item.binary.toNekoStack
 import cc.mewcraft.wakame.item.getBehaviorOrNull
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
@@ -58,12 +58,12 @@ interface Damageable : ItemBehavior {
 
         override fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
             // TODO: Test
-            val nekoStack = PlayNekoStackFactory.require(itemStack)
+            val nekoStack = itemStack.toNekoStack
             nekoStack.decreaseDurabilityNaturally(100)
         }
 
-        //对于原版掉耐久事件的处理，应该写在对应的Item Behavior中
-        //例如希望某物品行为不会因为原版的操作掉耐久，则应在其handleDamage中取消原版掉耐久事件
+        // 对于原版掉耐久事件的处理，应该写在对应的Item Behavior中
+        // 例如希望某物品行为不会因为原版的操作掉耐久，则应在其handleDamage中取消原版掉耐久事件
 //        override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
 //            val damage = event.damage
 //            val nekoStack = PlayNekoStackFactory.require(itemStack)

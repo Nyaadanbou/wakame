@@ -3,8 +3,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.attribute.AttributeEventHandler
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
-import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
-import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
+import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
@@ -66,7 +65,7 @@ class MultipleItemListener : KoinComponent, Listener {
         val player = event.player
         val slot = event.hand ?: return
         val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.playNekoStackOrNull ?: return
+        val nekoStack = item.tryNekoStack ?: return
         if (!nekoStack.slot.testEquipmentSlot(slot))
             return
 
@@ -95,7 +94,7 @@ class MultipleItemListener : KoinComponent, Listener {
     fun onJump(event: PlayerJumpEvent) {
         val player = event.player
         val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.playNekoStackOrNull ?: return
+        val nekoStack = item.tryNekoStack ?: return
 
         skillEventHandler.onJump(player, item)
     }
@@ -105,7 +104,7 @@ class MultipleItemListener : KoinComponent, Listener {
         val damager = event.damager as? Player ?: return
         val entity = event.entity as? LivingEntity ?: return
         val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.playNekoStackOrNull ?: return
+        val nekoStack = item.tryNekoStack ?: return
 
         skillEventHandler.onAttack(damager, entity, item)
     }
@@ -118,7 +117,7 @@ class SingleItemListener : Listener {
     @EventHandler
     fun onItemInteract(event: PlayerInteractEvent) {
         val item = event.item ?: return
-        val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
+        val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleInteract(event.player, item, event.action, event)
         }
@@ -129,7 +128,7 @@ class SingleItemListener : Listener {
         // TODO: 这是一个 POC，可能需要考虑背包内的所有 Neko 物品
         val damager = event.damager as? Player ?: return
         val item = damager.inventory.itemInMainHand
-        val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
+        val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleAttackEntity(damager, item, event.entity, event)
         }
@@ -139,7 +138,7 @@ class SingleItemListener : Listener {
     fun onItemBreakBlock(event: BlockBreakEvent) {
         val player = event.player
         val item = player.inventory.itemInMainHand.takeIf { !it.isEmpty } ?: return
-        val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
+        val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleBreakBlock(player, item, event)
         }
@@ -148,7 +147,7 @@ class SingleItemListener : Listener {
     @EventHandler
     fun onItemDamage(event: PlayerItemDamageEvent) {
         val item = event.item
-        val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
+        val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleDamage(event.player, item, event)
         }
@@ -157,7 +156,7 @@ class SingleItemListener : Listener {
     @EventHandler
     fun onItemBreak(event: PlayerItemBreakEvent) {
         val item = event.brokenItem
-        val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
+        val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleBreak(event.player, item, event)
         }
@@ -166,7 +165,7 @@ class SingleItemListener : Listener {
     @EventHandler
     fun onItemConsume(event: PlayerItemConsumeEvent) {
         val item = event.item
-        val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
+        val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleConsume(event.player, item, event)
         }
@@ -175,7 +174,7 @@ class SingleItemListener : Listener {
     @EventHandler
     fun onSkillPrepareCast(event: PlayerSkillPrepareCastEvent) {
         val item = event.item
-        val nekoStack = PlayNekoStackFactory.maybe(item) ?: return
+        val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleSkillPrepareCast(event.playerCaster, item, event.skill, event)
         }

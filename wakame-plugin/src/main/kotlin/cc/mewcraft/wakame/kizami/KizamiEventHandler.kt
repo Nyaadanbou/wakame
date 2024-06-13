@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BKizamiMeta
 import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
-import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
+import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.KizamiProvider
 import cc.mewcraft.wakame.registry.KizamiRegistry
@@ -66,8 +66,8 @@ class KizamiEventHandler {
         newItem: ItemStack?,
         predicate: PlayNekoStackPredicate,
     ) {
-        val oldNekoStack = oldItem?.playNekoStackOrNull
-        val newNekoStack = newItem?.playNekoStackOrNull
+        val oldNekoStack = oldItem?.tryNekoStack
+        val newNekoStack = newItem?.tryNekoStack
 
         // Optimization:
         // if old item and new item are both null,

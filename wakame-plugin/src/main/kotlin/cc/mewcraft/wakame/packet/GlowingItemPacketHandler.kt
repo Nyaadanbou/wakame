@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
+import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.util.NmsEntityUtils
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
@@ -32,7 +32,7 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
             PacketType.Play.Server.ENTITY_METADATA -> {
                 val origin = WrapperPlayServerEntityMetadata(event)
                 val entity = NmsEntityUtils.getEntity(origin.entityId) as? Item ?: return
-                val nekoStack = PlayNekoStackFactory.maybe(entity.itemStack) ?: return
+                val nekoStack = entity.itemStack.tryNekoStack ?: return
 
                 val metadataPacket = WrapperPlayServerEntityMetadata(
                     entity.entityId,

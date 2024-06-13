@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
-import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
+import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.Castable
 import cc.mewcraft.wakame.skill.context.SkillCastContextBuilder
@@ -147,8 +147,8 @@ class SkillEventHandler(
         newItem: ItemStack?,
         predicate: PlayNekoStackPredicate,
     ) {
-        oldItem?.playNekoStackOrNull?.removeSkills(player, predicate)
-        newItem?.playNekoStackOrNull?.addSkills(player, predicate)
+        oldItem?.tryNekoStack?.removeSkills(player, predicate)
+        newItem?.tryNekoStack?.addSkills(player, predicate)
     }
 
     /**

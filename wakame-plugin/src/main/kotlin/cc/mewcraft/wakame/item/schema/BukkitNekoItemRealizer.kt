@@ -2,10 +2,11 @@ package cc.mewcraft.wakame.item.schema
 
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.binary.NekoStack
+import cc.mewcraft.wakame.item.binary.NekoStackImplementation
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStackFactory
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.cell.isNoop
+import cc.mewcraft.wakame.item.binary.createNekoStack
 import cc.mewcraft.wakame.item.binary.meta.BCustomNameMeta
 import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
 import cc.mewcraft.wakame.item.binary.meta.BElementMeta
@@ -34,7 +35,7 @@ import org.bukkit.Registry
 import org.bukkit.inventory.ItemFlag
 import kotlin.reflect.KClass
 
-internal class NekoItemRealizerImpl : NekoItemRealizer {
+internal class BukkitNekoItemRealizer : NekoItemRealizer {
     override fun realize(item: NekoItem, context: SchemaGenerationContext): PlayNekoStack {
         return createItemStack0(item, context)
     }
@@ -56,41 +57,41 @@ internal class NekoItemRealizerImpl : NekoItemRealizer {
     /**
      * Creates a NekoStack with the [context].
      *
-     * @param item the item blueprint
+     * @param blueprint the item blueprint
      * @param context the input context
      * @return a new once-off NekoStack
      */
-    private fun createItemStack0(item: NekoItem, context: SchemaGenerationContext): PlayNekoStack {
+    private fun createItemStack0(blueprint: NekoItem, context: SchemaGenerationContext): PlayNekoStack {
         val nekoStack = run {
-            val key = item.material.asBukkit
-            val mat = requireNotNull(Registry.MATERIAL.get(key)) { "Can't find material by key '${item.material}'" }
-            PlayNekoStackFactory.new(mat)
+            val key = blueprint.material.asBukkit
+            val mat = requireNotNull(Registry.MATERIAL.get(key)) { "Can't find org.bukkit.Material by `${blueprint.material}`" }
+            mat.createNekoStack()
         }
 
-        //
-        // Write base data
-        //
-        nekoStack.key = item.key
+        /* Write basic data */
+
+        NekoStackImplementation.setKey(nekoStack.tags, blueprint.key)
         nekoStack.variant = 0
         nekoStack.itemStack.apply {
-            editMeta {
-                if (item.hideTooltip) {
-                    it.isHideTooltip = true
-                }
-                if (item.hideAdditionalTooltip) {
-                    it.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
-                }
+            val itemMeta = itemMeta
+
+            if (blueprint.hideTooltip) {
+                itemMeta.isHideTooltip = true
             }
-            item.shownInTooltipApplicator.applyToItem(this)
+
+            if (blueprint.hideAdditionalTooltip) {
+                itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+            }
+
+            blueprint.shownInTooltip.apply(itemMeta)
+
+            this.itemMeta = itemMeta
         }
 
-        //
-        // Write item meta
-        //
-        ItemMetaApplicator {
-            // Caution: the order of the generation matters here!!!
-            // Caution: 这里每个 statement 的执行顺序很重要，存在依赖关系!!!
+        /* Write item meta data */
 
+        ItemMetaApplicator {
+            // Caution: the order of the generation matters here!
             bind<SCustomNameMeta, BCustomNameMeta>()
             bind<SLoreMeta, BLoreMeta>()
             bind<SDurabilityMeta, BDurabilityMeta>()
@@ -100,13 +101,20 @@ internal class NekoItemRealizerImpl : NekoItemRealizer {
             bind<SKizamiMeta, BKizamiMeta>()
             bind<SSkinMeta, BSkinMeta>()
             bind<SSkinOwnerMeta, BSkinOwnerMeta>()
+        }.write(blueprint, nekoStack, context)
 
-        }.write(item, nekoStack, context)
+        /* Write item cell data */
 
-        //
-        // Write item cell
-        //
-        ItemCellApplicator.write(item, nekoStack, context)
+        blueprint.cellMap.forEach { (id, schemaCell) ->
+            // The order of cell population should be the same as
+            // that they are declared in the configuration file.
+
+            val binaryCell = BinaryCellFactory.reify(schemaCell, context)
+            if (!binaryCell.isNoop) {
+                // We only write the cell if it's not a noop.
+                nekoStack.cell.put(id, binaryCell)
+            }
+        }
 
         return nekoStack
     }
@@ -146,25 +154,25 @@ private class ItemMetaApplicator {
     }
 
     /**
-     * Writes all item meta specified by [bindings] to the item [stack].
+     * Writes all item meta specified by [bindings] to the item [nekoStack].
      *
-     * @param item the template item
-     * @param stack the world-state item
+     * @param blueprint the template item
+     * @param nekoStack the world-state item
      * @param context the generation context
      */
-    fun write(item: NekoItem, stack: NekoStack, context: SchemaGenerationContext) {
+    fun write(blueprint: NekoItem, nekoStack: NekoStack, context: SchemaGenerationContext) {
         bindings.forEach {
             val schemaItemMetaKClass = it.schemaItemMetaKClass
             val binaryItemMetaKClass = it.binaryItemMetaKClass
 
             // Get the schema item meta
-            val meta = item.getMeta(schemaItemMetaKClass)
+            val meta = blueprint.getMeta(schemaItemMetaKClass)
             // Generate a result from the schema item meta
             val value = meta.generate(context)
             // If something is generated, write the result to the item
             if (value is GenerationResult.Thing) {
                 // Get the accessor to the binary item meta
-                val accessor = stack.meta.getAccessor(binaryItemMetaKClass)
+                val accessor = nekoStack.meta.getAccessor(binaryItemMetaKClass)
                 // Write the result to the binary item meta
                 accessor.set(value.value)
             }
@@ -181,22 +189,4 @@ private class ItemMetaApplicator {
         val schemaItemMetaKClass: KClass<S>,
         val binaryItemMetaKClass: KClass<B>,
     )
-}
-
-/**
- * Responsible to write item cells to an item.
- */
-private object ItemCellApplicator {
-    fun write(item: NekoItem, stack: NekoStack, context: SchemaGenerationContext) {
-        item.cellMap.forEach { (id, schemaCell) ->
-            // The order of cell population should be the same as
-            // that they are declared in the configuration file.
-
-            val binaryCell = BinaryCellFactory.reify(schemaCell, context)
-            if (!binaryCell.isNoop) {
-                // We only write the cell if it's not a noop.
-                stack.cell.put(id, binaryCell)
-            }
-        }
-    }
 }

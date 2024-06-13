@@ -35,7 +35,7 @@ object NekoItemFactory {
         val material = root.node("material").krequire<Key>()
         val hideTooltip = root.node("hide_tooltip").getBoolean(false)
         val hideAdditionalTooltip = root.node("hide_additional_tooltip").getBoolean(false)
-        val shownInTooltipApplicator = root.node("shown_in_tooltip").krequire<ShownInTooltipApplicator>()
+        val shownInTooltip = root.node("shown_in_tooltip").krequire<ShownInTooltipApplicator>()
         val slot = root.node("slot").krequire<ItemSlot>()
 
         //
@@ -85,7 +85,7 @@ object NekoItemFactory {
             material = material,
             hideTooltip = hideTooltip,
             hideAdditionalTooltip = hideAdditionalTooltip,
-            shownInTooltipApplicator = shownInTooltipApplicator,
+            shownInTooltip = shownInTooltip,
             slot = slot,
             metaMap = schemaMeta,
             cellMap = schemaCell,

@@ -1,7 +1,12 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.item.schema.behavior.*
+import cc.mewcraft.wakame.item.schema.behavior.AttributeProvider
+import cc.mewcraft.wakame.item.schema.behavior.Castable
+import cc.mewcraft.wakame.item.schema.behavior.Damageable
+import cc.mewcraft.wakame.item.schema.behavior.ItemBehaviorHolder
+import cc.mewcraft.wakame.item.schema.behavior.KizamiProvider
+import cc.mewcraft.wakame.item.schema.behavior.Statistical
 
 object BehaviorRegistry : Initializable {
     val INSTANCES: Registry<String, ItemBehaviorHolder> = SimpleRegistry()
@@ -9,10 +14,10 @@ object BehaviorRegistry : Initializable {
     override fun onPreWorld() {
         // Register more behaviors here ...
 
-        INSTANCES += "attribute_provider" to AttributeProvider
-        INSTANCES += "castable" to Castable
-        INSTANCES += "damageable" to Damageable
-        INSTANCES += "kizami_provider" to KizamiProvider
-        INSTANCES += "statistical" to Statistical
+        INSTANCES.register("attribute_provider", AttributeProvider)
+        INSTANCES.register("castable", Castable)
+        INSTANCES.register("damageable", Damageable)
+        INSTANCES.register("kizami_provider", KizamiProvider)
+        INSTANCES.register("statistical", Statistical)
     }
 }

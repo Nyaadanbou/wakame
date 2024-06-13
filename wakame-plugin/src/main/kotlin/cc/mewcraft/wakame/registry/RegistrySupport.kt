@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableSet
 /**
  * An abstract key-value registry.
  */
-interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
+sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
     /**
      * All the [instances][V] in this registry.
      */
@@ -29,9 +29,7 @@ interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
      * @param uniqueId the name to be checked
      * @return `true` if the specific value is present in this registry
      */
-    fun has(uniqueId: K): Boolean {
-        return find(uniqueId) != null
-    }
+    fun has(uniqueId: K?): Boolean
 
     /**
      * Gets specified value in this registry.
@@ -40,9 +38,7 @@ interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
      * @return the specified value
      * @throws IllegalStateException if the specified value does not exist
      */
-    operator fun get(uniqueId: K): V {
-        return requireNotNull(find(uniqueId)) { "Can't find object for unique id: $uniqueId" }
-    }
+    operator fun get(uniqueId: K): V
 
     /**
      * Registers a new entry into this registry.
@@ -53,13 +49,6 @@ interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
     fun register(uniqueId: K, value: V)
 
     /**
-     * @see register
-     */
-    operator fun plusAssign(pair: Pair<K, V>) {
-        register(pair.first, pair.second)
-    }
-
-    /**
      * Clears all registered entries.
      */
     fun clear()
@@ -68,7 +57,7 @@ interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
 /**
  * Operations of mapping [K] to [B], and the reversed way.
  */
-interface BiRegistry<K, B> {
+sealed interface BiRegistry<K, B> {
     /**
      * Gets binary identifier by unique identifier.
      */
@@ -102,11 +91,9 @@ interface BiRegistry<K, B> {
 
 /**
  * Operations of directly mapping binary identifier to object.
- *
- * Side note: the name of this interface is bad, never mind.
  */
 @Suppress("PropertyName")
-interface BiKnot<K, V, B> {
+sealed interface BiKnot<K, V, B> {
     val INSTANCES: Registry<K, V>
     val BI_LOOKUP: BiRegistry<K, B>
 
@@ -141,6 +128,14 @@ internal class SimpleRegistry<K, V> : Registry<K, V> {
 
     override fun find(uniqueId: K?): V? {
         return if (uniqueId == null) null else uniqueId2ObjectMap[uniqueId]
+    }
+
+    override fun has(uniqueId: K?): Boolean {
+        return find(uniqueId) != null
+    }
+
+    override operator fun get(uniqueId: K): V { // TODO 无脑抛异常有点太一刀切了，考虑返回空然后逐个处理
+        return requireNotNull(find(uniqueId)) { "Can't find object by identifier `$uniqueId` in the registry" }
     }
 
     override fun register(uniqueId: K, value: V) {

@@ -8,9 +8,6 @@ import java.util.stream.Stream
 
 /**
  * 代表一个可以在物品提示框中显示/隐藏的物品信息。
- *
- * 目前支持的物品类型：
- * - [org.bukkit.inventory.ItemStack]
  */
 interface ShownInTooltip : Examinable {
     /**
@@ -23,12 +20,12 @@ interface ShownInTooltip : Examinable {
     /**
      * 让该物品信息在指定的物品上显示。
      */
-    fun show(item: Any)
+    fun show(any: Any)
 
     /**
      * 让该物品信息在指定的物品上隐藏。
      */
-    fun hide(item: Any)
+    fun hide(any: Any)
 
     // show/hide 函数不用泛型是因为没有太多必要
     // 运行时所使用的实现是由运行时的平台所决定的，而一个平台内只会有一个实现
@@ -44,13 +41,13 @@ interface ShownInTooltip : Examinable {
 /**
  * 代表多个 [ShownInTooltip] 的集合。
  *
- * 提供一个函数 [applyToItem]，可将全部设置应用于指定物品上。
+ * 提供一个函数 [apply]，可将全部设置应用于指定物品上。
  *
- * 目前支持的物品类型：
- * - [org.bukkit.inventory.ItemStack]
+ * 目前支持的类型：
+ * - [org.bukkit.inventory.meta.ItemMeta]
  */
 interface ShownInTooltipApplicator : Examinable {
-    fun applyToItem(item: Any)
+    fun apply(any: Any)
 }
 
 /**

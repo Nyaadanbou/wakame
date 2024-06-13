@@ -4,10 +4,20 @@ import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.suspendingHandler
-import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
+import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.pack.model.ModelRegistry
 import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.CompoundBinaryTag
+import cc.mewcraft.wakame.util.CompoundShadowTag
+import cc.mewcraft.wakame.util.ListShadowTag
+import cc.mewcraft.wakame.util.ThreadType
+import cc.mewcraft.wakame.util.copyWriteNbt
+import cc.mewcraft.wakame.util.getNbt
+import cc.mewcraft.wakame.util.getNbtOrNull
+import cc.mewcraft.wakame.util.nekoCompound
+import cc.mewcraft.wakame.util.nekoCompoundOrNull
+import cc.mewcraft.wakame.util.setNbt
+import cc.mewcraft.wakame.util.takeUnlessEmpty
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import me.lucko.helper.nbt.ShadowTagType
@@ -246,7 +256,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                         return@handler
                     }
 
-                    val nekoStack = itemInMainHand.playNekoStackOrNull
+                    val nekoStack = itemInMainHand.tryNekoStack
                     if (nekoStack == null) {
                         sender.sendPlainMessage("Item is not a legal wakame item")
                         return@handler

@@ -27,17 +27,12 @@ val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
         return wakameTag?.wrap
     }
 
-// Removes the wakame tag if there exists
-fun ItemStack.removeNekoCompound() {
-    this.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.removeTag(WAKAME_COMPOUND_NAME)
-}
-
 private fun ItemStack.getCustomData(): CompoundTag? {
     val customData = this.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()
     return customData?.toNms
 }
 
-//<editor-fold desc="NBT conversion">
+// Convert NMS compound to PacketEvents compound
 private val CompoundTag.toPacket: NBTCompound
     get() {
         val arrayOutputStream = FastByteArrayOutputStream()
@@ -47,6 +42,7 @@ private val CompoundTag.toPacket: NBTCompound
         return DefaultNBTSerializer.INSTANCE.deserializeTag(dataInputStream) as NBTCompound
     }
 
+// Convert PacketEvents compound to NMS compound
 private val NBTCompound.toNms: CompoundTag
     get() {
         val arrayOutputStream = FastByteArrayOutputStream()
@@ -55,4 +51,3 @@ private val NBTCompound.toNms: CompoundTag
         val dataInputStream: DataInput = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
         return NbtIo.read(dataInputStream)
     }
-//</editor-fold>

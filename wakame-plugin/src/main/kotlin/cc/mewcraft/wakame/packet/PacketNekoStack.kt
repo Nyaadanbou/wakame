@@ -1,42 +1,26 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.NekoStackBase
 import cc.mewcraft.wakame.util.WAKAME_COMPOUND_NAME
 import cc.mewcraft.wakame.util.packetevents.nekoCompoundOrNull
-import cc.mewcraft.wakame.util.packetevents.removeNekoCompound
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
+import kotlin.jvm.optionals.getOrNull
 
-/**
- * Wraps the [ItemStack] as a [PacketNekoStack].
- */
-val ItemStack.packetNekoStackOrNull: PacketNekoStack?
+val ItemStack.isNeko: Boolean
+    get() = this.components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(WAKAME_COMPOUND_NAME) != null
+
+val ItemStack.tryPacketNekoStack: PacketNekoStack?
     get() {
         if (!this.isNeko) return null
-        val packetNekoStack = PacketNekoStackImpl(this) // 发包系统只读取 NBT，因此不需要 copy
-        return packetNekoStack
+        return PacketNekoStack(this) // 发包系统只读取 NBT，因此不需要 copy
     }
 
-/**
- * Checks whether the [ItemStack] is neko.
- */
-val ItemStack.isNeko: Boolean
-    get() {
-        return this.components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(WAKAME_COMPOUND_NAME) != null
-    }
+class PacketNekoStack(
+    val itemStack: ItemStack,
+) : NekoStackBase {
 
-/**
- * A wrapper of a [Packet ItemStack][ItemStack].
- */
-interface PacketNekoStack : NekoStack {
-    val itemStack: ItemStack
-}
-
-private class PacketNekoStackImpl(
-    override val itemStack: ItemStack,
-) : NekoStackBase, PacketNekoStack {
     // We use property initializer here as it would be called multiple times,
     // and we don't want to do the unnecessary NBT conversion again and again
     override val tags: CompoundShadowTag = requireNotNull(itemStack.nekoCompoundOrNull) {
@@ -44,6 +28,6 @@ private class PacketNekoStackImpl(
     }
 
     override fun erase() {
-        itemStack.removeNekoCompound()
+        itemStack.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.removeTag(WAKAME_COMPOUND_NAME)
     }
 }
