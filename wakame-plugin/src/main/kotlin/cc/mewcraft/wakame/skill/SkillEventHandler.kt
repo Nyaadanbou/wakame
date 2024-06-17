@@ -2,13 +2,15 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
+import cc.mewcraft.wakame.item.binary.toNekoStack
 import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.Castable
-import cc.mewcraft.wakame.skill.context.SkillCastContextBuilder
+import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.Trigger.Single
 import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.hasCombo
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -18,7 +20,7 @@ import org.bukkit.inventory.ItemStack
  * Handles skill triggers for players.
  */
 class SkillEventHandler(
-    private val skillCastManager: SkillCastManager
+    private val skillCastManager: SkillCastManager,
 ) {
 
     /* Handles skill triggers for players. */
@@ -33,15 +35,30 @@ class SkillEventHandler(
 
     private fun onLeftClick(player: Player, itemStack: ItemStack, targetProvider: () -> Target) {
         val user = player.toUser()
+
         val skillMap = user.skillMap
-        val target = targetProvider.invoke()
-        skillMap.getSkill(Trigger.LeftClick).forEach { skill: Skill ->
-            skillCastManager.tryCast(skill, SkillCastContextBuilder.createPlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+        val skillState = user.skillState
+
+        val nekoStack = itemStack.toNekoStack
+        val target = targetProvider()
+
+        val skillsOnLeftClick = skillMap.getSkill(SingleTrigger.LEFT_CLICK)
+        val result = skillState.tryCast(skillsOnLeftClick, SingleTrigger.LEFT_CLICK)
+
+        // 释放所有单独 SingleTrigger.LEFT_CLICK 触发的技能
+        skillMap.getSkill(SingleTrigger.LEFT_CLICK).forEach { skill: Skill ->
+            skillCastManager.tryCast(skill, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
         }
-        if (!skillMap.getTriggers().hasCombo()) return
-        user.skillStateManager.addTrigger(Trigger.LeftClick) { skill ->
-            skillCastManager.tryCast(skill, SkillCastContextBuilder.createPlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
-                .isSuccessful()
+
+        // 施法前摇 -> 施法 -> 施法后摇
+        // 5t     -> 2t   -> 8t
+
+        // 接着检查玩家当前是否有 SequenceTrigger 触发的技能
+        if (!skillMap.getTriggers().any { it is Trigger.Combo })
+            return
+
+        user.skillState.addTrigger(SingleTrigger.LEFT_CLICK) { skill ->
+            skillCastManager.tryCast(skill, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack)).isSuccessful()
         }
     }
 
@@ -56,31 +73,35 @@ class SkillEventHandler(
     private fun onRightClick(player: Player, itemStack: ItemStack, targetProvider: () -> Target) {
         val user = player.toUser()
         val skillMap = user.skillMap
+        val nekoStack = itemStack.toNekoStack
         val target = targetProvider.invoke()
-        skillMap.getSkill(Trigger.RightClick).forEach { skill ->
-            skillCastManager.tryCast(skill, SkillCastContextBuilder.createPlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+        skillMap.getSkill(Single.RightClick).forEach { skill ->
+            skillCastManager.tryCast(skill, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
         }
-        if (!skillMap.getTriggers().hasCombo()) return
-        user.skillStateManager.addTrigger(Trigger.RightClick) { skill ->
-            skillCastManager.tryCast(skill, SkillCastContextBuilder.createPlayerSkillCastContext(CasterAdapter.adapt(player), target, itemStack))
+        if (!skillMap.getTriggers().any { it is Trigger.Combo })
+            return
+        user.skillState.addTrigger(Single.RightClick) { skill ->
+            skillCastManager.tryCast(skill, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
                 .isSuccessful()
         }
     }
 
     fun onJump(player: Player, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
-        skillMap.getSkill(Trigger.Jump).forEach { skill ->
-            skillCastManager.tryCast(skill, SkillCastContextBuilder
-                .createPlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), itemStack)
+        val nekoStack = itemStack.toNekoStack
+        skillMap.getSkill(Single.Jump).forEach { skill ->
+            skillCastManager.tryCast(
+                skill, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack)
             )
         }
     }
 
     fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack) {
         val skillMap = player.toUser().skillMap
-        skillMap.getSkill(Trigger.Attack).forEach { skill ->
-            skillCastManager.tryCast(skill, SkillCastContextBuilder
-                .createPlayerSkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), itemStack)
+        val nekoStack = itemStack.toNekoStack
+        skillMap.getSkill(Single.Attack).forEach { skill ->
+            skillCastManager.tryCast(
+                skill, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack)
             )
         }
     }
@@ -107,7 +128,7 @@ class SkillEventHandler(
             this.slot.testItemHeldEvent(player, previousSlot, newSlot) &&
                     this.hasBehavior<Castable>()
         }
-        player.toUser().skillStateManager.clear()
+        player.toUser().skillState.clear()
     }
 
     /**
@@ -127,10 +148,9 @@ class SkillEventHandler(
         newItem: ItemStack?,
     ) {
         updateSkills(player, oldItem, newItem) {
-            this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) &&
-                    this.hasBehavior<Castable>()
+            this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) && this.hasBehavior<Castable>()
         }
-        player.toUser().skillStateManager.clear()
+        player.toUser().skillState.clear()
     }
 
     /**

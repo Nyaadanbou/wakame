@@ -1,82 +1,48 @@
 package cc.mewcraft.wakame.skill.condition
 
-import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.condition.ConditionGroup
-import cc.mewcraft.wakame.config.NodeConfigProvider
-import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
-import java.util.*
 
 /**
- * Represents a skill condition group, which contains conditions and costs.
- * It will be initialized when creating [Skill].
+ * 代表一个技能条件组, 本质上是多个技能条件的集合.
  *
- * When triggering a skill, it will check if the conditions are met.
- * If so, the [Skill] will be executed, and all costs inside will be executed as well. Otherwise, it will not be executed.
+ * 外部可以将其当成一个整体, 看成是单个技能条件.
+ *
+ * 技能条件组的判断逻辑:
+ * - 判断为 `满足`: 条件组内的每个技能条件都满足.
+ * - 判断为 `不满足`: 条件组内存在一个技能条件不满足.
+ *
+ * 优先级高的条件会被优先执行和判断. 一旦有一个条件不满足,
+ * 那么在那之后, 优先级低的技能条件将被直接跳过而不会执行.
  */
-interface SkillConditionGroup : ConditionGroup<SkillCastContext> {
-    val tagResolvers: Array<TagResolver>
+interface SkillConditionGroup {
+    /**
+     * 技能条件组里所有的 [SkillCondition.resolver] 之和.
+     */
+    val resolver: TagResolver // TODO 单独弄个接口?
 
     /**
-     * Test if all conditions are met.
+     * 创建一个新的条件判断的会话.
      */
-    override fun test(context: SkillCastContext): Boolean
-    fun cost(context: SkillCastContext)
-    fun notifyFailure(context: SkillCastContext, notifyCount: Int = 1)
-}
+    fun newSession(context: SkillCastContext): SkillConditionSession
 
-data object EmptySkillConditionGroup : SkillConditionGroup {
-    override val tagResolvers: Array<TagResolver> = emptyArray()
-    override fun test(context: SkillCastContext): Boolean = true
-    override fun cost(context: SkillCastContext) = Unit
-    override fun notifyFailure(context: SkillCastContext, notifyCount: Int) = Unit
-}
-
-data class SortedSkillConditionGroup(
-    private val conditions: List<SkillCondition>,
-) : SkillConditionGroup {
-    override val tagResolvers: Array<TagResolver> = conditions.map { it.tagResolver }.toTypedArray()
-    private val failureConditions: TreeSet<SkillCondition> = TreeSet(reverseOrder())
-
-    override fun test(context: SkillCastContext): Boolean {
-        if (failureConditions.isNotEmpty())
-            failureConditions.clear()
-
-        for (condition in conditions) {
-            if (!condition.test(context))
-                failureConditions.add(condition)
-        }
-
-        return failureConditions.isEmpty()
-    }
-
-    override fun cost(context: SkillCastContext) {
-        conditions.forEach { it.cost(context) }
-    }
-
-    override fun notifyFailure(context: SkillCastContext, notifyCount: Int) {
-        var count = notifyCount
-        while (count-- > 0 && failureConditions.isNotEmpty()) {
-            val condition = failureConditions.pollFirst() ?: break
-            condition.notifyFailure(context)
-        }
+    companion object {
+        /**
+         * 返回一个空的技能条件组.
+         *
+         * 空的技能条件组不包含任何条件, 因此逻辑上技能永远可以释放.
+         */
+        fun empty(): SkillConditionGroup = EmptySkillConditionGroup
     }
 }
 
-internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionGroup> {
-    override fun deserialize(type: Type, node: ConfigurationNode): SkillConditionGroup {
-        val skillConditions = node.krequire<List<ConfigurationNode>>()
-            .map { listNode ->
-                val conditionType = listNode.node("type").krequire<String>()
-                val factory = SkillRegistry.CONDITIONS[conditionType]
-                factory.provide(NodeConfigProvider(listNode))
-            }
+//
+// Internals
+//
 
-        return SortedSkillConditionGroup(skillConditions)
+private data object EmptySkillConditionGroup : SkillConditionGroup {
+    override val resolver: TagResolver = TagResolver.empty()
+    override fun newSession(context: SkillCastContext): SkillConditionSession {
+        return SkillConditionSession.alwaysSuccess()
     }
 }

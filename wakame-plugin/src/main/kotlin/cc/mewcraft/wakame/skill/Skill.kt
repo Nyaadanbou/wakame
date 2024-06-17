@@ -19,7 +19,7 @@ interface Skill : Keyed {
      * The key of this skill.
      *
      * **Note that the [key] here is specified by the location of the skill
-     * configuration file, not the [SkillRegistry.SKILL_FACTORIES]'s key**,
+     * configuration file, not the [SkillRegistry.FACTORIES]'s key**,
      * which means that a [SkillFactory] can have multiple [Skill].
      *
      * [Skill] will be stored in the SkillRegistry, and the corresponding
@@ -39,5 +39,8 @@ interface Skill : Keyed {
      */
     val displays: SkillDisplay
 
+    /**
+     * 释放该技能.
+     */
     fun cast(context: SkillCastContext): SkillCastResult = FixedSkillCastResult.NOOP
 }

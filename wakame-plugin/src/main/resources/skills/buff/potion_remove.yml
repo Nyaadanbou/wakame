@@ -15,10 +15,8 @@ effect_types:
   - jump_boost
 
 conditions:
-  - id: "dura"
-    type: durability
-    require_durability: 10
-  - id: "chance"
-    type: molang
+  - type: durability
+    durability: 10
+  - type: molang
     eval: "math.random(0.0, 1.0) < 0.5"
     failure_message: "You failed to remove the potion effect."

@@ -21,7 +21,11 @@ typealias PlayNekoStackPredicate = PlayNekoStack.() -> Boolean
 typealias ShowNekoStackPredicate = ShowNekoStack.() -> Boolean
 
 val ItemStack.isNeko: Boolean
-    get() = ItemRegistry.INSTANCES.find(NekoStackImplementation.getKey(nekoCompoundOrNull)) != null
+    get() {
+        val compound = nekoCompoundOrNull ?: return false
+        val key = NekoStackImplementation.getKey(compound) ?: return false
+        return ItemRegistry.INSTANCES.find(key) != null
+    }
 
 val ItemStack.tryNekoStack: PlayNekoStack?
     get() {

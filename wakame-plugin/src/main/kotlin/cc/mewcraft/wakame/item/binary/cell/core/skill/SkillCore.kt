@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
@@ -12,17 +13,17 @@ import java.util.stream.Stream
 
 sealed class BinarySkillCore : BinaryCore {
     val instance: Skill
-        get() = SkillRegistry.INSTANCE[key]
+        get() = SkillRegistry.TYPES[key]
 
     abstract val trigger: Trigger
-    abstract val effectiveVariant: Int
+    abstract val effectiveVariant: ConfiguredSkill.Variant
 
     override fun provideDisplayLore(): LoreLine {
         val lineKey = SkillDisplaySupport.getLineKey(this) ?: return LoreLine.noop()
         val display = instance.displays
         val tooltips = display.tooltips
-        val tagResolvers = instance.conditions.tagResolvers
-        val lineText = tooltips.mapTo(ObjectArrayList(tooltips.size)) { SkillDisplaySupport.mini().deserialize(it, *tagResolvers) }
+        val tagResolvers = instance.conditions.resolver
+        val lineText = tooltips.mapTo(ObjectArrayList(tooltips.size)) { SkillDisplaySupport.mini().deserialize(it, tagResolvers) }
         return LoreLine.simple(lineKey, lineText)
     }
 

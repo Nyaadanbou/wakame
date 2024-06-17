@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.user.User
 import com.google.common.collect.Multimap
 import com.google.common.collect.MultimapBuilder
 import net.kyori.adventure.key.Key
-import java.util.*
+import java.util.UUID
 
 /**
  * Represents a skill map owned by a subject.
@@ -64,7 +64,7 @@ class PlayerSkillMap(
     }
 
     override fun getSkill(trigger: Trigger): Collection<Skill> {
-        return this.skills[trigger].map { SkillRegistry.INSTANCE[it] }
+        return this.skills[trigger].map { SkillRegistry.TYPES[it] }
     }
 
     override fun removeSkill(key: Key) {

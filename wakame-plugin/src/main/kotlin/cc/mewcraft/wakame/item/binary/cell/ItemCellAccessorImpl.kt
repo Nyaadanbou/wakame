@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.binary.NekoStackBase
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
@@ -82,7 +83,9 @@ internal value class ItemCellAccessorImpl(
                 val trigger = core.trigger
                 val skill = core.instance
                 val effectiveVariant = core.effectiveVariant
-                if (!neglectVariant && effectiveVariant >= 0 && base.variant != effectiveVariant) {
+                if (effectiveVariant == ConfiguredSkill.Variant.any())
+                    continue
+                if (!neglectVariant && base.variant != effectiveVariant.variant) {
                     continue
                 }
                 ret.put(trigger, skill)

@@ -13,7 +13,6 @@ import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.level.levelModule
 import cc.mewcraft.wakame.lookup.lookupModule
-import cc.mewcraft.wakame.molang.moLangModule
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.packet.packetModule
 import cc.mewcraft.wakame.random.randomModule
@@ -56,7 +55,6 @@ class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
                 kizamiModule(),
                 levelModule(),
                 lookupModule(),
-                moLangModule(),
                 packetModule(),
                 packModule(),
                 randomModule(),

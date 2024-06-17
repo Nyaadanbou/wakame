@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import net.kyori.adventure.key.Key
 
@@ -16,10 +17,10 @@ import net.kyori.adventure.key.Key
 internal data class SchemaSkillCoreImpl(
     override val key: Key, // the key will be used to get the Skill instance
     override val trigger: Trigger,
-    override val effectiveVariant: Int
+    override val effectiveVariant: ConfiguredSkill.Variant
 ) : SchemaSkillCore {
     override val instance: Skill
-        get() = SkillRegistry.INSTANCE[key]
+        get() = SkillRegistry.TYPES[key]
 
     override fun reify(context: SchemaGenerationContext): BinarySkillCore {
         // 根据设计，技能的数值分为两类：

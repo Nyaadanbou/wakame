@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.event.SkillPrepareCastEvent
 import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKeys
+import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 
 interface SkillCastManager {
     fun tryCast(skill: Skill, skillCastContext: SkillCastContext): SkillCastResult
@@ -13,7 +13,7 @@ internal class SkillCastManagerImpl : SkillCastManager {
     override fun tryCast(skill: Skill, skillCastContext: SkillCastContext): SkillCastResult {
         val event: SkillPrepareCastEvent
         when {
-            skillCastContext.has(SkillCastContextKeys.CASTER_PLAYER) -> {
+            skillCastContext.has(SkillCastContextKey.CASTER_PLAYER) -> {
                 event = PlayerSkillPrepareCastEvent(skill, skillCastContext)
             }
 
@@ -25,9 +25,10 @@ internal class SkillCastManagerImpl : SkillCastManager {
         event.callEvent()
         if (event.isCancelled) return FixedSkillCastResult.CANCELED
         val conditionGroup = skill.conditions
-        val context = event.skillCastContext
-        if (!conditionGroup.test(context)) {
-            conditionGroup.notifyFailure(context)
+        val context = event.context
+        val session = conditionGroup.newSession(context)
+        if (!session.isSuccess) {
+            session.onFailure(context)
             return FixedSkillCastResult.CONDITION_CANNOT_MEET
         }
 
@@ -35,7 +36,7 @@ internal class SkillCastManagerImpl : SkillCastManager {
             val result = skill.cast(context)
             if (!result.isSuccessful())
                 return result
-            conditionGroup.cost(context)
+            session.onSuccess(context)
             return FixedSkillCastResult.SUCCESS
         } catch (e: Throwable) {
             e.printStackTrace()

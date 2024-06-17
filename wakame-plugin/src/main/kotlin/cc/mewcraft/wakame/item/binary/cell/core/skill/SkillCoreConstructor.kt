@@ -25,6 +25,6 @@ fun BinarySkillCore(
     val configuredSkill = node.krequire<ConfiguredSkill>()
     val key = configuredSkill.key
     val trigger = configuredSkill.trigger
-    val effectiveVariant = configuredSkill.effectiveVariant
+    val effectiveVariant = configuredSkill.variant
     return BinarySkillCoreDataHolder(key, trigger, effectiveVariant)
 }

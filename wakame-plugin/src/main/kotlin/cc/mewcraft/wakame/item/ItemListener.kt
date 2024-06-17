@@ -24,9 +24,33 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 /**
- * 此监听器包含的事件需要同时处理两个物品。
+ * 此监听器仅处理 [PlayerItemHeldEvent] 和 [PlayerInventorySlotChangeEvent].
  *
- * 这里需要更详细的文档说明。
+ * ## 为什么需要单独列出来?
+ * 简单来说, 这是因为 ItemBehavior 架构的局限性.
+ * ItemBehavior 本质是“交互结果”的封装. 我们希望把交互结果封装成一个一个的类,
+ * 这样我们就不用把所有交互逻辑全部写在一个 [EventHandler] 里. 应该没有人希望
+ * 看到 [PlayerItemHeldEvent] 下有一个几百行的 [EventHandler] 吧.
+ *
+ * ItemBehavior 运行的流程是这样的:
+ *
+ * 1. 交互事件发生
+ * 2. 获取交互事件中的涉及的物品
+ * 3. 获取该物品的所有 ItemBehavior
+ * 4. 逐个执行获取到的 ItemBehavior
+ *
+ * 如果该交互事件只涉及到一个物品, 按照上面的流程就没什么问题.
+ * 但是当物品涉及到多个物品时, 上面的流程就存在局限性了.
+ *
+ *
+ *
+ * ## [PlayerItemHeldEvent]
+ *
+ *
+ *
+ * ## [PlayerInventorySlotChangeEvent]
+ *
+ * 这里需要更详细的文档说明.
  */
 class MultipleItemListener : KoinComponent, Listener {
     private val attributeEventHandler: AttributeEventHandler by inject()
@@ -51,69 +75,21 @@ class MultipleItemListener : KoinComponent, Listener {
         val player = event.player
         val rawSlot = event.rawSlot
         val slot = event.slot
-        val oldItem =
-            event.oldItemStack.takeUnlessEmpty() // it always returns a non-null ItemStack - it uses AIR to represent emptiness
+        val oldItem = event.oldItemStack.takeUnlessEmpty() // it always returns a non-null ItemStack - it uses AIR to represent emptiness
         val newItem = event.newItemStack.takeUnlessEmpty() // same as above
 
         attributeEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
         kizamiEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
         skillEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
     }
-
-    @EventHandler
-    fun onClick(event: PlayerInteractEvent) {
-        val player = event.player
-        val slot = event.hand ?: return
-        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.tryNekoStack ?: return
-        if (!nekoStack.slot.testEquipmentSlot(slot))
-            return
-
-        when (event.action) {
-            Action.LEFT_CLICK_BLOCK -> {
-                skillEventHandler.onLeftClickBlock(player, item, event.clickedBlock?.location!!)
-            }
-
-            Action.LEFT_CLICK_AIR -> {
-                skillEventHandler.onLeftClickAir(player, item)
-            }
-
-            Action.RIGHT_CLICK_BLOCK -> {
-                skillEventHandler.onRightClickBlock(player, item, event.clickedBlock?.location!!)
-            }
-
-            Action.RIGHT_CLICK_AIR -> {
-                skillEventHandler.onRightClickAir(player, item)
-            }
-
-            else -> return
-        }
-    }
-
-    @EventHandler
-    fun onJump(event: PlayerJumpEvent) {
-        val player = event.player
-        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.tryNekoStack ?: return
-
-        skillEventHandler.onJump(player, item)
-    }
-
-    @EventHandler
-    fun onAttack(event: EntityDamageByEntityEvent) {
-        val damager = event.damager as? Player ?: return
-        val entity = event.entity as? LivingEntity ?: return
-        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.tryNekoStack ?: return
-
-        skillEventHandler.onAttack(damager, entity, item)
-    }
 }
 
 /**
- * 此监听器包含的事件仅需要处理一个物品。
+ * 此监听器包含的事件仅涉及到一个物品.
  */
-class SingleItemListener : Listener {
+class SingleItemListener : KoinComponent, Listener {
+    private val skillEventHandler: SkillEventHandler by inject()
+
     @EventHandler
     fun onItemInteract(event: PlayerInteractEvent) {
         val item = event.item ?: return
@@ -174,9 +150,58 @@ class SingleItemListener : Listener {
     @EventHandler
     fun onSkillPrepareCast(event: PlayerSkillPrepareCastEvent) {
         val item = event.item
-        val nekoStack = item.tryNekoStack ?: return
+        val nekoStack = item?.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
-            behavior.handleSkillPrepareCast(event.playerCaster, item, event.skill, event)
+            behavior.handleSkillPrepareCast(event.caster, item, event.skill, event)
         }
+    }
+
+    @EventHandler
+    fun onClick(event: PlayerInteractEvent) {
+        val player = event.player
+        val slot = event.hand ?: return
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val nekoStack = item.tryNekoStack ?: return
+        if (!nekoStack.slot.testEquipmentSlot(slot))
+            return
+
+        when (event.action) {
+            Action.LEFT_CLICK_BLOCK -> {
+                skillEventHandler.onLeftClickBlock(player, item, event.clickedBlock?.location!!)
+            }
+
+            Action.LEFT_CLICK_AIR -> {
+                skillEventHandler.onLeftClickAir(player, item)
+            }
+
+            Action.RIGHT_CLICK_BLOCK -> {
+                skillEventHandler.onRightClickBlock(player, item, event.clickedBlock?.location!!)
+            }
+
+            Action.RIGHT_CLICK_AIR -> {
+                skillEventHandler.onRightClickAir(player, item)
+            }
+
+            else -> return
+        }
+    }
+
+    @EventHandler
+    fun onJump(event: PlayerJumpEvent) {
+        val player = event.player
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val nekoStack = item.tryNekoStack ?: return
+
+        skillEventHandler.onJump(player, item)
+    }
+
+    @EventHandler
+    fun onAttack(event: EntityDamageByEntityEvent) {
+        val damager = event.damager as? Player ?: return
+        val entity = event.entity as? LivingEntity ?: return
+        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val nekoStack = item.tryNekoStack ?: return
+
+        skillEventHandler.onAttack(damager, entity, item)
     }
 }

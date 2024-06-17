@@ -12,7 +12,7 @@ import net.kyori.adventure.key.Key
  * 1. Create a new interface that extends [Skill] interface.
  * 2. Create a companion object that implements [SkillFactory] interface with the type of the skill.
  * 3. Implement the [create] method to create a new instance of the skill.
- * 4. Register the skill type in the [SkillRegistry.SKILL_FACTORIES]
+ * 4. Register the skill type in the [SkillRegistry.FACTORIES]
  *
  * Example:
  *

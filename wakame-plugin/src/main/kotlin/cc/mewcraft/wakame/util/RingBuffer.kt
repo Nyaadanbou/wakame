@@ -3,15 +3,21 @@ package cc.mewcraft.wakame.util
 /**
  * A ring buffer is a fixed-size buffer with a read pointer and a write pointer.
  */
-class RingBuffer<T>(private val capacity: Int) {
+class RingBuffer<T>(
+    private val capacity: Int,
+) {
     private val buffer: Array<Any?> = arrayOfNulls<Any?>(capacity)
     private var writeIndex = 0
     private var readIndex = 0
     private var size = 0
 
-    fun isEmpty(): Boolean = size == 0
+    fun isEmpty(): Boolean {
+        return size == 0
+    }
 
-    fun isFull(): Boolean = size == capacity
+    fun isFull(): Boolean {
+        return size == capacity
+    }
 
     fun write(element: T) {
         buffer[writeIndex] = element
@@ -43,13 +49,17 @@ class RingBuffer<T>(private val capacity: Int) {
         return buffer[readIndex] as T?
     }
 
-    fun getSize(): Int = size
+    fun getSize(): Int {
+        return size
+    }
 
-    fun getCapacity(): Int = capacity
+    fun getCapacity(): Int {
+        return capacity
+    }
 
     fun readAll(): List<T> {
         val result = mutableListOf<T>()
-        for (i in 0 until size) {
+        for (i in 0..size - 1) {
             val index = (readIndex + i) % capacity
             @Suppress("UNCHECKED_CAST")
             result.add(buffer[index] as T)

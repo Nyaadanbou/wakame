@@ -5,14 +5,14 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.condition.DurabilityCondition
-import cc.mewcraft.wakame.skill.condition.MoLangCondition
+import cc.mewcraft.wakame.skill.SkillFactories
+import cc.mewcraft.wakame.skill.condition.MoLangExpression
+import cc.mewcraft.wakame.skill.condition.NekoDurability
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
-import cc.mewcraft.wakame.skill.factory.*
+import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
+import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill.trigger.Trigger
-import cc.mewcraft.wakame.skill.trigger.Trigger.*
 import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.generateCombinations
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -24,49 +24,48 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
 object SkillRegistry : Initializable, KoinComponent {
-    private val logger: Logger by inject(mode = LazyThreadSafetyMode.NONE)
-
     /* Trigger Constants */
-    val GENERIC_TRIGGERS: List<Trigger> = listOf(LeftClick, RightClick, Attack, Jump)
-    val COMBO_TRIGGERS: List<Trigger> = listOf(LeftClick, RightClick)
 
     /**
      * The key of the empty skill.
      */
     val EMPTY_KEY: Key = Key(Namespaces.SKILL, "empty")
 
-    val INSTANCE: Registry<Key, Skill> = SimpleRegistry()
+    /**
+     * 技能类型. 包含了技能的唯一标识, 条件, 描述信息等.
+     */
+    val TYPES: Registry<Key, Skill> = SimpleRegistry()
+
+    /**
+     * 技能条件.
+     */
     val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
-    val SKILL_FACTORIES: Registry<String, SkillFactory<*>> = SimpleRegistry()
-    val TRIGGER_INSTANCES: Registry<Key, Trigger> = SimpleRegistry()
 
-    private fun loadCondition() {
-        operator fun Pair<String, SkillConditionFactory<*>>.unaryPlus() = CONDITIONS.register(first, second)
+    /**
+     * 技能触发器.
+     */
+    val TRIGGERS: Registry<Key, Trigger> = SimpleRegistry()
 
-        +("durability" to DurabilityCondition)
-        +("molang" to MoLangCondition)
-    }
+    private val LOGGER: Logger by inject()
 
-    private fun loadType() {
-        operator fun Pair<String, SkillFactory<*>>.unaryPlus() = SKILL_FACTORIES.register(first, second)
-
-        +("command_execute" to CommandExecute)
-        +("dash" to Dash)
-        +("kill_entity" to KillEntity)
-        +("remove_potion_effect" to RemovePotionEffect)
-        +("teleport" to Teleport)
+    private fun loadSkillConditions() {
+        CONDITIONS.register("durability", NekoDurability)
+        CONDITIONS.register("molang", MoLangExpression)
     }
 
     private fun loadTriggers() {
+        val GENERIC_TRIGGERS: List<SingleTrigger> = listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.ATTACK, SingleTrigger.JUMP)
+        val COMBO_GENERATION_TRIGGERS: List<SingleTrigger> = listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
+
         // Register Static Triggers
-        GENERIC_TRIGGERS.forEach { TRIGGER_INSTANCES.register(it.key, it) }
+        GENERIC_TRIGGERS.forEach { TRIGGERS.register(it.key, it) }
         // Register Combo Triggers
-        val combos = COMBO_TRIGGERS.generateCombinations(3)
-        combos.forEach { TRIGGER_INSTANCES.register(it.key, it) }
+        val combos = SequenceTrigger.generate(COMBO_GENERATION_TRIGGERS, 3)
+        combos.forEach { TRIGGERS.register(it.key, it) }
     }
 
     private fun loadConfiguration() {
-        INSTANCE.clear()
+        TYPES.clear()
 
         val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(SKILL_PROTO_CONFIG_DIR)
         val namespaceDirs = mutableListOf<File>()
@@ -77,14 +76,14 @@ object SkillRegistry : Initializable, KoinComponent {
             .filter { it.isDirectory }
             .forEach {
                 namespaceDirs += it.also {
-                    logger.info("Loading skill namespace: {}", it.name)
+                    LOGGER.info("Loading skill namespace: {}", it.name)
                 }
             }
 
         val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(SKILL_PROTO_CONFIG_LOADER))
 
         // then walk each file, i.e., each skill
-        namespaceDirs.forEach { namespaceDir ->
+        for (namespaceDir in namespaceDirs) {
             namespaceDir.walk().maxDepth(1)
                 .drop(1) // exclude the `namespaceDir` itself
                 .filter { it.isFile }
@@ -98,19 +97,23 @@ object SkillRegistry : Initializable, KoinComponent {
 
                     val type = node.node("type").krequire<String>()
                     val provider = NodeConfigProvider(node, skillFile.path)
-                    val skill = SKILL_FACTORIES[type].create(skillKey, provider)
+                    val skill = SkillFactories[type]?.create(skillKey, provider)
+                    if (skill == null) {
+                        LOGGER.error("Failed to load skill: {}", skillKey)
+                        return@forEach
+                    }
 
-                    INSTANCE.register(skillKey, skill)
-                    logger.info("Loaded configured skill: {}", skillKey)
+                    TYPES.register(skillKey, skill)
+                    LOGGER.info("Loaded configured skill: {}", skillKey)
                 }
         }
     }
 
     override fun onPreWorld() {
-        loadType()
-        loadTriggers()
-        loadCondition()
+        SkillFactories.load()
+        loadSkillConditions()
         loadConfiguration()
+        loadTriggers()
     }
 
     override fun onReload() {

@@ -1,36 +1,28 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.condition.EmptySkillConditionGroup
-import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
+import cc.mewcraft.wakame.skill.FixedSkillCastResult
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillBase
+import cc.mewcraft.wakame.skill.SkillCastResult
 import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKeys
+import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 import net.kyori.adventure.key.Key
 
 interface KillEntity : Skill {
     companion object Factory : SkillFactory<KillEntity> {
         override fun create(key: Key, config: ConfigProvider): KillEntity {
-            val display = config.optionalEntry<SkillDisplay>("displays").orElse(EmptySkillDisplay)
-            val conditions = config.optionalEntry<SkillConditionGroup>("conditions").orElse(EmptySkillConditionGroup)
-
-            return Default(key, display, conditions)
+            return DefaultImpl(key, config)
         }
     }
 
-    private class Default(
+    private class DefaultImpl(
         override val key: Key,
-        display: Provider<SkillDisplay>,
-        conditions: Provider<SkillConditionGroup>
-    ) : KillEntity {
-        override val displays: SkillDisplay by display
-        override val conditions: SkillConditionGroup by conditions
+        config: ConfigProvider,
+    ) : KillEntity, SkillBase(key, config) {
 
         override fun cast(context: SkillCastContext): SkillCastResult {
-            val entity = context.optional(SkillCastContextKeys.TARGET_LIVING_ENTITY)?.bukkitEntity ?: return FixedSkillCastResult.NONE_TARGET
+            val entity = context.optional(SkillCastContextKey.TARGET_LIVING_ENTITY)?.bukkitEntity ?: return FixedSkillCastResult.NONE_TARGET
             entity.health = 0.0
             return FixedSkillCastResult.SUCCESS
         }

@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.item.binary.toNekoStack
 import cc.mewcraft.wakame.item.schema.NekoItem
-import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.registry.ElementRegistry
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -13,11 +12,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.reflect.KClass
 
 interface Statistical : ItemBehavior {
-    override val requiredItemMeta: Array<KClass<out SchemaItemMeta<*>>>
-        get() = emptyArray()
 
     companion object Factory : ItemBehaviorFactory<Statistical> {
         override fun create(item: NekoItem, config: ConfigProvider): Statistical {

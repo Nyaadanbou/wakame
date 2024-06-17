@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.item.schema.behavior
 
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.item.schema.NekoItem
-import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
-import kotlin.reflect.KClass
 
 /**
  * 可以施放技能的物品。
@@ -17,7 +15,5 @@ interface Castable : ItemBehavior {
         }
     }
 
-    private class Default : Castable {
-        override val requiredItemMeta: Array<KClass<out SchemaItemMeta<*>>> = emptyArray()
-    }
+    private class Default : Castable
 }

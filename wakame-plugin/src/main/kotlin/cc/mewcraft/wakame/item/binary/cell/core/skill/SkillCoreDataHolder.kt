@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.binary.cell.core.skill
 
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.skill.SkillBinaryKeys
+import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
@@ -15,7 +16,7 @@ import net.kyori.adventure.key.Key
 internal data class BinarySkillCoreDataHolder(
     override val key: Key,
     override val trigger: Trigger,
-    override val effectiveVariant: Int
+    override val effectiveVariant: ConfiguredSkill.Variant
 ) : BinarySkillCore() {
     override fun asTag(): ShadowTag = CompoundShadowTag {
         putIdentifier(key)
@@ -32,8 +33,8 @@ private fun CompoundShadowTag.putTrigger(trigger: Trigger) {
     this.putString(SkillBinaryKeys.SKILL_TRIGGER, trigger.key.asString())
 }
 
-private fun CompoundShadowTag.putEffectiveVariant(variant: Int) {
-    if (variant < 0)
+private fun CompoundShadowTag.putEffectiveVariant(variant: ConfiguredSkill.Variant) {
+    if (variant == ConfiguredSkill.Variant.any())
         return
-    this.putInt(SkillBinaryKeys.EFFECTIVE_VARIANT, variant)
+    this.putInt(SkillBinaryKeys.EFFECTIVE_VARIANT, variant.variant)
 }

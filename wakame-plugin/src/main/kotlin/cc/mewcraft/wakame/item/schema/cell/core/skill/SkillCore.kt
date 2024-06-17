@@ -18,7 +18,7 @@ fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
     val configuredSkill = node.krequire<ConfiguredSkill>()
     val key = configuredSkill.key
     val trigger = configuredSkill.trigger
-    val effectiveVariant = configuredSkill.effectiveVariant
+    val effectiveVariant = configuredSkill.variant
     val schemaSkillCore = SchemaSkillCoreImpl(key, trigger, effectiveVariant)
     return schemaSkillCore
 }
@@ -29,7 +29,7 @@ fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
 interface SchemaSkillCore : SchemaCore {
     val instance: Skill
     val trigger: Trigger
-    val effectiveVariant: Int
+    val effectiveVariant: ConfiguredSkill.Variant
     override fun reify(context: SchemaGenerationContext): BinarySkillCore
 }
 

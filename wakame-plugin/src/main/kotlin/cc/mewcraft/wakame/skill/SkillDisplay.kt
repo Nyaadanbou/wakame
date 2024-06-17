@@ -8,9 +8,13 @@ import java.lang.reflect.Type
 sealed interface SkillDisplay {
     val name: String
     val tooltips: List<String>
+
+    companion object {
+        fun empty(): SkillDisplay = EmptySkillDisplay
+    }
 }
 
-data object EmptySkillDisplay : SkillDisplay {
+private data object EmptySkillDisplay : SkillDisplay {
     override val name: String = ""
     override val tooltips: List<String> = emptyList()
 }
@@ -19,6 +23,7 @@ private data class SkillDisplayImpl(
     override val name: String,
     override val tooltips: List<String>
 ) : SkillDisplay
+
 
 internal object SkillDisplaySerializer : SchemaSerializer<SkillDisplay> {
     override fun deserialize(type: Type, node: ConfigurationNode): SkillDisplay {
