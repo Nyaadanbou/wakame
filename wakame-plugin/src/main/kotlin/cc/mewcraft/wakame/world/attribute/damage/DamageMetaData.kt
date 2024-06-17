@@ -2,6 +2,9 @@ package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item.binary.PlayNekoStack
+import cc.mewcraft.wakame.item.hasBehavior
+import cc.mewcraft.wakame.item.schema.behavior.Arrow
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.User
 import me.lucko.helper.random.VariableAmount
@@ -54,20 +57,46 @@ class PlayerMeleeAttackMetaData(
     override val packets: List<ElementDamagePacket> = generatePackets(isSweep)
     override val damageValue: Double = packets.sumOf { it.finalDamage }
 
+    private fun generatePackets(isSweep: Boolean): List<ElementDamagePacket> {
+        if (isSweep) return generateSweepPackets()
+        return generateNotSweepPackets()
+    }
+
+
     /**
      * 在元素伤害包生成时，所有的随机就已经确定了，包括：
      * 伤害值 value 在范围 [max,min] 的随机
      * 该元素伤害是否暴击的随机
      */
-    private fun generatePackets(isSweep: Boolean): List<ElementDamagePacket> {
+    private fun generateSweepPackets(): List<ElementDamagePacket> {
         val attributeMap = user.attributeMap
         val list = arrayListOf<ElementDamagePacket>()
         for (it in ElementRegistry.INSTANCES.objects) {
             list.add(
                 ElementDamagePacket(
                     it,
-                    if (isSweep) 1.0 else attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE),
-                    if (isSweep) 1.0 else attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE),
+                    1.0,
+                    1.0,
+                    attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE),
+                    attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
+                    Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
+                    attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
+                )
+            )
+        }
+        return list
+    }
+
+
+    private fun generateNotSweepPackets(): List<ElementDamagePacket> {
+        val attributeMap = user.attributeMap
+        val list = arrayListOf<ElementDamagePacket>()
+        for (it in ElementRegistry.INSTANCES.objects) {
+            list.add(
+                ElementDamagePacket(
+                    it,
+                    attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE),
+                    attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE),
                     attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE),
                     attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
                     Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
@@ -93,14 +122,63 @@ class EntityMeleeAttackMetaData(
 
 /**
  * 玩家使用弹射物造成伤害的元数据
- * 如：玩家射出的箭矢、三叉戟、雪球击中实体
+ * 如：玩家射出的箭矢、三叉戟击中实体
+ * 对于箭矢，除了计算玩家身上已有的属性值外，还需额外加上箭矢的属性
+ * 对于三叉戟，则不需要。因为三叉戟投掷命中和直接近战击打没有区别
  */
 class PlayerProjectileMetaData(
     val user: User<Player>,
+    val projectileType: ProjectileType,
+    val nekoStack: PlayNekoStack
 ) : DamageMetaData {
-    override val packets: List<ElementDamagePacket>
-        get() = TODO("Not yet implemented")
-    override val damageValue: Double = TODO("玩家弹射物攻击的获取和计算")
+    override val packets: List<ElementDamagePacket> = generatePackets(projectileType)
+    override val damageValue: Double = packets.sumOf { it.finalDamage }
+
+    private fun generatePackets(projectileType: ProjectileType): List<ElementDamagePacket> {
+        return when (projectileType) {
+            ProjectileType.ARROW -> generateArrowPackets()
+            ProjectileType.TRIDENT -> generateTridentPackets()
+        }
+    }
+
+    private fun generateArrowPackets(): List<ElementDamagePacket> {
+        //TODO 获取箭矢的属性
+        val attributeMap = user.attributeMap
+        val list = arrayListOf<ElementDamagePacket>()
+        for (it in ElementRegistry.INSTANCES.objects) {
+            list.add(
+                ElementDamagePacket(
+                    it,
+                    attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE),
+                    attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE),
+                    attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE),
+                    attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
+                    Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
+                    attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
+                )
+            )
+        }
+        return list
+    }
+
+    private fun generateTridentPackets(): List<ElementDamagePacket> {
+        val attributeMap = user.attributeMap
+        val list = arrayListOf<ElementDamagePacket>()
+        for (it in ElementRegistry.INSTANCES.objects) {
+            list.add(
+                ElementDamagePacket(
+                    it,
+                    attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE),
+                    attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE),
+                    attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE),
+                    attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
+                    Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
+                    attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
+                )
+            )
+        }
+        return list
+    }
 }
 
 /**
@@ -130,4 +208,12 @@ data class ElementDamagePacket(
      * 最终伤害 = Σ random(MIN_ATTACK_DAMAGE, MAX_ATTACK_DAMAGE) * (1 + ATTACK_DAMAGE_RATE) * (1 + CRITICAL_STRIKE_POWER)
      */
     val finalDamage: Double = value * (1 + rate) * (1.0 + if (isCritical) criticalPower else 0.0)
+}
+
+/**
+ * 弹射物类型
+ * TODO 考虑风弹、雪球等所有原版弹射物
+ */
+enum class ProjectileType {
+    ARROW, TRIDENT
 }

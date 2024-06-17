@@ -58,6 +58,10 @@ class PlayerDefenseMetaData(
                 )
             }
 
+            /**
+             * 玩家受到其他玩家的伤害时
+             * 使用全部元素进行减伤
+             */
             is PlayerMeleeAttackMetaData -> {
                 return damageMetaData.packets.sumOf {
                     DefenseUtils.getDamageAfterDefense(
