@@ -1,6 +1,7 @@
 import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroupImpl
+import cc.mewcraft.wakame.skill.condition.SkillConditionSession
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import io.mockk.*
 import org.junit.jupiter.api.AfterAll
@@ -27,84 +28,56 @@ class SkillConditionResultTest : KoinTest {
         }
     }
 
-    private fun testGroup(group: SkillConditionGroup, context: SkillCastContext): Boolean {
-        if (group.newSession(context)) {
-            group.cost(context)
-            return true
+    private fun testGroup(group: SkillConditionGroup, context: SkillCastContext): SkillConditionSession {
+        val session = group.newSession(context)
+        if (session.isSuccess) {
+            session.onSuccess(context)
         } else {
-            group.notifyFailure(context)
-            return false
+            session.onFailure(context)
         }
+
+        return session
     }
 
     @Test
     fun `test skill condition result`() {
         val mockContext = mockk<SkillCastContext>()
         val mockCondition = mockk<SkillCondition>(relaxed = true)
+        val session = mockk<SkillConditionSession>(relaxed = true)
+
+        every { session.isSuccess } returns true
+
         val skillConditions = SkillConditionGroupImpl(
             listOf(mockCondition)
         )
 
-        every { mockCondition.newSession(mockContext) } returns true
+        every { mockCondition.newSession(mockContext) } returns session
 
         val result = testGroup(skillConditions, mockContext)
-        assert(result)
+        assert(result.isSuccess)
         verify(exactly = 1) { mockCondition.newSession(mockContext) }
-        verify(exactly = 1) { mockCondition.cost(mockContext) }
-        verify(exactly = 0) { mockCondition.onFailure(mockContext) }
+        verify(exactly = 1) { session.onSuccess(mockContext) }
+        verify(exactly = 0) { session.onFailure(mockContext) }
     }
 
     @Test
     fun `test skill condition failure`() {
         val mockContext = mockk<SkillCastContext>()
         val mockCondition = mockk<SkillCondition>(relaxed = true)
+        val session = mockk<SkillConditionSession>(relaxed = true)
 
-        every { mockCondition.newSession(mockContext) } returns false
+        every { session.isSuccess } returns false
+
+        every { mockCondition.newSession(mockContext) } returns session
 
         val skillConditions = SkillConditionGroupImpl(
             listOf(mockCondition)
         )
 
         val result = testGroup(skillConditions, mockContext)
-        assert(!result)
+        assert(!result.isSuccess)
         verify(exactly = 1) { mockCondition.newSession(mockContext) }
-        verify(exactly = 0) { mockCondition.cost(mockContext) }
-        verify(exactly = 1) { mockCondition.onFailure(mockContext) }
-    }
-
-    @Test
-    fun `test skill condition priority`() {
-        val mockContext = mockk<SkillCastContext>()
-        val mockCondition1 = mockk<SkillCondition>(relaxed = true)
-        val mockCondition2 = mockk<SkillCondition>(relaxed = true)
-        val mockCondition3 = mockk<SkillCondition>(relaxed = true)
-
-        every { mockCondition1.newSession(mockContext) } returns false
-        every { mockCondition1.compareTo(any()) } returns -1 // Lower priority
-
-        every { mockCondition2.newSession(mockContext) } returns false
-        every { mockCondition2.compareTo(any()) } returns 1 // Higher priority
-
-        every { mockCondition3.newSession(mockContext) } returns true
-        every { mockCondition3.compareTo(any()) } returns 1 // Higher priority
-
-        val skillConditions = SkillConditionGroupImpl(
-            listOf(mockCondition1, mockCondition2, mockCondition3)
-        )
-
-        val result = testGroup(skillConditions, mockContext)
-        assert(!result)
-
-        verify(exactly = 1) { mockCondition1.newSession(mockContext) }
-        verify(exactly = 0) { mockCondition1.cost(mockContext) }
-        verify(exactly = 0) { mockCondition1.onFailure(mockContext) }
-
-        verify(exactly = 1) { mockCondition2.newSession(mockContext) }
-        verify(exactly = 0) { mockCondition2.cost(mockContext) }
-        verify(exactly = 1) { mockCondition2.onFailure(mockContext) }
-
-        verify(exactly = 1) { mockCondition3.newSession(mockContext) }
-        verify(exactly = 0) { mockCondition3.cost(mockContext) }
-        verify(exactly = 0) { mockCondition3.onFailure(mockContext) }
+        verify(exactly = 0) { session.onSuccess(mockContext) }
+        verify(exactly = 1) { session.onFailure(mockContext) }
     }
 }

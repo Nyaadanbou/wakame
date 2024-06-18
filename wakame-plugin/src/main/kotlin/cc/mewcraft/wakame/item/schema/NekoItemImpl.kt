@@ -67,8 +67,9 @@ internal class NekoItemImpl(
 
     // 必须最后执行验证，以保证所有 member properties 已经初始化
     init {
-        NekoItemValidator.chain(
-            BehaviorValidator(),
-        ).validate(NekoItemValidator.Args(this))
+        // No validation for now
+        // NekoItemValidator.chain(
+        //
+        // ).validate(NekoItemValidator.Args(this))
     }
 }

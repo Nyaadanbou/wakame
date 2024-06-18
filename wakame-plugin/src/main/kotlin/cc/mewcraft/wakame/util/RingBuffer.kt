@@ -59,7 +59,7 @@ class RingBuffer<T>(
 
     fun readAll(): List<T> {
         val result = mutableListOf<T>()
-        for (i in 0..size - 1) {
+        for (i in 0..<size) {
             val index = (readIndex + i) % capacity
             @Suppress("UNCHECKED_CAST")
             result.add(buffer[index] as T)

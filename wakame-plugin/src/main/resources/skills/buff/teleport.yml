@@ -5,5 +5,8 @@ teleportation:
 
 conditions:
   - type: molang
+    id: "chance"
     eval: "math.random(0.0, 1.0) < 0.5"
-    failure_message: "Failed to teleport"
+    failure_message:
+      - type: chat
+        text: "Failed to teleport"

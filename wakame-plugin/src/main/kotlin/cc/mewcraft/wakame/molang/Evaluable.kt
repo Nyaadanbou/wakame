@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.molang
 
 import cc.mewcraft.wakame.SchemaSerializer
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import team.unnamed.mocha.MochaEngine
@@ -32,8 +30,9 @@ fun interface Evaluable<T : Any> {
     fun evaluate(engine: MochaEngine<*>) : Double
 }
 
-internal object EvaluableSerializer : SchemaSerializer<Evaluable<*>>, KoinComponent {
-    private val engine: MochaEngine<*> by inject()
+internal object EvaluableSerializer : SchemaSerializer<Evaluable<*>> {
+    private val engine: MochaEngine<*>
+        get() = MoLangSupport.createEngine()
 
     override fun deserialize(type: Type, node: ConfigurationNode): Evaluable<*> {
         val evalString = (node.string ?: node.node("eval").get<String>())?.let { Evaluable.StringEval(it) }

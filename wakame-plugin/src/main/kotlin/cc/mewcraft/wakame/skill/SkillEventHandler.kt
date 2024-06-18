@@ -7,103 +7,74 @@ import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.Castable
 import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.state.SkillStateResult
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
-import cc.mewcraft.wakame.skill.trigger.Trigger
-import cc.mewcraft.wakame.skill.trigger.Trigger.Single
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 
 /**
  * Handles skill triggers for players.
  */
-class SkillEventHandler(
-    private val skillCastManager: SkillCastManager,
-) {
+class SkillEventHandler {
 
     /* Handles skill triggers for players. */
 
-    fun onLeftClickBlock(player: Player, itemStack: ItemStack, location: Location) {
-        onLeftClick(player, itemStack) { TargetAdapter.adapt(location) }
+    fun onLeftClickBlock(player: Player, itemStack: ItemStack, location: Location, event: PlayerInteractEvent) {
+        onLeftClick(player, itemStack, event) { TargetAdapter.adapt(location) }
     }
 
-    fun onLeftClickAir(player: Player, itemStack: ItemStack) {
-        onLeftClick(player, itemStack) { TargetAdapter.adapt(player) }
+    fun onLeftClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
+        onLeftClick(player, itemStack, event) { TargetAdapter.adapt(player) }
     }
 
-    private fun onLeftClick(player: Player, itemStack: ItemStack, targetProvider: () -> Target) {
+    private fun onLeftClick(player: Player, itemStack: ItemStack, event: PlayerInteractEvent, targetProvider: () -> Target) {
         val user = player.toUser()
-
-        val skillMap = user.skillMap
-        val skillState = user.skillState
-
         val nekoStack = itemStack.toNekoStack
         val target = targetProvider()
-
-        val skillsOnLeftClick = skillMap.getSkill(SingleTrigger.LEFT_CLICK)
-        val result = skillState.tryCast(skillsOnLeftClick, SingleTrigger.LEFT_CLICK)
-
-        // 释放所有单独 SingleTrigger.LEFT_CLICK 触发的技能
-        skillMap.getSkill(SingleTrigger.LEFT_CLICK).forEach { skill: Skill ->
-            skillCastManager.tryCast(skill, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
-        }
-
-        // 施法前摇 -> 施法 -> 施法后摇
-        // 5t     -> 2t   -> 8t
-
-        // 接着检查玩家当前是否有 SequenceTrigger 触发的技能
-        if (!skillMap.getTriggers().any { it is Trigger.Combo })
-            return
-
-        user.skillState.addTrigger(SingleTrigger.LEFT_CLICK) { skill ->
-            skillCastManager.tryCast(skill, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack)).isSuccessful()
+        val result = user.skillState.addTrigger(
+            SingleTrigger.LEFT_CLICK,
+            SkillCastContext(CasterAdapter.adapt(player), target, nekoStack)
+        )
+        if (result == SkillStateResult.CANCEL_EVENT) {
+            event.isCancelled = true
         }
     }
 
-    fun onRightClickBlock(player: Player, itemStack: ItemStack, location: Location) {
-        onRightClick(player, itemStack) { TargetAdapter.adapt(location) }
+    fun onRightClickBlock(player: Player, itemStack: ItemStack, location: Location, event: PlayerInteractEvent) {
+        onRightClick(player, itemStack, event) { TargetAdapter.adapt(location) }
     }
 
-    fun onRightClickAir(player: Player, itemStack: ItemStack) {
-        onRightClick(player, itemStack) { TargetAdapter.adapt(player) }
+    fun onRightClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
+        onRightClick(player, itemStack, event) { TargetAdapter.adapt(player) }
     }
 
-    private fun onRightClick(player: Player, itemStack: ItemStack, targetProvider: () -> Target) {
+    private fun onRightClick(player: Player, itemStack: ItemStack, event: PlayerInteractEvent, targetProvider: () -> Target) {
         val user = player.toUser()
-        val skillMap = user.skillMap
         val nekoStack = itemStack.toNekoStack
         val target = targetProvider.invoke()
-        skillMap.getSkill(Single.RightClick).forEach { skill ->
-            skillCastManager.tryCast(skill, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
-        }
-        if (!skillMap.getTriggers().any { it is Trigger.Combo })
-            return
-        user.skillState.addTrigger(Single.RightClick) { skill ->
-            skillCastManager.tryCast(skill, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
-                .isSuccessful()
+        val result = user.skillState.addTrigger(
+            SingleTrigger.RIGHT_CLICK,
+            SkillCastContext(CasterAdapter.adapt(player), target, nekoStack)
+        )
+        if (result == SkillStateResult.CANCEL_EVENT) {
+            event.isCancelled = true
         }
     }
 
     fun onJump(player: Player, itemStack: ItemStack) {
-        val skillMap = player.toUser().skillMap
+        val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
-        skillMap.getSkill(Single.Jump).forEach { skill ->
-            skillCastManager.tryCast(
-                skill, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack)
-            )
-        }
+        user.skillState.addTrigger(SingleTrigger.JUMP, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
     }
 
     fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack) {
-        val skillMap = player.toUser().skillMap
+        val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
-        skillMap.getSkill(Single.Attack).forEach { skill ->
-            skillCastManager.tryCast(
-                skill, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack)
-            )
-        }
+        user.skillState.addTrigger(SingleTrigger.ATTACK, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack))
     }
 
     /* Handles skill triggers for players. */

@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.schema.META_SERIALIZERS
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.skill.SKILL_SERIALIZERS
+import cc.mewcraft.wakame.skill.condition.SKILL_CONDITION_SERIALIZERS
 import cc.mewcraft.wakame.skill.factory.SKILL_FACTORY_SERIALIZERS
 import cc.mewcraft.wakame.skill.trigger.SKILL_TRIGGER_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
@@ -99,6 +100,9 @@ internal fun registryModule(): Module = module {
         createYamlLoader(KIZAMI_CONFIG_FILE) {
             registerAll(get(named(KIZAMI_SERIALIZERS)))
             registerAll(get(named(SKILL_SERIALIZERS)))
+            registerAll(get(named(SKILL_CONDITION_SERIALIZERS)))
+            registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
+            registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
         }
     }
 
@@ -114,6 +118,7 @@ internal fun registryModule(): Module = module {
         buildYamlLoader {
             registerAll(get(named(BASE_SERIALIZERS)))
             registerAll(get(named(SKILL_SERIALIZERS)))
+            registerAll(get(named(SKILL_CONDITION_SERIALIZERS)))
             registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
             registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
         }

@@ -37,27 +37,33 @@ enum class SingleTrigger(
     override val key: Key,
 ) : Trigger {
     /**
-     * // FIXME 明确自身的定义, 明确 SingleTrigger 用于 SequenceTrigger 时的一些注意事项
+     * 代表玩家按下了左键, 具体上是指左键空气与方块的交互.
+     *
+     * 不包括对生物的左键攻击.
      */
     LEFT_CLICK('0', Key(Namespaces.TRIGGER, "generic/left_click")),
 
     /**
+     * 代表玩家按下了右键, 具体上是指右键空气与方块的交互.
      *
+     * 不包括对生物的右键交互.
      */
     RIGHT_CLICK('1', Key(Namespaces.TRIGGER, "generic/right_click")),
 
     /**
+     * 代表玩家按下了攻击键, 具体上是指左键对生物的攻击.
      *
+     * 不包括对空气与方块的交互.
      */
     ATTACK('2', Key(Namespaces.TRIGGER, "generic/attack")),
 
     /**
-     *
+     * 代表玩家按下了跳跃键.
      */
     JUMP('3', Key(Namespaces.TRIGGER, "generic/jump")),
 
     /**
-     *
+     * 代表玩家没有进行任何操作.
      */
     NOOP('4', Key(Namespaces.TRIGGER, "generic/noop")),
     ;

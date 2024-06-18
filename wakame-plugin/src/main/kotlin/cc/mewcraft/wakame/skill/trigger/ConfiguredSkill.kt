@@ -84,7 +84,8 @@ internal object ConfiguredSkillSerializer : SchemaSerializer<ConfiguredSkill> {
     override fun deserialize(type: Type, node: ConfigurationNode): ConfiguredSkill {
         val key = node.node("key").krequire<Key>()
         val trigger = node.node("trigger").krequire<Trigger>()
-        val variant = node.node("variant").krequire<ConfiguredSkill.Variant>()
+        val variantNode = node.node("variant")
+        val variant = if (variantNode.isNull) ConfiguredSkill.Variant.any() else variantNode.krequire<ConfiguredSkill.Variant>()
         return ConfiguredSkill(key, trigger, variant)
     }
 }

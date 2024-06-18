@@ -55,12 +55,12 @@ object SkillRegistry : Initializable, KoinComponent {
 
     private fun loadTriggers() {
         val GENERIC_TRIGGERS: List<SingleTrigger> = listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.ATTACK, SingleTrigger.JUMP)
-        val COMBO_GENERATION_TRIGGERS: List<SingleTrigger> = listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
+        val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> = listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
 
         // Register Static Triggers
         GENERIC_TRIGGERS.forEach { TRIGGERS.register(it.key, it) }
         // Register Combo Triggers
-        val combos = SequenceTrigger.generate(COMBO_GENERATION_TRIGGERS, 3)
+        val combos = SequenceTrigger.generate(SEQUENCE_GENERATION_TRIGGERS, 3)
         combos.forEach { TRIGGERS.register(it.key, it) }
     }
 

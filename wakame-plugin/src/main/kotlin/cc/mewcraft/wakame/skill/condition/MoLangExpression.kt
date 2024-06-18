@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import org.koin.core.component.KoinComponent
 
 /**
  * 检查 MoLang 表达式.
@@ -29,10 +28,10 @@ interface MoLangExpression : SkillCondition {
 
     private class DefaultImpl(
         config: ConfigProvider,
-    ) : KoinComponent, MoLangExpression, SkillConditionBase(config) {
+    ) : MoLangExpression, SkillConditionBase(config) {
 
         override val evaluable: Evaluable<*> by config.entry<Evaluable<*>>("eval")
-        override val resolver: TagResolver = Placeholder.component(this.id, Component.text(this.evaluable.evaluate(getKoin().get()))) // TODO: Support MoLang tag resolver
+        override val resolver: TagResolver = Placeholder.component(this.id, Component.text(this.evaluable.evaluate(MoLangSupport.createEngine()))) // TODO: Support MoLang tag resolver
 
         override fun newSession(context: SkillCastContext): SkillConditionSession {
             val engine = MoLangSupport.createEngine()

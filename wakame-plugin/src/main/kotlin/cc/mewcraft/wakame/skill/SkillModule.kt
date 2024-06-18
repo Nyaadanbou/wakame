@@ -2,9 +2,11 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.molang.EvaluableSerializer
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroupSerializer
+import cc.mewcraft.wakame.skill.condition.skillConditionModule
 import cc.mewcraft.wakame.skill.factory.factoryModule
 import cc.mewcraft.wakame.skill.state.PlayerSkillStateShower
 import cc.mewcraft.wakame.skill.state.SkillStateShower
+import cc.mewcraft.wakame.skill.state.stateModule
 import cc.mewcraft.wakame.skill.trigger.ConfiguredSkillSerializer
 import cc.mewcraft.wakame.skill.trigger.TriggerSerializer
 import cc.mewcraft.wakame.skill.trigger.triggerModule
@@ -21,6 +23,8 @@ const val SKILL_SERIALIZERS = "skill_serializers"
 internal fun skillModule(): Module = module {
 
     includes(triggerModule())
+    includes(skillConditionModule())
+    includes(stateModule())
     includes(factoryModule())
 
     singleOf(::SkillEventHandler)

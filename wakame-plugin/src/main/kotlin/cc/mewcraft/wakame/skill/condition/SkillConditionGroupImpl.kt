@@ -11,7 +11,7 @@ import org.koin.core.component.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
-import java.util.TreeSet
+import java.util.*
 
 /**
  * 一个非空的技能条件组.
@@ -25,7 +25,7 @@ internal class SkillConditionGroupImpl(
 
     private val logger: Logger by inject()
 
-    private val children: TreeSet<SkillCondition> = TreeSet(
+    private val children: Queue<SkillCondition> = PriorityQueue(
         Comparator.comparing(SkillCondition::priority) // 按照优先级进行排序
     ).apply { addAll(conditions) }
 

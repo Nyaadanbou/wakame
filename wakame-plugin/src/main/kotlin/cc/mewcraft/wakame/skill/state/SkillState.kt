@@ -1,61 +1,58 @@
 package cc.mewcraft.wakame.skill.state
 
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
+import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.RingBuffer
-import me.lucko.helper.cooldown.Cooldown
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
+/**
+ * 技能状态
+ */
 interface SkillState {
-    fun addTrigger(trigger: SingleTrigger, skillCastFunction: (Skill) -> Boolean)
+    /**
+     * 添加一次技能触发
+     */
+    fun addTrigger(trigger: SingleTrigger, skillCastContext: SkillCastContext): SkillStateResult
+
+    /**
+     * 刷新一次技能状态
+     */
+    fun tick()
+
+    /**
+     * 中断技能状态
+     */
+    fun interrupt()
+
+    /**
+     * 将技能状态恢复为默认
+     */
     fun clear()
 }
 
 class PlayerSkillState(
     val user: User<Player>
 ) : SkillState, KoinComponent {
-    private val skillStateShower: SkillStateShower<Player> by inject()
+    private var info: SkillStateInfo = SkillStateInfo.idle(this)
 
-    private val cooldown: Cooldown = Cooldown.ofTicks(2)
-    private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(3)
+    override fun addTrigger(trigger: SingleTrigger, skillCastContext: SkillCastContext): SkillStateResult {
+        return info.addTrigger(trigger, skillCastContext)
+    }
 
-    override fun addTrigger(trigger: SingleTrigger, skillCastFunction: (Skill) -> Boolean) {
-        // To make sure the player is not spamming the skill
-        if (!cooldown.test())
-            return
+    override fun tick() {
+        info.tick()
+    }
 
-        currentSequence.write(trigger)
-        val completeSequence = currentSequence.readAll()
-        skillStateShower.displayProgress(completeSequence, user)
-
-        if (!currentSequence.isFull())
-            return
-
-        val sequence = SequenceTrigger.of(completeSequence)
-        val skills = user.skillMap.getSkill(sequence)
-        if (skills.isEmpty()) {
-            clear()
-            skillStateShower.displayFailure(completeSequence, user)
-            return
-        }
-        
-        val result = skills.map { skill -> skillCastFunction.invoke(skill) }
-        if (result.contains(false)) {
-            clear()
-            skillStateShower.displayFailure(completeSequence, user)
-            return
-        }
-
-        clear()
-        skillStateShower.displaySuccess(completeSequence, user)
+    override fun interrupt() {
+        info.interrupt()
     }
 
     override fun clear() {
-        currentSequence.clear()
-        cooldown.reset()
+        setInfo(SkillStateInfo.idle(this))
+    }
+
+    fun setInfo(skillStateInfo: SkillStateInfo) {
+        this.info = (skillStateInfo)
     }
 }

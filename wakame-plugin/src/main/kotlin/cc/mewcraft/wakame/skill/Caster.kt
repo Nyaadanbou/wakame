@@ -38,7 +38,7 @@ private data class PlayerCaster(
         bukkitPlayer.sendMessage(source, message, type)
     }
 
-    override fun deleteMessage(signature: SignedMessage.Signature?) {
+    override fun deleteMessage(signature: SignedMessage.Signature) {
         bukkitPlayer.deleteMessage(signature)
     }
 }

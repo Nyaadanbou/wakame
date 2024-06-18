@@ -16,7 +16,20 @@ effect_types:
 
 conditions:
   - type: durability
+    id: "dura"
     durability: 10
+    success_message:
+      - type: chat
+        text: "You successfully removed the potion effect. durability: -10"
+    failure_message:
+      - type: chat
+        text: "You failed to remove the potion effect. durability: -10"
   - type: molang
+    id: "chance"
     eval: "math.random(0.0, 1.0) < 0.5"
-    failure_message: "You failed to remove the potion effect."
+    success_message:
+      - type: chat
+        text: "You successfully removed the potion effect."
+    failure_message:
+      - type: chat
+        text: "You failed to remove the potion effect."

@@ -1,24 +1,22 @@
-import cc.mewcraft.wakame.skill.trigger.Trigger
-import cc.mewcraft.wakame.skill.trigger.Trigger.LeftClick
-import cc.mewcraft.wakame.skill.trigger.Trigger.RightClick
-import cc.mewcraft.wakame.util.generateCombinations
+import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
+import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import org.junit.jupiter.api.Test
 
 class TriggerUtilTest {
 
     @Test
     fun `test generate combos`() {
-        val combos = listOf(LeftClick, RightClick).generateCombinations(3)
+        val sequences = SequenceTrigger.generate(listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK), 3)
         val verifyResult = listOf(
-            Trigger.Combo(listOf(LeftClick, LeftClick, LeftClick)),
-            Trigger.Combo(listOf(LeftClick, LeftClick, RightClick)),
-            Trigger.Combo(listOf(LeftClick, RightClick, LeftClick)),
-            Trigger.Combo(listOf(LeftClick, RightClick, RightClick)),
-            Trigger.Combo(listOf(RightClick, LeftClick, LeftClick)),
-            Trigger.Combo(listOf(RightClick, LeftClick, RightClick)),
-            Trigger.Combo(listOf(RightClick, RightClick, LeftClick)),
-            Trigger.Combo(listOf(RightClick, RightClick, RightClick))
+            SequenceTrigger.of(listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK)),
+            SequenceTrigger.of(listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)),
+            SequenceTrigger.of(listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK)),
+            SequenceTrigger.of(listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.RIGHT_CLICK)),
+            SequenceTrigger.of(listOf(SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK)),
+            SequenceTrigger.of(listOf(SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)),
+            SequenceTrigger.of(listOf(SingleTrigger.RIGHT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK)),
+            SequenceTrigger.of(listOf(SingleTrigger.RIGHT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.RIGHT_CLICK))
         )
-        assert(combos == verifyResult)
+        assert(sequences == verifyResult)
     }
 }

@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.skill.condition
 
+import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 
@@ -13,7 +15,7 @@ abstract class SkillConditionBase(
 ) : SkillCondition {
     /* 每个条件都有的数据配置 */
     override val id: String by config.entry<String>("id")
-    override val priority: Int by config.entry<Int>("priority")
+    override val priority: Int by config.optionalEntry<Int>("priority").orElse(0)
 
     /* 下面是一些用于实现 Session 的“组件” (参考: 组合设计模式) */
 

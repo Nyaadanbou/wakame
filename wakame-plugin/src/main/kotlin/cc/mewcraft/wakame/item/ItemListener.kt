@@ -167,19 +167,19 @@ class SingleItemListener : KoinComponent, Listener {
 
         when (event.action) {
             Action.LEFT_CLICK_BLOCK -> {
-                skillEventHandler.onLeftClickBlock(player, item, event.clickedBlock?.location!!)
+                skillEventHandler.onLeftClickBlock(player, item, event.clickedBlock?.location!!, event)
             }
 
             Action.LEFT_CLICK_AIR -> {
-                skillEventHandler.onLeftClickAir(player, item)
+                skillEventHandler.onLeftClickAir(player, item, event)
             }
 
             Action.RIGHT_CLICK_BLOCK -> {
-                skillEventHandler.onRightClickBlock(player, item, event.clickedBlock?.location!!)
+                skillEventHandler.onRightClickBlock(player, item, event.clickedBlock?.location!!, event)
             }
 
             Action.RIGHT_CLICK_AIR -> {
-                skillEventHandler.onRightClickAir(player, item)
+                skillEventHandler.onRightClickAir(player, item, event)
             }
 
             else -> return
