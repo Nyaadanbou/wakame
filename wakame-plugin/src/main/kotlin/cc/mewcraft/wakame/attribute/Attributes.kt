@@ -189,6 +189,7 @@ internal constructor(
     val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element).apply(::register)
     val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element).apply(::register)
     val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element).apply(::register)
+    val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", .0, -1.0, 16384.0, element).apply(::register)
     //</editor-fold>
 }
 

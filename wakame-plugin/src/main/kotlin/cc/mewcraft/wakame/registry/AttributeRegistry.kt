@@ -148,6 +148,8 @@ object AttributeRegistry : Initializable {
 
         +buildFacade("defense_penetration", SHORT).single().element().bind { DEFENSE_PENETRATION }
 
+        +buildFacade("attack_damage_rate", SHORT).single().element().bind { ATTACK_DAMAGE_RATE }
+
         +buildFacade("entity_interaction_range", DOUBLE).single().bind { ENTITY_INTERACTION_RANGE }
 
         +buildFacade("health_regeneration", SHORT).single().bind { HEALTH_REGENERATION }
