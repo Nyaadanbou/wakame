@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.skill.factory
 
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.skill.FixedSkillCastResult
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillBase
-import cc.mewcraft.wakame.skill.SkillCastResult
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 import net.kyori.adventure.key.Key
@@ -21,10 +18,31 @@ interface KillEntity : Skill {
         config: ConfigProvider,
     ) : KillEntity, SkillBase(key, config) {
 
-        override fun cast(context: SkillCastContext): SkillCastResult {
-            val entity = context.optional(SkillCastContextKey.TARGET_LIVING_ENTITY)?.bukkitEntity ?: return FixedSkillCastResult.NONE_TARGET
-            entity.health = 0.0
-            return FixedSkillCastResult.SUCCESS
+        override fun cast(context: SkillCastContext): SkillTick {
+            return Tick(context)
+        }
+
+        private inner class Tick(
+            context: SkillCastContext,
+        ) : PlayerSkillTick(this@DefaultImpl, context) {
+
+            override fun tickCastPoint(): TickResult {
+                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                player.sendPlainMessage("杀死生物前摇awa")
+                return TickResult.ALL_DONE
+            }
+
+            override fun tickBackswing(): TickResult {
+                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                player.sendPlainMessage("杀死生物后摇qwq")
+                return TickResult.ALL_DONE
+            }
+
+            override fun tickCast(): TickResult {
+                val entity = context.optional(SkillCastContextKey.TARGET_LIVING_ENTITY)?.bukkitEntity ?: return TickResult.INTERRUPT
+                entity.health = 0.0
+                return TickResult.ALL_DONE
+            }
         }
     }
 }

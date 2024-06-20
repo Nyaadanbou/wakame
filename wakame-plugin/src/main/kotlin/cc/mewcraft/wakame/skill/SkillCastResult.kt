@@ -2,24 +2,40 @@ package cc.mewcraft.wakame.skill
 
 import net.kyori.adventure.translation.Translatable
 
-interface SkillCastResult : Translatable {
+interface SkillPrepareCastResult {
+    val skillTick: SkillTick
+
     fun isSuccessful(): Boolean
+
+    companion object {
+        fun success(skillTick: SkillTick): SkillPrepareCastResult {
+            return SuccessSkillPrepareCastResult(skillTick)
+        }
+    }
 }
 
-enum class FixedSkillCastResult(
+private data class SuccessSkillPrepareCastResult(
+    override val skillTick: SkillTick
+) : SkillPrepareCastResult {
+
+    override fun isSuccessful(): Boolean {
+        return true
+    }
+}
+
+enum class FailureSkillPrepareCastResult(
     private val translateKey: String,
-) : SkillCastResult {
-    SUCCESS("skill.result.success"),
-    NONE_CASTER("skill.result.none_caster"),
-    NONE_TARGET("skill.result.none_target"),
+) : SkillPrepareCastResult, Translatable {
     CANCELED("skill.result.canceled"),
     CONDITION_CANNOT_MEET("skill.result.condition_cannot_meet"),
-    NOOP("skill.result.noop"),
-    UNKNOWN_FAILURE("skill.result.unknown_failure");
+    UNKNOWN_FAILURE("skill.result.unknown_failure"),
+    ;
+
+    override val skillTick: SkillTick = SkillTick.empty()
 
     override fun translationKey(): String = translateKey
 
     override fun isSuccessful(): Boolean {
-        return this == SUCCESS
+        return false
     }
 }

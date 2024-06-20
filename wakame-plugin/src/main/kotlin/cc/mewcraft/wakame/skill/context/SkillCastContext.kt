@@ -12,6 +12,10 @@ import org.bukkit.inventory.ItemStack
  * 技能条件执行的上下文.
  */
 sealed interface SkillCastContext {
+    companion object {
+        fun empty(): SkillCastContext = EmptySkillCastContext
+    }
+
     fun <T : Any> set(key: SkillCastContextKey<T>, value: T)
     fun <T : Any> optional(key: SkillCastContextKey<T>): T?
     fun <T : Any> get(key: SkillCastContextKey<T>): T = optional(key) ?: throw IllegalArgumentException("No value for key: `$key`")
@@ -39,6 +43,16 @@ fun SkillCastContext(caster: Caster, target: Target? = null, nekoStack: PlayNeko
 
 /* Internals */
 
+private data object EmptySkillCastContext : SkillCastContext {
+    override fun <T : Any> set(key: SkillCastContextKey<T>, value: T) {}
+    override fun <T : Any> optional(key: SkillCastContextKey<T>): T? {
+        return null
+    }
+    override fun <T : Any> has(key: SkillCastContextKey<T>): Boolean {
+        return false
+    }
+}
+
 private class SkillCastContextImpl : SkillCastContext {
     private val storage: MutableMap<SkillCastContextKey<*>, Any> = HashMap()
 
@@ -60,6 +74,7 @@ private class SkillCastContextImpl : SkillCastContext {
         when (caster) {
             is Caster.Player -> {
                 set(SkillCastContextKey.CASTER_PLAYER, caster)
+                set(SkillCastContextKey.CASTER_ENTITY, caster)
                 set(SkillCastContextKey.USER, caster.bukkitPlayer.toUser())
             }
 

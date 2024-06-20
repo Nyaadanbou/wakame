@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.skill.condition.skillConditionModule
 import cc.mewcraft.wakame.skill.factory.factoryModule
 import cc.mewcraft.wakame.skill.state.PlayerSkillStateShower
 import cc.mewcraft.wakame.skill.state.SkillStateShower
-import cc.mewcraft.wakame.skill.state.stateModule
 import cc.mewcraft.wakame.skill.trigger.ConfiguredSkillSerializer
 import cc.mewcraft.wakame.skill.trigger.TriggerSerializer
 import cc.mewcraft.wakame.skill.trigger.triggerModule
@@ -24,10 +23,10 @@ internal fun skillModule(): Module = module {
 
     includes(triggerModule())
     includes(skillConditionModule())
-    includes(stateModule())
     includes(factoryModule())
 
     singleOf(::SkillEventHandler)
+    singleOf(::SkillTickerListener)
     singleOf(::PlayerSkillStateShower) bind SkillStateShower::class
 
     singleOf(::SkillCastManagerImpl) bind SkillCastManager::class

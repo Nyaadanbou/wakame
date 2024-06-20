@@ -11,12 +11,14 @@ import org.bukkit.entity.Entity as BukkitEntity
 import org.bukkit.entity.Player as BukkitPlayer
 
 sealed interface Caster : Audience {
-    interface Player : Caster {
-        val bukkitPlayer: BukkitPlayer
-    }
-
     interface Entity : Caster {
         val bukkitEntity: BukkitEntity
+    }
+
+    interface Player : Entity {
+        override val bukkitEntity: BukkitEntity
+            get() = bukkitPlayer
+        val bukkitPlayer: BukkitPlayer
     }
 }
 

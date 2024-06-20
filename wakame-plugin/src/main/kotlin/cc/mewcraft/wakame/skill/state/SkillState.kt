@@ -10,6 +10,9 @@ import org.koin.core.component.KoinComponent
  * 技能状态
  */
 interface SkillState {
+
+    val info: SkillStateInfo
+
     /**
      * 添加一次技能触发
      */
@@ -34,7 +37,8 @@ interface SkillState {
 class PlayerSkillState(
     val user: User<Player>
 ) : SkillState, KoinComponent {
-    private var info: SkillStateInfo = SkillStateInfo.idle(this)
+    override var info: SkillStateInfo = SkillStateInfo.idle(this)
+        private set
 
     override fun addTrigger(trigger: SingleTrigger, skillCastContext: SkillCastContext): SkillStateResult {
         return info.addTrigger(trigger, skillCastContext)

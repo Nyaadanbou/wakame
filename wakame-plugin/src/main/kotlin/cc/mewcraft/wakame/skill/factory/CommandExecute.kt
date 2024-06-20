@@ -3,10 +3,7 @@ package cc.mewcraft.wakame.skill.factory
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.skill.FixedSkillCastResult
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillBase
-import cc.mewcraft.wakame.skill.SkillCastResult
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 import net.kyori.adventure.key.Key
@@ -33,12 +30,33 @@ interface CommandExecute : Skill {
 
         override val commands: List<String> by commands
 
-        override fun cast(context: SkillCastContext): SkillCastResult {
-            val entity = context.optional(SkillCastContextKey.CASTER_ENTITY)?.bukkitEntity ?: return FixedSkillCastResult.NONE_CASTER
-            for (command in commands) {
-                command.replace("{caster}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }
+        override fun cast(context: SkillCastContext): SkillTick {
+            return Tick(context)
+        }
+
+        private inner class Tick(
+            context: SkillCastContext,
+        ) : PlayerSkillTick(this@DefaultImpl, context) {
+
+            override fun tickCastPoint(): TickResult {
+                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                player.sendPlainMessage("命令执行前摇")
+                return TickResult.ALL_DONE
             }
-            return FixedSkillCastResult.SUCCESS
+
+            override fun tickBackswing(): TickResult {
+                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                player.sendPlainMessage("命令执行后摇")
+                return TickResult.ALL_DONE
+            }
+
+            override fun tickCast(): TickResult {
+                val entity = context.optional(SkillCastContextKey.CASTER_ENTITY)?.bukkitEntity ?: return TickResult.INTERRUPT
+                for (command in commands) {
+                    command.replace("{caster}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }
+                }
+                return TickResult.ALL_DONE
+            }
         }
     }
 }

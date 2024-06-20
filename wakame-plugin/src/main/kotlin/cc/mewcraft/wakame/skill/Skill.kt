@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.skill
 
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.factory.SkillFactory
+import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 
 /**
@@ -19,7 +20,7 @@ interface Skill : Keyed {
      * The key of this skill.
      *
      * **Note that the [key] here is specified by the location of the skill
-     * configuration file, not the [SkillRegistry.FACTORIES]'s key**,
+     * configuration file, not the [SkillFactories]'s key**,
      * which means that a [SkillFactory] can have multiple [Skill].
      *
      * [Skill] will be stored in the SkillRegistry, and the corresponding
@@ -42,5 +43,18 @@ interface Skill : Keyed {
     /**
      * 释放该技能.
      */
-    fun cast(context: SkillCastContext): SkillCastResult = FixedSkillCastResult.NOOP
+    fun cast(context: SkillCastContext): SkillTick = SkillTick.empty()
+
+    companion object {
+        /**
+         * An empty skill.
+         */
+        fun empty(): Skill = EmptySkill
+    }
+}
+
+private data object EmptySkill : Skill {
+    override val key: Key = Key(Namespaces.SKILL, "empty")
+    override val displays: SkillDisplay = SkillDisplay.empty()
+    override val conditions: SkillConditionGroup = SkillConditionGroup.empty()
 }

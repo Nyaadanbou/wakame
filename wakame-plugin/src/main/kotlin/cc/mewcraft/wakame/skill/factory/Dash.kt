@@ -3,10 +3,7 @@ package cc.mewcraft.wakame.skill.factory
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.skill.FixedSkillCastResult
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillBase
-import cc.mewcraft.wakame.skill.SkillCastResult
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 import net.kyori.adventure.key.Key
@@ -33,12 +30,34 @@ interface Dash : Skill {
 
         override val distance: Double by distance
 
-        override fun cast(context: SkillCastContext): SkillCastResult {
-            val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return FixedSkillCastResult.NONE_CASTER
-            val direction = player.location.direction.normalize()
-            val velocity = direction.multiply(distance)
-            player.velocity = velocity
-            return FixedSkillCastResult.SUCCESS
+        override fun cast(context: SkillCastContext): SkillTick {
+            return Tick(context)
+        }
+
+        private inner class Tick(
+            context: SkillCastContext,
+        ) : PlayerSkillTick(this@DefaultImpl, context) {
+
+            override fun tickCastPoint(): TickResult {
+                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                player.sendPlainMessage("冲刺的前摇摇摇摇")
+                return TickResult.ALL_DONE
+            }
+
+            override fun tickBackswing(): TickResult {
+                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                player.sendPlainMessage("冲刺的后摇摇摇摇摇摇摇")
+                return TickResult.ALL_DONE
+            }
+
+            override fun tickCast(): TickResult {
+                val player =
+                    context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val direction = player.location.direction.normalize()
+                val velocity = direction.multiply(distance)
+                player.velocity = velocity
+                return TickResult.ALL_DONE
+            }
         }
     }
 }

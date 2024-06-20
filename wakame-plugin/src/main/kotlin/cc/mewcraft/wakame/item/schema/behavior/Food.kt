@@ -6,10 +6,7 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.item.schema.NekoItem
-import cc.mewcraft.wakame.skill.CasterAdapter
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillCastManager
-import cc.mewcraft.wakame.skill.TargetAdapter
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
@@ -43,13 +40,15 @@ interface Food : ItemBehavior {
 
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
             skills.forEach { skill ->
-                skillCastManager.tryCast(skill,
+                val result = skillCastManager.tryCast(
+                    skill,
                     SkillCastContext(
                         CasterAdapter.adapt(player),
                         TargetAdapter.adapt(player),
                         itemStack.tryNekoStack
                     )
                 )
+                SkillTicker.addChildren(result.skillTick)
             }
         }
     }

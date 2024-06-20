@@ -2,11 +2,12 @@ package cc.mewcraft.wakame.skill.state
 
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillCastManager
+import cc.mewcraft.wakame.skill.SkillTick
+import cc.mewcraft.wakame.skill.TickResult
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.util.RingBuffer
-import me.lucko.helper.cooldown.Cooldown
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -14,7 +15,7 @@ import org.koin.core.component.inject
 /**
  * 代表了一个玩家技能状态的信息.
  */
-interface SkillStateInfo {
+sealed interface SkillStateInfo {
     /**
      * 添加一个 [SingleTrigger],
      */
@@ -35,7 +36,7 @@ interface SkillStateInfo {
          * 创建一个空的 [SkillStateInfo] 实例.
          */
         fun idle(state: PlayerSkillState): SkillStateInfo {
-            return Idle(state, 2)
+            return IdleStateInfo(state)
         }
     }
 }
@@ -43,9 +44,8 @@ interface SkillStateInfo {
 /**
  * 表示玩家技能状态的空闲状态(无施法), 即玩家可以使用技能.
  */
-private class Idle(
+class IdleStateInfo(
     private val state: PlayerSkillState,
-    cooldownTicks: Long
 ) : SkillStateInfo, KoinComponent {
     companion object {
         private val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> =
@@ -53,14 +53,13 @@ private class Idle(
     }
 
     private val skillStateShower: SkillStateShower<Player> by inject()
-    private val cooldown: Cooldown = Cooldown.ofTicks(cooldownTicks)
+    private val skillCastManager: SkillCastManager by inject()
+
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(3)
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
         val user = state.user
-        // To make sure the player is not spamming the skill
-        if (!cooldown.test())
-            return SkillStateResult.SILENT_FAILURE
+        // TODO: Make sure the player is not spamming the skill
 
         val skills = mutableListOf<Skill>()
         if (trigger in SEQUENCE_GENERATION_TRIGGERS) {
@@ -83,14 +82,15 @@ private class Idle(
         if (skills.isEmpty())
             return SkillStateResult.SILENT_FAILURE
 
-        state.setInfo(BeforeCasting(state, skills, context, 1))
+        val skillTick = skillCastManager.tryCast(skills.first(), context).skillTick
+
+        state.setInfo(CastPointStateInfo(state, skillTick))
         return SkillStateResult.CANCEL_EVENT
     }
 
     override fun tick() = Unit
 
     override fun interrupt() {
-        cooldown.reset()
         currentSequence.clear()
         skillStateShower.displayFailure(currentSequence.readAll(), state.user)
     }
@@ -99,22 +99,10 @@ private class Idle(
 /**
  * 表示玩家技能状态的前摇状态, 即玩家正在试图使用技能.
  */
-private class BeforeCasting(
+class CastPointStateInfo(
     private val state: PlayerSkillState,
-    /**
-     * 将要释放的技能.
-     */
-    private val skills: Collection<Skill>,
-    /**
-     * 技能的上下文
-     */
-    private val context: SkillCastContext,
-    /**
-     * 此状态的持续时间.
-     */
-    waitingTicks: Long
+    private val skillTick: SkillTick,
 ) : SkillStateInfo {
-    private var counter: Long = waitingTicks
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
         interrupt()
@@ -122,63 +110,52 @@ private class BeforeCasting(
     }
 
     override fun tick() {
-        counter--
-        if (counter <= 0) {
-            state.setInfo(Casting(state, skills, context, 1))
+        val result = skillTick.tick()
+        when (result) {
+            TickResult.CONTINUE_TICK -> return
+            TickResult.ALL_DONE -> state.setInfo(CastStateInfo(state, skillTick))
+            TickResult.INTERRUPT -> interrupt()
         }
     }
 
     override fun interrupt() {
-        state.setInfo(Idle(state, 2))
+        state.setInfo(IdleStateInfo(state))
     }
 }
 
 /**
  * 表示玩家技能状态的释放状态, 即玩家正在释放技能.
  */
-private class Casting(
+class CastStateInfo(
     private val state: PlayerSkillState,
-    private val skills: Collection<Skill>,
-    /**
-     * 技能的上下文
-     */
-    private val context: SkillCastContext,
-    /**
-     * 此状态的持续时间.
-     */
-    castingTicks: Long
-) : SkillStateInfo, KoinComponent {
-    private val skillCastManager: SkillCastManager by inject()
-    private var counter: Long = castingTicks
+    private val skillTick: SkillTick,
+) : SkillStateInfo {
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
         return SkillStateResult.CANCEL_EVENT
     }
 
     override fun tick() {
-        counter--
-        if (counter <= 0) {
-            skills.forEach { skillCastManager.tryCast(it, context) }
-            state.setInfo(AfterCasting(state, 1))
+        val result = skillTick.tick()
+        when (result) {
+            TickResult.CONTINUE_TICK -> return
+            TickResult.ALL_DONE -> state.setInfo(BackswingStateInfo(state, skillTick))
+            TickResult.INTERRUPT -> interrupt()
         }
     }
 
     override fun interrupt() {
-        state.setInfo(Idle(state, 2))
+        state.setInfo(IdleStateInfo(state))
     }
 }
 
 /**
  * 表示玩家技能状态的后摇状态, 即玩家释放技能后的状态.
  */
-private class AfterCasting(
+class BackswingStateInfo(
     private val state: PlayerSkillState,
-    /**
-     * 此状态的持续时间.
-     */
-    waitingTicks: Long
+    private val skillTick: SkillTick,
 ) : SkillStateInfo {
-    private var counter: Long = waitingTicks
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
         interrupt()
@@ -186,13 +163,15 @@ private class AfterCasting(
     }
 
     override fun tick() {
-        counter--
-        if (counter <= 0) {
-            state.setInfo(Idle(state, 2))
+        val result = skillTick.tick()
+        when (result) {
+            TickResult.CONTINUE_TICK -> return
+            TickResult.ALL_DONE -> state.setInfo(IdleStateInfo(state))
+            TickResult.INTERRUPT -> interrupt()
         }
     }
 
     override fun interrupt() {
-        state.setInfo(Idle(state, 2))
+        state.setInfo(IdleStateInfo(state))
     }
 }

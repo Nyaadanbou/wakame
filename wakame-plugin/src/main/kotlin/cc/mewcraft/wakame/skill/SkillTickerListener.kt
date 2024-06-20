@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill.state
+package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
@@ -6,7 +6,7 @@ import org.bukkit.Server
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-class StateListener(
+class SkillTickerListener(
     private val server: Server
 ) : Listener {
 
@@ -16,6 +16,7 @@ class StateListener(
             val user = player.toUser()
             user.skillState.tick()
         }
+        SkillTicker.tick()
     }
 
 }

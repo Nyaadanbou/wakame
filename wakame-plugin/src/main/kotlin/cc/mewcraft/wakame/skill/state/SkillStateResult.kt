@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.skill.state
 
 enum class SkillStateResult {
+    /**
+     * 当前状态下的技能执行成功
+     */
     SUCCESS,
 
     /**
