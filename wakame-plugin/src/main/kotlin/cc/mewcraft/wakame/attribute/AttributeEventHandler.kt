@@ -57,8 +57,7 @@ class AttributeEventHandler : KoinComponent {
         newItem: ItemStack?,
     ) {
         updateAttributeModifiers(player, oldItem, newItem) {
-            this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) &&
-                    this.hasBehavior<AttributeProvider>()
+            this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) && this.hasBehavior<AttributeProvider>()
         }
     }
 
@@ -94,7 +93,7 @@ class AttributeEventHandler : KoinComponent {
 
         val userAttributes = player.toUser().attributeMap
         val itemAttributes = this.cell.getAttributeModifiers()
-        itemAttributes.forEach { attribute, modifier -> userAttributes[attribute]?.addModifier(modifier) }
+        itemAttributes.forEach { attribute, modifier -> userAttributes.getInstance(attribute)?.addModifier(modifier) }
     }
 
     /**
@@ -111,6 +110,6 @@ class AttributeEventHandler : KoinComponent {
 
         val userAttributes = player.toUser().attributeMap
         val itemAttributes = this.cell.getAttributeModifiers()
-        itemAttributes.forEach { attribute, modifier -> userAttributes[attribute]?.removeModifier(modifier) }
+        itemAttributes.forEach { attribute, modifier -> userAttributes.getInstance(attribute)?.removeModifier(modifier) }
     }
 }

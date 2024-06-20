@@ -88,16 +88,25 @@ inline fun <reified T : Any> ConfigProvider.optionalEntry(vararg paths: Array<St
         node?.get<T?>()
     }
 
+/**
+ * See [NodeConfigProvider].
+ */
 fun ConfigProvider.node(vararg path: String): ConfigProvider {
     return NodeConfigProvider(loadValue().node(*path))
 }
 
+/**
+ * See [DerivedConfigProvider].
+ */
 fun ConfigProvider.derive(vararg path: String): ConfigProvider {
     val provider = DerivedConfigProvider(this, arrayOf(*path))
     this.addChild(provider) // to support reload
     return provider
 }
 
+/**
+ * To be extended.
+ */
 sealed class ConfigProvider(
     val relPath: String,
 ) : Provider<ConfigurationNode>() {
@@ -150,7 +159,7 @@ class GsonFileConfigProvider internal constructor(
 }
 
 /**
- * A [ConfigProvider] of a wrapped node.
+ * A [ConfigProvider] of a wrapped [ConfigurationNode].
  *
  * **This provider is immutable and never updates!**
  *

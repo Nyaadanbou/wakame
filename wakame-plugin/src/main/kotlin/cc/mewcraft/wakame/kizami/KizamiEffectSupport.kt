@@ -107,10 +107,10 @@ data class KizamiAttribute(
     override val effect: Map<Attribute, AttributeModifier>,
 ) : KizamiEffect.Single<Map<Attribute, AttributeModifier>> {
     override fun apply(kizami: Kizami, user: User<*>) {
-        effect.forEach { (attribute, modifier) -> user.attributeMap[attribute]?.addModifier(modifier) }
+        effect.forEach { (attribute, modifier) -> user.attributeMap.getInstance(attribute)?.addModifier(modifier) }
     }
 
     override fun remove(kizami: Kizami, user: User<*>) {
-        effect.forEach { (attribute, modifier) -> user.attributeMap[attribute]?.removeModifier(modifier) }
+        effect.forEach { (attribute, modifier) -> user.attributeMap.getInstance(attribute)?.removeModifier(modifier) }
     }
 }

@@ -55,13 +55,6 @@ sealed interface AttributeMap {
      * Assigns all the data from [other] to this map.
      */
     fun assignValues(other: AttributeMap)
-
-    /**
-     * @see getInstance
-     */
-    operator fun get(attribute: Attribute): AttributeInstance? {
-        return getInstance(attribute)
-    }
 }
 
 /**
@@ -207,7 +200,7 @@ internal constructor(
     /**
      * The data values.
      */
-    private val data: PersistentDataContainer
+    private val pdc: PersistentDataContainer
         get() = entity.get()?.persistentDataContainer ?: error("The entity reference object no longer exists")
 
     init {
