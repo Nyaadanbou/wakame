@@ -154,6 +154,10 @@ object AttributeRegistry : Initializable {
 
         +buildFacade("universal_defense_penetration", SHORT).single().bind { UNIVERSAL_DEFENSE_PENETRATION }
 
+        +buildFacade("defense_penetration_rate", DOUBLE).single().element().bind { DEFENSE_PENETRATION_RATE }
+
+        +buildFacade("universal_defense_penetration_rate", DOUBLE).single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
+
         +buildFacade("attack_damage_rate", DOUBLE).single().element().bind { ATTACK_DAMAGE_RATE }
 
         +buildFacade("universal_attack_damage_rate", DOUBLE).single().bind { UNIVERSAL_ATTACK_DAMAGE_RATE }

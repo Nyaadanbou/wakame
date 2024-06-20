@@ -93,6 +93,7 @@ object Attributes : AttributeContainer<Attribute> {
     val MAX_MANA = RangedAttribute("max_mana", 100.0, .0, 16384.0).apply(::register)
     val UNIVERSAL_DEFENSE = RangedAttribute("universal_defense", .0, -16384.0, 16384.0).apply(::register)
     val UNIVERSAL_DEFENSE_PENETRATION = RangedAttribute("universal_defense_penetration", .0, -16384.0, 16384.0).apply(::register)
+    val UNIVERSAL_DEFENSE_PENETRATION_RATE = RangedAttribute("universal_defense_penetration_rate", .0, 0.0, 1.0).apply(::register)
     val UNIVERSAL_MAX_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_max_attack_damage", .0, .0, 16384.0).apply(::register)
     val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_min_attack_damage", .0, .0, 16384.0).apply(::register)
     val UNIVERSAL_ATTACK_DAMAGE_RATE = RangedAttribute("universal_attack_damage_rate", .0, -1.0, 16384.0).apply(::register)
@@ -192,6 +193,7 @@ internal constructor(
     //<editor-fold desc="Types">
     val DEFENSE = ElementAttribute("defense", .0, -16384.0, 16384.0, element).apply(::register)
     val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element).apply(::register)
+    val DEFENSE_PENETRATION_RATE = ElementAttribute("defense_penetration_rate", .0, -0.0, 1.0, element).apply(::register)
     val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element).apply(::register)
     val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element).apply(::register)
     val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", .0, -1.0, 16384.0, element).apply(::register)
