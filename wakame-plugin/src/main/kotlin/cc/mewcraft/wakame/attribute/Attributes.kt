@@ -85,13 +85,18 @@ object Attributes : AttributeContainer<Attribute> {
     val ATTACK_SPEED_LEVEL = RangedAttribute("attack_speed_level", .0, .0, 8.0).apply(::register) // !!! can only take integer
     val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", 0.01, .0, 1.0).apply(::register)
     val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, .0, 5.0).apply(::register)
-    val DAMAGE_REDUCTION_RATE = RangedAttribute("damage_reduction_rate", .0, .0, 1.0).apply(::register)
     val HEALTH_REGENERATION = RangedAttribute("health_regeneration", 1.0, .0, 16384.0).apply(::register)
     val LIFESTEAL = RangedAttribute("lifesteal", .0, .0, 16384.0).apply(::register)
     val MANASTEAL = RangedAttribute("manasteal", .0, .0, 16384.0).apply(::register)
     val MANA_CONSUMPTION_RATE = RangedAttribute("mana_consumption_rate", 1.0, .0, 5.0).apply(::register)
     val MANA_REGENERATION = RangedAttribute("mana_regeneration", 1.0, .0, 16384.0).apply(::register)
     val MAX_MANA = RangedAttribute("max_mana", 100.0, .0, 16384.0).apply(::register)
+    val UNIVERSAL_DEFENSE = RangedAttribute("universal_defense", .0, -16384.0, 16384.0).apply(::register)
+    val UNIVERSAL_DEFENSE_PENETRATION = RangedAttribute("universal_defense_penetration", .0, -16384.0, 16384.0).apply(::register)
+    val UNIVERSAL_MAX_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_max_attack_damage", .0, .0, 16384.0).apply(::register)
+    val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_min_attack_damage", .0, .0, 16384.0).apply(::register)
+    val UNIVERSAL_ATTACK_DAMAGE_RATE = RangedAttribute("universal_attack_damage_rate", .0, -1.0, 16384.0).apply(::register)
+    val UNIVERSAL_INCOMING_DAMAGE_RATE = RangedAttribute("universal_incoming_damage_rate", .0, -1.0, 16384.0).apply(::register)
     //</editor-fold>
 
     // The returned collect does NOT include any elemental attributes!
@@ -190,6 +195,7 @@ internal constructor(
     val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element).apply(::register)
     val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element).apply(::register)
     val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", .0, -1.0, 16384.0, element).apply(::register)
+    val INCOMING_DAMAGE_RATE = ElementAttribute("incoming_damage_rate", .0, -1.0, 16384.0,element).apply(::register)
     //</editor-fold>
 }
 

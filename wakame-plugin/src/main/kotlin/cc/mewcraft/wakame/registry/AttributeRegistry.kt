@@ -120,6 +120,10 @@ object AttributeRegistry : Initializable {
             { MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE }
         )
 
+        +buildFacade("universal_attack_damage", SHORT).ranged().bind(
+            { UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE }
+        )
+
         +buildFacade("attack_effect_chance", DOUBLE).single().bind { ATTACK_EFFECT_CHANCE }
 
         +buildFacade("attack_speed_level", BYTE).single().bind {
@@ -142,13 +146,21 @@ object AttributeRegistry : Initializable {
 
         +buildFacade("critical_strike_power", DOUBLE).single().bind { CRITICAL_STRIKE_POWER }
 
-        +buildFacade("damage_reduction_rate", DOUBLE).single().bind { DAMAGE_REDUCTION_RATE }
-
         +buildFacade("defense", SHORT).single().element().bind { DEFENSE }
+
+        +buildFacade("universal_defense", SHORT).single().bind { UNIVERSAL_DEFENSE }
 
         +buildFacade("defense_penetration", SHORT).single().element().bind { DEFENSE_PENETRATION }
 
+        +buildFacade("universal_defense_penetration", SHORT).single().bind { UNIVERSAL_DEFENSE_PENETRATION }
+
         +buildFacade("attack_damage_rate", DOUBLE).single().element().bind { ATTACK_DAMAGE_RATE }
+
+        +buildFacade("universal_attack_damage_rate", DOUBLE).single().bind { UNIVERSAL_ATTACK_DAMAGE_RATE }
+
+        +buildFacade("incoming_damage_rate", DOUBLE).single().element().bind { INCOMING_DAMAGE_RATE }
+
+        +buildFacade("universal_incoming_damage_rate", DOUBLE).single().bind { UNIVERSAL_INCOMING_DAMAGE_RATE }
 
         +buildFacade("entity_interaction_range", DOUBLE).single().bind { ENTITY_INTERACTION_RANGE }
 
