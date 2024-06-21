@@ -1,85 +1,42 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
+import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.user.User
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
 
 /**
  * 防御元数据
  * 包含了一次伤害中“防御阶段”的有关信息
+ * 其实现类实例化时，最终伤害值以及各种信息就已经确定了
  */
 sealed interface DefenseMetaData {
+    val damageeAttributeMap: AttributeMap
     fun calculateFinalDamage(damageMetaData: DamageMetaData): Double
 }
 
 /**
- * 无操作的防御元数据
- */
-data object NoopDefenseMetaData : DefenseMetaData {
-
-    override fun calculateFinalDamage(damageMetaData: DamageMetaData): Double {
-        return damageMetaData.damageValue
-    }
-}
-
-/**
- * 玩家防御元数据
- * 需要计算玩家的元素防御
- */
-class PlayerDefenseMetaData(
-    val user: User<Player>,
-) : DefenseMetaData {
-
-    override fun calculateFinalDamage(damageMetaData: DamageMetaData): Double {
-        when (damageMetaData) {
-
-            is DefaultDamageMetaData -> {
-                return DamageManager.getDamageAfterDefense(
-                    damageMetaData.damageValue,
-                    user.attributeMap.getValue(Attributes.byElement(ElementRegistry.DEFAULT).DEFENSE),
-                    0.0
-                )
-            }
-
-            is VanillaDamageMetaData -> {
-                return DamageManager.getDamageAfterDefense(
-                    damageMetaData.damageValue,
-                    user.attributeMap.getValue(Attributes.byElement(damageMetaData.element).DEFENSE),
-                    damageMetaData.defensePenetration
-                )
-            }
-
-            /**
-             * 玩家受到其他玩家的伤害时
-             * 使用全部元素进行减伤
-             */
-            is PlayerMeleeAttackMetaData, is PlayerProjectileDamageMetaData -> {
-                return damageMetaData.packets.sumOf {
-                    DamageManager.getDamageAfterDefense(
-                        it.finalDamage,
-                        user.attributeMap.getValue(Attributes.byElement(it.element).DEFENSE),
-                        it.defensePenetration
-                    )
-                }
-            }
-
-
-            is EntityMeleeAttackMetaData -> TODO()
-            is EntityProjectileDamageMetaData -> TODO()
-        }
-    }
-}
-
-/**
- * 非玩家实体防御元数据
+ * 玩家和非玩家实体的防御元数据
  */
 class EntityDefenseMetaData(
-    entity: LivingEntity
+    override val damageeAttributeMap: AttributeMap,
 ) : DefenseMetaData {
     override fun calculateFinalDamage(damageMetaData: DamageMetaData): Double {
-        TODO("Not yet implemented")
-    }
+        var totalElementDamage = 0.0
+        for (packet in damageMetaData.packets) {
+            val element = packet.element
+            //考虑防御后伤害、元素伤害减免（本元素+通用元素）
+            val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
+                packet.packetDamage,
+                damageeAttributeMap.getValue(Attributes.byElement(element).DEFENSE),
+                packet.defensePenetration
+            )
 
+            val incomingDamageRate = (damageeAttributeMap.getValue(Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE)
+                    + damageeAttributeMap.getValue(Attributes.byElement(element).INCOMING_DAMAGE_RATE))
+
+            totalElementDamage += damageAfterDefense * (1 + incomingDamageRate)
+        }
+        //防御后，再考虑暴击
+        val criticalPower = if (damageMetaData.isCritical) damageMetaData.criticalPower else 1.0
+        return totalElementDamage * criticalPower
+    }
 }

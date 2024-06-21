@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.getMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.BArrowMeta
 import cc.mewcraft.wakame.item.binary.playNekoStack
-import cc.mewcraft.wakame.item.binary.playNekoStackOrNull
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.User
 import me.lucko.helper.random.VariableAmount
@@ -18,10 +17,16 @@ import kotlin.random.Random
 /**
  * 伤害元数据
  * 包含了一次伤害中“攻击阶段”的有关信息
+ * 其实现类实例化时，攻击伤害值以及各种信息就已经确定了
  */
 sealed interface DamageMetaData {
     val packets: List<ElementDamagePacket>
+        get() = generatePackets()
     val damageValue: Double
+    val criticalPower: Double
+    val isCritical: Boolean
+
+    fun generatePackets(): List<ElementDamagePacket>
 }
 
 /**
@@ -31,19 +36,21 @@ sealed interface DamageMetaData {
  * 不做任何处理，只包含伤害值这一信息，伤害元素类型为默认元素
  */
 class DefaultDamageMetaData(
-    override val damageValue: Double
+    override val damageValue: Double,
 ) : DamageMetaData {
-    override val packets: List<ElementDamagePacket> = listOf(generateVanillaPacket())
+    override val criticalPower: Double = 1.0
+    override val isCritical: Boolean = false
 
-    private fun generateVanillaPacket(): ElementDamagePacket {
-        return ElementDamagePacket(
-            ElementRegistry.DEFAULT,
-            damageValue,
-            damageValue,
-            0.0,
-            0.0,
-            false,
-            0.0
+    override fun generatePackets(): List<ElementDamagePacket> {
+        return listOf(
+            ElementDamagePacket(
+                ElementRegistry.DEFAULT,
+                damageValue,
+                damageValue,
+                0.0,
+                0.0,
+                0.0
+            )
         )
     }
 }
@@ -57,19 +64,21 @@ class DefaultDamageMetaData(
 class VanillaDamageMetaData(
     override val damageValue: Double,
     val element: Element,
-    val defensePenetration: Double
+    private val defensePenetration: Double,
+    private val defensePenetrationRate: Double
 ) : DamageMetaData {
-    override val packets: List<ElementDamagePacket> = listOf(generateVanillaPacket())
-
-    private fun generateVanillaPacket(): ElementDamagePacket {
-        return ElementDamagePacket(
-            element,
-            damageValue,
-            damageValue,
-            0.0,
-            0.0,
-            false,
-            defensePenetration
+    override val criticalPower: Double = 1.0
+    override val isCritical: Boolean = false
+    override fun generatePackets(): List<ElementDamagePacket> {
+        return listOf(
+            ElementDamagePacket(
+                element,
+                damageValue,
+                damageValue,
+                0.0,
+                defensePenetration,
+                defensePenetrationRate
+            )
         )
     }
 }
@@ -82,17 +91,12 @@ class VanillaDamageMetaData(
  */
 class PlayerMeleeAttackMetaData(
     val user: User<Player>,
-    val isSweep: Boolean
+    private val isSweep: Boolean
 ) : DamageMetaData {
-    override val packets: List<ElementDamagePacket> = generatePackets(isSweep)
-    override val damageValue: Double = packets.sumOf { it.finalDamage }
-
-    /**
-     * 在元素伤害包生成时，所有的随机就已经确定了，包括：
-     * 伤害值 value 在范围 [max,min] 的随机
-     * 该元素伤害是否暴击的随机
-     */
-    private fun generatePackets(isSweep: Boolean): List<ElementDamagePacket> {
+    override val damageValue: Double = packets.sumOf { it.packetDamage }
+    override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+    override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+    override fun generatePackets(): List<ElementDamagePacket> {
         val attributeMap = user.attributeMap
         if (isSweep) {
             val list = mutableListOf<ElementDamagePacket>()
@@ -102,10 +106,12 @@ class PlayerMeleeAttackMetaData(
                         it,
                         1.0,
                         1.0,
-                        attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE),
-                        attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
-                        Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
+                        attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE)
+                                + attributeMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE),
                         attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
+                                + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION),
+                        attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
+                                + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
                     )
                 )
             }
@@ -123,11 +129,17 @@ class PlayerMeleeAttackMetaData(
 class EntityMeleeAttackMetaData(
     entity: LivingEntity
 ) : DamageMetaData {
-    override val packets: List<ElementDamagePacket> = TODO()
-    override val damageValue: Double = packets.sumOf { it.finalDamage }
+    override val damageValue: Double = packets.sumOf { it.packetDamage }
+    override val criticalPower: Double = TODO()
+    override val isCritical: Boolean = TODO()
+    override fun generatePackets(): List<ElementDamagePacket> {
+        TODO("Not yet implemented")
+    }
 }
 
-sealed interface ProjectileDamageMetaData : DamageMetaData
+sealed interface ProjectileDamageMetaData : DamageMetaData {
+    val projectileType: ProjectileType
+}
 
 /**
  * 玩家使用弹射物造成伤害的元数据
@@ -136,14 +148,15 @@ sealed interface ProjectileDamageMetaData : DamageMetaData
  * 对于三叉戟，则不需要，因为三叉戟投掷命中和直接近战击打没有区别
  */
 class PlayerProjectileDamageMetaData(
+    override val projectileType: ProjectileType,
     val user: User<Player>,
-    val projectileType: ProjectileType,
     val itemStack: ItemStack
 ) : ProjectileDamageMetaData {
-    override val packets: List<ElementDamagePacket> = generatePackets(projectileType)
-    override val damageValue: Double = packets.sumOf { it.finalDamage }
+    override val damageValue: Double = packets.sumOf { it.packetDamage }
+    override val criticalPower: Double = TODO()
+    override val isCritical: Boolean = TODO()
 
-    private fun generatePackets(projectileType: ProjectileType): List<ElementDamagePacket> {
+    override fun generatePackets(): List<ElementDamagePacket> {
         val attributeMap = user.attributeMap
         when (projectileType) {
             ProjectileType.ARROWS -> {
@@ -176,11 +189,15 @@ class PlayerProjectileDamageMetaData(
  * 如：骷髅射出的箭矢、溺尸射出的三叉戟
  */
 class EntityProjectileDamageMetaData(
-    entity: LivingEntity,
-    val projectileType: ProjectileType
+    override val projectileType: ProjectileType,
+    val entity: LivingEntity
 ) : ProjectileDamageMetaData {
-    override val packets: List<ElementDamagePacket> = TODO()
-    override val damageValue: Double = packets.sumOf { it.finalDamage }
+    override val damageValue: Double = packets.sumOf { it.packetDamage }
+    override val criticalPower: Double = TODO()
+    override val isCritical: Boolean = TODO()
+    override fun generatePackets(): List<ElementDamagePacket> {
+        TODO("Not yet implemented")
+    }
 }
 
 data class ElementDamagePacket(
@@ -188,14 +205,11 @@ data class ElementDamagePacket(
     val min: Double,
     val max: Double,
     val rate: Double,
-    val criticalPower: Double,
-    val isCritical: Boolean,
     val defensePenetration: Double,
+    val defensePenetrationRate: Double,
 ) {
     val value: Double = if (min >= max) max else VariableAmount.range(min, max).amount
-
-    //最终伤害 = Σ random(MIN_ATTACK_DAMAGE, MAX_ATTACK_DAMAGE) * (1 + ATTACK_DAMAGE_RATE) * (1 + CRITICAL_STRIKE_POWER)
-    val finalDamage: Double = value * (1 + rate) * (1.0 + if (isCritical) criticalPower else 0.0)
+    val packetDamage: Double = value * (1 + rate)
 }
 
 /**
@@ -225,12 +239,16 @@ private fun generatePackets0(attributeMap: AttributeMap): List<ElementDamagePack
         list.add(
             ElementDamagePacket(
                 it,
-                attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE),
-                attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE),
-                attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE),
-                attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
-                Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
+                attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
+                        + attributeMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE),
+                attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
+                        + attributeMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE),
+                attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE)
+                        + attributeMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE),
                 attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
+                        + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION),
+                attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
+                        + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
             )
         )
     }

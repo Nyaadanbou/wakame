@@ -69,19 +69,7 @@ object DamageManager {
     }
 
     fun generateDefenseMetaData(event: EntityDamageEvent): DefenseMetaData {
-        when (val damagee = event.entity) {
-            is Player -> {
-                return PlayerDefenseMetaData(damagee.toUser())
-            }
-
-            is LivingEntity -> {
-                TODO()
-            }
-
-            else -> {
-                throw RuntimeException("damagee must be LivingEntity")
-            }
-        }
+        TODO("获得受伤实体的AttributeMap")
     }
 
     private val projectileDamageMetaDataMap = mutableMapOf<UUID, ProjectileDamageMetaData>()
@@ -99,7 +87,7 @@ object DamageManager {
                     is Player -> {
                         projectileDamageMetaDataMap.put(
                             projectile.uniqueId,
-                            PlayerProjectileDamageMetaData(shooter.toUser(), ProjectileType.TRIDENT, projectile.itemStack)
+                            PlayerProjectileDamageMetaData(ProjectileType.TRIDENT, shooter.toUser(), projectile.itemStack)
                         )
                     }
 
@@ -115,7 +103,7 @@ object DamageManager {
                     is Player -> {
                         projectileDamageMetaDataMap.put(
                             projectile.uniqueId,
-                            PlayerProjectileDamageMetaData(shooter.toUser(), ProjectileType.ARROWS, projectile.itemStack)
+                            PlayerProjectileDamageMetaData(ProjectileType.ARROWS, shooter.toUser(), projectile.itemStack)
                         )
                     }
 
@@ -140,13 +128,20 @@ object DamageManager {
     fun removeProjectileDamageMetaData(uuid: UUID) {
         projectileDamageMetaDataMap.remove(uuid)
     }
+}
 
+/**
+ * 伤害系统中与公式有关的内容
+ */
+object DamageRules {
     /**
      * 计算 单种元素 被防御后的伤害
-     * 影响最终伤害的因素：原始伤害值、该元素防御力、该元素防御穿透
+     * 影响防御后伤害的因素：原始伤害值、防御（本元素+通用元素）、防御穿透
      * TODO 添加从配置文件载入防御计算公式的功能
      */
-    fun getDamageAfterDefense(originalDamage: Double, defense: Double, defensePenetration: Double): Double {
+    fun calculateDamageAfterDefense(
+        originalDamage: Double, defense: Double, defensePenetration: Double,
+    ): Double {
         val validDefense = (defense - defensePenetration).coerceAtLeast(0.0)
         return originalDamage * (1 - (validDefense / 1 * originalDamage + validDefense))
     }
