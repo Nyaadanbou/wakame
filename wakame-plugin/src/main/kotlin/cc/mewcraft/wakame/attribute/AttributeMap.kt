@@ -186,26 +186,34 @@ fun EntityAttributeMap(entity: LivingEntity): EntityAttributeMap {
  * Instead, it works as an "accessor" to the underlying attribute data about an entity.
  * By design, the underlying attribute data is actually stored in the entity's NBT storage.
  */
-class EntityAttributeMap
-internal constructor(
-    private val default: AttributeSupplier,
-    entity: LivingEntity,
-) : AttributeMap {
-    /**
-     * The underlying entity.
-     */
-    private val entity: WeakReference<LivingEntity> =
-        WeakReference(entity) // use WeakRef to prevent memory leak
+class EntityAttributeMap : AttributeMap {
+    internal constructor(default: AttributeSupplier, entity: LivingEntity) {
+        require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
+        this.default = default
+        this.weakEntity = WeakReference(entity)
+    }
 
     /**
-     * The data values.
+     * 默认属性的提供器.
+     */
+    private val default: AttributeSupplier
+
+    /**
+     * 弱引用封装的实体对象.
+     */
+    private val weakEntity: WeakReference<LivingEntity> // use WeakRef to prevent memory leak
+
+    /**
+     * 实体对象.
+     */
+    private val entity: LivingEntity
+        get() = requireNotNull(weakEntity.get()) { "The entity reference no longer exists" }
+
+    /**
+     * The persistent data values.
      */
     private val pdc: PersistentDataContainer
-        get() = entity.get()?.persistentDataContainer ?: error("The entity reference object no longer exists")
-
-    init {
-        require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
-    }
+        get() = entity.persistentDataContainer
 
     // Some thoughts about implementation:
     //  The AttributeMap data should be stored in the entity's NBT storage,
@@ -218,6 +226,11 @@ internal constructor(
     //  usually upon the entity is spawned. As a result, the attributes data
     //  must be persistent.
 
+    // 开发日记: 2024/6/24 小米
+    // 为了能够测试伤害系统, 暂时先把 EntityAttributeMap 的读取操作的一部分给实现了, 写入操作目前还完全没有实现.
+    // 具体来说, 现在的读取实际上总是会读取的实体的默认属性. 默认属性可以在配置文件中自由调整.
+    // 需要注意, 读取时如果默认属性不存在, 那么会直接抛异常. 因此测试前需要先准备好配置文件.
+
     override fun getInstance(attribute: Attribute): AttributeInstance? {
         TODO("Not yet implemented")
     }
@@ -227,23 +240,28 @@ internal constructor(
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
-        TODO("Not yet implemented")
+        // TODO 支持 overrides
+        return default.hasAttribute(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
-        TODO("Not yet implemented")
+        // TODO 支持 overrides
+        return default.hasModifier(attribute, uuid)
     }
 
     override fun getValue(attribute: Attribute): Double {
-        TODO("Not yet implemented")
+        // TODO 支持 overrides
+        return default.getValue(attribute, entity)
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        TODO("Not yet implemented")
+        // TODO 支持 overrides
+        return default.getBaseValue(attribute, entity)
     }
 
     override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        TODO("Not yet implemented")
+        // TODO 支持 overrides
+        return default.getModifierValue(attribute, uuid, entity)
     }
 
     override fun assignValues(other: AttributeMap) {
