@@ -1,18 +1,10 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.event.WakameEntityDamageEvent
-import cc.mewcraft.wakame.user.toUser
-import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.Arrow
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.SpectralArrow
-import org.bukkit.entity.Trident
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
-import org.bukkit.projectiles.BlockProjectileSource
 
 class DamageListener : Listener {
     @EventHandler
