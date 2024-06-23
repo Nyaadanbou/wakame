@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.skill.state
 
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillCastManager
-import cc.mewcraft.wakame.skill.SkillTick
-import cc.mewcraft.wakame.skill.TickResult
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
@@ -62,7 +59,8 @@ class IdleStateInfo(
         // TODO: Make sure the player is not spamming the skill
 
         val skills = mutableListOf<Skill>()
-        if (trigger in SEQUENCE_GENERATION_TRIGGERS) {
+        val skillMap = user.skillMap
+        if (skillMap.hasTrigger<SequenceTrigger>() && trigger in SEQUENCE_GENERATION_TRIGGERS) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
             val completeSequence = currentSequence.readAll()
@@ -70,13 +68,13 @@ class IdleStateInfo(
 
             if (currentSequence.isFull()) {
                 val sequence = SequenceTrigger.of(completeSequence)
-                val skillsOnSequence = user.skillMap.getSkill(sequence)
+                val skillsOnSequence = skillMap.getSkill(sequence)
                 skills.addAll(skillsOnSequence)
                 currentSequence.clear()
             }
         }
 
-        val skillsOnSingle = user.skillMap.getSkill(trigger)
+        val skillsOnSingle = skillMap.getSkill(trigger)
         skills.addAll(skillsOnSingle)
 
         if (skills.isEmpty())

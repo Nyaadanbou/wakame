@@ -16,15 +16,54 @@ import java.util.UUID
  * for the subject.
  */
 interface SkillMap {
+    /**
+     * Adds a [ConfiguredSkill] to the skill map.
+     */
     fun addSkill(skill: ConfiguredSkill)
+
+    /**
+     * Adds a collection of [Skill] keys to the skill map.
+     */
     fun addSkillsByKey(skills: Multimap<Trigger, Key>)
+
+    /**
+     * Adds a collection of [Skill] instances to the skill map.
+     */
     fun addSkillsByInstance(skills: Multimap<Trigger, Skill>)
+
+    /**
+     * Returns a collection of [Skill] instances that are triggered by the given [Trigger].
+     */
     fun getSkill(trigger: Trigger): Collection<Skill>
+
+    /**
+     * Removes a [Skill] from the skill map by its key.
+     */
     fun removeSkill(key: Key)
+
+    /**
+     * Removes a [Skill] from the skill map by its instance.
+     */
     fun removeSkill(skill: Skill)
+
+    /**
+     * Removes a collection of [Skill] from the skill map.
+     */
     fun removeSkill(skills: Multimap<Trigger, Skill>)
+
+    /**
+     * Returns a set of [Trigger]s that are currently available in the skill map.
+     */
     fun getTriggers(): Set<Trigger>
 
+    /**
+     * Checks whether the skill map has a trigger of the given class.
+     */
+    fun hasTrigger(clazz: Class<out Trigger>): Boolean
+
+    /**
+     * Returns a collection of [Skill] instances that are triggered by the given [Trigger].
+     */
     operator fun get(uniqueId: UUID, trigger: Trigger): Collection<Skill> = getSkill(trigger)
 }
 
@@ -33,6 +72,10 @@ interface SkillMap {
  */
 fun PlayerSkillMap(user: User<*>): PlayerSkillMap {
     return PlayerSkillMap(user.uniqueId)
+}
+
+inline fun <reified T : Trigger> SkillMap.hasTrigger(): Boolean {
+    return hasTrigger(T::class.java)
 }
 
 /**
@@ -83,5 +126,9 @@ class PlayerSkillMap(
 
     override fun getTriggers(): Set<Trigger> {
         return skills.keySet()
+    }
+
+    override fun hasTrigger(clazz: Class<out Trigger>): Boolean {
+        return skills.keys().any { clazz.isInstance(it) }
     }
 }
