@@ -1,23 +1,17 @@
 # 渲染器
 
-# 渲染器负责修改 ItemStack 的网络封包
-# 将其 NBT `tags.display` 下的内容
-# 根据此配置文件定义的格式进行修改
+# 渲染器负责修改 ItemStack 的网络封包,
+# 将其组件 `minecraft:lore` 下的内容
+# 根据此配置文件定义的格式进行修改.
 
 # 渲染布局
-# 定义什么内容应该出现在什么位置
-# 例如想让“攻击力”在“暴击概率”前面
+#   定义什么内容应该出现在什么位置,
+#   例如想让“攻击力”在“暴击概率”前面.
+#   由于内容可能根本不存在, 因此这里的位置都是相对的.
 #
-# 这里不一定要指定所有的占位符，你可以省略任意的占位符
-# 如果一个占位符没有写在这里，则对应内容不会渲染出来
-#
-# 语法说明：
-# primary:
-#   见内部的注释
-# element:
-#   见内部的注释
-# operation:
-#   见内部的注释
+# 缺省值
+#   这里不一定要指定所有的占位符，你可以省略任意的占位符.
+#   如果一个占位符没有写在这里，则对应内容不会渲染出来.
 renderer_layout:
 
   # 主体排序
@@ -28,17 +22,27 @@ renderer_layout:
   # (fixed:_namespace_)_文本内容或留空_
   # (fixed:*)_文本内容或留空_
   # (default:_文本内容_)_namespace:value_
-  # (default:empty)_namespace:value_
+  # (default:blank)_namespace:value_
   # _namespace:value_
   primary:
     - (fixed:meta)<!i><aqua><b>元数据 # 仅当下面存在 meta 命名空间下的内容时才渲染
     - meta:level # 必须写命名空间形式的唯一标识
     - meta:rarity
-    - meta:element
-    - meta:kizami
+    - meta:elements
+    - meta:kizamiz
     - (default:<!i><gray>无皮肤所有者)meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
-    - (default:empty)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
-    - meta:durability
+    - (default:blank)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
+    - meta:damageable
+    - meta:arrow
+    - meta:custom_model_data
+    - meta:attributable
+    - meta:kizamiable
+    - meta:skillful
+    - meta:fire_resistant
+    - meta:food
+    - meta:damage
+    - meta:max_damage
+    - meta:unbreakable
     - meta:lore
     - (fixed)<!i><gray>---------------- # 这行始终显示
     - (fixed:attribute)<!i><aqua><b>属性\r第二行属性介绍awa

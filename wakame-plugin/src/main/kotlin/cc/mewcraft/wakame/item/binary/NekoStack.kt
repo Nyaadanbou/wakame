@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemBehaviorAccessor
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
@@ -7,9 +8,14 @@ import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.getAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
+import cc.mewcraft.wakame.item.component.ItemComponentMap
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.Arrow
+import cc.mewcraft.wakame.item.components.Attributable
 import cc.mewcraft.wakame.item.schema.NekoItem
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
@@ -89,6 +95,11 @@ interface NekoStack : ItemBehaviorAccessor {
     val slot: ItemSlot
 
     /**
+     * 存放该物品的`物品组件`的容器. 用于读取/添加/移除该物品的`物品组件`.
+     */
+    val components: ItemComponentMap
+
+    /**
      * The [ItemCellAccessor] of this item.
      *
      * Used to manipulate the **cells** of this item.
@@ -125,4 +136,27 @@ interface NekoStack : ItemBehaviorAccessor {
  */
 inline fun <reified M : BinaryItemMeta<*>> NekoStack.getMetaAccessor(): M {
     return this.meta.getAccessor<M>()
+}
+
+fun main(nekoStack: NekoStack) {
+    // 获取 arrow
+    val arrow: Arrow? = nekoStack.components.get(ItemComponentTypes.ARROW)
+    if (arrow != null && arrow.pierceLevel > 1) {
+
+    }
+
+    // 渲染提示框
+    val attributable: Attributable? = nekoStack.components.get(ItemComponentTypes.ATTRIBUTABLE)
+    if (attributable != null) {
+        val loreLine: LoreLine = attributable.provideDisplayLore()
+    }
+
+
+    // 获取 item_name
+    val itemName: Component? = nekoStack.components.get(ItemComponentTypes.ITEM_NAME)
+    val hasFood: Boolean = nekoStack.components.has(ItemComponentTypes.FOOD)
+    // 设置 item_name
+    nekoStack.components.add(ItemComponentTypes.ITEM_NAME, Component.text("You can't change this name with anvils!"))
+    // 移除 cells (所有的词条栏)
+    nekoStack.components.remove(ItemComponentTypes.CELLS)
 }

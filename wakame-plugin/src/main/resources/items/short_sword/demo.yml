@@ -7,9 +7,10 @@ uuid: cfee549f-e4d7-4574-b104-92d8251ebee4
 
 # 原版物品类型
 # 可选，默认 "stone"
-material: wooden_sword
+item_type: wooden_sword
 
 # 需要移除的原版物品组件
+# 相当于原版的 `!minecraft:attribute_modifiers` 操作
 # 名字参考: https://minecraft.wiki/w/Data_component_format
 remove_components:
   - attribute_modifiers
@@ -55,31 +56,57 @@ assets:
 # - SLOT_4 (仅测试用)
 slot: MAIN_HAND
 
-# 物品行为
-# 可选，默认 无
-behaviors:
-  attribute_provider: { }
-  castable: { }
-  damageable:
-    disappear_when_broken: false
-    repair:
-      - minecraft:iron_ingot
-  kizami_provider: { }
-  statistical: { }
+# 开发日记: 2024/6/24
+# 按照小福米说的, wakame 应该始终是底层代码的抽象.
+# 因此在配置文件中, 哪些是 behaviors, 哪些是 components, 应该不做明确的区分.
+# 也就是对于策划来说, 他并不需要知道 behaviors 和 components 的区别.
+# 他所需要知道的, 就是如果配置文件写了这个“东西”, 那生成出来的物品就有这个“东西”. 反之如果没写, 那生成出来的物品就没有.
+# 这一点非常类似原版的物品组件系统.
+#
+# 例如, 这里指定的 castable 它是一个纯粹的 behavior, 有这个 behavior 物品就可以释放技能 (前提是词条栏里有技能).
+# 再来看另一个, attributable 是一个纯粹的 component, 有这个 component 物品就可以提供属性加成 (前提是词条栏里有属性).
+# 比较特殊的 damageable 是一个 component + behavior 的复合体, 其 component 负责储存耐久度信息,
+# 而 behavior 负责实现修复的交互逻辑 (例如想做一个拿着修复材料跟物品交换位置就可以修复的功能).
 
-# 名字
-# 可选，默认 "Unnamed"
-name: "<red>Demo Short Sword"
+# 可以释放技能
+castable: { }
 
-# 描述
-# 可选，默认 无
+# 可以追踪信息 (原来是 statistical)
+trackable: { }
+
+# 作为弹药
+arrow:
+  pierce_level: 3
+
+# 提供属性加成
+attributable: { }
+
+# 提供铭刻加成
+kizamiable: { }
+
+# 提供技能加成
+skillful: { }
+
+# 免疫火焰
+fire_resistant: { }
+
+# 不损失耐久
+unbreakable:
+  show_in_tooltip: true
+
+# 物品名字
+item_name: "<red>Item Name Demo"
+
+# 自定义名字
+custom_name: "<red>Custom Name Demo"
+
+# 额外的描述
 lore:
   - "<gold>Demo Lore 1"
   - "<gold>Demo Lore 2"
 
-# 保养度
-# 可选，默认 无
-durability:
+# 耐久度
+damageable:
   # 临界值
   # 必填
   # 可写成正态分布的形式
@@ -90,9 +117,6 @@ durability:
   damage: 0
 
 # 皮肤
-# 可选，默认 无
-# 如有设置，则物品自带预设的皮肤
-# 这种情况下，皮肤的所有者为无
 skin:
   - name: <red>demo_1
     predicate:
@@ -108,30 +132,23 @@ skin:
     cost: 123
 
 # 皮肤所有者
-# 可选，默认 无
-# 可以手动设置初始皮肤的所有者
-# 必须写玩家的 UUID (Mojang)
+# 用于手动设置默认皮肤的所有者
 skin_owner: 174eb4a8-20d1-4838-ab07-877cd1d68c14
 
 # 等级
-# 可选，默认 0
-# 1. 如果写 CONTEXT，则根据上下文生成（玩家或盲盒）
-# 2. 如果写 <正整数>，则始终以这里指定的物品等级生成
-# 如果选择 1，只有当物品的上下文存在时，等级才会有效
+# A. 如果写 CONTEXT，则根据上下文生成（玩家或盲盒）
+# B. 如果写 <正整数>，则始终以这里指定的物品等级生成
+# 如果选择 A，只有当物品的上下文存在时，等级才会有效
 # 对于以上情况，如果遇到无效等级，则会采用最小等级 0
 level: CONTEXT
-#level: 32
 
 # 稀有度
-# 可选，默认 首个稀有度
 # 如果写 "mapping:<唯一标识>"，则根据唯一标识对应的映射生成
 # 如果写 "rarity:<稀有度名>"，则始终以这里指定的稀有度生成
 rarity: mapping:demo_1
-#rarity: rarity:ancient
 
 # 元素标识
-# 可选，默认 无
-element:
+elements:
 
   # 抽选 n 个元素作为该物品的元素标识
   sample: 2
@@ -151,8 +168,7 @@ element:
       weight: 1
 
 # 铭刻标识
-# 可选，默认 无
-kizami:
+kizamiz:
   pool_a:
     sample: 3
     filters:
@@ -203,7 +219,6 @@ kizami:
         weight: 1
 
 # 词条栏
-# 可选，默认 无
 # 生成将按照该列表的顺序进行
 cells:
   a:

@@ -1,0 +1,44 @@
+package cc.mewcraft.wakame.item.component
+
+import org.bukkit.inventory.ItemStack
+
+// 开发日记: 2024/6/24 小米
+// 这个对象要作为 NekoItem 的成员
+
+// 开发日记: 2024/6/25 小米
+// 回顾一下总流程, 首先需要经过 configurate 反序列化得到 Template 对象.
+// 然后物品生成的时候, 会调用 Template 对象来生成对应的物品组件.
+//
+// 以前的逻辑:
+//   无论一个物品组件(的模板)是否有在配置文件中指定, 它都会被反序列化.
+//   这句话的意思是:
+//   如果配置文件未指定物品组件的模板,
+//   则反序列化会提供一个默认的模板对象,
+//   这个默认对象一般是空的, 也就是不生成内容;
+//   如果指定了, 则会提供一个具体的模板对象.
+//
+//   配置文件 到 NekoItem 阶段:
+//     用所有的已知 id 为索引, 反序列化每个模板,
+//     例如已知 "elements", 则直接 get<SchemaElements>("elements"),
+//     这行代码会 hardcode 在构建 NekoItem 实例的代码中.
+//     对于每个已知的物品组件, 都会有这样一行代码.
+//     这样序列化出来的 NekoItem 是拥有每个物品组件的模板的,
+//     只不过有的是默认的空模板, 有的是具体的模板.
+//   NekoItem 到 NekoStack 阶段
+//     遍历所有储存在 NekoItem 的模板
+//       如果模板为空模板, 则不生成;
+//       如果模板为具体模板, 则生成
+//
+// 优化的逻辑:
+//   一个物品组件(的类型)如果没有在配置文件中指定,
+//   则这个物品组件的模板在配置文件反序列化阶段就会被判定为 null,
+//   最终这个物品组件就不会被添加到 NekoItem 的实例中.
+//   也就是说, NekoItem 中存在的物品组件模板都是配置文件明确指定的.
+//   它们都应该被添加到最终的 NekoStack 上 (除非上下文禁止了某个组件的生成).
+
+/**
+ * 代表多个 [ItemComponentTemplate], 包含了一个物品的所有组件的模板.
+ */
+interface ItemComponentTemplates {
+    fun applyToItem(item: ItemStack)
+}

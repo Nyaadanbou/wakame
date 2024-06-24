@@ -105,3 +105,37 @@ object ItemMetaConstants {
         return Key(Namespaces.ITEM_META, block(this))
     }
 }
+
+/**
+ * Constant values of ItemComponent.
+ */
+object ItemComponentConstants {
+    const val ARROW = "arrow"
+    const val ATTRIBUTABLE = "attributable"
+    const val CELLS = "cells"
+    const val CRATE = "crate"
+    const val CUSTOM_NAME = "custom_name"
+    const val CUSTOM_MODEL_DATA = "custom_model_data"
+    const val DAMAGE = "damage"
+    const val DAMAGEABLE = "damageable"
+    const val MAX_DAMAGE = "max_damage"
+    const val ELEMENTS = "elements"
+    const val FIRE_RESISTANT = "fire_resistant"
+    const val FOOD = "food"
+    const val ITEM_NAME = "item_name"
+    const val KIZAMIZ = "kizamiz"
+    const val KIZAMIABLE = "kizamiable"
+    const val LEVEL = "level"
+    const val LORE = "lore"
+    const val RARITY = "rarity"
+    const val SKILLFUL = "skillful"
+    const val SKIN = "skin"
+    const val SKIN_OWNER = "skin_owner"
+    const val STATISTICS = "statistics"
+    const val TOOL = "tool"
+    const val UNBREAKABLE = "unbreakable"
+
+    inline fun createKey(block: ItemComponentConstants.() -> String): Key {
+        return Key(Namespaces.ITEM_META, block(this))
+    }
+}

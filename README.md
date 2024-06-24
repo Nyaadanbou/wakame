@@ -83,99 +83,152 @@ AttributeModifier 的 UUID 是肯定不与其他对象提供的 AttributeModifie
 
 ```
 Compound('wakame')
-  String('ns'): 'short_sword' // 物品的 namespace
-  String('id'): 'demo' // 物品的 id
-  Compound('meta')
-    String('name'): '<JSON text>'
-    List('(String) lore'):
-      String(None): '<JSON text>'
-      String(None): '<JSON text>'
-      String(None): '<JSON text>'
-    Byte('lvl'): 12b // 等级
-    Byte('rarity'): 0b // 稀有度
-    ByteArray('kizami'): [0b, 3b] // 铭刻
-    ByteArray('elem'): [1b, 2b] // 元素
-    Short('skin'): 35s // 皮肤 ID
-    IntArray('skin_owner'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
-  Compound('cells') // 所有的词条栏
-    Compound('a') // 词条栏的 id
-      Boolean('can_reforge'): true // 词条栏是否可重铸
-      Boolean('can_override'): false // 词条栏是否可由玩家覆盖
-      Compound('core') // 词条栏的内容（词条）
-        String('id'): 'attribute:attack_damage' // 词条的 id
-        Short('min'): 10s // 词条的元数据，下面两个也是
-        Short('max'): 15s
-        Byte('elem'): 0b
-        Byte('op'): 0b // 属性修饰符的操作模式，可以不存在，默认 0b
-      Compound('reforge') // 重铸的元数据（可能会用到）
-        Byte('success'): 5b // 重铸成功的次数
-        Byte('failure'): 1b // 重铸失败的次数
-      Compound('curse') // 词条栏的解锁条件
-        String('id'): 'entity_kills' // 条件的种类，这里是实体击杀
-        String('index'): 'demo_bosses_1' // 要求的击杀种类
-        Short('count'): 18s // 要求的击杀数量
-    Compound('b')
-      Boolean('can_reforge'): false
-      Boolean('can_override'): false
-      Compound('core')
-        String('id'): 'attribute:attack_damage'
-        Short('min'): 10s
-        Short('max'): 15s
-        Byte('elem'): 2b
-        Byte('op'): 0b
-      Compound('reforge')
-        // 空的，意为 0
-      Compound('curse')
-        // 空的，意为没有诅咒
-    Compound('c')
-      Boolean('can_reforge'): true
-      Boolean('can_override'): false
-      Compound('core'):
-        String('id'): 'attribute:attack_damage_rate'
-        Float('value'): 0.2f
-        Byte('elem'): 2b
-        Byte('op'): 0b
-      Compound('reforge')
-        // 空的，意为 0
-      Compound('curse')
-        // 空的，意为没有诅咒
-    Compound('d')
-      Boolean('can_reforge'): false
-      Boolean('can_override'): false
-      Compound('core')
-        String('id'): 'ability:dash'
-      Compound('reforge')
-      Compound('curse')
-    Compound('e')
-      Boolean('can_reforge'): false
-      Boolean('can_override'): false
-      Compound('core')
-        String('id'): 'ability:blink'
-      Compound('reforge')
-      Compound('curse')
-    Compound('f')
-      Boolean('can_reforge'): false
-      Boolean('can_override'): false
-      Compound('core') // 表示一个空槽
-      Compound('reforge')
-      Compound('curse')
-  Compound('stats') // 物品统计数据
-    Compound('entity_kills')
-      Short('minecraft:zombie'): 5s
-      Short('minecraft:spider'): 2s
-      Short('minecraft:wither'): 3s
-      Short('minecraft:ender_dragon'): 4s // 数量不为 0 将储存在 NBT
-      Short('mythicmobs:gojira'): 2s
-      Short('mythicmobs:skeleton_king'): 11s
-      Short('mythicmobs:sister'): 0s // 数量为 0 则实际不会储存在 NBT
-    Compound('peak_damage')
-      Short('neutral'): 55s
-      Short('fire'): 5s
-      Short('water'): 30s
-      Short('wind'): 0s
-      Short('earth'): 0s // 没有造成过伤害的元素，不需要写进 NBT，意为 0
-      Short('thunder'): 12s
-    Compound('reforge')
-      Byte('count'): 38b // 重铸总次数
-      Short('cost'): 32767s // 重铸总花费
+    // 物品的命名空间
+    String('namespace'): 'short_sword'
+    
+    // 物品的路径
+    String('path'): 'demo'
+    
+    // 物品的变体
+    String('variant'): 1
+    
+    // 物品的组件
+    Compound('components')
+    
+        // 提供属性加成?
+        Compound('attributable')
+            // 空
+        
+        // 提供铭刻加成?
+        Compound('kizamiable')
+            // 空
+        
+        // 弹药信息
+        Compound('arrow')
+            // 空
+
+        // 自定义名字
+        Compound('custom_name')
+            String('value'): '<JSON text>' // 这种只有一个值的组件, 统统把键写成 'value'
+        
+        // 物品名字
+        Compound('item_name')
+            String('value'): '<JSON text>'
+        
+        // 描述
+        Compound('lore')
+            List('(String) value')
+                String(): '<JSON text>'
+                String(): '<JSON text>'
+                String(): '<JSON text>'
+        
+        // 物品等级
+        Compound('level')
+            Byte('value'): 12b
+        
+        // 物品稀有度
+        Compound('rarity')
+            Byte('value'): 0b
+        
+        // 物品铭刻
+        Compound('kizami')
+            ByteArray('value'): [0b, 3b]
+        
+        // 物品元素
+        Compound('element')
+            ByteArray('value'): [1b, 2b]
+        
+        // 物品皮肤
+        Compound('skin')
+            Short('value'): 35s
+        
+        // 物品皮肤所有者
+        Compound('skin_owner')
+            IntArray('value'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
+            
+        // 食物
+        Compound('food')
+            List('(String) skills')
+                String(): 'skill key 1'
+                String(): 'skill key 2'
+        
+        // 词条栏
+        Compound('cells')
+            // 词条栏的 id
+            Compound('a')
+                 // 词条栏的内容（词条）
+                Compound('core')
+                    // 词条的 id
+                    String('id'): 'attribute:attack_damage'
+                    // 词条的具体设置
+                    Short('min'): 10s
+                    Short('max'): 15s
+                    Byte('elem'): 0b
+                    Byte('op'): 0b
+                 // 重铸的元数据（可能会用到）
+                Compound('reforge')
+                    Byte('success'): 5b
+                    Byte('failure'): 1b
+                // 词条栏的解锁条件
+                Compound('curse')
+                    // 诅咒的 id
+                    String('id'): 'entity_kills'
+                    // 诅咒的具体设置
+                    String('index'): 'demo_bosses_1'
+                    Short('count'): 18s
+            Compound('b')
+                Compound('core')
+                    String('id'): 'attribute:attack_damage'
+                    Short('min'): 10s
+                    Short('max'): 15s
+                    Byte('elem'): 2b
+                    Byte('op'): 0b
+                Compound('reforge')
+                    // 空, 或不存在, 都代表没有重铸数据
+                Compound('curse')
+                    // 空, 或不存在, 都代表无诅咒
+            Compound('c')
+                Compound('core'):
+                    String('id'): 'attribute:attack_damage_rate'
+                    Float('value'): 0.2f
+                    Byte('elem'): 2b
+                    Byte('op'): 0b
+                Compound('reforge')
+                Compound('curse')
+            Compound('d')
+                Compound('core')
+                    String('id'): 'ability:dash'
+                Compound('reforge')
+                Compound('curse')
+            Compound('e')
+                Compound('core')
+                    String('id'): 'ability:blink'
+                Compound('reforge')
+                Compound('curse')
+            Compound('f')
+                Compound('core')
+                     // 空, 或不存在, 都代表无核心
+                Compound('reforge')
+                Compound('curse')
+                
+        // 物品统计数据
+        Compound('stats')
+            Compound('entity_kills')
+                Short('minecraft:zombie'): 5s
+                Short('minecraft:spider'): 2s
+                Short('minecraft:wither'): 3s
+                Short('minecraft:ender_dragon'): 4s // 数量不为 0 将储存在 NBT
+                Short('mythicmobs:gojira'): 2s
+                Short('mythicmobs:skeleton_king'): 11s
+                Short('mythicmobs:sister'): 0s // 数量为 0 则实际不会储存在 NBT
+            Compound('peak_damage')
+                Short('neutral'): 55s
+                Short('fire'): 5s
+                Short('water'): 30s
+                Short('wind'): 0s
+                Short('earth'): 0s // 没有造成过伤害的元素，不需要写进 NBT，意为 0
+                Short('thunder'): 12s
+            Compound('reforge')
+                Byte('count'): 38b // 重铸总次数
+                Short('cost'): 32767s // 重铸总花费
 ```
