@@ -9,6 +9,13 @@ uuid: cfee549f-e4d7-4574-b104-92d8251ebee4
 # 可选，默认 "stone"
 material: wooden_sword
 
+# 需要移除的原版物品组件
+# 名字参考: https://minecraft.wiki/w/Data_component_format
+remove_components:
+  - attribute_modifiers
+  - food
+  - tool
+
 # 是否完全隐藏物品提示框（包括物品名字）
 hide_tooltip: false
 
