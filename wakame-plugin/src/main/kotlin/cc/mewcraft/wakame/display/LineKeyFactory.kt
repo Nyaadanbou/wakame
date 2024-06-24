@@ -8,5 +8,5 @@ interface LineKeyFactory<T> {
      *
      * @return [obj] 的唯一标识
      */
-    fun get(obj: T): FullKey?
+    fun get(obj: T): TooltipKey?
 }

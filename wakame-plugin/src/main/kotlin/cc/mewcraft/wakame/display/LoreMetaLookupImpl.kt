@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.display
 
 internal class LoreMetaLookupImpl(
-    private val indexes: Map<FullKey, FullIndex>,
-    private val metadata: Map<FullKey, LoreMeta>,
+    private val indexes: Map<TooltipKey, TooltipIndex>,
+    private val metadata: Map<TooltipKey, LoreMeta>,
 ) : LoreMetaLookup {
-    override fun getIndexOrNull(key: FullKey): FullIndex? {
+    override fun getIndexOrNull(key: TooltipKey): TooltipIndex? {
         return indexes[key]
     }
 
-    override fun <T : LoreMeta> getMetaOrNull(key: FullKey): T? {
+    override fun <T : LoreMeta> getMetaOrNull(key: TooltipKey): T? {
         @Suppress("UNCHECKED_CAST")
         return (metadata[key] as? T)
     }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.display.FullKey
+import cc.mewcraft.wakame.display.TooltipKey
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -17,7 +17,7 @@ internal object ItemMetaSupport : KoinComponent {
         return MINI
     }
 
-    fun getLineKey(itemMeta: BinaryItemMeta<*>): FullKey? {
+    fun getLineKey(itemMeta: BinaryItemMeta<*>): TooltipKey? {
         return LINE_KEY_FACTORY.get(itemMeta)
     }
 }

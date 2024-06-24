@@ -98,7 +98,7 @@ internal interface LoreMeta {
      * 完全一致。这种情况下 `Full Key` 只是个单例列表。而有些 `Raw Key`
      * 存在衍生规则，因此它们的 `Raw Key` 就与 `Full Key` 不一致。
      */
-    fun generateFullKeys(): List<FullKey> /* 必须按规定的按顺序排列 */
+    fun generateFullKeys(): List<TooltipKey> /* 必须按规定的按顺序排列 */
 
     /**
      * 生成从 `Full Key` 到 `Full Index` 的映射。
@@ -140,8 +140,8 @@ internal interface LoreMeta {
      *
      * @param offset `Full Index` 的偏移量
      */
-    fun generateFullIndexMappings(offset: Int): Map<FullKey, FullIndex> {
-        val key2IndexMap = LinkedHashMap<FullKey, FullIndex>() // for debug inspection
+    fun generateFullIndexMappings(offset: Int): Map<TooltipKey, TooltipIndex> {
+        val key2IndexMap = LinkedHashMap<TooltipKey, TooltipIndex>() // for debug inspection
         for ((localIndex, fullKey) in generateFullKeys().withIndex()) {
             key2IndexMap[fullKey] = rawIndex + localIndex + offset
         }
@@ -204,11 +204,11 @@ internal interface ConstantLoreMeta : LoreMeta {
         // 这样刚好能保证不同的固定内容行都有唯一的 Full Key
         get() = Key("fixed", rawIndex.toString())
 
-    override fun generateFullKeys(): List<FullKey> {
+    override fun generateFullKeys(): List<TooltipKey> {
         return listOf(rawKey)
     }
 
-    override fun generateFullIndexMappings(offset: Int): Map<FullKey, FullIndex> {
+    override fun generateFullIndexMappings(offset: Int): Map<TooltipKey, TooltipIndex> {
         return mapOf(rawKey to rawIndex + offset)
     }
 }

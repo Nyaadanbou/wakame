@@ -9,12 +9,12 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.DisplaySupport
 import cc.mewcraft.wakame.display.DynamicLoreMeta
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
-import cc.mewcraft.wakame.display.FullKey
 import cc.mewcraft.wakame.display.LineKeyFactory
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawIndex
 import cc.mewcraft.wakame.display.RawKey
 import cc.mewcraft.wakame.display.RendererConfiguration
+import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
@@ -63,7 +63,7 @@ internal class AttributeLoreMetaCreator : DynamicLoreMetaCreator {
 internal object AttributeDisplaySupport : KoinComponent {
     private val DISPLAY_KEY_FACTORY: AttributeLineKeyFactory by inject()
 
-    fun getLineKey(core: BinaryAttributeCore): FullKey? {
+    fun getLineKey(core: BinaryAttributeCore): TooltipKey? {
         return DISPLAY_KEY_FACTORY.get(core)
     }
 }
@@ -81,7 +81,7 @@ internal data class AttributeLoreMeta(
      *
      * 为该属性生成所有的 full keys
      */
-    override fun generateFullKeys(): List<FullKey> {
+    override fun generateFullKeys(): List<TooltipKey> {
         if (rawKey == AttributeRegistry.EMPTY_KEY) {
             return listOf(rawKey) // for `empty`, do not derive
         }
@@ -138,7 +138,7 @@ internal data class AttributeLoreMeta(
 internal class AttributeLineKeyFactory(
     private val config: RendererConfiguration,
 ) : LineKeyFactory<BinaryAttributeCore> {
-    override fun get(obj: BinaryAttributeCore): FullKey? {
+    override fun get(obj: BinaryAttributeCore): TooltipKey? {
         // 属性的 full key 目前有两种
         //   attribute:{facade_id}.{operation}
         //   attribute:{facade_id}.{operation}.{element}
@@ -173,17 +173,17 @@ internal class AttributeLineKeyFactory(
         /**
          * The full keys in this map are double-indexed by `key` + `operation`.
          */
-        val INDEX_FOR_COMBINATION_1: AttributeDoubleKeyTable<Key, Operation, FullKey> by ReloadableProperty { AttributeDoubleKeyTable() }
+        val INDEX_FOR_COMBINATION_1: AttributeDoubleKeyTable<Key, Operation, TooltipKey> by ReloadableProperty { AttributeDoubleKeyTable() }
 
         /**
          * The full keys in this map are triple-indexed by `key` + `operation` + `element`.
          */
-        val INDEX_FOR_COMBINATION_2: AttributeTripleKeyTable<Key, Operation, Element, FullKey> by ReloadableProperty { AttributeTripleKeyTable() }
+        val INDEX_FOR_COMBINATION_2: AttributeTripleKeyTable<Key, Operation, Element, TooltipKey> by ReloadableProperty { AttributeTripleKeyTable() }
 
         /**
          * Caches a full key from the given triple indexes.
          */
-        fun put(key: RawKey, operation: Operation, element: Element?, fullKey: FullKey) {
+        fun put(key: RawKey, operation: Operation, element: Element?, fullKey: TooltipKey) {
             if (element == null) {
                 INDEX_FOR_COMBINATION_1
                     .getOrPut(key) { Reference2ObjectOpenHashMap(4, 0.9f) } // 运算模式最多3个
@@ -199,7 +199,7 @@ internal class AttributeLineKeyFactory(
         /**
          * Gets a full key from the given triple indexes.
          */
-        fun get(key: RawKey, operation: Operation, element: Element?): FullKey? {
+        fun get(key: RawKey, operation: Operation, element: Element?): TooltipKey? {
             return if (element == null) {
                 INDEX_FOR_COMBINATION_1[key]?.get(operation)
             } else {
@@ -220,8 +220,8 @@ internal class AttributeLineKeyFactory(
             rawKey: RawKey,
             operation: Operation,
             element: Element?,
-            defaultValue: () -> FullKey,
-        ): FullKey {
+            defaultValue: () -> TooltipKey,
+        ): TooltipKey {
             val value = get(rawKey, operation, element)
             return if (value == null) {
                 val answer = defaultValue()
@@ -237,7 +237,7 @@ internal class AttributeLineKeyFactory(
          *
          * @return the old cache
          */
-        fun remove(key: RawKey, operation: Operation, element: Element? = null): FullKey? {
+        fun remove(key: RawKey, operation: Operation, element: Element? = null): TooltipKey? {
             if (element == null) {
                 val map1 = INDEX_FOR_COMBINATION_1[key] ?: return null
                 val value = map1.remove(operation)

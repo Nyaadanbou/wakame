@@ -14,8 +14,8 @@ internal typealias RawIndex = Int
 /**
  * 用于查询一个内容在 Item Lore 中的位置。
  */
-internal typealias FullKey = Key
+internal typealias TooltipKey = Key
 /**
- * 同 [FullKey].
+ * 同 [TooltipKey].
  */
-internal typealias FullIndex = Int
+internal typealias TooltipIndex = Int

@@ -6,11 +6,11 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.DisplaySupport
 import cc.mewcraft.wakame.display.DynamicLoreMeta
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
-import cc.mewcraft.wakame.display.FullKey
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawIndex
 import cc.mewcraft.wakame.display.RawKey
 import cc.mewcraft.wakame.display.RendererConfiguration
+import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -40,7 +40,7 @@ internal class EmptyCoreLoreMetaCreator : DynamicLoreMetaCreator {
 }
 
 internal data object EmptyLoreLine : LoreLine {
-    override val key: FullKey = GenericKeys.EMPTY
+    override val key: TooltipKey = GenericKeys.EMPTY
     override val content: List<Component> by Configs.YAML[ITEM_CONFIG_FILE].entry<List<Component>>("general", "empty_cell_tooltips")
 }
 
@@ -49,6 +49,6 @@ internal data class EmptyLoreMeta(
     override val rawIndex: RawIndex,
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
-    override fun generateFullKeys(): List<FullKey> = listOf(rawKey)
+    override fun generateFullKeys(): List<TooltipKey> = listOf(rawKey)
     override fun createDefault(): List<LoreLine>? = null
 }

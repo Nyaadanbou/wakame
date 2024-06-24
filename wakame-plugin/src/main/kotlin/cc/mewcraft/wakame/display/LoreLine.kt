@@ -15,7 +15,7 @@ interface LoreLine {
     /**
      * 能够唯一识别这一内容的标识。
      */
-    val key: FullKey
+    val key: TooltipKey
 
     /**
      * 最终生成的文本内容。如果有多行则该列表就有多个元素。
@@ -25,7 +25,7 @@ interface LoreLine {
     /**
      * 该内容是否应该显示。
      */
-    val isNop: Boolean
+    val isNoop: Boolean
         get() = this is NoopLoreLine
 
     /**
@@ -42,11 +42,11 @@ interface LoreLine {
             return NoopLoreLine
         }
 
-        fun constant(key: FullKey, lines: List<Component>): LoreLine {
+        fun constant(key: TooltipKey, lines: List<Component>): LoreLine {
             return ConstantLoreLine(key, lines)
         }
 
-        fun simple(key: FullKey, lines: List<Component>): LoreLine {
+        fun simple(key: TooltipKey, lines: List<Component>): LoreLine {
             return SimpleLoreLine(key, lines)
         }
     }
@@ -56,7 +56,7 @@ interface LoreLine {
  * 代表一个不会显示的内容。
  */
 private data object NoopLoreLine : LoreLine {
-    override val key: FullKey = GenericKeys.NOOP
+    override val key: TooltipKey = GenericKeys.NOOP
     override val content: List<Component> = emptyList()
     override fun toString(): String = "NOOP"
 }
@@ -65,7 +65,7 @@ private data object NoopLoreLine : LoreLine {
  * 代表一个始终不变的内容（位置也不变）。
  */
 private data class ConstantLoreLine(
-    override val key: FullKey,
+    override val key: TooltipKey,
     override val content: List<Component>,
 ) : LoreLine
 
@@ -73,6 +73,6 @@ private data class ConstantLoreLine(
  * 代表一个一般的内容，例如属性，技能等。
  */
 private data class SimpleLoreLine(
-    override val key: FullKey,
+    override val key: TooltipKey,
     override val content: List<Component>,
 ) : LoreLine

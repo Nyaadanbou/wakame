@@ -25,7 +25,7 @@ internal class TextStylizerImpl : TextStylizer {
     private fun ObjectArrayList<LoreLine>.addLoreLines(collection: Iterable<TooltipsProvider>) {
         for (provider in collection) {
             val loreLine = provider.provideDisplayLore()
-            if (loreLine.isNop) continue
+            if (loreLine.isNoop) continue
             this += loreLine
         }
     }

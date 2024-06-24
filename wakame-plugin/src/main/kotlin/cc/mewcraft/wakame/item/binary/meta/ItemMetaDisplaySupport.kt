@@ -4,12 +4,12 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.display.DisplaySupport
 import cc.mewcraft.wakame.display.DynamicLoreMeta
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
-import cc.mewcraft.wakame.display.FullKey
 import cc.mewcraft.wakame.display.LineKeyFactory
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawIndex
 import cc.mewcraft.wakame.display.RawKey
 import cc.mewcraft.wakame.display.RendererConfiguration
+import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -42,7 +42,7 @@ internal data class ItemMetaLoreMeta(
     override val rawIndex: RawIndex,
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
-    override fun generateFullKeys(): List<FullKey> {
+    override fun generateFullKeys(): List<TooltipKey> {
         return listOf(rawKey)
     }
 
@@ -57,7 +57,7 @@ internal data class ItemMetaLoreMeta(
 internal class ItemMetaLineKeyFactory(
     private val config: RendererConfiguration,
 ) : LineKeyFactory<BinaryItemMeta<*>> {
-    override fun get(obj: BinaryItemMeta<*>): FullKey? {
+    override fun get(obj: BinaryItemMeta<*>): TooltipKey? {
         val fullKey = obj.key // 元数据的 full key 就是 BinaryItemMeta#key
         val rawKey = fullKey // 元数据的 raw key 跟它的 full key 设计上一致
         if (rawKey !in config.rawKeys) {

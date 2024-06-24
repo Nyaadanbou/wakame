@@ -27,13 +27,13 @@ internal class RendererConfiguration(
     /**
      * 用于查询指定内容的 [LoreMeta]。
      */
-    val loreMetaLookup: Map<FullKey, LoreMeta>
+    val loreMetaLookup: Map<TooltipKey, LoreMeta>
         get() = _loreMetaLookup
 
     /**
-     * 用于查询指定内容的 [FullIndex]。
+     * 用于查询指定内容的 [TooltipIndex]。
      */
-    val loreIndexLookup: Map<FullKey, FullIndex>
+    val loreIndexLookup: Map<TooltipKey, TooltipIndex>
         get() = _loreIndexLookup
 
     /**
@@ -55,8 +55,8 @@ internal class RendererConfiguration(
     private val dynamicLoreMetaCreatorRegistry: DynamicLoreMetaCreatorRegistry by inject()
 
     private val _rawKeys: MutableSet<RawKey> = ConcurrentHashMap.newKeySet()
-    private val _loreMetaLookup: MutableMap<FullKey, LoreMeta> = ConcurrentHashMap()
-    private val _loreIndexLookup: MutableMap<FullKey, FullIndex> = ConcurrentHashMap()
+    private val _loreMetaLookup: MutableMap<TooltipKey, LoreMeta> = ConcurrentHashMap()
+    private val _loreIndexLookup: MutableMap<TooltipKey, TooltipIndex> = ConcurrentHashMap()
     private val _constantLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
     private val _defaultLoreLines: MutableCollection<LoreLine> = CopyOnWriteArrayList()
 

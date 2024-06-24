@@ -4,12 +4,12 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.display.DisplaySupport
 import cc.mewcraft.wakame.display.DynamicLoreMeta
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
-import cc.mewcraft.wakame.display.FullKey
 import cc.mewcraft.wakame.display.LineKeyFactory
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawIndex
 import cc.mewcraft.wakame.display.RawKey
 import cc.mewcraft.wakame.display.RendererConfiguration
+import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -44,7 +44,7 @@ internal object SkillDisplaySupport : KoinComponent {
     private val DISPLAY_KEY_FACTORY: SkillLineKeyFactory by inject()
     private val MINI: MiniMessage by inject()
 
-    fun getLineKey(core: BinarySkillCore): FullKey? {
+    fun getLineKey(core: BinarySkillCore): TooltipKey? {
         return DISPLAY_KEY_FACTORY.get(core)
     }
 
@@ -58,7 +58,7 @@ internal data class SkillLoreMeta(
     override val rawIndex: RawIndex,
     override val default: List<Component>?,
 ) : DynamicLoreMeta {
-    override fun generateFullKeys(): List<FullKey> {
+    override fun generateFullKeys(): List<TooltipKey> {
         return listOf(rawKey)
     }
 
@@ -73,7 +73,7 @@ internal data class SkillLoreMeta(
 internal class SkillLineKeyFactory(
     private val config: RendererConfiguration,
 ) : LineKeyFactory<BinarySkillCore> {
-    override fun get(obj: BinarySkillCore): FullKey? {
+    override fun get(obj: BinarySkillCore): TooltipKey? {
         val fullKey = obj.key // 技能的 full key 就是 Core#key
         val rawKey = fullKey // 技能的 raw key 与 full key 设计上一致
         if (rawKey !in config.rawKeys) {
