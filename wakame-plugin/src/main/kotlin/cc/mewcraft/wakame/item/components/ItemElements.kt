@@ -1,20 +1,47 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.GenerationContext
+import cc.mewcraft.wakame.item.component.GenerationResult
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.random.Pool
 import net.kyori.examination.Examinable
+import org.spongepowered.configurate.ConfigurationNode
+import java.lang.reflect.Type
 
-interface ItemElements : Examinable {
+interface ItemElements : Examinable, TooltipProvider {
 
-    class Value(val elementList: List<Element>) : ItemElements
+    val elements: List<Element>
 
-    class Codec(override val id: String) : ItemComponentType.Valued<ItemElements, ItemComponentHolder.NBT> {
+    data class Value(
+        override val elements: List<Element>,
+    ) : ItemElements {
+        override fun provideDisplayLore(): LoreLine {
+            if (!showInTooltip) {
+                return LoreLine.noop()
+            }
+            return LoreLine.simple(tooltipKey, tooltipText.render(elements, Element::displayName))
+        }
+
+        companion object : ItemComponentConfig(ItemComponentConstants.ELEMENTS) {
+            val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ELEMENTS }
+            val tooltipText: MergedTooltip = MergedTooltip()
+        }
+    }
+
+    class Codec(
+        override val id: String,
+    ) : ItemComponentType<ItemElements, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
+
         override fun read(holder: ItemComponentHolder.NBT): ItemElements? {
             TODO("Not yet implemented")
         }
@@ -29,9 +56,17 @@ interface ItemElements : Examinable {
 
     }
 
-    class Template(val elementSelector: Pool<Element, SchemaGenerationContext>) : ItemComponentTemplate<ItemElements> {
-        override fun generate(context: GenerationContext): cc.mewcraft.wakame.item.component.GenerationResult<ItemElements> {
+    data class Template(
+        val elementSelector: Pool<Element, SchemaGenerationContext>,
+    ) : ItemComponentTemplate<ItemElements> {
+        override fun generate(context: GenerationContext): GenerationResult<ItemElements> {
             TODO("Not yet implemented")
+        }
+
+        companion object : ItemComponentTemplate.Serializer<Template> {
+            override fun deserialize(type: Type, node: ConfigurationNode): Template {
+                TODO("Not yet implemented")
+            }
         }
     }
 }

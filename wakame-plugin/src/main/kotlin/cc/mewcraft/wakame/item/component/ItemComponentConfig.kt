@@ -35,6 +35,10 @@ abstract class ItemComponentConfig(
     inner class SingleTooltip : Examinable {
         val single: String by config.entry<String>("tooltips", "single")
 
+        fun render(): Component {
+            return ItemComponentInjections.mini.deserialize(single)
+        }
+
         fun render(resolver: TagResolver): Component {
             return ItemComponentInjections.mini.deserialize(single, resolver)
         }

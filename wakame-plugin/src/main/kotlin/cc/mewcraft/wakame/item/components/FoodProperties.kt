@@ -1,11 +1,16 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.item.component.GenerationContext
+import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
+import org.spongepowered.configurate.ConfigurationNode
+import java.lang.reflect.Type
 
 interface FoodProperties : Examinable {
     val nutrition: Int
@@ -21,7 +26,9 @@ interface FoodProperties : Examinable {
         val probability: Float,
     )
 
-    class Codec(override val id: String) : ItemComponentType.Valued<FoodProperties, ItemComponentHolder.Complex> {
+    class Codec(
+        override val id: String,
+    ) : ItemComponentType<FoodProperties, ItemComponentHolder.Complex> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.COMPLEX
 
         override fun read(holder: ItemComponentHolder.Complex): FoodProperties? {
@@ -38,6 +45,17 @@ interface FoodProperties : Examinable {
         override fun remove(holder: ItemComponentHolder.Complex) {
             // TODO 要将数据分别从两个地方移除: ItemStack 和 NBT
         }
+    }
 
+    class Template : ItemComponentTemplate<FoodProperties> {
+        override fun generate(context: GenerationContext): GenerationResult<FoodProperties> {
+            TODO("Not yet implemented")
+        }
+
+        companion object : ItemComponentTemplate.Serializer<Template> {
+            override fun deserialize(type: Type, node: ConfigurationNode): Template {
+                TODO("Not yet implemented")
+            }
+        }
     }
 }

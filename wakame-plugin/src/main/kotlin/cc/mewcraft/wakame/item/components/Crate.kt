@@ -21,7 +21,9 @@ interface Crate : Examinable {
         override val key: Key,
     ) : Crate
 
-    data class Codec(override val id: String) : ItemComponentType.Valued<Crate, ItemComponentHolder.NBT> {
+    class Codec(
+        override val id: String,
+    ) : ItemComponentType<Crate, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
         override fun read(holder: ItemComponentHolder.NBT): Crate? {

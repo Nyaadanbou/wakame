@@ -1,50 +1,62 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.TooltipsProvider
+import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.GenerationContext
+import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import net.kyori.examination.Examinable
 
-interface Attributable : Examinable, TooltipsProvider {
+interface Attributable : Examinable, TooltipProvider {
 
-    // 开发日记: 2024/6/25
-    // Attributable 属于 NonValued 组件类型, 没有“值”一说, 只有是否存在一说.
-    // 因此这里没有像 Arrow 一样有一个 Codec 类.
-    object Value : Attributable, TooltipsProvider, ItemComponentConfig(ItemComponentConstants.ATTRIBUTABLE) {
+    // 开发日记: 2024/6/24
+    // Attributable 本身没有“数值”一说, 只有是否存在于物品上一说.
+    // 因此这里 Value 写成单例就了 (反正也没有任何数值).
+    // 但需要注意的是, 即便是单例也依然提供了 LoreLine 的具体实现,
+    // 这是因为我们 !有可能! 希望那些拥有 Attributable 组件的物品的提示框里
+    // 能够显示一行 “提供属性加成” 的文本, 当然, 也可以选择不写这个实现.
+    object Value : Attributable, ItemComponentConfig(ItemComponentConstants.ATTRIBUTABLE) {
+        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ATTRIBUTABLE }
+        private val tooltipText: SingleTooltip = SingleTooltip()
+
         override fun provideDisplayLore(): LoreLine {
-            return LoreLine.noop()
+            if (!showInTooltip) {
+                return LoreLine.noop()
+            }
+            return LoreLine.simple(tooltipKey, listOf(tooltipText.render()))
         }
     }
 
-    // FIXME NonValued 因为没有值, 所以没有 class Value.
-    //  但是我们又需要能够提供该组件的提示框...
-    //  因此提示框的创建逻辑可能得放在 Codec 里, 通过 ItemComponentMap 里的函数直接提供提示框.
-
-    // 开发日记: 2024/6/25
-    // Attributable 属于 NonValued + NBT 组件类型,
-    // 这里的实现实际上根本不会运行.
-    // FIXME 也许统一为 NonValued + NBT 类型的组件类型创建一个通用的实现比较好?
     class Codec(
         override val id: String,
-    ) : ItemComponentType.NonValued<ItemComponentHolder.NBT> {
+    ) : ItemComponentType<Attributable, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
-        // true/false 无所谓, 因为实际逻辑不在这控制
-        override fun read(holder: ItemComponentHolder.NBT): Boolean = false
+        override fun read(holder: ItemComponentHolder.NBT): Attributable = Value
 
-        // 这个执行什么无所谓, 因为实际逻辑不在这控制
-        override fun write(holder: ItemComponentHolder.NBT, value: Boolean) = Unit
+        // 开发日记: 2024/6/25
+        // 这个执行什么无所谓, 因为实际运行逻辑是在 Map 里
+        override fun write(holder: ItemComponentHolder.NBT, value: Attributable) = Unit
 
-        // 这个执行什么无所谓, 因为实际逻辑不在这控制
+        // 开发日记: 2024/6/25
+        // 这个执行什么无所谓, 因为实际运行逻辑是在 Map 里
         override fun remove(holder: ItemComponentHolder.NBT) = Unit
     }
 
-    // 开发日记: 2024/6/25
+    // 开发日记: 2024/6/24
     // Attributable 既然是一个 NonValued 组件类型,
     // 那么似乎也不需要为其创建一个 Template 的类型.
-    // 在构建 NekoItem 的阶段只需要看配置文件里有没有这个 node 存在就行了.
-    // class Template() {}
+    // 在构建 NekoItem 的阶段只需要看配置文件里有没有这个 node 存在就行了?
+    // 开发日记: 2024/6/25
+    // 还不确定 Template 的具体框架是怎么样的
+    object Template : ItemComponentTemplate<Attributable> {
+        override fun generate(context: GenerationContext): GenerationResult<Attributable> {
+            return GenerationResult.of(Value)
+        }
+    }
 }

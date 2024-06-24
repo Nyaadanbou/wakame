@@ -4,11 +4,12 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
-import org.koin.core.component.KoinComponent
 
 interface CustomName : Examinable {
 
-    class Codec(override val id: String) : KoinComponent, ItemComponentType.Valued<Component, ItemComponentHolder.Item> {
+    class Codec(
+        override val id: String,
+    ) : ItemComponentType<Component, ItemComponentHolder.Item> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
 
         override fun read(holder: ItemComponentHolder.Item): Component? {

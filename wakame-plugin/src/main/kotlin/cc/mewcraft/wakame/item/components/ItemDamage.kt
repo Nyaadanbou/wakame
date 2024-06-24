@@ -8,14 +8,18 @@ import org.bukkit.inventory.meta.Damageable
 
 interface ItemDamage : Examinable {
 
-    class Codec(override val id: String) : ItemComponentType.Valued<Int, ItemComponentHolder.Item> {
+    class Codec(
+        override val id: String,
+    ) : ItemComponentType<Int, ItemComponentHolder.Item> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
 
         override fun read(holder: ItemComponentHolder.Item): Int? {
+            // TODO 等待 DataComponent API 写个更好的实现
             return (holder.item.itemMeta as? Damageable)?.damage
         }
 
         override fun write(holder: ItemComponentHolder.Item, value: Int) {
+            // TODO 等待 DataComponent API 写个更好的实现
             holder.item.editMeta<Damageable> { this.damage = value }
         }
 

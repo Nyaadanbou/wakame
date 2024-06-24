@@ -19,8 +19,10 @@ import cc.mewcraft.wakame.item.components.ItemLore
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.item.components.ItemSkinOwner
-import cc.mewcraft.wakame.item.components.ItemStatistics
+import cc.mewcraft.wakame.item.components.Kizamiable
+import cc.mewcraft.wakame.item.components.Skillful
 import cc.mewcraft.wakame.item.components.Tool
+import cc.mewcraft.wakame.item.components.Trackable
 import cc.mewcraft.wakame.item.components.Unbreakable
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import net.kyori.adventure.text.Component
@@ -30,140 +32,136 @@ object ItemComponentTypes {
      * 作为弹药.
      */
     // POC
-    val ARROW: ItemComponentType.Valued<Arrow, NBT> = Arrow.Codec(ItemComponentConstants.ARROW).apply(::register)
+    val ARROW: ItemComponentType<Arrow, NBT> = Arrow.Codec(ItemComponentConstants.ARROW).apply(::register)
 
     /**
      * 控制物品能否提供属性加成给玩家.
      */
     // POC
-    val ATTRIBUTABLE: ItemComponentType.NonValued<NBT> = Attributable.Codec(ItemComponentConstants.ATTRIBUTABLE).apply(::register)
+    val ATTRIBUTABLE: ItemComponentType<Attributable, NBT> = Attributable.Codec(ItemComponentConstants.ATTRIBUTABLE).apply(::register)
 
     /**
      * 物品的(所有)词条栏.
      */
     // POC
-    val CELLS: ItemComponentType.Valued<ItemCells, NBT> = ItemCells.Codec(ItemComponentConstants.CELLS).apply(::register)
+    val CELLS: ItemComponentType<ItemCells, NBT> = ItemCells.Codec(ItemComponentConstants.CELLS).apply(::register)
 
     /**
      * 作为盲盒.
      */
-    val CRATE: ItemComponentType.Valued<Crate, NBT> = valued(ItemComponentConstants.CRATE)
+    val CRATE: ItemComponentType<Crate, NBT> = dummy(ItemComponentConstants.CRATE)
 
     /**
      * 自定义模型数据. 对应原版组件: [`minecraft:custom_model_data`](https://minecraft.wiki/w/Data_component_format#custom_model_data)
      */
-    val CUSTOM_MODEL_DATA: ItemComponentType.Valued<Int, Item> = CustomModelData.Codec(ItemComponentConstants.CUSTOM_MODEL_DATA).apply(::register)
+    val CUSTOM_MODEL_DATA: ItemComponentType<Int, Item> = CustomModelData.Codec(ItemComponentConstants.CUSTOM_MODEL_DATA).apply(::register)
 
     /**
      * 自定义名字. 对应原版组件: [`minecraft:custom_name`](https://minecraft.wiki/w/Data_component_format#custom_name)
      */
     // POC
-    val CUSTOM_NAME: ItemComponentType.Valued<Component, Item> = CustomName.Codec(ItemComponentConstants.CUSTOM_NAME).apply(::register)
+    val CUSTOM_NAME: ItemComponentType<Component, Item> = CustomName.Codec(ItemComponentConstants.CUSTOM_NAME).apply(::register)
 
     /**
      * 损失的耐久.
      */
-    val DAMAGE: ItemComponentType.Valued<Int, Item> = valued(ItemComponentConstants.DAMAGE)
+    val DAMAGE: ItemComponentType<Int, Item> = dummy(ItemComponentConstants.DAMAGE)
 
     /**
      * 物品组件 [DAMAGE], [MAX_DAMAGE], [UNBREAKABLE] 的整合.
      */
     // POC
-    val DAMAGEABLE: ItemComponentType.Valued<Damageable, Complex> = Damageable.Codec(ItemComponentConstants.DAMAGEABLE).apply(::register)
+    val DAMAGEABLE: ItemComponentType<Damageable, Complex> = Damageable.Codec(ItemComponentConstants.DAMAGEABLE).apply(::register)
 
     /**
      * 物品元素.
      */
     // POC
-    val ELEMENTS: ItemComponentType.Valued<ItemElements, NBT> = ItemElements.Codec(ItemComponentConstants.ELEMENTS).apply(::register)
+    val ELEMENTS: ItemComponentType<ItemElements, NBT> = ItemElements.Codec(ItemComponentConstants.ELEMENTS).apply(::register)
 
     /**
      * 免疫火焰伤害. 对应原版组件: [`minecraft:fire_resistant`](https://minecraft.wiki/w/Data_component_format#fire_resistant)
      */
     // POC
-    val FIRE_RESISTANT: ItemComponentType.NonValued<Item> = FireResistant.Codec(ItemComponentConstants.FIRE_RESISTANT).apply(::register)
+    val FIRE_RESISTANT: ItemComponentType<FireResistant, Item> = FireResistant.Codec(ItemComponentConstants.FIRE_RESISTANT).apply(::register)
 
     /**
      * 作为食物.
      */
     // POC
-    val FOOD: ItemComponentType.Valued<FoodProperties, Complex> = FoodProperties.Codec(ItemComponentConstants.FOOD).apply(::register)
+    val FOOD: ItemComponentType<FoodProperties, Complex> = FoodProperties.Codec(ItemComponentConstants.FOOD).apply(::register)
 
     /**
      * 物品名字. 对应原版组件: [`minecraft:item_name`](https://minecraft.wiki/w/Data_component_format#item_name)
      */
-    val ITEM_NAME: ItemComponentType.Valued<Component, Item> = valued(ItemComponentConstants.ITEM_NAME)
+    val ITEM_NAME: ItemComponentType<Component, Item> = dummy(ItemComponentConstants.ITEM_NAME)
 
     /**
      * 物品铭刻.
      */
-    val KIZAMIZ: ItemComponentType.Valued<ItemKizamiz, NBT> = valued(ItemComponentConstants.KIZAMIZ)
+    val KIZAMIZ: ItemComponentType<ItemKizamiz, NBT> = dummy(ItemComponentConstants.KIZAMIZ)
 
     /**
      * 控制物品能否提供铭刻加成给玩家.
      */
-    val KIZAMIABLE: ItemComponentType.NonValued<NBT> = nonValuedByNbt(ItemComponentConstants.KIZAMIABLE)
+    val KIZAMIABLE: ItemComponentType<Kizamiable, NBT> = dummy(ItemComponentConstants.KIZAMIABLE)
 
     /**
      * 物品等级.
      */
-    val LEVEL: ItemComponentType.Valued<Int, NBT> = valued(ItemComponentConstants.LEVEL)
+    val LEVEL: ItemComponentType<Int, NBT> = dummy(ItemComponentConstants.LEVEL)
 
     /**
      * 物品描述 (不同于原版物品组件 `minecraft:lore`).
      */
-    val LORE: ItemComponentType.Valued<ItemLore, NBT> = valued(ItemComponentConstants.LORE)
+    val LORE: ItemComponentType<ItemLore, NBT> = dummy(ItemComponentConstants.LORE)
 
     /**
      * 最大可损失的耐久.
      */
-    val MAX_DAMAGE: ItemComponentType.Valued<Int, Item> = valued(ItemComponentConstants.MAX_DAMAGE)
+    val MAX_DAMAGE: ItemComponentType<Int, Item> = dummy(ItemComponentConstants.MAX_DAMAGE)
 
     /**
      * 物品稀有度.
      */
-    val RARITY: ItemComponentType.Valued<ItemRarity, NBT> = valued(ItemComponentConstants.RARITY)
+    val RARITY: ItemComponentType<ItemRarity, NBT> = dummy(ItemComponentConstants.RARITY)
 
     /**
      * 控制物品能否提供技能加成给玩家.
      */
-    val SKILLFUL: ItemComponentType.NonValued<NBT> = nonValuedByNbt(ItemComponentConstants.SKILLFUL)
+    val SKILLFUL: ItemComponentType<Skillful, NBT> = dummy(ItemComponentConstants.SKILLFUL)
 
     /**
      * 物品皮肤.
      */
-    val SKIN: ItemComponentType.Valued<ItemSkin, NBT> = valued(ItemComponentConstants.SKIN)
+    val SKIN: ItemComponentType<ItemSkin, NBT> = dummy(ItemComponentConstants.SKIN)
 
     /**
      * 物品皮肤所有者.
      */
-    val SKIN_OWNER: ItemComponentType.Valued<ItemSkinOwner, NBT> = valued(ItemComponentConstants.SKIN_OWNER)
-
-    /**
-     * 物品的(所有)统计数据.
-     */
-    val STATISTICS: ItemComponentType.Valued<ItemStatistics, NBT> = valued(ItemComponentConstants.STATISTICS)
+    val SKIN_OWNER: ItemComponentType<ItemSkinOwner, NBT> = dummy(ItemComponentConstants.SKIN_OWNER)
 
     /**
      * 作为工具.
      */
-    val TOOL: ItemComponentType.Valued<Tool, Item> = valued(ItemComponentConstants.TOOL)
+    val TOOL: ItemComponentType<Tool, Item> = dummy(ItemComponentConstants.TOOL)
+
+    /**
+     * 物品的(所有)统计数据.
+     */
+    val TRACKABLE: ItemComponentType<Trackable, NBT> = dummy(ItemComponentConstants.TRACKABLE)
 
     /**
      * 不损失耐久度.
      */
     // POC
-    val UNBREAKABLE: ItemComponentType.Valued<Unbreakable, Item> = Unbreakable.Codec(ItemComponentConstants.UNBREAKABLE).apply(::register)
+    val UNBREAKABLE: ItemComponentType<Unbreakable, Item> = Unbreakable.Codec(ItemComponentConstants.UNBREAKABLE).apply(::register)
 
-    private fun register(type: ItemComponentType) {
+    private fun register(type: ItemComponentType<*, *>) {
         ItemComponentRegistry.TYPES.register(type.id, type)
     }
 
-    private fun <T, S : ItemComponentHolder> valued(id: String): ItemComponentType.Valued<T, S> {
-        TODO()
-    }
-
-    private fun <S : ItemComponentHolder> nonValued(id: String): ItemComponentType.NonValued<S> {
+    private fun <T, S : ItemComponentHolder> dummy(id: String): ItemComponentType<T, S> {
         TODO()
     }
 
@@ -173,16 +171,4 @@ object ItemComponentTypes {
     //  这也就意味着组件的提示框文本必须由 Value 来提供.
     //  解决办法: Codec 产生 Value 产生 Name/LoreLine.
     //  Value 如果是 NonValued 就定义为单例 (kt object)
-    /**
-     * 创建一个 [ItemComponentType.NonValued] 实例, 其数据储存在 [NBT].
-     */
-    private fun nonValuedByNbt(id: String): ItemComponentType.NonValued<NBT> {
-        return object : ItemComponentType.NonValued<NBT> {
-            override val id: String = id
-            override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-            override fun read(holder: NBT): Boolean = false
-            override fun write(holder: NBT, value: Boolean) = Unit
-            override fun remove(holder: NBT) = Unit
-        }
-    }
 }

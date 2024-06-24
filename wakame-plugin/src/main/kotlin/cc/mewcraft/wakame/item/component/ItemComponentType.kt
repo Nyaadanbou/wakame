@@ -7,8 +7,11 @@ package cc.mewcraft.wakame.item.component
  * 代表了一个物品组件的类型.
  *
  * 封装了一个物品组件的读取/写入/移除逻辑.
+ *
+ * @param T 组件的快照类型, 属于 immutable class
+ * @param S 储存了物品组件信息的容器类型
  */
-sealed interface ItemComponentType {
+interface ItemComponentType<T, S : ItemComponentHolder> {
 
     /**
      * `组件类型`的唯一标识. 用于配置文件和NBT的序列化.
@@ -19,6 +22,13 @@ sealed interface ItemComponentType {
      * 标记该`组件类型`构建的`组件快照`需要用到的数据源.
      */
     val holder: Holder // 开发日记: 该成员是为了解决泛型擦除导致无法获取 ItemComponentHolder 类型的问题
+
+    // 开发日记: 2024/6/24 小米
+    // 对于 Holder 为 NBT 的组件来说, read/write/remove 函数是不需要实现的 - 它们实际上不会被调用
+
+    fun read(holder: S): T?
+    fun write(holder: S, value: T)
+    fun remove(holder: S)
 
     // 开发日记 1
     // ItemComponentType 应该尽可能的能够同时包含
@@ -34,37 +44,6 @@ sealed interface ItemComponentType {
     // 对于有些 ItemComponent, 他可能是 NBT + 原版组件的复合体,
     //  例如 wakame 自定义的 FoodComponent, 还带了个吃完食物后释放的技能
     //  对于这种情况, 是不是需要同时传入 item 和 nbt ?
-
-    /**
-     * 带值的组件类型.
-     *
-     * @param T 组件的快照类型, 属于 immutable class
-     * @param S 储存了物品组件信息的容器类型
-     */
-    interface Valued<T, S : ItemComponentHolder> : ItemComponentType {
-
-        fun read(holder: S): T?
-        fun write(holder: S, value: T)
-
-        // 开发日记: 2024/6/25 小米
-        // 对于 Holder 为 NBT 的组件来说, remove 函数是不需要实现的 - 它们实际上不会被调用
-
-        fun remove(holder: S)
-    }
-
-    /**
-     * 不带值的组件类型. 该组件在物品上只有“是否存在”一说, 其数据不会被使用.
-     */
-    interface NonValued<S : ItemComponentHolder> : ItemComponentType {
-
-        // 开发日记: 2024/6/25 小米
-        // 对于 Holder 为 NBT 的组件来说, read/write/remove 函数是不需要实现的 - 它们实际上不会被调用, 而是直接在 ItemComponentMap 处理完成
-        // 对于 Holder 为 Item 的组件来说, read/write/remove 函数定义了如何从 ItemStack 上修改原版的物品组件 - 它们需要被正确的实现
-
-        fun read(holder: S): Boolean
-        fun write(holder: S, value: Boolean)
-        fun remove(holder: S)
-    }
 
     /**
      * 标记一个 [ItemComponentType] 的构建需要用到的数据源.

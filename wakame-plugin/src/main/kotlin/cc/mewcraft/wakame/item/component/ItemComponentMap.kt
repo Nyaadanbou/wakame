@@ -7,12 +7,10 @@ import cc.mewcraft.wakame.util.nekoCompoundOrNull
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.inventory.ItemStack
 
-sealed interface TypedItemComponent {
-    val type: ItemComponentType
-
-    data class Valued<T>(override val type: ItemComponentType, val value: T) : TypedItemComponent
-    data class NonValued(override val type: ItemComponentType) : TypedItemComponent
-}
+data class TypedItemComponent<T>(
+    val type: ItemComponentType<T, *>,
+    val value: T,
+)
 
 /**
  * 这是一个从 [ItemComponentType] 映射到具体物品组件数据的容器.
@@ -34,18 +32,17 @@ sealed interface TypedItemComponent {
  * 如果想移除一个组件, 调用以下函数:
  * - [remove]
  */
-interface ItemComponentMap : Iterable<TypedItemComponent> {
+interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
     companion object {
         val EMPTY: ItemComponentMap = object : ItemComponentMap {
-            override fun <T, S : ItemComponentHolder> get(type: ItemComponentType.Valued<T, S>): T? = null
-            override fun has(type: ItemComponentType): Boolean = false
-            override fun <T, S : ItemComponentHolder> add(type: ItemComponentType.Valued<T, S>, value: T) = Unit
-            override fun <S : ItemComponentHolder> add(type: ItemComponentType.NonValued<S>) = Unit
-            override fun remove(type: ItemComponentType) = Unit
-            override fun keySet(): Set<ItemComponentType> = emptySet()
+            override fun <T, S : ItemComponentHolder> get(type: ItemComponentType<T, S>): T? = null
+            override fun has(type: ItemComponentType<*, *>): Boolean = false
+            override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) = Unit
+            override fun remove(type: ItemComponentType<*, *>) = Unit
+            override fun keySet(): Set<ItemComponentType<*, *>> = emptySet()
             override fun size(): Int = 0
-            override fun iterator(): Iterator<TypedItemComponent> = emptySet<TypedItemComponent>().iterator()
+            override fun iterator(): Iterator<TypedItemComponent<*>> = emptySet<TypedItemComponent<*>>().iterator()
         }
 
         /**
@@ -60,27 +57,23 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
          */
         fun composite(base: ItemComponentMap, overrides: ItemComponentMap): ItemComponentMap {
             return object : ItemComponentMap {
-                override fun <T, S : ItemComponentHolder> get(type: ItemComponentType.Valued<T, S>): T? {
+                override fun <T, S : ItemComponentHolder> get(type: ItemComponentType<T, S>): T? {
                     return overrides.get(type) ?: base.get(type)
                 }
 
-                override fun has(type: ItemComponentType): Boolean {
+                override fun has(type: ItemComponentType<*, *>): Boolean {
                     return overrides.has(type) || base.has(type)
                 }
 
-                override fun <T, S : ItemComponentHolder> add(type: ItemComponentType.Valued<T, S>, value: T) {
+                override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) {
                     overrides.add(type, value)
                 }
 
-                override fun <S : ItemComponentHolder> add(type: ItemComponentType.NonValued<S>) {
-                    overrides.add(type)
-                }
-
-                override fun remove(type: ItemComponentType) {
+                override fun remove(type: ItemComponentType<*, *>) {
                     overrides.remove(type)
                 }
 
-                override fun keySet(): Set<ItemComponentType> {
+                override fun keySet(): Set<ItemComponentType<*, *>> {
                     return base.keySet() union overrides.keySet()
                 }
 
@@ -95,28 +88,26 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
         }
     }
 
-    fun <T, S : ItemComponentHolder> get(type: ItemComponentType.Valued<T, S>): T?
+    fun <T, S : ItemComponentHolder> get(type: ItemComponentType<T, S>): T?
 
-    fun <T, S : ItemComponentHolder> getOrDefault(type: ItemComponentType.Valued<T, S>, fallback: T): T {
+    fun <T, S : ItemComponentHolder> getOrDefault(type: ItemComponentType<T, S>, fallback: T): T {
         return get(type) ?: fallback
     }
 
-    fun <T, S : ItemComponentHolder> getTyped(type: ItemComponentType.Valued<T, S>): TypedItemComponent? {
+    fun <T, S : ItemComponentHolder> getTyped(type: ItemComponentType<T, S>): TypedItemComponent<T>? {
         val value = get(type) ?: return null
-        return TypedItemComponent.Valued(type, value)
+        return TypedItemComponent(type, value)
     }
 
-    fun has(type: ItemComponentType): Boolean
+    fun has(type: ItemComponentType<*, *>): Boolean
 
-    fun <T, S : ItemComponentHolder> add(type: ItemComponentType.Valued<T, S>, value: T)
+    fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T)
 
-    fun <S : ItemComponentHolder> add(type: ItemComponentType.NonValued<S>)
+    fun remove(type: ItemComponentType<*, *>)
 
-    fun remove(type: ItemComponentType)
-
-    fun filter(predicate: (ItemComponentType) -> Boolean): ItemComponentMap {
+    fun filter(predicate: (ItemComponentType<*, *>) -> Boolean): ItemComponentMap {
         return object : ItemComponentMap {
-            override fun <T, S : ItemComponentHolder> get(type: ItemComponentType.Valued<T, S>): T? {
+            override fun <T, S : ItemComponentHolder> get(type: ItemComponentType<T, S>): T? {
                 if (predicate(type)) {
                     return this@ItemComponentMap.get(type)
                 }
@@ -124,26 +115,22 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
 
             }
 
-            override fun has(type: ItemComponentType): Boolean {
+            override fun has(type: ItemComponentType<*, *>): Boolean {
                 if (predicate(type)) {
                     return this@ItemComponentMap.has(type)
                 }
                 return false
             }
 
-            override fun <T, S : ItemComponentHolder> add(type: ItemComponentType.Valued<T, S>, value: T) {
+            override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) {
                 this@ItemComponentMap.add(type, value)
             }
 
-            override fun <S : ItemComponentHolder> add(type: ItemComponentType.NonValued<S>) {
-                this@ItemComponentMap.add(type)
-            }
-
-            override fun remove(type: ItemComponentType) {
+            override fun remove(type: ItemComponentType<*, *>) {
                 this@ItemComponentMap.remove(type)
             }
 
-            override fun keySet(): Set<ItemComponentType> {
+            override fun keySet(): Set<ItemComponentType<*, *>> {
                 return this@ItemComponentMap.keySet().filter(predicate).toSet()
             }
 
@@ -153,7 +140,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
         }
     }
 
-    fun keySet(): Set<ItemComponentType>
+    fun keySet(): Set<ItemComponentType<*, *>>
 
     fun size(): Int
 
@@ -161,21 +148,16 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
         return this.size() == 0
     }
 
-    override fun iterator(): Iterator<TypedItemComponent> {
-        return keySet().mapNotNull {
-            when (it) {
-                is ItemComponentType.Valued<*, *> -> getTyped(it)
-                is ItemComponentType.NonValued<*> -> TypedItemComponent.NonValued(it)
-            }
-        }.iterator()
+    override fun iterator(): Iterator<TypedItemComponent<*>> {
+        return keySet().mapNotNull { getTyped(it) }.iterator()
     }
 
     // Classes
 
     class Builder {
-        private val map: MutableMap<ItemComponentType, Any> = mutableMapOf()
+        private val map: MutableMap<ItemComponentType<*, *>, Any> = mutableMapOf()
 
-        fun <T> set(type: ItemComponentType, value: T?): Builder {
+        fun <T> set(type: ItemComponentType<T, *>, value: T?): Builder {
             if (value != null) {
                 map[type] = value
             } else {
@@ -185,16 +167,8 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
         }
 
         fun addAll(map: ItemComponentMap): Builder {
-            for (component: TypedItemComponent in map) {
-                when (component) {
-                    is TypedItemComponent.Valued<*> -> {
-                        this.map[component.type] = component.value as Any
-                    }
-
-                    is TypedItemComponent.NonValued -> {
-                        this.map[component.type] = Unit
-                    }
-                }
+            for (component: TypedItemComponent<*> in map) {
+                this.map[component.type] = component.value as Any
             }
             return this
         }
@@ -203,7 +177,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
             return buildFromMap(map)
         }
 
-        private fun buildFromMap(components: Map<ItemComponentType, Any>): ItemComponentMap {
+        private fun buildFromMap(components: Map<ItemComponentType<*, *>, Any>): ItemComponentMap {
             return if (components.isEmpty()) {
                 EMPTY
             } else {
@@ -216,25 +190,21 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
      * 用于单元测试.
      */
     private class SimpleMap(
-        private val map: MutableMap<ItemComponentType, Any>,
+        private val map: MutableMap<ItemComponentType<*, *>, Any>,
     ) : ItemComponentMap {
-        override fun <T, S : ItemComponentHolder> get(type: ItemComponentType.Valued<T, S>): T? {
+        override fun <T, S : ItemComponentHolder> get(type: ItemComponentType<T, S>): T? {
             return map[type] as (T?)
         }
 
-        override fun has(type: ItemComponentType): Boolean {
+        override fun has(type: ItemComponentType<*, *>): Boolean {
             return map.containsKey(type)
         }
 
-        override fun <T, S : ItemComponentHolder> add(type: ItemComponentType.Valued<T, S>, value: T) {
+        override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) {
             map[type] = value as Any
         }
 
-        override fun <S : ItemComponentHolder> add(type: ItemComponentType.NonValued<S>) {
-            map[type] = Unit
-        }
-
-        override fun remove(type: ItemComponentType) {
+        override fun remove(type: ItemComponentType<*, *>) {
             map.remove(type)
         }
 
@@ -242,22 +212,12 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
             return map.size
         }
 
-        override fun keySet(): Set<ItemComponentType> {
+        override fun keySet(): Set<ItemComponentType<*, *>> {
             return map.keys
         }
 
-        override fun iterator(): Iterator<TypedItemComponent> {
-            return map.entries.map { entry ->
-                when (val type = entry.key) {
-                    is ItemComponentType.Valued<*, *> -> {
-                        TypedItemComponent.Valued(type, entry.value)
-                    }
-
-                    is ItemComponentType.NonValued<*> -> {
-                        TypedItemComponent.NonValued(type)
-                    }
-                }
-            }.iterator()
+        override fun iterator(): Iterator<TypedItemComponent<*>> {
+            return map.entries.mapNotNull { getTyped(it.key) }.iterator()
         }
 
         override fun toString(): String {
@@ -274,81 +234,47 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
         // 储存了所有组件信息的
         private val nbt: CompoundShadowTag = item.nekoCompoundOrNull?.getCompoundOrNull("components") ?: throw IllegalStateException()
 
-        override fun <T, S : ItemComponentHolder> get(type: ItemComponentType.Valued<T, S>): T? {
+        override fun <T, S : ItemComponentHolder> get(type: ItemComponentType<T, S>): T? {
             val id = type.id
             val source = type.holder
             when (source) {
                 ItemComponentType.Holder.NBT -> {
-                    // 涉及的组件: Arrow, ItemCells, ItemElement, ItemKizami, ItemLevel, ItemLore, ItemRarity, ItemSkin, ItemSkinOwner, ItemStatistics
+                    // 涉及的组件: Arrow, Attributable, Crate, ItemCells, ItemElements, ItemKizamiz, ItemLevel, ItemLore, ItemRarity, ItemSkin, ItemSkinOwner, Kizamiable, Skillful, Trackable
 
                     // 如果不存在此标签, 则代表该组件不存在, 所以直接返回 null
                     val compound = nbt.getCompoundOrNull(id) ?: return null
 
                     val holder = ItemComponentHolder.NBT(compound)
-                    val cast = type as ItemComponentType.Valued<T, ItemComponentHolder.NBT>
+                    val cast = type as ItemComponentType<T, ItemComponentHolder.NBT>
                     return cast.read(holder)
                 }
 
                 ItemComponentType.Holder.ITEM -> {
-                    // 涉及的组件: CustomName, ItemDamage, ItemMaxDamage, ItemName, Tool
+                    // 涉及的组件: CustomName, CustomModelData, FireResistant, ItemDamage, ItemMaxDamage, ItemName, Tool, Unbreakable
 
                     val holder = ItemComponentHolder.Item(item)
-                    val cast = type as ItemComponentType.Valued<T, ItemComponentHolder.Item>
+                    val cast = type as ItemComponentType<T, ItemComponentHolder.Item>
                     return cast.read(holder)
                 }
 
                 ItemComponentType.Holder.COMPLEX -> {
-                    // 涉及的组件: FoodProperties
+                    // 涉及的组件: Damageable, FoodProperties
 
                     // 两者都需要的情况下, 如果其一不存在, 则直接返回 null
                     val compound = nbt.getCompoundOrNull(id) ?: return null
 
                     val holder = ItemComponentHolder.Complex(item, compound)
-                    val cast = type as ItemComponentType.Valued<T, ItemComponentHolder.Complex>
+                    val cast = type as ItemComponentType<T, ItemComponentHolder.Complex>
                     return cast.read(holder)
                 }
             }
         }
 
-        override fun has(type: ItemComponentType): Boolean {
-            when (type) {
-                is ItemComponentType.Valued<*, *> -> {
-                    // 涉及的组件: 见函数 get()
-                    return get(type) != null
-                }
-
-                is ItemComponentType.NonValued<*> -> {
-                    val id = type.id
-                    val source = type.holder
-                    when (source) {
-                        ItemComponentType.Holder.NBT -> {
-                            // 涉及的组件: Attributable, Kizamiable, Skillful
-
-                            return nbt.contains(id)
-                        }
-
-                        ItemComponentType.Holder.ITEM -> {
-                            // 涉及的组件: FireResistant
-
-                            val holder = ItemComponentHolder.Item(item)
-                            val cast = type as ItemComponentType.NonValued<ItemComponentHolder.Item>
-                            return cast.read(holder)
-                        }
-
-                        ItemComponentType.Holder.COMPLEX -> {
-                            // 涉及的组件:
-
-                            val compound = nbt.getCompoundOrNull(id) ?: return false
-                            val holder = ItemComponentHolder.Complex(item, compound)
-                            val cast = type as ItemComponentType.NonValued<ItemComponentHolder.Complex>
-                            return cast.read(holder)
-                        }
-                    }
-                }
-            }
+        override fun has(type: ItemComponentType<*, *>): Boolean {
+            return get(type) != null
         }
 
-        override fun <T, S : ItemComponentHolder> add(type: ItemComponentType.Valued<T, S>, value: T) {
+        override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) {
             val id = type.id
             val source = type.holder
             when (source) {
@@ -356,107 +282,54 @@ interface ItemComponentMap : Iterable<TypedItemComponent> {
                 ItemComponentType.Holder.NBT -> {
                     val compound = nbt.getOrPut(id, CompoundShadowTag::create)
                     val holder = ItemComponentHolder.NBT(compound)
-                    val cast = type as ItemComponentType.Valued<T, ItemComponentHolder.NBT>
+                    val cast = type as ItemComponentType<T, ItemComponentHolder.NBT>
                     cast.write(holder, value)
                 }
 
                 ItemComponentType.Holder.ITEM -> {
                     val holder = ItemComponentHolder.Item(item)
-                    val cast = type as ItemComponentType.Valued<T, ItemComponentHolder.Item>
+                    val cast = type as ItemComponentType<T, ItemComponentHolder.Item>
                     cast.write(holder, value)
                 }
 
                 ItemComponentType.Holder.COMPLEX -> {
                     val compound = nbt.getOrPut(id, CompoundShadowTag::create)
                     val holder = ItemComponentHolder.Complex(item, compound)
-                    val cast = type as ItemComponentType.Valued<T, ItemComponentHolder.Complex>
+                    val cast = type as ItemComponentType<T, ItemComponentHolder.Complex>
                     cast.write(holder, value)
                 }
             }
         }
 
-        override fun <S : ItemComponentHolder> add(type: ItemComponentType.NonValued<S>) {
+        override fun remove(type: ItemComponentType<*, *>) {
             val id = type.id
             val source = type.holder
             when (source) {
-                // 涉及的组件: 见 has()
-
                 ItemComponentType.Holder.NBT -> {
-                    nbt.put(id, CompoundShadowTag.create())
+                    nbt.remove(id)
                 }
 
                 ItemComponentType.Holder.ITEM -> {
                     val holder = ItemComponentHolder.Item(item)
-                    val cast = type as ItemComponentType.NonValued<ItemComponentHolder.Item>
-                    cast.write(holder, true)
+                    val cast = type as ItemComponentType<*, ItemComponentHolder.Item>
+                    cast.remove(holder)
                 }
 
                 ItemComponentType.Holder.COMPLEX -> {
-                    val compound = nbt.getOrPut(id, CompoundShadowTag::create)
+                    // 这个 NBT 标签实际上没必要 getOrPut, 因为反正
+                    // 这个标签最后要被移除. 只不过因为 Complex 要求非空.
+                    // val compound = nbt.getOrPut(id, CompoundShadowTag::create)
+
+                    val compound = EMPTY_COMPOUND
                     val holder = ItemComponentHolder.Complex(item, compound)
-                    val cast = type as ItemComponentType.NonValued<ItemComponentHolder.Complex>
-                    cast.write(holder, true)
+                    val cast = type as ItemComponentType<*, ItemComponentHolder.Complex>
+                    cast.remove(holder)
+                    nbt.remove(id)
                 }
             }
         }
 
-        override fun remove(type: ItemComponentType) {
-            val id = type.id
-            val source = type.holder
-            when (type) {
-                is ItemComponentType.Valued<*, *> -> {
-                    when (source) {
-                        ItemComponentType.Holder.NBT -> {
-                            nbt.remove(id)
-                        }
-
-                        ItemComponentType.Holder.ITEM -> {
-                            val holder = ItemComponentHolder.Item(item)
-                            val cast = type as ItemComponentType.Valued<*, ItemComponentHolder.Item>
-                            cast.remove(holder)
-                        }
-
-                        ItemComponentType.Holder.COMPLEX -> {
-                            // 这个 NBT 标签实际上没必要 getOrPut, 因为反正
-                            // 这个标签最后要被移除. 只不过因为 Complex 要求非空.
-                            // val compound = nbt.getOrPut(id, CompoundShadowTag::create)
-
-                            val compound = EMPTY_COMPOUND
-                            val holder = ItemComponentHolder.Complex(item, compound)
-                            val cast = type as ItemComponentType.Valued<*, ItemComponentHolder.Complex>
-                            cast.remove(holder)
-                            nbt.remove(id)
-                        }
-                    }
-                }
-
-                is ItemComponentType.NonValued<*> -> {
-                    when (source) {
-                        ItemComponentType.Holder.NBT -> {
-                            nbt.remove(id)
-                        }
-
-                        ItemComponentType.Holder.ITEM -> {
-                            val holder = ItemComponentHolder.Item(item)
-                            val cast = type as ItemComponentType.NonValued<ItemComponentHolder.Item>
-                            cast.remove(holder)
-                        }
-
-                        ItemComponentType.Holder.COMPLEX -> {
-                            // val compound = nbt.getOrPut(id, CompoundShadowTag::create)
-
-                            val compound = EMPTY_COMPOUND
-                            val holder = ItemComponentHolder.Complex(item, compound)
-                            val cast = type as ItemComponentType.NonValued<ItemComponentHolder.Complex>
-                            cast.remove(holder)
-                            nbt.remove(id)
-                        }
-                    }
-                }
-            }
-        }
-
-        override fun keySet(): Set<ItemComponentType> {
+        override fun keySet(): Set<ItemComponentType<*, *>> {
             return nbt.keySet().mapNotNull { ItemComponentRegistry.TYPES.find(it) }.toSet()
         }
 

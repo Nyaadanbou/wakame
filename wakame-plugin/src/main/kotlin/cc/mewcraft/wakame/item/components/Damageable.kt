@@ -1,7 +1,12 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.GenerationContext
 import cc.mewcraft.wakame.item.component.GenerationResult
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -17,7 +22,8 @@ import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import org.bukkit.inventory.meta.Damageable as BukkitDamageable
 
-interface Damageable : Examinable {
+interface Damageable : Examinable, TooltipProvider {
+
     /**
      * 当前损耗.
      */
@@ -43,11 +49,23 @@ interface Damageable : Examinable {
         override val maxDamage: Int,
         override val unbreakable: Boolean,
         override val repairItems: List<Key>,
-    ) : Damageable
+    ) : Damageable {
+        override fun provideDisplayLore(): LoreLine {
+            if (!showInTooltip) {
+                return LoreLine.noop()
+            }
+            return LoreLine.simple(tooltipKey, listOf(tooltipText.render()))
+        }
 
-    data class Codec(
+        companion object : ItemComponentConfig(ItemComponentConstants.DAMAGEABLE) {
+            val tooltipKey: TooltipKey = ItemComponentConstants.createKey { DAMAGEABLE }
+            val tooltipText: SingleTooltip = SingleTooltip()
+        }
+    }
+
+    class Codec(
         override val id: String,
-    ) : ItemComponentType.Valued<Damageable, ItemComponentHolder.Complex> {
+    ) : ItemComponentType<Damageable, ItemComponentHolder.Complex> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
 
         override fun read(holder: ItemComponentHolder.Complex): Damageable? {
