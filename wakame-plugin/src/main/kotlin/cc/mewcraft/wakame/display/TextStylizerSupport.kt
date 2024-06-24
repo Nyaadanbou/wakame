@@ -22,7 +22,7 @@ internal class TextStylizerImpl : TextStylizer {
         return ret
     }
 
-    private fun ObjectArrayList<LoreLine>.addLoreLines(collection: Iterable<TooltipsProvider>) {
+    private fun ObjectArrayList<LoreLine>.addLoreLines(collection: Iterable<TooltipProvider>) {
         for (provider in collection) {
             val loreLine = provider.provideDisplayLore()
             if (loreLine.isNoop) continue

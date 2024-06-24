@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-interface TooltipsProvider {
+interface TooltipProvider {
     fun provideDisplayName(): NameLine = NameLine.noop()
     fun provideDisplayLore(): LoreLine = LoreLine.noop()
 }

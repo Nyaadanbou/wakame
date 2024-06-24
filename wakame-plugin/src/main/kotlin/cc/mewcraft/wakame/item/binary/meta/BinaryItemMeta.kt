@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
-import cc.mewcraft.wakame.display.TooltipsProvider
+import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemMeta
 
 /**
@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.item.ItemMeta
  * @param T the value "stored" in this [BinaryItemMeta]
  * @constructor the primary constructor must have a single parameter of type [ItemMetaAccessor]
  */
-sealed interface BinaryItemMeta<T> : ItemMeta, TooltipsProvider {
+sealed interface BinaryItemMeta<T> : ItemMeta, TooltipProvider {
 
     /**
      * Checks whether the item meta exists in the underlying data.
