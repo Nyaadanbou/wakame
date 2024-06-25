@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 /**
  * A wakame player in Paper platform.
@@ -69,7 +70,9 @@ class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     private val server: Server by inject()
 
     // holds the live data of users
-    private val userRepository: Cache<UUID, User<Player>> = Caffeine.newBuilder().build()
+    private val userRepository: Cache<UUID, User<Player>> = Caffeine.newBuilder()
+        .expireAfterAccess(5, TimeUnit.MINUTES)
+        .build()
 
     @EventHandler
     private fun onQuit(e: PlayerQuitEvent) {

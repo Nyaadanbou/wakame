@@ -44,6 +44,8 @@ interface ManaCondition : SkillCondition {
             private val notification: Notification = Notification()
 
             override fun onSuccess(context: SkillCastContext) {
+                val user = context.get(SkillCastContextKey.USER)
+                user.resourceMap.take(ResourceTypeRegistry.MANA, mana)
                 notification.notifySuccess(context)
             }
 

@@ -45,7 +45,7 @@ class SkillEventHandler {
         targetProvider: () -> Target
     ) {
         val user = player.toUser()
-        val nekoStack = itemStack?.toNekoStack
+        val nekoStack = itemStack?.tryNekoStack // FIXME: 2024.7.5
         val target = targetProvider()
         val result = user.skillState.addTrigger(SingleTrigger.LEFT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
         if (result == SkillStateResult.CANCEL_EVENT) {
@@ -68,7 +68,7 @@ class SkillEventHandler {
         targetProvider: () -> Target
     ) {
         val user = player.toUser()
-        val nekoStack = itemStack?.toNekoStack
+        val nekoStack = itemStack?.tryNekoStack // FIXME: 2024.7.5
         val target = targetProvider.invoke()
         val result = user.skillState.addTrigger(SingleTrigger.RIGHT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
         checkResult(result, event)

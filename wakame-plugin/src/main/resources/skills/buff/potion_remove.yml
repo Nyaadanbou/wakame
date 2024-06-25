@@ -38,13 +38,21 @@ conditions:
         text: "You successfully removed the potion effect. durability: -10"
     failure_message:
       - type: chat
-        text: "You failed to remove the potion effect. durability: -10"
-  - type: molang
-    id: "chance"
-    eval: "math.random(0.0, 1.0) < 0.5"
+        text: "You failed to remove the potion effect. no durability"
+  - type: mana
+    id: "mana"
+    mana: 10
     success_message:
-      - type: chat
-        text: "You successfully removed the potion effect."
+      - type: title
+        title: "<green>You successfully removed the potion effect. mana: -10"
+        subtitle: ""
+        fade_in: 1
+        stay: 2
+        fade_out: 1
     failure_message:
-      - type: chat
-        text: "You failed to remove the potion effect."
+      - type: title
+        title: "<red>You failed to remove the potion effect. no mana"
+        subtitle: ""
+        fade_in: 1
+        stay: 2
+        fade_out: 1

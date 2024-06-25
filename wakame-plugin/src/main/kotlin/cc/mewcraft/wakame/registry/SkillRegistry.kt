@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillFactories
+import cc.mewcraft.wakame.skill.condition.ManaCondition
 import cc.mewcraft.wakame.skill.condition.MoLangExpression
 import cc.mewcraft.wakame.skill.condition.NekoDurability
 import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
@@ -51,6 +52,7 @@ object SkillRegistry : Initializable, KoinComponent {
     private fun loadSkillConditions() {
         CONDITIONS.register("durability", NekoDurability)
         CONDITIONS.register("molang", MoLangExpression)
+        CONDITIONS.register("mana", ManaCondition)
     }
 
     private fun loadTriggers() {
