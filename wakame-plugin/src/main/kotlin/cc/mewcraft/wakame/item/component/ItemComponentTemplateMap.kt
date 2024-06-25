@@ -37,8 +37,8 @@ import org.bukkit.inventory.ItemStack
 //   它们都应该被添加到最终的 NekoStack 上 (除非上下文禁止了某个组件的生成).
 
 /**
- * 代表多个 [ItemComponentTemplate], 包含了一个物品的所有组件的模板.
+ * 代表多个 [ItemComponentTemplate], 包含了一个物品的所有物品组件的模板.
  */
-interface ItemComponentTemplates {
+interface ItemComponentTemplateMap {
     fun applyToItem(item: ItemStack)
 }

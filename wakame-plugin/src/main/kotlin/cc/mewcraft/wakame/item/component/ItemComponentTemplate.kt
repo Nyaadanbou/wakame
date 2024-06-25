@@ -14,17 +14,13 @@ import java.lang.reflect.Type
 /**
  * 代表一个`物品组件`的`模板`, 可以看成是`物品组件`在配置文件中的抽象.
  *
- * `物品组件`的`模板`专门用来多样化生成`物品组件`的数据.
+ * `物品组件`的`模板`专门用来多样化生成`物品组件`的`数据`.
  *
  * @param T 组件快照的类型
  */
 interface ItemComponentTemplate<T> {
 
     // FIXME ItemComponentTemplate 也需要区分 Valued/NonValued 吗?
-
-    // interface Valued<T>
-    //
-    // interface NonValued
 
     /**
      * 生成一个该组件的快照.
