@@ -6,6 +6,21 @@ displays:
     - "有 <chance> 几率消耗 <dura> 点耐久以"
     - "移除自身的速度和跳跃提升药水效果"
 
+# 技能的打断触发器设置, 可用 CAST_POINT, CAST, BACKSWING
+interrupt_triggers:
+  backswing:
+    # 如果在施法过程中按下了鼠标左键或右键，就会打断施法
+    - LEFT_CLICK
+    - RIGHT_CLICK
+  cast:
+    # 如果在施法过程中按下了鼠标右键，就会打断施法
+    - RIGHT_CLICK
+
+forbidden_triggers:
+  cast:
+    # 释放技能时无法走动
+    - MOVE
+
 # 技能模板的 type
 type: remove_potion_effect
 

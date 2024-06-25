@@ -9,10 +9,14 @@ import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.state.SkillStateResult
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.toUser
+import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -26,17 +30,22 @@ class SkillEventHandler {
 
     /* 玩家的技能触发逻辑 */
 
-    fun onLeftClickBlock(player: Player, itemStack: ItemStack, location: Location, event: PlayerInteractEvent) {
+    fun onLeftClickBlock(player: Player, itemStack: ItemStack?, location: Location, event: PlayerInteractEvent) {
         onLeftClick(player, itemStack, event) { TargetAdapter.adapt(location) }
     }
 
-    fun onLeftClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
+    fun onLeftClickAir(player: Player, itemStack: ItemStack?, event: PlayerInteractEvent) {
         onLeftClick(player, itemStack, event) { TargetAdapter.adapt(player) }
     }
 
-    private fun onLeftClick(player: Player, itemStack: ItemStack, event: PlayerInteractEvent, targetProvider: () -> Target) {
+    private fun onLeftClick(
+        player: Player,
+        itemStack: ItemStack?,
+        event: PlayerInteractEvent,
+        targetProvider: () -> Target
+    ) {
         val user = player.toUser()
-        val nekoStack = itemStack.toNekoStack
+        val nekoStack = itemStack?.toNekoStack
         val target = targetProvider()
         val result = user.skillState.addTrigger(SingleTrigger.LEFT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
         if (result == SkillStateResult.CANCEL_EVENT) {
@@ -44,34 +53,52 @@ class SkillEventHandler {
         }
     }
 
-    fun onRightClickBlock(player: Player, itemStack: ItemStack, location: Location, event: PlayerInteractEvent) {
+    fun onRightClickBlock(player: Player, itemStack: ItemStack?, location: Location, event: PlayerInteractEvent) {
         onRightClick(player, itemStack, event) { TargetAdapter.adapt(location) }
     }
 
-    fun onRightClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
+    fun onRightClickAir(player: Player, itemStack: ItemStack?, event: PlayerInteractEvent) {
         onRightClick(player, itemStack, event) { TargetAdapter.adapt(player) }
     }
 
-    private fun onRightClick(player: Player, itemStack: ItemStack, event: PlayerInteractEvent, targetProvider: () -> Target) {
+    private fun onRightClick(
+        player: Player,
+        itemStack: ItemStack?,
+        event: PlayerInteractEvent,
+        targetProvider: () -> Target
+    ) {
         val user = player.toUser()
-        val nekoStack = itemStack.toNekoStack
+        val nekoStack = itemStack?.toNekoStack
         val target = targetProvider.invoke()
         val result = user.skillState.addTrigger(SingleTrigger.RIGHT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
+        checkResult(result, event)
+    }
+
+    fun onJump(player: Player, itemStack: ItemStack?, event: PlayerJumpEvent) {
+        val user = player.toUser()
+        val nekoStack = itemStack?.tryNekoStack
+        val result = user.skillState.addTrigger(SingleTrigger.JUMP, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
+        checkResult(result, event)
+    }
+
+    fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack?, event: EntityDamageByEntityEvent) {
+        val user = player.toUser()
+        val nekoStack = itemStack?.tryNekoStack
+        val result = user.skillState.addTrigger(SingleTrigger.ATTACK, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack))
+        checkResult(result, event)
+    }
+
+    fun onMove(player: Player, itemStack: ItemStack?, event: PlayerMoveEvent) {
+        val user = player.toUser()
+        val nekoStack = itemStack?.tryNekoStack
+        val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
+        checkResult(result, event)
+    }
+
+    private fun checkResult(result: SkillStateResult, event: Cancellable) {
         if (result == SkillStateResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
-    }
-
-    fun onJump(player: Player, itemStack: ItemStack) {
-        val user = player.toUser()
-        val nekoStack = itemStack.toNekoStack
-        user.skillState.addTrigger(SingleTrigger.JUMP, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
-    }
-
-    fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack) {
-        val user = player.toUser()
-        val nekoStack = itemStack.toNekoStack
-        user.skillState.addTrigger(SingleTrigger.ATTACK, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack))
     }
 
     /* 玩家的技能添加/移除逻辑 */
@@ -94,7 +121,7 @@ class SkillEventHandler {
     ) {
         updateSkills(player, oldItem, newItem) {
             it.slot.testItemHeldEvent(player, previousSlot, newSlot)
-            && it.templates.has(ItemTemplateTypes.CASTABLE)
+                    && it.templates.has(ItemTemplateTypes.CASTABLE)
         }
         player.toUser().skillState.clear()
     }
@@ -117,7 +144,7 @@ class SkillEventHandler {
     ) {
         updateSkills(player, oldItem, newItem) {
             it.slot.testInventorySlotChangeEvent(player, slot, rawSlot)
-            && it.templates.has(ItemTemplateTypes.CASTABLE)
+                    && it.templates.has(ItemTemplateTypes.CASTABLE)
         }
         player.toUser().skillState.clear()
     }

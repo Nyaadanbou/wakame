@@ -11,8 +11,13 @@ import net.kyori.adventure.key.Key
  */
 abstract class SkillBase(
     override val key: Key,
-    config: ConfigProvider,
+    private val config: ConfigProvider,
 ) : Skill {
     override val displays: SkillDisplay by config.optionalEntry<SkillDisplay>("displays").orElse(SkillDisplay.empty())
     override val conditions: SkillConditionGroup by config.optionalEntry<SkillConditionGroup>("conditions").orElse(SkillConditionGroup.empty())
+
+    protected inner class TriggerConditionGetter {
+        val forbiddenTriggers: TriggerConditions by config.optionalEntry<TriggerConditions>("forbidden_triggers").orElse(TriggerConditions.empty())
+        val interruptTriggers: TriggerConditions by config.optionalEntry<TriggerConditions>("interrupt_triggers").orElse(TriggerConditions.empty())
+    }
 }

@@ -14,11 +14,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
-import org.bukkit.event.player.PlayerItemHeldEvent
+import org.bukkit.event.player.*
+import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -59,6 +56,8 @@ class MultipleItemListener : KoinComponent, Listener {
  */
 class SingleItemListener : KoinComponent, Listener {
     private val skillEventHandler: SkillEventHandler by inject()
+
+    /* Item Behavior Event Handlers */
 
     @EventHandler
     fun onItemInteract(event: PlayerInteractEvent) {
@@ -126,13 +125,15 @@ class SingleItemListener : KoinComponent, Listener {
         }
     }
 
+    /* Skill Event Handlers */
+
     @EventHandler
     fun onClick(event: PlayerInteractEvent) {
         val player = event.player
         val slot = event.hand ?: return
-        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.tryNekoStack ?: return
-        if (!nekoStack.slot.testEquipmentSlot(slot))
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty()
+        val nekoStack = item?.tryNekoStack
+        if (nekoStack != null && !nekoStack.slot.testEquipmentSlot(slot))
             return
 
         when (event.action) {
@@ -159,19 +160,29 @@ class SingleItemListener : KoinComponent, Listener {
     @EventHandler
     fun onJump(event: PlayerJumpEvent) {
         val player = event.player
-        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.tryNekoStack ?: return
+        val item = player.inventory.itemInMainHand.takeIfNekoStack()
 
-        skillEventHandler.onJump(player, item)
+        skillEventHandler.onJump(player, item, event)
     }
 
     @EventHandler
     fun onAttack(event: EntityDamageByEntityEvent) {
         val damager = event.damager as? Player ?: return
         val entity = event.entity as? LivingEntity ?: return
-        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.tryNekoStack ?: return
+        val item = damager.inventory.itemInMainHand.takeIfNekoStack()
 
-        skillEventHandler.onAttack(damager, entity, item)
+        skillEventHandler.onAttack(damager, entity, item, event)
+    }
+
+    @EventHandler
+    fun onMove(event: PlayerMoveEvent) {
+        val player = event.player
+        val item = player.inventory.itemInMainHand.takeIfNekoStack()
+
+        skillEventHandler.onMove(player, item, event)
+    }
+
+    private fun ItemStack.takeIfNekoStack(): ItemStack? {
+        return this.takeUnlessEmpty()?.takeIf { it.tryNekoStack == null }
     }
 }

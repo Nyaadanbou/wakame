@@ -30,12 +30,16 @@ interface CommandExecute : Skill {
 
         override val commands: List<String> by commands
 
+        private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
+
         override fun cast(context: SkillCastContext): SkillTick {
-            return Tick(context)
+            return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
 
         private inner class Tick(
             context: SkillCastContext,
+            override val interruptTriggers: TriggerConditions,
+            override val forbiddenTriggers: TriggerConditions
         ) : PlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {

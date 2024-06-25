@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.skill.state
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.User
+import me.lucko.helper.cooldown.Cooldown
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
 
 /**
  * 技能状态
@@ -36,12 +36,23 @@ interface SkillState {
 
 class PlayerSkillState(
     val user: User<Player>
-) : SkillState, KoinComponent {
-    override var info: SkillStateInfo = SkillStateInfo.idle(this)
+) : SkillState {
+    companion object {
+        private val COOLDOWN_TRIGGERS: List<SingleTrigger> =
+            listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
+    }
+
+    private val cooldown: Cooldown = Cooldown.ofTicks(2)
+    override var info: SkillStateInfo = IdleStateInfo(this)
         private set
 
     override fun addTrigger(trigger: SingleTrigger, skillCastContext: SkillCastContext): SkillStateResult {
-        return info.addTrigger(trigger, skillCastContext)
+        if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
+            return SkillStateResult.SILENT_FAILURE
+        }
+
+        val result = info.addTrigger(trigger, skillCastContext)
+        return result
     }
 
     override fun tick() {
@@ -53,10 +64,12 @@ class PlayerSkillState(
     }
 
     override fun clear() {
-        setInfo(SkillStateInfo.idle(this))
+        info.interrupt()
+        cooldown.reset()
     }
 
     fun setInfo(skillStateInfo: SkillStateInfo) {
-        this.info = (skillStateInfo)
+        user.player.sendPlainMessage("技能状态变更: $info -> $skillStateInfo")
+        this.info = skillStateInfo
     }
 }

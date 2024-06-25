@@ -33,12 +33,16 @@ interface RemovePotionEffect : Skill {
 
         override val effectTypes: List<PotionEffectType> by effectTypes
 
+        private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
+
         override fun cast(context: SkillCastContext): SkillTick {
-            return Tick(context)
+            return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
 
         private inner class Tick(
             context: SkillCastContext,
+            override val interruptTriggers: TriggerConditions,
+            override val forbiddenTriggers: TriggerConditions
         ) : PlayerSkillTick(this@DefaultImpl, context) {
 
             private var counter: Int = 0

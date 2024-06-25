@@ -64,9 +64,14 @@ enum class SingleTrigger(
     JUMP('3', Key(Namespaces.TRIGGER, "generic/jump")),
 
     /**
+     * 玩家进行了移动操作.
+     */
+    MOVE('4', Key(Namespaces.TRIGGER, "generic/walk")),
+
+    /**
      * 代表玩家没有进行任何操作.
      */
-    NOOP('4', Key(Namespaces.TRIGGER, "generic/noop")),
+    NOOP(Char.MIN_VALUE, Key(Namespaces.TRIGGER, "generic/noop")),
     ;
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

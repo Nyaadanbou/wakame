@@ -13,6 +13,9 @@ import org.koin.core.component.inject
  * 代表了一个玩家技能状态的信息.
  */
 sealed interface SkillStateInfo {
+
+    val type: Type
+
     /**
      * 添加一个 [SingleTrigger],
      */
@@ -28,12 +31,33 @@ sealed interface SkillStateInfo {
      */
     fun interrupt()
 
-    companion object {
+    enum class Type {
         /**
-         * 创建一个空的 [SkillStateInfo] 实例.
+         * 很特殊的状态, 表示玩家可以使用技能.
+         *
+         * 无法拿到 [SkillTick] 实例.
          */
-        fun idle(state: PlayerSkillState): SkillStateInfo {
-            return IdleStateInfo(state)
+        IDLE,
+        CAST_POINT,
+        CAST,
+        BACKSWING,
+        ;
+    }
+}
+
+sealed class AbstractSkillStateInfo(
+    override val type: SkillStateInfo.Type
+) : SkillStateInfo {
+    protected inner class TriggerConditionManager(private val skillTick: SkillTick) {
+
+        fun isForbidden(trigger: SingleTrigger): Boolean {
+            return skillTick.forbiddenTriggers.values.get(type).contains(trigger)
+        }
+
+        fun interrupt(trigger: SingleTrigger) {
+            if (trigger in skillTick.interruptTriggers.values.get(type)) {
+                interrupt()
+            }
         }
     }
 }
@@ -43,7 +67,7 @@ sealed interface SkillStateInfo {
  */
 class IdleStateInfo(
     private val state: PlayerSkillState,
-) : SkillStateInfo, KoinComponent {
+) : AbstractSkillStateInfo(SkillStateInfo.Type.IDLE), KoinComponent {
     companion object {
         private val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
@@ -56,9 +80,8 @@ class IdleStateInfo(
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
         val user = state.user
-        // TODO: Make sure the player is not spamming the skill
 
-        val skills = mutableListOf<Skill>()
+        val castableSkills = mutableListOf<Skill>()
         val skillMap = user.skillMap
         if (skillMap.hasTrigger<SequenceTrigger>() && trigger in SEQUENCE_GENERATION_TRIGGERS) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
@@ -69,18 +92,18 @@ class IdleStateInfo(
             if (currentSequence.isFull()) {
                 val sequence = SequenceTrigger.of(completeSequence)
                 val skillsOnSequence = skillMap.getSkill(sequence)
-                skills.addAll(skillsOnSequence)
+                castableSkills.addAll(skillsOnSequence)
                 currentSequence.clear()
             }
         }
 
         val skillsOnSingle = skillMap.getSkill(trigger)
-        skills.addAll(skillsOnSingle)
+        castableSkills.addAll(skillsOnSingle)
 
-        if (skills.isEmpty())
+        if (castableSkills.isEmpty())
             return SkillStateResult.SILENT_FAILURE
 
-        val skillTick = skillCastManager.tryCast(skills.first(), context).skillTick
+        val skillTick = skillCastManager.tryCast(castableSkills.first(), context).skillTick
 
         state.setInfo(CastPointStateInfo(state, skillTick))
         return SkillStateResult.CANCEL_EVENT
@@ -100,10 +123,14 @@ class IdleStateInfo(
 class CastPointStateInfo(
     private val state: PlayerSkillState,
     private val skillTick: SkillTick,
-) : SkillStateInfo {
+) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST_POINT) {
+    private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
-        interrupt()
+        if (triggerConditionManager.isForbidden(trigger)) {
+            return SkillStateResult.CANCEL_EVENT
+        }
+        triggerConditionManager.interrupt(trigger)
         return SkillStateResult.SUCCESS
     }
 
@@ -127,10 +154,15 @@ class CastPointStateInfo(
 class CastStateInfo(
     private val state: PlayerSkillState,
     private val skillTick: SkillTick,
-) : SkillStateInfo {
+) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST) {
+    private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
-        return SkillStateResult.CANCEL_EVENT
+        if (triggerConditionManager.isForbidden(trigger)) {
+            return SkillStateResult.CANCEL_EVENT
+        }
+        triggerConditionManager.interrupt(trigger)
+        return SkillStateResult.SUCCESS
     }
 
     override fun tick() {
@@ -153,10 +185,14 @@ class CastStateInfo(
 class BackswingStateInfo(
     private val state: PlayerSkillState,
     private val skillTick: SkillTick,
-) : SkillStateInfo {
+) : AbstractSkillStateInfo(SkillStateInfo.Type.BACKSWING) {
+    private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
-        interrupt()
+        if (triggerConditionManager.isForbidden(trigger)) {
+            return SkillStateResult.CANCEL_EVENT
+        }
+        triggerConditionManager.interrupt(trigger)
         return SkillStateResult.SUCCESS
     }
 

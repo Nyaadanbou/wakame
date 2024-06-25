@@ -30,6 +30,18 @@ interface SkillTick {
     val context: SkillCastContext
 
     /**
+     * 此次触发效果中不允许的触发器.
+     *
+     * 不允许的触发器将会在触发时被取消.
+     */
+    val forbiddenTriggers: TriggerConditions
+
+    /**
+     * 此次触发效果中的中断触发器.
+     */
+    val interruptTriggers: TriggerConditions
+
+    /**
      * 触发一 tick 的效果.
      */
     fun tick(): TickResult = TickResult.ALL_DONE
@@ -38,6 +50,8 @@ interface SkillTick {
 private data object EmptySkillTick : SkillTick {
     override val skill: Skill = Skill.empty()
     override val context: SkillCastContext = SkillCastContext.empty()
+    override val forbiddenTriggers: TriggerConditions = TriggerConditions.empty()
+    override val interruptTriggers: TriggerConditions = TriggerConditions.empty()
 }
 
 /**
