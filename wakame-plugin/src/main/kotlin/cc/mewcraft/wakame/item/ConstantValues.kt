@@ -112,6 +112,7 @@ object ItemMetaConstants {
 object ItemComponentConstants {
     const val ARROW = "arrow"
     const val ATTRIBUTABLE = "attributable"
+    const val CASTABLE = "castable"
     const val CELLS = "cells"
     const val CRATE = "crate"
     const val CUSTOM_NAME = "custom_name"

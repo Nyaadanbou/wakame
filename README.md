@@ -90,68 +90,23 @@ Compound('wakame')
     String('path'): 'demo'
     
     // 物品的变体
-    String('variant'): 1
+    String('variant'): 0
     
     // 物品的组件
+    // 以下组件按照字母顺序排序
     Compound('components')
     
         // 提供属性加成?
         Compound('attributable')
             // 空
-        
-        // 提供铭刻加成?
-        Compound('kizamiable')
-            // 空
-        
+
         // 弹药信息
         Compound('arrow')
             // 空
+        
+        // 可以释放技能?
+        Compound('castable')
 
-        // 自定义名字
-        Compound('custom_name')
-            String('value'): '<JSON text>' // 这种只有一个值的组件, 统统把键写成 'value'
-        
-        // 物品名字
-        Compound('item_name')
-            String('value'): '<JSON text>'
-        
-        // 描述
-        Compound('lore')
-            List('(String) value')
-                String(): '<JSON text>'
-                String(): '<JSON text>'
-                String(): '<JSON text>'
-        
-        // 物品等级
-        Compound('level')
-            Byte('value'): 12b
-        
-        // 物品稀有度
-        Compound('rarity')
-            Byte('value'): 0b
-        
-        // 物品铭刻
-        Compound('kizami')
-            ByteArray('value'): [0b, 3b]
-        
-        // 物品元素
-        Compound('element')
-            ByteArray('value'): [1b, 2b]
-        
-        // 物品皮肤
-        Compound('skin')
-            Short('value'): 35s
-        
-        // 物品皮肤所有者
-        Compound('skin_owner')
-            IntArray('value'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
-            
-        // 食物
-        Compound('food')
-            List('(String) skills')
-                String(): 'skill key 1'
-                String(): 'skill key 2'
-        
         // 词条栏
         Compound('cells')
             // 词条栏的 id
@@ -202,15 +157,72 @@ Compound('wakame')
                 Compound('curse')
             Compound('e')
                 Compound('core')
-                    String('id'): 'ability:blink'
-                Compound('reforge')
-                Compound('curse')
-            Compound('f')
-                Compound('core')
                      // 空, 或不存在, 都代表无核心
                 Compound('reforge')
                 Compound('curse')
-                
+
+        // 盲盒
+        Compound('crate')
+            String('key'): 'common:demo'
+        
+        // 自定义名字
+        Compound('custom_name')
+            String('value'): '<JSON text>' // 这种只有一个值的组件, 统统把键写成 'value'
+
+        // 耐久度
+        Compound('damageable')
+            List('(String) repair_items')
+                String(): 'minecraft:iron_ingot'
+                String(): 'wakame:material/scraps'
+
+        // 物品元素
+        Compound('elements')
+            ByteArray('value'): [1b, 2b]
+
+        // 食物
+        Compound('food')
+            List('(String) skills')
+                String(): 'skill key 1'
+                String(): 'skill key 2'
+
+        // 物品名字
+        Compound('item_name')
+            String('value'): '<JSON text>'
+
+        // 物品铭刻
+        Compound('kizamiz')
+            ByteArray('value'): [0b, 3b]
+
+        // 提供铭刻加成?
+        Compound('kizamiable')
+            // 空
+
+        // 物品等级
+        Compound('level')
+            Byte('value'): 12b
+
+        // 描述
+        Compound('lore')
+            List('(String) value')
+                String(): '<JSON text>'
+                String(): '<JSON text>'
+                String(): '<JSON text>'
+
+        // 物品稀有度
+        Compound('rarity')
+            Byte('value'): 0b
+
+        // 提供技能加成?
+        Compound('skillful')
+        
+        // 物品皮肤
+        Compound('skin')
+            Short('value'): 35s
+
+        // 物品皮肤所有者
+        Compound('skin_owner')
+            IntArray('value'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
+
         // 物品统计数据
         Compound('stats')
             Compound('entity_kills')

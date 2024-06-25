@@ -101,29 +101,29 @@ lore:
 # 比较特殊的 damageable 是一个 component + behavior 的复合体, 其 component 负责储存耐久度信息,
 # 而 behavior 负责实现修复的交互逻辑 (例如想做一个拿着修复材料跟物品交换位置就可以修复的功能).
 #
-# 可以释放技能
+# 可以释放技能?
 castable: { }
 
-# 可以追踪信息 (原来是 statistical)
+# 附加追踪数据 (原来是 statistical)
 trackable: { }
 
 # 作为弹药
 arrow:
   pierce_level: 3
 
-# 提供属性加成
+# 提供属性加成?
 attributable: { }
 
-# 提供铭刻加成
+# 提供铭刻加成?
 kizamiable: { }
 
-# 提供技能加成
+# 提供技能加成?
 skillful: { }
 
-# 免疫火焰
+# 免疫火焰?
 fire_resistant: { }
 
-# 不损失耐久
+# 不损失耐久?
 unbreakable:
   show_in_tooltip: true
 

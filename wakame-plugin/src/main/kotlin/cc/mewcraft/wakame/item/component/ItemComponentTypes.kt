@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder.Item
 import cc.mewcraft.wakame.item.component.ItemComponentHolder.NBT
 import cc.mewcraft.wakame.item.components.Arrow
 import cc.mewcraft.wakame.item.components.Attributable
+import cc.mewcraft.wakame.item.components.Castable
 import cc.mewcraft.wakame.item.components.Crate
 import cc.mewcraft.wakame.item.components.CustomModelData
 import cc.mewcraft.wakame.item.components.CustomName
@@ -45,6 +46,11 @@ object ItemComponentTypes {
      */
     // POC
     val CELLS: ItemComponentType<ItemCells, NBT> = ItemCells.Codec(ItemComponentConstants.CELLS).apply(::register)
+
+    /**
+     * 控制物品能否释放技能.
+     */
+    val CASTABLE: ItemComponentType<Castable, NBT> = dummy(ItemComponentConstants.CASTABLE)
 
     /**
      * 作为盲盒.
