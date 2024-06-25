@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.item.component.GenerationContext
 import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -44,12 +44,12 @@ interface ItemCells : Examinable, TooltipProvider {
         }
     }
 
-    /* data */ class Template : ItemComponentTemplate<ItemCells> {
+    /* data */ class Template : ItemTemplate<ItemCells> {
         override fun generate(context: GenerationContext): GenerationResult<ItemCells> {
             TODO("Not yet implemented")
         }
 
-        companion object : ItemComponentTemplate.Serializer<Template> {
+        companion object : ItemTemplate.Serializer<Template> {
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 TODO("Not yet implemented")
             }

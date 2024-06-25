@@ -8,15 +8,10 @@ import cc.mewcraft.wakame.item.component.GenerationContext
 import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.editMeta
-import cc.mewcraft.wakame.util.getListOrNull
-import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.StringShadowTag
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -34,21 +29,9 @@ interface Damageable : Examinable, TooltipProvider {
      */
     val maxDamage: Int
 
-    /**
-     * 损耗达到最大损耗时, 物品是否消失.
-     */
-    val unbreakable: Boolean
-
-    /**
-     * 修复该物品所需要的材料.
-     */
-    val repairItems: List<Key>
-
     data class Value(
         override val damage: Int,
         override val maxDamage: Int,
-        override val unbreakable: Boolean,
-        override val repairItems: List<Key>,
     ) : Damageable {
         override fun provideDisplayLore(): LoreLine {
             if (!showInTooltip) {
@@ -71,12 +54,9 @@ interface Damageable : Examinable, TooltipProvider {
         override fun read(holder: ItemComponentHolder.Complex): Damageable? {
             // TODO DataComponent API 推出后重写
             val itemMeta = (holder.item.itemMeta as? BukkitDamageable) ?: return null
-            val repairItems = holder.tag.getListOrNull("repair_items", ShadowTagType.STRING)?.map { Key((it as StringShadowTag).value()) } ?: return null
             return Value(
                 damage = itemMeta.damage,
                 maxDamage = itemMeta.maxDamage,
-                unbreakable = itemMeta.isUnbreakable,
-                repairItems = repairItems
             )
         }
 
@@ -99,14 +79,13 @@ interface Damageable : Examinable, TooltipProvider {
     data class Template(
         val damage: RandomizedValue,
         val maxDamage: RandomizedValue,
-        val unbreakable: Boolean,
-        val repairItems: List<Key>,
-    ) : ItemComponentTemplate<Value> {
+        val disappearWhenBroken: Boolean,
+    ) : ItemTemplate<Value> {
         override fun generate(context: GenerationContext): GenerationResult<Value> {
             TODO("Not yet implemented")
         }
 
-        companion object : ItemComponentTemplate.Serializer<Arrow.Template> {
+        companion object : ItemTemplate.Serializer<Arrow.Template> {
             override fun deserialize(type: Type, node: ConfigurationNode): Arrow.Template {
                 TODO("Not yet implemented")
             }

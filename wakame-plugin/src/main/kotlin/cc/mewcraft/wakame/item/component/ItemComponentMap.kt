@@ -112,7 +112,6 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
                     return this@ItemComponentMap.get(type)
                 }
                 return null
-
             }
 
             override fun has(type: ItemComponentType<*, *>): Boolean {

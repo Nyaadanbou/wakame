@@ -1,5 +1,7 @@
-package cc.mewcraft.wakame.item.component
+package cc.mewcraft.wakame.item.template
 
+import cc.mewcraft.wakame.item.component.GenerationContext
+import cc.mewcraft.wakame.item.component.GenerationResult
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.TypeSerializer
@@ -12,13 +14,13 @@ import java.lang.reflect.Type
 // 甚至还包括了 wakame + 原版的混合组件.
 
 /**
- * 代表一个`物品组件`的`模板`, 可以看成是`物品组件`在配置文件中的抽象.
+ * 代表一个`物品组件`([ItemComponentType])的`模板`, 可以看成是`物品组件`在配置文件中的抽象.
  *
  * `物品组件`的`模板`专门用来多样化生成`物品组件`的`数据`.
  *
  * @param T 组件快照的类型
  */
-interface ItemComponentTemplate<T> {
+interface ItemTemplate<T> {
 
     // FIXME ItemComponentTemplate 也需要区分 Valued/NonValued 吗?
 
@@ -27,7 +29,10 @@ interface ItemComponentTemplate<T> {
      */
     fun generate(context: GenerationContext): GenerationResult<T>
 
-    interface Serializer<T : ItemComponentTemplate<*>> : TypeSerializer<T> {
+    /**
+     * 模板的序列化接口.
+     */
+    interface Serializer<T : ItemTemplate<*>> : TypeSerializer<T> {
         override fun deserialize(type: Type, node: ConfigurationNode): T
 
         override fun serialize(type: Type, obj: T?, node: ConfigurationNode): Nothing {

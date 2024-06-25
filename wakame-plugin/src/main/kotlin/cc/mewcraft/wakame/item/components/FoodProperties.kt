@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.item.component.GenerationContext
 import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemStack
@@ -47,12 +47,12 @@ interface FoodProperties : Examinable {
         }
     }
 
-    class Template : ItemComponentTemplate<FoodProperties> {
+    class Template : ItemTemplate<FoodProperties> {
         override fun generate(context: GenerationContext): GenerationResult<FoodProperties> {
             TODO("Not yet implemented")
         }
 
-        companion object : ItemComponentTemplate.Serializer<Template> {
+        companion object : ItemTemplate.Serializer<Template> {
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 TODO("Not yet implemented")
             }

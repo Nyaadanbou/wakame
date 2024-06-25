@@ -8,15 +8,15 @@ import cc.mewcraft.wakame.item.component.GenerationContext
 import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
 interface FireResistant : Examinable, TooltipProvider {
 
-    object Value : FireResistant, ItemComponentConfig(ItemComponentConstants.FIRE_RESISTANT) {
+    companion object Value : FireResistant, ItemComponentConfig(ItemComponentConstants.FIRE_RESISTANT) {
         val tooltipKey: TooltipKey = ItemComponentConstants.createKey { FIRE_RESISTANT }
         val tooltipText: SingleTooltip = SingleTooltip()
 
@@ -35,7 +35,7 @@ interface FireResistant : Examinable, TooltipProvider {
             if (!holder.item.itemMeta.isFireResistant) {
                 return null
             }
-            return Value
+            return FireResistant
         }
 
         override fun write(holder: ItemComponentHolder.Item, value: FireResistant) {
@@ -49,7 +49,7 @@ interface FireResistant : Examinable, TooltipProvider {
         }
     }
 
-    object Template : ItemComponentTemplate<FireResistant>, ItemComponentTemplate.Serializer<Template> {
+    object Template : ItemTemplate<FireResistant>, ItemTemplate.Serializer<Template> {
         override fun generate(context: GenerationContext): GenerationResult<FireResistant> {
             TODO("Not yet implemented")
         }

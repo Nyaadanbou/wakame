@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.component
 
 /**
- * 代表一个 [ItemComponentTemplate] 的生成结果.
+ * 代表一个 [ItemTemplate] 的生成结果.
  *
  * @param T 物品组件的快照类型
  */

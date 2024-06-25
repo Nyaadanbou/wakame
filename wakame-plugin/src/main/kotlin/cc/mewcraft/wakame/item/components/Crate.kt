@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.item.component.GenerationContext
 import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
@@ -41,12 +41,12 @@ interface Crate : Examinable {
 
     data class Template(
         val key: Key,
-    ) : ItemComponentTemplate<Crate> {
+    ) : ItemTemplate<Crate> {
         override fun generate(context: GenerationContext): GenerationResult<Crate> {
             TODO("Not yet implemented")
         }
 
-        companion object : ItemComponentTemplate.Serializer<Template> {
+        companion object : ItemTemplate.Serializer<Template> {
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 TODO("Not yet implemented")
             }

@@ -7,8 +7,8 @@ import cc.mewcraft.wakame.item.component.GenerationContext
 import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableByte
@@ -29,7 +29,7 @@ interface Arrow : Examinable, TooltipProvider {
     /**
      * 可穿透的实体数.
      */
-    val pierceLevel: Int
+    val pierceLevel: Byte
 
 
     // 开发日记: 2024/6/25
@@ -40,21 +40,21 @@ interface Arrow : Examinable, TooltipProvider {
     // 需要注意, 该类型还需要实现 TooltipsProvider 接口,
     // 否则其他系统将无法得知如何将该物品组件显示在物品提示框里.
     data class Value(
-        override val pierceLevel: Int,
+        override val pierceLevel: Byte,
     ) : Arrow {
+        override fun provideDisplayLore(): LoreLine {
+            if (!showInTooltip) {
+                return LoreLine.noop()
+            }
+            return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("pierce_level", Component.text(pierceLevel.toInt())))))
+        }
+
         // 开发日记: 2024/6/24 小米
         // companion object 将作为组件配置文件的入口,
         // 这些包括了物品提示框渲染的配置文件, 以及未来可能需要的其他东西
         private companion object : ItemComponentConfig(ItemComponentConstants.ARROW) {
             val tooltipKey: Key = ItemComponentConstants.createKey { ARROW }
             val tooltipText: SingleTooltip = SingleTooltip()
-        }
-
-        override fun provideDisplayLore(): LoreLine {
-            if (!showInTooltip) {
-                return LoreLine.noop()
-            }
-            return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("pierce_level", Component.text(pierceLevel)))))
         }
     }
 
@@ -75,12 +75,12 @@ interface Arrow : Examinable, TooltipProvider {
 
         override fun read(holder: ItemComponentHolder.NBT): Arrow {
             val pierceLevel = holder.tag.getByte(PIERCE_LEVEL)
-            return Value(pierceLevel.toInt())
+            return Value(pierceLevel)
         }
 
         override fun write(holder: ItemComponentHolder.NBT, value: Arrow) {
             val pierceLevel = value.pierceLevel
-            holder.tag.putByte(PIERCE_LEVEL, pierceLevel.toStableByte())
+            holder.tag.putByte(PIERCE_LEVEL, pierceLevel)
         }
 
         override fun remove(holder: ItemComponentHolder.NBT) {
@@ -93,8 +93,8 @@ interface Arrow : Examinable, TooltipProvider {
     // 实现需要定义模板的数据结构, 以及模板的(反)序列化函数.
     data class Template(
         val pierceLevel: RandomizedValue,
-    ) : ItemComponentTemplate<Arrow> {
-        companion object : ItemComponentTemplate.Serializer<Template> {
+    ) : ItemTemplate<Arrow> {
+        companion object : ItemTemplate.Serializer<Template> {
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
                 return Template(pierceLevel)
@@ -102,7 +102,7 @@ interface Arrow : Examinable, TooltipProvider {
         }
 
         override fun generate(context: GenerationContext): GenerationResult<Arrow> {
-            val pierceLevel = pierceLevel.calculate().toInt()
+            val pierceLevel = pierceLevel.calculate().toStableByte()
             return GenerationResult.of(Value(pierceLevel))
         }
     }

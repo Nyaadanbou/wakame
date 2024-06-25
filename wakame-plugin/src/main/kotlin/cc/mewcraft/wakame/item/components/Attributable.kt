@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.item.component.GenerationContext
 import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import net.kyori.examination.Examinable
 
 interface Attributable : Examinable, TooltipProvider {
@@ -20,7 +20,7 @@ interface Attributable : Examinable, TooltipProvider {
     // 但需要注意的是, 即便是单例也依然提供了 LoreLine 的具体实现,
     // 这是因为我们 !有可能! 希望那些拥有 Attributable 组件的物品的提示框里
     // 能够显示一行 “提供属性加成” 的文本, 当然, 也可以选择不写这个实现.
-    object Value : Attributable, ItemComponentConfig(ItemComponentConstants.ATTRIBUTABLE) {
+    companion object Value : Attributable, ItemComponentConfig(ItemComponentConstants.ATTRIBUTABLE) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ATTRIBUTABLE }
         private val tooltipText: SingleTooltip = SingleTooltip()
 
@@ -37,7 +37,7 @@ interface Attributable : Examinable, TooltipProvider {
     ) : ItemComponentType<Attributable, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
-        override fun read(holder: ItemComponentHolder.NBT): Attributable = Value
+        override fun read(holder: ItemComponentHolder.NBT): Attributable = Attributable
 
         // 开发日记: 2024/6/25
         // 这个执行什么无所谓, 因为实际运行逻辑是在 Map 里
@@ -54,9 +54,9 @@ interface Attributable : Examinable, TooltipProvider {
     // 在构建 NekoItem 的阶段只需要看配置文件里有没有这个 node 存在就行了?
     // 开发日记: 2024/6/25
     // 还不确定 Template 的具体框架是怎么样的
-    object Template : ItemComponentTemplate<Attributable> {
+    object Template : ItemTemplate<Attributable> {
         override fun generate(context: GenerationContext): GenerationResult<Attributable> {
-            return GenerationResult.of(Value)
+            return GenerationResult.of(Attributable)
         }
     }
 }

@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.component.GenerationContext
 import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentTemplate
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -16,9 +16,7 @@ interface Unbreakable : Examinable, TooltipProvider {
 
     data class Value(
         override val showInTooltip: Boolean,
-    ) : Unbreakable {
-
-    }
+    ) : Unbreakable
 
     class Codec(
         override val id: String,
@@ -40,8 +38,8 @@ interface Unbreakable : Examinable, TooltipProvider {
 
     data class Template(
         val showInTooltip: Boolean,
-    ) : ItemComponentTemplate<Value> {
-        companion object : ItemComponentTemplate.Serializer<Template> {
+    ) : ItemTemplate<Value> {
+        companion object : ItemTemplate.Serializer<Template> {
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 TODO("Not yet implemented")
             }
