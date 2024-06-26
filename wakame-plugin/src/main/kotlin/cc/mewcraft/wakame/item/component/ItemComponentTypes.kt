@@ -22,6 +22,7 @@ import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.item.components.ItemSkinOwner
 import cc.mewcraft.wakame.item.components.Kizamiable
 import cc.mewcraft.wakame.item.components.Skillful
+import cc.mewcraft.wakame.item.components.SystemUse
 import cc.mewcraft.wakame.item.components.Tool
 import cc.mewcraft.wakame.item.components.Trackable
 import cc.mewcraft.wakame.item.components.Unbreakable
@@ -146,6 +147,16 @@ object ItemComponentTypes {
      * 物品皮肤所有者.
      */
     val SKIN_OWNER: ItemComponentType<ItemSkinOwner, NBT> = dummy(ItemComponentConstants.SKIN_OWNER)
+
+    /**
+     * 作为系统物品. 系统物品的机制:
+     * - 是玩家不允许获取和使用的物品
+     * - 不会被物品发包系统读取和修改
+     * - 专门用于, 例如GUI容器内的物品
+     *
+     * 这也意味着系统物品的提示框文本完全取决于之上的原版组件.
+     */
+    val SYSTEM_USE: ItemComponentType<Unit, NBT> = SystemUse.Codec(ItemComponentConstants.SYSTEM_USE)
 
     /**
      * 作为工具.

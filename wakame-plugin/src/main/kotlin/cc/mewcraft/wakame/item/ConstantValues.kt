@@ -132,6 +132,7 @@ object ItemComponentConstants {
     const val SKILLFUL = "skillful"
     const val SKIN = "skin"
     const val SKIN_OWNER = "skin_owner"
+    const val SYSTEM_USE = "system_use"
     const val TOOL = "tool"
     const val TRACKABLE = "tracks"
     const val UNBREAKABLE = "unbreakable"
