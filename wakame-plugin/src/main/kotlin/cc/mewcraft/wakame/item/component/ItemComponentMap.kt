@@ -27,10 +27,10 @@ data class TypedItemComponent<T>(
  * - [getTyped]
  *
  * 如果你想修改一个组件的数据, 则需要创建一个新的快照, 然后调用以下函数:
- * - [add]
+ * - [set]
  *
  * 如果想移除一个组件, 调用以下函数:
- * - [remove]
+ * - [unset]
  */
 interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
@@ -38,8 +38,8 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         val EMPTY: ItemComponentMap = object : ItemComponentMap {
             override fun <T, S : ItemComponentHolder> get(type: ItemComponentType<T, S>): T? = null
             override fun has(type: ItemComponentType<*, *>): Boolean = false
-            override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) = Unit
-            override fun remove(type: ItemComponentType<*, *>) = Unit
+            override fun <T, S : ItemComponentHolder> set(type: ItemComponentType<T, S>, value: T) = Unit
+            override fun unset(type: ItemComponentType<*, *>) = Unit
             override fun keySet(): Set<ItemComponentType<*, *>> = emptySet()
             override fun size(): Int = 0
             override fun iterator(): Iterator<TypedItemComponent<*>> = emptySet<TypedItemComponent<*>>().iterator()
@@ -65,12 +65,12 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
                     return overrides.has(type) || base.has(type)
                 }
 
-                override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) {
-                    overrides.add(type, value)
+                override fun <T, S : ItemComponentHolder> set(type: ItemComponentType<T, S>, value: T) {
+                    overrides.set(type, value)
                 }
 
-                override fun remove(type: ItemComponentType<*, *>) {
-                    overrides.remove(type)
+                override fun unset(type: ItemComponentType<*, *>) {
+                    overrides.unset(type)
                 }
 
                 override fun keySet(): Set<ItemComponentType<*, *>> {
@@ -101,9 +101,9 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
     fun has(type: ItemComponentType<*, *>): Boolean
 
-    fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T)
+    fun <T, S : ItemComponentHolder> set(type: ItemComponentType<T, S>, value: T)
 
-    fun remove(type: ItemComponentType<*, *>)
+    fun unset(type: ItemComponentType<*, *>)
 
     fun filter(predicate: (ItemComponentType<*, *>) -> Boolean): ItemComponentMap {
         return object : ItemComponentMap {
@@ -121,12 +121,12 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
                 return false
             }
 
-            override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) {
-                this@ItemComponentMap.add(type, value)
+            override fun <T, S : ItemComponentHolder> set(type: ItemComponentType<T, S>, value: T) {
+                this@ItemComponentMap.set(type, value)
             }
 
-            override fun remove(type: ItemComponentType<*, *>) {
-                this@ItemComponentMap.remove(type)
+            override fun unset(type: ItemComponentType<*, *>) {
+                this@ItemComponentMap.unset(type)
             }
 
             override fun keySet(): Set<ItemComponentType<*, *>> {
@@ -199,11 +199,11 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             return map.containsKey(type)
         }
 
-        override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) {
+        override fun <T, S : ItemComponentHolder> set(type: ItemComponentType<T, S>, value: T) {
             map[type] = value as Any
         }
 
-        override fun remove(type: ItemComponentType<*, *>) {
+        override fun unset(type: ItemComponentType<*, *>) {
             map.remove(type)
         }
 
@@ -273,7 +273,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             return get(type) != null
         }
 
-        override fun <T, S : ItemComponentHolder> add(type: ItemComponentType<T, S>, value: T) {
+        override fun <T, S : ItemComponentHolder> set(type: ItemComponentType<T, S>, value: T) {
             val id = type.id
             val source = type.holder
             when (source) {
@@ -300,7 +300,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             }
         }
 
-        override fun remove(type: ItemComponentType<*, *>) {
+        override fun unset(type: ItemComponentType<*, *>) {
             val id = type.id
             val source = type.holder
             when (source) {

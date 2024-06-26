@@ -156,7 +156,7 @@ fun main(nekoStack: NekoStack) {
     val itemName: Component? = nekoStack.components.get(ItemComponentTypes.ITEM_NAME)
     val hasFood: Boolean = nekoStack.components.has(ItemComponentTypes.FOOD)
     // 设置 item_name
-    nekoStack.components.add(ItemComponentTypes.ITEM_NAME, Component.text("You can't change this name with anvils!"))
+    nekoStack.components.set(ItemComponentTypes.ITEM_NAME, Component.text("You can't change this name with anvils!"))
     // 移除 cells (所有的词条栏)
-    nekoStack.components.remove(ItemComponentTypes.CELLS)
+    nekoStack.components.unset(ItemComponentTypes.CELLS)
 }
