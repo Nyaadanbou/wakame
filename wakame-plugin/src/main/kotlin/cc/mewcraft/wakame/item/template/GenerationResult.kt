@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item.component
+package cc.mewcraft.wakame.item.template
 
 /**
  * 代表一个 [ItemTemplate] 的生成结果.

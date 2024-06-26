@@ -4,13 +4,16 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.GenerationContext
-import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import net.kyori.examination.Examinable
+import org.spongepowered.configurate.ConfigurationNode
+import java.lang.reflect.Type
 
 interface Attributable : Examinable, TooltipProvider {
 
@@ -37,6 +40,8 @@ interface Attributable : Examinable, TooltipProvider {
     ) : ItemComponentType<Attributable, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
+        // 开发日记: 2024/6/26
+        // NonValued + Holder.NBT 类型的 Codec 需要返回该组件的单例
         override fun read(holder: ItemComponentHolder.NBT): Attributable = Attributable
 
         // 开发日记: 2024/6/25
@@ -54,9 +59,13 @@ interface Attributable : Examinable, TooltipProvider {
     // 在构建 NekoItem 的阶段只需要看配置文件里有没有这个 node 存在就行了?
     // 开发日记: 2024/6/25
     // 还不确定 Template 的具体框架是怎么样的
-    object Template : ItemTemplate<Attributable> {
+    object Template : ItemTemplate<Attributable>, ItemTemplateType<Template> {
         override fun generate(context: GenerationContext): GenerationResult<Attributable> {
             return GenerationResult.of(Attributable)
+        }
+
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+            return this
         }
     }
 }

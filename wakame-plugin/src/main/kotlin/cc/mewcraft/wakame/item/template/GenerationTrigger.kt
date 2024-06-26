@@ -1,20 +1,28 @@
-package cc.mewcraft.wakame.item.component
+package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.crate.Crate
-import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.user.User
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
+import java.util.stream.Stream
 import kotlin.reflect.KClass
 
 /**
  * A thing that triggers the neko stack generation.
  *
- * To be used with [SchemaGenerationContext].
+ * To be used with [GenerationContext].
  */
-interface GenerationTrigger {
+interface GenerationTrigger : Examinable {
     /**
      * Level of the source.
      */
     val level: Int
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(
+            ExaminableProperty.of("level", level)
+        )
+    }
 
     companion object {
         private val supportedSources: Set<KClass<*>> = setOf(
@@ -33,7 +41,7 @@ interface GenerationTrigger {
         }
 
         /**
-         * Wraps the source as [SchemaGenerationTrigger].
+         * Wraps the source as [GenerationTrigger].
          *
          * The source must be one of the following type:
          * - [User]
@@ -44,7 +52,7 @@ interface GenerationTrigger {
          */
         fun wrap(source: Any): GenerationTrigger {
             require(supportedSources.any { it.isInstance(source) }) { "Unsupported trigger source: ${source::class.qualifiedName}" }
-            return RealSchemaGenerationTrigger(source)
+            return RealGenerationTrigger(source)
         }
     }
 }
@@ -53,7 +61,7 @@ private class FakeGenerationTrigger(
     override val level: Int,
 ) : GenerationTrigger
 
-private class RealSchemaGenerationTrigger(
+private class RealGenerationTrigger(
     private val source: Any,
 ) : GenerationTrigger {
     override val level: Int

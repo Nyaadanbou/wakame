@@ -40,5 +40,14 @@ import org.bukkit.inventory.ItemStack
  * 代表多个 [ItemTemplate], 包含了一个物品的所有物品组件的模板.
  */
 interface ItemTemplateMap {
+
+    fun <T2, T1 : ItemTemplateType<T2>> get(type: T1): T2
+    fun <T2, T1 : ItemTemplateType<T2>> has(type: T1): Boolean
+
+    // 开发日记 2024/6/26
+    // 模板的应用讲究顺序, 而顺序是由储存在模板内部的数据结构决定的.
+    /**
+     * 将模板全部应用到物品上.
+     */
     fun applyTo(item: ItemStack)
 }

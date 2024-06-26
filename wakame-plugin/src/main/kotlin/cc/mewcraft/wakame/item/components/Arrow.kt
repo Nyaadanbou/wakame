@@ -3,12 +3,13 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.GenerationContext
-import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentHolder.NBT
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableByte
@@ -31,7 +32,6 @@ interface Arrow : Examinable, TooltipProvider {
      */
     val pierceLevel: Byte
 
-
     // 开发日记: 2024/6/25
     // 这是物品组件的快照类型.
     // 每次从物品上读取一个物品组件信息,
@@ -52,7 +52,7 @@ interface Arrow : Examinable, TooltipProvider {
         // 开发日记: 2024/6/24 小米
         // companion object 将作为组件配置文件的入口,
         // 这些包括了物品提示框渲染的配置文件, 以及未来可能需要的其他东西
-        private companion object : ItemComponentConfig(ItemComponentConstants.ARROW) {
+        private companion object Config : ItemComponentConfig(ItemComponentConstants.ARROW) {
             val tooltipKey: Key = ItemComponentConstants.createKey { ARROW }
             val tooltipText: SingleTooltip = SingleTooltip()
         }
@@ -63,28 +63,28 @@ interface Arrow : Examinable, TooltipProvider {
     // 根据物品组件的具体情况, 这里的实现会稍有不同.
     class Codec(
         override val id: String,
-    ) : ItemComponentType<Arrow, ItemComponentHolder.NBT> {
-        // 开发日记: 2024/6/24 小米
-        // Codec 的 companion object 一般就写 NBT 标签的 key 就行.
-        // 如果有其他的常量也可以写在这里, 具体看情况.
-        companion object {
-            const val PIERCE_LEVEL = "pierce_level"
-        }
-
+    ) : ItemComponentType<Arrow, NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
-        override fun read(holder: ItemComponentHolder.NBT): Arrow {
-            val pierceLevel = holder.tag.getByte(PIERCE_LEVEL)
+        override fun read(holder: NBT): Arrow {
+            val pierceLevel = holder.tag.getByte(TAG_PIERCE_LEVEL)
             return Value(pierceLevel)
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: Arrow) {
+        override fun write(holder: NBT, value: Arrow) {
             val pierceLevel = value.pierceLevel
-            holder.tag.putByte(PIERCE_LEVEL, pierceLevel)
+            holder.tag.putByte(TAG_PIERCE_LEVEL, pierceLevel)
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
+        override fun remove(holder: NBT) {
             // no-op
+        }
+
+        // 开发日记: 2024/6/24 小米
+        // Codec 的 companion object 一般就写 NBT 标签的 key 就行.
+        // 如果有其他的常量也可以写在这里, 具体看情况.
+        private companion object {
+            const val TAG_PIERCE_LEVEL = "pierce_level"
         }
     }
 
@@ -94,16 +94,24 @@ interface Arrow : Examinable, TooltipProvider {
     data class Template(
         val pierceLevel: RandomizedValue,
     ) : ItemTemplate<Arrow> {
-        companion object : ItemTemplate.Serializer<Template> {
+        override fun generate(context: GenerationContext): GenerationResult<Arrow> {
+            val pierceLevel = pierceLevel.calculate().toStableByte()
+            return GenerationResult.of(Value(pierceLevel))
+        }
+
+        companion object Kind : ItemTemplateType<Template> {
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
                 return Template(pierceLevel)
             }
         }
+    }
 
-        override fun generate(context: GenerationContext): GenerationResult<Arrow> {
-            val pierceLevel = pierceLevel.calculate().toStableByte()
-            return GenerationResult.of(Value(pierceLevel))
-        }
+    // 开发日记 2024/6/26 小米
+    // 这种写法对于 Arrow 没问题, 但 Attributable 来说就没办法了,
+    // 因为 Attributable 的 companion object 已经被作为 Value 占用了.
+    companion object {
+        fun componentType(id: String): ItemComponentType<Arrow, NBT> = Codec(id)
+        fun templateType(): ItemTemplateType<Template> = Template
     }
 }
