@@ -17,11 +17,11 @@ import net.minecraft.world.item.component.CustomModelData
 import net.minecraft.world.item.component.ItemLore
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.inventory.CraftItemStack
-import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import net.minecraft.world.item.ItemStack as MojangStack
+import org.bukkit.inventory.ItemStack as BukkitStack
 
-const val WAKAME_COMPOUND_NAME: String = "wakame"
+const val WAKAME_TAG_NAME: String = "wakame"
 
 //<editor-fold desc="Shadow un(wrappers)">
 internal val Tag.wrap: ShadowTag
@@ -34,25 +34,16 @@ internal val CompoundShadowTag.unwrap: CompoundTag
     get() = this.shadowTarget as CompoundTag
 //</editor-fold>
 
-internal val ItemMeta.customTag: CompoundTag
-    get() {
-        val shadow = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this)
-        val customTag = shadow.getCustomTag()
-        if (customTag === null) {
-            val newCustomTag = CompoundTag()
-            shadow.setCustomTag(newCustomTag)
-            return newCustomTag
-        }
-        return customTag
-    }
+//<editor-fold desc="BukkitStack (NMS)">
+private val BukkitStack.handle: MojangStack?
+    get() = (this as? CraftItemStack)?.handle
 
-//<editor-fold desc="CraftItemStack - Direct Access to `tags.display`">
 /**
  * Sets the custom name. You may pass a `null` to remove it.
  *
- * Only works if `this` [ItemStack] is NMS-object backed.
+ * Only works if `this` [BukkitStack] is NMS-object backed.
  */
-var ItemStack.backingCustomName: Component?
+var BukkitStack.backingCustomName: Component?
     get() {
         return PaperAdventure.asAdventure(this.handle?.get(DataComponents.CUSTOM_NAME))
     }
@@ -67,9 +58,9 @@ var ItemStack.backingCustomName: Component?
 /**
  * Sets the item name. You may pass a `null` to remove it.
  *
- * Only works if `this` [ItemStack] is NMS-object backed.
+ * Only works if `this` [BukkitStack] is NMS-object backed.
  */
-var ItemStack.backingItemName: Component?
+var BukkitStack.backingItemName: Component?
     get() {
         return PaperAdventure.asAdventure(this.handle?.get(DataComponents.ITEM_NAME))
     }
@@ -84,9 +75,9 @@ var ItemStack.backingItemName: Component?
 /**
  * Sets the item lore. You may pass a `null` to remove it.
  *
- * Only works if `this` [ItemStack] is NMS-object backed.
+ * Only works if `this` [BukkitStack] is NMS-object backed.
  */
-var ItemStack.backingLore: List<Component>?
+var BukkitStack.backingLore: List<Component>?
     get() {
         return this.handle?.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
     }
@@ -101,9 +92,9 @@ var ItemStack.backingLore: List<Component>?
 /**
  * Sets the custom model data. You may pass a `null` to remove it.
  *
- * Only works if `this` [ItemStack] is NMS-object backed.
+ * Only works if `this` [BukkitStack] is NMS-object backed.
  */
-var ItemStack.backingCustomModelData: Int?
+var BukkitStack.backingCustomModelData: Int?
     get() {
         return this.handle?.get(DataComponents.CUSTOM_MODEL_DATA)?.value
     }
@@ -116,97 +107,82 @@ var ItemStack.backingCustomModelData: Int?
     }
 //</editor-fold>
 
-//<editor-fold desc="MojangStack - Neko Compound">
-internal var MojangStack.nekoCompound: CompoundShadowTag
-    get() {
-        val customData = this.getCustomDataOrCreate()
-        val wakameTag = customData.getOrPut(WAKAME_COMPOUND_NAME, ::CompoundTag)
-        return wakameTag.wrap
-    }
-    set(value) {
-        val customData = this.getCustomDataOrCreate()
-        customData.put(WAKAME_COMPOUND_NAME, value.unwrap)
-    }
-
-internal val MojangStack.nekoCompoundOrNull: CompoundShadowTag?
-    get() {
-        val customData = this.getCustomData()
-        val wakameTag = customData?.getCompoundOrNull(WAKAME_COMPOUND_NAME)
-        return wakameTag?.wrap
-    }
-//</editor-fold>
-
-//<editor-fold desc="BukkitStack - Neko Compound">
+//<editor-fold desc="BukkitStack (API & NMS) - Access to wakame tag">
 /**
  * ## Getter
  *
- * Gets the [WAKAME_COMPOUND_NAME] compound tag from `this`. If the
- * [WAKAME_COMPOUND_NAME] compound tag does not already exist, a new compound
+ * Gets the [WAKAME_TAG_NAME] compound tag from `this`. If the
+ * [WAKAME_TAG_NAME] compound tag does not already exist, a new compound
  * tag will be created and **saved** to `this`.
  *
  * ## Setter
  *
- * Sets the [WAKAME_COMPOUND_NAME] compound tag of `this` to given
- * value, overwriting any existing [WAKAME_COMPOUND_NAME] compound tag
+ * Sets the [WAKAME_TAG_NAME] compound tag of `this` to given
+ * value, overwriting any existing [WAKAME_TAG_NAME] compound tag
  * on the `this`.
  *
- * You can also set `this` to `null` to removes the [WAKAME_COMPOUND_NAME]
+ * You can also set `this` to `null` to removes the [WAKAME_TAG_NAME]
  * compound tag from `this`.
  */
-var ItemStack.nekoCompound: CompoundShadowTag
+var BukkitStack.wakameTag: CompoundShadowTag
     get() {
         val handle = this.handle
         if (handle != null) { // CraftItemStack
-            return handle.nekoCompound
+            return handle.wakameTag
         } else { // strictly-Bukkit ItemStack
-            val customTag = this.backingItemMeta!!.customTag
-            val tag = customTag.getOrPut(WAKAME_COMPOUND_NAME, ::CompoundTag) as CompoundTag
+            val customTag = this.backingItemMeta!!.minecraftCustomTag
+            val tag = customTag.getOrPut(WAKAME_TAG_NAME, ::CompoundTag) as CompoundTag
             return tag.wrap
         }
     }
     set(value) {
         val handle = this.handle
         if (handle != null) { // CraftItemStack
-            handle.nekoCompound = value
+            handle.wakameTag = value
         } else { // strictly-Bukkit ItemStack
-            this.backingItemMeta!!.customTag.put(WAKAME_COMPOUND_NAME, value.unwrap)
+            this.backingItemMeta!!.minecraftCustomTag.put(WAKAME_TAG_NAME, value.unwrap)
         }
     }
 
 /**
- * Gets the [WAKAME_COMPOUND_NAME] compound tag from `this` or `null`, if it does
- * not exist. Unlike [ItemStack.nekoCompound], which possibly modifies the
+ * Gets the [WAKAME_TAG_NAME] compound tag from `this` or `null`, if it does
+ * not exist. Unlike [BukkitStack.wakameTag], which possibly modifies the
  * item's NBT tags, this function will not modify `this` at all.
  */
-val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
+val BukkitStack.wakameTagOrNull: CompoundShadowTag?
     get() {
         val handle = this.handle
         return if (handle != null) { // CraftItemStack
-            handle.nekoCompoundOrNull
+            handle.wakameTagOrNull
         } else { // strictly-Bukkit ItemStack
-            (this.backingItemMeta?.customTag?.get(WAKAME_COMPOUND_NAME) as? CompoundTag)?.wrap
+            (this.backingItemMeta?.minecraftCustomTag?.get(WAKAME_TAG_NAME) as? CompoundTag)?.wrap
         }
     }
 
 /**
- * Removes the [WAKAME_COMPOUND_NAME] compound tag from `this`.
+ * Removes the [WAKAME_TAG_NAME] compound tag from `this`.
  */
-fun ItemStack.removeNekoCompound() {
+fun BukkitStack.removeWakameTag() {
     val handle = this.handle
     if (handle != null) { // CraftItemStack
-        handle.getCustomData()?.remove(WAKAME_COMPOUND_NAME)
+        handle.minecraftCustomData?.remove(WAKAME_TAG_NAME)
     } else { // strictly-Bukkit ItemStack
-        this.backingItemMeta?.customTag?.remove(WAKAME_COMPOUND_NAME)
+        this.backingItemMeta?.minecraftCustomTag?.remove(WAKAME_TAG_NAME)
     }
 }
 //</editor-fold>
 
+//<editor-fold desc="BukkitStack (API) - Access to ItemMeta on strictly-Bukkit stacks">
 /**
- * Gets the [ItemMeta] without cloning. If the item meta does not already
- * exist, it will try to create one and then return.
+ * Gets the [ItemMeta] on strictly-Bukkit [BukkitStack] without cloning.
+ * If the item meta does not already exist, it will try to create one
+ * and then return.
  */
-val ItemStack.backingItemMeta: ItemMeta?
+private val BukkitStack.backingItemMeta: ItemMeta?
     get() {
+        if (this is CraftItemStack)
+            return null
+
         val shadow = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
         var backingMeta = shadow.getMeta()
 
@@ -217,6 +193,41 @@ val ItemStack.backingItemMeta: ItemMeta?
 
         return backingMeta
     }
+//</editor-fold>
 
-internal val ItemStack.handle: MojangStack?
-    get() = (this as? CraftItemStack)?.handle
+//<editor-fold desc="ItemMeta">
+/**
+ * Access to the `minecraft:custom_tag` on [ItemMeta].
+ */
+private val ItemMeta.minecraftCustomTag: CompoundTag
+    get() {
+        val shadow = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this)
+        val customTag = shadow.getCustomTag()
+        if (customTag === null) {
+            val newCustomTag = CompoundTag()
+            shadow.setCustomTag(newCustomTag)
+            return newCustomTag
+        }
+        return customTag
+    }
+//</editor-fold>
+
+//<editor-fold desc="MojangStack">
+private var MojangStack.wakameTag: CompoundShadowTag
+    get() {
+        val customData = this.minecraftCustomDataOrCreate
+        val wakameTag = customData.getOrPut(WAKAME_TAG_NAME, ::CompoundTag)
+        return wakameTag.wrap
+    }
+    set(value) {
+        val customData = this.minecraftCustomDataOrCreate
+        customData.put(WAKAME_TAG_NAME, value.unwrap)
+    }
+
+private val MojangStack.wakameTagOrNull: CompoundShadowTag?
+    get() {
+        val customData = this.minecraftCustomData
+        val wakameTag = customData?.getCompoundOrNull(WAKAME_TAG_NAME)
+        return wakameTag?.wrap
+    }
+//</editor-fold>

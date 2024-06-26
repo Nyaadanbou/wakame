@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.component
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
-import cc.mewcraft.wakame.util.nekoCompoundOrNull
+import cc.mewcraft.wakame.util.wakameTagOrNull
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.inventory.ItemStack
 
@@ -231,14 +231,14 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         private val item: ItemStack,
     ) : ItemComponentMap {
         // 储存了所有组件信息的
-        private val nbt: CompoundShadowTag = item.nekoCompoundOrNull?.getCompoundOrNull("components") ?: throw IllegalStateException()
+        private val nbt: CompoundShadowTag = item.wakameTagOrNull?.getCompoundOrNull("components") ?: throw IllegalStateException()
 
         override fun <T, S : ItemComponentHolder> get(type: ItemComponentType<T, S>): T? {
             val id = type.id
             val source = type.holder
             when (source) {
                 ItemComponentType.Holder.NBT -> {
-                    // 涉及的组件: Arrow, Attributable, Crate, ItemCells, ItemElements, ItemKizamiz, ItemLevel, ItemLore, ItemRarity, ItemSkin, ItemSkinOwner, Kizamiable, Skillful, Trackable
+                    // 涉及的组件: Arrow, Attributable, Crate, ItemCells, ItemElements, ItemKizamiz, ItemLevel, ItemLore, ItemRarity, ItemSkin, ItemSkinOwner, Kizamiable, Skillful, SystemUse, Trackable
 
                     // 如果不存在此标签, 则代表该组件不存在, 所以直接返回 null
                     val compound = nbt.getCompoundOrNull(id) ?: return null

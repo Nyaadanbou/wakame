@@ -11,13 +11,13 @@ import cc.mewcraft.wakame.util.CompoundBinaryTag
 import cc.mewcraft.wakame.util.CompoundShadowTag
 import cc.mewcraft.wakame.util.ListShadowTag
 import cc.mewcraft.wakame.util.ThreadType
-import cc.mewcraft.wakame.util.copyWriteNbt
-import cc.mewcraft.wakame.util.getNbt
-import cc.mewcraft.wakame.util.getNbtOrNull
-import cc.mewcraft.wakame.util.nekoCompound
-import cc.mewcraft.wakame.util.nekoCompoundOrNull
-import cc.mewcraft.wakame.util.setNbt
+import cc.mewcraft.wakame.util.adventureNbt
+import cc.mewcraft.wakame.util.adventureNbtOrNull
+import cc.mewcraft.wakame.util.copyWriteAdventureNbt
+import cc.mewcraft.wakame.util.setAdventureNbt
 import cc.mewcraft.wakame.util.takeUnlessEmpty
+import cc.mewcraft.wakame.util.wakameTag
+import cc.mewcraft.wakame.util.wakameTagOrNull
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import me.lucko.helper.nbt.ShadowTagType
@@ -68,7 +68,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                 //<editor-fold desc="handler: print_wakame_nbt_if_not_null">
                 handler { context ->
                     val sender = context.sender() as Player
-                    val nbtOrNull = sender.inventory.itemInMainHand.nekoCompoundOrNull
+                    val nbtOrNull = sender.inventory.itemInMainHand.wakameTagOrNull
                     sender.sendPlainMessage("NBT: " + nbtOrNull?.asString()?.prettifyJson())
                 }
                 //</editor-fold>
@@ -88,7 +88,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                 //<editor-fold desc="handler: print_wakame_nbt_or_create">
                 handler { context ->
                     val sender = context.sender() as Player
-                    val nbt = sender.inventory.itemInMainHand.nekoCompound
+                    val nbt = sender.inventory.itemInMainHand.wakameTag
                     sender.sendPlainMessage("NBT: " + nbt.asString().prettifyJson())
                 }
                 //</editor-fold>
@@ -107,7 +107,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                     val bukkitStack = ItemStack(Material.NETHERITE_SWORD)
 
                     // test write operations
-                    bukkitStack.nekoCompound = CompoundShadowTag {
+                    bukkitStack.wakameTag = CompoundShadowTag {
                         putString("namespace", "short_sword")
                         putString("path", "demo")
                         putByte("variant", 18)
@@ -141,7 +141,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                     }
 
                     // test read operations (based on what have been written previously)
-                    with(bukkitStack.nekoCompound) {
+                    with(bukkitStack.wakameTag) {
                         check(getString("namespace") == "short_sword")
                         check(getString("path") == "demo")
                         check(getByte("variant") == 18.toByte())
@@ -203,17 +203,17 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
 
                     when (case) {
                         1 -> {
-                            val nbt = sender.inventory.itemInMainHand.getNbt()
+                            val nbt = sender.inventory.itemInMainHand.adventureNbt
                             sender.sendPlainMessage("NBT: ${nbt.toString().prettifyJson()}")
                         }
 
                         2 -> {
-                            val nbtOrNull = sender.inventory.itemInMainHand.getNbtOrNull()
+                            val nbtOrNull = sender.inventory.itemInMainHand.adventureNbtOrNull
                             sender.sendPlainMessage("NBT: " + nbtOrNull?.toString()?.prettifyJson())
                         }
 
                         3 -> {
-                            inventory.itemInMainHand.setNbt {
+                            inventory.itemInMainHand.setAdventureNbt {
                                 put("adventure", CompoundBinaryTag {
                                     putString("k1", "v1")
                                     putString("k2", "v2")
@@ -223,7 +223,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                         }
 
                         4 -> {
-                            val item = inventory.itemInMainHand.copyWriteNbt {
+                            val item = inventory.itemInMainHand.copyWriteAdventureNbt {
                                 put("adventure", CompoundBinaryTag {
                                     putString("k1", "v1")
                                     putString("k2", "v2")

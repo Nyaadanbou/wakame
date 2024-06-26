@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.shadow.inventory.ShadowCraftMetaItem
 import me.lucko.helper.shadows.nbt.ShadowTag
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
-import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
@@ -15,7 +14,7 @@ val ItemMeta.unhandledTags: MutableMap<String, ShadowTag>
 /**
  * Gets the custom model data or `0`, if it does not exist.
  */
-val ItemStack.modelData: Int
+val ItemStack.customModelData: Int
     get() {
         if (hasItemMeta()) {
             val itemMeta = itemMeta!!
@@ -26,13 +25,25 @@ val ItemStack.modelData: Int
     }
 
 /**
- * Gets the display name or an empty text, if the display name does not
+ * Gets the custom name or an empty text, if the display name does not
  * exist.
  */
-val ItemStack.adventureName: Component
+val ItemStack.adventureCustomName: Component
     get() {
         if (this.hasItemMeta()) {
             return this.itemMeta.displayName() ?: Component.empty()
+        }
+        return Component.empty()
+    }
+
+/**
+ * Gets the item name or an empty text, if the item name does not
+ * exist.
+ */
+val ItemStack.adventureItemName: Component
+    get() {
+        if (this.hasItemMeta()) {
+            return this.itemMeta.itemName() ?: Component.empty()
         }
         return Component.empty()
     }
@@ -47,17 +58,3 @@ val ItemStack.adventureLore: List<Component>
         }
         return emptyList()
     }
-
-//<editor-fold desc="Adventure NBT is for test only">
-fun ItemStack.getNbt(): CompoundBinaryTag =
-    ItemStackAdventureNbt.getNbt(this)
-
-fun ItemStack.getNbtOrNull(): CompoundBinaryTag? =
-    ItemStackAdventureNbt.getNbtOrNull(this)
-
-fun ItemStack.setNbt(compound: CompoundBinaryTag.Builder.() -> Unit) =
-    ItemStackAdventureNbt.setNbt(this, compound)
-
-fun ItemStack.copyWriteNbt(compound: CompoundBinaryTag.Builder.() -> Unit): ItemStack =
-    ItemStackAdventureNbt.copyWriteNbt(this, compound)
-//</editor-fold>

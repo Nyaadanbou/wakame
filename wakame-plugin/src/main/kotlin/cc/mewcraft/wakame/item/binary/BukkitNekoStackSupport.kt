@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.util.backingCustomModelData
 import cc.mewcraft.wakame.util.backingCustomName
 import cc.mewcraft.wakame.util.backingLore
 import cc.mewcraft.wakame.util.isNms
-import cc.mewcraft.wakame.util.nekoCompound
-import cc.mewcraft.wakame.util.nekoCompoundOrNull
-import cc.mewcraft.wakame.util.removeNekoCompound
+import cc.mewcraft.wakame.util.removeWakameTag
+import cc.mewcraft.wakame.util.wakameTag
+import cc.mewcraft.wakame.util.wakameTagOrNull
 import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -22,7 +22,7 @@ typealias ShowNekoStackPredicate = ShowNekoStack.() -> Boolean
 
 val ItemStack.isNeko: Boolean
     get() {
-        val compound = nekoCompoundOrNull ?: return false
+        val compound = wakameTagOrNull ?: return false
         val key = NekoStackImplementation.getKey(compound) ?: return false
         return ItemRegistry.INSTANCES.find(key) != null
     }
@@ -32,7 +32,7 @@ val ItemStack.tryNekoStack: PlayNekoStack?
         if (!this.hasItemMeta()) return null
         if (!this.isNms) return null
         if (!this.isNeko) return null
-        if (!BukkitNekoStackImplementation.isPlay(this.nekoCompound)) return null
+        if (!BukkitNekoStackImplementation.isPlay(this.wakameTag)) return null
         return PlayNekoStackImpl(this)
     }
 
@@ -41,7 +41,7 @@ val ItemStack.toNekoStack: PlayNekoStack
         require(this.hasItemMeta()) { "The ItemStack has no ItemMeta" }
         require(this.isNms) { "The ItemStack is not an NMS object" }
         require(this.isNeko) { "The itemStack is not from Wakame" }
-        require(BukkitNekoStackImplementation.isPlay(this.nekoCompound)) { "The ItemStack is not a play NekoStack" }
+        require(BukkitNekoStackImplementation.isPlay(this.wakameTag)) { "The ItemStack is not a play NekoStack" }
         return PlayNekoStackImpl(this)
     }
 
@@ -92,7 +92,7 @@ private object BukkitNekoStackDependencies : KoinComponent {
 // Common code shared by BukkitNekoStack implementations
 private interface BukkitNekoStackBase : NekoStackBase, BukkitNekoStack {
     override fun erase() {
-        itemStack.removeNekoCompound()
+        itemStack.removeWakameTag()
     }
 }
 
@@ -110,7 +110,7 @@ private class PlayNekoStackImpl(
                 // If this is a strictly-Bukkit ItemStack,
                 // the `wakame` compound should always be available (if not, create it)
                 // as we need to create a NekoItem realization from an empty ItemStack.
-                return itemStack.nekoCompound
+                return itemStack.wakameTag
             }
             // If this is a NMS-backed ItemStack,
             // reading/modifying is allowed only if it already has a `wakame` compound.
@@ -118,7 +118,7 @@ private class PlayNekoStackImpl(
             // NekoItem realization, in the world state because we want to avoid
             // undefined behaviors. Just imagine that a random code modifies a
             // vanilla item and make it an incomplete realization of NekoItem.
-            return itemStack.nekoCompoundOrNull ?: throw NullPointerException(
+            return itemStack.wakameTagOrNull ?: throw NullPointerException(
                 "Can't read/modify the tags of NMS-backed ItemStack which is not NekoItem realization"
             )
         }
@@ -145,7 +145,7 @@ private class ShowNekoStackImpl(
     // the purpose of being used by players. Therefore, we can relax the
     // restrictions a little.
     override val tags: CompoundShadowTag
-        get() = itemStack.nekoCompound
+        get() = itemStack.wakameTag
 
     override val customData: CustomDataAccessor
         get() = TODO("Not yet implemented")

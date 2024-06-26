@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util.packetevents
 
-import cc.mewcraft.wakame.util.WAKAME_COMPOUND_NAME
+import cc.mewcraft.wakame.util.WAKAME_TAG_NAME
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.wrap
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
@@ -20,17 +20,18 @@ import kotlin.jvm.optionals.getOrNull
 // The nullable return value allows you to know whether the wakame tag exists
 // Caution: The returned CompoundShadowTag should be read-only!!! Any writes
 // to it takes no effects
-val ItemStack.nekoCompoundOrNull: CompoundShadowTag?
+val ItemStack.wakameTagOrNull: CompoundShadowTag?
     get() {
-        val customData = this.getCustomData()
-        val wakameTag = customData?.getCompoundOrNull(WAKAME_COMPOUND_NAME)
+        val customData = this.minecraftCustomData
+        val wakameTag = customData?.getCompoundOrNull(WAKAME_TAG_NAME)
         return wakameTag?.wrap
     }
 
-private fun ItemStack.getCustomData(): CompoundTag? {
-    val customData = this.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()
-    return customData?.toNms
-}
+private val ItemStack.minecraftCustomData: CompoundTag?
+    get() {
+        val customData = this.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()
+        return customData?.toMinecraft
+    }
 
 // Convert NMS compound to PacketEvents compound
 private val CompoundTag.toPacket: NBTCompound
@@ -43,7 +44,7 @@ private val CompoundTag.toPacket: NBTCompound
     }
 
 // Convert PacketEvents compound to NMS compound
-private val NBTCompound.toNms: CompoundTag
+private val NBTCompound.toMinecraft: CompoundTag
     get() {
         val arrayOutputStream = FastByteArrayOutputStream()
         val dataOutputStream = DataOutputStream(arrayOutputStream)
