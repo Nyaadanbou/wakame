@@ -1,16 +1,20 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
-import cc.mewcraft.wakame.item.binary.playNekoStack
+import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
+import cc.mewcraft.wakame.item.binary.isNeko
+import cc.mewcraft.wakame.item.binary.toNekoStack
 import cc.mewcraft.wakame.item.hasBehavior
 import cc.mewcraft.wakame.item.schema.behavior.Attack
 import cc.mewcraft.wakame.user.toUser
+import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.projectiles.BlockProjectileSource
-import java.util.UUID
+import java.time.Duration
+import java.util.*
 
 object DamageManager {
     fun generateDamageMetaData(event: EntityDamageEvent): DamageMetaData {
@@ -19,9 +23,9 @@ object DamageManager {
             when (val damager = event.damager) {
                 //造成伤害的是玩家
                 is Player -> {
-                    val nekoStack = damager.inventory.itemInMainHand.playNekoStack
+                    val itemStack = damager.inventory.itemInMainHand
                     //玩家手中的物品是Attack
-                    if (nekoStack.isNeko && nekoStack.hasBehavior<Attack>()) {
+                    if (itemStack.isNeko && itemStack.toNekoStack.hasBehavior<Attack>()) {
                         return when (event.cause) {
                             DamageCause.ENTITY_ATTACK -> {
                                 PlayerMeleeAttackMetaData(damager.toUser(), false)
@@ -69,16 +73,31 @@ object DamageManager {
     }
 
     fun generateDefenseMetaData(event: EntityDamageEvent): DefenseMetaData {
-        TODO("获得受伤实体的AttributeMap")
+        return when (val damagee = event.entity) {
+            is Player -> {
+                EntityDefenseMetaData(damagee.toUser().attributeMap)
+            }
+
+            is LivingEntity -> {
+                EntityDefenseMetaData(EntityAttributeAccessor.getAttributeMap(damagee))
+            }
+
+            else -> {
+                throw IllegalArgumentException("damagee is not living entity!")
+            }
+        }
     }
-
-    private val projectileDamageMetaDataMap = mutableMapOf<UUID, ProjectileDamageMetaData>()
-
 
     /**
      * 弹射物生成时，其伤害信息就应该确定了
      * 只记录需要wakame属性系统处理的伤害信息
+     * 伤害信息不存在时，弹射物伤害将按原版处理
+     * 伤害信息过期的情况如下：
+     * 超过有效期（60秒）
+     * 弹射物击中方块
      */
+    private val projectileDamageMetaDataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, ProjectileDamageMetaData>()
+
     fun recordProjectileDamageMetaData(event: ProjectileLaunchEvent) {
         when (val projectile = event.entity) {
             //弹射物是三叉戟
@@ -92,7 +111,10 @@ object DamageManager {
                     }
 
                     is LivingEntity -> {
-                        TODO()
+                        projectileDamageMetaDataMap.put(
+                            projectile.uniqueId,
+                            EntityProjectileDamageMetaData(ProjectileType.TRIDENT, shooter)
+                        )
                     }
                 }
             }
@@ -108,25 +130,28 @@ object DamageManager {
                     }
 
                     is LivingEntity -> {
-                        TODO()
+                        projectileDamageMetaDataMap.put(
+                            projectile.uniqueId,
+                            EntityProjectileDamageMetaData(ProjectileType.ARROWS, shooter)
+                        )
                     }
 
                     is BlockProjectileSource -> {
-                        TODO()
+                        //TODO 让自定义箭矢在发射器中有效
                     }
                 }
             }
 
-            //可能还会有其他需要wakame属性系统处理的弹射物
+            //TODO 可能还会有其他需要wakame属性系统处理的弹射物
         }
     }
 
     fun findProjectileDamageMetaData(uuid: UUID): ProjectileDamageMetaData? {
-        return projectileDamageMetaDataMap.get(uuid)
+        return projectileDamageMetaDataMap.getIfPresent(uuid)
     }
 
     fun removeProjectileDamageMetaData(uuid: UUID) {
-        projectileDamageMetaDataMap.remove(uuid)
+        projectileDamageMetaDataMap.invalidate(uuid)
     }
 }
 

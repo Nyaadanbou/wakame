@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.event.WakameEntityDamageEvent
+import org.bukkit.entity.AbstractArrow
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 
 class DamageListener : Listener {
@@ -31,4 +33,21 @@ class DamageListener : Listener {
         DamageManager.recordProjectileDamageMetaData(event)
     }
 
+    /**
+     * 在弹射物击中方块时移除记录的 [DamageMetaData]
+     */
+    @EventHandler
+    fun on(event: ProjectileHitEvent) {
+        if (event.hitBlock == null) {
+            return
+        }
+        when (val projectile = event.entity) {
+            //弹射物是箭矢（普通箭、光灵箭、药水箭）、三叉戟
+            is AbstractArrow -> {
+                DamageManager.removeProjectileDamageMetaData(projectile.uniqueId)
+            }
+
+            //TODO 可能还会有其他需要wakame属性系统处理的弹射物
+        }
+    }
 }
