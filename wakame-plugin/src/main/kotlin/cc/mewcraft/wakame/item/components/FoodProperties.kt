@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.component.GenerationContext
-import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemStack
@@ -12,7 +13,10 @@ import org.bukkit.potion.PotionEffect
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
+// TODO 完成组件: FoodProperties
+
 interface FoodProperties : Examinable {
+
     val nutrition: Int
     val saturation: Float
     val canAlwaysEat: Boolean
@@ -26,7 +30,19 @@ interface FoodProperties : Examinable {
         val probability: Float,
     )
 
-    class Codec(
+    /* data */ class Value(
+        override val nutrition: Int,
+        override val saturation: Float,
+        override val canAlwaysEat: Boolean,
+        override val eatSeconds: Float,
+        override val usingConvertsTo: ItemStack,
+        override val effects: FoodEffect,
+        override val skills: List<Key>,
+    ) : FoodProperties {
+
+    }
+
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<FoodProperties, ItemComponentHolder.Complex> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.COMPLEX
@@ -47,12 +63,12 @@ interface FoodProperties : Examinable {
         }
     }
 
-    class Template : ItemTemplate<FoodProperties> {
+    /* data */ class Template : ItemTemplate<FoodProperties> {
         override fun generate(context: GenerationContext): GenerationResult<FoodProperties> {
             TODO("Not yet implemented")
         }
 
-        companion object : ItemTemplate.Serializer<Template> {
+        companion object : ItemTemplateType<Template> {
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 TODO("Not yet implemented")
             }

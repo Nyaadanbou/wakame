@@ -4,12 +4,13 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.GenerationContext
-import cc.mewcraft.wakame.item.component.GenerationResult
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.editMeta
 import net.kyori.examination.Examinable
@@ -40,19 +41,18 @@ interface Damageable : Examinable, TooltipProvider {
             return LoreLine.simple(tooltipKey, listOf(tooltipText.render()))
         }
 
-        companion object : ItemComponentConfig(ItemComponentConstants.DAMAGEABLE) {
+        private companion object : ItemComponentConfig(ItemComponentConstants.DAMAGEABLE) {
             val tooltipKey: TooltipKey = ItemComponentConstants.createKey { DAMAGEABLE }
             val tooltipText: SingleTooltip = SingleTooltip()
         }
     }
 
-    class Codec(
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<Damageable, ItemComponentHolder.Complex> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
 
         override fun read(holder: ItemComponentHolder.Complex): Damageable? {
-            // TODO DataComponent API 推出后重写
             val itemMeta = (holder.item.itemMeta as? BukkitDamageable) ?: return null
             return Value(
                 damage = itemMeta.damage,
@@ -61,7 +61,6 @@ interface Damageable : Examinable, TooltipProvider {
         }
 
         override fun write(holder: ItemComponentHolder.Complex, value: Damageable) {
-            // TODO DataComponent API 推出后重写
             holder.item.editMeta<BukkitDamageable> {
                 this.damage = value.damage
                 this.setMaxDamage(value.maxDamage)
@@ -69,11 +68,12 @@ interface Damageable : Examinable, TooltipProvider {
         }
 
         override fun remove(holder: ItemComponentHolder.Complex) {
-            // TODO DataComponent API 推出后重写
             holder.item.editMeta<BukkitDamageable> {
                 this.setMaxDamage(null)
             }
         }
+
+        private companion object
     }
 
     data class Template(
@@ -85,8 +85,8 @@ interface Damageable : Examinable, TooltipProvider {
             TODO("Not yet implemented")
         }
 
-        companion object : ItemTemplate.Serializer<Arrow.Template> {
-            override fun deserialize(type: Type, node: ConfigurationNode): Arrow.Template {
+        companion object : ItemTemplateType<Template> {
+            override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 TODO("Not yet implemented")
             }
         }

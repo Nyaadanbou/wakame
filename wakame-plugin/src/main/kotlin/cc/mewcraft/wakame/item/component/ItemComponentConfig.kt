@@ -23,6 +23,11 @@ abstract class ItemComponentConfig(
 
     val enabled: Boolean by config.entry<Boolean>("enabled")
     val displayName: Component by config.entry<Component>("display_name")
+
+    // 开发日记 2024/6/27
+    // TODO show_in_tooltip 除了能够在这里直接控制,
+    //  还应该考虑 renderer.yml 里不存在键值的情况,
+    //  「不存在的结果」应该存起来, 而不是每次都去哈希.
     val showInTooltip: Boolean by config.entry<Boolean>("show_in_tooltip")
 
     // 根据具体的物品组件的配置结构, 实例化相应的 inner class
@@ -105,13 +110,13 @@ abstract class ItemComponentConfig(
      * Tooltips for lore.
      *
      * @property line The format of a single line.
-     * @property header The header list. `null` indicates not adding the header.
-     * @property bottom The bottom list. `null` indicates not adding the bottom.
+     * @property header The header list.
+     * @property bottom The bottom list.
      */
     inner class LoreTooltip : Examinable {
         val line: String by config.entry<String>("tooltips", "line")
-        val header: List<String>? by config.entry<List<String>>("tooltips", "header")
-        val bottom: List<String>? by config.entry<List<String>>("tooltips", "bottom")
+        val header: List<String> by config.entry<List<String>>("tooltips", "header")
+        val bottom: List<String> by config.entry<List<String>>("tooltips", "bottom")
 
         override fun examinableProperties(): Stream<out ExaminableProperty> {
             return Stream.of(

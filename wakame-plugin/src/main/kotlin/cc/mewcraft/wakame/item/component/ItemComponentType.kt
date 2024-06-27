@@ -1,7 +1,18 @@
 package cc.mewcraft.wakame.item.component
 
-// FIXME 思考: 该接口定义的只是 wakame 的组件? 还是要包括原版的组件?
-//  也许分开才是上策 ... 统一和抽象会牺牲一部分代码可维护性其实
+// 开发日记 2024/6/26
+// 分为 Valued/NonValued 的原因:
+// 有些组件不带值, 只有存在与否一说
+// 不分为 Valued/NonValue 的原因:
+// 每个组件都有可能需要提供 LoreLine,
+// 那怕是 NonValued 也可能需要提供一个固定的 LoreLine,
+// 而 Map 里的 get 函数又直接返回的
+// 这种情况提供 LoreLine
+
+// 开发日记 2024/6/26
+// 叫做 ItemComponentType, 但实际上是 ItemComponentCodec 的作用
+// (因为 read/write/remove).
+// hmm, 要改个名字吗?
 
 /**
  * 代表了一个物品组件的类型.
@@ -29,6 +40,12 @@ interface ItemComponentType<T, S : ItemComponentHolder> {
     fun read(holder: S): T?
     fun write(holder: S, value: T)
     fun remove(holder: S)
+
+    // 开发日记 2024/6/26
+    // TODO Type 提供一个专门的实现来提供 LoreLine?
+    //  这样的问题在于有些组件可能会提供多个 LoreLine,
+    //  因此这里单单返回一个 LoreLine 应该是不够的.
+    // fun render(holder: S): LoreLine
 
     // 开发日记 1
     // ItemComponentType 应该尽可能的能够同时包含

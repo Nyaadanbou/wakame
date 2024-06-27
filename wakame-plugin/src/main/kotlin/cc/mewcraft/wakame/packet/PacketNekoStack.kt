@@ -11,7 +11,7 @@ import kotlin.jvm.optionals.getOrNull
 val ItemStack.isNeko: Boolean
     get() = this.components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(WAKAME_TAG_NAME) != null
 
-val ItemStack.tryPacketNekoStack: PacketNekoStack?
+val ItemStack.tryNekoStack: PacketNekoStack?
     get() {
         if (!this.isNeko) return null
         return PacketNekoStack(this) // 发包系统只读取 NBT，因此不需要 copy
@@ -24,7 +24,7 @@ class PacketNekoStack(
     // We use property initializer here as it would be called multiple times,
     // and we don't want to do the unnecessary NBT conversion again and again
     override val tags: CompoundShadowTag = requireNotNull(itemStack.wakameTagOrNull) {
-        "The ItemStack is not neko. Did you forget to check it before instantiating the PacketNekoStack?"
+        "The ItemStack is not from wakame. Did you forget to check it before instantiating the NekoStack?"
     }
 
     override fun erase() {

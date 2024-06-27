@@ -25,13 +25,14 @@ components:
     enabled: true
     display_name: "词条栏"
     show_in_tooltip: true
-    tooltips: { } # 内容更多, 委托到其他配置文件进行设置
+    tooltips: { } # 内容过多, 委托到其他配置文件进行设置
 
   crate:
     enabled: true
     display_name: "盲盒"
     show_in_tooltip: true
-    tooltips: { } # TODO 完成盲盒组件
+    tooltips:
+      single: "<!i>盲盒: <key>"
 
   custom_model_data:
     enabled: true

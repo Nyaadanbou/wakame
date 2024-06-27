@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.commons.collections.mapToByteArray
+import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
@@ -49,20 +51,20 @@ interface ItemKizamiz : Examinable, TooltipProvider {
         }
     }
 
-    class Codec(
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemKizamiz, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
         override fun read(holder: ItemComponentHolder.NBT): ItemKizamiz? {
-            val kizamiz: Set<Kizami> = holder.tag.getByteArrayOrNull(TAG_VALUE)?.mapTo(ObjectArraySet(4)) { KizamiRegistry.getBy(it) } ?: return null
-            return Value(kizamiz)
+            val kizamiSet = holder.tag.getByteArrayOrNull(TAG_VALUE)?.mapTo(ObjectArraySet(4), KizamiRegistry::getBy) ?: return null
+            return Value(kizamiz = kizamiSet)
         }
 
         override fun write(holder: ItemComponentHolder.NBT, value: ItemKizamiz) {
             require(value.kizamiz.isNotEmpty()) { "The set of kizami must be not empty" }
-            val raw: ByteArray = value.kizamiz.map { it.binaryId }.toByteArray()
-            holder.tag.putByteArray(TAG_VALUE, raw)
+            val byteArray = value.kizamiz.mapToByteArray(Kizami::binaryId)
+            holder.tag.putByteArray(TAG_VALUE, byteArray)
         }
 
         override fun remove(holder: ItemComponentHolder.NBT) {
@@ -78,12 +80,9 @@ interface ItemKizamiz : Examinable, TooltipProvider {
         val selector: Group<Kizami, GenerationContext>,
     ) : ItemTemplate<ItemKizamiz> {
         override fun generate(context: GenerationContext): GenerationResult<ItemKizamiz> {
-            val selected = selector.pickBulk(context).toSet()
-            return if (selected.isNotEmpty()) {
-                GenerationResult.of(Value(selected))
-            } else {
-                GenerationResult.empty()
-            }
+            val selected = selector.pickBulk(context).takeUnlessEmpty() ?: return GenerationResult.empty()
+            val kizamiz = Value(ObjectArraySet(selected))
+            return GenerationResult.of(kizamiz)
         }
 
         companion object : ItemTemplateType<Template> {

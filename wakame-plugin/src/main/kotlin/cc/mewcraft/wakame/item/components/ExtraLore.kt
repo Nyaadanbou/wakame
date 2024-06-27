@@ -1,0 +1,101 @@
+package cc.mewcraft.wakame.item.components
+
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentInjections
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.GenerationResult
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.util.getListOrNull
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import me.lucko.helper.nbt.ShadowTagType
+import me.lucko.helper.shadows.nbt.ListShadowTag
+import me.lucko.helper.shadows.nbt.StringShadowTag
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.examination.Examinable
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.getList
+import java.lang.reflect.Type
+
+interface ExtraLore : Examinable, TooltipProvider {
+
+    /**
+     * 物品的额外描述.
+     */
+    val lore: List<String>
+
+    // 开发日记 2024/6/27 小米
+    //
+    data class Value(
+        override val lore: List<String>,
+    ) : ExtraLore {
+        override fun provideDisplayLore(): LoreLine {
+            if (!showInTooltip) {
+                return LoreLine.noop()
+            }
+            val lines = lore.mapTo(ObjectArrayList(lore.size)) { ItemComponentInjections.mini.deserialize(tooltipText.line, Placeholder.parsed("line", it)) }
+            val header = tooltipText.header.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
+            val bottom = tooltipText.bottom.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
+            lines.addAll(0, header)
+            lines.addAll(bottom)
+            return LoreLine.simple(tooltipKey, lines)
+        }
+
+        private companion object : ItemComponentConfig(ItemComponentConstants.LORE) {
+            private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LORE }
+            private val tooltipText: LoreTooltip = LoreTooltip()
+        }
+    }
+
+    class Codec(
+        override val id: String,
+    ) : ItemComponentType<ExtraLore, ItemComponentHolder.NBT> {
+        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
+
+        override fun read(holder: ItemComponentHolder.NBT): ExtraLore? {
+            val raw: List<String> = holder.tag.getListOrNull(TAG_VALUE, ShadowTagType.STRING)?.map { (it as StringShadowTag).value() } ?: return null
+            return Value(raw)
+        }
+
+        override fun write(holder: ItemComponentHolder.NBT, value: ExtraLore) {
+            val strings: List<StringShadowTag> = value.lore.map(StringShadowTag::valueOf)
+            val list: ListShadowTag = ListShadowTag.create(strings, ShadowTagType.STRING)
+            holder.tag.put(TAG_VALUE, list)
+        }
+
+        override fun remove(holder: ItemComponentHolder.NBT) {
+            // no-op
+        }
+
+        private companion object {
+            const val TAG_VALUE = "value"
+        }
+    }
+
+    // 开发日记 2024/6/27
+    // 模板中的描述文本应该始终是 MiniMessage 吗?
+    // 我们可以让用户输入 MiniMessage, 但最终储存在内存里的
+    // 数据可以是 Component?
+    data class Template(
+        /**
+         * The item lore in the format of MiniMessage string.
+         */
+        val lore: List<String>,
+    ) : ItemTemplate<ExtraLore> {
+        override fun generate(context: GenerationContext): GenerationResult<ExtraLore> {
+            return GenerationResult.of(Value(lore))
+        }
+
+        companion object : ItemTemplateType<Template> {
+            override fun deserialize(type: Type, node: ConfigurationNode): Template {
+                return Template(node.getList<String>(emptyList()))
+            }
+        }
+    }
+}

@@ -44,7 +44,7 @@ private object PacketSupport : KoinComponent {
 
     fun handleSetSlot(user: User, packet: WrapperPlayServerSetSlot): PacketWrapper<*>? {
         val item = packet.item.takeUnlessEmpty() ?: return null
-        val nekoStack = item.tryPacketNekoStack ?: return null
+        val nekoStack = item.tryNekoStack ?: return null
         updateItem(nekoStack, user)
         return WrapperPlayServerSetSlot(
             packet.windowId,
@@ -57,7 +57,7 @@ private object PacketSupport : KoinComponent {
     fun handleWindowItems(user: User, packet: WrapperPlayServerWindowItems): PacketWrapper<*> {
         val items = packet.items
         val newItems = items.map mapItems@{ item ->
-            val nekoStack = item.takeUnlessEmpty()?.tryPacketNekoStack ?: return@mapItems item
+            val nekoStack = item.takeUnlessEmpty()?.tryNekoStack ?: return@mapItems item
             updateItem(nekoStack, user)
             nekoStack.itemStack
         }
@@ -74,7 +74,7 @@ private object PacketSupport : KoinComponent {
         val offers = packet.merchantOffers
         val newOffers = offers.map mapItems@{ offer ->
             val result = offer.outputItem.takeUnlessEmpty() ?: return@mapItems offer
-            val nekoStack = result.tryPacketNekoStack ?: return@mapItems offer
+            val nekoStack = result.tryNekoStack ?: return@mapItems offer
             updateItem(nekoStack, user)
             offer
         }

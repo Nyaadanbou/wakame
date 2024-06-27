@@ -29,14 +29,16 @@ interface Castable : Examinable, TooltipProvider {
         }
     }
 
-    class Codec(override val id: String) : ItemComponentType<Castable, ItemComponentHolder.NBT> {
+    data class Codec(
+        override val id: String,
+    ) : ItemComponentType<Castable, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
         override fun read(holder: ItemComponentHolder.NBT): Castable = Castable
         override fun write(holder: ItemComponentHolder.NBT, value: Castable) = Unit
         override fun remove(holder: ItemComponentHolder.NBT) = Unit
     }
 
-    object Template : ItemTemplate<Castable>, ItemTemplateType<Template> {
+    data object Template : ItemTemplate<Castable>, ItemTemplateType<Template> {
         override fun generate(context: GenerationContext): GenerationResult<Castable> {
             return GenerationResult.of(Value)
         }

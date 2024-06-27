@@ -6,18 +6,18 @@ import cc.mewcraft.wakame.item.components.Castable
 import cc.mewcraft.wakame.item.components.Crate
 import cc.mewcraft.wakame.item.components.CustomName
 import cc.mewcraft.wakame.item.components.Damageable
+import cc.mewcraft.wakame.item.components.ExtraLore
 import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemKizamiz
 import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.ItemLore
 import cc.mewcraft.wakame.item.components.ItemName
 import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.ItemTracks
 import cc.mewcraft.wakame.item.components.Kizamiable
 import cc.mewcraft.wakame.item.components.Tool
-import cc.mewcraft.wakame.item.components.Trackable
 import cc.mewcraft.wakame.item.components.Unbreakable
 
 object ItemTemplateTypes {
@@ -92,9 +92,9 @@ object ItemTemplateTypes {
     val LEVEL: ItemTemplateType<ItemLevel.Template> = ItemLevel.Template
 
     /**
-     * 组件: [ItemLore]
+     * 组件: [ExtraLore]
      */
-    val LORE: ItemTemplateType<ItemLore.Template> = ItemLore.Template
+    val LORE: ItemTemplateType<ExtraLore.Template> = ExtraLore.Template
 
     /**
      * 组件: [ItemRarity]
@@ -107,9 +107,9 @@ object ItemTemplateTypes {
     val TOOL: ItemTemplateType<Tool.Template> = Tool.Template
 
     /**
-     * 组件: [Trackable]
+     * 组件: [ItemTracks]
      */
-    val TRACKABLE: ItemTemplateType<Trackable.Template> = Trackable.Template
+    val TRACKS: ItemTemplateType<ItemTracks.Template> = ItemTracks.Template
 
     /**
      * 组件: [Unbreakable]

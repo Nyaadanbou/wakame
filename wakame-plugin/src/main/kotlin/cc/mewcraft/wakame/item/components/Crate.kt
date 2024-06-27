@@ -1,16 +1,26 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.component.GenerationContext
-import cc.mewcraft.wakame.item.component.GenerationResult
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Crate : Examinable {
+interface Crate : Examinable, TooltipProvider {
 
     /**
      * 盲盒的唯一标识.
@@ -19,23 +29,40 @@ interface Crate : Examinable {
 
     data class Value(
         override val key: Key,
-    ) : Crate
+    ) : Crate {
+        override fun provideDisplayLore(): LoreLine {
+            if (!showInTooltip) {
+                return LoreLine.noop()
+            }
+            return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("key", Component.text(key.asString())))))
+        }
 
-    class Codec(
+        private companion object : ItemComponentConfig(ItemComponentConstants.CRATE) {
+            val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CRATE }
+            val tooltipText: SingleTooltip = SingleTooltip()
+        }
+    }
+
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<Crate, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
         override fun read(holder: ItemComponentHolder.NBT): Crate? {
-            TODO("Not yet implemented")
+            val key = Key(holder.tag.getString(TAG_KEY))
+            return Value(key)
         }
 
         override fun write(holder: ItemComponentHolder.NBT, value: Crate) {
-            TODO("Not yet implemented")
+            holder.tag.putString(TAG_KEY, value.key.asString())
         }
 
         override fun remove(holder: ItemComponentHolder.NBT) {
-            TODO("Not yet implemented")
+            // no-op
+        }
+
+        private companion object {
+            const val TAG_KEY = "key"
         }
     }
 
@@ -43,12 +70,20 @@ interface Crate : Examinable {
         val key: Key,
     ) : ItemTemplate<Crate> {
         override fun generate(context: GenerationContext): GenerationResult<Crate> {
-            TODO("Not yet implemented")
+            return GenerationResult.of(Value(key))
         }
 
-        companion object : ItemTemplate.Serializer<Template> {
+        companion object : ItemTemplateType<Template> {
+            /**
+             * ## Node structure
+             * ```yaml
+             * <root>:
+             *   key: "foo:bar"
+             * ```
+             */
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                TODO("Not yet implemented")
+                val raw = node.node("key").krequire<Key>()
+                return Template(raw)
             }
         }
     }

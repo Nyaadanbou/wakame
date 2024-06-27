@@ -35,7 +35,7 @@ interface Attributable : Examinable, TooltipProvider {
         }
     }
 
-    class Codec(
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<Attributable, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
@@ -59,7 +59,7 @@ interface Attributable : Examinable, TooltipProvider {
     // 在构建 NekoItem 的阶段只需要看配置文件里有没有这个 node 存在就行了?
     // 开发日记: 2024/6/25
     // 还不确定 Template 的具体框架是怎么样的
-    object Template : ItemTemplate<Attributable>, ItemTemplateType<Template> {
+    data object Template : ItemTemplate<Attributable>, ItemTemplateType<Template> {
         override fun generate(context: GenerationContext): GenerationResult<Attributable> {
             return GenerationResult.of(Attributable)
         }

@@ -29,7 +29,7 @@ interface FireResistant : Examinable, TooltipProvider {
         }
     }
 
-    class Codec(
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<FireResistant, ItemComponentHolder.Item> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
@@ -50,7 +50,7 @@ interface FireResistant : Examinable, TooltipProvider {
         }
     }
 
-    object Template : ItemTemplate<FireResistant>, ItemTemplateType<Template> {
+    data object Template : ItemTemplate<FireResistant>, ItemTemplateType<Template> {
         override fun generate(context: GenerationContext): GenerationResult<FireResistant> {
             return GenerationResult.of(FireResistant)
         }

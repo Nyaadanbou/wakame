@@ -61,7 +61,7 @@ interface Arrow : Examinable, TooltipProvider {
     // 开发日记: 2024/6/25
     // 这是编码器, 定义了如何在游戏中读取/写入/移除物品上的组件信息.
     // 根据物品组件的具体情况, 这里的实现会稍有不同.
-    class Codec(
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<Arrow, NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
@@ -99,19 +99,18 @@ interface Arrow : Examinable, TooltipProvider {
             return GenerationResult.of(Value(pierceLevel))
         }
 
-        companion object Kind : ItemTemplateType<Template> {
+        companion object : ItemTemplateType<Template> {
+            /**
+             * ## Node structure
+             * ```yaml
+             * <root>:
+             *   pierce_level: <randomized_value>
+             * ```
+             */
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
                 return Template(pierceLevel)
             }
         }
-    }
-
-    // 开发日记 2024/6/26 小米
-    // 这种写法对于 Arrow 没问题, 但 Attributable 来说就没办法了,
-    // 因为 Attributable 的 companion object 已经被作为 Value 占用了.
-    companion object {
-        fun componentType(id: String): ItemComponentType<Arrow, NBT> = Codec(id)
-        fun templateType(): ItemTemplateType<Template> = Template
     }
 }
