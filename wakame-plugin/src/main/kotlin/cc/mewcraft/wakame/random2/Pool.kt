@@ -21,7 +21,7 @@ interface Pool<S, C : SelectionContext> {
     /**
      * 进入该 [pool][Pool] 需要满足的条件。多个条件为 Logic AND 的关系。
      *
-     * 如果条件不满足，则 [pick] 将直接返回 `null`。
+     * 如果条件不满足，则 [pickBulk] 将直接返回 `null`。
      */
     val filters: List<Filter<C>>
 
@@ -38,17 +38,17 @@ interface Pool<S, C : SelectionContext> {
      * - none of the [filters] are not met, or
      * - none of [samples][Sample] meet their own filters
      */
-    fun pick(context: C): List<S>
+    fun pickBulk(context: C): List<S>
 
     /**
-     * The same as [pick] but it only picks a **single** random [S]. In the
-     * case where [pick] returns an empty list, this function returns a `null`
+     * The same as [pickBulk] but it only picks a **single** random [S]. In the
+     * case where [pickBulk] returns an empty list, this function returns a `null`
      * instead.
      *
      * Use this function if you already know `this` pool can only pick a single
      * [S].
      */
-    fun pickOne(context: C): S?
+    fun pickSingle(context: C): S?
 
     companion object Factory {
         fun <S, C : SelectionContext> empty(): Pool<S, C> {

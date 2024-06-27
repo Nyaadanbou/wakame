@@ -21,11 +21,11 @@ internal class ImmutableGroup<S, C : SelectionContext>(
         }
         if (pool != null) {
             // 我们找到了一个满足条件的 pool，因此从这个 pool 中选择
-            return pool.pick(context)
+            return pool.pickBulk(context)
         }
 
         // pools 中没有一个满足条件的，因此从 fallback 中选择
-        return default.pick(context)
+        return default.pickBulk(context)
     }
 
     override fun pickSingle(context: C): S? {

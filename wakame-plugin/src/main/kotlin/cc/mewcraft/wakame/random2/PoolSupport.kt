@@ -12,14 +12,14 @@ internal class ImmutablePool<S, C : SelectionContext>(
     override val filters: List<Filter<C>>,
 ) : Pool<S, C> {
 
-    override fun pick(context: C): List<S> {
+    override fun pickBulk(context: C): List<S> {
         return pick0(context).map {
             it.trace(context) // 将结果应用到 context
             it.content // 提取被样本封装的 S
         }.toList()
     }
 
-    override fun pickOne(context: C): S? {
+    override fun pickSingle(context: C): S? {
         val stream = pick0(context)
         val sample = stream.findAny().getOrElse {
             return null
@@ -69,6 +69,6 @@ internal object EmptyPool : Pool<Nothing, SelectionContext> {
     override val isReplacement: Boolean = true
     override val filters: List<Filter<SelectionContext>> = emptyList()
 
-    override fun pick(context: SelectionContext): List<Nothing> = emptyList()
-    override fun pickOne(context: SelectionContext): Nothing? = null
+    override fun pickBulk(context: SelectionContext): List<Nothing> = emptyList()
+    override fun pickSingle(context: SelectionContext): Nothing? = null
 }
