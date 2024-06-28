@@ -21,6 +21,8 @@ import cc.mewcraft.wakame.random2.PoolSerializer
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
@@ -84,6 +86,8 @@ interface ItemElements : Examinable, TooltipProvider {
         }
 
         companion object : ItemTemplateType<Template> {
+            override val typeToken: TypeToken<Template> = typeTokenOf()
+
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 return Template(node.krequire<Pool<Element, GenerationContext>>())
             }

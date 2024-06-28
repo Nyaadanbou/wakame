@@ -11,6 +11,8 @@ import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -39,6 +41,8 @@ interface Skillful : Examinable, TooltipProvider {
     }
 
     data object Template : ItemTemplate<Skillful>, ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
+
         override fun generate(context: GenerationContext): GenerationResult<Skillful> {
             return GenerationResult.of(Value)
         }

@@ -1,20 +1,26 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.config.NodeConfigProvider
-import cc.mewcraft.wakame.item.schema.cell.SchemaCell
-import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
-import cc.mewcraft.wakame.registry.ItemMetaRegistry
+import cc.mewcraft.wakame.item.behavior.ItemBehavior
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateMap
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemover
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
-import com.google.common.collect.ImmutableClassToInstanceMap
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
+import org.spongepowered.configurate.kotlin.extensions.contains
 import java.nio.file.Path
 import java.util.UUID
 
 object NekoItemFactory {
-    val ITEM_ROOT_NODE_HINT: RepresentationHint<ConfigurationNode> = RepresentationHint.of("item_root_node", typeTokenOf<ConfigurationNode>())
+    val HINT_NODE_CELLS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_cells", typeTokenOf())
 
     /**
      * Creates a [NekoItem] from a [configuration node][ConfigurationNode].
@@ -27,48 +33,65 @@ object NekoItemFactory {
     fun create(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
         val provider = NodeConfigProvider(root, relPath.toString())
 
-        // required
+        // read all basic info
         val uuid = root.node("uuid").krequire<UUID>()
-        // required
         val itemType = root.node("item_type").krequire<Key>()
-        // optional
         val hideTooltip = root.node("hide_tooltip").getBoolean(false)
-        // optional
         val hideAdditionalTooltip = root.node("hide_additional_tooltip").getBoolean(false)
-        // optional
         val shownInTooltip = root.node("shown_in_tooltip").krequire<ShownInTooltipApplicator>()
-        // optional
+        val removeComponents = root.node("remove_components").krequire<VanillaComponentRemover>()
         val slot = root.node("slot").krequire<ItemSlot>()
-        // optional
-        val behaviors = root.node("behaviors").childrenMap().mapNotNull { (key, _) -> key?.toString() }
 
-        val schemaMeta = ImmutableClassToInstanceMap.builder<SchemaItemMeta<*>>().apply {
-            // Side note 1: always put all schema metadata for a `NekoItem` even if the schema meta contains "nothing".
-            // Side note 2: whether the data will be written to the item's NBT is decided by the realization process, not here.
+        // read all item behaviors
+        val behaviorMap = ItemBehaviorMap.build {
 
-            ItemMetaRegistry.Schema.reflections()
-                .associate { reflect ->
-                    reflect.clazz to reflect.path
-                }
-                .forEach { (clazz, path) ->
-                    val javaClass = clazz.java
-                    val itemMeta = root.node(path).krequire(clazz)
-                    put(javaClass, itemMeta)
-                }
-        }.build()
+            fun <T : ItemBehavior> tryAdd(id: String, type: ItemBehaviorType<T>) {
+                // 如果 root 里存在指定 id 的节点, 则添加对应的 behavior
+                if (root.contains(id)) this.put(type, type.create())
+            }
 
-        val schemaCell = buildMap {
-            // loop through each cell node
-            root.node("cells").childrenMap()
-                .mapKeys { it.key.toString() }
-                .forEach { (id, childNode) ->
-                    // inject required hints
-                    childNode.hint(ITEM_ROOT_NODE_HINT, root)
-                    // deserialize the cell node
-                    val cell = childNode.krequire<SchemaCell>()
-                    // add it to the result map
-                    this += (id to cell)
-                }
+            tryAdd("attributable", ItemBehaviorTypes.ATTRIBUTABLE)
+            tryAdd("castable", ItemBehaviorTypes.CASTABLE)
+            tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
+            tryAdd("damageable", ItemBehaviorTypes.DAMAGEABLE)
+            tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
+            tryAdd("food", ItemBehaviorTypes.FOOD)
+            tryAdd("kizamiable", ItemBehaviorTypes.KIZAMIABLE)
+            tryAdd("tool", ItemBehaviorTypes.TOOL)
+            tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
+            tryAdd("wearable", ItemBehaviorTypes.WEARABLE)
+        }
+
+        // read all item templates (of item components)
+        val templateMap = ItemTemplateMap.build {
+
+            fun <T : ItemTemplate<*>> tryAdd(id: String, type: ItemTemplateType<T>) {
+                val node = root.node(id)
+                val template = node.get(type.typeToken) ?: return
+                this.put(type, template)
+            }
+
+            tryAdd("arrow", ItemTemplateTypes.ARROW)
+            tryAdd("attributable", ItemTemplateTypes.ATTRIBUTABLE)
+            tryAdd("castable", ItemTemplateTypes.CASTABLE)
+            tryAdd("castable", ItemTemplateTypes.CRATE)
+            tryAdd("custom_name", ItemTemplateTypes.CUSTOM_NAME)
+            tryAdd("damageable", ItemTemplateTypes.DAMAGEABLE)
+            tryAdd("lore", ItemTemplateTypes.LORE)
+            tryAdd("fire_resistant", ItemTemplateTypes.FIRE_RESISTANT)
+            tryAdd("food", ItemTemplateTypes.FOOD)
+            tryAdd("cells", ItemTemplateTypes.CELLS)
+            tryAdd("elements", ItemTemplateTypes.ELEMENTS)
+            tryAdd("kizamiz", ItemTemplateTypes.KIZAMIZ)
+            tryAdd("level", ItemTemplateTypes.LEVEL)
+            tryAdd("item_name", ItemTemplateTypes.ITEM_NAME)
+            tryAdd("rarity", ItemTemplateTypes.RARITY)
+            // tryAdd("skin", ItemTemplateTypes.SKIN)
+            // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER)
+            tryAdd("kizamiable", ItemTemplateTypes.KIZAMIABLE)
+            tryAdd("skillful", ItemTemplateTypes.SKILLFUL)
+            tryAdd("tool", ItemTemplateTypes.TOOL)
+            tryAdd("unbreakable", ItemTemplateTypes.UNBREAKABLE)
         }
 
         return NekoItemImpl(
@@ -80,6 +103,9 @@ object NekoItemFactory {
             hideAdditionalTooltip = hideAdditionalTooltip,
             shownInTooltip = shownInTooltip,
             slot = slot,
+            removeComponents = removeComponents,
+            templates = templateMap,
+            behaviors = behaviorMap
         )
     }
 }

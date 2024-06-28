@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.ListShadowTag
 import cc.mewcraft.wakame.util.javaTypeOf
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.StringShadowTag
 import net.kyori.adventure.key.Key
@@ -122,6 +124,8 @@ interface FoodProperties : Examinable {
         }
 
         companion object : ItemTemplateType<Template> {
+            override val typeToken: TypeToken<Template> = typeTokenOf()
+
             /**
              * ## Node structure
              * ```yaml

@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
+import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemover
 import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -71,6 +72,11 @@ interface NekoItem : Keyed {
      * The inventory slot where this item can take effect.
      */
     val slot: ItemSlot
+
+    /**
+     * 需要移除的原版物品组件.
+     */
+    val removeComponents: VanillaComponentRemover
 
     /**
      * 物品组件的模板.

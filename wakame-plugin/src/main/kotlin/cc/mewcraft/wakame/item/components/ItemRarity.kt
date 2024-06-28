@@ -17,6 +17,8 @@ import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.getByteOrNull
 import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
@@ -102,6 +104,8 @@ interface ItemRarity : Examinable, TooltipProvider {
         companion object : ItemTemplateType<Template> {
             private const val MAPPING_PREFIX = "mapping:"
             private const val RARITY_PREFIX = "rarity:"
+
+            override val typeToken: TypeToken<Template> = typeTokenOf()
 
             /**
              * ## Node structure 1

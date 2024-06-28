@@ -13,6 +13,8 @@ import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.getListOrNull
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import me.lucko.helper.nbt.ShadowTagType
 import me.lucko.helper.shadows.nbt.ListShadowTag
@@ -91,6 +93,8 @@ interface ExtraLore : Examinable, TooltipProvider {
         }
 
         companion object : ItemTemplateType<Template> {
+            override val typeToken: TypeToken<Template> = typeTokenOf()
+
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 return Template(node.getList<String>(emptyList()))
             }

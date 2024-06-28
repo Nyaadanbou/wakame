@@ -58,10 +58,10 @@ val ItemStack.toNekoStack: NekoStack
             "The ItemStack is not an NMS object"
         }
         require(this.isNeko) {
-            "The itemStack is not from wakame"
+            "The ItemStack is not from wakame"
         }
-        require(NekoStackImplementations.isSystemUse(this.wakameTag)) {
-            "The ItemStack is not a play NekoStack"
+        require(!NekoStackImplementations.isSystemUse(this.wakameTag)) {
+            "The ItemStack is not to be used by players"
         }
         return NekoStackImpl(this)
     }

@@ -16,6 +16,8 @@ import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.editMeta
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableInt
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -89,8 +91,8 @@ interface Damageable : Examinable, TooltipProvider {
          * 当物品的当前损耗值大于最大损耗值时, 物品是否消失?
          */
         val disappearWhenBroken: Boolean,
-    ) : ItemTemplate<Value> {
-        override fun generate(context: GenerationContext): GenerationResult<Value> {
+    ) : ItemTemplate<Damageable> {
+        override fun generate(context: GenerationContext): GenerationResult<Damageable> {
             val damage = this.damage.calculate().toStableInt()
             val maxDamage = this.maxDamage.calculate().toStableInt()
             if (damage >= maxDamage) {
@@ -100,6 +102,8 @@ interface Damageable : Examinable, TooltipProvider {
         }
 
         companion object : ItemTemplateType<Template> {
+            override val typeToken: TypeToken<Template> = typeTokenOf()
+
             /**
              * ## Node structure
              * ```yaml

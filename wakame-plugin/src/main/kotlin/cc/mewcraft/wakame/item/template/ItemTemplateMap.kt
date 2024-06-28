@@ -41,8 +41,9 @@ import org.bukkit.inventory.ItemStack
  */
 interface ItemTemplateMap {
 
-    fun <T2, T1 : ItemTemplateType<T2>> get(type: T1): T2
-    fun <T2, T1 : ItemTemplateType<T2>> has(type: T1): Boolean
+    fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T?
+
+    fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean
 
     // 开发日记 2024/6/26
     // 模板的应用讲究顺序, 而顺序是由储存在模板内部的数据结构决定的.
@@ -50,4 +51,64 @@ interface ItemTemplateMap {
      * 将模板全部应用到物品上.
      */
     fun applyTo(item: ItemStack)
+
+    companion object {
+        /**
+         * 返回一个空的 [ItemTemplateMap]. 应用该对象到物品上不会产生任何效果.
+         */
+        fun empty(): ItemTemplateMap {
+            return EmptyMap
+        }
+
+        /**
+         * 构建一个 [ItemTemplateMap].
+         */
+        fun build(block: Builder.() -> Unit): ItemTemplateMap {
+            return BuilderImpl().apply(block).build()
+        }
+    }
+
+    /**
+     * [ItemTemplate] 的 builder, 用于构建 [ItemTemplateMap].
+     */
+    interface Builder {
+        /**
+         * 添加一个 [ItemTemplate]. 已存在的 [type] 会被覆盖.
+         */
+        fun <T : ItemTemplate<*>> put(type: ItemTemplateType<T>, template: T)
+
+        /**
+         * 构建.
+         */
+        fun build(): ItemTemplateMap
+    }
+
+    private object EmptyMap : ItemTemplateMap {
+        override fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T? = null
+        override fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean = false
+        override fun applyTo(item: ItemStack) = Unit
+    }
+
+    private class MapImpl : ItemTemplateMap {
+        override fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T? {
+            TODO("Not yet implemented")
+        }
+
+        override fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override fun applyTo(item: ItemStack) {
+            TODO("Not yet implemented")
+        }
+    }
+
+    private class BuilderImpl : ItemTemplateMap.Builder {
+        override fun <T : ItemTemplate<*>> put(type: ItemTemplateType<T>, template: T) {
+            TODO("Not yet implemented")
+        }
+        override fun build(): ItemTemplateMap {
+            TODO("Not yet implemented")
+        }
+    }
 }

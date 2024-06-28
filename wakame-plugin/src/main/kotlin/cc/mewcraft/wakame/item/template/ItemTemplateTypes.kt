@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.item.components.ItemName
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.ItemTracks
 import cc.mewcraft.wakame.item.components.Kizamiable
+import cc.mewcraft.wakame.item.components.Skillful
 import cc.mewcraft.wakame.item.components.Tool
 import cc.mewcraft.wakame.item.components.Unbreakable
 
@@ -100,6 +101,11 @@ object ItemTemplateTypes {
      * 组件: [ItemRarity]
      */
     val RARITY: ItemTemplateType<ItemRarity.Template> = ItemRarity.Template
+
+    /**
+     * 组件: [Skillful]
+     */
+    val SKILLFUL: ItemTemplateType<Skillful.Template> = Skillful.Template
 
     /**
      * 组件: [Tool]

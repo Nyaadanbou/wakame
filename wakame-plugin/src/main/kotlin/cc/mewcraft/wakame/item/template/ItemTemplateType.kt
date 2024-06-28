@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.template
 
+import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.TypeSerializer
@@ -16,6 +17,11 @@ import java.lang.reflect.Type
  * - 作为 [ItemTemplateMap] 的索引
  */
 interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T> {
+    /**
+     * The [TypeToken] of [T].
+     */
+    val typeToken: TypeToken<T> // generic sucks :x
+
     override fun deserialize(type: Type, node: ConfigurationNode): T
 
     override fun serialize(type: Type, obj: T?, node: ConfigurationNode): Nothing {

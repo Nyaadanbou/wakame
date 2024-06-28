@@ -13,6 +13,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableByte
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -102,6 +104,8 @@ interface Arrow : Examinable, TooltipProvider {
         }
 
         companion object : ItemTemplateType<Template> {
+            override val typeToken: TypeToken<Template> = typeTokenOf()
+
             /**
              * ## Node structure
              * ```yaml

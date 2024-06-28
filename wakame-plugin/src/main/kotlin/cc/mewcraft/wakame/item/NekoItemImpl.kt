@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
+import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemover
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -19,6 +20,7 @@ internal class NekoItemImpl(
     override val hideAdditionalTooltip: Boolean,
     override val shownInTooltip: ShownInTooltipApplicator,
     override val slot: ItemSlot,
+    override val removeComponents: VanillaComponentRemover,
     override val templates: ItemTemplateMap,
     override val behaviors: ItemBehaviorMap,
 ) : Examinable, NekoItem {

@@ -7,6 +7,8 @@ import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemFlag
 import org.spongepowered.configurate.ConfigurationNode
@@ -60,12 +62,14 @@ interface Unbreakable : Examinable, TooltipProvider {
 
     data class Template(
         val showInTooltip: Boolean,
-    ) : ItemTemplate<Value> {
-        override fun generate(context: GenerationContext): GenerationResult<Value> {
+    ) : ItemTemplate<Unbreakable> {
+        override fun generate(context: GenerationContext): GenerationResult<Unbreakable> {
             return GenerationResult.of(Value(showInTooltip))
         }
 
         companion object : ItemTemplateType<Template> {
+            override val typeToken: TypeToken<Template> = typeTokenOf()
+
             /**
              * ## Node structure
              * ```yaml
