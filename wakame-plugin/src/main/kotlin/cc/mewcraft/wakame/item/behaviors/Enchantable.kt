@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorFactory
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 
 /**
  * 物品附魔的逻辑.
@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorFactory
 interface Enchantable : ItemBehavior {
     private object Default : Enchantable
 
-    companion object : ItemBehaviorFactory<Enchantable> {
+    companion object Type : ItemBehaviorType<Enchantable> {
         override fun create(): Enchantable {
             return Default
         }

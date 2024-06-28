@@ -1,10 +1,13 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.entity.EntityKeyLookup
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorFactory
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.ItemTracks
 import cc.mewcraft.wakame.item.toNekoStack
-import cc.mewcraft.wakame.registry.ElementRegistry
+import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -18,24 +21,22 @@ import org.koin.core.component.inject
  */
 interface Trackable : ItemBehavior {
     private object Default : Trackable, KoinComponent {
-        private val lookup: EntityKeyLookup by inject()
+        private val entityKeyLookup: EntityKeyLookup by inject()
 
         override fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) {
-            // TODO: 这个只是一个 POC，要判断一个生物是否被一个物品击杀需要考虑很多情况（比如法杖的间接伤害统计）
-            if (attacked !is LivingEntity) return
-            val key = lookup.get(attacked)
-            val nekoStack = itemStack.toNekoStack
-
-            val statistics = nekoStack.statistics
-            val finalDamage = event.finalDamage
-            if (attacked.health - finalDamage <= 0.0) {
-                statistics.ENTITY_KILLS[key] += 1
+            if (attacked !is LivingEntity) {
+                return
             }
-            statistics.PEAK_DAMAGE[ElementRegistry.DEFAULT] = maxOf(statistics.PEAK_DAMAGE[ElementRegistry.DEFAULT], finalDamage.toInt())
+
+            val key: Key = entityKeyLookup.get(attacked)
+            val stack: NekoStack = itemStack.toNekoStack
+            val tracks: ItemTracks = stack.components.get(ItemComponentTypes.TRACKS) ?: return
+
+            //
         }
     }
 
-    companion object Factory : ItemBehaviorFactory<Trackable> {
+    companion object Type : ItemBehaviorType<Trackable> {
         override fun create(): Trackable {
             return Default
         }

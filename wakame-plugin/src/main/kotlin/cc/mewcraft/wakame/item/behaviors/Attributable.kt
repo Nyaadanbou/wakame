@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorFactory
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 
 /**
  * 物品提供属性加成的逻辑.
@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorFactory
 interface Attributable : ItemBehavior {
     private object Default : Attributable
 
-    companion object : ItemBehaviorFactory<Attributable> {
+    companion object Type : ItemBehaviorType<Attributable> {
         override fun create(): Attributable {
             return Default
         }

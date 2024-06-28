@@ -67,7 +67,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleSkillPrepareCast(caster: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) = Unit
 }
 
-interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
+interface ItemBehaviorType<T : ItemBehavior> : ItemBehaviorHolder {
     /**
      * Creates a [ItemBehavior].
      *

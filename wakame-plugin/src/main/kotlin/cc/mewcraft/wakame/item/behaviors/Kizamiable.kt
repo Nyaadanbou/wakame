@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorFactory
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 
 /**
  * 物品提供铭刻加成的逻辑.
@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorFactory
 interface Kizamiable : ItemBehavior {
     private object Default : Kizamiable
 
-    companion object Factory : ItemBehaviorFactory<Kizamiable> {
+    companion object Type : ItemBehaviorType<Kizamiable> {
         override fun create(): Kizamiable {
             return Default
         }

@@ -1,17 +1,17 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorFactory
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 
 /**
  * 物品进行充能的逻辑.
  */
 interface Chargeable : ItemBehavior {
-    private class Default : Chargeable
+    private object Default : Chargeable
 
-    companion object : ItemBehaviorFactory<Chargeable> {
+    companion object Type : ItemBehaviorType<Chargeable> {
         override fun create(): Chargeable {
-            return Default()
+            return Default
         }
     }
 }

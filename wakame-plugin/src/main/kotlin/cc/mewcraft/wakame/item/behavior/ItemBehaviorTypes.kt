@@ -12,14 +12,14 @@ import cc.mewcraft.wakame.item.behaviors.Trackable
 import cc.mewcraft.wakame.item.behaviors.Wearable
 
 object ItemBehaviorTypes {
-    val ATTRIBUTABLE: Attributable = Attributable.create()
-    val CASTABLE: Castable = Castable.create()
-    val CHARGEABLE: Chargeable = Chargeable.create()
-    val DAMAGEABLE: Damageable = Damageable.create()
-    val ENCHANTABLE: Enchantable = Enchantable.create()
-    val FOOD: Food = Food.create()
-    val KIZAMIABLE: Kizamiable = Kizamiable.create()
-    val TOOL: Tool = Tool.create()
-    val TRACKABLE: Trackable = Trackable.create()
-    val WEARABLE: Wearable = Wearable.create()
+    val ATTRIBUTABLE: ItemBehaviorType<Attributable> = Attributable
+    val CASTABLE: ItemBehaviorType<Castable> = Castable
+    val CHARGEABLE: ItemBehaviorType<Chargeable> = Chargeable
+    val DAMAGEABLE: ItemBehaviorType<Damageable> = Damageable
+    val ENCHANTABLE: ItemBehaviorType<Enchantable> = Enchantable
+    val FOOD: ItemBehaviorType<Food> = Food
+    val KIZAMIABLE: ItemBehaviorType<Kizamiable> = Kizamiable
+    val TOOL: ItemBehaviorType<Tool> = Tool
+    val TRACKABLE: ItemBehaviorType<Trackable> = Trackable
+    val WEARABLE: ItemBehaviorType<Wearable> = Wearable
 }
