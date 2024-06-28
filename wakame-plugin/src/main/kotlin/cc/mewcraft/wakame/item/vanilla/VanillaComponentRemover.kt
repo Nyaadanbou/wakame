@@ -15,7 +15,7 @@ interface VanillaComponentRemover {
     /**
      * 从指定的物品上移除既定的组件.
      */
-    fun applyToItem(item: ItemStack)
+    fun applyTo(item: ItemStack)
 
     companion object {
         /**
@@ -25,7 +25,7 @@ interface VanillaComponentRemover {
     }
 
     private object Empty : VanillaComponentRemover {
-        override fun applyToItem(item: ItemStack) = Unit
+        override fun applyTo(item: ItemStack) = Unit
     }
 }
 
@@ -47,7 +47,7 @@ internal object VanillaComponentRemoverSerializer : TypeDeserializer<VanillaComp
  * 一个空的实现. 该实现不会对物品进行任何操作.
  */
 private object EmptyVanillaComponentRemover : VanillaComponentRemover {
-    override fun applyToItem(item: ItemStack) = Unit
+    override fun applyTo(item: ItemStack) = Unit
 }
 
 /**
@@ -62,7 +62,7 @@ private class NaiveVanillaComponentRemover(
         }
     }
 
-    override fun applyToItem(item: ItemStack) {
+    override fun applyTo(item: ItemStack) {
         item.editMeta(::applyToMeta)
     }
 
