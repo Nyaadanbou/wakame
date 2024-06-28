@@ -65,7 +65,7 @@ interface ItemRarity : Examinable, TooltipProvider {
         }
 
         private companion object {
-            const val TAG_VALUE = "value"
+            const val TAG_VALUE = "raw"
         }
     }
 

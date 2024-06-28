@@ -167,31 +167,25 @@ Compound('wakame')
         
         // 自定义名字
         Compound('custom_name')
-            String('value'): '<JSON text>' // 这种只有一个值的组件, 统统把键写成 'value'
-
-        // 耐久度
-        Compound('damageable')
-            List('(String) repair_items')
-                String(): 'minecraft:iron_ingot'
-                String(): 'wakame:material/scraps'
+            String('raw'): '<aqua>The original "displayName"'
 
         // 物品元素
         Compound('elements')
-            ByteArray('value'): [1b, 2b]
+            ByteArray('raw'): [1b, 2b]
 
         // 食物
         Compound('food')
             List('(String) skills')
-                String(): 'skill key 1'
-                String(): 'skill key 2'
+                String(): 'melee:demo'
+                String(): 'ranged:demo'
 
         // 物品名字
         Compound('item_name')
-            String('value'): '<JSON text>'
+            String('raw'): '<aqua>The name that can't be changed by anvils' 
 
         // 物品铭刻
         Compound('kizamiz')
-            ByteArray('value'): [0b, 3b]
+            ByteArray('raw'): [0b, 3b]
 
         // 提供铭刻加成?
         Compound('kizamiable')
@@ -199,29 +193,29 @@ Compound('wakame')
 
         // 物品等级
         Compound('level')
-            Byte('value'): 12b
+            Byte('raw'): 12b
 
         // 描述
         Compound('lore')
-            List('(String) value')
-                String(): '<JSON text>'
-                String(): '<JSON text>'
-                String(): '<JSON text>'
+            List('(String) raw')
+                String(): '<red>This is the red first line'
+                String(): '<green>This is the green second line'
+                String(): '<blue>This is the blue third line'
 
         // 物品稀有度
         Compound('rarity')
-            Byte('value'): 0b
+            Byte('raw'): 0b
 
         // 提供技能加成?
         Compound('skillful')
         
         // 物品皮肤
         Compound('skin')
-            Short('value'): 35s
+            Short('raw'): 35s
 
         // 物品皮肤所有者
         Compound('skin_owner')
-            IntArray('value'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
+            IntArray('raw'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
 
         // 物品统计数据
         Compound('stats')
@@ -243,4 +237,7 @@ Compound('wakame')
             Compound('reforge')
                 Byte('count'): 38b // 重铸总次数
                 Short('cost'): 32767s // 重铸总花费
+         
+        // 作为系统物品
+        Compound('system_use')
 ```

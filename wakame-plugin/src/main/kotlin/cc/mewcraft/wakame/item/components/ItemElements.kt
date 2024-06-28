@@ -55,14 +55,14 @@ interface ItemElements : Examinable, TooltipProvider {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
         override fun read(holder: ItemComponentHolder.NBT): ItemElements? {
-            val elementSet = holder.tag.getByteArrayOrNull(TAG_ELEMENTS)?.mapTo(ObjectArraySet(2), ElementRegistry::getBy) ?: return null
+            val elementSet = holder.tag.getByteArrayOrNull(TAG_VALUE)?.mapTo(ObjectArraySet(2), ElementRegistry::getBy) ?: return null
             return Value(elements = elementSet)
         }
 
         override fun write(holder: ItemComponentHolder.NBT, value: ItemElements) {
             require(value.elements.isNotEmpty()) { "The set of elements must not be empty" }
             val byteArray = value.elements.mapToByteArray(Element::binaryId)
-            holder.tag.putByteArray(TAG_ELEMENTS, byteArray)
+            holder.tag.putByteArray(TAG_VALUE, byteArray)
         }
 
         override fun remove(holder: ItemComponentHolder.NBT) {
@@ -70,7 +70,7 @@ interface ItemElements : Examinable, TooltipProvider {
         }
 
         private companion object {
-            const val TAG_ELEMENTS = "elements"
+            const val TAG_VALUE = "raw"
         }
     }
 
