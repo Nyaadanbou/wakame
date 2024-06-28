@@ -103,6 +103,17 @@ interface ItemRarity : Examinable, TooltipProvider {
             private const val MAPPING_PREFIX = "mapping:"
             private const val RARITY_PREFIX = "rarity:"
 
+            /**
+             * ## Node structure 1
+             * ```yaml
+             * <node>: "mapping:_"
+             * ```
+             *
+             * ## Node structure 2
+             * ```yaml
+             * <node>: "rarity:_"
+             * ```
+             */
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 val string = node.krequire<String>()
                 return when {

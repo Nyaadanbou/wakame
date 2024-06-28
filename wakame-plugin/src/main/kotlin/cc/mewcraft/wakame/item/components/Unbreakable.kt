@@ -69,7 +69,7 @@ interface Unbreakable : Examinable, TooltipProvider {
             /**
              * ## Node structure
              * ```yaml
-             * <root>:
+             * <node>:
              *   show_in_tooltip: <boolean>
              * ```
              */

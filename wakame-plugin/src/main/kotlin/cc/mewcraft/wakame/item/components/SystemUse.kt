@@ -12,7 +12,7 @@ interface SystemUse : Examinable {
     // 它既不需要一个特定的 Value, 因为它只有存在与否;
     // 它也不需要一个特定的 Template, 因为配置文件暂时没有用处.
 
-    class Codec(
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<Unit, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT

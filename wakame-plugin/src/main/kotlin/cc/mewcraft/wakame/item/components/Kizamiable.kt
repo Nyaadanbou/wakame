@@ -29,20 +29,26 @@ interface Kizamiable : Examinable, TooltipProvider {
         }
     }
 
-    class Codec(
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<Kizamiable, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-        override fun read(holder: ItemComponentHolder.NBT): Kizamiable = Kizamiable
+        override fun read(holder: ItemComponentHolder.NBT): Kizamiable = Value
         override fun write(holder: ItemComponentHolder.NBT, value: Kizamiable) = Unit
         override fun remove(holder: ItemComponentHolder.NBT) = Unit
     }
 
-    object Template : ItemTemplate<Kizamiable>, ItemTemplateType<Template> {
+    data object Template : ItemTemplate<Kizamiable>, ItemTemplateType<Template> {
         override fun generate(context: GenerationContext): GenerationResult<Kizamiable> {
-            return GenerationResult.of(Kizamiable)
+            return GenerationResult.of(Value)
         }
 
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>: {}
+         * ```
+         */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return this
         }

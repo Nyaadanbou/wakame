@@ -33,7 +33,7 @@ interface Castable : Examinable, TooltipProvider {
         override val id: String,
     ) : ItemComponentType<Castable, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-        override fun read(holder: ItemComponentHolder.NBT): Castable = Castable
+        override fun read(holder: ItemComponentHolder.NBT): Castable = Value
         override fun write(holder: ItemComponentHolder.NBT, value: Castable) = Unit
         override fun remove(holder: ItemComponentHolder.NBT) = Unit
     }
@@ -43,6 +43,12 @@ interface Castable : Examinable, TooltipProvider {
             return GenerationResult.of(Value)
         }
 
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>: {}
+         * ```
+         */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return this
         }

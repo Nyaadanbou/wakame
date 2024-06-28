@@ -88,7 +88,7 @@ interface Tool : Examinable {
             /**
              * ## Node structure
              * ```yaml
-             * <root>:
+             * <node>:
              *   default_mining_speed: 4.0
              *   damage_per_block: 1
              *   rules:

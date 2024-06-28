@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -20,6 +21,10 @@ interface ItemCells : Examinable, TooltipProvider {
     // TODO 2024/6/25
     //  ItemCells 需要返回多个 LoreLine
     /* data */ class Value : ItemCells {
+        override fun provideDisplayLore(): LoreLine {
+            return LoreLine.noop()
+        }
+
         private companion object : ItemComponentConfig(ItemComponentConstants.CELLS) {
 
         }

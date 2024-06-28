@@ -67,6 +67,9 @@ interface Crate : Examinable, TooltipProvider {
     }
 
     data class Template(
+        /**
+         * 盲盒的唯一标识.
+         */
         val key: Key,
     ) : ItemTemplate<Crate> {
         override fun generate(context: GenerationContext): GenerationResult<Crate> {

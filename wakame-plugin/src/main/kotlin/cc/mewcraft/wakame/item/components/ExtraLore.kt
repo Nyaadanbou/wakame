@@ -30,8 +30,6 @@ interface ExtraLore : Examinable, TooltipProvider {
      */
     val lore: List<String>
 
-    // 开发日记 2024/6/27 小米
-    //
     data class Value(
         override val lore: List<String>,
     ) : ExtraLore {
@@ -53,20 +51,20 @@ interface ExtraLore : Examinable, TooltipProvider {
         }
     }
 
-    class Codec(
+    data class Codec(
         override val id: String,
     ) : ItemComponentType<ExtraLore, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
         override fun read(holder: ItemComponentHolder.NBT): ExtraLore? {
-            val raw: List<String> = holder.tag.getListOrNull(TAG_VALUE, ShadowTagType.STRING)?.map { (it as StringShadowTag).value() } ?: return null
-            return Value(raw)
+            val stringList = holder.tag.getListOrNull(TAG_VALUE, ShadowTagType.STRING)?.map { (it as StringShadowTag).value() } ?: return null
+            return Value(stringList)
         }
 
         override fun write(holder: ItemComponentHolder.NBT, value: ExtraLore) {
-            val strings: List<StringShadowTag> = value.lore.map(StringShadowTag::valueOf)
-            val list: ListShadowTag = ListShadowTag.create(strings, ShadowTagType.STRING)
-            holder.tag.put(TAG_VALUE, list)
+            val stringTagList = value.lore.map(StringShadowTag::valueOf)
+            val stringListTag = ListShadowTag.create(stringTagList, ShadowTagType.STRING)
+            holder.tag.put(TAG_VALUE, stringListTag)
         }
 
         override fun remove(holder: ItemComponentHolder.NBT) {
@@ -84,7 +82,7 @@ interface ExtraLore : Examinable, TooltipProvider {
     // 数据可以是 Component?
     data class Template(
         /**
-         * The item lore in the format of MiniMessage string.
+         * A list of MiniMessage strings.
          */
         val lore: List<String>,
     ) : ItemTemplate<ExtraLore> {

@@ -33,16 +33,22 @@ interface Skillful : Examinable, TooltipProvider {
         override val id: String,
     ) : ItemComponentType<Skillful, ItemComponentHolder.NBT> {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-        override fun read(holder: ItemComponentHolder.NBT): Skillful = Skillful
+        override fun read(holder: ItemComponentHolder.NBT): Skillful = Value
         override fun write(holder: ItemComponentHolder.NBT, value: Skillful) = Unit
         override fun remove(holder: ItemComponentHolder.NBT) = Unit
     }
 
     data object Template : ItemTemplate<Skillful>, ItemTemplateType<Template> {
         override fun generate(context: GenerationContext): GenerationResult<Skillful> {
-            return GenerationResult.of(Skillful)
+            return GenerationResult.of(Value)
         }
 
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>: {}
+         * ```
+         */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return this
         }

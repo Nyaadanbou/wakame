@@ -110,17 +110,21 @@ interface ItemLevel : Examinable, TooltipProvider {
 
         companion object : ItemTemplateType<Template> {
             /**
-             * ## Node structure
+             * ## Node structure 1
              * ```yaml
-             * <root>:
+             * <node>: <int>
+             * ```
              *
+             * ## Node structure 2
+             * ```yaml
+             * <node>: <enum>
              * ```
              */
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 return when (val scalar = node.rawScalar()) {
                     is Number -> Template(scalar)
                     is String -> Template(EnumLookup.lookup<Option>(scalar).getOrThrow())
-                    else -> throw SerializationException("Invalid value type for ${this::class.simpleName}")
+                    else -> throw SerializationException(node, type, "Invalid value type")
                 }
             }
         }

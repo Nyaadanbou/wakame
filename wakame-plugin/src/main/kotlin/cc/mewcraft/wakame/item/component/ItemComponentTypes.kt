@@ -12,9 +12,11 @@ import cc.mewcraft.wakame.item.components.ExtraLore
 import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemCells
+import cc.mewcraft.wakame.item.components.ItemDamage
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemKizamiz
 import cc.mewcraft.wakame.item.components.ItemLevel
+import cc.mewcraft.wakame.item.components.ItemMaxDamage
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.item.components.ItemSkinOwner
@@ -72,7 +74,7 @@ object ItemComponentTypes {
     /**
      * 物品已经损失的耐久.
      */
-    val DAMAGE: ItemComponentType<Int, ItemComponentHolder.Item> = dummy(ItemComponentConstants.DAMAGE)
+    val DAMAGE: ItemComponentType<Int, ItemComponentHolder.Item> = ItemDamage.Codec(ItemComponentConstants.DAMAGE)
 
     /**
      * 物品组件 [DAMAGE], [MAX_DAMAGE], [UNBREAKABLE] 的整合.
@@ -130,7 +132,7 @@ object ItemComponentTypes {
     /**
      * 物品最大可损失的耐久.
      */
-    val MAX_DAMAGE: ItemComponentType<Int, ItemComponentHolder.Item> = dummy(ItemComponentConstants.MAX_DAMAGE)
+    val MAX_DAMAGE: ItemComponentType<Int, ItemComponentHolder.Item> = ItemMaxDamage.Codec(ItemComponentConstants.MAX_DAMAGE)
 
     /**
      * 物品的稀有度.

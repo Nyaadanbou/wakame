@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.template
 
+import net.kyori.examination.Examinable
+
 // 开发日记:
 // wakame 物品组件其实是个大杂烩,
 // 不仅包括了 wakame 自己添加的物品组件,
@@ -13,7 +15,7 @@ package cc.mewcraft.wakame.item.template
  *
  * @param T 组件快照的类型
  */
-interface ItemTemplate<T> {
+interface ItemTemplate<T> : Examinable {
 
     // FIXME ItemComponentTemplate 也需要区分 Valued/NonValued 吗?
 

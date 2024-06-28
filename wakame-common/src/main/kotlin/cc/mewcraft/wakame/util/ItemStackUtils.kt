@@ -9,6 +9,6 @@ fun ItemStack.takeUnlessEmpty(): ItemStack? =
 fun ItemStack?.isEmpty(): Boolean =
     this == null || type.isAir || amount <= 0
 
-inline fun <reified T : ItemMeta> ItemStack.editMeta(crossinline block: T.() -> Unit) {
+inline fun <reified T : ItemMeta> ItemStack.editMeta(crossinline block: (T) -> Unit) {
     this.editMeta(T::class.java) { block(it) }
 }

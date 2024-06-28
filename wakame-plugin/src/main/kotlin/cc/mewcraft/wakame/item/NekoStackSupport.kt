@@ -101,18 +101,21 @@ internal val ItemStack.toSystemStack: NekoStack
  * before it's added to the world state so that it becomes a legal NekoItem.
  * Otherwise, undefined behaviors can occur.
  */
-internal fun Material.createNekoStack(): NekoStack {
+internal fun Material.createBlankNekoStack(): NekoStack {
     return NekoStackImpl(this)
 }
 
+@Contract(pure = true)
 internal fun NekoStack.isSystemUse(): Boolean {
     return components.has(ItemComponentTypes.SYSTEM_USE)
 }
 
+@Contract(pure = false)
 internal fun NekoStack.setSystemUse() {
     components.set(ItemComponentTypes.SYSTEM_USE, Unit)
 }
 
+@Contract(pure = false)
 internal fun NekoStack.unsetSystemUse() {
     this.handle.backingItemName = null
     this.handle.backingCustomName = null
@@ -123,10 +126,10 @@ internal fun NekoStack.unsetSystemUse() {
 }
 
 @Contract(pure = true)
-internal fun NekoStack.copyToSystemUse(): NekoStack {
-    if (this.isSystemUse()) {
-        return this
-    }
+internal fun NekoStack.copyAsSystemUse(): NekoStack {
+    // if (this.isSystemUse()) {
+    //     return this
+    // }
 
     val clone: NekoStack = NekoStackImpl(this.handle.clone())
     clone.setSystemUse()
@@ -134,10 +137,10 @@ internal fun NekoStack.copyToSystemUse(): NekoStack {
 }
 
 @Contract(pure = true)
-internal fun NekoStack.copyToNonSystemUse(): NekoStack {
-    if (!this.isSystemUse()) {
-        return this
-    }
+internal fun NekoStack.copyAsNonSystemUse(): NekoStack {
+    // if (!this.isSystemUse()) {
+    //     return this
+    // }
 
     val clone: NekoStack = NekoStackImpl(this.handle.clone())
     clone.unsetSystemUse()

@@ -38,7 +38,7 @@ interface FireResistant : Examinable, TooltipProvider {
             if (!holder.item.itemMeta.isFireResistant) {
                 return null
             }
-            return FireResistant
+            return Value
         }
 
         override fun write(holder: ItemComponentHolder.Item, value: FireResistant) {
@@ -52,9 +52,15 @@ interface FireResistant : Examinable, TooltipProvider {
 
     data object Template : ItemTemplate<FireResistant>, ItemTemplateType<Template> {
         override fun generate(context: GenerationContext): GenerationResult<FireResistant> {
-            return GenerationResult.of(FireResistant)
+            return GenerationResult.of(Value)
         }
 
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>: {}
+         * ```
+         */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return this
         }
