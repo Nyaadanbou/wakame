@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemKizamiz
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemMaxDamage
+import cc.mewcraft.wakame.item.components.ItemName
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.item.components.ItemSkinOwner
@@ -27,7 +28,6 @@ import cc.mewcraft.wakame.item.components.SystemUse
 import cc.mewcraft.wakame.item.components.Tool
 import cc.mewcraft.wakame.item.components.Unbreakable
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
-import net.kyori.adventure.text.Component
 
 object ItemComponentTypes {
     /**
@@ -69,7 +69,7 @@ object ItemComponentTypes {
      * 自定义名字. 对应原版组件: [`minecraft:custom_name`](https://minecraft.wiki/w/Data_component_format#custom_name)
      */
     // POC
-    val CUSTOM_NAME: ItemComponentType<Component, ItemComponentHolder.Item> = CustomName.Codec(ItemComponentConstants.CUSTOM_NAME).apply(::register)
+    val CUSTOM_NAME: ItemComponentType<CustomName, ItemComponentHolder.NBT> = CustomName.Codec(ItemComponentConstants.CUSTOM_NAME).apply(::register)
 
     /**
      * 物品已经损失的耐久.
@@ -101,9 +101,9 @@ object ItemComponentTypes {
     val FOOD: ItemComponentType<FoodProperties, ItemComponentHolder.Complex> = FoodProperties.Codec(ItemComponentConstants.FOOD).apply(::register)
 
     /**
-     * 物品的名字. 对应原版组件: [`minecraft:item_name`](https://minecraft.wiki/w/Data_component_format#item_name)
+     * 物品名字. 对应原版组件: [`minecraft:item_name`](https://minecraft.wiki/w/Data_component_format#item_name)
      */
-    val ITEM_NAME: ItemComponentType<Component, ItemComponentHolder.Item> = dummy(ItemComponentConstants.ITEM_NAME)
+    val ITEM_NAME: ItemComponentType<ItemName, ItemComponentHolder.NBT> = ItemName.Codec(ItemComponentConstants.ITEM_NAME)
 
     /**
      * 物品的铭刻.
