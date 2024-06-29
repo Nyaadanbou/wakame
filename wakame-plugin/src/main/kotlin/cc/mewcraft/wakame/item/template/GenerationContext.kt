@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.WatchedPrimitive
 import cc.mewcraft.wakame.util.WatchedReference
 import cc.mewcraft.wakame.util.WatchedSet
+import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
@@ -26,6 +27,11 @@ class GenerationContext(
      * 触发本次物品生成的对象.
      */
     val trigger: GenerationTrigger,
+
+    /**
+     * 本次生成的物品目标.
+     */
+    val itemKey: Key,
 
     /**
      * 随机数生成器的种子.
@@ -69,6 +75,7 @@ class GenerationContext(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
+            ExaminableProperty.of("itemKey", itemKey),
             ExaminableProperty.of("seed", seed),
             ExaminableProperty.of("trigger", trigger),
             ExaminableProperty.of("level", level),
