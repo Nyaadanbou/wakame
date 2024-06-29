@@ -83,6 +83,9 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             }
         }
 
+        /**
+         * 从零构建一个 [ItemComponentMap], 用于单元测试.
+         */
         fun builder(): Builder {
             return Builder()
         }
