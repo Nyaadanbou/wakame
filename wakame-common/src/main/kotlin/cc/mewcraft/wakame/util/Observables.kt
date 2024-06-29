@@ -9,10 +9,17 @@ class WatchedPrimitive<V>(
     initialValue: V,
     private val customPrefix: String? = null, // 允许手动指定日志前缀
 ) : ObservableProperty<V>(initialValue) {
-
     override fun afterChange(property: KProperty<*>, oldValue: V, newValue: V) {
-        val loggerPrefix = customPrefix ?: "[${property.javaField?.declaringClass?.simpleName ?: "Local"}]"
-        println("$loggerPrefix ${property.name}: $oldValue -> $newValue")
+        println("${customPrefix ?: "[${property.javaField?.declaringClass?.simpleName ?: "Local"}]"} ${property.name}: $oldValue -> $newValue")
+    }
+}
+
+class WatchedReference<V>(
+    initialValue: V,
+    private val customPrefix: String? = null, // 允许手动指定日志前缀
+) : ObservableProperty<V>(initialValue) {
+    override fun afterChange(property: KProperty<*>, oldValue: V, newValue: V) {
+        println("${customPrefix ?: "[${property.javaField?.declaringClass?.simpleName ?: "Local"}]"} ${property.name}: $oldValue -> $newValue")
     }
 }
 

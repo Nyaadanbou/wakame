@@ -22,7 +22,7 @@ data class FilterRarity(
      * Returns `true` if the [context] already has the [rarity] populated.
      */
     override fun testOriginal(context: GenerationContext): Boolean {
-        return rarity in context.rarities
+        return rarity == context.rarity
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

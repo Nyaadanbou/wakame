@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random2.SelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.WatchedPrimitive
+import cc.mewcraft.wakame.util.WatchedReference
 import cc.mewcraft.wakame.util.WatchedSet
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
@@ -39,7 +40,7 @@ class GenerationContext(
     /**
      * 已经生成的 [Rarity].
      */
-    val rarities: MutableCollection<Rarity> by WatchedSet(HashSet())
+    var rarity: Rarity? by WatchedReference(null)
 
     /**
      * 已经生成的 [Element].
@@ -71,7 +72,7 @@ class GenerationContext(
             ExaminableProperty.of("seed", seed),
             ExaminableProperty.of("trigger", trigger),
             ExaminableProperty.of("level", level),
-            ExaminableProperty.of("rarity", rarities),
+            ExaminableProperty.of("rarity", rarity),
             ExaminableProperty.of("elements", elements),
             ExaminableProperty.of("kizamiz", kizamiz),
             ExaminableProperty.of("curses", curses),
