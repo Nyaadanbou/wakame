@@ -73,16 +73,25 @@ assets:
 slot: MAIN_HAND
 
 # 物品名字
+#
 # When present, replaces default item name with contained chat component.
 # Differences from {@link #CUSTOM_NAME}:
 # - can't be changed or removed in Anvil
 # - is not styled with italics when displayed to player
 # - does not show labels where applicable
 #   (for example: banner markers, names in item frames)
-item_name: "<red>Item Name Demo"
+#
+# 额外标签:
+# <rarity:name> 稀有度名字
+# <rarity:style> 稀有度样式
+item_name: "<rarity:style><rarity:name> Item Name Demo"
 
 # 自定义名字
-custom_name: "<red>Custom Name Demo"
+#
+# 额外标签:
+# <rarity:name> 稀有度名字
+# <rarity:style> 稀有度样式
+custom_name: "<!i><rarity:style>Custom Name Demo"
 
 # 额外的描述
 lore:

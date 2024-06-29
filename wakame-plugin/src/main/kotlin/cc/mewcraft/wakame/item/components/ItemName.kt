@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentInjections
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
@@ -9,39 +10,79 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.Context
+import net.kyori.adventure.text.minimessage.tag.Tag
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-// TODO 完成组件: ItemName
-
 interface ItemName : Examinable {
 
+    /**
+     * 原始字符串, 格式为 MiniMessage.
+     *
+     * 这部分是直接存在 NBT 里的原始字符串.
+     */
     val raw: String
-    val cooked: Component
+
+    /**
+     * 原始字符串 [raw] 经解析之后的产生的 [Component].
+     *
+     * 这部分是直接存在原版物品组件 `minecraft:item_name` 上的.
+     * 因此, 如果之后有修改过该组件的值, 那么该文本可能与 [raw]
+     * 一开始生成出来的富文本有所差别.
+     */
+    val rich: Component
 
     /* data */ class Value(
         override val raw: String,
-        override val cooked: Component,
-    ) : ItemName
+        override val rich: Component,
+    ) : ItemName {
+        constructor(rich: Component) : this("", rich)
+    }
 
     data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemName> {
         override fun read(holder: ItemComponentHolder): ItemName? {
             val tag = holder.getTag() ?: return null
+
+            // 2024/6/29
+            // 设计上 custom_name 和 item_name 都不经过发包系统处理,
+            // 因此这里有什么就读取什么. 整体上做到简单, 一致, 无例外.
+
+            // 获取 raw string
             val raw = tag.getString(TAG_VALUE)
-            val cooked = Component.empty()
-            return Value(raw = raw, cooked = cooked)
+            // 获取 rich string
+            val rich = holder.item.itemMeta?.itemName() ?: Component.empty()
+
+            return Value(raw = raw, rich = rich)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemName) {
+            // 2024/6/29
+            // 设计上 custom_name 和 item_name 都不经过发包系统处理,
+            // 因此这里有什么就写入什么. 整体上做到简单, 一致, 无例外.
+
+            // 将 raw 写入到 NBT
             val tag = holder.getTagOrCreate()
-            tag.putString(TAG_VALUE, value.raw)
+            if (value.raw.isNotBlank()) {
+                // 只有当 raw 不为空字符串时才更新 NBT
+                tag.putString(TAG_VALUE, value.raw)
+            }
+
+            // 将 rich 写入到原版物品组件 `minecraft:item_name`
+            val item = holder.item
+            item.editMeta {
+                it.itemName(value.rich)
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {
             holder.removeTag()
+            holder.item.editMeta { it.itemName(null) }
         }
 
         private companion object {
@@ -59,9 +100,34 @@ interface ItemName : Examinable {
             if (itemName == null) {
                 return GenerationResult.empty()
             }
+
+            // 开发日记 2024/6/29
+            // 根据设计, custom_name 和 item_name 都不经过发包系统处理.
+            // 因此, 生成 custom_name 的时候就需要把 CustomName.rich
+            // 根据上下文也生成好, 不能写 Component.empty.
+
+            val resolver = TagResolver.builder()
+            val rarity = context.rarity
+            if (rarity != null) {
+                resolver.tag("rarity") { queue: ArgumentQueue, ctx: Context ->
+                    val arg = queue.popOr("Tag <rarity:_> must have an argument. Available arguments: 'name', 'style'").lowerValue()
+                    when (arg) {
+                        "name" -> {
+                            Tag.selfClosingInserting(rarity.displayName)
+                        }
+
+                        "style" -> {
+                            Tag.styling(*rarity.styles)
+                        }
+
+                        else -> throw ctx.newException("Unknown argument. Available arguments: 'name', 'style'", queue)
+                    }
+                }
+            }
             val raw = itemName
-            val cooked = Component.empty()
-            return GenerationResult.of(Value(raw, cooked))
+            val rich = ItemComponentInjections.mini.deserialize(itemName, resolver.build())
+
+            return GenerationResult.of(Value(raw = raw, rich = rich))
         }
 
         companion object : ItemTemplateType<Template> {
