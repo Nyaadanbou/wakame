@@ -107,7 +107,7 @@ interface Damageable : Examinable, TooltipProvider {
             /**
              * ## Node structure
              * ```yaml
-             * <root>:
+             * <node>:
              *   damage: <randomized_value>
              *   max_damage: <randomized_value>
              *   disappear_when_broken: <boolean>

@@ -129,7 +129,7 @@ interface FoodProperties : Examinable {
             /**
              * ## Node structure
              * ```yaml
-             * <root>:
+             * <node>:
              *   nutrition: <int>
              *   saturation: <float>
              *   can_always_eat: <boolean>

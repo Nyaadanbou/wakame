@@ -84,7 +84,7 @@ interface Crate : Examinable, TooltipProvider {
             /**
              * ## Node structure
              * ```yaml
-             * <root>:
+             * <node>:
              *   key: "foo:bar"
              * ```
              */

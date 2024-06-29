@@ -98,7 +98,7 @@ interface ItemElements : Examinable, TooltipProvider {
 /**
  * ## Node structure
  * ```yaml
- * <root>:
+ * <node>:
  *   sample: 2
  *   filters: [ ]
  *   entries:

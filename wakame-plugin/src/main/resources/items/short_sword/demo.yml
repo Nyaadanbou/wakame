@@ -1,12 +1,12 @@
 # !!! 所有内容均区分大小写 !!!
 
-# 唯一标识
+# UUID
 # 必填
+# 必须保证不存在两类物品 UUID 一致的情况
 # 生成工具：https://www.uuidgenerator.net/version7
 uuid: cfee549f-e4d7-4574-b104-92d8251ebee4
 
 # 原版物品类型
-# 可选，默认 "stone"
 item_type: wooden_sword
 
 # 是否完全隐藏物品提示框（包括物品名字）
@@ -104,8 +104,14 @@ lore:
 # 可以释放技能?
 castable: { }
 
-# 附加追踪数据 (原来是 statistical)
-trackable: { }
+# 作为盲盒
+crate:
+  # 物品绑定的盲盒 id
+  key: "foo:bar"
+
+# 追踪数据
+# 例如记录物品击杀过的怪物数量
+tracks: { }
 
 # 作为弹药
 arrow:
@@ -122,6 +128,24 @@ skillful: { }
 
 # 免疫火焰?
 fire_resistant: { }
+
+# 作为食物?
+food:
+  nutrition: 0
+  saturation: 0.0
+  can_always_eat: false
+  eat_seconds: 1.6
+  effects:
+    probability: 0.9
+    effect:
+      - type: speed
+        duration: 1
+        amplifier: 0
+        ambient: false
+        particles: true
+        icon: true
+  skills:
+    - "foo:bar"
 
 # 不损失耐久?
 unbreakable:
