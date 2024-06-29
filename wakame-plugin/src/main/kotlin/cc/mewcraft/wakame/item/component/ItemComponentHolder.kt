@@ -90,7 +90,7 @@ sealed interface ItemComponentHolder {
     fun removeTag(id: String)
 
     companion object {
-        fun create(item: ItemStack, compound: CompoundTag, components: ItemComponentMap): ItemComponentHolder {
+        fun create(compound: CompoundTag, item: ItemStack, components: ItemComponentMap): ItemComponentHolder {
             return Impl(item, components, compound)
         }
     }

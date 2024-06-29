@@ -3,7 +3,9 @@ package cc.mewcraft.wakame.item.component
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
+import cc.mewcraft.wakame.util.getOrPut
 import cc.mewcraft.wakame.util.wakameTagOrNull
+import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import org.bukkit.inventory.ItemStack
 
 data class TypedItemComponent<T>(
@@ -234,10 +236,11 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
     ) : ItemComponentMap {
 
         // 储存了所有组件信息的 NBT 标签
-        private val nbt: CompoundTag = item.wakameTagOrNull?.getCompoundOrNull("components") ?: throw IllegalStateException()
+        private val nbt: CompoundTag = item.wakameTagOrNull ?: throw IllegalStateException()
 
         override fun <T> get(type: ItemComponentType<T>): T? {
-            val holder = ItemComponentHolder.create(item, nbt, this)
+            val tag = nbt.getCompoundOrNull(TAG_COMPONENTS) ?: return null
+            val holder = ItemComponentHolder.create(tag, item, this)
             return type.read(holder)
         }
 
@@ -246,17 +249,23 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         }
 
         override fun <T> set(type: ItemComponentType<T>, value: T) {
-            val holder = ItemComponentHolder.create(item, nbt, this)
+            val tag = nbt.getOrPut(TAG_COMPONENTS, CompoundTag::create) ?: return
+            val holder = ItemComponentHolder.create(tag, item, this)
             return type.write(holder, value)
         }
 
         override fun unset(type: ItemComponentType<*>) {
-            val holder = ItemComponentHolder.create(item, nbt, this)
+            val tag = nbt.getCompoundOrNull(TAG_COMPONENTS) ?: return
+            val holder = ItemComponentHolder.create(tag, item, this)
             type.remove(holder)
         }
 
         override fun keySet(): Set<ItemComponentType<*>> {
-            return nbt.keySet().mapNotNull { ItemComponentRegistry.TYPES.find(it) }.toSet()
+            return nbt.getCompoundOrNull(TAG_COMPONENTS)
+                ?.keySet()
+                ?.mapNotNull(ItemComponentRegistry.TYPES::find)
+                ?.let(::ReferenceArraySet)
+                .orEmpty()
         }
 
         override fun size(): Int {
@@ -264,7 +273,12 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         }
 
         override fun toString(): String {
-            return nbt.toString()
+            return (nbt.getCompoundOrNull(TAG_COMPONENTS) ?: EMPTY_COMPOUND).toString()
+        }
+
+        companion object {
+            private const val TAG_COMPONENTS = "components"
+            private val EMPTY_COMPOUND = CompoundTag.create()
         }
     }
 }
