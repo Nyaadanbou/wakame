@@ -41,7 +41,7 @@ class GenerationContext(
     /**
      * 已经生成的物品等级.
      */
-    var level: Short by WatchedPrimitive(1)
+    var level: Short? by WatchedPrimitive(null)
 
     /**
      * 已经生成的 [Rarity].
@@ -75,9 +75,9 @@ class GenerationContext(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
+            ExaminableProperty.of("trigger", trigger),
             ExaminableProperty.of("itemKey", itemKey),
             ExaminableProperty.of("seed", seed),
-            ExaminableProperty.of("trigger", trigger),
             ExaminableProperty.of("level", level),
             ExaminableProperty.of("rarity", rarity),
             ExaminableProperty.of("elements", elements),

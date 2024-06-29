@@ -19,7 +19,11 @@ data class FilterItemLevel(
      * [level].
      */
     override fun testOriginal(context: GenerationContext): Boolean {
-        return context.level.toStableInt() in level
+        val level = context.level
+        if (level != null) {
+            level.toStableInt() in this.level
+        }
+        return false
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

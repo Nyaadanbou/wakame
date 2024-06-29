@@ -6,7 +6,9 @@ import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentInjections
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -87,18 +89,49 @@ interface ItemRarity : Examinable, TooltipProvider {
         }
 
         override fun generate(context: GenerationContext): GenerationResult<ItemRarity> {
-            val rarity: Rarity = when {
-                // use static rarity
-                static != null -> static
-                // use dynamic rarity
-                dynamic != null -> dynamic.pick(context.level.toInt(), context.random)
-                // fallback to the global rarity mappings
-                else -> LevelMappingRegistry.INSTANCES[LevelMappingRegistry.GLOBAL_NAME].pick(context.level.toInt(), context.random)
-            }.also {
-                // leave trace to the context
-                context.rarities += it
+            fun warnNullItemLevel() {
+                ItemComponentInjections.logger.warn("Failed to generate ${ItemComponentTypes.RARITY} for item '${context.itemKey}' because no ${ItemComponentTypes.LEVEL} was found in the generation context")
             }
-            return GenerationResult.of(Value(rarity))
+
+            val rarity: Rarity?
+
+            when {
+                // use static rarity
+                static != null -> {
+                    rarity = static
+                }
+
+                // use dynamic rarity
+                dynamic != null -> {
+                    val level = context.level
+                    if (level != null) {
+                        rarity = dynamic.pick(level.toInt(), context.random)
+                    } else {
+                        rarity = null
+                        warnNullItemLevel()
+                    }
+                }
+
+                // fallback to the global rarity mappings
+                else -> {
+                    val level = context.level
+                    if (level != null) {
+                        rarity = LevelMappingRegistry.INSTANCES[LevelMappingRegistry.GLOBAL_NAME].pick(level.toInt(), context.random)
+                    } else {
+                        rarity = null
+                        warnNullItemLevel()
+                    }
+                }
+            }
+
+            // leave trace to the context
+            context.rarity = rarity
+
+            if (rarity != null) {
+                return GenerationResult.of(Value(rarity = rarity))
+            }
+
+            return GenerationResult.empty()
         }
 
         companion object : ItemTemplateType<Template> {
