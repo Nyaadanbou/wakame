@@ -9,16 +9,16 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import java.io.DataInput
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import kotlin.jvm.optionals.getOrNull
+import cc.mewcraft.nbt.CompoundTag as CompoundShadowTag
 
 // The nullable return value allows you to know whether the wakame tag exists
-// Caution: The returned CompoundShadowTag should be read-only!!! Any writes
+// Caution: The returned CompoundTag should be read-only!!! Any writes
 // to it takes no effects
 val ItemStack.wakameTagOrNull: CompoundShadowTag?
     get() {

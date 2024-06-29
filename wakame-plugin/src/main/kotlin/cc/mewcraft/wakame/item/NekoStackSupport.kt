@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
@@ -13,7 +14,6 @@ import cc.mewcraft.wakame.util.isNms
 import cc.mewcraft.wakame.util.removeWakameTag
 import cc.mewcraft.wakame.util.wakameTag
 import cc.mewcraft.wakame.util.wakameTagOrNull
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -159,7 +159,7 @@ private class NekoStackImpl(
         handle = ItemStack(mat), // strictly-Bukkit ItemStack
     )
 
-    override val nbt: CompoundShadowTag
+    override val nbt: CompoundTag
         get() {
             // 开发日记 2024/6/26
             // 等到 Paper 的 delegate ItemStack 完成之后,
@@ -186,7 +186,7 @@ private class NekoStackImpl(
         }
 
     override val prototype: NekoItem
-        get() = ItemRegistry.INSTANCES[key]
+        get() = TODO("完成新的 ItemRegistry & 更新相关代码") // ItemRegistry.INSTANCES[key]
 
     override var namespace: String
         get() = requireNotNull(NekoStackImplementations.getNamespace(nbt)) { "Can't find 'namespace' on the item NBT" }
@@ -225,31 +225,31 @@ private class NekoStackImpl(
  * Common implementations related to [NekoStack].
  */
 private object NekoStackImplementations {
-    fun isSystemUse(nekoCompound: CompoundShadowTag): Boolean {
+    fun isSystemUse(nekoCompound: CompoundTag): Boolean {
         return nekoCompound.contains(ItemComponentTypes.SYSTEM_USE.id)
     }
 
-    fun getNamespace(nekoCompound: CompoundShadowTag): String? {
+    fun getNamespace(nekoCompound: CompoundTag): String? {
         return nekoCompound.getString(BaseBinaryKeys.NAMESPACE)
     }
 
-    fun getPath(nekoCompound: CompoundShadowTag): String? {
+    fun getPath(nekoCompound: CompoundTag): String? {
         return nekoCompound.getString(BaseBinaryKeys.PATH)
     }
 
-    fun getKey(nekoCompound: CompoundShadowTag): Key? {
+    fun getKey(nekoCompound: CompoundTag): Key? {
         return getNamespace(nekoCompound)?.let { namespace -> getPath(nekoCompound)?.let { path -> Key(namespace, path) } }
     }
 
-    fun setNamespace(nekoCompound: CompoundShadowTag, namespace: String) {
+    fun setNamespace(nekoCompound: CompoundTag, namespace: String) {
         nekoCompound.putString(BaseBinaryKeys.NAMESPACE, namespace)
     }
 
-    fun setPath(nekoCompound: CompoundShadowTag, path: String) {
+    fun setPath(nekoCompound: CompoundTag, path: String) {
         nekoCompound.putString(BaseBinaryKeys.PATH, path)
     }
 
-    fun setKey(nekoCompound: CompoundShadowTag, key: Key) {
+    fun setKey(nekoCompound: CompoundTag, key: Key) {
         setNamespace(nekoCompound, key.namespace())
         setPath(nekoCompound, key.value())
     }

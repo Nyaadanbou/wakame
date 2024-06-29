@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
@@ -8,7 +9,6 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.getStringOrNull
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -27,7 +27,7 @@ value class BItemNameMeta(
         get() = ItemMetaConstants.createKey { ITEM_NAME }
 
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.ITEM_NAME, ShadowTagType.STRING) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.ITEM_NAME, TagType.STRING) ?: false
 
     override fun getOrNull(): String? {
         return accessor.rootOrNull?.getStringOrNull(key.value())

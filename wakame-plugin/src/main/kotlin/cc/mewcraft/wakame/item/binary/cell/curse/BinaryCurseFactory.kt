@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell.curse
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
@@ -7,7 +8,6 @@ import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEmptyCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEntityKillsCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryPeakDamageCurse
 import cc.mewcraft.wakame.util.Key
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 object BinaryCurseFactory {
 
@@ -17,7 +17,7 @@ object BinaryCurseFactory {
      * @param compound the compound tag
      * @return a new instance
      */
-    fun wrap(compound: CompoundShadowTag): BinaryCurse {
+    fun wrap(compound: CompoundTag): BinaryCurse {
         if (compound.isEmpty) {
             // It's an empty binary curse,
             // just return the singleton.

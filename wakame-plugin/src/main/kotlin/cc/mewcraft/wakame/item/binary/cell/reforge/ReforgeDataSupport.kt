@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.binary.cell.reforge
 
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.item.ReforgeBinaryKeys
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
 import kotlin.reflect.KClass
 
 //
@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 //
 
 internal class ReforgeDataHolderImpl(
-    private val root: CompoundShadowTag,
+    private val root: CompoundTag,
 ) : ReforgeDataHolder {
     override val isEmpty: Boolean
         get() = root.isEmpty
@@ -29,12 +29,12 @@ internal class ReforgeDataHolderImpl(
         root.tags().clear()
     }
 
-    override fun asTag(): ShadowTag = root
+    override fun asTag(): Tag = root
     override fun toString(): String = root.asString()
 }
 
 private class FailureCountImpl(
-    private val root: CompoundShadowTag,
+    private val root: CompoundTag,
 ) : FailureCount {
     override val exists: Boolean
         get() = root.contains(ReforgeBinaryKeys.FAILURE_COUNT)
@@ -46,7 +46,7 @@ private class FailureCountImpl(
 }
 
 private class SuccessCountImpl(
-    private val root: CompoundShadowTag,
+    private val root: CompoundTag,
 ) : SuccessCount {
     override val exists: Boolean
         get() = root.contains(ReforgeBinaryKeys.SUCCESS_COUNT)

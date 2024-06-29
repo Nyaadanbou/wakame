@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.binary.cell
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.item.binary.cell.reforge.ReforgeDataFactory
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.SchemaCell
 import cc.mewcraft.wakame.item.schema.cell.core.noop.SchemaNoopCore
 import cc.mewcraft.wakame.item.schema.cell.curse.type.SchemaEmptyCurse
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 /**
  * A factory used to create [BinaryCell] from schema and binary sources.
@@ -38,7 +38,7 @@ object BinaryCellFactory {
      * @param compound the compound tag containing the cell
      * @return a new [BinaryCell]
      */
-    fun wrap(compound: CompoundShadowTag): BinaryCell {
+    fun wrap(compound: CompoundTag): BinaryCell {
         return BinaryCellTagWrapper(compound)
     }
 

@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Durability
-import cc.mewcraft.wakame.util.CompoundShadowTag
+import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.toStableShort
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -19,7 +19,7 @@ value class BDurabilityMeta(
         get() = ItemMetaConstants.createKey { DURABILITY }
 
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.DURABILITY, ShadowTagType.COMPOUND) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.DURABILITY, TagType.COMPOUND) ?: false
 
     /**
      * Gets damage.
@@ -72,7 +72,7 @@ value class BDurabilityMeta(
     }
 
     override fun set(value: Durability) {
-        accessor.rootOrCreate.put(key.value(), CompoundShadowTag {
+        accessor.rootOrCreate.put(key.value(), CompoundTag {
             putShort(THRESHOLD_TAG, value.threshold.toStableShort())
             putShort(DAMAGE_TAG, value.damage.toStableShort())
         })

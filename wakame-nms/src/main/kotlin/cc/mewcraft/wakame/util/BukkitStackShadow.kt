@@ -5,8 +5,6 @@ package cc.mewcraft.wakame.util
 import cc.mewcraft.wakame.shadow.inventory.ShadowCraftMetaItem0
 import cc.mewcraft.wakame.shadow.inventory.ShadowItemStack
 import io.papermc.paper.adventure.PaperAdventure
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
 import net.kyori.adventure.text.Component
@@ -18,6 +16,8 @@ import net.minecraft.world.item.component.ItemLore
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.meta.ItemMeta
+import cc.mewcraft.nbt.CompoundTag as CompoundShadowTag
+import cc.mewcraft.nbt.Tag as ShadowTag
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 

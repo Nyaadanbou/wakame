@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.nbt.ListTag
+import cc.mewcraft.nbt.StringTag
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
@@ -16,9 +19,6 @@ import cc.mewcraft.wakame.util.getListOrNull
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.ListShadowTag
-import me.lucko.helper.shadows.nbt.StringShadowTag
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
@@ -59,13 +59,13 @@ interface ExtraLore : Examinable, TooltipProvider {
         override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
 
         override fun read(holder: ItemComponentHolder.NBT): ExtraLore? {
-            val stringList = holder.tag.getListOrNull(TAG_VALUE, ShadowTagType.STRING)?.map { (it as StringShadowTag).value() } ?: return null
+            val stringList = holder.tag.getListOrNull(TAG_VALUE, TagType.STRING)?.map { (it as StringTag).value() } ?: return null
             return Value(stringList)
         }
 
         override fun write(holder: ItemComponentHolder.NBT, value: ExtraLore) {
-            val stringTagList = value.lore.map(StringShadowTag::valueOf)
-            val stringListTag = ListShadowTag.create(stringTagList, ShadowTagType.STRING)
+            val stringTagList = value.lore.map(StringTag::valueOf)
+            val stringListTag = ListTag.create(stringTagList, TagType.STRING)
             holder.tag.put(TAG_VALUE, stringListTag)
         }
 

@@ -1,11 +1,20 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.commons.provider.immutable.map
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.TagType
+import cc.mewcraft.nbt.TagType.BYTE
+import cc.mewcraft.nbt.TagType.DOUBLE
+import cc.mewcraft.nbt.TagType.SHORT
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.Keyed
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.ElementAttribute
+import cc.mewcraft.wakame.attribute.ElementAttributeContainer
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
@@ -15,15 +24,32 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.*
-import cc.mewcraft.wakame.item.schema.cell.core.attribute.*
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderR
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderRE
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderS
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderSE
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreR
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreRE
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreS
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreSE
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreTagWrapperR
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreTagWrapperRE
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreTagWrapperS
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreTagWrapperSE
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCore
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreR
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreRE
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreS
+import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreSE
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.RandomizedValue
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.toStableDouble
 import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.nbt.ShadowTagType.*
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -82,7 +108,7 @@ object AttributeRegistry : Initializable {
      *
      * @param type 词条在 NBT 中的数据类型。
      */
-    private fun buildFacade(key: String, type: ShadowTagType): FormatSelection {
+    private fun buildFacade(key: String, type: TagType): FormatSelection {
         return FormatSelectionImpl(Key(Namespaces.ATTRIBUTE, key), type)
     }
 
@@ -193,7 +219,7 @@ interface AttributeFacade<BC : BinaryAttributeCore, SC : SchemaAttributeCore> : 
     /**
      * A creator for [BinaryAttributeCore].
      */
-    val binaryCoreCreatorByTag: (CompoundShadowTag) -> BC
+    val binaryCoreCreatorByTag: (CompoundTag) -> BC
 
     /**
      * A creator for display text.
@@ -218,7 +244,7 @@ private interface MutableAttributeFacade<BC : BinaryAttributeCore, SC : SchemaAt
     override var attributeModifierCreator: (UUID, BC) -> Map<Attribute, AttributeModifier>
     override var schemaCoreCreatorByConfig: (ConfigurationNode) -> SC
     override var binaryCoreCreatorByConfig: (ConfigurationNode) -> BC
-    override var binaryCoreCreatorByTag: (CompoundShadowTag) -> BC
+    override var binaryCoreCreatorByTag: (CompoundTag) -> BC
     override var displayTextCreator: (BC) -> List<Component>
 }
 
@@ -342,7 +368,7 @@ private class MutableAttributeFacadeImpl<A : BinaryAttributeCore, B : SchemaAttr
     override var attributeModifierCreator: (UUID, A) -> Map<Attribute, AttributeModifier>,
     override var schemaCoreCreatorByConfig: (ConfigurationNode) -> B,
     override var binaryCoreCreatorByConfig: (ConfigurationNode) -> A,
-    override var binaryCoreCreatorByTag: (CompoundShadowTag) -> A,
+    override var binaryCoreCreatorByTag: (CompoundTag) -> A,
     override var displayTextCreator: (A) -> List<Component>,
 ) : MutableAttributeFacade<A, B> {
     override val key: Key = facadeId
@@ -471,7 +497,7 @@ private class DiscreteTooltips(
 
 private class FormatSelectionImpl(
     private val id: Key,
-    private val tagType: ShadowTagType,
+    private val tagType: TagType,
 ) : FormatSelection {
     override fun single(): SingleSelection {
         return SingleSelectionImpl(id, tagType)
@@ -484,7 +510,7 @@ private class FormatSelectionImpl(
 
 private class SingleSelectionImpl(
     private val id: Key,
-    private val tagType: ShadowTagType,
+    private val tagType: TagType,
 ) : SingleSelection {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
@@ -518,7 +544,7 @@ private class SingleSelectionImpl(
                 val value = node.getBinarySingle()
                 BinaryAttributeCoreDataHolderS(id, tagType, operation, value)
             },
-            binaryCoreCreatorByTag = { tag: CompoundShadowTag ->
+            binaryCoreCreatorByTag = { tag: CompoundTag ->
                 BinaryAttributeCoreTagWrapperS(tag)
             },
             displayTextCreator = { core: BinaryAttributeCoreS ->
@@ -536,7 +562,7 @@ private class SingleSelectionImpl(
 
 private class RangedSelectionImpl(
     private val id: Key,
-    private val tagType: ShadowTagType,
+    private val tagType: TagType,
 ) : RangedSelection {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
@@ -576,7 +602,7 @@ private class RangedSelectionImpl(
                 val upper = node.getBinaryUpper()
                 BinaryAttributeCoreDataHolderR(id, tagType, operation, lower, upper)
             },
-            binaryCoreCreatorByTag = { tag: CompoundShadowTag ->
+            binaryCoreCreatorByTag = { tag: CompoundTag ->
                 BinaryAttributeCoreTagWrapperR(tag)
             },
             displayTextCreator = { core: BinaryAttributeCoreR ->
@@ -595,7 +621,7 @@ private class RangedSelectionImpl(
 
 private class SingleElementAttributeBinderImpl(
     private val id: Key,
-    private val tagType: ShadowTagType,
+    private val tagType: TagType,
 ) : SingleElementAttributeBinder {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
@@ -627,7 +653,7 @@ private class SingleElementAttributeBinderImpl(
                 val element = node.getElement()
                 BinaryAttributeCoreDataHolderSE(id, tagType, operation, value, element)
             },
-            binaryCoreCreatorByTag = { tag: CompoundShadowTag ->
+            binaryCoreCreatorByTag = { tag: CompoundTag ->
                 BinaryAttributeCoreTagWrapperSE(tag)
             },
             displayTextCreator = { core: BinaryAttributeCoreSE ->
@@ -646,7 +672,7 @@ private class SingleElementAttributeBinderImpl(
 
 private class RangedElementAttributeBinderImpl(
     private val id: Key,
-    private val tagType: ShadowTagType,
+    private val tagType: TagType,
 ) : RangedElementAttributeBinder {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
@@ -684,7 +710,7 @@ private class RangedElementAttributeBinderImpl(
                 val element = node.getElement()
                 BinaryAttributeCoreDataHolderRE(id, tagType, operation, lower, upper, element)
             },
-            binaryCoreCreatorByTag = { tag: CompoundShadowTag ->
+            binaryCoreCreatorByTag = { tag: CompoundTag ->
                 BinaryAttributeCoreTagWrapperRE(tag)
             },
             displayTextCreator = { core: BinaryAttributeCoreRE ->

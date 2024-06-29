@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.item.BaseBinaryKeys
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.binary.cell.ItemCellAccessor
@@ -13,7 +14,6 @@ import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.Key
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import java.util.UUID
 import kotlin.reflect.KClass
@@ -72,15 +72,15 @@ internal interface NekoStackBase : NekoStack {
  * Some internal functions related to [NekoStack].
  */
 internal object NekoStackImplementation {
-    fun getNamespace(nekoCompound: CompoundShadowTag?): String? {
+    fun getNamespace(nekoCompound: CompoundTag?): String? {
         return nekoCompound?.getString(BaseBinaryKeys.NAMESPACE)
     }
 
-    fun getPath(nekoCompound: CompoundShadowTag?): String? {
+    fun getPath(nekoCompound: CompoundTag?): String? {
         return nekoCompound?.getString(BaseBinaryKeys.PATH)
     }
 
-    fun getKey(nekoCompound: CompoundShadowTag?): Key? {
+    fun getKey(nekoCompound: CompoundTag?): Key? {
         return getNamespace(nekoCompound)?.let { namespace ->
             getPath(nekoCompound)?.let { path ->
                 Key(namespace, path)
@@ -88,15 +88,15 @@ internal object NekoStackImplementation {
         }
     }
 
-    fun setNamespace(nekoCompound: CompoundShadowTag?, namespace: String) {
+    fun setNamespace(nekoCompound: CompoundTag?, namespace: String) {
         nekoCompound?.putString(BaseBinaryKeys.NAMESPACE, namespace)
     }
 
-    fun setPath(nekoCompound: CompoundShadowTag?, path: String) {
+    fun setPath(nekoCompound: CompoundTag?, path: String) {
         nekoCompound?.putString(BaseBinaryKeys.PATH, path)
     }
 
-    fun setKey(nekoCompound: CompoundShadowTag?, key: Key) {
+    fun setKey(nekoCompound: CompoundTag?, key: Key) {
         setNamespace(nekoCompound, key.namespace())
         setPath(nekoCompound, key.value())
     }

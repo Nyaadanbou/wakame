@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.core.attribute
 
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.element.Element
@@ -7,8 +9,6 @@ import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.getByteOrNull
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
 
 //
@@ -16,7 +16,7 @@ import net.kyori.adventure.key.Key
 //
 
 internal class BinaryAttributeCoreTagWrapperS(
-    private val compound: CompoundShadowTag,
+    private val compound: CompoundTag,
 ) : BinaryAttributeCoreS() {
     override val key: Key
         get() = compound.getIdentifier()
@@ -29,7 +29,7 @@ internal class BinaryAttributeCoreTagWrapperS(
         compound.tags().clear()
     }
 
-    override fun asTag(): ShadowTag {
+    override fun asTag(): Tag {
         return compound
     }
 
@@ -39,7 +39,7 @@ internal class BinaryAttributeCoreTagWrapperS(
 }
 
 internal class BinaryAttributeCoreTagWrapperR(
-    private val compound: CompoundShadowTag,
+    private val compound: CompoundTag,
 ) : BinaryAttributeCoreR() {
     override val key: Key
         get() = compound.getIdentifier()
@@ -54,7 +54,7 @@ internal class BinaryAttributeCoreTagWrapperR(
         compound.tags().clear()
     }
 
-    override fun asTag(): ShadowTag {
+    override fun asTag(): Tag {
         return compound
     }
 
@@ -64,7 +64,7 @@ internal class BinaryAttributeCoreTagWrapperR(
 }
 
 internal class BinaryAttributeCoreTagWrapperSE(
-    private val compound: CompoundShadowTag,
+    private val compound: CompoundTag,
 ) : BinaryAttributeCoreSE() {
     override val key: Key
         get() = compound.getIdentifier()
@@ -79,7 +79,7 @@ internal class BinaryAttributeCoreTagWrapperSE(
         compound.tags().clear()
     }
 
-    override fun asTag(): ShadowTag {
+    override fun asTag(): Tag {
         return compound
     }
 
@@ -89,7 +89,7 @@ internal class BinaryAttributeCoreTagWrapperSE(
 }
 
 internal class BinaryAttributeCoreTagWrapperRE(
-    private val compound: CompoundShadowTag,
+    private val compound: CompoundTag,
 ) : BinaryAttributeCoreRE() {
     override val key: Key
         get() = compound.getIdentifier()
@@ -106,7 +106,7 @@ internal class BinaryAttributeCoreTagWrapperRE(
         compound.tags().clear()
     }
 
-    override fun asTag(): ShadowTag {
+    override fun asTag(): Tag {
         return compound
     }
 
@@ -115,18 +115,18 @@ internal class BinaryAttributeCoreTagWrapperRE(
     }
 }
 
-private fun CompoundShadowTag.getIdentifier(): Key {
+private fun CompoundTag.getIdentifier(): Key {
     return Key(this.getString(CoreBinaryKeys.CORE_IDENTIFIER))
 }
 
-private fun CompoundShadowTag.getElement(): Element {
+private fun CompoundTag.getElement(): Element {
     return this.getByteOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { ElementRegistry.getBy(it) } ?: ElementRegistry.DEFAULT
 }
 
-private fun CompoundShadowTag.getOperation(): AttributeModifier.Operation {
+private fun CompoundTag.getOperation(): AttributeModifier.Operation {
     return AttributeModifier.Operation.byId(this.getInt(AttributeBinaryKeys.OPERATION_TYPE))
 }
 
-private fun CompoundShadowTag.getNumber(key: String): Double {
+private fun CompoundTag.getNumber(key: String): Double {
     return this.getDouble(key)
 }

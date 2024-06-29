@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell
 
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.CurseBinaryKeys
@@ -10,9 +12,7 @@ import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurseFactory
 import cc.mewcraft.wakame.item.binary.cell.reforge.ReforgeDataFactory
 import cc.mewcraft.wakame.item.binary.cell.reforge.ReforgeDataHolder
-import cc.mewcraft.wakame.util.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
+import cc.mewcraft.wakame.util.CompoundTag
 import kotlin.reflect.KClass
 import kotlin.reflect.full.safeCast
 
@@ -39,7 +39,7 @@ internal data class BinaryCellDataHolder(
         return CellSupport.typedCurse(this, clazz)
     }
 
-    override fun asTag(): ShadowTag = CompoundShadowTag {
+    override fun asTag(): Tag = CompoundTag {
         // 当对应的数据不存在时，这里的每个 asShadowTag()
         // 应该返回一个没有内容的空 Compound（不是 null）
         put(CoreBinaryKeys.BASE, core.asTag())
@@ -53,7 +53,7 @@ internal data class BinaryCellDataHolder(
 }
 
 internal data class BinaryCellTagWrapper(
-    private val compound: CompoundShadowTag,
+    private val compound: CompoundTag,
 ) : BinaryCell {
     override var core: BinaryCore
         get() {
@@ -87,7 +87,7 @@ internal data class BinaryCellTagWrapper(
         return CellSupport.typedCurse(this, clazz)
     }
 
-    override fun asTag(): ShadowTag {
+    override fun asTag(): Tag {
         return compound
     }
 

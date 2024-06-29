@@ -8,4 +8,5 @@ dependencies {
     compileOnly(libs.server.paper)
     // helper
     compileOnly(libs.helper)
+    compileOnly(libs.shadow.nbt)
 }

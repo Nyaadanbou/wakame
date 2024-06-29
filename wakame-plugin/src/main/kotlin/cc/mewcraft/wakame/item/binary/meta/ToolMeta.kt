@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Tool
 import cc.mewcraft.wakame.item.schema.meta.ToolRule
-import cc.mewcraft.wakame.util.CompoundShadowTag
+import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 
 @JvmInline
@@ -15,7 +15,7 @@ value class BToolMeta(
     override val key: Key
         get() = ItemMetaConstants.createKey { TOOL }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.TOOL, ShadowTagType.COMPOUND) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.TOOL, TagType.COMPOUND) ?: false
 
     /**
      * Gets the value of `rules`.
@@ -86,7 +86,7 @@ value class BToolMeta(
     }
 
     override fun set(value: Tool) {
-        accessor.rootOrCreate.put(key.value(), CompoundShadowTag {
+        accessor.rootOrCreate.put(key.value(), CompoundTag {
             // TODO 等待组件相关API的到来
         })
     }

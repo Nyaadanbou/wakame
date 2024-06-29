@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.skill.SkillBinaryKeys
 import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
-import cc.mewcraft.wakame.util.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
+import cc.mewcraft.wakame.util.CompoundTag
 import net.kyori.adventure.key.Key
 
 //
@@ -16,24 +16,24 @@ import net.kyori.adventure.key.Key
 internal data class BinarySkillCoreDataHolder(
     override val key: Key,
     override val trigger: Trigger,
-    override val effectiveVariant: ConfiguredSkill.Variant
+    override val effectiveVariant: ConfiguredSkill.Variant,
 ) : BinarySkillCore() {
-    override fun asTag(): ShadowTag = CompoundShadowTag {
+    override fun asTag(): Tag = CompoundTag {
         putIdentifier(key)
         putTrigger(trigger)
         putEffectiveVariant(effectiveVariant)
     }
 }
 
-private fun CompoundShadowTag.putIdentifier(id: Key) {
+private fun CompoundTag.putIdentifier(id: Key) {
     this.putString(CoreBinaryKeys.CORE_IDENTIFIER, id.asString())
 }
 
-private fun CompoundShadowTag.putTrigger(trigger: Trigger) {
+private fun CompoundTag.putTrigger(trigger: Trigger) {
     this.putString(SkillBinaryKeys.SKILL_TRIGGER, trigger.key.asString())
 }
 
-private fun CompoundShadowTag.putEffectiveVariant(variant: ConfiguredSkill.Variant) {
+private fun CompoundTag.putEffectiveVariant(variant: ConfiguredSkill.Variant) {
     if (variant == ConfiguredSkill.Variant.any())
         return
     this.putInt(SkillBinaryKeys.EFFECTIVE_VARIANT, variant.variant)

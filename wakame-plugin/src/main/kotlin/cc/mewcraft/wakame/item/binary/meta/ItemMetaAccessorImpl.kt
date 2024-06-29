@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.NekoStackBase
@@ -7,7 +8,6 @@ import cc.mewcraft.wakame.registry.ItemMetaRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
@@ -17,10 +17,10 @@ import kotlin.reflect.KClass
 internal value class ItemMetaAccessorImpl(
     override val item: NekoStackBase,
 ) : KoinComponent, ItemMetaAccessor {
-    override val rootOrNull: CompoundShadowTag?
+    override val rootOrNull: CompoundTag?
         get() = item.tags.getCompoundOrNull(Namespaces.ITEM_META)
-    override val rootOrCreate: CompoundShadowTag
-        get() = item.tags.getOrPut(Namespaces.ITEM_META, CompoundShadowTag::create)
+    override val rootOrCreate: CompoundTag
+        get() = item.tags.getOrPut(Namespaces.ITEM_META, CompoundTag::create)
 
     override val snapshot: Set<BinaryItemMeta<*>>
         get() {
@@ -54,8 +54,8 @@ internal value class ItemMetaAccessorImpl(
  */
 internal object ItemMetaAccessorNoop : ItemMetaAccessor {
     override val item: NekoStack get() = throw UnsupportedOperationException()
-    override val rootOrNull: CompoundShadowTag get() = throw UnsupportedOperationException()
-    override val rootOrCreate: CompoundShadowTag get() = throw UnsupportedOperationException()
+    override val rootOrNull: CompoundTag get() = throw UnsupportedOperationException()
+    override val rootOrCreate: CompoundTag get() = throw UnsupportedOperationException()
     override val snapshot: Set<BinaryItemMeta<*>> get() = throw UnsupportedOperationException()
     override fun <M : BinaryItemMeta<*>> getAccessor(clazz: KClass<out M>): M = throw UnsupportedOperationException()
 }

@@ -1,18 +1,18 @@
 package cc.mewcraft.wakame.item.binary.stats
 
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
+import cc.mewcraft.nbt.CompoundTag
 
 @Suppress("PropertyName")
 interface ItemStatisticsAccessor {
     /**
      * Gets the root tag of statistics or `null`, if it does not exist.
      */
-    val rootOrNull: CompoundShadowTag?
+    val rootOrNull: CompoundTag?
 
     /**
      * Gets the root tag of statistics or create one, if it does not exist.
      */
-    val rootOrCreate: CompoundShadowTag
+    val rootOrCreate: CompoundTag
 
     //
     // Statistics Accessors

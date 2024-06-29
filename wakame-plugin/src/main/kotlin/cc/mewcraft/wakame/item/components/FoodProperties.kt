@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.nbt.StringTag
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -7,12 +9,10 @@ import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.ListShadowTag
+import cc.mewcraft.wakame.util.ListTag
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.StringShadowTag
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.potion.PotionEffect
@@ -63,7 +63,7 @@ interface FoodProperties : Examinable {
             val eatSeconds = craftFood.eatSeconds
             val effects = craftFood.effects.map { FoodEffect(it.effect, it.probability) }
 
-            val skills = holder.tag.getList(TAG_SKILLS, ShadowTagType.STRING).map { Key((it as StringShadowTag).value()) }
+            val skills = holder.tag.getList(TAG_SKILLS, TagType.STRING).map { Key((it as StringTag).value()) }
 
             return Value(
                 nutrition = nutrition,
@@ -86,7 +86,7 @@ interface FoodProperties : Examinable {
                 itemMeta.setFood(craftFood)
             }
 
-            val stringListTag = ListShadowTag { value.skills.map { StringShadowTag.valueOf(it.asString()) }.forEach(::add) }
+            val stringListTag = ListTag { value.skills.map { StringTag.valueOf(it.asString()) }.forEach(::add) }
             holder.tag.put(TAG_SKILLS, stringListTag)
         }
 

@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 
 /**
@@ -19,7 +19,7 @@ value class BKizamiMeta(
     override val key: Key
         get() = ItemMetaConstants.createKey { KIZAMI }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.KIZAMI, ShadowTagType.BYTE_ARRAY) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.KIZAMI, TagType.BYTE_ARRAY) ?: false
 
     override fun getOrNull(): Set<Kizami>? {
         return accessor.rootOrNull

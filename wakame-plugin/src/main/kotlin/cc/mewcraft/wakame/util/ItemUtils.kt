@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.shadow.inventory.ShadowCraftMetaItem
-import me.lucko.helper.shadows.nbt.ShadowTag
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
-val ItemMeta.unhandledTags: MutableMap<String, ShadowTag>
+val ItemMeta.unhandledTags: MutableMap<String, Tag>
     get() = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem>(this).unhandledTags()
 
 /**

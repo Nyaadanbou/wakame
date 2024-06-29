@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.CellBinaryKeys
@@ -14,7 +15,6 @@ import cc.mewcraft.wakame.util.getOrPut
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 
 @JvmInline
 internal value class ItemCellAccessorImpl(
@@ -23,10 +23,10 @@ internal value class ItemCellAccessorImpl(
 
     /* Getters */
 
-    private val rootOrNull: CompoundShadowTag?
+    private val rootOrNull: CompoundTag?
         get() = base.tags.getCompoundOrNull(CellBinaryKeys.BASE)
-    private val rootOrCreate: CompoundShadowTag
-        get() = base.tags.getOrPut(CellBinaryKeys.BASE, CompoundShadowTag::create)
+    private val rootOrCreate: CompoundTag
+        get() = base.tags.getOrPut(CellBinaryKeys.BASE, CompoundTag::create)
 
     override val snapshot: Map<String, BinaryCell>
         get() {

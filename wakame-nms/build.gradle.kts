@@ -16,6 +16,7 @@ dependencies {
 
     // helper
     compileOnly(libs.helper)
+    compileOnly(libs.shadow.nbt)
 
     // internal
     compileOnly(project(":wakame-common"))

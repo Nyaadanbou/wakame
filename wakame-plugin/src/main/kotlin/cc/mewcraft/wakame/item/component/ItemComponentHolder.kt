@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.component
 
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
+import cc.mewcraft.nbt.CompoundTag
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -40,7 +40,7 @@ sealed interface ItemComponentHolder {
      * 那么这里的 NBT 只会是 `Compound('elements')` 或 `Compound('kizamiz')`,
      * 而不是最顶级的包含了所有组件信息的 `Compound('components')`.
      */
-    data class NBT(val tag: CompoundShadowTag) : ItemComponentHolder
+    data class NBT(val tag: CompoundTag) : ItemComponentHolder
 
     /**
      * 包含整个 [ItemStack] (本质是物品上的原版组件).
@@ -50,6 +50,6 @@ sealed interface ItemComponentHolder {
     /**
      * 包含整个 [ItemStack], 以及储存了单个组件信息的 NBT 结构.
      */
-    data class Complex(val item: ItemStack, val tag: CompoundShadowTag) : ItemComponentHolder
+    data class Complex(val item: ItemStack, val tag: CompoundTag) : ItemComponentHolder
 
 }

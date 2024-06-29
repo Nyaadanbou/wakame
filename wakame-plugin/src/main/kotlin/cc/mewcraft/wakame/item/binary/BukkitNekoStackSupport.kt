@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.binary
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.item.BaseBinaryKeys
 import cc.mewcraft.wakame.item.binary.show.CustomDataAccessor
 import cc.mewcraft.wakame.registry.ItemRegistry
@@ -10,7 +11,6 @@ import cc.mewcraft.wakame.util.isNms
 import cc.mewcraft.wakame.util.removeWakameTag
 import cc.mewcraft.wakame.util.wakameTag
 import cc.mewcraft.wakame.util.wakameTagOrNull
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
@@ -75,11 +75,11 @@ fun Material.createNekoStack(): PlayNekoStack {
 }
 
 internal object BukkitNekoStackImplementation {
-    fun isPlay(nekoCompound: CompoundShadowTag): Boolean {
+    fun isPlay(nekoCompound: CompoundTag): Boolean {
         return !isShow(nekoCompound) // an NS is either PNS or SNS
     }
 
-    fun isShow(nekoCompound: CompoundShadowTag): Boolean {
+    fun isShow(nekoCompound: CompoundTag): Boolean {
         return nekoCompound.contains(BaseBinaryKeys.SHOW)
     }
 }
@@ -104,7 +104,7 @@ private class PlayNekoStackImpl(
         itemStack = ItemStack(mat), // strictly-Bukkit ItemStack
     )
 
-    override val tags: CompoundShadowTag
+    override val tags: CompoundTag
         get() {
             if (!itemStack.isNms) {
                 // If this is a strictly-Bukkit ItemStack,
@@ -144,7 +144,7 @@ private class ShowNekoStackImpl(
     // as the ItemStack is solely used for the purpose of display, not for
     // the purpose of being used by players. Therefore, we can relax the
     // restrictions a little.
-    override val tags: CompoundShadowTag
+    override val tags: CompoundTag
         get() = itemStack.wakameTag
 
     override val customData: CustomDataAccessor
@@ -177,11 +177,11 @@ private class ShowNekoStackImpl(
 }
 
 private object ShowNekoStackImplementation {
-    fun writeSNSMark(compoundTag: CompoundShadowTag) {
+    fun writeSNSMark(compoundTag: CompoundTag) {
         compoundTag.putByte(BaseBinaryKeys.SHOW, 0) // 写入 SNS mark，告知发包系统不要修改此物品
     }
 
-    fun removeSNSMark(compoundTag: CompoundShadowTag) {
+    fun removeSNSMark(compoundTag: CompoundTag) {
         compoundTag.remove(BaseBinaryKeys.SHOW) // 移除 SNS mark
     }
 }

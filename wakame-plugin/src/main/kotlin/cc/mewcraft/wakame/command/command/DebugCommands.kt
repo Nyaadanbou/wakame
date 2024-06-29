@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.command.command
 
+import cc.mewcraft.nbt.IntTag
+import cc.mewcraft.nbt.ShortTag
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
@@ -8,8 +11,8 @@ import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.pack.model.ModelRegistry
 import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
 import cc.mewcraft.wakame.util.CompoundBinaryTag
-import cc.mewcraft.wakame.util.CompoundShadowTag
-import cc.mewcraft.wakame.util.ListShadowTag
+import cc.mewcraft.wakame.util.CompoundTag
+import cc.mewcraft.wakame.util.ListTag
 import cc.mewcraft.wakame.util.ThreadType
 import cc.mewcraft.wakame.util.adventureNbt
 import cc.mewcraft.wakame.util.adventureNbtOrNull
@@ -20,9 +23,6 @@ import cc.mewcraft.wakame.util.wakameTag
 import cc.mewcraft.wakame.util.wakameTagOrNull
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
-import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.IntShadowTag
-import me.lucko.helper.shadows.nbt.ShortShadowTag
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
@@ -107,7 +107,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                     val bukkitStack = ItemStack(Material.NETHERITE_SWORD)
 
                     // test write operations
-                    bukkitStack.wakameTag = CompoundShadowTag {
+                    bukkitStack.wakameTag = CompoundTag {
                         putString("namespace", "short_sword")
                         putString("path", "demo")
                         putByte("variant", 18)
@@ -122,19 +122,19 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                         putLongArray("long_array", longArrayOf(1, 2, 3))
                         putBoolean("boolean", true)
 
-                        val listShadowTag1 = ListShadowTag(
-                            IntShadowTag.valueOf(1),
+                        val listShadowTag1 = ListTag(
+                            IntTag.valueOf(1),
                         )
                         put("list1", listShadowTag1)
 
-                        val listShadowTag2 = ListShadowTag {
-                            add(ShortShadowTag.valueOf(1))
-                            add(ShortShadowTag.valueOf(2))
-                            add(ShortShadowTag.valueOf(3))
+                        val listShadowTag2 = ListTag {
+                            add(ShortTag.valueOf(1))
+                            add(ShortTag.valueOf(2))
+                            add(ShortTag.valueOf(3))
                         }
                         put("list2", listShadowTag2)
 
-                        val compoundShadowTag = CompoundShadowTag {
+                        val compoundShadowTag = CompoundTag {
                             putByte("k1", 31)
                         }
                         put("stats", compoundShadowTag)
@@ -156,17 +156,17 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                         check(getLongArray("long_array").last() == 3L)
                         check(getBoolean("boolean"))
 
-                        val intList = getList("list1", ShadowTagType.INT)
-                        val shortList = getList("list2", ShadowTagType.SHORT)
+                        val intList = getList("list1", TagType.INT)
+                        val shortList = getList("list2", TagType.SHORT)
 
                         check(intList.getInt(0) == 1)
                         check(shortList.getShort(2) == 3.toShort())
 
                         val intShadowTag = intList[0]
-                        check((intShadowTag as IntShadowTag).intValue() == 1)
+                        check((intShadowTag as IntTag).intValue() == 1)
 
                         val shortShadowTag = shortList[2]
-                        check((shortShadowTag as ShortShadowTag).intValue() == 3)
+                        check((shortShadowTag as ShortTag).intValue() == 3)
 
                         check(getCompound("stats").getByte("k1") == 31.toByte())
                     }

@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 
 /**
@@ -21,7 +21,7 @@ value class BElementMeta(
     override val key: Key
         get() = ItemMetaConstants.createKey { ELEMENT }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.ELEMENT, ShadowTagType.BYTE_ARRAY) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.ELEMENT, TagType.BYTE_ARRAY) ?: false
 
     override fun getOrNull(): Set<Element>? {
         return accessor.rootOrNull

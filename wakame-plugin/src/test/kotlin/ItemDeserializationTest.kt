@@ -1,3 +1,16 @@
+import cc.mewcraft.nbt.ByteArrayTag
+import cc.mewcraft.nbt.ByteTag
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.DoubleTag
+import cc.mewcraft.nbt.EndTag
+import cc.mewcraft.nbt.FloatTag
+import cc.mewcraft.nbt.IntArrayTag
+import cc.mewcraft.nbt.IntTag
+import cc.mewcraft.nbt.ListTag
+import cc.mewcraft.nbt.LongArrayTag
+import cc.mewcraft.nbt.LongTag
+import cc.mewcraft.nbt.ShortTag
+import cc.mewcraft.nbt.StringTag
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.entity.entityModule
@@ -5,13 +18,39 @@ import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.binary.cell.BinaryCellFactory
 import cc.mewcraft.wakame.item.binary.cell.isNoop
 import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.item.schema.*
-import cc.mewcraft.wakame.item.schema.meta.*
+import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.item.schema.NekoItemRealizer
+import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
+import cc.mewcraft.wakame.item.schema.SchemaGenerationTrigger
+import cc.mewcraft.wakame.item.schema.getMeta
+import cc.mewcraft.wakame.item.schema.meta.Durability
+import cc.mewcraft.wakame.item.schema.meta.Food
+import cc.mewcraft.wakame.item.schema.meta.GenerationResult
+import cc.mewcraft.wakame.item.schema.meta.SCustomNameMeta
+import cc.mewcraft.wakame.item.schema.meta.SDurabilityMeta
+import cc.mewcraft.wakame.item.schema.meta.SElementMeta
+import cc.mewcraft.wakame.item.schema.meta.SFoodMeta
+import cc.mewcraft.wakame.item.schema.meta.SKizamiMeta
+import cc.mewcraft.wakame.item.schema.meta.SLevelMeta
+import cc.mewcraft.wakame.item.schema.meta.SLoreMeta
+import cc.mewcraft.wakame.item.schema.meta.SRarityMeta
+import cc.mewcraft.wakame.item.schema.meta.SSkinMeta
+import cc.mewcraft.wakame.item.schema.meta.SSkinOwnerMeta
+import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.BehaviorRegistry
+import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry.EntityRegistry
+import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.registry.LevelMappingRegistry
+import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.skin.skinModule
@@ -22,7 +61,6 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
 import it.unimi.dsi.fastutil.longs.LongSet
-import me.lucko.helper.shadows.nbt.*
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -30,7 +68,7 @@ import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.slf4j.Logger
-import java.util.*
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
@@ -96,53 +134,53 @@ class ItemDeserializationTest : KoinTest {
 
         // mock NBT
         mockkStatic(
-            ByteArrayShadowTag::class,
-            ByteShadowTag::class,
-            CompoundShadowTag::class,
-            DoubleShadowTag::class,
-            EndShadowTag::class,
-            FloatShadowTag::class,
-            IntArrayShadowTag::class,
-            IntShadowTag::class,
-            ListShadowTag::class,
-            LongArrayShadowTag::class,
-            LongShadowTag::class,
-            ShortShadowTag::class,
-            StringShadowTag::class,
+            ByteArrayTag::class,
+            ByteTag::class,
+            CompoundTag::class,
+            DoubleTag::class,
+            EndTag::class,
+            FloatTag::class,
+            IntArrayTag::class,
+            IntTag::class,
+            ListTag::class,
+            LongArrayTag::class,
+            LongTag::class,
+            ShortTag::class,
+            StringTag::class,
         )
-        val mockByteArrayTag = mockk<ByteArrayShadowTag>()
-        every { ByteArrayShadowTag.create(any<ByteArray>()) } returns mockByteArrayTag
-        every { ByteArrayShadowTag.create(any<List<Byte>>()) } returns mockByteArrayTag
-        val mockByteTag = mockk<ByteShadowTag>()
-        every { ByteShadowTag.valueOf(any<Boolean>()) } returns mockByteTag
-        every { ByteShadowTag.valueOf(any<Byte>()) } returns mockByteTag
-        val mockCompoundTag = mockk<CompoundShadowTag>()
-        every { CompoundShadowTag.create() } returns mockCompoundTag
+        val mockByteArrayTag = mockk<ByteArrayTag>()
+        every { ByteArrayTag.create(any<ByteArray>()) } returns mockByteArrayTag
+        every { ByteArrayTag.create(any<List<Byte>>()) } returns mockByteArrayTag
+        val mockByteTag = mockk<ByteTag>()
+        every { ByteTag.valueOf(any<Boolean>()) } returns mockByteTag
+        every { ByteTag.valueOf(any<Byte>()) } returns mockByteTag
+        val mockCompoundTag = mockk<CompoundTag>()
+        every { CompoundTag.create() } returns mockCompoundTag
         every { mockCompoundTag.asString() } returns "EMPTY COMPOUND"
-        val mockDoubleTag = mockk<DoubleShadowTag>()
-        every { DoubleShadowTag.valueOf(any()) } returns mockDoubleTag
-        val mockEndTag = mockk<EndShadowTag>()
-        every { EndShadowTag.instance() } returns mockEndTag
-        val mockFloatTag = mockk<FloatShadowTag>()
-        every { FloatShadowTag.valueOf(any()) } returns mockFloatTag
-        val mockIntArrayTag = mockk<IntArrayShadowTag>()
-        every { IntArrayShadowTag.create(any<IntArray>()) } returns mockIntArrayTag
-        every { IntArrayShadowTag.create(any<List<Int>>()) } returns mockIntArrayTag
-        val mockIntTag = mockk<IntShadowTag>()
-        every { IntShadowTag.valueOf(any()) } returns mockIntTag
-        val mockListTag = mockk<ListShadowTag>()
-        every { ListShadowTag.create() } returns mockListTag
-        every { ListShadowTag.create(any(), any()) } returns mockListTag
-        val mockLongArrayTag = mockk<LongArrayShadowTag>()
-        every { LongArrayShadowTag.create(any<LongArray>()) } returns mockLongArrayTag
-        every { LongArrayShadowTag.create(any<LongSet>()) } returns mockLongArrayTag
-        every { LongArrayShadowTag.create(any<List<Long>>()) } returns mockLongArrayTag
-        val mockLongTag = mockk<LongShadowTag>()
-        every { LongShadowTag.valueOf(any()) } returns mockLongTag
-        val mockShortTag = mockk<ShortShadowTag>()
-        every { ShortShadowTag.valueOf(any()) } returns mockShortTag
-        val mockStringTag = mockk<StringShadowTag>()
-        every { StringShadowTag.valueOf(any()) } returns mockStringTag
+        val mockDoubleTag = mockk<DoubleTag>()
+        every { DoubleTag.valueOf(any()) } returns mockDoubleTag
+        val mockEndTag = mockk<EndTag>()
+        every { EndTag.instance() } returns mockEndTag
+        val mockFloatTag = mockk<FloatTag>()
+        every { FloatTag.valueOf(any()) } returns mockFloatTag
+        val mockIntArrayTag = mockk<IntArrayTag>()
+        every { IntArrayTag.create(any<IntArray>()) } returns mockIntArrayTag
+        every { IntArrayTag.create(any<List<Int>>()) } returns mockIntArrayTag
+        val mockIntTag = mockk<IntTag>()
+        every { IntTag.valueOf(any()) } returns mockIntTag
+        val mockListTag = mockk<ListTag>()
+        every { ListTag.create() } returns mockListTag
+        every { ListTag.create(any(), any()) } returns mockListTag
+        val mockLongArrayTag = mockk<LongArrayTag>()
+        every { LongArrayTag.create(any<LongArray>()) } returns mockLongArrayTag
+        every { LongArrayTag.create(any<LongSet>()) } returns mockLongArrayTag
+        every { LongArrayTag.create(any<List<Long>>()) } returns mockLongArrayTag
+        val mockLongTag = mockk<LongTag>()
+        every { LongTag.valueOf(any()) } returns mockLongTag
+        val mockShortTag = mockk<ShortTag>()
+        every { ShortTag.valueOf(any()) } returns mockShortTag
+        val mockStringTag = mockk<StringTag>()
+        every { StringTag.valueOf(any()) } returns mockStringTag
 
         // mock player
         val mockUser = mockk<User<Nothing>>(relaxed = true)

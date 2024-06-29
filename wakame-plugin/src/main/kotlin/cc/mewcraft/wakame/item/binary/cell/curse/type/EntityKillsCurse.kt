@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.curse.type
 
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.entity.EntityTypeHolder
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
@@ -8,10 +10,8 @@ import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEntityKillsCurse.Constants.COUNT_TAG_KEY
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEntityKillsCurse.Constants.INDEX_TAG_KEY
 import cc.mewcraft.wakame.registry.EntityRegistry
-import cc.mewcraft.wakame.util.CompoundShadowTag
+import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.toStableShort
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
 
 /**
@@ -46,7 +46,7 @@ interface BinaryEntityKillsCurse : BinaryCurse {
 }
 
 fun BinaryEntityKillsCurse(
-    compound: CompoundShadowTag,
+    compound: CompoundTag,
 ): BinaryEntityKillsCurse {
     return BinaryEntityKillsCurseNBTWrapper(compound)
 }
@@ -66,7 +66,7 @@ internal data class BinaryEntityKillsCurseDataHolder(
     override val index: EntityTypeHolder,
     override val count: Int,
 ) : BinaryEntityKillsCurse {
-    override fun asTag(): ShadowTag = CompoundShadowTag {
+    override fun asTag(): Tag = CompoundTag {
         putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
         putString(INDEX_TAG_KEY, index.name)
         putShort(COUNT_TAG_KEY, count.toStableShort())
@@ -74,7 +74,7 @@ internal data class BinaryEntityKillsCurseDataHolder(
 }
 
 internal class BinaryEntityKillsCurseNBTWrapper(
-    private val compound: CompoundShadowTag,
+    private val compound: CompoundTag,
 ) : BinaryEntityKillsCurse {
     override val index: EntityTypeHolder
         get() = compound.getEntityReference(INDEX_TAG_KEY)
@@ -85,7 +85,7 @@ internal class BinaryEntityKillsCurseNBTWrapper(
         compound.tags().clear()
     }
 
-    override fun asTag(): ShadowTag {
+    override fun asTag(): Tag {
         return compound
     }
 
@@ -94,6 +94,6 @@ internal class BinaryEntityKillsCurseNBTWrapper(
     }
 }
 
-private fun CompoundShadowTag.getEntityReference(key: String): EntityTypeHolder {
+private fun CompoundTag.getEntityReference(key: String): EntityTypeHolder {
     return EntityRegistry.TYPES[this.getString(key)]
 }

@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.binary.cell.core.empty
 
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
@@ -32,10 +32,10 @@ sealed interface BinaryEmptyCore : BinaryCore
 //
 
 private data object BinaryEmptyCoreImpl : BinaryEmptyCore {
-    private val EMPTY_COMPOUND: CompoundShadowTag = CompoundShadowTag.create()
+    private val EMPTY_COMPOUND: CompoundTag = CompoundTag.create()
 
     override val key: Key = GenericKeys.EMPTY
-    override fun asTag(): ShadowTag = EMPTY_COMPOUND
+    override fun asTag(): Tag = EMPTY_COMPOUND
     override fun provideDisplayLore(): LoreLine = EmptyLoreLine
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(ExaminableProperty.of("key", key))
     override fun toString(): String = toSimpleString()

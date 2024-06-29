@@ -1,17 +1,21 @@
 package cc.mewcraft.wakame.item.schema.cell.core.attribute
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.AttributeDataR
 import cc.mewcraft.wakame.attribute.facade.AttributeDataRE
 import cc.mewcraft.wakame.attribute.facade.AttributeDataS
 import cc.mewcraft.wakame.attribute.facade.AttributeDataSE
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.*
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderR
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderRE
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderS
+import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderSE
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.AttributeContextHolder
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
@@ -23,7 +27,7 @@ private fun SchemaAttributeCore.populateGenerationContext(context: SchemaGenerat
 
 data class SchemaAttributeCoreR(
     override val key: Key,
-    private val tagType: ShadowTagType,
+    private val tagType: TagType,
     override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
@@ -50,7 +54,7 @@ data class SchemaAttributeCoreR(
 
 data class SchemaAttributeCoreRE(
     override val key: Key,
-    private val tagType: ShadowTagType,
+    private val tagType: TagType,
     override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
@@ -79,7 +83,7 @@ data class SchemaAttributeCoreRE(
 
 data class SchemaAttributeCoreS(
     override val key: Key,
-    private val tagType: ShadowTagType,
+    private val tagType: TagType,
     override val operation: Operation,
     override val value: RandomizedValue,
 ) : SchemaAttributeCore, AttributeDataS<Operation, RandomizedValue> {
@@ -103,7 +107,7 @@ data class SchemaAttributeCoreS(
 
 data class SchemaAttributeCoreSE(
     override val key: Key,
-    private val tagType: ShadowTagType,
+    private val tagType: TagType,
     override val operation: Operation,
     override val value: RandomizedValue,
     override val element: Element,

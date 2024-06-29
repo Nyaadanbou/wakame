@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.item.schema.meta.Food
-import cc.mewcraft.wakame.util.CompoundShadowTag
+import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.toStableFloat
 import cc.mewcraft.wakame.util.toStableInt
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 import org.bukkit.potion.PotionEffect
 
@@ -26,7 +26,7 @@ value class BFoodMeta(
     override val key: Key
         get() = ItemMetaConstants.createKey { FOOD }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.FOOD, ShadowTagType.COMPOUND) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.FOOD, TagType.COMPOUND) ?: false
 
     /**
      * Gets the value of `nutrition`.
@@ -158,7 +158,7 @@ value class BFoodMeta(
 
     override fun set(value: Food) {
         // TODO 等待组件相关API的到来
-        accessor.rootOrCreate.put(key.value(), CompoundShadowTag {
+        accessor.rootOrCreate.put(key.value(), CompoundTag {
             putInt(NUTRITION_TAG, value.nutrition.toStableInt())
             putFloat(SATURATION_TAG, value.saturation.toStableFloat())
             putBoolean(IS_MEAT_TAG, value.isMeat)

@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.component
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
 import cc.mewcraft.wakame.util.wakameTagOrNull
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.bukkit.inventory.ItemStack
 
 data class TypedItemComponent<T>(
@@ -234,7 +234,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         private val item: ItemStack,
     ) : ItemComponentMap {
         // 储存了所有组件信息的
-        private val nbt: CompoundShadowTag = item.wakameTagOrNull?.getCompoundOrNull("components") ?: throw IllegalStateException()
+        private val nbt: CompoundTag = item.wakameTagOrNull?.getCompoundOrNull("components") ?: throw IllegalStateException()
 
         override fun <T, S : ItemComponentHolder> get(type: ItemComponentType<T, S>): T? {
             val id = type.id
@@ -282,7 +282,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             when (source) {
                 // 涉及的组件: 见 get()
                 ItemComponentType.Holder.NBT -> {
-                    val compound = nbt.getOrPut(id, CompoundShadowTag::create)
+                    val compound = nbt.getOrPut(id, CompoundTag::create)
                     val holder = ItemComponentHolder.NBT(compound)
                     val cast = type as ItemComponentType<T, ItemComponentHolder.NBT>
                     cast.write(holder, value)
@@ -295,7 +295,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
                 }
 
                 ItemComponentType.Holder.COMPLEX -> {
-                    val compound = nbt.getOrPut(id, CompoundShadowTag::create)
+                    val compound = nbt.getOrPut(id, CompoundTag::create)
                     val holder = ItemComponentHolder.Complex(item, compound)
                     val cast = type as ItemComponentType<T, ItemComponentHolder.Complex>
                     cast.write(holder, value)
@@ -320,7 +320,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
                 ItemComponentType.Holder.COMPLEX -> {
                     // 这个 NBT 标签实际上没必要 getOrPut, 因为反正
                     // 这个标签最后要被移除. 只不过因为 Complex 要求非空.
-                    // val compound = nbt.getOrPut(id, CompoundShadowTag::create)
+                    // val compound = nbt.getOrPut(id, CompoundTag::create)
 
                     val compound = EMPTY_COMPOUND
                     val holder = ItemComponentHolder.Complex(item, compound)
@@ -344,7 +344,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         }
 
         private companion object {
-            val EMPTY_COMPOUND: CompoundShadowTag = CompoundShadowTag.create()
+            val EMPTY_COMPOUND: CompoundTag = CompoundTag.create()
         }
     }
 }

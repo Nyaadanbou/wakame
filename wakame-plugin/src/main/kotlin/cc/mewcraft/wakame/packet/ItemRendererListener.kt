@@ -50,16 +50,16 @@ private object PacketSupport : KoinComponent {
             packet.windowId,
             packet.stateId,
             packet.slot,
-            nekoStack.itemStack
+            nekoStack.packetStack
         )
     }
 
     fun handleWindowItems(user: User, packet: WrapperPlayServerWindowItems): PacketWrapper<*> {
         val items = packet.items
-        val newItems = items.map mapItems@{ item ->
-            val nekoStack = item.takeUnlessEmpty()?.tryNekoStack ?: return@mapItems item
+        val newItems = items.map { item ->
+            val nekoStack = item.takeUnlessEmpty()?.tryNekoStack ?: return@map item
             updateItem(nekoStack, user)
-            nekoStack.itemStack
+            nekoStack.packetStack
         }
 
         return WrapperPlayServerWindowItems(

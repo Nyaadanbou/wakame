@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.registry.ItemSkinRegistry
 import cc.mewcraft.wakame.skin.ItemSkin
 import cc.mewcraft.wakame.util.getShortOrNull
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 
@@ -19,7 +19,7 @@ value class BSkinMeta(
     override val key: Key
         get() = ItemMetaConstants.createKey { SKIN }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.SKIN, ShadowTagType.SHORT) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.SKIN, TagType.SHORT) ?: false
 
     override fun getOrNull(): ItemSkin? {
         return accessor.rootOrNull

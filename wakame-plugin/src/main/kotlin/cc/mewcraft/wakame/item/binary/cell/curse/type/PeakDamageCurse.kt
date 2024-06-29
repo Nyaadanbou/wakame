@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.curse.type
 
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
@@ -8,10 +10,8 @@ import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryPeakDamageCurse.Constants.AMOUNT_TAG_KEY
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryPeakDamageCurse.Constants.ELEMENT_TAG_KEY
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.util.CompoundShadowTag
+import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.toStableShort
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
 
 /**
@@ -42,7 +42,7 @@ interface BinaryPeakDamageCurse : BinaryCurse {
 }
 
 fun BinaryPeakDamageCurse(
-    compound: CompoundShadowTag,
+    compound: CompoundTag,
 ): BinaryPeakDamageCurse {
     return BinaryPeakDamageCurseNBTWrapper(compound)
 }
@@ -62,7 +62,7 @@ internal data class BinaryPeakDamageCurseDataHolder(
     override val element: Element,
     override val amount: Int,
 ) : BinaryPeakDamageCurse {
-    override fun asTag(): ShadowTag = CompoundShadowTag {
+    override fun asTag(): Tag = CompoundTag {
         putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
         putShort(AMOUNT_TAG_KEY, amount.toStableShort())
         putByte(ELEMENT_TAG_KEY, element.binaryId)
@@ -70,7 +70,7 @@ internal data class BinaryPeakDamageCurseDataHolder(
 }
 
 internal class BinaryPeakDamageCurseNBTWrapper(
-    private val compound: CompoundShadowTag,
+    private val compound: CompoundTag,
 ) : BinaryPeakDamageCurse {
     override val element: Element
         get() = compound.getElement(ELEMENT_TAG_KEY)
@@ -81,7 +81,7 @@ internal class BinaryPeakDamageCurseNBTWrapper(
         compound.tags().clear()
     }
 
-    override fun asTag(): ShadowTag {
+    override fun asTag(): Tag {
         return compound
     }
 
@@ -90,6 +90,6 @@ internal class BinaryPeakDamageCurseNBTWrapper(
     }
 }
 
-private fun CompoundShadowTag.getElement(key: String): Element {
+private fun CompoundTag.getElement(key: String): Element {
     return ElementRegistry.getBy(this.getByte(key))
 }

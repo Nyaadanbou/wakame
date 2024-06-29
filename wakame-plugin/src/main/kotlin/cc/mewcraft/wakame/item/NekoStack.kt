@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -18,9 +18,9 @@ import java.util.UUID
 interface NekoStack {
 
     /**
-     * Gets the "wakame" [NBT][CompoundShadowTag] on this item.
+     * Gets the "wakame" [NBT][CompoundTag] on this item.
      */
-    val nbt: CompoundShadowTag
+    val nbt: CompoundTag
 
     /**
      * Gets the wrapped [ItemStack].

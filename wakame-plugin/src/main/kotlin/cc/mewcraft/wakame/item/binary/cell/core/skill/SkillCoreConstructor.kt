@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.util.krequire
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import org.spongepowered.configurate.ConfigurationNode
 
 //
@@ -12,7 +12,7 @@ import org.spongepowered.configurate.ConfigurationNode
 /**
  * A constructor function to create [BinarySkillCore].
  */
-fun BinarySkillCore(compound: CompoundShadowTag): BinarySkillCore {
+fun BinarySkillCore(compound: CompoundTag): BinarySkillCore {
     return BinarySkillCoreTagWrapper(compound)
 }
 

@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.util.getIntOrNull
 import cc.mewcraft.wakame.util.toStableByte
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -19,7 +19,7 @@ value class BLevelMeta(
     override val key: Key
         get() = ItemMetaConstants.createKey { LEVEL }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.LEVEL, ShadowTagType.BYTE) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.LEVEL, TagType.BYTE) ?: false
 
     override fun getOrNull(): Int? {
         return accessor.rootOrNull?.getIntOrNull(key.value())

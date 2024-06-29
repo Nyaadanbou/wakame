@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.binary.cell.reforge
 
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
+import cc.mewcraft.nbt.CompoundTag
 
 object ReforgeDataFactory {
     /**
      * Creates an empty reforge meta.
      */
     fun empty(): ReforgeDataHolder {
-        return ReforgeDataHolderImpl(CompoundShadowTag.create())
+        return ReforgeDataHolderImpl(CompoundTag.create())
     }
 
     /**
@@ -16,7 +16,7 @@ object ReforgeDataFactory {
      * @param compound the compound
      * @return a new instance
      */
-    fun wrap(compound: CompoundShadowTag): ReforgeDataHolder {
+    fun wrap(compound: CompoundTag): ReforgeDataHolder {
         if (compound.isEmpty) {
             return empty()
         }

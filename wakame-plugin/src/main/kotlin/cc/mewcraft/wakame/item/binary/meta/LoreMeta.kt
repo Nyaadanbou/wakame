@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.ListTag
+import cc.mewcraft.nbt.StringTag
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.util.getListOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import me.lucko.helper.nbt.ShadowTagType
-import me.lucko.helper.shadows.nbt.ListShadowTag
-import me.lucko.helper.shadows.nbt.StringShadowTag
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 
@@ -23,17 +23,17 @@ value class BLoreMeta(
         get() = ItemMetaConstants.createKey { LORE }
 
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.LORE, ShadowTagType.LIST) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.LORE, TagType.LIST) ?: false
 
     override fun getOrNull(): List<String>? {
         return accessor.rootOrNull
-            ?.getListOrNull(key.value(), ShadowTagType.STRING)
-            ?.map { (it as StringShadowTag).value() }
+            ?.getListOrNull(key.value(), TagType.STRING)
+            ?.map { (it as StringTag).value() }
     }
 
     override fun set(value: List<String>) {
-        val stringTags = value.map(StringShadowTag::valueOf)
-        val listShadowTag = ListShadowTag.create(stringTags, ShadowTagType.STRING)
+        val stringTags = value.map(StringTag::valueOf)
+        val listShadowTag = ListTag.create(stringTags, TagType.STRING)
         accessor.rootOrCreate.put(key.value(), listShadowTag)
     }
 

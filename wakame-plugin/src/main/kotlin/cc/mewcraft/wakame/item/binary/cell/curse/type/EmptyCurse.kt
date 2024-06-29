@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.binary.cell.curse.type
 
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.cell.curse.BinaryCurse
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
 
 /**
@@ -27,6 +27,6 @@ internal data object BinaryEmptyCurseImpl : BinaryEmptyCurse {
     override val key: Key = GenericKeys.EMPTY
     override fun test(context: NekoStack): Boolean = true
     override fun clear() = Unit
-    override fun asTag(): ShadowTag = EMPTY_COMPOUND
-    private val EMPTY_COMPOUND = CompoundShadowTag.create()
+    override fun asTag(): Tag = EMPTY_COMPOUND
+    private val EMPTY_COMPOUND = CompoundTag.create()
 }

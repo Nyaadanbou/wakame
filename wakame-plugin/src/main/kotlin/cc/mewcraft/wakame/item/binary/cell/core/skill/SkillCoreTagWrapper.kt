@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
+import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.SkillBinaryKeys
@@ -9,8 +11,6 @@ import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.getIntOrNull
 import cc.mewcraft.wakame.util.getStringOrNull
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
-import me.lucko.helper.shadows.nbt.ShadowTag
 import net.kyori.adventure.key.Key
 
 //
@@ -18,7 +18,7 @@ import net.kyori.adventure.key.Key
 //
 
 internal class BinarySkillCoreTagWrapper(
-    private val compound: CompoundShadowTag,
+    private val compound: CompoundTag,
 ) : BinarySkillCore() {
     override val key: Key
         get() = compound.getIdentifier()
@@ -31,7 +31,7 @@ internal class BinarySkillCoreTagWrapper(
         compound.tags().clear()
     }
 
-    override fun asTag(): ShadowTag {
+    override fun asTag(): Tag {
         return compound
     }
 
@@ -40,15 +40,15 @@ internal class BinarySkillCoreTagWrapper(
     }
 }
 
-private fun CompoundShadowTag.getIdentifier(): Key {
+private fun CompoundTag.getIdentifier(): Key {
     return Key(this.getString(CoreBinaryKeys.CORE_IDENTIFIER))
 }
 
-private fun CompoundShadowTag.getTrigger(): Trigger {
+private fun CompoundTag.getTrigger(): Trigger {
     return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillRegistry.TRIGGERS[Key(it)] } ?: SingleTrigger.NOOP
 }
 
-private fun CompoundShadowTag.getEffectiveVariant(): ConfiguredSkill.Variant {
+private fun CompoundTag.getEffectiveVariant(): ConfiguredSkill.Variant {
     val variant = this.getIntOrNull(SkillBinaryKeys.EFFECTIVE_VARIANT) ?: return ConfiguredSkill.Variant.any()
     return ConfiguredSkill.Variant.of(variant)
 }

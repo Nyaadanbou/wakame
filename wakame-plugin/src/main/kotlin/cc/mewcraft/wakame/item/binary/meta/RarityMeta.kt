@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.binary.meta
 
+import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.ItemMetaConstants
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.getByteOrNull
-import me.lucko.helper.nbt.ShadowTagType
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 
@@ -19,7 +19,7 @@ value class BRarityMeta(
     override val key: Key
         get() = ItemMetaConstants.createKey { RARITY }
     override val exists: Boolean
-        get() = accessor.rootOrNull?.contains(ItemMetaConstants.RARITY, ShadowTagType.BYTE) ?: false
+        get() = accessor.rootOrNull?.contains(ItemMetaConstants.RARITY, TagType.BYTE) ?: false
 
     override fun getOrNull(): Rarity? {
         return accessor.rootOrNull

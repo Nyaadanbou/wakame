@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.binary.cell.core.attribute
 
+import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
-import me.lucko.helper.shadows.nbt.CompoundShadowTag
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -24,7 +24,7 @@ import org.spongepowered.configurate.ConfigurationNode
  * ```
  */
 fun BinaryAttributeCore(
-    compound: CompoundShadowTag,
+    compound: CompoundTag,
 ): BinaryAttributeCore {
     val key = Key(compound.getString(CoreBinaryKeys.CORE_IDENTIFIER))
     val facade = AttributeRegistry.FACADES[key]

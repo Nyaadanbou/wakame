@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.filter
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random2.Filter
 import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.toStableInt
 import com.google.common.collect.Range
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -18,7 +19,7 @@ data class FilterItemLevel(
      * [level].
      */
     override fun testOriginal(context: GenerationContext): Boolean {
-        return context.level in level
+        return context.level.toStableInt() in level
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
