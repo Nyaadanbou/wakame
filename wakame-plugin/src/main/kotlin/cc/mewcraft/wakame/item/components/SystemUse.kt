@@ -14,10 +14,17 @@ interface SystemUse : Examinable {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Unit, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-        override fun read(holder: ItemComponentHolder.NBT): Unit = Unit
-        override fun write(holder: ItemComponentHolder.NBT, value: Unit) = Unit
-        override fun remove(holder: ItemComponentHolder.NBT) = Unit
+    ) : ItemComponentType<Unit> {
+        override fun read(holder: ItemComponentHolder): Unit? {
+            return if (holder.hasTag()) Unit else null
+        }
+
+        override fun write(holder: ItemComponentHolder, value: Unit) {
+            holder.putTag()
+        }
+
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
+        }
     }
 }

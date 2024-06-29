@@ -33,11 +33,18 @@ interface Kizamiable : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Kizamiable, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-        override fun read(holder: ItemComponentHolder.NBT): Kizamiable = Value
-        override fun write(holder: ItemComponentHolder.NBT, value: Kizamiable) = Unit
-        override fun remove(holder: ItemComponentHolder.NBT) = Unit
+    ) : ItemComponentType<Kizamiable> {
+        override fun read(holder: ItemComponentHolder): Kizamiable? {
+            return if (holder.hasTag()) Value else null
+        }
+
+        override fun write(holder: ItemComponentHolder, value: Kizamiable) {
+            holder.putTag()
+        }
+
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
+        }
     }
 
     data object Template : ItemTemplate<Kizamiable>, ItemTemplateType<Template> {

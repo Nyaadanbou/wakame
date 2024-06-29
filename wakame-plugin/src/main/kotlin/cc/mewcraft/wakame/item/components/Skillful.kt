@@ -33,11 +33,18 @@ interface Skillful : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Skillful, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-        override fun read(holder: ItemComponentHolder.NBT): Skillful = Value
-        override fun write(holder: ItemComponentHolder.NBT, value: Skillful) = Unit
-        override fun remove(holder: ItemComponentHolder.NBT) = Unit
+    ) : ItemComponentType<Skillful> {
+        override fun read(holder: ItemComponentHolder): Skillful? {
+            return if (holder.hasTag()) Value else null
+        }
+
+        override fun write(holder: ItemComponentHolder, value: Skillful) {
+            holder.putTag()
+        }
+
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
+        }
     }
 
     data object Template : ItemTemplate<Skillful>, ItemTemplateType<Template> {

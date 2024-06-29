@@ -31,10 +31,8 @@ interface Unbreakable : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Unbreakable, ItemComponentHolder.Item> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
-
-        override fun read(holder: ItemComponentHolder.Item): Unbreakable? {
+    ) : ItemComponentType<Unbreakable> {
+        override fun read(holder: ItemComponentHolder): Unbreakable? {
             val itemMeta = holder.item.itemMeta ?: return null
             if (!itemMeta.isUnbreakable) {
                 return null
@@ -42,7 +40,7 @@ interface Unbreakable : Examinable, TooltipProvider {
             return Value(!itemMeta.hasItemFlag(ItemFlag.HIDE_UNBREAKABLE))
         }
 
-        override fun write(holder: ItemComponentHolder.Item, value: Unbreakable) {
+        override fun write(holder: ItemComponentHolder, value: Unbreakable) {
             holder.item.editMeta {
                 it.isUnbreakable = true
                 if (value.showInTooltip) {
@@ -53,7 +51,7 @@ interface Unbreakable : Examinable, TooltipProvider {
             }
         }
 
-        override fun remove(holder: ItemComponentHolder.Item) {
+        override fun remove(holder: ItemComponentHolder) {
             holder.item.editMeta { it.isUnbreakable = false }
         }
 

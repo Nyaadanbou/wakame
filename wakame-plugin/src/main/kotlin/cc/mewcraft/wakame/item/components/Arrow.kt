@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
-import cc.mewcraft.wakame.item.component.ItemComponentHolder.NBT
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
@@ -67,21 +67,26 @@ interface Arrow : Examinable, TooltipProvider {
     // 根据物品组件的具体情况, 这里的实现会稍有不同.
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Arrow, NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-
-        override fun read(holder: NBT): Arrow {
-            val pierceLevel = holder.tag.getByte(TAG_PIERCE_LEVEL)
-            return Value(pierceLevel)
+    ) : ItemComponentType<Arrow> {
+        override fun read(holder: ItemComponentHolder): Arrow? {
+            val tag = holder.getTag() ?: return null
+            val pierceLevel = tag.getByte(TAG_PIERCE_LEVEL)
+            return Value(pierceLevel = pierceLevel)
         }
 
-        override fun write(holder: NBT, value: Arrow) {
+        override fun write(holder: ItemComponentHolder, value: Arrow) {
+            val tag = holder.getTagOrCreate()
             val pierceLevel = value.pierceLevel
-            holder.tag.putByte(TAG_PIERCE_LEVEL, pierceLevel)
+            tag.putByte(TAG_PIERCE_LEVEL, pierceLevel)
         }
 
-        override fun remove(holder: NBT) {
-            // no-op
+        // 开发日记 2024/6/29
+        // 由于 ItemComponentHolder 已重写,
+        // 对于原来 holder 为 NBT 的物品组件,
+        // 也必须要正确实现该函数.
+        // 具体来说就是调用一下 holder.removeTag()
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         // 开发日记: 2024/6/24 小米

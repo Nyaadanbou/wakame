@@ -27,21 +27,21 @@ interface ItemName : Examinable {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<ItemName, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-
-        override fun read(holder: ItemComponentHolder.NBT): ItemName {
-            val raw = holder.tag.getString(TAG_VALUE)
+    ) : ItemComponentType<ItemName> {
+        override fun read(holder: ItemComponentHolder): ItemName? {
+            val tag = holder.getTag() ?: return null
+            val raw = tag.getString(TAG_VALUE)
             val cooked = Component.empty()
-            return Value(raw, cooked)
+            return Value(raw = raw, cooked = cooked)
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: ItemName) {
-            holder.tag.putString(TAG_VALUE, value.raw)
+        override fun write(holder: ItemComponentHolder, value: ItemName) {
+            val tag = holder.getTagOrCreate()
+            tag.putString(TAG_VALUE, value.raw)
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         private companion object {

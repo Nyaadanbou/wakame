@@ -50,20 +50,20 @@ interface ItemRarity : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<ItemRarity, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-
-        override fun read(holder: ItemComponentHolder.NBT): ItemRarity? {
-            val raw = holder.tag.getByteOrNull(TAG_VALUE)?.let(RarityRegistry::findBy) ?: return null
-            return Value(raw)
+    ) : ItemComponentType<ItemRarity> {
+        override fun read(holder: ItemComponentHolder): ItemRarity? {
+            val tag = holder.getTag() ?: return null
+            val raw = tag.getByteOrNull(TAG_VALUE)?.let(RarityRegistry::findBy) ?: return null
+            return Value(rarity = raw)
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: ItemRarity) {
-            holder.tag.putByte(TAG_VALUE, value.rarity.binaryId)
+        override fun write(holder: ItemComponentHolder, value: ItemRarity) {
+            val tag = holder.getTagOrCreate()
+            tag.putByte(TAG_VALUE, value.rarity.binaryId)
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         private companion object {

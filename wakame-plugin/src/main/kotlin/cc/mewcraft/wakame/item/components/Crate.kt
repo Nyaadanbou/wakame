@@ -47,20 +47,19 @@ interface Crate : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Crate, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-
-        override fun read(holder: ItemComponentHolder.NBT): Crate? {
-            val key = Key(holder.tag.getString(TAG_KEY))
-            return Value(key)
+    ) : ItemComponentType<Crate> {
+        override fun read(holder: ItemComponentHolder): Crate? {
+            val tag = holder.getTag() ?: return null
+            val key = Key(tag.getString(TAG_KEY))
+            return Value(key = key)
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: Crate) {
-            holder.tag.putString(TAG_KEY, value.key.asString())
+        override fun write(holder: ItemComponentHolder, value: Crate) {
+            holder.getTagOrCreate().putString(TAG_KEY, value.key.asString())
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         private companion object {

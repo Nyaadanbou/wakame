@@ -47,21 +47,21 @@ interface ItemLevel : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<ItemLevel, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-
-        override fun read(holder: ItemComponentHolder.NBT): ItemLevel {
-            val raw = holder.tag.getShort(TAG_VALUE)
-            return Value(raw)
+    ) : ItemComponentType<ItemLevel> {
+        override fun read(holder: ItemComponentHolder): ItemLevel? {
+            val tag = holder.getTag() ?: return null
+            val raw = tag.getShort(TAG_VALUE)
+            return Value(level = raw)
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: ItemLevel) {
+        override fun write(holder: ItemComponentHolder, value: ItemLevel) {
+            val tag = holder.getTagOrCreate()
             val raw = value.level
-            holder.tag.putShort(TAG_VALUE, raw)
+            tag.putShort(TAG_VALUE, raw)
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         private companion object {

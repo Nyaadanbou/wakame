@@ -34,127 +34,127 @@ object ItemComponentTypes {
      * 将物品作为弹药.
      */
     // POC
-    val ARROW: ItemComponentType<Arrow, ItemComponentHolder.NBT> = Arrow.Codec(ItemComponentConstants.ARROW).apply(::register)
+    val ARROW: ItemComponentType<Arrow> = Arrow.Codec(ItemComponentConstants.ARROW).apply(::register)
 
     /**
      * 控制物品能否提供属性加成给玩家.
      */
     // POC
-    val ATTRIBUTABLE: ItemComponentType<Attributable, ItemComponentHolder.NBT> = Attributable.Codec(ItemComponentConstants.ATTRIBUTABLE).apply(::register)
+    val ATTRIBUTABLE: ItemComponentType<Attributable> = Attributable.Codec(ItemComponentConstants.ATTRIBUTABLE).apply(::register)
 
     /**
      * 控制物品能否释放技能.
      */
     // POC
-    val CASTABLE: ItemComponentType<Castable, ItemComponentHolder.NBT> = Castable.Codec(ItemComponentConstants.CASTABLE).apply(::register)
+    val CASTABLE: ItemComponentType<Castable> = Castable.Codec(ItemComponentConstants.CASTABLE).apply(::register)
 
     /**
      * 物品的词条栏.
      */
     // POC
-    val CELLS: ItemComponentType<ItemCells, ItemComponentHolder.NBT> = ItemCells.Codec(ItemComponentConstants.CELLS).apply(::register)
+    val CELLS: ItemComponentType<ItemCells> = ItemCells.Codec(ItemComponentConstants.CELLS).apply(::register)
 
     /**
      * 将物品作为盲盒.
      */
-    val CRATE: ItemComponentType<Crate, ItemComponentHolder.NBT> = Crate.Codec(ItemComponentConstants.CRATE)
+    val CRATE: ItemComponentType<Crate> = Crate.Codec(ItemComponentConstants.CRATE)
 
     /**
      * 自定义模型数据. 对应原版组件: [`minecraft:custom_model_data`](https://minecraft.wiki/w/Data_component_format#custom_model_data)
      */
     // POC
-    val CUSTOM_MODEL_DATA: ItemComponentType<Int, ItemComponentHolder.Item> = CustomModelData.Codec(ItemComponentConstants.CUSTOM_MODEL_DATA).apply(::register)
+    val CUSTOM_MODEL_DATA: ItemComponentType<Int> = CustomModelData.Codec(ItemComponentConstants.CUSTOM_MODEL_DATA).apply(::register)
 
     /**
      * 自定义名字. 对应原版组件: [`minecraft:custom_name`](https://minecraft.wiki/w/Data_component_format#custom_name)
      */
     // POC
-    val CUSTOM_NAME: ItemComponentType<CustomName, ItemComponentHolder.NBT> = CustomName.Codec(ItemComponentConstants.CUSTOM_NAME).apply(::register)
+    val CUSTOM_NAME: ItemComponentType<CustomName> = CustomName.Codec(ItemComponentConstants.CUSTOM_NAME).apply(::register)
 
     /**
      * 物品已经损失的耐久.
      */
-    val DAMAGE: ItemComponentType<Int, ItemComponentHolder.Item> = ItemDamage.Codec(ItemComponentConstants.DAMAGE)
+    val DAMAGE: ItemComponentType<Int> = ItemDamage.Codec(ItemComponentConstants.DAMAGE)
 
     /**
      * 物品组件 [DAMAGE], [MAX_DAMAGE], [UNBREAKABLE] 的整合.
      */
     // POC
-    val DAMAGEABLE: ItemComponentType<Damageable, ItemComponentHolder.Complex> = Damageable.Codec(ItemComponentConstants.DAMAGEABLE).apply(::register)
+    val DAMAGEABLE: ItemComponentType<Damageable> = Damageable.Codec(ItemComponentConstants.DAMAGEABLE).apply(::register)
 
     /**
      * 物品的元素.
      */
     // POC
-    val ELEMENTS: ItemComponentType<ItemElements, ItemComponentHolder.NBT> = ItemElements.Codec(ItemComponentConstants.ELEMENTS).apply(::register)
+    val ELEMENTS: ItemComponentType<ItemElements> = ItemElements.Codec(ItemComponentConstants.ELEMENTS).apply(::register)
 
     /**
      * 拥有此组件将使物品免疫火焰伤害. 对应原版组件: [`minecraft:fire_resistant`](https://minecraft.wiki/w/Data_component_format#fire_resistant)
      */
     // POC
-    val FIRE_RESISTANT: ItemComponentType<FireResistant, ItemComponentHolder.Item> = FireResistant.Codec(ItemComponentConstants.FIRE_RESISTANT).apply(::register)
+    val FIRE_RESISTANT: ItemComponentType<FireResistant> = FireResistant.Codec(ItemComponentConstants.FIRE_RESISTANT).apply(::register)
 
     /**
      * 将物品作为食物.
      */
     // POC
-    val FOOD: ItemComponentType<FoodProperties, ItemComponentHolder.Complex> = FoodProperties.Codec(ItemComponentConstants.FOOD).apply(::register)
+    val FOOD: ItemComponentType<FoodProperties> = FoodProperties.Codec(ItemComponentConstants.FOOD).apply(::register)
 
     /**
      * 物品名字. 对应原版组件: [`minecraft:item_name`](https://minecraft.wiki/w/Data_component_format#item_name)
      */
-    val ITEM_NAME: ItemComponentType<ItemName, ItemComponentHolder.NBT> = ItemName.Codec(ItemComponentConstants.ITEM_NAME)
+    val ITEM_NAME: ItemComponentType<ItemName> = ItemName.Codec(ItemComponentConstants.ITEM_NAME)
 
     /**
      * 物品的铭刻.
      */
     // POC
-    val KIZAMIZ: ItemComponentType<ItemKizamiz, ItemComponentHolder.NBT> = ItemKizamiz.Codec(ItemComponentConstants.KIZAMIZ).apply(::register)
+    val KIZAMIZ: ItemComponentType<ItemKizamiz> = ItemKizamiz.Codec(ItemComponentConstants.KIZAMIZ).apply(::register)
 
     /**
      * 控制物品能否提供铭刻加成给玩家.
      */
     // POC
-    val KIZAMIABLE: ItemComponentType<Kizamiable, ItemComponentHolder.NBT> = Kizamiable.Codec(ItemComponentConstants.KIZAMIABLE).apply(::register)
+    val KIZAMIABLE: ItemComponentType<Kizamiable> = Kizamiable.Codec(ItemComponentConstants.KIZAMIABLE).apply(::register)
 
     /**
      * 物品的等级.
      */
     // POC
-    val LEVEL: ItemComponentType<ItemLevel, ItemComponentHolder.NBT> = ItemLevel.Codec(ItemComponentConstants.LEVEL).apply(::register)
+    val LEVEL: ItemComponentType<ItemLevel> = ItemLevel.Codec(ItemComponentConstants.LEVEL).apply(::register)
 
     /**
      * 物品的描述 (不同于原版物品组件 `minecraft:lore`).
      */
     // POC
-    val LORE: ItemComponentType<ExtraLore, ItemComponentHolder.NBT> = ExtraLore.Codec(ItemComponentConstants.LORE).apply(::register)
+    val LORE: ItemComponentType<ExtraLore> = ExtraLore.Codec(ItemComponentConstants.LORE).apply(::register)
 
     /**
      * 物品最大可损失的耐久.
      */
-    val MAX_DAMAGE: ItemComponentType<Int, ItemComponentHolder.Item> = ItemMaxDamage.Codec(ItemComponentConstants.MAX_DAMAGE)
+    val MAX_DAMAGE: ItemComponentType<Int> = ItemMaxDamage.Codec(ItemComponentConstants.MAX_DAMAGE)
 
     /**
      * 物品的稀有度.
      */
     // POC
-    val RARITY: ItemComponentType<ItemRarity, ItemComponentHolder.NBT> = ItemRarity.Codec(ItemComponentConstants.RARITY).apply(::register)
+    val RARITY: ItemComponentType<ItemRarity> = ItemRarity.Codec(ItemComponentConstants.RARITY).apply(::register)
 
     /**
      * 控制物品能否提供技能加成给玩家.
      */
     // POC
-    val SKILLFUL: ItemComponentType<Skillful, ItemComponentHolder.NBT> = Skillful.Codec(ItemComponentConstants.SKILLFUL).apply(::register)
+    val SKILLFUL: ItemComponentType<Skillful> = Skillful.Codec(ItemComponentConstants.SKILLFUL).apply(::register)
 
     /**
      * 物品的皮肤.
      */
-    val SKIN: ItemComponentType<ItemSkin, ItemComponentHolder.NBT> = dummy(ItemComponentConstants.SKIN)
+    val SKIN: ItemComponentType<ItemSkin> = dummy(ItemComponentConstants.SKIN)
 
     /**
      * 物品的皮肤的所有者.
      */
-    val SKIN_OWNER: ItemComponentType<ItemSkinOwner, ItemComponentHolder.NBT> = dummy(ItemComponentConstants.SKIN_OWNER)
+    val SKIN_OWNER: ItemComponentType<ItemSkinOwner> = dummy(ItemComponentConstants.SKIN_OWNER)
 
     /**
      * 将物品作为系统物品. 系统物品的机制:
@@ -165,37 +165,36 @@ object ItemComponentTypes {
      * 这也意味着系统物品的提示框文本完全取决于之上的原版组件.
      */
     // POC
-    val SYSTEM_USE: ItemComponentType<Unit, ItemComponentHolder.NBT> = SystemUse.Codec(ItemComponentConstants.SYSTEM_USE)
+    val SYSTEM_USE: ItemComponentType<Unit> = SystemUse.Codec(ItemComponentConstants.SYSTEM_USE)
 
     /**
      * 将物品作为工具.
      */
     // POC
-    val TOOL: ItemComponentType<Tool, ItemComponentHolder.Item> = Tool.Codec(ItemComponentConstants.TOOL).apply(::register)
+    val TOOL: ItemComponentType<Tool> = Tool.Codec(ItemComponentConstants.TOOL).apply(::register)
 
     /**
      * 记录了物品的统计数据. 如果拥有此组件, 各种信息将被记录到物品之上.
      */
     // POC
-    val TRACKS: ItemComponentType<ItemTracks, ItemComponentHolder.NBT> = ItemTracks.Codec(ItemComponentConstants.TRACKABLE).apply(::register)
+    val TRACKS: ItemComponentType<ItemTracks> = ItemTracks.Codec(ItemComponentConstants.TRACKABLE).apply(::register)
 
     /**
      * 拥有此组件将阻止物品损失耐久度.
      */
     // POC
-    val UNBREAKABLE: ItemComponentType<Unbreakable, ItemComponentHolder.Item> = Unbreakable.Codec(ItemComponentConstants.UNBREAKABLE).apply(::register)
+    val UNBREAKABLE: ItemComponentType<Unbreakable> = Unbreakable.Codec(ItemComponentConstants.UNBREAKABLE).apply(::register)
 
-    private fun <T, S : ItemComponentHolder> register(type: ItemComponentType<T, S>) {
+    private fun <T> register(type: ItemComponentType<T>) {
         ItemComponentRegistry.TYPES.register(type.id, type)
     }
 
-    private fun <T, S : ItemComponentHolder> dummy(id: String): ItemComponentType<T, S> {
-        return object : ItemComponentType<T, S> {
+    private fun <T> dummy(id: String): ItemComponentType<T> {
+        return object : ItemComponentType<T> {
             override val id: String = id
-            override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-            override fun remove(holder: S) = Unit
-            override fun write(holder: S, value: T) = Unit
-            override fun read(holder: S): T? = null
+            override fun read(holder: ItemComponentHolder): T? = null
+            override fun remove(holder: ItemComponentHolder) = Unit
+            override fun write(holder: ItemComponentHolder, value: T) = Unit
         }
     }
 

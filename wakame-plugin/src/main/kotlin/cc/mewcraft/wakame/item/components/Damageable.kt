@@ -54,10 +54,8 @@ interface Damageable : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Damageable, ItemComponentHolder.Complex> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
-
-        override fun read(holder: ItemComponentHolder.Complex): Damageable? {
+    ) : ItemComponentType<Damageable> {
+        override fun read(holder: ItemComponentHolder): Damageable? {
             val itemMeta = (holder.item.itemMeta as? CraftDamageable) ?: return null
             return Value(
                 damage = itemMeta.damage,
@@ -65,14 +63,14 @@ interface Damageable : Examinable, TooltipProvider {
             )
         }
 
-        override fun write(holder: ItemComponentHolder.Complex, value: Damageable) {
+        override fun write(holder: ItemComponentHolder, value: Damageable) {
             holder.item.editMeta<CraftDamageable> { itemMeta ->
                 itemMeta.damage = value.damage
                 itemMeta.setMaxDamage(value.maxDamage)
             }
         }
 
-        override fun remove(holder: ItemComponentHolder.Complex) {
+        override fun remove(holder: ItemComponentHolder) {
             holder.item.editMeta<CraftDamageable> { itemMeta ->
                 itemMeta.setMaxDamage(null)
             }

@@ -13,18 +13,16 @@ interface CustomModelData : Examinable {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Int, ItemComponentHolder.Item> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
-
-        override fun read(holder: ItemComponentHolder.Item): Int? {
+    ) : ItemComponentType<Int> {
+        override fun read(holder: ItemComponentHolder): Int? {
             return holder.item.backingCustomModelData
         }
 
-        override fun write(holder: ItemComponentHolder.Item, value: Int) {
+        override fun write(holder: ItemComponentHolder, value: Int) {
             holder.item.backingCustomModelData = value
         }
 
-        override fun remove(holder: ItemComponentHolder.Item) {
+        override fun remove(holder: ItemComponentHolder) {
             holder.item.backingCustomModelData = null
         }
     }

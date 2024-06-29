@@ -47,10 +47,8 @@ interface FoodProperties : Examinable {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<FoodProperties, ItemComponentHolder.Complex> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.COMPLEX
-
-        override fun read(holder: ItemComponentHolder.Complex): FoodProperties? {
+    ) : ItemComponentType<FoodProperties> {
+        override fun read(holder: ItemComponentHolder): FoodProperties? {
             // 目前的逻辑: 如果物品上没有 `minecraft:food` 组件,
             // 那么就算 NBT 里有 `skills` 列表, 依然直接返回 null
             val itemMeta = holder.item.itemMeta ?: return null
@@ -63,7 +61,7 @@ interface FoodProperties : Examinable {
             val eatSeconds = craftFood.eatSeconds
             val effects = craftFood.effects.map { FoodEffect(it.effect, it.probability) }
 
-            val skills = holder.tag.getList(TAG_SKILLS, TagType.STRING).map { Key((it as StringTag).value()) }
+            val skills = holder.getTag()?.getList(TAG_SKILLS, TagType.STRING)?.map { Key((it as StringTag).value()) } ?: return null
 
             return Value(
                 nutrition = nutrition,
@@ -75,7 +73,7 @@ interface FoodProperties : Examinable {
             )
         }
 
-        override fun write(holder: ItemComponentHolder.Complex, value: FoodProperties) {
+        override fun write(holder: ItemComponentHolder, value: FoodProperties) {
             holder.item.editMeta { itemMeta ->
                 val craftFood = itemMeta.food
                 craftFood.nutrition = value.nutrition
@@ -87,15 +85,15 @@ interface FoodProperties : Examinable {
             }
 
             val stringListTag = ListTag { value.skills.map { StringTag.valueOf(it.asString()) }.forEach(::add) }
-            holder.tag.put(TAG_SKILLS, stringListTag)
+            holder.getTagOrCreate().put(TAG_SKILLS, stringListTag)
         }
 
-        override fun remove(holder: ItemComponentHolder.Complex) {
+        override fun remove(holder: ItemComponentHolder) {
             holder.item.editMeta { itemMeta ->
                 itemMeta.setFood(null)
             }
 
-            // no-op for NBT part
+            holder.removeTag()
         }
 
         private companion object {

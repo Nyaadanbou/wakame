@@ -33,21 +33,19 @@ interface FireResistant : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<FireResistant, ItemComponentHolder.Item> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
-
-        override fun read(holder: ItemComponentHolder.Item): FireResistant? {
+    ) : ItemComponentType<FireResistant> {
+        override fun read(holder: ItemComponentHolder): FireResistant? {
             if (!holder.item.itemMeta.isFireResistant) {
                 return null
             }
             return Value
         }
 
-        override fun write(holder: ItemComponentHolder.Item, value: FireResistant) {
+        override fun write(holder: ItemComponentHolder, value: FireResistant) {
             holder.item.editMeta { it.isFireResistant = true }
         }
 
-        override fun remove(holder: ItemComponentHolder.Item) {
+        override fun remove(holder: ItemComponentHolder) {
             holder.item.editMeta { it.isFireResistant = false }
         }
     }

@@ -53,22 +53,21 @@ interface ItemElements : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<ItemElements, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
+    ) : ItemComponentType<ItemElements> {
 
-        override fun read(holder: ItemComponentHolder.NBT): ItemElements? {
-            val elementSet = holder.tag.getByteArrayOrNull(TAG_VALUE)?.mapTo(ObjectArraySet(2), ElementRegistry::getBy) ?: return null
+        override fun read(holder: ItemComponentHolder): ItemElements? {
+            val elementSet = holder.getTag()?.getByteArrayOrNull(TAG_VALUE)?.mapTo(ObjectArraySet(2), ElementRegistry::getBy) ?: return null
             return Value(elements = elementSet)
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: ItemElements) {
+        override fun write(holder: ItemComponentHolder, value: ItemElements) {
             require(value.elements.isNotEmpty()) { "The set of elements must not be empty" }
             val byteArray = value.elements.mapToByteArray(Element::binaryId)
-            holder.tag.putByteArray(TAG_VALUE, byteArray)
+            holder.getTagOrCreate().putByteArray(TAG_VALUE, byteArray)
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         private companion object {

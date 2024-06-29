@@ -48,21 +48,21 @@ interface CustomName : Examinable {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<CustomName, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
-
-        override fun read(holder: ItemComponentHolder.NBT): CustomName {
-            val raw = holder.tag.getString(TAG_VALUE)
+    ) : ItemComponentType<CustomName> {
+        override fun read(holder: ItemComponentHolder): CustomName? {
+            val tag = holder.getTag() ?: return null
+            val raw = tag.getString(TAG_VALUE)
             val cooked = Component.empty()
-            return Value(raw, cooked)
+            return Value(raw = raw, cooked = cooked)
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: CustomName) {
-            holder.tag.putString(TAG_VALUE, value.raw)
+        override fun write(holder: ItemComponentHolder, value: CustomName) {
+            val tag = holder.getTagOrCreate()
+            tag.putString(TAG_VALUE, value.raw)
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         private companion object {
@@ -82,7 +82,7 @@ interface CustomName : Examinable {
             }
             val raw = customName
             val cooked = Component.empty()
-            return GenerationResult.of(Value(raw, cooked))
+            return GenerationResult.of(Value(raw = raw, cooked = cooked))
         }
 
         companion object : ItemTemplateType<Template> {

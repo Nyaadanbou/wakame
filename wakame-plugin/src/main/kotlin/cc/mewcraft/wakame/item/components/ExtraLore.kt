@@ -55,22 +55,22 @@ interface ExtraLore : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<ExtraLore, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-
-        override fun read(holder: ItemComponentHolder.NBT): ExtraLore? {
-            val stringList = holder.tag.getListOrNull(TAG_VALUE, TagType.STRING)?.map { (it as StringTag).value() } ?: return null
-            return Value(stringList)
+    ) : ItemComponentType<ExtraLore> {
+        override fun read(holder: ItemComponentHolder): ExtraLore? {
+            val tag = holder.getTag() ?: return null
+            val stringList = tag.getListOrNull(TAG_VALUE, TagType.STRING)?.map { (it as StringTag).value() } ?: return null
+            return Value(lore = stringList)
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: ExtraLore) {
+        override fun write(holder: ItemComponentHolder, value: ExtraLore) {
+            val tag = holder.getTagOrCreate()
             val stringTagList = value.lore.map(StringTag::valueOf)
             val stringListTag = ListTag.create(stringTagList, TagType.STRING)
-            holder.tag.put(TAG_VALUE, stringListTag)
+            tag.put(TAG_VALUE, stringListTag)
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         private companion object {

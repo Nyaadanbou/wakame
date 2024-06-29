@@ -1,32 +1,54 @@
 package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.TagType
+import cc.mewcraft.wakame.util.getCompoundOrNull
+import cc.mewcraft.wakame.util.getOrPut
 import org.bukkit.inventory.ItemStack
 
 /**
- * 代表一个储存了物品组件信息的容器.
+ * 代表一个储存了(wakame)物品组件的容器.
  *
- * 目前容器主要分为三类:
+ * 目前容器主要分为以下几类:
  *
  * - 有些物品组件是原版物品组件的代理, 这些组件就需要访问 [ItemStack].
  * - 有些物品组件是我们原创的, 这些组件就需要访问 NBT.
- * - 有些物品组件融合了以上两者, 这些组件就需要同时访问 [ItemStack] 和 NBT.
+ * - 有些物品组件比较特殊, 需要访问其他的组件.
+ * - 有些物品组件需要以上所有信息.
  */
 sealed interface ItemComponentHolder {
 
     /**
-     * 包含储存了单个组件信息的 NBT 结构.
+     * 用于获取 vanilla 物品组件的信息.
+     */
+    val item: ItemStack
+
+    /**
+     * 用于获取其他的 wakame 物品组件的信息.
      *
-     * 注意这里的 NBT 是包含单个组件信息的 NBT 结构. 也就是说, 如果下面是我们的物品组件的整个 NBT:
+     * ## 警告!!!
+     * 禁止利用该实例获取当前组件, 否则会无限递归引起爆栈.
+     */
+    val components: ItemComponentMap
+
+    /**
+     * 用于检查组件的 NBT 标签是否存在.
      *
+     * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
+     *
+     * ## NBT 结构: `components`
      * ```NBT
+     * // 这一级是包含所有物品组件的 NBT 结构,
+     * // 本函数所返回的 NBT 结构都是这个结构
+     * // 之下的信息.
      * Compound('components'):
      *
-     *     // 这一级是包含单个物品组件的最小 NBT 结构
+     *     // 这一级是包含单个物品组件的最小 NBT 结构,
+     *     // 这个结构的 key 对应本函数参数中的 id.
      *     Compound('elements'):
      *
      *         // 这一级是组件内部的具体数据
-     *         IntArray('value'): [1I, 2I, 3I]
+     *         ...
      *
      *     Compound('kizamiz'):
      *
@@ -36,20 +58,66 @@ sealed interface ItemComponentHolder {
      *
      *         ...
      * ```
+     */
+    fun hasTag(id: String): Boolean
+
+    /**
+     * 用于获取组件的 NBT 标签 (如果有).
      *
-     * 那么这里的 NBT 只会是 `Compound('elements')` 或 `Compound('kizamiz')`,
-     * 而不是最顶级的包含了所有组件信息的 `Compound('components')`.
+     * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
      */
-    data class NBT(val tag: CompoundTag) : ItemComponentHolder
+    fun getTag(id: String): CompoundTag?
 
     /**
-     * 包含整个 [ItemStack] (本质是物品上的原版组件).
+     * 用于获取组件的 NBT 标签.
+     *
+     * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
      */
-    data class Item(val item: ItemStack) : ItemComponentHolder
+    fun getTagOrCreate(id: String): CompoundTag
 
     /**
-     * 包含整个 [ItemStack], 以及储存了单个组件信息的 NBT 结构.
+     * 用于写入组件的 NBT 标签.
+     *
+     * 该函数的 [id] 将作为索引在 `components` 中添加相应的 [CompoundTag].
      */
-    data class Complex(val item: ItemStack, val tag: CompoundTag) : ItemComponentHolder
+    fun putTag(id: String)
 
+    /**
+     * 用于移除组件的 NBT 标签.
+     *
+     * 该函数的 [id] 将作为索引从 `components` 中移除相应的 [CompoundTag].
+     */
+    fun removeTag(id: String)
+
+    companion object {
+        fun create(item: ItemStack, compound: CompoundTag, components: ItemComponentMap): ItemComponentHolder {
+            return Impl(item, components, compound)
+        }
+    }
+
+    private class Impl(
+        override val item: ItemStack,
+        override val components: ItemComponentMap,
+        private val compound: CompoundTag,
+    ) : ItemComponentHolder {
+        override fun hasTag(id: String): Boolean {
+            return compound.contains(id, TagType.COMPOUND)
+        }
+
+        override fun getTag(id: String): CompoundTag? {
+            return compound.getCompoundOrNull(id)
+        }
+
+        override fun getTagOrCreate(id: String): CompoundTag {
+            return compound.getOrPut(id, CompoundTag::create)
+        }
+
+        override fun putTag(id: String) {
+            compound.put(id, CompoundTag.create())
+        }
+
+        override fun removeTag(id: String) {
+            compound.remove(id)
+        }
+    }
 }

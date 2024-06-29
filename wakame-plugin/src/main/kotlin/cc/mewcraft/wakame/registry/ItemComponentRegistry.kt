@@ -10,7 +10,7 @@ object ItemComponentRegistry : KoinComponent, Initializable {
 
     internal val CONFIG by lazy { Configs.YAML[ITEM_CONFIG_FILE].derive("components") }
 
-    val TYPES: Registry<String, ItemComponentType<*, *>> = SimpleRegistry()
+    val TYPES: Registry<String, ItemComponentType<*>> = SimpleRegistry()
 
     override fun onPreWorld() {
 

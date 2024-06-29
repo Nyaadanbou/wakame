@@ -55,22 +55,22 @@ interface ItemKizamiz : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<ItemKizamiz, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-
-        override fun read(holder: ItemComponentHolder.NBT): ItemKizamiz? {
-            val kizamiSet = holder.tag.getByteArrayOrNull(TAG_VALUE)?.mapTo(ObjectArraySet(4), KizamiRegistry::getBy) ?: return null
+    ) : ItemComponentType<ItemKizamiz> {
+        override fun read(holder: ItemComponentHolder): ItemKizamiz? {
+            val tag = holder.getTag() ?: return null
+            val kizamiSet = tag.getByteArrayOrNull(TAG_VALUE)?.mapTo(ObjectArraySet(4), KizamiRegistry::getBy) ?: return null
             return Value(kizamiz = kizamiSet)
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: ItemKizamiz) {
+        override fun write(holder: ItemComponentHolder, value: ItemKizamiz) {
             require(value.kizamiz.isNotEmpty()) { "The set of kizami must be not empty" }
+            val tag = holder.getTagOrCreate()
             val byteArray = value.kizamiz.mapToByteArray(Kizami::binaryId)
-            holder.tag.putByteArray(TAG_VALUE, byteArray)
+            tag.putByteArray(TAG_VALUE, byteArray)
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         private companion object {

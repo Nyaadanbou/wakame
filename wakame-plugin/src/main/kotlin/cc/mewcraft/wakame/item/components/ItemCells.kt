@@ -34,19 +34,18 @@ interface ItemCells : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<ItemCells, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-
-        override fun read(holder: ItemComponentHolder.NBT): ItemCells {
+    ) : ItemComponentType<ItemCells> {
+        override fun read(holder: ItemComponentHolder): ItemCells? {
+            val tag = holder.getTag() ?: return null
             return Value()
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: ItemCells) {
-
+        override fun write(holder: ItemComponentHolder, value: ItemCells) {
+            val tag = holder.getTagOrCreate()
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
 
         private companion object {

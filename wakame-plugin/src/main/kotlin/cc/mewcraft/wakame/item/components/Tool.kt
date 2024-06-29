@@ -46,10 +46,8 @@ interface Tool : Examinable {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Tool, ItemComponentHolder.Item> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.ITEM
-
-        override fun read(holder: ItemComponentHolder.Item): Tool? {
+    ) : ItemComponentType<Tool> {
+        override fun read(holder: ItemComponentHolder): Tool? {
             val craftTool = holder.item.itemMeta?.tool ?: return null
             val defaultMiningSpeed = craftTool.defaultMiningSpeed
             val damagePerBlock = craftTool.damagePerBlock
@@ -61,7 +59,7 @@ interface Tool : Examinable {
             )
         }
 
-        override fun write(holder: ItemComponentHolder.Item, value: Tool) {
+        override fun write(holder: ItemComponentHolder, value: Tool) {
             val craftTool = holder.item.itemMeta?.tool ?: return
             craftTool.defaultMiningSpeed = value.defaultMiningSpeed
             craftTool.damagePerBlock = value.damagePerBlock
@@ -69,7 +67,7 @@ interface Tool : Examinable {
             holder.item.itemMeta?.setTool(craftTool)
         }
 
-        override fun remove(holder: ItemComponentHolder.Item) {
+        override fun remove(holder: ItemComponentHolder) {
             holder.item.itemMeta?.setTool(null)
         }
 

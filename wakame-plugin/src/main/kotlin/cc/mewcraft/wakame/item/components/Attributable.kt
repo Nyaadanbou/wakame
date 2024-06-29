@@ -39,28 +39,29 @@ interface Attributable : Examinable, TooltipProvider {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Attributable, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
+    ) : ItemComponentType<Attributable> {
+        // 开发日记 2024/6/29
+        // 这是一个 NonValued 的组件,
+        // 因此只需要检查是否存在即可,
+        // 其内部的数据不重要.
 
-        // 开发日记: 2024/6/26
-        // NonValued + Holder.NBT 类型的 Codec 需要返回该组件的单例
-        override fun read(holder: ItemComponentHolder.NBT): Attributable = Value
+        override fun read(holder: ItemComponentHolder): Attributable? {
+            return if (holder.hasTag()) Value else null
+        }
 
-        // 开发日记: 2024/6/25
-        // 这个执行什么无所谓, 因为实际运行逻辑是在 Map 里
-        override fun write(holder: ItemComponentHolder.NBT, value: Attributable) = Unit
+        override fun write(holder: ItemComponentHolder, value: Attributable) {
+            holder.putTag()
+        }
 
-        // 开发日记: 2024/6/25
-        // 这个执行什么无所谓, 因为实际运行逻辑是在 Map 里
-        override fun remove(holder: ItemComponentHolder.NBT) = Unit
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
+        }
     }
 
     // 开发日记: 2024/6/24
     // Attributable 既然是一个 NonValued 组件类型,
-    // 那么似乎也不需要为其创建一个 Template 的类型.
-    // 在构建 NekoItem 的阶段只需要看配置文件里有没有这个 node 存在就行了?
-    // 开发日记: 2024/6/25
-    // 还不确定 Template 的具体框架是怎么样的
+    // 那么似乎也不需要为其创建一个 Template 的 class.
+    // 设置成一个 object 足矣.
     data object Template : ItemTemplate<Attributable>, ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 

@@ -22,19 +22,18 @@ interface ItemTracks : Examinable {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<ItemTracks, ItemComponentHolder.NBT> {
-        override val holder: ItemComponentType.Holder = ItemComponentType.Holder.NBT
-
-        override fun read(holder: ItemComponentHolder.NBT): ItemTracks {
+    ) : ItemComponentType<ItemTracks> {
+        override fun read(holder: ItemComponentHolder): ItemTracks? {
+            val tag = holder.getTag() ?: return null
             return Value()
         }
 
-        override fun write(holder: ItemComponentHolder.NBT, value: ItemTracks) {
-
+        override fun write(holder: ItemComponentHolder, value: ItemTracks) {
+            val tag = holder.getTagOrCreate()
         }
 
-        override fun remove(holder: ItemComponentHolder.NBT) {
-            // no-op
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
         }
     }
 
