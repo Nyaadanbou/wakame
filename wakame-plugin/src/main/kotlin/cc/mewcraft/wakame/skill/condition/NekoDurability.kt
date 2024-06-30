@@ -4,8 +4,10 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -18,7 +20,7 @@ internal interface NekoDurability : SkillCondition {
     /**
      * 剩余耐久度大于该值, 则条件满足.
      */
-    val durability: Int
+    val durability: Evaluable<*>
 
     companion object Factory : SkillConditionFactory<NekoDurability> {
         override fun create(config: ConfigProvider): NekoDurability {
@@ -30,13 +32,14 @@ internal interface NekoDurability : SkillCondition {
         config: ConfigProvider,
     ) : SkillConditionBase(config), NekoDurability {
 
-        override val durability: Int by config.entry<Int>("durability")
-        override val resolver: TagResolver = Placeholder.component(this.id, Component.text(this.durability))
+        override val durability: Evaluable<*> by config.entry<Evaluable<*>>("durability")
+        override val resolver: TagResolver = Placeholder.component(this.type, Component.text(this.durability.evaluate()))
 
         override fun newSession(context: SkillCastContext): SkillConditionSession {
             val nekoStack = context.optional(SkillCastContextKey.NEKO_STACK) ?: return SkillConditionSession.alwaysFailure()
             val damageable = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return SkillConditionSession.alwaysFailure()
-            val isSuccess = (damageable.maxDamage - damageable.damage) <= durability
+            val engine = context.get(SkillCastContextKey.MOCHA_ENGINE)
+            val isSuccess = (damageable.maxDamage - damageable.damage) <= durability.evaluate(engine).toStableInt()
             return SessionImpl(isSuccess)
         }
 
@@ -46,9 +49,11 @@ internal interface NekoDurability : SkillCondition {
             private val notification: Notification = Notification()
 
             override fun onSuccess(context: SkillCastContext) {
+                // FIXME: 2024.7.5
                 val nekoStack = context.optional(SkillCastContextKey.ITEM_STACK)?.tryNekoStack ?: return
                 val damageable = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return
-                val newDamage = damageable.copy(damage = damageable.damage + durability)
+                val engine = context.get(SkillCastContextKey.MOCHA_ENGINE)
+                val newDamage = damageable.copy(damage = damageable.damage + durability.evaluate(engine).toStableInt())
                 nekoStack.components.set(ItemComponentTypes.DAMAGEABLE, newDamage)
                 notification.notifySuccess(context)
             }

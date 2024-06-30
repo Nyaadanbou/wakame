@@ -182,6 +182,14 @@ class SingleItemListener : KoinComponent, Listener {
         skillEventHandler.onMove(player, item, event)
     }
 
+    @EventHandler
+    fun onSneak(event: PlayerToggleSneakEvent) {
+        val player = event.player
+        val item = player.inventory.itemInMainHand.takeIfNekoStack()
+
+        skillEventHandler.onSneak(player, item, event)
+    }
+
     private fun ItemStack.takeIfNekoStack(): ItemStack? {
         return this.takeUnlessEmpty()?.takeIf { it.tryNekoStack == null }
     }

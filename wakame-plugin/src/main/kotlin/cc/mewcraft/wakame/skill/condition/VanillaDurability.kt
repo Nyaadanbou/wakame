@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill.condition
 
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -15,7 +16,7 @@ interface VanillaDurability : SkillCondition {
     /**
      * 剩余耐久度大于该值, 则条件满足.
      */
-    val durability: Int
+    val durability: Evaluable<*>
 
     companion object : SkillConditionFactory<VanillaDurability> {
         override fun create(config: ConfigProvider): VanillaDurability {
@@ -27,13 +28,14 @@ interface VanillaDurability : SkillCondition {
         config: ConfigProvider,
     ) : VanillaDurability, SkillConditionBase(config) {
 
-        override val durability: Int by config.entry<Int>("durability")
+        override val durability: Evaluable<*> by config.entry<Evaluable<*>>("durability")
         override val resolver: TagResolver = TagResolver.empty()
 
         override fun newSession(context: SkillCastContext): SkillConditionSession {
             val itemStack = context.optional(SkillCastContextKey.ITEM_STACK) ?: return SkillConditionSession.alwaysFailure()
             val itemMeta = itemStack.itemMeta as? Damageable ?: return SkillConditionSession.alwaysFailure()
-            val isSuccess = (itemMeta.maxDamage - itemMeta.damage) >= durability
+            val engine = context.get(SkillCastContextKey.MOCHA_ENGINE)
+            val isSuccess = (itemMeta.maxDamage - itemMeta.damage) >= durability.evaluate(engine)
             return SessionImpl(isSuccess)
         }
 

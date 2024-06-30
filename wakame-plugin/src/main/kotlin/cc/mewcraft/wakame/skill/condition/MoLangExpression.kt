@@ -31,7 +31,7 @@ interface MoLangExpression : SkillCondition {
     ) : MoLangExpression, SkillConditionBase(config) {
 
         override val evaluable: Evaluable<*> by config.entry<Evaluable<*>>("eval")
-        override val resolver: TagResolver = Placeholder.component(this.id, Component.text(this.evaluable.evaluate(MoLangSupport.createEngine()))) // TODO: Support MoLang tag resolver
+        override val resolver: TagResolver = Placeholder.component(this.type, Component.text(this.evaluable.evaluate(MoLangSupport.createEngine()))) // TODO: Support MoLang tag resolver
 
         override fun newSession(context: SkillCastContext): SkillConditionSession {
             val engine = MoLangSupport.createEngine()

@@ -6,7 +6,6 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.util.withDefaultSettings
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
@@ -124,13 +123,13 @@ sealed class ConfigProvider(
 class YamlFileConfigProvider internal constructor(
     private val path: Path,
     relPath: String,
-    private val options: ConfigurationOptions.() -> ConfigurationOptions,
+    private val builder: YamlConfigurationLoader.Builder.() -> Unit
 ) : ConfigProvider(relPath) {
     override fun loadValue(): ConfigurationNode {
         return YamlConfigurationLoader.builder()
             .source { path.toFile().bufferedReader() }
             .withDefaultSettings()
-            .defaultOptions(options)
+            .apply(builder)
             .build()
             .load()
     }
@@ -147,12 +146,12 @@ class YamlFileConfigProvider internal constructor(
 class GsonFileConfigProvider internal constructor(
     private val path: Path,
     relPath: String,
-    private val options: ConfigurationOptions.() -> ConfigurationOptions,
+    private val builder: GsonConfigurationLoader.Builder.() -> Unit
 ) : ConfigProvider(relPath) {
     override fun loadValue(): ConfigurationNode {
         return GsonConfigurationLoader.builder()
             .source { path.toFile().bufferedReader() }
-            .defaultOptions(options)
+            .apply(builder)
             .build()
             .load()
     }

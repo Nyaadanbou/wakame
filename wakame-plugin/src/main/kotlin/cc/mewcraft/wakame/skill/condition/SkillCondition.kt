@@ -26,9 +26,9 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
  */
 interface SkillCondition {
     /**
-     * 条件的唯一标识.
+     * 条件的类型.
      */
-    val id: String
+    val type: String
 
     /**
      * 条件的优先级. 数值越高, 优先级越高.

@@ -35,6 +35,10 @@ interface ConditionMessage {
 interface ConditionMessageGroup {
     val messages: Iterable<ConditionMessage>
     fun send(audience: Audience)
+
+    companion object {
+        fun empty(): ConditionMessageGroup = EmptyConditionMessageGroup
+    }
 }
 
 /* 实现类 */

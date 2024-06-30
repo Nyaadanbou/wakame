@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.skill.condition
 
 import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.wakame.config.*
+import cc.mewcraft.wakame.skill.SkillSupport
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 
@@ -11,11 +10,15 @@ import cc.mewcraft.wakame.skill.context.SkillCastContextKey
  * 包含了 [SkillCondition] 实现类的共同逻辑.
  */
 abstract class SkillConditionBase(
-    private val config: ConfigProvider,
+    conditionConfig: ConfigProvider
 ) : SkillCondition {
     /* 每个条件都有的数据配置 */
-    override val id: String by config.entry<String>("id")
-    override val priority: Int by config.optionalEntry<Int>("priority").orElse(0)
+    final override val type: String by conditionConfig.entry<String>("type")
+    private val config = PatchedConfigProvider(conditionConfig, SkillSupport.GLOBAL_SKILL_CONDITIONS.derive(type))
+
+    /* 下面通过 PatchedConfig 来获取可覆盖的配置文件中的数据 */
+
+    final override val priority: Int by config.optionalEntry<Int>("priority").orElse(0)
 
     /* 下面是一些用于实现 Session 的“组件” (参考: 组合设计模式) */
 
@@ -30,7 +33,7 @@ abstract class SkillConditionBase(
          * 发送条件满足时的消息提示.
          */
         fun notifySuccess(context: SkillCastContext) {
-            val caster = context.optional(SkillCastContextKey.CASTER)
+            val caster = context.optional(SkillCastContextKey.CASTER_AUDIENCE)
             if (caster != null) {
                 successMessage.send(caster)
             }
@@ -40,7 +43,7 @@ abstract class SkillConditionBase(
          * 发送条件不满足时的消息提示.
          */
         fun notifyFailure(context: SkillCastContext) {
-            val caster = context.optional(SkillCastContextKey.CASTER)
+            val caster = context.optional(SkillCastContextKey.CASTER_AUDIENCE)
             if (caster != null) {
                 failureMessage.send(caster)
             }

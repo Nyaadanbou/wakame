@@ -35,6 +35,7 @@ const val ITEM_PROTO_CONFIG_LOADER = "item_prototype_config_loader"
 const val ITEM_GLOBAL_CONFIG_FILE = "items.yml"
 const val ITEM_GLOBAL_CONFIG_LOADER = "item_global_config_loader"
 
+const val SKILL_CONFIG_FILE = "skills.yml"
 const val SKILL_PROTO_CONFIG_DIR = "skills"
 const val SKILL_PROTO_CONFIG_LOADER = "skill_global_config_loader"
 

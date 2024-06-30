@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.skill.trigger
 
+import cc.mewcraft.commons.collections.contentEquals
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.adventure.key.Keyed
@@ -64,9 +65,14 @@ enum class SingleTrigger(
     JUMP('3', Key(Namespaces.TRIGGER, "generic/jump")),
 
     /**
-     * 玩家进行了移动操作.
+     * 玩家进行了移动操作, 不包括跳跃.
      */
     MOVE('4', Key(Namespaces.TRIGGER, "generic/walk")),
+
+    /**
+     * 代表玩家按下了潜行键.
+     */
+    SNEAK('5', Key(Namespaces.TRIGGER, "generic/sneak")),
 
     /**
      * 代表玩家没有进行任何操作.
@@ -94,6 +100,8 @@ interface SequenceTrigger : Trigger {
      * 组成该触发器序列的触发器 (按顺序).
      */
     val triggers: List<SingleTrigger>
+
+    fun isStartWith(triggers: List<SingleTrigger>): Boolean
 
     companion object {
         /**
@@ -132,6 +140,10 @@ interface SequenceTrigger : Trigger {
         override val triggers: List<SingleTrigger>,
     ) : SequenceTrigger {
         override val key: Key = Key(Namespaces.TRIGGER, "combo/${triggers.map { it.id }.joinToString("")}")
+
+        override fun isStartWith(triggers: List<SingleTrigger>): Boolean {
+            return this.triggers.take(triggers.size).contentEquals(triggers)
+        }
 
         override fun equals(other: Any?): Boolean {
             if (this === other)

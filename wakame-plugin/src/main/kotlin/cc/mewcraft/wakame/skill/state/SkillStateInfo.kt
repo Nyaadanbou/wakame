@@ -87,16 +87,19 @@ class IdleStateInfo(
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
             val completeSequence = currentSequence.readAll()
-            skillStateShower.displayProgress(completeSequence, user)
+            if (skillMap.getTriggers().filterIsInstance<SequenceTrigger>().any { it.isStartWith(completeSequence) }) {
+                skillStateShower.displayProgress(completeSequence, user)
 
-            if (currentSequence.isFull()) {
-                val sequence = SequenceTrigger.of(completeSequence)
-                val skillsOnSequence = skillMap.getSkill(sequence)
-                castableSkills.addAll(skillsOnSequence)
-                currentSequence.clear()
+                if (currentSequence.isFull()) {
+                    val sequence = SequenceTrigger.of(completeSequence)
+                    val skillsOnSequence = skillMap.getSkill(sequence)
+                    castableSkills.addAll(skillsOnSequence)
+                    currentSequence.clear()
+                }
             }
         }
 
+        // Single trigger skills
         val skillsOnSingle = skillMap.getSkill(trigger)
         castableSkills.addAll(skillsOnSingle)
 

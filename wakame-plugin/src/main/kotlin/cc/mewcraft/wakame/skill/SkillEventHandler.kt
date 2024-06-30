@@ -17,6 +17,7 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -92,6 +93,16 @@ class SkillEventHandler {
         val user = player.toUser()
         val nekoStack = itemStack?.tryNekoStack
         val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
+        checkResult(result, event)
+    }
+
+    fun onSneak(player: Player, itemStack: ItemStack?, event: PlayerToggleSneakEvent) {
+        val user = player.toUser()
+        val nekoStack = itemStack?.tryNekoStack
+        val result = user.skillState.addTrigger(
+            SingleTrigger.SNEAK,
+            SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack)
+        )
         checkResult(result, event)
     }
 

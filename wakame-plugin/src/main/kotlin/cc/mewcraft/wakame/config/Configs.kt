@@ -6,7 +6,9 @@ import cc.mewcraft.wakame.config.Configs.YAML
 import cc.mewcraft.wakame.config.Configs.getKoin
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
-import org.spongepowered.configurate.ConfigurationOptions
+import org.spongepowered.configurate.gson.GsonConfigurationLoader
+import org.spongepowered.configurate.loader.AbstractConfigurationLoader
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
 val MAIN_CONFIG: ConfigProvider by lazy { YAML["config.yml"] }
@@ -24,7 +26,7 @@ object Configs : KoinComponent {
     }
 }
 
-sealed class BasicConfigs {
+sealed class BasicConfigs<T: AbstractConfigurationLoader<*>, B : AbstractConfigurationLoader.Builder<B, T>> {
     /**
      * The map of config providers.
      *
@@ -38,16 +40,16 @@ sealed class BasicConfigs {
      */
     fun build(
         relPath: String,
-        options: ConfigurationOptions.() -> ConfigurationOptions,
+        builder: B.() -> Unit
     ): ConfigProvider {
-        return configProviders.getOrPut(relPath) { createConfigProvider(relPath, options) }
+        return configProviders.getOrPut(relPath) { createConfigProvider(relPath, builder) }
     }
 
     /**
      * Gets a [config provider][ConfigProvider] with the default options.
      */
     operator fun get(relPath: String): ConfigProvider {
-        return configProviders.getOrPut(relPath) { createConfigProvider(relPath) { this } }
+        return configProviders.getOrPut(relPath) { createConfigProvider(relPath, {}) }
     }
 
     fun reload() {
@@ -61,26 +63,26 @@ sealed class BasicConfigs {
 
     protected abstract fun createConfigProvider(
         relPath: String,
-        options: ConfigurationOptions.() -> ConfigurationOptions
+        builder: B.() -> Unit
     ): ConfigProvider
 }
 
-class YamlConfigs : BasicConfigs() {
+class YamlConfigs : BasicConfigs<YamlConfigurationLoader, YamlConfigurationLoader.Builder>() {
     override fun createConfigProvider(
         relPath: String,
-        options: ConfigurationOptions.() -> ConfigurationOptions
+        builder: YamlConfigurationLoader.Builder.() -> Unit
     ): ConfigProvider {
         val file = getConfigFile(relPath).toPath()
-        return YamlFileConfigProvider(file, relPath, options)
+        return YamlFileConfigProvider(file, relPath, builder)
     }
 }
 
-class GsonConfigs : BasicConfigs() {
+class GsonConfigs : BasicConfigs<GsonConfigurationLoader, GsonConfigurationLoader.Builder>() {
     override fun createConfigProvider(
         relPath: String,
-        options: ConfigurationOptions.() -> ConfigurationOptions
+        builder: GsonConfigurationLoader.Builder.() -> Unit
     ): ConfigProvider {
         val file = getConfigFile(relPath).toPath()
-        return GsonFileConfigProvider(file, relPath, options)
+        return GsonFileConfigProvider(file, relPath, builder)
     }
 }

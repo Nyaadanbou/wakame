@@ -1,10 +1,15 @@
 package cc.mewcraft.wakame.skill.context
 
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.molang.MoLangSupport
+import cc.mewcraft.wakame.resource.ResourceTypeRegistry
 import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.Target
+import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.inventory.ItemStack
+import team.unnamed.mocha.MochaEngine
+import team.unnamed.mocha.runtime.binding.Binding
 
 /**
  * 技能条件执行的上下文.
@@ -35,6 +40,9 @@ fun SkillCastContext(caster: Caster, target: Target? = null, nekoStack: NekoStac
         if (nekoStack != null) {
             setNekoStack(nekoStack)
         }
+
+        // 技能必须有 mocha engine
+        setMochaEngine(MoLangSupport.createEngine())
     }
     return context
 }
@@ -74,10 +82,12 @@ private class SkillCastContextImpl : SkillCastContext {
                 set(SkillCastContextKey.CASTER_PLAYER, caster)
                 set(SkillCastContextKey.CASTER_ENTITY, caster)
                 set(SkillCastContextKey.USER, caster.bukkitPlayer.toUser())
+                set(SkillCastContextKey.CASTER_AUDIENCE, caster.bukkitPlayer)
             }
 
             is Caster.Entity -> {
                 set(SkillCastContextKey.CASTER_ENTITY, caster)
+                set(SkillCastContextKey.CASTER_AUDIENCE, caster.bukkitEntity)
             }
         }
     }
@@ -87,6 +97,7 @@ private class SkillCastContextImpl : SkillCastContext {
         when (target) {
             is Target.LivingEntity -> {
                 set(SkillCastContextKey.TARGET_LIVING_ENTITY, target)
+                set(SkillCastContextKey.TARGET_AUDIENCE, target.bukkitEntity)
             }
 
             is Target.Location -> {
@@ -104,5 +115,19 @@ private class SkillCastContextImpl : SkillCastContext {
 
     fun setItemStack(itemStack: ItemStack) {
         set(SkillCastContextKey.ITEM_STACK, itemStack)
+    }
+
+    fun setMochaEngine(engine: MochaEngine<*>) {
+        optional(SkillCastContextKey.USER)?.let { engine.bindInstance(UserContext::class.java, UserContext(it), "user", "player") }
+        set(SkillCastContextKey.MOCHA_ENGINE, engine)
+    }
+}
+
+private class UserContext(
+    private val user: User<*>
+) {
+    @Binding("mana")
+    fun mana(): Double {
+        return user.resourceMap.current(ResourceTypeRegistry.MANA).toDouble()
     }
 }
