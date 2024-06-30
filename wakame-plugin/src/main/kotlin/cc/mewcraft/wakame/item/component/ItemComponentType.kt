@@ -22,7 +22,6 @@ import cc.mewcraft.nbt.CompoundTag
  * 封装了一个物品组件的读取/写入/移除逻辑.
  *
  * @param T 组件的快照类型, 属于 immutable class
- * @param S 储存了物品组件信息的容器类型
  */
 interface ItemComponentType<T> {
 
@@ -34,8 +33,19 @@ interface ItemComponentType<T> {
     // 开发日记: 2024/6/24 小米
     // 对于 Holder 为 NBT 的组件来说, read/write/remove 函数是不需要实现的 - 它们实际上不会被调用
 
+    /**
+     * 读取 [holder] 中包含的组件信息 [T].
+     */
     fun read(holder: ItemComponentHolder): T?
+
+    /**
+     * 将组件信息 [value] 写入到 [holder] 中.
+     */
     fun write(holder: ItemComponentHolder, value: T)
+
+    /**
+     * 从 [holder] 中移除当前的组件信息 [T].
+     */
     fun remove(holder: ItemComponentHolder)
 
     // 开发日记 2024/6/26
@@ -59,41 +69,28 @@ interface ItemComponentType<T> {
     //  例如 wakame 自定义的 FoodComponent, 还带了个吃完食物后释放的技能
     //  对于这种情况, 是不是需要同时传入 item 和 nbt ?
 
-    /* 用于快速获取当前组件对应的 NBT 标签 */
-
+    /**
+     * 快速访问当前组件的 NBT 标签.
+     */
     fun ItemComponentHolder.hasTag(): Boolean = this.hasTag(id)
-    fun ItemComponentHolder.getTag(): CompoundTag? = this.getTag(id)
-    fun ItemComponentHolder.getTagOrCreate(): CompoundTag = this.getTagOrCreate(id)
-    fun ItemComponentHolder.putTag() = this.putTag(id)
-    fun ItemComponentHolder.removeTag() = this.removeTag(id)
 
     /**
-     * 标记一个 [ItemComponentType] 的构建需要用到的数据源.
+     * 快速访问当前组件的 NBT 标签.
      */
-    enum class Holder {
-        /**
-         * 数据源为 NBT, 本质是原版物品上的 `custom_data` 组件
-         */
-        NBT,
+    fun ItemComponentHolder.getTag(): CompoundTag? = this.getTag(id)
 
-        /**
-         * 数据源为物品本身, 本质是原版物品上的某一个或多个组件
-         */
-        ITEM,
+    /**
+     * 快速访问当前组件的 NBT 标签.
+     */
+    fun ItemComponentHolder.getTagOrCreate(): CompoundTag = this.getTagOrCreate(id)
 
-        /**
-         * 数据源为 [NBT] 加上 [ITEM].
-         */
-        COMPLEX,
+    /**
+     * 快速访问当前组件的 NBT 标签.
+     */
+    fun ItemComponentHolder.putTag() = this.putTag(id)
 
-        // FIXME 思考: 到底需不需要这个? 初始答案似乎是不需要:
-        //  例如 Attributable, 数据源它属于 NBT, 组件类型它属于 NonValued,
-        //  这种情况直接从 `components` 移除它的 tag 就好.
-        //  我们从 NBT + NonValue 的组合就可以作出这个决策.
-        // /**
-        //  * 无数据源 (???)
-        //  */
-        // NONE,
-    }
-
+    /**
+     * 快速访问当前组件的 NBT 标签.
+     */
+    fun ItemComponentHolder.removeTag() = this.removeTag(id)
 }

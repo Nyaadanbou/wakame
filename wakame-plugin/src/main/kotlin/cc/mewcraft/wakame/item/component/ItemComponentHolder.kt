@@ -19,12 +19,12 @@ import org.bukkit.inventory.ItemStack
 sealed interface ItemComponentHolder {
 
     /**
-     * 用于获取 vanilla 物品组件的信息.
+     * 用于获取任意 vanilla 物品组件的信息.
      */
     val item: ItemStack
 
     /**
-     * 用于检查组件的 NBT 标签是否存在.
+     * 用于检查指定组件的 NBT 标签是否存在.
      *
      * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
      *
@@ -54,35 +54,35 @@ sealed interface ItemComponentHolder {
     fun hasTag(id: String): Boolean
 
     /**
-     * 用于获取组件的 NBT 标签 (如果有).
+     * 用于获取指定组件的 NBT 标签 (如果有).
      *
      * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
      */
     fun getTag(id: String): CompoundTag?
 
     /**
-     * 用于获取组件的 NBT 标签.
+     * 用于获取指定组件的 NBT 标签.
      *
      * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
      */
     fun getTagOrCreate(id: String): CompoundTag
 
     /**
-     * 用于写入组件的 NBT 标签.
+     * 用于写入指定组件的 NBT 标签.
      *
      * 该函数的 [id] 将作为索引在 `components` 中添加相应的 [CompoundTag].
      */
     fun putTag(id: String)
 
     /**
-     * 用于移除组件的 NBT 标签.
+     * 用于移除指定组件的 NBT 标签.
      *
      * 该函数的 [id] 将作为索引从 `components` 中移除相应的 [CompoundTag].
      */
     fun removeTag(id: String)
 
     /**
-     * 用于检查其他的 wakame 物品组件是否存在.
+     * 用于检查指定的 wakame 物品组件是否存在.
      *
      * ## 警告!!!
      * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
@@ -90,7 +90,7 @@ sealed interface ItemComponentHolder {
     fun hasData(type: ItemComponentType<*>): Boolean
 
     /**
-     * 用于获取其他的 wakame 物品组件.
+     * 用于获取指定的 wakame 物品组件.
      *
      * ## 警告!!!
      * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
@@ -98,7 +98,7 @@ sealed interface ItemComponentHolder {
     fun <T> getData(type: ItemComponentType<T>): T?
 
     /**
-     * 用于设置其他的 wakame 物品组件.
+     * 用于设置指定的 wakame 物品组件.
      *
      * ## 警告!!!
      * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
@@ -106,7 +106,7 @@ sealed interface ItemComponentHolder {
     fun <T> setData(type: ItemComponentType<T>, data: T)
 
     /**
-     * 用于移除其他的 wakame 物品组件.
+     * 用于移除指定的 wakame 物品组件.
      *
      * ## 警告!!!
      * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
