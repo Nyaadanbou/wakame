@@ -49,7 +49,8 @@ interface ManaCondition : SkillCondition {
             override fun onSuccess(context: SkillCastContext) {
                 val user = context.get(SkillCastContextKey.USER)
                 val engine = context.get(SkillCastContextKey.MOCHA_ENGINE)
-                user.resourceMap.take(ResourceTypeRegistry.MANA, mana.evaluate(engine).toStableInt())
+                val value = mana.evaluate(engine).toStableInt()
+                user.resourceMap.take(ResourceTypeRegistry.MANA, value)
                 notification.notifySuccess(context)
             }
 

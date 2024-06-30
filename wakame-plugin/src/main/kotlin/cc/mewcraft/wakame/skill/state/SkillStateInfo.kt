@@ -106,7 +106,8 @@ class IdleStateInfo(
         if (castableSkills.isEmpty())
             return SkillStateResult.SILENT_FAILURE
 
-        val skillTick = skillCastManager.tryCast(castableSkills.first(), context).skillTick
+        val skill = castableSkills.first()
+        val skillTick = skillCastManager.tryCast(skill, context).skillTick
 
         state.setInfo(CastPointStateInfo(state, skillTick))
         return SkillStateResult.CANCEL_EVENT

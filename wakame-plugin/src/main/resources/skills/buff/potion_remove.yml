@@ -42,7 +42,7 @@ conditions:
       - type: chat
         text: "You failed to remove the potion effect. no durability"
   - type: mana
-    mana: "player.maxMana() / 10"
+    mana: "player.max_mana() / 10"
 
 # 下面的是此技能的属性
 effect_types:

@@ -10,7 +10,9 @@ import org.bukkit.entity.Player
  * 技能状态
  */
 interface SkillState {
-
+    /**
+     * 技能状态信息
+     */
     val info: SkillStateInfo
 
     /**
