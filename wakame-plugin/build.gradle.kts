@@ -19,7 +19,7 @@ dependencies {
     compileOnly(libs.server.paper)
 
     // helper
-    compileOnly(libs.helper)
+    compileOnly("me.lucko", "helper", "6.0.0-SNAPSHOT")
     compileOnly(libs.helper.sql)
     compileOnly(libs.helper.profiles)
 
