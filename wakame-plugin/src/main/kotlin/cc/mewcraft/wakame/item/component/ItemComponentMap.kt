@@ -36,6 +36,8 @@ data class TypedItemComponent<T>(
 interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
     companion object {
+        const val TAG_COMPONENTS = "components"
+
         val EMPTY: ItemComponentMap = object : ItemComponentMap {
             override fun <T> get(type: ItemComponentType<T>): T? = null
             override fun has(type: ItemComponentType<*>): Boolean = false
@@ -277,7 +279,6 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         }
 
         companion object {
-            private const val TAG_COMPONENTS = "components"
             private val EMPTY_COMPOUND = CompoundTag.create()
         }
     }

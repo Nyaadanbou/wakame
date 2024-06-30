@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.util.backingCustomModelData
 import cc.mewcraft.wakame.util.backingCustomName
 import cc.mewcraft.wakame.util.backingItemName
 import cc.mewcraft.wakame.util.backingLore
+import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.isNms
 import cc.mewcraft.wakame.util.removeWakameTag
 import cc.mewcraft.wakame.util.wakameTag
@@ -225,33 +226,33 @@ private class NekoStackImpl(
  * Common implementations related to [NekoStack].
  */
 private object NekoStackImplementations {
-    fun isSystemUse(nekoCompound: CompoundTag): Boolean {
-        return nekoCompound.contains(ItemComponentTypes.SYSTEM_USE.id)
+    fun isSystemUse(wakameTag: CompoundTag): Boolean {
+        return wakameTag.getCompoundOrNull(ItemComponentMap.TAG_COMPONENTS)?.contains(ItemComponentTypes.SYSTEM_USE.id) ?: false
     }
 
-    fun getNamespace(nekoCompound: CompoundTag): String? {
-        return nekoCompound.getString(BaseBinaryKeys.NAMESPACE)
+    fun getNamespace(wakameTag: CompoundTag): String? {
+        return wakameTag.getString(BaseBinaryKeys.NAMESPACE)
     }
 
-    fun getPath(nekoCompound: CompoundTag): String? {
-        return nekoCompound.getString(BaseBinaryKeys.PATH)
+    fun getPath(wakameTag: CompoundTag): String? {
+        return wakameTag.getString(BaseBinaryKeys.PATH)
     }
 
-    fun getKey(nekoCompound: CompoundTag): Key? {
-        return getNamespace(nekoCompound)?.let { namespace -> getPath(nekoCompound)?.let { path -> Key(namespace, path) } }
+    fun getKey(wakameTag: CompoundTag): Key? {
+        return getNamespace(wakameTag)?.let { namespace -> getPath(wakameTag)?.let { path -> Key(namespace, path) } }
     }
 
-    fun setNamespace(nekoCompound: CompoundTag, namespace: String) {
-        nekoCompound.putString(BaseBinaryKeys.NAMESPACE, namespace)
+    fun setNamespace(wakameTag: CompoundTag, namespace: String) {
+        wakameTag.putString(BaseBinaryKeys.NAMESPACE, namespace)
     }
 
-    fun setPath(nekoCompound: CompoundTag, path: String) {
-        nekoCompound.putString(BaseBinaryKeys.PATH, path)
+    fun setPath(wakameTag: CompoundTag, path: String) {
+        wakameTag.putString(BaseBinaryKeys.PATH, path)
     }
 
-    fun setKey(nekoCompound: CompoundTag, key: Key) {
-        setNamespace(nekoCompound, key.namespace())
-        setPath(nekoCompound, key.value())
+    fun setKey(wakameTag: CompoundTag, key: Key) {
+        setNamespace(wakameTag, key.namespace())
+        setPath(wakameTag, key.value())
     }
 }
 
