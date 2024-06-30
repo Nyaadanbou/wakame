@@ -24,14 +24,6 @@ sealed interface ItemComponentHolder {
     val item: ItemStack
 
     /**
-     * 用于获取其他的 wakame 物品组件的信息.
-     *
-     * ## 警告!!!
-     * 禁止利用该实例获取当前组件, 否则会无限递归引起爆栈.
-     */
-    val components: ItemComponentMap
-
-    /**
      * 用于检查组件的 NBT 标签是否存在.
      *
      * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
@@ -89,6 +81,40 @@ sealed interface ItemComponentHolder {
      */
     fun removeTag(id: String)
 
+    /**
+     * 用于检查其他的 wakame 物品组件是否存在.
+     *
+     * ## 警告!!!
+     * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
+     */
+    fun hasData(type: ItemComponentType<*>): Boolean
+
+    /**
+     * 用于获取其他的 wakame 物品组件.
+     *
+     * ## 警告!!!
+     * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
+     */
+    fun <T> getData(type: ItemComponentType<T>): T?
+
+    /**
+     * 用于设置其他的 wakame 物品组件.
+     *
+     * ## 警告!!!
+     * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
+     */
+    fun <T> setData(type: ItemComponentType<T>, data: T)
+
+    /**
+     * 用于移除其他的 wakame 物品组件.
+     *
+     * ## 警告!!!
+     * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
+     */
+    fun unsetData(type: ItemComponentType<*>)
+
+    // TODO 2024/6/30 等 Paper 的 DataComponent API 推出以后, 添加相应的添加/获取/移除 vanilla 物品组件的函数
+
     companion object {
         fun create(compound: CompoundTag, item: ItemStack, components: ItemComponentMap): ItemComponentHolder {
             return Impl(item, components, compound)
@@ -97,7 +123,7 @@ sealed interface ItemComponentHolder {
 
     private class Impl(
         override val item: ItemStack,
-        override val components: ItemComponentMap,
+        private val components: ItemComponentMap,
         private val compound: CompoundTag,
     ) : ItemComponentHolder {
         override fun hasTag(id: String): Boolean {
@@ -118,6 +144,22 @@ sealed interface ItemComponentHolder {
 
         override fun removeTag(id: String) {
             compound.remove(id)
+        }
+
+        override fun hasData(type: ItemComponentType<*>): Boolean {
+            return components.has(type)
+        }
+
+        override fun <T> getData(type: ItemComponentType<T>): T? {
+            return components.get(type)
+        }
+
+        override fun <T> setData(type: ItemComponentType<T>, data: T) {
+            components.set(type, data)
+        }
+
+        override fun unsetData(type: ItemComponentType<*>) {
+            components.unset(type)
         }
     }
 }
