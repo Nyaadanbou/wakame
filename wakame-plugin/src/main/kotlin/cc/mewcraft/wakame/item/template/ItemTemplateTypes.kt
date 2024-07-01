@@ -123,6 +123,9 @@ object ItemTemplateTypes {
      */
     val UNBREAKABLE: ItemTemplateType<Unbreakable.Template> = Unbreakable.Template.register()
 
+    /**
+     * 获取所有模板的序列化器.
+     */
     internal fun collectTypeSerializers(): TypeSerializerCollection {
         return serializerBuilder.build()
     }

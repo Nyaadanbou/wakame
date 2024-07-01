@@ -89,26 +89,33 @@ interface ItemTemplateMap {
         override fun applyTo(item: ItemStack) = Unit
     }
 
-    private class MapImpl : ItemTemplateMap {
+    private class MapImpl(
+        map: LinkedHashMap<ItemTemplateType<*>, ItemTemplate<*>>,
+    ) : ItemTemplateMap {
+        private val map: LinkedHashMap<ItemTemplateType<*>, ItemTemplate<*>> = LinkedHashMap(map)
+
         override fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T? {
-            TODO("Not yet implemented")
+            return map[type] as T?
         }
 
         override fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean {
-            TODO("Not yet implemented")
+            return map.containsKey(type)
         }
 
         override fun applyTo(item: ItemStack) {
-            TODO("Not yet implemented")
+            // FIXME 2024/6/30 这个是不是应该属于 NekoItemRealizer 的实现, 而不应该放在这里?
         }
     }
 
-    private class BuilderImpl : ItemTemplateMap.Builder {
+    private class BuilderImpl : Builder {
+        private val map: LinkedHashMap<ItemTemplateType<*>, ItemTemplate<*>> = LinkedHashMap()
+
         override fun <T : ItemTemplate<*>> put(type: ItemTemplateType<T>, template: T) {
-            TODO("Not yet implemented")
+            map[type] = template
         }
+
         override fun build(): ItemTemplateMap {
-            TODO("Not yet implemented")
+            return MapImpl(map)
         }
     }
 }
