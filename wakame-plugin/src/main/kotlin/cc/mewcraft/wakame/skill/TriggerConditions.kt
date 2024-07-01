@@ -9,6 +9,9 @@ import com.google.common.collect.MultimapBuilder
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
+/**
+ * A collection of [SingleTrigger]s that are valid in a certain [SkillStateInfo.Type].
+ */
 sealed interface TriggerConditions {
     companion object {
         /**
@@ -28,8 +31,9 @@ sealed interface TriggerConditions {
     val values: Multimap<SkillStateInfo.Type, SingleTrigger>
 
     private data object Empty : TriggerConditions {
-        override val values: Multimap<SkillStateInfo.Type, SingleTrigger> =
-            MultimapBuilder.hashKeys().arrayListValues().build()
+        override val values: Multimap<SkillStateInfo.Type, SingleTrigger> = MultimapBuilder.hashKeys()
+            .arrayListValues()
+            .build()
     }
 
     private data class TriggerConditionsImpl(

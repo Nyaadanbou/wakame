@@ -75,16 +75,24 @@ private class SkillCastContextImpl : SkillCastContext {
     fun setCaster(caster: Caster) {
         set(SkillCastContextKey.CASTER, caster)
         when (caster) {
-            is Caster.Player -> {
+            is Caster.Single.Player -> {
                 set(SkillCastContextKey.CASTER_PLAYER, caster)
                 set(SkillCastContextKey.CASTER_ENTITY, caster)
                 set(SkillCastContextKey.USER, caster.bukkitPlayer.toUser())
                 set(SkillCastContextKey.CASTER_AUDIENCE, caster.bukkitPlayer)
             }
 
-            is Caster.Entity -> {
+            is Caster.Single.Entity -> {
                 set(SkillCastContextKey.CASTER_ENTITY, caster)
                 set(SkillCastContextKey.CASTER_AUDIENCE, caster.bukkitEntity)
+            }
+
+            is Caster.Single.Skill -> {
+                set(SkillCastContextKey.CASTER_SKILL, caster)
+            }
+
+            is Caster.CompositeNode -> {
+                set(SkillCastContextKey.CASTER_COMPOSITE_NODE, caster)
             }
         }
     }

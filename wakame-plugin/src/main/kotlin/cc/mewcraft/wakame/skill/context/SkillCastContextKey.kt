@@ -23,8 +23,10 @@ private constructor(
      */
     companion object {
         val CASTER: SkillCastContextKey<Caster> = SkillCastContextKey("caster")
-        val CASTER_ENTITY: SkillCastContextKey<Caster.Entity> = SkillCastContextKey("caster_entity")
-        val CASTER_PLAYER: SkillCastContextKey<Caster.Player> = SkillCastContextKey("caster_player")
+        val CASTER_ENTITY: SkillCastContextKey<Caster.Single.Entity> = SkillCastContextKey("caster_entity")
+        val CASTER_PLAYER: SkillCastContextKey<Caster.Single.Player> = SkillCastContextKey("caster_player")
+        val CASTER_SKILL: SkillCastContextKey<Caster.Single.Skill> = SkillCastContextKey("caster_skill")
+        val CASTER_COMPOSITE_NODE: SkillCastContextKey<Caster.CompositeNode> = SkillCastContextKey("caster_composite_node")
         val ITEM_STACK: SkillCastContextKey<ItemStack> = SkillCastContextKey("item_stack")
         val MOCHA_ENGINE: SkillCastContextKey<MochaEngine<*>> = SkillCastContextKey("mocha_engine")
         val NEKO_STACK: SkillCastContextKey<NekoStack> = SkillCastContextKey("neko_stack")

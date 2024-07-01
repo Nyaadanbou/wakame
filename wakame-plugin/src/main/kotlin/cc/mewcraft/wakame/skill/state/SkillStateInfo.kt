@@ -13,7 +13,9 @@ import org.koin.core.component.inject
  * 代表了一个玩家技能状态的信息.
  */
 sealed interface SkillStateInfo {
-
+    /**
+     * 当前状态的类型.
+     */
     val type: Type
 
     /**
