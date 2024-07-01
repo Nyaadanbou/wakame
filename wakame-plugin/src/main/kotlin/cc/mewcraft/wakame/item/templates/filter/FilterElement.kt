@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item.filter
+package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.template.GenerationContext

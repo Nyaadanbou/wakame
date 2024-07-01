@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.filter.AttributeContextHolder
-import cc.mewcraft.wakame.item.filter.CurseContextHolder
-import cc.mewcraft.wakame.item.filter.SkillContextHolder
+import cc.mewcraft.wakame.item.templates.filter.AttributeContextHolder
+import cc.mewcraft.wakame.item.templates.filter.CurseContextHolder
+import cc.mewcraft.wakame.item.templates.filter.SkillContextHolder
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random2.SelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
@@ -13,6 +13,11 @@ import cc.mewcraft.wakame.util.WatchedSet
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
+
+class GenerationContextException(
+    message: String? = null,
+    cause: Throwable? = null,
+) : Exception(message, cause)
 
 /**
  * 代表一个物品生成过程的上下文.
@@ -31,7 +36,7 @@ class GenerationContext(
     /**
      * 本次生成的物品目标.
      */
-    val itemKey: Key,
+    val target: Key,
 
     /**
      * 随机数生成器的种子.
@@ -43,10 +48,16 @@ class GenerationContext(
      */
     var level: Short? by WatchedPrimitive(null)
 
+    val levelOrThrow: Short
+        get() = level ?: throw GenerationContextException("The level is not present in the generation context")
+
     /**
      * 已经生成的 [Rarity].
      */
     var rarity: Rarity? by WatchedReference(null)
+
+    val rarityOrThrow: Rarity
+        get() = rarity ?: throw GenerationContextException("The rarity is not present in the generation context")
 
     /**
      * 已经生成的 [Element].
@@ -73,10 +84,14 @@ class GenerationContext(
      */
     val attributes: MutableCollection<AttributeContextHolder> by WatchedSet(HashSet())
 
+    fun newException(message: String?) {
+        // TODO 实现一个可以快速构建 GenerationContextException 的方便函数
+    }
+
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("trigger", trigger),
-            ExaminableProperty.of("itemKey", itemKey),
+            ExaminableProperty.of("target", target),
             ExaminableProperty.of("seed", seed),
             ExaminableProperty.of("level", level),
             ExaminableProperty.of("rarity", rarity),

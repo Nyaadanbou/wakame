@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.filter.FilterFactory
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -117,7 +116,7 @@ internal data object ElementPoolSerializer : PoolSerializer<Element, GenerationC
     }
 
     override fun filterFactory(node: ConfigurationNode): Filter<GenerationContext> {
-        return FilterFactory.create(node)
+        return node.krequire<Filter<GenerationContext>>()
     }
 
     override fun onPickSample(content: Element, context: GenerationContext) {

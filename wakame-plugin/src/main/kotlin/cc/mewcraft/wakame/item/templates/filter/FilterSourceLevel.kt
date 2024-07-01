@@ -1,29 +1,30 @@
-package cc.mewcraft.wakame.item.filter
+package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random2.Filter
 import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.toStableInt
 import com.google.common.collect.Range
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
-data class FilterItemLevel(
+/**
+ * Checks source level population.
+ *
+ * @property invert
+ * @property level
+ */
+data class FilterSourceLevel(
     override val invert: Boolean,
     private val level: Range<Int>,
 ) : Filter<GenerationContext>, Examinable {
 
     /**
-     * Returns `true` if the item level in the [context] is in the range of
+     * Returns `true` if the source level in the [context] is in the range of
      * [level].
      */
     override fun testOriginal(context: GenerationContext): Boolean {
-        val level = context.level
-        if (level != null) {
-            level.toStableInt() in this.level
-        }
-        return false
+        return (context.trigger.level) in level
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

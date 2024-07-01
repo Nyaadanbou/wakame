@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item.filter
+package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item.filter
+package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random2.Filter
@@ -9,24 +9,19 @@ import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
 /**
- * Checks skill population.
- *
- * This could be, for example, used to check whether a skill
- * with key `skill:blink` has been populated.
- *
- * @property key the key of the skill to check with
+ * Checks curse population.
  */
-data class FilterSkill(
+class FilterCurse(
     override val invert: Boolean,
     private val key: Key,
 ) : Filter<GenerationContext>, Examinable {
 
     /**
-     * Returns `true` if the [context] already has the skill with
+     * Returns `true` if the [context] already has the curse with
      * [key][key] populated.
      */
     override fun testOriginal(context: GenerationContext): Boolean {
-        return SkillContextHolder(key) in context.skills
+        return CurseContextHolder(key) in context.curses
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
@@ -41,7 +36,7 @@ data class FilterSkill(
     }
 }
 
-data class SkillContextHolder(
+data class CurseContextHolder(
     val key: Key,
 ) : Examinable {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -53,7 +48,7 @@ data class SkillContextHolder(
     override fun equals(other: Any?): Boolean {
         if (this === other)
             return true
-        if (other is SkillContextHolder)
+        if (other is CurseContextHolder)
             return key == other.key
         return false
     }

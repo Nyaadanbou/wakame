@@ -90,7 +90,7 @@ interface ItemRarity : Examinable, TooltipProvider {
 
         override fun generate(context: GenerationContext): GenerationResult<ItemRarity> {
             fun warnNullItemLevel() {
-                ItemComponentInjections.logger.warn("Failed to generate ${ItemComponentTypes.RARITY} for item '${context.itemKey}' because no ${ItemComponentTypes.LEVEL} was found in the generation context")
+                ItemComponentInjections.logger.warn("Failed to generate ${ItemComponentTypes.RARITY} for item '${context.target}' because no ${ItemComponentTypes.LEVEL} was found in the generation context")
             }
 
             val rarity: Rarity?

@@ -1,6 +1,7 @@
-package cc.mewcraft.wakame.item.filter
+package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.config.configurate.TypeDeserializer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random2.Filter
@@ -12,14 +13,15 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
+import java.lang.reflect.Type
 
-object FilterFactory {
+internal object FilterSerializer : TypeDeserializer<Filter<GenerationContext>> {
     // if the string starts with '~',
     // then we should create a filter
     // that always inverts its original result
     private const val NOT = '~'
 
-    fun create(node: ConfigurationNode): Filter<GenerationContext> {
+    override fun deserialize(type: Type, node: ConfigurationNode): Filter<GenerationContext> {
         val type0 = node.node("type").krequire<String>()
         val invert = type0.startsWith(NOT) // check if we should invert the original result
         val type = type0.substringAfter(NOT) // the type string (after ~)

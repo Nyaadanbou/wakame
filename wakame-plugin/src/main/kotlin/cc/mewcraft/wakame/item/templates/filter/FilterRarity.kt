@@ -1,36 +1,34 @@
-package cc.mewcraft.wakame.item.filter
+package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random2.Filter
+import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.toSimpleString
-import com.google.common.collect.Range
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
 /**
- * Checks source level population.
+ * Checks [rarity] population.
  *
- * @property invert
- * @property level
+ * @property rarity the [Rarity] to check with
  */
-data class FilterSourceLevel(
+data class FilterRarity(
     override val invert: Boolean,
-    private val level: Range<Int>,
+    private val rarity: Rarity,
 ) : Filter<GenerationContext>, Examinable {
 
     /**
-     * Returns `true` if the source level in the [context] is in the range of
-     * [level].
+     * Returns `true` if the [context] already has the [rarity] populated.
      */
     override fun testOriginal(context: GenerationContext): Boolean {
-        return (context.trigger.level) in level
+        return rarity == context.rarity
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("invert", invert),
-            ExaminableProperty.of("level", level),
+            ExaminableProperty.of("rarity", rarity),
         )
     }
 

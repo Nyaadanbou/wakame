@@ -1,34 +1,34 @@
-package cc.mewcraft.wakame.item.filter
+package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random2.Filter
-import cc.mewcraft.wakame.random2.Mark
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
+import kotlin.random.Random
 
 /**
- * Checks [mark] population.
+ * Checks [probability].
  *
- * @property mark the mark value in string to check with
+ * @property probability the probability of success for this toss
  */
-data class FilterMark(
+data class FilterToss(
     override val invert: Boolean,
-    private val mark: String,
+    private val probability: Float,
 ) : Filter<GenerationContext>, Examinable {
 
     /**
-     * Returns `true` if the [context] already has the [mark] populated.
+     * Returns `true` if the toss is success.
      */
     override fun testOriginal(context: GenerationContext): Boolean {
-        return Mark.stringMarkOf(mark) in context.marks
+        return Random.nextFloat() < probability
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("invert", invert),
-            ExaminableProperty.of("mark", mark),
+            ExaminableProperty.of("probability", probability),
         )
     }
 

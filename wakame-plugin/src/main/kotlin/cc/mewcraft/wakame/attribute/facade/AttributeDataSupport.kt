@@ -1,5 +1,9 @@
 package cc.mewcraft.wakame.attribute.facade
 
+import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.Element as ElementType
+
 /*
    属性数据抽象。
 
@@ -17,30 +21,30 @@ sealed interface AttributeComponent {
     /**
      * The `operation` component.
      */
-    interface Op<OP> : AttributeComponent {
-        val operation: OP
+    interface Op : AttributeComponent {
+        val operation: AttributeModifier.Operation
     }
 
     /**
      * The `element` component.
      */
-    interface Element<E> : AttributeComponent {
-        val element: E
+    interface Element : AttributeComponent {
+        val element: ElementType
     }
 
     /**
-     * The `single` value component.
+     * The `fixed` value component.
      */
-    interface Single<S> : AttributeComponent {
-        val value: S
+    interface Fixed<T> : AttributeComponent {
+        val value: T
     }
 
     /**
      * The `ranged` value component.
      */
-    interface Ranged<R> : AttributeComponent {
-        val lower: R
-        val upper: R
+    interface Ranged<T> : AttributeComponent {
+        val lower: T
+        val upper: T
     }
 }
 
@@ -58,55 +62,55 @@ sealed interface AttributeComponent {
 interface AttributeData
 
 /**
- * Components: [AttributeComponent.Op], [AttributeComponent.Single]
+ * Components: [AttributeComponent.Op], [AttributeComponent.Fixed]
  */
-interface AttributeDataS<OP, S> :
+interface AttributeDataS<T> :
     AttributeData,
-    AttributeComponent.Op<OP>,
-    AttributeComponent.Single<S> {
+    AttributeComponent.Op,
+    AttributeComponent.Fixed<T> {
 
-    override val operation: OP
-    override val value: S
+    override val operation: AttributeModifier.Operation
+    override val value: T
 }
 
 /**
- * Components: [AttributeComponent.Op], [AttributeComponent.Single]
+ * Components: [AttributeComponent.Op], [AttributeComponent.Fixed]
  */
-interface AttributeDataR<OP, R> :
+interface AttributeDataR<T> :
     AttributeData,
-    AttributeComponent.Op<OP>,
-    AttributeComponent.Ranged<R> {
+    AttributeComponent.Op,
+    AttributeComponent.Ranged<T> {
 
-    override val operation: OP
-    override val lower: R
-    override val upper: R
+    override val operation: AttributeModifier.Operation
+    override val lower: T
+    override val upper: T
 }
 
 /**
- * Components: [AttributeComponent.Op], [AttributeComponent.Single], [AttributeComponent.Element]
+ * Components: [AttributeComponent.Op], [AttributeComponent.Fixed], [AttributeComponent.Element]
  */
-interface AttributeDataSE<OP, S, E> :
+interface AttributeDataSE<T> :
     AttributeData,
-    AttributeComponent.Op<OP>,
-    AttributeComponent.Single<S>,
-    AttributeComponent.Element<E> {
+    AttributeComponent.Op,
+    AttributeComponent.Fixed<T>,
+    AttributeComponent.Element {
 
-    override val operation: OP
-    override val value: S
-    override val element: E
+    override val operation: AttributeModifier.Operation
+    override val value: T
+    override val element: Element
 }
 
 /**
  * Components: [AttributeComponent.Op], [AttributeComponent.Ranged], [AttributeComponent.Element]
  */
-interface AttributeDataRE<OP, R, E> :
+interface AttributeDataRE<T> :
     AttributeData,
-    AttributeComponent.Op<OP>,
-    AttributeComponent.Ranged<R>,
-    AttributeComponent.Element<E> {
+    AttributeComponent.Op,
+    AttributeComponent.Ranged<T>,
+    AttributeComponent.Element {
 
-    override val operation: OP
-    override val lower: R
-    override val upper: R
-    override val element: E
+    override val operation: AttributeModifier.Operation
+    override val lower: T
+    override val upper: T
+    override val element: ElementType
 }

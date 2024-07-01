@@ -24,24 +24,16 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderR
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderRE
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderS
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreDataHolderSE
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreR
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreRE
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreS
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreSE
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreTagWrapperR
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreTagWrapperRE
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreTagWrapperS
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCoreTagWrapperSE
-import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCore
-import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreR
-import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreRE
-import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreS
-import cc.mewcraft.wakame.item.schema.cell.core.attribute.SchemaAttributeCoreSE
+import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttribute
+import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttributeR
+import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttributeRE
+import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttributeS
+import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttributeSE
+import cc.mewcraft.wakame.item.components.cell.template.cores.attribute.TemplateCoreAttribute
+import cc.mewcraft.wakame.item.components.cell.template.cores.attribute.TemplateCoreAttributeR
+import cc.mewcraft.wakame.item.components.cell.template.cores.attribute.TemplateCoreAttributeRE
+import cc.mewcraft.wakame.item.components.cell.template.cores.attribute.TemplateCoreAttributeS
+import cc.mewcraft.wakame.item.components.cell.template.cores.attribute.TemplateCoreAttributeSE
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.RandomizedValue
@@ -88,7 +80,7 @@ object AttributeRegistry : Initializable {
     /**
      * The facades of all attributes.
      */
-    val FACADES: Registry<Key, AttributeFacade<BinaryAttributeCore, SchemaAttributeCore>> = SimpleRegistry()
+    val FACADES: Registry<Key, AttributeFacade<CoreAttribute, TemplateCoreAttribute>> = SimpleRegistry()
 
     /**
      * The config of all attributes.
@@ -133,8 +125,8 @@ object AttributeRegistry : Initializable {
             val tooltips = DiscreteTooltips(configuration)
 
             // override it
-            displayTextCreator = { core: BinaryAttributeCoreS ->
-                val lines = tooltips.line(core.operation)
+            displayTextCreator = { core: CoreAttributeS ->
+                val lines = tooltips.line(core.operation) // FIXME 把 BinaryCore 给暂时修复了
                 val resolver = tooltips.value("value", core.value.toInt())
                 listOf(AttributeRegistrySupport.mini().deserialize(lines, resolver))
             }
@@ -183,10 +175,10 @@ object AttributeRegistry : Initializable {
  *
  * 这里将各种操作和实现放在一起以方便外部统一调用。
  *
- * @param BC the type of [BinaryAttributeCore]
- * @param SC the type of [SchemaAttributeCore]
+ * @param BC the type of [CoreAttribute]
+ * @param SC the type of [TemplateCoreAttribute]
  */
-interface AttributeFacade<BC : BinaryAttributeCore, SC : SchemaAttributeCore> : Keyed {
+interface AttributeFacade<BC : CoreAttribute, SC : TemplateCoreAttribute> : Keyed {
     /**
      * 属性 facade 的唯一标识。
      *
@@ -207,17 +199,17 @@ interface AttributeFacade<BC : BinaryAttributeCore, SC : SchemaAttributeCore> : 
     val attributeModifierCreator: (UUID, BC) -> Map<Attribute, AttributeModifier>
 
     /**
-     * A creator for [SchemaAttributeCore].
+     * A creator for [TemplateCoreAttribute].
      */
     val schemaCoreCreatorByConfig: (ConfigurationNode) -> SC
 
     /**
-     * A creator for [BinaryAttributeCore].
+     * A creator for [CoreAttribute].
      */
     val binaryCoreCreatorByConfig: (ConfigurationNode) -> BC
 
     /**
-     * A creator for [BinaryAttributeCore].
+     * A creator for [CoreAttribute].
      */
     val binaryCoreCreatorByTag: (CompoundTag) -> BC
 
@@ -230,7 +222,7 @@ interface AttributeFacade<BC : BinaryAttributeCore, SC : SchemaAttributeCore> : 
 /**
  * A mutable [AttributeFacade] (except the property [facadeId]).
  */
-private interface MutableAttributeFacade<BC : BinaryAttributeCore, SC : SchemaAttributeCore> : AttributeFacade<BC, SC> {
+private interface MutableAttributeFacade<BC : CoreAttribute, SC : TemplateCoreAttribute> : AttributeFacade<BC, SC> {
     /**
      * The config of the attribute facade.
      */
@@ -275,12 +267,12 @@ inline fun <reified T : AttributeComponent> AttributeComponentMetadata.hasCompon
 
 private operator fun AttributeFacade<*, *>.unaryPlus() {
     @Suppress("UNCHECKED_CAST")
-    FACADES.register(this.facadeId, this as AttributeFacade<BinaryAttributeCore, SchemaAttributeCore>)
+    FACADES.register(this.facadeId, this as AttributeFacade<CoreAttribute, TemplateCoreAttribute>)
 }
 
 private operator fun AttributeFacadeOverride<*, *>.unaryPlus() {
     @Suppress("UNCHECKED_CAST")
-    FACADES.register(this.prototype.facadeId, this.prototype as AttributeFacade<BinaryAttributeCore, SchemaAttributeCore>)
+    FACADES.register(this.prototype.facadeId, this.prototype as AttributeFacade<CoreAttribute, TemplateCoreAttribute>)
 }
 
 /**
@@ -311,7 +303,7 @@ private interface RangedSelection : RangedAttributeBinder {
 private interface SingleAttributeBinder {
     fun bind(
         component: Attributes.() -> Attribute,
-    ): AttributeFacadeOverride<BinaryAttributeCoreS, SchemaAttributeCoreS>
+    ): AttributeFacadeOverride<CoreAttributeS, TemplateCoreAttributeS>
 }
 
 /**
@@ -321,7 +313,7 @@ private interface RangedAttributeBinder {
     fun bind(
         component1: Attributes.() -> Attribute,
         component2: Attributes.() -> Attribute,
-    ): AttributeFacadeOverride<BinaryAttributeCoreR, SchemaAttributeCoreR>
+    ): AttributeFacadeOverride<CoreAttributeR, TemplateCoreAttributeR>
 }
 
 /**
@@ -330,7 +322,7 @@ private interface RangedAttributeBinder {
 private interface SingleElementAttributeBinder {
     fun bind(
         component: ElementAttributeContainer.() -> ElementAttribute,
-    ): AttributeFacadeOverride<BinaryAttributeCoreSE, SchemaAttributeCoreSE>
+    ): AttributeFacadeOverride<CoreAttributeSE, TemplateCoreAttributeSE>
 }
 
 /**
@@ -340,10 +332,10 @@ private interface RangedElementAttributeBinder {
     fun bind(
         component1: ElementAttributeContainer.() -> ElementAttribute,
         component2: ElementAttributeContainer.() -> ElementAttribute,
-    ): AttributeFacadeOverride<BinaryAttributeCoreRE, SchemaAttributeCoreRE>
+    ): AttributeFacadeOverride<CoreAttributeRE, TemplateCoreAttributeRE>
 }
 
-private interface AttributeFacadeOverride<BC : BinaryAttributeCore, SC : SchemaAttributeCore> {
+private interface AttributeFacadeOverride<BC : CoreAttribute, SC : TemplateCoreAttribute> {
     val prototype: AttributeFacade<BC, SC>
     fun override(mutator: MutableAttributeFacade<BC, SC>.() -> Unit): AttributeFacade<BC, SC>
 }
@@ -361,7 +353,7 @@ private object AttributeRegistrySupport : KoinComponent {
     }
 }
 
-private class MutableAttributeFacadeImpl<A : BinaryAttributeCore, B : SchemaAttributeCore>(
+private class MutableAttributeFacadeImpl<A : CoreAttribute, B : TemplateCoreAttribute>(
     override val facadeId: Key,
     override val configuration: ConfigProvider,
     override var attributeComponentMetadata: AttributeComponentMetadata,
@@ -522,14 +514,14 @@ private class SingleSelectionImpl(
     /**
      * Components: Operation, Single
      */
-    override fun bind(component: Attributes.() -> Attribute): AttributeFacadeOverride<BinaryAttributeCoreS, SchemaAttributeCoreS> {
+    override fun bind(component: Attributes.() -> Attribute): AttributeFacadeOverride<CoreAttributeS, TemplateCoreAttributeS> {
         val facade = MutableAttributeFacadeImpl(
             facadeId = id,
             configuration = config,
             attributeComponentMetadata = AttributeComponentMetadataImpl(
-                AttributeComponent.Op::class, AttributeComponent.Single::class
+                AttributeComponent.Op::class, AttributeComponent.Fixed::class
             ),
-            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreS ->
+            attributeModifierCreator = { uuid: UUID, core: CoreAttributeS ->
                 ImmutableMap.of(
                     Attributes.component(), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
                 )
@@ -537,17 +529,17 @@ private class SingleSelectionImpl(
             schemaCoreCreatorByConfig = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getSchemaSingle()
-                SchemaAttributeCoreS(id, tagType, operation, value)
+                TemplateCoreAttributeS(tagType, id, operation, value)
             },
             binaryCoreCreatorByConfig = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getBinarySingle()
-                BinaryAttributeCoreDataHolderS(id, tagType, operation, value)
+                CoreAttributeS(tagType, id, operation, value)
             },
             binaryCoreCreatorByTag = { tag: CompoundTag ->
-                BinaryAttributeCoreTagWrapperS(tag)
+                CoreAttributeS(tagType, tag)
             },
-            displayTextCreator = { core: BinaryAttributeCoreS ->
+            displayTextCreator = { core: CoreAttributeS ->
                 val lines = tooltips.line(core.operation)
                 val resolver = tooltips.number("value", core.value)
                 listOf(AttributeRegistrySupport.mini().deserialize(lines, resolver))
@@ -577,14 +569,14 @@ private class RangedSelectionImpl(
     override fun bind(
         component1: Attributes.() -> Attribute,
         component2: Attributes.() -> Attribute,
-    ): AttributeFacadeOverride<BinaryAttributeCoreR, SchemaAttributeCoreR> {
+    ): AttributeFacadeOverride<CoreAttributeR, TemplateCoreAttributeR> {
         val facade = MutableAttributeFacadeImpl(
             facadeId = id,
             configuration = config,
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class
             ),
-            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreR ->
+            attributeModifierCreator = { uuid: UUID, core: CoreAttributeR ->
                 ImmutableMap.of(
                     Attributes.component1(), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
                     Attributes.component2(), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
@@ -594,18 +586,18 @@ private class RangedSelectionImpl(
                 val operation = node.getOperation()
                 val lower = node.getSchemaLower()
                 val upper = node.getSchemaUpper()
-                SchemaAttributeCoreR(id, tagType, operation, lower, upper)
+                TemplateCoreAttributeR(tagType, id, operation, lower, upper)
             },
             binaryCoreCreatorByConfig = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getBinaryLower()
                 val upper = node.getBinaryUpper()
-                BinaryAttributeCoreDataHolderR(id, tagType, operation, lower, upper)
+                CoreAttributeR(tagType, id, operation, lower, upper)
             },
             binaryCoreCreatorByTag = { tag: CompoundTag ->
-                BinaryAttributeCoreTagWrapperR(tag)
+                CoreAttributeR(tagType, tag)
             },
-            displayTextCreator = { core: BinaryAttributeCoreR ->
+            displayTextCreator = { core: CoreAttributeR ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
@@ -629,14 +621,14 @@ private class SingleElementAttributeBinderImpl(
     /**
      * Components: Operation, Single, Element
      */
-    override fun bind(component: ElementAttributeContainer.() -> ElementAttribute): AttributeFacadeOverride<BinaryAttributeCoreSE, SchemaAttributeCoreSE> {
+    override fun bind(component: ElementAttributeContainer.() -> ElementAttribute): AttributeFacadeOverride<CoreAttributeSE, TemplateCoreAttributeSE> {
         val facade = MutableAttributeFacadeImpl(
             facadeId = id,
             configuration = config,
             attributeComponentMetadata = AttributeComponentMetadataImpl(
-                AttributeComponent.Op::class, AttributeComponent.Single::class, AttributeComponent.Element::class
+                AttributeComponent.Op::class, AttributeComponent.Fixed::class, AttributeComponent.Element::class
             ),
-            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreSE ->
+            attributeModifierCreator = { uuid: UUID, core: CoreAttributeSE ->
                 ImmutableMap.of(
                     Attributes.byElement(core.element).component(), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
                 )
@@ -645,18 +637,18 @@ private class SingleElementAttributeBinderImpl(
                 val operation = node.getOperation()
                 val value = node.getSchemaSingle()
                 val element = node.getElement()
-                SchemaAttributeCoreSE(id, tagType, operation, value, element)
+                TemplateCoreAttributeSE(tagType, id, operation, value, element)
             },
             binaryCoreCreatorByConfig = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getBinarySingle()
                 val element = node.getElement()
-                BinaryAttributeCoreDataHolderSE(id, tagType, operation, value, element)
+                CoreAttributeSE(tagType, id, operation, value, element)
             },
             binaryCoreCreatorByTag = { tag: CompoundTag ->
-                BinaryAttributeCoreTagWrapperSE(tag)
+                CoreAttributeSE(tagType, tag)
             },
-            displayTextCreator = { core: BinaryAttributeCoreSE ->
+            displayTextCreator = { core: CoreAttributeSE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("value", core.value)
                 val resolver2 = tooltips.component("element", core.element.displayName)
@@ -683,14 +675,14 @@ private class RangedElementAttributeBinderImpl(
     override fun bind(
         component1: ElementAttributeContainer.() -> ElementAttribute,
         component2: ElementAttributeContainer.() -> ElementAttribute,
-    ): AttributeFacadeOverride<BinaryAttributeCoreRE, SchemaAttributeCoreRE> {
+    ): AttributeFacadeOverride<CoreAttributeRE, TemplateCoreAttributeRE> {
         val facade = MutableAttributeFacadeImpl(
             facadeId = id,
             configuration = config,
             attributeComponentMetadata = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class, AttributeComponent.Element::class
             ),
-            attributeModifierCreator = { uuid: UUID, core: BinaryAttributeCoreRE ->
+            attributeModifierCreator = { uuid: UUID, core: CoreAttributeRE ->
                 ImmutableMap.of(
                     Attributes.byElement(core.element).component1(), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
                     Attributes.byElement(core.element).component2(), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
@@ -701,19 +693,19 @@ private class RangedElementAttributeBinderImpl(
                 val lower = node.getSchemaLower()
                 val upper = node.getSchemaUpper()
                 val element = node.getElement()
-                SchemaAttributeCoreRE(id, tagType, operation, lower, upper, element)
+                TemplateCoreAttributeRE(tagType, id, operation, lower, upper, element)
             },
             binaryCoreCreatorByConfig = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getBinaryLower()
                 val upper = node.getBinaryUpper()
                 val element = node.getElement()
-                BinaryAttributeCoreDataHolderRE(id, tagType, operation, lower, upper, element)
+                CoreAttributeRE(tagType, id, operation, lower, upper, element)
             },
             binaryCoreCreatorByTag = { tag: CompoundTag ->
-                BinaryAttributeCoreTagWrapperRE(tag)
+                CoreAttributeRE(tagType, tag)
             },
-            displayTextCreator = { core: BinaryAttributeCoreRE ->
+            displayTextCreator = { core: CoreAttributeRE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
@@ -728,7 +720,7 @@ private class RangedElementAttributeBinderImpl(
     }
 }
 
-private class AttributeFacadeOverrideImpl<BC : BinaryAttributeCore, SC : SchemaAttributeCore>(
+private class AttributeFacadeOverrideImpl<BC : CoreAttribute, SC : TemplateCoreAttribute>(
     override val prototype: MutableAttributeFacade<BC, SC>,
 ) : AttributeFacadeOverride<BC, SC> {
     override fun override(mutator: MutableAttributeFacade<BC, SC>.() -> Unit): AttributeFacade<BC, SC> {
