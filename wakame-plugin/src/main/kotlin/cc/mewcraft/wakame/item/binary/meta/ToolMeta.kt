@@ -21,7 +21,6 @@ value class BToolMeta(
      * Gets the value of `rules`.
      */
     fun rules(): List<ToolRule> {
-        // TODO 等待组件相关API的到来
         return emptyList()
     }
 
@@ -33,7 +32,6 @@ value class BToolMeta(
     fun rules(value: List<ToolRule>) {
         val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
         if (compound != null) {
-            // TODO 等待组件相关API的到来
         } else throw IllegalStateException("Can't set 'rules' for empty tool")
     }
 
@@ -76,7 +74,6 @@ value class BToolMeta(
     }
 
     override fun getOrNull(): Tool? {
-        // TODO 等待组件相关API的到来
         return accessor.rootOrNull?.getCompoundOrNull(key.value())?.let { compound ->
             val rules: List<ToolRule> = emptyList()
             val defaultMiningSpeed = compound.getFloat(DEFAULT_MINING_SPEED_TAG)
@@ -87,7 +84,6 @@ value class BToolMeta(
 
     override fun set(value: Tool) {
         accessor.rootOrCreate.put(key.value(), CompoundTag {
-            // TODO 等待组件相关API的到来
         })
     }
 

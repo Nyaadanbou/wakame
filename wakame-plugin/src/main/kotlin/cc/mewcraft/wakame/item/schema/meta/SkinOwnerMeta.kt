@@ -37,6 +37,6 @@ internal data object SkinOwnerMetaSerializer : SchemaItemMetaSerializer<SSkinOwn
     override val defaultValue: SSkinOwnerMeta = DefaultSkinOwnerMeta
 
     override fun deserialize(type: Type, node: ConfigurationNode): SSkinOwnerMeta {
-        return DefaultSkinOwnerMeta // TODO returns a non-empty value
+        return DefaultSkinOwnerMeta
     }
 }

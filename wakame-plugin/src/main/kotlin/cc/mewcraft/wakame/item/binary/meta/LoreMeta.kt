@@ -13,8 +13,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 /**
  * 物品的描述(MiniMessage).
  */
-// TODO cell-overhaul: 类名不需要以 "B" 开头
-// TODO cell-overhaul: 类的选择应该有个单例持有所有类型，类似原版的 DataComponent，继而弃用 reified class
 @JvmInline
 value class BLoreMeta(
     private val accessor: ItemMetaAccessor,

@@ -8,8 +8,6 @@ import net.kyori.adventure.key.Key
 
 /* Use CMD-7 to navigate the whole file */
 
-// TODO 减少重复代码
-
 @JvmInline
 value class EntityKillsStatistics(
     override val accessor: ItemStatisticsAccessor,

@@ -17,8 +17,6 @@ import net.kyori.examination.Examinable
  */
 interface ItemTemplate<T> : Examinable {
 
-    // FIXME ItemComponentTemplate 也需要区分 Valued/NonValued 吗?
-
     /**
      * 生成一个该组件的快照.
      */

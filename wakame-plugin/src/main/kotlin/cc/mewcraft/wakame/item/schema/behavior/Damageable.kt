@@ -51,7 +51,6 @@ interface Damageable : ItemBehavior {
         override val disappearWhenBroken: Boolean by disappearWhenBroken
 
         override fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
-            // TODO: Test
             val nekoStack = itemStack.toNekoStack
             nekoStack.decreaseDurabilityNaturally(100)
         }
@@ -82,7 +81,7 @@ fun NekoStack.decreaseDurabilityNaturally(loss: Int) {
     val threshold = durabilityMeta.threshold()
     if (loss + originDamage >= threshold) {
         if (damageable.disappearWhenBroken) {
-            // TODO: itemStack.amount = 0
+            // itemStack.amount = 0
         } else {
             durabilityMeta.damage(threshold)
         }

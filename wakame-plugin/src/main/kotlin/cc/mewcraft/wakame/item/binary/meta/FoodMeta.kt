@@ -127,7 +127,6 @@ value class BFoodMeta(
      * Gets the value of `effects`.
      */
     fun effects(): Map<PotionEffect, Float> {
-        // TODO 等待组件相关API的到来
         return emptyMap()
     }
 
@@ -139,12 +138,10 @@ value class BFoodMeta(
     fun effects(value: Map<PotionEffect, Float>) {
         val compound = accessor.rootOrNull?.getCompoundOrNull(key.value())
         if (compound != null) {
-            // TODO 等待组件相关API的到来
         } else throw IllegalStateException("Can't set 'effects' for empty food")
     }
 
     override fun getOrNull(): Food? {
-        // TODO 等待组件相关API的到来
         return accessor.rootOrNull?.getCompoundOrNull(key.value())?.let { compound ->
             val nutrition = compound.getInt(NUTRITION_TAG)
             val saturation = compound.getFloat(SATURATION_TAG)
@@ -157,7 +154,6 @@ value class BFoodMeta(
     }
 
     override fun set(value: Food) {
-        // TODO 等待组件相关API的到来
         accessor.rootOrCreate.put(key.value(), CompoundTag {
             putInt(NUTRITION_TAG, value.nutrition.toStableInt())
             putFloat(SATURATION_TAG, value.saturation.toStableFloat())

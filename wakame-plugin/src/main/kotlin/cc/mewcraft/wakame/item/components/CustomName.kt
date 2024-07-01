@@ -60,10 +60,6 @@ interface CustomName : Examinable {
      */
     val rich: Component
 
-    // TODO 2024/6/28 CustomName 需要更合适的 ItemComponentHolder
-    //  因为渲染一个 CustomName 需要物品的 Rarity 组件, 而目前的
-    //  Holder 并不能很方便的直接获取其他的组件信息.
-
     data class Value(
         override val raw: String,
         override val rich: Component,

@@ -40,7 +40,7 @@ interface NekoItemRealizer {
 
 private object NekoItemRealizerImpl : NekoItemRealizer {
     override fun realize(item: NekoItem, context: GenerationContext): NekoStack {
-        TODO()
+        TODO("Not yet implemented")
     }
 
     override fun realize(item: NekoItem, user: User<*>): NekoStack {

@@ -49,9 +49,9 @@ interface ItemComponentType<T> {
     fun remove(holder: ItemComponentHolder)
 
     // 开发日记 2024/6/26
-    // TODO Type 提供一个专门的实现来提供 LoreLine?
-    //  这样的问题在于有些组件可能会提供多个 LoreLine,
-    //  因此这里单单返回一个 LoreLine 应该是不够的.
+    // Type 提供一个专门的实现来提供 LoreLine?
+    // 这样的问题在于有些组件可能会提供多个 LoreLine,
+    // 因此这里单单返回一个 LoreLine 应该是不够的.
     // fun render(holder: ItemComponentHolder): LoreLine
 
     // 开发日记 1
