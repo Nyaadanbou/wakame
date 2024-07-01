@@ -4,7 +4,6 @@ package cc.mewcraft.wakame.item.binary.cell.core.attribute
 
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.attribute.facade.AttributeDataR
 import cc.mewcraft.wakame.attribute.facade.AttributeDataRE
@@ -14,7 +13,6 @@ import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.ExaminableProperty
 import java.util.UUID
@@ -25,15 +23,17 @@ import java.util.stream.Stream
  *
  * This is the base class of binary attribute core.
  */
-sealed class BinaryAttributeCore : BinaryCore, AttributeComponent.Op<Operation>, AttributeModifierProvider {
+sealed class BinaryAttributeCore : BinaryCore, AttributeComponent.Op, AttributeModifierProvider {
     override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].attributeModifierCreator(uuid, this)
+        // return AttributeRegistry.FACADES[key].attributeModifierCreator(uuid, this)
+        TODO("to be deleted")
     }
 
     override fun provideDisplayLore(): LoreLine {
         val lineKey = AttributeDisplaySupport.getLineKey(this) ?: return LoreLine.noop()
-        val lineText = AttributeRegistry.FACADES[key].displayTextCreator(this)
-        return LoreLine.simple(lineKey, lineText)
+        // val lineText = AttributeRegistry.FACADES[key].displayTextCreator(this)
+        // return LoreLine.simple(lineKey, lineText)
+        TODO("to be deleted")
     }
 
     override fun toString(): String = toSimpleString()
@@ -41,7 +41,7 @@ sealed class BinaryAttributeCore : BinaryCore, AttributeComponent.Op<Operation>,
 
 /* Specific types of BinaryAttributeCore */
 
-sealed class BinaryAttributeCoreS : BinaryAttributeCore(), AttributeDataS<Operation, Double> {
+sealed class BinaryAttributeCoreS : BinaryAttributeCore(), AttributeDataS<Double> {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
@@ -49,7 +49,7 @@ sealed class BinaryAttributeCoreS : BinaryAttributeCore(), AttributeDataS<Operat
     )
 }
 
-sealed class BinaryAttributeCoreR : BinaryAttributeCore(), AttributeDataR<Operation, Double> {
+sealed class BinaryAttributeCoreR : BinaryAttributeCore(), AttributeDataR<Double> {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
@@ -58,7 +58,7 @@ sealed class BinaryAttributeCoreR : BinaryAttributeCore(), AttributeDataR<Operat
     )
 }
 
-sealed class BinaryAttributeCoreSE : BinaryAttributeCore(), AttributeDataSE<Operation, Double, Element> {
+sealed class BinaryAttributeCoreSE : BinaryAttributeCore(), AttributeDataSE<Double> {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
@@ -67,7 +67,7 @@ sealed class BinaryAttributeCoreSE : BinaryAttributeCore(), AttributeDataSE<Oper
     )
 }
 
-sealed class BinaryAttributeCoreRE : BinaryAttributeCore(), AttributeDataRE<Operation, Double, Element> {
+sealed class BinaryAttributeCoreRE : BinaryAttributeCore(), AttributeDataRE<Double> {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("operation", operation),
@@ -82,12 +82,12 @@ sealed class BinaryAttributeCoreRE : BinaryAttributeCore(), AttributeDataRE<Oper
 val BinaryAttributeCore.element: Element
     get() = requireNotNull(elementOrNull) { "The 'element' component is not present" }
 val BinaryAttributeCore.elementOrNull: Element?
-    get() = (this as? AttributeComponent.Element<Element>)?.element
+    get() = (this as? AttributeComponent.Element)?.element
 
 val BinaryAttributeCore.value: Double
     get() = requireNotNull(valueOrNull) { "The 'value' component is not present" }
 val BinaryAttributeCore.valueOrNull: Double?
-    get() = (this as? AttributeComponent.Single<Double>)?.value
+    get() = (this as? AttributeComponent.Fixed<Double>)?.value
 
 val BinaryAttributeCore.lower: Double
     get() = requireNotNull(lowerOrNull) { "The 'lower' component is not present" }

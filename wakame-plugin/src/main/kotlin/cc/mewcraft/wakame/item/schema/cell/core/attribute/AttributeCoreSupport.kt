@@ -31,7 +31,7 @@ data class SchemaAttributeCoreR(
     override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
-) : SchemaAttributeCore, AttributeDataR<Operation, RandomizedValue> {
+) : SchemaAttributeCore, AttributeDataR<RandomizedValue> {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
         populateGenerationContext(context)
 
@@ -59,7 +59,7 @@ data class SchemaAttributeCoreRE(
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
     override val element: Element,
-) : SchemaAttributeCore, AttributeDataRE<Operation, RandomizedValue, Element> {
+) : SchemaAttributeCore, AttributeDataRE<RandomizedValue> {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
         populateGenerationContext(context)
 
@@ -86,7 +86,7 @@ data class SchemaAttributeCoreS(
     private val tagType: TagType,
     override val operation: Operation,
     override val value: RandomizedValue,
-) : SchemaAttributeCore, AttributeDataS<Operation, RandomizedValue> {
+) : SchemaAttributeCore, AttributeDataS<RandomizedValue> {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
         populateGenerationContext(context)
 
@@ -111,7 +111,7 @@ data class SchemaAttributeCoreSE(
     override val operation: Operation,
     override val value: RandomizedValue,
     override val element: Element,
-) : SchemaAttributeCore, AttributeDataSE<Operation, RandomizedValue, Element> {
+) : SchemaAttributeCore, AttributeDataSE<RandomizedValue> {
     override fun reify(context: SchemaGenerationContext): BinaryAttributeCore {
         populateGenerationContext(context)
 
