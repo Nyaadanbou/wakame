@@ -11,13 +11,14 @@ import org.slf4j.Logger
  * write the code in this package.
  */
 internal object DisplaySupport : KoinComponent {
-    val LOGGER by inject<Logger>()
-
     // config
     const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
     const val RENDERER_CONFIG_LAYOUT_NODE_NAME = "renderer_layout"
     val RENDERER_CONFIG_PROVIDER by lazy { Configs.YAML[RENDERER_CONFIG_FILE] }
     val DYNAMIC_LORE_META_CREATOR_REGISTRY by inject<DynamicLoreMetaCreatorRegistry>()
+
+    // logger
+    val LOGGER by inject<Logger>()
 
     // mini message instance
     val MINI: MiniMessage by inject()

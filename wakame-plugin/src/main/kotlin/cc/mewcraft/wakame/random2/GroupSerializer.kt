@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.random2
 
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.javaTypeOf
+import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.contains
@@ -40,11 +41,10 @@ import java.lang.reflect.Type
  */
 abstract class GroupSerializer<S, C : SelectionContext> : SchemaSerializer<Group<S, C>> {
     companion object Constants {
-        val SHARED_POOL_NODE_HINT: RepresentationHint<ConfigurationNode> = RepresentationHint.of("shared_pool_node_hint", ConfigurationNode::class.java)
-
-        private const val FILTERS_PATH = "filters"
-        private const val SELECTS_PATH = "selects"
-        private const val DEFAULT_PATH = "default"
+        val HINT_NODE_SHARED_POOLS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_shared_pools", typeTokenOf<ConfigurationNode>())
+        private const val FILTERS_PATH: String = "filters"
+        private const val SELECTS_PATH: String = "selects"
+        private const val DEFAULT_PATH: String = "default"
     }
 
     protected abstract fun poolFactory(node: ConfigurationNode): Pool<S, C>
@@ -57,15 +57,19 @@ abstract class GroupSerializer<S, C : SelectionContext> : SchemaSerializer<Group
                 node.isMap && (!node.contains(FILTERS_PATH) && !node.contains(SELECTS_PATH) && !node.contains(DEFAULT_PATH)) -> {
                     // it's a list, which means it only has pools (no filters, no default)
 
-                    deserializeSelects(node, node)
+                    deserializeSelectsAndPut(node, node)
                 }
 
                 // Node structure 2
                 node.isMap -> {
                     // it's a map, which means it might have all components specified
 
-                    node.node(FILTERS_PATH).childrenList().forEach { this.filters += filterFactory(it) }
-                    node.node(SELECTS_PATH).run { deserializeSelects(node, this) }
+                    node.node(FILTERS_PATH).childrenList().forEach {
+                        this.filters += filterFactory(it)
+                    }
+                    node.node(SELECTS_PATH).run {
+                        deserializeSelectsAndPut(node, this)
+                    }
                     node.node(DEFAULT_PATH).run {
                         if (this.virtual()) {
                             Pool.empty()
@@ -87,17 +91,17 @@ abstract class GroupSerializer<S, C : SelectionContext> : SchemaSerializer<Group
         }
     }
 
-    private fun GroupBuilder<S, C>.deserializeSelects(groupNode: ConfigurationNode, selectNode: ConfigurationNode) {
+    private fun GroupBuilder<S, C>.deserializeSelectsAndPut(groupNode: ConfigurationNode, selectNode: ConfigurationNode) {
         selectNode.childrenMap().mapKeys { it.key.toString() }.forEach { (poolName, localPoolNode) ->
             val rawScalar = localPoolNode.rawScalar()
             if (rawScalar != null) {
                 // it's a raw string, meaning it's referencing a node in shared pools,
                 // so we need to pass the external node to the factory function
-                val sharePoolNode = groupNode.hint(SHARED_POOL_NODE_HINT) ?: throw SerializationException(
-                    selectNode, javaTypeOf<Group<S, C>>(), "Can't find hint ${SHARED_POOL_NODE_HINT.identifier()}"
+                val nodeSharedPools = groupNode.hint(HINT_NODE_SHARED_POOLS) ?: throw SerializationException(
+                    selectNode, javaTypeOf<Group<S, C>>(), "Can't find hint ${HINT_NODE_SHARED_POOLS.identifier()}"
                 )
-                val externalPoolNode = sharePoolNode.node(rawScalar)
-                this.pools[poolName] = poolFactory(externalPoolNode)
+                val nodeExternalPool = nodeSharedPools.node(rawScalar)
+                this.pools[poolName] = poolFactory(nodeExternalPool)
             } else {
                 // it's not a raw string - we just pass the local node
                 this.pools[poolName] = poolFactory(localPoolNode)
