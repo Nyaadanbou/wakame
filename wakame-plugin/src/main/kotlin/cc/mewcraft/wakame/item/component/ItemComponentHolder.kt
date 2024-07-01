@@ -19,16 +19,18 @@ import org.bukkit.inventory.ItemStack
 sealed interface ItemComponentHolder {
 
     /**
-     * 用于获取任意 vanilla 物品组件的信息.
+     * 用于获取任意原版物品组件的信息.
      */
     val item: ItemStack
+
+    //<editor-fold desc="操作当前组件的 NBT">
+    // 统一说明:
+    // 以下函数的 [id] 参数都将作为索引从 `components` 中获取相应的 [CompoundTag].
 
     /**
      * 用于检查指定组件的 NBT 标签是否存在.
      *
-     * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
-     *
-     * ## NBT 结构: `components`
+     * ## 关于 NBT 结构的统一说明
      * ```NBT
      * // 这一级是包含所有物品组件的 NBT 结构,
      * // 本函数所返回的 NBT 结构都是这个结构
@@ -54,41 +56,35 @@ sealed interface ItemComponentHolder {
     fun hasTag(id: String): Boolean
 
     /**
-     * 用于获取指定组件的 NBT 标签 (如果有).
-     *
-     * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
+     * 获取指定组件的 NBT 标签 (如果有).
      *
      * @return 指定的 NBT 标签
      */
     fun getTag(id: String): CompoundTag?
 
     /**
-     * 用于获取指定组件的 NBT 标签.
-     *
-     * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
+     * 获取指定组件的 NBT 标签.
      *
      * @return 如果指定的 NBT 标签已经存在则返回已存在的; 如果不存在则返回新创建的
      */
     fun getTagOrCreate(id: String): CompoundTag
 
     /**
-     * 用于写入指定组件的 NBT 标签.
-     *
-     * 该函数的 [id] 将作为索引在 `components` 中添加相应的 [CompoundTag].
+     * 写入指定组件的 NBT 标签.
      *
      * @return 原本已经存在的 NBT 标签; 如果原本不存在则返回 `null`
      */
     fun putTag(id: String): CompoundTag?
 
     /**
-     * 用于移除指定组件的 NBT 标签.
-     *
-     * 该函数的 [id] 将作为索引从 `components` 中移除相应的 [CompoundTag].
+     * 移除指定组件的 NBT 标签.
      */
     fun removeTag(id: String)
+    //</editor-fold>
 
+    //<editor-fold desc="操作萌芽的物品组件">
     /**
-     * 用于检查指定的 wakame 物品组件是否存在.
+     * 检查指定的萌芽物品组件是否存在.
      *
      * ## 警告!!!
      * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
@@ -96,7 +92,7 @@ sealed interface ItemComponentHolder {
     fun hasData(type: ItemComponentType<*>): Boolean
 
     /**
-     * 用于获取指定的 wakame 物品组件.
+     * 获取指定的萌芽物品组件.
      *
      * ## 警告!!!
      * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
@@ -104,7 +100,7 @@ sealed interface ItemComponentHolder {
     fun <T> getData(type: ItemComponentType<T>): T?
 
     /**
-     * 用于设置指定的 wakame 物品组件.
+     * 设置指定的萌芽物品组件.
      *
      * ## 警告!!!
      * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
@@ -112,17 +108,66 @@ sealed interface ItemComponentHolder {
     fun <T> setData(type: ItemComponentType<T>, data: T)
 
     /**
-     * 用于移除指定的 wakame 物品组件.
+     * 移除指定的萌芽物品组件.
      *
      * ## 警告!!!
      * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
      */
     fun unsetData(type: ItemComponentType<*>)
+    //</editor-fold>
 
-    // TODO 2024/6/30 等 Paper 的 DataComponent API 推出以后, 添加相应的添加/获取/移除 vanilla 物品组件的函数
+    //<editor-fold desc="操作原版的物品组件">
+    /**
+     * 检查指定的原版物品组件是否存在.
+     */
+    fun hasData(type: DataComponentType): Boolean
+
+    /**
+     * 获取指定的原版物品组件.
+     */
+    fun <T> getData(type: DataComponentType.Valued<T>): T?
+
+    /**
+     * 获取指定的原版物品组件, 或返回默认值.
+     */
+    fun <T> getDataOrDefault(type: DataComponentType.Valued<T>, fallback: T): T
+
+    /**
+     * 检查指定的原版物品组件是否已被重写.
+     */
+    fun isOverridden(type: DataComponentType): Boolean
+
+    /**
+     * 获取该物品上所有的原版组件信息.
+     */
+    fun getDataTypes(): Set<DataComponentType>
+
+    /**
+     * 设置指定的原版物品组件.
+     */
+    fun <T> setData(type: DataComponentType.NonValued)
+
+    /**
+     * 设置指定的原版物品组件.
+     */
+    fun <T> setData(type: DataComponentType.Valued<T>, data: T)
+
+    /**
+     * 移除指定的原版物品组件.
+     */
+    fun unsetData(type: DataComponentType)
+
+    /**
+     * 重置指定的原版物品组件.
+     */
+    fun resetData(type: DataComponentType)
+    //</editor-fold>
 
     companion object {
-        fun create(compound: CompoundTag, item: ItemStack, components: ItemComponentMap): ItemComponentHolder {
+        /**
+         * 创建一个 [ItemComponentHolder]. 仅供内部使用.
+         */
+        internal fun create(compound: CompoundTag, item: ItemStack, components: ItemComponentMap): ItemComponentHolder {
             return Impl(item, components, compound)
         }
     }
@@ -156,16 +201,59 @@ sealed interface ItemComponentHolder {
             return components.has(type)
         }
 
+        override fun hasData(type: DataComponentType): Boolean {
+            throw UnsupportedOperationException()
+        }
+
         override fun <T> getData(type: ItemComponentType<T>): T? {
             return components.get(type)
+        }
+
+        override fun <T> getData(type: DataComponentType.Valued<T>): T? {
+            throw UnsupportedOperationException()
         }
 
         override fun <T> setData(type: ItemComponentType<T>, data: T) {
             components.set(type, data)
         }
 
+        override fun <T> setData(type: DataComponentType.NonValued) {
+            throw UnsupportedOperationException()
+        }
+
+        override fun <T> setData(type: DataComponentType.Valued<T>, data: T) {
+            throw UnsupportedOperationException()
+        }
+
         override fun unsetData(type: ItemComponentType<*>) {
             components.unset(type)
         }
+
+        override fun unsetData(type: DataComponentType) {
+            throw UnsupportedOperationException()
+        }
+
+        override fun <T> getDataOrDefault(type: DataComponentType.Valued<T>, fallback: T): T {
+            throw UnsupportedOperationException()
+        }
+
+        override fun isOverridden(type: DataComponentType): Boolean {
+            throw UnsupportedOperationException()
+        }
+
+        override fun getDataTypes(): Set<DataComponentType> {
+            throw UnsupportedOperationException()
+        }
+
+        override fun resetData(type: DataComponentType) {
+            throw UnsupportedOperationException()
+        }
     }
+}
+
+// TODO 2024/6/30 等 Paper 的 DataComponent API 推出以后, 添加相应的添加/获取/移除 vanilla 物品组件的函数
+@Deprecated("DataComponent API 推出后换掉")
+interface DataComponentType {
+    interface Valued<T> : DataComponentType
+    interface NonValued : DataComponentType
 }
