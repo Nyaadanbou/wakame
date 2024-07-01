@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.crate.Crate
-import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.user.User
 
@@ -17,7 +16,7 @@ interface NekoItemRealizer {
      * @param context the context on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, context: GenerationContext): PlayNekoStack
+    fun realize(item: NekoItem, context: GenerationContext): NekoStack
 
     /**
      * Realizes an item template from a player.
@@ -26,7 +25,7 @@ interface NekoItemRealizer {
      * @param user the player on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, user: User<*>): PlayNekoStack
+    fun realize(item: NekoItem, user: User<*>): NekoStack
 
     /**
      * Realizes an item template from a crate.
@@ -35,6 +34,20 @@ interface NekoItemRealizer {
      * @param crate the crate on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, crate: Crate): PlayNekoStack
+    fun realize(item: NekoItem, crate: Crate): NekoStack
 
+}
+
+private object NekoItemRealizerImpl : NekoItemRealizer {
+    override fun realize(item: NekoItem, context: GenerationContext): NekoStack {
+        TODO()
+    }
+
+    override fun realize(item: NekoItem, user: User<*>): NekoStack {
+        TODO("Not yet implemented")
+    }
+
+    override fun realize(item: NekoItem, crate: Crate): NekoStack {
+        TODO("Not yet implemented")
+    }
 }

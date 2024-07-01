@@ -11,17 +11,13 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemover
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.contains
 import java.nio.file.Path
 import java.util.UUID
 
 object NekoItemFactory {
-    val HINT_NODE_CELLS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_cells", typeTokenOf())
-
     /**
      * Creates a [NekoItem] from a [configuration node][ConfigurationNode].
      *

@@ -4,8 +4,6 @@ import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
-import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStack
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemover
@@ -17,8 +15,7 @@ import java.util.UUID
 
 /**
  * Represents an **item template**, or a "blueprint" in other words.
- * Essentially, this is a representation of the item in the configuration
- * file.
+ * Essentially, this is an encapsulation of an item configuration.
  *
  * The design philosophy of `this` is, that you can use a [NekoItem] as
  * a **blueprint** to create as many [NekoStacks][NekoStack] as
@@ -93,15 +90,15 @@ interface NekoItem : Keyed {
     val behaviors: ItemBehaviorMap
 }
 
-fun NekoItem.reify(context: GenerationContext): PlayNekoStack {
+fun NekoItem.reify(context: GenerationContext): NekoStack {
     return NekoItemInjections.realizer.realize(this, context)
 }
 
-fun NekoItem.reify(user: User<*>): PlayNekoStack {
+fun NekoItem.reify(user: User<*>): NekoStack {
     return NekoItemInjections.realizer.realize(this, user)
 }
 
-fun NekoItem.reify(crate: Crate): PlayNekoStack {
+fun NekoItem.reify(crate: Crate): NekoStack {
     return NekoItemInjections.realizer.realize(this, crate)
 }
 
