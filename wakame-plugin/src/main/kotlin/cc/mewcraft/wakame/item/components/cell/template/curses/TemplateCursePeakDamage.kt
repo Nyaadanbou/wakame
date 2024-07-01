@@ -22,7 +22,7 @@ fun TemplateCursePeakDamage(node: ConfigurationNode): TemplateCursePeakDamage {
 }
 
 /**
- * 代表一个最高伤害的蓝图诅咒。
+ * `单次最高伤害` 的诅咒模板.
  *
  * @property amount 伤害数量
  * @property element 伤害类型

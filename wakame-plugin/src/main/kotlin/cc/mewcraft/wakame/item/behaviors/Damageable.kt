@@ -11,9 +11,6 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import cc.mewcraft.wakame.item.components.Damageable as DamageableComponent
 
-/**
- * 物品受损的逻辑.
- */
 interface Damageable : ItemBehavior {
     private object Default : Damageable {
         override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {

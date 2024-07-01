@@ -22,7 +22,7 @@ fun TemplateCurseEntityKills(node: ConfigurationNode): TemplateCurseEntityKills 
 }
 
 /**
- * 代表一个实体击杀的蓝图诅咒。
+ * `实体击杀数` 的诅咒模板.
  *
  * @property count 击杀数量
  * @property index 实体种类

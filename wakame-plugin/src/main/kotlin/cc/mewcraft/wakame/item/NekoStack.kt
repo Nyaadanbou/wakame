@@ -101,36 +101,3 @@ interface NekoStack {
     fun erase()
 
 }
-
-// fun main(nekoStack: NekoStack) {
-//     // 射箭...
-//     // 获取 arrow
-//     val arrow: Arrow? = nekoStack.components.get(ItemComponentTypes.ARROW)
-//     if (arrow != null && arrow.pierceLevel == 1.toByte()) {
-//         nekoStack.components.add(ItemComponentTypes.ARROW, Arrow.Value(1))
-//     }
-//
-//     val fireResistant: FireResistant? = nekoStack.components.get(ItemComponentTypes.FIRE_RESISTANT)
-//     nekoStack.components.add(ItemComponentTypes.FIRE_RESISTANT, FireResistant)
-//     nekoStack.components.remove(ItemComponentTypes.FIRE_RESISTANT)
-//
-//     val cells: ItemCells? = nekoStack.components.get(ItemComponentTypes.CELLS)
-//     val newCells: ItemCells? = cells?.copy(a = 2)
-//     newCells?.let { nekoStack.components.add(ItemComponentTypes.CELLS, it) }
-//
-//     // 渲染提示框
-//     val attributable: Attributable? = nekoStack.components.get(ItemComponentTypes.ATTRIBUTABLE)
-//     val attributableLoreLine: LoreLine? = nekoStack.components.render(ItemComponentTypes.ATTRIBUTABLE)
-//     if (attributable != null) {
-//         val loreLine: LoreLine = attributable.provideDisplayLore()
-//     }
-//
-//     // 获取 item_name
-//     val itemName: Component? = nekoStack.components.get(ItemComponentTypes.ITEM_NAME)
-//     val unbreakable: Unbreakable? = nekoStack.components.get(ItemComponentTypes.UNBREAKABLE)
-//     val hasFood: Boolean = nekoStack.components.has(ItemComponentTypes.FOOD)
-//     // 设置 item_name
-//     nekoStack.components.add(ItemComponentTypes.ITEM_NAME, Component.text("You can't change this name with anvils!"))
-//     // 移除 cells (所有的词条栏)
-//     nekoStack.components.remove(ItemComponentTypes.CELLS)
-// }

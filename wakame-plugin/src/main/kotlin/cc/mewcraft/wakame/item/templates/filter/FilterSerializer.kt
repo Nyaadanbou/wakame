@@ -22,11 +22,11 @@ internal object FilterSerializer : TypeDeserializer<Filter<GenerationContext>> {
     private const val NOT = '~'
 
     override fun deserialize(type: Type, node: ConfigurationNode): Filter<GenerationContext> {
-        val type0 = node.node("type").krequire<String>()
-        val invert = type0.startsWith(NOT) // check if we should invert the original result
-        val type = type0.substringAfter(NOT) // the type string (after ~)
+        val typeString0 = node.node("type").krequire<String>()
+        val invert = typeString0.startsWith(NOT) // check if we should invert the original result
+        val typeString = typeString0.substringAfter(NOT) // the type string (after ~)
 
-        val ret: Filter<GenerationContext> = when (type) {
+        val ret: Filter<GenerationContext> = when (typeString) {
             "skill" -> {
                 val key = node.node("key").krequire<Key>()
                 FilterSkill(invert, key)
@@ -74,7 +74,7 @@ internal object FilterSerializer : TypeDeserializer<Filter<GenerationContext>> {
                 FilterToss(invert, chance)
             }
 
-            else -> throw SerializationException("Can't recognize filter type $type0")
+            else -> throw SerializationException("Can't recognize filter type $typeString0")
         }
 
         return ret

@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.attribute.AttributeEventHandler
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.binary.tryNekoStack
-import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
@@ -24,30 +23,6 @@ import org.bukkit.event.player.PlayerItemHeldEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-/**
- * 代表一个“物品交互结果”的封装.
- *
- * 物品交互结果, 即玩家使用该物品与世界发生了交互后所发生的结果.
- *
- * ## 注意事项
- * 本接口覆盖了绝大部分与世界进行交互的事件, 但这里特别不包含 [org.bukkit.event.player.PlayerItemHeldEvent] 和 [cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent].
- * 因为这两事件并不在“物品交互结果”这个范畴内, 它们并没有让物品与世界发生交互, 而仅仅是玩家自身的状态发生了变化而已. 这样看来, 这两个事件不符合“物品交互结果”的定义,
- * 因此它们也不应该被放到 [ItemBehavior] 这个架构下.
- *
- * **而且经过我们的实践证明, 这两个事件确实是没有办法纳入 [ItemBehavior] 这个架构下的.**
- *
- * 下面分别解释一下这两个事件.
- *
- * ## [org.bukkit.event.player.PlayerItemHeldEvent]
- * 该事件仅仅是玩家切换了手持的物品, 没有与世界发生交互.
- * 而且, 该事件涉及到两个物品, 一个切换之前的, 一个切换之后的.
- *
- * ## [cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent]
- * 玩家背包内的某个物品发生了变化 (包括从空气变成某个物品), 没有与世界发生交互.
- * 从空气变成某个物品, 其实就包括了玩家登录时的情况. 你可以把玩家刚登录时的背包当成是空的,
- * 然后服务端会一个一个根据地图存档里的数据, 将背包里的物品一个一个填充回去.
- * 也就是说, 玩家登录时对于背包里的每个非空气物品都会触发一次该事件.
- */
 class MultipleItemListener : KoinComponent, Listener {
     private val attributeEventHandler: AttributeEventHandler by inject()
     private val kizamiEventHandler: KizamiEventHandler by inject()

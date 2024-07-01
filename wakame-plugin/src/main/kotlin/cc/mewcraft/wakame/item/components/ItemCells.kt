@@ -29,8 +29,6 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-// TODO 完成组件: ItemCells
-
 interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
 
     /**
@@ -53,9 +51,15 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
     /**
      * 修改一个词条栏.
      *
-     * @return 修改过的 [ItemCells] 副本
+     * 传入函数 [consumer] 中的词条栏为 [id] 指定的词条栏.
+     * 如果 [id] 指定的词条栏不存在, 则传入 [consumer] 的词条栏将是 `null`.
+     *
+     * 如果 [consumer] 返回的值为非空, 那么其值将写入返回的 [ItemCells];
+     * 反之, 返回的 [ItemCells] 将是一个完全未经修改的副本.
+     *
+     * @return 修改过/完全未经修改的 [ItemCells] 副本
      */
-    fun modify(id: String, consumer: (Cell?) -> Cell): ItemCells
+    fun modify(id: String, consumer: (Cell?) -> Cell?): ItemCells
 
     /**
      * 移除一个词条栏.
@@ -97,10 +101,12 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             }
         }
 
-        override fun modify(id: String, consumer: (Cell?) -> Cell): ItemCells {
+        override fun modify(id: String, consumer: (Cell?) -> Cell?): ItemCells {
             return copyEdit { map ->
                 val cell = consumer(map[id])
-                map.put(id, cell)
+                if (cell != null) {
+                    map.put(id, cell)
+                }
             }
         }
 

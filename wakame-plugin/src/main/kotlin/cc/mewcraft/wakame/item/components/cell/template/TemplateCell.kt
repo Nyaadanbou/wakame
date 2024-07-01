@@ -27,6 +27,9 @@ interface TemplateCell {
     val curse: Group<TemplateCurse, GenerationContext>
 
     companion object {
+        /**
+         * 构建一个 [TemplateCell].
+         */
         fun of(core: Group<TemplateCore, GenerationContext>, curse: Group<TemplateCurse, GenerationContext>): TemplateCell {
             return Impl(core, curse)
         }

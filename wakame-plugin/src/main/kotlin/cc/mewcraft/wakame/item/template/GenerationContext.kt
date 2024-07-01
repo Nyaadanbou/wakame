@@ -84,6 +84,9 @@ class GenerationContext(
      */
     val attributes: MutableCollection<AttributeContextHolder> by WatchedSet(HashSet())
 
+    /**
+     * 构建一个异常.
+     */
     fun newException(message: String?) {
         // TODO 实现一个可以快速构建 GenerationContextException 的方便函数
     }

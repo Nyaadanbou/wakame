@@ -256,8 +256,8 @@ private fun CompoundTag.getElement(): Element {
     return this.getByteOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { ElementRegistry.getBy(it) } ?: ElementRegistry.DEFAULT
 }
 
-private fun CompoundTag.getOperation(): AttributeModifier.Operation {
-    return AttributeModifier.Operation.byId(this.getInt(AttributeBinaryKeys.OPERATION_TYPE))
+private fun CompoundTag.getOperation(): Operation {
+    return Operation.byId(this.getInt(AttributeBinaryKeys.OPERATION_TYPE))
 }
 
 private fun CompoundTag.getNumber(key: String): Double {

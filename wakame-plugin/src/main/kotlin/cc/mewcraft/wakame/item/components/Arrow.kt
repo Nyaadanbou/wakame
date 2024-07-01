@@ -25,9 +25,8 @@ import java.lang.reflect.Type
 // TODO 2024/6/28 components 下的某些类都需要写成 data class, 以支持修改不可变数值的部分值.
 
 // 开发日记: 2024/6/25 小米
-// 这是文件列表里的第一个 物品组件,
-// 因此添加了更多注释解释代码.
-// 请留意.
+// 这是文件列表里的第一个物品组件,
+// 因此添加了更多代码注释, 请留意.
 
 interface Arrow : Examinable, TooltipProvider {
 
@@ -123,6 +122,12 @@ interface Arrow : Examinable, TooltipProvider {
                 val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
                 return Template(pierceLevel)
             }
+        }
+    }
+
+    companion object {
+        fun of(pierceLevel: Byte): Arrow {
+            return Value(pierceLevel)
         }
     }
 }

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.item.ItemSlot.NoopItemSlot
 import net.kyori.examination.Examinable
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -61,4 +62,20 @@ interface ItemSlot : Examinable {
      * This function is used to check whether the equipment slot is an effective slot for the item.
      */
     fun testEquipmentSlot(slot: EquipmentSlot): Boolean = false // default returns false
+
+    companion object {
+        /**
+         * 获取一个无操作 [ItemSlot].
+         */
+        fun noop(): ItemSlot {
+            return NoopItemSlot
+        }
+    }
+
+    /**
+     * This is the effective slot that never takes effect.
+     *
+     * Used for items that provides no effects for players, such as materials.
+     */
+    private data object NoopItemSlot : ItemSlot
 }

@@ -12,9 +12,6 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 
-/**
- * 物品食用后的逻辑。
- */
 interface Food : ItemBehavior {
     private object Default : Food, KoinComponent {
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {

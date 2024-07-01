@@ -43,10 +43,15 @@ internal object TemplateCoreSerializer : TypeDeserializer<TemplateCore> {
     override fun deserialize(type: Type, node: ConfigurationNode): TemplateCore {
         val key = node.node("key").krequire<Key>()
         val ret = when {
+            /* 技术核心 */
             key == GenericKeys.NOOP -> TemplateCoreNoop
             key == GenericKeys.EMPTY -> TemplateCoreEmpty
+
+            /* 普通核心 */
             key.namespace() == Namespaces.ATTRIBUTE -> TemplateCoreAttribute(node)
             key.namespace() == Namespaces.SKILL -> TemplateCoreSkill(node)
+
+            // 大概是配置文件写错了
             else -> throw IllegalArgumentException("Unknown namespaced key for template core: ${key.namespace()}")
         }
         return ret
@@ -123,7 +128,7 @@ internal object TemplateCorePoolSerializer : PoolSerializer<TemplateCore, Genera
     }
 
     override fun onPickSample(content: TemplateCore, context: GenerationContext) {
-        // context writes are delayed after the schema is realized
+        // context writes are delayed after the template is realized
     }
 }
 

@@ -41,18 +41,16 @@ object NekoItemFactory {
         // read all item behaviors
         val behaviorMap = ItemBehaviorMap.build {
 
-            fun <T : ItemBehavior> tryAdd(id: String, type: ItemBehaviorType<T>) {
+            fun <T : ItemBehavior> tryAdd(path: String, type: ItemBehaviorType<T>) {
                 // 如果 root 里存在指定 id 的节点, 则添加对应的 behavior
-                if (root.contains(id)) this.put(type, type.create())
+                if (root.contains(path)) this.put(type, type.create())
             }
 
-            tryAdd("attributable", ItemBehaviorTypes.ATTRIBUTABLE)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
             tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
             tryAdd("damageable", ItemBehaviorTypes.DAMAGEABLE)
             tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             tryAdd("food", ItemBehaviorTypes.FOOD)
-            tryAdd("kizamiable", ItemBehaviorTypes.KIZAMIABLE)
             tryAdd("tool", ItemBehaviorTypes.TOOL)
             tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
             tryAdd("wearable", ItemBehaviorTypes.WEARABLE)
@@ -61,8 +59,8 @@ object NekoItemFactory {
         // read all item templates (of item components)
         val templateMap = ItemTemplateMap.build {
 
-            fun <T : ItemTemplate<*>> tryAdd(id: String, type: ItemTemplateType<T>) {
-                val node = root.node(id)
+            fun <T : ItemTemplate<*>> tryAdd(path: String, type: ItemTemplateType<T>) {
+                val node = root.node(path)
                 val template = node.get(type.typeToken) ?: return
                 this.put(type, template)
             }
@@ -70,7 +68,7 @@ object NekoItemFactory {
             tryAdd("arrow", ItemTemplateTypes.ARROW)
             tryAdd("attributable", ItemTemplateTypes.ATTRIBUTABLE)
             tryAdd("castable", ItemTemplateTypes.CASTABLE)
-            tryAdd("castable", ItemTemplateTypes.CRATE)
+            tryAdd("crate", ItemTemplateTypes.CRATE)
             tryAdd("custom_name", ItemTemplateTypes.CUSTOM_NAME)
             tryAdd("damageable", ItemTemplateTypes.DAMAGEABLE)
             tryAdd("lore", ItemTemplateTypes.LORE)

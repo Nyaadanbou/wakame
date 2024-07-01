@@ -11,7 +11,7 @@ import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
 /**
- * 代表一个空[诅咒][Curse]的模板.
+ * `空` 诅咒模板.
  */
 data object TemplateCurseEmpty : TemplateCurse {
     override val key: Key = GenericKeys.EMPTY

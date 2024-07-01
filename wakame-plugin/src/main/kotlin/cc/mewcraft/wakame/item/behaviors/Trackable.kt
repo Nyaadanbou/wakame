@@ -16,9 +16,6 @@ import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-/**
- * 物品跟踪信息的逻辑.
- */
 interface Trackable : ItemBehavior {
     private object Default : Trackable, KoinComponent {
         private val entityKeyLookup: EntityKeyLookup by inject()
