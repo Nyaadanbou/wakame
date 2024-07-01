@@ -57,6 +57,8 @@ sealed interface ItemComponentHolder {
      * 用于获取指定组件的 NBT 标签 (如果有).
      *
      * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
+     *
+     * @return 指定的 NBT 标签
      */
     fun getTag(id: String): CompoundTag?
 
@@ -64,6 +66,8 @@ sealed interface ItemComponentHolder {
      * 用于获取指定组件的 NBT 标签.
      *
      * 该函数的 [id] 将作为索引从 `components` 中获取相应的 [CompoundTag].
+     *
+     * @return 如果指定的 NBT 标签已经存在则返回已存在的; 如果不存在则返回新创建的
      */
     fun getTagOrCreate(id: String): CompoundTag
 
@@ -71,8 +75,10 @@ sealed interface ItemComponentHolder {
      * 用于写入指定组件的 NBT 标签.
      *
      * 该函数的 [id] 将作为索引在 `components` 中添加相应的 [CompoundTag].
+     *
+     * @return 原本已经存在的 NBT 标签; 如果原本不存在则返回 `null`
      */
-    fun putTag(id: String)
+    fun putTag(id: String): CompoundTag?
 
     /**
      * 用于移除指定组件的 NBT 标签.
@@ -138,8 +144,8 @@ sealed interface ItemComponentHolder {
             return compound.getOrPut(id, CompoundTag::create)
         }
 
-        override fun putTag(id: String) {
-            compound.put(id, CompoundTag.create())
+        override fun putTag(id: String): CompoundTag? {
+            return compound.put(id, CompoundTag.create()) as CompoundTag?
         }
 
         override fun removeTag(id: String) {
