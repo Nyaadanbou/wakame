@@ -62,6 +62,11 @@ interface Attributable : Examinable, TooltipProvider {
     // Attributable 既然是一个 NonValued 组件类型,
     // 那么似乎也不需要为其创建一个 Template 的 class.
     // 设置成一个 object 足矣.
+    //
+    // 开发日记 2024/7/2
+    // 如果我们需要给物品加上一个标记,
+    // 但这个标记不储存在物品(NBT)上,
+    // 而是存在模板里. 是否可行?
     data object Template : ItemTemplate<Attributable>, ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
