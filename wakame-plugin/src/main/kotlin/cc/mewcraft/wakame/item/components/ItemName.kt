@@ -36,7 +36,7 @@ interface ItemName : Examinable {
      */
     val rich: Component
 
-    /* data */ class Value(
+    data class Value(
         override val raw: String,
         override val rich: Component,
     ) : ItemName {
