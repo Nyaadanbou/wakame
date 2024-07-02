@@ -5,7 +5,7 @@ import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.element.ELEMENT_ITEM_PROTO_SERIALIZERS
+import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -101,7 +101,7 @@ interface ItemElements : Examinable, TooltipProvider {
 
             override fun childSerializers(): TypeSerializerCollection {
                 return TypeSerializerCollection.builder()
-                    .registerAll(get(named(ELEMENT_ITEM_PROTO_SERIALIZERS)))
+                    .registerAll(get(named(ELEMENT_EXTERNALS)))
                     .kregister(ElementPoolSerializer)
                     .build()
             }

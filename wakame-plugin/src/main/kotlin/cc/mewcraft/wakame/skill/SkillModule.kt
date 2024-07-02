@@ -16,8 +16,8 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
+internal const val SKILL_EXTERNALS = "skill_externals"
 internal const val SKILL_GROUP_SERIALIZERS = "skill_group_serializers"
-internal const val SKILL_ITEM_PROTO_SERIALIZERS = "skill_item_proto_serializers"
 
 internal fun skillModule(): Module = module {
     includes(
@@ -32,8 +32,8 @@ internal fun skillModule(): Module = module {
 
     singleOf(::SkillCastManagerImpl) bind SkillCastManager::class
 
-    // 用于物品序列化
-    single<TypeSerializerCollection>(named(SKILL_ITEM_PROTO_SERIALIZERS)) {
+    // 用于外部代码
+    single<TypeSerializerCollection>(named(SKILL_EXTERNALS)) {
         TypeSerializerCollection.builder()
             .kregister(SkillTriggerSerializer)
             .kregister(ConfiguredSkillSerializer)

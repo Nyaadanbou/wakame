@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.kizami.KIZAMI_ITEM_PROTO_SERIALIZERS
+import cc.mewcraft.wakame.kizami.KIZAMI_EXTERNALS
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random2.Filter
 import cc.mewcraft.wakame.random2.Group
@@ -101,7 +101,7 @@ interface ItemKizamiz : Examinable, TooltipProvider {
 
             override fun childSerializers(): TypeSerializerCollection {
                 return TypeSerializerCollection.builder()
-                    .registerAll(get(named(KIZAMI_ITEM_PROTO_SERIALIZERS)))
+                    .registerAll(get(named(KIZAMI_EXTERNALS)))
                     .kregister(KizamiPoolSerializer)
                     .kregister(KizamiGroupSerializer)
                     .build()

@@ -25,7 +25,7 @@ import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.skill.ConfiguredSkill
-import cc.mewcraft.wakame.skill.SKILL_ITEM_PROTO_SERIALIZERS
+import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
@@ -286,7 +286,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
                     .kregister(TemplateCurseGroupSerializer)
 
                     // 技能, 部分核心会用到
-                    .registerAll(get(named(SKILL_ITEM_PROTO_SERIALIZERS)))
+                    .registerAll(get(named(SKILL_EXTERNALS)))
 
                     // 实体类型, 部分诅咒会用到
                     .registerAll(get(named(ENTITY_TYPE_HOLDER_SERIALIZER)))

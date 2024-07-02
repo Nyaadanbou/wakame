@@ -1,12 +1,16 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.config.configurate.MaterialSerializer
+import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
+import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.ITEM_PROTO_SERIALIZERS
-import cc.mewcraft.wakame.item.schema.BASE_SERIALIZERS
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
+import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
+import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
 import cc.mewcraft.wakame.skill.SKILL_GROUP_SERIALIZERS
 import cc.mewcraft.wakame.skill.condition.SKILL_CONDITION_SERIALIZERS
 import cc.mewcraft.wakame.skill.factory.SKILL_FACTORY_SERIALIZERS
@@ -14,6 +18,7 @@ import cc.mewcraft.wakame.skill.trigger.SKILL_TRIGGER_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
 import cc.mewcraft.wakame.util.buildYamlLoader
 import cc.mewcraft.wakame.util.createYamlLoader
+import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -98,10 +103,7 @@ internal fun registryModule(): Module = module {
     single<YamlConfigurationLoader>(named(KIZAMI_GLOBAL_CONFIG_LOADER)) {
         createYamlLoader(KIZAMI_GLOBAL_CONFIG_FILE) {
             registerAll(get(named(KIZAMI_SERIALIZERS)))
-            registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
-            registerAll(get(named(SKILL_CONDITION_SERIALIZERS)))
-            registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
-            registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
+            registerAll(get(named(SKILL_EXTERNALS)))
         }
     }
 
@@ -113,7 +115,9 @@ internal fun registryModule(): Module = module {
 
     single<YamlConfigurationLoader.Builder>(named(SKILL_PROTO_CONFIG_LOADER)) {
         buildYamlLoader {
-            registerAll(get(named(BASE_SERIALIZERS)))
+            register(MaterialSerializer)
+            register(PotionEffectTypeSerializer)
+            kregister(PotionEffectSerializer)
             registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
             registerAll(get(named(SKILL_CONDITION_SERIALIZERS)))
             registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
@@ -129,7 +133,7 @@ internal fun registryModule(): Module = module {
 
     single<YamlConfigurationLoader>(named(LEVEL_GLOBAL_CONFIG_LOADER)) {
         createYamlLoader(LEVEL_GLOBAL_CONFIG_FILE) {
-            registerAll(get(named(RARITY_SERIALIZERS)))
+            registerAll(get(named(RARITY_EXTERNALS)))
         }
     }
 }

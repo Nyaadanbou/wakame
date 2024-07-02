@@ -8,8 +8,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
+internal const val KIZAMI_EXTERNALS = "kizami_externals"
 internal const val KIZAMI_SERIALIZERS = "kizami_serializers"
-internal const val KIZAMI_ITEM_PROTO_SERIALIZERS = "kizami_item_proto_serializers"
 
 internal fun kizamiModule(): Module = module {
     singleOf(::KizamiEventHandler)
@@ -24,7 +24,7 @@ internal fun kizamiModule(): Module = module {
     }
 
     // 用于物品序列化
-    single<TypeSerializerCollection>(named(KIZAMI_ITEM_PROTO_SERIALIZERS)) {
+    single<TypeSerializerCollection>(named(KIZAMI_EXTERNALS)) {
         TypeSerializerCollection.builder()
             .kregister(KizamiSerializer)
             .build()

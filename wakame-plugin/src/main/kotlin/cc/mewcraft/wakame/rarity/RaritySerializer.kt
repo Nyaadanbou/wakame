@@ -26,7 +26,7 @@ import java.lang.reflect.Type
  *   ...
  * ```
  */
-internal class RaritySerializer : SchemaSerializer<Rarity> {
+internal object RaritySerializer : SchemaSerializer<Rarity> {
     override fun deserialize(type: Type, node: ConfigurationNode): Rarity {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {

@@ -30,7 +30,7 @@ import java.lang.reflect.Type
  *     ...
  * ```
  */
-internal class LevelMappingSerializer : SchemaSerializer<LevelMappings> {
+internal object LevelMappingSerializer : SchemaSerializer<LevelMappings> {
     override fun deserialize(type: Type, node: ConfigurationNode): LevelMappings {
         val rangeMapBuilder = ImmutableRangeMap.builder<Int, LevelMapping>()
         node.childrenMap().forEach { (_, n1) ->
