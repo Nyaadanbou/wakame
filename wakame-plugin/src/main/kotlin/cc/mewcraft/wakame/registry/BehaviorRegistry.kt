@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.item.schema.behavior.ItemBehaviorHolder
 import cc.mewcraft.wakame.item.schema.behavior.KizamiProvider
 import cc.mewcraft.wakame.item.schema.behavior.Statistical
 
+@Deprecated("不再使用")
 object BehaviorRegistry : Initializable {
     val INSTANCES: Registry<String, ItemBehaviorHolder> = SimpleRegistry()
 

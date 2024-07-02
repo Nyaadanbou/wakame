@@ -17,6 +17,7 @@ import kotlin.reflect.full.superclasses
 import kotlin.reflect.full.valueParameters
 import kotlin.reflect.typeOf
 
+@Deprecated("不再使用")
 object ItemMetaRegistry : Initializable {
     internal val CONFIG by lazy { Configs.YAML[ITEM_GLOBAL_CONFIG_FILE].derive("meta") }
 
