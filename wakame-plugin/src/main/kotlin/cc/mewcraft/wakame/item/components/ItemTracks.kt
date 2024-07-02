@@ -2,30 +2,22 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.util.typeTokenOf
-import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
-import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 // TODO 完成组件: ItemTracks
 
 interface ItemTracks : Examinable {
 
-    /* data */ class Value() : ItemTracks {
-
-    }
+    data class Value(
+        val map: Map<String, Int>,
+    ) : ItemTracks
 
     data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemTracks> {
         override fun read(holder: ItemComponentHolder): ItemTracks? {
             val tag = holder.getTag() ?: return null
-            return Value()
+            return Value(emptyMap())
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemTracks) {
@@ -37,15 +29,9 @@ interface ItemTracks : Examinable {
         }
     }
 
-    data object Template : ItemTemplate<ItemTracks>, ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
-
-        override fun generate(context: GenerationContext): GenerationResult<ItemTracks> {
-            return GenerationResult.of(Value())
-        }
-
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
-            return this
-        }
-    }
+    // 开发日记 2024/7/2 小米
+    // ItemTracks 没有必要添加模板,
+    // 因为其数据不应该由配置文件指定,
+    // 而是由玩家的交互去更新.
+    // data object Template
 }

@@ -15,7 +15,6 @@ import cc.mewcraft.wakame.item.components.ItemKizamiz
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemName
 import cc.mewcraft.wakame.item.components.ItemRarity
-import cc.mewcraft.wakame.item.components.ItemTracks
 import cc.mewcraft.wakame.item.components.Kizamiable
 import cc.mewcraft.wakame.item.components.Skillful
 import cc.mewcraft.wakame.item.components.Tool
@@ -112,11 +111,6 @@ object ItemTemplateTypes {
      * 组件: [Tool]
      */
     val TOOL: ItemTemplateType<Tool.Template> = Tool.Template.register()
-
-    /**
-     * 组件: [ItemTracks]
-     */
-    val TRACKS: ItemTemplateType<ItemTracks.Template> = ItemTracks.Template.register()
 
     /**
      * 组件: [Unbreakable]
