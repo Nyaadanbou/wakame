@@ -83,35 +83,27 @@ sealed interface ItemComponentHolder {
     //</editor-fold>
 
     //<editor-fold desc="操作萌芽的物品组件">
+
+    // 统一说明, 警告!
+    // 禁止使用以下函数操作当前组件, 否则会无限递归引起爆栈.
+
     /**
      * 检查指定的萌芽物品组件是否存在.
-     *
-     * ## 警告!!!
-     * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
      */
     fun hasData(type: ItemComponentType<*>): Boolean
 
     /**
      * 获取指定的萌芽物品组件.
-     *
-     * ## 警告!!!
-     * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
      */
     fun <T> getData(type: ItemComponentType<T>): T?
 
     /**
      * 设置指定的萌芽物品组件.
-     *
-     * ## 警告!!!
-     * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
      */
     fun <T> setData(type: ItemComponentType<T>, data: T)
 
     /**
      * 移除指定的萌芽物品组件.
-     *
-     * ## 警告!!!
-     * 禁止使用该函数操作当前组件, 否则会无限递归引起爆栈.
      */
     fun unsetData(type: ItemComponentType<*>)
     //</editor-fold>
