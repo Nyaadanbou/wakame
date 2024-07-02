@@ -18,7 +18,7 @@ object EntityRegistry : KoinComponent, Initializable {
     override fun onReload() = loadConfiguration()
 
     private fun loadConfiguration() {
-        val root = get<NekoConfigurationLoader>(named(ENTITY_CONFIG_LOADER)).load()
+        val root = get<NekoConfigurationLoader>(named(ENTITY_GLOBAL_CONFIG_LOADER)).load()
         root.node("entity_type_holders").childrenMap().forEach { (_, n) ->
             val entityTypeHolder = n.krequire<EntityTypeHolder>()
             TYPES.register(entityTypeHolder.name, entityTypeHolder)

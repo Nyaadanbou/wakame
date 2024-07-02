@@ -14,7 +14,7 @@ internal object DisplaySupport : KoinComponent {
     // config
     const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
     const val RENDERER_CONFIG_LAYOUT_NODE_NAME = "renderer_layout"
-    val RENDERER_CONFIG_PROVIDER by lazy { Configs.YAML[RENDERER_CONFIG_FILE] }
+    val RENDERER_CONFIG_PROVIDER by lazy { Configs.YAML[RENDERER_GLOBAL_CONFIG_FILE] }
     val DYNAMIC_LORE_META_CREATOR_REGISTRY by inject<DynamicLoreMetaCreatorRegistry>()
 
     // logger

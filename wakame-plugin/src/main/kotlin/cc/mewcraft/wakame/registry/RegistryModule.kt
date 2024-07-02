@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.schema.CELL_SERIALIZERS
 import cc.mewcraft.wakame.item.schema.META_SERIALIZERS
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
-import cc.mewcraft.wakame.skill.SKILL_SERIALIZERS
+import cc.mewcraft.wakame.skill.SKILL_GROUP_SERIALIZERS
 import cc.mewcraft.wakame.skill.condition.SKILL_CONDITION_SERIALIZERS
 import cc.mewcraft.wakame.skill.factory.SKILL_FACTORY_SERIALIZERS
 import cc.mewcraft.wakame.skill.trigger.SKILL_TRIGGER_SERIALIZERS
@@ -23,43 +23,43 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
 const val CRATE_PROTO_CONFIG_DIR = "crates"
-const val CRATE_PROTO_CONFIG_LOADER = "crate_config_loader"
+const val CRATE_PROTO_CONFIG_LOADER = "crate_prototype_config_loader"
 
 const val ITEM_PROTO_CONFIG_DIR = "items"
-const val ITEM_PROTO_CONFIG_LOADER = "item_proto_config_loader"
+const val ITEM_PROTO_CONFIG_LOADER = "item_prototype_config_loader"
 
-const val ITEM_CONFIG_FILE = "items.yml"
-const val ITEM_CONFIG_LOADER = "item_config_loader"
+const val ITEM_GLOBAL_CONFIG_FILE = "items.yml"
+const val ITEM_GLOBAL_CONFIG_LOADER = "item_global_config_loader"
 
 const val SKILL_PROTO_CONFIG_DIR = "skills"
-const val SKILL_PROTO_CONFIG_LOADER = "skill_config_loader"
+const val SKILL_PROTO_CONFIG_LOADER = "skill_global_config_loader"
 
-const val ATTRIBUTE_CONFIG_FILE = "attributes.yml"
-const val ATTRIBUTE_CONFIG_LOADER = "attribute_config_loader"
+const val ATTRIBUTE_GLOBAL_CONFIG_FILE = "attributes.yml"
+const val ATTRIBUTE_GLOBAL_CONFIG_LOADER = "attribute_global_config_loader"
 
-const val CATEGORY_CONFIG_FILE = "categories.yml"
-const val CATEGORY_CONFIG_LOADER = "category_config_loader"
+const val CATEGORY_GLOBAL_CONFIG_FILE = "categories.yml"
+const val CATEGORY_GLOBAL_CONFIG_LOADER = "category_config_loader"
 
-const val PROJECTILE_CONFIG_FILE = "projectiles.yml"
-const val PROJECTILE_CONFIG_LOADER = "projectile_config_loader"
+const val PROJECTILE_GLOBAL_CONFIG_FILE = "projectiles.yml"
+const val PROJECTILE_GLOBAL_CONFIG_LOADER = "projectile_global_config_loader"
 
-const val ELEMENT_CONFIG_FILE = "elements.yml"
-const val ELEMENT_CONFIG_LOADER = "element_config_loader"
+const val ELEMENT_GLOBAL_CONFIG_FILE = "elements.yml"
+const val ELEMENT_GLOBAL_CONFIG_LOADER = "element_global_config_loader"
 
-const val KIZAMI_CONFIG_FILE = "kizami.yml"
-const val KIZAMI_CONFIG_LOADER = "kizami_config_loader"
+const val KIZAMI_GLOBAL_CONFIG_FILE = "kizami.yml"
+const val KIZAMI_GLOBAL_CONFIG_LOADER = "kizami_global_config_loader"
 
-const val RARITY_CONFIG_FILE = "rarities.yml"
-const val RARITY_CONFIG_LOADER = "rarity_config_loader"
+const val RARITY_GLOBAL_CONFIG_FILE = "rarities.yml"
+const val RARITY_GLOBAL_CONFIG_LOADER = "rarity_global_config_loader"
 
-const val LEVEL_CONFIG_FILE = "levels.yml"
-const val LEVEL_CONFIG_LOADER = "level_config_loader"
+const val LEVEL_GLOBAL_CONFIG_FILE = "levels.yml"
+const val LEVEL_GLOBAL_CONFIG_LOADER = "level_global_config_loader"
 
-const val SKIN_CONFIG_FILE = "skins.yml"
-const val SKIN_CONFIG_LOADER = "skin_config_loader"
+const val SKIN_GLOBAL_CONFIG_FILE = "skins.yml"
+const val SKIN_GLOBAL_CONFIG_LOADER = "skin_global_config_loader"
 
-const val ENTITY_CONFIG_FILE = "entities.yml"
-const val ENTITY_CONFIG_LOADER = "entity_config_loader"
+const val ENTITY_GLOBAL_CONFIG_FILE = "entities.yml"
+const val ENTITY_GLOBAL_CONFIG_LOADER = "entity_global_config_loader"
 
 internal fun registryModule(): Module = module {
 
@@ -77,29 +77,28 @@ internal fun registryModule(): Module = module {
     single { RarityRegistry } bind Initializable::class
     single { SkillRegistry } bind Initializable::class
 
-    //<editor-fold desc="Definitions of YamlConfigurationLoader">
-    single<YamlConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)) {
-        createYamlLoader(ELEMENT_CONFIG_FILE) {
+    single<YamlConfigurationLoader>(named(ELEMENT_GLOBAL_CONFIG_LOADER)) {
+        createYamlLoader(ELEMENT_GLOBAL_CONFIG_FILE) {
             registerAll(get(named(ELEMENT_SERIALIZERS)))
         }
     }
 
-    single<YamlConfigurationLoader>(named(ENTITY_CONFIG_LOADER)) {
-        createYamlLoader(ENTITY_CONFIG_FILE) {
+    single<YamlConfigurationLoader>(named(ENTITY_GLOBAL_CONFIG_LOADER)) {
+        createYamlLoader(ENTITY_GLOBAL_CONFIG_FILE) {
             registerAll(get(named(ENTITY_TYPE_HOLDER_SERIALIZER)))
         }
     }
 
-    single<YamlConfigurationLoader>(named(SKIN_CONFIG_LOADER)) {
-        createYamlLoader(SKIN_CONFIG_FILE) {
+    single<YamlConfigurationLoader>(named(SKIN_GLOBAL_CONFIG_LOADER)) {
+        createYamlLoader(SKIN_GLOBAL_CONFIG_FILE) {
             registerAll(get(named(SKIN_SERIALIZERS)))
         }
     }
 
-    single<YamlConfigurationLoader>(named(KIZAMI_CONFIG_LOADER)) {
-        createYamlLoader(KIZAMI_CONFIG_FILE) {
+    single<YamlConfigurationLoader>(named(KIZAMI_GLOBAL_CONFIG_LOADER)) {
+        createYamlLoader(KIZAMI_GLOBAL_CONFIG_FILE) {
             registerAll(get(named(KIZAMI_SERIALIZERS)))
-            registerAll(get(named(SKILL_SERIALIZERS)))
+            registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
             registerAll(get(named(SKILL_CONDITION_SERIALIZERS)))
             registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
             registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
@@ -117,24 +116,22 @@ internal fun registryModule(): Module = module {
     single<YamlConfigurationLoader.Builder>(named(SKILL_PROTO_CONFIG_LOADER)) {
         buildYamlLoader {
             registerAll(get(named(BASE_SERIALIZERS)))
-            registerAll(get(named(SKILL_SERIALIZERS)))
+            registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
             registerAll(get(named(SKILL_CONDITION_SERIALIZERS)))
             registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
             registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
         }
     }
 
-    single<YamlConfigurationLoader>(named(RARITY_CONFIG_LOADER)) {
-        createYamlLoader(RARITY_CONFIG_FILE) {
+    single<YamlConfigurationLoader>(named(RARITY_GLOBAL_CONFIG_LOADER)) {
+        createYamlLoader(RARITY_GLOBAL_CONFIG_FILE) {
             registerAll(get(named(RARITY_SERIALIZERS)))
         }
     }
 
-    single<YamlConfigurationLoader>(named(LEVEL_CONFIG_LOADER)) {
-        createYamlLoader(LEVEL_CONFIG_FILE) {
+    single<YamlConfigurationLoader>(named(LEVEL_GLOBAL_CONFIG_LOADER)) {
+        createYamlLoader(LEVEL_GLOBAL_CONFIG_FILE) {
             registerAll(get(named(RARITY_SERIALIZERS)))
         }
     }
-    //</editor-fold>
-
 }

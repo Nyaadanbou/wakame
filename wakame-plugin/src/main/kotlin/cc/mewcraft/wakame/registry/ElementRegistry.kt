@@ -24,7 +24,7 @@ object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, B
         INSTANCES.clear()
         BI_LOOKUP.clear()
 
-        val root = get<NekoConfigurationLoader>(named(ELEMENT_CONFIG_LOADER)).load()
+        val root = get<NekoConfigurationLoader>(named(ELEMENT_GLOBAL_CONFIG_LOADER)).load()
         root.node("elements").childrenMap().forEach { (_, n) ->
             val element = n.krequire<Element>()
             // register element

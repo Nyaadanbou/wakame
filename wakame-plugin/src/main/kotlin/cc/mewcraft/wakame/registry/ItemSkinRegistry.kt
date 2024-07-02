@@ -18,7 +18,7 @@ object ItemSkinRegistry : KoinComponent, Initializable, BiKnot<String, ItemSkin,
         INSTANCES.clear()
         BI_LOOKUP.clear()
 
-        val root = get<NekoConfigurationLoader>(named(SKIN_CONFIG_LOADER)).load()
+        val root = get<NekoConfigurationLoader>(named(SKIN_GLOBAL_CONFIG_LOADER)).load()
 
         // placeholder code: read config and populate values
     }

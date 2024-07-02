@@ -29,7 +29,7 @@ import cc.mewcraft.wakame.item.schema.meta.ToolMetaSerializer
 import cc.mewcraft.wakame.item.schema.meta.ToolRuleSerializer
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
-import cc.mewcraft.wakame.skill.SKILL_SERIALIZERS
+import cc.mewcraft.wakame.skill.SKILL_GROUP_SERIALIZERS
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -66,7 +66,7 @@ internal fun schemaItemModule(): Module = module {
             // cores
             .kregister(SchemaCorePoolSerializer)
             .kregister(SchemaCoreGroupSerializer)
-            .registerAll(get(named(SKILL_SERIALIZERS)))
+            .registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
 
             // curses
             .kregister(SchemaCursePoolSerializer)

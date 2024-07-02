@@ -80,7 +80,7 @@ internal class RendererConfiguration(
 
         fun createDynamicLoreMeta(rawIndex: Int, rawLine: String, default: List<Component>?): DynamicLoreMeta {
             val creator = dynamicLoreMetaCreatorRegistry.getApplicableCreator(rawLine)
-                ?: throw IllegalArgumentException("Unrecognized raw line '$rawLine' while loading config $RENDERER_CONFIG_FILE")
+                ?: throw IllegalArgumentException("Unrecognized raw line '$rawLine' while loading config $RENDERER_GLOBAL_CONFIG_FILE")
             return creator.create(rawIndex, rawLine, default)
         }
 
@@ -116,7 +116,7 @@ internal class RendererConfiguration(
                     // 具体解析为 "(default:{}){}"
                     "default" -> {
                         val defaultText = queue.popOr(
-                            "Unknown syntax for '(default...)' while load config $RENDERER_CONFIG_FILE. Correct syntax: '(default:{text}|blank|empty){key}'"
+                            "Unknown syntax for '(default...)' while load config $RENDERER_GLOBAL_CONFIG_FILE. Correct syntax: '(default:{text}|blank|empty){key}'"
                         ).let {
                             if (it.isBlank() || it == "blank" || it == "empty") {
                                 listOf(Component.empty())
@@ -127,7 +127,7 @@ internal class RendererConfiguration(
                         ret = createDynamicLoreMeta(rawIndex, matcher.group(2), defaultText)
                     }
 
-                    else -> error("Unknown option '$params' while loading config $RENDERER_CONFIG_FILE")
+                    else -> error("Unknown option '$params' while loading config $RENDERER_GLOBAL_CONFIG_FILE")
                 }
             } else {
                 // 无参数，模式为 "{}"

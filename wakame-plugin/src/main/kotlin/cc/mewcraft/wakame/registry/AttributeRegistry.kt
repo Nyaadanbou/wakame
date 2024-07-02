@@ -85,7 +85,7 @@ object AttributeRegistry : Initializable {
     /**
      * The config of all attributes.
      */
-    val CONFIG: ConfigProvider by lazy { Configs.YAML[ATTRIBUTE_CONFIG_FILE] }
+    val CONFIG: ConfigProvider by lazy { Configs.YAML[ATTRIBUTE_GLOBAL_CONFIG_FILE] }
 
     /**
      * Builds an attribute facade.

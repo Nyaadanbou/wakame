@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
-import cc.mewcraft.wakame.display.RENDERER_CONFIG_FILE
+import cc.mewcraft.wakame.display.RENDERER_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.event.NekoReloadEvent
 import cc.mewcraft.wakame.item.MultipleItemListener
@@ -18,7 +18,19 @@ import cc.mewcraft.wakame.item.SingleItemListener
 import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.CATEGORY_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.ELEMENT_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.ENTITY_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.KIZAMI_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.PROJECTILE_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.SKIN_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.skill.SkillTickerListener
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
@@ -106,17 +118,17 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(CRATE_PROTO_CONFIG_DIR)
         saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
         saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
-        saveResource(ATTRIBUTE_CONFIG_FILE)
-        saveResource(CATEGORY_CONFIG_FILE)
-        saveResource(ELEMENT_CONFIG_FILE)
-        saveResource(ENTITY_CONFIG_FILE)
-        saveResource(ITEM_CONFIG_FILE)
-        saveResource(KIZAMI_CONFIG_FILE)
-        saveResource(LEVEL_CONFIG_FILE)
-        saveResource(PROJECTILE_CONFIG_FILE)
-        saveResource(RARITY_CONFIG_FILE)
-        saveResource(RENDERER_CONFIG_FILE)
-        saveResource(SKIN_CONFIG_FILE)
+        saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
+        saveResource(CATEGORY_GLOBAL_CONFIG_FILE)
+        saveResource(ELEMENT_GLOBAL_CONFIG_FILE)
+        saveResource(ENTITY_GLOBAL_CONFIG_FILE)
+        saveResource(ITEM_GLOBAL_CONFIG_FILE)
+        saveResource(KIZAMI_GLOBAL_CONFIG_FILE)
+        saveResource(LEVEL_GLOBAL_CONFIG_FILE)
+        saveResource(PROJECTILE_GLOBAL_CONFIG_FILE)
+        saveResource(RARITY_GLOBAL_CONFIG_FILE)
+        saveResource(RENDERER_GLOBAL_CONFIG_FILE)
+        saveResource(SKIN_GLOBAL_CONFIG_FILE)
     }
 
     private fun registerListeners() = with(PLUGIN) {

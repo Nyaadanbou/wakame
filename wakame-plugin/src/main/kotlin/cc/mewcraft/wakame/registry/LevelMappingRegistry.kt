@@ -27,7 +27,7 @@ object LevelMappingRegistry : KoinComponent, Initializable {
     private fun loadConfiguration() {
         INSTANCES.clear()
 
-        val root = get<NekoConfigurationLoader>(named(LEVEL_CONFIG_LOADER)).load()
+        val root = get<NekoConfigurationLoader>(named(LEVEL_GLOBAL_CONFIG_LOADER)).load()
 
         // deserialize the `global` mappings
         val globalLevelMappings = root.node(GLOBAL_NAME).krequire<LevelMappings>()

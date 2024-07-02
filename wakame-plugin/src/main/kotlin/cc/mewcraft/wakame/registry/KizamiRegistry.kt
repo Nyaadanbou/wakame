@@ -32,7 +32,7 @@ object KizamiRegistry : KoinComponent, Initializable, BiKnot<String, Kizami, Byt
         INSTANCES.clear()
         BI_LOOKUP.clear()
 
-        val root = get<NekoConfigurationLoader>(named(KIZAMI_CONFIG_LOADER)).load()
+        val root = get<NekoConfigurationLoader>(named(KIZAMI_GLOBAL_CONFIG_LOADER)).load()
         root.node("kizami").childrenMap().forEach { (_, childNode) ->
             val kizamiInstance = childNode.krequire<KizamiInstance>()
             val kizami = kizamiInstance.kizami

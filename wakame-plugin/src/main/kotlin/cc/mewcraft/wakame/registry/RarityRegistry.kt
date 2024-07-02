@@ -24,7 +24,7 @@ object RarityRegistry : KoinComponent, Initializable, BiKnot<String, Rarity, Byt
         INSTANCES.clear()
         BI_LOOKUP.clear()
 
-        val root = get<NekoConfigurationLoader>(named(RARITY_CONFIG_LOADER)).load()
+        val root = get<NekoConfigurationLoader>(named(RARITY_GLOBAL_CONFIG_LOADER)).load()
         root.node("rarities").childrenMap().forEach { (_, n) ->
             val rarity = n.krequire<Rarity>()
             INSTANCES.register(rarity.uniqueId, rarity)

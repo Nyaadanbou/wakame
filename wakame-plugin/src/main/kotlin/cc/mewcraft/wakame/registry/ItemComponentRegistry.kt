@@ -11,7 +11,7 @@ import org.koin.core.component.KoinComponent
  */
 object ItemComponentRegistry : KoinComponent, Initializable {
 
-    internal val CONFIG by lazy { Configs.YAML[ITEM_CONFIG_FILE].derive("components") }
+    internal val CONFIG by lazy { Configs.YAML[ITEM_GLOBAL_CONFIG_FILE].derive("components") }
 
     /**
      * 类型的注册表.

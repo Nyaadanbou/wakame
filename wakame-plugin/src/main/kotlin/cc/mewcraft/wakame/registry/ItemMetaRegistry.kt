@@ -18,7 +18,7 @@ import kotlin.reflect.full.valueParameters
 import kotlin.reflect.typeOf
 
 object ItemMetaRegistry : Initializable {
-    internal val CONFIG by lazy { Configs.YAML[ITEM_CONFIG_FILE].derive("meta") }
+    internal val CONFIG by lazy { Configs.YAML[ITEM_GLOBAL_CONFIG_FILE].derive("meta") }
 
     internal object Binary {
         private val itemMetaReflectionLookupByClass: Map<KClass<out BinaryItemMeta<*>>, BinaryItemMetaReflection> = run {

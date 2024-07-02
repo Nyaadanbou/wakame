@@ -12,7 +12,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.withOptions
 import org.koin.dsl.module
 
-const val RENDERER_CONFIG_FILE = "renderer.yml"
+const val RENDERER_GLOBAL_CONFIG_FILE = "renderer.yml"
 
 const val PLAY_ITEM_RENDERER = "play_item_renderer"
 const val SHOW_ITEM_RENDERER = "show_item_renderer"
@@ -37,7 +37,7 @@ internal fun displayModule(): Module = module {
 
     // config holder
     single {
-        RendererConfiguration(Configs.YAML[RENDERER_CONFIG_FILE])
+        RendererConfiguration(Configs.YAML[RENDERER_GLOBAL_CONFIG_FILE])
     } withOptions {
         bind<Initializable>()
     }
