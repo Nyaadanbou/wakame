@@ -1,7 +1,7 @@
-import cc.mewcraft.wakame.display.LoreFinalizer
 import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.RendererConfiguration
+import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.displayModule
+import cc.mewcraft.wakame.display.flatten
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.item.binary.cell.core.attribute.AttributeCoreInitializer
 import cc.mewcraft.wakame.item.binary.cell.core.empty.EmptyCoreInitializer
@@ -41,7 +41,7 @@ private fun createAttributeLine(x: String): LoreLine = LoreLine.simple(Key(x), l
 private fun createMetaLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
 private fun createSkillLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
 
-class LoreFinalizerTest : KoinTest {
+class LoreFlattenTest : KoinTest {
 
     companion object {
         @JvmStatic
@@ -81,7 +81,7 @@ class LoreFinalizerTest : KoinTest {
             ItemMetaInitializer.onPostWorld()
 
             // initialize renderer config
-            app.koin.get<RendererConfiguration>().also { it.onPostWorld() }
+            app.koin.get<RendererConfig>().also { it.onPostWorld() }
         }
 
         @JvmStatic
@@ -93,15 +93,14 @@ class LoreFinalizerTest : KoinTest {
 
     private fun buildTest(vararg loreLines: LoreLine) {
         val logger = get<Logger>()
-        val finalizer = get<LoreFinalizer>()
         logger.info("Start finalizing lore lines")
-        val (components, duration) = measureTimedValue { finalizer.finalize(loreLines.toList()) }
+        val (components, duration) = measureTimedValue { loreLines.toList().flatten() }
         components.forEach { logger.info(" - " + it.plain) }
-        logger.info("Finalized lore lines - ${duration.inWholeMicroseconds} micro seconds elapsed")
+        logger.info("Flattened lore lines - ${duration.inWholeMicroseconds} micro seconds elapsed")
     }
 
     @Test
-    fun `test finalize lore lines 1`() {
+    fun `test flatten lore lines 1`() {
         buildTest(
             createMetaLine("meta:level"),
             createMetaLine("meta:rarity"),
@@ -112,7 +111,7 @@ class LoreFinalizerTest : KoinTest {
     }
 
     @Test
-    fun `test finalize lore lines 2`() {
+    fun `test flatten lore lines 2`() {
         buildTest(
             createMetaLine("meta:level"),
             createMetaLine("meta:rarity"),
@@ -129,7 +128,7 @@ class LoreFinalizerTest : KoinTest {
     }
 
     @Test
-    fun `test finalize lore lines 3`() {
+    fun `test flatten lore lines 3`() {
         buildTest(
             createMetaLine("meta:level"),
             createMetaLine("meta:rarity"),
@@ -148,7 +147,7 @@ class LoreFinalizerTest : KoinTest {
     }
 
     @Test
-    fun `test finalize lore lines 4`() {
+    fun `test flatten lore lines 4`() {
         buildTest(
             createMetaLine("meta:level"),
             createMetaLine("meta:rarity"),
@@ -160,7 +159,7 @@ class LoreFinalizerTest : KoinTest {
     }
 
     @Test
-    fun `test finalize lore lines 5`() {
+    fun `test flatten lore lines 5`() {
         buildTest(
             createMetaLine("meta:level"),
             createMetaLine("meta:rarity"),

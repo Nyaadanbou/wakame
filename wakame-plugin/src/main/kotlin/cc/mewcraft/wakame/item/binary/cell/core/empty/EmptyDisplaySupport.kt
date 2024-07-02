@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawIndex
 import cc.mewcraft.wakame.display.RawKey
-import cc.mewcraft.wakame.display.RendererConfiguration
+import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
@@ -18,8 +18,8 @@ import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 
-@ReloadDependency(runAfter = [RendererConfiguration::class])
-@PostWorldDependency(runAfter = [RendererConfiguration::class])
+@ReloadDependency(runAfter = [RendererConfig::class])
+@PostWorldDependency(runAfter = [RendererConfig::class])
 internal object EmptyCoreInitializer : Initializable {
     override fun onPostWorld() {
         DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY.register(EmptyCoreLoreMetaCreator())

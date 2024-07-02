@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.skill.context
 
-import cc.mewcraft.wakame.item.binary.BukkitNekoStack
-import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStack
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.user.toUser
@@ -22,7 +20,7 @@ sealed interface SkillCastContext {
     fun <T : Any> has(key: SkillCastContextKey<T>): Boolean
 }
 
-fun SkillCastContext(caster: Caster, target: Target? = null, nekoStack: PlayNekoStack? = null): SkillCastContext {
+fun SkillCastContext(caster: Caster, target: Target? = null, nekoStack: NekoStack? = null): SkillCastContext {
     val context = SkillCastContextImpl()
     with(context) {
         // 技能必须有 caster
@@ -100,10 +98,8 @@ private class SkillCastContextImpl : SkillCastContext {
     }
 
     fun setNekoStack(nekoStack: NekoStack) {
-        if (nekoStack is BukkitNekoStack) {
-            set(SkillCastContextKey.ITEM_STACK, nekoStack.itemStack)
-        }
         set(SkillCastContextKey.NEKO_STACK, nekoStack)
+        set(SkillCastContextKey.ITEM_STACK, nekoStack.handle)
     }
 
     fun setItemStack(itemStack: ItemStack) {

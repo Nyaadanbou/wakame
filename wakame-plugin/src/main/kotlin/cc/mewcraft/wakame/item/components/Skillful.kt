@@ -17,13 +17,13 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Skillful : Examinable, TooltipProvider {
+interface Skillful : Examinable, TooltipProvider.Single {
 
     companion object Value : Skillful, ItemComponentConfig(ItemComponentConstants.SKILLFUL) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { SKILLFUL }
         private val tooltipText: SingleTooltip = SingleTooltip()
 
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

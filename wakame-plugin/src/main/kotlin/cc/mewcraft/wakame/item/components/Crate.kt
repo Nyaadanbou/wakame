@@ -22,7 +22,7 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Crate : Examinable, TooltipProvider {
+interface Crate : Examinable, TooltipProvider.Single {
 
     /**
      * 盲盒的唯一标识.
@@ -32,7 +32,7 @@ interface Crate : Examinable, TooltipProvider {
     data class Value(
         override val key: Key,
     ) : Crate {
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

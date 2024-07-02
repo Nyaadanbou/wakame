@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.item.binary.NekoStack
+import cc.mewcraft.wakame.item.NekoStack
 
 /**
  * A renderer that renders name and lore for an [NekoStack].

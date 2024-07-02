@@ -92,7 +92,7 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvi
         return AttributeRegistry.FACADES[key].attributeModifierCreator(uuid, this)
     }
 
-    override fun provideDisplayLore(): LoreLine {
+    override fun provideTooltipLore(): LoreLine {
         val tooltipKey = AttributeDisplaySupport.getLineKey(this) ?: return LoreLine.noop()
         val tooltipText = AttributeRegistry.FACADES[key].displayTextCreator(this)
         return LoreLine.simple(tooltipKey, tooltipText)

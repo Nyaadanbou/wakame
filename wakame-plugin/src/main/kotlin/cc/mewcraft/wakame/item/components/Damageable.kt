@@ -23,7 +23,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import org.bukkit.inventory.meta.Damageable as CraftDamageable
 
-interface Damageable : Examinable, TooltipProvider {
+interface Damageable : Examinable, TooltipProvider.Single {
 
     /**
      * 当前损耗.
@@ -39,7 +39,7 @@ interface Damageable : Examinable, TooltipProvider {
         override val damage: Int,
         override val maxDamage: Int,
     ) : Damageable {
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

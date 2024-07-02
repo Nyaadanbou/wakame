@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.item.binary.NekoStack
-import cc.mewcraft.wakame.item.binary.tryNekoStack
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.util.NmsEntityUtils
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
@@ -25,8 +25,7 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
     private val entityId2entityUniqueId: MutableMap<Int, UUID> = ConcurrentHashMap()
 
     override fun onPacketSend(event: PacketSendEvent) {
-        val player = event.player as? Player ?: return
-        // if (player.disable) return
+        if (event.player !is Player) return
 
         when (event.packetType) {
             PacketType.Play.Server.ENTITY_METADATA -> {

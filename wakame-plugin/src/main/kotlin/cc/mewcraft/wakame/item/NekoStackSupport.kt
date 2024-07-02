@@ -24,13 +24,14 @@ import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.util.UUID
 
+@get:Contract(pure = true)
 val ItemStack.isNeko: Boolean
     get() {
         val tag = wakameTagOrNull ?: return false
-        val key = NekoStackImplementations.getKey(tag) ?: return false
-        return ItemRegistry.INSTANCES.find(key) != null
+        return NekoStackSupport.getPrototype(tag) != null
     }
 
+@get:Contract(pure = false)
 val ItemStack.tryNekoStack: NekoStack?
     get() {
         // 开发日记 2024/6/26 小米
@@ -43,11 +44,12 @@ val ItemStack.tryNekoStack: NekoStack?
             return null
         if (!this.isNeko)
             return null
-        if (NekoStackImplementations.isSystemUse(this.wakameTag))
+        if (NekoStackSupport.isSystemUse(this.wakameTag))
             return null
         return NekoStackImpl(this)
     }
 
+@get:Contract(pure = false)
 val ItemStack.toNekoStack: NekoStack
     get() {
         // 开发日记 2024/6/26 小米
@@ -61,12 +63,13 @@ val ItemStack.toNekoStack: NekoStack
         require(this.isNeko) {
             "The ItemStack is not from wakame"
         }
-        require(!NekoStackImplementations.isSystemUse(this.wakameTag)) {
+        require(!NekoStackSupport.isSystemUse(this.wakameTag)) {
             "The ItemStack is not to be used by players"
         }
         return NekoStackImpl(this)
     }
 
+@get:Contract(pure = true)
 internal val ItemStack.trySystemStack: NekoStack?
     get() {
         // if (!this.hasItemMeta())
@@ -78,16 +81,17 @@ internal val ItemStack.trySystemStack: NekoStack?
         }
     }
 
+@get:Contract(pure = true)
 internal val ItemStack.toSystemStack: NekoStack
     get() {
         // require(this.hasItemMeta()) {
         //     "The ItemStack has no ItemMeta"
         // }
         require(this.isNeko) {
-            "The itemStack is not from wakame"
+            "The ItemStack is not from wakame"
         }
         return NekoStackImpl(this.clone()).apply {
-            require(this.isSystemUse()) { "" }
+            require(this.isSystemUse()) { "The ItemStack is not a system stack" }
         }
     }
 
@@ -102,22 +106,23 @@ internal val ItemStack.toSystemStack: NekoStack
  * before it's added to the world state so that it becomes a legal NekoItem.
  * Otherwise, undefined behaviors can occur.
  */
+@Contract(pure = true)
 internal fun Material.createBlankNekoStack(): NekoStack {
     return NekoStackImpl(this)
 }
 
 @Contract(pure = true)
-internal fun NekoStack.isSystemUse(): Boolean {
+private fun NekoStack.isSystemUse(): Boolean {
     return components.has(ItemComponentTypes.SYSTEM_USE)
 }
 
 @Contract(pure = false)
-internal fun NekoStack.setSystemUse() {
+private fun NekoStack.setSystemUse() {
     components.set(ItemComponentTypes.SYSTEM_USE, Unit)
 }
 
 @Contract(pure = false)
-internal fun NekoStack.unsetSystemUse() {
+private fun NekoStack.unsetSystemUse() {
     this.handle.backingItemName = null
     this.handle.backingCustomName = null
     this.handle.backingCustomModelData = null
@@ -127,7 +132,7 @@ internal fun NekoStack.unsetSystemUse() {
 }
 
 @Contract(pure = true)
-internal fun NekoStack.copyAsSystemUse(): NekoStack {
+internal fun NekoStack.toSystemUse(): NekoStack {
     // if (this.isSystemUse()) {
     //     return this
     // }
@@ -138,7 +143,7 @@ internal fun NekoStack.copyAsSystemUse(): NekoStack {
 }
 
 @Contract(pure = true)
-internal fun NekoStack.copyAsNonSystemUse(): NekoStack {
+internal fun NekoStack.toNonSystemUse(): NekoStack {
     // if (!this.isSystemUse()) {
     //     return this
     // }
@@ -187,35 +192,35 @@ private class NekoStackImpl(
         }
 
     override val prototype: NekoItem
-        get() = TODO("完成新的 ItemRegistry & 更新相关代码") // ItemRegistry.INSTANCES[key]
+        get() = NekoStackSupport.getPrototypeOrThrow(nbt)
 
     override var namespace: String
-        get() = requireNotNull(NekoStackImplementations.getNamespace(nbt)) { "Can't find 'namespace' on the item NBT" }
-        set(value) = NekoStackImplementations.setNamespace(nbt, value)
+        get() = NekoStackSupport.getNamespaceOrThrow(nbt)
+        set(value) = NekoStackSupport.setNamespace(nbt, value)
 
     override var path: String
-        get() = requireNotNull(NekoStackImplementations.getPath(nbt)) { "Can't find 'path' on the item NBT" }
-        set(value) = NekoStackImplementations.setPath(nbt, value)
+        get() = NekoStackSupport.getPathOrThrow(nbt)
+        set(value) = NekoStackSupport.setPath(nbt, value)
 
     override var key: Key
-        get() = requireNotNull(NekoStackImplementations.getKey(nbt)) { "Can't find 'key' on the item NBT" }
-        set(value) = NekoStackImplementations.setKey(nbt, value)
+        get() = NekoStackSupport.getKeyOrThrow(nbt)
+        set(value) = NekoStackSupport.setKey(nbt, value)
 
     override var variant: Int
-        get() = nbt.getInt(BaseBinaryKeys.VARIANT)
-        set(value) = nbt.putInt(BaseBinaryKeys.VARIANT, value)
+        get() = NekoStackSupport.getVariant(nbt)
+        set(value) = NekoStackSupport.setVariant(nbt, value)
 
     override val uuid: UUID
-        get() = ItemRegistry.INSTANCES[key].uuid
+        get() = NekoStackSupport.getUuid(nbt)
 
     override val slot: ItemSlot
-        get() = ItemRegistry.INSTANCES[key].slot
+        get() = NekoStackSupport.getSlot(nbt)
 
     override val components: ItemComponentMap
-        get() = ItemComponentMap.wrapItem(handle)
+        get() = NekoStackSupport.getComponents(handle)
 
     override val templates: ItemTemplateMap
-        get() = prototype.templates
+        get() = NekoStackSupport.getTemplates(nbt)
 
     override fun erase() {
         handle.removeWakameTag()
@@ -225,21 +230,71 @@ private class NekoStackImpl(
 /**
  * Common implementations related to [NekoStack].
  */
-private object NekoStackImplementations {
+internal object NekoStackSupport {
     fun isSystemUse(wakameTag: CompoundTag): Boolean {
-        return wakameTag.getCompoundOrNull(ItemComponentMap.TAG_COMPONENTS)?.contains(ItemComponentTypes.SYSTEM_USE.id) ?: false
+        return wakameTag.getCompoundOrNull(ItemComponentMap.TAG_COMPONENTS)
+            ?.contains(ItemComponentTypes.SYSTEM_USE.id)
+            ?: false
     }
 
     fun getNamespace(wakameTag: CompoundTag): String? {
         return wakameTag.getString(BaseBinaryKeys.NAMESPACE)
     }
 
+    fun getNamespaceOrThrow(wakameTag: CompoundTag): String {
+        return requireNotNull(getNamespace(wakameTag)) { "Can't find 'namespace' on item NBT" }
+    }
+
     fun getPath(wakameTag: CompoundTag): String? {
         return wakameTag.getString(BaseBinaryKeys.PATH)
     }
 
+    fun getPathOrThrow(wakameTag: CompoundTag): String {
+        return requireNotNull(getPath(wakameTag)) { "Can't find 'path' on item NBT" }
+    }
+
     fun getKey(wakameTag: CompoundTag): Key? {
         return getNamespace(wakameTag)?.let { namespace -> getPath(wakameTag)?.let { path -> Key(namespace, path) } }
+    }
+
+    fun getKeyOrThrow(wakameTag: CompoundTag): Key {
+        return requireNotNull(getKey(wakameTag)) { "Can' find 'key' on item NBT" }
+    }
+
+    // 如果不存在 NBT 标签, 默认返回 0
+    fun getVariant(wakameTag: CompoundTag): Int {
+        return wakameTag.getInt(BaseBinaryKeys.VARIANT)
+    }
+
+    fun getUuid(wakameTag: CompoundTag): UUID {
+        val prototype = getPrototypeOrThrow(wakameTag)
+        return prototype.uuid
+    }
+
+    fun getSlot(wakameTag: CompoundTag): ItemSlot {
+        val prototype = getPrototypeOrThrow(wakameTag)
+        return prototype.slot
+    }
+
+    fun getPrototype(wakameTag: CompoundTag): NekoItem? {
+        val key = getKeyOrThrow(wakameTag)
+        val prototype = ItemRegistry.INSTANCES.find(key)
+        return prototype
+    }
+
+    fun getPrototypeOrThrow(wakameTag: CompoundTag): NekoItem {
+        val key = getKeyOrThrow(wakameTag)
+        val prototype = requireNotNull(ItemRegistry.INSTANCES.find(key)) { "Can't find a prototype by '$key'" }
+        return prototype
+    }
+
+    fun getComponents(stack: ItemStack): ItemComponentMap {
+        return ItemComponentMap.wrapItem(stack)
+    }
+
+    fun getTemplates(wakameTag: CompoundTag): ItemTemplateMap {
+        val prototype = getPrototypeOrThrow(wakameTag)
+        return prototype.templates
     }
 
     fun setNamespace(wakameTag: CompoundTag, namespace: String) {
@@ -253,6 +308,10 @@ private object NekoStackImplementations {
     fun setKey(wakameTag: CompoundTag, key: Key) {
         setNamespace(wakameTag, key.namespace())
         setPath(wakameTag, key.value())
+    }
+
+    fun setVariant(wakameTag: CompoundTag, variant: Int) {
+        wakameTag.putInt(BaseBinaryKeys.VARIANT, variant)
     }
 }
 

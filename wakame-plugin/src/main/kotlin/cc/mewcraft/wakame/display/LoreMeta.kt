@@ -4,68 +4,6 @@ import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 
 /**
- * A creator of a [LoreMeta].
- */
-internal interface DynamicLoreMetaCreator {
-    /**
-     * The namespace of this creator. Used to identify different creators.
-     */
-    val namespace: String
-
-    /**
-     * Checks whether this creator is capable of creating a [LoreMeta]
-     * from the given [rawLine].
-     *
-     * @param rawLine the raw line text
-     * @return `true` if the [rawLine] is "legal" for this creator
-     */
-    fun test(rawLine: String): Boolean
-
-    /**
-     * Creates the [DynamicLoreMeta].
-     *
-     * @param rawIndex the raw index
-     * @param rawLine the raw line text
-     * @param default the default text if there is any
-     * @return the created [LoreMeta]
-     *
-     * @throws IllegalArgumentException if the raw line text is unrecognized
-     */
-    fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta
-}
-
-/**
- * The registry of [DynamicLoreMetaCreator].
- *
- * Use it to register [DynamicLoreMetaCreator].
- */
-internal interface DynamicLoreMetaCreatorRegistry {
-    /**
-     * Gets all creators in this registry.
-     *
-     * @return all the creators in this registry
-     */
-    fun entries(): Map<String, DynamicLoreMetaCreator>
-
-    /**
-     * Registers a [DynamicLoreMetaCreator].
-     *
-     * Duplicate creators are allowed (for now).
-     *
-     * @param creator the creator
-     */
-    fun register(creator: DynamicLoreMetaCreator)
-
-    /**
-     * Gets an applicable [DynamicLoreMetaCreator] for the [rawLine].
-     *
-     * @param rawLine the raw line in the config, without any modification
-     * @return an applicable [DynamicLoreMetaCreator] if there is one
-     */
-    fun getApplicableCreator(rawLine: String): DynamicLoreMetaCreator?
-}
-
-/**
  * 代表 [Item Lore](https://minecraft.wiki/w/Data_component_format#lore) 中的顺序，以及相关信息。这是一个顶层接口。
  *
  * 注意与 [LoreLine] 区别 - [LoreMeta] 描述的是顺序及其他信息，而 [LoreLine] 仅代表内容。
@@ -211,4 +149,67 @@ internal interface ConstantLoreMeta : LoreMeta {
     override fun generateFullIndexMappings(offset: Int): Map<TooltipKey, TooltipIndex> {
         return mapOf(rawKey to rawIndex + offset)
     }
+}
+
+
+/**
+ * A creator of a [DynamicLoreMeta].
+ */
+internal interface DynamicLoreMetaCreator {
+    /**
+     * The namespace of this creator. Used to identify different creators.
+     */
+    val namespace: String
+
+    /**
+     * Checks whether this creator is capable of creating a [LoreMeta]
+     * from the given [rawLine].
+     *
+     * @param rawLine the raw line text
+     * @return `true` if the [rawLine] is "legal" for this creator
+     */
+    fun test(rawLine: String): Boolean
+
+    /**
+     * Creates the [DynamicLoreMeta].
+     *
+     * @param rawIndex the raw index
+     * @param rawLine the raw line text
+     * @param default the default text if there is any
+     * @return the created [LoreMeta]
+     *
+     * @throws IllegalArgumentException if the raw line text is unrecognized
+     */
+    fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta
+}
+
+/**
+ * The registry of [DynamicLoreMetaCreator].
+ *
+ * Use it to register [DynamicLoreMetaCreator].
+ */
+internal interface DynamicLoreMetaCreatorRegistry {
+    /**
+     * Gets all creators in this registry.
+     *
+     * @return all the creators in this registry
+     */
+    fun entries(): Map<String, DynamicLoreMetaCreator>
+
+    /**
+     * Registers a [DynamicLoreMetaCreator].
+     *
+     * Duplicate creators are allowed (for now).
+     *
+     * @param creator the creator
+     */
+    fun register(creator: DynamicLoreMetaCreator)
+
+    /**
+     * Gets an applicable [DynamicLoreMetaCreator] for the [rawLine].
+     *
+     * @param rawLine the raw line in the config, without any modification
+     * @return an applicable [DynamicLoreMetaCreator] if there is one
+     */
+    fun getApplicableCreator(rawLine: String): DynamicLoreMetaCreator?
 }

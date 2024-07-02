@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.schema.NekoItem
-import cc.mewcraft.wakame.item.schema.NekoItemFactory
+import cc.mewcraft.wakame.item.NekoItem
+import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key

@@ -21,7 +21,7 @@ object CoreNoop : Core, CoreType<CoreNoop> {
     override val isEmpty: Boolean = false
 
     override fun asTag(): Tag = error("No-op core does not support this operation")
-    override fun provideDisplayLore(): LoreLine = error("No-op core does not support this operation")
+    override fun provideTooltipLore(): LoreLine = error("No-op core does not support this operation")
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(ExaminableProperty.of("key", key))
     override fun toString(): String = toSimpleString()

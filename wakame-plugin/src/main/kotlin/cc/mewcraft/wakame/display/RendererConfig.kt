@@ -13,7 +13,7 @@ import org.koin.core.component.inject
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
-internal class RendererConfiguration(
+internal class RendererConfig(
     private val config: ConfigProvider,
 ) : Initializable, KoinComponent {
     /**
@@ -95,11 +95,14 @@ internal class RendererConfiguration(
             val ret: LoreMeta
             val matcher = legalLinePattern.matcher(rawLine)
             if (matcher.matches()) {
+                // 统一说明: {} 代表用户输入
+
                 // 有参数，模式为 "({}){}"
                 val params = matcher.group(1)
                 val queue = StringArgumentQueue(params.split(':'))
                 when (queue.pop()) {
-                    // 具体解析为 "(fixed){}", "(fixed:{}){}"
+
+                    // 解析为 "(fixed){}", "(fixed:{}){}"
                     "fixed" -> {
                         val companionNamespace = queue.peek() // nullable
                         val customConstantText = matcher.group(2)
@@ -113,7 +116,7 @@ internal class RendererConfiguration(
                         }
                     }
 
-                    // 具体解析为 "(default:{}){}"
+                    // 解析为 "(default:{}){}"
                     "default" -> {
                         val defaultText = queue.popOr(
                             "Unknown syntax for '(default...)' while load config $RENDERER_GLOBAL_CONFIG_FILE. Correct syntax: '(default:{text}|blank|empty){key}'"
@@ -127,6 +130,7 @@ internal class RendererConfiguration(
                         ret = createDynamicLoreMeta(rawIndex, matcher.group(2), defaultText)
                     }
 
+                    // 配置文件写错了
                     else -> error("Unknown option '$params' while loading config $RENDERER_GLOBAL_CONFIG_FILE")
                 }
             } else {

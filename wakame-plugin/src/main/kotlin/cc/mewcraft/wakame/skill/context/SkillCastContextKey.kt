@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.skill.context
 
-import cc.mewcraft.wakame.item.binary.NekoStack
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.user.User

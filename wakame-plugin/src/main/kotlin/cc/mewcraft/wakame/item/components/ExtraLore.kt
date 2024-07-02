@@ -25,7 +25,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.lang.reflect.Type
 
-interface ExtraLore : Examinable, TooltipProvider {
+interface ExtraLore : Examinable, TooltipProvider.Single {
 
     /**
      * 物品的额外描述.
@@ -35,7 +35,7 @@ interface ExtraLore : Examinable, TooltipProvider {
     data class Value(
         override val lore: List<String>,
     ) : ExtraLore {
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

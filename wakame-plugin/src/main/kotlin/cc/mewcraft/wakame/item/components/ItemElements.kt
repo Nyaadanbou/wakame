@@ -33,7 +33,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
-interface ItemElements : Examinable, TooltipProvider {
+interface ItemElements : Examinable, TooltipProvider.Single {
 
     /**
      * 所有的元素.
@@ -43,7 +43,7 @@ interface ItemElements : Examinable, TooltipProvider {
     data class Value(
         override val elements: Set<Element>,
     ) : ItemElements {
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

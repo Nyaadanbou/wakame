@@ -27,7 +27,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
-interface ItemRarity : Examinable, TooltipProvider {
+interface ItemRarity : Examinable, TooltipProvider.Single {
 
     /**
      * 物品的稀有度.
@@ -37,7 +37,7 @@ interface ItemRarity : Examinable, TooltipProvider {
     data class Value(
         override val rarity: Rarity,
     ) : ItemRarity {
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

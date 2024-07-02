@@ -17,7 +17,7 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Attributable : Examinable, TooltipProvider {
+interface Attributable : Examinable, TooltipProvider.Single {
 
     // 开发日记: 2024/6/24
     // Attributable 本身没有“数值”一说, 只有是否存在于物品上一说.
@@ -29,7 +29,7 @@ interface Attributable : Examinable, TooltipProvider {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ATTRIBUTABLE }
         private val tooltipText: SingleTooltip = SingleTooltip()
 
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

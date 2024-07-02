@@ -52,8 +52,8 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         /**
          * 封装一个 [BukkitStack].
          */
-        fun wrapItem(item: BukkitStack): ItemComponentMap {
-            return ForBukkitStack(item)
+        fun wrapItem(stack: BukkitStack): ItemComponentMap {
+            return ForBukkitStack(stack)
         }
 
         /**

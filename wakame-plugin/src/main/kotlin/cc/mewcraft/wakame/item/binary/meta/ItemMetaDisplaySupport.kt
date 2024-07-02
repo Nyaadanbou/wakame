@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.display.LineKeyFactory
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawIndex
 import cc.mewcraft.wakame.display.RawKey
-import cc.mewcraft.wakame.display.RendererConfiguration
+import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
@@ -16,8 +16,8 @@ import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 
-@PostWorldDependency(runAfter = [RendererConfiguration::class])
-@ReloadDependency(runAfter = [RendererConfiguration::class])
+@PostWorldDependency(runAfter = [RendererConfig::class])
+@ReloadDependency(runAfter = [RendererConfig::class])
 internal object ItemMetaInitializer : Initializable {
     override fun onPostWorld() {
         DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY.register(ItemMetaLoreMetaCreator())
@@ -55,7 +55,7 @@ internal data class ItemMetaLoreMeta(
 }
 
 internal class ItemMetaLineKeyFactory(
-    private val config: RendererConfiguration,
+    private val config: RendererConfig,
 ) : LineKeyFactory<BinaryItemMeta<*>> {
     override fun get(obj: BinaryItemMeta<*>): TooltipKey? {
         val fullKey = obj.key // 元数据的 full key 就是 BinaryItemMeta#key

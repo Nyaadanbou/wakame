@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.NekoStack
@@ -43,7 +44,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
-interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
+interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<String, Cell>> {
 
     /**
      * 检查指定的词条栏是否存在.
@@ -91,11 +92,6 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
      * 获取**所有**词条栏上的 [ConfiguredSkill].
      */
     fun collectConfiguredSkills(context: NekoStack, ignoreCurse: Boolean = false, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
-
-    /**
-     * 获取所有 [Cell] 的 [LoreLine].
-     */
-    fun provideLoreLines(): List<LoreLine>
 
     class Value(
         private val cells: Map<String, Cell>,
@@ -163,8 +159,11 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             return ret.build()
         }
 
-        override fun provideLoreLines(): List<LoreLine> {
-            return this.map { (_, cell) -> cell.provideDisplayLore() }
+        override fun provideTooltipLore(): Collection<LoreLine> {
+            if (!showInTooltip) {
+                return emptyList()
+            }
+            return cells.values.map { cell -> cell.provideTooltipLore() }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, Cell>> {
@@ -177,9 +176,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             return Value(HashMap(cells)) // 显式副本
         }
 
-        private companion object : ItemComponentConfig(ItemComponentConstants.CELLS) {
-
-        }
+        private companion object : ItemComponentConfig(ItemComponentConstants.CELLS)
     }
 
     data class Codec(

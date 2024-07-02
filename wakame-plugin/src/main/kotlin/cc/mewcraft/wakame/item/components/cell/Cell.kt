@@ -14,7 +14,7 @@ import java.util.stream.Stream
 /**
  * 代表一个词条栏.
  */
-interface Cell : Examinable, TagLike, TooltipProvider {
+interface Cell : Examinable, TagLike, TooltipProvider.Single {
 
     /**
      * 词条栏的核心.
@@ -125,10 +125,10 @@ interface Cell : Examinable, TagLike, TooltipProvider {
             put(TAG_REFORGE, reforge.asTag())
         }
 
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             // 暂时.. 词条栏的提示框文本就是核心的.
             // 未来可以再考虑丰富词条栏的提示框文本.
-            return core.provideDisplayLore()
+            return core.provideTooltipLore()
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> {

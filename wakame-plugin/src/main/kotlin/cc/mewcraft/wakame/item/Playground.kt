@@ -67,7 +67,7 @@ fun stack(stack: NekoStack) {
     val attributable: Attributable? = stack.components.get(ItemComponentTypes.ATTRIBUTABLE)
     // val attributableLoreLine: LoreLine? = nekoStack.components.render(ItemComponentTypes.ATTRIBUTABLE)
     if (attributable != null) {
-        val loreLine: LoreLine = attributable.provideDisplayLore()
+        val loreLine: LoreLine = attributable.provideTooltipLore()
     }
 
     // 获取 item_name

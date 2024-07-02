@@ -17,13 +17,13 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface FireResistant : Examinable, TooltipProvider {
+interface FireResistant : Examinable, TooltipProvider.Single {
 
     companion object Value : FireResistant, ItemComponentConfig(ItemComponentConstants.FIRE_RESISTANT) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { FIRE_RESISTANT }
         private val tooltipText: SingleTooltip = SingleTooltip()
 
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

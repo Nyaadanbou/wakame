@@ -57,7 +57,7 @@ data class CoreSkill(
     override val isNoop: Boolean = false
     override val isEmpty: Boolean = false
 
-    override fun provideDisplayLore(): LoreLine {
+    override fun provideTooltipLore(): LoreLine {
         val tooltipKey = SkillDisplaySupport.getLineKey(this) ?: return LoreLine.noop()
         val tooltipText = instance.displays.tooltips
         val resolver = instance.conditions.resolver

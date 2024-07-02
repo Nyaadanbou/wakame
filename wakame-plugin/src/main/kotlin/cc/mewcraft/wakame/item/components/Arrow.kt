@@ -28,7 +28,7 @@ import java.lang.reflect.Type
 // 这是文件列表里的第一个物品组件,
 // 因此添加了更多代码注释, 请留意.
 
-interface Arrow : Examinable, TooltipProvider {
+interface Arrow : Examinable, TooltipProvider.Single {
 
     /**
      * 可穿透的实体数.
@@ -45,7 +45,7 @@ interface Arrow : Examinable, TooltipProvider {
     data class Value(
         override val pierceLevel: Byte,
     ) : Arrow {
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

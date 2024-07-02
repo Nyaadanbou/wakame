@@ -29,8 +29,7 @@ val ItemStack.wakameTagOrNull: CompoundShadowTag?
 
 private val ItemStack.minecraftCustomData: CompoundTag?
     get() {
-        val customData = this.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()
-        return customData?.toMinecraft
+        return this.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.toMinecraft
     }
 
 // Convert NMS compound to PacketEvents compound

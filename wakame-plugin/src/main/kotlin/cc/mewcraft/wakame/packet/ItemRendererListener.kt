@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.display.ItemRenderer
-import cc.mewcraft.wakame.display.PACKET_ITEM_RENDERER
+import cc.mewcraft.wakame.display.PacketItemRenderer
 import cc.mewcraft.wakame.packet.PacketSupport.handleMerchantOffers
 import cc.mewcraft.wakame.packet.PacketSupport.handleSetSlot
 import cc.mewcraft.wakame.packet.PacketSupport.handleWindowItems
@@ -18,7 +17,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWi
 import org.bukkit.GameMode
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 import kotlin.jvm.optionals.getOrNull
 
 internal class ItemRendererListener : PacketListenerAbstract() {
@@ -40,7 +38,7 @@ internal class ItemRendererListener : PacketListenerAbstract() {
 }
 
 private object PacketSupport : KoinComponent {
-    private val renderer: ItemRenderer<PacketNekoStack> by inject(named(PACKET_ITEM_RENDERER))
+    private val renderer: PacketItemRenderer by inject()
 
     fun handleSetSlot(user: User, packet: WrapperPlayServerSetSlot): PacketWrapper<*>? {
         val item = packet.item.takeUnlessEmpty() ?: return null
@@ -50,7 +48,7 @@ private object PacketSupport : KoinComponent {
             packet.windowId,
             packet.stateId,
             packet.slot,
-            nekoStack.packetStack
+            nekoStack.stack
         )
     }
 
@@ -59,7 +57,7 @@ private object PacketSupport : KoinComponent {
         val newItems = items.map { item ->
             val nekoStack = item.takeUnlessEmpty()?.tryNekoStack ?: return@map item
             updateItem(nekoStack, user)
-            nekoStack.packetStack
+            nekoStack.stack
         }
 
         return WrapperPlayServerWindowItems(

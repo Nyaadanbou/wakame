@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.display.LineKeyFactory
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawIndex
 import cc.mewcraft.wakame.display.RawKey
-import cc.mewcraft.wakame.display.RendererConfiguration
+import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
@@ -19,8 +19,8 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-@ReloadDependency(runAfter = [RendererConfiguration::class])
-@PostWorldDependency(runAfter = [RendererConfiguration::class])
+@ReloadDependency(runAfter = [RendererConfig::class])
+@PostWorldDependency(runAfter = [RendererConfig::class])
 internal object SkillCoreBootstrap : Initializable {
     override fun onPostWorld() {
         DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY.register(SkillLoreMetaCreator())
@@ -71,7 +71,7 @@ internal data class SkillLoreMeta(
 }
 
 internal class SkillLineKeyFactory(
-    private val config: RendererConfiguration,
+    private val config: RendererConfig,
 ) : LineKeyFactory<CoreSkill> {
     override fun get(obj: CoreSkill): TooltipKey? {
         val fullKey = obj.key // 技能的 full key 就是 Core#key

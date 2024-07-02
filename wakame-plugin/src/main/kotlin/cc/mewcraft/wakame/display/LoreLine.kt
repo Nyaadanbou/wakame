@@ -49,10 +49,6 @@ interface LoreLine {
         fun simple(key: TooltipKey, lines: List<Component>): LoreLine {
             return SimpleLoreLine(key, lines)
         }
-
-        fun bulk(map: Map<TooltipKey, LoreLine>): List<LoreLine> {
-            TODO("改进 LoreLine 接口, 使得 LoreLine 可以包含多个")
-        }
     }
 }
 

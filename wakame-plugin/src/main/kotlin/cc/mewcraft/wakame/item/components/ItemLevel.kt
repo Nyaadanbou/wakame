@@ -22,7 +22,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
-interface ItemLevel : Examinable, TooltipProvider {
+interface ItemLevel : Examinable, TooltipProvider.Single {
 
     /**
      * 物品的等级.
@@ -32,7 +32,7 @@ interface ItemLevel : Examinable, TooltipProvider {
     data class Value(
         override val level: Short,
     ) : ItemLevel {
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }

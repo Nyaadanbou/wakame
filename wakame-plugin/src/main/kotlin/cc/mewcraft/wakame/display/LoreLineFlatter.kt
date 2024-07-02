@@ -3,27 +3,39 @@ package cc.mewcraft.wakame.display
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
 import net.kyori.adventure.text.Component
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-internal class LoreFinalizerImpl(
-    private val config: RendererConfiguration,
-    private val loreMetaLookup: LoreMetaLookup,
-) : LoreFinalizer {
+internal fun Collection<LoreLine>.flatten(): List<Component> {
+    return LoreLineFlatter.flatten(this)
+}
 
-    private val lineComparator: Comparator<LoreLine> = Comparator { o1, o2 ->
-        val o1Idx = loreMetaLookup.getIndex(o1.key)
-        val o2Idx = loreMetaLookup.getIndex(o2.key)
-        if (o1Idx < o2Idx) -1 else if (o1Idx > o2Idx) 1 else 0
-    }
+internal object LoreLineFlatter : KoinComponent {
 
-    override fun finalize(loreLines: Collection<LoreLine>): List<Component> {
+    /**
+     * Flattens the [loreLines] so that it's converted to a list
+     * of [Component], which then is ready to be put on an item
+     * as the content of component `minecraft:lore`.
+     *
+     * The flattening process includes the following (but not least):
+     * - sorting the lines by certain order
+     * - inserting extra lines into the lore
+     * - ...
+     *
+     * See the implementation for more details.
+     *
+     * @param loreLines a collection of [LoreLine] to be flattened
+     * @return a sorted list of [Component]
+     */
+    fun flatten(loreLines: Collection<LoreLine>): List<Component> {
         val holder = ObjectRBTreeSet(lineComparator)
         holder += loreLines
-        holder += config.constantLoreLines
+        holder += rendererConfig.constantLoreLines
         // Adding duplicates to RBTree set makes no difference to the set.
         // Hence, we add in the default lines at the end so that
         // the default lines won't be added in
         // if these lines already exist.
-        holder += config.defaultLoreLines
+        holder += rendererConfig.defaultLoreLines
 
         // if a line can't find a larger index
         // than it, under certain conditions,
@@ -72,5 +84,14 @@ internal class LoreFinalizerImpl(
 
         // unwrap the components
         return holder.flatMapTo(ObjectArrayList(realLoreSize)) { it.content }
+    }
+
+    private val rendererConfig: RendererConfig by inject()
+    private val loreMetaLookup: LoreMetaLookup by inject()
+
+    private val lineComparator: Comparator<LoreLine> = Comparator { o1, o2 ->
+        val o1Idx = loreMetaLookup.getIndex(o1.key)
+        val o2Idx = loreMetaLookup.getIndex(o2.key)
+        if (o1Idx < o2Idx) -1 else if (o1Idx > o2Idx) 1 else 0
     }
 }

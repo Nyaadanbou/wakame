@@ -44,6 +44,8 @@ object ShadowNbtUtils {
 
 }
 
+// TODO 2024/7/2 优化: 直接 get, 然后判断类型?
+
 fun <T : Tag> CompoundTag.getOrPut(key: String, defaultValue: () -> T): T {
     if (contains(key)) {
         return (@Suppress("UNCHECKED_CAST") (get(key) as T))

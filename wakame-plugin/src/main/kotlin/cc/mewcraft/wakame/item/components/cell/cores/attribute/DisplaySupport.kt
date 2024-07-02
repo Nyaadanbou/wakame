@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.display.LineKeyFactory
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawIndex
 import cc.mewcraft.wakame.display.RawKey
-import cc.mewcraft.wakame.display.RendererConfiguration
+import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
@@ -35,8 +35,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.stream.Stream
 
-@ReloadDependency(runAfter = [RendererConfiguration::class])
-@PostWorldDependency(runAfter = [RendererConfiguration::class])
+@ReloadDependency(runAfter = [RendererConfig::class])
+@PostWorldDependency(runAfter = [RendererConfig::class])
 internal object AttributeCoreBootstrap : Initializable {
     override fun onPostWorld() {
         DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY.register(AttributeLoreMetaCreator())
@@ -136,7 +136,7 @@ internal data class AttributeLoreMeta(
 }
 
 internal class AttributeLineKeyFactory(
-    private val config: RendererConfiguration,
+    private val config: RendererConfig,
 ) : LineKeyFactory<CoreAttribute> {
     override fun get(obj: CoreAttribute): TooltipKey? {
         // 属性的 full key 目前有两种

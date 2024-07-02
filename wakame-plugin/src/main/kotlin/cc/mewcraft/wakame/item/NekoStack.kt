@@ -45,11 +45,6 @@ interface NekoStack {
     val handle: ItemStack
 
     /**
-     * The corresponding [NekoItem] this stack is generated from.
-     */
-    val prototype: NekoItem
-
-    /**
      * The `namespace` of this item.
      *
      * The `namespace` is the name of the directory in which the item is defined in the config.
@@ -82,6 +77,11 @@ interface NekoStack {
      * The inventory slot where this item becomes effective.
      */
     val slot: ItemSlot
+
+    /**
+     * The corresponding [NekoItem] this stack is generated from.
+     */
+    val prototype: NekoItem
 
     /**
      * 存放该物品的`物品组件`的容器. 该对象用于读取/添加/移除该物品的`物品组件`.

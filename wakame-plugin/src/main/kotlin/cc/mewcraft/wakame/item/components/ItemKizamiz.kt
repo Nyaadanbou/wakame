@@ -35,7 +35,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
-interface ItemKizamiz : Examinable, TooltipProvider {
+interface ItemKizamiz : Examinable, TooltipProvider.Single {
 
     /**
      * 所有的铭刻.
@@ -45,7 +45,7 @@ interface ItemKizamiz : Examinable, TooltipProvider {
     data class Value(
         override val kizamiz: Set<Kizami>,
     ) : ItemKizamiz {
-        override fun provideDisplayLore(): LoreLine {
+        override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
             }
