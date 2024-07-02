@@ -4,6 +4,7 @@ import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.TypeSerializer
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 // 开发日记 2024/6/26
@@ -22,8 +23,14 @@ interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T> {
      */
     val typeToken: TypeToken<T> // generic sucks :x
 
+    /**
+     * 定义如何将 [node] 反序列化为 [T].
+     */
     override fun deserialize(type: Type, node: ConfigurationNode): T
 
+    /**
+     * 定义如何将 [T] 序列化到 [node].
+     */
     override fun serialize(type: Type, obj: T?, node: ConfigurationNode): Nothing {
         throw UnsupportedOperationException()
     }
@@ -37,5 +44,16 @@ interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T> {
      */
     override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): T? {
         return null
+    }
+
+    /**
+     * 该序列化会用到的子序列化器.
+     *
+     * 当一个序列化实现非常复杂时, 拆分实现是个好习惯.
+     *
+     * 默认返回空集合, 意为该组件没有子序列化器.
+     */
+    fun childSerializers(): TypeSerializerCollection {
+        return TypeSerializerCollection.builder().build()
     }
 }

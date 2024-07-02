@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.components.cell.cores.skill.coreSkillModule
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-internal fun coreModule(): Module = module {
+internal fun cellCoreModule(): Module = module {
     includes(
         coreAttributeModule(),
         coreEmptyModule(),

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -13,20 +14,33 @@ import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCell
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCellSerializer
+import cc.mewcraft.wakame.item.components.cell.template.TemplateCoreGroupSerializer
+import cc.mewcraft.wakame.item.components.cell.template.TemplateCorePoolSerializer
+import cc.mewcraft.wakame.item.components.cell.template.TemplateCoreSerializer
+import cc.mewcraft.wakame.item.components.cell.template.TemplateCurseGroupSerializer
+import cc.mewcraft.wakame.item.components.cell.template.TemplateCursePoolSerializer
+import cc.mewcraft.wakame.item.components.cell.template.TemplateCurseSerializer
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.SKILL_ITEM_PROTO_SERIALIZERS
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.TriggerVariant
+import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
@@ -138,10 +152,10 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
                 }
                 val core = cell.core as? CoreSkill ?: continue
                 val variant = core.variant
-                if (variant == ConfiguredSkill.Variant.any()) {
+                if (variant == TriggerVariant.any()) {
                     continue
                 }
-                if (!ignoreVariant && context.variant != variant.variant) { // FIXME variant.variant .. hmm, 记得改个名
+                if (!ignoreVariant && context.variant != variant.id) {
                     continue
                 }
                 ret.put(core.trigger, core.instance)
@@ -206,7 +220,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             return GenerationResult.empty()
         }
 
-        companion object : ItemTemplateType<Template> {
+        companion object : ItemTemplateType<Template>, KoinComponent {
             override val typeToken: TypeToken<Template> = typeTokenOf()
 
             /**
@@ -258,6 +272,26 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
                 }.toMap(LinkedHashMap()) // 显式构建为有序 Map
 
                 return Template(cells)
+            }
+
+            override fun childSerializers(): TypeSerializerCollection {
+                return TypeSerializerCollection.builder()
+
+                    // 随机选择器
+                    .kregister(TemplateCoreSerializer)
+                    .kregister(TemplateCorePoolSerializer)
+                    .kregister(TemplateCoreGroupSerializer)
+                    .kregister(TemplateCurseSerializer)
+                    .kregister(TemplateCursePoolSerializer)
+                    .kregister(TemplateCurseGroupSerializer)
+
+                    // 技能, 部分核心会用到
+                    .registerAll(get(named(SKILL_ITEM_PROTO_SERIALIZERS)))
+
+                    // 实体类型, 部分诅咒会用到
+                    .registerAll(get(named(ENTITY_TYPE_HOLDER_SERIALIZER)))
+
+                    .build()
             }
         }
     }

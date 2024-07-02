@@ -2,6 +2,8 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.nbt.StringTag
 import cc.mewcraft.nbt.TagType
+import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
+import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -11,6 +13,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.ListTag
 import cc.mewcraft.wakame.util.javaTypeOf
+import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
@@ -20,6 +23,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 interface FoodProperties : Examinable {
@@ -149,6 +153,13 @@ interface FoodProperties : Examinable {
                 }
                 val skills = node.node("skills").getList<Key>(emptyList())
                 return Template(nutrition, saturation, canAlwaysEat, eatSeconds, effects, skills)
+            }
+
+            override fun childSerializers(): TypeSerializerCollection {
+                return TypeSerializerCollection.builder()
+                    .kregister(PotionEffectSerializer)
+                    .kregister(PotionEffectTypeSerializer)
+                    .build()
             }
         }
     }

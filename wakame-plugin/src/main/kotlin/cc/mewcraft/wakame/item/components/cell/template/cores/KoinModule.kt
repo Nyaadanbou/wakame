@@ -1,17 +1,17 @@
 package cc.mewcraft.wakame.item.components.cell.template.cores
 
-import cc.mewcraft.wakame.item.components.cell.template.cores.attribute.coreAttributeModule
-import cc.mewcraft.wakame.item.components.cell.template.cores.empty.coreEmptyModule
-import cc.mewcraft.wakame.item.components.cell.template.cores.noop.coreNoopModule
-import cc.mewcraft.wakame.item.components.cell.template.cores.skill.coreSkillModule
+import cc.mewcraft.wakame.item.components.cell.template.cores.attribute.templateCoreAttributeModule
+import cc.mewcraft.wakame.item.components.cell.template.cores.empty.templateCoreEmptyModule
+import cc.mewcraft.wakame.item.components.cell.template.cores.noop.templateCoreNoopModule
+import cc.mewcraft.wakame.item.components.cell.template.cores.skill.templateCoreSkillModule
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-internal fun coresModule(): Module = module {
+internal fun templateCoresModule(): Module = module {
     includes(
-        coreAttributeModule(),
-        coreEmptyModule(),
-        coreNoopModule(),
-        coreSkillModule(),
+        templateCoreAttributeModule(),
+        templateCoreEmptyModule(),
+        templateCoreNoopModule(),
+        templateCoreSkillModule(),
     )
 }

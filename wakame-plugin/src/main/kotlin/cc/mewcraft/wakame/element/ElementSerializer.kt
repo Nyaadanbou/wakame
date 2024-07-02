@@ -25,7 +25,7 @@ import java.lang.reflect.Type
  *   display_name: 中立
  * ```
  */
-internal class ElementSerializer : SchemaSerializer<Element> {
+internal object ElementSerializer : SchemaSerializer<Element> {
     override fun deserialize(type: Type, node: ConfigurationNode): Element {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {

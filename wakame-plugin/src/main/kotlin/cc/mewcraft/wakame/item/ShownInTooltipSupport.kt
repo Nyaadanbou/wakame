@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.config.configurate.TypeDeserializer
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.toSimpleString
 import com.google.common.collect.ImmutableMultimap
@@ -21,7 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta as BukkitItemMeta
 /**
  * 该接口为纯标记用途。
  */
-internal interface BukkitShownInTooltip : ShownInTooltip {
+internal interface NaiveShownInTooltip : ShownInTooltip {
     fun hide(meta: BukkitItemMeta)
     fun show(meta: BukkitItemMeta)
 
@@ -44,9 +45,9 @@ internal interface BukkitShownInTooltip : ShownInTooltip {
 /**
  * [ShownInTooltip] 的所有具体实现。使用枚举类实现。
  */
-internal enum class BukkitShownInTooltips(
+internal enum class NaiveShownInTooltips(
     override val id: Key,
-) : BukkitShownInTooltip {
+) : NaiveShownInTooltip {
     TRIM("trim") {
         override fun hide(meta: ItemMeta) {
             meta.addItemFlags(ItemFlag.HIDE_ARMOR_TRIM)
@@ -131,27 +132,32 @@ internal enum class BukkitShownInTooltips(
 
     constructor(component: String) : this(Key(component))
 
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(ExaminableProperty.of("id", id.asString()))
+    }
+
     override fun toString(): String {
         return toSimpleString()
     }
 
     companion object {
-        private val COMPONENT_TO_BUKKIT_SHOWN_IN_TOOLTIP: Map<Key, BukkitShownInTooltip> = buildMap {
-            BukkitShownInTooltips.entries.forEach { entry: BukkitShownInTooltips -> put(entry.id, entry) }
+        private val COMPONENT_TO_BUKKIT_SHOWN_IN_TOOLTIP: Map<Key, NaiveShownInTooltip> = buildMap {
+            NaiveShownInTooltips.entries.forEach { entry: NaiveShownInTooltips -> put(entry.id, entry) }
         }
 
-        fun getShownInTooltipByComponent(component: String): BukkitShownInTooltip {
+        fun getShownInTooltipByComponent(component: String): NaiveShownInTooltip {
             return requireNotNull(COMPONENT_TO_BUKKIT_SHOWN_IN_TOOLTIP[Key(component)]) { "Can't find BukkitShownInTooltip for item component name $component" }
         }
     }
 }
 
-internal class BukkitShownInTooltipApplicator(
-    private val settings: Map<BukkitShownInTooltip, Boolean>,
+internal class NaiveShownInTooltipApplicator(
+    private val settings: Map<NaiveShownInTooltip, Boolean>,
 ) : ShownInTooltipApplicator {
     override fun applyTo(any: Any) {
         ensureType(any)
-        for ((shownInTooltip: BukkitShownInTooltip, isShow: Boolean) in settings) {
+        for ((shownInTooltip: NaiveShownInTooltip, isShow: Boolean) in settings) {
             if (isShow) {
                 shownInTooltip.show(any)
             } else {
@@ -174,7 +180,7 @@ internal class BukkitShownInTooltipApplicator(
 }
 
 /**
- * This is a serializer for [BukkitShownInTooltipApplicator].
+ * This is a serializer for [NaiveShownInTooltipApplicator].
  *
  * ## Expected node structure
  *
@@ -190,9 +196,11 @@ internal class BukkitShownInTooltipApplicator(
  *   unbreakable: false
  * ```
  */
-internal object BukkitShownInTooltipApplicatorSerializer : ShownInTooltipApplicator.Serializer {
+internal object NaiveShownInTooltipApplicatorSerializer : TypeDeserializer<ShownInTooltipApplicator> {
     override fun deserialize(type: Type, node: ConfigurationNode): ShownInTooltipApplicator {
-        if (!node.isMap) throw SerializationException()
+        if (!node.isMap) {
+            throw SerializationException()
+        }
 
         val settings = node.childrenMap()
             // map key objects to their string representations
@@ -201,7 +209,7 @@ internal object BukkitShownInTooltipApplicatorSerializer : ShownInTooltipApplica
             }
             // map strings to BukkitShownInTooltip instances
             .mapKeys {
-                BukkitShownInTooltips.getShownInTooltipByComponent(it.key)
+                NaiveShownInTooltips.getShownInTooltipByComponent(it.key)
             }
             // map value nodes to boolean values
             .mapValues {
@@ -211,15 +219,11 @@ internal object BukkitShownInTooltipApplicatorSerializer : ShownInTooltipApplica
                 it.value.getBoolean(false)
             }
 
-        return BukkitShownInTooltipApplicator(settings)
-    }
-
-    override fun serialize(type: Type, obj: ShownInTooltipApplicator?, node: ConfigurationNode?) {
-        throw UnsupportedOperationException()
+        return NaiveShownInTooltipApplicator(settings)
     }
 
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): ShownInTooltipApplicator {
         // return a non-null value to allow missing value
-        return BukkitShownInTooltipApplicator(emptyMap())
+        return NaiveShownInTooltipApplicator(emptyMap())
     }
 }

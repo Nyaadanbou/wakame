@@ -126,6 +126,7 @@ object ItemTemplateTypes {
 
     private fun <T : ItemTemplate<*>> ItemTemplateType<T>.register(): ItemTemplateType<T> {
         serializerBuilder.register(this.typeToken, this)
+        serializerBuilder.registerAll(this.childSerializers())
         return this
     }
 

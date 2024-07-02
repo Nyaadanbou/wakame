@@ -5,6 +5,7 @@ import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.element.ELEMENT_ITEM_PROTO_SERIALIZERS
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -19,12 +20,17 @@ import cc.mewcraft.wakame.random2.Pool
 import cc.mewcraft.wakame.random2.PoolSerializer
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
+import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 interface ItemElements : Examinable, TooltipProvider {
@@ -55,7 +61,10 @@ interface ItemElements : Examinable, TooltipProvider {
     ) : ItemComponentType<ItemElements> {
 
         override fun read(holder: ItemComponentHolder): ItemElements? {
-            val elementSet = holder.getTag()?.getByteArrayOrNull(TAG_VALUE)?.mapTo(ObjectArraySet(2), ElementRegistry::getBy) ?: return null
+            val elementSet = holder.getTag()
+                ?.getByteArrayOrNull(TAG_VALUE)
+                ?.mapTo(ObjectArraySet(2), ElementRegistry::getBy)
+                ?: return null
             return Value(elements = elementSet)
         }
 
@@ -83,11 +92,18 @@ interface ItemElements : Examinable, TooltipProvider {
             return GenerationResult.of(elements)
         }
 
-        companion object : ItemTemplateType<Template> {
+        companion object : ItemTemplateType<Template>, KoinComponent {
             override val typeToken: TypeToken<Template> = typeTokenOf()
 
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 return Template(node.krequire<Pool<Element, GenerationContext>>())
+            }
+
+            override fun childSerializers(): TypeSerializerCollection {
+                return TypeSerializerCollection.builder()
+                    .registerAll(get(named(ELEMENT_ITEM_PROTO_SERIALIZERS)))
+                    .kregister(ElementPoolSerializer)
+                    .build()
             }
         }
     }

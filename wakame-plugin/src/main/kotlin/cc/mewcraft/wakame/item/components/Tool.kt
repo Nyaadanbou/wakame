@@ -109,7 +109,10 @@ interface Tool : Examinable {
                 val damagePerBlock = node.node("damage_per_block").getInt(1)
                 // optional
                 val rules = node.node("rules").childrenList().map { child ->
-                    val blockTypes = child.node("block_types").getList<String>(emptyList()).mapNotNull(NamespacedKey::fromString).mapNotNull(Registry.MATERIAL::get)
+                    val blockTypes = child.node("block_types")
+                        .getList<String>(emptyList())
+                        .mapNotNull(NamespacedKey::fromString)
+                        .mapNotNull(Registry.MATERIAL::get)
                     val speed = child.node("speed").get<Float>()
                     val correctForDrops = child.node("correct_for_drops").get<TriState>(TriState.NOT_SET)
                     Rule(blockTypes, speed, correctForDrops)

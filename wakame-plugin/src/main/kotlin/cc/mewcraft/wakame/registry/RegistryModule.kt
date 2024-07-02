@@ -3,9 +3,8 @@ package cc.mewcraft.wakame.registry
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.item.ITEM_PROTO_SERIALIZERS
 import cc.mewcraft.wakame.item.schema.BASE_SERIALIZERS
-import cc.mewcraft.wakame.item.schema.CELL_SERIALIZERS
-import cc.mewcraft.wakame.item.schema.META_SERIALIZERS
 import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.skill.SKILL_GROUP_SERIALIZERS
@@ -69,6 +68,7 @@ internal fun registryModule(): Module = module {
     single { BehaviorRegistry } bind Initializable::class
     single { ElementRegistry } bind Initializable::class
     single { EntityRegistry } bind Initializable::class
+    single { ItemComponentRegistry } bind Initializable::class
     single { ItemMetaRegistry } bind Initializable::class
     single { ItemRegistry } bind Initializable::class
     single { ItemSkinRegistry } bind Initializable::class
@@ -107,9 +107,7 @@ internal fun registryModule(): Module = module {
 
     single<YamlConfigurationLoader.Builder>(named(ITEM_PROTO_CONFIG_LOADER)) {
         buildYamlLoader {
-            registerAll(get<TypeSerializerCollection>(named(BASE_SERIALIZERS)))
-            registerAll(get<TypeSerializerCollection>(named(CELL_SERIALIZERS)))
-            registerAll(get<TypeSerializerCollection>(named(META_SERIALIZERS)))
+            registerAll(get<TypeSerializerCollection>(named(ITEM_PROTO_SERIALIZERS)))
         }
     }
 

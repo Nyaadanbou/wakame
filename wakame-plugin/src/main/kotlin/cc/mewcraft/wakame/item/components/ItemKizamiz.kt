@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.kizami.KIZAMI_ITEM_PROTO_SERIALIZERS
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random2.Filter
 import cc.mewcraft.wakame.random2.Group
@@ -21,12 +22,17 @@ import cc.mewcraft.wakame.random2.Pool
 import cc.mewcraft.wakame.random2.PoolSerializer
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
+import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 interface ItemKizamiz : Examinable, TooltipProvider {
@@ -86,11 +92,19 @@ interface ItemKizamiz : Examinable, TooltipProvider {
             return GenerationResult.of(kizamiz)
         }
 
-        companion object : ItemTemplateType<Template> {
+        companion object : ItemTemplateType<Template>, KoinComponent {
             override val typeToken: TypeToken<Template> = typeTokenOf()
 
             override fun deserialize(type: Type, node: ConfigurationNode): Template {
                 return Template(node.krequire<Group<Kizami, GenerationContext>>())
+            }
+
+            override fun childSerializers(): TypeSerializerCollection {
+                return TypeSerializerCollection.builder()
+                    .registerAll(get(named(KIZAMI_ITEM_PROTO_SERIALIZERS)))
+                    .kregister(KizamiPoolSerializer)
+                    .kregister(KizamiGroupSerializer)
+                    .build()
             }
         }
     }
