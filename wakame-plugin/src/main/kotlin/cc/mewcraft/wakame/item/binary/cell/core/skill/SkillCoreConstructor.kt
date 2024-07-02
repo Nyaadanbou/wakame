@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.binary.cell.core.skill
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 

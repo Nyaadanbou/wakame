@@ -5,9 +5,9 @@ import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.SkillBinaryKeys
-import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.getIntOrNull
 import cc.mewcraft.wakame.util.getStringOrNull
@@ -24,7 +24,7 @@ internal class BinarySkillCoreTagWrapper(
         get() = compound.getIdentifier()
     override val trigger: Trigger
         get() = compound.getTrigger()
-    override val effectiveVariant: ConfiguredSkill.Variant
+    override val variant: TriggerVariant
         get() = compound.getEffectiveVariant()
 
     override fun clear() {
@@ -48,7 +48,7 @@ private fun CompoundTag.getTrigger(): Trigger {
     return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillRegistry.TRIGGERS[Key(it)] } ?: SingleTrigger.NOOP
 }
 
-private fun CompoundTag.getEffectiveVariant(): ConfiguredSkill.Variant {
-    val variant = this.getIntOrNull(SkillBinaryKeys.EFFECTIVE_VARIANT) ?: return ConfiguredSkill.Variant.any()
-    return ConfiguredSkill.Variant.of(variant)
+private fun CompoundTag.getEffectiveVariant(): TriggerVariant {
+    val variant = this.getIntOrNull(SkillBinaryKeys.EFFECTIVE_VARIANT) ?: return TriggerVariant.any()
+    return TriggerVariant.of(variant)
 }

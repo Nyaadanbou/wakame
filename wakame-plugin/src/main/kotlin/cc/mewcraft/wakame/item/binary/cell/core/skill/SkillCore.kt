@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.binary.cell.core.BinaryCore
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.examination.ExaminableProperty
@@ -16,7 +16,7 @@ sealed class BinarySkillCore : BinaryCore {
         get() = SkillRegistry.TYPES[key]
 
     abstract val trigger: Trigger
-    abstract val effectiveVariant: ConfiguredSkill.Variant
+    abstract val variant: TriggerVariant
 
     override fun provideDisplayLore(): LoreLine {
         val lineKey = SkillDisplaySupport.getLineKey(this) ?: return LoreLine.noop()

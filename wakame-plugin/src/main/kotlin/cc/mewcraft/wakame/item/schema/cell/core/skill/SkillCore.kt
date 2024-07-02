@@ -3,9 +3,10 @@ package cc.mewcraft.wakame.item.schema.cell.core.skill
 import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
 import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.cell.core.SchemaCore
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -29,7 +30,7 @@ fun SchemaSkillCore(node: ConfigurationNode): SchemaSkillCore {
 interface SchemaSkillCore : SchemaCore {
     val instance: Skill
     val trigger: Trigger
-    val effectiveVariant: ConfiguredSkill.Variant
+    val variant: TriggerVariant
     override fun reify(context: SchemaGenerationContext): BinarySkillCore
 }
 

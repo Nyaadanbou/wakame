@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill.trigger
+package cc.mewcraft.wakame.molang
 
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
@@ -6,12 +6,12 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-const val SKILL_TRIGGER_SERIALIZERS = "skill_trigger_serializers"
+internal const val EVALUABLE_SERIALIZERS = "evaluable_serializers"
 
-internal fun skillTriggerModule(): Module = module {
-    single<TypeSerializerCollection>(named(SKILL_TRIGGER_SERIALIZERS)) {
+internal fun molangModule(): Module = module {
+    single<TypeSerializerCollection>(named(EVALUABLE_SERIALIZERS)) {
         TypeSerializerCollection.builder()
-            .kregister(SkillTriggerSerializer)
+            .kregister(EvaluableSerializer)
             .build()
     }
 }

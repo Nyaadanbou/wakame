@@ -5,9 +5,10 @@ import cc.mewcraft.wakame.item.components.cell.template.TemplateCore
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.templates.filter.SkillContextHolder
 import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -30,7 +31,7 @@ fun TemplateCoreSkill(node: ConfigurationNode): TemplateCoreSkill {
 interface TemplateCoreSkill : TemplateCore {
     val skill: Skill
     val trigger: Trigger
-    val variant: ConfiguredSkill.Variant
+    val variant: TriggerVariant
 
     override fun generate(context: GenerationContext): CoreSkill {
         return CoreSkill(key, trigger, variant)
@@ -40,7 +41,7 @@ interface TemplateCoreSkill : TemplateCore {
 private data class TemplateCoreSkillImpl(
     override val key: Key,
     override val trigger: Trigger,
-    override val variant: ConfiguredSkill.Variant,
+    override val variant: TriggerVariant,
 ) : TemplateCoreSkill {
     override val skill: Skill
         get() = SkillRegistry.TYPES[key]

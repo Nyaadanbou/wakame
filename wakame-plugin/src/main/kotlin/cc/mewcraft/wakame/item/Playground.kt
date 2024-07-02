@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.item.components.cell.CoreType
 import cc.mewcraft.wakame.item.components.cell.CoreTypes
 import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
+import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 
@@ -39,7 +39,7 @@ fun stack(stack: NekoStack) {
         cell ?: return@modify null
         val coreType: CoreType<*> = cell.core.type
         val coreSkill: CoreSkill = cell.getTypedCore(CoreTypes.SKILL) ?: return@modify null
-        val newCoreSkill = coreSkill.copy(variant = ConfiguredSkill.Variant.of(3))
+        val newCoreSkill = coreSkill.copy(variant = TriggerVariant.of(3))
         cell.setCore(newCoreSkill)
     }
     stack.components.set(ItemComponentTypes.CELLS, newItemCells)

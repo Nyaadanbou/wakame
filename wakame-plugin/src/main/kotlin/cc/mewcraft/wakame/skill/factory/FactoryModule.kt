@@ -8,7 +8,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 const val SKILL_FACTORY_SERIALIZERS = "skill_factory_serializers" // FIXME
 
-internal fun factoryModule(): Module = module {
+internal fun skillFactoryModule(): Module = module {
     single<TypeSerializerCollection>(named(SKILL_FACTORY_SERIALIZERS)) {
         TypeSerializerCollection.builder()
             .kregister(Teleport.TypeSerializer)

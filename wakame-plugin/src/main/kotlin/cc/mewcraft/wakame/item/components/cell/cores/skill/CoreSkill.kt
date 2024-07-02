@@ -7,11 +7,12 @@ import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.components.cell.Core
 import cc.mewcraft.wakame.item.components.cell.CoreType
 import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillBinaryKeys
-import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.getIntOrNull
@@ -39,17 +40,15 @@ fun CoreSkill(nbt: CompoundTag): CoreSkill {
  * 构建一个 [CoreSkill].
  */
 fun CoreSkill(node: ConfigurationNode): CoreSkill {
-    val configuredSkill = node.krequire<ConfiguredSkill>()
-    val key = configuredSkill.key
-    val trigger = configuredSkill.trigger
-    val variant = configuredSkill.variant
-    return CoreSkill(key, trigger, variant)
+    val skill = node.krequire<ConfiguredSkill>()
+    val coreSkill = CoreSkill(skill.key, skill.trigger, skill.variant)
+    return coreSkill
 }
 
 data class CoreSkill(
     override val key: Key,
     val trigger: Trigger,
-    val variant: ConfiguredSkill.Variant, // TODO 这个类叫做 TriggerVariant 怎么样?
+    val variant: TriggerVariant,
 ) : Core {
     val instance: Skill
         get() = SkillRegistry.TYPES[key]
@@ -93,9 +92,9 @@ private fun CompoundTag.getTrigger(): Trigger {
     return this.getStringOrNull(SkillBinaryKeys.SKILL_TRIGGER)?.let { SkillRegistry.TRIGGERS[Key(it)] } ?: SingleTrigger.NOOP
 }
 
-private fun CompoundTag.getVariant(): ConfiguredSkill.Variant {
-    val variant = this.getIntOrNull(SkillBinaryKeys.EFFECTIVE_VARIANT) ?: return ConfiguredSkill.Variant.any()
-    return ConfiguredSkill.Variant.of(variant)
+private fun CompoundTag.getVariant(): TriggerVariant {
+    val variant = this.getIntOrNull(SkillBinaryKeys.EFFECTIVE_VARIANT) ?: return TriggerVariant.any()
+    return TriggerVariant.of(variant)
 }
 
 private fun CompoundTag.putIdentifier(id: Key) {
@@ -106,9 +105,9 @@ private fun CompoundTag.putTrigger(trigger: Trigger) {
     this.putString(SkillBinaryKeys.SKILL_TRIGGER, trigger.key.asString())
 }
 
-private fun CompoundTag.putVariant(variant: ConfiguredSkill.Variant) {
-    if (variant == ConfiguredSkill.Variant.any())
+private fun CompoundTag.putVariant(variant: TriggerVariant) {
+    if (variant == TriggerVariant.any())
         return
-    this.putInt(SkillBinaryKeys.EFFECTIVE_VARIANT, variant.variant)
+    this.putInt(SkillBinaryKeys.EFFECTIVE_VARIANT, variant.id)
 }
 //</editor-fold>

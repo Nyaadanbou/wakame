@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.item.schema.SchemaGenerationContext
 import cc.mewcraft.wakame.item.schema.filter.SkillContextHolder
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.ConfiguredSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import net.kyori.adventure.key.Key
 
 //
@@ -17,7 +17,7 @@ import net.kyori.adventure.key.Key
 internal data class SchemaSkillCoreImpl(
     override val key: Key, // the key will be used to get the Skill instance
     override val trigger: Trigger,
-    override val effectiveVariant: ConfiguredSkill.Variant
+    override val variant: TriggerVariant
 ) : SchemaSkillCore {
     override val instance: Skill
         get() = SkillRegistry.TYPES[key]
@@ -35,6 +35,6 @@ internal data class SchemaSkillCoreImpl(
         // 综上，物品上的技能无需储存除 key 以外的任何数据
 
         context.skills += SkillContextHolder(key)
-        return BinarySkillCoreDataHolder(key, trigger, effectiveVariant)
+        return BinarySkillCoreDataHolder(key, trigger, variant)
     }
 }

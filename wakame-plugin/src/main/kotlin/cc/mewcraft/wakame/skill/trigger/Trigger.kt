@@ -10,6 +10,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.stream.Stream
 
@@ -18,7 +19,7 @@ import java.util.stream.Stream
  *
  * 这是一个顶级接口.
  */
-sealed interface Trigger : Examinable, Keyed
+sealed interface Trigger : Keyed, Examinable
 
 /**
  * 代表一个由单个按键输入完成的操作.
@@ -84,6 +85,9 @@ enum class SingleTrigger(
  * 代表一个由多个按键输入组成的操作, 也就是该触发器要求玩家按顺序触发指定的 [SingleTrigger].
  */
 interface SequenceTrigger : Trigger {
+    /**
+     * 组成该触发器序列的触发器 (按顺序).
+     */
     val triggers: List<SingleTrigger>
 
     companion object {
@@ -91,7 +95,7 @@ interface SequenceTrigger : Trigger {
          * 从给定的 [序列][sequence] 创建一个 [SequenceTrigger].
          */
         fun of(sequence: List<SingleTrigger>): SequenceTrigger {
-            return SequenceTriggerImpl(sequence)
+            return Impl(sequence)
         }
 
         /**
@@ -105,7 +109,7 @@ interface SequenceTrigger : Trigger {
 
             fun generate(currentCombo: List<SingleTrigger>) {
                 if (currentCombo.size == length) {
-                    results.add(SequenceTriggerImpl(currentCombo))
+                    results.add(Impl(currentCombo))
                     return
                 }
 
@@ -118,36 +122,38 @@ interface SequenceTrigger : Trigger {
             return results
         }
     }
-}
 
-private class SequenceTriggerImpl(
-    override val triggers: List<SingleTrigger>,
-) : SequenceTrigger {
-    override val key: Key = Key(Namespaces.TRIGGER, "combo/${triggers.map { it.id }.joinToString("")}")
+    private class Impl(
+        override val triggers: List<SingleTrigger>,
+    ) : SequenceTrigger {
+        override val key: Key = Key(Namespaces.TRIGGER, "combo/${triggers.map { it.id }.joinToString("")}")
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other)
-            return true
-        if (other !is SequenceTrigger)
-            return false
-        if (triggers.size != other.triggers.size)
-            return false
-        triggers.forEachIndexed { index, trigger ->
-            if (trigger != other.triggers[index]) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other)
+                return true
+            if (other !is SequenceTrigger)
                 return false
+            if (triggers.size != other.triggers.size)
+                return false
+            triggers.forEachIndexed { index, trigger ->
+                if (trigger != other.triggers[index]) {
+                    return false
+                }
             }
+            return true
         }
-        return true
-    }
 
-    override fun hashCode(): Int {
-        return triggers.fold(0) { hash, trigger -> 31 * hash + trigger.hashCode() }
+        override fun hashCode(): Int {
+            return triggers.fold(0) { hash, trigger -> 31 * hash + trigger.hashCode() }
+        }
     }
 }
 
-internal object TriggerSerializer : SchemaSerializer<Trigger> {
+internal object SkillTriggerSerializer : SchemaSerializer<Trigger> {
     override fun deserialize(type: Type, node: ConfigurationNode): Trigger {
-        val key = Key(node.string.orEmpty())
-        return SkillRegistry.TRIGGERS[key]
+        val raw = node.string ?: throw SerializationException(node, type, "Skill trigger cannot be an empty string")
+        val key = Key(raw)
+        val trigger = SkillRegistry.TRIGGERS.find(key) ?: throw SerializationException(node, type, "Cannot find skill trigger with key: '$key'")
+        return trigger
     }
 }
