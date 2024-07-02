@@ -45,6 +45,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             override fun unset(type: ItemComponentType<*>) = Unit
             override fun keySet(): Set<ItemComponentType<*>> = emptySet()
             override fun size(): Int = 0
+            override fun fuzzySize(): Int = 0
             override fun iterator(): Iterator<TypedItemComponent<*>> = emptySet<TypedItemComponent<*>>().iterator()
         }
 
@@ -82,6 +83,10 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
                 override fun size(): Int {
                     return keySet().size
+                }
+
+                override fun fuzzySize(): Int {
+                    return size()
                 }
             }
         }
@@ -140,7 +145,11 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             }
 
             override fun size(): Int {
-                return keySet().size
+                return this.keySet().size
+            }
+
+            override fun fuzzySize(): Int {
+                return this@ItemComponentMap.fuzzySize()
             }
         }
     }
@@ -148,6 +157,8 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
     fun keySet(): Set<ItemComponentType<*>>
 
     fun size(): Int
+
+    fun fuzzySize(): Int
 
     fun isEmpty(): Boolean {
         return this.size() == 0
@@ -217,6 +228,10 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             return map.size
         }
 
+        override fun fuzzySize(): Int {
+            return size()
+        }
+
         override fun keySet(): Set<ItemComponentType<*>> {
             return map.keys
         }
@@ -272,6 +287,10 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
         override fun size(): Int {
             return keySet().size
+        }
+
+        override fun fuzzySize(): Int {
+            return nbt.getCompoundOrNull(TAG_COMPONENTS)?.size() ?: 0
         }
 
         override fun toString(): String {
