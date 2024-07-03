@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
+import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -286,7 +286,7 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
                     .registerAll(get(named(SKILL_EXTERNALS)))
 
                     // 实体类型, 部分诅咒会用到
-                    .registerAll(get(named(ENTITY_TYPE_HOLDER_SERIALIZER)))
+                    .registerAll(get(named(ENTITY_TYPE_HOLDER_EXTERNALS)))
 
                     .build()
             }

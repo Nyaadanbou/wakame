@@ -23,33 +23,28 @@ import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import org.bukkit.inventory.meta.Damageable as CraftDamageable
 
-interface Damageable : Examinable, TooltipProvider.Single {
-
+data class Damageable(
     /**
      * 当前损耗.
      */
-    val damage: Int
+    val damage: Int,
 
     /**
      * 最大损耗.
      */
-    val maxDamage: Int
+    val maxDamage: Int,
+) : Examinable, TooltipProvider.Single {
 
-    data class Value(
-        override val damage: Int,
-        override val maxDamage: Int,
-    ) : Damageable {
-        override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
-                return LoreLine.noop()
-            }
-            return LoreLine.simple(tooltipKey, listOf(tooltipText.render()))
-        }
+    private companion object : ItemComponentConfig(ItemComponentConstants.DAMAGEABLE) {
+        val tooltipKey: TooltipKey = ItemComponentConstants.createKey { DAMAGEABLE }
+        val tooltipText: SingleTooltip = SingleTooltip()
+    }
 
-        private companion object : ItemComponentConfig(ItemComponentConstants.DAMAGEABLE) {
-            val tooltipKey: TooltipKey = ItemComponentConstants.createKey { DAMAGEABLE }
-            val tooltipText: SingleTooltip = SingleTooltip()
+    override fun provideTooltipLore(): LoreLine {
+        if (!showInTooltip) {
+            return LoreLine.noop()
         }
+        return LoreLine.simple(tooltipKey, listOf(tooltipText.render()))
     }
 
     data class Codec(
@@ -57,7 +52,7 @@ interface Damageable : Examinable, TooltipProvider.Single {
     ) : ItemComponentType<Damageable> {
         override fun read(holder: ItemComponentHolder): Damageable? {
             val itemMeta = (holder.item.itemMeta as? CraftDamageable) ?: return null
-            return Value(
+            return Damageable(
                 damage = itemMeta.damage,
                 maxDamage = itemMeta.maxDamage,
             )
@@ -96,7 +91,7 @@ interface Damageable : Examinable, TooltipProvider.Single {
             if (damage >= maxDamage) {
                 ItemComponentInjections.logger.warn("Detected possible malformed item generation: 'minecraft:damage' >= 'minecraft:max_damage'. Template: $this, Context: $context")
             }
-            return GenerationResult.of(Value(damage, maxDamage))
+            return GenerationResult.of(Damageable(damage, maxDamage))
         }
 
         companion object : ItemTemplateType<Template> {

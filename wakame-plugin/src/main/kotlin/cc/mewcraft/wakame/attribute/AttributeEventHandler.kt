@@ -1,32 +1,27 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.item.binary.PlayNekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
-import cc.mewcraft.wakame.item.binary.tryNekoStack
-import cc.mewcraft.wakame.item.hasBehavior
-import cc.mewcraft.wakame.item.schema.behavior.AttributeProvider
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 
 /**
- * Handles the update process of [AttributeMap].
- *
- * Specifically, it handles custom attributes from neko items, which
- * - should be updated in [AttributeMap] in real-time.
- * - must be applied to players as vanilla attribute modifiers.
+ * 属性系统与事件系统的交互逻辑.
  */
 class AttributeEventHandler : KoinComponent {
 
     /**
-     * Handles the attribute update when the player switches their held item.
+     * 玩家切换当前手持物品时, 执行的逻辑.
      *
      * @param player
      * @param previousSlot
      * @param newSlot
-     * @param oldItem the old item to check with, or `null` if it's empty
-     * @param newItem the new item to check with, or `null` if it's empty
+     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
      */
     fun handlePlayerItemHeld(
         player: Player,
@@ -36,18 +31,19 @@ class AttributeEventHandler : KoinComponent {
         newItem: ItemStack?,
     ) {
         updateAttributeModifiers(player, oldItem, newItem) {
-            this.slot.testItemHeldEvent(player, previousSlot, newSlot) && this.hasBehavior<AttributeProvider>()
+            it.slot.testItemHeldEvent(player, previousSlot, newSlot)
+            && it.templates.has(ItemTemplateTypes.ATTRIBUTABLE)
         }
     }
 
     /**
-     * Handles the attribute update when an ItemStack is changed in the player's inventory.
+     * 玩家背包里的物品发生变化时, 执行的逻辑.
      *
      * @param player
      * @param rawSlot
      * @param slot
-     * @param oldItem the old item to check with, or `null` if it's empty
-     * @param newItem the new item to check with, or `null` if it's empty
+     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
      */
     fun handlePlayerInventorySlotChange(
         player: Player,
@@ -57,59 +53,62 @@ class AttributeEventHandler : KoinComponent {
         newItem: ItemStack?,
     ) {
         updateAttributeModifiers(player, oldItem, newItem) {
-            this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) && this.hasBehavior<AttributeProvider>()
+            it.slot.testInventorySlotChangeEvent(player, slot, rawSlot)
+            && it.templates.has(ItemTemplateTypes.ATTRIBUTABLE)
         }
     }
 
     /**
-     * Updates attribute modifiers for the player.
+     * 根据玩家之前“激活”的物品和当前“激活”的物品所提供的属性, 更新玩家的属性.
      *
-     * @param player
-     * @param oldItem the old item to check with, or `null` if it's empty
-     * @param newItem the new item to check with, or `null` if it's empty
-     * @param predicate a function to test whether the item can provide attribute modifiers
+     * 这里的新/旧指的是玩家先前“激活”的物品和当前“激活”的物品.
+     *
+     * @param player 玩家
+     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param predicate 判断物品能否提供属性的谓词
      */
-    private inline fun updateAttributeModifiers(
+    private fun updateAttributeModifiers(
         player: Player,
         oldItem: ItemStack?,
         newItem: ItemStack?,
-        predicate: PlayNekoStackPredicate,
+        predicate: (NekoStack) -> Boolean,
     ) {
         oldItem?.tryNekoStack?.removeAttributeModifiers(player, predicate)
-        newItem?.tryNekoStack?.addAttributeModifiers(player, predicate)
+        newItem?.tryNekoStack?.attachAttributeModifiers(player, predicate)
     }
 
     /**
-     * Adds the attribute modifiers of [this] to the [player].
+     * 将该物品提供的 [AttributeModifier] 添加到 [player] 身上.
      *
-     * @param player the player we add attribute modifiers to
-     * @param predicate
-     * @receiver the ItemStack which may provide attribute modifiers
+     * @param player 要添加属性的玩家
+     * @param predicate 判断物品能否提供属性的谓词
+     * @receiver 可能提供属性的物品
      */
-    private inline fun PlayNekoStack.addAttributeModifiers(player: Player, predicate: PlayNekoStackPredicate) {
-        if (!this.predicate()) {
+    private fun NekoStack.attachAttributeModifiers(player: Player, predicate: (NekoStack) -> Boolean) {
+        if (!predicate(this)) {
             return
         }
-
         val userAttributes = player.toUser().attributeMap
-        val itemAttributes = this.cell.getAttributeModifiers()
+        val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
+        val itemAttributes = itemCells.collectAttributeModifiers(this, ignoreCurse = true) // TODO 等诅咒完成后移除 ignoreCurse
         itemAttributes.forEach { attribute, modifier -> userAttributes.getInstance(attribute)?.addModifier(modifier) }
     }
 
     /**
-     * Removes the attribute modifiers of [this] from the [player].
+     * 从 [player] 身上移除该物品提供的 [AttributeModifier].
      *
-     * @param player the player we remove attribute modifiers from
-     * @param predicate
-     * @receiver the ItemStack which may provide attribute modifiers
+     * @param player 要移除属性的玩家
+     * @param predicate 判断物品能否提供属性的谓词
+     * @receiver 可能提供属性的物品
      */
-    private inline fun PlayNekoStack.removeAttributeModifiers(player: Player, predicate: PlayNekoStackPredicate) {
-        if (!this.predicate()) {
+    private fun NekoStack.removeAttributeModifiers(player: Player, predicate: (NekoStack) -> Boolean) {
+        if (!predicate(this)) {
             return
         }
-
         val userAttributes = player.toUser().attributeMap
-        val itemAttributes = this.cell.getAttributeModifiers()
+        val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
+        val itemAttributes = itemCells.collectAttributeModifiers(this, ignoreCurse = true)  // TODO 等诅咒完成后移除 ignoreCurse
         itemAttributes.forEach { attribute, modifier -> userAttributes.getInstance(attribute)?.removeModifier(modifier) }
     }
 }

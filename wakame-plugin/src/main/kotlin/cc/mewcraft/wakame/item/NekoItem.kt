@@ -46,7 +46,7 @@ interface NekoItem : Keyed {
     val config: ConfigProvider
 
     /**
-     * The [key][Key] to the Material of this item.
+     * The [key][Key] to the ItemType of this item.
      */
     val itemType: Key
 

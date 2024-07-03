@@ -30,7 +30,7 @@ import cc.mewcraft.wakame.item.schema.meta.SSkinMeta
 import cc.mewcraft.wakame.item.schema.meta.SSkinOwnerMeta
 import cc.mewcraft.wakame.item.schema.meta.SchemaItemMeta
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.asBukkit
+import cc.mewcraft.wakame.util.toNamespacedKey
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemFlag
 import kotlin.reflect.KClass
@@ -63,7 +63,7 @@ internal class BukkitNekoItemRealizer : NekoItemRealizer {
      */
     private fun createItemStack0(blueprint: NekoItem, context: SchemaGenerationContext): PlayNekoStack {
         val nekoStack = run {
-            val key = blueprint.material.asBukkit
+            val key = blueprint.material.toNamespacedKey
             val mat = requireNotNull(Registry.MATERIAL.get(key)) { "Can't find org.bukkit.Material by `${blueprint.material}`" }
             mat.createNekoStack()
         }

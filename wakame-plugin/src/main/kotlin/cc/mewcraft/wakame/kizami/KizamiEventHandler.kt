@@ -1,13 +1,9 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.item.binary.PlayNekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
-import cc.mewcraft.wakame.item.binary.getMetaAccessor
-import cc.mewcraft.wakame.item.binary.meta.BKizamiMeta
-import cc.mewcraft.wakame.item.binary.meta.getOrEmpty
-import cc.mewcraft.wakame.item.binary.tryNekoStack
-import cc.mewcraft.wakame.item.hasBehavior
-import cc.mewcraft.wakame.item.schema.behavior.KizamiProvider
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
 import cc.mewcraft.wakame.user.User
@@ -16,55 +12,72 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
+/**
+ * 铭刻系统与事件系统的交互逻辑.
+ */
 class KizamiEventHandler {
     /**
-     * Updates kizami effects when the player switches their held item.
+     * 玩家切换手持物品时, 执行的逻辑.
      *
      * @param player
      * @param previousSlot
      * @param newSlot
-     * @param oldItem the old item to check with, or `null` if it's empty
-     * @param newItem the new item to check with, or `null` if it's empty
+     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
      */
-    fun handlePlayerItemHeld(player: Player, previousSlot: Int, newSlot: Int, oldItem: ItemStack?, newItem: ItemStack?) {
-        updateKizamiEffects(player, oldItem, newItem) {
-            this.slot.testItemHeldEvent(player, previousSlot, newSlot) &&
-            this.hasBehavior<KizamiProvider>()
+    fun handlePlayerItemHeld(
+        player: Player,
+        previousSlot: Int,
+        newSlot: Int,
+        oldItem: ItemStack?,
+        newItem: ItemStack?,
+    ) {
+        updateKizamiz(player, oldItem, newItem) {
+            it.slot.testItemHeldEvent(player, previousSlot, newSlot)
+            && it.templates.has(ItemTemplateTypes.KIZAMIABLE)
         }
     }
 
     /**
-     * Updates kizami effects when an ItemStack is changed in the player's inventory.
+     * 玩家背包内的物品发生变化时, 执行的逻辑.
      *
      * @param player
      * @param rawSlot
      * @param slot
-     * @param oldItem the old item to check with, or `null` if it's empty
-     * @param newItem the new item to check with, or `null` if it's empty
+     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
      */
-    fun handlePlayerInventorySlotChange(player: Player, rawSlot: Int, slot: Int, oldItem: ItemStack?, newItem: ItemStack?) {
-        updateKizamiEffects(player, oldItem, newItem) {
-            this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) &&
-            this.hasBehavior<KizamiProvider>()
+    fun handlePlayerInventorySlotChange(
+        player: Player,
+        rawSlot: Int,
+        slot: Int,
+        oldItem: ItemStack?,
+        newItem: ItemStack?,
+    ) {
+        updateKizamiz(player, oldItem, newItem) {
+            it.slot.testInventorySlotChangeEvent(player, slot, rawSlot)
+            && it.templates.has(ItemTemplateTypes.KIZAMIABLE)
         }
     }
 
     /**
-     * Updates the player states with the new and old ItemStacks.
+     * 根据玩家之前“激活”的物品和当前“激活”的物品所提供的属性, 更新玩家的铭刻.
      *
-     * This function essentially applies kizami effects to the player,
-     * such as updating attribute modifiers and active skills.
+     * 这里的新/旧指的是玩家先前“激活”的物品和当前“激活”的物品.
      *
-     * @param player
-     * @param oldItem
-     * @param newItem
-     * @param predicate a function to test whether the item can provide kizami
+     * 该函数本质上是更新铭刻给玩家提供的具体效果, 例如: 添加铭刻提供的属性,
+     * 移除铭刻提供的技能, 等等.
+     *
+     * @param player 玩家
+     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param predicate 判断物品能否提供属性的谓词
      */
-    private inline fun updateKizamiEffects(
+    private fun updateKizamiz(
         player: Player,
         oldItem: ItemStack?,
         newItem: ItemStack?,
-        predicate: PlayNekoStackPredicate,
+        predicate: (NekoStack) -> Boolean,
     ) {
         val oldNekoStack = oldItem?.tryNekoStack
         val newNekoStack = newItem?.tryNekoStack
@@ -95,8 +108,8 @@ class KizamiEventHandler {
         // The algorithm is simple:
         // subtract kizami amount, based on the old item,
         // then add kizami amount, based on the new item.
-        oldNekoStack?.subtractKizamiAmount(user, predicate)
-        newNekoStack?.addKizamiAmount(user, predicate)
+        oldNekoStack?.shrinkKizamiz(user, predicate)
+        newNekoStack?.growKizamiz(user, predicate)
 
         val mutableAmountMap = kizamiMap.mutableAmountMap
         val iterator = mutableAmountMap.iterator()
@@ -117,44 +130,43 @@ class KizamiEventHandler {
     }
 
     /**
-     * Add the kizami of [this] to the [user].
+     * 将该物品提供的铭刻添加到 [user] 身上.
      *
-     * @receiver the ItemStack which may provide kizami
-     * @param user the user we remove kizami from
-     * @param predicate
+     * @param user 要移除铭刻的玩家
+     * @param predicate 判断物品能否提供铭刻的谓词
+     * @receiver 可能提供铭刻的物品
      */
-    private inline fun PlayNekoStack.addKizamiAmount(user: User<Player>, predicate: PlayNekoStackPredicate) {
+    private fun NekoStack.growKizamiz(user: User<Player>, predicate: (NekoStack) -> Boolean) {
         val kizamiSet = this.getKizamiSet(predicate)
         val kizamiMap = user.kizamiMap
         kizamiMap.addOneEach(kizamiSet)
     }
 
     /**
-     * Remove the kizami of the [this] to the [user].
+     * 将该物品提供的铭刻从 [user] 身上移除.
      *
-     * @receiver the ItemStack which may provide kizami
-     * @param user the user we remove kizami from
-     * @param predicate
+     * @param user 要移除铭刻的玩家
+     * @param predicate 判断物品能否提供铭刻的谓词
+     * @receiver 可能提供铭刻的物品
      */
-    private inline fun PlayNekoStack.subtractKizamiAmount(user: User<Player>, predicate: PlayNekoStackPredicate) {
+    private fun NekoStack.shrinkKizamiz(user: User<Player>, predicate: (NekoStack) -> Boolean) {
         val kizamiSet = this.getKizamiSet(predicate)
         val kizamiMap = user.kizamiMap
         kizamiMap.subtractOneEach(kizamiSet)
     }
 
     /**
-     * Gets all kizami on [this], based on the result of [predicate].
+     * 根据谓词的结果, 返回物品上的所有铭刻.
      *
-     * @receiver the ItemStack which may provide kizami
-     * @param predicate
-     * @return all kizami on the ItemStack
+     * @param predicate 判断物品能否提供铭刻的谓词
+     * @return 物品提供的铭刻
+     * @receiver 可能提供铭刻的物品
      */
-    private inline fun PlayNekoStack.getKizamiSet(predicate: PlayNekoStackPredicate): Set<Kizami> {
-        if (!this.predicate()) {
+    private fun NekoStack.getKizamiSet(predicate: (NekoStack) -> Boolean): Set<Kizami> {
+        if (!predicate(this)) {
             return emptySet()
         }
-
-        val kizamiSet = this.getMetaAccessor<BKizamiMeta>().getOrEmpty()
-        return kizamiSet
+        val itemKizamiz = this.components.get(ItemComponentTypes.KIZAMIZ) ?: return emptySet()
+        return itemKizamiz.kizamiz
     }
 }

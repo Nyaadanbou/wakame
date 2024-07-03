@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.item.schema.NekoItem
+import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry.find
 import cc.mewcraft.wakame.util.typeTokenOf

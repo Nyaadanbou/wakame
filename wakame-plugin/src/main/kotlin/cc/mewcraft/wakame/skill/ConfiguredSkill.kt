@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
+import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.krequire
@@ -16,7 +16,7 @@ import java.util.function.Predicate
 /**
  * 构建一个 [ConfiguredSkill].
  */
-fun ConfiguredSkill(core: BinarySkillCore): ConfiguredSkill {
+fun ConfiguredSkill(core: CoreSkill): ConfiguredSkill {
     return ConfiguredSkill(core.key, core.trigger, core.variant)
 }
 

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
@@ -214,6 +215,9 @@ private class NekoStackImpl(
     override val templates: ItemTemplateMap
         get() = NekoStackSupport.getTemplates(nbt)
 
+    override val behaviors: ItemBehaviorMap
+        get() = NekoStackSupport.getBehaviors(nbt)
+
     override fun erase() {
         handle.removeWakameTag()
     }
@@ -291,6 +295,11 @@ internal object NekoStackSupport {
     fun getTemplates(wakameTag: CompoundTag): ItemTemplateMap {
         val prototype = getPrototypeOrThrow(wakameTag)
         return prototype.templates
+    }
+
+    fun getBehaviors(wakameTag: CompoundTag): ItemBehaviorMap {
+        val prototype = getPrototypeOrThrow(wakameTag)
+        return prototype.behaviors
     }
 
     fun setNamespace(wakameTag: CompoundTag, namespace: String) {

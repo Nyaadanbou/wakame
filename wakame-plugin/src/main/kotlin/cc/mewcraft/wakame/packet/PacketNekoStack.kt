@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackSupport
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.util.WAKAME_TAG_NAME
@@ -127,6 +128,9 @@ private constructor(
 
     override val templates: ItemTemplateMap
         get() = NekoStackSupport.getTemplates(nbt)
+
+    override val behaviors: ItemBehaviorMap
+        get() = NekoStackSupport.getBehaviors(nbt)
 
     override fun erase() {
         handle0.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.removeTag(WAKAME_TAG_NAME)

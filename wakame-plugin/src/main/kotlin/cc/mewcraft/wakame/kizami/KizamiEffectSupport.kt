@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.BinaryAttributeCore
-import cc.mewcraft.wakame.item.binary.cell.core.skill.BinarySkillCore
+import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttribute
+import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.user.User
@@ -65,12 +65,12 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             val namespace = key.namespace()
             when (namespace) {
                 Namespaces.SKILL -> {
-                    val skillCore = BinarySkillCore(childNode)
+                    val skillCore = CoreSkill(childNode)
                     collection += KizamiSkill(ConfiguredSkill(skillCore))
                 }
 
                 Namespaces.ATTRIBUTE -> {
-                    val attributeCore = BinaryAttributeCore(childNode)
+                    val attributeCore = CoreAttribute(childNode)
                     val attributeModifiers = attributeCore.provideAttributeModifiers(uuid)
                     collection += KizamiAttribute(attributeModifiers)
                 }

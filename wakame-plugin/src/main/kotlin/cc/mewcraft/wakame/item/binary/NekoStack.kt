@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.item.binary.meta.BinaryItemMeta
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.getAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
-import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.schema.NekoItem
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
@@ -88,11 +87,6 @@ interface NekoStack : ItemBehaviorAccessor {
      * The inventory slot where this item becomes effective.
      */
     val slot: ItemSlot
-
-    /**
-     * 存放该物品的`物品组件`的容器. 用于读取/添加/移除该物品的`物品组件`.
-     */
-    val components: ItemComponentMap
 
     /**
      * The [ItemCellAccessor] of this item.

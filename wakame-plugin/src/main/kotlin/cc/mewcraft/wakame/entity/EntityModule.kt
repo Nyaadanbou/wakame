@@ -7,7 +7,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-const val ENTITY_TYPE_HOLDER_SERIALIZER = "entity_type_holder_serializer"
+internal const val ENTITY_TYPE_HOLDER_EXTERNALS = "entity_type_holder_externals"
+internal const val ENTITY_TYPE_HOLDER_SERIALIZER = "entity_type_holder_serializer"
 
 internal fun entityModule(): Module = module {
 
@@ -25,6 +26,13 @@ internal fun entityModule(): Module = module {
         EntityKeyLookupImpl(buildList {
             registerImplementation("MythicMobs", this, ::MythicMobsEntityKeyLookup)
         })
+    }
+
+    // 外部代码使用
+    single<TypeSerializerCollection>(named(ENTITY_TYPE_HOLDER_EXTERNALS)) {
+        TypeSerializerCollection.builder()
+            .kregister(EntityTypeHolderSerializer)
+            .build()
     }
 
     single<TypeSerializerCollection>(named(ENTITY_TYPE_HOLDER_SERIALIZER)) {

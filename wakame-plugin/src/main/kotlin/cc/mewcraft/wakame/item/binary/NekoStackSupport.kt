@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessor
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaAccessorImpl
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessor
 import cc.mewcraft.wakame.item.binary.stats.ItemStatisticsAccessorImpl
-import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.schema.NekoItem
 import cc.mewcraft.wakame.item.schema.behavior.ItemBehavior
 import cc.mewcraft.wakame.registry.ItemRegistry
@@ -23,7 +22,8 @@ import kotlin.reflect.KClass
  */
 internal interface NekoStackBase : NekoStack {
     override val schema: NekoItem
-        get() = ItemRegistry.INSTANCES[key]
+        // get() = ItemRegistry.INSTANCES[key]
+        get() = throw NotImplementedError()
 
     override var key: Key
         get() = NekoStackImplementation.getKey(tags)!!
@@ -46,9 +46,6 @@ internal interface NekoStackBase : NekoStack {
 
     override val slot: ItemSlot
         get() = ItemRegistry.INSTANCES[key].slot
-
-    override val components: ItemComponentMap
-        get() = ItemComponentMap.wrapItem(itemStack)
 
     override val cell: ItemCellAccessor
         get() = ItemCellAccessorImpl(this)

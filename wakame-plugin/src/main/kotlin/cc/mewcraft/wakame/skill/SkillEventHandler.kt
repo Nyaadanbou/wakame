@@ -1,11 +1,10 @@
 package cc.mewcraft.wakame.skill
 
-import cc.mewcraft.wakame.item.binary.PlayNekoStack
-import cc.mewcraft.wakame.item.binary.PlayNekoStackPredicate
-import cc.mewcraft.wakame.item.binary.toNekoStack
-import cc.mewcraft.wakame.item.binary.tryNekoStack
-import cc.mewcraft.wakame.item.hasBehavior
-import cc.mewcraft.wakame.item.schema.behavior.Castable
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.toNekoStack
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.state.SkillStateResult
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
@@ -17,11 +16,15 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 
 /**
- * Handles skill triggers for players.
+ * 技能系统与事件系统的交互逻辑.
+ *
+ * 该类:
+ * - 根据玩家的操作, 处理玩家的技能触发逻辑
+ * - 根据玩家的物品, 从玩家身上添加/移除技能
  */
 class SkillEventHandler {
 
-    /* Handles skill triggers for players. */
+    /* 玩家的技能触发逻辑 */
 
     fun onLeftClickBlock(player: Player, itemStack: ItemStack, location: Location, event: PlayerInteractEvent) {
         onLeftClick(player, itemStack, event) { TargetAdapter.adapt(location) }
@@ -35,10 +38,7 @@ class SkillEventHandler {
         val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
         val target = targetProvider()
-        val result = user.skillState.addTrigger(
-            SingleTrigger.LEFT_CLICK,
-            SkillCastContext(CasterAdapter.adapt(player), target, nekoStack)
-        )
+        val result = user.skillState.addTrigger(SingleTrigger.LEFT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
         if (result == SkillStateResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
@@ -56,10 +56,7 @@ class SkillEventHandler {
         val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
         val target = targetProvider.invoke()
-        val result = user.skillState.addTrigger(
-            SingleTrigger.RIGHT_CLICK,
-            SkillCastContext(CasterAdapter.adapt(player), target, nekoStack)
-        )
+        val result = user.skillState.addTrigger(SingleTrigger.RIGHT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
         if (result == SkillStateResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
@@ -77,16 +74,16 @@ class SkillEventHandler {
         user.skillState.addTrigger(SingleTrigger.ATTACK, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack))
     }
 
-    /* Handles skill triggers for players. */
+    /* 玩家的技能添加/移除逻辑 */
 
     /**
-     * Updates skills when the player switches their held item.
+     * 玩家切换当前手持物品时, 执行的逻辑.
      *
      * @param player
      * @param previousSlot
      * @param newSlot
-     * @param oldItem the old item to check with, or `null` if it's empty
-     * @param newItem the new item to check with, or `null` if it's empty
+     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
      */
     fun handlePlayerItemHeld(
         player: Player,
@@ -96,20 +93,20 @@ class SkillEventHandler {
         newItem: ItemStack?,
     ) {
         updateSkills(player, oldItem, newItem) {
-            this.slot.testItemHeldEvent(player, previousSlot, newSlot) &&
-                    this.hasBehavior<Castable>()
+            it.slot.testItemHeldEvent(player, previousSlot, newSlot)
+            && it.templates.has(ItemTemplateTypes.CASTABLE)
         }
         player.toUser().skillState.clear()
     }
 
     /**
-     * Updates skills when an ItemStack is changed in the player's inventory.
+     * 玩家背包里的物品发生变化时, 执行的逻辑.
      *
      * @param player
      * @param rawSlot
      * @param slot
-     * @param oldItem the old item to check with, or `null` if it's empty
-     * @param newItem the new item to check with, or `null` if it's empty
+     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
      */
     fun handlePlayerInventorySlotChange(
         player: Player,
@@ -119,59 +116,63 @@ class SkillEventHandler {
         newItem: ItemStack?,
     ) {
         updateSkills(player, oldItem, newItem) {
-            this.slot.testInventorySlotChangeEvent(player, slot, rawSlot) && this.hasBehavior<Castable>()
+            it.slot.testInventorySlotChangeEvent(player, slot, rawSlot)
+            && it.templates.has(ItemTemplateTypes.CASTABLE)
         }
         player.toUser().skillState.clear()
     }
 
     /**
-     * Updates skills.
+     * 根据玩家之前“激活”的物品和当前“激活”的物品所提供的属性, 更新玩家的铭技能
      *
-     * @param player
-     * @param oldItem the old item to check with, or `null` if it's empty
-     * @param newItem the new item to check with, or `null` if it's empty
-     * @param predicate a function to test whether the item can provide skills
+     * 这里的新/旧指的是玩家先前“激活”的物品和当前“激活”的物品.
+     *
+     * @param player 玩家
+     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * @param predicate 判断物品能否提供技能的谓词
      */
-    private inline fun updateSkills(
+    private fun updateSkills(
         player: Player,
         oldItem: ItemStack?,
         newItem: ItemStack?,
-        predicate: PlayNekoStackPredicate,
+        predicate: (NekoStack) -> Boolean,
     ) {
         oldItem?.tryNekoStack?.removeSkills(player, predicate)
-        newItem?.tryNekoStack?.addSkills(player, predicate)
+        newItem?.tryNekoStack?.attachSkills(player, predicate)
     }
 
     /**
-     * Add the skills of [this] for the [player].
+     * 把物品提供的技能添加到 [player] 身上.
      *
-     * @param player the player we add skills to
-     * @param predicate
-     * @receiver the ItemStack which may provide skills
+     * @param player 要添加技能的玩家
+     * @param predicate 判断物品能否提供技能的谓词
+     * @receiver 可能提供技能的物品
      */
-    private inline fun PlayNekoStack.addSkills(player: Player, predicate: PlayNekoStackPredicate) {
-        if (!this.predicate()) {
+    private fun NekoStack.attachSkills(player: Player, predicate: (NekoStack) -> Boolean) {
+        if (!predicate(this)) {
             return
         }
+        val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
+        val configuredSkills = itemCells.collectConfiguredSkills(this, ignoreCurse = true, ignoreVariant = true) // TODO: no more ignorance if skill module is complete
         val skillMap = player.toUser().skillMap
-        val skills = this.cell.getSkills(neglectCurse = true, neglectVariant = true) // TODO: remove if skill module is complete
-        skillMap.addSkillsByInstance(skills)
+        skillMap.addSkillsByInstance(configuredSkills)
     }
 
     /**
-     * Remove the skills of [this] for the [player].
+     * 把物品提供的技能从 [player] 身上移除.
      *
-     * @param player the player we remove skills from
-     * @param predicate
-     * @receiver the ItemStack which may provide skills
+     * @param player 要移除技能的玩家
+     * @param predicate 判断物品能否提供技能的谓词
+     * @receiver 可能提供技能的物品
      */
-    private inline fun PlayNekoStack.removeSkills(player: Player, predicate: PlayNekoStackPredicate) {
-        if (!this.predicate()) {
+    private fun NekoStack.removeSkills(player: Player, predicate: (NekoStack) -> Boolean) {
+        if (!predicate(this)) {
             return
         }
-
+        val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
+        val configuredSkills = itemCells.collectConfiguredSkills(this, ignoreCurse = true, ignoreVariant = true) // TODO: no more ignorance if skill module is complete
         val skillMap = player.toUser().skillMap
-        val skills = this.cell.getSkills(neglectCurse = true, neglectVariant = true)  // TODO: remove if skill module is complete
-        skillMap.removeSkill(skills)
+        skillMap.removeSkill(configuredSkills)
     }
 }

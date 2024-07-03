@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import net.kyori.adventure.key.Key
@@ -92,6 +93,11 @@ interface NekoStack {
      * 存放该物品的`物品组件模板`的容器. 该对象用于读取物品模板的信息.
      */
     val templates: ItemTemplateMap
+
+    /**
+     * 存放物品的`物品行为`的容器. 该对象用于读取物品行为的信息.
+     */
+    val behaviors: ItemBehaviorMap
 
     /**
      * Removes all the custom tags from the item.

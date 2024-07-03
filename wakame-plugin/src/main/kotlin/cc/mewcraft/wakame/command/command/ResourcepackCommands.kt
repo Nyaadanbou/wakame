@@ -29,7 +29,7 @@ object ResourcepackCommands : KoinComponent, CommandFactory<CommandSender> {
                 suspendingHandler { context ->
                     val sender = context.sender()
                     val resourcePackManager = get<ResourcePackManager>()
-                    resourcePackManager.generate(reGenerate = true)
+                    resourcePackManager.generate(regenerate = true)
                         .onSuccess { sender.sendPlainMessage("Resourcepack has been generated successfully") }
                         .onFailure { sender.sendPlainMessage("Failed to generate resourcepack: $it") }
                 }

@@ -2,12 +2,8 @@ package cc.mewcraft.wakame.skill.condition
 
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.item.binary.getMetaAccessor
-import cc.mewcraft.wakame.item.binary.meta.BDurabilityMeta
-import cc.mewcraft.wakame.item.binary.tryNekoStack
-import cc.mewcraft.wakame.item.getBehaviorOrNull
-import cc.mewcraft.wakame.item.schema.behavior.Damageable
-import cc.mewcraft.wakame.item.schema.behavior.decreaseDurabilityNaturally
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 import net.kyori.adventure.text.Component
@@ -39,12 +35,9 @@ internal interface NekoDurability : SkillCondition {
 
         override fun newSession(context: SkillCastContext): SkillConditionSession {
             val nekoStack = context.optional(SkillCastContextKey.NEKO_STACK) ?: return SkillConditionSession.alwaysFailure()
-            val damageable = nekoStack.getBehaviorOrNull<Damageable>() ?: return SkillConditionSession.alwaysFailure()
-            val durabilityMeta = nekoStack.getMetaAccessor<BDurabilityMeta>()
-            if (!durabilityMeta.exists) {
-                return SkillConditionSession.alwaysFailure()
-            }
-            return SessionImpl(durability + durabilityMeta.damage() <= durabilityMeta.threshold())
+            val damageable = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return SkillConditionSession.alwaysFailure()
+            val isSuccess = (damageable.maxDamage - damageable.damage) <= durability
+            return SessionImpl(isSuccess)
         }
 
         private inner class SessionImpl(
@@ -53,11 +46,11 @@ internal interface NekoDurability : SkillCondition {
             private val notification: Notification = Notification()
 
             override fun onSuccess(context: SkillCastContext) {
+                val nekoStack = context.optional(SkillCastContextKey.ITEM_STACK)?.tryNekoStack ?: return
+                val damageable = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return
+                val newDamage = damageable.copy(damage = damageable.damage + durability)
+                nekoStack.components.set(ItemComponentTypes.DAMAGEABLE, newDamage)
                 notification.notifySuccess(context)
-
-                val nekoStack = context.optional(SkillCastContextKey.ITEM_STACK)?.tryNekoStack
-                val damageable = nekoStack?.getBehaviorOrNull<Damageable>() ?: return
-                nekoStack.decreaseDurabilityNaturally(durability)
             }
 
             override fun onFailure(context: SkillCastContext) {
