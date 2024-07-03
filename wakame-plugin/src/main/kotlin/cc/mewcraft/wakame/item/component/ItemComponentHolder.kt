@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.util.getOrPut
 import org.bukkit.inventory.ItemStack
 
 /**
- * 代表一个储存了(wakame)物品组件的容器.
+ * 代表一个储存了物品组件(wakame)的容器.
  *
  * 目前容器主要分为以下几类:
  *

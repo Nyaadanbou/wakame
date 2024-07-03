@@ -30,7 +30,7 @@ import cc.mewcraft.wakame.item.components.Unbreakable
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 
 /**
- * 物品组件的所有类型.
+ * 物品组件(wakame)的所有类型.
  */
 object ItemComponentTypes {
     /**

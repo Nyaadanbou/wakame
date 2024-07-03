@@ -17,9 +17,9 @@ import cc.mewcraft.nbt.CompoundTag
 // hmm, 要改个名字吗?
 
 /**
- * 代表了一个物品组件的类型.
+ * 代表了一个物品组件(wakame)的类型.
  *
- * 封装了一个物品组件的读取/写入/移除逻辑.
+ * 本接口封装了一个物品组件的 read/write/remove 逻辑.
  *
  * @param T 组件的快照类型, 属于 immutable class
  */
