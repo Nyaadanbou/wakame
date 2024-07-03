@@ -32,7 +32,7 @@ interface Damageable : ItemBehavior {
                 // 已达到最大损耗, 物品设置了达到最大损耗时不消失
 
                 // 回滚损耗让物品不坏掉
-                stack.components.set(ItemComponentTypes.DAMAGE, damage - 1)
+                stack.components.set(ItemComponentTypes.DAMAGE, damage - event.damage)
             }
         }
     }
