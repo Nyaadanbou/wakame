@@ -10,6 +10,9 @@ import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
+import cc.mewcraft.wakame.skill.tick.SkillTick
+import cc.mewcraft.wakame.skill.tick.TickResult
 import cc.mewcraft.wakame.util.krequire
 import io.papermc.paper.math.Position
 import net.kyori.adventure.key.Key

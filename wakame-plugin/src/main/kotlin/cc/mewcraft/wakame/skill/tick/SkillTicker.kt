@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill
+package cc.mewcraft.wakame.skill.tick
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 
@@ -11,7 +11,7 @@ object SkillTicker {
     fun tick() {
         for (child in children) {
             val result = child.tick()
-            if (result == TickResult.ALL_DONE) {
+            if (result != TickResult.CONTINUE_TICK) {
                 children.remove(child)
             }
         }

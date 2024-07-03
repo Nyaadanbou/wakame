@@ -20,6 +20,7 @@ import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.resource.ResourceListener
+import cc.mewcraft.wakame.skill.tick.SkillTickerListener
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CATEGORY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR

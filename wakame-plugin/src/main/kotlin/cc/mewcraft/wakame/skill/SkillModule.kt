@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.skill.condition.skillConditionModule
 import cc.mewcraft.wakame.skill.factory.skillFactoryModule
 import cc.mewcraft.wakame.skill.state.PlayerSkillStateShower
 import cc.mewcraft.wakame.skill.state.SkillStateShower
+import cc.mewcraft.wakame.skill.tick.skillTickModule
 import cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.skill.trigger.skillTriggerModule
 import cc.mewcraft.wakame.util.kregister
@@ -22,12 +23,12 @@ internal const val SKILL_GROUP_SERIALIZERS = "skill_group_serializers"
 internal fun skillModule(): Module = module {
     includes(
         skillFactoryModule(),
+        skillTickModule(),
         skillTriggerModule(),
-        skillConditionModule(),
+        skillConditionModule()
     )
 
     singleOf(::SkillEventHandler)
-    singleOf(::SkillTickerListener)
     singleOf(::PlayerSkillStateShower) bind SkillStateShower::class
 
     singleOf(::SkillCastManagerImpl) bind SkillCastManager::class

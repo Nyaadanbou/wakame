@@ -1,0 +1,7 @@
+# 技能模板的 type
+type: potion_drop
+
+# 下面的是此技能的属性
+effect_types:
+  - LUCK
+  - LONG_LEAPING

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill
+package cc.mewcraft.wakame.skill.tick
 
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.event.server.ServerTickStartEvent

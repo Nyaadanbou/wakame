@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.skill
 
+import cc.mewcraft.wakame.skill.tick.SkillTick
 import net.kyori.adventure.translation.Translatable
 
 interface SkillPrepareCastResult {

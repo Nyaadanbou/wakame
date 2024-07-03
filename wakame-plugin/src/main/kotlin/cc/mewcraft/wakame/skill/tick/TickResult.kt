@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill
+package cc.mewcraft.wakame.skill.tick
 
 enum class TickResult {
     /**

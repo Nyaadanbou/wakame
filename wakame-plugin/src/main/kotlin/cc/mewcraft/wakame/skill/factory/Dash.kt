@@ -6,6 +6,9 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
+import cc.mewcraft.wakame.skill.tick.SkillTick
+import cc.mewcraft.wakame.skill.tick.TickResult
 import net.kyori.adventure.key.Key
 
 interface Dash : Skill {

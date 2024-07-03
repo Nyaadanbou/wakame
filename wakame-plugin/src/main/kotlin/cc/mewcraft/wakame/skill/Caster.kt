@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.skill
 
+import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.user.User
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player

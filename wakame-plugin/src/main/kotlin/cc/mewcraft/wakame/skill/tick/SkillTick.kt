@@ -1,5 +1,7 @@
-package cc.mewcraft.wakame.skill
+package cc.mewcraft.wakame.skill.tick
 
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.TriggerConditions
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
 import cc.mewcraft.wakame.skill.state.BackswingStateInfo
@@ -30,18 +32,6 @@ interface SkillTick {
     val context: SkillCastContext
 
     /**
-     * 此次触发效果中不允许的触发器.
-     *
-     * 不允许的触发器将会在触发时被取消.
-     */
-    val forbiddenTriggers: TriggerConditions
-
-    /**
-     * 此次触发效果中的中断触发器.
-     */
-    val interruptTriggers: TriggerConditions
-
-    /**
      * 触发一 tick 的效果.
      */
     fun tick(): TickResult = TickResult.ALL_DONE
@@ -50,8 +40,6 @@ interface SkillTick {
 private data object EmptySkillTick : SkillTick {
     override val skill: Skill = Skill.empty()
     override val context: SkillCastContext = SkillCastContext.empty()
-    override val forbiddenTriggers: TriggerConditions = TriggerConditions.empty()
-    override val interruptTriggers: TriggerConditions = TriggerConditions.empty()
 }
 
 /**
@@ -61,6 +49,18 @@ abstract class PlayerSkillTick(
     final override val skill: Skill,
     final override val context: SkillCastContext
 ) : SkillTick {
+    /**
+     * 此次触发效果中不允许的触发器.
+     *
+     * 不允许的触发器将会在触发时被取消.
+     */
+    open val forbiddenTriggers: TriggerConditions = TriggerConditions.empty()
+
+    /**
+     * 此次触发效果中的中断触发器.
+     */
+    open val interruptTriggers: TriggerConditions = TriggerConditions.empty()
+
     final override fun tick(): TickResult {
         val user = context.get(SkillCastContextKey.CASTER_PLAYER).bukkitPlayer.toUser()
         val state = user.skillState

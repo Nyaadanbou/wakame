@@ -2,6 +2,8 @@ package cc.mewcraft.wakame.skill.state
 
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
+import cc.mewcraft.wakame.skill.tick.TickResult
 import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.util.RingBuffer
@@ -50,7 +52,7 @@ sealed interface SkillStateInfo {
 sealed class AbstractSkillStateInfo(
     override val type: SkillStateInfo.Type
 ) : SkillStateInfo {
-    protected inner class TriggerConditionManager(private val skillTick: SkillTick) {
+    protected inner class TriggerConditionManager(private val skillTick: PlayerSkillTick) {
 
         fun isForbidden(trigger: SingleTrigger): Boolean {
             return skillTick.forbiddenTriggers.values.get(type).contains(trigger)
@@ -109,7 +111,8 @@ class IdleStateInfo(
             return SkillStateResult.SILENT_FAILURE
 
         val skill = castableSkills.first()
-        val skillTick = skillCastManager.tryCast(skill, context).skillTick
+        val skillTick = skillCastManager.tryCast(skill, context).skillTick as? PlayerSkillTick
+            ?: return SkillStateResult.SILENT_FAILURE
 
         state.setInfo(CastPointStateInfo(state, skillTick))
         return SkillStateResult.CANCEL_EVENT
@@ -128,7 +131,7 @@ class IdleStateInfo(
  */
 class CastPointStateInfo(
     private val state: PlayerSkillState,
-    private val skillTick: SkillTick,
+    private val skillTick: PlayerSkillTick,
 ) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST_POINT) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
@@ -159,7 +162,7 @@ class CastPointStateInfo(
  */
 class CastStateInfo(
     private val state: PlayerSkillState,
-    private val skillTick: SkillTick,
+    private val skillTick: PlayerSkillTick,
 ) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
@@ -190,7 +193,7 @@ class CastStateInfo(
  */
 class BackswingStateInfo(
     private val state: PlayerSkillState,
-    private val skillTick: SkillTick,
+    private val skillTick: PlayerSkillTick,
 ) : AbstractSkillStateInfo(SkillStateInfo.Type.BACKSWING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
