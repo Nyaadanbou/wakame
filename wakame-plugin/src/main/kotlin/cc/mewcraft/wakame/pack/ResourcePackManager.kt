@@ -3,8 +3,18 @@ package cc.mewcraft.wakame.pack
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.lookup.AssetsLookup
-import cc.mewcraft.wakame.pack.generate.*
-import cc.mewcraft.wakame.pack.initializer.*
+import cc.mewcraft.wakame.pack.generate.GenerationContext
+import cc.mewcraft.wakame.pack.generate.ResourcePackCustomModelGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackExternalGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackRegistryModelGeneration
+import cc.mewcraft.wakame.pack.initializer.DirPackInitializer
+import cc.mewcraft.wakame.pack.initializer.InitializerArguments
+import cc.mewcraft.wakame.pack.initializer.NoSuchResourcePackException
+import cc.mewcraft.wakame.pack.initializer.PackInitializer
+import cc.mewcraft.wakame.pack.initializer.ZipPackInitializer
 import cc.mewcraft.wakame.pack.service.GithubService
 import cc.mewcraft.wakame.pack.service.NoneService
 import cc.mewcraft.wakame.pack.service.ResourcePackService
@@ -47,10 +57,10 @@ internal class ResourcePackManager(
      *
      * @return a result encapsulating whether the generation succeeds or not
      */
-    fun generate(reGenerate: Boolean): Result<Unit> {
+    fun generate(regenerate: Boolean): Result<Unit> {
         val resourceFile = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
         val resourcePackDir = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_DIR)
-        val initArg = InitializerArg(resourceFile, resourcePackDir, packReader)
+        val initArg = InitializerArguments(resourceFile, resourcePackDir, packReader)
 
         val resourcePackResult = runCatching {
             PackInitializer.chain(
@@ -59,34 +69,34 @@ internal class ResourcePackManager(
             ).initialize()
         }
 
-        val isNoPack = resourcePackResult.exceptionOrNull() is NoPackException
+        val isNoPack = resourcePackResult.exceptionOrNull() is NoSuchResourcePackException
 
         // Read the resource pack from the file
         // The resource pack may be empty if it's the first time to generate, so we need to handle the exception
         val resourcePack = when {
             resourcePackResult.isSuccess -> resourcePackResult.getOrThrow()
             isNoPack -> {
-                logger.info("Resource pack is empty, re-generating...")
+                logger.info("Resource pack is empty, regenerating...")
                 ResourcePack.resourcePack()
             }
 
             else -> return Result.failure(resourcePackResult.exceptionOrNull()!!)
         }
 
-        if (reGenerate || isNoPack) {
-            val generationArgs = GenerationArgs(
+        if (regenerate || isNoPack) {
+            val generationContext = GenerationContext(
                 description = config.description,
                 resourcePack = resourcePack,
-                allAssets = AssetsLookup.allAssets
+                assets = AssetsLookup.allAssets
             )
 
             // Generate the resource pack
             ResourcePackGeneration.chain(
-                ResourcePackMetaGeneration(generationArgs),
-                ResourcePackIconGeneration(generationArgs),
-                ResourcePackRegistryModelGeneration(generationArgs),
-                ResourcePackCustomModelGeneration(generationArgs),
-                ResourcePackExternalGeneration(generationArgs)
+                ResourcePackMetaGeneration(generationContext),
+                ResourcePackIconGeneration(generationContext),
+                ResourcePackRegistryModelGeneration(generationContext),
+                ResourcePackCustomModelGeneration(generationContext),
+                ResourcePackExternalGeneration(generationContext)
             ).generate().getOrElse {
                 if (it !is ResourcePackExternalGeneration.GenerationCancelledException) {
                     return Result.failure(it)
@@ -97,15 +107,20 @@ internal class ResourcePackManager(
             runCatching {
                 packWriter.writeToZipFile(resourceFile.toPath(), resourcePack)
                 packWriter.writeToDirectory(resourcePackDir, resourcePack)
-            }.getOrElse { return Result.failure(it) }
+            }.getOrElse {
+                return Result.failure(it)
+            }
             logger.info("Resource pack generated")
         }
 
         // Build the resource pack
-        val builtResourcePack = runCatching { MinecraftResourcePackWriter.minecraft().build(resourcePack) }
-            .getOrElse { return Result.failure(it) }
+        val builtResourcePack = runCatching {
+            MinecraftResourcePackWriter.minecraft().build(resourcePack)
+        }.getOrElse {
+            return Result.failure(it)
+        }
         pack = builtResourcePack
-            .also { logger.info("Resource pack built. File size: ${resourceFile.formatSize()}") }
+        logger.info("Resource pack built. File size: ${resourceFile.formatSize()}")
 
         return Result.success(Unit)
     }
@@ -139,10 +154,13 @@ internal class ResourcePackManager(
                 logger.error("Unknown resource pack service: $service", IllegalStateException("Unknown resource pack service"))
                 NoneService
             }
-        }.also { logger.info("Resource pack service: ${it::class.simpleName}") }
+        }.also {
+            logger.info("Resource pack service: ${it::class.simpleName}")
+        }
     }
 
     //<editor-fold desc="Resource pack server test">
+    @Blocking
     fun startServer() {
         if (!config.enabled) {
             logger.info("<red>Resource pack server is disabled")

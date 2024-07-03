@@ -9,13 +9,13 @@ import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import java.io.File
 import java.io.IOException
 
-data class InitializerArg(
+data class InitializerArguments(
     val zipFilePath: File,
     val resourcePackDir: File,
     val packReader: ResourcePackReader<FileTreeReader>,
 )
 
-data class NoPackException(
+data class NoSuchResourcePackException(
     override val message: String,
     override val cause: Throwable? = null,
 ) : PackException()
@@ -37,17 +37,17 @@ sealed class PackInitializer {
             if (e is IOException) {
                 throw e
             }
-            next?.init() ?: throw NoPackException("No resource pack found", e)
+            next?.init() ?: throw NoSuchResourcePackException("No resource pack found", e)
         }
     }
 
     protected var next: PackInitializer? = null
-    protected abstract val arg: InitializerArg
+    protected abstract val arg: InitializerArguments
     protected abstract fun init(): ResourcePack
 }
 
 internal class ZipPackInitializer(
-    override val arg: InitializerArg,
+    override val arg: InitializerArguments,
 ) : PackInitializer() {
     override fun init(): ResourcePack {
         val resourceFile = initFile()
@@ -76,15 +76,15 @@ internal class ZipPackInitializer(
 }
 
 internal class DirPackInitializer(
-    override val arg: InitializerArg,
+    override val arg: InitializerArguments,
 ) : PackInitializer() {
     override fun init(): ResourcePack {
         val resourcePackDir = arg.resourcePackDir
         if (!resourcePackDir.exists()) {
-            throw NoPackException("Resource pack directory does not exist")
+            throw NoSuchResourcePackException("Resource pack directory does not exist")
         }
         if (!resourcePackDir.list().isNullOrEmpty()) {
-            throw NoPackException("Resource pack directory is not empty")
+            throw NoSuchResourcePackException("Resource pack directory is not empty")
         }
         val pack = arg.packReader.readFromDirectory(resourcePackDir)
         return pack

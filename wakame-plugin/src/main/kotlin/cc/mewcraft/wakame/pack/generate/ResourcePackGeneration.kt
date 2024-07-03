@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.pack.generate
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.lookup.Assets
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
-import cc.mewcraft.wakame.lookup.material
+import cc.mewcraft.wakame.lookup.itemType
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.model.ModelRegistry
@@ -29,7 +29,7 @@ import java.io.File
 import team.unnamed.creative.model.Model as CreativeModel
 
 sealed class ResourcePackGeneration(
-    protected val args: GenerationArgs,
+    protected val args: GenerationContext,
 ) {
     companion object {
         fun chain(vararg generations: ResourcePackGeneration): ResourcePackGeneration {
@@ -44,11 +44,11 @@ sealed class ResourcePackGeneration(
     protected var next: ResourcePackGeneration? = null
 
     /**
-     * Generates the resource pack.
+     * 生成资源包.
      *
-     * The original resource pack will be changed.
+     * 原来的资源包会发生变化.
      *
-     * @return a result encapsulating whether the generation succeeds or not
+     * @return 封装了一个结果, 代表资源包生成是否成功
      */
     abstract fun generate(): Result<Unit>
 
@@ -58,78 +58,84 @@ sealed class ResourcePackGeneration(
 }
 
 internal class ResourcePackMetaGeneration(
-    args: GenerationArgs,
+    args: GenerationContext,
 ) : ResourcePackGeneration(args) {
     override fun generate(): Result<Unit> {
-        runCatching {
+        try {
             val packMeta = PackMeta.of(
                 22,
                 args.description.mini,
             )
             args.resourcePack.packMeta(packMeta)
-        }.onFailure { return Result.failure(it) }
-
+        } catch (e: Throwable) {
+            return Result.failure(e)
+        }
         return generateNext()
     }
 }
 
 internal class ResourcePackIconGeneration(
-    args: GenerationArgs,
+    args: GenerationContext,
 ) : ResourcePackGeneration(args), KoinComponent {
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
     override fun generate(): Result<Unit> {
-        runCatching { args.resourcePack.icon(Writable.file(assetsDir.resolve("logo.png"))) }
-            .onFailure { return Result.failure(it) }
-
+        try {
+            args.resourcePack.icon(Writable.file(assetsDir.resolve("logo.png")))
+        } catch (e: Throwable) {
+            return Result.failure(e)
+        }
         return generateNext()
     }
 }
 
 internal class ResourcePackExternalGeneration(
-    args: GenerationArgs,
+    args: GenerationContext,
 ) : ResourcePackGeneration(args) {
     class GenerationCancelledException : Throwable() {
         override val message: String = "Resource pack generation is cancelled"
     }
 
     override fun generate(): Result<Unit> {
-        // runCatching {
+        // try {
         //     // TODO: 异步触发事件
         //     val isCancelled = ResourcePackGenerateEvent(args).callEvent()
-        //     if (isCancelled)
+        //     if (isCancelled) {
         //         return Result.failure(GenerationCancelledException())
-        // }.onFailure { return Result.failure(it) }
-
+        //     }
+        // } catch (e: Throwable) {
+        //     return Result.failure(e)
+        // }
         return generateNext()
     }
 }
 
 internal class ResourcePackRegistryModelGeneration(
-    args: GenerationArgs,
+    args: GenerationContext,
 ) : ResourcePackGeneration(args) {
     override fun generate(): Result<Unit> {
-        runCatching {
-            ModelWriter.resource(RESOURCE_NAMESPACE)
-                .write(args.resourcePack, ModelRegistry.models())
-        }.onFailure { return Result.failure(it) }
+        try {
+            ModelWriter.resource(RESOURCE_NAMESPACE).write(args.resourcePack, ModelRegistry.models())
+        } catch (e: Throwable) {
+            return Result.failure(e)
+        }
         return generateNext()
     }
 }
 
 internal class ResourcePackCustomModelGeneration(
-    args: GenerationArgs,
+    args: GenerationContext,
 ) : ResourcePackGeneration(args), KoinComponent {
     private val logger: Logger by inject()
     private val config: ItemModelDataLookup by inject()
     private val vanillaResourcePack: VanillaResourcePack by inject()
 
     override fun generate(): Result<Unit> {
-        val assets = args.allAssets
+        val assets = args.assets
 
         try {
             for (asset in assets) {
-                val modelFiles = asset.modelFiles.takeIf { it.isNotEmpty() } ?: continue
+                val modelFiles = asset.files.takeIf { it.isNotEmpty() } ?: continue
                 for ((index, modelFile) in modelFiles.withIndex()) {
                     logger.info("Generating $index model for ${asset.key}, variant ${asset.variant}, path: $modelFile")
                     val customModelData = config.saveCustomModelData(asset.key, asset.variant)
@@ -138,8 +144,7 @@ internal class ResourcePackCustomModelGeneration(
                     //<editor-fold desc="Custom Model generation">
                     // Original asset from config
                     val modelKey = asset.modelKey(index + asset.variant)
-                    val configModelTemplate = ModelSerializer.INSTANCE
-                        .deserialize(Readable.file(modelFile), modelKey)
+                    val configModelTemplate = ModelSerializer.INSTANCE.deserialize(Readable.file(modelFile), modelKey)
 
                     val textureData = configModelTemplate.textures().layers()
                         .mapNotNull { it.key() }
@@ -155,52 +160,54 @@ internal class ResourcePackCustomModelGeneration(
                     }
                     // Replace the texture key with the custom texture key
                     val configModel = configModelTemplate.toBuilder()
-                        .textures(ModelTextures.builder().layers(customTextures.map { ModelTexture.ofKey(it.key().removeExtension()) }).build())
+                        .textures(
+                            ModelTextures.builder()
+                                .layers(customTextures.map { ModelTexture.ofKey(it.key().removeExtension()) })
+                                .build()
+                        )
                         .build()
                     //</editor-fold>
 
-                    val materialKey = asset.materialKey()
+                    val itemTypeKey = asset.itemTypeKey()
 
                     // Override for custom asset data
                     val overrideGenerator = ItemOverrideGeneratorProxy(
                         ItemModelData(
                             key = modelKey,
-                            material = asset.material,
+                            material = asset.itemType,
                             index = index,
                             customModelData = customModelData
                         )
                     )
 
                     // Override for vanilla asset
-                    val vanillaModelInCustomResourcePack = resourcePack.model(materialKey)
+                    val vanillaModelInCustomResourcePack = resourcePack.model(itemTypeKey)
 
                     val vanillaCmdOverrideBuilder = vanillaModelInCustomResourcePack?.toBuilder()
-                        ?: vanillaResourcePack.model(materialKey).toBuilder() // Generate the vanilla model if it doesn't exist
+                        ?: vanillaResourcePack.model(itemTypeKey).toBuilder() // Generate the vanilla model if it doesn't exist
 
                     val vanillaCmdOverride = vanillaCmdOverrideBuilder
                         .addOverride(overrideGenerator.generate())
                         .build()
 
                     resourcePack.model(configModel.toMinecraftFormat())
-                    resourcePack.model(vanillaCmdOverride).also {
-                        logger.info("Model for ${asset.key}, variant ${asset.variant} generated. CustomModelData: $customModelData")
-                    }
-                    customTextures.forEach {
-                        resourcePack.texture(it).also {
-                            logger.info("Texture for ${asset.key}, variant ${asset.variant} generated.")
-                        }
+                    resourcePack.model(vanillaCmdOverride)
+                    logger.info("Model for ${asset.key}, variant ${asset.variant} generated. CustomModelData: $customModelData")
+                    for (texture in customTextures) {
+                        resourcePack.texture(texture)
+                        logger.info("Texture for ${asset.key}, variant ${asset.variant} generated.")
                     }
                 }
 
                 //<editor-fold desc="Remove unused custom model data">
-                // 1. All custom model data that was used by items but the items' model path is removed
-                val unUsedModelCustomModelData = assets
-                    .filter { it.modelFiles.isEmpty() }
+                // All custom model data that was used by items but the items' model path is removed
+                val unusedModelCustomModelData = assets
+                    .filter { it.files.isEmpty() }
                     .mapNotNull { config[it.key, it.variant] }
-                val result1 = config.removeCustomModelData(*unUsedModelCustomModelData.toIntArray())
+                val removeResult = config.removeCustomModelData(*unusedModelCustomModelData.toIntArray())
 
-                if (result1) {
-                    logger.info("Removed unused custom model data from items with no model path: $unUsedModelCustomModelData")
+                if (removeResult) {
+                    logger.info("Removed unused custom model data from items with no model path: $unusedModelCustomModelData")
                 }
                 //</editor-fold>
             }
@@ -219,8 +226,8 @@ internal class ResourcePackCustomModelGeneration(
         }
     }
 
-    private fun Assets.materialKey(): Key {
-        return Key("item/${material.name.lowercase()}")
+    private fun Assets.itemTypeKey(): Key {
+        return Key("item/${itemType.name.lowercase()}")
     }
 
     private fun Key.removeExtension(): Key {

@@ -8,11 +8,11 @@ import java.io.File
 import kotlin.math.log10
 import kotlin.math.pow
 
-fun validateAssetsPathString(path: String, extension: String = ""): File? {
+internal fun validateAssetsPathString(path: String, extension: String = ""): File? {
     return runCatching { validateAssetsPathStringOrThrow(path, extension) }.getOrNull()
 }
 
-fun validateAssetsPathStringOrThrow(path: String, extension: String = ""): File {
+internal fun validateAssetsPathStringOrThrow(path: String, extension: String = ""): File {
     val assetsDir: File = NEKO_PLUGIN.get(named(PLUGIN_ASSETS_DIR))
     val file = assetsDir.resolve(path)
     if (!file.exists())
@@ -22,7 +22,7 @@ fun validateAssetsPathStringOrThrow(path: String, extension: String = ""): File 
     return file
 }
 
-fun File.formatSize(): String {
+internal fun File.formatSize(): String {
     // Do not look at this code, it's not important
     if (!this.exists()) return "File does not exist"
     val size = this.length()
