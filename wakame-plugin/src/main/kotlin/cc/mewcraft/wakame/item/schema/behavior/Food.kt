@@ -4,10 +4,9 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.item.binary.tryNekoStack
 import cc.mewcraft.wakame.item.schema.NekoItem
-import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillCastManager
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
@@ -39,17 +38,18 @@ interface Food : ItemBehavior {
         override val skills: List<Skill> by skills
 
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
-            skills.forEach { skill ->
-                val result = skillCastManager.tryCast(
-                    skill,
-                    SkillCastContext(
-                        CasterAdapter.adapt(player),
-                        TargetAdapter.adapt(player),
-                        itemStack.tryNekoStack
-                    )
-                )
-                SkillTicker.addChildren(result.skillTick)
-            }
+            // skills.forEach { skill ->
+            //     val result = skillCastManager.tryCast(
+            //         skill,
+            //         SkillCastContext(
+            //             CasterAdapter.adapt(player),
+            //             TargetAdapter.adapt(player),
+            //             itemStack.tryNekoStack
+            //         )
+            //     )
+            //     SkillTicker.addChildren(result.skillTick)
+            // }
+            // TODO to be deleted
         }
     }
 }
