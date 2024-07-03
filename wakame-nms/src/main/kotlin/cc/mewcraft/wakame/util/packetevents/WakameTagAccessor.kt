@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.util.wrap
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound
+import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter
 import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
@@ -39,7 +40,7 @@ private val CompoundTag.toPacket: NBTCompound
         val dataOutputStream = DataOutputStream(arrayOutputStream)
         NbtIo.write(this, dataOutputStream)
         val dataInputStream: DataInput = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
-        return DefaultNBTSerializer.INSTANCE.deserializeTag(dataInputStream) as NBTCompound
+        return DefaultNBTSerializer.INSTANCE.deserializeTag(NBTLimiter(), dataInputStream) as NBTCompound
     }
 
 // Convert PacketEvents compound to NMS compound

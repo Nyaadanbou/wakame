@@ -4,7 +4,6 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
-import cc.mewcraft.wakame.util.wakameTagOrNull
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import org.bukkit.inventory.ItemStack as BukkitStack
 
@@ -50,13 +49,6 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         }
 
         /**
-         * 封装一个 [BukkitStack].
-         */
-        fun wrapItem(stack: BukkitStack): ItemComponentMap {
-            return ForBukkitStack(stack)
-        }
-
-        /**
          * 组合两个 [ItemComponentMap], 一个作为默认值, 一个作为对默认值的重写.
          */
         fun composite(base: ItemComponentMap, overrides: ItemComponentMap): ItemComponentMap {
@@ -89,6 +81,32 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
                     return size()
                 }
             }
+        }
+
+        /**
+         * 封装一个 [BukkitStack].
+         *
+         * 警告: 传入的 [nbt] 必须是 [stack] 自身的一部分. 换句话说,
+         * 任何向 [nbt] 写入的数据必须直接实时反应在 [stack] 上,
+         * 就像是直接修改 [stack] 一样.
+         *
+         * @param stack 物品堆叠
+         * @param nbt 物品堆叠上的 `wakame` NBT 标签
+         */
+        fun wrapStack(
+            stack: BukkitStack,
+            nbt: CompoundTag,
+        ): ItemComponentMap {
+            return ForBukkitStack(stack, nbt)
+        }
+
+        /**
+         * 构建一个只允许读操作的 [ItemComponentMap].
+         */
+        fun unmodifiable(
+            delegate: ItemComponentMap,
+        ): ItemComponentMap {
+            return ForImmutable(delegate)
         }
 
         /**
@@ -250,11 +268,8 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
      */
     private class ForBukkitStack(
         private val stack: BukkitStack,
+        private val nbt: CompoundTag,
     ) : ItemComponentMap {
-
-        // 储存了所有组件信息的 NBT 标签
-        private val nbt: CompoundTag = stack.wakameTagOrNull ?: throw IllegalStateException()
-
         override fun <T> get(type: ItemComponentType<out T>): T? {
             val tag = nbt.getCompoundOrNull(TAG_COMPONENTS) ?: return null
             val holder = ItemComponentHolder.create(tag, stack, this)
@@ -309,6 +324,41 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
         companion object {
             private val EMPTY_COMPOUND = CompoundTag.create()
+        }
+    }
+
+    /**
+     * 用于构建只读的 [ItemComponentMap].
+     */
+    private class ForImmutable(
+        private val delegate: ItemComponentMap,
+    ) : ItemComponentMap {
+        override fun <T> get(type: ItemComponentType<out T>): T? {
+            return delegate.get(type)
+        }
+
+        override fun has(type: ItemComponentType<*>): Boolean {
+            return delegate.has(type)
+        }
+
+        override fun <T> set(type: ItemComponentType<in T>, value: T) {
+            throw UnsupportedOperationException("Write operations are not allowed in this map")
+        }
+
+        override fun unset(type: ItemComponentType<*>) {
+            throw UnsupportedOperationException("Write operations are not allowed in this map")
+        }
+
+        override fun keySet(): Set<ItemComponentType<*>> {
+            return delegate.keySet()
+        }
+
+        override fun size(): Int {
+            return delegate.size()
+        }
+
+        override fun fuzzySize(): Int {
+            return delegate.fuzzySize()
         }
     }
 }

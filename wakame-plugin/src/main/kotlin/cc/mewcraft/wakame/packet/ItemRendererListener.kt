@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.packet.PacketSupport.handleMerchantOffers
 import cc.mewcraft.wakame.packet.PacketSupport.handleSetSlot
 import cc.mewcraft.wakame.packet.PacketSupport.handleWindowItems
 import cc.mewcraft.wakame.util.bukkitPlayer
-import cc.mewcraft.wakame.util.packetevents.takeUnlessEmpty
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
@@ -48,7 +47,7 @@ private object PacketSupport : KoinComponent {
             packet.windowId,
             packet.stateId,
             packet.slot,
-            nekoStack.stack
+            nekoStack.handle0
         )
     }
 
@@ -57,7 +56,7 @@ private object PacketSupport : KoinComponent {
         val newItems = items.map { item ->
             val nekoStack = item.takeUnlessEmpty()?.tryNekoStack ?: return@map item
             updateItem(nekoStack, user)
-            nekoStack.stack
+            nekoStack.handle0
         }
 
         return WrapperPlayServerWindowItems(

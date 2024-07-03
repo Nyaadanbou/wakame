@@ -27,7 +27,7 @@ import java.util.UUID
 @get:Contract(pure = true)
 val ItemStack.isNeko: Boolean
     get() {
-        val tag = wakameTagOrNull ?: return false
+        val tag = this.wakameTagOrNull ?: return false
         return NekoStackSupport.getPrototype(tag) != null
     }
 
@@ -76,7 +76,7 @@ internal val ItemStack.trySystemStack: NekoStack?
         //     return null
         if (!this.isNeko)
             return null
-        return NekoStackImpl(this.clone()).takeIf {
+        return NekoStackImpl(this.clone() /* 副本 */).takeIf {
             it.isSystemUse()
         }
     }
@@ -90,7 +90,7 @@ internal val ItemStack.toSystemStack: NekoStack
         require(this.isNeko) {
             "The ItemStack is not from wakame"
         }
-        return NekoStackImpl(this.clone()).apply {
+        return NekoStackImpl(this.clone() /* 副本 */).apply {
             require(this.isSystemUse()) { "The ItemStack is not a system stack" }
         }
     }
@@ -107,7 +107,7 @@ internal val ItemStack.toSystemStack: NekoStack
  * Otherwise, undefined behaviors can occur.
  */
 @Contract(pure = true)
-internal fun Material.createBlankNekoStack(): NekoStack {
+internal fun Material.createNekoStack(): NekoStack {
     return NekoStackImpl(this)
 }
 
@@ -133,10 +133,6 @@ private fun NekoStack.unsetSystemUse() {
 
 @Contract(pure = true)
 internal fun NekoStack.toSystemUse(): NekoStack {
-    // if (this.isSystemUse()) {
-    //     return this
-    // }
-
     val clone: NekoStack = NekoStackImpl(this.handle.clone())
     clone.setSystemUse()
     return clone
@@ -144,10 +140,6 @@ internal fun NekoStack.toSystemUse(): NekoStack {
 
 @Contract(pure = true)
 internal fun NekoStack.toNonSystemUse(): NekoStack {
-    // if (!this.isSystemUse()) {
-    //     return this
-    // }
-
     val clone: NekoStack = NekoStackImpl(this.handle.clone())
     clone.unsetSystemUse()
     return clone
@@ -168,7 +160,7 @@ private class NekoStackImpl(
     override val nbt: CompoundTag
         get() {
             // 开发日记 2024/6/26
-            // 等到 Paper 的 delegate ItemStack 完成之后,
+            // TODO 等到 Paper 的 delegate ItemStack 完成之后,
             // 就不需要区分一个 ItemStack 是不是 NMS 了.
             // 到时候这个 if-clause 直接删掉就行.
             if (!handle.isNms) {
@@ -217,7 +209,7 @@ private class NekoStackImpl(
         get() = NekoStackSupport.getSlot(nbt)
 
     override val components: ItemComponentMap
-        get() = NekoStackSupport.getComponents(handle)
+        get() = NekoStackSupport.getComponents(handle, nbt)
 
     override val templates: ItemTemplateMap
         get() = NekoStackSupport.getTemplates(nbt)
@@ -288,8 +280,12 @@ internal object NekoStackSupport {
         return prototype
     }
 
-    fun getComponents(stack: ItemStack): ItemComponentMap {
-        return ItemComponentMap.wrapItem(stack)
+    fun getComponents(stack: ItemStack, nbt: CompoundTag): ItemComponentMap {
+        return ItemComponentMap.wrapStack(stack, nbt)
+    }
+
+    fun getImmutableComponents(stack: ItemStack, nbt: CompoundTag): ItemComponentMap {
+        return ItemComponentMap.unmodifiable(getComponents(stack, nbt))
     }
 
     fun getTemplates(wakameTag: CompoundTag): ItemTemplateMap {
