@@ -90,15 +90,15 @@ interface NekoItem : Keyed {
     val behaviors: ItemBehaviorMap
 }
 
-fun NekoItem.reify(context: GenerationContext): NekoStack {
+fun NekoItem.realize(context: GenerationContext): NekoStack {
     return NekoItemInjections.realizer.realize(this, context)
 }
 
-fun NekoItem.reify(user: User<*>): NekoStack {
+fun NekoItem.realize(user: User<*>): NekoStack {
     return NekoItemInjections.realizer.realize(this, user)
 }
 
-fun NekoItem.reify(crate: Crate): NekoStack {
+fun NekoItem.realize(crate: Crate): NekoStack {
     return NekoItemInjections.realizer.realize(this, crate)
 }
 

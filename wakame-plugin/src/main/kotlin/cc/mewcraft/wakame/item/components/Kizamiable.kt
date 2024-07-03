@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -49,6 +50,7 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
 
     data object Template : ItemTemplate<Kizamiable>, ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val componentType: ItemComponentType<Kizamiable> = ItemComponentTypes.KIZAMIABLE
 
         override fun generate(context: GenerationContext): GenerationResult<Kizamiable> {
             return GenerationResult.of(Value)

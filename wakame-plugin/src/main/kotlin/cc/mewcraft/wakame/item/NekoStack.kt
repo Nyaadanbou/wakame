@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.annotations.ApiStatus
 import java.util.UUID
 
 /**
@@ -21,6 +22,7 @@ interface NekoStack {
     /**
      * Gets the "wakame" [NBT][CompoundTag] on this item.
      */
+    @get:ApiStatus.Internal
     val nbt: CompoundTag
 
     /**
@@ -43,6 +45,7 @@ interface NekoStack {
      * NOT** modify `this` and then expect that your changes will apply to the
      * world state.
      */
+    @get:ApiStatus.Internal
     val handle: ItemStack
 
     /**
@@ -104,6 +107,7 @@ interface NekoStack {
      *
      * **Only to be used in certain special cases!**
      */
+    @ApiStatus.Internal
     fun erase()
 
 }

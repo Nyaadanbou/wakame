@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.template
 
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import net.kyori.examination.Examinable
 
 // 开发日记:
@@ -18,7 +19,14 @@ import net.kyori.examination.Examinable
 interface ItemTemplate<T> : Examinable {
 
     /**
-     * 生成一个该组件的快照.
+     * 该模板对应的物品组件.
+     */
+    val componentType: ItemComponentType<T>
+
+    /**
+     * 生成一个该模板的实例.
+     *
+     * 返回值的要求见 [GenerationResult].
      */
     fun generate(context: GenerationContext): GenerationResult<T>
 }

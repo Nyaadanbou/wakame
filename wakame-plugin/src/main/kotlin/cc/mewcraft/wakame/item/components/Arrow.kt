@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -102,6 +103,8 @@ interface Arrow : Examinable, TooltipProvider.Single {
     data class Template(
         val pierceLevel: RandomizedValue,
     ) : ItemTemplate<Arrow> {
+        override val componentType: ItemComponentType<Arrow> = ItemComponentTypes.ARROW
+
         override fun generate(context: GenerationContext): GenerationResult<Arrow> {
             val pierceLevel = pierceLevel.calculate().toStableByte()
             return GenerationResult.of(Value(pierceLevel))

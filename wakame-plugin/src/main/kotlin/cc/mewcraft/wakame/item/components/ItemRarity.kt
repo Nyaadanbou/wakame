@@ -88,6 +88,8 @@ interface ItemRarity : Examinable, TooltipProvider.Single {
             require((static != null) xor (dynamic != null)) { "(static != null) xor (dynamic != null)" }
         }
 
+        override val componentType: ItemComponentType<ItemRarity> = ItemComponentTypes.RARITY
+
         override fun generate(context: GenerationContext): GenerationResult<ItemRarity> {
             fun warnNullItemLevel() {
                 ItemComponentInjections.logger.warn("Failed to generate ${ItemComponentTypes.RARITY} for item '${context.target}' because no ${ItemComponentTypes.LEVEL} was found in the generation context")

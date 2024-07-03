@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -113,6 +114,8 @@ interface FoodProperties : Examinable {
         val effects: List<FoodEffect>,
         val skills: List<Key>,
     ) : ItemTemplate<FoodProperties> {
+        override val componentType: ItemComponentType<FoodProperties> = ItemComponentTypes.FOOD
+
         override fun generate(context: GenerationContext): GenerationResult<FoodProperties> {
             val foodProperties = Value(
                 nutrition,

@@ -28,6 +28,8 @@ internal fun itemModule(): Module = module {
         vanillaModule(),
     )
 
+    single<NekoItemRealizer> { ServerNekoItemRealizer }
+
     // NekoItem 的序列化器
     single<TypeSerializerCollection>(named(ITEM_PROTO_SERIALIZERS)) {
         TypeSerializerCollection.builder()

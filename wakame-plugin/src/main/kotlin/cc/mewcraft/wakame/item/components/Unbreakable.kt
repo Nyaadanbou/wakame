@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -61,6 +62,8 @@ interface Unbreakable : Examinable, TooltipProvider {
     data class Template(
         val showInTooltip: Boolean,
     ) : ItemTemplate<Unbreakable> {
+        override val componentType: ItemComponentType<Unbreakable> = ItemComponentTypes.UNBREAKABLE
+
         override fun generate(context: GenerationContext): GenerationResult<Unbreakable> {
             return GenerationResult.of(Value(showInTooltip))
         }

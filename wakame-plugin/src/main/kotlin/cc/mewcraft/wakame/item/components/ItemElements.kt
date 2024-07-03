@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -86,6 +87,8 @@ interface ItemElements : Examinable, TooltipProvider.Single {
     data class Template(
         val selector: Pool<Element, GenerationContext>,
     ) : ItemTemplate<ItemElements> {
+        override val componentType: ItemComponentType<ItemElements> = ItemComponentTypes.ELEMENTS
+
         override fun generate(context: GenerationContext): GenerationResult<ItemElements> {
             val selected = selector.pickBulk(context).takeUnlessEmpty() ?: return GenerationResult.empty()
             val elements = Value(ObjectArraySet(selected))

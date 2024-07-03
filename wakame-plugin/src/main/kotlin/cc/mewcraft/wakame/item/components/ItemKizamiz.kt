@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -86,6 +87,8 @@ interface ItemKizamiz : Examinable, TooltipProvider.Single {
     data class Template(
         val selector: Group<Kizami, GenerationContext>,
     ) : ItemTemplate<ItemKizamiz> {
+        override val componentType: ItemComponentType<ItemKizamiz> = ItemComponentTypes.KIZAMIZ
+
         override fun generate(context: GenerationContext): GenerationResult<ItemKizamiz> {
             val selected = selector.pickBulk(context).takeUnlessEmpty() ?: return GenerationResult.empty()
             val kizamiz = Value(ObjectArraySet(selected))

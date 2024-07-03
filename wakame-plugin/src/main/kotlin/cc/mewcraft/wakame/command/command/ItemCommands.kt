@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.parser.ItemParser
 import cc.mewcraft.wakame.command.suspendingHandler
 import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.reify
+import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.Command
@@ -40,7 +40,7 @@ object ItemCommands : CommandFactory<CommandSender> {
                     val multiplePlayerSelector = context.get<MultiplePlayerSelector>("player")
                     multiplePlayerSelector.values().forEach { player ->
                         repeat(amount) {
-                            val stack = item.reify(player.toUser())
+                            val stack = item.realize(player.toUser())
                             player.inventory.addItem(stack.handle)
                         }
                         player.sendPlainMessage("You received $amount item(s): ${item.key}")

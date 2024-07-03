@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -69,6 +70,7 @@ interface Attributable : Examinable, TooltipProvider.Single {
     // 而是存在模板里. 是否可行?
     data object Template : ItemTemplate<Attributable>, ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val componentType: ItemComponentType<Attributable> = ItemComponentTypes.ATTRIBUTABLE
 
         override fun generate(context: GenerationContext): GenerationResult<Attributable> {
             return GenerationResult.of(Value)

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -96,6 +97,8 @@ interface ItemName : Examinable {
          */
         val itemName: String?,
     ) : ItemTemplate<ItemName> {
+        override val componentType: ItemComponentType<ItemName> = ItemComponentTypes.ITEM_NAME
+
         override fun generate(context: GenerationContext): GenerationResult<ItemName> {
             if (itemName == null) {
                 return GenerationResult.empty()

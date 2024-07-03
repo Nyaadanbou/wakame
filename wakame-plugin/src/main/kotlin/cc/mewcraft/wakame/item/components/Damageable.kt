@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -85,6 +86,8 @@ data class Damageable(
          */
         val disappearWhenBroken: Boolean,
     ) : ItemTemplate<Damageable> {
+        override val componentType: ItemComponentType<Damageable> = ItemComponentTypes.DAMAGEABLE
+
         override fun generate(context: GenerationContext): GenerationResult<Damageable> {
             val damage = this.damage.calculate().toStableInt()
             val maxDamage = this.maxDamage.calculate().toStableInt()

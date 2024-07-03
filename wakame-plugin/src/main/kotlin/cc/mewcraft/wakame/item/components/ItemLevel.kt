@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -83,6 +84,8 @@ interface ItemLevel : Examinable, TooltipProvider.Single {
     data class Template(
         val level: Any,
     ) : ItemTemplate<ItemLevel> {
+        override val componentType: ItemComponentType<ItemLevel> = ItemComponentTypes.LEVEL
+
         override fun generate(context: GenerationContext): GenerationResult<ItemLevel> {
             val raw: Short = when (level) {
                 is Number -> {

@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cell.Cell
 import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
@@ -213,6 +214,8 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
     data class Template(
         val cells: Map<String, TemplateCell>,
     ) : ItemTemplate<ItemCells> {
+        override val componentType: ItemComponentType<ItemCells> = ItemComponentTypes.CELLS
+
         override fun generate(context: GenerationContext): GenerationResult<ItemCells> {
             return GenerationResult.empty()
         }

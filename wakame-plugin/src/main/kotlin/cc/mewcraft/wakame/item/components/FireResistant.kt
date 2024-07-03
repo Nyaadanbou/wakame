@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -52,6 +53,7 @@ interface FireResistant : Examinable, TooltipProvider.Single {
 
     data object Template : ItemTemplate<FireResistant>, ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val componentType: ItemComponentType<FireResistant> = ItemComponentTypes.FIRE_RESISTANT
 
         override fun generate(context: GenerationContext): GenerationResult<FireResistant> {
             return GenerationResult.of(Value)

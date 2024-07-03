@@ -257,9 +257,8 @@ internal object NekoStackSupport {
         return requireNotNull(getKey(wakameTag)) { "Can' find 'key' on item NBT" }
     }
 
-    // 如果不存在 NBT 标签, 默认返回 0
     fun getVariant(wakameTag: CompoundTag): Int {
-        return wakameTag.getInt(BaseBinaryKeys.VARIANT)
+        return wakameTag.getInt(BaseBinaryKeys.VARIANT) // 如果不存在 NBT 标签, 默认返回 0
     }
 
     fun getUuid(wakameTag: CompoundTag): UUID {

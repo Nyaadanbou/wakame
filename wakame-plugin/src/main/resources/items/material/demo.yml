@@ -4,15 +4,12 @@
 uuid: 3fd29e3b-2e51-4ccc-bc11-9fe07ed5b848
 
 # 原版物品
-material: shulker_shell
+item_type: shulker_shell
 
 # 物品名字
-name: "<red>Demo"
+item_name: "<red>Demo"
 
 # 物品描述
 lore:
   - "<gold>Demo 1"
   - "<gold>Demo 2"
-
-# 资源文件
-assets:

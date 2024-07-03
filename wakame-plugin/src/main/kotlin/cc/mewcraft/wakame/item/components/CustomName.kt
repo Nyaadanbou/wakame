@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -120,6 +121,8 @@ interface CustomName : Examinable {
          */
         val customName: String?,
     ) : ItemTemplate<CustomName> {
+        override val componentType: ItemComponentType<CustomName> = ItemComponentTypes.CUSTOM_NAME
+
         override fun generate(context: GenerationContext): GenerationResult<CustomName> {
             if (customName == null) {
                 return GenerationResult.empty()

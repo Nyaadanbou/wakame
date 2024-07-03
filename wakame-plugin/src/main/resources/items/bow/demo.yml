@@ -1,5 +1,5 @@
 uuid: c6bbbe7a-1d05-42a8-859c-c697811ad98a
-material: bow
+item_type: bow
 assets:
   - variant: 0
     path:
