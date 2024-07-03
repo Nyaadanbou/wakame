@@ -71,7 +71,7 @@ val ItemStack.toNekoStack: NekoStack
     }
 
 @get:Contract(pure = true)
-internal val ItemStack.trySystemStack: NekoStack?
+val ItemStack.trySystemStack: NekoStack?
     get() {
         // if (!this.hasItemMeta())
         //     return null
@@ -83,7 +83,7 @@ internal val ItemStack.trySystemStack: NekoStack?
     }
 
 @get:Contract(pure = true)
-internal val ItemStack.toSystemStack: NekoStack
+val ItemStack.toSystemStack: NekoStack
     get() {
         // require(this.hasItemMeta()) {
         //     "The ItemStack has no ItemMeta"
@@ -113,7 +113,7 @@ internal fun Material.createNekoStack(): NekoStack {
 }
 
 @Contract(pure = true)
-private fun NekoStack.isSystemUse(): Boolean {
+fun NekoStack.isSystemUse(): Boolean {
     return components.has(ItemComponentTypes.SYSTEM_USE)
 }
 
