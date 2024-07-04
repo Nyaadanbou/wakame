@@ -16,7 +16,6 @@ import net.kyori.adventure.util.TriState
 import net.kyori.examination.Examinable
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.Registry
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -115,7 +114,7 @@ interface Tool : Examinable {
                     val blockTypes = child.node("block_types")
                         .getList<String>(emptyList())
                         .mapNotNull(NamespacedKey::fromString)
-                        .mapNotNull(Registry.MATERIAL::get)
+                        .mapNotNull { Material.matchMaterial(it.asString()) }
                     val speed = child.node("speed").get<Float>()
                     val correctForDrops = child.node("correct_for_drops").get<TriState>(TriState.NOT_SET)
                     Rule(blockTypes, speed, correctForDrops)
