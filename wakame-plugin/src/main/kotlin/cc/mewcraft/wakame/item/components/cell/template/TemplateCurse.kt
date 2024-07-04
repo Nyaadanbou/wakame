@@ -53,10 +53,10 @@ interface TemplateCurse : Keyed, Examinable {
 internal object TemplateCurseSerializer : TypeDeserializer<TemplateCurse> {
     override fun deserialize(type: Type, node: ConfigurationNode): TemplateCurse {
         val ret = when (val key = node.node("key").krequire<Key>()) {
-            /* 技术诅咒 */
+            // 技术诅咒
             GenericKeys.EMPTY -> TemplateCurseEmpty
 
-            /* 普通诅咒 */
+            // 普通诅咒
             CurseConstants.createKey { ENTITY_KILLS } -> TemplateCurseEntityKills(node)
             CurseConstants.createKey { PEAK_DAMAGE } -> TemplateCursePeakDamage(node)
 

@@ -43,11 +43,11 @@ internal object TemplateCoreSerializer : TypeDeserializer<TemplateCore> {
     override fun deserialize(type: Type, node: ConfigurationNode): TemplateCore {
         val key = node.node("key").krequire<Key>()
         val ret = when {
-            /* 技术核心 */
+            // 技术核心
             key == GenericKeys.NOOP -> TemplateCoreNoop
             key == GenericKeys.EMPTY -> TemplateCoreEmpty
 
-            /* 普通核心 */
+            // 普通核心
             key.namespace() == Namespaces.ATTRIBUTE -> TemplateCoreAttribute(node)
             key.namespace() == Namespaces.SKILL -> TemplateCoreSkill(node)
 
