@@ -63,38 +63,39 @@ object Initializer : KoinComponent, Listener {
     private val PLUGIN: WakamePlugin by inject()
 
     /**
-     * A registry of Terminables.
+     * A registry of `Terminables`.
      */
     private val terminables: CompositeTerminable = CompositeTerminable.create()
 
     /**
      * A list containing all [Initializables][Initializable] instances for
-     * reload stage in the order by which they should be executed.
+     * `reload` stage in the order by which they should be executed.
      */
     private val toLateReload: MutableList<Initializable> = ArrayList()
 
     /**
      * A list containing all [Initializables][Initializable] instances for
-     * pre-world stage in the order by which they should be executed.
+     * `pre-world` stage in the order by which they should be executed.
      */
     private val toInitPreWorld: MutableList<Initializable> = ArrayList()
 
     /**
      * A list containing all [Initializables][Initializable] instances for
-     * post-world stage in the order by which they should be executed.
+     * `post-world` stage in the order by which they should be executed.
      */
     private val toInitPostWorld: MutableList<Initializable> = ArrayList()
 
     /**
-     * Whether the pre-world initialization has been completed successfully.
+     * Whether the `pre-world` initialization has been completed successfully.
      */
     private var preWorldInitialized = false
 
     /**
      * Returns `true` if this server is in "debug mode". The server **will**
-     * tolerate unhandled exceptions without shutting down if the debug mode is
-     * on. While the debug mode is off, the server will simply be shutdown upon
-     * unhandled exceptions to prevent further damage.
+     * tolerate unhandled exceptions if the debug mode is on. That is, logging
+     * the exceptions without shutting down the server. While the debug mode
+     * is off, the server will simply be shutdown upon unhandled exceptions
+     * to prevent further damage.
      */
     val isDebug: Boolean by MAIN_CONFIG.entry<Boolean>("debug")
 
@@ -162,7 +163,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     /**
-     * Starts the pre-world initialization process.
+     * Starts the `pre-world` initialization process.
      */
     private fun initPreWorld() {
         saveDefaultConfiguration()
@@ -207,7 +208,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     /**
-     * Starts the post-world initialization process.
+     * Starts the `post-world` initialization process.
      */
     private suspend fun initPostWorld() {
         fun forEachPostWorld(block: Initializable.() -> Unit): Result<Unit> {
@@ -283,7 +284,7 @@ object Initializer : KoinComponent, Listener {
     @EventHandler(priority = EventPriority.HIGHEST) // we want to have final say, so handle it the latest
     private fun handleLogin(e: PlayerLoginEvent) {
         if (!isDone && !isDebug) {
-            e.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("[Neko] Initialization not complete. Please wait."))
+            e.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("[萌芽] Initialization not complete. Please wait."))
         }
     }
 
@@ -291,7 +292,9 @@ object Initializer : KoinComponent, Listener {
     private suspend fun handleServerStarted(e: ServerLoadEvent) {
         if (preWorldInitialized) {
             initPostWorld()
-        } else LOGGER.warn("Skipping post world initialization")
+        } else {
+            LOGGER.warn("Skipping post world initialization")
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST) // configs are reloaded the earliest
