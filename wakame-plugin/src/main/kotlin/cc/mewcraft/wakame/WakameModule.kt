@@ -3,8 +3,6 @@ package cc.mewcraft.wakame
 import me.lucko.helper.plugin.KExtendedJavaPlugin
 import me.lucko.helper.plugin.KHelperPlugin
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.bukkit.Server
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.PluginManager
@@ -39,9 +37,4 @@ fun wakameModule(plugin: WakamePlugin): Module = module {
     single<Server> { plugin.server }
     single<File>(named(PLUGIN_DATA_DIR)) { plugin.dataFolder }
     single<File>(named(PLUGIN_ASSETS_DIR)) { get<File>(named(PLUGIN_DATA_DIR)).resolve("assets") }
-
-    ////// ComponentSerializer injections
-
-    single<MiniMessage> { MiniMessage.miniMessage() }
-    single<GsonComponentSerializer> { GsonComponentSerializer.gson() }
 }

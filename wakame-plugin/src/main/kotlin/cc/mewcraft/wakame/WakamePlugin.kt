@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame
 
+import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attack.attackModule
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.crate.crateModule
@@ -48,6 +49,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 wakameModule(this@WakamePlugin),
 
                 // sub modules (by alphabet order)
+                adventureModule(),
                 attackModule(),
                 attributeModule(),
                 crateModule(),
