@@ -22,6 +22,7 @@ internal fun rarityModule(): Module = module {
     single<TypeSerializerCollection>(named(RARITY_EXTERNALS)) {
         TypeSerializerCollection.builder()
             .kregister(RaritySerializer)
+            .kregister(LevelMappingSerializer)
             .build()
     }
 

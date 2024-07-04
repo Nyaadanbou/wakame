@@ -121,15 +121,16 @@ object ItemTemplateTypes {
      * 获取所有模板的序列化器.
      */
     internal fun collectTypeSerializers(): TypeSerializerCollection {
-        return serializerBuilder.build()
+        return ItemTemplateTypeHelper.serializerBuilder.build()
     }
 
-    private fun <T : ItemTemplate<*>> ItemTemplateType<T>.register(): ItemTemplateType<T> {
-        serializerBuilder.register(this.typeToken, this)
-        serializerBuilder.registerAll(this.childSerializers())
+    internal fun <T : ItemTemplate<*>> ItemTemplateType<T>.register(): ItemTemplateType<T> {
+        ItemTemplateTypeHelper.serializerBuilder.register(this.typeToken, this)
+        ItemTemplateTypeHelper.serializerBuilder.registerAll(this.childSerializers())
         return this
     }
+}
 
-    private val serializerBuilder: TypeSerializerCollection.Builder =
-        TypeSerializerCollection.builder()
+private object ItemTemplateTypeHelper {
+    val serializerBuilder: TypeSerializerCollection.Builder = TypeSerializerCollection.builder()
 }
