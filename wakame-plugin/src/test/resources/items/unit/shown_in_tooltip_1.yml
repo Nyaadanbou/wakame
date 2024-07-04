@@ -1,0 +1,15 @@
+# 测试: shown_in_tooltip
+
+uuid: b223861c-c8a5-40aa-acec-75030b1cedd8
+item_type: shulker_shell
+
+# 所有都为 false, 也就是所有的 ItemFlags 都应该要加上
+shown_in_tooltip:
+  trim: false
+  attribute_modifiers: false
+  can_break: false
+  dyed_color: false
+  enchantments: false
+  can_place_on: false
+  stored_enchantments: false
+  unbreakable: false

@@ -1,0 +1,5 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: wooden_sword
+
+# 标记该物品可以为玩家提供属性加成
+attributable: { }

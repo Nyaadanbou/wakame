@@ -1,0 +1,6 @@
+# 测试: hide_additional_tooltip
+
+uuid: 6cd8a6ca-cfd4-4a6f-81c8-141cffae6469
+item_type: shulker_shell
+
+hide_additional_tooltip: true

@@ -1,0 +1,51 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+kizamiz:
+  pool_a:
+    sample: 3
+    filters:
+      - type: rarity
+        rarity: rare
+    entries:
+      - value: wood
+        weight: 5
+      - value: iron
+        weight: 4
+      - value: gold
+        weight: 3
+      - value: diamond
+        weight: 2
+      - value: netherite
+        weight: 1
+  pool_b:
+    sample: 2
+    filters:
+      - type: rarity
+        rarity: uncommon
+    entries:
+      - value: wood
+        weight: 5
+      - value: iron
+        weight: 4
+      - value: gold
+        weight: 3
+      - value: diamond
+        weight: 2
+      - value: netherite
+        weight: 1
+  pool_c:
+    sample: 1
+    filters:
+      - type: rarity
+        rarity: common
+    entries:
+      - value: wood
+        weight: 5
+      - value: iron
+        weight: 4
+      - value: gold
+        weight: 3
+      - value: diamond
+        weight: 2
+      - value: netherite
+        weight: 1

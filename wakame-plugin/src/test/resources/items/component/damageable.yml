@@ -1,0 +1,6 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: netherite_pickaxe
+damageable:
+  damage: 0
+  max_damage: 512
+  disappear_when_broken: false

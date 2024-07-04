@@ -1,0 +1,8 @@
+# Use case: 一把没有攻击力的钻石剑
+
+uuid: ea4b2370-af54-4011-bdbc-1cf202a7b25b
+item_type: diamond_sword
+
+# 移除掉 `minecraft:attribute_modifiers` 组件, 这样这个物品就没有属性修饰符了, 也就没有了攻击力
+remove_components:
+  - attribute_modifiers

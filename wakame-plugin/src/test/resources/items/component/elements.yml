@@ -1,0 +1,14 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: diamond_sword
+elements:
+  sample: 2
+  filters: [ ]
+  entries:
+    - value: neutral
+      weight: 2
+    - value: water
+      weight: 1
+    - value: fire
+      weight: 1
+    - value: wind
+      weight: 1

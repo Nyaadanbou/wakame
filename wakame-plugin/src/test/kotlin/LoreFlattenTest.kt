@@ -1,3 +1,4 @@
+import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.displayModule
@@ -10,6 +11,7 @@ import cc.mewcraft.wakame.item.binary.cell.core.skill.SkillCoreInitializer
 import cc.mewcraft.wakame.item.binary.meta.ItemMetaInitializer
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
+import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -48,16 +50,22 @@ class LoreFlattenTest : KoinTest {
         @BeforeAll
         fun setup() {
             val app = startKoin {
-                modules(testEnvironment())
+                modules(
+                    testEnvironment()
+                )
 
                 // this module
-                modules(displayModule())
+                modules(
+                    displayModule()
+                )
 
                 // dependencies
                 modules(
+                    adventureModule(),
                     elementModule(),
                     itemModule(),
                     kizamiModule(),
+                    molangModule(),
                     registryModule(),
                     rarityModule(),
                     skillModule(),
@@ -81,7 +89,8 @@ class LoreFlattenTest : KoinTest {
             ItemMetaInitializer.onPostWorld()
 
             // initialize renderer config
-            app.koin.get<RendererConfig>().also { it.onPostWorld() }
+            val rendererConfig = app.koin.get<RendererConfig>()
+            rendererConfig.onPostWorld()
         }
 
         @JvmStatic
@@ -104,8 +113,8 @@ class LoreFlattenTest : KoinTest {
         buildTest(
             createMetaLine("meta:level"),
             createMetaLine("meta:rarity"),
-            createMetaLine("meta:element"),
-            createMetaLine("meta:kizami"),
+            createMetaLine("meta:elements"),
+            createMetaLine("meta:kizamiz"),
             createMetaLine("meta:lore"),
         )
     }
@@ -115,8 +124,8 @@ class LoreFlattenTest : KoinTest {
         buildTest(
             createMetaLine("meta:level"),
             createMetaLine("meta:rarity"),
-            createMetaLine("meta:element"),
-            createMetaLine("meta:kizami"),
+            createMetaLine("meta:elements"),
+            createMetaLine("meta:kizamiz"),
             createMetaLine("meta:lore"),
             createAttributeLine("attribute:attack_effect_chance.add"),
             createAttributeLine("attribute:attack_speed_level.add"),
@@ -132,8 +141,8 @@ class LoreFlattenTest : KoinTest {
         buildTest(
             createMetaLine("meta:level"),
             createMetaLine("meta:rarity"),
-            createMetaLine("meta:element"),
-            createMetaLine("meta:kizami"),
+            createMetaLine("meta:elements"),
+            createMetaLine("meta:kizamiz"),
             createMetaLine("meta:lore"),
             createAttributeLine("attribute:attack_effect_chance.add"),
             createAttributeLine("attribute:attack_speed_level.add"),

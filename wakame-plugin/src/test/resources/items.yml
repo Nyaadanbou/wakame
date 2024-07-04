@@ -1,0 +1,283 @@
+# 物品
+
+# 一般 // TODO 这个是不是应该放在词条栏的配置里?
+general:
+  empty_cell_tooltips:
+    - "<!i><gray>空词条栏"
+
+# 组件
+components:
+  arrow:
+    enabled: true
+    display_name: "弹药"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>穿透: <pierce_count>"
+
+  attributable:
+    enabled: true
+    display_name: "提供属性加成"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>提供属性加成"
+
+  cells:
+    enabled: true
+    display_name: "词条栏"
+    show_in_tooltip: true
+    tooltips: { } # 内容过多, 委托到其他配置文件进行设置
+
+  crate:
+    enabled: true
+    display_name: "盲盒"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>盲盒: <key>"
+
+  custom_model_data:
+    enabled: true
+    display_name: "自定义模型数据"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>自定义模型数据: <custom_model_data>"
+
+  custom_name:
+    enabled: true
+    display_name: "自定义名字"
+    show_in_tooltip: true
+    # 额外标签
+    # <rarity_name> 稀有度名字
+    # <rarity_style> 稀有度样式
+    tooltips:
+      single: "<!i><rarity_style><value>"
+
+  damage:
+    enabled: true
+    display_name: "耐久损耗"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>耐久损耗: <damage>"
+
+  damageable:
+    enabled: true
+    display_name: "耐久度"
+    show_in_tooltip: true
+    # 额外标签
+    # <damage> 损耗值
+    # <max_damage> 最大损耗值
+    # <percent> 剩余耐久百分比
+    tooltips:
+      single: "<!i>耐久度: <damage> / <max_damage>"
+
+  elements:
+    enabled: true
+    display_name: "元素"
+    show_in_tooltip: true
+    # 额外标签
+    # <merged> 多个元素合并后的文本
+    # <single> 单个元素
+    tooltips:
+      merged: "<!i>元素: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  fire_resistant:
+    enabled: true
+    display_name: "免疫火焰伤害"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>免疫火焰伤害"
+
+  food:
+    enabled: true
+    display_name: "作为食物"
+    show_in_tooltip: true
+    tooltips: { } # TODO 实现食物组件
+
+  item_name:
+    enabled: true
+    display_name: "物品名字"
+    show_in_tooltip: true
+    # 额外标签
+    # <rarity_name> 稀有度名字
+    # <rarity_style> 稀有度样式
+    tooltips:
+      single: "<rarity_style><rarity_name> <value>"
+
+  kizamiz:
+    enabled: true
+    display_name: "铭刻"
+    show_in_tooltip: true
+    # 额外标签
+    # <merged> 多个铭刻合并后的文本
+    # <single> 单个铭刻
+    tooltips:
+      merged: "<!i>铭刻: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  kizamiable:
+    enabled: true
+    display_name: "提供铭刻加成"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>提供铭刻加成"
+
+  level:
+    enabled: true
+    display_name: "等级"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>等级: <value>"
+
+  lore:
+    enabled: true
+    display_name: "描述"
+    show_in_tooltip: true
+    # 额外标签：
+    # <line> 描述内容
+    tooltips:
+      line: "<!i><line>"
+      header: [ ] # 空列表代表完全没有，不代表空行
+      bottom: [ ]
+
+  max_damage:
+    enabled: true
+    display_name: "最大耐久损耗"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>最大耐久损耗: <max_damage>"
+
+  rarity:
+    enabled: true
+    display_name: "稀有度"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>稀有度: <value>"
+
+  skillful:
+    enabled: true
+    display_name: "提供技能加成"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>提供技能加成"
+
+  skin:
+    enabled: true
+    display_name: "皮肤"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>皮肤: <value>"
+
+  skin_owner:
+    enabled: true
+    display_name: "皮肤所有者"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>皮肤所有者: <value>"
+
+  statistics:
+    enabled: true
+    display_name: "统计数据"
+    show_in_tooltip: true
+    tooltips: { } # 内容过多, 委托到其他配置文件进行设置
+
+  tool:
+    enabled: true
+    display_name: "工具"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>工具"
+
+  unbreakable:
+    enabled: true
+    display_name: "无耐久损耗"
+    show_in_tooltip: true
+    tooltips:
+      single: "<!i>无耐久损耗"
+
+# 元数据 // TODO 待移除
+meta:
+  custom_name:
+    enabled: true
+    display_name: "自定义名字"
+    # 额外标签
+    # <rarity_name> 稀有度名字
+    # <rarity_style> 稀有度样式
+    tooltips:
+      single: "<!i><rarity_style><value>"
+
+  durability:
+    enabled: true
+    display_name: "耐久度"
+    # 额外标签
+    # <damage> 损耗值
+    # <max_damage> 最大损耗值
+    # <percent> 剩余耐久百分比
+    tooltips:
+      single: "<!i>保养度: <damage> / <max_damage>"
+
+  element:
+    enabled: true
+    display_name: "元素"
+    # 额外标签
+    # <merged> 多个元素合并后的文本
+    # <single> 单个元素
+    tooltips:
+      merged: "<!i>元素: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  item_name:
+    enabled: true
+    display_name: "物品名字"
+    # 额外标签
+    # <rarity_name> 稀有度名字
+    # <rarity_style> 稀有度样式
+    tooltips:
+      single: "<rarity_style><rarity_name> <value>"
+
+  kizami:
+    enabled: true
+    display_name: "铭刻"
+    # 额外标签
+    # <merged> 多个铭刻合并后的文本
+    # <single> 单个铭刻
+    tooltips:
+      merged: "<!i>铭刻: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  level:
+    enabled: true
+    display_name: "等级"
+    tooltips:
+      single: "<!i>等级: <value>"
+
+  lore:
+    enabled: true
+    display_name: "描述"
+    # 额外标签：
+    # <line> 描述内容
+    tooltips:
+      line: "<!i><line>"
+      header: [ ] # 空列表代表完全没有，不代表空行
+      bottom: [ ]
+
+  rarity:
+    enabled: true
+    display_name: "稀有度"
+    tooltips:
+      single: "<!i>稀有度: <value>"
+
+  skin:
+    enabled: true
+    display_name: "皮肤"
+    tooltips:
+      single: "<!i>皮肤: <value>"
+
+  skin_owner:
+    enabled: true
+    display_name: "皮肤所有者"
+    tooltips:
+      single: "<!i>皮肤所有者: <value>"

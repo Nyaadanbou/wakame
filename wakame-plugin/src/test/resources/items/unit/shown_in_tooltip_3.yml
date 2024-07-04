@@ -1,0 +1,11 @@
+# 测试: shown_in_tooltip
+
+uuid: b223861c-c8a5-40aa-acec-75030b1cedd8
+item_type: shulker_shell
+
+# 有些不存在 (遵循物品的默认组件), 而出现的全部设置为 true
+shown_in_tooltip:
+  trim: true
+  can_break: true
+  enchantments: true
+  stored_enchantments: true

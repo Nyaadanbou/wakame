@@ -1,0 +1,18 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: emerald
+food:
+  nutrition: 0
+  saturation: 0.0
+  can_always_eat: false
+  eat_seconds: 1.6
+  effects:
+    probability: 0.9
+    effect:
+      - type: speed
+        duration: 1
+        amplifier: 0
+        ambient: false
+        particles: true
+        icon: true
+  skills:
+    - "foo:bar"

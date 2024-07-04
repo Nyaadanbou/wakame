@@ -1,0 +1,20 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 只有一个空的词条栏
+cells:
+  buckets:
+    foo:
+      core: "nothing"
+      curse: "nothing"
+  selectors:
+    core_groups:
+      nothing:
+        pool_1:
+          - key: generic:empty
+            weight: 999
+    curse_groups:
+      nothing:
+        pool_1:
+          - key: generic:empty
+            weight: 999

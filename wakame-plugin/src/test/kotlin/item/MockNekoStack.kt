@@ -1,0 +1,4 @@
+package item
+
+class MockNekoStack {
+}

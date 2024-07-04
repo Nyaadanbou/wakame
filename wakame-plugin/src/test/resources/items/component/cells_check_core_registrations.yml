@@ -1,0 +1,30 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 包含所有可能的核心
+cells:
+  buckets:
+    foo:
+      core: "all_possible_cores"
+      curse: "trivial"
+  selectors:
+    core_groups:
+      all_possible_cores:
+        pool_1:
+          - key: attribute:attack_damage
+            operation: add
+            element: neutral
+            lower: 20
+            upper: 30
+            weight: 1
+          - key: attribute:critical_strike_chance
+            value: 0.75
+            weight: 1
+          - key: attribute:critical_strike_power
+            value: 0.52
+            weight: 1
+    curse_groups:
+      trivial:
+        pool_1:
+          - key: generic:empty
+            weight: 999

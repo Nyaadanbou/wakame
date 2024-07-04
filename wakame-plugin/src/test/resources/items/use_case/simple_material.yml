@@ -1,0 +1,12 @@
+# Use case: 一个标准的, 仅作为合成材料使用的物品模板
+
+uuid: 1f203d07-12d9-4d13-b3df-c967297bd285
+item_type: shulker_shell
+
+# 材料类物品应该使用 `minecraft:item_name` 作为其物品名字
+item_name: "<aqua>毛毛帽"
+
+# 材料类物品可以加上 lore
+lore:
+  - "<!i><dark_gray>缤纷纨绔绒"
+  - "<!i><dark_gray>纯绚绵绝缎"

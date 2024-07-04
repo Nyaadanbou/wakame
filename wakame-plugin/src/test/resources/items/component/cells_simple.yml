@@ -1,0 +1,73 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 一个简单的词条栏设置
+cells:
+  buckets:
+    attack:
+      core: "base_attack"
+      # 这个词条栏没有诅咒
+    bonus:
+      core: "base_bonus"
+      curse: "curse_by_kills"
+  selectors:
+    core_groups:
+      base_attack:
+        selects:
+          pool_1:
+            # 池结构1: 拥有 filters, entries, default
+            filters:
+              - type: toss
+                chance: 0.6
+            entries:
+              - key: attribute:attack_damage
+                element: neutral
+                lower: 15
+                upper: 20
+                weight: 1
+          pool_2:
+            # 池结构2: 简单列表
+            - key: attribute:attack_damage
+              element: neutral
+              lower: 20
+              upper: 25
+              weight: 1
+      base_bonus:
+        selects:
+          pool_1:
+            filters:
+              - type: toss
+                chance: 0.6
+              - type: item_level
+                level: "[50,)"
+            entries:
+              - key: attribute:critical_strike_chance
+                value: 0.54
+                weight: 1
+              - key: attribute:critical_strike_power
+                value: 0.28
+                weight: 1
+          pool_2:
+            - key: attribute:critical_strike_chance
+              value: 0.75
+              weight: 1
+            - key: attribute:critical_strike_power
+              value: 0.52
+              weight: 1
+    curse_groups:
+      curse_by_kills:
+        selects:
+          pool_1:
+            filters:
+              - type: toss
+                chance: 0.6
+            entries:
+              - key: curse:entity_kills
+                index: demo_creeps_1
+                count: 5
+                weight: 1
+          pool_2:
+            - key: curse:entity_kills
+              index: demo_creeps_1
+              count: 3
+              weight: 1

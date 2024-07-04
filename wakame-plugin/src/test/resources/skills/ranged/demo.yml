@@ -1,0 +1,9 @@
+uuid: 5ec267e0-9bca-4312-b3f2-acbcb7326d12
+
+displays:
+  name: "药水移除2"
+  tooltips:
+    - ""
+
+# 技能模板的 type
+type: remove_potion_effect

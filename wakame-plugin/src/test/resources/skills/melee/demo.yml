@@ -1,0 +1,8 @@
+uuid: 5ff9f817-ced1-404d-955b-16c159f456fb
+
+displays:
+  name: "药水移除1"
+  tooltips:
+    - ""
+
+type: remove_potion_effect

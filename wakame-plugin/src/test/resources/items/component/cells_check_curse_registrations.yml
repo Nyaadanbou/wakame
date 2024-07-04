@@ -1,0 +1,31 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 包含所有可能的诅咒
+cells:
+  buckets:
+    foo:
+      core: "trivial"
+      curse: "all_possible_curses"
+  selectors:
+    core_groups:
+      trivial:
+        pool_1:
+          - key: generic:empty
+            weight: 999
+    curse_groups:
+      all_possible_curses:
+        pool_1:
+          # 空诅咒
+          - key: generic:empty
+            weight: 1
+          # 实体击杀
+          - key: curse:entity_kills
+            index: demo_creeps_1
+            count: 5
+            weight: 1
+          # 最高伤害
+          - key: curse:peak_damage
+            element: neutral
+            amount: 114
+            weight: 1

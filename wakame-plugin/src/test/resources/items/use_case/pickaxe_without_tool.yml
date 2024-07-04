@@ -1,0 +1,8 @@
+# Use case: 一把不是镐子的钻石镐
+
+uuid: f5d52a62-4f2a-4d22-825a-d1e6abfcf718
+item_type: diamond_sword
+
+# 移除掉 `minecraft:tool` 组件, 这样这个物品就不是工具了, 用它挖东西就跟的用木棍挖东西效果一样
+remove_components:
+  - tool

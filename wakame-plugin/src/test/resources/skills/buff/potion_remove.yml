@@ -1,0 +1,31 @@
+displays:
+  name: "药水移除"
+  tooltips:
+    - "有 <chance> 几率消耗 <dura> 点耐久以"
+    - "移除自身的速度和跳跃提升药水效果"
+
+type: remove_potion_effect
+
+effect_types:
+  - speed
+  - jump_boost
+
+conditions:
+  - type: durability
+    id: "dura"
+    durability: 10
+    success_message:
+      - type: chat
+        text: "You successfully removed the potion effect. durability: -10"
+    failure_message:
+      - type: chat
+        text: "You failed to remove the potion effect. durability: -10"
+  - type: molang
+    id: "chance"
+    eval: "math.random(0.0, 1.0) < 0.5"
+    success_message:
+      - type: chat
+        text: "You successfully removed the potion effect."
+    failure_message:
+      - type: chat
+        text: "You failed to remove the potion effect."
