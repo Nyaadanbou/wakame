@@ -7,10 +7,12 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillBase
+import cc.mewcraft.wakame.skill.TriggerConditions
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
-import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
+import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.skill.tick.TickResult
 import cc.mewcraft.wakame.util.krequire
@@ -80,7 +82,7 @@ interface Teleport : Skill {
             context: SkillCastContext,
             override val interruptTriggers: TriggerConditions,
             override val forbiddenTriggers: TriggerConditions
-        ) : PlayerSkillTick(this@DefaultImpl, context) {
+        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
                 val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT

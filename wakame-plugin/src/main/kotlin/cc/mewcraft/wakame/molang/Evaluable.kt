@@ -9,7 +9,9 @@ import java.lang.reflect.Type
 import kotlin.jvm.optionals.getOrNull
 
 /**
- * 表示一个可以被 [MochaEngine] 解析的东西
+ * 表示一个可以被 [MochaEngine] 解析的东西.
+ *
+ * @param T 该 [Evaluable] 由类型 [T] 的值组成.
  */
 fun interface Evaluable<T : Any> {
     /**

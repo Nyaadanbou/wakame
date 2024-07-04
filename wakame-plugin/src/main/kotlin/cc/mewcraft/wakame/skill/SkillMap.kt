@@ -106,7 +106,7 @@ class PlayerSkillMap(
     }
 
     override fun getSkill(trigger: Trigger): Collection<Skill> {
-        return this.skills[trigger].map { SkillRegistry.TYPES[it] }
+        return this.skills[trigger].map { SkillRegistry.INSTANCES[it] }
     }
 
     override fun removeSkill(key: Key) {

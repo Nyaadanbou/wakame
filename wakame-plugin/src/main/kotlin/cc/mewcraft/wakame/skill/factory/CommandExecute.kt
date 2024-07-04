@@ -6,9 +6,7 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
-import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
-import cc.mewcraft.wakame.skill.tick.SkillTick
-import cc.mewcraft.wakame.skill.tick.TickResult
+import cc.mewcraft.wakame.skill.tick.*
 import net.kyori.adventure.key.Key
 
 interface CommandExecute : Skill {
@@ -43,7 +41,7 @@ interface CommandExecute : Skill {
             context: SkillCastContext,
             override val interruptTriggers: TriggerConditions,
             override val forbiddenTriggers: TriggerConditions
-        ) : PlayerSkillTick(this@DefaultImpl, context) {
+        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
                 val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT

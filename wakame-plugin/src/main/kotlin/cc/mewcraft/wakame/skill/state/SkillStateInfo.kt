@@ -21,6 +21,14 @@ sealed interface SkillStateInfo {
     val type: Type
 
     /**
+     * 正在执行的 [PlayerSkillTick], 没有则返回 `null`.
+     *
+     * 同时也可以用来判断玩家是否正在施法状态.
+     */
+    val skillTick: PlayerSkillTick?
+        get() = null
+
+    /**
      * 添加一个 [SingleTrigger],
      */
     fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult
@@ -55,11 +63,11 @@ sealed class AbstractSkillStateInfo(
     protected inner class TriggerConditionManager(private val skillTick: PlayerSkillTick) {
 
         fun isForbidden(trigger: SingleTrigger): Boolean {
-            return skillTick.forbiddenTriggers.values.get(type).contains(trigger)
+            return skillTick.isForbidden(type, trigger)
         }
 
         fun interrupt(trigger: SingleTrigger) {
-            if (trigger in skillTick.interruptTriggers.values.get(type)) {
+            if (skillTick.isInterrupted(type, trigger)) {
                 interrupt()
             }
         }
@@ -131,7 +139,7 @@ class IdleStateInfo(
  */
 class CastPointStateInfo(
     private val state: PlayerSkillState,
-    private val skillTick: PlayerSkillTick,
+    override val skillTick: PlayerSkillTick,
 ) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST_POINT) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
@@ -162,7 +170,7 @@ class CastPointStateInfo(
  */
 class CastStateInfo(
     private val state: PlayerSkillState,
-    private val skillTick: PlayerSkillTick,
+    override val skillTick: PlayerSkillTick,
 ) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
@@ -193,7 +201,7 @@ class CastStateInfo(
  */
 class BackswingStateInfo(
     private val state: PlayerSkillState,
-    private val skillTick: PlayerSkillTick,
+    override val skillTick: PlayerSkillTick,
 ) : AbstractSkillStateInfo(SkillStateInfo.Type.BACKSWING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 

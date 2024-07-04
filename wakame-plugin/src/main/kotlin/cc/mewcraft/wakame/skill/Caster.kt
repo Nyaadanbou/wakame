@@ -32,7 +32,7 @@ sealed interface Caster {
         /**
          * 代表一个技能施法者.
          */
-        interface Skill : Caster {
+        interface Skill : Single {
             val skillTick: SkillTick
         }
     }

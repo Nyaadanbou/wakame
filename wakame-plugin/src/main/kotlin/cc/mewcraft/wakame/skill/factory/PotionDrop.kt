@@ -7,10 +7,7 @@ import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.context.SkillCastContextKey
-import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
-import cc.mewcraft.wakame.skill.tick.SkillTick
-import cc.mewcraft.wakame.skill.tick.SkillTicker
-import cc.mewcraft.wakame.skill.tick.TickResult
+import cc.mewcraft.wakame.skill.tick.*
 import net.kyori.adventure.key.Key
 import org.bukkit.Location
 import org.bukkit.Material
@@ -52,9 +49,17 @@ interface PotionDrop : Skill {
             context: SkillCastContext,
             override val interruptTriggers: TriggerConditions,
             override val forbiddenTriggers: TriggerConditions
-        ): PlayerSkillTick(this@DefaultImpl, context) {
+        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
             override fun tickCast(): TickResult {
-                val location = context.optional(SkillCastContextKey.TARGET_LOCATION)?.bukkitLocation ?: return TickResult.INTERRUPT
+                val location = when {
+                    context.has(SkillCastContextKey.TARGET_LOCATION) -> {
+                        context.optional(SkillCastContextKey.TARGET_LOCATION)!!.bukkitLocation
+                    }
+                    context.has(SkillCastContextKey.CASTER_ENTITY) -> {
+                        context.optional(SkillCastContextKey.CASTER_ENTITY)!!.bukkitEntity.location
+                    }
+                    else -> return TickResult.INTERRUPT
+                }
                 SkillTicker.addChildren(PotionTick(location.add(.0, 3.0, .0)))
                 return TickResult.ALL_DONE
             }

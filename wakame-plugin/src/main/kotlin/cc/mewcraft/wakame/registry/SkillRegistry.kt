@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
+import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -35,7 +36,7 @@ object SkillRegistry : Initializable, KoinComponent {
     /**
      * 技能类型. 包含了技能的唯一标识, 条件, 描述信息等.
      */
-    val TYPES: Registry<Key, Skill> = SimpleRegistry()
+    val INSTANCES: Registry<Key, Skill> = SimpleRegistry()
 
     /**
      * 技能条件.
@@ -46,6 +47,9 @@ object SkillRegistry : Initializable, KoinComponent {
      * 技能触发器.
      */
     val TRIGGERS: Registry<Key, Trigger> = SimpleRegistry()
+
+    val PATHS: Set<String>
+        get() = INSTANCES.mapTo(ObjectArraySet(1)) { it.key.value() }
 
     private val LOGGER: Logger by inject()
 
@@ -67,7 +71,7 @@ object SkillRegistry : Initializable, KoinComponent {
     }
 
     private fun loadConfiguration() {
-        TYPES.clear()
+        INSTANCES.clear()
 
         val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(SKILL_PROTO_CONFIG_DIR)
         val namespaceDirs = mutableListOf<File>()
@@ -105,7 +109,7 @@ object SkillRegistry : Initializable, KoinComponent {
                         return@forEach
                     }
 
-                    TYPES.register(skillKey, skill)
+                    INSTANCES.register(skillKey, skill)
                     LOGGER.info("Loaded configured skill: {}", skillKey)
                 }
         }

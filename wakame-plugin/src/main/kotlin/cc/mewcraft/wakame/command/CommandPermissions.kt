@@ -11,4 +11,5 @@ object CommandPermissions {
     val PLUGIN = Permission.of("wakame.command.plugin")
     val REFORGE = Permission.of("wakame.command.reforge")
     val RESOURCEPACK = Permission.of("wakame.command.resourcepack")
+    val SKILL = Permission.of("wakame.command.skill")
 }

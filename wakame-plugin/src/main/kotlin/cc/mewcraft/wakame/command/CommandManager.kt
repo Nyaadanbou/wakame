@@ -19,6 +19,7 @@ class CommandManager(
     fun init() {
         // We are in Paper, just register Brigadier
         registerBrigadier()
+        registerAsynchronousCompletions()
 
         // Change default settings
         settings().set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true)
@@ -32,5 +33,6 @@ class CommandManager(
         command(PluginCommands)
         command(ReforgeCommands)
         command(ResourcepackCommands)
+        command(SkillCommands)
     }
 }
