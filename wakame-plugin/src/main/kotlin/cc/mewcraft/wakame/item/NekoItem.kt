@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemover
 import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
+import net.kyori.examination.Examinable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.UUID
@@ -27,7 +28,7 @@ import java.util.UUID
  *
  * @see NekoStack
  */
-interface NekoItem : Keyed {
+interface NekoItem : Keyed, Examinable {
     /**
      * The [key][Key] of this item, where:
      * - [namespace][Key.namespace] is the name of the directory which contains the config file

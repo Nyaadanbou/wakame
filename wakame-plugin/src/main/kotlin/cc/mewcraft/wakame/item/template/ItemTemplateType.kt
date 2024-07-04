@@ -1,11 +1,14 @@
 package cc.mewcraft.wakame.item.template
 
 import io.leangen.geantyref.TypeToken
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
+import java.util.stream.Stream
 
 // 开发日记 2024/6/26
 // 之所以叫 Kind 不叫 Type 是因为 Type 跟 serialize 里的函数参数名冲突了.
@@ -17,11 +20,22 @@ import java.lang.reflect.Type
  * - 充当 [TypeSerializer]
  * - 作为 [ItemTemplateMap] 的索引
  */
-interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T> {
+interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T>, Examinable {
     /**
      * The [TypeToken] of [T].
      */
     val typeToken: TypeToken<T> // generic sucks :x
+
+    /**
+     * 该序列化会用到的子序列化器.
+     *
+     * 当一个序列化实现非常复杂时, 拆分实现是个好习惯.
+     *
+     * 默认返回空集合, 意为该组件没有子序列化器.
+     */
+    fun childSerializers(): TypeSerializerCollection {
+        return TypeSerializerCollection.builder().build()
+    }
 
     /**
      * 定义如何将 [node] 反序列化为 [T].
@@ -46,14 +60,7 @@ interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T> {
         return null
     }
 
-    /**
-     * 该序列化会用到的子序列化器.
-     *
-     * 当一个序列化实现非常复杂时, 拆分实现是个好习惯.
-     *
-     * 默认返回空集合, 意为该组件没有子序列化器.
-     */
-    fun childSerializers(): TypeSerializerCollection {
-        return TypeSerializerCollection.builder().build()
-    }
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("type", typeToken.type)
+    )
 }

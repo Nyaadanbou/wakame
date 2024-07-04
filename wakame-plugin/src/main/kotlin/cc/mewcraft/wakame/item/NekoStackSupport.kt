@@ -14,9 +14,11 @@ import cc.mewcraft.wakame.util.backingLore
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.isNms
 import cc.mewcraft.wakame.util.removeWakameTag
+import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.wakameTag
 import cc.mewcraft.wakame.util.wakameTagOrNull
 import net.kyori.adventure.key.Key
+import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
@@ -24,6 +26,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.util.UUID
+import java.util.stream.Stream
 
 @get:Contract(pure = true)
 val ItemStack.isNeko: Boolean
@@ -220,6 +223,19 @@ private class NekoStackImpl(
 
     override fun erase() {
         handle.removeWakameTag()
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("namespace", namespace),
+        ExaminableProperty.of("path", path),
+        ExaminableProperty.of("variant", variant),
+        ExaminableProperty.of("slot", slot),
+        ExaminableProperty.of("nbt", nbt),
+        ExaminableProperty.of("handle", handle),
+    )
+
+    override fun toString(): String {
+        return toSimpleString()
     }
 }
 

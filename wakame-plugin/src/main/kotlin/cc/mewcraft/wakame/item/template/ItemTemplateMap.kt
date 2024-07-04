@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.item.template
 
-import org.bukkit.inventory.ItemStack
+import cc.mewcraft.wakame.util.toSimpleString
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
+import java.util.stream.Stream
 
 // 开发日记: 2024/6/24 小米
 // 这个对象要作为 NekoItem 的成员
@@ -39,7 +42,7 @@ import org.bukkit.inventory.ItemStack
 /**
  * 代表多个 [ItemTemplate], 包含了一个物品的所有物品组件的模板.
  */
-interface ItemTemplateMap {
+interface ItemTemplateMap : Examinable {
 
     fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T?
 
@@ -47,10 +50,12 @@ interface ItemTemplateMap {
 
     // 开发日记 2024/6/26
     // 模板的应用讲究顺序, 而顺序是由储存在模板内部的数据结构决定的.
-    /**
-     * 将模板全部应用到物品上.
-     */
-    fun applyTo(item: ItemStack)
+    // 开发日记 2024/7/4
+    // 模板应用到物品的逻辑已经在 NekoItemRealizer 实现
+    // /**
+    //  * 将模板全部应用到物品上.
+    //  */
+    // fun applyTo(item: ItemStack)
 
     companion object {
         /**
@@ -71,7 +76,7 @@ interface ItemTemplateMap {
     /**
      * [ItemTemplate] 的 builder, 用于构建 [ItemTemplateMap].
      */
-    interface Builder {
+    interface Builder : Examinable {
         /**
          * 添加一个 [ItemTemplate]. 已存在的 [type] 会被覆盖.
          */
@@ -86,7 +91,7 @@ interface ItemTemplateMap {
     private object EmptyMap : ItemTemplateMap {
         override fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T? = null
         override fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean = false
-        override fun applyTo(item: ItemStack) = Unit
+        override fun toString(): String = toSimpleString()
     }
 
     private class MapImpl(
@@ -102,8 +107,12 @@ interface ItemTemplateMap {
             return map.containsKey(type)
         }
 
-        override fun applyTo(item: ItemStack) {
-            // FIXME 2024/6/30 这个是不是应该属于 NekoItemRealizer 的实现, 而不应该放在这里?
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("map", map)
+        )
+
+        override fun toString(): String {
+            return toSimpleString()
         }
     }
 
@@ -116,6 +125,14 @@ interface ItemTemplateMap {
 
         override fun build(): ItemTemplateMap {
             return MapImpl(map)
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("map", map)
+        )
+
+        override fun toString(): String {
+            return toSimpleString()
         }
     }
 }

@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import net.kyori.adventure.key.Key
+import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.ApiStatus
 import java.util.UUID
@@ -17,7 +19,7 @@ import java.util.UUID
  * probably will not directly work with this interface. Instead, you
  * will likely use the subclasses. Use your IDE to navigate them.
  */
-interface NekoStack {
+interface NekoStack : Keyed, Examinable {
 
     /**
      * Gets the "wakame" [NBT][CompoundTag] on this item.
@@ -65,7 +67,7 @@ interface NekoStack {
     /**
      * The namespaced identifier of this item.
      */
-    val key: Key
+    override val key: Key
 
     /**
      * The variant of this item.

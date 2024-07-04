@@ -1,17 +1,20 @@
 package cc.mewcraft.wakame.item.vanilla
 
 import cc.mewcraft.wakame.config.configurate.TypeDeserializer
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.lang.reflect.Type
+import java.util.stream.Stream
 
 /**
  * 用于移除物品的原版组件, 例如 `!minecraft:attribute_modifiers`.
  */
-interface VanillaComponentRemover {
+interface VanillaComponentRemover : Examinable {
     /**
      * 从指定的物品上移除既定的组件.
      */
@@ -30,7 +33,7 @@ interface VanillaComponentRemover {
 }
 
 /**
- * 序列化器.
+ * [VanillaComponentRemover] 的序列化器.
  */
 internal object VanillaComponentRemoverSerializer : TypeDeserializer<VanillaComponentRemover> {
     override fun deserialize(type: Type, node: ConfigurationNode): VanillaComponentRemover {
@@ -38,8 +41,8 @@ internal object VanillaComponentRemoverSerializer : TypeDeserializer<VanillaComp
         return NaiveVanillaComponentRemover(removes)
     }
 
-    override fun emptyValue(specificType: Type, options: ConfigurationOptions): VanillaComponentRemover? {
-        return EmptyVanillaComponentRemover
+    override fun emptyValue(specificType: Type, options: ConfigurationOptions): VanillaComponentRemover {
+        return EmptyVanillaComponentRemover // 配置文件缺省时使用空实例
     }
 }
 
@@ -65,6 +68,10 @@ private class NaiveVanillaComponentRemover(
     override fun applyTo(item: ItemStack) {
         item.editMeta(::applyToMeta)
     }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("removes", removes)
+    )
 
     enum class Supported {
         ATTRIBUTE_MODIFIERS {

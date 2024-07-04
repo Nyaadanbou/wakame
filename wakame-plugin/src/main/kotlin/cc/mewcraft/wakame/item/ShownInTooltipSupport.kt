@@ -133,9 +133,9 @@ internal enum class NaiveShownInTooltips(
     constructor(component: String) : this(Key(component))
 
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(ExaminableProperty.of("id", id.asString()))
-    }
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("id", id.asString())
+    )
 
     override fun toString(): String {
         return toSimpleString()
@@ -166,9 +166,9 @@ internal class NaiveShownInTooltipApplicator(
         }
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(ExaminableProperty.of("settings", settings))
-    }
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("settings", settings)
+    )
 
     override fun toString(): String {
         return toSimpleString()
