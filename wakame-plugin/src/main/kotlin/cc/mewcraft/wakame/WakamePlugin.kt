@@ -25,16 +25,20 @@ import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.test.testModule
 import cc.mewcraft.wakame.user.userModule
 import me.lucko.helper.plugin.KExtendedJavaPlugin
-import org.koin.core.component.KoinComponent
-import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.stopKoin
 
-val NEKO_PLUGIN: WakamePlugin by lazy { GlobalContext.get().get<WakamePlugin>() }
+/**
+ * 直接访问 [WakamePlugin] 的实例.
+ */
+val NEKO_PLUGIN: WakamePlugin
+    get() = WakamePluginHolder.INSTANCE
 
-class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
+class WakamePlugin : KExtendedJavaPlugin() {
 
     override suspend fun load() {
+        WakamePluginHolder.INSTANCE = this
+
         // Start Koin container
         startKoin {
 
@@ -80,4 +84,8 @@ class WakamePlugin : KoinComponent, KExtendedJavaPlugin() {
         stopKoin()
     }
 
+}
+
+private object WakamePluginHolder {
+    lateinit var INSTANCE: WakamePlugin
 }

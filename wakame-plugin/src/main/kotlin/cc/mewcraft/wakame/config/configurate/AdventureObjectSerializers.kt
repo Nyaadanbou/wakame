@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.config.configurate
 
+import cc.mewcraft.wakame.WakameInjections
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
@@ -7,6 +8,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.koin.core.component.get
 import org.koin.core.context.GlobalContext
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
@@ -20,11 +22,11 @@ internal object KeySerializer : ScalarSerializer<Key>(typeTokenOf()) {
 internal object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
         val message = obj.toString().replace("§", "")
-        return GlobalContext.get().get<MiniMessage>().deserialize(message)
+        return WakameInjections.get<MiniMessage>().deserialize(message)
     }
 
     override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any {
-        return GlobalContext.get().get<MiniMessage>().serialize(item)
+        return WakameInjections.get<MiniMessage>().serialize(item)
     }
 }
 

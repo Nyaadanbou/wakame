@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
+import cc.mewcraft.wakame.WakameInjections
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import java.io.File
@@ -13,7 +13,7 @@ internal fun validateAssetsPathString(path: String, extension: String = ""): Fil
 }
 
 internal fun validateAssetsPathStringOrThrow(path: String, extension: String = ""): File {
-    val assetsDir: File = NEKO_PLUGIN.get(named(PLUGIN_ASSETS_DIR))
+    val assetsDir: File = WakameInjections.get(named(PLUGIN_ASSETS_DIR))
     val file = assetsDir.resolve(path)
     if (!file.exists())
         throw IllegalArgumentException("No such file: $file")
