@@ -21,6 +21,7 @@ import cc.mewcraft.wakame.random2.Group
 import cc.mewcraft.wakame.random2.GroupSerializer
 import cc.mewcraft.wakame.random2.Pool
 import cc.mewcraft.wakame.random2.PoolSerializer
+import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import cc.mewcraft.wakame.util.kregister
@@ -104,6 +105,7 @@ interface ItemKizamiz : Examinable, TooltipProvider.Single {
 
             override fun childSerializers(): TypeSerializerCollection {
                 return TypeSerializerCollection.builder()
+                    .registerAll(get(named(RARITY_EXTERNALS)))
                     .registerAll(get(named(KIZAMI_EXTERNALS)))
                     .kregister(KizamiPoolSerializer)
                     .kregister(KizamiGroupSerializer)

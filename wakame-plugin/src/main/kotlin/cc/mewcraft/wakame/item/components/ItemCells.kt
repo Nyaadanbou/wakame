@@ -217,7 +217,7 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
         override val componentType: ItemComponentType<ItemCells> = ItemComponentTypes.CELLS
 
         override fun generate(context: GenerationContext): GenerationResult<ItemCells> {
-            return GenerationResult.empty()
+            TODO("完成 ItemCells 的 generate() 函数")
         }
 
         companion object : ItemTemplateType<Template>, KoinComponent {
@@ -278,6 +278,7 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
                 return TypeSerializerCollection.builder()
 
                     // 随机选择器
+                    .kregister(TemplateCellSerializer)
                     .kregister(TemplateCoreSerializer)
                     .kregister(TemplateCorePoolSerializer)
                     .kregister(TemplateCoreGroupSerializer)
