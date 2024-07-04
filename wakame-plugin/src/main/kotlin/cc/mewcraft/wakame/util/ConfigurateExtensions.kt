@@ -75,7 +75,7 @@ internal inline fun <reified T> ConfigurationNode.krequire(): T {
  */
 internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T {
     val ret = this.get(clazz) ?: throw NoSuchElementException(
-        "Missing value of type '${clazz}' at '${path().joinToString(".")}'"
+        "Can't get the value of type '${clazz}' at '${path().joinToString(".")}'"
     )
     return ret
 }
@@ -85,7 +85,7 @@ internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T {
  */
 internal fun <T> ConfigurationNode.krequire(type: KType): T {
     val ret = this.get(type) ?: throw NoSuchElementException(
-        "Missing value of type '${type}' at '${path().joinToString(".")}'"
+        "Can't get the value of type '${type}' at '${path().joinToString(".")}'"
     )
     @Suppress("UNCHECKED_CAST")
     return ret as T
