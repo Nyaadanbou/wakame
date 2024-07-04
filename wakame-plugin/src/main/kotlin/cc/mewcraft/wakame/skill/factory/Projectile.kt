@@ -182,14 +182,17 @@ interface Projectile : Skill {
                 val projectile = when (type) {
                     Type.ARROW -> Arrow(location)
                 }
-                projectile.summon()
+                if (!projectile.summon()) {
+                    return TickResult.INTERRUPT
+                }
+
                 return TickResult.ALL_DONE
             }
 
             private inner class Arrow(
                 val summonLocation: Target.Location
             ) {
-                fun summon() {
+                fun summon(): Boolean {
                     val location = summonLocation.bukkitLocation
                     val world = location.world
                     val arrowEntity: ArrowEntity =
@@ -199,8 +202,8 @@ interface Projectile : Skill {
                     // TODO: 更多的属性设置
 
                     val newTickCaster = CasterAdapter.adapt(this@Tick)
-                    val parent = context.caster
-                    context.caster = CasterAdapter.composite(newTickCaster, parent)
+                    val parent = context.caster ?: return false
+                    context.caster = CasterAdapter.composite(newTickCaster, CasterAdapter.composite(parent))
                     val startSkillTick = effects[Trigger.START]?.cast(context)
 
                     if (startSkillTick != null) {
@@ -212,12 +215,16 @@ interface Projectile : Skill {
                     registerHitEntityEvent(arrowEntity)
                     registerHitBlockEvent(arrowEntity)
                     registerDisappearEvent(arrowEntity)
+                    return true
                 }
 
                 private fun registerTickEvent(arrow: ArrowEntity) {
                     Events.subscribe(ServerTickStartEvent::class.java)
                         .expireIf { arrow.isDead }
                         .handler {
+                            val node = context.get(SkillCastContextKey.CASTER_COMPOSITE_NODE)
+                            val single = node.root().value
+                            println(single)
                             val newContext = SkillCastContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(arrow.location))
                             val tickSkillTick = effects[Trigger.TICK]?.cast(newContext) ?: return@handler
                             SkillTicker.addChildren(tickSkillTick)

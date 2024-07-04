@@ -43,7 +43,7 @@ sealed interface Caster {
     interface CompositeNode : Caster {
         val value: Single
 
-        val parent: Caster?
+        val parent: CompositeNode?
 
         val children: Set<CompositeNode>?
 
@@ -73,10 +73,13 @@ object CasterAdapter {
     }
 
     fun composite(
-        value: Caster.Single,
-        parent: Caster? = null,
+        value: Caster,
+        parent: Caster.CompositeNode? = null,
     ): Caster.CompositeNode {
-        return CompositeNodeCaster(parent, value)
+        return when (value) {
+            is Caster.Single -> CompositeNodeCaster(parent, value)
+            is Caster.CompositeNode -> value
+        }
     }
 }
 
@@ -102,7 +105,7 @@ private data class SkillCaster(
 ) : Caster.Single.Skill
 
 private class CompositeNodeCaster(
-    override var parent: Caster?,
+    override var parent: Caster.CompositeNode?,
     override val value: Caster.Single
 ) : Caster.CompositeNode {
     override var children: MutableSet<Caster.CompositeNode>? = null
