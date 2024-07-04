@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item
 
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
+import org.jetbrains.annotations.TestOnly
 
 /**
  * 代表一个可以在物品提示框中显示/隐藏的物品信息.
@@ -34,6 +35,16 @@ interface ShownInTooltip : Examinable {
  * 包含了多个 [ShownInTooltip], 可一次性全部应用到物品上.
  */
 interface ShownInTooltipApplicator : Examinable {
+
+    @TestOnly
+    fun isPresent(name: String): Boolean
+
+    @TestOnly
+    fun shouldShow(name: String): Boolean
+
+    @TestOnly
+    fun shouldHide(name: String): Boolean
+
     /**
      * 将全部设置应用到物品上.
      *

@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.item.ItemSlot.NoopItemSlot
 import net.kyori.examination.Examinable
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
+import org.jetbrains.annotations.TestOnly
 
 
 /**
@@ -43,6 +44,12 @@ interface ItemSlot : Examinable {
      */
 
     /**
+     * 栏位的名字.
+     */
+    @TestOnly
+    fun id(): String
+
+    /**
      * Checks if the given parameters is referring to the effective slot.
      *
      * This function is used to check whether the event leads to an effective slot for the item.
@@ -77,5 +84,7 @@ interface ItemSlot : Examinable {
      *
      * Used for items that provides no effects for players, such as materials.
      */
-    private data object NoopItemSlot : ItemSlot
+    private data object NoopItemSlot : ItemSlot {
+        override fun id(): String = toString()
+    }
 }

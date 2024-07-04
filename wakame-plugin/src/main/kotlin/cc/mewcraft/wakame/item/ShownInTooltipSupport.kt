@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.config.configurate.TypeDeserializer
+import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.toSimpleString
 import com.google.common.collect.ImmutableMultimap
@@ -155,6 +156,22 @@ internal enum class NaiveShownInTooltips(
 internal class NaiveShownInTooltipApplicator(
     private val settings: Map<NaiveShownInTooltip, Boolean>,
 ) : ShownInTooltipApplicator {
+    override fun isPresent(name: String): Boolean {
+        return EnumLookup.lookup<NaiveShownInTooltips>(name)
+            .map { settings.containsKey(it) }
+            .getOrDefault(false)
+    }
+
+    override fun shouldShow(name: String): Boolean {
+        val parsedEnum = EnumLookup.lookup<NaiveShownInTooltips>(name).getOrNull() ?: return false
+        return settings.getOrDefault(parsedEnum, false)
+    }
+
+    override fun shouldHide(name: String): Boolean {
+        val parsedEnum = EnumLookup.lookup<NaiveShownInTooltips>(name).getOrNull() ?: return false
+        return !settings.getOrDefault(parsedEnum, false)
+    }
+
     override fun applyTo(any: Any) {
         ensureType(any)
         for ((shownInTooltip: NaiveShownInTooltip, isShow: Boolean) in settings) {

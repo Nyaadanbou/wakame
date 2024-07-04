@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.item.vanilla
 
 import cc.mewcraft.wakame.config.configurate.TypeDeserializer
+import cc.mewcraft.wakame.util.EnumLookup
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
+import org.jetbrains.annotations.TestOnly
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -15,6 +17,12 @@ import java.util.stream.Stream
  * 用于移除物品的原版组件, 例如 `!minecraft:attribute_modifiers`.
  */
 interface VanillaComponentRemover : Examinable {
+    /**
+     * 检查组件是否在移除列表内.
+     */
+    @TestOnly
+    fun has(name: String): Boolean
+
     /**
      * 从指定的物品上移除既定的组件.
      */
@@ -28,6 +36,7 @@ interface VanillaComponentRemover : Examinable {
     }
 
     private object Empty : VanillaComponentRemover {
+        override fun has(name: String): Boolean = false
         override fun applyTo(item: ItemStack) = Unit
     }
 }
@@ -50,6 +59,7 @@ internal object VanillaComponentRemoverSerializer : TypeDeserializer<VanillaComp
  * 一个空的实现. 该实现不会对物品进行任何操作.
  */
 private object EmptyVanillaComponentRemover : VanillaComponentRemover {
+    override fun has(name: String): Boolean = false
     override fun applyTo(item: ItemStack) = Unit
 }
 
@@ -59,6 +69,10 @@ private object EmptyVanillaComponentRemover : VanillaComponentRemover {
 private class NaiveVanillaComponentRemover(
     private val removes: Set<Supported>,
 ) : VanillaComponentRemover {
+    override fun has(name: String): Boolean {
+        return removes.any { EnumLookup.lookup<Supported>(name).getOrNull() != null }
+    }
+
     private fun applyToMeta(meta: ItemMeta) {
         for (supported in removes) {
             supported.applyToMeta(meta)

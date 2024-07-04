@@ -77,6 +77,10 @@ private enum class VanillaItemSlot : ItemSlot {
         }
     },
     ;
+
+    override fun id(): String {
+        return name
+    }
 }
 
 /**
@@ -87,6 +91,10 @@ internal data object AccessoryItemSlot {
     // where we can easily introduce new ItemSlot.
 
     val SLOT_1: ItemSlot = object : ItemSlot {
+        override fun id(): String {
+            return "SLOT_1"
+        }
+
         override fun testInventorySlotChangeEvent(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 9
         }
@@ -101,6 +109,10 @@ internal data object AccessoryItemSlot {
     }
 
     val SLOT_2: ItemSlot = object : ItemSlot {
+        override fun id(): String {
+            return "SLOT_2"
+        }
+
         override fun testInventorySlotChangeEvent(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 10
         }
@@ -115,6 +127,10 @@ internal data object AccessoryItemSlot {
     }
 
     val SLOT_3: ItemSlot = object : ItemSlot {
+        override fun id(): String {
+            return "SLOT_3"
+        }
+
         override fun testInventorySlotChangeEvent(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 11
         }
@@ -129,6 +145,10 @@ internal data object AccessoryItemSlot {
     }
 
     val SLOT_4: ItemSlot = object : ItemSlot {
+        override fun id(): String {
+            return "SLOT_4"
+        }
+
         override fun testInventorySlotChangeEvent(player: Player, slot: Int, rawSlot: Int): Boolean {
             return rawSlot == 12
         }
