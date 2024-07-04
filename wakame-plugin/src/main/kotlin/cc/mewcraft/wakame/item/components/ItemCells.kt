@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cell.Cell
 import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
+import cc.mewcraft.wakame.item.components.cell.reforge.Reforge
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCell
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCellSerializer
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCoreGroupSerializer
@@ -22,6 +23,8 @@ import cc.mewcraft.wakame.item.components.cell.template.TemplateCoreSerializer
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCurseGroupSerializer
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCursePoolSerializer
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCurseSerializer
+import cc.mewcraft.wakame.item.components.cell.template.cores.empty.TemplateCoreEmpty
+import cc.mewcraft.wakame.item.components.cell.template.curses.TemplateCurseEmpty
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -217,7 +220,28 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
         override val componentType: ItemComponentType<ItemCells> = ItemComponentTypes.CELLS
 
         override fun generate(context: GenerationContext): GenerationResult<ItemCells> {
-            TODO("完成 ItemCells 的 generate() 函数")
+            val cells = HashMap<String, Cell>()
+            for ((id, templateCell) in this.cells) {
+                // make a core
+                val core = run {
+                    val templateCore = templateCell.core.pickSingle(context) ?: TemplateCoreEmpty
+                    templateCore.generate(context)
+                }
+
+                // make a curse
+                val curse = run {
+                    val templateCurse = templateCell.curse.pickSingle(context) ?: TemplateCurseEmpty
+                    templateCurse.generate(context)
+                }
+
+                // make a reforge
+                val reforge = Reforge.empty()
+
+                // collect all and return
+                val cell = Cell.of(id, core, curse, reforge)
+                cells.put(id, cell)
+            }
+            return GenerationResult.of(Value(cells))
         }
 
         companion object : ItemTemplateType<Template>, KoinComponent {

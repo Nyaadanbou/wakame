@@ -37,6 +37,13 @@ interface Reforge : TagLike {
 
     companion object {
         /**
+         * 返回一个空的 [Reforge].
+         */
+        fun empty(): Reforge {
+            return Empty
+        }
+
+        /**
          * 从 NBT 创建一个 [Reforge].
          */
         fun of(nbt: CompoundTag): Reforge {
