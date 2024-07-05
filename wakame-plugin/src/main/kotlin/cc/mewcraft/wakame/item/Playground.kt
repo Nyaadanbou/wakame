@@ -35,10 +35,9 @@ fun stack(stack: NekoStack) {
     val level: Short = itemLevel.level
 
     val itemCells: ItemCells = stack.components.get(ItemComponentTypes.CELLS) ?: return
-    val newItemCells: ItemCells = itemCells.modify("base_attack") { cell: Cell? ->
-        cell ?: return@modify null
+    val newItemCells: ItemCells = itemCells.modify("base_attack") { cell: Cell ->
         val coreType: CoreType<*> = cell.getCore().type
-        val coreSkill: CoreSkill = cell.getTypedCore(CoreTypes.SKILL) ?: return@modify null
+        val coreSkill: CoreSkill = cell.getTypedCore(CoreTypes.SKILL) ?: return@modify cell
         val newCoreSkill = coreSkill.copy(variant = TriggerVariant.of(3))
         cell.setCore(newCoreSkill)
     }
