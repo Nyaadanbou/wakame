@@ -16,17 +16,10 @@ sealed interface SkillContext {
         fun empty(): SkillContext = EmptySkillContext
     }
 
-    fun <T : Any> set(key: SkillContextKey<T>, value: T)
-    fun <T : Any> optional(key: SkillContextKey<T>): T?
-    fun <T : Any> get(key: SkillContextKey<T>): T = optional(key) ?: throw IllegalArgumentException("No value for key: `$key`")
-    fun <T : Any> has(key: SkillContextKey<T>): Boolean
-
-    // FIXME: 2024.7.5 删除这些属性
-    var caster: Caster?
-    var target: Target?
-    var nekoStack: NekoStack?
-    var itemStack: ItemStack?
-    var mochaEngine: MochaEngine<*>?
+    operator fun <T : Any> set(key: SkillContextKey<T>, value: T)
+    operator fun <T : Any> get(key: SkillContextKey<T>): T?
+    fun <T : Any> getOrThrow(key: SkillContextKey<T>): T = get(key) ?: throw IllegalArgumentException("Key '$key' not found in skill context")
+    operator fun <T : Any> contains(key: SkillContextKey<T>): Boolean
 }
 
 fun SkillContext(caster: Caster, target: Target? = null, nekoStack: NekoStack? = null): SkillContext {
@@ -55,18 +48,12 @@ fun SkillContext(caster: Caster, target: Target? = null, nekoStack: NekoStack? =
 
 private data object EmptySkillContext : SkillContext {
     override fun <T : Any> set(key: SkillContextKey<T>, value: T) {}
-    override fun <T : Any> optional(key: SkillContextKey<T>): T? {
+    override fun <T : Any> get(key: SkillContextKey<T>): T? {
         return null
     }
-    override fun <T : Any> has(key: SkillContextKey<T>): Boolean {
+    override fun <T : Any> contains(key: SkillContextKey<T>): Boolean {
         return false
     }
-
-    override var caster: Caster? = null
-    override var target: Target? = null
-    override var nekoStack: NekoStack? = null
-    override var itemStack: ItemStack? = null
-    override var mochaEngine: MochaEngine<*>? = null
 }
 
 private class SkillContextImpl : SkillContext {
@@ -76,12 +63,12 @@ private class SkillContextImpl : SkillContext {
         storage[key] = value
     }
 
-    override fun <T : Any> optional(key: SkillContextKey<T>): T? {
+    override fun <T : Any> get(key: SkillContextKey<T>): T? {
         @Suppress("UNCHECKED_CAST")
         return storage[key] as T?
     }
 
-    override fun <T : Any> has(key: SkillContextKey<T>): Boolean {
+    override fun <T : Any> contains(key: SkillContextKey<T>): Boolean {
         return storage.containsKey(key)
     }
 
@@ -98,8 +85,8 @@ private class SkillContextImpl : SkillContext {
         return storage.hashCode()
     }
 
-    override var caster: Caster?
-        get() = optional(SkillContextKey.CASTER)
+    var caster: Caster?
+        get() = get(SkillContextKey.CASTER)
         set(value) {
             value ?: return
             set(SkillContextKey.CASTER, value)
@@ -126,8 +113,8 @@ private class SkillContextImpl : SkillContext {
             }
         }
 
-    override var target: Target?
-        get() = optional(SkillContextKey.TARGET)
+    var target: Target?
+        get() = get(SkillContextKey.TARGET)
         set(value) {
             value ?: return
             set(SkillContextKey.TARGET, value)
@@ -145,26 +132,26 @@ private class SkillContextImpl : SkillContext {
             }
         }
 
-    override var nekoStack: NekoStack?
-        get() = optional(SkillContextKey.NEKO_STACK)
+    var nekoStack: NekoStack?
+        get() = get(SkillContextKey.NEKO_STACK)
         set(value) {
             value ?: return
             set(SkillContextKey.NEKO_STACK, value)
             set(SkillContextKey.ITEM_STACK, value.handle)
         }
 
-    override var itemStack: ItemStack?
-        get() = optional(SkillContextKey.ITEM_STACK)
+    var itemStack: ItemStack?
+        get() = get(SkillContextKey.ITEM_STACK)
         set(value) {
             value ?: return
             set(SkillContextKey.ITEM_STACK, value)
         }
 
-    override var mochaEngine: MochaEngine<*>?
-        get() = optional(SkillContextKey.MOCHA_ENGINE)
+    var mochaEngine: MochaEngine<*>?
+        get() = get(SkillContextKey.MOCHA_ENGINE)
         set(value) {
             value ?: return
-            optional(SkillContextKey.USER)?.let { value.bindInstance(UserContext::class.java, UserContext(it), "user", "player") }
+            get(SkillContextKey.USER)?.let { value.bindInstance(UserContext::class.java, UserContext(it), "user", "player") }
             set(SkillContextKey.MOCHA_ENGINE, value)
         }
 

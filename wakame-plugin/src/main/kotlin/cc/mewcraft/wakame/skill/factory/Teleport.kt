@@ -85,20 +85,20 @@ interface Teleport : Skill {
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
-                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("传送前摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("传送后摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickCast(): TickResult {
-                val player = context.optional(SkillContextKey.CASTER_PLAYER) ?: return TickResult.INTERRUPT
-                val location = context.optional(SkillContextKey.TARGET_LOCATION)?.bukkitLocation ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER] ?: return TickResult.INTERRUPT
+                val location = context[SkillContextKey.TARGET_LOCATION]?.bukkitLocation ?: return TickResult.INTERRUPT
                 when (val type = type) {
                     is Type.FIXED -> {
                         val position = type.position

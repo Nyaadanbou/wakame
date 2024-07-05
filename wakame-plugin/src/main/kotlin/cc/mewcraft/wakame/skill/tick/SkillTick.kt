@@ -108,7 +108,7 @@ abstract class AbstractPlayerSkillTick(
     open val interruptTriggers: TriggerConditions = TriggerConditions.empty()
 
     final override fun tick(): TickResult {
-        val user = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer?.toUser() ?: return tickCast()
+        val user = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer?.toUser() ?: return tickCast()
         val state = user.skillState
         if (state.info.skillTick != this)
             return tickCast()
@@ -130,7 +130,7 @@ abstract class AbstractPlayerSkillTick(
     }
 
     fun isPlayerTick(): Boolean {
-        val user = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer?.toUser() ?: return false
+        val user = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer?.toUser() ?: return false
         return user.skillState.info.skillTick == this
     }
 }

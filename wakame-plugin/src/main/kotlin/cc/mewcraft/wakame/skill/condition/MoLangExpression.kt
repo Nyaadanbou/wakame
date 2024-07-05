@@ -50,7 +50,7 @@ interface MoLangExpression : SkillCondition {
                 notification.notifySuccess(context)
 
                 // 自定义的逻辑
-                context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer?.heal(2.0)
+                context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer?.heal(2.0)
             }
 
             override fun onFailure(context: SkillContext) {
@@ -58,7 +58,7 @@ interface MoLangExpression : SkillCondition {
                 notification.notifyFailure(context)
 
                 // 自定义的逻辑
-                context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer?.damage(2.0)
+                context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer?.damage(2.0)
             }
         }
     }

@@ -44,19 +44,19 @@ interface CommandExecute : Skill {
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
-                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("命令执行前摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("命令执行后摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickCast(): TickResult {
-                val entity = context.optional(SkillContextKey.CASTER_ENTITY)?.bukkitEntity ?: return TickResult.INTERRUPT
+                val entity = context[SkillContextKey.CASTER_ENTITY]?.bukkitEntity ?: return TickResult.INTERRUPT
                 for (command in commands) {
                     command.replace("{caster}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }
                 }

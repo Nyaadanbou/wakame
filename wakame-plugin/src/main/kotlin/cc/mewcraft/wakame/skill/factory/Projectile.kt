@@ -178,7 +178,7 @@ interface Projectile : Skill {
             override val skill: Skill = this@DefaultImpl
 
             override fun tick(): TickResult {
-                val location = context.optional(SkillContextKey.TARGET_LOCATION) ?: return TickResult.INTERRUPT
+                val location = context[SkillContextKey.TARGET_LOCATION] ?: return TickResult.INTERRUPT
                 val projectile = when (type) {
                     Type.ARROW -> Arrow(location)
                 }
@@ -202,8 +202,8 @@ interface Projectile : Skill {
                     // TODO: 更多的属性设置
 
                     val newTickCaster = CasterAdapter.adapt(this@Tick)
-                    val parent = context.caster ?: return false
-                    context.caster = CasterAdapter.composite(newTickCaster, CasterAdapter.composite(parent))
+                    val parent = context[SkillContextKey.CASTER] ?: return false
+                    context[SkillContextKey.CASTER] = CasterAdapter.composite(newTickCaster, CasterAdapter.composite(parent))
                     val startSkillTick = effects[Trigger.START]?.cast(context)
 
                     if (startSkillTick != null) {
@@ -222,7 +222,7 @@ interface Projectile : Skill {
                     Events.subscribe(ServerTickStartEvent::class.java)
                         .expireIf { arrow.isDead }
                         .handler {
-                            val node = context.get(SkillContextKey.CASTER_COMPOSITE_NODE)
+                            val node = context.getOrThrow(SkillContextKey.CASTER_COMPOSITE_NODE)
                             val single = node.root().value
                             println(single)
                             val newContext = SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(arrow.location))

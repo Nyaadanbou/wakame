@@ -32,9 +32,9 @@ interface VanillaDurability : SkillCondition {
         override val resolver: TagResolver = TagResolver.empty()
 
         override fun newSession(context: SkillContext): SkillConditionSession {
-            val itemStack = context.optional(SkillContextKey.ITEM_STACK) ?: return SkillConditionSession.alwaysFailure()
+            val itemStack = context[SkillContextKey.ITEM_STACK] ?: return SkillConditionSession.alwaysFailure()
             val itemMeta = itemStack.itemMeta as? Damageable ?: return SkillConditionSession.alwaysFailure()
-            val engine = context.get(SkillContextKey.MOCHA_ENGINE)
+            val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
             val isSuccess = (itemMeta.maxDamage - itemMeta.damage) >= durability.evaluate(engine)
             return SessionImpl(isSuccess)
         }

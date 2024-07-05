@@ -33,7 +33,7 @@ abstract class SkillConditionBase(
          * 发送条件满足时的消息提示.
          */
         fun notifySuccess(context: SkillContext) {
-            val caster = context.optional(SkillContextKey.CASTER_AUDIENCE)
+            val caster = context[SkillContextKey.CASTER_AUDIENCE]
             if (caster != null) {
                 successMessage.send(caster)
             }
@@ -43,7 +43,7 @@ abstract class SkillConditionBase(
          * 发送条件不满足时的消息提示.
          */
         fun notifyFailure(context: SkillContext) {
-            val caster = context.optional(SkillContextKey.CASTER_AUDIENCE)
+            val caster = context[SkillContextKey.CASTER_AUDIENCE]
             if (caster != null) {
                 failureMessage.send(caster)
             }

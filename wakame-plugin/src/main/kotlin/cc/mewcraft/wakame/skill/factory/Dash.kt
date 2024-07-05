@@ -48,20 +48,19 @@ interface Dash : Skill {
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
-                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("冲刺的前摇摇摇摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("冲刺的后摇摇摇摇摇摇摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickCast(): TickResult {
-                val player =
-                    context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
                 val direction = player.location.direction.normalize()
                 val velocity = direction.multiply(distance)
                 player.velocity = velocity

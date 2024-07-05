@@ -52,11 +52,11 @@ interface PotionDrop : Skill {
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
             override fun tickCast(): TickResult {
                 val location = when {
-                    context.has(SkillContextKey.TARGET_LOCATION) -> {
-                        context.optional(SkillContextKey.TARGET_LOCATION)!!.bukkitLocation
+                    SkillContextKey.TARGET_LOCATION in context -> {
+                        context.getOrThrow(SkillContextKey.TARGET_LOCATION).bukkitLocation
                     }
-                    context.has(SkillContextKey.CASTER_ENTITY) -> {
-                        context.optional(SkillContextKey.CASTER_ENTITY)!!.bukkitEntity.location
+                    SkillContextKey.CASTER_ENTITY in context -> {
+                        context.getOrThrow(SkillContextKey.CASTER_ENTITY).bukkitEntity.location
                     }
                     else -> return TickResult.INTERRUPT
                 }

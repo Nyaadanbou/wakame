@@ -13,12 +13,12 @@ internal class SkillCastManagerImpl : SkillCastManager {
     override fun tryCast(skill: Skill, context: SkillContext): SkillPrepareCastResult {
         val event: SkillPrepareCastEvent
         when {
-            context.has(SkillContextKey.CASTER_PLAYER) -> {
+            context.contains(SkillContextKey.CASTER_PLAYER) -> {
                 event = PlayerSkillPrepareCastEvent(
                     skill = skill, 
-                    caster = context.get(SkillContextKey.CASTER_PLAYER).bukkitPlayer,
-                    target = context.optional(SkillContextKey.TARGET),
-                    item = context.optional(SkillContextKey.ITEM_STACK),
+                    caster = context.getOrThrow(SkillContextKey.CASTER_PLAYER).bukkitPlayer,
+                    target = context[SkillContextKey.TARGET],
+                    item = context[SkillContextKey.ITEM_STACK],
                 )
             }
 

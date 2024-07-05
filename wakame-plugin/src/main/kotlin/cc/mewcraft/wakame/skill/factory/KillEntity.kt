@@ -35,19 +35,19 @@ interface KillEntity : Skill {
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
-                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("杀死生物前摇awa")
                 return TickResult.ALL_DONE
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("杀死生物后摇qwq")
                 return TickResult.ALL_DONE
             }
 
             override fun tickCast(): TickResult {
-                val entity = context.optional(SkillContextKey.TARGET_LIVING_ENTITY)?.bukkitEntity ?: return TickResult.INTERRUPT
+                val entity = context[SkillContextKey.TARGET_LIVING_ENTITY]?.bukkitEntity ?: return TickResult.INTERRUPT
                 entity.health = 0.0
                 return TickResult.ALL_DONE
             }

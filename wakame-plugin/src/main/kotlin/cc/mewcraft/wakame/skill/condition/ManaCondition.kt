@@ -35,8 +35,8 @@ interface ManaCondition : SkillCondition {
         override val resolver: TagResolver = TagResolver.empty()
 
         override fun newSession(context: SkillContext): SkillConditionSession {
-            val user = context.optional(SkillContextKey.USER) ?: return SkillConditionSession.alwaysFailure()
-            val engine = context.get(SkillContextKey.MOCHA_ENGINE)
+            val user = context[SkillContextKey.USER] ?: return SkillConditionSession.alwaysFailure()
+            val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
             val isSuccess = user.resourceMap.current(ResourceTypeRegistry.MANA) >= mana.evaluate(engine)
             return SessionImpl(isSuccess)
         }
@@ -47,8 +47,8 @@ interface ManaCondition : SkillCondition {
             private val notification: Notification = Notification()
 
             override fun onSuccess(context: SkillContext) {
-                val user = context.get(SkillContextKey.USER)
-                val engine = context.get(SkillContextKey.MOCHA_ENGINE)
+                val user = context.getOrThrow(SkillContextKey.USER)
+                val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
                 val value = mana.evaluate(engine).toStableInt()
                 user.resourceMap.take(ResourceTypeRegistry.MANA, value)
                 notification.notifySuccess(context)
