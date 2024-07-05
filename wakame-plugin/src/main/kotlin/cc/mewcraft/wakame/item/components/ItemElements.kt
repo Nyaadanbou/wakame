@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -34,30 +35,34 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
-interface ItemElements : Examinable, TooltipProvider.Single {
-
+data class ItemElements(
     /**
      * 所有的元素.
      */
-    val elements: Set<Element>
+    val elements: Set<Element>,
+) : Examinable, TooltipProvider.Single {
 
-    data class Value(
-        override val elements: Set<Element>,
-    ) : ItemElements {
-        override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
-                return LoreLine.noop()
-            }
-            return LoreLine.simple(tooltipKey, tooltipText.render(elements, Element::displayName))
+    companion object : ItemComponentBridge<ItemElements>, ItemComponentConfig(ItemComponentConstants.ELEMENTS) {
+        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ELEMENTS }
+        private val tooltipText: MergedTooltip = MergedTooltip()
+
+        override fun codec(id: String): ItemComponentType<ItemElements> {
+            return Codec(id)
         }
 
-        private companion object : ItemComponentConfig(ItemComponentConstants.ELEMENTS) {
-            val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ELEMENTS }
-            val tooltipText: MergedTooltip = MergedTooltip()
+        override fun templateType(): ItemTemplateType<ItemElements> {
+            return TemplateType
         }
     }
 
-    data class Codec(
+    override fun provideTooltipLore(): LoreLine {
+        if (!showInTooltip) {
+            return LoreLine.noop()
+        }
+        return LoreLine.simple(tooltipKey, tooltipText.render(elements, Element::displayName))
+    }
+
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemElements> {
 
@@ -66,7 +71,7 @@ interface ItemElements : Examinable, TooltipProvider.Single {
                 ?.getByteArrayOrNull(TAG_VALUE)
                 ?.mapTo(ObjectArraySet(2), ElementRegistry::getBy)
                 ?: return null
-            return Value(elements = elementSet)
+            return ItemElements(elements = elementSet)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemElements) {
@@ -84,30 +89,30 @@ interface ItemElements : Examinable, TooltipProvider.Single {
         }
     }
 
-    data class Template(
+    private data class Template(
         val selector: Pool<Element, GenerationContext>,
     ) : ItemTemplate<ItemElements> {
         override val componentType: ItemComponentType<ItemElements> = ItemComponentTypes.ELEMENTS
 
         override fun generate(context: GenerationContext): GenerationResult<ItemElements> {
             val selected = selector.pickBulk(context).takeUnlessEmpty() ?: return GenerationResult.empty()
-            val elements = Value(ObjectArraySet(selected))
+            val elements = ItemElements(ObjectArraySet(selected))
             return GenerationResult.of(elements)
         }
+    }
 
-        companion object : ItemTemplateType<Template>, KoinComponent {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<ItemElements>, KoinComponent {
+        override val typeToken: TypeToken<ItemTemplate<ItemElements>> = typeTokenOf()
 
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                return Template(node.krequire<Pool<Element, GenerationContext>>())
-            }
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemElements> {
+            return Template(node.krequire<Pool<Element, GenerationContext>>())
+        }
 
-            override fun childSerializers(): TypeSerializerCollection {
-                return TypeSerializerCollection.builder()
-                    .registerAll(get(named(ELEMENT_EXTERNALS)))
-                    .kregister(ElementPoolSerializer)
-                    .build()
-            }
+        override fun childSerializers(): TypeSerializerCollection {
+            return TypeSerializerCollection.builder()
+                .registerAll(get(named(ELEMENT_EXTERNALS)))
+                .kregister(ElementPoolSerializer)
+                .build()
         }
     }
 }
@@ -129,7 +134,7 @@ interface ItemElements : Examinable, TooltipProvider.Single {
  *       weight: 1
  * ```
  */
-internal data object ElementPoolSerializer : PoolSerializer<Element, GenerationContext>() {
+private data object ElementPoolSerializer : PoolSerializer<Element, GenerationContext>() {
     override fun sampleFactory(node: ConfigurationNode): Element {
         return node.node("value").krequire<Element>()
     }

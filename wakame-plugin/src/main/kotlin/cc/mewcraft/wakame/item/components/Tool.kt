@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -21,11 +22,11 @@ import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.lang.reflect.Type
 
-interface Tool : Examinable {
-
-    val defaultMiningSpeed: Float
-    val damagePerBlock: Int
-    val rules: List<Rule>
+data class Tool(
+    val defaultMiningSpeed: Float,
+    val damagePerBlock: Int,
+    val rules: List<Rule>,
+) : Examinable {
 
     data class Rule(
         val blockTypes: Collection<Material>,
@@ -33,18 +34,20 @@ interface Tool : Examinable {
         val correctForDrops: TriState,
     )
 
-    data class Value(
-        override val defaultMiningSpeed: Float,
-        override val damagePerBlock: Int,
-        override val rules: List<Rule>,
-    ) : Tool {
-        private companion object : ItemComponentConfig(ItemComponentConstants.TOOL) {
-            val tooltipKey: TooltipKey = ItemComponentConstants.createKey { TOOL }
-            val tooltipText: SingleTooltip = SingleTooltip()
+    companion object : ItemComponentBridge<Tool>, ItemComponentConfig(ItemComponentConstants.TOOL) {
+        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { TOOL }
+        private val tooltipText: SingleTooltip = SingleTooltip()
+
+        override fun codec(id: String): ItemComponentType<Tool> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<Tool> {
+            return TemplateType
         }
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<Tool> {
         override fun read(holder: ItemComponentHolder): Tool? {
@@ -52,7 +55,7 @@ interface Tool : Examinable {
             val defaultMiningSpeed = craftTool.defaultMiningSpeed
             val damagePerBlock = craftTool.damagePerBlock
             val rules = craftTool.rules.mapNotNull { craftRule -> Rule(craftRule.blocks, craftRule.speed, TriState.byBoolean(craftRule.isCorrectForDrops)) }
-            return Value(
+            return Tool(
                 defaultMiningSpeed = defaultMiningSpeed,
                 damagePerBlock = damagePerBlock,
                 rules = rules
@@ -74,7 +77,7 @@ interface Tool : Examinable {
         private companion object
     }
 
-    data class Template(
+    private data class Template(
         val defaultMiningSpeed: Float,
         val damagePerBlock: Int,
         val rules: List<Rule>,
@@ -82,46 +85,46 @@ interface Tool : Examinable {
         override val componentType: ItemComponentType<Tool> = ItemComponentTypes.TOOL
 
         override fun generate(context: GenerationContext): GenerationResult<Tool> {
-            val raw = Value(defaultMiningSpeed, damagePerBlock, rules)
+            val raw = Tool(defaultMiningSpeed, damagePerBlock, rules)
             return GenerationResult.of(raw)
         }
+    }
 
-        companion object : ItemTemplateType<Template> {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Tool> {
+        override val typeToken: TypeToken<ItemTemplate<Tool>> = typeTokenOf()
 
-            /**
-             * ## Node structure
-             * ```yaml
-             * <node>:
-             *   default_mining_speed: 4.0
-             *   damage_per_block: 1
-             *   rules:
-             *     - block_types: ['minecraft:stone']
-             *       speed: 1.0
-             *       correct_for_drops: true
-             *     - block_types: ['minecraft:dirt', 'minecraft:grass']
-             *       speed: 2.0
-             *       correct_for_drops: true
-             * ```
-             */
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                // optional
-                val defaultMiningSpeed = node.node("default_mining_speed").getFloat(1F)
-                // optional
-                val damagePerBlock = node.node("damage_per_block").getInt(1)
-                // optional
-                val rules = node.node("rules").childrenList().map { child ->
-                    val blockTypes = child.node("block_types")
-                        .getList<String>(emptyList())
-                        .mapNotNull(NamespacedKey::fromString)
-                        .mapNotNull { Material.matchMaterial(it.asString()) }
-                    val speed = child.node("speed").get<Float>()
-                    val correctForDrops = child.node("correct_for_drops").get<TriState>(TriState.NOT_SET)
-                    Rule(blockTypes, speed, correctForDrops)
-                }
-
-                return Template(defaultMiningSpeed, damagePerBlock, rules)
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   default_mining_speed: 4.0
+         *   damage_per_block: 1
+         *   rules:
+         *     - block_types: ['minecraft:stone']
+         *       speed: 1.0
+         *       correct_for_drops: true
+         *     - block_types: ['minecraft:dirt', 'minecraft:grass']
+         *       speed: 2.0
+         *       correct_for_drops: true
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Tool> {
+            // optional
+            val defaultMiningSpeed = node.node("default_mining_speed").getFloat(1F)
+            // optional
+            val damagePerBlock = node.node("damage_per_block").getInt(1)
+            // optional
+            val rules = node.node("rules").childrenList().map { child ->
+                val blockTypes = child.node("block_types")
+                    .getList<String>(emptyList())
+                    .mapNotNull(NamespacedKey::fromString)
+                    .mapNotNull { Material.matchMaterial(it.asString()) }
+                val speed = child.node("speed").get<Float>()
+                val correctForDrops = child.node("correct_for_drops").get<TriState>(TriState.NOT_SET)
+                Rule(blockTypes, speed, correctForDrops)
             }
+
+            return Template(defaultMiningSpeed, damagePerBlock, rules)
         }
     }
 }

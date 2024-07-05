@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -18,7 +20,26 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Attributable : Examinable, TooltipProvider.Single {
+// 开发日记 2024/7/5
+// 1. 所有组件的数据类实现 ItemComponent 接口
+// 2. 如果一个组件是 NonValued, 那么它依然是接口, 但其 Value (单例) 应该隐藏起来
+// 3. 如果一个组件是 Valued, 那么直接写成 data class, 因为这样可以直接用 .copy
+
+interface Attributable : Examinable, ItemComponent, TooltipProvider.Single {
+
+    companion object : ItemComponentBridge<Attributable> {
+        fun of(): Attributable {
+            return Value
+        }
+
+        override fun codec(id: String): ItemComponentType<Attributable> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<Attributable> {
+            return TemplateType
+        }
+    }
 
     // 开发日记: 2024/6/24
     // Attributable 本身没有“数值”一说, 只有是否存在于物品上一说.
@@ -26,7 +47,7 @@ interface Attributable : Examinable, TooltipProvider.Single {
     // 但需要注意的是, 即便是单例也依然提供了 LoreLine 的具体实现,
     // 这是因为我们 !有可能! 希望那些拥有 Attributable 组件的物品的提示框里
     // 能够显示一行 “提供属性加成” 的文本, 当然, 也可以选择不写这个实现.
-    companion object Value : Attributable, ItemComponentConfig(ItemComponentConstants.ATTRIBUTABLE) {
+    private data object Value : Attributable, ItemComponentConfig(ItemComponentConstants.ATTRIBUTABLE) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ATTRIBUTABLE }
         private val tooltipText: SingleTooltip = SingleTooltip()
 
@@ -38,7 +59,7 @@ interface Attributable : Examinable, TooltipProvider.Single {
         }
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<Attributable> {
         // 开发日记 2024/6/29
@@ -68,13 +89,16 @@ interface Attributable : Examinable, TooltipProvider.Single {
     // 如果我们需要给物品加上一个标记,
     // 但这个标记不储存在物品(NBT)上,
     // 而是存在模板里. 是否可行?
-    data object Template : ItemTemplate<Attributable>, ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object Template : ItemTemplate<Attributable> {
         override val componentType: ItemComponentType<Attributable> = ItemComponentTypes.ATTRIBUTABLE
 
         override fun generate(context: GenerationContext): GenerationResult<Attributable> {
             return GenerationResult.of(Value)
         }
+    }
+
+    private data object TemplateType : ItemTemplateType<Attributable> {
+        override val typeToken: TypeToken<ItemTemplate<Attributable>> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -82,8 +106,8 @@ interface Attributable : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
-            return this
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Attributable> {
+            return Template
         }
     }
 }

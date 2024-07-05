@@ -110,11 +110,11 @@ internal object ServerNekoItemRealizer : NekoItemRealizer {
         // 获取 物品组件模板 的容器
         val templates: ItemTemplateMap = nekoStack.templates
 
-        fun <Q, T : ItemTemplate<Q>> generate(templateType: ItemTemplateType<T>) {
-            val template: T = templates.get(templateType) ?: return
-            val generated: GenerationResult<Q> = template.generate(context)
+        fun <T> generate(templateType: ItemTemplateType<T>) {
+            val template: ItemTemplate<T> = templates.get(templateType) ?: return
+            val generated: GenerationResult<T> = template.generate(context)
             if (!generated.isEmpty()) {
-                val value: Q = generated.value
+                val value: T = generated.value
                 components.set(template.componentType, value)
             }
         }

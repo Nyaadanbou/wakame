@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -23,36 +24,40 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface ItemCrate : Examinable, TooltipProvider.Single {
-
+data class ItemCrate(
     /**
      * 盲盒的唯一标识.
      */
-    val key: Key
+    val key: Key,
+) : Examinable, TooltipProvider.Single {
 
-    data class Value(
-        override val key: Key,
-    ) : ItemCrate {
-        override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
-                return LoreLine.noop()
-            }
-            return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("key", Component.text(key.asString())))))
+    companion object : ItemComponentBridge<ItemCrate>, ItemComponentConfig(ItemComponentConstants.CRATE) {
+        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CRATE }
+        private val tooltipText: SingleTooltip = SingleTooltip()
+
+        override fun codec(id: String): ItemComponentType<ItemCrate> {
+            return Codec(id)
         }
 
-        private companion object : ItemComponentConfig(ItemComponentConstants.CRATE) {
-            val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CRATE }
-            val tooltipText: SingleTooltip = SingleTooltip()
+        override fun templateType(): ItemTemplateType<ItemCrate> {
+            return TemplateType
         }
     }
 
-    data class Codec(
+    override fun provideTooltipLore(): LoreLine {
+        if (!showInTooltip) {
+            return LoreLine.noop()
+        }
+        return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("key", Component.text(key.asString())))))
+    }
+
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemCrate> {
         override fun read(holder: ItemComponentHolder): ItemCrate? {
             val tag = holder.getTag() ?: return null
             val key = Key(tag.getString(TAG_KEY))
-            return Value(key = key)
+            return ItemCrate(key = key)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemCrate) {
@@ -68,7 +73,7 @@ interface ItemCrate : Examinable, TooltipProvider.Single {
         }
     }
 
-    data class Template(
+    private data class Template(
         /**
          * 盲盒的唯一标识.
          */
@@ -77,23 +82,23 @@ interface ItemCrate : Examinable, TooltipProvider.Single {
         override val componentType: ItemComponentType<ItemCrate> = ItemComponentTypes.CRATE
 
         override fun generate(context: GenerationContext): GenerationResult<ItemCrate> {
-            return GenerationResult.of(Value(key))
+            return GenerationResult.of(ItemCrate(key = key))
         }
+    }
 
-        companion object : ItemTemplateType<Template> {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<ItemCrate> {
+        override val typeToken: TypeToken<ItemTemplate<ItemCrate>> = typeTokenOf()
 
-            /**
-             * ## Node structure
-             * ```yaml
-             * <node>:
-             *   key: "foo:bar"
-             * ```
-             */
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                val raw = node.node("key").krequire<Key>()
-                return Template(raw)
-            }
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   key: "foo:bar"
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemCrate> {
+            val raw = node.node("key").krequire<Key>()
+            return Template(raw)
         }
     }
 }

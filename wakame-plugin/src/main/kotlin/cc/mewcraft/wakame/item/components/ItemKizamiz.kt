@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -37,36 +38,44 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
-interface ItemKizamiz : Examinable, TooltipProvider.Single {
-
+data class ItemKizamiz(
     /**
      * 所有的铭刻.
      */
-    val kizamiz: Set<Kizami>
+    val kizamiz: Set<Kizami>,
+) : Examinable, TooltipProvider.Single {
 
-    data class Value(
-        override val kizamiz: Set<Kizami>,
-    ) : ItemKizamiz {
-        override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
-                return LoreLine.noop()
-            }
-            return LoreLine.simple(tooltipKey, tooltipText.render(kizamiz, Kizami::displayName))
+    companion object : ItemComponentBridge<ItemKizamiz>, ItemComponentConfig(ItemComponentConstants.KIZAMIZ) {
+        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
+        private val tooltipText: MergedTooltip = MergedTooltip()
+
+        fun of(kizamiz: Set<Kizami>): ItemKizamiz {
+            return ItemKizamiz(kizamiz)
         }
 
-        private companion object : ItemComponentConfig(ItemComponentConstants.KIZAMIZ) {
-            val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
-            val tooltipText: MergedTooltip = MergedTooltip()
+        override fun codec(id: String): ItemComponentType<ItemKizamiz> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<ItemKizamiz> {
+            return TemplateType
         }
     }
 
-    data class Codec(
+    override fun provideTooltipLore(): LoreLine {
+        if (!showInTooltip) {
+            return LoreLine.noop()
+        }
+        return LoreLine.simple(tooltipKey, tooltipText.render(kizamiz, Kizami::displayName))
+    }
+
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemKizamiz> {
         override fun read(holder: ItemComponentHolder): ItemKizamiz? {
             val tag = holder.getTag() ?: return null
             val kizamiSet = tag.getByteArrayOrNull(TAG_VALUE)?.mapTo(ObjectArraySet(4), KizamiRegistry::getBy) ?: return null
-            return Value(kizamiz = kizamiSet)
+            return ItemKizamiz(kizamiz = kizamiSet)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemKizamiz) {
@@ -85,37 +94,37 @@ interface ItemKizamiz : Examinable, TooltipProvider.Single {
         }
     }
 
-    data class Template(
+    private data class Template(
         val selector: Group<Kizami, GenerationContext>,
     ) : ItemTemplate<ItemKizamiz> {
         override val componentType: ItemComponentType<ItemKizamiz> = ItemComponentTypes.KIZAMIZ
 
         override fun generate(context: GenerationContext): GenerationResult<ItemKizamiz> {
             val selected = selector.pickBulk(context).takeUnlessEmpty() ?: return GenerationResult.empty()
-            val kizamiz = Value(ObjectArraySet(selected))
+            val kizamiz = ItemKizamiz(ObjectArraySet(selected))
             return GenerationResult.of(kizamiz)
         }
+    }
 
-        companion object : ItemTemplateType<Template>, KoinComponent {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<ItemKizamiz>, KoinComponent {
+        override val typeToken: TypeToken<ItemTemplate<ItemKizamiz>> = typeTokenOf()
 
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                return Template(node.krequire<Group<Kizami, GenerationContext>>())
-            }
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemKizamiz> {
+            return Template(node.krequire<Group<Kizami, GenerationContext>>())
+        }
 
-            override fun childSerializers(): TypeSerializerCollection {
-                return TypeSerializerCollection.builder()
-                    .registerAll(get(named(RARITY_EXTERNALS)))
-                    .registerAll(get(named(KIZAMI_EXTERNALS)))
-                    .kregister(KizamiPoolSerializer)
-                    .kregister(KizamiGroupSerializer)
-                    .build()
-            }
+        override fun childSerializers(): TypeSerializerCollection {
+            return TypeSerializerCollection.builder()
+                .registerAll(get(named(RARITY_EXTERNALS)))
+                .registerAll(get(named(KIZAMI_EXTERNALS)))
+                .kregister(KizamiPoolSerializer)
+                .kregister(KizamiGroupSerializer)
+                .build()
         }
     }
 }
 
-internal object KizamiGroupSerializer : GroupSerializer<Kizami, GenerationContext>() {
+private object KizamiGroupSerializer : GroupSerializer<Kizami, GenerationContext>() {
     override fun poolFactory(node: ConfigurationNode): Pool<Kizami, GenerationContext> {
         return node.krequire<Pool<Kizami, GenerationContext>>()
     }
@@ -145,7 +154,7 @@ internal object KizamiGroupSerializer : GroupSerializer<Kizami, GenerationContex
  *       weight: 1
  * ```
  */
-internal object KizamiPoolSerializer : PoolSerializer<Kizami, GenerationContext>() {
+private object KizamiPoolSerializer : PoolSerializer<Kizami, GenerationContext>() {
     override fun sampleFactory(node: ConfigurationNode): Kizami {
         return node.node("value").krequire<Kizami>()
     }

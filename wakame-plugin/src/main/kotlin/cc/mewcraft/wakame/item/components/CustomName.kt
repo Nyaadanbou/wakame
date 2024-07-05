@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
@@ -43,32 +44,34 @@ import java.lang.reflect.Type
 // 这个只有一个要求 —— 模板上储存的数据可以生成所有需要的物品数据.
 // 回答第三个: 存原始的 raw 即可.
 
-interface CustomName : Examinable {
-
+data class CustomName(
     /**
      * 原始字符串, 格式为 MiniMessage.
      *
      * 这部分是直接存在 NBT 里的原始字符串.
      */
-    val raw: String
-
+    val raw: String,
     /**
-     * 原始字符串 [raw] 经解析之后的产生的 [Component].
+     * 原始字符串, 格式为 MiniMessage.
      *
-     * 这部分是直接存在原版物品组件 `minecraft:custom_name` 上的.
-     * 因此, 如果玩家有修改过物品的名字, 那么该文本可能与 [raw]
-     * 一开始生成出来的富文本有所差别.
+     * 这部分是直接存在 NBT 里的原始字符串.
      */
-    val rich: Component
+    val rich: Component,
+) : Examinable {
 
-    data class Value(
-        override val raw: String,
-        override val rich: Component,
-    ) : CustomName {
-        constructor(rich: Component) : this("", rich)
+    constructor(rich: Component) : this("", rich)
+
+    companion object : ItemComponentBridge<CustomName>, ItemComponentConfig(ItemComponentConstants.CUSTOM_NAME) {
+        override fun codec(id: String): ItemComponentType<CustomName> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<CustomName> {
+            return TemplateType
+        }
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<CustomName> {
         override fun read(holder: ItemComponentHolder): CustomName? {
@@ -83,7 +86,7 @@ interface CustomName : Examinable {
             // 获取 rich string
             val rich = holder.item.itemMeta?.displayName() ?: Component.empty()
 
-            return Value(raw = raw, rich = rich)
+            return CustomName(raw = raw, rich = rich)
         }
 
         override fun write(holder: ItemComponentHolder, value: CustomName) {
@@ -110,12 +113,12 @@ interface CustomName : Examinable {
             holder.item.editMeta { it.displayName(null) }
         }
 
-        private companion object : ItemComponentConfig(ItemComponentConstants.CUSTOM_NAME) {
+        private companion object {
             const val TAG_VALUE = "raw"
         }
     }
 
-    data class Template(
+    private data class Template(
         /**
          * A MiniMessage string.
          */
@@ -154,21 +157,21 @@ interface CustomName : Examinable {
             val raw = customName
             val rich = ItemComponentInjections.mini.deserialize(customName, resolver.build())
 
-            return GenerationResult.of(Value(raw = raw, rich = rich))
+            return GenerationResult.of(CustomName(raw = raw, rich = rich))
         }
+    }
 
-        companion object : ItemTemplateType<Template> {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<CustomName> {
+        override val typeToken: TypeToken<ItemTemplate<CustomName>> = typeTokenOf()
 
-            /**
-             * ## Node structure
-             * ```yaml
-             * <node>: <string>
-             * ```
-             */
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                return Template(node.string)
-            }
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>: <string>
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<CustomName> {
+            return Template(node.string)
         }
     }
 }

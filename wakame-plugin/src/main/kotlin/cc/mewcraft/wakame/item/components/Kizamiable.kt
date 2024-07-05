@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -20,7 +21,21 @@ import java.lang.reflect.Type
 
 interface Kizamiable : Examinable, TooltipProvider.Single {
 
-    companion object Value : Kizamiable, ItemComponentConfig(ItemComponentConstants.KIZAMIZ) {
+    companion object : ItemComponentBridge<Kizamiable> {
+        fun of(): Kizamiable {
+            return Value
+        }
+
+        override fun codec(id: String): ItemComponentType<Kizamiable> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<Kizamiable> {
+            return TemplateType
+        }
+    }
+
+    private data object Value : Kizamiable, ItemComponentConfig(ItemComponentConstants.KIZAMIZ) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
         private val tooltipText: SingleTooltip = SingleTooltip()
 
@@ -32,7 +47,7 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
         }
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<Kizamiable> {
         override fun read(holder: ItemComponentHolder): Kizamiable? {
@@ -48,13 +63,16 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
         }
     }
 
-    data object Template : ItemTemplate<Kizamiable>, ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object Template : ItemTemplate<Kizamiable> {
         override val componentType: ItemComponentType<Kizamiable> = ItemComponentTypes.KIZAMIABLE
 
         override fun generate(context: GenerationContext): GenerationResult<Kizamiable> {
             return GenerationResult.of(Value)
         }
+    }
+
+    private data object TemplateType : ItemTemplateType<Kizamiable> {
+        override val typeToken: TypeToken<ItemTemplate<Kizamiable>> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -62,8 +80,8 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
-            return this
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Kizamiable> {
+            return Template
         }
     }
 }

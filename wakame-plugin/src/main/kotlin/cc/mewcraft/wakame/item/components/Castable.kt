@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -20,7 +21,21 @@ import java.lang.reflect.Type
 
 interface Castable : Examinable, TooltipProvider.Single {
 
-    companion object Value : Castable, ItemComponentConfig(ItemComponentConstants.CASTABLE) {
+    companion object : ItemComponentBridge<Castable> {
+        fun of(): Castable {
+            return Value
+        }
+
+        override fun codec(id: String): ItemComponentType<Castable> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<Castable> {
+            return TemplateType
+        }
+    }
+
+    private data object Value : Castable, ItemComponentConfig(ItemComponentConstants.CASTABLE) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CASTABLE }
         private val tooltipText: SingleTooltip = SingleTooltip()
 
@@ -32,7 +47,7 @@ interface Castable : Examinable, TooltipProvider.Single {
         }
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<Castable> {
         override fun read(holder: ItemComponentHolder): Castable? {
@@ -48,13 +63,16 @@ interface Castable : Examinable, TooltipProvider.Single {
         }
     }
 
-    data object Template : ItemTemplate<Castable>, ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object Template : ItemTemplate<Castable> {
         override val componentType: ItemComponentType<Castable> = ItemComponentTypes.CASTABLE
 
         override fun generate(context: GenerationContext): GenerationResult<Castable> {
             return GenerationResult.of(Value)
         }
+    }
+
+    private data object TemplateType : ItemTemplateType<Castable> {
+        override val typeToken: TypeToken<ItemTemplate<Castable>> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -62,8 +80,8 @@ interface Castable : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
-            return this
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Castable> {
+            return Template
         }
     }
 }

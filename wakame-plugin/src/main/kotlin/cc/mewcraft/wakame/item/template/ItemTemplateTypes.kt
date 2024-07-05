@@ -25,97 +25,97 @@ object ItemTemplateTypes {
     /**
      * 组件: [ItemArrow]
      */
-    val ARROW: ItemTemplateType<ItemArrow.Template> = ItemArrow.Template.register()
+    val ARROW: ItemTemplateType<ItemArrow> = ItemArrow.templateType().register()
 
     /**
      * 组件: [Attributable]
      */
-    val ATTRIBUTABLE: ItemTemplateType<Attributable.Template> = Attributable.Template.register()
+    val ATTRIBUTABLE: ItemTemplateType<Attributable> = Attributable.templateType().register()
 
     /**
      * 组件: [Castable]
      */
-    val CASTABLE: ItemTemplateType<Castable.Template> = Castable.Template.register()
+    val CASTABLE: ItemTemplateType<Castable> = Castable.templateType().register()
 
     /**
      * 组件:
      */
-    val CELLS: ItemTemplateType<ItemCells.Template> = ItemCells.Template.register()
+    val CELLS: ItemTemplateType<ItemCells> = ItemCells.templateType().register()
 
     /**
      * 组件: [ItemCrate]
      */
-    val CRATE: ItemTemplateType<ItemCrate.Template> = ItemCrate.Template.register()
+    val CRATE: ItemTemplateType<ItemCrate> = ItemCrate.templateType().register()
 
     /**
      * 组件: [CustomName]
      */
-    val CUSTOM_NAME: ItemTemplateType<CustomName.Template> = CustomName.Template.register()
+    val CUSTOM_NAME: ItemTemplateType<CustomName> = CustomName.templateType().register()
 
     /**
      * 组件: [Damageable]
      */
-    val DAMAGEABLE: ItemTemplateType<Damageable.Template> = Damageable.Template.register()
+    val DAMAGEABLE: ItemTemplateType<Damageable> = Damageable.templateType().register()
 
     /**
      * 组件: [ItemElements]
      */
-    val ELEMENTS: ItemTemplateType<ItemElements.Template> = ItemElements.Template.register()
+    val ELEMENTS: ItemTemplateType<ItemElements> = ItemElements.templateType().register()
 
     /**
      * 组件: [FireResistant]
      */
-    val FIRE_RESISTANT: ItemTemplateType<FireResistant.Template> = FireResistant.Template.register()
+    val FIRE_RESISTANT: ItemTemplateType<FireResistant> = FireResistant.templateType().register()
 
     /**
      * 组件: [FoodProperties]
      */
-    val FOOD: ItemTemplateType<FoodProperties.Template> = FoodProperties.Template.register()
+    val FOOD: ItemTemplateType<FoodProperties> = FoodProperties.templateType().register()
 
     /**
      * 组件: [ItemName]
      */
-    val ITEM_NAME: ItemTemplateType<ItemName.Template> = ItemName.Template.register()
+    val ITEM_NAME: ItemTemplateType<ItemName> = ItemName.templateType().register()
 
     /**
      * 组件: [ItemKizamiz]
      */
-    val KIZAMIZ: ItemTemplateType<ItemKizamiz.Template> = ItemKizamiz.Template.register()
+    val KIZAMIZ: ItemTemplateType<ItemKizamiz> = ItemKizamiz.templateType().register()
 
     /**
      * 组件: [Kizamiable]
      */
-    val KIZAMIABLE: ItemTemplateType<Kizamiable.Template> = Kizamiable.Template.register()
+    val KIZAMIABLE: ItemTemplateType<Kizamiable> = Kizamiable.templateType().register()
 
     /**
      * 组件: [ItemLevel]
      */
-    val LEVEL: ItemTemplateType<ItemLevel.Template> = ItemLevel.Template.register()
+    val LEVEL: ItemTemplateType<ItemLevel> = ItemLevel.templateType().register()
 
     /**
      * 组件: [ExtraLore]
      */
-    val LORE: ItemTemplateType<ExtraLore.Template> = ExtraLore.Template.register()
+    val LORE: ItemTemplateType<ExtraLore> = ExtraLore.templateType().register()
 
     /**
      * 组件: [ItemRarity]
      */
-    val RARITY: ItemTemplateType<ItemRarity.Template> = ItemRarity.Template.register()
+    val RARITY: ItemTemplateType<ItemRarity> = ItemRarity.templateType().register()
 
     /**
      * 组件: [Skillful]
      */
-    val SKILLFUL: ItemTemplateType<Skillful.Template> = Skillful.Template.register()
+    val SKILLFUL: ItemTemplateType<Skillful> = Skillful.templateType().register()
 
     /**
      * 组件: [Tool]
      */
-    val TOOL: ItemTemplateType<Tool.Template> = Tool.Template.register()
+    val TOOL: ItemTemplateType<Tool> = Tool.templateType().register()
 
     /**
      * 组件: [Unbreakable]
      */
-    val UNBREAKABLE: ItemTemplateType<Unbreakable.Template> = Unbreakable.Template.register()
+    val UNBREAKABLE: ItemTemplateType<Unbreakable> = Unbreakable.templateType().register()
 
     /**
      * 获取所有模板的序列化器.
@@ -124,7 +124,7 @@ object ItemTemplateTypes {
         return ItemTemplateTypeHelper.serializerBuilder.build()
     }
 
-    internal fun <T : ItemTemplate<*>> ItemTemplateType<T>.register(): ItemTemplateType<T> {
+    internal fun <T> ItemTemplateType<T>.register(): ItemTemplateType<T> {
         ItemTemplateTypeHelper.serializerBuilder.register(this.typeToken, this)
         ItemTemplateTypeHelper.serializerBuilder.registerAll(this.childSerializers())
         return this

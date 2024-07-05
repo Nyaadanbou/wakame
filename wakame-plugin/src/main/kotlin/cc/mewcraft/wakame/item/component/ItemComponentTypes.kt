@@ -36,102 +36,102 @@ object ItemComponentTypes {
     /**
      * 将物品作为弹药.
      */
-    val ARROW: ItemComponentType<ItemArrow> = ItemArrow.Codec(ItemComponentConstants.ARROW).register()
+    val ARROW: ItemComponentType<ItemArrow> = ItemArrow.codec(ItemComponentConstants.ARROW).register()
 
     /**
      * 控制物品能否提供属性加成给玩家.
      */
-    val ATTRIBUTABLE: ItemComponentType<Attributable> = Attributable.Codec(ItemComponentConstants.ATTRIBUTABLE).register()
+    val ATTRIBUTABLE: ItemComponentType<Attributable> = Attributable.codec(ItemComponentConstants.ATTRIBUTABLE).register()
 
     /**
      * 控制物品能否释放技能.
      */
-    val CASTABLE: ItemComponentType<Castable> = Castable.Codec(ItemComponentConstants.CASTABLE).register()
+    val CASTABLE: ItemComponentType<Castable> = Castable.codec(ItemComponentConstants.CASTABLE).register()
 
     /**
      * 物品的(所有)词条栏.
      */
-    val CELLS: ItemComponentType<ItemCells> = ItemCells.Codec(ItemComponentConstants.CELLS).register()
+    val CELLS: ItemComponentType<ItemCells> = ItemCells.codec(ItemComponentConstants.CELLS).register()
 
     /**
      * 将物品作为盲盒.
      */
-    val CRATE: ItemComponentType<ItemCrate> = ItemCrate.Codec(ItemComponentConstants.CRATE).register()
+    val CRATE: ItemComponentType<ItemCrate> = ItemCrate.codec(ItemComponentConstants.CRATE).register()
 
     /**
      * 自定义模型数据. 对应原版组件: [`minecraft:custom_model_data`](https://minecraft.wiki/w/Data_component_format#custom_model_data)
      */
-    val CUSTOM_MODEL_DATA: ItemComponentType<Int> = CustomModelData.Codec(ItemComponentConstants.CUSTOM_MODEL_DATA).register()
+    val CUSTOM_MODEL_DATA: ItemComponentType<CustomModelData> = CustomModelData.codec(ItemComponentConstants.CUSTOM_MODEL_DATA).register()
 
     /**
      * 自定义名字. 对应原版组件: [`minecraft:custom_name`](https://minecraft.wiki/w/Data_component_format#custom_name)
      */
-    val CUSTOM_NAME: ItemComponentType<CustomName> = CustomName.Codec(ItemComponentConstants.CUSTOM_NAME).register()
+    val CUSTOM_NAME: ItemComponentType<CustomName> = CustomName.codec(ItemComponentConstants.CUSTOM_NAME).register()
 
     /**
      * 物品已经损失的耐久.
      */
-    val DAMAGE: ItemComponentType<Int> = ItemDamage.Codec(ItemComponentConstants.DAMAGE).register()
+    val DAMAGE: ItemComponentType<Int> = ItemDamage.codec(ItemComponentConstants.DAMAGE).register()
 
     /**
      * 物品组件 [DAMAGE], [MAX_DAMAGE], [UNBREAKABLE] 的整合.
      */
-    val DAMAGEABLE: ItemComponentType<Damageable> = Damageable.Codec(ItemComponentConstants.DAMAGEABLE).register()
+    val DAMAGEABLE: ItemComponentType<Damageable> = Damageable.codec(ItemComponentConstants.DAMAGEABLE).register()
 
     /**
      * 物品的元素.
      */
-    val ELEMENTS: ItemComponentType<ItemElements> = ItemElements.Codec(ItemComponentConstants.ELEMENTS).register()
+    val ELEMENTS: ItemComponentType<ItemElements> = ItemElements.codec(ItemComponentConstants.ELEMENTS).register()
 
     /**
      * 拥有此组件将使物品免疫火焰伤害. 对应原版组件: [`minecraft:fire_resistant`](https://minecraft.wiki/w/Data_component_format#fire_resistant)
      */
-    val FIRE_RESISTANT: ItemComponentType<FireResistant> = FireResistant.Codec(ItemComponentConstants.FIRE_RESISTANT).register()
+    val FIRE_RESISTANT: ItemComponentType<FireResistant> = FireResistant.codec(ItemComponentConstants.FIRE_RESISTANT).register()
 
     /**
      * 将物品作为食物.
      */
-    val FOOD: ItemComponentType<FoodProperties> = FoodProperties.Codec(ItemComponentConstants.FOOD).register()
+    val FOOD: ItemComponentType<FoodProperties> = FoodProperties.codec(ItemComponentConstants.FOOD).register()
 
     /**
      * 物品名字. 对应原版组件: [`minecraft:item_name`](https://minecraft.wiki/w/Data_component_format#item_name)
      */
-    val ITEM_NAME: ItemComponentType<ItemName> = ItemName.Codec(ItemComponentConstants.ITEM_NAME).register()
+    val ITEM_NAME: ItemComponentType<ItemName> = ItemName.codec(ItemComponentConstants.ITEM_NAME).register()
 
     /**
      * 物品的铭刻.
      */
-    val KIZAMIZ: ItemComponentType<ItemKizamiz> = ItemKizamiz.Codec(ItemComponentConstants.KIZAMIZ).register()
+    val KIZAMIZ: ItemComponentType<ItemKizamiz> = ItemKizamiz.codec(ItemComponentConstants.KIZAMIZ).register()
 
     /**
      * 控制物品能否提供铭刻加成给玩家.
      */
-    val KIZAMIABLE: ItemComponentType<Kizamiable> = Kizamiable.Codec(ItemComponentConstants.KIZAMIABLE).register()
+    val KIZAMIABLE: ItemComponentType<Kizamiable> = Kizamiable.codec(ItemComponentConstants.KIZAMIABLE).register()
 
     /**
      * 物品的等级.
      */
-    val LEVEL: ItemComponentType<ItemLevel> = ItemLevel.Codec(ItemComponentConstants.LEVEL).register()
+    val LEVEL: ItemComponentType<ItemLevel> = ItemLevel.codec(ItemComponentConstants.LEVEL).register()
 
     /**
      * 物品的描述 (不同于原版物品组件 `minecraft:lore`).
      */
-    val LORE: ItemComponentType<ExtraLore> = ExtraLore.Codec(ItemComponentConstants.LORE).register()
+    val LORE: ItemComponentType<ExtraLore> = ExtraLore.codec(ItemComponentConstants.LORE).register()
 
     /**
      * 物品最大可损失的耐久.
      */
-    val MAX_DAMAGE: ItemComponentType<Int> = ItemMaxDamage.Codec(ItemComponentConstants.MAX_DAMAGE).register()
+    val MAX_DAMAGE: ItemComponentType<Int> = ItemMaxDamage.codec(ItemComponentConstants.MAX_DAMAGE).register()
 
     /**
      * 物品的稀有度.
      */
-    val RARITY: ItemComponentType<ItemRarity> = ItemRarity.Codec(ItemComponentConstants.RARITY).register()
+    val RARITY: ItemComponentType<ItemRarity> = ItemRarity.codec(ItemComponentConstants.RARITY).register()
 
     /**
      * 控制物品能否提供技能加成给玩家.
      */
-    val SKILLFUL: ItemComponentType<Skillful> = Skillful.Codec(ItemComponentConstants.SKILLFUL).register()
+    val SKILLFUL: ItemComponentType<Skillful> = Skillful.codec(ItemComponentConstants.SKILLFUL).register()
 
     /**
      * 物品的皮肤.
@@ -151,22 +151,22 @@ object ItemComponentTypes {
      *
      * 这也意味着系统物品的提示框文本完全取决于之上的原版组件.
      */
-    val SYSTEM_USE: ItemComponentType<Unit> = SystemUse.Codec(ItemComponentConstants.SYSTEM_USE).register()
+    val SYSTEM_USE: ItemComponentType<Unit> = SystemUse.codec(ItemComponentConstants.SYSTEM_USE).register()
 
     /**
      * 将物品作为工具.
      */
-    val TOOL: ItemComponentType<Tool> = Tool.Codec(ItemComponentConstants.TOOL).register()
+    val TOOL: ItemComponentType<Tool> = Tool.codec(ItemComponentConstants.TOOL).register()
 
     /**
      * 记录了物品的统计数据. 如果拥有此组件, 各种信息将被记录到物品之上.
      */
-    val TRACKS: ItemComponentType<ItemTracks> = ItemTracks.Codec(ItemComponentConstants.TRACKABLE).register()
+    val TRACKS: ItemComponentType<ItemTracks> = ItemTracks.codec(ItemComponentConstants.TRACKABLE).register()
 
     /**
      * 拥有此组件将阻止物品损失耐久度.
      */
-    val UNBREAKABLE: ItemComponentType<Unbreakable> = Unbreakable.Codec(ItemComponentConstants.UNBREAKABLE).register()
+    val UNBREAKABLE: ItemComponentType<Unbreakable> = Unbreakable.codec(ItemComponentConstants.UNBREAKABLE).register()
 
     /**
      * 注册该组件类型.

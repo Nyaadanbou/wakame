@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
@@ -26,41 +27,45 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.lang.reflect.Type
 
-interface ExtraLore : Examinable, TooltipProvider.Single {
-
+data class ExtraLore(
     /**
      * 物品的额外描述.
      */
-    val lore: List<String>
+    val lore: List<String>,
+) : Examinable, TooltipProvider.Single {
 
-    data class Value(
-        override val lore: List<String>,
-    ) : ExtraLore {
-        override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
-                return LoreLine.noop()
-            }
-            val lines = lore.mapTo(ObjectArrayList(lore.size)) { ItemComponentInjections.mini.deserialize(tooltipText.line, Placeholder.parsed("line", it)) }
-            val header = tooltipText.header.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
-            val bottom = tooltipText.bottom.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
-            lines.addAll(0, header)
-            lines.addAll(bottom)
-            return LoreLine.simple(tooltipKey, lines)
+    companion object : ItemComponentBridge<ExtraLore>, ItemComponentConfig(ItemComponentConstants.LORE) {
+        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LORE }
+        private val tooltipText: LoreTooltip = LoreTooltip()
+
+        override fun codec(id: String): ItemComponentType<ExtraLore> {
+            return Codec(id)
         }
 
-        private companion object : ItemComponentConfig(ItemComponentConstants.LORE) {
-            private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LORE }
-            private val tooltipText: LoreTooltip = LoreTooltip()
+        override fun templateType(): ItemTemplateType<ExtraLore> {
+            return TemplateType
         }
     }
 
-    data class Codec(
+    override fun provideTooltipLore(): LoreLine {
+        if (!showInTooltip) {
+            return LoreLine.noop()
+        }
+        val lines = lore.mapTo(ObjectArrayList(lore.size)) { ItemComponentInjections.mini.deserialize(tooltipText.line, Placeholder.parsed("line", it)) }
+        val header = tooltipText.header.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
+        val bottom = tooltipText.bottom.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
+        lines.addAll(0, header)
+        lines.addAll(bottom)
+        return LoreLine.simple(tooltipKey, lines)
+    }
+
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<ExtraLore> {
         override fun read(holder: ItemComponentHolder): ExtraLore? {
             val tag = holder.getTag() ?: return null
             val stringList = tag.getListOrNull(TAG_VALUE, TagType.STRING)?.map { (it as StringTag).value() } ?: return null
-            return Value(lore = stringList)
+            return ExtraLore(lore = stringList)
         }
 
         override fun write(holder: ItemComponentHolder, value: ExtraLore) {
@@ -83,7 +88,7 @@ interface ExtraLore : Examinable, TooltipProvider.Single {
     // 模板中的描述文本应该始终是 MiniMessage 吗?
     // 我们可以让用户输入 MiniMessage, 但最终储存在内存里的
     // 数据可以是 Component?
-    data class Template(
+    private data class Template(
         /**
          * A list of MiniMessage strings.
          */
@@ -92,15 +97,15 @@ interface ExtraLore : Examinable, TooltipProvider.Single {
         override val componentType: ItemComponentType<ExtraLore> = ItemComponentTypes.LORE
 
         override fun generate(context: GenerationContext): GenerationResult<ExtraLore> {
-            return GenerationResult.of(Value(lore))
+            return GenerationResult.of(ExtraLore(lore))
         }
+    }
 
-        companion object : ItemTemplateType<Template> {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<ExtraLore> {
+        override val typeToken: TypeToken<ItemTemplate<ExtraLore>> = typeTokenOf()
 
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                return Template(node.getList<String>(emptyList()))
-            }
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+            return Template(node.getList<String>(emptyList()))
         }
     }
 }

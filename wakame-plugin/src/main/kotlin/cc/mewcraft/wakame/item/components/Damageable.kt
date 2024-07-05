@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
@@ -36,9 +37,17 @@ data class Damageable(
     val maxDamage: Int,
 ) : Examinable, TooltipProvider.Single {
 
-    private companion object : ItemComponentConfig(ItemComponentConstants.DAMAGEABLE) {
-        val tooltipKey: TooltipKey = ItemComponentConstants.createKey { DAMAGEABLE }
-        val tooltipText: SingleTooltip = SingleTooltip()
+    companion object : ItemComponentBridge<Damageable>, ItemComponentConfig(ItemComponentConstants.DAMAGEABLE) {
+        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { DAMAGEABLE }
+        private val tooltipText: SingleTooltip = SingleTooltip()
+
+        override fun codec(id: String): ItemComponentType<Damageable> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<Damageable> {
+            return TemplateType
+        }
     }
 
     override fun provideTooltipLore(): LoreLine {
@@ -48,7 +57,7 @@ data class Damageable(
         return LoreLine.simple(tooltipKey, listOf(tooltipText.render()))
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<Damageable> {
         override fun read(holder: ItemComponentHolder): Damageable? {
@@ -75,12 +84,18 @@ data class Damageable(
         private companion object
     }
 
-    data class Template(
+    // 开发日记 2024/6/28
+    // 这个 disappearWhenBroken 并不会写入物品 NBT,
+    // 但可以通过物品的 ItemTemplateMap 获取该数据.
+    private data class Template(
+        /**
+         * 初始损耗.
+         */
         val damage: RandomizedValue,
+        /**
+         * 最大损耗.
+         */
         val maxDamage: RandomizedValue,
-        // 开发日记 2024/6/28
-        // 这个 disappearWhenBroken 并不会写入物品,
-        // 但可以通过物品的 ItemTemplateMap 获取该数据.
         /**
          * 当物品的当前损耗值大于最大损耗值时, 物品是否消失?
          */
@@ -96,25 +111,25 @@ data class Damageable(
             }
             return GenerationResult.of(Damageable(damage, maxDamage))
         }
+    }
 
-        companion object : ItemTemplateType<Template> {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Damageable> {
+        override val typeToken: TypeToken<ItemTemplate<Damageable>> = typeTokenOf()
 
-            /**
-             * ## Node structure
-             * ```yaml
-             * <node>:
-             *   damage: <randomized_value>
-             *   max_damage: <randomized_value>
-             *   disappear_when_broken: <boolean>
-             * ```
-             */
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                val damage = node.node("damage").krequire<RandomizedValue>()
-                val maxDamage = node.node("max_damage").krequire<RandomizedValue>()
-                val disappearWhenBroken = node.node("disappear_when_broken").krequire<Boolean>()
-                return Template(damage, maxDamage, disappearWhenBroken)
-            }
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   damage: <randomized_value>
+         *   max_damage: <randomized_value>
+         *   disappear_when_broken: <boolean>
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Damageable> {
+            val damage = node.node("damage").krequire<RandomizedValue>()
+            val maxDamage = node.node("max_damage").krequire<RandomizedValue>()
+            val disappearWhenBroken = node.node("disappear_when_broken").krequire<Boolean>()
+            return Template(damage, maxDamage, disappearWhenBroken)
         }
     }
 }

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -24,13 +25,23 @@ interface Unbreakable : Examinable, TooltipProvider {
 
     val showInTooltip: Boolean
 
-    data class Value(
+    companion object : ItemComponentBridge<Unbreakable> {
+        override fun codec(id: String): ItemComponentType<Unbreakable> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<Unbreakable> {
+            return TemplateType
+        }
+    }
+
+    private data class Value(
         override val showInTooltip: Boolean,
     ) : Unbreakable {
         private companion object
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<Unbreakable> {
         override fun read(holder: ItemComponentHolder): Unbreakable? {
@@ -59,7 +70,7 @@ interface Unbreakable : Examinable, TooltipProvider {
         private companion object
     }
 
-    data class Template(
+    private data class Template(
         val showInTooltip: Boolean,
     ) : ItemTemplate<Unbreakable> {
         override val componentType: ItemComponentType<Unbreakable> = ItemComponentTypes.UNBREAKABLE
@@ -67,21 +78,21 @@ interface Unbreakable : Examinable, TooltipProvider {
         override fun generate(context: GenerationContext): GenerationResult<Unbreakable> {
             return GenerationResult.of(Value(showInTooltip))
         }
+    }
 
-        companion object : ItemTemplateType<Template> {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Unbreakable> {
+        override val typeToken: TypeToken<ItemTemplate<Unbreakable>> = typeTokenOf()
 
-            /**
-             * ## Node structure
-             * ```yaml
-             * <node>:
-             *   show_in_tooltip: <boolean>
-             * ```
-             */
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
-                return Template(showInTooltip)
-            }
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   show_in_tooltip: <boolean>
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Unbreakable> {
+            val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
+            return Template(showInTooltip)
         }
     }
 }

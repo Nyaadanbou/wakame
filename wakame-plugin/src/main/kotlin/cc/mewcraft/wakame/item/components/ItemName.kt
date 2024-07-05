@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -19,14 +20,13 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface ItemName : Examinable {
-
+data class ItemName(
     /**
      * 原始字符串, 格式为 MiniMessage.
      *
      * 这部分是直接存在 NBT 里的原始字符串.
      */
-    val raw: String
+    val raw: String,
 
     /**
      * 原始字符串 [raw] 经解析之后的产生的 [Component].
@@ -35,16 +35,22 @@ interface ItemName : Examinable {
      * 因此, 如果之后有修改过该组件的值, 那么该文本可能与 [raw]
      * 一开始生成出来的富文本有所差别.
      */
-    val rich: Component
+    val rich: Component,
+) : Examinable {
 
-    data class Value(
-        override val raw: String,
-        override val rich: Component,
-    ) : ItemName {
-        constructor(rich: Component) : this("", rich)
+    constructor(rich: Component) : this("", rich)
+
+    companion object : ItemComponentBridge<ItemName> {
+        override fun codec(id: String): ItemComponentType<ItemName> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<ItemName> {
+            return TemplateType
+        }
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemName> {
         override fun read(holder: ItemComponentHolder): ItemName? {
@@ -59,7 +65,7 @@ interface ItemName : Examinable {
             // 获取 rich string
             val rich = holder.item.itemMeta?.itemName() ?: Component.empty()
 
-            return Value(raw = raw, rich = rich)
+            return ItemName(raw = raw, rich = rich)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemName) {
@@ -91,7 +97,7 @@ interface ItemName : Examinable {
         }
     }
 
-    data class Template(
+    private data class Template(
         /**
          * A MiniMessage string.
          */
@@ -130,21 +136,21 @@ interface ItemName : Examinable {
             val raw = itemName
             val rich = ItemComponentInjections.mini.deserialize(itemName, resolver.build())
 
-            return GenerationResult.of(Value(raw = raw, rich = rich))
+            return GenerationResult.of(ItemName(raw = raw, rich = rich))
         }
+    }
 
-        companion object : ItemTemplateType<Template> {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<ItemName> {
+        override val typeToken: TypeToken<ItemTemplate<ItemName>> = typeTokenOf()
 
-            /**
-             * ## Node structure
-             * ```yaml
-             * <node>: <string>
-             * ```
-             */
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                return Template(node.string)
-            }
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>: <string>
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemName> {
+            return Template(node.string)
         }
     }
 }

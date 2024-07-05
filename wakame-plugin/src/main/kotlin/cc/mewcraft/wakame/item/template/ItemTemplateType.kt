@@ -19,12 +19,14 @@ import java.util.stream.Stream
  *
  * - 充当 [TypeSerializer]
  * - 作为 [ItemTemplateMap] 的索引
+ *
+ * @param T 物品组件(数据)的类型
  */
-interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T>, Examinable {
+interface ItemTemplateType<T> : TypeSerializer<ItemTemplate<T>>, Examinable {
     /**
      * The [TypeToken] of [T].
      */
-    val typeToken: TypeToken<T> // generic sucks :x
+    val typeToken: TypeToken<ItemTemplate<T>> // generic sucks :x
 
     /**
      * 该序列化会用到的子序列化器.
@@ -40,12 +42,12 @@ interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T>, Examinable 
     /**
      * 定义如何将 [node] 反序列化为 [T].
      */
-    override fun deserialize(type: Type, node: ConfigurationNode): T
+    override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<T>
 
     /**
      * 定义如何将 [T] 序列化到 [node].
      */
-    override fun serialize(type: Type, obj: T?, node: ConfigurationNode): Nothing {
+    override fun serialize(type: Type, obj: ItemTemplate<T>?, node: ConfigurationNode): Nothing {
         throw UnsupportedOperationException()
     }
 
@@ -56,7 +58,7 @@ interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T>, Examinable 
      *
      * 默认返回 `null`, 意为该组件没有默认模板.
      */
-    override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): T? {
+    override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): ItemTemplate<T>? {
         return null
     }
 

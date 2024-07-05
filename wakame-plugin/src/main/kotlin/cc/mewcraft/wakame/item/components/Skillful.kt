@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -20,7 +21,17 @@ import java.lang.reflect.Type
 
 interface Skillful : Examinable, TooltipProvider.Single {
 
-    companion object Value : Skillful, ItemComponentConfig(ItemComponentConstants.SKILLFUL) {
+    companion object : ItemComponentBridge<Skillful> {
+        override fun codec(id: String): ItemComponentType<Skillful> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<Skillful> {
+            return TemplateType
+        }
+    }
+
+    private data object Value : Skillful, ItemComponentConfig(ItemComponentConstants.SKILLFUL) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { SKILLFUL }
         private val tooltipText: SingleTooltip = SingleTooltip()
 
@@ -32,7 +43,7 @@ interface Skillful : Examinable, TooltipProvider.Single {
         }
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<Skillful> {
         override fun read(holder: ItemComponentHolder): Skillful? {
@@ -48,13 +59,16 @@ interface Skillful : Examinable, TooltipProvider.Single {
         }
     }
 
-    data object Template : ItemTemplate<Skillful>, ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object Template : ItemTemplate<Skillful> {
         override val componentType: ItemComponentType<Skillful> = ItemComponentTypes.SKILLFUL
 
         override fun generate(context: GenerationContext): GenerationResult<Skillful> {
             return GenerationResult.of(Value)
         }
+    }
+
+    private data object TemplateType : ItemTemplateType<Skillful> {
+        override val typeToken: TypeToken<ItemTemplate<Skillful>> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -62,8 +76,8 @@ interface Skillful : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
-            return this
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Skillful> {
+            return Template
         }
     }
 }

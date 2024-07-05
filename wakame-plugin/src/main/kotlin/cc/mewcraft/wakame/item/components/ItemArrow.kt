@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -23,18 +24,35 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-// TODO 2024/6/28 components 下的某些类都需要写成 data class, 以支持修改不可变数值的部分值.
-
 // 开发日记: 2024/6/25 小米
 // 这是文件列表里的第一个物品组件,
 // 因此添加了更多代码注释, 请留意.
-
-interface ItemArrow : Examinable, TooltipProvider.Single {
-
+data class ItemArrow(
     /**
      * 可穿透的实体数.
      */
-    val pierceLevel: Byte
+    val pierceLevel: Byte,
+) : Examinable, TooltipProvider.Single {
+
+    // 开发日记: 2024/6/24 小米
+    // companion object 将作为组件配置文件的入口,
+    // 这些包括了物品提示框渲染的配置文件, 以及未来可能需要的其他东西
+    companion object : ItemComponentBridge<ItemArrow>, ItemComponentConfig(ItemComponentConstants.ARROW) {
+        private val tooltipKey: Key = ItemComponentConstants.createKey { ARROW }
+        private val tooltipText: SingleTooltip = SingleTooltip()
+
+        fun of(pierceLevel: Int): ItemArrow {
+            return ItemArrow(pierceLevel.toStableByte())
+        }
+
+        override fun codec(id: String): ItemComponentType<ItemArrow> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<ItemArrow> {
+            return TemplateType
+        }
+    }
 
     // 开发日记: 2024/6/25
     // 这是物品组件的快照类型.
@@ -43,35 +61,23 @@ interface ItemArrow : Examinable, TooltipProvider.Single {
     // 调用者需要通过快照来详细的读取物品组件上储存的信息.
     // 需要注意, 该类型还需要实现 TooltipsProvider 接口,
     // 否则其他系统将无法得知如何将该物品组件显示在物品提示框里.
-    data class Value(
-        override val pierceLevel: Byte,
-    ) : ItemArrow {
-        override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
-                return LoreLine.noop()
-            }
-            return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("pierce_level", Component.text(pierceLevel.toInt())))))
+    override fun provideTooltipLore(): LoreLine {
+        if (!showInTooltip) {
+            return LoreLine.noop()
         }
-
-        // 开发日记: 2024/6/24 小米
-        // companion object 将作为组件配置文件的入口,
-        // 这些包括了物品提示框渲染的配置文件, 以及未来可能需要的其他东西
-        private companion object Config : ItemComponentConfig(ItemComponentConstants.ARROW) {
-            val tooltipKey: Key = ItemComponentConstants.createKey { ARROW }
-            val tooltipText: SingleTooltip = SingleTooltip()
-        }
+        return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("pierce_level", Component.text(pierceLevel.toInt())))))
     }
 
     // 开发日记: 2024/6/25
     // 这是编码器, 定义了如何在游戏中读取/写入/移除物品上的组件信息.
     // 根据物品组件的具体情况, 这里的实现会稍有不同.
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemArrow> {
         override fun read(holder: ItemComponentHolder): ItemArrow? {
             val tag = holder.getTag() ?: return null
             val pierceLevel = tag.getByte(TAG_PIERCE_LEVEL)
-            return Value(pierceLevel = pierceLevel)
+            return ItemArrow(pierceLevel = pierceLevel)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemArrow) {
@@ -100,37 +106,31 @@ interface ItemArrow : Examinable, TooltipProvider.Single {
     // 开发日记: 2024/6/25
     // 这是模板类型, 也就是物品组件在配置文件中的封装.
     // 实现需要定义模板的数据结构, 以及模板的(反)序列化函数.
-    data class Template(
+    private data class Template(
         val pierceLevel: RandomizedValue,
     ) : ItemTemplate<ItemArrow> {
         override val componentType: ItemComponentType<ItemArrow> = ItemComponentTypes.ARROW
 
         override fun generate(context: GenerationContext): GenerationResult<ItemArrow> {
             val pierceLevel = pierceLevel.calculate().toStableByte()
-            return GenerationResult.of(Value(pierceLevel))
-        }
-
-        companion object : ItemTemplateType<Template> {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
-
-            /**
-             * ## Node structure
-             * ```yaml
-             * <node>:
-             *   pierce_level: <randomized_value>
-             * ```
-             */
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                // required
-                val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
-                return Template(pierceLevel)
-            }
+            return GenerationResult.of(ItemArrow(pierceLevel))
         }
     }
 
-    companion object {
-        fun of(pierceLevel: Byte): ItemArrow {
-            return Value(pierceLevel)
+    private data object TemplateType : ItemTemplateType<ItemArrow> {
+        override val typeToken: TypeToken<ItemTemplate<ItemArrow>> = typeTokenOf()
+
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   pierce_level: <randomized_value>
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemArrow> {
+            // required
+            val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
+            return Template(pierceLevel)
         }
     }
 }

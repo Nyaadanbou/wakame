@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -20,7 +21,21 @@ import java.lang.reflect.Type
 
 interface FireResistant : Examinable, TooltipProvider.Single {
 
-    companion object Value : FireResistant, ItemComponentConfig(ItemComponentConstants.FIRE_RESISTANT) {
+    companion object : ItemComponentBridge<FireResistant> {
+        fun of(): FireResistant {
+            return Value
+        }
+
+        override fun codec(id: String): ItemComponentType<FireResistant> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<FireResistant> {
+            return TemplateType
+        }
+    }
+
+    private data object Value : FireResistant, ItemComponentConfig(ItemComponentConstants.FIRE_RESISTANT) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { FIRE_RESISTANT }
         private val tooltipText: SingleTooltip = SingleTooltip()
 
@@ -32,7 +47,7 @@ interface FireResistant : Examinable, TooltipProvider.Single {
         }
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<FireResistant> {
         override fun read(holder: ItemComponentHolder): FireResistant? {
@@ -51,13 +66,16 @@ interface FireResistant : Examinable, TooltipProvider.Single {
         }
     }
 
-    data object Template : ItemTemplate<FireResistant>, ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object Template : ItemTemplate<FireResistant> {
         override val componentType: ItemComponentType<FireResistant> = ItemComponentTypes.FIRE_RESISTANT
 
         override fun generate(context: GenerationContext): GenerationResult<FireResistant> {
             return GenerationResult.of(Value)
         }
+    }
+
+    private data object TemplateType : ItemTemplateType<FireResistant> {
+        override val typeToken: TypeToken<ItemTemplate<FireResistant>> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -65,8 +83,8 @@ interface FireResistant : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
-            return this
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<FireResistant> {
+            return Template
         }
     }
 }

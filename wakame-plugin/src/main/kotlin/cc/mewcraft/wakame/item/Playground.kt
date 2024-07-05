@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.item.components.cell.Cell
 import cc.mewcraft.wakame.item.components.cell.CoreType
 import cc.mewcraft.wakame.item.components.cell.CoreTypes
 import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import net.kyori.adventure.text.Component
@@ -28,7 +29,7 @@ fun bukkit(stack: ItemStack) {
 }
 
 fun stack(stack: NekoStack) {
-    val damageableTemplate: Damageable.Template = stack.templates.get(ItemTemplateTypes.DAMAGEABLE) ?: return
+    val damageableTemplate: ItemTemplate<Damageable> = stack.templates.get(ItemTemplateTypes.DAMAGEABLE) ?: return
     val disappearWhenBroken: Boolean = damageableTemplate.disappearWhenBroken
 
     val itemLevel: ItemLevel = stack.components.get(ItemComponentTypes.LEVEL) ?: return
@@ -53,7 +54,7 @@ fun stack(stack: NekoStack) {
 
     // 设置免疫火焰 (对应原版组件: `minecraft:fire_resistant`)
     val fireResistant: FireResistant? = stack.components.get(ItemComponentTypes.FIRE_RESISTANT)
-    stack.components.set(ItemComponentTypes.FIRE_RESISTANT, FireResistant)
+    stack.components.set(ItemComponentTypes.FIRE_RESISTANT, FireResistant.of())
     stack.components.unset(ItemComponentTypes.FIRE_RESISTANT)
 
     // 设置 cells (所有的词条栏)
@@ -75,5 +76,5 @@ fun stack(stack: NekoStack) {
     val unbreakable: Unbreakable? = stack.components.get(ItemComponentTypes.UNBREAKABLE)
     val hasFood: Boolean = stack.components.has(ItemComponentTypes.FOOD)
     // 设置 item_name
-    stack.components.set(ItemComponentTypes.ITEM_NAME, ItemName.Value(Component.text("You can't change this name with anvils!")))
+    stack.components.set(ItemComponentTypes.ITEM_NAME, ItemName(Component.text("You can't change this name with anvils!")))
 }

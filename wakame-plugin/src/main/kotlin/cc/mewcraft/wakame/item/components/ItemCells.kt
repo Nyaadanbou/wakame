@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -49,6 +50,22 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<String, Cell>> {
+
+    companion object : ItemComponentBridge<ItemCells> {
+        fun of(cells: Map<String, Cell>): ItemCells {
+            return Value(cells)
+        }
+
+        // TODO 2024/7/5 添加更多构造 ItemCells 的方便函数
+
+        override fun codec(id: String): ItemComponentType<ItemCells> {
+            return Codec(id)
+        }
+
+        override fun templateType(): ItemTemplateType<ItemCells> {
+            return TemplateType
+        }
+    }
 
     /**
      * 检查指定的词条栏是否存在.
@@ -97,7 +114,9 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
      */
     fun collectConfiguredSkills(context: NekoStack, ignoreCurse: Boolean = false, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
 
-    class Value(
+    /* Internals */
+
+    private data class Value(
         private val cells: Map<String, Cell>,
     ) : ItemCells {
 
@@ -183,7 +202,7 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
         private companion object : ItemComponentConfig(ItemComponentConstants.CELLS)
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemCells> {
         override fun read(holder: ItemComponentHolder): ItemCells? {
@@ -209,12 +228,10 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
             holder.removeTag()
         }
 
-        private companion object {
-
-        }
+        private companion object
     }
 
-    data class Template(
+    private data class Template(
         val cells: Map<String, TemplateCell>,
     ) : ItemTemplate<ItemCells> {
         override val componentType: ItemComponentType<ItemCells> = ItemComponentTypes.CELLS
@@ -243,81 +260,81 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
             }
             return GenerationResult.of(Value(cells))
         }
+    }
 
-        companion object : ItemTemplateType<Template>, KoinComponent {
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<ItemCells>, KoinComponent {
+        override val typeToken: TypeToken<ItemTemplate<ItemCells>> = typeTokenOf()
 
-            /**
-             * ## Node structure
-             * ```yaml
-             * <node>:
-             *   buckets:
-             *     <词条栏 id>:
-             *       core: <核心选择器>
-             *       curse: <诅咒选择器>
-             *     <词条栏 id>:
-             *       core: <核心选择器>
-             *       curse: <诅咒选择器>
-             *     ...
-             *   selectors:
-             *     core_pools:
-             *       pool_1: <pool>
-             *       pool_2: <pool>
-             *       ...
-             *     core_groups:
-             *       group_1: <group>
-             *       group_2: <group>
-             *       ...
-             *     curse_pools:
-             *       pool_1: <pool>
-             *       pool_2: <pool>
-             *       ...
-             *     curse_groups:
-             *       group_1: <group>
-             *       group_2: <group>
-             *       ...
-             * ```
-             */
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                // 先把节点的键 (Any) 转成 String
-                val bucketMap: Map<String, ConfigurationNode> = node
-                    .node("buckets")
-                    .childrenMap()
-                    .mapKeys { (id, _) ->
-                        id.toString()
-                    }
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   buckets:
+         *     <词条栏 id>:
+         *       core: <核心选择器>
+         *       curse: <诅咒选择器>
+         *     <词条栏 id>:
+         *       core: <核心选择器>
+         *       curse: <诅咒选择器>
+         *     ...
+         *   selectors:
+         *     core_pools:
+         *       pool_1: <pool>
+         *       pool_2: <pool>
+         *       ...
+         *     core_groups:
+         *       group_1: <group>
+         *       group_2: <group>
+         *       ...
+         *     curse_pools:
+         *       pool_1: <pool>
+         *       pool_2: <pool>
+         *       ...
+         *     curse_groups:
+         *       group_1: <group>
+         *       group_2: <group>
+         *       ...
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+            // 先把节点的键 (Any) 转成 String
+            val bucketMap: Map<String, ConfigurationNode> = node
+                .node("buckets")
+                .childrenMap()
+                .mapKeys { (id, _) ->
+                    id.toString()
+                }
 
-                val selectors: ConfigurationNode = node.node("selectors")
-                val cells: LinkedHashMap<String, TemplateCell> = bucketMap.map { (id, node) ->
-                    // 先把节点 “selectors” 注入到节点 “buckets.<id>”
-                    node.hint(TemplateCellSerializer.HINT_NODE_SELECTORS, selectors)
-                    // 再反序列化 “buckets.<id>”, 最后转成 Pair
-                    id to node.krequire<TemplateCell>()
-                }.toMap(LinkedHashMap()) // 显式构建为有序 Map
+            val selectors: ConfigurationNode = node.node("selectors")
+            val cells: LinkedHashMap<String, TemplateCell> = bucketMap.map { (id, node) ->
+                // 先把节点 “selectors” 注入到节点 “buckets.<id>”
+                node.hint(TemplateCellSerializer.HINT_NODE_SELECTORS, selectors)
+                // 再反序列化 “buckets.<id>”, 最后转成 Pair
+                id to node.krequire<TemplateCell>()
+            }.toMap(LinkedHashMap()) // 显式构建为有序 Map
 
-                return Template(cells)
-            }
+            return Template(cells)
+        }
 
-            override fun childSerializers(): TypeSerializerCollection {
-                return TypeSerializerCollection.builder()
+        override fun childSerializers(): TypeSerializerCollection {
+            return TypeSerializerCollection.builder()
 
-                    // 随机选择器
-                    .kregister(TemplateCellSerializer)
-                    .kregister(TemplateCoreSerializer)
-                    .kregister(TemplateCorePoolSerializer)
-                    .kregister(TemplateCoreGroupSerializer)
-                    .kregister(TemplateCurseSerializer)
-                    .kregister(TemplateCursePoolSerializer)
-                    .kregister(TemplateCurseGroupSerializer)
+                // 随机选择器
+                .kregister(TemplateCellSerializer)
+                .kregister(TemplateCoreSerializer)
+                .kregister(TemplateCorePoolSerializer)
+                .kregister(TemplateCoreGroupSerializer)
+                .kregister(TemplateCurseSerializer)
+                .kregister(TemplateCursePoolSerializer)
+                .kregister(TemplateCurseGroupSerializer)
 
-                    // 技能, 部分核心会用到
-                    .registerAll(get(named(SKILL_EXTERNALS)))
+                // 技能, 部分核心会用到
+                .registerAll(get(named(SKILL_EXTERNALS)))
 
-                    // 实体类型, 部分诅咒会用到
-                    .registerAll(get(named(ENTITY_TYPE_HOLDER_EXTERNALS)))
+                // 实体类型, 部分诅咒会用到
+                .registerAll(get(named(ENTITY_TYPE_HOLDER_EXTERNALS)))
 
-                    .build()
-            }
+                .build()
         }
     }
 }

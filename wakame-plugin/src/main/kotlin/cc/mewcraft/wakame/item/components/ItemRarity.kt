@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
@@ -27,36 +28,40 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
-interface ItemRarity : Examinable, TooltipProvider.Single {
-
+data class ItemRarity(
     /**
      * 物品的稀有度.
      */
-    val rarity: Rarity
+    val rarity: Rarity,
+) : Examinable, TooltipProvider.Single {
 
-    data class Value(
-        override val rarity: Rarity,
-    ) : ItemRarity {
-        override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
-                return LoreLine.noop()
-            }
-            return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("value", rarity.displayName))))
+    companion object : ItemComponentBridge<ItemRarity>, ItemComponentConfig(ItemComponentConstants.RARITY) {
+        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { RARITY }
+        private val tooltipText: SingleTooltip = SingleTooltip()
+
+        override fun codec(id: String): ItemComponentType<ItemRarity> {
+            return Codec(id)
         }
 
-        private companion object : ItemComponentConfig(ItemComponentConstants.RARITY) {
-            private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { RARITY }
-            private val tooltipText: SingleTooltip = SingleTooltip()
+        override fun templateType(): ItemTemplateType<ItemRarity> {
+            return TemplateType
         }
     }
 
-    data class Codec(
+    override fun provideTooltipLore(): LoreLine {
+        if (!showInTooltip) {
+            return LoreLine.noop()
+        }
+        return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("value", rarity.displayName))))
+    }
+
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemRarity> {
         override fun read(holder: ItemComponentHolder): ItemRarity? {
             val tag = holder.getTag() ?: return null
             val raw = tag.getByteOrNull(TAG_VALUE)?.let(RarityRegistry::findBy) ?: return null
-            return Value(rarity = raw)
+            return ItemRarity(rarity = raw)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemRarity) {
@@ -73,7 +78,7 @@ interface ItemRarity : Examinable, TooltipProvider.Single {
         }
     }
 
-    data class Template(
+    private data class Template(
         /**
          * The default rarity held in this schema.
          */
@@ -130,42 +135,42 @@ interface ItemRarity : Examinable, TooltipProvider.Single {
             context.rarity = rarity
 
             if (rarity != null) {
-                return GenerationResult.of(Value(rarity = rarity))
+                return GenerationResult.of(ItemRarity(rarity = rarity))
             }
 
             return GenerationResult.empty()
         }
+    }
 
-        companion object : ItemTemplateType<Template> {
-            private const val MAPPING_PREFIX = "mapping:"
-            private const val RARITY_PREFIX = "rarity:"
+    private data object TemplateType : ItemTemplateType<ItemRarity> {
+        private const val MAPPING_PREFIX = "mapping:"
+        private const val RARITY_PREFIX = "rarity:"
 
-            override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val typeToken: TypeToken<ItemTemplate<ItemRarity>> = typeTokenOf()
 
-            /**
-             * ## Node structure 1
-             * ```yaml
-             * <node>: "mapping:_"
-             * ```
-             *
-             * ## Node structure 2
-             * ```yaml
-             * <node>: "rarity:_"
-             * ```
-             */
-            override fun deserialize(type: Type, node: ConfigurationNode): Template {
-                val string = node.krequire<String>()
-                return when {
-                    string.startsWith(MAPPING_PREFIX) -> Template(
-                        dynamic = LevelMappingRegistry.INSTANCES[string.substringAfter(MAPPING_PREFIX)],
-                    )
+        /**
+         * ## Node structure 1
+         * ```yaml
+         * <node>: "mapping:_"
+         * ```
+         *
+         * ## Node structure 2
+         * ```yaml
+         * <node>: "rarity:_"
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+            val string = node.krequire<String>()
+            return when {
+                string.startsWith(MAPPING_PREFIX) -> Template(
+                    dynamic = LevelMappingRegistry.INSTANCES[string.substringAfter(MAPPING_PREFIX)],
+                )
 
-                    string.startsWith(RARITY_PREFIX) -> Template(
-                        static = RarityRegistry.INSTANCES[string.substringAfter(RARITY_PREFIX)]
-                    )
+                string.startsWith(RARITY_PREFIX) -> Template(
+                    static = RarityRegistry.INSTANCES[string.substringAfter(RARITY_PREFIX)]
+                )
 
-                    else -> throw SerializationException("Can't parse rarity value '$string'")
-                }
+                else -> throw SerializationException("Can't parse rarity value '$string'")
             }
         }
     }

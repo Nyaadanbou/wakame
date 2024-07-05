@@ -44,9 +44,9 @@ import java.util.stream.Stream
  */
 interface ItemTemplateMap : Examinable {
 
-    fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T?
+    fun <T> get(type: ItemTemplateType<T>): ItemTemplate<T>?
 
-    fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean
+    fun <T> has(type: ItemTemplateType<T>): Boolean
 
     // 开发日记 2024/6/26
     // 模板的应用讲究顺序, 而顺序是由储存在模板内部的数据结构决定的.
@@ -80,7 +80,7 @@ interface ItemTemplateMap : Examinable {
         /**
          * 添加一个 [ItemTemplate]. 已存在的 [type] 会被覆盖.
          */
-        fun <T : ItemTemplate<*>> put(type: ItemTemplateType<T>, template: T)
+        fun <T> put(type: ItemTemplateType<T>, template: ItemTemplate<T>)
 
         /**
          * 构建.
@@ -89,8 +89,8 @@ interface ItemTemplateMap : Examinable {
     }
 
     private object EmptyMap : ItemTemplateMap {
-        override fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T? = null
-        override fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean = false
+        override fun <T> get(type: ItemTemplateType<T>): ItemTemplate<T>? = null
+        override fun <T> has(type: ItemTemplateType<T>): Boolean = false
         override fun toString(): String = toSimpleString()
     }
 
@@ -99,11 +99,11 @@ interface ItemTemplateMap : Examinable {
     ) : ItemTemplateMap {
         private val map: LinkedHashMap<ItemTemplateType<*>, ItemTemplate<*>> = LinkedHashMap(map)
 
-        override fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T? {
-            return map[type] as T?
+        override fun <T> get(type: ItemTemplateType<T>): ItemTemplate<T>? {
+            return map[type] as ItemTemplate<T>?
         }
 
-        override fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean {
+        override fun <T> has(type: ItemTemplateType<T>): Boolean {
             return map.containsKey(type)
         }
 
@@ -119,7 +119,7 @@ interface ItemTemplateMap : Examinable {
     private class BuilderImpl : Builder {
         private val map: LinkedHashMap<ItemTemplateType<*>, ItemTemplate<*>> = LinkedHashMap()
 
-        override fun <T : ItemTemplate<*>> put(type: ItemTemplateType<T>, template: T) {
+        override fun <T> put(type: ItemTemplateType<T>, template: ItemTemplate<T>) {
             map[type] = template
         }
 
