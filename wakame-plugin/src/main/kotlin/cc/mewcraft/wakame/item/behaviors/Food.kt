@@ -22,8 +22,7 @@ interface Food : ItemBehavior {
             val nekoStack: NekoStack = itemStack.toNekoStack
             val food: FoodProperties = nekoStack.components.get(ItemComponentTypes.FOOD) ?: return
             val skills: List<Key> = food.skills
-
-            // 释放食物组件上记录的技能
+            // FIXME: 2024.7.5 释放食物组件上记录的技能
         }
     }
 

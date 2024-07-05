@@ -21,7 +21,7 @@ sealed interface SkillCastContext {
     fun <T : Any> get(key: SkillCastContextKey<T>): T = optional(key) ?: throw IllegalArgumentException("No value for key: `$key`")
     fun <T : Any> has(key: SkillCastContextKey<T>): Boolean
 
-    // FIXME: 2024.7.5
+    // FIXME: 2024.7.5 删除这些属性
     var caster: Caster?
     var target: Target?
     var nekoStack: NekoStack?

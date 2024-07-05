@@ -54,7 +54,7 @@ data class CoreSkill(
     val variant: TriggerVariant,
 ) : Core {
     val instance: Skill
-        get() = SkillRegistry.TYPES[key]
+        get() = SkillRegistry.INSTANCES[key]
 
     override val type: CoreType<*> = Type
     override val isNoop: Boolean = false

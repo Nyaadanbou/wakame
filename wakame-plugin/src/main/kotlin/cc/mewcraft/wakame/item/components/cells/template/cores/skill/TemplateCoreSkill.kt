@@ -44,7 +44,7 @@ private data class TemplateCoreSkillImpl(
     override val variant: TriggerVariant,
 ) : TemplateCoreSkill {
     override val skill: Skill
-        get() = SkillRegistry.TYPES[key]
+        get() = SkillRegistry.INSTANCES[key]
 
     override fun generate(context: GenerationContext): CoreSkill {
         // 根据设计，技能的数值分为两类：

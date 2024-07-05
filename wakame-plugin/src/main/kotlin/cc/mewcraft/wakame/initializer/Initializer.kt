@@ -18,7 +18,6 @@ import cc.mewcraft.wakame.item.SingleItemListener
 import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
-import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.resource.ResourceListener
 import cc.mewcraft.wakame.skill.tick.SkillTickerListener
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
@@ -34,7 +33,6 @@ import cc.mewcraft.wakame.registry.PROJECTILE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.SKIN_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.skill.SkillTickerListener
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents

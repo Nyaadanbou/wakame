@@ -39,7 +39,8 @@ internal interface NekoDurability : SkillCondition {
             val nekoStack = context.optional(SkillCastContextKey.NEKO_STACK) ?: return SkillConditionSession.alwaysFailure()
             val damageable = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return SkillConditionSession.alwaysFailure()
             val engine = context.get(SkillCastContextKey.MOCHA_ENGINE)
-            val isSuccess = (damageable.maxDamage - damageable.damage) <= durability.evaluate(engine).toStableInt()
+            val evaluatedDurability = this.durability.evaluate(engine).toStableInt()
+            val isSuccess = (damageable.maxDamage - damageable.damage) <= evaluatedDurability
             return SessionImpl(isSuccess)
         }
 
@@ -49,11 +50,11 @@ internal interface NekoDurability : SkillCondition {
             private val notification: Notification = Notification()
 
             override fun onSuccess(context: SkillCastContext) {
-                // FIXME: 2024.7.5
                 val nekoStack = context.optional(SkillCastContextKey.ITEM_STACK)?.tryNekoStack ?: return
                 val damageable = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return
                 val engine = context.get(SkillCastContextKey.MOCHA_ENGINE)
-                val newDamage = damageable.copy(damage = damageable.damage + durability.evaluate(engine).toStableInt())
+                val evaluatedDurability = durability.evaluate(engine).toStableInt()
+                val newDamage = damageable.copy(damage = damageable.damage + evaluatedDurability)
                 nekoStack.components.set(ItemComponentTypes.DAMAGEABLE, newDamage)
                 notification.notifySuccess(context)
             }

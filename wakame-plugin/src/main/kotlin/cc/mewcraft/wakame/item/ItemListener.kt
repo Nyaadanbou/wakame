@@ -131,9 +131,9 @@ class SingleItemListener : KoinComponent, Listener {
     fun onClick(event: PlayerInteractEvent) {
         val player = event.player
         val slot = event.hand ?: return
-        val item = player.inventory.itemInMainHand.takeUnlessEmpty()
-        val nekoStack = item?.tryNekoStack
-        if (nekoStack != null && !nekoStack.slot.testEquipmentSlot(slot))
+        val item: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
+        val nekoStack = item?.tryNekoStack ?: return
+        if (!nekoStack.slot.testEquipmentSlot(slot))
             return
 
         when (event.action) {

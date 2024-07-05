@@ -31,45 +31,45 @@ class SkillEventHandler {
 
     /* 玩家的技能触发逻辑 */
 
-    fun onLeftClickBlock(player: Player, itemStack: ItemStack?, location: Location, event: PlayerInteractEvent) {
+    fun onLeftClickBlock(player: Player, itemStack: ItemStack, location: Location, event: PlayerInteractEvent) {
         onLeftClick(player, itemStack, event) { TargetAdapter.adapt(location) }
     }
 
-    fun onLeftClickAir(player: Player, itemStack: ItemStack?, event: PlayerInteractEvent) {
+    fun onLeftClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
         onLeftClick(player, itemStack, event) { TargetAdapter.adapt(player) }
     }
 
     private fun onLeftClick(
         player: Player,
-        itemStack: ItemStack?,
+        itemStack: ItemStack,
         event: PlayerInteractEvent,
         targetProvider: () -> Target
     ) {
         val user = player.toUser()
-        val nekoStack = itemStack?.tryNekoStack // FIXME: 2024.7.5
-        val target = targetProvider()
+        val nekoStack = itemStack.toNekoStack
+        val target = targetProvider.invoke()
         val result = user.skillState.addTrigger(SingleTrigger.LEFT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
         if (result == SkillStateResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
     }
 
-    fun onRightClickBlock(player: Player, itemStack: ItemStack?, location: Location, event: PlayerInteractEvent) {
+    fun onRightClickBlock(player: Player, itemStack: ItemStack, location: Location, event: PlayerInteractEvent) {
         onRightClick(player, itemStack, event) { TargetAdapter.adapt(location) }
     }
 
-    fun onRightClickAir(player: Player, itemStack: ItemStack?, event: PlayerInteractEvent) {
+    fun onRightClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
         onRightClick(player, itemStack, event) { TargetAdapter.adapt(player) }
     }
 
     private fun onRightClick(
         player: Player,
-        itemStack: ItemStack?,
+        itemStack: ItemStack,
         event: PlayerInteractEvent,
         targetProvider: () -> Target
     ) {
         val user = player.toUser()
-        val nekoStack = itemStack?.tryNekoStack // FIXME: 2024.7.5
+        val nekoStack = itemStack.toNekoStack
         val target = targetProvider.invoke()
         val result = user.skillState.addTrigger(SingleTrigger.RIGHT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
         checkResult(result, event)
