@@ -40,6 +40,7 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import io.leangen.geantyref.TypeToken
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import net.kyori.examination.Examinable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -231,7 +232,8 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
         }
 
         private fun edit(consumer: (MutableMap<String, Cell>) -> Unit): ItemCells {
-            val cells = HashMap<String, Cell>(this.cells)
+            // 优化: 词条栏绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
+            val cells = Object2ObjectArrayMap(this.cells)
             consumer.invoke(cells)
             return Value(HashMap(cells)) // 显式副本
         }
@@ -244,7 +246,8 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
     ) : ItemComponentType<ItemCells> {
         override fun read(holder: ItemComponentHolder): ItemCells? {
             val tag = holder.getTag() ?: return null
-            val cells = HashMap<String, Cell>()
+            // 优化: 词条栏绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
+            val cells = Object2ObjectArrayMap<String, Cell>(tag.size())
             for (id in tag.keySet()) {
                 val nbt = tag.getCompound(id)
                 val cell = Cell.of(id, nbt)
