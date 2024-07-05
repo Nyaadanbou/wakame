@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttribute
-import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
+import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
+import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.user.User

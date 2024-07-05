@@ -13,18 +13,18 @@ import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.cell.Cell
-import cc.mewcraft.wakame.item.components.cell.CoreTypes
-import cc.mewcraft.wakame.item.components.cell.template.TemplateCell
-import cc.mewcraft.wakame.item.components.cell.template.TemplateCellSerializer
-import cc.mewcraft.wakame.item.components.cell.template.TemplateCoreGroupSerializer
-import cc.mewcraft.wakame.item.components.cell.template.TemplateCorePoolSerializer
-import cc.mewcraft.wakame.item.components.cell.template.TemplateCoreSerializer
-import cc.mewcraft.wakame.item.components.cell.template.TemplateCurseGroupSerializer
-import cc.mewcraft.wakame.item.components.cell.template.TemplateCursePoolSerializer
-import cc.mewcraft.wakame.item.components.cell.template.TemplateCurseSerializer
-import cc.mewcraft.wakame.item.components.cell.template.cores.empty.TemplateCoreEmpty
-import cc.mewcraft.wakame.item.components.cell.template.curses.TemplateCurseEmpty
+import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.CoreTypes
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCell
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCellSerializer
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCoreGroupSerializer
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCorePoolSerializer
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCoreSerializer
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCurseGroupSerializer
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCursePoolSerializer
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCurseSerializer
+import cc.mewcraft.wakame.item.components.cells.template.cores.empty.TemplateCoreEmpty
+import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCurseEmpty
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -81,37 +81,37 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
     /**
      * 添加一个词条栏.
      *
-     * @return 修改过的 [ItemCells] 副本
+     * @return 修改过的副本
      */
     fun put(id: String, cell: Cell): ItemCells
 
     /**
      * 修改一个词条栏.
      *
-     * 传入函数 [consumer] 中的词条栏为 [id] 指定的词条栏.
-     * 如果 [id] 指定的词条栏不存在, 则传入 [consumer] 的词条栏将是 `null`.
+     * 传入函数 [block] 中的词条栏为 [id] 所指定的词条栏.
+     * 函数 [block] 所返回的词条栏将写入 [id] 指定的位置.
      *
-     * 如果 [consumer] 返回的值为非空, 那么其值将写入返回的 [ItemCells];
-     * 反之, 返回的 [ItemCells] 将是一个完全未经修改的副本.
+     * 如果 [id] 指定的词条栏不存在, 则 [block] 不会执行;
+     * 这种情况下, 该函数所返回的 [ItemCells] 是未经修改的副本.
      *
-     * @return 修改过/完全未经修改的 [ItemCells] 副本
+     * @return 修改过/完全未经修改的副本
      */
-    fun modify(id: String, consumer: (Cell?) -> Cell?): ItemCells
+    fun modify(id: String, block: (Cell) -> Cell): ItemCells
 
     /**
      * 移除一个词条栏.
      *
-     * @return 修改过的 [ItemCells] 副本
+     * @return 修改过的副本
      */
     fun remove(id: String): ItemCells
 
     /**
-     * 获取**所有**词条栏上的 [AttributeModifier].
+     * 获取所有词条栏上的 [AttributeModifier].
      */
     fun collectAttributeModifiers(context: NekoStack, ignoreCurse: Boolean = false): Multimap<Attribute, AttributeModifier>
 
     /**
-     * 获取**所有**词条栏上的 [ConfiguredSkill].
+     * 获取所有词条栏上的 [ConfiguredSkill].
      */
     fun collectConfiguredSkills(context: NekoStack, ignoreCurse: Boolean = false, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
 
@@ -165,22 +165,23 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
         }
 
         override fun put(id: String, cell: Cell): ItemCells {
-            return copyEdit { map ->
+            return edit { map ->
                 map.put(id, cell)
             }
         }
 
-        override fun modify(id: String, consumer: (Cell?) -> Cell?): ItemCells {
-            return copyEdit { map ->
-                val cell = consumer(map[id])
+        override fun modify(id: String, block: (Cell) -> Cell): ItemCells {
+            return edit { map ->
+                val cell = map[id]
                 if (cell != null) {
-                    map.put(id, cell)
+                    val newCell = block(cell)
+                    map.put(id, newCell)
                 }
             }
         }
 
         override fun remove(id: String): ItemCells {
-            return copyEdit { map ->
+            return edit { map ->
                 map.remove(id)
             }
         }
@@ -229,7 +230,7 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
             return cells.iterator()
         }
 
-        private fun copyEdit(consumer: (MutableMap<String, Cell>) -> Unit): ItemCells {
+        private fun edit(consumer: (MutableMap<String, Cell>) -> Unit): ItemCells {
             val cells = HashMap<String, Cell>(this.cells)
             consumer.invoke(cells)
             return Value(HashMap(cells)) // 显式副本

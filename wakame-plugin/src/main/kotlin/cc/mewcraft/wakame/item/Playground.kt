@@ -10,10 +10,10 @@ import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemName
 import cc.mewcraft.wakame.item.components.Unbreakable
-import cc.mewcraft.wakame.item.components.cell.Cell
-import cc.mewcraft.wakame.item.components.cell.CoreType
-import cc.mewcraft.wakame.item.components.cell.CoreTypes
-import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
+import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.CoreType
+import cc.mewcraft.wakame.item.components.cells.CoreTypes
+import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import net.kyori.adventure.text.Component

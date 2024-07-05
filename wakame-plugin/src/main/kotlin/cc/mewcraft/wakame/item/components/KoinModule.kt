@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.components.cell.componentCellModule
 import cc.mewcraft.wakame.item.components.crate.componentCrateModule
+import cc.mewcraft.wakame.item.components.cells.componentCellModule
 import org.koin.core.module.Module
 import org.koin.dsl.module
 

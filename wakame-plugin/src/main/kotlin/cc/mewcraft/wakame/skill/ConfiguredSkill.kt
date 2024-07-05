@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
+import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.krequire
