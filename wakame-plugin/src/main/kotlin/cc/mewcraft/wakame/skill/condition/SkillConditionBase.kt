@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.skill.condition
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.*
 import cc.mewcraft.wakame.skill.SkillSupport
-import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 
 /**
  * 包含了 [SkillCondition] 实现类的共同逻辑.
@@ -32,8 +32,8 @@ abstract class SkillConditionBase(
         /**
          * 发送条件满足时的消息提示.
          */
-        fun notifySuccess(context: SkillCastContext) {
-            val caster = context.optional(SkillCastContextKey.CASTER_AUDIENCE)
+        fun notifySuccess(context: SkillContext) {
+            val caster = context.optional(SkillContextKey.CASTER_AUDIENCE)
             if (caster != null) {
                 successMessage.send(caster)
             }
@@ -42,8 +42,8 @@ abstract class SkillConditionBase(
         /**
          * 发送条件不满足时的消息提示.
          */
-        fun notifyFailure(context: SkillCastContext) {
-            val caster = context.optional(SkillCastContextKey.CASTER_AUDIENCE)
+        fun notifyFailure(context: SkillContext) {
+            val caster = context.optional(SkillContextKey.CASTER_AUDIENCE)
             if (caster != null) {
                 failureMessage.send(caster)
             }

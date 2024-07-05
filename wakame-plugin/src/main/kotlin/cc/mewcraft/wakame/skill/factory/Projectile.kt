@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.Target
-import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTicker
 import cc.mewcraft.wakame.skill.tick.TickResult
@@ -168,17 +168,17 @@ interface Projectile : Skill {
         override val damage: Evaluable<*> by damage
         override val effects: Map<Trigger, Skill> by effects
 
-        override fun cast(context: SkillCastContext): SkillTick {
+        override fun cast(context: SkillContext): SkillTick {
             return Tick(context)
         }
 
         private inner class Tick(
-            override val context: SkillCastContext
+            override val context: SkillContext
         ) : SkillTick {
             override val skill: Skill = this@DefaultImpl
 
             override fun tick(): TickResult {
-                val location = context.optional(SkillCastContextKey.TARGET_LOCATION) ?: return TickResult.INTERRUPT
+                val location = context.optional(SkillContextKey.TARGET_LOCATION) ?: return TickResult.INTERRUPT
                 val projectile = when (type) {
                     Type.ARROW -> Arrow(location)
                 }
@@ -222,10 +222,10 @@ interface Projectile : Skill {
                     Events.subscribe(ServerTickStartEvent::class.java)
                         .expireIf { arrow.isDead }
                         .handler {
-                            val node = context.get(SkillCastContextKey.CASTER_COMPOSITE_NODE)
+                            val node = context.get(SkillContextKey.CASTER_COMPOSITE_NODE)
                             val single = node.root().value
                             println(single)
-                            val newContext = SkillCastContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(arrow.location))
+                            val newContext = SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(arrow.location))
                             val tickSkillTick = effects[Trigger.TICK]?.cast(newContext) ?: return@handler
                             SkillTicker.addChildren(tickSkillTick)
                         }
@@ -239,7 +239,7 @@ interface Projectile : Skill {
                                 .firstOrNull()
                             if (hitEntity != null && hitEntity is LivingEntity) {
                                 val newContext =
-                                    SkillCastContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(hitEntity))
+                                    SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(hitEntity))
                                 val hitEntitySkillTick = effects[Trigger.HIT_ENTITY]?.cast(newContext) ?: return@handler
                                 SkillTicker.addChildren(hitEntitySkillTick)
                             }
@@ -254,7 +254,7 @@ interface Projectile : Skill {
                             val hitBlock = it.hitBlock
                             if (hitBlock != null) {
                                 val newContext =
-                                    SkillCastContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(hitBlock.location))
+                                    SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(hitBlock.location))
                                 val hitBlockSkillTick = effects[Trigger.HIT_BLOCK]?.cast(newContext) ?: return@handler
                                 SkillTicker.addChildren(hitBlockSkillTick)
                             }
@@ -266,7 +266,7 @@ interface Projectile : Skill {
                         .expireIf { arrow.isDead }
                         .handler {
                             if (it.entity != arrow) return@handler
-                            val newContext = SkillCastContext(CasterAdapter.adapt(arrow))
+                            val newContext = SkillContext(CasterAdapter.adapt(arrow))
                             val disappearSkillTick = effects[Trigger.DISAPPEAR]?.cast(newContext) ?: return@handler
                             SkillTicker.addChildren(disappearSkillTick)
                         }

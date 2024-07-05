@@ -4,8 +4,8 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.*
 import net.kyori.adventure.key.Key
 
@@ -33,30 +33,30 @@ interface CommandExecute : Skill {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillCastContext): SkillTick {
+        override fun cast(context: SkillContext): SkillTick {
             return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
 
         private inner class Tick(
-            context: SkillCastContext,
+            context: SkillContext,
             override val interruptTriggers: TriggerConditions,
             override val forbiddenTriggers: TriggerConditions
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
-                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("命令执行前摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("命令执行后摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickCast(): TickResult {
-                val entity = context.optional(SkillCastContextKey.CASTER_ENTITY)?.bukkitEntity ?: return TickResult.INTERRUPT
+                val entity = context.optional(SkillContextKey.CASTER_ENTITY)?.bukkitEntity ?: return TickResult.INTERRUPT
                 for (command in commands) {
                     command.replace("{caster}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }
                 }

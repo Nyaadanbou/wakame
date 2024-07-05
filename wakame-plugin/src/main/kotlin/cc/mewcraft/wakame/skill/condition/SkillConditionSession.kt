@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.skill.condition
 
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillContext
 
 /**
  * 代表执行一次条件判断的会话.
@@ -21,12 +21,12 @@ interface SkillConditionSession {
      *
      * 这包括消耗相应的资源, 发送消息提示等等.
      */
-    fun onSuccess(context: SkillCastContext)
+    fun onSuccess(context: SkillContext)
 
     /**
      * 当条件**不满足时**执行的逻辑. 可能会修改 [context] 的状态.
      */
-    fun onFailure(context: SkillCastContext)
+    fun onFailure(context: SkillContext)
 
     companion object {
         /**
@@ -47,12 +47,12 @@ interface SkillConditionSession {
 
 private data object AlwaysSuccessSession : SkillConditionSession {
     override val isSuccess: Boolean = true
-    override fun onSuccess(context: SkillCastContext) {}
-    override fun onFailure(context: SkillCastContext) {}
+    override fun onSuccess(context: SkillContext) {}
+    override fun onFailure(context: SkillContext) {}
 }
 
 private data object AlwaysFailureSession : SkillConditionSession {
     override val isSuccess: Boolean = false
-    override fun onSuccess(context: SkillCastContext) {}
-    override fun onFailure(context: SkillCastContext) {}
+    override fun onSuccess(context: SkillContext) {}
+    override fun onFailure(context: SkillContext) {}
 }

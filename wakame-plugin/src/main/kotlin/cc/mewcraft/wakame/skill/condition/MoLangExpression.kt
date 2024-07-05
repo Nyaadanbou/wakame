@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.molang.MoLangSupport
-import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -33,7 +33,7 @@ interface MoLangExpression : SkillCondition {
         override val evaluable: Evaluable<*> by config.entry<Evaluable<*>>("eval")
         override val resolver: TagResolver = Placeholder.component(this.type, Component.text(this.evaluable.evaluate(MoLangSupport.createEngine()))) // TODO: Support MoLang tag resolver
 
-        override fun newSession(context: SkillCastContext): SkillConditionSession {
+        override fun newSession(context: SkillContext): SkillConditionSession {
             val engine = MoLangSupport.createEngine()
             // TODO: engine.bindInstance(...)
             val isSuccess = evaluable.evaluate(engine) != .0
@@ -45,20 +45,20 @@ interface MoLangExpression : SkillCondition {
         ) : SkillConditionSession {
             private val notification: Notification = Notification()
 
-            override fun onSuccess(context: SkillCastContext) {
+            override fun onSuccess(context: SkillContext) {
                 // 用预设的实现发消息
                 notification.notifySuccess(context)
 
                 // 自定义的逻辑
-                context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer?.heal(2.0)
+                context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer?.heal(2.0)
             }
 
-            override fun onFailure(context: SkillCastContext) {
+            override fun onFailure(context: SkillContext) {
                 // 用预设的实现发消息
                 notification.notifyFailure(context)
 
                 // 自定义的逻辑
-                context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer?.damage(2.0)
+                context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer?.damage(2.0)
             }
         }
     }

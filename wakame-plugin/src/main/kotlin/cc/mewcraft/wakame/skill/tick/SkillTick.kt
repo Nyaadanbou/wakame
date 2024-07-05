@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.skill.tick
 
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.TriggerConditions
-import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.state.BackswingStateInfo
 import cc.mewcraft.wakame.skill.state.CastPointStateInfo
 import cc.mewcraft.wakame.skill.state.CastStateInfo
@@ -31,7 +31,7 @@ interface SkillTick {
     /**
      * 此次触发效果的上下文.
      */
-    val context: SkillCastContext
+    val context: SkillContext
 
     /**
      * 触发一 tick 的效果.
@@ -41,7 +41,7 @@ interface SkillTick {
 
 private data object EmptySkillTick : SkillTick {
     override val skill: Skill = Skill.empty()
-    override val context: SkillCastContext = SkillCastContext.empty()
+    override val context: SkillContext = SkillContext.empty()
 }
 
 /**
@@ -72,7 +72,7 @@ interface PlayerSkillTick : SkillTick {
  */
 abstract class AbstractSkillTick(
     final override val skill: Skill,
-    final override val context: SkillCastContext
+    final override val context: SkillContext
 ) : SkillTick {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -93,7 +93,7 @@ abstract class AbstractSkillTick(
 
 abstract class AbstractPlayerSkillTick(
     skill: Skill,
-    context: SkillCastContext
+    context: SkillContext
 ) : AbstractSkillTick(skill, context), PlayerSkillTick {
     /**
      * 此次触发效果中不允许的触发器.
@@ -108,7 +108,7 @@ abstract class AbstractPlayerSkillTick(
     open val interruptTriggers: TriggerConditions = TriggerConditions.empty()
 
     final override fun tick(): TickResult {
-        val user = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer?.toUser() ?: return tickCast()
+        val user = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer?.toUser() ?: return tickCast()
         val state = user.skillState
         if (state.info.skillTick != this)
             return tickCast()
@@ -130,7 +130,7 @@ abstract class AbstractPlayerSkillTick(
     }
 
     fun isPlayerTick(): Boolean {
-        val user = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer?.toUser() ?: return false
+        val user = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer?.toUser() ?: return false
         return user.skillState.info.skillTick == this
     }
 }

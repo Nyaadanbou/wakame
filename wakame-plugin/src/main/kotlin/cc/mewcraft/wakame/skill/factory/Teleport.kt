@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillBase
 import cc.mewcraft.wakame.skill.TriggerConditions
-import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.skill.tick.TickResult
@@ -74,31 +74,31 @@ interface Teleport : Skill {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillCastContext): SkillTick {
+        override fun cast(context: SkillContext): SkillTick {
             return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
 
         private inner class Tick(
-            context: SkillCastContext,
+            context: SkillContext,
             override val interruptTriggers: TriggerConditions,
             override val forbiddenTriggers: TriggerConditions
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
-                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("传送前摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context.optional(SkillCastContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context.optional(SkillContextKey.CASTER_PLAYER)?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("传送后摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickCast(): TickResult {
-                val player = context.optional(SkillCastContextKey.CASTER_PLAYER) ?: return TickResult.INTERRUPT
-                val location = context.optional(SkillCastContextKey.TARGET_LOCATION)?.bukkitLocation ?: return TickResult.INTERRUPT
+                val player = context.optional(SkillContextKey.CASTER_PLAYER) ?: return TickResult.INTERRUPT
+                val location = context.optional(SkillContextKey.TARGET_LOCATION)?.bukkitLocation ?: return TickResult.INTERRUPT
                 when (val type = type) {
                     is Type.FIXED -> {
                         val position = type.position

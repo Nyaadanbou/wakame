@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.command.parser.SkillParser
 import cc.mewcraft.wakame.skill.CasterAdapter
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.TargetAdapter
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.SkillTicker
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
@@ -65,7 +65,7 @@ object SkillCommands : CommandFactory<CommandSender> {
                         ?: targetLocation?.let { TargetAdapter.adapt(it) }
 
                     val skill = context.get<Skill>("skill")
-                    val castContext = SkillCastContext(CasterAdapter.adapt(casterPlayer), target)
+                    val castContext = SkillContext(CasterAdapter.adapt(casterPlayer), target)
                     SkillTicker.addChildren(skill.cast(castContext))
                 }
             }.buildAndAdd(this)

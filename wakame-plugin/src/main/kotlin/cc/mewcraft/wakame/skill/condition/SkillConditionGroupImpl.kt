@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill.condition
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.koin.core.component.KoinComponent
@@ -31,7 +31,7 @@ internal class SkillConditionGroupImpl(
 
     override val resolver: TagResolver = TagResolver.resolver(conditions.map { it.resolver })
 
-    override fun newSession(context: SkillCastContext): SkillConditionSession {
+    override fun newSession(context: SkillContext): SkillConditionSession {
         return SessionImpl(children.map { it.newSession(context) })
     }
 
@@ -40,12 +40,12 @@ internal class SkillConditionGroupImpl(
     ) : SkillConditionSession {
         override val isSuccess: Boolean = children.all { it.isSuccess }
 
-        override fun onSuccess(context: SkillCastContext) {
+        override fun onSuccess(context: SkillContext) {
             // 所有条件满足, 执行每个条件的 onSuccess
             children.forEach { it.onSuccess(context) }
         }
 
-        override fun onFailure(context: SkillCastContext) {
+        override fun onFailure(context: SkillContext) {
             // 存在条件不满足, 执行第一个不满足的条件的 onFailure
             val sessionWithFailure = children.firstOrNull { !it.isSuccess }
             if (sessionWithFailure == null) {

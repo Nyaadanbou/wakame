@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.skill.condition
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.inventory.meta.Damageable
 
@@ -31,10 +31,10 @@ interface VanillaDurability : SkillCondition {
         override val durability: Evaluable<*> by config.entry<Evaluable<*>>("durability")
         override val resolver: TagResolver = TagResolver.empty()
 
-        override fun newSession(context: SkillCastContext): SkillConditionSession {
-            val itemStack = context.optional(SkillCastContextKey.ITEM_STACK) ?: return SkillConditionSession.alwaysFailure()
+        override fun newSession(context: SkillContext): SkillConditionSession {
+            val itemStack = context.optional(SkillContextKey.ITEM_STACK) ?: return SkillConditionSession.alwaysFailure()
             val itemMeta = itemStack.itemMeta as? Damageable ?: return SkillConditionSession.alwaysFailure()
-            val engine = context.get(SkillCastContextKey.MOCHA_ENGINE)
+            val engine = context.get(SkillContextKey.MOCHA_ENGINE)
             val isSuccess = (itemMeta.maxDamage - itemMeta.damage) >= durability.evaluate(engine)
             return SessionImpl(isSuccess)
         }
@@ -44,11 +44,11 @@ interface VanillaDurability : SkillCondition {
         ) : SkillConditionSession {
             private val notification: Notification = Notification()
 
-            override fun onSuccess(context: SkillCastContext) {
+            override fun onSuccess(context: SkillContext) {
                 notification.notifySuccess(context)
             }
 
-            override fun onFailure(context: SkillCastContext) {
+            override fun onFailure(context: SkillContext) {
                 notification.notifyFailure(context)
             }
         }

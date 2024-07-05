@@ -2,7 +2,7 @@ import cc.mewcraft.wakame.skill.condition.SkillCondition
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroupImpl
 import cc.mewcraft.wakame.skill.condition.SkillConditionSession
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillContext
 import io.mockk.*
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -28,7 +28,7 @@ class SkillConditionResultTest : KoinTest {
         }
     }
 
-    private fun testGroup(group: SkillConditionGroup, context: SkillCastContext): SkillConditionSession {
+    private fun testGroup(group: SkillConditionGroup, context: SkillContext): SkillConditionSession {
         val session = group.newSession(context)
         if (session.isSuccess) {
             session.onSuccess(context)
@@ -41,7 +41,7 @@ class SkillConditionResultTest : KoinTest {
 
     @Test
     fun `test skill condition result`() {
-        val mockContext = mockk<SkillCastContext>()
+        val mockContext = mockk<SkillContext>()
         val mockCondition = mockk<SkillCondition>(relaxed = true)
         val session = mockk<SkillConditionSession>(relaxed = true)
 
@@ -62,7 +62,7 @@ class SkillConditionResultTest : KoinTest {
 
     @Test
     fun `test skill condition failure`() {
-        val mockContext = mockk<SkillCastContext>()
+        val mockContext = mockk<SkillContext>()
         val mockCondition = mockk<SkillCondition>(relaxed = true)
         val session = mockk<SkillConditionSession>(relaxed = true)
 

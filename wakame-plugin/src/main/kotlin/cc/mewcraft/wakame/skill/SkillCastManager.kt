@@ -2,23 +2,23 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.event.SkillPrepareCastEvent
-import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 
 interface SkillCastManager {
-    fun tryCast(skill: Skill, context: SkillCastContext): SkillPrepareCastResult
+    fun tryCast(skill: Skill, context: SkillContext): SkillPrepareCastResult
 }
 
 internal class SkillCastManagerImpl : SkillCastManager {
-    override fun tryCast(skill: Skill, context: SkillCastContext): SkillPrepareCastResult {
+    override fun tryCast(skill: Skill, context: SkillContext): SkillPrepareCastResult {
         val event: SkillPrepareCastEvent
         when {
-            context.has(SkillCastContextKey.CASTER_PLAYER) -> {
+            context.has(SkillContextKey.CASTER_PLAYER) -> {
                 event = PlayerSkillPrepareCastEvent(
                     skill = skill, 
-                    caster = context.get(SkillCastContextKey.CASTER_PLAYER).bukkitPlayer,
-                    target = context.optional(SkillCastContextKey.TARGET),
-                    item = context.optional(SkillCastContextKey.ITEM_STACK),
+                    caster = context.get(SkillContextKey.CASTER_PLAYER).bukkitPlayer,
+                    target = context.optional(SkillContextKey.TARGET),
+                    item = context.optional(SkillContextKey.ITEM_STACK),
                 )
             }
 

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.skill.state
 
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.User
 import me.lucko.helper.cooldown.Cooldown
@@ -18,7 +18,7 @@ interface SkillState {
     /**
      * 添加一次技能触发
      */
-    fun addTrigger(trigger: SingleTrigger, skillCastContext: SkillCastContext): SkillStateResult
+    fun addTrigger(trigger: SingleTrigger, skillContext: SkillContext): SkillStateResult
 
     /**
      * 刷新一次技能状态
@@ -48,12 +48,12 @@ class PlayerSkillState(
     override var info: SkillStateInfo = IdleStateInfo(this)
         private set
 
-    override fun addTrigger(trigger: SingleTrigger, skillCastContext: SkillCastContext): SkillStateResult {
+    override fun addTrigger(trigger: SingleTrigger, skillContext: SkillContext): SkillStateResult {
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
             return SkillStateResult.SILENT_FAILURE
         }
 
-        val result = info.addTrigger(trigger, skillCastContext)
+        val result = info.addTrigger(trigger, skillContext)
         return result
     }
 

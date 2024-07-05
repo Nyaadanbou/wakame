@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.skill.condition
 
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillContext
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
 /**
@@ -48,7 +48,7 @@ interface SkillCondition {
     /**
      * 创建一个新的条件判断的会话.
      */
-    fun newSession(context: SkillCastContext): SkillConditionSession
+    fun newSession(context: SkillContext): SkillConditionSession
 }
 
 /**

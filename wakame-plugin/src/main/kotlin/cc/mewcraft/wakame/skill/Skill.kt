@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.factory.SkillFactory
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.util.Key
@@ -44,7 +44,7 @@ interface Skill : Keyed {
     /**
      * 释放该技能.
      */
-    fun cast(context: SkillCastContext): SkillTick = SkillTick.empty()
+    fun cast(context: SkillContext): SkillTick = SkillTick.empty()
 
     companion object {
         /**

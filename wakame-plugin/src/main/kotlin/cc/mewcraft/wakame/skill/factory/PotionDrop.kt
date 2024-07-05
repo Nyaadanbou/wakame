@@ -5,8 +5,8 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.context.SkillCastContext
-import cc.mewcraft.wakame.skill.context.SkillCastContextKey
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.*
 import net.kyori.adventure.key.Key
 import org.bukkit.Location
@@ -41,22 +41,22 @@ interface PotionDrop : Skill {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillCastContext): SkillTick {
+        override fun cast(context: SkillContext): SkillTick {
             return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
 
         private inner class Tick(
-            context: SkillCastContext,
+            context: SkillContext,
             override val interruptTriggers: TriggerConditions,
             override val forbiddenTriggers: TriggerConditions
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
             override fun tickCast(): TickResult {
                 val location = when {
-                    context.has(SkillCastContextKey.TARGET_LOCATION) -> {
-                        context.optional(SkillCastContextKey.TARGET_LOCATION)!!.bukkitLocation
+                    context.has(SkillContextKey.TARGET_LOCATION) -> {
+                        context.optional(SkillContextKey.TARGET_LOCATION)!!.bukkitLocation
                     }
-                    context.has(SkillCastContextKey.CASTER_ENTITY) -> {
-                        context.optional(SkillCastContextKey.CASTER_ENTITY)!!.bukkitEntity.location
+                    context.has(SkillContextKey.CASTER_ENTITY) -> {
+                        context.optional(SkillContextKey.CASTER_ENTITY)!!.bukkitEntity.location
                     }
                     else -> return TickResult.INTERRUPT
                 }
@@ -68,7 +68,7 @@ interface PotionDrop : Skill {
                 private val location: Location
             ) : SkillTick {
                 override val skill: Skill = this@DefaultImpl
-                override val context: SkillCastContext = this@Tick.context
+                override val context: SkillContext = this@Tick.context
 
                 private var counter: Int = 0
 

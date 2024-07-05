@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.state.SkillStateResult
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.toUser
@@ -48,7 +48,7 @@ class SkillEventHandler {
         val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
         val target = targetProvider.invoke()
-        val result = user.skillState.addTrigger(SingleTrigger.LEFT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
+        val result = user.skillState.addTrigger(SingleTrigger.LEFT_CLICK, SkillContext(CasterAdapter.adapt(player), target, nekoStack))
         if (result == SkillStateResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
@@ -71,28 +71,28 @@ class SkillEventHandler {
         val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
         val target = targetProvider.invoke()
-        val result = user.skillState.addTrigger(SingleTrigger.RIGHT_CLICK, SkillCastContext(CasterAdapter.adapt(player), target, nekoStack))
+        val result = user.skillState.addTrigger(SingleTrigger.RIGHT_CLICK, SkillContext(CasterAdapter.adapt(player), target, nekoStack))
         checkResult(result, event)
     }
 
     fun onJump(player: Player, itemStack: ItemStack?, event: PlayerJumpEvent) {
         val user = player.toUser()
         val nekoStack = itemStack?.tryNekoStack
-        val result = user.skillState.addTrigger(SingleTrigger.JUMP, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
+        val result = user.skillState.addTrigger(SingleTrigger.JUMP, SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
         checkResult(result, event)
     }
 
     fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack?, event: EntityDamageByEntityEvent) {
         val user = player.toUser()
         val nekoStack = itemStack?.tryNekoStack
-        val result = user.skillState.addTrigger(SingleTrigger.ATTACK, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack))
+        val result = user.skillState.addTrigger(SingleTrigger.ATTACK, SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack))
         checkResult(result, event)
     }
 
     fun onMove(player: Player, itemStack: ItemStack?, event: PlayerMoveEvent) {
         val user = player.toUser()
         val nekoStack = itemStack?.tryNekoStack
-        val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
+        val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
         checkResult(result, event)
     }
 
@@ -101,7 +101,7 @@ class SkillEventHandler {
         val nekoStack = itemStack?.tryNekoStack
         val result = user.skillState.addTrigger(
             SingleTrigger.SNEAK,
-            SkillCastContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack)
+            SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack)
         )
         checkResult(result, event)
     }

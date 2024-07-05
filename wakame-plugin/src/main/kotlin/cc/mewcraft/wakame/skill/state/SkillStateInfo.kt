@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.skill.state
 
 import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.context.SkillCastContext
+import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
+import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.skill.tick.TickResult
 import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
@@ -31,7 +32,7 @@ sealed interface SkillStateInfo {
     /**
      * 添加一个 [SingleTrigger],
      */
-    fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult
+    fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult
 
     /**
      * 进行一次状态的刷新.
@@ -90,7 +91,7 @@ class IdleStateInfo(
 
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(3)
 
-    override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
+    override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
         val user = state.user
 
         val castableSkills = mutableListOf<Skill>()
@@ -143,7 +144,7 @@ class CastPointStateInfo(
 ) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST_POINT) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
-    override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
+    override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
@@ -174,7 +175,7 @@ class CastStateInfo(
 ) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
-    override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
+    override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
@@ -205,7 +206,7 @@ class BackswingStateInfo(
 ) : AbstractSkillStateInfo(SkillStateInfo.Type.BACKSWING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager(skillTick)
 
-    override fun addTrigger(trigger: SingleTrigger, context: SkillCastContext): SkillStateResult {
+    override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
