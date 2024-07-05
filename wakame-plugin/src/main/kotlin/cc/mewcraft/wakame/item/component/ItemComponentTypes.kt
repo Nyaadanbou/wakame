@@ -1,17 +1,17 @@
 package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.components.Arrow
 import cc.mewcraft.wakame.item.components.Attributable
 import cc.mewcraft.wakame.item.components.Castable
-import cc.mewcraft.wakame.item.components.Crate
 import cc.mewcraft.wakame.item.components.CustomModelData
 import cc.mewcraft.wakame.item.components.CustomName
 import cc.mewcraft.wakame.item.components.Damageable
 import cc.mewcraft.wakame.item.components.ExtraLore
 import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
+import cc.mewcraft.wakame.item.components.ItemArrow
 import cc.mewcraft.wakame.item.components.ItemCells
+import cc.mewcraft.wakame.item.components.ItemCrate
 import cc.mewcraft.wakame.item.components.ItemDamage
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemKizamiz
@@ -36,7 +36,7 @@ object ItemComponentTypes {
     /**
      * 将物品作为弹药.
      */
-    val ARROW: ItemComponentType<Arrow> = Arrow.Codec(ItemComponentConstants.ARROW).register()
+    val ARROW: ItemComponentType<ItemArrow> = ItemArrow.Codec(ItemComponentConstants.ARROW).register()
 
     /**
      * 控制物品能否提供属性加成给玩家.
@@ -56,7 +56,7 @@ object ItemComponentTypes {
     /**
      * 将物品作为盲盒.
      */
-    val CRATE: ItemComponentType<Crate> = Crate.Codec(ItemComponentConstants.CRATE).register()
+    val CRATE: ItemComponentType<ItemCrate> = ItemCrate.Codec(ItemComponentConstants.CRATE).register()
 
     /**
      * 自定义模型数据. 对应原版组件: [`minecraft:custom_model_data`](https://minecraft.wiki/w/Data_component_format#custom_model_data)

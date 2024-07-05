@@ -1,15 +1,15 @@
 package cc.mewcraft.wakame.item.template
 
-import cc.mewcraft.wakame.item.components.Arrow
 import cc.mewcraft.wakame.item.components.Attributable
 import cc.mewcraft.wakame.item.components.Castable
-import cc.mewcraft.wakame.item.components.Crate
 import cc.mewcraft.wakame.item.components.CustomName
 import cc.mewcraft.wakame.item.components.Damageable
 import cc.mewcraft.wakame.item.components.ExtraLore
 import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
+import cc.mewcraft.wakame.item.components.ItemArrow
 import cc.mewcraft.wakame.item.components.ItemCells
+import cc.mewcraft.wakame.item.components.ItemCrate
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemKizamiz
 import cc.mewcraft.wakame.item.components.ItemLevel
@@ -23,9 +23,9 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 object ItemTemplateTypes {
     /**
-     * 组件: [Arrow]
+     * 组件: [ItemArrow]
      */
-    val ARROW: ItemTemplateType<Arrow.Template> = Arrow.Template.register()
+    val ARROW: ItemTemplateType<ItemArrow.Template> = ItemArrow.Template.register()
 
     /**
      * 组件: [Attributable]
@@ -43,9 +43,9 @@ object ItemTemplateTypes {
     val CELLS: ItemTemplateType<ItemCells.Template> = ItemCells.Template.register()
 
     /**
-     * 组件: [Crate]
+     * 组件: [ItemCrate]
      */
-    val CRATE: ItemTemplateType<Crate.Template> = Crate.Template.register()
+    val CRATE: ItemTemplateType<ItemCrate.Template> = ItemCrate.Template.register()
 
     /**
      * 组件: [CustomName]

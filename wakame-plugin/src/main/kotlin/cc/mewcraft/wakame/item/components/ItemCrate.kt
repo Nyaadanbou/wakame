@@ -23,7 +23,7 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Crate : Examinable, TooltipProvider.Single {
+interface ItemCrate : Examinable, TooltipProvider.Single {
 
     /**
      * 盲盒的唯一标识.
@@ -32,7 +32,7 @@ interface Crate : Examinable, TooltipProvider.Single {
 
     data class Value(
         override val key: Key,
-    ) : Crate {
+    ) : ItemCrate {
         override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
@@ -48,14 +48,14 @@ interface Crate : Examinable, TooltipProvider.Single {
 
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Crate> {
-        override fun read(holder: ItemComponentHolder): Crate? {
+    ) : ItemComponentType<ItemCrate> {
+        override fun read(holder: ItemComponentHolder): ItemCrate? {
             val tag = holder.getTag() ?: return null
             val key = Key(tag.getString(TAG_KEY))
             return Value(key = key)
         }
 
-        override fun write(holder: ItemComponentHolder, value: Crate) {
+        override fun write(holder: ItemComponentHolder, value: ItemCrate) {
             holder.getTagOrCreate().putString(TAG_KEY, value.key.asString())
         }
 
@@ -73,10 +73,10 @@ interface Crate : Examinable, TooltipProvider.Single {
          * 盲盒的唯一标识.
          */
         val key: Key,
-    ) : ItemTemplate<Crate> {
-        override val componentType: ItemComponentType<Crate> = ItemComponentTypes.CRATE
+    ) : ItemTemplate<ItemCrate> {
+        override val componentType: ItemComponentType<ItemCrate> = ItemComponentTypes.CRATE
 
-        override fun generate(context: GenerationContext): GenerationResult<Crate> {
+        override fun generate(context: GenerationContext): GenerationResult<ItemCrate> {
             return GenerationResult.of(Value(key))
         }
 

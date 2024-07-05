@@ -29,7 +29,7 @@ import java.lang.reflect.Type
 // 这是文件列表里的第一个物品组件,
 // 因此添加了更多代码注释, 请留意.
 
-interface Arrow : Examinable, TooltipProvider.Single {
+interface ItemArrow : Examinable, TooltipProvider.Single {
 
     /**
      * 可穿透的实体数.
@@ -45,7 +45,7 @@ interface Arrow : Examinable, TooltipProvider.Single {
     // 否则其他系统将无法得知如何将该物品组件显示在物品提示框里.
     data class Value(
         override val pierceLevel: Byte,
-    ) : Arrow {
+    ) : ItemArrow {
         override fun provideTooltipLore(): LoreLine {
             if (!showInTooltip) {
                 return LoreLine.noop()
@@ -67,14 +67,14 @@ interface Arrow : Examinable, TooltipProvider.Single {
     // 根据物品组件的具体情况, 这里的实现会稍有不同.
     data class Codec(
         override val id: String,
-    ) : ItemComponentType<Arrow> {
-        override fun read(holder: ItemComponentHolder): Arrow? {
+    ) : ItemComponentType<ItemArrow> {
+        override fun read(holder: ItemComponentHolder): ItemArrow? {
             val tag = holder.getTag() ?: return null
             val pierceLevel = tag.getByte(TAG_PIERCE_LEVEL)
             return Value(pierceLevel = pierceLevel)
         }
 
-        override fun write(holder: ItemComponentHolder, value: Arrow) {
+        override fun write(holder: ItemComponentHolder, value: ItemArrow) {
             val tag = holder.getTagOrCreate()
             val pierceLevel = value.pierceLevel
             tag.putByte(TAG_PIERCE_LEVEL, pierceLevel)
@@ -102,10 +102,10 @@ interface Arrow : Examinable, TooltipProvider.Single {
     // 实现需要定义模板的数据结构, 以及模板的(反)序列化函数.
     data class Template(
         val pierceLevel: RandomizedValue,
-    ) : ItemTemplate<Arrow> {
-        override val componentType: ItemComponentType<Arrow> = ItemComponentTypes.ARROW
+    ) : ItemTemplate<ItemArrow> {
+        override val componentType: ItemComponentType<ItemArrow> = ItemComponentTypes.ARROW
 
-        override fun generate(context: GenerationContext): GenerationResult<Arrow> {
+        override fun generate(context: GenerationContext): GenerationResult<ItemArrow> {
             val pierceLevel = pierceLevel.calculate().toStableByte()
             return GenerationResult.of(Value(pierceLevel))
         }
@@ -129,7 +129,7 @@ interface Arrow : Examinable, TooltipProvider.Single {
     }
 
     companion object {
-        fun of(pierceLevel: Byte): Arrow {
+        fun of(pierceLevel: Byte): ItemArrow {
             return Value(pierceLevel)
         }
     }
