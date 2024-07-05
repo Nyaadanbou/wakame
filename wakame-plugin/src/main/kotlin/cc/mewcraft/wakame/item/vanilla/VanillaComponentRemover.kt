@@ -18,7 +18,7 @@ import java.util.stream.Stream
  */
 interface VanillaComponentRemover : Examinable {
     /**
-     * 检查组件是否在移除列表内.
+     * 检查组件是否在要移除的列表内.
      */
     @TestOnly
     fun has(name: String): Boolean
