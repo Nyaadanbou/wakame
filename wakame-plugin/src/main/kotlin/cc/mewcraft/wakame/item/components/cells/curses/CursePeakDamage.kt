@@ -6,8 +6,10 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Curse
 import cc.mewcraft.wakame.item.components.cells.CurseType
+import cc.mewcraft.wakame.item.components.tracks.TrackTypes
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.toStableShort
@@ -41,9 +43,10 @@ data class CursePeakDamage(
     }
 
     override fun isUnlocked(context: NekoStack): Boolean {
-        // TODO 完成组件 ItemTracks
-        // return context.statistics.PEAK_DAMAGE[element] >= amount
-        return true
+        val tracks = context.components.get(ItemComponentTypes.TRACKS) ?: return false
+        val track = tracks.get(TrackTypes.PEAK_DAMAGE) ?: return false // 如果没有统计数据, 则返回锁定状态
+        val peakDamage = track.get(element)
+        return peakDamage >= amount
     }
 
     override fun serializeAsTag(): Tag = CompoundTag {

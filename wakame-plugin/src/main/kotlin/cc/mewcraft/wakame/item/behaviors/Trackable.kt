@@ -4,8 +4,10 @@ import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
+import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemTracks
+import cc.mewcraft.wakame.item.components.tracks.TrackTypes
 import cc.mewcraft.wakame.item.toNekoStack
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
@@ -25,11 +27,19 @@ interface Trackable : ItemBehavior {
                 return
             }
 
-            val key: Key = entityKeyLookup.get(attacked)
-            val stack: NekoStack = itemStack.toNekoStack
-            val tracks: ItemTracks = stack.components.get(ItemComponentTypes.TRACKS) ?: return
+            // 以下代码只是个 POC, 用作在游戏内测试 ItemTracks 有没有正常工作
 
-            //
+            val entityKey: Key = entityKeyLookup.get(attacked)
+            val stack: NekoStack = itemStack.toNekoStack
+            val components: ItemComponentMap = stack.components
+            val tracks: ItemTracks = components.get(ItemComponentTypes.TRACKS) ?: return
+
+            if (attacked.isDead) {
+                val newTracks: ItemTracks = tracks.modify(TrackTypes.ENTITY_KILLS) { track ->
+                    track.grow(entityKey)
+                }
+                components.set(ItemComponentTypes.TRACKS, newTracks)
+            }
         }
     }
 

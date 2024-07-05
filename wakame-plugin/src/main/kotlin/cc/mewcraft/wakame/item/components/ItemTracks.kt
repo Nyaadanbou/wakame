@@ -18,8 +18,6 @@ import cc.mewcraft.wakame.item.components.tracks.TrackTypes
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import net.kyori.examination.Examinable
 
-// TODO 完成组件: ItemTracks
-
 interface ItemTracks : Examinable, ItemComponent, Iterable<Map.Entry<TrackType<*>, Track>> {
 
     /**

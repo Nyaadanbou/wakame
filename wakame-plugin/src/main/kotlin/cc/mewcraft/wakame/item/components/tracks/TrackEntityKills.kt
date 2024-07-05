@@ -19,6 +19,11 @@ import org.koin.core.component.inject
  */
 interface TrackEntityKills : Track, TrackMap<TrackEntityKills, Key, Int> {
 
+    /**
+     * 给指定的 [key] 增加击杀数.
+     */
+    fun grow(key: Key, count: Int = 1): TrackEntityKills
+
     companion object : TrackType<TrackEntityKills>, KoinComponent {
         private val entityKeyLookup: EntityKeyLookup by inject()
 
@@ -59,6 +64,10 @@ private class TrackEntityKillsImpl(
         return edit { map ->
             map.remove(key)
         }
+    }
+
+    override fun grow(key: Key, count: Int): TrackEntityKills {
+        return set(key, get(key) + count)
     }
 
     override fun serializeAsTag(): Tag = CompoundTag {
