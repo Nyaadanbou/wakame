@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -32,7 +33,7 @@ data class ExtraLore(
      * 物品的额外描述.
      */
     val lore: List<String>,
-) : Examinable, TooltipProvider.Single {
+) : Examinable, ItemComponent, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ExtraLore>, ItemComponentConfig(ItemComponentConstants.LORE) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LORE }
@@ -42,7 +43,7 @@ data class ExtraLore(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ExtraLore> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -88,7 +89,7 @@ data class ExtraLore(
     // 模板中的描述文本应该始终是 MiniMessage 吗?
     // 我们可以让用户输入 MiniMessage, 但最终储存在内存里的
     // 数据可以是 Component?
-    private data class Template(
+    data class Template(
         /**
          * A list of MiniMessage strings.
          */
@@ -101,8 +102,8 @@ data class ExtraLore(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<ExtraLore> {
-        override val typeToken: TypeToken<ItemTemplate<ExtraLore>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template(node.getList<String>(emptyList()))

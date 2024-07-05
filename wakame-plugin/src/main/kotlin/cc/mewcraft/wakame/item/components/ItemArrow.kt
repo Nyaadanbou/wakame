@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -32,7 +33,7 @@ data class ItemArrow(
      * 可穿透的实体数.
      */
     val pierceLevel: Byte,
-) : Examinable, TooltipProvider.Single {
+) : Examinable, ItemComponent, TooltipProvider.Single {
 
     // 开发日记: 2024/6/24 小米
     // companion object 将作为组件配置文件的入口,
@@ -49,7 +50,7 @@ data class ItemArrow(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ItemArrow> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -106,7 +107,7 @@ data class ItemArrow(
     // 开发日记: 2024/6/25
     // 这是模板类型, 也就是物品组件在配置文件中的封装.
     // 实现需要定义模板的数据结构, 以及模板的(反)序列化函数.
-    private data class Template(
+    data class Template(
         val pierceLevel: RandomizedValue,
     ) : ItemTemplate<ItemArrow> {
         override val componentType: ItemComponentType<ItemArrow> = ItemComponentTypes.ARROW
@@ -117,8 +118,8 @@ data class ItemArrow(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<ItemArrow> {
-        override val typeToken: TypeToken<ItemTemplate<ItemArrow>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -127,7 +128,7 @@ data class ItemArrow(
          *   pierce_level: <randomized_value>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemArrow> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             // required
             val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
             return Template(pierceLevel)

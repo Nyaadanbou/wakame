@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -49,7 +50,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
-interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<String, Cell>> {
+interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterable<Map.Entry<String, Cell>> {
 
     companion object : ItemComponentBridge<ItemCells> {
         fun of(cells: Map<String, Cell>): ItemCells {
@@ -62,7 +63,7 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ItemCells> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -231,7 +232,7 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
         private companion object
     }
 
-    private data class Template(
+    data class Template(
         val cells: Map<String, TemplateCell>,
     ) : ItemTemplate<ItemCells> {
         override val componentType: ItemComponentType<ItemCells> = ItemComponentTypes.CELLS
@@ -262,8 +263,8 @@ interface ItemCells : TooltipProvider.Cluster, Examinable, Iterable<Map.Entry<St
         }
     }
 
-    private data object TemplateType : ItemTemplateType<ItemCells>, KoinComponent {
-        override val typeToken: TypeToken<ItemTemplate<ItemCells>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template>, KoinComponent {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure

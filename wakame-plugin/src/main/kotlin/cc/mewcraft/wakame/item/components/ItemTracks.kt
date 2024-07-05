@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -10,14 +11,14 @@ import net.kyori.examination.Examinable
 
 // TODO 完成组件: ItemTracks
 
-interface ItemTracks : Examinable {
+interface ItemTracks : Examinable, ItemComponent {
 
     companion object : ItemComponentBridge<ItemTracks>, ItemComponentConfig(ItemComponentConstants.TRACKABLE) {
         override fun codec(id: String): ItemComponentType<ItemTracks> {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ItemTracks> {
+        override fun templateType(): ItemTemplateType<Nothing> {
             throw UnsupportedOperationException()
         }
     }

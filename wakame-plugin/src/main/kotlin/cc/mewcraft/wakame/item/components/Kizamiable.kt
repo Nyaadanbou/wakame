@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -19,7 +20,7 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Kizamiable : Examinable, TooltipProvider.Single {
+interface Kizamiable : Examinable, ItemComponent, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Kizamiable> {
         fun of(): Kizamiable {
@@ -30,7 +31,7 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Kizamiable> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -63,7 +64,7 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
         }
     }
 
-    private data object Template : ItemTemplate<Kizamiable> {
+    data object Template : ItemTemplate<Kizamiable> {
         override val componentType: ItemComponentType<Kizamiable> = ItemComponentTypes.KIZAMIABLE
 
         override fun generate(context: GenerationContext): GenerationResult<Kizamiable> {
@@ -71,8 +72,8 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Kizamiable> {
-        override val typeToken: TypeToken<ItemTemplate<Kizamiable>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -80,7 +81,7 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Kizamiable> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template
         }
     }

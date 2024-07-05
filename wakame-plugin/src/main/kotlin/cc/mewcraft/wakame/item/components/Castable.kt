@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -19,7 +20,7 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Castable : Examinable, TooltipProvider.Single {
+interface Castable : Examinable, ItemComponent, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Castable> {
         fun of(): Castable {
@@ -30,7 +31,7 @@ interface Castable : Examinable, TooltipProvider.Single {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Castable> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -63,7 +64,7 @@ interface Castable : Examinable, TooltipProvider.Single {
         }
     }
 
-    private data object Template : ItemTemplate<Castable> {
+    data object Template : ItemTemplate<Castable> {
         override val componentType: ItemComponentType<Castable> = ItemComponentTypes.CASTABLE
 
         override fun generate(context: GenerationContext): GenerationResult<Castable> {
@@ -71,8 +72,8 @@ interface Castable : Examinable, TooltipProvider.Single {
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Castable> {
-        override val typeToken: TypeToken<ItemTemplate<Castable>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -80,7 +81,7 @@ interface Castable : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Castable> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template
         }
     }

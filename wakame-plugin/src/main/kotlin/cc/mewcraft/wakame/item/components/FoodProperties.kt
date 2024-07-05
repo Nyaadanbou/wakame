@@ -4,6 +4,7 @@ import cc.mewcraft.nbt.StringTag
 import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -35,7 +36,7 @@ data class FoodProperties(
     val eatSeconds: Float,
     val effects: List<FoodEffect>,
     val skills: List<Key>, // TODO 2024/6/28 等技能系统完全落地后改成对应的“技能”实例
-) : Examinable {
+) : Examinable, ItemComponent {
 
     data class FoodEffect(
         val potionEffect: PotionEffect,
@@ -47,7 +48,7 @@ data class FoodProperties(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<FoodProperties> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -108,7 +109,7 @@ data class FoodProperties(
         }
     }
 
-    private data class Template(
+    data class Template(
         val nutrition: Int,
         val saturation: Float,
         val canAlwaysEat: Boolean,
@@ -131,8 +132,8 @@ data class FoodProperties(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<FoodProperties> {
-        override val typeToken: TypeToken<ItemTemplate<FoodProperties>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure

@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -35,7 +36,7 @@ data class Damageable(
      * 最大损耗.
      */
     val maxDamage: Int,
-) : Examinable, TooltipProvider.Single {
+) : Examinable, ItemComponent, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Damageable>, ItemComponentConfig(ItemComponentConstants.DAMAGEABLE) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { DAMAGEABLE }
@@ -45,7 +46,7 @@ data class Damageable(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Damageable> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -87,7 +88,7 @@ data class Damageable(
     // 开发日记 2024/6/28
     // 这个 disappearWhenBroken 并不会写入物品 NBT,
     // 但可以通过物品的 ItemTemplateMap 获取该数据.
-    private data class Template(
+    data class Template(
         /**
          * 初始损耗.
          */
@@ -113,8 +114,8 @@ data class Damageable(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Damageable> {
-        override val typeToken: TypeToken<ItemTemplate<Damageable>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -125,7 +126,7 @@ data class Damageable(
          *   disappear_when_broken: <boolean>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Damageable> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             val damage = node.node("damage").krequire<RandomizedValue>()
             val maxDamage = node.node("max_damage").krequire<RandomizedValue>()
             val disappearWhenBroken = node.node("disappear_when_broken").krequire<Boolean>()

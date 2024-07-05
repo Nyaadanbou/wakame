@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -58,7 +59,7 @@ object NekoItemFactory {
         // read all item templates (of item components)
         val templateMap = ItemTemplateMap.build {
 
-            fun <T> tryAdd(path: String, type: ItemTemplateType<T>) {
+            fun <T : ItemTemplate<*>> tryAdd(path: String, type: ItemTemplateType<T>) {
                 val node = root.node(path)
                 val template = node.get(type.typeToken) ?: return
                 this.put(type, template)

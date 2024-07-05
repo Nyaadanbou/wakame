@@ -14,7 +14,7 @@ import net.kyori.examination.Examinable
  *
  * `物品组件`的`模板`专门用来多样化生成`物品组件`的`数据`.
  *
- * @param T 组件快照的类型
+ * @param T 组件的数据类型, 也就是必须与对应的 [ItemComponentType] 的泛型一致
  */
 interface ItemTemplate<T> : Examinable {
 

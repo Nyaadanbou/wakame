@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -26,7 +27,7 @@ data class Tool(
     val defaultMiningSpeed: Float,
     val damagePerBlock: Int,
     val rules: List<Rule>,
-) : Examinable {
+) : Examinable, ItemComponent {
 
     data class Rule(
         val blockTypes: Collection<Material>,
@@ -42,7 +43,7 @@ data class Tool(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Tool> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -77,7 +78,7 @@ data class Tool(
         private companion object
     }
 
-    private data class Template(
+    data class Template(
         val defaultMiningSpeed: Float,
         val damagePerBlock: Int,
         val rules: List<Rule>,
@@ -90,8 +91,8 @@ data class Tool(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Tool> {
-        override val typeToken: TypeToken<ItemTemplate<Tool>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -108,7 +109,7 @@ data class Tool(
          *       correct_for_drops: true
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Tool> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             // optional
             val defaultMiningSpeed = node.node("default_mining_speed").getFloat(1F)
             // optional

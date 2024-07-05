@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -40,7 +41,7 @@ data class ItemElements(
      * 所有的元素.
      */
     val elements: Set<Element>,
-) : Examinable, TooltipProvider.Single {
+) : Examinable, ItemComponent, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemElements>, ItemComponentConfig(ItemComponentConstants.ELEMENTS) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ELEMENTS }
@@ -50,7 +51,7 @@ data class ItemElements(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ItemElements> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -89,7 +90,7 @@ data class ItemElements(
         }
     }
 
-    private data class Template(
+    data class Template(
         val selector: Pool<Element, GenerationContext>,
     ) : ItemTemplate<ItemElements> {
         override val componentType: ItemComponentType<ItemElements> = ItemComponentTypes.ELEMENTS
@@ -101,10 +102,10 @@ data class ItemElements(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<ItemElements>, KoinComponent {
-        override val typeToken: TypeToken<ItemTemplate<ItemElements>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template>, KoinComponent {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemElements> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template(node.krequire<Pool<Element, GenerationContext>>())
         }
 

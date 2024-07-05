@@ -39,7 +39,7 @@ data class ItemCrate(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ItemCrate> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -73,7 +73,7 @@ data class ItemCrate(
         }
     }
 
-    private data class Template(
+    data class Template(
         /**
          * 盲盒的唯一标识.
          */
@@ -86,8 +86,8 @@ data class ItemCrate(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<ItemCrate> {
-        override val typeToken: TypeToken<ItemTemplate<ItemCrate>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -96,7 +96,7 @@ data class ItemCrate(
          *   key: "foo:bar"
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemCrate> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             val raw = node.node("key").krequire<Key>()
             return Template(raw)
         }

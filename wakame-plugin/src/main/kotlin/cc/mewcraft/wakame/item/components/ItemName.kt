@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
@@ -36,7 +37,7 @@ data class ItemName(
      * 一开始生成出来的富文本有所差别.
      */
     val rich: Component,
-) : Examinable {
+) : Examinable, ItemComponent {
 
     constructor(rich: Component) : this("", rich)
 
@@ -45,7 +46,7 @@ data class ItemName(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ItemName> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -97,7 +98,7 @@ data class ItemName(
         }
     }
 
-    private data class Template(
+    data class Template(
         /**
          * A MiniMessage string.
          */
@@ -140,8 +141,8 @@ data class ItemName(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<ItemName> {
-        override val typeToken: TypeToken<ItemTemplate<ItemName>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -149,7 +150,7 @@ data class ItemName(
          * <node>: <string>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemName> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template(node.string)
         }
     }

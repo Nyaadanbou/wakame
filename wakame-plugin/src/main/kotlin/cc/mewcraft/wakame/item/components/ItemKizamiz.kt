@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -43,7 +44,7 @@ data class ItemKizamiz(
      * 所有的铭刻.
      */
     val kizamiz: Set<Kizami>,
-) : Examinable, TooltipProvider.Single {
+) : Examinable, ItemComponent, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemKizamiz>, ItemComponentConfig(ItemComponentConstants.KIZAMIZ) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
@@ -57,7 +58,7 @@ data class ItemKizamiz(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ItemKizamiz> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -94,7 +95,7 @@ data class ItemKizamiz(
         }
     }
 
-    private data class Template(
+    data class Template(
         val selector: Group<Kizami, GenerationContext>,
     ) : ItemTemplate<ItemKizamiz> {
         override val componentType: ItemComponentType<ItemKizamiz> = ItemComponentTypes.KIZAMIZ
@@ -106,10 +107,10 @@ data class ItemKizamiz(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<ItemKizamiz>, KoinComponent {
-        override val typeToken: TypeToken<ItemTemplate<ItemKizamiz>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template>, KoinComponent {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemKizamiz> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template(node.krequire<Group<Kizami, GenerationContext>>())
         }
 

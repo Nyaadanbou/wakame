@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -33,7 +34,7 @@ data class ItemRarity(
      * 物品的稀有度.
      */
     val rarity: Rarity,
-) : Examinable, TooltipProvider.Single {
+) : Examinable, ItemComponent, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemRarity>, ItemComponentConfig(ItemComponentConstants.RARITY) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { RARITY }
@@ -43,7 +44,7 @@ data class ItemRarity(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ItemRarity> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -78,7 +79,7 @@ data class ItemRarity(
         }
     }
 
-    private data class Template(
+    data class Template(
         /**
          * The default rarity held in this schema.
          */
@@ -142,11 +143,11 @@ data class ItemRarity(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<ItemRarity> {
+    private data object TemplateType : ItemTemplateType<Template> {
         private const val MAPPING_PREFIX = "mapping:"
         private const val RARITY_PREFIX = "rarity:"
 
-        override val typeToken: TypeToken<ItemTemplate<ItemRarity>> = typeTokenOf()
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure 1

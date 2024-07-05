@@ -36,7 +36,7 @@ interface Attributable : Examinable, ItemComponent, TooltipProvider.Single {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Attributable> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -89,7 +89,7 @@ interface Attributable : Examinable, ItemComponent, TooltipProvider.Single {
     // 如果我们需要给物品加上一个标记,
     // 但这个标记不储存在物品(NBT)上,
     // 而是存在模板里. 是否可行?
-    private data object Template : ItemTemplate<Attributable> {
+    data object Template : ItemTemplate<Attributable> {
         override val componentType: ItemComponentType<Attributable> = ItemComponentTypes.ATTRIBUTABLE
 
         override fun generate(context: GenerationContext): GenerationResult<Attributable> {
@@ -97,8 +97,8 @@ interface Attributable : Examinable, ItemComponent, TooltipProvider.Single {
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Attributable> {
-        override val typeToken: TypeToken<ItemTemplate<Attributable>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -106,7 +106,7 @@ interface Attributable : Examinable, ItemComponent, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Attributable> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template
         }
     }

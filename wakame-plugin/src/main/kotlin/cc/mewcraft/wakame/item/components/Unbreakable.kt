@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -21,7 +22,7 @@ import java.lang.reflect.Type
 // 在配置文件中以 1:1 的形式配置原版物品组件
 // 是否可行.
 
-interface Unbreakable : Examinable, TooltipProvider {
+interface Unbreakable : Examinable, ItemComponent, TooltipProvider {
 
     val showInTooltip: Boolean
 
@@ -30,7 +31,7 @@ interface Unbreakable : Examinable, TooltipProvider {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Unbreakable> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -70,7 +71,7 @@ interface Unbreakable : Examinable, TooltipProvider {
         private companion object
     }
 
-    private data class Template(
+    data class Template(
         val showInTooltip: Boolean,
     ) : ItemTemplate<Unbreakable> {
         override val componentType: ItemComponentType<Unbreakable> = ItemComponentTypes.UNBREAKABLE
@@ -80,8 +81,8 @@ interface Unbreakable : Examinable, TooltipProvider {
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Unbreakable> {
-        override val typeToken: TypeToken<ItemTemplate<Unbreakable>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -90,7 +91,7 @@ interface Unbreakable : Examinable, TooltipProvider {
          *   show_in_tooltip: <boolean>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<Unbreakable> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
             return Template(showInTooltip)
         }

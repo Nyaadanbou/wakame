@@ -13,6 +13,11 @@ import java.util.stream.Stream
 // 开发日记 2024/6/26
 // 之所以叫 Kind 不叫 Type 是因为 Type 跟 serialize 里的函数参数名冲突了.
 // 而之所以叫 Kind 不叫 Serializer 是因为这将作为 ItemTemplate 的映射键.
+//
+// 开发日记 2024/7/5
+// 这里的类型 T 不能设置 upper bounds,
+// 因为存在数据类型为 primitive 的组件,
+// 例如 ItemDamage, ItemMaxDamage, ItemTracks, SystemUse.
 
 /**
  * 模板的“类型”. 该接口有两个作用:
@@ -20,13 +25,13 @@ import java.util.stream.Stream
  * - 充当 [TypeSerializer]
  * - 作为 [ItemTemplateMap] 的索引
  *
- * @param T 物品组件(数据)的类型
+ * @param T 物品模板的类型
  */
-interface ItemTemplateType<T> : TypeSerializer<ItemTemplate<T>>, Examinable {
+interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T>, Examinable {
     /**
      * The [TypeToken] of [T].
      */
-    val typeToken: TypeToken<ItemTemplate<T>> // generic sucks :x
+    val typeToken: TypeToken<T> // generic sucks :x
 
     /**
      * 该序列化会用到的子序列化器.
@@ -42,12 +47,12 @@ interface ItemTemplateType<T> : TypeSerializer<ItemTemplate<T>>, Examinable {
     /**
      * 定义如何将 [node] 反序列化为 [T].
      */
-    override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<T>
+    override fun deserialize(type: Type, node: ConfigurationNode): T
 
     /**
      * 定义如何将 [T] 序列化到 [node].
      */
-    override fun serialize(type: Type, obj: ItemTemplate<T>?, node: ConfigurationNode): Nothing {
+    override fun serialize(type: Type, obj: T?, node: ConfigurationNode): Nothing {
         throw UnsupportedOperationException()
     }
 
@@ -58,7 +63,7 @@ interface ItemTemplateType<T> : TypeSerializer<ItemTemplate<T>>, Examinable {
      *
      * 默认返回 `null`, 意为该组件没有默认模板.
      */
-    override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): ItemTemplate<T>? {
+    override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): T? {
         return null
     }
 

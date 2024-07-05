@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -57,7 +58,7 @@ data class CustomName(
      * 这部分是直接存在 NBT 里的原始字符串.
      */
     val rich: Component,
-) : Examinable {
+) : Examinable, ItemComponent {
 
     constructor(rich: Component) : this("", rich)
 
@@ -66,7 +67,7 @@ data class CustomName(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<CustomName> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -118,7 +119,7 @@ data class CustomName(
         }
     }
 
-    private data class Template(
+    data class Template(
         /**
          * A MiniMessage string.
          */
@@ -161,8 +162,8 @@ data class CustomName(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<CustomName> {
-        override val typeToken: TypeToken<ItemTemplate<CustomName>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -170,7 +171,7 @@ data class CustomName(
          * <node>: <string>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<CustomName> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template(node.string)
         }
     }

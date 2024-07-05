@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -19,7 +20,7 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface FireResistant : Examinable, TooltipProvider.Single {
+interface FireResistant : Examinable, ItemComponent, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<FireResistant> {
         fun of(): FireResistant {
@@ -30,7 +31,7 @@ interface FireResistant : Examinable, TooltipProvider.Single {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<FireResistant> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -66,7 +67,7 @@ interface FireResistant : Examinable, TooltipProvider.Single {
         }
     }
 
-    private data object Template : ItemTemplate<FireResistant> {
+    data object Template : ItemTemplate<FireResistant> {
         override val componentType: ItemComponentType<FireResistant> = ItemComponentTypes.FIRE_RESISTANT
 
         override fun generate(context: GenerationContext): GenerationResult<FireResistant> {
@@ -74,8 +75,8 @@ interface FireResistant : Examinable, TooltipProvider.Single {
         }
     }
 
-    private data object TemplateType : ItemTemplateType<FireResistant> {
-        override val typeToken: TypeToken<ItemTemplate<FireResistant>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -83,7 +84,7 @@ interface FireResistant : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<FireResistant> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template
         }
     }

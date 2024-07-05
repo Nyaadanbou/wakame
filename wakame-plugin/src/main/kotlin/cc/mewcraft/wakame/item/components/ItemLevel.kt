@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -30,7 +31,7 @@ data class ItemLevel(
      * 物品的等级.
      */
     val level: Short,
-) : Examinable, TooltipProvider.Single {
+) : Examinable, ItemComponent, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemLevel>, ItemComponentConfig(ItemComponentConstants.LEVEL) {
         private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LEVEL }
@@ -40,7 +41,7 @@ data class ItemLevel(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<ItemLevel> {
+        override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
     }
@@ -87,7 +88,7 @@ data class ItemLevel(
      * # 动态等级
      * 由生成的上下文决定要生成的等级.
      */
-    private data class Template(
+    data class Template(
         val level: Any,
     ) : ItemTemplate<ItemLevel> {
         override val componentType: ItemComponentType<ItemLevel> = ItemComponentTypes.LEVEL
@@ -120,8 +121,8 @@ data class ItemLevel(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<ItemLevel> {
-        override val typeToken: TypeToken<ItemTemplate<ItemLevel>> = typeTokenOf()
+    private data object TemplateType : ItemTemplateType<Template> {
+        override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure 1
@@ -134,7 +135,7 @@ data class ItemLevel(
          * <node>: <enum>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemTemplate<ItemLevel> {
+        override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return when (val scalar = node.rawScalar()) {
                 is Number -> Template(scalar)
                 is String -> Template(EnumLookup.lookup<Option>(scalar).getOrThrow())
