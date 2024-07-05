@@ -16,4 +16,8 @@ interface EntityKeyLookup {
      */
     fun get(entity: Entity): Key
 
+    /**
+     * 检查 [key] 是否有效 (对应的生物种类存在).
+     */
+    fun validate(key: Key): Boolean
 }

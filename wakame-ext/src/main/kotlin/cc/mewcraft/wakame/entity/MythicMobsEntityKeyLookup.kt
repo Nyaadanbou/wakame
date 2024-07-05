@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.entity
 
-import com.github.benmanes.caffeine.cache.Caffeine
-import com.github.benmanes.caffeine.cache.LoadingCache
+import cc.mewcraft.wakame.util.Key
 import io.lumine.mythic.bukkit.MythicBukkit
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
@@ -10,11 +9,6 @@ import kotlin.jvm.optionals.getOrElse
 class MythicMobsEntityKeyLookup : EntityKeyLookupPart {
 
     private val mythicApi: MythicBukkit by lazy { MythicBukkit.inst() }
-    private val keyCache: LoadingCache<String, Key> = Caffeine.newBuilder()
-        .maximumSize(128)
-        .build { name ->
-            Key.key(EntitySupport.NAMESPACE_MYTHIC_MOBS, name)
-        }
 
     /**
      * Returns `null` if the [entity] is not an MM entity.
@@ -23,8 +17,14 @@ class MythicMobsEntityKeyLookup : EntityKeyLookupPart {
         val activeMob = mythicApi.mobManager.getActiveMob(entity.uniqueId).getOrElse {
             return null
         }
+        return Key(EntitySupport.NAMESPACE_MYTHIC_MOBS, activeMob.name)
+    }
 
-        return keyCache[activeMob.name]
+    override fun validate(key: Key): Boolean {
+        if (key.namespace() != EntitySupport.NAMESPACE_MYTHIC_MOBS) {
+            return false
+        }
+        return mythicApi.mobManager.mobNames.contains(key.value())
     }
 
 }

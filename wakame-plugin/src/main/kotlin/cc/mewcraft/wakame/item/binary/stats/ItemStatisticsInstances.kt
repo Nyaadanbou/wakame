@@ -47,7 +47,7 @@ value class ReforgeStatistics(
     override val accessor: ItemStatisticsAccessor,
 ) : ItemStatistics {
     override val nbtPath: String
-        get() = StatisticsConstants.REFORGE
+        get() = StatisticsConstants.REFORGE_HISTORY
 
     val count: NumericSingleItemStats<Int>
         get() = object : NumericSingleItemStats<Int> {

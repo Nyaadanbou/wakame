@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.components.cells.template.cellTemplateModule
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-internal fun componentCellModule(): Module = module {
+internal fun componentCellsModule(): Module = module {
     includes(
         cellCoreModule(),
         cellCurseModule(),

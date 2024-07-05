@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.entity
 
 import cc.mewcraft.wakame.entity.MinecraftEntityKeyLookup.get
+import cc.mewcraft.wakame.util.toNamespacedKey
 import net.kyori.adventure.key.Key
+import org.bukkit.Registry
 import org.bukkit.entity.Entity
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.createScope
@@ -29,6 +31,10 @@ internal class EntityKeyLookupImpl(
         return MinecraftEntityKeyLookup.get(entity)
     }
 
+    override fun validate(key: Key): Boolean {
+        return lookupList.any { it.validate(key) }
+    }
+
 }
 
 /**
@@ -43,6 +49,10 @@ private object MinecraftEntityKeyLookup : EntityKeyLookupPart {
 
     override fun get(entity: Entity): Key {
         return entity.type.key
+    }
+
+    override fun validate(key: Key): Boolean {
+        return Registry.ENTITY_TYPE.get(key.toNamespacedKey) != null
     }
 
 }

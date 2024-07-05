@@ -77,7 +77,7 @@ object StatisticsBinaryKeys {
 object StatisticsConstants {
     const val ENTITY_KILLS = "entity_kills"
     const val PEAK_DAMAGE = "peak_damage"
-    const val REFORGE = "reforge"
+    const val REFORGE_HISTORY = "reforge_history"
 
     inline fun createKey(block: StatisticsConstants.() -> String): Key {
         return Key(Namespaces.STATISTICS, block(this))
