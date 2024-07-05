@@ -14,9 +14,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cell.Cell
-import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttribute
-import cc.mewcraft.wakame.item.components.cell.cores.skill.CoreSkill
-import cc.mewcraft.wakame.item.components.cell.reforge.Reforge
+import cc.mewcraft.wakame.item.components.cell.CoreTypes
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCell
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCellSerializer
 import cc.mewcraft.wakame.item.components.cell.template.TemplateCoreGroupSerializer
@@ -57,7 +55,9 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
             return Value(cells)
         }
 
-        // TODO 2024/7/5 添加更多构造 ItemCells 的方便函数
+        fun builder(): Builder {
+            return BuilderImpl()
+        }
 
         override fun codec(id: String): ItemComponentType<ItemCells> {
             return Codec(id)
@@ -115,7 +115,42 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
      */
     fun collectConfiguredSkills(context: NekoStack, ignoreCurse: Boolean = false, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
 
+    /**
+     * 用于方便构建 [ItemCells].
+     */
+    interface Builder {
+        fun has(id: String): Boolean
+        fun get(id: String): Cell?
+        fun put(id: String, cell: Cell): Cell?
+        fun remove(id: String): Cell?
+        fun build(): ItemCells
+    }
+
     /* Internals */
+
+    private class BuilderImpl : Builder {
+        private val map: HashMap<String, Cell> = HashMap()
+
+        override fun has(id: String): Boolean {
+            return map.containsKey(id)
+        }
+
+        override fun get(id: String): Cell? {
+            return map[id]
+        }
+
+        override fun put(id: String, cell: Cell): Cell? {
+            return map.put(id, cell)
+        }
+
+        override fun remove(id: String): Cell? {
+            return map.remove(id)
+        }
+
+        override fun build(): ItemCells {
+            return Value(map)
+        }
+    }
 
     private data class Value(
         private val cells: Map<String, Cell>,
@@ -153,10 +188,10 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
         override fun collectAttributeModifiers(context: NekoStack, ignoreCurse: Boolean): Multimap<Attribute, AttributeModifier> {
             val ret = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
             for ((_, cell) in this) {
-                if (!ignoreCurse && cell.curse.isLocked(context)) {
+                if (!ignoreCurse && cell.getCurse().isLocked(context)) {
                     continue // 诅咒还未解锁
                 }
-                val core = cell.core as? CoreAttribute ?: continue
+                val core = cell.getTypedCore(CoreTypes.ATTRIBUTE) ?: continue
                 val modifiers = core.provideAttributeModifiers(context.uuid)
                 val entries = modifiers.entries
                 ret.putAll(entries)
@@ -167,10 +202,10 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
         override fun collectConfiguredSkills(context: NekoStack, ignoreCurse: Boolean, ignoreVariant: Boolean): Multimap<Trigger, Skill> {
             val ret = ImmutableListMultimap.builder<Trigger, Skill>()
             for ((_, cell) in this) {
-                if (!ignoreCurse && cell.curse.isLocked(context)) {
+                if (!ignoreCurse && cell.getCurse().isLocked(context)) {
                     continue // 诅咒还未解锁
                 }
-                val core = cell.core as? CoreSkill ?: continue
+                val core = cell.getTypedCore(CoreTypes.SKILL) ?: continue
                 val variant = core.variant
                 if (variant == TriggerVariant.any()) {
                     continue
@@ -221,7 +256,7 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
             holder.putTag() // 总是重新写入全部数据
             val tag = holder.getTag()!!
             for ((id, cell) in value) {
-                tag.put(id, cell.asTag())
+                tag.put(id, cell.serializeAsTag())
             }
         }
 
@@ -238,28 +273,24 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
         override val componentType: ItemComponentType<ItemCells> = ItemComponentTypes.CELLS
 
         override fun generate(context: GenerationContext): GenerationResult<ItemCells> {
-            val cells = HashMap<String, Cell>()
+            val builder = builder()
             for ((id, templateCell) in this.cells) {
-                // make a core
-                val core = run {
+                // 生成核心
+                val generatedCore = run {
                     val templateCore = templateCell.core.pickSingle(context) ?: TemplateCoreEmpty
                     templateCore.generate(context)
                 }
 
-                // make a curse
-                val curse = run {
+                // 生成诅咒
+                val generatedCurse = run {
                     val templateCurse = templateCell.curse.pickSingle(context) ?: TemplateCurseEmpty
                     templateCurse.generate(context)
                 }
 
-                // make a reforge
-                val reforge = Reforge.empty()
-
-                // collect all and return
-                val cell = Cell.of(id, core, curse, reforge)
-                cells.put(id, cell)
+                // collect all and put it into the builder
+                builder.put(id, Cell.of(id, generatedCore, generatedCurse))
             }
-            return GenerationResult.of(Value(cells))
+            return GenerationResult.of(builder.build())
         }
     }
 
@@ -307,14 +338,18 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
                 }
 
             val selectors: ConfigurationNode = node.node("selectors")
-            val cells: LinkedHashMap<String, TemplateCell> = bucketMap.map { (id, node) ->
-                // 先把节点 “selectors” 注入到节点 “buckets.<id>”
-                node.hint(TemplateCellSerializer.HINT_NODE_SELECTORS, selectors)
-                // 再反序列化 “buckets.<id>”, 最后转成 Pair
-                id to node.krequire<TemplateCell>()
-            }.toMap(LinkedHashMap()) // 显式构建为有序 Map
+            val templates: LinkedHashMap<String, TemplateCell> = bucketMap
+                .map { (id, node) ->
+                    // 先把节点 “selectors” 注入到节点 “buckets.<id>”
+                    node.hint(TemplateCellSerializer.HINT_NODE_SELECTORS, selectors)
+                    // 再反序列化 “buckets.<id>”, 最后转成 Pair
+                    id to node.krequire<TemplateCell>()
+                }.toMap(
+                    // 显式构建为有序 Map
+                    LinkedHashMap()
+                )
 
-            return Template(cells)
+            return Template(templates)
         }
 
         override fun childSerializers(): TypeSerializerCollection {

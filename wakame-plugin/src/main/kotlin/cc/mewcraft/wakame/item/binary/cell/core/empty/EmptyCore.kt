@@ -35,7 +35,7 @@ private data object BinaryEmptyCoreImpl : BinaryEmptyCore {
     private val EMPTY_COMPOUND: CompoundTag = CompoundTag.create()
 
     override val key: Key = GenericKeys.EMPTY
-    override fun asTag(): Tag = EMPTY_COMPOUND
+    override fun serializeAsTag(): Tag = EMPTY_COMPOUND
     override fun provideDisplayLore(): LoreLine = EmptyLoreLine
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(ExaminableProperty.of("key", key))
     override fun toString(): String = toSimpleString()

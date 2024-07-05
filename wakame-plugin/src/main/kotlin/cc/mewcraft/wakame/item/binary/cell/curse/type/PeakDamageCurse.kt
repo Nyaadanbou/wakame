@@ -62,7 +62,7 @@ internal data class BinaryPeakDamageCurseDataHolder(
     override val element: Element,
     override val amount: Int,
 ) : BinaryPeakDamageCurse {
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
         putShort(AMOUNT_TAG_KEY, amount.toStableShort())
         putByte(ELEMENT_TAG_KEY, element.binaryId)
@@ -81,7 +81,7 @@ internal class BinaryPeakDamageCurseNBTWrapper(
         compound.tags().clear()
     }
 
-    override fun asTag(): Tag {
+    override fun serializeAsTag(): Tag {
         return compound
     }
 

@@ -27,6 +27,6 @@ internal data object BinaryEmptyCurseImpl : BinaryEmptyCurse {
     override val key: Key = GenericKeys.EMPTY
     override fun test(context: NekoStack): Boolean = true
     override fun clear() = Unit
-    override fun asTag(): Tag = EMPTY_COMPOUND
+    override fun serializeAsTag(): Tag = EMPTY_COMPOUND
     private val EMPTY_COMPOUND = CompoundTag.create()
 }

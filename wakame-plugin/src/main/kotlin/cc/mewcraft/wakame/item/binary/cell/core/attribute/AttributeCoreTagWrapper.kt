@@ -29,7 +29,7 @@ internal class BinaryAttributeCoreTagWrapperS(
         compound.tags().clear()
     }
 
-    override fun asTag(): Tag {
+    override fun serializeAsTag(): Tag {
         return compound
     }
 
@@ -54,7 +54,7 @@ internal class BinaryAttributeCoreTagWrapperR(
         compound.tags().clear()
     }
 
-    override fun asTag(): Tag {
+    override fun serializeAsTag(): Tag {
         return compound
     }
 
@@ -79,7 +79,7 @@ internal class BinaryAttributeCoreTagWrapperSE(
         compound.tags().clear()
     }
 
-    override fun asTag(): Tag {
+    override fun serializeAsTag(): Tag {
         return compound
     }
 
@@ -106,7 +106,7 @@ internal class BinaryAttributeCoreTagWrapperRE(
         compound.tags().clear()
     }
 
-    override fun asTag(): Tag {
+    override fun serializeAsTag(): Tag {
         return compound
     }
 

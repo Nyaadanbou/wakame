@@ -17,5 +17,5 @@ object CurseEmpty : Curse, CurseType<CurseEmpty> {
     override val isEmpty: Boolean = true
     override fun isLocked(context: NekoStack): Boolean = false
     override fun isUnlocked(context: NekoStack): Boolean = true
-    override fun asTag(): Tag = CompoundTag.create()
+    override fun serializeAsTag(): Tag = CompoundTag.create()
 }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.binary.cell.reforge
 
-import cc.mewcraft.wakame.item.TagLike
+import cc.mewcraft.wakame.item.BinarySerializable
 import kotlin.reflect.KClass
 
 /**
@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
  *
  * @see ReforgeDataFactory
  */
-interface ReforgeDataHolder : TagLike {
+interface ReforgeDataHolder : BinarySerializable {
     /**
      * Check if the reforge data is empty.
      */

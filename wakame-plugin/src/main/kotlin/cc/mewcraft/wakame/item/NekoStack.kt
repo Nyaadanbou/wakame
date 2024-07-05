@@ -90,17 +90,17 @@ interface NekoStack : Keyed, Examinable {
     val prototype: NekoItem
 
     /**
-     * 存放该物品的`物品组件`的容器. 该对象用于读取/添加/移除该物品的`物品组件`.
+     * 存放该物品的`物品组件`的容器. 该对象用于操作该物品的组件信息.
      */
     val components: ItemComponentMap
 
     /**
-     * 存放该物品的`物品组件模板`的容器. 该对象用于读取物品模板的信息.
+     * 存放该物品的`物品模板`的容器. 该对象用于读取物品模板的信息.
      */
     val templates: ItemTemplateMap
 
     /**
-     * 存放物品的`物品行为`的容器. 该对象用于读取物品行为的信息.
+     * 存放物品的`物品行为`的容器. 该对象用于获取该物品的行为逻辑.
      */
     val behaviors: ItemBehaviorMap
 

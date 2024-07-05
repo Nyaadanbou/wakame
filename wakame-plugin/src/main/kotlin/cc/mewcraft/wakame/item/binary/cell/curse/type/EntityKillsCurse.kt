@@ -66,7 +66,7 @@ internal data class BinaryEntityKillsCurseDataHolder(
     override val index: EntityTypeHolder,
     override val count: Int,
 ) : BinaryEntityKillsCurse {
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
         putString(INDEX_TAG_KEY, index.name)
         putShort(COUNT_TAG_KEY, count.toStableShort())
@@ -85,7 +85,7 @@ internal class BinaryEntityKillsCurseNBTWrapper(
         compound.tags().clear()
     }
 
-    override fun asTag(): Tag {
+    override fun serializeAsTag(): Tag {
         return compound
     }
 

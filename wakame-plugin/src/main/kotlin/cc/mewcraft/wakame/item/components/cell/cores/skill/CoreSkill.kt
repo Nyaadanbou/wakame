@@ -65,7 +65,7 @@ data class CoreSkill(
         return LoreLine.simple(tooltipKey, lineText)
     }
 
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putIdentifier(key)
         putTrigger(trigger)
         putVariant(variant)

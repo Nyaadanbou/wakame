@@ -126,7 +126,7 @@ internal data class CoreAttributeS(
         compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE)
     )
 
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putId(key)
         putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
         putOperation(operation)
@@ -159,7 +159,7 @@ internal data class CoreAttributeR(
         compound.getNumber(AttributeBinaryKeys.RANGED_MAX_VALUE)
     )
 
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putId(key)
         putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower, tagType)
         putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)
@@ -193,7 +193,7 @@ internal data class CoreAttributeSE(
         compound.getElement()
     )
 
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putId(key)
         putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
         putElement(element)
@@ -229,7 +229,7 @@ internal data class CoreAttributeRE(
         compound.getElement()
     )
 
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putId(key)
         putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower, tagType)
         putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)

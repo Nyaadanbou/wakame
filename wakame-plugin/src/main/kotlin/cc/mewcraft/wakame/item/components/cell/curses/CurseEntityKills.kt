@@ -50,7 +50,7 @@ data class CurseEntityKills(
         return sum >= count
     }
 
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
         putString(TAG_INDEX, index.name)
         putShort(TAG_COUNT, count.toStableShort())

@@ -31,7 +31,7 @@ internal class BinarySkillCoreTagWrapper(
         compound.tags().clear()
     }
 
-    override fun asTag(): Tag {
+    override fun serializeAsTag(): Tag {
         return compound
     }
 

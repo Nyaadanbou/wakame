@@ -3,10 +3,10 @@ package cc.mewcraft.wakame.item.components.cell
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.Keyed
+import cc.mewcraft.wakame.item.BinarySerializable
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.TagLike
 import cc.mewcraft.wakame.item.components.cell.curses.CurseEmpty
 import cc.mewcraft.wakame.item.components.cell.curses.CurseEntityKills
 import cc.mewcraft.wakame.item.components.cell.curses.CursePeakDamage
@@ -22,7 +22,7 @@ import net.kyori.examination.Examinable
  * - 如果诅咒是锁定状态([isLocked] 为 `true`), 则词条栏不应该生效.
  * - 如果诅咒是解锁状态([isLocked]] 为 `false`), 则词条栏应该生效.
  */
-interface Curse : Keyed, Examinable, TagLike {
+interface Curse : Examinable, Keyed, BinarySerializable {
     /**
      * 诅咒的唯一标识.
      */
@@ -50,6 +50,13 @@ interface Curse : Keyed, Examinable, TagLike {
 
     companion object {
         /**
+         * 返回一个空的诅咒.
+         */
+        fun empty(): Curse {
+            return CurseEmpty
+        }
+
+        /**
          * 构建一个 [Curse].
          */
         fun of(nbt: CompoundTag): Curse {
@@ -73,4 +80,7 @@ interface Curse : Keyed, Examinable, TagLike {
     }
 }
 
+/**
+ * 代表一个诅咒的类型.
+ */
 interface CurseType<T : Curse>

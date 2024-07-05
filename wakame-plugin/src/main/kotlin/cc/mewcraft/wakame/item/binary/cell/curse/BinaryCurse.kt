@@ -1,15 +1,15 @@
 package cc.mewcraft.wakame.item.binary.cell.curse
 
 import cc.mewcraft.wakame.condition.Condition
+import cc.mewcraft.wakame.item.BinarySerializable
 import cc.mewcraft.wakame.item.Curse
-import cc.mewcraft.wakame.item.TagLike
 import cc.mewcraft.wakame.item.binary.NekoStack
 import cc.mewcraft.wakame.item.binary.cell.curse.type.BinaryEmptyCurse
 
 /**
  * Represents a [Curse] in binary form.
  */
-interface BinaryCurse : Curse, TagLike, Condition<NekoStack> {
+interface BinaryCurse : Curse, BinarySerializable, Condition<NekoStack> {
 
     /**
      * Checks whether the curse is unlocked or not.

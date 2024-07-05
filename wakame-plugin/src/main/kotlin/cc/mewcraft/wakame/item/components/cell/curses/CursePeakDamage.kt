@@ -46,7 +46,7 @@ data class CursePeakDamage(
         return true
     }
 
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putString(CurseBinaryKeys.CURSE_IDENTIFIER, key.asString())
         putShort(TAG_AMOUNT, amount.toStableShort())
         putByte(TAG_ELEMENT, element.binaryId)

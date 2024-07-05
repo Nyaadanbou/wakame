@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.Keyed
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.item.BinarySerializable
 import cc.mewcraft.wakame.item.CoreBinaryKeys
-import cc.mewcraft.wakame.item.TagLike
 import cc.mewcraft.wakame.item.components.cell.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cell.cores.empty.CoreEmpty
 import cc.mewcraft.wakame.item.components.cell.cores.noop.CoreNoop
@@ -24,7 +24,7 @@ import net.kyori.examination.Examinable
 /**
  * 代表一个词条栏中的核心. 核心是[词条栏][Cell]中提供具体效果的东西.
  */
-interface Core : Keyed, Examinable, TagLike, TooltipProvider.Single {
+interface Core : Keyed, Examinable, BinarySerializable, TooltipProvider.Single {
     /**
      * 核心的唯一标识.
      */
@@ -51,28 +51,38 @@ interface Core : Keyed, Examinable, TagLike, TooltipProvider.Single {
 
     companion object {
         /**
+         * 返回一个空的核心.
+         */
+        fun empty(): Core {
+            return CoreEmpty
+        }
+
+        /**
          * 构建一个 [Core].
          */
         fun of(nbt: CompoundTag): Core {
             if (nbt.isEmpty) {
-                // There's nothing in the nbt,
-                // so we consider it an empty core.
                 return CoreEmpty
             }
-
             val key = Key(nbt.getString(CoreBinaryKeys.CORE_IDENTIFIER))
-
             val ret = when {
+                // 技术核心
                 key == GenericKeys.NOOP -> CoreNoop
                 key == GenericKeys.EMPTY -> CoreEmpty
+
+                // 普通核心
                 key.namespace() == Namespaces.ATTRIBUTE -> CoreAttribute(nbt)
                 key.namespace() == Namespaces.SKILL -> CoreSkill(nbt)
+
+                // 无法识别 NBT
                 else -> throw IllegalArgumentException("Failed to parse NBT tag ${nbt.asString()}")
             }
-
             return ret
         }
     }
 }
 
+/**
+ * 代表一个核心的类型.
+ */
 interface CoreType<T : Core>

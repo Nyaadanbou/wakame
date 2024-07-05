@@ -18,7 +18,7 @@ internal data class BinarySkillCoreDataHolder(
     override val trigger: Trigger,
     override val variant: TriggerVariant,
 ) : BinarySkillCore() {
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         putIdentifier(key)
         putTrigger(trigger)
         putEffectiveVariant(variant)

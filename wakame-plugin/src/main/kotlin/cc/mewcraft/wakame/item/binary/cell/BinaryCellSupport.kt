@@ -39,12 +39,12 @@ internal data class BinaryCellDataHolder(
         return CellSupport.typedCurse(this, clazz)
     }
 
-    override fun asTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): Tag = CompoundTag {
         // 当对应的数据不存在时，这里的每个 asShadowTag()
         // 应该返回一个没有内容的空 Compound（不是 null）
-        put(CoreBinaryKeys.BASE, core.asTag())
-        put(CurseBinaryKeys.BASE, curse.asTag())
-        put(ReforgeBinaryKeys.BASE, reforge.asTag())
+        put(CoreBinaryKeys.BASE, core.serializeAsTag())
+        put(CurseBinaryKeys.BASE, curse.serializeAsTag())
+        put(ReforgeBinaryKeys.BASE, reforge.serializeAsTag())
     }
 
     override fun provideDisplayLore(): LoreLine {
@@ -60,7 +60,7 @@ internal data class BinaryCellTagWrapper(
             return BinaryCoreFactory.wrap(compound.getCompound(CoreBinaryKeys.BASE))
         }
         set(value) {
-            compound.put(CoreBinaryKeys.BASE, value.asTag())
+            compound.put(CoreBinaryKeys.BASE, value.serializeAsTag())
         }
 
     override var curse: BinaryCurse
@@ -68,7 +68,7 @@ internal data class BinaryCellTagWrapper(
             return BinaryCurseFactory.wrap(compound.getCompound(CurseBinaryKeys.BASE))
         }
         set(value) {
-            compound.put(CurseBinaryKeys.BASE, value.asTag())
+            compound.put(CurseBinaryKeys.BASE, value.serializeAsTag())
         }
 
     override var reforge: ReforgeDataHolder
@@ -76,7 +76,7 @@ internal data class BinaryCellTagWrapper(
             return ReforgeDataFactory.wrap(compound.getCompound(ReforgeBinaryKeys.BASE))
         }
         set(value) {
-            compound.put(ReforgeBinaryKeys.BASE, value.asTag())
+            compound.put(ReforgeBinaryKeys.BASE, value.serializeAsTag())
         }
 
     override fun <T : BinaryCore> typedCore(clazz: KClass<T>): T? {
@@ -87,7 +87,7 @@ internal data class BinaryCellTagWrapper(
         return CellSupport.typedCurse(this, clazz)
     }
 
-    override fun asTag(): Tag {
+    override fun serializeAsTag(): Tag {
         return compound
     }
 

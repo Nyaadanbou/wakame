@@ -29,7 +29,7 @@ internal class ReforgeDataHolderImpl(
         root.tags().clear()
     }
 
-    override fun asTag(): Tag = root
+    override fun serializeAsTag(): Tag = root
     override fun toString(): String = root.asString()
 }
 
