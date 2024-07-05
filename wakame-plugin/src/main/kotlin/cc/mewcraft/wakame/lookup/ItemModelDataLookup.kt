@@ -19,6 +19,13 @@ internal class ItemModelDataLookup(
 ) : Initializable {
     private val root: BasicConfigurationNode by ReloadableProperty { loader.load() }
 
+    /**
+     * 用于存储自定义模型数据的表.
+     *
+     * R - 物品的 key.
+     * C - 物品的变体.
+     * V - CustomModelData 的值.
+     */
     private val customModelDataTable: Table<Key, Int, Int> = Tables.synchronizedTable(HashBasedTable.create())
 
     private fun loadLayout() {

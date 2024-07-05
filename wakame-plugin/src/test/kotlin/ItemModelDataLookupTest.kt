@@ -1,7 +1,6 @@
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.lookupModule
-import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.registry.ItemRegistry.get
+import cc.mewcraft.wakame.util.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -44,9 +43,12 @@ class ItemModelDataLookupTest : KoinTest {
     fun `test get item model data`() {
         val itemModelDataLookup = get<ItemModelDataLookup>()
         itemModelDataLookup.onPrePack()
-        val demoItem = ItemRegistry.INSTANCES.get("short_sword:demo")
-        val itemModelData = itemModelDataLookup[demoItem.key, 0]
+        val itemModelData1 = itemModelDataLookup[Key("short_sword:demo"), 0]
+        val itemModelData2 = itemModelDataLookup[Key("long_sword:demo"), 0]
+        val itemModelData3 = itemModelDataLookup[Key("short_sword:demo"), 1]
 
-        assertEquals(10000, itemModelData)
+        assertEquals(10000, itemModelData1)
+        assertEquals(10000, itemModelData2)
+        assertEquals(10001, itemModelData3)
     }
 }
