@@ -257,9 +257,12 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemCells) {
-            holder.putTag() // 总是重新写入全部数据
-            val tag = holder.getTag()!!
+            val tag = holder.getTagOrCreate()
+            tag.clear() // 总是重新写入全部数据
             for ((id, cell) in value) {
+                if (cell.getCore().isNoop) {
+                    continue // 拥有 No-op 核心的词条栏不应该写入物品
+                }
                 tag.put(id, cell.serializeAsTag())
             }
         }

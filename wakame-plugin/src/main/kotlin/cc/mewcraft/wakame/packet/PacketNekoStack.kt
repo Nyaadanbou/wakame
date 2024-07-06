@@ -124,7 +124,7 @@ private constructor(
         get() = NekoStackSupport.getPrototypeOrThrow(nbt)
 
     override val components: ItemComponentMap
-        get() = NekoStackSupport.getImmutableComponents(handle, nbt) // 使用 ImmutableMap 以禁止写入新的组件信息
+        get() = NekoStackSupport.getImmutableComponents(handle) // 使用 ImmutableMap 以禁止写入新的组件信息
 
     override val templates: ItemTemplateMap
         get() = NekoStackSupport.getTemplates(nbt)

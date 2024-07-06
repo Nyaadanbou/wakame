@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
 import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.wakameTag
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -100,18 +101,12 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
         /**
          * 封装一个 [BukkitStack].
          *
-         * 警告: 传入的 [nbt] 必须是 [stack] 自身的一部分. 换句话说,
-         * 任何向 [nbt] 写入的数据必须直接实时反应在 [stack] 上,
-         * 就像是直接修改 [stack] 一样.
-         *
          * @param stack 物品堆叠
-         * @param nbt 物品堆叠上的 `wakame` NBT 标签
          */
         fun wrapStack(
             stack: BukkitStack,
-            nbt: CompoundTag,
         ): ItemComponentMap {
-            return ForBukkitStack(stack, nbt)
+            return ForBukkitStack(stack)
         }
 
         /**
@@ -304,8 +299,14 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
      */
     private class ForBukkitStack(
         private val stack: BukkitStack,
-        private val nbt: CompoundTag,
     ) : ItemComponentMap {
+        // 开发日记 2024/7/7
+        // 由于 ItemStack.editMeta 会直接替换整个 ItemStack.meta,
+        // 导致 meta 内的 customTag 成员的实际引用会一直发生变化,
+        // 因此这里用 getter 而不是 property initializer.
+        private val nbt: CompoundTag
+            get() = stack.wakameTag
+
         override fun <T> get(type: ItemComponentType<out T>): T? {
             val tag = nbt.getCompoundOrNull(TAG_COMPONENTS) ?: return null
             val holder = ItemComponentHolder.create(tag, stack, this)

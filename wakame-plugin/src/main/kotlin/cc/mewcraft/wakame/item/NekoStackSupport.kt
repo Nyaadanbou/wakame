@@ -213,7 +213,7 @@ private class NekoStackImpl(
         get() = NekoStackSupport.getSlot(nbt)
 
     override val components: ItemComponentMap
-        get() = NekoStackSupport.getComponents(handle, nbt)
+        get() = NekoStackSupport.getComponents(handle)
 
     override val templates: ItemTemplateMap
         get() = NekoStackSupport.getTemplates(nbt)
@@ -299,12 +299,12 @@ internal object NekoStackSupport {
         return prototype
     }
 
-    fun getComponents(stack: ItemStack, nbt: CompoundTag): ItemComponentMap {
-        return ItemComponentMap.wrapStack(stack, nbt)
+    fun getComponents(stack: ItemStack): ItemComponentMap {
+        return ItemComponentMap.wrapStack(stack)
     }
 
-    fun getImmutableComponents(stack: ItemStack, nbt: CompoundTag): ItemComponentMap {
-        return ItemComponentMap.unmodifiable(getComponents(stack, nbt))
+    fun getImmutableComponents(stack: ItemStack): ItemComponentMap {
+        return ItemComponentMap.unmodifiable(getComponents(stack))
     }
 
     fun getTemplates(wakameTag: CompoundTag): ItemTemplateMap {

@@ -50,7 +50,7 @@ data class ItemLevel(
         if (!showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("level", Component.text(level.toInt())))))
+        return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("value", Component.text(level.toInt())))))
     }
 
     private data class Codec(
