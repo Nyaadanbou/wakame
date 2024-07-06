@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.lookup
 
-import cc.mewcraft.wakame.adventure.Keyed
+import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.toNamespacedKey
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow

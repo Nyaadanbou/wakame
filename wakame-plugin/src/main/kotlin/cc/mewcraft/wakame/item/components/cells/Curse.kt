@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.components.cells
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.adventure.Keyed
+import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.item.BinarySerializable
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants

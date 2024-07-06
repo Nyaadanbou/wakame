@@ -8,7 +8,7 @@ import cc.mewcraft.nbt.TagType.DOUBLE
 import cc.mewcraft.nbt.TagType.SHORT
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.adventure.Keyed
+import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation

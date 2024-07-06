@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.components.cells.template
 
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.adventure.Keyed
+import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeDeserializer
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.template.cores.attribute.TemplateCoreAttribute

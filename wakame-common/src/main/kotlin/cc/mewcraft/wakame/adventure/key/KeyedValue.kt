@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.adventure
+package cc.mewcraft.wakame.adventure.key
 
 import net.kyori.adventure.key.KeyedValue
 

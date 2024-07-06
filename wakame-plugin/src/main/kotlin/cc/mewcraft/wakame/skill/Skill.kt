@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.adventure.Keyed
+import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.context.SkillCastContext
 import cc.mewcraft.wakame.skill.factory.SkillFactory

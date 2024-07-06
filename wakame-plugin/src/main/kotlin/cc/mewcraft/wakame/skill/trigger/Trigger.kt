@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill.trigger
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.adventure.Keyed
+import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.toSimpleString
