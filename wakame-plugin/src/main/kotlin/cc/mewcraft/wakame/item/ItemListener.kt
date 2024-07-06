@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.attribute.AttributeEventHandler
 import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
-import cc.mewcraft.wakame.item.binary.tryNekoStack // FIXME 完成迁移
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
