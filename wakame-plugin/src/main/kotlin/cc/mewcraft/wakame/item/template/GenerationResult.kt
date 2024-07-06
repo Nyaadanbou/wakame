@@ -45,7 +45,8 @@ sealed interface GenerationResult<T> {
     }
 
     private data object Empty : GenerationResult<Nothing> {
-        override val value: Nothing = throw UnsupportedOperationException("Empty result has no value")
+        override val value: Nothing
+            get() = throw UnsupportedOperationException("Empty result has no value")
         override fun isEmpty(): Boolean = true
     }
 }
