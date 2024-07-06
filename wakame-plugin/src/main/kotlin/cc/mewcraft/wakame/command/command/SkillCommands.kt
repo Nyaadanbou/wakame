@@ -23,8 +23,7 @@ import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.commandBuilder
-import org.incendo.cloud.kotlin.extension.getOrNull
-
+import kotlin.jvm.optionals.getOrNull
 
 object SkillCommands : CommandFactory<CommandSender> {
     private const val SKILL_LITERAL = "skill"
@@ -54,10 +53,9 @@ object SkillCommands : CommandFactory<CommandSender> {
                 required("skill", SkillParser.skillParser())
                 optional("caster", SinglePlayerSelectorParser.singlePlayerSelectorParser())
                 handler { context ->
-                    val casterPlayer = context.getOrNull<SinglePlayerSelector>("caster")?.single()
+                    val casterPlayer = context.optional<SinglePlayerSelector>("caster").getOrNull()?.single()
                         ?: context.sender() as? Player
                         ?: return@handler
-
                     val targetEntity = context.flags().get<SingleEntitySelector>("target_entity")?.single() as? LivingEntity
                     val targetLocation = context.flags().get<Location>("target_location")
 
