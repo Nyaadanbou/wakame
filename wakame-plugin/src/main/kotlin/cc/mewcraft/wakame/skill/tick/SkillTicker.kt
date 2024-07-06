@@ -1,27 +1,30 @@
 package cc.mewcraft.wakame.skill.tick
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.tick.WakameTicker
+import cc.mewcraft.wakame.user.toUser
+import org.bukkit.Server
+import java.util.UUID
 
-/**
- * 用于处理非玩家状态的 [SkillTick]
- */
-object SkillTicker {
-    private val children: MutableList<SkillTick> = ObjectArrayList()
+class SkillTicker(
+    private val server: Server
+) : Initializable {
+    private var taskId: UUID? = null
 
-    fun tick() {
-        for (child in children) {
-            val result = child.tick()
-            if (result != TickResult.CONTINUE_TICK) {
-                children.remove(child)
-            }
-        }
+    fun start() {
+        taskId = WakameTicker.addTickAlwaysExecuted { server.onlinePlayers.forEach { it.toUser().skillState.tick() } }
     }
 
-    fun addChildren(skillTick: SkillTick) {
-        children.add(skillTick)
+    override fun close() {
+        taskId?.let { WakameTicker.stopTick(it) }
     }
 
-    fun getChildren(): List<SkillTick> {
-        return children
+    override fun onPreWorld() {
+        start()
+    }
+
+    override fun onReload() {
+        close()
+        start()
     }
 }

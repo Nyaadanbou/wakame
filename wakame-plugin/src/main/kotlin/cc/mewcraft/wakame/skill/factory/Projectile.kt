@@ -13,8 +13,8 @@ import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.SkillTick
-import cc.mewcraft.wakame.skill.tick.SkillTicker
-import cc.mewcraft.wakame.skill.tick.TickResult
+import cc.mewcraft.wakame.tick.WakameTicker
+import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.util.Key
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import me.lucko.helper.Events
@@ -207,7 +207,7 @@ interface Projectile : Skill {
                     val startSkillTick = effects[Trigger.START]?.cast(context)
 
                     if (startSkillTick != null) {
-                        SkillTicker.addChildren(startSkillTick)
+                        WakameTicker.addTick(startSkillTick)
                     }
 
                     // 注册事件监听器
@@ -227,7 +227,7 @@ interface Projectile : Skill {
                             println(single)
                             val newContext = SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(arrow.location))
                             val tickSkillTick = effects[Trigger.TICK]?.cast(newContext) ?: return@handler
-                            SkillTicker.addChildren(tickSkillTick)
+                            WakameTicker.addTick(tickSkillTick)
                         }
                 }
 
@@ -241,7 +241,7 @@ interface Projectile : Skill {
                                 val newContext =
                                     SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(hitEntity))
                                 val hitEntitySkillTick = effects[Trigger.HIT_ENTITY]?.cast(newContext) ?: return@handler
-                                SkillTicker.addChildren(hitEntitySkillTick)
+                                WakameTicker.addTick(hitEntitySkillTick)
                             }
                         }
                 }
@@ -256,7 +256,7 @@ interface Projectile : Skill {
                                 val newContext =
                                     SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(hitBlock.location))
                                 val hitBlockSkillTick = effects[Trigger.HIT_BLOCK]?.cast(newContext) ?: return@handler
-                                SkillTicker.addChildren(hitBlockSkillTick)
+                                WakameTicker.addTick(hitBlockSkillTick)
                             }
                         }
                 }
@@ -268,7 +268,7 @@ interface Projectile : Skill {
                             if (it.entity != arrow) return@handler
                             val newContext = SkillContext(CasterAdapter.adapt(arrow))
                             val disappearSkillTick = effects[Trigger.DISAPPEAR]?.cast(newContext) ?: return@handler
-                            SkillTicker.addChildren(disappearSkillTick)
+                            WakameTicker.addTick(disappearSkillTick)
                         }
                 }
             }

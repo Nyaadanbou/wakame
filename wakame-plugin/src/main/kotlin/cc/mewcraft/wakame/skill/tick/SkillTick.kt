@@ -9,12 +9,14 @@ import cc.mewcraft.wakame.skill.state.CastPointStateInfo
 import cc.mewcraft.wakame.skill.state.CastStateInfo
 import cc.mewcraft.wakame.skill.state.SkillStateInfo
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
+import cc.mewcraft.wakame.tick.TickResult
+import cc.mewcraft.wakame.tick.Tickable
 import cc.mewcraft.wakame.user.toUser
 
 /**
  * 表示技能触发的效果.
  */
-interface SkillTick {
+interface SkillTick : Tickable {
 
     companion object {
         /**
@@ -33,10 +35,7 @@ interface SkillTick {
      */
     val context: SkillContext
 
-    /**
-     * 触发一 tick 的效果.
-     */
-    fun tick(): TickResult = TickResult.ALL_DONE
+    override fun tick(): TickResult = TickResult.ALL_DONE
 }
 
 private data object EmptySkillTick : SkillTick {

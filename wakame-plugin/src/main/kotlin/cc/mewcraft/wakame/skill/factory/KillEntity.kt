@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
-import cc.mewcraft.wakame.skill.tick.TickResult
+import cc.mewcraft.wakame.tick.TickResult
 import net.kyori.adventure.key.Key
 
 interface KillEntity : Skill {

@@ -25,6 +25,7 @@ import cc.mewcraft.wakame.resource.resourceModule
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.test.testModule
+import cc.mewcraft.wakame.tick.tickModule
 import cc.mewcraft.wakame.user.userModule
 import cc.mewcraft.wakame.world.worldModule
 import me.lucko.helper.plugin.KExtendedJavaPlugin
@@ -75,6 +76,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 skinModule(),
                 skillModule(),
                 testModule(),
+                tickModule(),
                 userModule(),
                 worldModule(),
             )

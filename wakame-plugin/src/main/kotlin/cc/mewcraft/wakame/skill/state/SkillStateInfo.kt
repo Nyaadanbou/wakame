@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
-import cc.mewcraft.wakame.skill.tick.TickResult
+import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.util.RingBuffer

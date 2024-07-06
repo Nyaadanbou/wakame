@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.*
+import cc.mewcraft.wakame.tick.TickResult
 import net.kyori.adventure.key.Key
 
 interface CommandExecute : Skill {

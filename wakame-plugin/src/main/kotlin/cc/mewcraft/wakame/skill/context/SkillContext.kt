@@ -60,6 +60,28 @@ private class SkillContextImpl : SkillContext {
     private val storage: MutableMap<SkillContextKey<*>, Any> = HashMap()
 
     override fun <T : Any> set(key: SkillContextKey<T>, value: T) {
+        when (key) {
+            SkillContextKey.CASTER -> {
+                caster = value as Caster
+                return
+            }
+            SkillContextKey.TARGET -> {
+                target = value as Target
+                return
+            }
+            SkillContextKey.NEKO_STACK -> {
+                nekoStack = value as NekoStack
+                return
+            }
+            SkillContextKey.ITEM_STACK -> {
+                itemStack = value as ItemStack
+                return
+            }
+            SkillContextKey.MOCHA_ENGINE -> {
+                mochaEngine = value as MochaEngine<*>
+                return
+            }
+        }
         storage[key] = value
     }
 
@@ -89,7 +111,7 @@ private class SkillContextImpl : SkillContext {
         get() = get(SkillContextKey.CASTER)
         set(value) {
             value ?: return
-            set(SkillContextKey.CASTER, value)
+            storage[SkillContextKey.CASTER] = value
             when (value) {
                 is Caster.Single.Player -> {
                     set(SkillContextKey.CASTER_PLAYER, value)
@@ -117,7 +139,7 @@ private class SkillContextImpl : SkillContext {
         get() = get(SkillContextKey.TARGET)
         set(value) {
             value ?: return
-            set(SkillContextKey.TARGET, value)
+            storage[SkillContextKey.TARGET] = value
             when (value) {
                 is Target.LivingEntity -> {
                     set(SkillContextKey.TARGET_LIVING_ENTITY, value)
@@ -136,15 +158,15 @@ private class SkillContextImpl : SkillContext {
         get() = get(SkillContextKey.NEKO_STACK)
         set(value) {
             value ?: return
-            set(SkillContextKey.NEKO_STACK, value)
-            set(SkillContextKey.ITEM_STACK, value.handle)
+            storage[SkillContextKey.NEKO_STACK] = value
+            storage[SkillContextKey.ITEM_STACK] = value.handle
         }
 
     var itemStack: ItemStack?
         get() = get(SkillContextKey.ITEM_STACK)
         set(value) {
             value ?: return
-            set(SkillContextKey.ITEM_STACK, value)
+            storage[SkillContextKey.ITEM_STACK] = value
         }
 
     var mochaEngine: MochaEngine<*>?
@@ -152,7 +174,7 @@ private class SkillContextImpl : SkillContext {
         set(value) {
             value ?: return
             get(SkillContextKey.USER)?.let { value.bindInstance(UserContext::class.java, UserContext(it), "user", "player") }
-            set(SkillContextKey.MOCHA_ENGINE, value)
+            storage[SkillContextKey.MOCHA_ENGINE] = value
         }
 
 }

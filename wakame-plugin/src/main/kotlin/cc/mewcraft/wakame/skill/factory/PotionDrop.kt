@@ -8,6 +8,8 @@ import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.*
+import cc.mewcraft.wakame.tick.WakameTicker
+import cc.mewcraft.wakame.tick.TickResult
 import net.kyori.adventure.key.Key
 import org.bukkit.Location
 import org.bukkit.Material
@@ -60,7 +62,7 @@ interface PotionDrop : Skill {
                     }
                     else -> return TickResult.INTERRUPT
                 }
-                SkillTicker.addChildren(PotionTick(location.add(.0, 3.0, .0)))
+                WakameTicker.addTick(PotionTick(location.add(.0, 3.0, .0)))
                 return TickResult.ALL_DONE
             }
 
