@@ -59,7 +59,7 @@ renderer_layout:
     - attribute:max_mana
     - attribute:movement_speed
     - (fixed:skill)<!i><aqua><b>技能
-    - skill:buff/potion_remove
+    - skill:blink
     - skill:frost
     - skill:leapfrog
     - generic:empty # 空词条栏（用于标记空属性栏的相对位置）
