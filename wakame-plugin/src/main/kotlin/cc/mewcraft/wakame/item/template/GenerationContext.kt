@@ -48,16 +48,26 @@ class GenerationContext(
      */
     var level: Short? by WatchedPrimitive(null)
 
+    /**
+     * 已经生成的物品等级.
+     *
+     * @throws GenerationContextException
+     */
     val levelOrThrow: Short
-        get() = level ?: throw GenerationContextException("The level is not present in the generation context")
+        get() = level ?: throw GenerationContextException("Level is not present in the generation context")
 
     /**
      * 已经生成的 [Rarity].
      */
     var rarity: Rarity? by WatchedReference(null)
 
+    /**
+     * 已经生成的 [Rarity].
+     *
+     * @throws GenerationContextException
+     */
     val rarityOrThrow: Rarity
-        get() = rarity ?: throw GenerationContextException("The rarity is not present in the generation context")
+        get() = rarity ?: throw GenerationContextException("Rarity is not present in the generation context")
 
     /**
      * 已经生成的 [Element].
@@ -91,18 +101,16 @@ class GenerationContext(
         // TODO 实现一个可以快速构建 GenerationContextException 的方便函数
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("trigger", trigger),
-            ExaminableProperty.of("target", target),
-            ExaminableProperty.of("seed", seed),
-            ExaminableProperty.of("level", level),
-            ExaminableProperty.of("rarity", rarity),
-            ExaminableProperty.of("elements", elements),
-            ExaminableProperty.of("kizamiz", kizamiz),
-            ExaminableProperty.of("curses", curses),
-            ExaminableProperty.of("skills", skills),
-            ExaminableProperty.of("attributes", attributes),
-        )
-    }
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("trigger", trigger),
+        ExaminableProperty.of("target", target),
+        ExaminableProperty.of("seed", seed),
+        ExaminableProperty.of("level", level),
+        ExaminableProperty.of("rarity", rarity),
+        ExaminableProperty.of("elements", elements),
+        ExaminableProperty.of("kizamiz", kizamiz),
+        ExaminableProperty.of("curses", curses),
+        ExaminableProperty.of("skills", skills),
+        ExaminableProperty.of("attributes", attributes),
+    )
 }
