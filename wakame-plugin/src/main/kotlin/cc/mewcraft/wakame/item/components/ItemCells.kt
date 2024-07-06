@@ -235,7 +235,7 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
             // 优化: 词条栏绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
             val cells = Object2ObjectArrayMap(this.cells)
             consumer.invoke(cells)
-            return Value(HashMap(cells)) // 显式副本
+            return Value(Object2ObjectArrayMap(cells)) // 显式副本
         }
 
         private companion object : ItemComponentConfig(ItemComponentConstants.CELLS)
