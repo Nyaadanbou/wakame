@@ -25,27 +25,22 @@ renderer_layout:
   # (default:blank)_namespace:value_
   # _namespace:value_
   primary:
-    - (fixed:meta)<!i><aqua><b>元数据 # 仅当下面存在 meta 命名空间下的内容时才渲染
-    - meta:level # 必须写命名空间形式的唯一标识
-    - meta:rarity
-    - meta:elements
-    - meta:kizamiz
-    - (default:<!i><gray>无皮肤所有者)meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
-    - (default:blank)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
+    - (default:<!i><gray>无皮肤)meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
+    # - (default:blank)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
     - meta:damageable
-    - meta:arrow
-    - meta:custom_model_data
     - meta:attributable
     - meta:kizamiable
     - meta:skillful
-    - meta:fire_resistant
-    - meta:food
-    - meta:damage
-    - meta:max_damage
-    - meta:unbreakable
+    - meta:castable
+    - (fixed:meta)<!i><aqua><b>通用 # 仅当下面存在 meta 命名空间下的内容时才渲染
+    - meta:crate
+    - meta:level
+    - meta:rarity
+    - meta:elements
+    - meta:kizamiz
+    - meta:arrow
     - meta:lore
-    - (fixed)<!i><gray>---------------- # 这行始终显示
-    - (fixed:attribute)<!i><aqua><b>属性\r第二行属性介绍awa
+    - (fixed:attribute)<!i><aqua><b>属性
     - attribute:attack_damage
     - attribute:attack_effect_chance
     - attribute:attack_speed_level
@@ -65,19 +60,9 @@ renderer_layout:
     - attribute:movement_speed
     - (fixed:skill)<!i><aqua><b>技能
     - skill:buff/potion_remove
-    - skill:blink
-    - skill:cyclone
-    - skill:dash
-    - skill:fireblade
-    - skill:flood
     - skill:frost
     - skill:leapfrog
-    - skill:meteorite
-    - skill:sproink
-    - skill:stab
-    - skill:waterball
     - generic:empty # 空词条栏（用于标记空属性栏的相对位置）
-    - (fixed:*)<!i><gray>这行将不会被渲染 # 仅当下面存在任意命名空间下的内容时才渲染（不包括“无内容”的情况）
 
   # 元素排序
   # 同种属性，不同元素标识，都将按照此顺序渲染
