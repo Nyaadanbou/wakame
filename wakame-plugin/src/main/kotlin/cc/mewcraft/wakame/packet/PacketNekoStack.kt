@@ -17,7 +17,6 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import java.util.UUID
-import kotlin.jvm.optionals.getOrNull
 import com.github.retrooper.packetevents.protocol.item.ItemStack as PacketStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
@@ -133,7 +132,7 @@ private constructor(
         get() = NekoStackSupport.getBehaviors(nbt)
 
     override fun erase() {
-        handle0.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.removeTag(WAKAME_TAG_NAME)
+        handle0.unsetComponent(ComponentTypes.CUSTOM_DATA)
     }
 
     companion object {
