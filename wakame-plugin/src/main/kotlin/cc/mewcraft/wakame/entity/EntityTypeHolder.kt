@@ -52,6 +52,16 @@ private data class EntityTypeHolderImpl(
     override fun contains(key: Key): Boolean {
         return key in keySet
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other is EntityTypeHolderImpl && name == other.name) return true
+        return false
+    }
+
+    override fun hashCode(): Int {
+        return name.hashCode() + keySet.hashCode() * 31
+    }
 }
 
 internal object EntityTypeHolderSerializer : SchemaSerializer<EntityTypeHolder> {
