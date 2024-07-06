@@ -54,7 +54,7 @@ class GenerationContext(
      * @throws GenerationContextException
      */
     val levelOrThrow: Short
-        get() = level ?: throw GenerationContextException("Level is not present in the generation context")
+        get() = level ?: throw GenerationContextException("No 'level' is present in the generation context")
 
     /**
      * 已经生成的 [Rarity].
@@ -67,7 +67,7 @@ class GenerationContext(
      * @throws GenerationContextException
      */
     val rarityOrThrow: Rarity
-        get() = rarity ?: throw GenerationContextException("Rarity is not present in the generation context")
+        get() = rarity ?: throw GenerationContextException("No 'rarity' is present in the generation context")
 
     /**
      * 已经生成的 [Element].

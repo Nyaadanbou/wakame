@@ -21,7 +21,7 @@ data class FilterItemLevel(
     override fun testOriginal(context: GenerationContext): Boolean {
         val level = context.level
         if (level != null) {
-            level.toStableInt() in this.level
+            return level.toStableInt() in this.level
         }
         return false
     }

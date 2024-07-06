@@ -26,10 +26,10 @@ internal class NekoItemImpl(
 ) : Examinable, NekoItem {
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("key", key.asString()),
         ExaminableProperty.of("uuid", uuid),
         ExaminableProperty.of("config", config.relPath),
-        ExaminableProperty.of("item_type", itemType),
+        ExaminableProperty.of("item_type", itemType.asString()),
         ExaminableProperty.of("hide_tooltip", hideTooltip),
         ExaminableProperty.of("hide_additional_tooltip", hideAdditionalTooltip),
         ExaminableProperty.of("shown_in_tooltip", shownInTooltip),

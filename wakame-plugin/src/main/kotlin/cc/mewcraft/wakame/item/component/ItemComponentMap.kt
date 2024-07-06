@@ -4,7 +4,11 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
+import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
+import java.util.stream.Stream
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 data class TypedItemComponent<T>(
@@ -32,7 +36,7 @@ data class TypedItemComponent<T>(
  * 如果想移除一个组件, 调用以下函数:
  * - [unset]
  */
-interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
+interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
 
     companion object {
         const val TAG_COMPONENTS = "components"
@@ -46,6 +50,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             override fun size(): Int = 0
             override fun fuzzySize(): Int = 0
             override fun iterator(): Iterator<TypedItemComponent<*>> = emptySet<TypedItemComponent<*>>().iterator()
+            override fun toString(): String = toSimpleString()
         }
 
         /**
@@ -79,6 +84,15 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
                 override fun fuzzySize(): Int {
                     return size()
+                }
+
+                override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+                    ExaminableProperty.of("base", base),
+                    ExaminableProperty.of("overrides", overrides)
+                )
+
+                override fun toString(): String {
+                    return toSimpleString()
                 }
             }
         }
@@ -169,6 +183,14 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             override fun fuzzySize(): Int {
                 return this@ItemComponentMap.fuzzySize()
             }
+
+            override fun examinableProperties(): Stream<out ExaminableProperty> {
+                return this@ItemComponentMap.examinableProperties()
+            }
+
+            override fun toString(): String {
+                return this@ItemComponentMap.toString()
+            }
         }
     }
 
@@ -188,7 +210,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
     // Classes
 
-    class Builder {
+    class Builder : Examinable {
         private val map: MutableMap<ItemComponentType<*>, Any> = mutableMapOf()
 
         fun <T> set(type: ItemComponentType<T>, value: T?): Builder {
@@ -208,20 +230,20 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         }
 
         fun build(): ItemComponentMap {
-            return buildFromMap(map)
+            return ForTest(map)
         }
 
-        private fun buildFromMap(components: Map<ItemComponentType<*>, Any>): ItemComponentMap {
-            return if (components.isEmpty()) {
-                EMPTY
-            } else {
-                ForTest(components.toMutableMap())
-            }
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("map", map)
+        )
+
+        override fun toString(): String {
+            return toSimpleString()
         }
     }
 
     /**
-     * 用于单元测试.
+     * 用于单元测试. 本实现不涉及任何 NBT 操作.
      */
     private class ForTest(
         private val map: MutableMap<ItemComponentType<*>, Any>,
@@ -258,13 +280,27 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             return map.entries.mapNotNull { getTyped(it.key) }.iterator()
         }
 
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("map", map)
+        )
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other is ForTest && this.map == other.map) return true
+            return false
+        }
+
+        override fun hashCode(): Int {
+            return map.hashCode()
+        }
+
         override fun toString(): String {
-            return map.toString()
+            return toSimpleString()
         }
     }
 
     /**
-     * 用于封装 [BukkitStack].
+     * 用于封装 [BukkitStack]. 仅限用于实际的游戏运行环境.
      */
     private class ForBukkitStack(
         private val stack: BukkitStack,
@@ -308,6 +344,11 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
             return nbt.getCompoundOrNull(TAG_COMPONENTS)?.size() ?: 0
         }
 
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("stack", stack),
+            ExaminableProperty.of("nbt", nbt)
+        )
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other is ForBukkitStack && this.stack == other.stack) return true
@@ -319,11 +360,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
         }
 
         override fun toString(): String {
-            return (nbt.getCompoundOrNull(TAG_COMPONENTS) ?: EMPTY_COMPOUND).toString()
-        }
-
-        companion object {
-            private val EMPTY_COMPOUND = CompoundTag.create()
+            return toSimpleString()
         }
     }
 
@@ -359,6 +396,23 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>> {
 
         override fun fuzzySize(): Int {
             return delegate.fuzzySize()
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> {
+            return delegate.examinableProperties()
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            return delegate == other
+        }
+
+        override fun hashCode(): Int {
+            return delegate.hashCode()
+        }
+
+        override fun toString(): String {
+            return delegate.toString()
         }
     }
 }
