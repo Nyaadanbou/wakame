@@ -8,13 +8,11 @@ import org.koin.core.component.inject
 /**
  * The [ItemRenderer] used to render [PacketNekoStack].
  */
-internal class PacketItemRenderer(
-    private val textRenderer: TextRenderer,
-) : KoinComponent, ItemRenderer<PacketNekoStack> {
+internal class PacketItemRenderer : KoinComponent, ItemRenderer<PacketNekoStack> {
     private val itemModelDataLookup: ItemModelDataLookup by inject()
 
     override fun render(nekoStack: PacketNekoStack) {
-        val lore = textRenderer.generateLoreLines(nekoStack).flatten()
+        val lore = TextRenderer.generateLoreLines(nekoStack).flatten()
         val customModelData = itemModelDataLookup[nekoStack.key, nekoStack.variant]
         nekoStack.setLore(lore)
         nekoStack.setCustomModelData(customModelData)
