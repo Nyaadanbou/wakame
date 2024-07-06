@@ -70,11 +70,9 @@ internal fun registryModule(): Module = module {
     // We need to explicitly declare these Initializable,
     // so the functions can be called by the Initializer
     single { AttributeRegistry } bind Initializable::class
-    single { BehaviorRegistry } bind Initializable::class
     single { ElementRegistry } bind Initializable::class
     single { EntityRegistry } bind Initializable::class
     single { ItemComponentRegistry } bind Initializable::class
-    single { ItemMetaRegistry } bind Initializable::class
     single { ItemRegistry } bind Initializable::class
     single { ItemSkinRegistry } bind Initializable::class
     single { KizamiRegistry } bind Initializable::class

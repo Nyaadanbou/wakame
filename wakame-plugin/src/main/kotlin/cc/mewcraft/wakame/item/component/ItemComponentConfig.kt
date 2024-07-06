@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.component
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaSupport
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
@@ -88,7 +87,7 @@ abstract class ItemComponentConfig(
                     JoinConfiguration.separator(ItemComponentInjections.mini.deserialize(separator))
                 )
                 .let {
-                    ItemMetaSupport.mini().deserialize(merged, component("merged", it))
+                    ItemComponentInjections.mini.deserialize(merged, component("merged", it))
                 }
                 .let(::listOf)
         }

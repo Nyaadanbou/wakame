@@ -4,11 +4,11 @@ import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.displayModule
 import cc.mewcraft.wakame.display.flatten
 import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.item.binary.cell.core.attribute.AttributeCoreInitializer
-import cc.mewcraft.wakame.item.binary.cell.core.empty.EmptyCoreInitializer
-import cc.mewcraft.wakame.item.binary.cell.core.empty.EmptyLoreLine
-import cc.mewcraft.wakame.item.binary.cell.core.skill.SkillCoreInitializer
-import cc.mewcraft.wakame.item.binary.meta.ItemMetaInitializer
+import cc.mewcraft.wakame.item.components.cells.cores.attribute.AttributeCoreBootstrap
+import cc.mewcraft.wakame.item.components.cells.cores.empty.EmptyCoreBootstrap
+import cc.mewcraft.wakame.item.components.cells.cores.empty.EmptyLoreLine
+import cc.mewcraft.wakame.item.components.cells.cores.skill.SkillCoreBootstrap
+import cc.mewcraft.wakame.item.components.legacy.ItemMetaInitializer
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.molang.molangModule
@@ -81,9 +81,9 @@ class LoreFlattenTest : KoinTest {
             RarityRegistry.onPreWorld()
 
             // item cells
-            AttributeCoreInitializer.onPostWorld()
-            EmptyCoreInitializer.onPostWorld()
-            SkillCoreInitializer.onPostWorld()
+            AttributeCoreBootstrap.onPostWorld()
+            EmptyCoreBootstrap.onPostWorld()
+            SkillCoreBootstrap.onPostWorld()
 
             // item meta
             ItemMetaInitializer.onPostWorld()

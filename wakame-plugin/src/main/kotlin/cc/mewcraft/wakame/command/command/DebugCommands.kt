@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.suspendingHandler
-import cc.mewcraft.wakame.item.binary.tryNekoStack
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.pack.model.ModelRegistry
 import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
 import cc.mewcraft.wakame.util.CompoundBinaryTag
