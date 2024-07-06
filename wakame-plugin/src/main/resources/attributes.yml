@@ -33,8 +33,8 @@ attack_damage:
   display: "<element>攻击力"
   tooltips:
     add: "<!i><element>攻击力 <min:#;-.> ⎓ <max:#;-.>"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
   values:
     neutral: # 如果属性是带元素的，这一级缩进为元素的标识符，然后下一级缩进才是属性的默认/最小/最大
       default: .0 # 默认值
@@ -70,8 +70,8 @@ attack_damage_rate:
   display: "<element>攻击力"
   tooltips:
     add: "<!i><element>攻击力 <value:+#%;-.%>"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
   values:
     neutral:
       default: .0
@@ -107,8 +107,8 @@ attack_effect_chance:
   display: "元素叠加"
   tooltips:
     add: "<!i>元素叠加 <value:+#%;-.%>"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
   values:
     default: .01 # 默认值（这个属性不带元素，所以这一级缩进就是属性的默认/最小/最大）
     min: .0 # 最小值
@@ -119,8 +119,8 @@ attack_speed_level:
   display: "攻击速度"
   tooltips:
     add: "<!i>攻击速度 <value>"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
   mappings:
     0: "<red>究极慢"
     1: "超级慢"
@@ -153,8 +153,8 @@ critical_strike_chance:
   display: "暴击概率"
   tooltips:
     add: "<!i>暴击概率 <value:+#%;-.%>"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
   values:
     default: .01
     min: .0
@@ -165,8 +165,8 @@ critical_strike_power:
   display: "暴击伤害"
   tooltips:
     add: "<!i>暴击伤害 <value:+#%;-.%>"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
   values:
     default: 1.0
     min: .0
@@ -177,8 +177,8 @@ damage_reduction_rate:
   display: "伤害减免"
   tooltips:
     add: "<!i>伤害减免 <value:+#%;-.%>"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
   values:
     default: .0
     min: .0
@@ -299,8 +299,8 @@ mana_consumption_rate:
   display: "魔法消耗百分比"
   tooltips:
     add: "<!i>魔法消耗率 <value:+#%;-.%>"
-    multiply_base: "DO_NOT_USE"
-    multiply_total: "DO_NOT_USE"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
   values:
     default: 1.0
     min: .0
