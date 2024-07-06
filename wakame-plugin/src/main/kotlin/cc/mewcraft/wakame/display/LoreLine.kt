@@ -26,7 +26,7 @@ interface LoreLine {
      * 该内容是否应该显示。
      */
     val shouldShow: Boolean
-        get() = this is NoopLoreLine
+        get() = this !is NoopLoreLine
 
     /**
      * 该内容是否是始终不变的。
