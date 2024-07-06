@@ -59,7 +59,7 @@ fun CoreAttribute(
 ): CoreAttribute {
     val key = Key(nbt.getString(CoreBinaryKeys.CORE_IDENTIFIER))
     val facade = AttributeRegistry.FACADES[key]
-    return facade.binaryCoreCreatorByTag(nbt)
+    return facade.codecTagToInstance(nbt)
 }
 
 /**
@@ -80,7 +80,7 @@ fun CoreAttribute(
 ): CoreAttribute {
     val key = node.node("key").krequire<Key>()
     val facade = AttributeRegistry.FACADES[key]
-    return facade.binaryCoreCreatorByConfig(node)
+    return facade.codecNodeToInstance(node)
 }
 
 sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvider {
@@ -89,12 +89,12 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvi
     override val type: CoreType<*> = Type
 
     override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].attributeModifierCreator(uuid, this)
+        return AttributeRegistry.FACADES[key].modifierCreator(uuid, this)
     }
 
     override fun provideTooltipLore(): LoreLine {
         val tooltipKey = AttributeDisplaySupport.getLineKey(this) ?: return LoreLine.noop()
-        val tooltipText = AttributeRegistry.FACADES[key].displayTextCreator(this)
+        val tooltipText = AttributeRegistry.FACADES[key].tooltipCreator(this)
         return LoreLine.simple(tooltipKey, tooltipText)
     }
 

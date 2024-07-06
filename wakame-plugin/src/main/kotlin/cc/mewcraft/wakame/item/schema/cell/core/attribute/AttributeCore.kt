@@ -22,7 +22,7 @@ import org.spongepowered.configurate.ConfigurationNode
  */
 fun SchemaAttributeCore(node: ConfigurationNode): SchemaAttributeCore {
     val key = node.node("key").krequire<Key>()
-    val schemaAttributeCore = AttributeRegistry.FACADES[key].schemaCoreCreatorByConfig(node)
+    val schemaAttributeCore = AttributeRegistry.FACADES[key].codecNodeToTemplate(node)
     // return schemaAttributeCore
     TODO("to be deleted")
 }

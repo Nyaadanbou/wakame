@@ -89,7 +89,7 @@ internal data class AttributeLoreMeta(
         val namespace = rawKey.namespace()
         val values = StringCombiner(rawKey.value(), ".") {
             addList(derivation.operationIndex)
-            addList(derivation.elementIndex, AttributeRegistry.FACADES[rawKey].attributeComponentMetadata.hasComponent<AttributeComponent.Element>())
+            addList(derivation.elementIndex, AttributeRegistry.FACADES[rawKey].components.hasComponent<AttributeComponent.Element>())
         }.combine()
 
         return values.map { Key(namespace, it) }

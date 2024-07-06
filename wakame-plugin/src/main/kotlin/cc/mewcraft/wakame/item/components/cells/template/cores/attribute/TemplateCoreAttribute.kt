@@ -40,7 +40,7 @@ interface TemplateCoreAttribute : TemplateCore, AttributeData, AttributeComponen
  */
 fun TemplateCoreAttribute(node: ConfigurationNode): TemplateCoreAttribute {
     val key = node.node("key").krequire<Key>()
-    val template = AttributeRegistry.FACADES[key].schemaCoreCreatorByConfig(node) // TODO 这些涉及到数据转换的全部以 codec 开头
+    val template = AttributeRegistry.FACADES[key].codecNodeToTemplate(node)
     return template
 }
 

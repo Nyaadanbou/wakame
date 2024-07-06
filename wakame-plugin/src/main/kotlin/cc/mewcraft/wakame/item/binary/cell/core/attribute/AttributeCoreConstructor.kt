@@ -28,7 +28,7 @@ fun BinaryAttributeCore(
 ): BinaryAttributeCore {
     val key = Key(compound.getString(CoreBinaryKeys.CORE_IDENTIFIER))
     val facade = AttributeRegistry.FACADES[key]
-    val core = facade.binaryCoreCreatorByTag(compound)
+    val core = facade.codecTagToInstance(compound)
     // return core
     TODO("to be deleted")
 }
@@ -53,7 +53,7 @@ fun BinaryAttributeCore(
 ): BinaryAttributeCore {
     val key = node.node("key").krequire<Key>()
     val facade = AttributeRegistry.FACADES[key]
-    val core = facade.binaryCoreCreatorByConfig(node)
+    val core = facade.codecNodeToInstance(node)
     // return core
     TODO("to be deleted")
 }
