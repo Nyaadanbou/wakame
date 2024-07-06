@@ -9,7 +9,7 @@ import java.util.UUID
 /**
  * 用于处理 [Tickable].
  */
-internal object WakameTicker {
+internal object Ticker {
     private val ticks: MutableMap<UUID, Tickable> = Object2ObjectOpenHashMap()
 
     internal fun tick() {
@@ -47,6 +47,6 @@ internal object WakameTicker {
 internal class TickerListener : Listener {
     @EventHandler
     private fun onServerTickStart(event: ServerTickStartEvent) {
-        WakameTicker.tick()
+        Ticker.tick()
     }
 }

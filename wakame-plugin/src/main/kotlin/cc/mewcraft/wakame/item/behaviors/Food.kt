@@ -6,7 +6,11 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.toNekoStack
-import net.kyori.adventure.key.Key
+import cc.mewcraft.wakame.skill.CasterAdapter
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.TargetAdapter
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.tick.Ticker
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
@@ -21,8 +25,9 @@ interface Food : ItemBehavior {
 
             val nekoStack: NekoStack = itemStack.toNekoStack
             val food: FoodProperties = nekoStack.components.get(ItemComponentTypes.FOOD) ?: return
-            val skills: List<Key> = food.skills
-            // FIXME: 2024.7.5 释放食物组件上记录的技能
+            val skills: List<Skill> = food.skills
+            val castContext = SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack = nekoStack)
+            skills.forEach { Ticker.addTick(it.cast(castContext)) }
         }
     }
 

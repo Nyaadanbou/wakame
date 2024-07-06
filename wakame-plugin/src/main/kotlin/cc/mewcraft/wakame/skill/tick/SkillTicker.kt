@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.skill.tick
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.tick.WakameTicker
+import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.Server
 import java.util.UUID
@@ -12,11 +12,11 @@ class SkillTicker(
     private var taskId: UUID? = null
 
     fun start() {
-        taskId = WakameTicker.addTickAlwaysExecuted { server.onlinePlayers.forEach { it.toUser().skillState.tick() } }
+        taskId = Ticker.addTickAlwaysExecuted { server.onlinePlayers.forEach { it.toUser().skillState.tick() } }
     }
 
     override fun close() {
-        taskId?.let { WakameTicker.stopTick(it) }
+        taskId?.let { Ticker.stopTick(it) }
     }
 
     override fun onPreWorld() {
