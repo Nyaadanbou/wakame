@@ -10,18 +10,106 @@ cells:
   selectors:
     core_groups:
       all_possible_cores:
-        pool_1:
+        noop:
+          # 无操作核心 (没有核心, 也没有词条栏)
+          - key: generic:noop
+            weight: 1
+        empty:
+          # 空核心 (没有核心, 但有词条栏)
+          - key: generic:empty
+            weight: 1
+        attributes:
+          # 攻击力
           - key: attribute:attack_damage
             operation: add
             element: neutral
             lower: 20
             upper: 30
             weight: 1
-          - key: attribute:critical_strike_chance
-            value: 0.75
+          # 元素叠加
+          - key: attribute:attack_effect_chance
+            value: 0.01
             weight: 1
+          # 攻击速度
+          - key: attribute:attack_speed_level
+            value: 0
+            weight: 1
+          # 方块交互范围
+          - key: attribute:block_interaction_range
+            value: 4.5
+            weight: 1
+          # 暴击概率
+          - key: attribute:critical_strike_chance
+            value: 0.01
+            weight: 1
+          # 暴击伤害
           - key: attribute:critical_strike_power
-            value: 0.52
+            value: 1.0
+            weight: 1
+          # 伤害减免
+          - key: attribute:damage_reduction_rate
+            value: 0.0
+            weight: 1
+          # 防御
+          - key: attribute:defense
+            element: neutral
+            value: 0.0
+            weight: 1
+          # 防御穿透
+          - key: attribute:defense_penetration
+            element: neutral
+            value: 0.0
+            weight: 1
+          # 实体交互距离
+          - key: attribute:entity_interaction_range
+            value: 0.0
+            weight: 1
+          # 生命恢复
+          - key: attribute:health_regeneration
+            value: 1.0
+            weight: 1
+          # 生命汲取
+          - key: attribute:lifesteal
+            value: 0.0
+            weight: 1
+          # 魔法消耗百分比
+          - key: attribute:mana_consumption_rate
+            value: 1.0
+            weight: 1
+          # 魔法恢复
+          - key: attribute:mana_regeneration
+            value: 1.0
+            weight: 1
+          # 魔法汲取
+          - key: attribute:manasteal
+            value: 0.0
+            weight: 1
+          # 最大伤害吸收
+          - key: attribute:max_absorption
+            value: 0.0
+            weight: 1
+          # 最大生命值
+          - key: attribute:max_health
+            value: 30.0
+            weight: 1
+          # 最大魔法值
+          - key: attribute:max_mana
+            value: 100.0
+            weight: 1
+          # 移动速度
+          - key: attribute:movement_speed
+            value: 0.1
+            weight: 1
+        skills:
+          # 演示1
+          - key: skill:melee/demo
+            trigger: trigger:generic/attack
+            variant: 0
+            weight: 1
+          # 演示2
+          - key: skill:ranged/demo
+            trigger: trigger:generic/attack
+            variant: 0
             weight: 1
     curse_groups:
       trivial:

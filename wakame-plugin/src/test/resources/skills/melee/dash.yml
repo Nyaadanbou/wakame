@@ -1,8 +1,0 @@
-displays:
-  name: "冲刺"
-  tooltips:
-    - "<red>冲！"
-
-type: dash
-
-distance: 5
