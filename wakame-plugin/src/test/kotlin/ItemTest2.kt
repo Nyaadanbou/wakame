@@ -55,6 +55,7 @@ import it.unimi.dsi.fastutil.longs.LongSet
 import item.MockGenerationContext
 import item.MockNekoStack
 import net.kyori.adventure.key.Key
+import org.bukkit.Material
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -528,6 +529,20 @@ class ItemTest2 : KoinTest {
     ) {
         handleSerialization {
             assertNotNull(it)
+        }
+
+        handleGenerationResult {
+            assertTrue(!it.isEmpty())
+        }
+
+        handleGenerated {
+            assertEquals(2.1f, it.defaultMiningSpeed, 1e-5f)
+            assertEquals(4, it.damagePerBlock)
+            val rules = it.rules
+            assertNotNull(rules.elementAtOrNull(0))
+            assertTrue(rules[0].blockTypes.containsAll(setOf(Material.DIRT, Material.STONE)))
+            assertEquals(4.0f, rules[0].speed)
+            assertTrue(rules[0].correctForDrops.toBooleanOrElse(false))
         }
     }
 
