@@ -145,14 +145,20 @@ food:
   can_always_eat: false
   eat_seconds: 1.6
   effects:
-    probability: 0.9
-    effect:
-      - type: speed
-        duration: 1
-        amplifier: 0
-        ambient: false
-        particles: true
-        icon: true
+    - type: speed
+      duration: 12
+      amplifier: 2
+      ambient: false
+      particles: true
+      icon: true
+      probability: 0.9
+    - type: luck
+      duration: 12
+      amplifier: 2
+      ambient: false
+      particles: true
+      icon: true
+      probability: 0.9
   skills:
     - "foo:bar"
 

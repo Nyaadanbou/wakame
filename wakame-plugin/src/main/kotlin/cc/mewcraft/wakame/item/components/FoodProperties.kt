@@ -150,12 +150,12 @@ data class FoodProperties(
          */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             val nutrition = node.node("nutrition").getInt(0)
-            val saturation = node.node("saturation").getFloat(0F)
+            val saturation = node.node("saturation").getFloat(0f)
             val canAlwaysEat = node.node("can_always_eat").getBoolean(false)
-            val eatSeconds = node.node("eat_seconds").getFloat(1.6F)
+            val eatSeconds = node.node("eat_seconds").getFloat(1.6f)
             val effects = node.node("effects").childrenList().map { child ->
-                val probability = child.node("probability").getFloat(1F).takeIf { it > 0F && it <= 1F } ?: throw SerializationException(child, javaTypeOf<Float>(), "The probability of a single food effect must between 0 (exclusive) and 1 (inclusive)")
-                val potionEffect = child.node("effect").get<PotionEffect>() ?: throw SerializationException(child, javaTypeOf<PotionEffect>(), "The potion effect of a single food effect must be specifically set")
+                val probability = child.node("probability").getFloat(1f).takeIf { it > 0f && it <= 1f } ?: throw SerializationException(child, javaTypeOf<Float>(), "The probability of a single food effect must between 0 (exclusive) and 1 (inclusive)")
+                val potionEffect = child.get<PotionEffect>() ?: throw SerializationException(child, javaTypeOf<PotionEffect>(), "The potion effect of a single food effect must be specifically set")
                 FoodEffect(potionEffect, probability)
             }
             val skills = node.node("skills").getList<Key>(emptyList())
