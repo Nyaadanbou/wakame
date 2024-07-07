@@ -16,7 +16,6 @@ internal class PacketItemRenderer : KoinComponent, ItemRenderer<PacketNekoStack>
         val customModelData = itemModelDataLookup[nekoStack.key, nekoStack.variant]
         nekoStack.setLore(lore)
         nekoStack.setCustomModelData(customModelData)
-        // TODO 1.20.5 之后, `minecraft:custom_data` 不会发送到客户端. 是不是不需要显式的移除 NBT 标签了?
         // 为了麦若，去掉物品的真实根标签
         nekoStack.erase()
     }
