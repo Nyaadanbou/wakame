@@ -24,5 +24,4 @@ food:
 #      particles: true
 #      icon: false
   skills:
-    - "foo:bar/a"
-    - "foo:bar/b"
+    - "skill:foo/bar"
