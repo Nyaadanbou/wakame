@@ -1,18 +1,15 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.item.behaviors.Castable
-import cc.mewcraft.wakame.item.behaviors.Chargeable
-import cc.mewcraft.wakame.item.behaviors.Damageable
-import cc.mewcraft.wakame.item.behaviors.Enchantable
-import cc.mewcraft.wakame.item.behaviors.Food
-import cc.mewcraft.wakame.item.behaviors.Tool
-import cc.mewcraft.wakame.item.behaviors.Trackable
-import cc.mewcraft.wakame.item.behaviors.Wearable
+import cc.mewcraft.wakame.item.behaviors.*
 
 /**
  * 所有的物品行为类型.
  */
 object ItemBehaviorTypes {
+    /**
+     * 物品发动攻击的逻辑.
+     */
+    val ATTACK: ItemBehaviorType<Attack> = Attack
     /**
      * 物品施放技能的逻辑.
      */

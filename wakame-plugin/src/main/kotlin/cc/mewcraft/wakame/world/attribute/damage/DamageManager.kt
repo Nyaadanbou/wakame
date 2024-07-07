@@ -1,10 +1,8 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
-import cc.mewcraft.wakame.item.binary.isNeko
-import cc.mewcraft.wakame.item.binary.toNekoStack
-import cc.mewcraft.wakame.item.hasBehavior
-import cc.mewcraft.wakame.item.schema.behavior.Attack
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.entity.*
@@ -25,7 +23,7 @@ object DamageManager {
                 is Player -> {
                     val itemStack = damager.inventory.itemInMainHand
                     //玩家手中的物品是Attack
-                    if (itemStack.isNeko && itemStack.toNekoStack.hasBehavior<Attack>()) {
+                    if (itemStack.tryNekoStack?.behaviors?.has(ItemBehaviorTypes.ATTACK) == true) {
                         return when (event.cause) {
                             DamageCause.ENTITY_ATTACK -> {
                                 PlayerMeleeAttackMetaData(damager.toUser(), false)

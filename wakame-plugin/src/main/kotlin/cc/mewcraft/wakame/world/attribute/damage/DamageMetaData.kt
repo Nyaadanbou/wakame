@@ -4,10 +4,8 @@ import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.binary.getMetaAccessor
-import cc.mewcraft.wakame.item.binary.isNeko
-import cc.mewcraft.wakame.item.binary.meta.BArrowMeta
-import cc.mewcraft.wakame.item.binary.toNekoStack
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.User
 import me.lucko.helper.random.VariableAmount
@@ -165,22 +163,27 @@ class PlayerProjectileDamageMetaData(
             ProjectileType.ARROWS -> {
                 //如果玩家射出的箭矢
                 //不是nekoStack，则为原版箭矢
-                //没有arrowMeta，视为原版箭矢，理论上不应该出现这种情况
-                if (!itemStack.isNeko) {
+                val nekoStack = itemStack.tryNekoStack ?: return generatePackets0(attributeMap)
+
+                //没有ARROW组件，视为原版箭矢，理论上不应该出现这种情况
+                if (nekoStack.components.has(ItemComponentTypes.ARROW)) {
                     return generatePackets0(attributeMap)
                 }
-                val nekoStack = itemStack.toNekoStack
-                if (nekoStack.getMetaAccessor<BArrowMeta>().exists) {
-                    return generatePackets0(attributeMap)
-                } else {
-                    //将箭矢上的属性加到玩家身上
-                    val itemModifiers = nekoStack.cell.getAttributeModifiers()
-                    itemModifiers.forEach { attribute, modifier -> attributeMap.getInstance(attribute)?.addModifier(modifier) }
-                    val elementDamagePackets = generatePackets0(attributeMap)
-                    //生成完伤害包以后移除掉附加的属性
-                    itemModifiers.forEach { attribute, modifier -> attributeMap.getInstance(attribute)?.removeModifier(modifier) }
-                    return elementDamagePackets
+
+                //没有CELLS组件，视为原版箭矢
+                val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return generatePackets0(attributeMap)
+
+                //将箭矢上的属性加到玩家身上
+                val attributeModifiers = cells.collectAttributeModifiers(nekoStack, true)
+                attributeModifiers.forEach { attribute, modifier ->
+                    attributeMap.getInstance(attribute)?.addModifier(modifier)
                 }
+                val elementDamagePackets = generatePackets0(attributeMap)
+                //生成完伤害包以后移除掉附加的属性
+                attributeModifiers.forEach { attribute, modifier ->
+                    attributeMap.getInstance(attribute)?.removeModifier(modifier)
+                }
+                return elementDamagePackets
             }
 
             ProjectileType.TRIDENT -> {
