@@ -161,8 +161,8 @@ interface ItemTracks : Examinable, ItemComponent, Iterable<Map.Entry<TrackType<*
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemTracks) {
-            holder.removeTag() // 总是重新写入所有数据
             val tag = holder.getTagOrCreate()
+            tag.clear() // 总是重新写入所有数据
             for ((trackType, track) in value) {
                 val tagKey = trackType.id
                 val tagValue = track.serializeAsTag()
