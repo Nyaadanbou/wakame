@@ -15,10 +15,11 @@ cells:
             weight: 999
     curse_groups:
       all_possible_curses:
-        pool_1:
+        empty:
           # 空诅咒
           - key: generic:empty
             weight: 1
+        all_cores:
           # 实体击杀
           - key: curse:entity_kills
             index: demo_creeps_1

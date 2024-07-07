@@ -23,9 +23,12 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.Attributable
 import cc.mewcraft.wakame.item.components.Castable
+import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.cells.CoreTypes
 import cc.mewcraft.wakame.item.components.cells.CurseTypes
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
+import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmpty
+import cc.mewcraft.wakame.item.components.cells.cores.noop.CoreNoop
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
@@ -55,6 +58,8 @@ import it.unimi.dsi.fastutil.longs.LongSet
 import item.MockGenerationContext
 import item.MockNekoStack
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -70,6 +75,8 @@ import java.io.File
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -207,16 +214,16 @@ class ItemTest2 : KoinTest {
     fun `component - arrow`() = componentLifecycleTest(
         "arrow", ItemTemplateTypes.ARROW, ItemComponentTypes.ARROW
     ) {
-        handleSerialization { arrowTemplate ->
+        serialization { arrowTemplate ->
             assertNotNull(arrowTemplate)
             assertEquals(3, arrowTemplate.pierceLevel.calculate().toInt())
         }
 
-        handleGenerationResult { generationResult ->
-            assertTrue { !generationResult.isEmpty() }
+        result { it ->
+            assertFalse(it.isEmpty())
         }
 
-        handleGenerated { itemArrow ->
+        unboxed { itemArrow ->
             assertEquals(3, itemArrow.pierceLevel)
         }
     }
@@ -225,16 +232,16 @@ class ItemTest2 : KoinTest {
     fun `component - attributable`() = componentLifecycleTest(
         "attributable", ItemTemplateTypes.ATTRIBUTABLE, ItemComponentTypes.ATTRIBUTABLE
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
         }
 
-        handleGenerationResult {
-            assertTrue { !it.isEmpty() }
+        result {
+            assertFalse(it.isEmpty())
         }
 
-        handleGenerated {
-            assertTrue { it == Attributable.of() }
+        unboxed {
+            assertEquals(Attributable.of(), it)
         }
     }
 
@@ -242,16 +249,16 @@ class ItemTest2 : KoinTest {
     fun `component - castable`() = componentLifecycleTest(
         "castable", ItemTemplateTypes.CASTABLE, ItemComponentTypes.CASTABLE
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
         }
 
-        handleGenerationResult {
-            assertTrue { !it.isEmpty() }
+        result {
+            assertFalse(it.isEmpty())
         }
 
-        handleGenerated {
-            assertTrue { it == Castable.of() }
+        unboxed {
+            assertEquals(Castable.of(), it)
         }
     }
 
@@ -259,19 +266,19 @@ class ItemTest2 : KoinTest {
     fun `component - cells simple`() = componentLifecycleTest(
         "cells_simple", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
     ) {
-        handleGenerationContext {
-            it.level = 10 // 预设物品等级为 10
-        }
-
-        handleSerialization {
+        serialization {
             assertNotNull(it)
         }
 
-        handleGenerationResult {
-            assertTrue(!it.isEmpty())
+        context {
+            it.level = 10 // 预设物品等级为 10
         }
 
-        handleGenerated {
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
             // 词条栏: attack
             run {
                 val cell = it.get("attack")
@@ -326,26 +333,51 @@ class ItemTest2 : KoinTest {
     }
 
     @Test
-    fun `component - cells only empty`() = componentLifecycleTest(
-        "cells_only_empty", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
+    fun `component - cells only noop or empty`() = componentLifecycleTest(
+        "cells_only_noop_or_empty", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            val cell = it.get("foo")
+            assertNotNull(cell)
+            assertAny(
+                // 要么是 noop, 要么是 empty
+                { assertIs<CoreNoop>(cell.getCore()) },
+                { assertIs<CoreEmpty>(cell.getCore()) },
+            )
         }
     }
 
     @Test
-    fun `component - cells check_core_registrations`() {
-        componentLifecycleTest(
-            "cells_check_core_registrations", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
-        ) {
-            handleGenerationContext {
-                it.level = 10
-            }
+    fun `component - cells check_core_registrations`() = componentLifecycleTest(
+        "cells_check_core_registrations", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
 
-            handleSerialization {
-                assertNotNull(it)
-            }
+        context {
+            it.level = 10
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            // 本 test 主要是用来检查 core 是否注册成功, 能否正常被 pool 调用
+            val cell = it.get("foo")
+            assertNotNull(cell)
+            // CoreNoop 在第一个无条件的池中,
+            // 因此生成出来的肯定是 CoreNoop
+            assertIs<CoreNoop>(cell.getCore())
         }
     }
 
@@ -353,26 +385,67 @@ class ItemTest2 : KoinTest {
     fun `component - cells check_curse_registrations`() = componentLifecycleTest(
         "cells_check_curse_registrations", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
     ) {
-        handleGenerationContext {
+        serialization {
+            assertNotNull(it)
+        }
+
+        context {
             it.level = 10
         }
 
-        handleSerialization {
-            assertNotNull(it)
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            // 本 test 主要是用来检查 core 是否注册成功, 能否正常被 pool 调用
         }
     }
 
     @Test
-    fun `component - crate`() {
+    fun `component - crate`() = componentLifecycleTest(
+        "crate", ItemTemplateTypes.CRATE, ItemComponentTypes.CRATE
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
 
+        result {
+            assertTrue(!it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(Key.key("foo:bar"), it.key)
+        }
     }
+
 
     @Test
     fun `component - custom_name`() = componentLifecycleTest(
         "custom_name", ItemTemplateTypes.CUSTOM_NAME, ItemComponentTypes.CUSTOM_NAME,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
+        }
+
+        val common = RarityRegistry.INSTANCES["common"]
+        context {
+            it.rarity = common // 假设稀有度为 "common"
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(it.raw, "<!i><rarity:style>Foo")
+
+            val expectedStyle = Style.style(*common.styles)
+            val actualStyle = it.rich.style().edit {
+                // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
+                it.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
+            }
+            assertEquals(expectedStyle, actualStyle)
         }
     }
 
@@ -390,8 +463,18 @@ class ItemTest2 : KoinTest {
     fun `component - damageable`() = componentLifecycleTest(
         "damageable", ItemTemplateTypes.DAMAGEABLE, ItemComponentTypes.DAMAGEABLE,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
+            assertTrue(it.disappearWhenBroken)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(1, it.damage)
+            assertEquals(512, it.maxDamage)
         }
     }
 
@@ -404,8 +487,24 @@ class ItemTest2 : KoinTest {
     fun `component - elements`() = componentLifecycleTest(
         "elements", ItemTemplateTypes.ELEMENTS, ItemComponentTypes.ELEMENTS,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            val elements = it.elements
+            val possibleElements = setOf(
+                ElementRegistry.INSTANCES["neutral"],
+                ElementRegistry.INSTANCES["water"],
+                ElementRegistry.INSTANCES["fire"],
+                ElementRegistry.INSTANCES["wind"],
+            )
+            assertEquals(2, elements.size)
+            assertTrue(elements.all { it in possibleElements })
         }
     }
 
@@ -413,8 +512,16 @@ class ItemTest2 : KoinTest {
     fun `component - fire_resistant`() = componentLifecycleTest(
         "fire_resistant", ItemTemplateTypes.FIRE_RESISTANT, ItemComponentTypes.FIRE_RESISTANT
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(FireResistant.of(), it)
         }
     }
 
@@ -422,8 +529,55 @@ class ItemTest2 : KoinTest {
     fun `component - food`() = componentLifecycleTest(
         "food", ItemTemplateTypes.FOOD, ItemComponentTypes.FOOD,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(5, it.nutrition)
+            assertEquals(4.0f, it.saturation, 1e-5f)
+            assertEquals(false, it.canAlwaysEat)
+            assertEquals(3.2f, it.eatSeconds)
+
+            // 测试环境没法初始化io.papermc.paper.registry.RegistryAccess, 因此这一块只能放到游戏里手动测试.
+            /*
+            // 测试 effects
+            val effects = it.effects
+            assertEquals(2, effects.size)
+            // 检查第一个 effect
+            effects[0].run {
+                assertEquals(0.42f, this.probability, 1e-5f)
+                val potionEffect = this.potionEffect
+                assertEquals(PotionEffectType.SPEED, potionEffect.type)
+                assertEquals(12, potionEffect.duration)
+                assertEquals(4, potionEffect.amplifier)
+                assertEquals(true, potionEffect.isAmbient)
+                assertEquals(false, potionEffect.hasParticles())
+                assertEquals(true, potionEffect.hasIcon())
+            }
+            // 检查第二个 effect
+            effects[0].run {
+                assertEquals(1f, this.probability, 1e-5f)
+                val potionEffect = this.potionEffect
+                assertEquals(PotionEffectType.LUCK, potionEffect.type)
+                assertEquals(6, potionEffect.duration)
+                assertEquals(2, potionEffect.amplifier)
+                assertEquals(false, potionEffect.isAmbient)
+                assertEquals(true, potionEffect.hasParticles())
+                assertEquals(false, potionEffect.hasIcon())
+            }
+            */
+
+            // 测试 skills
+            val possibleSkills = setOf(
+                Key.key("foo:bar/a"),
+                Key.key("foo:bar/b")
+            )
+            assertTrue(it.skills.all { it in possibleSkills })
         }
     }
 
@@ -431,8 +585,28 @@ class ItemTest2 : KoinTest {
     fun `component - item_name`() = componentLifecycleTest(
         "item_name", ItemTemplateTypes.ITEM_NAME, ItemComponentTypes.ITEM_NAME,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
+        }
+
+        val common = RarityRegistry.INSTANCES["common"]
+        context {
+            it.rarity = common // 假设稀有度为 "common"
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals("<rarity:style><rarity:name>Foo", it.raw)
+
+            val expectedStyle = Style.style(*common.styles)
+            val actualStyle = it.rich.style().edit {
+                // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
+                it.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
+            }
+            assertEquals(expectedStyle, actualStyle)
         }
     }
 
@@ -440,16 +614,23 @@ class ItemTest2 : KoinTest {
     fun `component - kizamiz`() = componentLifecycleTest(
         "kizamiz", ItemTemplateTypes.KIZAMIZ, ItemComponentTypes.KIZAMIZ,
     ) {
-        handleGenerationContext {
-            it.rarity = RarityRegistry.INSTANCES["rare"]
-        }
-
-        handleSerialization {
+        serialization {
             assertNotNull(it)
         }
 
-        handleGenerated {
+        val rarity = RarityRegistry.INSTANCES["rare"]
+        context {
+            it.rarity = rarity // 假设稀有度
+        }
 
+        unboxed {
+            val kizamiz = it.kizamiz
+            assertEquals(2, kizamiz.size)
+            val possibleKizamiz = setOf(
+                KizamiRegistry.INSTANCES["netherite"],
+                KizamiRegistry.INSTANCES["luminite"],
+            )
+            assertTrue(kizamiz.all { it in possibleKizamiz })
         }
     }
 
@@ -457,17 +638,74 @@ class ItemTest2 : KoinTest {
     fun `component - kizamiable`() = componentLifecycleTest(
         "kizamiable", ItemTemplateTypes.KIZAMIABLE, ItemComponentTypes.KIZAMIABLE,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
         }
     }
 
     @Test
-    fun `component - level`() = componentLifecycleTest(
-        "level", ItemTemplateTypes.LEVEL, ItemComponentTypes.LEVEL,
+    fun `component - level exact`() = componentLifecycleTest(
+        "level_exact", ItemTemplateTypes.LEVEL, ItemComponentTypes.LEVEL,
     ) {
-        handleSerialization {
+        // level 的生成基于其模板的具体设置.
+        // 需要根据具体的设置, 执行对应的检查.
+
+        serialization {
             assertNotNull(it)
+        }
+
+        bootstrap {
+            createContext {
+                MockGenerationContext.create(
+                    Key.key("component:level_exact"),
+                    GenerationTrigger.fake(1) // 故意设置源等级为 1
+                )
+            }
+        }
+
+        context {
+            it.level = 2 // 上下文里的等级设置为 2
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(12, it.level)
+        }
+    }
+
+    @Test
+    fun `component - level context`() = componentLifecycleTest(
+        "level_context", ItemTemplateTypes.LEVEL, ItemComponentTypes.LEVEL,
+    ) {
+        // level 的生成基于其模板的具体设置.
+        // 需要根据具体的设置, 执行对应的检查.
+
+        serialization {
+            assertNotNull(it)
+        }
+
+        bootstrap {
+            createContext {
+                MockGenerationContext.create(
+                    Key.key("component:level_context"),
+                    GenerationTrigger.fake(4) // 设置源等级为 4, 如果一切正确, 最后的等级就是 4 级
+                )
+            }
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(4, it.level) // 因为等级是按照上下文生成, 所以应该跟上下文里的一样
         }
     }
 
@@ -475,7 +713,7 @@ class ItemTest2 : KoinTest {
     fun `component - lore`() = componentLifecycleTest(
         "lore", ItemTemplateTypes.LORE, ItemComponentTypes.LORE,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
         }
     }
@@ -484,15 +722,15 @@ class ItemTest2 : KoinTest {
     fun `component - rarity`() = componentLifecycleTest(
         "rarity", ItemTemplateTypes.RARITY, ItemComponentTypes.RARITY,
     ) {
-        handleGenerationContext {
-            it.level = 10
-        }
-
-        handleSerialization {
+        serialization {
             assertNotNull(it)
         }
 
-        handleGenerated {
+        context {
+            it.level = 10
+        }
+
+        unboxed {
 
         }
     }
@@ -501,7 +739,7 @@ class ItemTest2 : KoinTest {
     fun `component - skillful`() = componentLifecycleTest(
         "skillful", ItemTemplateTypes.SKILLFUL, ItemComponentTypes.SKILLFUL,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
         }
     }
@@ -523,19 +761,17 @@ class ItemTest2 : KoinTest {
 
     @Test
     fun `component - tool`() = componentLifecycleTest(
-        "tool",
-        ItemTemplateTypes.TOOL,
-        ItemComponentTypes.TOOL,
+        "tool", ItemTemplateTypes.TOOL, ItemComponentTypes.TOOL,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
         }
 
-        handleGenerationResult {
+        result {
             assertTrue(!it.isEmpty())
         }
 
-        handleGenerated {
+        unboxed {
             assertEquals(2.1f, it.defaultMiningSpeed, 1e-5f)
             assertEquals(4, it.damagePerBlock)
             val rules = it.rules
@@ -548,20 +784,26 @@ class ItemTest2 : KoinTest {
 
     @Test
     fun `component - trackable`() {
-
+        val prototype = readPrototype("component", "trackable")
     }
 
     @Test
     fun `component - unbreakable`() = componentLifecycleTest(
-        "unbreakable",
-        ItemTemplateTypes.UNBREAKABLE,
-        ItemComponentTypes.UNBREAKABLE,
+        "unbreakable", ItemTemplateTypes.UNBREAKABLE, ItemComponentTypes.UNBREAKABLE,
     ) {
-        handleSerialization {
+        serialization {
             assertNotNull(it)
         }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertTrue(it.showInTooltip)
+        }
     }
-    //</editor-fold>
+//</editor-fold>
 
     //<editor-fold desc="Use cases">
     @Test
@@ -583,7 +825,7 @@ class ItemTest2 : KoinTest {
     fun `use case - sword without attribute modifiers`() {
         val prototype = readPrototype("use_case", "sword_without_attribute_modifiers")
     }
-    //</editor-fold>
+//</editor-fold>
 }
 
 fun assertAny(vararg assertions: () -> Unit) {
@@ -703,7 +945,7 @@ private fun <T, S : ItemTemplate<T>> componentLifecycleTest(
     path: String,
     templateType: ItemTemplateType<S>,
     componentType: ItemComponentType<T>,
-    block: ComponentLifecycleTest<T, S>.DSL.() -> Unit,
+    block: ComponentLifecycleTest.Lifecycle<T, S>.() -> Unit,
 ) {
     val lifecycle = ComponentLifecycleTest(path, templateType, componentType)
     lifecycle.configure(block)
@@ -720,24 +962,13 @@ private class ComponentLifecycleTest<T, S : ItemTemplate<T>>(
 ) : KoinTest {
 
     private val logger: Logger by inject()
-
-    // 生成过程的上下文
-    private var handlerGenerationContext: ((GenerationContext) -> Unit)? = null
-
-    // 模板配置文件的序列化
-    private var handlerSerialization: ((S?) -> Unit)? = null
-
-    // 模板生成的结果
-    private var handlerGenerationResult: ((GenerationResult<T>) -> Unit)? = null
-
-    // 模板生成的结果所包含的值
-    private var handlerGenerated: ((T) -> Unit)? = null
+    private val lifecycle: LifecycleImpl<T, S> = LifecycleImpl()
 
     /**
      * 配置测试流程.
      */
-    fun configure(block: DSL.() -> Unit) {
-        block(DSL())
+    fun configure(block: Lifecycle<T, S>.() -> Unit) {
+        block(lifecycle)
     }
 
     /**
@@ -748,26 +979,38 @@ private class ComponentLifecycleTest<T, S : ItemTemplate<T>>(
         val nekoStack = MockNekoStack(prototype)
         val template = prototype.templates.get(templateType)
 
-        handlerSerialization?.invoke(template)
+        // 执行对 ItemTemplate 反序列化的断言
+        lifecycle.serializationBlock?.invoke(template)
 
         if (template == null) {
             return // 模板为空的话就不需要做接下来的测试了, 直接返回
         }
 
-        val generationTrigger = GenerationTrigger.fake(10)
-        val generationContext = MockGenerationContext.create(prototype, generationTrigger)
+        // 如果有自定义 GenerationContext, 则使用自定义的; 如果没有, 则使用统一预设的
+        val context = run {
+            val contextCreator = lifecycle.bootstrap.contextCreator
+            if (contextCreator != null) {
+                contextCreator()
+            } else {
+                val generationTrigger = GenerationTrigger.fake(10)
+                MockGenerationContext.create(prototype.key, generationTrigger)
+            }
+        }
 
-        handlerGenerationContext?.invoke(generationContext)
+        // 处理 GenerationContext
+        lifecycle.generationContextBlock?.invoke(context)
 
-        val generationResult = template.generate(generationContext)
+        val generationResult = template.generate(context)
 
-        handlerGenerationResult?.invoke(generationResult)
+        // 处理 GenerationResult
+        lifecycle.generationResultBlock?.invoke(generationResult)
 
         val generated = generationResult.value
         nekoStack.components.set(componentType, generated)
         nekoStack.components.get(componentType) ?: fail("Failed to get the component from the map")
 
-        handlerGenerated?.invoke(generated)
+        // 处理 GenerationResult 所封装的值
+        lifecycle.unboxedBlock?.invoke(generated)
 
         logger.info("")
         logger.info(prototype.toString())
@@ -777,21 +1020,50 @@ private class ComponentLifecycleTest<T, S : ItemTemplate<T>>(
         logger.info(generated.toString())
     }
 
-    inner class DSL {
-        fun handleGenerationContext(block: (GenerationContext) -> Unit) {
-            this@ComponentLifecycleTest.handlerGenerationContext = block
+    interface Lifecycle<T, S : ItemTemplate<T>> {
+        fun serialization(block: (S?) -> Unit)
+        fun bootstrap(block: LifecycleBootstrap.() -> Unit)
+        fun context(block: (GenerationContext) -> Unit)
+        fun result(block: (GenerationResult<T>) -> Unit)
+        fun unboxed(block: (T) -> Unit)
+    }
+
+    interface LifecycleBootstrap {
+        fun createContext(block: () -> GenerationContext)
+    }
+
+    private class LifecycleImpl<T, S : ItemTemplate<T>> : Lifecycle<T, S> {
+        var bootstrap: LifecycleBootstrapImpl = LifecycleBootstrapImpl()
+        var generationContextBlock: ((GenerationContext) -> Unit)? = null
+        var serializationBlock: ((S?) -> Unit)? = null
+        var generationResultBlock: ((GenerationResult<T>) -> Unit)? = null
+        var unboxedBlock: ((T) -> Unit)? = null
+
+        override fun bootstrap(block: LifecycleBootstrap.() -> Unit) {
+            block(bootstrap)
         }
 
-        fun handleSerialization(block: (S?) -> Unit) {
-            this@ComponentLifecycleTest.handlerSerialization = block
+        override fun serialization(block: (S?) -> Unit) {
+            serializationBlock = block
         }
 
-        fun handleGenerationResult(block: (GenerationResult<T>) -> Unit) {
-            this@ComponentLifecycleTest.handlerGenerationResult = block
+        override fun context(block: (GenerationContext) -> Unit) {
+            generationContextBlock = block
         }
 
-        fun handleGenerated(block: (T) -> Unit) {
-            this@ComponentLifecycleTest.handlerGenerated = block
+        override fun result(block: (GenerationResult<T>) -> Unit) {
+            generationResultBlock = block
+        }
+
+        override fun unboxed(block: (T) -> Unit) {
+            unboxedBlock = block
+        }
+    }
+
+    private class LifecycleBootstrapImpl : LifecycleBootstrap {
+        var contextCreator: (() -> GenerationContext)? = null
+        override fun createContext(block: () -> GenerationContext) {
+            contextCreator = block
         }
     }
 }

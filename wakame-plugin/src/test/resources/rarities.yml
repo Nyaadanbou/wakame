@@ -7,7 +7,7 @@ rarities:
   common:
     binary_index: 0
     display_name: 普通
-    styles: "<white>"
+    styles: "<gray>"
 
   uncommon:
     binary_index: 1

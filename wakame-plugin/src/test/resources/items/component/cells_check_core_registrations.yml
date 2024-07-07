@@ -18,7 +18,7 @@ cells:
           # 空核心 (没有核心, 但有词条栏)
           - key: generic:empty
             weight: 1
-        attributes:
+        all_attributes:
           # 攻击力
           - key: attribute:attack_damage
             operation: add
@@ -100,7 +100,7 @@ cells:
           - key: attribute:movement_speed
             value: 0.1
             weight: 1
-        skills:
+        all_skills:
           # 演示1
           - key: skill:melee/demo
             trigger: trigger:generic/attack

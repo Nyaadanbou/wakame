@@ -1,18 +1,28 @@
 uuid: 00000000-0000-0000-0000-000000000000
 item_type: emerald
 food:
-  nutrition: 0
-  saturation: 0.0
+  nutrition: 5
+  saturation: 4.0
   can_always_eat: false
-  eat_seconds: 1.6
-  effects:
-    probability: 0.9
-    effect:
-      - type: speed
-        duration: 1
-        amplifier: 0
-        ambient: false
-        particles: true
-        icon: true
+  eat_seconds: 3.2
+# 由于测试环境没法初始化 io.papermc.paper.registry.RegistryAccess,
+# 因此这里没办法反序列化 `type` 的值 (也就是PotionEffectType).
+# 所以这一块只能放到游戏里手动测试.
+#  effects:
+#    - type: speed
+#      probability: 0.42
+#      duration: 12
+#      amplifier: 4
+#      ambient: true
+#      particles: false
+#      icon: true
+#    - type: luck
+#      probability: 1.0 # probability 可以不写, 默认为 1.0
+#      duration: 6
+#      amplifier: 2
+#      ambient: false
+#      particles: true
+#      icon: false
   skills:
-    - "foo:bar"
+    - "foo:bar/a"
+    - "foo:bar/b"

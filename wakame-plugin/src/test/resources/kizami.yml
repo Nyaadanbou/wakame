@@ -1,25 +1,9 @@
-# 铭刻
-
-# 所有的铭刻
 kizami:
-
-  # 铭刻的唯一标识，一旦确定不要修改
   wood:
-
-    # 铭刻的 UUID，必须与其他 UUID 不同
     uuid: d301ab77-4159-4466-ada3-d892bce883cd
-
-    # 铭刻的二进制索引，一旦确定不要修改
     binary_index: 0
-
-    # 铭刻的展示名字，也是玩家看到的铭刻名字
-    display_name: <green>风灵之纹 # 铭刻的展示名字，也是玩家看到的铭刻名字
-
-    # 铭刻提供的风格样式，用于影响其他文本内容
+    display_name: <green>风灵之纹
     styles: ""
-
-    # 铭刻的效果
-    # 铭刻的数值均为固定数值，不能写正态分布
     effects:
       1:
         - key: attribute:movement_speed
@@ -41,12 +25,11 @@ kizami:
   iron:
     uuid: 506afa07-d56d-489d-9482-e3213a5667eb
     binary_index: 1
-    display_name: <green>狂战士
+    display_name: <green>狂战士之血
     styles: ""
     effects:
       1:
-        - # 铭刻也可提供技能
-          key: skill:buff/potion_remove
+        - key: skill:buff/potion_remove
           trigger: trigger:combo/101
 
   gold:
@@ -104,4 +87,11 @@ kizami:
     binary_index: 4
     display_name: <green>法力亲和
     styles: ""
-    effects: { } # 无效果
+    effects: { }
+
+  luminite:
+    uuid: c14629f3-319b-432b-8cb6-eaf4670defc7
+    binary_index: 5
+    display_name: <green>反重力
+    styles: ""
+    effects: { }
