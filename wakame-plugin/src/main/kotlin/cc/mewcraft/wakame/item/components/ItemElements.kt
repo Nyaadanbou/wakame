@@ -25,16 +25,19 @@ import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
+import java.util.stream.Stream
 
 data class ItemElements(
     /**
@@ -61,6 +64,14 @@ data class ItemElements(
             return LoreLine.noop()
         }
         return LoreLine.simple(tooltipKey, tooltipText.render(elements, Element::displayName))
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+        ExaminableProperty.of("elements", elements),
+    )
+
+    override fun toString(): String {
+        return toSimpleString()
     }
 
     private data class Codec(
