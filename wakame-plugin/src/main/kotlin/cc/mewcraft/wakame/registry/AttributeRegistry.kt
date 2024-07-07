@@ -68,8 +68,12 @@ import kotlin.reflect.KClass
  *
  * Check the [AttributeFacade] for implementation details.
  */
-@PreWorldDependency(runBefore = [ElementRegistry::class])
-@ReloadDependency(runBefore = [ElementRegistry::class])
+@PreWorldDependency(
+    runBefore = [ElementRegistry::class]
+)
+@ReloadDependency(
+    runBefore = [ElementRegistry::class]
+)
 object AttributeRegistry : Initializable {
 
     /**
@@ -166,7 +170,12 @@ object AttributeRegistry : Initializable {
     }
 
     override fun onPreWorld() {
+        // 注册所有 facade
         registerFacades()
+        // 初始化
+        ElementRegistry.INSTANCES.forEach { (_, element) ->
+            Attributes.byElement(element)
+        }
     }
 }
 
@@ -315,7 +324,7 @@ private interface RangedElementAttributeBinder {
 }
 
 private class AttributeFacadeOverride<BC : CoreAttribute, SC : TemplateCoreAttribute>(
-    val prototype: MutableAttributeFacade<BC, SC>
+    val prototype: MutableAttributeFacade<BC, SC>,
 ) {
     fun override(mutator: MutableAttributeFacade<BC, SC>.() -> Unit): AttributeFacade<BC, SC> {
         return prototype.apply(mutator)

@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.registry.Registry
-import cc.mewcraft.wakame.registry.SimpleRegistry
+import cc.mewcraft.wakame.initializer.PostWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -12,6 +13,12 @@ import org.slf4j.Logger
 /**
  * Provides default [AttributeInstance]s for various entity types.
  */
+@PostWorldDependency(
+    runBefore = [AttributeRegistry::class],
+)
+@ReloadDependency(
+    runBefore = [AttributeRegistry::class],
+)
 object DefaultAttributes : KoinComponent, Initializable {
 
     private val LOGGER: Logger by inject()
@@ -25,18 +32,7 @@ object DefaultAttributes : KoinComponent, Initializable {
      * attribute system to be compatible with 3rd party mob system such as MythicMobs,
      * in which case the enum type is not enough to express all types.
      */
-    private val SUPPLIERS: Registry<Key, AttributeSupplier> = SimpleRegistry()
-
-    private fun loadConfiguration() {
-        SUPPLIERS.clear()
-
-        val node = AttributeSupport.ENTITY_ATTRIBUTE_CONFIG.get()
-        val map = AttributeSupplierDeserializer(node).deserialize()
-        map.forEach { (k, v) ->
-            addSupplier(k, v)
-            LOGGER.info("Registered attribute supplier: {}", k)
-        }
-    }
+    private val SUPPLIERS: HashMap<Key, AttributeSupplier> = HashMap()
 
     /**
      * Gets the [AttributeSupplier] for the [key].
@@ -49,7 +45,7 @@ object DefaultAttributes : KoinComponent, Initializable {
      * @throws IllegalArgumentException
      */
     fun getSupplier(key: Key): AttributeSupplier {
-        return requireNotNull(SUPPLIERS.find(key)) { "Can't find attribute supplier for entity $key" }
+        return requireNotNull(SUPPLIERS[key]) { "Can't find attribute supplier for entity '$key'" }
     }
 
     /**
@@ -59,7 +55,7 @@ object DefaultAttributes : KoinComponent, Initializable {
      * @return true if the entity type has a default supplier, false otherwise
      */
     fun hasSupplier(key: Key): Boolean {
-        return SUPPLIERS.has(key)
+        return SUPPLIERS.containsKey(key)
     }
 
     /**
@@ -68,9 +64,11 @@ object DefaultAttributes : KoinComponent, Initializable {
      * @param key the entity key
      * @param supplier the attribute supplier
      */
-    fun addSupplier(key: Key, supplier: AttributeSupplier) {
-        SUPPLIERS.register(key, supplier)
+    fun addSupplier(key: Key, supplier: AttributeSupplier): AttributeSupplier? {
+        return SUPPLIERS.put(key, supplier)
     }
+
+    /* Internals */
 
     override fun onPostWorld() {
         loadConfiguration()
@@ -78,5 +76,16 @@ object DefaultAttributes : KoinComponent, Initializable {
 
     override fun onReload() {
         loadConfiguration()
+    }
+
+    private fun loadConfiguration() {
+        SUPPLIERS.clear()
+
+        val node = AttributeSupport.ENTITY_ATTRIBUTE_CONFIG.get()
+        val map = AttributeSupplierDeserializer(node).deserialize()
+        map.forEach { (k, v) ->
+            addSupplier(k, v)
+            LOGGER.info("Registered attribute supplier: {}", k)
+        }
     }
 }

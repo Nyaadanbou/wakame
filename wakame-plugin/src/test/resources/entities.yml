@@ -1,46 +1,41 @@
 # 实体 Entities
 
-# 实体的默认属性
+# 实体的默认属性:
 # 你必须在这里定义每种实体所拥有的属性及其数值
 # 如果一个实体没有定义属性X，则该实体没有属性X
 #
-# 例外：
+# 例外的默认属性:
 # 如果一个属性X它是基于原版属性，并且
 # - 在这里没有节点，那么最终将返回X所对应原版属性的数值，而非没有属性X
 # - 在这里存在节点，那么最终将返回这里X指定的值，或X的全局默认值，如果值为空
-#
-# 解释：
-# 没有定义 = 不存在节点(node)
-# 没有数值 = 存在节点但值为空(~)
 entity_attributes:
 
-  minecraft:living: # 这里写实体的 key，也可以是符合命名空间规范的任意值
-    parent: ~ # 父属性配置的 key，必须出现在该属性配置之前。可为空
+  minecraft:living:
+    parent: ~
     values:
-      defense: default # 如果一个属性带元素，并且没有 map 结构，则相当于给该属性的每个元素都指定了一个值
-      max_mana: 100.0 # 如果一个属性不带元素，则直接写标量来指定其数值
+      defense: 1.0 # 所有元素的 defense 属性都为 1.0
+      max_mana: 100.0
 
   minecraft:mob:
     parent: minecraft:living
-    values: { } # 属性值 map 可以为空，虽然没什么用
+    values: { } # 属性值 map 可以为空
 
   minecraft:monster:
     parent: minecraft:mob
     values:
-      defense: # 如果一个属性带元素，并且该节点是一个 map 结构，意思是给该属性的特定元素指定一个值。未指定的元素相当于没有该元素的属性
-        neutral: .0
+      defense:
+        neutral: .0 # 重写 neutral 元素的 defense 属性; 其他元素的 defense 属性依然继承 parent
 
   minecraft:player:
     parent: minecraft:living
     values:
-      attack_damage: default # default 意为采用全局默认值
+      attack_damage: default # 采用全局默认值
       attack_effect_chance: default
       attack_speed_level: default
       block_interaction_range: default
       critical_strike_chance: default
       critical_strike_power: default
       damage_reduction_rate: default
-      # defense: default # 这里被注释了，但 player 依然拥有 defense 属性。这因为其继承了 living，而 living 拥有 defense 属性
       defense_penetration: default
       entity_interaction_range: default
       health_regeneration: default
@@ -53,17 +48,25 @@ entity_attributes:
       max_mana: 200.0
       movement_speed: default
 
-  minecraft:spider: # 生物的唯一标识，参考 https://minecraft.wiki/w/Mob
+  minecraft:skeleton:
     parent: minecraft:monster
     values:
-      max_health: 20.0
+      max_health: 60.0
+      attack_damage:
+        neutral: 5.0 # attack_damage 是由两个属性组成的 (min 和 max). 这里指定的值将同时指定 min 和 max!
+
+  minecraft:spider:
+    parent: minecraft:monster
+    values:
+      max_health: 40.0
       defense:
-        neutral: 2.0 # 如果属性是带元素的，这一级缩进对应元素的值
+        neutral: 2.0
 
   minecraft:zombie:
     parent: minecraft:monster
     values:
-      max_health: 40.0
+      max_health: 20.0
+      max_mana: 80.0 # 重写
       defense:
         neutral: 4.0
 

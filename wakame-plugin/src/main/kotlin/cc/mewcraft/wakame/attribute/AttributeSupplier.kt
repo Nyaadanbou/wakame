@@ -120,7 +120,11 @@ internal constructor(
         return if (isAbsoluteVanilla(type)) {
             AttributeInstanceFactory.createInstance(type, attributable, false)
         } else {
-            requireNotNull(prototypes[type]) { "Can't find attribute instance for attribute '${type.descriptionId}'" }
+            requireNotNull(prototypes[type]) {
+                val id = type.descriptionId
+                val element = (type as? ElementAttribute)?.element?.uniqueId
+                "Can't find attribute instance for attribute '$id ($element)'"
+            }
         }
     }
 
@@ -272,7 +276,7 @@ internal class AttributeSupplierDeserializer(
             for (attribute in attributes) {
                 val value: Double? = run {
                     if (valueNode.string == "default") {
-                        null// we use null to indicate default value
+                        null // we use null to indicate default value
                     } else {
                         valueNode.get<Double>()
                     }
@@ -304,8 +308,6 @@ internal class AttributeSupplierDeserializer(
 
                     if (valueNode.isMap) {
                         // it's a map - there are possibly individual definition for each specified element
-                        // caution!!! the implementation, by design, does not add the elements that are not
-                        // specified in the map.
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
@@ -347,8 +349,8 @@ internal class AttributeSupplierDeserializer(
      */
     private fun validateValuesMap(valuesMap: Map<String, ConfigurationNode>): Map<String, ConfigurationNode> {
         // This will validate two things:
-        // 1. The facade ID is in the legal format
-        // 2. The ConfigNode has correct structure
+        // 1. The format of the facade id is correct
+        // 2. The config node has correct structure
         for ((facadeId, valueNode) in valuesMap) {
             if (!AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(facadeId)) {
                 error("The facade ID '$facadeId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")

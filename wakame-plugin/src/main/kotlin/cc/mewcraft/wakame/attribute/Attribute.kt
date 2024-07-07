@@ -276,7 +276,7 @@ protected constructor(
         return Stream.concat(
             super.examinableProperties(),
             Stream.of(
-                ExaminableProperty.of("element", element)
+                ExaminableProperty.of("element", element.uniqueId)
             )
         )
     }
