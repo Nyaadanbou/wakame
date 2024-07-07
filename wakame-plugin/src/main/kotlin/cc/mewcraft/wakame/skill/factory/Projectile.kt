@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.skill.factory
 
 import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.commons.provider.immutable.provider
-import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.molang.Evaluable
@@ -15,10 +14,10 @@ import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.tick.TickResult
-import cc.mewcraft.wakame.util.Key
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import me.lucko.helper.Events
 import net.kyori.adventure.key.Key
+import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDismountEvent
 import org.bukkit.event.entity.ProjectileHitEvent
@@ -123,10 +122,8 @@ interface Projectile : Skill {
             val range = config.optionalEntry<Double>("range").orElse(1.0)
             val penetration = config.optionalEntry<Int>("penetration").orElse(0)
             val gravity = config.optionalEntry<Boolean>("gravity").orElse(true)
-            val effects = provider {
-                mapOf(
-                    Trigger.HIT_ENTITY to SkillRegistry.INSTANCES[Key(Namespaces.SKILL, "melee/kill_entity")]
-                )
+            val effects = config.optionalEntry<Map<String, Key>>("effects").orElse(emptyMap()).map {
+                it.map { (trigger, skillKey) -> Trigger.entries.first { it.name.equals(trigger, ignoreCase = true) } to SkillRegistry.INSTANCES[skillKey] }.toMap()
             }
             val damage = config.optionalEntry<Evaluable<*>>("damage").orElse(Evaluable.StringEval("0"))
 
@@ -200,6 +197,8 @@ interface Projectile : Skill {
                     arrowEntity.setGravity(gravity)
                     arrowEntity.velocity = location.direction.multiply(initialVelocity)
                     // TODO: 更多的属性设置
+                    arrowEntity.damage = damage.evaluate()
+                    arrowEntity.pickupStatus = AbstractArrow.PickupStatus.ALLOWED
 
                     val newTickCaster = CasterAdapter.adapt(this@Tick)
                     val parent = context[SkillContextKey.CASTER] ?: return false
@@ -222,9 +221,6 @@ interface Projectile : Skill {
                     Events.subscribe(ServerTickStartEvent::class.java)
                         .expireIf { arrow.isDead }
                         .handler {
-                            val node = context.getOrThrow(SkillContextKey.CASTER_COMPOSITE_NODE)
-                            val single = node.root().value
-                            println(single)
                             val newContext = SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(arrow.location))
                             val tickSkillTick = effects[Trigger.TICK]?.cast(newContext) ?: return@handler
                             Ticker.addTick(tickSkillTick)
@@ -235,13 +231,15 @@ interface Projectile : Skill {
                     Events.subscribe(ServerTickStartEvent::class.java)
                         .expireIf { arrow.isDead }
                         .handler {
-                            val hitEntity = arrow.getNearbyEntities(range, range, range)
-                                .firstOrNull()
-                            if (hitEntity != null && hitEntity is LivingEntity) {
-                                val newContext =
-                                    SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(hitEntity))
-                                val hitEntitySkillTick = effects[Trigger.HIT_ENTITY]?.cast(newContext) ?: return@handler
-                                Ticker.addTick(hitEntitySkillTick)
+                            val affectedEntities = arrow.getNearbyEntities(range, range, range)
+
+                            for (affectedEntity in affectedEntities) {
+                                if (affectedEntity is LivingEntity) {
+                                    val newContext =
+                                        SkillContext(CasterAdapter.adapt(arrow), TargetAdapter.adapt(affectedEntity))
+                                    val hitEntitySkillTick = effects[Trigger.HIT_ENTITY]?.cast(newContext) ?: return@handler
+                                    Ticker.addTick(hitEntitySkillTick)
+                                }
                             }
                         }
                 }

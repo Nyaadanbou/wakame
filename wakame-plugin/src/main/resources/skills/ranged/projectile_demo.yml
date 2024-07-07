@@ -1,2 +1,8 @@
 # 技能模板的 type
 type: projectile
+
+effects:
+  start: "skill:melee/dash"
+  hit_entity: "skill:melee/kill_entity"
+  hit_block: "skill:buff/potion_drop"
+  disappear: "skill:melee/dash"

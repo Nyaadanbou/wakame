@@ -9,3 +9,7 @@ fun interface Tickable {
      */
     fun tick(): TickResult
 }
+
+fun interface AlwaysTickable : Tickable, Runnable {
+    override fun tick(): TickResult = TickResult.CONTINUE_TICK
+}

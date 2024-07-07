@@ -7,6 +7,7 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillBase
 import cc.mewcraft.wakame.skill.TriggerConditions
@@ -97,20 +98,21 @@ interface Teleport : Skill {
             }
 
             override fun tickCast(): TickResult {
-                val player = context[SkillContextKey.CASTER_PLAYER] ?: return TickResult.INTERRUPT
+                val node = context[SkillContextKey.CASTER_COMPOSITE_NODE] ?: return TickResult.INTERRUPT
+                val caster = node.root().value as? Caster.Single.Entity ?: return TickResult.INTERRUPT
                 val location = context[SkillContextKey.TARGET_LOCATION]?.bukkitLocation ?: return TickResult.INTERRUPT
                 when (val type = type) {
                     is Type.FIXED -> {
                         val position = type.position
-                        player.bukkitPlayer.teleport(position.toLocation(player.bukkitPlayer.world))
+                        caster.bukkitEntity.teleport(position.toLocation(caster.bukkitEntity.world))
                     }
 
                     is Type.TARGET -> {
                         val bukkitLocation = location.apply {
-                            pitch = player.bukkitPlayer.location.pitch
-                            yaw = player.bukkitPlayer.location.yaw
+                            pitch = caster.bukkitEntity.location.pitch
+                            yaw = caster.bukkitEntity.location.yaw
                         }
-                        player.bukkitPlayer.teleport(bukkitLocation)
+                        caster.bukkitEntity.teleport(bukkitLocation)
                     }
                 }
                 return TickResult.ALL_DONE
