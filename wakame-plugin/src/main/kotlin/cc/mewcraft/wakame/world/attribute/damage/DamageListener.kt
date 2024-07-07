@@ -1,14 +1,21 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.event.WakameEntityDamageEvent
+import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.entity.AbstractArrow
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 
-class DamageListener : Listener {
+class DamageListener : Listener, KoinComponent {
+    private val logger: Logger by inject()
+
     @EventHandler
     fun on(event: EntityDamageEvent) {
         val damageMetaData = DamageManager.generateDamageMetaData(event)
@@ -23,6 +30,8 @@ class DamageListener : Listener {
 
         //修改最终伤害
         event.damage = defenseMetaData.calculateFinalDamage(damageMetaData)
+        logger.info("${event.entity.type}(${event.entity.uniqueId}) 受到了 ${event.damage} 点伤害")
+        Bukkit.broadcast(Component.text("${event.entity.type}(${event.entity.uniqueId}) 受到了 ${event.damage} 点伤害"))
     }
 
     /**

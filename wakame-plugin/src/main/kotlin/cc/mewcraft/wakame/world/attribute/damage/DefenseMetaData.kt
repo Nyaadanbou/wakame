@@ -21,22 +21,23 @@ class EntityDefenseMetaData(
 ) : DefenseMetaData {
     override fun calculateFinalDamage(damageMetaData: DamageMetaData): Double {
         var totalElementDamage = 0.0
+        val criticalPower = if (damageMetaData.isCritical) damageMetaData.criticalPower else 1.0
         for (packet in damageMetaData.packets) {
             val element = packet.element
-            //考虑防御后伤害、元素伤害减免（本元素+通用元素）
             val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
                 packet.packetDamage,
                 damageeAttributeMap.getValue(Attributes.byElement(element).DEFENSE),
                 packet.defensePenetration
             )
-
             val incomingDamageRate = (damageeAttributeMap.getValue(Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE)
                     + damageeAttributeMap.getValue(Attributes.byElement(element).INCOMING_DAMAGE_RATE))
-
-            totalElementDamage += damageAfterDefense * (1 + incomingDamageRate)
+            //依次计算防御力、元素伤害百分比加成、考虑承伤百分比、最小伤害、暴击倍率
+            //FIXME 最小伤害问题
+            totalElementDamage += (damageAfterDefense *
+                    (1 + packet.rate) *
+                    (1 + incomingDamageRate)).coerceAtLeast(if (packet.packetDamage > 0) 1.0 else 0.0) *
+                    criticalPower
         }
-        //防御后，再考虑暴击
-        val criticalPower = if (damageMetaData.isCritical) damageMetaData.criticalPower else 1.0
-        return totalElementDamage * criticalPower
+        return totalElementDamage
     }
 }

@@ -43,6 +43,7 @@ object NekoItemFactory {
                 if (root.contains(path)) this.put(type, type.create())
             }
 
+            tryAdd("attack", ItemBehaviorTypes.ATTACK)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
             tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
             tryAdd("damageable", ItemBehaviorTypes.DAMAGEABLE)

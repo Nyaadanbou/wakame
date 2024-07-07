@@ -166,6 +166,6 @@ object DamageRules {
         originalDamage: Double, defense: Double, defensePenetration: Double,
     ): Double {
         val validDefense = (defense - defensePenetration).coerceAtLeast(0.0)
-        return originalDamage * (1 - (validDefense / 1 * originalDamage + validDefense))
+        return (originalDamage - validDefense).coerceAtLeast(0.0)
     }
 }

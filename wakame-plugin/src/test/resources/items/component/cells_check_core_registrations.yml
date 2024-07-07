@@ -74,7 +74,7 @@ cells:
           - key: attribute:health_regeneration
             value: 1.0
             weight: 1
-          # 百分比承伤
+          # 承伤百分比
           - key: attribute:incoming_damage_rate
             element: neutral
             value: 0.0
@@ -134,7 +134,7 @@ cells:
           - key: attribute:universal_defense_penetration_rate
             value: 0.0
             weight: 1
-          # 通用元素百分比承伤
+          # 通用元素承伤百分比
           - key: attribute:universal_incoming_damage_rate
             value: 0.0
             weight: 1

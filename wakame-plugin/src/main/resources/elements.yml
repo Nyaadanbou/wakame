@@ -33,9 +33,3 @@ elements:
     binary_index: 5
     display_name: 雷
     styles: "<white>"
-
-#  # 通用元素，设定上影响所有元素效果
-#  universal: # 元素的唯一标识，一旦确定不要修改
-#    binary_index: 127 # 元素的二进制索引，一旦确定不要修改
-#    display_name: 通用 # 元素的展示名字，也是玩家看到的元素名字
-#    styles: "<white>" # 元素提供的风格样式，用于影响其他文本内容

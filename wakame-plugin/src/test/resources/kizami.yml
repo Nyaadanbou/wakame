@@ -41,22 +41,22 @@ kizami:
       1:
         - key: attribute:defense
           operation: add
-          element: universal
+          element: neutral
           value: 5
       2:
         - key: attribute:defense
           operation: add
-          element: universal
+          element: neutral
           value: 10
       3:
         - key: attribute:defense
           operation: add
-          element: universal
+          element: neutral
           value: 15
       4:
         - key: attribute:defense
           operation: add
-          element: universal
+          element: neutral
           value: 20
 
   diamond:

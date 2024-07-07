@@ -60,10 +60,6 @@ attack_damage:
       default: .0
       min: -16384.0
       max: 16384.0
-    universal:
-      default: .0
-      min: -16384.0
-      max: 16384.0
 
 attack_damage_rate:
   enabled: true
@@ -94,10 +90,6 @@ attack_damage_rate:
       min: -0.1
       max: 5.0
     thunder:
-      default: .0
-      min: -0.1
-      max: 5.0
-    universal:
       default: .0
       min: -0.1
       max: 5.0
@@ -172,17 +164,6 @@ critical_strike_power:
     min: .0
     max: 5.0
 
-damage_reduction_rate:
-  enabled: true
-  display: "伤害减免"
-  tooltips:
-    add: "<!i>伤害减免 <value:+#%;-.%>"
-    multiply_base: "<red>DO_NOT_USE"
-    multiply_total: "<red>DO_NOT_USE"
-  values:
-    default: .0
-    min: .0
-    max: 1.0
 
 defense:
   enabled: true
@@ -216,18 +197,14 @@ defense:
       default: .0
       min: -16384.0
       max: 16384.0
-    universal:
-      default: .0
-      min: -16384.0
-      max: 16384.0
 
 defense_penetration:
   enabled: true
   display: "<element>防御穿透"
   tooltips:
     add: "<!i><element>防御穿透 <value:+#;-.>"
-    multiply_base: "<!i><element>防御穿透 <value:+#%;-.%>"
-    multiply_total: "<!i><element>防御穿透 ×<value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
   values:
     neutral:
       default: .0
@@ -253,10 +230,39 @@ defense_penetration:
       default: .0
       min: -16384.0
       max: 16384.0
-    universal:
+
+defense_penetration_rate:
+  enabled: true
+  display: "<element>防御穿透率"
+  tooltips:
+    add: "<!i><element>防御穿透率 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    neutral:
       default: .0
-      min: -16384.0
-      max: 16384.0
+      min: 0.0
+      max: 1.0
+    fire:
+      default: .0
+      min: 0.0
+      max: 1.0
+    water:
+      default: .0
+      min: 0.0
+      max: 1.0
+    wind:
+      default: .0
+      min: 0.0
+      max: 1.0
+    earth:
+      default: .0
+      min: 0.0
+      max: 1.0
+    thunder:
+      default: .0
+      min: 0.0
+      max: 1.0
 
 entity_interaction_range:
   enabled: true
@@ -281,6 +287,39 @@ health_regeneration:
     default: 1.0
     min: .0
     max: 5.0
+
+incoming_damage_rate:
+  enabled: true
+  display: "<element>承伤百分比"
+  tooltips:
+    add: "<!i><element>承伤百分比 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    neutral:
+      default: .0
+      min: -1.0
+      max: 10.0
+    fire:
+      default: .0
+      min: -1.0
+      max: 10.0
+    water:
+      default: .0
+      min: -1.0
+      max: 10.0
+    wind:
+      default: .0
+      min: -1.0
+      max: 10.0
+    earth:
+      default: .0
+      min: -1.0
+      max: 10.0
+    thunder:
+      default: .0
+      min: -1.0
+      max: 10.0
 
 lifesteal:
   enabled: true
@@ -377,3 +416,63 @@ movement_speed:
     default: 0.1
     min: -1.0
     max: 4.0
+
+universal_attack_damage:
+  enabled: true
+  display: "<element>攻击力"
+  tooltips:
+    add: "<!i><element>攻击力 <min:#;-.> ⎓ <max:#;-.>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: .0
+    min: -16384.0
+    max: 16384.0
+
+universal_attack_damage_rate:
+  enabled: true
+  display: "<element>攻击力"
+  tooltips:
+    add: "<!i><element>攻击力 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: .0
+    min: -0.1
+    max: 5.0
+
+universal_defense_penetration:
+  enabled: true
+  display: "<element>防御穿透"
+  tooltips:
+    add: "<!i><element>防御穿透 <value:+#;-.>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: .0
+    min: -16384.0
+    max: 16384.0
+
+universal_defense_penetration_rate:
+  enabled: true
+  display: "<element>防御穿透率"
+  tooltips:
+    add: "<!i><element>防御穿透率 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: .0
+    min: 0.0
+    max: 1.0
+
+universal_incoming_damage_rate:
+  enabled: true
+  display: "<element>承伤百分比"
+  tooltips:
+    add: "<!i><element>承伤百分比 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: .0
+    min: -1.0
+    max: 10.0

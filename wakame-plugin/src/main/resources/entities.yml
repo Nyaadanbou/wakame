@@ -34,16 +34,18 @@ entity_attributes:
     parent: minecraft:living
     values:
       attack_damage: default # default 意为采用全局默认值
+      attack_damage_rate: default
       attack_effect_chance: default
       attack_speed_level: default
       block_interaction_range: default
       critical_strike_chance: default
       critical_strike_power: default
-      damage_reduction_rate: default
       # defense: default # 这里被注释了，但 player 依然拥有 defense 属性。这因为其继承了 living，而 living 拥有 defense 属性
       defense_penetration: default
+      defense_penetration_rate: default
       entity_interaction_range: default
       health_regeneration: default
+      incoming_damage_rate: default
       lifesteal: default
       manasteal: default
       mana_consumption_rate: default
@@ -52,6 +54,13 @@ entity_attributes:
       max_health: default
       max_mana: 200.0
       movement_speed: default
+      universal_attack_damage: default
+      universal_attack_damage_rate: default
+      universal_defense: default
+      universal_defense_penetration: default
+      universal_defense_penetration_rate: default
+      universal_incoming_damage_rate: default
+
 
   minecraft:spider: # 生物的唯一标识，参考 https://minecraft.wiki/w/Mob
     parent: minecraft:monster
@@ -66,6 +75,30 @@ entity_attributes:
       max_health: 40.0
       defense:
         neutral: 4.0
+
+  minecraft:skeleton:
+    parent: minecraft:monster
+    values:
+      attack_damage:
+        neutral: 10.0
+      attack_damage_rate: 0
+#      critical_strike_chance: default
+#      critical_strike_power: default
+      defense:
+        neutral: 2.0
+      defense_penetration:
+        neutral: 0.0
+      defense_penetration_rate:
+        neutral: 0.0
+      incoming_damage_rate:
+        neutral: 0.0
+      max_health: 20
+      universal_attack_damage: 0
+      universal_attack_damage_rate: 0
+      universal_defense: 0
+      universal_defense_penetration: 0
+      universal_defense_penetration_rate: 0
+      universal_incoming_damage_rate: 0
 
 # 实体索引表（目前仅用于条件判断）
 entity_type_holders:

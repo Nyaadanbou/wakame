@@ -43,22 +43,32 @@ renderer_layout:
     - meta:lore
     - (fixed:attribute)<!i><aqua><b>属性
     - attribute:attack_damage
+    - attribute:attack_damage_rate
     - attribute:attack_effect_chance
     - attribute:attack_speed_level
+    - attribute:block_interaction_range
     - attribute:critical_strike_chance
     - attribute:critical_strike_power
-    - attribute:damage_reduction_rate
     - attribute:defense
     - attribute:defense_penetration
+    - attribute:defense_penetration_rate
+    - attribute:entity_interaction_range
     - attribute:health_regeneration
+    - attribute:incoming_damage_rate
     - attribute:lifesteal
+    - attribute:manasteal
     - attribute:mana_consumption_rate
     - attribute:mana_regeneration
-    - attribute:manasteal
     - attribute:max_absorption
     - attribute:max_health
     - attribute:max_mana
     - attribute:movement_speed
+    - attribute:universal_attack_damage
+    - attribute:universal_attack_damage_rate
+    - attribute:universal_defense
+    - attribute:universal_defense_penetration
+    - attribute:universal_defense_penetration_rate
+    - attribute:universal_incoming_damage_rate
     - (fixed:skill)<!i><aqua><b>技能
     - skill:buff/potion_remove
     - skill:frost
@@ -77,7 +87,6 @@ renderer_layout:
     - wind
     - earth
     - thunder
-    - universal
 
   # 运算模式排序
   # 同种属性，不同运算模式，都将按照此顺序渲染

@@ -219,7 +219,7 @@ data class ElementDamagePacket(
     val defensePenetrationRate: Double,
 ) {
     val value: Double = if (min >= max) max else VariableAmount.range(min, max).amount
-    val packetDamage: Double = value * (1 + rate)
+    val packetDamage: Double = value
 }
 
 /**
