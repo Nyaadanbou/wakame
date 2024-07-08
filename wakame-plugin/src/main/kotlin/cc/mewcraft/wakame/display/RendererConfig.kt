@@ -179,26 +179,76 @@ internal class RendererConfig(
     }
 
     override fun onPostWorld() {
-        this.loadLayout()
+        loadLayout()
     }
 
     override fun onReload() {
-        this.loadLayout()
+        loadLayout()
     }
 }
 
-internal class DynamicLoreMetaCreatorRegistryImpl : DynamicLoreMetaCreatorRegistry {
+/**
+ * A creator of a [DynamicLoreMeta].
+ */
+internal interface DynamicLoreMetaCreator {
+    /**
+     * The namespace of this creator. Used to identify different creators.
+     */
+    val namespace: String
+
+    /**
+     * Checks whether this creator is capable of creating a [LoreMeta]
+     * from the given [rawLine].
+     *
+     * @param rawLine the raw line text
+     * @return `true` if the [rawLine] is "legal" for this creator
+     */
+    fun test(rawLine: String): Boolean
+
+    /**
+     * Creates the [DynamicLoreMeta].
+     *
+     * @param rawIndex the raw index
+     * @param rawLine the raw line text
+     * @param default the default text if there is any
+     * @return the created [LoreMeta]
+     *
+     * @throws IllegalArgumentException if the raw line text is unrecognized
+     */
+    fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta
+}
+
+/**
+ * 注册表之 [DynamicLoreMetaCreator].
+ *
+ * 使用该对象来注册一个 [DynamicLoreMetaCreator].
+ */
+internal class DynamicLoreMetaCreatorRegistry {
     private val creators: MutableMap<String, DynamicLoreMetaCreator> = Object2ObjectArrayMap()
 
-    override fun entries(): Map<String, DynamicLoreMetaCreator> {
+    /**
+     * 获取该注册表类所有的 [DynamicLoreMetaCreator].
+     */
+    fun entries(): Map<String, DynamicLoreMetaCreator> {
         return this.creators
     }
 
-    override fun register(creator: DynamicLoreMetaCreator) {
+    /**
+     * 注册一个 [DynamicLoreMetaCreator].
+     *
+     * 会覆盖 [DynamicLoreMetaCreator.namespace] 相同的实例.
+     */
+    fun register(creator: DynamicLoreMetaCreator) {
         this.creators += creator.namespace to creator
     }
 
-    override fun getApplicableCreator(rawLine: String): DynamicLoreMetaCreator? {
+    /**
+     * 获取一个适用于 [rawLine] 的 [DynamicLoreMetaCreator].
+     *
+     * @param rawLine 配置文件中的原始字符串, 未经任何修改
+     * @return 返回一个合适的 [DynamicLoreMetaCreator]
+     */
+    fun getApplicableCreator(rawLine: String): DynamicLoreMetaCreator? {
         return this.creators.values.firstOrNull { creator -> creator.test(rawLine) }
     }
 }

@@ -13,7 +13,7 @@ const val RENDERER_GLOBAL_CONFIG_FILE = "renderer.yml"
 internal fun displayModule(): Module = module {
     // non-internals
     singleOf(::PacketItemRenderer)
-    single<DynamicLoreMetaCreatorRegistry> { DynamicLoreMetaCreatorRegistryImpl() }
+    singleOf(::DynamicLoreMetaCreatorRegistry)
 
     // config holder
     single {
