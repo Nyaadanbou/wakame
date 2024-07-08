@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.plus
-import kotlin.reflect.KClass
 
 internal object PluginEventBus {
     private val eventBus: EventBus = run {
@@ -28,11 +27,8 @@ internal object PluginEventBus {
         }
     }
 
-    fun <T : Any> subscribe(eventClass: KClass<T>, eventListener: suspend (T) -> Unit) {
-        eventBus.subscribe(eventClass, eventListener)
-    }
-
-    inline fun <reified T : Any> subscribe(noinline block: suspend (T) -> Unit) {
-        subscribe(T::class, block)
-    }
+    /**
+     * 获取插件的 [EventBus].
+     */
+    fun get(): EventBus = eventBus
 }

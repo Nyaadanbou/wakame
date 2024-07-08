@@ -227,9 +227,10 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
         }
 
         override fun provideTooltipLore(): Collection<LoreLine> {
-            if (!config.showInTooltip) {
-                return emptyList()
-            }
+            // showInTooltip 由核心各自的配置文件控制
+            // if (!config.showInTooltip) {
+            //     return emptyList()
+            // }
             return cells.values.map { cell -> cell.provideTooltipLore() }
         }
 

@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.RendererConfigReloadEvent
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.eventbus.PluginEventBus
+import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
@@ -183,8 +184,8 @@ private constructor(
 
     init {
         // 订阅事件: 当 renderer config 重载时刷新 showInTooltip 的值
-        PluginEventBus.subscribe<RendererConfigReloadEvent> { event ->
-            showInTooltip = tooltipKey in event.rawTooltipKeys
+        PluginEventBus.get().subscribe<RendererConfigReloadEvent> {
+            showInTooltip = tooltipKey in it.rawTooltipKeys
         }
     }
 }

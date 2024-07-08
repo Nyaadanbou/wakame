@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME
 import cc.mewcraft.wakame.display.DisplaySupport.RENDERER_LAYOUT_LINE_PATTERN
+import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.initializer.Initializable
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import net.kyori.adventure.text.Component
@@ -186,8 +187,16 @@ internal class RendererConfig(
         loadLayout()
     }
 
+    override suspend fun onPostWorldAsync() {
+        PluginEventBus.get().post(RendererConfigReloadEvent(rawTooltipKeys))
+    }
+
     override fun onReload() {
         loadLayout()
+    }
+
+    override suspend fun onReloadAsync() {
+        PluginEventBus.get().post(RendererConfigReloadEvent(rawTooltipKeys))
     }
 }
 
