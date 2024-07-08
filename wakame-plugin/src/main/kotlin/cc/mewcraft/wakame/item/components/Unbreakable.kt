@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -22,7 +21,7 @@ import java.lang.reflect.Type
 // 在配置文件中以 1:1 的形式配置原版物品组件
 // 是否可行.
 
-interface Unbreakable : Examinable, ItemComponent, TooltipProvider {
+interface Unbreakable : Examinable, ItemComponent {
 
     val showInTooltip: Boolean
 
