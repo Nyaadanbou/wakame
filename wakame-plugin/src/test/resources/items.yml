@@ -99,7 +99,7 @@ components:
     enabled: true
     display_name: "作为食物"
     show_in_tooltip: true
-    tooltips: { } # TODO 实现食物组件
+    tooltips: { }
 
   item_name:
     enabled: true

@@ -130,7 +130,7 @@ object AttributeRegistry : Initializable {
 
             // override it
             tooltipCreator = { core: CoreAttributeS ->
-                val lines = tooltips.line(core.operation) // FIXME 把 BinaryCore 给暂时修复了
+                val lines = tooltips.line(core.operation)
                 val resolver = tooltips.value("value", core.value.toInt())
                 listOf(AttributeRegistrySupport.mini().deserialize(lines, resolver))
             }

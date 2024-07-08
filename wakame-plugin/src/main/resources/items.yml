@@ -1,6 +1,6 @@
 # 物品
 
-# 一般 // TODO 这个是不是应该放在词条栏的配置里?
+# 一般
 general:
   empty_cell_tooltips:
     - "<!i><gray>空词条栏"
@@ -99,7 +99,7 @@ components:
     enabled: true
     display_name: "作为食物"
     show_in_tooltip: true
-    tooltips: { } # TODO 实现食物组件
+    tooltips: { }
 
   item_name:
     enabled: true
