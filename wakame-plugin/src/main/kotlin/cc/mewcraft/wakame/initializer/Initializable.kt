@@ -73,6 +73,11 @@ interface Initializable : Terminable {
     fun onReload() {}
 
     /**
+     * When [NekoReloadEvent] is fired, in an async thread.
+     */
+    suspend fun onReloadAsync() {}
+
+    /**
      * Closes this terminable.
      */
     override fun close() {}

@@ -144,7 +144,7 @@ object Initializer : KoinComponent, Listener {
         CommandManager(PLUGIN).init()
     }
 
-    private fun executeReload() {
+    private suspend fun executeReload() {
         fun forEachReload(block: Initializable.() -> Unit): Result<Unit> {
             toLateReload.forEach { initializable ->
                 try {
@@ -160,6 +160,16 @@ object Initializer : KoinComponent, Listener {
         LOGGER.info("[Initializer] onReload - Start")
         forEachReload { onReload() }.onFailure { return }
         LOGGER.info("[Initializer] onReload - Complete")
+
+        val asyncContext = Dispatchers.IO + CoroutineName("Neko Initializer - Reload Async")
+        val onReloadAsyncJobs = mutableListOf<Job>()
+        val onReloadAsyncResult = forEachReload {
+            onReloadAsyncJobs += NEKO_PLUGIN.launch(asyncContext) { onReloadAsync() }
+        }
+        LOGGER.info("[Initializer] onReloadAsync - Waiting")
+        onReloadAsyncJobs.joinAll() // wait for all async jobs
+        onReloadAsyncResult.onFailure { return }
+        LOGGER.info("[Initializer] onReloadAsync - Complete")
     }
 
     /**
@@ -298,7 +308,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST) // configs are reloaded the earliest
-    private fun handlePluginReloaded(e: NekoReloadEvent) {
+    private suspend fun handlePluginReloaded(e: NekoReloadEvent) {
         Configs.reload()
         executeReload()
     }
