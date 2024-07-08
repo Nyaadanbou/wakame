@@ -8,10 +8,10 @@ import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -44,11 +44,11 @@ data class ItemElements(
      * 所有的元素.
      */
     val elements: Set<Element>,
-) : Examinable, ItemComponent, TooltipProvider.Single {
+) : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<ItemElements>, ItemComponentConfig(ItemComponentConstants.ELEMENTS) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ELEMENTS }
-        private val tooltipText: MergedTooltip = MergedTooltip()
+    companion object : ItemComponentBridge<ItemElements>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.ELEMENTS
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ELEMENTS }
 
         override fun codec(id: String): ItemComponentType<ItemElements> {
             return Codec(id)
@@ -57,13 +57,16 @@ data class ItemElements(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.MergedTooltip = config.MergedTooltip()
     }
 
     override fun provideTooltipLore(): LoreLine {
-        if (!showInTooltip) {
+        if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, tooltipText.render(elements, Element::displayName))
+        return LoreLine.simple(tooltipKey, tooltip.render(elements, Element::displayName))
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(

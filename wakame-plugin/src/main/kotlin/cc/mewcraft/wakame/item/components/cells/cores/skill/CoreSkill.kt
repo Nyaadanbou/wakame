@@ -21,7 +21,10 @@ import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.examination.ExaminableProperty
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.stream.Stream
 
@@ -58,10 +61,10 @@ data class CoreSkill(
     override val isEmpty: Boolean = false
 
     override fun provideTooltipLore(): LoreLine {
-        val tooltipKey = SkillDisplaySupport.getLineKey(this) ?: return LoreLine.noop()
+        val tooltipKey = tooltipKeyProvider.get(this) ?: return LoreLine.noop()
         val tooltipText = instance.displays.tooltips
         val resolver = instance.conditions.resolver
-        val lineText = tooltipText.mapTo(ObjectArrayList(tooltipText.size)) { SkillDisplaySupport.mini().deserialize(it, resolver) }
+        val lineText = tooltipText.mapTo(ObjectArrayList(tooltipText.size)) { miniMessage.deserialize(it, resolver) }
         return LoreLine.simple(tooltipKey, lineText)
     }
 
@@ -79,7 +82,10 @@ data class CoreSkill(
         return toSimpleString()
     }
 
-    companion object Type : CoreType<CoreSkill>
+    companion object Type : CoreType<CoreSkill>, KoinComponent {
+        private val miniMessage: MiniMessage by inject()
+        private val tooltipKeyProvider: CoreSkillTooltipKeyProvider by inject()
+    }
 }
 
 

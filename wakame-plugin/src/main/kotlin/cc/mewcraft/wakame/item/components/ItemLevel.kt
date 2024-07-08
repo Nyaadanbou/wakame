@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemLevel.Template.Option
@@ -31,11 +31,11 @@ data class ItemLevel(
      * 物品的等级.
      */
     val level: Short,
-) : Examinable, ItemComponent, TooltipProvider.Single {
+) : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<ItemLevel>, ItemComponentConfig(ItemComponentConstants.LEVEL) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LEVEL }
-        private val tooltipText: SingleTooltip = SingleTooltip()
+    companion object : ItemComponentBridge<ItemLevel>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.LEVEL
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LEVEL }
 
         override fun codec(id: String): ItemComponentType<ItemLevel> {
             return Codec(id)
@@ -44,13 +44,16 @@ data class ItemLevel(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
     override fun provideTooltipLore(): LoreLine {
-        if (!showInTooltip) {
+        if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("value", Component.text(level.toInt())))))
+        return LoreLine.simple(tooltipKey, listOf(tooltip.render(Placeholder.component("value", Component.text(level.toInt())))))
     }
 
     private data class Codec(

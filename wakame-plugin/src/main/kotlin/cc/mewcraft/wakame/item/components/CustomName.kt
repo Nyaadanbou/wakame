@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -16,10 +17,13 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.Context
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -58,11 +62,21 @@ data class CustomName(
      * 这部分是直接存在 NBT 里的原始字符串.
      */
     val rich: Component,
-) : Examinable, ItemComponent {
+) : Examinable {
 
-    constructor(rich: Component) : this("", rich)
+    /**
+     * 用于直接设置 `minecraft:custom_name`.
+     */
+    constructor(
+        rich: Component,
+    ) : this(
+        miniMessage.serialize(rich), rich
+    )
 
-    companion object : ItemComponentBridge<CustomName>, ItemComponentConfig(ItemComponentConstants.CUSTOM_NAME) {
+    companion object : ItemComponentBridge<CustomName>, ItemComponentMeta, KoinComponent {
+        override val configPath: String = ItemComponentConstants.CUSTOM_NAME
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CUSTOM_NAME }
+
         override fun codec(id: String): ItemComponentType<CustomName> {
             return Codec(id)
         }
@@ -70,6 +84,9 @@ data class CustomName(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val miniMessage by inject<MiniMessage>()
+        private val config = ItemComponentConfig.provide(this)
     }
 
     private data class Codec(

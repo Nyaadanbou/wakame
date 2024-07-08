@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -20,7 +20,7 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Castable : Examinable, ItemComponent, TooltipProvider.Single {
+interface Castable : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Castable> {
         fun of(): Castable {
@@ -36,16 +36,19 @@ interface Castable : Examinable, ItemComponent, TooltipProvider.Single {
         }
     }
 
-    private data object Value : Castable, ItemComponentConfig(ItemComponentConstants.CASTABLE) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CASTABLE }
-        private val tooltipText: SingleTooltip = SingleTooltip()
+    private data object Value : Castable, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.CASTABLE
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CASTABLE }
 
         override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
+            if (!config.showInTooltip) {
                 return LoreLine.noop()
             }
-            return LoreLine.simple(tooltipKey, listOf(tooltipText.render()))
+            return LoreLine.simple(tooltipKey, listOf(tooltip.render()))
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
     private data class Codec(

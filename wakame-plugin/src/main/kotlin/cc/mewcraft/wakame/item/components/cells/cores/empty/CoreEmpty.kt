@@ -27,7 +27,7 @@ object CoreEmpty : Core, CoreType<CoreEmpty> {
     override val isEmpty: Boolean = true
 
     override fun serializeAsTag(): Tag = CompoundTag.create()
-    override fun provideTooltipLore(): LoreLine = EmptyLoreLine
+    override fun provideTooltipLore(): LoreLine = CoreEmptyLoreLine
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(ExaminableProperty.of("key", key))
     override fun toString(): String = toSimpleString()

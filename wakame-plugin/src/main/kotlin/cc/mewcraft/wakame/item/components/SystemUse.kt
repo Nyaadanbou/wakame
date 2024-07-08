@@ -1,15 +1,21 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.component.ItemComponent
+import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 
-interface SystemUse : Examinable, ItemComponent {
+interface SystemUse : Examinable {
 
-    companion object : ItemComponentBridge<Unit> {
+    companion object : ItemComponentBridge<Unit>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.SYSTEM_USE
+        override val tooltipKey: Key = ItemComponentConstants.createKey { SYSTEM_USE }
+
         override fun codec(id: String): ItemComponentType<Unit> {
             return Codec(id)
         }
@@ -17,6 +23,8 @@ interface SystemUse : Examinable, ItemComponent {
         override fun templateType(): ItemTemplateType<Nothing> {
             throw UnsupportedOperationException()
         }
+        
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     // 开发日记 2024/6/27

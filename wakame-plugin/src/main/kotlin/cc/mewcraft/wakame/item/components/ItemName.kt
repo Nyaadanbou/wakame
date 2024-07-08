@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.component.ItemComponent
+import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -12,12 +14,16 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.Context
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -37,11 +43,21 @@ data class ItemName(
      * 一开始生成出来的富文本有所差别.
      */
     val rich: Component,
-) : Examinable, ItemComponent {
+) : Examinable {
 
-    constructor(rich: Component) : this("", rich)
+    /**
+     * 用于直接设置 `minecraft:item_name`.
+     */
+    constructor(
+        rich: Component,
+    ) : this(
+        miniMessage.serialize(rich), rich
+    )
 
-    companion object : ItemComponentBridge<ItemName> {
+    companion object : ItemComponentBridge<ItemName>, ItemComponentMeta, KoinComponent {
+        override val configPath: String = ItemComponentConstants.ITEM_NAME
+        override val tooltipKey: Key = ItemComponentConstants.createKey { ITEM_NAME }
+
         override fun codec(id: String): ItemComponentType<ItemName> {
             return Codec(id)
         }
@@ -49,6 +65,9 @@ data class ItemName(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val miniMessage: MiniMessage by inject()
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     private data class Codec(

@@ -4,12 +4,12 @@ import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.display.DisplaySupport
 import cc.mewcraft.wakame.display.DynamicLoreMeta
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
+import cc.mewcraft.wakame.display.DynamicLoreMetaCreatorRegistry
 import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.RawIndex
-import cc.mewcraft.wakame.display.RawKey
+import cc.mewcraft.wakame.display.RawTooltipIndex
+import cc.mewcraft.wakame.display.RawTooltipKey
 import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
@@ -19,29 +19,39 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-@ReloadDependency(runAfter = [RendererConfig::class])
-@PostWorldDependency(runAfter = [RendererConfig::class])
-internal object EmptyCoreBootstrap : Initializable {
+// 文件说明:
+// 这里是 CoreEmpty 的所有跟提示框渲染相关的代码
+
+@ReloadDependency(
+    runAfter = [RendererConfig::class]
+)
+@PostWorldDependency(
+    runAfter = [RendererConfig::class]
+)
+internal object CoreEmptyBootstrap : Initializable, KoinComponent {
+    private val dynamicLoreMetaCreatorRegistry by inject<DynamicLoreMetaCreatorRegistry>()
+
     override fun onPostWorld() {
-        DisplaySupport.DYNAMIC_LORE_META_CREATOR_REGISTRY.register(EmptyCoreLoreMetaCreator())
-        DisplaySupport.LOGGER.info("Registered DynamicLoreMetaCreator for empty cores")
+        dynamicLoreMetaCreatorRegistry.register(CoreEmptyLoreMetaCreator())
     }
 }
 
-internal class EmptyCoreLoreMetaCreator : DynamicLoreMetaCreator {
+internal class CoreEmptyLoreMetaCreator : DynamicLoreMetaCreator {
     override val namespace: String = GenericKeys.EMPTY.namespace()
 
     override fun test(rawLine: String): Boolean {
         return Key(rawLine) == GenericKeys.EMPTY
     }
 
-    override fun create(rawIndex: RawIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
-        return EmptyLoreMeta(rawKey = Key(rawLine), rawIndex = rawIndex, default = default)
+    override fun create(rawTooltipIndex: RawTooltipIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
+        return CoreEmptyLoreMeta(rawTooltipKey = Key(rawLine), rawTooltipIndex = rawTooltipIndex, defaultText = default)
     }
 }
 
-internal data object EmptyLoreLine : LoreLine {
+internal data object CoreEmptyLoreLine : LoreLine {
     override val key: TooltipKey = GenericKeys.EMPTY
     override val content: List<Component> by ItemComponentRegistry.CONFIG
         .derive(ItemComponentConstants.CELLS)
@@ -49,11 +59,11 @@ internal data object EmptyLoreLine : LoreLine {
         .map(::listOf)
 }
 
-internal data class EmptyLoreMeta(
-    override val rawKey: RawKey,
-    override val rawIndex: RawIndex,
-    override val default: List<Component>?,
+internal data class CoreEmptyLoreMeta(
+    override val rawTooltipKey: RawTooltipKey,
+    override val rawTooltipIndex: RawTooltipIndex,
+    override val defaultText: List<Component>?,
 ) : DynamicLoreMeta {
-    override fun generateFullKeys(): List<TooltipKey> = listOf(rawKey)
+    override fun generateTooltipKeys(): List<TooltipKey> = listOf(rawTooltipKey)
     override fun createDefault(): List<LoreLine>? = null
 }

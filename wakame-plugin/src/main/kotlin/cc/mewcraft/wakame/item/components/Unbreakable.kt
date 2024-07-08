@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.component.ItemComponent
+import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -11,6 +13,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
+import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemFlag
 import org.spongepowered.configurate.ConfigurationNode
@@ -21,11 +24,14 @@ import java.lang.reflect.Type
 // 在配置文件中以 1:1 的形式配置原版物品组件
 // 是否可行.
 
-interface Unbreakable : Examinable, ItemComponent {
+interface Unbreakable : Examinable {
 
     val showInTooltip: Boolean
 
-    companion object : ItemComponentBridge<Unbreakable> {
+    companion object : ItemComponentBridge<Unbreakable>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.UNBREAKABLE
+        override val tooltipKey: Key = ItemComponentConstants.createKey { UNBREAKABLE }
+
         override fun codec(id: String): ItemComponentType<Unbreakable> {
             return Codec(id)
         }
@@ -33,6 +39,8 @@ interface Unbreakable : Examinable, ItemComponent {
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     private data class Value(

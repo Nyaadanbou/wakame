@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -31,9 +32,9 @@ data class ItemCrate(
     val key: Key,
 ) : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<ItemCrate>, ItemComponentConfig(ItemComponentConstants.CRATE) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CRATE }
-        private val tooltipText: SingleTooltip = SingleTooltip()
+    companion object : ItemComponentBridge<ItemCrate>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.CRATE
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CRATE }
 
         override fun codec(id: String): ItemComponentType<ItemCrate> {
             return Codec(id)
@@ -42,13 +43,16 @@ data class ItemCrate(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
     override fun provideTooltipLore(): LoreLine {
-        if (!showInTooltip) {
+        if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("key", Component.text(key.asString())))))
+        return LoreLine.simple(tooltipKey, listOf(tooltip.render(Placeholder.component("key", Component.text(key.asString())))))
     }
 
     private data class Codec(

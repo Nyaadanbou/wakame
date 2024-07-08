@@ -7,11 +7,11 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -33,11 +33,11 @@ data class ExtraLore(
      * 物品的额外描述.
      */
     val lore: List<String>,
-) : Examinable, ItemComponent, TooltipProvider.Single {
+) : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<ExtraLore>, ItemComponentConfig(ItemComponentConstants.LORE) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LORE }
-        private val tooltipText: LoreTooltip = LoreTooltip()
+    companion object : ItemComponentBridge<ExtraLore>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.LORE
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LORE }
 
         override fun codec(id: String): ItemComponentType<ExtraLore> {
             return Codec(id)
@@ -46,15 +46,18 @@ data class ExtraLore(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.LoreTooltip = config.LoreTooltip()
     }
 
     override fun provideTooltipLore(): LoreLine {
-        if (!showInTooltip) {
+        if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        val lines = lore.mapTo(ObjectArrayList(lore.size)) { ItemComponentInjections.mini.deserialize(tooltipText.line, Placeholder.parsed("line", it)) }
-        val header = tooltipText.header.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
-        val bottom = tooltipText.bottom.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
+        val lines = lore.mapTo(ObjectArrayList(lore.size)) { ItemComponentInjections.mini.deserialize(tooltip.line, Placeholder.parsed("line", it)) }
+        val header = tooltip.header.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
+        val bottom = tooltip.bottom.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.mini::deserialize) }
         lines.addAll(0, header)
         lines.addAll(bottom)
         return LoreLine.simple(tooltipKey, lines)

@@ -7,10 +7,10 @@ import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Cell
@@ -41,6 +41,7 @@ import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
+import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -49,9 +50,9 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
-interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterable<Map.Entry<String, Cell>> {
+interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<String, Cell>> {
 
-    companion object : ItemComponentBridge<ItemCells> {
+    companion object : ItemComponentBridge<ItemCells>, ItemComponentMeta {
         fun of(cells: Map<String, Cell>): ItemCells {
             return Value(cells)
         }
@@ -60,6 +61,9 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
             return BuilderImpl()
         }
 
+        override val configPath: String = ItemComponentConstants.CELLS
+        override val tooltipKey: Key = ItemComponentConstants.createKey { CELLS }
+
         override fun codec(id: String): ItemComponentType<ItemCells> {
             return Codec(id)
         }
@@ -67,6 +71,8 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     /**
@@ -221,7 +227,7 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
         }
 
         override fun provideTooltipLore(): Collection<LoreLine> {
-            if (!showInTooltip) {
+            if (!config.showInTooltip) {
                 return emptyList()
             }
             return cells.values.map { cell -> cell.provideTooltipLore() }
@@ -237,8 +243,6 @@ interface ItemCells : Examinable, ItemComponent, TooltipProvider.Cluster, Iterab
             consumer.invoke(cells)
             return Value(Object2ObjectArrayMap(cells)) // 显式副本
         }
-
-        private companion object : ItemComponentConfig(ItemComponentConstants.CELLS)
     }
 
     private data class Codec(

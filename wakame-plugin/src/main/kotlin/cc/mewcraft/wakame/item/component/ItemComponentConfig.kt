@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.item.component
 
-import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.display.RendererConfigReloadEvent
+import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
@@ -13,23 +15,72 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import org.koin.core.component.KoinComponent
+import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Stream
 
-abstract class ItemComponentConfig(
-    path: String,
-) {
-    protected val config: ConfigProvider by lazy { ItemComponentRegistry.CONFIG.derive(path) }
+/**
+ * 封装了一个物品组件的配置文件.
+ */
+internal class ItemComponentConfig
+private constructor(
+    private val configPath: String,
+    private val tooltipKey: TooltipKey,
+) : KoinComponent {
 
-    protected val enabled: Boolean by config.entry<Boolean>("enabled")
-    protected val displayName: Component by config.entry<Component>("display_name")
+    companion object {
+        /**
+         * 获取一个 [ItemComponentConfig] 实例.
+         *
+         * 用同一个 [component] 多次调用本函数返回的都是同一个实例.
+         *
+         * @param component 物品组件
+         */
+        fun provide(component: ItemComponentMeta): ItemComponentConfig {
+            return provide(component.configPath, component.tooltipKey)
+        }
 
-    // 开发日记 2024/6/27
-    // TODO show_in_tooltip 除了能够在这里直接控制,
-    //  还应该考虑 renderer.yml 里不存在键值的情况,
-    //  「不存在的结果」应该存起来, 而不是每次都去哈希.
-    protected val showInTooltip: Boolean by config.entry<Boolean>("show_in_tooltip")
+        /**
+         * 获取一个 [ItemComponentConfig] 实例.
+         *
+         * 用同一个 [configPath] 多次调用本函数返回的都是同一个实例.
+         *
+         * @param configPath 该组件在配置文件中的路径
+         * @param tooltipKey 该组件在提示框中的标识
+         */
+        fun provide(configPath: String, tooltipKey: TooltipKey): ItemComponentConfig {
+            return objectPool.computeIfAbsent(configPath) {
+                ItemComponentConfig(it, tooltipKey)
+            }
+        }
 
-    // 根据具体的物品组件的配置结构, 实例化相应的 inner class
+        private val objectPool = ConcurrentHashMap<String, ItemComponentConfig>()
+    }
+
+    /**
+     * 根配置文件.
+     */
+    val root by lazy { ItemComponentRegistry.CONFIG.derive(configPath) }
+
+    /**
+     * 该组件是否启用? (具体的作用之后再逐渐完善)
+     */
+    val enabled by root.entry<Boolean>("enabled")
+
+    /**
+     * 该组件的展示名字.
+     */
+    val displayName by root.entry<Component>("display_name")
+
+    /**
+     * 该组件是否显示在提示框中.
+     */
+    var showInTooltip = false
+        private set
+
+    // inner class 使用说明:
+    // 根据具体的物品组件的配置结构,
+    // 实例化相应的 inner class.
 
     /**
      * Tooltips for single text.
@@ -37,7 +88,7 @@ abstract class ItemComponentConfig(
      * @property single The format of the single text.
      */
     inner class SingleTooltip : Examinable {
-        val single: String by config.entry<String>("tooltips", "single")
+        val single: String by root.entry<String>("tooltips", "single")
 
         fun render(): Component {
             return ItemComponentInjections.mini.deserialize(single)
@@ -68,9 +119,9 @@ abstract class ItemComponentConfig(
      * @property separator The format of the separator.
      */
     inner class MergedTooltip : Examinable {
-        val merged: String by config.entry<String>("tooltips", "merged")
-        val single: String by config.entry<String>("tooltips", "single")
-        val separator: String by config.entry<String>("tooltips", "separator")
+        val merged: String by root.entry<String>("tooltips", "merged")
+        val single: String by root.entry<String>("tooltips", "single")
+        val separator: String by root.entry<String>("tooltips", "separator")
 
         /**
          * A convenience function to stylize a list of objects.
@@ -113,9 +164,9 @@ abstract class ItemComponentConfig(
      * @property bottom The bottom list.
      */
     inner class LoreTooltip : Examinable {
-        val line: String by config.entry<String>("tooltips", "line")
-        val header: List<String> by config.entry<List<String>>("tooltips", "header")
-        val bottom: List<String> by config.entry<List<String>>("tooltips", "bottom")
+        val line: String by root.entry<String>("tooltips", "line")
+        val header: List<String> by root.entry<List<String>>("tooltips", "header")
+        val bottom: List<String> by root.entry<List<String>>("tooltips", "bottom")
 
         override fun examinableProperties(): Stream<out ExaminableProperty> {
             return Stream.of(
@@ -127,6 +178,13 @@ abstract class ItemComponentConfig(
 
         override fun toString(): String {
             return toSimpleString()
+        }
+    }
+
+    init {
+        // 订阅事件: 当 renderer config 重载时刷新 showInTooltip 的值
+        PluginEventBus.subscribe<RendererConfigReloadEvent> { event ->
+            showInTooltip = tooltipKey in event.rawTooltipKeys
         }
     }
 }

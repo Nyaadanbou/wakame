@@ -1,25 +1,16 @@
 package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.config.Configs
-import net.kyori.adventure.text.minimessage.MiniMessage
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 
 /**
  * The singleton holds the common properties and functions to
  * write the code in this package.
  */
-internal object DisplaySupport : KoinComponent {
-    // config
+internal object DisplaySupport {
+    // 配置文件的常量
     const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
     const val RENDERER_CONFIG_LAYOUT_NODE_NAME = "renderer_layout"
-    val RENDERER_CONFIG_PROVIDER by lazy { Configs.YAML[RENDERER_GLOBAL_CONFIG_FILE] }
-    val DYNAMIC_LORE_META_CREATOR_REGISTRY by inject<DynamicLoreMetaCreatorRegistry>()
 
-    // logger
-    val LOGGER by inject<Logger>()
-
-    // mini message instance
-    val MINI: MiniMessage by inject()
+    // 全局渲染配置文件的 ConfigProvider
+    val RENDERER_GLOBAL_CONFIG_PROVIDER by lazy { Configs.YAML[RENDERER_GLOBAL_CONFIG_FILE] }
 }

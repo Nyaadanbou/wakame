@@ -2,10 +2,10 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -27,7 +27,7 @@ data class Tool(
     val defaultMiningSpeed: Float,
     val damagePerBlock: Int,
     val rules: List<Rule>,
-) : Examinable, ItemComponent {
+) : Examinable {
 
     data class Rule(
         val blockTypes: Collection<Material>,
@@ -35,9 +35,9 @@ data class Tool(
         val correctForDrops: TriState,
     )
 
-    companion object : ItemComponentBridge<Tool>, ItemComponentConfig(ItemComponentConstants.TOOL) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { TOOL }
-        private val tooltipText: SingleTooltip = SingleTooltip()
+    companion object : ItemComponentBridge<Tool>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.TOOL
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { TOOL }
 
         override fun codec(id: String): ItemComponentType<Tool> {
             return Codec(id)
@@ -46,6 +46,8 @@ data class Tool(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     private data class Codec(

@@ -4,9 +4,11 @@ import cc.mewcraft.nbt.StringTag
 import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
-import cc.mewcraft.wakame.item.component.ItemComponent
+import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -36,14 +38,17 @@ data class FoodProperties(
     val eatSeconds: Float,
     val effects: List<FoodEffect>,
     val skills: List<Key>, // TODO 2024/6/28 等技能系统完全落地后改成对应的“技能”实例
-) : Examinable, ItemComponent {
+) : Examinable {
 
     data class FoodEffect(
         val potionEffect: PotionEffect,
         val probability: Float,
     )
 
-    companion object : ItemComponentBridge<FoodProperties> {
+    companion object : ItemComponentBridge<FoodProperties>,  ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.FOOD
+        override val tooltipKey: Key = ItemComponentConstants.createKey { FOOD }
+
         override fun codec(id: String): ItemComponentType<FoodProperties> {
             return Codec(id)
         }
@@ -51,6 +56,8 @@ data class FoodProperties(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     private data class Codec(

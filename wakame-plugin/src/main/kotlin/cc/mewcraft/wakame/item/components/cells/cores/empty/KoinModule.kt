@@ -7,5 +7,5 @@ import org.koin.core.module.dsl.withOptions
 import org.koin.dsl.module
 
 internal fun coreEmptyModule(): Module = module {
-    single<EmptyCoreBootstrap> { EmptyCoreBootstrap } withOptions { bind<Initializable>() }
+    single<CoreEmptyBootstrap> { CoreEmptyBootstrap } withOptions { bind<Initializable>() }
 }

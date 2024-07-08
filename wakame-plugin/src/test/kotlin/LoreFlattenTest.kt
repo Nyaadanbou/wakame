@@ -4,11 +4,11 @@ import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.displayModule
 import cc.mewcraft.wakame.display.flatten
 import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.AttributeCoreBootstrap
-import cc.mewcraft.wakame.item.components.cells.cores.empty.EmptyCoreBootstrap
-import cc.mewcraft.wakame.item.components.cells.cores.empty.EmptyLoreLine
-import cc.mewcraft.wakame.item.components.cells.cores.skill.SkillCoreBootstrap
-import cc.mewcraft.wakame.item.components.legacy.ItemMetaInitializer
+import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeBootstrap
+import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmptyBootstrap
+import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmptyLoreLine
+import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkillBootstrap
+import cc.mewcraft.wakame.item.components.legacy.ItemMetaBootstrap
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.molang.molangModule
@@ -38,7 +38,7 @@ private val Component.plain: String get() = PlainTextComponentSerializer.plainTe
 private fun Component.contains(x: String): Boolean = this.plain.contains(x)
 
 private fun listText(vararg text: String): List<Component> = text.map { Component.text(it) }
-private fun createEmptyLine(): LoreLine = EmptyLoreLine
+private fun createEmptyLine(): LoreLine = CoreEmptyLoreLine
 private fun createAttributeLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
 private fun createMetaLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
 private fun createSkillLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
@@ -81,12 +81,12 @@ class LoreFlattenTest : KoinTest {
             RarityRegistry.onPreWorld()
 
             // item cells
-            AttributeCoreBootstrap.onPostWorld()
-            EmptyCoreBootstrap.onPostWorld()
-            SkillCoreBootstrap.onPostWorld()
+            CoreAttributeBootstrap.onPostWorld()
+            CoreEmptyBootstrap.onPostWorld()
+            CoreSkillBootstrap.onPostWorld()
 
             // item meta
-            ItemMetaInitializer.onPostWorld()
+            ItemMetaBootstrap.onPostWorld()
 
             // initialize renderer config
             val rendererConfig = app.koin.get<RendererConfig>()

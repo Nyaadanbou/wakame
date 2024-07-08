@@ -6,10 +6,10 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -44,11 +44,11 @@ data class ItemKizamiz(
      * 所有的铭刻.
      */
     val kizamiz: Set<Kizami>,
-) : Examinable, ItemComponent, TooltipProvider.Single {
+) : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<ItemKizamiz>, ItemComponentConfig(ItemComponentConstants.KIZAMIZ) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
-        private val tooltipText: MergedTooltip = MergedTooltip()
+    companion object : ItemComponentBridge<ItemKizamiz>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.KIZAMIZ
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
 
         fun of(kizamiz: Set<Kizami>): ItemKizamiz {
             return ItemKizamiz(kizamiz)
@@ -61,13 +61,16 @@ data class ItemKizamiz(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.MergedTooltip = config.MergedTooltip()
     }
 
     override fun provideTooltipLore(): LoreLine {
-        if (!showInTooltip) {
+        if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, tooltipText.render(kizamiz, Kizami::displayName))
+        return LoreLine.simple(tooltipKey, tooltip.render(kizamiz, Kizami::displayName))
     }
 
     private data class Codec(

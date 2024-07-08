@@ -8,14 +8,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.bukkit.Bukkit
+import org.bukkit.Server
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-enum class ThreadType {
+enum class ThreadType : KoinComponent {
     SYNC,
     ASYNC,
     DISPATCHERS_ASYNC,
     REMAIN,
     ;
+
+    private val server: Server by inject()
 
     suspend fun <T> switchContext(block: suspend () -> T): T {
         if (!NEKO_PLUGIN.isEnabled) {
@@ -50,7 +54,7 @@ enum class ThreadType {
                 SYNC -> NEKO_PLUGIN.minecraftDispatcher
                 ASYNC -> NEKO_PLUGIN.minecraftDispatcher
                 DISPATCHERS_ASYNC -> Dispatchers.IO
-                REMAIN -> if (Bukkit.getServer().isPrimaryThread) NEKO_PLUGIN.minecraftDispatcher else NEKO_PLUGIN.asyncDispatcher
+                REMAIN -> if (server.isPrimaryThread) NEKO_PLUGIN.minecraftDispatcher else NEKO_PLUGIN.asyncDispatcher
             }
         ) {
             block()

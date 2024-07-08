@@ -4,11 +4,11 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -34,11 +34,11 @@ data class ItemRarity(
      * 物品的稀有度.
      */
     val rarity: Rarity,
-) : Examinable, ItemComponent, TooltipProvider.Single {
+) : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<ItemRarity>, ItemComponentConfig(ItemComponentConstants.RARITY) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { RARITY }
-        private val tooltipText: SingleTooltip = SingleTooltip()
+    companion object : ItemComponentBridge<ItemRarity>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.RARITY
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { RARITY }
 
         override fun codec(id: String): ItemComponentType<ItemRarity> {
             return Codec(id)
@@ -47,13 +47,16 @@ data class ItemRarity(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
     override fun provideTooltipLore(): LoreLine {
-        if (!showInTooltip) {
+        if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("value", rarity.displayName))))
+        return LoreLine.simple(tooltipKey, listOf(tooltip.render(Placeholder.component("value", rarity.displayName))))
     }
 
     private data class Codec(

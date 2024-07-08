@@ -3,10 +3,10 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -33,18 +33,18 @@ data class ItemArrow(
      * 可穿透的实体数.
      */
     val pierceLevel: Byte,
-) : Examinable, ItemComponent, TooltipProvider.Single {
+) : Examinable, TooltipProvider.Single {
 
     // 开发日记: 2024/6/24 小米
     // companion object 将作为组件配置文件的入口,
     // 这些包括了物品提示框渲染的配置文件, 以及未来可能需要的其他东西
-    companion object : ItemComponentBridge<ItemArrow>, ItemComponentConfig(ItemComponentConstants.ARROW) {
-        private val tooltipKey: Key = ItemComponentConstants.createKey { ARROW }
-        private val tooltipText: SingleTooltip = SingleTooltip()
-
+    companion object : ItemComponentBridge<ItemArrow>, ItemComponentMeta {
         fun of(pierceLevel: Int): ItemArrow {
             return ItemArrow(pierceLevel.toStableByte())
         }
+
+        override val configPath: String = ItemComponentConstants.ARROW
+        override val tooltipKey: Key = ItemComponentConstants.createKey { ARROW }
 
         override fun codec(id: String): ItemComponentType<ItemArrow> {
             return Codec(id)
@@ -53,6 +53,9 @@ data class ItemArrow(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
     // 开发日记: 2024/6/25
@@ -63,10 +66,10 @@ data class ItemArrow(
     // 需要注意, 该类型还需要实现 TooltipsProvider 接口,
     // 否则其他系统将无法得知如何将该物品组件显示在物品提示框里.
     override fun provideTooltipLore(): LoreLine {
-        if (!showInTooltip) {
+        if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, listOf(tooltipText.render(Placeholder.component("pierce_level", Component.text(pierceLevel.toInt())))))
+        return LoreLine.simple(tooltipKey, listOf(tooltip.render(Placeholder.component("pierce_level", Component.text(pierceLevel.toInt())))))
     }
 
     // 开发日记: 2024/6/25

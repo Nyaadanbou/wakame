@@ -34,6 +34,8 @@ import cc.mewcraft.wakame.util.toStableLong
 import cc.mewcraft.wakame.util.toStableShort
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.invoke.MethodHandle
 import java.util.EnumMap
@@ -46,8 +48,7 @@ val CoreAttribute.element: Element?
 /**
  * 从 NBT 构建一个 [CoreAttribute].
  *
- * 给定的 [nbt] 必须是以下结构:
- *
+ * 给定的 [nbt] 必须是以下结构 (仅供参考):
  * ```NBT
  * string('id'): <key>
  * byte('op'): <operation>
@@ -65,8 +66,34 @@ fun CoreAttribute(
 /**
  * 从配置文件构建一个 [CoreAttribute].
  *
+ * ## 对于 CoreAttributeS
  * 给定的 [node] 必须是以下结构:
+ * ```yaml
+ * key: <key>
+ * operation: <operation>
+ * value: <double>
+ * ```
  *
+ * ## 对于 CoreAttributeSE
+ * 给定的 [node] 必须是以下结构:
+ * ```yaml
+ * key: <key>
+ * operation: <operation>
+ * value: <double>
+ * element: <element>
+ * ```
+ *
+ * ## 对于 CoreAttributeR
+ * 给定的 [node] 必须是以下结构:
+ * ```yaml
+ * key: <key>
+ * operation: <operation>
+ * lower: <double>
+ * upper: <double>
+ * ```
+ *
+ * ## 对于 CoreAttributeRE
+ * 给定的 [node] 必须是以下结构:
  * ```yaml
  * key: <key>
  * operation: <operation>
@@ -93,7 +120,7 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvi
     }
 
     override fun provideTooltipLore(): LoreLine {
-        val tooltipKey = AttributeDisplaySupport.getLineKey(this) ?: return LoreLine.noop()
+        val tooltipKey = lineKeyFactory.get(this) ?: return LoreLine.noop()
         val tooltipText = AttributeRegistry.FACADES[key].tooltipCreator(this)
         return LoreLine.simple(tooltipKey, tooltipText)
     }
@@ -107,7 +134,9 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvi
 
     override fun toString(): String = toSimpleString()
 
-    internal companion object Type : CoreType<CoreAttribute>
+    internal companion object Type : CoreType<CoreAttribute>, KoinComponent {
+        private val lineKeyFactory: CoreAttributeTooltipKeyProvider by inject()
+    }
 }
 
 internal data class CoreAttributeS(

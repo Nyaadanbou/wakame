@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -20,9 +20,12 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Skillful : Examinable, ItemComponent, TooltipProvider.Single {
+interface Skillful : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<Skillful> {
+    companion object : ItemComponentBridge<Skillful>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.SKILLFUL
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { SKILLFUL }
+
         override fun codec(id: String): ItemComponentType<Skillful> {
             return Codec(id)
         }
@@ -30,17 +33,17 @@ interface Skillful : Examinable, ItemComponent, TooltipProvider.Single {
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
-    private data object Value : Skillful, ItemComponentConfig(ItemComponentConstants.SKILLFUL) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { SKILLFUL }
-        private val tooltipText: SingleTooltip = SingleTooltip()
-
+    private data object Value : Skillful {
         override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
+            if (!config.showInTooltip) {
                 return LoreLine.noop()
             }
-            return LoreLine.simple(tooltipKey, listOf(tooltipText.render()))
+            return LoreLine.simple(tooltipKey, listOf(tooltip.render()))
         }
     }
 

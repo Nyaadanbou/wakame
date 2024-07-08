@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponent
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -20,9 +20,12 @@ import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-interface Kizamiable : Examinable, ItemComponent, TooltipProvider.Single {
+interface Kizamiable : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<Kizamiable> {
+    companion object : ItemComponentBridge<Kizamiable>, ItemComponentMeta {
+        override val configPath: String = ItemComponentConstants.KIZAMIABLE
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
+
         fun of(): Kizamiable {
             return Value
         }
@@ -34,17 +37,17 @@ interface Kizamiable : Examinable, ItemComponent, TooltipProvider.Single {
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
-    private data object Value : Kizamiable, ItemComponentConfig(ItemComponentConstants.KIZAMIZ) {
-        private val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
-        private val tooltipText: SingleTooltip = SingleTooltip()
-
+    private data object Value : Kizamiable {
         override fun provideTooltipLore(): LoreLine {
-            if (!showInTooltip) {
+            if (!config.showInTooltip) {
                 return LoreLine.noop()
             }
-            return LoreLine.simple(tooltipKey, listOf(tooltipText.render()))
+            return LoreLine.simple(tooltipKey, listOf(tooltip.render()))
         }
     }
 
