@@ -23,9 +23,6 @@ import java.lang.reflect.Type
 interface Kizamiable : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Kizamiable>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.KIZAMIABLE
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
-
         fun of(): Kizamiable {
             return Value
         }
@@ -37,6 +34,9 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.KIZAMIABLE
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

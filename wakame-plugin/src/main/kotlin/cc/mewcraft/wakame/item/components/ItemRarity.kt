@@ -37,9 +37,6 @@ data class ItemRarity(
 ) : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemRarity>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.RARITY
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { RARITY }
-
         override fun codec(id: String): ItemComponentType<ItemRarity> {
             return Codec(id)
         }
@@ -47,6 +44,9 @@ data class ItemRarity(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.RARITY
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { RARITY }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

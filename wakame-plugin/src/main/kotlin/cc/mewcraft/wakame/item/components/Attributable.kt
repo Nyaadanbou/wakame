@@ -27,7 +27,7 @@ import java.lang.reflect.Type
 
 interface Attributable : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<Attributable> {
+    companion object : ItemComponentBridge<Attributable>, ItemComponentMeta {
         fun of(): Attributable {
             return Value
         }
@@ -39,6 +39,12 @@ interface Attributable : Examinable, TooltipProvider.Single {
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.ATTRIBUTABLE
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ATTRIBUTABLE }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
     // 开发日记: 2024/6/24
@@ -47,19 +53,13 @@ interface Attributable : Examinable, TooltipProvider.Single {
     // 但需要注意的是, 即便是单例也依然提供了 LoreLine 的具体实现,
     // 这是因为我们 *有可能* 希望那些拥有 Attributable 组件的物品的提示框里
     // 能够显示一行 “提供属性加成” 的文本.
-    private data object Value : Attributable, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.ATTRIBUTABLE
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ATTRIBUTABLE }
-
+    private data object Value : Attributable {
         override fun provideTooltipLore(): LoreLine {
             if (!config.showInTooltip) {
                 return LoreLine.noop()
             }
             return LoreLine.simple(tooltipKey, listOf(tooltip.render()))
         }
-
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
-        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
     private data class Codec(

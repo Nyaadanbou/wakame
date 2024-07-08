@@ -13,9 +13,6 @@ import net.kyori.examination.Examinable
 interface SystemUse : Examinable {
 
     companion object : ItemComponentBridge<Unit>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.SYSTEM_USE
-        override val tooltipKey: Key = ItemComponentConstants.createKey { SYSTEM_USE }
-
         override fun codec(id: String): ItemComponentType<Unit> {
             return Codec(id)
         }
@@ -23,7 +20,10 @@ interface SystemUse : Examinable {
         override fun templateType(): ItemTemplateType<Nothing> {
             throw UnsupportedOperationException()
         }
-        
+
+        override val configPath: String = ItemComponentConstants.SYSTEM_USE
+        override val tooltipKey: Key = ItemComponentConstants.createKey { SYSTEM_USE }
+
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 

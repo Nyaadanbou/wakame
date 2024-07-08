@@ -22,10 +22,13 @@ import java.lang.reflect.Type
 
 interface FireResistant : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<FireResistant> {
+    companion object : ItemComponentBridge<FireResistant>, ItemComponentMeta {
         fun of(): FireResistant {
             return Value
         }
+
+        override val configPath: String = ItemComponentConstants.FIRE_RESISTANT
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { FIRE_RESISTANT }
 
         override fun codec(id: String): ItemComponentType<FireResistant> {
             return Codec(id)
@@ -34,21 +37,18 @@ interface FireResistant : Examinable, TooltipProvider.Single {
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
-    private data object Value : FireResistant, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.FIRE_RESISTANT
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { FIRE_RESISTANT }
-
+    private data object Value : FireResistant {
         override fun provideTooltipLore(): LoreLine {
             if (!config.showInTooltip) {
                 return LoreLine.noop()
             }
             return LoreLine.simple(tooltipKey, listOf(tooltip.render()))
         }
-
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
-        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
     private data class Codec(

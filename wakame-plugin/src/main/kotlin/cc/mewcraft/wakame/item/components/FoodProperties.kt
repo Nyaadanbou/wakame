@@ -46,9 +46,6 @@ data class FoodProperties(
     )
 
     companion object : ItemComponentBridge<FoodProperties>,  ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.FOOD
-        override val tooltipKey: Key = ItemComponentConstants.createKey { FOOD }
-
         override fun codec(id: String): ItemComponentType<FoodProperties> {
             return Codec(id)
         }
@@ -56,6 +53,9 @@ data class FoodProperties(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.FOOD
+        override val tooltipKey: Key = ItemComponentConstants.createKey { FOOD }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

@@ -47,8 +47,13 @@ data class ItemElements(
 ) : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemElements>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.ELEMENTS
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ELEMENTS }
+        fun of(elements: Collection<Element>): ItemElements {
+            return ItemElements(ObjectArraySet(elements))
+        }
+
+        fun of(vararg elements: Element): ItemElements {
+            return of(elements.toList())
+        }
 
         override fun codec(id: String): ItemComponentType<ItemElements> {
             return Codec(id)
@@ -57,6 +62,9 @@ data class ItemElements(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.ELEMENTS
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ELEMENTS }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.MergedTooltip = config.MergedTooltip()

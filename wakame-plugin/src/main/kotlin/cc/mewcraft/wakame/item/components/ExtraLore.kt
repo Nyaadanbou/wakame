@@ -36,9 +36,6 @@ data class ExtraLore(
 ) : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ExtraLore>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.LORE
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LORE }
-
         override fun codec(id: String): ItemComponentType<ExtraLore> {
             return Codec(id)
         }
@@ -46,6 +43,9 @@ data class ExtraLore(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.LORE
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LORE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.LoreTooltip = config.LoreTooltip()

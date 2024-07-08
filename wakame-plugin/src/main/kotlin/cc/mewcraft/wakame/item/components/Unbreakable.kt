@@ -29,9 +29,6 @@ interface Unbreakable : Examinable {
     val showInTooltip: Boolean
 
     companion object : ItemComponentBridge<Unbreakable>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.UNBREAKABLE
-        override val tooltipKey: Key = ItemComponentConstants.createKey { UNBREAKABLE }
-
         override fun codec(id: String): ItemComponentType<Unbreakable> {
             return Codec(id)
         }
@@ -39,6 +36,9 @@ interface Unbreakable : Examinable {
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.UNBREAKABLE
+        override val tooltipKey: Key = ItemComponentConstants.createKey { UNBREAKABLE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

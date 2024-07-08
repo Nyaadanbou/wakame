@@ -74,9 +74,6 @@ data class CustomName(
     )
 
     companion object : ItemComponentBridge<CustomName>, ItemComponentMeta, KoinComponent {
-        override val configPath: String = ItemComponentConstants.CUSTOM_NAME
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CUSTOM_NAME }
-
         override fun codec(id: String): ItemComponentType<CustomName> {
             return Codec(id)
         }
@@ -84,6 +81,9 @@ data class CustomName(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.CUSTOM_NAME
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CUSTOM_NAME }
 
         private val miniMessage by inject<MiniMessage>()
         private val config = ItemComponentConfig.provide(this)

@@ -61,9 +61,6 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             return BuilderImpl()
         }
 
-        override val configPath: String = ItemComponentConstants.CELLS
-        override val tooltipKey: Key = ItemComponentConstants.createKey { CELLS }
-
         override fun codec(id: String): ItemComponentType<ItemCells> {
             return Codec(id)
         }
@@ -71,6 +68,9 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.CELLS
+        override val tooltipKey: Key = ItemComponentConstants.createKey { CELLS }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

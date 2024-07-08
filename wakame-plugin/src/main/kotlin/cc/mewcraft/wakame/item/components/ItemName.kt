@@ -55,9 +55,6 @@ data class ItemName(
     )
 
     companion object : ItemComponentBridge<ItemName>, ItemComponentMeta, KoinComponent {
-        override val configPath: String = ItemComponentConstants.ITEM_NAME
-        override val tooltipKey: Key = ItemComponentConstants.createKey { ITEM_NAME }
-
         override fun codec(id: String): ItemComponentType<ItemName> {
             return Codec(id)
         }
@@ -65,6 +62,9 @@ data class ItemName(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.ITEM_NAME
+        override val tooltipKey: Key = ItemComponentConstants.createKey { ITEM_NAME }
 
         private val miniMessage: MiniMessage by inject()
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)

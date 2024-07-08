@@ -84,9 +84,6 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
             return BuilderImpl()
         }
 
-        override val configPath: String = ItemComponentConstants.TRACKABLE
-        override val tooltipKey: Key = ItemComponentConstants.createKey { TRACKABLE }
-
         override fun codec(id: String): ItemComponentType<ItemTracks> {
             return Codec(id)
         }
@@ -94,6 +91,9 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
         override fun templateType(): Nothing {
             throw UnsupportedOperationException()
         }
+
+        override val configPath: String = ItemComponentConstants.TRACKABLE
+        override val tooltipKey: Key = ItemComponentConstants.createKey { TRACKABLE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

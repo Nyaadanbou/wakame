@@ -22,7 +22,7 @@ import java.lang.reflect.Type
 
 interface Castable : Examinable, TooltipProvider.Single {
 
-    companion object : ItemComponentBridge<Castable> {
+    companion object : ItemComponentBridge<Castable>, ItemComponentMeta {
         fun of(): Castable {
             return Value
         }
@@ -34,21 +34,21 @@ interface Castable : Examinable, TooltipProvider.Single {
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
-    }
 
-    private data object Value : Castable, ItemComponentMeta {
         override val configPath: String = ItemComponentConstants.CASTABLE
         override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CASTABLE }
 
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
+        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
+    }
+
+    private data object Value : Castable {
         override fun provideTooltipLore(): LoreLine {
             if (!config.showInTooltip) {
                 return LoreLine.noop()
             }
             return LoreLine.simple(tooltipKey, listOf(tooltip.render()))
         }
-
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
-        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
     private data class Codec(

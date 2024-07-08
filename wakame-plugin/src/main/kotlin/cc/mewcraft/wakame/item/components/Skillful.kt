@@ -23,9 +23,6 @@ import java.lang.reflect.Type
 interface Skillful : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Skillful>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.SKILLFUL
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { SKILLFUL }
-
         override fun codec(id: String): ItemComponentType<Skillful> {
             return Codec(id)
         }
@@ -33,6 +30,9 @@ interface Skillful : Examinable, TooltipProvider.Single {
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.SKILLFUL
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { SKILLFUL }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

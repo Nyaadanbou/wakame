@@ -36,9 +36,6 @@ data class Tool(
     )
 
     companion object : ItemComponentBridge<Tool>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.TOOL
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { TOOL }
-
         override fun codec(id: String): ItemComponentType<Tool> {
             return Codec(id)
         }
@@ -46,6 +43,9 @@ data class Tool(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.TOOL
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { TOOL }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

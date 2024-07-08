@@ -47,11 +47,12 @@ data class ItemKizamiz(
 ) : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemKizamiz>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.KIZAMIZ
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
+        fun of(kizamiz: Collection<Kizami>): ItemKizamiz {
+            return ItemKizamiz(ObjectArraySet(kizamiz))
+        }
 
-        fun of(kizamiz: Set<Kizami>): ItemKizamiz {
-            return ItemKizamiz(kizamiz)
+        fun of(vararg kizamiz: Kizami): ItemKizamiz {
+            return of(kizamiz.toList())
         }
 
         override fun codec(id: String): ItemComponentType<ItemKizamiz> {
@@ -61,6 +62,9 @@ data class ItemKizamiz(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.KIZAMIZ
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.MergedTooltip = config.MergedTooltip()

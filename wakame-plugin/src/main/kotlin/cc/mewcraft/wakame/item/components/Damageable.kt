@@ -39,9 +39,6 @@ data class Damageable(
 ) : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Damageable>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.DAMAGEABLE
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { DAMAGEABLE }
-
         override fun codec(id: String): ItemComponentType<Damageable> {
             return Codec(id)
         }
@@ -49,6 +46,9 @@ data class Damageable(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.DAMAGEABLE
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { DAMAGEABLE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

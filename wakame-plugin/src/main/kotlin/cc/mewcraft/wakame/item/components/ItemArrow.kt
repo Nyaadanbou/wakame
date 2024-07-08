@@ -43,9 +43,6 @@ data class ItemArrow(
             return ItemArrow(pierceLevel.toStableByte())
         }
 
-        override val configPath: String = ItemComponentConstants.ARROW
-        override val tooltipKey: Key = ItemComponentConstants.createKey { ARROW }
-
         override fun codec(id: String): ItemComponentType<ItemArrow> {
             return Codec(id)
         }
@@ -53,6 +50,9 @@ data class ItemArrow(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.ARROW
+        override val tooltipKey: Key = ItemComponentConstants.createKey { ARROW }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

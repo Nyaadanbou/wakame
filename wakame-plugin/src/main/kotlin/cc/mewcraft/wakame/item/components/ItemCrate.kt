@@ -33,9 +33,6 @@ data class ItemCrate(
 ) : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemCrate>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.CRATE
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CRATE }
-
         override fun codec(id: String): ItemComponentType<ItemCrate> {
             return Codec(id)
         }
@@ -43,6 +40,9 @@ data class ItemCrate(
         override fun templateType(): ItemTemplateType<Template> {
             return TemplateType
         }
+
+        override val configPath: String = ItemComponentConstants.CRATE
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CRATE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
