@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.item.components.cells.cores.empty
 
+import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.GenericKeys
-import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.DisplaySupport
 import cc.mewcraft.wakame.display.DynamicLoreMeta
@@ -14,7 +15,8 @@ import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
 
@@ -41,7 +43,10 @@ internal class EmptyCoreLoreMetaCreator : DynamicLoreMetaCreator {
 
 internal data object EmptyLoreLine : LoreLine {
     override val key: TooltipKey = GenericKeys.EMPTY
-    override val content: List<Component> by Configs.YAML[ITEM_GLOBAL_CONFIG_FILE].entry<List<Component>>("general", "empty_cell_tooltips")
+    override val content: List<Component> by ItemComponentRegistry.CONFIG
+        .derive(ItemComponentConstants.CELLS)
+        .entry<Component>("tooltips", "empty")
+        .map(::listOf)
 }
 
 internal data class EmptyLoreMeta(
