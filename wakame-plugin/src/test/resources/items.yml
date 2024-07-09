@@ -158,6 +158,12 @@ components:
     tooltips:
       single: "<!i>皮肤所有者: <skin_owner_name>"
 
+  system_use:
+    enabled: true
+    display_name: "系统使用"
+    tooltips:
+      single: "<!i>系统使用"
+
   tool:
     enabled: true
     display_name: "工具"
