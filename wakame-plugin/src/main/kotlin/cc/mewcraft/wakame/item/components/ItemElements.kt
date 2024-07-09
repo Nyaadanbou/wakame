@@ -36,7 +36,6 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
-import java.lang.reflect.Type
 import java.util.stream.Stream
 
 data class ItemElements(
@@ -125,15 +124,21 @@ data class ItemElements(
     }
 
     private data class TemplateType(
-        override val id: String
+        override val id: String,
     ) : ItemTemplateType<Template>, KoinComponent {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>: <pool>
+         * ```
+         */
+        override fun decode(node: ConfigurationNode): Template {
             return Template(node.krequire<Pool<Element, GenerationContext>>())
         }
 
-        override fun childSerializers(): TypeSerializerCollection {
+        override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
                 .registerAll(get(named(ELEMENT_EXTERNALS)))
                 .kregister(ElementPoolSerializer)

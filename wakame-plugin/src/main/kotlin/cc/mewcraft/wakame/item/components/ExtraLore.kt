@@ -26,7 +26,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
-import java.lang.reflect.Type
 
 data class ExtraLore(
     /**
@@ -108,9 +107,17 @@ data class ExtraLore(
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   - "MiniMessage string"
+         *   - "MiniMessage string"
+         * ```
+         */
+        override fun decode(node: ConfigurationNode): Template {
             return Template(node.getList<String>(emptyList()))
         }
     }

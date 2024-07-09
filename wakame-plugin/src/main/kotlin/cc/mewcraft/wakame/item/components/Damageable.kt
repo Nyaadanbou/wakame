@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 import org.bukkit.inventory.meta.Damageable as CraftDamageable
 
 data class Damageable(
@@ -120,7 +119,7 @@ data class Damageable(
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -131,7 +130,7 @@ data class Damageable(
          *   disappear_when_broken: <boolean>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val damage = node.node("damage").krequire<RandomizedValue>()
             val maxDamage = node.node("max_damage").krequire<RandomizedValue>()
             val disappearWhenBroken = node.node("disappear_when_broken").krequire<Boolean>()

@@ -16,7 +16,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemFlag
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 interface HideAdditionalTooltip : Examinable {
 
@@ -74,7 +73,7 @@ interface HideAdditionalTooltip : Examinable {
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -82,7 +81,7 @@ interface HideAdditionalTooltip : Examinable {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             return Template
         }
     }

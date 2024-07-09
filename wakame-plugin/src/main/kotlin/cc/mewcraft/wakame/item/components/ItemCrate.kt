@@ -23,7 +23,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 data class ItemCrate(
     /**
@@ -91,9 +90,9 @@ data class ItemCrate(
     }
 
     private data class TemplateType(
-        override val id: String
+        override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -102,7 +101,7 @@ data class ItemCrate(
          *   key: "foo:bar"
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val raw = node.node("key").krequire<Key>()
             return Template(raw)
         }

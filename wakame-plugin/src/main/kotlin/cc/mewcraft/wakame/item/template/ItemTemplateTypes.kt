@@ -178,8 +178,7 @@ object ItemTemplateTypes {
     }
 
     internal fun <T : ItemTemplate<*>> ItemTemplateType<T>.register(): ItemTemplateType<T> {
-        ItemTemplateTypeHelper.serializerBuilder.register(this.typeToken, this)
-        ItemTemplateTypeHelper.serializerBuilder.registerAll(this.childSerializers())
+        ItemTemplateTypeHelper.serializerBuilder.registerAll(this.childrenCodecs())
         return this
     }
 }

@@ -24,7 +24,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
-import java.lang.reflect.Type
 
 data class ItemLevel(
     /**
@@ -125,9 +124,9 @@ data class ItemLevel(
     }
 
     private data class TemplateType(
-        override val id: String
+        override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure 1
@@ -140,11 +139,11 @@ data class ItemLevel(
          * <node>: <enum>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             return when (val scalar = node.rawScalar()) {
                 is Number -> Template(scalar)
                 is String -> Template(EnumLookup.lookup<Option>(scalar).getOrThrow())
-                else -> throw SerializationException(node, type, "Invalid value type")
+                else -> throw SerializationException(node, type.type, "Invalid value type")
             }
         }
     }

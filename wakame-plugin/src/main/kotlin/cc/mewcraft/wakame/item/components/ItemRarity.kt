@@ -27,7 +27,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
-import java.lang.reflect.Type
 
 data class ItemRarity(
     /**
@@ -154,7 +153,7 @@ data class ItemRarity(
             const val RARITY_PREFIX = "rarity:"
         }
 
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure 1
@@ -167,7 +166,7 @@ data class ItemRarity(
          * <node>: "rarity:_"
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val string = node.krequire<String>()
             return when {
                 string.startsWith(MAPPING_PREFIX) -> Template(

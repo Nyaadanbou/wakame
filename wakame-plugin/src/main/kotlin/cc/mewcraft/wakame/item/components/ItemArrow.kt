@@ -23,7 +23,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 // 开发日记: 2024/6/25 小米
 // 这是文件列表里的第一个物品组件,
@@ -124,7 +123,7 @@ data class ItemArrow(
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -133,7 +132,7 @@ data class ItemArrow(
          *   pierce_level: <randomized_value>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
             return Template(pierceLevel)
         }

@@ -48,7 +48,6 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
-import java.lang.reflect.Type
 
 interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<String, Cell>> {
 
@@ -307,9 +306,9 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     }
 
     private data class TemplateType(
-        override val id: String
+        override val id: String,
     ) : ItemTemplateType<Template>, KoinComponent {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -342,7 +341,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
          *       ...
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             // 先把节点的键 (Any) 转成 String
             val bucketMap: Map<String, ConfigurationNode> = node
                 .node("buckets")
@@ -366,7 +365,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             return Template(templates)
         }
 
-        override fun childSerializers(): TypeSerializerCollection {
+        override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
 
                 // 随机选择器

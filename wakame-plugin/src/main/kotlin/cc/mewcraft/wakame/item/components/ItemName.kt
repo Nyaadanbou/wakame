@@ -25,7 +25,6 @@ import net.kyori.examination.Examinable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 data class ItemName(
     /**
@@ -161,9 +160,9 @@ data class ItemName(
     }
 
     private data class TemplateType(
-        override val id: String
+        override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -171,7 +170,7 @@ data class ItemName(
          * <node>: <string>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             return Template(node.string)
         }
     }

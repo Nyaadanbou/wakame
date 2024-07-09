@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.editMeta
+import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
@@ -23,7 +24,6 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
-import java.lang.reflect.Type
 
 data class ItemEnchantments(
     val enchantments: Map<Enchantment, Int>,
@@ -124,7 +124,7 @@ data class ItemEnchantments(
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -136,13 +136,13 @@ data class ItemEnchantments(
          *     <key>: <level>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val enchantments = node.node("entries").childrenMap()
                 .mapKeys { (key, _) ->
                     try {
                         Key.key(key.toString())
                     } catch (e: InvalidKeyException) {
-                        throw SerializationException(node, type, "Malformed enchantment key: '$key'", e)
+                        throw SerializationException(node, javaTypeOf<Template>(), "Malformed enchantment key: '$key'", e)
                     }
                 }
                 .mapValues { (_, node) ->

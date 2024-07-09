@@ -14,7 +14,6 @@ import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.meta.ArmorMeta
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 data class ArmorTrim(
     val showInTooltip: Boolean,
@@ -69,7 +68,7 @@ data class ArmorTrim(
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -78,7 +77,7 @@ data class ArmorTrim(
          *   show_in_tooltip: <boolean>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
             return Template(showInTooltip)
         }

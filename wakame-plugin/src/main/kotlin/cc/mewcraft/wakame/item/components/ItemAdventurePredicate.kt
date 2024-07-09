@@ -14,7 +14,6 @@ import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemFlag
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 data class ItemAdventurePredicate(
     val showInTooltip: Boolean,
@@ -98,7 +97,7 @@ data class ItemAdventurePredicate(
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -107,11 +106,11 @@ data class ItemAdventurePredicate(
          *   show_in_tooltip: <boolean>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
             return when (id) {
-                ItemComponentConstants.CAN_BREAK -> Template(ItemComponentTypes.CAN_BREAK,showInTooltip)
-                ItemComponentConstants.CAN_PLACE_ON -> Template(ItemComponentTypes.CAN_PLACE_ON,showInTooltip)
+                ItemComponentConstants.CAN_BREAK -> Template(ItemComponentTypes.CAN_BREAK, showInTooltip)
+                ItemComponentConstants.CAN_PLACE_ON -> Template(ItemComponentTypes.CAN_PLACE_ON, showInTooltip)
                 else -> throw IllegalArgumentException("Unknown template id: '$id'")
             }
         }

@@ -4,7 +4,6 @@ import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
@@ -27,16 +26,28 @@ import java.util.stream.Stream
  *
  * @param T 物品模板的类型
  */
-interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T>, Examinable {
+interface ItemTemplateType<T : ItemTemplate<*>> : Examinable {
     /**
      * 模板的唯一标识.
      */
     val id: String
 
     /**
-     * The [TypeToken] of [T].
+     * 该模板的类型.
      */
-    val typeToken: TypeToken<T> // generic sucks :x
+    val type: TypeToken<T>
+
+    /**
+     * 定义如何将 [node] 反序列化为 [T].
+     */
+    fun decode(node: ConfigurationNode): T
+
+    /**
+     * 定义如何将 [T] 序列化到 [node].
+     */
+    fun encode(type: Type, obj: T?, node: ConfigurationNode): Nothing {
+        throw UnsupportedOperationException()
+    }
 
     /**
      * 该序列化会用到的子序列化器.
@@ -45,34 +56,11 @@ interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T>, Examinable 
      *
      * 默认返回空集合, 意为该组件没有子序列化器.
      */
-    fun childSerializers(): TypeSerializerCollection {
+    fun childrenCodecs(): TypeSerializerCollection {
         return TypeSerializerCollection.builder().build()
     }
 
-    /**
-     * 定义如何将 [node] 反序列化为 [T].
-     */
-    override fun deserialize(type: Type, node: ConfigurationNode): T
-
-    /**
-     * 定义如何将 [T] 序列化到 [node].
-     */
-    override fun serialize(type: Type, obj: T?, node: ConfigurationNode): Nothing {
-        throw UnsupportedOperationException()
-    }
-
-    /**
-     * 如果该模板在缺省时需要有个默认值,
-     * 那么该函数必须返回一个非空的值.
-     * 返回的值将作为默认值使用.
-     *
-     * 默认返回 `null`, 意为该组件没有默认模板.
-     */
-    override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): T? {
-        return null
-    }
-
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("type", typeToken.type)
+        ExaminableProperty.of("id", id)
     )
 }

@@ -37,7 +37,6 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
-import java.lang.reflect.Type
 
 data class ItemKizamiz(
     /**
@@ -115,15 +114,15 @@ data class ItemKizamiz(
     }
 
     private data class TemplateType(
-        override val id: String
+        override val id: String,
     ) : ItemTemplateType<Template>, KoinComponent {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             return Template(node.krequire<Group<Kizami, GenerationContext>>())
         }
 
-        override fun childSerializers(): TypeSerializerCollection {
+        override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
                 .registerAll(get(named(RARITY_EXTERNALS)))
                 .registerAll(get(named(KIZAMI_EXTERNALS)))

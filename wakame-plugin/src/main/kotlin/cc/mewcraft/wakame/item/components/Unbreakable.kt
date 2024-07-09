@@ -17,7 +17,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemFlag
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 // 开发日记 2024/6/27
 // 之所以写这个组件是因为想验证一下
@@ -91,7 +90,7 @@ interface Unbreakable : Examinable {
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -100,7 +99,7 @@ interface Unbreakable : Examinable {
          *   show_in_tooltip: <boolean>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
             return Template(showInTooltip)
         }

@@ -58,7 +58,8 @@ object NekoItemFactory {
 
             fun <T : ItemTemplate<*>> tryAdd(path: String, type: ItemTemplateType<T>) {
                 val node = root.node(path)
-                val template = node.get(type.typeToken) ?: return
+                if (node.virtual()) return // 如果节点是虚拟的, 则直接返回
+                val template = type.decode(node)
                 this.put(type, template)
             }
 

@@ -19,7 +19,6 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 interface Skillful : Examinable, TooltipProvider.Single {
 
@@ -75,7 +74,7 @@ interface Skillful : Examinable, TooltipProvider.Single {
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -83,7 +82,7 @@ interface Skillful : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             return Template
         }
     }

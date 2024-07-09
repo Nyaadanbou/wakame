@@ -25,7 +25,6 @@ import net.kyori.examination.Examinable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 // 开发日记 2024/6/28
 // CustomName 有几个需要思考的问题:
@@ -182,7 +181,7 @@ data class CustomName(
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -190,7 +189,7 @@ data class CustomName(
          * <node>: <string>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             return Template(node.string)
         }
     }

@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
-import java.lang.reflect.Type
 
 data class ItemDyeColor(
     val rgb: Int,
@@ -81,9 +80,9 @@ data class ItemDyeColor(
     }
 
     private data class TemplateType(
-        override val id: String
+        override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -92,7 +91,7 @@ data class ItemDyeColor(
          *   show_in_tooltip: <boolean>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val rgb = node.node("rgb").int.takeIf { it in 0x000000..0xFFFFFF } ?: throw SerializationException(node, javaTypeOf<Int>(), "RGB value out of range")
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
             return Template(

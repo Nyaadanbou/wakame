@@ -29,7 +29,6 @@ import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
-import java.lang.reflect.Type
 
 data class FoodProperties(
     val nutrition: Int,
@@ -142,7 +141,7 @@ data class FoodProperties(
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -157,7 +156,7 @@ data class FoodProperties(
          *       effect: <potion_effect>
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             val nutrition = node.node("nutrition").getInt(0)
             val saturation = node.node("saturation").getFloat(0f)
             val canAlwaysEat = node.node("can_always_eat").getBoolean(false)
@@ -171,7 +170,7 @@ data class FoodProperties(
             return Template(nutrition, saturation, canAlwaysEat, eatSeconds, effects, skills)
         }
 
-        override fun childSerializers(): TypeSerializerCollection {
+        override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
                 .kregister(PotionEffectSerializer)
                 .kregister(PotionEffectTypeSerializer)

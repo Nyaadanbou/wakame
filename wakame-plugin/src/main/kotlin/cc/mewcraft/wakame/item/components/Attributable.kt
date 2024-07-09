@@ -18,7 +18,6 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
 
 // 开发日记 2024/7/5
 // 1. 所有组件的数据类实现 ItemComponent 接口
@@ -103,7 +102,7 @@ interface Attributable : Examinable, TooltipProvider.Single {
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -111,7 +110,7 @@ interface Attributable : Examinable, TooltipProvider.Single {
          * <node>: {}
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             return Template
         }
     }

@@ -21,7 +21,6 @@ import org.bukkit.NamespacedKey
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
-import java.lang.reflect.Type
 
 data class Tool(
     val defaultMiningSpeed: Float,
@@ -96,7 +95,7 @@ data class Tool(
     private data class TemplateType(
         override val id: String,
     ) : ItemTemplateType<Template> {
-        override val typeToken: TypeToken<Template> = typeTokenOf()
+        override val type: TypeToken<Template> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -113,7 +112,7 @@ data class Tool(
          *       correct_for_drops: true
          * ```
          */
-        override fun deserialize(type: Type, node: ConfigurationNode): Template {
+        override fun decode(node: ConfigurationNode): Template {
             // optional
             val defaultMiningSpeed = node.node("default_mining_speed").getFloat(1F)
             // optional
