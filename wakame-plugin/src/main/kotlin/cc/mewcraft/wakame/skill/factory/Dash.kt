@@ -3,9 +3,7 @@ package cc.mewcraft.wakame.skill.factory
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillBase
-import cc.mewcraft.wakame.skill.TriggerConditions
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
@@ -48,19 +46,19 @@ interface Dash : Skill {
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
-                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("冲刺的前摇摇摇摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("冲刺的后摇摇摇摇摇摇摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickCast(): TickResult {
-                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 val direction = player.location.direction.normalize()
                 val velocity = direction.multiply(distance)
                 player.velocity = velocity

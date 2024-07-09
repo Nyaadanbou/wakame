@@ -4,9 +4,7 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillBase
-import cc.mewcraft.wakame.skill.TriggerConditions
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
@@ -53,21 +51,21 @@ interface RemovePotionEffect : Skill {
             private var counter: Int = 0
 
             override fun tickCastPoint(): TickResult {
-                val player = context.getOrThrow(SkillContextKey.CASTER_PLAYER).bukkitPlayer
+                val player = context.getOrThrow(SkillContextKey.CASTER).valueNonNull<Caster.Single.Player>().bukkitPlayer
                 player.sendPlainMessage("移除药水效果前摇")
                 counter++
                 return if (counter >= 20) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER]?.valueNonNull<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("移除药水效果后摇")
                 counter++
                 return if (counter >= 60) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
             }
 
             override fun tickCast(): TickResult {
-                val entity = context.getOrThrow(SkillContextKey.CASTER_ENTITY).bukkitEntity
+                val entity = context.getOrThrow(SkillContextKey.CASTER).valueNonNull<Caster.Single.Entity>().bukkitEntity
                 if (entity is LivingEntity) {
                     effectTypes.forEach { entity.removePotionEffect(it) }
                 }

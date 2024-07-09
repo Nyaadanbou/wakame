@@ -4,8 +4,10 @@ import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.molang.MoLangSupport
+import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
+import cc.mewcraft.wakame.skill.value
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -50,7 +52,7 @@ interface MoLangExpression : SkillCondition {
                 notification.notifySuccess(context)
 
                 // 自定义的逻辑
-                context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer?.heal(2.0)
+                context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer?.heal(2.0)
             }
 
             override fun onFailure(context: SkillContext) {
@@ -58,7 +60,7 @@ interface MoLangExpression : SkillCondition {
                 notification.notifyFailure(context)
 
                 // 自定义的逻辑
-                context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer?.damage(2.0)
+                context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer?.damage(2.0)
             }
         }
     }

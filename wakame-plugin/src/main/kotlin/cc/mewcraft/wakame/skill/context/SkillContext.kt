@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.Target
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.skill.toComposite
 import org.bukkit.inventory.ItemStack
 import team.unnamed.mocha.MochaEngine
 
@@ -22,7 +22,7 @@ sealed interface SkillContext {
     operator fun <T : Any> contains(key: SkillContextKey<T>): Boolean
 }
 
-fun SkillContext(caster: Caster, target: Target? = null, nekoStack: NekoStack? = null): SkillContext {
+fun SkillContext(caster: Caster.CompositeNode, target: Target? = null, nekoStack: NekoStack? = null): SkillContext {
     val context = SkillContextImpl()
     with(context) {
         // 技能必须有 caster
@@ -44,6 +44,10 @@ fun SkillContext(caster: Caster, target: Target? = null, nekoStack: NekoStack? =
     return context
 }
 
+fun SkillContext(caster: Caster.Single, target: Target? = null, nekoStack: NekoStack? = null): SkillContext {
+    return SkillContext(caster.toComposite(), target, nekoStack)
+}
+
 /* Internals */
 
 private data object EmptySkillContext : SkillContext {
@@ -62,7 +66,7 @@ private class SkillContextImpl : SkillContext {
     override fun <T : Any> set(key: SkillContextKey<T>, value: T) {
         when (key) {
             SkillContextKey.CASTER -> {
-                caster = value as Caster
+                caster = value as Caster.CompositeNode
                 return
             }
             SkillContextKey.TARGET -> {
@@ -107,32 +111,11 @@ private class SkillContextImpl : SkillContext {
         return storage.hashCode()
     }
 
-    var caster: Caster?
+    var caster: Caster.CompositeNode?
         get() = get(SkillContextKey.CASTER)
         set(value) {
             value ?: return
             storage[SkillContextKey.CASTER] = value
-            when (value) {
-                is Caster.Single.Player -> {
-                    set(SkillContextKey.CASTER_PLAYER, value)
-                    set(SkillContextKey.CASTER_ENTITY, value)
-                    set(SkillContextKey.USER, value.bukkitPlayer.toUser())
-                    set(SkillContextKey.CASTER_AUDIENCE, value.bukkitPlayer)
-                }
-
-                is Caster.Single.Entity -> {
-                    set(SkillContextKey.CASTER_ENTITY, value)
-                    set(SkillContextKey.CASTER_AUDIENCE, value.bukkitEntity)
-                }
-
-                is Caster.Single.Skill -> {
-                    set(SkillContextKey.CASTER_SKILL, value)
-                }
-
-                is Caster.CompositeNode -> {
-                    set(SkillContextKey.CASTER_COMPOSITE_NODE, value)
-                }
-            }
         }
 
     var target: Target?
@@ -140,18 +123,6 @@ private class SkillContextImpl : SkillContext {
         set(value) {
             value ?: return
             storage[SkillContextKey.TARGET] = value
-            when (value) {
-                is Target.LivingEntity -> {
-                    set(SkillContextKey.TARGET_LIVING_ENTITY, value)
-                    set(SkillContextKey.TARGET_AUDIENCE, value.bukkitEntity)
-                }
-
-                is Target.Location -> {
-                    set(SkillContextKey.TARGET_LOCATION, value)
-                }
-
-                is Target.Void -> {}
-            }
         }
 
     var nekoStack: NekoStack?

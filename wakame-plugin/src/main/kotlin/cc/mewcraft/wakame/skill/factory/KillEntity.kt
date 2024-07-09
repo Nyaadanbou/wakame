@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.skill.factory
 
 import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillBase
-import cc.mewcraft.wakame.skill.TriggerConditions
+import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
@@ -35,19 +34,19 @@ interface KillEntity : Skill {
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
-                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("杀死生物前摇awa")
                 return TickResult.ALL_DONE
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("杀死生物后摇qwq")
                 return TickResult.ALL_DONE
             }
 
             override fun tickCast(): TickResult {
-                val entity = context[SkillContextKey.TARGET_LIVING_ENTITY]?.bukkitEntity ?: return TickResult.INTERRUPT
+                val entity = context[SkillContextKey.TARGET]?.value<Target.LivingEntity>()?.bukkitEntity ?: return TickResult.INTERRUPT
                 entity.health = 0.0
                 return TickResult.ALL_DONE
             }

@@ -5,6 +5,7 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.*
@@ -54,11 +55,12 @@ interface PotionDrop : Skill {
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
             override fun tickCast(): TickResult {
                 val location = when {
-                    SkillContextKey.TARGET_LOCATION in context -> {
-                        context.getOrThrow(SkillContextKey.TARGET_LOCATION).bukkitLocation
+                    SkillContextKey.TARGET in context -> {
+                        context.getOrThrow(SkillContextKey.TARGET).value<Target.Location>()?.bukkitLocation ?: return TickResult.INTERRUPT
                     }
-                    SkillContextKey.CASTER_ENTITY in context -> {
-                        context.getOrThrow(SkillContextKey.CASTER_ENTITY).bukkitEntity.location
+                    SkillContextKey.CASTER in context -> {
+                        val entity = context.getOrThrow(SkillContextKey.CASTER).value<Caster.Single.Entity>() ?: return TickResult.INTERRUPT
+                        entity.bukkitEntity.location
                     }
                     else -> return TickResult.INTERRUPT
                 }

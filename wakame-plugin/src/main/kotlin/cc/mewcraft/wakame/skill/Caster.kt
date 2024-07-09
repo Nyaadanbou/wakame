@@ -41,8 +41,6 @@ sealed interface Caster {
      * 代表一个复合施法者, 由一个父施法者和多个子施法者组成.
      */
     interface CompositeNode : Caster {
-        val value: Single
-
         val parent: CompositeNode?
 
         val children: Set<CompositeNode>?
@@ -51,8 +49,38 @@ sealed interface Caster {
 
         fun removeChild(child: CompositeNode)
 
-        fun root(): CompositeNode
+        fun <T : Single> value(clazz: Class<T>): T?
+
+        fun <T : Single> valueNonNull(clazz: Class<T>): T {
+            return requireNotNull(value(clazz)) { "Value of type $clazz is null." }
+        }
+
+        fun <T : Single> root(clazz: Class<T>): T?
+
+        fun <T : Single> rootNonNull(clazz: Class<T>): T {
+            return requireNotNull(root(clazz)) { "Root value of type $clazz is null." }
+        }
     }
+}
+
+fun Caster.Single.toComposite(parent: Caster.CompositeNode? = null): Caster.CompositeNode {
+    return CasterAdapter.composite(this, parent)
+}
+
+inline fun <reified T : Caster.Single> Caster.CompositeNode.value(): T? {
+    return value(T::class.java)
+}
+
+inline fun <reified T : Caster.Single> Caster.CompositeNode.valueNonNull(): T {
+    return valueNonNull(T::class.java)
+}
+
+inline fun <reified T : Caster.Single> Caster.CompositeNode.root(): T? {
+    return root(T::class.java)
+}
+
+inline fun <reified T : Caster.Single> Caster.CompositeNode.rootNonNull(): T {
+    return rootNonNull(T::class.java)
 }
 
 object CasterAdapter {
@@ -106,7 +134,7 @@ private data class SkillCaster(
 
 private class CompositeNodeCaster(
     override var parent: Caster.CompositeNode?,
-    override val value: Caster.Single
+    private val value: Caster.Single
 ) : Caster.CompositeNode {
     override var children: MutableSet<Caster.CompositeNode>? = null
 
@@ -128,11 +156,19 @@ private class CompositeNodeCaster(
         children?.remove(child)
     }
 
-    override fun root(): Caster.CompositeNode {
+    override fun <T : Caster.Single> value(clazz: Class<T>): T? {
+        return if (clazz.isInstance(value)) {
+            clazz.cast(value)
+        } else {
+            null
+        }
+    }
+
+    override fun <T : Caster.Single> root(clazz: Class<T>): T? {
         var current: Caster.CompositeNode = this
         while (current.parent != null) {
             current = current.parent as Caster.CompositeNode
         }
-        return current
+        return current.value(clazz)
     }
 }

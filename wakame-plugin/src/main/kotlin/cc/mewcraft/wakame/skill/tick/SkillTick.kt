@@ -1,13 +1,9 @@
 package cc.mewcraft.wakame.skill.tick
 
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.TriggerConditions
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
-import cc.mewcraft.wakame.skill.state.BackswingStateInfo
-import cc.mewcraft.wakame.skill.state.CastPointStateInfo
-import cc.mewcraft.wakame.skill.state.CastStateInfo
-import cc.mewcraft.wakame.skill.state.SkillStateInfo
+import cc.mewcraft.wakame.skill.state.*
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.tick.Tickable
@@ -106,11 +102,17 @@ abstract class AbstractPlayerSkillTick(
      */
     open val interruptTriggers: TriggerConditions = TriggerConditions.empty()
 
+    protected val userState: SkillState?
+        get() {
+            val user = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer?.toUser() ?: return null
+            val state = user.skillState
+            if (state.info.skillTick != this)
+                return null
+            return state
+        }
+
     final override fun tick(): TickResult {
-        val user = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer?.toUser() ?: return tickCast()
-        val state = user.skillState
-        if (state.info.skillTick != this)
-            return tickCast()
+        val state = userState ?: return tickCast()
 
         return when (state.info) {
             is CastPointStateInfo -> tickCastPoint()
@@ -126,10 +128,5 @@ abstract class AbstractPlayerSkillTick(
 
     final override fun isInterrupted(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean {
         return interruptTriggers.values.get(type).contains(trigger)
-    }
-
-    fun isPlayerTick(): Boolean {
-        val user = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer?.toUser() ?: return false
-        return user.skillState.info.skillTick == this
     }
 }

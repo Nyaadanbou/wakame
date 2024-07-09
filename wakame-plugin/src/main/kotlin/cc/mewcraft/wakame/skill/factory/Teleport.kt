@@ -7,10 +7,8 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.Caster
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillBase
-import cc.mewcraft.wakame.skill.TriggerConditions
+import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
@@ -31,6 +29,7 @@ interface Teleport : Skill {
 
     sealed interface Type {
         data class FIXED(val position: Position) : Type
+        data class RANDOM(val distance: Double) : Type
         data object TARGET : Type
     }
 
@@ -49,6 +48,10 @@ interface Teleport : Skill {
 
                 "target" -> {
                     Type.TARGET
+                }
+
+                "random" -> {
+                    Type.RANDOM(node.node("distance").krequire<Double>())
                 }
 
                 else -> {
@@ -86,25 +89,35 @@ interface Teleport : Skill {
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(): TickResult {
-                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER]?.root<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("传送前摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickBackswing(): TickResult {
-                val player = context[SkillContextKey.CASTER_PLAYER]?.bukkitPlayer ?: return TickResult.INTERRUPT
+                val player = context[SkillContextKey.CASTER]?.root<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("传送后摇")
                 return TickResult.ALL_DONE
             }
 
             override fun tickCast(): TickResult {
-                val node = context[SkillContextKey.CASTER_COMPOSITE_NODE] ?: return TickResult.INTERRUPT
-                val caster = node.root().value as? Caster.Single.Entity ?: return TickResult.INTERRUPT
-                val location = context[SkillContextKey.TARGET_LOCATION]?.bukkitLocation ?: return TickResult.INTERRUPT
+                val node = context[SkillContextKey.CASTER] ?: return TickResult.INTERRUPT
+                val caster = node.root<Caster.Single.Entity>() ?: return TickResult.INTERRUPT
+                val target = context[SkillContextKey.TARGET]
+                val location = target?.value<Target.Location>()?.bukkitLocation ?: target?.value<Target.LivingEntity>()?.bukkitEntity?.location ?: return TickResult.INTERRUPT
                 when (val type = type) {
                     is Type.FIXED -> {
                         val position = type.position
                         caster.bukkitEntity.teleport(position.toLocation(caster.bukkitEntity.world))
+                    }
+
+                    is Type.RANDOM -> {
+                        val random = location.clone().add(
+                            (Math.random() - 0.5) * type.distance,
+                            0.0,
+                            (Math.random() - 0.5) * type.distance
+                        )
+                        caster.bukkitEntity.teleport(random)
                     }
 
                     is Type.TARGET -> {

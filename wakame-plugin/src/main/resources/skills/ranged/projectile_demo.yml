@@ -5,4 +5,4 @@ effects:
   start: "skill:melee/dash"
   hit_entity: "skill:melee/kill_entity"
   hit_block: "skill:buff/potion_drop"
-  disappear: "skill:melee/dash"
+  pick_up: "skill:buff/teleport_random"
