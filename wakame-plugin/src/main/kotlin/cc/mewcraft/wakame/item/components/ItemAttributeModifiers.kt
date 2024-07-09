@@ -89,7 +89,7 @@ data class ItemAttributeModifiers(
          * ```
          */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
-            val showInTooltip = node.node("show_in_tooltip").boolean
+            val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
             return Template(showInTooltip)
         }
     }
