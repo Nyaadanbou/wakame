@@ -89,7 +89,10 @@ object StatisticsConstants {
  */
 object ItemComponentConstants {
     const val ARROW = "arrow"
+    const val ATTRIBUTE_MODIFIERS = "attribute_modifiers"
     const val ATTRIBUTABLE = "attributable"
+    const val CAN_BREAK = "can_break"
+    const val CAN_PLACE_ON = "can_place_on"
     const val CASTABLE = "castable"
     const val CELLS = "cells"
     const val CRATE = "crate"
@@ -97,10 +100,14 @@ object ItemComponentConstants {
     const val CUSTOM_MODEL_DATA = "custom_model_data"
     const val DAMAGE = "damage"
     const val DAMAGEABLE = "damageable"
+    const val DYED_COLOR = "dyed_color"
+    const val ENCHANTMENTS = "enchantments"
     const val MAX_DAMAGE = "max_damage"
     const val ELEMENTS = "elements"
     const val FIRE_RESISTANT = "fire_resistant"
     const val FOOD = "food"
+    const val HIDE_TOOLTIP = "hide_tooltip"
+    const val HIDE_ADDITIONAL_TOOLTIP = "hide_additional_tooltip"
     const val ITEM_NAME = "item_name"
     const val KIZAMIZ = "kizamiz"
     const val KIZAMIABLE = "kizamiable"
@@ -110,9 +117,11 @@ object ItemComponentConstants {
     const val SKILLFUL = "skillful"
     const val SKIN = "skin"
     const val SKIN_OWNER = "skin_owner"
+    const val STORED_ENCHANTMENTS = "stored_enchantments"
     const val SYSTEM_USE = "system_use"
     const val TOOL = "tool"
     const val TRACKABLE = "tracks"
+    const val TRIM = "trim"
     const val UNBREAKABLE = "unbreakable"
 
     inline fun createKey(block: ItemComponentConstants.() -> String): Key {

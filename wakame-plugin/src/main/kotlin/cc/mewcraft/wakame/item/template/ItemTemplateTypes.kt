@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.template
 
+import cc.mewcraft.wakame.item.components.ArmorTrim
 import cc.mewcraft.wakame.item.components.Attributable
 import cc.mewcraft.wakame.item.components.Castable
 import cc.mewcraft.wakame.item.components.CustomName
@@ -7,10 +8,15 @@ import cc.mewcraft.wakame.item.components.Damageable
 import cc.mewcraft.wakame.item.components.ExtraLore
 import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
+import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
+import cc.mewcraft.wakame.item.components.HideTooltip
+import cc.mewcraft.wakame.item.components.ItemAdventurePredicate
 import cc.mewcraft.wakame.item.components.ItemArrow
+import cc.mewcraft.wakame.item.components.ItemAttributeModifiers
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.ItemCrate
 import cc.mewcraft.wakame.item.components.ItemElements
+import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.ItemKizamiz
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemName
@@ -31,6 +37,21 @@ object ItemTemplateTypes {
      * 组件: [Attributable]
      */
     val ATTRIBUTABLE: ItemTemplateType<Attributable.Template> = Attributable.templateType().register()
+
+    /**
+     * 组件: [ItemAttributeModifiers]
+     */
+    val ATTRIBUTE_MODIFIERS: ItemTemplateType<ItemAttributeModifiers.Template> = ItemAttributeModifiers.templateType().register()
+
+    /**
+     * 组件: [ItemAdventurePredicate]
+     */
+    val CAN_BREAK: ItemTemplateType<ItemAdventurePredicate.Template> = ItemAdventurePredicate.templateType().register()
+
+    /**
+     * 组件: [ItemAdventurePredicate]
+     */
+    val CAN_PLACE_ON: ItemTemplateType<ItemAdventurePredicate.Template> = ItemAdventurePredicate.templateType().register()
 
     /**
      * 组件: [Castable]
@@ -58,9 +79,19 @@ object ItemTemplateTypes {
     val DAMAGEABLE: ItemTemplateType<Damageable.Template> = Damageable.templateType().register()
 
     /**
+     * 组件: [ArmorTrim]
+     */
+    val DYED_COLOR: ItemTemplateType<ArmorTrim.Template> = ArmorTrim.templateType().register()
+
+    /**
      * 组件: [ItemElements]
      */
     val ELEMENTS: ItemTemplateType<ItemElements.Template> = ItemElements.templateType().register()
+
+    /**
+     * 组件: [ItemEnchantments]
+     */
+    val ENCHANTMENTS: ItemTemplateType<ItemEnchantments.Template> = ItemEnchantments.templateType().register()
 
     /**
      * 组件: [FireResistant]
@@ -71,6 +102,16 @@ object ItemTemplateTypes {
      * 组件: [FoodProperties]
      */
     val FOOD: ItemTemplateType<FoodProperties.Template> = FoodProperties.templateType().register()
+
+    /**
+     * 组件: [HideTooltip]
+     */
+    val HIDE_TOOLTIP: ItemTemplateType<HideTooltip.Template> = HideTooltip.templateType().register()
+
+    /**ni
+     * 组件: [HideAdditionalTooltip]
+     */
+    val HIDE_ADDITIONAL_TOOLTIP: ItemTemplateType<HideAdditionalTooltip.Template> = HideAdditionalTooltip.templateType().register()
 
     /**
      * 组件: [ItemName]
@@ -107,10 +148,19 @@ object ItemTemplateTypes {
      */
     val SKILLFUL: ItemTemplateType<Skillful.Template> = Skillful.templateType().register()
 
+    // FIXME templateType 也需要有一个 id,
+    //  因为有些组件可能会有相同的类型, 但是 id 不同.
+    val STORED_ENCHANTMENTS: ItemTemplateType<ItemEnchantments.Template> = ItemEnchantments.templateType().register()
+
     /**
      * 组件: [Tool]
      */
     val TOOL: ItemTemplateType<Tool.Template> = Tool.templateType().register()
+
+    /**
+     * 组件: [ArmorTrim]
+     */
+    val TRIM: ItemTemplateType<ArmorTrim.Template> = ArmorTrim.templateType().register()
 
     /**
      * 组件: [Unbreakable]

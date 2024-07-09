@@ -32,8 +32,7 @@ object NekoItemFactory {
         // read all basic info
         val uuid = root.node("uuid").krequire<UUID>()
         val itemType = root.node("item_type").krequire<Key>()
-        val hideTooltip = root.node("hide_tooltip").getBoolean(false)
-        val hideAdditionalTooltip = root.node("hide_additional_tooltip").getBoolean(false)
+        // FIXME move to components
         val shownInTooltip = root.node("shown_in_tooltip").krequire<ShownInTooltipApplicator>()
         val removeComponents = root.node("remove_components").krequire<VanillaComponentRemover>()
         val slot = root.node("slot").krequire<ItemSlot>()
@@ -68,21 +67,23 @@ object NekoItemFactory {
             tryAdd("arrow", ItemTemplateTypes.ARROW)
             tryAdd("attributable", ItemTemplateTypes.ATTRIBUTABLE)
             tryAdd("castable", ItemTemplateTypes.CASTABLE)
+            tryAdd("cells", ItemTemplateTypes.CELLS)
             tryAdd("crate", ItemTemplateTypes.CRATE)
             tryAdd("custom_name", ItemTemplateTypes.CUSTOM_NAME)
             tryAdd("damageable", ItemTemplateTypes.DAMAGEABLE)
-            tryAdd("lore", ItemTemplateTypes.LORE)
+            tryAdd("elements", ItemTemplateTypes.ELEMENTS)
             tryAdd("fire_resistant", ItemTemplateTypes.FIRE_RESISTANT)
             tryAdd("food", ItemTemplateTypes.FOOD)
-            tryAdd("cells", ItemTemplateTypes.CELLS)
-            tryAdd("elements", ItemTemplateTypes.ELEMENTS)
-            tryAdd("kizamiz", ItemTemplateTypes.KIZAMIZ)
-            tryAdd("level", ItemTemplateTypes.LEVEL)
+            tryAdd("hide_tooltip", ItemTemplateTypes.HIDE_TOOLTIP)
+            tryAdd("hide_additional_tooltip", ItemTemplateTypes.HIDE_ADDITIONAL_TOOLTIP)
             tryAdd("item_name", ItemTemplateTypes.ITEM_NAME)
+            tryAdd("kizamiz", ItemTemplateTypes.KIZAMIZ)
+            tryAdd("kizamiable", ItemTemplateTypes.KIZAMIABLE)
+            tryAdd("level", ItemTemplateTypes.LEVEL)
+            tryAdd("lore", ItemTemplateTypes.LORE)
             tryAdd("rarity", ItemTemplateTypes.RARITY)
             // tryAdd("skin", ItemTemplateTypes.SKIN)
             // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER)
-            tryAdd("kizamiable", ItemTemplateTypes.KIZAMIABLE)
             tryAdd("skillful", ItemTemplateTypes.SKILLFUL)
             tryAdd("tool", ItemTemplateTypes.TOOL)
             tryAdd("unbreakable", ItemTemplateTypes.UNBREAKABLE)
@@ -93,8 +94,6 @@ object NekoItemFactory {
             uuid = uuid,
             config = provider,
             itemType = itemType,
-            hideTooltip = hideTooltip,
-            hideAdditionalTooltip = hideAdditionalTooltip,
             shownInTooltip = shownInTooltip,
             slot = slot,
             removeComponents = removeComponents,

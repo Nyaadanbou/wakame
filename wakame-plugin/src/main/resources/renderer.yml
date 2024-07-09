@@ -32,6 +32,7 @@ renderer_layout:
     - meta:kizamiable
     - meta:skillful
     - meta:castable
+    - meta:fire_resistant
     - (fixed:meta)<!i><aqua><b>通用 # 仅当下面存在 meta 命名空间下的内容时才渲染
     - meta:crate
     - meta:level
