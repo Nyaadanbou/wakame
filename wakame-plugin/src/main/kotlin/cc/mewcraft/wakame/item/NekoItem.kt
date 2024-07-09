@@ -52,11 +52,6 @@ interface NekoItem : Keyed, Examinable {
     val itemType: Key
 
     /**
-     * The shown-in-tooltip applicator.
-     */
-    val shownInTooltip: ShownInTooltipApplicator
-
-    /**
      * The inventory slot where this item can take effect.
      */
     val slot: ItemSlot

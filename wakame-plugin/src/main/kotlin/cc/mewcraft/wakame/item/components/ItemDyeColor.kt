@@ -33,8 +33,8 @@ data class ItemDyeColor(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<*> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
 
         override val configPath: String = ItemComponentConstants.DYED_COLOR
@@ -80,9 +80,18 @@ data class ItemDyeColor(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template> {
+    private data class TemplateType(
+        override val id: String
+    ) : ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   show_in_tooltip: <boolean>
+         * ```
+         */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             val rgb = node.node("rgb").int.takeIf { it in 0x000000..0xFFFFFF } ?: throw SerializationException(node, javaTypeOf<Int>(), "RGB value out of range")
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)

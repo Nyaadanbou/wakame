@@ -38,8 +38,8 @@ data class ItemEnchantments(
             }
         }
 
-        override fun templateType(): ItemTemplateType<Template> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
     }
 
@@ -107,11 +107,10 @@ data class ItemEnchantments(
     }
 
     data class Template(
+        override val componentType: ItemComponentType<ItemEnchantments>,
         val enchantments: Map<Key, Int>,
         val showInTooltip: Boolean,
     ) : ItemTemplate<ItemEnchantments> {
-        override val componentType: ItemComponentType<ItemEnchantments> = ItemComponentTypes
-
         override fun generate(context: GenerationContext): GenerationResult<ItemEnchantments> {
             val enchantments = this.enchantments.mapKeys { (key, _) ->
                 val enchantKey = NamespacedKey.fromString(key.toString()) ?: throw IllegalArgumentException("Malformed enchantment key: '$key'")
@@ -122,7 +121,9 @@ data class ItemEnchantments(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template> {
+    private data class TemplateType(
+        override val id: String,
+    ) : ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
@@ -148,7 +149,19 @@ data class ItemEnchantments(
                     node.krequire<Int>()
                 }
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
-            return Template(enchantments, showInTooltip)
+            return when (id) {
+                ItemComponentConstants.ENCHANTMENTS -> {
+                    Template(ItemComponentTypes.ENCHANTMENTS, enchantments, showInTooltip)
+                }
+
+                ItemComponentConstants.STORED_ENCHANTMENTS -> {
+                    Template(ItemComponentTypes.STORED_ENCHANTMENTS, enchantments, showInTooltip)
+                }
+
+                else -> {
+                    throw IllegalArgumentException("Unknown template id: '$id'")
+                }
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.template
 
+import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.components.ArmorTrim
 import cc.mewcraft.wakame.item.components.Attributable
 import cc.mewcraft.wakame.item.components.Castable
@@ -15,6 +16,7 @@ import cc.mewcraft.wakame.item.components.ItemArrow
 import cc.mewcraft.wakame.item.components.ItemAttributeModifiers
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.ItemCrate
+import cc.mewcraft.wakame.item.components.ItemDyeColor
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.ItemKizamiz
@@ -31,141 +33,142 @@ object ItemTemplateTypes {
     /**
      * 组件: [ItemArrow]
      */
-    val ARROW: ItemTemplateType<ItemArrow.Template> = ItemArrow.templateType().register()
+    val ARROW: ItemTemplateType<ItemArrow.Template> = ItemArrow.templateType(ItemComponentConstants.ARROW).register()
 
     /**
      * 组件: [Attributable]
      */
-    val ATTRIBUTABLE: ItemTemplateType<Attributable.Template> = Attributable.templateType().register()
+    val ATTRIBUTABLE: ItemTemplateType<Attributable.Template> = Attributable.templateType(ItemComponentConstants.ATTRIBUTABLE).register()
 
     /**
      * 组件: [ItemAttributeModifiers]
      */
-    val ATTRIBUTE_MODIFIERS: ItemTemplateType<ItemAttributeModifiers.Template> = ItemAttributeModifiers.templateType().register()
+    val ATTRIBUTE_MODIFIERS: ItemTemplateType<ItemAttributeModifiers.Template> = ItemAttributeModifiers.templateType(ItemComponentConstants.ATTRIBUTE_MODIFIERS).register()
 
     /**
      * 组件: [ItemAdventurePredicate]
      */
-    val CAN_BREAK: ItemTemplateType<ItemAdventurePredicate.Template> = ItemAdventurePredicate.templateType().register()
+    val CAN_BREAK: ItemTemplateType<ItemAdventurePredicate.Template> = ItemAdventurePredicate.templateType(ItemComponentConstants.CAN_BREAK).register()
 
     /**
      * 组件: [ItemAdventurePredicate]
      */
-    val CAN_PLACE_ON: ItemTemplateType<ItemAdventurePredicate.Template> = ItemAdventurePredicate.templateType().register()
+    val CAN_PLACE_ON: ItemTemplateType<ItemAdventurePredicate.Template> = ItemAdventurePredicate.templateType(ItemComponentConstants.CAN_PLACE_ON).register()
 
     /**
      * 组件: [Castable]
      */
-    val CASTABLE: ItemTemplateType<Castable.Template> = Castable.templateType().register()
+    val CASTABLE: ItemTemplateType<Castable.Template> = Castable.templateType(ItemComponentConstants.CASTABLE).register()
 
     /**
-     * 组件:
+     * 组件: [ItemCells]
      */
-    val CELLS: ItemTemplateType<ItemCells.Template> = ItemCells.templateType().register()
+    val CELLS: ItemTemplateType<ItemCells.Template> = ItemCells.templateType(ItemComponentConstants.CELLS).register()
 
     /**
      * 组件: [ItemCrate]
      */
-    val CRATE: ItemTemplateType<ItemCrate.Template> = ItemCrate.templateType().register()
+    val CRATE: ItemTemplateType<ItemCrate.Template> = ItemCrate.templateType(ItemComponentConstants.CRATE).register()
 
     /**
      * 组件: [CustomName]
      */
-    val CUSTOM_NAME: ItemTemplateType<CustomName.Template> = CustomName.templateType().register()
+    val CUSTOM_NAME: ItemTemplateType<CustomName.Template> = CustomName.templateType(ItemComponentConstants.CUSTOM_NAME).register()
 
     /**
      * 组件: [Damageable]
      */
-    val DAMAGEABLE: ItemTemplateType<Damageable.Template> = Damageable.templateType().register()
+    val DAMAGEABLE: ItemTemplateType<Damageable.Template> = Damageable.templateType(ItemComponentConstants.DAMAGEABLE).register()
 
     /**
      * 组件: [ArmorTrim]
      */
-    val DYED_COLOR: ItemTemplateType<ArmorTrim.Template> = ArmorTrim.templateType().register()
+    val DYED_COLOR: ItemTemplateType<ItemDyeColor.Template> = ItemDyeColor.templateType(ItemComponentConstants.DYED_COLOR).register()
 
     /**
      * 组件: [ItemElements]
      */
-    val ELEMENTS: ItemTemplateType<ItemElements.Template> = ItemElements.templateType().register()
+    val ELEMENTS: ItemTemplateType<ItemElements.Template> = ItemElements.templateType(ItemComponentConstants.ELEMENTS).register()
 
     /**
      * 组件: [ItemEnchantments]
      */
-    val ENCHANTMENTS: ItemTemplateType<ItemEnchantments.Template> = ItemEnchantments.templateType().register()
+    val ENCHANTMENTS: ItemTemplateType<ItemEnchantments.Template> = ItemEnchantments.templateType(ItemComponentConstants.ENCHANTMENTS).register()
 
     /**
      * 组件: [FireResistant]
      */
-    val FIRE_RESISTANT: ItemTemplateType<FireResistant.Template> = FireResistant.templateType().register()
+    val FIRE_RESISTANT: ItemTemplateType<FireResistant.Template> = FireResistant.templateType(ItemComponentConstants.FIRE_RESISTANT).register()
 
     /**
      * 组件: [FoodProperties]
      */
-    val FOOD: ItemTemplateType<FoodProperties.Template> = FoodProperties.templateType().register()
+    val FOOD: ItemTemplateType<FoodProperties.Template> = FoodProperties.templateType(ItemComponentConstants.FOOD).register()
 
     /**
      * 组件: [HideTooltip]
      */
-    val HIDE_TOOLTIP: ItemTemplateType<HideTooltip.Template> = HideTooltip.templateType().register()
+    val HIDE_TOOLTIP: ItemTemplateType<HideTooltip.Template> = HideTooltip.templateType(ItemComponentConstants.HIDE_TOOLTIP).register()
 
     /**ni
      * 组件: [HideAdditionalTooltip]
      */
-    val HIDE_ADDITIONAL_TOOLTIP: ItemTemplateType<HideAdditionalTooltip.Template> = HideAdditionalTooltip.templateType().register()
+    val HIDE_ADDITIONAL_TOOLTIP: ItemTemplateType<HideAdditionalTooltip.Template> = HideAdditionalTooltip.templateType(ItemComponentConstants.HIDE_ADDITIONAL_TOOLTIP).register()
 
     /**
      * 组件: [ItemName]
      */
-    val ITEM_NAME: ItemTemplateType<ItemName.Template> = ItemName.templateType().register()
+    val ITEM_NAME: ItemTemplateType<ItemName.Template> = ItemName.templateType(ItemComponentConstants.ITEM_NAME).register()
 
     /**
      * 组件: [ItemKizamiz]
      */
-    val KIZAMIZ: ItemTemplateType<ItemKizamiz.Template> = ItemKizamiz.templateType().register()
+    val KIZAMIZ: ItemTemplateType<ItemKizamiz.Template> = ItemKizamiz.templateType(ItemComponentConstants.KIZAMIZ).register()
 
     /**
      * 组件: [Kizamiable]
      */
-    val KIZAMIABLE: ItemTemplateType<Kizamiable.Template> = Kizamiable.templateType().register()
+    val KIZAMIABLE: ItemTemplateType<Kizamiable.Template> = Kizamiable.templateType(ItemComponentConstants.KIZAMIABLE).register()
 
     /**
      * 组件: [ItemLevel]
      */
-    val LEVEL: ItemTemplateType<ItemLevel.Template> = ItemLevel.templateType().register()
+    val LEVEL: ItemTemplateType<ItemLevel.Template> = ItemLevel.templateType(ItemComponentConstants.LEVEL).register()
 
     /**
      * 组件: [ExtraLore]
      */
-    val LORE: ItemTemplateType<ExtraLore.Template> = ExtraLore.templateType().register()
+    val LORE: ItemTemplateType<ExtraLore.Template> = ExtraLore.templateType(ItemComponentConstants.LORE).register()
 
     /**
      * 组件: [ItemRarity]
      */
-    val RARITY: ItemTemplateType<ItemRarity.Template> = ItemRarity.templateType().register()
+    val RARITY: ItemTemplateType<ItemRarity.Template> = ItemRarity.templateType(ItemComponentConstants.RARITY).register()
 
     /**
      * 组件: [Skillful]
      */
-    val SKILLFUL: ItemTemplateType<Skillful.Template> = Skillful.templateType().register()
+    val SKILLFUL: ItemTemplateType<Skillful.Template> = Skillful.templateType(ItemComponentConstants.SKILLFUL).register()
 
-    // FIXME templateType 也需要有一个 id,
-    //  因为有些组件可能会有相同的类型, 但是 id 不同.
-    val STORED_ENCHANTMENTS: ItemTemplateType<ItemEnchantments.Template> = ItemEnchantments.templateType().register()
+    /**
+     * 组件: [ItemEnchantments]
+     */
+    val STORED_ENCHANTMENTS: ItemTemplateType<ItemEnchantments.Template> = ItemEnchantments.templateType(ItemComponentConstants.STORED_ENCHANTMENTS).register()
 
     /**
      * 组件: [Tool]
      */
-    val TOOL: ItemTemplateType<Tool.Template> = Tool.templateType().register()
+    val TOOL: ItemTemplateType<Tool.Template> = Tool.templateType(ItemComponentConstants.TOOL).register()
 
     /**
      * 组件: [ArmorTrim]
      */
-    val TRIM: ItemTemplateType<ArmorTrim.Template> = ArmorTrim.templateType().register()
+    val TRIM: ItemTemplateType<ArmorTrim.Template> = ArmorTrim.templateType(ItemComponentConstants.TRIM).register()
 
     /**
      * 组件: [Unbreakable]
      */
-    val UNBREAKABLE: ItemTemplateType<Unbreakable.Template> = Unbreakable.templateType().register()
+    val UNBREAKABLE: ItemTemplateType<Unbreakable.Template> = Unbreakable.templateType(ItemComponentConstants.UNBREAKABLE).register()
 
     /**
      * 获取所有模板的序列化器.

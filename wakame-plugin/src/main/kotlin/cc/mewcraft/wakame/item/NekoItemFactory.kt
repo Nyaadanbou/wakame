@@ -32,8 +32,6 @@ object NekoItemFactory {
         // read all basic info
         val uuid = root.node("uuid").krequire<UUID>()
         val itemType = root.node("item_type").krequire<Key>()
-        // FIXME move to components
-        val shownInTooltip = root.node("shown_in_tooltip").krequire<ShownInTooltipApplicator>()
         val removeComponents = root.node("remove_components").krequire<VanillaComponentRemover>()
         val slot = root.node("slot").krequire<ItemSlot>()
 
@@ -66,12 +64,17 @@ object NekoItemFactory {
 
             tryAdd("arrow", ItemTemplateTypes.ARROW)
             tryAdd("attributable", ItemTemplateTypes.ATTRIBUTABLE)
+            tryAdd("attribute_modifiers", ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
+            tryAdd("can_break", ItemTemplateTypes.CAN_BREAK)
+            tryAdd("can_place_on", ItemTemplateTypes.CAN_PLACE_ON)
             tryAdd("castable", ItemTemplateTypes.CASTABLE)
             tryAdd("cells", ItemTemplateTypes.CELLS)
             tryAdd("crate", ItemTemplateTypes.CRATE)
             tryAdd("custom_name", ItemTemplateTypes.CUSTOM_NAME)
             tryAdd("damageable", ItemTemplateTypes.DAMAGEABLE)
+            tryAdd("dyed_color", ItemTemplateTypes.DYED_COLOR)
             tryAdd("elements", ItemTemplateTypes.ELEMENTS)
+            tryAdd("enchantments", ItemTemplateTypes.ENCHANTMENTS)
             tryAdd("fire_resistant", ItemTemplateTypes.FIRE_RESISTANT)
             tryAdd("food", ItemTemplateTypes.FOOD)
             tryAdd("hide_tooltip", ItemTemplateTypes.HIDE_TOOLTIP)
@@ -85,7 +88,9 @@ object NekoItemFactory {
             // tryAdd("skin", ItemTemplateTypes.SKIN)
             // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER)
             tryAdd("skillful", ItemTemplateTypes.SKILLFUL)
+            tryAdd("stored_enchantments", ItemTemplateTypes.STORED_ENCHANTMENTS)
             tryAdd("tool", ItemTemplateTypes.TOOL)
+            tryAdd("trim", ItemTemplateTypes.TRIM)
             tryAdd("unbreakable", ItemTemplateTypes.UNBREAKABLE)
         }
 
@@ -94,7 +99,6 @@ object NekoItemFactory {
             uuid = uuid,
             config = provider,
             itemType = itemType,
-            shownInTooltip = shownInTooltip,
             slot = slot,
             removeComponents = removeComponents,
             templates = templateMap,

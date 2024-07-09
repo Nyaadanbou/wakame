@@ -19,7 +19,7 @@ data class CustomModelData(
         // 设计上 CustomModelData 不能由物品的配置文件决定,
         // 因此这里也没写对应的 Template 实现
 
-        override fun templateType(): Nothing {
+        override fun templateType(id: String): Nothing {
             throw UnsupportedOperationException()
         }
     }

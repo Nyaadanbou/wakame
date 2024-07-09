@@ -4,11 +4,11 @@ import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
@@ -29,8 +29,8 @@ data class ItemAdventurePredicate(
             }
         }
 
-        override fun templateType(): ItemTemplateType<Template> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
     }
 
@@ -87,21 +87,33 @@ data class ItemAdventurePredicate(
     }
 
     data class Template(
+        override val componentType: ItemComponentType<ItemAdventurePredicate>,
         val showInTooltip: Boolean,
     ) : ItemTemplate<ItemAdventurePredicate> {
-        override val componentType: ItemComponentType<ItemAdventurePredicate> = ItemTemplateTypes
-
         override fun generate(context: GenerationContext): GenerationResult<ItemAdventurePredicate> {
             return GenerationResult.of(ItemAdventurePredicate(showInTooltip))
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template> {
+    private data class TemplateType(
+        override val id: String,
+    ) : ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   show_in_tooltip: <boolean>
+         * ```
+         */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             val showInTooltip = node.node("show_in_tooltip").boolean
-            return Template(showInTooltip)
+            return when (id) {
+                ItemComponentConstants.CAN_BREAK -> Template(ItemComponentTypes.CAN_BREAK,showInTooltip)
+                ItemComponentConstants.CAN_PLACE_ON -> Template(ItemComponentTypes.CAN_PLACE_ON,showInTooltip)
+                else -> throw IllegalArgumentException("Unknown template id: '$id'")
+            }
         }
     }
 

@@ -15,8 +15,6 @@ import cc.mewcraft.wakame.util.toNamespacedKey
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.Registry
-import org.bukkit.inventory.ItemFlag
-import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ThreadLocalRandom
 
 /**
@@ -90,21 +88,6 @@ internal object ServerNekoItemRealizer : NekoItemRealizer {
         NekoStackSupport.setKey(wakameTag, itemKey)
         NekoStackSupport.setVariant(wakameTag, 0)
 
-        // TODO 2024/7/3 这些都可以转移到 ItemComponents 框架里去
-        nekoStack.editItemStack {
-            val im = this.itemMeta
-
-            if (blueprint.hideTooltip) {
-                im.isHideTooltip = true
-            }
-            if (blueprint.hideAdditionalTooltip) {
-                im.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
-            }
-            blueprint.shownInTooltip.applyTo(im)
-
-            this.itemMeta = im
-        }
-
         // 获取 物品组件 的容器
         val components: ItemComponentMap = nekoStack.components
         // 获取 物品组件模板 的容器
@@ -135,19 +118,24 @@ internal object ServerNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.ITEM_NAME)
         generate(ItemTemplateTypes.LORE)
 
-        generate(ItemTemplateTypes.DAMAGEABLE)
+        generate(ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
         generate(ItemTemplateTypes.FIRE_RESISTANT)
-        generate(ItemTemplateTypes.FOOD)
-        generate(ItemTemplateTypes.TOOL)
         generate(ItemTemplateTypes.UNBREAKABLE)
+        generate(ItemTemplateTypes.TRIM)
+        generate(ItemTemplateTypes.HIDE_TOOLTIP)
+        generate(ItemTemplateTypes.HIDE_ADDITIONAL_TOOLTIP)
+        generate(ItemTemplateTypes.CAN_BREAK)
+        generate(ItemTemplateTypes.CAN_PLACE_ON)
+        generate(ItemTemplateTypes.DYED_COLOR)
+        generate(ItemTemplateTypes.ENCHANTMENTS)
+        generate(ItemTemplateTypes.STORED_ENCHANTMENTS)
+        generate(ItemTemplateTypes.DAMAGEABLE)
+        generate(ItemTemplateTypes.TOOL)
+        generate(ItemTemplateTypes.FOOD)
 
         generate(ItemTemplateTypes.CELLS) // 词条栏最复杂, 并且依赖部分组件, 因此放在最后
         generate(ItemTemplateTypes.CRATE)
 
         return nekoStack
-    }
-
-    private fun NekoStack.editItemStack(block: ItemStack.() -> Unit) {
-        block(handle)
     }
 }

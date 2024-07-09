@@ -59,8 +59,8 @@ data class ItemElements(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Template> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
 
         override val configPath: String = ItemComponentConstants.ELEMENTS
@@ -124,7 +124,9 @@ data class ItemElements(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template>, KoinComponent {
+    private data class TemplateType(
+        override val id: String
+    ) : ItemTemplateType<Template>, KoinComponent {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
         override fun deserialize(type: Type, node: ConfigurationNode): Template {

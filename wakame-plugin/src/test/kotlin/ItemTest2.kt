@@ -24,6 +24,8 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.Attributable
 import cc.mewcraft.wakame.item.components.Castable
 import cc.mewcraft.wakame.item.components.FireResistant
+import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
+import cc.mewcraft.wakame.item.components.HideTooltip
 import cc.mewcraft.wakame.item.components.cells.CoreTypes
 import cc.mewcraft.wakame.item.components.cells.CurseTypes
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
@@ -132,18 +134,6 @@ class ItemTest2 : KoinTest {
 
     //<editor-fold desc="Units">
     @Test
-    fun `unit - hide additional tooltip`() {
-        val item = readPrototype("unit", "hide_additional_tooltip")
-        assertTrue { item.hideAdditionalTooltip }
-    }
-
-    @Test
-    fun `unit - hide tooltip`() {
-        val item = readPrototype("unit", "hide_tooltip")
-        assertTrue { item.hideTooltip }
-    }
-
-    @Test
     fun `unit - least configuration`() {
         val item = readPrototype("unit", "least_configuration")
         assertEquals(UUID.fromString("8729823f-8b80-4efd-bb9e-1c0f9b2eecc3"), item.uuid)
@@ -157,48 +147,6 @@ class ItemTest2 : KoinTest {
         assertTrue { removeComponents.has("attribute_modifiers") }
         assertTrue { removeComponents.has("food") }
         assertTrue { removeComponents.has("tool") }
-    }
-
-    @Test
-    fun `unit - shown in tooltip 1`() {
-        val item = readPrototype("unit", "shown_in_tooltip_1")
-        val shownInTooltip = item.shownInTooltip
-        assertTrue { shownInTooltip.isPresent("trim") && shownInTooltip.shouldHide("trim") }
-        assertTrue { shownInTooltip.isPresent("attribute_modifiers") && shownInTooltip.shouldHide("attribute_modifiers") }
-        assertTrue { shownInTooltip.isPresent("can_break") && shownInTooltip.shouldHide("can_break") }
-        assertTrue { shownInTooltip.isPresent("dyed_color") && shownInTooltip.shouldHide("dyed_color") }
-        assertTrue { shownInTooltip.isPresent("enchantments") && shownInTooltip.shouldHide("enchantments") }
-        assertTrue { shownInTooltip.isPresent("can_place_on") && shownInTooltip.shouldHide("can_place_on") }
-        assertTrue { shownInTooltip.isPresent("stored_enchantments") && shownInTooltip.shouldHide("stored_enchantments") }
-        assertTrue { shownInTooltip.isPresent("unbreakable") && shownInTooltip.shouldHide("unbreakable") }
-    }
-
-    @Test
-    fun `unit - shown in tooltip 2`() {
-        val item = readPrototype("unit", "shown_in_tooltip_2")
-        val shownInTooltip = item.shownInTooltip
-        assertTrue { shownInTooltip.isPresent("trim") && shownInTooltip.shouldShow("trim") }
-        assertTrue { shownInTooltip.isPresent("attribute_modifiers") && shownInTooltip.shouldHide("attribute_modifiers") }
-        assertTrue { shownInTooltip.isPresent("can_break") && shownInTooltip.shouldShow("can_break") }
-        assertTrue { shownInTooltip.isPresent("dyed_color") && shownInTooltip.shouldHide("dyed_color") }
-        assertTrue { shownInTooltip.isPresent("enchantments") && shownInTooltip.shouldShow("enchantments") }
-        assertTrue { shownInTooltip.isPresent("can_place_on") && shownInTooltip.shouldHide("can_place_on") }
-        assertTrue { shownInTooltip.isPresent("stored_enchantments") && shownInTooltip.shouldShow("stored_enchantments") }
-        assertTrue { shownInTooltip.isPresent("unbreakable") && shownInTooltip.shouldHide("unbreakable") }
-    }
-
-    @Test
-    fun `unit - shown in tooltip 3`() {
-        val item = readPrototype("unit", "shown_in_tooltip_3")
-        val shownInTooltip = item.shownInTooltip
-        assertTrue { shownInTooltip.isPresent("trim") && shownInTooltip.shouldShow("trim") }
-        assertTrue { !shownInTooltip.isPresent("attribute_modifiers") && shownInTooltip.shouldHide("attribute_modifiers") }
-        assertTrue { shownInTooltip.isPresent("can_break") && shownInTooltip.shouldShow("can_break") }
-        assertTrue { !shownInTooltip.isPresent("dyed_color") && shownInTooltip.shouldHide("dyed_color") }
-        assertTrue { shownInTooltip.isPresent("enchantments") && shownInTooltip.shouldShow("enchantments") }
-        assertTrue { !shownInTooltip.isPresent("can_place_on") && shownInTooltip.shouldHide("can_place_on") }
-        assertTrue { shownInTooltip.isPresent("stored_enchantments") && shownInTooltip.shouldShow("stored_enchantments") }
-        assertTrue { !shownInTooltip.isPresent("unbreakable") && shownInTooltip.shouldHide("unbreakable") }
     }
 
     @Test
@@ -242,6 +190,58 @@ class ItemTest2 : KoinTest {
 
         unboxed {
             assertEquals(Attributable.of(), it)
+        }
+    }
+
+    // 针对 attribute_modifiers 写下一个 test
+    @Test
+    fun `component - attribute_modifiers`() = componentLifecycleTest(
+        "attribute_modifiers", ItemTemplateTypes.ATTRIBUTE_MODIFIERS, ItemComponentTypes.ATTRIBUTE_MODIFIERS
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertFalse(it.showInTooltip)
+        }
+    }
+
+    @Test
+    fun `component - can_break`() = componentLifecycleTest(
+        "can_break", ItemTemplateTypes.CAN_BREAK, ItemComponentTypes.CAN_BREAK
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertFalse(it.showInTooltip)
+        }
+    }
+
+    @Test
+    fun `component - can_place_on`() = componentLifecycleTest(
+        "can_place_on", ItemTemplateTypes.CAN_PLACE_ON, ItemComponentTypes.CAN_PLACE_ON
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertFalse(it.showInTooltip)
         }
     }
 
@@ -460,6 +460,26 @@ class ItemTest2 : KoinTest {
     }
 
     @Test
+    fun `component - dyed color`() {
+        componentLifecycleTest(
+            "dyed_color", ItemTemplateTypes.DYED_COLOR, ItemComponentTypes.DYED_COLOR,
+        ) {
+            serialization {
+                assertNotNull(it)
+            }
+
+            result {
+                assertFalse(it.isEmpty())
+            }
+
+            unboxed {
+                assertFalse(it.showInTooltip)
+                assertEquals(0xffffff, it.rgb)
+            }
+        }
+    }
+
+    @Test
     fun `component - damageable`() = componentLifecycleTest(
         "damageable", ItemTemplateTypes.DAMAGEABLE, ItemComponentTypes.DAMAGEABLE,
     ) {
@@ -506,6 +526,18 @@ class ItemTest2 : KoinTest {
             // assertEquals(2, elements.size) // FIXME 有时候2个,有时候1个
             assertTrue(elements.all { it in possibleElements })
         }
+    }
+
+    @Test
+    fun `component - enchantments`() {
+        val prototype = readPrototype("component", "enchantments")
+        val template = prototype.templates.get(ItemTemplateTypes.ENCHANTMENTS)
+
+        assertNotNull(template)
+        assertFalse(template.showInTooltip)
+        assertEquals(2, template.enchantments.size)
+        assertEquals(1, template.enchantments[Key.key("sharpness")])
+        assertEquals(2, template.enchantments[Key.key("knockback")])
     }
 
     @Test
@@ -578,6 +610,40 @@ class ItemTest2 : KoinTest {
                 Key.key("foo:bar/b")
             )
             assertTrue(it.skills.all { it in possibleSkills })
+        }
+    }
+
+    @Test
+    fun `component - hide_additional_tooltip`() = componentLifecycleTest(
+        "hide_additional_tooltip", ItemTemplateTypes.HIDE_ADDITIONAL_TOOLTIP, ItemComponentTypes.HIDE_ADDITIONAL_TOOLTIP,
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(HideAdditionalTooltip.of(), it)
+        }
+    }
+
+    @Test
+    fun `component - hide_tooltip`() = componentLifecycleTest(
+        "hide_tooltip", ItemTemplateTypes.HIDE_TOOLTIP, ItemComponentTypes.HIDE_TOOLTIP,
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(HideTooltip.of(), it)
         }
     }
 
@@ -755,6 +821,18 @@ class ItemTest2 : KoinTest {
     }
 
     @Test
+    fun `component - stored_enchantments`() {
+        val prototype = readPrototype("component", "stored_enchantments")
+        val template = prototype.templates.get(ItemTemplateTypes.STORED_ENCHANTMENTS)
+
+        assertNotNull(template)
+        assertFalse(template.showInTooltip)
+        assertEquals(2, template.enchantments.size)
+        assertEquals(1, template.enchantments[Key.key("sharpness")])
+        assertEquals(2, template.enchantments[Key.key("knockback")])
+    }
+
+    @Test
     fun `component - system_use`() {
 
     }
@@ -785,6 +863,23 @@ class ItemTest2 : KoinTest {
     @Test
     fun `component - trackable`() {
         val prototype = readPrototype("component", "trackable")
+    }
+
+    @Test
+    fun `component - trim`() = componentLifecycleTest(
+        "trim", ItemTemplateTypes.TRIM, ItemComponentTypes.TRIM,
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertFalse(it.showInTooltip)
+        }
     }
 
     @Test

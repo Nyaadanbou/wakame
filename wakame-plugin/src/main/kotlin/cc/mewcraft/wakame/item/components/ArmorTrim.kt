@@ -25,8 +25,8 @@ data class ArmorTrim(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Template> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
     }
 
@@ -66,9 +66,18 @@ data class ArmorTrim(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template> {
+    private data class TemplateType(
+        override val id: String,
+    ) : ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>:
+         *   show_in_tooltip: <boolean>
+         * ```
+         */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
             return Template(showInTooltip)

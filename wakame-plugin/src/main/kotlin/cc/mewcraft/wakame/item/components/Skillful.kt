@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.Tool.Template
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -27,8 +28,8 @@ interface Skillful : Examinable, TooltipProvider.Single {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Template> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
 
         override val configPath: String = ItemComponentConstants.SKILLFUL
@@ -71,7 +72,9 @@ interface Skillful : Examinable, TooltipProvider.Single {
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template> {
+    private data class TemplateType(
+        override val id: String,
+    ) : ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**

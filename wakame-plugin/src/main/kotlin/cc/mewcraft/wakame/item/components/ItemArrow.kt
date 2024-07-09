@@ -47,8 +47,8 @@ data class ItemArrow(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Template> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
 
         override val configPath: String = ItemComponentConstants.ARROW
@@ -121,7 +121,9 @@ data class ItemArrow(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template> {
+    private data class TemplateType(
+        override val id: String,
+    ) : ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**
@@ -132,7 +134,6 @@ data class ItemArrow(
          * ```
          */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
-            // required
             val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
             return Template(pierceLevel)
         }

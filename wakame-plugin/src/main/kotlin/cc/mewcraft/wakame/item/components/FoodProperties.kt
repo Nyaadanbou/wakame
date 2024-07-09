@@ -45,13 +45,13 @@ data class FoodProperties(
         val probability: Float,
     )
 
-    companion object : ItemComponentBridge<FoodProperties>,  ItemComponentMeta {
+    companion object : ItemComponentBridge<FoodProperties>, ItemComponentMeta {
         override fun codec(id: String): ItemComponentType<FoodProperties> {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Template> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
 
         override val configPath: String = ItemComponentConstants.FOOD
@@ -139,7 +139,9 @@ data class FoodProperties(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template> {
+    private data class TemplateType(
+        override val id: String,
+    ) : ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
         /**

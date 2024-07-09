@@ -41,8 +41,8 @@ data class ItemRarity(
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Template> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
 
         override val configPath: String = ItemComponentConstants.RARITY
@@ -146,9 +146,13 @@ data class ItemRarity(
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template> {
-        private const val MAPPING_PREFIX = "mapping:"
-        private const val RARITY_PREFIX = "rarity:"
+    private data class TemplateType(
+        override val id: String,
+    ) : ItemTemplateType<Template> {
+        private companion object {
+            const val MAPPING_PREFIX = "mapping:"
+            const val RARITY_PREFIX = "rarity:"
+        }
 
         override val typeToken: TypeToken<Template> = typeTokenOf()
 

@@ -29,6 +29,11 @@ import java.util.stream.Stream
  */
 interface ItemTemplateType<T : ItemTemplate<*>> : TypeSerializer<T>, Examinable {
     /**
+     * 模板的唯一标识.
+     */
+    val id: String
+
+    /**
      * The [TypeToken] of [T].
      */
     val typeToken: TypeToken<T> // generic sucks :x

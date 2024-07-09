@@ -9,30 +9,6 @@ uuid: cfee549f-e4d7-4574-b104-92d8251ebee4
 # 原版物品类型
 item_type: wooden_sword
 
-# 是否完全隐藏物品提示框（包括物品名字）
-hide_tooltip: false
-
-# 是否隐藏物品提示框里的额外信息（例如不祥之瓶的药水效果）
-hide_additional_tooltip: false
-
-# 开发日记 2024/6/25
-# shown_in_tooltip 是原版组件里的一个选项, 用于控制一个物品组件是否显示在提示框.
-# 按照我们新的物品框架, 一个物品组件可以是原版物品组件的代理, 也就是说
-# 我们也许不需要有一个专门的 config section 来配置 shown_in_tooltip.
-# 我们可以把 show_in_tooltip 放在每个物品组件的设置里?
-#
-# 在提示框内显示特定的原版物品信息
-# true/false: 显示/不显示
-shown_in_tooltip:
-  trim: false
-  attribute_modifiers: false
-  can_break: false
-  dyed_color: false
-  enchantments: true
-  can_place_on: false
-  stored_enchantments: false
-  unbreakable: false
-
 # 开发日记 2024/6/25
 # 在物品生成的过程中, 移除原版物品组件将发生在最后阶段
 #

@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.template.ItemTemplateType
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 
@@ -17,7 +16,7 @@ interface SystemUse : Examinable {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Nothing> {
+        override fun templateType(id: String): Nothing {
             throw UnsupportedOperationException()
         }
 

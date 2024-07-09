@@ -88,7 +88,7 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
             return Codec(id)
         }
 
-        override fun templateType(): Nothing {
+        override fun templateType(id: String): Nothing {
             throw UnsupportedOperationException()
         }
 

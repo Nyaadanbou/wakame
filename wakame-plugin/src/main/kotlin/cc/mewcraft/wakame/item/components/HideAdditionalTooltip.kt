@@ -29,8 +29,8 @@ interface HideAdditionalTooltip : Examinable {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Template> {
-            return TemplateType
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
         }
 
         override val configPath: String = ItemComponentConstants.HIDE_ADDITIONAL_TOOLTIP
@@ -71,9 +71,17 @@ interface HideAdditionalTooltip : Examinable {
         }
     }
 
-    private data object TemplateType : ItemTemplateType<Template> {
+    private data class TemplateType(
+        override val id: String,
+    ) : ItemTemplateType<Template> {
         override val typeToken: TypeToken<Template> = typeTokenOf()
 
+        /**
+         * ## Node structure
+         * ```yaml
+         * <node>: {}
+         * ```
+         */
         override fun deserialize(type: Type, node: ConfigurationNode): Template {
             return Template
         }

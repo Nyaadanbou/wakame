@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 /**
  * 用来统一物品组件的具体实现.
  */
-interface ItemComponentBridge<T /* : ItemComponent */> {
+interface ItemComponentBridge<T> {
 
     /**
      * 物品组件的 [ItemComponentType].
@@ -15,6 +15,6 @@ interface ItemComponentBridge<T /* : ItemComponent */> {
     /**
      * 物品组件的模板的 [ItemTemplateType].
      */
-    fun templateType(): ItemTemplateType<*>
+    fun templateType(id: String): ItemTemplateType<*>
 
 }

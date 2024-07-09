@@ -15,7 +15,7 @@ interface ItemDamage : Examinable {
             return Codec(id)
         }
 
-        override fun templateType(): ItemTemplateType<Nothing> {
+        override fun templateType(id: String): ItemTemplateType<Nothing> {
             throw UnsupportedOperationException()
         }
     }
