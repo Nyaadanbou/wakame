@@ -1,12 +1,16 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.event.WakameEntityDamageEvent
+import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Player
+import org.bukkit.entity.Trident
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.koin.core.component.KoinComponent
@@ -39,6 +43,15 @@ class DamageListener : Listener, KoinComponent {
      */
     @EventHandler
     fun on(event: ProjectileLaunchEvent) {
+        DamageManager.recordProjectileDamageMetaData(event)
+    }
+
+    /**
+     * 在弹射物射出时记录其 [DamageMetaData]
+     * 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
+     */
+    @EventHandler
+    fun on(event: EntityShootBowEvent) {
         DamageManager.recordProjectileDamageMetaData(event)
     }
 

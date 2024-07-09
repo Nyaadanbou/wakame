@@ -151,7 +151,8 @@ sealed interface ProjectileDamageMetaData : DamageMetaData {
 class PlayerProjectileDamageMetaData(
     override val projectileType: ProjectileType,
     val user: User<Player>,
-    val itemStack: ItemStack
+    val itemStack: ItemStack,
+    private val force: Float
 ) : ProjectileDamageMetaData {
     override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
@@ -166,7 +167,7 @@ class PlayerProjectileDamageMetaData(
                 val nekoStack = itemStack.tryNekoStack ?: return generatePackets0(attributeMap)
 
                 //没有ARROW组件，视为原版箭矢，理论上不应该出现这种情况
-                if (nekoStack.components.has(ItemComponentTypes.ARROW)) {
+                if (!nekoStack.components.has(ItemComponentTypes.ARROW)) {
                     return generatePackets0(attributeMap)
                 }
 
@@ -178,7 +179,27 @@ class PlayerProjectileDamageMetaData(
                 attributeModifiers.forEach { attribute, modifier ->
                     attributeMap.getInstance(attribute)?.addModifier(modifier)
                 }
-                val elementDamagePackets = generatePackets0(attributeMap)
+
+                //生成伤害包，注意箭矢的伤害与拉弓的力度有关
+                val elementDamagePackets = mutableListOf<ElementDamagePacket>()
+                for (it in ElementRegistry.INSTANCES.objects) {
+                    elementDamagePackets.add(
+                        ElementDamagePacket(
+                            it,
+                            force * (attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
+                                    + attributeMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)),
+                            force * (attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
+                                    + attributeMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)),
+                            attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE)
+                                    + attributeMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE),
+                            attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
+                                    + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION),
+                            attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
+                                    + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
+                        )
+                    )
+                }
+
                 //生成完伤害包以后移除掉附加的属性
                 attributeModifiers.forEach { attribute, modifier ->
                     attributeMap.getInstance(attribute)?.removeModifier(modifier)

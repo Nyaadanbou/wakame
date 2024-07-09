@@ -32,7 +32,6 @@ class EntityDefenseMetaData(
             val incomingDamageRate = (damageeAttributeMap.getValue(Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE)
                     + damageeAttributeMap.getValue(Attributes.byElement(element).INCOMING_DAMAGE_RATE))
             //依次计算防御力、元素伤害百分比加成、考虑承伤百分比、最小伤害、暴击倍率
-            //FIXME 最小伤害问题
             totalElementDamage += (damageAfterDefense *
                     (1 + packet.rate) *
                     (1 + incomingDamageRate)).coerceAtLeast(if (packet.packetDamage > 0) 1.0 else 0.0) *

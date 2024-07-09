@@ -9,6 +9,7 @@ import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
+import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.projectiles.BlockProjectileSource
 import java.time.Duration
@@ -102,14 +103,14 @@ object DamageManager {
             is Trident -> {
                 when (val shooter = projectile.shooter) {
                     is Player -> {
-                        projectileDamageMetaDataMap.put(
+                        putProjectileDamageMetaData(
                             projectile.uniqueId,
-                            PlayerProjectileDamageMetaData(ProjectileType.TRIDENT, shooter.toUser(), projectile.itemStack)
+                            PlayerProjectileDamageMetaData(ProjectileType.TRIDENT, shooter.toUser(), projectile.itemStack, 1F)
                         )
                     }
 
                     is LivingEntity -> {
-                        projectileDamageMetaDataMap.put(
+                        putProjectileDamageMetaData(
                             projectile.uniqueId,
                             EntityProjectileDamageMetaData(ProjectileType.TRIDENT, shooter)
                         )
@@ -121,14 +122,12 @@ object DamageManager {
             is AbstractArrow -> {
                 when (val shooter = projectile.shooter) {
                     is Player -> {
-                        projectileDamageMetaDataMap.put(
-                            projectile.uniqueId,
-                            PlayerProjectileDamageMetaData(ProjectileType.ARROWS, shooter.toUser(), projectile.itemStack)
-                        )
+                        //玩家发射箭矢时，由EntityShootBowEvent处理
+                        //原因是需要获取玩家拉弓的力度
                     }
 
                     is LivingEntity -> {
-                        projectileDamageMetaDataMap.put(
+                        putProjectileDamageMetaData(
                             projectile.uniqueId,
                             EntityProjectileDamageMetaData(ProjectileType.ARROWS, shooter)
                         )
@@ -142,6 +141,26 @@ object DamageManager {
 
             //TODO 可能还会有其他需要wakame属性系统处理的弹射物
         }
+    }
+
+    fun recordProjectileDamageMetaData(event: EntityShootBowEvent) {
+        val entity = event.entity
+        if (entity !is Player) return
+
+        val projectile = event.projectile
+        if (projectile !is AbstractArrow) return
+        if (projectile is Trident) return
+
+        //玩家射出的箭矢伤害需要根据拉弓的力度进行调整
+        val force = DamageRules.calculateBowForce(72000 - entity.itemUseRemainingTime)
+        putProjectileDamageMetaData(
+            projectile.uniqueId,
+            PlayerProjectileDamageMetaData(ProjectileType.ARROWS, entity.toUser(), projectile.itemStack, force)
+        )
+    }
+
+    fun putProjectileDamageMetaData(uuid: UUID, projectileDamageMetaData: ProjectileDamageMetaData) {
+        projectileDamageMetaDataMap.put(uuid, projectileDamageMetaData)
     }
 
     fun findProjectileDamageMetaData(uuid: UUID): ProjectileDamageMetaData? {
@@ -167,5 +186,15 @@ object DamageRules {
     ): Double {
         val validDefense = (defense - defensePenetration).coerceAtLeast(0.0)
         return (originalDamage - validDefense).coerceAtLeast(0.0)
+    }
+
+    /**
+     * 通过拉弓的时间计算拉弓的力度
+     * TODO 添加从配置文件载入防御计算公式的功能
+     */
+    fun calculateBowForce(useTicks: Int): Float {
+        val useSeconds = useTicks / 20F
+        val force = (useSeconds * useSeconds + useSeconds * 2F) / 3F
+        return force.coerceIn(0F, 1F)
     }
 }
