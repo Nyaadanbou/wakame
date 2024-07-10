@@ -1,6 +1,30 @@
 # 技能模板的 type
 type: projectile
 
+# 弹射物类型
+projectile_type: ARROW
+
+# 弹射物的初始的速度
+initial_velocity: 2F
+
+# 弹射物最大移动距离, 超过这个距离弹射物会消失
+maximum_distance: 100
+
+# 弹射物可穿透的最大实体数量
+penetration: 1
+
+# 弹射物是否有重力
+gravity: true
+
+# 弹射物触发的效果
+# Key: 触发的条件, 可用值:
+#   start: 弹射物发射时触发
+#   tick: 弹射物每次 tick 时触发
+#   hit_entity: 弹射物击中实体时触发
+#   hit_block: 弹射物击中方块时触发
+#   pick_up: 玩家捡起弹射物时触发
+#   disappear: 弹射物消失时触发 (特指因为超过最大距离而消失, 其他情况不处理)
+# Value: 触发的技能 key
 effects:
   start: "skill:melee/dash"
   hit_entity: "skill:melee/kill_entity"
