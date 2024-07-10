@@ -419,9 +419,9 @@ movement_speed:
 
 universal_attack_damage:
   enabled: true
-  display: "<element>攻击力"
+  display: "通用攻击力"
   tooltips:
-    add: "<!i><element>攻击力 <min:#;-.> ⎓ <max:#;-.>"
+    add: "<!i>通用攻击力 <min:#;-.> ⎓ <max:#;-.>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
@@ -431,9 +431,9 @@ universal_attack_damage:
 
 universal_attack_damage_rate:
   enabled: true
-  display: "<element>攻击力"
+  display: "通用攻击力"
   tooltips:
-    add: "<!i><element>攻击力 <value:+#%;-.%>"
+    add: "<!i>通用攻击力 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
@@ -443,9 +443,9 @@ universal_attack_damage_rate:
 
 universal_defense:
   enabled: true
-  display: "<element>防御"
+  display: "通用防御"
   tooltips:
-    add: "<!i><element>防御 <value:+#;-.>"
+    add: "<!i>通用防御 <value:+#;-.>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
@@ -455,9 +455,9 @@ universal_defense:
 
 universal_defense_penetration:
   enabled: true
-  display: "<element>防御穿透"
+  display: "通用防御穿透"
   tooltips:
-    add: "<!i><element>防御穿透 <value:+#;-.>"
+    add: "<!i>通用防御穿透 <value:+#;-.>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
@@ -467,9 +467,9 @@ universal_defense_penetration:
 
 universal_defense_penetration_rate:
   enabled: true
-  display: "<element>防御穿透率"
+  display: "通用防御穿透率"
   tooltips:
-    add: "<!i><element>防御穿透率 <value:+#%;-.%>"
+    add: "<!i>通用防御穿透率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
@@ -479,9 +479,9 @@ universal_defense_penetration_rate:
 
 universal_incoming_damage_rate:
   enabled: true
-  display: "<element>承伤百分比"
+  display: "通用承伤百分比"
   tooltips:
-    add: "<!i><element>承伤百分比 <value:+#%;-.%>"
+    add: "<!i>通用承伤百分比 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
