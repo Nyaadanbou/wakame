@@ -17,7 +17,7 @@ class ItemModelDataLookupTest : KoinTest {
         fun setup() {
             startKoin {
                 modules(
-                    testEnvironment()
+                    testEnv()
                 )
 
                 // this module

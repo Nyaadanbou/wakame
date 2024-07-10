@@ -1,4 +1,8 @@
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.WatchedCollection
+import cc.mewcraft.wakame.util.WatchedList
+import cc.mewcraft.wakame.util.WatchedMap
+import cc.mewcraft.wakame.util.WatchedPrimitive
+import cc.mewcraft.wakame.util.WatchedSet
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
@@ -13,7 +17,7 @@ class WatchedValueTest {
         @BeforeAll
         fun setup() {
             startKoin {
-                modules(testEnvironment())
+                modules(testEnv())
             }
         }
 

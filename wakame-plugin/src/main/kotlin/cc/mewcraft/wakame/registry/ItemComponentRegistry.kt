@@ -11,14 +11,15 @@ import org.koin.core.component.KoinComponent
  */
 object ItemComponentRegistry : KoinComponent, Initializable {
 
-    internal val CONFIG by lazy { Configs.YAML[ITEM_GLOBAL_CONFIG_FILE].derive("components") }
+    const val NODE_COMPONENTS = "components"
+
+    /**
+     * 物品组件的全局配置文件.
+     */
+    internal val CONFIG = Configs.YAML[ITEM_GLOBAL_CONFIG_FILE].derive(NODE_COMPONENTS)
 
     /**
      * 物品组件类型的注册表.
      */
-    val TYPES: Registry<String, ItemComponentType<*>> = SimpleRegistry()
-
-    override fun onPreWorld() {
-
-    }
+    internal val TYPES: Registry<String, ItemComponentType<*>> = SimpleRegistry()
 }

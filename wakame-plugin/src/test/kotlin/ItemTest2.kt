@@ -92,7 +92,7 @@ class ItemTest2 : KoinTest {
             startKoin {
                 // environment
                 modules(
-                    testEnvironment()
+                    testEnv()
                 )
 
                 // this module

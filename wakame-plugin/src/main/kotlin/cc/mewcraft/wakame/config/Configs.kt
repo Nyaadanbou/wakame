@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.config.Configs.YAML
 import cc.mewcraft.wakame.config.Configs.getKoin
+import org.jetbrains.annotations.TestOnly
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
@@ -24,9 +25,15 @@ object Configs : KoinComponent {
         YAML.reload()
         GSON.reload()
     }
+
+    @TestOnly
+    fun cleanup() {
+        YAML.cleanup()
+        GSON.cleanup()
+    }
 }
 
-sealed class BasicConfigs<T: AbstractConfigurationLoader<*>, B : AbstractConfigurationLoader.Builder<B, T>> {
+sealed class BasicConfigs<T : AbstractConfigurationLoader<*>, B : AbstractConfigurationLoader.Builder<B, T>> {
     /**
      * The map of config providers.
      *
@@ -38,10 +45,7 @@ sealed class BasicConfigs<T: AbstractConfigurationLoader<*>, B : AbstractConfigu
     /**
      * Builds a [config provider][ConfigProvider] with the specified options.
      */
-    fun build(
-        relPath: String,
-        builder: B.() -> Unit
-    ): ConfigProvider {
+    fun build(relPath: String, builder: B.() -> Unit): ConfigProvider {
         return configProviders.getOrPut(relPath) { createConfigProvider(relPath, builder) }
     }
 
@@ -52,25 +56,39 @@ sealed class BasicConfigs<T: AbstractConfigurationLoader<*>, B : AbstractConfigu
         return configProviders.getOrPut(relPath) { createConfigProvider(relPath, {}) }
     }
 
+    /**
+     * Reloads all the config providers.
+     */
     fun reload() {
         configProviders.values.forEach(ConfigProvider::update)
     }
 
+    /**
+     * Cleans up the config providers.
+     */
+    @TestOnly
+    fun cleanup() {
+        configProviders.clear()
+    }
+
+    /**
+     * Gets the config file.
+     */
     protected fun getConfigFile(path: String): File {
         return getKoin().getOrNull<WakamePlugin>()?.getBundledFile(path) // we're in a server environment
             ?: getKoin().get<File>(named(PLUGIN_DATA_DIR)).resolve(path) // we're in a test environment
     }
 
-    protected abstract fun createConfigProvider(
-        relPath: String,
-        builder: B.() -> Unit
-    ): ConfigProvider
+    /**
+     * Creates a config provider.
+     */
+    protected abstract fun createConfigProvider(relPath: String, builder: B.() -> Unit): ConfigProvider
 }
 
 class YamlConfigs : BasicConfigs<YamlConfigurationLoader, YamlConfigurationLoader.Builder>() {
     override fun createConfigProvider(
         relPath: String,
-        builder: YamlConfigurationLoader.Builder.() -> Unit
+        builder: YamlConfigurationLoader.Builder.() -> Unit,
     ): ConfigProvider {
         val file = getConfigFile(relPath).toPath()
         return YamlFileConfigProvider(file, relPath, builder)
@@ -80,7 +98,7 @@ class YamlConfigs : BasicConfigs<YamlConfigurationLoader, YamlConfigurationLoade
 class GsonConfigs : BasicConfigs<GsonConfigurationLoader, GsonConfigurationLoader.Builder>() {
     override fun createConfigProvider(
         relPath: String,
-        builder: GsonConfigurationLoader.Builder.() -> Unit
+        builder: GsonConfigurationLoader.Builder.() -> Unit,
     ): ConfigProvider {
         val file = getConfigFile(relPath).toPath()
         return GsonFileConfigProvider(file, relPath, builder)

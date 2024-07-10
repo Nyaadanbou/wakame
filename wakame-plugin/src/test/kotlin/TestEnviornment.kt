@@ -10,8 +10,17 @@ import java.nio.file.Path
 
 /* Common environment for running unit tests */
 
-fun testEnvironment(): Module = module {
-    single<Logger> { LoggerFactory.getLogger("TestEnvironment") }
-    single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/test/resources").toFile().absoluteFile }
+fun commonEnv(): Module = module {
+    single<Logger> { LoggerFactory.getLogger("TestEnv") }
     single<File>(named(PLUGIN_ASSETS_DIR)) { get<File>(named(PLUGIN_DATA_DIR)).resolve("assets") }
+}
+
+fun mainEnv(): Module = module {
+    includes(commonEnv())
+    single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/main/resources").toFile().absoluteFile }
+}
+
+fun testEnv(): Module = module {
+    includes(commonEnv())
+    single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/test/resources").toFile().absoluteFile }
 }

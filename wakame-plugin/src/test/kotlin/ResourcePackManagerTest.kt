@@ -4,7 +4,14 @@ import cc.mewcraft.wakame.util.readFromDirectory
 import cc.mewcraft.wakame.util.readFromZipFile
 import cc.mewcraft.wakame.util.writeToDirectory
 import cc.mewcraft.wakame.util.writeToZipFile
-import io.mockk.*
+import io.mockk.Call
+import io.mockk.MockKAnswerScope
+import io.mockk.confirmVerified
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import io.mockk.verify
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -37,7 +44,7 @@ class ResourcePackManagerTest : KoinTest {
         @BeforeAll
         fun setup() {
             startKoin {
-                modules(testEnvironment())
+                modules(testEnv())
 
                 // Add test module
                 modules(testModule)

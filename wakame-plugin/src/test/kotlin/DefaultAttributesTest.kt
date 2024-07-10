@@ -26,7 +26,7 @@ class DefaultAttributesTest : KoinTest {
         fun setup() {
             startKoin {
                 modules(
-                    testEnvironment()
+                    testEnv()
                 )
 
                 // this module

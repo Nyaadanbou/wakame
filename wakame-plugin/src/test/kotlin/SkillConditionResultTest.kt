@@ -3,7 +3,9 @@ import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroupImpl
 import cc.mewcraft.wakame.skill.condition.SkillConditionSession
 import cc.mewcraft.wakame.skill.context.SkillContext
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -17,7 +19,7 @@ class SkillConditionResultTest : KoinTest {
         @BeforeAll
         fun setup() {
             startKoin {
-                modules(testEnvironment())
+                modules(testEnv())
             }
         }
 

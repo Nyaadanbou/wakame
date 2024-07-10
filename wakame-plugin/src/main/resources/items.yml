@@ -8,11 +8,26 @@ components:
     tooltips:
       single: "<!i>穿透: <pierce_level>"
 
+  attribute_modifiers:
+    enabled: true
+    display_name: "属性修饰符"
+    tooltips: { }
+
   attributable:
     enabled: true
     display_name: "提供属性加成"
     tooltips:
       single: "<!i>提供属性加成"
+
+  can_break:
+    enabled: true
+    display_name: "CAN_BREAK"
+    tooltips: { }
+
+  can_place_on:
+    enabled: true
+    display_name: "CAN_PLACE_ON"
+    tooltips: { }
 
   castable:
     enabled: true
@@ -64,6 +79,11 @@ components:
     tooltips:
       single: "<!i>耐久度: <damage> / <max_damage>"
 
+  dyed_color:
+    enabled: true
+    display_name: "染色"
+    tooltips: { }
+
   elements:
     enabled: true
     display_name: "元素"
@@ -75,6 +95,11 @@ components:
       single: "<single>"
       separator: ", "
 
+  enchantments:
+    enabled: true
+    display_name: "附魔"
+    tooltips: { }
+
   fire_resistant:
     enabled: true
     display_name: "免疫火焰伤害"
@@ -85,6 +110,14 @@ components:
     enabled: true
     display_name: "作为食物"
     tooltips: { }
+
+  hide_tooltip:
+    enabled: true
+    display_name: "隐藏提示框"
+
+  hide_additional_tooltip:
+    enabled: true
+    display_name: "隐藏额外提示框"
 
   item_name:
     enabled: true
@@ -158,6 +191,11 @@ components:
     tooltips:
       single: "<!i>皮肤所有者: <skin_owner_name>"
 
+  stored_enchantments:
+    enabled: true
+    display_name: "存储的附魔"
+    tooltips: { }
+
   system_use:
     enabled: true
     display_name: "系统使用"
@@ -174,6 +212,10 @@ components:
     enabled: true
     display_name: "信息跟踪"
     tooltips: { } # 内容过多, 委托到其他配置文件进行设置
+
+  trim:
+    enabled: true
+    display_name: "纹饰"
 
   unbreakable:
     enabled: true

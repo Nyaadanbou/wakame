@@ -51,7 +51,7 @@ class LoreFlattenTest : KoinTest {
         fun setup() {
             val app = startKoin {
                 modules(
-                    testEnvironment()
+                    testEnv()
                 )
 
                 // this module
