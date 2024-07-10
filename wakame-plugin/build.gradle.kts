@@ -94,7 +94,7 @@ tasks {
     val inputJarPath by lazy { shadowJar.get().archiveFile.get().asFile.absolutePath }
     val finalJarName by lazy { "${ext.get("name")}-${project.version}.jar" }
     val finalJarPath by lazy { layout.buildDirectory.file(finalJarName).get().asFile.absolutePath }
-    val deployTargetPath = rootProject.file(".deploy_config").takeIf { it.exists() }?.readText()?.takeIf { it.isNotBlank() }
+    val deployTargetPath = rootProject.file(".deploy_config").takeIf { it.exists() }?.readLines().orEmpty()
     register<Copy>("copyJar") {
         group = "mewcraft"
         dependsOn(build)
@@ -106,13 +106,16 @@ tasks {
         group = "mewcraft"
         dependsOn(named("copyJar"))
         doLast {
-            if (deployTargetPath == null) {
+            if (deployTargetPath.isEmpty()) {
                 logger.lifecycle("No deploy target path found, skipping deployment")
                 return@doLast
             }
 
-            exec {
-                commandLine("rsync", finalJarPath, deployTargetPath)
+            for (s in deployTargetPath) {
+                logger.lifecycle("Deploying to $s...")
+                exec {
+                    commandLine("rsync", finalJarPath, s)
+                }
             }
         }
     }

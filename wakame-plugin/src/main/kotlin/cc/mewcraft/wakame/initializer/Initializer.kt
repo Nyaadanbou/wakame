@@ -18,7 +18,6 @@ import cc.mewcraft.wakame.item.SingleItemListener
 import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
-import cc.mewcraft.wakame.resource.ResourceListener
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CATEGORY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
@@ -138,7 +137,6 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
-        registerTerminableListener(get<ResourceListener>()).bindWith(this)
         registerTerminableListener(get<SingleItemListener>()).bindWith(this)
         registerTerminableListener(get<DamageListener>()).bindWith(this)
         registerTerminableListener(get<TickerListener>()).bindWith(this)

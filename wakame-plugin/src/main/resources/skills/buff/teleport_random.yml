@@ -1,0 +1,5 @@
+type: teleport
+
+teleportation:
+  type: random
+  distance: 5.0
