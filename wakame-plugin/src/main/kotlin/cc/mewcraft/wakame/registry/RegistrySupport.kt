@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.registry
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableSet
+import org.jetbrains.annotations.TestOnly
 
 // Side note: use CMD-7 to navigate this file
 
@@ -51,6 +52,7 @@ sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
     /**
      * Clears all registered entries.
      */
+    @TestOnly
     fun clear()
 }
 
