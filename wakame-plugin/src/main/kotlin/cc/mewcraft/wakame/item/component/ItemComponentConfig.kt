@@ -92,15 +92,15 @@ private constructor(
         val single: String by root.entry<String>("tooltips", "single")
 
         fun render(): Component {
-            return ItemComponentInjections.mini.deserialize(single)
+            return ItemComponentInjections.miniMessage.deserialize(single)
         }
 
         fun render(resolver: TagResolver): Component {
-            return ItemComponentInjections.mini.deserialize(single, resolver)
+            return ItemComponentInjections.miniMessage.deserialize(single, resolver)
         }
 
         fun render(vararg resolver: TagResolver): Component {
-            return ItemComponentInjections.mini.deserialize(single, *resolver)
+            return ItemComponentInjections.miniMessage.deserialize(single, *resolver)
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> {
@@ -133,13 +133,13 @@ private constructor(
         ): List<Component> {
             return collection
                 .mapTo(ObjectArrayList(collection.size)) {
-                    ItemComponentInjections.mini.deserialize(single, component("single", extractor(it)))
+                    ItemComponentInjections.miniMessage.deserialize(single, component("single", extractor(it)))
                 }
                 .join(
-                    JoinConfiguration.separator(ItemComponentInjections.mini.deserialize(separator))
+                    JoinConfiguration.separator(ItemComponentInjections.miniMessage.deserialize(separator))
                 )
                 .let {
-                    ItemComponentInjections.mini.deserialize(merged, component("merged", it))
+                    ItemComponentInjections.miniMessage.deserialize(merged, component("merged", it))
                 }
                 .let(::listOf)
         }

@@ -46,10 +46,16 @@ data class ItemElements(
 ) : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemElements>, ItemComponentMeta {
+        /**
+         * 构建一个 [ItemElements] 的实例.
+         */
         fun of(elements: Collection<Element>): ItemElements {
             return ItemElements(ObjectArraySet(elements))
         }
 
+        /**
+         * 构建一个 [ItemElements] 的实例.
+         */
         fun of(vararg elements: Element): ItemElements {
             return of(elements.toList())
         }

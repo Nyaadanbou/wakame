@@ -52,10 +52,16 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<String, Cell>> {
 
     companion object : ItemComponentBridge<ItemCells>, ItemComponentMeta {
+        /**
+         * 构建一个 [ItemCells] 的实例.
+         */
         fun of(cells: Map<String, Cell>): ItemCells {
             return Value(cells)
         }
 
+        /**
+         * 返回一个 [ItemCells] 的构建器.
+         */
         fun builder(): Builder {
             return BuilderImpl()
         }

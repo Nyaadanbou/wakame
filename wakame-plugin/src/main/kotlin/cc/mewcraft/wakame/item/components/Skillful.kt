@@ -23,6 +23,13 @@ import org.spongepowered.configurate.ConfigurationNode
 interface Skillful : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Skillful>, ItemComponentMeta {
+        /**
+         * 返回 [Skillful] 的实例.
+         */
+        fun of(): Skillful {
+            return Value
+        }
+
         override fun codec(id: String): ItemComponentType<Skillful> {
             return Codec(id)
         }

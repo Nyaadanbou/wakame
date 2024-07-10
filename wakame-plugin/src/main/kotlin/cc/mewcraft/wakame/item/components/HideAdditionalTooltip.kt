@@ -20,6 +20,9 @@ import org.spongepowered.configurate.ConfigurationNode
 interface HideAdditionalTooltip : Examinable {
 
     companion object : ItemComponentBridge<HideAdditionalTooltip>, ItemComponentMeta {
+        /**
+         * 返回 [HideAdditionalTooltip] 的实例.
+         */
         fun of(): HideAdditionalTooltip {
             return Value
         }

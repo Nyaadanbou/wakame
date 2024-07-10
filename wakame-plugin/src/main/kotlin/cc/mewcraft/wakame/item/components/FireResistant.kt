@@ -22,12 +22,12 @@ import org.spongepowered.configurate.ConfigurationNode
 interface FireResistant : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<FireResistant>, ItemComponentMeta {
+        /**
+         * 返回 [FireResistant] 的实例.
+         */
         fun of(): FireResistant {
             return Value
         }
-
-        override val configPath: String = ItemComponentConstants.FIRE_RESISTANT
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { FIRE_RESISTANT }
 
         override fun codec(id: String): ItemComponentType<FireResistant> {
             return Codec(id)
@@ -36,6 +36,9 @@ interface FireResistant : Examinable, TooltipProvider.Single {
         override fun templateType(id: String): ItemTemplateType<Template> {
             return TemplateType(id)
         }
+
+        override val configPath: String = ItemComponentConstants.FIRE_RESISTANT
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { FIRE_RESISTANT }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

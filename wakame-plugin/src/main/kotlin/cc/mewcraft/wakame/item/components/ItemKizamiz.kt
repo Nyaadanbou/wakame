@@ -46,10 +46,16 @@ data class ItemKizamiz(
 ) : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemKizamiz>, ItemComponentMeta {
+        /**
+         * 构建一个 [ItemKizamiz] 的实例.
+         */
         fun of(kizamiz: Collection<Kizami>): ItemKizamiz {
             return ItemKizamiz(ObjectArraySet(kizamiz))
         }
 
+        /**
+         * 构建一个 [ItemKizamiz] 的实例.
+         */
         fun of(vararg kizamiz: Kizami): ItemKizamiz {
             return of(kizamiz.toList())
         }

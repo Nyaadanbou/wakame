@@ -33,9 +33,6 @@ data class ItemLevel(
 ) : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<ItemLevel>, ItemComponentMeta {
-        override val configPath: String = ItemComponentConstants.LEVEL
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LEVEL }
-
         override fun codec(id: String): ItemComponentType<ItemLevel> {
             return Codec(id)
         }
@@ -43,6 +40,9 @@ data class ItemLevel(
         override fun templateType(id: String): ItemTemplateType<Template> {
             return TemplateType(id)
         }
+
+        override val configPath: String = ItemComponentConstants.LEVEL
+        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LEVEL }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

@@ -28,6 +28,13 @@ interface Unbreakable : Examinable {
     val showInTooltip: Boolean
 
     companion object : ItemComponentBridge<Unbreakable>, ItemComponentMeta {
+        /**
+         * 构建一个 [Unbreakable] 的实例.
+         */
+        fun of(showInTooltip: Boolean): Unbreakable {
+            return Value(showInTooltip)
+        }
+
         override fun codec(id: String): ItemComponentType<Unbreakable> {
             return Codec(id)
         }

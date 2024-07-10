@@ -10,7 +10,7 @@ import cc.mewcraft.nbt.CompoundTag
 // 那怕是 NonValued 也可能需要提供一个固定的 LoreLine,
 // 而 Map 里的 get 函数又直接返回的
 // 这种情况提供 LoreLine
-
+//
 // 开发日记 2024/6/26
 // 叫做 ItemComponentType, 但实际上是 ItemComponentCodec 的作用
 // (因为 read/write/remove).
@@ -29,9 +29,6 @@ interface ItemComponentType<T> {
      * `组件类型`的唯一标识. 用于配置文件和NBT的序列化.
      */
     val id: String
-
-    // 开发日记: 2024/6/24 小米
-    // 对于 Holder 为 NBT 的组件来说, read/write/remove 函数是不需要实现的 - 它们实际上不会被调用
 
     /**
      * 读取 [holder] 中包含的组件信息 [T].

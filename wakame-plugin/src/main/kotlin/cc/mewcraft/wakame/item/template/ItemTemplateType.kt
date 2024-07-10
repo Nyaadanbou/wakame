@@ -6,13 +6,8 @@ import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
-import java.lang.reflect.Type
 import java.util.stream.Stream
 
-// 开发日记 2024/6/26
-// 之所以叫 Kind 不叫 Type 是因为 Type 跟 serialize 里的函数参数名冲突了.
-// 而之所以叫 Kind 不叫 Serializer 是因为这将作为 ItemTemplate 的映射键.
-//
 // 开发日记 2024/7/5
 // 这里的类型 T 不能设置 upper bounds,
 // 因为存在数据类型为 primitive 的组件,
@@ -43,9 +38,9 @@ interface ItemTemplateType<T : ItemTemplate<*>> : Examinable {
     fun decode(node: ConfigurationNode): T
 
     /**
-     * 定义如何将 [T] 序列化到 [node].
+     * 定义如何将 [T] 写入到 [node].
      */
-    fun encode(type: Type, obj: T?, node: ConfigurationNode): Nothing {
+    fun encode(obj: T?, node: ConfigurationNode) {
         throw UnsupportedOperationException()
     }
 
@@ -61,6 +56,6 @@ interface ItemTemplateType<T : ItemTemplate<*>> : Examinable {
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("id", id)
+        ExaminableProperty.of("id", id),
     )
 }

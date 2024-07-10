@@ -153,7 +153,7 @@ data class ItemName(
                 }
             }
             val raw = itemName
-            val rich = ItemComponentInjections.mini.deserialize(itemName, resolver.build())
+            val rich = ItemComponentInjections.miniMessage.deserialize(itemName, resolver.build())
 
             return GenerationResult.of(ItemName(raw = raw, rich = rich))
         }

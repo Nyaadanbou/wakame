@@ -22,6 +22,9 @@ import org.spongepowered.configurate.ConfigurationNode
 interface Kizamiable : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Kizamiable>, ItemComponentMeta {
+        /**
+         * 返回 [Kizamiable] 的实例.
+         */
         fun of(): Kizamiable {
             return Value
         }

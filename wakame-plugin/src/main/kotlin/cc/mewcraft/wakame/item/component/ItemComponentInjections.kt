@@ -7,5 +7,5 @@ import org.slf4j.Logger
 
 internal object ItemComponentInjections : KoinComponent {
     val logger: Logger by inject()
-    val mini: MiniMessage by inject()
+    val miniMessage: MiniMessage by inject()
 }

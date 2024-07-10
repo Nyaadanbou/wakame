@@ -19,14 +19,12 @@ import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 
-// 开发日记 2024/7/5
-// 1. 所有组件的数据类实现 ItemComponent 接口
-// 2. 如果一个组件是 NonValued, 那么它依然是接口, 但其 Value (单例) 应该隐藏起来
-// 3. 如果一个组件是 Valued, 那么直接写成 data class, 因为这样可以直接用 .copy
-
 interface Attributable : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Attributable>, ItemComponentMeta {
+        /**
+         * 返回 [Attributable] 的实例.
+         */
         fun of(): Attributable {
             return Value
         }
@@ -64,11 +62,6 @@ interface Attributable : Examinable, TooltipProvider.Single {
     private data class Codec(
         override val id: String,
     ) : ItemComponentType<Attributable> {
-        // 开发日记 2024/6/29
-        // 这是一个 NonValued 的组件,
-        // 因此只需要检查是否存在即可,
-        // 其内部的数据不重要.
-
         override fun read(holder: ItemComponentHolder): Attributable? {
             return if (holder.hasTag()) Value else null
         }
@@ -82,11 +75,6 @@ interface Attributable : Examinable, TooltipProvider.Single {
         }
     }
 
-    // 开发日记: 2024/6/24
-    // Attributable 既然是一个 NonValued 组件类型,
-    // 那么似乎也不需要为其创建一个 Template 的 class.
-    // 设置成一个 object 足矣.
-    //
     // 开发日记 2024/7/2
     // 如果我们需要给物品加上一个标记,
     // 但这个标记不储存在物品(NBT)上,

@@ -22,6 +22,9 @@ import org.spongepowered.configurate.ConfigurationNode
 interface Castable : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Castable>, ItemComponentMeta {
+        /**
+         * 返回 [Castable] 的实例.
+         */
         fun of(): Castable {
             return Value
         }

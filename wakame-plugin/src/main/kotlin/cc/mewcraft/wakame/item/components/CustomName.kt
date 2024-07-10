@@ -31,22 +31,6 @@ import org.spongepowered.configurate.ConfigurationNode
 // 1. 在物品上存什么;
 // 2. 从物品上获取时返回什么;
 // 3. 在后台模板上存什么;
-//
-// 第一个问题, 存什么是要看具体需求的, 也就是分析到底要不要.
-// wakame 的物品组件都是“自己的物品组件”,
-// 这句的话意思是, 组件在*概念上*都是 wakame 自己的,
-// 但在组件的实现方式上是多种多样的 —— 可以基于 NBT/Item/Complex.
-// 回答第一个: 存 raw string 和 rich string
-// raw 是配置文件里的原始 MiniMessage 字符串,
-// rich 是根据 raw 生成出来的 text component.
-//
-// 第二个问题, 从物品上获取时返回什么.
-// 这个也是看具体需求 —— 我们需要最原始的数据, 还是处理过后的数据?
-// 回答第二个: 有什么就返回什么.
-//
-// 第三个问题, 从后台模板上存什么.
-// 这个只有一个要求 —— 模板上储存的数据可以生成所有需要的物品数据.
-// 回答第三个: 存原始的 raw 即可.
 
 data class CustomName(
     /**
@@ -172,8 +156,7 @@ data class CustomName(
                 }
             }
             val raw = customName
-            val rich = ItemComponentInjections.mini.deserialize(customName, resolver.build())
-
+            val rich = ItemComponentInjections.miniMessage.deserialize(customName, resolver.build())
             return GenerationResult.of(CustomName(raw = raw, rich = rich))
         }
     }

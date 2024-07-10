@@ -51,10 +51,16 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
     }
 
     companion object : ItemComponentBridge<ItemTracks>, ItemComponentMeta {
+        /**
+         * 返回一个空的 [ItemTracks] 实例.
+         */
         fun of(): ItemTracks {
             return Value(emptyMap())
         }
 
+        /**
+         * 从 [nbt] 中读取 [ItemTracks] 实例.
+         */
         fun of(nbt: CompoundTag): ItemTracks {
             val builder = builder()
             for (tagKey in nbt.keySet()) {
@@ -80,6 +86,9 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
             return builder.build()
         }
 
+        /**
+         * 返回一个 [ItemTracks] 的构建器.
+         */
         fun builder(): Builder {
             return BuilderImpl()
         }
@@ -187,6 +196,9 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
     // 而是由玩家的交互去更新.
     //
     // 开发日记 2024/7/6
-    // FIXME 如果没有模板, 那系统怎么知道要不要
+    // 如果没有模板, 那系统怎么知道要不要
     // 往物品里写入需要跟踪的信息? 读行为?
+    //
+    // 开发日记 2024/7/10
+    // 对的, 就是读行为.
 }
