@@ -17,7 +17,7 @@ internal object TextRenderer {
      */
     @Contract(pure = true)
     fun generateNameLine(stack: NekoStack): NameLine {
-        return NameLine.noop() // TODO 移除
+        return NameLine.noop()
     }
 
     /**

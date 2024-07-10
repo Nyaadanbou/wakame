@@ -186,6 +186,7 @@ fun EntityAttributeMap(entity: LivingEntity): EntityAttributeMap {
  * Instead, it works as an "accessor" to the underlying attribute data about an entity.
  * By design, the underlying attribute data is actually stored in the entity's NBT storage.
  */
+// TODO EntityAttributeMap 支持 overrides
 class EntityAttributeMap : AttributeMap {
     internal constructor(default: AttributeSupplier, entity: LivingEntity) {
         require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
@@ -232,40 +233,35 @@ class EntityAttributeMap : AttributeMap {
     // 需要注意, 读取时如果默认属性不存在, 那么会直接抛异常. 因此测试前需要先准备好配置文件.
 
     override fun getInstance(attribute: Attribute): AttributeInstance? {
-        TODO("Not yet implemented")
+        throw NotImplementedError("Not yet implemented")
     }
 
     override fun register(attribute: Attribute) {
-        TODO("Not yet implemented")
+        throw NotImplementedError("Not yet implemented")
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
-        // TODO 支持 overrides
         return default.hasAttribute(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
-        // TODO 支持 overrides
         return default.hasModifier(attribute, uuid)
     }
 
     override fun getValue(attribute: Attribute): Double {
-        // TODO 支持 overrides
         return default.getValue(attribute, entity)
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        // TODO 支持 overrides
         return default.getBaseValue(attribute, entity)
     }
 
     override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        // TODO 支持 overrides
         return default.getModifierValue(attribute, uuid, entity)
     }
 
     override fun assignValues(other: AttributeMap) {
-        TODO("Not yet implemented")
+        throw NotImplementedError("Not yet implemented")
     }
 }
 

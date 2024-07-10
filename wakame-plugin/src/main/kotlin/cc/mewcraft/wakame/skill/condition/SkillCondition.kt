@@ -43,7 +43,7 @@ interface SkillCondition {
     /**
      * 用于创建技能的文字描述信息.
      */
-    val resolver: TagResolver // TODO 单独弄个接口?
+    val resolver: TagResolver
 
     /**
      * 创建一个新的条件判断的会话.

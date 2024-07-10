@@ -19,7 +19,7 @@ interface SkillConditionGroup {
     /**
      * 技能条件组里所有的 [SkillCondition.resolver] 之和.
      */
-    val resolver: TagResolver // TODO 单独弄个接口?
+    val resolver: TagResolver
 
     /**
      * 创建一个新的条件判断的会话.

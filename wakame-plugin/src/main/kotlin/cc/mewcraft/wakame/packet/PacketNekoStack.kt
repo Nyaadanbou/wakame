@@ -21,7 +21,7 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack as PacketStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 internal fun PacketStack.takeUnlessEmpty(): ItemStack? {
-    return this.takeIf { !it.isEmpty } // FIXME 需要这个吗？
+    return this.takeIf { !it.isEmpty }
 }
 
 internal val PacketStack.isNeko: Boolean
