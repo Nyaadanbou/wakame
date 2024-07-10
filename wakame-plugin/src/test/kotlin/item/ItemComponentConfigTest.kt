@@ -18,6 +18,9 @@ import testEnv
 import kotlin.test.Test
 import kotlin.test.fail
 
+/**
+ * 用于检查所有物品组件的配置是否已经出现在 main/items.yml 或 test/items.yml.
+ */
 class ItemComponentConfigTest : KoinTest {
     @BeforeEach
     fun beforeEach() {
