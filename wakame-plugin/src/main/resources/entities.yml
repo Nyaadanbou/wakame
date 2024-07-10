@@ -20,16 +20,6 @@ entity_attributes:
       defense: default # 如果一个属性带元素，并且没有 map 结构，则相当于给该属性的每个元素都指定了一个值
       max_mana: 100.0 # 如果一个属性不带元素，则直接写标量来指定其数值
 
-  minecraft:mob:
-    parent: minecraft:living
-    values: { } # 属性值 map 可以为空，虽然没什么用
-
-  minecraft:monster:
-    parent: minecraft:mob
-    values:
-      defense: # 如果一个属性带元素，并且该节点是一个 map 结构，意思是给该属性的特定元素指定一个值。未指定的元素相当于没有该元素的属性
-        neutral: .0
-
   minecraft:player:
     parent: minecraft:living
     values:
@@ -61,44 +51,463 @@ entity_attributes:
       universal_defense_penetration_rate: default
       universal_incoming_damage_rate: default
 
+  minecraft:mob:
+    parent: minecraft:living
+    values: { } # 属性值 map 可以为空，虽然没什么用
 
-  minecraft:spider: # 生物的唯一标识，参考 https://minecraft.wiki/w/Mob
-    parent: minecraft:monster
+  minecraft:monster:
+    parent: minecraft:mob
     values:
-      max_health: 20.0
-      defense:
-        neutral: 2.0 # 如果属性是带元素的，这一级缩进对应元素的值
-
-  minecraft:zombie:
-    parent: minecraft:monster
-    values:
-      max_health: 40.0
-      defense:
-        neutral: 4.0
-
-  minecraft:skeleton:
-    parent: minecraft:monster
-    values:
-      attack_damage:
-        neutral: 10.0
+      attack_damage: 0
       attack_damage_rate: 0
-#      critical_strike_chance: default
-#      critical_strike_power: default
-      defense:
-        neutral: 2.0
-      defense_penetration:
-        neutral: 0.0
-      defense_penetration_rate:
-        neutral: 0.0
-      incoming_damage_rate:
-        neutral: 0.0
-      max_health: 20
+      critical_strike_chance: default
+      critical_strike_power: default
+      defense: 0
+      defense_penetration: 0
+      defense_penetration_rate: 0
+      incoming_damage_rate: 0
       universal_attack_damage: 0
       universal_attack_damage_rate: 0
       universal_defense: 0
       universal_defense_penetration: 0
       universal_defense_penetration_rate: 0
       universal_incoming_damage_rate: 0
+
+  minecraft:abstract_horse:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:abstract_skeleton:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:abstract_villager:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:ageable:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:allay:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:ambient:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:animals:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:armadillo:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:armor_stand:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:axolotl:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:bat:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:bee:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:blaze:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:bogged:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:breedable:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:breeze:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:camel:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:cat:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:cave_spider:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:chested_horse:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:chicken:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:cod:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:collar_colorable:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:complex_living_entity:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:cow:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:creature:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:creeper:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:dolphin:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:donkey:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:drowned:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:elder_guardian:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:ender_dragon:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:enderman:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:endermite:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:enemy:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:evoker:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:fish:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:flying:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:fox:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:frog:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:ghast:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:giant:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:glow_squid:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:goat:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:golem:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:guardian:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:hoglin:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:horse:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:human_entity:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:husk:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:illager:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:illusioner:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:iron_golem:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:llama:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:magma_cube:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:mule:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:mushroom_cow:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:npc:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:ocelot:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:panda:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:parrot:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:phantom:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:pig:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:piglin:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:piglin_abstract:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:piglin_brute:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:pig_zombie:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:pillager:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:polar_bear:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:puffer_fish:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:rabbit:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:raider:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:ranged_entity:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:ravager:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:salmon:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:schoolable_fish:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:sheep:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:shulker:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:silverfish:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:skeleton:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:skeleton_horse:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:slime:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:sniffer:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:snowman:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:spellcaster:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:spider:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:squid:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:steerable:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:stray:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:strider:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:tadpole:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:tameable:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:trader_llama:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:tropical_fish:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:turtle:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:vex:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:villager:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:vindicator:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:wandering_trader:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:warden:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:water_mob:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:witch:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:wither:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:wither_skeleton:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:wolf:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:zoglin:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:zombie:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:zombie_horse:
+    parent: minecraft:monster
+    values: { }
+
+  minecraft:zombie_villager:
+    parent: minecraft:monster
+    values: { }
 
 # 实体索引表（目前仅用于条件判断）
 entity_type_holders:
