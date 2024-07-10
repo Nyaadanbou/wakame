@@ -114,77 +114,45 @@ object AttributeRegistry : Initializable {
     private fun registerFacades() {
         // Register special attribute
         +buildFacade("empty", BYTE).single().bind { EMPTY }
-
         // Registry more attribute facades here ...
-        +buildFacade("attack_damage", SHORT).ranged().element().bind(
-            { MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE }
-        )
-
-        +buildFacade("universal_attack_damage", SHORT).ranged().bind(
-            { UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE }
-        )
-
+        +buildFacade("attack_damage", SHORT).ranged().element().bind({ MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE })
+        +buildFacade("attack_damage_rate", DOUBLE).single().element().bind { ATTACK_DAMAGE_RATE }
         +buildFacade("attack_effect_chance", DOUBLE).single().bind { ATTACK_EFFECT_CHANCE }
-
         +buildFacade("attack_speed_level", BYTE).single().bind {
             ATTACK_SPEED_LEVEL
         }.override {
             // create closures
             val tooltips = DiscreteTooltips(config)
-
             // override it
             tooltipCreator = { core: CoreAttributeS ->
                 val lines = tooltips.line(core.operation)
                 val resolver = tooltips.value("value", core.value.toInt())
-                listOf(AttributeRegistrySupport.mini().deserialize(lines, resolver))
+                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
             }
         }
-
         +buildFacade("block_interaction_range", DOUBLE).single().bind { BLOCK_INTERACTION_RANGE }
-
         +buildFacade("critical_strike_chance", DOUBLE).single().bind { CRITICAL_STRIKE_CHANCE }
-
         +buildFacade("critical_strike_power", DOUBLE).single().bind { CRITICAL_STRIKE_POWER }
-
         +buildFacade("defense", SHORT).single().element().bind { DEFENSE }
-
-        +buildFacade("universal_defense", SHORT).single().bind { UNIVERSAL_DEFENSE }
-
         +buildFacade("defense_penetration", SHORT).single().element().bind { DEFENSE_PENETRATION }
-
-        +buildFacade("universal_defense_penetration", SHORT).single().bind { UNIVERSAL_DEFENSE_PENETRATION }
-
         +buildFacade("defense_penetration_rate", DOUBLE).single().element().bind { DEFENSE_PENETRATION_RATE }
-
-        +buildFacade("universal_defense_penetration_rate", DOUBLE).single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
-
-        +buildFacade("attack_damage_rate", DOUBLE).single().element().bind { ATTACK_DAMAGE_RATE }
-
-        +buildFacade("universal_attack_damage_rate", DOUBLE).single().bind { UNIVERSAL_ATTACK_DAMAGE_RATE }
-
-        +buildFacade("incoming_damage_rate", DOUBLE).single().element().bind { INCOMING_DAMAGE_RATE }
-
-        +buildFacade("universal_incoming_damage_rate", DOUBLE).single().bind { UNIVERSAL_INCOMING_DAMAGE_RATE }
-
         +buildFacade("entity_interaction_range", DOUBLE).single().bind { ENTITY_INTERACTION_RANGE }
-
         +buildFacade("health_regeneration", SHORT).single().bind { HEALTH_REGENERATION }
-
+        +buildFacade("incoming_damage_rate", DOUBLE).single().element().bind { INCOMING_DAMAGE_RATE }
         +buildFacade("lifesteal", SHORT).single().bind { LIFESTEAL }
-
         +buildFacade("mana_consumption_rate", DOUBLE).single().bind { MANA_CONSUMPTION_RATE }
-
         +buildFacade("mana_regeneration", SHORT).single().bind { MANA_REGENERATION }
-
         +buildFacade("manasteal", SHORT).single().bind { MANASTEAL }
-
         +buildFacade("max_absorption", SHORT).single().bind { MAX_ABSORPTION }
-
         +buildFacade("max_health", SHORT).single().bind { MAX_HEALTH }
-
         +buildFacade("max_mana", SHORT).single().bind { MAX_MANA }
-
         +buildFacade("movement_speed", DOUBLE).single().bind { MOVEMENT_SPEED }
+        +buildFacade("universal_attack_damage", SHORT).ranged().bind({ UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE })
+        +buildFacade("universal_defense", SHORT).single().bind { UNIVERSAL_DEFENSE }
+        +buildFacade("universal_defense_penetration", SHORT).single().bind { UNIVERSAL_DEFENSE_PENETRATION }
+        +buildFacade("universal_defense_penetration_rate", DOUBLE).single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
+        +buildFacade("universal_attack_damage_rate", DOUBLE).single().bind { UNIVERSAL_ATTACK_DAMAGE_RATE }
+        +buildFacade("universal_incoming_damage_rate", DOUBLE).single().bind { UNIVERSAL_INCOMING_DAMAGE_RATE }
     }
 
     override fun onPreWorld() {
@@ -206,6 +174,11 @@ object AttributeRegistry : Initializable {
  * @param S the type of [TemplateCoreAttribute]
  */
 interface AttributeFacade<T : CoreAttribute, S : TemplateCoreAttribute> : Keyed {
+    /**
+     * 该属性的全局配置文件.
+     */
+    val config: ConfigProvider
+
     /**
      * 属性 facade 的唯一标识。
      *
@@ -355,23 +328,17 @@ private class AttributeFacadeOverride<BC : CoreAttribute, SC : TemplateCoreAttri
 
 //<editor-fold desc="Implementations">
 private object AttributeRegistrySupport : KoinComponent {
-    private val MINI: MiniMessage by inject()
-
-    fun mini(): MiniMessage {
-        return MINI
-    }
+    val miniMessage: MiniMessage by inject()
 }
 
 /**
  * A mutable [AttributeFacade] (except the property [facadeId]).
  */
 private class MutableAttributeFacade<T : CoreAttribute, S : TemplateCoreAttribute>(
+    // the config provider of this facade
+    override val config: ConfigProvider,
     // this should be immutable
     override val facadeId: Key,
-
-    // the config provider of this facade
-    val config: ConfigProvider,
-
     // these are mutable through override() in DSL
     override var components: AttributeComponentMetadata,
     override var modifierCreator: (UUID, T) -> Map<Attribute, AttributeModifier>,
@@ -492,7 +459,7 @@ private class DiscreteTooltips(
             map.withDefault { int ->
                 "??? ($int)" // fallback for unknown discrete values
             }.mapValues { (_, v) ->
-                AttributeRegistrySupport.mini().deserialize(v)
+                AttributeRegistrySupport.miniMessage.deserialize(v)
             }
         }
 
@@ -505,27 +472,27 @@ private class DiscreteTooltips(
 }
 
 private class FormatSelectionImpl(
-    private val id: Key,
+    private val facadeId: Key,
     private val tagType: TagType,
 ) : FormatSelection {
     override fun single(): SingleSelection {
-        return SingleSelectionImpl(id, tagType)
+        return SingleSelectionImpl(facadeId, tagType)
     }
 
     override fun ranged(): RangedSelection {
-        return RangedSelectionImpl(id, tagType)
+        return RangedSelectionImpl(facadeId, tagType)
     }
 }
 
 private class SingleSelectionImpl(
-    private val id: Key,
+    private val facadeId: Key,
     private val tagType: TagType,
 ) : SingleSelection {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): SingleElementAttributeBinder {
-        return SingleElementAttributeBinderImpl(id, tagType)
+        return SingleElementAttributeBinderImpl(facadeId, tagType)
     }
 
     /**
@@ -533,8 +500,8 @@ private class SingleSelectionImpl(
      */
     override fun bind(component: Attributes.() -> Attribute): AttributeFacadeOverride<CoreAttributeS, TemplateCoreAttributeS> {
         val facade = MutableAttributeFacade(
-            facadeId = id,
             config = config,
+            facadeId = facadeId,
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Fixed::class
             ),
@@ -546,12 +513,12 @@ private class SingleSelectionImpl(
             codecNodeToTemplate = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getTemplateSingle()
-                TemplateCoreAttributeS(tagType, id, operation, value)
+                TemplateCoreAttributeS(tagType, facadeId, operation, value)
             },
             codecNodeToInstance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getSingle()
-                CoreAttributeS(tagType, id, operation, value)
+                CoreAttributeS(tagType, facadeId, operation, value)
             },
             codecTagToInstance = { tag: CompoundTag ->
                 CoreAttributeS(tagType, tag)
@@ -559,7 +526,7 @@ private class SingleSelectionImpl(
             tooltipCreator = { core: CoreAttributeS ->
                 val lines = tooltips.line(core.operation)
                 val resolver = tooltips.number("value", core.value)
-                listOf(AttributeRegistrySupport.mini().deserialize(lines, resolver))
+                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
             },
         )
 
@@ -568,14 +535,14 @@ private class SingleSelectionImpl(
 }
 
 private class RangedSelectionImpl(
-    private val id: Key,
+    private val facadeId: Key,
     private val tagType: TagType,
 ) : RangedSelection {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): RangedElementAttributeBinder {
-        return RangedElementAttributeBinderImpl(id, tagType)
+        return RangedElementAttributeBinderImpl(facadeId, tagType)
     }
 
     /**
@@ -586,8 +553,8 @@ private class RangedSelectionImpl(
         component2: Attributes.() -> Attribute,
     ): AttributeFacadeOverride<CoreAttributeR, TemplateCoreAttributeR> {
         val facade = MutableAttributeFacade(
-            facadeId = id,
             config = config,
+            facadeId = facadeId,
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class
             ),
@@ -601,13 +568,13 @@ private class RangedSelectionImpl(
                 val operation = node.getOperation()
                 val lower = node.getTemplateLower()
                 val upper = node.getTemplateUpper()
-                TemplateCoreAttributeR(tagType, id, operation, lower, upper)
+                TemplateCoreAttributeR(tagType, facadeId, operation, lower, upper)
             },
             codecNodeToInstance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getLower()
                 val upper = node.getUpper()
-                CoreAttributeR(tagType, id, operation, lower, upper)
+                CoreAttributeR(tagType, facadeId, operation, lower, upper)
             },
             codecTagToInstance = { tag: CompoundTag ->
                 CoreAttributeR(tagType, tag)
@@ -616,7 +583,7 @@ private class RangedSelectionImpl(
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
-                listOf(AttributeRegistrySupport.mini().deserialize(lines, resolver1, resolver2))
+                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver1, resolver2))
             },
         )
 
@@ -625,10 +592,10 @@ private class RangedSelectionImpl(
 }
 
 private class SingleElementAttributeBinderImpl(
-    private val id: Key,
+    private val facadeId: Key,
     private val tagType: TagType,
 ) : SingleElementAttributeBinder {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     /**
@@ -636,8 +603,8 @@ private class SingleElementAttributeBinderImpl(
      */
     override fun bind(component: ElementAttributeContainer.() -> ElementAttribute): AttributeFacadeOverride<CoreAttributeSE, TemplateCoreAttributeSE> {
         val facade = MutableAttributeFacade(
-            facadeId = id,
             config = config,
+            facadeId = facadeId,
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Fixed::class, AttributeComponent.Element::class
             ),
@@ -650,13 +617,13 @@ private class SingleElementAttributeBinderImpl(
                 val operation = node.getOperation()
                 val value = node.getTemplateSingle()
                 val element = node.getElement()
-                TemplateCoreAttributeSE(tagType, id, operation, value, element)
+                TemplateCoreAttributeSE(tagType, facadeId, operation, value, element)
             },
             codecNodeToInstance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getSingle()
                 val element = node.getElement()
-                CoreAttributeSE(tagType, id, operation, value, element)
+                CoreAttributeSE(tagType, facadeId, operation, value, element)
             },
             codecTagToInstance = { tag: CompoundTag ->
                 CoreAttributeSE(tagType, tag)
@@ -665,7 +632,7 @@ private class SingleElementAttributeBinderImpl(
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("value", core.value)
                 val resolver2 = tooltips.component("element", core.element.displayName)
-                listOf(AttributeRegistrySupport.mini().deserialize(lines, resolver1, resolver2))
+                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver1, resolver2))
             },
         )
 
@@ -674,10 +641,10 @@ private class SingleElementAttributeBinderImpl(
 }
 
 private class RangedElementAttributeBinderImpl(
-    private val id: Key,
+    private val facadeId: Key,
     private val tagType: TagType,
 ) : RangedElementAttributeBinder {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     /**
@@ -688,8 +655,8 @@ private class RangedElementAttributeBinderImpl(
         component2: ElementAttributeContainer.() -> ElementAttribute,
     ): AttributeFacadeOverride<CoreAttributeRE, TemplateCoreAttributeRE> {
         val facade = MutableAttributeFacade(
-            facadeId = id,
             config = config,
+            facadeId = facadeId,
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class, AttributeComponent.Element::class
             ),
@@ -704,14 +671,14 @@ private class RangedElementAttributeBinderImpl(
                 val lower = node.getTemplateLower()
                 val upper = node.getTemplateUpper()
                 val element = node.getElement()
-                TemplateCoreAttributeRE(tagType, id, operation, lower, upper, element)
+                TemplateCoreAttributeRE(tagType, facadeId, operation, lower, upper, element)
             },
             codecNodeToInstance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getLower()
                 val upper = node.getUpper()
                 val element = node.getElement()
-                CoreAttributeRE(tagType, id, operation, lower, upper, element)
+                CoreAttributeRE(tagType, facadeId, operation, lower, upper, element)
             },
             codecTagToInstance = { tag: CompoundTag ->
                 CoreAttributeRE(tagType, tag)
@@ -721,7 +688,7 @@ private class RangedElementAttributeBinderImpl(
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
                 val resolver3 = tooltips.component("element", core.element.displayName)
-                listOf(AttributeRegistrySupport.mini().deserialize(lines, resolver1, resolver2, resolver3))
+                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver1, resolver2, resolver3))
             },
         )
 
