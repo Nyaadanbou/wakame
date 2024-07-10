@@ -1,5 +1,0 @@
-type: skill_group
-
-skills:
-  1: skill:buff/potion_remove
-  2: skill:buff/teleport_fixed
