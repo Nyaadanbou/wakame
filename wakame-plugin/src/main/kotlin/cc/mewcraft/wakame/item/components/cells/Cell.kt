@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.item.components.cells
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.nbt.Tag
+import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.item.BinarySerializable
 import cc.mewcraft.wakame.item.components.cells.reforge.ReforgeHistory
 import cc.mewcraft.wakame.util.CompoundTag
 import net.kyori.examination.Examinable

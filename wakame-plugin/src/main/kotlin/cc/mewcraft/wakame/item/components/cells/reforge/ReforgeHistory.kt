@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.components.cells.reforge
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.nbt.Tag
-import cc.mewcraft.wakame.item.BinarySerializable
+import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.item.ReforgeBinaryKeys
 import cc.mewcraft.wakame.util.CompoundTag
 

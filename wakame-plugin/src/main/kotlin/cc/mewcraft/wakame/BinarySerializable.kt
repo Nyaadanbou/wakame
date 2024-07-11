@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item
+package cc.mewcraft.wakame
 
 import cc.mewcraft.nbt.Tag
 
