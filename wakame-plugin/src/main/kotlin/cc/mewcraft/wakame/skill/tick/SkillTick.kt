@@ -2,23 +2,22 @@ package cc.mewcraft.wakame.skill.tick
 
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
-import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.state.*
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.tick.Tickable
-import cc.mewcraft.wakame.user.toUser
 
 /**
  * 表示技能触发的效果.
  */
-interface SkillTick : Tickable {
+sealed interface SkillTick : Tickable {
 
     companion object {
         /**
          * 一个空的技能触发效果.
          */
-        fun empty(): SkillTick = EmptySkillTick
+        @Suppress("UNCHECKED_CAST")
+        fun <T : SkillTick> empty(): T = EmptyPlayerSkillTick as T
     }
 
     /**
@@ -31,12 +30,15 @@ interface SkillTick : Tickable {
      */
     val context: SkillContext
 
-    override fun tick(): TickResult = TickResult.ALL_DONE
+    override fun tick(tickCount: Long): TickResult = TickResult.ALL_DONE
 }
 
-private data object EmptySkillTick : SkillTick {
+private data object EmptyPlayerSkillTick : PlayerSkillTick {
     override val skill: Skill = Skill.empty()
     override val context: SkillContext = SkillContext.empty()
+
+    override fun isForbidden(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean = false
+    override fun isInterrupted(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean = false
 }
 
 /**
@@ -49,7 +51,7 @@ interface PlayerSkillTick : SkillTick {
     fun isForbidden(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean
     fun isInterrupted(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean
 
-    fun tickCastPoint(): TickResult = TickResult.ALL_DONE
+    fun tickCastPoint(tickCount: Long): TickResult = TickResult.ALL_DONE
 
     /**
      * 触发一次技能施法的效果.
@@ -58,8 +60,8 @@ interface PlayerSkillTick : SkillTick {
      * 1. 当 [PlayerSkillTick] 不被玩家触发时.
      * 2. 当 [PlayerSkillTick] 被玩家触发时, 且玩家处于施法状态时.
      */
-    fun tickCast(): TickResult = TickResult.ALL_DONE
-    fun tickBackswing(): TickResult = TickResult.ALL_DONE
+    fun tickCast(tickCount: Long): TickResult = TickResult.ALL_DONE
+    fun tickBackswing(tickCount: Long): TickResult = TickResult.ALL_DONE
 }
 
 /**
@@ -102,24 +104,8 @@ abstract class AbstractPlayerSkillTick(
      */
     open val interruptTriggers: TriggerConditions = TriggerConditions.empty()
 
-    protected val userState: SkillState?
-        get() {
-            val user = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer?.toUser() ?: return null
-            val state = user.skillState
-            if (state.info.skillTick != this)
-                return null
-            return state
-        }
-
-    final override fun tick(): TickResult {
-        val state = userState ?: return tickCast()
-
-        return when (state.info) {
-            is CastPointStateInfo -> tickCastPoint()
-            is CastStateInfo -> tickCast()
-            is BackswingStateInfo -> tickBackswing()
-            else -> TickResult.ALL_DONE
-        }
+    final override fun tick(tickCount: Long): TickResult {
+        return tickCast(tickCount)
     }
 
     final override fun isForbidden(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean {

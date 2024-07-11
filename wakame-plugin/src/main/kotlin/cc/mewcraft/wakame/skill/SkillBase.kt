@@ -4,6 +4,8 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
+import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 import net.kyori.adventure.key.Key
 
 /**
@@ -19,5 +21,15 @@ abstract class SkillBase(
     protected inner class TriggerConditionGetter {
         val forbiddenTriggers: TriggerConditions by config.optionalEntry<TriggerConditions>("forbidden_triggers").orElse(TriggerConditions.empty())
         val interruptTriggers: TriggerConditions by config.optionalEntry<TriggerConditions>("interrupt_triggers").orElse(TriggerConditions.empty())
+    }
+
+    protected object TargetUtil {
+        fun getLocation(context: SkillContext): Target.Location? {
+            return when (val target = context[SkillContextKey.TARGET]) {
+                is Target.Location -> target
+                is Target.LivingEntity -> TargetAdapter.adapt(target.bukkitEntity.location)
+                else -> null
+            }
+        }
     }
 }

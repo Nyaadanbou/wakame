@@ -1,0 +1,41 @@
+uuid: 0190a09c-c9b7-7536-b1db-49869721d49c
+item_type: stone_sword
+remove_components:
+  - attribute_modifiers
+  - tool
+slot: MAIN_HAND
+item_name: "<rarity:style><rarity:name> Shoot!"
+rarity: mapping:demo_1
+level: 2
+lore:
+  - "<rainbow>评价为g22"
+food:
+  nutrition: 2
+  saturation: 2.0
+  can_always_eat: true
+  eat_seconds: 5
+  effects:
+    - type: luck
+      duration: 12
+      amplifier: 2
+      ambient: false
+      particles: true
+      icon: true
+      probability: 0.9
+  skills:
+    - "skill:buff/teleport_random"
+cells:
+  buckets:
+    a:
+      core: core_a
+  selectors:
+    core_groups:
+      core_a:
+        filters: [ ]
+        selects:
+          skill:
+            entries:
+              - key: skill:ranged/projectile_demo
+                trigger: trigger:combo/111
+                weight: 5
+        default: [ ]

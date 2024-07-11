@@ -220,10 +220,11 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
                 }
                 val core = cell.getTypedCore(CoreTypes.SKILL) ?: continue
                 val variant = core.variant
-                if (variant == TriggerVariant.any()) {
+                if (ignoreVariant || variant == TriggerVariant.any()) {
+                    ret.put(core.trigger, core.instance)
                     continue
                 }
-                if (!ignoreVariant && context.variant != variant.id) {
+                if (variant.id != context.variant) {
                     continue
                 }
                 ret.put(core.trigger, core.instance)

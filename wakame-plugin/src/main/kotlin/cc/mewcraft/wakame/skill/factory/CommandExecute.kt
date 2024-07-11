@@ -44,19 +44,19 @@ interface CommandExecute : Skill {
             override val forbiddenTriggers: TriggerConditions
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
-            override fun tickCastPoint(): TickResult {
+            override fun tickCastPoint(tickCount: Long): TickResult {
                 val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("命令执行前摇")
                 return TickResult.ALL_DONE
             }
 
-            override fun tickBackswing(): TickResult {
+            override fun tickBackswing(tickCount: Long): TickResult {
                 val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("命令执行后摇")
                 return TickResult.ALL_DONE
             }
 
-            override fun tickCast(): TickResult {
+            override fun tickCast(tickCount: Long): TickResult {
                 val entity = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitEntity ?: return TickResult.INTERRUPT
                 for (command in commands) {
                     command.replace("{caster}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }

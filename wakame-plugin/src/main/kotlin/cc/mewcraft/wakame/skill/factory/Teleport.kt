@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
@@ -88,23 +87,22 @@ interface Teleport : Skill {
             override val forbiddenTriggers: TriggerConditions
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
-            override fun tickCastPoint(): TickResult {
+            override fun tickCastPoint(tickCount: Long): TickResult {
                 val player = context[SkillContextKey.CASTER]?.root<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("传送前摇")
                 return TickResult.ALL_DONE
             }
 
-            override fun tickBackswing(): TickResult {
+            override fun tickBackswing(tickCount: Long): TickResult {
                 val player = context[SkillContextKey.CASTER]?.root<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("传送后摇")
                 return TickResult.ALL_DONE
             }
 
-            override fun tickCast(): TickResult {
+            override fun tickCast(tickCount: Long): TickResult {
                 val node = context[SkillContextKey.CASTER] ?: return TickResult.INTERRUPT
                 val caster = node.root<Caster.Single.Entity>() ?: return TickResult.INTERRUPT
-                val target = context[SkillContextKey.TARGET]
-                val location = target?.value<Target.Location>()?.bukkitLocation ?: target?.value<Target.LivingEntity>()?.bukkitEntity?.location ?: return TickResult.INTERRUPT
+                val location = TargetUtil.getLocation(context)?.bukkitLocation ?: return TickResult.INTERRUPT
                 when (val type = type) {
                     is Type.FIXED -> {
                         val position = type.position

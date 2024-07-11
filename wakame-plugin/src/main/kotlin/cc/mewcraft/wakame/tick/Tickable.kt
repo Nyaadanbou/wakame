@@ -7,9 +7,12 @@ fun interface Tickable {
      * @return [TickResult] 表示此次 Tick 的结果.
      * @see TickResult
      */
-    fun tick(): TickResult
+    fun tick(tickCount: Long): TickResult
 }
 
 fun interface AlwaysTickable : Tickable, Runnable {
-    override fun tick(): TickResult = TickResult.CONTINUE_TICK
+    override fun tick(tickCount: Long): TickResult {
+        run()
+        return TickResult.CONTINUE_TICK
+    }
 }

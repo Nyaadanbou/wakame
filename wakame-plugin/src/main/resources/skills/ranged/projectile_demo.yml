@@ -5,7 +5,7 @@ type: projectile
 projectile_type: ARROW
 
 # 弹射物的初始的速度
-initial_velocity: 2F
+initial_velocity: 2
 
 # 弹射物最大移动距离, 超过这个距离弹射物会消失
 maximum_distance: 100

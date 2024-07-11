@@ -50,21 +50,21 @@ interface RemovePotionEffect : Skill {
 
             private var counter: Int = 0
 
-            override fun tickCastPoint(): TickResult {
+            override fun tickCastPoint(tickCount: Long): TickResult {
                 val player = context.getOrThrow(SkillContextKey.CASTER).valueNonNull<Caster.Single.Player>().bukkitPlayer
                 player.sendPlainMessage("移除药水效果前摇")
                 counter++
                 return if (counter >= 20) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
             }
 
-            override fun tickBackswing(): TickResult {
+            override fun tickBackswing(tickCount: Long): TickResult {
                 val player = context[SkillContextKey.CASTER]?.valueNonNull<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
                 player.sendPlainMessage("移除药水效果后摇")
                 counter++
                 return if (counter >= 60) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
             }
 
-            override fun tickCast(): TickResult {
+            override fun tickCast(tickCount: Long): TickResult {
                 val entity = context.getOrThrow(SkillContextKey.CASTER).valueNonNull<Caster.Single.Entity>().bukkitEntity
                 if (entity is LivingEntity) {
                     effectTypes.forEach { entity.removePotionEffect(it) }

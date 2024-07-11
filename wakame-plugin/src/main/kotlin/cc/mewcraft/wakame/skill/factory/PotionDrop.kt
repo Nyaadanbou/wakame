@@ -5,9 +5,7 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.context.SkillContext
-import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.*
 import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.tick.TickResult
@@ -53,31 +51,17 @@ interface PotionDrop : Skill {
             override val interruptTriggers: TriggerConditions,
             override val forbiddenTriggers: TriggerConditions
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
-            override fun tickCast(): TickResult {
-                val location = when {
-                    SkillContextKey.TARGET in context -> {
-                        context.getOrThrow(SkillContextKey.TARGET).value<Target.Location>()?.bukkitLocation ?: return TickResult.INTERRUPT
-                    }
-                    SkillContextKey.CASTER in context -> {
-                        val entity = context.getOrThrow(SkillContextKey.CASTER).value<Caster.Single.Entity>() ?: return TickResult.INTERRUPT
-                        entity.bukkitEntity.location
-                    }
-                    else -> return TickResult.INTERRUPT
-                }
-                Ticker.addTick(PotionTick(location.add(.0, 3.0, .0)))
+            override fun tickCast(tickCount: Long): TickResult {
+                val location = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
+                Ticker.addTick(PotionTick(location.bukkitLocation.add(.0, 3.0, .0)))
                 return TickResult.ALL_DONE
             }
 
             private inner class PotionTick(
                 private val location: Location
-            ) : SkillTick {
-                override val skill: Skill = this@DefaultImpl
-                override val context: SkillContext = this@Tick.context
-
-                private var counter: Int = 0
-
-                override fun tick(): TickResult {
-                    if (counter % 20 == 0) {
+            ) : AbstractSkillTick(this@DefaultImpl, context) {
+                override fun tick(tickCount: Long): TickResult {
+                    if (tickCount % 20 == 0L) {
                         val potionItem = ItemStack(Material.SPLASH_POTION)
                         val potionMeta = potionItem.itemMeta as PotionMeta
                         potionMeta.basePotionType = effectTypes.random()
@@ -86,10 +70,9 @@ interface PotionDrop : Skill {
                         location.world.strikeLightning(location)
                     }
 
-                    if (counter >= 200) {
+                    if (tickCount >= 200) {
                         return TickResult.ALL_DONE
                     }
-                    counter++
 
                     return TickResult.CONTINUE_TICK
                 }

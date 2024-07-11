@@ -13,7 +13,11 @@ class SkillTicker(
     private var taskId: UUID? = null
 
     fun start() {
-        val alwaysTickable = AlwaysTickable { server.onlinePlayers.forEach { it.toUser().skillState.tick() } }
+        val alwaysTickable = AlwaysTickable {
+            for (player in server.onlinePlayers) {
+                player.toUser().skillState.tick()
+            }
+        }
         taskId = Ticker.addTick(alwaysTickable)
     }
 

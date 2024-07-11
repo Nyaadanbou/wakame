@@ -2,31 +2,45 @@ package cc.mewcraft.wakame.tick
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import java.util.HashMap
 import java.util.UUID
 
 /**
  * 用于处理 [Tickable].
  */
 internal object Ticker {
-    private val ticksToAdd: MutableList<Pair<UUID, Tickable>> = ArrayList()
+    private val ticksToAdd: MutableMap<UUID, Tickable> = Object2ObjectOpenHashMap()
     private val tickToRemove: MutableList<UUID> = ArrayList()
 
-    private val ticks: MutableMap<UUID, Tickable> = HashMap()
+    private val ticks: MutableMap<UUID, Tickable> = Object2ObjectOpenHashMap()
+    private val tickableToTicks: MutableMap<Tickable, Long> = Object2LongOpenHashMap()
 
     internal fun tickStart() {
-        tickToRemove.forEach { ticks.remove(it) }
+        tickToRemove.forEach {
+            val tickable = ticks.remove(it)
+            tickableToTicks.remove(tickable)
+        }
         tickToRemove.clear()
         ticks.putAll(ticksToAdd)
+        for ((_, value) in ticksToAdd) {
+            tickableToTicks[value] = 0
+        }
         ticksToAdd.clear()
     }
 
     internal fun tickEnd() {
         for ((index, child) in ticks) {
-            val result = child.tick()
-            if (result != TickResult.CONTINUE_TICK) {
+            try {
+                val tickCount = tickableToTicks[child]!!
+                val result = child.tick(tickCount)
+                if (result != TickResult.CONTINUE_TICK) {
+                    tickToRemove.add(index)
+                }
+                tickableToTicks.merge(child, 1, Long::plus)
+            } catch (t: Throwable) {
                 tickToRemove.add(index)
             }
         }
@@ -38,7 +52,7 @@ internal object Ticker {
 
     fun addTick(skillTick: Tickable): UUID {
         val tickId = UUID.randomUUID()
-        ticksToAdd.add(tickId to skillTick)
+        ticksToAdd[tickId] = skillTick
         return tickId
     }
 
