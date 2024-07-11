@@ -100,7 +100,7 @@ class PlayerMeleeAttackMetaData(
         val attributeMap = user.attributeMap
         if (isSweep) {
             val list = mutableListOf<ElementDamagePacket>()
-            for (it in ElementRegistry.INSTANCES.objects) {
+            for (it in ElementRegistry.INSTANCES.values) {
                 list.add(
                     ElementDamagePacket(
                         it,
@@ -182,7 +182,7 @@ class PlayerProjectileDamageMetaData(
 
                 //生成伤害包，注意箭矢的伤害与拉弓的力度有关
                 val elementDamagePackets = mutableListOf<ElementDamagePacket>()
-                for (it in ElementRegistry.INSTANCES.objects) {
+                for (it in ElementRegistry.INSTANCES.values) {
                     elementDamagePackets.add(
                         ElementDamagePacket(
                             it,
@@ -266,7 +266,7 @@ enum class ProjectileType {
  */
 private fun generatePackets0(attributeMap: AttributeMap): List<ElementDamagePacket> {
     val list = mutableListOf<ElementDamagePacket>()
-    for (it in ElementRegistry.INSTANCES.objects) {
+    for (it in ElementRegistry.INSTANCES.values) {
         list.add(
             ElementDamagePacket(
                 it,

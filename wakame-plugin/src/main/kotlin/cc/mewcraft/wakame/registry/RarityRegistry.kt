@@ -18,7 +18,7 @@ object RarityRegistry : KoinComponent, Initializable, BiKnot<String, Rarity, Byt
     /**
      * The default rarity. By design, it should be the most common rarity.
      */
-    val DEFAULT: Rarity by lazy { INSTANCES.objects.first() }
+    val DEFAULT: Rarity by lazy { INSTANCES.values.first() }
 
     private fun loadConfiguration() {
         INSTANCES.clear()

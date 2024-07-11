@@ -12,7 +12,7 @@ object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, B
     /**
      * The default element. By design, it should be the most common element.
      */
-    val DEFAULT: Element by lazy { INSTANCES.objects.first() }
+    val DEFAULT: Element by lazy { INSTANCES.values.first() }
 
     override val INSTANCES: Registry<String, Element> = SimpleRegistry()
     override val BI_LOOKUP: BiRegistry<String, Byte> = SimpleBiRegistry()

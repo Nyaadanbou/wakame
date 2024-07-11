@@ -14,7 +14,7 @@ sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
     /**
      * All the [instances][V] in this registry.
      */
-    val objects: Set<V>
+    val values: Set<V>
 
     /**
      * Gets specified value in this registry.
@@ -125,7 +125,7 @@ sealed interface BiKnot<K, V, B> {
 internal class SimpleRegistry<K, V> : Registry<K, V> {
     private val uniqueId2ObjectMap: MutableMap<K, V> = LinkedHashMap() // order matters
 
-    override val objects: Set<V>
+    override val values: Set<V>
         get() = ImmutableSet.copyOf(uniqueId2ObjectMap.values)
 
     override fun find(uniqueId: K?): V? {
