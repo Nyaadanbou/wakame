@@ -13,6 +13,7 @@ internal fun rarityModule(): Module = module {
 
     single<TypeSerializerCollection>(named(RARITY_SERIALIZERS)) {
         TypeSerializerCollection.builder()
+            .kregister(GlowColorSerializer)
             .kregister(RaritySerializer)
             .kregister(LevelMappingSerializer)
             .build()
@@ -21,6 +22,7 @@ internal fun rarityModule(): Module = module {
     // 用于外部代码
     single<TypeSerializerCollection>(named(RARITY_EXTERNALS)) {
         TypeSerializerCollection.builder()
+            .kregister(GlowColorSerializer)
             .kregister(RaritySerializer)
             .kregister(LevelMappingSerializer)
             .build()

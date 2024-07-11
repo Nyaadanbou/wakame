@@ -23,13 +23,15 @@ data class Rarity @InternalApi internal constructor(
     override val binaryId: Byte,
     override val displayName: Component,
     override val styles: Array<StyleBuilderApplicable>,
+    val glowColor: GlowColor
 ) : KoinComponent, FriendlyNamed, BiIdentifiable<String, Byte>, Examinable {
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("key", uniqueId),
             ExaminableProperty.of("binary", binaryId),
             ExaminableProperty.of("displayName", PlainTextComponentSerializer.plainText().serialize(displayName)),
-            ExaminableProperty.of("styles", styles)
+            ExaminableProperty.of("styles", styles),
+            ExaminableProperty.of("glowColor", glowColor)
         )
     }
 

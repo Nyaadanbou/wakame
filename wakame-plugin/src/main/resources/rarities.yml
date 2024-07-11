@@ -8,26 +8,31 @@ rarities:
     binary_index: 0
     display_name: 普通
     styles: "<white>"
+    glow_color: WHITE
 
   uncommon:
     binary_index: 1
     display_name: 罕见
     styles: "<white>"
+    glow_color: GREEN
 
   rare:
     binary_index: 2
     display_name: 稀有
     styles: "<white>"
+    glow_color: AQUA
 
   epic:
     binary_index: 3
     display_name: 史诗
     styles: "<white>"
+    glow_color: DARK_PURPLE
 
   ancient:
     binary_index: 4
     display_name: 上古
     styles: "<white>"
+    glow_color: GOLD
 
   demo: # 稀有度的 name，供其他模块引用，一旦确定不要修改
     binary_index: 99 # 稀有度的二进制形式，最大 127，一旦确定不要修改

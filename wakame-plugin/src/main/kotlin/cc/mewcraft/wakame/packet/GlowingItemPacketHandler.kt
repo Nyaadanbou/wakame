@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.rarity.GlowColor
 import cc.mewcraft.wakame.util.NmsEntityUtils
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
@@ -12,13 +13,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextColor
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.random.Random
 
 class GlowingItemPacketHandler : PacketListenerAbstract() {
 
@@ -32,12 +30,15 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
                 val origin = WrapperPlayServerEntityMetadata(event)
                 val entity = NmsEntityUtils.getEntity(origin.entityId) as? Item ?: return
                 val nekoStack = entity.itemStack.tryNekoStack ?: return
+                val rarityColor = nekoStack.components.get(ItemComponentTypes.RARITY)?.rarity?.glowColor
+                    ?.takeIf { it != GlowColor.empty() }
+                    ?: return
 
                 val metadataPacket = WrapperPlayServerEntityMetadata(
                     entity.entityId,
                     listOf(EntityData(0, EntityDataTypes.BYTE, 0x40.toByte()))
                 )
-                val teamPacket = createTeamPacket(entity, nekoStack)
+                val teamPacket = createTeamPacket(entity, rarityColor)
                 entityId2entityUniqueId[entity.entityId] = entity.uniqueId
 
                 with(event.user) {
@@ -57,11 +58,8 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
         }
     }
 
-    private fun createTeamPacket(itemEntity: Item, nekoStack: NekoStack): WrapperPlayServerTeams {
+    private fun createTeamPacket(itemEntity: Item, color: GlowColor): WrapperPlayServerTeams {
         val entityUniqueId = itemEntity.uniqueId
-        // TODO: 根据 NekoStack 设置颜色
-        val color = NamedTextColor.nearestTo(TextColor.color(Random(nekoStack.variant).nextInt(0xFFFFFF)))
-
         return WrapperPlayServerTeams(
             "glow_item_$entityUniqueId",
             WrapperPlayServerTeams.TeamMode.CREATE,
@@ -71,7 +69,7 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
                 null,
                 WrapperPlayServerTeams.NameTagVisibility.NEVER,
                 WrapperPlayServerTeams.CollisionRule.NEVER,
-                color,
+                color.color,
                 WrapperPlayServerTeams.OptionData.NONE
             ),
             listOf(entityUniqueId.toString())

@@ -39,6 +39,7 @@ internal object RaritySerializer : SchemaSerializer<Rarity> {
         val binary = node.node("binary_index").krequire<Int>().toStableByte()
         val displayName = node.node("display_name").krequire<Component>()
         val styles = node.node("styles").krequire<Array<StyleBuilderApplicable>>()
-        return (@OptIn(InternalApi::class) Rarity(key, binary, displayName, styles))
+        val glowColor = node.node("glow_color").krequire<GlowColor>()
+        return (@OptIn(InternalApi::class) Rarity(key, binary, displayName, styles, glowColor))
     }
 }
