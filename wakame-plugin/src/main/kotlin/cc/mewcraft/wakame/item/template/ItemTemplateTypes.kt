@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.item.components.HideTooltip
 import cc.mewcraft.wakame.item.components.ItemAdventurePredicate
 import cc.mewcraft.wakame.item.components.ItemArrow
 import cc.mewcraft.wakame.item.components.ItemAttributeModifiers
+import cc.mewcraft.wakame.item.components.ItemBow
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.ItemCrate
 import cc.mewcraft.wakame.item.components.ItemDyeColor
@@ -44,6 +45,11 @@ object ItemTemplateTypes {
      * 组件: [ItemAttributeModifiers]
      */
     val ATTRIBUTE_MODIFIERS: ItemTemplateType<ItemAttributeModifiers.Template> = ItemAttributeModifiers.templateType(ItemComponentConstants.ATTRIBUTE_MODIFIERS).register()
+
+    /**
+     * 组件: [ItemBow]
+     */
+    val BOW: ItemTemplateType<ItemBow.Template> = ItemBow.templateType(ItemComponentConstants.BOW).register()
 
     /**
      * 组件: [ItemAdventurePredicate]

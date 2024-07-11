@@ -19,6 +19,11 @@ components:
     tooltips:
       single: "<!i>提供属性加成"
 
+  bow:
+    enabled: true
+    display_name: "弓"
+    tooltips: { }
+
   can_break:
     enabled: true
     display_name: "CAN_BREAK"

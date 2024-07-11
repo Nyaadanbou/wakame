@@ -91,6 +91,7 @@ object ItemComponentConstants {
     const val ARROW = "arrow"
     const val ATTRIBUTE_MODIFIERS = "attribute_modifiers"
     const val ATTRIBUTABLE = "attributable"
+    const val BOW = "bow"
     const val CAN_BREAK = "can_break"
     const val CAN_PLACE_ON = "can_place_on"
     const val CASTABLE = "castable"

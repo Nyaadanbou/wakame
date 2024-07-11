@@ -76,6 +76,7 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.CASTABLE)
 
         generate(ItemTemplateTypes.ARROW)
+        generate(ItemTemplateTypes.BOW)
 
         generate(ItemTemplateTypes.LEVEL)
         generate(ItemTemplateTypes.RARITY)

@@ -104,6 +104,9 @@ Compound('wakame')
         Compound('arrow')
             // 空
         
+        Compound('bow')
+            // 空
+        
         // 可以释放技能?
         Compound('castable')
 

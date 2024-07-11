@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.item.components.HideTooltip
 import cc.mewcraft.wakame.item.components.ItemAdventurePredicate
 import cc.mewcraft.wakame.item.components.ItemArrow
 import cc.mewcraft.wakame.item.components.ItemAttributeModifiers
+import cc.mewcraft.wakame.item.components.ItemBow
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.ItemCrate
 import cc.mewcraft.wakame.item.components.ItemDamage
@@ -56,6 +57,11 @@ object ItemComponentTypes {
      * 对应原版组件: [`minecraft:attribute_modifiers`](https://minecraft.wiki/w/Data_component_format#attribute_modifiers)
      */
     val ATTRIBUTE_MODIFIERS: ItemComponentType<ItemAttributeModifiers> = ItemAttributeModifiers.codec(ItemComponentConstants.ATTRIBUTE_MODIFIERS).register()
+
+    /**
+     * 将物品作为弓.
+     */
+    val BOW: ItemComponentType<Unit> = ItemBow.codec(ItemComponentConstants.BOW).register()
 
     /**
      * 冒险模式的玩家使用此物品可以破坏的方块.

@@ -100,6 +100,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("arrow", ItemTemplateTypes.ARROW)
             tryAdd("attributable", ItemTemplateTypes.ATTRIBUTABLE)
             tryAdd("attribute_modifiers", ItemTemplateTypes.ATTRIBUTE_MODIFIERS) { unsupported() }
+            tryAdd("bow", ItemTemplateTypes.BOW)
             tryAdd("can_break", ItemTemplateTypes.CAN_BREAK) { unsupported() }
             tryAdd("can_place_on", ItemTemplateTypes.CAN_PLACE_ON) { unsupported() }
             tryAdd("castable", ItemTemplateTypes.CASTABLE)
@@ -191,6 +192,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("arrow", ItemTemplateTypes.ARROW)
             tryAdd("attributable", ItemTemplateTypes.ATTRIBUTABLE)
             tryAdd("attribute_modifiers", ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
+            tryAdd("bow", ItemTemplateTypes.BOW)
             tryAdd("can_break", ItemTemplateTypes.CAN_BREAK)
             tryAdd("can_place_on", ItemTemplateTypes.CAN_PLACE_ON)
             tryAdd("castable", ItemTemplateTypes.CASTABLE)

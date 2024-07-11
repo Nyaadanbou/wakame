@@ -146,6 +146,23 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
+    fun `component - bow`() = componentLifecycleTest(
+        "bow", ItemTemplateTypes.BOW, ItemComponentTypes.BOW
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(Unit, it)
+        }
+    }
+
+    @Test
     fun `component - can_break`() = componentLifecycleTest(
         "can_break", ItemTemplateTypes.CAN_BREAK, ItemComponentTypes.CAN_BREAK
     ) {
