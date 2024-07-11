@@ -108,7 +108,7 @@ data class ItemKizamiz(
     }
 
     data class Template(
-        val selector: Group<Kizami, GenerationContext>,
+        private val selector: Group<Kizami, GenerationContext>,
     ) : ItemTemplate<ItemKizamiz> {
         override val componentType: ItemComponentType<ItemKizamiz> = ItemComponentTypes.KIZAMIZ
 

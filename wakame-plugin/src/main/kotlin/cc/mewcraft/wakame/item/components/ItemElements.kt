@@ -118,7 +118,7 @@ data class ItemElements(
     }
 
     data class Template(
-        val selector: Pool<Element, GenerationContext>,
+        private val selector: Pool<Element, GenerationContext>,
     ) : ItemTemplate<ItemElements> {
         override val componentType: ItemComponentType<ItemElements> = ItemComponentTypes.ELEMENTS
 

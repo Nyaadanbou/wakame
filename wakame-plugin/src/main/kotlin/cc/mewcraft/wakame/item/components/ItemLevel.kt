@@ -91,8 +91,18 @@ data class ItemLevel(
      * 由生成的上下文决定要生成的等级.
      */
     data class Template(
-        val level: Any,
+        private val level: Any,
     ) : ItemTemplate<ItemLevel> {
+        /**
+         * 检查等级是否为固定的.
+         */
+        val isConstant: Boolean = level is Number
+
+        /**
+         * 检查等级是否基于上下文.
+         */
+        val isContext: Boolean = level == Option.CONTEXT
+
         override val componentType: ItemComponentType<ItemLevel> = ItemComponentTypes.LEVEL
 
         override fun generate(context: GenerationContext): GenerationResult<ItemLevel> {

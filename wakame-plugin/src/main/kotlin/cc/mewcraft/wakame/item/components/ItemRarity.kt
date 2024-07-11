@@ -92,8 +92,18 @@ data class ItemRarity(
         private val dynamic: LevelMappings? = null,
     ) : ItemTemplate<ItemRarity> {
 
+        /**
+         * 检查稀有度是不是固定的.
+         */
+        val isStatic: Boolean = static != null
+
+        /**
+         * 检查稀有度是不是动态的.
+         */
+        val isDynamic: Boolean = dynamic != null
+
         init {
-            require((static != null) xor (dynamic != null)) { "(static != null) xor (dynamic != null)" }
+            require(isStatic xor isDynamic) { "(static != null) xor (dynamic != null)" }
         }
 
         override val componentType: ItemComponentType<ItemRarity> = ItemComponentTypes.RARITY

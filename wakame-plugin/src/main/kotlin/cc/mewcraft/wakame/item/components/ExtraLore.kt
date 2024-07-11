@@ -97,9 +97,6 @@ data class ExtraLore(
     // 支持在模板 lore 的基础之上添加额外的内容. 这一
     // 机制依赖于 MiniMessage 的解析.
     data class Template(
-        /**
-         * A list of MiniMessage strings.
-         */
         val lore: List<String>,
     ) : ItemTemplate<ExtraLore> {
         override val componentType: ItemComponentType<ExtraLore> = ItemComponentTypes.LORE

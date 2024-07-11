@@ -120,9 +120,6 @@ data class CustomName(
     }
 
     data class Template(
-        /**
-         * A MiniMessage string.
-         */
         val customName: String?,
     ) : ItemTemplate<CustomName> {
         override val componentType: ItemComponentType<CustomName> = ItemComponentTypes.CUSTOM_NAME
