@@ -16,15 +16,15 @@ import java.util.UUID
 
 /**
  * Represents an **item template**, or a "blueprint" in other words.
- * Essentially, this is an encapsulation of an item configuration.
+ * Essentially, this is an encapsulation of an item's configuration.
  *
  * The design philosophy of `this` is, that you can use a [NekoItem] as
- * a **blueprint** to create as many [NekoStacks][NekoStack] as
- * you want by calling [NekoItemRealizer.realize], where each of the
- * ItemStack will have the data of different values, and even have the
- * data of different types. This allows us to create more possibilities
- * for items, achieving better game experience by randomizing the item
- * generation and hence reducing duplication.
+ * a **blueprint** to create as many [NekoStacks][NekoStack] as you want
+ * by calling [NekoItemRealizer.realize], where each of the ItemStack
+ * will have the data of different values, and even have the data of
+ * different types. This allows us to create more possibilities for items,
+ * achieving better game experience by randomizing the item generation
+ * and hence reducing duplication.
  *
  * @see NekoStack
  */
@@ -76,6 +76,10 @@ interface NekoItem : Keyed, Examinable {
     val behaviors: ItemBehaviorMap
 }
 
+fun NekoItem.realize(): NekoStack {
+    return NekoItemInjections.realizer.realize(this)
+}
+
 fun NekoItem.realize(context: GenerationContext): NekoStack {
     return NekoItemInjections.realizer.realize(this, context)
 }
@@ -89,5 +93,5 @@ fun NekoItem.realize(crate: Crate): NekoStack {
 }
 
 private object NekoItemInjections : KoinComponent {
-    val realizer: NekoItemRealizer by inject()
+    val realizer: CustomNekoItemRealizer by inject()
 }

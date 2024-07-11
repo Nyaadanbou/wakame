@@ -38,7 +38,7 @@ object AssetsLookup : Initializable, KoinComponent {
         assets.clear()
         plugin.saveResourceRecursively(PLUGIN_ASSETS_DIR)
 
-        NekoItemNodeIterator.forEach { key, _, root ->
+        NekoItemNodeIterator.forEach { (key, _, root) ->
             val assetsNodes = root.node("assets").childrenList()
             for (assetsNode in assetsNodes) {
                 val sid = assetsNode.node("variant").krequire<Int>()
@@ -54,12 +54,12 @@ object AssetsLookup : Initializable, KoinComponent {
     }
 
     fun getAssets(key: Key): List<Assets> {
-        require(ItemRegistry.INSTANCES.find(key) != null) { "No such NekoItem: $key" }
+        require(ItemRegistry.CUSTOM.find(key) != null) { "No such NekoItem: $key" }
         return assets[key].toList()
     }
 
     fun getAssets(key: Key, sid: Int): Assets {
-        require(ItemRegistry.INSTANCES.find(key) != null) { "No such NekoItem: $key" }
+        require(ItemRegistry.CUSTOM.find(key) != null) { "No such NekoItem: $key" }
         return assets[key].firstOrNull { it.variant == sid } ?: throw NoSuchElementException("No such variant: $sid")
     }
 

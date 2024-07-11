@@ -31,7 +31,7 @@ data class ItemAssets(
 
 internal val Assets.itemType: Material
     get() = requireNotNull(
-        Registry.MATERIAL.get(ItemRegistry.INSTANCES[key].itemType.toNamespacedKey)
+        Registry.MATERIAL.get(ItemRegistry.CUSTOM[key].itemType.toNamespacedKey)
     ) {
         "Can't find material by key: $key"
     }

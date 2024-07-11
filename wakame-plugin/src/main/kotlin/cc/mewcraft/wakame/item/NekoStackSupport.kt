@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -17,6 +19,7 @@ import cc.mewcraft.wakame.util.removeWakameTag
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.wakameTag
 import cc.mewcraft.wakame.util.wakameTagOrNull
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
@@ -28,59 +31,75 @@ import org.slf4j.Logger
 import java.util.UUID
 import java.util.stream.Stream
 
+/**
+ * 检查一个物品能否算作 [NekoStack].
+ */
 @get:Contract(pure = true)
 val ItemStack.isNeko: Boolean
     get() {
+        val tag = this.wakameTagOrNull
+        if (tag != null) {
+            val prototype = NekoStackSupport.getPrototype(tag)
+            if (prototype != null) {
+                return true
+            }
+        }
+        return VanillaNekoStackRegistry.has(this.type)
+    }
+
+/**
+ * 检查一个物品是否算作 [CustomNekoStack].
+ */
+@get:Contract(pure = true)
+val ItemStack.isCustomNeko: Boolean
+    get() {
         val tag = this.wakameTagOrNull ?: return false
-        return NekoStackSupport.getPrototype(tag) != null
+        val prototype = NekoStackSupport.getPrototype(tag)
+        return prototype != null
+    }
+
+/**
+ * 检查一个物品是否算作 [VanillaNekoStack]
+ */
+@get:Contract(pure = true)
+val ItemStack.isVanillaNeko: Boolean
+    get() {
+        if (this.wakameTagOrNull != null) {
+            return false
+        }
+        return VanillaNekoStackRegistry.has(this.type)
     }
 
 @get:Contract(pure = false)
 val ItemStack.tryNekoStack: NekoStack?
     get() {
-        // 开发日记 2024/6/26 小米
-        // 看 CraftBukkit 的实现, 发现调用 hasItemMeta 时,
-        // 如果这个物品是 NMS, 则会产生一个 copy, 非常慢!
-        // 而且似乎这里也不需要判断.
-        // if (!this.hasItemMeta())
-        //     return null
-        if (!this.isNms)
-            return null
-        if (!this.isNeko)
-            return null
-        if (NekoStackSupport.isSystemUse(this.wakameTag))
-            return null
-        return NekoStackImpl(this)
+        val tag = this.wakameTagOrNull
+        if (tag != null) {
+            val prototype = NekoStackSupport.getPrototype(tag)
+            if (prototype != null) {
+                if (!NekoStackSupport.isSystemUse(tag)) {
+                    return CustomNekoStack(this)
+                }
+            }
+        }
+        return VanillaNekoStackRegistry.get(this.type)
     }
 
 @get:Contract(pure = false)
 val ItemStack.toNekoStack: NekoStack
     get() {
-        // 开发日记 2024/6/26 小米
-        // 同 tryNekoStack 里所说的.
-        // require(this.hasItemMeta()) {
-        //     "The ItemStack has no ItemMeta"
-        // }
-        require(this.isNms) {
-            "The ItemStack is not an NMS object"
+        return requireNotNull(this.tryNekoStack) {
+            "The ItemStack is not a NekoStack"
         }
-        require(this.isNeko) {
-            "The ItemStack is not from wakame"
-        }
-        require(!NekoStackSupport.isSystemUse(this.wakameTag)) {
-            "The ItemStack is not to be used by players"
-        }
-        return NekoStackImpl(this)
     }
 
 @get:Contract(pure = true)
 val ItemStack.trySystemStack: NekoStack?
     get() {
-        // if (!this.hasItemMeta())
-        //     return null
-        if (!this.isNeko)
+        if (!this.isCustomNeko) {
             return null
-        return NekoStackImpl(this.clone() /* 副本 */).takeIf {
+        }
+        return CustomNekoStack(this.clone()).takeIf {
             it.isSystemUse()
         }
     }
@@ -88,14 +107,11 @@ val ItemStack.trySystemStack: NekoStack?
 @get:Contract(pure = true)
 val ItemStack.toSystemStack: NekoStack
     get() {
-        // require(this.hasItemMeta()) {
-        //     "The ItemStack has no ItemMeta"
-        // }
-        require(this.isNeko) {
-            "The ItemStack is not from wakame"
+        require(this.isCustomNeko) {
+            "The ItemStack is not a CustomNekoStack"
         }
-        return NekoStackImpl(this.clone() /* 副本 */).apply {
-            require(this.isSystemUse()) { "The ItemStack is not a system stack" }
+        return CustomNekoStack(this.clone()).apply {
+            require(this.isSystemUse()) { "The ItemStack is not of system-use" }
         }
     }
 
@@ -112,7 +128,7 @@ val ItemStack.toSystemStack: NekoStack
  */
 @Contract(pure = true)
 internal fun Material.createNekoStack(): NekoStack {
-    return NekoStackImpl(this)
+    return CustomNekoStack(this)
 }
 
 @Contract(pure = true)
@@ -137,22 +153,26 @@ private fun NekoStack.unsetSystemUse() {
 
 @Contract(pure = true)
 internal fun NekoStack.toSystemUse(): NekoStack {
-    val clone: NekoStack = NekoStackImpl(this.handle.clone())
+    val clone: NekoStack = CustomNekoStack(this.handle.clone())
     clone.setSystemUse()
     return clone
 }
 
 @Contract(pure = true)
 internal fun NekoStack.toNonSystemUse(): NekoStack {
-    val clone: NekoStack = NekoStackImpl(this.handle.clone())
+    val clone: NekoStack = CustomNekoStack(this.handle.clone())
     clone.unsetSystemUse()
     return clone
 }
 
 /**
- * An implementation of [NekoStack].
+ * 一个标准的 [NekoStack] 实现.
+ *
+ * 底层物品必须拥有 `minecraft:custom_data` 组件, 并且其中存在 `wakame` 的复合标签.
+ *
+ * 该实现是可变的, 也就是说可以修改其中的属性.
  */
-private class NekoStackImpl(
+private class CustomNekoStack(
     override val handle: ItemStack,
 ) : NekoStack {
 
@@ -226,12 +246,8 @@ private class NekoStackImpl(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("namespace", namespace),
-        ExaminableProperty.of("path", path),
+        ExaminableProperty.of("key", key.asString()),
         ExaminableProperty.of("variant", variant),
-        ExaminableProperty.of("slot", slot),
-        ExaminableProperty.of("nbt", nbt),
-        ExaminableProperty.of("handle", handle),
     )
 
     override fun toString(): String {
@@ -240,13 +256,98 @@ private class NekoStackImpl(
 }
 
 /**
+ * 一个特殊的 [NekoStack] 实现, 代表一个 Minecraft 原版物品的萌芽版本.
+ *
+ * 仅用于封装原版物品的*类型*, 以便让原版物品拥有默认的萌芽特性.
+ *
+ * 该实现是不可变的, 也就是说不能修改其中的任何属性.
+ */
+internal class VanillaNekoStack(
+    override val key: Key,
+    override val prototype: NekoItem,
+    override val components: ItemComponentMap,
+) : NekoStack {
+    override val nbt: CompoundTag
+        get() = unsupported() // 由于本实现完全不可变, 因此不需要封装 NBT.
+    override val handle: ItemStack
+        get() = unsupported() // 由于本实现完全不可变, 因此不需要封装 ItemStack
+
+    override val namespace: String = key.namespace()
+    override val path: String = key.value()
+
+    // 变体永远都是 0
+    override var variant: Int = 0
+    override val uuid: UUID = prototype.uuid
+    override val slot: ItemSlot = prototype.slot
+    override val templates: ItemTemplateMap = prototype.templates
+    override val behaviors: ItemBehaviorMap = prototype.behaviors
+
+    override fun erase(): Unit = unsupported()
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("key", key.asString()),
+        ExaminableProperty.of("variant", variant),
+    )
+
+    override fun toString(): String {
+        return toSimpleString()
+    }
+
+    private fun unsupported(): Nothing {
+        throw UnsupportedOperationException("This operation is not supported on VanillaNekoStack")
+    }
+}
+
+@ReloadDependency(
+    runBefore = [ItemRegistry::class],
+)
+internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
+    private val realizer: VanillaNekoItemRealizer by inject()
+    private val registry: Object2ObjectOpenHashMap<Key, VanillaNekoStack> = Object2ObjectOpenHashMap()
+
+    fun has(material: Material): Boolean {
+        return has(material.key())
+    }
+
+    fun has(key: Key): Boolean {
+        return registry.containsKey(key)
+    }
+
+    fun get(material: Material): VanillaNekoStack? {
+        return get(material.key())
+    }
+
+    fun get(key: Key): VanillaNekoStack? {
+        return registry[key]
+    }
+
+    fun register(key: Key, stack: VanillaNekoStack) {
+        registry[key] = stack
+    }
+
+    override fun onPostWorld() {
+        realizeAndRegister()
+    }
+
+    override fun onReload() {
+        realizeAndRegister()
+    }
+
+    private fun realizeAndRegister() {
+        registry.clear()
+        for ((key, prototype) in ItemRegistry.VANILLA) {
+            val stack = realizer.realize(prototype)
+            register(key, stack)
+        }
+    }
+}
+
+/**
  * Common implementations related to [NekoStack].
  */
 internal object NekoStackSupport {
     fun isSystemUse(wakameTag: CompoundTag): Boolean {
-        return wakameTag.getCompoundOrNull(ItemComponentMap.TAG_COMPONENTS)
-            ?.contains(ItemComponentTypes.SYSTEM_USE.id)
-            ?: false
+        return wakameTag.getCompoundOrNull(ItemComponentMap.TAG_COMPONENTS)?.contains(ItemComponentConstants.SYSTEM_USE) ?: false
     }
 
     fun getNamespace(wakameTag: CompoundTag): String? {
@@ -289,13 +390,13 @@ internal object NekoStackSupport {
 
     fun getPrototype(wakameTag: CompoundTag): NekoItem? {
         val key = getKeyOrThrow(wakameTag)
-        val prototype = ItemRegistry.INSTANCES.find(key)
+        val prototype = ItemRegistry.CUSTOM.find(key)
         return prototype
     }
 
     fun getPrototypeOrThrow(wakameTag: CompoundTag): NekoItem {
         val key = getKeyOrThrow(wakameTag)
-        val prototype = requireNotNull(ItemRegistry.INSTANCES.find(key)) { "Can't find a prototype by '$key'" }
+        val prototype = requireNotNull(ItemRegistry.CUSTOM.find(key)) { "Can't find a prototype by '$key'" }
         return prototype
     }
 
@@ -331,6 +432,11 @@ internal object NekoStackSupport {
     }
 
     fun setVariant(wakameTag: CompoundTag, variant: Int) {
+        if (variant == 0) {
+            // 如果不存在 NBT 标签, 默认返回 0
+            wakameTag.remove(BaseBinaryKeys.VARIANT)
+            return
+        }
         wakameTag.putInt(BaseBinaryKeys.VARIANT, variant)
     }
 }

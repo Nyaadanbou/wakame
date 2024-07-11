@@ -40,15 +40,20 @@ import org.slf4j.Logger
 )
 object ItemRegistry : KoinComponent, Initializable {
     /**
-     * All loaded [NekoItem]s.
+     * 用于原版物品代理的 [NekoItem]. 这些 NekoItem 不应该用来生成物品.
      */
-    val INSTANCES: Registry<Key, NekoItem> = SimpleRegistry()
+    val VANILLA: Registry<Key, NekoItem> = SimpleRegistry()
+
+    /**
+     * 用于一般用途的 [NekoItem]. 这些 [NekoItem] 可以用来生成物品.
+     */
+    val CUSTOM: Registry<Key, NekoItem> = SimpleRegistry()
 
     /**
      * All namespaces of loaded items.
      */
     val NAMESPACES: List<String> by ReloadableProperty {
-        INSTANCES.objects.map { it.key.namespace() }.distinct().sorted()
+        CUSTOM.values.map { it.key.namespace() }.distinct().sorted()
     }
 
     /**
@@ -56,7 +61,7 @@ object ItemRegistry : KoinComponent, Initializable {
      */
     val PATHS_BY_NAMESPACE: Map<String, List<String>> by ReloadableProperty {
         val ret = hashMapOf<String, MutableList<String>>()
-        INSTANCES.objects.forEach {
+        CUSTOM.values.forEach {
             val namespace = it.key.namespace()
             val path = it.key.value()
             ret.getOrPut(namespace, ::ArrayList).add(path)
@@ -70,7 +75,9 @@ object ItemRegistry : KoinComponent, Initializable {
      * @param key the key in string representation
      * @return the specific [NekoItem]
      */
-    fun Registry<Key, NekoItem>.get(key: String): NekoItem = this[Key(key)]
+    fun Registry<Key, NekoItem>.get(key: String): NekoItem {
+        return this[Key(key)]
+    }
 
     /**
      * Gets specific [NekoItem] from the registry if there is one.
@@ -78,7 +85,9 @@ object ItemRegistry : KoinComponent, Initializable {
      * @param key the key in string representation
      * @return the specific [NekoItem] or `null` if not found
      */
-    fun Registry<Key, NekoItem>.find(key: String): NekoItem? = this.find(Key(key))
+    fun Registry<Key, NekoItem>.find(key: String): NekoItem? {
+        return this.find(Key(key))
+    }
 
     /**
      * Gets specific [NekoItem] from the registry.
@@ -87,7 +96,9 @@ object ItemRegistry : KoinComponent, Initializable {
      * @param path the path
      * @return the specific [NekoItem]
      */
-    fun Registry<Key, NekoItem>.get(namespace: String, path: String): NekoItem = this[Key(namespace, path)]
+    fun Registry<Key, NekoItem>.get(namespace: String, path: String): NekoItem {
+        return this[Key(namespace, path)]
+    }
 
     /**
      * Gets specific [NekoItem] from the registry if there is one.
@@ -96,27 +107,54 @@ object ItemRegistry : KoinComponent, Initializable {
      * @param path the path
      * @return the specific [NekoItem] or `null` if not found
      */
-    fun Registry<Key, NekoItem>.find(namespace: String, path: String): NekoItem? = this.find(Key(namespace, path))
+    fun Registry<Key, NekoItem>.find(namespace: String, path: String): NekoItem? {
+        return this.find(Key(namespace, path))
+    }
 
-    override fun onPreWorld() = loadConfiguration()
-    override fun onReload() = loadConfiguration()
+    override fun onPreWorld() {
+        loadConfiguration()
+    }
 
-    private val LOGGER: Logger by inject()
+    override fun onReload() {
+        loadConfiguration()
+    }
+
+    private val logger: Logger by inject()
+
     private fun loadConfiguration() {
-        INSTANCES.clear()
+        VANILLA.clear()
+        CUSTOM.clear()
 
-        NekoItemNodeIterator.forEach { key, path, node ->
-            runCatching {
-                NekoItemFactory.create(key, path, node)
-            }.onSuccess {
-                INSTANCES.register(key, it)
-            }.onFailure {
-                if (Initializer.isDebug) {
-                    LOGGER.error("Can't load item '$key'", it)
-                } else {
-                    LOGGER.error("Can't load item '$key': ${it.message}")
+        for ((key, path, node) in NekoItemNodeIterator) {
+            val namespace = key.namespace()
+
+            if (namespace == Key.MINECRAFT_NAMESPACE) {
+                // Process as vanilla item
+                runCatching {
+                    NekoItemFactory.createVanilla(key, path, node)
+                }.onSuccess {
+                    VANILLA.register(key, it)
+                }.onFailure {
+                    logError(key, it)
+                }
+            } else {
+                // Process as custom item
+                runCatching {
+                    NekoItemFactory.createCustom(key, path, node)
+                }.onSuccess {
+                    CUSTOM.register(key, it)
+                }.onFailure {
+                    logError(key, it)
                 }
             }
+        }
+    }
+
+    private fun logError(key: Key, throwable: Throwable) {
+        if (Initializer.isDebug) {
+            logger.error("Can't load item '$key'", throwable)
+        } else {
+            logger.error("Can't load item '$key': ${throwable.message}")
         }
     }
 }

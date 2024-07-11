@@ -1,0 +1,14 @@
+# 测试不支持的物品组件
+#
+# 不支持的物品组件都是因为涉及到修改物品本身的数据.
+# 这里只测试了几个不支持的类型, 看看程序是否检测到.
+# 该原型*不应该*加载成功
+
+uuid: 00000000-0000-0000-0000-000000000000
+attribute_modifiers:
+  show_in_tooltip: false
+crate:
+  key: "foo:bar"
+fire_resistant: { }
+unbreakable:
+  show_in_tooltip: false

@@ -17,15 +17,6 @@ import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import net.kyori.adventure.text.Component
-import org.bukkit.inventory.ItemStack
-
-fun template(item: NekoItem) {
-
-}
-
-fun bukkit(stack: ItemStack) {
-    stack.isNeko
-}
 
 fun stack(stack: NekoStack) {
     val damageableTemplate: Damageable.Template = stack.templates.get(ItemTemplateTypes.DAMAGEABLE) ?: return

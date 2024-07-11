@@ -30,6 +30,10 @@ interface GenerationTrigger : Examinable {
             Crate::class,
         )
 
+        fun noop(): GenerationTrigger {
+            return NoopGenerationTrigger
+        }
+
         /**
          * Creates a fake trigger with specific [level].
          *
@@ -55,6 +59,11 @@ interface GenerationTrigger : Examinable {
             return RealGenerationTrigger(source)
         }
     }
+}
+
+private object NoopGenerationTrigger : GenerationTrigger {
+    override val level: Int
+        get() = throw UnsupportedOperationException("Noop trigger")
 }
 
 private class FakeGenerationTrigger(

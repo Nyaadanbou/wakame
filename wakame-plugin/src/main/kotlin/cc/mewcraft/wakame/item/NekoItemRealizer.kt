@@ -1,20 +1,17 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.GenerationTrigger
 import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.toNamespacedKey
-import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.Registry
+import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ThreadLocalRandom
 
 /**
@@ -23,81 +20,151 @@ import java.util.concurrent.ThreadLocalRandom
 interface NekoItemRealizer {
 
     /**
-     * Realizes an item template from a custom trigger.
+     * Realizes an item template from no context.
      *
-     * @param item the item template
-     * @param context the context on which the realization is based
+     * @param prototype the item template
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, context: GenerationContext): NekoStack
+    fun realize(prototype: NekoItem): NekoStack
 
     /**
-     * Realizes an item template from a player.
+     * Realizes an item template from an online player.
      *
-     * @param item the item template
+     * @param prototype the item template
      * @param user the player on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, user: User<*>): NekoStack
+    fun realize(prototype: NekoItem, user: User<*>): NekoStack
 
     /**
      * Realizes an item template from a crate.
      *
-     * @param item the item template
+     * @param prototype the item template
      * @param crate the crate on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(item: NekoItem, crate: Crate): NekoStack
+    fun realize(prototype: NekoItem, crate: Crate): NekoStack
+
+    /**
+     * Realizes an item template from a custom context.
+     *
+     * @param prototype the item template
+     * @param context the context on which the realization is based
+     * @return a one-off NekoStack
+     */
+    fun realize(prototype: NekoItem, context: GenerationContext): NekoStack
 
 }
 
-internal object ServerNekoItemRealizer : NekoItemRealizer {
-    override fun realize(item: NekoItem, context: GenerationContext): NekoStack {
-        return generateNekoStack(item, context)
+internal object VanillaNekoItemRealizer : NekoItemRealizer {
+    override fun realize(prototype: NekoItem): VanillaNekoStack {
+        // 没 trigger 的 ctx
+        val context = GenerationContext(GenerationTrigger.noop(), prototype.key, 0)
+        // 获取 物品组件 的构建器
+        val componentMapBuilder = ItemComponentMap.builder()
+
+        fun <T, S : ItemTemplate<T>> generate(type: ItemTemplateType<S>) {
+            val template = prototype.templates.get(type) ?: return
+            val generated = template.generate(context)
+            if (!generated.isEmpty()) {
+                val value = generated.value
+                componentMapBuilder.set(template.componentType, value)
+            }
+        }
+
+        generate(ItemTemplateTypes.ATTRIBUTABLE)
+        generate(ItemTemplateTypes.CASTABLE)
+
+        generate(ItemTemplateTypes.ARROW)
+
+        generate(ItemTemplateTypes.LEVEL)
+        generate(ItemTemplateTypes.RARITY)
+        generate(ItemTemplateTypes.ELEMENTS)
+        generate(ItemTemplateTypes.KIZAMIZ)
+        generate(ItemTemplateTypes.LORE)
+        generate(ItemTemplateTypes.CELLS)
+
+        val components = componentMapBuilder.build()
+        val immutableComponents = ItemComponentMap.unmodifiable(components)
+
+        val vanillaNekoStack = VanillaNekoStack(
+            key = prototype.key,
+            prototype = prototype,
+            components = immutableComponents
+        )
+        return vanillaNekoStack
     }
 
-    override fun realize(item: NekoItem, user: User<*>): NekoStack {
-        return realize0(item, user)
+    override fun realize(prototype: NekoItem, user: User<*>): VanillaNekoStack {
+        return realize(prototype)
     }
 
-    override fun realize(item: NekoItem, crate: Crate): NekoStack {
-        return realize0(item, crate)
+    override fun realize(prototype: NekoItem, crate: Crate): VanillaNekoStack {
+        return realize(prototype)
     }
 
-    private fun realize0(item: NekoItem, source: Any): NekoStack {
-        val target = item.key // 物品模板的标识
-        val context = GenerationContext(GenerationTrigger.wrap(source), target, ThreadLocalRandom.current().nextLong())
-        val nekoStack = generateNekoStack(item, context)
+    override fun realize(prototype: NekoItem, context: GenerationContext): VanillaNekoStack {
+        return realize(prototype)
+    }
+}
+
+internal object CustomNekoItemRealizer : NekoItemRealizer {
+    override fun realize(prototype: NekoItem): NekoStack {
+        return realizeByTrigger(prototype, GenerationTrigger.noop())
+    }
+
+    override fun realize(prototype: NekoItem, user: User<*>): NekoStack {
+        return realizeByTrigger(prototype, GenerationTrigger.wrap(user))
+    }
+
+    override fun realize(prototype: NekoItem, crate: Crate): NekoStack {
+        return realizeByTrigger(prototype, GenerationTrigger.wrap(crate))
+    }
+
+    override fun realize(prototype: NekoItem, context: GenerationContext): NekoStack {
+        return realizeByContext(prototype, context)
+    }
+
+    private fun realizeByTrigger(item: NekoItem, trigger: GenerationTrigger): NekoStack {
+        val target = item.key
+        val context = GenerationContext(trigger, target, ThreadLocalRandom.current().nextLong())
+        val nekoStack = realizeByContext(item, context)
         return nekoStack
     }
 
     /**
      * Generates a NekoStack with the [context].
      *
-     * @param blueprint the item blueprint
+     * @param prototype the item blueprint
      * @param context the input context
      * @return a new NekoStack
      */
-    private fun generateNekoStack(blueprint: NekoItem, context: GenerationContext): NekoStack {
-        val itemKey: Key = blueprint.key
-        val itemType: Material = requireNotNull(Registry.MATERIAL.get(blueprint.itemType.toNamespacedKey)) {
-            "Can't find org.bukkit.Material by '${blueprint.itemType}'"
+    private fun realizeByContext(prototype: NekoItem, context: GenerationContext): NekoStack {
+        val itemType: Material = requireNotNull(Registry.MATERIAL.get(prototype.itemType.toNamespacedKey)) {
+            "Can't find org.bukkit.Material by '${prototype.itemType}'"
         }
-        val nekoStack: NekoStack = itemType.createNekoStack()
-        val wakameTag: CompoundTag = nekoStack.nbt
+        val nekoStack = itemType.createNekoStack()
+
+        // 移除既定的 原版组件
+        nekoStack.editHandle {
+            prototype.removeComponents.applyTo(this)
+        }
+
+        val itemKey = prototype.key
+        val wakameTag = nekoStack.nbt
         NekoStackSupport.setKey(wakameTag, itemKey)
         NekoStackSupport.setVariant(wakameTag, 0)
 
         // 获取 物品组件 的容器
-        val components: ItemComponentMap = nekoStack.components
+        val components = nekoStack.components
         // 获取 物品组件模板 的容器
-        val templates: ItemTemplateMap = nekoStack.templates
+        val templates = nekoStack.templates
 
-        fun <T, S : ItemTemplate<T>> generate(templateType: ItemTemplateType<S>) {
-            val template: S = templates.get(templateType) ?: return
-            val generated: GenerationResult<T> = template.generate(context)
+        fun <T, S : ItemTemplate<T>> generate(type: ItemTemplateType<S>) {
+            val template = templates.get(type) ?: return
+            val generated = template.generate(context)
             if (!generated.isEmpty()) {
-                val value: T = generated.value
+                val value = generated.value
                 components.set(template.componentType, value)
             }
         }
@@ -137,5 +204,9 @@ internal object ServerNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.CRATE)
 
         return nekoStack
+    }
+
+    private fun NekoStack.editHandle(block: ItemStack.() -> Unit) {
+        block(handle)
     }
 }

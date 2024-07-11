@@ -14,19 +14,17 @@ import java.io.File
 import java.nio.file.Path
 
 /**
- * NekoItem 物品配置文件的遍历器。
+ * NekoItem 物品配置文件的遍历器.
+ *
+ * 该遍历器会实时反应文件的变化.
  */
-object NekoItemNodeIterator : KoinComponent {
-    /**
-     * 根据配置文件的目录结构，遍历所有物品配置文件，并对每个物品配置文件执行 [block]。
-     * 每次调用时会传入一个物品的 [Key] 和对应文件的根 [ConfigurationNode]。
-     *
-     * @param block 需要执行的代码块，会被多次调用。
-     * - 参数 [Key] 为物品的唯一标识
-     * - 参数 [ConfigurationNode] 为物品的根配置
-     * - 参数 [Path] 为物品配置文件的路径
-     */
-    fun forEach(block: (Key, Path, ConfigurationNode) -> Unit) {
+internal object NekoItemNodeIterator : Iterable<Triple<Key, Path, ConfigurationNode>>, KoinComponent {
+    override fun iterator(): Iterator<Triple<Key, Path, ConfigurationNode>> {
+        return collectElements().iterator()
+    }
+
+    private fun collectElements(): List<Triple<Key, Path, ConfigurationNode>> {
+        val mutableList = mutableListOf<Triple<Key, Path, ConfigurationNode>>()
         val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_PROTO_CONFIG_DIR)
         val namespaceDirs = mutableListOf<File>()
 
@@ -48,11 +46,14 @@ object NekoItemNodeIterator : KoinComponent {
                     val value = file.nameWithoutExtension
                     val key = Key(namespace, value)
 
-                    val text = file.bufferedReader().use { it.readText() }
+                    val text = file.readText(Charsets.UTF_8)
                     val path = file.toPath()
                     val node = loaderBuilder.buildAndLoadString(text)
-                    block(key, path, node)
+                    val triple = Triple(key, path, node)
+                    mutableList.add(triple)
                 }
         }
+
+        return mutableList
     }
 }

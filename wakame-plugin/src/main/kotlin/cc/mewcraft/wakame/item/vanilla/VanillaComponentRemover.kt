@@ -32,7 +32,7 @@ interface VanillaComponentRemover : Examinable {
         /**
          * 获取一个空的实例. 该实例不会进行任何操作.
          */
-        fun empty(): VanillaComponentRemover = Empty
+        fun noop(): VanillaComponentRemover = Empty
     }
 
     private object Empty : VanillaComponentRemover {

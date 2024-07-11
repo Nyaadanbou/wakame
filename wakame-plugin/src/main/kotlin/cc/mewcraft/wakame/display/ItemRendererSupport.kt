@@ -14,8 +14,8 @@ internal class PacketItemRenderer : KoinComponent, ItemRenderer<PacketNekoStack>
     override fun render(nekoStack: PacketNekoStack) {
         val lore = TextRenderer.generateLoreLines(nekoStack).flatten()
         val customModelData = itemModelDataLookup[nekoStack.key, nekoStack.variant]
-        nekoStack.setLore(lore)
-        nekoStack.setCustomModelData(customModelData)
+        nekoStack.lore(lore)
+        nekoStack.customModelData(customModelData)
         // 为了麦若，去掉物品的真实根标签
         nekoStack.erase()
     }

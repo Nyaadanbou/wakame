@@ -45,7 +45,7 @@ class ItemParser<C : Any> : AggregateParser<C, NekoItem> {
         return AggregateResultMapper agg@{ commandContext, aggregateCommandContext ->
             val namespace = aggregateCommandContext.get<String>("namespace")
             val path = aggregateCommandContext.get<String>("path")
-            val item = ItemRegistry.INSTANCES.find(namespace, path)
+            val item = ItemRegistry.CUSTOM.find(namespace, path)
             if (item == null) {
                 ArgumentParseResult.failureFuture(ItemParseException(commandContext))
             } else {

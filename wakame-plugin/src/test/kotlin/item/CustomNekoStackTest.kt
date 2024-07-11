@@ -1,24 +1,8 @@
-import cc.mewcraft.nbt.ByteArrayTag
-import cc.mewcraft.nbt.ByteTag
-import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.nbt.DoubleTag
-import cc.mewcraft.nbt.EndTag
-import cc.mewcraft.nbt.FloatTag
-import cc.mewcraft.nbt.IntArrayTag
-import cc.mewcraft.nbt.IntTag
-import cc.mewcraft.nbt.ListTag
-import cc.mewcraft.nbt.LongArrayTag
-import cc.mewcraft.nbt.LongTag
-import cc.mewcraft.nbt.ShortTag
-import cc.mewcraft.nbt.StringTag
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.adventure.adventureModule
+package item
+
+import assertAny
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.entity.entityModule
-import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.Attributable
@@ -31,49 +15,21 @@ import cc.mewcraft.wakame.item.components.cells.CurseTypes
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
 import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmpty
 import cc.mewcraft.wakame.item.components.cells.cores.noop.CoreNoop
-import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.GenerationTrigger
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.kizami.kizamiModule
-import cc.mewcraft.wakame.level.levelModule
-import cc.mewcraft.wakame.molang.molangModule
-import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.EntityRegistry
-import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
-import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.registry.registryModule
-import cc.mewcraft.wakame.skill.skillModule
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
-import it.unimi.dsi.fastutil.longs.LongSet
-import item.MockGenerationContext
-import item.MockNekoStack
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.core.qualifier.named
 import org.koin.test.KoinTest
-import org.koin.test.get
-import org.koin.test.inject
-import org.slf4j.Logger
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import java.io.File
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -81,68 +37,46 @@ import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import kotlin.test.fail
 
-class ItemTest2 : KoinTest {
+class CustomNekoStackTest : KoinTest {
     companion object {
         @JvmStatic
         @BeforeAll
         fun setup() {
-            // 配置依赖注入
-            startKoin {
-                // environment
-                modules(
-                    testEnv()
-                )
-
-                // this module
-                modules(
-                    itemModule()
-                )
-
-                // dependencies
-                modules(
-                    adventureModule(),
-                    elementModule(),
-                    entityModule(),
-                    kizamiModule(),
-                    levelModule(),
-                    molangModule(),
-                    rarityModule(),
-                    registryModule(),
-                    skillModule(),
-                )
-            }
-
-            // 按依赖顺序, 初始化注册表
-            AttributeRegistry.onPreWorld()
-            ElementRegistry.onPreWorld()
-            SkillRegistry.onPreWorld()
-            KizamiRegistry.onPreWorld()
-            RarityRegistry.onPreWorld()
-            LevelMappingRegistry.onPreWorld()
-            EntityRegistry.onPreWorld()
+            CommonNekoStackTest.beforeAll()
         }
 
         @JvmStatic
         @AfterAll
         fun shutdown() {
-            unmockStaticNBT()
-            stopKoin()
+            CommonNekoStackTest.afterAll()
+        }
+
+        private val ZERO_UUID = UUID(0, 0)
+
+        private fun <T, S : ItemTemplate<T>> componentLifecycleTest(
+            path: String,
+            templateType: ItemTemplateType<S>,
+            componentType: ItemComponentType<T>,
+            block: ItemComponentLifecycleTest.Lifecycle<T, S>.() -> Unit,
+        ) {
+            val lifecycle = ItemComponentLifecycleTest("component", path, templateType, componentType)
+            lifecycle.configure(block)
+            lifecycle.start()
         }
     }
 
-    //<editor-fold desc="Units">
+    //<editor-fold desc="Intrinsic Properties">
     @Test
     fun `unit - least configuration`() {
-        val item = readPrototype("unit", "least_configuration")
+        val item = readCustomPrototype("unit", "least_configuration")
         assertEquals(UUID.fromString("8729823f-8b80-4efd-bb9e-1c0f9b2eecc3"), item.uuid)
         assertEquals(Key.key("wooden_sword"), item.itemType)
     }
 
     @Test
     fun `unit - remove_components`() {
-        val item = readPrototype("unit", "remove_components")
+        val item = readCustomPrototype("unit", "remove_components")
         val removeComponents = item.removeComponents
         assertTrue { removeComponents.has("attribute_modifiers") }
         assertTrue { removeComponents.has("food") }
@@ -151,13 +85,13 @@ class ItemTest2 : KoinTest {
 
     @Test
     fun `unit - slot`() {
-        val item = readPrototype("unit", "slot")
+        val item = readCustomPrototype("unit", "slot")
         val slot = item.slot
         assertEquals("MAIN_HAND", slot.id())
     }
     //</editor-fold>
 
-    //<editor-fold desc="Components">
+    //<editor-fold desc="Item Components">
     @Test
     fun `component - arrow`() = componentLifecycleTest(
         "arrow", ItemTemplateTypes.ARROW, ItemComponentTypes.ARROW
@@ -530,7 +464,7 @@ class ItemTest2 : KoinTest {
 
     @Test
     fun `component - enchantments`() {
-        val prototype = readPrototype("component", "enchantments")
+        val prototype = readCustomPrototype("component", "enchantments")
         val template = prototype.templates.get(ItemTemplateTypes.ENCHANTMENTS)
 
         assertNotNull(template)
@@ -822,7 +756,7 @@ class ItemTest2 : KoinTest {
 
     @Test
     fun `component - stored_enchantments`() {
-        val prototype = readPrototype("component", "stored_enchantments")
+        val prototype = readCustomPrototype("component", "stored_enchantments")
         val template = prototype.templates.get(ItemTemplateTypes.STORED_ENCHANTMENTS)
 
         assertNotNull(template)
@@ -862,7 +796,7 @@ class ItemTest2 : KoinTest {
 
     @Test
     fun `component - trackable`() {
-        val prototype = readPrototype("component", "trackable")
+        val prototype = readCustomPrototype("component", "trackable")
     }
 
     @Test
@@ -898,267 +832,27 @@ class ItemTest2 : KoinTest {
             assertTrue(it.showInTooltip)
         }
     }
-//</editor-fold>
+    //</editor-fold>
 
-    //<editor-fold desc="Use cases">
+    //<editor-fold desc="Use Cases">
     @Test
     fun `use case - apple without food`() {
-        val prototype = readPrototype("use_case", "apple_without_food")
+        val prototype = readCustomPrototype("use_case", "apple_without_food")
     }
 
     @Test
     fun `use case - pickaxe without tool`() {
-        val prototype = readPrototype("use_case", "pickaxe_without_tool")
+        val prototype = readCustomPrototype("use_case", "pickaxe_without_tool")
     }
 
     @Test
     fun `use case - simple material`() {
-        val prototype = readPrototype("use_case", "simple_material")
+        val prototype = readCustomPrototype("use_case", "simple_material")
     }
 
     @Test
     fun `use case - sword without attribute modifiers`() {
-        val prototype = readPrototype("use_case", "sword_without_attribute_modifiers")
+        val prototype = readCustomPrototype("use_case", "sword_without_attribute_modifiers")
     }
-//</editor-fold>
-}
-
-fun assertAny(vararg assertions: () -> Unit) {
-    val errors = mutableListOf<Throwable>()
-    for (assertion in assertions) {
-        try {
-            assertion()
-            return // If any assertion succeeds, return without error.
-        } catch (e: Throwable) {
-            errors.add(e)
-        }
-    }
-    // If all assertions fail, throw an exception containing all error messages.
-    val message = errors.joinToString(separator = "\n") { it.message ?: "Unknown error" }
-    fail("All assertions failed:\n$message")
-}
-
-private fun mockStaticNBT() {
-    mockkStatic(
-        ByteArrayTag::class, ByteTag::class, CompoundTag::class, DoubleTag::class, EndTag::class, FloatTag::class,
-        IntArrayTag::class, IntTag::class, ListTag::class, LongArrayTag::class, LongTag::class, ShortTag::class,
-        StringTag::class,
-    )
-
-    mockk<ByteArrayTag>().let {
-        every { ByteArrayTag.create(any<ByteArray>()) } returns it
-        every { ByteArrayTag.create(any<List<Byte>>()) } returns it
-    }
-
-    mockk<ByteTag>().let {
-        every { ByteTag.valueOf(any<Boolean>()) } returns it
-        every { ByteTag.valueOf(any<Byte>()) } returns it
-    }
-
-    mockk<CompoundTag>().let {
-        every { CompoundTag.create() } returns it
-    }
-
-    mockk<DoubleTag>().let {
-        every { DoubleTag.valueOf(any()) } returns it
-    }
-
-    mockk<EndTag>().let {
-        every { EndTag.instance() } returns it
-    }
-
-    mockk<FloatTag>().let {
-        every { FloatTag.valueOf(any()) } returns it
-    }
-
-    mockk<IntArrayTag>().let {
-        every { IntArrayTag.create(any<IntArray>()) } returns it
-        every { IntArrayTag.create(any<List<Int>>()) } returns it
-    }
-
-    mockk<IntTag>().let {
-        every { IntTag.valueOf(any()) } returns it
-    }
-
-    mockk<ListTag>().let {
-        every { ListTag.create() } returns it
-        every { ListTag.create(any(), any()) } returns it
-    }
-
-    mockk<LongArrayTag>().let {
-        every { LongArrayTag.create(any<LongArray>()) } returns it
-        every { LongArrayTag.create(any<LongSet>()) } returns it
-        every { LongArrayTag.create(any<List<Long>>()) } returns it
-    }
-
-    mockk<LongTag>().let {
-        every { LongTag.valueOf(any()) } returns it
-    }
-
-    mockk<ShortTag>().let {
-        every { ShortTag.valueOf(any()) } returns it
-    }
-
-    mockk<StringTag>().let {
-        every { StringTag.valueOf(any()) } returns it
-    }
-}
-
-private fun unmockStaticNBT() {
-    unmockkStatic(
-        ByteArrayTag::class, ByteTag::class, CompoundTag::class, DoubleTag::class, EndTag::class, FloatTag::class,
-        IntArrayTag::class, IntTag::class, ListTag::class, LongArrayTag::class, LongTag::class, ShortTag::class,
-        StringTag::class,
-    )
-}
-
-private val ZERO_UUID = UUID(0, 0)
-
-/**
- * 从指定的文件读取 [NekoItem].
- */
-private fun KoinTest.readPrototype(namespace: String, path: String): NekoItem {
-    val pluginDataDir = get<File>(named(PLUGIN_DATA_DIR))
-    val itemsDir = pluginDataDir.resolve("items")
-    val namespaceDir = itemsDir.resolve(namespace)
-    val itemFile = namespaceDir.resolve("$path.yml")
-    if (!itemFile.exists()) {
-        fail("File not found: $namespace:$path")
-    }
-
-    val key = Key.key(namespace, path)
-    val relPath = itemFile.toPath()
-    val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(ITEM_PROTO_CONFIG_LOADER)) // will be reused
-    val node = loaderBuilder.buildAndLoadString(itemFile.readText())
-    return NekoItemFactory.create(key, relPath, node)
-}
-
-/**
- * 开始一个物品组件的标准测试流程.
- */
-private fun <T, S : ItemTemplate<T>> componentLifecycleTest(
-    path: String,
-    templateType: ItemTemplateType<S>,
-    componentType: ItemComponentType<T>,
-    block: ComponentLifecycleTest.Lifecycle<T, S>.() -> Unit,
-) {
-    val lifecycle = ComponentLifecycleTest(path, templateType, componentType)
-    lifecycle.configure(block)
-    lifecycle.start()
-}
-
-/**
- * 一个适用于任何物品组件的测试流程.
- */
-private class ComponentLifecycleTest<T, S : ItemTemplate<T>>(
-    val path: String,
-    val templateType: ItemTemplateType<S>,
-    val componentType: ItemComponentType<T>,
-) : KoinTest {
-
-    private val logger: Logger by inject()
-    private val lifecycle: LifecycleImpl<T, S> = LifecycleImpl()
-
-    /**
-     * 配置测试流程.
-     */
-    fun configure(block: Lifecycle<T, S>.() -> Unit) {
-        block(lifecycle)
-    }
-
-    /**
-     * 开始测试流程.
-     */
-    fun start() {
-        val prototype = readPrototype("component", path)
-        val nekoStack = MockNekoStack(prototype)
-        val template = prototype.templates.get(templateType)
-
-        // 执行对 ItemTemplate 反序列化的断言
-        lifecycle.serializationBlock?.invoke(template)
-
-        if (template == null) {
-            return // 模板为空的话就不需要做接下来的测试了, 直接返回
-        }
-
-        // 如果有自定义 GenerationContext, 则使用自定义的; 如果没有, 则使用统一预设的
-        val context = run {
-            val contextCreator = lifecycle.bootstrap.contextCreator
-            if (contextCreator != null) {
-                contextCreator()
-            } else {
-                val generationTrigger = GenerationTrigger.fake(10)
-                MockGenerationContext.create(prototype.key, generationTrigger)
-            }
-        }
-
-        // 处理 GenerationContext
-        lifecycle.generationContextBlock?.invoke(context)
-
-        val generationResult = template.generate(context)
-
-        // 处理 GenerationResult
-        lifecycle.generationResultBlock?.invoke(generationResult)
-
-        val generated = generationResult.value
-        nekoStack.components.set(componentType, generated)
-        nekoStack.components.get(componentType) ?: fail("Failed to get the component from the map")
-
-        // 处理 GenerationResult 所封装的值
-        lifecycle.unboxedBlock?.invoke(generated)
-
-        logger.info("")
-        logger.info(prototype.toString())
-        logger.info("")
-        logger.info(nekoStack.toString())
-        logger.info("")
-        logger.info(generated.toString())
-    }
-
-    interface Lifecycle<T, S : ItemTemplate<T>> {
-        fun serialization(block: (S?) -> Unit)
-        fun bootstrap(block: LifecycleBootstrap.() -> Unit)
-        fun context(block: (GenerationContext) -> Unit)
-        fun result(block: (GenerationResult<T>) -> Unit)
-        fun unboxed(block: (T) -> Unit)
-    }
-
-    interface LifecycleBootstrap {
-        fun createContext(block: () -> GenerationContext)
-    }
-
-    private class LifecycleImpl<T, S : ItemTemplate<T>> : Lifecycle<T, S> {
-        var bootstrap: LifecycleBootstrapImpl = LifecycleBootstrapImpl()
-        var generationContextBlock: ((GenerationContext) -> Unit)? = null
-        var serializationBlock: ((S?) -> Unit)? = null
-        var generationResultBlock: ((GenerationResult<T>) -> Unit)? = null
-        var unboxedBlock: ((T) -> Unit)? = null
-
-        override fun bootstrap(block: LifecycleBootstrap.() -> Unit) {
-            block(bootstrap)
-        }
-
-        override fun serialization(block: (S?) -> Unit) {
-            serializationBlock = block
-        }
-
-        override fun context(block: (GenerationContext) -> Unit) {
-            generationContextBlock = block
-        }
-
-        override fun result(block: (GenerationResult<T>) -> Unit) {
-            generationResultBlock = block
-        }
-
-        override fun unboxed(block: (T) -> Unit) {
-            unboxedBlock = block
-        }
-    }
-
-    private class LifecycleBootstrapImpl : LifecycleBootstrap {
-        var contextCreator: (() -> GenerationContext)? = null
-        override fun createContext(block: () -> GenerationContext) {
-            contextCreator = block
-        }
-    }
+    //</editor-fold>
 }
