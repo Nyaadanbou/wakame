@@ -73,31 +73,7 @@ entity_attributes:
       universal_defense_penetration_rate: 0
       universal_incoming_damage_rate: 0
 
-  minecraft:abstract_horse:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:abstract_skeleton:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:abstract_villager:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:ageable:
-    parent: minecraft:monster
-    values: { }
-
   minecraft:allay:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:ambient:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:animals:
     parent: minecraft:monster
     values: { }
 
@@ -129,10 +105,6 @@ entity_attributes:
     parent: minecraft:monster
     values: { }
 
-  minecraft:breedable:
-    parent: minecraft:monster
-    values: { }
-
   minecraft:breeze:
     parent: minecraft:monster
     values: { }
@@ -149,10 +121,6 @@ entity_attributes:
     parent: minecraft:monster
     values: { }
 
-  minecraft:chested_horse:
-    parent: minecraft:monster
-    values: { }
-
   minecraft:chicken:
     parent: minecraft:monster
     values: { }
@@ -161,19 +129,7 @@ entity_attributes:
     parent: minecraft:monster
     values: { }
 
-  minecraft:collar_colorable:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:complex_living_entity:
-    parent: minecraft:monster
-    values: { }
-
   minecraft:cow:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:creature:
     parent: minecraft:monster
     values: { }
 
@@ -209,19 +165,11 @@ entity_attributes:
     parent: minecraft:monster
     values: { }
 
-  minecraft:enemy:
-    parent: minecraft:monster
-    values: { }
-
   minecraft:evoker:
     parent: minecraft:monster
     values: { }
 
   minecraft:fish:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:flying:
     parent: minecraft:monster
     values: { }
 
@@ -265,10 +213,6 @@ entity_attributes:
     parent: minecraft:monster
     values: { }
 
-  minecraft:human_entity:
-    parent: minecraft:monster
-    values: { }
-
   minecraft:husk:
     parent: minecraft:monster
     values: { }
@@ -301,10 +245,6 @@ entity_attributes:
     parent: minecraft:monster
     values: { }
 
-  minecraft:npc:
-    parent: minecraft:monster
-    values: { }
-
   minecraft:ocelot:
     parent: minecraft:monster
     values: { }
@@ -326,10 +266,6 @@ entity_attributes:
     values: { }
 
   minecraft:piglin:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:piglin_abstract:
     parent: minecraft:monster
     values: { }
 
@@ -361,19 +297,11 @@ entity_attributes:
     parent: minecraft:monster
     values: { }
 
-  minecraft:ranged_entity:
-    parent: minecraft:monster
-    values: { }
-
   minecraft:ravager:
     parent: minecraft:monster
     values: { }
 
   minecraft:salmon:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:schoolable_fish:
     parent: minecraft:monster
     values: { }
 
@@ -409,19 +337,11 @@ entity_attributes:
     parent: minecraft:monster
     values: { }
 
-  minecraft:spellcaster:
-    parent: minecraft:monster
-    values: { }
-
   minecraft:spider:
     parent: minecraft:monster
     values: { }
 
   minecraft:squid:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:steerable:
     parent: minecraft:monster
     values: { }
 
@@ -434,10 +354,6 @@ entity_attributes:
     values: { }
 
   minecraft:tadpole:
-    parent: minecraft:monster
-    values: { }
-
-  minecraft:tameable:
     parent: minecraft:monster
     values: { }
 
