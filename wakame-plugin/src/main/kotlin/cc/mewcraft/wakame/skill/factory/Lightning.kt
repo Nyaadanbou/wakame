@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.tick.TickResult
 import net.kyori.adventure.key.Key
 
 interface Lightning : Skill {
+
     companion object Factory : SkillFactory<Lightning> {
         override fun create(key: Key, config: ConfigProvider): Lightning {
             return DefaultImpl(key, config)
@@ -36,7 +37,6 @@ interface Lightning : Skill {
                 val location = TargetUtil.getLocation(context)?.bukkitLocation ?: return TickResult.INTERRUPT
                 val world = location.world
                 val lightning = world.strikeLightning(location)
-
                 return TickResult.ALL_DONE
             }
         }

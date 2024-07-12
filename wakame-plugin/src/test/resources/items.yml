@@ -119,6 +119,8 @@ components:
   glowable:
     enabled: true
     display_name: "可发光"
+    tooltips:
+      single: "可发光"
 
   hide_tooltip:
     enabled: true

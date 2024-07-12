@@ -14,6 +14,7 @@ internal object SkillFactories {
         FACTORIES.register("command_execute", CommandExecute)
         FACTORIES.register("dash", Dash)
         FACTORIES.register("kill_entity", KillEntity)
+        FACTORIES.register("lightning", Lightning)
         FACTORIES.register("potion_drop", PotionDrop)
         FACTORIES.register("projectile", Projectile)
         FACTORIES.register("remove_potion_effect", RemovePotionEffect)
