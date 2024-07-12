@@ -21,6 +21,8 @@ class MockNekoStack(
         get() = throw NotImplementedError("NBT is not finished yet")
     override val handle: ItemStack
         get() = throw NotImplementedError("ItemStack is not finished yet")
+    override val itemStack: ItemStack
+        get() = throw NotImplementedError("ItemStack is not finished yet")
     override val namespace: String = prototype.key.namespace()
     override val path: String = prototype.key.value()
     override val key: Key = prototype.key

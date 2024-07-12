@@ -41,7 +41,7 @@ object ItemCommands : CommandFactory<CommandSender> {
                     multiplePlayerSelector.values().forEach { player ->
                         repeat(amount) {
                             val stack = item.realize(player.toUser())
-                            player.inventory.addItem(stack.handle)
+                            player.inventory.addItem(stack.itemStack)
                         }
                         player.sendPlainMessage("You received $amount item(s): ${item.key}")
                     }

@@ -142,7 +142,7 @@ private fun NekoStack.setSystemUse() {
 }
 
 @Contract(pure = false)
-private fun NekoStack.unsetSystemUse() {
+private fun CustomNekoStack.unsetSystemUse() {
     this.handle.backingItemName = null
     this.handle.backingCustomName = null
     this.handle.backingCustomModelData = null
@@ -153,14 +153,14 @@ private fun NekoStack.unsetSystemUse() {
 
 @Contract(pure = true)
 internal fun NekoStack.toSystemUse(): NekoStack {
-    val clone: NekoStack = CustomNekoStack(this.handle.clone())
+    val clone = CustomNekoStack(this.itemStack)
     clone.setSystemUse()
     return clone
 }
 
 @Contract(pure = true)
 internal fun NekoStack.toNonSystemUse(): NekoStack {
-    val clone: NekoStack = CustomNekoStack(this.handle.clone())
+    val clone = CustomNekoStack(this.itemStack)
     clone.unsetSystemUse()
     return clone
 }
@@ -206,6 +206,9 @@ private class CustomNekoStack(
                 "Can't read/modify the NBT of NMS-backed ItemStack which is not NekoStack"
             )
         }
+
+    override val itemStack: ItemStack
+        get() = handle.clone()
 
     override val prototype: NekoItem
         get() = NekoStackSupport.getPrototypeOrThrow(nbt)
@@ -270,7 +273,9 @@ internal class VanillaNekoStack(
     override val nbt: CompoundTag
         get() = unsupported() // 由于本实现完全不可变, 因此不需要封装 NBT.
     override val handle: ItemStack
-        get() = unsupported() // 由于本实现完全不可变, 因此不需要封装 ItemStack
+        get() = unsupported()
+    override val itemStack: ItemStack
+        get() = unsupported()
 
     override val namespace: String = key.namespace()
     override val path: String = key.value()

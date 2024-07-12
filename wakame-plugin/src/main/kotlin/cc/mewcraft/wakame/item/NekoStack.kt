@@ -27,6 +27,9 @@ interface NekoStack : Keyed, Examinable {
     @get:ApiStatus.Internal
     val nbt: CompoundTag
 
+    @get:ApiStatus.Internal
+    val handle: ItemStack
+
     /**
      * Gets the wrapped [ItemStack].
      *
@@ -47,8 +50,7 @@ interface NekoStack : Keyed, Examinable {
      * NOT** modify `this` and then expect that your changes will apply to the
      * world state.
      */
-    @get:ApiStatus.Internal
-    val handle: ItemStack
+    val itemStack: ItemStack
 
     /**
      * The `namespace` of this item.

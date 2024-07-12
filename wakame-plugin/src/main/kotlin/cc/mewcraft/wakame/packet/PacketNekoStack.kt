@@ -144,6 +144,9 @@ private class PacketCustomNekoStack(
     // 由于 ItemComponentMap 对 BukkitStack 有直接依赖, 我们需要转换一个
     override val handle: BukkitStack = SpigotConversionUtil.toBukkitItemStack(handle0)
 
+    override val itemStack: BukkitStack
+        get() = handle.clone()
+
     // 开发日记1: We use property initializer here as it would be called multiple times,
     // and we don't want to do the unnecessary NBT conversion again and again
     // 开发日记2: 该 NBT 标签应该只接受读操作 (虽然可以写, 但不保证生效, 也没啥用应该)
@@ -196,6 +199,9 @@ private class PacketVanillaNekoStack(
     override val components: ItemComponentMap,
 ) : PacketNekoStack {
     override val nbt: CompoundTag
+        get() = abortReadOps()
+
+    override val itemStack: org.bukkit.inventory.ItemStack
         get() = abortReadOps()
 
     override val handle: BukkitStack
