@@ -6,12 +6,17 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import java.util.UUID
 
 /**
  * 用于处理 [Tickable].
  */
-internal object Ticker {
+internal object Ticker : KoinComponent {
+    private val logger: Logger by inject()
+
     private val ticksToAdd: MutableMap<UUID, Tickable> = Object2ObjectOpenHashMap()
     private val tickToRemove: MutableList<UUID> = ArrayList()
 
@@ -41,6 +46,7 @@ internal object Ticker {
                 }
                 tickableToTicks.merge(child, 1, Long::plus)
             } catch (t: Throwable) {
+                logger.error("Error occurred while ticking $child", t)
                 tickToRemove.add(index)
             }
         }

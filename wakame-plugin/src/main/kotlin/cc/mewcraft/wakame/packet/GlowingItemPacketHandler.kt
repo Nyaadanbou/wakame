@@ -31,7 +31,7 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
                 val entity = NmsEntityUtils.getEntity(origin.entityId) as? Item ?: return
                 val nekoStack = entity.itemStack.tryNekoStack ?: return
                 val itemComponents = nekoStack.components
-                if (itemComponents.has(ItemComponentTypes.GLOWABLE))
+                if (!itemComponents.has(ItemComponentTypes.GLOWABLE))
                     return
                 val rarityColor = itemComponents.get(ItemComponentTypes.RARITY)?.rarity?.glowColor
                     ?.takeIf { it != GlowColor.empty() }

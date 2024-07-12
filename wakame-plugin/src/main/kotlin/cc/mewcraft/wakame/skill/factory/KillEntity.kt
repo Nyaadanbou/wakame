@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.skill.factory
 
+import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.Target
@@ -29,8 +30,8 @@ interface KillEntity : Skill {
 
         private inner class Tick(
             context: SkillContext,
-            override val interruptTriggers: TriggerConditions,
-            override val forbiddenTriggers: TriggerConditions
+            override val interruptTriggers: Provider<TriggerConditions>,
+            override val forbiddenTriggers: Provider<TriggerConditions>
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(tickCount: Long): TickResult {

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.skill
 
+import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
@@ -19,8 +20,20 @@ abstract class SkillBase(
     override val conditions: SkillConditionGroup by config.optionalEntry<SkillConditionGroup>("conditions").orElse(SkillConditionGroup.empty())
 
     protected inner class TriggerConditionGetter {
-        val forbiddenTriggers: TriggerConditions by config.optionalEntry<TriggerConditions>("forbidden_triggers").orElse(TriggerConditions.empty())
-        val interruptTriggers: TriggerConditions by config.optionalEntry<TriggerConditions>("interrupt_triggers").orElse(TriggerConditions.empty())
+        val forbiddenTriggers: Provider<TriggerConditions> = config.optionalEntry<TriggerConditions>("forbidden_triggers").orElse(TriggerConditions.empty())
+        val interruptTriggers: Provider<TriggerConditions> = config.optionalEntry<TriggerConditions>("interrupt_triggers").orElse(TriggerConditions.empty())
+    }
+
+    protected object CasterUtil {
+        fun <T : Caster.Single> getCaster(clazz: Class<T>, context: SkillContext): T? {
+            val caster = context[SkillContextKey.CASTER]
+            return caster?.value(clazz)
+                ?: caster?.root(clazz)
+        }
+
+        inline fun <reified T : Caster.Single> getCaster(context: SkillContext): T? {
+            return getCaster(T::class.java, context)
+        }
     }
 
     protected object TargetUtil {

@@ -83,8 +83,8 @@ interface Teleport : Skill {
 
         private inner class Tick(
             context: SkillContext,
-            override val interruptTriggers: TriggerConditions,
-            override val forbiddenTriggers: TriggerConditions
+            override val interruptTriggers: Provider<TriggerConditions>,
+            override val forbiddenTriggers: Provider<TriggerConditions>
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
 
             override fun tickCastPoint(tickCount: Long): TickResult {

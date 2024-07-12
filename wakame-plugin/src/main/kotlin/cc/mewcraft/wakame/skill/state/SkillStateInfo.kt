@@ -22,7 +22,7 @@ sealed interface SkillStateInfo {
     val type: Type
 
     /**
-     * 正在执行的 [PlayerSkillTick], 没有则返回 [SkillTick.emptyPlayer].
+     * 正在执行的 [PlayerSkillTick], 没有则返回 [SkillTick.empty].
      *
      * 同时也可以用来判断玩家是否正在施法状态.
      */
@@ -64,15 +64,12 @@ sealed class AbstractSkillStateInfo(
     protected var counter: Long = 0
 
     protected inner class TriggerConditionManager {
-
         fun isForbidden(trigger: SingleTrigger): Boolean {
             return skillTick.isForbidden(type, trigger)
         }
 
-        fun interrupt(trigger: SingleTrigger) {
-            if (skillTick.isInterrupted(type, trigger)) {
-                interrupt()
-            }
+        fun isInterrupt(trigger: SingleTrigger): Boolean {
+            return skillTick.isInterrupted(type, trigger)
         }
     }
 }
@@ -117,8 +114,20 @@ class IdleStateInfo(
     private fun addSequenceSkills(trigger: SingleTrigger): Boolean {
         val user = state.user
         val skillMap = user.skillMap
-        val isFirstRightClick = currentSequence.isEmpty() && trigger == SingleTrigger.RIGHT_CLICK
-        if (isFirstRightClick && skillMap.hasTrigger<SequenceTrigger>()) {
+        // isFirstRightClickAndHasTrigger 的真值表:
+        // currentSequence.isEmpty() | trigger == SingleTrigger.RIGHT_CLICK | skillMap.hasTrigger<SequenceTrigger>() -> isFirstRightClickAndHasTrigger
+        // f | f | f -> f
+        // f | f | t -> t
+        // f | t | f -> f
+        // f | t | t -> t
+        // t | f | f -> f
+        // t | f | t -> f
+        // t | t | f -> f
+        // t | t | t -> t
+        // 可计算出最终表达式为: Result = skillMap.hasTrigger<SequenceTrigger>() && (!currentSequence.isEmpty() || trigger == SingleTrigger.RIGHT_CLICK)
+        val isFirstRightClickAndHasTrigger = (!currentSequence.isEmpty() || trigger == SingleTrigger.RIGHT_CLICK) && skillMap.hasTrigger<SequenceTrigger>()
+
+        if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
             val completeSequence = currentSequence.readAll()
@@ -180,7 +189,10 @@ class CastPointStateInfo(
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
-        triggerConditionManager.interrupt(trigger)
+        if (triggerConditionManager.isInterrupt(trigger)) {
+            interrupt()
+            return SkillStateResult.SILENT_FAILURE
+        }
         return SkillStateResult.SUCCESS
     }
 
@@ -212,7 +224,10 @@ class CastStateInfo(
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
-        triggerConditionManager.interrupt(trigger)
+        if (triggerConditionManager.isInterrupt(trigger)) {
+            interrupt()
+            return SkillStateResult.SILENT_FAILURE
+        }
         return SkillStateResult.SUCCESS
     }
 
@@ -244,7 +259,9 @@ class BackswingStateInfo(
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
-        triggerConditionManager.interrupt(trigger)
+        if (triggerConditionManager.isInterrupt(trigger)) {
+            interrupt()
+        }
         return SkillStateResult.SUCCESS
     }
 

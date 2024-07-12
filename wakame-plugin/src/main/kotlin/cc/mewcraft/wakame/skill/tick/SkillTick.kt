@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.skill.tick
 
+import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.provider
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.state.*
@@ -97,22 +99,22 @@ abstract class AbstractPlayerSkillTick(
      *
      * 不允许的触发器将会在触发时被取消.
      */
-    open val forbiddenTriggers: TriggerConditions = TriggerConditions.empty()
+    open val forbiddenTriggers: Provider<TriggerConditions> = provider { TriggerConditions.empty() }
 
     /**
      * 此次触发效果中的中断触发器.
      */
-    open val interruptTriggers: TriggerConditions = TriggerConditions.empty()
+    open val interruptTriggers: Provider<TriggerConditions> = provider { TriggerConditions.empty() }
 
     final override fun tick(tickCount: Long): TickResult {
         return tickCast(tickCount)
     }
 
     final override fun isForbidden(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean {
-        return forbiddenTriggers.values.get(type).contains(trigger)
+        return forbiddenTriggers.get().values.get(type).contains(trigger)
     }
 
     final override fun isInterrupted(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean {
-        return interruptTriggers.values.get(type).contains(trigger)
+        return interruptTriggers.get().values.get(type).contains(trigger)
     }
 }
