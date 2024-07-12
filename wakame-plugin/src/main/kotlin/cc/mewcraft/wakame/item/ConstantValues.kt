@@ -107,6 +107,7 @@ object ItemComponentConstants {
     const val ELEMENTS = "elements"
     const val FIRE_RESISTANT = "fire_resistant"
     const val FOOD = "food"
+    const val GLOWABLE = "glowable"
     const val HIDE_TOOLTIP = "hide_tooltip"
     const val HIDE_ADDITIONAL_TOOLTIP = "hide_additional_tooltip"
     const val ITEM_NAME = "item_name"

@@ -116,6 +116,10 @@ components:
     display_name: "作为食物"
     tooltips: { }
 
+  glowable:
+    enabled: true
+    display_name: "可发光"
+
   hide_tooltip:
     enabled: true
     display_name: "隐藏提示框"

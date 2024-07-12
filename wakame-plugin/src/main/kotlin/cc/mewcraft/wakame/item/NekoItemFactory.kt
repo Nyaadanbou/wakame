@@ -113,6 +113,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("enchantments", ItemTemplateTypes.ENCHANTMENTS) { unsupported() }
             tryAdd("fire_resistant", ItemTemplateTypes.FIRE_RESISTANT) { unsupported() }
             tryAdd("food", ItemTemplateTypes.FOOD) { unsupported() }
+            tryAdd("glowable", ItemTemplateTypes.GLOWABLE)
             tryAdd("hide_tooltip", ItemTemplateTypes.HIDE_TOOLTIP) { unsupported() }
             tryAdd("hide_additional_tooltip", ItemTemplateTypes.HIDE_ADDITIONAL_TOOLTIP) { unsupported() }
             tryAdd("item_name", ItemTemplateTypes.ITEM_NAME) { unsupported() }
@@ -205,6 +206,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("enchantments", ItemTemplateTypes.ENCHANTMENTS)
             tryAdd("fire_resistant", ItemTemplateTypes.FIRE_RESISTANT)
             tryAdd("food", ItemTemplateTypes.FOOD)
+            tryAdd("glowable", ItemTemplateTypes.GLOWABLE)
             tryAdd("hide_tooltip", ItemTemplateTypes.HIDE_TOOLTIP)
             tryAdd("hide_additional_tooltip", ItemTemplateTypes.HIDE_ADDITIONAL_TOOLTIP)
             tryAdd("item_name", ItemTemplateTypes.ITEM_NAME)

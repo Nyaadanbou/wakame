@@ -5,11 +5,7 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.Attributable
-import cc.mewcraft.wakame.item.components.Castable
-import cc.mewcraft.wakame.item.components.FireResistant
-import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
-import cc.mewcraft.wakame.item.components.HideTooltip
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.CoreTypes
 import cc.mewcraft.wakame.item.components.cells.CurseTypes
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
@@ -561,6 +557,23 @@ class CustomNekoStackTest : KoinTest {
                 Key.key("foo:bar/b")
             )
             assertTrue(it.skills.all { it in possibleSkills })
+        }
+    }
+
+    @Test
+    fun `component - glowable`() = componentLifecycleTest(
+        "glowable", ItemTemplateTypes.GLOWABLE, ItemComponentTypes.GLOWABLE,
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(ItemGlowable.of(), it)
         }
     }
 

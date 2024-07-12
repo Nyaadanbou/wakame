@@ -74,6 +74,7 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
 
         generate(ItemTemplateTypes.ATTRIBUTABLE)
         generate(ItemTemplateTypes.CASTABLE)
+        generate(ItemTemplateTypes.GLOWABLE)
 
         generate(ItemTemplateTypes.ARROW)
         generate(ItemTemplateTypes.BOW)
@@ -175,6 +176,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
 
         generate(ItemTemplateTypes.ATTRIBUTABLE)
         generate(ItemTemplateTypes.CASTABLE)
+        generate(ItemTemplateTypes.GLOWABLE)
 
         generate(ItemTemplateTypes.ARROW)
 
