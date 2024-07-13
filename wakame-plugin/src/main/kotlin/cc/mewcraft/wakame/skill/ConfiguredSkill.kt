@@ -2,12 +2,14 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
+import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -62,7 +64,7 @@ internal object ConfiguredSkillVariantSerializer : ScalarSerializer<TriggerVaria
 internal object ConfiguredSkillSerializer : SchemaSerializer<ConfiguredSkill> {
     override fun deserialize(type: Type, node: ConfigurationNode): ConfiguredSkill {
         val key = node.node("key").krequire<Key>()
-        val trigger = node.node("trigger").krequire<Trigger>()
+        val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
         val variantNode = node.node("variant")
         val variant = if (variantNode.isNull) TriggerVariant.any() else variantNode.krequire<TriggerVariant>()
         return ConfiguredSkill(key, trigger, variant)

@@ -13,6 +13,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
@@ -163,5 +164,10 @@ class SingleItemListener : KoinComponent, Listener {
         val item = damager.inventory.itemInMainHand.takeIfNekoStack()
 
         skillEventHandler.onAttack(damager, entity, item, event)
+    }
+
+    @EventHandler
+    fun onProjectileHit(event: ProjectileHitEvent) {
+        skillEventHandler.onProjectileHit(event.entity, event.hitEntity)
     }
 }
