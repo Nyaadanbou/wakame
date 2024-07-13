@@ -108,6 +108,8 @@ private fun CompoundTag.putIdentifier(id: Key) {
 }
 
 private fun CompoundTag.putTrigger(trigger: Trigger) {
+    if (trigger == SingleTrigger.NOOP)
+        return
     this.putString(SkillBinaryKeys.SKILL_TRIGGER, trigger.key.asString())
 }
 

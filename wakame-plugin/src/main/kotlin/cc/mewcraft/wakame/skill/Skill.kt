@@ -54,6 +54,13 @@ interface Skill : Keyed {
     }
 }
 
+/**
+ * 代表了一个被动技能.
+ *
+ * 此类仅作为一个标记接口, 用于标记一个技能是被动技能.
+ */
+interface PassiveSkill : Skill
+
 private data object EmptySkill : Skill {
     override val key: Key = Key(Namespaces.SKILL, "empty")
     override val displays: SkillDisplay = SkillDisplay.empty()

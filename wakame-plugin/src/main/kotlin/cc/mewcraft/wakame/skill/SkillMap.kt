@@ -1,11 +1,15 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.user.User
 import com.google.common.collect.Multimap
 import com.google.common.collect.MultimapBuilder
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
+import org.bukkit.entity.Player
 import java.util.UUID
 
 /**
@@ -66,13 +70,6 @@ interface SkillMap {
     operator fun get(uniqueId: UUID, trigger: Trigger): Collection<Skill> = getSkill(trigger)
 }
 
-/**
- * Creates a new [PlayerSkillMap].
- */
-fun PlayerSkillMap(user: User<*>): PlayerSkillMap {
-    return PlayerSkillMap(user.uniqueId)
-}
-
 inline fun <reified T : Trigger> SkillMap.hasTrigger(): Boolean {
     return hasTrigger(T::class.java)
 }
@@ -84,42 +81,54 @@ inline fun <reified T : Trigger> SkillMap.hasTrigger(): Boolean {
  * then check whether the input has triggered a skill or not.
  */
 class PlayerSkillMap(
-    private val uniqueId: UUID,
+    private val user: User<Player>
 ) : SkillMap {
     private val skills: Multimap<Trigger, Key> = MultimapBuilder
         .hashKeys(8)
         .arrayListValues(5)
         .build()
 
+    private val skill2Ticks: MutableMap<Key, UUID> = Object2ObjectOpenHashMap()
+
     override fun addSkill(skill: ConfiguredSkill) {
         this.skills.put(skill.trigger, skill.key)
+        val skillInstance = getSkillByKey(skill.key)
+        registerSkillTick(skillInstance)
     }
 
     override fun addSkillsByKey(skills: Multimap<Trigger, Key>) {
         this.skills.putAll(skills)
+        for (key in skills.values()) {
+            val skillInstance = getSkillByKey(key)
+            registerSkillTick(skillInstance)
+        }
     }
 
     override fun addSkillsByInstance(skills: Multimap<Trigger, Skill>) {
         for ((trigger, skill) in skills.entries()) {
             this.skills.put(trigger, skill.key)
+            registerSkillTick(skill)
         }
     }
 
     override fun getSkill(trigger: Trigger): Collection<Skill> {
-        return this.skills[trigger].map { SkillRegistry.INSTANCES[it] }
+        return this.skills[trigger].map { getSkillByKey(it) }
     }
 
     override fun removeSkill(key: Key) {
         this.skills.entries().removeIf { it.value == key }
+        removeSkillTick(key)
     }
 
     override fun removeSkill(skill: Skill) {
         this.skills.entries().removeIf { it.value == skill.key }
+        removeSkillTick(skill.key)
     }
 
     override fun removeSkill(skills: Multimap<Trigger, Skill>) {
         for ((trigger, skill) in skills.entries()) {
             this.skills.remove(trigger, skill.key)
+            removeSkillTick(skill.key)
         }
     }
 
@@ -129,5 +138,23 @@ class PlayerSkillMap(
 
     override fun hasTrigger(clazz: Class<out Trigger>): Boolean {
         return skills.keys().any { clazz.isInstance(it) }
+    }
+
+    private fun getSkillByKey(key: Key): Skill {
+        return SkillRegistry.INSTANCES[key]
+    }
+
+    private fun registerSkillTick(skill: Skill) {
+        if (skill is PassiveSkill) {
+            val tickable = skill.cast(SkillContext(CasterAdapter.adapt(user)))
+            skill2Ticks[skill.key] = Ticker.addTick(tickable)
+        }
+    }
+
+    private fun removeSkillTick(skill: Key) {
+        val tickId = skill2Ticks.remove(skill)
+        if (tickId != null) {
+            Ticker.stopTick(tickId)
+        }
     }
 }

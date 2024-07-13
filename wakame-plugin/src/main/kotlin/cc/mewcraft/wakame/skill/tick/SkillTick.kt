@@ -33,6 +33,7 @@ sealed interface SkillTick : Tickable {
     val context: SkillContext
 
     override fun tick(tickCount: Long): TickResult = TickResult.ALL_DONE
+    override fun whenRemove() {}
 }
 
 private data object EmptyPlayerSkillTick : PlayerSkillTick {

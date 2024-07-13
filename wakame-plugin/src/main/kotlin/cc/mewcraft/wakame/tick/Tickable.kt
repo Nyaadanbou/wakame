@@ -8,6 +8,8 @@ fun interface Tickable {
      * @see TickResult
      */
     fun tick(tickCount: Long): TickResult
+
+    fun whenRemove() {}
 }
 
 fun interface AlwaysTickable : Tickable, Runnable {

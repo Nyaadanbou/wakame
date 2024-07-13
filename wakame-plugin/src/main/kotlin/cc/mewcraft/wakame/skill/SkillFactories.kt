@@ -11,6 +11,7 @@ internal object SkillFactories {
     private val FACTORIES: Registry<String, SkillFactory<*>> = SimpleRegistry()
 
     fun load() {
+        FACTORIES.register("bloodrage", Bloodrage)
         FACTORIES.register("command_execute", CommandExecute)
         FACTORIES.register("dash", Dash)
         FACTORIES.register("kill_entity", KillEntity)

@@ -24,9 +24,15 @@ internal object Ticker : KoinComponent {
     private val tickableToTicks: MutableMap<Tickable, Long> = Object2LongOpenHashMap()
 
     internal fun tickStart() {
-        tickToRemove.forEach {
-            val tickable = ticks.remove(it)
-            tickableToTicks.remove(tickable)
+        for (tick in tickToRemove) {
+            val tickable = ticks.remove(tick)
+            try {
+                tickable?.whenRemove()
+            } catch (t: Throwable) {
+                logger.error("Error occurred while removing $tickable", t)
+            } finally {
+                tickableToTicks.remove(tickable)
+            }
         }
         tickToRemove.clear()
         ticks.putAll(ticksToAdd)
