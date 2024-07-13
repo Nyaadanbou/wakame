@@ -1,0 +1,13 @@
+entries:
+
+  opposition:
+    - value: fire
+      weight: 1
+    - value: wind
+      weight: 1
+
+  harmonious:
+    - value: water
+      weight: 1
+    - value: earth
+      weight: 1

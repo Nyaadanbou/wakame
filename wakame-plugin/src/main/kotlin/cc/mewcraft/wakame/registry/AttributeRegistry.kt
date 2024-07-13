@@ -118,9 +118,7 @@ object AttributeRegistry : Initializable {
         +buildFacade("attack_damage", SHORT).ranged().element().bind({ MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE })
         +buildFacade("attack_damage_rate", DOUBLE).single().element().bind { ATTACK_DAMAGE_RATE }
         +buildFacade("attack_effect_chance", DOUBLE).single().bind { ATTACK_EFFECT_CHANCE }
-        +buildFacade("attack_speed_level", BYTE).single().bind {
-            ATTACK_SPEED_LEVEL
-        }.override {
+        +buildFacade("attack_speed_level", BYTE).single().bind { ATTACK_SPEED_LEVEL }.override {
             // create closures
             val tooltips = DiscreteTooltips(config)
             // override it

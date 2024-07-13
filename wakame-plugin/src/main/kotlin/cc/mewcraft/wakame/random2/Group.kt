@@ -21,16 +21,25 @@ import java.util.Collections
  */
 interface Group<S, C : SelectionContext> {
 
+    // TODO: 我希望 Pool 是一个 Ref<Pool<S,C>>, Ref 是一个封装了 Pool 的类;
+    //  这个 Ref 中的 Pool 可能来自于一个共享的地方, 也可能是一个独立的 Pool;
+    //  Ref 中的 Pool 只能有一个, 因为这里的 Map 是一个 ID 对应一个 Pool.
     /**
      * 该 [group][Group] 包含的所有 [pools][Pool].
      */
     val pools: Map<String, Pool<S, C>>
 
+    // TODO: 我希望 Filter 是一个 Ref<Filter<C>>, Ref 是一个封装了 Filter 的类;
+    //  这个 Ref 中的 Filter 可能来自于一个共享的地方, 也可能是一个独立的 Filter;
+    //  Ref 中的 Filter 可能只有一个, 也可能包含多个;
+    //  因为这里最终是个 List, 所以本质上确实可以包含多个.
     /**
      * 进入该 [group][Group] 需要满足的条件. 多个条件为 AND 关系.
      */
     val filters: List<Filter<C>>
 
+    // TODO: 我希望 Default 是一个 Ref<Pool<S,C>>, Ref 是一个封装了 Pool 的类;
+    //  这个 Ref 只包含一个 Pool, 且这个 Pool 可能来自于一个共享的地方, 也可能是一个独立的 Pool.
     /**
      * The fallback [pool][Pool] when nothing is picked from [pools].
      */

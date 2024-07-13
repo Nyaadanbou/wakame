@@ -17,6 +17,11 @@ interface Sample<S, in C : SelectionContext> {
      */
     val weight: Double
 
+    // TODO: 我希望 Filter 是一个 Ref<Filter<C>>, Ref 是一个封装了 Filter 的类;
+    //  这个 Ref 中的 Filter 可能来自于一个共享的地方, 也可能是一个独立的 Filter;
+    //  Ref 中的 Filter 可能只有一个, 也可能包含多个;
+    //  因为这里最终是个 List, 所以本质上确实可以包含多个.
+    //  这里的机制应该跟 Group 中的一样.
     /**
      * 该 [sample][Sample] 被选中必须满足的条件。如果条件不满足, 则该 [sample][Sample] 不会进入最终的样本空间当中。
      *
