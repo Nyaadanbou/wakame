@@ -110,6 +110,10 @@ internal interface DynamicLoreMeta : LoreMeta {
      * Creates default lore line (if the [defaultText] is not `null`).
      */
     fun createDefault(): List<LoreLine>?
+
+    companion object {
+        const val NAMESPACE_DEFAULT = "default"
+    }
 }
 
 /**
@@ -142,7 +146,7 @@ internal interface ConstantLoreMeta : LoreMeta {
         // 经综合考虑, 固定内容的 RawTooltipKey 最好就是其在配置文件中“原始顺序”的字符串形式
         // 例如, 这行固定内容位于列表中的第 3 个, 那么其 RawTooltipKey 就是 "fixed:3"
         // 这样刚好能保证不同的固定内容行都有唯一的 TooltipKey
-        get() = Key("fixed", rawTooltipIndex.toString())
+        get() = Key(NAMESPACE_CONSTANT, rawTooltipIndex.toString())
 
     override fun generateTooltipKeys(): List<TooltipKey> {
         return listOf(rawTooltipKey)
@@ -150,5 +154,9 @@ internal interface ConstantLoreMeta : LoreMeta {
 
     override fun generateTooltipKeyIndexes(offset: Int): Map<TooltipKey, TooltipIndex> {
         return mapOf(rawTooltipKey to rawTooltipIndex + offset)
+    }
+
+    companion object {
+        const val NAMESPACE_CONSTANT = "fixed"
     }
 }

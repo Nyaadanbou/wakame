@@ -43,6 +43,8 @@ components:
   cells:
     enabled: true
     display_name: "词条栏"
+    # 最多可显示多少个空词条栏
+    max_visible_empty_cores: 10
     tooltips:
       # 其他的设置委托到专门的配置文件
       empty: "<!i><gray>空词条栏"

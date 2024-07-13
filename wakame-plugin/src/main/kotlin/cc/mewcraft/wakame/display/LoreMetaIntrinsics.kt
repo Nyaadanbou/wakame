@@ -2,6 +2,9 @@ package cc.mewcraft.wakame.display
 
 import net.kyori.adventure.text.Component
 
+// 文件说明:
+// 包含 LoreMeta 的内部实现.
+
 /**
  * 代表一个自定义固定内容的 [LoreMeta].
  */

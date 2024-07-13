@@ -3,10 +3,11 @@ package cc.mewcraft.wakame.item.components.cells.cores.skill
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.display.DynamicLoreMeta
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
-import cc.mewcraft.wakame.display.DynamicLoreMetaCreatorRegistry
+import cc.mewcraft.wakame.display.DynamicLoreMetaCreators
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawTooltipIndex
 import cc.mewcraft.wakame.display.RawTooltipKey
+import cc.mewcraft.wakame.display.RendererBootstrap
 import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipKeyProvider
@@ -22,16 +23,16 @@ import org.koin.core.component.inject
 // 这里是 CoreSkill 所有跟提示框渲染相关的代码
 
 @ReloadDependency(
-    runAfter = [RendererConfig::class]
+    runAfter = [RendererBootstrap::class]
 )
 @PostWorldDependency(
-    runAfter = [RendererConfig::class]
+    runAfter = [RendererBootstrap::class]
 )
 internal object CoreSkillBootstrap : Initializable, KoinComponent {
-    private val dynamicLoreMetaCreatorRegistry by inject<DynamicLoreMetaCreatorRegistry>()
+    private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
 
     override fun onPostWorld() {
-        dynamicLoreMetaCreatorRegistry.register(CoreSkillLoreMetaCreator())
+        dynamicLoreMetaCreators.register(CoreSkillLoreMetaCreator())
     }
 }
 

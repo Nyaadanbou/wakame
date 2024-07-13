@@ -1,16 +1,15 @@
 package cc.mewcraft.wakame.item.components.cells.cores.empty
 
-import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.DynamicLoreMeta
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
-import cc.mewcraft.wakame.display.DynamicLoreMetaCreatorRegistry
+import cc.mewcraft.wakame.display.DynamicLoreMetaCreators
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawTooltipIndex
 import cc.mewcraft.wakame.display.RawTooltipKey
-import cc.mewcraft.wakame.display.RendererConfig
+import cc.mewcraft.wakame.display.RendererBootstrap
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
@@ -25,17 +24,31 @@ import org.koin.core.component.inject
 // 文件说明:
 // 这里是 CoreEmpty 的所有跟提示框渲染相关的代码
 
+internal object CoreEmptyDisplaySupport {
+    /**
+     * 最多能有几个空核心被渲染出来.
+     */
+    val MAX_DISPLAY_COUNT by ItemComponentRegistry.CONFIG.derive(ItemComponentConstants.CELLS).entry<Int>("max_visible_empty_cores")
+
+    /**
+     * 根据索引生成对应的 [TooltipKey].
+     */
+    fun derive(rawTooltipKey: RawTooltipKey, index: Int): TooltipKey {
+        return Key("${rawTooltipKey.namespace()}:${rawTooltipKey.value()}/$index")
+    }
+}
+
 @ReloadDependency(
-    runAfter = [RendererConfig::class]
+    runAfter = [RendererBootstrap::class]
 )
 @PostWorldDependency(
-    runAfter = [RendererConfig::class]
+    runAfter = [RendererBootstrap::class]
 )
 internal object CoreEmptyBootstrap : Initializable, KoinComponent {
-    private val dynamicLoreMetaCreatorRegistry by inject<DynamicLoreMetaCreatorRegistry>()
+    private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
 
     override fun onPostWorld() {
-        dynamicLoreMetaCreatorRegistry.register(CoreEmptyLoreMetaCreator())
+        dynamicLoreMetaCreators.register(CoreEmptyLoreMetaCreator())
     }
 }
 
@@ -47,16 +60,12 @@ internal class CoreEmptyLoreMetaCreator : DynamicLoreMetaCreator {
     }
 
     override fun create(rawTooltipIndex: RawTooltipIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
-        return CoreEmptyLoreMeta(rawTooltipKey = Key(rawLine), rawTooltipIndex = rawTooltipIndex, defaultText = default)
+        return CoreEmptyLoreMeta(
+            rawTooltipKey = Key(rawLine),
+            rawTooltipIndex = rawTooltipIndex,
+            defaultText = default
+        )
     }
-}
-
-internal data object CoreEmptyLoreLine : LoreLine {
-    override val key: TooltipKey = GenericKeys.EMPTY
-    override val content: List<Component> by ItemComponentRegistry.CONFIG
-        .derive(ItemComponentConstants.CELLS)
-        .entry<Component>("tooltips", "empty")
-        .map(::listOf)
 }
 
 internal data class CoreEmptyLoreMeta(
@@ -64,6 +73,22 @@ internal data class CoreEmptyLoreMeta(
     override val rawTooltipIndex: RawTooltipIndex,
     override val defaultText: List<Component>?,
 ) : DynamicLoreMeta {
-    override fun generateTooltipKeys(): List<TooltipKey> = listOf(rawTooltipKey)
-    override fun createDefault(): List<LoreLine>? = null
+    // 根据 MAX_DISPLAY_COUNT 生成对应数量的 TooltipKey. 生成出来的格式为:
+    // "namespace:value/0",
+    // "namespace:value/1",
+    // "namespace:value/2", ...
+    override fun generateTooltipKeys(): List<TooltipKey> {
+        val ret = mutableListOf<TooltipKey>()
+        for (i in 0 until CoreEmptyDisplaySupport.MAX_DISPLAY_COUNT) {
+            ret += CoreEmptyDisplaySupport.derive(rawTooltipKey, i)
+        }
+        return ret
+    }
+
+    override fun createDefault(): List<LoreLine>? {
+        if (defaultText.isNullOrEmpty()) {
+            return null
+        }
+        return generateTooltipKeys().map { key -> LoreLine.simple(key, defaultText) }
+    }
 }

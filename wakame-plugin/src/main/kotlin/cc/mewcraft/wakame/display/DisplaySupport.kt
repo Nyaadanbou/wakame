@@ -8,8 +8,7 @@ import cc.mewcraft.wakame.config.Configs
  */
 internal object DisplaySupport {
     // 配置文件的常量
-    const val RENDERER_LAYOUT_LINE_PATTERN = "\\((.+?)\\)(.*)"
-    const val RENDERER_CONFIG_LAYOUT_NODE_NAME = "renderer_layout"
+    const val RENDERER_CONFIG_LAYOUT_NODE_KEY = "renderer_layout"
 
     // 全局渲染配置文件的 ConfigProvider
     val RENDERER_GLOBAL_CONFIG_PROVIDER by lazy { Configs.YAML[RENDERER_GLOBAL_CONFIG_FILE] }

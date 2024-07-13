@@ -8,7 +8,7 @@ internal interface LoreMetaLookup {
      * @see TooltipKeyProvider.get
      */
     fun getIndex(key: TooltipKey): TooltipIndex =
-        requireNotNull(getIndexOrNull(key)) { "Can't find [TooltipIndex] with key '$key'" }
+        requireNotNull(getIndexOrNull(key)) { "Can't find TooltipIndex with key '$key'" }
 
     /**
      * @see getIndex

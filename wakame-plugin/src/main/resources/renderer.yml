@@ -1,39 +1,15 @@
-# 渲染器
-
-# 渲染器负责修改 ItemStack 的网络封包,
-# 将其组件 `minecraft:lore` 下的内容
-# 根据此配置文件定义的格式进行修改.
-
-# 渲染布局
-#   定义什么内容应该出现在什么位置,
-#   例如想让“攻击力”在“暴击概率”前面.
-#   由于内容可能根本不存在, 因此这里的位置都是相对的.
-#
-# 缺省值
-#   这里不一定要指定所有的占位符，你可以省略任意的占位符.
-#   如果一个占位符没有写在这里，则对应内容不会渲染出来.
 renderer_layout:
 
-  # 主体排序
-  # 定义各种内容的顺序
-  #
-  # 语法说明：
-  # (fixed)_文本内容或留空_
-  # (fixed:_namespace_)_文本内容或留空_
-  # (fixed:*)_文本内容或留空_
-  # (default:_文本内容_)_namespace:value_
-  # (default:blank)_namespace:value_
-  # _namespace:value_
   primary:
-    - (default:<!i><gray>无皮肤)meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
-    # - (default:blank)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
+    - (default:'<!i><gray>无皮肤')meta:skin
+    - (default:blank)meta:skin_owner
     - meta:damageable
     - meta:attributable
     - meta:kizamiable
     - meta:skillful
     - meta:castable
     - meta:fire_resistant
-    - (fixed:meta)<!i><aqua><b>通用 # 仅当下面存在 meta 命名空间下的内容时才渲染
+    - (fixed:meta)<!i><aqua><b>通用
     - meta:crate
     - meta:level
     - meta:rarity
@@ -73,13 +49,8 @@ renderer_layout:
     - skill:buff/potion_remove
     - skill:frost
     - skill:leapfrog
-    - generic:empty # 空词条栏（用于标记空属性栏的相对位置）
+    - generic:empty
 
-  # 元素排序
-  # 同种属性，不同元素标识，都将按照此顺序渲染
-  #
-  # 语法说明：
-  # 元素的唯一标识
   element:
     - neutral
     - fire
@@ -88,11 +59,6 @@ renderer_layout:
     - earth
     - thunder
 
-  # 运算模式排序
-  # 同种属性，不同运算模式，都将按照此顺序渲染
-  #
-  # 语法说明：
-  # 运算模式的唯一标识
   operation:
     - add
     - multiply_base

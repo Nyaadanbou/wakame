@@ -23,7 +23,7 @@ import kotlin.test.fail
 /**
  * 用于检查所有属性的配置是否已经出现在 main/attributes.yml 或 test/attributes.yml.
  */
-class AttributeConfigTest : KoinTest {
+class CheckMissingAttributeConfigTest : KoinTest {
     @BeforeEach
     fun beforeEach() {
         startKoin {

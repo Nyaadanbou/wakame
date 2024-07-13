@@ -1,3 +1,5 @@
+package attribute
+
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.DefaultAttributes
@@ -14,12 +16,13 @@ import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
+import testEnv
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class DefaultAttributesTest : KoinTest {
+class DefaultAttributeSerializationTest : KoinTest {
     companion object {
         @JvmStatic
         @BeforeAll

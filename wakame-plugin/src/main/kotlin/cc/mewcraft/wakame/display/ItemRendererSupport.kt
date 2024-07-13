@@ -9,14 +9,16 @@ import org.koin.core.component.inject
  * The [ItemRenderer] used to render [PacketNekoStack].
  */
 internal class PacketItemRenderer : KoinComponent, ItemRenderer<PacketNekoStack> {
+    private val loreLineFlatter: LoreLineFlatter by inject()
     private val itemModelDataLookup: ItemModelDataLookup by inject()
 
     override fun render(nekoStack: PacketNekoStack) {
-        val lore = TextRenderer.generateLoreLines(nekoStack).flatten()
+        val loreLines = TextRenderer.generateLoreLines(nekoStack)
+        val lore = loreLineFlatter.flatten(loreLines) // flatten the lore lines
         val customModelData = itemModelDataLookup[nekoStack.key, nekoStack.variant]
+
         nekoStack.lore(lore)
         nekoStack.customModelData(customModelData)
-        // 为了麦若，去掉物品的真实根标签
-        nekoStack.erase()
+        nekoStack.erase() // 为了麦若, 去掉 `minecraft:custom_data`
     }
 }

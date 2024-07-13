@@ -9,10 +9,11 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.DisplaySupport
 import cc.mewcraft.wakame.display.DynamicLoreMeta
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
-import cc.mewcraft.wakame.display.DynamicLoreMetaCreatorRegistry
+import cc.mewcraft.wakame.display.DynamicLoreMetaCreators
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.RawTooltipIndex
 import cc.mewcraft.wakame.display.RawTooltipKey
+import cc.mewcraft.wakame.display.RendererBootstrap
 import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipKeyProvider
@@ -40,22 +41,22 @@ import java.util.stream.Stream
 // 这里是 CoreAttribute 的所有跟提示框渲染相关的代码
 
 @ReloadDependency(
-    runAfter = [RendererConfig::class]
+    runAfter = [RendererBootstrap::class]
 )
 @PostWorldDependency(
-    runAfter = [RendererConfig::class]
+    runAfter = [RendererBootstrap::class]
 )
 internal object CoreAttributeBootstrap : Initializable, KoinComponent {
-    private val dynamicLoreMetaCreatorRegistry by inject<DynamicLoreMetaCreatorRegistry>()
+    private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
 
     override fun onPostWorld() {
-        dynamicLoreMetaCreatorRegistry.register(CoreAttributeLoreMetaCreator())
+        dynamicLoreMetaCreators.register(CoreAttributeLoreMetaCreator())
     }
 }
 
 internal class CoreAttributeLoreMetaCreator : DynamicLoreMetaCreator {
-    private val operationRawLines = DisplaySupport.RENDERER_GLOBAL_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME, "operation")
-    private val elementRawLines = DisplaySupport.RENDERER_GLOBAL_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_NAME, "element")
+    private val operationRawLines = DisplaySupport.RENDERER_GLOBAL_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_KEY, "operation")
+    private val elementRawLines = DisplaySupport.RENDERER_GLOBAL_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_KEY, "element")
 
     override val namespace: String = Namespaces.ATTRIBUTE
 
@@ -64,8 +65,16 @@ internal class CoreAttributeLoreMetaCreator : DynamicLoreMetaCreator {
     }
 
     override fun create(rawTooltipIndex: RawTooltipIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
-        val derivationRule = CoreAttributeLoreMeta.Derivation(operationIndex = operationRawLines, elementIndex = elementRawLines)
-        return CoreAttributeLoreMeta(rawTooltipKey = Key(rawLine), rawTooltipIndex = rawTooltipIndex, defaultText = default, derivation = derivationRule)
+        val derivationRule = CoreAttributeLoreMeta.Derivation(
+            operationIndex = operationRawLines,
+            elementIndex = elementRawLines
+        )
+        return CoreAttributeLoreMeta(
+            rawTooltipKey = Key(rawLine),
+            rawTooltipIndex = rawTooltipIndex,
+            defaultText = default,
+            derivation = derivationRule
+        )
     }
 }
 
