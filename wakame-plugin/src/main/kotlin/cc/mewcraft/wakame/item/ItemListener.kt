@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
-import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -158,39 +157,11 @@ class SingleItemListener : KoinComponent, Listener {
     }
 
     @EventHandler
-    fun onJump(event: PlayerJumpEvent) {
-        val player = event.player
-        val item = player.inventory.itemInMainHand.takeIfNekoStack()
-
-        skillEventHandler.onJump(player, item, event)
-    }
-
-    @EventHandler
     fun onAttack(event: EntityDamageByEntityEvent) {
         val damager = event.damager as? Player ?: return
         val entity = event.entity as? LivingEntity ?: return
         val item = damager.inventory.itemInMainHand.takeIfNekoStack()
 
         skillEventHandler.onAttack(damager, entity, item, event)
-    }
-
-    @EventHandler
-    fun onMove(event: PlayerMoveEvent) {
-        val player = event.player
-        val item = player.inventory.itemInMainHand.takeIfNekoStack()
-
-        skillEventHandler.onMove(player, item, event)
-    }
-
-    @EventHandler
-    fun onSneak(event: PlayerToggleSneakEvent) {
-        val player = event.player
-        val item = player.inventory.itemInMainHand.takeIfNekoStack()
-
-        skillEventHandler.onSneak(player, item, event)
-    }
-
-    private fun ItemStack.takeIfNekoStack(): ItemStack? {
-        return this.takeUnlessEmpty()?.takeIf { it.tryNekoStack == null }
     }
 }

@@ -8,17 +8,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.backingCustomModelData
-import cc.mewcraft.wakame.util.backingCustomName
-import cc.mewcraft.wakame.util.backingItemName
-import cc.mewcraft.wakame.util.backingLore
-import cc.mewcraft.wakame.util.getCompoundOrNull
-import cc.mewcraft.wakame.util.isNms
-import cc.mewcraft.wakame.util.removeWakameTag
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.wakameTag
-import cc.mewcraft.wakame.util.wakameTagOrNull
+import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
@@ -114,6 +104,10 @@ val ItemStack.toSystemStack: NekoStack
             require(this.isSystemUse()) { "The ItemStack is not of system-use" }
         }
     }
+
+fun ItemStack.takeIfNekoStack(): ItemStack? {
+    return this.takeUnlessEmpty()?.takeIf { it.tryNekoStack == null }
+}
 
 /**
  * This function is meant to be used to create a new [NekoStack]

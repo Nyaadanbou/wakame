@@ -3,14 +3,17 @@ package cc.mewcraft.wakame.skill.factory
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
+import cc.mewcraft.wakame.util.getFirstBlockBelow
+import cc.mewcraft.wakame.util.getTargetLocation
 import com.destroystokyo.paper.ParticleBuilder
 import net.kyori.adventure.key.Key
+import org.bukkit.Location
 import org.bukkit.Particle
+import org.bukkit.entity.LivingEntity
 
 interface Lightning : Skill {
 
@@ -35,47 +38,37 @@ interface Lightning : Skill {
             override val interruptTriggers: Provider<TriggerConditions>,
             override val forbiddenTriggers: Provider<TriggerConditions>
         ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
-            private val caster: Caster.Single.Player? = CasterUtil.getCaster<Caster.Single.Player>(context)
+            private val castLocation: Location? = TargetUtil.getLocation(context, true)?.bukkitLocation
+                ?: CasterUtil.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.location?.getTargetLocation(16)?.getFirstBlockBelow()?.location
 
             override fun tickCastPoint(tickCount: Long): TickResult {
+                castLocation ?: return TickResult.INTERRUPT
                 if (tickCount >= 50) {
                     return TickResult.ALL_DONE
                 }
-                val location = TargetUtil.getLocation(context)
-                location?.let { generateBlueSmoke(it) }
+                generateBlueSmoke(castLocation)
 
                 return TickResult.CONTINUE_TICK
             }
 
             override fun tickCast(tickCount: Long): TickResult {
-                val location = TargetUtil.getLocation(context)?.bukkitLocation ?: return TickResult.INTERRUPT
-                val world = location.world
-                val lightning = world.strikeLightning(location)
+                val world = castLocation!!.world
+                val lightning = world.strikeLightningEffect(castLocation)
+                val entitiesBeStruck = world.getNearbyEntities(castLocation, 3.0, 3.0, 3.0)
+                for (entity in entitiesBeStruck) {
+                    if (entity is LivingEntity) {
+                        entity.damage(10.0, lightning)
+                    }
+                }
                 return TickResult.ALL_DONE
             }
 
-            override fun tickBackswing(tickCount: Long): TickResult {
-                if (tickCount >= 5) {
-                    caster ?: return TickResult.ALL_DONE
-                    ParticleBuilder(Particle.SONIC_BOOM)
-                        .count(1)
-                        .offset(0.5, 1.0, 0.5)
-                        .extra(0.5)
-                        .allPlayers()
-                        .location(caster.bukkitPlayer.location)
-                        .spawn()
-
-                    return TickResult.ALL_DONE
-                }
-                return TickResult.CONTINUE_TICK
-            }
-
-            private fun generateBlueSmoke(location: Target.Location) {
+            private fun generateBlueSmoke(location: Location) {
                 ParticleBuilder(Particle.DUST)
                     .count(50)
                     .offset(0.5, 1.0, 0.5)
                     .extra(0.5)
-                    .location(location.bukkitLocation)
+                    .location(location)
                     .allPlayers()
                     .color(0, 0, 255)
                     .spawn()

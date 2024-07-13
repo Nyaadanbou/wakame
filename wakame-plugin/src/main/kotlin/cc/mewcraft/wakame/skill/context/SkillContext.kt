@@ -130,7 +130,6 @@ private class SkillContextImpl : SkillContext {
         set(value) {
             value ?: return
             storage[SkillContextKey.NEKO_STACK] = value
-            storage[SkillContextKey.ITEM_STACK] = value.itemStack
         }
 
     var itemStack: ItemStack?

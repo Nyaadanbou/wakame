@@ -37,10 +37,30 @@ abstract class SkillBase(
     }
 
     protected object TargetUtil {
-        fun getLocation(context: SkillContext): Target.Location? {
+        fun getEntity(context: SkillContext, ignoreCaster: Boolean = false): Target.LivingEntity? {
+            return when (val target = context[SkillContextKey.TARGET]) {
+                is Target.LivingEntity -> {
+                    val caster = CasterUtil.getCaster<Caster.Single.Entity>(context)?.bukkitEntity
+                    val targetEntity = target.bukkitEntity
+                    if (caster != null && caster == targetEntity && ignoreCaster) null
+                    else target
+                }
+                is Target.Location -> {
+                    val location = target.bukkitLocation
+                    location.getNearbyLivingEntities(1.0).firstOrNull()?.let { TargetAdapter.adapt(it) }
+                }
+                else -> null
+            }
+        }
+
+        fun getLocation(context: SkillContext, ignoreCaster: Boolean = false): Target.Location? {
             return when (val target = context[SkillContextKey.TARGET]) {
                 is Target.Location -> target
-                is Target.LivingEntity -> TargetAdapter.adapt(target.bukkitEntity.location)
+                is Target.LivingEntity -> {
+                    val caster = CasterUtil.getCaster<Caster.Single.Entity>(context)?.bukkitEntity
+                    val targetEntity = target.bukkitEntity
+                    if (caster != null && caster == targetEntity && ignoreCaster) null else TargetAdapter.adapt(targetEntity.location)
+                }
                 else -> null
             }
         }

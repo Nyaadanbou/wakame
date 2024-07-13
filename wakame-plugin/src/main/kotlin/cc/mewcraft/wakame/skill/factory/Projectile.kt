@@ -12,14 +12,13 @@ import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
-import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.tick.Tickable
+import cc.mewcraft.wakame.tick.Ticker
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import me.lucko.helper.Events
 import net.kyori.adventure.key.Key
 import org.bukkit.Location
-import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.player.PlayerPickupArrowEvent
@@ -201,10 +200,9 @@ interface Projectile : Skill {
                     val shooter = parent?.value<Caster.Single.Entity>()?.bukkitEntity as? ProjectileSource
 
                     arrowEntity = if (shooter != null) {
-                        shooter.launchProjectile(ArrowEntity::class.java, summonLocation.direction) {
+                        shooter.launchProjectile(ArrowEntity::class.java, null) {
                             it.setGravity(gravity)
-                            it.velocity = summonLocation.direction.multiply(initialVelocity)
-                            it.pickupStatus = AbstractArrow.PickupStatus.ALLOWED
+                            it.velocity = it.velocity.normalize().multiply(initialVelocity)
                             it.pierceLevel = penetration
                         }
                     } else {
@@ -212,8 +210,7 @@ interface Projectile : Skill {
                         world.spawnArrow(summonLocation, summonLocation.direction, initialVelocity, 0.0f)
                             .also {
                                 it.setGravity(gravity)
-                                it.velocity = summonLocation.direction.multiply(initialVelocity)
-                                it.pickupStatus = AbstractArrow.PickupStatus.ALLOWED
+                                it.velocity = summonLocation.direction.normalize().multiply(initialVelocity)
                                 it.pierceLevel = penetration
                             }
                     }

@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.skill.state
 
+import cc.mewcraft.wakame.item.takeIfNekoStack
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
@@ -7,8 +9,14 @@ import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
+import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.RingBuffer
+import com.destroystokyo.paper.event.player.PlayerJumpEvent
+import me.lucko.helper.Events
 import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
+import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -58,9 +66,18 @@ sealed interface SkillStateInfo {
 }
 
 sealed class AbstractSkillStateInfo(
+    val state: PlayerSkillState,
+    final override val skillTick: PlayerSkillTick,
     override val type: SkillStateInfo.Type,
-    final override val skillTick: PlayerSkillTick
+    registerEvents: Boolean = true,
 ) : SkillStateInfo {
+
+    init {
+        if (registerEvents) {
+            registerTriggerEvents()
+        }
+    }
+
     protected var counter: Long = 0
 
     protected inner class TriggerConditionManager {
@@ -72,14 +89,53 @@ sealed class AbstractSkillStateInfo(
             return skillTick.isInterrupted(type, trigger)
         }
     }
+
+    private fun registerTriggerEvents() {
+        Events.subscribe(PlayerJumpEvent::class.java)
+            .filter { it.player == state.user.player }
+            .handler { event ->
+                val user = event.player.toUser()
+                val itemStack = user.player.inventory.itemInMainHand.takeIfNekoStack()
+                val nekoStack = itemStack?.tryNekoStack
+                val result = user.skillState.addTrigger(SingleTrigger.JUMP, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
+                checkResult(result, event)
+            }
+
+        Events.subscribe(PlayerMoveEvent::class.java)
+            .filter { it.player == state.user.player }
+            .filter { it.from.blockX != it.to.blockX || it.from.blockY != it.to.blockY || it.from.blockZ != it.to.blockZ }
+            .handler { event ->
+                val user = event.player.toUser()
+                val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
+                val nekoStack = itemStack?.tryNekoStack
+                val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
+                checkResult(result, event)
+            }
+
+        Events.subscribe(PlayerToggleSneakEvent::class.java)
+            .filter { it.player == state.user.player }
+            .handler { event ->
+                val user = event.player.toUser()
+                val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
+                val nekoStack = itemStack?.tryNekoStack
+                val result = user.skillState.addTrigger(SingleTrigger.SNEAK, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
+                checkResult(result, event)
+            }
+    }
+
+    private fun checkResult(result: SkillStateResult, event: Cancellable) {
+        if (result == SkillStateResult.CANCEL_EVENT) {
+            event.isCancelled = true
+        }
+    }
 }
 
 /**
  * 表示玩家技能状态的空闲状态(无施法), 即玩家可以使用技能.
  */
 class IdleStateInfo(
-    private val state: PlayerSkillState,
-) : AbstractSkillStateInfo(SkillStateInfo.Type.IDLE, SkillTick.empty()), KoinComponent {
+    state: PlayerSkillState,
+) : AbstractSkillStateInfo(state, SkillTick.empty(), SkillStateInfo.Type.IDLE, false), KoinComponent {
     companion object {
         private val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
@@ -94,9 +150,11 @@ class IdleStateInfo(
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
         castableSkill = null
+        val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
+
         // Sequence trigger skills
-        if (trigger in SEQUENCE_GENERATION_TRIGGERS) {
-            if (addSequenceSkills(trigger)) {
+        if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
+            if (addSequenceSkills(castTrigger)) {
                 skillStateShower.displaySuccess(currentSequence.readAll(), state.user)
                 currentSequence.clear()
                 return handleSkills(context)
@@ -104,7 +162,7 @@ class IdleStateInfo(
         }
 
         // Single trigger skills
-        if (addSingleSkills(trigger)) {
+        if (addSingleSkills(castTrigger)) {
             return handleSkills(context)
         }
 
@@ -153,10 +211,7 @@ class IdleStateInfo(
         val user = state.user
         val skillMap = user.skillMap
         val skills = skillMap.getSkill(trigger)
-        if (skills.isEmpty()) {
-            return false
-        }
-        castableSkill = skills.first()
+        castableSkill = skills.firstOrNull() ?: return false
         return true
     }
 
@@ -180,12 +235,13 @@ class IdleStateInfo(
  * 表示玩家技能状态的前摇状态, 即玩家正在试图使用技能.
  */
 class CastPointStateInfo(
-    private val state: PlayerSkillState,
+    state: PlayerSkillState,
     skillTick: PlayerSkillTick,
-) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST_POINT, skillTick) {
+) : AbstractSkillStateInfo(state, skillTick, SkillStateInfo.Type.CAST_POINT) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
+        // FIXME: 在需要的时候再监听事件操作
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
@@ -215,9 +271,9 @@ class CastPointStateInfo(
  * 表示玩家技能状态的释放状态, 即玩家正在释放技能.
  */
 class CastStateInfo(
-    private val state: PlayerSkillState,
+    state: PlayerSkillState,
     skillTick: PlayerSkillTick,
-) : AbstractSkillStateInfo(SkillStateInfo.Type.CAST, skillTick) {
+) : AbstractSkillStateInfo(state, skillTick, SkillStateInfo.Type.CAST) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
@@ -250,9 +306,9 @@ class CastStateInfo(
  * 表示玩家技能状态的后摇状态, 即玩家释放技能后的状态.
  */
 class BackswingStateInfo(
-    private val state: PlayerSkillState,
+    state: PlayerSkillState,
     skillTick: PlayerSkillTick,
-) : AbstractSkillStateInfo(SkillStateInfo.Type.BACKSWING, skillTick) {
+) : AbstractSkillStateInfo(state, skillTick, SkillStateInfo.Type.BACKSWING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {

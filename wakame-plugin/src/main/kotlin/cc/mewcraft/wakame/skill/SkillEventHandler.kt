@@ -9,15 +9,12 @@ import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.state.SkillStateResult
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.toUser
-import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -36,7 +33,14 @@ class SkillEventHandler {
     }
 
     fun onLeftClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
-        onLeftClick(player, itemStack, event) { TargetAdapter.adapt(player) }
+        onLeftClick(player, itemStack, event) {
+            val targetEntity = player.getTargetEntity(16)
+            if (targetEntity == null || targetEntity !is LivingEntity) {
+                TargetAdapter.adapt(player)
+            } else {
+                TargetAdapter.adapt(targetEntity)
+            }
+        }
     }
 
     private fun onLeftClick(
@@ -59,7 +63,14 @@ class SkillEventHandler {
     }
 
     fun onRightClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
-        onRightClick(player, itemStack, event) { TargetAdapter.adapt(player) }
+        onRightClick(player, itemStack, event) {
+            val targetEntity = player.getTargetEntity(16)
+            if (targetEntity == null || targetEntity !is LivingEntity) {
+                TargetAdapter.adapt(player)
+            } else {
+                TargetAdapter.adapt(targetEntity)
+            }
+        }
     }
 
     private fun onRightClick(
@@ -75,34 +86,10 @@ class SkillEventHandler {
         checkResult(result, event)
     }
 
-    fun onJump(player: Player, itemStack: ItemStack?, event: PlayerJumpEvent) {
-        val user = player.toUser()
-        val nekoStack = itemStack?.tryNekoStack
-        val result = user.skillState.addTrigger(SingleTrigger.JUMP, SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
-        checkResult(result, event)
-    }
-
     fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack?, event: EntityDamageByEntityEvent) {
         val user = player.toUser()
         val nekoStack = itemStack?.tryNekoStack
         val result = user.skillState.addTrigger(SingleTrigger.ATTACK, SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack))
-        checkResult(result, event)
-    }
-
-    fun onMove(player: Player, itemStack: ItemStack?, event: PlayerMoveEvent) {
-        val user = player.toUser()
-        val nekoStack = itemStack?.tryNekoStack
-        val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack))
-        checkResult(result, event)
-    }
-
-    fun onSneak(player: Player, itemStack: ItemStack?, event: PlayerToggleSneakEvent) {
-        val user = player.toUser()
-        val nekoStack = itemStack?.tryNekoStack
-        val result = user.skillState.addTrigger(
-            SingleTrigger.SNEAK,
-            SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack)
-        )
         checkResult(result, event)
     }
 
