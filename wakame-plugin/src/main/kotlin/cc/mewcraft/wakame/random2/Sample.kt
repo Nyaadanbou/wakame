@@ -18,11 +18,11 @@ interface Sample<S, in C : SelectionContext> {
     val weight: Double
 
     /**
-     * 该 [sample][Sample] 被选中必须满足的条件。如果条件不满足，则该 [sample][Sample] 不会进入最终的样本空间当中。
+     * 该 [sample][Sample] 被选中必须满足的条件。如果条件不满足, 则该 [sample][Sample] 不会进入最终的样本空间当中。
      *
      * ## 条件将对样本概率产生直接影响
      *
-     * 请注意，如果存在不满足条件的样本，那么最终的样本数量将少于原本设置的数量。又由于样本被选择的概率是基于总权重的，因此所有样本被选中的概率也会随之变化。
+     * 请注意, 如果存在不满足条件的样本, 那么最终的样本数量将少于原本设置的数量。又由于样本被选择的概率是基于总权重的, 因此所有样本被选中的概率也会随之变化。
      */
     val filters: List<Filter<C>>
 
@@ -39,7 +39,7 @@ interface Sample<S, in C : SelectionContext> {
     fun trace(context: C)
 
     companion object Factory {
-        inline fun <S, C : SelectionContext> build(content: S, block: SampleBuilder<S, C>.() -> Unit): Sample<S, C> {
+        fun <S, C : SelectionContext> build(content: S, block: SampleBuilder<S, C>.() -> Unit): Sample<S, C> {
             val builder = SampleBuilderImpl<S, C>(content).apply(block)
             val sample = object : AbstractSample<S, C>(
                 content = builder.content,
@@ -62,10 +62,30 @@ interface Sample<S, in C : SelectionContext> {
  * @param S the instance type wrapped in [sample][Sample]
  * @param C the context type required by [filters][Filter]
  */
-interface SampleBuilder<S, C : SelectionContext>{
+interface SampleBuilder<S, C : SelectionContext> {
     val content: S
     var weight: Double
     var filters: MutableList<Filter<C>>
     var mark: Mark<*>?
     var trace: (C) -> Unit
+}
+
+
+/* Implementations */
+
+
+private abstract class AbstractSample<T, C : SelectionContext>(
+    override val content: T,
+    override val weight: Double,
+    override val filters: List<Filter<C>>,
+    override val mark: Mark<*>?,
+) : Sample<T, C>
+
+private class SampleBuilderImpl<T, C : SelectionContext>(
+    override val content: T,
+) : SampleBuilder<T, C> {
+    override var weight: Double = 1.0
+    override var filters: MutableList<Filter<C>> = ArrayList()
+    override var mark: Mark<*>? = null
+    override var trace: (C) -> Unit = {}
 }
