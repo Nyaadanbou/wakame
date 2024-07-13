@@ -6,7 +6,9 @@ package cc.mewcraft.wakame.util
 class ThreadLocalCyclingCounter(
     private val limit: Int,
 ) {
-    private val threadLocalCounter = ThreadLocal.withInitial { 0 }
+    private companion object {
+        val threadLocalCounter: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
+    }
 
     /**
      * 获取下一个计数值.
