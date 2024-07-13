@@ -1,0 +1,29 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 引用全局样本
+cells:
+  buckets:
+    foo:
+      core: "with_global_references"
+      curse: "with_global_references"
+  selectors:
+    core_groups:
+      with_global_references:
+        refs_1:
+          - key: global:rate # 开头写 global:, 代表引用全局样本
+            weight: 1 # FIXME 由于引用可能包含多个样本, 权重怎么处理?
+          - key: generic:empty
+            weight: 1
+        refs_2:
+          - key: global:speed
+            weight: 1
+          - key: generic:empty
+            weight: 1
+    curse_groups:
+      with_global_references:
+        refs_1:
+          - key: global:random_curses
+            weight: 1
+          - key: generic:empty
+            weight: 1

@@ -1,0 +1,40 @@
+entries:
+
+  rate:
+    - key: attribute:attack_damage_rate
+      element: neutral
+      value: 0.0
+      weight: 1
+
+  speed:
+    - key: attribute:attack_speed_level
+      value: 0
+      weight: 1
+
+  strike:
+    - key: attribute:critical_strike_chance
+      value: 0.0
+      weight: 1
+    - key: attribute:critical_strike_power
+      value: 1.0
+      weight: 1
+
+  skills:
+    - key: skill:melee/demo
+      trigger: trigger:generic/attack
+      variant: 0
+      weight: 1
+    - key: skill:ranged/demo
+      trigger: trigger:generic/attack
+      variant: 0
+      weight: 1
+
+  curses:
+    - key: curse:entity_kills
+      index: demo_creeps_1
+      count: 114
+      weight: 1
+    - key: curse:peak_damage
+      element: neutral
+      amount: 514
+      weight: 1

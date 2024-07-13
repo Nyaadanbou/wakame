@@ -1,0 +1,25 @@
+entries:
+
+  apprentice:
+    - value: wood
+      weight: 3
+    - value: iron
+      weight: 2
+    - value: gold
+      weight: 1
+
+  journeyman:
+    - value: iron
+      weight: 3
+    - value: gold
+      weight: 2
+    - value: diamond
+      weight: 1
+
+  master:
+    - value: gold
+      weight: 3
+    - value: diamond
+      weight: 2
+    - value: netherite
+      weight: 1

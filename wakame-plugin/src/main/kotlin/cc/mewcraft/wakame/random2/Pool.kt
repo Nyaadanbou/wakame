@@ -19,6 +19,10 @@ import kotlin.random.asJavaRandom
  */
 interface Pool<S, C : SelectionContext> {
 
+    // TODO: 首先, 这里直接声明为 Ref<Sample<S,C>>;
+    //  Ref 是一个封装了 Sample 的类;
+    //  其中可能包含0个或多个Sample.
+    //  Ref 中的 Sample 可能来自于一个共享的地方, 也可能是几个独立的 Sample.
     /**
      * 该 [pool][Pool] 包含的所有 [sample][Sample].
      */
@@ -29,6 +33,11 @@ interface Pool<S, C : SelectionContext> {
      */
     val pickAmount: Long
 
+    // TODO: 我希望 Filter 是一个 Ref<Filter<C>>, Ref 是一个封装了 Filter 的类;
+    //  这个 Ref 中的 Filter 可能来自于一个共享的地方, 也可能是一个独立的 Filter;
+    //  Ref 中的 Filter 可能只有一个, 也可能包含多个;
+    //  因为这里最终是个 List, 所以本质上确实可以包含多个.
+    //  这里的机制应该跟 Group 中的一样.
     /**
      * 进入该 [pool][Pool] 需要满足的条件. 多个条件为 Logic AND 的关系.
      *

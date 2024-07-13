@@ -1,0 +1,19 @@
+filters:
+
+  geq_20lvl:
+    - type: "item_level"
+      level: "[20,)"
+
+  with_fire:
+    - type: "element"
+      element: "fire"
+
+  with_rare:
+    - type: "rarity"
+      rarity: "rare"
+
+  impossible:
+    - type: "toss"
+      chance: 0.01
+    - type: "mark"
+      mark: "impossible"
