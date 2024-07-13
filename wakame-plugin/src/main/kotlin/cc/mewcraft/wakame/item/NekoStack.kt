@@ -27,9 +27,6 @@ interface NekoStack : Keyed, Examinable {
     @get:ApiStatus.Internal
     val nbt: CompoundTag
 
-    @get:ApiStatus.Internal
-    val handle: ItemStack
-
     /**
      * Gets the wrapped [ItemStack].
      *
@@ -49,6 +46,12 @@ interface NekoStack : Keyed, Examinable {
      * In other words, if you have already added `this` to the world state, **DO
      * NOT** modify `this` and then expect that your changes will apply to the
      * world state.
+     */
+    @get:ApiStatus.Internal
+    val handle: ItemStack
+
+    /**
+     * Gets the clone of [handle].
      */
     val itemStack: ItemStack
 

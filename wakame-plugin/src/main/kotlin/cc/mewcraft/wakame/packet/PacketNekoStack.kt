@@ -201,7 +201,7 @@ private class PacketVanillaNekoStack(
     override val nbt: CompoundTag
         get() = abortReadOps()
 
-    override val itemStack: org.bukkit.inventory.ItemStack
+    override val itemStack: BukkitStack
         get() = abortReadOps()
 
     override val handle: BukkitStack
