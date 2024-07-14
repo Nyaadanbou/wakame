@@ -61,6 +61,10 @@ class PaperPlayerAdapter : KoinComponent, Listener, PlayerAdapter<Player> {
     override fun adapt(player: Player): User<Player> {
         return userManager.getPlayer(player)
     }
+
+    override fun adapt(uniqueId: UUID): User<Player> {
+        return userManager.getPlayer(uniqueId)
+    }
 }
 
 /**
@@ -70,14 +74,15 @@ class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     private val server: Server by inject()
 
     // holds the live data of users
-    private val userRepository: Cache<UUID, User<Player>> = Caffeine.newBuilder()
+    private val userRepository: Cache<Player, User<Player>> = Caffeine.newBuilder()
+        .weakKeys()
         .expireAfterAccess(5, TimeUnit.MINUTES)
         .build()
 
     @EventHandler
     private fun onQuit(e: PlayerQuitEvent) {
         // cleanup user data for the player
-        userRepository.invalidate(e.player.uniqueId)
+        userRepository.invalidate(e.player)
     }
 
     @EventHandler
@@ -92,6 +97,6 @@ class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     }
 
     override fun getPlayer(player: Player): User<Player> {
-        return userRepository.get(player.uniqueId) { _ -> PaperUser(player) }
+        return userRepository.get(player) { k -> PaperUser(k) }
     }
 }
