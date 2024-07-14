@@ -11,7 +11,7 @@ cells:
     core_groups:
       with_global_references:
         refs_1:
-          - key: global:rate # 开头写 global:, 代表引用全局样本
+          - key: global:rate # 命名空间为 global, 代表引用全局样本
             weight: 1 # FIXME 由于引用可能包含多个样本, 权重怎么处理?
           - key: generic:empty
             weight: 1

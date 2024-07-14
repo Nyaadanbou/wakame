@@ -28,13 +28,3 @@ entries:
       trigger: trigger:generic/attack
       variant: 0
       weight: 1
-
-  curses:
-    - key: curse:entity_kills
-      index: demo_creeps_1
-      count: 114
-      weight: 1
-    - key: curse:peak_damage
-      element: neutral
-      amount: 514
-      weight: 1
