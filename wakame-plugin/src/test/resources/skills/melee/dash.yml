@@ -1,0 +1,9 @@
+displays:
+  name: "冲刺"
+  tooltips:
+    - "<red>冲！"
+
+# 技能模板的 type
+type: dash
+
+distance: 5

@@ -1,0 +1,9 @@
+type: teleport
+
+teleportation:
+  type: fixed
+  # 坐标
+  world: world
+  x: 0.0
+  y: 0.0
+  z: 0.0

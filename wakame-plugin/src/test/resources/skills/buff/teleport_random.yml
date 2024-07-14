@@ -1,0 +1,6 @@
+type: teleport
+
+teleportation:
+  type: random
+  # 随机传送的最小距离
+  distance: 5.0

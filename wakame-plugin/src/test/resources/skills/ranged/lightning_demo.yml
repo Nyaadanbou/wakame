@@ -1,0 +1,15 @@
+type: lightning
+
+# 技能的打断触发器设置, 可用 CAST_POINT, CAST, BACKSWING
+interrupt_triggers:
+  cast_point:
+    # 如果在施法点过程中按下了鼠标左键或右键，这个状态就会被打断 (回到无施法状态)
+    - LEFT_CLICK
+    - RIGHT_CLICK
+    - SNEAK
+
+# 在技能施法施法的时候, 在某个状态下不能进行的操作
+forbidden_triggers:
+  cast:
+    # 释放技能时无法走动
+    - MOVE

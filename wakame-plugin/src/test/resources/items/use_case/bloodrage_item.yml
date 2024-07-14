@@ -1,0 +1,27 @@
+uuid: 0190ac7a-6f82-7c70-a45c-b0300829b220
+item_type: golden_sword
+remove_components:
+  - attribute_modifiers
+  - tool
+slot: MAIN_HAND
+item_name: "<rarity:style><rarity:name> 红温武器"
+rarity: mapping:demo_1
+level: 2
+castable: { }
+glowable: { }
+lore:
+  - "<red>红温了"
+cells:
+  buckets:
+    a:
+      core: core_a
+  selectors:
+    core_groups:
+      core_a:
+        filters: [ ]
+        selects:
+          skill:
+            entries:
+              - key: skill:melee/bloodrage
+                weight: 999
+        default: [ ]

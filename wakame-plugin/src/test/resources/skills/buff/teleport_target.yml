@@ -1,0 +1,5 @@
+type: teleport
+
+teleportation:
+  # 传送到目标坐标, 无需参数.
+  type: target
