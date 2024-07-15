@@ -9,6 +9,4 @@ interface Ticker {
     fun addTick(skillTick: Tickable): Int
 
     fun stopTick(taskId: Int)
-
-    fun stopTick(skillTick: Tickable)
 }
