@@ -19,7 +19,8 @@ data class LocalNode<T>(
 
 @NodeDsl
 data class CompositeNode<T>(
-    override val key: Key, private val nodes: MutableList<Node<T>> = mutableListOf(),
+    override val key: Key,
+    private val nodes: MutableList<Node<T>>,
 ) : Node<T> {
     fun addNode(init: Builder<T>.() -> Unit): CompositeNode<T> {
         val builder = Builder<T>().apply(init)
@@ -35,12 +36,12 @@ data class CompositeNode<T>(
     class Builder<T> {
         val nodes = mutableListOf<Node<T>>()
 
-        fun local(key: String, value: T) {
-            nodes.add(LocalNode(Key.key(key), value))
+        fun local(key: Key, value: T) {
+            nodes.add(LocalNode(key, value))
         }
 
-        fun composite(key: String, init: Builder<T>.() -> Unit = {}) {
-            val node = CompositeNode<T>(Key.key(key))
+        fun composite(key: Key, init: Builder<T>.() -> Unit = {}) {
+            val node = CompositeNode<T>(key, mutableListOf())
             node.addNode(init)
             nodes.add(node)
         }
@@ -56,7 +57,7 @@ fun <T> NodeContainer(
 }
 
 @NodeDsl
-interface NodeContainer<T> {
+interface NodeContainer<T> : Iterable<T> {
     companion object {
         /**
          * 获取一个*不可变*的空 [NodeContainer].
@@ -69,7 +70,6 @@ interface NodeContainer<T> {
     fun set(init: CompositeNode.Builder<T>.() -> Unit)
     fun add(init: CompositeNode.Builder<T>.() -> Unit)
     fun values(): List<T>
-    fun iterator(): Iterator<T>
 }
 
 private object NodeContainerEmpty : NodeContainer<Nothing> {
@@ -82,7 +82,7 @@ private object NodeContainerEmpty : NodeContainer<Nothing> {
 @NodeDsl
 private class NodeContainerImpl<T>(
     private val shared: SharedStorage<T>,
-) : Iterable<T>, NodeContainer<T> {
+) : NodeContainer<T> {
     private var root: Node<T>? = null
 
     override fun set(init: CompositeNode.Builder<T>.() -> Unit) {
@@ -183,33 +183,33 @@ interface SharedStorage<T> {
         }
     }
 
-    fun addEntry(key: String, init: EntryBuilder<T>.() -> Unit = {})
-    fun getNodes(key: String): List<Node<T>>
+    fun addEntry(ref: String, init: EntryBuilder<T>.() -> Unit = {})
+    fun getNodes(ref: String): List<Node<T>>
 
     @NodeDsl
     interface EntryBuilder<T> {
-        fun local(key: String, value: T)
-        fun composite(key: String, init: CompositeNode<T>.() -> Unit = {})
+        fun local(key: Key, value: T)
+        fun composite(key: Key, init: CompositeNode<T>.() -> Unit = {})
     }
 }
 
 object SharedStorageEmpty : SharedStorage<Nothing> {
     override fun addEntry(key: String, init: EntryBuilder<Nothing>.() -> Unit) = Unit
-    override fun getNodes(key: String): List<Node<Nothing>> = emptyList()
+    override fun getNodes(ref: String): List<Node<Nothing>> = emptyList()
 }
 
 private class SharedStorageImpl<T> : SharedStorage<T> {
     private val entries: HashMap<String, List<Node<T>>> = HashMap()
 
-    override fun addEntry(key: String, init: EntryBuilder<T>.() -> Unit) {
+    override fun addEntry(ref: String, init: EntryBuilder<T>.() -> Unit) {
         val builder = EntryBuilderImpl<T>().apply(init)
-        entries[key] = builder.nodes
+        entries[ref] = builder.nodes
     }
 
-    override fun getNodes(key: String): List<Node<T>> {
+    override fun getNodes(ref: String): List<Node<T>> {
         val resolvedNodes = mutableListOf<Node<T>>()
         val visited = mutableSetOf<String>()
-        resolveNode(key, resolvedNodes, visited)
+        resolveNode(ref, resolvedNodes, visited)
         return resolvedNodes
     }
 
@@ -244,12 +244,12 @@ private class SharedStorageImpl<T> : SharedStorage<T> {
     class EntryBuilderImpl<T> : EntryBuilder<T> {
         val nodes = mutableListOf<Node<T>>()
 
-        override fun local(key: String, value: T) {
-            nodes.add(LocalNode(Key.key(key), value))
+        override fun local(key: Key, value: T) {
+            nodes.add(LocalNode(key, value))
         }
 
-        override fun composite(key: String, init: CompositeNode<T>.() -> Unit) {
-            val compositeNode = CompositeNode<T>(Key.key(key)).apply(init)
+        override fun composite(key: Key, init: CompositeNode<T>.() -> Unit) {
+            val compositeNode = CompositeNode<T>(key, mutableListOf()).apply(init)
             nodes.add(compositeNode)
         }
     }

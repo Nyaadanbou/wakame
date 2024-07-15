@@ -2,6 +2,7 @@ package random3
 
 import cc.mewcraft.wakame.random3.NodeContainer
 import cc.mewcraft.wakame.random3.SharedStorage
+import net.kyori.adventure.key.Key.key
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -12,8 +13,8 @@ class NodeContainerTest {
     fun `should resolve local node values correctly`() {
         val sharedStorage = SharedStorage<String>()
         val nodeContainer = NodeContainer(sharedStorage) {
-            local("foo:1", "Value 1")
-            local("foo:2", "Value 2")
+            local(key("foo:1"), "Value 1")
+            local(key("foo:2"), "Value 2")
         }
 
         val values = nodeContainer.values()
@@ -24,24 +25,24 @@ class NodeContainerTest {
     fun `should resolve global node values correctly`() {
         val sharedStorage = SharedStorage {
             addEntry("bar1") {
-                local("foo:3", "Global Value 3")
+                local(key("foo:3"), "Global Value 3")
             }
             addEntry("bar2") {
-                local("foo:4", "Global Value 4")
-                local("foo:5", "Global Value 5")
+                local(key("foo:4"), "Global Value 4")
+                local(key("foo:5"), "Global Value 5")
             }
             addEntry("bar3") {
-                composite("global:bar2")
-                local("foo:6", "Global Value 6")
-                local("foo:7", "Global Value 7")
+                composite(key("global:bar2"))
+                local(key("foo:6"), "Global Value 6")
+                local(key("foo:7"), "Global Value 7")
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            local("foo:1", "Value 1")
-            local("foo:2", "Value 2")
-            composite("global:bar1")
-            composite("global:bar3")
+            local(key("foo:1"), "Value 1")
+            local(key("foo:2"), "Value 2")
+            composite(key("global:bar1"))
+            composite(key("global:bar3"))
         }
 
         val values = nodeContainer.values()
@@ -52,19 +53,19 @@ class NodeContainerTest {
     fun `should resolve mixed node values correctly`() {
         val sharedStorage = SharedStorage {
             addEntry("bar1") {
-                local("foo:3", "Global Value 3")
+                local(key("foo:3"), "Global Value 3")
             }
             addEntry("bar2") {
-                local("foo:4", "Global Value 4")
-                local("foo:5", "Global Value 5")
+                local(key("foo:4"), "Global Value 4")
+                local(key("foo:5"), "Global Value 5")
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            local("foo:1", "Value 1")
-            local("foo:2", "Value 2")
-            composite("global:bar1")
-            composite("global:bar2")
+            local(key("foo:1"), "Value 1")
+            local(key("foo:2"), "Value 2")
+            composite(key("global:bar1"))
+            composite(key("global:bar2"))
         }
 
         val values = nodeContainer.values()
@@ -84,12 +85,12 @@ class NodeContainerTest {
     fun `should correctly resolve single layer of nested nodes`() {
         val sharedStorage = SharedStorage {
             addEntry("nested1") {
-                local("foo:nested1", "Nested Value 1")
+                local(key("foo:nested1"), "Nested Value 1")
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            composite("global:nested1")
+            composite(key("global:nested1"))
         }
 
         val values = nodeContainer.values()
@@ -100,15 +101,15 @@ class NodeContainerTest {
     fun `should correctly resolve multiple layers of nested nodes`() {
         val sharedStorage = SharedStorage {
             addEntry("nested1") {
-                composite("global:nested2")
+                composite(key("global:nested2"))
             }
             addEntry("nested2") {
-                local("foo:nested2", "Nested Value 2")
+                local(key("foo:nested2"), "Nested Value 2")
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            composite("global:nested1")
+            composite(key("global:nested1"))
         }
 
         val values = nodeContainer.values()
@@ -128,13 +129,13 @@ class NodeContainerTest {
     fun `should include duplicate values from nested nodes with DSL`() {
         val sharedStorage = SharedStorage {
             addEntry("nested") {
-                local("foo:nested", "Duplicate Value")
-                local("foo:nested", "Duplicate Value")
+                local(key("foo:nested"), "Duplicate Value")
+                local(key("foo:nested"), "Duplicate Value")
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            composite("global:nested")
+            composite(key("global:nested"))
         }
 
         val values = nodeContainer.values()
@@ -145,18 +146,18 @@ class NodeContainerTest {
     fun `should correctly resolve deeply nested nodes across multiple global keys`() {
         val sharedStorage = SharedStorage {
             addEntry("nested1") {
-                composite("global:nested2")
+                composite(key("global:nested2"))
             }
             addEntry("nested2") {
-                composite("global:nested3")
+                composite(key("global:nested3"))
             }
             addEntry("nested3") {
-                local("foo:nested3", "Deeply Nested Value 3")
+                local(key("foo:nested3"), "Deeply Nested Value 3")
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            composite("global:nested1")
+            composite(key("global:nested1"))
         }
 
         val values = nodeContainer.values()
@@ -167,12 +168,12 @@ class NodeContainerTest {
     fun `should correctly resolve single layer of nested composite nodes`() {
         val sharedStorage = SharedStorage {
             addEntry("layer1") {
-                local("foo:layer1", "Layer 1 Value")
+                local(key("foo:layer1"), "Layer 1 Value")
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            composite("global:layer1")
+            composite(key("global:layer1"))
         }
 
         val values = nodeContainer.values()
@@ -183,15 +184,15 @@ class NodeContainerTest {
     fun `should correctly resolve two layers of nested composite nodes`() {
         val sharedStorage = SharedStorage {
             addEntry("layer2") {
-                local("foo:layer2", "Layer 2 Value")
+                local(key("foo:layer2"), "Layer 2 Value")
             }
             addEntry("layer1") {
-                composite("global:layer2")
+                composite(key("global:layer2"))
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            composite("global:layer1")
+            composite(key("global:layer1"))
         }
 
         val values = nodeContainer.values()
@@ -202,18 +203,18 @@ class NodeContainerTest {
     fun `should correctly resolve three layers of nested composite nodes`() {
         val sharedStorage = SharedStorage {
             addEntry("layer3") {
-                local("foo:layer3", "Layer 3 Value")
+                local(key("foo:layer3"), "Layer 3 Value")
             }
             addEntry("layer2") {
-                composite("global:layer3")
+                composite(key("global:layer3"))
             }
             addEntry("layer1") {
-                composite("global:layer2")
+                composite(key("global:layer2"))
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            composite("global:layer1")
+            composite(key("global:layer1"))
         }
 
         val values = nodeContainer.values()
@@ -224,22 +225,22 @@ class NodeContainerTest {
     fun `should correctly resolve four layers of nested composite nodes`() {
         val sharedStorage = SharedStorage {
             addEntry("layer4") {
-                local("foo:layer4", "Layer 4 Value")
+                local(key("foo:layer4"), "Layer 4 Value")
             }
             addEntry("layer3") {
-                composite("global:layer4")
+                composite(key("global:layer4"))
             }
             addEntry("layer2") {
-                composite("global:layer3")
+                composite(key("global:layer3"))
             }
             addEntry("layer1") {
-                local("foo:layer1", "Layer 1 Value")
-                composite("global:layer2")
+                local(key("foo:layer1"), "Layer 1 Value")
+                composite(key("global:layer2"))
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            composite("global:layer1")
+            composite(key("global:layer1"))
         }
 
         val values = nodeContainer.values()
@@ -257,21 +258,21 @@ class NodeContainerTest {
     fun `should not throw exception when resolving circular references`() {
         val sharedStorage = SharedStorage {
             addEntry("layer1") {
-                local("foo:layer1", "Layer 1 Value")
-                composite("global:layer2")
+                local(key("foo:layer1"), "Layer 1 Value")
+                composite(key("global:layer2"))
             }
             addEntry("layer2") {
-                composite("global:layer3")
+                composite(key("global:layer3"))
             }
             addEntry("layer3") {
-                composite("global:layer1")
+                composite(key("global:layer1"))
             }
         }
 
         val nodeContainer = NodeContainer(sharedStorage) {
-            composite("global:layer1")
-            composite("global:layer2")
-            composite("global:layer3")
+            composite(key("global:layer1"))
+            composite(key("global:layer2"))
+            composite(key("global:layer3"))
         }
 
         val values = nodeContainer.values()
