@@ -1,4 +1,4 @@
-package random2
+package cc.mewcraft.wakame.random3
 
 import net.kyori.adventure.key.Key
 
