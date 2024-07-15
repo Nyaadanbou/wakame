@@ -32,22 +32,34 @@ data class CompositeNode<T>(
     class Builder<T> {
         val nodes = mutableListOf<Node<T>>()
 
-        fun node(key: String, value: T) {
+        fun local(key: String, value: T) {
             nodes.add(LocalNode(Key.key(key), value))
         }
 
-        fun compositeNode(key: String, init: Builder<T>.() -> Unit = {}) {
-            val compositeNode = CompositeNode<T>(Key.key(key))
-            compositeNode.addNode(init)
-            nodes.add(compositeNode)
+        fun composite(key: String, init: Builder<T>.() -> Unit = {}) {
+            val node = CompositeNode<T>(Key.key(key))
+            node.addNode(init)
+            nodes.add(node)
         }
     }
+}
+
+fun <T> NodeContainer(
+    shared: SharedStorage<T>,
+    block: CompositeNode.Builder<T>.() -> Unit = {},
+): NodeContainer<T> {
+    return NodeContainer(shared).apply { update(block) }
 }
 
 class NodeContainer<T>(
     private val shared: SharedStorage<T>,
 ) : Iterable<T> {
-    var root: Node<T>? = null
+    private var root: Node<T>? = null
+
+    fun update(init: CompositeNode.Builder<T>.() -> Unit) {
+        val builder = CompositeNode.Builder<T>().apply(init)
+        root = CompositeNode(Key.key("root"), builder.nodes)
+    }
 
     fun values(): List<T> {
         return this.toList()
@@ -103,6 +115,14 @@ class NodeContainer<T>(
     }
 }
 
+fun <T> SharedStorage(
+    block: SharedStorage<T>.() -> Unit,
+): SharedStorage<T> {
+    val storage = SharedStorage<T>()
+    storage.apply(block)
+    return storage
+}
+
 class SharedStorage<T> {
     companion object {
         const val NAMESPACE_GLOBAL = "global"
@@ -153,11 +173,11 @@ class SharedStorage<T> {
     class Builder<T> {
         val nodes = mutableListOf<Node<T>>()
 
-        fun node(key: String, value: T) {
+        fun local(key: String, value: T) {
             nodes.add(LocalNode(Key.key(key), value))
         }
 
-        fun compositeNode(key: String, init: CompositeNode<T>.() -> Unit = {}) {
+        fun composite(key: String, init: CompositeNode<T>.() -> Unit = {}) {
             val compositeNode = CompositeNode<T>(Key.key(key)).apply(init)
             nodes.add(compositeNode)
         }
