@@ -27,7 +27,7 @@ import java.util.stream.Stream
 /**
  * 代表了一个玩家技能状态的信息.
  */
-sealed interface SkillStateInfo : Examinable /* TODO: 实现Examinable */{
+sealed interface SkillStateInfo : Examinable {
     /**
      * 当前状态的类型.
      */
@@ -140,7 +140,10 @@ sealed class AbstractSkillStateInfo(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return super.examinableProperties()
+        return Stream.of(
+            ExaminableProperty.of("type", type),
+            ExaminableProperty.of("skillTick", skillTick),
+        )
     }
 
     override fun toString(): String {

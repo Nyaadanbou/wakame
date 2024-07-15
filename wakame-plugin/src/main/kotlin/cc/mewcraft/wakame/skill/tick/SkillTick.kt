@@ -8,11 +8,15 @@ import cc.mewcraft.wakame.skill.state.*
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.tick.Tickable
+import cc.mewcraft.wakame.util.toSimpleString
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
+import java.util.stream.Stream
 
 /**
  * 表示技能触发的效果.
  */
-sealed interface SkillTick : Tickable {
+sealed interface SkillTick : Tickable, Examinable {
 
     companion object {
         /**
@@ -88,6 +92,17 @@ abstract class AbstractSkillTick(
         var result = skill.hashCode()
         result = 31 * result + context.hashCode()
         return result
+    }
+
+    override fun toString(): String {
+        return toSimpleString()
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(
+            ExaminableProperty.of("skill", skill),
+            ExaminableProperty.of("context", context)
+        )
     }
 }
 
