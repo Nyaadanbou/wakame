@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.tick.TickableBuilder
 import cc.mewcraft.wakame.tick.Ticker
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import me.lucko.helper.Events
 import me.lucko.helper.event.Subscription
@@ -235,13 +236,23 @@ private class ArrowWrapper(
             ProjectileSupport.ticker.addTick(startSkillTick)
         }
 
-        // 注册事件监听器
-        with(arrowEntity!!) {
-            registerTickEvent(this)
-            registerHitEntityEvent(this)
-            registerHitBlockEvent(this)
-            registerDisappearEvent(this)
+        val subscriptions = buildList {
+            // 注册事件监听器
+            with(arrowEntity!!) {
+                addAll(registerTickEvent(this))
+                addAll(registerHitEntityEvent(this))
+                addAll(registerHitBlockEvent(this))
+                addAll(registerDisappearEvent(this))
+            }
         }
+
+        EntitySubscriptionTerminator.newBuilder<EntityRemoveFromWorldEvent>()
+            .terminatorEvent(EntityRemoveFromWorldEvent::class.java)
+            .addSubscriptions(subscriptions)
+            .predicate { it.entity == arrowEntity }
+            .build()
+            .startListen()
+
         return true
     }
 
@@ -249,29 +260,29 @@ private class ArrowWrapper(
         arrowEntity?.remove()
     }
 
-    private fun registerTickEvent(arrow: Arrow) {
-        Events.subscribe(ServerTickStartEvent::class.java)
-            .handler {
-                val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
-                val tickSkillTick = projectile.effects[Trigger.TICK]?.cast(newContext) ?: return@handler
-                ProjectileSupport.ticker.addTick(tickSkillTick)
-            }
-            .unregisterIfRemoved()
-
-        Events.subscribe(ServerTickStartEvent::class.java)
-            .handler {
-                if (arrow.location.distance(summonLocation) > projectile.maximumDistance) {
+    private fun registerTickEvent(arrow: Arrow): List<Subscription> {
+        return listOf(
+            Events.subscribe(ServerTickStartEvent::class.java)
+                .handler {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
-                    val disappearSkillTick = projectile.effects[Trigger.DISAPPEAR]?.cast(newContext) ?: return@handler
-                    ProjectileSupport.ticker.addTick(disappearSkillTick)
-                    arrow.remove()
+                    val tickSkillTick = projectile.effects[Trigger.TICK]?.cast(newContext) ?: return@handler
+                    ProjectileSupport.ticker.addTick(tickSkillTick)
+                },
+
+            Events.subscribe(ServerTickStartEvent::class.java)
+                .handler {
+                    if (arrow.location.distance(summonLocation) > projectile.maximumDistance) {
+                        val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
+                        val disappearSkillTick = projectile.effects[Trigger.DISAPPEAR]?.cast(newContext) ?: return@handler
+                        ProjectileSupport.ticker.addTick(disappearSkillTick)
+                        arrow.remove()
+                    }
                 }
-            }
-            .unregisterIfRemoved()
+        )
     }
 
-    private fun registerHitEntityEvent(arrow: Arrow) {
-        Events.subscribe(ProjectileHitEvent::class.java)
+    private fun registerHitEntityEvent(arrow: Arrow): List<Subscription> {
+        return listOf(Events.subscribe(ProjectileHitEvent::class.java)
             .handler {
                 if (it.entity != arrow) return@handler
                 val hitEntity = it.hitEntity ?: return@handler
@@ -280,12 +291,11 @@ private class ArrowWrapper(
                     val hitEntitySkillTick = projectile.effects[Trigger.HIT_ENTITY]?.cast(newContext) ?: return@handler
                     ProjectileSupport.ticker.addTick(hitEntitySkillTick)
                 }
-            }
-            .unregisterIfRemoved()
+            })
     }
 
-    private fun registerHitBlockEvent(arrow: Arrow) {
-        Events.subscribe(ProjectileHitEvent::class.java)
+    private fun registerHitBlockEvent(arrow: Arrow): List<Subscription> {
+        return listOf(Events.subscribe(ProjectileHitEvent::class.java)
             .handler {
                 if (it.entity != arrow) return@handler
                 val hitBlock = it.hitBlock
@@ -294,27 +304,20 @@ private class ArrowWrapper(
                     val hitBlockSkillTick = projectile.effects[Trigger.HIT_BLOCK]?.cast(newContext) ?: return@handler
                     ProjectileSupport.ticker.addTick(hitBlockSkillTick)
                 }
-            }
-            .unregisterIfRemoved()
+            })
     }
 
-    private fun registerDisappearEvent(arrow: Arrow) {
-        Events.subscribe(PlayerPickupArrowEvent::class.java)
+    private fun registerDisappearEvent(arrow: Arrow): List<Subscription> {
+        return listOf(Events.subscribe(PlayerPickupArrowEvent::class.java)
             .handler {
                 if (it.arrow != arrow) return@handler
                 val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(it.player))
                 val pickupSkillTick = projectile.effects[Trigger.PICK_UP]?.cast(newContext) ?: return@handler
                 ProjectileSupport.ticker.addTick(pickupSkillTick)
-            }
-            .unregisterIfRemoved()
-    }
-
-    private fun Subscription.unregisterIfRemoved() {
-        ProjectileSupport.listener.addSubscription(arrowEntity!!.uniqueId, this)
+            })
     }
 }
 
 private object ProjectileSupport : KoinComponent {
-    val listener: ProjectileSkillListener by inject()
     val ticker: Ticker by inject()
 }

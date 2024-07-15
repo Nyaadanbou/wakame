@@ -30,7 +30,6 @@ internal fun skillModule(): Module = module {
     )
 
     singleOf(::SkillEventHandler)
-    singleOf(::ProjectileSkillListener) bind Listener::class
     singleOf(::PlayerSkillStateShower) bind SkillStateShower::class
 
     singleOf(::SkillCastManagerImpl) bind SkillCastManager::class

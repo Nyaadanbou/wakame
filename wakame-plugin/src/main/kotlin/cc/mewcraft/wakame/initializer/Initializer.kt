@@ -138,7 +138,6 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
-        registerTerminableListener(get<ProjectileSkillListener>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
         registerTerminableListener(get<SingleItemListener>()).bindWith(this)
         registerTerminableListener(get<DamageListener>()).bindWith(this)
