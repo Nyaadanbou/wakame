@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.skill.state
 
+import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
 import cc.mewcraft.wakame.item.takeIfNekoStack
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.skill.*
@@ -96,41 +97,45 @@ sealed class AbstractSkillStateInfo(
 
     private fun registerTriggerEvents() {
         // FIXME: 检查可能出现的对象残留问题.
-        // TODO: 写一层抽象, 用于自动注销某一实体的所注册的所有订阅.
-        //  基本的架构是: 当关于实体的 x 事件发生时, 它下面所注册的所有订阅都会被注销.
-        Events.subscribe(PlayerJumpEvent::class.java)
-            .filter { it.player == state.user.player }
-            .expireIf { state.info != this }
-            .handler { event ->
-                val user = event.player.toUser()
-                val itemStack = user.player.inventory.itemInMainHand.takeIfNekoStack()
-                val nekoStack = itemStack?.toNekoStack
-                val result = user.skillState.addTrigger(SingleTrigger.JUMP, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
-                checkResult(result, event)
-            }
+        val subscriptions = listOf(
+            Events.subscribe(PlayerJumpEvent::class.java)
+                .filter { it.player == state.user.player }
+                .handler { event ->
+                    val user = event.player.toUser()
+                    val itemStack = user.player.inventory.itemInMainHand.takeIfNekoStack()
+                    val nekoStack = itemStack?.toNekoStack
+                    val result = user.skillState.addTrigger(SingleTrigger.JUMP, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
+                    checkResult(result, event)
+                },
 
-        Events.subscribe(PlayerMoveEvent::class.java)
-            .filter { it.player == state.user.player }
-            .filter { it.from.blockX != it.to.blockX || it.from.blockY != it.to.blockY || it.from.blockZ != it.to.blockZ }
-            .expireIf { state.info != this }
-            .handler { event ->
-                val user = event.player.toUser()
-                val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
-                val nekoStack = itemStack?.toNekoStack
-                val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
-                checkResult(result, event)
-            }
+            Events.subscribe(PlayerMoveEvent::class.java)
+                .filter { it.player == state.user.player }
+                .filter { it.from.blockX != it.to.blockX || it.from.blockY != it.to.blockY || it.from.blockZ != it.to.blockZ }
+                .handler { event ->
+                    val user = event.player.toUser()
+                    val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
+                    val nekoStack = itemStack?.toNekoStack
+                    val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
+                    checkResult(result, event)
+                },
 
-        Events.subscribe(PlayerToggleSneakEvent::class.java)
-            .filter { it.player == state.user.player }
-            .expireIf { state.info != this }
-            .handler { event ->
-                val user = event.player.toUser()
-                val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
-                val nekoStack = itemStack?.toNekoStack
-                val result = user.skillState.addTrigger(SingleTrigger.SNEAK, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
-                checkResult(result, event)
-            }
+            Events.subscribe(PlayerToggleSneakEvent::class.java)
+                .filter { it.player == state.user.player }
+                .handler { event ->
+                    val user = event.player.toUser()
+                    val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
+                    val nekoStack = itemStack?.toNekoStack
+                    val result = user.skillState.addTrigger(SingleTrigger.SNEAK, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
+                    checkResult(result, event)
+                }
+        )
+
+        EntitySubscriptionTerminator.newBuilder<PlayerSkillStateChangeEvent>()
+            .terminatorEvent(PlayerSkillStateChangeEvent::class.java)
+            .predicate { it.player == state.user.player }
+            .addSubscriptions(subscriptions)
+            .build()
+            .startListen()
     }
 
     private fun checkResult(result: SkillStateResult, event: Cancellable) {

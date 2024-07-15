@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.skill.state
 
+import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
@@ -83,6 +84,7 @@ class PlayerSkillState(
     }
 
     fun setInfo(skillStateInfo: SkillStateInfo) {
+        PlayerSkillStateChangeEvent(user.player, info, skillStateInfo).callEvent()
         user.player.sendPlainMessage("技能状态变更: $info -> $skillStateInfo")
         this.info = skillStateInfo
     }
