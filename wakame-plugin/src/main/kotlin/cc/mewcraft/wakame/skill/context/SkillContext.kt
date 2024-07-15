@@ -7,10 +7,9 @@ import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.toComposite
 import cc.mewcraft.wakame.skill.value
 import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.WatchedMap
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.inventory.ItemStack
 import team.unnamed.mocha.MochaEngine
-import java.util.HashMap
 
 /**
  * 技能条件执行的上下文.
@@ -69,7 +68,7 @@ private data object EmptySkillContext : SkillContext {
 }
 
 private class SkillContextImpl : SkillContext {
-    private val storage: MutableMap<SkillContextKey<*>, Any> by WatchedMap(HashMap())
+    private val storage: MutableMap<SkillContextKey<*>, Any> = Reference2ObjectOpenHashMap()
 
     override fun <T : Any> set(key: SkillContextKey<T>, value: T) {
         when (key) {
