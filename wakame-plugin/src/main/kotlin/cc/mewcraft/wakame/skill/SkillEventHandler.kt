@@ -28,7 +28,9 @@ import org.bukkit.inventory.ItemStack
  * - 根据玩家的操作, 处理玩家的技能触发逻辑
  * - 根据玩家的物品, 从玩家身上添加/移除技能
  */
-class SkillEventHandler {
+class SkillEventHandler(
+    private val ticker: Ticker
+) {
 
     /* 玩家的技能触发逻辑 */
 
@@ -105,7 +107,7 @@ class SkillEventHandler {
                 val configuredSkills = cells.collectConfiguredSkills(nekoStack)
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
                 val context = SkillContext(CasterAdapter.adapt(projectile), target, nekoStack)
-                configuredSkills.values().map { it.cast(context) }.forEach { Ticker.addTick(it) }
+                configuredSkills.values().map { it.cast(context) }.forEach { ticker.addTick(it) }
             }
         }
     }

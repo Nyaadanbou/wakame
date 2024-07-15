@@ -5,11 +5,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.skill.Caster
-import cc.mewcraft.wakame.skill.PassiveSkill
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillBase
-import cc.mewcraft.wakame.skill.SkillBase.CasterUtil
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.AbstractSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
@@ -39,7 +35,7 @@ interface Bloodrage : Skill, PassiveSkill {
     ) : Bloodrage, SkillBase(key, config) {
         override val uniqueId: UUID by uniqueId
 
-        override fun cast(context: SkillContext): SkillTick {
+        override fun cast(context: SkillContext): SkillTick<Bloodrage> {
             return BloodrageTick(context, this)
         }
     }
@@ -48,11 +44,11 @@ interface Bloodrage : Skill, PassiveSkill {
 private class BloodrageTick(
     context: SkillContext,
     private val bloodrage: Bloodrage
-) : AbstractSkillTick(bloodrage, context) {
+) : AbstractSkillTick<Bloodrage>(bloodrage, context) {
     private val attribute = Attributes.MAX_HEALTH
 
-    override fun tick(tickCount: Long): TickResult {
-        val player = CasterUtil.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return TickResult.INTERRUPT
+    override fun tick(): TickResult {
+        val player = CasterUtils.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return TickResult.INTERRUPT
         // When player health is below 50%
         val user = player.toUser()
         val attributeMap = user.attributeMap
@@ -70,7 +66,7 @@ private class BloodrageTick(
     }
 
     override fun whenRemove() {
-        val player = CasterUtil.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return
+        val player = CasterUtils.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return
         val user = player.toUser()
         val attributeMap = user.attributeMap
         attributeMap.getInstance(attribute)?.removeModifier(bloodrage.uniqueId)

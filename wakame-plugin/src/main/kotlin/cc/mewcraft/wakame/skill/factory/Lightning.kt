@@ -29,50 +29,51 @@ interface Lightning : Skill {
     ) : Lightning, SkillBase(key, config) {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillContext): SkillTick {
-            return LightningTick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
+        override fun cast(context: SkillContext): SkillTick<Lightning> {
+            return LightningTick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
+    }
+}
 
-        private inner class LightningTick(
-            context: SkillContext,
-            override val interruptTriggers: Provider<TriggerConditions>,
-            override val forbiddenTriggers: Provider<TriggerConditions>
-        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
-            private val castLocation: Location? = TargetUtil.getLocation(context, true)?.bukkitLocation
-                ?: CasterUtil.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.location?.getTargetLocation(16)?.getFirstBlockBelow()?.location
+private class LightningTick(
+    context: SkillContext,
+    skill: Lightning,
+    override val interruptTriggers: Provider<TriggerConditions>,
+    override val forbiddenTriggers: Provider<TriggerConditions>
+) : AbstractPlayerSkillTick<Lightning>(skill, context) {
+    private val castLocation: Location? = TargetUtil.getLocation(context, true)?.bukkitLocation
+        ?: CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.location?.getTargetLocation(16)?.getFirstBlockBelow()?.location
 
-            override fun tickCastPoint(tickCount: Long): TickResult {
-                castLocation ?: return TickResult.INTERRUPT
-                if (tickCount >= 50) {
-                    return TickResult.ALL_DONE
-                }
-                generateBlueSmoke(castLocation)
+    override fun tickCastPoint(tickCount: Long): TickResult {
+        castLocation ?: return TickResult.INTERRUPT
+        if (tickCount >= 50) {
+            return TickResult.ALL_DONE
+        }
+        generateBlueSmoke(castLocation)
 
-                return TickResult.CONTINUE_TICK
-            }
+        return TickResult.CONTINUE_TICK
+    }
 
-            override fun tickCast(tickCount: Long): TickResult {
-                val world = castLocation!!.world
-                val lightning = world.strikeLightningEffect(castLocation)
-                val entitiesBeStruck = world.getNearbyEntities(castLocation, 3.0, 3.0, 3.0)
-                for (entity in entitiesBeStruck) {
-                    if (entity is LivingEntity) {
-                        entity.damage(10.0, lightning)
-                    }
-                }
-                return TickResult.ALL_DONE
-            }
-
-            private fun generateBlueSmoke(location: Location) {
-                ParticleBuilder(Particle.DUST)
-                    .count(50)
-                    .offset(0.5, 1.0, 0.5)
-                    .extra(0.5)
-                    .location(location)
-                    .allPlayers()
-                    .color(0, 0, 255)
-                    .spawn()
+    override fun tickCast(tickCount: Long): TickResult {
+        val world = castLocation!!.world
+        val lightning = world.strikeLightningEffect(castLocation)
+        val entitiesBeStruck = world.getNearbyEntities(castLocation, 3.0, 3.0, 3.0)
+        for (entity in entitiesBeStruck) {
+            if (entity is LivingEntity) {
+                entity.damage(10.0, lightning)
             }
         }
+        return TickResult.ALL_DONE
+    }
+
+    private fun generateBlueSmoke(location: Location) {
+        ParticleBuilder(Particle.DUST)
+            .count(50)
+            .offset(0.5, 1.0, 0.5)
+            .extra(0.5)
+            .location(location)
+            .allPlayers()
+            .color(0, 0, 255)
+            .spawn()
     }
 }

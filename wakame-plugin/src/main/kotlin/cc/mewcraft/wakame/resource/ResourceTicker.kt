@@ -5,12 +5,16 @@ import cc.mewcraft.wakame.tick.AlwaysTickable
 import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.Server
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.util.*
 
 class ResourceTicker(
     private val server: Server
-) : Initializable {
-    private var taskId: UUID? = null
+) : Initializable, KoinComponent {
+    private val ticker: Ticker by inject()
+
+    private var taskId: Int? = null
 
     fun start() {
         val alwaysTickable = AlwaysTickable {
@@ -19,11 +23,11 @@ class ResourceTicker(
                 user.resourceMap.add(ResourceTypeRegistry.MANA, 1)
             }
         }
-        taskId = Ticker.addTick(alwaysTickable)
+        taskId = ticker.addTick(alwaysTickable)
     }
 
     override fun close() {
-        taskId?.let { Ticker.stopTick(it) }
+        taskId?.let { ticker.stopTick(it) }
     }
 
     override fun onPreWorld() {

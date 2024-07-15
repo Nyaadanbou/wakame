@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.SkillBase.TargetUtil
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.factory.Projectile.Trigger
@@ -16,7 +15,7 @@ import cc.mewcraft.wakame.skill.factory.Projectile.Type
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
-import cc.mewcraft.wakame.tick.Tickable
+import cc.mewcraft.wakame.tick.TickableBuilder
 import cc.mewcraft.wakame.tick.Ticker
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import me.lucko.helper.Events
@@ -162,7 +161,7 @@ interface Projectile : Skill {
         override val gravity: Boolean by gravity
         override val effects: Map<Trigger, Skill> by effects
 
-        override fun cast(context: SkillContext): SkillTick {
+        override fun cast(context: SkillContext): SkillTick<Projectile> {
             return ProjectileTick(context, this)
         }
     }
@@ -171,7 +170,7 @@ interface Projectile : Skill {
 private class ProjectileTick(
     context: SkillContext,
     val projectile: Projectile
-) : AbstractPlayerSkillTick(projectile, context) {
+) : AbstractPlayerSkillTick<Projectile>(projectile, context) {
 
     override fun tickCast(tickCount: Long): TickResult {
         val target = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
@@ -183,15 +182,16 @@ private class ProjectileTick(
             return TickResult.INTERRUPT
         }
 
-        Ticker.addTick(
-            Tickable { tc ->
+        val tickable = TickableBuilder.newBuilder()
+            .execute { tc ->
                 if (tc >= this@ProjectileTick.projectile.duration) {
                     projectile.remove()
-                    return@Tickable TickResult.ALL_DONE
+                    return@execute TickResult.ALL_DONE
                 }
                 TickResult.CONTINUE_TICK
             }
-        )
+
+        ProjectileSupport.ticker.addTick(tickable)
 
         return TickResult.ALL_DONE
     }
@@ -232,7 +232,7 @@ private class ArrowWrapper(
         val startSkillTick = projectile.effects[Trigger.START]?.cast(context)
 
         if (startSkillTick != null) {
-            Ticker.addTick(startSkillTick)
+            ProjectileSupport.ticker.addTick(startSkillTick)
         }
 
         // 注册事件监听器
@@ -254,7 +254,7 @@ private class ArrowWrapper(
             .handler {
                 val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
                 val tickSkillTick = projectile.effects[Trigger.TICK]?.cast(newContext) ?: return@handler
-                Ticker.addTick(tickSkillTick)
+                ProjectileSupport.ticker.addTick(tickSkillTick)
             }
             .unregisterIfRemoved()
 
@@ -263,7 +263,7 @@ private class ArrowWrapper(
                 if (arrow.location.distance(summonLocation) > projectile.maximumDistance) {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
                     val disappearSkillTick = projectile.effects[Trigger.DISAPPEAR]?.cast(newContext) ?: return@handler
-                    Ticker.addTick(disappearSkillTick)
+                    ProjectileSupport.ticker.addTick(disappearSkillTick)
                     arrow.remove()
                 }
             }
@@ -278,7 +278,7 @@ private class ArrowWrapper(
                 if (hitEntity is LivingEntity) {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitEntity))
                     val hitEntitySkillTick = projectile.effects[Trigger.HIT_ENTITY]?.cast(newContext) ?: return@handler
-                    Ticker.addTick(hitEntitySkillTick)
+                    ProjectileSupport.ticker.addTick(hitEntitySkillTick)
                 }
             }
             .unregisterIfRemoved()
@@ -292,7 +292,7 @@ private class ArrowWrapper(
                 if (hitBlock != null) {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitBlock.location))
                     val hitBlockSkillTick = projectile.effects[Trigger.HIT_BLOCK]?.cast(newContext) ?: return@handler
-                    Ticker.addTick(hitBlockSkillTick)
+                    ProjectileSupport.ticker.addTick(hitBlockSkillTick)
                 }
             }
             .unregisterIfRemoved()
@@ -304,7 +304,7 @@ private class ArrowWrapper(
                 if (it.arrow != arrow) return@handler
                 val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(it.player))
                 val pickupSkillTick = projectile.effects[Trigger.PICK_UP]?.cast(newContext) ?: return@handler
-                Ticker.addTick(pickupSkillTick)
+                ProjectileSupport.ticker.addTick(pickupSkillTick)
             }
             .unregisterIfRemoved()
     }
@@ -316,4 +316,5 @@ private class ArrowWrapper(
 
 private object ProjectileSupport : KoinComponent {
     val listener: ProjectileSkillListener by inject()
+    val ticker: Ticker by inject()
 }

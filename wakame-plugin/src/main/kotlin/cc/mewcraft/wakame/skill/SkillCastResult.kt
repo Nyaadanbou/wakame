@@ -4,19 +4,19 @@ import cc.mewcraft.wakame.skill.tick.SkillTick
 import net.kyori.adventure.translation.Translatable
 
 interface SkillPrepareCastResult {
-    val skillTick: SkillTick
+    val skillTick: SkillTick<*>
 
     fun isSuccessful(): Boolean
 
     companion object {
-        fun success(skillTick: SkillTick): SkillPrepareCastResult {
+        fun success(skillTick: SkillTick<*>): SkillPrepareCastResult {
             return SuccessSkillPrepareCastResult(skillTick)
         }
     }
 }
 
 private data class SuccessSkillPrepareCastResult(
-    override val skillTick: SkillTick
+    override val skillTick: SkillTick<*>
 ) : SkillPrepareCastResult {
 
     override fun isSuccessful(): Boolean {
@@ -32,7 +32,7 @@ enum class FailureSkillPrepareCastResult(
     UNKNOWN_FAILURE("skill.result.unknown_failure"),
     ;
 
-    override val skillTick: SkillTick = SkillTick.empty()
+    override val skillTick: SkillTick<*> = SkillTick.empty()
 
     override fun translationKey(): String = translateKey
 

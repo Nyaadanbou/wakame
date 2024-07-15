@@ -44,7 +44,7 @@ interface Skill : Keyed {
     /**
      * 释放该技能.
      */
-    fun cast(context: SkillContext): SkillTick = SkillTick.empty()
+    fun cast(context: SkillContext): SkillTick<*> = SkillTick.empty()
 
     companion object {
         /**

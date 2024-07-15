@@ -35,35 +35,36 @@ interface Dash : Skill {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillContext): SkillTick {
-            return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
+        override fun cast(context: SkillContext): SkillTick<Dash> {
+            return DashTick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
+    }
+}
 
-        private inner class Tick(
-            context: SkillContext,
-            override val interruptTriggers: Provider<TriggerConditions>,
-            override val forbiddenTriggers: Provider<TriggerConditions>
-        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
+private class DashTick(
+    context: SkillContext,
+    skill: Dash,
+    override val interruptTriggers: Provider<TriggerConditions>,
+    override val forbiddenTriggers: Provider<TriggerConditions>
+) : AbstractPlayerSkillTick<Dash>(skill, context) {
 
-            override fun tickCastPoint(tickCount: Long): TickResult {
-                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-                player.sendPlainMessage("冲刺的前摇摇摇摇")
-                return TickResult.ALL_DONE
-            }
+    override fun tickCastPoint(tickCount: Long): TickResult {
+        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
+        player.sendPlainMessage("冲刺的前摇摇摇摇")
+        return TickResult.ALL_DONE
+    }
 
-            override fun tickBackswing(tickCount: Long): TickResult {
-                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-                player.sendPlainMessage("冲刺的后摇摇摇摇摇摇摇")
-                return TickResult.ALL_DONE
-            }
+    override fun tickBackswing(tickCount: Long): TickResult {
+        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
+        player.sendPlainMessage("冲刺的后摇摇摇摇摇摇摇")
+        return TickResult.ALL_DONE
+    }
 
-            override fun tickCast(tickCount: Long): TickResult {
-                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-                val direction = player.location.direction.normalize()
-                val velocity = direction.multiply(distance)
-                player.velocity = velocity
-                return TickResult.ALL_DONE
-            }
-        }
+    override fun tickCast(tickCount: Long): TickResult {
+        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
+        val direction = player.location.direction.normalize()
+        val velocity = direction.multiply(skill.distance)
+        player.velocity = velocity
+        return TickResult.ALL_DONE
     }
 }

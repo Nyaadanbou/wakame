@@ -17,6 +17,8 @@ import org.bukkit.entity.ThrownPotion
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionType
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
 interface PotionDrop : Skill {
@@ -42,41 +44,47 @@ interface PotionDrop : Skill {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillContext): SkillTick {
-            return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
-        }
-
-        private inner class Tick(
-            context: SkillContext,
-            override val interruptTriggers: Provider<TriggerConditions>,
-            override val forbiddenTriggers: Provider<TriggerConditions>
-        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
-            override fun tickCast(tickCount: Long): TickResult {
-                val location = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
-                Ticker.addTick(PotionTick(location.bukkitLocation.add(.0, 3.0, .0)))
-                return TickResult.ALL_DONE
-            }
-
-            private inner class PotionTick(
-                private val location: Location
-            ) : AbstractSkillTick(this@DefaultImpl, context) {
-                override fun tick(tickCount: Long): TickResult {
-                    if (tickCount % 20 == 0L) {
-                        val potionItem = ItemStack(Material.SPLASH_POTION)
-                        val potionMeta = potionItem.itemMeta as PotionMeta
-                        potionMeta.basePotionType = effectTypes.random()
-                        val thrownPotion = location.world.spawnEntity(location, EntityType.POTION) as ThrownPotion
-                        thrownPotion.potionMeta = potionMeta
-                        location.world.strikeLightning(location)
-                    }
-
-                    if (tickCount >= 200) {
-                        return TickResult.ALL_DONE
-                    }
-
-                    return TickResult.CONTINUE_TICK
-                }
-            }
+        override fun cast(context: SkillContext): SkillTick<PotionDrop> {
+            return PotionDropTick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
     }
+}
+
+private class PotionDropTick(
+    context: SkillContext,
+    skill: PotionDrop,
+    override val interruptTriggers: Provider<TriggerConditions>,
+    override val forbiddenTriggers: Provider<TriggerConditions>
+) : AbstractPlayerSkillTick<PotionDrop>(skill, context) {
+    override fun tickCast(tickCount: Long): TickResult {
+        val location = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
+        PotionDropSupport.ticker.addTick(PotionDropEffectTick(this, location.bukkitLocation.add(.0, 3.0, .0)))
+        return TickResult.ALL_DONE
+    }
+}
+
+private class PotionDropEffectTick(
+    tick: PotionDropTick,
+    private val location: Location
+) : AbstractSkillTick<PotionDrop>(tick.skill, tick.context) {
+    override fun tick(): TickResult {
+        if (tickCount % 20 == 0L) {
+            val potionItem = ItemStack(Material.SPLASH_POTION)
+            val potionMeta = potionItem.itemMeta as PotionMeta
+            potionMeta.basePotionType = skill.effectTypes.random()
+            val thrownPotion = location.world.spawnEntity(location, EntityType.POTION) as ThrownPotion
+            thrownPotion.potionMeta = potionMeta
+            location.world.strikeLightning(location)
+        }
+
+        if (tickCount >= 200) {
+            return TickResult.ALL_DONE
+        }
+
+        return TickResult.CONTINUE_TICK
+    }
+}
+
+private object PotionDropSupport : KoinComponent {
+    val ticker: Ticker by inject()
 }

@@ -38,7 +38,7 @@ sealed interface SkillStateInfo : Examinable {
      *
      * 同时也可以用来判断玩家是否正在施法状态.
      */
-    val skillTick: PlayerSkillTick
+    val skillTick: PlayerSkillTick<*>
 
     /**
      * 添加一个 [SingleTrigger],
@@ -71,7 +71,7 @@ sealed interface SkillStateInfo : Examinable {
 
 sealed class AbstractSkillStateInfo(
     val state: PlayerSkillState,
-    final override val skillTick: PlayerSkillTick,
+    final override val skillTick: PlayerSkillTick<*>,
     override val type: SkillStateInfo.Type,
     registerEvents: Boolean = true,
 ) : SkillStateInfo {
@@ -257,7 +257,7 @@ class IdleStateInfo(
  */
 class CastPointStateInfo(
     state: PlayerSkillState,
-    skillTick: PlayerSkillTick,
+    skillTick: PlayerSkillTick<*>,
 ) : AbstractSkillStateInfo(state, skillTick, SkillStateInfo.Type.CAST_POINT) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
@@ -292,7 +292,7 @@ class CastPointStateInfo(
  */
 class CastStateInfo(
     state: PlayerSkillState,
-    skillTick: PlayerSkillTick,
+    skillTick: PlayerSkillTick<*>,
 ) : AbstractSkillStateInfo(state, skillTick, SkillStateInfo.Type.CAST) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
@@ -327,7 +327,7 @@ class CastStateInfo(
  */
 class BackswingStateInfo(
     state: PlayerSkillState,
-    skillTick: PlayerSkillTick,
+    skillTick: PlayerSkillTick<*>,
 ) : AbstractSkillStateInfo(state, skillTick, SkillStateInfo.Type.BACKSWING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 

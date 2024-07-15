@@ -38,41 +38,42 @@ interface RemovePotionEffect : Skill {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillContext): SkillTick {
-            return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
+        override fun cast(context: SkillContext): SkillTick<RemovePotionEffect> {
+            return RemovePotionEffectTick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
+    }
+}
 
-        private inner class Tick(
-            context: SkillContext,
-            override val interruptTriggers: Provider<TriggerConditions>,
-            override val forbiddenTriggers: Provider<TriggerConditions>
-        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
+private class RemovePotionEffectTick(
+    context: SkillContext,
+    skill: RemovePotionEffect,
+    override val interruptTriggers: Provider<TriggerConditions>,
+    override val forbiddenTriggers: Provider<TriggerConditions>
+) : AbstractPlayerSkillTick<RemovePotionEffect>(skill, context) {
 
-            private var counter: Int = 0
+    private var counter: Int = 0
 
-            override fun tickCastPoint(tickCount: Long): TickResult {
-                val player = context.getOrThrow(SkillContextKey.CASTER).valueNonNull<Caster.Single.Player>().bukkitPlayer
-                player?.sendPlainMessage("移除药水效果前摇")
-                counter++
-                return if (counter >= 20) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
-            }
+    override fun tickCastPoint(tickCount: Long): TickResult {
+        val player = context.getOrThrow(SkillContextKey.CASTER).valueNonNull<Caster.Single.Player>().bukkitPlayer
+        player?.sendPlainMessage("移除药水效果前摇")
+        counter++
+        return if (counter >= 20) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
+    }
 
-            override fun tickBackswing(tickCount: Long): TickResult {
-                val player = context[SkillContextKey.CASTER]?.valueNonNull<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-                player.sendPlainMessage("移除药水效果后摇")
-                counter++
-                return if (counter >= 60) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
-            }
+    override fun tickBackswing(tickCount: Long): TickResult {
+        val player = context[SkillContextKey.CASTER]?.valueNonNull<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
+        player.sendPlainMessage("移除药水效果后摇")
+        counter++
+        return if (counter >= 60) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
+    }
 
-            override fun tickCast(tickCount: Long): TickResult {
-                val entity = context.getOrThrow(SkillContextKey.CASTER).valueNonNull<Caster.Single.Entity>().bukkitEntity
-                if (entity is LivingEntity) {
-                    effectTypes.forEach { entity.removePotionEffect(it) }
-                }
-                entity?.sendPlainMessage("正在移除药水效果...")
-                counter++
-                return if (counter >= 40) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
-            }
+    override fun tickCast(tickCount: Long): TickResult {
+        val entity = context.getOrThrow(SkillContextKey.CASTER).valueNonNull<Caster.Single.Entity>().bukkitEntity
+        if (entity is LivingEntity) {
+            skill.effectTypes.forEach { entity.removePotionEffect(it) }
         }
+        entity?.sendPlainMessage("正在移除药水效果...")
+        counter++
+        return if (counter >= 40) TickResult.ALL_DONE else TickResult.CONTINUE_TICK
     }
 }

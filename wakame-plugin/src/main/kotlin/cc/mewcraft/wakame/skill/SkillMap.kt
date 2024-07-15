@@ -8,10 +8,12 @@ import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
 import com.google.common.collect.Multimap
 import com.google.common.collect.MultimapBuilder
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
-import java.util.UUID
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import java.util.*
 
 /**
  * Represents a skill map owned by a subject.
@@ -100,7 +102,7 @@ class PlayerSkillMap(
         .arrayListValues(5)
         .build()
 
-    private val skill2Ticks: MutableMap<Key, UUID> = Object2ObjectOpenHashMap()
+    private val skill2Ticks: MutableMap<Key, Int> = Object2IntOpenHashMap()
 
     override fun addSkill(skill: ConfiguredSkill) {
         this.skills.put(skill.trigger, skill.key)
@@ -154,7 +156,7 @@ class PlayerSkillMap(
 
     override fun clear() {
         skills.clear()
-        skill2Ticks.values.forEach { Ticker.stopTick(it) }
+        skill2Ticks.values.forEach { SkillMapSupport.ticker.stopTick(it) }
         skill2Ticks.clear()
     }
 
@@ -163,17 +165,22 @@ class PlayerSkillMap(
     }
 
     private fun registerSkillTick(skill: Skill) {
-        val user = PlayerAdapters.get<Player>().adapt(uniqueId)
-        if (skill is PassiveSkill) {
-            val tickable = skill.cast(SkillContext(CasterAdapter.adapt(user)))
-            skill2Ticks[skill.key] = Ticker.addTick(tickable)
+        if (skill !is PassiveSkill) {
+            return
         }
+        val user = PlayerAdapters.get<Player>().adapt(uniqueId)
+        val tickable = skill.cast(SkillContext(CasterAdapter.adapt(user)))
+        skill2Ticks[skill.key] = SkillMapSupport.ticker.addTick(tickable)
     }
 
     private fun removeSkillTick(skill: Key) {
         val tickId = skill2Ticks.remove(skill)
         if (tickId != null) {
-            Ticker.stopTick(tickId)
+            SkillMapSupport.ticker.stopTick(tickId)
         }
     }
+}
+
+private object SkillMapSupport : KoinComponent {
+    val ticker: Ticker by inject()
 }
