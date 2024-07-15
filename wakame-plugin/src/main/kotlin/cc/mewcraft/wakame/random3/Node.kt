@@ -16,6 +16,7 @@ data class LocalNode<T>(
     override val key: Key, val value: T,
 ) : Node<T>
 
+@NodeDsl
 data class CompositeNode<T>(
     override val key: Key, private val nodes: MutableList<Node<T>> = mutableListOf(),
 ) : Node<T> {
@@ -29,6 +30,7 @@ data class CompositeNode<T>(
         return nodes
     }
 
+    @NodeDsl
     class Builder<T> {
         val nodes = mutableListOf<Node<T>>()
 
@@ -44,6 +46,7 @@ data class CompositeNode<T>(
     }
 }
 
+@NodeDsl
 fun <T> NodeContainer(
     shared: SharedStorage<T>,
     block: CompositeNode.Builder<T>.() -> Unit = {},
@@ -51,6 +54,7 @@ fun <T> NodeContainer(
     return NodeContainer(shared).apply { update(block) }
 }
 
+@NodeDsl
 class NodeContainer<T>(
     private val shared: SharedStorage<T>,
 ) : Iterable<T> {
@@ -115,6 +119,7 @@ class NodeContainer<T>(
     }
 }
 
+@NodeDsl
 fun <T> SharedStorage(
     block: SharedStorage<T>.() -> Unit,
 ): SharedStorage<T> {
@@ -123,6 +128,7 @@ fun <T> SharedStorage(
     return storage
 }
 
+@NodeDsl
 class SharedStorage<T> {
     companion object {
         const val NAMESPACE_GLOBAL = "global"
@@ -170,6 +176,7 @@ class SharedStorage<T> {
         }
     }
 
+    @NodeDsl
     class Builder<T> {
         val nodes = mutableListOf<Node<T>>()
 
@@ -183,3 +190,6 @@ class SharedStorage<T> {
         }
     }
 }
+
+@DslMarker
+annotation class NodeDsl
