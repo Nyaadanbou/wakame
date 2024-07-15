@@ -24,33 +24,34 @@ interface KillEntity : Skill {
     ) : KillEntity, SkillBase(key, config) {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillContext): SkillTick {
-            return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
+        override fun cast(context: SkillContext): SkillTick<KillEntity> {
+            return Tick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
+    }
+}
 
-        private inner class Tick(
-            context: SkillContext,
-            override val interruptTriggers: Provider<TriggerConditions>,
-            override val forbiddenTriggers: Provider<TriggerConditions>
-        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
+private class Tick(
+    context: SkillContext,
+    skill: KillEntity,
+    override val interruptTriggers: Provider<TriggerConditions>,
+    override val forbiddenTriggers: Provider<TriggerConditions>
+) : AbstractPlayerSkillTick<KillEntity>(skill, context) {
 
-            override fun tickCastPoint(tickCount: Long): TickResult {
-                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-                player.sendPlainMessage("杀死生物前摇awa")
-                return TickResult.ALL_DONE
-            }
+    override fun tickCastPoint(tickCount: Long): TickResult {
+        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
+        player.sendPlainMessage("杀死生物前摇awa")
+        return TickResult.ALL_DONE
+    }
 
-            override fun tickBackswing(tickCount: Long): TickResult {
-                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-                player.sendPlainMessage("杀死生物后摇qwq")
-                return TickResult.ALL_DONE
-            }
+    override fun tickBackswing(tickCount: Long): TickResult {
+        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
+        player.sendPlainMessage("杀死生物后摇qwq")
+        return TickResult.ALL_DONE
+    }
 
-            override fun tickCast(tickCount: Long): TickResult {
-                val entity = context[SkillContextKey.TARGET]?.value<Target.LivingEntity>()?.bukkitEntity ?: return TickResult.INTERRUPT
-                entity.health = 0.0
-                return TickResult.ALL_DONE
-            }
-        }
+    override fun tickCast(tickCount: Long): TickResult {
+        val entity = context[SkillContextKey.TARGET]?.value<Target.LivingEntity>()?.bukkitEntity ?: return TickResult.INTERRUPT
+        entity.health = 0.0
+        return TickResult.ALL_DONE
     }
 }

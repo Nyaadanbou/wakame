@@ -38,7 +38,7 @@ sealed interface Caster {
          * 代表一个技能施法者.
          */
         interface Skill : Single {
-            val skillTick: SkillTick
+            val skillTick: SkillTick<*>
         }
     }
 
@@ -101,7 +101,7 @@ object CasterAdapter {
         return EntityCaster(entity)
     }
 
-    fun adapt(skillTick: SkillTick): Caster.Single.Skill {
+    fun adapt(skillTick: SkillTick<*>): Caster.Single.Skill {
         return SkillCaster(skillTick)
     }
 
@@ -169,7 +169,7 @@ private class EntityCaster(
 }
 
 private data class SkillCaster(
-    override val skillTick: SkillTick
+    override val skillTick: SkillTick<*>
 ) : Caster.Single.Skill
 
 private class CompositeNodeCaster(

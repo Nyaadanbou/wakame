@@ -8,9 +8,10 @@ import org.bukkit.Server
 import java.util.UUID
 
 class SkillTicker(
-    private val server: Server
+    private val server: Server,
+    private val ticker: Ticker,
 ) : Initializable {
-    private var taskId: UUID? = null
+    private var taskId: Int? = null
 
     fun start() {
         val alwaysTickable = AlwaysTickable {
@@ -18,11 +19,11 @@ class SkillTicker(
                 player.toUser().skillState.tick()
             }
         }
-        taskId = Ticker.addTick(alwaysTickable)
+        taskId = ticker.addTick(alwaysTickable)
     }
 
     override fun close() {
-        taskId?.let { Ticker.stopTick(it) }
+        taskId?.let { ticker.stopTick(it) }
     }
 
     override fun onPreWorld() {

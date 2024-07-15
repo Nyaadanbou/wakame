@@ -16,33 +16,36 @@ import java.util.stream.Stream
 /**
  * 表示技能触发的效果.
  */
-sealed interface SkillTick : Tickable, Examinable {
+sealed interface SkillTick<S : Skill> : Tickable, Examinable {
 
     companion object {
         /**
          * 一个空的技能触发效果.
          */
         @Suppress("UNCHECKED_CAST")
-        fun <T : SkillTick> empty(): T = EmptyPlayerSkillTick as T
+        fun <T : SkillTick<*>> empty(): T = EmptyPlayerSkillTick as T
     }
 
     /**
      * 此次 Tick 的技能
      */
-    val skill: Skill
+    val skill: S
 
     /**
      * 此次触发效果的上下文.
      */
     val context: SkillContext
 
-    override fun tick(tickCount: Long): TickResult = TickResult.ALL_DONE
+    override fun tick(): TickResult = TickResult.ALL_DONE
     override fun whenRemove() {}
 }
 
-private data object EmptyPlayerSkillTick : PlayerSkillTick {
+private data object EmptyPlayerSkillTick : PlayerSkillTick<Skill> {
     override val skill: Skill = Skill.empty()
     override val context: SkillContext = SkillContext.empty()
+    override var tickCount: Long
+        get() = throw UnsupportedOperationException()
+        set(_) = throw UnsupportedOperationException()
 
     override fun isForbidden(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean = false
     override fun isInterrupted(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean = false
@@ -54,7 +57,7 @@ private data object EmptyPlayerSkillTick : PlayerSkillTick {
  * 当然它也可以与 [SkillTick] 一样使用.
  * @see tickCast
  */
-interface PlayerSkillTick : SkillTick {
+interface PlayerSkillTick<S : Skill> : SkillTick<S> {
     fun isForbidden(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean
     fun isInterrupted(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean
 
@@ -74,13 +77,15 @@ interface PlayerSkillTick : SkillTick {
 /**
  * 表示一个技能触发效果的结果.
  */
-abstract class AbstractSkillTick(
-    final override val skill: Skill,
+abstract class AbstractSkillTick<S : Skill>(
+    final override val skill: S,
     final override val context: SkillContext
-) : SkillTick {
+) : SkillTick<S> {
+    override var tickCount: Long = 0
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is AbstractPlayerSkillTick) return false
+        if (other !is AbstractPlayerSkillTick<*>) return false
 
         if (skill != other.skill) return false
         if (context != other.context) return false
@@ -106,10 +111,10 @@ abstract class AbstractSkillTick(
     }
 }
 
-abstract class AbstractPlayerSkillTick(
-    skill: Skill,
+abstract class AbstractPlayerSkillTick<S : Skill>(
+    skill: S,
     context: SkillContext
-) : AbstractSkillTick(skill, context), PlayerSkillTick {
+) : AbstractSkillTick<S>(skill, context), PlayerSkillTick<S> {
     /**
      * 此次触发效果中不允许的触发器.
      *
@@ -122,7 +127,7 @@ abstract class AbstractPlayerSkillTick(
      */
     open val interruptTriggers: Provider<TriggerConditions> = provider { TriggerConditions.empty() }
 
-    final override fun tick(tickCount: Long): TickResult {
+    final override fun tick(): TickResult {
         return tickCast(tickCount)
     }
 

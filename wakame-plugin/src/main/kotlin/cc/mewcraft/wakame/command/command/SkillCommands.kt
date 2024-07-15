@@ -23,10 +23,14 @@ import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.commandBuilder
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.jvm.optionals.getOrNull
 
-object SkillCommands : CommandFactory<CommandSender> {
+object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
     private const val SKILL_LITERAL = "skill"
+
+    private val ticker: Ticker by inject()
 
     override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> {
         return buildList {
@@ -64,7 +68,7 @@ object SkillCommands : CommandFactory<CommandSender> {
 
                     val skill = context.get<Skill>("skill")
                     val castContext = SkillContext(CasterAdapter.adapt(casterPlayer), target)
-                    Ticker.addTick(skill.cast(castContext))
+                    ticker.addTick(skill.cast(castContext))
                 }
             }.buildAndAdd(this)
         }

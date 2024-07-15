@@ -34,35 +34,36 @@ interface CommandExecute : Skill {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillContext): SkillTick {
-            return Tick(context, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
+        override fun cast(context: SkillContext): SkillTick<CommandExecute> {
+            return CommandExecuteTick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
         }
+    }
+}
 
-        private inner class Tick(
-            context: SkillContext,
-            override val interruptTriggers: Provider<TriggerConditions>,
-            override val forbiddenTriggers: Provider<TriggerConditions>
-        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
+private class CommandExecuteTick(
+    context: SkillContext,
+    skill: CommandExecute,
+    override val interruptTriggers: Provider<TriggerConditions>,
+    override val forbiddenTriggers: Provider<TriggerConditions>
+) : AbstractPlayerSkillTick<CommandExecute>(skill, context) {
 
-            override fun tickCastPoint(tickCount: Long): TickResult {
-                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-                player.sendPlainMessage("命令执行前摇")
-                return TickResult.ALL_DONE
-            }
+    override fun tickCastPoint(tickCount: Long): TickResult {
+        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
+        player.sendPlainMessage("命令执行前摇")
+        return TickResult.ALL_DONE
+    }
 
-            override fun tickBackswing(tickCount: Long): TickResult {
-                val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-                player.sendPlainMessage("命令执行后摇")
-                return TickResult.ALL_DONE
-            }
+    override fun tickBackswing(tickCount: Long): TickResult {
+        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
+        player.sendPlainMessage("命令执行后摇")
+        return TickResult.ALL_DONE
+    }
 
-            override fun tickCast(tickCount: Long): TickResult {
-                val entity = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitEntity ?: return TickResult.INTERRUPT
-                for (command in commands) {
-                    command.replace("{caster}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }
-                }
-                return TickResult.ALL_DONE
-            }
+    override fun tickCast(tickCount: Long): TickResult {
+        val entity = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitEntity ?: return TickResult.INTERRUPT
+        for (command in skill.commands) {
+            command.replace("{caster}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }
         }
+        return TickResult.ALL_DONE
     }
 }
