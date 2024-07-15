@@ -106,7 +106,8 @@ interface Teleport : Skill {
                 when (val type = type) {
                     is Type.FIXED -> {
                         val position = type.position
-                        caster.bukkitEntity.teleport(position.toLocation(caster.bukkitEntity.world))
+                        val bukkitEntity = caster.bukkitEntity ?: return TickResult.INTERRUPT
+                        bukkitEntity.teleport(position.toLocation(bukkitEntity.world))
                     }
 
                     is Type.RANDOM -> {
@@ -115,15 +116,15 @@ interface Teleport : Skill {
                             0.0,
                             (Math.random() - 0.5) * type.distance
                         )
-                        caster.bukkitEntity.teleport(random)
+                        caster.bukkitEntity?.teleport(random)
                     }
 
                     is Type.TARGET -> {
                         val bukkitLocation = location.apply {
-                            pitch = caster.bukkitEntity.location.pitch
-                            yaw = caster.bukkitEntity.location.yaw
+                            caster.bukkitEntity?.location?.pitch?.let { pitch = it }
+                            caster.bukkitEntity?.location?.yaw?.let { yaw = it }
                         }
-                        caster.bukkitEntity.teleport(bukkitLocation)
+                        caster.bukkitEntity?.teleport(bukkitLocation)
                     }
                 }
                 return TickResult.ALL_DONE

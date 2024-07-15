@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.user
 
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.UUID
 import kotlin.reflect.KClass
 import org.bukkit.entity.Player as PaperPlayer
 
@@ -13,6 +14,8 @@ import org.bukkit.entity.Player as PaperPlayer
  */
 interface PlayerAdapter<P> {
     fun adapt(player: P): User<P>
+
+    fun adapt(uniqueId: UUID): User<P>
 }
 
 /**

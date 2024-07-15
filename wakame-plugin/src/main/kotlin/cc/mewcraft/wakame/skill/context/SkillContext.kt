@@ -5,11 +5,18 @@ import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.toComposite
+import cc.mewcraft.wakame.skill.value
+import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.WatchedMap
 import org.bukkit.inventory.ItemStack
 import team.unnamed.mocha.MochaEngine
+import java.util.HashMap
 
 /**
  * 技能条件执行的上下文.
+ *
+ * ## 警告
+ * 永远不要永久持有该对象!
  */
 sealed interface SkillContext {
     companion object {
@@ -55,13 +62,14 @@ private data object EmptySkillContext : SkillContext {
     override fun <T : Any> get(key: SkillContextKey<T>): T? {
         return null
     }
+
     override fun <T : Any> contains(key: SkillContextKey<T>): Boolean {
         return false
     }
 }
 
 private class SkillContextImpl : SkillContext {
-    private val storage: MutableMap<SkillContextKey<*>, Any> = HashMap()
+    private val storage: MutableMap<SkillContextKey<*>, Any> by WatchedMap(HashMap())
 
     override fun <T : Any> set(key: SkillContextKey<T>, value: T) {
         when (key) {
@@ -69,18 +77,22 @@ private class SkillContextImpl : SkillContext {
                 caster = value as Caster.CompositeNode
                 return
             }
+
             SkillContextKey.TARGET -> {
                 target = value as Target
                 return
             }
+
             SkillContextKey.NEKO_STACK -> {
                 nekoStack = value as NekoStack
                 return
             }
+
             SkillContextKey.ITEM_STACK -> {
                 itemStack = value as ItemStack
                 return
             }
+
             SkillContextKey.MOCHA_ENGINE -> {
                 mochaEngine = value as MochaEngine<*>
                 return
@@ -116,6 +128,11 @@ private class SkillContextImpl : SkillContext {
         set(value) {
             value ?: return
             storage[SkillContextKey.CASTER] = value
+            val casterPlayer = caster?.value<Caster.Single.Player>() ?: return
+            val bukkitPlayer = casterPlayer.bukkitPlayer
+            if (bukkitPlayer?.isConnected == false)
+                throw IllegalStateException("Player ${bukkitPlayer.name} is not connected")
+            bukkitPlayer?.toUser()?.let { storage[SkillContextKey.USER] = it }
         }
 
     var target: Target?

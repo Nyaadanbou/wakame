@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.skill.state
 
 import cc.mewcraft.wakame.item.takeIfNekoStack
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
@@ -11,19 +11,23 @@ import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.RingBuffer
+import cc.mewcraft.wakame.util.toSimpleString
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import me.lucko.helper.Events
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.stream.Stream
 
 /**
  * 代表了一个玩家技能状态的信息.
  */
-sealed interface SkillStateInfo {
+sealed interface SkillStateInfo : Examinable /* TODO: 实现Examinable */{
     /**
      * 当前状态的类型.
      */
@@ -91,12 +95,16 @@ sealed class AbstractSkillStateInfo(
     }
 
     private fun registerTriggerEvents() {
+        // FIXME: 检查可能出现的对象残留问题.
+        // TODO: 写一层抽象, 用于自动注销某一实体的所注册的所有订阅.
+        //  基本的架构是: 当关于实体的 x 事件发生时, 它下面所注册的所有订阅都会被注销.
         Events.subscribe(PlayerJumpEvent::class.java)
             .filter { it.player == state.user.player }
+            .expireIf { state.info != this }
             .handler { event ->
                 val user = event.player.toUser()
                 val itemStack = user.player.inventory.itemInMainHand.takeIfNekoStack()
-                val nekoStack = itemStack?.tryNekoStack
+                val nekoStack = itemStack?.toNekoStack
                 val result = user.skillState.addTrigger(SingleTrigger.JUMP, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
                 checkResult(result, event)
             }
@@ -104,20 +112,22 @@ sealed class AbstractSkillStateInfo(
         Events.subscribe(PlayerMoveEvent::class.java)
             .filter { it.player == state.user.player }
             .filter { it.from.blockX != it.to.blockX || it.from.blockY != it.to.blockY || it.from.blockZ != it.to.blockZ }
+            .expireIf { state.info != this }
             .handler { event ->
                 val user = event.player.toUser()
                 val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
-                val nekoStack = itemStack?.tryNekoStack
+                val nekoStack = itemStack?.toNekoStack
                 val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
                 checkResult(result, event)
             }
 
         Events.subscribe(PlayerToggleSneakEvent::class.java)
             .filter { it.player == state.user.player }
+            .expireIf { state.info != this }
             .handler { event ->
                 val user = event.player.toUser()
                 val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
-                val nekoStack = itemStack?.tryNekoStack
+                val nekoStack = itemStack?.toNekoStack
                 val result = user.skillState.addTrigger(SingleTrigger.SNEAK, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
                 checkResult(result, event)
             }
@@ -127,6 +137,14 @@ sealed class AbstractSkillStateInfo(
         if (result == SkillStateResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return super.examinableProperties()
+    }
+
+    override fun toString(): String {
+        return toSimpleString()
     }
 }
 
@@ -241,7 +259,6 @@ class CastPointStateInfo(
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
-        // FIXME: 在需要的时候再监听事件操作
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }

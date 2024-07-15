@@ -16,7 +16,7 @@ internal class SkillCastManagerImpl : SkillCastManager {
             context.contains(SkillContextKey.CASTER) -> {
                 event = PlayerSkillPrepareCastEvent(
                     skill = skill, 
-                    caster = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()!!.bukkitPlayer,
+                    caster = requireNotNull(context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()!!.bukkitPlayer) { "Caster is not a player" },
                     target = context[SkillContextKey.TARGET],
                     item = context[SkillContextKey.ITEM_STACK],
                 )

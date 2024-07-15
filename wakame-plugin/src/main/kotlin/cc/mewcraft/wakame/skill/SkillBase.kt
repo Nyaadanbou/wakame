@@ -24,7 +24,7 @@ abstract class SkillBase(
         val interruptTriggers: Provider<TriggerConditions> = config.optionalEntry<TriggerConditions>("interrupt_triggers").orElse(TriggerConditions.empty())
     }
 
-    protected object CasterUtil {
+    object CasterUtil {
         fun <T : Caster.Single> getCaster(clazz: Class<T>, context: SkillContext): T? {
             val caster = context[SkillContextKey.CASTER]
             return caster?.value(clazz)
@@ -36,7 +36,7 @@ abstract class SkillBase(
         }
     }
 
-    protected object TargetUtil {
+    object TargetUtil {
         fun getEntity(context: SkillContext, ignoreCaster: Boolean = false): Target.LivingEntity? {
             return when (val target = context[SkillContextKey.TARGET]) {
                 is Target.LivingEntity -> {
@@ -58,7 +58,7 @@ abstract class SkillBase(
                 is Target.Location -> target
                 is Target.LivingEntity -> {
                     val caster = CasterUtil.getCaster<Caster.Single.Entity>(context)?.bukkitEntity
-                    val targetEntity = target.bukkitEntity
+                    val targetEntity = target.bukkitEntity ?: return null
                     if (caster != null && caster == targetEntity && ignoreCaster) null else TargetAdapter.adapt(targetEntity.location)
                 }
                 else -> null

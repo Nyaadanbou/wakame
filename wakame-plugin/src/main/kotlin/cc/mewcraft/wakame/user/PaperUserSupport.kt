@@ -40,7 +40,7 @@ class PaperUser(
     override val attributeMap: AttributeMap = PlayerAttributeMap(this)
     override val skillMap: SkillMap = PlayerSkillMap(this)
     override val resourceMap: ResourceMap = PlayerResourceMap(this)
-    override val skillState: SkillState = PlayerSkillState(this)
+    override val skillState: SkillState<Player> = PlayerSkillState(this)
 
     private val levelProvider: PlayerLevelProvider by inject()
 }
@@ -82,6 +82,8 @@ class PaperUserManager : KoinComponent, Listener, UserManager<Player> {
     @EventHandler
     private fun onQuit(e: PlayerQuitEvent) {
         // cleanup user data for the player
+        val user = getPlayer(e.player)
+        user.skillMap.clear()
         userRepository.invalidate(e.player)
     }
 

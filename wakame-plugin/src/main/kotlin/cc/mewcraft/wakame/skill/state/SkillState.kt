@@ -2,14 +2,19 @@ package cc.mewcraft.wakame.skill.state
 
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
+import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
 import me.lucko.helper.cooldown.Cooldown
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import java.util.*
 
 /**
  * 技能状态
  */
-interface SkillState {
+sealed interface SkillState<U> {
+    val user: User<U>
+
     /**
      * 技能状态信息
      */
@@ -36,15 +41,23 @@ interface SkillState {
     fun clear()
 }
 
+fun PlayerSkillState(user: User<Player>): PlayerSkillState {
+    return PlayerSkillState(user.uniqueId)
+}
+
 class PlayerSkillState(
-    val user: User<Player>
-) : SkillState {
+    private val uniqueId: UUID
+) : SkillState<Player> {
     companion object {
         private val COOLDOWN_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
     }
 
     private val cooldown: Cooldown = Cooldown.ofTicks(2)
+
+    override val user: User<Player>
+        get() = PlayerAdapters.get<Player>().adapt(uniqueId)
+
     override var info: SkillStateInfo = IdleStateInfo(this)
         private set
 

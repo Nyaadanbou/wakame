@@ -2,10 +2,15 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.util.toSimpleString
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import java.lang.ref.WeakReference
 import java.util.Collections
 import java.util.WeakHashMap
+import java.util.stream.Stream
 import org.bukkit.entity.Entity as BukkitEntity
 import org.bukkit.entity.Player as BukkitPlayer
 
@@ -19,14 +24,14 @@ sealed interface Caster {
          * 代表一个生物施法者, 不包括玩家.
          */
         interface Entity : Single {
-            val bukkitEntity: BukkitEntity
+            val bukkitEntity: BukkitEntity?
         }
 
         /**
          * 代表一个玩家施法者.
          */
         interface Player : Entity {
-            val bukkitPlayer: BukkitPlayer
+            val bukkitPlayer: BukkitPlayer?
         }
 
         /**
@@ -113,18 +118,53 @@ object CasterAdapter {
 
 /* Implementations */
 
-private data class PlayerCaster(
-    override val bukkitPlayer: BukkitPlayer
-) : Caster.Single.Player {
-    override val bukkitEntity: Entity
+private class PlayerCaster(
+    bukkitPlayer: BukkitPlayer
+) : Caster.Single.Player, Examinable {
+
+    init {
+        require(bukkitPlayer.isConnected) { "Player should be connected." }
+    }
+
+    private val weakBukkitPlayer: WeakReference<BukkitPlayer> = WeakReference(bukkitPlayer)
+
+    override val bukkitPlayer: Player?
+        get() = weakBukkitPlayer.get()
+
+    override val bukkitEntity: Entity?
         get() = bukkitPlayer
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(
+            ExaminableProperty.of("bukkitPlayer", bukkitPlayer)
+        )
+    }
+
+    override fun toString(): String {
+        return toSimpleString()
+    }
 }
 
-private data class EntityCaster(
-    override val bukkitEntity: BukkitEntity
-) : Caster.Single.Entity {
+private class EntityCaster(
+    bukkitEntity: BukkitEntity
+) : Caster.Single.Entity, Examinable {
     init {
         require(bukkitEntity !is BukkitPlayer) { "EntityCaster should not be a player." }
+    }
+
+    private val weakBukkitEntity: WeakReference<BukkitEntity> = WeakReference(bukkitEntity)
+
+    override val bukkitEntity: Entity?
+        get() = weakBukkitEntity.get()
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(
+            ExaminableProperty.of("bukkitEntity", bukkitEntity)
+        )
+    }
+
+    override fun toString(): String {
+        return toSimpleString()
     }
 }
 
@@ -135,7 +175,7 @@ private data class SkillCaster(
 private class CompositeNodeCaster(
     override var parent: Caster.CompositeNode?,
     private val value: Caster.Single
-) : Caster.CompositeNode {
+) : Caster.CompositeNode, Examinable {
     override var children: MutableSet<Caster.CompositeNode>? = null
 
     override fun addChild(child: Caster.CompositeNode) {
@@ -170,5 +210,17 @@ private class CompositeNodeCaster(
             current = current.parent as Caster.CompositeNode
         }
         return current.value(clazz)
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(
+            ExaminableProperty.of("parent", parent),
+            ExaminableProperty.of("children", children),
+            ExaminableProperty.of("value", value)
+        )
+    }
+
+    override fun toString(): String {
+        return toSimpleString()
     }
 }

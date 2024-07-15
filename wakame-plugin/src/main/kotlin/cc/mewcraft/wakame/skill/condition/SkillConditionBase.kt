@@ -37,7 +37,7 @@ abstract class SkillConditionBase(
         fun notifySuccess(context: SkillContext) {
             val caster = context[SkillContextKey.CASTER]?.value<Caster.Single.Entity>()
             if (caster != null) {
-                successMessage.send(caster.bukkitEntity)
+                caster.bukkitEntity?.let { successMessage.send(it) }
             }
         }
 
@@ -47,7 +47,7 @@ abstract class SkillConditionBase(
         fun notifyFailure(context: SkillContext) {
             val caster = context[SkillContextKey.CASTER]?.value<Caster.Single.Entity>()
             if (caster != null) {
-                failureMessage.send(caster.bukkitEntity)
+                caster.bukkitEntity?.let { failureMessage.send(it) }
             }
         }
     }

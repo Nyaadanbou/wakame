@@ -10,6 +10,8 @@ import java.util.UUID
 /**
  * Represents a player in wakame system.
  *
+ * 这个类**不能**被其他类持有, 只能通过 [UserManager] 或 [PlayerAdapters] 获取.
+ *
  * @param P the player type
  */
 interface User<P> {
@@ -52,5 +54,5 @@ interface User<P> {
     /**
      * Skill State Manager of the player.
      */
-    val skillState: SkillState
+    val skillState: SkillState<P>
 }

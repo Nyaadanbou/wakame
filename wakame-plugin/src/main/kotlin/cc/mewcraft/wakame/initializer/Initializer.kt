@@ -31,6 +31,7 @@ import cc.mewcraft.wakame.registry.PROJECTILE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.SKIN_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.skill.ProjectileSkillListener
 import cc.mewcraft.wakame.tick.TickerListener
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
@@ -136,6 +137,7 @@ object Initializer : KoinComponent, Listener {
     private fun registerListeners() = with(PLUGIN) {
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
+        registerTerminableListener(get<ProjectileSkillListener>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
         registerTerminableListener(get<SingleItemListener>()).bindWith(this)
         registerTerminableListener(get<DamageListener>()).bindWith(this)

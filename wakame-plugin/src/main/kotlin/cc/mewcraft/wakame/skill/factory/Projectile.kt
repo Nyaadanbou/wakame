@@ -8,8 +8,11 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.SkillBase.TargetUtil
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
+import cc.mewcraft.wakame.skill.factory.Projectile.Trigger
+import cc.mewcraft.wakame.skill.factory.Projectile.Type
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
@@ -17,13 +20,16 @@ import cc.mewcraft.wakame.tick.Tickable
 import cc.mewcraft.wakame.tick.Ticker
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import me.lucko.helper.Events
+import me.lucko.helper.event.Subscription
 import net.kyori.adventure.key.Key
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.player.PlayerPickupArrowEvent
 import org.bukkit.projectiles.ProjectileSource
-import org.bukkit.entity.Arrow as ArrowEntity
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.bukkit.entity.Arrow
 
 /**
  * 代表一个弹射物.
@@ -157,146 +163,157 @@ interface Projectile : Skill {
         override val effects: Map<Trigger, Skill> by effects
 
         override fun cast(context: SkillContext): SkillTick {
-            return Tick(context)
-        }
-
-        private inner class Tick(
-            context: SkillContext
-        ) : AbstractPlayerSkillTick(this@DefaultImpl, context) {
-
-            override fun tickCast(tickCount: Long): TickResult {
-                val target = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
-                val location = target.bukkitLocation
-                val projectile = when (type) {
-                    Type.ARROW -> Arrow(location)
-                }
-                if (!projectile.summon()) {
-                    return TickResult.INTERRUPT
-                }
-
-                Ticker.addTick(
-                    Tickable { tc ->
-                        if (tc >= duration) {
-                            projectile.remove()
-                            return@Tickable TickResult.ALL_DONE
-                        }
-                        TickResult.CONTINUE_TICK
-                    }
-                )
-
-                return TickResult.ALL_DONE
-            }
-
-
-            private inner class Arrow(
-                val summonLocation: Location
-            ) {
-                private var arrowEntity: ArrowEntity? = null
-
-                private val parent: Caster.CompositeNode?
-                    get() = context[SkillContextKey.CASTER]
-
-                fun summon(): Boolean {
-                    val shooter = parent?.value<Caster.Single.Entity>()?.bukkitEntity as? ProjectileSource
-
-                    arrowEntity = if (shooter != null) {
-                        shooter.launchProjectile(ArrowEntity::class.java, null) {
-                            it.setGravity(gravity)
-                            it.velocity = it.velocity.normalize().multiply(initialVelocity)
-                            it.pierceLevel = penetration
-                        }
-                    } else {
-                        val world = summonLocation.world
-                        world.spawnArrow(summonLocation, summonLocation.direction, initialVelocity, 0.0f)
-                            .also {
-                                it.setGravity(gravity)
-                                it.velocity = summonLocation.direction.normalize().multiply(initialVelocity)
-                                it.pierceLevel = penetration
-                            }
-                    }
-
-                    val newTickCaster = CasterAdapter.adapt(this@Tick)
-                    context[SkillContextKey.CASTER] = newTickCaster.toComposite(parent)
-                    val startSkillTick = effects[Trigger.START]?.cast(context)
-
-                    if (startSkillTick != null) {
-                        Ticker.addTick(startSkillTick)
-                    }
-
-                    // 注册事件监听器
-                    with(arrowEntity!!) {
-                        registerTickEvent(this)
-                        registerHitEntityEvent(this)
-                        registerHitBlockEvent(this)
-                        registerDisappearEvent(this)
-                    }
-                    return true
-                }
-
-                fun remove() {
-                    arrowEntity?.remove()
-                }
-
-                private fun registerTickEvent(arrow: ArrowEntity) {
-                    Events.subscribe(ServerTickStartEvent::class.java)
-                        .expireIf { arrow.isDead }
-                        .handler {
-                            val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
-                            val tickSkillTick = effects[Trigger.TICK]?.cast(newContext) ?: return@handler
-                            Ticker.addTick(tickSkillTick)
-                        }
-
-                    Events.subscribe(ServerTickStartEvent::class.java)
-                        .expireIf { arrow.isDead }
-                        .handler {
-                            if (arrow.location.distance(summonLocation) > maximumDistance) {
-                                val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
-                                val disappearSkillTick = effects[Trigger.DISAPPEAR]?.cast(newContext) ?: return@handler
-                                Ticker.addTick(disappearSkillTick)
-                                arrow.remove()
-                            }
-                        }
-                }
-
-                private fun registerHitEntityEvent(arrow: ArrowEntity) {
-                    Events.subscribe(ProjectileHitEvent::class.java)
-                        .expireIf { arrow.isDead }
-                        .handler {
-                            if (it.entity != arrow) return@handler
-                            val hitEntity = it.hitEntity ?: return@handler
-                            if (hitEntity is LivingEntity) {
-                                val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitEntity))
-                                val hitEntitySkillTick = effects[Trigger.HIT_ENTITY]?.cast(newContext) ?: return@handler
-                                Ticker.addTick(hitEntitySkillTick)
-                            }
-                        }
-                }
-
-                private fun registerHitBlockEvent(arrow: ArrowEntity) {
-                    Events.subscribe(ProjectileHitEvent::class.java)
-                        .expireIf { arrow.isDead }
-                        .handler {
-                            if (it.entity != arrow) return@handler
-                            val hitBlock = it.hitBlock
-                            if (hitBlock != null) {
-                                val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitBlock.location))
-                                val hitBlockSkillTick = effects[Trigger.HIT_BLOCK]?.cast(newContext) ?: return@handler
-                                Ticker.addTick(hitBlockSkillTick)
-                            }
-                        }
-                }
-
-                private fun registerDisappearEvent(arrow: ArrowEntity) {
-                    Events.subscribe(PlayerPickupArrowEvent::class.java)
-                        .expireIf { arrow.isDead }
-                        .handler {
-                            if (it.arrow != arrow) return@handler
-                            val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(it.player))
-                            val pickupSkillTick = effects[Trigger.PICK_UP]?.cast(newContext) ?: return@handler
-                            Ticker.addTick(pickupSkillTick)
-                        }
-                }
-            }
+            return ProjectileTick(context, this)
         }
     }
+}
+
+private class ProjectileTick(
+    context: SkillContext,
+    val projectile: Projectile
+) : AbstractPlayerSkillTick(projectile, context) {
+
+    override fun tickCast(tickCount: Long): TickResult {
+        val target = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
+        val location = target.bukkitLocation
+        val projectile = when (projectile.type) {
+            Type.ARROW -> ArrowWrapper(projectile, context, location, this)
+        }
+        if (!projectile.summon()) {
+            return TickResult.INTERRUPT
+        }
+
+        Ticker.addTick(
+            Tickable { tc ->
+                if (tc >= this@ProjectileTick.projectile.duration) {
+                    projectile.remove()
+                    return@Tickable TickResult.ALL_DONE
+                }
+                TickResult.CONTINUE_TICK
+            }
+        )
+
+        return TickResult.ALL_DONE
+    }
+}
+
+private class ArrowWrapper(
+    val projectile: Projectile,
+    val context: SkillContext,
+    val summonLocation: Location,
+    val tick: ProjectileTick
+) {
+    private var arrowEntity: Arrow? = null
+
+    private val parent: Caster.CompositeNode?
+        get() = context[SkillContextKey.CASTER]
+
+    fun summon(): Boolean {
+        val shooter = parent?.value<Caster.Single.Entity>()?.bukkitEntity as? ProjectileSource
+
+        arrowEntity = if (shooter != null) {
+            shooter.launchProjectile(Arrow::class.java, null) {
+                it.setGravity(projectile.gravity)
+                it.velocity = it.velocity.normalize().multiply(projectile.initialVelocity)
+                it.pierceLevel = projectile.penetration
+            }
+        } else {
+            val world = summonLocation.world
+            world.spawnArrow(summonLocation, summonLocation.direction, projectile.initialVelocity, 0.0f)
+                .also {
+                    it.setGravity(projectile.gravity)
+                    it.velocity = summonLocation.direction.normalize().multiply(projectile.initialVelocity)
+                    it.pierceLevel = projectile.penetration
+                }
+        }
+
+        val newTickCaster = CasterAdapter.adapt(tick)
+        context[SkillContextKey.CASTER] = newTickCaster.toComposite(parent)
+        val startSkillTick = projectile.effects[Trigger.START]?.cast(context)
+
+        if (startSkillTick != null) {
+            Ticker.addTick(startSkillTick)
+        }
+
+        // 注册事件监听器
+        with(arrowEntity!!) {
+            registerTickEvent(this)
+            registerHitEntityEvent(this)
+            registerHitBlockEvent(this)
+            registerDisappearEvent(this)
+        }
+        return true
+    }
+
+    fun remove() {
+        arrowEntity?.remove()
+    }
+
+    private fun registerTickEvent(arrow: Arrow) {
+        Events.subscribe(ServerTickStartEvent::class.java)
+            .handler {
+                val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
+                val tickSkillTick = projectile.effects[Trigger.TICK]?.cast(newContext) ?: return@handler
+                Ticker.addTick(tickSkillTick)
+            }
+            .unregisterIfRemoved()
+
+        Events.subscribe(ServerTickStartEvent::class.java)
+            .handler {
+                if (arrow.location.distance(summonLocation) > projectile.maximumDistance) {
+                    val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
+                    val disappearSkillTick = projectile.effects[Trigger.DISAPPEAR]?.cast(newContext) ?: return@handler
+                    Ticker.addTick(disappearSkillTick)
+                    arrow.remove()
+                }
+            }
+            .unregisterIfRemoved()
+    }
+
+    private fun registerHitEntityEvent(arrow: Arrow) {
+        Events.subscribe(ProjectileHitEvent::class.java)
+            .handler {
+                if (it.entity != arrow) return@handler
+                val hitEntity = it.hitEntity ?: return@handler
+                if (hitEntity is LivingEntity) {
+                    val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitEntity))
+                    val hitEntitySkillTick = projectile.effects[Trigger.HIT_ENTITY]?.cast(newContext) ?: return@handler
+                    Ticker.addTick(hitEntitySkillTick)
+                }
+            }
+            .unregisterIfRemoved()
+    }
+
+    private fun registerHitBlockEvent(arrow: Arrow) {
+        Events.subscribe(ProjectileHitEvent::class.java)
+            .handler {
+                if (it.entity != arrow) return@handler
+                val hitBlock = it.hitBlock
+                if (hitBlock != null) {
+                    val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitBlock.location))
+                    val hitBlockSkillTick = projectile.effects[Trigger.HIT_BLOCK]?.cast(newContext) ?: return@handler
+                    Ticker.addTick(hitBlockSkillTick)
+                }
+            }
+            .unregisterIfRemoved()
+    }
+
+    private fun registerDisappearEvent(arrow: Arrow) {
+        Events.subscribe(PlayerPickupArrowEvent::class.java)
+            .handler {
+                if (it.arrow != arrow) return@handler
+                val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(it.player))
+                val pickupSkillTick = projectile.effects[Trigger.PICK_UP]?.cast(newContext) ?: return@handler
+                Ticker.addTick(pickupSkillTick)
+            }
+            .unregisterIfRemoved()
+    }
+
+    private fun Subscription.unregisterIfRemoved() {
+        ProjectileSupport.listener.addSubscription(arrowEntity!!.uniqueId, this)
+    }
+}
+
+private object ProjectileSupport : KoinComponent {
+    val listener: ProjectileSkillListener by inject()
 }

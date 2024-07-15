@@ -1,10 +1,9 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.user.User
-import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.LivingEntity as BukkitLivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.Location as BukkitLocation
-import org.bukkit.entity.LivingEntity as BukkitLivingEntity
 
 sealed interface Target {
     data object Void : Target {
@@ -17,7 +16,7 @@ sealed interface Target {
     }
 
     interface LivingEntity : Target {
-        val bukkitEntity: BukkitLivingEntity
+        val bukkitEntity: BukkitLivingEntity?
     }
 
     fun <T : Target> value(clazz: Class<T>): T?
@@ -32,7 +31,7 @@ object TargetAdapter {
         return BukkitLivingEntityTarget(user.player)
     }
 
-    fun adapt(entity: LivingEntity): Target.LivingEntity {
+    fun adapt(entity: BukkitLivingEntity): Target.LivingEntity {
         return BukkitLivingEntityTarget(entity)
     }
 

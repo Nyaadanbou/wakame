@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.tick.Ticker
+import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
 import com.google.common.collect.Multimap
 import com.google.common.collect.MultimapBuilder
@@ -65,6 +66,13 @@ interface SkillMap {
     fun hasTrigger(clazz: Class<out Trigger>): Boolean
 
     /**
+     * Clears all skills in the skill map.
+     *
+     * 他会停止所有技能的持续效果.
+     */
+    fun clear()
+
+    /**
      * Returns a collection of [Skill] instances that are triggered by the given [Trigger].
      */
     operator fun get(uniqueId: UUID, trigger: Trigger): Collection<Skill> = getSkill(trigger)
@@ -74,6 +82,10 @@ inline fun <reified T : Trigger> SkillMap.hasTrigger(): Boolean {
     return hasTrigger(T::class.java)
 }
 
+fun PlayerSkillMap(user: User<Player>): PlayerSkillMap {
+    return PlayerSkillMap(user.uniqueId)
+}
+
 /**
  * This object keeps track of all activated skills owned by a player.
  *
@@ -81,7 +93,7 @@ inline fun <reified T : Trigger> SkillMap.hasTrigger(): Boolean {
  * then check whether the input has triggered a skill or not.
  */
 class PlayerSkillMap(
-    private val user: User<Player>
+    private val uniqueId: UUID
 ) : SkillMap {
     private val skills: Multimap<Trigger, Key> = MultimapBuilder
         .hashKeys(8)
@@ -140,11 +152,18 @@ class PlayerSkillMap(
         return skills.keys().any { clazz.isInstance(it) }
     }
 
+    override fun clear() {
+        skills.clear()
+        skill2Ticks.values.forEach { Ticker.stopTick(it) }
+        skill2Ticks.clear()
+    }
+
     private fun getSkillByKey(key: Key): Skill {
         return SkillRegistry.INSTANCES[key]
     }
 
     private fun registerSkillTick(skill: Skill) {
+        val user = PlayerAdapters.get<Player>().adapt(uniqueId)
         if (skill is PassiveSkill) {
             val tickable = skill.cast(SkillContext(CasterAdapter.adapt(user)))
             skill2Ticks[skill.key] = Ticker.addTick(tickable)
