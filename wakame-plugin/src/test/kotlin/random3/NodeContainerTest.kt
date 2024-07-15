@@ -1,4 +1,4 @@
-package random2
+package random3
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
