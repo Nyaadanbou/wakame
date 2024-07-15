@@ -1,5 +1,7 @@
 package random3
 
+import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.SharedStorage
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -231,6 +233,7 @@ class NodeContainerTest {
                 composite("global:layer3")
             }
             addEntry("layer1") {
+                local("foo:layer1", "Layer 1 Value")
                 composite("global:layer2")
             }
         }
@@ -240,7 +243,39 @@ class NodeContainerTest {
         }
 
         val values = nodeContainer.values()
-        assertEquals(listOf("Layer 4 Value"), values)
+        assertEquals(listOf("Layer 1 Value", "Layer 4 Value"), values)
+    }
+
+    /**
+     * 测试循环引用是否会抛异常.
+     *
+     * 需要注意虽然循环引用不会抛异常, 但如果多个引用指向了同一个 LocalNode,
+     * 那么最终 NodeContainer 中将包含重复的 LocalNode. 具体包含几个取决于
+     * 有几个引用指向了这个 LocalNode.
+     */
+    @Test
+    fun `should not throw exception when resolving circular references`() {
+        val sharedStorage = SharedStorage {
+            addEntry("layer1") {
+                local("foo:layer1", "Layer 1 Value")
+                composite("global:layer2")
+            }
+            addEntry("layer2") {
+                composite("global:layer3")
+            }
+            addEntry("layer3") {
+                composite("global:layer1")
+            }
+        }
+
+        val nodeContainer = NodeContainer(sharedStorage) {
+            composite("global:layer1")
+            composite("global:layer2")
+            composite("global:layer3")
+        }
+
+        val values = nodeContainer.values()
+        assertEquals(listOf("Layer 1 Value", "Layer 1 Value", "Layer 1 Value"), values)
     }
 
 }
