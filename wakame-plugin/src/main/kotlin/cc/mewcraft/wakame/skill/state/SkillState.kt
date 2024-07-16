@@ -6,6 +6,8 @@ import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
 import me.lucko.helper.cooldown.Cooldown
+import me.lucko.helper.text3.mini
+import net.kyori.adventure.text.event.HoverEvent
 import org.bukkit.entity.Player
 import java.util.UUID
 
@@ -85,7 +87,7 @@ class PlayerSkillState(
 
     fun setInfo(skillStateInfo: SkillStateInfo) {
         PlayerSkillStateChangeEvent(user.player, info, skillStateInfo).callEvent()
-        user.player.sendPlainMessage("技能状态变更: $info -> $skillStateInfo")
+        user.player.sendMessage("技能状态已切换为 ${skillStateInfo.javaClass.simpleName}".mini.hoverEvent(HoverEvent.showText("技能状态变更: $info -> $skillStateInfo".mini)))
         this.info = skillStateInfo
     }
 }

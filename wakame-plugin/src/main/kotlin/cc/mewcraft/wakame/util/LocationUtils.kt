@@ -24,7 +24,7 @@ fun Location.getFirstBlockBelow(): Block? {
     var currentY = blockY
     while (currentY >= world.minHeight) {
         val block = world.getBlockAt(blockX, currentY, blockZ)
-        if (block.type != Material.AIR) {
+        if (block.type != Material.AIR || !block.isReplaceable) {
             return block
         }
         currentY--
