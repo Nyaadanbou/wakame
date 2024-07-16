@@ -2,4 +2,7 @@ type: teleport
 
 teleportation:
   type: random
-  distance: 5.0
+  # 随机传送的最小距离
+  min_distance: 10
+  # 随机传送的最大距离
+  max_distance: 20

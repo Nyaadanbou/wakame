@@ -1,17 +1,17 @@
 package cc.mewcraft.wakame.tick
 
 import cc.mewcraft.wakame.WakamePlugin
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.scheduler.BukkitScheduler
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
 
+
 internal class BukkitTicker(
     private val plugin: WakamePlugin
 ) : Ticker {
-    private val scheduler: BukkitScheduler
-        get() = plugin.server.scheduler
+    private val tasks: MutableMap<Int, TickRunnable> = Int2ObjectOpenHashMap()
 
     override fun addTick(tickable: AlwaysTickable): Int {
         return addTick(tickable as Tickable)
@@ -20,11 +20,13 @@ internal class BukkitTicker(
     override fun addTick(skillTick: Tickable): Int {
         val runnable = TickRunnable(skillTick)
         val taskId = runnable.runTaskTimer(plugin, 0, 1).taskId
+        tasks[taskId] = runnable
         return taskId
     }
 
     override fun stopTick(taskId: Int) {
-        scheduler.cancelTask(taskId)
+        val runnable = tasks.remove(taskId)
+        runnable?.cancel()
     }
 }
 
