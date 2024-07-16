@@ -4,30 +4,30 @@ kizamiz:
   pool_a:
     sample: 2
     filters:
-      - type: rarity
+      - type: item:rarity
         rarity: rare
     entries:
-      - value: netherite
+      - type: kizami:netherite
         weight: 2
-      - value: luminite
+      - type: kizami:luminite
         weight: 1
   pool_b:
     sample: 2
     filters:
-      - type: rarity
+      - type: item:rarity
         rarity: uncommon
     entries:
-      - value: gold
+      - type: kizami:gold
         weight: 3
-      - value: diamond
+      - type: kizami:diamond
         weight: 2
   pool_c:
     sample: 2
     filters:
-      - type: rarity
+      - type: item:rarity
         rarity: common
     entries:
-      - value: wood
+      - type: kizami:wood
         weight: 5
-      - value: iron
+      - type: kizami:iron
         weight: 4

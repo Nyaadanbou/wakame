@@ -35,7 +35,7 @@ cells:
         selects:
           skill:
             entries:
-              - key: skill:ranged/projectile_demo
+              - type: skill:ranged/projectile_demo
                 trigger: trigger:combo/111
                 weight: 5
         default: [ ]

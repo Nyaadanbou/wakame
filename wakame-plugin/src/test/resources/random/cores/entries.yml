@@ -1,30 +1,48 @@
 entries:
 
   rate:
-    - key: attribute:attack_damage_rate
+    - type: attribute:attack_damage_rate
       element: neutral
       value: 0.0
       weight: 1
 
   speed:
-    - key: attribute:attack_speed_level
+    - type: attribute:attack_speed_level
       value: 0
       weight: 1
 
   strike:
-    - key: attribute:critical_strike_chance
+    - type: attribute:critical_strike_chance
       value: 0.0
       weight: 1
-    - key: attribute:critical_strike_power
+    - type: attribute:critical_strike_power
       value: 1.0
       weight: 1
 
   skills:
-    - key: skill:melee/demo
+    - type: skill:melee/demo
       trigger: trigger:generic/attack
       variant: 0
       weight: 1
-    - key: skill:ranged/demo
+    - type: skill:ranged/demo
       trigger: trigger:generic/attack
       variant: 0
+      weight: 1
+
+  # 这个 entry 引用了 `strike`,
+  # 因此它拥有 `strike` 包含的所有节点;
+  # 除此之外它还定义了一个 LocalNode.
+  #
+  # 因此最终, 它拥有 `strike` 中的所有节点:
+  # - attribute:critical_strike_chance
+  # - attribute:critical_strike_power
+  #
+  # 以及本地定义的节点:
+  # - attribute:attack_effect_chance
+  reference:
+    # 这是一个 CompositeNode, 引用了 strike
+    - type: global:strike
+    # 这是一个 LocalNode, 直接储存自身的值
+    - type: attribute:attack_effect_chance
+      value: 0.01
       weight: 1

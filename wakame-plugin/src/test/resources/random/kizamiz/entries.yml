@@ -1,25 +1,25 @@
 entries:
 
   apprentice:
-    - value: wood
+    - type: kizami:wood
       weight: 3
-    - value: iron
+    - type: kizami:iron
       weight: 2
-    - value: gold
+    - type: kizami:gold
       weight: 1
 
   journeyman:
-    - value: iron
+    - type: kizami:iron
       weight: 3
-    - value: gold
+    - type: kizami:gold
       weight: 2
-    - value: diamond
+    - type: kizami:diamond
       weight: 1
 
   master:
-    - value: gold
+    - type: kizami:gold
       weight: 3
-    - value: diamond
+    - type: kizami:diamond
       weight: 2
-    - value: netherite
+    - type: kizami:netherite
       weight: 1

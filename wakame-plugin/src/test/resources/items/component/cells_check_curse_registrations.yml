@@ -11,22 +11,22 @@ cells:
     core_groups:
       trivial:
         pool_1:
-          - key: generic:empty
+          - type: generic:empty
             weight: 999
     curse_groups:
       all_possible_curses:
         empty:
           # 空诅咒
-          - key: generic:empty
+          - type: generic:empty
             weight: 1
         all_cores:
           # 实体击杀
-          - key: curse:entity_kills
+          - type: curse:entity_kills
             index: demo_creeps_1
             count: 5
             weight: 1
           # 最高伤害
-          - key: curse:peak_damage
+          - type: curse:peak_damage
             element: neutral
             amount: 114
             weight: 1
