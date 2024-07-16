@@ -41,24 +41,25 @@ private class LightningTick(
     override val interruptTriggers: Provider<TriggerConditions>,
     override val forbiddenTriggers: Provider<TriggerConditions>
 ) : AbstractPlayerSkillTick<Lightning>(skill, context) {
-    private val target: Location?
+    private val entityLocationTarget: Location?
         get() = TargetUtil.getLocation(context, true)?.bukkitLocation
-            ?: CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.location?.getTargetLocation(16)?.getFirstBlockBelow()?.location
+    private val locationTarget: Location? = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.location?.getTargetLocation(16)?.getFirstBlockBelow()?.location
 
     override fun tickCastPoint(tickCount: Long): TickResult {
-        target ?: return TickResult.INTERRUPT
+        val target = entityLocationTarget ?: locationTarget ?: return TickResult.INTERRUPT
         if (tickCount >= 50) {
             return TickResult.ALL_DONE
         }
-        generateBlueSmoke(target!!)
+        generateBlueSmoke(target)
 
         return TickResult.CONTINUE_TICK
     }
 
     override fun tickCast(tickCount: Long): TickResult {
-        val world = target!!.world
-        val lightning = world.strikeLightningEffect(target!!)
-        val entitiesBeStruck = world.getNearbyEntities(target!!, 3.0, 3.0, 3.0)
+        val target = entityLocationTarget ?: locationTarget ?: return TickResult.INTERRUPT
+        val world = target.world
+        val lightning = world.strikeLightningEffect(target)
+        val entitiesBeStruck = world.getNearbyEntities(target, 3.0, 3.0, 3.0)
         for (entity in entitiesBeStruck) {
             if (entity is LivingEntity) {
                 entity.damage(10.0, lightning)
@@ -74,7 +75,7 @@ private class LightningTick(
             .extra(0.5)
             .location(location)
             .allPlayers()
-            .color(0, 0, 255)
+            .color(0, 127, 255)
             .spawn()
     }
 }

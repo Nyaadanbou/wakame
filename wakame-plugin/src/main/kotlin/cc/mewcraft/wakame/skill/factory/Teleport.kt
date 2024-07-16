@@ -29,7 +29,11 @@ interface Teleport : Skill {
 
     sealed interface Type {
         data class FIXED(val position: Position) : Type
-        data class RANDOM(val distance: Double) : Type
+        data class RANDOM(
+            val minDistance: Int,
+            val maxDistance: Int,
+        ) : Type
+
         data object TARGET : Type
     }
 
@@ -86,12 +90,7 @@ private class TeleportTick(
             }
 
             is Type.RANDOM -> {
-                val random = location.clone().add(
-                    (Math.random() - 0.5) * type.distance,
-                    0.0,
-                    (Math.random() - 0.5) * type.distance
-                )
-                caster.bukkitEntity?.teleport(random)
+                caster.bukkitEntity?.sendPlainMessage("随机传送, 最小距离: ${type.minDistance}, 最大距离: ${type.maxDistance}")
             }
 
             is Type.TARGET -> {
@@ -124,7 +123,10 @@ internal object TeleportTypeSerializer : SchemaSerializer<Type> {
             }
 
             "random" -> {
-                Type.RANDOM(node.node("distance").krequire<Double>())
+                Type.RANDOM(
+                    node.node("min_distance").krequire<Int>(),
+                    node.node("max_distance").krequire<Int>()
+                )
             }
 
             else -> {
