@@ -14,7 +14,8 @@ sealed interface Node<T> {
 }
 
 data class LocalNode<T>(
-    override val key: Key, val value: T,
+    override val key: Key,
+    val value: T,
 ) : Node<T>
 
 @NodeDsl
@@ -22,8 +23,8 @@ data class CompositeNode<T>(
     override val key: Key,
     private val nodes: MutableList<Node<T>>,
 ) : Node<T> {
-    fun addNode(init: Builder<T>.() -> Unit): CompositeNode<T> {
-        val builder = Builder<T>().apply(init)
+    fun addNode(init: NodeBuilder<T>.() -> Unit): CompositeNode<T> {
+        val builder = NodeBuilder<T>().apply(init)
         nodes.addAll(builder.nodes)
         return this
     }
@@ -33,14 +34,17 @@ data class CompositeNode<T>(
     }
 
     @NodeDsl
-    class Builder<T> {
+    class NodeBuilder<T> {
         val nodes = mutableListOf<Node<T>>()
 
         fun local(key: Key, value: T) {
             nodes.add(LocalNode(key, value))
         }
 
-        fun composite(key: Key, init: Builder<T>.() -> Unit = {}) {
+        fun composite(key: Key, init: NodeBuilder<T>.() -> Unit = {}) {
+            require(key.namespace() == SharedStorage.NAMESPACE_GLOBAL) {
+                "CompositeNode key must be in the 'global' namespace"
+            }
             val node = CompositeNode<T>(key, mutableListOf())
             node.addNode(init)
             nodes.add(node)
@@ -51,7 +55,7 @@ data class CompositeNode<T>(
 @NodeDsl
 fun <T> NodeContainer(
     shared: SharedStorage<T>,
-    block: CompositeNode.Builder<T>.() -> Unit = {},
+    block: CompositeNode.NodeBuilder<T>.() -> Unit = {},
 ): NodeContainer<T> {
     return NodeContainerImpl(shared).apply { set(block) }
 }
@@ -67,14 +71,14 @@ interface NodeContainer<T> : Iterable<T> {
         }
     }
 
-    fun set(init: CompositeNode.Builder<T>.() -> Unit)
-    fun add(init: CompositeNode.Builder<T>.() -> Unit)
+    fun set(init: CompositeNode.NodeBuilder<T>.() -> Unit)
+    fun add(init: CompositeNode.NodeBuilder<T>.() -> Unit)
     fun values(): List<T>
 }
 
 private object NodeContainerEmpty : NodeContainer<Nothing> {
-    override fun set(init: CompositeNode.Builder<Nothing>.() -> Unit) = Unit
-    override fun add(init: CompositeNode.Builder<Nothing>.() -> Unit) = Unit
+    override fun set(init: CompositeNode.NodeBuilder<Nothing>.() -> Unit) = Unit
+    override fun add(init: CompositeNode.NodeBuilder<Nothing>.() -> Unit) = Unit
     override fun values(): List<Nothing> = emptyList()
     override fun iterator(): Iterator<Nothing> = values().iterator()
 }
@@ -83,18 +87,18 @@ private object NodeContainerEmpty : NodeContainer<Nothing> {
 private class NodeContainerImpl<T>(
     private val shared: SharedStorage<T>,
 ) : NodeContainer<T> {
-    private var root: Node<T>? = null
+    private var root: CompositeNode<T>? = null
 
-    override fun set(init: CompositeNode.Builder<T>.() -> Unit) {
-        val builder = CompositeNode.Builder<T>().apply(init)
-        root = CompositeNode(Key.key("root"), builder.nodes)
+    override fun set(init: CompositeNode.NodeBuilder<T>.() -> Unit) {
+        val builder = CompositeNode.NodeBuilder<T>().apply(init)
+        root = CompositeNode(Key.key("internal", "root"), builder.nodes)
     }
 
-    override fun add(init: CompositeNode.Builder<T>.() -> Unit) {
-        val builder = CompositeNode.Builder<T>().apply(init)
+    override fun add(init: CompositeNode.NodeBuilder<T>.() -> Unit) {
+        val builder = CompositeNode.NodeBuilder<T>().apply(init)
         when (root) {
             null -> {
-                root = CompositeNode(Key.key("root"), builder.nodes)
+                root = CompositeNode(Key.key("internal", "root"), builder.nodes)
             }
 
             is CompositeNode -> {
@@ -186,6 +190,9 @@ interface SharedStorage<T> {
     fun addEntry(ref: String, init: EntryBuilder<T>.() -> Unit = {})
     fun getNodes(ref: String): List<Node<T>>
 
+    /**
+     * Entry 包含若干 Node.
+     */
     @NodeDsl
     interface EntryBuilder<T> {
         fun local(key: Key, value: T)
@@ -194,7 +201,7 @@ interface SharedStorage<T> {
 }
 
 object SharedStorageEmpty : SharedStorage<Nothing> {
-    override fun addEntry(key: String, init: EntryBuilder<Nothing>.() -> Unit) = Unit
+    override fun addEntry(ref: String, init: EntryBuilder<Nothing>.() -> Unit) = Unit
     override fun getNodes(ref: String): List<Node<Nothing>> = emptyList()
 }
 
@@ -249,7 +256,11 @@ private class SharedStorageImpl<T> : SharedStorage<T> {
         }
 
         override fun composite(key: Key, init: CompositeNode<T>.() -> Unit) {
-            val compositeNode = CompositeNode<T>(key, mutableListOf()).apply(init)
+            require(key.namespace() == SharedStorage.NAMESPACE_GLOBAL) {
+                "CompositeNode key must be in the 'global' namespace"
+            }
+            val compositeNode = CompositeNode<T>(key, mutableListOf())
+            compositeNode.apply(init)
             nodes.add(compositeNode)
         }
     }

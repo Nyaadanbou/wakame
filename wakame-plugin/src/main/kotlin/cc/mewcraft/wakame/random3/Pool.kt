@@ -280,7 +280,7 @@ abstract class PoolSerializer<S, C : SelectionContext> : SchemaSerializer<Pool<S
     /**
      * 假设节点持有一个 [Node<Filter<C>>][Node] 的列表.
      */
-    private fun ConfigurationNode.writeFiltersTo(builder: CompositeNode.Builder<Filter<C>>) {
+    private fun ConfigurationNode.writeFiltersTo(builder: CompositeNode.NodeBuilder<Filter<C>>) {
         // 如果是这个 ConfigurationNode 是 virtual(),
         // 那么 ConfigurationNode#childrenList() 就会是一个空列表.
         // 也就是说, filters 这个 ConfigurationNode 可以在配置文件中完全省略.
@@ -301,7 +301,7 @@ abstract class PoolSerializer<S, C : SelectionContext> : SchemaSerializer<Pool<S
     /**
      * 假设节点持有一个 [Node<Sample<S,C>>][Node] 的列表.
      */
-    private fun ConfigurationNode.writeSamplesTo(builder: CompositeNode.Builder<Sample<S, C>>) {
+    private fun ConfigurationNode.writeSamplesTo(builder: CompositeNode.NodeBuilder<Sample<S, C>>) {
         for (child in this.childrenList()) {
             val key = this.extractKey("key")
             if (key.namespace() == SharedStorage.NAMESPACE_GLOBAL) {
