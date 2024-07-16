@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.random3
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.typeTokenOf
-import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.contains
@@ -14,7 +13,7 @@ import java.util.Collections
 /**
  * [Group] 是一个包含了若干 [Pool] 的集合
  *
- * 同时, 该接口提供函数 [select], 让你从其中包含的所有 [pools][Pool]
+ * 同时, 该接口提供函数 [select], 让你从其中包含的所有 [Pool]
  * 中随机选择一个 [S]. 关于具体的选择过程, 见函数 [select] 的说明.
  *
  * @param S 样本所携带的实例
@@ -23,57 +22,52 @@ import java.util.Collections
 interface Group<S, C : SelectionContext> {
 
     /**
-     * 该 [group][Group] 包含的所有 [pools][Pool].
+     * 包含一些 [Group] 的构造方法.
+     */
+    companion object Factory {
+        fun <S, C : SelectionContext> empty(): Group<S, C> {
+            return GroupEmpty as Group<S, C>
+        }
+    }
+
+    /**
+     * 该 [Group] 包含的所有 [Pool].
+     *
+     * **实现上该 [Map] 的遍历顺序是固定的.**
      */
     val pools: Map<String, Pool<S, C>>
 
     /**
-     * 进入该 [group][Group] 需要满足的条件. 多个条件为 `AND` 关系.
+     * 进入该 [Group] 需要满足的全部条件.
      */
     val filters: NodeContainer<Filter<C>>
 
     /**
-     * The fallback [pool][Pool] when nothing is picked from [pools].
+     * The fallback [Pool] when nothing is picked from [pools].
      */
     val default: Pool<S, C>
 
     /**
-     * Randomly pick several [S's][S] with given [context].
+     * Randomly pick several [S] with given [context].
      *
      * Returns an empty list if:
-     * - [filters][filters] are not met, and
-     * - [fallback pool][default] returns a `null`.
+     * - the [filters] are not met, and
+     * - [default] returns a `null`.
      *
      * ## 随机抽取的步骤
-     * 1. 首先检查 `this` 的 [filters][filters]
+     * 1. 首先检查 `this` 的 [filters]
      *    * 如果条件满足, 则继续接下来的操作
      *    * 如果条件不满足, 则直接返回空列表
-     * 2. 按顺序从 `this` 的 [pools] 选择第一个满足条件的池, 然后调用 [Pool.pickBulk] 来选择最终的样本
-     *    * 如果 [pools][Pool] 中没有满足条件的, 将从 [fallback pool][default] 中选择一个结果
-     *    * 如果 [fallback pool][default] 也没有结果, 最终将返回空列表
+     * 2. 按顺序从 `this` 的 [pools] 选择第一个满足条件的池, 然后调用 [Pool.select] 来选择最终的样本
+     *    * 如果 [pools] 中没有满足条件的, 将从 [default] 中选择一个结果
+     *    * 如果 [default] 也没有结果, 最终将返回空列表
      */
     fun select(context: C): List<S>
-
-    companion object Factory {
-        fun <S, C : SelectionContext> empty(): Group<S, C> {
-            @Suppress("UNCHECKED_CAST")
-            return (GroupEmpty as Group<S, C>)
-        }
-
-        fun <S, C : SelectionContext> build(
-            filterSharedStorage: SharedStorage<Filter<C>>,
-            block: GroupBuilder<S, C>.() -> Unit,
-        ): Group<S, C> {
-            val builder = GroupBuilderImpl<S, C>(filterSharedStorage).apply(block)
-            val ret = GroupImpl(builder.pools, builder.filters, builder.default)
-            return ret
-        }
-    }
 }
 
 interface GroupBuilder<S, C : SelectionContext> {
     val pools: MutableMap<String, Pool<S, C>>
-    val filters: NodeContainer<Filter<C>> // TODO 应该设计一个 MutableNodeContainer. 原本的 NodeContainer 变成不可变的?
+    val filters: NodeContainer<Filter<C>>
     var default: Pool<S, C>
 }
 
@@ -103,105 +97,94 @@ interface GroupBuilder<S, C : SelectionContext> {
  *   <children map>
  * ```
  *
- * @param S the type of content
+ * @param V the type of content
  * @param C the type of context
  */
-abstract class GroupSerializer<S, C : SelectionContext> : SchemaSerializer<Group<S, C>> {
+abstract class GroupSerializer<V, C : SelectionContext> : SchemaSerializer<Group<V, C>> {
     companion object Constants {
         val HINT_NODE_SHARED_POOLS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_shared_pools", typeTokenOf<ConfigurationNode>())
-        private const val FILTERS_PATH = "filters"
-        private const val SELECTS_PATH = "selects"
-        private const val DEFAULT_PATH = "default"
+        private const val PATH_FILTERS = "filters"
+        private const val PATH_SELECTS = "selects"
+        private const val PATH_DEFAULT = "default"
     }
 
-    protected abstract val globalFilters: SharedStorage<Filter<C>>
+    protected abstract val filterNodeFacade: FilterNodeFacade<C>
+    protected abstract fun poolConstructor(node: ConfigurationNode): Pool<V, C>
+    protected abstract fun filterConstructor(node: ConfigurationNode): Filter<C>
 
-    protected abstract fun poolFactory(node: ConfigurationNode): Pool<S, C>
-    protected abstract fun filterFactory(node: ConfigurationNode): Filter<C>
+    final override fun deserialize(type: Type, node: ConfigurationNode): Group<V, C> {
+        when {
+            // Node structure 1:
+            // 这是一个纯粹的池映射, 没有过滤器, 也没有默认值
+            node.isMap && !node.contains(PATH_FILTERS) && !node.contains(PATH_SELECTS) && !node.contains(PATH_DEFAULT) -> {
+                val pools = decodeAsPoolMap(node, node)
+                val group = GroupImpl(
+                    pools = pools,
+                    filters = NodeContainer.empty(),
+                    default = Pool.empty()
+                )
+                return group
+            }
 
-    final override fun deserialize(type: Type, node: ConfigurationNode): Group<S, C> {
-        return Group.build(globalFilters) {
-            when {
-                // Node structure 1:
-                // it's a list, which means it only has pools (no filters, no default)
-                node.isMap && (!node.contains(FILTERS_PATH) && !node.contains(SELECTS_PATH) && !node.contains(DEFAULT_PATH)) -> {
-                    decodePools(node, node)
-                }
-
-                // Node structure 2:
-                // it's a map, which means it might have all components specified
-                node.isMap -> {
-
-                    node.node(FILTERS_PATH).takeUnless { it.virtual() }?.run node@{
-                        filters.add builder@{
-                            this@node.writeFiltersTo(this@builder)
-                        }
-                    }
-                    node.node(SELECTS_PATH).takeUnless { it.virtual() }?.run node@{
-                        decodePools(node, this@node)
-                    }
-                    node.node(DEFAULT_PATH).takeUnless { it.virtual() }?.run node@{
-                        poolFactory(this@node)
-                    }?.also {
-                        this.default = it
+            // Node structure 2:
+            // 这是一个完整的结构, 可能包含所有组件
+            node.isMap -> {
+                val pools = decodeAsPoolMap(node, node.node(PATH_SELECTS))
+                val filters = NodeContainer(filterNodeFacade.repository()) {
+                    for (listChild in node.node(PATH_FILTERS).childrenList()) {
+                        node(filterNodeFacade.reader().readNode(listChild))
                     }
                 }
-
-                // Unknown structure
-                else -> {
-                    // it's an unknown format
-
-                    throw SerializationException(node.path(), type, "Unsupported format")
+                val default = node.node(PATH_DEFAULT).let {
+                    if (it.virtual()) {
+                        Pool.empty()
+                    } else {
+                        poolConstructor(node.node(PATH_DEFAULT))
+                    }
                 }
+                val group = GroupImpl(
+                    pools = pools,
+                    filters = filters,
+                    default = default
+                )
+                return group
+            }
+
+            // Unknown structure
+            // 这是一个未知的格式
+            else -> {
+                throw SerializationException(node.path(), type, "Failed to deserialize ${type}. Check your config.")
             }
         }
-    }
-
-    private fun ConfigurationNode.extractKey(path: String): Key {
-        val string = this.node(path).string ?: throw SerializationException(this, javaTypeOf<String>(), "The key is not specified")
-        val key = runCatching { Key.key(string) }.getOrElse { throw SerializationException(this, javaTypeOf<Key>(), it) }
-        return key
     }
 
     /**
-     * 假设节点持有一个 [Node<Filter<C>>][Node] 的列表.
+     * ## [groupNode] structure
+     *
+     * ## [selectNode] structure
+     *
      */
-    private fun ConfigurationNode.writeFiltersTo(builder: CompositeNode.NodeBuilder<Filter<C>>) {
-        // 如果是这个 ConfigurationNode 是 virtual(),
-        // 那么 ConfigurationNode#childrenList() 就会是一个空列表.
-        // 也就是说, filters 这个 ConfigurationNode 可以在配置文件中完全省略.
-
-        for (child in this.childrenList()) {
-            val key = this.extractKey("type")
-            if (key.namespace() == SharedStorage.NAMESPACE_GLOBAL) {
-                // if `namespace` is "global", it's a `composite node`
-                builder.composite(key)
-                continue
-            }
-
-            // otherwise, it's a `local node`, we just create & put it
-            builder.local(key, filterFactory(child))
-        }
-    }
-
-    private fun GroupBuilder<S, C>.decodePools(groupNode: ConfigurationNode, selectNode: ConfigurationNode) {
+    private fun decodeAsPoolMap(groupNode: ConfigurationNode, selectNode: ConfigurationNode): Map<String, Pool<V, C>> {
+        val ret = mutableMapOf<String, Pool<V, C>>()
         selectNode.childrenMap()
             .mapKeys { it.key.toString() }
             .forEach { (poolName, localPoolNode) ->
                 val rawScalar = localPoolNode.rawScalar()
                 if (rawScalar != null) {
-                    // it's a raw string, meaning it's referencing a node in shared pools,
-                    // so we need to pass the external node to the factory function
+                    // 这是一个原始字符串,
+                    // 意味着它引用了共享池中的一个 config.Node,
+                    // 因此, 我们需要将外部的节点传递给工厂函数.
                     val sharedPoolsNode = groupNode.hint(HINT_NODE_SHARED_POOLS) ?: throw SerializationException(
-                        selectNode, javaTypeOf<Group<S, C>>(), "Can't find hint ${HINT_NODE_SHARED_POOLS.identifier()}"
+                        selectNode, javaTypeOf<Group<V, C>>(), "Can't find hint '${HINT_NODE_SHARED_POOLS.identifier()}'"
                     )
-                    val referentPoolNode = sharedPoolsNode.node(rawScalar)
-                    this.pools[poolName] = poolFactory(referentPoolNode)
+                    val externalPoolNode = sharedPoolsNode.node(rawScalar)
+                    ret.put(poolName, poolConstructor(externalPoolNode))
                 } else {
-                    // it's not a raw string - we just pass the local node
-                    this.pools[poolName] = poolFactory(localPoolNode)
+                    // 这不是一个原始字符串 - 我们只传递本地节点
+                    ret.put(poolName, poolConstructor(localPoolNode))
                 }
             }
+        return ret
     }
 }
 
@@ -221,12 +204,12 @@ private class GroupImpl<S, C : SelectionContext>(
     override val filters: NodeContainer<Filter<C>>,
     override val default: Pool<S, C>,
 ) : Group<S, C> {
-
     override fun select(context: C): List<S> {
-        val isAllFiltersTrue = filters.all {
+        val test = filters.all {
             it.test(context)
         }
-        if (!isAllFiltersTrue) {
+        if (!test) {
+            // 如果该 Group 本身的条件没有全部满足, 则直接返回空列表
             return emptyList()
         }
 
@@ -239,18 +222,10 @@ private class GroupImpl<S, C : SelectionContext>(
 
         if (pool != null) {
             // 我们找到了一个满足条件的 pool, 因此从这个 pool 中选择
-            return pool.pickBulk(context)
+            return pool.select(context)
         }
 
         // pools 中没有一个满足条件的, 因此从 fallback 中选择
-        return default.pickBulk(context)
+        return default.select(context)
     }
-}
-
-private class GroupBuilderImpl<S, C : SelectionContext>(
-    globalFilters: SharedStorage<Filter<C>>,
-) : GroupBuilder<S, C> {
-    override val pools: MutableMap<String, Pool<S, C>> = LinkedHashMap() // pool list 需要遵循配置文件里的顺序, 因此必须为 LinkedHashMap
-    override val filters: NodeContainer<Filter<C>> = NodeContainer(globalFilters)
-    override var default: Pool<S, C> = Pool.empty()
 }

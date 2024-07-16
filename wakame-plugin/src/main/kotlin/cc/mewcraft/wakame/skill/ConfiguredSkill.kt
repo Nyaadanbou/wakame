@@ -63,7 +63,7 @@ internal object ConfiguredSkillVariantSerializer : ScalarSerializer<TriggerVaria
 
 internal object ConfiguredSkillSerializer : SchemaSerializer<ConfiguredSkill> {
     override fun deserialize(type: Type, node: ConfigurationNode): ConfiguredSkill {
-        val key = node.node("key").krequire<Key>()
+        val key = node.node("type").krequire<Key>()
         val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
         val variantNode = node.node("variant")
         val variant = if (variantNode.isNull) TriggerVariant.any() else variantNode.krequire<TriggerVariant>()

@@ -22,19 +22,19 @@ kizami:
     # 铭刻的数值均为固定数值，不能写正态分布
     effects:
       1:
-        - key: attribute:movement_speed
+        - type: attribute:movement_speed
           operation: multiply_base
           value: 0.2
       2:
-        - key: attribute:movement_speed
+        - type: attribute:movement_speed
           operation: multiply_base
           value: 0.4
       3:
-        - key: attribute:movement_speed
+        - type: attribute:movement_speed
           operation: multiply_base
           value: 0.6
       4:
-        - key: attribute:movement_speed
+        - type: attribute:movement_speed
           operation: multiply_base
           value: 0.8
 
@@ -56,22 +56,22 @@ kizami:
     styles: ""
     effects:
       1:
-        - key: attribute:defense
+        - type: attribute:defense
           operation: add
           element: neutral
           value: 5
       2:
-        - key: attribute:defense
+        - type: attribute:defense
           operation: add
           element: neutral
           value: 10
       3:
-        - key: attribute:defense
+        - type: attribute:defense
           operation: add
           element: neutral
           value: 15
       4:
-        - key: attribute:defense
+        - type: attribute:defense
           operation: add
           element: neutral
           value: 20
@@ -83,19 +83,19 @@ kizami:
     styles: ""
     effects:
       1:
-        - key: attribute:max_health
+        - type: attribute:max_health
           operation: add
           value: 5
       2:
-        - key: attribute:max_health
+        - type: attribute:max_health
           operation: add
           value: 10
       3:
-        - key: attribute:max_health
+        - type: attribute:max_health
           operation: add
           value: 15
       4:
-        - key: attribute:max_health
+        - type: attribute:max_health
           operation: add
           value: 20
 

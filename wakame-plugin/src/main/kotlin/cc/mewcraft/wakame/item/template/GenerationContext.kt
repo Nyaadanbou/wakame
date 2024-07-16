@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.templates.filter.AttributeContextHolder
 import cc.mewcraft.wakame.item.templates.filter.CurseContextHolder
 import cc.mewcraft.wakame.item.templates.filter.SkillContextHolder
 import cc.mewcraft.wakame.kizami.Kizami
-import cc.mewcraft.wakame.random2.SelectionContext
+import cc.mewcraft.wakame.random3.SelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.WatchedPrimitive
 import cc.mewcraft.wakame.util.WatchedReference

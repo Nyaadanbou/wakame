@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.config.configurate.TypeDeserializer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.random2.Filter
+import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.krequire
@@ -16,65 +16,65 @@ import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 internal object FilterSerializer : TypeDeserializer<Filter<GenerationContext>> {
-    // if the string starts with '~',
-    // then we should create a filter
-    // that always inverts its original result
-    private const val NOT = '~'
+    const val NAMESPACE_FILTER = "item"
 
     override fun deserialize(type: Type, node: ConfigurationNode): Filter<GenerationContext> {
-        val typeString0 = node.node("type").krequire<String>()
-        val invert = typeString0.startsWith(NOT) // check if we should invert the original result
-        val typeString = typeString0.substringAfter(NOT) // the type string (after ~)
+        val rawType = node.node("type").krequire<Key>() // decoded as a Key, but we only focus on the Key#value()
+        val inverted = node.node("invert").getBoolean(false) // check if we should invert the original result
 
-        val ret: Filter<GenerationContext> = when (typeString) {
+        if (rawType.namespace() != NAMESPACE_FILTER) {
+            throw SerializationException("The 'type' of filter must be in the '$NAMESPACE_FILTER' namespace")
+        }
+
+        val ret: Filter<GenerationContext> = when (rawType.value()) {
             "skill" -> {
                 val key = node.node("key").krequire<Key>()
-                FilterSkill(invert, key)
+                FilterSkill(inverted, key)
             }
 
             "attribute" -> {
                 val key = node.node("key").krequire<Key>()
                 val operation = node.node("operation").krequire<String>().let { EnumLookup.lookup<AttributeModifier.Operation>(it).getOrThrow() }
                 val element = node.node("element").get<Element>() // optional
-                FilterAttribute(invert, key, operation, element)
+                FilterAttribute(inverted, key, operation, element)
             }
 
             "curse" -> {
                 val curse = node.node("key").krequire<Key>()
-                FilterCurse(invert, curse)
+                FilterCurse(inverted, curse)
             }
 
             "element" -> {
                 val element = node.node("element").krequire<Element>()
-                FilterElement(invert, element)
+                FilterElement(inverted, element)
             }
 
             "item_level" -> {
                 val level = node.node("level").krequire<Range<Int>>()
-                FilterItemLevel(invert, level)
+                FilterItemLevel(inverted, level)
             }
 
             "mark" -> {
                 val meta = node.node("mark").krequire<String>()
-                FilterMark(invert, meta)
+                FilterMark(inverted, meta)
             }
 
             "rarity" -> {
                 val rarity = node.node("rarity").krequire<Rarity>()
-                FilterRarity(invert, rarity)
+                FilterRarity(inverted, rarity)
             }
 
             "source_level" -> {
                 val level = node.node("level").krequire<Range<Int>>()
-                FilterSourceLevel(invert, level)
+                FilterSourceLevel(inverted, level)
             }
 
             "toss" -> {
                 val chance = node.node("chance").krequire<Float>()
-                FilterToss(invert, chance)
+                FilterToss(inverted, chance)
             }
 
-            else -> throw SerializationException("Can't recognize filter type $typeString0")
+            else -> throw SerializationException("Can't recognize filter type '$rawType'")
         }
 
         return ret

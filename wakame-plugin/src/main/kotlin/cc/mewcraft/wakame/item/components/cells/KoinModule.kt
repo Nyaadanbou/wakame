@@ -1,17 +1,17 @@
 package cc.mewcraft.wakame.item.components.cells
 
-import cc.mewcraft.wakame.item.components.cells.cores.cellCoreModule
-import cc.mewcraft.wakame.item.components.cells.curses.cellCurseModule
-import cc.mewcraft.wakame.item.components.cells.reforge.cellReforgeModule
-import cc.mewcraft.wakame.item.components.cells.template.cellTemplateModule
+import cc.mewcraft.wakame.item.components.cells.cores.cellsCoresModule
+import cc.mewcraft.wakame.item.components.cells.curses.cellsCursesModule
+import cc.mewcraft.wakame.item.components.cells.reforge.cellsReforgeModule
+import cc.mewcraft.wakame.item.components.cells.template.cellsTemplateModule
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
 internal fun componentCellsModule(): Module = module {
     includes(
-        cellCoreModule(),
-        cellCurseModule(),
-        cellReforgeModule(),
-        cellTemplateModule()
+        cellsCoresModule(),
+        cellsCursesModule(),
+        cellsReforgeModule(),
+        cellsTemplateModule()
     )
 }

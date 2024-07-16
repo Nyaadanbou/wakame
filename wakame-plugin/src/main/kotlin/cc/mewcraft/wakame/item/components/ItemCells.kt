@@ -294,19 +294,21 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             val builder = builder()
             for ((id, templateCell) in this.cells) {
                 // 生成核心
-                val generatedCore = run {
-                    val templateCore = templateCell.core.pickSingle(context) ?: TemplateCoreEmpty
-                    templateCore.generate(context)
+                val core = run {
+                    val selected = templateCell.core.select(context)
+                    val template = selected.firstOrNull() ?: TemplateCoreEmpty
+                    template.generate(context)
                 }
 
                 // 生成诅咒
-                val generatedCurse = run {
-                    val templateCurse = templateCell.curse.pickSingle(context) ?: TemplateCurseEmpty
-                    templateCurse.generate(context)
+                val curse = run {
+                    val selected = templateCell.curse.select(context)
+                    val template = selected.firstOrNull() ?: TemplateCurseEmpty
+                    template.generate(context)
                 }
 
                 // collect all and put it into the builder
-                builder.put(id, Cell.of(id, generatedCore, generatedCurse))
+                builder.put(id, Cell.of(id, core, curse))
             }
             return GenerationResult.of(builder.build())
         }

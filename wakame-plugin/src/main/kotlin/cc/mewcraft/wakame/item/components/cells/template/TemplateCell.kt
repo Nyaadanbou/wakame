@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.item.components.cells.template
 import cc.mewcraft.wakame.config.configurate.TypeDeserializer
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.random2.Group
-import cc.mewcraft.wakame.random2.GroupSerializer
+import cc.mewcraft.wakame.random3.Group
+import cc.mewcraft.wakame.random3.GroupSerializer
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.ConfigurationNode
@@ -26,6 +26,9 @@ interface TemplateCell {
      */
     val curse: Group<TemplateCurse, GenerationContext>
 
+    /**
+     * 包含一些 [TemplateCell] 的构造方法.
+     */
     companion object {
         /**
          * 构建一个 [TemplateCell].

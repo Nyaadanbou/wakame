@@ -6,14 +6,9 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 
 /**
- * 封装了从一个 [ConfigurationNode] 读取一个 [Node] 的共同逻辑.
+ * 封装了从一个 [ConfigurationNode] 读取一个 [Node] 的通用逻辑.
  */
 abstract class NodeReader<T> {
-    /**
-     * 用于读取全局节点的值.
-     */
-    abstract val globalValues: SharedStorage<T>
-
     /**
      * 将一个 [ConfigurationNode] 读成 [T].
      *
@@ -26,7 +21,22 @@ abstract class NodeReader<T> {
      *   bar: foo
      * ```
      */
-    abstract fun readValue(node: ConfigurationNode): T
+    protected abstract fun readValue(node: ConfigurationNode): T
+
+    /**
+     * 从 [ConfigurationNode] 中读取 "type" (类型为 [Key]).
+     *
+     * "type" 的命名空间将决定 [Node] 的解析结果 (参考 [Node] 的实现).
+     */
+    protected fun ConfigurationNode.type(): Key {
+        val rawType = this.node("type").string ?: throw SerializationException(
+            this, javaTypeOf<String>(), "The 'type' of this node is not specified"
+        )
+        val type = runCatching { Key.key(rawType) }.getOrElse {
+            throw SerializationException(this, javaTypeOf<Key>(), it)
+        }
+        return type
+    }
 
     /**
      * 将一个 [ConfigurationNode] 读成 [Node<T>][Node].
@@ -44,25 +54,16 @@ abstract class NodeReader<T> {
      */
     fun readNode(node: ConfigurationNode): Node<T> {
         val type = node.type()
-        // 首先处理 CompositeNode
-        if (type.namespace() == SharedStorage.NAMESPACE_GLOBAL) {
+
+        // 首先看看是不是 CompositeNode; 如果是的话就直接构建一个 CompositeNode, 然后返回.
+        if (type.namespace() == Node.NAMESPACE_GLOBAL) {
             // 这里只需要直接构建一个 CompositeNode, 并不需要去读取 CompositeNode 所指向的数据.
-            // 这是因为 CompositeNode 的数据是懒加载的 - 只有在需要的时候才会从 SharedStorage 获取.
+            // 这是因为 CompositeNode 的数据是懒加载的 - 只有需要的时候才会从 SharedStorage 获取.
             return CompositeNode(type, mutableListOf())
         }
 
         // 否则就是 LocalNode
         val value = readValue(node)
         return LocalNode(type, value)
-    }
-
-    private fun ConfigurationNode.type(): Key {
-        val rawType = this.node("type").string ?: throw SerializationException(
-            this, javaTypeOf<String>(), "The 'type' of this node is not specified"
-        )
-        val type = runCatching { Key.key(rawType) }.getOrElse {
-            throw SerializationException(this, javaTypeOf<Key>(), it)
-        }
-        return type
     }
 }

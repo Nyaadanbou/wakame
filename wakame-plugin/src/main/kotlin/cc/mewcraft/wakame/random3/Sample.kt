@@ -3,14 +3,14 @@ package cc.mewcraft.wakame.random3
 /**
  * 代表 [Pool] 中的一个样本.
  *
- * @param S 样本所携带的实例
+ * @param V 样本所携带的实例
  * @param C 条件所需要的上下文
  */
-class Sample<S, C : SelectionContext>(
+class Sample<V, C : SelectionContext>(
     /**
-     * The value wrapped within `this` [sample][Sample].
+     * The data wrapped within `this` [Sample].
      */
-    val value: S,
+    val data: V,
 
     /**
      * The weight of `this` sample. Must be non-null.
@@ -18,7 +18,7 @@ class Sample<S, C : SelectionContext>(
     val weight: Double,
 
     /**
-     * 该 [sample][Sample] 被选中必须满足的条件. 如果条件不满足, 则该 [sample][Sample] 不会进入最终的样本空间当中.
+     * 该 [Sample] 被选中必须满足的条件. 如果条件不满足, 则该 [Sample] 不会进入最终的样本空间当中.
      *
      * ## 条件将对样本概率产生直接影响
      *
@@ -31,11 +31,4 @@ class Sample<S, C : SelectionContext>(
      * Gets the [mark][Mark].
      */
     val marks: StringMark?,
-
-    /**
-     * A function which leaves "trace" to the context [C].
-     *
-     * **This should be called upon this sample is picked.**
-     */
-    val trace: Sample<S, C>.(C) -> Unit = {},
 )

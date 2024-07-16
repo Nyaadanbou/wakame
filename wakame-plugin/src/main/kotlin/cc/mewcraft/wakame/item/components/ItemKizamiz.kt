@@ -12,17 +12,24 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.cells.template.TEMPLATE_KIZAMI_SAMPLE_NODE_FACADE
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
+import cc.mewcraft.wakame.item.template.ITEM_FILTER_NODE_FACADE
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.kizami.KIZAMI_EXTERNALS
 import cc.mewcraft.wakame.kizami.Kizami
-import cc.mewcraft.wakame.random2.Filter
-import cc.mewcraft.wakame.random2.Group
-import cc.mewcraft.wakame.random2.GroupSerializer
-import cc.mewcraft.wakame.random2.Pool
-import cc.mewcraft.wakame.random2.PoolSerializer
+import cc.mewcraft.wakame.random3.Filter
+import cc.mewcraft.wakame.random3.FilterNodeFacade
+import cc.mewcraft.wakame.random3.Group
+import cc.mewcraft.wakame.random3.GroupSerializer
+import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.Pool
+import cc.mewcraft.wakame.random3.PoolSerializer
+import cc.mewcraft.wakame.random3.Sample
+import cc.mewcraft.wakame.random3.SampleNodeFacade
+import cc.mewcraft.wakame.random3.SampleNodeReader
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
@@ -34,6 +41,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -113,7 +121,7 @@ data class ItemKizamiz(
         override val componentType: ItemComponentType<ItemKizamiz> = ItemComponentTypes.KIZAMIZ
 
         override fun generate(context: GenerationContext): GenerationResult<ItemKizamiz> {
-            val selected = selector.pickBulk(context).takeUnlessEmpty() ?: return GenerationResult.empty()
+            val selected = selector.select(context).takeUnlessEmpty() ?: return GenerationResult.empty()
             val kizamiz = ItemKizamiz(ObjectArraySet(selected))
             return GenerationResult.of(kizamiz)
         }
@@ -139,13 +147,22 @@ data class ItemKizamiz(
     }
 }
 
-private object KizamiGroupSerializer : GroupSerializer<Kizami, GenerationContext>() {
-    override fun poolFactory(node: ConfigurationNode): Pool<Kizami, GenerationContext> {
-        return node.krequire<Pool<Kizami, GenerationContext>>()
+internal class KizamiSampleNodeReader : KoinComponent, SampleNodeReader<Kizami, GenerationContext>() {
+    override val sampleValueType: TypeToken<Kizami> = typeTokenOf()
+    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+    override fun readData(node: ConfigurationNode): Kizami {
+        return node.node("type").krequire()
     }
+}
 
-    override fun filterFactory(node: ConfigurationNode): Filter<GenerationContext> {
-        return node.krequire<Filter<GenerationContext>>()
+private class KizamiPool(
+    override val amount: Long,
+    override val samples: NodeContainer<Sample<Kizami, GenerationContext>>,
+    override val filters: NodeContainer<Filter<GenerationContext>>,
+    override val isReplacement: Boolean,
+) : Pool<Kizami, GenerationContext>() {
+    override fun whenSelect(value: Kizami, context: GenerationContext) {
+        context.kizamiz += value
     }
 }
 
@@ -157,28 +174,53 @@ private object KizamiGroupSerializer : GroupSerializer<Kizami, GenerationContext
  *   sample: 2
  *   filters: [ ]
  *   entries:
- *     - value: wood
+ *     - type: kizami:wood
  *       weight: 3
- *     - value: iron
+ *     - type: kizami:iron
  *       weight: 2
- *     - value: gold
+ *     - type: kizami:gold
  *       weight: 1
- *     - value: diamond
+ *     - type: kizami:diamond
  *       weight: 1
- *     - value: netherite
+ *     - type: kizami:netherite
  *       weight: 1
  * ```
  */
-private object KizamiPoolSerializer : PoolSerializer<Kizami, GenerationContext>() {
-    override fun sampleFactory(node: ConfigurationNode): Kizami {
-        return node.node("value").krequire<Kizami>()
+private object KizamiPoolSerializer : KoinComponent, PoolSerializer<Kizami, GenerationContext>() {
+    override val sampleNodeFacade: SampleNodeFacade<Kizami, GenerationContext> by inject(named(TEMPLATE_KIZAMI_SAMPLE_NODE_FACADE))
+    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+
+    override fun poolConstructor(
+        amount: Long,
+        samples: NodeContainer<Sample<Kizami, GenerationContext>>,
+        filters: NodeContainer<Filter<GenerationContext>>,
+        isReplacement: Boolean,
+    ): Pool<Kizami, GenerationContext> {
+        return KizamiPool(
+            amount = amount,
+            samples = samples,
+            filters = filters,
+            isReplacement = isReplacement,
+        )
     }
 
-    override fun filterFactory(node: ConfigurationNode): Filter<GenerationContext> {
+    override fun valueConstructor(node: ConfigurationNode): Kizami {
+        return node.node("type").krequire<Kizami>()
+    }
+
+    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
         return node.krequire<Filter<GenerationContext>>()
     }
+}
 
-    override fun onPickSample(content: Kizami, context: GenerationContext) {
-        context.kizamiz += content
+private object KizamiGroupSerializer : KoinComponent, GroupSerializer<Kizami, GenerationContext>() {
+    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+
+    override fun poolConstructor(node: ConfigurationNode): Pool<Kizami, GenerationContext> {
+        return node.krequire<Pool<Kizami, GenerationContext>>()
+    }
+
+    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
+        return node.krequire<Filter<GenerationContext>>()
     }
 }

@@ -39,8 +39,8 @@ interface TemplateCoreAttribute : TemplateCore, AttributeData, AttributeComponen
  * 构建一个 [TemplateCoreAttribute].
  */
 fun TemplateCoreAttribute(node: ConfigurationNode): TemplateCoreAttribute {
-    val key = node.node("key").krequire<Key>()
-    val template = AttributeRegistry.FACADES[key].codecNodeToTemplate(node)
+    val type = node.node("type").krequire<Key>()
+    val template = AttributeRegistry.FACADES[type].codecNodeToTemplate(node)
     return template
 }
 
