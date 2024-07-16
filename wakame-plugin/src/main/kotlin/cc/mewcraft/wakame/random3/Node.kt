@@ -37,6 +37,10 @@ data class CompositeNode<T>(
     class NodeBuilder<T> {
         val nodes = mutableListOf<Node<T>>()
 
+        fun node(node: Node<T>) {
+            nodes.add(node)
+        }
+
         fun local(key: Key, value: T) {
             nodes.add(LocalNode(key, value))
         }
@@ -189,13 +193,26 @@ interface SharedStorage<T> {
 
     fun addEntry(ref: String, init: EntryBuilder<T>.() -> Unit = {})
     fun getNodes(ref: String): List<Node<T>>
+    fun clear()
 
     /**
-     * Entry 包含若干 Node.
+     * 设计上, 一个引用包含若干 [Node].
      */
     @NodeDsl
     interface EntryBuilder<T> {
+        /**
+         * 添加一个预先构建好的 [Node].
+         */
+        fun node(node: Node<T>)
+
+        /**
+         * 构建一个 [LocalNode] 并添加进引用.
+         */
         fun local(key: Key, value: T)
+
+        /**
+         * 构建一个 [CompositeNode] 并添加进引用.
+         */
         fun composite(key: Key, init: CompositeNode<T>.() -> Unit = {})
     }
 }
@@ -203,6 +220,7 @@ interface SharedStorage<T> {
 object SharedStorageEmpty : SharedStorage<Nothing> {
     override fun addEntry(ref: String, init: EntryBuilder<Nothing>.() -> Unit) = Unit
     override fun getNodes(ref: String): List<Node<Nothing>> = emptyList()
+    override fun clear() = Unit
 }
 
 private class SharedStorageImpl<T> : SharedStorage<T> {
@@ -218,6 +236,10 @@ private class SharedStorageImpl<T> : SharedStorage<T> {
         val visited = mutableSetOf<String>()
         resolveNode(ref, resolvedNodes, visited)
         return resolvedNodes
+    }
+
+    override fun clear() {
+        entries.clear()
     }
 
     private fun resolveNode(key: String, resolvedNodes: MutableList<Node<T>>, visitedKeys: MutableSet<String>) {
@@ -250,6 +272,10 @@ private class SharedStorageImpl<T> : SharedStorage<T> {
 
     class EntryBuilderImpl<T> : EntryBuilder<T> {
         val nodes = mutableListOf<Node<T>>()
+
+        override fun node(node: Node<T>) {
+            nodes.add(node)
+        }
 
         override fun local(key: Key, value: T) {
             nodes.add(LocalNode(key, value))
