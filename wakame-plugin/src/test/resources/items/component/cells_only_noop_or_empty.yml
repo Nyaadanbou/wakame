@@ -12,13 +12,13 @@ cells:
       nothing:
         noop_or_empty:
           # 有 0.5 的概率分别抽中 noop 和 empty
-          - key: generic:noop
+          - type: generic:noop
             weight: 1
-          - key: generic:empty
+          - type: generic:empty
             weight: 1
     curse_groups:
       nothing:
         pool_1:
           # 由于只有一个(无条件的)样本, 因此总会抽中. 这里的 weight 写多少也就无所谓了.
-          - key: generic:empty
+          - type: generic:empty
             weight: 1

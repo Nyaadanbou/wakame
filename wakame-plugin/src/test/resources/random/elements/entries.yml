@@ -1,13 +1,13 @@
 entries:
 
   opposition:
-    - value: fire
+    - type: element:fire
       weight: 1
-    - value: wind
+    - type: element:wind
       weight: 1
 
   harmonious:
-    - value: water
+    - type: element:water
       weight: 1
-    - value: earth
+    - type: element:earth
       weight: 1

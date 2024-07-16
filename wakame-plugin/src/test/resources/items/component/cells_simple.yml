@@ -26,12 +26,12 @@ cells:
               # 设置了两个样本,
               # 一个是 15-20 点的火元素攻击力,
               # 另一个是 20-25 点的水元素攻击力.
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
                 element: fire
                 lower: 15
                 upper: 20
                 weight: 1
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
                 element: water
                 lower: 20
                 upper: 25
@@ -43,11 +43,11 @@ cells:
               - type: item_level
                 level: "[20,)"
             entries:
-              - key: attribute:critical_strike_chance
+              - type: attribute:critical_strike_chance
                 value: 0.54
                 weight: 1
           pool_2:
-            - key: attribute:critical_strike_chance
+            - type: attribute:critical_strike_chance
               value: 0.75
               weight: 1
     curse_groups:
@@ -61,7 +61,7 @@ cells:
               - type: item_level
                 level: "[20,)"
             entries:
-              - key: curse:entity_kills
+              - type: curse:entity_kills
                 index: demo_creeps_1
                 count: 5
                 weight: 1
@@ -72,7 +72,7 @@ cells:
                 level: "[10,)"
             entries:
               # 这应该是最后生成的诅咒.
-              - key: curse:entity_kills
+              - type: curse:entity_kills
                 index: demo_creeps_1
                 count: 3
                 weight: 1

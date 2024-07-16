@@ -206,13 +206,13 @@ elements:
 
   # 候选的元素标识，以及它们各自的权重
   entries:
-    - value: neutral
+    - type: element:neutral
       weight: 2
-    - value: water
+    - type: element:water
       weight: 1
-    - value: fire
+    - type: element:fire
       weight: 1
-    - value: wind
+    - type: element:wind
       weight: 1
 
 # 铭刻标识
@@ -224,53 +224,53 @@ kizamiz:
 
     # 条件，可用于实现特定条件下完全不生成铭刻
     filters:
-      - type: rarity
+      - type: item:rarity
         rarity: rare
 
     # 候选的铭刻标识，以及它们各自的权重
     entries:
-      - value: wood
+      - type: kizami:wood
         weight: 5
-      - value: iron
+      - type: kizami:iron
         weight: 4
-      - value: gold
+      - type: kizami:gold
         weight: 3
-      - value: diamond
+      - type: kizami:diamond
         weight: 2
-      - value: netherite
+      - type: kizami:netherite
         weight: 1
 
   pool_b:
     sample: 2
     filters:
-      - type: rarity
+      - type: item:rarity
         rarity: uncommon
     entries:
-      - value: wood
+      - type: kizami:wood
         weight: 5
-      - value: iron
+      - type: kizami:iron
         weight: 4
-      - value: gold
+      - type: kizami:gold
         weight: 3
-      - value: diamond
+      - type: kizami:diamond
         weight: 2
-      - value: netherite
+      - type: kizami:netherite
         weight: 1
   pool_c:
     sample: 1
     filters:
-      - type: rarity
+      - type: item:rarity
         rarity: common
     entries:
-      - value: wood
+      - type: kizami:wood
         weight: 5
-      - value: iron
+      - type: kizami:iron
         weight: 4
-      - value: gold
+      - type: kizami:gold
         weight: 3
-      - value: diamond
+      - type: kizami:diamond
         weight: 2
-      - value: netherite
+      - type: kizami:netherite
         weight: 1
 
 # 词条栏
@@ -322,7 +322,7 @@ cells:
 
         # 该池包含的所有核心
         entries:
-          - key: attribute:max_health
+          - type: attribute:max_health
             value: 20
             weight: 1
 
@@ -331,7 +331,7 @@ cells:
       shared_pool_2:
         filters: [ ]
         entries:
-          - key: attribute:max_mana
+          - type: attribute:max_mana
             value: 100
             weight: 1
             filters: [ ]
@@ -361,10 +361,10 @@ cells:
           # 该核心组的一个候选池
           pool_1:
             filters:
-              - type: rarity
+              - type: item:rarity
                 rarity: rare
             entries:
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
 
                 # 修饰符的运算模式，可省略，默认为 add，可用值 multiply_base, multiply_total
                 operation: add
@@ -385,50 +385,50 @@ cells:
 
                 # 该样本的权重
                 weight: 1
-              - key: attribute:critical_strike_chance
+              - type: attribute:critical_strike_chance
                 value:
                   base: 0.75
                   spread: 0.1
                   min: -0.2
                   max: 0.3
                 weight: 1
-              - key: attribute:critical_strike_power
+              - type: attribute:critical_strike_power
                 value: 0.52
                 weight: 1
                 filters:
-                  - type: item_level
+                  - type: item:item_level
                     level: "[20,)"
 
           # 该核心组的第二个候选池
           pool_2:
             filters:
-              - type: rarity
+              - type: item:rarity
                 rarity: common
             entries:
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
                 element: neutral
                 lower: 10
                 upper: 15
                 weight: 1
-              - key: attribute:critical_strike_chance
+              - type: attribute:critical_strike_chance
                 value: 0.5
                 weight: 1
-              - key: attribute:critical_strike_power
+              - type: attribute:critical_strike_power
                 value: 0.25
                 weight: 1
                 filters:
-                  - type: item_level
+                  - type: item:item_level
                     level: "[10,)"
 
         # 备用池，如果 selects 中没有满足条件的池，将使用备用池
         # 写成 `[ ]` 或直接删除该节点，表示没有备用池
         default:
-          - key: attribute:attack_damage
+          - type: attribute:attack_damage
             element: neutral
             lower: 5
             upper: 8
             weight: 1
-          - key: attribute:critical_strike_chance
+          - type: attribute:critical_strike_chance
             value:
               base: 0.3
               scale: 0.1
@@ -437,7 +437,7 @@ cells:
       # 核心组：core_b
       core_b:
         filters:
-          - type: rarity
+          - type: item:rarity
             rarity: common
         selects:
           pool_1: shared_pool_1 # 这里使用了 core_pools.shared_pool_1
@@ -456,14 +456,14 @@ cells:
         filters: [ ]
         selects: { }
         default:
-          - key: generic:noop
+          - type: generic:noop
             weight: 10
-          - key: generic:empty
+          - type: generic:empty
             weight: 10
-          - key: attribute:lifesteal
+          - type: attribute:lifesteal
             value: 0.2
             weight: 10
-          - key: attribute:manasteal
+          - type: attribute:manasteal
             value: 0.21
             weight: 10
 
@@ -473,61 +473,61 @@ cells:
         selects:
           fire:
             filters:
-              - type: element
+              - type: item:element
                 element: fire
             entries:
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
                 element: fire
                 lower: 10
                 upper: 16
                 weight: 8
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
                 element: fire
                 lower: 0.1
                 upper: 0.1
                 operation: multiply_base
                 weight: 8
-              - key: attribute:attack_effect_chance
+              - type: attribute:attack_effect_chance
                 element: fire
                 value: 0.38
                 weight: 8
           water:
             filters:
-              - type: element
+              - type: item:element
                 element: water
             entries:
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
                 element: water
                 lower: 10
                 upper: 17
                 weight: 8
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
                 element: water
                 lower: 0.2
                 upper: 0.2
                 operation: multiply_base
                 weight: 8
-              - key: attribute:attack_effect_chance
+              - type: attribute:attack_effect_chance
                 element: water
                 value: 0.42
                 weight: 8
           wind:
             filters:
-              - type: element
+              - type: item:element
                 element: wind
             entries:
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
                 element: wind
                 lower: 10
                 upper: 18
                 weight: 8
-              - key: attribute:attack_damage
+              - type: attribute:attack_damage
                 element: wind
                 lower: 0.3
                 upper: 0.3
                 operation: multiply_base
                 weight: 8
-              - key: attribute:attack_effect_chance
+              - type: attribute:attack_effect_chance
                 element: wind
                 value: 0.56
                 weight: 8
@@ -539,10 +539,10 @@ cells:
         selects:
           skill:
             entries:
-              - key: skill:melee/dash
+              - type: skill:melee/dash
                 trigger: trigger:combo/110
                 weight: 2
-              - key: skill:melee/kill_entity
+              - type: skill:melee/kill_entity
                 trigger: trigger:generic/attack
                 weight: 1
         default: [ ]
@@ -556,26 +556,26 @@ cells:
       shared_pool_1:
         filters: [ ]
         entries:
-          - key: curse:entity_kills
+          - type: curse:entity_kills
             index: demo_bosses_1
             count: 2
             weight: 1
-          - key: curse:entity_kills
+          - type: curse:entity_kills
             index: demo_bosses_2
             count: 2
             weight: 1
-          - key: curse:entity_kills
+          - type: curse:entity_kills
             index: demo_bosses_3
             count: 2
             weight: 1
       shared_pool_2:
         filters: [ ]
         entries:
-          - key: curse:peak_damage
+          - type: curse:peak_damage
             amount: 20
             element: fire
             weight: 1
-          - key: curse:peak_damage
+          - type: curse:peak_damage
             amount: 32
             element: water
             weight: 1
@@ -589,19 +589,19 @@ cells:
         selects:
           pool_1: shared_pool_1 # 这里引用了 curse_pools.shared_pool_1
         default:
-          - key: curse:entity_kills
+          - type: curse:entity_kills
             index: demo_creeps_1
             count: 2
             weight: 1
-          - key: curse:entity_kills
+          - type: curse:entity_kills
             index: demo_creeps_2
             count: 2
             weight: 1
-          - key: curse:entity_kills
+          - type: curse:entity_kills
             index: demo_creeps_3
             count: 2
             weight: 1
-          - key: generic:empty
+          - type: generic:empty
             weight: 2
 
       # 诅咒组：curse_b
@@ -610,15 +610,15 @@ cells:
         selects:
           pool_1: shared_pool_2 # 这里引用了 curse_pools.shared_pool_2
         default:
-          - key: curse:peak_damage
+          - type: curse:peak_damage
             amount: 10
             element: fire
             weight: 1
-          - key: curse:peak_damage
+          - type: curse:peak_damage
             amount: 16
             element: water
             weight: 1
-          - key: generic:empty
+          - type: generic:empty
             weight: 3
 
       # 诅咒组：curse_c
@@ -626,11 +626,11 @@ cells:
         filters: [ ]
         selects: { }
         default:
-          - key: curse:peak_damage
+          - type: curse:peak_damage
             amount: 20
             element: fire
             weight: 1
-          - key: generic:empty
+          - type: generic:empty
             weight: 3
 
       # 诅咒组：curse_d
@@ -638,7 +638,7 @@ cells:
         filters: [ ]
         selects: { }
         default:
-          - key: curse:peak_damage
+          - type: curse:peak_damage
             amount: 30
             element: water
             weight: 1
@@ -648,7 +648,7 @@ cells:
         filters: [ ]
         selects: { }
         default:
-          - key: curse:peak_damage
+          - type: curse:peak_damage
             amount: 40
             element: fire
             weight: 1
@@ -658,7 +658,7 @@ cells:
         filters: [ ]
         selects: { }
         default:
-          - key: curse:peak_damage
+          - type: curse:peak_damage
             amount: 50
             element: water
             weight: 1

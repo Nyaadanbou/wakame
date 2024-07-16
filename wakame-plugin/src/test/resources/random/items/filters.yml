@@ -1,41 +1,40 @@
 # 包含所有的可以引用的 filters
 filters:
 
-  # 这是第一个引用
-  # 引用它的方式为:
-  # type: "global:geq_20lvl"
+  # 这是第一个引用, 其引用名为 "geq_20lvl".
+  # 引用它的方式为: `type: global:geq_20lvl`.
   geq_20lvl:
     # 该引用包含的第一个 filter, 也是最后一个 filter
     # 该 filter 属于 LocalNode, 不是 CompositeNode
-    - type: "item_level"
+    - type: item:item_level
       level: "[20,)"
 
   # 这是第二个引用
   # 引用它的方式为:
-  # type: "global:with_fire"
+  # `type: global:with_fire`
   with_fire:
-    - type: "element"
-      element: "fire"
+    - type: item:element
+      element: fire
 
   # 第三个引用
   with_rare:
-    - type: "rarity"
-      rarity: "rare"
+    - type: item:rarity
+      rarity: rare
 
   # 第四个引用
   impossible:
     # 该引用包含的第一个 filter
-    - type: "toss"
+    - type: item:toss
       chance: 0.01
     # 该引用包含的第二个 filter
-    - type: "mark"
-      mark: "impossible"
+    - type: item:mark
+      mark: impossible
 
   # 第五个引用
   non_local:
-    # 该 filter 不是 LocalNode, 而是一个 CompositeNode.
-    # 因为它的 type 是以 namespace:value 形式书写的,
-    # 并且其 namespace 是 "global".
-    - type: "global:impossible"
-    - type: "toss"
+    # 该 filter *不是* LocalNode, 而是一个 CompositeNode.
+    # 因为它的 type 的 namespace 是 "global", 不是 "item".
+    - type: global:impossible
+    # 该 filter 是一个 LocalNode.
+    - type: item:toss
       chance: 0.01

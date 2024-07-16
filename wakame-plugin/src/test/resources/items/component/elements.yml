@@ -7,11 +7,11 @@ elements:
   filters: [ ]
   # 抽出来的元素一定是下面 4 个中的 2 个
   entries:
-    - value: neutral
+    - type: element:neutral
       weight: 2
-    - value: water
+    - type: element:water
       weight: 1
-    - value: fire
+    - type: element:fire
       weight: 1
-    - value: wind
+    - type: element:wind
       weight: 1

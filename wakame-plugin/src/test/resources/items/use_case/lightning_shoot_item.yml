@@ -23,7 +23,7 @@ cells:
         selects:
           skill:
             entries:
-              - key: skill:ranged/projectile_lightning
+              - type: skill:ranged/projectile_lightning
                 trigger: trigger:combo/111
                 weight: 5
         default: [ ]
@@ -32,7 +32,7 @@ cells:
         selects:
           skill:
             entries:
-              - key: skill:ranged/lightning_demo
+              - type: skill:ranged/lightning_demo
                 trigger: trigger:combo/101
                 weight: 5
         default: [ ]
