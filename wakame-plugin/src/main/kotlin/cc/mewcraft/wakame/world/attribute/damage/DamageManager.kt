@@ -17,6 +17,16 @@ import java.util.*
 
 object DamageManager {
     fun generateDamageMetaData(event: EntityDamageEvent): DamageMetaData {
+        //先检查是不是自定义伤害
+        //若是，则直接返回自定义伤害信息
+        val uuid = event.entity.uniqueId
+        val customDamageMetaData = findCustomDamageMetaData(uuid)
+        if (customDamageMetaData != null) {
+            removeCustomDamageMetaData(uuid)
+            return customDamageMetaData
+        }
+
+        //不是自定义伤害
         //存在造成伤害的实体时
         if (event is EntityDamageByEntityEvent) {
             when (val damager = event.damager) {
@@ -170,6 +180,35 @@ object DamageManager {
     fun removeProjectileDamageMetaData(uuid: UUID) {
         projectileDamageMetaDataMap.invalidate(uuid)
     }
+
+    private val customDamageMetaDataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, CustomDamageMetaData>()
+
+    fun putCustomDamageMetaData(uuid: UUID, customDamageMetaData: CustomDamageMetaData) {
+        customDamageMetaDataMap.put(uuid, customDamageMetaData)
+    }
+
+    fun findCustomDamageMetaData(uuid: UUID): CustomDamageMetaData? {
+        return customDamageMetaDataMap.getIfPresent(uuid)
+    }
+
+    fun removeCustomDamageMetaData(uuid: UUID) {
+        customDamageMetaDataMap.invalidate(uuid)
+    }
+}
+
+fun LivingEntity.applyCustomDamage(customDamageMetaData: CustomDamageMetaData, originEntity: LivingEntity?) {
+    val defenseMetaData = when (val damagee = this) {
+        is Player -> {
+            EntityDefenseMetaData(damagee.toUser().attributeMap)
+        }
+
+        else -> {
+            EntityDefenseMetaData(EntityAttributeAccessor.getAttributeMap(damagee))
+        }
+    }
+    val finalDamage = defenseMetaData.calculateFinalDamage(customDamageMetaData)
+    DamageManager.putCustomDamageMetaData(this.uniqueId, customDamageMetaData)
+    this.damage(finalDamage, originEntity)
 }
 
 /**

@@ -1,18 +1,21 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.event.WakameEntityDamageEvent
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.Player
-import org.bukkit.entity.Trident
+import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
@@ -22,20 +25,28 @@ class DamageListener : Listener, KoinComponent {
 
     @EventHandler
     fun on(event: EntityDamageEvent) {
+        if (event.entity !is LivingEntity) return
         val damageMetaData = DamageManager.generateDamageMetaData(event)
         val defenseMetaData = DamageManager.generateDefenseMetaData(event)
-        val wakameEntityDamageEvent = WakameEntityDamageEvent(event, damageMetaData, defenseMetaData)
+        val wakameEntityDamageEvent = WakameEntityDamageEvent(damageMetaData, defenseMetaData)
         wakameEntityDamageEvent.callEvent()
 
         //如果伤害事件被取消，什么也不做
-        //WakameEntityDamageEvent的取消与否完全依赖于其内部的EntityDamageEvent
         if (wakameEntityDamageEvent.isCancelled) return
 
 
         //修改最终伤害
-        event.damage = defenseMetaData.calculateFinalDamage(damageMetaData)
+        event.damage = wakameEntityDamageEvent.finalDamage
         logger.info("${event.entity.type}(${event.entity.uniqueId}) 受到了 ${event.damage} 点伤害")
-        Bukkit.broadcast(Component.text("${event.entity.type}(${event.entity.uniqueId}) 受到了 ${event.damage} 点伤害"))
+        val stringBuilder = StringBuilder()
+        val miniMessage = MiniMessage.miniMessage()
+        for (it in damageMetaData.packets) {
+            stringBuilder.append("${miniMessage.serialize(it.element.displayName)}: ${it.packetDamage}<newline>")
+        }
+        stringBuilder.append("（各元素未计算防御阶段）")
+        Bukkit.broadcast(
+            miniMessage.deserialize("<hover:show_text:'${stringBuilder}'>${event.entity.type}(${event.entity.uniqueId}) 受到了 ${event.damage} 点伤害")
+        )
     }
 
     /**
@@ -72,4 +83,24 @@ class DamageListener : Listener, KoinComponent {
             //TODO 可能还会有其他需要wakame属性系统处理的弹射物
         }
     }
+
+
+//    @EventHandler
+//    fun on(event: PlayerInteractEntityEvent) {
+//        val player = event.player
+//        val entity = event.rightClicked
+//        if (event.hand != EquipmentSlot.HAND) return
+//        player.sendMessage(Component.text("你右键了" + entity.type + "(" + entity.uniqueId + ")"))
+//        if (entity is LivingEntity) {
+//            entity.applyCustomDamage(
+//                CustomDamageMetaData(
+//                    1.0, false,
+//                    listOf(
+//                        ElementDamagePacket(ElementRegistry.DEFAULT, 5.0, 10.0, 0.0, 0.0, 0.0)
+//                    )
+//                ),
+//                player
+//            )
+//        }
+//    }
 }

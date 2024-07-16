@@ -231,6 +231,22 @@ class EntityProjectileDamageMetaData(
     }
 }
 
+/**
+ * 自定义伤害的元数据
+ * 如：技能造成的伤害
+ */
+class CustomDamageMetaData(
+    override val criticalPower: Double,
+    override val isCritical: Boolean,
+    private val customElementDamagePackets: List<ElementDamagePacket>
+) : DamageMetaData {
+    override val damageValue: Double = packets.sumOf { it.packetDamage }
+    override fun generatePackets(): List<ElementDamagePacket> {
+        return customElementDamagePackets
+    }
+}
+
+
 data class ElementDamagePacket(
     val element: Element,
     val min: Double,
