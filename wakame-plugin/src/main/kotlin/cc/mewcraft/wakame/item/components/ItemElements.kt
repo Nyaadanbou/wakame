@@ -14,13 +14,20 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.cells.template.TEMPLATE_ELEMENT_SAMPLE_NODE_FACADE
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
+import cc.mewcraft.wakame.item.template.ITEM_FILTER_NODE_FACADE
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.random2.Filter
-import cc.mewcraft.wakame.random2.Pool
-import cc.mewcraft.wakame.random2.PoolSerializer
+import cc.mewcraft.wakame.random3.Filter
+import cc.mewcraft.wakame.random3.FilterNodeFacade
+import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.Pool
+import cc.mewcraft.wakame.random3.PoolSerializer
+import cc.mewcraft.wakame.random3.Sample
+import cc.mewcraft.wakame.random3.SampleNodeFacade
+import cc.mewcraft.wakame.random3.SampleNodeReader
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import cc.mewcraft.wakame.util.kregister
@@ -33,6 +40,7 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -123,7 +131,7 @@ data class ItemElements(
         override val componentType: ItemComponentType<ItemElements> = ItemComponentTypes.ELEMENTS
 
         override fun generate(context: GenerationContext): GenerationResult<ItemElements> {
-            val selected = selector.pickBulk(context).takeUnlessEmpty() ?: return GenerationResult.empty()
+            val selected = selector.select(context).takeUnlessEmpty() ?: return GenerationResult.empty()
             val elements = ItemElements(ObjectArraySet(selected))
             return GenerationResult.of(elements)
         }
@@ -153,6 +161,25 @@ data class ItemElements(
     }
 }
 
+internal class ElementSampleNodeReader : KoinComponent, SampleNodeReader<Element, GenerationContext>() {
+    override val sampleValueType: TypeToken<Element> = typeTokenOf()
+    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+    override fun readData(node: ConfigurationNode): Element {
+        return node.node("type").krequire()
+    }
+}
+
+private data class ElementPool(
+    override val amount: Long,
+    override val samples: NodeContainer<Sample<Element, GenerationContext>>,
+    override val filters: NodeContainer<Filter<GenerationContext>>,
+    override val isReplacement: Boolean,
+) : Pool<Element, GenerationContext>() {
+    override fun whenSelect(value: Element, context: GenerationContext) {
+        context.elements += value
+    }
+}
+
 /**
  * ## Node structure
  * ```yaml
@@ -160,26 +187,39 @@ data class ItemElements(
  *   sample: 2
  *   filters: [ ]
  *   entries:
- *     - value: neutral
+ *     - type: element:neutral
  *       weight: 2
- *     - value: water
+ *     - type: element:water
  *       weight: 1
- *     - value: fire
+ *     - type: element:fire
  *       weight: 1
- *     - value: wind
+ *     - type: element:wind
  *       weight: 1
  * ```
  */
-private data object ElementPoolSerializer : PoolSerializer<Element, GenerationContext>() {
-    override fun sampleFactory(node: ConfigurationNode): Element {
-        return node.node("value").krequire<Element>()
+private data object ElementPoolSerializer : KoinComponent, PoolSerializer<Element, GenerationContext>() {
+    override val sampleNodeFacade: SampleNodeFacade<Element, GenerationContext> by inject(named(TEMPLATE_ELEMENT_SAMPLE_NODE_FACADE))
+    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+
+    override fun poolConstructor(
+        amount: Long,
+        samples: NodeContainer<Sample<Element, GenerationContext>>,
+        filters: NodeContainer<Filter<GenerationContext>>,
+        isReplacement: Boolean,
+    ): Pool<Element, GenerationContext> {
+        return ElementPool(
+            amount = amount,
+            samples = samples,
+            filters = filters,
+            isReplacement = isReplacement,
+        )
     }
 
-    override fun filterFactory(node: ConfigurationNode): Filter<GenerationContext> {
+    override fun valueConstructor(node: ConfigurationNode): Element {
+        return node.node("type").krequire<Element>()
+    }
+
+    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
         return node.krequire<Filter<GenerationContext>>()
-    }
-
-    override fun onPickSample(content: Element, context: GenerationContext) {
-        context.elements += content
     }
 }

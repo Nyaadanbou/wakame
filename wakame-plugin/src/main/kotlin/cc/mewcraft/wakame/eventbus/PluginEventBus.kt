@@ -13,7 +13,7 @@ internal object PluginEventBus {
         when {
             // 如果是测试环境, 则只能用自定义的 coroutine scope
             RunningEnvironment.TEST.isRunning() -> {
-                EventBus(CoroutineScope(Dispatchers.Default) + SupervisorJob())
+                EventBus(CoroutineScope(Dispatchers.Unconfined) + SupervisorJob())
             }
 
             // 如果是生产环境, 则使用插件的 coroutine scope

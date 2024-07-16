@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.random2.Filter
+import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
 import com.google.common.collect.Range

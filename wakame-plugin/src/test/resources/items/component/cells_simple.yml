@@ -20,7 +20,7 @@ cells:
             # 然后这里设置了一个物品等级 ≥10 的条件,
             # 因此这个 pool_1 一定会被选择到.
             filters:
-              - type: item_level
+              - type: item:item_level
                 level: "[10,)"
             entries:
               # 设置了两个样本,
@@ -40,7 +40,7 @@ cells:
         selects:
           pool_1:
             filters:
-              - type: item_level
+              - type: item:item_level
                 level: "[20,)"
             entries:
               - type: attribute:critical_strike_chance
@@ -58,7 +58,7 @@ cells:
             # 但这里的筛选条件设置成了 ≥20,
             # 因此这个 pool_1 里面的样本永远不可能出现.
             filters:
-              - type: item_level
+              - type: item:item_level
                 level: "[20,)"
             entries:
               - type: curse:entity_kills
@@ -68,7 +68,7 @@ cells:
           pool_2:
             # pool_1 池肯定不满足, 因此最终选择的诅咒肯定来自 pool_2.
             filters:
-              - type: item_level
+              - type: item:item_level
                 level: "[10,)"
             entries:
               # 这应该是最后生成的诅咒.

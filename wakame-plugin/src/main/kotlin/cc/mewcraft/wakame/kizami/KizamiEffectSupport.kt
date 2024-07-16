@@ -61,7 +61,7 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
 
         // add each single effect to the collection
         node.childrenList().forEach { childNode ->
-            val key = childNode.node("key").krequire<Key>()
+            val key = childNode.node("type").krequire<Key>()
             val namespace = key.namespace()
             when (namespace) {
                 Namespaces.SKILL -> {

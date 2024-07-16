@@ -5,7 +5,12 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.components.Attributable
+import cc.mewcraft.wakame.item.components.Castable
+import cc.mewcraft.wakame.item.components.FireResistant
+import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
+import cc.mewcraft.wakame.item.components.HideTooltip
+import cc.mewcraft.wakame.item.components.ItemGlowable
 import cc.mewcraft.wakame.item.components.cells.CoreTypes
 import cc.mewcraft.wakame.item.components.cells.CurseTypes
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
@@ -348,6 +353,33 @@ class CustomNekoStackTest : KoinTest {
             // 本 test 主要是用来检查 core 是否注册成功, 能否正常被 pool 调用
         }
     }
+
+    @Test
+    fun `component - cells check references 1`() = componentLifecycleTest(
+        "cells_references_1", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        context {
+            it.level = 10
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            val cell = it.get("foo")
+            assertNotNull(cell)
+            val core = cell.getTypedCore(CoreTypes.ATTRIBUTE)
+            assertNotNull(core)
+            assertEquals(Key.key("attribute:attack_damage_rate"), core.key)
+        }
+    }
+
+    // TODO 编写更多关于 random3 引用的测试
 
     @Test
     fun `component - crate`() = componentLifecycleTest(

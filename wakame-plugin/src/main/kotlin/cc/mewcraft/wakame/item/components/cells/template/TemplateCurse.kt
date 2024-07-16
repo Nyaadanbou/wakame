@@ -10,14 +10,25 @@ import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCurseEmp
 import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCurseEntityKills
 import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCursePeakDamage
 import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.ITEM_FILTER_NODE_FACADE
 import cc.mewcraft.wakame.item.templates.filter.CurseContextHolder
-import cc.mewcraft.wakame.random2.Filter
-import cc.mewcraft.wakame.random2.GroupSerializer
-import cc.mewcraft.wakame.random2.Pool
-import cc.mewcraft.wakame.random2.PoolSerializer
+import cc.mewcraft.wakame.random3.Filter
+import cc.mewcraft.wakame.random3.FilterNodeFacade
+import cc.mewcraft.wakame.random3.GroupSerializer
+import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.Pool
+import cc.mewcraft.wakame.random3.PoolSerializer
+import cc.mewcraft.wakame.random3.Sample
+import cc.mewcraft.wakame.random3.SampleNodeFacade
+import cc.mewcraft.wakame.random3.SampleNodeReader
 import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -51,19 +62,41 @@ interface TemplateCurse : Keyed, Examinable {
  * ```
  */
 internal object TemplateCurseSerializer : TypeDeserializer<TemplateCurse> {
+    private val KEY_ENTITY_KILLS = CurseConstants.createKey { ENTITY_KILLS }
+    private val KEY_PEAK_DAMAGE = CurseConstants.createKey { PEAK_DAMAGE }
+
     override fun deserialize(type: Type, node: ConfigurationNode): TemplateCurse {
-        val ret = when (val key = node.node("key").krequire<Key>()) {
+        val ret = when (val key = node.node("type").krequire<Key>()) {
             // 技术诅咒
             GenericKeys.EMPTY -> TemplateCurseEmpty
 
             // 普通诅咒
-            CurseConstants.createKey { ENTITY_KILLS } -> TemplateCurseEntityKills(node)
-            CurseConstants.createKey { PEAK_DAMAGE } -> TemplateCursePeakDamage(node)
+            KEY_ENTITY_KILLS -> TemplateCurseEntityKills(node)
+            KEY_PEAK_DAMAGE -> TemplateCursePeakDamage(node)
 
             // 大概是配置文件写错了
             else -> throw IllegalArgumentException("Unknown curse: $key")
         }
         return ret
+    }
+}
+
+internal class TemplateCurseSampleNodeReader : KoinComponent, SampleNodeReader<TemplateCurse, GenerationContext>() {
+    override val sampleValueType: TypeToken<TemplateCurse> = typeTokenOf()
+    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+    override fun readData(node: ConfigurationNode): TemplateCurse {
+        return node.krequire()
+    }
+}
+
+internal class TemplateCursePool(
+    override val amount: Long,
+    override val samples: NodeContainer<Sample<TemplateCurse, GenerationContext>>,
+    override val filters: NodeContainer<Filter<GenerationContext>>,
+    override val isReplacement: Boolean,
+) : Pool<TemplateCurse, GenerationContext>() {
+    override fun whenSelect(value: TemplateCurse, context: GenerationContext) {
+        context.curses += CurseContextHolder(value.key)
     }
 }
 
@@ -100,29 +133,44 @@ internal object TemplateCurseSerializer : TypeDeserializer<TemplateCurse> {
  *       amount: 32
  * ```
  */
-internal object TemplateCursePoolSerializer : PoolSerializer<TemplateCurse, GenerationContext>() {
-    override fun sampleFactory(node: ConfigurationNode): TemplateCurse {
+internal object TemplateCursePoolSerializer : KoinComponent, PoolSerializer<TemplateCurse, GenerationContext>() {
+    override val sampleNodeFacade: SampleNodeFacade<TemplateCurse, GenerationContext> by inject(named(TEMPLATE_CURSE_SAMPLE_NODE_FACADE))
+    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+
+    override fun poolConstructor(
+        amount: Long,
+        samples: NodeContainer<Sample<TemplateCurse, GenerationContext>>,
+        filters: NodeContainer<Filter<GenerationContext>>,
+        isReplacement: Boolean,
+    ): Pool<TemplateCurse, GenerationContext> {
+        return TemplateCursePool(
+            amount = amount,
+            samples = samples,
+            filters = filters,
+            isReplacement = isReplacement,
+        )
+    }
+
+    override fun valueConstructor(node: ConfigurationNode): TemplateCurse {
         return node.krequire<TemplateCurse>()
     }
 
-    override fun filterFactory(node: ConfigurationNode): Filter<GenerationContext> {
+    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
         return node.krequire<Filter<GenerationContext>>()
-    }
-
-    override fun onPickSample(content: TemplateCurse, context: GenerationContext) {
-        context.curses += CurseContextHolder(content.key)
     }
 }
 
 /**
  * @see GroupSerializer
  */
-internal object TemplateCurseGroupSerializer : GroupSerializer<TemplateCurse, GenerationContext>() {
-    override fun poolFactory(node: ConfigurationNode): Pool<TemplateCurse, GenerationContext> {
+internal object TemplateCurseGroupSerializer : KoinComponent, GroupSerializer<TemplateCurse, GenerationContext>() {
+    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+
+    override fun poolConstructor(node: ConfigurationNode): Pool<TemplateCurse, GenerationContext> {
         return node.krequire<Pool<TemplateCurse, GenerationContext>>()
     }
 
-    override fun filterFactory(node: ConfigurationNode): Filter<GenerationContext> {
+    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
         return node.krequire<Filter<GenerationContext>>()
     }
 }

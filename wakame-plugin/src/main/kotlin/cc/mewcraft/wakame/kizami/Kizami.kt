@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.FriendlyNamed
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.annotation.InternalApi
 import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableByte
@@ -54,7 +55,7 @@ data class Kizami @InternalApi internal constructor(
  * ## Node structure 1: read from registry
  *
  * ```yaml
- * <node>: iron
+ * <node>: kizami:iron
  * ```
  *
  * ## Node structure 2: create from config
@@ -77,7 +78,9 @@ internal object KizamiSerializer : SchemaSerializer<Kizami> {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {
             // if it's structure 1
-            return KizamiRegistry.INSTANCES[scalar]
+            // TODO 更严格的解析方式
+            val key = Key(scalar)
+            return KizamiRegistry.INSTANCES[key.value()]
         }
 
         // if it's structure 2

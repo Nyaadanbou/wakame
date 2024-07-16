@@ -1,27 +1,26 @@
 uuid: 00000000-0000-0000-0000-000000000000
 item_type: bedrock
 
-# 引用全局样本
+# 假设物品等级为 10
+# 引用了全局的数据.
 cells:
   buckets:
     foo:
-      core: "with_global_references"
-      curse: "with_global_references"
+      core: "with_references"
+      curse: "with_references"
   selectors:
+    core_pools: { }
     core_groups:
-      with_global_references:
+      with_references:
         refs_1:
           - type: global:rate # 命名空间为 global, 代表引用全局样本
-            weight: 1 # FIXME 由于引用可能包含多个样本, 权重怎么处理?
-          - type: generic:empty
-            weight: 1
         refs_2:
           - type: global:speed
-            weight: 1
           - type: generic:empty
             weight: 1
+    curse_pools: { }
     curse_groups:
-      with_global_references:
+      with_references:
         refs_1:
           - type: global:random_curses
             weight: 1

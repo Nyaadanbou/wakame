@@ -1,16 +1,20 @@
 package cc.mewcraft.wakame.random3
 
-import cc.mewcraft.wakame.random3.SharedStorage.EntryBuilder
+import cc.mewcraft.wakame.random3.NodeRepository.EntryBuilder
 import net.kyori.adventure.key.Key
 
 /**
  * 代表一个节点.
  *
  * 节点可以自身储存任意值, 也可以引用一个全局的节点.
- * 当节点引用一个全局节点时, 会递归解析全局节点的值.
+ * 当节点引用一个全局节点时, 支持递归解析全局节点的值.
  */
 sealed interface Node<T> {
     val key: Key
+
+    companion object {
+        const val NAMESPACE_GLOBAL = "global"
+    }
 }
 
 data class LocalNode<T>(
@@ -46,7 +50,7 @@ data class CompositeNode<T>(
         }
 
         fun composite(key: Key, init: NodeBuilder<T>.() -> Unit = {}) {
-            require(key.namespace() == SharedStorage.NAMESPACE_GLOBAL) {
+            require(key.namespace() == Node.NAMESPACE_GLOBAL) {
                 "CompositeNode key must be in the 'global' namespace"
             }
             val node = CompositeNode<T>(key, mutableListOf())
@@ -58,12 +62,15 @@ data class CompositeNode<T>(
 
 @NodeDsl
 fun <T> NodeContainer(
-    shared: SharedStorage<T>,
+    shared: NodeRepository<T>,
     block: CompositeNode.NodeBuilder<T>.() -> Unit = {},
 ): NodeContainer<T> {
     return NodeContainerImpl(shared).apply { set(block) }
 }
 
+/**
+ * 一个持有 [Node] 的容器, 用于存放 [Node] 实例.
+ */
 @NodeDsl
 interface NodeContainer<T> : Iterable<T> {
     companion object {
@@ -89,20 +96,24 @@ private object NodeContainerEmpty : NodeContainer<Nothing> {
 
 @NodeDsl
 private class NodeContainerImpl<T>(
-    private val shared: SharedStorage<T>,
+    private val shared: NodeRepository<T>,
 ) : NodeContainer<T> {
+    companion object {
+        private val ROOT_KEY = Key.key("internal:root")
+    }
+
     private var root: CompositeNode<T>? = null
 
     override fun set(init: CompositeNode.NodeBuilder<T>.() -> Unit) {
         val builder = CompositeNode.NodeBuilder<T>().apply(init)
-        root = CompositeNode(Key.key("internal", "root"), builder.nodes)
+        root = CompositeNode(ROOT_KEY, builder.nodes)
     }
 
     override fun add(init: CompositeNode.NodeBuilder<T>.() -> Unit) {
         val builder = CompositeNode.NodeBuilder<T>().apply(init)
         when (root) {
             null -> {
-                root = CompositeNode(Key.key("internal", "root"), builder.nodes)
+                root = CompositeNode(ROOT_KEY, builder.nodes)
             }
 
             is CompositeNode -> {
@@ -125,7 +136,7 @@ private class NodeContainerImpl<T>(
 
     class NodeIterator<T>(
         root: Node<T>?,
-        private val shared: SharedStorage<T>,
+        private val shared: NodeRepository<T>,
     ) : Iterator<T> {
         private val valuesQueue = mutableListOf<T>()
         private val visitedGlobals = mutableSetOf<String>()
@@ -143,7 +154,7 @@ private class NodeContainerImpl<T>(
                 }
 
                 is CompositeNode -> {
-                    if (node.key.namespace() == SharedStorage.NAMESPACE_GLOBAL && visitedGlobals.add(node.key.value())) {
+                    if (node.key.namespace() == Node.NAMESPACE_GLOBAL && visitedGlobals.add(node.key.value())) {
                         for (it in shared.getNodes(node.key.value())) {
                             resolveNode(it)
                         }
@@ -170,24 +181,25 @@ private class NodeContainerImpl<T>(
 }
 
 @NodeDsl
-fun <T> SharedStorage(
-    block: SharedStorage<T>.() -> Unit = {},
-): SharedStorage<T> {
-    val storage = SharedStorageImpl<T>()
+fun <T> NodeRepository(
+    block: NodeRepository<T>.() -> Unit = {},
+): NodeRepository<T> {
+    val storage = NodeRepositoryImpl<T>()
     storage.apply(block)
     return storage
 }
 
+/**
+ * 一个持有 [Node] 的仓库, 用于存放共享的 [Node] 实例.
+ */
 @NodeDsl
-interface SharedStorage<T> {
+interface NodeRepository<T> {
     companion object {
-        const val NAMESPACE_GLOBAL = "global"
-
         /**
-         * 获取一个*不可变*的空ß [SharedStorage].
+         * 获取一个*不可变*的空ß [NodeRepository].
          */
-        fun <T> empty(): SharedStorage<T> {
-            return SharedStorageEmpty as SharedStorage<T>
+        fun <T> empty(): NodeRepository<T> {
+            return NodeRepositoryEmpty as NodeRepository<T>
         }
     }
 
@@ -217,13 +229,13 @@ interface SharedStorage<T> {
     }
 }
 
-object SharedStorageEmpty : SharedStorage<Nothing> {
+private object NodeRepositoryEmpty : NodeRepository<Nothing> {
     override fun addEntry(ref: String, init: EntryBuilder<Nothing>.() -> Unit) = Unit
     override fun getNodes(ref: String): List<Node<Nothing>> = emptyList()
     override fun clear() = Unit
 }
 
-private class SharedStorageImpl<T> : SharedStorage<T> {
+private class NodeRepositoryImpl<T> : NodeRepository<T> {
     private val entries: HashMap<String, List<Node<T>>> = HashMap()
 
     override fun addEntry(ref: String, init: EntryBuilder<T>.() -> Unit) {
@@ -282,7 +294,7 @@ private class SharedStorageImpl<T> : SharedStorage<T> {
         }
 
         override fun composite(key: Key, init: CompositeNode<T>.() -> Unit) {
-            require(key.namespace() == SharedStorage.NAMESPACE_GLOBAL) {
+            require(key.namespace() == Node.NAMESPACE_GLOBAL) {
                 "CompositeNode key must be in the 'global' namespace"
             }
             val compositeNode = CompositeNode<T>(key, mutableListOf())
@@ -293,4 +305,4 @@ private class SharedStorageImpl<T> : SharedStorage<T> {
 }
 
 @DslMarker
-annotation class NodeDsl
+private annotation class NodeDsl

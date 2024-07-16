@@ -105,7 +105,7 @@ fun CoreAttribute(
 fun CoreAttribute(
     node: ConfigurationNode,
 ): CoreAttribute {
-    val key = node.node("key").krequire<Key>()
+    val key = node.node("type").krequire<Key>()
     val facade = AttributeRegistry.FACADES[key]
     return facade.codecNodeToInstance(node)
 }
