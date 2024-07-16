@@ -99,18 +99,21 @@ private class DashTick(
                 return TickResult.ALL_DONE
             }
         } else {
-            if (blockBelow.isCanBeDashThrough()) {
+            stepVector = if (blockBelow.isCanBeDashThrough()) {
                 // 如果脚下没有方块，尝试向下移动一格高度
-                stepVector = stepVector.setY(-1.0)
+                stepVector.setY(-1.0)
             } else {
                 // 保持原来的Y轴高度
-                stepVector = stepVector.setY(0.0)
+                stepVector.setY(0.0)
             }
         }
 
         // 应用速度到玩家对象上
         player.velocity = stepVector
         affectEntityNearby(player)
+        if (tickCount >= 10L && !player.isBlocking) {
+            return TickResult.ALL_DONE
+        }
 
         return TickResult.CONTINUE_TICK
     }

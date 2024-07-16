@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill.factory
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
@@ -9,6 +10,9 @@ import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.util.getFirstBlockBelow
 import cc.mewcraft.wakame.util.getTargetLocation
+import cc.mewcraft.wakame.world.attribute.damage.CustomDamageMetaData
+import cc.mewcraft.wakame.world.attribute.damage.ElementDamagePacket
+import cc.mewcraft.wakame.world.attribute.damage.applyCustomDamage
 import com.destroystokyo.paper.ParticleBuilder
 import net.kyori.adventure.key.Key
 import org.bukkit.Location
@@ -56,13 +60,20 @@ private class LightningTick(
     }
 
     override fun tickCast(tickCount: Long): TickResult {
+        val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity as? LivingEntity
         val target = entityLocationTarget ?: locationTarget ?: return TickResult.INTERRUPT
         val world = target.world
-        val lightning = world.strikeLightningEffect(target)
+        world.strikeLightningEffect(target)
         val entitiesBeStruck = world.getNearbyEntities(target, 3.0, 3.0, 3.0)
         for (entity in entitiesBeStruck) {
             if (entity is LivingEntity) {
-                entity.damage(10.0, lightning)
+                entity.applyCustomDamage(
+                    CustomDamageMetaData(
+                        1.0, true,
+                        listOf(ElementDamagePacket(ElementRegistry.DEFAULT, 5.0, 10.0, 0.0, 0.0, 0.0))
+                    ),
+                    caster
+                )
             }
         }
         return TickResult.ALL_DONE
