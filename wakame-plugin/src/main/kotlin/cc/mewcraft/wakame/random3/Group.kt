@@ -14,8 +14,8 @@ import java.util.Collections
 /**
  * [Group] 是一个包含了若干 [Pool] 的集合
  *
- * 同时, 该接口提供函数 [pickBulk], 让你从其中包含的所有 [pools][Pool]
- * 中随机选择一个 [S]. 关于具体的选择过程, 见函数 [pickBulk] 的说明.
+ * 同时, 该接口提供函数 [select], 让你从其中包含的所有 [pools][Pool]
+ * 中随机选择一个 [S]. 关于具体的选择过程, 见函数 [select] 的说明.
  *
  * @param S 样本所携带的实例
  * @param C 条件所需要的上下文
@@ -52,16 +52,7 @@ interface Group<S, C : SelectionContext> {
      *    * 如果 [pools][Pool] 中没有满足条件的, 将从 [fallback pool][default] 中选择一个结果
      *    * 如果 [fallback pool][default] 也没有结果, 最终将返回空列表
      */
-    fun pickBulk(context: C): List<S>
-
-    /**
-     * The same as [pickBulk] but it only picks a **single** random [S]. In the
-     * case where [pickBulk] returns an empty list, this function returns a `null`
-     * instead.
-     *
-     * Use this function if you just want to pick a single [S].
-     */
-    fun pick(context: C): S?
+    fun select(context: C): List<S>
 
     companion object Factory {
         fun <S, C : SelectionContext> empty(): Group<S, C> {
@@ -175,7 +166,7 @@ abstract class GroupSerializer<S, C : SelectionContext> : SchemaSerializer<Group
     /**
      * 假设节点持有一个 [Node<Filter<C>>][Node] 的列表.
      */
-    private fun ConfigurationNode.writeFiltersTo(builder: CompositeNode.Builder<Filter<C>>) {
+    private fun ConfigurationNode.writeFiltersTo(builder: CompositeNode.NodeBuilder<Filter<C>>) {
         // 如果是这个 ConfigurationNode 是 virtual(),
         // 那么 ConfigurationNode#childrenList() 就会是一个空列表.
         // 也就是说, filters 这个 ConfigurationNode 可以在配置文件中完全省略.
@@ -222,8 +213,7 @@ private object GroupEmpty : Group<Nothing, SelectionContext> {
     override val pools: Map<String, Pool<Nothing, SelectionContext>> = emptyMap()
     override val filters: NodeContainer<Filter<SelectionContext>> = NodeContainer.empty()
     override val default: Pool<Nothing, SelectionContext> = Pool.empty()
-    override fun pick(context: SelectionContext): Nothing? = null
-    override fun pickBulk(context: SelectionContext): List<Nothing> = Collections.emptyList()
+    override fun select(context: SelectionContext): List<Nothing> = Collections.emptyList()
 }
 
 private class GroupImpl<S, C : SelectionContext>(
@@ -232,7 +222,7 @@ private class GroupImpl<S, C : SelectionContext>(
     override val default: Pool<S, C>,
 ) : Group<S, C> {
 
-    override fun pickBulk(context: C): List<S> {
+    override fun select(context: C): List<S> {
         val isAllFiltersTrue = filters.all {
             it.test(context)
         }
@@ -254,10 +244,6 @@ private class GroupImpl<S, C : SelectionContext>(
 
         // pools 中没有一个满足条件的, 因此从 fallback 中选择
         return default.pickBulk(context)
-    }
-
-    override fun pick(context: C): S? {
-        return pickBulk(context).firstOrNull()
     }
 }
 
