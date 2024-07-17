@@ -87,7 +87,7 @@ object CommonNekoStackTest {
         LevelMappingRegistry.onPreWorld()
         EntityRegistry.onPreWorld()
 
-        // 初始化所有 random3 的实现
+        // 初始化所有 random3.Node 相关的实现
         with(app.koin) {
             get<ElementSampleNodeFacade>().onPreWorld()
             get<KizamiSampleNodeFacade>().onPreWorld()

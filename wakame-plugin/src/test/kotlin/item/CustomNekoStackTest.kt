@@ -379,7 +379,33 @@ class CustomNekoStackTest : KoinTest {
         }
     }
 
-    // TODO 编写更多关于 random3 引用的测试
+    @Test
+    fun `component - cells check references 2`() = componentLifecycleTest(
+        "cells_references_2", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        context {
+            it.level = 10
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            val cell = it.get("foo_b")
+            assertNotNull(cell)
+            val core = cell.getTypedCore(CoreTypes.ATTRIBUTE)
+            assertNotNull(core)
+            assertAny(
+                { assertEquals(Key.key("attribute:critical_strike_chance"), core.key) },
+                { assertEquals(Key.key("attribute:critical_strike_power"), core.key) }
+            )
+        }
+    }
 
     @Test
     fun `component - crate`() = componentLifecycleTest(
