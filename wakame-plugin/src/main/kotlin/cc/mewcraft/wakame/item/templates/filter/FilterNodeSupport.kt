@@ -30,10 +30,10 @@ internal class ItemFilterNodeFacade(
     override val dataDir: Path,
 ) : FilterNodeFacade<GenerationContext>(), Initializable {
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        kregister(FilterSerializer)
         registerAll(get(named(ELEMENT_EXTERNALS)))
         registerAll(get(named(KIZAMI_EXTERNALS)))
         registerAll(get(named(RARITY_EXTERNALS)))
+        kregister(FilterSerializer)
     }.build()
 
     override val repository: NodeRepository<Filter<GenerationContext>> = NodeRepository()

@@ -16,6 +16,7 @@ import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCurseEnt
 import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCursePeakDamage
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.templates.filter.CurseContextHolder
+import cc.mewcraft.wakame.item.templates.filter.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filter.ItemFilterNodeFacade
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.GroupSerializer
@@ -108,6 +109,7 @@ internal class TemplateCurseSampleNodeFacade(
         registerAll(get(named(ELEMENT_EXTERNALS)))
             .registerAll(get(named(ENTITY_TYPE_HOLDER_EXTERNALS)))
             .kregister(TemplateCurseSerializer)
+            .kregister(FilterSerializer)
     }.build()
     override val repository: NodeRepository<Sample<TemplateCurse, GenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<TemplateCurse> = typeTokenOf()

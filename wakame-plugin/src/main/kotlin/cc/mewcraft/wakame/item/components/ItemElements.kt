@@ -183,6 +183,7 @@ internal class ElementSampleNodeFacade(
 ) : SampleNodeFacade<Element, GenerationContext>(), Initializable {
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
         kregister(ElementSerializer)
+        kregister(FilterSerializer)
     }.build()
     override val repository: NodeRepository<Sample<Element, GenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<Element> = typeTokenOf()
