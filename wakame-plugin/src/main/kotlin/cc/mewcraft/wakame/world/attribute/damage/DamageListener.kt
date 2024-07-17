@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.event.WakameEntityDamageEvent
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.util.toSimpleString
+import io.papermc.paper.event.entity.EntityKnockbackEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
@@ -84,23 +84,35 @@ class DamageListener : Listener, KoinComponent {
         }
     }
 
+    /**
+     * 用于取消自定义伤害的击退
+     */
+    @EventHandler
+    fun on(event: EntityKnockbackEvent) {
+        val uuid = event.entity.uniqueId
+        val customDamageMetaData = DamageManager.findCustomDamageMetaData(uuid) ?: return
+        if (!customDamageMetaData.knockback) {
+            event.isCancelled = true
+        }
+        DamageManager.removeCustomDamageMetaData(uuid)
+    }
 
-//    @EventHandler
-//    fun on(event: PlayerInteractEntityEvent) {
-//        val player = event.player
-//        val entity = event.rightClicked
-//        if (event.hand != EquipmentSlot.HAND) return
-//        player.sendMessage(Component.text("你右键了" + entity.type + "(" + entity.uniqueId + ")"))
-//        if (entity is LivingEntity) {
-//            entity.applyCustomDamage(
-//                CustomDamageMetaData(
-//                    1.0, false,
-//                    listOf(
-//                        ElementDamagePacket(ElementRegistry.DEFAULT, 5.0, 10.0, 0.0, 0.0, 0.0)
-//                    )
-//                ),
-//                player
-//            )
-//        }
-//    }
+    @EventHandler
+    fun on(event: PlayerInteractEntityEvent) {
+        val player = event.player
+        val entity = event.rightClicked
+        if (event.hand != EquipmentSlot.HAND) return
+        player.sendMessage(Component.text("你右键了" + entity.type + "(" + entity.uniqueId + ")"))
+        if (entity is LivingEntity) {
+            entity.applyCustomDamage(
+                CustomDamageMetaData(
+                    1.0, false, false,
+                    listOf(
+                        ElementDamagePacket(ElementRegistry.DEFAULT, 5.0, 10.0, 0.0, 0.0, 0.0)
+                    )
+                ),
+                player
+            )
+        }
+    }
 }

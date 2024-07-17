@@ -238,6 +238,7 @@ class EntityProjectileDamageMetaData(
 class CustomDamageMetaData(
     override val criticalPower: Double,
     override val isCritical: Boolean,
+    val knockback: Boolean,
     private val customElementDamagePackets: List<ElementDamagePacket>
 ) : DamageMetaData {
     override val damageValue: Double = packets.sumOf { it.packetDamage }
