@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.config
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.map
-import cc.mewcraft.wakame.util.withDefaultSettings
+import cc.mewcraft.wakame.util.withDefaults
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -128,7 +128,7 @@ class YamlFileConfigProvider internal constructor(
     override fun loadValue(): ConfigurationNode {
         return YamlConfigurationLoader.builder()
             .source { path.toFile().bufferedReader() }
-            .withDefaultSettings()
+            .withDefaults()
             .apply(builder)
             .build()
             .load()
