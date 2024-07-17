@@ -68,6 +68,8 @@ private class RemovePotionEffectTick(
     }
 
     override fun tickCast(tickCount: Long): TickResult {
+        if (!checkConditions())
+            return TickResult.ALL_DONE
         val entity = context.getOrThrow(SkillContextKey.CASTER).valueNonNull<Caster.Single.Entity>().bukkitEntity
         if (entity is LivingEntity) {
             skill.effectTypes.forEach { entity.removePotionEffect(it) }

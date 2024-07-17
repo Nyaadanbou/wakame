@@ -50,6 +50,8 @@ private class Tick(
     }
 
     override fun tickCast(tickCount: Long): TickResult {
+        if (!checkConditions())
+            return TickResult.ALL_DONE
         val entity = context[SkillContextKey.TARGET]?.value<Target.LivingEntity>()?.bukkitEntity ?: return TickResult.INTERRUPT
         entity.health = 0.0
         return TickResult.ALL_DONE

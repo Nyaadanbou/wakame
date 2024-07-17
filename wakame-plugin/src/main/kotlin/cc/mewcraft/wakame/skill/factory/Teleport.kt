@@ -80,6 +80,8 @@ private class TeleportTick(
     }
 
     override fun tickCast(tickCount: Long): TickResult {
+        if (!checkConditions())
+            return TickResult.ALL_DONE
         val caster = CasterUtils.getCaster<Caster.Single.Player>(context) ?: return TickResult.INTERRUPT
         val location = TargetUtil.getLocation(context)?.bukkitLocation ?: return TickResult.INTERRUPT
         when (val type = skill.type) {

@@ -5,6 +5,8 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.Damageable
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
@@ -16,6 +18,8 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+
+const val STARTING_TICK: Long = 10L
 
 interface Dash : Skill {
 
@@ -74,7 +78,9 @@ private class DashTick(
     }
 
     override fun tickCast(tickCount: Long): TickResult {
-        if (tickCount >= skill.duration) {
+        if (!checkConditions())
+            return TickResult.ALL_DONE
+        if (tickCount >= skill.duration + STARTING_TICK) {
             return TickResult.ALL_DONE
         }
 
@@ -110,22 +116,37 @@ private class DashTick(
 
         // 应用速度到玩家对象上
         player.velocity = stepVector
-        affectEntityNearby(player)
-        if (tickCount >= 10L && !player.isBlocking) {
+        if (tickCount >= STARTING_TICK && !player.hasActiveItem()) {
             return TickResult.ALL_DONE
+        }
+
+        if (affectEntityNearby(player)) {
+            context[SkillContextKey.NEKO_STACK]?.let {
+                val components = it.components
+                val damage = components.get(ItemComponentTypes.DAMAGEABLE) ?: return@let
+                if (damage.damage < damage.maxDamage) {
+                    components.set(ItemComponentTypes.DAMAGEABLE, Damageable(damage.damage + 1, damage.maxDamage))
+                } else {
+                    return TickResult.ALL_DONE
+                }
+            }
         }
 
         return TickResult.CONTINUE_TICK
     }
 
-    private fun affectEntityNearby(player: Player) {
+    private fun affectEntityNearby(player: Player): Boolean {
         val entities = player.getNearbyEntities(2.0, 1.0, 2.0)
+        if (entities.isEmpty()) {
+            return false
+        }
         for (entity in entities) {
             if (entity is LivingEntity) {
                 entity.velocity = player.location.direction.multiply(2.0)
                 entity.damage(2.0, player)
             }
         }
+        return true
     }
 
     private fun Block.isCanBeDashThrough(): Boolean {

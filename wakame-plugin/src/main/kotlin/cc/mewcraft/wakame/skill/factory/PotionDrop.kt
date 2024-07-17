@@ -68,6 +68,8 @@ private class PotionDropEffectTick(
     private val location: Location
 ) : AbstractSkillTick<PotionDrop>(tick.skill, tick.context) {
     override fun tick(): TickResult {
+        if (!checkConditions())
+            return TickResult.ALL_DONE
         if (tickCount % 20 == 0L) {
             val potionItem = ItemStack(Material.SPLASH_POTION)
             val potionMeta = potionItem.itemMeta as PotionMeta

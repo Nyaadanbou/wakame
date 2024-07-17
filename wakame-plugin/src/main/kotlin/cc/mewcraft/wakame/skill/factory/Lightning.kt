@@ -60,6 +60,8 @@ private class LightningTick(
     }
 
     override fun tickCast(tickCount: Long): TickResult {
+        if (!checkConditions())
+            return TickResult.ALL_DONE
         val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity as? LivingEntity
         val target = entityLocationTarget ?: locationTarget ?: return TickResult.INTERRUPT
         val world = target.world

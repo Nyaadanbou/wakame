@@ -60,6 +60,8 @@ private class CommandExecuteTick(
     }
 
     override fun tickCast(tickCount: Long): TickResult {
+        if (!checkConditions())
+            return TickResult.ALL_DONE
         val entity = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitEntity ?: return TickResult.INTERRUPT
         for (command in skill.commands) {
             command.replace("{caster}", entity.name).also { entity.server.dispatchCommand(entity.server.consoleSender, it) }

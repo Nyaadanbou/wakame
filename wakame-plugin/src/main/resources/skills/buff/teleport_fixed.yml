@@ -8,9 +8,10 @@ teleportation:
   z: 0.0
 
 conditions:
-  - type: molang
-    id: "chance"
-    eval: "math.random(0.0, 1.0) < 0.5"
-    failure_message:
-      - type: chat
-        text: "Failed to teleport"
+  before_cast:
+    - type: molang
+      id: "chance"
+      eval: "math.random(0.0, 1.0) < 0.5"
+      failure_message:
+        - type: chat
+          text: "Failed to teleport"

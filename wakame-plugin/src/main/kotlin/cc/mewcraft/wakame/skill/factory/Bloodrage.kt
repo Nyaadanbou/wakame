@@ -48,6 +48,8 @@ private class BloodrageTick(
     private val attribute = Attributes.MAX_HEALTH
 
     override fun tick(): TickResult {
+        if (!checkConditions())
+            return TickResult.ALL_DONE
         val player = CasterUtils.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return TickResult.INTERRUPT
         // When player health is below 50%
         val user = player.toUser()

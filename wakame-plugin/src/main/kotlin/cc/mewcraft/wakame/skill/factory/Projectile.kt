@@ -174,6 +174,8 @@ private class ProjectileTick(
 ) : AbstractPlayerSkillTick<Projectile>(projectile, context) {
 
     override fun tickCast(tickCount: Long): TickResult {
+        if (!checkConditions())
+            return TickResult.ALL_DONE
         val target = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
         val location = target.bukkitLocation
         val projectile = when (projectile.type) {

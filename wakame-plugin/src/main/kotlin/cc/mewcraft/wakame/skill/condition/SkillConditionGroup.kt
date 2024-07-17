@@ -19,12 +19,12 @@ interface SkillConditionGroup {
     /**
      * 技能条件组里所有的 [SkillCondition.resolver] 之和.
      */
-    val resolver: TagResolver
+    fun getResolver(time: ConditionTime = ConditionTime.BEFORE_CAST): TagResolver
 
     /**
      * 创建一个新的条件判断的会话.
      */
-    fun newSession(context: SkillContext): SkillConditionSession
+    fun newSession(time: ConditionTime, context: SkillContext): SkillConditionSession
 
     companion object {
         /**
@@ -41,8 +41,8 @@ interface SkillConditionGroup {
 //
 
 private data object EmptySkillConditionGroup : SkillConditionGroup {
-    override val resolver: TagResolver = TagResolver.empty()
-    override fun newSession(context: SkillContext): SkillConditionSession {
+    override fun getResolver(time: ConditionTime): TagResolver = TagResolver.empty()
+    override fun newSession(time: ConditionTime, context: SkillContext): SkillConditionSession {
         return SkillConditionSession.alwaysSuccess()
     }
 }
