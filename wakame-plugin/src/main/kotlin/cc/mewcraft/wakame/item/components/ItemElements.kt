@@ -7,6 +7,10 @@ import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementSerializer
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -14,21 +18,23 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.cells.template.TEMPLATE_ELEMENT_SAMPLE_NODE_FACADE
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ITEM_FILTER_NODE_FACADE
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.templates.filter.FilterSerializer
+import cc.mewcraft.wakame.item.templates.filter.ItemFilterNodeFacade
 import cc.mewcraft.wakame.random3.Filter
-import cc.mewcraft.wakame.random3.FilterNodeFacade
+import cc.mewcraft.wakame.random3.Node
 import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.NodeFacadeSupport
+import cc.mewcraft.wakame.random3.NodeRepository
 import cc.mewcraft.wakame.random3.Pool
 import cc.mewcraft.wakame.random3.PoolSerializer
 import cc.mewcraft.wakame.random3.Sample
 import cc.mewcraft.wakame.random3.SampleNodeFacade
-import cc.mewcraft.wakame.random3.SampleNodeReader
 import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
@@ -44,6 +50,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import java.nio.file.Path
 import java.util.stream.Stream
 
 data class ItemElements(
@@ -156,19 +163,46 @@ data class ItemElements(
             return TypeSerializerCollection.builder()
                 .registerAll(get(named(ELEMENT_EXTERNALS)))
                 .kregister(ElementPoolSerializer)
+                .kregister(FilterSerializer) // 凡是随机池都要用到筛选器
                 .build()
         }
     }
 }
 
-internal class ElementSampleNodeReader : KoinComponent, SampleNodeReader<Element, GenerationContext>() {
-    override val sampleValueType: TypeToken<Element> = typeTokenOf()
-    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
-    override fun readData(node: ConfigurationNode): Element {
-        return node.node("type").krequire()
+@PreWorldDependency(
+    runAfter = [ItemRegistry::class]
+)
+@ReloadDependency(
+    runAfter = [ItemRegistry::class]
+)
+/**
+ * 封装了类型 [Element] 所需要的所有 [Node] 相关的实现.
+ */
+internal class ElementSampleNodeFacade(
+    override val dataDir: Path,
+) : SampleNodeFacade<Element, GenerationContext>(), Initializable {
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
+        kregister(ElementSerializer)
+    }.build()
+    override val repository: NodeRepository<Sample<Element, GenerationContext>> = NodeRepository()
+    override val sampleDataType: TypeToken<Element> = typeTokenOf()
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override fun decodeSampleData(node: ConfigurationNode): Element {
+        return node.node("type").krequire<Element>()
+    }
+
+    override fun onPreWorld() {
+        NodeFacadeSupport.reload(this)
+    }
+
+    override fun onReload() {
+        NodeFacadeSupport.reload(this)
     }
 }
 
+/**
+ * [Element] 的 [Pool].
+ */
 private data class ElementPool(
     override val amount: Long,
     override val samples: NodeContainer<Sample<Element, GenerationContext>>,
@@ -198,8 +232,8 @@ private data class ElementPool(
  * ```
  */
 private data object ElementPoolSerializer : KoinComponent, PoolSerializer<Element, GenerationContext>() {
-    override val sampleNodeFacade: SampleNodeFacade<Element, GenerationContext> by inject(named(TEMPLATE_ELEMENT_SAMPLE_NODE_FACADE))
-    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+    override val sampleNodeFacade: ElementSampleNodeFacade by inject()
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
 
     override fun poolConstructor(
         amount: Long,

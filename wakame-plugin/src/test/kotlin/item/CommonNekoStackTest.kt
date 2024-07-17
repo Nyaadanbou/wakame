@@ -7,20 +7,20 @@ import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.components.cells.template.TEMPLATE_CORE_SAMPLE_NODE_FACADE
-import cc.mewcraft.wakame.item.components.cells.template.TEMPLATE_CURSE_SAMPLE_NODE_FACADE
-import cc.mewcraft.wakame.item.components.cells.template.TEMPLATE_ELEMENT_SAMPLE_NODE_FACADE
-import cc.mewcraft.wakame.item.components.cells.template.TEMPLATE_KIZAMI_SAMPLE_NODE_FACADE
+import cc.mewcraft.wakame.item.components.ElementSampleNodeFacade
+import cc.mewcraft.wakame.item.components.KizamiSampleNodeFacade
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCoreSampleNodeFacade
+import cc.mewcraft.wakame.item.components.cells.template.TemplateCurseSampleNodeFacade
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.GenerationTrigger
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.templates.filter.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.level.levelModule
 import cc.mewcraft.wakame.molang.molangModule
-import cc.mewcraft.wakame.random3.SampleNodeFacade
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -89,10 +89,11 @@ object CommonNekoStackTest {
 
         // 初始化所有 random3 的实现
         with(app.koin) {
-            get<SampleNodeFacade<*, *>>(named(TEMPLATE_CORE_SAMPLE_NODE_FACADE)).onPreWorld()
-            get<SampleNodeFacade<*, *>>(named(TEMPLATE_CURSE_SAMPLE_NODE_FACADE)).onPreWorld()
-            get<SampleNodeFacade<*, *>>(named(TEMPLATE_ELEMENT_SAMPLE_NODE_FACADE)).onPreWorld()
-            get<SampleNodeFacade<*, *>>(named(TEMPLATE_KIZAMI_SAMPLE_NODE_FACADE)).onPreWorld()
+            get<ElementSampleNodeFacade>().onPreWorld()
+            get<KizamiSampleNodeFacade>().onPreWorld()
+            get<TemplateCoreSampleNodeFacade>().onPreWorld()
+            get<TemplateCurseSampleNodeFacade>().onPreWorld()
+            get<ItemFilterNodeFacade>().onPreWorld()
         }
     }
 

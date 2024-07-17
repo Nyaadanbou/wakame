@@ -130,9 +130,9 @@ abstract class GroupSerializer<V, C : SelectionContext> : SchemaSerializer<Group
             // 这是一个完整的结构, 可能包含所有组件
             node.isMap -> {
                 val pools = decodeAsPoolMap(node, node.node(PATH_SELECTS))
-                val filters = NodeContainer(filterNodeFacade.repository()) {
+                val filters = NodeContainer(filterNodeFacade.repository) {
                     for (listChild in node.node(PATH_FILTERS).childrenList()) {
-                        node(filterNodeFacade.reader().readNode(listChild))
+                        node(filterNodeFacade.decodeNode(listChild))
                     }
                 }
                 val default = node.node(PATH_DEFAULT).let {

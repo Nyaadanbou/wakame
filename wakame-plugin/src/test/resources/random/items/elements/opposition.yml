@@ -1,0 +1,5 @@
+nodes:
+  - type: element:fire
+    weight: 1
+  - type: element:wind
+    weight: 1

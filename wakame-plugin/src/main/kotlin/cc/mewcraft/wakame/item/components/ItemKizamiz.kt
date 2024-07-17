@@ -5,6 +5,9 @@ import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -12,25 +15,28 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.cells.template.TEMPLATE_KIZAMI_SAMPLE_NODE_FACADE
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ITEM_FILTER_NODE_FACADE
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.templates.filter.FilterSerializer
+import cc.mewcraft.wakame.item.templates.filter.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.KIZAMI_EXTERNALS
 import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiSerializer
 import cc.mewcraft.wakame.random3.Filter
-import cc.mewcraft.wakame.random3.FilterNodeFacade
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.random3.GroupSerializer
+import cc.mewcraft.wakame.random3.Node
 import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.NodeFacadeSupport
+import cc.mewcraft.wakame.random3.NodeRepository
 import cc.mewcraft.wakame.random3.Pool
 import cc.mewcraft.wakame.random3.PoolSerializer
 import cc.mewcraft.wakame.random3.Sample
 import cc.mewcraft.wakame.random3.SampleNodeFacade
-import cc.mewcraft.wakame.random3.SampleNodeReader
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
+import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import cc.mewcraft.wakame.util.kregister
@@ -45,6 +51,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import java.nio.file.Path
 
 data class ItemKizamiz(
     /**
@@ -142,19 +149,46 @@ data class ItemKizamiz(
                 .registerAll(get(named(KIZAMI_EXTERNALS)))
                 .kregister(KizamiPoolSerializer)
                 .kregister(KizamiGroupSerializer)
+                .kregister(FilterSerializer) // 凡是随机池都要用到筛选器
                 .build()
         }
     }
 }
 
-internal class KizamiSampleNodeReader : KoinComponent, SampleNodeReader<Kizami, GenerationContext>() {
-    override val sampleValueType: TypeToken<Kizami> = typeTokenOf()
-    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
-    override fun readData(node: ConfigurationNode): Kizami {
-        return node.node("type").krequire()
+@PreWorldDependency(
+    runAfter = [ItemRegistry::class]
+)
+@ReloadDependency(
+    runAfter = [ItemRegistry::class]
+)
+/**
+ * 封装了类型 [Kizami] 所需要的所有 [Node] 相关的实现.
+ */
+internal class KizamiSampleNodeFacade(
+    override val dataDir: Path,
+) : SampleNodeFacade<Kizami, GenerationContext>(), Initializable {
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
+        kregister(KizamiSerializer)
+    }.build()
+    override val repository: NodeRepository<Sample<Kizami, GenerationContext>> = NodeRepository()
+    override val sampleDataType: TypeToken<Kizami> = typeTokenOf()
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override fun decodeSampleData(node: ConfigurationNode): Kizami {
+        return node.node("type").krequire<Kizami>()
+    }
+
+    override fun onPreWorld() {
+        NodeFacadeSupport.reload(this)
+    }
+
+    override fun onReload() {
+        NodeFacadeSupport.reload(this)
     }
 }
 
+/**
+ * [Kizami] 的 [Pool].
+ */
 private class KizamiPool(
     override val amount: Long,
     override val samples: NodeContainer<Sample<Kizami, GenerationContext>>,
@@ -187,8 +221,8 @@ private class KizamiPool(
  * ```
  */
 private object KizamiPoolSerializer : KoinComponent, PoolSerializer<Kizami, GenerationContext>() {
-    override val sampleNodeFacade: SampleNodeFacade<Kizami, GenerationContext> by inject(named(TEMPLATE_KIZAMI_SAMPLE_NODE_FACADE))
-    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+    override val sampleNodeFacade: KizamiSampleNodeFacade by inject()
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
 
     override fun poolConstructor(
         amount: Long,
@@ -214,7 +248,7 @@ private object KizamiPoolSerializer : KoinComponent, PoolSerializer<Kizami, Gene
 }
 
 private object KizamiGroupSerializer : KoinComponent, GroupSerializer<Kizami, GenerationContext>() {
-    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
 
     override fun poolConstructor(node: ConfigurationNode): Pool<Kizami, GenerationContext> {
         return node.krequire<Pool<Kizami, GenerationContext>>()

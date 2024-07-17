@@ -1,0 +1,7 @@
+nodes:
+  - type: kizami:gold
+    weight: 3
+  - type: kizami:diamond
+    weight: 2
+  - type: kizami:netherite
+    weight: 1

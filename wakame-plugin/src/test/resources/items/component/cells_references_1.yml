@@ -13,16 +13,15 @@ cells:
     core_groups:
       with_references:
         refs_1:
-          - type: global:rate # 命名空间为 global, 代表引用全局样本
+          - type: global:example_a # 命名空间为 global, 代表引用全局样本
         refs_2:
-          - type: global:speed
           - type: generic:empty
             weight: 1
     curse_pools: { }
     curse_groups:
       with_references:
         refs_1:
-          - type: global:random_curses
+          - type: global:everything
             weight: 1
           - type: generic:empty
             weight: 1

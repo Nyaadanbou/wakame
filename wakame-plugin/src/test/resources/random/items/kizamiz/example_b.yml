@@ -1,0 +1,7 @@
+nodes:
+  - type: kizami:iron
+    weight: 3
+  - type: kizami:gold
+    weight: 2
+  - type: kizami:diamond
+    weight: 1

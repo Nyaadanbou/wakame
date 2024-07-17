@@ -3,6 +3,11 @@ package cc.mewcraft.wakame.item.components.cells.template
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeDeserializer
+import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
+import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.Curse
@@ -10,27 +15,33 @@ import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCurseEmp
 import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCurseEntityKills
 import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCursePeakDamage
 import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.ITEM_FILTER_NODE_FACADE
 import cc.mewcraft.wakame.item.templates.filter.CurseContextHolder
+import cc.mewcraft.wakame.item.templates.filter.ItemFilterNodeFacade
 import cc.mewcraft.wakame.random3.Filter
-import cc.mewcraft.wakame.random3.FilterNodeFacade
 import cc.mewcraft.wakame.random3.GroupSerializer
+import cc.mewcraft.wakame.random3.Node
 import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.NodeFacadeSupport
+import cc.mewcraft.wakame.random3.NodeRepository
 import cc.mewcraft.wakame.random3.Pool
 import cc.mewcraft.wakame.random3.PoolSerializer
 import cc.mewcraft.wakame.random3.Sample
 import cc.mewcraft.wakame.random3.SampleNodeFacade
-import cc.mewcraft.wakame.random3.SampleNodeReader
+import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
+import java.nio.file.Path
 
 /**
  * 代表一个[诅咒][Curse]的模板.
@@ -81,14 +92,42 @@ internal object TemplateCurseSerializer : TypeDeserializer<TemplateCurse> {
     }
 }
 
-internal class TemplateCurseSampleNodeReader : KoinComponent, SampleNodeReader<TemplateCurse, GenerationContext>() {
-    override val sampleValueType: TypeToken<TemplateCurse> = typeTokenOf()
-    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
-    override fun readData(node: ConfigurationNode): TemplateCurse {
-        return node.krequire()
+@PreWorldDependency(
+    runAfter = [ItemRegistry::class]
+)
+@ReloadDependency(
+    runAfter = [ItemRegistry::class]
+)
+/**
+ * 封装了类型 [TemplateCurse] 所需要的所有 [Node] 相关的实现.
+ */
+internal class TemplateCurseSampleNodeFacade(
+    override val dataDir: Path,
+) : SampleNodeFacade<TemplateCurse, GenerationContext>(), Initializable {
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
+        registerAll(get(named(ELEMENT_EXTERNALS)))
+            .registerAll(get(named(ENTITY_TYPE_HOLDER_EXTERNALS)))
+            .kregister(TemplateCurseSerializer)
+    }.build()
+    override val repository: NodeRepository<Sample<TemplateCurse, GenerationContext>> = NodeRepository()
+    override val sampleDataType: TypeToken<TemplateCurse> = typeTokenOf()
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override fun decodeSampleData(node: ConfigurationNode): TemplateCurse {
+        return node.krequire<TemplateCurse>()
+    }
+
+    override fun onPreWorld() {
+        NodeFacadeSupport.reload(this)
+    }
+
+    override fun onReload() {
+        NodeFacadeSupport.reload(this)
     }
 }
 
+/**
+ * [TemplateCurse] 的 [Pool].
+ */
 internal class TemplateCursePool(
     override val amount: Long,
     override val samples: NodeContainer<Sample<TemplateCurse, GenerationContext>>,
@@ -134,8 +173,8 @@ internal class TemplateCursePool(
  * ```
  */
 internal object TemplateCursePoolSerializer : KoinComponent, PoolSerializer<TemplateCurse, GenerationContext>() {
-    override val sampleNodeFacade: SampleNodeFacade<TemplateCurse, GenerationContext> by inject(named(TEMPLATE_CURSE_SAMPLE_NODE_FACADE))
-    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+    override val sampleNodeFacade: TemplateCurseSampleNodeFacade by inject()
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
 
     override fun poolConstructor(
         amount: Long,
@@ -164,7 +203,7 @@ internal object TemplateCursePoolSerializer : KoinComponent, PoolSerializer<Temp
  * @see GroupSerializer
  */
 internal object TemplateCurseGroupSerializer : KoinComponent, GroupSerializer<TemplateCurse, GenerationContext>() {
-    override val filterNodeFacade: FilterNodeFacade<GenerationContext> by inject(named(ITEM_FILTER_NODE_FACADE))
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
 
     override fun poolConstructor(node: ConfigurationNode): Pool<TemplateCurse, GenerationContext> {
         return node.krequire<Pool<TemplateCurse, GenerationContext>>()
