@@ -13,7 +13,7 @@ cells:
     core_groups:
       with_references:
         refs_1:
-          - type: global:example_a # 命名空间为 global, 代表引用全局样本
+          - type: global:foo/example_a # 命名空间为 global, 代表引用全局样本
         refs_2:
           - type: generic:empty
             weight: 1

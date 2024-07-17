@@ -118,10 +118,10 @@ abstract class NodeFacade<T> : KoinComponent {
         // 遍历 entriesDataDir 中的每一个文件,
         // 并将其读取为一个 random.Node,
         // 最后将其添加到 repository 中.
-        forEachEntryFile { entryFile ->
-            val entryRef = entryFile.nameWithoutExtension
+        forEachEntryFile { file ->
+            val entryRef = getEntryRef(file)
             validateFileName(entryRef)
-            val fileText = entryFile.readText(Charsets.UTF_8)
+            val fileText = file.readText(Charsets.UTF_8)
             val rootNode = loadBuilder.buildAndLoadString(fileText)
             repository.addEntry(entryRef) {
                 // "nodes" 装的是一个 List, 其中的每一项都是一个 LocalNode 或 CompositeNode
@@ -137,14 +137,8 @@ abstract class NodeFacade<T> : KoinComponent {
         }
     }
 
-    private fun forEachEntryFile(block: (File) -> Unit) {
-        val pluginDataDir = get<File>(named(PLUGIN_DATA_DIR))
-        val entriesDataDir = pluginDataDir.resolve(dataDir.toFile())
-        entriesDataDir
-            .walk()
-            .drop(1) // exclude the directory itself
-            .filter { it.isFile && it.extension == "yml" }
-            .forEach(block)
+    private fun getEntryRef(file: File): String {
+        return file.toRelativeString(pluginDataDir.resolve(dataDir.toFile())).substringBeforeLast(".")
     }
 
     private fun validateFileName(filename: String) {
@@ -156,5 +150,16 @@ abstract class NodeFacade<T> : KoinComponent {
         }
     }
 
+    private fun forEachEntryFile(block: (File) -> Unit) {
+        val pluginDataDir = get<File>(named(PLUGIN_DATA_DIR))
+        val entriesDataDir = pluginDataDir.resolve(dataDir.toFile())
+        entriesDataDir
+            .walk()
+            .drop(1) // exclude the directory itself
+            .filter { it.isFile && it.extension == "yml" }
+            .forEach(block)
+    }
+
     private val logger: Logger by inject()
+    private val pluginDataDir by inject<File>(named(PLUGIN_DATA_DIR))
 }
