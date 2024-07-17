@@ -1,4 +1,9 @@
 nodes:
-  - type: attribute:attack_speed_level
-    value: 0
+  - type: skill:melee/demo
+    trigger: trigger:generic/attack
+    variant: 0
+    weight: 1
+  - type: skill:ranged/demo
+    trigger: trigger:generic/attack
+    variant: 0
     weight: 1

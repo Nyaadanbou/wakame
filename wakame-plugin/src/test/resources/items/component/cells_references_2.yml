@@ -1,0 +1,22 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 假设物品等级为 10
+# 引用了全局的数据.
+cells:
+  buckets:
+    foo_a:
+      core: "a"
+    foo_b:
+      core: "b"
+  selectors:
+    core_pools: { }
+    core_groups:
+      a:
+        qwe:
+          - type: global:example_a # 命名空间为 global, 代表引用全局样本
+      b:
+        zxc:
+          - type: global:example_b
+    curse_pools: { }
+    curse_groups: { }

@@ -1,9 +1,7 @@
 nodes:
-  - type: skill:melee/demo
-    trigger: trigger:generic/attack
-    variant: 0
+  - type: attribute:critical_strike_chance
+    value: 0.0
     weight: 1
-  - type: skill:ranged/demo
-    trigger: trigger:generic/attack
-    variant: 0
+  - type: attribute:critical_strike_power
+    value: 1.0
     weight: 1

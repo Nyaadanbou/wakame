@@ -1,7 +1,6 @@
 nodes:
-  - type: attribute:critical_strike_chance
-    value: 0.0
-    weight: 1
-  - type: attribute:critical_strike_power
-    value: 1.0
+  - type: global:example_d
+  - type: skill:foo/bar
+    trigger: trigger:generic/attack
+    variant: 0
     weight: 1
