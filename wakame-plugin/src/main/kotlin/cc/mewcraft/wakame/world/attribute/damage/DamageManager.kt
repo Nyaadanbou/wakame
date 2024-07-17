@@ -22,7 +22,6 @@ object DamageManager {
         val uuid = event.entity.uniqueId
         val customDamageMetaData = findCustomDamageMetaData(uuid)
         if (customDamageMetaData != null) {
-            removeCustomDamageMetaData(uuid)
             return customDamageMetaData
         }
 
