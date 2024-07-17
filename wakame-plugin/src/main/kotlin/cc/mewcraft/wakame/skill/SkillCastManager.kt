@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.event.SkillPrepareCastEvent
+import cc.mewcraft.wakame.skill.condition.ConditionTime
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 
@@ -29,7 +30,7 @@ internal class SkillCastManagerImpl : SkillCastManager {
         event.callEvent()
         if (event.isCancelled) return FailureSkillPrepareCastResult.CANCELED
         val conditionGroup = skill.conditions
-        val session = conditionGroup.newSession(context)
+        val session = conditionGroup.newSession(ConditionTime.BEFORE_CAST, context)
         if (!session.isSuccess) {
             session.onFailure(context)
             return FailureSkillPrepareCastResult.CONDITION_CANNOT_MEET

@@ -33,16 +33,21 @@ forbidden_triggers:
     - MOVE
 
 conditions:
-  - type: durability
-    durability: 10
-    success_message:
-      - type: chat
-        text: "You successfully removed the potion effect. durability: -10"
-    failure_message:
-      - type: chat
-        text: "You failed to remove the potion effect. no durability"
-  - type: mana
-    mana: "player.max_mana() / 10"
+  before_cast:
+    - type: durability
+      durability: 10
+      success_message:
+        - type: chat
+          text: "You successfully removed the potion effect. durability: -10"
+      failure_message:
+        - type: chat
+          text: "You failed to remove the potion effect. no durability"
+    - type: mana
+      mana: "player.max_mana() / 10"
+  ticking:
+    - type: mana
+      mana: "player.max_mana() / 10"
+
 
 # 下面的是此技能的属性, 可选值: [https://jd.papermc.io/paper/1.21/org/bukkit/potion/PotionEffectType.html]
 effect_types:

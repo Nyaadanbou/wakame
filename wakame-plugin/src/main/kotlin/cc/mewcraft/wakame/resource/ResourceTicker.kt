@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.user.toUser
 import org.bukkit.Server
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.*
 
 class ResourceTicker(
     private val server: Server
@@ -21,6 +20,7 @@ class ResourceTicker(
             server.onlinePlayers.forEach {
                 val user = it.toUser()
                 user.resourceMap.add(ResourceTypeRegistry.MANA, 1)
+                user.player.level = user.resourceMap.current(ResourceTypeRegistry.MANA)
             }
         }
         taskId = ticker.addTick(alwaysTickable)

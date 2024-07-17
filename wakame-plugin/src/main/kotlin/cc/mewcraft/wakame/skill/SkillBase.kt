@@ -5,8 +5,6 @@ import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
-import cc.mewcraft.wakame.skill.context.SkillContext
-import cc.mewcraft.wakame.skill.context.SkillContextKey
 import net.kyori.adventure.key.Key
 
 /**

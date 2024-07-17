@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.skill.tick
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.provider
 import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.condition.ConditionTime
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.state.*
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
@@ -82,6 +83,20 @@ abstract class AbstractSkillTick<S : Skill>(
     final override val context: SkillContext
 ) : SkillTick<S> {
     override var tickCount: Long = 0
+
+    protected fun checkConditions(successOperator: Boolean = true, failureOperator: Boolean = true): Boolean {
+        val conditions = skill.conditions
+        val session = conditions.newSession(ConditionTime.TICKING, context)
+        if (successOperator && session.isSuccess) {
+            session.onSuccess(context)
+        }
+
+        if (failureOperator && !session.isSuccess) {
+            session.onFailure(context)
+        }
+
+        return session.isSuccess
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

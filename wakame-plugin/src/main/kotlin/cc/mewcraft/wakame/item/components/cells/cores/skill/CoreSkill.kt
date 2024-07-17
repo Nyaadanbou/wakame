@@ -63,7 +63,7 @@ data class CoreSkill(
     override fun provideTooltipLore(): LoreLine {
         val tooltipKey = tooltipKeyProvider.get(this) ?: return LoreLine.noop()
         val tooltipText = instance.displays.tooltips
-        val resolver = instance.conditions.resolver
+        val resolver = instance.conditions.getResolver()
         val lineText = tooltipText.mapTo(ObjectArrayList(tooltipText.size)) { miniMessage.deserialize(it, resolver) }
         return LoreLine.simple(tooltipKey, lineText)
     }
