@@ -11,7 +11,7 @@ import net.kyori.adventure.key.Key
 /**
  * 空的诅咒. 相当于永远是解锁状态.
  */
-object CurseEmpty : Curse, CurseType<CurseEmpty> {
+data object CurseEmpty : Curse, CurseType<CurseEmpty> {
     override val key: Key = GenericKeys.EMPTY
     override val type: CurseType<CurseEmpty> = this
     override val isEmpty: Boolean = true
