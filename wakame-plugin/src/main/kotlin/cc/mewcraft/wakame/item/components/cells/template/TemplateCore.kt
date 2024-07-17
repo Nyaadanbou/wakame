@@ -16,6 +16,7 @@ import cc.mewcraft.wakame.item.components.cells.template.cores.noop.TemplateCore
 import cc.mewcraft.wakame.item.components.cells.template.cores.skill.TemplateCoreSkill
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.templates.filter.FilterAttribute
+import cc.mewcraft.wakame.item.templates.filter.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filter.FilterSkill
 import cc.mewcraft.wakame.item.templates.filter.ItemFilterNodeFacade
 import cc.mewcraft.wakame.random3.Filter
@@ -96,6 +97,7 @@ internal class TemplateCoreSampleNodeFacade(
         registerAll(get(named(ELEMENT_EXTERNALS)))
         registerAll(get(named(SKILL_EXTERNALS)))
         kregister(TemplateCoreSerializer)
+        kregister(FilterSerializer)
     }.build()
     override val repository: NodeRepository<Sample<TemplateCore, GenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<TemplateCore> = typeTokenOf()

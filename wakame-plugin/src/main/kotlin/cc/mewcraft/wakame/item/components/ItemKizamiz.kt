@@ -169,6 +169,7 @@ internal class KizamiSampleNodeFacade(
 ) : SampleNodeFacade<Kizami, GenerationContext>(), Initializable {
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
         kregister(KizamiSerializer)
+        kregister(FilterSerializer)
     }.build()
     override val repository: NodeRepository<Sample<Kizami, GenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<Kizami> = typeTokenOf()
