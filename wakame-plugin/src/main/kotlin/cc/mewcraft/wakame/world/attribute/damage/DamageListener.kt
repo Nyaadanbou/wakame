@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.event.WakameEntityDamageEvent
-import cc.mewcraft.wakame.registry.ElementRegistry
 import io.papermc.paper.event.entity.EntityKnockbackEvent
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.AbstractArrow
@@ -14,8 +12,6 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
-import org.bukkit.event.player.PlayerInteractEntityEvent
-import org.bukkit.inventory.EquipmentSlot
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
@@ -97,22 +93,22 @@ class DamageListener : Listener, KoinComponent {
         DamageManager.removeCustomDamageMetaData(uuid)
     }
 
-    @EventHandler
-    fun on(event: PlayerInteractEntityEvent) {
-        val player = event.player
-        val entity = event.rightClicked
-        if (event.hand != EquipmentSlot.HAND) return
-        player.sendMessage(Component.text("你右键了" + entity.type + "(" + entity.uniqueId + ")"))
-        if (entity is LivingEntity) {
-            entity.applyCustomDamage(
-                CustomDamageMetaData(
-                    1.0, false, false,
-                    listOf(
-                        ElementDamagePacket(ElementRegistry.DEFAULT, 5.0, 10.0, 0.0, 0.0, 0.0)
-                    )
-                ),
-                player
-            )
-        }
-    }
+//    @EventHandler
+//    fun on(event: PlayerInteractEntityEvent) {
+//        val player = event.player
+//        val entity = event.rightClicked
+//        if (event.hand != EquipmentSlot.HAND) return
+//        player.sendMessage(Component.text("你右键了" + entity.type + "(" + entity.uniqueId + ")"))
+//        if (entity is LivingEntity) {
+//            entity.applyCustomDamage(
+//                CustomDamageMetaData(
+//                    1.0, false, false,
+//                    listOf(
+//                        ElementDamagePacket(ElementRegistry.DEFAULT, 5.0, 10.0, 0.0, 0.0, 0.0)
+//                    )
+//                ),
+//                player
+//            )
+//        }
+//    }
 }
