@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.item.component.componentModule
 import cc.mewcraft.wakame.item.components.componentsModule
 import cc.mewcraft.wakame.item.template.ITEM_COMPONENT_TEMPLATE_SERIALIZERS
 import cc.mewcraft.wakame.item.template.templateModule
-import cc.mewcraft.wakame.item.templates.filter.FilterSerializer
 import cc.mewcraft.wakame.item.templates.templatesModule
 import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemoverSerializer
 import cc.mewcraft.wakame.item.vanilla.vanillaModule
@@ -40,8 +39,6 @@ internal fun itemModule(): Module = module {
             .kregister(ItemSlotSerializer)
             // item type
             .kregister(MaterialSerializer)
-            // item filter (for all Pool & Group)
-            .kregister(FilterSerializer)
             // vanilla component remover
             .kregister(VanillaComponentRemoverSerializer)
             // item component templates

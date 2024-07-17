@@ -1,0 +1,9 @@
+nodes:
+  - type: skill:melee/demo
+    trigger: trigger:generic/attack
+    variant: 0
+    weight: 1
+  - type: skill:ranged/demo
+    trigger: trigger:generic/attack
+    variant: 0
+    weight: 1

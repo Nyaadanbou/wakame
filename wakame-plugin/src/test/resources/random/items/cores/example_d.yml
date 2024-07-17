@@ -1,0 +1,4 @@
+nodes:
+  - type: attribute:attack_speed_level
+    value: 0
+    weight: 1

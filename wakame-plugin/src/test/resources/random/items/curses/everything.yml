@@ -1,0 +1,9 @@
+nodes:
+  - type: curse:entity_kills
+    index: demo_creeps_1
+    count: 114
+    weight: 1
+  - type: curse:peak_damage
+    element: neutral
+    amount: 514
+    weight: 1

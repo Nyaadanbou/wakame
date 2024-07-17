@@ -1,0 +1,7 @@
+nodes:
+  # 该 filter *不是* LocalNode, 而是一个 CompositeNode.
+  # 因为它的 type 的 namespace 是 "global", 不是 "item".
+  - type: global:impossible
+  # 该 filter 是一个 LocalNode.
+  - type: item:toss
+    chance: 0.01

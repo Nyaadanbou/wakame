@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.random3
 
-import cc.mewcraft.wakame.random3.NodeRepository.EntryBuilder
 import net.kyori.adventure.key.Key
 
 /**
@@ -203,6 +202,7 @@ interface NodeRepository<T> {
         }
     }
 
+    fun hasEntry(entryId: String): Boolean
     fun addEntry(ref: String, init: EntryBuilder<T>.() -> Unit = {})
     fun getNodes(ref: String): List<Node<T>>
     fun clear()
@@ -227,20 +227,40 @@ interface NodeRepository<T> {
          */
         fun composite(key: Key, init: CompositeNode<T>.() -> Unit = {})
     }
+
+    /**
+     * 可供外部引用的共享节点. 每个 [NodeRepository] 都包含有多个 [Entry].
+     */
+    interface Entry<T> {
+        /**
+         * 引用.
+         */
+        val ref: String
+
+        /**
+         * 节点.
+         */
+        val nodes: List<Node<T>>
+    }
 }
 
 private object NodeRepositoryEmpty : NodeRepository<Nothing> {
-    override fun addEntry(ref: String, init: EntryBuilder<Nothing>.() -> Unit) = Unit
+    override fun hasEntry(entryId: String): Boolean = false
+    override fun addEntry(ref: String, init: NodeRepository.EntryBuilder<Nothing>.() -> Unit) = Unit
     override fun getNodes(ref: String): List<Node<Nothing>> = emptyList()
     override fun clear() = Unit
 }
 
 private class NodeRepositoryImpl<T> : NodeRepository<T> {
-    private val entries: HashMap<String, List<Node<T>>> = HashMap()
+    private val entries: HashMap<String, NodeRepository.Entry<T>> = HashMap()
 
-    override fun addEntry(ref: String, init: EntryBuilder<T>.() -> Unit) {
+    override fun hasEntry(entryId: String): Boolean {
+        return entries.containsKey(entryId)
+    }
+
+    override fun addEntry(ref: String, init: NodeRepository.EntryBuilder<T>.() -> Unit) {
         val builder = EntryBuilderImpl<T>().apply(init)
-        entries[ref] = builder.nodes
+        entries[ref] = EntryImpl(ref, builder.nodes)
     }
 
     override fun getNodes(ref: String): List<Node<T>> {
@@ -260,8 +280,8 @@ private class NodeRepositoryImpl<T> : NodeRepository<T> {
         }
         visitedKeys.add(key)
 
-        val nodes = entries[key] ?: return
-        for (node in nodes) {
+        val entry = entries[key] ?: return
+        for (node in entry.nodes) {
             when (node) {
                 is LocalNode -> {
                     resolvedNodes.add(node)
@@ -282,7 +302,12 @@ private class NodeRepositoryImpl<T> : NodeRepository<T> {
         }
     }
 
-    class EntryBuilderImpl<T> : EntryBuilder<T> {
+    data class EntryImpl<T>(
+        override val ref: String,
+        override val nodes: List<Node<T>>,
+    ) : NodeRepository.Entry<T>
+
+    class EntryBuilderImpl<T> : NodeRepository.EntryBuilder<T> {
         val nodes = mutableListOf<Node<T>>()
 
         override fun node(node: Node<T>) {

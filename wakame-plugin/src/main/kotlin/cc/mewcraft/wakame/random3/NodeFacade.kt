@@ -1,60 +1,160 @@
 package cc.mewcraft.wakame.random3
 
-import cc.mewcraft.wakame.config.ConfigProvider
-import io.leangen.geantyref.TypeToken
+import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.util.javaTypeOf
+import cc.mewcraft.wakame.util.yamlConfig
+import net.kyori.adventure.key.Key
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
+import org.slf4j.Logger
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.SerializationException
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import java.io.File
+import java.nio.file.Path
 
 /**
- * 包含了一个类型 [T] 所需要的所有 [Node] 相关的实现.
+ * 封装了类型 [T] 所需要的所有 [Node] 相关的实现.
+ *
+ * **注意!** 该实现使用了独立的 config loader, 因此需要单独指定 [serializers].
  */
-abstract class NodeFacade<T> {
+abstract class NodeFacade<T> : KoinComponent {
     /**
-     * 本实例的类型.
-     */
-    abstract val typeToken: TypeToken<NodeFacade<T>>
-
-    /**
-     * 根节点必须是是一个键为 `entries`, 值为 Map 的节点.
+     * 指向存放 [NodeRepository.Entry] 的数据文件夹.
      *
-     * Map 的键是一个字符串, 值是一个 List, 其中的每一项都是一个 [LocalNode] 或 [CompositeNode].
+     * 文件夹里面的每一个文件都是一个 [NodeRepository.Entry], 其文件名(不含扩展名)将充当索引.
+     * 文件内容必须有一个键为 "nodes" 的根节点, 值为 List, 其中的每一项都是一个 [Node].
+     *
+     * *必须为相对路径*, 根目录为插件的数据文件夹.
      */
-    protected abstract val config: ConfigProvider
+    abstract val dataDir: Path
 
     /**
-     * 用于从 config.Node 读取 [Node] 实例.
+     * 读取 [dataDir] 中的数据所需要的序列化器.
      */
-    protected abstract val reader: NodeReader<T>
+    abstract val serializers: TypeSerializerCollection
 
     /**
      * 储存共享的 [Node<T>][Node].
      */
-    protected abstract val repository: NodeRepository<T>
+    abstract val repository: NodeRepository<T>
 
-    fun reader(): NodeReader<T> {
-        return reader
-    }
+    /**
+     * 将一个 [ConfigurationNode] 转换成 [Node] 所包含的 [T].
+     *
+     * 将由 [decodeNode] 调用, 用于构建 [Node] 中所包含的具体数据.
+     *
+     * ## Node structure
+     * ```yaml
+     * <node>:
+     *   # 下面只是随便写点数据演示.
+     *   # 具体结构取决于泛型 [T].
+     *   foo: bar
+     *   bar: foo
+     * ```
+     */
+    protected abstract fun decodeNodeData(node: ConfigurationNode): T
 
-    fun repository(): NodeRepository<T> {
-        return repository
+    /**
+     * 将一个 [ConfigurationNode] 转换成 [Node].
+     *
+     * ## Node structure
+     * ```yaml
+     * <node>:
+     *   # type 是必须要有的, 类型为 Key
+     *   type: <key>
+     *   # 其余都是根据泛型 [T] 来决定的,
+     *   # 这些会由 readValue() 来处理.
+     *   foo: bar
+     *   bar: foo
+     * ```
+     */
+    fun decodeNode(node: ConfigurationNode): Node<T> {
+        // 从 config.Node 中读取 "type"
+        // ("type" 的类型为 Key)
+        // "type" 的命名空间将决定 random3.Node 的解析结果
+        // (具体的结果, 参考 random3.Node 的实现)
+        val rawType = node.node("type").string ?: throw SerializationException(
+            node, javaTypeOf<String>(), "The 'type' of this node is not specified"
+        )
+        val type = runCatching { Key.key(rawType) }.getOrElse {
+            throw SerializationException(node, javaTypeOf<Key>(), it)
+        }
+
+        // 首先看看是不是 CompositeNode; 如果是的话就直接构建一个 CompositeNode, 然后返回.
+        if (type.namespace() == Node.NAMESPACE_GLOBAL) {
+            // 这里只需要直接构建一个 CompositeNode, 并不需要去读取 CompositeNode 所指向的数据.
+            // 这是因为 CompositeNode 的数据是懒加载的 - 只有需要的时候才会从 SharedStorage 获取.
+            return CompositeNode(type, mutableListOf())
+        }
+
+        // 否则就是 LocalNode
+        val value = decodeNodeData(node)
+        return LocalNode(type, value)
     }
 
     /**
-     * 从配置文件读取所有的过滤器.
+     * 从配置文件读取所有的数据, 并载入到 [NodeRepository].
      */
     fun populate() {
-        // 获取根配置
-        val root = config.get().node("entries")
+        if (dataDir.isAbsolute) {
+            throw IllegalArgumentException("'dataDir' must be a relative path to the plugin data directory")
+        }
 
-        // 清空 storage
+        val loadBuilder = yamlConfig {
+            withDefaults()
+            serializers {
+                registerAll(serializers)
+            }
+        }
+
+        // 清空 repository
         repository.clear()
 
-        // 填充 storage
-        root.childrenMap()
-            .mapKeys { (key, _) -> key.toString() }
-            .forEach { (entryId, mapChild) ->
-                // mapChild 装的是一个 List, 其中的每一项都是一个 LocalNode 或 CompositeNode
-                repository.addEntry(entryId) {
-                    mapChild.childrenList().map { reader.readNode(it) }.forEach { node(it) }
-                }
+        // 填充 repository
+        //
+        // 遍历 entriesDataDir 中的每一个文件,
+        // 并将其读取为一个 random.Node,
+        // 最后将其添加到 repository 中.
+        forEachEntryFile { entryFile ->
+            val entryRef = entryFile.nameWithoutExtension
+            validateFileName(entryRef)
+            val fileText = entryFile.readText(Charsets.UTF_8)
+            val rootNode = loadBuilder.buildAndLoadString(fileText)
+            repository.addEntry(entryRef) {
+                // "nodes" 装的是一个 List, 其中的每一项都是一个 LocalNode 或 CompositeNode
+                rootNode.node("nodes")
+                    .childrenList()
+                    .map { listChild ->
+                        decodeNode(listChild)
+                    }
+                    .forEach {
+                        node(it)
+                    }
             }
+        }
     }
+
+    private fun forEachEntryFile(block: (File) -> Unit) {
+        val pluginDataDir = get<File>(named(PLUGIN_DATA_DIR))
+        val entriesDataDir = pluginDataDir.resolve(dataDir.toFile())
+        entriesDataDir
+            .walk()
+            .drop(1) // exclude the directory itself
+            .filter { it.isFile && it.extension == "yml" }
+            .forEach(block)
+    }
+
+    private fun validateFileName(filename: String) {
+        if (filename.isBlank() || !Key.parseableValue(filename)) {
+            throw IllegalArgumentException("The filename '$filename' is not valid to be an entry reference. Valid filename pattern: [a-z0-9/._-]+")
+        }
+        if (repository.hasEntry(filename)) {
+            logger.warn("The entry with name '$filename' already exists")
+        }
+    }
+
+    private val logger: Logger by inject()
 }

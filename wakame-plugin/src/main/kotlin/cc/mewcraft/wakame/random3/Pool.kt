@@ -213,15 +213,7 @@ abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, 
      * structure of the passed-in node is as following:
      * ```yaml
      * <node>:
-     *   <impl_defined>: <impl_defined>
-     *   ...
-     *   weight: 1
-     *   mark: x1y1z1 # optional
-     *   filters: # optional
-     *     - type: <filter_type>
-     *       <impl_defined>: <impl_defined>
-     *     - <node with the same format as above>
-     *     - ...
+     *   ... (完全取决于实现)
      * ```
      *
      * The `<impl_defined>` is what you need to take care of.
@@ -235,10 +227,9 @@ abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, 
      * The factory to create [Filter] from a [ConfigurationNode]. The
      * structure of the passed-in node is as following:
      * ```yaml
-     * type: <filter_type>
-     * <impl_defined>: <impl_defined>
-     *     ...
-     * <impl_defined>: <impl_defined>
+     * <node>:
+     *   type: <filter_type>
+     *   ...
      * ```
      *
      * @param node the configuration node
@@ -264,11 +255,11 @@ abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, 
         when {
             // Node structure 1
             node.isList -> {
-                val sampleNodeContainer = NodeContainer(sampleNodeFacade.repository()) {
+                val sampleNodeContainer = NodeContainer(sampleNodeFacade.repository) {
                     // 遍历当前 ListNode, 一个一个转成 random3.Node
                     for (listChild in node.childrenList()) {
                         // 设计上每一个 listChild 都是一个 random3.Node
-                        node(sampleNodeFacade.reader().readNode(listChild))
+                        node(sampleNodeFacade.decodeNode(listChild))
                     }
                 }
 
@@ -284,14 +275,14 @@ abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, 
             node.isMap -> {
                 val selectAmount = node.node("sample").getLong(1)
                 val isReplacement = node.node("replacement").getBoolean(false)
-                val sampleNodes = NodeContainer(sampleNodeFacade.repository()) {
+                val sampleNodes = NodeContainer(sampleNodeFacade.repository) {
                     for (listChild in node.node("entries").childrenList()) {
-                        node(sampleNodeFacade.reader().readNode(listChild))
+                        node(sampleNodeFacade.decodeNode(listChild))
                     }
                 }
-                val filterNodes = NodeContainer(filterNodeFacade.repository()) {
+                val filterNodes = NodeContainer(filterNodeFacade.repository) {
                     for (listChild in node.node("filters").childrenList()) {
-                        node(filterNodeFacade.reader().readNode(listChild))
+                        node(filterNodeFacade.decodeNode(listChild))
                     }
                 }
 
