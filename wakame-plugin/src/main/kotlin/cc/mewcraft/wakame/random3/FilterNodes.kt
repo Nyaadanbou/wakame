@@ -32,6 +32,9 @@ abstract class FilterNodeReader<C : SelectionContext> : NodeReader<Filter<C>>()
 @ReloadDependency(
     runAfter = [ItemRegistry::class]
 )
+// TODO 应该作为一个抽象类, 必须由需要的模块自己实现. 这样的话, 对于实现类, 泛型就可以“省略”掉了.
+// TODO 给定一个 Path, 每个类负责创建它自己的 ConfigProvider, 这样可以避免在 koinModule 中定义太复杂的对象构建过程
+// TODO 读取 Path 内的所有文件, 每个文件作为一个单独的 Entry.
 class FilterNodeFacade<C : SelectionContext>(
     override val config: ConfigProvider,
     override val reader: FilterNodeReader<C>,
