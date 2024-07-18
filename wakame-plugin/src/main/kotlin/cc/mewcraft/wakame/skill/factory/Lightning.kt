@@ -3,17 +3,17 @@ package cc.mewcraft.wakame.skill.factory
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.util.getFirstBlockBelow
 import cc.mewcraft.wakame.util.getTargetLocation
-import cc.mewcraft.wakame.world.attribute.damage.CustomDamageMetaData
-import cc.mewcraft.wakame.world.attribute.damage.ElementDamagePacket
+import cc.mewcraft.wakame.world.attribute.damage.EvaluableCustomDamageMetaData
 import cc.mewcraft.wakame.world.attribute.damage.applyCustomDamage
 import com.destroystokyo.paper.ParticleBuilder
 import net.kyori.adventure.key.Key
@@ -24,6 +24,8 @@ import org.bukkit.entity.LivingEntity
 interface Lightning : Skill {
 
     val targetType: TargetType
+
+    val damageMetadata: EvaluableCustomDamageMetaData
 
     /**
      * 雷击允许的目标类型.
@@ -48,7 +50,8 @@ interface Lightning : Skill {
     companion object Factory : SkillFactory<Lightning> {
         override fun create(key: Key, config: ConfigProvider): Lightning {
             val targetType = config.optionalEntry<TargetType>("target_type").orElse(TargetType.ALL)
-            return DefaultImpl(key, config, targetType)
+            val damageMetadata = config.entry<EvaluableCustomDamageMetaData>("damage_metadata")
+            return DefaultImpl(key, config, targetType, damageMetadata)
         }
     }
 
@@ -56,8 +59,10 @@ interface Lightning : Skill {
         override val key: Key,
         config: ConfigProvider,
         targetType: Provider<TargetType>,
+        damageMetadata: Provider<EvaluableCustomDamageMetaData>
     ) : Lightning, SkillBase(key, config) {
         override val targetType: TargetType by targetType
+        override val damageMetadata: EvaluableCustomDamageMetaData by damageMetadata
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
@@ -98,10 +103,7 @@ private class LightningTick(
         for (entity in entitiesBeStruck) {
             if (entity is LivingEntity) {
                 entity.applyCustomDamage(
-                    CustomDamageMetaData(
-                        1.0, true,
-                        listOf(ElementDamagePacket(ElementRegistry.DEFAULT, 5.0, 10.0, 0.0, 0.0, 0.0))
-                    ),
+                    skill.damageMetadata.evaluate(context.getOrThrow(SkillContextKey.MOCHA_ENGINE)),
                     caster
                 )
             }

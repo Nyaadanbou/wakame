@@ -20,6 +20,7 @@ import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
 import cc.mewcraft.wakame.util.buildYamlLoader
 import cc.mewcraft.wakame.util.createYamlLoader
 import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.world.attribute.damage.DAMAGE_EXTERNAL
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -119,6 +120,8 @@ internal fun registryModule(): Module = module {
             register(PotionEffectTypeSerializer)
             kregister(PotionEffectSerializer)
             kregister(TriggersConditionsSerializer)
+            registerAll(get(named(DAMAGE_EXTERNAL)))
+            registerAll(get(named(ELEMENT_SERIALIZERS)))
             registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
             registerAll(get(named(SKILL_CONDITION_SERIALIZERS)))
             registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))

@@ -6,6 +6,26 @@ type: lightning
 # - ALL: 所有
 target_type: ENTITY
 
+# 伤害的设置, 以下所有值都可以使用 MoLang 表达式或常量
+damage_metadata:
+  # 暴击倍率
+  critical_power: 2.0
+  is_critical: false
+  # 伤害值
+  damage_packets:
+    - element: thunder # 伤害的元素类型
+      min: 10 # 最小伤害
+      max: 20 # 最大伤害
+      rate: 1.0 # 伤害倍率
+      defense_penetration: 0.0 # 伤害穿透
+      defense_penetration_rate: 0.0 # 伤害穿透倍率
+    - element: fire
+      min: 5
+      max: 10
+      rate: 1.0
+      defense_penetration: 0.0
+      defense_penetration_rate: 0.0
+
 # 技能的打断触发器设置, 可用 CAST_POINT, CAST, BACKSWING
 interrupt_triggers:
   cast_point:

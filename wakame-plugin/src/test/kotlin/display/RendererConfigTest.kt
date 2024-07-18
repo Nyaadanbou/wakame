@@ -24,6 +24,7 @@ import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.world.worldModule
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.junit.jupiter.api.AfterAll
@@ -67,6 +68,7 @@ class RendererConfigTest : KoinTest {
                     rarityModule(),
                     skillModule(),
                     skinModule(),
+                    worldModule()
                 )
             }
 
