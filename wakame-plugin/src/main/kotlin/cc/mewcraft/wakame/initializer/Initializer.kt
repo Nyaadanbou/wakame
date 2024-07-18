@@ -19,7 +19,6 @@ import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.CATEGORY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ELEMENT_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ENTITY_GLOBAL_CONFIG_FILE
@@ -27,10 +26,8 @@ import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.KIZAMI_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.PROJECTILE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.SKIN_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.skill.ProjectileSkillListener
 import cc.mewcraft.wakame.tick.TickerListener
 import cc.mewcraft.wakame.user.PaperUserManager
@@ -122,16 +119,16 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
         saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
-        saveResource(CATEGORY_GLOBAL_CONFIG_FILE)
+        // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(ELEMENT_GLOBAL_CONFIG_FILE)
         saveResource(ENTITY_GLOBAL_CONFIG_FILE)
         saveResource(ITEM_GLOBAL_CONFIG_FILE)
         saveResource(KIZAMI_GLOBAL_CONFIG_FILE)
         saveResource(LEVEL_GLOBAL_CONFIG_FILE)
-        saveResource(PROJECTILE_GLOBAL_CONFIG_FILE)
+        // saveResource(PROJECTILE_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(RARITY_GLOBAL_CONFIG_FILE)
         saveResource(RENDERER_GLOBAL_CONFIG_FILE)
-        saveResource(SKIN_GLOBAL_CONFIG_FILE)
+        // saveResource(SKIN_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
     }
 
     private fun registerListeners() = with(PLUGIN) {
