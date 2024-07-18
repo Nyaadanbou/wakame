@@ -36,12 +36,15 @@ import org.koin.core.context.stopKoin
  * 直接访问 [WakamePlugin] 的实例.
  */
 val NEKO_PLUGIN: WakamePlugin
-    get() = WakamePluginHolder.INSTANCE
+    get() = requireNotNull(WakamePlugin.INSTANCE) { "WakamePlugin is not initialized yet" }
 
 class WakamePlugin : KExtendedJavaPlugin() {
+    companion object {
+        var INSTANCE: WakamePlugin? = null
+    }
 
     override suspend fun load() {
-        WakamePluginHolder.INSTANCE = this
+        INSTANCE = this
 
         // Start Koin container
         startKoin {
@@ -90,10 +93,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
     override suspend fun disable() {
         Initializer.disable()
         stopKoin()
+        INSTANCE = null
     }
 
-}
-
-private object WakamePluginHolder {
-    lateinit var INSTANCE: WakamePlugin
 }
