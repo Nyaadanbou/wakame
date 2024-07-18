@@ -67,7 +67,7 @@ data class RandomizedValue(
      * Whether the numeric value has scale enabled or not.
      */
     val isScaled: Boolean
-        get() = scale > .0
+        get() = scale != .0
 
     /**
      * Whether the numeric value has random enabled or not.
@@ -98,7 +98,7 @@ data class RandomizedValue(
     )
 
     init {
-        check(scale >= 0) { "scale must not be negative" }
+        // check(scale >= 0) { "scale must not be negative" } // 应该允许为负, 不然没法产生等级越高数值越小的结果
         check(sigma >= 0) { "sigma must not be negative" }
         if (lowerBound != null) {
             check(lowerBound <= 0) { "lowerBound must be negative or zero" }
