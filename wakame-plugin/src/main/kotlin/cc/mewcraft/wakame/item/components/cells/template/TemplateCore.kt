@@ -29,7 +29,10 @@ import cc.mewcraft.wakame.random3.Pool
 import cc.mewcraft.wakame.random3.PoolSerializer
 import cc.mewcraft.wakame.random3.Sample
 import cc.mewcraft.wakame.random3.SampleNodeFacade
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
@@ -82,9 +85,11 @@ internal object TemplateCoreSerializer : TypeDeserializer<TemplateCore> {
 }
 
 @PreWorldDependency(
-    runAfter = [ItemRegistry::class]
+    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
+    runAfter = [ItemRegistry::class],
 )
 @ReloadDependency(
+    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
     runAfter = [ItemRegistry::class]
 )
 /**

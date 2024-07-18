@@ -156,9 +156,11 @@ data class ItemKizamiz(
 }
 
 @PreWorldDependency(
+    runBefore = [KizamiRegistry::class],
     runAfter = [ItemRegistry::class]
 )
 @ReloadDependency(
+    runBefore = [KizamiRegistry::class],
     runAfter = [ItemRegistry::class]
 )
 /**

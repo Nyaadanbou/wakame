@@ -11,7 +11,10 @@ import cc.mewcraft.wakame.random3.FilterNodeFacade
 import cc.mewcraft.wakame.random3.NodeFacadeSupport
 import cc.mewcraft.wakame.random3.NodeRepository
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
+import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.get
@@ -21,9 +24,11 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.nio.file.Path
 
 @PreWorldDependency(
+    runBefore = [ElementRegistry::class, KizamiRegistry::class, RarityRegistry::class],
     runAfter = [ItemRegistry::class]
 )
 @ReloadDependency(
+    runBefore = [ElementRegistry::class, KizamiRegistry::class, RarityRegistry::class],
     runAfter = [ItemRegistry::class]
 )
 internal class ItemFilterNodeFacade(

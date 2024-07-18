@@ -170,9 +170,11 @@ data class ItemElements(
 }
 
 @PreWorldDependency(
+    runBefore = [ElementRegistry::class],
     runAfter = [ItemRegistry::class]
 )
 @ReloadDependency(
+    runBefore = [ElementRegistry::class],
     runAfter = [ItemRegistry::class]
 )
 /**
