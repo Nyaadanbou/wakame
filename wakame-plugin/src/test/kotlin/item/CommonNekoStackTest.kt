@@ -32,6 +32,7 @@ import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.skill.skillModule
+import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
 import net.kyori.adventure.key.Key
 import org.koin.core.context.startKoin
@@ -73,6 +74,7 @@ object CommonNekoStackTest {
                 rarityModule(),
                 registryModule(),
                 skillModule(),
+                worldModule(),
             )
         }
 

@@ -13,37 +13,67 @@ import kotlin.jvm.optionals.getOrNull
  *
  * @param T 该 [Evaluable] 由类型 [T] 的值组成.
  */
-fun interface Evaluable<T : Any> {
-    /**
-     * 表示一个字符串 MoLang 表达式。
-     */
-    data class StringEval(val value: String) : Evaluable<String> {
-        override fun evaluate(engine: MochaEngine<*>): Double = engine.eval(value)
-    }
+interface Evaluable<T : Any> {
+    companion object {
+        /**
+         * 从一个字符串创建一个 [Evaluable].
+         */
+        fun fromString(value: String): Evaluable<String> = StringEval(value)
 
-    /**
-     * 表示一个数字。
-     */
-    data class NumberEval(val value: Number) : Evaluable<Number> {
-        override fun evaluate(engine: MochaEngine<*>): Double = value.toDouble()
+        /**
+         * 从一个数字创建一个 [Evaluable].
+         */
+        fun fromNumber(value: Number): Evaluable<Number> = NumberEval(value)
+
+        /**
+         * 从一个布尔值创建一个 [Evaluable].
+         */
+        fun fromBoolean(value: Boolean): Evaluable<Boolean> = BooleanEval(value)
     }
 
     fun evaluate(engine: MochaEngine<*>) : Double
 
-    fun evaluate(): Double {
-        val engine = MoLangSupport.createEngine()
-        return evaluate(engine)
-    }
+    fun evaluate(): Double
 }
 
 internal object EvaluableSerializer : SchemaSerializer<Evaluable<*>> {
     override fun deserialize(type: Type, node: ConfigurationNode): Evaluable<*> {
         val string = node.get<String>()
+        if (string == "true" || string == "false")
+            return Evaluable.fromBoolean(string.toBoolean())
+
         val evalNumber = string?.let { Numbers.parse(it).getOrNull() }
         if (evalNumber != null)
-            return Evaluable.NumberEval(evalNumber)
+            return Evaluable.fromNumber(evalNumber)
 
-        val evalString = string?.let { Evaluable.StringEval(it) }
+        val evalString = string?.let { Evaluable.fromString(it) }
         return evalString ?: throw IllegalArgumentException("Cannot deserialize Evaluable from ${node.path()}")
     }
+}
+
+/**
+ * 表示一个字符串 MoLang 表达式.
+ */
+private data class StringEval(val value: String) : Evaluable<String> {
+    override fun evaluate(engine: MochaEngine<*>): Double = engine.eval(value)
+    override fun evaluate(): Double {
+        val engine = MoLangSupport.createEngine()
+        return evaluate(engine)
+    }
+}
+
+/**
+ * 表示一个数字.
+ */
+private data class NumberEval(val value: Number) : Evaluable<Number> {
+    override fun evaluate(engine: MochaEngine<*>): Double = value.toDouble()
+    override fun evaluate(): Double = value.toDouble()
+}
+
+/**
+ * 表示一个布尔值.
+ */
+private data class BooleanEval(val value: Boolean) : Evaluable<Boolean> {
+    override fun evaluate(engine: MochaEngine<*>): Double = if (value) 1.0 else 0.0
+    override fun evaluate(): Double = if (value) 1.0 else 0.0
 }
