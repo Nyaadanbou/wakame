@@ -120,7 +120,7 @@ abstract class NodeFacade<T> : KoinComponent {
         // 最后将其添加到 repository 中.
         forEachEntryFile { file ->
             val entryRef = getEntryRef(file)
-            validateFileName(entryRef)
+            validateEntryRef(entryRef)
             val fileText = file.readText(Charsets.UTF_8)
             val rootNode = loadBuilder.buildAndLoadString(fileText)
             repository.addEntry(entryRef) {
@@ -141,12 +141,12 @@ abstract class NodeFacade<T> : KoinComponent {
         return file.toRelativeString(pluginDataDir.resolve(dataDir.toFile())).substringBeforeLast(".")
     }
 
-    private fun validateFileName(filename: String) {
-        if (filename.isBlank() || !Key.parseableValue(filename)) {
-            throw IllegalArgumentException("The filename '$filename' is not valid to be an entry reference. Valid filename pattern: [a-z0-9/._-]+")
+    private fun validateEntryRef(entryRef: String) {
+        if (entryRef.isBlank() || !Key.parseableValue(entryRef)) {
+            throw IllegalArgumentException("The filename '$entryRef' is not valid to be an entry reference. Valid filename pattern: [a-z0-9/._-]+")
         }
-        if (repository.hasEntry(filename)) {
-            logger.warn("The entry with name '$filename' already exists")
+        if (repository.hasEntry(entryRef)) {
+            logger.warn("The entry with name '$entryRef' already exists")
         }
     }
 
