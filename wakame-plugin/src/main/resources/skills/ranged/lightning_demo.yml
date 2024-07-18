@@ -1,5 +1,11 @@
 type: lightning
 
+# 技能指定的目标, 可选值:
+# - LOCATION: 坐标
+# - ENTITY: 实体
+# - ALL: 所有
+target_type: ENTITY
+
 # 技能的打断触发器设置, 可用 CAST_POINT, CAST, BACKSWING
 interrupt_triggers:
   cast_point:

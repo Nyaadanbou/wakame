@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.skill.factory
 
 import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
@@ -21,16 +23,42 @@ import org.bukkit.entity.LivingEntity
 
 interface Lightning : Skill {
 
+    val targetType: TargetType
+
+    /**
+     * 雷击允许的目标类型.
+     */
+    enum class TargetType {
+        /**
+         * 仅允许目标为实体.
+         */
+        ENTITY,
+
+        /**
+         * 仅允许目标为位置.
+         */
+        LOCATION,
+
+        /**
+         * 允许目标为实体或位置.
+         */
+        ALL
+    }
+
     companion object Factory : SkillFactory<Lightning> {
         override fun create(key: Key, config: ConfigProvider): Lightning {
-            return DefaultImpl(key, config)
+            val targetType = config.optionalEntry<TargetType>("target_type").orElse(TargetType.ALL)
+            return DefaultImpl(key, config, targetType)
         }
     }
 
     private class DefaultImpl(
         override val key: Key,
         config: ConfigProvider,
+        targetType: Provider<TargetType>,
     ) : Lightning, SkillBase(key, config) {
+        override val targetType: TargetType by targetType
+
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
         override fun cast(context: SkillContext): SkillTick<Lightning> {
@@ -50,7 +78,7 @@ private class LightningTick(
     private val locationTarget: Location? = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.location?.getTargetLocation(16)?.getFirstBlockBelow()?.location
 
     override fun tickCastPoint(tickCount: Long): TickResult {
-        val target = entityLocationTarget ?: locationTarget ?: return TickResult.INTERRUPT
+        val target = getTargetLocation() ?: return TickResult.INTERRUPT
         if (tickCount >= 50) {
             return TickResult.ALL_DONE
         }
@@ -63,7 +91,7 @@ private class LightningTick(
         if (!checkConditions())
             return TickResult.ALL_DONE
         val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity as? LivingEntity
-        val target = entityLocationTarget ?: locationTarget ?: return TickResult.INTERRUPT
+        val target = getTargetLocation() ?: return TickResult.INTERRUPT
         val world = target.world
         world.strikeLightningEffect(target)
         val entitiesBeStruck = world.getNearbyEntities(target, 3.0, 3.0, 3.0)
@@ -90,5 +118,14 @@ private class LightningTick(
             .allPlayers()
             .color(0, 127, 255)
             .spawn()
+    }
+
+    private fun getTargetLocation(): Location? {
+        val targetType = skill.targetType
+        return when (targetType) {
+            Lightning.TargetType.ENTITY -> entityLocationTarget ?: return null
+            Lightning.TargetType.LOCATION -> locationTarget ?: return null
+            Lightning.TargetType.ALL -> entityLocationTarget ?: locationTarget ?: return null
+        }
     }
 }

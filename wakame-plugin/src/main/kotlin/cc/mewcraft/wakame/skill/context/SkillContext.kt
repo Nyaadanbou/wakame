@@ -24,8 +24,8 @@ sealed interface SkillContext {
 
     operator fun <T : Any> set(key: SkillContextKey<T>, value: T)
     operator fun <T : Any> get(key: SkillContextKey<T>): T?
-    fun <T : Any> getOrThrow(key: SkillContextKey<T>): T = get(key) ?: throw IllegalArgumentException("Key '$key' not found in skill context")
     operator fun <T : Any> contains(key: SkillContextKey<T>): Boolean
+    fun <T : Any> getOrThrow(key: SkillContextKey<T>): T = get(key) ?: throw IllegalArgumentException("Key '$key' not found in skill context")
 }
 
 fun SkillContext(caster: Caster.CompositeNode, target: Target? = null, nekoStack: NekoStack? = null): SkillContext {
