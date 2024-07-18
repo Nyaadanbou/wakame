@@ -64,16 +64,13 @@ private class DashTick(
     override val interruptTriggers: Provider<TriggerConditions>,
     override val forbiddenTriggers: Provider<TriggerConditions>
 ) : AbstractPlayerSkillTick<Dash>(skill, context) {
+    companion object {
+        private val DASH_DAMAGE_KEY: SkillContextKey<Int> = SkillContextKey.create("dash_damage")
+    }
 
     override fun tickCastPoint(tickCount: Long): TickResult {
         val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
         player.sendPlainMessage("冲刺的前摇摇摇摇")
-        return TickResult.ALL_DONE
-    }
-
-    override fun tickBackswing(tickCount: Long): TickResult {
-        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-        player.sendPlainMessage("冲刺的后摇摇摇摇摇摇摇")
         return TickResult.ALL_DONE
     }
 
@@ -121,18 +118,24 @@ private class DashTick(
         }
 
         if (affectEntityNearby(player)) {
-            context[SkillContextKey.NEKO_STACK]?.let {
-                val components = it.components
-                val damage = components.get(ItemComponentTypes.DAMAGEABLE) ?: return@let
-                if (damage.damage < damage.maxDamage) {
-                    components.set(ItemComponentTypes.DAMAGEABLE, Damageable(damage.damage + 1, damage.maxDamage))
-                } else {
-                    return TickResult.ALL_DONE
-                }
-            }
+            context[DASH_DAMAGE_KEY] = context[DASH_DAMAGE_KEY]?.plus(1) ?: 1
         }
 
         return TickResult.CONTINUE_TICK
+    }
+
+    override fun tickBackswing(tickCount: Long): TickResult {
+        val damageCount = context[DASH_DAMAGE_KEY] ?: return TickResult.ALL_DONE
+        context[SkillContextKey.NEKO_STACK]?.let {
+            val components = it.components
+            val damage = components.get(ItemComponentTypes.DAMAGEABLE) ?: return@let
+            if (damage.damage < damage.maxDamage) {
+                components.set(ItemComponentTypes.DAMAGEABLE, Damageable(damage.damage + damageCount, damage.maxDamage))
+            } else {
+                return TickResult.ALL_DONE
+            }
+        }
+        return TickResult.ALL_DONE
     }
 
     private fun affectEntityNearby(player: Player): Boolean {
