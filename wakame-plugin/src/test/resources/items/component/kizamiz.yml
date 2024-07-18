@@ -1,6 +1,9 @@
 uuid: 00000000-0000-0000-0000-000000000000
 item_type: bedrock
+
+# 物品的铭刻标识
 kizamiz:
+  # 第一个随机池
   pool_a:
     sample: 2
     filters:
@@ -11,6 +14,7 @@ kizamiz:
         weight: 2
       - type: kizami:luminite
         weight: 1
+  # 第二个随机池
   pool_b:
     sample: 2
     filters:
@@ -21,6 +25,7 @@ kizamiz:
         weight: 3
       - type: kizami:diamond
         weight: 2
+  # 第三个随机池
   pool_c:
     sample: 2
     filters:

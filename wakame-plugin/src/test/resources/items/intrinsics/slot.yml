@@ -1,0 +1,18 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 物品的生效栏位
+# 可选，默认: 无
+#
+# 选项：
+# - MAIN_HAND
+# - OFF_HAND
+# - HELMET
+# - CHESTPLATE
+# - LEGGINGS
+# - BOOTS
+# - SLOT_1 (仅测试用)
+# - SLOT_2 (仅测试用)
+# - SLOT_3 (仅测试用)
+# - SLOT_4 (仅测试用)
+slot: MAIN_HAND

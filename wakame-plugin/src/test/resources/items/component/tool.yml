@@ -1,5 +1,7 @@
 uuid: 00000000-0000-0000-0000-000000000000
 item_type: bedrock
+
+# 使该物品成为工具. 对应原版组件: https://minecraft.wiki/w/Data_component_format#tool
 tool:
   default_mining_speed: 2.1
   damage_per_block: 4

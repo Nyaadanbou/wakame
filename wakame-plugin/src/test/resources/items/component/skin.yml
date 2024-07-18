@@ -1,0 +1,15 @@
+# 皮肤
+# 还未实现, 仅供参考!
+skin:
+  - name: <red>demo_1
+    predicate:
+      open: 0
+      close: 1
+    permission: ads
+    cost: 123
+  - name: <red>demo_2
+    predicate:
+      open: 2
+      close: 3
+    permission: qwe
+    cost: 123

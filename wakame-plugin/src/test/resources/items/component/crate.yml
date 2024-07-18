@@ -1,4 +1,7 @@
 uuid: 00000000-0000-0000-0000-000000000000
 item_type: bedrock
+
+# 将物品作为盲盒
 crate:
+  # 物品绑定的盲盒 id
   key: "foo:bar"

@@ -70,15 +70,8 @@ class CustomNekoStackTest : KoinTest {
 
     //<editor-fold desc="Intrinsic Properties">
     @Test
-    fun `unit - least configuration`() {
-        val item = readCustomPrototype("unit", "least_configuration")
-        assertEquals(UUID.fromString("8729823f-8b80-4efd-bb9e-1c0f9b2eecc3"), item.uuid)
-        assertEquals(Key.key("wooden_sword"), item.itemType)
-    }
-
-    @Test
-    fun `unit - remove_components`() {
-        val item = readCustomPrototype("unit", "remove_components")
+    fun `intrinsics - remove_components`() {
+        val item = readCustomPrototype("intrinsics", "remove_components")
         val removeComponents = item.removeComponents
         assertTrue { removeComponents.has("attribute_modifiers") }
         assertTrue { removeComponents.has("food") }
@@ -86,8 +79,8 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
-    fun `unit - slot`() {
-        val item = readCustomPrototype("unit", "slot")
+    fun `intrinsics - slot`() {
+        val item = readCustomPrototype("intrinsics", "slot")
         val slot = item.slot
         assertEquals("MAIN_HAND", slot.id())
     }
@@ -910,8 +903,8 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
-    fun `component - trackable`() {
-        val prototype = readCustomPrototype("component", "trackable")
+    fun `component - tracks`() {
+        val prototype = readCustomPrototype("component", "tracks")
     }
 
     @Test
@@ -950,6 +943,13 @@ class CustomNekoStackTest : KoinTest {
     //</editor-fold>
 
     //<editor-fold desc="Use Cases">
+    @Test
+    fun `use case - least configuration`() {
+        val item = readCustomPrototype("use_case", "least_configuration")
+        assertEquals(UUID.fromString("8729823f-8b80-4efd-bb9e-1c0f9b2eecc3"), item.uuid)
+        assertEquals(Key.key("wooden_sword"), item.itemType)
+    }
+
     @Test
     fun `use case - apple without food`() {
         val prototype = readCustomPrototype("use_case", "apple_without_food")

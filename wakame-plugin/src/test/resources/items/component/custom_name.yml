@@ -1,3 +1,9 @@
 uuid: 00000000-0000-0000-0000-000000000000
 item_type: bedrock
+
+# 自定义名字
+#
+# 额外标签:
+# <rarity:name> 稀有度名字
+# <rarity:style> 稀有度样式
 custom_name: "<!i><rarity:style>Foo"

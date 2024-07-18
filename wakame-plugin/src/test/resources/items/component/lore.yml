@@ -1,5 +1,7 @@
 uuid: 00000000-0000-0000-0000-000000000000
 item_type: bedrock
+
+# 物品额外的描述
 lore:
   - "<gold>Test Lore 1"
   - "<gold>Test Lore 2"

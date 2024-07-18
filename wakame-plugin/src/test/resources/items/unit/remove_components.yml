@@ -1,9 +1,0 @@
-# 测试: remove_components
-
-uuid: bbccd096-85f2-43ee-8e6b-806b41dea096
-item_type: wooden_sword
-
-remove_components:
-  - attribute_modifiers
-  - food
-  - tool

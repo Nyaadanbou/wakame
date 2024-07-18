@@ -1,3 +1,5 @@
 uuid: 1c2d958d-575e-42fe-be98-101c4d084c4c
 item_type: bow
+
+# 将物品作为弓.
 bow: { }

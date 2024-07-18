@@ -1,5 +1,7 @@
 uuid: 00000000-0000-0000-0000-000000000000
 item_type: diamond_sword
+
+# 物品的元素标识
 elements:
   # 最终一定会生成 2 个元素
   sample: 2

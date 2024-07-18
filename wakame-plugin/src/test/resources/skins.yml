@@ -1,0 +1,10 @@
+# 所有的皮肤
+skins:
+  demo_1: # 皮肤的唯一标识
+    namespace: skin # 皮肤的命名空间
+    model_path: path/to/model # 皮肤的模型路径
+    permission: danbou.skin.demo_1
+    description:
+      - <red>皮肤的描述
+      - <aqua>支持任意内容
+      - <yellow>将出现在部分UI

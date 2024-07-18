@@ -1,4 +1,6 @@
 uuid: 00000000-0000-0000-0000-000000000000
 item_type: bedrock
+
+# 阻止物品损失耐久度. 对应原版组件: https://minecraft.wiki/w/Data_component_format#unbreakable
 unbreakable:
   show_in_tooltip: true

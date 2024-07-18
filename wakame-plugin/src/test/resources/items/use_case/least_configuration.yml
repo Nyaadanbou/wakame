@@ -1,0 +1,10 @@
+# 测试: 最小物品模板 (至少需要这些信息才能构成一个萌芽物品)
+
+# UUID, 必填
+# 必须保证不存在两类物品 UUID 一致的情况!
+# 生成工具：https://www.uuidgenerator.net/version7
+uuid: 8729823f-8b80-4efd-bb9e-1c0f9b2eecc3
+
+# 原版的物品类型
+# 参考 Minecraft Wiki 上的物品数据值
+item_type: wooden_sword

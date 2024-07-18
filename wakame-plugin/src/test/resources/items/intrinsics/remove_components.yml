@@ -1,0 +1,13 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 需要移除的原版物品组件
+# 相当于原版物品组件系统的 `!minecraft:attribute_modifiers` 操作
+# 名字参考: https://minecraft.wiki/w/Data_component_format
+remove_components:
+  - attribute_modifiers
+  - food
+  - tool
+
+# 开发日记 2024/6/25
+# 在物品生成的过程中, 移除原版物品组件将发生在最后阶段
