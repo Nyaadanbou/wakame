@@ -62,7 +62,7 @@ abstract class Pool<S, C : SelectionContext> {
      * - none of the samples meet their own filters
      */
     open fun select(context: C): List<S> {
-        return PoolSupport.select(this, context)
+        return PoolSupport.select(this, context).onEach { whenSelect(it, context) }
     }
 
     /* Internal Implementations */
