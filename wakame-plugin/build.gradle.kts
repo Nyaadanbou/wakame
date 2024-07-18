@@ -29,7 +29,8 @@ dependencies {
     implementation(project(":wakame-ext"))
     implementation(project(":wakame-git"))
     compileOnly(project(":wakame-nms"))
-    runtimeOnly(project(":wakame-nms"))
+    // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
+    runtimeOnly(project(path = ":wakame-nms", configuration = "reobf"))
 
     // libraries
     compileOnly(libs.asm) // runtime is provided by paper
@@ -72,6 +73,13 @@ dependencies {
 
 tasks {
     shadowJar {
+        // invui 的 nms 模块只能在 spigot-mapping 下运行,
+        // 因此必须告知服务端我们用的是 spigot-mapping,
+        // 这样才能触发 paper 的 remapping 机制.
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "spigot"
+        }
+
         relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
         relocate("org.koin", "cc.mewcraft.wakame.external.koin")
         relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")

@@ -26,5 +26,12 @@ dependencies {
 }
 
 paperweight {
-    reobfArtifactConfiguration = ReobfArtifactConfiguration.MOJANG_PRODUCTION
+    reobfArtifactConfiguration = ReobfArtifactConfiguration.REOBF_PRODUCTION
+}
+
+tasks {
+    // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
+    assemble {
+        dependsOn(reobfJar)
+    }
 }
