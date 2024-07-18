@@ -55,7 +55,7 @@ abstract class NodeFacade<T> : KoinComponent {
      *   bar: foo
      * ```
      */
-    protected abstract fun decodeNodeData(node: ConfigurationNode): T
+    abstract fun decodeNodeData(node: ConfigurationNode): T
 
     /**
      * 将一个 [ConfigurationNode] 转换成 [Node].

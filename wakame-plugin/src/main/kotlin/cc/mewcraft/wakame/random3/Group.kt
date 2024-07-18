@@ -110,7 +110,7 @@ abstract class GroupSerializer<V, C : SelectionContext> : SchemaSerializer<Group
 
     protected abstract val filterNodeFacade: FilterNodeFacade<C>
     protected abstract fun poolConstructor(node: ConfigurationNode): Pool<V, C>
-    protected abstract fun filterConstructor(node: ConfigurationNode): Filter<C>
+    // protected abstract fun filterConstructor(node: ConfigurationNode): Filter<C>
 
     final override fun deserialize(type: Type, node: ConfigurationNode): Group<V, C> {
         when {

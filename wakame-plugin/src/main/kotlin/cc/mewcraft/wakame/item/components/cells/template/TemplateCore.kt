@@ -84,42 +84,6 @@ internal object TemplateCoreSerializer : TypeDeserializer<TemplateCore> {
     }
 }
 
-@PreWorldDependency(
-    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
-    runAfter = [ItemRegistry::class],
-)
-@ReloadDependency(
-    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
-    runAfter = [ItemRegistry::class]
-)
-/**
- * 封装了类型 [TemplateCore] 所需要的所有 [Node] 相关的实现.
- */
-internal class TemplateCoreSampleNodeFacade(
-    override val dataDir: Path,
-) : SampleNodeFacade<TemplateCore, GenerationContext>(), Initializable {
-    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        registerAll(get(named(ELEMENT_EXTERNALS)))
-        registerAll(get(named(SKILL_EXTERNALS)))
-        kregister(TemplateCoreSerializer)
-        kregister(FilterSerializer)
-    }.build()
-    override val repository: NodeRepository<Sample<TemplateCore, GenerationContext>> = NodeRepository()
-    override val sampleDataType: TypeToken<TemplateCore> = typeTokenOf()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
-    override fun decodeSampleData(node: ConfigurationNode): TemplateCore {
-        return node.krequire<TemplateCore>()
-    }
-
-    override fun onPreWorld() {
-        NodeFacadeSupport.reload(this)
-    }
-
-    override fun onReload() {
-        NodeFacadeSupport.reload(this)
-    }
-}
-
 /**
  * [TemplateCore] 的 [Pool].
  */
@@ -170,8 +134,8 @@ internal class TemplateCorePool(
  * ```
  */
 internal object TemplateCorePoolSerializer : KoinComponent, PoolSerializer<TemplateCore, GenerationContext>() {
-    override val sampleNodeFacade: TemplateCoreSampleNodeFacade by inject()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override val sampleNodeFacade by inject<TemplateCoreSampleNodeFacade>()
+    override val filterNodeFacade by inject<ItemFilterNodeFacade>()
 
     override fun poolConstructor(
         amount: Long,
@@ -186,17 +150,46 @@ internal object TemplateCorePoolSerializer : KoinComponent, PoolSerializer<Templ
             isReplacement = isReplacement,
         )
     }
+}
 
-    override fun valueConstructor(node: ConfigurationNode): TemplateCore {
+internal object TemplateCoreGroupSerializer : KoinComponent, GroupSerializer<TemplateCore, GenerationContext>() {
+    override val filterNodeFacade by inject<ItemFilterNodeFacade>()
+
+    override fun poolConstructor(node: ConfigurationNode): Pool<TemplateCore, GenerationContext> {
+        return node.krequire<Pool<TemplateCore, GenerationContext>>()
+    }
+}
+
+/**
+ * 封装了类型 [TemplateCore] 所需要的所有 [Node] 相关的实现.
+ */
+@PreWorldDependency(
+    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
+    runAfter = [ItemRegistry::class],
+)
+@ReloadDependency(
+    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
+    runAfter = [ItemRegistry::class]
+)
+internal class TemplateCoreSampleNodeFacade(
+    override val dataDir: Path,
+) : SampleNodeFacade<TemplateCore, GenerationContext>(), Initializable {
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
+        registerAll(get(named(ELEMENT_EXTERNALS)))
+        registerAll(get(named(SKILL_EXTERNALS)))
+        kregister(TemplateCoreSerializer)
+        kregister(FilterSerializer)
+    }.build()
+    override val repository: NodeRepository<Sample<TemplateCore, GenerationContext>> = NodeRepository()
+    override val sampleDataType: TypeToken<TemplateCore> = typeTokenOf()
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+
+    override fun decodeSampleData(node: ConfigurationNode): TemplateCore {
         return node.krequire<TemplateCore>()
     }
 
-    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
-        return node.krequire<Filter<GenerationContext>>()
-    }
-
-    override fun intrinsicFilters(value: TemplateCore): Filter<GenerationContext> {
-        return when (value) {
+    override fun intrinsicFilters(value: TemplateCore): Collection<Filter<GenerationContext>> {
+        val filter = when (value) {
             // A noop core should always return true
             is TemplateCoreNoop -> {
                 Filter.alwaysTrue()
@@ -226,17 +219,14 @@ internal object TemplateCorePoolSerializer : KoinComponent, PoolSerializer<Templ
                 throw SerializationException("Can't create intrinsic conditions for unknown template core: ${value}. This is a bug.")
             }
         }
-    }
-}
-
-internal object TemplateCoreGroupSerializer : KoinComponent, GroupSerializer<TemplateCore, GenerationContext>() {
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
-
-    override fun poolConstructor(node: ConfigurationNode): Pool<TemplateCore, GenerationContext> {
-        return node.krequire<Pool<TemplateCore, GenerationContext>>()
+        return listOf(filter)
     }
 
-    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
-        return node.krequire<Filter<GenerationContext>>()
+    override fun onPreWorld() {
+        NodeFacadeSupport.reload(this)
+    }
+
+    override fun onReload() {
+        NodeFacadeSupport.reload(this)
     }
 }

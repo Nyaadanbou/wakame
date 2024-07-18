@@ -81,6 +81,11 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     }
 
     /**
+     * 词条栏的数量.
+     */
+    val size: Int
+
+    /**
      * 检查指定的词条栏是否存在.
      */
     fun has(id: String): Boolean
@@ -167,6 +172,8 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     private data class Value(
         private val cells: Map<String, Cell>,
     ) : ItemCells {
+        override val size: Int
+            get() = cells.size
 
         override fun has(id: String): Boolean {
             return cells.containsKey(id)

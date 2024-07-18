@@ -101,7 +101,7 @@ private object PoolSupport {
                 .stream(context.random.asJavaRandom())
                 .limit(pool.amount)
         } else {
-            // FIXME 虽然循环引用会导致添加重复的Node,
+            // 注意: 虽然循环引用会导致添加重复的Node,
             //  但是在最终去重的时候好像又只会保留一个?
             //  这取决于 Sample 的 equals 的具体实现.
             RandomSelector.weighted(samples, SampleWeigher)
@@ -208,45 +208,45 @@ abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, 
         isReplacement: Boolean,
     ): Pool<V, C>
 
-    /**
-     * The factory to create value [V] from a [ConfigurationNode]. The
-     * structure of the passed-in node is as following:
-     * ```yaml
-     * <node>:
-     *   ... (完全取决于实现)
-     * ```
-     *
-     * The `<impl_defined>` is what you need to take care of.
-     *
-     * @param node the configuration node
-     * @return the content
-     */
-    protected open fun valueConstructor(node: ConfigurationNode): V? = null
-
-    /**
-     * The factory to create [Filter] from a [ConfigurationNode]. The
-     * structure of the passed-in node is as following:
-     * ```yaml
-     * <node>:
-     *   type: <filter_type>
-     *   ...
-     * ```
-     *
-     * @param node the configuration node
-     * @return a new filter
-     */
-    protected open fun filterConstructor(node: ConfigurationNode): Filter<C> = Filter.alwaysTrue()
-
-    /**
-     * Defines the "intrinsic filters" of each sample in the pool.
-     *
-     * "Intrinsic filters" can be thought as those which will be
-     * automatically added to the sample without specifically
-     * configuring it in the configuration.
-     *
-     * @return the intrinsic filters
-     */
-    protected open fun intrinsicFilters(value: V): Filter<C> = Filter.alwaysTrue() // FIXME 应该返回一个 List<Filters<C>>
+    // /**
+    //  * The function to create value [V] from a [ConfigurationNode]. The
+    //  * structure of the passed-in node is as following:
+    //  * ```yaml
+    //  * <node>:
+    //  *   ... (完全取决于实现)
+    //  * ```
+    //  *
+    //  * The `<impl_defined>` is what you need to take care of.
+    //  *
+    //  * @param node the configuration node
+    //  * @return the content
+    //  */
+    // protected open fun valueConstructor(node: ConfigurationNode): V? = null
+    //
+    // /**
+    //  * The function to create [Filter] from a [ConfigurationNode]. The
+    //  * structure of the passed-in node is as following:
+    //  * ```yaml
+    //  * <node>:
+    //  *   type: <filter_type>
+    //  *   ...
+    //  * ```
+    //  *
+    //  * @param node the configuration node
+    //  * @return a new filter
+    //  */
+    // protected open fun filterConstructor(node: ConfigurationNode): Filter<C> = Filter.alwaysTrue()
+    //
+    // /**
+    //  * Defines the "intrinsic filters" of each sample in the pool.
+    //  *
+    //  * "Intrinsic filters" can be thought as those which will be
+    //  * automatically added to the sample without specifically
+    //  * configuring it in the configuration.
+    //  *
+    //  * @return the intrinsic filters
+    //  */
+    // protected open fun intrinsicFilters(value: V): Filter<C> = Filter.alwaysTrue()
 
     /**
      * You should not override this.
@@ -254,6 +254,7 @@ abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, 
     final override fun deserialize(type: Type, node: ConfigurationNode): Pool<V, C> {
         when {
             // Node structure 1
+            // 这是一个纯粹的池映射, 没有过滤器, 也没有默认值
             node.isList -> {
                 val sampleNodeContainer = NodeContainer(sampleNodeFacade.repository) {
                     // 遍历当前 ListNode, 一个一个转成 random3.Node
@@ -272,6 +273,7 @@ abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, 
             }
 
             // Node structure 2
+            // 这是一个完整的结构, 可能包含所有组件
             node.isMap -> {
                 val selectAmount = node.node("sample").getLong(1)
                 val isReplacement = node.node("replacement").getBoolean(false)

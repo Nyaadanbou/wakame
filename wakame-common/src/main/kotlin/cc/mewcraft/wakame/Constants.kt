@@ -6,4 +6,6 @@ package cc.mewcraft.wakame
 data object Constants {
     const val NOOP = "noop"
     const val EMPTY = "empty"
+    const val TRUE = "true"
+    const val FALSE = "false"
 }

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.templates.filter.FilterSerializer.NAMESPACE_FILTER
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -15,6 +16,11 @@ class FilterCurse(
     override val invert: Boolean,
     private val key: Key,
 ) : Filter<GenerationContext>, Examinable {
+    companion object {
+        val TYPE = Key.key(NAMESPACE_FILTER, "curse")
+    }
+
+    override val type: Key = TYPE
 
     /**
      * Returns `true` if the [context] already has the curse with

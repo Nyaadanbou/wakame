@@ -155,40 +155,6 @@ data class ItemKizamiz(
     }
 }
 
-@PreWorldDependency(
-    runBefore = [KizamiRegistry::class],
-    runAfter = [ItemRegistry::class]
-)
-@ReloadDependency(
-    runBefore = [KizamiRegistry::class],
-    runAfter = [ItemRegistry::class]
-)
-/**
- * 封装了类型 [Kizami] 所需要的所有 [Node] 相关的实现.
- */
-internal class KizamiSampleNodeFacade(
-    override val dataDir: Path,
-) : SampleNodeFacade<Kizami, GenerationContext>(), Initializable {
-    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        kregister(KizamiSerializer)
-        kregister(FilterSerializer)
-    }.build()
-    override val repository: NodeRepository<Sample<Kizami, GenerationContext>> = NodeRepository()
-    override val sampleDataType: TypeToken<Kizami> = typeTokenOf()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
-    override fun decodeSampleData(node: ConfigurationNode): Kizami {
-        return node.node("type").krequire<Kizami>()
-    }
-
-    override fun onPreWorld() {
-        NodeFacadeSupport.reload(this)
-    }
-
-    override fun onReload() {
-        NodeFacadeSupport.reload(this)
-    }
-}
-
 /**
  * [Kizami] 的 [Pool].
  */
@@ -240,14 +206,6 @@ private object KizamiPoolSerializer : KoinComponent, PoolSerializer<Kizami, Gene
             isReplacement = isReplacement,
         )
     }
-
-    override fun valueConstructor(node: ConfigurationNode): Kizami {
-        return node.node("type").krequire<Kizami>()
-    }
-
-    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
-        return node.krequire<Filter<GenerationContext>>()
-    }
 }
 
 private object KizamiGroupSerializer : KoinComponent, GroupSerializer<Kizami, GenerationContext>() {
@@ -256,8 +214,43 @@ private object KizamiGroupSerializer : KoinComponent, GroupSerializer<Kizami, Ge
     override fun poolConstructor(node: ConfigurationNode): Pool<Kizami, GenerationContext> {
         return node.krequire<Pool<Kizami, GenerationContext>>()
     }
+}
 
-    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
-        return node.krequire<Filter<GenerationContext>>()
+/**
+ * 封装了类型 [Kizami] 所需要的所有 [Node] 相关的实现.
+ */
+@PreWorldDependency(
+    runBefore = [KizamiRegistry::class],
+    runAfter = [ItemRegistry::class]
+)
+@ReloadDependency(
+    runBefore = [KizamiRegistry::class],
+    runAfter = [ItemRegistry::class]
+)
+internal class KizamiSampleNodeFacade(
+    override val dataDir: Path,
+) : SampleNodeFacade<Kizami, GenerationContext>(), Initializable {
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
+        kregister(KizamiSerializer)
+        kregister(FilterSerializer)
+    }.build()
+    override val repository: NodeRepository<Sample<Kizami, GenerationContext>> = NodeRepository()
+    override val sampleDataType: TypeToken<Kizami> = typeTokenOf()
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+
+    override fun decodeSampleData(node: ConfigurationNode): Kizami {
+        return node.node("type").krequire<Kizami>()
+    }
+
+    override fun intrinsicFilters(value: Kizami): Collection<Filter<GenerationContext>> {
+        return emptyList()
+    }
+
+    override fun onPreWorld() {
+        NodeFacadeSupport.reload(this)
+    }
+
+    override fun onReload() {
+        NodeFacadeSupport.reload(this)
     }
 }

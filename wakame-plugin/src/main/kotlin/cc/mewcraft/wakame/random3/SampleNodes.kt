@@ -16,10 +16,19 @@ import java.nio.file.Path
  * 封装了类型 [Sample] 所需要的所有 [Node] 相关的实现.
  */
 abstract class SampleNodeFacade<V, C : SelectionContext> : NodeFacade<Sample<V, C>>() {
-    // Abstracts
-
+    /**
+     * 参考 [NodeFacade.dataDir].
+     */
     abstract override val dataDir: Path
+
+    /**
+     * 参考 [NodeFacade.serializers].
+     */
     abstract override val serializers: TypeSerializerCollection
+
+    /**
+     * 参考 [NodeFacade.repository].
+     */
     abstract override val repository: NodeRepository<Sample<V, C>>
 
     /**
@@ -41,12 +50,26 @@ abstract class SampleNodeFacade<V, C : SelectionContext> : NodeFacade<Sample<V, 
      */
     abstract fun decodeSampleData(node: ConfigurationNode): V
 
-    // Overrides: NodeFacade
+    /**
+     * 定义样本的“内置过滤器”.
+     *
+     * “内置过滤器”可以被认为是那些会自动添加到样本中的过滤器, 而无需在配置中特别配置它们.
+     *
+     * @return 内在过滤器
+     */
+    abstract fun intrinsicFilters(value: V): Collection<Filter<C>>
 
-    override fun decodeNodeData(node: ConfigurationNode): Sample<V, C> {
+    final override fun decodeNodeData(node: ConfigurationNode): Sample<V, C> {
         val data = decodeSampleData(node)
         val weight = node.node("weight").krequire<Double>()
         val filters = NodeContainer(filterNodeFacade.repository) {
+            // 添加内在过滤器
+            val intrinsics = intrinsicFilters(data)
+            for (filter in intrinsics) {
+                local(filter.type, filter)
+            }
+
+            // 添加配置中的过滤器
             for (listChild in node.node("filters").childrenList()) {
                 node(filterNodeFacade.decodeNode(listChild))
             }

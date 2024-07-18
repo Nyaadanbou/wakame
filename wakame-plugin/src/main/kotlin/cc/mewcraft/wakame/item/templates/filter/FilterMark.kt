@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.templates.filter.FilterSerializer.NAMESPACE_FILTER
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.StringMark
 import cc.mewcraft.wakame.util.toSimpleString
+import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
@@ -17,6 +19,11 @@ data class FilterMark(
     override val invert: Boolean,
     private val mark: String,
 ) : Filter<GenerationContext>, Examinable {
+    companion object {
+        val TYPE = Key.key(NAMESPACE_FILTER, "mark")
+    }
+
+    override val type: Key = TYPE
 
     /**
      * Returns `true` if the [context] already has the [mark] populated.

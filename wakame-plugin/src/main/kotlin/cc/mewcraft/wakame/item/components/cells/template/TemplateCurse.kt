@@ -95,42 +95,6 @@ internal object TemplateCurseSerializer : TypeDeserializer<TemplateCurse> {
     }
 }
 
-@PreWorldDependency(
-    runBefore = [ElementRegistry::class, EntityRegistry::class],
-    runAfter = [ItemRegistry::class]
-)
-@ReloadDependency(
-    runBefore = [ElementRegistry::class, EntityRegistry::class],
-    runAfter = [ItemRegistry::class]
-)
-/**
- * 封装了类型 [TemplateCurse] 所需要的所有 [Node] 相关的实现.
- */
-internal class TemplateCurseSampleNodeFacade(
-    override val dataDir: Path,
-) : SampleNodeFacade<TemplateCurse, GenerationContext>(), Initializable {
-    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        registerAll(get(named(ELEMENT_EXTERNALS)))
-            .registerAll(get(named(ENTITY_TYPE_HOLDER_EXTERNALS)))
-            .kregister(TemplateCurseSerializer)
-            .kregister(FilterSerializer)
-    }.build()
-    override val repository: NodeRepository<Sample<TemplateCurse, GenerationContext>> = NodeRepository()
-    override val sampleDataType: TypeToken<TemplateCurse> = typeTokenOf()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
-    override fun decodeSampleData(node: ConfigurationNode): TemplateCurse {
-        return node.krequire<TemplateCurse>()
-    }
-
-    override fun onPreWorld() {
-        NodeFacadeSupport.reload(this)
-    }
-
-    override fun onReload() {
-        NodeFacadeSupport.reload(this)
-    }
-}
-
 /**
  * [TemplateCurse] 的 [Pool].
  */
@@ -179,8 +143,8 @@ internal class TemplateCursePool(
  * ```
  */
 internal object TemplateCursePoolSerializer : KoinComponent, PoolSerializer<TemplateCurse, GenerationContext>() {
-    override val sampleNodeFacade: TemplateCurseSampleNodeFacade by inject()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override val sampleNodeFacade by inject<TemplateCurseSampleNodeFacade>()
+    override val filterNodeFacade by inject<ItemFilterNodeFacade>()
 
     override fun poolConstructor(
         amount: Long,
@@ -195,27 +159,55 @@ internal object TemplateCursePoolSerializer : KoinComponent, PoolSerializer<Temp
             isReplacement = isReplacement,
         )
     }
-
-    override fun valueConstructor(node: ConfigurationNode): TemplateCurse {
-        return node.krequire<TemplateCurse>()
-    }
-
-    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
-        return node.krequire<Filter<GenerationContext>>()
-    }
 }
 
 /**
  * @see GroupSerializer
  */
 internal object TemplateCurseGroupSerializer : KoinComponent, GroupSerializer<TemplateCurse, GenerationContext>() {
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override val filterNodeFacade by inject<ItemFilterNodeFacade>()
 
     override fun poolConstructor(node: ConfigurationNode): Pool<TemplateCurse, GenerationContext> {
         return node.krequire<Pool<TemplateCurse, GenerationContext>>()
     }
+}
 
-    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
-        return node.krequire<Filter<GenerationContext>>()
+/**
+ * 封装了类型 [TemplateCurse] 所需要的所有 [Node] 相关的实现.
+ */
+@PreWorldDependency(
+    runBefore = [ElementRegistry::class, EntityRegistry::class],
+    runAfter = [ItemRegistry::class]
+)
+@ReloadDependency(
+    runBefore = [ElementRegistry::class, EntityRegistry::class],
+    runAfter = [ItemRegistry::class]
+)
+internal class TemplateCurseSampleNodeFacade(
+    override val dataDir: Path,
+) : SampleNodeFacade<TemplateCurse, GenerationContext>(), Initializable {
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
+        registerAll(get(named(ELEMENT_EXTERNALS)))
+            .registerAll(get(named(ENTITY_TYPE_HOLDER_EXTERNALS)))
+            .kregister(TemplateCurseSerializer)
+            .kregister(FilterSerializer)
+    }.build()
+    override val repository: NodeRepository<Sample<TemplateCurse, GenerationContext>> = NodeRepository()
+    override val sampleDataType: TypeToken<TemplateCurse> = typeTokenOf()
+    override val filterNodeFacade by inject<ItemFilterNodeFacade>()
+    override fun decodeSampleData(node: ConfigurationNode): TemplateCurse {
+        return node.krequire<TemplateCurse>()
+    }
+
+    override fun intrinsicFilters(value: TemplateCurse): Collection<Filter<GenerationContext>> {
+        return emptyList()
+    }
+
+    override fun onPreWorld() {
+        NodeFacadeSupport.reload(this)
+    }
+
+    override fun onReload() {
+        NodeFacadeSupport.reload(this)
     }
 }

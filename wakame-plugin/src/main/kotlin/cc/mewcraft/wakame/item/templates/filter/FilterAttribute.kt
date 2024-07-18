@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.templates.filter
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.templates.filter.FilterSerializer.NAMESPACE_FILTER
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -14,12 +15,17 @@ import java.util.stream.Stream
 /**
  * Checks attribute population.
  */
-class FilterAttribute(
+data class FilterAttribute(
     override val invert: Boolean,
     private val key: Key,
     private val operation: Operation?,
     private val element: Element?,
 ) : Filter<GenerationContext>, Examinable {
+    companion object {
+        val TYPE = Key.key(NAMESPACE_FILTER, "attribute")
+    }
+
+    override val type: Key = TYPE
 
     /**
      * Returns `true` if the [context] already has the attribute with

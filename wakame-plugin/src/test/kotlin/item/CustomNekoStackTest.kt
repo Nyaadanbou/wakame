@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.item.components.HideTooltip
 import cc.mewcraft.wakame.item.components.ItemGlowable
 import cc.mewcraft.wakame.item.components.cells.CoreTypes
 import cc.mewcraft.wakame.item.components.cells.CurseTypes
+import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeS
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
 import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmpty
 import cc.mewcraft.wakame.item.components.cells.cores.noop.CoreNoop
@@ -281,6 +282,32 @@ class CustomNekoStackTest : KoinTest {
                 val actualIndex = curseEntityKills.index
                 assertEquals(expectedIndex, actualIndex)
             }
+        }
+    }
+
+    @Test
+    fun `component - cells intrinsics filter`() = componentLifecycleTest(
+        "cells_intrinsics_filters", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        context {
+            it.level = 1 // 预设物品等级为 1
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(2, it.size)
+            val cell1 = assertNotNull(it.get("foo_1"))
+            val core1 = assertIs<CoreAttributeS>(cell1.getCore())
+            assertEquals(5.0, core1.value)
+            val cell2 = assertNotNull(it.get("foo_2"))
+            val core2 = assertIs<CoreEmpty>(cell2.getCore())
         }
     }
 

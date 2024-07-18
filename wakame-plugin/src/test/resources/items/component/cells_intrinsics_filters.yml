@@ -1,0 +1,37 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 两个词条栏, 各自生成的属性是完全同类的.
+# 那么最终只有第一个词条栏里的属性会生成.
+cells:
+  buckets:
+    # 这是第一个进行属性生成的词条栏,
+    # 因此这个词条栏里的属性一定会生成.
+    foo_1:
+      core: dupe_1
+    # 这是第二个进行属性生成的词条栏,
+    # 由于第一个词条栏已经生成了 attribute:max_mana/add 属性.
+    # 因此这个词条栏里的属性不会再生成,
+    # 最终留下一个空的词条栏.
+    foo_2:
+      core: dupe_2
+  selectors:
+    core_groups:
+      dupe_1:
+        filters: [ ]
+        selects:
+          pool_1:
+            entries:
+              - type: attribute:max_mana
+                value: 5
+                operation: add
+                weight: 1
+      dupe_2:
+        filters: [ ]
+        selects:
+          pool_1:
+            entries:
+              - type: attribute:max_mana
+                operation: add
+                value: 12
+                weight: 1

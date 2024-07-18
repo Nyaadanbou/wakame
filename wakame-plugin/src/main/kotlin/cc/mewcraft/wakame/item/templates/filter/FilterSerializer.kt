@@ -22,54 +22,50 @@ internal object FilterSerializer : TypeDeserializer<Filter<GenerationContext>> {
         val rawType = node.node("type").krequire<Key>() // decoded as a Key, but we only focus on the Key#value()
         val inverted = node.node("invert").getBoolean(false) // check if we should invert the original result
 
-        if (rawType.namespace() != NAMESPACE_FILTER) {
-            throw SerializationException("The 'type' of filter must be in the '$NAMESPACE_FILTER' namespace")
-        }
-
-        val ret: Filter<GenerationContext> = when (rawType.value()) {
-            "skill" -> {
+        val ret: Filter<GenerationContext> = when (rawType) {
+            FilterSkill.TYPE -> {
                 val key = node.node("key").krequire<Key>()
                 FilterSkill(inverted, key)
             }
 
-            "attribute" -> {
+            FilterAttribute.TYPE -> {
                 val key = node.node("key").krequire<Key>()
                 val operation = node.node("operation").krequire<String>().let { EnumLookup.lookup<AttributeModifier.Operation>(it).getOrThrow() }
                 val element = node.node("element").get<Element>() // optional
                 FilterAttribute(inverted, key, operation, element)
             }
 
-            "curse" -> {
+            FilterCurse.TYPE -> {
                 val curse = node.node("key").krequire<Key>()
                 FilterCurse(inverted, curse)
             }
 
-            "element" -> {
+            FilterElement.TYPE -> {
                 val element = node.node("element").krequire<Element>()
                 FilterElement(inverted, element)
             }
 
-            "item_level" -> {
+            FilterItemLevel.TYPE -> {
                 val level = node.node("level").krequire<Range<Int>>()
                 FilterItemLevel(inverted, level)
             }
 
-            "mark" -> {
+            FilterMark.TYPE -> {
                 val meta = node.node("mark").krequire<String>()
                 FilterMark(inverted, meta)
             }
 
-            "rarity" -> {
+            FilterRarity.TYPE -> {
                 val rarity = node.node("rarity").krequire<Rarity>()
                 FilterRarity(inverted, rarity)
             }
 
-            "source_level" -> {
+            FilterSourceLevel.TYPE -> {
                 val level = node.node("level").krequire<Range<Int>>()
                 FilterSourceLevel(inverted, level)
             }
 
-            "toss" -> {
+            FilterToss.TYPE -> {
                 val chance = node.node("chance").krequire<Float>()
                 FilterToss(inverted, chance)
             }

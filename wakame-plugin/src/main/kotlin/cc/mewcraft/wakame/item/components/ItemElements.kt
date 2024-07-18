@@ -169,40 +169,6 @@ data class ItemElements(
     }
 }
 
-@PreWorldDependency(
-    runBefore = [ElementRegistry::class],
-    runAfter = [ItemRegistry::class]
-)
-@ReloadDependency(
-    runBefore = [ElementRegistry::class],
-    runAfter = [ItemRegistry::class]
-)
-/**
- * 封装了类型 [Element] 所需要的所有 [Node] 相关的实现.
- */
-internal class ElementSampleNodeFacade(
-    override val dataDir: Path,
-) : SampleNodeFacade<Element, GenerationContext>(), Initializable {
-    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        kregister(ElementSerializer)
-        kregister(FilterSerializer)
-    }.build()
-    override val repository: NodeRepository<Sample<Element, GenerationContext>> = NodeRepository()
-    override val sampleDataType: TypeToken<Element> = typeTokenOf()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
-    override fun decodeSampleData(node: ConfigurationNode): Element {
-        return node.node("type").krequire<Element>()
-    }
-
-    override fun onPreWorld() {
-        NodeFacadeSupport.reload(this)
-    }
-
-    override fun onReload() {
-        NodeFacadeSupport.reload(this)
-    }
-}
-
 /**
  * [Element] 的 [Pool].
  */
@@ -251,12 +217,43 @@ private data object ElementPoolSerializer : KoinComponent, PoolSerializer<Elemen
             isReplacement = isReplacement,
         )
     }
+}
 
-    override fun valueConstructor(node: ConfigurationNode): Element {
+/**
+ * 封装了类型 [Element] 所需要的所有 [Node] 相关的实现.
+ */
+@PreWorldDependency(
+    runBefore = [ElementRegistry::class],
+    runAfter = [ItemRegistry::class]
+)
+@ReloadDependency(
+    runBefore = [ElementRegistry::class],
+    runAfter = [ItemRegistry::class]
+)
+internal class ElementSampleNodeFacade(
+    override val dataDir: Path,
+) : SampleNodeFacade<Element, GenerationContext>(), Initializable {
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
+        kregister(ElementSerializer)
+        kregister(FilterSerializer)
+    }.build()
+    override val repository: NodeRepository<Sample<Element, GenerationContext>> = NodeRepository()
+    override val sampleDataType: TypeToken<Element> = typeTokenOf()
+    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+
+    override fun decodeSampleData(node: ConfigurationNode): Element {
         return node.node("type").krequire<Element>()
     }
 
-    override fun filterConstructor(node: ConfigurationNode): Filter<GenerationContext> {
-        return node.krequire<Filter<GenerationContext>>()
+    override fun intrinsicFilters(value: Element): Collection<Filter<GenerationContext>> {
+        return emptyList()
+    }
+
+    override fun onPreWorld() {
+        NodeFacadeSupport.reload(this)
+    }
+
+    override fun onReload() {
+        NodeFacadeSupport.reload(this)
     }
 }
