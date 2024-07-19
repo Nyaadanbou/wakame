@@ -231,7 +231,7 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getTypedCore(CoreTypes.ATTRIBUTE)
+                val core = cell.getCoreAs(CoreTypes.ATTRIBUTE)
                 assertNotNull(core)
 
                 fun assert(element: Element, expectedMin: Double, expectedMax: Double) {
@@ -258,7 +258,7 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getTypedCore(CoreTypes.ATTRIBUTE)
+                val core = cell.getCoreAs(CoreTypes.ATTRIBUTE)
                 assertNotNull(core)
 
                 val modMap = core.provideAttributeModifiers(ZERO_UUID)
@@ -267,7 +267,7 @@ class CustomNekoStackTest : KoinTest {
                 assertEquals(0.75, mod.amount, 1e-5)
 
                 // 测试诅咒
-                val curseEntityKills = cell.getTypedCurse(CurseTypes.ENTITY_KILLS)
+                val curseEntityKills = cell.getCurseAs(CurseTypes.ENTITY_KILLS)
                 assertNotNull(curseEntityKills)
                 assertEquals(3, curseEntityKills.count)
 
@@ -393,7 +393,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo")
             assertNotNull(cell)
-            val core = cell.getTypedCore(CoreTypes.ATTRIBUTE)
+            val core = cell.getCoreAs(CoreTypes.ATTRIBUTE)
             assertNotNull(core)
             assertEquals(Key.key("attribute:attack_damage_rate"), core.key)
         }
@@ -418,7 +418,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo_b")
             assertNotNull(cell)
-            val core = cell.getTypedCore(CoreTypes.ATTRIBUTE)
+            val core = cell.getCoreAs(CoreTypes.ATTRIBUTE)
             assertNotNull(core)
             assertAny(
                 { assertEquals(Key.key("attribute:critical_strike_chance"), core.key) },
