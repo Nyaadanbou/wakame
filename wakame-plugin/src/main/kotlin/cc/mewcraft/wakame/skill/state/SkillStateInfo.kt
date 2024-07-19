@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.takeIfNekoStack
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill.state.display.StateDisplay
 import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
@@ -167,7 +168,7 @@ class IdleStateInfo(
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
     }
 
-    private val skillStateShower: SkillStateShower<Player> by inject()
+    private val stateDisplay: StateDisplay<Player> by inject()
     private val skillCastManager: SkillCastManager by inject()
 
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(3)
@@ -182,7 +183,7 @@ class IdleStateInfo(
         // Sequence trigger skills
         if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
             if (addSequenceSkills(castTrigger)) {
-                skillStateShower.displaySuccess(currentSequence.readAll(), state.user)
+                stateDisplay.displaySuccess(currentSequence.readAll(), state.user)
                 currentSequence.clear()
                 return handleSkills(context)
             }
@@ -216,14 +217,14 @@ class IdleStateInfo(
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
             val completeSequence = currentSequence.readAll()
-            skillStateShower.displayProgress(completeSequence, user)
+            stateDisplay.displayProgress(completeSequence, user)
 
             if (currentSequence.isFull()) {
                 val sequence = SequenceTrigger.of(completeSequence)
                 val skillsOnSequence = skillMap.getSkill(sequence).firstOrNull()
                 if (skillsOnSequence == null) {
                     currentSequence.clear()
-                    skillStateShower.displayFailure(completeSequence, user)
+                    stateDisplay.displayFailure(completeSequence, user)
                     return false
                 }
                 castableSkill = skillsOnSequence
@@ -254,7 +255,7 @@ class IdleStateInfo(
         if (!currentSequence.isEmpty()) {
             sequenceCounter++
             if (sequenceCounter >= 30) {
-                skillStateShower.displayFailure(currentSequence.readAll(), state.user)
+                stateDisplay.displayFailure(currentSequence.readAll(), state.user)
                 currentSequence.clear()
             }
         } else {
@@ -265,7 +266,6 @@ class IdleStateInfo(
     override fun interrupt() {
         currentSequence.clear()
         castableSkill = null
-        skillStateShower.displayFailure(currentSequence.readAll(), state.user)
     }
 }
 
