@@ -211,7 +211,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
                 if (!ignoreCurse && cell.getCurse().isLocked(context)) {
                     continue // 诅咒还未解锁
                 }
-                val core = cell.getTypedCore(CoreTypes.ATTRIBUTE) ?: continue
+                val core = cell.getCoreAs(CoreTypes.ATTRIBUTE) ?: continue
                 val modifiers = core.provideAttributeModifiers(context.uuid)
                 val entries = modifiers.entries
                 ret.putAll(entries)
@@ -225,7 +225,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
                 if (!ignoreCurse && cell.getCurse().isLocked(context)) {
                     continue // 诅咒还未解锁
                 }
-                val core = cell.getTypedCore(CoreTypes.SKILL) ?: continue
+                val core = cell.getCoreAs(CoreTypes.SKILL) ?: continue
                 val variant = core.variant
                 if (ignoreVariant || variant == TriggerVariant.any()) {
                     ret.put(core.trigger, core.instance)

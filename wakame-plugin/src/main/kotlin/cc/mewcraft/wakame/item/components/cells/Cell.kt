@@ -17,9 +17,14 @@ import java.util.stream.Stream
 interface Cell : Examinable, BinarySerializable, TooltipProvider.Single {
 
     /**
-     * 词条栏的 id.
+     * 返回词条栏的 id.
      */
-    val id: String
+    fun getId(): String
+
+    /**
+     * 设置词条栏的 id.
+     */
+    fun setId(id: String): Cell
 
     /**
      * 返回词条栏的核心.
@@ -29,7 +34,7 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.Single {
     /**
      * 尝试返回指定类型的词条栏核心. 如果类型不符则返回 `null`.
      */
-    fun <T : Core> getTypedCore(type: CoreType<T>): T?
+    fun <T : Core> getCoreAs(type: CoreType<T>): T?
 
     /**
      * 设置词条栏的核心.
@@ -46,7 +51,7 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.Single {
     /**
      * 尝试返回指定类型的词条栏诅咒. 如果类型不符合则返回 `null`.
      */
-    fun <T : Curse> getTypedCurse(type: CurseType<T>): T?
+    fun <T : Curse> getCurseAs(type: CurseType<T>): T?
 
     /**
      * 设置词条栏的诅咒.
@@ -95,7 +100,7 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.Single {
 // 如果词条栏真实存在于物品上,
 // 那么实际实现就会是这个.
 private data class CellImpl(
-    override val id: String,
+    private val id: String,
     private val core: Core,
     private val curse: Curse,
     private val reforgeHistory: ReforgeHistory,
@@ -111,11 +116,19 @@ private data class CellImpl(
         reforgeHistory = ReforgeHistory.of(nbt.getCompound(TAG_REFORGE))
     )
 
+    override fun getId(): String {
+        return id
+    }
+
+    override fun setId(id: String): Cell {
+        return copy(id = id)
+    }
+
     override fun getCore(): Core {
         return core
     }
 
-    override fun <T : Core> getTypedCore(type: CoreType<T>): T? {
+    override fun <T : Core> getCoreAs(type: CoreType<T>): T? {
         if (core.type === type) {
             return core as T?
         }
@@ -130,7 +143,7 @@ private data class CellImpl(
         return curse
     }
 
-    override fun <T : Curse> getTypedCurse(type: CurseType<T>): T? {
+    override fun <T : Curse> getCurseAs(type: CurseType<T>): T? {
         if (curse.type === type) {
             return curse as T?
         }
