@@ -57,6 +57,9 @@ dependencies {
         exclude("net.kyori")
         exclude("org.jetbrains")
     }
+    implementation(platform(libs.bom.invui)) {
+        exclude("org.jetbrains")
+    }
     implementation(platform(libs.bom.jgit))
     implementation(platform(libs.bom.packetevents.spigot))
 
@@ -98,6 +101,10 @@ tasks {
         // cloud-paper dependencies
         relocate("xyz.jpenilla.reflectionremapper", "cc.mewcraft.wakame.external.reflectionremapper")
         relocate("net.fabricmc.mappingio", "cc.mewcraft.wakame.external.mappingio")
+
+        // invui
+        relocate("xyz.xenondevs.invui", "cc.mewcraft.wakame.external.invui")
+        relocate("xyz.xenondevs.inventoryaccess", "cc.mewcraft.wakame.external.invui.inventoryaccess")
     }
 
     val inputJarPath by lazy { shadowJar.get().archiveFile.get().asFile.absolutePath }
