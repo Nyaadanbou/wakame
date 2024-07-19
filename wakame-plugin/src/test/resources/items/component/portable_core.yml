@@ -1,0 +1,14 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 如果核心依赖等级, 则必须加上物品等级的组件
+level: 10
+
+# 使该物品成为便携式核心
+portable_core:
+  # 核心的类型
+  type: attribute:attack_damage_rate
+  # 下面的所有设置取决于核心的类型
+  operation: add
+  element: fire
+  value: 0.1

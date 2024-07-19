@@ -1,7 +1,42 @@
 package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.components.ArmorTrim
+import cc.mewcraft.wakame.item.components.Attributable
+import cc.mewcraft.wakame.item.components.Castable
+import cc.mewcraft.wakame.item.components.CustomModelData
+import cc.mewcraft.wakame.item.components.CustomName
+import cc.mewcraft.wakame.item.components.Damageable
+import cc.mewcraft.wakame.item.components.ExtraLore
+import cc.mewcraft.wakame.item.components.FireResistant
+import cc.mewcraft.wakame.item.components.FoodProperties
+import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
+import cc.mewcraft.wakame.item.components.HideTooltip
+import cc.mewcraft.wakame.item.components.ItemAdventurePredicate
+import cc.mewcraft.wakame.item.components.ItemArrow
+import cc.mewcraft.wakame.item.components.ItemAttributeModifiers
+import cc.mewcraft.wakame.item.components.ItemBow
+import cc.mewcraft.wakame.item.components.ItemCells
+import cc.mewcraft.wakame.item.components.ItemCrate
+import cc.mewcraft.wakame.item.components.ItemDamage
+import cc.mewcraft.wakame.item.components.ItemDyeColor
+import cc.mewcraft.wakame.item.components.ItemElements
+import cc.mewcraft.wakame.item.components.ItemEnchantments
+import cc.mewcraft.wakame.item.components.ItemGlowable
+import cc.mewcraft.wakame.item.components.ItemKizamiz
+import cc.mewcraft.wakame.item.components.ItemLevel
+import cc.mewcraft.wakame.item.components.ItemMaxDamage
+import cc.mewcraft.wakame.item.components.ItemName
+import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.ItemSkin
+import cc.mewcraft.wakame.item.components.ItemSkinOwner
+import cc.mewcraft.wakame.item.components.ItemTracks
+import cc.mewcraft.wakame.item.components.Kizamiable
+import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.components.Skillful
+import cc.mewcraft.wakame.item.components.SystemUse
+import cc.mewcraft.wakame.item.components.Tool
+import cc.mewcraft.wakame.item.components.Unbreakable
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 
 /**
@@ -170,6 +205,11 @@ object ItemComponentTypes {
      * 对应原版组件: [`minecraft:max_damage`](https://minecraft.wiki/w/Data_component_format#max_damage)
      */
     val MAX_DAMAGE: ItemComponentType<Int> = ItemMaxDamage.codec(ItemComponentConstants.MAX_DAMAGE).register()
+
+    /**
+     * 将物品作为便携式核心, 用于重铸系统.
+     */
+    val PORTABLE_CORE: ItemComponentType<PortableCore> = PortableCore.codec(ItemComponentConstants.PORTABLE_CORE).register()
 
     /**
      * 物品的稀有度.
