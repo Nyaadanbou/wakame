@@ -18,11 +18,11 @@ class MockNekoStack(
     override val prototype: NekoItem,
 ) : NekoStack {
     override val nbt: CompoundTag
-        get() = throw NotImplementedError("NBT is not finished yet")
+        get() = throw NotImplementedError("Not implemented")
     override val handle: ItemStack
-        get() = throw NotImplementedError("ItemStack is not finished yet")
+        get() = throw NotImplementedError("Not implemented")
     override val itemStack: ItemStack
-        get() = throw NotImplementedError("ItemStack is not finished yet")
+        get() = throw NotImplementedError("Not implemented")
     override val namespace: String = prototype.key.namespace()
     override val path: String = prototype.key.value()
     override val key: Key = prototype.key
@@ -32,7 +32,8 @@ class MockNekoStack(
     override val components: ItemComponentMap = ItemComponentMap.builder().build()
     override val templates: ItemTemplateMap = prototype.templates
     override val behaviors: ItemBehaviorMap = prototype.behaviors
-    override fun erase() {}
+    override fun clone(): NekoStack = throw NotImplementedError("Not implemented")
+    override fun erase() = Unit
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key.asString()),
