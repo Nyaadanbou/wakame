@@ -10,10 +10,10 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
-object SkillSupport : KoinComponent {
+internal object SkillSupport : KoinComponent {
     val GLOBAL_SKILL_CONDITIONS: ConfigProvider by lazy {
         Configs.YAML
-            .build(SKILL_CONFIG_FILE) {
+            .build(SKILL_CONFIG_FILE, false) {
                 defaultOptions(get<YamlConfigurationLoader.Builder>(named((SKILL_PROTO_CONFIG_LOADER))).defaultOptions())
             }
             .derive("conditions")

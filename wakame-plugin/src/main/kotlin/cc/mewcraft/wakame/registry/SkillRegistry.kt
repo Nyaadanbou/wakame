@@ -102,7 +102,7 @@ object SkillRegistry : Initializable, KoinComponent {
                     val node = loaderBuilder.buildAndLoadString(text)
 
                     val type = node.node("type").krequire<String>()
-                    val provider = NodeConfigProvider(node, skillFile.path)
+                    val provider = NodeConfigProvider(node, skillFile.path, lazy = false)
                     val skill = SkillFactories[type]?.create(skillKey, provider)
                     if (skill == null) {
                         LOGGER.error("Failed to load skill: {}", skillKey)
