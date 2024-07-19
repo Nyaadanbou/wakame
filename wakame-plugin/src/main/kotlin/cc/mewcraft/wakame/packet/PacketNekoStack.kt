@@ -183,6 +183,10 @@ private class PacketCustomNekoStack(
     override val behaviors: ItemBehaviorMap
         get() = NekoStackSupport.getBehaviors(nbt)
 
+    override fun clone(): NekoStack {
+        throw UnsupportedOperationException("clone() is not supported")
+    }
+
     override fun erase() {
         handle0.unsetComponent(ComponentTypes.CUSTOM_DATA)
     }
@@ -228,6 +232,10 @@ private class PacketVanillaNekoStack(
 
     override val behaviors: ItemBehaviorMap
         get() = prototype.behaviors
+
+    override fun clone(): NekoStack {
+        throw UnsupportedOperationException("clone() is not supported")
+    }
 
     override fun erase() {
         // no-op

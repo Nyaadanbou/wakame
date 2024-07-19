@@ -110,6 +110,11 @@ interface NekoStack : Keyed, Examinable {
     val behaviors: ItemBehaviorMap
 
     /**
+     * 克隆物品堆叠.
+     */
+    fun clone(): NekoStack
+
+    /**
      * Removes all the custom tags from the item.
      *
      * **Only to be used in certain special cases!**
