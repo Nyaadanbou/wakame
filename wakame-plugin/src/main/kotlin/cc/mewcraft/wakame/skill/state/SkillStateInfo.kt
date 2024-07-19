@@ -171,6 +171,7 @@ class IdleStateInfo(
     private val skillCastManager: SkillCastManager by inject()
 
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(3)
+    private var sequenceCounter: Long = 0
 
     private var castableSkill: Skill? = null
 
@@ -248,7 +249,18 @@ class IdleStateInfo(
         return SkillStateResult.CANCEL_EVENT
     }
 
-    override fun tick() = Unit
+    override fun tick() {
+        // Invalidate the sequence if it's not empty
+        if (!currentSequence.isEmpty()) {
+            sequenceCounter++
+            if (sequenceCounter >= 30) {
+                skillStateShower.displayFailure(currentSequence.readAll(), state.user)
+                currentSequence.clear()
+            }
+        } else {
+            sequenceCounter = 0
+        }
+    }
 
     override fun interrupt() {
         currentSequence.clear()
