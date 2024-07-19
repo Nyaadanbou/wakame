@@ -35,7 +35,7 @@ interface CommandExecute : Skill {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
         override fun cast(context: SkillContext): SkillTick<CommandExecute> {
-            return CommandExecuteTick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
+            return CommandExecuteTick(context, this, triggerConditionGetter.interrupt, triggerConditionGetter.forbidden)
         }
     }
 }

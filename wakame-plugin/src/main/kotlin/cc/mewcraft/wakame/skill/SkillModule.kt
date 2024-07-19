@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.skill.tick.skillTickModule
 import cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.skill.trigger.skillTriggerModule
 import cc.mewcraft.wakame.util.kregister
-import org.bukkit.event.Listener
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
@@ -37,6 +36,7 @@ internal fun skillModule(): Module = module {
     // 用于外部代码
     single<TypeSerializerCollection>(named(SKILL_EXTERNALS)) {
         TypeSerializerCollection.builder()
+            .kregister(SkillSerializer)
             .kregister(SkillTriggerSerializer)
             .kregister(ConfiguredSkillSerializer)
             .kregister(ConfiguredSkillVariantSerializer)

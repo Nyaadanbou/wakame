@@ -1,7 +1,11 @@
-# 技能模板的 type
+# 唯一的默认萌芽技能.
+
+# 技能模板的 type, 这里是 potion_drop.
 type: potion_drop
 
-# 下面的是此技能的属性
+# 下面的是此技能的属性.
+# 详细的属性说明请看技能属性说明文档.
+# 这里是一个 potion_drop 技能的例子, 意为药水掉落的效果类型.
 effect_types:
   - LUCK
   - LONG_LEAPING

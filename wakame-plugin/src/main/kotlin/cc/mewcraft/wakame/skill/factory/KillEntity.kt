@@ -25,7 +25,7 @@ interface KillEntity : Skill {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
         override fun cast(context: SkillContext): SkillTick<KillEntity> {
-            return Tick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
+            return Tick(context, this, triggerConditionGetter.interrupt, triggerConditionGetter.forbidden)
         }
     }
 }

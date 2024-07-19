@@ -45,7 +45,7 @@ interface PotionDrop : Skill {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
         override fun cast(context: SkillContext): SkillTick<PotionDrop> {
-            return PotionDropTick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
+            return PotionDropTick(context, this, triggerConditionGetter.interrupt, triggerConditionGetter.forbidden)
         }
     }
 }
@@ -76,7 +76,6 @@ private class PotionDropEffectTick(
             potionMeta.basePotionType = skill.effectTypes.random()
             val thrownPotion = location.world.spawnEntity(location, EntityType.POTION) as ThrownPotion
             thrownPotion.potionMeta = potionMeta
-            location.world.strikeLightning(location)
         }
 
         if (tickCount >= 200) {

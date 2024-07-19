@@ -37,8 +37,8 @@ object TargetUtil {
             is Target.Location -> target
             is Target.LivingEntity -> {
                 val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity
-                val targetEntity = target.bukkitEntity ?: return null
-                if (caster != null && caster == targetEntity && ignoreCaster) null else TargetAdapter.adapt(targetEntity.location)
+                val targetEntity = target.bukkitEntity
+                if (caster != null && caster == targetEntity && ignoreCaster) null else targetEntity?.location?.let { TargetAdapter.adapt(it) }
             }
             else -> null
         }

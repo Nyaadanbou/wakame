@@ -53,7 +53,7 @@ interface Dash : Skill {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
         override fun cast(context: SkillContext): SkillTick<Dash> {
-            return DashTick(context, this, triggerConditionGetter.interruptTriggers, triggerConditionGetter.forbiddenTriggers)
+            return DashTick(context, this, triggerConditionGetter.interrupt, triggerConditionGetter.forbidden)
         }
     }
 }
