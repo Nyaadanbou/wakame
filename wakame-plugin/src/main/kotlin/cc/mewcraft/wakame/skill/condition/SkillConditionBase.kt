@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.skill.condition
 
 import cc.mewcraft.commons.provider.immutable.orElse
+import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.config.*
 import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.SkillSupport
@@ -28,8 +29,8 @@ abstract class SkillConditionBase(
      * 该实现可以向施法者(Caster)发送预设的消息提示.
      */
     protected inner class Notification {
-        private val successMessage: ConditionMessageGroup by config.entry<ConditionMessageGroup>("success_message")
-        private val failureMessage: ConditionMessageGroup by config.entry<ConditionMessageGroup>("failure_message")
+        private val successMessage: AudienceMessageGroup by config.entry<AudienceMessageGroup>("success_message")
+        private val failureMessage: AudienceMessageGroup by config.entry<AudienceMessageGroup>("failure_message")
 
         /**
          * 发送条件满足时的消息提示.

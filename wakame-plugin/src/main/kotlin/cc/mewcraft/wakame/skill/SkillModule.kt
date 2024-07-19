@@ -2,10 +2,9 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroupSerializer
-import cc.mewcraft.wakame.skill.condition.skillConditionModule
 import cc.mewcraft.wakame.skill.factory.skillFactoryModule
-import cc.mewcraft.wakame.skill.state.PlayerSkillStateShower
-import cc.mewcraft.wakame.skill.state.SkillStateShower
+import cc.mewcraft.wakame.skill.state.display.PlayerStateDisplay
+import cc.mewcraft.wakame.skill.state.display.StateDisplay
 import cc.mewcraft.wakame.skill.tick.skillTickModule
 import cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.skill.trigger.skillTriggerModule
@@ -25,11 +24,10 @@ internal fun skillModule(): Module = module {
         skillFactoryModule(),
         skillTickModule(),
         skillTriggerModule(),
-        skillConditionModule()
     )
 
     singleOf(::SkillEventHandler)
-    singleOf(::PlayerSkillStateShower) bind SkillStateShower::class
+    singleOf(::PlayerStateDisplay) bind StateDisplay::class
 
     singleOf(::SkillCastManagerImpl) bind SkillCastManager::class
 

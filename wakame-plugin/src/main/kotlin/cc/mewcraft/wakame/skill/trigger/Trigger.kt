@@ -2,17 +2,18 @@ package cc.mewcraft.wakame.skill.trigger
 
 import cc.mewcraft.commons.collections.contentEquals
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.function.Predicate
 import java.util.stream.Stream
 
 /**
@@ -166,11 +167,21 @@ interface SequenceTrigger : Trigger {
     }
 }
 
-internal object SkillTriggerSerializer : SchemaSerializer<Trigger> {
-    override fun deserialize(type: Type, node: ConfigurationNode): Trigger {
-        val raw = node.string ?: throw SerializationException(node, type, "Skill trigger cannot be an empty string")
-        val key = Key(raw)
-        val trigger = SkillRegistry.TRIGGERS.find(key) ?: throw SerializationException(node, type, "Cannot find skill trigger with key: '$key'")
-        return trigger
+internal object SkillTriggerSerializer : ScalarSerializer<Trigger>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): Trigger {
+        if (obj is String) {
+            val triggers = SkillRegistry.TRIGGERS
+            val string = obj.lowercase()
+            val trigger = triggers.find(Key(string))
+                ?: triggers.find(Key(Namespaces.TRIGGER, string))
+                ?: throw SerializationException("Cannot find trigger with key $obj")
+            return trigger
+        }
+
+        throw SerializationException("Cannot deserialize object of type ${obj::class.simpleName} to SkillTrigger")
+    }
+
+    override fun serialize(item: Trigger?, typeSupported: Predicate<Class<*>>?): Any {
+        throw UnsupportedOperationException()
     }
 }

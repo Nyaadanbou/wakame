@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.adventure.ADVENTURE_SERIALIZERS
 import cc.mewcraft.wakame.config.configurate.MaterialSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
@@ -14,7 +15,6 @@ import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
 import cc.mewcraft.wakame.skill.SKILL_GROUP_SERIALIZERS
 import cc.mewcraft.wakame.skill.SkillSerializer
 import cc.mewcraft.wakame.skill.TriggersConditionsSerializer
-import cc.mewcraft.wakame.skill.condition.SKILL_CONDITION_SERIALIZERS
 import cc.mewcraft.wakame.skill.factory.SKILL_FACTORY_SERIALIZERS
 import cc.mewcraft.wakame.skill.trigger.SKILL_TRIGGER_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
@@ -59,6 +59,9 @@ const val KIZAMI_GLOBAL_CONFIG_LOADER = "kizami_global_config_loader"
 
 const val RARITY_GLOBAL_CONFIG_FILE = "rarities.yml"
 const val RARITY_GLOBAL_CONFIG_LOADER = "rarity_global_config_loader"
+
+const val STATE_GLOBAL_CONFIG_FILE = "state.yml"
+const val STATE_GLOBAL_CONFIG_LOADER = "state_global_config_loader"
 
 const val LEVEL_GLOBAL_CONFIG_FILE = "levels.yml"
 const val LEVEL_GLOBAL_CONFIG_LOADER = "level_global_config_loader"
@@ -122,11 +125,18 @@ internal fun registryModule(): Module = module {
             register(SkillSerializer)
             kregister(PotionEffectSerializer)
             kregister(TriggersConditionsSerializer)
+            registerAll(get(named(ADVENTURE_SERIALIZERS)))
             registerAll(get(named(DAMAGE_EXTERNAL)))
             registerAll(get(named(ELEMENT_SERIALIZERS)))
             registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
-            registerAll(get(named(SKILL_CONDITION_SERIALIZERS)))
             registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
+            registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
+        }
+    }
+
+    single<YamlConfigurationLoader.Builder>(named(STATE_GLOBAL_CONFIG_LOADER)) {
+        buildYamlLoader {
+            registerAll(get(named(ADVENTURE_SERIALIZERS)))
             registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
         }
     }
