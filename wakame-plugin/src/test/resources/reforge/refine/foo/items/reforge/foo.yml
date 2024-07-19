@@ -1,12 +1,17 @@
-# 词条栏的重铸设置
+# 词条栏的定制设置
 cells:
 
-  # 定义 id 为 “a” 的词条栏的重铸设置
+  # 定义 id 为 “a” 的词条栏的定制设置
   a:
 
-    # 定义该词条栏最多可重铸几次
+    # 定制该词条栏的额外花费,
+    # 会直接加到物品最终的花费
+    # 类型: Molang
+    cost: "math.random(0.0, 100.0)"
+
+    # 定义该词条栏最多可定制几次
     # 类型: 整数
-    reforge_limit: 1
+    mod_limit: 1
 
     # 定义该词条栏“接受”哪些核心
     # 类型: 列表
@@ -15,6 +20,6 @@ cells:
     # 只要输入的核心满足其中的任意规则,
     # 就会被算作“接受”.
     accepted_cores:
-      - type: "attribute:attack_damage"
+      - type: attribute:attack_damage
         element: fire
         operation: add
