@@ -1,0 +1,20 @@
+# 词条栏的重铸设置
+cells:
+
+  # 定义 id 为 “a” 的词条栏的重铸设置
+  a:
+
+    # 定义该词条栏最多可重铸几次
+    # 类型: 整数
+    reforge_limit: 1
+
+    # 定义该词条栏“接受”哪些核心
+    # 类型: 列表
+    #
+    # 该列表中的每一项都是一个匹配规则.
+    # 只要输入的核心满足其中的任意规则,
+    # 就会被算作“接受”.
+    accepted_cores:
+      - type: "attribute:attack_damage"
+        element: fire
+        operation: add
