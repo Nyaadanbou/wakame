@@ -1,0 +1,10 @@
+nodes:
+  - type: attribute:attack_damage
+    element: fire
+    operation: add
+  - type: attribute:attack_damage
+    element: wind
+    operation: add
+  - type: attribute:attack_damage
+    element: thunder
+    operation: add
