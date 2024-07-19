@@ -18,7 +18,7 @@ abstract class SkillBase(
     override val conditions: SkillConditionGroup by config.optionalEntry<SkillConditionGroup>("conditions").orElse(SkillConditionGroup.empty())
 
     protected inner class TriggerConditionGetter {
-        val forbiddenTriggers: Provider<TriggerConditions> = config.optionalEntry<TriggerConditions>("forbidden_triggers").orElse(TriggerConditions.empty())
-        val interruptTriggers: Provider<TriggerConditions> = config.optionalEntry<TriggerConditions>("interrupt_triggers").orElse(TriggerConditions.empty())
+        val forbidden: Provider<TriggerConditions> = config.optionalEntry<TriggerConditions>("forbidden_triggers").orElse(TriggerConditions.empty())
+        val interrupt: Provider<TriggerConditions> = config.optionalEntry<TriggerConditions>("interrupt_triggers").orElse(TriggerConditions.empty())
     }
 }

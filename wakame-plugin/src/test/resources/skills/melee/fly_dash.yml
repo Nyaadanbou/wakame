@@ -1,0 +1,8 @@
+type: fly_dash
+
+# 移动的距离
+distance: 2
+
+# 在开始移动前释放的技能
+before_moving_effects:
+  - "skill:buff/potion_drop"

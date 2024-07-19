@@ -38,4 +38,18 @@ object TargetAdapter {
     fun adapt(location: BukkitLocation): Target.Location {
         return BukkitLocationTarget(location)
     }
+
+    fun adapt(caster: Caster.Single): Target {
+        when (caster) {
+            is Caster.Single.Entity -> return adapt(caster.bukkitEntity as BukkitLivingEntity)
+            is Caster.Single.Skill -> throw UnsupportedOperationException()
+        }
+    }
+
+    fun adapt(caster: Caster.CompositeNode): Target {
+        val single = caster.value<Caster.Single>()
+            ?: caster.root<Caster.Single>()
+            ?: throw IllegalStateException("No single caster")
+        return adapt(single)
+    }
 }

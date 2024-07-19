@@ -2,12 +2,17 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.factory.SkillFactory
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
+import org.spongepowered.configurate.serialize.ScalarSerializer
+import java.lang.reflect.Type
+import java.util.function.Predicate
 
 /**
  * Represents a skill "attached" to a player.
@@ -65,4 +70,15 @@ private data object EmptySkill : Skill {
     override val key: Key = Key(Namespaces.SKILL, "empty")
     override val displays: SkillDisplay = SkillDisplay.empty()
     override val conditions: SkillConditionGroup = SkillConditionGroup.empty()
+}
+
+internal object SkillSerializer : ScalarSerializer<Skill>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): Skill {
+        val string = obj.toString()
+        return SkillRegistry.INSTANCES[Key(string)]
+    }
+
+    override fun serialize(item: Skill?, typeSupported: Predicate<Class<*>>?): Any {
+        throw UnsupportedOperationException()
+    }
 }

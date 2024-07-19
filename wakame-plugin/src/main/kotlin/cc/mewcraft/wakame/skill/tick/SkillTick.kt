@@ -59,6 +59,13 @@ private data object EmptyPlayerSkillTick : PlayerSkillTick<Skill> {
  * @see tickCast
  */
 interface PlayerSkillTick<S : Skill> : SkillTick<S> {
+    /**
+     * 此次触发效果的触发次数.
+     *
+     * 与下面的 tickCount 不同, 此次触发效果的触发次数是指整个过程中的触发次数.
+     */
+    override var tickCount: Long
+
     fun isForbidden(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean
     fun isInterrupted(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean
 

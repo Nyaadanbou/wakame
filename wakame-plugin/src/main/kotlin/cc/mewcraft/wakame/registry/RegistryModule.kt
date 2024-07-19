@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
 import cc.mewcraft.wakame.skill.SKILL_GROUP_SERIALIZERS
+import cc.mewcraft.wakame.skill.SkillSerializer
 import cc.mewcraft.wakame.skill.TriggersConditionsSerializer
 import cc.mewcraft.wakame.skill.condition.SKILL_CONDITION_SERIALIZERS
 import cc.mewcraft.wakame.skill.factory.SKILL_FACTORY_SERIALIZERS
@@ -118,6 +119,7 @@ internal fun registryModule(): Module = module {
         buildYamlLoader {
             register(MaterialSerializer)
             register(PotionEffectTypeSerializer)
+            register(SkillSerializer)
             kregister(PotionEffectSerializer)
             kregister(TriggersConditionsSerializer)
             registerAll(get(named(DAMAGE_EXTERNAL)))
