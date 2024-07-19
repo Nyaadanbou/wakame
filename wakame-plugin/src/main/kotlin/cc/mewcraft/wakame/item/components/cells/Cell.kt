@@ -17,6 +17,11 @@ import java.util.stream.Stream
 interface Cell : Examinable, BinarySerializable, TooltipProvider.Single {
 
     /**
+     * 词条栏的 id.
+     */
+    val id: String
+
+    /**
      * 返回词条栏的核心.
      */
     fun getCore(): Core
@@ -90,7 +95,7 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.Single {
 // 如果词条栏真实存在于物品上,
 // 那么实际实现就会是这个.
 private data class CellImpl(
-    private val id: String,
+    override val id: String,
     private val core: Core,
     private val curse: Curse,
     private val reforgeHistory: ReforgeHistory,
