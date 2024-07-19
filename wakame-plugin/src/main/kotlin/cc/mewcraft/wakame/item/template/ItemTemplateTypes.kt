@@ -1,7 +1,35 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.components.ArmorTrim
+import cc.mewcraft.wakame.item.components.Attributable
+import cc.mewcraft.wakame.item.components.Castable
+import cc.mewcraft.wakame.item.components.CustomName
+import cc.mewcraft.wakame.item.components.Damageable
+import cc.mewcraft.wakame.item.components.ExtraLore
+import cc.mewcraft.wakame.item.components.FireResistant
+import cc.mewcraft.wakame.item.components.FoodProperties
+import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
+import cc.mewcraft.wakame.item.components.HideTooltip
+import cc.mewcraft.wakame.item.components.ItemAdventurePredicate
+import cc.mewcraft.wakame.item.components.ItemArrow
+import cc.mewcraft.wakame.item.components.ItemAttributeModifiers
+import cc.mewcraft.wakame.item.components.ItemBow
+import cc.mewcraft.wakame.item.components.ItemCells
+import cc.mewcraft.wakame.item.components.ItemCrate
+import cc.mewcraft.wakame.item.components.ItemDyeColor
+import cc.mewcraft.wakame.item.components.ItemElements
+import cc.mewcraft.wakame.item.components.ItemEnchantments
+import cc.mewcraft.wakame.item.components.ItemGlowable
+import cc.mewcraft.wakame.item.components.ItemKizamiz
+import cc.mewcraft.wakame.item.components.ItemLevel
+import cc.mewcraft.wakame.item.components.ItemName
+import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.Kizamiable
+import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.components.Skillful
+import cc.mewcraft.wakame.item.components.Tool
+import cc.mewcraft.wakame.item.components.Unbreakable
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 object ItemTemplateTypes {
@@ -124,6 +152,11 @@ object ItemTemplateTypes {
      * 组件: [ExtraLore]
      */
     val LORE: ItemTemplateType<ExtraLore.Template> = ExtraLore.templateType(ItemComponentConstants.LORE).register()
+
+    /**
+     * 组件: [PortableCore]
+     */
+    val PORTABLE_CORE: ItemTemplateType<PortableCore.Template> = PortableCore.templateType(ItemComponentConstants.PORTABLE_CORE).register()
 
     /**
      * 组件: [ItemRarity]

@@ -179,6 +179,11 @@ components:
     tooltips:
       single: "<!i>最大耐久损耗: <max_damage>"
 
+  portable_core:
+    enabled: true
+    display_name: "便携式核心"
+    tooltips: { } # 取决于核心
+
   rarity:
     enabled: true
     display_name: "稀有度"

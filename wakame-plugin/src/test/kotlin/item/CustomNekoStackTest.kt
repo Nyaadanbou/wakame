@@ -827,6 +827,25 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
+    fun `component - portable core`() = componentLifecycleTest(
+        "portable_core", ItemTemplateTypes.PORTABLE_CORE, ItemComponentTypes.PORTABLE_CORE
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        context {
+            it.level = 10 // 单元测试一次只读取/生成一个模板, 因此这里得手动设置等级
+        }
+
+        unboxed {
+            val core = it.core
+            assertNotNull(core)
+            assertEquals(Key.key("attribute:attack_damage_rate"), core.key)
+        }
+    }
+
+    @Test
     fun `component - rarity`() = componentLifecycleTest(
         "rarity", ItemTemplateTypes.RARITY, ItemComponentTypes.RARITY,
     ) {
