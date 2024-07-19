@@ -229,7 +229,7 @@ internal object NumericValueSerializer : TypeSerializer<RandomizedValue> {
         val scalar = node.rawScalar()
         if (scalar != null) {
             // if it's just a simple plain value like "value: 32"
-            return RandomizedValue(node.double, .0, .0, upperBound = .0)
+            return RandomizedValue(node.double, .0, .0, lowerBound = null, upperBound = null)
         }
 
         val base = node.node("base").krequire<Double>()
