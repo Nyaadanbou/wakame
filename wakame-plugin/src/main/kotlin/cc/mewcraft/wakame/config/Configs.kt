@@ -45,15 +45,15 @@ sealed class BasicConfigs<T : AbstractConfigurationLoader<*>, B : AbstractConfig
     /**
      * Builds a [config provider][ConfigProvider] with the specified options.
      */
-    fun build(relPath: String, builder: B.() -> Unit): ConfigProvider {
-        return configProviders.getOrPut(relPath) { createConfigProvider(relPath, builder) }
+    fun build(relPath: String, lazy: Boolean, builder: B.() -> Unit): ConfigProvider {
+        return configProviders.getOrPut(relPath) { createConfigProvider(relPath, lazy, builder) }
     }
 
     /**
      * Gets a [config provider][ConfigProvider] with the default options.
      */
-    operator fun get(relPath: String): ConfigProvider {
-        return configProviders.getOrPut(relPath) { createConfigProvider(relPath, {}) }
+    operator fun get(relPath: String, lazy: Boolean = true): ConfigProvider {
+        return build(relPath, lazy) {}
     }
 
     /**
@@ -82,25 +82,27 @@ sealed class BasicConfigs<T : AbstractConfigurationLoader<*>, B : AbstractConfig
     /**
      * Creates a config provider.
      */
-    protected abstract fun createConfigProvider(relPath: String, builder: B.() -> Unit): ConfigProvider
+    protected abstract fun createConfigProvider(relPath: String, lazy: Boolean, builder: B.() -> Unit): ConfigProvider
 }
 
 class YamlConfigs : BasicConfigs<YamlConfigurationLoader, YamlConfigurationLoader.Builder>() {
     override fun createConfigProvider(
         relPath: String,
+        lazy: Boolean,
         builder: YamlConfigurationLoader.Builder.() -> Unit,
     ): ConfigProvider {
         val file = getConfigFile(relPath).toPath()
-        return YamlFileConfigProvider(file, relPath, builder)
+        return YamlFileConfigProvider(file, relPath, lazy, builder)
     }
 }
 
 class GsonConfigs : BasicConfigs<GsonConfigurationLoader, GsonConfigurationLoader.Builder>() {
     override fun createConfigProvider(
         relPath: String,
+        lazy: Boolean,
         builder: GsonConfigurationLoader.Builder.() -> Unit,
     ): ConfigProvider {
         val file = getConfigFile(relPath).toPath()
-        return GsonFileConfigProvider(file, relPath, builder)
+        return GsonFileConfigProvider(file, relPath, lazy, builder)
     }
 }

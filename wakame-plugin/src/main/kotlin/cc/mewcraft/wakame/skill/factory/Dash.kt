@@ -68,12 +68,6 @@ private class DashTick(
         private val DASH_DAMAGE_KEY: SkillContextKey<Int> = SkillContextKey.create("dash_damage")
     }
 
-    override fun tickCastPoint(tickCount: Long): TickResult {
-        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-        player.sendPlainMessage("冲刺的前摇摇摇摇")
-        return TickResult.ALL_DONE
-    }
-
     override fun tickCast(tickCount: Long): TickResult {
         if (!checkConditions())
             return TickResult.ALL_DONE

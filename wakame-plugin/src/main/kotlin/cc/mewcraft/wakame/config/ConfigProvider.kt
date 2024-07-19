@@ -116,15 +116,22 @@ sealed class ConfigProvider(
  * A [ConfigProvider] with a YAML file being its data source.
  *
  * @property path the file path to the YAML
- * @property options the configuration options
+ * @property builder the configuration loader builder
  *
  * @param relPath the relative file path
  */
 class YamlFileConfigProvider internal constructor(
     private val path: Path,
     relPath: String,
+    lazy: Boolean = true,
     private val builder: YamlConfigurationLoader.Builder.() -> Unit
 ) : ConfigProvider(relPath) {
+    init {
+        if (!lazy) {
+            get()
+        }
+    }
+
     override fun loadValue(): ConfigurationNode {
         return YamlConfigurationLoader.builder()
             .source { path.toFile().bufferedReader() }
@@ -139,15 +146,22 @@ class YamlFileConfigProvider internal constructor(
  * A [ConfigProvider] with a JSON file being its data source.
  *
  * @property path the file path to the JSON
- * @property options the configuration options
+ * @property builder the configuration loader builder
  *
  * @param relPath the relative file path
  */
 class GsonFileConfigProvider internal constructor(
     private val path: Path,
     relPath: String,
+    lazy: Boolean = true,
     private val builder: GsonConfigurationLoader.Builder.() -> Unit
 ) : ConfigProvider(relPath) {
+    init {
+        if (!lazy) {
+            get()
+        }
+    }
+
     override fun loadValue(): ConfigurationNode {
         return GsonConfigurationLoader.builder()
             .source { path.toFile().bufferedReader() }
@@ -169,7 +183,14 @@ class GsonFileConfigProvider internal constructor(
 class NodeConfigProvider internal constructor(
     private val node: ConfigurationNode,
     relPath: String = "",
+    lazy: Boolean = true
 ) : ConfigProvider(relPath) {
+    init {
+        if (!lazy) {
+            get()
+        }
+    }
+
     override fun loadValue(): ConfigurationNode {
         return node
     }
