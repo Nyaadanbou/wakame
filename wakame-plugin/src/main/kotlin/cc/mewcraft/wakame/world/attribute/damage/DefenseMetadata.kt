@@ -8,18 +8,18 @@ import cc.mewcraft.wakame.attribute.Attributes
  * 包含了一次伤害中“防御阶段”的有关信息
  * 其实现类实例化时，最终伤害值以及各种信息就已经确定了
  */
-sealed interface DefenseMetaData {
+sealed interface DefenseMetadata {
     val damageeAttributeMap: AttributeMap
-    fun calculateFinalDamage(damageMetaData: DamageMetaData): Double
+    fun calculateFinalDamage(damageMetaData: DamageMetadata): Double
 }
 
 /**
  * 玩家和非玩家实体的防御元数据
  */
-class EntityDefenseMetaData(
+class EntityDefenseMetadata(
     override val damageeAttributeMap: AttributeMap,
-) : DefenseMetaData {
-    override fun calculateFinalDamage(damageMetaData: DamageMetaData): Double {
+) : DefenseMetadata {
+    override fun calculateFinalDamage(damageMetaData: DamageMetadata): Double {
         var totalElementDamage = 0.0
         val criticalPower = if (damageMetaData.isCritical) damageMetaData.criticalPower else 1.0
         for (packet in damageMetaData.packets) {

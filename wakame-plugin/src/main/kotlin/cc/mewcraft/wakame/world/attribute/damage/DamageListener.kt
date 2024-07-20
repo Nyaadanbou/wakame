@@ -46,7 +46,7 @@ class DamageListener : Listener, KoinComponent {
     }
 
     /**
-     * 在弹射物射出时记录其 [DamageMetaData]
+     * 在弹射物射出时记录其 [DamageMetadata]
      */
     @EventHandler
     fun on(event: ProjectileLaunchEvent) {
@@ -54,7 +54,7 @@ class DamageListener : Listener, KoinComponent {
     }
 
     /**
-     * 在弹射物射出时记录其 [DamageMetaData]
+     * 在弹射物射出时记录其 [DamageMetadata]
      * 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
      */
     @EventHandler
@@ -63,7 +63,7 @@ class DamageListener : Listener, KoinComponent {
     }
 
     /**
-     * 在弹射物击中方块时移除记录的 [DamageMetaData]
+     * 在弹射物击中方块时移除记录的 [DamageMetadata]
      */
     @EventHandler
     fun on(event: ProjectileHitEvent) {

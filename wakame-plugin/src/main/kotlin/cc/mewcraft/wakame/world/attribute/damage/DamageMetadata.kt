@@ -19,7 +19,7 @@ import kotlin.random.Random
  * 包含了一次伤害中“攻击阶段”的有关信息
  * 其实现类实例化时，攻击伤害值以及各种信息就已经确定了
  */
-sealed interface DamageMetaData {
+sealed interface DamageMetadata {
     val packets: List<ElementDamagePacket>
         get() = generatePackets()
     val damageValue: Double
@@ -35,9 +35,9 @@ sealed interface DamageMetaData {
  * 如：溺水伤害，风弹、末影珍珠击中实体伤害
  * 不做任何处理，只包含伤害值这一信息，伤害元素类型为默认元素
  */
-class DefaultDamageMetaData(
+class DefaultDamageMetadata(
     override val damageValue: Double,
-) : DamageMetaData {
+) : DamageMetadata {
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
 
@@ -61,12 +61,12 @@ class DefaultDamageMetaData(
  * 用于特定原版伤害类型加上元素和护甲穿透
  * 如：给溺水伤害加上水元素，给着火伤害加上火元素
  */
-class VanillaDamageMetaData(
+class VanillaDamageMetadata(
     override val damageValue: Double,
     val element: Element,
     private val defensePenetration: Double,
     private val defensePenetrationRate: Double
-) : DamageMetaData {
+) : DamageMetadata {
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
     override fun generatePackets(): List<ElementDamagePacket> {
@@ -89,10 +89,10 @@ class VanillaDamageMetaData(
  * [isSweep] 表示这次伤害是否是横扫造成的
  * 会根据横扫的逻辑削弱伤害
  */
-class PlayerMeleeAttackMetaData(
+class PlayerMeleeAttackMetadata(
     val user: User<Player>,
     private val isSweep: Boolean
-) : DamageMetaData {
+) : DamageMetadata {
     override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
@@ -126,9 +126,9 @@ class PlayerMeleeAttackMetaData(
  * 非玩家实体近战攻击造成的伤害元数据
  * 如：僵尸近战攻击、河豚接触伤害
  */
-class EntityMeleeAttackMetaData(
+class EntityMeleeAttackMetadata(
     entity: LivingEntity
-) : DamageMetaData {
+) : DamageMetadata {
     private val entityAttributeMap = EntityAttributeAccessor.getAttributeMap(entity)
     override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
@@ -138,7 +138,7 @@ class EntityMeleeAttackMetaData(
     }
 }
 
-sealed interface ProjectileDamageMetaData : DamageMetaData {
+sealed interface ProjectileDamageMetadata : DamageMetadata {
     val projectileType: ProjectileType
 }
 
@@ -148,12 +148,12 @@ sealed interface ProjectileDamageMetaData : DamageMetaData {
  * 对于箭矢，除了计算玩家身上已有的属性值外，还需额外加上箭矢的属性
  * 对于三叉戟，则不需要，因为三叉戟投掷命中和直接近战击打没有区别
  */
-class PlayerProjectileDamageMetaData(
+class PlayerProjectileDamageMetadata(
     override val projectileType: ProjectileType,
     val user: User<Player>,
     val itemStack: ItemStack,
     private val force: Float
-) : ProjectileDamageMetaData {
+) : ProjectileDamageMetadata {
     override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
@@ -218,10 +218,10 @@ class PlayerProjectileDamageMetaData(
  * 非玩家实体使用弹射物造成伤害的元数据
  * 如：骷髅射出的箭矢、溺尸射出的三叉戟
  */
-class EntityProjectileDamageMetaData(
+class EntityProjectileDamageMetadata(
     override val projectileType: ProjectileType,
     val entity: LivingEntity
-) : ProjectileDamageMetaData {
+) : ProjectileDamageMetadata {
     private val entityAttributeMap = EntityAttributeAccessor.getAttributeMap(entity)
     override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
@@ -235,12 +235,12 @@ class EntityProjectileDamageMetaData(
  * 自定义伤害的元数据
  * 如：技能造成的伤害
  */
-class CustomDamageMetaData(
+class CustomDamageMetadata(
     override val criticalPower: Double,
     override val isCritical: Boolean,
     val knockback: Boolean,
     private val customElementDamagePackets: List<ElementDamagePacket>
-) : DamageMetaData {
+) : DamageMetadata {
     override val damageValue: Double = packets.sumOf { it.packetDamage }
     override fun generatePackets(): List<ElementDamagePacket> {
         return customElementDamagePackets
