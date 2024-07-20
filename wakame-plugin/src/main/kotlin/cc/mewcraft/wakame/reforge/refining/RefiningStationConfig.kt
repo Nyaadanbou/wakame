@@ -5,23 +5,23 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 
 /**
- * 封装了定制站的配置文件.
+ * 封装了定制台的配置文件.
  */
 interface RefiningStationConfig {
     /**
-     * 是否启用这个定制站.
+     * 是否启用这个定制台.
      */
     val enabled: Boolean // 未定义, 只是留个接口
 
     /**
-     * 定制站的GUI标题.
+     * 定制台的GUI标题.
      */
     val title: Component
 
     /**
-     * 定制站的花费设置.
+     * 定制台的花费设置, 该设置适用于整个定制台.
      */
-    val costConfig: StationCost
+    val cost: StationCost
 
     /**
      * 针对具体的物品类型的定制规则.
@@ -33,12 +33,33 @@ interface RefiningStationConfig {
 
 /**
  * 适用于一整个定制工作台的花费设置.
+ *
+ * 这里定义的所有成员的具体用途都取决于具体的实现.
  */
 interface StationCost {
+    /**
+     * 基础花费.
+     */
     val base: Double
+
+    /**
+     * 每个词条栏的花费.
+     */
     val perCell: Double
+
+    /**
+     * 稀有度的花费系数.
+     */
     val rarityModifiers: Map<Rarity, Double>
+
+    /**
+     * 物品等级的花费系数.
+     */
     val itemLevelModifier: Double
+
+    /**
+     * 核心等级的花费系数.
+     */
     val coreLevelModifier: Double
 }
 
@@ -64,9 +85,14 @@ interface ItemRule {
  */
 interface CellRule {
     /**
-     * 适用的词条栏 id.
+     * 该规则适用的词条栏的 id.
      */
     val target: String
+
+    /**
+     * 定制词条栏所需要的权限.
+     */
+    val permission: String
 
     /**
      * 定制该词条栏的花费.
@@ -76,7 +102,7 @@ interface CellRule {
     /**
      * 词条栏最多能定制几次.
      */
-    val modLimit: Int
+    val modificationLimit: Int
 
     /**
      * 词条栏“接受“哪些核心.

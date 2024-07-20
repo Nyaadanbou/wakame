@@ -56,6 +56,12 @@ interface CoreMatchRule {
     fun test(core: Core): Boolean
 }
 
+/**
+ * 需要的子序列化器:
+ * - Element
+ * - Trigger
+ * - TriggerVariant
+ */
 internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {
         val typeNode = node.node("type")

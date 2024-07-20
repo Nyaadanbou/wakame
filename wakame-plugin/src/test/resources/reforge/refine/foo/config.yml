@@ -21,6 +21,7 @@ cost:
   per_core: 500
   # 稀有度对于核心的基础花费的修饰系数
   rarity_modifiers:
+    # 这一级的键写稀有度的 id, 值写 double 类型的修饰系数
     common: 1.0
     uncommon: 1.1
     rare: 1.1
