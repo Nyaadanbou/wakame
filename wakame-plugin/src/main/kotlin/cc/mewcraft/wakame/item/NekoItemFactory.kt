@@ -122,6 +122,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("level", ItemTemplateTypes.LEVEL) { restricted { !it.isConstant } } // 对于 VanillaNekoItem, LEVEL 应该始终采用固定值
             tryAdd("lore", ItemTemplateTypes.LORE)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE) { unsupported() }
+            tryAdd("portable_curse", ItemTemplateTypes.PORTABLE_CURSE) { unsupported() }
             tryAdd("rarity", ItemTemplateTypes.RARITY) { restricted { !it.isStatic } } // 对于 VanillaNekoItem, RARITY 应该始终采用固定值
             // tryAdd("skin", ItemTemplateTypes.SKIN) { unsupported() }
             // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER) { unsupported() }
@@ -216,6 +217,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("level", ItemTemplateTypes.LEVEL)
             tryAdd("lore", ItemTemplateTypes.LORE)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE)
+            tryAdd("portable_curse", ItemTemplateTypes.PORTABLE_CURSE)
             tryAdd("rarity", ItemTemplateTypes.RARITY)
             // tryAdd("skin", ItemTemplateTypes.SKIN)
             // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER)

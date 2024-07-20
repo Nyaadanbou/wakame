@@ -116,6 +116,7 @@ object ItemComponentConstants {
     const val LEVEL = "level"
     const val LORE = "lore"
     const val PORTABLE_CORE = "portable_core"
+    const val PORTABLE_CURSE = "portable_curse"
     const val RARITY = "rarity"
     const val SKILLFUL = "skillful"
     const val SKIN = "skin"

@@ -1,0 +1,13 @@
+uuid: 00000000-0000-0000-0000-000000000000
+item_type: bedrock
+
+# 如果诅咒依赖等级, 则必须加上物品等级的组件
+level: 10
+
+# 使该物品成为便携式诅咒
+portable_curse:
+  # 诅咒的类型
+  type: curse:entity_kills
+  # 下面的属性取决于诅咒的类型
+  count: 1
+  index: demo_creeps_1

@@ -184,6 +184,11 @@ components:
     display_name: "便携式核心"
     tooltips: { } # 取决于核心
 
+  portable_curse:
+    enabled: true
+    display_name: "便携式诅咒"
+    tooltips: { } # 取决于诅咒
+
   rarity:
     enabled: true
     display_name: "稀有度"

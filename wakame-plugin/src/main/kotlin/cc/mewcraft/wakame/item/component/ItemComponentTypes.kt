@@ -33,6 +33,7 @@ import cc.mewcraft.wakame.item.components.ItemSkinOwner
 import cc.mewcraft.wakame.item.components.ItemTracks
 import cc.mewcraft.wakame.item.components.Kizamiable
 import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.components.PortableCurse
 import cc.mewcraft.wakame.item.components.Skillful
 import cc.mewcraft.wakame.item.components.SystemUse
 import cc.mewcraft.wakame.item.components.Tool
@@ -210,6 +211,11 @@ object ItemComponentTypes {
      * 将物品作为便携式核心, 用于重铸系统.
      */
     val PORTABLE_CORE: ItemComponentType<PortableCore> = PortableCore.codec(ItemComponentConstants.PORTABLE_CORE).register()
+
+    /**
+     * 将物品作为便携式魔咒, 用于重铸系统.
+     */
+    val PORTABLE_CURSE: ItemComponentType<PortableCurse> = PortableCurse.codec(ItemComponentConstants.PORTABLE_CURSE).register()
 
     /**
      * 物品的稀有度.
