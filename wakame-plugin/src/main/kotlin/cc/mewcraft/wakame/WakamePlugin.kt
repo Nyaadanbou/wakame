@@ -18,6 +18,8 @@ import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.packet.packetModule
 import cc.mewcraft.wakame.random3.randomModule
+import cc.mewcraft.wakame.player.playerModule
+import cc.mewcraft.wakame.random2.randomModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
@@ -71,6 +73,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 molangModule(),
                 packetModule(),
                 packModule(),
+                playerModule(),
                 randomModule(),
                 rarityModule(),
                 reforgeModule(),

@@ -18,6 +18,7 @@ import cc.mewcraft.wakame.item.SingleItemListener
 import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.pack.ResourcePackListener
 import cc.mewcraft.wakame.pack.ResourcePackManager
+import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ELEMENT_GLOBAL_CONFIG_FILE
@@ -132,6 +133,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun registerListeners() = with(PLUGIN) {
+        registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ProjectileSkillListener>()).bindWith(this)

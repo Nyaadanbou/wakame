@@ -16,7 +16,7 @@ import java.time.Duration
 import java.util.*
 
 object DamageManager {
-    fun generateDamageMetaData(event: EntityDamageEvent): DamageMetaData {
+    fun generateDamageMetaData(event: EntityDamageEvent): DamageMetadata {
         //先检查是不是自定义伤害
         //若是，则直接返回自定义伤害信息
         val uuid = event.entity.uniqueId
@@ -36,11 +36,11 @@ object DamageManager {
                     if (itemStack.tryNekoStack?.behaviors?.has(ItemBehaviorTypes.ATTACK) == true) {
                         return when (event.cause) {
                             DamageCause.ENTITY_ATTACK -> {
-                                PlayerMeleeAttackMetaData(damager.toUser(), false)
+                                PlayerMeleeAttackMetadata(damager.toUser(), false)
                             }
 
                             DamageCause.ENTITY_SWEEP_ATTACK -> {
-                                PlayerMeleeAttackMetaData(damager.toUser(), true)
+                                PlayerMeleeAttackMetadata(damager.toUser(), true)
                             }
 
                             /**
@@ -51,43 +51,43 @@ object DamageManager {
                              * 其他伤害类型均视为原版伤害
                              */
                             else -> {
-                                DefaultDamageMetaData(event.damage)
+                                DefaultDamageMetadata(event.damage)
                             }
                         }
                         //玩家手中的物品不是Attack，甚至不是Neko
                     } else {
-                        return DefaultDamageMetaData(event.damage)
+                        return DefaultDamageMetadata(event.damage)
                     }
                 }
 
                 //造成伤害的是非玩家实体
                 is LivingEntity -> {
-                    return EntityMeleeAttackMetaData(damager)
+                    return EntityMeleeAttackMetadata(damager)
                 }
 
                 //造成伤害的是弹射物
                 //查找是否存在记录，若不存在，按照默认伤害处理
                 is Projectile -> {
-                    return findProjectileDamageMetaData(damager.uniqueId) ?: DefaultDamageMetaData(event.damage)
+                    return findProjectileDamageMetaData(damager.uniqueId) ?: DefaultDamageMetadata(event.damage)
                 }
             }
             //如果造成伤害的实体不是LivingEntity也不是弹射物
             //这种情况理论上不应该存在，若出现，按照默认伤害处理
-            return DefaultDamageMetaData(event.damage)
+            return DefaultDamageMetadata(event.damage)
         }
         //如果伤害没有攻击者，视为原版伤害
         //TODO 对一些原版伤害进行修饰，比如加强溺水伤害
-        return DefaultDamageMetaData(event.damage)
+        return DefaultDamageMetadata(event.damage)
     }
 
-    fun generateDefenseMetaData(event: EntityDamageEvent): DefenseMetaData {
+    fun generateDefenseMetaData(event: EntityDamageEvent): DefenseMetadata {
         return when (val damagee = event.entity) {
             is Player -> {
-                EntityDefenseMetaData(damagee.toUser().attributeMap)
+                EntityDefenseMetadata(damagee.toUser().attributeMap)
             }
 
             is LivingEntity -> {
-                EntityDefenseMetaData(EntityAttributeAccessor.getAttributeMap(damagee))
+                EntityDefenseMetadata(EntityAttributeAccessor.getAttributeMap(damagee))
             }
 
             else -> {
@@ -104,7 +104,7 @@ object DamageManager {
      * 超过有效期（60秒）
      * 弹射物击中方块
      */
-    private val projectileDamageMetaDataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, ProjectileDamageMetaData>()
+    private val projectileDamageMetaDataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, ProjectileDamageMetadata>()
 
     fun recordProjectileDamageMetaData(event: ProjectileLaunchEvent) {
         when (val projectile = event.entity) {
@@ -114,14 +114,14 @@ object DamageManager {
                     is Player -> {
                         putProjectileDamageMetaData(
                             projectile.uniqueId,
-                            PlayerProjectileDamageMetaData(ProjectileType.TRIDENT, shooter.toUser(), projectile.itemStack, 1F)
+                            PlayerProjectileDamageMetadata(ProjectileType.TRIDENT, shooter.toUser(), projectile.itemStack, 1F)
                         )
                     }
 
                     is LivingEntity -> {
                         putProjectileDamageMetaData(
                             projectile.uniqueId,
-                            EntityProjectileDamageMetaData(ProjectileType.TRIDENT, shooter)
+                            EntityProjectileDamageMetadata(ProjectileType.TRIDENT, shooter)
                         )
                     }
                 }
@@ -138,7 +138,7 @@ object DamageManager {
                     is LivingEntity -> {
                         putProjectileDamageMetaData(
                             projectile.uniqueId,
-                            EntityProjectileDamageMetaData(ProjectileType.ARROWS, shooter)
+                            EntityProjectileDamageMetadata(ProjectileType.ARROWS, shooter)
                         )
                     }
 
@@ -164,15 +164,15 @@ object DamageManager {
         val force = DamageRules.calculateBowForce(72000 - entity.itemUseRemainingTime)
         putProjectileDamageMetaData(
             projectile.uniqueId,
-            PlayerProjectileDamageMetaData(ProjectileType.ARROWS, entity.toUser(), projectile.itemStack, force)
+            PlayerProjectileDamageMetadata(ProjectileType.ARROWS, entity.toUser(), projectile.itemStack, force)
         )
     }
 
-    fun putProjectileDamageMetaData(uuid: UUID, projectileDamageMetaData: ProjectileDamageMetaData) {
+    fun putProjectileDamageMetaData(uuid: UUID, projectileDamageMetaData: ProjectileDamageMetadata) {
         projectileDamageMetaDataMap.put(uuid, projectileDamageMetaData)
     }
 
-    fun findProjectileDamageMetaData(uuid: UUID): ProjectileDamageMetaData? {
+    fun findProjectileDamageMetaData(uuid: UUID): ProjectileDamageMetadata? {
         return projectileDamageMetaDataMap.getIfPresent(uuid)
     }
 
@@ -180,13 +180,13 @@ object DamageManager {
         projectileDamageMetaDataMap.invalidate(uuid)
     }
 
-    private val customDamageMetaDataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, CustomDamageMetaData>()
+    private val customDamageMetaDataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, CustomDamageMetadata>()
 
-    fun putCustomDamageMetaData(uuid: UUID, customDamageMetaData: CustomDamageMetaData) {
+    fun putCustomDamageMetaData(uuid: UUID, customDamageMetaData: CustomDamageMetadata) {
         customDamageMetaDataMap.put(uuid, customDamageMetaData)
     }
 
-    fun findCustomDamageMetaData(uuid: UUID): CustomDamageMetaData? {
+    fun findCustomDamageMetaData(uuid: UUID): CustomDamageMetadata? {
         return customDamageMetaDataMap.getIfPresent(uuid)
     }
 
@@ -195,14 +195,14 @@ object DamageManager {
     }
 }
 
-fun LivingEntity.applyCustomDamage(customDamageMetaData: CustomDamageMetaData, originEntity: LivingEntity?) {
+fun LivingEntity.applyCustomDamage(customDamageMetaData: CustomDamageMetadata, originEntity: LivingEntity?) {
     val defenseMetaData = when (val damagee = this) {
         is Player -> {
-            EntityDefenseMetaData(damagee.toUser().attributeMap)
+            EntityDefenseMetadata(damagee.toUser().attributeMap)
         }
 
         else -> {
-            EntityDefenseMetaData(EntityAttributeAccessor.getAttributeMap(damagee))
+            EntityDefenseMetadata(EntityAttributeAccessor.getAttributeMap(damagee))
         }
     }
     val finalDamage = defenseMetaData.calculateFinalDamage(customDamageMetaData)
