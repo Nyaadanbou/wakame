@@ -58,8 +58,10 @@ data class AttributeModifier(
     }
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other is AttributeModifier) return id == other.id
+        if (this === other)
+            return true
+        if (other is AttributeModifier)
+            return id == other.id && operation == other.operation
         return false
     }
 

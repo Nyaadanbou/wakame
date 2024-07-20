@@ -154,7 +154,13 @@ private sealed class SimpleAttributeInstance : AttributeInstance {
     }
 
     override fun addModifier(modifier: AttributeModifier) {
-        require(modifiersByUuid.putIfAbsent(modifier.id, modifier) == null) { "$modifier is already applied on this attribute!" }
+        // FIXME 修复重复添加 AttributeModifier 的问题
+        //  目前如果同一个物品上, 同一个 Attribute, 有多个不同的 AttributeModifier,
+        //  那么这里的 alreadyExists 就会返回 true, 从而导致 AttributeModifier 产生“重复”问题.
+        val alreadyExists = modifiersByUuid.putIfAbsent(modifier.id, modifier) != null
+        if (alreadyExists) {
+            AttributeSupport.LOGGER.warn("$modifier is already applied on this attribute!")
+        }
         getModifiers0(modifier.operation).add(modifier)
         setDirty()
     }
