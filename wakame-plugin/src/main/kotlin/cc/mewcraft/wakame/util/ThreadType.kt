@@ -52,7 +52,7 @@ enum class ThreadType : KoinComponent {
         return NEKO_PLUGIN.launch(
             when (this) {
                 SYNC -> NEKO_PLUGIN.minecraftDispatcher
-                ASYNC -> NEKO_PLUGIN.minecraftDispatcher
+                ASYNC -> NEKO_PLUGIN.asyncDispatcher
                 DISPATCHERS_ASYNC -> Dispatchers.IO
                 REMAIN -> if (server.isPrimaryThread) NEKO_PLUGIN.minecraftDispatcher else NEKO_PLUGIN.asyncDispatcher
             }
