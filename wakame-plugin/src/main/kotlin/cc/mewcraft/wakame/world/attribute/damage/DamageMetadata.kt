@@ -19,13 +19,13 @@ import kotlin.random.Random
  * 其实现类实例化时，攻击伤害值以及各种信息就已经确定了
  */
 sealed interface DamageMetadata {
-    val packets: List<ElementDamagePacket>
+    val packets: List<DamagePacket>
         get() = generatePackets()
     val damageValue: Double
     val criticalPower: Double
     val isCritical: Boolean
 
-    fun generatePackets(): List<ElementDamagePacket>
+    fun generatePackets(): List<DamagePacket>
 }
 
 /**
@@ -40,9 +40,9 @@ class DefaultDamageMetadata(
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
 
-    override fun generatePackets(): List<ElementDamagePacket> {
+    override fun generatePackets(): List<DamagePacket> {
         return listOf(
-            ElementDamagePacket(
+            DamagePacket(
                 ElementRegistry.DEFAULT,
                 damageValue,
                 damageValue,
@@ -67,9 +67,9 @@ class VanillaDamageMetadata(
 ) : DamageMetadata {
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
-    override fun generatePackets(): List<ElementDamagePacket> {
+    override fun generatePackets(): List<DamagePacket> {
         return listOf(
-            ElementDamagePacket(
+            DamagePacket(
                 element,
                 damageValue,
                 damageValue,
@@ -94,13 +94,13 @@ class PlayerMeleeAttackMetadata(
     override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
-    override fun generatePackets(): List<ElementDamagePacket> {
+    override fun generatePackets(): List<DamagePacket> {
         val attributeMap = user.attributeMap
         if (isSweep) {
-            val list = mutableListOf<ElementDamagePacket>()
+            val list = mutableListOf<DamagePacket>()
             for (it in ElementRegistry.INSTANCES.values) {
                 list.add(
-                    ElementDamagePacket(
+                    DamagePacket(
                         it,
                         1.0,
                         1.0,
@@ -131,7 +131,7 @@ class EntityMeleeAttackMetadata(
     override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
-    override fun generatePackets(): List<ElementDamagePacket> {
+    override fun generatePackets(): List<DamagePacket> {
         return generatePackets0(entityAttributeMap)
     }
 }
@@ -156,7 +156,7 @@ class PlayerProjectileDamageMetadata(
     override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
 
-    override fun generatePackets(): List<ElementDamagePacket> {
+    override fun generatePackets(): List<DamagePacket> {
         val attributeMap = user.attributeMap
         when (projectileType) {
             ProjectileType.ARROWS -> {
@@ -180,10 +180,10 @@ class PlayerProjectileDamageMetadata(
                 }
 
                 // 生成伤害包，注意箭矢的伤害与拉弓的力度有关
-                val elementDamagePackets = mutableListOf<ElementDamagePacket>()
+                val damagePackets = mutableListOf<DamagePacket>()
                 for (it in ElementRegistry.INSTANCES.values) {
-                    elementDamagePackets.add(
-                        ElementDamagePacket(
+                    damagePackets.add(
+                        DamagePacket(
                             it,
                             force * (attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
                                     + attributeMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)),
@@ -203,7 +203,7 @@ class PlayerProjectileDamageMetadata(
                 attributeModifiers.forEach { attribute, modifier ->
                     attributeMap.getInstance(attribute)?.removeModifier(modifier)
                 }
-                return elementDamagePackets
+                return damagePackets
             }
 
             ProjectileType.TRIDENT -> {
@@ -225,7 +225,7 @@ class EntityProjectileDamageMetadata(
     override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
-    override fun generatePackets(): List<ElementDamagePacket> {
+    override fun generatePackets(): List<DamagePacket> {
         return generatePackets0(entityAttributeMap)
     }
 }
@@ -238,11 +238,11 @@ class CustomDamageMetadata(
     override val criticalPower: Double,
     override val isCritical: Boolean,
     val knockback: Boolean,
-    private val customElementDamagePackets: List<ElementDamagePacket>,
+    private val customDamagePackets: List<DamagePacket>,
 ) : DamageMetadata {
     override val damageValue: Double = packets.sumOf { it.packetDamage }
-    override fun generatePackets(): List<ElementDamagePacket> {
-        return customElementDamagePackets
+    override fun generatePackets(): List<DamagePacket> {
+        return customDamagePackets
     }
 }
 
@@ -268,11 +268,11 @@ enum class ProjectileType {
 /**
  * 用于简化重复的代码
  */
-private fun generatePackets0(attributeMap: AttributeMap): List<ElementDamagePacket> {
-    val list = mutableListOf<ElementDamagePacket>()
+private fun generatePackets0(attributeMap: AttributeMap): List<DamagePacket> {
+    val list = mutableListOf<DamagePacket>()
     for (it in ElementRegistry.INSTANCES.values) {
         list.add(
-            ElementDamagePacket(
+            DamagePacket(
                 it,
                 attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
                         + attributeMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE),

@@ -27,11 +27,11 @@ class DamageListener : Listener, KoinComponent {
         val wakameEntityDamageEvent = WakameEntityDamageEvent(damageMetaData, defenseMetaData)
         wakameEntityDamageEvent.callEvent()
 
-        //如果伤害事件被取消，什么也不做
+        // 如果伤害事件被取消，什么也不做
         if (wakameEntityDamageEvent.isCancelled) return
 
 
-        //修改最终伤害
+        // 修改最终伤害
         event.damage = wakameEntityDamageEvent.finalDamage
         logger.info("${event.entity.type}(${event.entity.uniqueId}) 受到了 ${event.damage} 点伤害")
         val stringBuilder = StringBuilder()
@@ -71,12 +71,12 @@ class DamageListener : Listener, KoinComponent {
             return
         }
         when (val projectile = event.entity) {
-            //弹射物是箭矢（普通箭、光灵箭、药水箭）、三叉戟
+            // 弹射物是箭矢（普通箭、光灵箭、药水箭）、三叉戟
             is AbstractArrow -> {
                 DamageManager.removeProjectileDamageMetaData(projectile.uniqueId)
             }
 
-            //TODO 可能还会有其他需要wakame属性系统处理的弹射物
+            // TODO 可能还会有其他需要wakame属性系统处理的弹射物
         }
     }
 

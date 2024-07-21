@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.registryModule
-import cc.mewcraft.wakame.world.attribute.damage.DamagePacketBundle
-import cc.mewcraft.wakame.world.attribute.damage.damagePacketBundle
+import cc.mewcraft.wakame.world.attribute.damage.DamageBundle
+import cc.mewcraft.wakame.world.attribute.damage.damageBundle
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.AfterAll
@@ -24,9 +24,9 @@ import testEnv
 import kotlin.test.Test
 
 /**
- * 测试 [DamagePacketBundle] 的 DSL 的正确性.
+ * 测试 [DamageBundle] 的 DSL 的正确性.
  */
-class DamagePacketBundleDSLTest : KoinTest {
+class DamageBundleDSLTest : KoinTest {
     companion object {
         @BeforeAll
         @JvmStatic
@@ -91,14 +91,14 @@ class DamagePacketBundleDSLTest : KoinTest {
         every { attriMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE) } returns 0.1
     }
 
-    private fun printBundle(id: String, bundle: DamagePacketBundle) {
+    private fun printBundle(id: String, bundle: DamageBundle) {
         bundle.packets().forEach { logger.info("Packet ($id): $it") }
     }
 
     // 标准的伤害包构建方式
     @Test
     fun `use case 1`() {
-        val bundle: DamagePacketBundle = damagePacketBundle(attriMap) {
+        val bundle: DamageBundle = damageBundle(attriMap) {
             // 使用 every() 为每个元素构建伤害包
             every {
                 min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
@@ -126,7 +126,7 @@ class DamagePacketBundleDSLTest : KoinTest {
     // 只需要调用 standard() 即可.
     @Test
     fun `use case 2`() {
-        val bundle1: DamagePacketBundle = damagePacketBundle(attriMap) {
+        val bundle1: DamageBundle = damageBundle(attriMap) {
             every {
                 // 这里的 standard() 意思是使用“标准”计算方式
                 min { standard() }
@@ -136,7 +136,7 @@ class DamagePacketBundleDSLTest : KoinTest {
                 defensePenetrationRate { standard() }
             }
         }
-        val bundle2: DamagePacketBundle = damagePacketBundle(attriMap) {
+        val bundle2: DamageBundle = damageBundle(attriMap) {
             every {
                 // 或者, 如果每个变量采用“标准”计算方式,
                 // 那么直接调用 standard() 即可,
@@ -157,7 +157,7 @@ class DamagePacketBundleDSLTest : KoinTest {
         val damageValue = 12.0
         val defensePenetration = 3.0
         val defensePenetrationRate = 0.1
-        val bundle: DamagePacketBundle = damagePacketBundle {
+        val bundle: DamageBundle = damageBundle {
             every {
                 min(damageValue) // 也可以直接传入一个值, 不一定要用 lambda
                 max(damageValue)
@@ -175,7 +175,7 @@ class DamagePacketBundleDSLTest : KoinTest {
     // 这种情况可以混合使用两种 DSL.
     @Test
     fun `use case 4`() {
-        val bundle: DamagePacketBundle = damagePacketBundle(attriMap) {
+        val bundle: DamageBundle = damageBundle(attriMap) {
             every {
                 // 最小/最大设置为 1.0
                 min(1.0)
@@ -196,7 +196,7 @@ class DamagePacketBundleDSLTest : KoinTest {
     @Test
     fun `use case 5`() {
         val damageValue = 1.0
-        val bundle: DamagePacketBundle = damagePacketBundle {
+        val bundle: DamageBundle = damageBundle {
             default {
                 min(damageValue)
                 max(damageValue)

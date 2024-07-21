@@ -12,7 +12,7 @@ import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.util.stream.Stream
 
-data class ElementDamagePacket(
+data class DamagePacket(
     val element: Element,
     val min: Double,
     val max: Double,
@@ -40,11 +40,11 @@ data class ElementDamagePacket(
 }
 
 /**
- * 伤害捆绑包, 封装了一个或多个 [ElementDamagePacket].
+ * 伤害捆绑包, 封装了一个或多个 [DamagePacket].
  */
-class DamagePacketBundle : Examinable, KoinComponent {
+class DamageBundle : Examinable, KoinComponent {
     private val logger: Logger by inject()
-    private val packets = Reference2ObjectArrayMap<Element, ElementDamagePacket>()
+    private val packets = Reference2ObjectArrayMap<Element, DamagePacket>()
 
     private fun getElementById(id: String): Element? {
         return ElementRegistry.INSTANCES.find(id) ?: run {
@@ -56,7 +56,7 @@ class DamagePacketBundle : Examinable, KoinComponent {
     /**
      * 向伤害捆绑包中添加元素伤害包, 将覆盖已有的元素伤害包.
      */
-    fun add(packet: ElementDamagePacket) {
+    fun add(packet: DamagePacket) {
         val element = packet.element
         val previous = packets.put(element, packet)
         if (previous != null) {
@@ -67,21 +67,21 @@ class DamagePacketBundle : Examinable, KoinComponent {
     /**
      * 向伤害捆绑包中添加元素伤害包, 如果已存在相同元素的伤害包则不添加.
      */
-    fun addIfAbsent(packet: ElementDamagePacket) {
+    fun addIfAbsent(packet: DamagePacket) {
         packets.putIfAbsent(packet.element, packet)
     }
 
     /**
      * 从伤害捆绑包中移除元素伤害包.
      */
-    fun remove(element: Element): ElementDamagePacket? {
+    fun remove(element: Element): DamagePacket? {
         return packets.remove(element)
     }
 
     /**
      * 从伤害捆绑包中移除元素伤害包.
      */
-    fun remove(id: String): ElementDamagePacket? {
+    fun remove(id: String): DamagePacket? {
         val element = getElementById(id) ?: return null
         return packets.remove(element)
     }
@@ -89,14 +89,14 @@ class DamagePacketBundle : Examinable, KoinComponent {
     /**
      * 从伤害捆绑包中获取元素伤害包.
      */
-    fun get(element: Element): ElementDamagePacket? {
+    fun get(element: Element): DamagePacket? {
         return packets[element]
     }
 
     /**
      * 从伤害捆绑包中获取元素伤害包.
      */
-    fun get(id: String): ElementDamagePacket? {
+    fun get(id: String): DamagePacket? {
         val element = getElementById(id) ?: return null
         return get(element)
     }
@@ -104,7 +104,7 @@ class DamagePacketBundle : Examinable, KoinComponent {
     /**
      * 从伤害捆绑包中获取所有元素伤害包.
      */
-    fun packets(): Collection<ElementDamagePacket> {
+    fun packets(): Collection<DamagePacket> {
         return packets.values
     }
 
