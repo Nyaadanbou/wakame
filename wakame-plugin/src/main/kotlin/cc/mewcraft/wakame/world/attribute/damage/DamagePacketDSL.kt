@@ -129,11 +129,21 @@ class DamagePacketDSL(
         // 如果 ElementDamagePacket 的代码改动,
         // 并且有不止一个地方调用了 standard(),
         // 那么只需要改动这一个地方即可.
-        min { standard() }
-        max { standard() }
-        rate { standard() }
-        defensePenetration { standard() }
-        defensePenetrationRate { standard() }
+        min {
+            standard()
+        }
+        max {
+            standard()
+        }
+        rate {
+            standard()
+        }
+        defensePenetration {
+            standard()
+        }
+        defensePenetrationRate {
+            standard()
+        }
     }
 
     fun min(block: MinDamageDSL.() -> Double) {
