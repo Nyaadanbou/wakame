@@ -138,7 +138,10 @@ abstract class NodeFacade<T> : KoinComponent {
     }
 
     private fun getEntryRef(file: File): String {
-        return file.toRelativeString(pluginDataDir.resolve(dataDir.toFile())).substringBeforeLast(".")
+        val base = pluginDataDir.resolve(dataDir.toFile())
+        return file.toRelativeString(base)
+            .substringBeforeLast(".") // 去除文件扩展名
+            .replace("\\", "/") // Windows OS 用的是 "\" 而不是 "/"
     }
 
     private fun validateEntryRef(entryRef: String) {
