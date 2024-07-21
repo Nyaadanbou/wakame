@@ -75,7 +75,7 @@ class DamageBundleDSL(
     fun every(block: DamagePacketDSL.() -> Unit) {
         for ((_, element) in ElementRegistry.INSTANCES) {
             // every() 只添加先前不存在的元素伤害包, 使其永远成为一个 "fallback".
-            // 这样无论 DSL 的调用顺序是怎样的, 都可以让 element() 拥有更高优先级.
+            // 这样无论 DSL 的调用顺序是怎样的, 都可以让 single() 拥有更高优先级.
             bundle.addIfAbsent(DamagePacketDSL(element, attrMap).apply(block).build())
         }
     }
