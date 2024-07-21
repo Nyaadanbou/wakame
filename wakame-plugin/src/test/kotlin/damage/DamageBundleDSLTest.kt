@@ -109,7 +109,7 @@ class DamageBundleDSLTest : KoinTest {
             }
             // 使用 element() 为单个元素构建伤害包, 将覆盖由 every() 统一定义的伤害包
             // 如果“fire”这个字符串 id 对应的元素不存在, 会有警告, 并且该伤害包不会被添加
-            element("fire") {
+            single("fire") {
                 min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
                 max { value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
                 rate { .0 }

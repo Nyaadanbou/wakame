@@ -81,22 +81,29 @@ class DamageBundleDSL(
     }
 
     /**
+     * 为默认的元素构建 [DamagePacket].
+     */
+    fun default(block: DamagePacketDSL.() -> Unit) {
+        val element = ElementRegistry.DEFAULT
+        bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
+    }
+
+    /**
      * 为指定的元素构建 [DamagePacket].
      */
-    fun element(id: String, block: DamagePacketDSL.() -> Unit) {
-        val element = getElementById(id) ?: run {
-            DamageBundleDSLSupport.logger.warn("Element '$id' not found while building damage packet bundle. The damage packet will not be added.")
+    fun single(elementId: String, block: DamagePacketDSL.() -> Unit) {
+        val element = getElementById(elementId) ?: run {
+            DamageBundleDSLSupport.logger.warn("Element '$elementId' not found while building damage packet bundle. The damage packet will not be added.")
             return
         }
         bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
     }
 
     /**
-     * 为默认的元素构建 [DamagePacket].
+     * 为指定的元素构建 [DamagePacket].
      */
-    fun default(block: DamagePacketDSL.() -> Unit) {
-        val element = ElementRegistry.DEFAULT
-        bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
+    fun single(elementType: Element, block: DamagePacketDSL.() -> Unit) {
+        bundle.add(DamagePacketDSL(elementType, attrMap).apply(block).build())
     }
 
     /**
@@ -203,8 +210,13 @@ class DamagePacketDSL(
     }
 
     private fun <T> validateValue(value: T?): T {
-        contract { returns() implies (value != null) }
-        return value ?: throw IllegalArgumentException("A value is not present in the DSL object")
+        // 使用 contract 以告知编译器: 如果该函数成功返回, 那么 value 一定不为 null.
+        contract {
+            returns() implies (value != null)
+        }
+        return value ?: throw IllegalArgumentException(
+            "A value is not present in the DSL object"
+        )
     }
 
     @DamagePacketBundleDsl
@@ -257,9 +269,14 @@ class DamagePacketDSL(
         abstract val attrMap: AttributeMap
 
         /**
-         * 使用“标准的”计算方式计算 [value].
+         * 使用“标准的”方式计算 [value].
+         *
+         * 实现类可以通过重写这个方法来定义自己的计算方式.
          */
         abstract fun standard(): Double
+
+        // 开发日记 2024/7/22
+        // 除了“标准”以外, 如果还有其他会大量用到的重复计算方式, 可以进一步扩展 DSL.
 
         /**
          * 获取指定的 [Attribute] 的值.
