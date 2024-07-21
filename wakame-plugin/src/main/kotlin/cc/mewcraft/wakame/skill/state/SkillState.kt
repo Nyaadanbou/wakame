@@ -5,16 +5,23 @@ import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.cooldown.Cooldown
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.event.HoverEvent
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
+import java.util.stream.Stream
 import java.util.UUID
 
 /**
  * 技能状态
  */
-sealed interface SkillState<U> {
+sealed interface SkillState<U> : Examinable {
     val user: User<U>
 
     /**
@@ -73,7 +80,12 @@ class PlayerSkillState(
     }
 
     override fun tick() {
-        info.tick()
+        try {
+            info.tick()
+        } catch (t: Throwable) {
+            SkillStateSupport.logger.error("玩家 ($user) 的技能状态 ${info.javaClass.simpleName} 执行时发生异常", t)
+            runCatching { info.interrupt() }.onFailure { info = IdleStateInfo(this) }
+        }
     }
 
     override fun interrupt() {
@@ -90,4 +102,18 @@ class PlayerSkillState(
         user.player.sendMessage("技能状态已切换为 ${skillStateInfo.javaClass.simpleName}".mini.hoverEvent(HoverEvent.showText("技能状态变更: $info -> $skillStateInfo".mini)))
         this.info = skillStateInfo
     }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(
+            ExaminableProperty.of("info", info)
+        )
+    }
+
+    override fun toString(): String {
+        return toSimpleString()
+    }
+}
+
+private object SkillStateSupport : KoinComponent {
+    val logger: Logger by inject()
 }

@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.Target
 import cc.mewcraft.wakame.skill.context.SkillContext
@@ -10,17 +8,18 @@ import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
 import net.kyori.adventure.key.Key
+import org.spongepowered.configurate.ConfigurationNode
 
 interface KillEntity : Skill {
     companion object Factory : SkillFactory<KillEntity> {
-        override fun create(key: Key, config: ConfigProvider): KillEntity {
+        override fun create(key: Key, config: ConfigurationNode): KillEntity {
             return DefaultImpl(key, config)
         }
     }
 
     private class DefaultImpl(
         override val key: Key,
-        config: ConfigProvider,
+        config: ConfigurationNode,
     ) : KillEntity, SkillBase(key, config) {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
@@ -33,8 +32,8 @@ interface KillEntity : Skill {
 private class Tick(
     context: SkillContext,
     skill: KillEntity,
-    override val interruptTriggers: Provider<TriggerConditions>,
-    override val forbiddenTriggers: Provider<TriggerConditions>
+    override val interruptTriggers: TriggerConditions,
+    override val forbiddenTriggers: TriggerConditions
 ) : AbstractPlayerSkillTick<KillEntity>(skill, context) {
 
     override fun tickCastPoint(tickCount: Long): TickResult {

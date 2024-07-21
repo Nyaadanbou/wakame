@@ -2,11 +2,7 @@
 
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
@@ -38,19 +34,17 @@ interface Teleport : Skill {
     }
 
     companion object Factory : SkillFactory<Teleport> {
-        override fun create(key: Key, config: ConfigProvider): Teleport {
-            val type = config.optionalEntry<Type>("teleportation").orElse(Type.FIXED(Position.block(0, 0, 0)))
+        override fun create(key: Key, config: ConfigurationNode): Teleport {
+            val type = config.node("teleportation").krequire<Type>()
             return DefaultImpl(key, config, type)
         }
     }
 
     private class DefaultImpl(
         override val key: Key,
-        config: ConfigProvider,
-        type: Provider<Type>,
+        config: ConfigurationNode,
+        override val type: Type,
     ) : Teleport, SkillBase(key, config) {
-
-        override val type: Type by type
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
@@ -63,8 +57,8 @@ interface Teleport : Skill {
 private class TeleportTick(
     context: SkillContext,
     skill: Teleport,
-    override val interruptTriggers: Provider<TriggerConditions>,
-    override val forbiddenTriggers: Provider<TriggerConditions>
+    override val interruptTriggers: TriggerConditions,
+    override val forbiddenTriggers: TriggerConditions
 ) : AbstractPlayerSkillTick<Teleport>(skill, context) {
 
     override fun tickCastPoint(tickCount: Long): TickResult {

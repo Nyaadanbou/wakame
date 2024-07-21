@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.skill.condition
 
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.resource.ResourceTypeRegistry
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import org.spongepowered.configurate.ConfigurationNode
 
 /**
  * 检查玩家的魔法值.
@@ -20,18 +20,16 @@ interface ManaCondition : SkillCondition {
     val mana: Evaluable<*>
 
     companion object : SkillConditionFactory<ManaCondition> {
-        override fun create(config: ConfigProvider): ManaCondition {
+        override fun create(config: ConfigurationNode): ManaCondition {
             return DefaultImpl(config)
         }
     }
 
     private class DefaultImpl(
-        config: ConfigProvider,
-    ) : ManaCondition, SkillConditionBase(
-        config
-    ) {
+        config: ConfigurationNode,
+    ) : ManaCondition, SkillConditionBase(config) {
 
-        override val mana: Evaluable<*> by config.entry<Evaluable<*>>("mana")
+        override val mana: Evaluable<*> = config.node("mana").krequire()
         override val resolver: TagResolver = TagResolver.empty()
 
         override fun newSession(context: SkillContext): SkillConditionSession {

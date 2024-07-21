@@ -1,18 +1,17 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.AbstractSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
-import java.util.UUID
+import org.spongepowered.configurate.ConfigurationNode
+import java.util.*
 
 /**
  * 玩家血量低于一定值的时候触发效果.
@@ -22,19 +21,17 @@ interface Bloodrage : Skill, PassiveSkill {
     val uniqueId: UUID
 
     companion object Factory : SkillFactory<Bloodrage> {
-        override fun create(key: Key, config: ConfigProvider): Bloodrage {
-            val uniqueId = config.entry<UUID>("uuid")
+        override fun create(key: Key, config: ConfigurationNode): Bloodrage {
+            val uniqueId = config.node("uuid").krequire<UUID>()
             return DefaultImpl(key, config, uniqueId)
         }
     }
 
     private class DefaultImpl(
         key: Key,
-        config: ConfigProvider,
-        uniqueId: Provider<UUID>
+        config: ConfigurationNode,
+        override val uniqueId: UUID
     ) : Bloodrage, SkillBase(key, config) {
-        override val uniqueId: UUID by uniqueId
-
         override fun cast(context: SkillContext): SkillTick<Bloodrage> {
             return BloodrageTick(context, this)
         }

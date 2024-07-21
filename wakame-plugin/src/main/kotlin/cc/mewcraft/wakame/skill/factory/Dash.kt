@@ -1,10 +1,5 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.Damageable
 import cc.mewcraft.wakame.skill.*
@@ -13,11 +8,14 @@ import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 
 const val STARTING_TICK: Long = 10L
 
@@ -34,21 +32,19 @@ interface Dash : Skill {
     val duration: Long
 
     companion object Factory : SkillFactory<Dash> {
-        override fun create(key: Key, config: ConfigProvider): Dash {
-            val stepDistance = config.entry<Double>("step_distance")
-            val duration = config.optionalEntry<Long>("duration").orElse(50)
+        override fun create(key: Key, config: ConfigurationNode): Dash {
+            val stepDistance = config.node("step_distance").krequire<Double>()
+            val duration = config.node("duration").get<Long>() ?: 50
             return DefaultImpl(key, config, stepDistance, duration)
         }
     }
 
     private class DefaultImpl(
         override val key: Key,
-        config: ConfigProvider,
-        stepDistance: Provider<Double>,
-        duration: Provider<Long>
+        config: ConfigurationNode,
+        override val stepDistance: Double,
+        override val duration: Long,
     ) : Dash, SkillBase(key, config) {
-        override val stepDistance: Double by stepDistance
-        override val duration: Long by duration
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
@@ -61,8 +57,8 @@ interface Dash : Skill {
 private class DashTick(
     context: SkillContext,
     skill: Dash,
-    override val interruptTriggers: Provider<TriggerConditions>,
-    override val forbiddenTriggers: Provider<TriggerConditions>
+    override val interruptTriggers: TriggerConditions,
+    override val forbiddenTriggers: TriggerConditions
 ) : AbstractPlayerSkillTick<Dash>(skill, context) {
     companion object {
         private val DASH_DAMAGE_KEY: SkillContextKey<Int> = SkillContextKey.create("dash_damage")

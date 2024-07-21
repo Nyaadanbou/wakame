@@ -1,11 +1,10 @@
 package cc.mewcraft.wakame.skill.tick
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.provider
-import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.TriggerConditions
 import cc.mewcraft.wakame.skill.condition.ConditionTime
 import cc.mewcraft.wakame.skill.context.SkillContext
-import cc.mewcraft.wakame.skill.state.*
+import cc.mewcraft.wakame.skill.state.SkillStateInfo
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.tick.Tickable
@@ -127,8 +126,7 @@ abstract class AbstractSkillTick<S : Skill>(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("skill", skill),
-            ExaminableProperty.of("context", context)
+            ExaminableProperty.of("skill", skill)
         )
     }
 }
@@ -142,22 +140,22 @@ abstract class AbstractPlayerSkillTick<S : Skill>(
      *
      * 不允许的触发器将会在触发时被取消.
      */
-    open val forbiddenTriggers: Provider<TriggerConditions> = provider { TriggerConditions.empty() }
+    open val forbiddenTriggers: TriggerConditions = TriggerConditions.empty()
 
     /**
      * 此次触发效果中的中断触发器.
      */
-    open val interruptTriggers: Provider<TriggerConditions> = provider { TriggerConditions.empty() }
+    open val interruptTriggers:TriggerConditions = TriggerConditions.empty()
 
     final override fun tick(): TickResult {
         return tickCast(tickCount)
     }
 
     final override fun isForbidden(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean {
-        return forbiddenTriggers.get().values.get(type).contains(trigger)
+        return forbiddenTriggers.values.get(type).contains(trigger)
     }
 
     final override fun isInterrupted(type: SkillStateInfo.Type, trigger: SingleTrigger): Boolean {
-        return interruptTriggers.get().values.get(type).contains(trigger)
+        return interruptTriggers.values.get(type).contains(trigger)
     }
 }

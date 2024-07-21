@@ -10,8 +10,11 @@ import cc.mewcraft.wakame.skill.PlayerSkillMap
 import cc.mewcraft.wakame.skill.SkillMap
 import cc.mewcraft.wakame.skill.state.PlayerSkillState
 import cc.mewcraft.wakame.skill.state.SkillState
+import cc.mewcraft.wakame.util.toSimpleString
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
 import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -22,6 +25,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import java.util.stream.Stream
 
 /**
  * A wakame player in Paper platform.
@@ -30,7 +34,7 @@ import java.util.concurrent.TimeUnit
  */
 class PaperUser(
     override val player: Player,
-) : User<Player>, KoinComponent {
+) : User<Player>, Examinable, KoinComponent {
     override val uniqueId: UUID
         get() = player.uniqueId
     override val level: Int
@@ -42,6 +46,19 @@ class PaperUser(
     override val skillState: SkillState<Player> = PlayerSkillState(this)
 
     private val levelProvider: PlayerLevelProvider by inject()
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(
+            ExaminableProperty.of("player", player),
+            ExaminableProperty.of("uniqueId", uniqueId),
+            ExaminableProperty.of("level", level),
+            ExaminableProperty.of("skillState", skillState),
+        )
+    }
+
+    override fun toString(): String {
+        return toSimpleString()
+    }
 }
 
 /**

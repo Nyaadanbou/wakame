@@ -1,9 +1,5 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
@@ -13,6 +9,8 @@ import cc.mewcraft.wakame.tick.TickResult
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.LivingEntity
 import org.bukkit.potion.PotionEffectType
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 
 interface RemovePotionEffect : Skill {
 
@@ -22,19 +20,17 @@ interface RemovePotionEffect : Skill {
     val effectTypes: List<PotionEffectType>
 
     companion object Factory : SkillFactory<RemovePotionEffect> {
-        override fun create(key: Key, config: ConfigProvider): RemovePotionEffect {
-            val effectTypes = config.optionalEntry<List<PotionEffectType>>("effect_types").orElse(emptyList())
+        override fun create(key: Key, config: ConfigurationNode): RemovePotionEffect {
+            val effectTypes = config.node("effect_types").get<List<PotionEffectType>>() ?: emptyList()
             return DefaultImpl(key, config, effectTypes)
         }
     }
 
     private class DefaultImpl(
         override val key: Key,
-        config: ConfigProvider,
-        effectTypes: Provider<List<PotionEffectType>>,
+        config: ConfigurationNode,
+        override val effectTypes: List<PotionEffectType>,
     ) : RemovePotionEffect, SkillBase(key, config) {
-
-        override val effectTypes: List<PotionEffectType> by effectTypes
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
@@ -47,8 +43,8 @@ interface RemovePotionEffect : Skill {
 private class RemovePotionEffectTick(
     context: SkillContext,
     skill: RemovePotionEffect,
-    override val interruptTriggers: Provider<TriggerConditions>,
-    override val forbiddenTriggers: Provider<TriggerConditions>
+    override val interruptTriggers: TriggerConditions,
+    override val forbiddenTriggers: TriggerConditions
 ) : AbstractPlayerSkillTick<RemovePotionEffect>(skill, context) {
 
     private var counter: Int = 0

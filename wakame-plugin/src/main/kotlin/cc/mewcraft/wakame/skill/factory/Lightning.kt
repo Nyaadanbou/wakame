@@ -1,10 +1,5 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
@@ -13,6 +8,7 @@ import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.util.getFirstBlockBelow
 import cc.mewcraft.wakame.util.getTargetLocation
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.world.attribute.damage.EvaluableCustomDamageMetaData
 import cc.mewcraft.wakame.world.attribute.damage.applyCustomDamage
 import com.destroystokyo.paper.ParticleBuilder
@@ -20,6 +16,8 @@ import net.kyori.adventure.key.Key
 import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.entity.LivingEntity
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 
 interface Lightning : Skill {
 
@@ -48,22 +46,19 @@ interface Lightning : Skill {
     }
 
     companion object Factory : SkillFactory<Lightning> {
-        override fun create(key: Key, config: ConfigProvider): Lightning {
-            val targetType = config.optionalEntry<TargetType>("target_type").orElse(TargetType.ALL)
-            val damageMetadata = config.entry<EvaluableCustomDamageMetaData>("damage_metadata")
+        override fun create(key: Key, config: ConfigurationNode): Lightning {
+            val targetType = config.node("target_type").get<TargetType>() ?: TargetType.ALL
+            val damageMetadata = config.node("damage_metadata").krequire<EvaluableCustomDamageMetaData>()
             return DefaultImpl(key, config, targetType, damageMetadata)
         }
     }
 
     private class DefaultImpl(
         override val key: Key,
-        config: ConfigProvider,
-        targetType: Provider<TargetType>,
-        damageMetadata: Provider<EvaluableCustomDamageMetaData>
+        config: ConfigurationNode,
+        override val targetType: TargetType,
+        override val damageMetadata: EvaluableCustomDamageMetaData,
     ) : Lightning, SkillBase(key, config) {
-        override val targetType: TargetType by targetType
-        override val damageMetadata: EvaluableCustomDamageMetaData by damageMetadata
-
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
         override fun cast(context: SkillContext): SkillTick<Lightning> {
@@ -75,8 +70,8 @@ interface Lightning : Skill {
 private class LightningTick(
     context: SkillContext,
     skill: Lightning,
-    override val interruptTriggers: Provider<TriggerConditions>,
-    override val forbiddenTriggers: Provider<TriggerConditions>
+    override val interruptTriggers: TriggerConditions,
+    override val forbiddenTriggers: TriggerConditions
 ) : AbstractPlayerSkillTick<Lightning>(skill, context) {
     private val entityLocationTarget: Location?
         get() = TargetUtil.getLocation(context, true)?.bukkitLocation
