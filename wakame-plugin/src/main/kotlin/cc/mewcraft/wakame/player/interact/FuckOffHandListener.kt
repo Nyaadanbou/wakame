@@ -21,7 +21,7 @@ class FuckOffHandListener : Listener {
         if (livingEntity !is Player) return
         if (event.hand != EquipmentSlot.OFF_HAND) return
         val bow = event.bow ?: return
-        if (bow.type != Material.BOW || bow.type != Material.CROSSBOW) return
+        if (bow.type != Material.BOW && bow.type != Material.CROSSBOW) return
 
         event.isCancelled = true
         val playerInventory = livingEntity.inventory

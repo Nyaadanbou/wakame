@@ -1,14 +1,11 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
-import cc.mewcraft.wakame.attribute.AttributeMap
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.User
-import me.lucko.helper.random.VariableAmount
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -162,6 +159,7 @@ class PlayerProjectileDamageMetadata(
         val attributeMap = user.attributeMap
         when (projectileType) {
             ProjectileType.ARROWS -> {
+                var isCustomArrow = true
                 //如果玩家射出的箭矢
                 //不是nekoStack，则为原版箭矢
                 val nekoStack = itemStack.tryNekoStack ?: return generatePackets0(attributeMap)
@@ -181,23 +179,78 @@ class PlayerProjectileDamageMetadata(
                 }
 
                 //生成伤害包，注意箭矢的伤害与拉弓的力度有关
-                val elementDamagePackets = mutableListOf<ElementDamagePacket>()
-                for (it in ElementRegistry.INSTANCES.values) {
-                    elementDamagePackets.add(
-                        ElementDamagePacket(
-                            it,
-                            force * (attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)),
-                            force * (attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)),
-                            attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE),
-                            attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION),
-                            attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
-                        )
-                    )
+//                val elementDamagePackets = mutableListOf<ElementDamagePacket>()
+//                for (it in ElementRegistry.INSTANCES.values) {
+//                    elementDamagePackets.add(
+//                        ElementDamagePacket(
+//                            // FIXME 需要: attributemap, element
+//                            it,
+//                            force * (attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
+//                                    + attributeMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)),
+//                            force * (attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
+//                                    + attributeMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)),
+//                            attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE)
+//                                    + attributeMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE),
+//                            attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
+//                                    + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION),
+//                            attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
+//                                    + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
+//                        )
+//                    )
+//                }
+                // DSL - domain specific language
+                val elementDamagePackets = buildDamageBundle(attributeMap) {
+                    // fallback/default
+                    every {
+                        min {
+                            // 这个 receiver 必须提供对 attributemap & element 的访问
+                            val crit = value(Attributes.CRITICAL_STRIKE_POWER)
+                            val defense = value { DEFENSE }
+                            0
+                        }
+                        max {
+                            // 同上
+                            0
+                        }
+                        rate {
+                            0
+                        }
+                        defensePenetration {
+                            0
+                        }
+                        defensePenetrationRate {
+
+                        }
+                    }
+
+                    // override
+                    element(fire) {
+                        // 这个 receiver 必须提供对 attributemap & element 的访问
+                        min {
+                        }
+                        max {
+                        }
+                        rate {
+                        }
+                        defensePenetration {
+                        }
+                        defensePenetrationRate {
+                        }
+                    }
+
+                    // override
+                    element(wind) {
+                        min {
+                        }
+                        max {
+                        }
+                        rate {
+                        }
+                        defensePenetration {
+                        }
+                        defensePenetrationRate {
+                        }
+                    }
                 }
 
                 //生成完伤害包以后移除掉附加的属性
@@ -248,23 +301,13 @@ class CustomDamageMetadata(
 }
 
 
-data class ElementDamagePacket(
-    val element: Element,
-    val min: Double,
-    val max: Double,
-    val rate: Double,
-    val defensePenetration: Double,
-    val defensePenetrationRate: Double,
-) {
-    val value: Double = if (min >= max) max else VariableAmount.range(min, max).amount
-    val packetDamage: Double = value
-}
+
 
 /**
  * 弹射物类型
  * 包含所有会经过wakame属性系统处理的弹射物
  * 其他原版弹射物不应该在此枚举类出现，而应该由 [DamageManager] 过滤，并视为原版伤害
- * 如风弹砸生物造成的1伤害，应采用 [DefaultDamageMetaData] 而非 [ProjectileDamageMetaData]
+ * 如风弹砸生物造成的1伤害，应采用 [DefaultDamageMetadata] 而非 [ProjectileDamageMetadata]
  */
 enum class ProjectileType {
     /**
@@ -301,4 +344,97 @@ private fun generatePackets0(attributeMap: AttributeMap): List<ElementDamagePack
         )
     }
     return list
+}
+
+fun buildDamageBundle(
+    attrMap: AttributeMap,
+    block: DamageBundleDSL.() -> DamagePacketBundle,
+): DamagePacketBundle {
+    val dsl = DamageBundleDSL(attrMap)
+    return block(dsl)
+}
+
+class DamageBundleDSL(
+    val attrMap: AttributeMap,
+) {
+    fun every(block: ElementDamagePacketDSL.() -> Unit) {
+
+    }
+}
+
+class ElementDamagePacketDSL(
+    val element: Element,
+    val attrMap: AttributeMap,
+) {
+    var min: Double? = null
+    var max: Double? = null
+    var rate: Double? = null
+    var defensePenetration: Double? = null
+    var defensePenetrationRate: Double? = null
+
+    fun min(block: DamageDSL.() -> Double) {
+        min = block(DamageDSL(element, attrMap))
+    }
+
+    fun max(block: DamageDSL.() -> Double) {
+        max = block(DamageDSL(element, attrMap))
+    }
+
+    fun rate(block: DamageRateDSL.() -> Double) {
+        rate = block(DamageRateDSL(element, attrMap))
+    }
+
+    fun defensePenetration(block: DefensePenetrationDSL.() -> Double) {
+        defensePenetration = block(DefensePenetrationDSL(element, attrMap))
+    }
+
+    fun defensePenetrationRate(block: DefensePenetrationRateDSL.() -> Double) {
+        defensePenetrationRate = block(DefensePenetrationRateDSL(element,attrMap))
+    }
+
+    class DamageDSL(
+        val element: Element,
+        val attrMap: AttributeMap
+    ) {
+        fun value(attribute: Attribute): Double {
+            return attrMap.getValue(attribute)
+        }
+
+        fun value(block: ElementAttributeContainer.() -> ElementAttribute): Double {
+            val container = Attributes.byElement(element)
+            val value = attrMap.getValue(block(container))
+            return value
+        }
+
+        fun by(block: ElementAttributeContainer.() -> ElementAttribute): ElementAttribute {
+            return block(element)
+        }
+    }
+
+    class DamageRateDSL(
+        val element: Element,
+        val attrMap: AttributeMap
+    ) {
+        fun by(block: ElementAttributeContainer.() -> ElementAttribute): ElementAttribute {
+            return block(element)
+        }
+    }
+
+    class DefensePenetrationDSL(
+        val element: Element,
+        val attrMap: AttributeMap
+    ) {
+        fun by(block: ElementAttributeContainer.() -> ElementAttribute): ElementAttribute {
+            return block(element)
+        }
+    }
+
+    class DefensePenetrationRateDSL(
+        val element: Element,
+        val attrMap: AttributeMap
+    ) {
+        fun by(block: ElementAttributeContainer.() -> ElementAttribute): ElementAttribute {
+            return block(element)
+        }
+    }
 }
