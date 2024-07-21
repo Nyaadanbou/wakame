@@ -99,7 +99,7 @@ class DamageBundleDSLTest : KoinTest {
     @Test
     fun `use case 1`() {
         val bundle: DamageBundle = damageBundle(attriMap) {
-            // 使用 every() 为每个元素构建伤害包
+            // 使用 every() 为*每个*已知的元素构建伤害包
             every {
                 min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
                 max { value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
@@ -107,12 +107,22 @@ class DamageBundleDSLTest : KoinTest {
                 defensePenetration { value { DEFENSE_PENETRATION } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION) }
                 defensePenetrationRate { value { DEFENSE_PENETRATION_RATE } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE) }
             }
-            // 使用 element() 为单个元素构建伤害包, 将覆盖由 every() 统一定义的伤害包
+
+            // 使用 single() 为单个元素构建伤害包, 将覆盖由 every() 统一定义的伤害包
             // 如果“fire”这个字符串 id 对应的元素不存在, 会有警告, 并且该伤害包不会被添加
             single("fire") {
                 min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
                 max { value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
                 rate { .0 }
+                defensePenetration { .0 }
+                defensePenetrationRate { .0 }
+            }
+
+            // 如果已经有一个 Element 的实例, 直接传进来也行
+            single(windElem) {
+                min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
+                max { value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
+                rate { 1.0 }
                 defensePenetration { .0 }
                 defensePenetrationRate { .0 }
             }
