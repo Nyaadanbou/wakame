@@ -79,13 +79,13 @@ class DamageBundleDSLTest : KoinTest {
 
         // 初始化 AttributeMap 的摹刻, 用于测试
         attriMap = mockk()
-        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "min_attack_damage" }) } returns 12.0
-        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "max_attack_damage" }) } returns 14.0
-        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "attack_damage_rate" }) } returns 0.2
-        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "defense_penetration" }) } returns 2.0
+        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "min_attack_damage" }) } returns 8.0
+        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "max_attack_damage" }) } returns 8.0
+        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "attack_damage_rate" }) } returns 0.1
+        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "defense_penetration" }) } returns 1.0
         every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "defense_penetration_rate" }) } returns 0.1
         every { attriMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) } returns 2.0
-        every { attriMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) } returns 4.0
+        every { attriMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) } returns 2.0
         every { attriMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE) } returns 0.1
         every { attriMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION) } returns 1.0
         every { attriMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE) } returns 0.1
@@ -190,11 +190,32 @@ class DamageBundleDSLTest : KoinTest {
         printBundle("1", bundle)
     }
 
+    // 有些伤害包的构造依赖了 AttributeMap,
+    // 并且数值是基于“标准”计算方式之上的,
+    // 这时可以修饰 standard() 的返回值.
+    @Test
+    fun `use case 5`() {
+        val force = 0.8
+        val bundle: DamageBundle = damageBundle(attriMap) {
+            every {
+                // 先把所有数值用“标准”方式计算出来,
+                // 这样可以省去写 defense 的步骤.
+                standard()
+                // 然后单独设置 min, max 的值,
+                // 做法是修饰“标准”方式的返回值.
+                min { force * standard() }
+                max { force * standard() }
+            }
+        }
+
+        printBundle("1", bundle)
+    }
+
     // 有些伤害包只需要包含默认元素, 并且也不依赖 AttrMap.
     // 这时候可以使用 default() 来直接构建默认元素的伤害包.
     // 但注意, 因为没有 AttrMap, 因此也只能使用直接传值的 DSL.
     @Test
-    fun `use case 5`() {
+    fun `use case 6`() {
         val damageValue = 1.0
         val bundle: DamageBundle = damageBundle {
             default {
