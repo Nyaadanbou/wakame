@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.skill.condition
 
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.inventory.meta.Damageable
+import org.spongepowered.configurate.ConfigurationNode
 
 /**
  * 检查原版物品的耐久度.
@@ -19,16 +19,16 @@ interface VanillaDurability : SkillCondition {
     val durability: Evaluable<*>
 
     companion object : SkillConditionFactory<VanillaDurability> {
-        override fun create(config: ConfigProvider): VanillaDurability {
+        override fun create(config: ConfigurationNode): VanillaDurability {
             return DefaultImpl(config)
         }
     }
 
     private class DefaultImpl(
-        config: ConfigProvider,
+        config: ConfigurationNode,
     ) : VanillaDurability, SkillConditionBase(config) {
 
-        override val durability: Evaluable<*> by config.entry<Evaluable<*>>("durability")
+        override val durability: Evaluable<*> = config.node("durability").krequire()
         override val resolver: TagResolver = TagResolver.empty()
 
         override fun newSession(context: SkillContext): SkillConditionSession {

@@ -1,29 +1,27 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.tick.Ticker
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 
 interface FlyDash : Skill {
     val distance: Double
 
-    val beforeMovingEffects: List<Skill>
+    val beforeMovingEffects: List<SkillProvider>
 
     companion object Factory : SkillFactory<FlyDash> {
-        override fun create(key: Key, config: ConfigProvider): FlyDash {
-            val distance = config.entry<Double>("distance")
-            val castPointEffects = config.optionalEntry<List<Skill>>("before_moving_effects").orElse(emptyList())
+        override fun create(key: Key, config: ConfigurationNode): FlyDash {
+            val distance = config.node("distance").krequire<Double>()
+            val castPointEffects = config.node("before_moving_effects").get<List<SkillProvider>>() ?: emptyList()
             return FlyDashDefaultImpl(key, config, distance, castPointEffects)
         }
     }
@@ -31,13 +29,10 @@ interface FlyDash : Skill {
 
 private class FlyDashDefaultImpl(
     key: Key,
-    config: ConfigProvider,
-    distance: Provider<Double>,
-    castPointEffects: Provider<List<Skill>>
+    config: ConfigurationNode,
+    override val distance: Double,
+    override val beforeMovingEffects: List<SkillProvider>,
 ): FlyDash, SkillBase(key, config) {
-    override val distance: Double by distance
-    override val beforeMovingEffects: List<Skill> by castPointEffects
-
     private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
     override fun cast(context: SkillContext): SkillTick<FlyDash> {
@@ -48,8 +43,8 @@ private class FlyDashDefaultImpl(
 private class FlyDashTick(
     skill: FlyDash,
     context: SkillContext,
-    override val forbiddenTriggers: Provider<TriggerConditions>,
-    override val interruptTriggers: Provider<TriggerConditions>
+    override val forbiddenTriggers: TriggerConditions,
+    override val interruptTriggers: TriggerConditions
 ): AbstractPlayerSkillTick<FlyDash>(skill, context) {
     override fun tickCast(tickCount: Long): TickResult {
         if (!checkConditions())
@@ -59,7 +54,7 @@ private class FlyDashTick(
             val casterNode = caster.toComposite()
             val newContext = SkillContext(CasterAdapter.adapt(this).toComposite(casterNode), TargetAdapter.adapt(caster))
             for (effect in skill.beforeMovingEffects) {
-                FlyDashSupport.ticker.addTick(effect.cast(newContext))
+                FlyDashSupport.ticker.addTick(effect.get().cast(newContext))
             }
             return TickResult.CONTINUE_TICK
         }

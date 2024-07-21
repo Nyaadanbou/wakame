@@ -68,6 +68,7 @@ dependencies {
     testImplementation(libs.helper.profiles)
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
+    testImplementation(libs.mockbukkit)
     testImplementation(libs.server.paper)
 }
 

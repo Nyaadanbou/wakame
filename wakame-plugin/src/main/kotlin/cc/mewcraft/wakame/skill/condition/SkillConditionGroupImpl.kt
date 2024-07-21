@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.skill.condition
 
 import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.util.krequire
@@ -81,7 +80,7 @@ internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionG
             val conditions = value.krequire<List<ConfigurationNode>>().map { listNode ->
                 val conditionType = listNode.node("type").krequire<String>()
                 val conditionFactory = SkillRegistry.CONDITIONS[conditionType]
-                conditionFactory.create(NodeConfigProvider(listNode))
+                conditionFactory.create(listNode)
             }
             builder.putAll(conditionTime, conditions)
         }

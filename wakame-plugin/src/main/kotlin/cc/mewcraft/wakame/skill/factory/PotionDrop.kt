@@ -1,14 +1,15 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillBase
+import cc.mewcraft.wakame.skill.TargetUtil
+import cc.mewcraft.wakame.skill.TriggerConditions
 import cc.mewcraft.wakame.skill.context.SkillContext
-import cc.mewcraft.wakame.skill.tick.*
-import cc.mewcraft.wakame.tick.Ticker
+import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
+import cc.mewcraft.wakame.skill.tick.AbstractSkillTick
+import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
+import cc.mewcraft.wakame.tick.Ticker
 import net.kyori.adventure.key.Key
 import org.bukkit.Location
 import org.bukkit.Material
@@ -19,6 +20,8 @@ import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionType
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 
 
 interface PotionDrop : Skill {
@@ -29,19 +32,17 @@ interface PotionDrop : Skill {
     val effectTypes: List<PotionType>
 
     companion object Factory : SkillFactory<PotionDrop> {
-        override fun create(key: Key, config: ConfigProvider): PotionDrop {
-            val effectTypes = config.optionalEntry<List<PotionType>>("effect_types").orElse(emptyList())
+        override fun create(key: Key, config: ConfigurationNode): PotionDrop {
+            val effectTypes = config.node("effect_types").get<List<PotionType>>() ?: emptyList()
             return DefaultImpl(key, config, effectTypes)
         }
     }
 
     private class DefaultImpl(
         override val key: Key,
-        config: ConfigProvider,
-        effectTypes: Provider<List<PotionType>>,
+        config: ConfigurationNode,
+        override val effectTypes: List<PotionType>,
     ) : PotionDrop, SkillBase(key, config) {
-        override val effectTypes: List<PotionType> by effectTypes
-
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
         override fun cast(context: SkillContext): SkillTick<PotionDrop> {
@@ -53,8 +54,8 @@ interface PotionDrop : Skill {
 private class PotionDropTick(
     context: SkillContext,
     skill: PotionDrop,
-    override val interruptTriggers: Provider<TriggerConditions>,
-    override val forbiddenTriggers: Provider<TriggerConditions>
+    override val interruptTriggers: TriggerConditions,
+    override val forbiddenTriggers: TriggerConditions
 ) : AbstractPlayerSkillTick<PotionDrop>(skill, context) {
     override fun tickCast(tickCount: Long): TickResult {
         val location = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT

@@ -25,6 +25,8 @@ import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.stream.Stream
+import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.full.superclasses
 
 /**
  * 代表了一个玩家技能状态的信息.
@@ -96,6 +98,25 @@ sealed class AbstractSkillStateInfo(
         }
     }
 
+    override fun tick() {
+        val result = try {
+            tickSkill(counter)
+        } catch (t: Throwable) {
+            val skillKClass = skillTick.skill::class
+            val skillName = skillKClass.superclasses.first { it.isSubclassOf(Skill::class) }.simpleName ?: skillKClass.simpleName
+            throw IllegalSkillStateException("在执行 $skillName 技能时发生了异常", t)
+        }
+        counter++
+        when (result) {
+            TickResult.CONTINUE_TICK -> return
+            TickResult.ALL_DONE -> setNextState()
+            TickResult.INTERRUPT -> interrupt()
+        }
+    }
+
+    protected abstract fun tickSkill(tickCount: Long): TickResult
+    protected abstract fun setNextState()
+
     private fun registerTriggerEvents() {
         // FIXME: 检查可能出现的对象残留问题.
         val subscriptions = listOf(
@@ -147,8 +168,7 @@ sealed class AbstractSkillStateInfo(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("type", type),
-            ExaminableProperty.of("skillTick", skillTick),
+            ExaminableProperty.of("type", type)
         )
     }
 
@@ -263,6 +283,14 @@ class IdleStateInfo(
         }
     }
 
+    override fun tickSkill(tickCount: Long): TickResult {
+        throw UnsupportedOperationException("IdleStateInfo does not support tickSkill")
+    }
+
+    override fun setNextState() {
+        throw UnsupportedOperationException("IdleStateInfo does not support setNextState")
+    }
+
     override fun interrupt() {
         currentSequence.clear()
         castableSkill = null
@@ -289,14 +317,12 @@ class CastPointStateInfo(
         return SkillStateResult.SUCCESS
     }
 
-    override fun tick() {
-        val result = skillTick.tickCastPoint(counter)
-        counter++
-        when (result) {
-            TickResult.CONTINUE_TICK -> return
-            TickResult.ALL_DONE -> state.setInfo(CastStateInfo(state, skillTick))
-            TickResult.INTERRUPT -> interrupt()
-        }
+    override fun tickSkill(tickCount: Long): TickResult {
+        return skillTick.tickCastPoint(counter)
+    }
+
+    override fun setNextState() {
+        state.setInfo(CastStateInfo(state, skillTick))
     }
 
     override fun interrupt() {
@@ -324,14 +350,12 @@ class CastStateInfo(
         return SkillStateResult.SUCCESS
     }
 
-    override fun tick() {
-        val result = skillTick.tickCast(counter)
-        counter++
-        when (result) {
-            TickResult.CONTINUE_TICK -> return
-            TickResult.ALL_DONE -> state.setInfo(BackswingStateInfo(state, skillTick))
-            TickResult.INTERRUPT -> interrupt()
-        }
+    override fun tickSkill(tickCount: Long): TickResult {
+        return skillTick.tickCast(counter)
+    }
+
+    override fun setNextState() {
+        state.setInfo(BackswingStateInfo(state, skillTick))
     }
 
     override fun interrupt() {
@@ -358,14 +382,12 @@ class BackswingStateInfo(
         return SkillStateResult.SUCCESS
     }
 
-    override fun tick() {
-        val result = skillTick.tickBackswing(counter)
-        counter++
-        when (result) {
-            TickResult.CONTINUE_TICK -> return
-            TickResult.ALL_DONE -> state.setInfo(IdleStateInfo(state))
-            TickResult.INTERRUPT -> interrupt()
-        }
+    override fun tickSkill(tickCount: Long): TickResult {
+        return skillTick.tickBackswing(counter)
+    }
+
+    override fun setNextState() {
+        state.setInfo(IdleStateInfo(state))
     }
 
     override fun interrupt() {

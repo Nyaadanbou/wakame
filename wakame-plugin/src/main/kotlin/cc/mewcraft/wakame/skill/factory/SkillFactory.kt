@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillFactories
 import net.kyori.adventure.key.Key
+import org.spongepowered.configurate.ConfigurationNode
 
 /**
  * Represents a factory of a certain skill.
@@ -12,7 +12,7 @@ import net.kyori.adventure.key.Key
  * 1. Create a new interface that extends [Skill] interface.
  * 2. Create a companion object that implements [SkillFactory] interface with the type of the skill.
  * 3. Implement the [create] method to create a new instance of the skill.
- * 4. Register the skill type in the [SkillRegistry.FACTORIES]
+ * 4. Register the skill type in the [SkillFactories]
  *
  * Example:
  *
@@ -37,7 +37,7 @@ interface SkillFactory<T : Skill> {
      * Create a new instance of the skill base on a certain skill type
      *
      * @param key The key of the skill. See [Skill.key]
-     * @param config The configuration provider of the skill.
+     * @param config The configuration node of the skill.
      */
-    fun create(key: Key, config: ConfigProvider): T
+    fun create(key: Key, config: ConfigurationNode): T
 }

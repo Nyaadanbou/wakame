@@ -15,14 +15,14 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 internal object SkillSupport : KoinComponent {
     val GLOBAL_SKILL_CONDITIONS: ConfigProvider by lazy {
         Configs.YAML
-            .build(SKILL_CONFIG_FILE, false) {
+            .build(SKILL_CONFIG_FILE) {
                 defaultOptions(get<YamlConfigurationLoader.Builder>(named((SKILL_PROTO_CONFIG_LOADER))).defaultOptions())
             }
             .derive("conditions")
     }
 
     val GLOBAL_STATE_CONFIG by lazy {
-        Configs.YAML.build(STATE_GLOBAL_CONFIG_FILE, false) {
+        Configs.YAML.build(STATE_GLOBAL_CONFIG_FILE) {
             defaultOptions(get<YamlConfigurationLoader.Builder>(named((STATE_GLOBAL_CONFIG_LOADER))).defaultOptions())
         }
     }

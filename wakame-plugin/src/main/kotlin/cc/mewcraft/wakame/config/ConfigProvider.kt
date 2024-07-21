@@ -123,14 +123,8 @@ sealed class ConfigProvider(
 class YamlFileConfigProvider internal constructor(
     private val path: Path,
     relPath: String,
-    lazy: Boolean = true,
     private val builder: YamlConfigurationLoader.Builder.() -> Unit
 ) : ConfigProvider(relPath) {
-    init {
-        if (!lazy) {
-            get()
-        }
-    }
 
     override fun loadValue(): ConfigurationNode {
         return YamlConfigurationLoader.builder()
@@ -153,14 +147,8 @@ class YamlFileConfigProvider internal constructor(
 class GsonFileConfigProvider internal constructor(
     private val path: Path,
     relPath: String,
-    lazy: Boolean = true,
     private val builder: GsonConfigurationLoader.Builder.() -> Unit
 ) : ConfigProvider(relPath) {
-    init {
-        if (!lazy) {
-            get()
-        }
-    }
 
     override fun loadValue(): ConfigurationNode {
         return GsonConfigurationLoader.builder()
@@ -183,14 +171,7 @@ class GsonFileConfigProvider internal constructor(
 class NodeConfigProvider internal constructor(
     private val node: ConfigurationNode,
     relPath: String = "",
-    lazy: Boolean = true
 ) : ConfigProvider(relPath) {
-    init {
-        if (!lazy) {
-            get()
-        }
-    }
-
     override fun loadValue(): ConfigurationNode {
         return node
     }

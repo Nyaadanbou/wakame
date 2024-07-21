@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.skill.condition
 
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.skill.Caster
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.value
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import org.spongepowered.configurate.ConfigurationNode
 
 /**
  * 检查 MoLang 表达式.
@@ -23,21 +23,20 @@ interface MoLangExpression : SkillCondition {
     val evaluable: Evaluable<*>
 
     companion object Factory : SkillConditionFactory<MoLangExpression> {
-        override fun create(config: ConfigProvider): MoLangExpression {
+        override fun create(config: ConfigurationNode): MoLangExpression {
             return DefaultImpl(config)
         }
     }
 
     private class DefaultImpl(
-        config: ConfigProvider,
+        config: ConfigurationNode,
     ) : MoLangExpression, SkillConditionBase(config) {
 
-        override val evaluable: Evaluable<*> by config.entry<Evaluable<*>>("eval")
+        override val evaluable: Evaluable<*> = config.node("eval").krequire<Evaluable<*>>()
         override val resolver: TagResolver = Placeholder.component(this.type, Component.text(this.evaluable.evaluate(MoLangSupport.createEngine()))) // TODO: Support MoLang tag resolver
 
         override fun newSession(context: SkillContext): SkillConditionSession {
-            val engine = MoLangSupport.createEngine()
-            // TODO: engine.bindInstance(...)
+            val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
             val isSuccess = evaluable.evaluate(engine) != .0
             return SessionImpl(isSuccess)
         }

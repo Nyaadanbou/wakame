@@ -2,8 +2,9 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillFactories
 import cc.mewcraft.wakame.skill.condition.ManaCondition
@@ -25,6 +26,8 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
+@PreWorldDependency(runBefore = [ElementRegistry::class])
+@ReloadDependency(runBefore = [ElementRegistry::class])
 object SkillRegistry : Initializable, KoinComponent {
     /* Trigger Constants */
 
@@ -102,8 +105,7 @@ object SkillRegistry : Initializable, KoinComponent {
                     val node = loaderBuilder.buildAndLoadString(text)
 
                     val type = node.node("type").krequire<String>()
-                    val provider = NodeConfigProvider(node, skillFile.path, lazy = false)
-                    val skill = SkillFactories[type]?.create(skillKey, provider)
+                    val skill = SkillFactories[type]?.create(skillKey, node)
                     if (skill == null) {
                         LOGGER.error("Failed to load skill: {}", skillKey)
                         return@forEach

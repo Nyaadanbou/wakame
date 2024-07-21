@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.skill.condition
 
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import org.spongepowered.configurate.ConfigurationNode
 
 /**
  * 检查 wakame 物品的耐久度.
@@ -23,16 +23,16 @@ internal interface NekoDurability : SkillCondition {
     val durability: Evaluable<*>
 
     companion object Factory : SkillConditionFactory<NekoDurability> {
-        override fun create(config: ConfigProvider): NekoDurability {
+        override fun create(config: ConfigurationNode): NekoDurability {
             return DefaultImpl(config)
         }
     }
 
     private class DefaultImpl(
-        config: ConfigProvider,
+        config: ConfigurationNode,
     ) : SkillConditionBase(config), NekoDurability {
 
-        override val durability: Evaluable<*> by config.entry<Evaluable<*>>("durability")
+        override val durability: Evaluable<*> = config.node("durability").krequire<Evaluable<*>>()
         override val resolver: TagResolver = Placeholder.component(this.type, Component.text(this.durability.evaluate()))
 
         override fun newSession(context: SkillContext): SkillConditionSession {

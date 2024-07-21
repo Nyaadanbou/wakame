@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.skill.condition
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.skill.context.SkillContext
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import org.spongepowered.configurate.ConfigurationNode
 
 /**
  * 代表一个单独的技能条件.
@@ -59,5 +60,5 @@ interface SkillCondition {
  * 在 [SkillCondition] 的实现里创建一个 `companion object`, 让其实现 [SkillConditionFactory].
  */
 interface SkillConditionFactory<C : SkillCondition> {
-    fun create(config: ConfigProvider): C
+    fun create(config: ConfigurationNode): C
 }
