@@ -16,78 +16,102 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 /**
- * 开始构建一个 [DamagePacketBundle].
+ * 开始构建一个 [DamageBundle].
  */
-fun damagePacketBundle(attrMap: AttributeMap, block: DamagePacketBundleDSL.() -> Unit): DamagePacketBundle {
-    return DamagePacketBundleDSL(attrMap).apply(block).get()
+fun damageBundle(attrMap: AttributeMap, block: DamageBundleDSL.() -> Unit): DamageBundle {
+    return DamageBundleDSL(attrMap).apply(block).get()
 }
 
 /**
- * 开始构建一个 [DamagePacketBundle], 不依赖任何 [AttributeMap].
+ * 开始构建一个 [DamageBundle], 不依赖任何 [AttributeMap].
  */
-fun damagePacketBundle(block: DamagePacketBundleDSL.() -> Unit): DamagePacketBundle {
-    return DamagePacketBundleDSL().apply(block).get()
+fun damageBundle(block: DamageBundleDSL.() -> Unit): DamageBundle {
+    return DamageBundleDSL().apply(block).get()
 }
 
+/**
+ * 开始构建一个 [DamagePacket].
+ */
+fun damagePacket(element: Element, attrMap: AttributeMap, block: DamagePacketDSL.() -> Unit): DamagePacket {
+    return DamagePacketDSL(element, attrMap).apply(block).build()
+}
+
+/**
+ * 开始构建一个 [DamagePacket], 不依赖任何 [AttributeMap].
+ */
+fun damagePacket(element: Element, block: DamagePacketDSL.() -> Unit): DamagePacket {
+    return DamagePacketDSL(element).apply(block).build()
+}
+
+/**
+ * 开始构建一个 [DamagePacket], 使用默认的元素.
+ */
+fun damagePacket(block: DamagePacketDSL.() -> Unit): DamagePacket {
+    return DamagePacketDSL(ElementRegistry.DEFAULT).apply(block).build()
+}
+
+/**
+ * 用于标记 [DamageBundleDSL] 和 [DamagePacketDSL] 的 DSL.
+ */
 @DslMarker
 annotation class DamagePacketBundleDsl
 
 /**
- * 用于构建 [DamagePacketBundle] 的 DSL.
+ * [DamageBundle] 的 DSL.
  */
 @DamagePacketBundleDsl
-class DamagePacketBundleDSL(
+class DamageBundleDSL(
     private val attrMap: AttributeMap? = null,
 ) {
-    private val bundle: DamagePacketBundle = DamagePacketBundle()
+    private val bundle: DamageBundle = DamageBundle()
 
     private fun getElementById(id: String): Element? {
         return ElementRegistry.INSTANCES.find(id)
     }
 
     /**
-     * 为每种已知的元素构建 [ElementDamagePacket].
+     * 为每种已知的元素构建 [DamagePacket].
      */
-    fun every(block: ElementDamagePacketDSL.() -> Unit) {
+    fun every(block: DamagePacketDSL.() -> Unit) {
         for ((_, element) in ElementRegistry.INSTANCES) {
             // every() 只添加先前不存在的元素伤害包, 使其永远成为一个 "fallback".
             // 这样无论 DSL 的调用顺序是怎样的, 都可以让 element() 拥有更高优先级.
-            bundle.addIfAbsent(ElementDamagePacketDSL(element, attrMap).apply(block).build())
+            bundle.addIfAbsent(DamagePacketDSL(element, attrMap).apply(block).build())
         }
     }
 
     /**
-     * 为指定的元素构建 [ElementDamagePacket].
+     * 为指定的元素构建 [DamagePacket].
      */
-    fun element(id: String, block: ElementDamagePacketDSL.() -> Unit) {
+    fun element(id: String, block: DamagePacketDSL.() -> Unit) {
         val element = getElementById(id) ?: run {
-            DamagePacketBundleDSLSupport.logger.warn("Element '$id' not found while building damage packet bundle. The damage packet will not be added.")
+            DamageBundleDSLSupport.logger.warn("Element '$id' not found while building damage packet bundle. The damage packet will not be added.")
             return
         }
-        bundle.add(ElementDamagePacketDSL(element, attrMap).apply(block).build())
+        bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
     }
 
     /**
-     * 为默认的元素构建 [ElementDamagePacket].
+     * 为默认的元素构建 [DamagePacket].
      */
-    fun default(block: ElementDamagePacketDSL.() -> Unit) {
+    fun default(block: DamagePacketDSL.() -> Unit) {
         val element = ElementRegistry.DEFAULT
-        bundle.add(ElementDamagePacketDSL(element, attrMap).apply(block).build())
+        bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
     }
 
     /**
-     * 返回构建好的 [DamagePacketBundle].
+     * 返回构建好的 [DamageBundle].
      */
-    fun get(): DamagePacketBundle {
+    fun get(): DamageBundle {
         return bundle
     }
 }
 
 /**
- * 用于构建 [ElementDamagePacket] 的 DSL.
+ * [DamagePacket] 的 DSL.
  */
 @DamagePacketBundleDsl
-class ElementDamagePacketDSL(
+class DamagePacketDSL(
     private val element: Element,
     private val attrMap: AttributeMap? = null,
 ) {
@@ -157,8 +181,8 @@ class ElementDamagePacketDSL(
         defensePenetrationRate = value
     }
 
-    fun build(): ElementDamagePacket {
-        return ElementDamagePacket(
+    fun build(): DamagePacket {
+        return DamagePacket(
             element,
             validateValue(min),
             validateValue(max),
@@ -246,8 +270,8 @@ class ElementDamagePacketDSL(
 }
 
 /**
- * 包含了依赖注入进来的实例. 存到一个单例中, 以节省在运行时寻找依赖的开销.
+ * 储存依赖注入进来的实例. 存到一个单例中, 以避免运行时的哈希开销.
  */
-private object DamagePacketBundleDSLSupport : KoinComponent {
+private object DamageBundleDSLSupport : KoinComponent {
     val logger: Logger by inject()
 }
