@@ -15,13 +15,19 @@ import org.bukkit.inventory.EquipmentSlot
  * 经过几个小时的讨论，得出必须要枪毙副手射箭
  */
 class FuckOffHandListener : Listener {
+    private val fuckOffHandSet = setOf(
+        Material.BOW,
+        Material.CROSSBOW,
+        Material.TRIDENT
+    )
+
     @EventHandler(priority = EventPriority.LOWEST)
     fun on(event: PlayerInteractEvent) {
         val player = event.player
         if (event.hand != EquipmentSlot.OFF_HAND) return
         val playerInventory = player.inventory
         val itemInOffHand = playerInventory.itemInOffHand
-        if (itemInOffHand.type != Material.BOW && itemInOffHand.type != Material.CROSSBOW) return
+        if (!fuckOffHandSet.contains(itemInOffHand.type)) return
 
         event.setUseItemInHand(Event.Result.DENY)
         val itemInMainHand = playerInventory.itemInMainHand
