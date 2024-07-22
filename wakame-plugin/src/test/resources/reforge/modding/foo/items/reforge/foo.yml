@@ -16,7 +16,7 @@ cells:
 
     # 定义该词条栏最多可定制几次.
     # 类型: int
-    modification_limit: 1
+    mod_limit: 1
 
     # 定义该词条栏“接受”哪些核心.
     # 类型: list

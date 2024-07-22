@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.refining
+package cc.mewcraft.wakame.reforge.modding.match
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.AttributeModifier

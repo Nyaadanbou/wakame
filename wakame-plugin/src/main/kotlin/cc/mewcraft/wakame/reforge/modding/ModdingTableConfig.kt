@@ -1,13 +1,15 @@
-package cc.mewcraft.wakame.reforge.refining
+package cc.mewcraft.wakame.reforge.modding
 
 import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.reforge.modding.match.CoreMatchRule
+import cc.mewcraft.wakame.reforge.modding.match.CurseMatchRule
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 
 /**
  * 封装了定制台的配置文件.
  */
-interface RefiningStationConfig {
+interface ModdingTableConfig {
     /**
      * 是否启用这个定制台.
      */
@@ -102,7 +104,7 @@ interface CellRule {
     /**
      * 词条栏最多能定制几次.
      */
-    val modificationLimit: Int
+    val modLimit: Int
 
     /**
      * 词条栏“接受“哪些核心.

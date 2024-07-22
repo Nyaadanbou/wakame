@@ -12,3 +12,8 @@ fun ItemStack?.isEmpty(): Boolean =
 inline fun <reified T : ItemMeta> ItemStack.editMeta(crossinline block: (T) -> Unit) {
     this.editMeta(T::class.java) { block(it) }
 }
+
+fun ItemStack.hideTooltip(hide: Boolean): ItemStack {
+    editMeta { it.isHideTooltip = hide }
+    return this
+}
