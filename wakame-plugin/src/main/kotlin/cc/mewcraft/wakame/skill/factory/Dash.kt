@@ -8,12 +8,15 @@ import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
+import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
@@ -31,11 +34,23 @@ interface Dash : Skill {
      */
     val duration: Long
 
+    /**
+     * 撞到实体后是否能继续冲刺
+     */
+    val canContinueAfterHit: Boolean
+
+    /**
+     * 撞到实体后触发的效果
+     */
+    val hitEffects: List<SkillProvider>
+
     companion object Factory : SkillFactory<Dash> {
         override fun create(key: Key, config: ConfigurationNode): Dash {
             val stepDistance = config.node("step_distance").krequire<Double>()
             val duration = config.node("duration").get<Long>() ?: 50
-            return DefaultImpl(key, config, stepDistance, duration)
+            val canContinueAfterHit = config.node("can_continue_after_hit").get<Boolean>() ?: true
+            val hitEffect = config.node("hit_effects").get<List<SkillProvider>>() ?: emptyList()
+            return DefaultImpl(key, config, stepDistance, duration, canContinueAfterHit, hitEffect)
         }
     }
 
@@ -44,6 +59,8 @@ interface Dash : Skill {
         config: ConfigurationNode,
         override val stepDistance: Double,
         override val duration: Long,
+        override val canContinueAfterHit: Boolean,
+        override val hitEffects: List<SkillProvider>
     ) : Dash, SkillBase(key, config) {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
@@ -110,6 +127,9 @@ private class DashTick(
 
         if (affectEntityNearby(player)) {
             context[DASH_DAMAGE_KEY] = context[DASH_DAMAGE_KEY]?.plus(1) ?: 1
+            if (!skill.canContinueAfterHit) {
+                return TickResult.ALL_DONE
+            }
         }
 
         return TickResult.CONTINUE_TICK
@@ -138,8 +158,12 @@ private class DashTick(
         }
         for (entity in entities) {
             if (entity is LivingEntity) {
-                entity.velocity = player.location.direction.multiply(2.0)
-                entity.damage(2.0, player)
+                for (skillProvider in skill.hitEffects) {
+                    val effect = skillProvider.get()
+                    val caster = CasterUtils.getCaster<Caster.Single>(context)
+                    val newContext = SkillContext(CasterAdapter.adapt(this).toComposite(caster?.toComposite()), TargetAdapter.adapt(entity))
+                    DashSupport.ticker.addTick(effect.cast(newContext))
+                }
             }
         }
         return true
@@ -155,4 +179,8 @@ private class DashTick(
         }
     }
 
+}
+
+private object DashSupport : KoinComponent {
+    val ticker: Ticker by inject()
 }
