@@ -5,11 +5,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
-import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
-import org.bukkit.entity.Trident
+import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
@@ -17,7 +13,7 @@ import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.projectiles.BlockProjectileSource
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 object DamageManager {
     fun generateDamageMetaData(event: EntityDamageEvent): DamageMetadata {
@@ -224,9 +220,9 @@ object DamageRules {
      * TODO 添加从配置文件载入防御计算公式的功能
      */
     fun calculateDamageAfterDefense(
-        originalDamage: Double, defense: Double, defensePenetration: Double,
+        originalDamage: Double, defense: Double, defensePenetration: Double, defensePenetrationRate: Double
     ): Double {
-        val validDefense = (defense - defensePenetration).coerceAtLeast(0.0)
+        val validDefense = (defense - defensePenetration).coerceAtLeast(0.0) * (1 - defensePenetrationRate)
         return (originalDamage - validDefense).coerceAtLeast(0.0)
     }
 

@@ -27,7 +27,8 @@ class EntityDefenseMetadata(
             val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
                 packet.packetDamage,
                 damageeAttributeMap.getValue(Attributes.byElement(element).DEFENSE),
-                packet.defensePenetration
+                packet.defensePenetration,
+                packet.defensePenetrationRate
             )
             val incomingDamageRate = (damageeAttributeMap.getValue(Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE) +
                     damageeAttributeMap.getValue(Attributes.byElement(element).INCOMING_DAMAGE_RATE))
