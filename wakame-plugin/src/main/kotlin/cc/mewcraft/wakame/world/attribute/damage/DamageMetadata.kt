@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.User
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -19,13 +18,9 @@ import kotlin.random.Random
  */
 sealed interface DamageMetadata {
     val damageBundle: DamageBundle
-        get() = buildDamageBundle()
     val damageValue: Double
-        get() = damageBundle.bundleDamage
     val criticalPower: Double
     val isCritical: Boolean
-
-    fun buildDamageBundle(): DamageBundle
 }
 
 /**
@@ -37,19 +32,17 @@ sealed interface DamageMetadata {
 class DefaultDamageMetadata(
     override val damageValue: Double,
 ) : DamageMetadata {
-    override val criticalPower: Double = 1.0
-    override val isCritical: Boolean = false
-    override fun buildDamageBundle(): DamageBundle {
-        return damageBundle {
-            single(ElementRegistry.DEFAULT) {
-                min(damageValue)
-                max(damageValue)
-                rate(0.0)
-                defensePenetration(0.0)
-                defensePenetrationRate(0.0)
-            }
+    override val damageBundle: DamageBundle = damageBundle {
+        default {
+            min(damageValue)
+            max(damageValue)
+            rate(0.0)
+            defensePenetration(0.0)
+            defensePenetrationRate(0.0)
         }
     }
+    override val criticalPower: Double = 1.0
+    override val isCritical: Boolean = false
 }
 
 /**
@@ -63,19 +56,17 @@ class VanillaDamageMetadata(
     private val defensePenetration: Double,
     private val defensePenetrationRate: Double,
 ) : DamageMetadata {
-    override val criticalPower: Double = 1.0
-    override val isCritical: Boolean = false
-    override fun buildDamageBundle(): DamageBundle {
-        return damageBundle {
-            single(ElementRegistry.DEFAULT) {
-                min(damageValue)
-                max(damageValue)
-                rate(0.0)
-                defensePenetration(defensePenetration)
-                defensePenetrationRate(defensePenetrationRate)
-            }
+    override val damageBundle: DamageBundle = damageBundle {
+        default {
+            min(damageValue)
+            max(damageValue)
+            rate(0.0)
+            defensePenetration(defensePenetration)
+            defensePenetrationRate(defensePenetrationRate)
         }
     }
+    override val criticalPower: Double = 1.0
+    override val isCritical: Boolean = false
 }
 
 /**
@@ -86,13 +77,15 @@ class VanillaDamageMetadata(
  */
 class PlayerMeleeAttackMetadata(
     val user: User<Player>,
-    private val isSweep: Boolean,
+    private val isSweep: Boolean
 ) : DamageMetadata {
     private val attributeMap = user.attributeMap
+    override val damageBundle: DamageBundle = buildDamageBundle()
+    override val damageValue: Double = damageBundle.bundleDamage
     override val criticalPower: Double = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
 
-    override fun buildDamageBundle(): DamageBundle {
+    private fun buildDamageBundle(): DamageBundle {
         return if (isSweep) {
             damageBundle(attributeMap) {
                 every {
@@ -119,13 +112,12 @@ class EntityMeleeAttackMetadata(
     entity: LivingEntity,
 ) : DamageMetadata {
     private val entityAttributeMap = EntityAttributeAccessor.getAttributeMap(entity)
+    override val damageBundle: DamageBundle = damageBundle(entityAttributeMap) {
+        every { standard() }
+    }
+    override val damageValue: Double = damageBundle.bundleDamage
     override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
-    override fun buildDamageBundle(): DamageBundle {
-        return damageBundle(entityAttributeMap) {
-            every { standard() }
-        }
-    }
 }
 
 sealed interface ProjectileDamageMetadata : DamageMetadata {
@@ -145,10 +137,13 @@ class PlayerProjectileDamageMetadata(
     private val force: Float,
 ) : ProjectileDamageMetadata {
     private val attributeMap = user.attributeMap
+    override val damageBundle: DamageBundle = buildDamageBundle()
+    override val damageValue: Double = damageBundle.bundleDamage
     override val criticalPower: Double = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
 
     private fun buildBowDamageBundle(): DamageBundle {
+        //AttributeMap需要实时获取
         return damageBundle(attributeMap) {
             every {
                 standard()
@@ -158,7 +153,7 @@ class PlayerProjectileDamageMetadata(
         }
     }
 
-    override fun buildDamageBundle(): DamageBundle {
+    private fun buildDamageBundle(): DamageBundle {
         when (projectileType) {
             ProjectileType.ARROWS -> {
                 // 如果玩家射出的箭矢
@@ -208,13 +203,12 @@ class EntityProjectileDamageMetadata(
     val entity: LivingEntity,
 ) : ProjectileDamageMetadata {
     private val entityAttributeMap = EntityAttributeAccessor.getAttributeMap(entity)
+    override val damageBundle: DamageBundle = damageBundle(entityAttributeMap) {
+        every { standard() }
+    }
+    override val damageValue: Double = damageBundle.bundleDamage
     override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
-    override fun buildDamageBundle(): DamageBundle {
-        return damageBundle(entityAttributeMap) {
-            every { standard() }
-        }
-    }
 }
 
 /**
@@ -225,11 +219,9 @@ class CustomDamageMetadata(
     override val criticalPower: Double,
     override val isCritical: Boolean,
     val knockback: Boolean,
-    private val customDamageBundle: DamageBundle
+    override val damageBundle: DamageBundle
 ) : DamageMetadata {
-    override fun buildDamageBundle(): DamageBundle {
-        return customDamageBundle
-    }
+    override val damageValue: Double = damageBundle.bundleDamage
 }
 
 
