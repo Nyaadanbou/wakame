@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.player.interact
 
 import org.bukkit.Material
-import org.bukkit.entity.Player
+import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityShootBowEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 
 /**
@@ -16,17 +16,16 @@ import org.bukkit.inventory.EquipmentSlot
  */
 class FuckOffHandListener : Listener {
     @EventHandler(priority = EventPriority.LOWEST)
-    fun on(event: EntityShootBowEvent) {
-        val livingEntity = event.entity
-        if (livingEntity !is Player) return
+    fun on(event: PlayerInteractEvent) {
+        val player = event.player
         if (event.hand != EquipmentSlot.OFF_HAND) return
-        val bow = event.bow ?: return
-        if (bow.type != Material.BOW && bow.type != Material.CROSSBOW) return
+        val playerInventory = player.inventory
+        val itemInOffHand = playerInventory.itemInOffHand
+        if (itemInOffHand.type != Material.BOW && itemInOffHand.type != Material.CROSSBOW) return
 
-        event.isCancelled = true
-        val playerInventory = livingEntity.inventory
+        event.setUseItemInHand(Event.Result.DENY)
         val itemInMainHand = playerInventory.itemInMainHand
-        playerInventory.setItem(EquipmentSlot.HAND, bow)
+        playerInventory.setItem(EquipmentSlot.HAND, itemInOffHand)
         playerInventory.setItem(EquipmentSlot.OFF_HAND, itemInMainHand)
     }
 }
