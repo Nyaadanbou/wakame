@@ -11,6 +11,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.*
 
@@ -85,6 +86,10 @@ internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionG
             builder.putAll(conditionTime, conditions)
         }
 
-        return SkillConditionGroupImpl(ImmutableMultimap.copyOf(builder))
+        return try {
+            SkillConditionGroupImpl(ImmutableMultimap.copyOf(builder))
+        } catch (t: Throwable) {
+            throw SerializationException(node, type, "Failed to create SkillConditionGroup", t)
+        }
     }
 }

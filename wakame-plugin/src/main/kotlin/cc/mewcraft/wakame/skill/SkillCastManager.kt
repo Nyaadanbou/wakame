@@ -30,7 +30,7 @@ internal class SkillCastManagerImpl : SkillCastManager {
         event.callEvent()
         if (event.isCancelled) return FailureSkillPrepareCastResult.CANCELED
         val conditionGroup = skill.conditions
-        val session = conditionGroup.newSession(ConditionTime.BEFORE_CAST, context)
+        val session = conditionGroup.newSession(ConditionTime.CAST_POINT, context)
         if (!session.isSuccess) {
             session.onFailure(context)
             return FailureSkillPrepareCastResult.CONDITION_CANNOT_MEET

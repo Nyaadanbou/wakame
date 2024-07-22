@@ -92,7 +92,7 @@ abstract class AbstractSkillTick<S : Skill>(
 
     protected fun checkConditions(successOperator: Boolean = true, failureOperator: Boolean = true): Boolean {
         val conditions = skill.conditions
-        val session = conditions.newSession(ConditionTime.TICKING, context)
+        val session = conditions.newSession(ConditionTime.CASTING, context)
         if (successOperator && session.isSuccess) {
             session.onSuccess(context)
         }
