@@ -1,7 +1,7 @@
 type: "kill_entity"
 
 conditions:
-  before_cast:
+  cast_point:
     - id: "chance"
       type: molang
       eval: "math.random(0.0, 1.0) < 0.5"

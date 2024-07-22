@@ -33,7 +33,7 @@ forbidden_triggers:
     - MOVE
 
 conditions:
-  before_cast:
+  cast_point:
     - type: durability
       durability: 10
       success_message:
@@ -44,7 +44,7 @@ conditions:
           text: "You failed to remove the potion effect. no durability"
     - type: mana
       mana: "player.max_mana() / 10"
-  ticking:
+  casting:
     - type: mana
       mana: "player.max_mana() / 10"
 
