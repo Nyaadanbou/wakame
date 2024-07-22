@@ -36,7 +36,7 @@ class DamageListener : Listener, KoinComponent {
         logger.info("${event.entity.type}(${event.entity.uniqueId}) 受到了 ${event.damage} 点伤害")
         val stringBuilder = StringBuilder()
         val miniMessage = MiniMessage.miniMessage()
-        for (it in damageMetaData.packets) {
+        for (it in damageMetaData.damageBundle) {
             stringBuilder.append("${miniMessage.serialize(it.element.displayName)}: ${it.packetDamage}<newline>")
         }
         stringBuilder.append("（各元素未计算防御阶段）")

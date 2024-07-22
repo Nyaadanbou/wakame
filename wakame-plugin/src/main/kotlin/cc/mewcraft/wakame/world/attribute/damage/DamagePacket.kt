@@ -12,15 +12,52 @@ import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.util.stream.Stream
 
+/**
+ * 伤害包，包含了一种特定元素的伤害信息
+ */
 data class DamagePacket(
+    /**
+     * 伤害的元素类型
+     */
     val element: Element,
+
+    /**
+     * 伤害的最小值
+     */
     val min: Double,
+
+    /**
+     * 伤害的最大值
+     */
     val max: Double,
+
+    /**
+     * 伤害的加成比率
+     * 例如：火元素伤害+50%
+     */
     val rate: Double,
+
+    /**
+     * 伤害的护甲穿透值
+     */
     val defensePenetration: Double,
+
+    /**
+     * 伤害的护甲穿透率
+     */
     val defensePenetrationRate: Double,
 ) : Examinable {
+
+    /**
+     * 伤害值在最大值与最小值之间的随机结果
+     * 伤害值在伤害包实例化时就已经确定了
+     */
     val value: Double = if (min >= max) max else VariableAmount.range(min, max).amount
+
+    /**
+     * 该伤害包的总伤害值，称为“包伤害”
+     * [DamageMetadata] 的伤害值是捆绑包中所有包伤害的和
+     */
     val packetDamage: Double = value
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -45,6 +82,7 @@ data class DamagePacket(
 class DamageBundle : Examinable, KoinComponent {
     private val logger: Logger by inject()
     private val packets = Reference2ObjectArrayMap<Element, DamagePacket>()
+    val bundleDamage: Double = packets.values.sumOf { it.packetDamage }
 
     private fun getElementById(id: String): Element? {
         return ElementRegistry.INSTANCES.find(id) ?: run {
