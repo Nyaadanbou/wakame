@@ -22,7 +22,7 @@ class EntityDefenseMetadata(
     override fun calculateFinalDamage(damageMetaData: DamageMetadata): Double {
         var totalElementDamage = 0.0
         val criticalPower = if (damageMetaData.isCritical) damageMetaData.criticalPower else 1.0
-        for (packet in damageMetaData.packets) {
+        for (packet in damageMetaData.damageBundle.packets()) {
             val element = packet.element
             val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
                 packet.packetDamage,

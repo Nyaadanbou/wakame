@@ -19,13 +19,14 @@ import kotlin.random.Random
  * 其实现类实例化时，攻击伤害值以及各种信息就已经确定了
  */
 sealed interface DamageMetadata {
-    val packets: List<DamagePacket>
-        get() = generatePackets()
+    val damageBundle: DamageBundle
+        get() = buildDamageBundle()
     val damageValue: Double
+        get() = damageBundle.bundleDamage
     val criticalPower: Double
     val isCritical: Boolean
 
-    fun generatePackets(): List<DamagePacket>
+    fun buildDamageBundle(): DamageBundle
 }
 
 /**
@@ -39,18 +40,16 @@ class DefaultDamageMetadata(
 ) : DamageMetadata {
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
-
-    override fun generatePackets(): List<DamagePacket> {
-        return listOf(
-            DamagePacket(
-                ElementRegistry.DEFAULT,
-                damageValue,
-                damageValue,
-                0.0,
-                0.0,
-                0.0
-            )
-        )
+    override fun buildDamageBundle(): DamageBundle {
+        return damageBundle {
+            single(ElementRegistry.DEFAULT) {
+                min { damageValue }
+                max { damageValue }
+                rate { 0.0 }
+                defensePenetration { 0.0 }
+                defensePenetrationRate { 0.0 }
+            }
+        }
     }
 }
 
@@ -67,17 +66,16 @@ class VanillaDamageMetadata(
 ) : DamageMetadata {
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
-    override fun generatePackets(): List<DamagePacket> {
-        return listOf(
-            DamagePacket(
-                element,
-                damageValue,
-                damageValue,
-                0.0,
-                defensePenetration,
-                defensePenetrationRate
-            )
-        )
+    override fun buildDamageBundle(): DamageBundle {
+        return damageBundle {
+            single(ElementRegistry.DEFAULT) {
+                min { damageValue }
+                max { damageValue }
+                rate { 0.0 }
+                defensePenetration { defensePenetration }
+                defensePenetrationRate { defensePenetrationRate }
+            }
+        }
     }
 }
 
@@ -91,31 +89,25 @@ class PlayerMeleeAttackMetadata(
     val user: User<Player>,
     private val isSweep: Boolean,
 ) : DamageMetadata {
-    override val damageValue: Double = packets.sumOf { it.packetDamage }
-    override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
-    override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
-    override fun generatePackets(): List<DamagePacket> {
-        val attributeMap = user.attributeMap
-        if (isSweep) {
-            val list = mutableListOf<DamagePacket>()
-            for (it in ElementRegistry.INSTANCES.values) {
-                list.add(
-                    DamagePacket(
-                        it,
-                        1.0,
-                        1.0,
-                        attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE)
-                                + attributeMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE),
-                        attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
-                                + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION),
-                        attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
-                                + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
-                    )
-                )
+    private val attributeMap = user.attributeMap
+    override val criticalPower: Double = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+    override val isCritical: Boolean = Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+
+    override fun buildDamageBundle(): DamageBundle {
+        return if (isSweep) {
+            damageBundle(attributeMap) {
+                every {
+                    min(1.0)
+                    max(1.0)
+                    rate { standard() }
+                    defensePenetration { standard() }
+                    defensePenetrationRate { standard() }
+                }
             }
-            return list
         } else {
-            return generatePackets0(attributeMap)
+            damageBundle(attributeMap) {
+                every { standard() }
+            }
         }
     }
 }
@@ -128,11 +120,12 @@ class EntityMeleeAttackMetadata(
     entity: LivingEntity,
 ) : DamageMetadata {
     private val entityAttributeMap = EntityAttributeAccessor.getAttributeMap(entity)
-    override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
-    override fun generatePackets(): List<DamagePacket> {
-        return generatePackets0(entityAttributeMap)
+    override fun buildDamageBundle(): DamageBundle {
+        return damageBundle(entityAttributeMap) {
+            every { standard() }
+        }
     }
 }
 
@@ -152,26 +145,34 @@ class PlayerProjectileDamageMetadata(
     val itemStack: ItemStack,
     private val force: Float,
 ) : ProjectileDamageMetadata {
-    override val damageValue: Double = packets.sumOf { it.packetDamage }
-    override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
-    override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+    private val attributeMap = user.attributeMap
+    override val criticalPower: Double = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+    override val isCritical: Boolean = Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
 
-    override fun generatePackets(): List<DamagePacket> {
-        val attributeMap = user.attributeMap
-        when (projectileType) {
+    private fun buildBowDamageBundle(): DamageBundle{
+        return damageBundle(attributeMap) {
+            every {
+                standard()
+                min { force * standard() }
+                max { force * standard() }
+            }
+        }
+    }
+
+    override fun buildDamageBundle(): DamageBundle {
+        when(projectileType){
             ProjectileType.ARROWS -> {
-                var isCustomArrow = true
                 // 如果玩家射出的箭矢
                 // 不是nekoStack，则为原版箭矢
-                val nekoStack = itemStack.tryNekoStack ?: return generatePackets0(attributeMap)
+                val nekoStack = itemStack.tryNekoStack ?: return buildBowDamageBundle()
 
                 // 没有ARROW组件，视为原版箭矢，理论上不应该出现这种情况
                 if (!nekoStack.components.has(ItemComponentTypes.ARROW)) {
-                    return generatePackets0(attributeMap)
+                    return buildBowDamageBundle()
                 }
 
                 // 没有CELLS组件，视为原版箭矢
-                val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return generatePackets0(attributeMap)
+                val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return buildBowDamageBundle()
 
                 // 将箭矢上的属性加到玩家身上
                 val attributeModifiers = cells.collectAttributeModifiers(nekoStack, true)
@@ -179,35 +180,21 @@ class PlayerProjectileDamageMetadata(
                     attributeMap.getInstance(attribute)?.addModifier(modifier)
                 }
 
-                // 生成伤害包，注意箭矢的伤害与拉弓的力度有关
-                val damagePackets = mutableListOf<DamagePacket>()
-                for (it in ElementRegistry.INSTANCES.values) {
-                    damagePackets.add(
-                        DamagePacket(
-                            it,
-                            force * (attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)),
-                            force * (attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)),
-                            attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE),
-                            attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION),
-                            attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
-                                    + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
-                        )
-                    )
-                }
+                // 生成伤害包
+                val damageBundle = buildBowDamageBundle()
 
                 // 生成完伤害包以后移除掉附加的属性
                 attributeModifiers.forEach { attribute, modifier ->
                     attributeMap.getInstance(attribute)?.removeModifier(modifier)
                 }
-                return damagePackets
+
+                return damageBundle
             }
 
             ProjectileType.TRIDENT -> {
-                return generatePackets0(attributeMap)
+                return damageBundle(attributeMap){
+                    every { standard() }
+                }
             }
         }
     }
@@ -222,11 +209,12 @@ class EntityProjectileDamageMetadata(
     val entity: LivingEntity,
 ) : ProjectileDamageMetadata {
     private val entityAttributeMap = EntityAttributeAccessor.getAttributeMap(entity)
-    override val damageValue: Double = packets.sumOf { it.packetDamage }
     override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
-    override fun generatePackets(): List<DamagePacket> {
-        return generatePackets0(entityAttributeMap)
+    override fun buildDamageBundle(): DamageBundle {
+        return damageBundle(entityAttributeMap){
+            every { standard() }
+        }
     }
 }
 
@@ -238,11 +226,10 @@ class CustomDamageMetadata(
     override val criticalPower: Double,
     override val isCritical: Boolean,
     val knockback: Boolean,
-    private val customDamagePackets: List<DamagePacket>,
+    private val customDamageBundle: DamageBundle
 ) : DamageMetadata {
-    override val damageValue: Double = packets.sumOf { it.packetDamage }
-    override fun generatePackets(): List<DamagePacket> {
-        return customDamagePackets
+    override fun buildDamageBundle(): DamageBundle {
+        return customDamageBundle
     }
 }
 
@@ -263,29 +250,4 @@ enum class ProjectileType {
      * 三叉戟
      */
     TRIDENT
-}
-
-/**
- * 用于简化重复的代码
- */
-private fun generatePackets0(attributeMap: AttributeMap): List<DamagePacket> {
-    val list = mutableListOf<DamagePacket>()
-    for (it in ElementRegistry.INSTANCES.values) {
-        list.add(
-            DamagePacket(
-                it,
-                attributeMap.getValue(Attributes.byElement(it).MIN_ATTACK_DAMAGE)
-                        + attributeMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE),
-                attributeMap.getValue(Attributes.byElement(it).MAX_ATTACK_DAMAGE)
-                        + attributeMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE),
-                attributeMap.getValue(Attributes.byElement(it).ATTACK_DAMAGE_RATE)
-                        + attributeMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE),
-                attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION)
-                        + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION),
-                attributeMap.getValue(Attributes.byElement(it).DEFENSE_PENETRATION_RATE)
-                        + attributeMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
-            )
-        )
-    }
-    return list
 }
