@@ -17,9 +17,25 @@ import kotlin.random.Random
  * 其实现类实例化时，攻击伤害值以及各种信息就已经确定了
  */
 sealed interface DamageMetadata {
+    /**
+     * 伤害捆绑包
+     * 包含了这次伤害中各元素伤害值的信息
+     */
     val damageBundle: DamageBundle
+
+    /**
+     * 攻击阶段伤害的终值
+     */
     val damageValue: Double
+
+    /**
+     * 这次伤害暴击时暴击倍率的值
+     */
     val criticalPower: Double
+
+    /**
+     * 这次伤害是否暴击
+     */
     val isCritical: Boolean
 }
 
