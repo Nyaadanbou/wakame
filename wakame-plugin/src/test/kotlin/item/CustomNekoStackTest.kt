@@ -839,7 +839,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            val core = it.core
+            val core = it.wrapped
             assertNotNull(core)
             assertEquals(Key.key("attribute:attack_damage_rate"), core.key)
         }

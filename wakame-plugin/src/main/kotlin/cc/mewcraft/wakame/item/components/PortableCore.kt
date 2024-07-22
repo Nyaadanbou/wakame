@@ -33,8 +33,8 @@ data class PortableCore(
     /**
      * 便携式核心所包含的核心.
      */
-    val core: Core,
-) : Examinable, TooltipProvider.Single {
+    override val wrapped: Core,
+) : PortableObject<Core>, Examinable, TooltipProvider.Single {
     companion object : ItemComponentBridge<PortableCore>, ItemComponentMeta {
         override fun codec(id: String): ItemComponentType<PortableCore> {
             return Codec(id)
@@ -54,7 +54,7 @@ data class PortableCore(
         if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return core.provideTooltipLore()
+        return wrapped.provideTooltipLore()
     }
 
     private data class Codec(override val id: String) : ItemComponentType<PortableCore> {
@@ -69,7 +69,7 @@ data class PortableCore(
 
         override fun write(holder: ItemComponentHolder, value: PortableCore) {
             val tag = holder.getTagOrCreate()
-            tag.put("core", value.core.serializeAsTag())
+            tag.put("core", value.wrapped.serializeAsTag())
         }
 
         override fun remove(holder: ItemComponentHolder) {

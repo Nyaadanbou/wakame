@@ -30,8 +30,8 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 data class PortableCurse(
-    val curse: Curse,
-) : Examinable, TooltipProvider.Single {
+    override val wrapped: Curse,
+) : PortableObject<Curse>, Examinable, TooltipProvider.Single {
     companion object : ItemComponentBridge<PortableCurse>, ItemComponentMeta {
         override fun codec(id: String): ItemComponentType<PortableCurse> {
             return Codec(id)
@@ -62,7 +62,7 @@ data class PortableCurse(
 
         override fun write(holder: ItemComponentHolder, value: PortableCurse) {
             val tag = holder.getTagOrCreate()
-            tag.put(TAG_CURSE, value.curse.serializeAsTag())
+            tag.put(TAG_CURSE, value.wrapped.serializeAsTag())
         }
 
         override fun remove(holder: ItemComponentHolder) {
