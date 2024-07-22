@@ -11,3 +11,10 @@ step_distance: 0.5
 
 # 冲刺的时间
 duration: 50
+
+# 在撞到生物后是否可以继续冲刺
+can_continue_after_hit: true
+
+# 撞到生物后产生的效果
+hit_effects:
+  - "skill:buff/potion_drop"
