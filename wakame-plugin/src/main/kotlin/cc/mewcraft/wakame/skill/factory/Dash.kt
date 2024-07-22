@@ -103,6 +103,7 @@ private class DashTick(
 
         // 应用速度到玩家对象上
         player.velocity = stepVector
+        player.isSprinting = true
         if (tickCount >= STARTING_TICK && !player.hasActiveItem()) {
             return TickResult.ALL_DONE
         }
@@ -115,6 +116,8 @@ private class DashTick(
     }
 
     override fun tickBackswing(tickCount: Long): TickResult {
+        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer
+        player?.isSprinting = false
         val damageCount = context[DASH_DAMAGE_KEY] ?: return TickResult.ALL_DONE
         context[SkillContextKey.NEKO_STACK]?.let {
             val components = it.components
