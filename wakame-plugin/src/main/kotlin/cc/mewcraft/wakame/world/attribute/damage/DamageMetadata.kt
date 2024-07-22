@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
-import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
 import cc.mewcraft.wakame.element.Element
@@ -43,11 +42,11 @@ class DefaultDamageMetadata(
     override fun buildDamageBundle(): DamageBundle {
         return damageBundle {
             single(ElementRegistry.DEFAULT) {
-                min { damageValue }
-                max { damageValue }
-                rate { 0.0 }
-                defensePenetration { 0.0 }
-                defensePenetrationRate { 0.0 }
+                min(damageValue)
+                max(damageValue)
+                rate(0.0)
+                defensePenetration(0.0)
+                defensePenetrationRate(0.0)
             }
         }
     }
@@ -69,11 +68,11 @@ class VanillaDamageMetadata(
     override fun buildDamageBundle(): DamageBundle {
         return damageBundle {
             single(ElementRegistry.DEFAULT) {
-                min { damageValue }
-                max { damageValue }
-                rate { 0.0 }
-                defensePenetration { defensePenetration }
-                defensePenetrationRate { defensePenetrationRate }
+                min(damageValue)
+                max(damageValue)
+                rate(0.0)
+                defensePenetration(defensePenetration)
+                defensePenetrationRate(defensePenetrationRate)
             }
         }
     }
@@ -149,7 +148,7 @@ class PlayerProjectileDamageMetadata(
     override val criticalPower: Double = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
 
-    private fun buildBowDamageBundle(): DamageBundle{
+    private fun buildBowDamageBundle(): DamageBundle {
         return damageBundle(attributeMap) {
             every {
                 standard()
@@ -160,7 +159,7 @@ class PlayerProjectileDamageMetadata(
     }
 
     override fun buildDamageBundle(): DamageBundle {
-        when(projectileType){
+        when (projectileType) {
             ProjectileType.ARROWS -> {
                 // 如果玩家射出的箭矢
                 // 不是nekoStack，则为原版箭矢
@@ -192,7 +191,7 @@ class PlayerProjectileDamageMetadata(
             }
 
             ProjectileType.TRIDENT -> {
-                return damageBundle(attributeMap){
+                return damageBundle(attributeMap) {
                     every { standard() }
                 }
             }
@@ -212,7 +211,7 @@ class EntityProjectileDamageMetadata(
     override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
     override val isCritical: Boolean = Random.nextDouble() < entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
     override fun buildDamageBundle(): DamageBundle {
-        return damageBundle(entityAttributeMap){
+        return damageBundle(entityAttributeMap) {
             every { standard() }
         }
     }
