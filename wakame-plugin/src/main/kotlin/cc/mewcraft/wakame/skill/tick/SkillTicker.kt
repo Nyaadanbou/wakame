@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.tick.AlwaysTickable
 import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.Server
-import java.util.UUID
 
 class SkillTicker(
     private val server: Server,
@@ -19,7 +18,7 @@ class SkillTicker(
                 player.toUser().skillState.tick()
             }
         }
-        taskId = ticker.addTick(alwaysTickable)
+        taskId = ticker.schedule(alwaysTickable)
     }
 
     override fun close() {

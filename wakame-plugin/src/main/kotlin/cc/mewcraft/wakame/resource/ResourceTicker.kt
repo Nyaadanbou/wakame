@@ -19,7 +19,7 @@ class ResourceTicker(
                 user.player.level = user.resourceMap.current(ResourceTypeRegistry.MANA)
             }
         }
-        taskId = Ticker.INSTANCE.addTick(alwaysTickable)
+        taskId = Ticker.INSTANCE.schedule(alwaysTickable)
     }
 
     override fun close() {

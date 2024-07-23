@@ -65,7 +65,7 @@ object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
 
                     val skill = context.get<Skill>("skill")
                     val castContext = SkillContext(CasterAdapter.adapt(casterPlayer), target)
-                    Ticker.INSTANCE.addTick(skill.cast(castContext))
+                    Ticker.INSTANCE.schedule(skill.cast(castContext))
                 }
             }.buildAndAdd(this)
         }
