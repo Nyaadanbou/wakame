@@ -23,8 +23,6 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.player.PlayerPickupArrowEvent
 import org.bukkit.projectiles.ProjectileSource
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.ScalarSerializer
@@ -182,7 +180,7 @@ private class ProjectileTick(
                 TickResult.CONTINUE_TICK
             }
 
-        ProjectileSupport.ticker.addTick(tickable)
+        Ticker.INSTANCE.addTick(tickable)
 
         return TickResult.ALL_DONE
     }
@@ -223,7 +221,7 @@ private class ArrowWrapper(
         val startSkillTick = projectile.effects[Trigger.START]?.get()?.cast(context)
 
         if (startSkillTick != null) {
-            ProjectileSupport.ticker.addTick(startSkillTick)
+            Ticker.INSTANCE.addTick(startSkillTick)
         }
 
         val subscriptions = buildList {
@@ -256,7 +254,7 @@ private class ArrowWrapper(
                 .handler {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
                     val tickSkillTick = projectile.effects[Trigger.TICK]?.get()?.cast(newContext) ?: return@handler
-                    ProjectileSupport.ticker.addTick(tickSkillTick)
+                    Ticker.INSTANCE.addTick(tickSkillTick)
                 },
 
             Events.subscribe(ServerTickStartEvent::class.java)
@@ -264,7 +262,7 @@ private class ArrowWrapper(
                     if (arrow.location.distance(summonLocation) > projectile.maximumDistance) {
                         val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
                         val disappearSkillTick = projectile.effects[Trigger.DISAPPEAR]?.get()?.cast(newContext) ?: return@handler
-                        ProjectileSupport.ticker.addTick(disappearSkillTick)
+                        Ticker.INSTANCE.addTick(disappearSkillTick)
                         arrow.remove()
                     }
                 }
@@ -279,7 +277,7 @@ private class ArrowWrapper(
                 if (hitEntity is LivingEntity) {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitEntity))
                     val hitEntitySkillTick = projectile.effects[Trigger.HIT_ENTITY]?.get()?.cast(newContext) ?: return@handler
-                    ProjectileSupport.ticker.addTick(hitEntitySkillTick)
+                    Ticker.INSTANCE.addTick(hitEntitySkillTick)
                 }
             })
     }
@@ -292,7 +290,7 @@ private class ArrowWrapper(
                 if (hitBlock != null) {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitBlock.location))
                     val hitBlockSkillTick = projectile.effects[Trigger.HIT_BLOCK]?.get()?.cast(newContext) ?: return@handler
-                    ProjectileSupport.ticker.addTick(hitBlockSkillTick)
+                    Ticker.INSTANCE.addTick(hitBlockSkillTick)
                 }
             })
     }
@@ -303,7 +301,7 @@ private class ArrowWrapper(
                 if (it.arrow != arrow) return@handler
                 val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(it.player))
                 val pickupSkillTick = projectile.effects[Trigger.PICK_UP]?.get()?.cast(newContext) ?: return@handler
-                ProjectileSupport.ticker.addTick(pickupSkillTick)
+                Ticker.INSTANCE.addTick(pickupSkillTick)
             })
     }
 }
@@ -316,8 +314,4 @@ internal object ProjectileTriggerSerializer : ScalarSerializer<Trigger>(typeToke
     override fun serialize(item: Trigger, typeSupported: Predicate<Class<*>>): Any {
         throw UnsupportedOperationException()
     }
-}
-
-private object ProjectileSupport : KoinComponent {
-    val ticker: Ticker by inject()
 }

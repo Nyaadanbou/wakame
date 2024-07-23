@@ -11,8 +11,6 @@ import com.google.common.collect.MultimapBuilder
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.*
 
 /**
@@ -156,7 +154,7 @@ class PlayerSkillMap(
 
     override fun clear() {
         skills.clear()
-        skill2Ticks.values.forEach { SkillMapSupport.ticker.stopTick(it) }
+        skill2Ticks.values.forEach { Ticker.INSTANCE.stopTick(it) }
         skill2Ticks.clear()
     }
 
@@ -170,17 +168,13 @@ class PlayerSkillMap(
         }
         val user = PlayerAdapters.get<Player>().adapt(uniqueId)
         val tickable = skill.cast(SkillContext(CasterAdapter.adapt(user)))
-        skill2Ticks[skill.key] = SkillMapSupport.ticker.addTick(tickable)
+        skill2Ticks[skill.key] = Ticker.INSTANCE.addTick(tickable)
     }
 
     private fun removeSkillTick(skill: Key) {
         val tickId = skill2Ticks.remove(skill)
         if (tickId != null) {
-            SkillMapSupport.ticker.stopTick(tickId)
+            Ticker.INSTANCE.stopTick(tickId)
         }
     }
-}
-
-private object SkillMapSupport : KoinComponent {
-    val ticker: Ticker by inject()
 }

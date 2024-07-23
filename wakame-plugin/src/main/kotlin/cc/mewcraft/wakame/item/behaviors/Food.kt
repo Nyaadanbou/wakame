@@ -15,13 +15,9 @@ import cc.mewcraft.wakame.tick.Ticker
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 interface Food : ItemBehavior {
-    private object Default : Food, KoinComponent {
-        private val ticker: Ticker by inject()
-
+    private object Default : Food {
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
             if (event.isCancelled) {
                 return
@@ -31,7 +27,7 @@ interface Food : ItemBehavior {
             val food: FoodProperties = nekoStack.components.get(ItemComponentTypes.FOOD) ?: return
             val skills: List<Skill> = food.skills.map { SkillRegistry.INSTANCES[it] }
             val castContext = SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack = nekoStack)
-            skills.forEach { ticker.addTick(it.cast(castContext)) }
+            skills.forEach { Ticker.INSTANCE.addTick(it.cast(castContext)) }
         }
     }
 
