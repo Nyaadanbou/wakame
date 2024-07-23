@@ -411,7 +411,7 @@ private class VanillaAttributeInstance(
  * A mutable implementation of [AttributeInstanceSnapshot].
  */
 private class MutableAttributeInstanceSnapshot(
-    override val attribute: Attribute,
+    attribute: Attribute,
 ) : AttributeInstanceSnapshot {
     constructor(instance: WakameAttributeInstance) : this(instance.attribute) {
         delegation.replace(instance.delegation)
@@ -425,6 +425,9 @@ private class MutableAttributeInstanceSnapshot(
 
     val delegation: AttributeInstanceDelegation =
         AttributeInstanceDelegation(attribute)
+
+    override val attribute: Attribute
+        get() = delegation.attribute
 
     override fun getValue(): Double =
         delegation.getValue()
