@@ -184,7 +184,7 @@ private class PlayerAttributeMap(
             val snapshot = instance.getSnapshot()
             data.put(attribute, snapshot)
         }
-        return MutableAttributeMapSnapshot()
+        return MutableAttributeMapSnapshot(data)
     }
 
     override fun register(attribute: Attribute) {
@@ -342,7 +342,7 @@ private class EntityAttributeMap : AttributeMap {
 // 中也得转换成 WakameAttributeInstance.
 
 private class MutableAttributeMapSnapshot(
-    val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot> = Reference2ObjectOpenHashMap(),
+    val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>,
 ) : AttributeMapSnapshot {
     override fun getInstance(attribute: Attribute): AttributeInstanceSnapshot? {
         return data[attribute]
