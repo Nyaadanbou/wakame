@@ -100,7 +100,7 @@ class PlayerSkillMap(
         .arrayListValues(5)
         .build()
 
-    private val skill2Ticks: MutableMap<Key, Int> = Object2IntOpenHashMap()
+    private val skill2Ticks: Object2IntOpenHashMap<Key> = Object2IntOpenHashMap()
 
     override fun addSkill(skill: ConfiguredSkill) {
         this.skills.put(skill.trigger, skill.key)
@@ -172,9 +172,7 @@ class PlayerSkillMap(
     }
 
     private fun removeSkillTick(skill: Key) {
-        val tickId = skill2Ticks.remove(skill)
-        if (tickId != null) {
-            Ticker.INSTANCE.stopTick(tickId)
-        }
+        val tickId = skill2Ticks.removeInt(skill)
+        Ticker.INSTANCE.stopTick(tickId)
     }
 }

@@ -68,7 +68,7 @@ private data object EmptySkillContext : SkillContext {
 }
 
 private class SkillContextImpl : SkillContext {
-    private val storage: MutableMap<SkillContextKey<*>, Any> = Reference2ObjectOpenHashMap()
+    private val storage: Reference2ObjectOpenHashMap<SkillContextKey<*>, Any> = Reference2ObjectOpenHashMap()
 
     override fun <T : Any> set(key: SkillContextKey<T>, value: T?) {
         if (value == null) {

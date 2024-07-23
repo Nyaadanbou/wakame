@@ -11,7 +11,7 @@ import org.slf4j.Logger
 internal class BukkitTicker(
     private val plugin: WakamePlugin
 ) : Ticker {
-    private val tasks: MutableMap<Int, TickRunnable> = Int2ObjectOpenHashMap()
+    private val tasks: Int2ObjectOpenHashMap<TickRunnable> = Int2ObjectOpenHashMap()
 
     override fun schedule(tickable: AlwaysTickable): Int {
         return schedule(tickable as Tickable)
