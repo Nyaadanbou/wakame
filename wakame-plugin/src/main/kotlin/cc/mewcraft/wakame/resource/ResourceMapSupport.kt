@@ -4,16 +4,16 @@ import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.user.User
 
 /**
- * Creates a new [PlayerResourceMap].
+ * Creates a new [ResourceMap].
  */
-fun PlayerResourceMap(user: User<*>): PlayerResourceMap {
+fun ResourceMap(user: User<*>): ResourceMap {
     return PlayerResourceMap(user.attributeMap)
 }
 
 /**
  * A Resource Map owned by a player.
  */
-class PlayerResourceMap(
+private class PlayerResourceMap(
     private val attributeMap: AttributeMap,
 ) : ResourceMap {
     private val data: Map<ResourceType, Resource> = buildMap {
