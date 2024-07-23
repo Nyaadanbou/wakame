@@ -5,9 +5,8 @@ import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
 import me.lucko.helper.cooldown.Cooldown
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import java.util.*
+import java.util.UUID
 
 /**
  * 技能状态
@@ -41,12 +40,12 @@ sealed interface SkillState<U> {
     fun clear()
 }
 
-fun PlayerSkillState(user: User<Player>): PlayerSkillState {
+fun SkillState(user: User<Player>): SkillState<Player> {
     return PlayerSkillState(user.uniqueId)
 }
 
-class PlayerSkillState(
-    private val uniqueId: UUID
+private class PlayerSkillState(
+    private val uniqueId: UUID,
 ) : SkillState<Player> {
     companion object {
         private val COOLDOWN_TRIGGERS: List<SingleTrigger> =
