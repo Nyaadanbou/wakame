@@ -194,7 +194,7 @@ private class ArrowWrapper(
 ) {
     private var arrowEntity: Arrow? = null
 
-    private val parent: Caster.CompositeNode?
+    private val parent: Caster.Composite?
         get() = context[SkillContextKey.CASTER]
 
     fun summon(): Boolean {

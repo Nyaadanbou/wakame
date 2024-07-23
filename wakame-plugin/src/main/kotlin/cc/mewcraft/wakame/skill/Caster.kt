@@ -45,14 +45,14 @@ sealed interface Caster {
     /**
      * 代表一个复合施法者, 由一个父施法者和多个子施法者组成.
      */
-    interface CompositeNode : Caster {
-        val parent: CompositeNode?
+    interface Composite : Caster {
+        val parent: Composite?
 
-        val children: Set<CompositeNode>?
+        val children: Set<Composite>?
 
-        fun addChild(child: CompositeNode)
+        fun addChild(child: Composite)
 
-        fun removeChild(child: CompositeNode)
+        fun removeChild(child: Composite)
 
         fun <T : Single> value(clazz: Class<T>): T?
 
@@ -68,23 +68,23 @@ sealed interface Caster {
     }
 }
 
-fun Caster.Single.toComposite(parent: Caster.CompositeNode? = null): Caster.CompositeNode {
+fun Caster.Single.toComposite(parent: Caster.Composite? = null): Caster.Composite {
     return CasterAdapter.composite(this, parent)
 }
 
-inline fun <reified T : Caster.Single> Caster.CompositeNode.value(): T? {
+inline fun <reified T : Caster.Single> Caster.Composite.value(): T? {
     return value(T::class.java)
 }
 
-inline fun <reified T : Caster.Single> Caster.CompositeNode.valueNonNull(): T {
+inline fun <reified T : Caster.Single> Caster.Composite.valueNonNull(): T {
     return valueNonNull(T::class.java)
 }
 
-inline fun <reified T : Caster.Single> Caster.CompositeNode.root(): T? {
+inline fun <reified T : Caster.Single> Caster.Composite.root(): T? {
     return root(T::class.java)
 }
 
-inline fun <reified T : Caster.Single> Caster.CompositeNode.rootNonNull(): T {
+inline fun <reified T : Caster.Single> Caster.Composite.rootNonNull(): T {
     return rootNonNull(T::class.java)
 }
 
@@ -110,11 +110,11 @@ object CasterAdapter {
 
     fun composite(
         value: Caster,
-        parent: Caster.CompositeNode? = null,
-    ): Caster.CompositeNode {
+        parent: Caster.Composite? = null,
+    ): Caster.Composite {
         return when (value) {
-            is Caster.Single -> CompositeNodeCaster(parent, value)
-            is Caster.CompositeNode -> value
+            is Caster.Single -> CompositeCaster(parent, value)
+            is Caster.Composite -> value
         }
     }
 }
@@ -175,25 +175,25 @@ private data class SkillCaster(
     override val skillTick: SkillTick<*>
 ) : Caster.Single.Skill
 
-private class CompositeNodeCaster(
-    override var parent: Caster.CompositeNode?,
+private class CompositeCaster(
+    override var parent: Caster.Composite?,
     private val value: Caster.Single
-) : Caster.CompositeNode, Examinable {
-    override var children: MutableSet<Caster.CompositeNode>? = null
+) : Caster.Composite, Examinable {
+    override var children: MutableSet<Caster.Composite>? = null
 
-    override fun addChild(child: Caster.CompositeNode) {
+    override fun addChild(child: Caster.Composite) {
         if (children == null) {
             children = Collections.newSetFromMap(WeakHashMap(1))
         }
-        if (child is CompositeNodeCaster) {
+        if (child is CompositeCaster) {
             child.parent = this
         }
 
         children!!.add(child)
     }
 
-    override fun removeChild(child: Caster.CompositeNode) {
-        if (child is CompositeNodeCaster) {
+    override fun removeChild(child: Caster.Composite) {
+        if (child is CompositeCaster) {
             child.parent = null
         }
         children?.remove(child)
@@ -208,9 +208,9 @@ private class CompositeNodeCaster(
     }
 
     override fun <T : Caster.Single> root(clazz: Class<T>): T? {
-        var current: Caster.CompositeNode = this
+        var current: Caster.Composite = this
         while (current.parent != null) {
-            current = current.parent as Caster.CompositeNode
+            current = current.parent as Caster.Composite
         }
         return current.value(clazz)
     }

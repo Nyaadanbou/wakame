@@ -46,7 +46,7 @@ object TargetAdapter {
         }
     }
 
-    fun adapt(caster: Caster.CompositeNode): Target {
+    fun adapt(caster: Caster.Composite): Target {
         val single = caster.value<Caster.Single>()
             ?: caster.root<Caster.Single>()
             ?: throw IllegalStateException("No single caster")
