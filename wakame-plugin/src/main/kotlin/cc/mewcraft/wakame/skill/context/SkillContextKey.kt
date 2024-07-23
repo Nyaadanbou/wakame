@@ -34,7 +34,7 @@ class SkillContextKey<T : Any> private constructor(
             return instance
         }
 
-        val CASTER: SkillContextKey<Caster.CompositeNode> = create("caster")
+        val CASTER: SkillContextKey<Caster.Composite> = create("caster")
         val ITEM_STACK: SkillContextKey<ItemStack> = create("item_stack")
         val MOCHA_ENGINE: SkillContextKey<MochaEngine<*>> = create("mocha_engine")
         val NEKO_STACK: SkillContextKey<NekoStack> = create("neko_stack")

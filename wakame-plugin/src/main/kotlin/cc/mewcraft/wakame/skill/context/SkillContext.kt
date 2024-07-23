@@ -28,7 +28,7 @@ sealed interface SkillContext {
     fun <T : Any> getOrThrow(key: SkillContextKey<T>): T = get(key) ?: throw IllegalArgumentException("Key '$key' not found in skill context")
 }
 
-fun SkillContext(caster: Caster.CompositeNode, target: Target? = null, nekoStack: NekoStack? = null): SkillContext {
+fun SkillContext(caster: Caster.Composite, target: Target? = null, nekoStack: NekoStack? = null): SkillContext {
     val context = SkillContextImpl()
     with(context) {
         // 技能必须有 caster
@@ -78,7 +78,7 @@ private class SkillContextImpl : SkillContext {
 
         when (key) {
             SkillContextKey.CASTER -> {
-                caster = value as Caster.CompositeNode
+                caster = value as Caster.Composite
                 return
             }
 
@@ -127,7 +127,7 @@ private class SkillContextImpl : SkillContext {
         return storage.hashCode()
     }
 
-    var caster: Caster.CompositeNode?
+    var caster: Caster.Composite?
         get() = get(SkillContextKey.CASTER)
         set(value) {
             value ?: return
