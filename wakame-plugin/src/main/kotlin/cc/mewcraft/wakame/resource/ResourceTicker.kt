@@ -5,14 +5,10 @@ import cc.mewcraft.wakame.tick.AlwaysTickable
 import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.Server
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class ResourceTicker(
     private val server: Server
-) : Initializable, KoinComponent {
-    private val ticker: Ticker by inject()
-
+) : Initializable {
     private var taskId: Int? = null
 
     fun start() {
@@ -23,11 +19,11 @@ class ResourceTicker(
                 user.player.level = user.resourceMap.current(ResourceTypeRegistry.MANA)
             }
         }
-        taskId = ticker.addTick(alwaysTickable)
+        taskId = Ticker.INSTANCE.addTick(alwaysTickable)
     }
 
     override fun close() {
-        taskId?.let { ticker.stopTick(it) }
+        taskId?.let { Ticker.INSTANCE.stopTick(it) }
     }
 
     override fun onPreWorld() {

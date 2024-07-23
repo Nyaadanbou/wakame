@@ -8,8 +8,6 @@ import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
@@ -54,7 +52,7 @@ private class FlyDashTick(
             val casterNode = caster.toComposite()
             val newContext = SkillContext(CasterAdapter.adapt(this).toComposite(casterNode), TargetAdapter.adapt(caster))
             for (effect in skill.beforeMovingEffects) {
-                FlyDashSupport.ticker.addTick(effect.get().cast(newContext))
+                Ticker.INSTANCE.addTick(effect.get().cast(newContext))
             }
             return TickResult.CONTINUE_TICK
         }
@@ -70,8 +68,4 @@ private class FlyDashTick(
 
         return TickResult.ALL_DONE
     }
-}
-
-private object FlyDashSupport : KoinComponent {
-    val ticker: Ticker by inject()
 }

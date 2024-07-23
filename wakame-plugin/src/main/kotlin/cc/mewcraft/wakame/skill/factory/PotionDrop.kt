@@ -18,8 +18,6 @@ import org.bukkit.entity.ThrownPotion
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionType
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
@@ -59,7 +57,7 @@ private class PotionDropTick(
 ) : AbstractPlayerSkillTick<PotionDrop>(skill, context) {
     override fun tickCast(tickCount: Long): TickResult {
         val location = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
-        PotionDropSupport.ticker.addTick(PotionDropEffectTick(this, location.bukkitLocation.add(.0, 3.0, .0)))
+        Ticker.INSTANCE.addTick(PotionDropEffectTick(this, location.bukkitLocation.add(.0, 3.0, .0)))
         return TickResult.ALL_DONE
     }
 }
@@ -85,8 +83,4 @@ private class PotionDropEffectTick(
 
         return TickResult.CONTINUE_TICK
     }
-}
-
-private object PotionDropSupport : KoinComponent {
-    val ticker: Ticker by inject()
 }
