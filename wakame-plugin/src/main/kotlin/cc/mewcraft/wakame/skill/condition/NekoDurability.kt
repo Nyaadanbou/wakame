@@ -24,11 +24,11 @@ internal interface NekoDurability : SkillCondition {
 
     companion object Factory : SkillConditionFactory<NekoDurability> {
         override fun create(config: ConfigurationNode): NekoDurability {
-            return DefaultImpl(config)
+            return Impl(config)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         config: ConfigurationNode,
     ) : SkillConditionBase(config), NekoDurability {
 

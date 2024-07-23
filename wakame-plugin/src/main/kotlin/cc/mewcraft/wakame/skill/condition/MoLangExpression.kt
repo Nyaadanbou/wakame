@@ -24,11 +24,11 @@ interface MoLangExpression : SkillCondition {
 
     companion object Factory : SkillConditionFactory<MoLangExpression> {
         override fun create(config: ConfigurationNode): MoLangExpression {
-            return DefaultImpl(config)
+            return Impl(config)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         config: ConfigurationNode,
     ) : MoLangExpression, SkillConditionBase(config) {
 
