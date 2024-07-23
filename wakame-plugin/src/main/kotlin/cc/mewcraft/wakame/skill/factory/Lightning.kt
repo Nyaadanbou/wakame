@@ -49,11 +49,11 @@ interface Lightning : Skill {
         override fun create(key: Key, config: ConfigurationNode): Lightning {
             val targetType = config.node("target_type").get<TargetType>() ?: TargetType.ALL
             val damageMetadata = config.node("damage_metadata").krequire<EvaluableCustomDamageMetaData>()
-            return DefaultImpl(key, config, targetType, damageMetadata)
+            return Impl(key, config, targetType, damageMetadata)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         override val key: Key,
         config: ConfigurationNode,
         override val targetType: TargetType,

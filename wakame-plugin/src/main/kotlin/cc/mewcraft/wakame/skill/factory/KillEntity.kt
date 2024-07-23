@@ -13,11 +13,11 @@ import org.spongepowered.configurate.ConfigurationNode
 interface KillEntity : Skill {
     companion object Factory : SkillFactory<KillEntity> {
         override fun create(key: Key, config: ConfigurationNode): KillEntity {
-            return DefaultImpl(key, config)
+            return Impl(key, config)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         override val key: Key,
         config: ConfigurationNode,
     ) : KillEntity, SkillBase(key, config) {

@@ -36,11 +36,11 @@ interface Teleport : Skill {
     companion object Factory : SkillFactory<Teleport> {
         override fun create(key: Key, config: ConfigurationNode): Teleport {
             val type = config.node("teleportation").krequire<Type>()
-            return DefaultImpl(key, config, type)
+            return Impl(key, config, type)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         override val key: Key,
         config: ConfigurationNode,
         override val type: Type,

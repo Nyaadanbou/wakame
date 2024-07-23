@@ -22,11 +22,11 @@ interface RemovePotionEffect : Skill {
     companion object Factory : SkillFactory<RemovePotionEffect> {
         override fun create(key: Key, config: ConfigurationNode): RemovePotionEffect {
             val effectTypes = config.node("effect_types").get<List<PotionEffectType>>() ?: emptyList()
-            return DefaultImpl(key, config, effectTypes)
+            return Impl(key, config, effectTypes)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         override val key: Key,
         config: ConfigurationNode,
         override val effectTypes: List<PotionEffectType>,

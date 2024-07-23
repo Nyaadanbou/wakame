@@ -14,27 +14,27 @@ import org.spongepowered.configurate.kotlin.extensions.get
 interface FlyDash : Skill {
     val distance: Double
 
-    val beforeMovingEffects: List<SkillProvider>
+    val preMoveEffects: List<SkillProvider>
 
     companion object Factory : SkillFactory<FlyDash> {
         override fun create(key: Key, config: ConfigurationNode): FlyDash {
             val distance = config.node("distance").krequire<Double>()
-            val castPointEffects = config.node("before_moving_effects").get<List<SkillProvider>>() ?: emptyList()
-            return FlyDashDefaultImpl(key, config, distance, castPointEffects)
+            val castPointEffects = config.node("pre_move_effects").get<List<SkillProvider>>() ?: emptyList()
+            return Impl(key, config, distance, castPointEffects)
         }
     }
-}
 
-private class FlyDashDefaultImpl(
-    key: Key,
-    config: ConfigurationNode,
-    override val distance: Double,
-    override val beforeMovingEffects: List<SkillProvider>,
-): FlyDash, SkillBase(key, config) {
-    private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
+    private class Impl(
+        key: Key,
+        config: ConfigurationNode,
+        override val distance: Double,
+        override val preMoveEffects: List<SkillProvider>,
+    ): FlyDash, SkillBase(key, config) {
+        private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-    override fun cast(context: SkillContext): SkillTick<FlyDash> {
-        return FlyDashTick(this, context, triggerConditionGetter.forbidden, triggerConditionGetter.interrupt)
+        override fun cast(context: SkillContext): SkillTick<FlyDash> {
+            return FlyDashTick(this, context, triggerConditionGetter.forbidden, triggerConditionGetter.interrupt)
+        }
     }
 }
 
@@ -51,7 +51,7 @@ private class FlyDashTick(
         if (tickCount == 0L) {
             val casterNode = caster.toComposite()
             val newContext = SkillContext(CasterAdapter.adapt(this).toComposite(casterNode), TargetAdapter.adapt(caster))
-            for (effect in skill.beforeMovingEffects) {
+            for (effect in skill.preMoveEffects) {
                 Ticker.INSTANCE.schedule(effect.get().cast(newContext))
             }
             return TickResult.CONTINUE_TICK

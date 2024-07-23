@@ -58,11 +58,11 @@ interface Bloodrage : Skill, PassiveSkill {
             val invalidTime = config.node("invalid_time").krequire<Long>()
             val restartTime = config.node("restart_time").krequire<Long>()
             val effects = config.node("effects").krequire<List<BloodrageEffect>>()
-            return DefaultImpl(key, config, uniqueId, condition, invalidTime, restartTime, effects)
+            return Impl(key, config, uniqueId, condition, invalidTime, restartTime, effects)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         key: Key,
         config: ConfigurationNode,
         override val uniqueId: UUID,
@@ -79,7 +79,7 @@ interface Bloodrage : Skill, PassiveSkill {
 
 private class BloodrageTick(
     context: SkillContext,
-    private val bloodrage: Bloodrage
+    bloodrage: Bloodrage
 ) : AbstractSkillTick<Bloodrage>(bloodrage, context) {
     companion object {
         private val BLOODRAGE_EFFECT_TIME = SkillContextKey.create<Long>("bloodrage_effect_time")
@@ -110,10 +110,10 @@ private class BloodrageTick(
         val effects = skill.effects
         val currentTickCount = this.tickCount
 
-        val isNotOverInvalidTime = effectTime?.let { currentTickCount - it < bloodrage.invalidTime } ?: true // 效果的持续时间没有超过失效时间
-        val isOverRestartTime = lastEndTime?.let { currentTickCount - it >= bloodrage.restartTime } ?: true // 上次结束时间距离现在超过重启时间
+        val isNotOverInvalidTime = effectTime?.let { currentTickCount - it < skill.invalidTime } ?: true // 效果的持续时间没有超过失效时间
+        val isOverRestartTime = lastEndTime?.let { currentTickCount - it >= skill.restartTime } ?: true // 上次结束时间距离现在超过重启时间
 
-        if (bloodrage.condition.evaluate(engine) > 0.0 && isNotOverInvalidTime && isOverRestartTime) {
+        if (skill.condition.evaluate(engine) > 0.0 && isNotOverInvalidTime && isOverRestartTime) {
             Bukkit.broadcast("Bloodrage start!".mini)
             if (effects.all { it.apply(skill, context) }) {
                 // 效果生效后, 记录生效时间.
@@ -131,7 +131,7 @@ private class BloodrageTick(
     }
 
     override fun whenRemove() {
-        val effects = bloodrage.effects
+        val effects = skill.effects
         effects.forEach { it.remove(skill, context) }
     }
 }

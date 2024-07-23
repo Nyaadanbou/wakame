@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.skill.condition
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.MultimapBuilder
@@ -73,7 +74,7 @@ internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionG
 
         for ((key, value) in node.childrenMap()) {
             val conditionPhase = try {
-                ConditionPhase.valueOf(key.toString().uppercase())
+                EnumLookup.lookup<ConditionPhase>(key.toString()).getOrThrow()
             } catch (e: IllegalArgumentException) {
                 throw SerializationException(node, type, "Invalid condition phase: $key")
             }
