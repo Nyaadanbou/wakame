@@ -5,11 +5,16 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.PortableObject
 import cc.mewcraft.wakame.item.components.cells.Curse
 import cc.mewcraft.wakame.reforge.modding.session.ModdingSession
+import cc.mewcraft.wakame.util.ThreadLocalCyclingCounter
 import org.bukkit.Material
+import org.bukkit.Tag
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
@@ -20,13 +25,14 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
  */
 class CurseModdingMenu(
     override val viewer: Player,
-) : ModdingMenu<Curse>() {
+) : ModdingMenu<Curse>(), KoinComponent {
+    override val logger: Logger by inject()
     override fun recipeMenuConstructor(
-        mainMenu: ModdingMenu<Curse>,
+        parentMenu: ModdingMenu<Curse>,
         viewer: Player,
         recipe: ModdingSession.Recipe<Curse>,
     ): RecipeMenu<Curse> {
-        return CurseRecipeMenu(viewer, mainMenu, recipe)
+        return CurseRecipeMenu(viewer, parentMenu, recipe)
     }
 }
 
@@ -36,10 +42,10 @@ class CurseModdingMenu(
 class CurseRecipeMenu(
     override val viewer: Player,
     override val parentMenu: ModdingMenu<Curse>,
-    override val targetRecipe: ModdingSession.Recipe<Curse>,
+    override val sessionRecipe: ModdingSession.Recipe<Curse>,
 ) : RecipeMenu<Curse>() {
     override fun viewItemConstructor(recipe: ModdingSession.Recipe<Curse>): Item {
-        return ViewItem(targetRecipe)
+        return ViewItem(this.sessionRecipe)
     }
 
     override fun getPortableObject(stack: NekoStack): PortableObject<Curse>? {
@@ -52,8 +58,18 @@ class CurseRecipeMenu(
     class ViewItem(
         private val recipe: ModdingSession.Recipe<Curse>,
     ) : AbstractItem() {
+
+        // 临时实现, 用于方便预览
+        private companion object {
+            val trims: List<Material> = Tag.ITEMS_TRIM_MATERIALS.values.toList()
+            val cyclingCounter: ThreadLocalCyclingCounter = ThreadLocalCyclingCounter(trims.size)
+            fun getTrimMaterial(): Material {
+                return trims[cyclingCounter.next()]
+            }
+        }
+
         override fun getItemProvider(): ItemProvider {
-            val stack = ItemStack(Material.DIAMOND)
+            val stack = ItemStack(getTrimMaterial())
             recipe.display.apply(stack)
             return ItemWrapper(stack)
         }

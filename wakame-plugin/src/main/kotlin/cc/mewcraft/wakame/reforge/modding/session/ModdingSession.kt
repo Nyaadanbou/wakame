@@ -1,11 +1,14 @@
 package cc.mewcraft.wakame.reforge.modding.session
 
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.components.cells.Cell
-import cc.mewcraft.wakame.reforge.modding.CellRule
+import cc.mewcraft.wakame.reforge.modding.config.ModdingTable
 import net.kyori.adventure.text.Component
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
+import java.util.stream.Stream
 
 /**
  * 代表一个物品定制的过程, 封装了一次定制所需要的所有状态.
@@ -15,7 +18,7 @@ import org.jetbrains.annotations.Contract
  *
  * @param T 定制的类型
  */
-interface ModdingSession<T> {
+interface ModdingSession<T> : Examinable {
     /**
      * 包含了 [ModdingSession] 实例的构造方式.
      */
@@ -23,8 +26,7 @@ interface ModdingSession<T> {
         /**
          * 从一个输入的物品栈创建一个 [ModdingSession] 实例.
          */
-        fun <T> of(inputStack: NekoStack): ModdingSession<T> {
-            TODO()
+        fun <T> of(input: NekoStack): ModdingSession<T> {
             // 1. 从配置文件中读取定制规则
             // 2. 根据规则创建 [Recipe] 实例
             // 3. 返回 [ModdingSession] 实例
@@ -32,7 +34,14 @@ interface ModdingSession<T> {
     }
 
     /**
+     * 当前使用该会话的玩家.
+     */
+    val viewer: Player
+
+    /**
      * 被定制的物品, 也就是玩家放入定制台的物品.
+     *
+     * 当一个 [ModdingSession] 实例被创建时, [input] 就已经同时确定.
      *
      * **该对象的状态不应该由定制台以任何方式修改**; 定制台只能读取该对象的状态, 或对其克隆实例进行写入操作.
      * 这是因为当一个定制的过程被中途取消时, 玩家放入定制台的所有物品都应该被原封不动地放回到玩家的背包中.
@@ -42,13 +51,20 @@ interface ModdingSession<T> {
 
     /**
      * 被定制后的物品, 也就是 [input] 被修改后的样子.
+     *
+     * 每当玩家对定制台上的物品进行修改时 (例如放了个新的材料到词条栏里), [output] 将被实时更新.
      */
     var output: NekoStack?
 
     /**
-     * 当前所有的改动.
+     * 当前所有的修改.
      */
     val recipes: RecipeMap<T>
+
+    /**
+     * 标记玩家是否已确认要结束定制.
+     */
+    var confirmed: Boolean
 
     /**
      * 标记该会话是否被冻结.
@@ -62,8 +78,14 @@ interface ModdingSession<T> {
      */
     fun reforge(): Result
 
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("viewer", viewer.name),
+        ExaminableProperty.of("input", input),
+        ExaminableProperty.of("output", output),
+    )
+
     /**
-     * 代表一个物品定制的结果. 当玩家按下“定制”按钮后, 将产生一个 [Result].
+     * 代表一个物品定制的结果.
      */
     interface Result {
         /**
@@ -72,21 +94,6 @@ interface ModdingSession<T> {
          * 该物品是一个新对象, 不是原物品对象修改后的状态.
          */
         val modded: NekoStack
-    }
-
-    /**
-     * [Recipe] 的映射. 从词条栏 id 映射到对应的 [Recipe].
-     */
-    interface RecipeMap<T> : Iterable<Map.Entry<String, Recipe<T>>> {
-        val size: Int
-        fun get(id: String): Recipe<T>?
-        fun put(id: String, recipe: Recipe<T>)
-        fun contains(id: String): Boolean
-
-        /**
-         * 获取所有的由玩家放入输入容器的物品.
-         */
-        fun getInputItems(): List<ItemStack>
     }
 
     /**
@@ -106,14 +113,9 @@ interface ModdingSession<T> {
         val id: String
 
         /**
-         * 要修改的目标词条栏.
-         */
-        val cell: Cell
-
-        /**
          * 该定制的规则, 由配置文件指定.
          */
-        val rule: CellRule
+        val rule: ModdingTable.CellRule
 
         /**
          * 该定制在 GUI 中的样子.
@@ -139,12 +141,6 @@ interface ModdingSession<T> {
         fun test(replacement: T): TestResult
 
         /**
-         * 将 [replacement] 应用到词条栏上, 并返回一个新的 [Cell] 对象.
-         */
-        @Contract(pure = true)
-        fun apply(replacement: T): ApplyResult
-
-        /**
          * 该定制在 GUI 中的样子.
          */
         interface Display {
@@ -154,6 +150,7 @@ interface ModdingSession<T> {
             /**
              * 将该 [Display] 应用到一个物品上.
              */
+            @Contract(pure = false)
             fun apply(item: ItemStack)
         }
 
@@ -162,29 +159,29 @@ interface ModdingSession<T> {
          */
         interface TestResult {
             /**
-             * 表示输入的 [T] 可以用在 [cell] 上.
+             * 表示输入的 [T] 可以用在词条栏上.
              */
             val isSuccess: Boolean
 
             /**
-             * 表示输入的 [T] 不能用在 [cell] 上.
-             */
-            val isFailure: Boolean
-
-            /**
              * 该测试结果的文字描述.
              */
-            val reason: String // 等设计稳定后, 到时候应该换成一个枚举类
+            val resultType: String // 等设计稳定后, 到时候应该换成一个枚举类
         }
+    }
+
+    /**
+     * [Recipe] 的映射. 从词条栏 id 映射到对应的 [Recipe].
+     */
+    interface RecipeMap<T> : Iterable<Map.Entry<String, Recipe<T>>> {
+        val size: Int
+        fun get(id: String): Recipe<T>?
+        fun put(id: String, recipe: Recipe<T>)
+        fun contains(id: String): Boolean
 
         /**
-         * 一个 [Recipe] 应用到词条栏的结果.
+         * 获取所有的由玩家放入输入容器的物品.
          */
-        interface ApplyResult {
-            /**
-             * 返回*修改后*的词条栏.
-             */
-            val cell: Cell
-        }
+        fun getInputItems(): List<ItemStack>
     }
 }

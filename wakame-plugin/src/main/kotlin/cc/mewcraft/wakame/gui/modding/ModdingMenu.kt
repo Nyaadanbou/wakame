@@ -10,8 +10,6 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.ScrollGui
@@ -29,42 +27,57 @@ import xyz.xenondevs.invui.window.type.context.setTitle
 /**
  * 定制台的主菜单, 也是定制台玩家界面的代码入口.
  *
+ * 按照整体设计 (假设每一步都是符合要求的):
+ * - 玩家首先要将需要定制的物品放入 [inputInventory]
+ * - 之后, 主菜单中便会出现物品上每一个词条栏的*子菜单*
+ * - 在每一个关于词条栏的子菜单中
+ *    - 玩家可以看到子菜单所关联的词条栏的核心/诅咒信息
+ *    - 玩家可以将一个便携式物品放入子菜单的*输入容器*中
+ *    - 这相当于告诉系统: 我要消耗这个物品来定制这个词条栏
+ * - 主菜单的 [outputInventory] 会实时显示定制之后的物品
+ * - 玩家可以随时将定制后的物品从 [outputInventory] 中取出
+ * - 如果玩家取出 [outputInventory] 中的物品, 则相当于完成定制, 同时会消耗掉所有的输入容器中的物品
+ *
  * @param T 定制的类型
  */
-abstract class ModdingMenu<T> : KoinComponent {
+abstract class ModdingMenu<T> {
+    /**
+     * 日志记录器.
+     */
+    protected abstract val logger: Logger
+
     /**
      * 菜单的使用者.
      */
-    abstract val viewer: Player
+    protected abstract val viewer: Player
 
     /**
      * [RecipeMenu] 的构造函数.
      */
-    abstract fun recipeMenuConstructor(mainMenu: ModdingMenu<T>, viewer: Player, recipe: ModdingSession.Recipe<T>): RecipeMenu<T>
-
-    /**
-     * 日志记录器.
-     */
-    protected val logger: Logger by inject()
+    protected abstract fun recipeMenuConstructor(
+        parentMenu: ModdingMenu<T>,
+        viewer: Player,
+        recipe: ModdingSession.Recipe<T>,
+    ): RecipeMenu<T>
 
     /**
      * 用于输入被定制物品的容器.
      *
      * 玩家放入定制台的物品将会被放入这个容器中.
      */
-    protected val inputInventory: VirtualInventory = VirtualInventory(/* maxStackSizes = */ intArrayOf(1))
+    private val inputInventory: VirtualInventory = VirtualInventory(/* maxStackSizes = */ intArrayOf(1))
 
     /**
      * 用于输出定制后物品的容器.
      *
      * 定制后的物品将会被放入这个容器中.
      */
-    protected val outputInventory: VirtualInventory = VirtualInventory(/* maxStackSizes = */ intArrayOf(1))
+    private val outputInventory: VirtualInventory = VirtualInventory(/* maxStackSizes = */ intArrayOf(1))
 
     /**
      * 主菜单的 [Gui].
      */
-    protected val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
+    private val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
         builder.setStructure(
             ". . . x x x . . .",
             ". . . x x x . . .",
@@ -85,7 +98,7 @@ abstract class ModdingMenu<T> : KoinComponent {
     /**
      * 主菜单的 [Window].
      */
-    protected val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
+    private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
         setGui(primaryGui)
         setTitle(text("定制台").decorate(TextDecoration.BOLD))
     }
@@ -97,7 +110,7 @@ abstract class ModdingMenu<T> : KoinComponent {
      * 当玩家放入需要定制的物品到定制台时, 会创建一个 [ModdingSession],
      * 并且实例会赋值到这个属性上.
      */
-    protected var currentSession: ModdingSession<T>? = null
+    var currentSession: ModdingSession<T>? = null
 
     // 添加输入容器的 handlers
     init {
@@ -123,7 +136,7 @@ abstract class ModdingMenu<T> : KoinComponent {
 
                     // 不是有词条栏的物品 - 返回
                     if (stack.components.has(ItemComponentTypes.CELLS)) {
-                        viewer.sendPlainMessage("请放入一个有核心的物品!")
+                        viewer.sendPlainMessage("请放入一个拥有核心的物品!")
                         return@pre
                     }
 
@@ -132,17 +145,15 @@ abstract class ModdingMenu<T> : KoinComponent {
                         currentSession = it
                     }
 
-                    val recipeGuis = ArrayList<Gui>(session.recipes.size)
-                    val recipes = session.recipes
-                    recipes.forEach { (_, recipe) ->
-                        val recipeMenu = recipeMenuConstructor(this, viewer, recipe)
-                        val recipeGui = recipeMenu.createdGui
-                        recipeGuis += recipeGui
-                    }
+                    val recipeGuis = session.recipes
+                        .map { (_, recipe) ->
+                            recipeMenuConstructor(this, viewer, recipe)
+                        }
+                        .map { it.createdGui }
                     // 更新主菜单的内容
-                    primaryGui.setContent(recipeGuis)
+                    fillRecipes(recipeGuis)
                     // 设置输出容器的物品
-                    outputInventory.setItem(UpdateReason.SUPPRESSED, 0, ItemStack(Material.BARRIER).hideTooltip(true))
+                    refreshOutputInventory()
                 }
 
                 // Case 3: 玩家将物品从输入槽位取出
@@ -152,31 +163,32 @@ abstract class ModdingMenu<T> : KoinComponent {
 
                     val session = currentSession ?: run {
                         event.isCancelled = true
-                        logger.error("Modding session is null, but input item is removed. This is a bug! Current viewer: ${viewer.name}")
+                        logger.error("Modding session (viewer: ${viewer.name}) is null, but input item is being removed. This is a bug!")
                         return@pre
                     }
 
                     // 把主菜单的内容清空
-                    primaryGui.setContent(null)
+                    clearRecipes()
                     // 清空输出容器的物品
-                    outputInventory.setItem(UpdateReason.SUPPRESSED, 0, null)
+                    clearOutputSlot()
 
-                    // 输入容器中的物品已经由玩家自己拿出来了,
-                    // 因此不需要再将输入容器里的物品归还给玩家.
-                    // session.inputSnapshot.itemStack.let { viewer.inventory.addItem(it) }
+                    // 玩家把物品从输入容器中拿出来时, 我们不能直接让该操作自然的发生.
+                    // 因为输入容器中的物品可能是经过修改的, 而不是玩家物品的原始状态.
+                    // 因此这里: 清空输入容器, 然后 setItemOnCurse
+                    clearInputSlot()
+                    setItemOnCursor(session.input.handle)
 
                     // 归还定制过程中放入定制台的其他物品
                     session.recipes
                         .mapNotNull { (_, recipe) ->
-                            recipe.input
-                        }
-                        .map { nekoStack ->
-                            nekoStack.itemStack
+                            recipe.input?.handle
                         }
                         .forEach { itemStack ->
                             viewer.inventory.addItem(itemStack)
                         }
 
+                    // 冻结 session
+                    session.frozen = true
                     // 最后把 session 置为 null (让其被 GC)
                     currentSession = null
                 }
@@ -201,15 +213,37 @@ abstract class ModdingMenu<T> : KoinComponent {
 
                 // Case 2: 玩家从输出容器中取出物品
                 event.isRemove -> {
-                    currentSession?.run {
-                        logger.error("Modding session is null, but output item is removed. This is a bug!")
+                    val session = currentSession
+                    if (session == null) {
+                        event.isCancelled = true
+                        logger.error("Modding session (viewer: ${viewer.name}) is null, but output item is being removed. This is a bug!")
+                        return@pre
                     }
-                    // 当玩家从输出容器取出物品时:
-                    // - inputItemInventory 中的物品需要清空 (相当于消耗掉原始物品),
-                    inputInventory.setItemSilently(0, null)
-                    // - 所有的 RecipeGui 中的输入需要清空 (相当于消耗掉所需材料),
-                    primaryGui.setContent(null)
-                    // - 最后把 session 置为 null (让其被 GC)
+
+                    // 玩家必须点两次才能取出定制后的物品
+                    if (!session.confirmed) {
+                        event.isCancelled = true
+                        session.confirmed = true
+                        return@pre
+                    }
+
+                    // 如果玩家取出定制后的物品, 意味着定制过程即将完成.
+                    // 我们需要消耗掉所有的材料, 然后替换玩家指针上的物品.
+                    val output = session.output ?: run {
+                        event.isCancelled = true
+                        logger.error("Output item is null while player is trying to take it. This is a bug!")
+                        return@pre
+                    }
+
+                    // 将玩家指针上的物品替换为定制后的物品
+                    setItemOnCursor(output.handle)
+                    // 清空 inputInventory 中的物品 (相当于消耗掉原始物品),
+                    clearInputSlot()
+                    // 清空 RecipeGui 中输入容器的物品 (相当于消耗掉所需材料),
+                    clearRecipes()
+                    // 冻结会话
+                    session.frozen = true
+                    // 让会话被 GC
                     currentSession = null
                 }
             }
@@ -224,11 +258,12 @@ abstract class ModdingMenu<T> : KoinComponent {
         primaryWindow.addCloseHandler close@{
             // 如果当前没有会话, 则直接返回
             val session = currentSession ?: run {
+                logger.info("The window of modding menu is closed while session being null.")
                 return@close
             }
 
             // 有会话, 则将定制过程中玩家输入的物品归还给玩家
-            viewer.inventory.addItem(session.input.itemStack)
+            viewer.inventory.addItem(session.input.handle)
             viewer.inventory.addItem(*session.recipes.getInputItems().toTypedArray())
         }
         primaryWindow.addOpenHandler open@{
@@ -236,14 +271,42 @@ abstract class ModdingMenu<T> : KoinComponent {
         }
     }
 
+    private fun setItemOnCursor(stack: ItemStack) {
+        viewer.setItemOnCursor(stack)
+    }
+
+    private fun fillRecipes(guis: List<Gui>) {
+        primaryGui.setContent(guis)
+    }
+
+    private fun clearRecipes() {
+        primaryGui.setContent(null)
+    }
+
+    private fun fillInputSlot(stack: ItemStack) {
+        inputInventory.setItem(UpdateReason.SUPPRESSED, 0, stack)
+    }
+
+    private fun clearInputSlot() {
+        inputInventory.setItem(UpdateReason.SUPPRESSED, 0, null)
+    }
+
+    private fun fillOutputSlot(stack: ItemStack) {
+        outputInventory.setItem(UpdateReason.SUPPRESSED, 0, stack)
+    }
+
+    private fun clearOutputSlot() {
+        outputInventory.setItem(UpdateReason.SUPPRESSED, 0, null)
+    }
+
     /**
-     * 基于当前的所有状态, 刷新输出槽位的物品.
+     * 基于当前的所有状态, 更新输出槽位的物品.
      */
     fun refreshOutputInventory() {
         val session = currentSession ?: return
         val result = session.reforge()
         val output = result.modded
-        outputInventory.setItem(UpdateReason.SUPPRESSED, 0, output.handle)
+        fillOutputSlot(output.handle)
     }
 
     /**
