@@ -60,9 +60,6 @@ const val KIZAMI_GLOBAL_CONFIG_LOADER = "kizami_global_config_loader"
 const val RARITY_GLOBAL_CONFIG_FILE = "rarities.yml"
 const val RARITY_GLOBAL_CONFIG_LOADER = "rarity_global_config_loader"
 
-const val STATE_GLOBAL_CONFIG_FILE = "state.yml"
-const val STATE_GLOBAL_CONFIG_LOADER = "state_global_config_loader"
-
 const val LEVEL_GLOBAL_CONFIG_FILE = "levels.yml"
 const val LEVEL_GLOBAL_CONFIG_LOADER = "level_global_config_loader"
 
@@ -130,13 +127,6 @@ internal fun registryModule(): Module = module {
             registerAll(get(named(ELEMENT_SERIALIZERS)))
             registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
             registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
-            registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
-        }
-    }
-
-    single<YamlConfigurationLoader.Builder>(named(STATE_GLOBAL_CONFIG_LOADER)) {
-        buildYamlLoader {
-            registerAll(get(named(ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS)))
             registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
         }
     }
