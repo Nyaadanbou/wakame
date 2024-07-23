@@ -21,7 +21,7 @@ class AttributeSupplier
 internal constructor(
     private val prototypes: Map<Attribute, AttributeInstance>,
 ) {
-    val attributes: Collection<Attribute> = prototypes.keys
+    val attributes: Set<Attribute> = prototypes.keys
 
     /**
      * Creates a new [AttributeInstance] from this supplier.
