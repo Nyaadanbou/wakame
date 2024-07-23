@@ -14,13 +14,13 @@ interface Tickable {
     fun whenRemove() {}
 }
 
-fun interface AlwaysTickable : Tickable, Runnable {
-    override var tickCount: Long
-        get() = 0
-        set(_) {}
+class AlwaysTickable(
+    private val block: () -> Unit
+): Tickable {
+    override var tickCount: Long = 0
 
     override fun tick(): TickResult {
-        run()
+        block()
         return TickResult.CONTINUE_TICK
     }
 }

@@ -22,7 +22,7 @@ sealed interface SkillContext {
         fun empty(): SkillContext = EmptySkillContext
     }
 
-    operator fun <T : Any> set(key: SkillContextKey<T>, value: T)
+    operator fun <T : Any> set(key: SkillContextKey<T>, value: T?)
     operator fun <T : Any> get(key: SkillContextKey<T>): T?
     operator fun <T : Any> contains(key: SkillContextKey<T>): Boolean
     fun <T : Any> getOrThrow(key: SkillContextKey<T>): T = get(key) ?: throw IllegalArgumentException("Key '$key' not found in skill context")
@@ -57,7 +57,7 @@ fun SkillContext(caster: Caster.Single, target: Target? = null, nekoStack: NekoS
 /* Internals */
 
 private data object EmptySkillContext : SkillContext {
-    override fun <T : Any> set(key: SkillContextKey<T>, value: T) {}
+    override fun <T : Any> set(key: SkillContextKey<T>, value: T?) {}
     override fun <T : Any> get(key: SkillContextKey<T>): T? {
         return null
     }
@@ -70,7 +70,12 @@ private data object EmptySkillContext : SkillContext {
 private class SkillContextImpl : SkillContext {
     private val storage: MutableMap<SkillContextKey<*>, Any> = Reference2ObjectOpenHashMap()
 
-    override fun <T : Any> set(key: SkillContextKey<T>, value: T) {
+    override fun <T : Any> set(key: SkillContextKey<T>, value: T?) {
+        if (value == null) {
+            storage.remove(key)
+            return
+        }
+
         when (key) {
             SkillContextKey.CASTER -> {
                 caster = value as Caster.CompositeNode

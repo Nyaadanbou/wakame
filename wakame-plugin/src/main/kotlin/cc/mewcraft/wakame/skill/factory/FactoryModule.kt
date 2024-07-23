@@ -12,6 +12,7 @@ internal fun skillFactoryModule(): Module = module {
     single<TypeSerializerCollection>(named(SKILL_FACTORY_SERIALIZERS)) {
         TypeSerializerCollection.builder()
             .register(ProjectileTriggerSerializer)
+            .kregister(BloodrageEffectSerializer)
             .kregister(TeleportTypeSerializer)
             .build()
     }
