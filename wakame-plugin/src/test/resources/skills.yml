@@ -1,3 +1,21 @@
+# 支持全局配置的技能条件
+conditions:
+  mana:
+    success_message:
+      - type: title
+        title: "<green>You successfully removed the potion effect. mana: -10"
+        subtitle: "a"
+        fade_in: 10
+        stay: 20
+        fade_out: 10
+    failure_message:
+      - type: title
+        title: "<red>You failed to remove the potion effect. no mana"
+        subtitle: "a"
+        fade_in: 10
+        stay: 20
+        fade_out: 10
+
 display:
   triggers:
     trigger:generic/left_click: "<green>Left Click"
