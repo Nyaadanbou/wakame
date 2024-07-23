@@ -26,8 +26,8 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
-@PreWorldDependency(runBefore = [ElementRegistry::class])
-@ReloadDependency(runBefore = [ElementRegistry::class])
+@PreWorldDependency(runBefore = [AttributeRegistry::class, ElementRegistry::class])
+@ReloadDependency(runBefore = [AttributeRegistry::class, ElementRegistry::class])
 object SkillRegistry : Initializable, KoinComponent {
     /* Trigger Constants */
 

@@ -98,6 +98,9 @@ object CasterAdapter {
     }
 
     fun adapt(entity: BukkitEntity): Caster.Single.Entity {
+        if (entity is BukkitPlayer) {
+            return adapt(entity)
+        }
         return EntityCaster(entity)
     }
 

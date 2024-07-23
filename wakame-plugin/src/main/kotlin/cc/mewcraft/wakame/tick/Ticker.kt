@@ -9,4 +9,8 @@ interface Ticker {
     fun addTick(skillTick: Tickable): Int
 
     fun stopTick(taskId: Int)
+
+    fun stopTick(tickable: Tickable)
+
+    operator fun contains(taskId: Int?): Boolean
 }

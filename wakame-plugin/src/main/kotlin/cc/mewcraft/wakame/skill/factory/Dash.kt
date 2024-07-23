@@ -12,9 +12,9 @@ import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
+import org.bukkit.Server
 import org.bukkit.block.Block
 import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
@@ -44,13 +44,19 @@ interface Dash : Skill {
      */
     val hitEffects: List<SkillProvider>
 
+    /**
+     * 判定的间隔.
+     */
+    val hitInterval: Long
+
     companion object Factory : SkillFactory<Dash> {
         override fun create(key: Key, config: ConfigurationNode): Dash {
             val stepDistance = config.node("step_distance").krequire<Double>()
             val duration = config.node("duration").get<Long>() ?: 50
             val canContinueAfterHit = config.node("can_continue_after_hit").get<Boolean>() ?: true
             val hitEffect = config.node("hit_effects").get<List<SkillProvider>>() ?: emptyList()
-            return DefaultImpl(key, config, stepDistance, duration, canContinueAfterHit, hitEffect)
+            val hitInterval = config.node("hit_interval").get<Long>() ?: 20
+            return DefaultImpl(key, config, stepDistance, duration, canContinueAfterHit, hitEffect, hitInterval)
         }
     }
 
@@ -60,7 +66,8 @@ interface Dash : Skill {
         override val stepDistance: Double,
         override val duration: Long,
         override val canContinueAfterHit: Boolean,
-        override val hitEffects: List<SkillProvider>
+        override val hitEffects: List<SkillProvider>,
+        override val hitInterval: Long
     ) : Dash, SkillBase(key, config) {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
@@ -79,6 +86,7 @@ private class DashTick(
 ) : AbstractPlayerSkillTick<Dash>(skill, context) {
     companion object {
         private val DASH_DAMAGE_KEY: SkillContextKey<Int> = SkillContextKey.create("dash_damage")
+        private val DASH_EFFECT_TIME: SkillContextKey<Long> = SkillContextKey.create("dash_effect_time")
     }
 
     override fun tickCast(tickCount: Long): TickResult {
@@ -151,19 +159,22 @@ private class DashTick(
         return TickResult.ALL_DONE
     }
 
-    private fun affectEntityNearby(player: Player): Boolean {
-        val entities = player.getNearbyEntities(2.0, 1.0, 2.0)
+    private fun affectEntityNearby(livingEntity: LivingEntity): Boolean {
+        val entities = livingEntity.getNearbyEntities(2.0, 1.0, 2.0)
         if (entities.isEmpty()) {
             return false
         }
         for (entity in entities) {
-            if (entity is LivingEntity) {
-                for (skillProvider in skill.hitEffects) {
-                    val effect = skillProvider.get()
-                    val caster = CasterUtils.getCaster<Caster.Single>(context)
-                    val newContext = SkillContext(CasterAdapter.adapt(this).toComposite(caster?.toComposite()), TargetAdapter.adapt(entity))
-                    DashSupport.ticker.addTick(effect.cast(newContext))
-                }
+            if (entity !is LivingEntity)
+                continue
+            if (context[DASH_EFFECT_TIME]?.let { DashSupport.server.currentTick - it < skill.hitInterval } == true)
+                continue
+
+            for (skillProvider in skill.hitEffects) {
+                val effect = skillProvider.get()
+                val newContext = SkillContext(CasterAdapter.adapt(livingEntity), TargetAdapter.adapt(entity))
+                DashSupport.ticker.addTick(effect.cast(newContext))
+                context[DASH_EFFECT_TIME] = DashSupport.server.currentTick.toLong()
             }
         }
         return true
@@ -183,4 +194,5 @@ private class DashTick(
 
 private object DashSupport : KoinComponent {
     val ticker: Ticker by inject()
+    val server: Server by inject()
 }

@@ -28,6 +28,22 @@ internal class BukkitTicker(
         val runnable = tasks.remove(taskId)
         runnable?.cancel()
     }
+
+    override fun stopTick(tickable: Tickable) {
+        val iterator = tasks.iterator()
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            if (entry.value.tick == tickable) {
+                entry.value.cancel()
+                iterator.remove()
+            }
+        }
+    }
+
+    override fun contains(taskId: Int?): Boolean {
+        if (taskId == null) return false
+        return tasks.containsKey(taskId)
+    }
 }
 
 private class TickRunnable(
