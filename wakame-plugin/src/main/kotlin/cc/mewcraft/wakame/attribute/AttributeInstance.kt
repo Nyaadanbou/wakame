@@ -136,7 +136,7 @@ object AttributeInstanceFactory {
  */
 private class AttributeInstanceDelegation(
     val attribute: Attribute,
-) : Cloneable {
+) {
     val modifiersById: Object2ObjectArrayMap<UUID, AttributeModifier> =
         Object2ObjectArrayMap()
     val modifiersByOp: SetMultimap<Operation, AttributeModifier> =
@@ -212,16 +212,6 @@ private class AttributeInstanceDelegation(
         this.modifiersByOp.clear()
         this.modifiersByOp.putAll(other.modifiersByOp)
         this.dirty = true
-    }
-
-    override fun clone(): AttributeInstanceDelegation {
-        val ret = AttributeInstanceDelegation(attribute)
-        ret.baseValue = baseValue
-        ret.modifiersById.putAll(modifiersById)
-        ret.modifiersByOp.putAll(modifiersByOp)
-        ret.dirty = dirty
-        ret.cachedValue = cachedValue
-        return ret
     }
 
     private fun calculateValue(): Double {
