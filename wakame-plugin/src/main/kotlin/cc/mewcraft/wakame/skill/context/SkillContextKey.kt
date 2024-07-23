@@ -47,6 +47,7 @@ class SkillContextKey<T : Any> private constructor(
     }
 
     override fun equals(other: Any?): Boolean {
+        if (this === other) return true
         return other is SkillContextKey<*> && other.key == key
     }
 
