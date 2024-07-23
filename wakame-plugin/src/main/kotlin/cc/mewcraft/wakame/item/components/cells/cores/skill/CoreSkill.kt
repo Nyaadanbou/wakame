@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillBinaryKeys
+import cc.mewcraft.wakame.skill.condition.ConditionTime
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
@@ -63,7 +64,7 @@ data class CoreSkill(
     override fun provideTooltipLore(): LoreLine {
         val tooltipKey = tooltipKeyProvider.get(this) ?: return LoreLine.noop()
         val tooltipText = instance.displays.tooltips
-        val resolver = instance.conditions.getResolver()
+        val resolver = instance.conditions.getResolver(ConditionTime.CAST_POINT)
         val lineText = tooltipText.mapTo(ObjectArrayList(tooltipText.size)) { miniMessage.deserialize(it, resolver) }
         return LoreLine.simple(tooltipKey, lineText)
     }
