@@ -20,11 +20,11 @@ interface VanillaDurability : SkillCondition {
 
     companion object : SkillConditionFactory<VanillaDurability> {
         override fun create(config: ConfigurationNode): VanillaDurability {
-            return DefaultImpl(config)
+            return Impl(config)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         config: ConfigurationNode,
     ) : VanillaDurability, SkillConditionBase(config) {
 

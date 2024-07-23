@@ -21,11 +21,11 @@ interface ManaCondition : SkillCondition {
 
     companion object : SkillConditionFactory<ManaCondition> {
         override fun create(config: ConfigurationNode): ManaCondition {
-            return DefaultImpl(config)
+            return Impl(config)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         config: ConfigurationNode,
     ) : ManaCondition, SkillConditionBase(config) {
 

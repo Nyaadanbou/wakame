@@ -19,7 +19,7 @@ import java.util.*
  * 一个非空的技能条件组.
  */
 internal class SkillConditionGroupImpl(
-    conditions: ImmutableMultimap<ConditionTime, SkillCondition>,
+    conditions: ImmutableMultimap<ConditionPhase, SkillCondition>,
 ) : KoinComponent, SkillConditionGroup {
     init {
         require(!conditions.isEmpty) { "Empty conditions" }
@@ -27,7 +27,7 @@ internal class SkillConditionGroupImpl(
 
     private val logger: Logger by inject()
 
-    private val children: Map<ConditionTime, PriorityQueue<SkillCondition>> = conditions.entries().groupBy(
+    private val children: Map<ConditionPhase, PriorityQueue<SkillCondition>> = conditions.entries().groupBy(
         { it.key },
         { it.value }
     ).mapValues { (_, value) ->
@@ -36,12 +36,12 @@ internal class SkillConditionGroupImpl(
         ).apply { addAll(value) }
     }
 
-    override fun getResolver(time: ConditionTime): TagResolver {
+    override fun getResolver(time: ConditionPhase): TagResolver {
         val children = this.children[time] ?: return TagResolver.empty()
         return TagResolver.resolver(children.map { it.resolver })
     }
 
-    override fun newSession(time: ConditionTime, context: SkillContext): SkillConditionSession {
+    override fun newSession(time: ConditionPhase, context: SkillContext): SkillConditionSession {
         val children = this.children[time] ?: return SkillConditionSession.alwaysSuccess()
         return SessionImpl(children.map { it.newSession(context) })
     }
@@ -74,16 +74,16 @@ internal class SkillConditionGroupImpl(
  */
 internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionGroup> {
     override fun deserialize(type: Type, node: ConfigurationNode): SkillConditionGroup {
-        val builder = MultimapBuilder.enumKeys(ConditionTime::class.java).arrayListValues().build<ConditionTime, SkillCondition>()
+        val builder = MultimapBuilder.enumKeys(ConditionPhase::class.java).arrayListValues().build<ConditionPhase, SkillCondition>()
 
         for ((key, value) in node.childrenMap()) {
-            val conditionTime = ConditionTime.valueOf(key.toString().uppercase())
+            val conditionPhase = ConditionPhase.valueOf(key.toString().uppercase())
             val conditions = value.krequire<List<ConfigurationNode>>().map { listNode ->
                 val conditionType = listNode.node("type").krequire<String>()
                 val conditionFactory = SkillRegistry.CONDITIONS[conditionType]
                 conditionFactory.create(listNode)
             }
-            builder.putAll(conditionTime, conditions)
+            builder.putAll(conditionPhase, conditions)
         }
 
         return try {

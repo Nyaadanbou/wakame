@@ -30,7 +30,7 @@ class SkillConditionResultTest : KoinTest {
     }
 
     private fun testGroup(group: SkillConditionGroup, context: SkillContext): SkillConditionSession {
-        val session = group.newSession(ConditionTime.CAST_POINT, context)
+        val session = group.newSession(ConditionPhase.CAST_POINT, context)
         if (session.isSuccess) {
             session.onSuccess(context)
         } else {
@@ -49,7 +49,7 @@ class SkillConditionResultTest : KoinTest {
         every { session.isSuccess } returns true
 
         val skillConditions = SkillConditionGroupImpl(
-            ImmutableMultimap.of(ConditionTime.CAST_POINT, mockCondition)
+            ImmutableMultimap.of(ConditionPhase.CAST_POINT, mockCondition)
         )
 
         every { mockCondition.newSession(mockContext) } returns session
@@ -72,7 +72,7 @@ class SkillConditionResultTest : KoinTest {
         every { mockCondition.newSession(mockContext) } returns session
 
         val skillConditions = SkillConditionGroupImpl(
-            ImmutableMultimap.of(ConditionTime.CAST_POINT, mockCondition)
+            ImmutableMultimap.of(ConditionPhase.CAST_POINT, mockCondition)
         )
 
         val result = testGroup(skillConditions, mockContext)

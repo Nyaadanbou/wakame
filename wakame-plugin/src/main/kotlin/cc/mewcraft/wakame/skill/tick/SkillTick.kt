@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill.tick
 
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.TriggerConditions
-import cc.mewcraft.wakame.skill.condition.ConditionTime
+import cc.mewcraft.wakame.skill.condition.ConditionPhase
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.state.SkillStateInfo
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
@@ -92,7 +92,7 @@ abstract class AbstractSkillTick<S : Skill>(
 
     protected fun checkConditions(successOperator: Boolean = true, failureOperator: Boolean = true): Boolean {
         val conditions = skill.conditions
-        val session = conditions.newSession(ConditionTime.CASTING, context)
+        val session = conditions.newSession(ConditionPhase.CASTING, context)
         if (successOperator && session.isSuccess) {
             session.onSuccess(context)
         }
