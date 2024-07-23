@@ -173,7 +173,7 @@ private class DashTick(
             for (skillProvider in skill.hitEffects) {
                 val effect = skillProvider.get()
                 val newContext = SkillContext(CasterAdapter.adapt(livingEntity), TargetAdapter.adapt(entity))
-                Ticker.INSTANCE.addTick(effect.cast(newContext))
+                Ticker.INSTANCE.schedule(effect.cast(newContext))
                 context[DASH_EFFECT_TIME] = DashSupport.server.currentTick.toLong()
             }
         }

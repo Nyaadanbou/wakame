@@ -11,9 +11,9 @@ interface Ticker {
         val INSTANCE: Ticker by inject()
     }
 
-    fun addTick(tickable: AlwaysTickable): Int
+    fun schedule(tickable: AlwaysTickable): Int
 
-    fun addTick(skillTick: Tickable): Int
+    fun schedule(skillTick: Tickable): Int
 
     fun stopTick(taskId: Int)
 

@@ -52,7 +52,7 @@ private class FlyDashTick(
             val casterNode = caster.toComposite()
             val newContext = SkillContext(CasterAdapter.adapt(this).toComposite(casterNode), TargetAdapter.adapt(caster))
             for (effect in skill.beforeMovingEffects) {
-                Ticker.INSTANCE.addTick(effect.get().cast(newContext))
+                Ticker.INSTANCE.schedule(effect.get().cast(newContext))
             }
             return TickResult.CONTINUE_TICK
         }

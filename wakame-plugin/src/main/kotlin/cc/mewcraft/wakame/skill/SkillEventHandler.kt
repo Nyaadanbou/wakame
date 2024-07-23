@@ -107,7 +107,7 @@ class SkillEventHandler(
                 val configuredSkills = cells.collectConfiguredSkills(nekoStack)
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
                 val context = SkillContext(CasterAdapter.adapt(projectile), target, nekoStack)
-                configuredSkills.values().map { it.cast(context) }.forEach { ticker.addTick(it) }
+                configuredSkills.values().map { it.cast(context) }.forEach { ticker.schedule(it) }
             }
         }
     }

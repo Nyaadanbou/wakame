@@ -168,7 +168,7 @@ class PlayerSkillMap(
         }
         val user = PlayerAdapters.get<Player>().adapt(uniqueId)
         val tickable = skill.cast(SkillContext(CasterAdapter.adapt(user)))
-        skill2Ticks[skill.key] = Ticker.INSTANCE.addTick(tickable)
+        skill2Ticks[skill.key] = Ticker.INSTANCE.schedule(tickable)
     }
 
     private fun removeSkillTick(skill: Key) {

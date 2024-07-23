@@ -27,7 +27,7 @@ interface Food : ItemBehavior {
             val food: FoodProperties = nekoStack.components.get(ItemComponentTypes.FOOD) ?: return
             val skills: List<Skill> = food.skills.map { SkillRegistry.INSTANCES[it] }
             val castContext = SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack = nekoStack)
-            skills.forEach { Ticker.INSTANCE.addTick(it.cast(castContext)) }
+            skills.forEach { Ticker.INSTANCE.schedule(it.cast(castContext)) }
         }
     }
 

@@ -57,7 +57,7 @@ private class PotionDropTick(
 ) : AbstractPlayerSkillTick<PotionDrop>(skill, context) {
     override fun tickCast(tickCount: Long): TickResult {
         val location = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
-        Ticker.INSTANCE.addTick(PotionDropEffectTick(this, location.bukkitLocation.add(.0, 3.0, .0)))
+        Ticker.INSTANCE.schedule(PotionDropEffectTick(this, location.bukkitLocation.add(.0, 3.0, .0)))
         return TickResult.ALL_DONE
     }
 }
