@@ -18,12 +18,12 @@ interface Evaluable<T : Any> {
         /**
          * 从一个字符串创建一个 [Evaluable].
          */
-        fun fromString(value: String): Evaluable<String> = StringEval(value)
+        fun parseExpression(value: String): Evaluable<String> = StringEval(value)
 
         /**
          * 从一个数字创建一个 [Evaluable].
          */
-        fun fromNumber(value: Number): Evaluable<Number> = NumberEval(value)
+        fun parseNumber(value: Number): Evaluable<Number> = NumberEval(value)
     }
 
     fun evaluate(engine: MochaEngine<*>) : Double
@@ -36,9 +36,9 @@ internal object EvaluableSerializer : SchemaSerializer<Evaluable<*>> {
         val string = node.get<String>()
         val evalNumber = string?.let { Numbers.parse(it).getOrNull() }
         if (evalNumber != null)
-            return Evaluable.fromNumber(evalNumber)
+            return Evaluable.parseNumber(evalNumber)
 
-        val evalString = string?.let { Evaluable.fromString(it) }
+        val evalString = string?.let { Evaluable.parseExpression(it) }
         return evalString ?: throw IllegalArgumentException("Cannot deserialize Evaluable from ${node.path()}")
     }
 }
