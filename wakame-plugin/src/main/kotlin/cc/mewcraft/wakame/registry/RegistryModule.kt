@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.adventure.ADVENTURE_SERIALIZERS
+import cc.mewcraft.wakame.adventure.ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS
 import cc.mewcraft.wakame.config.configurate.MaterialSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
@@ -125,7 +125,7 @@ internal fun registryModule(): Module = module {
             register(SkillSerializer)
             kregister(PotionEffectSerializer)
             kregister(TriggersConditionsSerializer)
-            registerAll(get(named(ADVENTURE_SERIALIZERS)))
+            registerAll(get(named(ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS)))
             registerAll(get(named(DAMAGE_EXTERNAL)))
             registerAll(get(named(ELEMENT_SERIALIZERS)))
             registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
@@ -136,7 +136,7 @@ internal fun registryModule(): Module = module {
 
     single<YamlConfigurationLoader.Builder>(named(STATE_GLOBAL_CONFIG_LOADER)) {
         buildYamlLoader {
-            registerAll(get(named(ADVENTURE_SERIALIZERS)))
+            registerAll(get(named(ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS)))
             registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
         }
     }
