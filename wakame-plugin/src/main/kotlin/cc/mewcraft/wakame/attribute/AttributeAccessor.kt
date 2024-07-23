@@ -21,7 +21,7 @@ sealed class AttributeAccessor<T> {
 }
 
 /**
- * Provides the access to the [PlayerAttributeMap] of all (online) players.
+ * Provides the access to the [AttributeMap] of all (online) players.
  *
  * To get the [AttributeMap] of a player, it's recommended using the
  * [PlayerAdapter] (instead of [PlayerAttributeAccessor]) to get the [User]
@@ -42,6 +42,6 @@ data object PlayerAttributeAccessor : KoinComponent, AttributeAccessor<Player>()
 data object EntityAttributeAccessor : AttributeAccessor<LivingEntity>() {
     override fun getAttributeMap(subject: LivingEntity): AttributeMap {
         // TODO add support for MythicMobs mobs
-        return EntityAttributeMap(subject)
+        return AttributeMap(subject)
     }
 }
