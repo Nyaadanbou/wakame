@@ -54,7 +54,7 @@ interface Bloodrage : Skill, PassiveSkill {
     companion object Factory : SkillFactory<Bloodrage> {
         override fun create(key: Key, config: ConfigurationNode): Bloodrage {
             val uniqueId = config.node("uuid").krequire<UUID>()
-            val condition = config.node("condition").get<Evaluable<*>>() ?: Evaluable.fromNumber(1.0)
+            val condition = config.node("condition").get<Evaluable<*>>() ?: Evaluable.parseNumber(1.0)
             val invalidTime = config.node("invalid_time").krequire<Long>()
             val restartTime = config.node("restart_time").krequire<Long>()
             val effects = config.node("effects").krequire<List<BloodrageEffect>>()
