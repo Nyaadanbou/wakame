@@ -3,15 +3,12 @@ package cc.mewcraft.wakame.skill.factory
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
-import cc.mewcraft.wakame.skill.factory.Projectile.Trigger
-import cc.mewcraft.wakame.skill.factory.Projectile.Type
 import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.tick.TickableBuilder
 import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import me.lucko.helper.Events
@@ -25,9 +22,6 @@ import org.bukkit.event.player.PlayerPickupArrowEvent
 import org.bukkit.projectiles.ProjectileSource
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.serialize.ScalarSerializer
-import java.util.function.Predicate
-import java.lang.reflect.Type as ReflectType
 
 /**
  * 代表一个弹射物.
@@ -36,49 +30,7 @@ interface Projectile : Skill {
     /**
      * 弹射物的类型.
      */
-    enum class Type {
-        ARROW,
-    }
-
-    /**
-     * 弹射物的效果触发器.
-     */
-    enum class Trigger {
-        /**
-         * 当此弹射物技能被触发时.
-         */
-        START,
-
-        /**
-         * 当此弹射物被 tick 时.
-         */
-        TICK,
-
-        /**
-         * 当此弹射物击中生物时.
-         */
-        HIT_ENTITY,
-
-        /**
-         * 当此弹射物被玩家捡起时 (仅支持原版弹射物).
-         */
-        PICK_UP,
-
-        /**
-         * 当此弹射物消失时. (特指因为超过最大距离而消失, 其他情况不处理).
-         */
-        DISAPPEAR,
-
-        /**
-         * 当此弹射物击中方块时.
-         */
-        HIT_BLOCK,
-    }
-
-    /**
-     * 弹射物的类型.
-     */
-    val type: Type
+    val type: ProjectileType
 
     /**
      * 初始位移速度.
@@ -111,19 +63,19 @@ interface Projectile : Skill {
     /**
      * 触发的效果.
      */
-    val effects: Map<Trigger, SkillProvider>
+    val effects: Map<ProjectileTrigger, SkillProvider>
 
     companion object Factory : SkillFactory<Projectile> {
         override fun create(key: Key, config: ConfigurationNode): Projectile {
-            val projectileType = config.node("projectile_type").krequire<Type>()
+            val projectileType = config.node("projectile_type").krequire<ProjectileType>()
             val initialVelocity = config.node("initial_velocity").get<Float>() ?: 2F
             val maximumDistance = config.node("maximum_distance").get<Int>() ?: 100
             val duration = config.node("duration").get<Int>() ?: 100
             val penetration = config.node("penetration").get<Int>() ?: 0
             val gravity = config.node("gravity").get<Boolean>() ?: true
-            val effects = config.node("effects").get<Map<Trigger, SkillProvider>>() ?: emptyMap()
+            val effects = config.node("effects").get<Map<ProjectileTrigger, SkillProvider>>() ?: emptyMap()
 
-            return DefaultImpl(
+            return Impl(
                 key, config,
                 type = projectileType,
                 initialVelocity = initialVelocity,
@@ -136,16 +88,16 @@ interface Projectile : Skill {
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         override val key: Key,
         config: ConfigurationNode,
-        override val type: Type,
+        override val type: ProjectileType,
         override val initialVelocity: Float,
         override val maximumDistance: Int,
         override val duration: Int,
         override val penetration: Int,
         override val gravity: Boolean,
-        override val effects: Map<Trigger, SkillProvider>,
+        override val effects: Map<ProjectileTrigger, SkillProvider>,
     ) : Projectile, SkillBase(key, config) {
 
         override fun cast(context: SkillContext): SkillTick<Projectile> {
@@ -154,9 +106,51 @@ interface Projectile : Skill {
     }
 }
 
+/**
+ * 弹射物的类型.
+ */
+enum class ProjectileType {
+    ARROW,
+}
+
+/**
+ * 弹射物的效果触发器.
+ */
+enum class ProjectileTrigger {
+    /**
+     * 当此弹射物技能被触发时.
+     */
+    START,
+
+    /**
+     * 当此弹射物被 tick 时.
+     */
+    TICK,
+
+    /**
+     * 当此弹射物击中生物时.
+     */
+    HIT_ENTITY,
+
+    /**
+     * 当此弹射物被玩家捡起时 (仅支持原版弹射物).
+     */
+    PICK_UP,
+
+    /**
+     * 当此弹射物消失时. (特指因为超过最大距离而消失, 其他情况不处理).
+     */
+    DISAPPEAR,
+
+    /**
+     * 当此弹射物击中方块时.
+     */
+    HIT_BLOCK,
+}
+
 private class ProjectileTick(
     context: SkillContext,
-    val projectile: Projectile
+    projectile: Projectile
 ) : AbstractPlayerSkillTick<Projectile>(projectile, context) {
 
     override fun tickCast(tickCount: Long): TickResult {
@@ -164,8 +158,8 @@ private class ProjectileTick(
             return TickResult.ALL_DONE
         val target = TargetUtil.getLocation(context) ?: return TickResult.INTERRUPT
         val location = target.bukkitLocation
-        val projectile = when (projectile.type) {
-            Type.ARROW -> ArrowWrapper(projectile, context, location, this)
+        val projectile = when (skill.type) {
+            ProjectileType.ARROW -> ArrowWrapper(skill, context, location, this)
         }
         if (!projectile.summon()) {
             return TickResult.INTERRUPT
@@ -173,7 +167,7 @@ private class ProjectileTick(
 
         val tickable = TickableBuilder.newBuilder()
             .execute { tc ->
-                if (tc >= this@ProjectileTick.projectile.duration) {
+                if (tc >= this@ProjectileTick.skill.duration) {
                     projectile.remove()
                     return@execute TickResult.ALL_DONE
                 }
@@ -218,7 +212,7 @@ private class ArrowWrapper(
 
         val newTickCaster = CasterAdapter.adapt(tick)
         context[SkillContextKey.CASTER] = newTickCaster.toComposite(parent)
-        val startSkillTick = projectile.effects[Trigger.START]?.get()?.cast(context)
+        val startSkillTick = projectile.effects[ProjectileTrigger.START]?.get()?.cast(context)
 
         if (startSkillTick != null) {
             Ticker.INSTANCE.schedule(startSkillTick)
@@ -253,7 +247,7 @@ private class ArrowWrapper(
             Events.subscribe(ServerTickStartEvent::class.java)
                 .handler {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
-                    val tickSkillTick = projectile.effects[Trigger.TICK]?.get()?.cast(newContext) ?: return@handler
+                    val tickSkillTick = projectile.effects[ProjectileTrigger.TICK]?.get()?.cast(newContext) ?: return@handler
                     Ticker.INSTANCE.schedule(tickSkillTick)
                 },
 
@@ -261,7 +255,7 @@ private class ArrowWrapper(
                 .handler {
                     if (arrow.location.distance(summonLocation) > projectile.maximumDistance) {
                         val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
-                        val disappearSkillTick = projectile.effects[Trigger.DISAPPEAR]?.get()?.cast(newContext) ?: return@handler
+                        val disappearSkillTick = projectile.effects[ProjectileTrigger.DISAPPEAR]?.get()?.cast(newContext) ?: return@handler
                         Ticker.INSTANCE.schedule(disappearSkillTick)
                         arrow.remove()
                     }
@@ -276,7 +270,7 @@ private class ArrowWrapper(
                 val hitEntity = it.hitEntity ?: return@handler
                 if (hitEntity is LivingEntity) {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitEntity))
-                    val hitEntitySkillTick = projectile.effects[Trigger.HIT_ENTITY]?.get()?.cast(newContext) ?: return@handler
+                    val hitEntitySkillTick = projectile.effects[ProjectileTrigger.HIT_ENTITY]?.get()?.cast(newContext) ?: return@handler
                     Ticker.INSTANCE.schedule(hitEntitySkillTick)
                 }
             })
@@ -289,7 +283,7 @@ private class ArrowWrapper(
                 val hitBlock = it.hitBlock
                 if (hitBlock != null) {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitBlock.location))
-                    val hitBlockSkillTick = projectile.effects[Trigger.HIT_BLOCK]?.get()?.cast(newContext) ?: return@handler
+                    val hitBlockSkillTick = projectile.effects[ProjectileTrigger.HIT_BLOCK]?.get()?.cast(newContext) ?: return@handler
                     Ticker.INSTANCE.schedule(hitBlockSkillTick)
                 }
             })
@@ -300,18 +294,8 @@ private class ArrowWrapper(
             .handler {
                 if (it.arrow != arrow) return@handler
                 val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(it.player))
-                val pickupSkillTick = projectile.effects[Trigger.PICK_UP]?.get()?.cast(newContext) ?: return@handler
+                val pickupSkillTick = projectile.effects[ProjectileTrigger.PICK_UP]?.get()?.cast(newContext) ?: return@handler
                 Ticker.INSTANCE.schedule(pickupSkillTick)
             })
-    }
-}
-
-internal object ProjectileTriggerSerializer : ScalarSerializer<Trigger>(typeTokenOf()) {
-    override fun deserialize(type: ReflectType, obj: Any): Trigger {
-        return Trigger.valueOf(obj.toString().uppercase())
-    }
-
-    override fun serialize(item: Trigger, typeSupported: Predicate<Class<*>>): Any {
-        throw UnsupportedOperationException()
     }
 }

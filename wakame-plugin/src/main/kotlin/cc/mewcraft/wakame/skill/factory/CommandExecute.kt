@@ -20,11 +20,11 @@ interface CommandExecute : Skill {
     companion object Factory : SkillFactory<CommandExecute> {
         override fun create(key: Key, config: ConfigurationNode): CommandExecute {
             val commands = config.node("commands").krequire<List<String>>()
-            return DefaultImpl(key, config, commands)
+            return Impl(key, config, commands)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         override val key: Key,
         config: ConfigurationNode,
         override val commands: List<String>

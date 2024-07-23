@@ -2,7 +2,7 @@ import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import org.junit.jupiter.api.Test
 
-class TriggerUtilTest {
+class ProjectileTriggerUtilTest {
 
     @Test
     fun `test generate combos`() {

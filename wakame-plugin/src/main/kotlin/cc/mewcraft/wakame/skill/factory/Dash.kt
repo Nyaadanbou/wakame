@@ -56,11 +56,11 @@ interface Dash : Skill {
             val canContinueAfterHit = config.node("can_continue_after_hit").get<Boolean>() ?: true
             val hitEffect = config.node("hit_effects").get<List<SkillProvider>>() ?: emptyList()
             val hitInterval = config.node("hit_interval").get<Long>() ?: 20
-            return DefaultImpl(key, config, stepDistance, duration, canContinueAfterHit, hitEffect, hitInterval)
+            return Impl(key, config, stepDistance, duration, canContinueAfterHit, hitEffect, hitInterval)
         }
     }
 
-    private class DefaultImpl(
+    private class Impl(
         override val key: Key,
         config: ConfigurationNode,
         override val stepDistance: Double,
@@ -108,16 +108,16 @@ private class DashTick(
         val blockInFront = nextLocation.block
         val blockBelow = nextLocation.clone().add(0.0, -1.0, 0.0).block
 
-        if (!blockInFront.isCanBeDashThrough()) {
+        if (!blockInFront.isAccessibleForDash()) {
             // 如果前方有方块，尝试向上移动一格高度
             val blockAboveFront = nextLocation.clone().add(0.0, 1.0, 0.0).block
-            if (blockAboveFront.isCanBeDashThrough() && blockInFront.location.add(0.0, 1.0, 0.0).block.isCanBeDashThrough()) {
+            if (blockAboveFront.isAccessibleForDash() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessibleForDash()) {
                 stepVector = stepVector.setY(1.0)
             } else {
                 return TickResult.ALL_DONE
             }
         } else {
-            stepVector = if (blockBelow.isCanBeDashThrough()) {
+            stepVector = if (blockBelow.isAccessibleForDash()) {
                 // 如果脚下没有方块，尝试向下移动一格高度
                 stepVector.setY(-1.0)
             } else {
@@ -180,7 +180,7 @@ private class DashTick(
         return true
     }
 
-    private fun Block.isCanBeDashThrough(): Boolean {
+    private fun Block.isAccessibleForDash(): Boolean {
         return when {
             this.type == Material.AIR -> true
             this.isReplaceable -> true
