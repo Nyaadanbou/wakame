@@ -11,9 +11,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
-import java.util.*
 
 /**
  * 一个非空的技能条件组.
@@ -27,14 +27,9 @@ internal class SkillConditionGroupImpl(
 
     private val logger: Logger by inject()
 
-    private val children: Map<ConditionPhase, PriorityQueue<SkillCondition>> = conditions.entries().groupBy(
-        { it.key },
-        { it.value }
-    ).mapValues { (_, value) ->
-        PriorityQueue(
-            Comparator.comparing(SkillCondition::priority) // 按照优先级进行排序
-        ).apply { addAll(value) }
-    }
+    private val children: Map<ConditionPhase, Collection<SkillCondition>> = conditions.entries()
+        .groupBy({ it.key }, { it.value })
+        .mapValues { (_, value) -> value.sortedWith(compareBy({ it.priority }, { it.hashCode() })) }
 
     override fun getResolver(time: ConditionPhase): TagResolver {
         val children = this.children[time] ?: return TagResolver.empty()
@@ -77,9 +72,13 @@ internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionG
         val builder = MultimapBuilder.enumKeys(ConditionPhase::class.java).arrayListValues().build<ConditionPhase, SkillCondition>()
 
         for ((key, value) in node.childrenMap()) {
-            val conditionPhase = ConditionPhase.valueOf(key.toString().uppercase())
+            val conditionPhase = try {
+                ConditionPhase.valueOf(key.toString().uppercase())
+            } catch (e: IllegalArgumentException) {
+                throw SerializationException(node, type, "Invalid condition phase: $key")
+            }
             val conditions = value.krequire<List<ConfigurationNode>>().map { listNode ->
-                val conditionType = listNode.node("type").krequire<String>()
+                val conditionType = listNode.node("type").get<String>() ?: throw SerializationException(listNode, type, "Missing condition type")
                 val conditionFactory = SkillRegistry.CONDITIONS[conditionType]
                 conditionFactory.create(listNode)
             }
