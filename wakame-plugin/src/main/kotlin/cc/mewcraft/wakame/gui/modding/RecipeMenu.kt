@@ -88,7 +88,7 @@ abstract class RecipeMenu<T>(
                     // 保存物品快照
                     recipeSession.input = stack
                     // 通知主菜单, 更新输出容器里的物品
-                    parentMenu.refreshOutputInventory()
+                    parentMenu.refreshOutput()
                     // 玩家做出了修改, 重置确认状态
                     session.confirmed = false
                 }
@@ -108,6 +108,8 @@ abstract class RecipeMenu<T>(
                     }
 
                     // 设置 itemOnCursor 为原输入
+                    // FIXME setItemOnCursor 好像没有考虑用 shift 移除物品的情况
+                    //  其他 setItemOnCursor 的地方也要重新考虑一下
                     setItemOnCursor(input.handle)
                     // 清空物品输入
                     recipeSession.input = null
