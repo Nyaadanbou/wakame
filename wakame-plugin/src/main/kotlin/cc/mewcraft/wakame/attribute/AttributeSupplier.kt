@@ -48,7 +48,7 @@ internal constructor(
         return product
     }
 
-    fun createInstance(type: Attribute): ImmutableAttributeInstance? {
+    fun createInstance(type: Attribute): IntangibleAttributeInstance? {
         val prototype = prototypes[type] ?: return null
         val product = AttributeInstanceFactory.createInstance(type)
         product.replace(prototype)
