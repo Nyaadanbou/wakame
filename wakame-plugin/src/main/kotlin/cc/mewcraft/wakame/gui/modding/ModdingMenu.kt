@@ -171,7 +171,7 @@ abstract class ModdingMenu<T> {
                     // 更新主菜单的内容
                     fillRecipes(recipeGuis)
                     // 设置输出容器的物品
-                    refreshOutputInventory()
+                    refreshOutput()
                 }
 
                 // Case 3: 玩家将物品从输入槽位取出
@@ -322,8 +322,11 @@ abstract class ModdingMenu<T> {
     /**
      * 基于当前的所有状态, 更新输出槽位的物品.
      */
-    fun refreshOutputInventory() {
-        val session = currentSession ?: return
+    fun refreshOutput() {
+        val session = currentSession ?: run {
+            logger.info("Trying to refresh output inventory while session being null.")
+            return
+        }
         val result = session.reforge()
         val output = result.modded
         fillOutputSlot(output.handle)
