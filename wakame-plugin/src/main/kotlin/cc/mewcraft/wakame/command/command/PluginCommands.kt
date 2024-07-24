@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
+import cc.mewcraft.wakame.eventbus.PluginEventBus
+import cc.mewcraft.wakame.util.ThreadType
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.Command
 import org.incendo.cloud.CommandFactory
@@ -28,7 +30,11 @@ object PluginCommands : KoinComponent, CommandFactory<CommandSender> {
                 handler { context ->
                     val sender = context.sender()
                     sender.sendPlainMessage("Calling reload event ...")
-                    NekoCommandReloadEvent().callEvent()
+                    val event = NekoCommandReloadEvent()
+                    event.callEvent()
+                    ThreadType.REMAIN.launch {
+                        PluginEventBus.get().post(event)
+                    }
                 }
             }.buildAndAdd(this)
         }
