@@ -16,8 +16,8 @@ internal fun damageModule(): Module = module {
     // 用于外部代码
     single<TypeSerializerCollection>(named(DAMAGE_EXTERNAL)) {
         TypeSerializerCollection.builder()
-            .kregister(EvaluableCustomDamageMetaDataSerializer)
-            .kregister(EvaluableElementDamagePacketSerializer)
+            .kregister(EvaluableDamageBundleSerializer)
+            .kregister(EvaluableDamagePacketSerializer)
             .build()
     }
 }
