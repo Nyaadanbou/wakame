@@ -111,6 +111,8 @@ abstract class RecipeMenu<T>(
                     setItemOnCursor(input.handle)
                     // 清空物品输入
                     recipeSession.input = null
+                    // 通知主菜单, 更新输出容器里的物品
+                    parentMenu.refreshOutput()
                     // 玩家做出了修改, 重置确认状态
                     moddingSession.confirmed = false
                 }
