@@ -1,0 +1,19 @@
+# 诅咒
+
+curses:
+  empty:
+    display_name: "没有诅咒"
+    tooltips:
+      single: "<!i>没有诅咒"
+
+  entity_kills:
+    enabled: true
+    display_name: "实体击杀"
+    tooltips:
+      single: "<!i>实体击杀: <value>"
+
+  peak_damage:
+    enabled: true
+    display_name: "最高一击"
+    tooltips:
+      single: "<!i>最高一击: <value>"

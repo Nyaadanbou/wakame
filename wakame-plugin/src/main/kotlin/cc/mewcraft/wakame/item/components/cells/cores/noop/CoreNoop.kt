@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components.cells.cores.noop
 import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreType
 import cc.mewcraft.wakame.util.toSimpleString
@@ -20,9 +21,12 @@ object CoreNoop : Core, CoreType<CoreNoop> {
     override val isNoop: Boolean = true
     override val isEmpty: Boolean = false
 
-    override fun serializeAsTag(): Tag = error("No-op core does not support this operation")
-    override fun provideTooltipLore(): LoreLine = error("No-op core does not support this operation")
+    override fun serializeAsTag(): Tag = error()
+    override fun provideTooltipName(): NameLine = error()
+    override fun provideTooltipLore(): LoreLine = error()
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(ExaminableProperty.of("key", key))
     override fun toString(): String = toSimpleString()
+
+    private fun error(): Nothing = error("No-op core does not support this operation")
 }

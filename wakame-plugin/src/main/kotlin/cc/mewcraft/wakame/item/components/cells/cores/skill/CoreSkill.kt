@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components.cells.cores.skill
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreType
@@ -54,17 +55,26 @@ data class CoreSkill(
     val trigger: Trigger,
     val variant: TriggerVariant,
 ) : Core {
-    val instance: Skill
+    val skill: Skill
         get() = SkillRegistry.INSTANCES[key]
 
     override val type: CoreType<*> = Type
     override val isNoop: Boolean = false
     override val isEmpty: Boolean = false
 
+    override fun provideTooltipName(): NameLine {
+        val skill = skill
+        val tooltipName = skill.displays.name
+        val resolver = skill.conditions.resolver
+        val component = miniMessage.deserialize(tooltipName, resolver)
+        return NameLine.simple(component)
+    }
+
     override fun provideTooltipLore(): LoreLine {
+        val skill = skill
         val tooltipKey = tooltipKeyProvider.get(this) ?: return LoreLine.noop()
-        val tooltipText = instance.displays.tooltips
-        val resolver = instance.conditions.getResolver(ConditionPhase.CAST_POINT)
+        val tooltipText = skill.displays.tooltips
+        val resolver = skill.conditions.getResolver(ConditionPhase.CAST_POINT)
         val lineText = tooltipText.mapTo(ObjectArrayList(tooltipText.size)) { miniMessage.deserialize(it, resolver) }
         return LoreLine.simple(tooltipKey, lineText)
     }
