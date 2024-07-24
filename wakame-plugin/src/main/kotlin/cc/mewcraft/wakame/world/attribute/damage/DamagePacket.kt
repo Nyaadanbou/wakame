@@ -66,7 +66,7 @@ data class DamagePacket(
         ExaminableProperty.of("max", max),
         ExaminableProperty.of("rate", rate),
         ExaminableProperty.of("defense_penetration", defensePenetration),
-        ExaminableProperty.of("defense_penetrationRate", defensePenetrationRate),
+        ExaminableProperty.of("defense_penetration_rate", defensePenetrationRate),
         ExaminableProperty.of("value", value),
         ExaminableProperty.of("packet_damage", packetDamage),
     )

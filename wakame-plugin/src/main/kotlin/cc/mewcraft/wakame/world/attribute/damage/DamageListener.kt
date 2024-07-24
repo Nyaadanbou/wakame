@@ -16,7 +16,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
 
-class DamageListener : Listener, KoinComponent {
+object DamageListener : Listener, KoinComponent {
     private val logger: Logger by inject()
 
     @EventHandler
@@ -50,7 +50,7 @@ class DamageListener : Listener, KoinComponent {
      */
     @EventHandler
     fun on(event: ProjectileLaunchEvent) {
-        DamageManager.recordProjectileDamageMetaData(event)
+        DamageManager.recordProjectileDamageMetadata(event)
     }
 
     /**
@@ -59,7 +59,7 @@ class DamageListener : Listener, KoinComponent {
      */
     @EventHandler
     fun on(event: EntityShootBowEvent) {
-        DamageManager.recordProjectileDamageMetaData(event)
+        DamageManager.recordProjectileDamageMetadata(event)
     }
 
     /**
@@ -73,7 +73,7 @@ class DamageListener : Listener, KoinComponent {
         when (val projectile = event.entity) {
             // 弹射物是箭矢（普通箭、光灵箭、药水箭）、三叉戟
             is AbstractArrow -> {
-                DamageManager.removeProjectileDamageMetaData(projectile.uniqueId)
+                DamageManager.removeProjectileDamageMetadata(projectile.uniqueId)
             }
 
             // TODO 可能还会有其他需要wakame属性系统处理的弹射物
@@ -86,11 +86,11 @@ class DamageListener : Listener, KoinComponent {
     @EventHandler
     fun on(event: EntityKnockbackEvent) {
         val uuid = event.entity.uniqueId
-        val customDamageMetaData = DamageManager.findCustomDamageMetaData(uuid) ?: return
+        val customDamageMetaData = DamageManager.findCustomDamageMetadata(uuid) ?: return
         if (!customDamageMetaData.knockback) {
             event.isCancelled = true
         }
-        DamageManager.removeCustomDamageMetaData(uuid)
+        DamageManager.removeCustomDamageMetadata(uuid)
     }
 
 //    @EventHandler

@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
+import cc.mewcraft.wakame.attribute.IntangibleAttributeMaps
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
-import org.bukkit.Bukkit
 import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
@@ -21,7 +21,7 @@ object DamageManager {
         // 先检查是不是自定义伤害
         // 若是，则直接返回自定义伤害信息
         val uuid = event.entity.uniqueId
-        val customDamageMetaData = findCustomDamageMetaData(uuid)
+        val customDamageMetaData = findCustomDamageMetadata(uuid)
         if (customDamageMetaData != null) {
             return customDamageMetaData
         }
@@ -35,29 +35,17 @@ object DamageManager {
                     val itemStack = damager.inventory.itemInMainHand
                     // 玩家手中的物品是Attack
                     if (itemStack.tryNekoStack?.behaviors?.has(ItemBehaviorTypes.ATTACK) == true) {
-                        return when (event.cause) {
+                        when (event.cause) {
                             DamageCause.ENTITY_ATTACK -> {
-                                PlayerMeleeAttackMetadata(damager.toUser(), false)
+                                return PlayerMeleeAttackMetadata(damager.toUser(), false)
                             }
 
                             DamageCause.ENTITY_SWEEP_ATTACK -> {
-                                PlayerMeleeAttackMetadata(damager.toUser(), true)
+                                return PlayerMeleeAttackMetadata(damager.toUser(), true)
                             }
 
-                            /**
-                             * 纯原版的情况下，理论上玩家能够产生的伤害类型只有：
-                             * ENTITY_ATTACK
-                             * ENTITY_SWEEP_ATTACK
-                             * MAGIC
-                             * 其他伤害类型均视为原版伤害
-                             */
-                            else -> {
-                                DefaultDamageMetadata(event.damage)
-                            }
+                            else -> {}
                         }
-                        // 玩家手中的物品不是Attack，甚至不是Neko
-                    } else {
-                        return DefaultDamageMetadata(event.damage)
                     }
                 }
 
@@ -67,18 +55,44 @@ object DamageManager {
                 }
 
                 // 造成伤害的是弹射物
-                // 查找是否存在记录，若不存在，按照默认伤害处理
+                // 查找是否存在记录，若不存在，对箭矢和三叉戟进行特殊处理
+                // 其他弹射物按照默认伤害处理
                 is Projectile -> {
-                    return findProjectileDamageMetaData(damager.uniqueId) ?: DefaultDamageMetadata(event.damage)
+                    val projectileDamageMetadata = findProjectileDamageMetadata(damager.uniqueId)
+                    if (projectileDamageMetadata != null) return projectileDamageMetadata
+                    when (damager) {
+                        is Arrow -> {
+                            return DefaultArrowDamageMetadata(
+                                damager,
+                                if (damager.shooter is BlockProjectileSource) IntangibleAttributeMaps.DISPENSER else IntangibleAttributeMaps.ARROW
+                            )
+                        }
+
+                        is SpectralArrow -> {
+                            return DefaultArrowDamageMetadata(
+                                damager,
+                                if (damager.shooter is BlockProjectileSource) IntangibleAttributeMaps.DISPENSER else IntangibleAttributeMaps.ARROW
+                            )
+                        }
+
+                        is Trident -> {
+                            return DefaultTridentDamageMetadata(damager, IntangibleAttributeMaps.TRIDENT)
+                        }
+                    }
                 }
             }
-            // 如果造成伤害的实体不是LivingEntity也不是弹射物
-            // 这种情况理论上不应该存在，若出现，按照默认伤害处理
-            return DefaultDamageMetadata(event.damage)
         }
-        // 如果伤害没有攻击者，视为原版伤害
-        // TODO 对一些原版伤害进行修饰，比如加强溺水伤害
-        return DefaultDamageMetadata(event.damage)
+
+        /*
+        如果：
+         - 伤害没有攻击者
+         - 玩家使用无Attack行为物品甚至非neko物品攻击
+         - 伤害攻击者非玩家、living实体、弹射物
+         - 伤害攻击者是弹射物，但没有记录，也不是箭矢和三叉戟
+        则视为原版伤害，使用原版伤害映射
+        */
+        val damageMapping = VanillaDamageMappings.get(event.damageSource.damageType)
+        return VanillaDamageMetadata(event.damage, damageMapping.element, damageMapping.defensePenetration, damageMapping.defensePenetrationRate)
     }
 
     fun generateDefenseMetaData(event: EntityDamageEvent): DefenseMetadata {
@@ -97,102 +111,99 @@ object DamageManager {
         }
     }
 
+    private val projectileDamageMetadataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, ProjectileDamageMetadata>()
+
     /**
      * 弹射物生成时，其伤害信息就应该确定了
      * 只记录需要wakame属性系统处理的伤害信息
+     * 如玩家的风弹、鸡蛋、雪球、末影珍珠等弹射物的伤害信息不会被记录，将会使用 [VanillaDamageMetadata]
      * 伤害信息不存在时，弹射物伤害将按原版处理
+     *
      * 伤害信息过期的情况如下：
      * 超过有效期（60秒）
      * 弹射物击中方块
      */
-    private val projectileDamageMetaDataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, ProjectileDamageMetadata>()
-
-    fun recordProjectileDamageMetaData(event: ProjectileLaunchEvent) {
-        when (val projectile = event.entity) {
-            // 弹射物是三叉戟
-            is Trident -> {
-                when (val shooter = projectile.shooter) {
-                    is Player -> {
-                        putProjectileDamageMetaData(
+    fun recordProjectileDamageMetadata(event: ProjectileLaunchEvent) {
+        val projectile = event.entity
+        when (val shooter = projectile.shooter) {
+            //发射者是玩家时
+            is Player -> {
+                //记录三叉戟伤害信息
+                when (projectile) {
+                    is Trident -> {
+                        putProjectileDamageMetadata(
                             projectile.uniqueId,
-                            PlayerProjectileDamageMetadata(ProjectileType.TRIDENT, shooter.toUser(), projectile.itemStack, 1F)
+                            PlayerTridentDamageMetadata(shooter.toUser(), projectile)
                         )
                     }
 
-                    is LivingEntity -> {
-                        putProjectileDamageMetaData(
-                            projectile.uniqueId,
-                            EntityProjectileDamageMetadata(ProjectileType.TRIDENT, shooter)
-                        )
+                    is Arrow, is SpectralArrow -> {
+                        //玩家箭矢的伤害信息需要拉弓力度
+                        //由 #recordProjectileDamageMetadata(event: EntityShootBowEvent) 处理
                     }
                 }
             }
 
-            // 弹射物是箭矢（普通箭、光灵箭、药水箭）
-            is AbstractArrow -> {
-                when (val shooter = projectile.shooter) {
-                    is Player -> {
-                        // 玩家发射箭矢时，由EntityShootBowEvent处理
-                        // 原因是需要获取玩家拉弓的力度
-                    }
-
-                    is LivingEntity -> {
-                        putProjectileDamageMetaData(
-                            projectile.uniqueId,
-                            EntityProjectileDamageMetadata(ProjectileType.ARROWS, shooter)
-                        )
-                    }
-
-                    is BlockProjectileSource -> {
-                        // TODO 让自定义箭矢在发射器中有效
-                    }
-                }
+            //发射者是非玩家实体时
+            //非玩家实体的弹射物伤害只和其AttributeMap有关
+            is LivingEntity -> {
+                putProjectileDamageMetadata(
+                    projectile.uniqueId,
+                    EntityProjectileDamageMetadata(shooter, projectile)
+                )
             }
-
-            // TODO 可能还会有其他需要wakame属性系统处理的弹射物
         }
     }
 
-    fun recordProjectileDamageMetaData(event: EntityShootBowEvent) {
+    fun recordProjectileDamageMetadata(event: EntityShootBowEvent) {
         val entity = event.entity
         if (entity !is Player) return
 
         val projectile = event.projectile
-        if (projectile !is AbstractArrow) return
-        if (projectile is Trident) return
-
         // 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
         val force = DamageRules.calculateBowForce(72000 - entity.itemUseRemainingTime)
-        putProjectileDamageMetaData(
-            projectile.uniqueId,
-            PlayerProjectileDamageMetadata(ProjectileType.ARROWS, entity.toUser(), projectile.itemStack, force)
-        )
+        when (projectile) {
+            is Arrow -> {
+                putProjectileDamageMetadata(
+                    projectile.uniqueId,
+                    PlayerArrowDamageMetadata(entity.toUser(), projectile, force)
+                )
+            }
+
+            is SpectralArrow -> {
+                putProjectileDamageMetadata(
+                    projectile.uniqueId,
+                    PlayerArrowDamageMetadata(entity.toUser(), projectile, force)
+                )
+            }
+        }
     }
 
-    fun putProjectileDamageMetaData(uuid: UUID, projectileDamageMetaData: ProjectileDamageMetadata) {
-        projectileDamageMetaDataMap.put(uuid, projectileDamageMetaData)
+    fun putProjectileDamageMetadata(uuid: UUID, projectileDamageMetaData: ProjectileDamageMetadata) {
+        projectileDamageMetadataMap.put(uuid, projectileDamageMetaData)
     }
 
-    fun findProjectileDamageMetaData(uuid: UUID): ProjectileDamageMetadata? {
-        return projectileDamageMetaDataMap.getIfPresent(uuid)
+    fun findProjectileDamageMetadata(uuid: UUID): ProjectileDamageMetadata? {
+        return projectileDamageMetadataMap.getIfPresent(uuid)
     }
 
-    fun removeProjectileDamageMetaData(uuid: UUID) {
-        projectileDamageMetaDataMap.invalidate(uuid)
+    fun removeProjectileDamageMetadata(uuid: UUID) {
+        projectileDamageMetadataMap.invalidate(uuid)
     }
 
-    private val customDamageMetaDataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, CustomDamageMetadata>()
 
-    fun putCustomDamageMetaData(uuid: UUID, customDamageMetaData: CustomDamageMetadata) {
-        customDamageMetaDataMap.put(uuid, customDamageMetaData)
+    private val customDamageMetadataMap = Caffeine.newBuilder().softValues().expireAfterAccess(Duration.ofSeconds(60)).build<UUID, CustomDamageMetadata>()
+
+    fun putCustomDamageMetadata(uuid: UUID, customDamageMetaData: CustomDamageMetadata) {
+        customDamageMetadataMap.put(uuid, customDamageMetaData)
     }
 
-    fun findCustomDamageMetaData(uuid: UUID): CustomDamageMetadata? {
-        return customDamageMetaDataMap.getIfPresent(uuid)
+    fun findCustomDamageMetadata(uuid: UUID): CustomDamageMetadata? {
+        return customDamageMetadataMap.getIfPresent(uuid)
     }
 
-    fun removeCustomDamageMetaData(uuid: UUID) {
-        customDamageMetaDataMap.invalidate(uuid)
+    fun removeCustomDamageMetadata(uuid: UUID) {
+        customDamageMetadataMap.invalidate(uuid)
     }
 }
 
@@ -207,7 +218,7 @@ fun LivingEntity.applyCustomDamage(customDamageMetaData: CustomDamageMetadata, o
         }
     }
     val finalDamage = defenseMetaData.calculateFinalDamage(customDamageMetaData)
-    DamageManager.putCustomDamageMetaData(this.uniqueId, customDamageMetaData)
+    DamageManager.putCustomDamageMetadata(this.uniqueId, customDamageMetaData)
     this.damage(finalDamage, originEntity)
 }
 
@@ -218,7 +229,6 @@ object DamageRules {
     /**
      * 计算 单种元素 被防御后的伤害
      * 影响防御后伤害的因素：原始伤害值、防御（本元素+通用元素）、防御穿透
-     * TODO 添加从配置文件载入防御计算公式的功能
      */
     fun calculateDamageAfterDefense(
         originalDamage: Double, defense: Double, defensePenetration: Double, defensePenetrationRate: Double
@@ -229,7 +239,6 @@ object DamageRules {
 
     /**
      * 通过拉弓的时间计算拉弓的力度
-     * TODO 添加从配置文件载入防御计算公式的功能
      */
     fun calculateBowForce(useTicks: Int): Float {
         val useSeconds = useTicks / 20F

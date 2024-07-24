@@ -2,13 +2,12 @@ package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
+import cc.mewcraft.wakame.attribute.IntangibleAttributeMap
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.User
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
+import org.bukkit.entity.*
 import kotlin.random.Random
 
 /**
@@ -39,31 +38,11 @@ sealed interface DamageMetadata {
     val isCritical: Boolean
 }
 
-/**
- * 默认伤害元数据
- * 用于处理各种繁杂但一般不需要经过wakame属性系统计算的伤害
- * 如：溺水伤害，风弹、末影珍珠击中实体伤害
- * 不做任何处理，只包含伤害值这一信息，伤害元素类型为默认元素
- */
-class DefaultDamageMetadata(
-    override val damageValue: Double,
-) : DamageMetadata {
-    override val damageBundle: DamageBundle = damageBundle {
-        default {
-            min(damageValue)
-            max(damageValue)
-            rate(0.0)
-            defensePenetration(0.0)
-            defensePenetrationRate(0.0)
-        }
-    }
-    override val criticalPower: Double = 1.0
-    override val isCritical: Boolean = false
-}
 
 /**
  * 原版伤害元数据
- * 用于特定原版伤害类型加上元素和护甲穿透
+ * 默认的伤害元数据，作为缺省值存在
+ * 可用于给特定原版伤害类型加上元素和护甲穿透
  * 如：给溺水伤害加上水元素，给着火伤害加上火元素
  */
 class VanillaDamageMetadata(
@@ -73,7 +52,7 @@ class VanillaDamageMetadata(
     private val defensePenetrationRate: Double,
 ) : DamageMetadata {
     override val damageBundle: DamageBundle = damageBundle {
-        default {
+        single(element) {
             min(damageValue)
             max(damageValue)
             rate(0.0)
@@ -95,15 +74,14 @@ class PlayerMeleeAttackMetadata(
     val user: User<Player>,
     private val isSweep: Boolean
 ) : DamageMetadata {
-    private val attributeMap = user.attributeMap
     override val damageBundle: DamageBundle = buildDamageBundle()
     override val damageValue: Double = damageBundle.bundleDamage
-    override val criticalPower: Double = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
-    override val isCritical: Boolean = Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+    override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+    override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
 
     private fun buildDamageBundle(): DamageBundle {
         return if (isSweep) {
-            damageBundle(attributeMap) {
+            damageBundle(user.attributeMap) {
                 every {
                     min(1.0)
                     max(1.0)
@@ -113,7 +91,7 @@ class PlayerMeleeAttackMetadata(
                 }
             }
         } else {
-            damageBundle(attributeMap) {
+            damageBundle(user.attributeMap) {
                 every { standard() }
             }
         }
@@ -125,42 +103,40 @@ class PlayerMeleeAttackMetadata(
  * 如：僵尸近战攻击、河豚接触伤害
  */
 class EntityMeleeAttackMetadata(
-    entity: LivingEntity,
+    val entity: LivingEntity,
 ) : DamageMetadata {
-    private val entityAttributeMap = EntityAttributeAccessor.getAttributeMap(entity)
-    override val damageBundle: DamageBundle = damageBundle(entityAttributeMap) {
+    override val damageBundle: DamageBundle = damageBundle(EntityAttributeAccessor.getAttributeMap(entity)) {
         every { standard() }
     }
     override val damageValue: Double = damageBundle.bundleDamage
-    override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
-    override val isCritical: Boolean = Random.nextDouble() < entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+    override val criticalPower: Double = EntityAttributeAccessor.getAttributeMap(entity).getValue(Attributes.CRITICAL_STRIKE_POWER)
+    override val isCritical: Boolean = Random.nextDouble() < EntityAttributeAccessor.getAttributeMap(entity).getValue(Attributes.CRITICAL_STRIKE_CHANCE)
 }
 
 sealed interface ProjectileDamageMetadata : DamageMetadata {
-    val projectileType: ProjectileType
+    val projectile: Projectile
 }
 
 /**
- * 玩家使用弹射物造成伤害的元数据
- * 如：玩家射出的箭矢、三叉戟击中实体
- * 对于箭矢，除了计算玩家身上已有的属性值外，还需额外加上箭矢的属性
- * 对于三叉戟，则不需要，因为三叉戟投掷命中和直接近战击打没有区别
+ * 玩家使用弓、弩射出箭矢造成伤害的元数据
+ * 箭矢除了计算玩家身上已有的属性值外
+ * 还需额外加上箭矢的属性，并计算拉弓力度
  */
-class PlayerProjectileDamageMetadata(
-    override val projectileType: ProjectileType,
+class PlayerArrowDamageMetadata private constructor(
     val user: User<Player>,
-    val itemStack: ItemStack,
+    override val projectile: AbstractArrow,
     private val force: Float,
 ) : ProjectileDamageMetadata {
-    private val attributeMap = user.attributeMap
+    constructor(user: User<Player>, arrow: Arrow, force: Float) : this(user, arrow as AbstractArrow, force)
+    constructor(user: User<Player>, arrow: SpectralArrow, force: Float) : this(user, arrow as AbstractArrow, force)
+
     override val damageBundle: DamageBundle = buildDamageBundle()
     override val damageValue: Double = damageBundle.bundleDamage
-    override val criticalPower: Double = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
-    override val isCritical: Boolean = Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+    override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+    override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
 
-    private fun buildBowDamageBundle(): DamageBundle {
-        //AttributeMap需要实时获取
-        return damageBundle(attributeMap) {
+    private fun defaultBowArrowDamageBundle(): DamageBundle {
+        return damageBundle(user.attributeMap) {
             every {
                 standard()
                 min { force * standard() }
@@ -170,62 +146,171 @@ class PlayerProjectileDamageMetadata(
     }
 
     private fun buildDamageBundle(): DamageBundle {
-        when (projectileType) {
-            ProjectileType.ARROWS -> {
-                // 如果玩家射出的箭矢
-                // 不是nekoStack，则为原版箭矢
-                val nekoStack = itemStack.tryNekoStack ?: return buildBowDamageBundle()
+        val userAttributeMap = user.attributeMap
+        val itemStack = projectile.itemStack
+        // 如果玩家射出的箭矢
+        // 不是nekoStack，则为原版箭矢
+        val nekoStack = itemStack.tryNekoStack ?: return defaultBowArrowDamageBundle()
 
-                // 没有ARROW组件，视为原版箭矢，理论上不应该出现这种情况
-                if (!nekoStack.components.has(ItemComponentTypes.ARROW)) {
-                    return buildBowDamageBundle()
-                }
+        // 没有ARROW组件，视为原版箭矢，理论上不应该出现这种情况
+        if (!nekoStack.components.has(ItemComponentTypes.ARROW)) {
+            return defaultBowArrowDamageBundle()
+        }
 
-                // 没有CELLS组件，视为原版箭矢
-                val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return buildBowDamageBundle()
+        // 没有CELLS组件，视为原版箭矢
+        val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return defaultBowArrowDamageBundle()
 
-                // 将箭矢上的属性加到玩家身上
-                val attributeModifiers = cells.collectAttributeModifiers(nekoStack, true)
-                attributeModifiers.forEach { attribute, modifier ->
-                    attributeMap.getInstance(attribute)?.addModifier(modifier)
-                }
+        // 获取属性映射的快照，将箭矢的属性加上
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, true)
+        val attributeMapSnapshot = userAttributeMap.getSnapshot()
+        attributeModifiers.forEach { attribute, modifier ->
+            attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
+        }
 
-                // 生成伤害包
-                val damageBundle = buildBowDamageBundle()
-
-                // 生成完伤害包以后移除掉附加的属性
-                attributeModifiers.forEach { attribute, modifier ->
-                    attributeMap.getInstance(attribute)?.removeModifier(modifier)
-                }
-
-                return damageBundle
-            }
-
-            ProjectileType.TRIDENT -> {
-                return damageBundle(attributeMap) {
-                    every { standard() }
-                }
+        return damageBundle(attributeMapSnapshot) {
+            every {
+                standard()
+                min { force * standard() }
+                max { force * standard() }
             }
         }
     }
 }
 
 /**
- * 非玩家实体使用弹射物造成伤害的元数据
- * 如：骷髅射出的箭矢、溺尸射出的三叉戟
+ * 玩家投掷三叉戟造成伤害的元数据
  */
-class EntityProjectileDamageMetadata(
-    override val projectileType: ProjectileType,
-    val entity: LivingEntity,
+class PlayerTridentDamageMetadata(
+    val user: User<Player>,
+    override val projectile: Trident,
 ) : ProjectileDamageMetadata {
-    private val entityAttributeMap = EntityAttributeAccessor.getAttributeMap(entity)
-    override val damageBundle: DamageBundle = damageBundle(entityAttributeMap) {
+    override val damageBundle: DamageBundle = damageBundle(user.attributeMap) {
         every { standard() }
     }
     override val damageValue: Double = damageBundle.bundleDamage
-    override val criticalPower: Double = entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
-    override val isCritical: Boolean = Random.nextDouble() < entityAttributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+    override val criticalPower: Double = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+    override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
 }
+
+/**
+ * 非玩家实体使用弹射物造成伤害的元数据
+ * 如：骷髅射出的箭矢、溺尸射出的三叉戟
+ * 这些弹射物的伤害完全取决于发射者的属性映射
+ */
+class EntityProjectileDamageMetadata(
+    val entity: LivingEntity,
+    override val projectile: Projectile
+) : ProjectileDamageMetadata {
+    override val damageBundle: DamageBundle = damageBundle(EntityAttributeAccessor.getAttributeMap(entity)) {
+        every { standard() }
+    }
+    override val damageValue: Double = damageBundle.bundleDamage
+    override val criticalPower: Double = EntityAttributeAccessor.getAttributeMap(entity).getValue(Attributes.CRITICAL_STRIKE_POWER)
+    override val isCritical: Boolean = Random.nextDouble() < EntityAttributeAccessor.getAttributeMap(entity).getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+}
+
+/**
+ * 默认情况下箭矢造成伤害的元数据
+ * 用于处理未记录伤害的箭矢等特殊情况
+ * 如：箭矢落地后再次命中，发射器发射的箭矢命中
+ */
+class DefaultArrowDamageMetadata private constructor(
+    override val projectile: AbstractArrow,
+    intangibleAttributeMap: IntangibleAttributeMap
+) : ProjectileDamageMetadata {
+    constructor(arrow: Arrow, intangibleAttributeMap: IntangibleAttributeMap) : this(arrow as AbstractArrow, intangibleAttributeMap)
+    constructor(arrow: SpectralArrow, intangibleAttributeMap: IntangibleAttributeMap) : this(arrow as AbstractArrow, intangibleAttributeMap)
+
+    override val damageBundle: DamageBundle = buildDamageBundle(intangibleAttributeMap)
+    override val damageValue: Double = damageBundle.bundleDamage
+    override val criticalPower: Double = 1.0
+    override val isCritical: Boolean = false
+
+    private fun defaultArrowDamageBundle(): DamageBundle {
+        return damageBundle {
+            every {
+                min(1.0)
+                max(1.0)
+                rate(0.0)
+                defensePenetration(0.0)
+                defensePenetrationRate(0.0)
+            }
+        }
+    }
+
+    private fun buildDamageBundle(intangibleAttributeMap: IntangibleAttributeMap): DamageBundle {
+        val itemStack = projectile.itemStack
+        // 不是nekoStack，则为原版箭矢
+        val nekoStack = itemStack.tryNekoStack ?: return defaultArrowDamageBundle()
+
+        // 没有ARROW组件，视为原版箭矢，理论上不应该出现这种情况
+        if (!nekoStack.components.has(ItemComponentTypes.ARROW)) {
+            return defaultArrowDamageBundle()
+        }
+
+        // 没有CELLS组件，视为原版箭矢
+        val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return defaultArrowDamageBundle()
+
+        // 获取无形属性映射的快照，将箭矢的属性加上
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, true)
+        val attributeMapSnapshot = intangibleAttributeMap.getSnapshot()
+        attributeModifiers.forEach { attribute, modifier ->
+            attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
+        }
+
+        return damageBundle(attributeMapSnapshot) {
+            every { standard() }
+        }
+    }
+}
+
+/**
+ * 默认情况下三叉戟造成伤害的元数据
+ * 用于处理未记录伤害的三叉戟等特殊情况
+ * 如：三叉戟落地后再次命中（原版无此特性）
+ */
+class DefaultTridentDamageMetadata(
+    override val projectile: Trident,
+    intangibleAttributeMap: IntangibleAttributeMap
+) : ProjectileDamageMetadata {
+    override val damageBundle: DamageBundle = buildDamageBundle(intangibleAttributeMap)
+    override val damageValue: Double = damageBundle.bundleDamage
+    override val criticalPower: Double = 1.0
+    override val isCritical: Boolean = false
+
+    private fun defaultTridentDamageBundle(): DamageBundle {
+        return damageBundle {
+            every {
+                min(8.0)
+                max(8.0)
+                rate(0.0)
+                defensePenetration(0.0)
+                defensePenetrationRate(0.0)
+            }
+        }
+    }
+
+    private fun buildDamageBundle(intangibleAttributeMap: IntangibleAttributeMap): DamageBundle {
+        val itemStack = projectile.itemStack
+        // 不是nekoStack，则为原版三叉戟
+        val nekoStack = itemStack.tryNekoStack ?: return defaultTridentDamageBundle()
+
+        // 没有CELLS组件，视为原版三叉戟
+        val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return defaultTridentDamageBundle()
+
+        // 获取无形属性映射的快照，将三叉戟的属性加上
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, true)
+        val attributeMapSnapshot = intangibleAttributeMap.getSnapshot()
+        attributeModifiers.forEach { attribute, modifier ->
+            attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
+        }
+
+        return damageBundle(attributeMapSnapshot) {
+            every { standard() }
+        }
+    }
+}
+
 
 /**
  * 自定义伤害的元数据
@@ -238,23 +323,4 @@ class CustomDamageMetadata(
     override val damageBundle: DamageBundle
 ) : DamageMetadata {
     override val damageValue: Double = damageBundle.bundleDamage
-}
-
-
-/**
- * 弹射物类型
- * 包含所有会经过wakame属性系统处理的弹射物
- * 其他原版弹射物不应该在此枚举类出现，而应该由 [DamageManager] 过滤，并视为原版伤害
- * 如风弹砸生物造成的1伤害，应采用 [DefaultDamageMetadata] 而非 [ProjectileDamageMetadata]
- */
-enum class ProjectileType {
-    /**
-     * 箭矢（普通箭、光灵箭、药水箭）
-     */
-    ARROWS,
-
-    /**
-     * 三叉戟
-     */
-    TRIDENT
 }

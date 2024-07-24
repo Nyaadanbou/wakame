@@ -425,6 +425,37 @@ entity_attributes:
     parent: minecraft:monster
     values: { }
 
+
+
+
+  minecraft:all_zero:
+    parent: ~
+    values:
+      attack_damage: 0
+      attack_damage_rate: 0
+      critical_strike_chance: 0
+      critical_strike_power: 0
+      defense_penetration: 0
+      defense_penetration_rate: 0
+      universal_attack_damage: 0
+      universal_attack_damage_rate: 0
+      universal_defense_penetration: 0
+      universal_defense_penetration_rate: 0
+
+  minecraft:arrow:
+    parent: minecraft:all_zero
+    values: { }
+
+  minecraft:trident:
+    parent: minecraft:all_zero
+    values: { }
+
+  minecraft:dispenser:
+    parent: minecraft:all_zero
+    values: { }
+
+
+
 # 实体索引表（目前仅用于条件判断）
 entity_type_holders:
 
