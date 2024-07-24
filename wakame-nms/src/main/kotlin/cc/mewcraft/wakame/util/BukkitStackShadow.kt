@@ -130,7 +130,7 @@ var BukkitStack.wakameTag: CompoundShadowTag
         if (handle != null) { // CraftItemStack
             return handle.wakameTag
         } else { // strictly-Bukkit ItemStack
-            val customTag = this.backingItemMeta!!.minecraftCustomData
+            val customTag = this.backingItemMeta!!.getDirectCustomData()
             val tag = customTag.getOrPut(WAKAME_TAG_NAME, ::CompoundTag) as CompoundTag
             return tag.wrap
         }
@@ -140,7 +140,7 @@ var BukkitStack.wakameTag: CompoundShadowTag
         if (handle != null) { // CraftItemStack
             handle.wakameTag = value
         } else { // strictly-Bukkit ItemStack
-            this.backingItemMeta!!.minecraftCustomData.put(WAKAME_TAG_NAME, value.unwrap)
+            this.backingItemMeta!!.getDirectCustomData().put(WAKAME_TAG_NAME, value.unwrap)
         }
     }
 
@@ -155,7 +155,7 @@ val BukkitStack.wakameTagOrNull: CompoundShadowTag?
         return if (handle != null) { // CraftItemStack
             handle.wakameTagOrNull
         } else { // strictly-Bukkit ItemStack
-            (this.backingItemMeta?.minecraftCustomData?.get(WAKAME_TAG_NAME) as? CompoundTag)?.wrap
+            (this.backingItemMeta?.getDirectCustomData()?.get(WAKAME_TAG_NAME) as? CompoundTag)?.wrap
         }
     }
 
@@ -167,7 +167,7 @@ fun BukkitStack.removeWakameTag() {
     if (handle != null) { // CraftItemStack
         handle.getDirectCustomData()?.remove(WAKAME_TAG_NAME)
     } else { // strictly-Bukkit ItemStack
-        this.backingItemMeta?.minecraftCustomData?.remove(WAKAME_TAG_NAME)
+        this.backingItemMeta?.getDirectCustomData()?.remove(WAKAME_TAG_NAME)
     }
 }
 //</editor-fold>
@@ -199,17 +199,16 @@ private val BukkitStack.backingItemMeta: ItemMeta?
 /**
  * Access to the `minecraft:custom_data` on [ItemMeta].
  */
-private val ItemMeta.minecraftCustomData: CompoundTag
-    get() {
-        val shadow = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this)
-        val customTag = shadow.getCustomTag()
-        if (customTag === null) {
-            val newCustomTag = CompoundTag()
-            shadow.setCustomTag(newCustomTag)
-            return newCustomTag
-        }
-        return customTag
+private fun ItemMeta.getDirectCustomData(): CompoundTag {
+    val shadow = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this)
+    val customTag = shadow.getCustomTag()
+    if (customTag === null) {
+        val newCustomTag = CompoundTag()
+        shadow.setCustomTag(newCustomTag)
+        return newCustomTag
     }
+    return customTag
+}
 //</editor-fold>
 
 //<editor-fold desc="MojangStack">
@@ -220,8 +219,12 @@ private var MojangStack.wakameTag: CompoundShadowTag
         return wakameTag.wrap
     }
     set(value) {
-        val customData = this.getDirectCustomDataOrCreate()
-        customData.put(WAKAME_TAG_NAME, value.unwrap)
+        // 替换整个物品组件: minecraft:custom_data
+        // 也就是说一旦该 setter 函数被调用, 那么物品组件
+        // minecraft:custom_data 中的其他内容都会被移除.
+        val tag = CompoundTag()
+        tag.put(WAKAME_TAG_NAME, value.unwrap)
+        this.setCustomData(tag)
     }
 
 private val MojangStack.wakameTagOrNull: CompoundShadowTag?
