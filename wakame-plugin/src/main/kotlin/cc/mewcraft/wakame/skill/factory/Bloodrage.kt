@@ -11,11 +11,15 @@ import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.tick.TickResult
+import cc.mewcraft.wakame.tick.Tickable
+import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.krequire
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
@@ -84,18 +88,25 @@ private class BloodrageTick(
     companion object {
         private val BLOODRAGE_EFFECT_TIME = SkillContextKey.create<Long>("bloodrage_effect_time")
         private val BLOODRAGE_LAST_END_TIME = SkillContextKey.create<Long>("bloodrage_last_end_time")
+        private val BLOODRAGE_TASK_ID = SkillContextKey.create<Int>("bloodrage_task_id")
     }
 
-    private var lastEndTime: Long?
+    var lastEndTime: Long?
         get() = context[BLOODRAGE_LAST_END_TIME]
         set(value) {
             context[BLOODRAGE_LAST_END_TIME] = value
         }
 
-    private var effectTime: Long?
+    var effectTime: Long?
         get() = context[BLOODRAGE_EFFECT_TIME]
         set(value) {
             context[BLOODRAGE_EFFECT_TIME] = value
+        }
+
+    var taskId: Int?
+        get() = context[BLOODRAGE_TASK_ID]
+        set(value) {
+            context[BLOODRAGE_TASK_ID] = value
         }
 
     /**
@@ -107,32 +118,60 @@ private class BloodrageTick(
         if (!checkConditions())
             return TickResult.ALL_DONE
         val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
-        val effects = skill.effects
         val currentTickCount = this.tickCount
 
         val isNotOverInvalidTime = effectTime?.let { currentTickCount - it < skill.invalidTime } ?: true // 效果的持续时间没有超过失效时间
         val isOverRestartTime = lastEndTime?.let { currentTickCount - it >= skill.restartTime } ?: true // 上次结束时间距离现在超过重启时间
 
         if (skill.condition.evaluate(engine) > 0.0 && isNotOverInvalidTime && isOverRestartTime) {
-            Bukkit.broadcast("Bloodrage start!".mini)
-            if (effects.all { it.apply(skill, context) }) {
-                // 效果生效后, 记录生效时间.
-                effectTime = currentTickCount
+            val effectTick = BloodrageEffectTick(this, context)
+            // 防止重复地调度任务.
+            if (taskId in BloodrageSupport.ticker) {
+                return TickResult.CONTINUE_TICK
             }
-        } else {
-            Bukkit.broadcast("Bloodrage end!".mini)
-            effects.forEach { it.remove(skill, context) }
 
-            // 记录上次结束时间. FIXME: 在效果真的结束的时候记录.
-            lastEndTime = currentTickCount
+            taskId = BloodrageSupport.ticker.schedule(effectTick)
+        } else {
+            taskId?.let { BloodrageSupport.ticker.stopTick(it) }
         }
 
         return TickResult.CONTINUE_TICK
     }
 
     override fun whenRemove() {
+        taskId?.let { BloodrageSupport.ticker.stopTick(it) }
+    }
+}
+
+private class BloodrageEffectTick(
+    private val skillTick: BloodrageTick,
+    private val context: SkillContext
+) : Tickable {
+    override var tickCount: Long = 0
+
+    override fun tick(): TickResult {
+        if (this.tickCount >= skillTick.skill.invalidTime) {
+            return TickResult.ALL_DONE
+        }
+
+        val skill = skillTick.skill
+        val effects = skill.effects
+        if (effects.all { it.apply(skill, context) }) {
+            // 效果生效后, 记录生效时间.
+            Bukkit.broadcast("Bloodrage start!".mini)
+            skillTick.effectTime = skillTick.tickCount
+        }
+
+        return TickResult.CONTINUE_TICK
+    }
+
+    override fun whenRemove() {
+        Bukkit.broadcast("Bloodrage end!".mini)
+        val skill = skillTick.skill
         val effects = skill.effects
         effects.forEach { it.remove(skill, context) }
+        // 记录上次结束时间.
+        skillTick.lastEndTime = skillTick.tickCount
     }
 }
 
@@ -181,6 +220,10 @@ private data class AttributeBloodrageEffect(
         val effect = core.provideAttributeModifiers(bloodrage.uniqueId)
         effect.forEach { (attribute, modifier) -> user.attributeMap.getInstance(attribute)?.removeModifier(modifier) }
     }
+}
+
+private object BloodrageSupport : KoinComponent {
+    val ticker: Ticker by inject()
 }
 
 /**
