@@ -49,12 +49,6 @@ sealed interface AttributeInstance : AttributeInstanceSnapshotable {
  * 代表一个不可变的属性实例.
  */
 sealed interface ImmutableAttributeInstance : AttributeInstanceSnapshotable {
-    companion object {
-        fun of(instance: AttributeInstance): ImmutableAttributeInstance {
-            return ImmutableAttributeInstanceImpl(instance)
-        }
-    }
-
     val attribute: Attribute
     fun getValue(): Double
     fun getBaseValue(): Double
@@ -78,6 +72,7 @@ sealed interface AttributeInstanceSnapshot {
     fun removeModifier(modifier: AttributeModifier)
     fun removeModifier(uuid: UUID)
     fun removeModifiers()
+    fun toImmutable(): ImmutableAttributeInstance
 }
 
 /**
@@ -98,7 +93,7 @@ object AttributeInstanceFactory {
      * 用于创建原型, 以构建 [AttributeSupplier].
      */
     fun createPrototype(attribute: Attribute): AttributeInstance {
-        return ProtoAttributeInstance(attribute)
+        return ProtoAttributeInstance(AttributeInstanceDelegation(attribute))
     }
 
     /**
@@ -110,7 +105,7 @@ object AttributeInstanceFactory {
      * @param attribute
      */
     fun createInstance(attribute: Attribute): AttributeInstance {
-        return WakameAttributeInstance(attribute)
+        return WakameAttributeInstance(AttributeInstanceDelegation(attribute))
     }
 
     /**
@@ -126,7 +121,7 @@ object AttributeInstanceFactory {
     fun createInstance(attribute: Attribute, attributable: Attributable, registerVanilla: Boolean): AttributeInstance {
         return if (!attribute.vanilla) {
             // 是我们自己的萌芽属性, 直接创建实例即可
-            WakameAttributeInstance(attribute)
+            WakameAttributeInstance(AttributeInstanceDelegation(attribute))
         } else {
             // 关于 Attribute#vanilla 的解释:
             // 设计上, 如果这个 Attribute 是基于原版的(比如最大生命值),
@@ -135,7 +130,7 @@ object AttributeInstanceFactory {
             // 必须重定向到原版 AttributeInstance 的实例上
 
             // 从 Attributable 中获取要被封装的 BukkitAttributeInstance
-            val bukkitInst = run {
+            val handle = run {
                 val ret: BukkitAttributeInstance?
                 val bukkitAttribute = attribute.toBukkit()
                 val bukkitAttributeInstance = attributable.getAttribute(bukkitAttribute)
@@ -160,7 +155,7 @@ object AttributeInstanceFactory {
                 ret
             }
 
-            VanillaAttributeInstance(bukkitInst)
+            VanillaAttributeInstance(handle)
         }
     }
 }
@@ -174,10 +169,12 @@ object AttributeInstanceFactory {
  */
 private class AttributeInstanceDelegation(
     val attribute: Attribute,
-) {
+) : Cloneable {
     val modifiersById: Object2ObjectArrayMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
     val modifiersByOp: SetMultimap<Operation, AttributeModifier> = SetMultimapBuilder.enumKeys(Operation::class.java).hashSetValues().build()
     var dirty: Boolean = true
+    @get:JvmName("baseValue")
+    @set:JvmName("baseValue")
     var baseValue: Double = attribute.defaultValue // initially set the baseValue to the attribute.defaultValue
     var cachedValue: Double = 0.0
 
@@ -250,6 +247,15 @@ private class AttributeInstanceDelegation(
         this.dirty = true
     }
 
+    public override fun clone(): AttributeInstanceDelegation {
+        val ret = AttributeInstanceDelegation(this.attribute)
+        ret.baseValue = this.baseValue
+        ret.modifiersById.putAll(this.modifiersById)
+        ret.modifiersByOp.putAll(this.modifiersByOp)
+        ret.dirty = this.dirty
+        return ret
+    }
+
     private fun calculateValue(): Double {
         var x: Double = getBaseValue()
         getModifierOrReturnEmpty(Operation.ADD).forEach { x += it.amount }
@@ -278,16 +284,13 @@ private class AttributeInstanceDelegation(
  * [WakameAttributeInstance], and should not be stored in the world state.
  */
 private class ProtoAttributeInstance(
-    attribute: Attribute,
+    val delegation: AttributeInstanceDelegation,
 ) : AttributeInstance {
-    val delegation: AttributeInstanceDelegation = AttributeInstanceDelegation(attribute)
-
     override val attribute: Attribute
         get() = delegation.attribute
 
-    override fun getSnapshot(): AttributeInstanceSnapshot {
-        throw UnsupportedOperationException("This operation is not supported for prototype instances.")
-    }
+    override fun getSnapshot(): AttributeInstanceSnapshot =
+        AttributeInstanceSnapshotImpl(delegation.clone())
 
     override fun getValue(): Double =
         delegation.getValue()
@@ -329,16 +332,13 @@ private class ProtoAttributeInstance(
  * This class represents the concrete attribute instance in our own system.
  */
 private class WakameAttributeInstance(
-    attribute: Attribute,
+    val delegation: AttributeInstanceDelegation,
 ) : AttributeInstance {
-    val delegation: AttributeInstanceDelegation = AttributeInstanceDelegation(attribute)
-
     override val attribute: Attribute
         get() = delegation.attribute
 
-    override fun getSnapshot(): AttributeInstanceSnapshot {
-        return AttributeInstanceSnapshotImpl(this)
-    }
+    override fun getSnapshot(): AttributeInstanceSnapshot =
+        AttributeInstanceSnapshotImpl(delegation.clone())
 
     override fun getValue(): Double =
         delegation.getValue()
@@ -395,7 +395,10 @@ private class VanillaAttributeInstance(
         get() = handle.attribute.toNeko()
 
     override fun getSnapshot(): AttributeInstanceSnapshot {
-        return AttributeInstanceSnapshotImpl(this)
+        val delegation = AttributeInstanceDelegation(attribute)
+        delegation.setBaseValue(getBaseValue())
+        getModifiers().forEach { delegation.addModifier(it) }
+        return AttributeInstanceSnapshotImpl(delegation)
     }
 
     override fun getValue(): Double {
@@ -450,17 +453,8 @@ private class VanillaAttributeInstance(
 }
 
 private class ImmutableAttributeInstanceImpl(
-    attribute: Attribute,
+    val delegation: AttributeInstanceDelegation,
 ) : ImmutableAttributeInstance {
-    constructor(instance: AttributeInstance) : this(instance.attribute) {
-        delegation.setBaseValue(instance.getBaseValue())
-        for (it in instance.getModifiers()) {
-            delegation.addModifier(it)
-        }
-    }
-
-    val delegation: AttributeInstanceDelegation = AttributeInstanceDelegation(attribute)
-
     override val attribute: Attribute
         get() = delegation.attribute
 
@@ -485,30 +479,13 @@ private class ImmutableAttributeInstanceImpl(
     }
 
     override fun getSnapshot(): AttributeInstanceSnapshot {
-        return AttributeInstanceSnapshotImpl(this)
+        return AttributeInstanceSnapshotImpl(delegation.clone())
     }
 }
 
 private class AttributeInstanceSnapshotImpl(
-    attribute: Attribute,
+    val delegation: AttributeInstanceDelegation,
 ) : AttributeInstanceSnapshot {
-    constructor(instance: WakameAttributeInstance) : this(instance.attribute) {
-        delegation.replace(instance.delegation)
-    }
-
-    constructor(instance: VanillaAttributeInstance) : this(instance.attribute) {
-        delegation.setBaseValue(instance.getBaseValue())
-        for (it in instance.getModifiers()) {
-            delegation.addModifier(it)
-        }
-    }
-
-    constructor(instance: ImmutableAttributeInstanceImpl) : this(instance.attribute) {
-        delegation.replace(instance.delegation)
-    }
-
-    val delegation: AttributeInstanceDelegation = AttributeInstanceDelegation(attribute)
-
     override val attribute: Attribute
         get() = delegation.attribute
 
@@ -541,4 +518,8 @@ private class AttributeInstanceSnapshotImpl(
 
     override fun removeModifiers() =
         delegation.removeModifiers()
+
+    override fun toImmutable(): ImmutableAttributeInstance {
+        return ImmutableAttributeInstanceImpl(delegation.clone())
+    }
 }

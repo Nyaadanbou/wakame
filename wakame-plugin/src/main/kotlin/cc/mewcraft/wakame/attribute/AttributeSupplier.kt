@@ -49,11 +49,11 @@ internal constructor(
     }
 
     fun createInstance(type: Attribute): ImmutableAttributeInstance? {
-        ensureNonVanilla(type)
         val prototype = prototypes[type] ?: return null
         val product = AttributeInstanceFactory.createInstance(type)
-        product.replace(prototype) // 将实例的值替换为原型的值
-        return ImmutableAttributeInstance.of(product)
+        product.replace(prototype)
+        val snapshot = product.getSnapshot() // 创建快照
+        return snapshot.toImmutable() // 转为不可变
     }
 
     /**
@@ -69,7 +69,6 @@ internal constructor(
     }
 
     fun getValue(type: Attribute): Double {
-        ensureNonVanilla(type)
         return getDefault(type).getValue()
     }
 
@@ -86,7 +85,6 @@ internal constructor(
     }
 
     fun getBaseValue(type: Attribute): Double {
-        ensureNonVanilla(type)
         return getDefault(type).getBaseValue()
     }
 
@@ -106,7 +104,6 @@ internal constructor(
     }
 
     fun getModifierValue(type: Attribute, uuid: UUID): Double {
-        ensureNonVanilla(type)
         return requireNotNull(getDefault(type).getModifier(uuid)?.amount) {
             "Can't find attribute modifier '$uuid' on attribute '${type.descriptionId}'"
         }
@@ -140,6 +137,7 @@ internal constructor(
      * @param type the attribute type
      * @param attributable the attributable object in the world state
      * @return the prototype
+     * @throws IllegalArgumentException if the [type] is not present in this supplier
      */
     private fun getDefault(type: Attribute, attributable: Attributable): AttributeInstance {
         return if (isAbsoluteVanilla(type)) {
@@ -154,12 +152,11 @@ internal constructor(
     }
 
     /**
-     * 获取原型.
+     * 获取指定的原型.
      *
-     * @throws IllegalArgumentException 如果 [type] 是原版属性
+     * @throws IllegalArgumentException 如果 [type] 不在此供应者中
      */
     private fun getDefault(type: Attribute): AttributeInstance {
-        ensureNonVanilla(type)
         return requireNotNull(prototypes[type]) {
             val id = type.descriptionId
             val element = (type as? ElementAttribute)?.element?.uniqueId
@@ -182,10 +179,6 @@ internal constructor(
      */
     private fun isAbsoluteVanilla(type: Attribute): Boolean {
         return type.vanilla && !prototypes.containsKey(type)
-    }
-
-    private fun ensureNonVanilla(type: Attribute) {
-        require(!type.vanilla) { "The attribute '$type' is a vanilla attribute" }
     }
 }
 
