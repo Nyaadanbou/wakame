@@ -40,12 +40,12 @@ sealed interface SkillState<U> {
     fun clear()
 }
 
-fun SkillState(user: User<Player>): SkillState<Player> {
+fun PlayerSkillState(user: User<Player>): PlayerSkillState {
     return PlayerSkillState(user.uniqueId)
 }
 
-private class PlayerSkillState(
-    private val uniqueId: UUID,
+class PlayerSkillState(
+    private val uniqueId: UUID
 ) : SkillState<Player> {
     companion object {
         private val COOLDOWN_TRIGGERS: List<SingleTrigger> =
