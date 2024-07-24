@@ -1,6 +1,10 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.entity.EntityKeyLookup
+import cc.mewcraft.wakame.event.NekoCommandReloadEvent
+import cc.mewcraft.wakame.eventbus.PluginEventBus
+import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.user.User
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -8,71 +12,22 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataContainer
+import org.jetbrains.annotations.ApiStatus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.slf4j.Logger
 import java.lang.ref.WeakReference
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 /**
- * 一个存放属性及其数值的容器.
+ * 代表一个从 [属性类型][Attribute] 到 [属性实例][AttributeInstance] 的映射.
  */
-sealed interface AttributeMap {
-    /**
-     * 根据当前的状态创建一个新的 [AttributeMapSnapshot].
-     */
-    fun getSnapshot(): AttributeMapSnapshot
-
-    /**
-     * Registers an [attribute] to this map. This will overwrite any existing instance.
-     */
-    fun register(attribute: Attribute)
-
-    /**
-     * Gets an [AttributeInstance] specified by the [attribute].
-     *
-     * Returns `null` if the specified instance does not exist in this map.
-     */
-    fun getInstance(attribute: Attribute): AttributeInstance?
-
+sealed interface AttributeMapLike {
     /**
      * 获取所有的属性, 也就是 [hasAttribute] 返回 `true` 的属性.
      */
     fun getAttributes(): Set<Attribute>
-
-    /**
-     * Checks whether this map has the [attribute].
-     */
-    fun hasAttribute(attribute: Attribute): Boolean
-
-    /**
-     * Checks whether this map has the modifier specified by [attribute] and [uuid].
-     */
-    fun hasModifier(attribute: Attribute, uuid: UUID): Boolean
-
-    /**
-     * Gets the value for the [attribute] after all modifiers have been applied.
-     */
-    fun getValue(attribute: Attribute): Double
-
-    /**
-     * Gets the base value for the [attribute].
-     */
-    fun getBaseValue(attribute: Attribute): Double
-
-    /**
-     * Gets the modifier value specified by [attribute] and [uuid].
-     */
-    fun getModifierValue(attribute: Attribute, uuid: UUID): Double
-}
-
-/**
- * [AttributeMap] 的快照 (支持读/写). 用于临时的数值储存和计算.
- */
-sealed interface AttributeMapSnapshot {
-    /**
-     * 获取指定 [attribute] 的实例.
-     */
-    fun getInstance(attribute: Attribute): AttributeInstanceSnapshot?
 
     /**
      * 检查是否存在 [attribute].
@@ -101,6 +56,61 @@ sealed interface AttributeMapSnapshot {
 }
 
 /**
+ * 代表一个 [AttributeMapLike] 的快照, 支持读/写, 用于临时的数值储存和计算.
+ */
+sealed interface AttributeMapSnapshot : AttributeMapLike {
+    /**
+     * 获取指定 [attribute] 的实例快照.
+     *
+     * 如果指定的 [attribute] 不存在, 则返回 `null`.
+     */
+    fun getInstance(attribute: Attribute): AttributeInstanceSnapshot?
+}
+
+/**
+ * 代表一个可以创建 [AttributeMapSnapshot] 的对象.
+ */
+sealed interface AttributeMapSnapshotable {
+    /**
+     * 根据当前状态创建一个 [AttributeMapSnapshot].
+     */
+    fun getSnapshot(): AttributeMapSnapshot
+}
+
+/**
+ * 代表一个标准的 [AttributeMapLike], 支持读/写.
+ *
+ * 该对象在实现上必须与一个主体绑定, 例如玩家,怪物等.
+ * **任何对该对象的修改都应该实时反应到绑定的主体上!**
+ */
+sealed interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable {
+    /**
+     * 获取指定 [attribute] 的 [AttributeInstance].
+     *
+     * 如果指定的 [attribute] 不存在, 则返回 `null`.
+     */
+    fun getInstance(attribute: Attribute): AttributeInstance?
+
+    /**
+     * 将指定 [attribute] 注册到该容器. 这将覆盖任何已存在的实例.
+     */
+    @ApiStatus.Internal
+    fun register(attribute: Attribute)
+}
+
+/**
+ * 代表一个不可变的 [AttributeMapLike], 不支持任何写入.
+ */
+sealed interface ImmutableAttributeMap : AttributeMapLike, AttributeMapSnapshotable {
+    /**
+     * 获取指定 [attribute] 的 [ImmutableAttributeInstance].
+     *
+     * 如果指定的 [attribute] 不存在, 则返回 `null`.
+     */
+    fun getInstance(attribute: Attribute): ImmutableAttributeInstance?
+}
+
+/**
  * A constructor function of [AttributeMap].
  *
  * @param user the user to which this map is bound
@@ -122,6 +132,14 @@ fun AttributeMap(entity: LivingEntity): AttributeMap {
     val key = AttributeMapSupport.ENTITY_KEY_LOOKUP.get(entity)
     val default = DefaultAttributes.getSupplier(key)
     return EntityAttributeMap(default, entity)
+}
+
+/**
+ * [ImmutableAttributeMap] 的实例.
+ */
+object ImmutableAttributeMaps {
+    val ARROW: ImmutableAttributeMap by ReloadableProperty { ImmutableAttributeMapPool.get(Key.key("arrow")) }
+    val DISPENSER: ImmutableAttributeMap by ReloadableProperty { ImmutableAttributeMapPool.get(Key.key("dispenser")) }
 }
 
 
@@ -176,15 +194,17 @@ private class PlayerAttributeMap(
         default.attributes.filter(Attribute::vanilla).forEach(::getInstance)
     }
 
+    @Suppress("DuplicatedCode")
     override fun getSnapshot(): AttributeMapSnapshot {
-        val attributes = getAttributes()
         val data = Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>()
-        for (attribute in attributes) {
-            val instance = requireNotNull(getInstance(attribute)) { "The returned AttributeInstance should not be null. This is a bug!" }
+        for (attribute in getAttributes()) {
+            val instance = requireNotNull(getInstance(attribute)) {
+                "The returned AttributeInstance should not be null. This is a bug!"
+            }
             val snapshot = instance.getSnapshot()
             data.put(attribute, snapshot)
         }
-        return MutableAttributeMapSnapshot(data)
+        return AttributeMapSnapshotImpl(data)
     }
 
     override fun register(attribute: Attribute) {
@@ -332,6 +352,90 @@ private class EntityAttributeMap : AttributeMap {
     }
 }
 
+private object ImmutableAttributeMapPool : KoinComponent {
+    val logger: Logger by inject()
+    val pool: ConcurrentHashMap<Key, ImmutableAttributeMap> = ConcurrentHashMap()
+
+    fun get(key: Key): ImmutableAttributeMap {
+        return pool.computeIfAbsent(key) {
+            val default = DefaultAttributes.getSupplier(it)
+            ImmutableAttributeMapImpl(default)
+        }
+    }
+
+    fun reset() {
+        pool.clear()
+    }
+
+    init {
+        PluginEventBus.get().subscribe<NekoCommandReloadEvent> {
+            reset()
+            logger.info("Reset object pool of ImmutableAttributeMap")
+        }
+    }
+}
+
+// 开发日记 2024/7/24
+// 我感觉这个 ImmutableAttributeMap 可以参考 AttributeMapSnapshot 的实现,
+// 只不过不允许任何写入操作.
+
+private class ImmutableAttributeMapImpl(
+    val default: AttributeSupplier,
+) : ImmutableAttributeMap {
+    @Suppress("DuplicatedCode")
+    override fun getSnapshot(): AttributeMapSnapshot {
+        val data = Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>()
+        for (attribute in getAttributes()) {
+            val instance = requireNotNull(getInstance(attribute)) {
+                "The returned AttributeInstance should not be null. This is a bug!"
+            }
+            val snapshot = instance.getSnapshot()
+            data.put(attribute, snapshot)
+        }
+        return AttributeMapSnapshotImpl(data)
+    }
+
+    override fun getInstance(attribute: Attribute): ImmutableAttributeInstance? {
+        if (attribute.vanilla) {
+            return null
+        }
+        return default.createInstance(attribute)
+    }
+
+    override fun getAttributes(): Set<Attribute> {
+        return default.attributes.filterNot { it.vanilla }.toSet()
+    }
+
+    override fun hasAttribute(attribute: Attribute): Boolean {
+        ensureNonVanilla(attribute)
+        return default.hasAttribute(attribute)
+    }
+
+    override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
+        ensureNonVanilla(attribute)
+        return default.hasModifier(attribute, uuid)
+    }
+
+    override fun getValue(attribute: Attribute): Double {
+        ensureNonVanilla(attribute)
+        return default.getValue(attribute)
+    }
+
+    override fun getBaseValue(attribute: Attribute): Double {
+        ensureNonVanilla(attribute)
+        return default.getBaseValue(attribute)
+    }
+
+    override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
+        ensureNonVanilla(attribute)
+        return default.getModifierValue(attribute, uuid)
+    }
+
+    private fun ensureNonVanilla(attribute: Attribute) {
+        require(!attribute.vanilla) { "Vanilla attributes are not supported for ImmutableAttributeMap" }
+    }
+}
+
 // 开发日记 2024/7/23
 // 属性快照... 不知道还有没有更好的方案
 
@@ -341,11 +445,15 @@ private class EntityAttributeMap : AttributeMap {
 // 中是 VanillaAttributeInstance, 它在 AttributeMapSnapshot
 // 中也得转换成 WakameAttributeInstance.
 
-private class MutableAttributeMapSnapshot(
+private class AttributeMapSnapshotImpl(
     val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>,
 ) : AttributeMapSnapshot {
     override fun getInstance(attribute: Attribute): AttributeInstanceSnapshot? {
         return data[attribute]
+    }
+
+    override fun getAttributes(): Set<Attribute> {
+        return data.keys
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {

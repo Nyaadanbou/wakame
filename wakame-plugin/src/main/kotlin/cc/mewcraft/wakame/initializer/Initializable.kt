@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.initializer
 
-import cc.mewcraft.wakame.event.NekoReloadEvent
+import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import me.lucko.helper.terminable.Terminable
 
 /**
@@ -68,12 +68,12 @@ interface Initializable : Terminable {
     suspend fun onPostPackAsync() {}
 
     /**
-     * When [NekoReloadEvent] is fired.
+     * When [NekoCommandReloadEvent] is fired.
      */
     fun onReload() {}
 
     /**
-     * When [NekoReloadEvent] is fired, in an async thread.
+     * When [NekoCommandReloadEvent] is fired, in an async thread.
      */
     suspend fun onReloadAsync() {}
 

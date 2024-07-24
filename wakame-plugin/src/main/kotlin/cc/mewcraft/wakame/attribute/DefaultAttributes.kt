@@ -11,7 +11,7 @@ import org.koin.core.component.inject
 import org.slf4j.Logger
 
 /**
- * Provides default [AttributeInstance]s for various entity types.
+ * Provides default [AttributeInstance]s for various subject types.
  */
 @PostWorldDependency(
     runBefore = [AttributeRegistry::class],
@@ -24,7 +24,7 @@ object DefaultAttributes : KoinComponent, Initializable {
     private val LOGGER: Logger by inject()
 
     /**
-     * This registry holds the attribute suppliers for all entity types.
+     * This registry holds the attribute suppliers for all subject types.
      *
      * ## Notes
      *
@@ -37,22 +37,22 @@ object DefaultAttributes : KoinComponent, Initializable {
     /**
      * Gets the [AttributeSupplier] for the [key].
      *
-     * **Currently, only limited entity types are supported.** Getting an
-     * unsupported entity type will throw an [IllegalArgumentException].
+     * **Currently, only limited subject types are supported.** Getting an
+     * unsupported subject type will throw an [IllegalArgumentException].
      *
-     * @param key the entity key
+     * @param key the subject key
      * @return the attribute supplier
      * @throws IllegalArgumentException
      */
     fun getSupplier(key: Key): AttributeSupplier {
-        return requireNotNull(SUPPLIERS[key]) { "Can't find attribute supplier for entity '$key'" }
+        return requireNotNull(SUPPLIERS[key]) { "Can't find attribute supplier for key '$key'" }
     }
 
     /**
-     * Checks if the [key] entity has a [AttributeSupplier].
+     * Checks if the [key] subject has a [AttributeSupplier].
      *
-     * @param key the entity key
-     * @return true if the entity type has a default supplier, false otherwise
+     * @param key the subject key
+     * @return true if the subject type has a default supplier, false otherwise
      */
     fun hasSupplier(key: Key): Boolean {
         return SUPPLIERS.containsKey(key)
@@ -61,7 +61,7 @@ object DefaultAttributes : KoinComponent, Initializable {
     /**
      * Registers a [AttributeSupplier] for the [key].
      *
-     * @param key the entity key
+     * @param key the subject key
      * @param supplier the attribute supplier
      */
     fun addSupplier(key: Key, supplier: AttributeSupplier): AttributeSupplier? {

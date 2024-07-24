@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame
 
-import cc.mewcraft.wakame.event.NekoReloadEvent
+import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.registerEvents
 import org.bukkit.event.EventHandler
@@ -10,7 +10,7 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 /**
- * A property that will be reset using [loader] upon [NekoReloadEvent] being fired.
+ * A property that will be reset using [loader] upon [NekoCommandReloadEvent] being fired.
  *
  * @param T the property type
  * @property loader the loader to load the value
@@ -26,7 +26,7 @@ class ReloadableProperty<T>(
     }
 
     @EventHandler(priority = EventPriority.HIGHEST) // properties are reloaded the latest because some of them depend on configs
-    private fun onNekoReload(e: NekoReloadEvent) {
+    private fun on(e: NekoCommandReloadEvent) {
         reload()
     }
 
