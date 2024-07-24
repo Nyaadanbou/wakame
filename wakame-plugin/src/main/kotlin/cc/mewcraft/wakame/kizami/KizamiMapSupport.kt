@@ -5,9 +5,9 @@ import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 
 /**
- * Creates a new [KizamiMap].
+ * Creates a new [PlayerKizamiMap].
  */
-fun KizamiMap(user: User<*>): KizamiMap {
+fun PlayerKizamiMap(user: User<*>): PlayerKizamiMap {
     return PlayerKizamiMap()
 }
 
@@ -16,7 +16,7 @@ fun KizamiMap(user: User<*>): KizamiMap {
  *
  * This class records the number of kizami each owned by a player.
  */
-private class PlayerKizamiMap : KizamiMap {
+class PlayerKizamiMap : KizamiMap {
     private val amountMap: Object2IntOpenHashMap<Kizami> = Object2IntOpenHashMap<Kizami>().apply { defaultReturnValue(0) }
 
     override val mutableAmountMap: MutableMap<Kizami, Int>
