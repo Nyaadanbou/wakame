@@ -139,6 +139,7 @@ fun AttributeMap(entity: LivingEntity): AttributeMap {
  */
 object IntangibleAttributeMaps {
     val ARROW: IntangibleAttributeMap by ReloadableProperty { IntangibleAttributeMapPool.get(Key.key("arrow")) }
+    val TRIDENT: IntangibleAttributeMap by ReloadableProperty { IntangibleAttributeMapPool.get(Key.key("trident")) }
     val DISPENSER: IntangibleAttributeMap by ReloadableProperty { IntangibleAttributeMapPool.get(Key.key("dispenser")) }
 }
 
