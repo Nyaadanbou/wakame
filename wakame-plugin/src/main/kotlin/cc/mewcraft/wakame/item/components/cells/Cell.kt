@@ -4,6 +4,7 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.components.cells.reforge.ReforgeHistory
 import cc.mewcraft.wakame.util.CompoundTag
@@ -14,7 +15,7 @@ import java.util.stream.Stream
 /**
  * 代表一个词条栏.
  */
-interface Cell : Examinable, BinarySerializable, TooltipProvider.Single {
+interface Cell : Examinable, BinarySerializable, TooltipProvider.SingleWithName {
 
     /**
      * 返回词条栏的 id.
@@ -168,20 +169,17 @@ private data class CellImpl(
         put(TAG_REFORGE, reforgeHistory.serializeAsTag())
     }
 
-    override fun provideTooltipLore(): LoreLine {
-        // 暂时.. 词条栏的提示框文本就是核心的.
-        // 未来可以再考虑丰富词条栏的提示框文本.
-        return core.provideTooltipLore()
-    }
+    // 暂时.. 词条栏的提示框文本就是核心的.
+    // 未来可以再考虑丰富词条栏的提示框文本.
+    override fun provideTooltipName(): NameLine = core.provideTooltipName()
+    override fun provideTooltipLore(): LoreLine = core.provideTooltipLore()
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("id", id),
-            ExaminableProperty.of("core", core),
-            ExaminableProperty.of("curse", curse),
-            ExaminableProperty.of("reforge", reforgeHistory),
-        )
-    }
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("id", id),
+        ExaminableProperty.of("core", core),
+        ExaminableProperty.of("curse", curse),
+        ExaminableProperty.of("reforge", reforgeHistory),
+    )
 
     private companion object {
         const val TAG_CORE = "core"

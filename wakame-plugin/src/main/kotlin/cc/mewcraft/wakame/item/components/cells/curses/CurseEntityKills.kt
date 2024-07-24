@@ -2,12 +2,15 @@ package cc.mewcraft.wakame.item.components.cells.curses
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.nbt.Tag
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.entity.EntityTypeHolder
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Curse
+import cc.mewcraft.wakame.item.components.cells.CurseConfig
 import cc.mewcraft.wakame.item.components.cells.CurseType
 import cc.mewcraft.wakame.item.components.tracks.TrackTypes
 import cc.mewcraft.wakame.registry.EntityRegistry
@@ -34,7 +37,8 @@ data class CurseEntityKills(
     val index: EntityTypeHolder,
     val count: Int,
 ) : Curse {
-    override val key: Key = CurseConstants.createKey { ENTITY_KILLS }
+    override val key: Key
+        get() = Type.key
     override val type: CurseType<CurseEntityKills> = Type
     override val isEmpty: Boolean = false
 
@@ -58,9 +62,21 @@ data class CurseEntityKills(
         putShort(TAG_COUNT, count.toStableShort())
     }
 
-    internal companion object Type : CurseType<CurseEntityKills> {
+    override fun provideTooltipName(): NameLine {
+        return NameLine.simple(config.displayName)
+    }
+
+    override fun provideTooltipLore(): LoreLine {
+        return LoreLine.simple(key, listOf(tooltip.render()))
+    }
+
+    companion object Type : CurseType<CurseEntityKills> {
         const val TAG_INDEX = "index"
         const val TAG_COUNT = "count"
+        val key = CurseConstants.createKey { ENTITY_KILLS }
+
+        private val config: CurseConfig = CurseConfig(CurseConstants.ENTITY_KILLS)
+        private val tooltip: CurseConfig.SingleTooltip = config.SingleTooltip()
     }
 }
 

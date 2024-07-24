@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import java.util.function.Supplier
 import java.util.stream.Stream
 
 /**
@@ -55,7 +56,7 @@ interface LoreLine {
             return SimpleLoreLine(key, lines)
         }
 
-        fun supply(key: TooltipKey, provider: Provider<List<Component>>): LoreLine {
+        fun supply(key: TooltipKey, provider: Supplier<List<Component>>): LoreLine {
             return SupplierLoreLine(key, provider)
         }
     }
@@ -86,17 +87,18 @@ private data class SimpleLoreLine(
 ) : LoreLine
 
 /**
- * 跟 [SimpleLoreLine] 一样, 只不过 [content] 由 [Provider] 提供.
+ * 跟 [SimpleLoreLine] 一样, 只不过 [provider] 由 [Provider] 提供.
  */
 private class SupplierLoreLine(
     override val key: TooltipKey,
-    content: Provider<List<Component>>,
+    val provider: Supplier<List<Component>>,
 ) : LoreLine, Examinable {
-    override val content: List<Component> by content
+    override val content: List<Component>
+        get() = provider.get()
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
-        ExaminableProperty.of("content", content)
+        ExaminableProperty.of("content", provider)
     )
 
     override fun toString(): String = toSimpleString()

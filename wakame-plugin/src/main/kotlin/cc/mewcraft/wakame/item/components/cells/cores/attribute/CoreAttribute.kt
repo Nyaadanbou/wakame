@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.attribute.facade.AttributeDataS
 import cc.mewcraft.wakame.attribute.facade.AttributeDataSE
 import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.components.cells.Core
@@ -119,23 +120,26 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvi
         return AttributeRegistry.FACADES[key].modifierCreator(uuid, this)
     }
 
-    override fun provideTooltipLore(): LoreLine {
-        val tooltipKey = lineKeyFactory.get(this) ?: return LoreLine.noop()
-        val tooltipText = AttributeRegistry.FACADES[key].tooltipCreator(this)
-        return LoreLine.simple(tooltipKey, tooltipText)
+    override fun provideTooltipName(): NameLine {
+        val tooltipName = AttributeRegistry.FACADES[key].tooltipNameCreator(this)
+        return NameLine.simple(tooltipName)
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("key", key),
-            ExaminableProperty.of("operation", operation),
-        )
+    override fun provideTooltipLore(): LoreLine {
+        val tooltipKey = lineKeyFactory.get(this) ?: return LoreLine.noop()
+        val tooltipLore = AttributeRegistry.FACADES[key].tooltipLoreCreator(this)
+        return LoreLine.simple(tooltipKey, tooltipLore)
     }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("key", key.asString()),
+        ExaminableProperty.of("operation", operation),
+    )
 
     override fun toString(): String = toSimpleString()
 
-    internal companion object Type : CoreType<CoreAttribute>, KoinComponent {
-        private val lineKeyFactory: CoreAttributeTooltipKeyProvider by inject()
+    private companion object Type : CoreType<CoreAttribute>, KoinComponent {
+        val lineKeyFactory: CoreAttributeTooltipKeyProvider by inject()
     }
 }
 
@@ -164,7 +168,6 @@ internal data class CoreAttributeS(
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.concat(
         super.examinableProperties(),
         Stream.of(
-            ExaminableProperty.of("operation", operation),
             ExaminableProperty.of("value", value),
         )
     )
@@ -233,7 +236,7 @@ internal data class CoreAttributeSE(
         super.examinableProperties(),
         Stream.of(
             ExaminableProperty.of("value", value),
-            ExaminableProperty.of("element", element),
+            ExaminableProperty.of("element", element.uniqueId),
         )
     )
 }
@@ -271,7 +274,7 @@ internal data class CoreAttributeRE(
         Stream.of(
             ExaminableProperty.of("lower", lower),
             ExaminableProperty.of("upper", upper),
-            ExaminableProperty.of("element", element),
+            ExaminableProperty.of("element", element.uniqueId),
         )
     )
 }

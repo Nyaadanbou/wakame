@@ -228,13 +228,13 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
                 val core = cell.getCoreAs(CoreTypes.SKILL) ?: continue
                 val variant = core.variant
                 if (ignoreVariant || variant == TriggerVariant.any()) {
-                    ret.put(core.trigger, core.instance)
+                    ret.put(core.trigger, core.skill)
                     continue
                 }
                 if (variant.id != context.variant) {
                     continue
                 }
-                ret.put(core.trigger, core.instance)
+                ret.put(core.trigger, core.skill)
             }
             return ret.build()
         }

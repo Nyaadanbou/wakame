@@ -2,12 +2,15 @@ package cc.mewcraft.wakame.item.components.cells.curses
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.nbt.Tag
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.CurseBinaryKeys
 import cc.mewcraft.wakame.item.CurseConstants
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Curse
+import cc.mewcraft.wakame.item.components.cells.CurseConfig
 import cc.mewcraft.wakame.item.components.cells.CurseType
 import cc.mewcraft.wakame.item.components.tracks.TrackTypes
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -34,7 +37,8 @@ data class CursePeakDamage(
     val element: Element,
     val amount: Int,
 ) : Curse {
-    override val key: Key = CurseConstants.createKey { PEAK_DAMAGE }
+    override val key: Key
+        get() = Type.key
     override val type: CurseType<CursePeakDamage> = Type
     override val isEmpty: Boolean = false
 
@@ -55,9 +59,21 @@ data class CursePeakDamage(
         putByte(TAG_ELEMENT, element.binaryId)
     }
 
-    internal companion object Type : CurseType<CursePeakDamage> {
+    override fun provideTooltipName(): NameLine {
+        return NameLine.simple(config.displayName)
+    }
+
+    override fun provideTooltipLore(): LoreLine {
+        return LoreLine.simple(key, listOf(tooltip.render()))
+    }
+
+    companion object Type : CurseType<CursePeakDamage> {
         const val TAG_AMOUNT = "amount"
         const val TAG_ELEMENT = "element"
+        val key = CurseConstants.createKey { PEAK_DAMAGE }
+
+        private val config = CurseConfig(CurseConstants.PEAK_DAMAGE)
+        private val tooltip = config.SingleTooltip()
     }
 }
 

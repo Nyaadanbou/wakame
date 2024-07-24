@@ -24,7 +24,7 @@ import net.kyori.examination.Examinable
 /**
  * 代表一个词条栏中的核心. 核心是[词条栏][Cell]中提供具体效果的东西.
  */
-interface Core : Keyed, Examinable, BinarySerializable, TooltipProvider.Single {
+interface Core : Keyed, Examinable, BinarySerializable, TooltipProvider.SingleWithName {
     /**
      * 核心的唯一标识.
      */

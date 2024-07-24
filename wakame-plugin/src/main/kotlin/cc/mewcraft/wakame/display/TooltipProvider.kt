@@ -12,10 +12,24 @@ sealed interface TooltipProvider {
         fun provideTooltipLore(): LoreLine
     }
 
+    interface SingleWithName : Single {
+        /**
+         * 提供单个 [NameLine].
+         */
+        fun provideTooltipName(): NameLine
+    }
+
     interface Cluster {
         /**
          * 提供多个 [LoreLine].
          */
         fun provideTooltipLore(): Collection<LoreLine>
+    }
+
+    interface ClusterWithName {
+        /**
+         * 提供多个 [NameLine] 和 [LoreLine].
+         */
+        fun provideTooltipName(): Collection<Pair<NameLine, LoreLine>>
     }
 }
