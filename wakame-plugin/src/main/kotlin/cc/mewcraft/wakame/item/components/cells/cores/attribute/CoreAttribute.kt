@@ -138,7 +138,7 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvi
 
     override fun toString(): String = toSimpleString()
 
-    private companion object Type : CoreType<CoreAttribute>, KoinComponent {
+    internal companion object Type : CoreType<CoreAttribute>, KoinComponent {
         val lineKeyFactory: CoreAttributeTooltipKeyProvider by inject()
     }
 }

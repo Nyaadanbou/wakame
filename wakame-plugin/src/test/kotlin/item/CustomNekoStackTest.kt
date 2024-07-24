@@ -858,7 +858,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            val curse = it.curse
+            val curse = it.wrapped
             assertNotNull(curse)
             assertEquals(Key.key("curse:entity_kills"), curse.key)
         }

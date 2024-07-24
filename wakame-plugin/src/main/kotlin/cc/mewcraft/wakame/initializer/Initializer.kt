@@ -24,6 +24,7 @@ import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.CURSE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ELEMENT_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ENTITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
@@ -121,6 +122,7 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
+        saveResource(CURSE_GLOBAL_CONFIG_FILE)
         saveResource(DAMAGE_GLOBAL_CONFIG_FILE)
         saveResource(ELEMENT_GLOBAL_CONFIG_FILE)
         saveResource(ENTITY_GLOBAL_CONFIG_FILE)
