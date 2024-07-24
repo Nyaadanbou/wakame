@@ -121,7 +121,7 @@ object AttributeRegistry : Initializable {
             // create closures
             val tooltips = DiscreteTooltips(config)
             // override it
-            tooltipCreator = { core: CoreAttributeS ->
+            tooltipLoreCreator = { core: CoreAttributeS ->
                 val lines = tooltips.line(core.operation)
                 val resolver = tooltips.value("value", core.value.toInt())
                 listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
@@ -211,9 +211,14 @@ interface AttributeFacade<T : CoreAttribute, S : TemplateCoreAttribute> : Keyed 
     val codecTagToInstance: (CompoundTag) -> T
 
     /**
-     * A creator for display text.
+     * A creator for tooltip name.
      */
-    val tooltipCreator: (T) -> List<Component>
+    val tooltipNameCreator: (T) -> Component
+
+    /**
+     * A creator for tooltip lore.
+     */
+    val tooltipLoreCreator: (T) -> List<Component>
 }
 
 /**
@@ -342,7 +347,8 @@ private class MutableAttributeFacade<T : CoreAttribute, S : TemplateCoreAttribut
     override var codecNodeToTemplate: (ConfigurationNode) -> S,
     override var codecNodeToInstance: (ConfigurationNode) -> T,
     override var codecTagToInstance: (CompoundTag) -> T,
-    override var tooltipCreator: (T) -> List<Component>,
+    override var tooltipNameCreator: (T) -> Component,
+    override var tooltipLoreCreator: (T) -> List<Component>,
 ) : AttributeFacade<T, S> {
     override val key: Key = facadeId
 }
@@ -486,6 +492,7 @@ private class SingleSelectionImpl(
     private val tagType: TagType,
 ) : SingleSelection {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
+    private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): SingleElementAttributeBinder {
@@ -520,7 +527,10 @@ private class SingleSelectionImpl(
             codecTagToInstance = { tag: CompoundTag ->
                 CoreAttributeS(tagType, tag)
             },
-            tooltipCreator = { core: CoreAttributeS ->
+            tooltipNameCreator = {
+                AttributeRegistrySupport.miniMessage.deserialize(displayName)
+            },
+            tooltipLoreCreator = { core: CoreAttributeS ->
                 val lines = tooltips.line(core.operation)
                 val resolver = tooltips.number("value", core.value)
                 listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
@@ -536,6 +546,7 @@ private class RangedSelectionImpl(
     private val tagType: TagType,
 ) : RangedSelection {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
+    private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): RangedElementAttributeBinder {
@@ -576,7 +587,10 @@ private class RangedSelectionImpl(
             codecTagToInstance = { tag: CompoundTag ->
                 CoreAttributeR(tagType, tag)
             },
-            tooltipCreator = { core: CoreAttributeR ->
+            tooltipNameCreator = {
+                AttributeRegistrySupport.miniMessage.deserialize(displayName)
+            },
+            tooltipLoreCreator = { core: CoreAttributeR ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
@@ -593,6 +607,7 @@ private class SingleElementAttributeBinderImpl(
     private val tagType: TagType,
 ) : SingleElementAttributeBinder {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
+    private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     /**
@@ -625,7 +640,11 @@ private class SingleElementAttributeBinderImpl(
             codecTagToInstance = { tag: CompoundTag ->
                 CoreAttributeSE(tagType, tag)
             },
-            tooltipCreator = { core: CoreAttributeSE ->
+            tooltipNameCreator = {
+                val resolver = Placeholder.component("element", it.element.displayName)
+                AttributeRegistrySupport.miniMessage.deserialize(displayName, resolver)
+            },
+            tooltipLoreCreator = { core: CoreAttributeSE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("value", core.value)
                 val resolver2 = tooltips.component("element", core.element.displayName)
@@ -642,6 +661,7 @@ private class RangedElementAttributeBinderImpl(
     private val tagType: TagType,
 ) : RangedElementAttributeBinder {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
+    private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     /**
@@ -680,7 +700,11 @@ private class RangedElementAttributeBinderImpl(
             codecTagToInstance = { tag: CompoundTag ->
                 CoreAttributeRE(tagType, tag)
             },
-            tooltipCreator = { core: CoreAttributeRE ->
+            tooltipNameCreator = {
+                val resolver = Placeholder.component("element", it.element.displayName)
+                AttributeRegistrySupport.miniMessage.deserialize(displayName, resolver)
+            },
+            tooltipLoreCreator = { core: CoreAttributeRE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
