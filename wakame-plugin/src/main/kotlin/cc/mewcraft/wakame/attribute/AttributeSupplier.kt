@@ -37,8 +37,8 @@ internal constructor(
     fun createInstance(type: Attribute, attributable: Attributable): AttributeInstance? {
         if (isAbsoluteVanilla(type)) {
             // 如果指定的属性是 absolute-vanilla，那么
-            //  - 该函数应该直接采用原版属性的值，而非返回空值
-            //  - 该函数不能覆盖原版属性的任何值，应该仅作为原版属性的代理
+            // - 该函数应该直接采用原版属性的值, 而非返回空值
+            // - 该函数不能覆盖原版属性的任何值, 应该仅作为原版属性的代理
             return AttributeInstanceFactory.createInstance(type, attributable, false)
         }
 
@@ -46,6 +46,14 @@ internal constructor(
         val product = AttributeInstanceFactory.createInstance(type, attributable, true)
         product.replace(prototype) // 将实例的值替换为原型的值
         return product
+    }
+
+    fun createInstance(type: Attribute): ImmutableAttributeInstance? {
+        ensureNonVanilla(type)
+        val prototype = prototypes[type] ?: return null
+        val product = AttributeInstanceFactory.createInstance(type)
+        product.replace(prototype) // 将实例的值替换为原型的值
+        return ImmutableAttributeInstance.of(product)
     }
 
     /**
@@ -60,6 +68,11 @@ internal constructor(
         return getDefault(type, attributable).getValue()
     }
 
+    fun getValue(type: Attribute): Double {
+        ensureNonVanilla(type)
+        return getDefault(type).getValue()
+    }
+
     /**
      * Gets the base value for the [type].
      *
@@ -70,6 +83,11 @@ internal constructor(
      */
     fun getBaseValue(type: Attribute, attributable: Attributable): Double {
         return getDefault(type, attributable).getBaseValue()
+    }
+
+    fun getBaseValue(type: Attribute): Double {
+        ensureNonVanilla(type)
+        return getDefault(type).getBaseValue()
     }
 
     /**
@@ -83,6 +101,13 @@ internal constructor(
      */
     fun getModifierValue(type: Attribute, uuid: UUID, attributable: Attributable): Double {
         return requireNotNull(getDefault(type, attributable).getModifier(uuid)?.amount) {
+            "Can't find attribute modifier '$uuid' on attribute '${type.descriptionId}'"
+        }
+    }
+
+    fun getModifierValue(type: Attribute, uuid: UUID): Double {
+        ensureNonVanilla(type)
+        return requireNotNull(getDefault(type).getModifier(uuid)?.amount) {
             "Can't find attribute modifier '$uuid' on attribute '${type.descriptionId}'"
         }
     }
@@ -129,6 +154,20 @@ internal constructor(
     }
 
     /**
+     * 获取原型.
+     *
+     * @throws IllegalArgumentException 如果 [type] 是原版属性
+     */
+    private fun getDefault(type: Attribute): AttributeInstance {
+        ensureNonVanilla(type)
+        return requireNotNull(prototypes[type]) {
+            val id = type.descriptionId
+            val element = (type as? ElementAttribute)?.element?.uniqueId
+            "Can't find attribute instance for attribute '$id ($element)'"
+        }
+    }
+
+    /**
      * Checks whether the [type] is **absolute-vanilla**.
      *
      * We say the [type] is **absolute-vanilla** if the [Attribute.vanilla]
@@ -143,6 +182,10 @@ internal constructor(
      */
     private fun isAbsoluteVanilla(type: Attribute): Boolean {
         return type.vanilla && !prototypes.containsKey(type)
+    }
+
+    private fun ensureNonVanilla(type: Attribute) {
+        require(!type.vanilla) { "The attribute '$type' is a vanilla attribute" }
     }
 }
 

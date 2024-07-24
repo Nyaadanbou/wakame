@@ -11,8 +11,9 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.display.RENDERER_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.event.NekoLoadDataEvent
-import cc.mewcraft.wakame.event.NekoReloadEvent
+import cc.mewcraft.wakame.event.NekoCommandReloadEvent
+import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
+import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.item.MultipleItemListener
 import cc.mewcraft.wakame.item.SingleItemListener
 import cc.mewcraft.wakame.pack.PackException
@@ -267,7 +268,10 @@ object Initializer : KoinComponent, Listener {
 
         isDone = true
         NEKO_PLUGIN.launch(asyncContext) {
-            NekoLoadDataEvent().callEvent() // call it async
+            NekoPostLoadDataEvent().run {
+                this.callEvent() // call it async
+                PluginEventBus.get().post(this)
+            }
         }
 
         LOGGER.info(Component.text("Done loading", NamedTextColor.AQUA))
@@ -311,7 +315,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST) // configs are reloaded the earliest
-    private suspend fun handlePluginReloaded(e: NekoReloadEvent) {
+    private suspend fun handlePluginReloaded(e: NekoCommandReloadEvent) {
         Configs.reload()
         executeReload()
     }

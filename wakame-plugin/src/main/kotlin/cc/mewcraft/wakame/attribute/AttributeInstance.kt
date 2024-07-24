@@ -11,18 +11,15 @@ import java.util.UUID
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
 
 /**
- * Represents a combination of an [Attribute] with zero or more
- * [AttributeModifier]s owned by the [Attribute].
+ * 属性实例 ([AttributeInstance]) 本质上是一个用于数值计算的容器, 里面包含了一个
+ * [Attribute] 和多个与之关联的 [AttributeModifier]. 每一个 [AttributeModifier]
+ * 在概念上都是对 [Attribute] 的修饰, 会影响 [AttributeInstance] 的数值计算结果.
  *
- * This should be directly linked to a certain living entity,
- * e.g. a player, a zombie, etc.
+ * **Caution:** This should be directly linked to a certain living entity,
+ * e.g. a player, a zombie, etc. Any changes on this instance
+ * should reflect on the linked entity in real time.
  */
-sealed interface AttributeInstance {
-    /**
-     * 根据当前的状态创建一个新的 [AttributeInstanceSnapshot].
-     */
-    fun getSnapshot(): AttributeInstanceSnapshot
-
+sealed interface AttributeInstance : AttributeInstanceSnapshotable {
     /**
      * The [Attribute] in this [AttributeInstance].
      *
@@ -49,9 +46,27 @@ sealed interface AttributeInstance {
 }
 
 /**
- * [AttributeInstance] 的快照 (支持读/写). 用于临时的数值储存和计算.
+ * 代表一个不可变的属性实例.
  */
-interface AttributeInstanceSnapshot {
+sealed interface ImmutableAttributeInstance : AttributeInstanceSnapshotable {
+    companion object {
+        fun of(instance: AttributeInstance): ImmutableAttributeInstance {
+            return ImmutableAttributeInstanceImpl(instance)
+        }
+    }
+
+    val attribute: Attribute
+    fun getValue(): Double
+    fun getBaseValue(): Double
+    fun getModifier(uuid: UUID): AttributeModifier?
+    fun getModifiers(): Set<AttributeModifier>
+    fun hasModifier(modifier: AttributeModifier): Boolean
+}
+
+/**
+ * 代表一个属性实例的快照 (支持读/写), 用于临时的数值储存和计算.
+ */
+sealed interface AttributeInstanceSnapshot {
     val attribute: Attribute
     fun getValue(): Double
     fun getBaseValue(): Double
@@ -66,20 +81,43 @@ interface AttributeInstanceSnapshot {
 }
 
 /**
- * 用于创建 [AttributeInstance].
+ * 代表一个可以产生 [AttributeInstanceSnapshot] 的对象.
+ */
+sealed interface AttributeInstanceSnapshotable {
+    /**
+     * 根据当前状态创建一个 [AttributeInstanceSnapshot].
+     */
+    fun getSnapshot(): AttributeInstanceSnapshot
+}
+
+/**
+ * 用于创建各种类型的 [AttributeInstance].
  */
 object AttributeInstanceFactory {
     /**
-     * 用于创建原型. 原型不应该放在世界状态里。
+     * 用于创建原型, 以构建 [AttributeSupplier].
      */
     fun createPrototype(attribute: Attribute): AttributeInstance {
         return ProtoAttributeInstance(attribute)
     }
 
     /**
-     * 用于创建实例. 实例将绑定到 [attributable].
+     * 用于创建一个独立的 [AttributeInstance].
      *
-     * **副作用** - 会依据情况修改 [attributable] 的状态.
+     * 本函数返回的实例不与任何主体绑定, 是完全独立的数据结构.
+     * 实例本身也不会自动更新自己的任何数据, 除非你显式的这么做.
+     *
+     * @param attribute
+     */
+    fun createInstance(attribute: Attribute): AttributeInstance {
+        return WakameAttributeInstance(attribute)
+    }
+
+    /**
+     * 用于创建一个标准的 [AttributeInstance].
+     *
+     * 本函数返回的实例将自动绑定到 [attributable] 上, 将对 [attributable] 产生副作用.
+     * 也就是说, 任何对本实例的修改 (例如增加最大生命值) 都会实时反应到 [attributable] 上.
      *
      * @param attribute
      * @param attributable 世界状态中需要创建 [AttributeInstance] 的对象
@@ -132,15 +170,13 @@ object AttributeInstanceFactory {
 
 
 /**
- * 包含了 [AttributeInstance] 和 [AttributeInstanceSnapshot] 的共同实现.
+ * 该类提供了各种属性实例的核心逻辑.
  */
 private class AttributeInstanceDelegation(
     val attribute: Attribute,
 ) {
-    val modifiersById: Object2ObjectArrayMap<UUID, AttributeModifier> =
-        Object2ObjectArrayMap()
-    val modifiersByOp: SetMultimap<Operation, AttributeModifier> =
-        SetMultimapBuilder.enumKeys(Operation::class.java).hashSetValues().build()
+    val modifiersById: Object2ObjectArrayMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
+    val modifiersByOp: SetMultimap<Operation, AttributeModifier> = SetMultimapBuilder.enumKeys(Operation::class.java).hashSetValues().build()
     var dirty: Boolean = true
     var baseValue: Double = attribute.defaultValue // initially set the baseValue to the attribute.defaultValue
     var cachedValue: Double = 0.0
@@ -242,9 +278,12 @@ private class AttributeInstanceDelegation(
  * [WakameAttributeInstance], and should not be stored in the world state.
  */
 private class ProtoAttributeInstance(
-    override val attribute: Attribute,
+    attribute: Attribute,
 ) : AttributeInstance {
     val delegation: AttributeInstanceDelegation = AttributeInstanceDelegation(attribute)
+
+    override val attribute: Attribute
+        get() = delegation.attribute
 
     override fun getSnapshot(): AttributeInstanceSnapshot {
         throw UnsupportedOperationException("This operation is not supported for prototype instances.")
@@ -290,12 +329,15 @@ private class ProtoAttributeInstance(
  * This class represents the concrete attribute instance in our own system.
  */
 private class WakameAttributeInstance(
-    override val attribute: Attribute,
+    attribute: Attribute,
 ) : AttributeInstance {
     val delegation: AttributeInstanceDelegation = AttributeInstanceDelegation(attribute)
 
+    override val attribute: Attribute
+        get() = delegation.attribute
+
     override fun getSnapshot(): AttributeInstanceSnapshot {
-        return MutableAttributeInstanceSnapshot(this)
+        return AttributeInstanceSnapshotImpl(this)
     }
 
     override fun getValue(): Double =
@@ -353,7 +395,7 @@ private class VanillaAttributeInstance(
         get() = handle.attribute.toNeko()
 
     override fun getSnapshot(): AttributeInstanceSnapshot {
-        return MutableAttributeInstanceSnapshot(this)
+        return AttributeInstanceSnapshotImpl(this)
     }
 
     override fun getValue(): Double {
@@ -381,10 +423,10 @@ private class VanillaAttributeInstance(
     }
 
     override fun addModifier(modifier: AttributeModifier) {
-        // 如果玩家手持 wakame 物品，并且 wakame 物品上有增加最大生命值的属性（原版属性），
-        // 那么当玩家先离线，然后再上线，后台会抛异常：Modifier is already applied on this attribute!
-        // 这是因为玩家下线时，并不会触发移除物品属性的逻辑，导致属性被永久保存到 NBT 了
-        // 解决办法：addTransientModifier
+        // 如果玩家手持 wakame 物品, 并且 wakame 物品上有增加最大生命值的属性 (原版属性),
+        // 那么当玩家先离线, 然后再上线, 后台会抛异常: “Modifier is already applied on this attribute!”
+        // 这是因为玩家下线时, 并不会触发移除物品属性的逻辑, 导致属性被永久保存到 NBT 了.
+        // 解决办法: addTransientModifier
         handle.addTransientModifier(modifier.toBukkit())
     }
 
@@ -407,10 +449,47 @@ private class VanillaAttributeInstance(
     }
 }
 
-/**
- * A mutable implementation of [AttributeInstanceSnapshot].
- */
-private class MutableAttributeInstanceSnapshot(
+private class ImmutableAttributeInstanceImpl(
+    attribute: Attribute,
+) : ImmutableAttributeInstance {
+    constructor(instance: AttributeInstance) : this(instance.attribute) {
+        delegation.setBaseValue(instance.getBaseValue())
+        for (it in instance.getModifiers()) {
+            delegation.addModifier(it)
+        }
+    }
+
+    val delegation: AttributeInstanceDelegation = AttributeInstanceDelegation(attribute)
+
+    override val attribute: Attribute
+        get() = delegation.attribute
+
+    override fun getValue(): Double {
+        return delegation.getValue()
+    }
+
+    override fun getBaseValue(): Double {
+        return delegation.getBaseValue()
+    }
+
+    override fun getModifier(uuid: UUID): AttributeModifier? {
+        return delegation.getModifier(uuid)
+    }
+
+    override fun getModifiers(): Set<AttributeModifier> {
+        return delegation.getModifiers()
+    }
+
+    override fun hasModifier(modifier: AttributeModifier): Boolean {
+        return delegation.hasModifier(modifier)
+    }
+
+    override fun getSnapshot(): AttributeInstanceSnapshot {
+        return AttributeInstanceSnapshotImpl(this)
+    }
+}
+
+private class AttributeInstanceSnapshotImpl(
     attribute: Attribute,
 ) : AttributeInstanceSnapshot {
     constructor(instance: WakameAttributeInstance) : this(instance.attribute) {
@@ -418,13 +497,17 @@ private class MutableAttributeInstanceSnapshot(
     }
 
     constructor(instance: VanillaAttributeInstance) : this(instance.attribute) {
+        delegation.setBaseValue(instance.getBaseValue())
         for (it in instance.getModifiers()) {
             delegation.addModifier(it)
         }
     }
 
-    val delegation: AttributeInstanceDelegation =
-        AttributeInstanceDelegation(attribute)
+    constructor(instance: ImmutableAttributeInstanceImpl) : this(instance.attribute) {
+        delegation.replace(instance.delegation)
+    }
+
+    val delegation: AttributeInstanceDelegation = AttributeInstanceDelegation(attribute)
 
     override val attribute: Attribute
         get() = delegation.attribute

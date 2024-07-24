@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.world.attribute.damage
 
 import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeMap
+import cc.mewcraft.wakame.attribute.AttributeMapLike
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.attribute.ElementAttributeContainer
@@ -18,12 +18,12 @@ import kotlin.contracts.contract
 /**
  * 开始构建一个 [DamageBundle].
  */
-fun damageBundle(attrMap: AttributeMap, block: DamageBundleDSL.() -> Unit): DamageBundle {
+fun damageBundle(attrMap: AttributeMapLike, block: DamageBundleDSL.() -> Unit): DamageBundle {
     return DamageBundleDSL(attrMap).apply(block).get()
 }
 
 /**
- * 开始构建一个 [DamageBundle], 不依赖任何 [AttributeMap].
+ * 开始构建一个 [DamageBundle], 不依赖任何 [AttributeMapLike].
  */
 fun damageBundle(block: DamageBundleDSL.() -> Unit): DamageBundle {
     return DamageBundleDSL().apply(block).get()
@@ -32,12 +32,12 @@ fun damageBundle(block: DamageBundleDSL.() -> Unit): DamageBundle {
 /**
  * 开始构建一个 [DamagePacket].
  */
-fun damagePacket(element: Element, attrMap: AttributeMap, block: DamagePacketDSL.() -> Unit): DamagePacket {
+fun damagePacket(element: Element, attrMap: AttributeMapLike, block: DamagePacketDSL.() -> Unit): DamagePacket {
     return DamagePacketDSL(element, attrMap).apply(block).build()
 }
 
 /**
- * 开始构建一个 [DamagePacket], 不依赖任何 [AttributeMap].
+ * 开始构建一个 [DamagePacket], 不依赖任何 [AttributeMapLike].
  */
 fun damagePacket(element: Element, block: DamagePacketDSL.() -> Unit): DamagePacket {
     return DamagePacketDSL(element).apply(block).build()
@@ -61,7 +61,7 @@ annotation class DamagePacketBundleDsl
  */
 @DamagePacketBundleDsl
 class DamageBundleDSL(
-    private val attrMap: AttributeMap? = null,
+    private val attrMap: AttributeMapLike? = null,
 ) {
     private val bundle: DamageBundle = DamageBundle()
 
@@ -120,7 +120,7 @@ class DamageBundleDSL(
 @DamagePacketBundleDsl
 class DamagePacketDSL(
     private val element: Element,
-    private val attrMap: AttributeMap? = null,
+    private val attrMap: AttributeMapLike? = null,
 ) {
     private var min: Double? = null
     private var max: Double? = null
@@ -132,7 +132,7 @@ class DamagePacketDSL(
      * 使用“标准”计算方式定义所有的值.
      */
     fun standard() {
-        requireNotNull(attrMap) { "AttributeMap must not be null to use this DSL" }
+        requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
         // 如果 ElementDamagePacket 的代码改动,
         // 并且有不止一个地方调用了 standard(),
         // 那么只需要改动这一个地方即可.
@@ -154,7 +154,7 @@ class DamagePacketDSL(
     }
 
     fun min(block: MinDamageDSL.() -> Double) {
-        requireNotNull(attrMap) { "AttributeMap must not be null to use this DSL" }
+        requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
         min = block(MinDamageDSL(element, attrMap))
     }
 
@@ -163,7 +163,7 @@ class DamagePacketDSL(
     }
 
     fun max(block: MaxDamageDSL.() -> Double) {
-        requireNotNull(attrMap) { "AttributeMap must not be null to use this DSL" }
+        requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
         max = block(MaxDamageDSL(element, attrMap))
     }
 
@@ -172,7 +172,7 @@ class DamagePacketDSL(
     }
 
     fun rate(block: DamageRateDSL.() -> Double) {
-        requireNotNull(attrMap) { "AttributeMap must not be null to use this DSL" }
+        requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
         rate = block(DamageRateDSL(element, attrMap))
     }
 
@@ -181,7 +181,7 @@ class DamagePacketDSL(
     }
 
     fun defensePenetration(block: DefensePenetrationDSL.() -> Double) {
-        requireNotNull(attrMap) { "AttributeMap must not be null to use this DSL" }
+        requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
         defensePenetration = block(DefensePenetrationDSL(element, attrMap))
     }
 
@@ -190,7 +190,7 @@ class DamagePacketDSL(
     }
 
     fun defensePenetrationRate(block: DefensePenetrationRateDSL.() -> Double) {
-        requireNotNull(attrMap) { "AttributeMap must not be null to use this DSL" }
+        requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
         defensePenetrationRate = block(DefensePenetrationRateDSL(element, attrMap))
     }
 
@@ -221,7 +221,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class MinDamageDSL(
-        override val element: Element, override val attrMap: AttributeMap,
+        override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)
@@ -230,7 +230,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class MaxDamageDSL(
-        override val element: Element, override val attrMap: AttributeMap,
+        override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)
@@ -239,7 +239,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class DamageRateDSL(
-        override val element: Element, override val attrMap: AttributeMap,
+        override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return value { ATTACK_DAMAGE_RATE } + value(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE)
@@ -248,7 +248,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class DefensePenetrationDSL(
-        override val element: Element, override val attrMap: AttributeMap,
+        override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return value { DEFENSE_PENETRATION } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION)
@@ -257,7 +257,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class DefensePenetrationRateDSL(
-        override val element: Element, override val attrMap: AttributeMap,
+        override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return value { DEFENSE_PENETRATION_RATE } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
@@ -266,7 +266,7 @@ class DamagePacketDSL(
 
     abstract class ValueDSL {
         abstract val element: Element
-        abstract val attrMap: AttributeMap
+        abstract val attrMap: AttributeMapLike
 
         /**
          * 使用“标准的”方式计算 [value].
