@@ -5,14 +5,14 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 
-internal fun ItemStack.setCustomData(tag: CompoundTag) {
-    val customData = CustomData.of(tag)
-    this.set(DataComponents.CUSTOM_DATA, customData)
-}
-
 internal fun ItemStack.getCustomData(): CompoundTag? {
     val customData = this.get(DataComponents.CUSTOM_DATA)
     return customData?.copyTag() // 返回一个副本
+}
+
+internal fun ItemStack.setCustomData(tag: CompoundTag) {
+    val customData = CustomData.of(tag)
+    this.set(DataComponents.CUSTOM_DATA, customData)
 }
 
 internal fun ItemStack.getDirectCustomData(): CompoundTag? {

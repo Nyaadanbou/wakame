@@ -250,7 +250,14 @@ private class CustomNekoStack(
         get() = NekoStackSupport.getBehaviors(nbt)
 
     override fun clone(): NekoStack {
-        return CustomNekoStack(handle.clone())
+        val oldHandle = handle
+        val newHandle = handle.clone()
+        // 由于我们是*直接*对 minecraft:custom_data 中的 CompoundTag
+        // 进行读写操作, 而没有调用 minecraft:custom_data 的 copyTag(),
+        // 因此必须显式的对 NBT 进行拷贝, 否则会出现引用问题.
+        val copy = oldHandle.wakameTag.copy()
+        newHandle.wakameTag = (copy as CompoundTag)
+        return CustomNekoStack(newHandle)
     }
 
     override fun erase() {
