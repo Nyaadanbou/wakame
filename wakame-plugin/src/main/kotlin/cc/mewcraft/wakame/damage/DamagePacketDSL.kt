@@ -107,6 +107,13 @@ class DamageBundleDSL(
     }
 
     /**
+     * 直接添加一个 [DamagePacket].
+     */
+    fun single(packet: DamagePacket) {
+        bundle.add(packet)
+    }
+
+    /**
      * 返回构建好的 [DamageBundle].
      */
     fun get(): DamageBundle {

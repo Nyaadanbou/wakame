@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.util.getFirstBlockBelow
 import cc.mewcraft.wakame.util.getTargetLocation
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.world.attribute.damage.EvaluableCustomDamageMetaData
+import cc.mewcraft.wakame.world.attribute.damage.EvaluableDamageMetadata
 import cc.mewcraft.wakame.world.attribute.damage.applyCustomDamage
 import com.destroystokyo.paper.ParticleBuilder
 import net.kyori.adventure.key.Key
@@ -23,7 +23,7 @@ interface Lightning : Skill {
 
     val targetType: TargetType
 
-    val damageMetadata: EvaluableCustomDamageMetaData
+    val damageMetadata: EvaluableDamageMetadata
 
     /**
      * 雷击允许的目标类型.
@@ -48,7 +48,7 @@ interface Lightning : Skill {
     companion object Factory : SkillFactory<Lightning> {
         override fun create(key: Key, config: ConfigurationNode): Lightning {
             val targetType = config.node("target_type").get<TargetType>() ?: TargetType.ALL
-            val damageMetadata = config.node("damage_metadata").krequire<EvaluableCustomDamageMetaData>()
+            val damageMetadata = config.node("damage_metadata").krequire<EvaluableDamageMetadata>()
             return Impl(key, config, targetType, damageMetadata)
         }
     }
@@ -57,7 +57,7 @@ interface Lightning : Skill {
         override val key: Key,
         config: ConfigurationNode,
         override val targetType: TargetType,
-        override val damageMetadata: EvaluableCustomDamageMetaData,
+        override val damageMetadata: EvaluableDamageMetadata,
     ) : Lightning, SkillBase(key, config) {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
