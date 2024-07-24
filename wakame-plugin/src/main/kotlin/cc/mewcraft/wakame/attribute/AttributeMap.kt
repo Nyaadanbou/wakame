@@ -359,7 +359,14 @@ private object ImmutableAttributeMapPool : KoinComponent {
     fun get(key: Key): ImmutableAttributeMap {
         return pool.computeIfAbsent(key) {
             val default = DefaultAttributes.getSupplier(it)
-            ImmutableAttributeMapImpl(default)
+            val data = Reference2ObjectOpenHashMap<Attribute, ImmutableAttributeInstance>()
+            for (attribute in default.attributes) {
+                val instance = default.createInstance(attribute) ?: continue
+                val snapshot = instance.getSnapshot()
+                val immutable = snapshot.toImmutable()
+                data[attribute] = immutable
+            }
+            ImmutableAttributeMapImpl(data)
         }
     }
 
@@ -376,19 +383,18 @@ private object ImmutableAttributeMapPool : KoinComponent {
 }
 
 // 开发日记 2024/7/24
-// 我感觉这个 ImmutableAttributeMap 可以参考 AttributeMapSnapshot 的实现,
+// 我感觉这个 ImmutableAttributeMap 可以照搬
+// AttributeMapSnapshot 的实现,
 // 只不过不允许任何写入操作.
 
 private class ImmutableAttributeMapImpl(
-    val default: AttributeSupplier,
+    val data: Reference2ObjectOpenHashMap<Attribute, ImmutableAttributeInstance>,
 ) : ImmutableAttributeMap {
     @Suppress("DuplicatedCode")
     override fun getSnapshot(): AttributeMapSnapshot {
         val data = Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>()
         for (attribute in getAttributes()) {
-            val instance = requireNotNull(getInstance(attribute)) {
-                "The returned AttributeInstance should not be null. This is a bug!"
-            }
+            val instance = requireNotNull(getInstance(attribute)) { "The returned AttributeInstance should not be null. This is a bug!" }
             val snapshot = instance.getSnapshot()
             data.put(attribute, snapshot)
         }
@@ -396,43 +402,31 @@ private class ImmutableAttributeMapImpl(
     }
 
     override fun getInstance(attribute: Attribute): ImmutableAttributeInstance? {
-        if (attribute.vanilla) {
-            return null
-        }
-        return default.createInstance(attribute)
+        return data[attribute]
     }
 
     override fun getAttributes(): Set<Attribute> {
-        return default.attributes.filterNot { it.vanilla }.toSet()
+        return data.keys
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
-        ensureNonVanilla(attribute)
-        return default.hasAttribute(attribute)
+        return data.containsKey(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
-        ensureNonVanilla(attribute)
-        return default.hasModifier(attribute, uuid)
+        return data[attribute]?.getModifier(uuid) != null
     }
 
     override fun getValue(attribute: Attribute): Double {
-        ensureNonVanilla(attribute)
-        return default.getValue(attribute)
+        return data[attribute]?.getValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in ImmutableAttributeMap")
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        ensureNonVanilla(attribute)
-        return default.getBaseValue(attribute)
+        return data[attribute]?.getBaseValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in ImmutableAttributeMap")
     }
 
     override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        ensureNonVanilla(attribute)
-        return default.getModifierValue(attribute, uuid)
-    }
-
-    private fun ensureNonVanilla(attribute: Attribute) {
-        require(!attribute.vanilla) { "Vanilla attributes are not supported for ImmutableAttributeMap" }
+        return data[attribute]?.getModifier(uuid)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in ImmutableAttributeMap")
     }
 }
 
@@ -465,14 +459,14 @@ private class AttributeMapSnapshotImpl(
     }
 
     override fun getValue(attribute: Attribute): Double {
-        return data[attribute]?.getValue() ?: throw NoSuchElementException("Attribute '$attribute' not found")
+        return data[attribute]?.getValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in AttributeMapSnapshot")
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        return data[attribute]?.getBaseValue() ?: throw NoSuchElementException("Attribute '$attribute' not found")
+        return data[attribute]?.getBaseValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in AttributeMapSnapshot")
     }
 
     override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        return data[attribute]?.getModifier(uuid)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found")
+        return data[attribute]?.getModifier(uuid)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in AttributeMapSnapshot")
     }
 }
