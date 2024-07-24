@@ -4,65 +4,66 @@
 components:
   arrow:
     enabled: true
-    display_name: "弹药"
+    display_name: "<!i>弹药"
     tooltips:
       single: "<!i>穿透: <pierce_level>"
 
   attribute_modifiers:
     enabled: true
-    display_name: "属性修饰符"
+    display_name: "<!i>属性修饰符"
     tooltips: { }
 
   attributable:
     enabled: true
-    display_name: "提供属性加成"
+    display_name: "<!i>提供属性加成"
     tooltips:
       single: "<!i>提供属性加成"
 
   bow:
     enabled: true
-    display_name: "弓"
+    display_name: "<!i>弓"
     tooltips: { }
 
   can_break:
     enabled: true
-    display_name: "CAN_BREAK"
+    display_name: "<!i>CAN_BREAK"
     tooltips: { }
 
   can_place_on:
     enabled: true
-    display_name: "CAN_PLACE_ON"
+    display_name: "<!i>CAN_PLACE_ON"
     tooltips: { }
 
   castable:
     enabled: true
-    display_name: "可以施放技能"
+    display_name: "<!i>可以施放技能"
     tooltips:
       single: "<!i>可以施放技能"
 
   cells:
     enabled: true
-    display_name: "词条栏"
+    display_name: "<!i>词条栏"
     max_visible_empty_cores: 10
     tooltips:
-      # 其他的设置委托到专门的配置文件
-      empty: "<!i><gray>空词条栏"
+      empty_core:
+        name: "<!i>空词条栏"
+        lore: "<!i><gray>空词条栏"
 
   crate:
     enabled: true
-    display_name: "盲盒"
+    display_name: "<!i>盲盒"
     tooltips:
       single: "<!i>盲盒: <key>"
 
   custom_model_data:
     enabled: true
-    display_name: "自定义模型数据"
+    display_name: "<!i>自定义模型数据"
     tooltips:
       single: "<!i>自定义模型数据: <custom_model_data>"
 
   custom_name:
     enabled: true
-    display_name: "自定义名字"
+    display_name: "<!i>自定义名字"
     # 额外标签
     # <rarity_name> 稀有度名字
     # <rarity_style> 稀有度样式
@@ -71,13 +72,13 @@ components:
 
   damage:
     enabled: true
-    display_name: "耐久损耗"
+    display_name: "<!i>耐久损耗"
     tooltips:
       single: "<!i>耐久损耗: <damage>"
 
   damageable:
     enabled: true
-    display_name: "耐久度"
+    display_name: "<!i>耐久度"
     # 额外标签
     # <damage> 损耗值
     # <max_damage> 最大损耗值
@@ -87,12 +88,12 @@ components:
 
   dyed_color:
     enabled: true
-    display_name: "染色"
+    display_name: "<!i>染色"
     tooltips: { }
 
   elements:
     enabled: true
-    display_name: "元素"
+    display_name: "<!i>元素"
     # 额外标签
     # <merged> 多个元素合并后的文本
     # <single> 单个元素
@@ -103,37 +104,37 @@ components:
 
   enchantments:
     enabled: true
-    display_name: "附魔"
+    display_name: "<!i>附魔"
     tooltips: { }
 
   fire_resistant:
     enabled: true
-    display_name: "免疫火焰伤害"
+    display_name: "<!i>免疫火焰伤害"
     tooltips:
       single: "<!i>免疫火焰伤害"
 
   food:
     enabled: true
-    display_name: "作为食物"
+    display_name: "<!i>作为食物"
     tooltips: { }
 
   glowable:
     enabled: true
-    display_name: "可发光"
+    display_name: "<!i>可发光"
     tooltips:
       single: "可发光"
 
   hide_tooltip:
     enabled: true
-    display_name: "隐藏提示框"
+    display_name: "<!i>隐藏提示框"
 
   hide_additional_tooltip:
     enabled: true
-    display_name: "隐藏额外提示框"
+    display_name: "<!i>隐藏额外提示框"
 
   item_name:
     enabled: true
-    display_name: "物品名字"
+    display_name: "<!i>物品名字"
     # 额外标签
     # <rarity_name> 稀有度名字
     # <rarity_style> 稀有度样式
@@ -142,7 +143,7 @@ components:
 
   kizamiz:
     enabled: true
-    display_name: "铭刻"
+    display_name: "<!i>铭刻"
     # 额外标签
     # <merged> 多个铭刻合并后的文本
     # <single> 单个铭刻
@@ -153,19 +154,19 @@ components:
 
   kizamiable:
     enabled: true
-    display_name: "提供铭刻加成"
+    display_name: "<!i>提供铭刻加成"
     tooltips:
       single: "<!i>提供铭刻加成"
 
   level:
     enabled: true
-    display_name: "等级"
+    display_name: "<!i>等级"
     tooltips:
       single: "<!i>等级: <value>"
 
   lore:
     enabled: true
-    display_name: "描述"
+    display_name: "<!i>描述"
     # 额外标签：
     # <line> 描述内容
     tooltips:
@@ -175,72 +176,72 @@ components:
 
   max_damage:
     enabled: true
-    display_name: "最大耐久损耗"
+    display_name: "<!i>最大耐久损耗"
     tooltips:
       single: "<!i>最大耐久损耗: <max_damage>"
 
   portable_core:
     enabled: true
-    display_name: "便携式核心"
+    display_name: "<!i>便携式核心"
     tooltips: { } # 取决于核心
 
   portable_curse:
     enabled: true
-    display_name: "便携式诅咒"
+    display_name: "<!i>便携式诅咒"
     tooltips: { } # 取决于诅咒
 
   rarity:
     enabled: true
-    display_name: "稀有度"
+    display_name: "<!i>稀有度"
     tooltips:
       single: "<!i>稀有度: <value>"
 
   skillful:
     enabled: true
-    display_name: "提供技能加成"
+    display_name: "<!i>提供技能加成"
     tooltips:
       single: "<!i>提供技能加成"
 
   skin:
     enabled: true
-    display_name: "皮肤"
+    display_name: "<!i>皮肤"
     tooltips:
       single: "<!i>皮肤: <skin_name>"
 
   skin_owner:
     enabled: true
-    display_name: "皮肤所有者"
+    display_name: "<!i>皮肤所有者"
     tooltips:
       single: "<!i>皮肤所有者: <skin_owner_name>"
 
   stored_enchantments:
     enabled: true
-    display_name: "存储的附魔"
+    display_name: "<!i>存储的附魔"
     tooltips: { }
 
   system_use:
     enabled: true
-    display_name: "系统使用"
+    display_name: "<!i>系统使用"
     tooltips:
       single: "<!i>系统使用"
 
   tool:
     enabled: true
-    display_name: "工具"
+    display_name: "<!i>工具"
     tooltips:
       single: "<!i>工具"
 
   tracks:
     enabled: true
-    display_name: "信息跟踪"
+    display_name: "<!i>信息跟踪"
     tooltips: { } # 内容过多, 委托到其他配置文件进行设置
 
   trim:
     enabled: true
-    display_name: "纹饰"
+    display_name: "<!i>纹饰"
 
   unbreakable:
     enabled: true
-    display_name: "无耐久损耗"
+    display_name: "<!i>无耐久损耗"
     tooltips:
       single: "<!i>无耐久损耗"

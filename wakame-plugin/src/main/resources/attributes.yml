@@ -7,7 +7,7 @@
 #   enabled: true
 #
 #   属性的名字，展示给玩家看的
-#   display: "无属性"
+#   display_name: "无属性"
 #
 #   属性在提示框里的样式
 #   tooltips:
@@ -21,16 +21,16 @@
 
 empty:
   enabled: true
-  display: "无属性"
+  display_name: "<!i>无属性"
   tooltips:
-    add: "Empty"
-    multiply_base: "Empty"
-    multiply_total: "Empty"
+    add: "<!i>Empty"
+    multiply_base: "<!i>Empty"
+    multiply_total: "<!i>Empty"
   values: { }
 
 attack_damage:
   enabled: true
-  display: "<element>攻击力"
+  display_name: "<!i><element>攻击力"
   tooltips:
     add: "<!i><element>攻击力 <min:#;-.> ⎓ <max:#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -63,7 +63,7 @@ attack_damage:
 
 attack_damage_rate:
   enabled: true
-  display: "<element>攻击力"
+  display_name: "<!i><element>攻击力"
   tooltips:
     add: "<!i><element>攻击力 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -96,7 +96,7 @@ attack_damage_rate:
 
 attack_effect_chance:
   enabled: true
-  display: "元素叠加"
+  display_name: "<!i>元素叠加"
   tooltips:
     add: "<!i>元素叠加 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -108,7 +108,7 @@ attack_effect_chance:
 
 attack_speed_level:
   enabled: true
-  display: "攻击速度"
+  display_name: "<!i>攻击速度"
   tooltips:
     add: "<!i>攻击速度 <value>"
     multiply_base: "<red>DO_NOT_USE"
@@ -130,7 +130,7 @@ attack_speed_level:
 
 block_interaction_range:
   enabled: true
-  display: "方块交互距离"
+  display_name: "<!i>方块交互距离"
   tooltips:
     add: "<!i>方块交互距离 <value:+#.#;-.>"
     multiply_base: "<!i>方块交互距离 <value:+#%;-.%>"
@@ -142,7 +142,7 @@ block_interaction_range:
 
 critical_strike_chance:
   enabled: true
-  display: "暴击概率"
+  display_name: "<!i>暴击概率"
   tooltips:
     add: "<!i>暴击概率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -154,7 +154,7 @@ critical_strike_chance:
 
 critical_strike_power:
   enabled: true
-  display: "暴击伤害"
+  display_name: "<!i>暴击伤害"
   tooltips:
     add: "<!i>暴击伤害 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -167,7 +167,7 @@ critical_strike_power:
 
 defense:
   enabled: true
-  display: "<element>防御力"
+  display_name: "<!i><element>防御力"
   tooltips:
     add: "<!i><element>防御力 <value:+#;-.>"
     multiply_base: "<!i><element>防御力 <value:+#%;-.%>"
@@ -200,7 +200,7 @@ defense:
 
 defense_penetration:
   enabled: true
-  display: "<element>防御穿透"
+  display_name: "<!i><element>防御穿透"
   tooltips:
     add: "<!i><element>防御穿透 <value:+#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -233,7 +233,7 @@ defense_penetration:
 
 defense_penetration_rate:
   enabled: true
-  display: "<element>防御穿透率"
+  display_name: "<!i><element>防御穿透率"
   tooltips:
     add: "<!i><element>防御穿透率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -266,7 +266,7 @@ defense_penetration_rate:
 
 entity_interaction_range:
   enabled: true
-  display: "实体交互距离"
+  display_name: "<!i>实体交互距离"
   tooltips:
     add: "<!i>实体交互距离 <value:+#.#;-.>"
     multiply_base: "<!i>实体交互距离 <value:+#%;-.%>"
@@ -278,7 +278,7 @@ entity_interaction_range:
 
 health_regeneration:
   enabled: true
-  display: "生命恢复"
+  display_name: "<!i>生命恢复"
   tooltips:
     add: "<!i>生命恢复 <value:+#;-.>"
     multiply_base: "<!i>生命恢复 <value:+#%;-.%>"
@@ -290,7 +290,7 @@ health_regeneration:
 
 incoming_damage_rate:
   enabled: true
-  display: "<element>承伤百分比"
+  display_name: "<!i><element>承伤百分比"
   tooltips:
     add: "<!i><element>承伤百分比 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -323,7 +323,7 @@ incoming_damage_rate:
 
 lifesteal:
   enabled: true
-  display: "攻击吸血"
+  display_name: "<!i>攻击吸血"
   tooltips:
     add: "<!i>攻击吸血 <value:+#;-.>"
     multiply_base: "<!i>攻击吸血 <value:+#%;-.%>"
@@ -335,7 +335,7 @@ lifesteal:
 
 mana_consumption_rate:
   enabled: true
-  display: "魔法消耗百分比"
+  display_name: "<!i>魔法消耗百分比"
   tooltips:
     add: "<!i>魔法消耗率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -347,7 +347,7 @@ mana_consumption_rate:
 
 mana_regeneration:
   enabled: true
-  display: "魔法恢复"
+  display_name: "<!i>魔法恢复"
   tooltips:
     add: "<!i>魔法恢复 <value:+#;-.>"
     multiply_base: "<!i>魔法恢复 <value:+#%;-.%>"
@@ -359,7 +359,7 @@ mana_regeneration:
 
 manasteal:
   enabled: true
-  display: "魔法汲取"
+  display_name: "<!i>魔法汲取"
   tooltips:
     add: "<!i>魔法汲取 <value:+#;-.>"
     multiply_base: "<!i>魔法汲取 <value:+#%;-.%>"
@@ -371,7 +371,7 @@ manasteal:
 
 max_absorption:
   enabled: true
-  display: "最大护盾"
+  display_name: "<!i>最大护盾"
   tooltips:
     add: "<!i>最大护盾 <value:+#;-.>"
     multiply_base: "<!i>最大护盾 <value:+#%;-.%>"
@@ -383,7 +383,7 @@ max_absorption:
 
 max_health:
   enabled: true
-  display: "最大生命"
+  display_name: "<!i>最大生命"
   tooltips:
     add: "<!i>最大生命 <value:+#;-.>"
     multiply_base: "<!i>最大生命 <value:+#%;-.%>"
@@ -395,7 +395,7 @@ max_health:
 
 max_mana:
   enabled: true
-  display: "最大魔法"
+  display_name: "<!i>最大魔法"
   tooltips:
     add: "<!i>最大魔法 <value:+#;-.>"
     multiply_base: "<!i>最大魔法 <value:+#%;-.%>"
@@ -407,7 +407,7 @@ max_mana:
 
 movement_speed:
   enabled: true
-  display: "移动速度"
+  display_name: "<!i>移动速度"
   tooltips:
     add: "<!i>移动速度 <value:+#.#;-.>"
     multiply_base: "<!i>移动速度 <value:+#%;-.%>"
@@ -419,7 +419,7 @@ movement_speed:
 
 universal_attack_damage:
   enabled: true
-  display: "通用攻击力"
+  display_name: "<!i>通用攻击力"
   tooltips:
     add: "<!i>通用攻击力 <min:#;-.> ⎓ <max:#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -431,7 +431,7 @@ universal_attack_damage:
 
 universal_attack_damage_rate:
   enabled: true
-  display: "通用攻击力"
+  display_name: "<!i>通用攻击力"
   tooltips:
     add: "<!i>通用攻击力 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -443,7 +443,7 @@ universal_attack_damage_rate:
 
 universal_defense:
   enabled: true
-  display: "通用防御"
+  display_name: "<!i>通用防御"
   tooltips:
     add: "<!i>通用防御 <value:+#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -455,7 +455,7 @@ universal_defense:
 
 universal_defense_penetration:
   enabled: true
-  display: "通用防御穿透"
+  display_name: "<!i>通用防御穿透"
   tooltips:
     add: "<!i>通用防御穿透 <value:+#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -467,7 +467,7 @@ universal_defense_penetration:
 
 universal_defense_penetration_rate:
   enabled: true
-  display: "通用防御穿透率"
+  display_name: "<!i>通用防御穿透率"
   tooltips:
     add: "<!i>通用防御穿透率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -479,7 +479,7 @@ universal_defense_penetration_rate:
 
 universal_incoming_damage_rate:
   enabled: true
-  display: "通用承伤百分比"
+  display_name: "<!i>通用承伤百分比"
   tooltips:
     add: "<!i>通用承伤百分比 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
