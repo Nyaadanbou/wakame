@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.gui.modding.CoreModdingMenu
 import cc.mewcraft.wakame.gui.modding.CurseModdingMenu
+import cc.mewcraft.wakame.reforge.modding.config.ModdingTableWtf
 import cc.mewcraft.wakame.util.ThreadType
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.Command
@@ -50,7 +51,8 @@ object ReforgeCommands : CommandFactory<CommandSender> {
 
                     ThreadType.SYNC.launch {
                         sender.sendPlainMessage("Opening menu...")
-                        val menu = CoreModdingMenu(viewer)
+                        // TODO 载入特定的 ModdingTable
+                        val menu = CoreModdingMenu(ModdingTableWtf, viewer)
                         menu.open()
                     }
                 }
@@ -74,7 +76,8 @@ object ReforgeCommands : CommandFactory<CommandSender> {
 
                     ThreadType.SYNC.launch {
                         sender.sendPlainMessage("Opening menu...")
-                        val menu = CurseModdingMenu(viewer)
+                        // TODO 载入特定的 ModdingTable
+                        val menu = CurseModdingMenu(ModdingTableWtf, viewer)
                         menu.open()
                     }
                 }

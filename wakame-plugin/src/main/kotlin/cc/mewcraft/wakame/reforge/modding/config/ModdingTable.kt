@@ -5,11 +5,12 @@ import cc.mewcraft.wakame.reforge.modding.match.CoreMatchRule
 import cc.mewcraft.wakame.reforge.modding.match.CurseMatchRule
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.examination.Examinable
 
 /**
- * 封装了定制台的配置文件.
+ * 代表一个定制台, 包含配置文件.
  */
-interface ModdingTable {
+interface ModdingTable : Examinable {
     /**
      * 是否启用这个定制台.
      */
@@ -23,21 +24,21 @@ interface ModdingTable {
     /**
      * 定制台的花费设置, 该设置适用于整个定制台.
      */
-    val cost: GlobalCost
+    val globalCost: GlobalCost
 
     /**
      * 针对具体的物品类型的定制规则.
      *
      * [Key] 为物品的类型 (萌芽物品的 id), [ItemRule] 为对应的定制规则.
      */
-    val rules: Map<Key, ItemRule>
+    val itemRules: ItemRuleMap
 
     /**
      * 适用于一整个定制工作台的花费设置.
      *
      * 这里定义的所有成员的具体用途都取决于具体的实现.
      */
-    interface GlobalCost {
+    interface GlobalCost : Examinable {
         /**
          * 基础花费.
          */
@@ -67,7 +68,7 @@ interface ModdingTable {
     /**
      * 代表一个物品的定制规则.
      */
-    interface ItemRule {
+    interface ItemRule : Examinable {
         /**
          * 适用的萌芽物品类型.
          */
@@ -78,22 +79,24 @@ interface ModdingTable {
          *
          * [String] 为词条栏的 id, [CellRule] 为对应的定制规则.
          */
-        val cellRules: Map<String, CellRule>
+        val cellRules: CellRuleMap
+    }
+
+    /**
+     * 代表一个映射, 储存了各种物品的定制规则.
+     */
+    interface ItemRuleMap : Examinable {
+        operator fun get(key: Key): ItemRule?
     }
 
     /**
      * 代表一个词条栏的定制规则.
      */
-    interface CellRule {
-        /**
-         * 该规则适用的词条栏的 id.
-         */
-        val target: String
-
+    interface CellRule : Examinable {
         /**
          * 定制词条栏所需要的权限.
          */
-        val permission: String
+        val permission: String?
 
         /**
          * 定制该词条栏的花费.
@@ -118,5 +121,12 @@ interface ModdingTable {
          * 储存了具体的规则, 定义了一个诅咒必须满足什么样的规则才算被“接受”.
          */
         val acceptedCurses: List<CurseMatchRule>
+    }
+
+    /**
+     * 代表一个映射, 储存了各个词条栏的定制规则.
+     */
+    interface CellRuleMap : Examinable {
+        operator fun get(key: String): CellRule?
     }
 }
