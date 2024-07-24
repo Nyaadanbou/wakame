@@ -165,7 +165,7 @@ val BukkitStack.wakameTagOrNull: CompoundShadowTag?
 fun BukkitStack.removeWakameTag() {
     val handle = this.handle
     if (handle != null) { // CraftItemStack
-        handle.minecraftCustomData?.remove(WAKAME_TAG_NAME)
+        handle.getDirectCustomData()?.remove(WAKAME_TAG_NAME)
     } else { // strictly-Bukkit ItemStack
         this.backingItemMeta?.minecraftCustomData?.remove(WAKAME_TAG_NAME)
     }
@@ -215,18 +215,18 @@ private val ItemMeta.minecraftCustomData: CompoundTag
 //<editor-fold desc="MojangStack">
 private var MojangStack.wakameTag: CompoundShadowTag
     get() {
-        val customData = this.minecraftCustomDataOrCreate
+        val customData = this.getDirectCustomDataOrCreate()
         val wakameTag = customData.getOrPut(WAKAME_TAG_NAME, ::CompoundTag)
         return wakameTag.wrap
     }
     set(value) {
-        val customData = this.minecraftCustomDataOrCreate
+        val customData = this.getDirectCustomDataOrCreate()
         customData.put(WAKAME_TAG_NAME, value.unwrap)
     }
 
 private val MojangStack.wakameTagOrNull: CompoundShadowTag?
     get() {
-        val customData = this.minecraftCustomData
+        val customData = this.getDirectCustomData()
         val wakameTag = customData?.getCompoundOrNull(WAKAME_TAG_NAME)
         return wakameTag?.wrap
     }

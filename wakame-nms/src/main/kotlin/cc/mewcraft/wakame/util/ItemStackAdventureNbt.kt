@@ -22,7 +22,7 @@ import org.bukkit.inventory.ItemStack as BukkitStack
 val BukkitStack.adventureNbt: CompoundBinaryTag
     get() {
         val mojangStack = CraftItemStack.unwrap(this)
-        return mojangStack.minecraftCustomData?.toAdventure ?: CompoundBinaryTag.empty()
+        return mojangStack.getDirectCustomData()?.toAdventure ?: CompoundBinaryTag.empty()
     }
 
 /**
@@ -38,7 +38,7 @@ val BukkitStack.adventureNbtOrNull: CompoundBinaryTag?
         if (this is CraftItemStack) {
             // If handle is null, that means this Bukkit item is not backed by an NMS item
             // If tag is null, that means this item simply does not have any NBT tags
-            return this.handle.minecraftCustomData?.toAdventure
+            return this.handle.getDirectCustomData()?.toAdventure
         }
         return null // The item is a strictly-Bukkit stack
     }
@@ -51,7 +51,7 @@ val BukkitStack.adventureNbtOrNull: CompoundBinaryTag?
  */
 fun BukkitStack.setAdventureNbt(setter: CompoundBinaryTag.Builder.() -> Unit) {
     if (this is CraftItemStack && !this.isEmpty) {
-        val adventureCompound = this.handle.minecraftCustomDataOrCreate.toAdventure
+        val adventureCompound = this.handle.getDirectCustomDataOrCreate().toAdventure
         val adventureCompoundBuilder = CompoundBinaryTag.builder().put(adventureCompound).apply(setter)
         this.handle.set(DataComponents.CUSTOM_DATA, CustomData.of(adventureCompoundBuilder.build().toMinecraft))
     }
@@ -64,7 +64,7 @@ fun BukkitStack.setAdventureNbt(setter: CompoundBinaryTag.Builder.() -> Unit) {
  */
 fun BukkitStack.copyWriteAdventureNbt(setter: CompoundBinaryTag.Builder.() -> Unit): BukkitStack {
     val mojangStack = CraftItemStack.asNMSCopy(this)
-    val adventureCompound = mojangStack.minecraftCustomDataOrCreate.toAdventure
+    val adventureCompound = mojangStack.getDirectCustomDataOrCreate().toAdventure
     val adventureCompoundBuilder = CompoundBinaryTag.builder().put(adventureCompound).apply(setter)
     mojangStack.set(DataComponents.CUSTOM_DATA, CustomData.of(adventureCompoundBuilder.build().toMinecraft))
     return mojangStack.asBukkitMirror()
