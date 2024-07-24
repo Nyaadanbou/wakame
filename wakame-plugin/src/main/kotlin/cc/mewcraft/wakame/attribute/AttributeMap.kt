@@ -101,13 +101,13 @@ sealed interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable {
 /**
  * 代表一个不可变的 [AttributeMapLike], 不支持任何写入.
  */
-sealed interface ImmutableAttributeMap : AttributeMapLike, AttributeMapSnapshotable {
+sealed interface IntangibleAttributeMap : AttributeMapLike, AttributeMapSnapshotable {
     /**
-     * 获取指定 [attribute] 的 [ImmutableAttributeInstance].
+     * 获取指定 [attribute] 的 [IntangibleAttributeInstance].
      *
      * 如果指定的 [attribute] 不存在, 则返回 `null`.
      */
-    fun getInstance(attribute: Attribute): ImmutableAttributeInstance?
+    fun getInstance(attribute: Attribute): IntangibleAttributeInstance?
 }
 
 /**
@@ -135,11 +135,11 @@ fun AttributeMap(entity: LivingEntity): AttributeMap {
 }
 
 /**
- * [ImmutableAttributeMap] 的实例.
+ * [IntangibleAttributeMap] 的实例.
  */
-object ImmutableAttributeMaps {
-    val ARROW: ImmutableAttributeMap by ReloadableProperty { ImmutableAttributeMapPool.get(Key.key("arrow")) }
-    val DISPENSER: ImmutableAttributeMap by ReloadableProperty { ImmutableAttributeMapPool.get(Key.key("dispenser")) }
+object IntangibleAttributeMaps {
+    val ARROW: IntangibleAttributeMap by ReloadableProperty { IntangibleAttributeMapPool.get(Key.key("arrow")) }
+    val DISPENSER: IntangibleAttributeMap by ReloadableProperty { IntangibleAttributeMapPool.get(Key.key("dispenser")) }
 }
 
 
@@ -352,21 +352,21 @@ private class EntityAttributeMap : AttributeMap {
     }
 }
 
-private object ImmutableAttributeMapPool : KoinComponent {
+private object IntangibleAttributeMapPool : KoinComponent {
     val logger: Logger by inject()
-    val pool: ConcurrentHashMap<Key, ImmutableAttributeMap> = ConcurrentHashMap()
+    val pool: ConcurrentHashMap<Key, IntangibleAttributeMap> = ConcurrentHashMap()
 
-    fun get(key: Key): ImmutableAttributeMap {
+    fun get(key: Key): IntangibleAttributeMap {
         return pool.computeIfAbsent(key) {
             val default = DefaultAttributes.getSupplier(it)
-            val data = Reference2ObjectOpenHashMap<Attribute, ImmutableAttributeInstance>()
+            val data = Reference2ObjectOpenHashMap<Attribute, IntangibleAttributeInstance>()
             for (attribute in default.attributes) {
                 val instance = default.createInstance(attribute) ?: continue
                 val snapshot = instance.getSnapshot()
                 val immutable = snapshot.toImmutable()
                 data[attribute] = immutable
             }
-            ImmutableAttributeMapImpl(data)
+            IntangibleAttributeMapImpl(data)
         }
     }
 
@@ -377,19 +377,19 @@ private object ImmutableAttributeMapPool : KoinComponent {
     init {
         PluginEventBus.get().subscribe<NekoCommandReloadEvent> {
             reset()
-            logger.info("Reset object pool of ImmutableAttributeMap")
+            logger.info("Reset object pool of IntangibleAttributeMap")
         }
     }
 }
 
 // 开发日记 2024/7/24
-// 我感觉这个 ImmutableAttributeMap 可以照搬
+// 我感觉这个 IntangibleAttributeMap 可以照搬
 // AttributeMapSnapshot 的实现,
 // 只不过不允许任何写入操作.
 
-private class ImmutableAttributeMapImpl(
-    val data: Reference2ObjectOpenHashMap<Attribute, ImmutableAttributeInstance>,
-) : ImmutableAttributeMap {
+private class IntangibleAttributeMapImpl(
+    val data: Reference2ObjectOpenHashMap<Attribute, IntangibleAttributeInstance>,
+) : IntangibleAttributeMap {
     @Suppress("DuplicatedCode")
     override fun getSnapshot(): AttributeMapSnapshot {
         val data = Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>()
@@ -401,7 +401,7 @@ private class ImmutableAttributeMapImpl(
         return AttributeMapSnapshotImpl(data)
     }
 
-    override fun getInstance(attribute: Attribute): ImmutableAttributeInstance? {
+    override fun getInstance(attribute: Attribute): IntangibleAttributeInstance? {
         return data[attribute]
     }
 
@@ -418,15 +418,15 @@ private class ImmutableAttributeMapImpl(
     }
 
     override fun getValue(attribute: Attribute): Double {
-        return data[attribute]?.getValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in ImmutableAttributeMap")
+        return data[attribute]?.getValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in IntangibleAttributeMap")
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        return data[attribute]?.getBaseValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in ImmutableAttributeMap")
+        return data[attribute]?.getBaseValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in IntangibleAttributeMap")
     }
 
     override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        return data[attribute]?.getModifier(uuid)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in ImmutableAttributeMap")
+        return data[attribute]?.getModifier(uuid)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in IntangibleAttributeMap")
     }
 }
 

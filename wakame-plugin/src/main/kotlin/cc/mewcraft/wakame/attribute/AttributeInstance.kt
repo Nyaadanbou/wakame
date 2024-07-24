@@ -48,7 +48,7 @@ sealed interface AttributeInstance : AttributeInstanceSnapshotable {
 /**
  * 代表一个不可变的属性实例.
  */
-sealed interface ImmutableAttributeInstance : AttributeInstanceSnapshotable {
+sealed interface IntangibleAttributeInstance : AttributeInstanceSnapshotable {
     val attribute: Attribute
     fun getValue(): Double
     fun getBaseValue(): Double
@@ -72,7 +72,7 @@ sealed interface AttributeInstanceSnapshot {
     fun removeModifier(modifier: AttributeModifier)
     fun removeModifier(uuid: UUID)
     fun removeModifiers()
-    fun toImmutable(): ImmutableAttributeInstance
+    fun toImmutable(): IntangibleAttributeInstance
 }
 
 /**
@@ -452,9 +452,9 @@ private class VanillaAttributeInstance(
     }
 }
 
-private class ImmutableAttributeInstanceImpl(
+private class IntangibleAttributeInstanceImpl(
     val delegation: AttributeInstanceDelegation,
-) : ImmutableAttributeInstance {
+) : IntangibleAttributeInstance {
     override val attribute: Attribute
         get() = delegation.attribute
 
@@ -519,7 +519,7 @@ private class AttributeInstanceSnapshotImpl(
     override fun removeModifiers() =
         delegation.removeModifiers()
 
-    override fun toImmutable(): ImmutableAttributeInstance {
-        return ImmutableAttributeInstanceImpl(delegation.clone())
+    override fun toImmutable(): IntangibleAttributeInstance {
+        return IntangibleAttributeInstanceImpl(delegation.clone())
     }
 }
