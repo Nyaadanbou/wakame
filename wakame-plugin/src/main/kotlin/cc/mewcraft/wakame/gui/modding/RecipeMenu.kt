@@ -25,32 +25,25 @@ import xyz.xenondevs.invui.item.impl.SimpleItem
  *
  * @param T 定制的类型
  */
-abstract class RecipeMenu<T> : KoinComponent {
-    protected val logger: Logger by inject()
-
-    protected abstract val viewer: Player
-    protected abstract val parentMenu: ModdingMenu<T>
-    protected abstract val sessionRecipe: ModdingSession.Recipe<T>
-    protected abstract fun getPortableObject(stack: NekoStack): PortableObject<T>?
-
-    private val inputInventory: VirtualInventory = VirtualInventory(1)
-    private val recipeGui: Gui = Gui.normal { builder ->
+abstract class RecipeMenu<T>(
+    private val viewer: Player,
+    private val parentMenu: ModdingMenu<T>,
+    private val recipeSession: ModdingSession.RecipeSession<T>,
+) : KoinComponent {
+    private val logger: Logger by inject()
+    private val inputInventory: VirtualInventory = VirtualInventory(/* maxStackSizes = */ intArrayOf(1))
+    val recipeGui: Gui = Gui.normal { builder ->
         // a: 定制对象的预览物品
         // b: 接收玩家输入的物品的容器
         // *: 起视觉引导作用的物品
         builder.setStructure("a * b")
-        builder.addIngredient('a', viewItemConstructor(sessionRecipe))
+        builder.addIngredient('a', viewItemConstructor(recipeSession))
         builder.addIngredient('b', inputInventory)
         builder.addIngredient('*', SimpleItem(ItemStack(Material.WHITE_STAINED_GLASS_PANE).hideTooltip(true)))
     }
 
-    protected abstract fun viewItemConstructor(recipe: ModdingSession.Recipe<T>): Item
-
-    /**
-     * 创建的 [Gui].
-     */
-    val createdGui: Gui
-        get() = recipeGui
+    protected abstract fun getPortableObject(stack: NekoStack): PortableObject<T>?
+    protected abstract fun viewItemConstructor(recipeSession: ModdingSession.RecipeSession<T>): Item
 
     // 初始化输入容器的 handler
     init {
@@ -85,15 +78,15 @@ abstract class RecipeMenu<T> : KoinComponent {
                         return@pre
                     }
 
-                    val result = sessionRecipe.test(portableObject.wrapped)
+                    val result = recipeSession.test(portableObject.wrapped)
                     if (!result.isSuccess) {
                         event.isCancelled = true
-                        viewer.sendMessage("无法将该修改应用到词条栏上!")
+                        viewer.sendMessage("该物品无法用于定制该词条栏!")
                         return@pre
                     }
 
                     // 保存物品快照
-                    sessionRecipe.input = stack
+                    recipeSession.input = stack
                     // 通知主菜单, 更新输出容器里的物品
                     parentMenu.refreshOutputInventory()
                     // 玩家做出了修改, 重置确认状态
@@ -102,8 +95,24 @@ abstract class RecipeMenu<T> : KoinComponent {
 
                 // Case 3: 玩家从输入容器中移除物品
                 event.isRemove -> {
-                    // 清空物品快照
-                    sessionRecipe.input = null
+                    val moddingSession = parentMenu.currentSession ?: run {
+                        event.isCancelled = true
+                        logger.error("Modding session (viewer: ${viewer.name}) is null, but an item is being added to the recipe menu. This is a bug!")
+                        return@pre
+                    }
+
+                    val input = recipeSession.input ?: run {
+                        event.isCancelled = true
+                        logger.error("Recipe menu (viewer: ${viewer.name}) input is null, but an item is being removed from the recipe menu. This is a bug!")
+                        return@pre
+                    }
+
+                    // 设置 itemOnCursor 为原输入
+                    setItemOnCursor(input.handle)
+                    // 清空物品输入
+                    recipeSession.input = null
+                    // 玩家做出了修改, 重置确认状态
+                    moddingSession.confirmed = false
                 }
             }
         }
@@ -112,5 +121,9 @@ abstract class RecipeMenu<T> : KoinComponent {
             val newItem = event.newItem
             logger.info("Recipe input updated: ${prevItem?.type} -> ${newItem?.type}")
         }
+    }
+
+    private fun setItemOnCursor(stack: ItemStack) {
+        viewer.setItemOnCursor(stack)
     }
 }

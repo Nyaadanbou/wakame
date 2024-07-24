@@ -20,20 +20,6 @@ import java.util.stream.Stream
  */
 interface ModdingSession<T> : Examinable {
     /**
-     * 包含了 [ModdingSession] 实例的构造方式.
-     */
-    companion object {
-        /**
-         * 从一个输入的物品栈创建一个 [ModdingSession] 实例.
-         */
-        fun <T> of(input: NekoStack): ModdingSession<T> {
-            // 1. 从配置文件中读取定制规则
-            // 2. 根据规则创建 [Recipe] 实例
-            // 3. 返回 [ModdingSession] 实例
-        }
-    }
-
-    /**
      * 当前使用该会话的玩家.
      */
     val viewer: Player
@@ -50,16 +36,16 @@ interface ModdingSession<T> : Examinable {
     val input: NekoStack
 
     /**
+     * 当前每个词条栏的会话.
+     */
+    val recipeSessions: RecipeSessionMap<T>
+
+    /**
      * 被定制后的物品, 也就是 [input] 被修改后的样子.
      *
      * 每当玩家对定制台上的物品进行修改时 (例如放了个新的材料到词条栏里), [output] 将被实时更新.
      */
     var output: NekoStack?
-
-    /**
-     * 当前所有的修改.
-     */
-    val recipes: RecipeMap<T>
 
     /**
      * 标记玩家是否已确认要结束定制.
@@ -106,7 +92,7 @@ interface ModdingSession<T> : Examinable {
      *
      * @param T 定制的类型
      */
-    interface Recipe<T> {
+    interface RecipeSession<in T> {
         /**
          * 该定制对应的词条栏的 id.
          */
@@ -155,7 +141,7 @@ interface ModdingSession<T> : Examinable {
         }
 
         /**
-         * 一个 [Recipe] 测试输入的结果.
+         * 一个 [RecipeSession] 测试输入的结果.
          */
         interface TestResult {
             /**
@@ -171,12 +157,12 @@ interface ModdingSession<T> : Examinable {
     }
 
     /**
-     * [Recipe] 的映射. 从词条栏 id 映射到对应的 [Recipe].
+     * [RecipeSession] 的映射. 从词条栏 id 映射到对应的 [RecipeSession].
      */
-    interface RecipeMap<T> : Iterable<Map.Entry<String, Recipe<T>>> {
+    interface RecipeSessionMap<T> : Iterable<Map.Entry<String, RecipeSession<T>>> {
         val size: Int
-        fun get(id: String): Recipe<T>?
-        fun put(id: String, recipe: Recipe<T>)
+        fun get(id: String): RecipeSession<T>?
+        fun put(id: String, recipeSession: RecipeSession<T>)
         fun contains(id: String): Boolean
 
         /**

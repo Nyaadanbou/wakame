@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.gui.modding
 
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.reforge.modding.config.ModdingTable
 import cc.mewcraft.wakame.reforge.modding.session.ModdingSession
 import cc.mewcraft.wakame.util.hideTooltip
 import net.kyori.adventure.sound.Sound
@@ -25,15 +27,15 @@ import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 
 /**
- * 定制台的主菜单, 也是定制台玩家界面的代码入口.
+ * 定制台的主菜单, 也是玩家打开定制台后的代码入口.
  *
- * 按照整体设计 (假设每一步都是符合要求的):
+ * 按照整体设计 (假设每一步都没有意外发生):
  * - 玩家首先要将需要定制的物品放入 [inputInventory]
- * - 之后, 主菜单中便会出现物品上每一个词条栏的*子菜单*
- * - 在每一个关于词条栏的子菜单中
- *    - 玩家可以看到子菜单所关联的词条栏的核心/诅咒信息
+ * - 然后主菜单中便会出现若干个*子菜单*, 每个*子菜单*对应物品上的一个词条栏
+ * - 在每一个子菜单中:
+ *    - 玩家可以看到子菜单所关联的词条栏信息
  *    - 玩家可以将一个便携式物品放入子菜单的*输入容器*中
- *    - 这相当于告诉系统: 我要消耗这个物品来定制这个词条栏
+ *    - 这相当于告诉定制台: 我要消耗这个物品来定制这个词条栏
  * - 主菜单的 [outputInventory] 会实时显示定制之后的物品
  * - 玩家可以随时将定制后的物品从 [outputInventory] 中取出
  * - 如果玩家取出 [outputInventory] 中的物品, 则相当于完成定制, 同时会消耗掉所有的输入容器中的物品
@@ -47,30 +49,40 @@ abstract class ModdingMenu<T> {
     protected abstract val logger: Logger
 
     /**
-     * 菜单的使用者.
+     * 该菜单所依赖的定制台.
+     */
+    protected abstract val table: ModdingTable
+
+    /**
+     * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     protected abstract val viewer: Player
+
+    /**
+     * [ModdingSession] 的构造函数.
+     */
+    protected abstract fun moddingSessionConstructor(
+        viewer: Player, input: NekoStack,
+    ): ModdingSession<T>? // 返回 null 代表不支持定制
 
     /**
      * [RecipeMenu] 的构造函数.
      */
     protected abstract fun recipeMenuConstructor(
-        parentMenu: ModdingMenu<T>,
-        viewer: Player,
-        recipe: ModdingSession.Recipe<T>,
+        parentMenu: ModdingMenu<T>, viewer: Player, recipeSession: ModdingSession.RecipeSession<T>,
     ): RecipeMenu<T>
 
     /**
      * 用于输入被定制物品的容器.
      *
-     * 玩家放入定制台的物品将会被放入这个容器中.
+     * 我们通过这个容器来接收玩家放入定制台的物品.
      */
     private val inputInventory: VirtualInventory = VirtualInventory(/* maxStackSizes = */ intArrayOf(1))
 
     /**
      * 用于输出定制后物品的容器.
      *
-     * 定制后的物品将会被放入这个容器中.
+     * 我们通过这个容器将定制后的物品给予玩家.
      */
     private val outputInventory: VirtualInventory = VirtualInventory(/* maxStackSizes = */ intArrayOf(1))
 
@@ -107,8 +119,8 @@ abstract class ModdingMenu<T> {
      * 正在进行中的定制.
      *
      * 初始值为 `null`, 因为玩家刚打开定制台时, 应该是没有任何正在进行的定制.
-     * 当玩家放入需要定制的物品到定制台时, 会创建一个 [ModdingSession],
-     * 并且实例会赋值到这个属性上.
+     * 当玩家放入需要定制的物品到定制台时, 实现应该创建一个 [ModdingSession],
+     * 并且把实例赋值到这个属性上.
      */
     var currentSession: ModdingSession<T>? = null
 
@@ -130,26 +142,32 @@ abstract class ModdingMenu<T> {
                 event.isAdd -> {
                     // 不是 NekoStack - 返回
                     val stack = newItem?.tryNekoStack ?: run {
+                        event.isCancelled = true
                         viewer.sendPlainMessage("请放入一个萌芽物品!")
                         return@pre
                     }
 
                     // 不是有词条栏的物品 - 返回
-                    if (stack.components.has(ItemComponentTypes.CELLS)) {
-                        viewer.sendPlainMessage("请放入一个拥有核心的物品!")
+                    if (!stack.components.has(ItemComponentTypes.CELLS)) {
+                        event.isCancelled = true
+                        viewer.sendPlainMessage("请放入一个拥有词条栏的物品!")
                         return@pre
                     }
 
                     // 创建会话, 并赋值到成员变量上
-                    val session = ModdingSession.of<T>(stack).also {
+                    val session = moddingSessionConstructor(viewer, stack)?.also {
                         currentSession = it
+                    } ?: run {
+                        event.isCancelled = true
+                        viewer.sendPlainMessage("该物品不支持定制!")
+                        return@pre
                     }
 
-                    val recipeGuis = session.recipes
-                        .map { (_, recipe) ->
-                            recipeMenuConstructor(this, viewer, recipe)
-                        }
-                        .map { it.createdGui }
+                    val recipeGuis = mutableListOf<Gui>()
+                    for ((_, recipeSession) in session.recipeSessions) {
+                        val recipeMenu = recipeMenuConstructor(this, viewer, recipeSession)
+                        recipeGuis += recipeMenu.recipeGui
+                    }
                     // 更新主菜单的内容
                     fillRecipes(recipeGuis)
                     // 设置输出容器的物品
@@ -158,7 +176,7 @@ abstract class ModdingMenu<T> {
 
                 // Case 3: 玩家将物品从输入槽位取出
                 event.isRemove -> {
-                    // 玩家将物品从输入容器取出, 意味着定制过程被中途终止了.
+                    // 玩家将物品从*输入容器*取出, 意味着定制过程被中途终止了.
                     // 我们需要把玩家放入定制台的所有物品*原封不动*的归还给玩家.
 
                     val session = currentSession ?: run {
@@ -179,7 +197,7 @@ abstract class ModdingMenu<T> {
                     setItemOnCursor(session.input.handle)
 
                     // 归还定制过程中放入定制台的其他物品
-                    session.recipes
+                    session.recipeSessions
                         .mapNotNull { (_, recipe) ->
                             recipe.input?.handle
                         }
@@ -235,6 +253,8 @@ abstract class ModdingMenu<T> {
                         return@pre
                     }
 
+                    // TODO 计算价格, 然后扣钱
+
                     // 将玩家指针上的物品替换为定制后的物品
                     setItemOnCursor(output.handle)
                     // 清空 inputInventory 中的物品 (相当于消耗掉原始物品),
@@ -264,7 +284,7 @@ abstract class ModdingMenu<T> {
 
             // 有会话, 则将定制过程中玩家输入的物品归还给玩家
             viewer.inventory.addItem(session.input.handle)
-            viewer.inventory.addItem(*session.recipes.getInputItems().toTypedArray())
+            viewer.inventory.addItem(*session.recipeSessions.getInputItems().toTypedArray())
         }
         primaryWindow.addOpenHandler open@{
             viewer.playSound(Sound.sound().type(org.bukkit.Sound.BLOCK_ANVIL_PLACE).volume(1f).pitch(0f).build())

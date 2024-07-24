@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.util
 
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
@@ -15,5 +16,10 @@ inline fun <reified T : ItemMeta> ItemStack.editMeta(crossinline block: (T) -> U
 
 fun ItemStack.hideTooltip(hide: Boolean): ItemStack {
     editMeta { it.isHideTooltip = hide }
+    return this
+}
+
+fun ItemStack.hideAllFlags(): ItemStack {
+    editMeta { it.addItemFlags(*ItemFlag.entries.toTypedArray()) }
     return this
 }

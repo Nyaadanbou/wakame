@@ -4,8 +4,10 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.PortableObject
 import cc.mewcraft.wakame.item.components.cells.Curse
+import cc.mewcraft.wakame.reforge.modding.config.ModdingTable
+import cc.mewcraft.wakame.reforge.modding.session.CurseModdingSession
 import cc.mewcraft.wakame.reforge.modding.session.ModdingSession
-import cc.mewcraft.wakame.util.ThreadLocalCyclingCounter
+import cc.mewcraft.wakame.util.hideAllFlags
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.entity.Player
@@ -24,15 +26,29 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
  * 定制*诅咒*的主菜单.
  */
 class CurseModdingMenu(
+    override val table: ModdingTable,
     override val viewer: Player,
 ) : ModdingMenu<Curse>(), KoinComponent {
     override val logger: Logger by inject()
+
+    override fun moddingSessionConstructor(viewer: Player, input: NekoStack): ModdingSession<Curse>? {
+        val inputType = input.key
+        val cells = input.components.get(ItemComponentTypes.CELLS) ?: throw IllegalArgumentException("Null cells")
+        val itemRule = table.itemRules[inputType] ?: return null
+        val recipeMap = CurseModdingSession.RecipeSessionMap()
+        for ((id, cell) in cells) {
+            val cellRule = itemRule.cellRules[id] ?: continue
+            val recipeDisplay = CurseModdingSession.RecipeSession.Display(cell.provideTooltipName().content, cell.provideTooltipLore().content)
+            val recipe = CurseModdingSession.RecipeSession(id, cellRule, recipeDisplay)
+            recipeMap.put(id, recipe)
+        }
+        return CurseModdingSession(viewer, input, recipeMap)
+    }
+
     override fun recipeMenuConstructor(
-        parentMenu: ModdingMenu<Curse>,
-        viewer: Player,
-        recipe: ModdingSession.Recipe<Curse>,
+        parentMenu: ModdingMenu<Curse>, viewer: Player, recipeSession: ModdingSession.RecipeSession<Curse>,
     ): RecipeMenu<Curse> {
-        return CurseRecipeMenu(viewer, parentMenu, recipe)
+        return CurseRecipeMenu(viewer, parentMenu, recipeSession)
     }
 }
 
@@ -40,12 +56,14 @@ class CurseModdingMenu(
  * 子菜单, 用于定制单个词条栏里的*诅咒*.
  */
 class CurseRecipeMenu(
-    override val viewer: Player,
-    override val parentMenu: ModdingMenu<Curse>,
-    override val sessionRecipe: ModdingSession.Recipe<Curse>,
-) : RecipeMenu<Curse>() {
-    override fun viewItemConstructor(recipe: ModdingSession.Recipe<Curse>): Item {
-        return ViewItem(this.sessionRecipe)
+    viewer: Player,
+    parentMenu: ModdingMenu<Curse>,
+    recipeSession: ModdingSession.RecipeSession<Curse>,
+) : RecipeMenu<Curse>(
+    viewer, parentMenu, recipeSession
+), KoinComponent {
+    override fun viewItemConstructor(recipeSession: ModdingSession.RecipeSession<Curse>): Item {
+        return ViewItem(recipeSession)
     }
 
     override fun getPortableObject(stack: NekoStack): PortableObject<Curse>? {
@@ -56,21 +74,23 @@ class CurseRecipeMenu(
      * 用于预览*诅咒*的 [Item].
      */
     class ViewItem(
-        private val recipe: ModdingSession.Recipe<Curse>,
+        private val recipeSession: ModdingSession.RecipeSession<Curse>,
     ) : AbstractItem() {
 
         // 临时实现, 用于方便预览
         private companion object {
-            val trims: List<Material> = Tag.ITEMS_TRIM_MATERIALS.values.toList()
-            val cyclingCounter: ThreadLocalCyclingCounter = ThreadLocalCyclingCounter(trims.size)
-            fun getTrimMaterial(): Material {
-                return trims[cyclingCounter.next()]
-            }
+            val trims: List<Material> = Tag.ITEMS_TRIM_TEMPLATES.values.toList()
+        }
+
+        private fun getTrimMaterial(): Material {
+            val sessionHash = recipeSession.hashCode()
+            val index = sessionHash % trims.size
+            return trims[index]
         }
 
         override fun getItemProvider(): ItemProvider {
-            val stack = ItemStack(getTrimMaterial())
-            recipe.display.apply(stack)
+            val stack = ItemStack(getTrimMaterial()).hideAllFlags()
+            recipeSession.display.apply(stack)
             return ItemWrapper(stack)
         }
 

@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack
 internal class CoreModdingSession(
     override val viewer: Player,
     override val input: NekoStack,
-    override val recipes: ModdingSession.RecipeMap<Core>,
+    override val recipeSessions: ModdingSession.RecipeSessionMap<Core>,
 ) : ModdingSession<Core> {
     override var output: NekoStack? = null
     override var frozen: Boolean = false
@@ -27,7 +27,7 @@ internal class CoreModdingSession(
         val clone = input.clone()
         // 根据玩家当前的输入, 修改每个词条栏
         var cells = clone.components.get(ItemComponentTypes.CELLS) ?: throw IllegalArgumentException("Null cells")
-        for ((id, recipe) in recipes) {
+        for ((id, recipe) in recipeSessions) {
             val inputCore = recipe.input?.components?.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped
             if (inputCore != null) {
                 // 重新赋值变量为一个新对象
@@ -49,14 +49,16 @@ internal class CoreModdingSession(
         override val modded: NekoStack,
     ) : ModdingSession.Result
 
-    class Recipe(
+    class RecipeSession(
         override val id: String,
         override val rule: ModdingTable.CellRule,
         override val display: Display,
-    ) : ModdingSession.Recipe<Core> {
+    ) : ModdingSession.RecipeSession<Core> {
         override var input: NekoStack? = null
 
-        override fun test(replacement: Core): ModdingSession.Recipe.TestResult {
+        override fun test(replacement: Core): ModdingSession.RecipeSession.TestResult {
+            // TODO 检查权限
+            // TODO 检查定制次数是否达到上限
             val any = rule.acceptedCores.any { it.test(replacement) }
             if (any) {
                 return TestResult(true, "Test OK")
@@ -68,10 +70,10 @@ internal class CoreModdingSession(
         class Display(
             override val name: Component,
             override val lore: List<Component>,
-        ) : ModdingSession.Recipe.Display {
+        ) : ModdingSession.RecipeSession.Display {
             override fun apply(item: ItemStack) {
                 item.editMeta {
-                    it.displayName(name)
+                    it.itemName(name)
                     it.lore(lore)
                 }
             }
@@ -80,21 +82,21 @@ internal class CoreModdingSession(
         class TestResult(
             override val isSuccess: Boolean,
             override val resultType: String,
-        ) : ModdingSession.Recipe.TestResult
+        ) : ModdingSession.RecipeSession.TestResult
     }
 
-    class RecipeMap(
-        private val map: MutableMap<String, ModdingSession.Recipe<Core>>,
-    ) : ModdingSession.RecipeMap<Core> {
+    class RecipeSessionMap : ModdingSession.RecipeSessionMap<Core> {
+        private val map: MutableMap<String, ModdingSession.RecipeSession<Core>> = HashMap()
+
         override val size: Int
             get() = map.size
 
-        override fun get(id: String): ModdingSession.Recipe<Core>? {
+        override fun get(id: String): ModdingSession.RecipeSession<Core>? {
             return map[id]
         }
 
-        override fun put(id: String, recipe: ModdingSession.Recipe<Core>) {
-            map[id] = recipe
+        override fun put(id: String, recipeSession: ModdingSession.RecipeSession<Core>) {
+            map[id] = recipeSession
         }
 
         override fun contains(id: String): Boolean {
@@ -105,7 +107,7 @@ internal class CoreModdingSession(
             return map.values.mapNotNull { it.input }.map { it.handle }
         }
 
-        override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Recipe<Core>>> {
+        override fun iterator(): Iterator<Map.Entry<String, ModdingSession.RecipeSession<Core>>> {
             return map.iterator()
         }
     }
@@ -117,7 +119,7 @@ internal class CoreModdingSession(
 internal class CurseModdingSession(
     override val viewer: Player,
     override val input: NekoStack,
-    override val recipes: RecipeMap,
+    override val recipeSessions: ModdingSession.RecipeSessionMap<Curse>,
 ) : ModdingSession<Curse> {
     override var output: NekoStack? = null
     override var frozen: Boolean = false
@@ -128,7 +130,7 @@ internal class CurseModdingSession(
         val clone = input.clone()
         // 根据玩家当前的输入, 修改每个词条栏
         var cells = clone.components.get(ItemComponentTypes.CELLS) ?: throw IllegalArgumentException("Null cells")
-        for ((id, recipe) in recipes) {
+        for ((id, recipe) in recipeSessions) {
             val inputCurse = recipe.input?.components?.get(ItemComponentTypes.PORTABLE_CURSE)?.wrapped
             if (inputCurse != null) {
                 // 重新赋值变量为一个新对象
@@ -150,14 +152,16 @@ internal class CurseModdingSession(
         override val modded: NekoStack,
     ) : ModdingSession.Result
 
-    class Recipe(
+    class RecipeSession(
         override val id: String,
         override val rule: ModdingTable.CellRule,
         override val display: Display,
-    ) : ModdingSession.Recipe<Curse> {
+    ) : ModdingSession.RecipeSession<Curse> {
         override var input: NekoStack? = null
 
-        override fun test(replacement: Curse): ModdingSession.Recipe.TestResult {
+        override fun test(replacement: Curse): ModdingSession.RecipeSession.TestResult {
+            // TODO 检查权限
+            // TODO 检查定制次数是否达到上限
             val any = rule.acceptedCurses.any { it.test(replacement) }
             if (any) {
                 return TestResult(true, "Test OK")
@@ -169,10 +173,10 @@ internal class CurseModdingSession(
         class Display(
             override val name: Component,
             override val lore: List<Component>,
-        ) : ModdingSession.Recipe.Display {
+        ) : ModdingSession.RecipeSession.Display {
             override fun apply(item: ItemStack) {
                 item.editMeta {
-                    it.displayName(name)
+                    it.itemName(name)
                     it.lore(lore)
                 }
             }
@@ -181,21 +185,21 @@ internal class CurseModdingSession(
         class TestResult(
             override val isSuccess: Boolean,
             override val resultType: String,
-        ) : ModdingSession.Recipe.TestResult
+        ) : ModdingSession.RecipeSession.TestResult
     }
 
-    class RecipeMap(
-        private val map: MutableMap<String, ModdingSession.Recipe<Curse>>,
-    ) : ModdingSession.RecipeMap<Curse> {
+    class RecipeSessionMap : ModdingSession.RecipeSessionMap<Curse> {
+        private val map: HashMap<String, ModdingSession.RecipeSession<Curse>> = HashMap()
+
         override val size: Int
             get() = map.size
 
-        override fun get(id: String): ModdingSession.Recipe<Curse>? {
+        override fun get(id: String): ModdingSession.RecipeSession<Curse>? {
             return map[id]
         }
 
-        override fun put(id: String, recipe: ModdingSession.Recipe<Curse>) {
-            map[id] = recipe
+        override fun put(id: String, recipeSession: ModdingSession.RecipeSession<Curse>) {
+            map[id] = recipeSession
         }
 
         override fun contains(id: String): Boolean {
@@ -206,7 +210,7 @@ internal class CurseModdingSession(
             return map.values.mapNotNull { it.input }.map { it.handle }
         }
 
-        override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Recipe<Curse>>> {
+        override fun iterator(): Iterator<Map.Entry<String, ModdingSession.RecipeSession<Curse>>> {
             return map.iterator()
         }
     }
