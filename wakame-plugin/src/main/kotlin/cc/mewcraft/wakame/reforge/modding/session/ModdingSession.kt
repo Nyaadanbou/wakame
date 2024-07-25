@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.modding.session
 
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.reforge.modding.config.ModdingTable
+import cc.mewcraft.wakame.reforge.modding.ModdingTable
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
