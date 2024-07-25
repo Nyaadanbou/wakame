@@ -188,10 +188,9 @@ private class CustomNekoStack(
 
     override val nbt: CompoundTag
         get() {
-            // 开发日记 2024/6/26
             // TODO 等到 Paper 的 delegate ItemStack 完成之后,
-            // 就不需要区分一个 ItemStack 是不是 NMS 了.
-            // 到时候这个 if-clause 直接删掉就行.
+            //  就不需要区分一个 ItemStack 是不是 NMS 了.
+            //  到时候这个 if-clause 直接删掉就行.
             if (!handle.isNms) {
                 // If this is a strictly-Bukkit ItemStack:
 
@@ -213,7 +212,15 @@ private class CustomNekoStack(
         }
 
     override val itemStack: ItemStack
-        get() = handle.clone()
+        get() {
+            // 由于我们是*直接*对 minecraft:custom_data 中的 CompoundTag
+            // 进行读写操作, 而没有调用 minecraft:custom_data 的 copyTag(),
+            // 因此必须显式的对 NBT 进行拷贝, 否则会出现引用问题!
+            val newHandle = handle.clone()
+            val wakameTagCopy = (newHandle.wakameTag.copy() as CompoundTag)
+            newHandle.wakameTag = wakameTagCopy
+            return newHandle
+        }
 
     override val prototype: NekoItem
         get() = NekoStackSupport.getPrototypeOrThrow(nbt)
@@ -250,14 +257,7 @@ private class CustomNekoStack(
         get() = NekoStackSupport.getBehaviors(nbt)
 
     override fun clone(): NekoStack {
-        val oldHandle = handle
-        val newHandle = handle.clone()
-        // 由于我们是*直接*对 minecraft:custom_data 中的 CompoundTag
-        // 进行读写操作, 而没有调用 minecraft:custom_data 的 copyTag(),
-        // 因此必须显式的对 NBT 进行拷贝, 否则会出现引用问题.
-        val copy = oldHandle.wakameTag.copy()
-        newHandle.wakameTag = (copy as CompoundTag)
-        return CustomNekoStack(newHandle)
+        return CustomNekoStack(itemStack)
     }
 
     override fun erase() {
