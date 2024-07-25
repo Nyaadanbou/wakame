@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.util.EnumLookup
-import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.MultimapBuilder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -30,7 +29,7 @@ internal class SkillConditionGroupImpl(
 
     private val children: Map<ConditionPhase, Collection<SkillCondition>> = conditions.entries()
         .groupBy({ it.key }, { it.value })
-        .mapValues { (_, value) -> value.sortedWith(compareBy({ it.priority }, { it.hashCode() })) }
+        .mapValues { (_, value) -> value.sortedBy { it.priority } }
 
     override fun getResolver(time: ConditionPhase): TagResolver {
         val children = this.children[time] ?: return TagResolver.empty()
@@ -76,9 +75,9 @@ internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionG
             val conditionPhase = try {
                 EnumLookup.lookup<ConditionPhase>(key.toString()).getOrThrow()
             } catch (e: IllegalArgumentException) {
-                throw SerializationException(node, type, "Invalid condition phase: $key")
+                throw SerializationException(value, type, "Invalid condition phase: $key")
             }
-            val conditions = value.krequire<List<ConfigurationNode>>().map { listNode ->
+            val conditions = value.childrenList().map { listNode ->
                 val conditionType = listNode.node("type").get<String>() ?: throw SerializationException(listNode, type, "Missing condition type")
                 val conditionFactory = SkillRegistry.CONDITIONS[conditionType]
                 conditionFactory.create(listNode)

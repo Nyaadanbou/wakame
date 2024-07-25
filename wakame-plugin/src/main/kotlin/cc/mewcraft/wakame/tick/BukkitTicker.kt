@@ -13,10 +13,6 @@ internal class BukkitTicker(
 ) : Ticker {
     private val tasks: Int2ObjectOpenHashMap<TickRunnable> = Int2ObjectOpenHashMap()
 
-    override fun schedule(tickable: AlwaysTickable): Int {
-        return schedule(tickable as Tickable)
-    }
-
     override fun schedule(skillTick: Tickable): Int {
         val runnable = TickRunnable(skillTick)
         val taskId = runnable.runTaskTimer(plugin, 0, 1).taskId

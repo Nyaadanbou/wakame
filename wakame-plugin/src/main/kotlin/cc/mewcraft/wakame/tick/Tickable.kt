@@ -1,6 +1,12 @@
 package cc.mewcraft.wakame.tick
 
 interface Tickable {
+    companion object {
+        fun always(block: () -> Unit): Tickable {
+            return Always(block)
+        }
+    }
+
     var tickCount: Long
 
     /**
@@ -12,15 +18,15 @@ interface Tickable {
     fun tick(): TickResult
 
     fun whenRemove() {}
-}
 
-class AlwaysTickable(
-    private val block: () -> Unit
-): Tickable {
-    override var tickCount: Long = 0
+    private class Always(
+        private val block: () -> Unit
+    ): Tickable {
+        override var tickCount: Long = 0
 
-    override fun tick(): TickResult {
-        block()
-        return TickResult.CONTINUE_TICK
+        override fun tick(): TickResult {
+            block()
+            return TickResult.CONTINUE_TICK
+        }
     }
 }

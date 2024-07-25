@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.skill.tick
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.tick.AlwaysTickable
+import cc.mewcraft.wakame.tick.Tickable
 import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.Server
@@ -13,7 +13,7 @@ class SkillTicker(
     private var taskId: Int? = null
 
     fun start() {
-        val alwaysTickable = AlwaysTickable {
+        val alwaysTickable = Tickable.always {
             for (player in server.onlinePlayers) {
                 player.toUser().skillState.tick()
             }

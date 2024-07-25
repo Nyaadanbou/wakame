@@ -38,6 +38,6 @@ interrupt_triggers:
 
 # 在技能施法施法的时候, 在某个状态下不能进行的操作
 forbidden_triggers:
-  cast:
+  casting:
     # 释放技能时无法走动
     - MOVE
