@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.behavior
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.player.equipment.ArmorEquipEvent
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.world.block.event.BlockBreakActionEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -61,7 +60,6 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
-    fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
     fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) = Unit
     fun handleSkillPrepareCast(caster: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) = Unit
