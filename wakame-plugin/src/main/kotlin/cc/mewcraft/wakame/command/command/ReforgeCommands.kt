@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.gui.modding.CoreModdingMenu
 import cc.mewcraft.wakame.gui.modding.CurseModdingMenu
-import cc.mewcraft.wakame.reforge.modding.config.ModdingTableWtf
+import cc.mewcraft.wakame.reforge.modding.ModdingTableWtf
 import cc.mewcraft.wakame.util.ThreadType
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.Command

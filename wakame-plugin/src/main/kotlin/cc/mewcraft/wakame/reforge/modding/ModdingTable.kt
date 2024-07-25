@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.modding.config
+package cc.mewcraft.wakame.reforge.modding
 
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reforge.modding.match.CoreMatchRule
