@@ -224,7 +224,7 @@ class DamagePacketDSL(
         override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
-            return value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)
+            return (value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)).coerceAtLeast(0.0)
         }
     }
 
@@ -233,7 +233,7 @@ class DamagePacketDSL(
         override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
-            return value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)
+            return (value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)).coerceAtLeast(0.0)
         }
     }
 
@@ -251,7 +251,7 @@ class DamagePacketDSL(
         override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
-            return value { DEFENSE_PENETRATION } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION)
+            return (value { DEFENSE_PENETRATION } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION)).coerceAtLeast(0.0)
         }
     }
 
@@ -260,7 +260,7 @@ class DamagePacketDSL(
         override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
-            return value { DEFENSE_PENETRATION_RATE } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
+            return (value { DEFENSE_PENETRATION_RATE } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)).coerceAtLeast(0.0)
         }
     }
 
