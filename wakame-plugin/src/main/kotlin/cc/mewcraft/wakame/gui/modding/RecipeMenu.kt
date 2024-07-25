@@ -135,8 +135,8 @@ abstract class RecipeMenu<T>(
 
                 // 清空输入容器
                 clearInputSlot()
-                // 设置 itemOnCursor 为玩家的原输入
-                setItemOnCursor(input.handle)
+                // 将原输入物品退回玩家
+                viewer.inventory.addItem(input.handle)
                 // 清空输入物品
                 recipeSession.input = null
                 // 通知主菜单, 更新输出容器
@@ -160,10 +160,6 @@ abstract class RecipeMenu<T>(
         // 初始化输入容器的 handlers
         inputInventory.setPreUpdateHandler(::onInputInventoryPreUpdate)
         inputInventory.setPostUpdateHandler(::onInputInventoryPostUpdate)
-    }
-
-    private fun setItemOnCursor(stack: ItemStack) {
-        viewer.setItemOnCursor(stack)
     }
 
     private fun fillInputSlot(stack: ItemStack) {
