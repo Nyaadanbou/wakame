@@ -31,7 +31,7 @@ class CurseModdingMenu(
 ) : ModdingMenu<Curse>(), KoinComponent {
     override val logger: Logger by inject()
 
-    override fun moddingSessionConstructor(viewer: Player, input: NekoStack): ModdingSession<Curse>? {
+    override fun createModdingSession(viewer: Player, input: NekoStack): ModdingSession<Curse>? {
         val inputType = input.key
         val cells = input.components.get(ItemComponentTypes.CELLS) ?: throw IllegalArgumentException("Null cells")
         val itemRule = table.itemRules[inputType] ?: return null
@@ -45,7 +45,7 @@ class CurseModdingMenu(
         return CurseModdingSession(viewer, input, recipeMap)
     }
 
-    override fun recipeMenuConstructor(
+    override fun createRecipeMenu(
         parentMenu: ModdingMenu<Curse>, viewer: Player, recipeSession: ModdingSession.RecipeSession<Curse>,
     ): RecipeMenu<Curse> {
         return CurseRecipeMenu(viewer, parentMenu, recipeSession)
