@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.damage.DamageListener
+import cc.mewcraft.wakame.damage.VanillaDamageMappings.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.display.RENDERER_GLOBAL_CONFIG_FILE
@@ -122,6 +123,7 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
+        saveResource(DAMAGE_GLOBAL_CONFIG_FILE)
         saveResource(ELEMENT_GLOBAL_CONFIG_FILE)
         saveResource(ENTITY_GLOBAL_CONFIG_FILE)
         saveResource(ITEM_GLOBAL_CONFIG_FILE)

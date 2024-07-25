@@ -35,7 +35,7 @@ import java.lang.reflect.Type
     runBefore = [ElementRegistry::class]
 )
 object VanillaDamageMappings : Initializable, KoinComponent {
-    private const val DAMAGE_GLOBAL_CONFIG_FILE = "damage.yml"
+    const val DAMAGE_GLOBAL_CONFIG_FILE = "damage.yml"
 
     private val DEFAULT_MAPPING: VanillaDamageMapping by ReloadableProperty { VanillaDamageMapping(ElementRegistry.DEFAULT, .0, .0) }
 
