@@ -246,8 +246,8 @@ abstract class ModdingMenu<T> {
                 // 清空所有子菜单
                 clearRecipes()
 
-                // 归还玩家放入定制台的主要物品 (被定制的物品), 这里我们通过 setItemOnCursor 来实现
-                setItemOnCursor(session.input.handle)
+                // 归还玩家放入定制台的主要物品 (被定制的物品)
+                viewer.inventory.addItem(session.input.handle)
                 // 归还玩家放入定制台的其他物品 (定制所需的耗材), 这里我们直接把物品添加到玩家的背包里
                 session.recipeSessions.getInputItems().forEach { itemStack ->
                     viewer.inventory.addItem(itemStack)
@@ -323,8 +323,8 @@ abstract class ModdingMenu<T> {
 
                 // TODO 计算价格, 然后扣钱
 
-                // 将玩家指针上的物品替换为定制后的物品
-                setItemOnCursor(output.handle)
+                // 将定制后的物品添加到玩家背包
+                viewer.inventory.addItem(output.handle)
                 // 清空输入容器 (相当于消耗掉原始物品)
                 clearInputSlot()
                 // 清空输出容器 (因为玩家已经拿到手了)
@@ -388,10 +388,6 @@ abstract class ModdingMenu<T> {
      */
     fun open() {
         primaryWindow.open(viewer)
-    }
-
-    private fun setItemOnCursor(stack: ItemStack) {
-        viewer.setItemOnCursor(stack)
     }
 
     private fun fillRecipes(guis: List<Gui>) {
