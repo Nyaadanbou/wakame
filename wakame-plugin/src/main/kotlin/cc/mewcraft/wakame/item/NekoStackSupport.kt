@@ -142,32 +142,18 @@ fun NekoStack.isSystemUse(): Boolean {
 }
 
 @Contract(pure = false)
-private fun NekoStack.setSystemUse() {
+fun NekoStack.setSystemUse() {
     components.set(ItemComponentTypes.SYSTEM_USE, Unit)
 }
 
 @Contract(pure = false)
-private fun CustomNekoStack.unsetSystemUse() {
+fun NekoStack.unsetSystemUse() {
     this.handle.backingItemName = null
     this.handle.backingCustomName = null
     this.handle.backingCustomModelData = null
     this.handle.backingLore = null
 
     components.unset(ItemComponentTypes.SYSTEM_USE)
-}
-
-@Contract(pure = true)
-internal fun NekoStack.toSystemUse(): NekoStack {
-    val clone = CustomNekoStack(this.itemStack)
-    clone.setSystemUse()
-    return clone
-}
-
-@Contract(pure = true)
-internal fun NekoStack.toNonSystemUse(): NekoStack {
-    val clone = CustomNekoStack(this.itemStack)
-    clone.unsetSystemUse()
-    return clone
 }
 
 /**

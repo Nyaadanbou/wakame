@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.item.NekoStackSupport
 import cc.mewcraft.wakame.item.VanillaNekoStackRegistry
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.WAKAME_TAG_NAME
@@ -20,6 +21,7 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import java.util.UUID
+import kotlin.jvm.optionals.getOrNull
 import com.github.retrooper.packetevents.protocol.item.ItemStack as PacketStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
@@ -91,6 +93,11 @@ internal interface PacketNekoStack : NekoStack {
     val handle0: PacketStack
 
     /**
+     * 发包系统是否需要修改该物品?
+     */
+    val shouldRender: Boolean
+
+    /**
      * 设置自定义名称. 您可以传递 `null` 来移除名称.
      */
     fun customName(value: Component?) {
@@ -142,15 +149,24 @@ private class PacketCustomNekoStack(
 ) : PacketNekoStack {
     // 开发日记:
     // 由于 ItemComponentMap 对 BukkitStack 有直接依赖, 我们需要转换一个
-    override val handle: BukkitStack = SpigotConversionUtil.toBukkitItemStack(handle0)
+    override val handle: BukkitStack =
+        SpigotConversionUtil.toBukkitItemStack(handle0)
 
     override val itemStack: BukkitStack
-        get() = handle.clone()
+        get() = abortReadOps()
+
+    override val shouldRender: Boolean
+        get() = handle0.getComponent(ComponentTypes.CUSTOM_DATA)
+            ?.getOrNull()
+            ?.getCompoundTagOrNull(WAKAME_TAG_NAME)
+            ?.getCompoundTagOrNull(ItemComponentMap.TAG_COMPONENTS)
+            ?.getTagOrNull(ItemComponentTypes.SYSTEM_USE.id) == null
 
     // 开发日记1: We use property initializer here as it would be called multiple times,
     // and we don't want to do the unnecessary NBT conversion again and again
     // 开发日记2: 该 NBT 标签应该只接受读操作 (虽然可以写, 但不保证生效, 也没啥用应该)
-    override val nbt: CompoundTag = handle.wakameTag
+    override val nbt: CompoundTag =
+        handle.wakameTag
 
     override val namespace: String
         get() = NekoStackSupport.getNamespaceOrThrow(nbt)
@@ -191,6 +207,10 @@ private class PacketCustomNekoStack(
         handle0.unsetComponent(ComponentTypes.CUSTOM_DATA)
     }
 
+    private fun abortReadOps(): Nothing {
+        throw UnsupportedOperationException("Read operation is not allowed in PacketCustomNekoStack")
+    }
+
     private fun abortWriteOps(): Nothing {
         throw UnsupportedOperationException("Write operation is not allowed in PacketCustomNekoStack")
     }
@@ -207,6 +227,9 @@ private class PacketVanillaNekoStack(
 
     override val itemStack: BukkitStack
         get() = abortReadOps()
+
+    override val shouldRender: Boolean
+        get() = true
 
     override val handle: BukkitStack
         get() = abortReadOps()
@@ -233,9 +256,8 @@ private class PacketVanillaNekoStack(
     override val behaviors: ItemBehaviorMap
         get() = prototype.behaviors
 
-    override fun clone(): NekoStack {
-        throw UnsupportedOperationException("clone() is not supported")
-    }
+    override fun clone(): NekoStack =
+        abortReadOps()
 
     override fun erase() {
         // no-op

@@ -110,7 +110,7 @@ interface NekoStack : Keyed, Examinable {
     val behaviors: ItemBehaviorMap
 
     /**
-     * 克隆物品堆叠.
+     * 返回一个克隆.
      */
     fun clone(): NekoStack
 
