@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.world.attribute.damage
+package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
@@ -7,7 +7,13 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.User
-import org.bukkit.entity.*
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Arrow
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
+import org.bukkit.entity.SpectralArrow
+import org.bukkit.entity.Trident
 import kotlin.random.Random
 
 /**

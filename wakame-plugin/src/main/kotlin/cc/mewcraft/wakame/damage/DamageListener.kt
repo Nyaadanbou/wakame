@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.world.attribute.damage
+package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.event.WakameEntityDamageEvent
 import io.papermc.paper.event.entity.EntityKnockbackEvent

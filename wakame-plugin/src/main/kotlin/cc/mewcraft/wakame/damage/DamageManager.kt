@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.world.attribute.damage
+package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
 import cc.mewcraft.wakame.attribute.IntangibleAttributeMaps
@@ -6,7 +6,12 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
-import org.bukkit.entity.*
+import org.bukkit.entity.Arrow
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
+import org.bukkit.entity.SpectralArrow
+import org.bukkit.entity.Trident
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
@@ -14,7 +19,7 @@ import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.projectiles.BlockProjectileSource
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 
 object DamageManager {
     fun generateDamageMetaData(event: EntityDamageEvent): DamageMetadata {
