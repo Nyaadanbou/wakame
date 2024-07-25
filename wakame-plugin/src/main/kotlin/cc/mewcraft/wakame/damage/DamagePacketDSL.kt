@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalContracts::class)
 
-package cc.mewcraft.wakame.world.attribute.damage
+package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeMapLike

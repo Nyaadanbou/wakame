@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.event;
 
-import cc.mewcraft.wakame.world.attribute.damage.DamageMetadata;
-import cc.mewcraft.wakame.world.attribute.damage.DefenseMetadata;
+import cc.mewcraft.wakame.damage.DamageMetadata;
+import cc.mewcraft.wakame.damage.DefenseMetadata;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

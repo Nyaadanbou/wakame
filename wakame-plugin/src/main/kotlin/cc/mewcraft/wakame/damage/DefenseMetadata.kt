@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.world.attribute.damage
+package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes

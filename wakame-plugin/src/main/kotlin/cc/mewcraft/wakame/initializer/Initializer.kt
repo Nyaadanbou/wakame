@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.command.CommandManager
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.damage.DamageListener
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.display.RENDERER_GLOBAL_CONFIG_FILE
@@ -35,7 +36,6 @@ import cc.mewcraft.wakame.tick.TickerListener
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
-import cc.mewcraft.wakame.world.attribute.damage.DamageListener
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
