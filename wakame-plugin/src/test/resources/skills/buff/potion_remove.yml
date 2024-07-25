@@ -11,7 +11,7 @@ type: remove_potion_effect
 
 # 技能的打断触发器设置, 可用 CAST_POINT, CAST, BACKSWING
 interrupt_triggers:
-  cast:
+  casting:
     # 如果在施法过程中按下了鼠标右键，这个状态就会被打断 (回到无施法状态)
     # 可用的触发器:
     # - LEFT_CLICK
@@ -28,7 +28,7 @@ interrupt_triggers:
 
 # 在技能施法施法的时候, 在某个状态下不能进行的操作
 forbidden_triggers:
-  cast:
+  casting:
     # 释放技能时无法走动
     - MOVE
 

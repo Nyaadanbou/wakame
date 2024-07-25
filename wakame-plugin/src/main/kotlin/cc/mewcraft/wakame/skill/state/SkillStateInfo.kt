@@ -67,7 +67,7 @@ sealed interface SkillStateInfo : Examinable {
          */
         IDLE,
         CAST_POINT,
-        CAST,
+        CASTING,
         BACKSWING,
         ;
     }
@@ -322,7 +322,7 @@ class CastPointStateInfo(
     }
 
     override fun setNextState() {
-        state.setInfo(CastStateInfo(state, skillTick))
+        state.setInfo(CastingStateInfo(state, skillTick))
     }
 
     override fun interrupt() {
@@ -333,10 +333,10 @@ class CastPointStateInfo(
 /**
  * 表示玩家技能状态的释放状态, 即玩家正在释放技能.
  */
-class CastStateInfo(
+class CastingStateInfo(
     state: PlayerSkillState,
     skillTick: PlayerSkillTick<*>,
-) : AbstractSkillStateInfo(state, skillTick, SkillStateInfo.Type.CAST) {
+) : AbstractSkillStateInfo(state, skillTick, SkillStateInfo.Type.CASTING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
     override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
