@@ -9,26 +9,52 @@ import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 
 /**
  * 定制词条栏*核心*的过程, 封装了一次定制所需要的所有状态.
  */
 internal class CoreModdingSession(
     override val viewer: Player,
-    override val input: NekoStack,
+    input: NekoStack,
     override val recipeSessions: ModdingSession.RecipeSessionMap<Core>,
-) : ModdingSession<Core> {
-    override var output: NekoStack? = null
-    override var frozen: Boolean = false
-    override var confirmed: Boolean = false
+) : ModdingSession<Core>, KoinComponent {
+    private val logger: Logger by inject()
+
+    private val _input: NekoStack = input
+    override val input: NekoStack
+        get() = _input.clone()
+
+    private var _output: NekoStack? = null
+    override var output: NekoStack?
+        get() = _output
+        set(value) {
+            _output = value
+            logger.info("Core modding session's output updated")
+        }
+    private var _confirmed: Boolean = false
+    override var confirmed: Boolean
+        get() = _confirmed
+        set(value) {
+            _confirmed = value
+            logger.info("Core modding session's confirmed status updated: $value")
+        }
+
+    private var frozen: Boolean = false
+    override fun frozen(): Boolean = frozen
+    override fun freeze() {
+        frozen = true
+    }
 
     override fun reforge(): ModdingSession.Result {
         // 永远在克隆上进行操作
-        val clone = input.clone()
+        val clone = input
         // 根据玩家当前的输入, 修改每个词条栏
         var cells = clone.components.get(ItemComponentTypes.CELLS) ?: throw IllegalArgumentException("Null cells")
-        for ((id, recipe) in recipeSessions) {
-            val inputCore = recipe.input?.components?.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped
+        for ((id, recipeSession) in recipeSessions) {
+            val inputCore = recipeSession.input?.components?.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped
             if (inputCore != null) {
                 // 重新赋值变量为一个新对象
                 cells = cells.modify(id) { it.setCore(inputCore) }
@@ -45,9 +71,9 @@ internal class CoreModdingSession(
         return toSimpleString()
     }
 
-    class Result(
-        override val modded: NekoStack,
-    ) : ModdingSession.Result
+    class Result(modded: NekoStack) : ModdingSession.Result {
+        override val copy: NekoStack = modded.clone()
+    }
 
     class RecipeSession(
         override val id: String,
@@ -104,7 +130,7 @@ internal class CoreModdingSession(
         }
 
         override fun getInputItems(): List<ItemStack> {
-            return map.values.mapNotNull { it.input }.map { it.handle }
+            return map.values.mapNotNull { it.input?.handle }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, ModdingSession.RecipeSession<Core>>> {
@@ -118,20 +144,44 @@ internal class CoreModdingSession(
  */
 internal class CurseModdingSession(
     override val viewer: Player,
-    override val input: NekoStack,
+    input: NekoStack,
     override val recipeSessions: ModdingSession.RecipeSessionMap<Curse>,
-) : ModdingSession<Curse> {
-    override var output: NekoStack? = null
-    override var frozen: Boolean = false
-    override var confirmed: Boolean = false
+) : ModdingSession<Curse>, KoinComponent {
+    private val logger: Logger by inject()
+
+    private val _input: NekoStack = input
+    override val input: NekoStack
+        get() = _input.clone()
+
+    private var _output: NekoStack? = null
+    override var output: NekoStack?
+        get() = _output
+        set(value) {
+            _output = value
+            logger.info("Curse modding session's output updated")
+        }
+
+    private var _confirmed: Boolean = false
+    override var confirmed: Boolean
+        get() = _confirmed
+        set(value) {
+            _confirmed = value
+            logger.info("Curse modding session's confirmed status updated: $value")
+        }
+
+    private var frozen: Boolean = false
+    override fun frozen(): Boolean = frozen
+    override fun freeze() {
+        frozen = true
+    }
 
     override fun reforge(): ModdingSession.Result {
         // 永远在克隆上进行操作
-        val clone = input.clone()
+        val clone = input
         // 根据玩家当前的输入, 修改每个词条栏
         var cells = clone.components.get(ItemComponentTypes.CELLS) ?: throw IllegalArgumentException("Null cells")
-        for ((id, recipe) in recipeSessions) {
-            val inputCurse = recipe.input?.components?.get(ItemComponentTypes.PORTABLE_CURSE)?.wrapped
+        for ((id, recipeSession) in recipeSessions) {
+            val inputCurse = recipeSession.input?.components?.get(ItemComponentTypes.PORTABLE_CURSE)?.wrapped
             if (inputCurse != null) {
                 // 重新赋值变量为一个新对象
                 cells = cells.modify(id) { it.setCurse(inputCurse) }
@@ -148,9 +198,9 @@ internal class CurseModdingSession(
         return toSimpleString()
     }
 
-    class Result(
-        override val modded: NekoStack,
-    ) : ModdingSession.Result
+    class Result(modded: NekoStack) : ModdingSession.Result {
+        override val copy: NekoStack = modded.clone()
+    }
 
     class RecipeSession(
         override val id: String,
@@ -207,7 +257,7 @@ internal class CurseModdingSession(
         }
 
         override fun getInputItems(): List<ItemStack> {
-            return map.values.mapNotNull { it.input }.map { it.handle }
+            return map.values.mapNotNull { it.input?.handle }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, ModdingSession.RecipeSession<Curse>>> {

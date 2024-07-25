@@ -14,7 +14,7 @@ import java.util.stream.Stream
  * 代表一个物品定制的过程, 封装了一次定制所需要的所有状态.
  *
  * 当玩家将需要定制的物品 *X* 放入定制台的输入的时候, 将产生一个 [ModdingSession].
- * 如果此时玩家把物品 *X* 取出, 则 [ModdingSession] 将被销毁 (然后让其自然被 GC).
+ * 如果此时玩家把物品 *X* 取出, 则 [ModdingSession] 将被永久冻结, 不应再被使用.
  *
  * @param T 定制的类型
  */
@@ -25,7 +25,7 @@ interface ModdingSession<T> : Examinable {
     val viewer: Player
 
     /**
-     * 被定制的物品, 也就是玩家放入定制台的物品.
+     * 获取被定制物品的*克隆*, 也就是玩家放入定制台的物品.
      *
      * 当一个 [ModdingSession] 实例被创建时, [input] 就已经同时确定.
      *
@@ -36,26 +36,34 @@ interface ModdingSession<T> : Examinable {
     val input: NekoStack
 
     /**
+     * 被定制后的物品, 也就是 [input] 基于当前状态被修改后的样子.
+     *
+     * 每当玩家对定制台上的物品进行修改时, [output] 将被实时更新.
+     */
+    var output: NekoStack?
+
+    /**
      * 当前每个词条栏的会话.
      */
     val recipeSessions: RecipeSessionMap<T>
 
     /**
-     * 被定制后的物品, 也就是 [input] 被修改后的样子.
+     * 玩家的确认状态.
      *
-     * 每当玩家对定制台上的物品进行修改时 (例如放了个新的材料到词条栏里), [output] 将被实时更新.
-     */
-    var output: NekoStack?
-
-    /**
-     * 标记玩家是否已确认要结束定制.
+     * 如果确认状态已经为 `true`, 则玩家可以直接获取 [output] 物品.
+     * 否则玩家需要先将确认状态设置为 `true`, 然后再获取 [output] 物品.
      */
     var confirmed: Boolean
 
     /**
-     * 标记该会话是否被冻结.
+     * 检查该会话是否已经被冻结.
      */
-    var frozen: Boolean
+    fun frozen(): Boolean
+
+    /**
+     * 冻结该会话.
+     */
+    fun freeze()
 
     /**
      * 以当前状态修改 [input] (的副本), 并返回一个新的 [Result].
@@ -79,7 +87,7 @@ interface ModdingSession<T> : Examinable {
          *
          * 该物品是一个新对象, 不是原物品对象修改后的状态.
          */
-        val modded: NekoStack
+        val copy: NekoStack
     }
 
     /**
@@ -87,7 +95,7 @@ interface ModdingSession<T> : Examinable {
      *
      * 对于一个物品一次完整的定制过程, 可以看成是对该物品上的每个词条栏分别进行修改.
      * 玩家可以选择定制他想定制的词条栏; 选择方式就是往定制台上的特定槽位放入特定的物品.
-     * *放入*这个操作在代码里的体现, 就是设置 [input] 为放入的物品.
+     * *放入*这个操作在代码里的体现, 就是设置 [input] 为玩家放入的(合法)物品.
      * 一旦放入了一个*合法的*物品, 那么 [input] 将不再为 `null`.
      *
      * @param T 定制的类型
@@ -109,14 +117,14 @@ interface ModdingSession<T> : Examinable {
         val display: Display
 
         /**
-         * 玩家当前输入的物品堆叠; **该对象不应该被定制台以任何方式修改**!
+         * 玩家当前输入的定制材料; **该对象不应该被定制台以任何方式修改**!
          *
          * 这里将输入的物品储存起来, 以便在定制过程被中途取消时放回到玩家背包.
          *
          * - 如果为 `null`, 则说明玩家还没有放入任何物品.
          * - 如果不为 `null`, 则说明已经放入了一个*合法的*物品.
          *
-         * 实现必须确保 [input] 不为 `null` 时, 它是符合要求的.
+         * 实现必须确保当 [input] 不为 `null` 时, 它符合 [rule] 的规则.
          */
         var input: NekoStack?
 

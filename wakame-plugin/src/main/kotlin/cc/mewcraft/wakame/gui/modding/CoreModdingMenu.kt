@@ -31,7 +31,7 @@ class CoreModdingMenu(
 ) : ModdingMenu<Core>(), KoinComponent {
     override val logger: Logger by inject()
 
-    override fun moddingSessionConstructor(viewer: Player, input: NekoStack): ModdingSession<Core>? {
+    override fun createModdingSession(viewer: Player, input: NekoStack): ModdingSession<Core>? {
         // 开发日记 2024/7/23
         // 当创建一个会话时, 需要先识别这个输入的物品类型 (namespace:path),
         // 然后通过定制台的配置文件, 获取到这个物品的定制规则 (RecipeMap),
@@ -52,7 +52,7 @@ class CoreModdingMenu(
         return CoreModdingSession(viewer, input, recipeMap)
     }
 
-    override fun recipeMenuConstructor(
+    override fun createRecipeMenu(
         parentMenu: ModdingMenu<Core>, viewer: Player, recipeSession: ModdingSession.RecipeSession<Core>,
     ): RecipeMenu<Core> {
         return CoreRecipeMenu(viewer, parentMenu, recipeSession)
