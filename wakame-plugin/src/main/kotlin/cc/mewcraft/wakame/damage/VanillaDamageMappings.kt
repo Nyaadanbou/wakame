@@ -55,8 +55,8 @@ object VanillaDamageMappings : Initializable, KoinComponent {
             withDefaults()
             source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_GLOBAL_CONFIG_FILE).bufferedReader() }
             serializers {
-                kregister(VanillaDamageMappingSerializer)
                 kregister(ElementSerializer)
+                kregister(VanillaDamageMappingSerializer)
             }
         }.build().load()
 
@@ -78,7 +78,7 @@ object VanillaDamageMappings : Initializable, KoinComponent {
                     return@forEach
                 }
                 val mapping = node.get<VanillaDamageMapping>() ?: run {
-                    logger.warn("Malformed vanilla damage mapping. Please correct your config.")
+                    logger.warn("Malformed vanilla damage mapping at: ${node.path()}. Please correct your config.")
                     return@forEach
                 }
                 MAPPINGS[damageType] = mapping
@@ -91,14 +91,11 @@ object VanillaDamageMappings : Initializable, KoinComponent {
 data class VanillaDamageMapping(
     val element: Element,
     val defensePenetration: Double,
-    val defensePenetrationRate: Double
-) {
-    // 加一些方便函数
-}
+    val defensePenetrationRate: Double,
+)
 
 internal object VanillaDamageMappingSerializer : TypeSerializer<VanillaDamageMapping> {
     override fun deserialize(type: Type, node: ConfigurationNode): VanillaDamageMapping {
-        node.virtual()
         val element = node.node("element").krequire<Element>()
         val defensePenetration = node.node("defense_penetration").getDouble(0.0)
         val defensePenetrationRate = node.node("defense_penetration_rate").getDouble(0.0)

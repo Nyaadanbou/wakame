@@ -44,7 +44,7 @@ fun damagePacket(element: Element, block: DamagePacketDSL.() -> Unit): DamagePac
 }
 
 /**
- * 开始构建一个 [DamagePacket], 使用默认的元素.
+ * 开始构建一个 [DamagePacket], 使用默认的元素, 不依赖任何 [AttributeMapLike].
  */
 fun damagePacket(block: DamagePacketDSL.() -> Unit): DamagePacket {
     return DamagePacketDSL(ElementRegistry.DEFAULT).apply(block).build()
