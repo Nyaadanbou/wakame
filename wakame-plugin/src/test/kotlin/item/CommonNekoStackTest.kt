@@ -2,6 +2,7 @@ package item
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.adventure.adventureModule
+import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.item.NekoItem
@@ -66,6 +67,7 @@ object CommonNekoStackTest {
             // dependencies
             modules(
                 adventureModule(),
+                damageModule(),
                 elementModule(),
                 entityModule(),
                 kizamiModule(),

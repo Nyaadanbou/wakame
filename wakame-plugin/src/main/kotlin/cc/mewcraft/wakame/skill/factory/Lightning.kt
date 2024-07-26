@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.skill.factory
 
+import cc.mewcraft.wakame.damage.EvaluableDamageMetadata
+import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
@@ -9,8 +11,6 @@ import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.util.getFirstBlockBelow
 import cc.mewcraft.wakame.util.getTargetLocation
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.world.attribute.damage.EvaluableDamageMetadata
-import cc.mewcraft.wakame.world.attribute.damage.applyCustomDamage
 import com.destroystokyo.paper.ParticleBuilder
 import net.kyori.adventure.key.Key
 import org.bukkit.Location
@@ -97,10 +97,7 @@ private class LightningTick(
         val entitiesBeStruck = world.getNearbyEntities(target, 3.0, 3.0, 3.0)
         for (entity in entitiesBeStruck) {
             if (entity is LivingEntity) {
-                entity.applyCustomDamage(
-                    skill.damageMetadata.evaluate(context.getOrThrow(SkillContextKey.MOCHA_ENGINE)),
-                    caster
-                )
+                entity.hurt(skill.damageMetadata.evaluate(context.getOrThrow(SkillContextKey.MOCHA_ENGINE)), caster)
             }
         }
         return TickResult.ALL_DONE
