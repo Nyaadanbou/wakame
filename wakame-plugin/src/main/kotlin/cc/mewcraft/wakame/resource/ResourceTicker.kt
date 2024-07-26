@@ -12,14 +12,13 @@ class ResourceTicker(
     private var taskId: Int? = null
 
     fun start() {
-        val alwaysTickable = Tickable.always {
+        taskId = Ticker.INSTANCE.schedule(Tickable.always {
             server.onlinePlayers.forEach {
                 val user = it.toUser()
                 user.resourceMap.add(ResourceTypeRegistry.MANA, 1)
                 user.player.level = user.resourceMap.current(ResourceTypeRegistry.MANA)
             }
-        }
-        taskId = Ticker.INSTANCE.schedule(alwaysTickable)
+        })
     }
 
     override fun close() {
