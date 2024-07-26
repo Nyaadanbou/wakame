@@ -1,6 +1,7 @@
 package display
 
 import cc.mewcraft.wakame.adventure.adventureModule
+import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.LoreLineFlatter
 import cc.mewcraft.wakame.display.RendererBootstrap
@@ -60,6 +61,7 @@ class RendererConfigTest : KoinTest {
 
                     // dependencies
                     adventureModule(),
+                    damageModule(),
                     elementModule(),
                     itemModule(),
                     kizamiModule(),

@@ -21,7 +21,7 @@ import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
 import cc.mewcraft.wakame.util.buildYamlLoader
 import cc.mewcraft.wakame.util.createYamlLoader
 import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.world.attribute.damage.DAMAGE_EXTERNAL
+import cc.mewcraft.wakame.damage.DAMAGE_EXTERNAL
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
