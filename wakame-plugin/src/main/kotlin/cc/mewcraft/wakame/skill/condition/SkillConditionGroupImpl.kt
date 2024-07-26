@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.util.EnumLookup
-import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.MultimapBuilder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.koin.core.component.KoinComponent
@@ -19,26 +18,25 @@ import java.lang.reflect.Type
  * 一个非空的技能条件组.
  */
 internal class SkillConditionGroupImpl(
-    conditions: ImmutableMultimap<ConditionPhase, SkillCondition>,
+    conditions: Map<ConditionPhase, Collection<SkillCondition>>
 ) : KoinComponent, SkillConditionGroup {
     init {
-        require(!conditions.isEmpty) { "Empty conditions" }
+        require(conditions.isNotEmpty()) { "Empty conditions" }
     }
 
     private val logger: Logger by inject()
 
-    private val children: Map<ConditionPhase, Collection<SkillCondition>> = conditions.entries()
-        .groupBy({ it.key }, { it.value })
-        .mapValues { (_, value) -> value.sortedBy { it.priority } }
+    private val children: Map<ConditionPhase, Collection<SkillCondition>> = conditions
+        .mapValues { (_, conditions) -> conditions.sortedBy { it.priority } }
 
     override fun getResolver(time: ConditionPhase): TagResolver {
-        val children = this.children[time] ?: return TagResolver.empty()
-        return TagResolver.resolver(children.map { it.resolver })
+        val child = this.children[time] ?: return TagResolver.empty()
+        return TagResolver.resolver(child.map { it.resolver })
     }
 
     override fun newSession(time: ConditionPhase, context: SkillContext): SkillConditionSession {
-        val children = this.children[time] ?: return SkillConditionSession.alwaysSuccess()
-        return SessionImpl(children.map { it.newSession(context) })
+        val child = this.children[time] ?: return SkillConditionSession.alwaysSuccess()
+        return SessionImpl(child.map { it.newSession(context) })
     }
 
     private inner class SessionImpl(
@@ -71,22 +69,22 @@ internal object SkillConditionGroupSerializer : SchemaSerializer<SkillConditionG
     override fun deserialize(type: Type, node: ConfigurationNode): SkillConditionGroup {
         val builder = MultimapBuilder.enumKeys(ConditionPhase::class.java).arrayListValues().build<ConditionPhase, SkillCondition>()
 
-        for ((key, value) in node.childrenMap()) {
+        for ((nodeKey, mapChild) in node.childrenMap()) {
             val conditionPhase = try {
-                EnumLookup.lookup<ConditionPhase>(key.toString()).getOrThrow()
+                EnumLookup.lookup<ConditionPhase>(nodeKey.toString()).getOrThrow()
             } catch (e: IllegalArgumentException) {
-                throw SerializationException(value, type, "Invalid condition phase: $key")
+                throw SerializationException(mapChild, type, "Invalid condition phase: $nodeKey")
             }
-            val conditions = value.childrenList().map { listNode ->
-                val conditionType = listNode.node("type").get<String>() ?: throw SerializationException(listNode, type, "Missing condition type")
+            val conditions = mapChild.childrenList().map { listChild ->
+                val conditionType = listChild.node("type").get<String>() ?: throw SerializationException(listChild, type, "Missing condition type")
                 val conditionFactory = SkillRegistry.CONDITIONS[conditionType]
-                conditionFactory.create(listNode)
+                conditionFactory.create(listChild)
             }
             builder.putAll(conditionPhase, conditions)
         }
 
         return try {
-            SkillConditionGroupImpl(ImmutableMultimap.copyOf(builder))
+            SkillConditionGroupImpl(builder.asMap())
         } catch (t: Throwable) {
             throw SerializationException(node, type, "Failed to create SkillConditionGroup", t)
         }
