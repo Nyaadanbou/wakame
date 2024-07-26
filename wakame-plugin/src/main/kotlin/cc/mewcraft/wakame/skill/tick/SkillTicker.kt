@@ -13,12 +13,11 @@ class SkillTicker(
     private var taskId: Int? = null
 
     fun start() {
-        val alwaysTickable = Tickable.always {
+        taskId = ticker.schedule(Tickable.always {
             for (player in server.onlinePlayers) {
                 player.toUser().skillState.tick()
             }
-        }
-        taskId = ticker.schedule(alwaysTickable)
+        })
     }
 
     override fun close() {
