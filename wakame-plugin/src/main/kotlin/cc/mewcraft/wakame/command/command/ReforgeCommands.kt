@@ -18,8 +18,8 @@ import org.incendo.cloud.bukkit.data.SinglePlayerSelector
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.commandBuilder
-import org.incendo.cloud.kotlin.extension.getOrNull
 import org.incendo.cloud.parser.standard.EnumParser
+import kotlin.jvm.optionals.getOrNull
 
 object ReforgeCommands : CommandFactory<CommandSender> {
     private const val REFORGE_LITERAL = "reforge"
@@ -51,7 +51,7 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                     val sender = ctx.sender()
                     val type = ctx.get<ModdingType>("type")
                     val table = ctx.get<ModdingTable>("table")
-                    val player = ctx.getOrNull<SinglePlayerSelector>("player")
+                    val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
                     val viewer = player?.single() ?: (sender as? Player) ?: run {
                         sender.sendPlainMessage("Player not found!")
                         return@handler
