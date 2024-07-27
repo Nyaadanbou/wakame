@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.NamespacedPathCollector
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -26,32 +27,19 @@ internal object NekoItemNodeIterator : Iterable<Triple<Key, Path, ConfigurationN
     private fun collectElements(): List<Triple<Key, Path, ConfigurationNode>> {
         val mutableList = mutableListOf<Triple<Key, Path, ConfigurationNode>>()
         val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(ITEM_PROTO_CONFIG_DIR)
-        val namespaceDirs = mutableListOf<File>()
-
-        // first walk each directory, i.e., each namespace
-        dataDirectory.walk().maxDepth(1)
-            .drop(1) // exclude the `dataDirectory` itself
-            .filter { it.isDirectory }
-            .forEach { namespaceDirs += it }
-
         val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(ITEM_PROTO_CONFIG_LOADER)) // will be reused
 
-        // then walk each file (i.e., each item) in each namespace
-        namespaceDirs.forEach { namespaceDir ->
-            namespaceDir.walk()
-                .drop(1) // exclude the namespace directory itself
-                .filter { it.extension == "yml" }
-                .forEach { file ->
-                    val namespace = namespaceDir.name
-                    val value = file.nameWithoutExtension
-                    val key = Key(namespace, value)
+        val itemFileCollector = NamespacedPathCollector(dataDirectory, true)
+        itemFileCollector.collect("yml").forEach { namespacedPath ->
+            val namespace = namespacedPath.namespace
+            val value = namespacedPath.path
+            val key = Key(namespace, value)
 
-                    val text = file.readText(Charsets.UTF_8)
-                    val path = file.toPath()
-                    val node = loaderBuilder.buildAndLoadString(text)
-                    val triple = Triple(key, path, node)
-                    mutableList.add(triple)
-                }
+            val text = namespacedPath.file.readText()
+            val path = namespacedPath.file.toPath()
+            val node = loaderBuilder.buildAndLoadString(text)
+            val triple = Triple(key, path, node)
+            mutableList.add(triple)
         }
 
         return mutableList
