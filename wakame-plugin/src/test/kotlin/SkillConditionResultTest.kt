@@ -1,7 +1,9 @@
-import cc.mewcraft.wakame.skill.condition.*
+import cc.mewcraft.wakame.skill.condition.ConditionPhase
+import cc.mewcraft.wakame.skill.condition.SkillCondition
+import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroupImpl
+import cc.mewcraft.wakame.skill.condition.SkillConditionSession
 import cc.mewcraft.wakame.skill.context.SkillContext
-import com.google.common.collect.ImmutableMultimap
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -49,7 +51,7 @@ class SkillConditionResultTest : KoinTest {
         every { session.isSuccess } returns true
 
         val skillConditions = SkillConditionGroupImpl(
-            ImmutableMultimap.of(ConditionPhase.CAST_POINT, mockCondition)
+            mapOf(ConditionPhase.CAST_POINT to listOf(mockCondition))
         )
 
         every { mockCondition.newSession(mockContext) } returns session
@@ -72,7 +74,7 @@ class SkillConditionResultTest : KoinTest {
         every { mockCondition.newSession(mockContext) } returns session
 
         val skillConditions = SkillConditionGroupImpl(
-            ImmutableMultimap.of(ConditionPhase.CAST_POINT, mockCondition)
+            mapOf(ConditionPhase.CAST_POINT to listOf(mockCondition))
         )
 
         val result = testGroup(skillConditions, mockContext)

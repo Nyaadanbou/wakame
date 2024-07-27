@@ -65,7 +65,7 @@ data class CoreSkill(
     override fun provideTooltipName(): NameLine {
         val skill = skill
         val tooltipName = skill.displays.name
-        val resolver = skill.conditions.resolver
+        val resolver = skill.conditions.getResolver(ConditionPhase.CAST_POINT)
         val component = miniMessage.deserialize(tooltipName, resolver)
         return NameLine.simple(component)
     }
