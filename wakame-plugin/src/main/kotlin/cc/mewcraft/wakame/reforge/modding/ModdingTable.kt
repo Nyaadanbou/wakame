@@ -1,8 +1,5 @@
 package cc.mewcraft.wakame.reforge.modding
 
-import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.reforge.modding.match.CoreMatchRule
-import cc.mewcraft.wakame.reforge.modding.match.CurseMatchRule
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
@@ -24,7 +21,7 @@ interface ModdingTable : Examinable {
     /**
      * 定制台的花费设置, 该设置适用于整个定制台.
      */
-    val globalCost: GlobalCost
+    val cost: Cost
 
     /**
      * 针对具体的物品类型的定制规则.
@@ -38,21 +35,26 @@ interface ModdingTable : Examinable {
      *
      * 这里定义的所有成员的具体用途都取决于具体的实现.
      */
-    interface GlobalCost : Examinable {
+    interface Cost : Examinable {
         /**
          * 基础花费.
          */
         val base: Double
 
         /**
-         * 每个词条栏的花费.
+         * 每个核心的花费.
          */
-        val perCell: Double
+        val perCore: Double
+
+        /**
+         * 每个诅咒的花费.
+         */
+        val perCurse: Double
 
         /**
          * 稀有度的花费系数.
          */
-        val rarityModifiers: Map<Rarity, Double>
+        val rarityModifiers: Map<Key, Double>
 
         /**
          * 物品等级的花费系数.
@@ -86,6 +88,13 @@ interface ModdingTable : Examinable {
      * 代表一个映射, 储存了各种物品的定制规则.
      */
     interface ItemRuleMap : Examinable {
+        /**
+         * 获取物品的定制规则.
+         *
+         * 如果返回 `null` 则说明该物品不支持定制.
+         *
+         * @param key 物品的类型
+         */
         operator fun get(key: Key): ItemRule?
     }
 

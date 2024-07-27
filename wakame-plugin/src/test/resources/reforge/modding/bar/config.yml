@@ -1,1 +1,9 @@
-# placeholder
+enabled: true
+title: "<b>定制工作台: Bar"
+cost:
+  base: 1000
+  per_core: 500
+  per_curse: 500
+  rarity_modifiers: { }
+  item_level_modifier: 1
+  core_level_modifier: 1
