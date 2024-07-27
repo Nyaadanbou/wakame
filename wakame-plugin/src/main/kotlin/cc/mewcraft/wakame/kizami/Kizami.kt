@@ -3,12 +3,13 @@ package cc.mewcraft.wakame.kizami
 import cc.mewcraft.wakame.BiIdentifiable
 import cc.mewcraft.wakame.FriendlyNamed
 import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.annotation.InternalApi
+import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableByte
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
@@ -22,33 +23,42 @@ import java.util.UUID
 import java.util.stream.Stream
 
 /**
- * This class solely serves the purpose of identifying kizami.
+ * 代表一个铭刻类型.
  *
- * **DO NOT CONSTRUCT IT YOURSELF!** Use [KizamiRegistry] to get the instances instead.
+ * 使用 [KizamiRegistry] 来获得该实例.
  */
-data class Kizami @InternalApi internal constructor(
-    val uuid: UUID,
+interface Kizami : Keyed, Examinable, FriendlyNamed, BiIdentifiable<String, Byte> {
+    val uuid: UUID
+}
+
+/**
+ * [Kizami] 的实现.
+ */
+private data class KizamiType(
+    override val uuid: UUID,
     override val uniqueId: String,
     override val binaryId: Byte,
     override val displayName: Component,
     override val styles: Array<StyleBuilderApplicable>,
-) : KoinComponent, FriendlyNamed, BiIdentifiable<String, Byte>, Examinable {
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("key", uniqueId),
-            ExaminableProperty.of("binary", binaryId),
-            ExaminableProperty.of("displayName", PlainTextComponentSerializer.plainText().serialize(displayName)),
-            ExaminableProperty.of("styles", styles)
-        )
-    }
+) : KoinComponent, Kizami {
+    override val key: Key = Key.key("kizami", uniqueId)
 
-    override fun toString(): String = toSimpleString()
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("uuid", uuid),
+        ExaminableProperty.of("uniqueId", uniqueId),
+        ExaminableProperty.of("binaryId", binaryId),
+        ExaminableProperty.of("displayName", PlainTextComponentSerializer.plainText().serialize(displayName)),
+        ExaminableProperty.of("styles", styles)
+    )
+
     override fun hashCode(): Int = uniqueId.hashCode()
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other is Kizami) return other.uniqueId == uniqueId
         return false
     }
+
+    override fun toString(): String = toSimpleString()
 }
 
 /**
@@ -89,6 +99,6 @@ internal object KizamiSerializer : SchemaSerializer<Kizami> {
         val binary = node.node("binary_index").krequire<Int>().toStableByte()
         val displayName = node.node("display_name").krequire<Component>()
         val styles = node.node("styles").krequire<Array<StyleBuilderApplicable>>()
-        return (@OptIn(InternalApi::class) Kizami(uuid, key, binary, displayName, styles))
+        return KizamiType(uuid, key, binary, displayName, styles)
     }
 }
