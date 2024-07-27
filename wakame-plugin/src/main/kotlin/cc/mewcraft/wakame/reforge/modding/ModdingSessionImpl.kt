@@ -1,10 +1,9 @@
-package cc.mewcraft.wakame.reforge.modding.session
+package cc.mewcraft.wakame.reforge.modding
 
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.Curse
-import cc.mewcraft.wakame.reforge.modding.ModdingTable
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player

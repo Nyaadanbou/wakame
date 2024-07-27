@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.setSystemUse
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.reforge.modding.ModdingSession
 import cc.mewcraft.wakame.reforge.modding.ModdingTable
-import cc.mewcraft.wakame.reforge.modding.session.ModdingSession
 import cc.mewcraft.wakame.util.hideTooltip
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component.text

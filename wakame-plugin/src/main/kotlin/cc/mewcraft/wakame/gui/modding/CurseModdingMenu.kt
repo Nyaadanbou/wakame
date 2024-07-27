@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.PortableObject
 import cc.mewcraft.wakame.item.components.cells.Curse
+import cc.mewcraft.wakame.reforge.modding.CurseModdingSession
+import cc.mewcraft.wakame.reforge.modding.ModdingSession
 import cc.mewcraft.wakame.reforge.modding.ModdingTable
-import cc.mewcraft.wakame.reforge.modding.session.CurseModdingSession
-import cc.mewcraft.wakame.reforge.modding.session.ModdingSession
 import cc.mewcraft.wakame.util.hideAllFlags
 import org.bukkit.Material
 import org.bukkit.Tag

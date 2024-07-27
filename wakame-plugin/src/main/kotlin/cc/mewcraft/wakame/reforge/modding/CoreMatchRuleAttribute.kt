@@ -1,11 +1,14 @@
-package cc.mewcraft.wakame.reforge.modding.match
+package cc.mewcraft.wakame.reforge.modding
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
+import cc.mewcraft.wakame.util.toSimpleString
+import net.kyori.adventure.key.Key
+import net.kyori.examination.ExaminableProperty
 import java.util.regex.Pattern
+import java.util.stream.Stream
 
 /**
  * 用于测试属性核心.
@@ -13,7 +16,7 @@ import java.util.regex.Pattern
 class CoreMatchRuleAttribute(
     override val path: Pattern,
     val operation: AttributeModifier.Operation,
-    val element: Element?,
+    val element: Key?,
 ) : CoreMatchRule {
     override val priority: Int = 1
 
@@ -37,6 +40,15 @@ class CoreMatchRuleAttribute(
             return false
         }
 
-        return operation == core.operation && element == core.element
+        return operation == core.operation && element == core.element?.key
     }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("path", path),
+        ExaminableProperty.of("priority", priority),
+        ExaminableProperty.of("operation", operation),
+        ExaminableProperty.of("element", element),
+    )
+
+    override fun toString(): String = toSimpleString()
 }
