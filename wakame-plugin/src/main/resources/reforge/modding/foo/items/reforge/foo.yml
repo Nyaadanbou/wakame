@@ -1,0 +1,40 @@
+# 词条栏的定制设置.
+cells:
+
+  # 定义 id 为 “a” 的词条栏的定制设置.
+  a:
+
+    # 定制该词条栏所需要的权限.
+    # 如果省略, 则默认无需权限.
+    # 类型: str
+    permission: wtf
+
+    # 定制该词条栏的额外花费,
+    # 会直接加到物品最终的花费.
+    # 类型: str
+    cost: "math.random(0.0, 100.0)"
+
+    # 定义该词条栏最多可定制几次.
+    # 类型: int
+    mod_limit: 1
+
+    # 定义该词条栏“接受”哪些核心.
+    # 类型: list
+    #
+    # 该列表中的每一项都是一个匹配规则.
+    # 只要输入的核心满足其中的任意规则,
+    # 就会被算作“接受”.
+    accepted_cores:
+      - type: attribute:attack_damage
+        element: fire
+        operation: add
+
+    # 定义该词条栏“接受”哪些诅咒.
+    # 类型: list
+    #
+    # 该列表中的每一项都是一个匹配规则.
+    # 只要输入的诅咒满足其中的任意规则,
+    # 就会被算作“接受”.
+    accepted_curses:
+      - type: curse:entity_kills
+      - type: curse:peak_damage
