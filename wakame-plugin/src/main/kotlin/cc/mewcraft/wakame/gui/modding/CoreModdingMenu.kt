@@ -38,11 +38,21 @@ class CoreModdingMenu(
         // 然后将这个物品的定制规则传递给会话.
 
         val inputType = input.key
-        val cells = input.components.get(ItemComponentTypes.CELLS) ?: throw IllegalArgumentException("Null cells")
+        val cells = input.components.get(ItemComponentTypes.CELLS) ?: run {
+            // 如果没有词条栏, 则判定为无法定制
+            logger.error("No cells found in input item: '$input'. This is a bug!")
+            return null
+        }
+
+        // 如果没有定制规则, 则判定为无法定制
         val itemRule = table.itemRules[inputType] ?: return null
+
         val recipeMap = CoreModdingSession.RecipeSessionMap()
         for ((id, cell) in cells) {
+
+            // 如果词条栏不存在对应的规则, 则该词条栏不会出现在 GUI 中
             val cellRule = itemRule.cellRules[id] ?: continue
+
             val name = cell.provideTooltipName().content
             val lore = cell.provideTooltipLore().content
             val recipeDisplay = CoreModdingSession.RecipeSession.Display(name, lore)
