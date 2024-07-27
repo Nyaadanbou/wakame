@@ -50,7 +50,7 @@ components:
     tooltips:
       empty_core:
         name: "<!i>空词条栏"
-        lore: "<!i><gray>空词条栏"
+        lore: "<!i><dark_gray>空词条栏"
 
   crate:
     enabled: true
