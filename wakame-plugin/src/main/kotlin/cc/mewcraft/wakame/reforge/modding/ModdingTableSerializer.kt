@@ -27,8 +27,8 @@ import java.lang.reflect.Type
  * [ModdingTable] 的序列化器.
  */
 internal object ModdingTableSerializer : KoinComponent {
-    private const val REFORGE_DIR_NAME = "reforge"
-    private const val MODDING_DIR_NAME = "modding"
+    const val REFORGE_DIR_NAME = "reforge"
+    const val MODDING_DIR_NAME = "modding"
 
     private val logger: Logger by inject()
     private val moddingDir by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(MODDING_DIR_NAME) }
