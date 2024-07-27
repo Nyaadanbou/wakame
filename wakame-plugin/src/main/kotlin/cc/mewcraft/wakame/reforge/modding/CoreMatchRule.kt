@@ -1,14 +1,15 @@
-package cc.mewcraft.wakame.reforge.modding.match
+package cc.mewcraft.wakame.reforge.modding
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.krequire
+import net.kyori.adventure.key.Key
+import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
@@ -34,7 +35,7 @@ import java.util.regex.PatternSyntaxException
 /**
  * 词条栏的核心的匹配规则, 用于测试一个核心是否符合某种规则.
  */
-interface CoreMatchRule {
+interface CoreMatchRule : Examinable {
     /**
      * 正则表达式, 用于匹配核心的*路径*.
      *
@@ -58,7 +59,6 @@ interface CoreMatchRule {
 
 /**
  * 需要的子序列化器:
- * - Element
  * - Trigger
  * - TriggerVariant
  */
@@ -85,13 +85,13 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
             } catch (e: Throwable) {
                 throw IOException("Unknown error", e)
             }
-            Pair(namespace, pattern)
+            namespace to pattern
         }
 
         when (namespace) {
             Namespaces.ATTRIBUTE -> {
                 val operation = node.node("operation").get<AttributeModifier.Operation>(AttributeModifier.Operation.ADD)
-                val element = node.node("element").get<Element>()
+                val element = node.node("element").get<String>()?.let { Key.key("element", it) }
                 return CoreMatchRuleAttribute(pattern, operation, element)
             }
 

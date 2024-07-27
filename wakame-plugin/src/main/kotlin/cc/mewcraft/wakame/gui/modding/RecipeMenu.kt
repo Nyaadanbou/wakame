@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.gui.modding
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.components.PortableObject
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.reforge.modding.session.ModdingSession
+import cc.mewcraft.wakame.reforge.modding.ModdingSession
 import cc.mewcraft.wakame.util.hideTooltip
 import org.bukkit.Material
 import org.bukkit.entity.Player
