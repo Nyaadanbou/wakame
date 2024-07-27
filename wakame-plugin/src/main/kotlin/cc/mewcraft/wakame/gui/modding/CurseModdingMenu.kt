@@ -33,12 +33,22 @@ class CurseModdingMenu(
 
     override fun createModdingSession(viewer: Player, input: NekoStack): ModdingSession<Curse>? {
         val inputType = input.key
-        val cells = input.components.get(ItemComponentTypes.CELLS) ?: throw IllegalArgumentException("Null cells")
+        val cells = input.components.get(ItemComponentTypes.CELLS) ?: run {
+            logger.error("No cells found in input item: '$input'. This is a bug!")
+            return null
+        }
+
+        // 如果没有定制规则, 则判定为无法定制
         val itemRule = table.itemRules[inputType] ?: return null
         val recipeMap = CurseModdingSession.RecipeSessionMap()
         for ((id, cell) in cells) {
+
+            // 如果词条栏没有对应的规则, 则该词条栏不会出现在 GUI 中
             val cellRule = itemRule.cellRules[id] ?: continue
-            val recipeDisplay = CurseModdingSession.RecipeSession.Display(cell.provideTooltipName().content, cell.provideTooltipLore().content)
+
+            val name = cell.provideTooltipName().content
+            val lore = cell.provideTooltipLore().content
+            val recipeDisplay = CurseModdingSession.RecipeSession.Display(name, lore)
             val recipe = CurseModdingSession.RecipeSession(id, cellRule, recipeDisplay)
             recipeMap.put(id, recipe)
         }

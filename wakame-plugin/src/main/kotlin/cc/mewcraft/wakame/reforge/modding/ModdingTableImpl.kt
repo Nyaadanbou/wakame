@@ -126,8 +126,8 @@ internal class ModdingTableImpl(
     data class CellRuleMap(
         val map: Map<String, ModdingTable.CellRule>,
     ) : ModdingTable.CellRuleMap {
-        override fun get(key: String): ModdingTable.CellRule {
-            return map[key] ?: error("No such cell rule: $key")
+        override fun get(key: String): ModdingTable.CellRule? {
+            return map[key]
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
