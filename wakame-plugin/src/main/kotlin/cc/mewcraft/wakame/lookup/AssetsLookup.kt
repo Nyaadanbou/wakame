@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.lookup
 
-import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
+import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR_NAME
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
@@ -36,7 +36,7 @@ object AssetsLookup : Initializable, KoinComponent {
 
     private fun loadConfiguration() {
         assets.clear()
-        plugin.saveResourceRecursively(PLUGIN_ASSETS_DIR)
+        plugin.saveResourceRecursively(PLUGIN_ASSETS_DIR_NAME)
 
         NekoItemNodeIterator.forEach { (key, _, root) ->
             val assetsNodes = root.node("assets").childrenList()
