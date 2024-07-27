@@ -1,0 +1,13 @@
+type: shaped_recipe
+pattern:
+  - AAA
+  - ABA
+  - AAA
+ingredient:
+  A:
+    - minecraft:gold_block
+    - minecraft:diamond_block
+  B: minecraft:apple
+result:
+  item: minecraft:enchant_golden_apple
+  amount: 1
