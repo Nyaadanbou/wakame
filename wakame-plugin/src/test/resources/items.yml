@@ -52,7 +52,6 @@ components:
         name: "<!i>空词条栏"
         lore: "<!i><gray>空词条栏"
 
-
   crate:
     enabled: true
     display_name: "盲盒"
