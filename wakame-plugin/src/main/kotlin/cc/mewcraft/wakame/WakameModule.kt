@@ -21,6 +21,7 @@ import java.nio.file.Path
 
 const val PLUGIN_DATA_DIR = "plugin_data_dir"
 const val PLUGIN_ASSETS_DIR = "plugin_assets_dir"
+const val PLUGIN_ASSETS_DIR_NAME = "assets"
 
 fun wakameModule(plugin: WakamePlugin): Module = module {
     single<WakamePlugin> {
