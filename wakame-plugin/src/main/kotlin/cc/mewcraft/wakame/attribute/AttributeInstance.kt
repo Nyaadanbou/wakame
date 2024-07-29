@@ -6,8 +6,8 @@ import com.google.common.collect.MultimapBuilder.SetMultimapBuilder
 import com.google.common.collect.SetMultimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
+import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
-import java.util.UUID
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
 
 /**
@@ -45,9 +45,9 @@ sealed interface AttributeInstance : AttributeInstanceSnapshotable {
     fun setBaseValue(baseValue: Double)
 
     /**
-     * 获取指定 [uuid] 的 [AttributeModifier].
+     * 获取指定 [id] 的 [AttributeModifier].
      */
-    fun getModifier(uuid: UUID): AttributeModifier?
+    fun getModifier(id: Key): AttributeModifier?
 
     /**
      * 返回一个包含所有 [AttributeModifier] 的集合. 返回的集合不可变.
@@ -70,9 +70,9 @@ sealed interface AttributeInstance : AttributeInstanceSnapshotable {
     fun removeModifier(modifier: AttributeModifier)
 
     /**
-     * 移除指定 [uuid] 的 [AttributeModifier].
+     * 移除指定 [id] 的 [AttributeModifier].
      */
-    fun removeModifier(uuid: UUID)
+    fun removeModifier(id: Key)
 
     /**
      * 移除所有 [AttributeModifier].
@@ -105,9 +105,9 @@ sealed interface IntangibleAttributeInstance : AttributeInstanceSnapshotable {
     fun getBaseValue(): Double
 
     /**
-     * 获取指定 [uuid] 的 [AttributeModifier].
+     * 获取指定 [id] 的 [AttributeModifier].
      */
-    fun getModifier(uuid: UUID): AttributeModifier?
+    fun getModifier(id: Key): AttributeModifier?
 
     /**
      * 返回一个包含所有 [AttributeModifier] 的集合. 返回的集合不可变.
@@ -145,9 +145,9 @@ sealed interface AttributeInstanceSnapshot {
     fun setBaseValue(baseValue: Double)
 
     /**
-     * 获取指定 [uuid] 的 [AttributeModifier].
+     * 获取指定 [id] 的 [AttributeModifier].
      */
-    fun getModifier(uuid: UUID): AttributeModifier?
+    fun getModifier(id: Key): AttributeModifier?
 
     /**
      * 返回一个包含所有 [AttributeModifier] 的集合. 返回的集合不可变.
@@ -170,9 +170,9 @@ sealed interface AttributeInstanceSnapshot {
     fun removeModifier(modifier: AttributeModifier)
 
     /**
-     * 移除指定 [uuid] 的 [AttributeModifier].
+     * 移除指定 [id] 的 [AttributeModifier].
      */
-    fun removeModifier(uuid: UUID)
+    fun removeModifier(id: Key)
 
     /**
      * 移除所有 [AttributeModifier].
@@ -275,7 +275,8 @@ object AttributeInstanceFactory {
 private class AttributeInstanceDelegation(
     val attribute: Attribute,
 ) : Cloneable {
-    val modifiersById: Object2ObjectArrayMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
+    // TODO 直接把这个 modifiersById 变成一个 Table 如何?
+    val modifiersById: Object2ObjectArrayMap<Key, AttributeModifier> = Object2ObjectArrayMap()
     val modifiersByOp: SetMultimap<Operation, AttributeModifier> = SetMultimapBuilder.enumKeys(Operation::class.java).hashSetValues().build()
     var dirty: Boolean = true
 
@@ -307,8 +308,8 @@ private class AttributeInstanceDelegation(
         return ImmutableSet.copyOf(modifiersById.values)
     }
 
-    fun getModifier(uuid: UUID): AttributeModifier? {
-        return modifiersById[uuid]
+    fun getModifier(id: Key): AttributeModifier? {
+        return modifiersById[id]
     }
 
     fun hasModifier(modifier: AttributeModifier): Boolean {
@@ -333,8 +334,8 @@ private class AttributeInstanceDelegation(
         dirty = true
     }
 
-    fun removeModifier(uuid: UUID) {
-        getModifier(uuid)?.let { removeModifier(it) }
+    fun removeModifier(id: Key) {
+        getModifier(id)?.let { removeModifier(it) }
         dirty = true
     }
 
@@ -409,8 +410,8 @@ private class ProtoAttributeInstance(
     override fun setBaseValue(baseValue: Double) =
         delegation.setBaseValue(baseValue)
 
-    override fun getModifier(uuid: UUID): AttributeModifier? =
-        delegation.getModifier(uuid)
+    override fun getModifier(id: Key): AttributeModifier? =
+        delegation.getModifier(id)
 
     override fun getModifiers(): Set<AttributeModifier> =
         delegation.getModifiers()
@@ -424,8 +425,8 @@ private class ProtoAttributeInstance(
     override fun removeModifier(modifier: AttributeModifier) =
         delegation.removeModifier(modifier)
 
-    override fun removeModifier(uuid: UUID) =
-        delegation.removeModifier(uuid)
+    override fun removeModifier(id: Key) =
+        delegation.removeModifier(id)
 
     override fun removeModifiers() =
         delegation.removeModifiers()
@@ -457,8 +458,8 @@ private class WakameAttributeInstance(
     override fun setBaseValue(baseValue: Double) =
         delegation.setBaseValue(baseValue)
 
-    override fun getModifier(uuid: UUID): AttributeModifier? =
-        delegation.getModifier(uuid)
+    override fun getModifier(id: Key): AttributeModifier? =
+        delegation.getModifier(id)
 
     override fun getModifiers(): Set<AttributeModifier> =
         delegation.getModifiers()
@@ -472,8 +473,8 @@ private class WakameAttributeInstance(
     override fun removeModifier(modifier: AttributeModifier) =
         delegation.removeModifier(modifier)
 
-    override fun removeModifier(uuid: UUID) =
-        delegation.removeModifier(uuid)
+    override fun removeModifier(id: Key) =
+        delegation.removeModifier(id)
 
     override fun removeModifiers() =
         delegation.removeModifiers()
@@ -521,8 +522,8 @@ private class VanillaAttributeInstance(
         handle.baseValue = baseValue
     }
 
-    override fun getModifier(uuid: UUID): AttributeModifier? {
-        return handle.getModifier(uuid)?.toNeko()
+    override fun getModifier(id: Key): AttributeModifier? {
+        return handle.getModifier(AttributeLegacyMappings.byKey(id))?.toNeko()
     }
 
     override fun getModifiers(): Set<AttributeModifier> {
@@ -530,7 +531,7 @@ private class VanillaAttributeInstance(
     }
 
     override fun hasModifier(modifier: AttributeModifier): Boolean {
-        return handle.getModifier(modifier.id) != null
+        return handle.getModifier(AttributeLegacyMappings.byKey(modifier.id)) != null
     }
 
     override fun addModifier(modifier: AttributeModifier) {
@@ -545,12 +546,12 @@ private class VanillaAttributeInstance(
         handle.removeModifier(modifier.toBukkit())
     }
 
-    override fun removeModifier(uuid: UUID) {
-        handle.removeModifier(uuid)
+    override fun removeModifier(id: Key) {
+        handle.removeModifier(AttributeLegacyMappings.byKey(id))
     }
 
     override fun removeModifiers() {
-        handle.modifiers.forEach { removeModifier(it.uniqueId) }
+        handle.modifiers.forEach { removeModifier(AttributeLegacyMappings.byId(it.uniqueId)) }
     }
 
     override fun replace(other: AttributeInstance) {
@@ -572,8 +573,8 @@ private class IntangibleAttributeInstanceImpl(
     override fun getBaseValue(): Double =
         delegation.getBaseValue()
 
-    override fun getModifier(uuid: UUID): AttributeModifier? =
-        delegation.getModifier(uuid)
+    override fun getModifier(id: Key): AttributeModifier? =
+        delegation.getModifier(id)
 
     override fun getModifiers(): Set<AttributeModifier> =
         delegation.getModifiers()
@@ -600,8 +601,8 @@ private class AttributeInstanceSnapshotImpl(
     override fun setBaseValue(baseValue: Double) =
         delegation.setBaseValue(baseValue)
 
-    override fun getModifier(uuid: UUID): AttributeModifier? =
-        delegation.getModifier(uuid)
+    override fun getModifier(id: Key): AttributeModifier? =
+        delegation.getModifier(id)
 
     override fun getModifiers(): Set<AttributeModifier> =
         delegation.getModifiers()
@@ -615,8 +616,8 @@ private class AttributeInstanceSnapshotImpl(
     override fun removeModifier(modifier: AttributeModifier) =
         delegation.removeModifier(modifier)
 
-    override fun removeModifier(uuid: UUID) =
-        delegation.removeModifier(uuid)
+    override fun removeModifier(id: Key) =
+        delegation.removeModifier(id)
 
     override fun removeModifiers() =
         delegation.removeModifiers()

@@ -70,8 +70,8 @@ object KizamiInstanceSerializer : SchemaSerializer<KizamiInstance> {
                 .childrenMap() // Int -> KizamiEffect
                 .mapKeys { it.key.toString().toIntOrNull()?.takeIf { amount -> amount > 0 } ?: throw SerializationException(node, type, "The node key must be a positive integer") }
                 .forEach { (amount, childNode) ->
-                    // add kizami UUID hint
-                    childNode.hint(KizamiSerializer.UUID_HINT, kizami.uuid)
+                    // add kizami key hint
+                    childNode.hint(KizamiSerializer.HINT_KEY, kizami.key)
                     // add effect mapping
                     val kizamiEffect = childNode.krequire<KizamiEffect>()
                     this[amount] = kizamiEffect

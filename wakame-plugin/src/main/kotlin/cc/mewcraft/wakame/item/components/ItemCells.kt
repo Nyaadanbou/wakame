@@ -212,7 +212,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
                     continue // 诅咒还未解锁
                 }
                 val core = cell.getCoreAs(CoreTypes.ATTRIBUTE) ?: continue
-                val modifiers = core.provideAttributeModifiers(context.uuid)
+                val modifiers = core.provideAttributeModifiers(context.key)
                 val entries = modifiers.entries
                 ret.putAll(entries)
             }

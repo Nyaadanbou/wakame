@@ -8,11 +8,11 @@ import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.facade.AttributeComponent
-import cc.mewcraft.wakame.attribute.facade.AttributeDataR
-import cc.mewcraft.wakame.attribute.facade.AttributeDataRE
-import cc.mewcraft.wakame.attribute.facade.AttributeDataS
-import cc.mewcraft.wakame.attribute.facade.AttributeDataSE
-import cc.mewcraft.wakame.attribute.facade.AttributeModifierProvider
+import cc.mewcraft.wakame.attribute.facade.AttributeComponentR
+import cc.mewcraft.wakame.attribute.facade.AttributeComponentRE
+import cc.mewcraft.wakame.attribute.facade.AttributeComponentS
+import cc.mewcraft.wakame.attribute.facade.AttributeComponentSE
+import cc.mewcraft.wakame.attribute.facade.AttributeModifierSource
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.element.Element
@@ -40,7 +40,6 @@ import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.invoke.MethodHandle
 import java.util.EnumMap
-import java.util.UUID
 import java.util.stream.Stream
 
 val CoreAttribute.element: Element?
@@ -111,13 +110,13 @@ fun CoreAttribute(
     return facade.convertNode2Instance(node)
 }
 
-sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvider {
+sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierSource {
     override val isNoop: Boolean = false
     override val isEmpty: Boolean = false
     override val type: CoreType<*> = Type
 
-    override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].createAttributeModifiers(uuid, this)
+    override fun provideAttributeModifiers(id: Key): Map<Attribute, AttributeModifier> {
+        return AttributeRegistry.FACADES[key].createAttributeModifiers(id, this)
     }
 
     override fun provideTooltipName(): NameLine {
@@ -148,7 +147,7 @@ internal data class CoreAttributeS(
     override val key: Key,
     override val operation: Operation,
     override val value: Double,
-) : CoreAttribute(), AttributeDataS<Double> {
+) : CoreAttribute(), AttributeComponentS<Double> {
     constructor(
         tagType: TagType,
         compound: CompoundTag,
@@ -179,7 +178,7 @@ internal data class CoreAttributeR(
     override val operation: Operation,
     override val lower: Double,
     override val upper: Double,
-) : CoreAttribute(), AttributeDataR<Double> {
+) : CoreAttribute(), AttributeComponentR<Double> {
     constructor(
         tagType: TagType,
         compound: CompoundTag,
@@ -213,7 +212,7 @@ internal data class CoreAttributeSE(
     override val operation: Operation,
     override val value: Double,
     override val element: Element,
-) : CoreAttribute(), AttributeDataSE<Double> {
+) : CoreAttribute(), AttributeComponentSE<Double> {
     constructor(
         tagType: TagType,
         compound: CompoundTag,
@@ -248,7 +247,7 @@ internal data class CoreAttributeRE(
     override val lower: Double,
     override val upper: Double,
     override val element: Element,
-) : CoreAttribute(), AttributeDataRE<Double> {
+) : CoreAttribute(), AttributeComponentRE<Double> {
     constructor(
         tagType: TagType,
         compound: CompoundTag,

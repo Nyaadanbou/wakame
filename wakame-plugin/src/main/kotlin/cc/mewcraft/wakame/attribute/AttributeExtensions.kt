@@ -18,14 +18,14 @@ fun BukkitAttributeModifier.Operation.toNeko() = when (this) {
 }
 
 fun WakameAttributeModifier.toBukkit() = BukkitAttributeModifier(
-    /* uuid = */ id,
+    /* uuid = */ AttributeLegacyMappings.byKey(id),
     /* name = */ "REMOVE in 1.21",
     /* amount = */ amount,
     /* operation = */ operation.toBukkit(),
 )
 
 fun BukkitAttributeModifier.toNeko() = WakameAttributeModifier(
-    id = uniqueId,
+    id = AttributeLegacyMappings.byId(uniqueId),
     amount = amount,
     operation = operation.toNeko(),
 )

@@ -1,15 +1,15 @@
 package cc.mewcraft.wakame.attribute
 
 import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap
-import java.util.UUID
+import net.kyori.adventure.key.Key
 
 /**
  * An [AttributeModifier] is responsible to modify an [Attribute]. By
  * design, all the instance creators of [AttributeModifier] must provide a
- * [UUID], which is then used to distinguish the "source" of the modifier.
+ * [Key], which is then used to distinguish the "source" of the modifier.
  */
 data class AttributeModifier(
-    val id: UUID,
+    val id: Key,
     val amount: Double,
     val operation: Operation,
 ) {

@@ -5,7 +5,12 @@ import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.skill.*
+import cc.mewcraft.wakame.skill.Caster
+import cc.mewcraft.wakame.skill.CasterUtils
+import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill.PassiveSkill
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillBase
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractSkillTick
@@ -24,7 +29,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
-import java.util.*
+import java.util.UUID
 
 /**
  * 玩家血量低于一定值的时候触发效果.
@@ -73,7 +78,7 @@ interface Bloodrage : Skill, PassiveSkill {
         override val condition: Evaluable<*>,
         override val invalidTime: Long,
         override val restartTime: Long,
-        override val effects: List<BloodrageEffect>
+        override val effects: List<BloodrageEffect>,
     ) : Bloodrage, SkillBase(key, config) {
         override fun cast(context: SkillContext): SkillTick<Bloodrage> {
             return BloodrageTick(context, this)
@@ -83,7 +88,7 @@ interface Bloodrage : Skill, PassiveSkill {
 
 private class BloodrageTick(
     context: SkillContext,
-    bloodrage: Bloodrage
+    bloodrage: Bloodrage,
 ) : AbstractSkillTick<Bloodrage>(bloodrage, context) {
     companion object {
         private val BLOODRAGE_EFFECT_TIME = SkillContextKey.create<Long>("bloodrage_effect_time")
@@ -145,7 +150,7 @@ private class BloodrageTick(
 
 private class BloodrageEffectTick(
     private val skillTick: BloodrageTick,
-    private val context: SkillContext
+    private val context: SkillContext,
 ) : Tickable {
     override var tickCount: Long = 0
 
@@ -204,7 +209,7 @@ private data class AttributeBloodrageEffect(
     override fun apply(bloodrage: Bloodrage, context: SkillContext): Boolean {
         val player = CasterUtils.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return false
         val user = player.toUser()
-        val effect = core.provideAttributeModifiers(bloodrage.uniqueId)
+        val effect = core.provideAttributeModifiers(bloodrage.key)
         val attributeMap = user.attributeMap
         for ((attribute, modifier) in effect) {
             if (attributeMap.hasModifier(attribute, modifier.id))
@@ -217,7 +222,7 @@ private data class AttributeBloodrageEffect(
     override fun remove(bloodrage: Bloodrage, context: SkillContext) {
         val player = CasterUtils.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return
         val user = player.toUser()
-        val effect = core.provideAttributeModifiers(bloodrage.uniqueId)
+        val effect = core.provideAttributeModifiers(bloodrage.key)
         effect.forEach { (attribute, modifier) -> user.attributeMap.getInstance(attribute)?.removeModifier(modifier) }
     }
 }

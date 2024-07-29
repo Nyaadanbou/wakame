@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.Element as ElementType
 
 /*
-   属性数据抽象。
+   属性数据的抽象。
 
-   这些类描述了属性数值的所有可能的结构，详细用途参见实现。
+   这些类描述了"属性组件"的所有可能的结构，详细用途参见实现。
 */
 
 /**
@@ -54,17 +54,17 @@ sealed interface AttributeComponent {
  * **Do not directly implement this interface!**
  *
  * Instead, implement the following:
- * - [AttributeDataS]
- * - [AttributeDataR]
- * - [AttributeDataSE]
- * - [AttributeDataRE]
+ * - [AttributeComponentS]
+ * - [AttributeComponentR]
+ * - [AttributeComponentSE]
+ * - [AttributeComponentRE]
  */
 interface AttributeData
 
 /**
  * Components: [AttributeComponent.Op], [AttributeComponent.Fixed]
  */
-interface AttributeDataS<T> :
+interface AttributeComponentS<T> :
     AttributeData,
     AttributeComponent.Op,
     AttributeComponent.Fixed<T> {
@@ -76,7 +76,7 @@ interface AttributeDataS<T> :
 /**
  * Components: [AttributeComponent.Op], [AttributeComponent.Fixed]
  */
-interface AttributeDataR<T> :
+interface AttributeComponentR<T> :
     AttributeData,
     AttributeComponent.Op,
     AttributeComponent.Ranged<T> {
@@ -89,7 +89,7 @@ interface AttributeDataR<T> :
 /**
  * Components: [AttributeComponent.Op], [AttributeComponent.Fixed], [AttributeComponent.Element]
  */
-interface AttributeDataSE<T> :
+interface AttributeComponentSE<T> :
     AttributeData,
     AttributeComponent.Op,
     AttributeComponent.Fixed<T>,
@@ -103,7 +103,7 @@ interface AttributeDataSE<T> :
 /**
  * Components: [AttributeComponent.Op], [AttributeComponent.Ranged], [AttributeComponent.Element]
  */
-interface AttributeDataRE<T> :
+interface AttributeComponentRE<T> :
     AttributeData,
     AttributeComponent.Op,
     AttributeComponent.Ranged<T>,

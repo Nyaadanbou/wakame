@@ -53,8 +53,8 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             throw SerializationException(node, type, "Node must be a list")
         }
 
-        // get the kizami UUID we are dealing with (UUID is necessary to create attribute modifiers)
-        val uuid = node.ownHint(KizamiSerializer.UUID_HINT) ?: throw SerializationException(node, type, "No provided hint for UUID")
+        // get the kizami id we are dealing with (id is necessary to create attribute modifiers)
+        val id = node.ownHint(KizamiSerializer.HINT_KEY) ?: throw SerializationException(node, type, "No provided hint for key")
 
         // the collection of effects we are going to deserialize
         val collection = mutableListOf<KizamiEffect.Single<*>>()
@@ -71,7 +71,7 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
 
                 Namespaces.ATTRIBUTE -> {
                     val attributeCore = CoreAttribute(childNode)
-                    val attributeModifiers = attributeCore.provideAttributeModifiers(uuid)
+                    val attributeModifiers = attributeCore.provideAttributeModifiers(id)
                     collection += KizamiAttribute(attributeModifiers)
                 }
 

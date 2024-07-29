@@ -7,7 +7,6 @@ import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
-import java.util.UUID
 
 /**
  * Responsible to provide default attribute values for a certain [Attributable].
@@ -89,23 +88,23 @@ internal constructor(
     }
 
     /**
-     * Gets the modifier value specified by [type] and [uuid].
+     * Gets the modifier value specified by [type] and [id].
      *
      * @param type the attribute type
-     * @param uuid the uuid
+     * @param id the uuid
      * @param attributable
      * @return the modifier value
      * @throws IllegalArgumentException if the [type] is not present in this supplier
      */
-    fun getModifierValue(type: Attribute, uuid: UUID, attributable: Attributable): Double {
-        return requireNotNull(getDefault(type, attributable).getModifier(uuid)?.amount) {
-            "Can't find attribute modifier '$uuid' on attribute '${type.descriptionId}'"
+    fun getModifierValue(type: Attribute, id: Key, attributable: Attributable): Double {
+        return requireNotNull(getDefault(type, attributable).getModifier(id)?.amount) {
+            "Can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
         }
     }
 
-    fun getModifierValue(type: Attribute, uuid: UUID): Double {
-        return requireNotNull(getDefault(type).getModifier(uuid)?.amount) {
-            "Can't find attribute modifier '$uuid' on attribute '${type.descriptionId}'"
+    fun getModifierValue(type: Attribute, id: Key): Double {
+        return requireNotNull(getDefault(type).getModifier(id)?.amount) {
+            "Can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
         }
     }
 
@@ -121,14 +120,14 @@ internal constructor(
     }
 
     /**
-     * Checks whether this supplier has the modifier specified by [type] and [uuid].
+     * Checks whether this supplier has the modifier specified by [type] and [id].
      *
      * @param type the attribute type
-     * @param uuid the uuid
+     * @param id the uuid
      * @return `true` if this supplier has the modifier
      */
-    fun hasModifier(type: Attribute, uuid: UUID): Boolean {
-        return prototypes[type]?.getModifier(uuid) != null
+    fun hasModifier(type: Attribute, id: Key): Boolean {
+        return prototypes[type]?.getModifier(id) != null
     }
 
     /**
