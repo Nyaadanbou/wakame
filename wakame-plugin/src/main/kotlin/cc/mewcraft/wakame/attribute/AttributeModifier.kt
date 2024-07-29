@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
+import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap
 import java.util.UUID
 
 /**
@@ -9,14 +10,9 @@ import java.util.UUID
  */
 data class AttributeModifier(
     val id: UUID,
-    val name: String? = null,
     val amount: Double,
     val operation: Operation,
 ) {
-    constructor(id: UUID, amount: Double, operation: Operation) : this(
-        id, null, amount, operation
-    )
-
     enum class Operation(
         val key: String,
         val id: Int,
@@ -28,31 +24,26 @@ data class AttributeModifier(
         val binary: Byte = id.toByte()
 
         companion object {
-            private val OPERATIONS_ARRAY: Array<Operation> = arrayOf(
-                ADD,
-                MULTIPLY_BASE,
-                MULTIPLY_TOTAL
-            )
-            private val OPERATIONS_MAP: Map<String, Operation> = mapOf(
+            private val BY_KEY: Map<String, Operation> = mapOf(
                 ADD.key to ADD,
                 MULTIPLY_BASE.key to MULTIPLY_BASE,
                 MULTIPLY_TOTAL.key to MULTIPLY_TOTAL
-            )
+            ).let(::Object2ReferenceArrayMap)
 
-            fun byKey(key: String): Operation {
-                return requireNotNull(byKeyOrNull(key)) { "No operation with key '$key'" }
+            fun byKey(key: String): Operation? {
+                return BY_KEY[key]
             }
 
-            fun byKeyOrNull(key: String): Operation? {
-                return OPERATIONS_MAP[key]
+            fun byKeyOrThrow(key: String): Operation {
+                return requireNotNull(byKey(key)) { "Can't find operation with key '$key'" }
             }
 
-            fun byId(id: Int): Operation {
-                return if (id >= 0 && id < OPERATIONS_ARRAY.size) {
-                    OPERATIONS_ARRAY[id]
-                } else {
-                    throw IllegalArgumentException("No operation with id '$id'")
-                }
+            fun byId(id: Int): Operation? {
+                return entries.getOrNull(id)
+            }
+
+            fun byIdOrThrow(id: Int): Operation {
+                return byId(id) ?: throw IllegalArgumentException("Can't find operation with id '$id'")
             }
         }
     }
@@ -66,6 +57,6 @@ data class AttributeModifier(
     }
 
     override fun hashCode(): Int {
-        return id.hashCode()
+        return id.hashCode() * 31 + operation.hashCode()
     }
 }

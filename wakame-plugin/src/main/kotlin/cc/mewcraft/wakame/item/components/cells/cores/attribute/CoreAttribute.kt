@@ -61,7 +61,7 @@ fun CoreAttribute(
 ): CoreAttribute {
     val key = Key(nbt.getString(CoreBinaryKeys.CORE_IDENTIFIER))
     val facade = AttributeRegistry.FACADES[key]
-    return facade.codecTagToInstance(nbt)
+    return facade.convertNBT2Instance(nbt)
 }
 
 /**
@@ -108,7 +108,7 @@ fun CoreAttribute(
 ): CoreAttribute {
     val key = node.node("type").krequire<Key>()
     val facade = AttributeRegistry.FACADES[key]
-    return facade.codecNodeToInstance(node)
+    return facade.convertNode2Instance(node)
 }
 
 sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvider {
@@ -117,17 +117,17 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierProvi
     override val type: CoreType<*> = Type
 
     override fun provideAttributeModifiers(uuid: UUID): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[key].modifierCreator(uuid, this)
+        return AttributeRegistry.FACADES[key].createAttributeModifiers(uuid, this)
     }
 
     override fun provideTooltipName(): NameLine {
-        val tooltipName = AttributeRegistry.FACADES[key].tooltipNameCreator(this)
+        val tooltipName = AttributeRegistry.FACADES[key].createTooltipName(this)
         return NameLine.simple(tooltipName)
     }
 
     override fun provideTooltipLore(): LoreLine {
         val tooltipKey = lineKeyFactory.get(this) ?: return LoreLine.noop()
-        val tooltipLore = AttributeRegistry.FACADES[key].tooltipLoreCreator(this)
+        val tooltipLore = AttributeRegistry.FACADES[key].createTooltipLore(this)
         return LoreLine.simple(tooltipKey, tooltipLore)
     }
 
@@ -289,7 +289,7 @@ private fun CompoundTag.getElement(): Element {
 }
 
 private fun CompoundTag.getOperation(): Operation {
-    return Operation.byId(this.getInt(AttributeBinaryKeys.OPERATION_TYPE))
+    return Operation.byIdOrThrow(this.getInt(AttributeBinaryKeys.OPERATION_TYPE))
 }
 
 private fun CompoundTag.getNumber(key: String): Double {
