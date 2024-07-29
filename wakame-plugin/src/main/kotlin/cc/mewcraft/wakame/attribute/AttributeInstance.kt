@@ -46,7 +46,7 @@ sealed interface AttributeInstance : AttributeInstanceSnapshotable {
 }
 
 /**
- * 代表一个不可变的属性实例.
+ * 代表一个无形的属性实例. 该实例不可变, 并且不会对世界状态产生任何副作用.
  */
 sealed interface IntangibleAttributeInstance : AttributeInstanceSnapshotable {
     val attribute: Attribute
@@ -72,7 +72,7 @@ sealed interface AttributeInstanceSnapshot {
     fun removeModifier(modifier: AttributeModifier)
     fun removeModifier(uuid: UUID)
     fun removeModifiers()
-    fun toImmutable(): IntangibleAttributeInstance
+    fun toIntangible(): IntangibleAttributeInstance
 }
 
 /**
@@ -119,44 +119,38 @@ object AttributeInstanceFactory {
      * @param registerVanilla 是否在世界状态中为 [attributable] 注册属性
      */
     fun createInstance(attribute: Attribute, attributable: Attributable, registerVanilla: Boolean): AttributeInstance {
-        return if (!attribute.vanilla) {
+        if (!attribute.vanilla) {
             // 是我们自己的萌芽属性, 直接创建实例即可
-            WakameAttributeInstance(AttributeInstanceDelegation(attribute))
-        } else {
-            // 关于 Attribute#vanilla 的解释:
-            // 设计上, 如果这个 Attribute 是基于原版的(比如最大生命值),
-            // 那么我们的 AttributeInstance 在实现上则必须是对应原版
-            // AttributeInstance 的 proxy —— 也就是说, 所有函数调用
-            // 必须重定向到原版 AttributeInstance 的实例上
-
-            // 从 Attributable 中获取要被封装的 BukkitAttributeInstance
-            val handle = run {
-                val ret: BukkitAttributeInstance?
-                val bukkitAttribute = attribute.toBukkit()
-                val bukkitAttributeInstance = attributable.getAttribute(bukkitAttribute)
-                if (bukkitAttributeInstance != null) {
-                    ret = bukkitAttributeInstance
-                } else {
-                    if (registerVanilla) {
-                        // 仅当该 Attributable 没有该属性, 并且 registerVanilla 为 true 时, 我们才真的新注册该属性
-
-                        // 这将产生副作用, 会直接改变 Attributable 的世界状态.
-                        // 这部分没有详细的 API 文档, 但我们自己总结一下就是:
-                        // 当该属性本来就存在时, 它会覆盖原有的.
-                        attributable.registerAttribute(bukkitAttribute)
-                    } else {
-                        // 该 Attributable 不存在该原版属性,
-                        // 然而用户并没有指定允许注册新的属性.
-                        throw IllegalArgumentException("Can't find vanilla attribute instance for attribute $attribute")
-                    }
-                    ret = attributable.getAttribute(bukkitAttribute)!!
-                }
-
-                ret
-            }
-
-            VanillaAttributeInstance(handle)
+            return WakameAttributeInstance(AttributeInstanceDelegation(attribute))
         }
+
+        // 关于 Attribute#vanilla 的解释:
+        // 设计上, 如果这个 Attribute 是基于原版的(比如: generic.max_health),
+        // 那么我们的 AttributeInstance 在实现上则必须是对应原版
+        // AttributeInstance 的代理 —— 也就是说, 所有函数调用
+        // 必须重定向到原版 AttributeInstance 的实例上.
+
+        val handle = run {
+            val bukkitAttribute = attribute.toBukkit()
+            val bukkitAttributeInstance = attributable.getAttribute(bukkitAttribute)
+            if (bukkitAttributeInstance != null) {
+                return@run bukkitAttributeInstance
+            } else {
+                if (registerVanilla) {
+                    // 仅当该 Attributable 没有该属性, 并且 registerVanilla 为 true 时, 我们才真的新注册该属性.
+                    // 这将产生副作用, 会直接改变 Attributable 的世界状态.
+                    // 这部分没有 API 文档, 但查看 CraftBukkit 源码就会发现:
+                    // 当该属性本来就存在于 Attributable 时, 它会覆盖原有的.
+                    attributable.registerAttribute(bukkitAttribute)
+                } else {
+                    // 该 Attributable 不存在该原版属性, 然而用户并没有指定允许注册新的属性.
+                    throw IllegalArgumentException("Can't find vanilla attribute instance for attribute $attribute")
+                }
+                return@run attributable.getAttribute(bukkitAttribute)!!
+            }
+        }
+        return VanillaAttributeInstance(handle)
+
     }
 }
 
@@ -173,6 +167,7 @@ private class AttributeInstanceDelegation(
     val modifiersById: Object2ObjectArrayMap<UUID, AttributeModifier> = Object2ObjectArrayMap()
     val modifiersByOp: SetMultimap<Operation, AttributeModifier> = SetMultimapBuilder.enumKeys(Operation::class.java).hashSetValues().build()
     var dirty: Boolean = true
+
     @get:JvmName("baseValue")
     @set:JvmName("baseValue")
     var baseValue: Double = attribute.defaultValue // initially set the baseValue to the attribute.defaultValue
@@ -197,10 +192,16 @@ private class AttributeInstanceDelegation(
         return cachedValue
     }
 
+    /**
+     * 返回所有 [AttributeModifier] 的集合. 返回的集合不可变.
+     */
     fun getModifiers(): Set<AttributeModifier> {
         return ImmutableSet.copyOf(modifiersById.values)
     }
 
+    /**
+     * 返回指定 [uuid] 下所有 [AttributeModifier] 的集合. 返回的集合不可变.
+     */
     fun getModifier(uuid: UUID): AttributeModifier? {
         return modifiersById[uuid]
     }
@@ -223,7 +224,7 @@ private class AttributeInstanceDelegation(
 
     fun removeModifier(modifier: AttributeModifier) {
         modifiersById.remove(modifier.id)
-        getModifiersOrCreateEmpty(modifier.operation).remove(modifier)
+        modifiersByOp.remove(modifier.operation, modifier)
         dirty = true
     }
 
@@ -244,7 +245,8 @@ private class AttributeInstanceDelegation(
         this.modifiersById.putAll(other.modifiersById)
         this.modifiersByOp.clear()
         this.modifiersByOp.putAll(other.modifiersByOp)
-        this.dirty = true
+        this.dirty = other.dirty
+        this.cachedValue = other.cachedValue
     }
 
     public override fun clone(): AttributeInstanceDelegation {
@@ -253,6 +255,7 @@ private class AttributeInstanceDelegation(
         ret.modifiersById.putAll(this.modifiersById)
         ret.modifiersByOp.putAll(this.modifiersByOp)
         ret.dirty = this.dirty
+        ret.cachedValue = this.cachedValue
         return ret
     }
 
@@ -519,7 +522,7 @@ private class AttributeInstanceSnapshotImpl(
     override fun removeModifiers() =
         delegation.removeModifiers()
 
-    override fun toImmutable(): IntangibleAttributeInstance {
+    override fun toIntangible(): IntangibleAttributeInstance {
         return IntangibleAttributeInstanceImpl(delegation.clone())
     }
 }

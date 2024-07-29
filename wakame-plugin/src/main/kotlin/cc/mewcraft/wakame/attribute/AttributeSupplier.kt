@@ -53,7 +53,7 @@ internal constructor(
         val product = AttributeInstanceFactory.createInstance(type)
         product.replace(prototype)
         val snapshot = product.getSnapshot() // 创建快照
-        return snapshot.toImmutable() // 转为不可变
+        return snapshot.toIntangible() // 转为不可变
     }
 
     /**
