@@ -1,9 +1,9 @@
-type: shaped_recipe
+type: shaped
 pattern:
   - AAA
   - ABA
   - AAA
-ingredient:
+ingredients:
   A:
     - minecraft:gold_block
     - minecraft:diamond_block

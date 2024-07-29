@@ -1,0 +1,10 @@
+type: shapeless
+ingredients:
+  - minecraft:poppy
+  - minecraft:poppy
+  - minecraft:poppy
+  - minecraft:poppy
+  - minecraft:red_dye
+result:
+  item: minecraft:rose_bush
+  amount: 2
