@@ -1,9 +1,6 @@
 package recipe
 
-import cc.mewcraft.wakame.craft.recipe.RecipeRegistry
-import cc.mewcraft.wakame.craft.recipe.ShapelessRecipe
-import cc.mewcraft.wakame.craft.recipe.SingleRecipeChoice
-import cc.mewcraft.wakame.craft.recipe.SingleRecipeResult
+import cc.mewcraft.wakame.craft.recipe.*
 import cc.mewcraft.wakame.util.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -39,7 +36,31 @@ class RecipeSerializationTest : KoinTest {
     @Test
     fun `shaped recipe serialization`() {
         RecipeRegistry.onPostWorld()
-        logger.info(RecipeRegistry.ALL[Key("test:shaped")].toString())
+        val key = Key("test:shaped")
+        val recipe = RecipeRegistry.ALL.find(key)
+        assertNotNull(recipe)
+        assertIs<ShapedRecipe>(recipe)
+        val pattern = recipe.pattern
+        assertEquals("XAX", pattern[0])
+        assertEquals("ABA", pattern[1])
+        assertEquals("XAX", pattern[2])
+        val ingredients = recipe.ingredients
+        assertContains(ingredients, 'A')
+        assertContains(ingredients, 'B')
+        val recipeChoiceA = ingredients['A']
+        val recipeChoiceB = ingredients['B']
+        assertNotNull(recipeChoiceA)
+        assertNotNull(recipeChoiceB)
+        assertEquals(
+            MultiRecipeChoice(
+                listOf(Key("minecraft:gold_block"), Key("minecraft:diamond_block"))
+            ), recipeChoiceA
+        )
+        assertEquals(SingleRecipeChoice(Key("minecraft:apple")), recipeChoiceB)
+        val result = recipe.result
+        assertIs<SingleRecipeResult>(result)
+        assertEquals(Key("minecraft:enchant_golden_apple"), result.result)
+        assertEquals(1, result.amount)
     }
 
     @Test

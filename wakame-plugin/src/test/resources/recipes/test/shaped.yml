@@ -1,8 +1,8 @@
 type: shaped
 pattern:
-  - AAA
+  - XAX
   - ABA
-  - AAA
+  - XAX
 ingredients:
   A:
     - minecraft:gold_block
