@@ -17,7 +17,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.lang.ref.WeakReference
-import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -35,9 +34,9 @@ sealed interface AttributeMapLike {
     fun hasAttribute(attribute: Attribute): Boolean
 
     /**
-     * 检查是否存在 [attribute] 的指定 [uuid] 的修饰器.
+     * 检查是否存在 [attribute] 的指定 [id] 的修饰器.
      */
-    fun hasModifier(attribute: Attribute, uuid: UUID): Boolean
+    fun hasModifier(attribute: Attribute, id: Key): Boolean
 
     /**
      * 获取 [attribute] 的值.
@@ -50,9 +49,9 @@ sealed interface AttributeMapLike {
     fun getBaseValue(attribute: Attribute): Double
 
     /**
-     * 获取 [attribute] 的指定 [uuid] 的修饰器的值.
+     * 获取 [attribute] 的指定 [id] 的修饰器的值.
      */
-    fun getModifierValue(attribute: Attribute, uuid: UUID): Double
+    fun getModifierValue(attribute: Attribute, id: Key): Double
 }
 
 /**
@@ -227,8 +226,8 @@ private class PlayerAttributeMap(
         return data[attribute] != null || default.hasAttribute(attribute)
     }
 
-    override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
-        return data[attribute]?.getModifier(uuid) != null || default.hasModifier(attribute, uuid)
+    override fun hasModifier(attribute: Attribute, id: Key): Boolean {
+        return data[attribute]?.getModifier(id) != null || default.hasModifier(attribute, id)
     }
 
     override fun getValue(attribute: Attribute): Double {
@@ -239,8 +238,8 @@ private class PlayerAttributeMap(
         return data[attribute]?.getBaseValue() ?: default.getBaseValue(attribute, player)
     }
 
-    override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        return data[attribute]?.getModifier(uuid)?.amount ?: default.getModifierValue(attribute, uuid, player)
+    override fun getModifierValue(attribute: Attribute, id: Key): Double {
+        return data[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, player)
     }
 
     /**
@@ -336,8 +335,8 @@ private class EntityAttributeMap : AttributeMap {
         return default.hasAttribute(attribute)
     }
 
-    override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
-        return default.hasModifier(attribute, uuid)
+    override fun hasModifier(attribute: Attribute, id: Key): Boolean {
+        return default.hasModifier(attribute, id)
     }
 
     override fun getValue(attribute: Attribute): Double {
@@ -348,8 +347,8 @@ private class EntityAttributeMap : AttributeMap {
         return default.getBaseValue(attribute, entity)
     }
 
-    override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        return default.getModifierValue(attribute, uuid, entity)
+    override fun getModifierValue(attribute: Attribute, id: Key): Double {
+        return default.getModifierValue(attribute, id, entity)
     }
 }
 
@@ -414,8 +413,8 @@ private class IntangibleAttributeMapImpl(
         return data.containsKey(attribute)
     }
 
-    override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
-        return data[attribute]?.getModifier(uuid) != null
+    override fun hasModifier(attribute: Attribute, id: Key): Boolean {
+        return data[attribute]?.getModifier(id) != null
     }
 
     override fun getValue(attribute: Attribute): Double {
@@ -426,8 +425,8 @@ private class IntangibleAttributeMapImpl(
         return data[attribute]?.getBaseValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in IntangibleAttributeMap")
     }
 
-    override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        return data[attribute]?.getModifier(uuid)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in IntangibleAttributeMap")
+    override fun getModifierValue(attribute: Attribute, id: Key): Double {
+        return data[attribute]?.getModifier(id)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in IntangibleAttributeMap")
     }
 }
 
@@ -455,8 +454,8 @@ private class AttributeMapSnapshotImpl(
         return data.containsKey(attribute)
     }
 
-    override fun hasModifier(attribute: Attribute, uuid: UUID): Boolean {
-        return data[attribute]?.getModifier(uuid) != null
+    override fun hasModifier(attribute: Attribute, id: Key): Boolean {
+        return data[attribute]?.getModifier(id) != null
     }
 
     override fun getValue(attribute: Attribute): Double {
@@ -467,7 +466,7 @@ private class AttributeMapSnapshotImpl(
         return data[attribute]?.getBaseValue() ?: throw NoSuchElementException("Attribute '$attribute' not found in AttributeMapSnapshot")
     }
 
-    override fun getModifierValue(attribute: Attribute, uuid: UUID): Double {
-        return data[attribute]?.getModifier(uuid)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in AttributeMapSnapshot")
+    override fun getModifierValue(attribute: Attribute, id: Key): Double {
+        return data[attribute]?.getModifier(id)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in AttributeMapSnapshot")
     }
 }

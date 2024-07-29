@@ -54,7 +54,6 @@ import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import java.text.DecimalFormat
 import java.text.NumberFormat
-import java.util.UUID
 import java.util.stream.Stream
 import kotlin.reflect.KClass
 
@@ -193,7 +192,7 @@ interface AttributeFacade<T : CoreAttribute, S : TemplateCoreAttribute> : Keyed 
     /**
      * A creator for attribute modifiers.
      */
-    val createAttributeModifiers: (UUID, T) -> Map<Attribute, AttributeModifier>
+    val createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>
 
     /**
      * A creator for [TemplateCoreAttribute].
@@ -343,7 +342,7 @@ private class MutableAttributeFacade<T : CoreAttribute, S : TemplateCoreAttribut
     override val facadeId: Key,
     // these are mutable through override() in DSL
     override var components: AttributeComponentMetadata,
-    override var createAttributeModifiers: (UUID, T) -> Map<Attribute, AttributeModifier>,
+    override var createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>,
     override var convertNode2Template: (ConfigurationNode) -> S,
     override var convertNode2Instance: (ConfigurationNode) -> T,
     override var convertNBT2Instance: (CompoundTag) -> T,
@@ -509,9 +508,9 @@ private class SingleSelectionImpl(
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Fixed::class
             ),
-            createAttributeModifiers = { uuid: UUID, core: CoreAttributeS ->
+            createAttributeModifiers = { id: Key, core: CoreAttributeS ->
                 ImmutableMap.of(
-                    Attributes.component(), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
+                    Attributes.component(), AttributeModifier(id, core.value.toStableDouble(), core.operation)
                 )
             },
             convertNode2Template = { node: ConfigurationNode ->
@@ -566,10 +565,10 @@ private class RangedSelectionImpl(
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class
             ),
-            createAttributeModifiers = { uuid: UUID, core: CoreAttributeR ->
+            createAttributeModifiers = { id: Key, core: CoreAttributeR ->
                 ImmutableMap.of(
-                    Attributes.component1(), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
-                    Attributes.component2(), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
+                    Attributes.component1(), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
+                    Attributes.component2(), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
                 )
             },
             convertNode2Template = { node: ConfigurationNode ->
@@ -620,9 +619,9 @@ private class SingleElementAttributeBinderImpl(
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Fixed::class, AttributeComponent.Element::class
             ),
-            createAttributeModifiers = { uuid: UUID, core: CoreAttributeSE ->
+            createAttributeModifiers = { id: Key, core: CoreAttributeSE ->
                 ImmutableMap.of(
-                    Attributes.byElement(core.element).component(), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
+                    Attributes.byElement(core.element).component(), AttributeModifier(id, core.value.toStableDouble(), core.operation)
                 )
             },
             convertNode2Template = { node: ConfigurationNode ->
@@ -677,10 +676,10 @@ private class RangedElementAttributeBinderImpl(
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class, AttributeComponent.Element::class
             ),
-            createAttributeModifiers = { uuid: UUID, core: CoreAttributeRE ->
+            createAttributeModifiers = { id: Key, core: CoreAttributeRE ->
                 ImmutableMap.of(
-                    Attributes.byElement(core.element).component1(), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
-                    Attributes.byElement(core.element).component2(), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
+                    Attributes.byElement(core.element).component1(), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
+                    Attributes.byElement(core.element).component2(), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
                 )
             },
             convertNode2Template = { node: ConfigurationNode ->

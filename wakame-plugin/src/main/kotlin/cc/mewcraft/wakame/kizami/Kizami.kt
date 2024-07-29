@@ -79,10 +79,10 @@ private data class KizamiType(
  */
 internal object KizamiSerializer : SchemaSerializer<Kizami> {
     /**
-     * The UUID hint is used to pass the kizami UUID to the child
+     * The key hint is used to pass the kizami key to the child
      * node deserialization, such as the deserialization of `effects`.
      */
-    val UUID_HINT: RepresentationHint<UUID> = RepresentationHint.of("uuid", UUID::class.java)
+    val HINT_KEY: RepresentationHint<Key> = RepresentationHint.of("key", Key::class.java)
 
     override fun deserialize(type: Type, node: ConfigurationNode): Kizami {
         val scalar = node.rawScalar() as? String

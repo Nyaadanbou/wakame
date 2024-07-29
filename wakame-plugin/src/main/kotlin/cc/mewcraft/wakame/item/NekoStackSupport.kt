@@ -282,24 +282,24 @@ internal class VanillaNekoStack(
     override val namespace: String = key.namespace()
     override val path: String = key.value()
 
-    // 变体永远都是 0
-    override var variant: Int = 0
+    override var variant: Int = 0 // 变体永远都是 0
     override val uuid: UUID = prototype.uuid
     override val slot: ItemSlot = prototype.slot
     override val templates: ItemTemplateMap = prototype.templates
     override val behaviors: ItemBehaviorMap = prototype.behaviors
 
-    override fun clone(): NekoStack = unsupported()
-    override fun erase(): Unit = unsupported()
+    override fun clone(): NekoStack =
+        unsupported()
+
+    override fun erase(): Unit =
+        unsupported()
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key.asString()),
         ExaminableProperty.of("variant", variant),
     )
 
-    override fun toString(): String {
-        return toSimpleString()
-    }
+    override fun toString(): String = toSimpleString()
 
     private fun unsupported(): Nothing {
         throw UnsupportedOperationException("This operation is not supported on VanillaNekoStack")

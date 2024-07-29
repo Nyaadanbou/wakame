@@ -54,7 +54,7 @@ class CustomNekoStackTest : KoinTest {
             CommonNekoStackTest.afterAll()
         }
 
-        private val ZERO_UUID = UUID(0, 0)
+        private val ZERO_KEY = Key.key("noop:noop")
 
         private fun <T, S : ItemTemplate<T>> componentLifecycleTest(
             path: String,
@@ -235,7 +235,7 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(core)
 
                 fun assert(element: Element, expectedMin: Double, expectedMax: Double) {
-                    val modMap = core.provideAttributeModifiers(ZERO_UUID)
+                    val modMap = core.provideAttributeModifiers(ZERO_KEY)
                     val modMin = modMap[Attributes.byElement(element).MIN_ATTACK_DAMAGE]
                     val modMax = modMap[Attributes.byElement(element).MAX_ATTACK_DAMAGE]
                     assertNotNull(modMin)
@@ -261,7 +261,7 @@ class CustomNekoStackTest : KoinTest {
                 val core = cell.getCoreAs(CoreTypes.ATTRIBUTE)
                 assertNotNull(core)
 
-                val modMap = core.provideAttributeModifiers(ZERO_UUID)
+                val modMap = core.provideAttributeModifiers(ZERO_KEY)
                 val mod = modMap[Attributes.CRITICAL_STRIKE_CHANCE]
                 assertNotNull(mod)
                 assertEquals(0.75, mod.amount, 1e-5)
