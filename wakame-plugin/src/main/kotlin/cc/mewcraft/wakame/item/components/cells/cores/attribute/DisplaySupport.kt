@@ -128,7 +128,7 @@ internal data class CoreAttributeLoreMeta(
 
         init {
             // validate values
-            this.operationIndex.forEach { Operation.byKey(it) }
+            this.operationIndex.forEach { Operation.byKeyOrThrow(it) }
             this.elementIndex.forEach { ElementRegistry.INSTANCES[it] }
         }
 

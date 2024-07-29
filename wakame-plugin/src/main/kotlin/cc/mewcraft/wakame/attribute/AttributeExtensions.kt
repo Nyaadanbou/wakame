@@ -19,14 +19,13 @@ fun BukkitAttributeModifier.Operation.toNeko() = when (this) {
 
 fun WakameAttributeModifier.toBukkit() = BukkitAttributeModifier(
     /* uuid = */ id,
-    /* name = */ name.orEmpty(),
+    /* name = */ "REMOVE in 1.21",
     /* amount = */ amount,
     /* operation = */ operation.toBukkit(),
 )
 
 fun BukkitAttributeModifier.toNeko() = WakameAttributeModifier(
     id = uniqueId,
-    name = name.takeIf { it.isNotEmpty() },
     amount = amount,
     operation = operation.toNeko(),
 )

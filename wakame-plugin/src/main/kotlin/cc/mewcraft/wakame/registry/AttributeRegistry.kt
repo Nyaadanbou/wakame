@@ -121,7 +121,7 @@ object AttributeRegistry : Initializable {
             // create closures
             val tooltips = DiscreteTooltips(config)
             // override it
-            tooltipLoreCreator = { core: CoreAttributeS ->
+            createTooltipLore = { core: CoreAttributeS ->
                 val lines = tooltips.line(core.operation)
                 val resolver = tooltips.value("value", core.value.toInt())
                 listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
@@ -193,32 +193,32 @@ interface AttributeFacade<T : CoreAttribute, S : TemplateCoreAttribute> : Keyed 
     /**
      * A creator for attribute modifiers.
      */
-    val modifierCreator: (UUID, T) -> Map<Attribute, AttributeModifier>
+    val createAttributeModifiers: (UUID, T) -> Map<Attribute, AttributeModifier>
 
     /**
      * A creator for [TemplateCoreAttribute].
      */
-    val codecNodeToTemplate: (ConfigurationNode) -> S
+    val convertNode2Template: (ConfigurationNode) -> S
 
     /**
      * A creator for [CoreAttribute].
      */
-    val codecNodeToInstance: (ConfigurationNode) -> T
+    val convertNode2Instance: (ConfigurationNode) -> T
 
     /**
      * A creator for [CoreAttribute].
      */
-    val codecTagToInstance: (CompoundTag) -> T
+    val convertNBT2Instance: (CompoundTag) -> T
 
     /**
      * A creator for tooltip name.
      */
-    val tooltipNameCreator: (T) -> Component
+    val createTooltipName: (T) -> Component
 
     /**
      * A creator for tooltip lore.
      */
-    val tooltipLoreCreator: (T) -> List<Component>
+    val createTooltipLore: (T) -> List<Component>
 }
 
 /**
@@ -343,12 +343,12 @@ private class MutableAttributeFacade<T : CoreAttribute, S : TemplateCoreAttribut
     override val facadeId: Key,
     // these are mutable through override() in DSL
     override var components: AttributeComponentMetadata,
-    override var modifierCreator: (UUID, T) -> Map<Attribute, AttributeModifier>,
-    override var codecNodeToTemplate: (ConfigurationNode) -> S,
-    override var codecNodeToInstance: (ConfigurationNode) -> T,
-    override var codecTagToInstance: (CompoundTag) -> T,
-    override var tooltipNameCreator: (T) -> Component,
-    override var tooltipLoreCreator: (T) -> List<Component>,
+    override var createAttributeModifiers: (UUID, T) -> Map<Attribute, AttributeModifier>,
+    override var convertNode2Template: (ConfigurationNode) -> S,
+    override var convertNode2Instance: (ConfigurationNode) -> T,
+    override var convertNBT2Instance: (CompoundTag) -> T,
+    override var createTooltipName: (T) -> Component,
+    override var createTooltipLore: (T) -> List<Component>,
 ) : AttributeFacade<T, S> {
     override val key: Key = facadeId
 }
@@ -509,28 +509,28 @@ private class SingleSelectionImpl(
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Fixed::class
             ),
-            modifierCreator = { uuid: UUID, core: CoreAttributeS ->
+            createAttributeModifiers = { uuid: UUID, core: CoreAttributeS ->
                 ImmutableMap.of(
                     Attributes.component(), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
                 )
             },
-            codecNodeToTemplate = { node: ConfigurationNode ->
+            convertNode2Template = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getTemplateSingle()
                 TemplateCoreAttributeS(tagType, facadeId, operation, value)
             },
-            codecNodeToInstance = { node: ConfigurationNode ->
+            convertNode2Instance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getSingle()
                 CoreAttributeS(tagType, facadeId, operation, value)
             },
-            codecTagToInstance = { tag: CompoundTag ->
+            convertNBT2Instance = { tag: CompoundTag ->
                 CoreAttributeS(tagType, tag)
             },
-            tooltipNameCreator = {
+            createTooltipName = {
                 AttributeRegistrySupport.miniMessage.deserialize(displayName)
             },
-            tooltipLoreCreator = { core: CoreAttributeS ->
+            createTooltipLore = { core: CoreAttributeS ->
                 val lines = tooltips.line(core.operation)
                 val resolver = tooltips.number("value", core.value)
                 listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
@@ -566,31 +566,31 @@ private class RangedSelectionImpl(
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class
             ),
-            modifierCreator = { uuid: UUID, core: CoreAttributeR ->
+            createAttributeModifiers = { uuid: UUID, core: CoreAttributeR ->
                 ImmutableMap.of(
                     Attributes.component1(), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
                     Attributes.component2(), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
                 )
             },
-            codecNodeToTemplate = { node: ConfigurationNode ->
+            convertNode2Template = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getTemplateLower()
                 val upper = node.getTemplateUpper()
                 TemplateCoreAttributeR(tagType, facadeId, operation, lower, upper)
             },
-            codecNodeToInstance = { node: ConfigurationNode ->
+            convertNode2Instance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getLower()
                 val upper = node.getUpper()
                 CoreAttributeR(tagType, facadeId, operation, lower, upper)
             },
-            codecTagToInstance = { tag: CompoundTag ->
+            convertNBT2Instance = { tag: CompoundTag ->
                 CoreAttributeR(tagType, tag)
             },
-            tooltipNameCreator = {
+            createTooltipName = {
                 AttributeRegistrySupport.miniMessage.deserialize(displayName)
             },
-            tooltipLoreCreator = { core: CoreAttributeR ->
+            createTooltipLore = { core: CoreAttributeR ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
@@ -620,31 +620,31 @@ private class SingleElementAttributeBinderImpl(
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Fixed::class, AttributeComponent.Element::class
             ),
-            modifierCreator = { uuid: UUID, core: CoreAttributeSE ->
+            createAttributeModifiers = { uuid: UUID, core: CoreAttributeSE ->
                 ImmutableMap.of(
                     Attributes.byElement(core.element).component(), AttributeModifier(uuid, core.value.toStableDouble(), core.operation)
                 )
             },
-            codecNodeToTemplate = { node: ConfigurationNode ->
+            convertNode2Template = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getTemplateSingle()
                 val element = node.getElement()
                 TemplateCoreAttributeSE(tagType, facadeId, operation, value, element)
             },
-            codecNodeToInstance = { node: ConfigurationNode ->
+            convertNode2Instance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getSingle()
                 val element = node.getElement()
                 CoreAttributeSE(tagType, facadeId, operation, value, element)
             },
-            codecTagToInstance = { tag: CompoundTag ->
+            convertNBT2Instance = { tag: CompoundTag ->
                 CoreAttributeSE(tagType, tag)
             },
-            tooltipNameCreator = {
+            createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.displayName)
                 AttributeRegistrySupport.miniMessage.deserialize(displayName, resolver)
             },
-            tooltipLoreCreator = { core: CoreAttributeSE ->
+            createTooltipLore = { core: CoreAttributeSE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("value", core.value)
                 val resolver2 = tooltips.component("element", core.element.displayName)
@@ -677,34 +677,34 @@ private class RangedElementAttributeBinderImpl(
             components = AttributeComponentMetadataImpl(
                 AttributeComponent.Op::class, AttributeComponent.Ranged::class, AttributeComponent.Element::class
             ),
-            modifierCreator = { uuid: UUID, core: CoreAttributeRE ->
+            createAttributeModifiers = { uuid: UUID, core: CoreAttributeRE ->
                 ImmutableMap.of(
                     Attributes.byElement(core.element).component1(), AttributeModifier(uuid, core.lower.toStableDouble(), core.operation),
                     Attributes.byElement(core.element).component2(), AttributeModifier(uuid, core.upper.toStableDouble(), core.operation),
                 )
             },
-            codecNodeToTemplate = { node: ConfigurationNode ->
+            convertNode2Template = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getTemplateLower()
                 val upper = node.getTemplateUpper()
                 val element = node.getElement()
                 TemplateCoreAttributeRE(tagType, facadeId, operation, lower, upper, element)
             },
-            codecNodeToInstance = { node: ConfigurationNode ->
+            convertNode2Instance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getLower()
                 val upper = node.getUpper()
                 val element = node.getElement()
                 CoreAttributeRE(tagType, facadeId, operation, lower, upper, element)
             },
-            codecTagToInstance = { tag: CompoundTag ->
+            convertNBT2Instance = { tag: CompoundTag ->
                 CoreAttributeRE(tagType, tag)
             },
-            tooltipNameCreator = {
+            createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.displayName)
                 AttributeRegistrySupport.miniMessage.deserialize(displayName, resolver)
             },
-            tooltipLoreCreator = { core: CoreAttributeRE ->
+            createTooltipLore = { core: CoreAttributeRE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
@@ -748,6 +748,6 @@ private fun ConfigurationNode.getElement(): Element {
 }
 
 private fun ConfigurationNode.getOperation(): Operation {
-    return node("operation").string?.let { Operation.byKey(it) } ?: Operation.ADD
+    return node("operation").string?.let { Operation.byKeyOrThrow(it) } ?: Operation.ADD
 }
 //</editor-fold>
