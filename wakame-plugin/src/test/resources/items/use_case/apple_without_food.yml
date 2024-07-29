@@ -1,6 +1,5 @@
 # Use case: 一个不能吃的苹果
 
-uuid: c8c488d0-6021-4db6-a22f-bcfc2596a618
 item_type: golden_apple
 
 # 移除掉 `minecraft:food` 组件, 这样这个物品就不再是食物了 (变为不可食用), 只是一个有着食物模型的物品

@@ -9,7 +9,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.ApiStatus
-import java.util.UUID
 
 /**
  * A wrapper of an ItemStack, which provides dedicated properties and
@@ -78,11 +77,6 @@ interface NekoStack : Keyed, Examinable {
      * The variant of this item.
      */
     var variant: Int
-
-    /**
-     * The UUID of this item.
-     */
-    val uuid: UUID
 
     /**
      * The inventory slot where this item becomes effective.

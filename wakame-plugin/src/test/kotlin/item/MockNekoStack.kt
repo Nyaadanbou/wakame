@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
-import java.util.UUID
 import java.util.stream.Stream
 
 class MockNekoStack(
@@ -27,7 +26,6 @@ class MockNekoStack(
     override val path: String = prototype.key.value()
     override val key: Key = prototype.key
     override var variant: Int = 0
-    override val uuid: UUID = prototype.uuid
     override val slot: ItemSlot = prototype.slot
     override val components: ItemComponentMap = ItemComponentMap.builder().build()
     override val templates: ItemTemplateMap = prototype.templates

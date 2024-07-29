@@ -32,7 +32,6 @@ import org.bukkit.Material
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.test.KoinTest
-import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -984,7 +983,6 @@ class CustomNekoStackTest : KoinTest {
     @Test
     fun `use case - least configuration`() {
         val item = readCustomPrototype("use_case", "least_configuration")
-        assertEquals(UUID.fromString("8729823f-8b80-4efd-bb9e-1c0f9b2eecc3"), item.uuid)
         assertEquals(Key.key("wooden_sword"), item.itemType)
     }
 

@@ -1,8 +1,5 @@
 type: bloodrage
 
-# 此技能的唯一标识符, 用于添加属性.
-uuid: 0190ac7a-1fbf-7cd3-b93b-ad8d390e420d
-
 # 当下面的计算值大于 0.0, 此技能效果生效.
 condition: "player.health() <= player.max_health() * 0.5"
 

@@ -8,12 +8,10 @@ import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import java.util.UUID
 import java.util.stream.Stream
 
 internal class NekoItemImpl(
     override val key: Key,
-    override val uuid: UUID,
     override val config: ConfigProvider,
     override val itemType: Key,
     override val slot: ItemSlot,
@@ -24,7 +22,6 @@ internal class NekoItemImpl(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key.asString()),
-        ExaminableProperty.of("uuid", uuid),
         ExaminableProperty.of("config", config.relPath),
         ExaminableProperty.of("item_type", itemType.asString()),
         ExaminableProperty.of("slot", slot),

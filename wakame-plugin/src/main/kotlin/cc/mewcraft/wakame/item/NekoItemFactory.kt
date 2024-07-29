@@ -23,7 +23,6 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.contains
 import org.spongepowered.configurate.serialize.SerializationException
 import java.nio.file.Path
-import java.util.UUID
 
 internal class RestrictedItemTemplateException : Throwable()
 internal class UnsupportedItemTemplateException : Throwable()
@@ -45,7 +44,6 @@ object NekoItemFactory : KoinComponent {
         val provider = NodeConfigProvider(root, relPath.toString())
 
         // read all basic info
-        val uuid = root.node("uuid").krequire<UUID>()
         val itemType = key.takeIf { Material.matchMaterial(key.asString()) != null } ?: throw SerializationException("Invalid item type: '$key'. Usually it's the incorrect file name")
         val removeComponents = VanillaComponentRemover.noop()
         val slot = root.node("slot").krequire<ItemSlot>()
@@ -135,7 +133,6 @@ object NekoItemFactory : KoinComponent {
 
         return NekoItemImpl(
             key = key,
-            uuid = uuid,
             config = provider,
             itemType = itemType,
             slot = slot,
@@ -161,7 +158,6 @@ object NekoItemFactory : KoinComponent {
         val provider = NodeConfigProvider(root, relPath.toString())
 
         // read all basic info
-        val uuid = root.node("uuid").krequire<UUID>()
         val itemType = root.node("item_type").krequire<Key>()
         val removeComponents = root.node("remove_components").krequire<VanillaComponentRemover>()
         val slot = root.node("slot").krequire<ItemSlot>()
@@ -230,7 +226,6 @@ object NekoItemFactory : KoinComponent {
 
         return NekoItemImpl(
             key = key,
-            uuid = uuid,
             config = provider,
             itemType = itemType,
             slot = slot,

@@ -19,7 +19,6 @@ import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
 import java.lang.reflect.Type
-import java.util.UUID
 import java.util.stream.Stream
 
 /**
@@ -27,15 +26,12 @@ import java.util.stream.Stream
  *
  * 使用 [KizamiRegistry] 来获得该实例.
  */
-interface Kizami : Keyed, Examinable, FriendlyNamed, BiIdentifiable<String, Byte> {
-    val uuid: UUID
-}
+interface Kizami : Keyed, Examinable, FriendlyNamed, BiIdentifiable<String, Byte>
 
 /**
  * [Kizami] 的实现.
  */
 private data class KizamiType(
-    override val uuid: UUID,
     override val uniqueId: String,
     override val binaryId: Byte,
     override val displayName: Component,
@@ -44,7 +40,6 @@ private data class KizamiType(
     override val key: Key = Key.key("kizami", uniqueId)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("uuid", uuid),
         ExaminableProperty.of("uniqueId", uniqueId),
         ExaminableProperty.of("binaryId", binaryId),
         ExaminableProperty.of("displayName", PlainTextComponentSerializer.plainText().serialize(displayName)),
@@ -94,11 +89,10 @@ internal object KizamiSerializer : SchemaSerializer<Kizami> {
         }
 
         // if it's structure 2
-        val uuid = node.node("uuid").krequire<UUID>()
         val key = node.key().toString()
         val binary = node.node("binary_index").krequire<Int>().toStableByte()
         val displayName = node.node("display_name").krequire<Component>()
         val styles = node.node("styles").krequire<Array<StyleBuilderApplicable>>()
-        return KizamiType(uuid, key, binary, displayName, styles)
+        return KizamiType(key, binary, displayName, styles)
     }
 }
