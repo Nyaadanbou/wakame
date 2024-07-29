@@ -1,7 +1,6 @@
 # 唯一的默认萌芽物品.
 # 自带一个自定义模型.
 
-uuid: c6bbbe7a-1d05-42a8-859c-c697811ad98a
 item_type: bow
 assets:
   - variant: 0

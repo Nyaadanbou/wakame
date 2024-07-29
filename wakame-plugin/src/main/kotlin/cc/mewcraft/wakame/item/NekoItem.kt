@@ -12,7 +12,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.UUID
 
 /**
  * Represents an **item template**, or a "blueprint" in other words.
@@ -35,11 +34,6 @@ interface NekoItem : Keyed, Examinable {
      * - [value][Key.value] is the name of the config file itself (without the file extension)
      */
     override val key: Key
-
-    /**
-     * The UUID of this item.
-     */
-    val uuid: UUID
 
     /**
      * The [config provider][ConfigProvider] of this item.

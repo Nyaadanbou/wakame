@@ -91,7 +91,7 @@ internal constructor(
      * Gets the modifier value specified by [type] and [id].
      *
      * @param type the attribute type
-     * @param id the uuid
+     * @param id the modifier id
      * @param attributable
      * @return the modifier value
      * @throws IllegalArgumentException if the [type] is not present in this supplier
@@ -123,7 +123,7 @@ internal constructor(
      * Checks whether this supplier has the modifier specified by [type] and [id].
      *
      * @param type the attribute type
-     * @param id the uuid
+     * @param id the modifier id
      * @return `true` if this supplier has the modifier
      */
     fun hasModifier(type: Attribute, id: Key): Boolean {

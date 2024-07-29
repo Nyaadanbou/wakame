@@ -20,7 +20,6 @@ import com.github.retrooper.packetevents.resources.ResourceLocation
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 import com.github.retrooper.packetevents.protocol.item.ItemStack as PacketStack
 import org.bukkit.inventory.ItemStack as BukkitStack
@@ -181,9 +180,6 @@ private class PacketCustomNekoStack(
         get() = NekoStackSupport.getVariant(nbt)
         set(_) = abortWriteOps()
 
-    override val uuid: UUID
-        get() = NekoStackSupport.getUuid(nbt)
-
     override val slot: ItemSlot
         get() = NekoStackSupport.getSlot(nbt)
 
@@ -243,9 +239,6 @@ private class PacketVanillaNekoStack(
     override var variant: Int
         get() = 0
         set(_) = abortWriteOps()
-
-    override val uuid: UUID
-        get() = prototype.uuid
 
     override val slot: ItemSlot
         get() = prototype.slot

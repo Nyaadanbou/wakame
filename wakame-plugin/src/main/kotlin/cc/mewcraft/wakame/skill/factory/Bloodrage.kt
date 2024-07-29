@@ -29,17 +29,11 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
-import java.util.UUID
 
 /**
  * 玩家血量低于一定值的时候触发效果.
  */
 interface Bloodrage : Skill, PassiveSkill {
-    /**
-     * 用于添加属性的唯一标识.
-     */
-    val uniqueId: UUID
-
     /**
      * 激活的条件. (MoLang) 表达式
      */
@@ -62,19 +56,17 @@ interface Bloodrage : Skill, PassiveSkill {
 
     companion object Factory : SkillFactory<Bloodrage> {
         override fun create(key: Key, config: ConfigurationNode): Bloodrage {
-            val uniqueId = config.node("uuid").krequire<UUID>()
             val condition = config.node("condition").get<Evaluable<*>>() ?: Evaluable.parseNumber(1.0)
             val invalidTime = config.node("invalid_time").krequire<Long>()
             val restartTime = config.node("restart_time").krequire<Long>()
             val effects = config.node("effects").krequire<List<BloodrageEffect>>()
-            return Impl(key, config, uniqueId, condition, invalidTime, restartTime, effects)
+            return Impl(key, config, condition, invalidTime, restartTime, effects)
         }
     }
 
     private class Impl(
         key: Key,
         config: ConfigurationNode,
-        override val uniqueId: UUID,
         override val condition: Evaluable<*>,
         override val invalidTime: Long,
         override val restartTime: Long,

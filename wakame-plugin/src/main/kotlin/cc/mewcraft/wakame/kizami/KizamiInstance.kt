@@ -50,7 +50,6 @@ data class KizamiInstance(
  *
  * ```yaml
  * <node>:
- *   uuid: <UUID>
  *   binary_index: <Byte>
  *   display_name: <MiniMessage String>
  *   styles: <MiniMessage String>

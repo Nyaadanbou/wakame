@@ -29,7 +29,6 @@ import org.jetbrains.annotations.Contract
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
-import java.util.UUID
 import java.util.stream.Stream
 
 /**
@@ -227,9 +226,6 @@ private class CustomNekoStack(
         get() = NekoStackSupport.getVariant(nbt)
         set(value) = NekoStackSupport.setVariant(nbt, value)
 
-    override val uuid: UUID
-        get() = NekoStackSupport.getUuid(nbt)
-
     override val slot: ItemSlot
         get() = NekoStackSupport.getSlot(nbt)
 
@@ -283,7 +279,6 @@ internal class VanillaNekoStack(
     override val path: String = key.value()
 
     override var variant: Int = 0 // 变体永远都是 0
-    override val uuid: UUID = prototype.uuid
     override val slot: ItemSlot = prototype.slot
     override val templates: ItemTemplateMap = prototype.templates
     override val behaviors: ItemBehaviorMap = prototype.behaviors
@@ -384,11 +379,6 @@ internal object NekoStackSupport {
 
     fun getVariant(wakameTag: CompoundTag): Int {
         return wakameTag.getInt(BaseBinaryKeys.VARIANT) // 如果不存在 NBT 标签, 默认返回 0
-    }
-
-    fun getUuid(wakameTag: CompoundTag): UUID {
-        val prototype = getPrototypeOrThrow(wakameTag)
-        return prototype.uuid
     }
 
     fun getSlot(wakameTag: CompoundTag): ItemSlot {
