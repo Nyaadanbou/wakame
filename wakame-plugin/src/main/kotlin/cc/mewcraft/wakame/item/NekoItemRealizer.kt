@@ -142,7 +142,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
      * @return a new NekoStack
      */
     private fun realizeByContext(prototype: NekoItem, context: GenerationContext): NekoStack {
-        val itemType: Material = requireNotNull(Registry.MATERIAL.get(prototype.itemType.toNamespacedKey)) {
+        val itemType: Material = requireNotNull(Registry.MATERIAL.get(prototype.itemType.toNamespacedKey())) {
             "Can't find org.bukkit.Material by '${prototype.itemType}'"
         }
         val nekoStack = itemType.createNekoStack()

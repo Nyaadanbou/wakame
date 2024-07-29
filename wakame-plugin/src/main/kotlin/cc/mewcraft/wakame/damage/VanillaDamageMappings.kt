@@ -70,7 +70,7 @@ object VanillaDamageMappings : Initializable, KoinComponent {
                 } catch (e: InvalidKeyException) {
                     throw IllegalArgumentException("Invalid key format for damage type", e)
                 }
-                adventKey.toNamespacedKey
+                adventKey.toNamespacedKey()
             }
             .forEach { (key, node) ->
                 val damageType = damageTypeRegistry.get(key) ?: run {
