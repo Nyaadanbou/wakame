@@ -28,19 +28,59 @@ sealed interface AttributeInstance : AttributeInstanceSnapshotable {
      * the [AttributeInstance] object.
      */
     val attribute: Attribute
+
+    /**
+     * 获取经过所有 [AttributeModifier] 修饰后的最终数值.
+     */
     fun getValue(): Double
+
+    /**
+     * 获取该属性实例的基值.
+     */
     fun getBaseValue(): Double
+
+    /**
+     * 设置该属性实例的基值.
+     */
     fun setBaseValue(baseValue: Double)
+
+    /**
+     * 获取指定 [uuid] 的 [AttributeModifier].
+     */
     fun getModifier(uuid: UUID): AttributeModifier?
+
+    /**
+     * 返回一个包含所有 [AttributeModifier] 的集合. 返回的集合不可变.
+     */
     fun getModifiers(): Set<AttributeModifier>
+
+    /**
+     * 判断是否存在指定的 [AttributeModifier].
+     */
     fun hasModifier(modifier: AttributeModifier): Boolean
+
+    /**
+     * 添加一个 [AttributeModifier] 到该属性实例.
+     */
     fun addModifier(modifier: AttributeModifier)
+
+    /**
+     * 移除指定的 [AttributeModifier].
+     */
     fun removeModifier(modifier: AttributeModifier)
+
+    /**
+     * 移除指定 [uuid] 的 [AttributeModifier].
+     */
     fun removeModifier(uuid: UUID)
+
+    /**
+     * 移除所有 [AttributeModifier].
+     */
     fun removeModifiers()
 
     /**
-     * Replace the states of this instance with the [other]'s.
+     * 将本实例的状态替换为 [other] 的状态.
      */
     fun replace(other: AttributeInstance)
 }
@@ -49,11 +89,34 @@ sealed interface AttributeInstance : AttributeInstanceSnapshotable {
  * 代表一个无形的属性实例. 该实例不可变, 并且不会对世界状态产生任何副作用.
  */
 sealed interface IntangibleAttributeInstance : AttributeInstanceSnapshotable {
+    /**
+     * 该属性实例的 [Attribute].
+     */
     val attribute: Attribute
+
+    /**
+     * 获取经过所有 [AttributeModifier] 修饰后的最终数值.
+     */
     fun getValue(): Double
+
+    /**
+     * 获取该属性实例的基值.
+     */
     fun getBaseValue(): Double
+
+    /**
+     * 获取指定 [uuid] 的 [AttributeModifier].
+     */
     fun getModifier(uuid: UUID): AttributeModifier?
+
+    /**
+     * 返回一个包含所有 [AttributeModifier] 的集合. 返回的集合不可变.
+     */
     fun getModifiers(): Set<AttributeModifier>
+
+    /**
+     * 判断是否存在指定的 [AttributeModifier].
+     */
     fun hasModifier(modifier: AttributeModifier): Boolean
 }
 
@@ -61,17 +124,64 @@ sealed interface IntangibleAttributeInstance : AttributeInstanceSnapshotable {
  * 代表一个属性实例的快照 (支持读/写), 用于临时的数值储存和计算.
  */
 sealed interface AttributeInstanceSnapshot {
+    /**
+     * 该属性实例的 [Attribute].
+     */
     val attribute: Attribute
+
+    /**
+     * 获取经过所有 [AttributeModifier] 修饰后的最终数值.
+     */
     fun getValue(): Double
+
+    /**
+     * 获取该属性实例的基值.
+     */
     fun getBaseValue(): Double
+
+    /**
+     * 设置该属性实例的基值.
+     */
     fun setBaseValue(baseValue: Double)
+
+    /**
+     * 获取指定 [uuid] 的 [AttributeModifier].
+     */
     fun getModifier(uuid: UUID): AttributeModifier?
+
+    /**
+     * 返回一个包含所有 [AttributeModifier] 的集合. 返回的集合不可变.
+     */
     fun getModifiers(): Set<AttributeModifier>
+
+    /**
+     * 判断是否存在指定的 [AttributeModifier].
+     */
     fun hasModifier(modifier: AttributeModifier): Boolean
+
+    /**
+     * 添加一个 [AttributeModifier] 到该属性实例.
+     */
     fun addModifier(modifier: AttributeModifier)
+
+    /**
+     * 移除指定的 [AttributeModifier].
+     */
     fun removeModifier(modifier: AttributeModifier)
+
+    /**
+     * 移除指定 [uuid] 的 [AttributeModifier].
+     */
     fun removeModifier(uuid: UUID)
+
+    /**
+     * 移除所有 [AttributeModifier].
+     */
     fun removeModifiers()
+
+    /**
+     * 将本实例转换为一个 [IntangibleAttributeInstance].
+     */
     fun toIntangible(): IntangibleAttributeInstance
 }
 
@@ -134,23 +244,24 @@ object AttributeInstanceFactory {
             val bukkitAttribute = attribute.toBukkit()
             val bukkitAttributeInstance = attributable.getAttribute(bukkitAttribute)
             if (bukkitAttributeInstance != null) {
+                // 如果世界状态中已经存在该属性, 那么我们直接返回它.
                 return@run bukkitAttributeInstance
-            } else {
-                if (registerVanilla) {
-                    // 仅当该 Attributable 没有该属性, 并且 registerVanilla 为 true 时, 我们才真的新注册该属性.
-                    // 这将产生副作用, 会直接改变 Attributable 的世界状态.
-                    // 这部分没有 API 文档, 但查看 CraftBukkit 源码就会发现:
-                    // 当该属性本来就存在于 Attributable 时, 它会覆盖原有的.
-                    attributable.registerAttribute(bukkitAttribute)
-                } else {
-                    // 该 Attributable 不存在该原版属性, 然而用户并没有指定允许注册新的属性.
-                    throw IllegalArgumentException("Can't find vanilla attribute instance for attribute $attribute")
-                }
-                return@run attributable.getAttribute(bukkitAttribute)!!
             }
-        }
-        return VanillaAttributeInstance(handle)
 
+            if (registerVanilla) {
+                // 仅当 registerVanilla 为 true 时, 我们才新注册该属性.
+                // 这将产生副作用, 会直接改变 Attributable 的世界状态!!!
+                // 这部分没有 API 文档, 但查看 CraftBukkit 源码就会发现:
+                // 当该属性本来就存在于 Attributable 时, 它会覆盖原有的.
+                attributable.registerAttribute(bukkitAttribute)
+            } else {
+                // 该 Attributable 不存在该原版属性, 然而用户并没有指定允许注册新的属性.
+                throw IllegalArgumentException("Can't find vanilla attribute instance for attribute $attribute")
+            }
+            return@run attributable.getAttribute(bukkitAttribute)!!
+        }
+
+        return VanillaAttributeInstance(handle)
     }
 }
 
@@ -192,16 +303,10 @@ private class AttributeInstanceDelegation(
         return cachedValue
     }
 
-    /**
-     * 返回所有 [AttributeModifier] 的集合. 返回的集合不可变.
-     */
     fun getModifiers(): Set<AttributeModifier> {
         return ImmutableSet.copyOf(modifiersById.values)
     }
 
-    /**
-     * 返回指定 [uuid] 下所有 [AttributeModifier] 的集合. 返回的集合不可变.
-     */
     fun getModifier(uuid: UUID): AttributeModifier? {
         return modifiersById[uuid]
     }
@@ -461,29 +566,23 @@ private class IntangibleAttributeInstanceImpl(
     override val attribute: Attribute
         get() = delegation.attribute
 
-    override fun getValue(): Double {
-        return delegation.getValue()
-    }
+    override fun getValue(): Double =
+        delegation.getValue()
 
-    override fun getBaseValue(): Double {
-        return delegation.getBaseValue()
-    }
+    override fun getBaseValue(): Double =
+        delegation.getBaseValue()
 
-    override fun getModifier(uuid: UUID): AttributeModifier? {
-        return delegation.getModifier(uuid)
-    }
+    override fun getModifier(uuid: UUID): AttributeModifier? =
+        delegation.getModifier(uuid)
 
-    override fun getModifiers(): Set<AttributeModifier> {
-        return delegation.getModifiers()
-    }
+    override fun getModifiers(): Set<AttributeModifier> =
+        delegation.getModifiers()
 
-    override fun hasModifier(modifier: AttributeModifier): Boolean {
-        return delegation.hasModifier(modifier)
-    }
+    override fun hasModifier(modifier: AttributeModifier): Boolean =
+        delegation.hasModifier(modifier)
 
-    override fun getSnapshot(): AttributeInstanceSnapshot {
-        return AttributeInstanceSnapshotImpl(delegation.clone())
-    }
+    override fun getSnapshot(): AttributeInstanceSnapshot =
+        AttributeInstanceSnapshotImpl(delegation.clone())
 }
 
 private class AttributeInstanceSnapshotImpl(
@@ -522,7 +621,6 @@ private class AttributeInstanceSnapshotImpl(
     override fun removeModifiers() =
         delegation.removeModifiers()
 
-    override fun toIntangible(): IntangibleAttributeInstance {
-        return IntangibleAttributeInstanceImpl(delegation.clone())
-    }
+    override fun toIntangible(): IntangibleAttributeInstance =
+        IntangibleAttributeInstanceImpl(delegation.clone())
 }
