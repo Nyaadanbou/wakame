@@ -364,7 +364,7 @@ private object IntangibleAttributeMapPool : KoinComponent {
             for (attribute in default.attributes) {
                 val instance = default.createInstance(attribute) ?: continue
                 val snapshot = instance.getSnapshot()
-                val immutable = snapshot.toImmutable()
+                val immutable = snapshot.toIntangible()
                 data[attribute] = immutable
             }
             IntangibleAttributeMapImpl(data)
