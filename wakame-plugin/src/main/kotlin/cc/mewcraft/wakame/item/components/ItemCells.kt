@@ -37,6 +37,7 @@ import cc.mewcraft.wakame.skill.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.value
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import io.leangen.geantyref.TypeToken
@@ -207,14 +208,15 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
 
         override fun collectAttributeModifiers(context: NekoStack, ignoreCurse: Boolean): Multimap<Attribute, AttributeModifier> {
             val ret = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
-            for ((_, cell) in this) {
+            for ((id, cell) in this) {
                 if (!ignoreCurse && cell.getCurse().isLocked(context)) {
                     continue // 诅咒还未解锁
                 }
                 val core = cell.getCoreAs(CoreTypes.ATTRIBUTE) ?: continue
-                val modifiers = core.provideAttributeModifiers(context.key)
-                val entries = modifiers.entries
-                ret.putAll(entries)
+                // 拼接物品 key 和词条栏 id 作为属性修饰符的 id
+                val identity = context.key.value { "$it/$id" }
+                val attributeModifiers = core.provideAttributeModifiers(identity)
+                ret.putAll(attributeModifiers.entries)
             }
             return ret.build()
         }
