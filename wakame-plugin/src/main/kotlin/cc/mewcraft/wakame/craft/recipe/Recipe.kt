@@ -58,6 +58,8 @@ class ShapedRecipe(
 ) : Recipe {
     override fun addBukkitRecipe() {
         val shapedRecipe = BukkitShapredRecipe(key.toNamespacedKey, result.toBukkitItemStack())
+        //TODO 'X'改为全局变量
+        pattern.forEach { it.replace('X', ' ') }
         shapedRecipe.shape(*pattern)
         ingredients.forEach {
             shapedRecipe.setIngredient(it.key, org.bukkit.inventory.RecipeChoice.ExactChoice(it.value.toBukkitItemStacks()))
@@ -119,13 +121,12 @@ enum class RecipeType(
     FURNACE(RecipeTypeBridge(typeTokenOf()) { type, node ->
         FurnaceRecipe()
     }),*/
-    SHAPED(RecipeTypeBridge(typeTokenOf()) { type, node ->
+    SHAPED(RecipeTypeBridge(typeTokenOf()) { _, node ->
         val pattern = node.node("pattern").getList<String>(emptyList()).apply {
             require(isNotEmpty()) { "The pattern is not present" }
             require(size <= 3) { "The pattern should be 1, 2 or 3 rows, not $size" }
             var lastLength = -1
             this.forEach {
-                //TODO 空？
                 require(it.length in 1..3) { "The pattern rows should be 1, 2, or 3 characters, not ${it.length}" }
                 require(lastLength == -1 || lastLength == it.length) { "The pattern must be rectangular" }
                 lastLength = it.length
@@ -140,11 +141,15 @@ enum class RecipeType(
                 mapChild.krequire<RecipeChoice>()
             }
 
-        // 判断 pattern 中的 key 是否都在 ingredients 中
+        //判断 X 特殊字符是否被误用
+        require(!ingredients.keys.contains('X')) { "'X' means an empty slot in pattern, should not be used as an ingredient char" }
+        //TODO 'X'改为全局变量
+
+        //判断 pattern 中的 key 是否都在 ingredients 中
         val missingIngredientKeys = pattern
             .map { it.toCharArray() }
             .reduce { acc, chars -> acc + chars }
-            .filterNot { it in ingredients.keys }
+            .filter { it !in ingredients.keys && it != 'X' }
         if (missingIngredientKeys.isNotEmpty()) {
             throw SerializationException("The keys [${missingIngredientKeys.joinToString()}] are specified in the pattern but not present in the ingredients")
         }
@@ -159,7 +164,7 @@ enum class RecipeType(
             ingredients = ingredients,
         )
     }),
-    SHAPELESS(RecipeTypeBridge(typeTokenOf()) { type, node ->
+    SHAPELESS(RecipeTypeBridge(typeTokenOf()) { _, node ->
         val ingredients = node.node("ingredients").getList<RecipeChoice>(emptyList()).apply {
             require(isNotEmpty()) { "Ingredients is not present" }
             require(size <= 9) { "Ingredients should not be more than 9" }
