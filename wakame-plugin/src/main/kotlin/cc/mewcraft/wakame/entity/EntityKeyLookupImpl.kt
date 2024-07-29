@@ -52,7 +52,7 @@ private object MinecraftEntityKeyLookup : EntityKeyLookupPart {
     }
 
     override fun validate(key: Key): Boolean {
-        return Registry.ENTITY_TYPE.get(key.toNamespacedKey) != null
+        return Registry.ENTITY_TYPE.get(key.toNamespacedKey()) != null
     }
 
 }
