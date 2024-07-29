@@ -2,12 +2,15 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import com.google.common.collect.ImmutableSet
-import com.google.common.collect.MultimapBuilder.SetMultimapBuilder
-import com.google.common.collect.SetMultimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
+import it.unimi.dsi.fastutil.objects.ObjectCollection
+import it.unimi.dsi.fastutil.objects.ObjectSets
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
+import org.jetbrains.annotations.VisibleForTesting
+import java.util.EnumMap
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
 
 /**
@@ -275,9 +278,8 @@ object AttributeInstanceFactory {
 private class AttributeInstanceDelegation(
     val attribute: Attribute,
 ) : Cloneable {
-    // TODO 直接把这个 modifiersById 变成一个 Table 如何?
     val modifiersById: Object2ObjectArrayMap<Key, AttributeModifier> = Object2ObjectArrayMap()
-    val modifiersByOp: SetMultimap<Operation, AttributeModifier> = SetMultimapBuilder.enumKeys(Operation::class.java).hashSetValues().build()
+    val modifiersByOp: EnumMap<Operation, Object2ObjectOpenHashMap<Key, AttributeModifier>> = EnumMap(Operation::class.java)
     var dirty: Boolean = true
 
     @get:JvmName("baseValue")
@@ -308,6 +310,11 @@ private class AttributeInstanceDelegation(
         return ImmutableSet.copyOf(modifiersById.values)
     }
 
+    @VisibleForTesting
+    fun getModifiers(operation: Operation): MutableMap<Key, AttributeModifier> {
+        return modifiersByOp.computeIfAbsent(operation) { Object2ObjectOpenHashMap() }
+    }
+
     fun getModifier(id: Key): AttributeModifier? {
         return modifiersById[id]
     }
@@ -317,20 +324,20 @@ private class AttributeInstanceDelegation(
     }
 
     fun addModifier(modifier: AttributeModifier) {
-        // FIXME 修复重复添加 AttributeModifier 的问题
-        //  目前如果同一个物品上, 同一个 Attribute, 有多个不同的 AttributeModifier,
-        //  那么这里的 alreadyExists 就会返回 true, 从而导致 AttributeModifier 产生“重复”问题.
-        val alreadyExists = modifiersById.putIfAbsent(modifier.id, modifier) != null
-        if (alreadyExists) {
-            AttributeSupport.LOGGER.warn("$modifier is already applied on this attribute!")
+        if (modifiersById.putIfAbsent(modifier.id, modifier) != null) {
+            AttributeSupport.LOGGER.warn("$modifier is already applied on this attribute (same id)")
+            return
         }
-        getModifiersOrCreateEmpty(modifier.operation).add(modifier)
+        if (getModifiers(modifier.operation).putIfAbsent(modifier.id, modifier) != null) {
+            AttributeSupport.LOGGER.warn("$modifier is already applied on this attribute (same operation)")
+            return
+        }
         dirty = true
     }
 
     fun removeModifier(modifier: AttributeModifier) {
         modifiersById.remove(modifier.id)
-        modifiersByOp.remove(modifier.operation, modifier)
+        modifiersByOp[modifier.operation]?.remove(modifier.id)
         dirty = true
     }
 
@@ -367,22 +374,15 @@ private class AttributeInstanceDelegation(
 
     private fun calculateValue(): Double {
         var x: Double = getBaseValue()
-        getModifierOrReturnEmpty(Operation.ADD).forEach { x += it.amount }
+        getModifiersOrReturnEmpty(Operation.ADD).forEach { x += it.amount }
         var y: Double = x
-        getModifierOrReturnEmpty(Operation.MULTIPLY_BASE).forEach { y += x * it.amount }
-        getModifierOrReturnEmpty(Operation.MULTIPLY_TOTAL).forEach { y *= 1.0 + it.amount }
+        getModifiersOrReturnEmpty(Operation.MULTIPLY_BASE).forEach { y += x * it.amount }
+        getModifiersOrReturnEmpty(Operation.MULTIPLY_TOTAL).forEach { y *= 1.0 + it.amount }
         return this.attribute.sanitizeValue(y)
     }
 
-    private fun getModifierOrReturnEmpty(operation: Operation): Set<AttributeModifier> {
-        if (!modifiersByOp.containsKey(operation)) {
-            return emptySet()
-        }
-        return modifiersByOp.get(operation)
-    }
-
-    private fun getModifiersOrCreateEmpty(operation: Operation): MutableSet<AttributeModifier> {
-        return modifiersByOp.get(operation)
+    private fun getModifiersOrReturnEmpty(operation: Operation): ObjectCollection<AttributeModifier> {
+        return modifiersByOp[operation]?.values ?: ObjectSets.emptySet()
     }
 }
 
