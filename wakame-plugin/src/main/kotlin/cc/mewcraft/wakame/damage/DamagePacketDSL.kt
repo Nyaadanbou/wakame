@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeMapLike
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.ElementAttribute
-import cc.mewcraft.wakame.attribute.ElementAttributeContainer
+import cc.mewcraft.wakame.attribute.ElementAttributes
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.ElementRegistry
 import org.koin.core.component.KoinComponent
@@ -295,8 +295,8 @@ class DamagePacketDSL(
         /**
          * 获取指定的 [ElementAttribute] 的值.
          */
-        fun value(block: ElementAttributeContainer.() -> ElementAttribute): Double {
-            val container = Attributes.byElement(element)
+        fun value(block: ElementAttributes.() -> ElementAttribute): Double {
+            val container = Attributes.element(element)
             val value = attrMap.getValue(block(container))
             return value
         }

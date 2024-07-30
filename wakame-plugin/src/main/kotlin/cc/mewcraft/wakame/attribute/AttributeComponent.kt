@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.Element as ElementType
 
 /**
- * 用于构成 [AttributeGroup] 的一部分.
+ * 用于构成 [AttributeComponentGroup] 的一部分.
  *
  * 这些接口仅用于理清类的继承结构, 你不应该直接实现这些接口!
  */
@@ -55,8 +55,8 @@ sealed interface AttributeComponent {
  * [Attribute] 和 [AttributeInstance].
  *
  * 例如, 玩家看到的物品“攻击力”属性, 实际上是由两个 [Attribute] 组成的.
- * 一个是 [ElementAttributeContainer.MIN_ATTACK_DAMAGE], 另一个是
- * [ElementAttributeContainer.MAX_ATTACK_DAMAGE].
+ * 一个是 [ElementAttributes.MIN_ATTACK_DAMAGE], 另一个是
+ * [ElementAttributes.MAX_ATTACK_DAMAGE].
  *
  * 因此我们需要这么一个类, 将这两个 [Attribute] 组合成一个玩家眼中的“属性”.
  *
@@ -78,14 +78,14 @@ sealed interface AttributeComponent {
  *
  * 这些功能都需要一个统一的接口来实现, 以增加代码的可读性.
  */
-interface AttributeGroup : AttributeComponent.Op /* 所有属性都有 Op */
+interface AttributeComponentGroup : AttributeComponent.Op /* 所有属性都有 Op */
 
 /**
  * 组件: [AttributeComponent.Op], [AttributeComponent.Fixed]
  *
  * 这种属性只有一个固定的数值, 典型代表: 移速.
  */
-interface AttributeGroupS<T> : AttributeGroup, AttributeComponent.Fixed<T> {
+interface AttributeComponentGroupS<T> : AttributeComponentGroup, AttributeComponent.Fixed<T> {
     override val value: T
 }
 
@@ -94,7 +94,7 @@ interface AttributeGroupS<T> : AttributeGroup, AttributeComponent.Fixed<T> {
  *
  * 这种属性有一个最小值和最大值, 典型代表: 暂无.
  */
-interface AttributeGroupR<T> : AttributeGroup, AttributeComponent.Ranged<T> {
+interface AttributeComponentGroupR<T> : AttributeComponentGroup, AttributeComponent.Ranged<T> {
     override val lower: T
     override val upper: T
 }
@@ -104,7 +104,7 @@ interface AttributeGroupR<T> : AttributeGroup, AttributeComponent.Ranged<T> {
  *
  * 这种属性只有一个固定的数值, 并且有一个元素类型, 典型代表: 所有元素伤害加成.
  */
-interface AttributeGroupSE<T> : AttributeGroup, AttributeComponent.Fixed<T>, AttributeComponent.Element {
+interface AttributeComponentGroupSE<T> : AttributeComponentGroup, AttributeComponent.Fixed<T>, AttributeComponent.Element {
     override val value: T
     override val element: Element
 }
@@ -114,7 +114,7 @@ interface AttributeGroupSE<T> : AttributeGroup, AttributeComponent.Fixed<T>, Att
  *
  * 这种属性有一个最小值和最大值, 并且有一个元素类型, 典型代表: 基于元素的浮动攻击力.
  */
-interface AttributeGroupRE<T> : AttributeGroup, AttributeComponent.Ranged<T>, AttributeComponent.Element {
+interface AttributeComponentGroupRE<T> : AttributeComponentGroup, AttributeComponent.Ranged<T>, AttributeComponent.Element {
     override val lower: T
     override val upper: T
     override val element: ElementType
