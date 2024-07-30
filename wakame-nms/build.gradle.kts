@@ -22,7 +22,6 @@ dependencies {
     compileOnly(project(":wakame-common"))
     compileOnly(platform(libs.bom.adventure))
     compileOnly(platform(libs.bom.packetevents.spigot))
-    compileOnly(libs.bytebuddy)
 }
 
 paperweight {

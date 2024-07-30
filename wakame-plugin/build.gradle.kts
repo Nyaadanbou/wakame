@@ -35,8 +35,6 @@ dependencies {
     // libraries
     compileOnly(libs.asm) // runtime is provided by paper
     compileOnly(libs.asm.commons) // ^
-    implementation(libs.bytebuddy)
-    implementation(libs.bytebuddy.agent)
     implementation(libs.commons.collections)
     implementation(libs.commons.provider)
     implementation(libs.mocha)
