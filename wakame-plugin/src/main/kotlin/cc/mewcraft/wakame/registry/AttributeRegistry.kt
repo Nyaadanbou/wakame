@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.ElementAttribute
-import cc.mewcraft.wakame.attribute.ElementAttributeContainer
+import cc.mewcraft.wakame.attribute.ElementAttributes
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.derive
@@ -156,7 +156,7 @@ object AttributeRegistry : Initializable {
         registerFacades()
         // 初始化
         ElementRegistry.INSTANCES.forEach { (_, element) ->
-            Attributes.byElement(element)
+            Attributes.element(element)
         }
     }
 }
@@ -301,7 +301,7 @@ private interface RangedAttributeBinder {
  */
 private interface SingleElementAttributeBinder {
     fun bind(
-        component: ElementAttributeContainer.() -> ElementAttribute,
+        component: ElementAttributes.() -> ElementAttribute,
     ): AttributeFacadeOverride<CoreAttributeSE, TemplateCoreAttributeSE>
 }
 
@@ -310,8 +310,8 @@ private interface SingleElementAttributeBinder {
  */
 private interface RangedElementAttributeBinder {
     fun bind(
-        component1: ElementAttributeContainer.() -> ElementAttribute,
-        component2: ElementAttributeContainer.() -> ElementAttribute,
+        component1: ElementAttributes.() -> ElementAttribute,
+        component2: ElementAttributes.() -> ElementAttribute,
     ): AttributeFacadeOverride<CoreAttributeRE, TemplateCoreAttributeRE>
 }
 
@@ -612,7 +612,7 @@ private class SingleElementAttributeBinderImpl(
     /**
      * Components: Operation, Single, Element
      */
-    override fun bind(component: ElementAttributeContainer.() -> ElementAttribute): AttributeFacadeOverride<CoreAttributeSE, TemplateCoreAttributeSE> {
+    override fun bind(component: ElementAttributes.() -> ElementAttribute): AttributeFacadeOverride<CoreAttributeSE, TemplateCoreAttributeSE> {
         val facade = MutableAttributeFacade(
             config = config,
             facadeId = facadeId,
@@ -621,7 +621,7 @@ private class SingleElementAttributeBinderImpl(
             ),
             createAttributeModifiers = { id: Key, core: CoreAttributeSE ->
                 ImmutableMap.of(
-                    Attributes.byElement(core.element).component(), AttributeModifier(id, core.value.toStableDouble(), core.operation)
+                    Attributes.element(core.element).component(), AttributeModifier(id, core.value.toStableDouble(), core.operation)
                 )
             },
             convertNode2Template = { node: ConfigurationNode ->
@@ -667,8 +667,8 @@ private class RangedElementAttributeBinderImpl(
      * Components: Operation, Ranged, Element
      */
     override fun bind(
-        component1: ElementAttributeContainer.() -> ElementAttribute,
-        component2: ElementAttributeContainer.() -> ElementAttribute,
+        component1: ElementAttributes.() -> ElementAttribute,
+        component2: ElementAttributes.() -> ElementAttribute,
     ): AttributeFacadeOverride<CoreAttributeRE, TemplateCoreAttributeRE> {
         val facade = MutableAttributeFacade(
             config = config,
@@ -678,8 +678,8 @@ private class RangedElementAttributeBinderImpl(
             ),
             createAttributeModifiers = { id: Key, core: CoreAttributeRE ->
                 ImmutableMap.of(
-                    Attributes.byElement(core.element).component1(), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
-                    Attributes.byElement(core.element).component2(), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
+                    Attributes.element(core.element).component1(), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
+                    Attributes.element(core.element).component2(), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
                 )
             },
             convertNode2Template = { node: ConfigurationNode ->

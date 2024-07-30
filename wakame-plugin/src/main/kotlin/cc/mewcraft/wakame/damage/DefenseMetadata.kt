@@ -26,12 +26,12 @@ class EntityDefenseMetadata(
             val element = packet.element
             val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
                 packet.packetDamage,
-                (damageeAttributeMap.getValue(Attributes.byElement(element).DEFENSE) + damageeAttributeMap.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0),
+                (damageeAttributeMap.getValue(Attributes.element(element).DEFENSE) + damageeAttributeMap.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0),
                 packet.defensePenetration,
                 packet.defensePenetrationRate
             )
             val incomingDamageRate = damageeAttributeMap.getValue(Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE) +
-                    damageeAttributeMap.getValue(Attributes.byElement(element).INCOMING_DAMAGE_RATE)
+                    damageeAttributeMap.getValue(Attributes.element(element).INCOMING_DAMAGE_RATE)
             // 依次计算防御力、元素伤害百分比加成、考虑承伤百分比、最小伤害、暴击倍率
             totalElementDamage += (damageAfterDefense *
                     (1 + packet.rate) *
