@@ -28,6 +28,11 @@ dependencyResolutionManagement {
         }
     }
     versionCatalogs {
+        create("local") {
+            from(files("gradle/local.versions.toml"))
+        }
+    }
+    versionCatalogs {
         create("libs") {
             from("cc.mewcraft.gradle:catalog:1.0-SNAPSHOT")
         }
@@ -40,6 +45,7 @@ include(":wakame-api")
 include(":wakame-common")
 include(":wakame-ext")
 include(":wakame-git")
+include(":wakame-mixin")
 include(":wakame-nms")
 include(":wakame-plugin")
 include(":wakame-reforge")

@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "cc.mewcraft.wakame.mixin.core",
+  "plugin": "cc.mewcraft.wakame.mixin.plugin.CorePlugin",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_17",
+  "server": [
+    "MixinServerLevel",
+    "MixinServerPlayer"
+  ]
+}
