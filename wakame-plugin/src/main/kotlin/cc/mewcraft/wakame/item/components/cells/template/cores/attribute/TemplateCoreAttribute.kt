@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.components.cells.template.cores.attribute
 
-import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.attribute.AttributeComponent
 import cc.mewcraft.wakame.attribute.AttributeComponentGroupR
 import cc.mewcraft.wakame.attribute.AttributeComponentGroupRE
@@ -49,7 +48,6 @@ internal val TemplateCoreAttribute.element: Element?
     get() = (this as? AttributeComponent.Element)?.element
 
 internal data class TemplateCoreAttributeR(
-    private val tagType: TagType,
     override val key: Key,
     override val operation: Operation,
     override val lower: RandomizedValue,
@@ -60,12 +58,11 @@ internal data class TemplateCoreAttributeR(
         val factor = context.levelOrThrow
         val lower = lower.calculate(factor)
         val upper = upper.calculate(factor)
-        return CoreAttributeR(tagType, key, operation, min(lower, upper), max(lower, upper))
+        return CoreAttributeR(key, operation, min(lower, upper), max(lower, upper))
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
-        ExaminableProperty.of("tagType", tagType),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("lower", lower),
         ExaminableProperty.of("upper", upper)
@@ -75,7 +72,6 @@ internal data class TemplateCoreAttributeR(
 }
 
 internal data class TemplateCoreAttributeRE(
-    private val tagType: TagType,
     override val key: Key,
     override val operation: Operation,
     override val lower: RandomizedValue,
@@ -87,12 +83,11 @@ internal data class TemplateCoreAttributeRE(
         val factor = context.levelOrThrow
         val lower = lower.calculate(factor)
         val upper = upper.calculate(factor)
-        return CoreAttributeRE(tagType, key, operation, min(lower, upper), max(lower, upper), element)
+        return CoreAttributeRE(key, operation, min(lower, upper), max(lower, upper), element)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
-        ExaminableProperty.of("tagType", tagType),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("lower", lower),
         ExaminableProperty.of("upper", upper),
@@ -103,7 +98,6 @@ internal data class TemplateCoreAttributeRE(
 }
 
 internal data class TemplateCoreAttributeS(
-    private val tagType: TagType,
     override val key: Key,
     override val operation: Operation,
     override val value: RandomizedValue,
@@ -112,12 +106,11 @@ internal data class TemplateCoreAttributeS(
         populateContextWithDefault(context)
         val factor = context.levelOrThrow
         val value = value.calculate(factor)
-        return CoreAttributeS(tagType, key, operation, value)
+        return CoreAttributeS(key, operation, value)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
-        ExaminableProperty.of("tagType", tagType),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("value", value),
     )
@@ -126,7 +119,6 @@ internal data class TemplateCoreAttributeS(
 }
 
 internal data class TemplateCoreAttributeSE(
-    private val tagType: TagType,
     override val key: Key,
     override val operation: Operation,
     override val value: RandomizedValue,
@@ -136,12 +128,11 @@ internal data class TemplateCoreAttributeSE(
         populateContextWithDefault(context)
         val factor = context.levelOrThrow
         val value = value.calculate(factor)
-        return CoreAttributeSE(tagType, key, operation, value, element)
+        return CoreAttributeSE(key, operation, value, element)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
-        ExaminableProperty.of("tagType", tagType),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("value", value),
         ExaminableProperty.of("element", element),

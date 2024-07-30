@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.components.cells.cores.attribute
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.nbt.Tag
-import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.AttributeComponent
@@ -25,21 +24,12 @@ import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.getByteOrNull
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toMethodHandle
 import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.toStableByte
-import cc.mewcraft.wakame.util.toStableDouble
-import cc.mewcraft.wakame.util.toStableFloat
-import cc.mewcraft.wakame.util.toStableInt
-import cc.mewcraft.wakame.util.toStableLong
-import cc.mewcraft.wakame.util.toStableShort
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
-import java.lang.invoke.MethodHandle
-import java.util.EnumMap
 import java.util.stream.Stream
 
 val CoreAttribute.element: Element?
@@ -143,16 +133,13 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierSourc
 }
 
 internal data class CoreAttributeS(
-    private val tagType: TagType,
     override val key: Key,
     override val operation: Operation,
     override val value: Double,
 ) : CoreAttribute(), AttributeComponentGroupS<Double> {
     constructor(
-        tagType: TagType,
         compound: CompoundTag,
     ) : this(
-        tagType,
         compound.getId(),
         compound.getOperation(),
         compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE)
@@ -160,7 +147,7 @@ internal data class CoreAttributeS(
 
     override fun serializeAsTag(): Tag = CompoundTag {
         putId(key)
-        putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
+        putNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
         putOperation(operation)
     }
 
@@ -173,17 +160,14 @@ internal data class CoreAttributeS(
 }
 
 internal data class CoreAttributeR(
-    private val tagType: TagType,
     override val key: Key,
     override val operation: Operation,
     override val lower: Double,
     override val upper: Double,
 ) : CoreAttribute(), AttributeComponentGroupR<Double> {
     constructor(
-        tagType: TagType,
         compound: CompoundTag,
     ) : this(
-        tagType,
         compound.getId(),
         compound.getOperation(),
         compound.getNumber(AttributeBinaryKeys.RANGED_MIN_VALUE),
@@ -192,8 +176,8 @@ internal data class CoreAttributeR(
 
     override fun serializeAsTag(): Tag = CompoundTag {
         putId(key)
-        putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower, tagType)
-        putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)
+        putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower)
+        putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)
         putOperation(operation)
     }
 
@@ -207,17 +191,14 @@ internal data class CoreAttributeR(
 }
 
 internal data class CoreAttributeSE(
-    private val tagType: TagType,
     override val key: Key,
     override val operation: Operation,
     override val value: Double,
     override val element: Element,
 ) : CoreAttribute(), AttributeComponentGroupSE<Double> {
     constructor(
-        tagType: TagType,
         compound: CompoundTag,
     ) : this(
-        tagType,
         compound.getId(),
         compound.getOperation(),
         compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE),
@@ -226,7 +207,7 @@ internal data class CoreAttributeSE(
 
     override fun serializeAsTag(): Tag = CompoundTag {
         putId(key)
-        putNumber(AttributeBinaryKeys.SINGLE_VALUE, value, tagType)
+        putNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
         putElement(element)
         putOperation(operation)
     }
@@ -241,7 +222,6 @@ internal data class CoreAttributeSE(
 }
 
 internal data class CoreAttributeRE(
-    private val tagType: TagType,
     override val key: Key,
     override val operation: Operation,
     override val lower: Double,
@@ -249,10 +229,8 @@ internal data class CoreAttributeRE(
     override val element: Element,
 ) : CoreAttribute(), AttributeComponentGroupRE<Double> {
     constructor(
-        tagType: TagType,
         compound: CompoundTag,
     ) : this(
-        tagType,
         compound.getId(),
         compound.getOperation(),
         compound.getNumber(AttributeBinaryKeys.RANGED_MIN_VALUE),
@@ -262,8 +240,8 @@ internal data class CoreAttributeRE(
 
     override fun serializeAsTag(): Tag = CompoundTag {
         putId(key)
-        putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower, tagType)
-        putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper, tagType)
+        putNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower)
+        putNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)
         putElement(element)
         putOperation(operation)
     }
@@ -299,9 +277,8 @@ private fun CompoundTag.putId(id: Key) {
     this.putString(CoreBinaryKeys.CORE_IDENTIFIER, id.asString())
 }
 
-private fun CompoundTag.putNumber(key: String, value: Double, tagType: TagType) {
-    val converted = TAG_TYPE_2_NUMBER_CONVERTER_MAP.getValue(tagType).invoke(value)
-    TAG_TYPE_2_TAG_SETTER_MAP.getValue(tagType).invoke(this, key, converted)
+private fun CompoundTag.putNumber(key: String, value: Double) {
+    this.putDouble(key, value)
 }
 
 private fun CompoundTag.putElement(element: Element) {
@@ -311,30 +288,3 @@ private fun CompoundTag.putElement(element: Element) {
 private fun CompoundTag.putOperation(operation: Operation) {
     this.putByte(AttributeBinaryKeys.OPERATION_TYPE, operation.binary)
 }
-
-// The MethodHandle's signature: CompoundTag.(String, Number) -> Unit
-private val TAG_TYPE_2_TAG_SETTER_MAP: Map<TagType, MethodHandle> =
-    buildMap {
-        this[TagType.BYTE] = CompoundTag::putByte
-        this[TagType.SHORT] = CompoundTag::putShort
-        this[TagType.INT] = CompoundTag::putInt
-        this[TagType.LONG] = CompoundTag::putLong
-        this[TagType.FLOAT] = CompoundTag::putFloat
-        this[TagType.DOUBLE] = CompoundTag::putDouble
-    }.mapValues {
-        it.value.toMethodHandle()
-    }.let(::EnumMap)
-
-// The MethodHandle's signature: (Number) -> Number
-private val TAG_TYPE_2_NUMBER_CONVERTER_MAP: Map<TagType, MethodHandle> =
-    buildMap {
-        this[TagType.BYTE] = Number::toStableByte
-        this[TagType.SHORT] = Number::toStableShort
-        this[TagType.INT] = Number::toStableInt
-        this[TagType.LONG] = Number::toStableLong
-        this[TagType.FLOAT] = Number::toStableFloat
-        this[TagType.DOUBLE] = Number::toStableDouble
-    }.mapValues {
-        it.value.toMethodHandle()
-    }.let(::EnumMap)
-//</editor-fold>
