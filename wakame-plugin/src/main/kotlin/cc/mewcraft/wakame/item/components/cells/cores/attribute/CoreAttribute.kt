@@ -5,14 +5,14 @@ import cc.mewcraft.nbt.Tag
 import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
+import cc.mewcraft.wakame.attribute.AttributeComponent
+import cc.mewcraft.wakame.attribute.AttributeGroupR
+import cc.mewcraft.wakame.attribute.AttributeGroupRE
+import cc.mewcraft.wakame.attribute.AttributeGroupS
+import cc.mewcraft.wakame.attribute.AttributeGroupSE
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.facade.AttributeComponent
-import cc.mewcraft.wakame.attribute.facade.AttributeComponentR
-import cc.mewcraft.wakame.attribute.facade.AttributeComponentRE
-import cc.mewcraft.wakame.attribute.facade.AttributeComponentS
-import cc.mewcraft.wakame.attribute.facade.AttributeComponentSE
-import cc.mewcraft.wakame.attribute.facade.AttributeModifierSource
+import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.element.Element
@@ -147,7 +147,7 @@ internal data class CoreAttributeS(
     override val key: Key,
     override val operation: Operation,
     override val value: Double,
-) : CoreAttribute(), AttributeComponentS<Double> {
+) : CoreAttribute(), AttributeGroupS<Double> {
     constructor(
         tagType: TagType,
         compound: CompoundTag,
@@ -178,7 +178,7 @@ internal data class CoreAttributeR(
     override val operation: Operation,
     override val lower: Double,
     override val upper: Double,
-) : CoreAttribute(), AttributeComponentR<Double> {
+) : CoreAttribute(), AttributeGroupR<Double> {
     constructor(
         tagType: TagType,
         compound: CompoundTag,
@@ -212,7 +212,7 @@ internal data class CoreAttributeSE(
     override val operation: Operation,
     override val value: Double,
     override val element: Element,
-) : CoreAttribute(), AttributeComponentSE<Double> {
+) : CoreAttribute(), AttributeGroupSE<Double> {
     constructor(
         tagType: TagType,
         compound: CompoundTag,
@@ -247,7 +247,7 @@ internal data class CoreAttributeRE(
     override val lower: Double,
     override val upper: Double,
     override val element: Element,
-) : CoreAttribute(), AttributeComponentRE<Double> {
+) : CoreAttribute(), AttributeGroupRE<Double> {
     constructor(
         tagType: TagType,
         compound: CompoundTag,

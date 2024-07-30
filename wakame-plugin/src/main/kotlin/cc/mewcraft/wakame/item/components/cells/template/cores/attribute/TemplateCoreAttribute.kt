@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.item.components.cells.template.cores.attribute
 
 import cc.mewcraft.nbt.TagType
+import cc.mewcraft.wakame.attribute.AttributeComponent
+import cc.mewcraft.wakame.attribute.AttributeGroupR
+import cc.mewcraft.wakame.attribute.AttributeGroupRE
+import cc.mewcraft.wakame.attribute.AttributeGroupS
+import cc.mewcraft.wakame.attribute.AttributeGroupSE
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.facade.AttributeComponent
-import cc.mewcraft.wakame.attribute.facade.AttributeComponentR
-import cc.mewcraft.wakame.attribute.facade.AttributeComponentRE
-import cc.mewcraft.wakame.attribute.facade.AttributeComponentS
-import cc.mewcraft.wakame.attribute.facade.AttributeComponentSE
-import cc.mewcraft.wakame.attribute.facade.AttributeData
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeR
@@ -31,7 +30,7 @@ import kotlin.math.min
 /**
  * 一个属性核心的模板.
  */
-interface TemplateCoreAttribute : TemplateCore, AttributeData, AttributeComponent.Op {
+interface TemplateCoreAttribute : TemplateCore, AttributeComponent.Op {
     override fun generate(context: GenerationContext): CoreAttribute
 }
 
@@ -55,7 +54,7 @@ internal data class TemplateCoreAttributeR(
     override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
-) : TemplateCoreAttribute, AttributeComponentR<RandomizedValue> {
+) : TemplateCoreAttribute, AttributeGroupR<RandomizedValue> {
     override fun generate(context: GenerationContext): CoreAttribute {
         populateContextWithDefault(context)
         val factor = context.levelOrThrow
@@ -82,7 +81,7 @@ internal data class TemplateCoreAttributeRE(
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
     override val element: Element,
-) : TemplateCoreAttribute, AttributeComponentRE<RandomizedValue> {
+) : TemplateCoreAttribute, AttributeGroupRE<RandomizedValue> {
     override fun generate(context: GenerationContext): CoreAttribute {
         populateContextWithDefault(context)
         val factor = context.levelOrThrow
@@ -108,7 +107,7 @@ internal data class TemplateCoreAttributeS(
     override val key: Key,
     override val operation: Operation,
     override val value: RandomizedValue,
-) : TemplateCoreAttribute, AttributeComponentS<RandomizedValue> {
+) : TemplateCoreAttribute, AttributeGroupS<RandomizedValue> {
     override fun generate(context: GenerationContext): CoreAttribute {
         populateContextWithDefault(context)
         val factor = context.levelOrThrow
@@ -132,7 +131,7 @@ internal data class TemplateCoreAttributeSE(
     override val operation: Operation,
     override val value: RandomizedValue,
     override val element: Element,
-) : TemplateCoreAttribute, AttributeComponentSE<RandomizedValue> {
+) : TemplateCoreAttribute, AttributeGroupSE<RandomizedValue> {
     override fun generate(context: GenerationContext): CoreAttribute {
         populateContextWithDefault(context)
         val factor = context.levelOrThrow
