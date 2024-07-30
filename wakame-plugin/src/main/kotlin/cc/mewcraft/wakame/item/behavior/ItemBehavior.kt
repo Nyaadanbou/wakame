@@ -40,7 +40,7 @@ sealed interface ItemBehaviorHolder
  * 该事件仅仅是玩家切换了手持的物品, 没有与世界发生交互.
  * 而且, 该事件涉及到两个物品, 一个切换之前的, 一个切换之后的.
  *
- * ## [cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent]
+ * ## [io.papermc.paper.event.player.PlayerInventorySlotChangeEvent]
  * 玩家背包内的某个物品发生了变化 (包括从空气变成某个物品), 没有与世界发生交互.
  * 从空气变成某个物品, 其实就包括了玩家登录时的情况. 你可以把玩家刚登录时的背包当成是空的,
  * 然后服务端会一个一个根据地图存档里的数据, 将背包里的物品一个一个填充回去.

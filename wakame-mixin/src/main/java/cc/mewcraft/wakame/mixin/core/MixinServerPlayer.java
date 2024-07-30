@@ -30,7 +30,7 @@ public abstract class MixinServerPlayer extends Player {
     @Shadow
     abstract public @NotNull CraftPlayer getBukkitEntity();
 
-    @Inject(method = "<init>", at = @At("TAIL"))
+    @Inject(method = "<init>", at = @At("RETURN"))
     public void onConstruction(CallbackInfo callback) {
         System.out.println("This is a message from MixinServerPlayer!");
 

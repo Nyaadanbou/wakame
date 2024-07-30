@@ -14,6 +14,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.ProjectileHitEvent
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
@@ -44,6 +45,11 @@ class MultipleItemListener : KoinComponent, Listener {
     @EventHandler
     fun onSlotChange(event: PlayerInventorySlotChangeEvent) {
         val player = event.player
+        val type = player.openInventory.type
+        if (type != InventoryType.CRAFTING) {
+            return
+        }
+
         val rawSlot = event.rawSlot
         val slot = event.slot
         val oldItem = event.oldItemStack.takeUnlessEmpty() // it always returns a non-null ItemStack - it uses AIR to represent emptiness
