@@ -1,0 +1,9 @@
+[versions]
+ignite = "1.0.1"
+mixin = "0.8.6"
+mixinExtras = "0.3.6"
+
+[libraries]
+ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
+mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
+mixinExtras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixinExtras" }

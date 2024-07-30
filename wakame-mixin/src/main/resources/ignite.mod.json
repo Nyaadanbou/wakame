@@ -1,0 +1,7 @@
+{
+  "id": "wakame",
+  "version": "1.0",
+  "mixins": [
+    "mixins.wakame.json"
+  ]
+}

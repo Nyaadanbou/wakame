@@ -28,7 +28,7 @@ sealed interface ItemBehaviorHolder
  * 物品交互结果, 即玩家使用该物品与世界发生了交互后所发生的结果.
  *
  * ## 注意事项
- * 本接口覆盖了绝大部分与世界进行交互的事件, 但这里特别不包含 [org.bukkit.event.player.PlayerItemHeldEvent] 和 [cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent].
+ * 本接口覆盖了绝大部分与世界进行交互的事件, 但这里特别不包含 [org.bukkit.event.player.PlayerItemHeldEvent] 和 [io.papermc.paper.event.player.PlayerInventorySlotChangeEvent].
  * 因为这两事件并不在“物品交互结果”这个范畴内, 它们并没有让物品与世界发生交互, 而仅仅是玩家自身的状态发生了变化而已. 这样看来, 这两个事件不符合“物品交互结果”的定义,
  * 因此它们也不应该被放到 [ItemBehavior] 这个架构下.
  *

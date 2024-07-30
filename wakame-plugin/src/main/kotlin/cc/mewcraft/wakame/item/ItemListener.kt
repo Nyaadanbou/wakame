@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.attribute.AttributeEventHandler
-import cc.mewcraft.wakame.event.PlayerInventorySlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
+import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -14,7 +14,11 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.ProjectileHitEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

@@ -11,6 +11,11 @@ dependencyResolutionManagement {
         }
     }
     versionCatalogs {
+        create("local") {
+            from(files("../gradle/local.versions.toml"))
+        }
+    }
+    versionCatalogs {
         create("libs") {
             from("cc.mewcraft.gradle:catalog:1.0-SNAPSHOT")
         }
