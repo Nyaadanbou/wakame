@@ -2,9 +2,6 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.nbt.TagType
-import cc.mewcraft.nbt.TagType.BYTE
-import cc.mewcraft.nbt.TagType.DOUBLE
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.key.Keyed
@@ -64,7 +61,7 @@ import kotlin.reflect.KClass
 /**
  * This singleton holds various implementations for **each** attribute.
  *
- * Check the [AttributeFacade] for implementation details.
+ * Check the [AttributeFacade] for more details.
  */
 @PreWorldDependency(
     runBefore = [ElementRegistry::class]
@@ -92,18 +89,17 @@ object AttributeRegistry : Initializable {
     /**
      * Builds an attribute facade.
      *
-     * @param key 词条在 NBT/模板 中的唯一标识。
+     * 注意, 参数 [key] 仅仅是词条在 NBT/模板 中的唯一标识.
+     * 底层由多个对象组成的词条标识就与这里的 [key] 不同.
      *
-     * 注意，这仅仅是词条在 NBT/模板 中的唯一标识。底层由多个对象组成的词条标识就与这里的 [key] 不同。
-     *
-     * 例如攻击力这个属性词条，底层实际上是由两个属性组成的，分别是 `MIN_ATTACK_DAMAGE` 和
-     * `MAX_ATTACK_DAMAGE`，但攻击力属性词条在 NBT/模板中的标识是一个经过“合并”得到的
+     * 例如攻击力这个属性词条, 底层实际上是由两个属性组成的, 分别是 `MIN_ATTACK_DAMAGE` 和
+     * `MAX_ATTACK_DAMAGE`, 但攻击力属性词条在 NBT/模板中的标识是一个经过“合并”得到的
      * `attribute:attack_damage`.
      *
-     * @param type 词条在 NBT 中的数据类型。
+     * @param key 词条在 NBT/模板 中的唯一标识
      */
-    private fun buildFacade(key: String, type: TagType): FormatSelection {
-        return FormatSelectionImpl(Key(Namespaces.ATTRIBUTE, key), type)
+    private fun buildFacade(key: String): FormatSelection {
+        return FormatSelectionImpl(Key(Namespaces.ATTRIBUTE, key))
     }
 
     /**
@@ -111,12 +107,12 @@ object AttributeRegistry : Initializable {
      */
     private fun registerFacades() {
         // Register special attribute
-        +buildFacade("empty", BYTE).single().bind { EMPTY }
+        +buildFacade("empty").single().bind { EMPTY }
         // Registry more attribute facades here ...
-        +buildFacade("attack_damage", DOUBLE).ranged().element().bind({ MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE })
-        +buildFacade("attack_damage_rate", DOUBLE).single().element().bind { ATTACK_DAMAGE_RATE }
-        +buildFacade("attack_effect_chance", DOUBLE).single().bind { ATTACK_EFFECT_CHANCE }
-        +buildFacade("attack_speed_level", BYTE).single().bind { ATTACK_SPEED_LEVEL }.override {
+        +buildFacade("attack_damage").ranged().element().bind({ MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE })
+        +buildFacade("attack_damage_rate").single().element().bind { ATTACK_DAMAGE_RATE }
+        +buildFacade("attack_effect_chance").single().bind { ATTACK_EFFECT_CHANCE }
+        +buildFacade("attack_speed_level").single().bind { ATTACK_SPEED_LEVEL }.override {
             // create closures
             val tooltips = DiscreteTooltips(config)
             // override it
@@ -126,29 +122,29 @@ object AttributeRegistry : Initializable {
                 listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
             }
         }
-        +buildFacade("block_interaction_range", DOUBLE).single().bind { BLOCK_INTERACTION_RANGE }
-        +buildFacade("critical_strike_chance", DOUBLE).single().bind { CRITICAL_STRIKE_CHANCE }
-        +buildFacade("critical_strike_power", DOUBLE).single().bind { CRITICAL_STRIKE_POWER }
-        +buildFacade("defense", DOUBLE).single().element().bind { DEFENSE }
-        +buildFacade("defense_penetration", DOUBLE).single().element().bind { DEFENSE_PENETRATION }
-        +buildFacade("defense_penetration_rate", DOUBLE).single().element().bind { DEFENSE_PENETRATION_RATE }
-        +buildFacade("entity_interaction_range", DOUBLE).single().bind { ENTITY_INTERACTION_RANGE }
-        +buildFacade("health_regeneration", DOUBLE).single().bind { HEALTH_REGENERATION }
-        +buildFacade("incoming_damage_rate", DOUBLE).single().element().bind { INCOMING_DAMAGE_RATE }
-        +buildFacade("lifesteal", DOUBLE).single().bind { LIFESTEAL }
-        +buildFacade("mana_consumption_rate", DOUBLE).single().bind { MANA_CONSUMPTION_RATE }
-        +buildFacade("mana_regeneration", DOUBLE).single().bind { MANA_REGENERATION }
-        +buildFacade("manasteal", DOUBLE).single().bind { MANASTEAL }
-        +buildFacade("max_absorption", DOUBLE).single().bind { MAX_ABSORPTION }
-        +buildFacade("max_health", DOUBLE).single().bind { MAX_HEALTH }
-        +buildFacade("max_mana", DOUBLE).single().bind { MAX_MANA }
-        +buildFacade("movement_speed", DOUBLE).single().bind { MOVEMENT_SPEED }
-        +buildFacade("universal_attack_damage", DOUBLE).ranged().bind({ UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE })
-        +buildFacade("universal_defense", DOUBLE).single().bind { UNIVERSAL_DEFENSE }
-        +buildFacade("universal_defense_penetration", DOUBLE).single().bind { UNIVERSAL_DEFENSE_PENETRATION }
-        +buildFacade("universal_defense_penetration_rate", DOUBLE).single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
-        +buildFacade("universal_attack_damage_rate", DOUBLE).single().bind { UNIVERSAL_ATTACK_DAMAGE_RATE }
-        +buildFacade("universal_incoming_damage_rate", DOUBLE).single().bind { UNIVERSAL_INCOMING_DAMAGE_RATE }
+        +buildFacade("block_interaction_range").single().bind { BLOCK_INTERACTION_RANGE }
+        +buildFacade("critical_strike_chance").single().bind { CRITICAL_STRIKE_CHANCE }
+        +buildFacade("critical_strike_power").single().bind { CRITICAL_STRIKE_POWER }
+        +buildFacade("defense").single().element().bind { DEFENSE }
+        +buildFacade("defense_penetration").single().element().bind { DEFENSE_PENETRATION }
+        +buildFacade("defense_penetration_rate").single().element().bind { DEFENSE_PENETRATION_RATE }
+        +buildFacade("entity_interaction_range").single().bind { ENTITY_INTERACTION_RANGE }
+        +buildFacade("health_regeneration").single().bind { HEALTH_REGENERATION }
+        +buildFacade("incoming_damage_rate").single().element().bind { INCOMING_DAMAGE_RATE }
+        +buildFacade("lifesteal").single().bind { LIFESTEAL }
+        +buildFacade("mana_consumption_rate").single().bind { MANA_CONSUMPTION_RATE }
+        +buildFacade("mana_regeneration").single().bind { MANA_REGENERATION }
+        +buildFacade("manasteal").single().bind { MANASTEAL }
+        +buildFacade("max_absorption").single().bind { MAX_ABSORPTION }
+        +buildFacade("max_health").single().bind { MAX_HEALTH }
+        +buildFacade("max_mana").single().bind { MAX_MANA }
+        +buildFacade("movement_speed").single().bind { MOVEMENT_SPEED }
+        +buildFacade("universal_attack_damage").ranged().bind({ UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE })
+        +buildFacade("universal_defense").single().bind { UNIVERSAL_DEFENSE }
+        +buildFacade("universal_defense_penetration").single().bind { UNIVERSAL_DEFENSE_PENETRATION }
+        +buildFacade("universal_defense_penetration_rate").single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
+        +buildFacade("universal_attack_damage_rate").single().bind { UNIVERSAL_ATTACK_DAMAGE_RATE }
+        +buildFacade("universal_incoming_damage_rate").single().bind { UNIVERSAL_INCOMING_DAMAGE_RATE }
     }
 
     override fun onPreWorld() {
@@ -475,27 +471,25 @@ private class DiscreteTooltips(
 
 private class FormatSelectionImpl(
     private val facadeId: Key,
-    private val tagType: TagType,
 ) : FormatSelection {
     override fun single(): SingleSelection {
-        return SingleSelectionImpl(facadeId, tagType)
+        return SingleSelectionImpl(facadeId)
     }
 
     override fun ranged(): RangedSelection {
-        return RangedSelectionImpl(facadeId, tagType)
+        return RangedSelectionImpl(facadeId)
     }
 }
 
 private class SingleSelectionImpl(
     private val facadeId: Key,
-    private val tagType: TagType,
 ) : SingleSelection {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): SingleElementAttributeBinder {
-        return SingleElementAttributeBinderImpl(facadeId, tagType)
+        return SingleElementAttributeBinderImpl(facadeId)
     }
 
     /**
@@ -516,15 +510,15 @@ private class SingleSelectionImpl(
             convertNode2Template = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getTemplateSingle()
-                TemplateCoreAttributeS(tagType, facadeId, operation, value)
+                TemplateCoreAttributeS(facadeId, operation, value)
             },
             convertNode2Instance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getSingle()
-                CoreAttributeS(tagType, facadeId, operation, value)
+                CoreAttributeS(facadeId, operation, value)
             },
             convertNBT2Instance = { tag: CompoundTag ->
-                CoreAttributeS(tagType, tag)
+                CoreAttributeS(tag)
             },
             createTooltipName = {
                 AttributeRegistrySupport.miniMessage.deserialize(displayName)
@@ -542,14 +536,13 @@ private class SingleSelectionImpl(
 
 private class RangedSelectionImpl(
     private val facadeId: Key,
-    private val tagType: TagType,
 ) : RangedSelection {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): RangedElementAttributeBinder {
-        return RangedElementAttributeBinderImpl(facadeId, tagType)
+        return RangedElementAttributeBinderImpl(facadeId)
     }
 
     /**
@@ -575,16 +568,16 @@ private class RangedSelectionImpl(
                 val operation = node.getOperation()
                 val lower = node.getTemplateLower()
                 val upper = node.getTemplateUpper()
-                TemplateCoreAttributeR(tagType, facadeId, operation, lower, upper)
+                TemplateCoreAttributeR(facadeId, operation, lower, upper)
             },
             convertNode2Instance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getLower()
                 val upper = node.getUpper()
-                CoreAttributeR(tagType, facadeId, operation, lower, upper)
+                CoreAttributeR(facadeId, operation, lower, upper)
             },
             convertNBT2Instance = { tag: CompoundTag ->
-                CoreAttributeR(tagType, tag)
+                CoreAttributeR(tag)
             },
             createTooltipName = {
                 AttributeRegistrySupport.miniMessage.deserialize(displayName)
@@ -603,7 +596,6 @@ private class RangedSelectionImpl(
 
 private class SingleElementAttributeBinderImpl(
     private val facadeId: Key,
-    private val tagType: TagType,
 ) : SingleElementAttributeBinder {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
     private val displayName: String by config.entry<String>("display_name")
@@ -628,16 +620,16 @@ private class SingleElementAttributeBinderImpl(
                 val operation = node.getOperation()
                 val value = node.getTemplateSingle()
                 val element = node.getElement()
-                TemplateCoreAttributeSE(tagType, facadeId, operation, value, element)
+                TemplateCoreAttributeSE(facadeId, operation, value, element)
             },
             convertNode2Instance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val value = node.getSingle()
                 val element = node.getElement()
-                CoreAttributeSE(tagType, facadeId, operation, value, element)
+                CoreAttributeSE(facadeId, operation, value, element)
             },
             convertNBT2Instance = { tag: CompoundTag ->
-                CoreAttributeSE(tagType, tag)
+                CoreAttributeSE(tag)
             },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.displayName)
@@ -657,7 +649,6 @@ private class SingleElementAttributeBinderImpl(
 
 private class RangedElementAttributeBinderImpl(
     private val facadeId: Key,
-    private val tagType: TagType,
 ) : RangedElementAttributeBinder {
     private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
     private val displayName: String by config.entry<String>("display_name")
@@ -687,17 +678,17 @@ private class RangedElementAttributeBinderImpl(
                 val lower = node.getTemplateLower()
                 val upper = node.getTemplateUpper()
                 val element = node.getElement()
-                TemplateCoreAttributeRE(tagType, facadeId, operation, lower, upper, element)
+                TemplateCoreAttributeRE(facadeId, operation, lower, upper, element)
             },
             convertNode2Instance = { node: ConfigurationNode ->
                 val operation = node.getOperation()
                 val lower = node.getLower()
                 val upper = node.getUpper()
                 val element = node.getElement()
-                CoreAttributeRE(tagType, facadeId, operation, lower, upper, element)
+                CoreAttributeRE(facadeId, operation, lower, upper, element)
             },
             convertNBT2Instance = { tag: CompoundTag ->
-                CoreAttributeRE(tagType, tag)
+                CoreAttributeRE(tag)
             },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.displayName)
