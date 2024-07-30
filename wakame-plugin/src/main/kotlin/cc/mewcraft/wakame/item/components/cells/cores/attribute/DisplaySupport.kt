@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.item.components.cells.cores.attribute
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
+import cc.mewcraft.wakame.attribute.AttributeComponent
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.facade.AttributeComponent
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.DisplaySupport
 import cc.mewcraft.wakame.display.DynamicLoreMeta

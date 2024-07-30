@@ -1,7 +1,5 @@
-package cc.mewcraft.wakame.attribute.facade
+package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeModifier
 import net.kyori.adventure.key.Key
 
 /**
