@@ -45,6 +45,7 @@ class MultipleItemListener : KoinComponent, Listener {
     @EventHandler
     fun onSlotChange(event: PlayerInventorySlotChangeEvent) {
         val player = event.player
+
         val type = player.openInventory.type
         if (type != InventoryType.CRAFTING) {
             return
@@ -52,8 +53,11 @@ class MultipleItemListener : KoinComponent, Listener {
 
         val rawSlot = event.rawSlot
         val slot = event.slot
-        val oldItem = event.oldItemStack.takeUnlessEmpty() // it always returns a non-null ItemStack - it uses AIR to represent emptiness
-        val newItem = event.newItemStack.takeUnlessEmpty() // same as above
+
+        // it always returns a non-null ItemStack - it uses AIR to represent emptiness
+        val oldItem = event.oldItemStack.takeUnlessEmpty()
+        // same as above
+        val newItem = event.newItemStack.takeUnlessEmpty()
 
         attributeEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
         kizamiEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
