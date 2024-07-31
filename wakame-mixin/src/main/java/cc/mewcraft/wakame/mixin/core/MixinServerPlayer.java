@@ -32,9 +32,6 @@ public abstract class MixinServerPlayer extends Player {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void onConstruction(CallbackInfo callback) {
-        System.out.println("This is a message from MixinServerPlayer!");
-
-        // 将名为 containerListener 的成员变量重新赋值, 修改成我们自己的对象
         this.containerListener = new CustomContainerListener((ServerPlayer) (Object) this);
     }
 }

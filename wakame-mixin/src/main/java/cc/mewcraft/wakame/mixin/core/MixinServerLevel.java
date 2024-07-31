@@ -32,6 +32,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void onConstruction(CallbackInfo callback) {
-        System.out.println("This is a message from MixinServerLevel!");
+
     }
 }
