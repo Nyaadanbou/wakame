@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "cc.mewcraft.wakame"
-version = "1.0.0"
+version = "1.0"
 description = "The mixin part"
 
 dependencies {
