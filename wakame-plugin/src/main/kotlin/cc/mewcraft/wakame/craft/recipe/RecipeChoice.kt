@@ -1,15 +1,19 @@
 package cc.mewcraft.wakame.craft.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.item.realize
+import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -27,7 +31,26 @@ data class SingleRecipeChoice(
     val choice: Key
 ) : RecipeChoice {
     override fun toBukkitItemStacks(): List<ItemStack> {
-        TODO("Not yet implemented")
+        //TODO 临时实现
+        when (choice.namespace()) {
+            "minecraft" -> {
+                val material = Material.getMaterial(choice.value().uppercase(Locale.getDefault()))
+                material ?: throw IllegalArgumentException("Unknown vanilla item: '$choice'")
+                return listOf(ItemStack(material))
+            }
+
+            "wakame" -> {
+                val nekoItem = ItemRegistry.CUSTOM.find(Key.key(choice.value().replaceFirst('/', ':')))
+                val nekoStack = nekoItem?.realize()
+                val itemStack = nekoStack?.itemStack
+                itemStack ?: throw IllegalArgumentException("Unknown wakame item: '$choice'")
+                return listOf(itemStack)
+            }
+
+            else -> {
+                throw IllegalArgumentException("Unknown namespace")
+            }
+        }
     }
 
 
@@ -45,7 +68,30 @@ data class MultiRecipeChoice(
     val choices: List<Key>
 ) : RecipeChoice {
     override fun toBukkitItemStacks(): List<ItemStack> {
-        TODO("Not yet implemented")
+        //TODO 临时实现
+        val itemStacks: MutableList<ItemStack> = mutableListOf()
+        choices.forEach {
+            when (it.namespace()) {
+                "minecraft" -> {
+                    val material = Material.getMaterial(it.value().uppercase(Locale.getDefault()))
+                    material ?: throw IllegalArgumentException("Unknown vanilla item: '$it'")
+                    itemStacks.add(ItemStack(material))
+                }
+
+                "wakame" -> {
+                    val nekoItem = ItemRegistry.CUSTOM.find(Key.key(it.value().replaceFirst('/', ':')))
+                    val nekoStack = nekoItem?.realize()
+                    val itemStack = nekoStack?.itemStack
+                    itemStack ?: throw IllegalArgumentException("Unknown wakame item: '$it'")
+                    itemStacks.add(itemStack)
+                }
+
+                else -> {
+                    throw IllegalArgumentException("Unknown namespace")
+                }
+            }
+        }
+        return itemStacks
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
