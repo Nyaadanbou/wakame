@@ -139,14 +139,18 @@ object RecipeRegistry : Initializable, KoinComponent {
 
     override fun onPostWorld() {
         //TODO 待优化写法
-        val plugin: Plugin by inject()
         loadConfig()
-        Bukkit.getScheduler().runTask(plugin, Runnable { registerRecipes() })
+        ThreadType.SYNC.launch {
+            registerRecipes()
+        }
     }
 
     override fun onReload() {
+        //TODO 待优化写法
         loadConfig()
-        registerRecipes()
+        ThreadType.SYNC.launch {
+            registerRecipes()
+        }
         //向所有玩家的客户端发送配方刷新数据包
         Bukkit.updateRecipes()
     }
