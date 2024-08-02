@@ -73,9 +73,6 @@ private class LightningTick(
     override val interruptTriggers: TriggerConditions,
     override val forbiddenTriggers: TriggerConditions
 ) : AbstractPlayerSkillTick<Lightning>(skill, context) {
-    private val entityLocationTarget: Location?
-        get() = TargetUtil.getLocation(context, true)?.bukkitLocation
-    private val locationTarget: Location? = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.location?.getTargetLocation(16)?.getFirstBlockBelow()?.location
 
     override fun tickCastPoint(tickCount: Long): TickResult {
         val target = getTargetLocation() ?: return TickResult.INTERRUPT
@@ -90,14 +87,15 @@ private class LightningTick(
     override fun tickCast(tickCount: Long): TickResult {
         if (!checkConditions())
             return TickResult.ALL_DONE
-        val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity as? LivingEntity
+        val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
         val target = getTargetLocation() ?: return TickResult.INTERRUPT
         val world = target.world
         world.strikeLightningEffect(target)
         val entitiesBeStruck = world.getNearbyEntities(target, 3.0, 3.0, 3.0)
+        val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity as? LivingEntity
         for (entity in entitiesBeStruck) {
             if (entity is LivingEntity) {
-                entity.hurt(skill.damageMetadata.evaluate(context.getOrThrow(SkillContextKey.MOCHA_ENGINE)), caster)
+                entity.hurt(skill.damageMetadata.evaluate(engine), caster)
             }
         }
         return TickResult.ALL_DONE
@@ -113,6 +111,10 @@ private class LightningTick(
             .color(0, 127, 255)
             .spawn()
     }
+
+    private val entityLocationTarget: Location?
+        get() = TargetUtil.getLocation(context, true)?.bukkitLocation
+    private val locationTarget: Location? = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.location?.getTargetLocation(16)?.getFirstBlockBelow()?.location
 
     private fun getTargetLocation(): Location? {
         val targetType = skill.targetType

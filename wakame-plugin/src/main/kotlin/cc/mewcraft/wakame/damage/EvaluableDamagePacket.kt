@@ -62,7 +62,7 @@ internal object EvaluableDamageBundleSerializer : SchemaSerializer<EvaluableDama
             criticalPower = node.node("critical_power").krequire(),
             isCritical = node.node("is_critical").krequire(),
             knockback = node.node("knockback").krequire(),
-            damagePackets = node.childrenList().map { it.krequire<EvaluableDamagePacket>() }
+            damagePackets = node.node("damage_packets").childrenList().map { it.krequire<EvaluableDamagePacket>() }
         )
     }
 }
