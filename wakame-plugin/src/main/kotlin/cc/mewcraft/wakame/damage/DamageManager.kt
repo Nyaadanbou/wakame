@@ -22,8 +22,8 @@ object DamageManager {
         val uuid = event.entity.uniqueId
         val customDamageMetadata = findCustomDamageMetadata(uuid)
         if (customDamageMetadata != null) {
-            //如果自定义伤害有源且需要取消击退
-            //FIX BUG: 无源伤害(即没有造成伤害的LivingEntity)不会触发击退事件
+            // 如果自定义伤害有源且需要取消击退
+            // FIXED BUG: 无源伤害(即没有造成伤害的LivingEntity)不会触发击退事件
             if (!customDamageMetadata.knockback && (event is EntityDamageByEntityEvent)) {
                 markCancelKnockback(uuid)
             }
