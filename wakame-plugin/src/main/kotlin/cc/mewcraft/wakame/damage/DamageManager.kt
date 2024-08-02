@@ -6,12 +6,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
-import org.bukkit.entity.Arrow
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
-import org.bukkit.entity.SpectralArrow
-import org.bukkit.entity.Trident
+import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
@@ -19,7 +14,7 @@ import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.projectiles.BlockProjectileSource
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 object DamageManager {
     fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
@@ -27,6 +22,10 @@ object DamageManager {
         val uuid = event.entity.uniqueId
         val customDamageMetadata = findCustomDamageMetadata(uuid)
         if (customDamageMetadata != null) {
+            if (!customDamageMetadata.knockback) {
+                markCancelKnockback(uuid)
+            }
+            removeCustomDamageMetadata(uuid)
             return customDamageMetadata
         }
 
@@ -207,7 +206,7 @@ object DamageManager {
 
     private val customDamageMetadataMap = Caffeine.newBuilder()
         .softValues()
-        .expireAfterAccess(Duration.ofSeconds(60))
+        .expireAfterAccess(Duration.ofSeconds(4))
         .build<UUID, CustomDamageMetadata>()
 
     fun putCustomDamageMetadata(uuid: UUID, customDamageMetadata: CustomDamageMetadata) {
@@ -221,6 +220,17 @@ object DamageManager {
     fun removeCustomDamageMetadata(uuid: UUID) {
         customDamageMetadataMap.invalidate(uuid)
     }
+
+    private val cancelKnockbackSet: MutableSet<UUID> = mutableSetOf()
+
+    fun markCancelKnockback(uuid: UUID) {
+        cancelKnockbackSet.add(uuid)
+    }
+
+    fun unmarkCancelKnockback(uuid: UUID): Boolean {
+        return cancelKnockbackSet.remove(uuid)
+    }
+    //TODO 更通用的临时标记工具类
 }
 
 /**

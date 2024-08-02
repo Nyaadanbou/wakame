@@ -102,8 +102,6 @@ object DamageListener : Listener, KoinComponent {
             is AbstractArrow -> {
                 DamageManager.removeProjectileDamageMetadata(projectile.uniqueId)
             }
-
-            // TODO 可能还会有其他需要 wakame 属性系统处理的弹射物
         }
     }
 
@@ -113,11 +111,9 @@ object DamageListener : Listener, KoinComponent {
     @EventHandler
     fun on(event: EntityKnockbackEvent) {
         val uuid = event.entity.uniqueId
-        val customDamageMetadata = DamageManager.findCustomDamageMetadata(uuid) ?: return
-        if (!customDamageMetadata.knockback) {
+        if (DamageManager.unmarkCancelKnockback(uuid)) {
             event.isCancelled = true
         }
-        DamageManager.removeCustomDamageMetadata(uuid)
     }
 
     /* @EventHandler
