@@ -1,5 +1,5 @@
 enabled: true
-title: "<b>定制工作台: Bar"
+title: "<b>定制工作台: Example B"
 cost:
   base: 1000
   per_core: 500
