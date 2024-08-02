@@ -83,7 +83,7 @@ class NamespacedPathCollector(
                     .filter { it.isFile && it.extension == extension }
                     .forEach { file ->
                         val relativePath = if (deepPath) {
-                            file.relativeTo(namespaceDir).path.removeSuffix(".${file.extension}")
+                            file.relativeTo(namespaceDir).path.removeSuffix(".${file.extension}").replace("\\", "/")
                         } else {
                             file.nameWithoutExtension
                         }
