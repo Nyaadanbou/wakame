@@ -27,6 +27,7 @@ internal fun itemModule(): Module = module {
         vanillaModule(),
     )
 
+    single { ItemSlotRegistry } bind Initializable::class
     single { VanillaNekoStackRegistry } bind Initializable::class
     single { VanillaNekoItemRealizer }
     single { CustomNekoItemRealizer }
@@ -35,10 +36,12 @@ internal fun itemModule(): Module = module {
     single<TypeSerializerCollection>(named(ITEM_PROTO_SERIALIZERS)) {
         TypeSerializerCollection.builder()
 
-            // item slot
-            .kregister(ItemSlotSerializer)
             // item type
             .kregister(MaterialSerializer)
+            // item slot
+            .kregister(ItemSlotSerializer)
+            // item slot group
+            .kregister(ItemSlotGroupSerializer)
             // vanilla component remover
             .kregister(VanillaComponentRemoverSerializer)
             // item component templates

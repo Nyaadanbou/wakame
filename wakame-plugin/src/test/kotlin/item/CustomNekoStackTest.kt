@@ -80,8 +80,18 @@ class CustomNekoStackTest : KoinTest {
     @Test
     fun `intrinsics - slot`() {
         val item = readCustomPrototype("intrinsics", "slot")
-        val slot = item.slot
-        assertEquals("MAIN_HAND", slot.id())
+        val slotGroup = item.slotGroup
+        assertTrue(slotGroup.contains(Key.key("vanilla:mainhand")), "mainhand")
+    }
+
+    @Test
+    fun `intrinsics - slot list`() {
+        val item = readCustomPrototype("intrinsics", "slot_list")
+        val slotGroup = item.slotGroup
+        assertTrue(slotGroup.contains(Key.key("custom:9")), "9")
+        assertTrue(slotGroup.contains(Key.key("custom:10")), "10")
+        assertTrue(slotGroup.contains(Key.key("custom:11")), "11")
+        assertTrue(slotGroup.contains(Key.key("custom:12")), "12")
     }
     //</editor-fold>
 

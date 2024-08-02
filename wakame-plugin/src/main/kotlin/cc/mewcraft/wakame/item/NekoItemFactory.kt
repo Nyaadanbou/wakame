@@ -46,7 +46,7 @@ object NekoItemFactory : KoinComponent {
         // read all basic info
         val itemType = key.takeIf { Material.matchMaterial(key.asString()) != null } ?: throw SerializationException("Invalid item type: '$key'. Usually it's the incorrect file name")
         val removeComponents = VanillaComponentRemover.noop()
-        val slot = root.node("slot").krequire<ItemSlot>()
+        val slotGroup = root.node("slot").krequire<ItemSlotGroup>()
 
         // read all item behaviors
         val behaviorMap = ItemBehaviorMap.build {
@@ -135,7 +135,7 @@ object NekoItemFactory : KoinComponent {
             key = key,
             config = provider,
             itemType = itemType,
-            slot = slot,
+            slotGroup = slotGroup,
             removeComponents = removeComponents,
             templates = templateMap,
             behaviors = behaviorMap
@@ -160,7 +160,7 @@ object NekoItemFactory : KoinComponent {
         // read all basic info
         val itemType = root.node("item_type").krequire<Key>()
         val removeComponents = root.node("remove_components").krequire<VanillaComponentRemover>()
-        val slot = root.node("slot").krequire<ItemSlot>()
+        val slotGroup = root.node("slot").krequire<ItemSlotGroup>()
 
         // read all item behaviors
         val behaviorMap = ItemBehaviorMap.build {
@@ -228,7 +228,7 @@ object NekoItemFactory : KoinComponent {
             key = key,
             config = provider,
             itemType = itemType,
-            slot = slot,
+            slotGroup = slotGroup,
             removeComponents = removeComponents,
             templates = templateMap,
             behaviors = behaviorMap

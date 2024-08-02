@@ -79,9 +79,9 @@ interface NekoStack : Keyed, Examinable {
     var variant: Int
 
     /**
-     * The inventory slot where this item becomes effective.
+     * The inventory slot group where this item becomes effective.
      */
-    val slot: ItemSlot
+    val slotGroup: ItemSlotGroup // TODO implement it
 
     /**
      * The corresponding [NekoItem] this stack is generated from.

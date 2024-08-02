@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.ItemSlotGroup
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackSupport
@@ -180,8 +180,8 @@ private class PacketCustomNekoStack(
         get() = NekoStackSupport.getVariant(nbt)
         set(_) = abortWriteOps()
 
-    override val slot: ItemSlot
-        get() = NekoStackSupport.getSlot(nbt)
+    override val slotGroup: ItemSlotGroup
+        get() = NekoStackSupport.getSlotGroup(nbt)
 
     override val prototype: NekoItem
         get() = NekoStackSupport.getPrototypeOrThrow(nbt)
@@ -240,8 +240,8 @@ private class PacketVanillaNekoStack(
         get() = 0
         set(_) = abortWriteOps()
 
-    override val slot: ItemSlot
-        get() = prototype.slot
+    override val slotGroup: ItemSlotGroup
+        get() = prototype.slotGroup
 
     override val templates: ItemTemplateMap
         get() = prototype.templates

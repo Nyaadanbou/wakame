@@ -46,9 +46,9 @@ interface NekoItem : Keyed, Examinable {
     val itemType: Key
 
     /**
-     * The inventory slot where this item can take effect.
+     * The item slot group where this item can take effect.
      */
-    val slot: ItemSlot
+    val slotGroup: ItemSlotGroup
 
     /**
      * 需要移除的原版物品组件.

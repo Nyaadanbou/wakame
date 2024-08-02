@@ -2,7 +2,7 @@ item_type: stick
 remove_components:
   - attribute_modifiers
   - tool
-slot: MAIN_HAND
+slot: vanilla:mainhand
 item_name: "<rarity:style><rarity:name> 射雷"
 rarity: mapping:demo_1
 level: 23

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -16,47 +17,13 @@ import org.bukkit.inventory.ItemStack
  * 铭刻系统与事件系统的交互逻辑.
  */
 class KizamiEventHandler {
-    /**
-     * 玩家切换手持物品时, 执行的逻辑.
-     *
-     * @param player
-     * @param previousSlot
-     * @param newSlot
-     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
-     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
-     */
-    fun handlePlayerItemHeld(
-        player: Player,
-        previousSlot: Int,
-        newSlot: Int,
-        oldItem: ItemStack?,
-        newItem: ItemStack?,
-    ) {
-        updateKizamiz(player, oldItem, newItem) {
-            it.slot.testItemHeldEvent(player, previousSlot, newSlot)
-            && it.templates.has(ItemTemplateTypes.KIZAMIABLE)
-        }
-    }
 
     /**
-     * 玩家背包内的物品发生变化时, 执行的逻辑.
-     *
-     * @param player
-     * @param rawSlot
-     * @param slot
-     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
-     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * 当玩家装备的物品发生变化时, 执行的逻辑.
      */
-    fun handlePlayerInventorySlotChange(
-        player: Player,
-        rawSlot: Int,
-        slot: Int,
-        oldItem: ItemStack?,
-        newItem: ItemStack?,
-    ) {
+    fun handlePlayerSlotChange(player: Player, slot: ItemSlot, oldItem: ItemStack?, newItem: ItemStack?) {
         updateKizamiz(player, oldItem, newItem) {
-            it.slot.testInventorySlotChangeEvent(player, slot, rawSlot)
-            && it.templates.has(ItemTemplateTypes.KIZAMIABLE)
+            it.slotGroup.contains(slot) && it.templates.has(ItemTemplateTypes.KIZAMIABLE)
         }
     }
 

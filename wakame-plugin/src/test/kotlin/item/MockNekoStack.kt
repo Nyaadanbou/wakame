@@ -1,7 +1,7 @@
 package item
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.ItemSlotGroup
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
@@ -26,7 +26,7 @@ class MockNekoStack(
     override val path: String = prototype.key.value()
     override val key: Key = prototype.key
     override var variant: Int = 0
-    override val slot: ItemSlot = prototype.slot
+    override val slotGroup: ItemSlotGroup = prototype.slotGroup
     override val components: ItemComponentMap = ItemComponentMap.builder().build()
     override val templates: ItemTemplateMap = prototype.templates
     override val behaviors: ItemBehaviorMap = prototype.behaviors
