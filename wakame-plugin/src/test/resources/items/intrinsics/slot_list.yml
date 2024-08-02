@@ -1,0 +1,8 @@
+item_type: bedrock
+
+# 写成列表
+slot:
+ - custom:9
+ - custom:10
+ - custom:11
+ - custom:12

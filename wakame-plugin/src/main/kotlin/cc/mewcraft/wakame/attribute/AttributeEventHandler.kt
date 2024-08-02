@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -15,46 +16,11 @@ import org.koin.core.component.KoinComponent
 class AttributeEventHandler : KoinComponent {
 
     /**
-     * 玩家切换当前手持物品时, 执行的逻辑.
-     *
-     * @param player
-     * @param previousSlot
-     * @param newSlot
-     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
-     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * 当玩家装备的物品发生变化时, 执行的逻辑.
      */
-    fun handlePlayerItemHeld(
-        player: Player,
-        previousSlot: Int,
-        newSlot: Int,
-        oldItem: ItemStack?,
-        newItem: ItemStack?,
-    ) {
+    fun handlePlayerSlotChange(player: Player, slot: ItemSlot, oldItem: ItemStack?, newItem: ItemStack?) {
         updateAttributeModifiers(player, oldItem, newItem) {
-            it.slot.testItemHeldEvent(player, previousSlot, newSlot)
-            && it.templates.has(ItemTemplateTypes.ATTRIBUTABLE)
-        }
-    }
-
-    /**
-     * 玩家背包里的物品发生变化时, 执行的逻辑.
-     *
-     * @param player
-     * @param rawSlot
-     * @param slot
-     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
-     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
-     */
-    fun handlePlayerInventorySlotChange(
-        player: Player,
-        rawSlot: Int,
-        slot: Int,
-        oldItem: ItemStack?,
-        newItem: ItemStack?,
-    ) {
-        updateAttributeModifiers(player, oldItem, newItem) {
-            it.slot.testInventorySlotChangeEvent(player, slot, rawSlot)
-            && it.templates.has(ItemTemplateTypes.ATTRIBUTABLE)
+            it.slotGroup.contains(slot) && it.templates.has(ItemTemplateTypes.ATTRIBUTABLE)
         }
     }
 

@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.attribute.AttributeEventHandler
+import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
-import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -14,12 +14,10 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.ProjectileHitEvent
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
-import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -30,38 +28,15 @@ class MultipleItemListener : KoinComponent, Listener {
     private val skillEventHandler: SkillEventHandler by inject()
 
     @EventHandler
-    fun onItemHeld(event: PlayerItemHeldEvent) {
+    fun onItemSlotChange(event: PlayerItemSlotChangeEvent) {
         val player = event.player
-        val previousSlot = event.previousSlot
-        val newSlot = event.newSlot
-        val oldItem = player.inventory.getItem(previousSlot) // it returns `null` to represent emptiness
-        val newItem = player.inventory.getItem(newSlot) // same as above
+        val itemSlot = event.slot
+        val oldItem = event.oldItemStack
+        val newItem = event.newItemStack
 
-        attributeEventHandler.handlePlayerItemHeld(player, previousSlot, newSlot, oldItem, newItem)
-        kizamiEventHandler.handlePlayerItemHeld(player, previousSlot, newSlot, oldItem, newItem)
-        skillEventHandler.handlePlayerItemHeld(player, previousSlot, newSlot, oldItem, newItem)
-    }
-
-    @EventHandler
-    fun onSlotChange(event: PlayerInventorySlotChangeEvent) {
-        val player = event.player
-
-        val type = player.openInventory.type
-        if (type != InventoryType.CRAFTING) {
-            return
-        }
-
-        val rawSlot = event.rawSlot
-        val slot = event.slot
-
-        // it always returns a non-null ItemStack - it uses AIR to represent emptiness
-        val oldItem = event.oldItemStack.takeUnlessEmpty()
-        // same as above
-        val newItem = event.newItemStack.takeUnlessEmpty()
-
-        attributeEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
-        kizamiEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
-        skillEventHandler.handlePlayerInventorySlotChange(player, rawSlot, slot, oldItem, newItem)
+        attributeEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
+        kizamiEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
+        skillEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
     }
 }
 
@@ -147,7 +122,7 @@ class SingleItemListener : KoinComponent, Listener {
         val slot = event.hand ?: return
         val item: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
         val nekoStack = item?.tryNekoStack ?: return
-        if (!nekoStack.slot.testEquipmentSlot(slot))
+        if (!nekoStack.slotGroup.test(slot))
             return
 
         when (event.action) {

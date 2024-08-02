@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.skill
 
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -29,7 +30,7 @@ import org.bukkit.inventory.ItemStack
  * - 根据玩家的物品, 从玩家身上添加/移除技能
  */
 class SkillEventHandler(
-    private val ticker: Ticker
+    private val ticker: Ticker,
 ) {
 
     /* 玩家的技能触发逻辑 */
@@ -53,7 +54,7 @@ class SkillEventHandler(
         player: Player,
         itemStack: ItemStack,
         event: PlayerInteractEvent,
-        targetProvider: () -> Target
+        targetProvider: () -> Target,
     ) {
         val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
@@ -83,7 +84,7 @@ class SkillEventHandler(
         player: Player,
         itemStack: ItemStack,
         event: PlayerInteractEvent,
-        targetProvider: () -> Target
+        targetProvider: () -> Target,
     ) {
         val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
@@ -121,49 +122,12 @@ class SkillEventHandler(
     /* 玩家的技能添加/移除逻辑 */
 
     /**
-     * 玩家切换当前手持物品时, 执行的逻辑.
-     *
-     * @param player
-     * @param previousSlot
-     * @param newSlot
-     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
-     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
+     * 当玩家装备的物品发生变化时, 执行的逻辑.
      */
-    fun handlePlayerItemHeld(
-        player: Player,
-        previousSlot: Int,
-        newSlot: Int,
-        oldItem: ItemStack?,
-        newItem: ItemStack?,
-    ) {
+    fun handlePlayerSlotChange(player: Player, slot: ItemSlot, oldItem: ItemStack?, newItem: ItemStack?) {
         updateSkills(player, oldItem, newItem) {
-            it.slot.testItemHeldEvent(player, previousSlot, newSlot)
-                    && it.templates.has(ItemTemplateTypes.CASTABLE)
+            it.slotGroup.contains(slot) && it.templates.has(ItemTemplateTypes.CASTABLE)
         }
-        player.toUser().skillState.clear()
-    }
-
-    /**
-     * 玩家背包里的物品发生变化时, 执行的逻辑.
-     *
-     * @param player
-     * @param rawSlot
-     * @param slot
-     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
-     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
-     */
-    fun handlePlayerInventorySlotChange(
-        player: Player,
-        rawSlot: Int,
-        slot: Int,
-        oldItem: ItemStack?,
-        newItem: ItemStack?,
-    ) {
-        updateSkills(player, oldItem, newItem) {
-            it.slot.testInventorySlotChangeEvent(player, slot, rawSlot)
-                    && it.templates.has(ItemTemplateTypes.CASTABLE)
-        }
-        player.toUser().skillState.clear()
     }
 
     /**

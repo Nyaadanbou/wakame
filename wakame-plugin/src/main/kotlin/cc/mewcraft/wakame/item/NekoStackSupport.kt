@@ -226,8 +226,8 @@ private class CustomNekoStack(
         get() = NekoStackSupport.getVariant(nbt)
         set(value) = NekoStackSupport.setVariant(nbt, value)
 
-    override val slot: ItemSlot
-        get() = NekoStackSupport.getSlot(nbt)
+    override val slotGroup: ItemSlotGroup
+        get() = NekoStackSupport.getSlotGroup(nbt)
 
     override val components: ItemComponentMap
         get() = NekoStackSupport.getComponents(handle)
@@ -279,7 +279,7 @@ internal class VanillaNekoStack(
     override val path: String = key.value()
 
     override var variant: Int = 0 // 变体永远都是 0
-    override val slot: ItemSlot = prototype.slot
+    override val slotGroup: ItemSlotGroup = prototype.slotGroup
     override val templates: ItemTemplateMap = prototype.templates
     override val behaviors: ItemBehaviorMap = prototype.behaviors
 
@@ -381,9 +381,9 @@ internal object NekoStackSupport {
         return wakameTag.getInt(BaseBinaryKeys.VARIANT) // 如果不存在 NBT 标签, 默认返回 0
     }
 
-    fun getSlot(wakameTag: CompoundTag): ItemSlot {
+    fun getSlotGroup(wakameTag: CompoundTag): ItemSlotGroup {
         val prototype = getPrototypeOrThrow(wakameTag)
-        return prototype.slot
+        return prototype.slotGroup
     }
 
     fun getPrototype(wakameTag: CompoundTag): NekoItem? {
