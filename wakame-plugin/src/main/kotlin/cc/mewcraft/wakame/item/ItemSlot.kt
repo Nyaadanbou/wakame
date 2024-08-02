@@ -54,18 +54,6 @@ sealed interface ItemSlot : Examinable {
      */
     val slotIndex: Int
 
-    // /**
-    //  * 检查 *事件的结果* 是否指向了有效的栏位.
-    //  */
-    // fun testItemHeldEvent(player: Player, previousSlot: Int, newSlot: Int): Boolean =
-    //     false // default returns false
-    //
-    // /**
-    //  * 检查 *事件的结果* 是否指向了有效的栏位.
-    //  */
-    // fun testInventorySlotChangeEvent(player: Player, slot: Int, rawSlot: Int): Boolean =
-    //     false // default returns false
-
     /**
      * 检查给定的 [EquipmentSlot] 是否为有效的栏位.
      */
@@ -77,18 +65,6 @@ sealed interface ItemSlot : Examinable {
      */
     fun testEquipmentSlotGroup(group: EquipmentSlotGroup): Boolean =
         false // default returns false
-
-    // /**
-    //  * 检查给定的 *玩家背包栏位* 是否为有效的栏位.
-    //  */
-    // fun testPlayerInventorySlot(slotIndex: Int): Boolean =
-    //     false // default returns false
-    //
-    // /**
-    //  * 检查给定的 [ItemSlotGroup] 是否为有效的栏位.
-    //  */
-    // fun testItemSlotGroup(group: ItemSlotGroup): Boolean =
-    //     false // default returns false
 
     /**
      * 获取该 [ItemSlot] 所对应的玩家背包里的物品.
