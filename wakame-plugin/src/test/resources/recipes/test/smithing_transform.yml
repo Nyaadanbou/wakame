@@ -1,0 +1,8 @@
+type: smithing_transform
+base:
+  - minecraft:cobblestone
+  - minecraft:stone
+addition: minecraft:ender_pearl
+result:
+  item: minecraft:end_stone
+  amount: 1

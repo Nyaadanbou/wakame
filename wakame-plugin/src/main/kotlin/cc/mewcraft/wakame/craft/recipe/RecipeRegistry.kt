@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
-import org.bukkit.plugin.Plugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -19,7 +18,7 @@ import java.io.File
     runBefore = [ItemRegistry::class]
 )
 object RecipeRegistry : Initializable, KoinComponent {
-    const val RECIPE_DIR_NAME = "recipes"
+    private const val RECIPE_DIR_NAME = "recipes"
     val raw: MutableMap<Key, Recipe> = mutableMapOf()
 
     val ALL: MutableMap<Key, Recipe> = mutableMapOf()

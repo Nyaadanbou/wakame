@@ -11,15 +11,21 @@ import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Bukkit
-import org.bukkit.inventory.RecipeChoice.ExactChoice
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
+import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.stream.Stream
+import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
+import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
+import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe as BukkitShapredRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
+import org.bukkit.inventory.SmithingTransformRecipe as BukkitSmithingTransformRecipe
+import org.bukkit.inventory.SmokingRecipe as BukkitSmokingRecipe
+import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 
 /**
  * 合成配方.
@@ -35,17 +41,102 @@ sealed interface Recipe : Keyed, Examinable {
     }
 }
 
-abstract class BlastingRecipe : Recipe
-abstract class CampfireRecipe : Recipe
+/**
+ * 高炉配方.
+ */
+class BlastingRecipe(
+    override val key: Key,
+    override val result: RecipeResult,
+    val input: RecipeChoice,
+    val cookingTime: Int,
+    val exp: Float
+) : Recipe {
+    override fun registerBukkitRecipe(): Boolean {
+        val blastingRecipe = BukkitBlastingRecipe(
+            key.toNamespacedKey,
+            result.toBukkitItemStack(),
+            input.toBukkitRecipeChoice(),
+            exp,
+            cookingTime
+        )
+        return Bukkit.addRecipe(blastingRecipe)
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("recipe_result", result),
+        ExaminableProperty.of("input", input),
+        ExaminableProperty.of("cooking_time", cookingTime),
+        ExaminableProperty.of("exp", exp)
+    )
+
+    override fun toString(): String = toSimpleString()
+}
+
+/**
+ * 营火配方.
+ */
+class CampfireRecipe(
+    override val key: Key,
+    override val result: RecipeResult,
+    val input: RecipeChoice,
+    val cookingTime: Int,
+    val exp: Float
+) : Recipe {
+    override fun registerBukkitRecipe(): Boolean {
+        val campfireRecipe = BukkitCampfireRecipe(
+            key.toNamespacedKey,
+            result.toBukkitItemStack(),
+            input.toBukkitRecipeChoice(),
+            exp,
+            cookingTime
+        )
+        return Bukkit.addRecipe(campfireRecipe)
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("recipe_result", result),
+        ExaminableProperty.of("input", input),
+        ExaminableProperty.of("cooking_time", cookingTime),
+        ExaminableProperty.of("exp", exp)
+    )
+
+    override fun toString(): String = toSimpleString()
+}
 
 /**
  * 熔炉配方.
  */
-abstract class FurnaceRecipe(
+class FurnaceRecipe(
     override val key: Key,
     override val result: RecipeResult,
+    val input: RecipeChoice,
+    val cookingTime: Int,
+    val exp: Float
+) : Recipe {
+    override fun registerBukkitRecipe(): Boolean {
+        val furnaceRecipe = BukkitFurnaceRecipe(
+            key.toNamespacedKey,
+            result.toBukkitItemStack(),
+            input.toBukkitRecipeChoice(),
+            exp,
+            cookingTime
+        )
+        return Bukkit.addRecipe(furnaceRecipe)
+    }
 
-    ) : Recipe
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("recipe_result", result),
+        ExaminableProperty.of("input", input),
+        ExaminableProperty.of("cooking_time", cookingTime),
+        ExaminableProperty.of("exp", exp)
+    )
+
+
+    override fun toString(): String = toSimpleString()
+}
 
 /**
  * 工作台有序合成配方.
@@ -65,7 +156,7 @@ class ShapedRecipe(
         pattern.forEachIndexed { i, s -> pattern[i] = s.replace(EMPTY_INGREDIENT_CHAR, ' ') }
         shapedRecipe.shape(*pattern)
         ingredients.forEach {
-            shapedRecipe.setIngredient(it.key, ExactChoice(it.value.toBukkitItemStacks()))
+            shapedRecipe.setIngredient(it.key, it.value.toBukkitRecipeChoice())
         }
         return Bukkit.addRecipe(shapedRecipe, false)
     }
@@ -91,7 +182,7 @@ class ShapelessRecipe(
     override fun registerBukkitRecipe(): Boolean {
         val shapelessRecipe = BukkitShapelessRecipe(key.toNamespacedKey, result.toBukkitItemStack())
         ingredients.forEach {
-            shapelessRecipe.addIngredient(ExactChoice(it.toBukkitItemStacks()))
+            shapelessRecipe.addIngredient(it.toBukkitRecipeChoice())
         }
         return Bukkit.addRecipe(shapelessRecipe, false)
     }
@@ -105,23 +196,148 @@ class ShapelessRecipe(
     override fun toString(): String = toSimpleString()
 }
 
-abstract class SmithingTransformRecipe : Recipe
+/**
+ * 锻造台配方.
+ */
+class SmithingTransformRecipe(
+    override val key: Key,
+    override val result: RecipeResult,
+    val base: RecipeChoice,
+    val addition: RecipeChoice,
+    val template: RecipeChoice,
+) : Recipe {
+    override fun registerBukkitRecipe(): Boolean {
+        val smithingTransformRecipe = BukkitSmithingTransformRecipe(
+            key.toNamespacedKey,
+            result.toBukkitItemStack(),
+            template.toBukkitRecipeChoice(),
+            base.toBukkitRecipeChoice(),
+            addition.toBukkitRecipeChoice(),
+            false
+        )
+        return Bukkit.addRecipe(smithingTransformRecipe)
+    }
 
-abstract class SmokingRecipe : Recipe
-abstract class StonecuttingRecipe : Recipe
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("recipe_result", result),
+        ExaminableProperty.of("base", base),
+        ExaminableProperty.of("addition", addition),
+        ExaminableProperty.of("template", template)
+    )
+
+    override fun toString(): String = toSimpleString()
+}
+
+/**
+ * 烟熏炉配方.
+ */
+class SmokingRecipe(
+    override val key: Key,
+    override val result: RecipeResult,
+    val input: RecipeChoice,
+    val cookingTime: Int,
+    val exp: Float
+) : Recipe {
+    override fun registerBukkitRecipe(): Boolean {
+        val smokingRecipe = BukkitSmokingRecipe(
+            key.toNamespacedKey,
+            result.toBukkitItemStack(),
+            input.toBukkitRecipeChoice(),
+            exp,
+            cookingTime
+        )
+        return Bukkit.addRecipe(smokingRecipe)
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("recipe_result", result),
+        ExaminableProperty.of("input", input),
+        ExaminableProperty.of("cooking_time", cookingTime),
+        ExaminableProperty.of("exp", exp)
+    )
+
+    override fun toString(): String = toSimpleString()
+}
+
+/**
+ * 切石机配方.
+ */
+class StonecuttingRecipe(
+    override val key: Key,
+    override val result: RecipeResult,
+    val input: RecipeChoice
+) : Recipe {
+    override fun registerBukkitRecipe(): Boolean {
+        val stonecuttingRecipe = BukkitStonecuttingRecipe(
+            key.toNamespacedKey,
+            result.toBukkitItemStack(),
+            input.toBukkitRecipeChoice(),
+        )
+        return Bukkit.addRecipe(stonecuttingRecipe)
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("recipe_result", result),
+        ExaminableProperty.of("input", input)
+    )
+
+    override fun toString(): String = toSimpleString()
+}
 
 enum class RecipeType(
     private val bridge: RecipeTypeBridge<*>,
 ) {
-    /*BLASTING(RecipeTypeBridge(typeTokenOf()) { type, node ->
-        BlastingRecipe()
+    BLASTING(RecipeTypeBridge(typeTokenOf()) { _, node ->
+        val input = node.node("input").krequire<RecipeChoice>()
+        val cookingTime = node.node("cooking_time").getInt(100)
+        val exp = node.node("exp").getFloat(0F)
+
+        val result = node.node("result").krequire<RecipeResult>()
+        val key = node.getRecipeKey()
+
+        BlastingRecipe(
+            key = key,
+            result = result,
+            input = input,
+            cookingTime = cookingTime,
+            exp = exp
+        )
     }),
-    CAMPFIRE(RecipeTypeBridge(typeTokenOf()) { type, node ->
-        CampfireRecipe()
+    CAMPFIRE(RecipeTypeBridge(typeTokenOf()) { _, node ->
+        val input = node.node("input").krequire<RecipeChoice>()
+        val cookingTime = node.node("cooking_time").getInt(100)
+        val exp = node.node("exp").getFloat(0F)
+
+        val result = node.node("result").krequire<RecipeResult>()
+        val key = node.getRecipeKey()
+
+        CampfireRecipe(
+            key = key,
+            result = result,
+            input = input,
+            cookingTime = cookingTime,
+            exp = exp
+        )
     }),
-    FURNACE(RecipeTypeBridge(typeTokenOf()) { type, node ->
-        FurnaceRecipe()
-    }),*/
+    FURNACE(RecipeTypeBridge(typeTokenOf()) { _, node ->
+        val input = node.node("input").krequire<RecipeChoice>()
+        val cookingTime = node.node("cooking_time").getInt(200)
+        val exp = node.node("exp").getFloat(0F)
+
+        val result = node.node("result").krequire<RecipeResult>()
+        val key = node.getRecipeKey()
+
+        FurnaceRecipe(
+            key = key,
+            result = result,
+            input = input,
+            cookingTime = cookingTime,
+            exp = exp
+        )
+    }),
     SHAPED(RecipeTypeBridge(typeTokenOf()) { _, node ->
         val pattern = node.node("pattern").getList<String>(emptyList()).apply {
             require(isNotEmpty()) { "The pattern is not present" }
@@ -166,10 +382,18 @@ enum class RecipeType(
         )
     }),
     SHAPELESS(RecipeTypeBridge(typeTokenOf()) { _, node ->
-        val ingredients = node.node("ingredients").getList<RecipeChoice>(emptyList()).apply {
-            require(isNotEmpty()) { "Ingredients is not present" }
-            require(size <= 9) { "Ingredients should not be more than 9" }
-        }
+        val ingredients = node.node("ingredients")
+            .childrenMap()
+            .mapValues { (_, mapChild) ->
+                mapChild.krequire<RecipeChoice>()
+            }
+            .values
+            .toList()
+            .apply {
+                require(isNotEmpty()) { "Ingredients is not present" }
+                require(size <= 9) { "Ingredients should not be more than 9" }
+            }
+
 
         val result = node.node("result").krequire<RecipeResult>()
         val key = node.getRecipeKey()
@@ -180,15 +404,55 @@ enum class RecipeType(
             ingredients = ingredients
         )
     }),
-    /*SMITHING_TRANSFORM(RecipeTypeBridge(typeTokenOf()) { type, node ->
-        SmithingTrimRecipe()
-    })
-    SMOKING(RecipeTypeBridge(typeTokenOf()) { type, node ->
-        SmokingRecipe()
+    SMITHING_TRANSFORM(RecipeTypeBridge(typeTokenOf()) { _, node ->
+        val base = node.node("base").krequire<RecipeChoice>()
+        val addition = node.node("addition").get<RecipeChoice>(EmptyRecipeChoice)
+        val template = node.node("template").get<RecipeChoice>(EmptyRecipeChoice)
+
+        //addition和template不能同时是EmptyRecipeChoice
+        require(addition != EmptyRecipeChoice || template != EmptyRecipeChoice) {
+            "Addition and template cannot be empty at the same time"
+        }
+
+        val result = node.node("result").krequire<RecipeResult>()
+        val key = node.getRecipeKey()
+
+        SmithingTransformRecipe(
+            key = key,
+            result = result,
+            base = base,
+            addition = addition,
+            template = template
+        )
     }),
-    STONECUTTING(RecipeTypeBridge(typeTokenOf()) { type, node ->
-        StonecuttingRecipe()
-    })*/;
+    SMOKING(RecipeTypeBridge(typeTokenOf()) { _, node ->
+        val input = node.node("input").krequire<RecipeChoice>()
+        val cookingTime = node.node("cooking_time").getInt(100)
+        val exp = node.node("exp").getFloat(0F)
+
+        val result = node.node("result").krequire<RecipeResult>()
+        val key = node.getRecipeKey()
+
+        SmokingRecipe(
+            key = key,
+            result = result,
+            input = input,
+            cookingTime = cookingTime,
+            exp = exp
+        )
+    }),
+    STONECUTTING(RecipeTypeBridge(typeTokenOf()) { _, node ->
+        val input = node.node("input").krequire<RecipeChoice>()
+
+        val result = node.node("result").krequire<RecipeResult>()
+        val key = node.getRecipeKey()
+
+        StonecuttingRecipe(
+            key = key,
+            result = result,
+            input = input,
+        )
+    });
 
     fun deserialize(node: ConfigurationNode): Recipe {
         val typeToken = bridge.typeToken

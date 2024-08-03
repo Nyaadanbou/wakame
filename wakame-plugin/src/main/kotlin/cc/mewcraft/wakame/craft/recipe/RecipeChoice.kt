@@ -10,6 +10,7 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.RecipeChoice as BukkitRecipeChoice
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -21,7 +22,16 @@ import java.util.stream.Stream
  * 表现为合成输入gui中一格的物品.
  */
 sealed interface RecipeChoice : Examinable {
-    fun toBukkitItemStacks(): List<ItemStack>
+    fun toBukkitRecipeChoice(): BukkitRecipeChoice
+}
+
+/**
+ * 空输入.
+ */
+data object EmptyRecipeChoice : RecipeChoice {
+    override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
+        return BukkitRecipeChoice.empty()
+    }
 }
 
 /**
@@ -30,13 +40,13 @@ sealed interface RecipeChoice : Examinable {
 data class SingleRecipeChoice(
     val choice: Key
 ) : RecipeChoice {
-    override fun toBukkitItemStacks(): List<ItemStack> {
+    override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         //TODO 临时实现
         when (choice.namespace()) {
             "minecraft" -> {
                 val material = Material.getMaterial(choice.value().uppercase(Locale.getDefault()))
                 material ?: throw IllegalArgumentException("Unknown vanilla item: '$choice'")
-                return listOf(ItemStack(material))
+                return BukkitRecipeChoice.ExactChoice(ItemStack(material))
             }
 
             "wakame" -> {
@@ -44,7 +54,7 @@ data class SingleRecipeChoice(
                 val nekoStack = nekoItem?.realize()
                 val itemStack = nekoStack?.itemStack
                 itemStack ?: throw IllegalArgumentException("Unknown wakame item: '$choice'")
-                return listOf(itemStack)
+                return BukkitRecipeChoice.ExactChoice(itemStack)
             }
 
             else -> {
@@ -67,7 +77,7 @@ data class SingleRecipeChoice(
 data class MultiRecipeChoice(
     val choices: List<Key>
 ) : RecipeChoice {
-    override fun toBukkitItemStacks(): List<ItemStack> {
+    override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         //TODO 临时实现
         val itemStacks: MutableList<ItemStack> = mutableListOf()
         choices.forEach {
@@ -91,7 +101,7 @@ data class MultiRecipeChoice(
                 }
             }
         }
-        return itemStacks
+        return BukkitRecipeChoice.ExactChoice(itemStacks)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

@@ -1,0 +1,5 @@
+type: furnace
+input: minecraft:gravel
+result:
+  item: minecraft:sand
+  amount: 1
