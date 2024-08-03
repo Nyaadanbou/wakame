@@ -22,24 +22,24 @@ interface ReforgeHistory : BinarySerializable {
     val isEmpty: Boolean
 
     /**
-     * 重铸成功的次数.
+     * 该词条栏有史以来被*定制*的次数.
      */
-    val successCount: Int
+    val modCount: Int
 
     /**
-     * 设置重铸成功的次数.
+     * 设置该词条栏有史以来被*定制*的次数.
      */
-    fun setSuccessCount(value: Int): ReforgeHistory
+    fun setModCount(value: Int): ReforgeHistory
 
     /**
-     * 重铸失败的次数.
+     * 该词条栏有史以来被*重造*的次数.
      */
-    val failureCount: Int
+    val rerollCount: Int
 
     /**
-     * 设置重铸失败的次数.
+     * 设置该词条栏有史以来被*重造*的次数.
      */
-    fun setFailureCount(value: Int): ReforgeHistory
+    fun setRerollCount(value: Int): ReforgeHistory
 
     companion object {
         /**
@@ -56,38 +56,38 @@ interface ReforgeHistory : BinarySerializable {
             if (nbt.isEmpty) {
                 return Empty
             }
-            val successCount = nbt.getInt(ReforgeBinaryKeys.SUCCESS_COUNT)
-            val failureCount = nbt.getInt(ReforgeBinaryKeys.FAILURE_COUNT)
-            return ReforgeHistoryImpl(successCount, failureCount)
+            val modCount = nbt.getInt(ReforgeBinaryKeys.MOD_COUNT)
+            val rerollCount = nbt.getInt(ReforgeBinaryKeys.REROLL_COUNT)
+            return ReforgeHistoryImpl(modCount, rerollCount)
         }
     }
 
     private data object Empty : ReforgeHistory {
         override val isEmpty: Boolean = true
-        override val successCount: Int = 0
-        override fun setSuccessCount(value: Int): ReforgeHistory = this
-        override val failureCount: Int = 0
-        override fun setFailureCount(value: Int): ReforgeHistory = this
+        override val modCount: Int = 0
+        override fun setModCount(value: Int): ReforgeHistory = ReforgeHistoryImpl(value, rerollCount)
+        override val rerollCount: Int = 0
+        override fun setRerollCount(value: Int): ReforgeHistory = ReforgeHistoryImpl(modCount, value)
         override fun serializeAsTag(): Tag = CompoundTag.create()
     }
 }
 
 private data class ReforgeHistoryImpl(
-    override val successCount: Int,
-    override val failureCount: Int,
+    override val modCount: Int,
+    override val rerollCount: Int,
 ) : ReforgeHistory {
     override val isEmpty: Boolean = false
 
-    override fun setSuccessCount(value: Int): ReforgeHistory {
-        return copy(successCount = value)
+    override fun setModCount(value: Int): ReforgeHistory {
+        return copy(modCount = value)
     }
 
-    override fun setFailureCount(value: Int): ReforgeHistory {
-        return copy(failureCount = value)
+    override fun setRerollCount(value: Int): ReforgeHistory {
+        return copy(rerollCount = value)
     }
 
     override fun serializeAsTag(): Tag = CompoundTag {
-        putInt(ReforgeBinaryKeys.SUCCESS_COUNT, successCount)
-        putInt(ReforgeBinaryKeys.FAILURE_COUNT, failureCount)
+        putInt(ReforgeBinaryKeys.MOD_COUNT, modCount)
+        putInt(ReforgeBinaryKeys.REROLL_COUNT, rerollCount)
     }
 }

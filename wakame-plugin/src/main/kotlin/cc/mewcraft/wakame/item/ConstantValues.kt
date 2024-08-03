@@ -15,31 +15,19 @@ object BaseBinaryKeys {
     const val NAMESPACE = "namespace"
     const val PATH = "path"
     const val VARIANT = "sid"
-    const val SHOW = "show"
 }
 
 /**
- * Keys in the [Cell][CellBinaryKeys.BASE] compound.
- */
-object CellBinaryKeys {
-    const val BASE = "cell"
-    const val REFORGEABLE = "can_reforge"
-    const val OVERRIDABLE = "can_override"
-}
-
-/**
- * Keys in the [Core][CoreBinaryKeys.BASE] compound.
+ * Keys in the `core` compound.
  */
 object CoreBinaryKeys {
-    const val BASE = "core"
     const val CORE_IDENTIFIER = "id"
 }
 
 /**
- * Keys in the [Curse][CurseBinaryKeys.BASE] compound.
+ * Keys in the `curse` compound.
  */
 object CurseBinaryKeys {
-    const val BASE = "curse"
     const val CURSE_IDENTIFIER = "id"
 }
 
@@ -56,19 +44,11 @@ object CurseConstants {
 }
 
 /**
- * Keys in the [Reforge][ReforgeBinaryKeys.BASE] compound.
+ * Keys in the `reforge` compound.
  */
 object ReforgeBinaryKeys {
-    const val BASE = "reforge"
-    const val SUCCESS_COUNT = "success"
-    const val FAILURE_COUNT = "failure"
-}
-
-/**
- * Keys in the [Statistics][StatisticsBinaryKeys.BASE] compound.
- */
-object StatisticsBinaryKeys {
-    const val BASE = "statistics"
+    const val MOD_COUNT = "mod_count"
+    const val REROLL_COUNT = "reroll_count"
 }
 
 /**
