@@ -168,7 +168,7 @@ class RecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(Key("minecraft:enchant_golden_apple"), result.result)
+        assertEquals(Key("minecraft:enchanted_golden_apple"), result.result)
         assertEquals(1, result.amount)
     }
 
