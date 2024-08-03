@@ -77,9 +77,7 @@ interface ModdingTable : Examinable {
         val target: Key
 
         /**
-         * 词条栏的定制规则.
-         *
-         * [String] 为词条栏的 id, [CellRule] 为对应的定制规则.
+         * 该物品每个词条栏的定制规则.
          */
         val cellRules: CellRuleMap
     }
@@ -89,7 +87,7 @@ interface ModdingTable : Examinable {
      */
     interface ItemRuleMap : Examinable {
         /**
-         * 获取物品的定制规则.
+         * 获取指定物品的定制规则.
          *
          * 如果返回 `null` 则说明该物品不支持定制.
          *
