@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -56,7 +57,7 @@ data class PortableCurse(
     ) : ItemComponentType<PortableCurse> {
         override fun read(holder: ItemComponentHolder): PortableCurse? {
             val tag = holder.getTag() ?: return null
-            val curse = Curse.of(tag.getCompound(TAG_CURSE))
+            val curse = tag.getCompoundOrNull(TAG_CURSE)?.let { Curse.of(it) } ?: return null
             return PortableCurse(curse)
         }
 

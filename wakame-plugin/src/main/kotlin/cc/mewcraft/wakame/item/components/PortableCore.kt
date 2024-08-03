@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
+import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -34,6 +35,10 @@ data class PortableCore(
      * 便携式核心所包含的核心.
      */
     override val wrapped: Core,
+    /**
+     * 便携式核心的历史合并次数.
+     */
+    val mergeCount: Int,
 ) : PortableObject<Core>, Examinable, TooltipProvider.Single {
     companion object : ItemComponentBridge<PortableCore>, ItemComponentMeta {
         override fun codec(id: String): ItemComponentType<PortableCore> {
@@ -60,20 +65,26 @@ data class PortableCore(
     private data class Codec(override val id: String) : ItemComponentType<PortableCore> {
         override fun read(holder: ItemComponentHolder): PortableCore? {
             val tag = holder.getTag() ?: return null
-            val tagCore = tag.getCompound("core")
-            if (tagCore.isEmpty) {
-                return PortableCore(Core.empty())
-            }
-            return PortableCore(Core.of(tagCore))
+            val core = tag.getCompoundOrNull(TAG_CORE)?.let { Core.of(it) } ?: return null
+            val mergeCount = tag.getInt(TAG_MERGE_COUNT)
+            return PortableCore(core, mergeCount)
         }
 
         override fun write(holder: ItemComponentHolder, value: PortableCore) {
             val tag = holder.getTagOrCreate()
-            tag.put("core", value.wrapped.serializeAsTag())
+            tag.put(TAG_CORE, value.wrapped.serializeAsTag())
+            if (value.mergeCount > 0) {
+                tag.putInt(TAG_MERGE_COUNT, value.mergeCount)
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {
             holder.removeTag()
+        }
+
+        companion object {
+            private const val TAG_CORE = "core"
+            private const val TAG_MERGE_COUNT = "merge_count"
         }
     }
 
@@ -83,7 +94,7 @@ data class PortableCore(
         override val componentType: ItemComponentType<PortableCore> = ItemComponentTypes.PORTABLE_CORE
         override fun generate(context: GenerationContext): GenerationResult<PortableCore> {
             val core = templateCore.generate(context)
-            val portableCore = PortableCore(core)
+            val portableCore = PortableCore(core, 0)
             return GenerationResult.of(portableCore)
         }
     }
