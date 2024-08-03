@@ -1,0 +1,7 @@
+type: smoking
+input: minecraft:cobblestone
+cooking_time: 100
+exp: 2
+result:
+  item: minecraft:netherrack
+  amount: 1

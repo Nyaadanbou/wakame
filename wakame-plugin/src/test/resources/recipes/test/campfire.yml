@@ -1,0 +1,7 @@
+type: campfire
+input: minecraft:poisonous_potato
+cooking_time: 1
+exp: 1000
+result:
+  item: minecraft:diamond
+  amount: 1

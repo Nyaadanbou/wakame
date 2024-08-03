@@ -48,6 +48,97 @@ class RecipeSerializationTest : KoinTest {
     }
 
     @Test
+    fun `blasting recipe serialization`() {
+        key = Key("test:blasting")
+
+        val recipe = RecipeRegistry.raw[key]
+        assertNotNull(recipe)
+        assertIs<BlastingRecipe>(recipe)
+
+        val input = recipe.input
+        assertEquals(
+            MultiRecipeChoice(
+                listOf(
+                    Key("minecraft:glass"),
+                    Key("minecraft:white_stained_glass"),
+                    Key("minecraft:orange_stained_glass"),
+                    Key("minecraft:magenta_stained_glass"),
+                    Key("minecraft:light_blue_stained_glass"),
+                    Key("minecraft:yellow_stained_glass"),
+                    Key("minecraft:lime_stained_glass"),
+                    Key("minecraft:pink_stained_glass"),
+                    Key("minecraft:gray_stained_glass"),
+                    Key("minecraft:light_gray_stained_glass"),
+                    Key("minecraft:cyan_stained_glass"),
+                    Key("minecraft:purple_stained_glass"),
+                    Key("minecraft:blue_stained_glass"),
+                    Key("minecraft:brown_stained_glass"),
+                    Key("minecraft:green_stained_glass"),
+                    Key("minecraft:red_stained_glass"),
+                    Key("minecraft:black_stained_glass")
+                )
+            ), input
+        )
+
+        val cookingTime = recipe.cookingTime
+        assertEquals(40, cookingTime)
+
+        val exp = recipe.exp
+        assertEquals(495F, exp)
+
+        val result = recipe.result
+        assertIs<SingleRecipeResult>(result)
+        assertEquals(Key("minecraft:quartz"), result.result)
+        assertEquals(1, result.amount)
+    }
+
+    @Test
+    fun `campfire recipe serialization`() {
+        key = Key("test:campfire")
+
+        val recipe = RecipeRegistry.raw[key]
+        assertNotNull(recipe)
+        assertIs<CampfireRecipe>(recipe)
+
+        val input = recipe.input
+        assertEquals(SingleRecipeChoice(Key("minecraft:poisonous_potato")), input)
+
+        val cookingTime = recipe.cookingTime
+        assertEquals(1, cookingTime)
+
+        val exp = recipe.exp
+        assertEquals(1000F, exp)
+
+        val result = recipe.result
+        assertIs<SingleRecipeResult>(result)
+        assertEquals(Key("minecraft:diamond"), result.result)
+        assertEquals(1, result.amount)
+    }
+
+    @Test
+    fun `furnace recipe serialization`() {
+        key = Key("test:furnace")
+
+        val recipe = RecipeRegistry.raw[key]
+        assertNotNull(recipe)
+        assertIs<FurnaceRecipe>(recipe)
+
+        val input = recipe.input
+        assertEquals(SingleRecipeChoice(Key("minecraft:gravel")), input)
+
+        val cookingTime = recipe.cookingTime
+        assertEquals(200, cookingTime)
+
+        val exp = recipe.exp
+        assertEquals(0F, exp)
+
+        val result = recipe.result
+        assertIs<SingleRecipeResult>(result)
+        assertEquals(Key("minecraft:sand"), result.result)
+        assertEquals(1, result.amount)
+    }
+
+    @Test
     fun `shaped recipe serialization`() {
         key = Key("test:shaped")
 
@@ -90,18 +181,116 @@ class RecipeSerializationTest : KoinTest {
         assertIs<ShapelessRecipe>(recipe)
         val ingredients = recipe.ingredients
         assertContains(ingredients, SingleRecipeChoice(Key("minecraft:poppy")))
-        assertContains(ingredients, SingleRecipeChoice(Key("minecraft:red_dye")))
+        assertContains(
+            ingredients,
+            MultiRecipeChoice(
+                listOf(
+                    Key("minecraft:red_dye"),
+                    Key("minecraft:pink_dye"),
+                )
+            )
+        )
         assertEquals(4, ingredients
             .filterIsInstance<SingleRecipeChoice>()
             .count { it.choice == Key("minecraft:poppy") }
         )
         assertEquals(1, ingredients
-            .filterIsInstance<SingleRecipeChoice>()
-            .count { it.choice == Key("minecraft:red_dye") }
+            .filterIsInstance<MultiRecipeChoice>()
+            .count {
+                it.choices.contains(Key("minecraft:red_dye"))
+                        && it.choices.contains(Key("minecraft:pink_dye"))
+            }
         )
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
         assertEquals(Key("minecraft:rose_bush"), result.result)
+        assertEquals(2, result.amount)
+    }
+
+    @Test
+    fun `smithing transform recipe serialization`() {
+        key = Key("test:smithing_transform")
+
+        val recipe = RecipeRegistry.raw[key]
+        assertNotNull(recipe)
+        assertIs<SmithingTransformRecipe>(recipe)
+
+        val base = recipe.base
+        assertEquals(
+            MultiRecipeChoice(
+                listOf(
+                    Key("minecraft:cobblestone"),
+                    Key("minecraft:stone"),
+                )
+            ), base
+        )
+
+        val addition = recipe.addition
+        assertEquals(SingleRecipeChoice(Key("minecraft:ender_pearl")), addition)
+
+        val template = recipe.template
+        assertEquals(EmptyRecipeChoice, template)
+
+
+        val result = recipe.result
+        assertIs<SingleRecipeResult>(result)
+        assertEquals(Key("minecraft:end_stone"), result.result)
+        assertEquals(1, result.amount)
+    }
+
+    @Test
+    fun `smoking recipe serialization`() {
+        key = Key("test:smoking")
+
+        val recipe = RecipeRegistry.raw[key]
+        assertNotNull(recipe)
+        assertIs<SmokingRecipe>(recipe)
+
+        val input = recipe.input
+        assertEquals(SingleRecipeChoice(Key("minecraft:cobblestone")), input)
+
+        val cookingTime = recipe.cookingTime
+        assertEquals(100, cookingTime)
+
+        val exp = recipe.exp
+        assertEquals(2F, exp)
+
+        val result = recipe.result
+        assertIs<SingleRecipeResult>(result)
+        assertEquals(Key("minecraft:netherrack"), result.result)
+        assertEquals(1, result.amount)
+    }
+
+    @Test
+    fun `stonecutting recipe serialization`() {
+        key = Key("test:stonecutting")
+
+        val recipe = RecipeRegistry.raw[key]
+        assertNotNull(recipe)
+        assertIs<StonecuttingRecipe>(recipe)
+
+        val input = recipe.input
+        assertEquals(
+            MultiRecipeChoice(
+                listOf(
+                    Key("minecraft:oak_planks"),
+                    Key("minecraft:spruce_planks"),
+                    Key("minecraft:birch_planks"),
+                    Key("minecraft:jungle_planks"),
+                    Key("minecraft:acacia_planks"),
+                    Key("minecraft:dark_oak_planks"),
+                    Key("minecraft:mangrove_planks"),
+                    Key("minecraft:cherry_planks"),
+                    Key("minecraft:bamboo_planks"),
+                    Key("minecraft:crimson_planks"),
+                    Key("minecraft:warped_planks")
+                )
+            ), input
+        )
+
+        val result = recipe.result
+        assertIs<SingleRecipeResult>(result)
+        assertEquals(Key("minecraft:stick"), result.result)
         assertEquals(2, result.amount)
     }
 }

@@ -1,10 +1,12 @@
 type: shapeless
 ingredients:
-  - minecraft:poppy
-  - minecraft:poppy
-  - minecraft:poppy
-  - minecraft:poppy
-  - minecraft:red_dye
+  A: minecraft:poppy
+  B: minecraft:poppy
+  C: minecraft:poppy
+  D: minecraft:poppy
+  E:
+    - minecraft:red_dye
+    - minecraft:pink_dye
 result:
   item: minecraft:rose_bush
   amount: 2
