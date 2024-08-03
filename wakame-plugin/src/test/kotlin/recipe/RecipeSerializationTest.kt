@@ -1,6 +1,6 @@
 package recipe
 
-import cc.mewcraft.wakame.craft.recipe.*
+import cc.mewcraft.wakame.recipe.*
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
