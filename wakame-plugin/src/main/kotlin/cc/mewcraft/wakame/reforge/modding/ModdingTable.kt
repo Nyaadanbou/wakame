@@ -128,6 +128,11 @@ interface ModdingTable : Examinable {
          * 储存了具体的规则, 定义了一个诅咒必须满足什么样的规则才算被“接受”.
          */
         val acceptedCurses: List<CurseMatchRule>
+
+        /**
+         * 是否需要判断定制此词条栏的物品元素与输入物品的元素符合.
+         */
+        val requireElementMatch: Boolean
     }
 
     /**

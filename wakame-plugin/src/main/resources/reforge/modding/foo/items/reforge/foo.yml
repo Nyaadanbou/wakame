@@ -38,3 +38,6 @@ cells:
     accepted_curses:
       - type: curse:entity_kills
       - type: curse:peak_damage
+
+    # 是否需要判断定制此词条栏的物品元素与输入物品的元素符合.
+    require_element_match: true
