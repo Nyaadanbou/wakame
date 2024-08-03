@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.Curse
+import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
+import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
@@ -83,7 +85,27 @@ internal class CoreModdingSession(
 
         override fun test(replacement: Core): ModdingSession.RecipeSession.TestResult {
             // TODO 检查权限
-            // TODO 检查定制次数是否达到上限
+            val input = input
+
+            val itemElements = input?.components?.get(ItemComponentTypes.ELEMENTS)
+            if (rule.requireElementMatch && itemElements != null && replacement is CoreAttribute) {
+                val coreElement = replacement.element
+                if (coreElement != null) {
+                    val any = itemElements.elements.contains(coreElement)
+                    if (!any) {
+                        return TestResult(false, "Element mismatch")
+                    }
+                }
+            }
+
+            val cell = input?.components?.get(ItemComponentTypes.CELLS)?.get(id)
+            if (cell != null) {
+                val modCount = cell.getReforgeHistory().modCount
+                if (modCount >= rule.modLimit) {
+                    return TestResult(false, "Mod count exceeds limit")
+                }
+            }
+
             val any = rule.acceptedCores.any { it.test(replacement) }
             if (any) {
                 return TestResult(true, "Test OK")

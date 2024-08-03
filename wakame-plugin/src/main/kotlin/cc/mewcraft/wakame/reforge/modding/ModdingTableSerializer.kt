@@ -166,12 +166,14 @@ internal object ModdingTableSerializer : KoinComponent {
             val modLimit = node.node("mod_limit").getInt(Int.MAX_VALUE)
             val acceptedCores = node.node("accepted_cores").getList<CoreMatchRule>(emptyList())
             val acceptedCurses = node.node("accepted_curses").getList<CurseMatchRule>(emptyList())
+            val requireElementMatch = node.node("require_element_match").getBoolean(false)
             return ModdingTableImpl.CellRule(
                 permission = permission,
                 cost = cost,
                 modLimit = modLimit,
                 acceptedCores = acceptedCores,
                 acceptedCurses = acceptedCurses,
+                requireElementMatch = requireElementMatch,
             )
         }
     }

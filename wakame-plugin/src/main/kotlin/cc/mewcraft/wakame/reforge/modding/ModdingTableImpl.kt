@@ -36,6 +36,7 @@ object ModdingTableWtf : ModdingTable {
         override val modLimit: Int = Int.MAX_VALUE
         override val acceptedCores: List<CoreMatchRule> = listOf(CoreMatchRuleAny)
         override val acceptedCurses: List<CurseMatchRule> = listOf(CurseMatchRuleAny)
+        override val requireElementMatch: Boolean = false
     }
 
     data object CellRuleMapAny : ModdingTable.CellRuleMap {
@@ -111,6 +112,7 @@ internal class ModdingTableImpl(
         override val modLimit: Int,
         override val acceptedCores: List<CoreMatchRule> = emptyList(),
         override val acceptedCurses: List<CurseMatchRule> = emptyList(),
+        override val requireElementMatch: Boolean
     ) : ModdingTable.CellRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("permission", permission),
@@ -118,6 +120,7 @@ internal class ModdingTableImpl(
             ExaminableProperty.of("modLimit", modLimit),
             ExaminableProperty.of("acceptedCores", acceptedCores),
             ExaminableProperty.of("acceptedCurses", acceptedCurses),
+            ExaminableProperty.of("requireElementMatch", requireElementMatch),
         )
 
         override fun toString(): String = toSimpleString()
