@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.craft.recipe
+package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item.realize

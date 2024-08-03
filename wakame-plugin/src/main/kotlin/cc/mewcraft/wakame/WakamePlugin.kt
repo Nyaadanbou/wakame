@@ -3,7 +3,7 @@ package cc.mewcraft.wakame
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attack.attackModule
 import cc.mewcraft.wakame.attribute.attributeModule
-import cc.mewcraft.wakame.craft.recipe.recipeModule
+import cc.mewcraft.wakame.recipe.recipeModule
 import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display.displayModule

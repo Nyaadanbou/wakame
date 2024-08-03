@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.craft.recipe
+package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
