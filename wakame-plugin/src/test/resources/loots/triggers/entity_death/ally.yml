@@ -1,0 +1,6 @@
+# 是否覆盖原版的掉落表
+overwrite_vanilla: true
+
+# 实体死亡后, 应用的掉落表
+selects:
+  - entity:ally_extras

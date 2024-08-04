@@ -1,0 +1,6 @@
+# 打开遗迹箱子后, 应用的掉落表
+selects:
+  - pool: block:gold_ore_extras_1
+    rolls: 2
+  - pool: block:gold_ore_extras_2
+    rolls: 1
