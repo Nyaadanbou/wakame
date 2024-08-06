@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.util.toNamespacedKey
 import org.bukkit.Material
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
-import java.util.concurrent.ThreadLocalRandom
 
 /**
  * Realizes [NekoItem] into an item which then can be added to the game world.
@@ -59,7 +58,7 @@ interface NekoItemRealizer {
 internal object VanillaNekoItemRealizer : NekoItemRealizer {
     override fun realize(prototype: NekoItem): VanillaNekoStack {
         // 没 trigger 的 ctx
-        val context = GenerationContext(GenerationTrigger.noop(), prototype.key, 0)
+        val context = GenerationContext(GenerationTrigger.nop(), prototype.key, 0)
         // 获取 物品组件 的构建器
         val componentMapBuilder = ItemComponentMap.builder()
 
@@ -112,7 +111,7 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
 
 internal object CustomNekoItemRealizer : NekoItemRealizer {
     override fun realize(prototype: NekoItem): NekoStack {
-        return realizeByTrigger(prototype, GenerationTrigger.noop())
+        return realizeByTrigger(prototype, GenerationTrigger.nop())
     }
 
     override fun realize(prototype: NekoItem, user: User<*>): NekoStack {
@@ -129,7 +128,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
 
     private fun realizeByTrigger(item: NekoItem, trigger: GenerationTrigger): NekoStack {
         val target = item.key
-        val context = GenerationContext(trigger, target, ThreadLocalRandom.current().nextLong())
+        val context = GenerationContext(trigger, target)
         val nekoStack = realizeByContext(item, context)
         return nekoStack
     }

@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.util.WatchedReference
 import cc.mewcraft.wakame.util.WatchedSet
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
+import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 
 class GenerationContextException(
@@ -29,19 +30,19 @@ class GenerationContextException(
  */
 class GenerationContext(
     /**
-     * 触发本次物品生成的对象.
+     * 本次物品生成的触发器.
      */
     val trigger: GenerationTrigger,
 
     /**
-     * 本次生成的物品目标.
+     * 本次生成的目标物品.
      */
     val target: Key,
 
     /**
      * 随机数生成器的种子.
      */
-    seed: Long,
+    seed: Long = ThreadLocalRandom.current().nextLong(),
 ) : SelectionContext(seed) {
     /**
      * 已经生成的物品等级.
