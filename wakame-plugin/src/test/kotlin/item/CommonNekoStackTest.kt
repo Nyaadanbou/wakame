@@ -248,7 +248,7 @@ class ItemComponentLifecycleTest<T, S : ItemTemplate<T>>(
         // 初始为默认的 GenerationContext 生成函数
         var newContext: () -> GenerationContext = {
             val target = this.target
-            val trigger = GenerationTrigger.fake(10)
+            val trigger = GenerationTrigger.direct(10)
             MockGenerationContext.create(target, trigger)
         }
 
