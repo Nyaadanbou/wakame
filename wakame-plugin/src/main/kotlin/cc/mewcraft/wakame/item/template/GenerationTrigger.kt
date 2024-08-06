@@ -9,9 +9,9 @@ import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
 /**
- * 代表一个触发 [NekoStack] 生成的东西, 包含了生成物品所需的信息.
+ * 代表一个触发 [NekoStack] 物品生成的东西, 包含了开始物品生成所需的基本信息.
  *
- * 设计上, 本对象应配合 [GenerationContext] 一起使用.
+ * 设计上本对象必须配合 [GenerationContext] 一起使用.
  */
 interface GenerationTrigger : Examinable {
     /**
@@ -20,7 +20,12 @@ interface GenerationTrigger : Examinable {
     val level: Int
 
     companion object {
-        fun noop(): GenerationTrigger {
+        /**
+         * 获取一个空的触发器.
+         *
+         * 该触发器没有包含任何信息, 因此部分物品生成可能会失败.
+         */
+        fun nop(): GenerationTrigger {
             return NopGenerationTrigger
         }
 
@@ -30,8 +35,8 @@ interface GenerationTrigger : Examinable {
          * @param level a constant level
          * @return the created trigger
          */
-        fun direct(level: Int): GenerationTrigger {
-            return DirectGenerationTrigger(level)
+        fun direct(level: Number): GenerationTrigger {
+            return DirectGenerationTrigger(level.toInt())
         }
 
         /**
@@ -55,6 +60,10 @@ interface GenerationTrigger : Examinable {
         }
     }
 }
+
+
+/* Implementations */
+
 
 private object NopGenerationTrigger : GenerationTrigger {
     override val level: Int
