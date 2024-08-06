@@ -13,7 +13,7 @@ import org.slf4j.Logger
 import testEnv
 import kotlin.test.*
 
-class RecipeSerializationTest : KoinTest {
+class VanillaRecipeSerializationTest : KoinTest {
     companion object {
         @JvmStatic
         @BeforeAll

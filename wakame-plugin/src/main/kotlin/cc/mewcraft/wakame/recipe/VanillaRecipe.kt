@@ -31,7 +31,7 @@ import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
  * 合成配方.
  * 是对Bukkit的合成配方的包装.
  */
-sealed interface Recipe : Keyed, Examinable {
+sealed interface VanillaRecipe : Keyed, Examinable {
     val result: RecipeResult
 
     fun registerBukkitRecipe(): Boolean
@@ -50,7 +50,7 @@ class BlastingRecipe(
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float
-) : Recipe {
+) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val blastingRecipe = BukkitBlastingRecipe(
             key.toNamespacedKey,
@@ -82,7 +82,7 @@ class CampfireRecipe(
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float
-) : Recipe {
+) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val campfireRecipe = BukkitCampfireRecipe(
             key.toNamespacedKey,
@@ -114,7 +114,7 @@ class FurnaceRecipe(
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float
-) : Recipe {
+) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val furnaceRecipe = BukkitFurnaceRecipe(
             key.toNamespacedKey,
@@ -146,7 +146,7 @@ class ShapedRecipe(
     override val result: RecipeResult,
     val pattern: Array<String>,
     val ingredients: Map<Char, RecipeChoice>
-) : Recipe {
+) : VanillaRecipe {
     companion object {
         const val EMPTY_INGREDIENT_CHAR = 'X'
     }
@@ -178,7 +178,7 @@ class ShapelessRecipe(
     override val key: Key,
     override val result: RecipeResult,
     val ingredients: List<RecipeChoice>
-) : Recipe {
+) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val shapelessRecipe = BukkitShapelessRecipe(key.toNamespacedKey, result.toBukkitItemStack())
         ingredients.forEach {
@@ -205,7 +205,7 @@ class SmithingTransformRecipe(
     val base: RecipeChoice,
     val addition: RecipeChoice,
     val template: RecipeChoice,
-) : Recipe {
+) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val smithingTransformRecipe = BukkitSmithingTransformRecipe(
             key.toNamespacedKey,
@@ -238,7 +238,7 @@ class SmokingRecipe(
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float
-) : Recipe {
+) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val smokingRecipe = BukkitSmokingRecipe(
             key.toNamespacedKey,
@@ -268,7 +268,7 @@ class StonecuttingRecipe(
     override val key: Key,
     override val result: RecipeResult,
     val input: RecipeChoice
-) : Recipe {
+) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val stonecuttingRecipe = BukkitStonecuttingRecipe(
             key.toNamespacedKey,
@@ -454,7 +454,7 @@ enum class RecipeType(
         )
     });
 
-    fun deserialize(node: ConfigurationNode): Recipe {
+    fun deserialize(node: ConfigurationNode): VanillaRecipe {
         val typeToken = bridge.typeToken
         val serializer = bridge.serializer
         return serializer.deserialize(typeToken.type, node)
@@ -470,7 +470,7 @@ private fun ConfigurationNode.getRecipeKey(): Key {
 /**
  * 一个容器, 封装了 [typeToken] 和 [serializer].
  */
-internal class RecipeTypeBridge<T : Recipe>(
+internal class RecipeTypeBridge<T : VanillaRecipe>(
     val typeToken: TypeToken<T>,
     val serializer: TypeSerializer<T>,
 ) {
@@ -482,9 +482,9 @@ internal class RecipeTypeBridge<T : Recipe>(
 }
 
 /**
- * [Recipe] 的序列化器.
+ * [VanillaRecipe] 的序列化器.
  */
-internal object RecipeSerializer : TypeSerializer<Recipe> {
+internal object RecipeSerializer : TypeSerializer<VanillaRecipe> {
     val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
 
     /**
@@ -494,7 +494,7 @@ internal object RecipeSerializer : TypeSerializer<Recipe> {
      * (剩下的取决于 Recipe 具体实现)
      * ```
      */
-    override fun deserialize(type: Type, node: ConfigurationNode): Recipe {
+    override fun deserialize(type: Type, node: ConfigurationNode): VanillaRecipe {
         val recipeType = node.node("type").krequire<RecipeType>()
         val recipe = recipeType.deserialize(node)
         return recipe
