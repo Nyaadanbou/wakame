@@ -42,22 +42,20 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
     companion object {
         const val TAG_COMPONENTS = "components"
 
-        val EMPTY: ItemComponentMap = object : ItemComponentMap {
-            override fun <T> get(type: ItemComponentType<out T>): T? = null
-            override fun has(type: ItemComponentType<*>): Boolean = false
-            override fun <T> set(type: ItemComponentType<in T>, value: T) = Unit
-            override fun unset(type: ItemComponentType<*>) = Unit
-            override fun keySet(): Set<ItemComponentType<*>> = emptySet()
-            override fun size(): Int = 0
-            override fun fuzzySize(): Int = 0
-            override fun iterator(): Iterator<TypedItemComponent<*>> = emptySet<TypedItemComponent<*>>().iterator()
-            override fun toString(): String = toSimpleString()
+        /**
+         * 获取一个空的 [ItemComponentMap] (不可变).
+         */
+        fun empty(): ItemComponentMap {
+            return Empty
         }
 
         /**
          * 组合两个 [ItemComponentMap], 一个作为默认值, 一个作为对默认值的重写.
          */
-        fun composite(base: ItemComponentMap, overrides: ItemComponentMap): ItemComponentMap {
+        fun composite(
+            base: ItemComponentMap,
+            overrides: ItemComponentMap,
+        ): ItemComponentMap {
             return object : ItemComponentMap {
                 override fun <T> get(type: ItemComponentType<out T>): T? {
                     return overrides.get(type) ?: base.get(type)
@@ -205,6 +203,9 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
 
     // Classes
 
+    /**
+     * 用于构建一个直接引用的 [ItemComponentMap].
+     */
     class Builder : Examinable {
         private val map: MutableMap<ItemComponentType<*>, Any> = mutableMapOf()
 
@@ -238,12 +239,28 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
     }
 
     /**
-     * 用于单元测试. 本实现不涉及任何 NBT 操作.
+     * 空的 [ItemComponentMap] 实例 (不可变).
+     */
+    private object Empty : ItemComponentMap {
+        override fun <T> get(type: ItemComponentType<out T>): T? = null
+        override fun has(type: ItemComponentType<*>): Boolean = false
+        override fun <T> set(type: ItemComponentType<in T>, value: T) = Unit
+        override fun unset(type: ItemComponentType<*>) = Unit
+        override fun keySet(): Set<ItemComponentType<*>> = emptySet()
+        override fun size(): Int = 0
+        override fun fuzzySize(): Int = 0
+        override fun iterator(): Iterator<TypedItemComponent<*>> = emptySet<TypedItemComponent<*>>().iterator()
+        override fun toString(): String = toSimpleString()
+    }
+
+    /**
+     * 本实现直接储存了所有组件, 不涉及任何封装和 NBT 操作.
      */
     private class ForTest(
         private val map: MutableMap<ItemComponentType<*>, Any>,
     ) : ItemComponentMap {
         override fun <T> get(type: ItemComponentType<out T>): T? {
+            @Suppress("UNCHECKED_CAST")
             return map[type] as T?
         }
 
@@ -295,7 +312,10 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
     }
 
     /**
-     * 用于封装 [BukkitStack]. 仅限用于实际的游戏运行环境.
+     * 封装了一个 [BukkitStack].
+     *
+     * 所有组件的*读取*将从封装的物品上获取;
+     * 所有组件的*写入*将应用到封装的物品上.
      */
     private class ForBukkitStack(
         private val stack: BukkitStack,
@@ -366,7 +386,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
     }
 
     /**
-     * 用于构建只读的 [ItemComponentMap].
+     * 本质是个委托, 用于构建一个只读的 [ItemComponentMap].
      */
     private class ForImmutable(
         private val delegate: ItemComponentMap,

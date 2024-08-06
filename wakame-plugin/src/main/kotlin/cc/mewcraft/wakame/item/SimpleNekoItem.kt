@@ -1,16 +1,19 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemover
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
-import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
-internal class NekoItemImpl(
+/**
+ * 一个标准的 [NekoItem].
+ */
+internal class SimpleNekoItem(
     override val key: Key,
     override val config: ConfigProvider,
     override val itemType: Key,
@@ -18,7 +21,7 @@ internal class NekoItemImpl(
     override val removeComponents: VanillaComponentRemover,
     override val templates: ItemTemplateMap,
     override val behaviors: ItemBehaviorMap,
-) : Examinable, NekoItem {
+) : NekoItem {
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key.asString()),
@@ -39,4 +42,18 @@ internal class NekoItemImpl(
         //
         // ).validate(NekoItemValidator.Args(this))
     }
+}
+
+/**
+ * 空的 [NekoItem], 某些特殊情况下使用.
+ */
+internal object EmptyNekoItem : NekoItem {
+    override val key: Key = GenericKeys.EMPTY
+    override val config: ConfigProvider
+        get() = throw UnsupportedOperationException("EmptyNekoItem does not have a config.")
+    override val itemType: Key = Key.key("air")
+    override val slotGroup: ItemSlotGroup = ItemSlotGroup.empty()
+    override val removeComponents: VanillaComponentRemover = VanillaComponentRemover.nop()
+    override val templates: ItemTemplateMap = ItemTemplateMap.empty()
+    override val behaviors: ItemBehaviorMap = ItemBehaviorMap.empty()
 }

@@ -23,6 +23,19 @@ import java.lang.reflect.Type
  * 代表一组 [ItemSlot], 直接储存在 [NekoItem] 中.
  */
 interface ItemSlotGroup {
+
+    /**
+     * 包含用于创建 [ItemSlotGroup] 的函数.
+     */
+    companion object {
+        /**
+         * 获取一个空的 [ItemSlotGroup] 实例.
+         */
+        fun empty(): ItemSlotGroup {
+            return EmptyItemSlotGroup
+        }
+    }
+
     val children: Set<ItemSlot>
 
     /**
