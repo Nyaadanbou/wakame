@@ -21,6 +21,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWi
 import org.bukkit.GameMode
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.slf4j.Logger
 import kotlin.jvm.optionals.getOrNull
 
 internal class ItemRendererListener : PacketListenerAbstract() {
@@ -43,6 +44,7 @@ internal class ItemRendererListener : PacketListenerAbstract() {
 }
 
 private object PacketSupport : KoinComponent {
+    private val logger: Logger by inject()
     private val renderer: PacketItemRenderer by inject()
 
     fun handleSetSlot(user: User, packet: WrapperPlayServerSetSlot): PacketWrapper<*>? {
@@ -124,9 +126,24 @@ private object PacketSupport : KoinComponent {
     }
 
     private fun updateItem(nekoStack: PacketNekoStack, user: User) {
-        // TODO: 有需要可做创造模式兼容等
+        // 创造模式会复制假的物品到客户端本地,
+        // 而假的物品是不包含 wakame 数据的,
+        // 最终导致物品上的 wakame 数据被清除.
+        //
+        // 这个问题的解决办法就是在物品上永远存一份原始数据的备份,
+        // 但那样会导致额外的内存和性能开销. 不如等 Mojang 更新.
+        //
+        // 因此, 我们现阶段直接忽视该问题.
+
         val player = user.bukkitPlayer
-        if (player.gameMode == GameMode.CREATIVE) return
-        renderer.render(nekoStack)
+        if (player.gameMode == GameMode.CREATIVE) {
+            return
+        }
+
+        try {
+            renderer.render(nekoStack)
+        } catch (e: Throwable) {
+            logger.error("An error occurred while rendering NekoStack: $nekoStack", e)
+        }
     }
 }
