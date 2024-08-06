@@ -779,7 +779,7 @@ class CustomNekoStackTest : KoinTest {
             createContext {
                 MockGenerationContext.create(
                     Key.key("component:level_exact"),
-                    GenerationTrigger.fake(1) // 故意设置源等级为 1
+                    GenerationTrigger.direct(1) // 故意设置源等级为 1
                 )
             }
         }
@@ -812,7 +812,7 @@ class CustomNekoStackTest : KoinTest {
             createContext {
                 MockGenerationContext.create(
                     Key.key("component:level_context"),
-                    GenerationTrigger.fake(4) // 设置源等级为 4, 如果一切正确, 最后的等级就是 4 级
+                    GenerationTrigger.direct(4) // 设置源等级为 4, 如果一切正确, 最后的等级就是 4 级
                 )
             }
         }
