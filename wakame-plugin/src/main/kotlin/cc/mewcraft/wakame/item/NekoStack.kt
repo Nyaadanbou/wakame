@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
@@ -8,7 +9,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemStack
-import org.jetbrains.annotations.ApiStatus
 
 /**
  * A wrapper of an ItemStack, which provides dedicated properties and
@@ -21,9 +21,20 @@ import org.jetbrains.annotations.ApiStatus
 interface NekoStack : Keyed, Examinable {
 
     /**
+     * 包含快速获取特殊 [NekoStack] 实例的函数.
+     */
+    companion object {
+        /**
+         * 获取一个空的 [NekoStack] 实例.
+         */
+        fun empty(): NekoStack {
+            return EmptyNekoStack
+        }
+    }
+
+    /**
      * Gets the "wakame" [NBT][CompoundTag] on this item.
      */
-    @get:ApiStatus.Internal
     val nbt: CompoundTag
 
     /**
@@ -46,7 +57,6 @@ interface NekoStack : Keyed, Examinable {
      * NOT** modify `this` and then expect that your changes will apply to the
      * world state.
      */
-    @get:ApiStatus.Internal
     val handle: ItemStack
 
     /**
@@ -111,9 +121,52 @@ interface NekoStack : Keyed, Examinable {
     /**
      * Removes all the custom tags from the item.
      *
-     * **Only to be used in certain special cases!**
+     * This will make the item a vanilla item, where [ItemStack.isNeko] returns `false`.
      */
-    @ApiStatus.Internal
     fun erase()
 
+}
+
+/**
+ * 代表一个空的 [NekoStack].
+ *
+ * 该实例所有状态都不可变; 尝试改变状态不会有任何效果.
+ */
+private object EmptyNekoStack : NekoStack {
+    override val nbt: CompoundTag
+        get() = CompoundTag.create()
+
+    override val handle: ItemStack
+        get() = ItemStack.empty()
+
+    override val itemStack: ItemStack
+        get() = ItemStack.empty()
+
+    override val key: Key = GenericKeys.EMPTY
+
+    override val namespace: String = key.namespace()
+
+    override val path: String = key.value()
+
+    override var variant: Int
+        get() = 0
+        set(_) {}
+
+    override val prototype: NekoItem = NekoItem.empty()
+
+    override val slotGroup: ItemSlotGroup = prototype.slotGroup
+
+    override val components: ItemComponentMap = ItemComponentMap.empty()
+
+    override val templates: ItemTemplateMap = prototype.templates
+
+    override val behaviors: ItemBehaviorMap = prototype.behaviors
+
+    override fun clone(): NekoStack {
+        return this
+    }
+
+    override fun erase() {
+        // do nothing
+    }
 }

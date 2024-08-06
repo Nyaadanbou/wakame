@@ -28,6 +28,19 @@ import org.koin.core.component.inject
  * @see NekoStack
  */
 interface NekoItem : Keyed, Examinable {
+
+    /**
+     * 包含快速获取特殊 [NekoItem] 实例的函数.
+     */
+    companion object {
+        /**
+         * 获取空的 [NekoItem] 实例.
+         */
+        fun empty(): NekoItem {
+            return EmptyNekoItem
+        }
+    }
+
     /**
      * The [key][Key] of this item, where:
      * - [namespace][Key.namespace] is the name of the directory which contains the config file
@@ -60,12 +73,8 @@ interface NekoItem : Keyed, Examinable {
      */
     val templates: ItemTemplateMap
 
-    // 开发日记 2024/6/25
-    // 物品行为在配置文件中跟物品组件是同级的一类设置 (这两者在配置文件里没有区别).
-    // 也就是说, 配置文件中的同一个节点, 可能既会被物品行为使用, 也会被物品组件使用.
-
     /**
-     * The list of behaviors of this item.
+     * 物品的行为.
      */
     val behaviors: ItemBehaviorMap
 }

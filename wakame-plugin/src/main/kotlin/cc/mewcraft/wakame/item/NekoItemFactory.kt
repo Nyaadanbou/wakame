@@ -45,7 +45,7 @@ object NekoItemFactory : KoinComponent {
 
         // read all basic info
         val itemType = key.takeIf { Material.matchMaterial(key.asString()) != null } ?: throw SerializationException("Invalid item type: '$key'. Usually it's the incorrect file name")
-        val removeComponents = VanillaComponentRemover.noop()
+        val removeComponents = VanillaComponentRemover.nop()
         val slotGroup = root.node("slot").krequire<ItemSlotGroup>()
 
         // read all item behaviors
@@ -131,7 +131,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("unbreakable", ItemTemplateTypes.UNBREAKABLE) { unsupported() }
         }
 
-        return NekoItemImpl(
+        return SimpleNekoItem(
             key = key,
             config = provider,
             itemType = itemType,
@@ -224,7 +224,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("unbreakable", ItemTemplateTypes.UNBREAKABLE)
         }
 
-        return NekoItemImpl(
+        return SimpleNekoItem(
             key = key,
             config = provider,
             itemType = itemType,
