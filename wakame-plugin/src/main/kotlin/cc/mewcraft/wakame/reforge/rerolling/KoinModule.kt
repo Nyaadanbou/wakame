@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.reforge.rerolling
 
+import cc.mewcraft.wakame.initializer.Initializable
 import org.koin.core.module.Module
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal fun rerollingModule(): Module = module {
-    // placeholder code
+    single { RerollingTables } bind Initializable::class
 }

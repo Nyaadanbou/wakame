@@ -3,12 +3,20 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
+import cc.mewcraft.wakame.command.parser.MergingTableParser
 import cc.mewcraft.wakame.command.parser.ModdingTableParser
+import cc.mewcraft.wakame.command.parser.RerollingTableParser
+import cc.mewcraft.wakame.command.suspendingHandler
+import cc.mewcraft.wakame.gui.merging.MergingMenu
 import cc.mewcraft.wakame.gui.modding.CoreModdingMenu
 import cc.mewcraft.wakame.gui.modding.CurseModdingMenu
+import cc.mewcraft.wakame.gui.rerolling.RerollingMenu
+import cc.mewcraft.wakame.reforge.merging.MergingTable
 import cc.mewcraft.wakame.reforge.modding.ModdingTable
 import cc.mewcraft.wakame.reforge.modding.ModdingType
-import cc.mewcraft.wakame.util.ThreadType
+import cc.mewcraft.wakame.reforge.rerolling.RerollingTable
+import cc.mewcraft.wakame.util.coroutine.BukkitMain
+import kotlinx.coroutines.Dispatchers
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.incendo.cloud.Command
@@ -39,37 +47,85 @@ object ReforgeCommands : CommandFactory<CommandSender> {
 
             commandManager.commandBuilder(
                 name = CommandConstants.ROOT_COMMAND,
+                description = Description.of("Open a merging menu for a player")
+            ) {
+                permission(CommandPermissions.REFORGE.and(CommandPermissions.REFORGE_MERGING))
+                literal(REFORGE_LITERAL)
+                literal("merging")
+                required("table", MergingTableParser.mergingTableParser())
+                optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
+                suspendingHandler(context = Dispatchers.BukkitMain) { ctx ->
+                    val sender = ctx.sender()
+                    val table = ctx.get<MergingTable>("table")
+                    val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
+                    val viewer = player?.single() ?: (sender as? Player) ?: run {
+                        sender.sendPlainMessage("Player not found!")
+                        return@suspendingHandler
+                    }
+
+                    val menu = MergingMenu(table, viewer)
+                    sender.sendPlainMessage("Opening merging menu ...")
+                    menu.open()
+                }
+            }.buildAndAdd(this)
+
+            commandManager.commandBuilder(
+                name = CommandConstants.ROOT_COMMAND,
                 description = Description.of("Open a modding menu for a player")
             ) {
-                permission(CommandPermissions.REFORGE)
+                permission(CommandPermissions.REFORGE.and(CommandPermissions.REFORGE_MODDING))
                 literal(REFORGE_LITERAL)
                 literal("modding")
                 required("type", EnumParser.enumParser(ModdingType::class.java))
                 required("table", ModdingTableParser.moddingTableParser())
                 optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
-                handler { ctx ->
+                suspendingHandler(context = Dispatchers.BukkitMain) { ctx ->
                     val sender = ctx.sender()
                     val type = ctx.get<ModdingType>("type")
                     val table = ctx.get<ModdingTable>("table")
                     val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
                     val viewer = player?.single() ?: (sender as? Player) ?: run {
                         sender.sendPlainMessage("Player not found!")
-                        return@handler
+                        return@suspendingHandler
                     }
 
-                    ThreadType.SYNC.launch {
-                        when (type) {
-                            ModdingType.CORE -> {
-                                sender.sendPlainMessage("Opening menu for modding cores ...")
-                                CoreModdingMenu(table, viewer).open()
-                            }
+                    when (type) {
+                        ModdingType.CORE -> {
+                            val moddingMenu = CoreModdingMenu(table, viewer)
+                            sender.sendPlainMessage("Opening menu for modding cores ...")
+                            moddingMenu.open()
+                        }
 
-                            ModdingType.CURSE -> {
-                                sender.sendPlainMessage("Opening menu for modding curses ...")
-                                CurseModdingMenu(table, viewer).open()
-                            }
+                        ModdingType.CURSE -> {
+                            val moddingMenu = CurseModdingMenu(table, viewer)
+                            sender.sendPlainMessage("Opening menu for modding curses ...")
+                            moddingMenu.open()
                         }
                     }
+                }
+            }.buildAndAdd(this)
+
+            commandManager.commandBuilder(
+                name = CommandConstants.ROOT_COMMAND,
+                description = Description.of("Open a rerolling menu for a player")
+            ) {
+                permission(CommandPermissions.REFORGE.and(CommandPermissions.REFORGE_REROLLING))
+                literal(REFORGE_LITERAL)
+                literal("rerolling")
+                required("table", RerollingTableParser.rerollingTableParser())
+                optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
+                suspendingHandler(context = Dispatchers.BukkitMain) { ctx ->
+                    val sender = ctx.sender()
+                    val table = ctx.get<RerollingTable>("table")
+                    val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
+                    val viewer = player?.single() ?: (sender as? Player) ?: run {
+                        sender.sendPlainMessage("Player not found!")
+                        return@suspendingHandler
+                    }
+
+                    val menu = RerollingMenu(table, viewer)
+                    sender.sendPlainMessage("Opening rerolling menu ...")
+                    menu.open()
                 }
             }.buildAndAdd(this)
         }

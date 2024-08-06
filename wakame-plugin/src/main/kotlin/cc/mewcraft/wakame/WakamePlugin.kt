@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display.displayModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.entity.entityModule
+import cc.mewcraft.wakame.gui.guiModule
 import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer.initializerModule
 import cc.mewcraft.wakame.item.itemModule
@@ -16,10 +17,11 @@ import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.level.levelModule
 import cc.mewcraft.wakame.lookup.lookupModule
 import cc.mewcraft.wakame.molang.molangModule
+import cc.mewcraft.wakame.monetary.monetaryModule
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.packet.packetModule
-import cc.mewcraft.wakame.random3.randomModule
 import cc.mewcraft.wakame.player.playerModule
+import cc.mewcraft.wakame.random3.randomModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
@@ -65,12 +67,14 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 displayModule(),
                 elementModule(),
                 entityModule(),
+                guiModule(),
                 initializerModule(),
                 itemModule(),
                 kizamiModule(),
                 levelModule(),
                 lookupModule(),
                 molangModule(),
+                monetaryModule(),
                 packetModule(),
                 packModule(),
                 playerModule(),

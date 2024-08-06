@@ -1,0 +1,51 @@
+# 合并工作台是否启用?
+enabled: true
+# 合并工作台的容器GUI的标题
+title: "合并工作台: Example A"
+
+# 合并工作台可以接受的最大物品等级
+max_accepted_level: 10
+# 合并工作台输出的核心可以拥有的*最大*合并次数
+max_merge_count: 2
+
+# 输出的核心的合并次数的计算规则:
+# 合并台输出核心的合并次数永远为 2 个输入核心的合并次数*之和*再加一
+# 最后看和是否大于 max_merge_count，如果大于则不能合并，如果小于或等于则可以合并
+
+# 属性数值合并的计算方式
+# x 代表第一个属性的数值
+# y 代表第二个属性的数值
+sum_formula:
+  add: "(x+y) * 0.8"
+  multiply_base: "(x+y) * 0.8"
+  multiply_total: "(x+y) * 0.8"
+
+# 合并工作台的花费计算
+cost:
+  # 基础花费, 类似起步价
+  base: 200
+  # 每个定制核心的基础花费, 类似的士的每公里的费用
+  per_core: 基于每个核心类型
+  # 便携版核心(PortableCore)的等级的修饰系数
+  core_level_modifier: 1
+  # 便携版核心(PortableCore)的合并次数的修饰系数
+  core_merge_count_modifier: 1
+  # 这一级的 key 写合并次数, value 写 double 类型
+  core_merge_count_mapping:
+    0: 1
+    1: 1
+    2: 1.5
+
+# 该合并台支持合并的核心类型（可引用）
+accepted_cores:
+  - type: attribute:attack_damage
+    element: fire
+    operation: add
+    cost: 100
+  - type: attribute:attack_damage
+    element: fire
+    operation: multiple_base
+    cost: 500
+  - type: attribute:attack_effect_chance
+    operation: add
+    cost: 500
