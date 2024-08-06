@@ -32,9 +32,14 @@ fun wakameModule(plugin: WakamePlugin): Module = module {
     }
 
     single<Server> { plugin.server }
+
     single<PluginManager> { plugin.server.pluginManager }
+
     single<LifecycleEventManager<Plugin>> { plugin.lifecycleManager }
+
     single<ComponentLogger> { plugin.componentLogger } bind Logger::class
+
+    // 配置文件
     single<File>(named(PLUGIN_DATA_DIR)) { plugin.dataFolder }
     single<File>(named(PLUGIN_ASSETS_DIR)) { get<File>(named(PLUGIN_DATA_DIR)).resolve("assets") }
     single<Path>(named(PLUGIN_DATA_DIR)) { get<File>(named(PLUGIN_DATA_DIR)).toPath() }
