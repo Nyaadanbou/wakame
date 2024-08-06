@@ -1,0 +1,9 @@
+type: station
+input:
+  - key: minecraft:raw_copper
+    amount: 3
+  - key: wakame:material/raw_tin
+    amount: 1
+output:
+  key: raw_bronze
+  amount: 4

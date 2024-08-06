@@ -19,9 +19,10 @@ import java.io.File
 )
 object RecipeRegistry : Initializable, KoinComponent {
     private const val RECIPE_DIR_NAME = "recipes"
-    val raw: MutableMap<Key, Recipe> = mutableMapOf()
+    val raw: MutableMap<Key, VanillaRecipe> = mutableMapOf()
 
-    val ALL: MutableMap<Key, Recipe> = mutableMapOf()
+    //TODO map直接对外暴露，不安全
+    val ALL: MutableMap<Key, VanillaRecipe> = mutableMapOf()
     val BLASTING: MutableMap<Key, BlastingRecipe> = mutableMapOf()
     val CAMPFIRE: MutableMap<Key, CampfireRecipe> = mutableMapOf()
     val FURNACE: MutableMap<Key, FurnaceRecipe> = mutableMapOf()
@@ -56,10 +57,10 @@ object RecipeRegistry : Initializable, KoinComponent {
                 // 注入 key 节点
                 recipeNode.hint(RecipeSerializer.HINT_NODE, key)
                 // 反序列化 Recipe
-                val recipe = recipeNode.krequire<Recipe>()
+                val vanillaRecipe = recipeNode.krequire<VanillaRecipe>()
                 // 添加进临时注册表
-                raw[key] = recipe
-                logger.info("Loading recipe: '${recipe.key}'")
+                raw[key] = vanillaRecipe
+                logger.info("Loading recipe: '${vanillaRecipe.key}'")
 
             } catch (e: Throwable) {
                 val message = "Can't load recipe: '${file.relativeTo(recipeDir)}'"
@@ -93,47 +94,47 @@ object RecipeRegistry : Initializable, KoinComponent {
         }
     }
 
-    private fun register(key: Key, recipe: Recipe) {
-        val success = recipe.registerBukkitRecipe()
+    private fun register(key: Key, vanillaRecipe: VanillaRecipe) {
+        val success = vanillaRecipe.registerBukkitRecipe()
         if (!success) {
             logger.warn("Can't register recipe: '$key'")
             return
         }
-        ALL[key] = recipe
-        when (recipe) {
+        ALL[key] = vanillaRecipe
+        when (vanillaRecipe) {
             is BlastingRecipe -> {
-                BLASTING[key] = recipe
+                BLASTING[key] = vanillaRecipe
             }
 
             is CampfireRecipe -> {
-                CAMPFIRE[key] = recipe
+                CAMPFIRE[key] = vanillaRecipe
             }
 
             is FurnaceRecipe -> {
-                FURNACE[key] = recipe
+                FURNACE[key] = vanillaRecipe
             }
 
             is ShapedRecipe -> {
-                SHAPED[key] = recipe
+                SHAPED[key] = vanillaRecipe
             }
 
             is ShapelessRecipe -> {
-                SHAPELESS[key] = recipe
+                SHAPELESS[key] = vanillaRecipe
             }
 
             is SmithingTransformRecipe -> {
-                SMITHING_TRANSFORM[key] = recipe
+                SMITHING_TRANSFORM[key] = vanillaRecipe
             }
 
             is SmokingRecipe -> {
-                SMOKING[key] = recipe
+                SMOKING[key] = vanillaRecipe
             }
 
             is StonecuttingRecipe -> {
-                STONECUTTING[key] = recipe
+                STONECUTTING[key] = vanillaRecipe
             }
         }
-        logger.info("Registered recipe: '${recipe.key}'")
+        logger.info("Registered recipe: '${vanillaRecipe.key}'")
     }
 
     override fun onPostWorld() {
