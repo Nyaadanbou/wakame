@@ -6,17 +6,17 @@ cells:
 
   # 对应 id 为 a 的词条栏
   a:
-    # 重造次数上限
-    mod_limit: 3
     # 重造花费
     cost: 100.0
+    # 重造次数上限
+    max_reroll: 3
 
   # 对应 id 为 b 的词条栏
   b:
-    mod_limit: 4
     cost: 150.0
+    max_reroll: 4
 
   # 对应 id 为 c 的词条栏
   c:
-    mod_limit: 5
     cost: 200.0
+    max_reroll: 5

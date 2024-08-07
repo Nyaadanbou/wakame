@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.gui.rerolling
 
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.rerolling.RerollingSession
 import cc.mewcraft.wakame.reforge.rerolling.RerollingTable
@@ -27,34 +28,52 @@ import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.ScrollItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
+import kotlin.properties.Delegates
 
 /**
  * 重造台的主菜单, 也是玩家打开重造台后的代码入口.
  */
-class RerollingMenu(
+internal class RerollingMenu(
     val table: RerollingTable,
     val viewer: Player,
 ) : KoinComponent {
 
+    /**
+     * 给玩家显示 GUI.
+     */
     fun open() {
         primaryWindow.open(viewer)
     }
 
+    /**
+     * 基于 [rerollingSession] 的当前状态执行一次重造, 并刷新输出容器.
+     */
     fun refreshOutput() {
         val session = rerollingSession ?: run {
             logger.info("Trying to refresh output without a session.")
             return
         }
+
+        if (session.frozen) {
+            logger.error("Trying to refresh output in a frozen session. This is a bug!")
+            return
+        }
+
+        // 执行一次重造
         val result = session.reforge()
-        val cost = result.cost // TODO 计算花费
-        val copy = result.item
-        val outputRenderer = RerollingOutputItemRenderer()
-        outputRenderer.render(copy)
-        fillOutputSlot(copy.handle)
+
+        // 渲染输出物品
+        val resultItem = result.item
+        val renderer = OutputItemRenderer(result)
+        renderer.render(resultItem)
+
+        // 填充输出容器
+        editOutputSlot { resultItem.unsafe.handle }
     }
 
     private val logger: Logger by inject()
 
+    //<editor-fold desc="InvUI components">
     private val inputInventory: VirtualInventory = VirtualInventory(intArrayOf(1))
     private val outputInventory: VirtualInventory = VirtualInventory(intArrayOf(1))
     private val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
@@ -78,18 +97,15 @@ class RerollingMenu(
         setGui(primaryGui)
         setTitle(text("重造台").decorate(TextDecoration.BOLD))
     }
+    //</editor-fold>
 
-    private var _rerollingSession: RerollingSession? = null
-    var rerollingSession: RerollingSession?
-        get() = _rerollingSession
-        set(value) {
-            _rerollingSession = value
-            if (value == null) {
-                logger.info("Rerolling session cleared.")
-            } else {
-                logger.info("Rerolling session set: ${value.inputNekoStack.key}")
-            }
+    var rerollingSession: RerollingSession? by Delegates.observable(null) { _, _, new ->
+        if (new == null) {
+            logger.info("Rerolling session cleared.")
+        } else {
+            logger.info("Rerolling session set: ${new.inputItem.key}")
         }
+    }
 
     init {
         inputInventory.setPreUpdateHandler(::onInputInventoryPreUpdate)
@@ -106,41 +122,46 @@ class RerollingMenu(
         logger.info("Input item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         when {
+            // 玩家交换物品:
+            // 禁止该操作.
             event.isSwap -> {
-                event.isCancelled = true
-                viewer.sendPlainMessage("不支持交换物品.")
+                viewer.sendPlainMessage("猫咪不可以!")
+                event.isCancelled = true; return
             }
 
+            // 玩家把物品放进输入容器:
+            // 这时候我们需要创建一个新的‘重造会话’,
+            // 然后把所有(可重造的)词条栏图标呈现在菜单里,
+            // 最后刷新一下输出容器里的图标.
             event.isAdd -> {
-                // 不是 NekoStack - 返回
-                val stack = newItem?.tryNekoStack ?: run {
-                    event.isCancelled = true
+                val ns = newItem?.tryNekoStack ?: run {
                     viewer.sendPlainMessage("请放入一个萌芽物品!")
-                    return
+                    event.isCancelled = true; return
                 }
 
-                // 不是有词条栏的物品 - 返回
-                if (!stack.components.has(ItemComponentTypes.CELLS)) {
-                    event.isCancelled = true
+                if (!ns.components.has(ItemComponentTypes.LEVEL)) {
+                    viewer.sendPlainMessage("请放入一个拥有等级的物品!")
+                    event.isCancelled = true; return
+                }
+
+                if (!ns.components.has(ItemComponentTypes.CELLS)) {
                     viewer.sendPlainMessage("请放入一个拥有词条栏的物品!")
-                    return
+                    event.isCancelled = true; return
                 }
 
-                // 创建会话
-                val session = createRerollingSession(viewer, stack) ?: run {
-                    event.isCancelled = true
+                val session = createRerollSession(viewer, ns) ?: run {
                     viewer.sendPlainMessage("该物品不支持重造!")
-                    return
+                    event.isCancelled = true; return
                 }
 
                 // 设置会话
                 rerollingSession = session
 
                 // 将*克隆*放入输入容器
-                event.newItem = stack.itemStack
+                event.newItem = ns.itemStack
 
-                val selectionMenus = session.selectionSessions.map { (_, cellSession) ->
-                    createSelectionMenu(this, cellSession)
+                val selectionMenus = session.selections.map { (_, selection) ->
+                    createSelectionMenu(this, selection)
                 }
                 val selectionGuis = selectionMenus.map {
                     it.primaryGui
@@ -148,10 +169,11 @@ class RerollingMenu(
                 fillSelectionGuis(selectionGuis)
 
                 // 更新输出容器
-                // 提示玩家可以从输出容器中取出物品
                 refreshOutput()
             }
 
+            // 玩家从输入容器拿出物品:
+            // 说明玩家中途放弃了这次重造.
             event.isRemove -> {
                 event.isCancelled = true
 
@@ -165,7 +187,6 @@ class RerollingMenu(
                 clearSelectionGuis()
 
                 session.returnInput(viewer)
-                session.clearSelections()
 
                 session.frozen = true
                 rerollingSession = null
@@ -183,6 +204,49 @@ class RerollingMenu(
         val newItem = event.newItem
         val prevItem = event.previousItem
         logger.info("Output item updating: ${prevItem?.type} -> ${newItem?.type}")
+
+        when {
+            // 玩家尝试交换物品:
+            // 禁止该操作.
+            event.isSwap -> {
+                event.isCancelled = true
+                viewer.sendPlainMessage("不支持交换物品.")
+            }
+
+            // 玩家把物品放进输出容器:
+            // 禁止该操作.
+            event.isAdd -> {
+                event.isCancelled = true
+                viewer.sendPlainMessage("不支持放入物品.")
+            }
+
+            // 玩家从输出容器拿出物品:
+            // 说明玩家想要完成这次重造.
+            event.isRemove -> {
+                event.isCancelled = true
+
+                val session = rerollingSession ?: run {
+                    logger.error("Rerolling session (viewer: ${viewer.name}) is null, but output item is being removed. This is a bug!")
+                    return
+                }
+
+                // 首先获得当前的重造结果
+                val result = session.result
+                if (!result.cost.test(viewer)) {
+                    viewer.sendPlainMessage("你没有足够的货币!")
+                    return
+                }
+
+                // 把重造后的物品给玩家
+                viewer.inventory.addItem(result.item.unsafe.handle)
+
+                clearOutputSlot()
+                clearSelectionGuis()
+
+                session.frozen = true
+                rerollingSession = null
+            }
+        }
     }
 
     private fun onOutputInventoryPostUpdate(event: ItemPostUpdateEvent) {
@@ -193,6 +257,15 @@ class RerollingMenu(
 
     private fun onWindowClose() {
         logger.info("Rerolling window closed for ${viewer.name}")
+
+        val session = rerollingSession ?: run {
+            logger.info("The window of reroll menu is closed while session being null.")
+            return
+        }
+
+        clearOutputSlot()
+        clearSelectionGuis()
+        session.returnInput(viewer)
     }
 
     private fun onWindowOpen() {
@@ -200,31 +273,56 @@ class RerollingMenu(
     }
 
     /**
-     * 构建 [RerollingSession] 的逻辑. 返回 `null` 表示 [input] 不支持重造.
+     * 构建 [RerollingSession] 的逻辑.
+     *
+     * 返回 `null` 表示 [inputItem] 不支持重造.
      */
-    private fun createRerollingSession(
+    private fun createRerollSession(
         viewer: Player,
-        input: NekoStack,
+        inputItem: NekoStack,
     ): RerollingSession? {
-        val itemType = input.key
-        val itemCells = input.components.get(ItemComponentTypes.CELLS) ?: run {
-            logger.error("No cells found in input item: '$input'. This is a bug!")
+        // 如果这个物品没有对应的词条栏模板, 则判定整个物品不支持重造
+        val templateCellMap = inputItem.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
+            logger.warn("Input item has no cell templates. This might be a design issue.")
             return null
         }
 
-        val itemRule = table.itemRules[itemType] ?: return null
+        val itemCells = inputItem.components.get(ItemComponentTypes.CELLS)!!
 
-        val cellSessionMap = SimpleRerollingSession.SelectionSessionMap()
-        // TODO fill the Map
+        // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
+        val itemRule = table.itemRules[inputItem.key] ?: return null
 
-        return SimpleRerollingSession(viewer, input, cellSessionMap)
+        val selectionMap = SimpleRerollingSession.SelectionMap()
+        for ((id, cell) in itemCells) {
+
+            // 如果这个词条栏没有对应的重造规则, 则判定该词条栏不支持重造
+            val cellRule = itemRule.cellRules[id] ?: continue
+
+            val display = SimpleRerollingSession.Selection.Display(
+                name = cell.provideTooltipName().content,
+                lore = cell.provideTooltipLore().content,
+            )
+
+            // 这个词条栏没有对应的模板, 则判定该词条栏不支持重造
+            val coreTemplate = templateCellMap[id]?.core ?: continue
+
+            val selection = SimpleRerollingSession.Selection(
+                id = id,
+                rule = cellRule,
+                group = coreTemplate,
+                display = display,
+            )
+            selectionMap[id] = selection
+        }
+
+        return SimpleRerollingSession(table, viewer, inputItem, selectionMap)
     }
 
     private fun createSelectionMenu(
         parentMenu: RerollingMenu,
-        selectionSession: RerollingSession.SelectionSession,
+        selection: RerollingSession.Selection,
     ): SelectionMenu {
-        return SelectionMenu(parentMenu, selectionSession)
+        return SelectionMenu(parentMenu, selection)
     }
 
     private fun fillSelectionGuis(guis: List<Gui>) {

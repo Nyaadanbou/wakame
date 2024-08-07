@@ -37,6 +37,6 @@ internal object RerollingTableSerializer : KoinComponent {
      */
     fun load(tableDir: File): RerollingTable {
         // TODO
-        return RerollingTableWtf
+        return WtfRerollingTable
     }
 }

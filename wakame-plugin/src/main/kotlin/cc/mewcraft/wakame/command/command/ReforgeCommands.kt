@@ -9,11 +9,9 @@ import cc.mewcraft.wakame.command.parser.RerollingTableParser
 import cc.mewcraft.wakame.command.suspendingHandler
 import cc.mewcraft.wakame.gui.merging.MergingMenu
 import cc.mewcraft.wakame.gui.modding.CoreModdingMenu
-import cc.mewcraft.wakame.gui.modding.CurseModdingMenu
 import cc.mewcraft.wakame.gui.rerolling.RerollingMenu
 import cc.mewcraft.wakame.reforge.merging.MergingTable
 import cc.mewcraft.wakame.reforge.modding.ModdingTable
-import cc.mewcraft.wakame.reforge.modding.ModdingType
 import cc.mewcraft.wakame.reforge.rerolling.RerollingTable
 import cc.mewcraft.wakame.util.coroutine.BukkitMain
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +24,6 @@ import org.incendo.cloud.bukkit.data.SinglePlayerSelector
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.commandBuilder
-import org.incendo.cloud.parser.standard.EnumParser
 import kotlin.jvm.optionals.getOrNull
 
 object ReforgeCommands : CommandFactory<CommandSender> {
@@ -51,7 +48,7 @@ object ReforgeCommands : CommandFactory<CommandSender> {
             ) {
                 permission(CommandPermissions.REFORGE.and(CommandPermissions.REFORGE_MERGING))
                 literal(REFORGE_LITERAL)
-                literal("merging")
+                literal("merge")
                 required("table", MergingTableParser.mergingTableParser())
                 optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
                 suspendingHandler(context = Dispatchers.BukkitMain) { ctx ->
@@ -63,9 +60,9 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
-                    val menu = MergingMenu(table, viewer)
+                    val mergingMenu = MergingMenu(table, viewer)
                     sender.sendPlainMessage("Opening merging menu ...")
-                    menu.open()
+                    mergingMenu.open()
                 }
             }.buildAndAdd(this)
 
@@ -75,13 +72,11 @@ object ReforgeCommands : CommandFactory<CommandSender> {
             ) {
                 permission(CommandPermissions.REFORGE.and(CommandPermissions.REFORGE_MODDING))
                 literal(REFORGE_LITERAL)
-                literal("modding")
-                required("type", EnumParser.enumParser(ModdingType::class.java))
+                literal("mod")
                 required("table", ModdingTableParser.moddingTableParser())
                 optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
                 suspendingHandler(context = Dispatchers.BukkitMain) { ctx ->
                     val sender = ctx.sender()
-                    val type = ctx.get<ModdingType>("type")
                     val table = ctx.get<ModdingTable>("table")
                     val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
                     val viewer = player?.single() ?: (sender as? Player) ?: run {
@@ -89,19 +84,9 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
-                    when (type) {
-                        ModdingType.CORE -> {
-                            val moddingMenu = CoreModdingMenu(table, viewer)
-                            sender.sendPlainMessage("Opening menu for modding cores ...")
-                            moddingMenu.open()
-                        }
-
-                        ModdingType.CURSE -> {
-                            val moddingMenu = CurseModdingMenu(table, viewer)
-                            sender.sendPlainMessage("Opening menu for modding curses ...")
-                            moddingMenu.open()
-                        }
-                    }
+                    val moddingMenu = CoreModdingMenu(table, viewer)
+                    sender.sendPlainMessage("Opening modding menu ...")
+                    moddingMenu.open()
                 }
             }.buildAndAdd(this)
 
@@ -111,7 +96,7 @@ object ReforgeCommands : CommandFactory<CommandSender> {
             ) {
                 permission(CommandPermissions.REFORGE.and(CommandPermissions.REFORGE_REROLLING))
                 literal(REFORGE_LITERAL)
-                literal("rerolling")
+                literal("reroll")
                 required("table", RerollingTableParser.rerollingTableParser())
                 optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
                 suspendingHandler(context = Dispatchers.BukkitMain) { ctx ->
@@ -123,9 +108,9 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
-                    val menu = RerollingMenu(table, viewer)
+                    val rerollingMenu = RerollingMenu(table, viewer)
                     sender.sendPlainMessage("Opening rerolling menu ...")
-                    menu.open()
+                    rerollingMenu.open()
                 }
             }.buildAndAdd(this)
         }

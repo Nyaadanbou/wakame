@@ -82,6 +82,33 @@ abstract class ModdingMenu<T> {
     ): RecipeMenu<T>
 
     /**
+     * 向指定玩家打开定制台的主界面.
+     */
+    fun open() {
+        primaryWindow.open(viewer)
+    }
+
+    /**
+     * 获取当前的定制会话.
+     */
+    fun getSession(): ModdingSession<T>? {
+        return currentSession
+    }
+
+    /**
+     * 基于当前的所有状态, 更新输出槽位的物品.
+     */
+    fun refreshOutput() {
+        val session = getSession() ?: run {
+            logger.info("Trying to refresh output inventory while session being null.")
+            return
+        }
+        val result = session.reforge()
+        val copy = result.copy
+        fillOutputSlot(copy.unsafe.handle)
+    }
+
+    /**
      * 用于输入被定制物品的容器.
      *
      * 我们通过这个容器来接收玩家放入定制台的物品.
@@ -159,13 +186,6 @@ abstract class ModdingMenu<T> {
      */
     private fun dropSession() {
         currentSession = null
-    }
-
-    /**
-     * 获取当前的定制会话.
-     */
-    fun getSession(): ModdingSession<T>? {
-        return currentSession
     }
 
     /**
@@ -247,7 +267,7 @@ abstract class ModdingMenu<T> {
                 clearRecipes()
 
                 // 归还玩家放入定制台的主要物品 (被定制的物品)
-                viewer.inventory.addItem(session.input.handle)
+                viewer.inventory.addItem(session.input.unsafe.handle)
                 // 归还玩家放入定制台的其他物品 (定制所需的耗材), 这里我们直接把物品添加到玩家的背包里
                 session.recipeSessions.getInputItems().forEach { itemStack ->
                     viewer.inventory.addItem(itemStack)
@@ -370,26 +390,6 @@ abstract class ModdingMenu<T> {
         viewer.playSound(Sound.sound().type(org.bukkit.Sound.BLOCK_ANVIL_PLACE).volume(1f).pitch(0f).build())
     }
 
-    /**
-     * 基于当前的所有状态, 更新输出槽位的物品.
-     */
-    fun refreshOutput() {
-        val session = getSession() ?: run {
-            logger.info("Trying to refresh output inventory while session being null.")
-            return
-        }
-        val result = session.reforge()
-        val copy = result.copy
-        fillOutputSlot(copy.handle)
-    }
-
-    /**
-     * 向指定玩家打开定制台的主界面.
-     */
-    fun open() {
-        primaryWindow.open(viewer)
-    }
-
     private fun fillRecipes(guis: List<Gui>) {
         primaryGui.setContent(guis)
     }
@@ -427,10 +427,10 @@ abstract class ModdingMenu<T> {
     /**
      * 向前翻页的 [Item].
      */
-    class PrevItem : ScrollItem(-1) {
+    private class PrevItem : ScrollItem(-1) {
         override fun getItemProvider(gui: ScrollGui<*>): ItemProvider {
-            val stack = ItemStack(Material.ARROW)
-            stack.editMeta { it.itemName(text("向上翻页")) }
+            val stack = ItemStack(Material.PAPER)
+            stack.editMeta { it.itemName(text("上一页")) }
             return ItemWrapper(stack)
         }
     }
@@ -438,10 +438,10 @@ abstract class ModdingMenu<T> {
     /**
      * 向后翻页的 [Item].
      */
-    class NextItem : ScrollItem(1) {
+    private class NextItem : ScrollItem(1) {
         override fun getItemProvider(gui: ScrollGui<*>): ItemProvider {
-            val stack = ItemStack(Material.ARROW)
-            stack.editMeta { it.itemName(text("向下翻页")) }
+            val stack = ItemStack(Material.PAPER)
+            stack.editMeta { it.itemName(text("下一页")) }
             return ItemWrapper(stack)
         }
     }
