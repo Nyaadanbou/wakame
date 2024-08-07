@@ -34,8 +34,8 @@ class SimpleRerollingSession(
         logger.info("Rerolling session's confirmed status updated: $new")
     }
 
-    override var frozen: Boolean by Delegates.vetoable(false) { _, _, new ->
-        if (!new) {
+    override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
+        if (!new && old) {
             logger.error("Trying to unfreeze a frozen session. This is a bug!")
             return@vetoable false
         }

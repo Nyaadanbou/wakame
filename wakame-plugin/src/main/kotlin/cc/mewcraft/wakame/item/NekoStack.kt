@@ -165,10 +165,10 @@ object NekoStackDelegates {
     }
 
     /**
-     * 创建一个写入时复制的 [NekoStack] 委托.
+     * 创建一个支持读写的 [NekoStack] 委托.
      *
-     * 当委托对象被访问时, 返回的对象是原始对象的克隆.
-     * 当委托对象被赋值时, 会先将新的对象克隆, 再赋值.
+     * 当委托对象被读取时, 返回的对象是原始对象的克隆.
+     * 当委托对象被写入时, 会先将新的对象克隆, 再写入.
      */
     fun copyOnWrite(stack: NekoStack): ReadWriteProperty<Any?, NekoStack> {
         return CopyOnWrite(stack)
