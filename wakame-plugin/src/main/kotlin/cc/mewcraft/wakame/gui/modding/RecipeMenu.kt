@@ -136,7 +136,7 @@ abstract class RecipeMenu<T>(
                 // 清空输入容器
                 clearInputSlot()
                 // 将原输入物品退回玩家
-                viewer.inventory.addItem(input.handle)
+                viewer.inventory.addItem(input.unsafe.handle)
                 // 清空输入物品
                 recipeSession.input = null
                 // 通知主菜单, 更新输出容器

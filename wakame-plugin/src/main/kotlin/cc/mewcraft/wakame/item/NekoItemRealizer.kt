@@ -152,7 +152,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         }
 
         val itemKey = prototype.key
-        val wakameTag = nekoStack.nbt
+        val wakameTag = nekoStack.unsafe.nbt
         NekoStackSupport.setKey(wakameTag, itemKey)
         NekoStackSupport.setVariant(wakameTag, 0)
 
@@ -211,6 +211,6 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
     }
 
     private fun NekoStack.editHandle(block: ItemStack.() -> Unit) {
-        block(handle)
+        block(unsafe.handle)
     }
 }

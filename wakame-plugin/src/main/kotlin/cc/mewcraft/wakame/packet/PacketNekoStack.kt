@@ -147,11 +147,11 @@ private class PacketCustomNekoStack(
 ) : PacketNekoStack {
     // 开发日记:
     // 由于 ItemComponentMap 对 BukkitStack 有直接依赖, 我们需要转换一个
-    override val handle: BukkitStack =
+    val handle: BukkitStack =
         SpigotConversionUtil.toBukkitItemStack(handle0)
 
     override val itemStack: BukkitStack
-        get() = abortReadOps()
+        get() = abortReads()
 
     override val shouldRender: Boolean
         get() = handle0.getComponent(ComponentTypes.CUSTOM_DATA)
@@ -163,7 +163,7 @@ private class PacketCustomNekoStack(
     // 开发日记1: We use property initializer here as it would be called multiple times,
     // and we don't want to do the unnecessary NBT conversion again and again
     // 开发日记2: 该 NBT 标签应该只接受读操作 (虽然可以写, 但不保证生效, 也没啥用应该)
-    override val nbt: CompoundTag =
+    val nbt: CompoundTag =
         handle.wakameTag
 
     override val namespace: String
@@ -177,7 +177,7 @@ private class PacketCustomNekoStack(
 
     override var variant: Int
         get() = NekoStackSupport.getVariant(nbt)
-        set(_) = abortWriteOps()
+        set(_) = abortWrites()
 
     override val slotGroup: ItemSlotGroup
         get() = NekoStackSupport.getSlotGroup(nbt)
@@ -194,6 +194,9 @@ private class PacketCustomNekoStack(
     override val behaviors: ItemBehaviorMap
         get() = NekoStackSupport.getBehaviors(nbt)
 
+    override val unsafe: NekoStack.Unsafe
+        get() = NekoStackSupport.createUnsafe(nbt, handle)
+
     override fun clone(): NekoStack {
         throw UnsupportedOperationException("clone() is not supported")
     }
@@ -202,11 +205,11 @@ private class PacketCustomNekoStack(
         handle0.unsetComponent(ComponentTypes.CUSTOM_DATA)
     }
 
-    private fun abortReadOps(): Nothing {
+    private fun abortReads(): Nothing {
         throw UnsupportedOperationException("Read operation is not allowed in PacketCustomNekoStack")
     }
 
-    private fun abortWriteOps(): Nothing {
+    private fun abortWrites(): Nothing {
         throw UnsupportedOperationException("Write operation is not allowed in PacketCustomNekoStack")
     }
 }
@@ -217,17 +220,11 @@ private class PacketVanillaNekoStack(
     override val prototype: NekoItem,
     override val components: ItemComponentMap,
 ) : PacketNekoStack {
-    override val nbt: CompoundTag
-        get() = abortReadOps()
-
     override val itemStack: BukkitStack
-        get() = abortReadOps()
+        get() = abortReads()
 
     override val shouldRender: Boolean
         get() = true
-
-    override val handle: BukkitStack
-        get() = abortReadOps()
 
     override val namespace: String
         get() = key.namespace()
@@ -237,7 +234,7 @@ private class PacketVanillaNekoStack(
 
     override var variant: Int
         get() = 0
-        set(_) = abortWriteOps()
+        set(_) = abortWrites()
 
     override val slotGroup: ItemSlotGroup
         get() = prototype.slotGroup
@@ -248,19 +245,21 @@ private class PacketVanillaNekoStack(
     override val behaviors: ItemBehaviorMap
         get() = prototype.behaviors
 
+    override val unsafe: NekoStack.Unsafe
+        get() = abortReads()
+
     override fun clone(): NekoStack =
-        abortReadOps()
+        abortReads()
 
     override fun erase() {
-        // no-op
-        // 本来就是原版物品, 不需要擦除 `custom_data`
+        // NOP: 本来就是原版物品, 不需要擦除 `custom_data`
     }
 
-    private fun abortReadOps(): Nothing {
+    private fun abortReads(): Nothing {
         throw UnsupportedOperationException("Read operation is not allowed in PacketVanillaNekoStack")
     }
 
-    private fun abortWriteOps(): Nothing {
+    private fun abortWrites(): Nothing {
         throw UnsupportedOperationException("Write operation is not allowed in PacketVanillaNekoStack")
     }
 }

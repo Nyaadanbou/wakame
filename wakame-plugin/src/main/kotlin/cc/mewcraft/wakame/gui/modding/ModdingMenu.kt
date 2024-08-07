@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.gui.modding
 
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.bypassPacket
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.setSystemUse
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.modding.ModdingSession
@@ -299,8 +299,8 @@ abstract class ModdingMenu<T> {
                 if (!session.confirmed) {
                     editOutputSlot {
                         val ns = it.toNekoStack
-                        ns.setSystemUse() // 让发包系统忽略该物品
-                        ns.handle.editMeta { meta ->
+                        ns.bypassPacket(true) // 让发包系统忽略该物品
+                        ns.unsafe.handle.editMeta { meta ->
                             meta.displayName(
                                 text("请再次点击以取出")
                                     .color(NamedTextColor.AQUA)
@@ -324,7 +324,7 @@ abstract class ModdingMenu<T> {
                 // TODO 计算价格, 然后扣钱
 
                 // 将定制后的物品添加到玩家背包
-                viewer.inventory.addItem(output.handle)
+                viewer.inventory.addItem(output.unsafe.handle)
                 // 清空输入容器 (相当于消耗掉原始物品)
                 clearInputSlot()
                 // 清空输出容器 (因为玩家已经拿到手了)
@@ -359,7 +359,7 @@ abstract class ModdingMenu<T> {
         }
 
         // 有会话, 则将定制过程中玩家输入的所有物品归还给玩家
-        viewer.inventory.addItem(session.input.handle)
+        viewer.inventory.addItem(session.input.unsafe.handle)
         viewer.inventory.addItem(*session.recipeSessions.getInputItems().toTypedArray())
     }
 
