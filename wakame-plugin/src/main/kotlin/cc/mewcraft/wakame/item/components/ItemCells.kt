@@ -87,6 +87,11 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     val size: Int
 
     /**
+     * 将本对象转换成一个 [Builder].
+     */
+    fun builder(): Builder
+
+    /**
      * 检查指定的词条栏是否存在.
      */
     fun has(id: String): Boolean
@@ -140,6 +145,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
         fun has(id: String): Boolean
         fun get(id: String): Cell?
         fun put(id: String, cell: Cell): Cell?
+        fun modify(id: String, block: (Cell) -> Cell)
         fun remove(id: String): Cell?
         fun build(): ItemCells
     }
@@ -147,7 +153,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     /* Internals */
 
     private class BuilderImpl : Builder {
-        private val map: HashMap<String, Cell> = HashMap()
+        val map: HashMap<String, Cell> = HashMap()
 
         override fun has(id: String): Boolean {
             return map.containsKey(id)
@@ -159,6 +165,12 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
 
         override fun put(id: String, cell: Cell): Cell? {
             return map.put(id, cell)
+        }
+
+        override fun modify(id: String, block: (Cell) -> Cell) {
+            val cell = map[id] ?: return
+            val newCell = block(cell)
+            map.put(id, newCell)
         }
 
         override fun remove(id: String): Cell? {
@@ -175,6 +187,12 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     ) : ItemCells {
         override val size: Int
             get() = cells.size
+
+        override fun builder(): Builder {
+            val builder = BuilderImpl()
+            builder.map.putAll(cells)
+            return builder
+        }
 
         override fun has(id: String): Boolean {
             return cells.containsKey(id)
