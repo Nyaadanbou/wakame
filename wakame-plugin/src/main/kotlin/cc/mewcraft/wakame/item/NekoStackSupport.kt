@@ -93,6 +93,7 @@ val ItemStack.toNekoStack: NekoStack
         }
     }
 
+@Deprecated("Use ItemStack#tryNekoStack instead", ReplaceWith("this.tryNekoStack"))
 @get:Contract(pure = true)
 val ItemStack.trySystemStack: NekoStack?
     get() {
@@ -104,6 +105,7 @@ val ItemStack.trySystemStack: NekoStack?
         }
     }
 
+@Deprecated("Use ItemStack#toNekoStack instead", ReplaceWith("this.toNekoStack"))
 @get:Contract(pure = true)
 val ItemStack.toSystemStack: NekoStack
     get() {
@@ -136,23 +138,42 @@ internal fun Material.createNekoStack(): NekoStack {
 }
 
 @Contract(pure = true)
-fun NekoStack.isSystemUse(): Boolean {
+fun NekoStack.bypassPacket(): Boolean {
     return components.has(ItemComponentTypes.SYSTEM_USE)
 }
 
 @Contract(pure = false)
-fun NekoStack.setSystemUse() {
-    components.set(ItemComponentTypes.SYSTEM_USE, Unit)
+fun NekoStack.bypassPacket(bypass: Boolean) {
+    if (bypass) {
+        components.set(ItemComponentTypes.SYSTEM_USE, Unit)
+    } else {
+        val handle = this.unsafe.handle
+
+        handle.backingItemName = null
+        handle.backingCustomName = null
+        handle.backingCustomModelData = null
+        handle.backingLore = null
+
+        components.unset(ItemComponentTypes.SYSTEM_USE)
+    }
 }
 
+@Deprecated("Use NekoStack#bypassPacket instead", ReplaceWith("this.bypassPacket()"))
+@Contract(pure = true)
+fun NekoStack.isSystemUse(): Boolean {
+    return bypassPacket()
+}
+
+@Deprecated("Use NekoStack#bypassPacket instead", ReplaceWith("this.bypassPacket(bypass)"))
+@Contract(pure = false)
+fun NekoStack.setSystemUse() {
+    bypassPacket(true)
+}
+
+@Deprecated("Use NekoStack#bypassPacket instead", ReplaceWith("this.bypassPacket(bypass)"))
 @Contract(pure = false)
 fun NekoStack.unsetSystemUse() {
-    this.handle.backingItemName = null
-    this.handle.backingCustomName = null
-    this.handle.backingCustomModelData = null
-    this.handle.backingLore = null
-
-    components.unset(ItemComponentTypes.SYSTEM_USE)
+    bypassPacket(false)
 }
 
 /**
@@ -163,7 +184,7 @@ fun NekoStack.unsetSystemUse() {
  * 该实现是可变的, 也就是说可以修改其中的属性.
  */
 private class CustomNekoStack(
-    override val handle: ItemStack,
+    val handle: ItemStack,
 ) : NekoStack {
 
     // 该构造器接受一个 ItemType, 用于从零开始创建一个物品
@@ -171,7 +192,7 @@ private class CustomNekoStack(
         handle = ItemStack(mat), // strictly-Bukkit ItemStack
     )
 
-    override val nbt: CompoundTag
+    val nbt: CompoundTag
         get() {
             // TODO 等到 Paper 的 delegate ItemStack 完成之后,
             //  就不需要区分一个 ItemStack 是不是 NMS 了.
@@ -198,12 +219,12 @@ private class CustomNekoStack(
 
     override val itemStack: ItemStack
         get() {
-            // 由于我们是*直接*对 minecraft:custom_data 中的 CompoundTag
-            // 进行读写操作, 而没有调用 minecraft:custom_data 的 copyTag(),
+            // 由于我们是*直接*对 `minecraft:custom_data` 中的 NBT
+            // 进行读写操作, 而没有调用 `minecraft:custom_data` 的 copyTag(),
             // 因此必须显式的对 NBT 进行拷贝, 否则会出现引用问题!
             val newHandle = handle.clone()
-            val wakameTagCopy = (newHandle.wakameTag.copy() as CompoundTag)
-            newHandle.wakameTag = wakameTagCopy
+            val nbtCopy = newHandle.wakameTag.copy()
+            newHandle.wakameTag = nbtCopy as CompoundTag
             return newHandle
         }
 
@@ -238,6 +259,9 @@ private class CustomNekoStack(
     override val behaviors: ItemBehaviorMap
         get() = NekoStackSupport.getBehaviors(nbt)
 
+    override val unsafe: NekoStack.Unsafe
+        get() = NekoStackUnsafe(nbt, handle)
+
     override fun clone(): NekoStack {
         return CustomNekoStack(itemStack)
     }
@@ -268,10 +292,6 @@ internal class VanillaNekoStack(
     override val prototype: NekoItem,
     override val components: ItemComponentMap,
 ) : NekoStack {
-    override val nbt: CompoundTag
-        get() = unsupported() // 由于本实现完全不可变, 因此不需要封装 NBT.
-    override val handle: ItemStack
-        get() = unsupported()
     override val itemStack: ItemStack
         get() = unsupported()
 
@@ -282,6 +302,8 @@ internal class VanillaNekoStack(
     override val slotGroup: ItemSlotGroup = prototype.slotGroup
     override val templates: ItemTemplateMap = prototype.templates
     override val behaviors: ItemBehaviorMap = prototype.behaviors
+    override val unsafe: NekoStack.Unsafe
+        get() = unsupported()
 
     override fun clone(): NekoStack =
         unsupported()
@@ -289,15 +311,17 @@ internal class VanillaNekoStack(
     override fun erase(): Unit =
         unsupported()
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key.asString()),
-        ExaminableProperty.of("variant", variant),
-    )
+    override fun examinableProperties(): Stream<out ExaminableProperty> =
+        Stream.of(
+            ExaminableProperty.of("key", key.asString()),
+            ExaminableProperty.of("variant", variant),
+        )
 
-    override fun toString(): String = toSimpleString()
+    override fun toString(): String =
+        toSimpleString()
 
     private fun unsupported(): Nothing {
-        throw UnsupportedOperationException("This operation is not supported on VanillaNekoStack")
+        throw UnsupportedOperationException("This operation is not supported on ${this::class.simpleName}")
     }
 }
 
@@ -437,7 +461,16 @@ internal object NekoStackSupport {
         }
         wakameTag.putInt(BaseBinaryKeys.VARIANT, variant)
     }
+
+    fun createUnsafe(nbt: CompoundTag, handle: ItemStack): NekoStack.Unsafe {
+        return NekoStackUnsafe(nbt, handle)
+    }
 }
+
+private class NekoStackUnsafe(
+    override val nbt: CompoundTag,
+    override val handle: ItemStack,
+) : NekoStack.Unsafe
 
 private object NekoStackInjections : KoinComponent {
     val logger: Logger by inject()

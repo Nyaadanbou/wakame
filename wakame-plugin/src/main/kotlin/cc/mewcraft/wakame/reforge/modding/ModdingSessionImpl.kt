@@ -151,7 +151,7 @@ internal class CoreModdingSession(
         }
 
         override fun getInputItems(): List<ItemStack> {
-            return map.values.mapNotNull { it.input?.handle }
+            return map.values.mapNotNull { it.input?.unsafe?.handle }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, ModdingSession.RecipeSession<Core>>> {
@@ -278,7 +278,7 @@ internal class CurseModdingSession(
         }
 
         override fun getInputItems(): List<ItemStack> {
-            return map.values.mapNotNull { it.input?.handle }
+            return map.values.mapNotNull { it.input?.unsafe?.handle }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, ModdingSession.RecipeSession<Curse>>> {
