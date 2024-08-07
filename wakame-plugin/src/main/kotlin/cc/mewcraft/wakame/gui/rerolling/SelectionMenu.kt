@@ -2,7 +2,8 @@ package cc.mewcraft.wakame.gui.rerolling
 
 import cc.mewcraft.wakame.reforge.rerolling.RerollingSession
 import cc.mewcraft.wakame.util.hideAllFlags
-import cc.mewcraft.wakame.util.hideTooltip
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.text
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.entity.Player
@@ -20,9 +21,9 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 /**
  * 重造台中用于选择*单个*词条栏的子菜单, 将被嵌入进 [RerollingMenu] 中.
  */
-class SelectionMenu(
+internal class SelectionMenu(
     val parentMenu: RerollingMenu,
-    val selectionSession: RerollingSession.SelectionSession,
+    val selection: RerollingSession.Selection,
 ) : KoinComponent {
     val primaryGui: Gui = Gui.normal { builder ->
         builder.setStructure(
@@ -36,20 +37,19 @@ class SelectionMenu(
     private val logger: Logger by inject()
 
     private companion object {
-        // 临时实现
         val trims: List<Material> = Tag.ITEMS_TRIM_TEMPLATES.values.toList()
     }
 
     private inner class IndicatorItem : AbstractItem() {
         fun getTrimMaterial(): Material {
-            val sessionHash = selectionSession.hashCode()
+            val sessionHash = selection.hashCode()
             val index = sessionHash % trims.size
             return trims[index]
         }
 
         override fun getItemProvider(): ItemProvider {
             val stack = ItemStack(getTrimMaterial()).hideAllFlags()
-            selectionSession.display.apply(stack)
+            selection.display.apply(stack)
             return ItemWrapper(stack)
         }
 
@@ -60,15 +60,19 @@ class SelectionMenu(
 
     private inner class SelectionItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val stack = if (selectionSession.selected) {
-                // 临时实现, 表示已选择
-                Material.PINK_DYE
+            val mat: Material
+            val name: Component
+            if (selection.selected) {
+                mat = Material.PINK_DYE
+                name = text("将被重造")
             } else {
-                // 临时实现, 表示未选择
-                Material.GRAY_DYE
-            }.let {
-                ItemStack(it).hideAllFlags().hideTooltip(true)
+                mat = Material.GRAY_DYE
+                name = text("保持不变")
             }
+
+            val stack = ItemStack(mat).hideAllFlags()
+            stack.editMeta { meta -> meta.itemName(name) }
+
             return ItemWrapper(stack)
         }
 
@@ -78,8 +82,16 @@ class SelectionMenu(
                 return
             }
 
-            // 反转当前的选择状态
-            selectionSession.selected = !selectionSession.selected
+            selection.invertSelect()
+
+            if (selection.selected) {
+                parentMenu.viewer.sendPlainMessage("词条栏 ${selection.id} 将被重造.")
+            } else {
+                parentMenu.viewer.sendPlainMessage("词条栏 ${selection.id} 保持不变.")
+            }
+
+            // 重新渲染主菜单的输出物品
+            parentMenu.refreshOutput()
         }
     }
 }

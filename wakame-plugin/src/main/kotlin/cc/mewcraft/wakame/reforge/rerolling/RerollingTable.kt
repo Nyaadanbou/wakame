@@ -1,14 +1,20 @@
 package cc.mewcraft.wakame.reforge.rerolling
 
-import cc.mewcraft.wakame.molang.Evaluable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
+import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction
+import team.unnamed.mocha.runtime.compiled.Named
 
 /**
  * 代表一个重造台(的配置文件).
  */
-interface RerollingTable {
+interface RerollingTable : Examinable {
+    /**
+     * 重造台的唯一标识.
+     */
+    val identifier: String
+
     /**
      * 重造台是否启用.
      */
@@ -36,34 +42,60 @@ interface RerollingTable {
      * - 常量
      * - 计算方式
      *
-     * 常量是一些固定的数值, 例如基础花费, 稀有度花费映射等. 将作为下面公式的输入值.
+     * 常量是*确切的数值*, 例如“基础花费”, 稀有度的数值映射等. 将作为下面公式的输入值.
      *
-     * 公式是一些动态的数值, 例如每个词条栏的花费计算方式, 整个物品最终花费的计算方式等.
+     * 计算方式是*数学表达式*, 例如每个词条栏的花费计算方式, 整个物品最终花费的计算方式等.
      */
     interface Cost : Examinable {
         /* 常量 */
 
         /**
-         * 基础花费.
+         * 所谓的“基础花费”.
          */
         val base: Double
 
         /**
-         * 每个稀有度的花费.
+         * 每个稀有度对应的数值.
          */
-        val rarityMapping: Map<Key, Double>
+        val rarityNumberMapping: Map<Key, Double>
 
-        /* 公式 */
+        /* 计算方式 */
 
         /**
          * 物品上的每个词条栏的花费的计算方式.
          */
-        val eachCostFormula: Evaluable<*>
+        val eachFunction: EachFunction
 
         /**
          * 整个物品在被重造时, 最终花费的计算方式.
          */
-        val totalCostFormula: Evaluable<*>
+        val totalFunction: TotalFunction
+
+        /**
+         * 重造总花费的计算方式.
+         */
+        interface TotalFunction : MochaCompiledFunction {
+            fun compute(
+                @Named("base") base: Double,
+                @Named("rarity") rarity: Double,
+                @Named("item_level") itemLevel: Int,
+                @Named("all_count") allCount: Int,
+                @Named("selected_count") selectedCount: Int,
+                @Named("selected_cost_sum") selectedCostSum: Double,
+                @Named("unselected_cost_sum") unselectedCostSum: Double,
+            ): Double
+        }
+
+        /**
+         * 单个词条栏花费的计算方式.
+         */
+        interface EachFunction : MochaCompiledFunction {
+            fun compute(
+                @Named("cost") cost: Double,
+                @Named("max_reroll") maxReroll: Int,
+                @Named("reroll_count") rerollCount: Int, // 从 NBT 读取
+            ): Double
+        }
     }
 
     /**
@@ -95,14 +127,14 @@ interface RerollingTable {
      */
     interface CellRule : Examinable {
         /**
-         * 词条栏最多能重造几次.
-         */
-        val modLimit: Int
-
-        /**
-         * 该词条栏的花费. 具体作用由实现定义.
+         * 该词条栏的花费. 具体作用看具体实现.
          */
         val cost: Double
+
+        /**
+         * 词条栏最多能重造几次.
+         */
+        val maxReroll: Int
     }
 
     /**
@@ -114,7 +146,7 @@ interface RerollingTable {
          *
          * 如果返回 `null` 则说明该词条栏不支持重造.
          *
-         * @param key 词条栏的名称
+         * @param key 词条栏的唯一标识
          */
         operator fun get(key: String): CellRule?
     }

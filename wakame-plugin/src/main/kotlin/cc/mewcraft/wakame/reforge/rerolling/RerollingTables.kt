@@ -25,7 +25,7 @@ object RerollingTables : Initializable {
         tables.clear()
         val tables = RerollingTableSerializer.loadAll()
         this.tables.putAll(tables)
-        this.tables.put("wtf", RerollingTableWtf)
+        this.tables.put("wtf", WtfRerollingTable)
     }
 
     override fun onPostWorld() {
