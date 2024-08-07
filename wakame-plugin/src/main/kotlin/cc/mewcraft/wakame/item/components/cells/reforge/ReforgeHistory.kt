@@ -14,6 +14,8 @@ import cc.mewcraft.wakame.util.CompoundTag
 
 /**
  * 词条栏的重铸历史数据.
+ *
+ * 该对象不可变, 所有的修改操作都会返回一个新的 [ReforgeHistory] 实例.
  */
 interface ReforgeHistory : BinarySerializable {
     /**
@@ -32,6 +34,11 @@ interface ReforgeHistory : BinarySerializable {
     fun setModCount(value: Int): ReforgeHistory
 
     /**
+     * 增加该词条栏有史以来被*定制*的次数.
+     */
+    fun addModCount(value: Int): ReforgeHistory
+
+    /**
      * 该词条栏有史以来被*重造*的次数.
      */
     val rerollCount: Int
@@ -40,6 +47,11 @@ interface ReforgeHistory : BinarySerializable {
      * 设置该词条栏有史以来被*重造*的次数.
      */
     fun setRerollCount(value: Int): ReforgeHistory
+
+    /**
+     * 增加该词条栏有史以来被*重造*的次数.
+     */
+    fun addRerollCount(value: Int): ReforgeHistory
 
     companion object {
         /**
@@ -66,11 +78,17 @@ interface ReforgeHistory : BinarySerializable {
         override val isEmpty: Boolean = true
         override val modCount: Int = 0
         override fun setModCount(value: Int): ReforgeHistory = ReforgeHistoryImpl(value, rerollCount)
+        override fun addModCount(value: Int): ReforgeHistory = setModCount(modCount + value)
         override val rerollCount: Int = 0
         override fun setRerollCount(value: Int): ReforgeHistory = ReforgeHistoryImpl(modCount, value)
+        override fun addRerollCount(value: Int): ReforgeHistory = setRerollCount(rerollCount + value)
         override fun serializeAsTag(): Tag = CompoundTag.create()
     }
 }
+
+
+/* Implementations */
+
 
 private data class ReforgeHistoryImpl(
     override val modCount: Int,
@@ -82,8 +100,16 @@ private data class ReforgeHistoryImpl(
         return copy(modCount = value)
     }
 
+    override fun addModCount(value: Int): ReforgeHistory {
+        return setModCount(modCount + value)
+    }
+
     override fun setRerollCount(value: Int): ReforgeHistory {
         return copy(rerollCount = value)
+    }
+
+    override fun addRerollCount(value: Int): ReforgeHistory {
+        return setRerollCount(rerollCount + value)
     }
 
     override fun serializeAsTag(): Tag = CompoundTag {
