@@ -1,23 +1,20 @@
 package cc.mewcraft.wakame.reforge.modding
 
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.components.cells.Core
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
-import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
-import java.util.stream.Stream
 
 /**
- * 代表一个物品定制的过程, 封装了一次定制所需要的所有状态.
+ * 代表一个定制词条栏核心的过程, 封装了一次定制所需要的所有状态.
  *
  * 当玩家将需要定制的物品 *X* 放入定制台的输入的时候, 将产生一个 [ModdingSession].
  * 如果此时玩家把物品 *X* 取出, 则 [ModdingSession] 将被永久冻结, 不应再被使用.
- *
- * @param T 定制的类型
  */
-interface ModdingSession<T> : Examinable {
+interface ModdingSession : Examinable {
     /**
      * 当前使用该会话的玩家.
      */
@@ -26,56 +23,45 @@ interface ModdingSession<T> : Examinable {
     /**
      * 获取被定制物品的*克隆*, 也就是玩家放入定制台的物品.
      *
-     * 当一个 [ModdingSession] 实例被创建时, [input] 就已经同时确定.
+     * 当一个 [ModdingSession] 实例被创建时, [inputItem] 就已经同时确定.
      *
      * **该对象的状态不应该由定制台以任何方式修改**; 定制台只能读取该对象的状态, 或对其克隆实例进行写入操作.
      * 这是因为当一个定制的过程被中途取消时, 玩家放入定制台的所有物品都应该被原封不动地放回到玩家的背包中.
      * 因此, 我们在这里暂存玩家放入定制台的物品的原始状态.
      */
-    val input: NekoStack
+    val inputItem: NekoStack
 
     /**
-     * 被定制后的物品, 也就是 [input] 基于当前状态被修改后的样子.
-     *
-     * 每当玩家对定制台上的物品进行修改时, [output] 将被实时更新.
+     * 被定制后的物品, 也就是 [inputItem] 基于当前状态被修改后的样子.
+     * 每当玩家对定制台上的物品进行修改时, [outputItem] 将被实时更新.
+     * 初始为 [inputItem] 的克隆.
      */
-    var output: NekoStack?
+    var outputItem: NekoStack
 
     /**
      * 当前每个词条栏的会话.
      */
-    val recipeSessions: RecipeSessionMap<T>
+    val replaceMap: ReplaceMap
 
     /**
      * 玩家的确认状态.
      *
-     * 如果确认状态已经为 `true`, 则玩家可以直接获取 [output] 物品.
-     * 否则玩家需要先将确认状态设置为 `true`, 然后再获取 [output] 物品.
+     * 如果确认状态已经为 `true`, 则玩家可以直接获取 [outputItem] 物品.
+     * 否则玩家需要先将确认状态设置为 `true`, 然后再获取 [outputItem] 物品.
      */
     var confirmed: Boolean
 
     /**
-     * 检查该会话是否已经被冻结.
+     * 标记该会话是否已经被冻结.
      */
-    fun frozen(): Boolean
+    var frozen: Boolean
 
     /**
-     * 冻结该会话.
-     */
-    fun freeze()
-
-    /**
-     * 以当前状态修改 [input] (的副本), 并返回一个新的 [Result].
+     * 以当前状态修改 [inputItem] (的副本), 并返回一个新的 [Result].
      *
-     * 该函数不应该修改 [input] 本身的状态.
+     * 该函数不应该修改 [inputItem] 本身的状态.
      */
     fun reforge(): Result
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("viewer", viewer.name),
-        ExaminableProperty.of("input", input),
-        ExaminableProperty.of("output", output),
-    )
 
     /**
      * 代表一个物品定制的结果.
@@ -86,7 +72,7 @@ interface ModdingSession<T> : Examinable {
          *
          * 该物品是一个新对象, 不是原物品对象修改后的状态.
          */
-        val copy: NekoStack
+        val item: NekoStack
     }
 
     /**
@@ -96,10 +82,8 @@ interface ModdingSession<T> : Examinable {
      * 玩家可以选择定制他想定制的词条栏; 选择方式就是往定制台上的特定槽位放入特定的物品.
      * *放入*这个操作在代码里的体现, 就是设置 [input] 为玩家放入的(合法)物品.
      * 一旦放入了一个*合法的*物品, 那么 [input] 将不再为 `null`.
-     *
-     * @param T 定制的类型
      */
-    interface RecipeSession<in T> {
+    interface Replace {
         /**
          * 该定制对应的词条栏的 id.
          */
@@ -123,7 +107,7 @@ interface ModdingSession<T> : Examinable {
          * - 如果为 `null`, 则说明玩家还没有放入任何物品.
          * - 如果不为 `null`, 则说明已经放入了一个*合法的*物品.
          *
-         * 实现必须确保当 [input] 不为 `null` 时, 它符合 [rule] 的规则.
+         * 实现必须确保当 [inputItem] 不为 `null` 时, 它符合 [rule] 的规则.
          */
         var input: NekoStack?
 
@@ -131,7 +115,7 @@ interface ModdingSession<T> : Examinable {
          * 测试 [replacement] 是否可以应用到词条栏上.
          */
         @Contract(pure = true)
-        fun test(replacement: T): TestResult
+        fun test(replacement: Core): TestResult
 
         /**
          * 该定制在 GUI 中的样子.
@@ -148,28 +132,28 @@ interface ModdingSession<T> : Examinable {
         }
 
         /**
-         * 一个 [RecipeSession] 测试输入的结果.
+         * 一个 [Replace] 测试输入的结果.
          */
         interface TestResult {
             /**
-             * 表示输入的 [T] 可以用在词条栏上.
+             * 表示输入的核心可以用在词条栏上.
              */
-            val isSuccess: Boolean
+            val successful: Boolean
 
             /**
              * 该测试结果的文字描述.
              */
-            val resultType: String // 等设计稳定后, 到时候应该换成一个枚举类
+            val message: String // 等设计稳定后, 到时候应该换成一个枚举类
         }
     }
 
     /**
-     * [RecipeSession] 的映射. 从词条栏 id 映射到对应的 [RecipeSession].
+     * [Replace] 的映射. 从词条栏的唯一标识映射到对应的 [Replace].
      */
-    interface RecipeSessionMap<T> : Iterable<Map.Entry<String, RecipeSession<T>>> {
+    interface ReplaceMap : Iterable<Map.Entry<String, Replace>> {
         val size: Int
-        fun get(id: String): RecipeSession<T>?
-        fun put(id: String, recipeSession: RecipeSession<T>)
+        fun get(id: String): Replace?
+        fun put(id: String, replace: Replace)
         fun contains(id: String): Boolean
 
         /**

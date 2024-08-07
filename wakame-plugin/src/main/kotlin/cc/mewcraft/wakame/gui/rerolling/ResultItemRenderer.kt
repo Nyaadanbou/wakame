@@ -13,7 +13,7 @@ import net.kyori.adventure.text.format.TextDecoration
 // TODO 更丰富的结果预览:
 //  - 能够显示哪些词条栏会被重造, 哪些不会
 //  这要求对渲染模块进行重构 ...
-internal class OutputItemRenderer(
+internal class ResultItemRenderer(
     private val result: RerollingSession.Result,
 ) : ItemRenderer<NekoStack> {
     override fun render(nekoStack: NekoStack) {

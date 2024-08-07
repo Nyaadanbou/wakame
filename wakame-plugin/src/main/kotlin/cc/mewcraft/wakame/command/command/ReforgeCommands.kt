@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.command.parser.ModdingTableParser
 import cc.mewcraft.wakame.command.parser.RerollingTableParser
 import cc.mewcraft.wakame.command.suspendingHandler
 import cc.mewcraft.wakame.gui.merging.MergingMenu
-import cc.mewcraft.wakame.gui.modding.CoreModdingMenu
+import cc.mewcraft.wakame.gui.modding.ModdingMenu
 import cc.mewcraft.wakame.gui.rerolling.RerollingMenu
 import cc.mewcraft.wakame.reforge.merging.MergingTable
 import cc.mewcraft.wakame.reforge.modding.ModdingTable
@@ -84,7 +84,7 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
-                    val moddingMenu = CoreModdingMenu(table, viewer)
+                    val moddingMenu = ModdingMenu(table, viewer)
                     sender.sendPlainMessage("Opening modding menu ...")
                     moddingMenu.open()
                 }
