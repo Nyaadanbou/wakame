@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.convertor.convertToConfigKey
 import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.krequire
@@ -31,27 +32,7 @@ data class SingleRecipeResult(
     val amount: Int
 ) : RecipeResult {
     override fun toBukkitItemStack(): ItemStack {
-        //TODO 临时实现
-        when (result.namespace()) {
-            "minecraft" -> {
-                val material = Material.getMaterial(result.value().uppercase(Locale.getDefault()))
-                material ?: throw IllegalArgumentException("Unknown vanilla item: '$result'")
-                return ItemStack(material, amount)
-            }
-
-            "wakame" -> {
-                val nekoItem = ItemRegistry.CUSTOM.find(Key.key(result.value().replaceFirst('/', ':')))
-                val nekoStack = nekoItem?.realize()
-                val itemStack = nekoStack?.itemStack
-                itemStack ?: throw IllegalArgumentException("Unknown wakame item: '$result'")
-                itemStack.amount = amount
-                return itemStack
-            }
-
-            else -> {
-                throw IllegalArgumentException("Unknown namespace")
-            }
-        }
+        return result.convertToConfigKey().realize()
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
