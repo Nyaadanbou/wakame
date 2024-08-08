@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.gui.rerolling
+package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.reforge.rerolling.RerollingSession
 import cc.mewcraft.wakame.util.hideAllFlags

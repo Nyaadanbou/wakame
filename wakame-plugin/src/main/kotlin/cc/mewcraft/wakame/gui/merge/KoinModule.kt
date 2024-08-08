@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.gui.merging
+package cc.mewcraft.wakame.gui.merge
 
 import org.koin.dsl.module
 

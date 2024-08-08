@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.command.parser.MergingTableParser
 import cc.mewcraft.wakame.command.parser.ModdingTableParser
 import cc.mewcraft.wakame.command.parser.RerollingTableParser
 import cc.mewcraft.wakame.command.suspendingHandler
-import cc.mewcraft.wakame.gui.merging.MergingMenu
-import cc.mewcraft.wakame.gui.modding.ModdingMenu
-import cc.mewcraft.wakame.gui.rerolling.RerollingMenu
+import cc.mewcraft.wakame.gui.merge.MergingMenu
+import cc.mewcraft.wakame.gui.mod.ModdingMenu
+import cc.mewcraft.wakame.gui.reroll.RerollingMenu
 import cc.mewcraft.wakame.reforge.merging.MergingTable
 import cc.mewcraft.wakame.reforge.modding.ModdingTable
 import cc.mewcraft.wakame.reforge.rerolling.RerollingTable

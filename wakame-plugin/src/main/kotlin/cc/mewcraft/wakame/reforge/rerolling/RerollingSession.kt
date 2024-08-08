@@ -123,7 +123,7 @@ interface RerollingSession : Examinable {
         val rule: RerollingTable.CellRule
 
         /** 用于重新随机词条栏核心的掉落表. */
-        val group: Group<TemplateCore, GenerationContext>
+        val template: Group<TemplateCore, GenerationContext>
 
         /** 渲染词条栏的逻辑. */
         val display: Display

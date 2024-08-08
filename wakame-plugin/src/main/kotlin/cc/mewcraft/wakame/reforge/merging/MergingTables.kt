@@ -25,7 +25,7 @@ object MergingTables : Initializable {
         tables.clear()
         val tables = MergingTableSerializer.loadAll()
         this.tables.putAll(tables)
-        this.tables.put("wtf", MergingTableWtf)
+        this.tables.put("wtf", WtfMergingTable)
     }
 
     override fun onPostWorld() {

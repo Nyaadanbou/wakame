@@ -1,13 +1,11 @@
-package cc.mewcraft.wakame.gui.modding
+package cc.mewcraft.wakame.gui.mod
 
-import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.bypassPacket
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.modding.ModdingSession
 import cc.mewcraft.wakame.reforge.modding.ModdingTable
-import cc.mewcraft.wakame.reforge.modding.SimpleModdingSession
 import cc.mewcraft.wakame.util.hideTooltip
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component.text
@@ -43,21 +41,21 @@ import kotlin.properties.Delegates
  * - 然后主菜单中便会出现若干个*子菜单*, 每个*子菜单*对应物品上的一个词条栏
  * - 在每一个子菜单中:
  *    - 玩家可以看到子菜单所关联的词条栏信息
- *    - 玩家可以将一个便携式物品放入子菜单的*输入容器*中
+ *    - 玩家可以将一个便携式核心放入子菜单的*输入容器*中
  *    - 这相当于告诉定制台: 我要消耗这个物品来定制这个词条栏
  * - 主菜单的 [outputInventory] 会实时显示定制之后的物品
  * - 玩家可以随时将定制后的物品从 [outputInventory] 中取出
- * - 如果玩家取出 [outputInventory] 中的物品, 则相当于完成定制, 同时会消耗掉所有的输入容器中的物品
+ * - 如果玩家取出了 [outputInventory] 中的物品, 则相当于完成定制, 同时会消耗掉所有的输入容器中的物品
  *
  * ## 实现原则
  * - GUI 里面玩家能看到的所有物品必须全部都是深度克隆
  * - 所有被实际操作的物品均储存在 [ModdingSession]
  */
-class ModdingMenu(
+internal class ModdingMenu(
     val table: ModdingTable,
     val viewer: Player,
 ) : KoinComponent {
-    private val logger: Logger by inject()
+    val logger: Logger by inject()
 
     /**
      * 向指定玩家打开定制台的主界面.
@@ -80,11 +78,11 @@ class ModdingMenu(
     }
 
     /**
-     * 正在进行中的定制.
+     * 当前正在进行中的定制.
      *
-     * 初始值为 `null`, 因为玩家刚打开定制台时, 应该是没有任何正在进行的定制.
+     * 初始值为 `null`, 因为玩家刚打开定制台时, 应该是没有任何正在进行中的定制.
      * 当玩家放入需要定制的物品到定制台时, 实现应该创建一个 [ModdingSession],
-     * 并且把实例赋值到这个属性上.
+     * 并且赋值到这个属性上.
      */
     var currentSession: ModdingSession? by Delegates.observable(null) { _, old, new ->
         logger.info("Current modding session updated: $old -> $new")
@@ -143,39 +141,6 @@ class ModdingMenu(
         primaryWindow.addOpenHandler(::onWindowOpen)
     }
 
-    private fun createCoreModdingSession(
-        viewer: Player, input: NekoStack,
-    ): ModdingSession? {
-        // 开发日记 2024/7/23
-        // 当创建一个会话时, 需要先识别这个输入的物品类型 (namespace:path),
-        // 然后通过定制台的配置文件, 获取到这个物品的定制规则 (RecipeMap),
-        // 然后将这个物品的定制规则传递给会话.
-
-        val inputType = input.key
-        val cells = input.components.get(ItemComponentTypes.CELLS) ?: run {
-            // 如果没有词条栏, 则判定为无法定制
-            logger.error("No cells found in input item: '$input'. This is a bug!")
-            return null
-        }
-
-        // 如果没有定制规则, 则判定为无法定制
-        val itemRule = table.itemRules[inputType] ?: return null
-
-        val recipeMap = SimpleModdingSession.ReplaceMap()
-        for ((id, cell) in cells) {
-
-            // 如果词条栏不存在对应的规则, 则该词条栏不会出现在 GUI 中
-            val cellRule = itemRule.cellRules[id] ?: continue
-
-            val name = cell.provideTooltipName().content
-            val lore = cell.provideTooltipLore().content
-            val recipeDisplay = SimpleModdingSession.Replace.Display(name, lore)
-            val recipe = SimpleModdingSession.Replace(id, cellRule, recipeDisplay)
-            recipeMap.put(id, recipe)
-        }
-        return SimpleModdingSession(viewer, input, recipeMap)
-    }
-
     /**
      * 当输入容器中的物品发生*变化前*调用.
      */
@@ -185,34 +150,32 @@ class ModdingMenu(
         logger.info("Input item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         when {
-            // Case 1: 玩家交换输入槽位中的物品
+            // 玩家交换输入槽位中的物品:
             event.isSwap -> {
                 event.isCancelled = true
                 viewer.sendMessage("猫咪不可以!")
             }
 
-            // Case 2: 玩家将物品放入输入槽位
+            // 玩家将物品放入输入槽位:
             event.isAdd -> {
                 // 不是 NekoStack - 返回
                 val stack = newItem?.tryNekoStack ?: run {
-                    event.isCancelled = true
                     viewer.sendPlainMessage("请放入一个萌芽物品!")
-                    return
+                    event.isCancelled = true; return
                 }
 
                 // 不是有词条栏的物品 - 返回
                 if (!stack.components.has(ItemComponentTypes.CELLS)) {
-                    event.isCancelled = true
                     viewer.sendPlainMessage("请放入一个拥有词条栏的物品!")
-                    return
+                    event.isCancelled = true; return
                 }
 
                 // 创建会话
-                val session = createCoreModdingSession(viewer, stack) ?: run {
-                    event.isCancelled = true
+                val session = ModdingSessionFactory.create(this, stack) ?: run {
                     viewer.sendPlainMessage("该物品不支持定制!")
-                    return
+                    event.isCancelled = true; return
                 }
+
                 // 设置会话
                 currentSession = session
 
@@ -224,19 +187,16 @@ class ModdingMenu(
                 event.newItem = stack.itemStack
 
                 // 更新主菜单的内容
-                val recipeMenus = session.replaceMap.map { (_, recipeSession) ->
-                    ReplaceMenu(this, recipeSession)
-                }
-                val recipeGuis = recipeMenus.map {
-                    it.gui
-                }
-                fillRecipes(recipeGuis)
+                val replaceGuis = session.replaceMap
+                    .map { (_, replace) -> ReplaceMenu(this, replace) }
+                    .map { it.gui }
+                fillReplaceGuis(replaceGuis)
 
                 // 设置输出容器的物品
                 refreshOutput()
             }
 
-            // Case 3: 玩家将物品从输入槽位取出
+            // 玩家将物品从输入槽位取出:
             event.isRemove -> {
                 // 玩家将物品从*输入容器*取出, 意味着定制过程被中途终止了.
                 // 我们需要把玩家放入定制台的所有物品*原封不动*的归还给玩家.
@@ -252,7 +212,7 @@ class ModdingMenu(
                 // 清空输出容器
                 clearOutputSlot()
                 // 清空所有子菜单
-                clearRecipes()
+                clearReplaceGuis()
 
                 // 归还玩家放入定制台的主要物品 (被定制的物品)
                 viewer.inventory.addItem(session.inputItem.unsafe.handle)
@@ -284,13 +244,13 @@ class ModdingMenu(
     private fun onOutputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         logger.info("Output item updating: ${event.previousItem?.type} -> ${event.newItem?.type}")
         when {
-            // Case 1: 玩家向输出容器中添加物品
+            // 玩家向输出容器中添加物品:
             event.isSwap || event.isAdd -> {
                 event.isCancelled = true
                 viewer.sendMessage("猫咪不可以!")
             }
 
-            // Case 2: 玩家从输出容器中取出物品
+            // 玩家从输出容器中取出物品:
             event.isRemove -> {
                 // 首先取消事件, 禁止玩家直接从容器中取出物品.
                 // 原因是我们可能对容器内的物品进行了修改.
@@ -335,7 +295,7 @@ class ModdingMenu(
                 // 清空输出容器 (因为玩家已经拿到手了)
                 clearOutputSlot()
                 // 清空所有子菜单 (相当于消耗掉所需材料)
-                clearRecipes()
+                clearReplaceGuis()
                 // 冻结会话
                 session.frozen = true
                 // 丢弃会话
@@ -369,11 +329,11 @@ class ModdingMenu(
         viewer.playSound(Sound.sound().type(org.bukkit.Sound.BLOCK_ANVIL_PLACE).volume(1f).pitch(0f).build())
     }
 
-    private fun fillRecipes(guis: List<Gui>) {
+    private fun fillReplaceGuis(guis: List<Gui>) {
         primaryGui.setContent(guis)
     }
 
-    private fun clearRecipes() {
+    private fun clearReplaceGuis() {
         primaryGui.setContent(null)
     }
 
@@ -395,8 +355,7 @@ class ModdingMenu(
 
     private fun editOutputSlot(block: (ItemStack) -> Unit) {
         val stack = getOutputSlot() ?: return
-        block(stack)
-        fillOutputSlot(stack)
+        fillOutputSlot(stack.apply(block))
     }
 
     private fun clearOutputSlot() {

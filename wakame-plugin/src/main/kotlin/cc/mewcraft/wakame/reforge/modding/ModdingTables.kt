@@ -34,7 +34,7 @@ object ModdingTables : Initializable {
         tables.clear()
         val tables = ModdingTableSerializer.loadAll()
         this.tables.putAll(tables)
-        this.tables.put("wtf", ModdingTableWtf)
+        this.tables.put("wtf", WtfModdingTable)
     }
 
     override fun onPostWorld() {

@@ -16,6 +16,6 @@ object MergingTableSerializer {
      */
     fun load(tableDir: File): MergingTable {
         // TODO
-        return MergingTableWtf
+        return WtfMergingTable
     }
 }

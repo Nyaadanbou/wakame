@@ -152,9 +152,9 @@ interface ModdingSession : Examinable {
      */
     interface ReplaceMap : Iterable<Map.Entry<String, Replace>> {
         val size: Int
-        fun get(id: String): Replace?
-        fun put(id: String, replace: Replace)
-        fun contains(id: String): Boolean
+        operator fun get(id: String): Replace?
+        operator fun set(id: String, replace: Replace)
+        operator fun contains(id: String): Boolean
 
         /**
          * 获取所有的由玩家放入输入容器的物品.
