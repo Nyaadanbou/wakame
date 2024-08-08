@@ -202,8 +202,7 @@ object NekoStackDelegates {
 
 
 private object EmptyNekoStack : NekoStack {
-    override val unsafe: NekoStack.Unsafe
-        get() = NekoStackSupport.createUnsafe(CompoundTag.create(), ItemStack.empty())
+    override val unsafe: NekoStack.Unsafe = Unsafe
 
     override val itemStack: ItemStack
         get() = ItemStack.empty()
@@ -234,5 +233,12 @@ private object EmptyNekoStack : NekoStack {
 
     override fun erase() {
         // do nothing
+    }
+
+    object Unsafe: NekoStack.Unsafe {
+        override val nbt: CompoundTag
+            get() = CompoundTag.create()
+        override val handle: ItemStack
+            get() = ItemStack.empty()
     }
 }

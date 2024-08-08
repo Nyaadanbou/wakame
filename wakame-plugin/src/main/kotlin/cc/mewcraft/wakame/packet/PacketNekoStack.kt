@@ -195,7 +195,7 @@ private class PacketCustomNekoStack(
         get() = NekoStackSupport.getBehaviors(nbt)
 
     override val unsafe: NekoStack.Unsafe
-        get() = NekoStackSupport.createUnsafe(nbt, handle)
+        get() = Unsafe(this)
 
     override fun clone(): NekoStack {
         throw UnsupportedOperationException("clone() is not supported")
@@ -211,6 +211,13 @@ private class PacketCustomNekoStack(
 
     private fun abortWrites(): Nothing {
         throw UnsupportedOperationException("Write operation is not allowed in PacketCustomNekoStack")
+    }
+
+    class Unsafe(val nekoStack: PacketCustomNekoStack) : NekoStack.Unsafe {
+        override val nbt: CompoundTag
+            get() = nekoStack.nbt
+        override val handle: org.bukkit.inventory.ItemStack
+            get() = nekoStack.handle
     }
 }
 
