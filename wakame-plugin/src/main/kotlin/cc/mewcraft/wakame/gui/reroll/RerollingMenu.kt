@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.reforge.rerolling.RerollingSession
-import cc.mewcraft.wakame.reforge.rerolling.RerollingTable
+import cc.mewcraft.wakame.reforge.reroll.RerollingSession
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable
 import cc.mewcraft.wakame.util.hideTooltip
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.TextDecoration

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.rerolling
+package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates

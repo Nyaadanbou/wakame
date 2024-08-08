@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.modding
+package cc.mewcraft.wakame.reforge.mod
 
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component

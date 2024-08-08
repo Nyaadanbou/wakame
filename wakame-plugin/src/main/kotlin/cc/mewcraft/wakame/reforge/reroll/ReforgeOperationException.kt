@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.rerolling
+package cc.mewcraft.wakame.reforge.reroll
 
 internal class ReforgeOperationException(
     message: String,

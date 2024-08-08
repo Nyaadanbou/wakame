@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.merging
+package cc.mewcraft.wakame.reforge.merge
 
 import java.io.File
 

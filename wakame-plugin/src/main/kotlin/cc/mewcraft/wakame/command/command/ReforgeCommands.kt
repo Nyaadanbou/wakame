@@ -10,9 +10,9 @@ import cc.mewcraft.wakame.command.suspendingHandler
 import cc.mewcraft.wakame.gui.merge.MergingMenu
 import cc.mewcraft.wakame.gui.mod.ModdingMenu
 import cc.mewcraft.wakame.gui.reroll.RerollingMenu
-import cc.mewcraft.wakame.reforge.merging.MergingTable
-import cc.mewcraft.wakame.reforge.modding.ModdingTable
-import cc.mewcraft.wakame.reforge.rerolling.RerollingTable
+import cc.mewcraft.wakame.reforge.merge.MergingTable
+import cc.mewcraft.wakame.reforge.mod.ModdingTable
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable
 import cc.mewcraft.wakame.util.coroutine.BukkitMain
 import kotlinx.coroutines.Dispatchers
 import org.bukkit.command.CommandSender

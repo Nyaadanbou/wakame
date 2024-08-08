@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.modding
+package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.commons.collections.associateNotNull
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.modding
+package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates

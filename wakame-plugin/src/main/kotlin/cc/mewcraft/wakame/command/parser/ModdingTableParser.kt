@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.reforge.modding.ModdingTable
-import cc.mewcraft.wakame.reforge.modding.ModdingTables
+import cc.mewcraft.wakame.reforge.mod.ModdingTable
+import cc.mewcraft.wakame.reforge.mod.ModdingTables
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent

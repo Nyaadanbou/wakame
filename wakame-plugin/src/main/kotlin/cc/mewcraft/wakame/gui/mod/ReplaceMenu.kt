@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.reforge.modding.ModdingSession
+import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.hideAllFlags
 import cc.mewcraft.wakame.util.hideTooltip
 import org.bukkit.Material

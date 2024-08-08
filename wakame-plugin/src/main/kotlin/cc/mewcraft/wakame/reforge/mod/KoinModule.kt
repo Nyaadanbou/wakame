@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.modding
+package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.initializer.Initializable
 import org.koin.core.module.Module

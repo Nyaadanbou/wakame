@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.merging
+package cc.mewcraft.wakame.reforge.merge
 
 /**
  * 代表一个合并台(的配置文件).

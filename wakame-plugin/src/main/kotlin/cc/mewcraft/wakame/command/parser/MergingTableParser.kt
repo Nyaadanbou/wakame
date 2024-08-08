@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.reforge.merging.MergingTable
-import cc.mewcraft.wakame.reforge.merging.MergingTables
+import cc.mewcraft.wakame.reforge.merge.MergingTable
+import cc.mewcraft.wakame.reforge.merge.MergingTables
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
