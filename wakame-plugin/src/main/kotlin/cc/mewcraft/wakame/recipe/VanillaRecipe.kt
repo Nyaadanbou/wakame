@@ -462,7 +462,7 @@ enum class RecipeType(
 }
 
 private fun ConfigurationNode.getRecipeKey(): Key {
-    return this.hint(RecipeSerializer.HINT_NODE) ?: throw SerializationException(
+    return this.hint(VanillaRecipeSerializer.HINT_NODE) ?: throw SerializationException(
         "The hint node for recipe key is not present"
     )
 }
@@ -484,7 +484,7 @@ internal class RecipeTypeBridge<T : VanillaRecipe>(
 /**
  * [VanillaRecipe] 的序列化器.
  */
-internal object RecipeSerializer : TypeSerializer<VanillaRecipe> {
+internal object VanillaRecipeSerializer : TypeSerializer<VanillaRecipe> {
     val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
 
     /**

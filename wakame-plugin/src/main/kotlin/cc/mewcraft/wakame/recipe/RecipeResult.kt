@@ -69,7 +69,7 @@ internal object RecipeResultSerializer : TypeSerializer<RecipeResult> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
         val item = node.node("item").krequire<Key>()
         val amount = node.node("amount").getInt(1).apply {
-            require(this >= 1)
+            require(this >= 1) { "Item amount should not less than 1" }
         }
         return SingleRecipeResult(item, amount)
     }
