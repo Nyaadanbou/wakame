@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.random3
 
-import cc.mewcraft.wakame.util.WatchedSet
+import cc.mewcraft.wakame.util.ObservableDelegates
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -29,7 +29,7 @@ open class SelectionContext(
     /**
      * All the [marks][Mark] that has been added to `this` context.
      */
-    val marks: MutableSet<Mark<*>> by WatchedSet(HashSet())
+    val marks: MutableSet<Mark<*>> by ObservableDelegates.set(HashSet())
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
