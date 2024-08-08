@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.gui.merging
+package cc.mewcraft.wakame.gui.merge
 
 import cc.mewcraft.wakame.reforge.merging.MergingTable
 import org.bukkit.entity.Player

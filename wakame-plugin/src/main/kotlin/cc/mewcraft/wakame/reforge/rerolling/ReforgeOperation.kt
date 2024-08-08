@@ -149,7 +149,7 @@ internal class ReforgeOperation(
             if (sel.selected) {
 
                 // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
-                val selected = sel.group.select(context).firstOrNull() ?: TemplateCoreEmpty
+                val selected = sel.template.select(context).firstOrNull() ?: TemplateCoreEmpty
                 val generated = selected.generate(context)
                 cells.modify(id) { it.setCore(generated) }
 

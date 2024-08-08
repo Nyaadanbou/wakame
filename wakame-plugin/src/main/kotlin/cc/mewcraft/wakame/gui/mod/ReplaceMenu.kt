@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.gui.modding
+package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
@@ -25,13 +25,13 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 
 /**
- * 用于定制*单个*词条栏的菜单, 将被当做子菜单嵌入进 [ModdingMenu] 中.
+ * 用于定制*单个*词条栏核心的菜单, 将被当做子菜单嵌入到 [ModdingMenu] 中.
  *
  * - 该实例在主菜单刚被打开的时候不会创建
  * - 仅当玩家把要定制的物品放入定制台时, 该实例才会被创建
  * - 物品上的*每个*词条栏都有一个对应的 [ReplaceMenu] 实例来处理定制
  */
-class ReplaceMenu(
+internal class ReplaceMenu(
     private val parentMenu: ModdingMenu,
     private val replace: ModdingSession.Replace,
 ) : KoinComponent {
@@ -39,7 +39,7 @@ class ReplaceMenu(
     private val viewer: Player = parentMenu.viewer
 
     private val inputInventory: VirtualInventory = VirtualInventory(/* maxStackSizes = */ intArrayOf(1))
-    private val coreReplaceGui: Gui = Gui.normal { builder ->
+    private val primaryGui: Gui = Gui.normal { builder ->
         // a: 定制对象的预览物品
         // b: 接收玩家输入的物品的容器
         // *: 起视觉引导作用的物品
@@ -58,7 +58,7 @@ class ReplaceMenu(
      * 获取当前定制的 [Gui].
      */
     val gui: Gui
-        get() = coreReplaceGui
+        get() = primaryGui
 
     /**
      * 当输入容器中的物品发生*变化前*调用.
@@ -66,7 +66,7 @@ class ReplaceMenu(
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val prevItem = event.previousItem
         val newItem = event.newItem
-        logger.info("Recipe input updating: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("Replace input updating: ${prevItem?.type} -> ${newItem?.type}")
 
         when {
             // Case 1: 玩家交换输入容器中的物品
@@ -78,7 +78,7 @@ class ReplaceMenu(
             // Case 2: 玩家向输入容器中添加物品
             event.isAdd -> {
                 val session = parentMenu.currentSession ?: run {
-                    logger.error("Modding session (viewer: ${viewer.name}) is null, but an item is being added to the recipe menu. This is a bug!")
+                    logger.error("Modding session (viewer: ${viewer.name}) is null, but an item is being added to the replace menu. This is a bug!")
                     viewer.sendMessage("发生未知错误")
                     event.isCancelled = true; return
                 }
@@ -118,12 +118,12 @@ class ReplaceMenu(
                 event.isCancelled = true
 
                 val moddingSession = parentMenu.currentSession ?: run {
-                    logger.error("Modding session (viewer: ${viewer.name}) is null, but an item is being removed to the recipe menu. This is a bug!")
+                    logger.error("Modding session is null (viewer: ${viewer.name}), but an item is being removed from the replace menu. This is a bug!")
                     return
                 }
 
                 val input = replace.input ?: run {
-                    logger.error("Recipe session (viewer: ${viewer.name}) input is null, but an item is being removed from the recipe menu. This is a bug!")
+                    logger.error("Replace's input is null (viewer: ${viewer.name}), but an item is being removed from the replace menu. This is a bug!")
                     return
                 }
 
@@ -147,7 +147,7 @@ class ReplaceMenu(
     private fun onInputInventoryPostUpdate(event: ItemPostUpdateEvent) {
         val prevItem = event.previousItem
         val newItem = event.newItem
-        logger.info("Recipe input updated: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("Replace input updated: ${prevItem?.type} -> ${newItem?.type}")
     }
 
     private fun fillInputSlot(stack: ItemStack) {

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.gui.rerolling
+package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.display.ItemRenderer
 import cc.mewcraft.wakame.item.NekoStack
@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.TextDecoration
  * 用于渲染重造后的物品.
  */
 // TODO 更丰富的结果预览:
-//  - 能够显示哪些词条栏会被重造, 哪些不会
+//  能够显示哪些词条栏会被重造, 哪些不会
 //  这要求对渲染模块进行重构 ...
 internal class ResultItemRenderer(
     private val result: RerollingSession.Result,

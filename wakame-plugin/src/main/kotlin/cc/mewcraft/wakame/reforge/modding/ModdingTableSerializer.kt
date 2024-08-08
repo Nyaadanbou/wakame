@@ -112,7 +112,7 @@ internal object ModdingTableSerializer : KoinComponent {
                     }.buildAndLoadString(text)
 
                     val cellRuleMap = itemNode.node("cells").krequire<Map<String, ModdingTable.CellRule>>()
-                    val itemRule = ModdingTableImpl.ItemRule(key, ModdingTableImpl.CellRuleMap(cellRuleMap))
+                    val itemRule = SimpleModdingTable.ItemRule(key, SimpleModdingTable.CellRuleMap(cellRuleMap))
                     key to itemRule
                 } catch (e: Exception) {
                     logger.error("Can't load item rule: '${it.file.relativeTo(moddingDir)}'", e)
@@ -120,9 +120,9 @@ internal object ModdingTableSerializer : KoinComponent {
                 }
             }
             .toMap(HashMap())
-            .let(ModdingTableImpl::ItemRuleMap)
+            .let(SimpleModdingTable::ItemRuleMap)
 
-        return ModdingTableImpl(
+        return SimpleModdingTable(
             enabled = tableMainData.enabled,
             title = tableMainData.title,
             cost = tableMainData.cost,
@@ -148,7 +148,7 @@ internal object ModdingTableSerializer : KoinComponent {
                 .toMap()
             val itemLevelModifier = node.node("item_level_modifier").getDouble(0.0)
             val coreLevelModifier = node.node("core_level_modifier").getDouble(0.0)
-            return ModdingTableImpl.Cost(
+            return SimpleModdingTable.Cost(
                 base = base,
                 perCore = perCore,
                 perCurse = perCurse,
@@ -167,7 +167,7 @@ internal object ModdingTableSerializer : KoinComponent {
             val acceptedCores = node.node("accepted_cores").getList<CoreMatchRule>(emptyList())
             val acceptedCurses = node.node("accepted_curses").getList<CurseMatchRule>(emptyList())
             val requireElementMatch = node.node("require_element_match").getBoolean(false)
-            return ModdingTableImpl.CellRule(
+            return SimpleModdingTable.CellRule(
                 permission = permission,
                 cost = cost,
                 modLimit = modLimit,

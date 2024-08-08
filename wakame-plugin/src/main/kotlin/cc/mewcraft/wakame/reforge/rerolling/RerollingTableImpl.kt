@@ -9,7 +9,7 @@ import java.util.stream.Stream
 internal object WtfRerollingTable : RerollingTable {
     override val identifier: String = "wtf"
     override val enabled: Boolean = true
-    override val title: Component = Component.text("Rerolling Table (CheatMode ON)")
+    override val title: Component = Component.text("Rerolling Table (Cheat ON)")
     override val cost: RerollingTable.Cost = ZeroCost
     override val itemRules: RerollingTable.ItemRuleMap = AnyItemRuleMap
 

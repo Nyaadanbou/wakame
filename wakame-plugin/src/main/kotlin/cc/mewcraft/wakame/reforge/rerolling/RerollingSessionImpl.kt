@@ -147,7 +147,7 @@ class SimpleRerollingSession(
     class Selection(
         override val id: String,
         override val rule: RerollingTable.CellRule,
-        override val group: Group<TemplateCore, GenerationContext>,
+        override val template: Group<TemplateCore, GenerationContext>,
         override val display: RerollingSession.Selection.Display,
     ) : RerollingSession.Selection, KoinComponent {
         private val logger: Logger by inject()
@@ -163,7 +163,7 @@ class SimpleRerollingSession(
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("id", id),
             ExaminableProperty.of("rule", rule),
-            ExaminableProperty.of("group", group),
+            ExaminableProperty.of("group", template),
             ExaminableProperty.of("display", display),
             ExaminableProperty.of("selected", selected),
         )

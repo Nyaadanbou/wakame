@@ -156,7 +156,7 @@ internal class SimpleModdingSession(
             return map[id]
         }
 
-        override fun put(id: String, replace: ModdingSession.Replace) {
+        override fun set(id: String, replace: ModdingSession.Replace) {
             map[id] = replace
         }
 

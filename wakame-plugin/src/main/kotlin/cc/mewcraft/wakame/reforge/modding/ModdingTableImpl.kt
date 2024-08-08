@@ -9,13 +9,13 @@ import java.util.stream.Stream
 /**
  * 一个没有任何限制的定制台.
  */
-object ModdingTableWtf : ModdingTable {
+internal object WtfModdingTable : ModdingTable {
     override val enabled: Boolean = true
-    override val title: Component = Component.text("Wtf Modding Table")
-    override val cost: ModdingTable.Cost = CostFree
-    override val itemRules: ModdingTable.ItemRuleMap = ItemRuleMapAny
+    override val title: Component = Component.text("Modding Table (Cheat ON)")
+    override val cost: ModdingTable.Cost = ZeroCost
+    override val itemRules: ModdingTable.ItemRuleMap = AnyItemRuleMap
 
-    data object CostFree : ModdingTable.Cost {
+    private object ZeroCost : ModdingTable.Cost {
         override val base: Double = 0.0
         override val perCore: Double = 0.0
         override val perCurse: Double = 0.0
@@ -24,13 +24,13 @@ object ModdingTableWtf : ModdingTable {
         override val coreLevelModifier: Double = 0.0
     }
 
-    data class ItemRuleAny(
+    private class AnyItemRule(
         override val target: Key,
     ) : ModdingTable.ItemRule {
-        override val cellRules: ModdingTable.CellRuleMap = CellRuleMapAny
+        override val cellRules: ModdingTable.CellRuleMap = AnyCellRuleMap
     }
 
-    data object CellRuleAny : ModdingTable.CellRule {
+    private object AnyCellRule : ModdingTable.CellRule {
         override val permission: String? = null
         override val cost: Double = 0.0
         override val modLimit: Int = Int.MAX_VALUE
@@ -39,15 +39,15 @@ object ModdingTableWtf : ModdingTable {
         override val requireElementMatch: Boolean = false
     }
 
-    data object CellRuleMapAny : ModdingTable.CellRuleMap {
+    private object AnyCellRuleMap : ModdingTable.CellRuleMap {
         override fun get(key: String): ModdingTable.CellRule {
-            return CellRuleAny
+            return AnyCellRule
         }
     }
 
-    data object ItemRuleMapAny : ModdingTable.ItemRuleMap {
+    private object AnyItemRuleMap : ModdingTable.ItemRuleMap {
         override fun get(key: Key): ModdingTable.ItemRule {
-            return ItemRuleAny(key)
+            return AnyItemRule(key)
         }
     }
 }
@@ -55,7 +55,7 @@ object ModdingTableWtf : ModdingTable {
 /**
  * 一个标准的定制台, 需要从配置文件中构建.
  */
-internal class ModdingTableImpl(
+internal class SimpleModdingTable(
     override val enabled: Boolean,
     override val title: Component,
     override val cost: ModdingTable.Cost,

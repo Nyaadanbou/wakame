@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.gui.rerolling
+package cc.mewcraft.wakame.gui.reroll
 
 import org.koin.dsl.module
 
