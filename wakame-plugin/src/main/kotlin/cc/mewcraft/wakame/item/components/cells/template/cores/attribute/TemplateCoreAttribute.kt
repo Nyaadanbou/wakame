@@ -55,7 +55,7 @@ internal data class TemplateCoreAttributeR(
 ) : TemplateCoreAttribute, AttributeComponentGroupR<RandomizedValue> {
     override fun generate(context: GenerationContext): CoreAttribute {
         populateContextWithDefault(context)
-        val factor = context.levelOrThrow
+        val factor = context.level ?: 0
         val lower = lower.calculate(factor)
         val upper = upper.calculate(factor)
         return CoreAttributeR(key, operation, min(lower, upper), max(lower, upper))
@@ -80,7 +80,7 @@ internal data class TemplateCoreAttributeRE(
 ) : TemplateCoreAttribute, AttributeComponentGroupRE<RandomizedValue> {
     override fun generate(context: GenerationContext): CoreAttribute {
         populateContextWithDefault(context)
-        val factor = context.levelOrThrow
+        val factor = context.level ?: 0
         val lower = lower.calculate(factor)
         val upper = upper.calculate(factor)
         return CoreAttributeRE(key, operation, min(lower, upper), max(lower, upper), element)
@@ -104,7 +104,7 @@ internal data class TemplateCoreAttributeS(
 ) : TemplateCoreAttribute, AttributeComponentGroupS<RandomizedValue> {
     override fun generate(context: GenerationContext): CoreAttribute {
         populateContextWithDefault(context)
-        val factor = context.levelOrThrow
+        val factor = context.level ?: 0
         val value = value.calculate(factor)
         return CoreAttributeS(key, operation, value)
     }
@@ -126,7 +126,7 @@ internal data class TemplateCoreAttributeSE(
 ) : TemplateCoreAttribute, AttributeComponentGroupSE<RandomizedValue> {
     override fun generate(context: GenerationContext): CoreAttribute {
         populateContextWithDefault(context)
-        val factor = context.levelOrThrow
+        val factor = context.level ?: 0
         val value = value.calculate(factor)
         return CoreAttributeSE(key, operation, value, element)
     }

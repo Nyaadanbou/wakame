@@ -48,25 +48,9 @@ class GenerationContext(
     var level: Short? by ObservableDelegates.reference(null)
 
     /**
-     * 已经生成的物品等级.
-     *
-     * @throws GenerationContextException
-     */
-    val levelOrThrow: Short
-        get() = level ?: throw GenerationContextException("No 'level' is present in the generation context")
-
-    /**
      * 已经生成的 [Rarity].
      */
     var rarity: Rarity? by ObservableDelegates.reference(null)
-
-    /**
-     * 已经生成的 [Rarity].
-     *
-     * @throws GenerationContextException
-     */
-    val rarityOrThrow: Rarity
-        get() = rarity ?: throw GenerationContextException("No 'rarity' is present in the generation context")
 
     /**
      * 已经生成的 [Element].

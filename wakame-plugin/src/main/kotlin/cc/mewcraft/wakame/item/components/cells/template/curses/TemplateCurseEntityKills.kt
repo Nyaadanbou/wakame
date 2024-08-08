@@ -33,7 +33,7 @@ data class TemplateCurseEntityKills(
 ) : TemplateCurse {
     override val key: Key = CurseConstants.createKey { ENTITY_KILLS }
     override fun generate(context: GenerationContext): Curse {
-        val level = context.levelOrThrow
+        val level = context.level ?: 0
         val count = this.count.calculate(level).toStableInt()
         return CurseEntityKills(index, count)
     }
