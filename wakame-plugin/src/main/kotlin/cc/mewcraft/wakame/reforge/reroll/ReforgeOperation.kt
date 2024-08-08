@@ -72,25 +72,34 @@ internal class ReforgeOperation(
         val trigger = GenerationTrigger.direct(level)
         val context = GenerationContext(trigger, inputItem.key)
 
-        // 先把*不可由玩家改变的信息*写入 context
-        // 对于这些信息, 有什么就写入什么, 无需跳过
-        inputItem.components.get(ItemComponentTypes.RARITY)?.rarity?.let { context.rarity = it }
-        inputItem.components.get(ItemComponentTypes.ELEMENTS)?.elements?.let { context.elements += it }
-        inputItem.components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz?.let { context.kizamiz += it }
+        // 先把*不可由玩家改变的信息*全部写入 context
+        level.toShort().let {
+            context.level = it
+        }
+        inputItem.components.get(ItemComponentTypes.RARITY)?.rarity?.let {
+            context.rarity = it
+        }
+        inputItem.components.get(ItemComponentTypes.ELEMENTS)?.elements?.let {
+            context.elements += it
+        }
+        inputItem.components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz?.let {
+            context.kizamiz += it
+        }
 
-        // 然后再把*可由玩家改变的信息*写入 context
-        // 注意, 我们必须跳过玩家选择要重造的词条栏.
-        // 如果不跳过, 那么新的词条栏将无法被正确生成.
-        // 例如, 由于已存在相同的信息而最终生成了空词条栏.
-        cells.filter { (id, _) -> !selections.contains(id) }
-            .map { (_, cell) -> cell.getCore() }
-            .forEach { core ->
-                when (core) {
-                    is CoreSkill ->
-                        context.skills += SkillContextHolder(core.key)
-
-                    is CoreAttribute ->
-                        context.attributes += AttributeContextHolder(core.key, core.operation, core.element)
+        // 然后再把*可由玩家改变的信息*全部写入 context
+        cells
+            .filter { (id, _) ->
+                // 注意, 我们必须跳过玩家选择要重造的词条栏.
+                // 如果不跳过, 那么新的词条栏将无法被正确生成.
+                // 例如, 由于已存在相同的信息而最终生成了空词条栏.
+                selections[id]?.selected == false
+            }
+            .forEach { (_, cell) ->
+                when (
+                    val core = cell.getCore()
+                ) {
+                    is CoreSkill -> context.skills += SkillContextHolder(core.key)
+                    is CoreAttribute -> context.attributes += AttributeContextHolder(core.key, core.operation, core.element)
                 }
             }
 
@@ -168,7 +177,7 @@ internal class ReforgeOperation(
         // 计算重造物品的总花费.
         val compute = table.cost.totalFunction.compute(
             base = table.cost.base,
-            rarity = table.cost.rarityNumberMapping.getOrDefault(context.rarityOrThrow.key, .0),
+            rarity = context.rarity?.key?.let { table.cost.rarityNumberMapping.getOrDefault(it, .0) } ?: .0,
             itemLevel = level,
             allCount = selections.size,
             selectedCount = selections.count { it.selected },

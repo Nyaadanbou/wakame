@@ -92,6 +92,8 @@ internal class SelectionMenu(
 
             // 重新渲染主菜单的输出物品
             parentMenu.refreshOutput()
+
+            notifyWindows()
         }
     }
 }
