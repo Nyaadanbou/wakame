@@ -1,4 +1,4 @@
-package reforge.modding
+package reforge.mod
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.rarity.rarityModule
