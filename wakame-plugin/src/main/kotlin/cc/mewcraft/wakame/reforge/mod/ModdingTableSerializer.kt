@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.reforge.mod
 import cc.mewcraft.commons.collections.associateNotNull
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.rarity.RaritySerializer
 import cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.util.NamespacedPathCollector
 import cc.mewcraft.wakame.util.kregister
@@ -28,7 +27,7 @@ import java.lang.reflect.Type
  */
 internal object ModdingTableSerializer : KoinComponent {
     const val REFORGE_DIR_NAME = "reforge"
-    const val MODDING_DIR_NAME = "modding"
+    const val MODDING_DIR_NAME = "mod"
 
     private val logger: Logger by inject()
     private val moddingDir by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(MODDING_DIR_NAME) }
@@ -77,24 +76,24 @@ internal object ModdingTableSerializer : KoinComponent {
     fun load(tableDir: File): ModdingTable {
         require(tableDir.isDirectory) { "Not a directory: '$tableDir'" }
 
-        val tableMainFile = tableDir.resolve("config.yml")
-        val tableItemsDir = tableDir.resolve("items")
+        val tableMainConfigFile = tableDir.resolve("config.yml")
+        val tableItemsDirectory = tableDir.resolve("items")
 
         // config.yml 的配置节点
-        val tableMainNode = yamlConfig {
+        val tableMainConfigNode = yamlConfig {
             withDefaults()
             serializers { kregister(Cost) }
-        }.buildAndLoadString(tableMainFile.readText())
+        }.buildAndLoadString(tableMainConfigFile.readText())
 
         // 解析主要配置
-        val tableMainData = object {
-            val enabled: Boolean = tableMainNode.node("enabled").getBoolean(true)
-            val title: Component = tableMainNode.node("title").get<Component>(Component.text("Unnamed Modding Table"))
-            val cost: ModdingTable.Cost = tableMainNode.node("cost").krequire<ModdingTable.Cost>()
+        val tableMainConfigData = object {
+            val enabled: Boolean = tableMainConfigNode.node("enabled").getBoolean(true)
+            val title: Component = tableMainConfigNode.node("title").get<Component>(Component.text("Unnamed Modding Table"))
+            val cost: ModdingTable.Cost = tableMainConfigNode.node("cost").krequire<ModdingTable.Cost>()
         }
 
         // 解析物品规则
-        val itemRuleMap = NamespacedPathCollector(tableItemsDir, true)
+        val itemRuleMap = NamespacedPathCollector(tableItemsDirectory, true)
             .collect("yml")
             .associateNotNull {
                 try {
@@ -103,7 +102,6 @@ internal object ModdingTableSerializer : KoinComponent {
                     val itemNode = yamlConfig {
                         withDefaults()
                         serializers {
-                            kregister(RaritySerializer)
                             kregister(CellRule)
                             kregister(CoreMatchRuleSerializer)
                             kregister(CurseMatchRuleSerializer)
@@ -123,9 +121,9 @@ internal object ModdingTableSerializer : KoinComponent {
             .let(SimpleModdingTable::ItemRuleMap)
 
         return SimpleModdingTable(
-            enabled = tableMainData.enabled,
-            title = tableMainData.title,
-            cost = tableMainData.cost,
+            enabled = tableMainConfigData.enabled,
+            title = tableMainConfigData.title,
+            cost = tableMainConfigData.cost,
             itemRules = itemRuleMap,
         )
     }

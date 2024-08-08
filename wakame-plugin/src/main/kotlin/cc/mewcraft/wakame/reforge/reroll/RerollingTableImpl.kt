@@ -66,7 +66,6 @@ internal object WtfRerollingTable : RerollingTable {
     }
 }
 
-// TODO 完成 SimpleRerollingTable 的序列化
 internal class SimpleRerollingTable(
     override val identifier: String,
     override val enabled: Boolean,
@@ -74,69 +73,86 @@ internal class SimpleRerollingTable(
     override val cost: RerollingTable.Cost,
     override val itemRules: RerollingTable.ItemRuleMap,
 ) : RerollingTable {
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("enabled", enabled),
+        ExaminableProperty.of("title", title),
+        ExaminableProperty.of("cost", cost),
+        ExaminableProperty.of("itemRules", itemRules),
+    )
+
+    override fun toString(): String =
+        toSimpleString()
+
+    data class Cost(
+        override val base: Double,
+        override val rarityNumberMapping: Map<Key, Double>,
+        override val eachFunction: RerollingTable.Cost.EachFunction,
+        override val totalFunction: RerollingTable.Cost.TotalFunction,
+    ) : RerollingTable.Cost {
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("base", base),
+            ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
+            ExaminableProperty.of("eachFunction", eachFunction),
+            ExaminableProperty.of("totalFunction", totalFunction),
+        )
+
+        override fun toString(): String =
+            toSimpleString()
+    }
+
     data class CellRule(
         override val cost: Double,
         override val maxReroll: Int,
     ) : RerollingTable.CellRule {
-        override fun examinableProperties(): Stream<out ExaminableProperty> {
-            return Stream.of(
-                ExaminableProperty.of("cost", cost),
-                ExaminableProperty.of("modLimit", maxReroll),
-            )
-        }
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("cost", cost),
+            ExaminableProperty.of("modLimit", maxReroll),
+        )
 
-        override fun toString(): String {
-            return toSimpleString()
-        }
+        override fun toString(): String =
+            toSimpleString()
     }
 
     data class CellRuleMap(
-        private val map: MutableMap<String, RerollingTable.CellRule> = HashMap(),
+        private val map: Map<String, RerollingTable.CellRule>,
     ) : RerollingTable.CellRuleMap {
         override fun get(key: String): RerollingTable.CellRule? {
             return map[key]
         }
 
-        override fun examinableProperties(): Stream<out ExaminableProperty> {
-            return Stream.of(
-                ExaminableProperty.of("map", map),
-            )
-        }
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("map", map),
+        )
 
-        override fun toString(): String {
-            return toSimpleString()
-        }
+        override fun toString(): String =
+            toSimpleString()
     }
 
     data class ItemRule(
         override val cellRules: RerollingTable.CellRuleMap,
     ) : RerollingTable.ItemRule {
-        override fun examinableProperties(): Stream<out ExaminableProperty> {
-            return Stream.of(
-                ExaminableProperty.of("cellRules", cellRules),
-            )
-        }
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("cellRules", cellRules),
+        )
 
-        override fun toString(): String {
-            return toSimpleString()
-        }
+        override fun toString(): String =
+            toSimpleString()
     }
 
     data class ItemRuleMap(
-        private val map: MutableMap<Key, RerollingTable.ItemRule> = HashMap(),
+        private val map: Map<Key, RerollingTable.ItemRule>,
     ) : RerollingTable.ItemRuleMap {
         override fun get(key: Key): RerollingTable.ItemRule? {
             return map[key]
         }
 
-        override fun examinableProperties(): Stream<out ExaminableProperty> {
-            return Stream.of(
-                ExaminableProperty.of("map", map),
-            )
-        }
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("map", map),
+        )
 
-        override fun toString(): String {
-            return toSimpleString()
-        }
+        override fun toString(): String =
+            toSimpleString()
     }
 }

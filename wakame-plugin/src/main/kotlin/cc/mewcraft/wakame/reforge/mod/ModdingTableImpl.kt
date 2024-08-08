@@ -93,7 +93,7 @@ internal class SimpleModdingTable(
     }
 
     data class ItemRuleMap(
-        val map: Map<Key, ModdingTable.ItemRule>,
+        private val map: Map<Key, ModdingTable.ItemRule>,
     ) : ModdingTable.ItemRuleMap {
         override fun get(key: Key): ModdingTable.ItemRule? {
             return map[key]
@@ -127,7 +127,7 @@ internal class SimpleModdingTable(
     }
 
     data class CellRuleMap(
-        val map: Map<String, ModdingTable.CellRule>,
+        private val map: Map<String, ModdingTable.CellRule>,
     ) : ModdingTable.CellRuleMap {
         override fun get(key: String): ModdingTable.CellRule? {
             return map[key]
