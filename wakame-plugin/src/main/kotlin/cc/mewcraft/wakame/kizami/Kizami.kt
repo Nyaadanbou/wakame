@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.BiIdentifiable
 import cc.mewcraft.wakame.FriendlyNamed
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.KizamiRegistry
@@ -37,7 +38,7 @@ private data class KizamiType(
     override val displayName: Component,
     override val styles: Array<StyleBuilderApplicable>,
 ) : KoinComponent, Kizami {
-    override val key: Key = Key.key("kizami", uniqueId)
+    override val key: Key = Key.key(Namespaces.KIZAMI, uniqueId)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("uniqueId", uniqueId),

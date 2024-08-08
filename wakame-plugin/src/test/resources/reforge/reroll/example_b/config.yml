@@ -1,0 +1,14 @@
+enabled: true
+title: "重造工作台: Example B"
+cost:
+  constants:
+    base: 200.0
+    rarity_number_mapping:
+      common: 1.0
+      uncommon: 2.0
+      rare: 3.0
+      epic: 4.0
+      ancient: 5.0
+  calculations:
+    each: "cost * reroll_count"
+    total: "(all_count - selected_count) * 100 + rarity + unselected_cost_sum"
