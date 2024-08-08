@@ -7,9 +7,7 @@ import cc.mewcraft.wakame.item.templates.filter.SkillContextHolder
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random3.SelectionContext
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.util.WatchedPrimitive
-import cc.mewcraft.wakame.util.WatchedReference
-import cc.mewcraft.wakame.util.WatchedSet
+import cc.mewcraft.wakame.util.ObservableDelegates
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import java.util.concurrent.ThreadLocalRandom
@@ -47,7 +45,7 @@ class GenerationContext(
     /**
      * 已经生成的物品等级.
      */
-    var level: Short? by WatchedPrimitive(null)
+    var level: Short? by ObservableDelegates.reference(null)
 
     /**
      * 已经生成的物品等级.
@@ -60,7 +58,7 @@ class GenerationContext(
     /**
      * 已经生成的 [Rarity].
      */
-    var rarity: Rarity? by WatchedReference(null)
+    var rarity: Rarity? by ObservableDelegates.reference(null)
 
     /**
      * 已经生成的 [Rarity].
@@ -73,27 +71,27 @@ class GenerationContext(
     /**
      * 已经生成的 [Element].
      */
-    val elements: MutableCollection<Element> by WatchedSet(HashSet())
+    val elements: MutableCollection<Element> by ObservableDelegates.set(HashSet())
 
     /**
      * 已经生成的 [Kizami].
      */
-    val kizamiz: MutableCollection<Kizami> by WatchedSet(HashSet())
+    val kizamiz: MutableCollection<Kizami> by ObservableDelegates.set(HashSet())
 
     /**
      * 已经生成的 [Curse].
      */
-    val curses: MutableCollection<CurseContextHolder> by WatchedSet(HashSet())
+    val curses: MutableCollection<CurseContextHolder> by ObservableDelegates.set(HashSet())
 
     /**
      * 已经生成的 [Skill].
      */
-    val skills: MutableCollection<SkillContextHolder> by WatchedSet(HashSet())
+    val skills: MutableCollection<SkillContextHolder> by ObservableDelegates.set(HashSet())
 
     /**
      * 已经生成的 [AttributeContextHolder].
      */
-    val attributes: MutableCollection<AttributeContextHolder> by WatchedSet(HashSet())
+    val attributes: MutableCollection<AttributeContextHolder> by ObservableDelegates.set(HashSet())
 
     /**
      * 构建一个异常.
