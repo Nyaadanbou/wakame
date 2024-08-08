@@ -65,7 +65,7 @@ interface RerollingSession : Examinable {
     /**
      * 根据 [selections] 的当前状态, 对 [inputItem] 执行一次重造.
      *
-     * 该函数在每次执行后, 会将新的重造后的对象赋值到 [outputItem].
+     * 该函数在每次执行后 (其返回前), 会将新的重造结果赋值到 [result].
      */
     fun reforge(): Result
 

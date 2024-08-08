@@ -61,11 +61,11 @@ internal class RerollingMenu(
 
         // 渲染输出物品
         val resultItem = result.item
-        val renderer = ResultItemRenderer(result)
+        val renderer = OutputItemRenderer(result)
         renderer.render(resultItem)
 
         // 填充输出容器
-        editOutputSlot { resultItem.unsafe.handle }
+        fillOutputSlot(resultItem.unsafe.handle)
     }
 
     /**
@@ -99,7 +99,7 @@ internal class RerollingMenu(
         builder.addIngredient('o', outputInventory)
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
-        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_VERTICAL)
     }
     private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
         setGui(primaryGui)
@@ -209,15 +209,15 @@ internal class RerollingMenu(
             // 玩家尝试交换物品:
             // 禁止该操作.
             event.isSwap -> {
-                event.isCancelled = true
-                viewer.sendPlainMessage("不支持交换物品.")
+                viewer.sendPlainMessage("猫咪不可以!")
+                event.isCancelled = true; return
             }
 
             // 玩家把物品放进输出容器:
             // 禁止该操作.
             event.isAdd -> {
-                event.isCancelled = true
-                viewer.sendPlainMessage("不支持放入物品.")
+                viewer.sendPlainMessage("猫咪不可以!")
+                event.isCancelled = true; return
             }
 
             // 玩家从输出容器拿出物品:
@@ -240,6 +240,7 @@ internal class RerollingMenu(
                 // 把重造后的物品给玩家
                 viewer.inventory.addItem(result.item.unsafe.handle)
 
+                clearInputSlot()
                 clearOutputSlot()
                 clearSelectionGuis()
 
@@ -263,6 +264,10 @@ internal class RerollingMenu(
             return
         }
 
+        session.frozen = true
+        rerollingSession = null
+
+        clearInputSlot()
         clearOutputSlot()
         clearSelectionGuis()
         session.returnInput(viewer)
@@ -280,10 +285,6 @@ internal class RerollingMenu(
         primaryGui.setContent(null)
     }
 
-    private fun fillInputSlot(stack: ItemStack) {
-        inputInventory.setItemSilently(0, stack)
-    }
-
     private fun clearInputSlot() {
         inputInventory.setItemSilently(0, null)
     }
@@ -292,17 +293,8 @@ internal class RerollingMenu(
         outputInventory.setItemSilently(0, stack)
     }
 
-    private fun getOutputSlot(): ItemStack? {
-        return outputInventory.getItem(0)
-    }
-
     private fun clearOutputSlot() {
         outputInventory.setItemSilently(0, null)
-    }
-
-    private fun editOutputSlot(block: (ItemStack) -> Unit) {
-        val stack = getOutputSlot() ?: return
-        fillOutputSlot(stack.apply(block))
     }
 
     private class PrevItem : ScrollItem(-1) {

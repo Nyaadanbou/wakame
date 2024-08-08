@@ -25,13 +25,13 @@ class SimpleRerollingSession(
     private val logger: Logger by inject()
 
     override var result: RerollingSession.Result by Delegates.observable(Result.empty()) { _, _, new ->
-        logger.info("Rerolling session's result updated: $new")
+        logger.info("RerollingSession's result updated: $new")
     }
 
     override val inputItem: NekoStack by NekoStackDelegates.readOnly(inputItem)
 
     override var confirmed: Boolean by Delegates.observable(false) { _, _, new ->
-        logger.info("Rerolling session's confirmed status updated: $new")
+        logger.info("RerollingSession's confirmed status updated: $new")
     }
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
@@ -39,7 +39,7 @@ class SimpleRerollingSession(
             logger.error("Trying to unfreeze a frozen session. This is a bug!")
             return@vetoable false
         }
-        logger.info("Rerolling session's frozen status updated: $new")
+        logger.info("RerollingSession's frozen status updated: $new")
         return@vetoable true
     }
 
@@ -69,12 +69,13 @@ class SimpleRerollingSession(
         viewer.inventory.addItem(inputItem.unsafe.handle)
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("viewer", viewer.name),
-            ExaminableProperty.of("table", table),
-        )
-    }
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("viewer", viewer.name),
+        ExaminableProperty.of("table", table),
+    )
+
+    override fun toString(): String =
+        toSimpleString()
 
     class Result(
         override val successful: Boolean,
@@ -90,7 +91,8 @@ class SimpleRerollingSession(
             ExaminableProperty.of("item", item),
         )
 
-        override fun toString(): String = toSimpleString()
+        override fun toString(): String =
+            toSimpleString()
 
         companion object {
             private val EMPTY: Result = Result(false, TotalCost.zero(), NekoStack.empty())
@@ -140,7 +142,8 @@ class SimpleRerollingSession(
                 ExaminableProperty.of("default", default),
             )
 
-            override fun toString(): String = toSimpleString()
+            override fun toString(): String =
+                toSimpleString()
         }
     }
 
@@ -152,8 +155,8 @@ class SimpleRerollingSession(
     ) : RerollingSession.Selection, KoinComponent {
         private val logger: Logger by inject()
 
-        override var selected: Boolean by Delegates.observable(false) { _, _, new ->
-            logger.info("Cell session's selected status updated: $new")
+        override var selected: Boolean by Delegates.observable(false) { _, old, new ->
+            logger.info("Selection status updated (cell: '$id'): $old -> $new")
         }
 
         override fun invertSelect() {
@@ -168,7 +171,8 @@ class SimpleRerollingSession(
             ExaminableProperty.of("selected", selected),
         )
 
-        override fun toString(): String = toSimpleString()
+        override fun toString(): String =
+            toSimpleString()
 
         class Display(
             override val name: Component,
@@ -180,6 +184,14 @@ class SimpleRerollingSession(
                     meta.lore(lore)
                 }
             }
+
+            override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+                ExaminableProperty.of("name", name),
+                ExaminableProperty.of("lore", lore),
+            )
+
+            override fun toString(): String =
+                toSimpleString()
         }
     }
 
@@ -214,6 +226,7 @@ class SimpleRerollingSession(
             ExaminableProperty.of("map", map),
         )
 
-        override fun toString(): String = toSimpleString()
+        override fun toString(): String =
+            toSimpleString()
     }
 }
