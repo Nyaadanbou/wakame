@@ -260,7 +260,7 @@ private class CustomNekoStack(
         get() = NekoStackSupport.getBehaviors(nbt)
 
     override val unsafe: NekoStack.Unsafe
-        get() = NekoStackUnsafe(nbt, handle)
+        get() = Unsafe(this)
 
     override fun clone(): NekoStack {
         return CustomNekoStack(itemStack)
@@ -277,6 +277,15 @@ private class CustomNekoStack(
 
     override fun toString(): String {
         return toSimpleString()
+    }
+
+    class Unsafe(
+        val owner: CustomNekoStack,
+    ) : NekoStack.Unsafe {
+        override val nbt: CompoundTag
+            get() = owner.nbt
+        override val handle: ItemStack
+            get() = owner.handle
     }
 }
 
@@ -461,16 +470,7 @@ internal object NekoStackSupport {
         }
         wakameTag.putInt(BaseBinaryKeys.VARIANT, variant)
     }
-
-    fun createUnsafe(nbt: CompoundTag, handle: ItemStack): NekoStack.Unsafe {
-        return NekoStackUnsafe(nbt, handle)
-    }
 }
-
-private class NekoStackUnsafe(
-    override val nbt: CompoundTag,
-    override val handle: ItemStack,
-) : NekoStack.Unsafe
 
 private object NekoStackInjections : KoinComponent {
     val logger: Logger by inject()
