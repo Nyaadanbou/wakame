@@ -48,7 +48,7 @@ private class ObservableReference<V>(
             // fallback to default value
             prefix = LoggerPrefix.declaringClass(property)
         }
-        println("$prefix Reference: `${property.name}`, Value: $oldValue -> $newValue")
+        println("$prefix Ref: `${property.name}`, Updated: $oldValue -> $newValue")
     }
 }
 
