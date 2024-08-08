@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.gui.reroll
 import cc.mewcraft.wakame.display.ItemRenderer
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.bypassPacket
-import cc.mewcraft.wakame.reforge.rerolling.RerollingSession
+import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.format.TextDecoration
 

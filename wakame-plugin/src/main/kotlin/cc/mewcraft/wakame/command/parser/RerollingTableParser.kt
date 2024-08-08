@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.reforge.rerolling.RerollingTable
-import cc.mewcraft.wakame.reforge.rerolling.RerollingTables
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable
+import cc.mewcraft.wakame.reforge.reroll.RerollingTables
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent

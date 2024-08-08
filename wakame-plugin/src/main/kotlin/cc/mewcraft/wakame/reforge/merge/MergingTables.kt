@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.merging
+package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.initializer.Initializable
 

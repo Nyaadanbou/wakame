@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.rerolling
+package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key

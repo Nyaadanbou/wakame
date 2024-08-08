@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.gui.reroll
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.reforge.rerolling.RerollingSession
-import cc.mewcraft.wakame.reforge.rerolling.SimpleRerollingSession
+import cc.mewcraft.wakame.reforge.reroll.RerollingSession
+import cc.mewcraft.wakame.reforge.reroll.SimpleRerollingSession
 
 internal object RerollingSessionFactory {
     /**

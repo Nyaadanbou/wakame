@@ -2,7 +2,7 @@ package reforge.modding
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.reforge.modding.ModdingTableSerializer
+import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.registry.registryModule
 import org.junit.jupiter.api.AfterAll

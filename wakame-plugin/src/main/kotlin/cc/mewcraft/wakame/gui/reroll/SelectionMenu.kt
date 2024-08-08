@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.gui.reroll
 
-import cc.mewcraft.wakame.reforge.rerolling.RerollingSession
+import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.util.hideAllFlags
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.merging
+package cc.mewcraft.wakame.reforge.merge
 
 /**
  * 一个没有任何限制的合并台.

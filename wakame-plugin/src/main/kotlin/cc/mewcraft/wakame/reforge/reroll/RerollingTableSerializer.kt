@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.reforge.rerolling
+package cc.mewcraft.wakame.reforge.reroll
 
 import org.koin.core.component.KoinComponent
 import java.io.File

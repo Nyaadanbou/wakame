@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.item.bypassPacket
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.reforge.modding.ModdingSession
-import cc.mewcraft.wakame.reforge.modding.ModdingTable
+import cc.mewcraft.wakame.reforge.mod.ModdingSession
+import cc.mewcraft.wakame.reforge.mod.ModdingTable
 import cc.mewcraft.wakame.util.hideTooltip
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component.text

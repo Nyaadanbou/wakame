@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.reforge.modding.ModdingSession
-import cc.mewcraft.wakame.reforge.modding.SimpleModdingSession
+import cc.mewcraft.wakame.reforge.mod.ModdingSession
+import cc.mewcraft.wakame.reforge.mod.SimpleModdingSession
 
 internal object ModdingSessionFactory {
     /**
