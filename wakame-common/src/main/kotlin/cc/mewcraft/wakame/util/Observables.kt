@@ -58,11 +58,12 @@ private class ObservableCollection<E>(
 ) : ReadOnlyProperty<Any?, MutableCollection<E>> {
     private var observable: ObservableCollection0<E>? = null
     override fun getValue(thisRef: Any?, property: KProperty<*>): MutableCollection<E> {
-        var ret: ObservableCollection0<E>? = observable
-        if (ret == null) {
-            ret = ObservableCollection0(property, source, prefix)
+        var value: ObservableCollection0<E>? = observable
+        if (value == null) {
+            value = ObservableCollection0(property, source, prefix)
+            observable = value
         }
-        return ret
+        return value
     }
 }
 
@@ -72,11 +73,12 @@ private class ObservableList<E>(
 ) : ReadOnlyProperty<Any?, MutableList<E>> {
     private var observable: ObservableList0<E>? = null
     override fun getValue(thisRef: Any?, property: KProperty<*>): MutableList<E> {
-        var ret: ObservableList0<E>? = observable
-        if (ret == null) {
-            ret = ObservableList0(property, source, prefix)
+        var value: ObservableList0<E>? = observable
+        if (value == null) {
+            value = ObservableList0(property, source, prefix)
+            observable = value
         }
-        return ret
+        return value
     }
 }
 
@@ -86,11 +88,12 @@ private class ObservableSet<E>(
 ) : ReadOnlyProperty<Any?, MutableSet<E>> {
     private var observable: ObservableSet0<E>? = null
     override fun getValue(thisRef: Any?, property: KProperty<*>): MutableSet<E> {
-        var ret: ObservableSet0<E>? = observable
-        if (ret == null) {
-            ret = ObservableSet0(property, source, prefix)
+        var observable: ObservableSet0<E>? = observable
+        if (observable == null) {
+            observable = ObservableSet0(property, source, prefix)
+            observable = observable
         }
-        return ret
+        return observable
     }
 }
 
@@ -100,11 +103,12 @@ private class ObservableMap<K, V>(
 ) : ReadOnlyProperty<Any?, MutableMap<K, V>> {
     private var observable: ObservableMap0<K, V>? = null
     override fun getValue(thisRef: Any?, property: KProperty<*>): MutableMap<K, V> {
-        var ret: ObservableMap0<K, V>? = observable
-        if (ret == null) {
-            ret = ObservableMap0(property, source, prefix)
+        var value: ObservableMap0<K, V>? = observable
+        if (value == null) {
+            value = ObservableMap0(property, source, prefix)
+            observable = value
         }
-        return ret
+        return value
     }
 }
 
