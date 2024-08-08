@@ -17,7 +17,7 @@ import java.io.File
 @ReloadDependency(
     runBefore = [ItemRegistry::class]
 )
-object RecipeRegistry : Initializable, KoinComponent {
+object VanillaRecipeRegistry : Initializable, KoinComponent {
     private const val RECIPE_DIR_NAME = "recipes"
     val raw: MutableMap<Key, VanillaRecipe> = mutableMapOf()
 
@@ -48,22 +48,22 @@ object RecipeRegistry : Initializable, KoinComponent {
                 val recipeNode = yamlConfig {
                     withDefaults()
                     serializers {
-                        kregister(RecipeSerializer)
+                        kregister(VanillaRecipeSerializer)
                         kregister(RecipeChoiceSerializer)
                         kregister(RecipeResultSerializer)
                     }
                 }.buildAndLoadString(fileText)
 
                 // 注入 key 节点
-                recipeNode.hint(RecipeSerializer.HINT_NODE, key)
+                recipeNode.hint(VanillaRecipeSerializer.HINT_NODE, key)
                 // 反序列化 Recipe
                 val vanillaRecipe = recipeNode.krequire<VanillaRecipe>()
                 // 添加进临时注册表
                 raw[key] = vanillaRecipe
-                logger.info("Loading recipe: '${vanillaRecipe.key}'")
+                logger.info("Loading vanilla recipe: '${vanillaRecipe.key}'")
 
             } catch (e: Throwable) {
-                val message = "Can't load recipe: '${file.relativeTo(recipeDir)}'"
+                val message = "Can't load vanilla recipe: '${file.relativeTo(recipeDir)}'"
                 if (RunningEnvironment.TEST.isRunning()) {
                     throw IllegalArgumentException(message, e)
                 }
@@ -89,7 +89,7 @@ object RecipeRegistry : Initializable, KoinComponent {
             try {
                 register(it.key, it.value)
             } catch (e: Throwable) {
-                logger.warn("Can't register recipe: '${it.key}'", e)
+                logger.warn("Can't register vanilla recipe: '${it.key}'", e)
             }
         }
     }
@@ -97,7 +97,7 @@ object RecipeRegistry : Initializable, KoinComponent {
     private fun register(key: Key, vanillaRecipe: VanillaRecipe) {
         val success = vanillaRecipe.registerBukkitRecipe()
         if (!success) {
-            logger.warn("Can't register recipe: '$key'")
+            logger.warn("Can't register vanilla recipe: '$key'")
             return
         }
         ALL[key] = vanillaRecipe
@@ -134,7 +134,7 @@ object RecipeRegistry : Initializable, KoinComponent {
                 STONECUTTING[key] = vanillaRecipe
             }
         }
-        logger.info("Registered recipe: '${vanillaRecipe.key}'")
+        logger.info("Registered vanilla recipe: '${vanillaRecipe.key}'")
     }
 
     override fun onPostWorld() {
@@ -150,8 +150,8 @@ object RecipeRegistry : Initializable, KoinComponent {
         loadConfig()
         ThreadType.SYNC.launch {
             registerRecipes()
+            //向所有玩家的客户端发送配方刷新数据包
+            Bukkit.updateRecipes()
         }
-        //向所有玩家的客户端发送配方刷新数据包
-        Bukkit.updateRecipes()
     }
 }

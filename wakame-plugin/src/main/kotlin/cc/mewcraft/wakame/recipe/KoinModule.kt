@@ -7,5 +7,5 @@ import org.koin.dsl.module
 
 
 internal fun recipeModule(): Module = module {
-    single { RecipeRegistry } bind Initializable::class
+    single { VanillaRecipeRegistry } bind Initializable::class
 }

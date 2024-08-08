@@ -29,6 +29,7 @@ import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.resource.resourceModule
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
+import cc.mewcraft.wakame.station.stationModule
 import cc.mewcraft.wakame.test.testModule
 import cc.mewcraft.wakame.tick.tickModule
 import cc.mewcraft.wakame.user.userModule
@@ -88,6 +89,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 resourceModule(),
                 skinModule(),
                 skillModule(),
+                stationModule(),
                 testModule(),
                 tickModule(),
                 userModule(),
