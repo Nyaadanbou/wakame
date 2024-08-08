@@ -33,7 +33,7 @@ data class TemplateCursePeakDamage(
 ) : TemplateCurse {
     override val key: Key = CurseConstants.createKey { PEAK_DAMAGE }
     override fun generate(context: GenerationContext): Curse {
-        val level = context.levelOrThrow
+        val level = context.level ?: 0
         val amount = this.amount.calculate(level).toStableInt()
         return CursePeakDamage(element, amount)
     }
