@@ -1,4 +1,4 @@
-package reforge.rerolling
+package reforge.reroll
 
 class RerollingTableSerializationTest {
 }
