@@ -150,6 +150,9 @@ private class PacketCustomNekoStack(
     val handle: BukkitStack =
         SpigotConversionUtil.toBukkitItemStack(handle0)
 
+    override val isEmpty: Boolean
+        get() = false
+
     override val itemStack: BukkitStack
         get() = abortReads()
 
@@ -227,6 +230,9 @@ private class PacketVanillaNekoStack(
     override val prototype: NekoItem,
     override val components: ItemComponentMap,
 ) : PacketNekoStack {
+    override val isEmpty: Boolean
+        get() = false
+
     override val itemStack: BukkitStack
         get() = abortReads()
 

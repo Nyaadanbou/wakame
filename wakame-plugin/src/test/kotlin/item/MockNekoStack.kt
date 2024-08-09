@@ -15,6 +15,9 @@ import java.util.stream.Stream
 class MockNekoStack(
     override val prototype: NekoItem,
 ) : NekoStack {
+    override val isEmpty: Boolean
+        get() = false
+
     override val itemStack: ItemStack
         get() = throw NotImplementedError("Not implemented")
 
