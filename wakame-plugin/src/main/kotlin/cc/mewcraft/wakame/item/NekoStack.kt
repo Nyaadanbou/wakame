@@ -172,6 +172,15 @@ object NekoStackDelegates {
     }
 
     /**
+     * 创建一个可空的只读 [NekoStack] 委托.
+     *
+     * 当委托对象被访问时, 返回的对象是原始对象的克隆.
+     */
+    fun nullableReadOnly(stack: NekoStack?): ReadOnlyProperty<Any?, NekoStack?> {
+        return NullableReadOnly(stack)
+    }
+
+    /**
      * 创建一个支持读写的 [NekoStack] 委托.
      *
      * 当委托对象被读取时, 返回的对象是原始对象的克隆.
@@ -181,12 +190,30 @@ object NekoStackDelegates {
         return CopyOnWrite(stack)
     }
 
+    /**
+     * 创建一个可空的支持读写的 [NekoStack] 委托.
+     *
+     * 当委托对象被读取时, 返回的对象是原始对象的克隆.
+     * 当委托对象被写入时, 会先将新的对象克隆, 再写入.
+     */
+    fun nullableCopyOnWrite(stack: NekoStack?): ReadWriteProperty<Any?, NekoStack?> {
+        return NullableCopyOnWrite(stack)
+    }
+
     //<editor-fold desc="Implementations">
     private class ReadOnly(
         private val stack: NekoStack,
     ) : ReadOnlyProperty<Any?, NekoStack> {
         override fun getValue(thisRef: Any?, property: KProperty<*>): NekoStack {
             return stack.clone()
+        }
+    }
+
+    private class NullableReadOnly(
+        private val stack: NekoStack?,
+    ) : ReadOnlyProperty<Any?, NekoStack?> {
+        override fun getValue(thisRef: Any?, property: KProperty<*>): NekoStack? {
+            return stack?.clone()
         }
     }
 
@@ -199,6 +226,18 @@ object NekoStackDelegates {
 
         override fun setValue(thisRef: Any?, property: KProperty<*>, value: NekoStack) {
             stack = value.clone()
+        }
+    }
+
+    private class NullableCopyOnWrite(
+        private var stack: NekoStack?,
+    ) : ReadWriteProperty<Any?, NekoStack?> {
+        override fun getValue(thisRef: Any?, property: KProperty<*>): NekoStack? {
+            return stack?.clone()
+        }
+
+        override fun setValue(thisRef: Any?, property: KProperty<*>, value: NekoStack?) {
+            stack = value?.clone()
         }
     }
     //</editor-fold>
