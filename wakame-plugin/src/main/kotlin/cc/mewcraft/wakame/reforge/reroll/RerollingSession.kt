@@ -116,16 +116,24 @@ interface RerollingSession : Examinable {
      * 封装了单个词条栏的选择状态.
      */
     interface Selection : Examinable {
-        /** 词条栏的唯一标识. */
+        /**
+         * 词条栏的唯一标识.
+         */
         val id: String
 
-        /** 词条栏的重造规则. */
+        /**
+         * 词条栏的重造规则.
+         */
         val rule: RerollingTable.CellRule
 
-        /** 用于重新随机词条栏核心的掉落表. */
+        /**
+         * 用于重新随机词条栏核心的掉落表.
+         */
         val template: Group<TemplateCore, GenerationContext>
 
-        /** 渲染词条栏的逻辑. */
+        /**
+         * 渲染词条栏的逻辑.
+         */
         val display: Display
 
         /**
@@ -135,7 +143,9 @@ interface RerollingSession : Examinable {
          */
         var selected: Boolean
 
-        /** 反转当前的选择 [selected]. */
+        /**
+         * 反转当前的选择 [selected].
+         */
         fun invertSelect()
 
         interface Display : Examinable {

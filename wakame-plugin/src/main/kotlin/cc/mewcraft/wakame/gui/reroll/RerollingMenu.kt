@@ -76,7 +76,7 @@ internal class RerollingMenu(
      * 并将其赋值给这个属性.
      */
     var rerollingSession: RerollingSession? by Delegates.observable(null) { _, old, new ->
-        logger.info("Current rerolling session updated: $old -> $new")
+        logger.info("RerollingSession updated: $old -> $new")
     }
 
     val logger: Logger by inject()
@@ -94,7 +94,6 @@ internal class RerollingMenu(
             ". . . . . . . . .",
         )
         builder.addIngredient('.', SimpleItem(ItemStack(Material.BLACK_STAINED_GLASS_PANE).hideTooltip(true)))
-        builder.addIngredient('#', SimpleItem(ItemStack(Material.GREEN_STAINED_GLASS_PANE).hideTooltip(true)))
         builder.addIngredient('i', inputInventory)
         builder.addIngredient('o', outputInventory)
         builder.addIngredient('<', PrevItem())
@@ -104,6 +103,8 @@ internal class RerollingMenu(
     private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
         setGui(primaryGui)
         setTitle(text("重造台").decorate(TextDecoration.BOLD))
+        addOpenHandler(::onWindowOpen)
+        addCloseHandler(::onWindowClose)
     }
     //</editor-fold>
 
@@ -112,8 +113,6 @@ internal class RerollingMenu(
         inputInventory.setPostUpdateHandler(::onInputInventoryPostUpdate)
         outputInventory.setPreUpdateHandler(::onOutputInventoryPreUpdate)
         outputInventory.setPostUpdateHandler(::onOutputInventoryPostUpdate)
-        primaryWindow.addCloseHandler(::onWindowClose)
-        primaryWindow.addOpenHandler(::onWindowOpen)
     }
 
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
@@ -274,7 +273,7 @@ internal class RerollingMenu(
     }
 
     private fun onWindowOpen() {
-        logger.info("Rerolling window opened for ${viewer.name}")
+        logger.info("RerollingMenu opened for ${viewer.name}")
     }
 
     private fun fillSelectionGuis(guis: List<Gui>) {
