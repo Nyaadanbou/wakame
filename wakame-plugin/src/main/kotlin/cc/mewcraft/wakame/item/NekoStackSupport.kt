@@ -217,6 +217,9 @@ private class CustomNekoStack(
             )
         }
 
+    override val isEmpty: Boolean
+        get() = false
+
     override val itemStack: ItemStack
         get() {
             // 由于我们是*直接*对 `minecraft:custom_data` 中的 NBT
@@ -301,6 +304,7 @@ internal class VanillaNekoStack(
     override val prototype: NekoItem,
     override val components: ItemComponentMap,
 ) : NekoStack {
+    override val isEmpty: Boolean = false
     override val itemStack: ItemStack
         get() = unsupported()
 

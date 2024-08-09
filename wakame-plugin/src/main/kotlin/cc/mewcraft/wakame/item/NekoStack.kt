@@ -40,6 +40,13 @@ interface NekoStack : Keyed, Examinable {
     }
 
     /**
+     * 检查该物品是否为空.
+     *
+     * 空物品没有任何作用, 也不会真的出现在世界状态中.
+     */
+    val isEmpty: Boolean
+
+    /**
      * Gets the clone of the wrapped [ItemStack].
      */
     @get:Contract(" -> new")
@@ -202,7 +209,7 @@ object NekoStackDelegates {
 
 
 private object EmptyNekoStack : NekoStack {
-    override val unsafe: NekoStack.Unsafe = Unsafe
+    override val isEmpty: Boolean = true
 
     override val itemStack: ItemStack
         get() = ItemStack.empty()
@@ -227,6 +234,8 @@ private object EmptyNekoStack : NekoStack {
 
     override val behaviors: ItemBehaviorMap = prototype.behaviors
 
+    override val unsafe: NekoStack.Unsafe = Unsafe
+
     override fun clone(): NekoStack {
         return this
     }
@@ -235,7 +244,7 @@ private object EmptyNekoStack : NekoStack {
         // do nothing
     }
 
-    object Unsafe: NekoStack.Unsafe {
+    object Unsafe : NekoStack.Unsafe {
         override val nbt: CompoundTag
             get() = CompoundTag.create()
         override val handle: ItemStack
