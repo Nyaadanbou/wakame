@@ -32,13 +32,15 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 data class PortableCore(
     /**
-     * 便携式核心所包含的核心.
+     * 本便携式核心所包含的核心.
      */
     override val wrapped: Core,
     /**
-     * 便携式核心的历史合并次数.
+     * 本便携式核心当前的惩罚值.
+     *
+     * 该值的具体作用由实现决定, 这里仅提供一个通用的字段.
      */
-    val mergeCount: Int,
+    val penalty: Int,
 ) : PortableObject<Core>, Examinable, TooltipProvider.Single {
     companion object : ItemComponentBridge<PortableCore>, ItemComponentMeta {
         override fun codec(id: String): ItemComponentType<PortableCore> {
@@ -66,15 +68,15 @@ data class PortableCore(
         override fun read(holder: ItemComponentHolder): PortableCore? {
             val tag = holder.getTag() ?: return null
             val core = tag.getCompoundOrNull(TAG_CORE)?.let { Core.of(it) } ?: return null
-            val mergeCount = tag.getInt(TAG_MERGE_COUNT)
+            val mergeCount = tag.getInt(TAG_PENALTY)
             return PortableCore(core, mergeCount)
         }
 
         override fun write(holder: ItemComponentHolder, value: PortableCore) {
             val tag = holder.getTagOrCreate()
             tag.put(TAG_CORE, value.wrapped.serializeAsTag())
-            if (value.mergeCount > 0) {
-                tag.putInt(TAG_MERGE_COUNT, value.mergeCount)
+            if (value.penalty > 0) {
+                tag.putInt(TAG_PENALTY, value.penalty)
             }
         }
 
@@ -84,7 +86,7 @@ data class PortableCore(
 
         companion object {
             private const val TAG_CORE = "core"
-            private const val TAG_MERGE_COUNT = "merge_count"
+            private const val TAG_PENALTY = "penalty"
         }
     }
 
