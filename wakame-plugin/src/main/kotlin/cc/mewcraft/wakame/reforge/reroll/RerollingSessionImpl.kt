@@ -28,7 +28,7 @@ class SimpleRerollingSession(
         logger.info("RerollingSession's result updated: $new")
     }
 
-    override val inputItem: NekoStack by NekoStackDelegates.readOnly(inputItem)
+    override val inputItem: NekoStack by NekoStackDelegates.copyOnRead(inputItem)
 
     override var confirmed: Boolean by Delegates.observable(false) { _, _, new ->
         logger.info("RerollingSession's confirmed status updated: $new")
@@ -83,7 +83,7 @@ class SimpleRerollingSession(
         item: NekoStack,
     ) : RerollingSession.Result {
 
-        override val item: NekoStack by NekoStackDelegates.readOnly(item)
+        override val item: NekoStack by NekoStackDelegates.copyOnRead(item)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("successful", successful),

@@ -61,7 +61,7 @@ internal class RerollingMenu(
 
         // 渲染输出物品
         val resultItem = result.item
-        val renderer = OutputItemRenderer(result)
+        val renderer = ResultRenderer(result)
         renderer.render(resultItem)
 
         // 填充输出容器
