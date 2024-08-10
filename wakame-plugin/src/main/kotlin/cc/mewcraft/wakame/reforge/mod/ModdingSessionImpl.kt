@@ -27,7 +27,7 @@ internal class SimpleModdingSession(
 ) : ModdingSession, KoinComponent {
     private val logger: Logger by inject()
 
-    override val inputItem: NekoStack by NekoStackDelegates.readOnly(input)
+    override val inputItem: NekoStack by NekoStackDelegates.copyOnRead(input)
 
     override var outputItem: NekoStack by NekoStackDelegates.copyOnWrite(input)
 
@@ -76,7 +76,7 @@ internal class SimpleModdingSession(
     class Result(
         modded: NekoStack,
     ) : ModdingSession.Result {
-        override val item: NekoStack by NekoStackDelegates.readOnly(modded)
+        override val item: NekoStack by NekoStackDelegates.copyOnRead(modded)
     }
 
     class Replace(
