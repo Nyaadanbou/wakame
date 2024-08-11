@@ -5,10 +5,45 @@ title: "合并工作台: Example A"
 
 # 合并工作台可以接受的最大物品等级.
 # 如果玩家放入的物品等级超过了这个值, 合并将算作失败.
-max_input_level: 10
+max_input_item_level: 10
 # 合并工作台输出的核心可以拥有的最大惩罚.
 # 如果输出的核心的惩罚值超过了这个值, 合并将算作失败.
-max_output_penalty: 2
+max_output_item_penalty: 2
+
+# 稀有度->数值的映射表.
+# 可用于所有的自定义函数.
+rarity_number_mapping:
+  common: 1.0
+  uncommon: 1.5
+  rare: 2.0
+  epic: 2.5
+  ancient: 3.0
+
+# 在这里设置完成合并操作所需要消耗的货币资源.
+# 如果玩家没有足够的货币资源, 合并将算作失败.
+currency_cost:
+  # 基础花费, 将作为常数出现在下面的自定义函数中.
+  base: 200.0
+
+  # 自定义函数, 计算完成合并操作所需要消耗的货币数量.
+  #
+  # 可用参数:
+  #  query.base()
+  #    基础花费
+  #  query.level_1()
+  #    第一个物品的等级
+  #  query.level_2()
+  #    第二个物品的等级
+  #  query.rarity_1()
+  #    第一个物品的稀有度对应的数值
+  #  query.rarity_2()
+  #    第二个物品的稀有度对应的数值
+  #  query.penalty_1()
+  #    第一个物品的惩罚值
+  #  query.penalty_2()
+  #    第二个物品的惩罚值
+  #
+  total: "query.base() + query.rarity_1()"
 
 # 属性数值合并的自定义函数.
 #
@@ -18,73 +53,35 @@ max_output_penalty: 2
 # - add_multiplied_total
 #
 # 可用参数:
-#  query.value_1
+#  query.value_1()
 #    第一个属性修饰符的数值
-#  query.value_2
+#  query.value_2()
 #    第二个属性修饰符的数值
 #
-number_merge_functions:
-  op0: "( query.value_1 + query.value_2 ) * ( 0.5 + math.random( -0.5, 0.0 ) )"
-  op1: "( query.value_1 + query.value_2 ) * ( 0.5 + math.random( -0.5, 0.0 ) )"
-  op2: "( query.value_1 + query.value_2 ) * ( 0.5 + math.random( -0.5, 0.0 ) )"
+number_merge_function:
+  op0: "( query.value_1() + query.value_2() ) * ( 0.5 + math.random( -0.5, 0.0 ) )"
+  op1: "( query.value_1() + query.value_2() ) * ( 0.5 + math.random( -0.5, 0.0 ) )"
+  op2: "( query.value_1() + query.value_2() ) * ( 0.5 + math.random( -0.5, 0.0 ) )"
 
 # 输出核心的等级的自定义函数.
 #
 # 可用参数:
-#  query.level_1
+#  query.level_1()
 #    第一个核心的等级
-#  query.value_2
+#  query.level_2()
 #    第二个核心的等级
 #
-output_level_function: "math.max( query.level_1, query.level_2 )"
+output_level_function: "math.max( query.level_1(), query.level_2() )"
 
 # 输出核心的惩罚的自定义函数.
 #
 # 可用参数:
-#  query.penalty_1
+#  query.penalty_1()
 #    第一个核心的惩罚值
-#  query.penalty_2
+#  query.penalty_2()
 #    第二个核心的惩罚值
 #
-output_penalty_function: "query.penalty_1 + query.penalty_2 + 1"
-
-# 在这里设置完成合并操作所需要消耗的资源.
-# 如果玩家没有足够的资源, 合并将算作失败.
-cost:
-
-  # 常量
-  constants:
-    # 基础花费, 类似起步价
-    base: 200.0
-    # 稀有度->数值的映射
-    rarity_number_mapping:
-      common: 1.0
-      uncommon: 1.5
-      rare: 2.0
-      epic: 2.5
-      ancient: 3.0
-
-  # 自定义函数
-  functions:
-    # 最终金币花费的计算函数.
-    #
-    # 可用参数:
-    #  query.base_cost
-    #    基础花费
-    #  query.level_1
-    #    第一个物品的等级
-    #  query.level_2
-    #    第二个物品的等级
-    #  query.rarity_1
-    #    第一个物品的稀有度对应的数值
-    #  query.rarity_2
-    #    第二个物品的稀有度对应的数值
-    #  query.penalty_1
-    #    第一个物品的惩罚值
-    #  query.penalty_2
-    #    第二个物品的惩罚值
-    #
-    total: "query.base_cost + query.rarity_number"
+output_penalty_function: "query.penalty_1() + query.penalty_2() + 1"
 
 # 合并工作台可以接受的核心类型.
 # 如果玩家放入的核心不在这个列表中, 那么合并将算作失败.
@@ -94,10 +91,10 @@ accepted_cores:
     operation: add
   - type: attribute:mana_regeneration
     element: ~
-    operation: multiple_base
+    operation: multiply_base
   - type: attribute:mana_regeneration
     element: ~
-    operation: multiple_total
+    operation: multiply_total
   - type: attribute:attack_damage_rate
     element: fire
     operation: add
