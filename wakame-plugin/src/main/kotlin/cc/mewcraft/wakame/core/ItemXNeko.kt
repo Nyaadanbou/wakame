@@ -8,12 +8,12 @@ import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-class NekoItemX(
-    override val itemId: String,
-) : ItemX {
-    override val plugin: String = "wakame"
+class ItemXNeko(
+    identifier: String,
+) : ItemXAbstract(ItemXFactoryNeko.plugin, identifier) {
+
     override fun createItemStack(): ItemStack? {
-        val key = Key.key(itemId.replaceFirst('/', ':'))
+        val key = Key.key(identifier.replaceFirst('/', ':'))
         val nekoItem = ItemRegistry.CUSTOM.find(key)
         val nekoStack = nekoItem?.realize()
         val itemStack = nekoStack?.itemStack
@@ -21,7 +21,7 @@ class NekoItemX(
     }
 
     override fun createItemStack(player: Player): ItemStack? {
-        val key = Key.key(itemId.replaceFirst('/', ':'))
+        val key = Key.key(identifier.replaceFirst('/', ':'))
         val nekoItem = ItemRegistry.CUSTOM.find(key)
         val nekoStack = nekoItem?.realize(player.toUser())
         val itemStack = nekoStack?.itemStack
@@ -30,25 +30,25 @@ class NekoItemX(
 
     override fun matches(itemStack: ItemStack): Boolean {
         val nekoStack = itemStack.tryNekoStack ?: return false
-        val key = nekoStack.key()
-        return "${key.namespace()}/${key.value()}" == itemId
+        val key = nekoStack.key
+        return "${key.namespace()}/${key.value()}" == identifier
     }
-
 }
 
-class NekoItemXBuilder : ItemXBuilder<NekoItemX> {
-    override val available: Boolean = true
-    override fun byItemStack(itemStack: ItemStack): NekoItemX? {
+object ItemXFactoryNeko : ItemXFactory {
+    override val plugin: String = "wakame"
+
+    override val isValid: Boolean = true
+
+    override fun byItemStack(itemStack: ItemStack): ItemXNeko? {
         val nekoStack = itemStack.tryNekoStack ?: return null
         val key = nekoStack.key()
-        return NekoItemX("${key.namespace()}/${key.value()}")
+        return ItemXNeko("${key.namespace()}/${key.value()}")
     }
 
-    override fun byReference(plugin: String, itemId: String): NekoItemX? {
-        if (plugin != "wakame") return null
-        return NekoItemX(itemId)
+    override fun byUid(plugin: String, itemId: String): ItemXNeko? {
+        if (plugin != this.plugin)
+            return null
+        return ItemXNeko(itemId)
     }
-
-    //TODO 注册
-
 }
