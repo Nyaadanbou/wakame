@@ -58,9 +58,11 @@ interface CoreMatchRule : Examinable {
 }
 
 /**
- * 需要的子序列化器:
- * - Trigger
- * - TriggerVariant
+ * [CoreMatchRule] 的序列化器.
+ *
+ * 依赖的序列化器:
+ * - [cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer]
+ * - [cc.mewcraft.wakame.skill.ConfiguredSkillVariantSerializer]
  */
 internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {

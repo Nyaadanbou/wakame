@@ -20,7 +20,7 @@ import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 
-class MergingMenu(
+internal class MergingMenu(
     val table: MergingTable,
     val viewer: Player,
 ) : KoinComponent {
@@ -38,7 +38,9 @@ class MergingMenu(
     fun refreshOutput() {
         val result = mergingSession.merge()
         if (result.successful) {
-            setOutputSlot(result.item.unsafe.handle)
+            val item = result.item
+            ResultRenderer(result).render(item)
+            setOutputSlot(item.unsafe.handle)
         } else {
             setOutputSlot(null)
         }
@@ -48,11 +50,13 @@ class MergingMenu(
      * 本次合并的会话.
      *
      * ## 开发日记 2024/8/9
-     * 不像 mod 和 reroll 那样, merge 的会话是在打开菜单的时候创建的.
+     * 不像 mod 和 reroll 的会话, merge 的会话是在打开菜单的时候创建.
      * 并且直到菜单关闭之前, 会话永远是这一个对象, 不会中途替换成其他的.
      * 而菜单这边的逻辑, 需要根据几个虚拟容器的变化, 来改变会话中的状态.
      */
-    var mergingSession: MergingSession = MergingSessionFactory.create(this, null, null)
+    private val mergingSession: MergingSession = MergingSessionFactory.create(
+        this, null, null
+    )
 
     private val logger: Logger by inject()
 
@@ -88,101 +92,105 @@ class MergingMenu(
     }
 
     //<editor-fold desc="inventory listeners">
-    private fun onInputSlotPreUpdate(e: ItemPreUpdateEvent) {
-
-    }
-
-    private fun asNekoStack(newItem: ItemStack?, e: ItemPreUpdateEvent): NekoStack? {
-        val added = newItem?.tryNekoStack ?: run {
-            viewer.sendPlainMessage("放入的不是萌芽物品!")
-            e.isCancelled = true; return null
-        }
-
-        return added
-    }
-
-    private fun onInputSlot1PreUpdate(e: ItemPreUpdateEvent) {
-        // FIXME onInputSlot1PreUpdate 和 onInputSlot2PreUpdate 有很多重复的代码, 需要降重
-
+    private fun onInputSlotPreUpdate(
+        e: ItemPreUpdateEvent,
+        setMenuInputSlot: (ItemStack?) -> Unit,
+        setBackInputItem: (NekoStack?) -> Unit,
+        retBackInputItem: (Player) -> Unit,
+    ) {
         val oldItem = e.previousItem
         val newItem = e.newItem
-        logger.info("MergingMenu input slot 1 pre-update: $oldItem -> $newItem")
+        logger.info("MergingMenu input slot pre-update: $oldItem -> $newItem")
 
         when {
             e.isSwap -> {
                 viewer.sendPlainMessage("猫咪不可以!")
-                e.isCancelled = true; return
+                e.isCancelled = true
             }
 
             e.isAdd -> {
-                val added = asNekoStack(newItem, e) ?: return
+                val added = newItem?.tryNekoStack ?: run {
+                    viewer.sendPlainMessage("请放入一个萌芽物品!")
+                    e.isCancelled = true; return
+                }
 
-                mergingSession.inputItem1 = added
-                mergingSession.merge()
+                setBackInputItem(added)
                 refreshOutput()
             }
 
             e.isRemove -> {
                 e.isCancelled = true
-                setInputSlot1(null)
+                setMenuInputSlot(null)
                 setOutputSlot(null)
 
-                mergingSession.returnInputItem1(viewer)
-                mergingSession.inputItem1 = null
+                retBackInputItem(viewer)
+                setBackInputItem(null)
                 refreshOutput()
             }
         }
     }
 
-    private fun onInputSlot2PreUpdate(e: ItemPreUpdateEvent) {
-        val oldItem = e.previousItem
-        val newItem = e.newItem
-        logger.info("MergingMenu input slot 2 pre-update: $oldItem -> $newItem")
+    private fun onInputSlot1PreUpdate(e: ItemPreUpdateEvent) = onInputSlotPreUpdate(
+        e,
+        { setInputSlot1(it) },
+        { mergingSession.inputItemX = it },
+        { mergingSession.returnInputItemX(it) }
+    )
 
-        when {
-            e.isSwap -> {
-                viewer.sendPlainMessage("猫咪不可以!")
-                e.isCancelled = true; return
-            }
-
-            e.isAdd -> {
-                val added = asNekoStack(newItem, e) ?: return
-
-                mergingSession.inputItem2 = added
-                mergingSession.merge()
-                refreshOutput()
-            }
-
-            e.isRemove -> {
-                e.isCancelled = true
-                setInputSlot2(null)
-                setOutputSlot(null)
-
-                mergingSession.returnInputItem2(viewer)
-                mergingSession.inputItem2 = null
-                refreshOutput()
-            }
-        }
-    }
+    private fun onInputSlot2PreUpdate(e: ItemPreUpdateEvent) = onInputSlotPreUpdate(
+        e,
+        { setInputSlot2(it) },
+        { mergingSession.inputItemY = it },
+        { mergingSession.returnInputItemY(it) }
+    )
 
     private fun onOutputSlotPreUpdate(e: ItemPreUpdateEvent) {
         val oldItem = e.previousItem
         val newItem = e.newItem
         logger.info("MergingMenu output slot pre-update: $oldItem -> $newItem")
+
+        when {
+            e.isSwap || e.isAdd -> {
+                viewer.sendPlainMessage("猫咪不可以!")
+                e.isCancelled = true
+            }
+
+            e.isRemove -> {
+                e.isCancelled = true
+
+                val result = mergingSession.result
+                if (result.successful) {
+                    // 把合并后的物品递给玩家
+                    val handle = result.item.unsafe.handle
+                    viewer.inventory.addItem(handle)
+
+                    // 清空菜单中的物品
+                    setInputSlot1(null)
+                    setInputSlot2(null)
+                    setOutputSlot(null)
+                } else {
+                    viewer.sendPlainMessage("合并失败!")
+                }
+            }
+        }
     }
     //</editor-fold>
 
-    //<editor-fold desc="window listeners">
     private fun onWindowClose() {
+        logger.info("MergingMenu closed for ${viewer.name}")
+
         setInputSlot1(null)
         setInputSlot2(null)
         setOutputSlot(null)
+
+        mergingSession.returnInputItemX(viewer)
+        mergingSession.returnInputItemY(viewer)
+        mergingSession.frozen = true
     }
 
     private fun onWindowOpen() {
         logger.info("MergingMenu opened for ${viewer.name}")
     }
-    //</editor-fold>
 
     private fun getInputSlot1(): ItemStack? {
         return inputSlot1.getItem(0)

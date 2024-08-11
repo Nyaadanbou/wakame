@@ -108,8 +108,8 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierSourc
     /**
      * 检查两个属性核心是否拥有一样的:
      * - 运算模式
-     * - 元素类型
      * - 数值结构
+     * - 元素类型 (如果有)
      *
      * 该函数不会检查任何数值的相等性.
      */
