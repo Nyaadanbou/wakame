@@ -1,7 +1,9 @@
 package recipe
 
+import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.recipe.*
 import cc.mewcraft.wakame.util.Key
+import core.ItemXMock
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -24,6 +26,7 @@ class VanillaRecipeSerializationTest : KoinTest {
                 )
             }
 
+            ItemXBootstrap.init()
             VanillaRecipeRegistry.loadConfig()
         }
 
@@ -56,28 +59,28 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<BlastingRecipe>(recipe)
 
         val input = recipe.input
-        assertEquals(
-            MultiRecipeChoice(
-                listOf(
-                    Key("minecraft:glass"),
-                    Key("minecraft:white_stained_glass"),
-                    Key("minecraft:orange_stained_glass"),
-                    Key("minecraft:magenta_stained_glass"),
-                    Key("minecraft:light_blue_stained_glass"),
-                    Key("minecraft:yellow_stained_glass"),
-                    Key("minecraft:lime_stained_glass"),
-                    Key("minecraft:pink_stained_glass"),
-                    Key("minecraft:gray_stained_glass"),
-                    Key("minecraft:light_gray_stained_glass"),
-                    Key("minecraft:cyan_stained_glass"),
-                    Key("minecraft:purple_stained_glass"),
-                    Key("minecraft:blue_stained_glass"),
-                    Key("minecraft:brown_stained_glass"),
-                    Key("minecraft:green_stained_glass"),
-                    Key("minecraft:red_stained_glass"),
-                    Key("minecraft:black_stained_glass")
-                )
-            ), input
+        assertIs<MultiRecipeChoice>(input)
+        assertContentEquals(
+            expected = listOf(
+                ItemXMock("minecraft:glass"),
+                ItemXMock("minecraft:white_stained_glass"),
+                ItemXMock("minecraft:orange_stained_glass"),
+                ItemXMock("minecraft:magenta_stained_glass"),
+                ItemXMock("minecraft:light_blue_stained_glass"),
+                ItemXMock("minecraft:yellow_stained_glass"),
+                ItemXMock("minecraft:lime_stained_glass"),
+                ItemXMock("minecraft:pink_stained_glass"),
+                ItemXMock("minecraft:gray_stained_glass"),
+                ItemXMock("minecraft:light_gray_stained_glass"),
+                ItemXMock("minecraft:cyan_stained_glass"),
+                ItemXMock("minecraft:purple_stained_glass"),
+                ItemXMock("minecraft:blue_stained_glass"),
+                ItemXMock("minecraft:brown_stained_glass"),
+                ItemXMock("minecraft:green_stained_glass"),
+                ItemXMock("minecraft:red_stained_glass"),
+                ItemXMock("minecraft:black_stained_glass")
+            ),
+            actual = input.choices
         )
 
         val cookingTime = recipe.cookingTime
@@ -88,7 +91,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(Key("minecraft:quartz"), result.result)
+        assertEquals(ItemXMock("minecraft:quartz"), result.result)
         assertEquals(1, result.amount)
     }
 
@@ -101,7 +104,8 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<CampfireRecipe>(recipe)
 
         val input = recipe.input
-        assertEquals(SingleRecipeChoice(Key("minecraft:poisonous_potato")), input)
+        assertIs<SingleRecipeChoice>(input)
+        assertEquals(ItemXMock("minecraft:poisonous_potato"), input.choice)
 
         val cookingTime = recipe.cookingTime
         assertEquals(1, cookingTime)
@@ -111,7 +115,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(Key("minecraft:diamond"), result.result)
+        assertEquals(ItemXMock("minecraft:diamond"), result.result)
         assertEquals(1, result.amount)
     }
 
@@ -124,7 +128,8 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<FurnaceRecipe>(recipe)
 
         val input = recipe.input
-        assertEquals(SingleRecipeChoice(Key("minecraft:gravel")), input)
+        assertIs<SingleRecipeChoice>(input)
+        assertEquals(ItemXMock("minecraft:gravel"), input.choice)
 
         val cookingTime = recipe.cookingTime
         assertEquals(200, cookingTime)
@@ -134,7 +139,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(Key("minecraft:sand"), result.result)
+        assertEquals(ItemXMock("minecraft:sand"), result.result)
         assertEquals(1, result.amount)
     }
 
@@ -159,16 +164,19 @@ class VanillaRecipeSerializationTest : KoinTest {
         val recipeChoiceB = ingredients['B']
         assertNotNull(recipeChoiceA)
         assertNotNull(recipeChoiceB)
-        assertEquals(
-            MultiRecipeChoice(
-                listOf(Key("minecraft:gold_block"), Key("minecraft:diamond_block"))
-            ), recipeChoiceA
+        assertIs<MultiRecipeChoice>(recipeChoiceA)
+        assertIs<SingleRecipeChoice>(recipeChoiceB)
+        assertContentEquals(
+            listOf(
+                ItemXMock("minecraft:gold_block"),
+                ItemXMock("minecraft:diamond_block")
+            ), recipeChoiceA.choices
         )
-        assertEquals(SingleRecipeChoice(Key("minecraft:apple")), recipeChoiceB)
+        assertEquals(ItemXMock("minecraft:apple"), recipeChoiceB.choice)
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(Key("minecraft:enchanted_golden_apple"), result.result)
+        assertEquals(ItemXMock("minecraft:enchanted_golden_apple"), result.result)
         assertEquals(1, result.amount)
     }
 
@@ -180,30 +188,32 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertNotNull(recipe)
         assertIs<ShapelessRecipe>(recipe)
         val ingredients = recipe.ingredients
-        assertContains(ingredients, SingleRecipeChoice(Key("minecraft:poppy")))
+        assertContains(ingredients, SingleRecipeChoice(ItemXMock("minecraft", "poppy")))
         assertContains(
             ingredients,
             MultiRecipeChoice(
                 listOf(
-                    Key("minecraft:red_dye"),
-                    Key("minecraft:pink_dye"),
+                    ItemXMock("minecraft:red_dye"),
+                    ItemXMock("minecraft:pink_dye"),
                 )
             )
         )
         assertEquals(4, ingredients
             .filterIsInstance<SingleRecipeChoice>()
-            .count { it.choice == Key("minecraft:poppy") }
+            .count { it.choice == ItemXMock("minecraft:poppy") }
         )
         assertEquals(1, ingredients
             .filterIsInstance<MultiRecipeChoice>()
             .count {
-                it.choices.contains(Key("minecraft:red_dye"))
-                        && it.choices.contains(Key("minecraft:pink_dye"))
+                it.choices == listOf(
+                    ItemXMock("minecraft:red_dye"),
+                    ItemXMock("minecraft:pink_dye")
+                )
             }
         )
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(Key("minecraft:rose_bush"), result.result)
+        assertEquals(ItemXMock("minecraft:rose_bush"), result.result)
         assertEquals(2, result.amount)
     }
 
@@ -216,25 +226,26 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<SmithingTransformRecipe>(recipe)
 
         val base = recipe.base
-        assertEquals(
-            MultiRecipeChoice(
-                listOf(
-                    Key("minecraft:cobblestone"),
-                    Key("minecraft:stone"),
-                )
-            ), base
+        assertIs<MultiRecipeChoice>(base)
+        assertContentEquals(
+            listOf(
+                ItemXMock("minecraft:cobblestone"),
+                ItemXMock("minecraft:stone"),
+            ), base.choices
         )
 
         val addition = recipe.addition
-        assertEquals(SingleRecipeChoice(Key("minecraft:ender_pearl")), addition)
+        assertIs<SingleRecipeChoice>(addition)
+        assertEquals(ItemXMock("minecraft:ender_pearl"), addition.choice)
 
         val template = recipe.template
+        assertIs<EmptyRecipeChoice>(template)
         assertEquals(EmptyRecipeChoice, template)
 
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(Key("minecraft:end_stone"), result.result)
+        assertEquals(ItemXMock("minecraft:end_stone"), result.result)
         assertEquals(1, result.amount)
     }
 
@@ -247,7 +258,8 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<SmokingRecipe>(recipe)
 
         val input = recipe.input
-        assertEquals(SingleRecipeChoice(Key("minecraft:cobblestone")), input)
+        assertIs<SingleRecipeChoice>(input)
+        assertEquals(ItemXMock("minecraft:cobblestone"), input.choice)
 
         val cookingTime = recipe.cookingTime
         assertEquals(100, cookingTime)
@@ -257,7 +269,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(Key("minecraft:netherrack"), result.result)
+        assertEquals(ItemXMock("minecraft:netherrack"), result.result)
         assertEquals(1, result.amount)
     }
 
@@ -270,27 +282,26 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<StonecuttingRecipe>(recipe)
 
         val input = recipe.input
-        assertEquals(
-            MultiRecipeChoice(
-                listOf(
-                    Key("minecraft:oak_planks"),
-                    Key("minecraft:spruce_planks"),
-                    Key("minecraft:birch_planks"),
-                    Key("minecraft:jungle_planks"),
-                    Key("minecraft:acacia_planks"),
-                    Key("minecraft:dark_oak_planks"),
-                    Key("minecraft:mangrove_planks"),
-                    Key("minecraft:cherry_planks"),
-                    Key("minecraft:bamboo_planks"),
-                    Key("minecraft:crimson_planks"),
-                    Key("minecraft:warped_planks")
-                )
-            ), input
+        assertIs<MultiRecipeChoice>(input)
+        assertContentEquals(
+            listOf(
+                ItemXMock("minecraft:oak_planks"),
+                ItemXMock("minecraft:spruce_planks"),
+                ItemXMock("minecraft:birch_planks"),
+                ItemXMock("minecraft:jungle_planks"),
+                ItemXMock("minecraft:acacia_planks"),
+                ItemXMock("minecraft:dark_oak_planks"),
+                ItemXMock("minecraft:mangrove_planks"),
+                ItemXMock("minecraft:cherry_planks"),
+                ItemXMock("minecraft:bamboo_planks"),
+                ItemXMock("minecraft:crimson_planks"),
+                ItemXMock("minecraft:warped_planks")
+            ), input.choices
         )
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(Key("minecraft:stick"), result.result)
+        assertEquals(ItemXMock("minecraft:stick"), result.result)
         assertEquals(2, result.amount)
     }
 }

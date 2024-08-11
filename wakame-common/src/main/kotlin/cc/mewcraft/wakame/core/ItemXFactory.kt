@@ -22,8 +22,8 @@ interface ItemXFactory {
      * 通过*通用物品标识*构建该物品库插件对应的 [ItemX].
      * 构建失败则返回空.
      */
-    fun byUid(identifier: String): ItemX? {
-        val split = identifier.split(":")
+    fun byUid(uid: String): ItemX? {
+        val split = uid.split(":")
         if (split.size != 2) return null
         return byUid(split[0], split[1])
     }
