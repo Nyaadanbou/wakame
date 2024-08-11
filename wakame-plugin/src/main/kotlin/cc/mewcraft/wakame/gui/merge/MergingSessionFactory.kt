@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession
 
-object MergingSessionFactory {
+internal object MergingSessionFactory {
     fun create(
         menu: MergingMenu,
         inputItem1: NekoStack?,
