@@ -93,7 +93,15 @@ internal class ReplaceMenu(
                     event.isCancelled = true; return
                 }
 
-                val result = replace.test(portableObject.wrapped)
+                val outputItem = session.outputItem
+                val itemCells = outputItem.components.get(ItemComponentTypes.CELLS)!!
+                val wrapped = portableObject.wrapped
+                if (itemCells.hasSimilar(wrapped)) {
+                    viewer.sendMessage("该物品已经包含该核心!")
+                    event.isCancelled = true; return
+                }
+
+                val result = replace.test(wrapped)
                 if (!result.successful) {
                     viewer.sendMessage("该物品无法用于定制该词条栏!")
                     event.isCancelled = true; return

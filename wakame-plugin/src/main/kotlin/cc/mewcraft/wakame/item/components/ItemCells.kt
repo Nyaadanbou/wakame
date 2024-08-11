@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreTypes
 import cc.mewcraft.wakame.item.components.cells.template.TemplateCell
 import cc.mewcraft.wakame.item.components.cells.template.TemplateCellSerializer
@@ -139,6 +140,11 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     fun collectConfiguredSkills(context: NekoStack, ignoreCurse: Boolean = false, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
 
     /**
+     * 判断是否包含指定的核心.
+     */
+    fun hasSimilar(core: Core): Boolean
+
+    /**
      * 用于方便构建 [ItemCells].
      */
     interface Builder {
@@ -257,6 +263,10 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
                 ret.put(core.trigger, core.skill)
             }
             return ret.build()
+        }
+
+        override fun hasSimilar(core: Core): Boolean {
+            return cells.values.any { cell -> cell.getCore().isSimilar(core) }
         }
 
         override fun provideTooltipLore(): Collection<LoreLine> {

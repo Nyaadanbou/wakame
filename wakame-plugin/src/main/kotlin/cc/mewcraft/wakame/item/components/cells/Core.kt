@@ -49,6 +49,8 @@ interface Core : Keyed, Examinable, BinarySerializable, TooltipProvider.SingleWi
      */
     val isEmpty: Boolean
 
+    fun isSimilar(other: Core): Boolean
+
     companion object {
         /**
          * 返回一个空的核心.
