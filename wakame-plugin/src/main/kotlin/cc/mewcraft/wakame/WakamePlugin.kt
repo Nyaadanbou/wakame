@@ -3,7 +3,7 @@ package cc.mewcraft.wakame
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attack.attackModule
 import cc.mewcraft.wakame.attribute.attributeModule
-import cc.mewcraft.wakame.recipe.recipeModule
+import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display.displayModule
@@ -24,6 +24,7 @@ import cc.mewcraft.wakame.packet.packetModule
 import cc.mewcraft.wakame.player.playerModule
 import cc.mewcraft.wakame.random3.randomModule
 import cc.mewcraft.wakame.rarity.rarityModule
+import cc.mewcraft.wakame.recipe.recipeModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.resource.resourceModule
@@ -96,6 +97,9 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 worldModule(),
             )
         }
+
+        // Initialize ItemX
+        ItemXBootstrap.init()
     }
 
     override suspend fun enable() {
