@@ -1,9 +1,13 @@
 package cc.mewcraft.wakame.core
 
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.stream.Stream
 
 
 /**
@@ -19,7 +23,7 @@ import org.bukkit.inventory.ItemStack
  * ## 实现指南
  * 用户应该直接实现 [ItemXAbstract].
  */
-sealed interface ItemX : Keyed {
+sealed interface ItemX : Keyed, Examinable {
 
     /**
      * 该通用物品所属的插件的名字, 必须符合 [net.kyori.adventure.key.KeyPattern.Namespace].
@@ -66,4 +70,22 @@ abstract class ItemXAbstract(
     constructor(uid: String) : this(
         uid.substringBefore(':'), uid.substringAfter(':')
     )
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("plugin", plugin),
+        ExaminableProperty.of("identifier", identifier),
+    )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        return other is ItemX && plugin == other.plugin && identifier == other.identifier
+    }
+
+    override fun hashCode(): Int {
+        return plugin.hashCode() + 31 * identifier.hashCode()
+    }
+
+    override fun toString(): String {
+        return toSimpleString()
+    }
 }

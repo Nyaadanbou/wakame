@@ -1,10 +1,9 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.convertor.convertToConfigKey
+import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
@@ -24,11 +23,11 @@ interface RecipeResult : Examinable {
  * 单物品输出.
  */
 data class SingleRecipeResult(
-    val result: Key,
+    val result: ItemX,
     val amount: Int
 ) : RecipeResult {
     override fun toBukkitItemStack(): ItemStack {
-        return result.convertToConfigKey().realize()
+        return result.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${result.key}'")
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -44,7 +43,7 @@ data class SingleRecipeResult(
  */
 internal object RecipeResultSerializer : TypeSerializer<RecipeResult> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
-        val item = node.node("item").krequire<Key>()
+        val item = node.node("item").krequire<ItemX>()
         val amount = node.node("amount").getInt(1).apply {
             require(this >= 1) { "Item amount should not less than 1" }
         }

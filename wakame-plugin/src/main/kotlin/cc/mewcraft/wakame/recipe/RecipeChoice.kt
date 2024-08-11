@@ -1,14 +1,13 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.convertor.convertToConfigKey
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.util.toSimpleString
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.stream.Stream
@@ -35,10 +34,11 @@ data object EmptyRecipeChoice : RecipeChoice {
  * 单物品输入.
  */
 data class SingleRecipeChoice(
-    val choice: Key
+    val choice: ItemX
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
-        return BukkitRecipeChoice.ExactChoice(choice.convertToConfigKey().realize())
+        val itemStack = choice.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${choice.key}'")
+        return BukkitRecipeChoice.ExactChoice(itemStack)
     }
 
 
@@ -53,12 +53,13 @@ data class SingleRecipeChoice(
  * 多物品输入.
  */
 data class MultiRecipeChoice(
-    val choices: List<Key>
+    val choices: List<ItemX>
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         val itemStacks: MutableList<ItemStack> = mutableListOf()
         choices.forEach {
-            itemStacks.add(it.convertToConfigKey().realize())
+            val itemStack = it.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${it.key}'")
+            itemStacks.add(itemStack)
         }
         return BukkitRecipeChoice.ExactChoice(itemStacks)
     }
@@ -75,18 +76,11 @@ data class MultiRecipeChoice(
  */
 internal object RecipeChoiceSerializer : TypeSerializer<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
-        val rawScalar = node.rawScalar()
-        if (rawScalar != null) {
-            val rawStr = rawScalar.toString()
-            val choice = Key.key(rawStr)
-            return SingleRecipeChoice(choice)
+        val itemXList = node.getList<ItemX>(emptyList())
+        return when (itemXList.size) {
+            0 -> throw SerializationException(node, type, "Recipe choice must have at least 1 element")
+            1 -> SingleRecipeChoice(itemXList[0])
+            else -> MultiRecipeChoice(itemXList)
         }
-
-        if (node.isList) {
-            val choices = node.krequire<List<Key>>()
-            return MultiRecipeChoice(choices)
-        }
-
-        throw SerializationException(node, type, "Unrecognized recipe choice")
     }
 }

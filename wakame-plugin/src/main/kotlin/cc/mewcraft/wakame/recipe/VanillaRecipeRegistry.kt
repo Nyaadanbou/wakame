@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.core.ItemXSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.ItemRegistry
@@ -51,6 +52,7 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
                         kregister(VanillaRecipeSerializer)
                         kregister(RecipeChoiceSerializer)
                         kregister(RecipeResultSerializer)
+                        kregister(ItemXSerializer)
                     }
                 }.buildAndLoadString(fileText)
 
