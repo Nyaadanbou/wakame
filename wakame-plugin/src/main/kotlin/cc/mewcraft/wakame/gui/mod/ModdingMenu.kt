@@ -30,6 +30,8 @@ import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.ScrollItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
+import kotlin.collections.component1
+import kotlin.collections.component2
 import kotlin.properties.Delegates
 
 /**
@@ -286,7 +288,11 @@ internal class ModdingMenu(
                 // 如果玩家取出定制后的物品, 意味着定制过程即将完成.
                 // 我们需要消耗掉所有的材料, 然后替换玩家指针上的物品.
 
-                // TODO 计算价格, 然后扣钱
+                val cost = evalCost(session)
+                if (cost > 0) {
+                    // TODO: 扣钱
+                    viewer.sendMessage("定制需要消耗 $cost 金币")
+                }
 
                 // 将定制后的物品添加到玩家背包
                 viewer.inventory.addItem(output.unsafe.handle)
@@ -360,6 +366,28 @@ internal class ModdingMenu(
 
     private fun clearOutputSlot() {
         outputInventory.setItemSilently(0, null)
+    }
+
+    private fun evalCost(session: ModdingSession): Double {
+        val tableCost = table.cost
+        val base = tableCost.base
+        val perCore = tableCost.perCore
+        val rarityModifiers = tableCost.rarityModifiers
+        val itemLevelModifier = tableCost.itemLevelModifier
+        val coreLevelModifier = tableCost.coreLevelModifier
+
+        var finalCost = base
+        val replaceMap = session.replaceMap
+        finalCost += perCore * replaceMap.size
+        val inputItem = session.inputItem
+        inputItem.components.get(ItemComponentTypes.RARITY)?.let { rarity -> rarityModifiers[rarity.rarity.key]?.let { finalCost += it } }
+        inputItem.components.get(ItemComponentTypes.LEVEL)?.let { level -> level.level.let { finalCost += itemLevelModifier * it } }
+        for ((_, replaceSession) in replaceMap) {
+            val inputCore = replaceSession.input ?: continue
+            val coreLevel = inputCore.components.get(ItemComponentTypes.LEVEL)?.level ?: 0
+            finalCost += coreLevelModifier * coreLevel
+        }
+        return finalCost
     }
 
     /**

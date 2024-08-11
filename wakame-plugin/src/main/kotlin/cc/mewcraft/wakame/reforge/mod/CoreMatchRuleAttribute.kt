@@ -15,7 +15,7 @@ import java.util.stream.Stream
  */
 class CoreMatchRuleAttribute(
     override val path: Pattern,
-    val operation: AttributeModifier.Operation,
+    val operation: AttributeModifier.Operation?,
     val element: Key?,
 ) : CoreMatchRule {
     override val priority: Int = 1
@@ -40,7 +40,11 @@ class CoreMatchRuleAttribute(
             return false
         }
 
-        return operation == core.operation && element == core.element?.key
+        if (operation != null && core.operation != operation) {
+            return false
+        }
+
+        return element == core.element?.key
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

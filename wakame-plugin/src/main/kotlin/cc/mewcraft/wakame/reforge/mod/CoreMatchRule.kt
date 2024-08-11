@@ -90,7 +90,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
 
         when (namespace) {
             Namespaces.ATTRIBUTE -> {
-                val operation = node.node("operation").get<AttributeModifier.Operation>(AttributeModifier.Operation.ADD)
+                val operation = node.node("operation").get<AttributeModifier.Operation>()
                 val element = node.node("element").get<String>()?.let { Key.key("element", it) }
                 return CoreMatchRuleAttribute(pattern, operation, element)
             }
