@@ -34,6 +34,10 @@ object CoreEmpty : Core, CoreType<CoreEmpty> {
     override val isNoop: Boolean = false
     override val isEmpty: Boolean = true
 
+    override fun isSimilar(other: Core): Boolean {
+        return other === this
+    }
+
     override fun serializeAsTag(): Tag {
         return CompoundTag.create()
     }

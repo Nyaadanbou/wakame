@@ -21,6 +21,10 @@ object CoreNoop : Core, CoreType<CoreNoop> {
     override val isNoop: Boolean = true
     override val isEmpty: Boolean = false
 
+    override fun isSimilar(other: Core): Boolean {
+        return other === this
+    }
+
     override fun serializeAsTag(): Tag = error()
     override fun provideTooltipName(): NameLine = error()
     override fun provideTooltipLore(): LoreLine = error()

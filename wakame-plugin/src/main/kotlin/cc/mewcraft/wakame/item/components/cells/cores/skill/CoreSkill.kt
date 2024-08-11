@@ -62,6 +62,11 @@ data class CoreSkill(
     override val isNoop: Boolean = false
     override val isEmpty: Boolean = false
 
+    override fun isSimilar(other: Core): Boolean {
+        if (other !is CoreSkill) return false
+        return key == other.key
+    }
+
     override fun provideTooltipName(): NameLine {
         val skill = skill
         val tooltipName = skill.displays.name

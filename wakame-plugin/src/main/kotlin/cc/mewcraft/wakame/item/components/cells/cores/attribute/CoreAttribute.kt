@@ -113,7 +113,7 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierSourc
      *
      * 该函数不会检查任何数值的相等性.
      */
-    abstract fun isSimilar(other: CoreAttribute): Boolean
+    abstract override fun isSimilar(other: Core): Boolean
 
     override fun provideAttributeModifiers(id: Key): Map<Attribute, AttributeModifier> {
         return AttributeRegistry.FACADES[key].createAttributeModifiers(id, this)
@@ -155,7 +155,7 @@ internal data class CoreAttributeS(
         compound.getNumber(AttributeBinaryKeys.SINGLE_VALUE)
     )
 
-    override fun isSimilar(other: CoreAttribute): Boolean {
+    override fun isSimilar(other: Core): Boolean {
         return other is CoreAttributeS
                 && other.key == key
                 && other.operation == operation
@@ -190,7 +190,7 @@ internal data class CoreAttributeR(
         compound.getNumber(AttributeBinaryKeys.RANGED_MAX_VALUE)
     )
 
-    override fun isSimilar(other: CoreAttribute): Boolean {
+    override fun isSimilar(other: Core): Boolean {
         return other is CoreAttributeR
                 && other.key == key
                 && other.operation == operation
@@ -227,7 +227,7 @@ internal data class CoreAttributeSE(
         compound.getElement()
     )
 
-    override fun isSimilar(other: CoreAttribute): Boolean {
+    override fun isSimilar(other: Core): Boolean {
         return other is CoreAttributeSE
                 && other.key == key
                 && other.operation == operation
@@ -267,7 +267,7 @@ internal data class CoreAttributeRE(
         compound.getElement()
     )
 
-    override fun isSimilar(other: CoreAttribute): Boolean {
+    override fun isSimilar(other: Core): Boolean {
         return other is CoreAttributeRE
                 && other.key == key
                 && other.operation == operation
