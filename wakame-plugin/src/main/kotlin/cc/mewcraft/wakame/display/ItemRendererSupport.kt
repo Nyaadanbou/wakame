@@ -15,15 +15,15 @@ internal class PacketItemRenderer : KoinComponent, ItemRenderer<PacketNekoStack>
     private val loreLineFlatter: LoreLineFlatter by inject()
     private val itemModelDataLookup: ItemModelDataLookup by inject()
 
-    override fun render(nekoStack: PacketNekoStack) {
-        val loreLineList = LoreLineExtractor.extract(nekoStack)
+    override fun render(item: PacketNekoStack) {
+        val loreLineList = LoreLineExtractor.extract(item)
         val lore = loreLineFlatter.flatten(loreLineList) // flatten the lore lines
-        nekoStack.lore(lore)
+        item.lore(lore)
 
-        val customModelData = itemModelDataLookup[nekoStack.key, nekoStack.variant]
-        nekoStack.customModelData(customModelData)
+        val customModelData = itemModelDataLookup[item.key, item.variant]
+        item.customModelData(customModelData)
 
-        nekoStack.erase() // 为了麦若, 去掉 `minecraft:custom_data`
+        item.erase() // 为了麦若, 去掉 `minecraft:custom_data`
     }
 }
 

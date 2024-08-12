@@ -5,11 +5,10 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.toSimpleString
-import net.kyori.adventure.extra.kotlin.text
+import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
@@ -26,7 +25,7 @@ internal class SimpleMergingSession(
     private val logger: Logger by inject()
 
     companion object {
-        private val PREFIX = "[${SimpleMergingSession::class.simpleName}]"
+        private const val PREFIX = ReforgeLoggerPrefix.MERGE
     }
 
     constructor(
@@ -176,7 +175,7 @@ internal class SimpleMergingSession(
     object Result {
 
         /**
-         * 构建一个用于表示*空合并*的 [MergingSession.Result].
+         * 构建一个用于表示*没有合并*的 [MergingSession.Result].
          */
         fun empty(): MergingSession.Result {
             return Result(false, NekoStack.empty(), Type.empty(), Cost.zero())
@@ -196,9 +195,6 @@ internal class SimpleMergingSession(
             return Result(true, item, type, cost)
         }
 
-        /**
-         * 一个一般的 [MergingSession.Result] 实现.
-         */
         private class Result(
             successful: Boolean,
             item: NekoStack,
@@ -263,11 +259,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation
                 get() = throw IllegalStateException("This type is not supposed to be used.")
             override val description: List<Component> = listOf(
-                text {
-                    content("合并类型: 无")
-                    color(NamedTextColor.WHITE)
-                    decoration(TextDecoration.ITALIC, false)
-                }
+                "<!i><white>类型: 无".mini
             )
         }
 
@@ -275,11 +267,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation
                 get() = throw IllegalStateException("This type is not supposed to be used.")
             override val description: List<Component> = listOf(
-                text {
-                    content("合并类型: 失败")
-                    color(NamedTextColor.RED)
-                    decoration(TextDecoration.ITALIC, false)
-                }
+                "<!i><white>类型: <red>无法计算".mini
             )
         }
 
@@ -287,11 +275,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation =
                 AttributeModifier.Operation.ADD
             override val description: List<Component> = listOf(
-                text {
-                    content("合并类型: OP0")
-                    color(NamedTextColor.WHITE)
-                    decoration(TextDecoration.ITALIC, false)
-                }
+                "<!i><white>类型: <green>OP0".mini
             )
         }
 
@@ -299,11 +283,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation =
                 AttributeModifier.Operation.MULTIPLY_BASE
             override val description: List<Component> = listOf(
-                text {
-                    content("合并类型: OP1")
-                    color(NamedTextColor.WHITE)
-                    decoration(TextDecoration.ITALIC, false)
-                }
+                "<!i><white>类型: <green>OP1".mini
             )
         }
 
@@ -311,11 +291,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation =
                 AttributeModifier.Operation.MULTIPLY_TOTAL
             override val description: List<Component> = listOf(
-                text {
-                    content("合并类型: OP2")
-                    color(NamedTextColor.WHITE)
-                    decoration(TextDecoration.ITALIC, false)
-                }
+                "<!i><white>类型: <green>OP2".mini
             )
         }
     }
@@ -325,21 +301,21 @@ internal class SimpleMergingSession(
      */
     object Cost {
         /**
-         * 无消耗.
+         * 表示没有资源消耗, 当没有合并发生时使用这个.
          */
         fun zero(): MergingSession.Cost {
             return Zero
         }
 
         /**
-         * 无法计算的消耗, 用于合并失败.
+         * 表示由于合并失败而产生的资源消耗.
          */
         fun failure(): MergingSession.Cost {
             return Failure
         }
 
         /**
-         * 普通消耗, 用于合并成功.
+         * 表示由于合并成功而产生的资源消耗.
          */
         fun success(defaultCurrencyAmount: Double): MergingSession.Cost {
             return Success(defaultCurrencyAmount)
@@ -349,24 +325,14 @@ internal class SimpleMergingSession(
             override fun toString(): String = toSimpleString()
         }
 
-        /**
-         * 表示无资源消耗.
-         */
         private data object Zero : Base() {
             override fun take(viewer: Player) = Unit
             override fun test(viewer: Player): Boolean = true
             override val description: List<Component> = listOf(
-                text {
-                    content("合并花费: 无")
-                    color(NamedTextColor.WHITE)
-                    decoration(TextDecoration.ITALIC, false)
-                }
+                "<!i><white>花费: 无".mini
             )
         }
 
-        /**
-         * 表示由于合并失败而产生的无法计算的资源消耗.
-         */
         private data object Failure : Base() {
             override fun take(viewer: Player): Unit =
                 throw IllegalStateException("This cost is not supposed to be taken.")
@@ -375,20 +341,13 @@ internal class SimpleMergingSession(
                 throw IllegalStateException("This cost is not supposed to be tested.")
 
             override val description: List<Component> = listOf(
-                text {
-                    content("合并花费: 无法计算")
-                    color(NamedTextColor.RED)
-                    decoration(TextDecoration.ITALIC, false)
-                }
+                "<!i><white>花费: <red>无法计算".mini
             )
         }
 
         // 2024/8/12 TBD
         // 支持多货币
         // 支持自定义物品
-        /**
-         * 表示一个合并成功的资源消耗.
-         */
         private data class Success(
             val defaultCurrencyAmount: Double,
         ) : Base() {
@@ -401,11 +360,7 @@ internal class SimpleMergingSession(
             }
 
             override val description: List<Component> = listOf(
-                text {
-                    content("合并花费: $defaultCurrencyAmount")
-                    color(NamedTextColor.WHITE)
-                    decoration(TextDecoration.ITALIC, false)
-                }
+                "<!i><white>花费: <green>${defaultCurrencyAmount.toInt()} 金币".mini
             )
 
             override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(

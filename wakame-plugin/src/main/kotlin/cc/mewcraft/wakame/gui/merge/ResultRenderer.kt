@@ -1,34 +1,61 @@
 package cc.mewcraft.wakame.gui.merge
 
-import cc.mewcraft.wakame.display.ItemRenderer
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.bypassPacket
 import cc.mewcraft.wakame.reforge.merge.MergingSession
+import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 
 /**
- * 负责渲染合并后的结果.
+ * 负责渲染合并后的物品在 [MergingMenu.outputSlot] 里面的样子.
  */
-internal class ResultRenderer(
-    private val result: MergingSession.Result,
-) : ItemRenderer<NekoStack> {
-    override fun render(nekoStack: NekoStack) {
-        nekoStack.bypassPacket()
+internal object ResultRenderer {
+    fun render(result: MergingSession.Result): ItemStack {
+        val item = result.item
+        val ret: ItemStack
 
-        val handle = nekoStack.unsafe.handle
+        if (result.successful) {
+            // 渲染成功的结果
 
-        handle.editMeta { meta ->
-            val name = Component.text("合成核心")
-            meta.itemName(name)
+            ret = ItemStack(item.unsafe.handle.type)
+            ret.editMeta { meta ->
+                val name = text {
+                    content("合成核心")
+                    color(NamedTextColor.AQUA)
+                    decorate(TextDecoration.BOLD)
+                }
+                val lore = buildList {
+                    add(Component.empty())
+                    addAll(result.type.description)
+                    addAll(result.cost.description)
+                }
 
-            val lore = mutableListOf<Component>()
-            lore += Component.empty()
-            lore += result.type.description
-            lore += Component.empty()
-            lore += result.cost.description
-            meta.lore(lore)
+                meta.itemName(name)
+                meta.lore(lore)
+            }
+        } else {
+            // 渲染失败的结果
+
+            ret = ItemStack(Material.BARRIER) // 使用 `minecraft:barrier` 作为合并失败的“基础物品”
+            ret.editMeta { meta ->
+                val name = text {
+                    content("无法合并!")
+                    color(NamedTextColor.RED)
+                    decorate(TextDecoration.BOLD)
+                }
+                val lore = buildList {
+                    add(Component.empty())
+                    addAll(result.type.description)
+                    addAll(result.cost.description)
+                }
+
+                meta.itemName(name)
+                meta.lore(lore)
+            }
         }
 
-        nekoStack.erase()
+        return ret
     }
 }

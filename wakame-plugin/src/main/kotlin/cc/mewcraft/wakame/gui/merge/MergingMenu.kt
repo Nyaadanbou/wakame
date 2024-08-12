@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.gui.merge
 
 import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable
 import cc.mewcraft.wakame.util.hideTooltip
@@ -23,6 +24,10 @@ internal class MergingMenu(
     val viewer: Player,
 ) : KoinComponent {
 
+    companion object {
+        private const val PREFIX = ReforgeLoggerPrefix.MERGE
+    }
+
     /**
      * 给玩家展示合并台.
      */
@@ -31,17 +36,15 @@ internal class MergingMenu(
     }
 
     /**
-     * 根据当前 [mergingSession] 的状态, 刷新输出容器.
+     * 根据当前 [mergingSession] 的状态, 进行一次合并操作, 并刷新输出容器里的物品.
      */
     fun refreshOutput() {
+        // 进行一次合并操作
         val result = mergingSession.merge()
-        if (result.successful) {
-            val item = result.item
-            ResultRenderer(result).render(item)
-            setOutputSlot(item.unsafe.handle)
-        } else {
-            setOutputSlot(null)
-        }
+        // 根据合并的结果, 渲染输出容器里的物品
+        val output = ResultRenderer.render(result)
+        // 设置输出容器里的物品
+        setOutputSlot(output)
     }
 
     /**
@@ -85,6 +88,10 @@ internal class MergingMenu(
     }
 
     init {
+        inputSlot1.guiPriority = 3
+        inputSlot2.guiPriority = 2
+        outputSlot.guiPriority = 1
+
         inputSlot1.setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT1) }
         inputSlot2.setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT2) }
         outputSlot.setPreUpdateHandler(::onOutputSlotPreUpdate)
@@ -98,7 +105,7 @@ internal class MergingMenu(
     private fun onInputSlotPreUpdate(e: ItemPreUpdateEvent, inputSlot: InputSlot) {
         val oldItem = e.previousItem
         val newItem = e.newItem
-        logger.info("MergingMenu input slot pre-update: ${oldItem?.type} -> ${newItem?.type}")
+        logger.info("$PREFIX Input slot ($inputSlot) pre-update: ${oldItem?.type} -> ${newItem?.type}")
 
         when {
             e.isSwap -> {
@@ -148,7 +155,7 @@ internal class MergingMenu(
     private fun onOutputSlotPreUpdate(e: ItemPreUpdateEvent) {
         val oldItem = e.previousItem
         val newItem = e.newItem
-        logger.info("MergingMenu output slot pre-update: ${oldItem?.type} -> ${newItem?.type}")
+        logger.info("$PREFIX Output slot pre-update: ${oldItem?.type} -> ${newItem?.type}")
 
         when {
             e.isSwap || e.isAdd -> {
@@ -181,7 +188,7 @@ internal class MergingMenu(
     //</editor-fold>
 
     private fun onWindowClose() {
-        logger.info("MergingMenu closed for ${viewer.name}")
+        logger.info("$PREFIX Menu closed for ${viewer.name}")
 
         setInputSlot1(null)
         setInputSlot2(null)
@@ -193,7 +200,7 @@ internal class MergingMenu(
     }
 
     private fun onWindowOpen() {
-        logger.info("MergingMenu opened for ${viewer.name}")
+        logger.info("$PREFIX Menu opened for ${viewer.name}")
     }
 
     private fun getInputSlot1(): ItemStack? {
