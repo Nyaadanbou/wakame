@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeS
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeSE
+import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession.Cost
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession.Result
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession.Type
@@ -22,7 +23,7 @@ internal class MergeOperation(
     private val logger: Logger,
 ) {
     companion object {
-        private val PREFIX = "[${MergeOperation::class.simpleName}]"
+        private const val PREFIX = ReforgeLoggerPrefix.MERGE
     }
 
     fun execute(): MergingSession.Result {
@@ -34,26 +35,31 @@ internal class MergeOperation(
         val inputItem1 = session.inputItem1
         val inputItem2 = session.inputItem2
 
+        // 输入的物品不能是空
         if (inputItem1 == null || inputItem2 == null) {
             logger.info("$PREFIX Trying to merge with null input items.")
             return Result.empty()
         }
 
+        // 输入的物品必须是*便携式*属性*核心*
         val core1 = (inputItem1.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute)
             ?: return Result.failure()
         val core2 = (inputItem2.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute)
             ?: return Result.failure()
 
+        // 两个核心除了数值以外, 其余数据必须一致
         if (!core1.isSimilar(core2)) {
             logger.info("$PREFIX Trying to merge cores with different attributes.")
             return Result.failure()
         }
 
+        // 输入的核心种类至少要跟一条规则相匹配
         if (!session.table.acceptedCoreMatcher.test(core1) || !session.table.acceptedCoreMatcher.test(core2)) {
             logger.info("$PREFIX Trying to merge cores with unacceptable types.")
             return Result.failure()
         }
 
+        // 输入的物品等级必须低于工作台指定的值
         if (session.getLevel1() > session.table.maxInputItemLevel || session.getLevel2() > session.table.maxInputItemLevel) {
             logger.info("$PREFIX Trying to merge cores with too high level.")
             return Result.failure()
@@ -78,6 +84,8 @@ internal class MergeOperation(
         }
 
         val mergedPenalty = session.outputPenaltyFunction.evaluate().let(::ceil).toInt()
+
+        // 合并后的惩罚值必须低于工作台指定的值
         if (mergedPenalty > session.table.maxOutputItemPenalty) {
             logger.info("$PREFIX Trying to merge cores with too high penalty.")
             return Result.failure()

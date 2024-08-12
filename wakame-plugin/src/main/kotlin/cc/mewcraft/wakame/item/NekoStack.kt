@@ -29,7 +29,7 @@ interface NekoStack : Keyed, Examinable {
      */
     companion object {
         /**
-         * 获取一个空的 [NekoStack].
+         * 获取一个空的 [NekoStack], 底层为 `minecraft:air`.
          *
          * 该实例的所有状态都不可变; 尝试改变其状态不会有任何效果.
          */

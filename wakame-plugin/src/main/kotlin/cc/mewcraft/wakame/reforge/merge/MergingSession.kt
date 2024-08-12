@@ -153,16 +153,20 @@ interface MergingSession : Examinable {
         /**
          * 本次合并是否成功.
          *
-         * 如果成功, [item] 将会是合并后的物品, [cost] 将会是合并所消耗的资源.
-         * 如果失败, [item] 和 [cost] 将会是空的.
+         * 如果成功 (`true`), [item] 将会是合并成功后的物品, [cost] 将会是合并所消耗的资源,
+         * 并且 [item] 和 [cost] 的所有函数都会正常返回.
+         *
+         * 如果失败 (`false`), [item] 和 [cost] 的部分函数将不会正常返回 (会抛异常).
          */
         val successful: Boolean
 
         /**
          * 合并后的物品.
          *
-         * 用户应该始终先检查 [successful] 是否为 `true`, 然后再使用 [item].
+         * 如果要将该物品给予玩家, 应该先确保 [successful] 为 `true` 后再进行操作.
+         * 当 [successful] 为 `false` 时, 该对象实际上是 [NekoStack.empty].
          */
+        @get:Contract(" -> new")
         val item: NekoStack
 
         /**
