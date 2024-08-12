@@ -101,7 +101,7 @@ internal class SimpleMergingTable(
         private val code: Map<MergingTable.NumberMergeFunction.Type, String>,
     ) : MergingTable.NumberMergeFunction {
         override fun code(type: MergingTable.NumberMergeFunction.Type): String {
-            return code[type] ?: error("No code for type '$type'")
+            return code[type] ?: throw IllegalArgumentException("No code for type '$type'")
         }
 
         override fun compile(type: MergingTable.NumberMergeFunction.Type, session: MergingSession): MochaFunction {

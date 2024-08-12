@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.PortableCore
@@ -20,39 +21,50 @@ internal class MergeOperation(
     private val session: MergingSession,
     private val logger: Logger,
 ) {
+    companion object {
+        private val PREFIX = "[${MergeOperation::class.simpleName}]"
+    }
+
     fun execute(): MergingSession.Result {
         if (session.frozen) {
-            logger.error("Trying to merge a frozen merging session. This is a bug!")
+            logger.error("$PREFIX Trying to merge a frozen merging session. This is a bug!")
             return Result.failure()
         }
 
-        val inputItemX = session.inputItem1
-        val inputItemY = session.inputItem2
+        val inputItem1 = session.inputItem1
+        val inputItem2 = session.inputItem2
 
-        if (inputItemX == null || inputItemY == null) {
-            logger.info("Trying to merge with null input items.")
+        if (inputItem1 == null || inputItem2 == null) {
+            logger.info("$PREFIX Trying to merge with null input items.")
             return Result.empty()
         }
 
-        val coreX = (inputItemX.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute) ?: return Result.failure()
-        val coreY = (inputItemY.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute) ?: return Result.failure()
+        val core1 = (inputItem1.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute)
+            ?: return Result.failure()
+        val core2 = (inputItem2.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute)
+            ?: return Result.failure()
 
-        if (!coreX.isSimilar(coreY)) {
-            logger.info("Trying to merge cores with different attributes.")
+        if (!core1.isSimilar(core2)) {
+            logger.info("$PREFIX Trying to merge cores with different attributes.")
             return Result.failure()
         }
 
-        val mergedOperation = coreX.operation
-        val mergeType = MergingTable.NumberMergeFunction.Type.by(mergedOperation)
-        val mergedValue = session.numberMergeFunction(mergeType).evaluate()
-        val mergedCore = when (coreX) {
-            is CoreAttributeS -> {
-                coreX.copy(value = mergedValue)
-            }
+        if (!session.table.acceptedCoreMatcher.test(core1) || !session.table.acceptedCoreMatcher.test(core2)) {
+            logger.info("$PREFIX Trying to merge cores with unacceptable types.")
+            return Result.failure()
+        }
 
-            is CoreAttributeSE -> {
-                coreX.copy(value = mergedValue)
-            }
+        if (session.getLevel1() > session.table.maxInputItemLevel || session.getLevel2() > session.table.maxInputItemLevel) {
+            logger.info("$PREFIX Trying to merge cores with too high level.")
+            return Result.failure()
+        }
+
+        val mergedOp = core1.operation
+        val mergeType = MergingTable.NumberMergeFunction.Type.by(mergedOp)
+        val mergedValue = session.numberMergeFunction(mergeType).evaluate()
+        val mergedCore = when (core1 /* 或者用 core2, 结果上没有区别 */) {
+            is CoreAttributeS -> core1.copy(value = mergedValue)
+            is CoreAttributeSE -> core1.copy(value = mergedValue)
 
             // 我们不支持拥有两个数值的核心, 原因:
             // - 实际的游戏设计中, 不太可能设计出合并这种核心
@@ -60,21 +72,29 @@ internal class MergeOperation(
             // - 拥有两个数值的核心也许本来就是个设计错误...
 
             else -> {
-                logger.error("Can't merge the cores: $coreX, $coreY")
+                logger.info("$PREFIX Trying to merge cores with multiple value structure.")
                 return Result.failure()
             }
         }
 
         val mergedPenalty = session.outputPenaltyFunction.evaluate().let(::ceil).toInt()
+        if (mergedPenalty > session.table.maxOutputItemPenalty) {
+            logger.info("$PREFIX Trying to merge cores with too high penalty.")
+            return Result.failure()
+        }
+
         val mergedLevel = session.outputLevelFunction.evaluate().let(::ceil).toInt().toShort()
+
+        // 输出的物品直接以 inputItem1 为基础进行修改
+        val outputItem: NekoStack = inputItem1
+        outputItem.components.set(ItemComponentTypes.LEVEL, ItemLevel(mergedLevel))
+        outputItem.components.set(ItemComponentTypes.PORTABLE_CORE, PortableCore(mergedCore, mergedPenalty))
+
         val totalCost = session.currencyCostFunction.evaluate()
 
-        inputItemX.components.set(ItemComponentTypes.LEVEL, ItemLevel(mergedLevel))
-        inputItemX.components.set(ItemComponentTypes.PORTABLE_CORE, PortableCore(mergedCore, mergedPenalty))
-
         return Result.success(
-            item = inputItemX,
-            type = Type.success(mergedOperation),
+            item = outputItem,
+            type = Type.success(mergedOp),
             cost = Cost.success(totalCost)
         )
     }

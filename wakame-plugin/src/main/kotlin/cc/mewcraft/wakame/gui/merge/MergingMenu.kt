@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable
 import cc.mewcraft.wakame.util.hideTooltip
-import net.kyori.adventure.text.Component.text
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -79,7 +78,7 @@ internal class MergingMenu(
 
     private val primaryWindow: Window = Window.single { builder ->
         builder.setGui(primaryGui)
-        builder.setTitle(text("合并台"))
+        builder.setTitle(table.title)
         builder.setViewer(viewer)
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
@@ -132,12 +131,12 @@ internal class MergingMenu(
                 when (inputSlot) {
                     InputSlot.INPUT1 -> {
                         setInputSlot1(null)
-                        mergingSession.returnInputItemX(viewer)
+                        mergingSession.returnInputItem1(viewer)
                     }
 
                     InputSlot.INPUT2 -> {
                         setInputSlot2(null)
-                        mergingSession.returnInputItemY(viewer)
+                        mergingSession.returnInputItem2(viewer)
                     }
                 }
 
@@ -188,8 +187,8 @@ internal class MergingMenu(
         setInputSlot2(null)
         setOutputSlot(null)
 
-        mergingSession.returnInputItemX(viewer)
-        mergingSession.returnInputItemY(viewer)
+        mergingSession.returnInputItem1(viewer)
+        mergingSession.returnInputItem2(viewer)
         mergingSession.frozen = true
     }
 
