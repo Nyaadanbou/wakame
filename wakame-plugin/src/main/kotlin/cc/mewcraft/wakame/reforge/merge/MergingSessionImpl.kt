@@ -25,6 +25,10 @@ internal class SimpleMergingSession(
 ) : MergingSession, KoinComponent {
     private val logger: Logger by inject()
 
+    companion object {
+        private val PREFIX = "[${SimpleMergingSession::class.simpleName}]"
+    }
+
     constructor(
         viewer: Player,
         table: MergingTable,
@@ -47,7 +51,7 @@ internal class SimpleMergingSession(
         slot: InputSlot,
     ) {
         if (frozen) {
-            logger.error("Trying to return input item of a frozen merging session. This is a bug!")
+            logger.error("$PREFIX Trying to return input item of a frozen merging session. This is a bug!")
             return
         }
 
@@ -60,7 +64,7 @@ internal class SimpleMergingSession(
             try {
                 viewer.inventory.addItem(item)
             } catch (e: Exception) {
-                logger.error("Failed to return input item to player", e)
+                logger.error("$PREFIX Failed to return input item '$slot' to player '${viewer.name}'", e)
             } finally {
                 when (slot) {
                     InputSlot.INPUT1 -> inputItem1 = null
@@ -70,16 +74,16 @@ internal class SimpleMergingSession(
         }
     }
 
-    override fun returnInputItemX(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT1)
-    override fun returnInputItemY(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
+    override fun returnInputItem1(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT1)
+    override fun returnInputItem2(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
 
     override var result: MergingSession.Result by Delegates.vetoable(Result.empty()) { _, old, new ->
         if (frozen) {
-            logger.error("Trying to set result of a frozen merging session. This is a bug!")
+            logger.error("$PREFIX Trying to set result of a frozen merging session. This is a bug!")
             return@vetoable false
         }
 
-        logger.info("Updating MergingSession result")
+        logger.info("$PREFIX Updating result: $new")
         return@vetoable true
     }
 
@@ -97,10 +101,10 @@ internal class SimpleMergingSession(
         val result = try {
             operation.execute()
         } catch (e: MergingOperationException) {
-            logger.info("Failed to merge: {}", e.message)
+            logger.info("$PREFIX Failed to merge: {}", e.message)
             Result.failure()
         } catch (e: Exception) {
-            logger.error("An unknown error occurred while merging. This is a bug!", e)
+            logger.error("$PREFIX An unknown error occurred while merging. This is a bug!", e)
             Result.failure()
         }
 
@@ -115,11 +119,11 @@ internal class SimpleMergingSession(
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
         if (!new && old) {
-            logger.error("Unfreezing a frozen merging session. This is a bug!")
+            logger.error("$PREFIX Unfreezing a frozen merging session. This is a bug!")
             return@vetoable false
         }
 
-        logger.info("Freezing MergingSession frozen")
+        logger.info("$PREFIX Updating frozen state: $new")
         return@vetoable true
     }
 
@@ -192,6 +196,9 @@ internal class SimpleMergingSession(
             return Result(true, item, type, cost)
         }
 
+        /**
+         * 一个一般的 [MergingSession.Result] 实现.
+         */
         private class Result(
             successful: Boolean,
             item: NekoStack,
@@ -246,7 +253,13 @@ internal class SimpleMergingSession(
             }
         }
 
-        private class Empty : MergingSession.Type {
+        private abstract class Base : MergingSession.Type {
+            override fun toString(): String {
+                return toSimpleString()
+            }
+        }
+
+        private class Empty : Base() {
             override val operation: AttributeModifier.Operation
                 get() = throw IllegalStateException("This type is not supposed to be used.")
             override val description: List<Component> = listOf(
@@ -258,7 +271,7 @@ internal class SimpleMergingSession(
             )
         }
 
-        private class Failure : MergingSession.Type {
+        private class Failure : Base() {
             override val operation: AttributeModifier.Operation
                 get() = throw IllegalStateException("This type is not supposed to be used.")
             override val description: List<Component> = listOf(
@@ -270,8 +283,9 @@ internal class SimpleMergingSession(
             )
         }
 
-        private class Success0 : MergingSession.Type {
-            override val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD
+        private class Success0 : Base() {
+            override val operation: AttributeModifier.Operation =
+                AttributeModifier.Operation.ADD
             override val description: List<Component> = listOf(
                 text {
                     content("合并类型: OP0")
@@ -281,8 +295,9 @@ internal class SimpleMergingSession(
             )
         }
 
-        private class Success1 : MergingSession.Type {
-            override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_BASE
+        private class Success1 : Base() {
+            override val operation: AttributeModifier.Operation =
+                AttributeModifier.Operation.MULTIPLY_BASE
             override val description: List<Component> = listOf(
                 text {
                     content("合并类型: OP1")
@@ -292,8 +307,9 @@ internal class SimpleMergingSession(
             )
         }
 
-        private class Success2 : MergingSession.Type {
-            override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_TOTAL
+        private class Success2 : Base() {
+            override val operation: AttributeModifier.Operation =
+                AttributeModifier.Operation.MULTIPLY_TOTAL
             override val description: List<Component> = listOf(
                 text {
                     content("合并类型: OP2")
@@ -329,10 +345,14 @@ internal class SimpleMergingSession(
             return Success(defaultCurrencyAmount)
         }
 
+        private abstract class Base : MergingSession.Cost {
+            override fun toString(): String = toSimpleString()
+        }
+
         /**
-         * 零消耗.
+         * 表示无资源消耗.
          */
-        private data object Zero : MergingSession.Cost {
+        private data object Zero : Base() {
             override fun take(viewer: Player) = Unit
             override fun test(viewer: Player): Boolean = true
             override val description: List<Component> = listOf(
@@ -344,7 +364,10 @@ internal class SimpleMergingSession(
             )
         }
 
-        private data object Failure : MergingSession.Cost {
+        /**
+         * 表示由于合并失败而产生的无法计算的资源消耗.
+         */
+        private data object Failure : Base() {
             override fun take(viewer: Player): Unit =
                 throw IllegalStateException("This cost is not supposed to be taken.")
 
@@ -360,11 +383,15 @@ internal class SimpleMergingSession(
             )
         }
 
-        // TBD 支持多货币
-        // TBD 支持自定义物品
+        // 2024/8/12 TBD
+        // 支持多货币
+        // 支持自定义物品
+        /**
+         * 表示一个合并成功的资源消耗.
+         */
         private data class Success(
             val defaultCurrencyAmount: Double,
-        ) : MergingSession.Cost {
+        ) : Base() {
             override fun take(viewer: Player) {
                 // TODO 实现 take, 还有下面的 test
             }
@@ -379,6 +406,10 @@ internal class SimpleMergingSession(
                     color(NamedTextColor.WHITE)
                     decoration(TextDecoration.ITALIC, false)
                 }
+            )
+
+            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+                ExaminableProperty.of("defaultCurrencyAmount", defaultCurrencyAmount),
             )
         }
     }

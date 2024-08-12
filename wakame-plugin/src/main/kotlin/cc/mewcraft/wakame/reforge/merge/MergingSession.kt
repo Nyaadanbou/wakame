@@ -39,14 +39,14 @@ interface MergingSession : Examinable {
      *
      * 该函数返回后, [inputItem1] 将被设置为 `null`.
      */
-    fun returnInputItemX(viewer: Player)
+    fun returnInputItem1(viewer: Player)
 
     /**
      * 将 [inputItem2] (的克隆) 归还给玩家.
      *
      * 该函数返回后, [inputItem2] 将被设置为 `null`.
      */
-    fun returnInputItemY(viewer: Player)
+    fun returnInputItem2(viewer: Player)
 
     /**
      * 合并 [inputItem1] 和 [inputItem2] 的结果.

@@ -80,7 +80,7 @@ interface MergingTable : Examinable {
          * ( query.x + query.y ) * ( 0.7 + math.random(-0.5, 0.5) )
          * ```
          *
-         * 如果指定的源代码不存在, 则返回空字符串.
+         * @throws IllegalArgumentException 如果指定的源代码不存在
          */
         fun code(type: Type): String
 
