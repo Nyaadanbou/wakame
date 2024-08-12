@@ -31,39 +31,49 @@ internal class SimpleMergingSession(
         inputItem1: NekoStack?,
         inputItem2: NekoStack?,
     ) : this(viewer, table) {
-        this.inputItemX = inputItem1
-        this.inputItemY = inputItem2
+        this.inputItem1 = inputItem1
+        this.inputItem2 = inputItem2
     }
 
-    override var inputItemX: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(null)
-    override var inputItemY: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(null)
+    override var inputItem1: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(null)
+    override var inputItem2: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(null)
+
+    private enum class InputSlot {
+        INPUT1, INPUT2
+    }
 
     private fun returnInputItem(
-        inputItem: NekoStack?,
         viewer: Player,
-        setInputItem: () -> Unit,
+        slot: InputSlot,
     ) {
         if (frozen) {
             logger.error("Trying to return input item of a frozen merging session. This is a bug!")
             return
         }
 
-        val item = inputItem?.unsafe?.handle
+        val item = when (slot) {
+            InputSlot.INPUT1 -> inputItem1
+            InputSlot.INPUT2 -> inputItem2
+        }?.unsafe?.handle
+
         if (item != null) {
             try {
                 viewer.inventory.addItem(item)
             } catch (e: Exception) {
                 logger.error("Failed to return input item to player", e)
             } finally {
-                setInputItem()
+                when (slot) {
+                    InputSlot.INPUT1 -> inputItem1 = null
+                    InputSlot.INPUT2 -> inputItem2 = null
+                }
             }
         }
     }
 
-    override fun returnInputItemX(viewer: Player) = returnInputItem(inputItemX, viewer) { inputItemX = null }
-    override fun returnInputItemY(viewer: Player) = returnInputItem(inputItemY, viewer) { inputItemY = null }
+    override fun returnInputItemX(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT1)
+    override fun returnInputItemY(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
 
-    override var result: MergingSession.Result by Delegates.vetoable(Result.failure()) { _, old, new ->
+    override var result: MergingSession.Result by Delegates.vetoable(Result.empty()) { _, old, new ->
         if (frozen) {
             logger.error("Trying to set result of a frozen merging session. This is a bug!")
             return@vetoable false
@@ -83,18 +93,24 @@ internal class SimpleMergingSession(
 
     override fun merge(): MergingSession.Result {
         val operation = MergeOperation(this, logger)
+
         val result = try {
             operation.execute()
         } catch (e: MergingOperationException) {
             logger.info("Failed to merge: {}", e.message)
-            return Result.failure()
+            Result.failure()
         } catch (e: Exception) {
             logger.error("An unknown error occurred while merging. This is a bug!", e)
-            return Result.failure()
-        } finally {
-            frozen = true
+            Result.failure()
         }
-        return result
+
+        return result.also { this.result = it }
+    }
+
+    override fun reset() {
+        inputItem1 = null
+        inputItem2 = null
+        result = Result.empty()
     }
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
@@ -133,14 +149,14 @@ internal class SimpleMergingSession(
         return penalty.toDouble()
     }
 
-    override fun getValueX(): Double = getValue(inputItemX)
-    override fun getValueY(): Double = getValue(inputItemY)
-    override fun getLevelX(): Double = getLevel(inputItemX)
-    override fun getLevelY(): Double = getLevel(inputItemY)
-    override fun getRarityNumberX(): Double = getRarityNumber(inputItemX)
-    override fun getRarityNumberY(): Double = getRarityNumber(inputItemY)
-    override fun getPenaltyX(): Double = getPenalty(inputItemX)
-    override fun getPenaltyY(): Double = getPenalty(inputItemY)
+    override fun getValue1(): Double = getValue(inputItem1)
+    override fun getValue2(): Double = getValue(inputItem2)
+    override fun getLevel1(): Double = getLevel(inputItem1)
+    override fun getLevel2(): Double = getLevel(inputItem2)
+    override fun getRarityNumber1(): Double = getRarityNumber(inputItem1)
+    override fun getRarityNumber2(): Double = getRarityNumber(inputItem2)
+    override fun getPenalty1(): Double = getPenalty(inputItem1)
+    override fun getPenalty2(): Double = getPenalty(inputItem2)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("viewer", viewer),
@@ -156,21 +172,21 @@ internal class SimpleMergingSession(
     object Result {
 
         /**
-         * 构建一个用于表示空合并的 [MergingSession.Result].
+         * 构建一个用于表示*空合并*的 [MergingSession.Result].
          */
         fun empty(): MergingSession.Result {
             return Result(false, NekoStack.empty(), Type.empty(), Cost.zero())
         }
 
         /**
-         * 构建一个用于表示合并失败的 [MergingSession.Result].
+         * 构建一个用于表示*合并失败*的 [MergingSession.Result].
          */
         fun failure(): MergingSession.Result {
             return Result(false, NekoStack.empty(), Type.failure(), Cost.failure())
         }
 
         /**
-         * 构建一个用于表示合并成功的 [MergingSession.Result].
+         * 构建一个用于表示*合并成功*的 [MergingSession.Result].
          */
         fun success(item: NekoStack, type: MergingSession.Type, cost: MergingSession.Cost): MergingSession.Result {
             return Result(true, item, type, cost)
@@ -222,11 +238,11 @@ internal class SimpleMergingSession(
         /**
          * 通过 [AttributeModifier.Operation] 构建 [MergingSession.Type].
          */
-        fun by(operation: AttributeModifier.Operation): MergingSession.Type {
+        fun success(operation: AttributeModifier.Operation): MergingSession.Type {
             return when (operation) {
-                AttributeModifier.Operation.ADD -> Op0()
-                AttributeModifier.Operation.MULTIPLY_BASE -> Op1()
-                AttributeModifier.Operation.MULTIPLY_TOTAL -> Op2()
+                AttributeModifier.Operation.ADD -> Success0()
+                AttributeModifier.Operation.MULTIPLY_BASE -> Success1()
+                AttributeModifier.Operation.MULTIPLY_TOTAL -> Success2()
             }
         }
 
@@ -254,7 +270,7 @@ internal class SimpleMergingSession(
             )
         }
 
-        private class Op0 : MergingSession.Type {
+        private class Success0 : MergingSession.Type {
             override val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD
             override val description: List<Component> = listOf(
                 text {
@@ -265,7 +281,7 @@ internal class SimpleMergingSession(
             )
         }
 
-        private class Op1 : MergingSession.Type {
+        private class Success1 : MergingSession.Type {
             override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_BASE
             override val description: List<Component> = listOf(
                 text {
@@ -276,7 +292,7 @@ internal class SimpleMergingSession(
             )
         }
 
-        private class Op2 : MergingSession.Type {
+        private class Success2 : MergingSession.Type {
             override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_TOTAL
             override val description: List<Component> = listOf(
                 text {
@@ -309,8 +325,8 @@ internal class SimpleMergingSession(
         /**
          * 普通消耗, 用于合并成功.
          */
-        fun normal(defaultCurrencyAmount: Double): MergingSession.Cost {
-            return Normal(defaultCurrencyAmount)
+        fun success(defaultCurrencyAmount: Double): MergingSession.Cost {
+            return Success(defaultCurrencyAmount)
         }
 
         /**
@@ -346,7 +362,7 @@ internal class SimpleMergingSession(
 
         // TBD 支持多货币
         // TBD 支持自定义物品
-        private class Normal(
+        private data class Success(
             val defaultCurrencyAmount: Double,
         ) : MergingSession.Cost {
             override fun take(viewer: Player) {

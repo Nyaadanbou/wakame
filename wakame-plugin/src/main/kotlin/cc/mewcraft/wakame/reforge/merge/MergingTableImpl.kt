@@ -40,7 +40,7 @@ internal object WtfMergingTable : MergingTable {
         override fun get(key: Key): Double = 10.0
     }
 
-    override val numberMergeFunction: MergingTable.NumberMergeFunction = SimpleMergingTable.NumberMergeFunction(emptyMap<MergingTable.NumberMergeFunction.Type, String>().withDefault {
+    override val numberMergeFunction: MergingTable.NumberMergeFunction = SimpleMergingTable.NumberMergeFunction(MergingTable.NumberMergeFunction.Type.entries.associateWith {
         // 返回两个属性数值之和
         "query.value_1() + query.value_2()"
     })
@@ -101,7 +101,7 @@ internal class SimpleMergingTable(
         private val code: Map<MergingTable.NumberMergeFunction.Type, String>,
     ) : MergingTable.NumberMergeFunction {
         override fun code(type: MergingTable.NumberMergeFunction.Type): String {
-            return code[type] ?: ""
+            return code[type] ?: error("No code for type '$type'")
         }
 
         override fun compile(type: MergingTable.NumberMergeFunction.Type, session: MergingSession): MochaFunction {
@@ -194,61 +194,61 @@ internal class SimpleMergingTable(
 
 //<editor-fold desc="Mocha bindings">
 @Binding("query")
-private class NumberMergeBinding(
+internal class NumberMergeBinding(
     val session: MergingSession,
 ) {
     @Binding("value_1")
-    fun value1(): Double = session.getValueX()
+    fun value1(): Double = session.getValue1()
 
     @Binding("value_2")
-    fun value2(): Double = session.getValueY()
+    fun value2(): Double = session.getValue2()
 }
 
 @Binding("query")
-private class OutputLevelBinding(
+internal class OutputLevelBinding(
     val session: MergingSession,
 ) {
     @Binding("level_1")
-    fun level1(): Double = session.getLevelX()
+    fun level1(): Double = session.getLevel1()
 
     @Binding("level_2")
-    fun level2(): Double = session.getLevelY()
+    fun level2(): Double = session.getLevel2()
 }
 
 @Binding("query")
-private class OutputPenaltyBinding(
+internal class OutputPenaltyBinding(
     val session: MergingSession,
 ) {
     @Binding("penalty_1")
-    fun penalty1(): Double = session.getPenaltyX()
+    fun penalty1(): Double = session.getPenalty1()
 
     @Binding("penalty_2")
-    fun penalty2(): Double = session.getPenaltyY()
+    fun penalty2(): Double = session.getPenalty2()
 }
 
 @Binding("query")
-private class TotalCostBinding(
+internal class TotalCostBinding(
     val session: MergingSession,
 ) {
     @Binding("base")
     fun base(): Double = session.table.currencyCost.base
 
     @Binding("level_1")
-    fun level1(): Double = session.getLevelX()
+    fun level1(): Double = session.getLevel1()
 
     @Binding("level_2")
-    fun level2(): Double = session.getLevelY()
+    fun level2(): Double = session.getLevel2()
 
     @Binding("rarity_1")
-    fun rarity1(): Double = session.getRarityNumberX()
+    fun rarity1(): Double = session.getRarityNumber1()
 
     @Binding("rarity_2")
-    fun rarity2(): Double = session.getRarityNumberY()
+    fun rarity2(): Double = session.getRarityNumber2()
 
     @Binding("penalty_1")
-    fun penalty1(): Double = session.getPenaltyX()
+    fun penalty1(): Double = session.getPenalty1()
 
     @Binding("penalty_2")
-    fun penalty2(): Double = session.getPenaltyY()
+    fun penalty2(): Double = session.getPenalty2()
 }
 //</editor-fold>
