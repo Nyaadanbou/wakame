@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.gui.merge
 
-import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable
@@ -81,26 +80,26 @@ internal class MergingMenu(
     private val primaryWindow: Window = Window.single { builder ->
         builder.setGui(primaryGui)
         builder.setTitle(text("合并台"))
+        builder.setViewer(viewer)
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
     }
 
     init {
-        inputSlot1.setPreUpdateHandler(::onInputSlot1PreUpdate)
-        inputSlot2.setPreUpdateHandler(::onInputSlot2PreUpdate)
+        inputSlot1.setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT1) }
+        inputSlot2.setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT2) }
         outputSlot.setPreUpdateHandler(::onOutputSlotPreUpdate)
     }
 
+    private enum class InputSlot {
+        INPUT1, INPUT2
+    }
+
     //<editor-fold desc="inventory listeners">
-    private fun onInputSlotPreUpdate(
-        e: ItemPreUpdateEvent,
-        setMenuInputSlot: (ItemStack?) -> Unit,
-        setBackInputItem: (NekoStack?) -> Unit,
-        retBackInputItem: (Player) -> Unit,
-    ) {
+    private fun onInputSlotPreUpdate(e: ItemPreUpdateEvent, inputSlot: InputSlot) {
         val oldItem = e.previousItem
         val newItem = e.newItem
-        logger.info("MergingMenu input slot pre-update: $oldItem -> $newItem")
+        logger.info("MergingMenu input slot pre-update: ${oldItem?.type} -> ${newItem?.type}")
 
         when {
             e.isSwap -> {
@@ -114,40 +113,43 @@ internal class MergingMenu(
                     e.isCancelled = true; return
                 }
 
-                setBackInputItem(added)
+                when (inputSlot) {
+                    InputSlot.INPUT1 -> {
+                        mergingSession.inputItem1 = added
+                    }
+
+                    InputSlot.INPUT2 -> {
+                        mergingSession.inputItem2 = added
+                    }
+                }
+
                 refreshOutput()
             }
 
             e.isRemove -> {
                 e.isCancelled = true
-                setMenuInputSlot(null)
-                setOutputSlot(null)
 
-                retBackInputItem(viewer)
-                setBackInputItem(null)
+                when (inputSlot) {
+                    InputSlot.INPUT1 -> {
+                        setInputSlot1(null)
+                        mergingSession.returnInputItemX(viewer)
+                    }
+
+                    InputSlot.INPUT2 -> {
+                        setInputSlot2(null)
+                        mergingSession.returnInputItemY(viewer)
+                    }
+                }
+
                 refreshOutput()
             }
         }
     }
 
-    private fun onInputSlot1PreUpdate(e: ItemPreUpdateEvent) = onInputSlotPreUpdate(
-        e,
-        { setInputSlot1(it) },
-        { mergingSession.inputItemX = it },
-        { mergingSession.returnInputItemX(it) }
-    )
-
-    private fun onInputSlot2PreUpdate(e: ItemPreUpdateEvent) = onInputSlotPreUpdate(
-        e,
-        { setInputSlot2(it) },
-        { mergingSession.inputItemY = it },
-        { mergingSession.returnInputItemY(it) }
-    )
-
     private fun onOutputSlotPreUpdate(e: ItemPreUpdateEvent) {
         val oldItem = e.previousItem
         val newItem = e.newItem
-        logger.info("MergingMenu output slot pre-update: $oldItem -> $newItem")
+        logger.info("MergingMenu output slot pre-update: ${oldItem?.type} -> ${newItem?.type}")
 
         when {
             e.isSwap || e.isAdd -> {
@@ -168,6 +170,9 @@ internal class MergingMenu(
                     setInputSlot1(null)
                     setInputSlot2(null)
                     setOutputSlot(null)
+
+                    // 重置会话状态
+                    mergingSession.reset()
                 } else {
                     viewer.sendPlainMessage("合并失败!")
                 }

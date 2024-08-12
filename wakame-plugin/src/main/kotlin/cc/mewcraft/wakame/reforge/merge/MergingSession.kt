@@ -26,30 +26,30 @@ interface MergingSession : Examinable {
      * 输入的第一个物品.
      */
     @get:Contract(" -> new")
-    var inputItemX: NekoStack?
+    var inputItem1: NekoStack?
 
     /**
      * 输入的第二个物品.
      */
     @get:Contract(" -> new")
-    var inputItemY: NekoStack?
+    var inputItem2: NekoStack?
 
     /**
-     * 将 [inputItemX] (的克隆) 归还给玩家.
+     * 将 [inputItem1] (的克隆) 归还给玩家.
      *
-     * 该函数返回后, [inputItemX] 将被设置为 `null`.
+     * 该函数返回后, [inputItem1] 将被设置为 `null`.
      */
     fun returnInputItemX(viewer: Player)
 
     /**
-     * 将 [inputItemY] (的克隆) 归还给玩家.
+     * 将 [inputItem2] (的克隆) 归还给玩家.
      *
-     * 该函数返回后, [inputItemY] 将被设置为 `null`.
+     * 该函数返回后, [inputItem2] 将被设置为 `null`.
      */
     fun returnInputItemY(viewer: Player)
 
     /**
-     * 合并 [inputItemX] 和 [inputItemY] 的结果.
+     * 合并 [inputItem1] 和 [inputItem2] 的结果.
      *
      * 每次调用函数 [merge] 之后, 该属性会被重新赋值.
      */
@@ -76,16 +76,23 @@ interface MergingSession : Examinable {
     val currencyCostFunction: MochaFunction
 
     /**
-     * 尝试合并 [inputItemX] 和 [inputItemY].
+     * 尝试合并 [inputItem1] 和 [inputItem2].
      *
-     * 该函数会检查 [inputItemX] 和 [inputItemY] 是否可以合并, 如果可以, 则合并它们.
+     * 该函数会检查 [inputItem1] 和 [inputItem2] 是否可以合并, 如果可以, 则合并它们.
      *
-     * 如果合并成功, [inputItemX] 和 [inputItemY] 将会被设置为 `null` (表示已消耗).
-     * 如果合并失败, [inputItemX] 和 [inputItemY] 将会保持不变.
+     * 如果合并成功, [inputItem1] 和 [inputItem2] 将会被设置为 `null` (表示已消耗).
+     * 如果合并失败, [inputItem1] 和 [inputItem2] 将会保持不变.
      *
      * 函数的返回值会赋值到成员属性 [result] 之上.
      */
     fun merge(): Result
+
+    /**
+     * 重置当前会话的状态. 该函数:
+     * - 会把 [inputItem1] 和 [inputItem2] 设置为 `null`.
+     * - 会把 [result] 设置为“空”的结果.
+     */
+    fun reset()
 
     /**
      * 标记该会话是否已经被冻结.
@@ -99,44 +106,44 @@ interface MergingSession : Examinable {
     /* 如果这些值无法获取, 返回 0 */
 
     /**
-     * 获取 [inputItemX] 的属性数值. 若不存在则返回 `0`.
+     * 获取 [inputItem1] 的属性数值. 若不存在则返回 `0`.
      */
-    fun getValueX(): Double
+    fun getValue1(): Double
 
     /**
-     * 获取 [inputItemY] 的属性数值. 若不存在则返回 `0`.
+     * 获取 [inputItem2] 的属性数值. 若不存在则返回 `0`.
      */
-    fun getValueY(): Double
+    fun getValue2(): Double
 
     /**
-     * 获取 [inputItemX] 的物品等级. 若不存在则返回 `0`.
+     * 获取 [inputItem1] 的物品等级. 若不存在则返回 `0`.
      */
-    fun getLevelX(): Double
+    fun getLevel1(): Double
 
     /**
-     * 获取 [inputItemY] 的物品等级. 若不存在则返回 `0`.
+     * 获取 [inputItem2] 的物品等级. 若不存在则返回 `0`.
      */
-    fun getLevelY(): Double
+    fun getLevel2(): Double
 
     /**
-     * 获取 [inputItemX] 的稀有度对应的数值. 若不存在则返回 `0`.
+     * 获取 [inputItem1] 的稀有度对应的数值. 若不存在则返回 `0`.
      */
-    fun getRarityNumberX(): Double
+    fun getRarityNumber1(): Double
 
     /**
-     * 获取 [inputItemY] 的稀有度对应的数值. 若不存在则返回 `0`.
+     * 获取 [inputItem2] 的稀有度对应的数值. 若不存在则返回 `0`.
      */
-    fun getRarityNumberY(): Double
+    fun getRarityNumber2(): Double
 
     /**
-     * 获取 [inputItemX] 的惩罚值. 若不存在则返回 `0`.
+     * 获取 [inputItem1] 的惩罚值. 若不存在则返回 `0`.
      */
-    fun getPenaltyX(): Double
+    fun getPenalty1(): Double
 
     /**
-     * 获取 [inputItemY] 的惩罚值. 若不存在则返回 `0`.
+     * 获取 [inputItem2] 的惩罚值. 若不存在则返回 `0`.
      */
-    fun getPenaltyY(): Double
+    fun getPenalty2(): Double
     //</editor-fold>
 
     /**

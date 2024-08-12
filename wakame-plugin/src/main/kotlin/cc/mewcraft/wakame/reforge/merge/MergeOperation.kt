@@ -15,6 +15,7 @@ import kotlin.math.ceil
 /**
  * 封装了一个标准的, 独立的, 重造流程.
  */
+// 构造器必须是 exception-free !!!
 internal class MergeOperation(
     private val session: MergingSession,
     private val logger: Logger,
@@ -25,18 +26,17 @@ internal class MergeOperation(
             return Result.failure()
         }
 
-        val inputItemX = session.inputItemX
-        val inputItemY = session.inputItemY
+        val inputItemX = session.inputItem1
+        val inputItemY = session.inputItem2
 
         if (inputItemX == null || inputItemY == null) {
             logger.info("Trying to merge with null input items.")
-            return Result.failure()
+            return Result.empty()
         }
 
-        val coreX = inputItemX.components.get(ItemComponentTypes.PORTABLE_CORE)
-            ?.wrapped as? CoreAttribute ?: return Result.failure()
-        val coreY = inputItemY.components.get(ItemComponentTypes.PORTABLE_CORE)
-            ?.wrapped as? CoreAttribute ?: return Result.failure()
+        val coreX = (inputItemX.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute) ?: return Result.failure()
+        val coreY = (inputItemY.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute) ?: return Result.failure()
+
         if (!coreX.isSimilar(coreY)) {
             logger.info("Trying to merge cores with different attributes.")
             return Result.failure()
@@ -74,8 +74,8 @@ internal class MergeOperation(
 
         return Result.success(
             item = inputItemX,
-            type = Type.by(mergedOperation),
-            cost = Cost.normal(totalCost)
+            type = Type.success(mergedOperation),
+            cost = Cost.success(totalCost)
         )
     }
 }
