@@ -5,10 +5,10 @@ title: "合并工作台: Example A"
 
 # 合并工作台可以接受的最大物品等级.
 # 如果玩家放入的物品等级超过了这个值, 合并将算作失败.
-max_input_item_level: 10
+max_input_item_level: 30
 # 合并工作台输出的核心可以拥有的最大惩罚.
 # 如果输出的核心的惩罚值超过了这个值, 合并将算作失败.
-max_output_item_penalty: 2
+max_output_item_penalty: 3
 
 # 稀有度->数值的映射表.
 # 可用于所有的自定义函数.
@@ -43,7 +43,7 @@ currency_cost:
   #  query.penalty_2()
   #    第二个物品的惩罚值
   #
-  total: "query.base() + query.rarity_1()"
+  total: "query.base() + 100 * ( query.penalty_1() + query.penalty_2() )"
 
 # 属性数值合并的自定义函数.
 #
@@ -59,9 +59,9 @@ currency_cost:
 #    第二个属性修饰符的数值
 #
 number_merge_function:
-  op0: "( query.value_1() + query.value_2() ) * ( 0.5 + math.random( -0.5, 0.0 ) )"
-  op1: "( query.value_1() + query.value_2() ) * ( 0.5 + math.random( -0.5, 0.0 ) )"
-  op2: "( query.value_1() + query.value_2() ) * ( 0.5 + math.random( -0.5, 0.0 ) )"
+  op0: "( query.value_1() + query.value_2() ) * math.random( 0.5, 1.5 )"
+  op1: "( query.value_1() + query.value_2() ) * math.random( 0.5, 1.5 )"
+  op2: "( query.value_1() + query.value_2() ) * math.random( 0.5, 1.5 )"
 
 # 输出核心的等级的自定义函数.
 #
