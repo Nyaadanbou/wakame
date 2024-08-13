@@ -33,6 +33,7 @@ import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.KIZAMI_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.user.PaperUserManager
@@ -121,6 +122,7 @@ object Initializer : KoinComponent, Listener {
         saveDefaultConfig() // config.yml
         saveResourceRecursively(CRATE_PROTO_CONFIG_DIR)
         saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
+        saveResourceRecursively(LANG_PROTO_CONFIG_DIR)
         saveResourceRecursively(REFORGE_DIR_NAME)
         saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)

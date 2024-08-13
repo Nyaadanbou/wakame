@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.command.command
 
+import cc.mewcraft.wakame.adventure.translator.MessageContacts
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
@@ -61,7 +62,7 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                     }
 
                     val mergingMenu = MergingMenu(table, viewer)
-                    sender.sendPlainMessage("Opening merging menu ...")
+                    sender.sendMessage(MessageContacts.MSG_OPEN_MERGING_MENU)
                     mergingMenu.open()
                 }
             }.buildAndAdd(this)

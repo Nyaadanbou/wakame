@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer.initializerModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
+import cc.mewcraft.wakame.lang.langModule
 import cc.mewcraft.wakame.level.levelModule
 import cc.mewcraft.wakame.lookup.lookupModule
 import cc.mewcraft.wakame.molang.molangModule
@@ -71,6 +72,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 initializerModule(),
                 itemModule(),
                 kizamiModule(),
+                langModule(),
                 levelModule(),
                 lookupModule(),
                 molangModule(),
