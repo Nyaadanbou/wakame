@@ -117,7 +117,7 @@ private class MiniMessageTranslationRegistryImpl(
     override fun translate(component: TranslatableComponent, locale: Locale): Component? {
         val translation = translations[component.key()] ?: return null
         val miniMessageString = translation.translate(locale) ?: return null
-        if (miniMessageString == "") {
+        if (miniMessageString.isEmpty()) {
             return Component.empty()
         }
         val resultingComponent = if (component.arguments().isEmpty()) {
@@ -196,10 +196,10 @@ private class MiniMessageTranslationRegistryImpl(
     }
 
     inner class Translation(private val key: String) : Examinable {
-        private val formats: MutableMap<Locale, String?> = ConcurrentHashMap()
+        private val formats: MutableMap<Locale, String> = ConcurrentHashMap()
 
         fun register(locale: Locale, format: String) {
-            require(formats.putIfAbsent(locale, format) == null) { String.format("Translation already exists: %s for %s", this.key, locale) }
+            require(formats.putIfAbsent(locale, format) == null) { "Translation already exists: ${this.key} for $locale" }
         }
 
         fun translate(locale: Locale): String? {
