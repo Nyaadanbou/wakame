@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
+import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
-import cc.mewcraft.wakame.reforge.mod.CoreMatchRuleSerializer
 import cc.mewcraft.wakame.skill.ConfiguredSkillVariantSerializer
 import cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.util.kregister

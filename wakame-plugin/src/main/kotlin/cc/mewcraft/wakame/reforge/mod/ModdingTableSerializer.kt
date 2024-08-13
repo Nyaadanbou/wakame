@@ -3,6 +3,10 @@ package cc.mewcraft.wakame.reforge.mod
 import cc.mewcraft.commons.collections.associateNotNull
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.reforge.common.CoreMatchRule
+import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
+import cc.mewcraft.wakame.reforge.common.CurseMatchRule
+import cc.mewcraft.wakame.reforge.common.CurseMatchRuleSerializer
 import cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.util.NamespacedPathCollector
 import cc.mewcraft.wakame.util.kregister
