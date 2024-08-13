@@ -1,11 +1,13 @@
 package cc.mewcraft.wakame.command.command
 
+import cc.mewcraft.wakame.adventure.translator.MessageContacts
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.util.ThreadType
+import me.lucko.helper.text3.arguments
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.Command
 import org.incendo.cloud.CommandFactory
@@ -13,6 +15,7 @@ import org.incendo.cloud.CommandManager
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.commandBuilder
 import org.koin.core.component.KoinComponent
+import kotlin.system.measureTimeMillis
 
 object PluginCommands : KoinComponent, CommandFactory<CommandSender> {
     private const val RELOAD_LITERAL = "reload"
@@ -31,10 +34,13 @@ object PluginCommands : KoinComponent, CommandFactory<CommandSender> {
                     val sender = context.sender()
                     sender.sendPlainMessage("Calling reload event ...")
                     val event = NekoCommandReloadEvent()
-                    event.callEvent()
-                    ThreadType.REMAIN.launch {
-                        PluginEventBus.get().post(event)
+                    val reloadTime = measureTimeMillis {
+                        event.callEvent()
+                        ThreadType.REMAIN.launch {
+                            PluginEventBus.get().post(event)
+                        }
                     }
+                    sender.sendMessage(MessageContacts.MSG_RELOADED.arguments(reloadTime.toString()))
                 }
             }.buildAndAdd(this)
         }

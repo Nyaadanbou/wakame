@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.reforge.mod.ModdingTable
 import cc.mewcraft.wakame.util.hideTooltip
+import cc.mewcraft.wakame.util.translateBy
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
@@ -126,7 +127,7 @@ internal class ModdingMenu(
     // 主要 Gui 的 Window
     private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
         setGui(primaryGui)
-        setTitle(text("定制台").decorate(TextDecoration.BOLD))
+        setTitle(table.title.translateBy(viewer))
     }
 
     init {

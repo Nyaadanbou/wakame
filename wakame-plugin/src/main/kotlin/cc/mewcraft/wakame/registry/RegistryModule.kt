@@ -41,6 +41,9 @@ const val ITEM_PROTO_CONFIG_LOADER = "item_prototype_config_loader"
 const val ITEM_GLOBAL_CONFIG_FILE = "items.yml"
 const val ITEM_GLOBAL_CONFIG_LOADER = "item_global_config_loader"
 
+const val LANG_PROTO_CONFIG_DIR = "lang"
+const val LANG_PROTO_CONFIG_LOADER = "lang_prototype_config_loader"
+
 const val SKILL_CONFIG_FILE = "skills.yml"
 const val SKILL_PROTO_CONFIG_DIR = "skills"
 const val SKILL_PROTO_CONFIG_LOADER = "skill_global_config_loader"
@@ -115,6 +118,12 @@ internal fun registryModule(): Module = module {
     single<YamlConfigurationLoader.Builder>(named(ITEM_PROTO_CONFIG_LOADER)) {
         buildYamlLoader {
             registerAll(get<TypeSerializerCollection>(named(ITEM_PROTO_SERIALIZERS)))
+        }
+    }
+
+    single<YamlConfigurationLoader.Builder>(named(LANG_PROTO_CONFIG_LOADER)) {
+        buildYamlLoader {
+            registerAll(get<TypeSerializerCollection>(named(ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS)))
         }
     }
 
