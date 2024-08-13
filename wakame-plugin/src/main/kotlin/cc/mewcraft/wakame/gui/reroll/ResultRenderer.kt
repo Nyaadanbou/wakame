@@ -1,44 +1,36 @@
 package cc.mewcraft.wakame.gui.reroll
 
-import cc.mewcraft.wakame.display.ItemRenderer
-import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
-import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
+import cc.mewcraft.wakame.util.hideTooltip
+import me.lucko.helper.text3.mini
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 
 /**
- * 用于渲染重造*失败*后的物品.
+ * 负责渲染重造后的物品在 [RerollingMenu.outputInventory] 里面的样子.
  */
-internal class FailureResultRenderer(
-    private val result: RerollingSession.Result,
-) : ItemRenderer<NekoStack> {
-    override fun render(item: NekoStack) {
-        TODO("Not yet implemented")
-    }
-}
+internal object ResultRenderer {
 
-/**
- * 用于渲染重造*成功*后的物品.
- */
-// TODO 更丰富的结果预览:
-//  能够显示哪些词条栏会被重造, 哪些不会
-//  这要求对渲染模块进行重构 ...
-internal class SuccessResultRenderer(
-    private val result: RerollingSession.Result,
-) : ItemRenderer<NekoStack> {
-    override fun render(item: NekoStack) {
-        item.erase()
+    // TODO 更丰富的结果预览:
+    //  能够显示哪些词条栏会被重造, 哪些不会
+    //  这要求对渲染模块进行重构 ...
 
-        // 渲染重造的总花费
-        item.unsafe.handle.editMeta { meta ->
-            val lore = text {
-                content("重造花费: ${result.cost.default}")
-                color(NamedTextColor.WHITE)
-                decoration(TextDecoration.ITALIC, false)
+    fun render(result: RerollingSession.Result): ItemStack {
+        val item = result.item // deep clone
+        val ret: ItemStack
+
+        if (result.successful) {
+            ret = item.unsafe.handle
+            ret.editMeta { meta ->
+                val lore = buildList {
+                    add("<!i><white>重造花费: <green>${result.cost.default}".mini)
+                }
+                meta.lore(lore)
             }
-            meta.lore(listOf(lore))
+        } else {
+            ret = ItemStack(Material.BARRIER).hideTooltip(true)
         }
 
+        return ret
     }
 }

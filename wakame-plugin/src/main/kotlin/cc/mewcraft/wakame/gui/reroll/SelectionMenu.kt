@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.gui.reroll
 
+import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.util.hideAllFlags
 import net.kyori.adventure.text.Component
@@ -25,6 +26,7 @@ internal class SelectionMenu(
     val parentMenu: RerollingMenu,
     val selection: RerollingSession.Selection,
 ) : KoinComponent {
+
     val primaryGui: Gui = Gui.normal { builder ->
         builder.setStructure(
             "a",
@@ -37,7 +39,8 @@ internal class SelectionMenu(
     private val logger: Logger by inject()
 
     private companion object {
-        val trims: List<Material> = Tag.ITEMS_TRIM_TEMPLATES.values.toList()
+        private const val PREFIX = ReforgeLoggerPrefix.REROLL
+        private val trims: List<Material> = Tag.ITEMS_TRIM_TEMPLATES.values.toList()
     }
 
     private inner class IndicatorItem : AbstractItem() {
@@ -78,11 +81,11 @@ internal class SelectionMenu(
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (parentMenu.rerollingSession == null) {
-                logger.error("Trying to select without a session. This is a bug!")
+                logger.error("$PREFIX Trying to select without a session. This is a bug!")
                 return
             }
 
-            selection.invertSelect()
+            selection.invert()
 
             if (selection.selected) {
                 parentMenu.viewer.sendPlainMessage("词条栏 ${selection.id} 将被重造.")

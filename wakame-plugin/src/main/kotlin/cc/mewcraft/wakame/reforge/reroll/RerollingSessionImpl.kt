@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.components.cells.template.TemplateCore
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random3.Group
+import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -22,33 +23,31 @@ class SimpleRerollingSession(
     inputItem: NekoStack,
     override val selections: RerollingSession.SelectionMap,
 ) : RerollingSession, KoinComponent {
+
+    companion object {
+        private const val PREFIX = ReforgeLoggerPrefix.REROLL
+    }
+
     private val logger: Logger by inject()
 
     override var result: RerollingSession.Result by Delegates.observable(Result.empty()) { _, _, new ->
-        logger.info("RerollingSession's result updated: $new")
+        logger.info("$PREFIX Result status updated: $new")
     }
 
     override val inputItem: NekoStack by NekoStackDelegates.copyOnRead(inputItem)
 
-    override var confirmed: Boolean by Delegates.observable(false) { _, _, new ->
-        logger.info("RerollingSession's confirmed status updated: $new")
+    override var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
+        logger.info("$PREFIX Confirmation status updated: $old -> $new")
     }
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
         if (!new && old) {
-            logger.error("Trying to unfreeze a frozen session. This is a bug!")
+            logger.error("$PREFIX Trying to unfreeze a frozen session. This is a bug!")
             return@vetoable false
         }
-        logger.info("RerollingSession's frozen status updated: $new")
+
+        logger.info("$PREFIX Frozen status updated: $old -> $new")
         return@vetoable true
-    }
-
-    override fun select(id: String) {
-        selections[id]?.selected = true
-    }
-
-    override fun unselected(id: String) {
-        selections[id]?.selected = false
     }
 
     override fun reforge(): RerollingSession.Result {
@@ -56,10 +55,10 @@ class SimpleRerollingSession(
         try {
             result = operation.execute()
         } catch (e: ReforgeOperationException) {
-            logger.warn("An error occurred while reforging an item: ${e.message}")
+            logger.warn("$PREFIX An error occurred while reforging an item: ${e.message}")
             result = Result.error()
         } catch (e: Exception) {
-            logger.error("An unknown error occurred while reforging an item", e)
+            logger.error("$PREFIX An unknown error occurred while reforging an item", e)
             result = Result.error()
         }
         return result
@@ -77,16 +76,21 @@ class SimpleRerollingSession(
     override fun toString(): String =
         toSimpleString()
 
-    class Result(
-        override val successful: Boolean,
-        override val cost: RerollingSession.Result.TotalCost,
+    class Result( // FIXME 变成单例
+        successful: Boolean,
+        description: List<Component>,
+        cost: RerollingSession.Result.TotalCost,
         item: NekoStack,
     ) : RerollingSession.Result {
 
+        override val successful: Boolean = successful
+        override val description: List<Component> = description
+        override val cost: RerollingSession.Result.TotalCost = cost
         override val item: NekoStack by NekoStackDelegates.copyOnRead(item)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("successful", successful),
+            ExaminableProperty.of("description", description),
             ExaminableProperty.of("cost", cost),
             ExaminableProperty.of("item", item),
         )
@@ -95,15 +99,8 @@ class SimpleRerollingSession(
             toSimpleString()
 
         companion object {
-            private val EMPTY: Result = Result(false, TotalCost.zero(), NekoStack.empty())
-            private val ERROR: Result = Result(false, TotalCost.error(), NekoStack.empty())
-
-            fun success(
-                cost: RerollingSession.Result.TotalCost,
-                item: NekoStack,
-            ): Result {
-                return Result(true, cost, item)
-            }
+            private val EMPTY: Result = Result(false, listOf(Component.text("没有要重造的物品")), TotalCost.zero(), NekoStack.empty())
+            private val ERROR: Result = Result(false, listOf(Component.text("重造发生内部错误!")), TotalCost.error(), NekoStack.empty())
 
             fun empty(): Result {
                 return EMPTY
@@ -111,6 +108,13 @@ class SimpleRerollingSession(
 
             fun error(): Result {
                 return ERROR
+            }
+
+            fun success(
+                cost: RerollingSession.Result.TotalCost,
+                item: NekoStack,
+            ): Result {
+                return Result(true, listOf(Component.text("重造成功!")), cost, item)
             }
         }
 
@@ -156,10 +160,10 @@ class SimpleRerollingSession(
         private val logger: Logger by inject()
 
         override var selected: Boolean by Delegates.observable(false) { _, old, new ->
-            logger.info("Selection status updated (cell: '$id'): $old -> $new")
+            logger.info("$PREFIX Selection status updated (cell: '$id'): $old -> $new")
         }
 
-        override fun invertSelect() {
+        override fun invert() {
             selected = !selected
         }
 

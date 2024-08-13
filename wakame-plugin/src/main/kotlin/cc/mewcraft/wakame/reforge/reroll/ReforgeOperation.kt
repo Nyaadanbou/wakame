@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationTrigger
 import cc.mewcraft.wakame.item.templates.filter.AttributeContextHolder
 import cc.mewcraft.wakame.item.templates.filter.SkillContextHolder
+import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import org.koin.core.component.KoinComponent
 import org.slf4j.Logger
 import kotlin.properties.Delegates
@@ -27,6 +28,10 @@ internal class ReforgeOperation(
     private val session: RerollingSession,
     private val logger: Logger,
 ) : KoinComponent {
+
+    companion object {
+        private const val PREFIX = ReforgeLoggerPrefix.REROLL
+    }
 
     /**
      * 重造台.
@@ -48,14 +53,14 @@ internal class ReforgeOperation(
      */
     private var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
         if (!new && old) {
-            throw ReforgeOperationException("Unfreezing an operation is prohibited. This is a bug!")
+            throw ReforgeOperationException("$PREFIX Unfreezing an operation is prohibited. This is a bug!")
         }
         return@vetoable true
     }
 
     private fun throwMissingComponent(type: ItemComponentType<*>): Nothing {
         frozen = true
-        throw ReforgeOperationException("Input item has no '$type' component. This is a bug!")
+        throw ReforgeOperationException("$PREFIX Input item has no '$type' component. This is a bug!")
     }
 
     /**
@@ -98,8 +103,12 @@ internal class ReforgeOperation(
                 when (
                     val core = cell.getCore()
                 ) {
-                    is CoreSkill -> context.skills += SkillContextHolder(core.key)
-                    is CoreAttribute -> context.attributes += AttributeContextHolder(core.key, core.operation, core.element)
+                    is CoreSkill -> {
+                        context.skills += SkillContextHolder(core.key)
+                    }
+                    is CoreAttribute -> {
+                        context.attributes += AttributeContextHolder(core.key, core.operation, core.element)
+                    }
                 }
             }
 

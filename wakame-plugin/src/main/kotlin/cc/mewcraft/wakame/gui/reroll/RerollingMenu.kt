@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.reforge.reroll.RerollingTable
 import cc.mewcraft.wakame.util.hideTooltip
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -17,7 +17,6 @@ import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.inventory.VirtualInventory
-import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
@@ -35,11 +34,15 @@ internal class RerollingMenu(
     val viewer: Player,
 ) : KoinComponent {
 
+    companion object {
+        private const val PREFIX = ReforgeLoggerPrefix.REROLL
+    }
+
     /**
      * 给玩家显示 GUI.
      */
     fun open() {
-        primaryWindow.open(viewer)
+        primaryWindow.open()
     }
 
     /**
@@ -47,25 +50,21 @@ internal class RerollingMenu(
      */
     fun refreshOutput() {
         val session = rerollingSession ?: run {
-            logger.info("Trying to refresh output without a session.")
+            logger.info("$PREFIX Trying to refresh output without a session.")
             return
         }
 
         if (session.frozen) {
-            logger.error("Trying to refresh output in a frozen session. This is a bug!")
+            logger.error("$PREFIX Trying to refresh output in a frozen session. This is a bug!")
             return
         }
 
         // 执行一次重造
         val result = session.reforge()
-
         // 渲染输出物品
-        val resultItem = result.item
-        val renderer = SuccessResultRenderer(result)
-        renderer.render(resultItem)
-
+        val output = ResultRenderer.render(result)
         // 填充输出容器
-        fillOutputSlot(resultItem.unsafe.handle)
+        setOutputSlot(output)
     }
 
     /**
@@ -76,14 +75,14 @@ internal class RerollingMenu(
      * 并将其赋值给这个属性.
      */
     var rerollingSession: RerollingSession? by Delegates.observable(null) { _, old, new ->
-        logger.info("RerollingSession updated: $old -> $new")
+        logger.info("$PREFIX Session status updated: $old -> $new")
     }
 
     val logger: Logger by inject()
 
     //<editor-fold desc="InvUI components">
-    private val inputInventory: VirtualInventory = VirtualInventory(intArrayOf(1))
-    private val outputInventory: VirtualInventory = VirtualInventory(intArrayOf(1))
+    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
+    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
     private val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
         builder.setStructure(
             ". . . . . . . . .",
@@ -94,31 +93,30 @@ internal class RerollingMenu(
             ". . . . . . . . .",
         )
         builder.addIngredient('.', SimpleItem(ItemStack(Material.BLACK_STAINED_GLASS_PANE).hideTooltip(true)))
-        builder.addIngredient('i', inputInventory)
-        builder.addIngredient('o', outputInventory)
+        builder.addIngredient('i', inputSlot)
+        builder.addIngredient('o', outputSlot)
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_VERTICAL)
     }
-    private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
-        setGui(primaryGui)
-        setTitle(text("重造台").decorate(TextDecoration.BOLD))
-        addOpenHandler(::onWindowOpen)
-        addCloseHandler(::onWindowClose)
+    private val primaryWindow: Window = Window.single { builder ->
+        builder.setGui(primaryGui)
+        builder.setTitle(table.title)
+        builder.setViewer(viewer)
+        builder.addOpenHandler(::onWindowOpen)
+        builder.addCloseHandler(::onWindowClose)
     }
     //</editor-fold>
 
     init {
-        inputInventory.setPreUpdateHandler(::onInputInventoryPreUpdate)
-        inputInventory.setPostUpdateHandler(::onInputInventoryPostUpdate)
-        outputInventory.setPreUpdateHandler(::onOutputInventoryPreUpdate)
-        outputInventory.setPostUpdateHandler(::onOutputInventoryPostUpdate)
+        inputSlot.setPreUpdateHandler(::onInputInventoryPreUpdate)
+        outputSlot.setPreUpdateHandler(::onOutputInventoryPreUpdate)
     }
 
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("Input item updating: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("$PREFIX Input slot updating: ${prevItem?.type} -> ${newItem?.type}")
 
         when {
             // 玩家交换物品:
@@ -165,7 +163,7 @@ internal class RerollingMenu(
                 val selectionGuis = selectionMenus.map {
                     it.primaryGui
                 }
-                fillSelectionGuis(selectionGuis)
+                setSelectionGuis(selectionGuis)
 
                 // 更新输出容器
                 refreshOutput()
@@ -177,13 +175,13 @@ internal class RerollingMenu(
                 event.isCancelled = true
 
                 val session = rerollingSession ?: run {
-                    logger.error("Rerolling session (viewer: ${viewer.name}) is null, but input item is being removed. This is a bug!")
+                    logger.error("$PREFIX Rerolling session (viewer: ${viewer.name}) is null, but input item is being removed. This is a bug!")
                     return
                 }
 
-                clearInputSlot()
-                clearOutputSlot()
-                clearSelectionGuis()
+                setInputSlot(null)
+                setOutputSlot(null)
+                setSelectionGuis(null)
 
                 session.returnInput(viewer)
 
@@ -193,16 +191,10 @@ internal class RerollingMenu(
         }
     }
 
-    private fun onInputInventoryPostUpdate(event: ItemPostUpdateEvent) {
-        val newItem = event.newItem
-        val prevItem = event.previousItem
-        logger.info("Input item updated: ${prevItem?.type} -> ${newItem?.type}")
-    }
-
     private fun onOutputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("Output item updating: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("$PREFIX Output item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         when {
             // 玩家尝试交换物品:
@@ -225,7 +217,7 @@ internal class RerollingMenu(
                 event.isCancelled = true
 
                 val session = rerollingSession ?: run {
-                    logger.error("Rerolling session (viewer: ${viewer.name}) is null, but output item is being removed. This is a bug!")
+                    logger.error("$PREFIX Rerolling session (viewer: ${viewer.name}) is null, but output item is being removed. This is a bug!")
                     return
                 }
 
@@ -239,9 +231,9 @@ internal class RerollingMenu(
                 // 把重造后的物品给玩家
                 viewer.inventory.addItem(result.item.unsafe.handle)
 
-                clearInputSlot()
-                clearOutputSlot()
-                clearSelectionGuis()
+                setInputSlot(null)
+                setOutputSlot(null)
+                setSelectionGuis(null)
 
                 session.frozen = true
                 rerollingSession = null
@@ -249,26 +241,20 @@ internal class RerollingMenu(
         }
     }
 
-    private fun onOutputInventoryPostUpdate(event: ItemPostUpdateEvent) {
-        val newItem = event.newItem
-        val prevItem = event.previousItem
-        logger.info("Output item updated: ${prevItem?.type} -> ${newItem?.type}")
-    }
-
     private fun onWindowClose() {
         logger.info("Rerolling window closed for ${viewer.name}")
 
         val session = rerollingSession ?: run {
-            logger.info("The window of reroll menu is closed while session being null.")
+            logger.info("$PREFIX The window is closed while session being null.")
             return
         }
 
         session.frozen = true
         rerollingSession = null
 
-        clearInputSlot()
-        clearOutputSlot()
-        clearSelectionGuis()
+        setInputSlot(null)
+        setOutputSlot(null)
+        setSelectionGuis(null)
         session.returnInput(viewer)
     }
 
@@ -276,24 +262,16 @@ internal class RerollingMenu(
         logger.info("RerollingMenu opened for ${viewer.name}")
     }
 
-    private fun fillSelectionGuis(guis: List<Gui>) {
+    private fun setSelectionGuis(guis: List<Gui>?) {
         primaryGui.setContent(guis)
     }
 
-    private fun clearSelectionGuis() {
-        primaryGui.setContent(null)
+    private fun setInputSlot(stack: ItemStack?) {
+        inputSlot.setItemSilently(0, null)
     }
 
-    private fun clearInputSlot() {
-        inputInventory.setItemSilently(0, null)
-    }
-
-    private fun fillOutputSlot(stack: ItemStack) {
-        outputInventory.setItemSilently(0, stack)
-    }
-
-    private fun clearOutputSlot() {
-        outputInventory.setItemSilently(0, null)
+    private fun setOutputSlot(stack: ItemStack?) {
+        outputSlot.setItemSilently(0, stack)
     }
 
     private class PrevItem : ScrollItem(-1) {

@@ -53,16 +53,6 @@ interface RerollingSession : Examinable {
     var frozen: Boolean
 
     /**
-     * 标记一个词条栏为“已选择”.
-     */
-    fun select(id: String)
-
-    /**
-     * 标记一个词条栏为“未选择”.
-     */
-    fun unselected(id: String)
-
-    /**
      * 根据 [selections] 的当前状态, 对 [inputItem] 执行一次重造.
      *
      * 该函数在每次执行后 (其返回前), 会将新的重造结果赋值到 [result].
@@ -82,6 +72,11 @@ interface RerollingSession : Examinable {
          * `true` 表示重造成功.
          */
         val successful: Boolean
+
+        /**
+         * 本次重造的结果的描述.
+         */
+        val description: List<Component>
 
         /**
          * 本次重造的总花费.
@@ -144,9 +139,9 @@ interface RerollingSession : Examinable {
         var selected: Boolean
 
         /**
-         * 反转当前的选择 [selected].
+         * 反转当前 [selected] 的状态.
          */
-        fun invertSelect()
+        fun invert()
 
         interface Display : Examinable {
             val name: Component
