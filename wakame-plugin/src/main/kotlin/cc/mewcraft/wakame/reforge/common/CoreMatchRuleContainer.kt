@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.reforge.mod.CoreMatchRule
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -43,7 +42,7 @@ class SimpleCoreMatchRuleContainer(
  * [CoreMatchRuleContainer] 的序列化器.
  *
  * 依赖的序列化器:
- * - [cc.mewcraft.wakame.reforge.mod.CoreMatchRuleSerializer]
+ * - [CoreMatchRuleSerializer]
  */
 internal object CoreMatchRuleContainerSerializer : TypeSerializer<CoreMatchRuleContainer> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRuleContainer {

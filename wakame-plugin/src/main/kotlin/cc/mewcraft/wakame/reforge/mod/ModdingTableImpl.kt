@@ -1,5 +1,9 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.reforge.common.CoreMatchRule
+import cc.mewcraft.wakame.reforge.common.CoreMatchRuleAny
+import cc.mewcraft.wakame.reforge.common.CurseMatchRule
+import cc.mewcraft.wakame.reforge.common.CurseMatchRuleAny
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
