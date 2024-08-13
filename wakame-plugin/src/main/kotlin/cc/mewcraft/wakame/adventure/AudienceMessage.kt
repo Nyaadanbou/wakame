@@ -150,6 +150,10 @@ internal interface AudienceMessageSerializer<T> : TypeSerializer<T> {
  */
 internal object CombinedAudienceMessageSerializer : AudienceMessageSerializer<AudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessage {
+        if (node.rawScalar() != null) {
+            return ChatAudienceMessageSerializer.deserialize(type, node)
+        }
+
         val messageTypeNode = node.node("type")
         return when (
             val messageType = messageTypeNode.krequire<String>()
@@ -171,6 +175,9 @@ internal object CombinedAudienceMessageSerializer : AudienceMessageSerializer<Au
 
 internal object AudienceMessageGroupSerializer : AudienceMessageSerializer<AudienceMessageGroup> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessageGroup {
+        if (node.rawScalar() != null) {
+            return AudienceMessageGroupImpl(listOf(node.krequire()))
+        }
         val messages = node.getList<AudienceMessage>(emptyList())
         return AudienceMessageGroupImpl(messages)
     }
@@ -186,9 +193,18 @@ internal object AudienceMessageGroupSerializer : AudienceMessageSerializer<Audie
  * ```yaml
  * text: "foo"
  * ```
+ *
+ * or
+ *
+ * ```yaml
+ * "foo"
+ * ```
  */
 internal object ChatAudienceMessageSerializer : AudienceMessageSerializer<ChatAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): ChatAudienceMessage {
+        if (node.rawScalar() != null) {
+            return ChatAudienceMessage(node.krequire())
+        }
         val text = node.node("text").krequire<String>()
         return ChatAudienceMessage(text)
     }
