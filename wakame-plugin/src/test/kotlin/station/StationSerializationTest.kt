@@ -1,9 +1,12 @@
 package station
 
+import cc.mewcraft.wakame.core.ItemXBootstrap
+import cc.mewcraft.wakame.station.ExpChoice
 import cc.mewcraft.wakame.station.ItemChoice
 import cc.mewcraft.wakame.station.ItemResult
 import cc.mewcraft.wakame.station.StationRecipeRegistry
 import cc.mewcraft.wakame.util.Key
+import core.ItemXMock
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -27,6 +30,7 @@ class StationSerializationTest : KoinTest {
                 )
             }
 
+            ItemXBootstrap.init()
             StationRecipeRegistry.loadConfig()
         }
 
@@ -58,17 +62,18 @@ class StationSerializationTest : KoinTest {
         assertNotNull(recipe)
 
         val input = recipe.input
-        assertEquals(
+        assertContentEquals(
             listOf(
-                ItemChoice(Key("minecraft:raw_copper"), 3),
-                ItemChoice(Key("wakame:material/raw_tin"), 1),
+                ItemChoice(ItemXMock("minecraft:raw_copper"), 3),
+                ItemChoice(ItemXMock("wakame:material/raw_tin"), 1),
+                ExpChoice(495F)
             ), input
         )
 
         val output = recipe.output
-        assertEquals(
+        assertContentEquals(
             listOf(
-                ItemResult(Key("wakame:material/raw_bronze"), 4)
+                ItemResult(ItemXMock("wakame:material/raw_bronze"), 4)
             ), output
         )
     }

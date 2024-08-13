@@ -1,11 +1,14 @@
 package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.core.ItemXSerializer
+import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
+import org.jetbrains.annotations.VisibleForTesting
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -18,10 +21,15 @@ import java.io.File
 )
 object StationRecipeRegistry : Initializable, KoinComponent {
     private const val RECIPE_DIR_NAME = "station/recipes"
+
+    @VisibleForTesting
     val raw: MutableMap<Key, StationRecipe> = mutableMapOf()
+
+    val RECIPES: MutableMap<Key, StationRecipe> = mutableMapOf()
 
     private val logger: Logger by inject()
 
+    @VisibleForTesting
     fun loadConfig() {
         raw.clear()
 
@@ -39,6 +47,7 @@ object StationRecipeRegistry : Initializable, KoinComponent {
                         kregister(StationRecipeSerializer)
                         kregister(StationChoiceSerializer)
                         kregister(StationResultSerializer)
+                        kregister(ItemXSerializer)
                     }
                 }.buildAndLoadString(fileText)
 
@@ -60,11 +69,22 @@ object StationRecipeRegistry : Initializable, KoinComponent {
         }
     }
 
-    override fun onPostWorld() {
-        loadConfig()
+    private suspend fun registerRecipes() {
+        // ....TODO
+        PluginEventBus.get().post(StationRecipeLoadEvent)
     }
 
-    override fun onReload() {
+    override suspend fun onPostWorldAsync() {
+        loadConfig()
+        registerRecipes()
+    }
+
+    override suspend fun onReloadAsync() {
         loadConfig()
     }
 }
+
+/**
+ * 当合成站所有配方加载完毕时发生.
+ */
+object StationRecipeLoadEvent

@@ -2,13 +2,11 @@ package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
@@ -24,19 +22,30 @@ import java.util.stream.Stream
 sealed interface StationRecipe : Keyed, Examinable {
     val input: List<StationChoice>
     val output: List<StationResult>
-    fun matches(user: User<Player>): Boolean
+
+    // MATCHER
+
+    fun populateContext(contextMap: StationChoiceMatcherContextMap)
 }
 
 /**
  * 工作站配方的实现.
  */
-class SimpleStationRecipe(
+internal class SimpleStationRecipe(
     override val key: Key,
     override val input: List<StationChoice>,
     override val output: List<StationResult>
 ) : StationRecipe {
-    override fun matches(user: User<Player>): Boolean {
-        TODO("Not yet implemented")
+
+    private val distinctMatchers: List<StationChoiceMatcher<*>> =
+        input.map { it.matcher /* matcher 为单例 */ }.distinct()
+
+    override fun populateContext(contextMap: StationChoiceMatcherContextMap) {
+        distinctMatchers.forEach { matcher ->
+            val player = contextMap.player
+            val context = matcher.createContext(player)
+            contextMap[matcher] = context
+        }
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -45,8 +54,8 @@ class SimpleStationRecipe(
         ExaminableProperty.of("output", output),
     )
 
-    override fun toString(): String = toSimpleString()
-
+    override fun toString(): String =
+        toSimpleString()
 }
 
 
@@ -58,7 +67,7 @@ internal object StationRecipeSerializer : TypeSerializer<StationRecipe>, KoinCom
 
     override fun deserialize(type: Type, node: ConfigurationNode): StationRecipe {
         val key = node.hint(HINT_NODE) ?: throw SerializationException(
-            "The hint node for recipe key is not present"
+            "The hint node for station recipe key is not present"
         )
 
         val input = node.node("input").getList<StationChoice>(emptyList()).apply {

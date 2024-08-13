@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
+import org.jetbrains.annotations.VisibleForTesting
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -20,6 +21,8 @@ import java.io.File
 )
 object VanillaRecipeRegistry : Initializable, KoinComponent {
     private const val RECIPE_DIR_NAME = "recipes"
+
+    @VisibleForTesting
     val raw: MutableMap<Key, VanillaRecipe> = mutableMapOf()
 
     //TODO map直接对外暴露，不安全
@@ -35,6 +38,7 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
 
     private val logger: Logger by inject()
 
+    @VisibleForTesting
     fun loadConfig() {
         raw.clear()
 
@@ -142,15 +146,13 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
     override fun onPostWorld() {
         //TODO 待优化写法
         loadConfig()
-        ThreadType.SYNC.launch {
-            registerRecipes()
-        }
+        runTask { registerRecipes() }
     }
 
     override fun onReload() {
         //TODO 待优化写法
         loadConfig()
-        ThreadType.SYNC.launch {
+        runTask {
             registerRecipes()
             //向所有玩家的客户端发送配方刷新数据包
             Bukkit.updateRecipes()
