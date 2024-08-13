@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.reforge.merge.MergingSession
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -22,9 +21,8 @@ internal object ResultRenderer {
             ret = ItemStack(item.unsafe.handle.type)
             ret.editMeta { meta ->
                 val name = text {
-                    content("合成核心")
+                    content("合成核心 (成功)")
                     color(NamedTextColor.AQUA)
-                    decorate(TextDecoration.BOLD)
                 }
                 val lore = buildList {
                     add(Component.empty())
@@ -41,14 +39,15 @@ internal object ResultRenderer {
             ret = ItemStack(Material.BARRIER) // 使用 `minecraft:barrier` 作为合并失败的“基础物品”
             ret.editMeta { meta ->
                 val name = text {
-                    content("无法合并!")
+                    content("合成核心 (失败)")
                     color(NamedTextColor.RED)
-                    decorate(TextDecoration.BOLD)
                 }
                 val lore = buildList {
                     add(Component.empty())
                     addAll(result.type.description)
                     addAll(result.cost.description)
+                    add(Component.empty())
+                    add(result.description)
                 }
 
                 meta.itemName(name)

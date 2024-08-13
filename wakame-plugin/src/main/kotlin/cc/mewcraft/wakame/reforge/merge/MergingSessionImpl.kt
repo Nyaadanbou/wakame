@@ -99,12 +99,9 @@ internal class SimpleMergingSession(
 
         val result = try {
             operation.execute()
-        } catch (e: MergingOperationException) {
-            logger.info("$PREFIX Failed to merge: {}", e.message)
-            Result.failure()
         } catch (e: Exception) {
             logger.error("$PREFIX An unknown error occurred while merging. This is a bug!", e)
-            Result.failure()
+            Result.failure(Component.text("内部错误"))
         }
 
         return result.also { this.result = it }
@@ -178,37 +175,40 @@ internal class SimpleMergingSession(
          * 构建一个用于表示*没有合并*的 [MergingSession.Result].
          */
         fun empty(): MergingSession.Result {
-            return Result(false, NekoStack.empty(), Type.empty(), Cost.zero())
+            return Result(false, Component.text("没有可以合并的东西"), NekoStack.empty(), Type.empty(), Cost.zero())
         }
 
         /**
          * 构建一个用于表示*合并失败*的 [MergingSession.Result].
          */
-        fun failure(): MergingSession.Result {
-            return Result(false, NekoStack.empty(), Type.failure(), Cost.failure())
+        fun failure(description: Component): MergingSession.Result {
+            return Result(false, description, NekoStack.empty(), Type.failure(), Cost.failure())
         }
 
         /**
          * 构建一个用于表示*合并成功*的 [MergingSession.Result].
          */
         fun success(item: NekoStack, type: MergingSession.Type, cost: MergingSession.Cost): MergingSession.Result {
-            return Result(true, item, type, cost)
+            return Result(true, Component.text("合并成功!"), item, type, cost)
         }
 
         private class Result(
             successful: Boolean,
+            description: Component,
             item: NekoStack,
             type: MergingSession.Type,
             cost: MergingSession.Cost,
         ) : MergingSession.Result {
 
             override val successful = successful
+            override val description: Component = description
             override val item: NekoStack by NekoStackDelegates.copyOnRead(item)
             override val type: MergingSession.Type = type
             override val cost = cost
 
             override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
                 ExaminableProperty.of("successful", successful),
+                ExaminableProperty.of("description", description),
                 ExaminableProperty.of("item", item),
                 ExaminableProperty.of("type", type),
                 ExaminableProperty.of("cost", cost),
@@ -259,7 +259,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation
                 get() = throw IllegalStateException("This type is not supposed to be used.")
             override val description: List<Component> = listOf(
-                "<!i><white>类型: 无".mini
+                "<!i><white>类型: <gray>没有合并".mini
             )
         }
 
@@ -275,7 +275,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation =
                 AttributeModifier.Operation.ADD
             override val description: List<Component> = listOf(
-                "<!i><white>类型: <green>OP0".mini
+                "<!i><white>类型: <green>Type 0".mini
             )
         }
 
@@ -283,7 +283,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation =
                 AttributeModifier.Operation.MULTIPLY_BASE
             override val description: List<Component> = listOf(
-                "<!i><white>类型: <green>OP1".mini
+                "<!i><white>类型: <green>Type 1".mini
             )
         }
 
@@ -291,7 +291,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation =
                 AttributeModifier.Operation.MULTIPLY_TOTAL
             override val description: List<Component> = listOf(
-                "<!i><white>类型: <green>OP2".mini
+                "<!i><white>类型: <green>Type 2".mini
             )
         }
     }
@@ -301,7 +301,7 @@ internal class SimpleMergingSession(
      */
     object Cost {
         /**
-         * 表示没有资源消耗, 当没有合并发生时使用这个.
+         * 表示没有资源消耗.
          */
         fun zero(): MergingSession.Cost {
             return Zero
@@ -329,7 +329,7 @@ internal class SimpleMergingSession(
             override fun take(viewer: Player) = Unit
             override fun test(viewer: Player): Boolean = true
             override val description: List<Component> = listOf(
-                "<!i><white>花费: 无".mini
+                "<!i><white>花费: <gray>没有消耗".mini
             )
         }
 
