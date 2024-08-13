@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.adventure.translator
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TranslatableComponent
-import net.kyori.adventure.text.renderer.TranslatableComponentRenderer
 import net.kyori.adventure.translation.Translator
 import net.kyori.adventure.util.TriState
 import net.kyori.examination.Examinable
@@ -29,8 +28,7 @@ interface MiniMessageTranslator : Translator, Examinable {
 }
 
 class MiniMessageTranslatorImpl : MiniMessageTranslator {
-    val renderer: TranslatableComponentRenderer<Locale> = TranslatableComponentRenderer.usingTranslationSource(this)
-    private val sources: MutableSet<Translator?> = Collections.newSetFromMap(ConcurrentHashMap())
+    private val sources: MutableSet<Translator> = ConcurrentHashMap.newKeySet()
 
     override fun name(): Key {
         return NAME
@@ -50,7 +48,7 @@ class MiniMessageTranslatorImpl : MiniMessageTranslator {
 
     override fun translate(component: TranslatableComponent, locale: Locale): Component? {
         for (source in this.sources) {
-            val translation = source!!.translate(component, locale)
+            val translation = source.translate(component, locale)
             if (translation != null) return translation
         }
         return null
