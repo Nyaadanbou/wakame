@@ -161,6 +161,11 @@ interface MergingSession : Examinable {
         val successful: Boolean
 
         /**
+         * 本次合并结果的描述.
+         */
+        val description: Component
+
+        /**
          * 合并后的物品.
          *
          * 如果要将该物品给予玩家, 应该先确保 [successful] 为 `true` 后再进行操作.
