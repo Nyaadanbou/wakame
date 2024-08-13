@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.core
 
 import org.bukkit.inventory.ItemStack
-import java.util.*
 
 
 object ItemXRegistry {
@@ -20,6 +19,9 @@ object ItemXRegistry {
     }
 
     fun byItem(itemStack: ItemStack): ItemX? {
+        if (itemStack.isEmpty)
+            return null
+
         for (builder in builderList) {
             val itemX = builder.byItemStack(itemStack) ?: continue
             return itemX

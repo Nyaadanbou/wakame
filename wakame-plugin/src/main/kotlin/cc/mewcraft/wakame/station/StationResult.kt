@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
@@ -24,7 +24,7 @@ sealed interface StationResult : Examinable {
  * 物品类型的工作站输出.
  */
 data class ItemResult(
-    val item: Key,
+    val item: ItemX,
     val amount: Int
 ) : StationResult {
     override fun apply(user: User<Player>) {
@@ -46,7 +46,7 @@ data class ItemResult(
  */
 internal object StationResultSerializer : TypeSerializer<StationResult> {
     override fun deserialize(type: Type, node: ConfigurationNode): StationResult {
-        val item = node.node("item").krequire<Key>()
+        val item = node.node("item").krequire<ItemX>()
         val amount = node.node("amount").getInt(1).apply {
             require(this >= 1) { "Item amount should not less than 1" }
         }
