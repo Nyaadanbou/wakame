@@ -25,7 +25,11 @@ object StationRecipeRegistry : Initializable, KoinComponent {
     @VisibleForTesting
     val raw: MutableMap<Key, StationRecipe> = mutableMapOf()
 
-    val RECIPES: MutableMap<Key, StationRecipe> = mutableMapOf()
+    private val recipes: MutableMap<Key, StationRecipe> = mutableMapOf()
+
+    fun find(key: Key): StationRecipe? {
+        return recipes[key]
+    }
 
     private val logger: Logger by inject()
 
@@ -70,9 +74,17 @@ object StationRecipeRegistry : Initializable, KoinComponent {
     }
 
     private suspend fun registerRecipes() {
-        // ....TODO
+        raw.forEach { (key, recipe) ->
+            if (recipe.isValid()) {
+                recipes[key] = recipe
+                logger.info("Registered station recipe: '$key'")
+            } else {
+                logger.warn("Can't registered station recipe: '$key'")
+            }
+        }
         PluginEventBus.get().post(StationRecipeLoadEvent)
     }
+
 
     override suspend fun onPostWorldAsync() {
         loadConfig()
@@ -81,6 +93,7 @@ object StationRecipeRegistry : Initializable, KoinComponent {
 
     override suspend fun onReloadAsync() {
         loadConfig()
+        registerRecipes()
     }
 }
 

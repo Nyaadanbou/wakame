@@ -12,14 +12,20 @@ class StationSession(
     val station: Station,
     val user: User<Player>,
 ) {
-    val recipeMatcher = StationRecipeMatcher
+    val recipeMatcher = RecipeMatcher
 
-    val recipeMatcherResults: Reference2ObjectOpenHashMap<StationRecipe, StationRecipeMatcherResult> = Reference2ObjectOpenHashMap()
+    val recipeMatcherResults: Reference2ObjectOpenHashMap<StationRecipe, RecipeMatcherResult> = Reference2ObjectOpenHashMap()
 
     fun update() {
         station.forEach {
-            val newResult = recipeMatcher.check(it, user.player)
-            recipeMatcherResults[it] = newResult
+            val newResult = recipeMatcher.match(it, user.player)
+            if (!newResult.isSame(recipeMatcherResults[it])) {
+                recipeMatcherResults[it] = newResult
+            }
         }
+    }
+
+    fun render(){
+        TODO()
     }
 }

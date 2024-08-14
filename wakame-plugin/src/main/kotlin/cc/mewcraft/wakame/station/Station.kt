@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.util.RunningEnvironment
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -8,6 +10,7 @@ import org.koin.core.component.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
+import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
@@ -27,6 +30,10 @@ sealed interface Station : Iterable<StationRecipe> {
 class SimpleStation(
     override val id: String
 ) : Station, KoinComponent {
+    companion object {
+        const val TYPE = "simple"
+    }
+
     val logger: Logger by inject()
 
     private val recipes: MutableMap<Key, StationRecipe> = mutableMapOf()
@@ -52,12 +59,36 @@ class SimpleStation(
 /**
  * [Station] 的序列化器.
  */
-internal object StationSerializer : TypeSerializer<Station> {
+internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
+    private val logger: Logger by inject()
     val HINT_NODE: RepresentationHint<String> = RepresentationHint.of("id", typeTokenOf<String>())
     override fun deserialize(type: Type, node: ConfigurationNode): Station {
         val id = node.hint(HINT_NODE) ?: throw SerializationException(
             "The hint node for station id is not present"
         )
-        return SimpleStation(id)
+        val stationType = node.node("type").krequire<String>()
+        when (stationType) {
+            SimpleStation.TYPE -> {
+                val station = SimpleStation(id)
+                val recipeKeys = node.node("recipes").getList<Key>(emptyList())
+                for (key in recipeKeys) {
+                    val stationRecipe = if (RunningEnvironment.TEST.isRunning()) {
+                        StationRecipeRegistry.raw[key]
+                    } else {
+                        StationRecipeRegistry.find(key)
+                    }
+                    if (stationRecipe == null) {
+                        logger.warn("Can't find station recipe: '$key'. Skip add it to station: '$id'")
+                        continue
+                    }
+                    station.addRecipe(stationRecipe)
+                }
+                return station
+            }
+
+            else -> {
+                throw SerializationException("Unknown station type")
+            }
+        }
     }
 }

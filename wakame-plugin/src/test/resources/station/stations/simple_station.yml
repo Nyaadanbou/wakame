@@ -1,0 +1,34 @@
+type: simple
+title: "无分类合成站"
+
+structure:
+  - "X X X X X X X X X"
+  - "X X . . . . . X X"
+  - "X X . . . . . X X"
+  - "X X . . . . . X X"
+  - "X X . . . . . X X"
+  - "X X < X X X > X X"
+
+icons:
+  background: "menu:background"
+  prev_page: "menu:prev_page"
+  next_page: "menu:next_page"
+  content:
+    # 可用标签:
+    # - <result_type>
+    # - <result_name>
+    # - <result_amount>
+    name: "合成: <result_name> *<result_amount>"
+    # 可用标签:
+    # - <ingredients>
+    lore:
+      - "合成所需材料:"
+      - "<ingredients>"
+      - ""
+      - "左键点击 - 合成一次"
+      - "右键点击 - 预览配方"
+      - "潜行点击 - 合成全部"
+
+recipes:
+  - test_station:raw_bronze
+  - test_station:amethyst_dust
