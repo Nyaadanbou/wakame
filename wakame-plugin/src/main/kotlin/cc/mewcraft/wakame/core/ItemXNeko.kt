@@ -11,6 +11,9 @@ import org.bukkit.inventory.ItemStack
 class ItemXNeko(
     identifier: String,
 ) : ItemXAbstract(ItemXFactoryNeko.plugin, identifier) {
+    companion object {
+        const val DEFAULT_RENDER_NAME = "<white>UNKNOWN</white>"
+    }
 
     override fun createItemStack(): ItemStack? {
         val key = Key.key(identifier.replaceFirst('/', ':'))
@@ -33,6 +36,12 @@ class ItemXNeko(
         val key = nekoStack.key
         return "${key.namespace()}/${key.value()}" == identifier
     }
+
+    override fun renderName(): String {
+        val key = Key.key(identifier.replaceFirst('/', ':'))
+        val nekoItem = ItemRegistry.CUSTOM.find(key) ?: return DEFAULT_RENDER_NAME
+        return key.asString() //TODO
+    }
 }
 
 object ItemXFactoryNeko : ItemXFactory {
@@ -46,9 +55,9 @@ object ItemXFactoryNeko : ItemXFactory {
         return ItemXNeko("${key.namespace()}/${key.value()}")
     }
 
-    override fun byUid(plugin: String, itemId: String): ItemXNeko? {
+    override fun byUid(plugin: String, identifier: String): ItemXNeko? {
         if (plugin != this.plugin)
             return null
-        return ItemXNeko(itemId)
+        return ItemXNeko(identifier)
     }
 }

@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 
 object StationRecipeMatcher {
-    fun match(recipe: StationRecipe, player: Player): StationRecipeMatcherResult {
+    fun check(recipe: StationRecipe, player: Player): StationRecipeMatcherResult {
         val recipeInput = recipe.input
         val contextMap = StationChoiceMatcherContextMap(player)
 
@@ -16,7 +16,7 @@ object StationRecipeMatcher {
         }
 
         return StationRecipeMatcherResult(
-            states, TODO()
+            states, states.map { it.description }
         )
     }
 }

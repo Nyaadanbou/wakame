@@ -66,7 +66,7 @@ class StationSerializationTest : KoinTest {
             listOf(
                 ItemChoice(ItemXMock("minecraft:raw_copper"), 3),
                 ItemChoice(ItemXMock("wakame:material/raw_tin"), 1),
-                ExpChoice(495F)
+                ExpChoice(495)
             ), input
         )
 
