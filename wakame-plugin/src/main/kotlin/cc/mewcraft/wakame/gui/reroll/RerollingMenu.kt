@@ -94,7 +94,7 @@ internal class RerollingMenu(
         )
         builder.addIngredient('.', SimpleItem(ItemStack(Material.BLACK_STAINED_GLASS_PANE).hideTooltip(true)))
         builder.addIngredient('i', inputSlot)
-        builder.addIngredient('o', outputSlot)
+        builder.addIngredient('o', outputSlot, ItemWrapper(ItemStack(Material.BARRIER).hideTooltip(true)))
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_VERTICAL)
@@ -242,7 +242,7 @@ internal class RerollingMenu(
     }
 
     private fun onWindowClose() {
-        logger.info("Rerolling window closed for ${viewer.name}")
+        logger.info("$PREFIX Rerolling window closed for ${viewer.name}")
 
         val session = rerollingSession ?: run {
             logger.info("$PREFIX The window is closed while session being null.")
@@ -259,7 +259,7 @@ internal class RerollingMenu(
     }
 
     private fun onWindowOpen() {
-        logger.info("RerollingMenu opened for ${viewer.name}")
+        logger.info("$PREFIX RerollingMenu opened for ${viewer.name}")
     }
 
     private fun setSelectionGuis(guis: List<Gui>?) {
@@ -267,7 +267,7 @@ internal class RerollingMenu(
     }
 
     private fun setInputSlot(stack: ItemStack?) {
-        inputSlot.setItemSilently(0, null)
+        inputSlot.setItemSilently(0, stack)
     }
 
     private fun setOutputSlot(stack: ItemStack?) {

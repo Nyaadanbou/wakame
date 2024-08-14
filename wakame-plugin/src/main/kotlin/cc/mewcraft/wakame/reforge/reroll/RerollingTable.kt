@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
@@ -26,9 +27,14 @@ interface RerollingTable : Examinable {
     val title: Component
 
     /**
+     * 稀有度到数值的映射.
+     */
+    val rarityNumberMapping: RarityNumberMapping
+
+    /**
      * 重造台的花费设置.
      */
-    val cost: Cost
+    val currencyCost: CurrencyCost
 
     /**
      * 包含了每个物品的重造规则.
@@ -36,30 +42,25 @@ interface RerollingTable : Examinable {
     val itemRules: ItemRuleMap
 
     /**
-     * 重造台的花费设置.
+     * 重造台的货币花费设置.
      *
      * 分为两部分:
-     * - 计算常量
-     * - 计算方式
+     * - 常量
+     * - 函数
      *
-     * 计算常量是*确切的数值*, 例如“基础花费”, 稀有度的数值映射等. 将作为计算方式的输入值.
+     * 常量是*确切的数值*, 例如“基础花费”, 稀有度的数值映射等. 将作为函数的输入值.
      *
-     * 计算方式是*数学表达式*, 例如每个词条栏的花费计算方式, 整个物品最终花费的计算方式等.
+     * 函数是*数学表达式*, 例如每个词条栏的花费计算方式, 整个物品最终花费的计算方式等.
      */
-    interface Cost : Examinable {
-        /* 计算常量 */
+    interface CurrencyCost : Examinable {
+        /* 常量 */
 
         /**
          * 所谓的“基础花费”.
          */
         val base: Double
 
-        /**
-         * 每个稀有度对应的数值.
-         */
-        val rarityNumberMapping: Map<Key, Double>
-
-        /* 计算方式 */
+        /* 函数 */
 
         /**
          * 物品上的每个词条栏的花费的计算方式.
@@ -127,7 +128,7 @@ interface RerollingTable : Examinable {
      */
     interface CellRule : Examinable {
         /**
-         * 该词条栏的花费. 具体作用看具体实现.
+         * 该词条栏的“花费”. 其具体作用由实现决定.
          */
         val cost: Double
 

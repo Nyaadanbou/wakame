@@ -81,30 +81,30 @@ interface RerollingSession : Examinable {
         /**
          * 本次重造的总花费.
          */
-        val cost: TotalCost
+        val cost: Total
 
         /**
          * 重造后的物品.
          */
         @get:Contract(" -> new")
         val item: NekoStack
+    }
 
-        interface TotalCost : Examinable {
-            /**
-             * 默认货币的花费.
-             */
-            val default: Double
+    interface Total : Examinable {
+        /**
+         * 默认货币的花费.
+         */
+        val default: Double
 
-            /**
-             * 其他货币的花费.
-             */
-            fun get(currency: String): Double
+        /**
+         * 其他货币的花费.
+         */
+        fun get(currency: String): Double
 
-            /**
-             * 检查玩家是否有足够的货币.
-             */
-            fun test(viewer: Player): Boolean
-        }
+        /**
+         * 检查玩家是否有足够的货币.
+         */
+        fun test(viewer: Player): Boolean
     }
 
     /**
@@ -129,7 +129,7 @@ interface RerollingSession : Examinable {
         /**
          * 渲染词条栏的逻辑.
          */
-        val display: Display
+        val display: SelectionDisplay
 
         /**
          * 记录了该词条栏是否被选择重造.
@@ -142,14 +142,17 @@ interface RerollingSession : Examinable {
          * 反转当前 [selected] 的状态.
          */
         fun invert()
+    }
 
-        interface Display : Examinable {
-            val name: Component
-            val lore: List<Component>
+    /**
+     * 封装了词条栏的图标渲染逻辑.
+     */
+    interface SelectionDisplay : Examinable {
+        val name: Component
+        val lore: List<Component>
 
-            @Contract(pure = false)
-            fun apply(item: ItemStack)
-        }
+        @Contract(pure = false)
+        fun apply(item: ItemStack)
     }
 
     /**

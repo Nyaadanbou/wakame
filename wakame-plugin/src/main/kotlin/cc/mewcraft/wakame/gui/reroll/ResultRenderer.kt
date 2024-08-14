@@ -20,7 +20,7 @@ internal object ResultRenderer {
         val ret: ItemStack
 
         if (result.successful) {
-            ret = item.unsafe.handle
+            ret = ItemStack(item.unsafe.handle.type)
             ret.editMeta { meta ->
                 val lore = buildList {
                     add("<!i><white>重造花费: <green>${result.cost.default}".mini)

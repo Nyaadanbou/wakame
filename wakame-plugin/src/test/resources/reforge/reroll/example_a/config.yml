@@ -3,52 +3,49 @@ enabled: true
 # 重造工作台的容器GUI的标题
 title: "重造工作台: Example A"
 
-# 重造花费的设置.
-cost:
+# 稀有度->数值的映射表.
+# 可用于所有的自定义函数.
+rarity_number_mapping:
+  common: 1.0
+  uncommon: 1.5
+  rare: 2.0
+  epic: 3.0
+  ancient: 5.0
 
-  # 重造花费的计算常量.
-  # 这些常量并没有与生俱来的含义, 它们仅仅是参与计算的一堆数字.
-  # 这些常量的具体作用完全取决于计算方式的表达式如何使用它们.
-  constants:
-    # 重造的“基础花费”
-    base: 100.0
-    # 每个稀有度对应的数值
-    rarity_number_mapping:
-      common: 1.0
-      uncommon: 1.5
-      rare: 2.0
-      epic: 3.0
-      ancient: 5.0
+# 重造操作所需货币的设置.
+currency_cost:
 
-  # 重造花费的计算方式.
-  # 这些不单是数值, 而是数学表达式, 你可以组合各种参数来计算出一个数值.
-  calculations:
-    # 单个词条栏的花费计算方式. 可用的参数:
-    #
-    # cost
-    #   词条栏的重造花费
-    # max_reroll
-    #   词条栏的重造次数上限
-    # reroll_count
-    #   词条栏有史以来被重造过的次数 // dev: 从物品 NBT 读取
-    #
-    each: "cost * reroll_count"
+  # 重造的“基础花费”
+  # 基础花费没有与生俱来的含义, 它们仅仅是参与计算的一个数字.
+  # 基础花费的具体作用完全取决于计算方式的表达式如何使用它.
+  base_cost: 100.0
 
-    # 整个物品的花费计算方式. 可用的参数:
-    #
-    # base
-    #   重造的“基础花费”
-    # rarity
-    #   被重造物品的稀有度(的对应的数值)
-    # item_level
-    #   被重造物品的等级
-    # all_count
-    #   物品上可被重造的词条栏的总数
-    # selected_count
-    #   玩家选择重造的词条栏的数量
-    # selected_cost_sum
-    #   所有玩家选择的词条栏的花费总和
-    # unselected_cost_sum
-    #   所有玩家未选择的词条栏的花费总和
-    #
-    total: "(all_count - selected_count) * 100 + rarity + unselected_cost_sum"
+  # 单个词条栏的花费计算方式. 可用的参数:
+  #
+  # cost
+  #   词条栏的重造花费
+  # max_reroll
+  #   词条栏的重造次数上限
+  # reroll_count
+  #   词条栏有史以来被重造过的次数 // dev: 从物品 NBT 读取
+  #
+  each_function: "cost * reroll_count"
+
+  # 整个物品的花费计算方式. 可用的参数:
+  #
+  # base
+  #   重造的“基础花费”
+  # rarity
+  #   被重造物品的稀有度(的对应的数值)
+  # item_level
+  #   被重造物品的等级
+  # all_count
+  #   物品上可被重造的词条栏的总数
+  # selected_count
+  #   玩家选择重造的词条栏的数量
+  # selected_cost_sum
+  #   所有玩家选择的词条栏的花费总和
+  # unselected_cost_sum
+  #   所有玩家未选择的词条栏的花费总和
+  #
+  total_function: "(all_count - selected_count) * 100 + rarity + unselected_cost_sum"
