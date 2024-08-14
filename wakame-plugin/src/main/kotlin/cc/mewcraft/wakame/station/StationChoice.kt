@@ -4,8 +4,6 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.text3.mini
-import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
@@ -14,12 +12,28 @@ import java.lang.reflect.Type
 import java.util.stream.Stream
 
 /**
- * 工作站的一项输入.
+ * 工作站的一项输入要求.
  */
 sealed interface StationChoice : Examinable {
-    val description: Component
-    val matcher: StationChoiceMatcher<*>
-    fun checkState(contextMap: StationChoiceMatcherContextMap): StationChoiceCheckState
+    val checker: ChoiceChecker<*>
+
+    /**
+     * 通过上下文检查此 [StationChoice] 的满足与否
+     * 上下文依靠 [ChoiceCheckerContextMap] 获取
+     */
+    fun check(contextMap: ChoiceCheckerContextMap): Boolean
+
+    /**
+     * 获取此 [StationChoice] 的描述
+     * 使用MiniMessage格式
+     */
+    fun description(): String
+
+    /**
+     * 该 [StationChoice] 是否有效
+     * 用于延迟验证配方是否能够注册
+     */
+    fun isValid(): Boolean
 }
 
 
@@ -37,24 +51,32 @@ internal data class ItemChoice(
         const val TYPE: String = "item"
     }
 
-    // 构建格式: "材料 *1"
-    override val description: Component = "<!i><white>${item.renderName()} *$amount</white>".mini
-    override val matcher: ItemChoiceMatcher = ItemChoiceMatcher
 
-    override fun checkState(contextMap: StationChoiceMatcherContextMap): StationChoiceCheckState {
-        val context = contextMap[matcher]
+    override val checker: ItemChoiceChecker = ItemChoiceChecker
+
+    override fun check(contextMap: ChoiceCheckerContextMap): Boolean {
+        val context = contextMap[checker]
         val inventory = context.inventorySnapshot
 
         if (!inventory.containsKey(item)) {
-            return StationChoiceCheckState(this, false)
+            return false
         }
         val invAmount = inventory.getInt(item)
         if (invAmount > amount) {
             inventory[item] = invAmount - amount
-            return StationChoiceCheckState(this, true)
+            return true
         }
         inventory.removeInt(item)
-        return StationChoiceCheckState(this, invAmount == amount)
+        return invAmount == amount
+    }
+
+    override fun description(): String {
+        // 构建格式: "材料 *1"
+        return "<white>${item.renderName()} *$amount</white>"
+    }
+
+    override fun isValid(): Boolean {
+        return item.createItemStack() != null
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -76,15 +98,21 @@ internal data class ExpChoice(
         const val TYPE: String = "exp"
     }
 
-    // 构建格式: "EXP *1"
-    override val description: Component = "<!i><white>EXP *$amount</white>".mini
-    override val matcher: ExpChoiceMatcher = ExpChoiceMatcher
+    override val checker: ExpChoiceChecker = ExpChoiceChecker
 
-    override fun checkState(contextMap: StationChoiceMatcherContextMap): StationChoiceCheckState {
-        val context = contextMap[matcher]
+    override fun check(contextMap: ChoiceCheckerContextMap): Boolean {
+        val context = contextMap[checker]
         context.experienceSnapshot -= amount
-        val sufficient = context.experienceSnapshot >= 0
-        return StationChoiceCheckState(this, sufficient)
+        return context.experienceSnapshot >= 0
+    }
+
+    override fun description(): String {
+        // 构建格式: "EXP *1"
+        return "<white>EXP *$amount</white>"
+    }
+
+    override fun isValid(): Boolean {
+        return true
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

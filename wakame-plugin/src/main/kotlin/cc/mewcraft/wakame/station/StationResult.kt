@@ -18,6 +18,12 @@ import java.util.stream.Stream
 sealed interface StationResult : Examinable {
     fun apply(user: User<Player>)
 
+    /**
+     * 该 [StationResult] 是否有效
+     * 用于延迟验证配方是否能够注册
+     */
+    fun isValid(): Boolean
+
 }
 
 /**
@@ -29,6 +35,10 @@ data class ItemResult(
 ) : StationResult {
     override fun apply(user: User<Player>) {
         TODO("Not yet implemented")
+    }
+
+    override fun isValid(): Boolean {
+        return item.createItemStack() != null
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

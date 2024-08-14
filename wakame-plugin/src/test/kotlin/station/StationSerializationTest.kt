@@ -1,13 +1,11 @@
 package station
 
 import cc.mewcraft.wakame.core.ItemXBootstrap
-import cc.mewcraft.wakame.station.ExpChoice
-import cc.mewcraft.wakame.station.ItemChoice
-import cc.mewcraft.wakame.station.ItemResult
-import cc.mewcraft.wakame.station.StationRecipeRegistry
+import cc.mewcraft.wakame.eventbus.PluginEventBus
+import cc.mewcraft.wakame.station.*
 import cc.mewcraft.wakame.util.Key
 import core.ItemXMock
-import net.kyori.adventure.key.Key
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -16,7 +14,10 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.slf4j.Logger
 import testEnv
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class StationSerializationTest : KoinTest {
 
@@ -31,7 +32,6 @@ class StationSerializationTest : KoinTest {
             }
 
             ItemXBootstrap.init()
-            StationRecipeRegistry.loadConfig()
         }
 
         @JvmStatic
@@ -42,39 +42,74 @@ class StationSerializationTest : KoinTest {
     }
 
     private val logger: Logger by inject()
-    private lateinit var key: Key
 
-    @BeforeTest
-    fun beforeEach() {
-
-    }
-
-    @AfterTest
-    fun afterTest() {
-        logger.info(key.asString())
-    }
+//    @BeforeTest
+//    fun beforeEach() {
+//
+//    }
+//
+//    @AfterTest
+//    fun afterTest() {
+//
+//    }
 
     @Test
-    fun `station recipe serialization`() {
-        key = Key("test_station:raw_bronze")
+    fun `simple station serialization`() = runBlocking {
+        StationRecipeRegistry.loadConfig() // 单元测试时跳过工作站配方的有效性验证
+        PluginEventBus.get().post(StationRecipeLoadEvent)
 
-        val recipe = StationRecipeRegistry.raw[key]
-        assertNotNull(recipe)
+        val key1 = Key("test_station:raw_bronze")
 
-        val input = recipe.input
+        val recipe1 = StationRecipeRegistry.raw[key1]
+        assertNotNull(recipe1)
+
+        val input1 = recipe1.input
         assertContentEquals(
             listOf(
                 ItemChoice(ItemXMock("minecraft:raw_copper"), 3),
                 ItemChoice(ItemXMock("wakame:material/raw_tin"), 1),
                 ExpChoice(495)
-            ), input
+            ), input1
         )
 
-        val output = recipe.output
+        val output1 = recipe1.output
         assertContentEquals(
             listOf(
                 ItemResult(ItemXMock("wakame:material/raw_bronze"), 4)
-            ), output
+            ), output1
+        )
+
+
+        val key2 = Key("test_station:amethyst_dust")
+
+        val recipe2 = StationRecipeRegistry.raw[key2]
+        assertNotNull(recipe2)
+
+        val input2 = recipe2.input
+        assertContentEquals(
+            listOf(
+                ItemChoice(ItemXMock("minecraft:amethyst_shard"), 1),
+            ), input2
+        )
+
+        val output2 = recipe2.output
+        assertContentEquals(
+            listOf(
+                ItemResult(ItemXMock("wakame:material/amethyst_dust"), 2)
+            ), output2
+        )
+
+
+        val id = "simple_station"
+
+        val station = StationRegistry.find(id)
+        assertNotNull(station)
+        assertIs<SimpleStation>(station)
+        assertContentEquals(
+            listOf(
+                recipe1,
+                recipe2
+            ), station
         )
     }
 }

@@ -17,19 +17,23 @@ import java.io.File
 
 object StationRegistry : KoinComponent {
     private const val STATION_DIR_NAME = "station/stations"
-    val STATIONS: MutableMap<String, Station> = mutableMapOf()
+    private val stations: MutableMap<String, Station> = mutableMapOf()
+
+    fun find(id: String): Station? {
+        return stations[id]
+    }
 
     private val logger: Logger by inject()
 
     @VisibleForTesting
     fun loadConfig() {
-        STATIONS.clear()
+        stations.clear()
 
         val stationDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(STATION_DIR_NAME)
         stationDir.walk().drop(1).filter { it.extension == "yml" }.forEach { file ->
             try {
                 val fileText = file.readText()
-                val id = file.name
+                val id = file.nameWithoutExtension
 
                 val stationNode = yamlConfig {
                     withDefaults()
@@ -40,7 +44,7 @@ object StationRegistry : KoinComponent {
 
                 stationNode.hint(StationSerializer.HINT_NODE, id)
                 val station = stationNode.krequire<Station>()
-                STATIONS[id] = station
+                stations[id] = station
                 logger.info("Registered station: '${station.id}'")
 
             } catch (e: Throwable) {
@@ -57,7 +61,6 @@ object StationRegistry : KoinComponent {
     init {
         PluginEventBus.get().subscribe<StationRecipeLoadEvent> {
             loadConfig()
-            TODO()
         }
     }
 }

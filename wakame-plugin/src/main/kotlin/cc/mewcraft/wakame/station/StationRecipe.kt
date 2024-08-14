@@ -23,7 +23,11 @@ sealed interface StationRecipe : Keyed, Examinable {
     val input: List<StationChoice>
     val output: List<StationResult>
 
-    fun populateContext(contextMap: StationChoiceMatcherContextMap)
+    /**
+     * 该 [StationRecipe] 是否有效
+     * 用于延迟验证配方是否能够注册
+     */
+    fun isValid(): Boolean
 }
 
 /**
@@ -35,22 +39,21 @@ internal class SimpleStationRecipe(
     override val output: List<StationResult>
 ) : StationRecipe {
 
-    private val distinctMatchers: List<StationChoiceMatcher<*>> =
-        input.map { it.matcher /* matcher 为单例 */ }.distinct()
-
-    override fun populateContext(contextMap: StationChoiceMatcherContextMap) {
-        distinctMatchers.forEach { matcher ->
-            val player = contextMap.player
-            val context = matcher.createContext(player)
-            contextMap[matcher] = context
-        }
-    }
-
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("output", output),
     )
+
+    override fun isValid(): Boolean {
+        input.forEach {
+            if (!it.isValid()) return false
+        }
+        output.forEach {
+            if (!it.isValid()) return false
+        }
+        return true
+    }
 
     override fun toString(): String =
         toSimpleString()
