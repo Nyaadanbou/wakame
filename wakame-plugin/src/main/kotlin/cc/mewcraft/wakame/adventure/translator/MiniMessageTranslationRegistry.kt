@@ -45,7 +45,7 @@ interface MiniMessageTranslationRegistry : Translator {
      * Register all translations from a bundle.
      */
     fun registerAll(locale: Locale, bundle: Map<String, String>) {
-        this.registerAll(locale, bundle.keys) { key: String -> bundle[key] ?: throw IllegalArgumentException("Missing translation for key: $key") }
+        this.registerAll(locale, bundle.keys) { requireNotNull(bundle[it]) { "Missing translation for key: $it" } }
     }
 
     /**
@@ -72,7 +72,7 @@ interface MiniMessageTranslationRegistry : Translator {
             if (errorCount == 1) {
                 throw firstError
             } else if (errorCount > 1) {
-                throw IllegalArgumentException(String.format("Invalid key (and %d more)", errorCount - 1), firstError)
+                throw IllegalArgumentException("Invalid key (and ${errorCount - 1} more)", firstError)
             }
         }
     }
