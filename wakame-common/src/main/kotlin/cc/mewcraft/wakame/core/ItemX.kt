@@ -56,6 +56,11 @@ sealed interface ItemX : Keyed, Examinable {
      * 判断传入的 [itemStack] 是否与该物品匹配.
      */
     fun matches(itemStack: ItemStack): Boolean
+
+    /**
+     * 该物品的渲染时的名字.
+     */
+    fun renderName(): String
 }
 
 /**

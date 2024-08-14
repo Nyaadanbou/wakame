@@ -23,4 +23,8 @@ class ItemXMock(
     override fun matches(itemStack: ItemStack): Boolean {
         throw NotImplementedError()
     }
+
+    override fun renderName(): String {
+        throw NotImplementedError()
+    }
 }

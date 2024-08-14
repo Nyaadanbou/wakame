@@ -14,10 +14,11 @@ import java.lang.reflect.Type
 /**
  * 工作站.
  */
-sealed interface Station {
+sealed interface Station : Iterable<StationRecipe> {
     val id: String
     fun addRecipe(recipe: StationRecipe): Boolean
     fun removeRecipe(key: Key): StationRecipe?
+
 }
 
 /**
@@ -41,6 +42,10 @@ class SimpleStation(
 
     override fun removeRecipe(key: Key): StationRecipe? {
         return recipes.remove(key)
+    }
+
+    override fun iterator(): Iterator<StationRecipe> {
+        return recipes.values.iterator()
     }
 }
 

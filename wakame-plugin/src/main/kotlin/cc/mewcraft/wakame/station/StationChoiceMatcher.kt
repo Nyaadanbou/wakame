@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.core.ItemXRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
+import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -18,8 +19,16 @@ class StationChoiceCheckState(
     val choice: StationChoice,
     val sufficient: Boolean
 ) : Examinable {
+    companion object {
+        const val SUFFICIENT_ICON = "<green>✔</green>"
+        const val INSUFFICIENT_ICON = "<red>✖</red>"
+    }
+
+    // 构建格式: "✔ 材料 *1"
     val description: Component
-        get() = TODO() // 构建类似 "✅ 材料 x1"
+        get() =
+            "<!i>${if (sufficient) SUFFICIENT_ICON else INSUFFICIENT_ICON} ".mini
+                .append(choice.description)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("choice", choice),

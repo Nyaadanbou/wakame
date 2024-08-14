@@ -23,8 +23,6 @@ sealed interface StationRecipe : Keyed, Examinable {
     val input: List<StationChoice>
     val output: List<StationResult>
 
-    // MATCHER
-
     fun populateContext(contextMap: StationChoiceMatcherContextMap)
 }
 

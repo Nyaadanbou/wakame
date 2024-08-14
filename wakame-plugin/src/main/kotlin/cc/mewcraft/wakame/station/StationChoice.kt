@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
+import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -36,7 +37,8 @@ internal data class ItemChoice(
         const val TYPE: String = "item"
     }
 
-    override val description: Component = TODO()
+    // 构建格式: "材料 *1"
+    override val description: Component = "<!i><white>${item.renderName()} *$amount</white>".mini
     override val matcher: ItemChoiceMatcher = ItemChoiceMatcher
 
     override fun checkState(contextMap: StationChoiceMatcherContextMap): StationChoiceCheckState {
@@ -74,7 +76,8 @@ internal data class ExpChoice(
         const val TYPE: String = "exp"
     }
 
-    override val description: Component = TODO()
+    // 构建格式: "EXP *1"
+    override val description: Component = "<!i><white>EXP *$amount</white>".mini
     override val matcher: ExpChoiceMatcher = ExpChoiceMatcher
 
     override fun checkState(contextMap: StationChoiceMatcherContextMap): StationChoiceCheckState {

@@ -7,6 +7,9 @@ import org.bukkit.inventory.ItemStack
 class ItemXVanilla(
     identifier: String,
 ) : ItemXAbstract(ItemXFactoryVanilla.plugin, identifier) {
+    companion object {
+        const val DEFAULT_RENDER_NAME = "<white>UNKNOWN</white>"
+    }
 
     override fun createItemStack(): ItemStack? {
         val material = Material.matchMaterial(identifier, false) ?: return null
@@ -20,6 +23,11 @@ class ItemXVanilla(
     override fun matches(itemStack: ItemStack): Boolean {
         return !itemStack.hasItemMeta() && itemStack.type == Material.matchMaterial(identifier, false)
     }
+
+    override fun renderName(): String {
+        val material = Material.matchMaterial(identifier, false) ?: return DEFAULT_RENDER_NAME
+        return "<tr:${material.translationKey()}>"
+    }
 }
 
 object ItemXFactoryVanilla : ItemXFactory {
@@ -31,9 +39,9 @@ object ItemXFactoryVanilla : ItemXFactory {
         return ItemXVanilla(itemStack.type.key.value())
     }
 
-    override fun byUid(plugin: String, itemId: String): ItemXVanilla? {
+    override fun byUid(plugin: String, identifier: String): ItemXVanilla? {
         if (plugin != this.plugin)
             return null
-        return ItemXVanilla(itemId)
+        return ItemXVanilla(identifier)
     }
 }
