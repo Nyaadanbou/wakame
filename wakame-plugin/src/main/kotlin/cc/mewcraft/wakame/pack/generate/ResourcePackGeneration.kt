@@ -19,6 +19,7 @@ import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
+import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta
 import team.unnamed.creative.model.ModelTexture
 import team.unnamed.creative.model.ModelTextures
@@ -63,7 +64,7 @@ internal class ResourcePackMetaGeneration(
     override fun generate(): Result<Unit> {
         try {
             val packMeta = PackMeta.of(
-                22,
+                PackFormat.format(32, 32, 34),
                 args.description.mini,
             )
             args.resourcePack.packMeta(packMeta)

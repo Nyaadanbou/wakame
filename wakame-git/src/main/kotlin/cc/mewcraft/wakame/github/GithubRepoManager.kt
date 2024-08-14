@@ -18,7 +18,7 @@ class GithubRepoManager(
     private val git: Git
 
     init {
-        if (!localRepoPath.exists()) {
+        if (!localRepoPath.exists() || !localRepoPath.isDirectory || !localRepoPath.resolve(".git").exists()) {
             localRepoPath.mkdirs()
             git = Git.cloneRepository()
                 .setURI("https://github.com/$repo.git")
