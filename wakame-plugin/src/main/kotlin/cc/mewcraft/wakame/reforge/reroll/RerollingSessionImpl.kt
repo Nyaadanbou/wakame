@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.components.cells.template.TemplateCore
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.reroll.SimpleRerollingSession.Total
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -52,14 +53,11 @@ class SimpleRerollingSession(
 
     override fun reforge(): RerollingSession.Result {
         val operation = ReforgeOperation(this, logger)
-        try {
-            result = operation.execute()
-        } catch (e: ReforgeOperationException) {
-            logger.warn("$PREFIX An error occurred while reforging an item: ${e.message}")
-            result = Result.error()
+        val result = try {
+            operation.execute()
         } catch (e: Exception) {
-            logger.error("$PREFIX An unknown error occurred while reforging an item", e)
-            result = Result.error()
+            logger.error("$PREFIX An unknown error occurred while rerolling an item", e)
+            Result.error()
         }
         return result
     }
@@ -76,64 +74,67 @@ class SimpleRerollingSession(
     override fun toString(): String =
         toSimpleString()
 
-    class Result( // FIXME 变成单例
-        successful: Boolean,
-        description: List<Component>,
-        cost: RerollingSession.Result.TotalCost,
-        item: NekoStack,
-    ) : RerollingSession.Result {
-
-        override val successful: Boolean = successful
-        override val description: List<Component> = description
-        override val cost: RerollingSession.Result.TotalCost = cost
-        override val item: NekoStack by NekoStackDelegates.copyOnRead(item)
-
-        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("successful", successful),
-            ExaminableProperty.of("description", description),
-            ExaminableProperty.of("cost", cost),
-            ExaminableProperty.of("item", item),
-        )
-
-        override fun toString(): String =
-            toSimpleString()
-
-        companion object {
-            private val EMPTY: Result = Result(false, listOf(Component.text("没有要重造的物品")), TotalCost.zero(), NekoStack.empty())
-            private val ERROR: Result = Result(false, listOf(Component.text("重造发生内部错误!")), TotalCost.error(), NekoStack.empty())
-
-            fun empty(): Result {
-                return EMPTY
-            }
-
-            fun error(): Result {
-                return ERROR
-            }
-
-            fun success(
-                cost: RerollingSession.Result.TotalCost,
-                item: NekoStack,
-            ): Result {
-                return Result(true, listOf(Component.text("重造成功!")), cost, item)
-            }
+    object Result {
+        fun empty(): RerollingSession.Result {
+            return EMPTY
         }
 
-        data class TotalCost(
+        fun error(): RerollingSession.Result {
+            return ERROR
+        }
+
+        fun success(
+            cost: RerollingSession.Total,
+            item: NekoStack,
+        ): RerollingSession.Result {
+            return Simple(true, listOf(Component.text("重造成功!")), cost, item)
+        }
+
+        private val EMPTY: RerollingSession.Result = Simple(false, listOf(Component.text("没有要重造的物品")), Total.zero(), NekoStack.empty())
+        private val ERROR: RerollingSession.Result = Simple(false, listOf(Component.text("重造发生内部错误!")), Total.error(), NekoStack.empty())
+
+        private class Simple(
+            successful: Boolean,
+            description: List<Component>,
+            cost: RerollingSession.Total,
+            item: NekoStack,
+        ) : RerollingSession.Result {
+            override val successful: Boolean = successful
+            override val description: List<Component> = description
+            override val cost: RerollingSession.Total = cost
+            override val item: NekoStack by NekoStackDelegates.copyOnRead(item)
+
+            override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+                ExaminableProperty.of("successful", successful),
+                ExaminableProperty.of("description", description),
+                ExaminableProperty.of("cost", cost),
+                ExaminableProperty.of("item", item),
+            )
+
+            override fun toString(): String =
+                toSimpleString()
+        }
+    }
+
+    object Total {
+        fun zero(): RerollingSession.Total {
+            return ZERO
+        }
+
+        fun error(): RerollingSession.Total {
+            return ERROR
+        }
+
+        fun success(default: Double): RerollingSession.Total {
+            return Simple(default)
+        }
+
+        private val ZERO: RerollingSession.Total = Simple(.0)
+        private val ERROR: RerollingSession.Total = Simple(Double.MAX_VALUE)
+
+        private class Simple(
             override val default: Double,
-        ) : RerollingSession.Result.TotalCost {
-            companion object {
-                private val ZERO: TotalCost = TotalCost(.0)
-                private val ERROR: TotalCost = TotalCost(Double.MAX_VALUE)
-
-                fun zero(): TotalCost {
-                    return ZERO
-                }
-
-                fun error(): TotalCost {
-                    return ERROR
-                }
-            }
-
+        ) : RerollingSession.Total {
             override fun get(currency: String): Double {
                 return .0 // TODO 等到需要支持多货币的时候再实现
             }
@@ -155,7 +156,7 @@ class SimpleRerollingSession(
         override val id: String,
         override val rule: RerollingTable.CellRule,
         override val template: Group<TemplateCore, GenerationContext>,
-        override val display: RerollingSession.Selection.Display,
+        override val display: RerollingSession.SelectionDisplay,
     ) : RerollingSession.Selection, KoinComponent {
         private val logger: Logger by inject()
 
@@ -177,26 +178,26 @@ class SimpleRerollingSession(
 
         override fun toString(): String =
             toSimpleString()
+    }
 
-        class Display(
-            override val name: Component,
-            override val lore: List<Component>,
-        ) : RerollingSession.Selection.Display {
-            override fun apply(item: ItemStack) {
-                item.editMeta { meta ->
-                    meta.itemName(name)
-                    meta.lore(lore)
-                }
+    class SelectionDisplay(
+        override val name: Component,
+        override val lore: List<Component>,
+    ) : RerollingSession.SelectionDisplay {
+        override fun apply(item: ItemStack) {
+            item.editMeta { meta ->
+                meta.itemName(name)
+                meta.lore(lore)
             }
-
-            override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-                ExaminableProperty.of("name", name),
-                ExaminableProperty.of("lore", lore),
-            )
-
-            override fun toString(): String =
-                toSimpleString()
         }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+            ExaminableProperty.of("name", name),
+            ExaminableProperty.of("lore", lore),
+        )
+
+        override fun toString(): String =
+            toSimpleString()
     }
 
     class SelectionMap(

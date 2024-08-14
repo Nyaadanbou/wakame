@@ -1,47 +1,55 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
+/**
+ * 一个无限制的 [RerollingTable] 实现.
+ */
 internal object WtfRerollingTable : RerollingTable {
     override val identifier: String = "wtf"
-    override val enabled: Boolean = true
-    override val title: Component = Component.text("Rerolling Table (Cheat ON)")
-    override val cost: RerollingTable.Cost = ZeroCost
-    override val itemRules: RerollingTable.ItemRuleMap = AnyItemRuleMap
 
-    override fun toString(): String {
-        return toSimpleString()
+    override val enabled: Boolean = true
+
+    override val title: Component = Component.text("Rerolling Table (Cheat ON)")
+
+    override val rarityNumberMapping: RarityNumberMapping = object : RarityNumberMapping {
+        override fun get(key: Key): Double = 1.0
     }
 
-    private data object ZeroCost : RerollingTable.Cost {
+    override val currencyCost: RerollingTable.CurrencyCost = object : RerollingTable.CurrencyCost {
         override val base: Double = 0.0
-        override val rarityNumberMapping: Map<Key, Double> = emptyMap<Key, Double>().withDefault { 0.0 }
-        override val eachFunction: RerollingTable.Cost.EachFunction = ZeroEachFunction
-        override val totalFunction: RerollingTable.Cost.TotalFunction = ZeroTotalFunction
-
-        object ZeroEachFunction : RerollingTable.Cost.EachFunction {
-            override fun compute(cost: Double, maxReroll: Int, rerollCount: Int): Double {
-                return .0
-            }
-        }
-
-        object ZeroTotalFunction : RerollingTable.Cost.TotalFunction {
+        override val eachFunction: RerollingTable.CurrencyCost.EachFunction = object : RerollingTable.CurrencyCost.EachFunction {
             override fun compute(
-                base: Double,
-                rarity: Double,
-                itemLevel: Int,
-                allCount: Int,
-                selectedCount: Int,
-                selectedCostSum: Double,
-                unselectedCostSum: Double,
-            ): Double {
-                return .0
-            }
+                cost: Double, maxReroll: Int, rerollCount: Int
+            ): Double = .0
         }
+        override val totalFunction: RerollingTable.CurrencyCost.TotalFunction = object : RerollingTable.CurrencyCost.TotalFunction {
+            override fun compute(
+                base: Double, rarity: Double, itemLevel: Int, allCount: Int, selectedCount: Int, selectedCostSum: Double, unselectedCostSum: Double
+            ): Double = .0
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+            ExaminableProperty.of("base", base),
+        )
+
+        override fun toString(): String =
+            toSimpleString()
+    }
+
+    override val itemRules: RerollingTable.ItemRuleMap = object :RerollingTable.ItemRuleMap {
+        override fun get(key: Key): RerollingTable.ItemRule {
+            return AnyItemRule
+        }
+    }
+
+    override fun toString(): String {
+        return toSimpleString() // 最简输出
     }
 
     private data object AnyCellRule : RerollingTable.CellRule {
@@ -58,19 +66,17 @@ internal object WtfRerollingTable : RerollingTable {
     private data object AnyItemRule : RerollingTable.ItemRule {
         override val cellRules: RerollingTable.CellRuleMap = AnyCellRuleMap
     }
-
-    private data object AnyItemRuleMap : RerollingTable.ItemRuleMap {
-        override fun get(key: Key): RerollingTable.ItemRule {
-            return AnyItemRule
-        }
-    }
 }
 
+/**
+ * 一个标准的 [RerollingTable] 实现, 设计上需要从配置文件构建.
+ */
 internal class SimpleRerollingTable(
     override val identifier: String,
     override val enabled: Boolean,
     override val title: Component,
-    override val cost: RerollingTable.Cost,
+    override val rarityNumberMapping: RarityNumberMapping,
+    override val currencyCost: RerollingTable.CurrencyCost,
     override val itemRules: RerollingTable.ItemRuleMap,
 ) : RerollingTable {
 
@@ -78,24 +84,21 @@ internal class SimpleRerollingTable(
         ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("enabled", enabled),
         ExaminableProperty.of("title", title),
-        ExaminableProperty.of("cost", cost),
+        ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
+        ExaminableProperty.of("currencyCost", currencyCost),
         ExaminableProperty.of("itemRules", itemRules),
     )
 
     override fun toString(): String =
         toSimpleString()
 
-    data class Cost(
+    data class CurrencyCost(
         override val base: Double,
-        override val rarityNumberMapping: Map<Key, Double>,
-        override val eachFunction: RerollingTable.Cost.EachFunction,
-        override val totalFunction: RerollingTable.Cost.TotalFunction,
-    ) : RerollingTable.Cost {
+        override val eachFunction: RerollingTable.CurrencyCost.EachFunction,
+        override val totalFunction: RerollingTable.CurrencyCost.TotalFunction,
+    ) : RerollingTable.CurrencyCost {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("base", base),
-            ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
-            ExaminableProperty.of("eachFunction", eachFunction),
-            ExaminableProperty.of("totalFunction", totalFunction),
         )
 
         override fun toString(): String =

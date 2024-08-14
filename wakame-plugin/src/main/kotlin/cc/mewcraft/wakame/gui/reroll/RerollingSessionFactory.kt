@@ -3,10 +3,13 @@ package cc.mewcraft.wakame.gui.reroll
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.reforge.reroll.SimpleRerollingSession
 
 internal object RerollingSessionFactory {
+    private const val PREFIX = ReforgeLoggerPrefix.REROLL
+
     /**
      * 构建一个 [RerollingSession].
      *
@@ -18,7 +21,7 @@ internal object RerollingSessionFactory {
     ): RerollingSession? {
         val templates = input.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
             // 如果这个物品没有对应的词条栏模板, 则判定整个物品不支持重造
-            menu.logger.warn("Input item has no cell templates. This might be a config issue!")
+            menu.logger.warn("$PREFIX Input item has no `cells` templates. This might be a config issue!")
             return null
         }
 
@@ -37,7 +40,7 @@ internal object RerollingSessionFactory {
             // 这个词条栏没有对应的模板, 则判定该词条栏不支持重造
             val template = templates[id]?.core ?: continue
 
-            val display = SimpleRerollingSession.Selection.Display(
+            val display = SimpleRerollingSession.SelectionDisplay(
                 name = cell.provideTooltipName().content,
                 lore = cell.provideTooltipLore().content,
             )

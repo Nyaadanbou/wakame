@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
 import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
@@ -11,7 +13,11 @@ import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationTrigger
 import cc.mewcraft.wakame.item.templates.filter.AttributeContextHolder
 import cc.mewcraft.wakame.item.templates.filter.SkillContextHolder
+import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.registry.RarityRegistry
+import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.slf4j.Logger
 import kotlin.properties.Delegates
@@ -24,7 +30,11 @@ import kotlin.properties.Delegates
  * - [RerollingSession.Selection]
  * - [RerollingSession.SelectionMap]
  */
-internal class ReforgeOperation(
+internal class ReforgeOperation
+/**
+ * @throws ReforgeOperationException 如果物品缺少必要的组件
+ */
+constructor(
     private val session: RerollingSession,
     private val logger: Logger,
 ) : KoinComponent {
@@ -34,65 +44,51 @@ internal class ReforgeOperation(
     }
 
     /**
-     * 重造台.
-     */
-    private val table: RerollingTable = session.table
-
-    /**
      * 要被重造的物品; 我们将对该实例进行修改.
      */
     private val inputItem: NekoStack = session.inputItem // it's a clone
 
     /**
-     * 玩家的选择, 包含已选择/未选择的词条栏.
+     * 要被重造的物品的信息.
      */
-    private val selections: RerollingSession.SelectionMap = session.selections
+    private val inputItemInfo: InputItemInfo = InputItemInfo(inputItem)
 
     /**
      * 该对象是否已被冻结. 被冻结的对象无法再执行函数 [execute].
      */
     private var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
         if (!new && old) {
-            throw ReforgeOperationException("$PREFIX Unfreezing an operation is prohibited. This is a bug!")
+            logger.error("$PREFIX Unfreezing an operation is prohibited. This is a bug!")
+            return@vetoable false
         }
+        logger.info("$PREFIX Operation frozen status updated: $old -> $new")
         return@vetoable true
     }
 
-    private fun throwMissingComponent(type: ItemComponentType<*>): Nothing {
-        frozen = true
+    private fun createMissingComponentException(type: ItemComponentType<*>): Nothing {
         throw ReforgeOperationException("$PREFIX Input item has no '$type' component. This is a bug!")
     }
 
     /**
-     * 基于要被重造的物品 ([inputItem]), 初始化上下文.
+     * 基于要被重造的物品 ([inputItemInfo]), 初始化上下文.
      *
      * 该上下文将被用于生成新的词条栏.
      */
-    private fun generateContext(): GenerationContext {
-        // 获取必要的物品信息
-        val level = inputItem.components.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: throwMissingComponent(ItemComponentTypes.LEVEL)
-        val cells = inputItem.components.get(ItemComponentTypes.CELLS) ?: throwMissingComponent(ItemComponentTypes.CELLS)
-
+    private fun generateContext(): Result<GenerationContext> {
         // 创建一个空的 context
-        val trigger = GenerationTrigger.direct(level)
-        val context = GenerationContext(trigger, inputItem.key)
+        val trigger = GenerationTrigger.direct(inputItemInfo.level)
+        val context = GenerationContext(trigger, inputItemInfo.key)
 
-        // 先把*不可由玩家改变的信息*全部写入 context
-        level.toShort().let {
-            context.level = it
-        }
-        inputItem.components.get(ItemComponentTypes.RARITY)?.rarity?.let {
-            context.rarity = it
-        }
-        inputItem.components.get(ItemComponentTypes.ELEMENTS)?.elements?.let {
-            context.elements += it
-        }
-        inputItem.components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz?.let {
-            context.kizamiz += it
-        }
+        // 先把*不可由玩家改变的信息*全部写入上下文
+        context.level = inputItemInfo.level.toShort()
+        context.rarity = inputItemInfo.rarity
+        context.elements += inputItemInfo.elements
+        context.kizamiz += inputItemInfo.kizamiz
 
-        // 然后再把*可由玩家改变的信息*全部写入 context
-        cells
+        val selections = session.selections
+
+        // 然后再把*可由玩家改变的信息*全部写入上下文
+        this@ReforgeOperation.inputItemInfo.cells
             .filter { (id, _) ->
                 // 注意, 我们必须跳过玩家选择要重造的词条栏.
                 // 如果不跳过, 那么新的词条栏将无法被正确生成.
@@ -106,13 +102,14 @@ internal class ReforgeOperation(
                     is CoreSkill -> {
                         context.skills += SkillContextHolder(core.key)
                     }
+
                     is CoreAttribute -> {
                         context.attributes += AttributeContextHolder(core.key, core.operation, core.element)
                     }
                 }
             }
 
-        return context
+        return Result.success(context)
     }
 
     /**
@@ -125,33 +122,37 @@ internal class ReforgeOperation(
      *
      * @throws ReforgeOperationException 如果重造失败.
      */
-    fun execute(): SimpleRerollingSession.Result {
+    fun execute(): RerollingSession.Result {
         if (frozen) {
-            // 禁止重复执行该函数
-            throw ReforgeOperationException("Trying to execute a frozen operation. This is a bug!")
+            logger.error("$PREFIX Trying to execute a frozen operation. This is a bug!")
+            return SimpleRerollingSession.Result.error()
         }
-        // 冻结该对象
         frozen = true
 
         // 将要作为输出的物品.
         val outputItem = inputItem.clone()
 
         // 准备上下文, 用于重新生成核心.
-        val context = generateContext()
-
-        // 获取必要的物品信息.
-        val level = outputItem.components.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: throwMissingComponent(ItemComponentTypes.LEVEL)
-        val cells = outputItem.components.get(ItemComponentTypes.CELLS)?.builder() ?: throwMissingComponent(ItemComponentTypes.CELLS)
+        val context = generateContext().getOrElse {
+            logger.error("$PREFIX An internal error occurred while generating context: ${it.message}")
+            return SimpleRerollingSession.Result.error()
+        }
 
         // 储存词条栏的总花费 (选择/未选择).
         var sumOfEachSelected = .0
         var sumOfEachUnselected = .0
 
+        val table = session.table
+        val selections = session.selections
+
+        // 词条栏 (builder)
+        val cells = inputItemInfo.cells.builder()
+
         // 遍历每一个选择:
         for ((id, sel) in selections) {
 
             // 计算当前词条栏的花费.
-            val eachCost = table.cost.eachFunction.compute(
+            val eachCost = table.currencyCost.eachFunction.compute(
                 cost = sel.rule.cost,
                 maxReroll = sel.rule.maxReroll,
                 rerollCount = cells.get(id)?.getReforgeHistory()?.rerollCount ?: 0
@@ -167,9 +168,11 @@ internal class ReforgeOperation(
             if (sel.selected) {
 
                 // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
-                val selected = sel.template.select(context).firstOrNull() ?: TemplateCoreEmpty
-                val generated = selected.generate(context)
-                cells.modify(id) { it.setCore(generated) }
+                cells.modify(id) {
+                    val selected = sel.template.select(context).firstOrNull() ?: TemplateCoreEmpty
+                    val generated = selected.generate(context)
+                    it.setCore(generated)
+                }
 
                 // 为重造过的词条栏 +1 重造次数
                 cells.modify(id) {
@@ -184,17 +187,56 @@ internal class ReforgeOperation(
         outputItem.components.set(ItemComponentTypes.CELLS, cells.build())
 
         // 计算重造物品的总花费.
-        val compute = table.cost.totalFunction.compute(
-            base = table.cost.base,
-            rarity = context.rarity?.key?.let { table.cost.rarityNumberMapping.getOrDefault(it, .0) } ?: .0,
-            itemLevel = level,
+        val compute = table.currencyCost.totalFunction.compute(
+            base = table.currencyCost.base,
+            rarity = table.rarityNumberMapping.get(inputItemInfo.rarity.key),
+            itemLevel = inputItemInfo.level,
             allCount = selections.size,
             selectedCount = selections.count { it.selected },
             selectedCostSum = sumOfEachSelected,
             unselectedCostSum = sumOfEachUnselected,
         )
-        val totalCost = SimpleRerollingSession.Result.TotalCost(compute)
+        val total = SimpleRerollingSession.Total.success(compute)
 
-        return SimpleRerollingSession.Result.success(totalCost, outputItem)
+        return SimpleRerollingSession.Result.success(total, outputItem)
+    }
+}
+
+
+/**
+ * 封装了重造过程中 [RerollingSession.inputItem] 的必要信息.
+ */
+private class InputItemInfo
+/**
+ * @throws ReforgeOperationException 如果 [wrapped] 缺少必要的组件.
+ */
+constructor(
+    wrapped: NekoStack,
+) {
+    companion object {
+        private const val PREFIX = ReforgeLoggerPrefix.REROLL
+    }
+
+    val key: Key = wrapped.key
+
+    val level: Int
+    val cells: ItemCells
+    val rarity: Rarity
+    val elements: Set<Element>
+    val kizamiz: Set<Kizami>
+
+    init {
+        // 等级和词条栏是必要的
+        level = wrapped.components.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: throwMissingComponentException(ItemComponentTypes.LEVEL)
+        cells = wrapped.components.get(ItemComponentTypes.CELLS) ?: throwMissingComponentException(ItemComponentTypes.CELLS)
+
+        // 这些理论上可以忽略不计
+        rarity = wrapped.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
+        elements = wrapped.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
+        kizamiz = wrapped.components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz ?: emptySet()
+    }
+
+    private fun throwMissingComponentException(type: ItemComponentType<*>): Nothing {
+        throw ReforgeOperationException("$PREFIX Input item has no '$type' component. This is a bug!")
     }
 }
