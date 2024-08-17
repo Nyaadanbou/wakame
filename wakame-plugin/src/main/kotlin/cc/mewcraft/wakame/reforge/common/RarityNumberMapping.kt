@@ -7,6 +7,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.ConfigurationOptions
 import java.lang.reflect.Type
 import java.util.stream.Stream
 
@@ -14,28 +15,26 @@ import java.util.stream.Stream
  * 用于将 [稀有度][cc.mewcraft.wakame.rarity.Rarity] 映射成浮点数.
  */
 interface RarityNumberMapping : Examinable {
-    /**
-     * 获取指定稀有度的浮点数值. 如果不存在则返回 `0.0`.
-     */
-    fun get(key: Key): Double
-}
+    companion object {
+        /**
+         * 创建一个永远返回固定值的 [RarityNumberMapping] 实例.
+         */
+        fun constant(value: Double): RarityNumberMapping {
+            return ConstantRarityNumberMapping(value)
+        }
 
-/**
- * [RarityNumberMapping] 的一般实现.
- */
-class SimpleRarityNumberMapping(
-    private val map: Map<Key, Double>,
-) : RarityNumberMapping {
-    override fun get(key: Key): Double {
-        return map[key] ?: 0.0
+        /**
+         * 创建一个标准的 [RarityNumberMapping] 实例, 用于从配置文件构建.
+         */
+        fun simple(map: Map<Key, Double>): RarityNumberMapping {
+            return SimpleRarityNumberMapping(map)
+        }
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-        ExaminableProperty.of("map", map)
-    )
-
-    override fun toString(): String =
-        toSimpleString()
+    /**
+     * 获取指定稀有度对应的数值. 如果不存在则返回 `0.0`.
+     */
+    fun get(key: Key): Double
 }
 
 /**
@@ -53,4 +52,41 @@ internal object RarityNumberMappingSerializer : TypeSerializer<RarityNumberMappi
 
         return ret
     }
+
+    override fun emptyValue(specificType: Type, options: ConfigurationOptions): RarityNumberMapping? {
+        return EmptyRarityNumberMapping
+    }
+}
+
+private object EmptyRarityNumberMapping : RarityNumberMapping {
+    override fun get(key: Key): Double = 0.0
+    override fun toString(): String = toSimpleString()
+}
+
+private class ConstantRarityNumberMapping(
+    val constant: Double
+) : RarityNumberMapping {
+    override fun get(key: Key): Double {
+        return constant
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+        ExaminableProperty.of("constant", constant)
+    )
+
+    override fun toString(): String = toSimpleString()
+}
+
+private class SimpleRarityNumberMapping(
+    private val map: Map<Key, Double>,
+) : RarityNumberMapping {
+    override fun get(key: Key): Double {
+        return map[key] ?: 0.0
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+        ExaminableProperty.of("map", map)
+    )
+
+    override fun toString(): String = toSimpleString()
 }

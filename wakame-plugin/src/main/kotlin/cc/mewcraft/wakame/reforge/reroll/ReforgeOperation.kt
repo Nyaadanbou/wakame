@@ -88,12 +88,12 @@ constructor(
         val selections = session.selections
 
         // 然后再把*可由玩家改变的信息*全部写入上下文
-        this@ReforgeOperation.inputItemInfo.cells
-            .filter { (id, _) ->
+        inputItemInfo.cells
+            .filterx { cell ->
                 // 注意, 我们必须跳过玩家选择要重造的词条栏.
                 // 如果不跳过, 那么新的词条栏将无法被正确生成.
                 // 例如, 由于已存在相同的信息而最终生成了空词条栏.
-                selections[id]?.selected == false
+                selections[cell.getId()]?.selected == false
             }
             .forEach { (_, cell) ->
                 when (
