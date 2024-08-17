@@ -4,37 +4,37 @@ enabled: true
 # 定制工作台的容器GUI的标题
 title: "<b>定制工作台: Example A"
 
-# 定制的花费计算
+# 稀有度->数值的映射表.
+# 可用于所有的自定义函数.
+rarity_number_mapping:
+  common: 1.0
+  uncommon: 1.5
+  rare: 2.0
+  epic: 2.5
+  ancient: 3.0
+
+# 在这里设置完成定制操作所需要消耗的货币资源.
+# 如果玩家没有足够的货币资源, 合并将算作失败.
 #
-# 无论定制什么物品, 首先计算这个费用, 记为 A:
-#   A = base + (rarity_modifier * per_core * N), N 为单次定制核心的数量
+# 计算函数, 用于计算完成整个物品定制的总花费
 #
-# 对于定制的单个物品来说, 计算这个物品的费用, 记为 B:
-#   B = 物品等级 * item_level_modifier
+# 可用参数:
 #
-# 对于定制的*每个*便携版核心来说, 计算定制该核心的花费, 记为 C:
-#   C = 便携版核心等级 * core_level_modifier
+# query.source_item_rarity()
+#   被定制物品的稀有度所映射的数值
+# query.source_item_level()
+#   被定制物品的等级
+# query.source_item_total_cell_count()
+#   被定制物品的词条栏的数量
+# query.source_item_changeable_cell_count()
+#   被定制物品上可以被定制的词条栏的数量
+# query.source_item_changed_cell_count()
+#   被定制物品上参与了定制的词条栏的数量
+# query.source_item_changed_cell_cost()
+#   被定制物品上参与了定制的词条栏的总花费
 #
-# 对于定制的*每个*词条栏来说, 计算定制该词条栏的花费, 记为 D:
-#   D = 取决于实现
-#
-# 总花费的计算为: A + B + ∑C + ∑D
-cost:
-  # 基础花费, 类似起步价
-  base: 1000
-  # 每个定制核心的基础花费, 类似的士的每公里的费用
-  per_core: 500
-  # 每个定制诅咒的基础花费
-  per_curse: 500
-  # 稀有度对于核心的基础花费的修饰系数
-  rarity_modifiers:
-    # 这一级的键写稀有度的 id, 值写 double 类型的修饰系数
-    common: 1.0
-    uncommon: 1.1
-    rare: 1.1
-    epic: 1.0
-    ancient: 1.0
-  # 物品的等级的修饰系数
-  item_level_modifier: 1
-  # 便携版核心(PortableCore)的等级的修饰系数
-  core_level_modifier: 1
+currency_cost: |
+  200 * query.source_item_rarity()
+  + 100 * query.source_item_changed_cell_count() 
+  + query.source_item_changed_cell_cost()
+
