@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.TemporaryIcons
 import cc.mewcraft.wakame.util.hideAllFlags
 import cc.mewcraft.wakame.util.hideTooltip
 import cc.mewcraft.wakame.util.toSimpleString
@@ -23,7 +24,6 @@ import team.unnamed.mocha.runtime.MochaFunction
 import java.util.stream.Stream
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.math.abs
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -389,30 +389,6 @@ internal class SimpleModdingSession(
 
         private val zeroMochaFunction: MochaFunction = MochaFunction { .0 }
 
-        // 临时实现
-        private val temporaryIcons: List<Material> = listOf(
-            Material.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.VEX_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.WILD_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.DUNE_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.RAISER_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.HOST_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.WARD_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.TIDE_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.RIB_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.EYE_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Material.SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE,
-        )
-
-        // 临时实现
-        private fun getTrimMaterial(hashCode: Int): Material {
-            return temporaryIcons[abs(hashCode) % temporaryIcons.size]
-        }
-
         private class Unchangeable(
             override val session: ModdingSession,
             override val cell: Cell,
@@ -452,7 +428,7 @@ internal class SimpleModdingSession(
 
             override val id: String = cell.getId()
 
-            override val display: ItemStack = ItemStack(getTrimMaterial(id.hashCode())).apply {
+            override val display: ItemStack = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
                 editMeta { meta ->
                     val name = cell.provideTooltipName().content
                     val lore = cell.provideTooltipLore().content

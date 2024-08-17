@@ -51,7 +51,7 @@ class SimpleRerollingSession(
         return@vetoable true
     }
 
-    override fun reforge(): RerollingSession.Result {
+    private fun reforge0(): RerollingSession.Result {
         val operation = ReforgeOperation(this, logger)
         val result = try {
             operation.execute()
@@ -62,8 +62,14 @@ class SimpleRerollingSession(
         return result
     }
 
+    override fun reforge(): RerollingSession.Result {
+        val ret = reforge0()
+        this.result = ret
+        return ret
+    }
+
     override fun returnInput(viewer: Player) {
-        viewer.inventory.addItem(inputItem.unsafe.handle)
+        viewer.inventory.addItem(inputItem.itemStack)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

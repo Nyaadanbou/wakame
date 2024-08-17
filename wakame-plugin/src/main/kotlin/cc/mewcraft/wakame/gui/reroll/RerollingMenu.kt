@@ -154,15 +154,11 @@ internal class RerollingMenu(
                 // 设置会话
                 rerollingSession = session
 
-                // 将*克隆*放入输入容器
-                event.newItem = ns.itemStack
-
-                val selectionMenus = session.selections.map { (_, selection) ->
-                    SelectionMenu(this, selection)
-                }
-                val selectionGuis = selectionMenus.map {
-                    it.primaryGui
-                }
+                // 设置子菜单
+                val selectionGuis = session
+                    .selections
+                    .map { (_, selection) -> SelectionMenu(this, selection) }
+                    .map { it.primaryGui }
                 setSelectionGuis(selectionGuis)
 
                 // 更新输出容器
@@ -175,7 +171,7 @@ internal class RerollingMenu(
                 event.isCancelled = true
 
                 val session = rerollingSession ?: run {
-                    logger.error("$PREFIX Rerolling session (viewer: ${viewer.name}) is null, but input item is being removed. This is a bug!")
+                    logger.error("$PREFIX Rerolling session is null, but input item is being removed. This is a bug!")
                     return
                 }
 
@@ -198,43 +194,46 @@ internal class RerollingMenu(
 
         when {
             // 玩家尝试交换物品:
-            // 禁止该操作.
             event.isSwap -> {
                 viewer.sendPlainMessage("猫咪不可以!")
                 event.isCancelled = true; return
             }
 
             // 玩家把物品放进输出容器:
-            // 禁止该操作.
             event.isAdd -> {
                 viewer.sendPlainMessage("猫咪不可以!")
                 event.isCancelled = true; return
             }
 
             // 玩家从输出容器拿出物品:
-            // 说明玩家想要完成这次重造.
             event.isRemove -> {
                 event.isCancelled = true
 
+                // 从输出容器取出物品, 说明玩家想要完成这次重造.
+
                 val session = rerollingSession ?: run {
-                    logger.error("$PREFIX Rerolling session (viewer: ${viewer.name}) is null, but output item is being removed. This is a bug!")
+                    logger.error("$PREFIX Rerolling session is null, but output item is being removed. This is a bug!")
                     return
                 }
 
                 // 首先获得当前的重造结果
                 val result = session.result
+
+                // 判断玩家是否有足够的货币
                 if (!result.cost.test(viewer)) {
                     viewer.sendPlainMessage("你没有足够的货币!")
                     return
                 }
 
                 // 把重造后的物品给玩家
-                viewer.inventory.addItem(result.item.unsafe.handle)
+                viewer.inventory.addItem(result.item.itemStack)
 
+                // 清空菜单内容
                 setInputSlot(null)
                 setOutputSlot(null)
                 setSelectionGuis(null)
 
+                // 冻结会话
                 session.frozen = true
                 rerollingSession = null
             }
@@ -249,13 +248,14 @@ internal class RerollingMenu(
             return
         }
 
-        session.frozen = true
-        rerollingSession = null
-
         setInputSlot(null)
         setOutputSlot(null)
         setSelectionGuis(null)
+
         session.returnInput(viewer)
+
+        session.frozen = true
+        rerollingSession = null
     }
 
     private fun onWindowOpen() {
