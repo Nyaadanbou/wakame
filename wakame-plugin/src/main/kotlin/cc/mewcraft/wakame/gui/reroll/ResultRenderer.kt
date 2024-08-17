@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.gui.reroll
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.util.hideTooltip
 import me.lucko.helper.text3.mini
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -20,11 +21,16 @@ internal object ResultRenderer {
         val ret: ItemStack
 
         if (result.successful) {
-            ret = ItemStack(item.unsafe.handle.type)
+            ret = item.itemStack
             ret.editMeta { meta ->
+                val name = meta.itemName()
                 val lore = buildList {
                     add("<!i><white>重造花费: <green>${result.cost.default}".mini)
+                    add(Component.empty())
+                    add("<!i><gray>⤷ 点击取出".mini)
                 }
+
+                meta.itemName(name)
                 meta.lore(lore)
             }
         } else {

@@ -127,6 +127,7 @@ constructor(
             logger.error("$PREFIX Trying to execute a frozen operation. This is a bug!")
             return SimpleRerollingSession.Result.error()
         }
+
         frozen = true
 
         // 将要作为输出的物品.
