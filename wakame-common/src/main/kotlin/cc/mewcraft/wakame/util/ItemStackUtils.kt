@@ -19,7 +19,17 @@ fun ItemStack.hideTooltip(hide: Boolean): ItemStack {
     return this
 }
 
+fun ItemMeta.hideTooltip(hide: Boolean): ItemMeta {
+    isHideTooltip = hide
+    return this
+}
+
 fun ItemStack.hideAllFlags(): ItemStack {
     editMeta { it.addItemFlags(*ItemFlag.entries.toTypedArray()) }
+    return this
+}
+
+fun ItemMeta.hideAllFlags(): ItemMeta {
+    addItemFlags(*ItemFlag.entries.toTypedArray())
     return this
 }

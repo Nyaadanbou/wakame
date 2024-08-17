@@ -93,6 +93,11 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     fun builder(): Builder
 
     /**
+     * 过滤出符合条件的词条栏.
+     */
+    fun filterx(predicate: (Cell) -> Boolean): ItemCells
+
+    /**
      * 检查指定的词条栏是否存在.
      */
     fun has(id: String): Boolean
@@ -140,9 +145,9 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     fun collectConfiguredSkills(context: NekoStack, ignoreCurse: Boolean = false, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
 
     /**
-     * 判断是否包含指定的核心.
+     * 忽略数值的前提下, 判断是否包含指定的核心.
      */
-    fun hasSimilar(core: Core): Boolean
+    fun hasSimilarCore(core: Core): Boolean
 
     /**
      * 用于方便构建 [ItemCells].
@@ -198,6 +203,12 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             val builder = BuilderImpl()
             builder.map.putAll(cells)
             return builder
+        }
+
+        override fun filterx(predicate: (Cell) -> Boolean): ItemCells {
+            return edit { map ->
+                map.entries.removeIf { (_, cell) -> !predicate(cell) }
+            }
         }
 
         override fun has(id: String): Boolean {
@@ -265,7 +276,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             return ret.build()
         }
 
-        override fun hasSimilar(core: Core): Boolean {
+        override fun hasSimilarCore(core: Core): Boolean {
             return cells.values.any { cell -> cell.getCore().isSimilar(core) }
         }
 

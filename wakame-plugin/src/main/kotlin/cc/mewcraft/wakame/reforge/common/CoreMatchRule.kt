@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.reforge.common
 
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
@@ -8,11 +10,19 @@ import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmpty
 import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
+import cc.mewcraft.wakame.util.javaTypeOf
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
+import org.spongepowered.configurate.serialize.SerializationException
+import java.io.IOException
+import java.lang.reflect.Type
 import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 import java.util.stream.Stream
 
 // 开发日记 2024/7/19
@@ -54,6 +64,59 @@ interface CoreMatchRule : Examinable {
     fun test(core: Core): Boolean
 }
 
+/**
+ * [CoreMatchRule] 的序列化器.
+ *
+ * 依赖的序列化器:
+ * - [cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer]
+ * - [cc.mewcraft.wakame.skill.ConfiguredSkillVariantSerializer]
+ */
+internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
+    override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {
+        val typeNode = node.node("type")
+        val rawType = typeNode.string ?: throw SerializationException(typeNode, javaTypeOf<String>(), "Missing key: 'type'")
+        if (rawType == "*") {
+            // 值为 “*” - 直接解析为 CoreMatchRuleAny
+            return CoreMatchRuleAny
+        }
+
+        val (namespace, pattern) = run {
+            val index = rawType.indexOf(':')
+            if (index == -1) {
+                throw SerializationException(typeNode, javaTypeOf<String>(), "Invalid type: '$rawType'")
+            }
+            val namespace = rawType.substring(0, index)
+            val patternString = rawType.substring(index + 1)
+            val pattern = try {
+                patternString.toPattern()
+            } catch (e: PatternSyntaxException) {
+                throw SerializationException(typeNode, javaTypeOf<Pattern>(), e)
+            } catch (e: Throwable) {
+                throw IOException("Unknown error", e)
+            }
+            namespace to pattern
+        }
+
+        when (namespace) {
+            Namespaces.ATTRIBUTE -> {
+                val operation = node.node("operation").get<AttributeModifier.Operation>()
+                val element = node.node("element").get<String>()?.let { Key.key("element", it) }
+                return CoreMatchRuleAttribute(pattern, operation, element)
+            }
+
+            Namespaces.SKILL -> {
+                val trigger = node.node("trigger").krequire<Trigger>()
+                val variant = node.node("variant").get<TriggerVariant>(TriggerVariant.any())
+                return CoreMatchRuleSkill(pattern, trigger, variant)
+            }
+
+            else -> {
+                throw SerializationException(typeNode, javaTypeOf<String>(), "Unknown namespace: '$namespace'")
+            }
+        }
+    }
+}
+
 
 /* Implementations */
 
@@ -61,7 +124,7 @@ interface CoreMatchRule : Examinable {
 /**
  * 用于测试空核心. 可能用不到?
  */
-data object CoreMatchRuleEmpty : CoreMatchRule {
+private data object CoreMatchRuleEmpty : CoreMatchRule {
     override val path: Pattern = "empty".toPattern()
     override val priority: Int = Int.MIN_VALUE + 1
     override fun test(core: Core): Boolean {
@@ -80,7 +143,7 @@ data object CoreMatchRuleEmpty : CoreMatchRule {
 /**
  * 可以匹配所有核心的匹配规则.
  */
-data object CoreMatchRuleAny : CoreMatchRule {
+private data object CoreMatchRuleAny : CoreMatchRule {
     override val path: Pattern = "[a-z0-9/._-]+".toPattern()
     override val priority: Int = Int.MIN_VALUE
     override fun test(core: Core): Boolean = true // 永远返回 true
@@ -96,7 +159,7 @@ data object CoreMatchRuleAny : CoreMatchRule {
 /**
  * 用于测试属性核心.
  */
-class CoreMatchRuleAttribute(
+private class CoreMatchRuleAttribute(
     override val path: Pattern,
     val operation: AttributeModifier.Operation?,
     val element: Key?,
@@ -143,7 +206,7 @@ class CoreMatchRuleAttribute(
 /**
  * 用于测试技能核心.
  */
-class CoreMatchRuleSkill(
+private class CoreMatchRuleSkill(
     override val path: Pattern,
     val trigger: Trigger,
     val variant: TriggerVariant,

@@ -37,4 +37,3 @@ currency_cost: |
   200 * query.source_item_rarity()
   + 100 * query.source_item_changed_cell_count() 
   + query.source_item_changed_cell_cost()
-
