@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.SimpleRerollingSession.Total
+import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -77,8 +78,7 @@ class SimpleRerollingSession(
         ExaminableProperty.of("table", table),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String = toSimpleString()
 
     object Result {
         fun empty(): RerollingSession.Result {
@@ -93,11 +93,11 @@ class SimpleRerollingSession(
             cost: RerollingSession.Total,
             item: NekoStack,
         ): RerollingSession.Result {
-            return Simple(true, listOf(Component.text("重造成功!")), cost, item)
+            return Simple(true, listOf(Component.text("<green>重造准备就绪")), cost, item)
         }
 
-        private val EMPTY: RerollingSession.Result = Simple(false, listOf(Component.text("没有要重造的物品")), Total.zero(), NekoStack.empty())
-        private val ERROR: RerollingSession.Result = Simple(false, listOf(Component.text("重造发生内部错误!")), Total.error(), NekoStack.empty())
+        private val EMPTY: RerollingSession.Result = Simple(false, listOf(Component.text("<gray>没有要重造的物品")), Total.zero(), NekoStack.empty())
+        private val ERROR: RerollingSession.Result = Simple(false, listOf(Component.text("<red>重造发生内部错误")), Total.error(), NekoStack.empty())
 
         private class Simple(
             successful: Boolean,
@@ -112,13 +112,12 @@ class SimpleRerollingSession(
 
             override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
                 ExaminableProperty.of("successful", successful),
-                ExaminableProperty.of("description", description),
+                ExaminableProperty.of("description", description.plain),
                 ExaminableProperty.of("cost", cost),
                 ExaminableProperty.of("item", item),
             )
 
-            override fun toString(): String =
-                toSimpleString()
+            override fun toString(): String = toSimpleString()
         }
     }
 
@@ -153,8 +152,7 @@ class SimpleRerollingSession(
                 ExaminableProperty.of("default", default),
             )
 
-            override fun toString(): String =
-                toSimpleString()
+            override fun toString(): String = toSimpleString()
         }
     }
 
@@ -182,8 +180,7 @@ class SimpleRerollingSession(
             ExaminableProperty.of("selected", selected),
         )
 
-        override fun toString(): String =
-            toSimpleString()
+        override fun toString(): String = toSimpleString()
     }
 
     class SelectionDisplay(
@@ -202,8 +199,7 @@ class SimpleRerollingSession(
             ExaminableProperty.of("lore", lore),
         )
 
-        override fun toString(): String =
-            toSimpleString()
+        override fun toString(): String = toSimpleString()
     }
 
     class SelectionMap(
@@ -237,7 +233,6 @@ class SimpleRerollingSession(
             ExaminableProperty.of("map", map),
         )
 
-        override fun toString(): String =
-            toSimpleString()
+        override fun toString(): String = toSimpleString()
     }
 }

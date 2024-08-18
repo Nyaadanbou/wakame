@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.TemporaryIcons
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.util.hideAllFlags
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
 import org.bukkit.Material
-import org.bukkit.Tag
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -38,20 +38,13 @@ internal class SelectionMenu(
 
     private val logger: Logger by inject()
 
-    private companion object {
+    companion object {
         private const val PREFIX = ReforgeLoggerPrefix.REROLL
-        private val trims: List<Material> = Tag.ITEMS_TRIM_TEMPLATES.values.toList()
     }
 
     private inner class IndicatorItem : AbstractItem() {
-        fun getTrimMaterial(): Material {
-            val sessionHash = selection.hashCode()
-            val index = sessionHash % trims.size
-            return trims[index]
-        }
-
         override fun getItemProvider(): ItemProvider {
-            val stack = ItemStack(getTrimMaterial()).hideAllFlags()
+            val stack = ItemStack(TemporaryIcons.get(selection.hashCode())).hideAllFlags()
             selection.display.apply(stack)
             return ItemWrapper(stack)
         }

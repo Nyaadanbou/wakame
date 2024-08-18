@@ -4,15 +4,16 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
+import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.common.TemporaryIcons
 import cc.mewcraft.wakame.util.hideAllFlags
 import cc.mewcraft.wakame.util.hideTooltip
+import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -52,6 +53,8 @@ internal class SimpleModdingSession(
         logger.info("$PREFIX Session's replace parameters updated: $old -> $new")
     }
 
+    override val totalFunction: MochaFunction = table.currencyCost.total.compile(this)
+
     override var latestResult: ModdingSession.Result by Delegates.observable(Result.empty()) { _, old, new ->
         logger.info("$PREFIX Session's result updated: $old -> $new")
     }
@@ -67,26 +70,37 @@ internal class SimpleModdingSession(
     }
 
     private fun executeReforge0(): ModdingSession.Result {
+        if (frozen) {
+            logger.info("$PREFIX Trying to reforge in a frozen session. This is a bug!")
+            return Result.empty()
+        }
+
         // 如果源物品不存在, 则返回空
         val output = sourceItem ?: return Result.empty()
 
-        if (replaceParams.all { (_, repl) -> !repl.changed }) {
-            logger.info("$PREFIX Skipped reforge as no replaces are applicable")
-            return Result.failure("没有任何修改".mini)
+        if (!isSourceItemLegit) {
+            logger.info("$PREFIX Skipped reforge as source item is not legit")
+            return Result.failure("<gray>不可定制".mini)
         }
 
-        // 把存在修改的筛选出来
+        if (replaceParams.all { (_, repl) -> !repl.changed }) {
+            logger.info("$PREFIX Skipped reforge as all replaces are not applicable")
+            return Result.failure("<gray>没有任何修改".mini)
+        }
+
+        // 把经过修改的词条栏筛选出来
         val changedReplaceParams = replaceParams.filter { (_, repl) -> repl.changed }
 
+        // 检查经过修改的词条栏中是否存在无效的耗材
         if (changedReplaceParams.any { (_, repl) -> !repl.latestResult.applicable }) {
             logger.info("$PREFIX Skipped reforge as some replaces are not applicable")
-            return Result.failure("存在无效的耗材".mini)
+            return Result.failure("<gray>存在无效的耗材".mini)
         }
 
         // 如果源物品不合法, 则返回失败
         val cellBuilder = output.components.get(ItemComponentTypes.CELLS)?.builder() ?: run {
             logger.info("$PREFIX No cells found in source item")
-            return Result.failure("源物品没有词条栏".mini)
+            return Result.failure("<gray>源物品没有词条栏".mini)
         }
 
         for ((id, replace) in changedReplaceParams) {
@@ -103,9 +117,17 @@ internal class SimpleModdingSession(
             cellBuilder.modify(id) { cell -> cell.setCore(wrappedCore) }
         }
 
+        // 把修改后的词条栏应用到输出物品山
         output.components.set(ItemComponentTypes.CELLS, cellBuilder.build())
 
-        return Result.success(output, "定制成功!".mini, Cost.empty())
+        // 计算需要消耗的货币数量
+        val cost = Cost.normal(totalFunction.evaluate())
+
+        return Result.success(
+            outputItem = output,
+            description = "<green>定制准备就绪".mini,
+            cost = cost
+        )
     }
 
     override fun executeReforge(): ModdingSession.Result {
@@ -114,17 +136,36 @@ internal class SimpleModdingSession(
         return result
     }
 
-    override fun getPlayerInputs(): Collection<ItemStack> {
-        val itemsToReturn = mutableListOf<ItemStack>()
+    override fun getInapplicablePlayerInputs(): Collection<ItemStack> {
+        val itemsToReturn = buildList {
+            if (!isSourceItemLegit) {
+                sourceItem?.let { add(it.itemStack) }
+            }
 
-        // 收集被定制的物品
-        sourceItem?.let { itemsToReturn.add(it.itemStack) }
+            for (replace in replaceParams.values) {
+                val result = replace.latestResult
+                val ingredient = result.ingredient?.itemStack
+                if (ingredient != null && (!result.applicable /* 无法应用的物品不会被消耗, 因此应该被返回 */)) {
+                    add(ingredient)
+                }
+            }
+        }
 
-        // 收集用于定制的耗材
-        for (replace in replaceParams.values) {
-            val ingredient = replace.latestResult.ingredient?.itemStack
-            if (ingredient != null) {
-                itemsToReturn.add(ingredient)
+        return itemsToReturn
+    }
+
+    override fun getAllPlayerInputs(): Collection<ItemStack> {
+        val itemsToReturn = buildList {
+
+            // 收集被定制的物品
+            sourceItem?.let { add(it.itemStack) }
+
+            // 收集用于定制的所有耗材
+            for (replace in replaceParams.values) {
+                val ingredient = replace.latestResult.ingredient?.itemStack
+                if (ingredient != null) {
+                    add(ingredient)
+                }
             }
         }
 
@@ -271,7 +312,7 @@ internal class SimpleModdingSession(
         private abstract class Base : ModdingSession.Result {
             override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
                 ExaminableProperty.of("successful", successful),
-                ExaminableProperty.of("description", description.map(Component::plain)),
+                ExaminableProperty.of("description", description.plain),
                 ExaminableProperty.of("outputItem", outputItem),
                 ExaminableProperty.of("cost", cost),
             )
@@ -340,7 +381,7 @@ internal class SimpleModdingSession(
             )
 
             override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("description", description.map(Component::plain))
+                ExaminableProperty.of("description", description.plain)
             )
 
             override fun toString(): String = toSimpleString()
@@ -362,7 +403,7 @@ internal class SimpleModdingSession(
             )
 
             override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("description", description.map(Component::plain)),
+                ExaminableProperty.of("description", description.plain),
                 ExaminableProperty.of("currencyAmount", currencyAmount)
             )
 
@@ -405,7 +446,7 @@ internal class SimpleModdingSession(
                     return ReplaceResult.empty()
                 }
 
-                return ReplaceResult.failure(ingredient, "无法修改".mini)
+                return ReplaceResult.failure(ingredient, "<gray>源物品的这个词条栏不可修改".mini)
             }
 
             override fun getIngredientLevel(): Int = 0
@@ -441,6 +482,8 @@ internal class SimpleModdingSession(
             override val totalFunction: MochaFunction = rule.currencyCost.total.compile(session, this)
 
             override val changed: Boolean
+                // 当耗材不为空时, 代表这个词条栏
+                // 已经被修改过, 不管成功与否
                 get() = latestResult.ingredient != null
 
             override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReplaceResult.empty()) { _, old, new ->
@@ -456,31 +499,31 @@ internal class SimpleModdingSession(
                 // 如果源物品为空, 则返回内部错误
                 val sourceItem = session.sourceItem ?: run {
                     logger.error("$PREFIX Source item is null, but an item is being replaced. This is a bug!")
-                    return ReplaceResult.failure(ingredient, "内部错误".mini)
+                    return ReplaceResult.failure(ingredient, "<red>内部错误".mini)
                 }
 
                 // TODO 检查权限
 
                 // 获取耗材中的便携核心
                 val portableCore = ingredient.components.get(ItemComponentTypes.PORTABLE_CORE) ?: run {
-                    return ReplaceResult.failure(ingredient, "这个物品没有便携核心".mini)
+                    return ReplaceResult.failure(ingredient, "<gray>这个物品没有便携核心".mini)
                 }
 
                 // 获取源物品上的词条栏
                 val sourceCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: run {
                     logger.error("$PREFIX Source item has no cells, but an item is being replaced. This is a bug!")
-                    return ReplaceResult.failure(ingredient, "内部错误".mini)
+                    return ReplaceResult.failure(ingredient, "<red>内部错误".mini)
                 }
 
                 // 源物品的词条栏上必须没有与便携核心相似的核心
                 val sourceCellsExcludingThis = sourceCells.filterx { it.getId() != cell.getId() }
                 if (sourceCellsExcludingThis.hasSimilarCore(portableCore.wrapped)) {
-                    return ReplaceResult.failure(ingredient, "物品上存在相似的便携核心".mini)
+                    return ReplaceResult.failure(ingredient, "<gray>源物品上存在相似的便携核心".mini)
                 }
 
                 // 便携式核心 必须符合定制规则
                 if (!rule.acceptedCores.test(portableCore.wrapped)) {
-                    return ReplaceResult.failure(ingredient, "词条栏不接受这种便携核心".mini)
+                    return ReplaceResult.failure(ingredient, "<gray>源物品的词条栏不接受这种便携核心".mini)
                 }
 
                 // 便携式核心上面的所有元素 必须全部出现在被定制物品上
@@ -488,18 +531,18 @@ internal class SimpleModdingSession(
                     val elementsOnSource = sourceItem.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
                     val elementsOnIngredient = ingredient.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
                     if (!elementsOnIngredient.containsAll(elementsOnSource)) {
-                        return ReplaceResult.failure(ingredient, "便携核心的元素跟源物品不相融".mini)
+                        return ReplaceResult.failure(ingredient, "<gray>便携核心的元素跟源物品的不相融".mini)
                     }
                 }
 
                 // 被定制物品上储存的历史定制次数 必须小于等于定制规则
                 val modCount = ingredient.components.get(ItemComponentTypes.CELLS)?.get(id)?.getReforgeHistory()?.modCount ?: Int.MAX_VALUE
                 if (modCount > rule.modLimit) {
-                    return ReplaceResult.failure(ingredient, "这个词条栏已经历经无数雕琢".mini)
+                    return ReplaceResult.failure(ingredient, "<gray>源物品的这个词条栏已经历经无数雕琢".mini)
                 }
 
                 // 全部检查通过!
-                return ReplaceResult.success(ingredient, "便携核心将融合到源物品当中".mini)
+                return ReplaceResult.success(ingredient, "<green>便携核心准备就绪".mini)
             }
 
             override fun executeReplace(ingredient: NekoStack?): ModdingSession.Replace.Result {
@@ -550,10 +593,14 @@ internal class SimpleModdingSession(
         }
 
         private abstract class Base : ModdingSession.Replace.Result {
+            override fun getPortableCore(): PortableCore? {
+                return ingredient?.components?.get(ItemComponentTypes.PORTABLE_CORE)
+            }
+
             override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
                 ExaminableProperty.of("ingredient", ingredient),
                 ExaminableProperty.of("applicable", applicable),
-                ExaminableProperty.of("description", description.map(Component::plain)),
+                ExaminableProperty.of("description", description.plain),
             )
 
             override fun toString(): String = toSimpleString()
@@ -562,9 +609,7 @@ internal class SimpleModdingSession(
         private class Empty : Base() {
             override val ingredient: NekoStack? = null
             override val applicable: Boolean = false // 空气无法参与定制, 需要额外逻辑判断
-            override val description: List<Component> = listOf(
-                "<gray>没有耗材输入".mini
-            )
+            override val description: List<Component> = listOf("<gray>没有耗材输入".mini)
         }
 
         private class Simple(
@@ -651,7 +696,3 @@ internal class SimpleModdingSession(
         }
     }
 }
-
-// 临时实现, 之后搞个更好的
-private val Component.plain: String
-    get() = PlainTextComponentSerializer.plainText().serialize(this)
