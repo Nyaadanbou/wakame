@@ -21,6 +21,7 @@ class ItemXVanilla(
     }
 
     override fun matches(itemStack: ItemStack): Boolean {
+        // TODO 使用是否存在Custom Data判断
         return !itemStack.hasItemMeta() && itemStack.type == Material.matchMaterial(identifier, false)
     }
 

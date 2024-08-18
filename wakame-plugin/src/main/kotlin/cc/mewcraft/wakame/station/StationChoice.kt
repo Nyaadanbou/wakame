@@ -12,10 +12,11 @@ import java.lang.reflect.Type
 import java.util.stream.Stream
 
 /**
- * 工作站的一项输入要求.
+ * 合成站的一项输入要求.
  */
 sealed interface StationChoice : Examinable {
     val checker: ChoiceChecker<*>
+    val consumer: ChoiceConsumer<*>
 
     /**
      * 通过上下文检查此 [StationChoice] 的满足与否
@@ -24,10 +25,16 @@ sealed interface StationChoice : Examinable {
     fun check(contextMap: ChoiceCheckerContextMap): Boolean
 
     /**
+     * 将此 [StationChoice] 的消耗添加到上下文中
+     * 上下文依靠 [ChoiceConsumerContextMap] 获取
+     */
+    fun consume(contextMap: ChoiceConsumerContextMap)
+
+    /**
      * 获取此 [StationChoice] 的描述
      * 使用MiniMessage格式
      */
-    fun description(): String
+    fun description(stationLayout: StationLayout): String
 
     /**
      * 该 [StationChoice] 是否有效
@@ -41,7 +48,7 @@ sealed interface StationChoice : Examinable {
 
 
 /**
- * 物品类型的工作站输入.
+ * 物品类型的合成站输入.
  */
 internal data class ItemChoice(
     val item: ItemX,
@@ -51,8 +58,8 @@ internal data class ItemChoice(
         const val TYPE: String = "item"
     }
 
-
     override val checker: ItemChoiceChecker = ItemChoiceChecker
+    override val consumer: ItemChoiceConsumer = ItemChoiceConsumer
 
     override fun check(contextMap: ChoiceCheckerContextMap): Boolean {
         val context = contextMap[checker]
@@ -70,9 +77,17 @@ internal data class ItemChoice(
         return invAmount == amount
     }
 
-    override fun description(): String {
-        // 构建格式: "材料 *1"
-        return "<white>${item.renderName()} *$amount</white>"
+    override fun consume(contextMap: ChoiceConsumerContextMap) {
+        val context = contextMap[consumer]
+        context.add(item, amount)
+    }
+
+    override fun description(stationLayout: StationLayout): String {
+        // 缺省构建格式: "材料 *1"
+        return stationLayout.choicesLang["item"]
+            ?.replace("<render_name>", item.renderName())
+            ?.replace("<amount>", amount.toString())
+            ?: "${item.renderName()} <white>×$amount</white>"
     }
 
     override fun isValid(): Boolean {
@@ -89,7 +104,7 @@ internal data class ItemChoice(
 }
 
 /**
- * 经验值类型的工作站输入.
+ * 经验值类型的合成站输入.
  */
 internal data class ExpChoice(
     val amount: Int
@@ -99,6 +114,7 @@ internal data class ExpChoice(
     }
 
     override val checker: ExpChoiceChecker = ExpChoiceChecker
+    override val consumer: ExpChoiceConsumer = ExpChoiceConsumer
 
     override fun check(contextMap: ChoiceCheckerContextMap): Boolean {
         val context = contextMap[checker]
@@ -106,9 +122,16 @@ internal data class ExpChoice(
         return context.experienceSnapshot >= 0
     }
 
-    override fun description(): String {
-        // 构建格式: "EXP *1"
-        return "<white>EXP *$amount</white>"
+    override fun consume(contextMap: ChoiceConsumerContextMap) {
+        val context = contextMap[consumer]
+        context.add(amount)
+    }
+
+    override fun description(stationLayout: StationLayout): String {
+        // 缺省构建格式: "EXP *1"
+        return stationLayout.choicesLang["exp"]
+            ?.replace("<amount>", amount.toString())
+            ?: "EXP <white>×$amount</white>"
     }
 
     override fun isValid(): Boolean {

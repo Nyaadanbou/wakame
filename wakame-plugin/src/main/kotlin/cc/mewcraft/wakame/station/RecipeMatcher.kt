@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Reference2BooleanArrayMap
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 /**
  * [StationRecipe] 的匹配器.
@@ -27,35 +28,55 @@ object RecipeMatcher {
 
         // 检查每个StationChoice
         // 组装后返回配方匹配结果
-        val matcherResult = RecipeMatcherResult()
+        val choiceCheckerFlags: Reference2BooleanArrayMap<StationChoice> = Reference2BooleanArrayMap()
         choices.forEach {
-            matcherResult.choiceCheckerFlags.put(it, it.check(checkerContextMap))
+            choiceCheckerFlags.put(it, it.check(checkerContextMap))
         }
-        return matcherResult
+        return RecipeMatcherResult(recipe, choiceCheckerFlags)
     }
 }
 
 /**
- * 工作站配方匹配器的匹配结果的封装.
+ * 合成站配方匹配器的匹配结果的封装.
  */
-class RecipeMatcherResult {
-    companion object {
-        const val SUFFICIENT_PREFIX = "<green>✔</green>"
-        const val INSUFFICIENT_PREFIX = "<red>✖</red>"
-    }
+data class RecipeMatcherResult(
+    val recipe: StationRecipe,
+    val choiceCheckerFlags: Reference2BooleanArrayMap<StationChoice>
+) {
 
-    val choiceCheckerFlags: Reference2BooleanArrayMap<StationChoice> = Reference2BooleanArrayMap()
+    val canCraft: Boolean = !choiceCheckerFlags.values.contains(false)
 
     /**
-     * 获取展示此结果的lore格式
+     * 获取展示该配方的Gui物品的name
      */
-    fun lore(): List<Component> {
-        return choiceCheckerFlags.map {
-            val prefix = if (it.value) SUFFICIENT_PREFIX else INSUFFICIENT_PREFIX
+    private fun name(stationLayout: StationLayout): Component {
+        return stationLayout.recipeNameLang.replace("<result>", recipe.output.description(stationLayout)).mini
+    }
+
+    /**
+     * 获取展示该配方的Gui物品的lore
+     */
+    private fun lore(stationLayout: StationLayout): List<Component> {
+        val choices = choiceCheckerFlags.map {
+            val prefix = if (it.value) stationLayout.sufficientPrefixLang else stationLayout.insufficientPrefixLang
             val choice = it.key
-            // 构建格式: "✔ 材料 *1"
-            "<!i>$prefix ${choice.description()}".mini
+            choice.description(stationLayout).replace("<prefix>", prefix)
         }
+        return stationLayout.recipeLoreLang
+            .flatMap { if (it == "<choices>") choices else listOf(it) }
+            .map { it.mini }
+    }
+
+    /**
+     * 获取展示该配方的Gui物品
+     */
+    fun guiItemStack(stationLayout: StationLayout): ItemStack {
+        val itemStack = recipe.output.guiItemStack()
+        itemStack.editMeta {
+            it.itemName(name(stationLayout))
+            it.lore(lore(stationLayout))
+        }
+        return itemStack
     }
 
     /**

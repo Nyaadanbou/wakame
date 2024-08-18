@@ -52,6 +52,9 @@ sealed interface ItemX : Keyed, Examinable {
      */
     fun createItemStack(player: Player): ItemStack?
 
+    // 开发日记: 2024/8/19 芙兰
+    // 相比于先将ItemStack转成ItemX再equals进行判等, 使用matches方法去匹配玩家背包中的物品会更快.
+    // 毕竟ItemStack转成ItemX是要对每一个插件的构造器逐步尝试的
     /**
      * 判断传入的 [itemStack] 是否与该物品匹配.
      */

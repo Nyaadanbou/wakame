@@ -14,10 +14,7 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.slf4j.Logger
 import testEnv
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-import kotlin.test.assertIs
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class StationSerializationTest : KoinTest {
 
@@ -55,7 +52,7 @@ class StationSerializationTest : KoinTest {
 
     @Test
     fun `simple station serialization`() = runBlocking {
-        StationRecipeRegistry.loadConfig() // 单元测试时跳过工作站配方的有效性验证
+        StationRecipeRegistry.loadConfig() // 单元测试时跳过合成站配方的有效性验证
         PluginEventBus.get().post(StationRecipeLoadEvent)
 
         val key1 = Key("test_station:raw_bronze")
@@ -73,11 +70,7 @@ class StationSerializationTest : KoinTest {
         )
 
         val output1 = recipe1.output
-        assertContentEquals(
-            listOf(
-                ItemResult(ItemXMock("wakame:material/raw_bronze"), 4)
-            ), output1
-        )
+        assertEquals(ItemResult(ItemXMock("wakame:material/raw_bronze"), 4), output1)
 
 
         val key2 = Key("test_station:amethyst_dust")
@@ -93,11 +86,7 @@ class StationSerializationTest : KoinTest {
         )
 
         val output2 = recipe2.output
-        assertContentEquals(
-            listOf(
-                ItemResult(ItemXMock("wakame:material/amethyst_dust"), 2)
-            ), output2
-        )
+        assertEquals(ItemResult(ItemXMock("wakame:material/amethyst_dust"), 2), output2)
 
 
         val id = "simple_station"
