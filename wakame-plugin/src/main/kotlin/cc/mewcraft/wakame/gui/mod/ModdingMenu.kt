@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.reforge.mod.ModdingTable
 import cc.mewcraft.wakame.util.hideTooltip
 import cc.mewcraft.wakame.util.translateBy
-import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component.text
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -71,7 +70,7 @@ internal class ModdingMenu(
      */
     fun updateOutput() {
         val result = moddingSession.latestResult
-        val output = ResultRender.renderNormal(result)
+        val output = ResultRender.normal(result)
         setOutputSlot(output)
     }
 
@@ -145,6 +144,11 @@ internal class ModdingMenu(
         val prevItem = event.previousItem
         logger.info("$PREFIX Input item updating: ${prevItem?.type} -> ${newItem?.type}")
 
+        if (moddingSession.frozen) {
+            logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary input slot. This is a bug!")
+            event.isCancelled = true; return
+        }
+
         when {
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
@@ -178,7 +182,7 @@ internal class ModdingMenu(
                 event.isCancelled = true
 
                 // 归还玩家放入定制台的所有物品
-                val itemsToReturn = moddingSession.getPlayerInputs()
+                val itemsToReturn = moddingSession.getAllPlayerInputs()
                 viewer.inventory.addItem(*itemsToReturn.toTypedArray())
 
                 // 重置会话状态
@@ -202,6 +206,11 @@ internal class ModdingMenu(
         val newItem = event.newItem
         val prevItem = event.previousItem
         logger.info("$PREFIX Output item updating: ${prevItem?.type} -> ${newItem?.type}")
+
+        if (moddingSession.frozen) {
+            logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary output slot. This is a bug!")
+            event.isCancelled = true; return
+        }
 
         when {
             // 玩家向 outputSlot 中添加物品:
@@ -227,18 +236,25 @@ internal class ModdingMenu(
 
                     // 玩家必须先确认才能完成定制
                     if (!confirmed) {
-                        val rendered = ResultRender.renderConfirm(result)
+                        val rendered = ResultRender.confirm(result)
                         setOutputSlot(rendered)
                         confirmed = true
                         return
                     }
 
-                    // 把定制后的物品给予玩家
-                    val itemStack = result.outputItem?.itemStack ?: run {
-                        logger.error("$PREFIX Output item is null, but the player is trying to take it. This is a bug!")
-                        return
+                    // 储存所有需要给予玩家的物品
+                    val itemsToGive = buildList {
+                        // 定制后的物品
+                        add(result.outputItem?.itemStack ?: run {
+                            logger.error("$PREFIX Output item is null, but the player is trying to take it. This is a bug!")
+                            return
+                        })
+
+                        // 未使用的物品, 一般是无效的耗材
+                        addAll(moddingSession.getInapplicablePlayerInputs())
                     }
-                    viewer.inventory.addItem(itemStack)
+                    // 把所有输出的物品给予玩家
+                    viewer.inventory.addItem(*itemsToGive.toTypedArray())
 
                     // 从玩家身上拿走需要的资源
                     result.cost.take(viewer)
@@ -267,12 +283,15 @@ internal class ModdingMenu(
 
     private fun onWindowClose() {
         // 将定制过程中玩家输入的所有物品归还给玩家
-        val itemsToReturn = moddingSession.getPlayerInputs()
+        val itemsToReturn = moddingSession.getAllPlayerInputs()
         viewer.inventory.addItem(*itemsToReturn.toTypedArray())
+
+        // 冻结会话
+        moddingSession.frozen = true
     }
 
     private fun onWindowOpen() {
-        viewer.playSound(Sound.sound().type(org.bukkit.Sound.BLOCK_ANVIL_PLACE).volume(1f).pitch(0f).build())
+        // NOP
     }
 
     init {

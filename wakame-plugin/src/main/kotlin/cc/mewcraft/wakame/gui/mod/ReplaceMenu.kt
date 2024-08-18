@@ -67,6 +67,12 @@ internal class ReplaceMenu(
         val newItem = event.newItem
         logger.info("$PREFIX Replace input updating: ${prevItem?.type} -> ${newItem?.type}")
 
+        if (parent.moddingSession.frozen) {
+            logger.error("$PREFIX The modding session is frozen, but the player is trying to interact with the replace's input slot. This is a bug!")
+            event.isCancelled = true
+            return
+        }
+
         when {
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
 import net.kyori.adventure.text.Component
@@ -68,6 +69,12 @@ interface ModdingSession : Examinable {
     val replaceParams: ReplaceMap
 
     /**
+     * 定制这个物品所需要的货币数量.
+     */
+    @VariableByPlayer
+    val totalFunction: MochaFunction
+
+    /**
      * 储存了最新的定制结果.
      */
     @VariableByPlayer
@@ -91,9 +98,18 @@ interface ModdingSession : Examinable {
     fun executeReforge(): Result
 
     /**
-     * 获取玩家放入本会话的所有物品. 主要用于快速归还物品.
+     * 获取玩家放入本会话的所有物品, 无论这些物品是否可以参与定制.
+     *
+     * 例如, 玩家放入了需要定制的一把长剑, 以及几个任意的便携核心, 那么这些物品都会被返回.
      */
-    fun getPlayerInputs(): Collection<ItemStack>
+    fun getAllPlayerInputs(): Collection<ItemStack>
+
+    /**
+     * 获取玩家放入本会话的无法使用的物品.
+     *
+     * 例如, 玩家放入了需要定制的一把长剑, 以及几个便携核心, 但是这些核心不符合定制规则 (不会参与定制), 那么这些核心就会被返回.
+     */
+    fun getInapplicablePlayerInputs(): Collection<ItemStack>
 
     /**
      * 重置本次会话的所有状态.
@@ -274,6 +290,11 @@ interface ModdingSession : Examinable {
              */
             @get:Contract(" -> new")
             val ingredient: NekoStack?
+
+            /**
+             * 获取 [Result.ingredient] 中包含的便携核心.
+             */
+            fun getPortableCore(): PortableCore?
 
             /**
              * [ingredient] 是否可以应用在词条栏上.
