@@ -2,7 +2,9 @@ package station
 
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.station.*
+import cc.mewcraft.wakame.station.SimpleStation
+import cc.mewcraft.wakame.station.StationRegistry
+import cc.mewcraft.wakame.station.recipe.*
 import cc.mewcraft.wakame.util.Key
 import core.ItemXMock
 import kotlinx.coroutines.runBlocking

@@ -1,5 +1,6 @@
-package cc.mewcraft.wakame.station
+package cc.mewcraft.wakame.station.recipe
 
+import cc.mewcraft.wakame.station.StationLayout
 import it.unimi.dsi.fastutil.objects.Reference2BooleanArrayMap
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component

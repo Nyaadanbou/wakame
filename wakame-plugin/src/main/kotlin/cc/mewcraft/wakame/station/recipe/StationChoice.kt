@@ -1,7 +1,8 @@
-package cc.mewcraft.wakame.station
+package cc.mewcraft.wakame.station.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.station.StationLayout
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable

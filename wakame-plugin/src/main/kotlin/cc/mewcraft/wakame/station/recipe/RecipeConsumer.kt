@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.station
+package cc.mewcraft.wakame.station.recipe
 
 import org.bukkit.entity.Player
 

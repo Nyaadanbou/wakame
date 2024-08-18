@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.station.recipe.StationRecipe
+import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
