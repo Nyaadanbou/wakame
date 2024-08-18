@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.station
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
+import cc.mewcraft.wakame.station.recipe.StationRecipeLoadEvent
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire

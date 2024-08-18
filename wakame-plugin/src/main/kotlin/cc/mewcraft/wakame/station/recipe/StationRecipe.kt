@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.station
+package cc.mewcraft.wakame.station.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer

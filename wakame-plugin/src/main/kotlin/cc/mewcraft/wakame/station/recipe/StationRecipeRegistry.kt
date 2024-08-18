@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.station
+package cc.mewcraft.wakame.station.recipe
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.core.ItemXSerializer
