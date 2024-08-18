@@ -11,21 +11,38 @@ import org.bukkit.entity.Player
 class StationSession(
     val station: Station,
     val user: User<Player>,
-) {
-    val recipeMatcher = RecipeMatcher
+) : Iterable<RecipeMatcherResult> {
+    private val recipeMatcherResults: Reference2ObjectOpenHashMap<StationRecipe, RecipeMatcherResult> = Reference2ObjectOpenHashMap()
 
-    val recipeMatcherResults: Reference2ObjectOpenHashMap<StationRecipe, RecipeMatcherResult> = Reference2ObjectOpenHashMap()
-
-    fun update() {
+    /**
+     * 初始化时遍历所有配方并进行匹配.
+     */
+    init {
         station.forEach {
-            val newResult = recipeMatcher.match(it, user.player)
+            recipeMatcherResults[it] = it.match(user.player)
+        }
+    }
+
+    /**
+     * 遍历所有配方并进行匹配.
+     * 对于匹配结果不变的配方，不进行map写入操作.
+     */
+    fun updateRecipeMatcherResults() {
+        station.forEach {
+            val newResult = it.match(user.player)
             if (!newResult.isSame(recipeMatcherResults[it])) {
                 recipeMatcherResults[it] = newResult
             }
         }
     }
 
-    fun render(){
-        TODO()
+    /**
+     * [RecipeMatcherResult] 的迭代器.
+     * 获取时会先进行排序，可合成的配方会排在前面.
+     */
+    override fun iterator(): Iterator<RecipeMatcherResult> {
+        return recipeMatcherResults.values.sortedBy {
+            it.canCraft
+        }.iterator()
     }
 }

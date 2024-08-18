@@ -15,20 +15,22 @@ import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 /**
- * 工作站.
+ * 合成站.
  */
 sealed interface Station : Iterable<StationRecipe> {
     val id: String
+    val layout: StationLayout
     fun addRecipe(recipe: StationRecipe): Boolean
     fun removeRecipe(key: Key): StationRecipe?
 
 }
 
 /**
- * 无分类工作站的实现.
+ * 无分类合成站的实现.
  */
 class SimpleStation(
-    override val id: String
+    override val id: String,
+    override val layout: StationLayout
 ) : Station, KoinComponent {
     companion object {
         const val TYPE = "simple"
@@ -69,7 +71,14 @@ internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
         val stationType = node.node("type").krequire<String>()
         when (stationType) {
             SimpleStation.TYPE -> {
-                val station = SimpleStation(id)
+                // 获取合成站布局
+                val stationLayout = node.node("layout").krequire<StationLayout>().apply {
+                    require(this.isSimple) {"Simple station should use 0~5 in structure"}
+                }
+
+                val station = SimpleStation(id, stationLayout)
+
+                // 向合成站添加配方
                 val recipeKeys = node.node("recipes").getList<Key>(emptyList())
                 for (key in recipeKeys) {
                     val stationRecipe = if (RunningEnvironment.TEST.isRunning()) {
@@ -83,6 +92,7 @@ internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
                     }
                     station.addRecipe(stationRecipe)
                 }
+
                 return station
             }
 
