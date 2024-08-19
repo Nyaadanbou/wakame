@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable
+import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession
 import cc.mewcraft.wakame.util.hideTooltip
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -40,7 +41,7 @@ internal class MergingMenu(
      */
     fun refreshOutput() {
         // 进行一次合并操作
-        val result = mergingSession.merge()
+        val result = mergingSession.executeReforge()
         // 根据合并的结果, 渲染输出容器里的物品
         val output = ResultRenderer.render(result)
         // 设置输出容器里的物品
@@ -55,9 +56,7 @@ internal class MergingMenu(
      * 并且直到菜单关闭之前, 会话永远是这一个对象, 不会中途替换成其他的.
      * 而菜单这边的逻辑, 需要根据几个虚拟容器的变化, 来改变会话中的状态.
      */
-    private val mergingSession: MergingSession = MergingSessionFactory.create(
-        this, null, null
-    )
+    private val mergingSession: MergingSession = SimpleMergingSession(viewer, table)
 
     private val logger: Logger by inject()
 
@@ -166,7 +165,7 @@ internal class MergingMenu(
             e.isRemove -> {
                 e.isCancelled = true
 
-                val result = mergingSession.result
+                val result = mergingSession.latestResult
                 if (result.successful) {
                     // 把合并后的物品递给玩家
                     val handle = result.item.unsafe.handle

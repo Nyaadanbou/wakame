@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
@@ -21,6 +22,8 @@ import kotlin.properties.Delegates
 internal class SimpleMergingSession(
     override val viewer: Player,
     override val table: MergingTable,
+    inputItem1: NekoStack? = null,
+    inputItem2: NekoStack? = null,
 ) : MergingSession, KoinComponent {
     private val logger: Logger by inject()
 
@@ -28,18 +31,8 @@ internal class SimpleMergingSession(
         private const val PREFIX = ReforgeLoggerPrefix.MERGE
     }
 
-    constructor(
-        viewer: Player,
-        table: MergingTable,
-        inputItem1: NekoStack?,
-        inputItem2: NekoStack?,
-    ) : this(viewer, table) {
-        this.inputItem1 = inputItem1
-        this.inputItem2 = inputItem2
-    }
-
-    override var inputItem1: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(null)
-    override var inputItem2: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(null)
+    override var inputItem1: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem1)
+    override var inputItem2: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem2)
 
     private enum class InputSlot {
         INPUT1, INPUT2
@@ -76,7 +69,7 @@ internal class SimpleMergingSession(
     override fun returnInputItem1(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT1)
     override fun returnInputItem2(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
 
-    override var result: MergingSession.Result by Delegates.vetoable(Result.empty()) { _, old, new ->
+    override var latestResult: MergingSession.Result by Delegates.vetoable(Result.empty()) { _, old, new ->
         if (frozen) {
             logger.error("$PREFIX Trying to set result of a frozen merging session. This is a bug!")
             return@vetoable false
@@ -86,15 +79,15 @@ internal class SimpleMergingSession(
         return@vetoable true
     }
 
-    private val _numberMergeFunction = mutableMapOf<MergingTable.NumberMergeFunction.Type, MochaFunction>()
+    private val _numberMergeFunctionMap = mutableMapOf<MergingTable.NumberMergeFunction.Type, MochaFunction>()
     override val numberMergeFunction: (MergingTable.NumberMergeFunction.Type) -> MochaFunction = { type ->
-        _numberMergeFunction.getOrPut(type) { table.numberMergeFunction.compile(type, this) }
+        _numberMergeFunctionMap.getOrPut(type) { table.numberMergeFunction.compile(type, this) }
     }
     override val outputLevelFunction: MochaFunction = table.outputLevelFunction.compile(this)
     override val outputPenaltyFunction: MochaFunction = table.outputPenaltyFunction.compile(this)
     override val currencyCostFunction: MochaFunction = table.currencyCost.totalFunction.compile(this)
 
-    override fun merge(): MergingSession.Result {
+    override fun executeReforge(): MergingSession.Result {
         val operation = MergeOperation(this, logger)
 
         val result = try {
@@ -104,13 +97,13 @@ internal class SimpleMergingSession(
             Result.failure(Component.text("内部错误"))
         }
 
-        return result.also { this.result = it }
+        return result.also { this.latestResult = it }
     }
 
     override fun reset() {
         inputItem1 = null
         inputItem2 = null
-        result = Result.empty()
+        latestResult = Result.empty()
     }
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
@@ -163,8 +156,7 @@ internal class SimpleMergingSession(
         ExaminableProperty.of("table", table),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String = toSimpleString()
 
     /**
      * 包含了构建各种 [MergingSession.Result] 的方法.
@@ -214,8 +206,7 @@ internal class SimpleMergingSession(
                 ExaminableProperty.of("cost", cost),
             )
 
-            override fun toString(): String =
-                toSimpleString()
+            override fun toString(): String = toSimpleString()
         }
     }
 
@@ -250,9 +241,14 @@ internal class SimpleMergingSession(
         }
 
         private abstract class Base : MergingSession.Type {
-            override fun toString(): String {
-                return toSimpleString()
+            override fun examinableProperties(): Stream<out ExaminableProperty?> {
+                return Stream.of(
+                    ExaminableProperty.of("operation", operation),
+                    ExaminableProperty.of("description", description.plain),
+                )
             }
+
+            override fun toString(): String = toSimpleString()
         }
 
         private class Empty : Base() {
@@ -261,6 +257,11 @@ internal class SimpleMergingSession(
             override val description: List<Component> = listOf(
                 "<!i><white>类型: <gray>没有合并".mini
             )
+
+            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+                ExaminableProperty.of("operation", "N/A"),
+                ExaminableProperty.of("description", description.plain),
+            )
         }
 
         private class Failure : Base() {
@@ -268,6 +269,11 @@ internal class SimpleMergingSession(
                 get() = throw IllegalStateException("This type is not supposed to be used.")
             override val description: List<Component> = listOf(
                 "<!i><white>类型: <red>无法计算".mini
+            )
+
+            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+                ExaminableProperty.of("operation", "N/A"),
+                ExaminableProperty.of("description", description.plain),
             )
         }
 
@@ -322,10 +328,14 @@ internal class SimpleMergingSession(
         }
 
         private abstract class Base : MergingSession.Cost {
+            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+                ExaminableProperty.of("description", description.plain),
+            )
+
             override fun toString(): String = toSimpleString()
         }
 
-        private data object Zero : Base() {
+        private object Zero : Base() {
             override fun take(viewer: Player) = Unit
             override fun test(viewer: Player): Boolean = true
             override val description: List<Component> = listOf(
@@ -333,7 +343,7 @@ internal class SimpleMergingSession(
             )
         }
 
-        private data object Failure : Base() {
+        private object Failure : Base() {
             override fun take(viewer: Player): Unit =
                 throw IllegalStateException("This cost is not supposed to be taken.")
 
@@ -348,8 +358,8 @@ internal class SimpleMergingSession(
         // 2024/8/12 TBD
         // 支持多货币
         // 支持自定义物品
-        private data class Success(
-            val defaultCurrencyAmount: Double,
+        private class Success(
+            val currencyAmount: Double,
         ) : Base() {
             override fun take(viewer: Player) {
                 // TODO 实现 take, 还有下面的 test
@@ -360,12 +370,17 @@ internal class SimpleMergingSession(
             }
 
             override val description: List<Component> = listOf(
-                "<!i><white>花费: <green>${defaultCurrencyAmount.toInt()} 金币".mini
+                "<!i><white>花费: <green>${currencyAmount.toInt()} 金币".mini
             )
 
-            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("defaultCurrencyAmount", defaultCurrencyAmount),
+            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.concat(
+                super.examinableProperties(),
+                Stream.of(
+                    ExaminableProperty.of("currencyAmount", currencyAmount),
+                )
             )
+
+            override fun toString(): String = toSimpleString()
         }
     }
 }
