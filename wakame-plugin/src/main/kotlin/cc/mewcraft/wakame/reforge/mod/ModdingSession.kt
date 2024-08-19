@@ -317,7 +317,6 @@ interface ModdingSession : Examinable {
         val values: Collection<Replace>
 
         operator fun get(id: String): Replace?
-        operator fun set(id: String, replace: Replace)
         operator fun contains(id: String): Boolean
 
         /**

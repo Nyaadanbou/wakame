@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.reforge.mod.ModdingTable
+import cc.mewcraft.wakame.reforge.mod.SimpleModdingSession
 import cc.mewcraft.wakame.util.hideTooltip
 import cc.mewcraft.wakame.util.translateBy
 import net.kyori.adventure.text.Component.text
@@ -91,9 +92,7 @@ internal class ModdingMenu(
     /**
      * 本菜单的 [ModdingSession].
      */
-    val moddingSession: ModdingSession = ModdingSessionFactory.create(
-        this, null
-    )
+    val moddingSession: ModdingSession = SimpleModdingSession(table, viewer)
 
     /**
      * 玩家是否已经确认取出定制后的物品.

@@ -35,7 +35,7 @@ import kotlin.reflect.KProperty
 internal class SimpleModdingSession(
     override val table: ModdingTable,
     override val viewer: Player,
-    sourceItem: NekoStack?,
+    sourceItem: NekoStack? = null,
 ) : ModdingSession, KoinComponent {
     companion object {
         private const val PREFIX = ReforgeLoggerPrefix.MOD
@@ -646,7 +646,6 @@ internal class SimpleModdingSession(
             override val values: Collection<ModdingSession.Replace> = emptyList()
 
             override fun get(id: String): ModdingSession.Replace? = null
-            override fun set(id: String, replace: ModdingSession.Replace) = Unit
             override fun contains(id: String): Boolean = false
             override fun getPlayerInputs(): Collection<ItemStack> = emptyList()
             override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Replace>> = emptyList<Map.Entry<String, ModdingSession.Replace>>().iterator()
@@ -667,10 +666,6 @@ internal class SimpleModdingSession(
 
             override fun get(id: String): ModdingSession.Replace? {
                 return data[id]
-            }
-
-            override fun set(id: String, replace: ModdingSession.Replace) {
-                data[id] = replace
             }
 
             override fun contains(id: String): Boolean {

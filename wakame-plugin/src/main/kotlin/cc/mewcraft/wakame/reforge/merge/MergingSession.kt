@@ -51,9 +51,9 @@ interface MergingSession : Examinable {
     /**
      * 合并 [inputItem1] 和 [inputItem2] 的结果.
      *
-     * 每次调用函数 [merge] 之后, 该属性会被重新赋值.
+     * 每次调用函数 [executeReforge] 之后, 该属性会被重新赋值.
      */
-    val result: Result
+    val latestResult: Result
 
     /**
      * 用于计算当前输出核心的合并数值.
@@ -83,21 +83,21 @@ interface MergingSession : Examinable {
      * 如果合并成功, [inputItem1] 和 [inputItem2] 将会被设置为 `null` (表示已消耗).
      * 如果合并失败, [inputItem1] 和 [inputItem2] 将会保持不变.
      *
-     * 函数的返回值会赋值到成员属性 [result] 之上.
+     * 函数的返回值会赋值到成员属性 [latestResult] 之上.
      */
-    fun merge(): Result
+    fun executeReforge(): Result
 
     /**
      * 重置当前会话的状态. 该函数:
      * - 会把 [inputItem1] 和 [inputItem2] 设置为 `null`.
-     * - 会把 [result] 设置为“空”的结果.
+     * - 会把 [latestResult] 设置为“空”的结果.
      */
     fun reset()
 
     /**
      * 标记该会话是否已经被冻结.
      *
-     * 被冻结的会话将不再能够调用 [merge].
+     * 被冻结的会话将不再能够调用 [executeReforge].
      */
     var frozen: Boolean
 
