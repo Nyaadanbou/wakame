@@ -15,7 +15,6 @@ import cc.mewcraft.wakame.util.WAKAME_TAG_NAME
 import cc.mewcraft.wakame.util.wakameTag
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore
-import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.resources.ResourceLocation
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.key.Key
@@ -24,7 +23,7 @@ import kotlin.jvm.optionals.getOrNull
 import com.github.retrooper.packetevents.protocol.item.ItemStack as PacketStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
-internal fun PacketStack.takeUnlessEmpty(): ItemStack? =
+internal fun PacketStack.takeUnlessEmpty(): PacketStack? =
     this.takeIf { !it.isEmpty }
 
 internal fun ResourceLocation.toKey(): Key =
@@ -213,7 +212,7 @@ private class PacketCustomNekoStack(
 }
 
 private class PacketVanillaNekoStack(
-    override val handle0: ItemStack,
+    override val handle0: PacketStack,
     override val key: Key,
     override val prototype: NekoItem,
     override val components: ItemComponentMap,

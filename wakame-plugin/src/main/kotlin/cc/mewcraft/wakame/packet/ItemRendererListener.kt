@@ -1,15 +1,20 @@
 package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.display.PacketItemRenderer
+import cc.mewcraft.wakame.packet.PacketSupport.handleEntityData
 import cc.mewcraft.wakame.packet.PacketSupport.handleMerchantOffers
 import cc.mewcraft.wakame.packet.PacketSupport.handleSetSlot
 import cc.mewcraft.wakame.packet.PacketSupport.handleWindowItems
 import cc.mewcraft.wakame.util.bukkitPlayer
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData
+import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
+import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.protocol.player.User
 import com.github.retrooper.packetevents.wrapper.PacketWrapper
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
@@ -26,6 +31,7 @@ internal class ItemRendererListener : PacketListenerAbstract() {
             PacketType.Play.Server.SET_SLOT -> handleSetSlot(user, WrapperPlayServerSetSlot(event))
             PacketType.Play.Server.WINDOW_ITEMS -> handleWindowItems(user, WrapperPlayServerWindowItems(event))
             PacketType.Play.Server.MERCHANT_OFFERS -> handleMerchantOffers(user, WrapperPlayServerMerchantOffers(event))
+            PacketType.Play.Server.ENTITY_METADATA -> handleEntityData(user, WrapperPlayServerEntityMetadata(event))
             else -> return
         }
         if (newPacket != null) {
@@ -83,6 +89,37 @@ private object PacketSupport : KoinComponent {
             packet.villagerXp,
             packet.isShowProgress,
             packet.isCanRestock
+        )
+    }
+
+    fun handleEntityData(user: User, packet: WrapperPlayServerEntityMetadata): PacketWrapper<*> {
+        val oldMetadata = packet.entityMetadata
+        val newMetadata = ArrayList<EntityData>()
+
+        for (metadata in oldMetadata) {
+            val value = metadata.value
+            if (value !is ItemStack) {
+                newMetadata += metadata
+                continue
+            }
+
+            val nekoStack = value.takeUnlessEmpty()?.tryNekoStack?.takeIf { it.shouldRender }
+            if (nekoStack == null) {
+                newMetadata += metadata
+                continue
+            }
+            updateItem(nekoStack, user)
+
+            newMetadata += EntityData(
+                metadata.index,
+                EntityDataTypes.ITEMSTACK,
+                nekoStack.handle0
+            )
+        }
+
+        return WrapperPlayServerEntityMetadata(
+            packet.entityId,
+            newMetadata
         )
     }
 
