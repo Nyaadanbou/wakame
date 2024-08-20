@@ -39,7 +39,7 @@ internal object ReplaceRender {
                 ingredient.erase()
                 rendered = ingredient.itemStack
                 rendered.editMeta { meta ->
-                    val name = "<white>结果: <green>有效材料".mini
+                    val name = "<white>结果: <green>就绪".mini
                     val lore = buildList<Component> {
                         result.getPortableCore()?.provideTooltipLore()?.content?.let { addAll(it) }
                         add(Component.empty())
@@ -55,7 +55,7 @@ internal object ReplaceRender {
 
             rendered = ItemStack(Material.BARRIER)
             rendered.editMeta { meta ->
-                val name = "<white>结果: 无效材料".mini
+                val name = "<white>结果: <red>无效".mini
                 val lore = buildList<Component> {
                     addAll(result.description)
                     add(Component.empty())

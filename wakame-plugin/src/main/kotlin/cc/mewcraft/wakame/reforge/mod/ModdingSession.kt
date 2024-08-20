@@ -236,10 +236,9 @@ interface ModdingSession : Examinable {
         val totalFunction: MochaFunction
 
         /**
-         * 本定制是否修改过 (即是否有耗材放入).
+         * 被定制的词条栏是否可以修改.
          */
-        @VariableByPlayer
-        val changed: Boolean
+        val isChangeable: Boolean
 
         /**
          * 储存了当前最新的定制结果.
@@ -248,6 +247,12 @@ interface ModdingSession : Examinable {
          */
         @VariableByPlayer
         val latestResult: Result
+
+        /**
+         * 检查是否有耗材放入, 包括非法的耗材.
+         */
+        @VariableByPlayer
+        val hasInput: Boolean
 
         /**
          * 尝试将耗材 [ingredient] 应用到这个词条栏上.

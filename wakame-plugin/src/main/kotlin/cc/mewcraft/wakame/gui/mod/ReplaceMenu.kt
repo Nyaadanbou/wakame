@@ -83,11 +83,10 @@ internal class ReplaceMenu(
                 }
 
                 // 执行一次替换流程, 并获取其结果
-                val result = replace.executeReplace(ns)
+                val replaceResult = replace.executeReplace(ns)
 
                 // 将容器里的物品替换成渲染后的物品
-                val rendered = ReplaceRender.render(result)
-                event.newItem = rendered
+                event.newItem = ReplaceRender.render(replaceResult)
 
                 // 执行一次定制流程
                 parent.executeReforge()
