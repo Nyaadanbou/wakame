@@ -15,16 +15,22 @@ internal object ResultRenderer {
         val item = result.item
         val ret: ItemStack
 
+        val clickToMerge = "<gray>⤷ 点击确认合并".mini
+
         if (result.successful) {
             // 渲染成功的结果
 
             ret = ItemStack(item.unsafe.handle.type)
             ret.editMeta { meta ->
-                val name = "<white>结果: <green>准备就绪".mini
-                val lore = buildList {
+                val name = "<white>结果: <green>就绪".mini
+                val lore = buildList<Component> {
+                    add(Component.empty())
+                    add(result.description)
                     add(Component.empty())
                     addAll(result.type.description)
                     addAll(result.cost.description)
+                    add(Component.empty())
+                    add(clickToMerge)
                 }.removeItalic
 
                 meta.displayName(name.removeItalic)
@@ -36,12 +42,12 @@ internal object ResultRenderer {
             ret = ItemStack(Material.BARRIER) // 使用 `minecraft:barrier` 作为合并失败的“基础物品”
             ret.editMeta { meta ->
                 val name = "<white>结果: <red>失败".mini
-                val lore = buildList {
+                val lore = buildList<Component> {
+                    add(Component.empty())
+                    add(result.description)
                     add(Component.empty())
                     addAll(result.type.description)
                     addAll(result.cost.description)
-                    add(Component.empty())
-                    add(result.description)
                 }.removeItalic
 
                 meta.itemName(name)

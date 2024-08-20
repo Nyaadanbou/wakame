@@ -11,14 +11,13 @@ import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession.Cost
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession.Result
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession.Type
-import net.kyori.adventure.text.Component.*
+import me.lucko.helper.text3.mini
 import org.slf4j.Logger
 import kotlin.math.ceil
 
 /**
  * 封装了一个标准的, 独立的, 重造流程.
  */
-// 构造器必须是 exception-free !!!
 internal class MergeOperation(
     private val session: MergingSession,
     private val logger: Logger,
@@ -30,7 +29,7 @@ internal class MergeOperation(
     fun execute(): MergingSession.Result {
         if (session.frozen) {
             logger.error("$PREFIX Trying to merge a frozen merging session. This is a bug!")
-            return Result.failure(text("无法合并: 会话已冻结."))
+            return Result.failure("<gray>会话已被冻结.".mini)
         }
 
         val inputItem1 = session.inputItem1
@@ -44,26 +43,26 @@ internal class MergeOperation(
 
         // 输入的物品必须是*便携式*属性*核心*
         val core1 = (inputItem1.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute)
-            ?: return Result.failure(text("无法合并: 第一个物品不是属性核心."))
+            ?: return Result.failure("<gray>第一个物品不是属性类核心.".mini)
         val core2 = (inputItem2.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute)
-            ?: return Result.failure(text("无法合并: 第二个物品不是属性核心."))
+            ?: return Result.failure("<gray>第二个物品不是属性类核心.".mini)
 
         // 两个核心除了数值以外, 其余数据必须一致
         if (!core1.isSimilar(core2)) {
             logger.info("$PREFIX Trying to merge cores with different attributes.")
-            return Result.failure(text("无法合并: 两个核心的属性种类不同."))
+            return Result.failure("<gray>两个核心的属性种类不一致.".mini)
         }
 
         // 输入的核心种类至少要跟一条规则相匹配
         if (!session.table.acceptedCoreMatcher.test(core1) || !session.table.acceptedCoreMatcher.test(core2)) {
             logger.info("$PREFIX Trying to merge cores with unacceptable types.")
-            return Result.failure(text("无法合并: 输入核心无法在本合并台进行合并."))
+            return Result.failure("<gray>核心无法在本合并台进行合并.".mini)
         }
 
         // 输入的物品等级必须低于工作台指定的值
         if (session.getLevel1() > session.table.maxInputItemLevel || session.getLevel2() > session.table.maxInputItemLevel) {
             logger.info("$PREFIX Trying to merge cores with too high level.")
-            return Result.failure(text("无法合并: 输入核心的等级超出了本合并台的上限."))
+            return Result.failure("<gray>核心的等级超出了本合并台的上限.".mini)
         }
 
         val mergedOp = core1.operation
@@ -80,7 +79,7 @@ internal class MergeOperation(
 
             else -> {
                 logger.info("$PREFIX Trying to merge cores with multiple value structure.")
-                return Result.failure(text("无法合并: 输入核心无法进行合并."))
+                return Result.failure("<gray>核心的类型无法参与合并.".mini)
             }
         }
 
@@ -89,7 +88,7 @@ internal class MergeOperation(
         // 合并后的惩罚值必须低于工作台指定的值
         if (mergedPenalty > session.table.maxOutputItemPenalty) {
             logger.info("$PREFIX Trying to merge cores with too high penalty.")
-            return Result.failure(text("无法合并: 过于昂贵!"))
+            return Result.failure("<gray>过于昂贵!".mini)
         }
 
         val mergedLevel = session.outputLevelFunction.evaluate().let(::ceil).toInt().toShort()

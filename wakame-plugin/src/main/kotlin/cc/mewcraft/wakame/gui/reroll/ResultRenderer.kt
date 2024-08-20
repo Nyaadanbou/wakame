@@ -54,7 +54,7 @@ internal object ResultRenderer {
                     addAll(result.description)
                     addAll(result.cost.description)
                     add(Component.empty())
-                    add("<gray>⤷ 点击开始重造".mini)
+                    add("<gray>⤷ 点击确认重造".mini)
                 }
 
                 meta.displayName(name.removeItalic)

@@ -175,7 +175,7 @@ internal class SimpleModdingTable(
             val mocha = MochaEngine.createStandard()
             val binding = TableTotalBinding(session)
             mocha.bindInstance(binding, "query")
-            return mocha.compile(code)
+            return mocha.prepareEval(code)
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -194,7 +194,7 @@ internal class SimpleModdingTable(
             val mocha = MochaEngine.createStandard()
             val binding = CellTotalBinding(session, replace)
             mocha.bindInstance(binding, "query")
-            return mocha.compile(code)
+            return mocha.prepareEval(code)
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(

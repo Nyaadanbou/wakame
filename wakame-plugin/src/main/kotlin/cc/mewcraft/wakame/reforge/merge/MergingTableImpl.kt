@@ -56,12 +56,13 @@ internal object WtfMergingTable : MergingTable {
     )
 
     override val currencyCost: MergingTable.CurrencyCost = SimpleMergingTable.CurrencyCost(
-        0.0,
         SimpleMergingTable.CurrencyCost.TotalFunction(
             // 返回基础花费加上稀有度映射值之和
             "query.base() + query.rarity_1() + query.rarity_2()"
         )
     )
+
+    override fun toString(): String = toSimpleString()
 }
 
 /**
@@ -84,18 +85,17 @@ internal class SimpleMergingTable(
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("enabled", enabled),
         ExaminableProperty.of("title", title),
-        ExaminableProperty.of("maxInputLevel", maxInputItemLevel),
-        ExaminableProperty.of("maxOutputPenalty", maxOutputItemPenalty),
-        ExaminableProperty.of("coreMatcherMap", acceptedCoreMatcher),
-        ExaminableProperty.of("rarityNumberMap", rarityNumberMapping),
+        ExaminableProperty.of("maxInputItemLevel", maxInputItemLevel),
+        ExaminableProperty.of("maxOutputItemPenalty", maxOutputItemPenalty),
+        ExaminableProperty.of("acceptedCoreMatcher", acceptedCoreMatcher),
+        ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
         ExaminableProperty.of("numberMergeFunction", numberMergeFunction),
         ExaminableProperty.of("outputLevelFunction", outputLevelFunction),
         ExaminableProperty.of("outputPenaltyFunction", outputPenaltyFunction),
-        ExaminableProperty.of("cost", currencyCost),
+        ExaminableProperty.of("currencyCost", currencyCost),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String = toSimpleString()
 
     class NumberMergeFunction(
         private val code: Map<MergingTable.NumberMergeFunction.Type, String>,
@@ -116,8 +116,7 @@ internal class SimpleMergingTable(
             ExaminableProperty.of("code", code)
         )
 
-        override fun toString(): String =
-            toSimpleString()
+        override fun toString(): String = toSimpleString()
     }
 
     class OutputLevelFunction(
@@ -135,8 +134,7 @@ internal class SimpleMergingTable(
             ExaminableProperty.of("code", code)
         )
 
-        override fun toString(): String =
-            toSimpleString()
+        override fun toString(): String = toSimpleString()
     }
 
     class OutputPenaltyFunction(
@@ -154,25 +152,20 @@ internal class SimpleMergingTable(
             ExaminableProperty.of("code", code)
         )
 
-        override fun toString(): String =
-            toSimpleString()
+        override fun toString(): String = toSimpleString()
     }
 
     class CurrencyCost(
-        override val base: Double = 0.0,
-        override val totalFunction: MergingTable.CurrencyCost.TotalFunction,
+        override val total: MergingTable.CurrencyCost.TotalFunction,
     ) : MergingTable.CurrencyCost {
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("base", base),
-            ExaminableProperty.of("totalCostFunction", totalFunction),
+            ExaminableProperty.of("total", total),
         )
 
-        override fun toString(): String =
-            toSimpleString()
-
+        override fun toString(): String = toSimpleString()
 
         class TotalFunction(
-            override val code: String,
+            val code: String,
         ) : MergingTable.CurrencyCost.TotalFunction {
 
             override fun compile(session: MergingSession): MochaFunction {
@@ -186,8 +179,7 @@ internal class SimpleMergingTable(
                 ExaminableProperty.of("code", code)
             )
 
-            override fun toString(): String =
-                toSimpleString()
+            override fun toString(): String = toSimpleString()
         }
     }
 }
@@ -230,9 +222,6 @@ internal class OutputPenaltyBinding(
 internal class TotalCostBinding(
     val session: MergingSession,
 ) {
-    @Binding("base")
-    fun base(): Double = session.table.currencyCost.base
-
     @Binding("level_1")
     fun level1(): Double = session.getLevel1()
 
