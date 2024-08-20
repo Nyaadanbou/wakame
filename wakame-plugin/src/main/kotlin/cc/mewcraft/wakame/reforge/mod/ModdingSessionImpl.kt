@@ -264,429 +264,429 @@ internal class SimpleModdingSession(
             return ReplaceMap.simple(map)
         }
     }
+}
 
-    object Result {
-        /**
-         * 空的结果. 当要定制的物品不存在时, 用这个.
-         */
-        fun empty(): ModdingSession.Result {
-            return Empty()
-        }
-
-        /**
-         * 失败的结果. 当存在要定制的物品, 但由于某种原因无法定制时, 用这个.
-         */
-        fun failure(description: List<Component>): ModdingSession.Result {
-            return Failure(description)
-        }
-
-        /**
-         * 失败的结果. 当存在要定制的物品, 但由于某种原因无法定制时, 用这个.
-         */
-        fun failure(description: Component): ModdingSession.Result {
-            return failure(listOf(description))
-        }
-
-        /**
-         * 成功的结果. 当成功定制物品时, 用这个.
-         */
-        fun success(
-            outputItem: NekoStack,
-            description: List<Component>,
-            cost: ModdingSession.Cost
-        ): ModdingSession.Result {
-            return Success(outputItem, description, cost)
-        }
-
-        /**
-         * 成功的结果. 当成功定制物品时, 用这个.
-         */
-        fun success(
-            outputItem: NekoStack,
-            description: Component,
-            cost: ModdingSession.Cost
-        ): ModdingSession.Result {
-            return success(outputItem, listOf(description), cost)
-        }
-
-        private abstract class Base : ModdingSession.Result {
-            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("successful", successful),
-                ExaminableProperty.of("description", description.plain),
-                ExaminableProperty.of("outputItem", outputItem),
-                ExaminableProperty.of("cost", cost),
-            )
-
-            override fun toString(): String = toSimpleString()
-        }
-
-        private class Empty : Base() {
-            override val isEmpty: Boolean = true
-            override val successful: Boolean = false
-            override val description: List<Component> = listOf(
-                "<gray>没有输出结果".mini
-            )
-            override val outputItem: NekoStack? = null
-            override val cost: ModdingSession.Cost = Cost.empty()
-        }
-
-        private class Failure(
-            description: List<Component>,
-        ) : Base() {
-            override val isEmpty: Boolean = false
-            override val successful: Boolean = false
-            override val description: List<Component> = description
-            override val outputItem: NekoStack? = null
-            override val cost: ModdingSession.Cost = Cost.empty()
-        }
-
-        private class Success(
-            outputItem: NekoStack,
-            description: List<Component>,
-            cost: ModdingSession.Cost,
-        ) : Base() {
-            override val isEmpty: Boolean = false
-            override val successful: Boolean = true
-            override val description: List<Component> = description
-            override val outputItem: NekoStack by NekoStackDelegates.copyOnRead(outputItem)
-            override val cost: ModdingSession.Cost = cost
-        }
+internal object Result {
+    /**
+     * 空的结果. 当要定制的物品不存在时, 用这个.
+     */
+    fun empty(): ModdingSession.Result {
+        return Empty()
     }
 
-    object Cost {
-        fun empty(): ModdingSession.Cost {
-            return Empty()
-        }
-
-        /**
-         * @param currencyAmount 要消耗的默认货币数量
-         */
-        fun simple(
-            currencyAmount: Double
-        ): ModdingSession.Cost {
-            return Simple(currencyAmount)
-        }
-
-        private class Empty : ModdingSession.Cost {
-            override fun take(viewer: Player) {
-                // do nothing
-            }
-
-            override fun test(viewer: Player): Boolean {
-                return true
-            }
-
-            override val description: List<Component> = listOf(
-                "<gray>无资源消耗".mini
-            )
-
-            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("description", description.plain)
-            )
-
-            override fun toString(): String = toSimpleString()
-        }
-
-        private class Simple(
-            val currencyAmount: Double,
-        ) : ModdingSession.Cost {
-            override fun take(viewer: Player) {
-                // TODO 实现 take, test, description
-            }
-
-            override fun test(viewer: Player): Boolean {
-                return true
-            }
-
-            override val description: List<Component> = listOf(
-                "<gray>金币: <yellow>${currencyAmount}".mini
-            )
-
-            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("description", description.plain),
-                ExaminableProperty.of("currencyAmount", currencyAmount)
-            )
-
-            override fun toString(): String = toSimpleString()
-        }
+    /**
+     * 失败的结果. 当存在要定制的物品, 但由于某种原因无法定制时, 用这个.
+     */
+    fun failure(description: List<Component>): ModdingSession.Result {
+        return Failure(description)
     }
 
-    object Replace {
-        /**
-         * 封装一个不可修改的词条栏.
-         */
-        fun unchangeable(session: ModdingSession, cell: Cell): ModdingSession.Replace {
-            return Unchangeable(session, cell)
-        }
-
-        /**
-         * 封装一个可以修改的词条栏.
-         */
-        fun changeable(session: ModdingSession, cell: Cell, rule: ModdingTable.CellRule): ModdingSession.Replace {
-            return Changeable(session, cell, rule)
-        }
-
-        private const val PREFIX = ReforgeLoggerPrefix.MOD
-        private val ZERO_MOCHA_FUNCTION: MochaFunction = MochaFunction { .0 }
-
-        private class Unchangeable(
-            override val session: ModdingSession,
-            override val cell: Cell,
-        ) : ModdingSession.Replace, KoinComponent {
-            override val id = cell.getId()
-            override val rule = ModdingTable.CellRule.empty()
-            override val display = ItemStack(Material.BARRIER).hideTooltip(true)
-            override val totalFunction = ZERO_MOCHA_FUNCTION // 不可修改的词条栏不需要花费 (?)
-            override val changed: Boolean = false
-            override var latestResult = ReplaceResult.empty()
-
-            override fun executeReplace(ingredient: NekoStack?): ModdingSession.Replace.Result {
-                if (ingredient == null) {
-                    return ReplaceResult.empty()
-                }
-
-                return ReplaceResult.failure(ingredient, "<gray>源物品的这个词条栏不可修改".mini)
-            }
-
-            override fun getIngredientLevel(): Int = 0
-            override fun getIngredientRarityNumber(): Double = .0
-
-            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("id", id),
-                ExaminableProperty.of("latestResult", latestResult),
-            )
-
-            override fun toString(): String = toSimpleString()
-        }
-
-        private class Changeable(
-            override val session: ModdingSession,
-            override val cell: Cell,
-            override val rule: ModdingTable.CellRule,
-        ) : ModdingSession.Replace, KoinComponent {
-            private val logger: Logger by inject()
-
-            override val id: String = cell.getId()
-
-            override val display: ItemStack = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
-                editMeta { meta ->
-                    val name = cell.provideTooltipName().content
-                    val lore = cell.provideTooltipLore().content
-                    meta.itemName(name)
-                    meta.lore(lore)
-                    meta.hideAllFlags()
-                }
-            }
-
-            override val totalFunction: MochaFunction = rule.currencyCost.total.compile(session, this)
-
-            override val changed: Boolean
-                // 当耗材不为空时, 代表这个词条栏
-                // 已经被修改过, 不管成功与否
-                get() = latestResult.ingredient != null
-
-            override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReplaceResult.empty()) { _, old, new ->
-                logger.info("$PREFIX Replace result updated: $old -> $new")
-            }
-
-            private fun executeReplace0(ingredient: NekoStack?): ModdingSession.Replace.Result {
-                // 如果耗材为空, 则返回空结果
-                if (ingredient == null) {
-                    return ReplaceResult.empty()
-                }
-
-                // 如果源物品为空, 则返回内部错误
-                val sourceItem = session.sourceItem ?: run {
-                    logger.error("$PREFIX Source item is null, but an item is being replaced. This is a bug!")
-                    return ReplaceResult.failure(ingredient, "<red>内部错误".mini)
-                }
-
-                // TODO 检查权限
-
-                // 获取耗材中的便携核心
-                val portableCore = ingredient.components.get(ItemComponentTypes.PORTABLE_CORE) ?: run {
-                    return ReplaceResult.failure(ingredient, "<gray>这个物品不是便携核心".mini)
-                }
-
-                // 获取源物品上的词条栏
-                val sourceCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: run {
-                    logger.error("$PREFIX Source item has no cells, but an item is being replaced. This is a bug!")
-                    return ReplaceResult.failure(ingredient, "<red>内部错误".mini)
-                }
-
-                // 源物品的词条栏上必须没有与便携核心相似的核心
-                val sourceCellsExcludingThis = sourceCells.filterx { it.getId() != cell.getId() }
-                if (sourceCellsExcludingThis.hasSimilarCore(portableCore.wrapped)) {
-                    return ReplaceResult.failure(ingredient, "<gray>源物品上存在相似的便携核心".mini)
-                }
-
-                // 便携式核心 必须符合定制规则
-                if (!rule.acceptedCores.test(portableCore.wrapped)) {
-                    return ReplaceResult.failure(ingredient, "<gray>源物品的词条栏不接受这种便携核心".mini)
-                }
-
-                // 便携式核心上面的所有元素 必须全部出现在被定制物品上
-                if (rule.requireElementMatch) {
-                    val elementsOnSource = sourceItem.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
-                    val elementsOnIngredient = ingredient.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
-                    if (!elementsOnIngredient.containsAll(elementsOnSource)) {
-                        return ReplaceResult.failure(ingredient, "<gray>便携核心的元素跟源物品的不相融".mini)
-                    }
-                }
-
-                // 被定制物品上储存的历史定制次数 必须小于等于定制规则
-                val modCount = ingredient.components.get(ItemComponentTypes.CELLS)?.get(id)?.getReforgeHistory()?.modCount ?: Int.MAX_VALUE
-                if (modCount > rule.modLimit) {
-                    return ReplaceResult.failure(ingredient, "<gray>源物品的这个词条栏已经历经无数雕琢".mini)
-                }
-
-                // 全部检查通过!
-                return ReplaceResult.success(ingredient, "<green>便携核心准备就绪".mini)
-            }
-
-            override fun executeReplace(ingredient: NekoStack?): ModdingSession.Replace.Result {
-                val result = executeReplace0(ingredient)
-                latestResult = result
-                return result
-            }
-
-            override fun getIngredientLevel(): Int {
-                return latestResult.ingredient?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
-            }
-
-            override fun getIngredientRarityNumber(): Double {
-                return latestResult.ingredient?.components?.get(ItemComponentTypes.RARITY)?.rarity?.let { session.table.rarityNumberMapping.get(it.key) } ?: .0
-            }
-
-            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("id", id),
-                ExaminableProperty.of("latestResult", latestResult),
-            )
-
-            override fun toString(): String = toSimpleString()
-        }
+    /**
+     * 失败的结果. 当存在要定制的物品, 但由于某种原因无法定制时, 用这个.
+     */
+    fun failure(description: Component): ModdingSession.Result {
+        return failure(listOf(description))
     }
 
-    object ReplaceResult {
-        /**
-         * 空的结果. 当没有耗材输入时, 用这个.
-         */
-        fun empty(): ModdingSession.Replace.Result {
-            return Empty()
-        }
-
-        fun failure(ingredient: NekoStack?, description: List<Component>): ModdingSession.Replace.Result {
-            return Simple(ingredient, false, description)
-        }
-
-        fun failure(ingredient: NekoStack?, description: Component): ModdingSession.Replace.Result {
-            return failure(ingredient, listOf(description))
-        }
-
-        fun success(ingredient: NekoStack?, description: List<Component>): ModdingSession.Replace.Result {
-            return Simple(ingredient, true, description)
-        }
-
-        fun success(ingredient: NekoStack?, description: Component): ModdingSession.Replace.Result {
-            return success(ingredient, listOf(description))
-        }
-
-        private abstract class Base : ModdingSession.Replace.Result {
-            override fun getPortableCore(): PortableCore? {
-                return ingredient?.components?.get(ItemComponentTypes.PORTABLE_CORE)
-            }
-
-            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("ingredient", ingredient),
-                ExaminableProperty.of("applicable", applicable),
-                ExaminableProperty.of("description", description.plain),
-            )
-
-            override fun toString(): String = toSimpleString()
-        }
-
-        private class Empty : Base() {
-            override val ingredient: NekoStack? = null
-            override val applicable: Boolean = false // 空气无法参与定制, 需要额外逻辑判断
-            override val description: List<Component> = listOf("<gray>没有耗材输入".mini)
-        }
-
-        private class Simple(
-            ingredient: NekoStack?,
-            override val applicable: Boolean,
-            override val description: List<Component>,
-        ) : Base() {
-            override val ingredient: NekoStack? by NekoStackDelegates.nullableCopyOnRead(ingredient)
-        }
+    /**
+     * 成功的结果. 当成功定制物品时, 用这个.
+     */
+    fun success(
+        outputItem: NekoStack,
+        description: List<Component>,
+        cost: ModdingSession.Cost
+    ): ModdingSession.Result {
+        return Success(outputItem, description, cost)
     }
 
-    object ReplaceMap {
-        /**
-         * 返回一个 不可变的 空的 [ReplaceMap].
-         *
-         * 当没有可以定制的词条栏时, 使用这个.
-         */
-        fun empty(): ModdingSession.ReplaceMap {
-            return Empty
+    /**
+     * 成功的结果. 当成功定制物品时, 用这个.
+     */
+    fun success(
+        outputItem: NekoStack,
+        description: Component,
+        cost: ModdingSession.Cost
+    ): ModdingSession.Result {
+        return success(outputItem, listOf(description), cost)
+    }
+
+    private abstract class Base : ModdingSession.Result {
+        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+            ExaminableProperty.of("successful", successful),
+            ExaminableProperty.of("description", description.plain),
+            ExaminableProperty.of("outputItem", outputItem),
+            ExaminableProperty.of("cost", cost),
+        )
+
+        override fun toString(): String = toSimpleString()
+    }
+
+    private class Empty : Base() {
+        override val isEmpty: Boolean = true
+        override val successful: Boolean = false
+        override val description: List<Component> = listOf(
+            "<gray>没有输出结果".mini
+        )
+        override val outputItem: NekoStack? = null
+        override val cost: ModdingSession.Cost = Cost.empty()
+    }
+
+    private class Failure(
+        description: List<Component>,
+    ) : Base() {
+        override val isEmpty: Boolean = false
+        override val successful: Boolean = false
+        override val description: List<Component> = description
+        override val outputItem: NekoStack? = null
+        override val cost: ModdingSession.Cost = Cost.empty()
+    }
+
+    private class Success(
+        outputItem: NekoStack,
+        description: List<Component>,
+        cost: ModdingSession.Cost,
+    ) : Base() {
+        override val isEmpty: Boolean = false
+        override val successful: Boolean = true
+        override val description: List<Component> = description
+        override val outputItem: NekoStack by NekoStackDelegates.copyOnRead(outputItem)
+        override val cost: ModdingSession.Cost = cost
+    }
+}
+
+internal object Cost {
+    fun empty(): ModdingSession.Cost {
+        return Empty()
+    }
+
+    /**
+     * @param currencyAmount 要消耗的默认货币数量
+     */
+    fun simple(
+        currencyAmount: Double
+    ): ModdingSession.Cost {
+        return Simple(currencyAmount)
+    }
+
+    private class Empty : ModdingSession.Cost {
+        override fun take(viewer: Player) {
+            // do nothing
         }
 
-        /**
-         * 返回一个 新的 可变的 [ReplaceMap].
-         *
-         * 当存在可以定制的词条栏时, 使用这个.
-         */
-        fun simple(data: Map<String, ModdingSession.Replace> = HashMap()): ModdingSession.ReplaceMap {
-            return Simple(data)
+        override fun test(viewer: Player): Boolean {
+            return true
         }
 
-        private object Empty : ModdingSession.ReplaceMap {
-            override val size: Int = 0
-            override val keys: Set<String> = emptySet()
-            override val values: Collection<ModdingSession.Replace> = emptyList()
+        override val description: List<Component> = listOf(
+            "<gray>无资源消耗".mini
+        )
 
-            override fun get(id: String): ModdingSession.Replace? = null
-            override fun contains(id: String): Boolean = false
-            override fun getPlayerInputs(): Collection<ItemStack> = emptyList()
-            override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Replace>> = emptyList<Map.Entry<String, ModdingSession.Replace>>().iterator()
-            override fun toString(): String = toSimpleString()
+        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+            ExaminableProperty.of("description", description.plain)
+        )
+
+        override fun toString(): String = toSimpleString()
+    }
+
+    private class Simple(
+        val currencyAmount: Double,
+    ) : ModdingSession.Cost {
+        override fun take(viewer: Player) {
+            // TODO 实现 take, test, description
         }
 
-        private class Simple(
-            data: Map<String, ModdingSession.Replace>
-        ) : ModdingSession.ReplaceMap {
-            val data: HashMap<String, ModdingSession.Replace> = HashMap(data) // explicit copy
+        override fun test(viewer: Player): Boolean {
+            return true
+        }
 
-            override val size: Int
-                get() = data.size
-            override val keys: Set<String>
-                get() = data.keys
-            override val values: Collection<ModdingSession.Replace>
-                get() = data.values
+        override val description: List<Component> = listOf(
+            "<gray>金币: <yellow>${currencyAmount}".mini
+        )
 
-            override fun get(id: String): ModdingSession.Replace? {
-                return data[id]
+        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+            ExaminableProperty.of("description", description.plain),
+            ExaminableProperty.of("currencyAmount", currencyAmount)
+        )
+
+        override fun toString(): String = toSimpleString()
+    }
+}
+
+internal object Replace {
+    /**
+     * 封装一个不可修改的词条栏.
+     */
+    fun unchangeable(session: ModdingSession, cell: Cell): ModdingSession.Replace {
+        return Unchangeable(session, cell)
+    }
+
+    /**
+     * 封装一个可以修改的词条栏.
+     */
+    fun changeable(session: ModdingSession, cell: Cell, rule: ModdingTable.CellRule): ModdingSession.Replace {
+        return Changeable(session, cell, rule)
+    }
+
+    private const val PREFIX = ReforgeLoggerPrefix.MOD
+    private val ZERO_MOCHA_FUNCTION: MochaFunction = MochaFunction { .0 }
+
+    private class Unchangeable(
+        override val session: ModdingSession,
+        override val cell: Cell,
+    ) : ModdingSession.Replace, KoinComponent {
+        override val id = cell.getId()
+        override val rule = ModdingTable.CellRule.empty()
+        override val display = ItemStack(Material.BARRIER).hideTooltip(true)
+        override val totalFunction = ZERO_MOCHA_FUNCTION // 不可修改的词条栏不需要花费 (?)
+        override val changed: Boolean = false
+        override var latestResult = ReplaceResult.empty()
+
+        override fun executeReplace(ingredient: NekoStack?): ModdingSession.Replace.Result {
+            if (ingredient == null) {
+                return ReplaceResult.empty()
             }
 
-            override fun contains(id: String): Boolean {
-                return data.containsKey(id)
+            return ReplaceResult.failure(ingredient, "<gray>源物品的这个词条栏不可修改".mini)
+        }
+
+        override fun getIngredientLevel(): Int = 0
+        override fun getIngredientRarityNumber(): Double = .0
+
+        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+            ExaminableProperty.of("id", id),
+            ExaminableProperty.of("latestResult", latestResult),
+        )
+
+        override fun toString(): String = toSimpleString()
+    }
+
+    private class Changeable(
+        override val session: ModdingSession,
+        override val cell: Cell,
+        override val rule: ModdingTable.CellRule,
+    ) : ModdingSession.Replace, KoinComponent {
+        private val logger: Logger by inject()
+
+        override val id: String = cell.getId()
+
+        override val display: ItemStack = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
+            editMeta { meta ->
+                val name = cell.provideTooltipName().content
+                val lore = cell.provideTooltipLore().content
+                meta.itemName(name)
+                meta.lore(lore)
+                meta.hideAllFlags()
+            }
+        }
+
+        override val totalFunction: MochaFunction = rule.currencyCost.total.compile(session, this)
+
+        override val changed: Boolean
+            // 当耗材不为空时, 代表这个词条栏
+            // 已经被修改过, 不管成功与否
+            get() = latestResult.ingredient != null
+
+        override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReplaceResult.empty()) { _, old, new ->
+            logger.info("$PREFIX Replace result updated: $old -> $new")
+        }
+
+        private fun executeReplace0(ingredient: NekoStack?): ModdingSession.Replace.Result {
+            // 如果耗材为空, 则返回空结果
+            if (ingredient == null) {
+                return ReplaceResult.empty()
             }
 
-            override fun getPlayerInputs(): List<ItemStack> {
-                return data.values.mapNotNull { it.latestResult.ingredient?.unsafe?.handle }
+            // 如果源物品为空, 则返回内部错误
+            val sourceItem = session.sourceItem ?: run {
+                logger.error("$PREFIX Source item is null, but an item is being replaced. This is a bug!")
+                return ReplaceResult.failure(ingredient, "<red>内部错误".mini)
             }
 
-            override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Replace>> {
-                return data.iterator()
+            // TODO 检查权限
+
+            // 获取耗材中的便携核心
+            val portableCore = ingredient.components.get(ItemComponentTypes.PORTABLE_CORE) ?: run {
+                return ReplaceResult.failure(ingredient, "<gray>这个物品不是便携核心".mini)
             }
 
-            override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-                ExaminableProperty.of("size", size),
-                ExaminableProperty.of("data", data),
-            )
-
-            override fun toString(): String {
-                return toSimpleString()
+            // 获取源物品上的词条栏
+            val sourceCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: run {
+                logger.error("$PREFIX Source item has no cells, but an item is being replaced. This is a bug!")
+                return ReplaceResult.failure(ingredient, "<red>内部错误".mini)
             }
+
+            // 源物品的词条栏上必须没有与便携核心相似的核心
+            val sourceCellsExcludingThis = sourceCells.filterx { it.getId() != cell.getId() }
+            if (sourceCellsExcludingThis.hasSimilarCore(portableCore.wrapped)) {
+                return ReplaceResult.failure(ingredient, "<gray>源物品上存在相似的便携核心".mini)
+            }
+
+            // 便携式核心 必须符合定制规则
+            if (!rule.acceptedCores.test(portableCore.wrapped)) {
+                return ReplaceResult.failure(ingredient, "<gray>源物品的词条栏不接受这种便携核心".mini)
+            }
+
+            // 便携式核心上面的所有元素 必须全部出现在被定制物品上
+            if (rule.requireElementMatch) {
+                val elementsOnSource = sourceItem.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
+                val elementsOnIngredient = ingredient.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
+                if (!elementsOnIngredient.containsAll(elementsOnSource)) {
+                    return ReplaceResult.failure(ingredient, "<gray>便携核心的元素跟源物品的不相融".mini)
+                }
+            }
+
+            // 被定制物品上储存的历史定制次数 必须小于等于定制规则
+            val modCount = ingredient.components.get(ItemComponentTypes.CELLS)?.get(id)?.getReforgeHistory()?.modCount ?: Int.MAX_VALUE
+            if (modCount > rule.modLimit) {
+                return ReplaceResult.failure(ingredient, "<gray>源物品的这个词条栏已经历经无数雕琢".mini)
+            }
+
+            // 全部检查通过!
+            return ReplaceResult.success(ingredient, "<green>便携核心准备就绪".mini)
+        }
+
+        override fun executeReplace(ingredient: NekoStack?): ModdingSession.Replace.Result {
+            val result = executeReplace0(ingredient)
+            latestResult = result
+            return result
+        }
+
+        override fun getIngredientLevel(): Int {
+            return latestResult.ingredient?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
+        }
+
+        override fun getIngredientRarityNumber(): Double {
+            return latestResult.ingredient?.components?.get(ItemComponentTypes.RARITY)?.rarity?.let { session.table.rarityNumberMapping.get(it.key) } ?: .0
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+            ExaminableProperty.of("id", id),
+            ExaminableProperty.of("latestResult", latestResult),
+        )
+
+        override fun toString(): String = toSimpleString()
+    }
+}
+
+internal object ReplaceResult {
+    /**
+     * 空的结果. 当没有耗材输入时, 用这个.
+     */
+    fun empty(): ModdingSession.Replace.Result {
+        return Empty()
+    }
+
+    fun failure(ingredient: NekoStack?, description: List<Component>): ModdingSession.Replace.Result {
+        return Simple(ingredient, false, description)
+    }
+
+    fun failure(ingredient: NekoStack?, description: Component): ModdingSession.Replace.Result {
+        return failure(ingredient, listOf(description))
+    }
+
+    fun success(ingredient: NekoStack?, description: List<Component>): ModdingSession.Replace.Result {
+        return Simple(ingredient, true, description)
+    }
+
+    fun success(ingredient: NekoStack?, description: Component): ModdingSession.Replace.Result {
+        return success(ingredient, listOf(description))
+    }
+
+    private abstract class Base : ModdingSession.Replace.Result {
+        override fun getPortableCore(): PortableCore? {
+            return ingredient?.components?.get(ItemComponentTypes.PORTABLE_CORE)
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+            ExaminableProperty.of("ingredient", ingredient),
+            ExaminableProperty.of("applicable", applicable),
+            ExaminableProperty.of("description", description.plain),
+        )
+
+        override fun toString(): String = toSimpleString()
+    }
+
+    private class Empty : Base() {
+        override val ingredient: NekoStack? = null
+        override val applicable: Boolean = false // 空气无法参与定制, 需要额外逻辑判断
+        override val description: List<Component> = listOf("<gray>没有耗材输入".mini)
+    }
+
+    private class Simple(
+        ingredient: NekoStack?,
+        override val applicable: Boolean,
+        override val description: List<Component>,
+    ) : Base() {
+        override val ingredient: NekoStack? by NekoStackDelegates.nullableCopyOnRead(ingredient)
+    }
+}
+
+internal object ReplaceMap {
+    /**
+     * 返回一个 不可变的 空的 [ReplaceMap].
+     *
+     * 当没有可以定制的词条栏时, 使用这个.
+     */
+    fun empty(): ModdingSession.ReplaceMap {
+        return Empty
+    }
+
+    /**
+     * 返回一个 新的 可变的 [ReplaceMap].
+     *
+     * 当存在可以定制的词条栏时, 使用这个.
+     */
+    fun simple(data: Map<String, ModdingSession.Replace> = HashMap()): ModdingSession.ReplaceMap {
+        return Simple(data)
+    }
+
+    private object Empty : ModdingSession.ReplaceMap {
+        override val size: Int = 0
+        override val keys: Set<String> = emptySet()
+        override val values: Collection<ModdingSession.Replace> = emptyList()
+
+        override fun get(id: String): ModdingSession.Replace? = null
+        override fun contains(id: String): Boolean = false
+        override fun getPlayerInputs(): Collection<ItemStack> = emptyList()
+        override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Replace>> = emptyList<Map.Entry<String, ModdingSession.Replace>>().iterator()
+        override fun toString(): String = toSimpleString()
+    }
+
+    private class Simple(
+        data: Map<String, ModdingSession.Replace>
+    ) : ModdingSession.ReplaceMap {
+        val data: HashMap<String, ModdingSession.Replace> = HashMap(data) // explicit copy
+
+        override val size: Int
+            get() = data.size
+        override val keys: Set<String>
+            get() = data.keys
+        override val values: Collection<ModdingSession.Replace>
+            get() = data.values
+
+        override fun get(id: String): ModdingSession.Replace? {
+            return data[id]
+        }
+
+        override fun contains(id: String): Boolean {
+            return data.containsKey(id)
+        }
+
+        override fun getPlayerInputs(): List<ItemStack> {
+            return data.values.mapNotNull { it.latestResult.ingredient?.unsafe?.handle }
+        }
+
+        override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Replace>> {
+            return data.iterator()
+        }
+
+        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+            ExaminableProperty.of("size", size),
+            ExaminableProperty.of("data", data),
+        )
+
+        override fun toString(): String {
+            return toSimpleString()
         }
     }
 }
