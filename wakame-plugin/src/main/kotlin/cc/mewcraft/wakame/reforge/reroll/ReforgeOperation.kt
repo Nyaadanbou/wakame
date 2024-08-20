@@ -53,6 +53,18 @@ internal class ReforgeOperation(
         // 如果源物品不存在, 返回一个空结果
         val sourceItem = sourceItem ?: return Result.empty()
 
+        // 获取词条栏的选择状态
+        // 如果没有可重造的词条栏, 返回一个失败结果
+        val selectionMap = session.selectionMap
+        if (selectionMap.isEmpty || selectionMap.values.all { !it.changeable }) {
+            return Result.failure("<gray>没有可重造的词条栏".mini)
+        }
+
+        // 如果没有选择任何词条栏, 返回一个失败结果
+        if (selectionMap.values.all { !it.selected }) {
+            return Result.failure("<gray>没有选择任何词条栏".mini)
+        }
+
         // region 准备作为输出的物品
         val output = sourceItem.clone()
 
@@ -76,13 +88,11 @@ internal class ReforgeOperation(
                 itemKizamiz,
                 itemCells
             )
-        } catch (e: Exception) {
-            // 感觉上下文的生成可能会出问题, catch 保底一下
+        } catch (e: Exception) { // 有必要 try-catch?
             logger.error("$PREFIX Unexpected error while preparing generation context", e)
             return Result.error()
         }
 
-        val selectionMap = session.selectionMap
         val cellsBuilder = itemCells.builder()
 
         // 遍历每一个选择:

@@ -63,9 +63,8 @@ class SimpleRerollingSession(
     }
 
     private fun executeReforge0(): RerollingSession.Result {
-        val operation = ReforgeOperation(this)
         val result = try {
-            operation.execute()
+            ReforgeOperation(this).execute()
         } catch (e: Exception) {
             logger.error("$PREFIX An unknown error occurred while rerolling an item", e)
             Result.error()
@@ -74,9 +73,9 @@ class SimpleRerollingSession(
     }
 
     override fun executeReforge(): RerollingSession.Result {
-        val ret = executeReforge0()
-        this.latestResult = ret
-        return ret
+        val result = executeReforge0()
+        latestResult = result
+        return result
     }
 
     override fun reset() {
@@ -105,14 +104,14 @@ class SimpleRerollingSession(
 
     private inner class SourceItemDelegate(
         private var backing: NekoStack?,
-    ) : ReadWriteProperty<Any?, NekoStack?> {
-        override fun getValue(thisRef: Any?, property: KProperty<*>): NekoStack? {
+    ) : ReadWriteProperty<RerollingSession, NekoStack?> {
+        override fun getValue(thisRef: RerollingSession, property: KProperty<*>): NekoStack? {
             return backing?.clone()
         }
 
-        override fun setValue(thisRef: Any?, property: KProperty<*>, value: NekoStack?) {
+        override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: NekoStack?) {
             backing = value?.clone()
-            selectionMap = SelectionMap.simple(this@SimpleRerollingSession)
+            selectionMap = SelectionMap.simple(thisRef)
             latestResult = executeReforge0()
         }
     }
@@ -286,16 +285,16 @@ internal object Cost {
 
 internal object Selection {
     /**
-     * 创建一个空的 [Selection].
+     * 创建一个不可修改的 [Selection].
      */
-    fun empty(session: RerollingSession): RerollingSession.Selection {
+    fun unchangeable(session: RerollingSession): RerollingSession.Selection {
         return Empty(session)
     }
 
     /**
-     * 创建一个一般的 [Selection].
+     * 创建一个可被修改的 [Selection].
      */
-    fun simple(
+    fun changeable(
         session: RerollingSession,
         id: String,
         rule: RerollingTable.CellRule,
@@ -320,6 +319,8 @@ internal object Selection {
             get() = ItemStack.empty()
         override val total: MochaFunction
             get() = MochaFunction { .0 }
+        override val changeable: Boolean
+            get() = false
         override var selected: Boolean
             set(_) = Unit
             get() = false
@@ -336,9 +337,9 @@ internal object Selection {
         override val display: ItemStack,
     ) : RerollingSession.Selection, KoinComponent {
         private val logger: Logger by inject()
-
         override val total: MochaFunction = rule.currencyCost.compile(session, this)
-
+        override val changeable: Boolean
+            get() = true
         override var selected: Boolean by Delegates.observable(false) { _, old, new ->
             logger.info("$PREFIX Selection status updated (cell: '$id'): $old -> $new")
         }
@@ -369,12 +370,15 @@ internal object SelectionMap : KoinComponent {
     }
 
     /**
-     * 创建一个一般的 [SelectionMap].
+     * 创建一个普通的 [SelectionMap].
+     *
+     * 该函数会根据 [session] 的具体状态, 选择性的调用 [empty] 并返回.
      */
     fun simple(session: RerollingSession): RerollingSession.SelectionMap {
         // 获取源物品
         // 如果源物品不存在, 则直接返回空容器
         val sourceItem = session.sourceItem ?: return empty(session)
+        val sourceItemId = sourceItem.key
 
         // 获取源物品的词条栏模板
         // 如果源物品没有词条栏*模板*, 则判定整个物品不支持重造
@@ -389,7 +393,7 @@ internal object SelectionMap : KoinComponent {
 
         // 获取源物品的重造规则
         // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
-        val itemRule = session.table.itemRuleMap[sourceItem.key] ?: return empty(session)
+        val itemRule = session.table.itemRuleMap[sourceItemId] ?: return empty(session)
 
         val selectionMap = Simple(session)
         for ((id, cell) in cells) {
@@ -411,7 +415,7 @@ internal object SelectionMap : KoinComponent {
                 it.hideAllFlags()
             }
 
-            val selection = Selection.simple(
+            val selection = Selection.changeable(
                 session = session,
                 id = id,
                 rule = cellRule,
@@ -437,6 +441,8 @@ internal object SelectionMap : KoinComponent {
             get() = emptySet()
         override val values: Collection<RerollingSession.Selection>
             get() = emptyList()
+        override val isEmpty: Boolean
+            get() = true
 
         override fun get(id: String): RerollingSession.Selection? = null
         override fun contains(id: String): Boolean = false
@@ -451,7 +457,7 @@ internal object SelectionMap : KoinComponent {
     private class Simple(
         override val session: RerollingSession,
     ) : RerollingSession.SelectionMap, KoinComponent {
-        private val map: HashMap<String, RerollingSession.Selection> = HashMap()
+        private val map: MutableMap<String, RerollingSession.Selection> = HashMap()
 
         override val size: Int
             get() = map.size
@@ -459,6 +465,8 @@ internal object SelectionMap : KoinComponent {
             get() = map.keys
         override val values: Collection<RerollingSession.Selection>
             get() = map.values
+        override val isEmpty: Boolean
+            get() = map.isEmpty()
 
         override fun get(id: String): RerollingSession.Selection? {
             return map[id]
