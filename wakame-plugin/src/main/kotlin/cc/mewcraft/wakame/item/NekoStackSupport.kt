@@ -226,8 +226,12 @@ private class CustomNekoStack(
             // 进行读写操作, 而没有调用 `minecraft:custom_data` 的 copyTag(),
             // 因此必须显式的对 NBT 进行拷贝, 否则会出现引用问题!
             val newHandle = handle.clone()
-            val nbtCopy = newHandle.wakameTag.copy()
-            newHandle.wakameTag = nbtCopy as CompoundTag
+            val wakameTag = newHandle.wakameTagOrNull?.copy()
+            if (wakameTag != null) {
+                // 由于存在 erase 函数可以直接抹除萌芽标签,
+                // 这里仅仅在萌芽标签存在的情况下才复制标签.
+                newHandle.wakameTag = wakameTag as CompoundTag
+            }
             return newHandle
         }
 
