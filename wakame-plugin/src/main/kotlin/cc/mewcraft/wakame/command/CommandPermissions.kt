@@ -15,4 +15,5 @@ object CommandPermissions {
     val REFORGE_REROLLING = Permission.of("wakame.command.reforge.rerolling")
     val RESOURCEPACK = Permission.of("wakame.command.resourcepack")
     val SKILL = Permission.of("wakame.command.skill")
+    val STATION = Permission.of("wakame.command.station")
 }

@@ -1,10 +1,12 @@
 package station
 
 import cc.mewcraft.wakame.core.ItemXBootstrap
-import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.station.SimpleStation
 import cc.mewcraft.wakame.station.StationRegistry
-import cc.mewcraft.wakame.station.recipe.*
+import cc.mewcraft.wakame.station.recipe.ExpChoice
+import cc.mewcraft.wakame.station.recipe.ItemChoice
+import cc.mewcraft.wakame.station.recipe.ItemResult
+import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
 import cc.mewcraft.wakame.util.Key
 import core.ItemXMock
 import kotlinx.coroutines.runBlocking
@@ -55,9 +57,9 @@ class StationSerializationTest : KoinTest {
     @Test
     fun `simple station serialization`() = runBlocking {
         StationRecipeRegistry.loadConfig() // 单元测试时跳过合成站配方的有效性验证
-        PluginEventBus.get().post(StationRecipeLoadEvent)
+        StationRegistry.loadConfig()
 
-        val key1 = Key("test_station:raw_bronze")
+        val key1 = Key("test:raw_bronze")
 
         val recipe1 = StationRecipeRegistry.raw[key1]
         assertNotNull(recipe1)
@@ -75,7 +77,7 @@ class StationSerializationTest : KoinTest {
         assertEquals(ItemResult(ItemXMock("wakame:material/raw_bronze"), 4), output1)
 
 
-        val key2 = Key("test_station:amethyst_dust")
+        val key2 = Key("test:amethyst_dust")
 
         val recipe2 = StationRecipeRegistry.raw[key2]
         assertNotNull(recipe2)

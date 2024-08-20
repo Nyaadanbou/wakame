@@ -42,17 +42,45 @@ layout:
       # <render_name>
       # <amount>
       item: "<render_name> <gray>*<amount></gray>"
-    # 可用占位符:
-    # - <result>
-    name: "<!i><gold>合成:</gold> <result>"
-    # 可用占位符:
-    # - <choices>
-    lore:
-      - "<!i><yellow>===================</yellow>"
-      - "<!i><gold>合成所需材料:</gold>"
-      - "<choices>"
-      - "<!i><yellow>===================</yellow>"
-      - "<!i><gold>左键点击</gold> <dark_gray>>></dark_gray> <gold>合成一次</gold>"
-      - "<!i><gold>右键点击</gold> <dark_gray>>></dark_gray> <gold>预览配方</gold>"
-      - "<!i><gold>潜行点击</gold> <dark_gray>>></dark_gray> <gold>合成全部</gold>"
-      - "<!i><yellow>===================</yellow>"
+    recipe:
+      # 可用占位符:
+      # - <result>
+      name: "<!i><gold>合成:</gold> <result>"
+      # 可用占位符:
+      # - <choices>
+      lore: >-
+        <!i><yellow>===================</yellow>
+        <!i><gold>合成所需材料:</gold>
+        <choices>
+        <!i><yellow>===================</yellow>
+        <!i><gold>左键单击</gold> <dark_gray>>></dark_gray> <gold>合成一次</gold>
+        <!i><gold>右键单击</gold> <dark_gray>>></dark_gray> <gold>预览配方</gold>
+        <!i><gold>潜行单击</gold> <dark_gray>>></dark_gray> <gold>合成八次</gold>
+        <!i><gold><key:key.drop>键丢出</gold> <dark_gray>>></dark_gray> <gold>合成全部</gold>
+        <!i><yellow>===================</yellow>
+
+preview_layout:
+  title: "<bold>合成预览</bold>"
+
+  # X: background
+  # I: input/choices
+  # O: output/result
+  # <: prev_page
+  # >: next_page
+  # C: craft
+  # B: back
+  structure:
+    - "X X X X X X X X X"
+    - "X I I I I X X X X"
+    - "X I I I I X X O X"
+    - "X I I I I X X X X"
+    - "X < X X > X X C X"
+    - "X X X X B X X X X"
+
+  # 直接写Wakame物品的命名空间路径
+  icons:
+    background: "menu:background"
+    prev_page: "menu:prev_page"
+    next_page: "menu:next_page"
+    craft: "menu:craft"
+    back: "menu:back"

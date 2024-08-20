@@ -12,6 +12,10 @@ class ItemXMock(
         uid.substringBefore(':'), uid.substringAfter(':')
     )
 
+    override fun isValid(): Boolean {
+        throw NotImplementedError()
+    }
+
     override fun createItemStack(): ItemStack? {
         throw NotImplementedError()
     }

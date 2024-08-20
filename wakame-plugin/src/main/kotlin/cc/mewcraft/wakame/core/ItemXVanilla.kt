@@ -11,6 +11,10 @@ class ItemXVanilla(
         const val DEFAULT_RENDER_NAME = "<white>UNKNOWN</white>"
     }
 
+    override fun isValid(): Boolean {
+        return true
+    }
+
     override fun createItemStack(): ItemStack? {
         val material = Material.matchMaterial(identifier, false) ?: return null
         return ItemStack(material)

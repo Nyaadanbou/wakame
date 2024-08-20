@@ -15,6 +15,11 @@ class ItemXNeko(
         const val DEFAULT_RENDER_NAME = "<white>UNKNOWN</white>"
     }
 
+    override fun isValid(): Boolean {
+        val key = Key.key(identifier.replaceFirst('/', ':'))
+        return ItemRegistry.CUSTOM.find(key) != null
+    }
+
     override fun createItemStack(): ItemStack? {
         val key = Key.key(identifier.replaceFirst('/', ':'))
         val nekoItem = ItemRegistry.CUSTOM.find(key)

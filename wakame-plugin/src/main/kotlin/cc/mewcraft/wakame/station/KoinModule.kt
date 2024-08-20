@@ -9,4 +9,5 @@ import org.koin.dsl.module
 
 internal fun stationModule(): Module = module {
     single { StationRecipeRegistry } bind Initializable::class
+    single { StationRegistry } bind Initializable::class
 }

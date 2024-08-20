@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.station.recipe.RecipeMatcherResult
 import cc.mewcraft.wakame.station.recipe.StationRecipe
-import cc.mewcraft.wakame.user.User
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.entity.Player
 
@@ -12,7 +11,7 @@ import org.bukkit.entity.Player
  */
 class StationSession(
     val station: Station,
-    val user: User<Player>,
+    val player: Player,
 ) : Iterable<RecipeMatcherResult> {
     private val recipeMatcherResults: Reference2ObjectOpenHashMap<StationRecipe, RecipeMatcherResult> = Reference2ObjectOpenHashMap()
 
@@ -21,7 +20,7 @@ class StationSession(
      */
     init {
         station.forEach {
-            recipeMatcherResults[it] = it.match(user.player)
+            recipeMatcherResults[it] = it.match(player)
         }
     }
 
@@ -31,7 +30,7 @@ class StationSession(
      */
     fun updateRecipeMatcherResults() {
         station.forEach {
-            val newResult = it.match(user.player)
+            val newResult = it.match(player)
             if (!newResult.isSame(recipeMatcherResults[it])) {
                 recipeMatcherResults[it] = newResult
             }

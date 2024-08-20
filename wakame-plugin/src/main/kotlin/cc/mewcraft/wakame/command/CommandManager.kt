@@ -34,5 +34,6 @@ class CommandManager(
         command(ReforgeCommands)
         command(ResourcepackCommands)
         command(SkillCommands)
+        command(StationCommands)
     }
 }

@@ -2,7 +2,10 @@ package cc.mewcraft.wakame.station.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.station.StationLayout
+import cc.mewcraft.wakame.core.ItemXNeko
+import cc.mewcraft.wakame.gui.MenuLayout
+import cc.mewcraft.wakame.item.setSystemUse
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.util.giveItemStack
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
@@ -32,14 +35,14 @@ sealed interface StationResult : Examinable {
 
     /**
      * 获取此 [StationResult] 的描述
-     * 使用MiniMessage格式
+     * 使用MiniMessage格式的字符串
      */
-    fun description(stationLayout: StationLayout): String
+    fun description(layout: MenuLayout): String
 
     /**
-     * 获取此 [StationResult] 的Gui物品
+     * 获取此 [StationResult] 的展示物品
      */
-    fun guiItemStack(): ItemStack
+    fun displayItemStack(): ItemStack
 
 }
 
@@ -57,22 +60,25 @@ data class ItemResult(
     }
 
     override fun isValid(): Boolean {
-        return item.createItemStack() != null
+        return item.isValid()
     }
 
-    override fun description(stationLayout: StationLayout): String {
-        // 缺省构建格式: "材料 *1"
-        return stationLayout.resultsLang["item"]
+    override fun description(layout: MenuLayout): String {
+        // 缺省构建格式: "材料 ×1"
+        return layout.getLang("results.item")
             ?.replace("<render_name>", item.renderName())
             ?.replace("<amount>", amount.toString())
-            ?: "${item.renderName()} <white>×$amount</white>"
+            ?: "${item.renderName()} ×$amount"
     }
 
-    override fun guiItemStack(): ItemStack {
-        // TODO 使用gui物品
-        val itemStack = item.createItemStack() ?: ItemStack(Material.BARRIER)
-        itemStack.amount = amount
-        return itemStack
+    override fun displayItemStack(): ItemStack {
+        // TODO gui物品
+        val displayItemStack = item.createItemStack() ?: ItemStack(Material.BARRIER)
+        if (item is ItemXNeko) {
+            displayItemStack.tryNekoStack?.setSystemUse()
+        }
+        displayItemStack.amount = amount
+        return displayItemStack
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
