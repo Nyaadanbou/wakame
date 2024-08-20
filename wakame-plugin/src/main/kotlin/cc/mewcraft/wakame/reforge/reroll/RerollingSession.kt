@@ -167,6 +167,11 @@ interface RerollingSession : Examinable {
         val total: MochaFunction
 
         /**
+         * 词条栏是否可以被重造.
+         */
+        val changeable: Boolean
+
+        /**
          * 记录了该词条栏是否被选择重造.
          *
          * `true` 表示该词条栏应该被重造.
@@ -200,6 +205,7 @@ interface RerollingSession : Examinable {
         val size: Int
         val keys: Set<String>
         val values: Collection<Selection>
+        val isEmpty: Boolean
 
         operator fun get(id: String): Selection?
         operator fun contains(id: String): Boolean
