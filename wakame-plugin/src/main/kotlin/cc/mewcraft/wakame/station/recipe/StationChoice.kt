@@ -2,11 +2,16 @@ package cc.mewcraft.wakame.station.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.station.StationLayout
+import cc.mewcraft.wakame.core.ItemXNeko
+import cc.mewcraft.wakame.gui.MenuLayout
+import cc.mewcraft.wakame.item.setSystemUse
+import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -32,16 +37,21 @@ sealed interface StationChoice : Examinable {
     fun consume(contextMap: ChoiceConsumerContextMap)
 
     /**
-     * 获取此 [StationChoice] 的描述
-     * 使用MiniMessage格式
-     */
-    fun description(stationLayout: StationLayout): String
-
-    /**
      * 该 [StationChoice] 是否有效
      * 用于延迟验证配方是否能够注册
      */
     fun isValid(): Boolean
+
+    /**
+     * 获取此 [StationChoice] 的描述
+     * 使用MiniMessage格式的字符串
+     */
+    fun description(layout: MenuLayout): String
+
+    /**
+     * 获取此 [StationChoice] 的展示物品
+     */
+    fun displayItemStack(): ItemStack
 }
 
 
@@ -83,16 +93,26 @@ internal data class ItemChoice(
         context.add(item, amount)
     }
 
-    override fun description(stationLayout: StationLayout): String {
-        // 缺省构建格式: "材料 *1"
-        return stationLayout.choicesLang["item"]
-            ?.replace("<render_name>", item.renderName())
-            ?.replace("<amount>", amount.toString())
-            ?: "${item.renderName()} <white>×$amount</white>"
+    override fun isValid(): Boolean {
+        return item.isValid()
     }
 
-    override fun isValid(): Boolean {
-        return item.createItemStack() != null
+    override fun description(layout: MenuLayout): String {
+        // 缺省构建格式: "<prefix> 材料 ×1"
+        return layout.getLang("choices.item")
+            ?.replace("<render_name>", item.renderName())
+            ?.replace("<amount>", amount.toString())
+            ?: "<prefix> ${item.renderName()} ×$amount"
+    }
+
+    override fun displayItemStack(): ItemStack {
+        // TODO gui物品
+        val displayItemStack = item.createItemStack() ?: ItemStack(Material.BARRIER)
+        if (item is ItemXNeko) {
+            displayItemStack.tryNekoStack?.setSystemUse()
+        }
+        displayItemStack.amount = amount
+        return displayItemStack
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -128,15 +148,19 @@ internal data class ExpChoice(
         context.add(amount)
     }
 
-    override fun description(stationLayout: StationLayout): String {
-        // 缺省构建格式: "EXP *1"
-        return stationLayout.choicesLang["exp"]
-            ?.replace("<amount>", amount.toString())
-            ?: "EXP <white>×$amount</white>"
-    }
-
     override fun isValid(): Boolean {
         return true
+    }
+
+    override fun description(layout: MenuLayout): String {
+        // 缺省构建格式: "<prefix> EXP ×1"
+        return layout.getLang("choices.exp")
+            ?.replace("<amount>", amount.toString())
+            ?: "<prefix> EXP ×$amount"
+    }
+
+    override fun displayItemStack(): ItemStack {
+        return ItemStack(Material.EXPERIENCE_BOTTLE)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

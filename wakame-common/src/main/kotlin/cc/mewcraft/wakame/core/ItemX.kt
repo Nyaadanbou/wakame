@@ -43,6 +43,12 @@ sealed interface ItemX : Keyed, Examinable {
     }
 
     /**
+     * 该物品是否有效.
+     * 即该物品是否保证可以正常创建出 [ItemStack]
+     */
+    fun isValid(): Boolean
+
+    /**
      * 创建一个 [ItemStack].
      */
     fun createItemStack(): ItemStack?

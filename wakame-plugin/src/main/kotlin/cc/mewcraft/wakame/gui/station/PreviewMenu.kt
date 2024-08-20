@@ -4,9 +4,6 @@ import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.item.setSystemUse
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.station.Station
-import cc.mewcraft.wakame.station.StationSession
-import cc.mewcraft.wakame.station.recipe.RecipeMatcherResult
 import cc.mewcraft.wakame.station.recipe.StationRecipe
 import cc.mewcraft.wakame.util.hideTooltip
 import net.kyori.adventure.text.Component
@@ -28,88 +25,75 @@ import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 
-class StationMenu(
+/**
+ * 合成站配方预览的菜单
+ * 这个菜单是"静态"的
+ * 即不涉及物品和标题的变化
+ */
+class PreviewMenu(
     /**
-     * 该菜单所依赖的合成站.
+     * 该菜单所预览的配方.
      */
-    val station: Station,
+    val recipe: StationRecipe,
 
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
+
+    /**
+     * 该菜单的上级菜单.
+     */
+    val previousStationMenu: StationMenu
 ) : KoinComponent {
     private val logger: Logger by inject()
 
     /**
      * 该菜单的布局
      */
-    private val layout: MenuLayout = station.layout
+    private val layout: MenuLayout = previousStationMenu.station.previewLayout
 
     /**
-     * 合成站的会话.
-     * 玩家打开合成站便创建.
-     * [StationSession] 类创建时会自动初始化, 无需额外手动刷新.
-     */
-    val stationSession = StationSession(station, viewer)
-
-
-
-    /**
-     * 合成站菜单的 [Gui].
+     * 合成站配方预览菜单的 [Gui].
      * 'X': background
-     * '.': recipe
+     * 'I': input/choices
+     * 'O': output/result
      * '<': prev_page
      * '>': next_page
+     * 'C': craft
+     * 'B': back
      */
-    private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
+    private val previewGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*layout.structure.toTypedArray())
         builder.addIngredient('X', BackgroundItem(layout))
         builder.addIngredient('<', PrevItem(layout))
         builder.addIngredient('>', NextItem(layout))
-        builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_VERTICAL)
+        builder.addIngredient('C', CraftItem(this, recipe))
+        builder.addIngredient('B', BackItem(this))
+        builder.addIngredient('I', Markers.CONTENT_LIST_SLOT_VERTICAL)
+        builder.addIngredient('O', SimpleItem(recipe.output.displayItemStack()))
+        builder.setContent(recipe.input.map { SimpleItem(it.displayItemStack()) })
     }
 
     /**
-     * 合成站菜单的 [Window].
+     * 合成站配方预览的 [Window].
      */
-    private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
-        setGui(primaryGui)
+    private val previewWindow: Window.Builder.Normal.Single = Window.single().apply {
+        setGui(previewGui)
+        setTitle(layout.title)
     }
 
     /**
-     * 刷新Gui.
-     * 根据 [StationSession] 的内容刷新展示配方的物品以及标题.
-     */
-    fun update() {
-        // 排序已在 StationSession 的迭代器中实现
-        val recipeItems = stationSession.map {
-            RecipeItem(this, it)
-        }
-        primaryGui.setContent(recipeItems)
-        val title = layout.title
-        //TODO slot背景颜色红绿显示
-        primaryWindow.setTitle(title)
-    }
-
-    /**
-     * 向指定玩家打开合成站的主界面.
+     * 向指定玩家打开该合成站配方预览菜单.
      */
     fun open() {
-        primaryWindow.open(viewer)
+        previewWindow.open(viewer)
     }
-
-    /**
-     * 初始化时刷新一次.
-     */
-    init {
-        update()
-    }
-
 
     /**
      * 背景占位的图标 [Item].
@@ -166,45 +150,60 @@ class StationMenu(
     }
 
     /**
-     * 展示一个配方的图标 [Item].
+     * 返回的图标 [Item].
      */
-    class RecipeItem(
-        private val stationMenu: StationMenu,
-        private val recipeMatcherResult: RecipeMatcherResult
-    ) : AbstractCraftItem() {
+    class BackItem(
+        private val previewMenu: PreviewMenu
+    ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            return ItemWrapper(recipeMatcherResult.displayItemStack(stationMenu.layout))
+            //TODO gui物品
+            val layout = previewMenu.layout
+            val key = layout.getIcon("back")
+            val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
+            nekoStack ?: return ItemBuilder(Material.BARRIER)
+                .setDisplayName(Component.text("返回").color(NamedTextColor.AQUA))
+            nekoStack.setSystemUse()
+            return ItemWrapper(nekoStack.itemStack)
         }
 
-        private fun updateMenu() {
-            // 刷新会话中的配方匹配结果
-            stationMenu.stationSession.updateRecipeMatcherResults()
-            // 刷新菜单Gui
-            stationMenu.update()
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            val previousStationMenu = previewMenu.previousStationMenu
+            previousStationMenu.stationSession.updateRecipeMatcherResults()
+            previousStationMenu.update()
+        }
+    }
+
+    /**
+     * 触发点击合成的图标 [Item].
+     */
+    class CraftItem(
+        private val previewMenu: PreviewMenu,
+        private var stationRecipe: StationRecipe
+    ) : AbstractCraftItem() {
+        override fun getItemProvider(): ItemProvider {
+            //TODO gui物品
+            val layout = previewMenu.layout
+            val key = layout.getIcon("craft")
+            val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
+            nekoStack ?: return ItemBuilder(Material.CRAFTING_TABLE)
+                .setDisplayName(Component.text("合成").color(NamedTextColor.YELLOW))
+            nekoStack.setSystemUse()
+            return ItemWrapper(nekoStack.itemStack)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             when (clickType) {
                 // 左键合成
-                ClickType.LEFT -> {
-                    val stationRecipe = recipeMatcherResult.recipe
+                ClickType.LEFT, ClickType.RIGHT -> {
                     if (stationRecipe.match(player).canCraft) {
                         tryCraft(stationRecipe, player)
                     } else {
                         notifyFail(player)
                     }
-
-                    updateMenu()
-                }
-
-                // 右键预览
-                ClickType.RIGHT -> {
-                    PreviewMenu(recipeMatcherResult.recipe, player, stationMenu).open()
                 }
 
                 // 潜行合成8次
                 ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> {
-                    val stationRecipe = recipeMatcherResult.recipe
                     var count = 0
                     if (stationRecipe.match(player).canCraft) {
                         do {
@@ -214,13 +213,10 @@ class StationMenu(
                     } else {
                         notifyFail(player)
                     }
-
-                    updateMenu()
                 }
 
                 // 丢弃一键合成全部
                 ClickType.DROP, ClickType.CONTROL_DROP -> {
-                    val stationRecipe = recipeMatcherResult.recipe
                     if (stationRecipe.match(player).canCraft) {
                         do {
                             tryCraft(stationRecipe, player)
@@ -228,8 +224,6 @@ class StationMenu(
                     } else {
                         notifyFail(player)
                     }
-
-                    updateMenu()
                 }
 
                 else -> {
@@ -239,32 +233,4 @@ class StationMenu(
         }
 
     }
-}
-
-/**
- * 封装了合成逻辑的一个抽象 [Item].
- */
-abstract class AbstractCraftItem : AbstractItem() {
-    fun tryCraft(stationRecipe: StationRecipe, player: Player) {
-        // 无法正常执行消耗就抛出异常中断代码执行
-        // 不给玩家执行合成的结果
-        try {
-            stationRecipe.consume(player)
-            stationRecipe.output.apply(player)
-        } catch (e: RuntimeException) {
-            player.sendMessage(
-                Component.text("发生了一个内部错误，请汇报给管理员!")
-                    .color(NamedTextColor.RED)
-            )
-            e.printStackTrace()
-        }
-    }
-
-    fun notifyFail(player: Player) {
-        player.sendMessage(
-            Component.text("你没有足够的材料来合成这个物品!")
-                .color(NamedTextColor.RED)
-        )
-    }
-
 }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.station.recipe
 
-import cc.mewcraft.wakame.station.StationLayout
+import cc.mewcraft.wakame.gui.MenuLayout
 import it.unimi.dsi.fastutil.objects.Reference2BooleanArrayMap
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
@@ -49,21 +49,28 @@ data class RecipeMatcherResult(
 
     /**
      * 获取展示该配方的Gui物品的name
+     * 使用 [Component] 格式
      */
-    private fun name(stationLayout: StationLayout): Component {
-        return stationLayout.recipeNameLang.replace("<result>", recipe.output.description(stationLayout)).mini
+    fun recipeItemName(layout: MenuLayout): Component {
+        // 缺省构建格式: "合成: <result>"
+        return (layout.getLang("recipe.name") ?: "合成: <result>")
+            .replace("<result>", recipe.output.description(layout)).mini
     }
 
     /**
      * 获取展示该配方的Gui物品的lore
+     * 使用 [Component] 格式
      */
-    private fun lore(stationLayout: StationLayout): List<Component> {
+    fun recipeItemLore(layout: MenuLayout): List<Component> {
+        val sufficientPrefix = layout.getLang("prefix.sufficient") ?: "✔"
+        val insufficientPrefix = layout.getLang("prefix.insufficient") ?: "✖"
         val choices = choiceCheckerFlags.map {
-            val prefix = if (it.value) stationLayout.sufficientPrefixLang else stationLayout.insufficientPrefixLang
+            val prefix = if (it.value) sufficientPrefix else insufficientPrefix
             val choice = it.key
-            choice.description(stationLayout).replace("<prefix>", prefix)
+            choice.description(layout).replace("<prefix>", prefix)
         }
-        return stationLayout.recipeLoreLang
+        val loreStrings = (layout.getLang("recipe.lore") ?: "合成所需材料:\n<choices>").split('\n')
+        return loreStrings
             .flatMap { if (it == "<choices>") choices else listOf(it) }
             .map { it.mini }
     }
@@ -71,11 +78,12 @@ data class RecipeMatcherResult(
     /**
      * 获取展示该配方的Gui物品
      */
-    fun guiItemStack(stationLayout: StationLayout): ItemStack {
-        val itemStack = recipe.output.guiItemStack()
+    fun displayItemStack(layout: MenuLayout): ItemStack {
+        // TODO gui物品
+        val itemStack = recipe.output.displayItemStack()
         itemStack.editMeta {
-            it.itemName(name(stationLayout))
-            it.lore(lore(stationLayout))
+            it.itemName(recipeItemName(layout))
+            it.lore(recipeItemLore(layout))
         }
         return itemStack
     }

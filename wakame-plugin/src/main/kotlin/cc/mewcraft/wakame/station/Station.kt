@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.station.recipe.StationRecipe
 import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
 import cc.mewcraft.wakame.util.RunningEnvironment
@@ -21,7 +22,8 @@ import java.lang.reflect.Type
  */
 sealed interface Station : Iterable<StationRecipe> {
     val id: String
-    val layout: StationLayout
+    val layout: MenuLayout
+    val previewLayout: MenuLayout
     fun addRecipe(recipe: StationRecipe): Boolean
     fun removeRecipe(key: Key): StationRecipe?
 
@@ -32,10 +34,13 @@ sealed interface Station : Iterable<StationRecipe> {
  */
 class SimpleStation(
     override val id: String,
-    override val layout: StationLayout
+    override val layout: MenuLayout,
+    override val previewLayout: MenuLayout
 ) : Station, KoinComponent {
     companion object {
         const val TYPE = "simple"
+        val STATION_STRUCTURE_LEGAL_CHARS = charArrayOf('X', '.', '<', '>')
+        val PREVIEW_STRUCTURE_LEGAL_CHARS = charArrayOf('X', 'I', 'O', 'C', 'B', '<', '>')
     }
 
     val logger: Logger by inject()
@@ -73,12 +78,29 @@ internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
         val stationType = node.node("type").krequire<String>()
         when (stationType) {
             SimpleStation.TYPE -> {
-                // 获取合成站布局
-                val stationLayout = node.node("layout").krequire<StationLayout>().apply {
-                    require(this.isSimple) {"Simple station should use 0~5 in structure"}
+                // 获取合成站菜单布局
+                val stationLayout = node.node("layout").krequire<MenuLayout>().apply {
+                    val illegalChars = this.structure.map { it.toCharArray() }
+                        .reduce { acc, chars -> acc + chars }
+                        .distinct()
+                        .filter { !SimpleStation.STATION_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
+                    if (illegalChars.isNotEmpty()) {
+                        throw SerializationException("The chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station menu structure")
+                    }
                 }
 
-                val station = SimpleStation(id, stationLayout)
+                // 获取合成站预览菜单布局
+                val previewLayout = node.node("preview_layout").krequire<MenuLayout>().apply {
+                    val illegalChars = this.structure.map { it.toCharArray() }
+                        .reduce { acc, chars -> acc + chars }
+                        .distinct()
+                        .filter { !SimpleStation.PREVIEW_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
+                    if (illegalChars.isNotEmpty()) {
+                        throw SerializationException("The chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station preview menu structure")
+                    }
+                }
+
+                val station = SimpleStation(id, stationLayout, previewLayout)
 
                 // 向合成站添加配方
                 val recipeKeys = node.node("recipes").getList<Key>(emptyList())

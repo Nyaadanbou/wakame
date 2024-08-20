@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.station
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
+import cc.mewcraft.wakame.gui.MenuLayoutSerializer
+import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.station.recipe.StationRecipeLoadEvent
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.kregister
@@ -16,9 +18,15 @@ import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
 
-object StationRegistry : KoinComponent {
+object StationRegistry : Initializable, KoinComponent {
     private const val STATION_DIR_NAME = "station/stations"
     private val stations: MutableMap<String, Station> = mutableMapOf()
+
+    /**
+     * 获取所有合成站的唯一标识.
+     */
+    val NAMES: Set<String>
+        get() = stations.keys
 
     fun find(id: String): Station? {
         return stations[id]
@@ -40,6 +48,7 @@ object StationRegistry : KoinComponent {
                     withDefaults()
                     serializers {
                         kregister(StationSerializer)
+                        kregister(MenuLayoutSerializer)
                     }
                 }.buildAndLoadString(fileText)
 
@@ -59,9 +68,7 @@ object StationRegistry : KoinComponent {
         }
     }
 
-    init {
-        PluginEventBus.get().subscribe<StationRecipeLoadEvent> {
-            loadConfig()
-        }
+    override suspend fun onPostWorldAsync() {
+        PluginEventBus.get().subscribe<StationRecipeLoadEvent> { loadConfig() }
     }
 }
