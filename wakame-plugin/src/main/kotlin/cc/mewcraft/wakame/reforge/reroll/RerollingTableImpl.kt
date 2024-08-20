@@ -67,7 +67,7 @@ internal class SimpleRerollingTable(
         ExaminableProperty.of("enabled", enabled),
         ExaminableProperty.of("title", title),
         ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
-        ExaminableProperty.of("currencyCost", this@SimpleRerollingTable.currencyCost),
+        ExaminableProperty.of("currencyCost", currencyCost),
         ExaminableProperty.of("itemRuleMap", itemRuleMap),
     )
 

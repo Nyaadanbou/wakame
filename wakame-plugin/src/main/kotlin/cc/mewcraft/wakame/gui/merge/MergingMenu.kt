@@ -176,6 +176,12 @@ internal class MergingMenu(
 
                 val result = session.latestResult
                 if (result.successful) {
+
+                    // 玩家必须有足够的资源
+                    if (!result.cost.test(viewer)) {
+                        return
+                    }
+
                     // 把合并后的物品递给玩家
                     val handle = result.item.unsafe.handle
                     viewer.inventory.addItem(handle)
@@ -187,8 +193,6 @@ internal class MergingMenu(
 
                     // 重置会话状态
                     session.reset()
-                } else {
-                    viewer.sendPlainMessage("合并失败!")
                 }
             }
         }

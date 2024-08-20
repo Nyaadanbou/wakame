@@ -157,24 +157,15 @@ interface MergingTable : Examinable {
      */
     interface CurrencyCost : Examinable {
         /**
-         * 基础花费.
-         *
-         * 具体用途取决于具体的实现!
-         */
-        val base: Double
-
-        /**
          * 总花费的自定义函数.
          */
-        val totalFunction: TotalFunction
+        val total: TotalFunction
 
         /**
          * 封装了用于计算合并总花费的自定义函数.
          *
          * 函数的上下文:
          * ```
-         * query.base()
-         *   基础花费
          * query.level_1()
          *   第一个物品的等级
          * query.level_2()
@@ -190,11 +181,6 @@ interface MergingTable : Examinable {
          * ```
          */
         interface TotalFunction : Examinable {
-            /**
-             * 源代码.
-             */
-            val code: String
-
             /**
              * 编译自定义函数.
              */

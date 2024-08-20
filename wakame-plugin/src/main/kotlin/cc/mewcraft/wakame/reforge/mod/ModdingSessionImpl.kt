@@ -505,7 +505,7 @@ internal class SimpleModdingSession(
 
                 // 获取耗材中的便携核心
                 val portableCore = ingredient.components.get(ItemComponentTypes.PORTABLE_CORE) ?: run {
-                    return ReplaceResult.failure(ingredient, "<gray>这个物品没有便携核心".mini)
+                    return ReplaceResult.failure(ingredient, "<gray>这个物品不是便携核心".mini)
                 }
 
                 // 获取源物品上的词条栏

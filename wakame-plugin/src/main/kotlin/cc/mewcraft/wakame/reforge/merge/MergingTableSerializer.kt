@@ -68,7 +68,6 @@ internal object MergingTableSerializer : KoinComponent {
             withDefaults()
             serializers {
                 kregister(CurrencyCost)
-                kregister(CurrencyCost.TotalFunction)
                 kregister(NumberMergeFunction)
                 kregister(OutputLevelFunction)
                 kregister(OutputPenaltyFunction)
@@ -113,16 +112,9 @@ internal object MergingTableSerializer : KoinComponent {
 
     private object CurrencyCost : TypeSerializer<MergingTable.CurrencyCost> {
         override fun deserialize(type: Type, node: ConfigurationNode): MergingTable.CurrencyCost {
-            val base = node.node("base").double
-            val total = node.node("total").krequire<MergingTable.CurrencyCost.TotalFunction>()
-            return SimpleMergingTable.CurrencyCost(base, total)
-        }
-
-        object TotalFunction : TypeSerializer<MergingTable.CurrencyCost.TotalFunction> {
-            override fun deserialize(type: Type, node: ConfigurationNode): MergingTable.CurrencyCost.TotalFunction {
-                val code = node.string ?: "0.0"
-                return SimpleMergingTable.CurrencyCost.TotalFunction(code)
-            }
+            val code = node.string ?: "0.0"
+            val function = SimpleMergingTable.CurrencyCost.TotalFunction(code)
+            return SimpleMergingTable.CurrencyCost(function)
         }
     }
 

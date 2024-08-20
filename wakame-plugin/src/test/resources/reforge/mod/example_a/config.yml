@@ -2,7 +2,7 @@
 enabled: true
 
 # 定制工作台的容器GUI的标题
-title: "<b>定制工作台: Example A"
+title: "定制工作台: Example A"
 
 # 稀有度->数值的映射表.
 # 可用于所有的自定义函数.
@@ -16,7 +16,7 @@ rarity_number_mapping:
 # 在这里设置完成定制操作所需要消耗的货币资源.
 # 如果玩家没有足够的货币资源, 合并将算作失败.
 #
-# 计算函数, 用于计算完成整个物品定制的总花费
+# 计算函数, 用于计算完成整个物品定制的总花费.
 #
 # 可用参数:
 #
@@ -33,7 +33,7 @@ rarity_number_mapping:
 # query.source_item_changed_cell_cost()
 #   被定制物品上参与了定制的词条栏的总花费
 #
-currency_cost: |
-  200 * query.source_item_rarity()
-  + 100 * query.source_item_changed_cell_count() 
+currency_cost: >-
+  200.0 * query.source_item_rarity()
+  + 100.0 * query.source_item_changed_cell_count()
   + query.source_item_changed_cell_cost()

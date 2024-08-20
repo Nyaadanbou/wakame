@@ -1,5 +1,6 @@
-# 重造工作台是否启用
+# 重造工作台是否启用?
 enabled: true
+
 # 重造工作台的菜单标题
 title: "重造工作台: Example A"
 
@@ -36,7 +37,7 @@ rarity_number_mapping:
 #   'selected' = 被选中要重造的词条栏
 #   'unselected' = 未被选中要重造的词条栏
 #
-currency_cost: |
-  10 * query.source_level()
+currency_cost: >-
+  10.0 * query.source_level()
   + query.source_rarity() * query.sum_of_cost('unselected')
-  + 100 * ( query.count_cell('all') - query.count_cell('selected') )
+  + 100.0 * ( query.count_cell('all') - query.count_cell('selected') )
