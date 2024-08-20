@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.WAKAME_TAG_NAME
-import cc.mewcraft.wakame.util.wakameTag
+import cc.mewcraft.wakame.util.wakameTagOrNull
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore
 import com.github.retrooper.packetevents.resources.ResourceLocation
@@ -147,8 +147,14 @@ private class PacketCustomNekoStack(
 ) : PacketNekoStack {
     // 开发日记:
     // 由于 ItemComponentMap 对 BukkitStack 有直接依赖, 我们需要转换一个
-    val handle: BukkitStack =
-        SpigotConversionUtil.toBukkitItemStack(handle0)
+    val handle: BukkitStack = SpigotConversionUtil.toBukkitItemStack(handle0)
+
+    // 开发日记1: We use property initializer here as it would be called multiple times,
+    // and we don't want to do the unnecessary NBT conversion again and again
+    // 开发日记2: 该 NBT 标签应该只接受读操作 (虽然可以写, 但不保证生效, 也没啥用应该)
+    val nbt: CompoundTag = requireNotNull(handle.wakameTagOrNull) {
+        "PacketCustomNekoStack should have a wakame tag"
+    }
 
     override val isEmpty: Boolean
         get() = false
@@ -162,12 +168,6 @@ private class PacketCustomNekoStack(
             ?.getCompoundTagOrNull(WAKAME_TAG_NAME)
             ?.getCompoundTagOrNull(ItemComponentMap.TAG_COMPONENTS)
             ?.getTagOrNull(ItemComponentTypes.SYSTEM_USE.id) == null
-
-    // 开发日记1: We use property initializer here as it would be called multiple times,
-    // and we don't want to do the unnecessary NBT conversion again and again
-    // 开发日记2: 该 NBT 标签应该只接受读操作 (虽然可以写, 但不保证生效, 也没啥用应该)
-    val nbt: CompoundTag =
-        handle.wakameTag
 
     override val namespace: String
         get() = NekoStackSupport.getNamespaceOrThrow(nbt)
@@ -219,7 +219,7 @@ private class PacketCustomNekoStack(
     class Unsafe(val nekoStack: PacketCustomNekoStack) : NekoStack.Unsafe {
         override val nbt: CompoundTag
             get() = nekoStack.nbt
-        override val handle: org.bukkit.inventory.ItemStack
+        override val handle: BukkitStack
             get() = nekoStack.handle
     }
 }
