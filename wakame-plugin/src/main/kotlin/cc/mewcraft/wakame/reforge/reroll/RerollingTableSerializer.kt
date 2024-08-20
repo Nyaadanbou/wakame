@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.util.NamespacedPathCollector
-import cc.mewcraft.wakame.util.compileFunc
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
@@ -17,7 +16,6 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
-import team.unnamed.mocha.MochaEngine
 import java.io.File
 import java.lang.reflect.Type
 
@@ -78,7 +76,7 @@ internal object RerollingTableSerializer : KoinComponent {
         val tableMainConfigNode = yamlConfig {
             withDefaults()
             serializers {
-                kregister(CurrencyCost)
+                kregister(TableCurrencyCostSerializer)
                 kregister(RarityNumberMappingSerializer)
             }
         }.buildAndLoadString(tableMainConfigFile.readText())
@@ -88,7 +86,7 @@ internal object RerollingTableSerializer : KoinComponent {
         val enabled = tableMainConfigNode.node("enabled").getBoolean(false)
         val title = tableMainConfigNode.node("title").krequire<Component>()
         val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").krequire<RarityNumberMapping>()
-        val currencyCost = tableMainConfigNode.node("currency_cost").krequire<RerollingTable.CurrencyCost>()
+        val currencyCost = tableMainConfigNode.node("currency_cost").krequire<RerollingTable.TableCurrencyCost>()
 
         // 反序列化好的 items/
         val itemRules = NamespacedPathCollector(tableItemsDirectory, true)
@@ -100,7 +98,8 @@ internal object RerollingTableSerializer : KoinComponent {
                     val itemRuleNode = yamlConfig {
                         withDefaults()
                         serializers {
-                            kregister(CellRule)
+                            kregister(CellRuleSerializer)
+                            kregister(CellCurrencyCostSerializer)
                         }
                     }.buildAndLoadString(text)
 
@@ -109,7 +108,7 @@ internal object RerollingTableSerializer : KoinComponent {
                     // ...
 
                     SimpleRerollingTable.ItemRule(
-                        cellRules = SimpleRerollingTable.CellRuleMap(cellRules)
+                        cellRuleMap = SimpleRerollingTable.CellRuleMap(cellRules)
                     )
                 }
 
@@ -124,38 +123,34 @@ internal object RerollingTableSerializer : KoinComponent {
             title = title,
             rarityNumberMapping = rarityNumberMapping,
             currencyCost = currencyCost,
-            itemRules = itemRules
+            itemRuleMap = itemRules
         )
     }
 
-    private object CurrencyCost : TypeSerializer<RerollingTable.CurrencyCost> {
-        override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CurrencyCost {
-            // 常量
-            val base = node.node("base_cost").double
-
-            // 函数
-            val mocha = MochaEngine.createStandard()
-            val eachFunctionCode = node.node("each_function").krequire<String>()
-            val eachFunction = mocha.compileFunc<RerollingTable.CurrencyCost.EachFunction>(eachFunctionCode)
-            val totalFunctionCode = node.node("total_function").krequire<String>()
-            val totalFunction = mocha.compileFunc<RerollingTable.CurrencyCost.TotalFunction>(totalFunctionCode)
-
-            return SimpleRerollingTable.CurrencyCost(
-                base = base,
-                eachFunction = eachFunction,
-                totalFunction = totalFunction
-            )
+    private object TableCurrencyCostSerializer : TypeSerializer<RerollingTable.TableCurrencyCost> {
+        override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.TableCurrencyCost {
+            val code = node.krequire<String>()
+            val ret = SimpleRerollingTable.TableCurrencyCost(code)
+            return ret
         }
     }
 
-    private object CellRule : TypeSerializer<RerollingTable.CellRule> {
+    private object CellCurrencyCostSerializer : TypeSerializer<RerollingTable.CellCurrencyCost> {
+        override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellCurrencyCost {
+            val code = node.krequire<String>()
+            val ret = SimpleRerollingTable.CellCurrencyCost(code)
+            return ret
+        }
+    }
+
+    private object CellRuleSerializer : TypeSerializer<RerollingTable.CellRule> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellRule {
-            val cost = node.node("cost").double
             val maxReroll = node.node("max_reroll").int
+            val currencyCost = node.node("currency_cost").krequire<RerollingTable.CellCurrencyCost>()
 
             return SimpleRerollingTable.CellRule(
-                cost = cost,
-                maxReroll = maxReroll
+                maxReroll = maxReroll,
+                currencyCost = currencyCost
             )
         }
     }

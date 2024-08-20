@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.common.TemporaryIcons
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.util.hideAllFlags
 import net.kyori.adventure.text.Component
@@ -11,9 +10,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
@@ -23,9 +19,13 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
  * 重造台中用于选择*单个*词条栏的子菜单, 将被嵌入进 [RerollingMenu] 中.
  */
 internal class SelectionMenu(
-    val parentMenu: RerollingMenu,
+    val parent: RerollingMenu,
     val selection: RerollingSession.Selection,
-) : KoinComponent {
+) {
+
+    companion object {
+        private const val PREFIX = ReforgeLoggerPrefix.REROLL
+    }
 
     val primaryGui: Gui = Gui.normal { builder ->
         builder.setStructure(
@@ -36,17 +36,12 @@ internal class SelectionMenu(
         builder.addIngredient('b', SelectionItem())
     }
 
-    private val logger: Logger by inject()
-
-    companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.REROLL
-    }
-
+    /**
+     * 用于给玩家展示词条栏的样子.
+     */
     private inner class IndicatorItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val stack = ItemStack(TemporaryIcons.get(selection.hashCode())).hideAllFlags()
-            selection.display.apply(stack)
-            return ItemWrapper(stack)
+            return ItemWrapper(selection.display)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -54,10 +49,14 @@ internal class SelectionMenu(
         }
     }
 
+    /**
+     * 用于给玩家选择是否重造词条栏.
+     */
     private inner class SelectionItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
             val mat: Material
             val name: Component
+
             if (selection.selected) {
                 mat = Material.PINK_DYE
                 name = text("将被重造")
@@ -67,27 +66,21 @@ internal class SelectionMenu(
             }
 
             val stack = ItemStack(mat).hideAllFlags()
-            stack.editMeta { meta -> meta.itemName(name) }
+            stack.editMeta { it.itemName(name) }
 
             return ItemWrapper(stack)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            if (parentMenu.rerollingSession == null) {
-                logger.error("$PREFIX Trying to select without a session. This is a bug!")
-                return
-            }
-
-            selection.invert()
-
-            if (selection.selected) {
-                parentMenu.viewer.sendPlainMessage("词条栏 ${selection.id} 将被重造.")
+            if (selection.invert()) {
+                parent.viewer.sendPlainMessage("词条栏 ${selection.id} 将被重造.")
             } else {
-                parentMenu.viewer.sendPlainMessage("词条栏 ${selection.id} 保持不变.")
+                parent.viewer.sendPlainMessage("词条栏 ${selection.id} 保持不变.")
             }
 
-            // 重新渲染主菜单的输出物品
-            parentMenu.refreshOutput()
+            // 执行一次重造, 并更新主菜单
+            parent.executeReforge()
+            parent.updateOutput()
 
             notifyWindows()
         }
