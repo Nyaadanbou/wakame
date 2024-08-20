@@ -46,7 +46,7 @@ internal object RarityNumberMappingSerializer : TypeSerializer<RarityNumberMappi
         node: ConfigurationNode,
     ): RarityNumberMapping {
         val map = node.childrenMap()
-            .mapKeys { Key.key(Namespaces.ELEMENT, it.key.toString()) }
+            .mapKeys { Key.key(Namespaces.RARITY, it.key.toString()) }
             .mapValues { it.value.double }
         val ret = SimpleRarityNumberMapping(map)
 
