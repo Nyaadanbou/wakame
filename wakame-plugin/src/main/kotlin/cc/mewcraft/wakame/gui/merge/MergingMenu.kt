@@ -37,11 +37,18 @@ internal class MergingMenu(
     }
 
     /**
-     * 根据当前 [mergingSession] 的状态, 进行一次合并操作, 并刷新输出容器里的物品.
+     * 基于当前 [session] 的状态, 执行一次合并操作.
      */
-    fun refreshOutput() {
-        // 进行一次合并操作
-        val result = mergingSession.executeReforge()
+    fun executeReforge() {
+        session.executeReforge()
+    }
+
+    /**
+     * 根据当前 [session] 的状态, 刷新输出容器里的物品.
+     */
+    fun updateOutput() {
+        // 获取最新的合并结果
+        val result = session.latestResult
         // 根据合并的结果, 渲染输出容器里的物品
         val output = ResultRenderer.render(result)
         // 设置输出容器里的物品
@@ -56,7 +63,7 @@ internal class MergingMenu(
      * 并且直到菜单关闭之前, 会话永远是这一个对象, 不会中途替换成其他的.
      * 而菜单这边的逻辑, 需要根据几个虚拟容器的变化, 来改变会话中的状态.
      */
-    private val mergingSession: MergingSession = SimpleMergingSession(viewer, table)
+    private val session: MergingSession = SimpleMergingSession(viewer, table)
 
     private val logger: Logger by inject()
 
@@ -120,15 +127,16 @@ internal class MergingMenu(
 
                 when (inputSlot) {
                     InputSlot.INPUT1 -> {
-                        mergingSession.inputItem1 = added
+                        session.inputItem1 = added
                     }
 
                     InputSlot.INPUT2 -> {
-                        mergingSession.inputItem2 = added
+                        session.inputItem2 = added
                     }
                 }
 
-                refreshOutput()
+                executeReforge()
+                updateOutput()
             }
 
             e.isRemove -> {
@@ -137,16 +145,17 @@ internal class MergingMenu(
                 when (inputSlot) {
                     InputSlot.INPUT1 -> {
                         setInputSlot1(null)
-                        mergingSession.returnInputItem1(viewer)
+                        session.returnInputItem1(viewer)
                     }
 
                     InputSlot.INPUT2 -> {
                         setInputSlot2(null)
-                        mergingSession.returnInputItem2(viewer)
+                        session.returnInputItem2(viewer)
                     }
                 }
 
-                refreshOutput()
+                executeReforge()
+                updateOutput()
             }
         }
     }
@@ -165,7 +174,7 @@ internal class MergingMenu(
             e.isRemove -> {
                 e.isCancelled = true
 
-                val result = mergingSession.latestResult
+                val result = session.latestResult
                 if (result.successful) {
                     // 把合并后的物品递给玩家
                     val handle = result.item.unsafe.handle
@@ -177,7 +186,7 @@ internal class MergingMenu(
                     setOutputSlot(null)
 
                     // 重置会话状态
-                    mergingSession.reset()
+                    session.reset()
                 } else {
                     viewer.sendPlainMessage("合并失败!")
                 }
@@ -193,9 +202,9 @@ internal class MergingMenu(
         setInputSlot2(null)
         setOutputSlot(null)
 
-        mergingSession.returnInputItem1(viewer)
-        mergingSession.returnInputItem2(viewer)
-        mergingSession.frozen = true
+        session.returnInputItem1(viewer)
+        session.returnInputItem2(viewer)
+        session.frozen = true
     }
 
     private fun onWindowOpen() {

@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.gui.mod
 
-import cc.mewcraft.wakame.item.bypassPacket
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.removeItalic
 import me.lucko.helper.text3.mini
@@ -24,31 +23,31 @@ internal object ReplaceRender {
 
                 rendered = ItemStack(Material.BARRIER)
                 rendered.editMeta { meta ->
-                    val name = "<red>内部错误".mini
+                    val name = "<white>结果: <red>内部错误".mini
                     val lore = buildList {
                         add(Component.empty())
                         add(clickToWithdraw)
                     }
 
                     meta.itemName(name)
-                    meta.lore(lore)
+                    meta.lore(lore.removeItalic)
                 }
             } else {
                 // 正常情况
 
                 // FIXME NekoStackDisplay 急急急
-                ingredient.bypassPacket(true)
+                ingredient.erase()
                 rendered = ingredient.itemStack
                 rendered.editMeta { meta ->
-                    val name = "<green>有效材料".mini
+                    val name = "<white>结果: <green>有效材料".mini
                     val lore = buildList<Component> {
                         result.getPortableCore()?.provideTooltipLore()?.content?.let { addAll(it) }
                         add(Component.empty())
                         add(clickToWithdraw)
                     }
 
-                    meta.itemName(name)
-                    meta.lore(lore)
+                    meta.displayName(name.removeItalic)
+                    meta.lore(lore.removeItalic)
                 }
             }
         } else {
@@ -56,7 +55,7 @@ internal object ReplaceRender {
 
             rendered = ItemStack(Material.BARRIER)
             rendered.editMeta { meta ->
-                val name = "<white>无效材料".mini
+                val name = "<white>结果: 无效材料".mini
                 val lore = buildList<Component> {
                     addAll(result.description)
                     add(Component.empty())
@@ -64,7 +63,7 @@ internal object ReplaceRender {
                 }
 
                 meta.itemName(name)
-                meta.lore(lore)
+                meta.lore(lore.removeItalic)
             }
         }
 

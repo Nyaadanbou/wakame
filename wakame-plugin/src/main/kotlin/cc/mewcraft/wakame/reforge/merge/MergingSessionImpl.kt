@@ -87,17 +87,22 @@ internal class SimpleMergingSession(
     override val outputPenaltyFunction: MochaFunction = table.outputPenaltyFunction.compile(this)
     override val currencyCostFunction: MochaFunction = table.currencyCost.totalFunction.compile(this)
 
-    override fun executeReforge(): MergingSession.Result {
+    private fun executeReforge0(): MergingSession.Result {
         val operation = MergeOperation(this, logger)
-
         val result = try {
             operation.execute()
         } catch (e: Exception) {
             logger.error("$PREFIX An unknown error occurred while merging. This is a bug!", e)
-            Result.failure(Component.text("内部错误"))
+            Result.failure("<red>内部错误".mini)
         }
 
-        return result.also { this.latestResult = it }
+        return result
+    }
+
+    override fun executeReforge(): MergingSession.Result {
+        val result = executeReforge0()
+        latestResult = result
+        return result
     }
 
     override fun reset() {
@@ -167,7 +172,7 @@ internal class SimpleMergingSession(
          * 构建一个用于表示*没有合并*的 [MergingSession.Result].
          */
         fun empty(): MergingSession.Result {
-            return Result(false, Component.text("没有可以合并的东西"), NekoStack.empty(), Type.empty(), Cost.zero())
+            return Result(false, "<gray>没有可以合并的东西".mini, NekoStack.empty(), Type.empty(), Cost.zero())
         }
 
         /**
@@ -181,7 +186,7 @@ internal class SimpleMergingSession(
          * 构建一个用于表示*合并成功*的 [MergingSession.Result].
          */
         fun success(item: NekoStack, type: MergingSession.Type, cost: MergingSession.Cost): MergingSession.Result {
-            return Result(true, Component.text("合并成功!"), item, type, cost)
+            return Result(true, Component.text("<green>合并准备就绪"), item, type, cost)
         }
 
         private class Result(
@@ -200,7 +205,7 @@ internal class SimpleMergingSession(
 
             override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
                 ExaminableProperty.of("successful", successful),
-                ExaminableProperty.of("description", description),
+                ExaminableProperty.of("description", description.plain),
                 ExaminableProperty.of("item", item),
                 ExaminableProperty.of("type", type),
                 ExaminableProperty.of("cost", cost),
@@ -255,7 +260,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation
                 get() = throw IllegalStateException("This type is not supposed to be used.")
             override val description: List<Component> = listOf(
-                "<!i><white>类型: <gray>没有合并".mini
+                "<white>类型: <gray>没有合并".mini
             )
 
             override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -268,7 +273,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation
                 get() = throw IllegalStateException("This type is not supposed to be used.")
             override val description: List<Component> = listOf(
-                "<!i><white>类型: <red>无法计算".mini
+                "<white>类型: <red>无法计算".mini
             )
 
             override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -281,7 +286,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation =
                 AttributeModifier.Operation.ADD
             override val description: List<Component> = listOf(
-                "<!i><white>类型: <green>Type 0".mini
+                "<white>类型: <green>Type 0".mini
             )
         }
 
@@ -289,7 +294,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation =
                 AttributeModifier.Operation.MULTIPLY_BASE
             override val description: List<Component> = listOf(
-                "<!i><white>类型: <green>Type 1".mini
+                "<white>类型: <green>Type 1".mini
             )
         }
 
@@ -297,7 +302,7 @@ internal class SimpleMergingSession(
             override val operation: AttributeModifier.Operation =
                 AttributeModifier.Operation.MULTIPLY_TOTAL
             override val description: List<Component> = listOf(
-                "<!i><white>类型: <green>Type 2".mini
+                "<white>类型: <green>Type 2".mini
             )
         }
     }
@@ -339,7 +344,7 @@ internal class SimpleMergingSession(
             override fun take(viewer: Player) = Unit
             override fun test(viewer: Player): Boolean = true
             override val description: List<Component> = listOf(
-                "<!i><white>花费: <gray>没有消耗".mini
+                "<white>花费: <gray>没有消耗".mini
             )
         }
 
@@ -351,7 +356,7 @@ internal class SimpleMergingSession(
                 throw IllegalStateException("This cost is not supposed to be tested.")
 
             override val description: List<Component> = listOf(
-                "<!i><white>花费: <red>无法计算".mini
+                "<white>花费: <red>无法计算".mini
             )
         }
 
@@ -370,7 +375,7 @@ internal class SimpleMergingSession(
             }
 
             override val description: List<Component> = listOf(
-                "<!i><white>花费: <green>${currencyAmount.toInt()} 金币".mini
+                "<white>花费: <green>${currencyAmount.toInt()} 金币".mini
             )
 
             override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.concat(

@@ -38,7 +38,7 @@ internal class ReplaceMenu(
     private val viewer: Player = parent.viewer
 
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
-    private val primaryGui: Gui = Gui.normal { builder ->
+    val primaryGui: Gui = Gui.normal { builder ->
         // a: 被定制对象的预览物品
         // b: 接收玩家输入的虚拟容器
         // *: 起视觉引导作用的物品
@@ -54,12 +54,6 @@ internal class ReplaceMenu(
     }
 
     /**
-     * 获取当前定制的 [Gui].
-     */
-    val gui: Gui
-        get() = primaryGui
-
-    /**
      * 当输入容器中的物品发生*变化前*调用.
      */
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
@@ -67,7 +61,7 @@ internal class ReplaceMenu(
         val newItem = event.newItem
         logger.info("$PREFIX Replace input updating: ${prevItem?.type} -> ${newItem?.type}")
 
-        if (parent.moddingSession.frozen) {
+        if (parent.session.frozen) {
             logger.error("$PREFIX The modding session is frozen, but the player is trying to interact with the replace's input slot. This is a bug!")
             event.isCancelled = true
             return
@@ -82,21 +76,21 @@ internal class ReplaceMenu(
 
             // 玩家尝试向 inputSlot 中添加物品:
             event.isAdd -> {
-                val stack = newItem?.tryNekoStack ?: run {
+                val ns = newItem?.tryNekoStack ?: run {
                     viewer.sendPlainMessage("猫咪不可以!")
                     event.isCancelled = true
                     return
                 }
 
                 // 执行一次替换流程, 并获取其结果
-                val result = replace.executeReplace(stack)
+                val result = replace.executeReplace(ns)
 
                 // 将容器里的物品替换成渲染后的物品
                 val rendered = ReplaceRender.render(result)
                 event.newItem = rendered
 
                 // 执行一次定制流程
-                parent.moddingSession.executeReforge()
+                parent.executeReforge()
 
                 // 更新主菜单的状态
                 parent.updateOutput()
@@ -108,7 +102,6 @@ internal class ReplaceMenu(
             // 玩家尝试从 inputSlot 中移除物品
             event.isRemove -> {
                 event.isCancelled = true
-                setInputSlot(null)
 
                 val ingredient = replace.latestResult.ingredient ?: run {
                     logger.error("$PREFIX Ingredient is null, but an item is being removed from the replace menu. This is a bug!")
@@ -121,8 +114,11 @@ internal class ReplaceMenu(
                 // 更新本定制的结果
                 replace.executeReplace(null)
 
+                // 更新本菜单的内容
+                setInputSlot(null)
+
                 // 执行一次定制流程
-                parent.moddingSession.executeReforge()
+                parent.executeReforge()
 
                 // 更新主菜单
                 parent.updateOutput()

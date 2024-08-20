@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
+import cc.mewcraft.wakame.util.removeItalic
 import me.lucko.helper.text3.mini
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -44,20 +45,20 @@ internal object ResultRender {
             if (item == null) {
                 ret = ItemStack(Material.BARRIER)
                 ret.editMeta { meta ->
-                    val name = "<white>定制结果: <red>内部错误".mini
+                    val name = "<white>结果: <red>内部错误".mini
                     meta.itemName(name)
                 }
             } else {
                 // FIXME 移除萌芽标签 / 实现 NekoStack#gui
                 ret = item.itemStack
                 ret.editMeta { meta ->
-                    val name = "<white>定制结果: <green>准备就绪".mini
+                    val name = "<white>结果: <green>准备就绪".mini
                     val lore = buildList {
                         addAll(result.description)
                     }
 
                     meta.itemName(name)
-                    meta.lore(lore)
+                    meta.lore(lore.removeItalic)
                 }
             }
         } else {
@@ -65,13 +66,13 @@ internal object ResultRender {
 
             ret = ItemStack(Material.BARRIER)
             ret.editMeta { meta ->
-                val name = "<white>定制结果: <red>失败".mini
+                val name = "<white>结果: <red>失败".mini
                 val lore = buildList {
                     addAll(result.description)
                 }
 
                 meta.itemName(name)
-                meta.lore(lore)
+                meta.lore(lore.removeItalic)
             }
         }
 

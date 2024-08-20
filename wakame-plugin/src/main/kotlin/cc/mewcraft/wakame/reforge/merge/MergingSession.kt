@@ -83,7 +83,8 @@ interface MergingSession : Examinable {
      * 如果合并成功, [inputItem1] 和 [inputItem2] 将会被设置为 `null` (表示已消耗).
      * 如果合并失败, [inputItem1] 和 [inputItem2] 将会保持不变.
      *
-     * 函数的返回值会赋值到成员属性 [latestResult] 之上.
+     * ## 副作用
+     * 函数的返回值会自动赋值给属性 [latestResult].
      */
     fun executeReforge(): Result
 
