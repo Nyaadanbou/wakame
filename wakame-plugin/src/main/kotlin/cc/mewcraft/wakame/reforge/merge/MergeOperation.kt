@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeS
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeSE
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import me.lucko.helper.text3.mini
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.slf4j.Logger
 import kotlin.math.ceil
 
@@ -17,11 +19,13 @@ import kotlin.math.ceil
  */
 internal class MergeOperation(
     private val session: MergingSession,
-    private val logger: Logger,
-) {
+) : KoinComponent {
+
     companion object {
         private const val PREFIX = ReforgeLoggerPrefix.MERGE
     }
+
+    private val logger: Logger by inject()
 
     fun execute(): MergingSession.Result {
         if (session.frozen) {

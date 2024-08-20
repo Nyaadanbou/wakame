@@ -89,7 +89,7 @@ internal class SimpleMergingSession(
 
     private fun executeReforge0(): MergingSession.Result {
         val result = try {
-            MergeOperation(this, logger).execute()
+            MergeOperation(this).execute()
         } catch (e: Exception) {
             logger.error("$PREFIX An unknown error occurred while merging. This is a bug!", e)
             Result.failure("<red>内部错误".mini)

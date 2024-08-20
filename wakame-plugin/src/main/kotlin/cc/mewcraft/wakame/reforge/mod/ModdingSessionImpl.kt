@@ -195,7 +195,7 @@ internal class SimpleModdingSession(
         val total = replaceParams
             .values
             .filter { it.latestResult.applicable }
-            .sumOf { it.totalFunction.evaluate() }
+            .sumOf { it.total.evaluate() }
         return total
     }
 
@@ -429,9 +429,9 @@ internal object Replace {
                 meta.hideAllFlags()
             }
         }
-        override val totalFunction
+        override val total
             get() = ZERO_MOCHA_FUNCTION // 不可修改的词条栏不需要花费 (?)
-        override val isChangeable: Boolean
+        override val changeable: Boolean
             get() = false
         override var latestResult by Delegates.observable(ReplaceResult.empty()) { _, old, new ->
             logger.info("$PREFIX Replace (unchangeable) result updated: $old -> $new")
@@ -482,9 +482,9 @@ internal object Replace {
             }
         }
 
-        override val totalFunction: MochaFunction = rule.currencyCost.total.compile(session, this)
+        override val total: MochaFunction = rule.currencyCost.total.compile(session, this)
 
-        override val isChangeable: Boolean
+        override val changeable: Boolean
             get() = true
 
         override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReplaceResult.empty()) { _, old, new ->
