@@ -9,13 +9,11 @@ import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.common.TemporaryIcons
 import cc.mewcraft.wakame.util.hideAllFlags
-import cc.mewcraft.wakame.util.hideTooltip
 import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
@@ -80,21 +78,20 @@ internal class SimpleModdingSession(
 
         if (!isSourceItemLegit) {
             logger.info("$PREFIX Skipped reforge as source item is not legit")
-            return Result.failure("<gray>不可定制".mini)
-        }
-
-        if (replaceParams.all { (_, repl) -> !repl.changed }) {
-            logger.info("$PREFIX Skipped reforge as all replaces are not applicable")
-            return Result.failure("<gray>没有任何修改".mini)
+            return Result.failure("<gray>源物品无法定制".mini)
         }
 
         // 把经过修改的词条栏筛选出来
-        val changedReplaceParams = replaceParams.filter { (_, repl) -> repl.changed }
+        val changedReplaceParams = replaceParams.filter { (_, repl) -> repl.hasInput }
+        if (changedReplaceParams.isEmpty()) {
+            logger.info("$PREFIX Skipped reforge as all replaces are not applicable")
+            return Result.failure("<gray>没有作出任何修改".mini)
+        }
 
         // 检查经过修改的词条栏中是否存在无效的耗材
         if (changedReplaceParams.any { (_, repl) -> !repl.latestResult.applicable }) {
             logger.info("$PREFIX Skipped reforge as some replaces are not applicable")
-            return Result.failure("<gray>存在无效的耗材".mini)
+            return Result.failure("<gray>部分修改无法应用".mini)
         }
 
         // 如果源物品不合法, 则返回失败
@@ -123,11 +120,7 @@ internal class SimpleModdingSession(
         // 计算需要消耗的货币数量
         val cost = Cost.simple(totalFunction.evaluate())
 
-        return Result.success(
-            outputItem = output,
-            description = "<green>定制准备就绪".mini,
-            cost = cost
-        )
+        return Result.success(output, cost)
     }
 
     override fun executeReforge(): ModdingSession.Result {
@@ -242,11 +235,11 @@ internal class SimpleModdingSession(
             }
 
             isSourceItemLegit = true
-            replaceParams = createNonEmptyReplaceParameters(clone, sourceCells, sourceItemRule)
+            replaceParams = createReplaceParameters(clone, sourceCells, sourceItemRule)
             executeReforge()
         }
 
-        private fun createNonEmptyReplaceParameters(
+        private fun createReplaceParameters(
             sourceItem: NekoStack,
             sourceCells: ItemCells,
             sourceItemRule: ModdingTable.ItemRule,
@@ -293,21 +286,9 @@ internal object Result {
      */
     fun success(
         outputItem: NekoStack,
-        description: List<Component>,
         cost: ModdingSession.Cost
     ): ModdingSession.Result {
-        return Success(outputItem, description, cost)
-    }
-
-    /**
-     * 成功的结果. 当成功定制物品时, 用这个.
-     */
-    fun success(
-        outputItem: NekoStack,
-        description: Component,
-        cost: ModdingSession.Cost
-    ): ModdingSession.Result {
-        return success(outputItem, listOf(description), cost)
+        return Success(outputItem, listOf("<gray>定制准备就绪!".mini), cost)
     }
 
     private abstract class Base : ModdingSession.Result {
@@ -434,19 +415,40 @@ internal object Replace {
         override val session: ModdingSession,
         override val cell: Cell,
     ) : ModdingSession.Replace, KoinComponent {
-        override val id = cell.getId()
-        override val rule = ModdingTable.CellRule.empty()
-        override val display = ItemStack(Material.BARRIER).hideTooltip(true)
-        override val totalFunction = ZERO_MOCHA_FUNCTION // 不可修改的词条栏不需要花费 (?)
-        override val changed: Boolean = false
-        override var latestResult = ReplaceResult.empty()
+        private val logger: Logger by inject()
+
+        override val id
+            get() = cell.getId()
+        override val rule
+            get() = ModdingTable.CellRule.empty()
+        override val display = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
+            val unchangeable = "<red>(不可修改)".mini
+            editMeta { meta ->
+                val name = cell.provideTooltipName().content.appendSpace().append(unchangeable)
+                meta.itemName(name)
+                meta.hideAllFlags()
+            }
+        }
+        override val totalFunction
+            get() = ZERO_MOCHA_FUNCTION // 不可修改的词条栏不需要花费 (?)
+        override val isChangeable: Boolean
+            get() = false
+        override var latestResult by Delegates.observable(ReplaceResult.empty()) { _, old, new ->
+            logger.info("$PREFIX Replace (unchangeable) result updated: $old -> $new")
+        }
+        override val hasInput: Boolean
+            get() = latestResult.ingredient != null
+
+        private fun executeReplace0(ingredient: NekoStack?): ModdingSession.Replace.Result {
+            if (ingredient == null)
+                return ReplaceResult.empty()
+            return ReplaceResult.failure(ingredient, "<gray>源物品的词条栏不可修改".mini)
+        }
 
         override fun executeReplace(ingredient: NekoStack?): ModdingSession.Replace.Result {
-            if (ingredient == null) {
-                return ReplaceResult.empty()
-            }
-
-            return ReplaceResult.failure(ingredient, "<gray>源物品的这个词条栏不可修改".mini)
+            val result = executeReplace0(ingredient)
+            latestResult = result
+            return result
         }
 
         override fun getIngredientLevel(): Int = 0
@@ -467,7 +469,8 @@ internal object Replace {
     ) : ModdingSession.Replace, KoinComponent {
         private val logger: Logger by inject()
 
-        override val id: String = cell.getId()
+        override val id: String
+            get() = cell.getId()
 
         override val display: ItemStack = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
             editMeta { meta ->
@@ -481,14 +484,15 @@ internal object Replace {
 
         override val totalFunction: MochaFunction = rule.currencyCost.total.compile(session, this)
 
-        override val changed: Boolean
-            // 当耗材不为空时, 代表这个词条栏
-            // 已经被修改过, 不管成功与否
-            get() = latestResult.ingredient != null
+        override val isChangeable: Boolean
+            get() = true
 
         override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReplaceResult.empty()) { _, old, new ->
-            logger.info("$PREFIX Replace result updated: $old -> $new")
+            logger.info("$PREFIX Replace (changeable) result updated: $old -> $new")
         }
+
+        override val hasInput: Boolean
+            get() = latestResult.ingredient != null
 
         private fun executeReplace0(ingredient: NekoStack?): ModdingSession.Replace.Result {
             // 如果耗材为空, 则返回空结果
@@ -538,7 +542,7 @@ internal object Replace {
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
             val modCount = ingredient.components.get(ItemComponentTypes.CELLS)?.get(id)?.getReforgeHistory()?.modCount ?: Int.MAX_VALUE
             if (modCount > rule.modLimit) {
-                return ReplaceResult.failure(ingredient, "<gray>源物品的这个词条栏已经历经无数雕琢".mini)
+                return ReplaceResult.failure(ingredient, "<gray>源物品的词条栏已经历经无数雕琢".mini)
             }
 
             // 全部检查通过!
