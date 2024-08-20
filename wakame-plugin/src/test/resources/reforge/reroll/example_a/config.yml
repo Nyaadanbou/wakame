@@ -1,6 +1,6 @@
-# 重造工作台是否启用?
+# 重造工作台是否启用
 enabled: true
-# 重造工作台的容器GUI的标题
+# 重造工作台的菜单标题
 title: "重造工作台: Example A"
 
 # 稀有度->数值的映射表.
@@ -12,40 +12,31 @@ rarity_number_mapping:
   epic: 3.0
   ancient: 5.0
 
-# 重造操作所需货币的设置.
-currency_cost:
-
-  # 重造的“基础花费”
-  # 基础花费没有与生俱来的含义, 它们仅仅是参与计算的一个数字.
-  # 基础花费的具体作用完全取决于计算方式的表达式如何使用它.
-  base_cost: 100.0
-
-  # 单个词条栏的花费计算方式. 可用的参数:
-  #
-  # cost
-  #   词条栏的重造花费
-  # max_reroll
-  #   词条栏的重造次数上限
-  # reroll_count
-  #   词条栏有史以来被重造过的次数 // dev: 从物品 NBT 读取
-  #
-  each_function: "cost * reroll_count"
-
-  # 整个物品的花费计算方式. 可用的参数:
-  #
-  # base
-  #   重造的“基础花费”
-  # rarity
-  #   被重造物品的稀有度(的对应的数值)
-  # item_level
-  #   被重造物品的等级
-  # all_count
-  #   物品上可被重造的词条栏的总数
-  # selected_count
-  #   玩家选择重造的词条栏的数量
-  # selected_cost_sum
-  #   所有玩家选择的词条栏的花费总和
-  # unselected_cost_sum
-  #   所有玩家未选择的词条栏的花费总和
-  #
-  total_function: "(all_count - selected_count) * 100 + rarity + unselected_cost_sum"
+# 在这里设置重造操作所需要的货币.
+# 数据类型: molang
+#
+# 可用上下文:
+#
+# query.source_rarity()
+#   源物品的稀有度所映射到的数值
+# query.source_level()
+#   源物品的等级
+# query.count_cell(`type`)
+#   返回指定类型的词条栏的数量
+#   你必须传入一个参数 `type`
+#   `type` = 'all' | 'selected' | 'unselected'
+#   'all' = 所有词条栏
+#   'selected' = 被选中要重造的词条栏
+#   'unselected' = 未被选中要重造的词条栏
+# query.sum_of_cost(`type`)
+#   返回指定类型的词条栏的货币花费(之和)
+#   你必须传入一个参数 `type`
+#   `type` = 'all' | 'selected' | 'unselected'
+#   'all' = 所有词条栏
+#   'selected' = 被选中要重造的词条栏
+#   'unselected' = 未被选中要重造的词条栏
+#
+currency_cost: |
+  10 * query.source_level()
+  + query.source_rarity() * query.sum_of_cost('unselected')
+  + 100 * ( query.count_cell('all') - query.count_cell('selected') )

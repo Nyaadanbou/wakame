@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
@@ -17,83 +16,139 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.registry.RarityRegistry
+import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.slf4j.Logger
-import kotlin.properties.Delegates
 
 /**
  * 封装了一个标准的, 独立的, 重造流程.
- *
- * 该类不应该修改下面这些对象的状态:
- * - [RerollingSession]
- * - [RerollingSession.Selection]
- * - [RerollingSession.SelectionMap]
  */
-internal class ReforgeOperation
-/**
- * @throws ReforgeOperationException 如果物品缺少必要的组件
- */
-constructor(
+internal class ReforgeOperation(
     private val session: RerollingSession,
-    private val logger: Logger,
 ) : KoinComponent {
 
     companion object {
         private const val PREFIX = ReforgeLoggerPrefix.REROLL
     }
 
-    /**
-     * 要被重造的物品; 我们将对该实例进行修改.
-     */
-    private val inputItem: NekoStack = session.inputItem // it's a clone
+    private val logger: Logger by inject()
 
     /**
-     * 要被重造的物品的信息.
+     * 要被重造的物品; 我们将原地对该实例进行修改.
      */
-    private val inputItemInfo: InputItemInfo = InputItemInfo(inputItem)
+    private val sourceItem: NekoStack? = session.sourceItem
 
     /**
-     * 该对象是否已被冻结. 被冻结的对象无法再执行函数 [execute].
+     * 基于 [session] 和 [sourceItem] 执行一次重造流程, 并返回一个 [RerollingSession.Result].
      */
-    private var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
-        if (!new && old) {
-            logger.error("$PREFIX Unfreezing an operation is prohibited. This is a bug!")
-            return@vetoable false
+    fun execute(): RerollingSession.Result {
+        if (session.frozen) {
+            logger.error("$PREFIX Trying to refresh output in a frozen session. This is a bug!")
+            return Result.error()
         }
-        logger.info("$PREFIX Operation frozen status updated: $old -> $new")
-        return@vetoable true
-    }
 
-    private fun createMissingComponentException(type: ItemComponentType<*>): Nothing {
-        throw ReforgeOperationException("$PREFIX Input item has no '$type' component. This is a bug!")
+        // 获取源物品
+        // 如果源物品不存在, 返回一个空结果
+        val sourceItem = sourceItem ?: return Result.empty()
+
+        // region 准备作为输出的物品
+        val output = sourceItem.clone()
+
+        // 获取必要的物品组件
+        val itemId = sourceItem.key
+        val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: return Result.failure("<gray>源物品不可重造".mini)
+        val itemCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return Result.failure("<gray>源物品不可重造".mini)
+
+        // 获取可有可无的物品组件
+        val itemRarity = sourceItem.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
+        val itemElements = sourceItem.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
+        val itemKizamiz = sourceItem.components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz ?: emptySet()
+
+        // 准备生成核心用的上下文
+        val context = try {
+            generateContext(
+                itemId,
+                itemLevel,
+                itemRarity,
+                itemElements,
+                itemKizamiz,
+                itemCells
+            )
+        } catch (e: Exception) {
+            // 感觉上下文的生成可能会出问题, catch 保底一下
+            logger.error("$PREFIX Unexpected error while preparing generation context", e)
+            return Result.error()
+        }
+
+        val selectionMap = session.selectionMap
+        val cellsBuilder = itemCells.builder()
+
+        // 遍历每一个选择:
+        for ((id, sel) in selectionMap) {
+
+            // 如果玩家选择了该词条栏:
+            if (sel.selected) {
+
+                // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
+                cellsBuilder.modify(id) { cell ->
+                    val selected = sel.template.select(context).firstOrNull() ?: TemplateCoreEmpty
+                    val generated = selected.generate(context)
+                    cell.setCore(generated)
+                }
+
+                // 为重造过的词条栏 +1 重造次数
+                cellsBuilder.modify(id) { cell ->
+                    val oldValue = cell.getReforgeHistory()
+                    val newValue = oldValue.addRerollCount(1)
+                    cell.setReforgeHistory(newValue)
+                }
+            }
+        }
+
+        // 将新的词条栏组件写入物品
+        output.components.set(ItemComponentTypes.CELLS, cellsBuilder.build())
+        // endregion
+
+        // region 计算重造物品的总花费
+        val total = Cost.simple(session.total.evaluate())
+        // endregion
+
+        return Result.success(output, total)
     }
 
     /**
-     * 基于要被重造的物品 ([inputItemInfo]), 初始化上下文.
-     *
-     * 该上下文将被用于生成新的词条栏.
+     * 初始化物品生成的上下文.
      */
-    private fun generateContext(): Result<GenerationContext> {
+    private fun generateContext(
+        itemId: Key,
+        itemLevel: Int,
+        itemRarity: Rarity,
+        itemElements: Set<Element>,
+        itemKizamiz: Set<Kizami>,
+        itemCells: ItemCells,
+    ): GenerationContext {
         // 创建一个空的 context
-        val trigger = GenerationTrigger.direct(inputItemInfo.level)
-        val context = GenerationContext(trigger, inputItemInfo.key)
+        val trigger = GenerationTrigger.direct(itemLevel)
+        val context = GenerationContext(trigger, itemId)
 
         // 先把*不可由玩家改变的信息*全部写入上下文
-        context.level = inputItemInfo.level.toShort()
-        context.rarity = inputItemInfo.rarity
-        context.elements += inputItemInfo.elements
-        context.kizamiz += inputItemInfo.kizamiz
+        context.level = itemLevel.toShort()
+        context.rarity = itemRarity
+        context.elements += itemElements
+        context.kizamiz += itemKizamiz
 
-        val selections = session.selections
+        val selectionMap = session.selectionMap
 
         // 然后再把*可由玩家改变的信息*全部写入上下文
-        inputItemInfo.cells
+        itemCells
             .filterx { cell ->
                 // 注意, 我们必须跳过玩家选择要重造的词条栏.
                 // 如果不跳过, 那么新的词条栏将无法被正确生成.
-                // 例如, 由于已存在相同的信息而最终生成了空词条栏.
-                selections[cell.getId()]?.selected == false
+                // 这是因为截止至 2024/8/20, 我们的设计不允许
+                // 相似的核心出现在同一个物品上.
+                selectionMap[cell.getId()]?.selected == false
             }
             .forEach { (_, cell) ->
                 when (
@@ -109,135 +164,6 @@ constructor(
                 }
             }
 
-        return Result.success(context)
-    }
-
-    /**
-     * 执行一次重造.
-     *
-     * 基本流程:
-     * - 计算最终的重造花费
-     * - 重新生成选择的核心
-     * - 更新词条栏的重造次数
-     *
-     * @throws ReforgeOperationException 如果重造失败.
-     */
-    fun execute(): RerollingSession.Result {
-        if (frozen) {
-            logger.error("$PREFIX Trying to execute a frozen operation. This is a bug!")
-            return SimpleRerollingSession.Result.error()
-        }
-
-        frozen = true
-
-        // 将要作为输出的物品.
-        val outputItem = inputItem.clone()
-
-        // 准备上下文, 用于重新生成核心.
-        val context = generateContext().getOrElse {
-            logger.error("$PREFIX An internal error occurred while generating context: ${it.message}")
-            return SimpleRerollingSession.Result.error()
-        }
-
-        // 储存词条栏的总花费 (选择/未选择).
-        var sumOfEachSelected = .0
-        var sumOfEachUnselected = .0
-
-        val table = session.table
-        val selections = session.selections
-
-        // 词条栏 (builder)
-        val cells = inputItemInfo.cells.builder()
-
-        // 遍历每一个选择:
-        for ((id, sel) in selections) {
-
-            // 计算当前词条栏的花费.
-            val eachCost = table.currencyCost.eachFunction.compute(
-                cost = sel.rule.cost,
-                maxReroll = sel.rule.maxReroll,
-                rerollCount = cells.get(id)?.getReforgeHistory()?.rerollCount ?: 0
-            )
-            // 分别加到选择/未选择的总花费上.
-            if (sel.selected) {
-                sumOfEachSelected += eachCost
-            } else {
-                sumOfEachUnselected += eachCost
-            }
-
-            // 如果玩家选择了该词条栏:
-            if (sel.selected) {
-
-                // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
-                cells.modify(id) {
-                    val selected = sel.template.select(context).firstOrNull() ?: TemplateCoreEmpty
-                    val generated = selected.generate(context)
-                    it.setCore(generated)
-                }
-
-                // 为重造过的词条栏 +1 重造次数
-                cells.modify(id) {
-                    val oldReforgeHistory = it.getReforgeHistory()
-                    val newReforgeHistory = oldReforgeHistory.addRerollCount(1)
-                    it.setReforgeHistory(newReforgeHistory)
-                }
-            }
-        }
-
-        // 将新的词条栏组件写入物品.
-        outputItem.components.set(ItemComponentTypes.CELLS, cells.build())
-
-        // 计算重造物品的总花费.
-        val compute = table.currencyCost.totalFunction.compute(
-            base = table.currencyCost.base,
-            rarity = table.rarityNumberMapping.get(inputItemInfo.rarity.key),
-            itemLevel = inputItemInfo.level,
-            allCount = selections.size,
-            selectedCount = selections.count { it.selected },
-            selectedCostSum = sumOfEachSelected,
-            unselectedCostSum = sumOfEachUnselected,
-        )
-        val total = SimpleRerollingSession.Total.success(compute)
-
-        return SimpleRerollingSession.Result.success(total, outputItem)
-    }
-}
-
-
-/**
- * 封装了重造过程中 [RerollingSession.inputItem] 的必要信息.
- */
-private class InputItemInfo
-/**
- * @throws ReforgeOperationException 如果 [wrapped] 缺少必要的组件.
- */
-constructor(
-    wrapped: NekoStack,
-) {
-    companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.REROLL
-    }
-
-    val key: Key = wrapped.key
-
-    val level: Int
-    val cells: ItemCells
-    val rarity: Rarity
-    val elements: Set<Element>
-    val kizamiz: Set<Kizami>
-
-    init {
-        // 等级和词条栏是必要的
-        level = wrapped.components.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: throwMissingComponentException(ItemComponentTypes.LEVEL)
-        cells = wrapped.components.get(ItemComponentTypes.CELLS) ?: throwMissingComponentException(ItemComponentTypes.CELLS)
-
-        // 这些理论上可以忽略不计
-        rarity = wrapped.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
-        elements = wrapped.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
-        kizamiz = wrapped.components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz ?: emptySet()
-    }
-
-    private fun throwMissingComponentException(type: ItemComponentType<*>): Nothing {
-        throw ReforgeOperationException("$PREFIX Input item has no '$type' component. This is a bug!")
+        return context
     }
 }

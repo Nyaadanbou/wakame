@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellCurrencyCost
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
-import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction
-import team.unnamed.mocha.runtime.compiled.Named
+import team.unnamed.mocha.runtime.MochaFunction
 
 /**
  * 代表一个重造台(的配置文件).
@@ -34,70 +34,12 @@ interface RerollingTable : Examinable {
     /**
      * 重造台的花费设置.
      */
-    val currencyCost: CurrencyCost
+    val currencyCost: TableCurrencyCost
 
     /**
      * 包含了每个物品的重造规则.
      */
-    val itemRules: ItemRuleMap
-
-    /**
-     * 重造台的货币花费设置.
-     *
-     * 分为两部分:
-     * - 常量
-     * - 函数
-     *
-     * 常量是*确切的数值*, 例如“基础花费”, 稀有度的数值映射等. 将作为函数的输入值.
-     *
-     * 函数是*数学表达式*, 例如每个词条栏的花费计算方式, 整个物品最终花费的计算方式等.
-     */
-    interface CurrencyCost : Examinable {
-        /* 常量 */
-
-        /**
-         * 所谓的“基础花费”.
-         */
-        val base: Double
-
-        /* 函数 */
-
-        /**
-         * 物品上的每个词条栏的花费的计算方式.
-         */
-        val eachFunction: EachFunction
-
-        /**
-         * 整个物品在被重造时, 最终花费的计算方式.
-         */
-        val totalFunction: TotalFunction
-
-        /**
-         * 重造总花费的计算方式.
-         */
-        interface TotalFunction : MochaCompiledFunction {
-            fun compute(
-                @Named("base") base: Double,
-                @Named("rarity") rarity: Double,
-                @Named("item_level") itemLevel: Int,
-                @Named("all_count") allCount: Int,
-                @Named("selected_count") selectedCount: Int,
-                @Named("selected_cost_sum") selectedCostSum: Double,
-                @Named("unselected_cost_sum") unselectedCostSum: Double,
-            ): Double
-        }
-
-        /**
-         * 单个词条栏花费的计算方式.
-         */
-        interface EachFunction : MochaCompiledFunction {
-            fun compute(
-                @Named("cost") cost: Double,
-                @Named("max_reroll") maxReroll: Int,
-                @Named("reroll_count") rerollCount: Int, // 从 NBT 读取
-            ): Double
-        }
-    }
+    val itemRuleMap: ItemRuleMap
 
     /**
      * 代表一个物品的重造规则.
@@ -106,7 +48,7 @@ interface RerollingTable : Examinable {
         /**
          * 该物品每个词条栏的重造规则.
          */
-        val cellRules: CellRuleMap
+        val cellRuleMap: CellRuleMap
     }
 
     /**
@@ -121,6 +63,8 @@ interface RerollingTable : Examinable {
          * @param key 物品的类型
          */
         operator fun get(key: Key): ItemRule?
+
+        operator fun contains(key: Key): Boolean
     }
 
     /**
@@ -128,14 +72,18 @@ interface RerollingTable : Examinable {
      */
     interface CellRule : Examinable {
         /**
-         * 该词条栏的“花费”. 其具体作用由实现决定.
-         */
-        val cost: Double
-
-        /**
          * 词条栏最多能重造几次.
          */
         val maxReroll: Int
+
+        /**
+         * 该词条栏的货币花费.
+         */
+        val currencyCost: CellCurrencyCost
+
+        companion object {
+            fun empty(): CellRule = EmptyCellRule
+        }
     }
 
     /**
@@ -150,5 +98,57 @@ interface RerollingTable : Examinable {
          * @param key 词条栏的唯一标识
          */
         operator fun get(key: String): CellRule?
+
+        operator fun contains(key: String): Boolean
+
+        companion object {
+            fun empty(): CellRuleMap = EmptyCellRuleMap
+        }
     }
+
+    //////
+
+    /**
+     * 可用上下文:
+     * ```
+     * query.source_rarity()
+     *   no args
+     * query.source_item_level()
+     *   no args
+     * query.cell_count(`type`)
+     *   type = 'all' | 'selected' | 'unselected'
+     * query.cell_cost(`type`)
+     *   type = 'all' | 'selected' | 'unselected'
+     * ```
+     */
+    fun interface TableCurrencyCost {
+        fun compile(session: RerollingSession): MochaFunction
+    }
+
+    /**
+     * 可用上下文:
+     * ```
+     * query.max_reroll()
+     *   no args
+     * query.reroll_count()
+     *   no args
+     * ```
+     */
+    fun interface CellCurrencyCost {
+        fun compile(session: RerollingSession, selection: RerollingSession.Selection): MochaFunction
+    }
+}
+
+
+/* Internals */
+
+
+private object EmptyCellRule : RerollingTable.CellRule {
+    override val maxReroll: Int = 0
+    override val currencyCost: CellCurrencyCost = CellCurrencyCost { _, _ -> MochaFunction { .0 } }
+}
+
+private object EmptyCellRuleMap : RerollingTable.CellRuleMap {
+    override fun get(key: String): RerollingTable.CellRule? = null
+    override fun contains(key: String): Boolean = false
 }
