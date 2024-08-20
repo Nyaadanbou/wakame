@@ -37,6 +37,11 @@ object Namespaces {
     const val KIZAMI = "kizami"
 
     /**
+     * The namespace of all types of Rarity.
+     */
+    const val RARITY = "rarity"
+
+    /**
      * The namespace of all types of ItemStatistics.
      */
     const val STATISTICS = "statistics"

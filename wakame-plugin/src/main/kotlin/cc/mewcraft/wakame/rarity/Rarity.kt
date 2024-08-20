@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.BiIdentifiable
 import cc.mewcraft.wakame.FriendlyNamed
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.RarityRegistry
@@ -38,7 +39,7 @@ private data class RarityType(
     override val styles: Array<StyleBuilderApplicable>,
     override val glowColor: GlowColor,
 ) : KoinComponent, Rarity {
-    override val key: Key = Key.key("rarity", uniqueId)
+    override val key: Key = Key.key(Namespaces.RARITY, uniqueId)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("uniqueId", uniqueId),
