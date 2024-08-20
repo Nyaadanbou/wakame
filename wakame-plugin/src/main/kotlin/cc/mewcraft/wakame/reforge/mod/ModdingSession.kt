@@ -233,12 +233,12 @@ interface ModdingSession : Examinable {
         /**
          * 自定义函数, 计算定制这个词条栏所需要的货币数量.
          */
-        val totalFunction: MochaFunction
+        val total: MochaFunction
 
         /**
          * 被定制的词条栏是否可以修改.
          */
-        val isChangeable: Boolean
+        val changeable: Boolean
 
         /**
          * 储存了当前最新的定制结果.
