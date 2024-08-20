@@ -121,7 +121,7 @@ internal class SimpleModdingSession(
         output.components.set(ItemComponentTypes.CELLS, cellBuilder.build())
 
         // 计算需要消耗的货币数量
-        val cost = Cost.normal(totalFunction.evaluate())
+        val cost = Cost.simple(totalFunction.evaluate())
 
         return Result.success(
             outputItem = output,
@@ -359,12 +359,12 @@ internal class SimpleModdingSession(
         }
 
         /**
-         * @param defaultCurrencyAmount 要消耗的默认货币数量
+         * @param currencyAmount 要消耗的默认货币数量
          */
-        fun normal(
-            defaultCurrencyAmount: Double
+        fun simple(
+            currencyAmount: Double
         ): ModdingSession.Cost {
-            return Normal(defaultCurrencyAmount)
+            return Simple(currencyAmount)
         }
 
         private class Empty : ModdingSession.Cost {
@@ -387,7 +387,7 @@ internal class SimpleModdingSession(
             override fun toString(): String = toSimpleString()
         }
 
-        private class Normal(
+        private class Simple(
             val currencyAmount: Double,
         ) : ModdingSession.Cost {
             override fun take(viewer: Player) {
@@ -427,8 +427,7 @@ internal class SimpleModdingSession(
         }
 
         private const val PREFIX = ReforgeLoggerPrefix.MOD
-
-        private val zeroMochaFunction: MochaFunction = MochaFunction { .0 }
+        private val ZERO_MOCHA_FUNCTION: MochaFunction = MochaFunction { .0 }
 
         private class Unchangeable(
             override val session: ModdingSession,
@@ -437,7 +436,7 @@ internal class SimpleModdingSession(
             override val id = cell.getId()
             override val rule = ModdingTable.CellRule.empty()
             override val display = ItemStack(Material.BARRIER).hideTooltip(true)
-            override val totalFunction = zeroMochaFunction // 不可修改的词条栏不需要花费 (?)
+            override val totalFunction = ZERO_MOCHA_FUNCTION // 不可修改的词条栏不需要花费 (?)
             override val changed: Boolean = false
             override var latestResult = ReplaceResult.empty()
 

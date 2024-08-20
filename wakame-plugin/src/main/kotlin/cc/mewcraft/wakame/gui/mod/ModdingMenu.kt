@@ -65,26 +65,29 @@ internal class ModdingMenu(
     }
 
     /**
-     * 基于当前的所有状态更新 [outputSlot].
-     *
-     * 也就是定制后的物品的图标.
+     * 基于当前的所有状态执行一次定制.
+     */
+    fun executeReforge() {
+        session.executeReforge()
+    }
+
+    /**
+     * 基于 [session] 的当前状态更新 [outputSlot], 也就是定制后的物品.
      */
     fun updateOutput() {
-        val result = moddingSession.latestResult
+        val result = session.latestResult
         val output = ResultRender.normal(result)
         setOutputSlot(output)
     }
 
     /**
-     * 基于当前的所有状态更新子菜单 (调用 [ScrollGui.setContent]).
-     *
-     * 也就是每个词条栏的定制菜单.
+     * 基于 [session] 的当前状态更新子菜单, 也就是每个词条栏的定制菜单.
      */
     fun updateReplace() {
-        val replaceMap = moddingSession.replaceParams
-        val replaceGuis = replaceMap
+        val replaceParams = session.replaceParams
+        val replaceGuis = replaceParams
             .map { (_, replace) -> ReplaceMenu(this, replace) }
-            .map { it.gui }
+            .map { it.primaryGui }
 
         setReplaceGuis(replaceGuis)
     }
@@ -92,7 +95,7 @@ internal class ModdingMenu(
     /**
      * 本菜单的 [ModdingSession].
      */
-    val moddingSession: ModdingSession = SimpleModdingSession(table, viewer)
+    val session: ModdingSession = SimpleModdingSession(table, viewer)
 
     /**
      * 玩家是否已经确认取出定制后的物品.
@@ -143,7 +146,7 @@ internal class ModdingMenu(
         val prevItem = event.previousItem
         logger.info("$PREFIX Input item updating: ${prevItem?.type} -> ${newItem?.type}")
 
-        if (moddingSession.frozen) {
+        if (session.frozen) {
             logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary input slot. This is a bug!")
             event.isCancelled = true; return
         }
@@ -165,7 +168,7 @@ internal class ModdingMenu(
                     event.isCancelled = true; return
                 }
 
-                moddingSession.sourceItem = stack
+                session.sourceItem = stack
                 updateReplace()
                 updateOutput()
 
@@ -181,11 +184,11 @@ internal class ModdingMenu(
                 event.isCancelled = true
 
                 // 归还玩家放入定制台的所有物品
-                val itemsToReturn = moddingSession.getAllPlayerInputs()
+                val itemsToReturn = session.getAllPlayerInputs()
                 viewer.inventory.addItem(*itemsToReturn.toTypedArray())
 
                 // 重置会话状态
-                moddingSession.reset()
+                session.reset()
 
                 // 清空菜单内容
                 setInputSlot(null)
@@ -206,7 +209,7 @@ internal class ModdingMenu(
         val prevItem = event.previousItem
         logger.info("$PREFIX Output item updating: ${prevItem?.type} -> ${newItem?.type}")
 
-        if (moddingSession.frozen) {
+        if (session.frozen) {
             logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary output slot. This is a bug!")
             event.isCancelled = true; return
         }
@@ -228,7 +231,7 @@ internal class ModdingMenu(
                 // 如果不满足则终止操作, 给玩家合适的提示.
 
                 // 获取当前定制的结果
-                val result = moddingSession.latestResult
+                val result = session.latestResult
 
                 // 如果结果成功的话:
                 if (result.successful) {
@@ -250,7 +253,7 @@ internal class ModdingMenu(
                         })
 
                         // 未使用的物品, 一般是无效的耗材
-                        addAll(moddingSession.getInapplicablePlayerInputs())
+                        addAll(session.getInapplicablePlayerInputs())
                     }
                     // 把所有输出的物品给予玩家
                     viewer.inventory.addItem(*itemsToGive.toTypedArray())
@@ -259,7 +262,7 @@ internal class ModdingMenu(
                     result.cost.take(viewer)
 
                     // 重置会话状态
-                    moddingSession.reset()
+                    session.reset()
 
                     // 清空菜单内容
                     setInputSlot(null)
@@ -282,11 +285,11 @@ internal class ModdingMenu(
 
     private fun onWindowClose() {
         // 将定制过程中玩家输入的所有物品归还给玩家
-        val itemsToReturn = moddingSession.getAllPlayerInputs()
+        val itemsToReturn = session.getAllPlayerInputs()
         viewer.inventory.addItem(*itemsToReturn.toTypedArray())
 
         // 冻结会话
-        moddingSession.frozen = true
+        session.frozen = true
     }
 
     private fun onWindowOpen() {
