@@ -88,12 +88,12 @@ private class ObservableSet<E>(
 ) : ReadOnlyProperty<Any?, MutableSet<E>> {
     private var observable: ObservableSet0<E>? = null
     override fun getValue(thisRef: Any?, property: KProperty<*>): MutableSet<E> {
-        var observable: ObservableSet0<E>? = observable
-        if (observable == null) {
-            observable = ObservableSet0(property, source, prefix)
-            observable = observable
+        var value: ObservableSet0<E>? = observable
+        if (value == null) {
+            value = ObservableSet0(property, source, prefix)
+            observable = value
         }
-        return observable
+        return value
     }
 }
 
