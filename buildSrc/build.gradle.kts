@@ -13,6 +13,5 @@ repositories {
 dependencies {
     implementation(libs.indra.common)
     implementation(libs.kotlin.jvm)
-    implementation(libs.ksp)
     implementation(libs.shadow)
 }
