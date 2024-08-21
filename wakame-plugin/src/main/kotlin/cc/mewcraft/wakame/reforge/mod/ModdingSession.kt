@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.reforge.mod
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
@@ -323,6 +324,11 @@ interface ModdingSession : Examinable {
 
         operator fun get(id: String): Replace?
         operator fun contains(id: String): Boolean
+
+        /**
+         * 检查是否有相似的核心已放入该容器.
+         */
+        fun containSimilarCore(core: Core): Boolean
 
         /**
          * 获取玩家放入本会话的所有物品. 主要用于快速归还物品.

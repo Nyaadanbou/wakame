@@ -52,7 +52,7 @@ internal object ResultRender {
                 // FIXME 移除萌芽标签 / 实现 NekoStack#gui
                 ret = item.itemStack
                 ret.editMeta { meta ->
-                    val name = "<white>结果: <green>准备就绪".mini
+                    val name = "<white>结果: <green>就绪".mini
                     val lore = buildList {
                         addAll(result.description)
                     }
