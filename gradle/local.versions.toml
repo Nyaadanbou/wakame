@@ -1,9 +1,32 @@
 [versions]
+kotlin = "2.0.10"
+kotlinx-coroutines-core = "1.9.0-RC.2"
+koin = "3.5.3"
 ignite = "1.0.1"
 mixin = "0.8.6"
-mixinExtras = "0.3.6"
+mixin-extras = "0.3.6"
+paper = "1.20.6-R0.1-SNAPSHOT"
 
 [libraries]
+
+# Gradle plugins
+
+kotlin-jvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
+kotlinx-serialization = { group = "org.jetbrains.kotlin.plugin.serialization", name = "org.jetbrains.kotlin.plugin.serialization.gradle.plugin", version.ref = "kotlin" }
+kotlinx-atomicfu = { group = "org.jetbrains.kotlin.plugin.atomicfu", name = "org.jetbrains.kotlin.plugin.atomicfu.gradle.plugin", version.ref = "kotlin" }
+
+# Code dependencies
+
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
+
 ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
 mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
-mixinExtras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixinExtras" }
+mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
+
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
+koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5", version.ref = "koin" }
+
+helper = { group = "me.lucko", name = "helper", version = "6.0.0-SNAPSHOT" }
+
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }

@@ -12,10 +12,10 @@ description = "Add custom stuff to server"
 
 dependencies {
     // server
-    paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle(local.versions.paper)
 
     // helper
-    compileOnly("me.lucko", "helper", "6.0.0-SNAPSHOT")
+    compileOnly(local.helper)
     compileOnly(libs.shadow.nbt)
 
     // internal

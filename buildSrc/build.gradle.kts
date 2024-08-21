@@ -11,7 +11,18 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.indra.common)
-    implementation(libs.kotlin.jvm)
+    implementation(local.kotlin.jvm)
     implementation(libs.shadow)
+    implementation(libs.indra.common)
+}
+
+dependencies {
+    implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
+    implementation(files(local.javaClass.superclass.protectionDomain.codeSource.location))
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }

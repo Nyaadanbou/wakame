@@ -4,6 +4,6 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.server.paper)
+    compileOnly(local.paper)
     implementation(platform(libs.bom.invui))
 }

@@ -5,10 +5,10 @@ plugins {
 
 dependencies {
     // server
-    compileOnly(libs.server.paper)
+    compileOnly(local.paper)
 
     // helper
-    compileOnly("me.lucko", "helper", "6.0.0-SNAPSHOT")
+    compileOnly(local.helper)
 
     // internal
     compileOnly(platform(libs.bom.caffeine))

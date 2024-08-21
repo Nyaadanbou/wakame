@@ -1,5 +1,6 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
+import org.gradle.kotlin.dsl.paper
 
 plugins {
     id("neko.repositories") version "1.0-SNAPSHOT"
@@ -16,12 +17,10 @@ description = "Add custom stuff to server"
 
 dependencies {
     // server
-    compileOnly(libs.server.paper)
+    compileOnly(local.paper)
 
     // helper
-    compileOnly("me.lucko", "helper", "6.0.0-SNAPSHOT")
-    compileOnly(libs.helper.sql)
-    compileOnly(libs.helper.profiles)
+    compileOnly(local.helper)
 
     // internal
     implementation(project(":wakame-api"))
@@ -65,12 +64,10 @@ dependencies {
     testImplementation(libs.configurate.yaml)
     testImplementation(libs.configurate.extra.kotlin)
     testImplementation(libs.helper)
-    testImplementation(libs.helper.sql)
-    testImplementation(libs.helper.profiles)
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
     testImplementation(libs.mockbukkit)
-    testImplementation(libs.server.paper)
+    testImplementation(local.paper)
 }
 
 tasks {
@@ -111,7 +108,7 @@ tasks {
     val deployTargetPath = rootProject.file(".deploy_config").takeIf { it.exists() }?.readLines().orEmpty().filter { !it.startsWith('#') }
     register<Copy>("copyJar") {
         group = "mewcraft"
-        dependsOn(build)
+        dependsOn(assemble)
         from(inputJarPath)
         into(layout.buildDirectory)
         rename("(?i)${project.name}.*\\.jar", finalJarName)

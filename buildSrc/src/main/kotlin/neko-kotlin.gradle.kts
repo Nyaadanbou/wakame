@@ -3,6 +3,9 @@ plugins {
     id("com.gradleup.shadow")
 }
 
+// Expose version catalog
+val local = the<org.gradle.accessors.dm.LibrariesForLocal>()
+
 tasks {
     compileJava {
         options.encoding = "UTF-8"
@@ -12,7 +15,8 @@ tasks {
     }
     compileKotlin {
         compilerOptions {
-            suppressWarnings.set(true) // we rely on IDE analysis
+            // we rely on IDE analysis
+            suppressWarnings.set(true)
             freeCompilerArgs.add("-Xjvm-default=all")
         }
     }
@@ -35,8 +39,10 @@ tasks {
         }
     }
     test {
-        jvmArgs("-XX:+EnableDynamicAgentLoading") // suppress Java agent warning
-        useJUnitPlatform() // use JUnit 5
+        // suppress Java agent warning
+        jvmArgs("-XX:+EnableDynamicAgentLoading")
+        // use JUnit 5
+        useJUnitPlatform()
     }
 }
 
@@ -50,10 +56,10 @@ kotlin {
     sourceSets {
         val main by getting {
             dependencies {
-                // Basic runtime are shipped with: https://github.com/GamerCoder215/KotlinMC
+                // kotlin are shipped with: https://github.com/GamerCoder215/KotlinMC
                 compileOnly(kotlin("stdlib"))
                 compileOnly(kotlin("reflect"))
-                compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.KOTLINX_COROUTINES}")
+                compileOnly(local.kotlinx.coroutines.core)
             }
         }
         val test by getting {
@@ -61,7 +67,7 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation(kotlin("stdlib"))
                 implementation(kotlin("reflect"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.KOTLINX_COROUTINES}")
+                implementation(local.kotlinx.coroutines.core)
             }
         }
     }

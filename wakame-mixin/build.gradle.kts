@@ -9,13 +9,13 @@ version = "1.0"
 description = "The mixin part"
 
 dependencies {
-    paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle(local.versions.paper)
 
     remapper("net.fabricmc", "tiny-remapper", "0.10.1", classifier = "fat")
 
     compileOnly(local.ignite)
     compileOnly(local.mixin)
-    compileOnly(local.mixinExtras)
+    compileOnly(local.mixin.extras)
 
     compileOnly(project(":wakame-common"))
 }
