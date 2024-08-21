@@ -51,7 +51,7 @@ data class RecipeMatcherResult(
      * 获取展示该配方的Gui物品的name
      * 使用 [Component] 格式
      */
-    fun recipeItemName(layout: MenuLayout): Component {
+    private fun recipeItemName(layout: MenuLayout): Component {
         // 缺省构建格式: "合成: <result>"
         return (layout.getLang("recipe.name") ?: "合成: <result>")
             .replace("<result>", recipe.output.description(layout)).mini
@@ -61,7 +61,7 @@ data class RecipeMatcherResult(
      * 获取展示该配方的Gui物品的lore
      * 使用 [Component] 格式
      */
-    fun recipeItemLore(layout: MenuLayout): List<Component> {
+    private fun recipeItemLore(layout: MenuLayout): List<Component> {
         val sufficientPrefix = layout.getLang("prefix.sufficient") ?: "✔"
         val insufficientPrefix = layout.getLang("prefix.insufficient") ?: "✖"
         val choices = choiceCheckerFlags.map {
