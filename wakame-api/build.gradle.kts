@@ -9,6 +9,6 @@ description = "Add custom stuff to server"
 
 dependencies {
     compileOnly(project(":wakame-common"))
-    compileOnly(libs.server.paper)
+    compileOnly(local.paper)
     compileOnly(libs.checker.qual)
 }

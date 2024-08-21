@@ -14,8 +14,10 @@ tasks {
         dependsOn(shadowJar)
     }
     test {
-        jvmArgs("-XX:+EnableDynamicAgentLoading") // suppress Java agent warning
-        useJUnitPlatform() // use JUnit 5
+        // suppress Java agent warning
+        jvmArgs("-XX:+EnableDynamicAgentLoading")
+        // use JUnit 5
+        useJUnitPlatform()
     }
 }
 
