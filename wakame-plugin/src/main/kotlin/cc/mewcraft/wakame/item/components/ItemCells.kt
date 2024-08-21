@@ -147,7 +147,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     /**
      * 忽略数值的前提下, 判断是否包含指定的核心.
      */
-    fun hasSimilarCore(core: Core): Boolean
+    fun containSimilarCore(core: Core): Boolean
 
     /**
      * 用于方便构建 [ItemCells].
@@ -276,7 +276,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             return ret.build()
         }
 
-        override fun hasSimilarCore(core: Core): Boolean {
+        override fun containSimilarCore(core: Core): Boolean {
             return cells.values.any { cell -> cell.getCore().isSimilar(core) }
         }
 

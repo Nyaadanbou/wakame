@@ -190,7 +190,11 @@ private class CoreMatchRuleAttribute(
             return false
         }
 
-        return element == core.element?.key
+        if (element != null && element != core.element?.key) {
+            return false
+        }
+
+        return true
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

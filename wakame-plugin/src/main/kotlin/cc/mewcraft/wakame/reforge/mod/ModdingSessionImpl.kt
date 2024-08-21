@@ -6,6 +6,9 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
+import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.common.TemporaryIcons
 import cc.mewcraft.wakame.util.hideAllFlags
@@ -519,13 +522,17 @@ internal object Replace {
                 return ReplaceResult.failure(ingredient, "<red>内部错误".mini)
             }
 
-            // 源物品的词条栏上必须没有与便携核心相似的核心
+            // 源物品的词条栏上 必须没有与便携核心相似的核心
             val sourceCellsExcludingThis = sourceCells.filterx { it.getId() != cell.getId() }
-            if (sourceCellsExcludingThis.hasSimilarCore(portableCore.wrapped)) {
+            if (sourceCellsExcludingThis.containSimilarCore(portableCore.wrapped)) {
                 return ReplaceResult.failure(ingredient, "<gray>源物品上存在相似的便携核心".mini)
             }
 
-            // 便携式核心 必须符合定制规则
+            if (session.replaceParams.containSimilarCore(portableCore.wrapped)) {
+                return ReplaceResult.failure(ingredient, "<gray>输入之中存在相似的便携核心".mini)
+            }
+
+            // 便携式核心的类型 必须符合定制规则
             if (!rule.acceptedCores.test(portableCore.wrapped)) {
                 return ReplaceResult.failure(ingredient, "<gray>源物品的词条栏不接受这种便携核心".mini)
             }
@@ -533,14 +540,15 @@ internal object Replace {
             // 便携式核心上面的所有元素 必须全部出现在被定制物品上
             if (rule.requireElementMatch) {
                 val elementsOnSource = sourceItem.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
-                val elementsOnIngredient = ingredient.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
-                if (!elementsOnIngredient.containsAll(elementsOnSource)) {
+                // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
+                val elementOnIngredient = (portableCore.wrapped as? CoreAttribute)?.element
+                if (elementOnIngredient != null && elementOnIngredient !in elementsOnSource) {
                     return ReplaceResult.failure(ingredient, "<gray>便携核心的元素跟源物品的不相融".mini)
                 }
             }
 
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
-            val modCount = ingredient.components.get(ItemComponentTypes.CELLS)?.get(id)?.getReforgeHistory()?.modCount ?: Int.MAX_VALUE
+            val modCount = sourceItem.components.get(ItemComponentTypes.CELLS)?.get(id)?.getReforgeHistory()?.modCount ?: Int.MAX_VALUE
             if (modCount > rule.modLimit) {
                 return ReplaceResult.failure(ingredient, "<gray>源物品的词条栏已经历经无数雕琢".mini)
             }
@@ -651,6 +659,7 @@ internal object ReplaceMap {
 
         override fun get(id: String): ModdingSession.Replace? = null
         override fun contains(id: String): Boolean = false
+        override fun containSimilarCore(core: Core): Boolean = false
         override fun getPlayerInputs(): Collection<ItemStack> = emptyList()
         override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Replace>> = emptyList<Map.Entry<String, ModdingSession.Replace>>().iterator()
         override fun toString(): String = toSimpleString()
@@ -674,6 +683,16 @@ internal object ReplaceMap {
 
         override fun contains(id: String): Boolean {
             return data.containsKey(id)
+        }
+
+        override fun containSimilarCore(core: Core): Boolean {
+            return data.values.any { replace ->
+                replace.latestResult.ingredient
+                    ?.components
+                    ?.get(ItemComponentTypes.PORTABLE_CORE)
+                    ?.wrapped
+                    ?.isSimilar(core) == true
+            }
         }
 
         override fun getPlayerInputs(): List<ItemStack> {
