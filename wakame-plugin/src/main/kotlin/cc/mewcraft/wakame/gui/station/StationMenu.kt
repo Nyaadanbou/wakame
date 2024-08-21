@@ -58,7 +58,6 @@ class StationMenu(
     val stationSession = StationSession(station, viewer)
 
 
-
     /**
      * 合成站菜单的 [Gui].
      * 'X': background
@@ -69,9 +68,9 @@ class StationMenu(
     private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*layout.structure.toTypedArray())
         builder.addIngredient('X', BackgroundItem(layout))
-        builder.addIngredient('<', PrevItem(layout))
-        builder.addIngredient('>', NextItem(layout))
-        builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_VERTICAL)
+        builder.addIngredient('<', PrevItem(this))
+        builder.addIngredient('>', NextItem(this))
+        builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
     }
 
     /**
@@ -121,7 +120,7 @@ class StationMenu(
             //TODO gui物品
             val key = layout.getIcon("background")
             val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
-            nekoStack ?: return ItemWrapper(ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE).hideTooltip(true))
+            nekoStack ?: return ItemWrapper(ItemStack(Material.GRAY_STAINED_GLASS_PANE).hideTooltip(true))
             nekoStack.setSystemUse()
             return ItemWrapper(nekoStack.itemStack)
         }
@@ -135,10 +134,14 @@ class StationMenu(
      * 上一页的图标 [Item].
      */
     class PrevItem(
-        private val layout: MenuLayout
+        private val stationMenu: StationMenu,
     ) : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             //TODO gui物品
+            val layout = stationMenu.layout
+            if (!stationMenu.primaryGui.hasPreviousPage()) {
+                return BackgroundItem(layout).itemProvider
+            }
             val key = layout.getIcon("prev_page")
             val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
             nekoStack ?: return ItemBuilder(Material.SOUL_SAND)
@@ -152,10 +155,14 @@ class StationMenu(
      * 下一页的图标 [Item].
      */
     class NextItem(
-        private val layout: MenuLayout
+        private val stationMenu: StationMenu,
     ) : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             //TODO gui物品
+            val layout = stationMenu.layout
+            if (!stationMenu.primaryGui.hasNextPage()) {
+                return BackgroundItem(layout).itemProvider
+            }
             val key = layout.getIcon("next_page")
             val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
             nekoStack ?: return ItemBuilder(Material.MAGMA_BLOCK)

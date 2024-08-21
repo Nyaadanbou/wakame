@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.station.recipe.RecipeMatcherResult
 import cc.mewcraft.wakame.station.recipe.StationRecipe
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import org.bukkit.entity.Player
 
 /**
@@ -13,7 +13,7 @@ class StationSession(
     val station: Station,
     val player: Player,
 ) : Iterable<RecipeMatcherResult> {
-    private val recipeMatcherResults: Reference2ObjectOpenHashMap<StationRecipe, RecipeMatcherResult> = Reference2ObjectOpenHashMap()
+    private val recipeMatcherResults: Reference2ObjectLinkedOpenHashMap<StationRecipe, RecipeMatcherResult> = Reference2ObjectLinkedOpenHashMap()
 
     /**
      * 初始化时遍历所有配方并进行匹配.
@@ -42,7 +42,7 @@ class StationSession(
      * 获取时会先进行排序，可合成的配方会排在前面.
      */
     override fun iterator(): Iterator<RecipeMatcherResult> {
-        return recipeMatcherResults.values.sortedBy {
+        return recipeMatcherResults.values.sortedByDescending {
             it.canCraft
         }.iterator()
     }

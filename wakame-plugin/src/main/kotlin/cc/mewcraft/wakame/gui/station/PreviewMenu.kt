@@ -71,11 +71,11 @@ class PreviewMenu(
     private val previewGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*layout.structure.toTypedArray())
         builder.addIngredient('X', BackgroundItem(layout))
-        builder.addIngredient('<', PrevItem(layout))
-        builder.addIngredient('>', NextItem(layout))
+        builder.addIngredient('<', PrevItem(this))
+        builder.addIngredient('>', NextItem(this))
         builder.addIngredient('C', CraftItem(this, recipe))
         builder.addIngredient('B', BackItem(this))
-        builder.addIngredient('I', Markers.CONTENT_LIST_SLOT_VERTICAL)
+        builder.addIngredient('I', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         builder.addIngredient('O', SimpleItem(recipe.output.displayItemStack()))
         builder.setContent(recipe.input.map { SimpleItem(it.displayItemStack()) })
     }
@@ -105,7 +105,7 @@ class PreviewMenu(
             //TODO gui物品
             val key = layout.getIcon("background")
             val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
-            nekoStack ?: return ItemWrapper(ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE).hideTooltip(true))
+            nekoStack ?: return ItemWrapper(ItemStack(Material.GRAY_STAINED_GLASS_PANE).hideTooltip(true))
             nekoStack.setSystemUse()
             return ItemWrapper(nekoStack.itemStack)
         }
@@ -119,10 +119,14 @@ class PreviewMenu(
      * 上一页的图标 [Item].
      */
     class PrevItem(
-        private val layout: MenuLayout
+        private val previewMenu: PreviewMenu,
     ) : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             //TODO gui物品
+            val layout = previewMenu.layout
+            if (!previewMenu.previewGui.hasPreviousPage()) {
+                return BackgroundItem(layout).itemProvider
+            }
             val key = layout.getIcon("prev_page")
             val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
             nekoStack ?: return ItemBuilder(Material.SOUL_SAND)
@@ -136,10 +140,14 @@ class PreviewMenu(
      * 下一页的图标 [Item].
      */
     class NextItem(
-        private val layout: MenuLayout
+        private val previewMenu: PreviewMenu,
     ) : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             //TODO gui物品
+            val layout = previewMenu.layout
+            if (!previewMenu.previewGui.hasNextPage()) {
+                return BackgroundItem(layout).itemProvider
+            }
             val key = layout.getIcon("next_page")
             val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
             nekoStack ?: return ItemBuilder(Material.MAGMA_BLOCK)
@@ -170,6 +178,7 @@ class PreviewMenu(
             val previousStationMenu = previewMenu.previousStationMenu
             previousStationMenu.stationSession.updateRecipeMatcherResults()
             previousStationMenu.update()
+            previousStationMenu.open()
         }
     }
 
@@ -193,7 +202,7 @@ class PreviewMenu(
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             when (clickType) {
-                // 左键合成
+                // 单击合成
                 ClickType.LEFT, ClickType.RIGHT -> {
                     if (stationRecipe.match(player).canCraft) {
                         tryCraft(stationRecipe, player)

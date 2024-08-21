@@ -48,7 +48,7 @@ layout:
       name: "<!i><gold>合成:</gold> <result>"
       # 可用占位符:
       # - <choices>
-      lore: >-
+      lore: |-
         <!i><yellow>===================</yellow>
         <!i><gold>合成所需材料:</gold>
         <choices>

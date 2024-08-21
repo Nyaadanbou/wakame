@@ -85,10 +85,13 @@ internal object MenuLayoutSerializer : TypeSerializer<MenuLayout>, KoinComponent
             .mapValues { (_, mapChild) ->
                 mapChild.krequire<Key>()
             }
+        // TODO 使用真正的i18n
         val lang: MutableMap<String, String> = mutableMapOf()
         node.node("lang").visit(ConfigurationVisitor.Stateless { node1 ->
             if (node1.rawScalar() != null) {
-                lang[node1.path().joinToString(separator = ".")] = node1.rawScalar().toString()
+                val langKeyArray = node1.path().array()
+                val sliceArray = langKeyArray.sliceArray(langKeyArray.indexOf("lang") + 1 until langKeyArray.size)
+                lang[sliceArray.joinToString(separator = ".")] = node1.rawScalar().toString()
             }
         })
         return MenuLayout(
