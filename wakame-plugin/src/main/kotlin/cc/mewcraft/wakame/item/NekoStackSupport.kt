@@ -15,11 +15,11 @@ import cc.mewcraft.wakame.util.backingItemName
 import cc.mewcraft.wakame.util.backingLore
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.isNms
-import cc.mewcraft.wakame.util.removeWakameTag
+import cc.mewcraft.wakame.util.nyaTag
+import cc.mewcraft.wakame.util.nyaTagOrNull
+import cc.mewcraft.wakame.util.removeNyaTag
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.wakameTag
-import cc.mewcraft.wakame.util.wakameTagOrNull
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
@@ -37,7 +37,7 @@ import java.util.stream.Stream
 @get:Contract(pure = true)
 val ItemStack.isNeko: Boolean
     get() {
-        val tag = this.wakameTagOrNull
+        val tag = this.nyaTagOrNull
         if (tag != null) {
             val prototype = NekoStackSupport.getPrototype(tag)
             if (prototype != null) {
@@ -53,7 +53,7 @@ val ItemStack.isNeko: Boolean
 @get:Contract(pure = true)
 val ItemStack.isCustomNeko: Boolean
     get() {
-        val tag = this.wakameTagOrNull ?: return false
+        val tag = this.nyaTagOrNull ?: return false
         val prototype = NekoStackSupport.getPrototype(tag)
         return prototype != null
     }
@@ -64,7 +64,7 @@ val ItemStack.isCustomNeko: Boolean
 @get:Contract(pure = true)
 val ItemStack.isVanillaNeko: Boolean
     get() {
-        if (this.wakameTagOrNull != null) {
+        if (this.nyaTagOrNull != null) {
             return false
         }
         return VanillaNekoStackRegistry.has(this.type)
@@ -73,7 +73,7 @@ val ItemStack.isVanillaNeko: Boolean
 @get:Contract(pure = false)
 val ItemStack.tryNekoStack: NekoStack?
     get() {
-        val tag = this.wakameTagOrNull
+        val tag = this.nyaTagOrNull
         if (tag != null) {
             val prototype = NekoStackSupport.getPrototype(tag)
             if (prototype != null) {
@@ -189,32 +189,29 @@ private class CustomNekoStack(
 
     // 该构造器接受一个 ItemType, 用于从零开始创建一个物品
     constructor(mat: Material) : this(
-        handle = ItemStack(mat), // strictly-Bukkit ItemStack
+        handle = ItemStack(mat),
     )
 
     val nbt: CompoundTag
         get() {
-            // TODO 等到 Paper 的 delegate ItemStack 完成之后,
-            //  就不需要区分一个 ItemStack 是不是 NMS 了.
-            //  到时候这个 if-clause 直接删掉就行.
             if (!handle.isNms) {
-                // If this is a strictly-Bukkit ItemStack:
+                // 如果我们正在创建一个新的萌芽物品:
 
                 // the `wakame` compound should always be available (if not, create it)
                 // as we need to create a NekoItem realization from an empty ItemStack.
-                return handle.wakameTag
+                return handle.nyaTag
+            } else {
+                // 如果这个物品是从世界状态中读取到的:
+
+                // reading/modifying is allowed only if it already has a `wakame` compound.
+                // We explicitly prohibit modifying the ItemStacks, which are not already
+                // NekoItem realization, in the world state because we want to avoid
+                // undefined behaviors. Just imagine that a random code modifies a
+                // vanilla item and make it an incomplete realization of NekoItem.
+                return handle.nyaTagOrNull ?: throw NullPointerException(
+                    "Can't find specific NBT tags on the item"
+                )
             }
-
-            // If this is a NMS-backed ItemStack:
-
-            // reading/modifying is allowed only if it already has a `wakame` compound.
-            // We explicitly prohibit modifying the ItemStacks, which are not already
-            // NekoItem realization, in the world state because we want to avoid
-            // undefined behaviors. Just imagine that a random code modifies a
-            // vanilla item and make it an incomplete realization of NekoItem.
-            return handle.wakameTagOrNull ?: throw NullPointerException(
-                "Can't read/modify the NBT of NMS-backed ItemStack which is not NekoStack"
-            )
         }
 
     override val isEmpty: Boolean
@@ -226,11 +223,11 @@ private class CustomNekoStack(
             // 进行读写操作, 而没有调用 `minecraft:custom_data` 的 copyTag(),
             // 因此必须显式的对 NBT 进行拷贝, 否则会出现引用问题!
             val newHandle = handle.clone()
-            val wakameTag = newHandle.wakameTagOrNull?.copy()
+            val wakameTag = newHandle.nyaTagOrNull?.copy()
             if (wakameTag != null) {
                 // 由于存在 erase 函数可以直接抹除萌芽标签,
                 // 这里仅仅在萌芽标签存在的情况下才复制标签.
-                newHandle.wakameTag = wakameTag as CompoundTag
+                newHandle.nyaTag = wakameTag as CompoundTag
             }
             return newHandle
         }
@@ -274,7 +271,7 @@ private class CustomNekoStack(
     }
 
     override fun erase() {
-        handle.removeWakameTag()
+        handle.removeNyaTag()
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

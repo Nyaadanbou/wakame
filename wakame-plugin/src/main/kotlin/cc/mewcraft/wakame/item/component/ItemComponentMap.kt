@@ -4,8 +4,8 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
+import cc.mewcraft.wakame.util.nyaTag
 import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.wakameTag
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -325,7 +325,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
         // 导致 meta 内的 customTag 成员的实际引用会一直发生变化,
         // 因此这里用 getter 而不是 property initializer.
         private val nbt: CompoundTag
-            get() = stack.wakameTag
+            get() = stack.nyaTag
 
         override fun <T> get(type: ItemComponentType<out T>): T? {
             val tag = nbt.getCompoundOrNull(TAG_COMPONENTS) ?: return null

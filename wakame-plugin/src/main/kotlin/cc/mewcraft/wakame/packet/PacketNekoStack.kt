@@ -11,8 +11,8 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.WAKAME_TAG_NAME
-import cc.mewcraft.wakame.util.wakameTagOrNull
+import cc.mewcraft.wakame.util.NYA_TAG_NAME
+import cc.mewcraft.wakame.util.nyaTagOrNull
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore
 import com.github.retrooper.packetevents.resources.ResourceLocation
@@ -34,7 +34,7 @@ internal val PacketStack.isNeko: Boolean
         if (this.hasComponentPatches()) {
             val customData = this.components.get(ComponentTypes.CUSTOM_DATA)
             if (customData != null) {
-                if (customData.getCompoundTagOrNull(WAKAME_TAG_NAME) != null) {
+                if (customData.getCompoundTagOrNull(NYA_TAG_NAME) != null) {
                     return true
                 }
             }
@@ -49,7 +49,7 @@ internal val PacketStack.isCustomNeko: Boolean
         if (!this.hasComponentPatches()) {
             return false
         }
-        val ret = this.components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(WAKAME_TAG_NAME) != null
+        val ret = this.components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(NYA_TAG_NAME) != null
         return ret
     }
 
@@ -68,7 +68,7 @@ internal val PacketStack.tryNekoStack: PacketNekoStack?
         if (this.hasComponentPatches()) {
             val customData = this.components.get(ComponentTypes.CUSTOM_DATA)
             if (customData != null) {
-                val wakameTag = customData.getCompoundTagOrNull(WAKAME_TAG_NAME)
+                val wakameTag = customData.getCompoundTagOrNull(NYA_TAG_NAME)
                 if (wakameTag != null) {
                     return PacketCustomNekoStack(this)
                 }
@@ -152,7 +152,7 @@ private class PacketCustomNekoStack(
     // 开发日记1: We use property initializer here as it would be called multiple times,
     // and we don't want to do the unnecessary NBT conversion again and again
     // 开发日记2: 该 NBT 标签应该只接受读操作 (虽然可以写, 但不保证生效, 也没啥用应该)
-    val nbt: CompoundTag = requireNotNull(handle.wakameTagOrNull) {
+    val nbt: CompoundTag = requireNotNull(handle.nyaTagOrNull) {
         "PacketCustomNekoStack should have a wakame tag"
     }
 
@@ -165,7 +165,7 @@ private class PacketCustomNekoStack(
     override val shouldRender: Boolean
         get() = handle0.getComponent(ComponentTypes.CUSTOM_DATA)
             ?.getOrNull()
-            ?.getCompoundTagOrNull(WAKAME_TAG_NAME)
+            ?.getCompoundTagOrNull(NYA_TAG_NAME)
             ?.getCompoundTagOrNull(ItemComponentMap.TAG_COMPONENTS)
             ?.getTagOrNull(ItemComponentTypes.SYSTEM_USE.id) == null
 

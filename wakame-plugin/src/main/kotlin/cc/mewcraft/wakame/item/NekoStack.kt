@@ -125,33 +125,14 @@ interface NekoStack : Keyed, Examinable {
         /**
          * 获取该 [NekoStack] 的 `wakame` NBT 标签.
          *
-         * 这是 `wakame` NBT 的直接引用, 任何对该对象的修改都会直接影响到物品的 NBT 数据.
+         * 这是 `wakame` NBT 的直接引用, 任何对该对象的修改都会直接影响到物品本身的 NBT 数据.
          */
         val nbt: CompoundTag
 
         /**
          * 获取该 [NekoStack] 封装的 [ItemStack].
          *
-         * 这是 [ItemStack] 对象的直接引用, 任何对该对象的修改都会直接影响到物品的状态.
-         *
-         * ## 其他说明
-         *
-         * The item stack may or may not be backed by a NMS object.
-         *
-         * ## 当它封装的是 NMS 对象时
-         *
-         * Any changes on `this` will reflect on the underlying game state, which
-         * means: you may freely modify `this` and it will make sure that your
-         * modifications will be directly and instantly applied to the world state.
-         *
-         * ## 当它封装的是 Bukkit 对象时
-         *
-         * Any changes on `this` will **NOT** apply to the underlying world state,
-         * which means: you should only use `this` to add a new [ItemStack] to the
-         * world state, such as giving it to players and dropping it on the ground.
-         * In other words, if you have already added `this` to the world state, **DO
-         * NOT** modify `this` and then expect that your changes will apply to the
-         * world state.
+         * 这是 [ItemStack] 对象的直接引用, 任何对该对象的修改都会直接影响到物品本身的状态.
          */
         val handle: ItemStack
     }

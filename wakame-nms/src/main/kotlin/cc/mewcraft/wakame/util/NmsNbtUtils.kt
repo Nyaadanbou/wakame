@@ -49,20 +49,9 @@ object NmsNbtUtils {
         return listTag
     }
 
-    fun removeItemData(tag: CompoundTag): CompoundTag {
-        tag.remove("Items")
-        tag.remove("HandItems")
-        tag.remove("ArmorItems")
-        tag.remove("SaddleItem")
-        tag.remove("Inventory")
-
-        return tag
-    }
-
     fun convertListToStream(tag: ListTag): Stream<MojangStack> {
         return tag.stream().map { MojangStack.parseOptional(MinecraftServer.getServer().registryAccess(), it as CompoundTag) }
     }
-
 }
 
 @Suppress("UNCHECKED_CAST")

@@ -16,13 +16,15 @@ import java.util.TreeMap
 
 @ObcClassTarget("inventory.CraftMetaItem")
 interface ShadowCraftMetaItem : Shadow {
-    @Field
-    @Target("unhandledTags")
-    @ShadowingStrategy(wrapper = UnhandledTagsShadowingStrategy::class)
-    fun unhandledTags(): MutableMap<String, Tag>
+    @get:Field
+    @get:Target("unhandledTags")
+    @get:ShadowingStrategy(wrapper = UnhandledTagsShadowingStrategy::class)
+    val unhandledTags: MutableMap<String, Tag>
 }
 
-////// Strategy implementations //////
+//
+// Strategy implementations
+//
 
 private typealias NmsTag = Any
 
@@ -43,7 +45,9 @@ private class UnhandledTagsShadowingStrategy : Wrapper, Unwrapper {
     }
 }
 
-////// Helper classes //////
+//
+// Helper classes
+//
 
 private val NmsTag.wrap: Tag
     get() = BukkitShadowFactory.global().shadow<Tag>(this)
