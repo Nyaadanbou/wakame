@@ -16,12 +16,6 @@ version = "1.0.0-SNAPSHOT"
 description = "Add custom stuff to server"
 
 dependencies {
-    // server
-    compileOnly(local.paper)
-
-    // helper
-    compileOnly(local.helper)
-
     // internal
     implementation(project(":wakame-api"))
     implementation(project(":wakame-common"))
@@ -32,6 +26,8 @@ dependencies {
     runtimeOnly(project(path = ":wakame-nms", configuration = "reobf"))
 
     // libraries
+    compileOnly(local.paper)
+    compileOnly(local.helper)
     compileOnly(libs.asm) // runtime is provided by paper
     compileOnly(libs.asm.commons) // ^
     implementation(libs.commons.collections)
@@ -61,13 +57,13 @@ dependencies {
     implementation(platform(libs.bom.packetevents.spigot))
 
     // test
+    testImplementation(local.paper)
+    testImplementation(local.helper)
     testImplementation(libs.configurate.yaml)
     testImplementation(libs.configurate.extra.kotlin)
-    testImplementation(libs.helper)
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
     testImplementation(libs.mockbukkit)
-    testImplementation(local.paper)
 }
 
 tasks {
@@ -134,13 +130,14 @@ tasks {
 
 paper {
     main = "cc.mewcraft.wakame.WakamePlugin"
+    // loader = "cc.mewcraft.wakame.loader.WakameLoader"
+    // bootstrapper = "cc.mewcraft.wakame.loader.WakameBootstrapper"
     name = project.ext.get("name") as String
     version = "${project.version}"
     description = project.description
-    apiVersion = "1.19"
+    apiVersion = "1.21"
     author = "Nailm"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
-    bootstrapper = "cc.mewcraft.wakame.loader.WakameBootstrapper"
     serverDependencies {
         register("Kotlin") {
             required = true
