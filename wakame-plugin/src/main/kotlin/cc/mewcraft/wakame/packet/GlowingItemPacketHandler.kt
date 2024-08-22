@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.packet
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.rarity.GlowColor
-import cc.mewcraft.wakame.util.NmsEntityUtils
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
@@ -12,6 +11,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
+import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
@@ -28,7 +28,7 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
         when (event.packetType) {
             PacketType.Play.Server.ENTITY_METADATA -> {
                 val origin = WrapperPlayServerEntityMetadata(event)
-                val entity = NmsEntityUtils.getEntity(origin.entityId) as? Item ?: return
+                val entity = SpigotConversionUtil.getEntityById(null, origin.entityId) as? Item ?: return
                 val nekoStack = entity.itemStack.tryNekoStack ?: return
                 val itemComponents = nekoStack.components
                 if (!itemComponents.has(ItemComponentTypes.GLOWABLE))
