@@ -8,5 +8,5 @@ dependencies {
     compileOnly(local.paper)
     // helper
     compileOnly(local.helper)
-    compileOnly(libs.shadow.nbt)
+    compileOnly(local.shadow.nbt)
 }

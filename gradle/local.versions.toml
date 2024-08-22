@@ -6,6 +6,7 @@ ignite = "1.0.1"
 mixin = "0.8.6"
 mixin-extras = "0.3.6"
 paper = "1.21.1-R0.1-SNAPSHOT"
+shadow-nbt = "1.21.1-SNAPSHOT"
 
 [libraries]
 
@@ -30,3 +31,4 @@ koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5", versio
 helper = { group = "me.lucko", name = "helper", version = "6.0.0-SNAPSHOT" }
 
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
