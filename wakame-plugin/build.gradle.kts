@@ -37,7 +37,7 @@ dependencies {
     implementation(libs.commons.collections)
     implementation(libs.commons.provider)
     implementation(libs.mocha)
-    implementation(libs.shadow.nbt)
+    implementation(local.shadow.nbt)
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
