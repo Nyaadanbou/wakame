@@ -10,17 +10,12 @@ import cc.mewcraft.wakame.command.suspendingHandler
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.pack.model.ModelRegistry
 import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
-import cc.mewcraft.wakame.util.CompoundBinaryTag
 import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.ListTag
 import cc.mewcraft.wakame.util.ThreadType
-import cc.mewcraft.wakame.util.adventureNbt
-import cc.mewcraft.wakame.util.adventureNbtOrNull
-import cc.mewcraft.wakame.util.copyWriteAdventureNbt
-import cc.mewcraft.wakame.util.setAdventureNbt
+import cc.mewcraft.wakame.util.nyaTag
+import cc.mewcraft.wakame.util.nyaTagOrNull
 import cc.mewcraft.wakame.util.takeUnlessEmpty
-import cc.mewcraft.wakame.util.wakameTag
-import cc.mewcraft.wakame.util.wakameTagOrNull
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import org.bukkit.Bukkit
@@ -68,7 +63,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                 //<editor-fold desc="handler: print_wakame_nbt_if_not_null">
                 handler { context ->
                     val sender = context.sender() as Player
-                    val nbtOrNull = sender.inventory.itemInMainHand.wakameTagOrNull
+                    val nbtOrNull = sender.inventory.itemInMainHand.nyaTagOrNull
                     sender.sendPlainMessage("NBT: " + nbtOrNull?.asString()?.prettifyJson())
                 }
                 //</editor-fold>
@@ -88,7 +83,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                 //<editor-fold desc="handler: print_wakame_nbt_or_create">
                 handler { context ->
                     val sender = context.sender() as Player
-                    val nbt = sender.inventory.itemInMainHand.wakameTag
+                    val nbt = sender.inventory.itemInMainHand.nyaTag
                     sender.sendPlainMessage("NBT: " + nbt.asString().prettifyJson())
                 }
                 //</editor-fold>
@@ -107,7 +102,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                     val bukkitStack = ItemStack(Material.NETHERITE_SWORD)
 
                     // test write operations
-                    bukkitStack.wakameTag = CompoundTag {
+                    bukkitStack.nyaTag = CompoundTag {
                         putString("namespace", "short_sword")
                         putString("path", "demo")
                         putByte("variant", 18)
@@ -141,7 +136,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                     }
 
                     // test read operations (based on what have been written previously)
-                    with(bukkitStack.wakameTag) {
+                    with(bukkitStack.nyaTag) {
                         check(getString("namespace") == "short_sword")
                         check(getString("path") == "demo")
                         check(getByte("variant") == 18.toByte())
@@ -180,58 +175,6 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                         val overworld = Bukkit.getWorlds().first()
                         val spawnLoc = overworld.spawnLocation
                         overworld.dropItem(spawnLoc, bukkitStack)
-                    }
-                }
-                //</editor-fold>
-            }.buildAndAdd(this)
-
-            // /<root> debug test_adventure_nbt_invocation
-            commandManager.commandBuilder(
-                name = CommandConstants.ROOT_COMMAND,
-                description = Description.of("Invokes the adventure NBT and see if they run as expected")
-            ) {
-                senderType<Player>()
-                permission(CommandPermissions.DEBUG)
-                literal(DEBUG_LITERAL)
-                literal("test_adventure_nbt_invocation")
-                required("case", IntegerParser.integerParser(1, 4))
-                //<editor-fold desc="handler: test_adventure_nbt_invocation">
-                handler { context ->
-                    val sender = context.sender() as Player
-                    val inventory = sender.inventory
-                    val case = context.get<Int>("case")
-
-                    when (case) {
-                        1 -> {
-                            val nbt = sender.inventory.itemInMainHand.adventureNbt
-                            sender.sendPlainMessage("NBT: ${nbt.toString().prettifyJson()}")
-                        }
-
-                        2 -> {
-                            val nbtOrNull = sender.inventory.itemInMainHand.adventureNbtOrNull
-                            sender.sendPlainMessage("NBT: " + nbtOrNull?.toString()?.prettifyJson())
-                        }
-
-                        3 -> {
-                            inventory.itemInMainHand.setAdventureNbt {
-                                put("adventure", CompoundBinaryTag {
-                                    putString("k1", "v1")
-                                    putString("k2", "v2")
-                                    putByte("k3", 3)
-                                })
-                            }
-                        }
-
-                        4 -> {
-                            val item = inventory.itemInMainHand.copyWriteAdventureNbt {
-                                put("adventure", CompoundBinaryTag {
-                                    putString("k1", "v1")
-                                    putString("k2", "v2")
-                                    putByte("k3", 3)
-                                })
-                            }
-                            inventory.addItem(item)
-                        }
                     }
                 }
                 //</editor-fold>

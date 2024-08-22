@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
 val ItemMeta.unhandledTags: MutableMap<String, Tag>
-    get() = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem>(this).unhandledTags()
+    get() = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem>(this).unhandledTags
 
 /**
  * Gets the custom model data or `0`, if it does not exist.
@@ -43,7 +43,7 @@ val ItemStack.adventureCustomName: Component
 val ItemStack.adventureItemName: Component
     get() {
         if (this.hasItemMeta()) {
-            return this.itemMeta.itemName() ?: Component.empty()
+            return this.itemMeta.itemName()
         }
         return Component.empty()
     }

@@ -10,17 +10,27 @@ internal fun ItemStack.getCustomData(): CompoundTag? {
     return customData?.copyTag() // 返回一个副本
 }
 
+internal fun ItemStack.getCustomDataOrCreate(): CompoundTag {
+    val customData = this.get(DataComponents.CUSTOM_DATA)
+    if (customData === null) {
+        val empty = CustomData.of(CompoundTag())
+        this.set(DataComponents.CUSTOM_DATA, empty)
+        return empty.copyTag() // 返回一个副本
+    }
+    return customData.copyTag() // 返回一个副本
+}
+
 internal fun ItemStack.setCustomData(tag: CompoundTag) {
     val customData = CustomData.of(tag)
     this.set(DataComponents.CUSTOM_DATA, customData)
 }
 
-internal fun ItemStack.getDirectCustomData(): CompoundTag? {
+internal fun ItemStack.getUnsafeCustomData(): CompoundTag? {
     val customData = this.get(DataComponents.CUSTOM_DATA)
     return customData?.unsafe // 直接返回 backing CompoundTag
 }
 
-internal fun ItemStack.getDirectCustomDataOrCreate(): CompoundTag {
+internal fun ItemStack.getUnsafeCustomDataOrCreate(): CompoundTag {
     val customData = this.get(DataComponents.CUSTOM_DATA)
     if (customData === null) {
         val empty = CustomData.of(CompoundTag())

@@ -2,26 +2,22 @@
 
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.shadow.inventory.ShadowCraftMetaItem0
 import cc.mewcraft.wakame.shadow.inventory.ShadowItemStack
-import io.papermc.paper.adventure.PaperAdventure
-import me.lucko.shadow.bukkit.BukkitShadowFactory
-import me.lucko.shadow.shadow
-import net.kyori.adventure.text.Component
-import net.minecraft.core.component.DataComponents
+import io.papermc.paper.adventure.*
+import me.lucko.shadow.*
+import me.lucko.shadow.bukkit.*
+import net.kyori.adventure.text.*
+import net.minecraft.core.component.*
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
-import net.minecraft.world.item.component.CustomModelData
-import net.minecraft.world.item.component.ItemLore
-import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.inventory.CraftItemStack
-import org.bukkit.inventory.meta.ItemMeta
+import net.minecraft.world.item.component.*
+import org.bukkit.craftbukkit.inventory.*
 import cc.mewcraft.nbt.CompoundTag as CompoundShadowTag
 import cc.mewcraft.nbt.Tag as ShadowTag
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
-const val WAKAME_TAG_NAME: String = "wakame"
+const val NYA_TAG_NAME: String = "wakame"
 
 //<editor-fold desc="Shadow un(wrappers)">
 internal val Tag.wrap: ShadowTag
@@ -35,202 +31,130 @@ internal val CompoundShadowTag.unwrap: CompoundTag
 //</editor-fold>
 
 //<editor-fold desc="BukkitStack (NMS)">
-private val BukkitStack.handle: MojangStack?
-    get() = (this as? CraftItemStack)?.handle
-
 /**
- * Sets the custom name. You may pass a `null` to remove it.
- *
- * Only works if `this` [BukkitStack] is NMS-object backed.
+ * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.backingCustomName: Component?
-    get() {
-        return PaperAdventure.asAdventure(this.handle?.get(DataComponents.CUSTOM_NAME))
-    }
+    get() = this.handle.get(DataComponents.CUSTOM_NAME)?.let(PaperAdventure::asAdventure)
     set(value) {
         if (value != null) {
-            this.handle?.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
+            this.handle.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
         } else {
-            this.handle?.remove(DataComponents.CUSTOM_NAME)
+            this.handle.remove(DataComponents.CUSTOM_NAME)
         }
     }
 
 /**
- * Sets the item name. You may pass a `null` to remove it.
- *
- * Only works if `this` [BukkitStack] is NMS-object backed.
+ * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.backingItemName: Component?
-    get() {
-        return PaperAdventure.asAdventure(this.handle?.get(DataComponents.ITEM_NAME))
-    }
+    get() = this.handle.get(DataComponents.ITEM_NAME)?.let(PaperAdventure::asAdventure)
     set(value) {
         if (value != null) {
-            this.handle?.set(DataComponents.ITEM_NAME, PaperAdventure.asVanilla(value))
+            this.handle.set(DataComponents.ITEM_NAME, PaperAdventure.asVanilla(value))
         } else {
-            this.handle?.remove(DataComponents.ITEM_NAME)
+            this.handle.remove(DataComponents.ITEM_NAME)
         }
     }
 
 /**
- * Sets the item lore. You may pass a `null` to remove it.
- *
- * Only works if `this` [BukkitStack] is NMS-object backed.
+ * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.backingLore: List<Component>?
-    get() {
-        return this.handle?.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
-    }
+    get() = this.handle.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
     set(value) {
         if (value != null) {
-            this.handle?.set(DataComponents.LORE, ItemLore(value.map(PaperAdventure::asVanilla)))
+            this.handle.set(DataComponents.LORE, ItemLore(value.map(PaperAdventure::asVanilla)))
         } else {
-            this.handle?.remove(DataComponents.LORE)
+            this.handle.remove(DataComponents.LORE)
         }
     }
 
 /**
- * Sets the custom model data. You may pass a `null` to remove it.
- *
- * Only works if `this` [BukkitStack] is NMS-object backed.
+ * 设置自定义模型数据. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.backingCustomModelData: Int?
-    get() {
-        return this.handle?.get(DataComponents.CUSTOM_MODEL_DATA)?.value
-    }
+    get() = this.handle.get(DataComponents.CUSTOM_MODEL_DATA)?.value
     set(value) {
         if (value != null) {
-            this.handle?.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(value))
+            this.handle.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(value))
         } else {
-            this.handle?.remove(DataComponents.CUSTOM_MODEL_DATA)
+            this.handle.remove(DataComponents.CUSTOM_MODEL_DATA)
         }
+    }
+
+/**
+ * 获取封装的 NMS 对象.
+ */
+internal val BukkitStack.handle: MojangStack
+    get() = if (this is CraftItemStack) {
+        this.handle
+    } else {
+        val shadow = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
+        val delegate = shadow.craftDelegate
+        delegate.handle
     }
 //</editor-fold>
 
-//<editor-fold desc="BukkitStack (API & NMS) - Access to wakame tag">
-/**
- * ## Getter
- *
- * Gets the [WAKAME_TAG_NAME] compound tag from `this`. If the
- * [WAKAME_TAG_NAME] compound tag does not already exist, a new compound
- * tag will be created and **saved** to `this`.
- *
- * ## Setter
- *
- * Sets the [WAKAME_TAG_NAME] compound tag of `this` to given
- * value, overwriting any existing [WAKAME_TAG_NAME] compound tag
- * on the `this`.
- *
- * You can also set `this` to `null` to removes the [WAKAME_TAG_NAME]
- * compound tag from `this`.
- */
-var BukkitStack.wakameTag: CompoundShadowTag
+//<editor-fold desc="BukkitStack - Access to nya tags">
+var BukkitStack.nyaTag: CompoundShadowTag
+    /**
+     * 获取萌芽标签.
+     * 如果物品上不存在萌芽标签, 将会创建一个新的萌芽标签并*写入*到物品上.
+     */
     get() {
         val handle = this.handle
-        if (handle != null) { // CraftItemStack
-            return handle.wakameTag
-        } else { // strictly-Bukkit ItemStack
-            val customTag = this.backingItemMeta!!.getDirectCustomData()
-            val tag = customTag.getOrPut(WAKAME_TAG_NAME, ::CompoundTag) as CompoundTag
-            return tag.wrap
-        }
+        return handle.nyaTag
     }
+    /**
+     * 设置萌芽标签.
+     * 如果物品上已经存在萌芽标签, 将会覆盖掉原有的萌芽标签.
+     * 你也可以传入 `null` 来移除物品上的萌芽标签.
+     */
     set(value) {
         val handle = this.handle
-        if (handle != null) { // CraftItemStack
-            handle.wakameTag = value
-        } else { // strictly-Bukkit ItemStack
-            this.backingItemMeta!!.getDirectCustomData().put(WAKAME_TAG_NAME, value.unwrap)
-        }
+        handle.nyaTag = value
     }
 
 /**
- * Gets the [WAKAME_TAG_NAME] compound tag from `this` or `null`, if it does
- * not exist. Unlike [BukkitStack.wakameTag], which possibly modifies the
- * item's NBT tags, this function will not modify `this` at all.
+ * 获取萌芽标签. 如果物品上不存在萌芽标签, 将会返回 `null`.
+ * 与 [nyaTag] 不同, 该函数永远不会修改物品的任何数据.
  */
-val BukkitStack.wakameTagOrNull: CompoundShadowTag?
+val BukkitStack.nyaTagOrNull: CompoundShadowTag?
     get() {
         val handle = this.handle
-        return if (handle != null) { // CraftItemStack
-            handle.wakameTagOrNull
-        } else { // strictly-Bukkit ItemStack
-            (this.backingItemMeta?.getDirectCustomData()?.get(WAKAME_TAG_NAME) as? CompoundTag)?.wrap
-        }
+        return handle.nyaTagOrNull
     }
 
 /**
- * Removes the [WAKAME_TAG_NAME] compound tag from `this`.
+ * 移除物品上的萌芽标签.
  */
-fun BukkitStack.removeWakameTag() {
+fun BukkitStack.removeNyaTag() {
     val handle = this.handle
-    if (handle != null) { // CraftItemStack
-        handle.getDirectCustomData()?.remove(WAKAME_TAG_NAME)
-    } else { // strictly-Bukkit ItemStack
-        this.backingItemMeta?.getDirectCustomData()?.remove(WAKAME_TAG_NAME)
-    }
-}
-//</editor-fold>
-
-//<editor-fold desc="BukkitStack (API) - Access to ItemMeta on strictly-Bukkit stacks">
-/**
- * Gets the [ItemMeta] on strictly-Bukkit [BukkitStack] without cloning.
- * If the item meta does not already exist, it will try to create one
- * and then return.
- */
-private val BukkitStack.backingItemMeta: ItemMeta?
-    get() {
-        if (this is CraftItemStack)
-            return null
-
-        val shadow = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
-        var backingMeta = shadow.getMeta()
-
-        if (backingMeta == null) {
-            backingMeta = Bukkit.getItemFactory().getItemMeta(type)
-            shadow.setMeta(backingMeta)
-        }
-
-        return backingMeta
-    }
-//</editor-fold>
-
-//<editor-fold desc="ItemMeta">
-/**
- * Access to the `minecraft:custom_data` on [ItemMeta].
- */
-private fun ItemMeta.getDirectCustomData(): CompoundTag {
-    val shadow = BukkitShadowFactory.global().shadow<ShadowCraftMetaItem0>(this)
-    val customTag = shadow.getCustomTag()
-    if (customTag === null) {
-        val newCustomTag = CompoundTag()
-        shadow.setCustomTag(newCustomTag)
-        return newCustomTag
-    }
-    return customTag
+    handle.getUnsafeCustomData()?.remove(NYA_TAG_NAME)
 }
 //</editor-fold>
 
 //<editor-fold desc="MojangStack">
-private var MojangStack.wakameTag: CompoundShadowTag
+private var MojangStack.nyaTag: CompoundShadowTag
     get() {
-        val customData = this.getDirectCustomDataOrCreate()
-        val wakameTag = customData.getOrPut(WAKAME_TAG_NAME, ::CompoundTag)
-        return wakameTag.wrap
+        val customData = this.getUnsafeCustomDataOrCreate()
+        val nyaTag = customData.getOrPut(NYA_TAG_NAME, ::CompoundTag)
+        return nyaTag.wrap
     }
     set(value) {
-        // 替换整个物品组件: minecraft:custom_data
+        // 替换整个物品组件: `minecraft:custom_data`.
         // 也就是说一旦该 setter 函数被调用, 那么物品组件
-        // minecraft:custom_data 中的其他内容都会被移除.
+        // `minecraft:custom_data` 中的其他内容都会被移除.
         val tag = CompoundTag()
-        tag.put(WAKAME_TAG_NAME, value.unwrap)
+        tag.put(NYA_TAG_NAME, value.unwrap)
         this.setCustomData(tag)
     }
 
-private val MojangStack.wakameTagOrNull: CompoundShadowTag?
+private val MojangStack.nyaTagOrNull: CompoundShadowTag?
     get() {
-        val customData = this.getDirectCustomData()
-        val wakameTag = customData?.getCompoundOrNull(WAKAME_TAG_NAME)
-        return wakameTag?.wrap
+        val customData = this.getUnsafeCustomData()
+        val nyaTag = customData?.getCompoundOrNull(NYA_TAG_NAME)
+        return nyaTag?.wrap
     }
 //</editor-fold>
