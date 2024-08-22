@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.command
 
 import cc.mewcraft.wakame.command.command.*
@@ -5,20 +7,20 @@ import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
 import org.incendo.cloud.SenderMapper
 import org.incendo.cloud.execution.ExecutionCoordinator
-import org.incendo.cloud.paper.PaperCommandManager
+import org.incendo.cloud.paper.LegacyPaperCommandManager
 import org.incendo.cloud.setting.ManagerSetting
 import org.koin.core.component.KoinComponent
 
 class CommandManager(
     plugin: Plugin,
-) : KoinComponent, PaperCommandManager<CommandSender>(
+) : KoinComponent, LegacyPaperCommandManager<CommandSender>(
     plugin,
     ExecutionCoordinator.asyncCoordinator(),
     SenderMapper.identity()
 ) {
     fun init() {
         // We are in Paper, just register Brigadier
-        registerBrigadier()
+        registerLegacyPaperBrigadier() // FIXME 等 cloud-minecraft 更新后换成 ModernPaperCommandManager
         registerAsynchronousCompletions()
 
         // Change default settings
