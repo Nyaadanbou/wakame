@@ -66,7 +66,7 @@ object ModelRegistry : Initializable, KoinComponent {
         return models.values
     }
 
-    override fun onPrePack() {
+    override fun onPreWorld() {
         loadModels().onFailure { it.printStackTrace() }
     }
 

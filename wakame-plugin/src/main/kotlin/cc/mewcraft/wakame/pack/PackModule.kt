@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.pack.model.ModelViewPersistenceHandlerImpl
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.new
 import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.binds
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.ResourcePackWriter
@@ -31,11 +31,13 @@ const val GENERATED_RESOURCE_PACK_ZIP_FILE = "generated/$RESOURCE_PACK_ZIP_NAME"
 internal fun packModule(): Module = module {
     singleOf(::VanillaResourcePack)
 
-    single { ModelRegistry } binds arrayOf(Initializable::class)
-    single { ModelAnimateTask() } binds arrayOf(Initializable::class)
+    single { ModelRegistry } bind Initializable::class
+    single { ModelAnimateTask() } bind Initializable::class
+
+    single { ResourcePackFacade } bind Initializable::class
 
     single<ResourcePackManager> {
-        ResourcePackManager(new(::ResourcePackConfiguration), get(), get())
+        ResourcePackManager(get(), get())
     }
 
     single<ResourcePackReader<FileTreeReader>> { MinecraftResourcePackReader.minecraft() }
@@ -45,7 +47,6 @@ internal fun packModule(): Module = module {
         BukkitModelEngine_v1_20_R3.create(get(), new(::ModelViewPersistenceHandlerImpl))
     }
 
-    single<ResourcePackListener> {
-        ResourcePackListener()
-    }
+    single<ResourcePackListener> { ResourcePackListener() }
+    single<ResourcePackFacadeListener> { ResourcePackFacadeListener() }
 }

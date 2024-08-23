@@ -42,7 +42,7 @@ class ItemModelDataLookupTest : KoinTest {
     @Test
     fun `test get item model data`() {
         val itemModelDataLookup = get<ItemModelDataLookup>()
-        itemModelDataLookup.onPrePack()
+        itemModelDataLookup.onPreWorld()
         val itemModelData1 = itemModelDataLookup[Key("short_sword:demo"), 0]
         val itemModelData2 = itemModelDataLookup[Key("long_sword:demo"), 0]
         val itemModelData3 = itemModelDataLookup[Key("short_sword:demo"), 1]

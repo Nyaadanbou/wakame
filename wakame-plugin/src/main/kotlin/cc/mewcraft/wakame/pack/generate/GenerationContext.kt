@@ -15,7 +15,7 @@ data class GenerationContext(
      */
     val resourcePack: ResourcePack,
     /**
-     * 资源包里包含的所有“资产”.
+     * 资源包里包含的所有“资源文件”.
      */
     val assets: Collection<Assets>,
 )

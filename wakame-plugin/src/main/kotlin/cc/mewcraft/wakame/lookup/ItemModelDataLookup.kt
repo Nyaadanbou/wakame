@@ -2,6 +2,8 @@ package cc.mewcraft.wakame.lookup
 
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.HashBasedTable
@@ -12,7 +14,7 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 
-
+@PreWorldDependency(runBefore = [ItemRegistry::class])
 internal class ItemModelDataLookup(
     private val logger: Logger,
     private val loader: GsonConfigurationLoader,
@@ -81,7 +83,7 @@ internal class ItemModelDataLookup(
         loader.save(node)
     }
 
-    override fun onPrePack() {
+    override fun onPreWorld() {
         loadLayout()
     }
 

@@ -1,25 +1,15 @@
-import cc.mewcraft.wakame.pack.ResourcePackConfiguration
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.util.readFromDirectory
 import cc.mewcraft.wakame.util.readFromZipFile
 import cc.mewcraft.wakame.util.writeToDirectory
 import cc.mewcraft.wakame.util.writeToZipFile
-import io.mockk.Call
-import io.mockk.MockKAnswerScope
-import io.mockk.confirmVerified
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
-import io.mockk.verify
+import io.mockk.*
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.slf4j.Logger
 import team.unnamed.creative.ResourcePack
@@ -34,9 +24,6 @@ class ResourcePackManagerTest : KoinTest {
     private val logger: Logger by inject()
 
     companion object {
-        private val testModule = module {
-            single { ResourcePackConfiguration() }
-        }
 
         private const val CREATIVE_EXTENSION_FILE = "cc.mewcraft.wakame.util.CreativeExtensionsKt"
 
@@ -45,9 +32,6 @@ class ResourcePackManagerTest : KoinTest {
         fun setup() {
             startKoin {
                 modules(testEnv())
-
-                // Add test module
-                modules(testModule)
             }
         }
 
@@ -87,7 +71,6 @@ class ResourcePackManagerTest : KoinTest {
 
         // Create the manager
         val manager = ResourcePackManager(
-            get(),
             mockResourceReader,
             mockResourceWriter,
         )

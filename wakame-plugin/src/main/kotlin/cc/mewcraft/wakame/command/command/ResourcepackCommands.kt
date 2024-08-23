@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.suspendingHandler
+import cc.mewcraft.wakame.pack.ResourcePackFacade
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.Command
@@ -45,8 +46,7 @@ object ResourcepackCommands : KoinComponent, CommandFactory<CommandSender> {
                 literal("upload")
                 suspendingHandler { context ->
                     val sender = context.sender()
-                    val resourcePackManager = get<ResourcePackManager>()
-                    resourcePackManager.startServer()
+                    ResourcePackFacade.publisher.publish()
                     sender.sendPlainMessage("Resourcepack service has been started")
                 }
             }.buildAndAdd(this)

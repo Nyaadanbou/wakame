@@ -14,8 +14,8 @@ import me.lucko.helper.terminable.Terminable
  *   being called, and vice versa.
  * - Functions of different stages will always be called in the order as
  *   they are declared in this file. For example, [onPreWorld] is always
- *   called before [onPrePack] because [onPreWorld] is declared **before**
- *   [onPrePack]. You can rely on this rule to enforce a basic
+ *   called before [onPostWorld] because [onPreWorld] is declared **before**
+ *   [onPostWorld]. You can rely on this rule to enforce a basic
  *   initialization order.
  * - However, functions of the same stage will be called in
  *   un-deterministic order. Suppose there are 2 initializables, X and Y.
@@ -35,17 +35,6 @@ interface Initializable : Terminable {
     fun onPreWorld() {}
 
     /**
-     * Before the resource pack generation starts.
-     */
-    fun onPrePack() {}
-
-    /**
-     * After the first stage of resource pack generation ("pre-world") has
-     * finished. Lookup registries are now loaded.
-     */
-    fun onPostPackPreWorld() {}
-
-    /**
      * After the world has been loaded.
      */
     fun onPostWorld() {}
@@ -54,18 +43,6 @@ interface Initializable : Terminable {
      * After the world has been loaded, in an async thread.
      */
     suspend fun onPostWorldAsync() {}
-
-    /**
-     * After the second (and last) stage of resource pack generation
-     * ("post-world") has finished.
-     */
-    fun onPostPack() {}
-
-    /**
-     * After the second (and last) stage of resource pack generation
-     * ("post-world") has finished, in an async thread.
-     */
-    suspend fun onPostPackAsync() {}
 
     /**
      * When [NekoCommandReloadEvent] is fired.

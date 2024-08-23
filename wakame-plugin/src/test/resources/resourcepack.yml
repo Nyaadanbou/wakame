@@ -1,0 +1,19 @@
+service:
+  enabled: true
+  type: self_host
+  host: "play.mewcraft.cc"
+  port: 7270
+  append_port: true
+publisher:
+  enabled: true
+  type: github
+  username: "g2213swo"
+  token: ""
+  repo: "Nyaadanbou/rprelay"
+  branch: "main"
+  path: "pack"
+  commit_message: "Auto upload resource pack"
+prompt:
+  force: false
+generation:
+  description: Wakame

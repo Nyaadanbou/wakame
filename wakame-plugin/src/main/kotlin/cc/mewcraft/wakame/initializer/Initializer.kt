@@ -18,9 +18,8 @@ import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.item.MultipleItemListener
 import cc.mewcraft.wakame.item.SingleItemListener
-import cc.mewcraft.wakame.pack.PackException
+import cc.mewcraft.wakame.pack.ResourcePackFacadeListener
 import cc.mewcraft.wakame.pack.ResourcePackListener
-import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.player.inventory.ItemSlotWatcher
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer.REFORGE_DIR_NAME
@@ -144,6 +143,7 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
+        registerTerminableListener(get<ResourcePackFacadeListener>()).bindWith(this)
         registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
         registerTerminableListener(get<SingleItemListener>()).bindWith(this)
         registerTerminableListener(get<DamageListener>()).bindWith(this)
@@ -207,23 +207,6 @@ object Initializer : KoinComponent, Listener {
         forEachPreWorld { onPreWorld() }.onFailure { return }
         LOGGER.info("[Initializer] onPreWorld - Complete")
 
-        LOGGER.info("[Initializer] onPrePack - Start")
-        forEachPreWorld { onPrePack() }.onFailure { return }
-        LOGGER.info("[Initializer] onPrePack - Complete")
-
-        get<ResourcePackManager>().generate(false).onFailure {
-            if (it is PackException) {
-                LOGGER.warn("Failed to generate pack. This is not a critical issue.", it)
-            } else {
-                shutdown("An exception occurred during resource pack generation.", it)
-                return
-            }
-        }
-
-        LOGGER.info("[Initializer] onPostPackPreWorld - Start")
-        forEachPreWorld { onPostPackPreWorld() }.onFailure { return }
-        LOGGER.info("[Initializer] onPostPackPreWorld - Complete")
-
         preWorldInitialized = true
     }
 
@@ -258,20 +241,6 @@ object Initializer : KoinComponent, Listener {
         onPostWorldAsyncResult.onFailure { return }
         LOGGER.info("[Initializer] onPostWorldAsync - Complete")
 
-        LOGGER.info("[Initializer] onPostPack - Start")
-        forEachPostWorld { onPostPack() }.onFailure { return }
-        LOGGER.info("[Initializer] onPostPack - Complete")
-
-        LOGGER.info("[Initializer] onPostPackAsync - Start")
-        val onPostPackJobs = mutableListOf<Job>()
-        val onPostPackAsyncResult = forEachPostWorld {
-            onPostPackJobs += NEKO_PLUGIN.launch(asyncContext) { onPostPackAsync() }
-        }
-        LOGGER.info("[Initializer] onPostPackAsync - Waiting")
-        onPostPackJobs.joinAll() // wait for all async jobs
-        onPostPackAsyncResult.onFailure { return }
-        LOGGER.info("[Initializer] onPostPackAsync - Complete")
-
         isDone = true
         NEKO_PLUGIN.launch(asyncContext) {
             NekoPostLoadDataEvent().run {
@@ -290,7 +259,6 @@ object Initializer : KoinComponent, Listener {
     fun disable() {
         unregisterEvents()
         terminables.closeAndReportException()
-        get<ResourcePackManager>().close()
     }
 
     private fun shutdown(message: String, throwable: Throwable) {

@@ -12,28 +12,6 @@ debug: true
 # EXPERIENCE_LEVEL - Minecraft 原版经验等级
 player_level_provider: EXPERIENCE_LEVEL
 
-# 资源包设置
-resource_pack:
-  auto_upload:
-    enabled: true
-    service: self_host
-    host: "play.mewcraft.cc"
-    port: 7270
-    append_port: true
-    github:
-      username: "g2213swo"
-      token: ""
-      repo: "Nyaadanbou/rprelay"
-      branch: "main"
-      path: "pack"
-      commit_message: "Auto upload resource pack"
-  prompt:
-    force: false
-  generation:
-    description: Wakame
-    compression_level: -1
-    protection: false
-
 # 性能设置
 performance:
   neko_executor:
