@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.util.toNamespacedKey
 import cc.mewcraft.wakame.attribute.Attribute as WakameAttribute
 import cc.mewcraft.wakame.attribute.AttributeModifier as WakameAttributeModifier
 import org.bukkit.attribute.Attribute as BukkitAttribute
@@ -18,14 +19,13 @@ fun BukkitAttributeModifier.Operation.toNeko() = when (this) {
 }
 
 fun WakameAttributeModifier.toBukkit() = BukkitAttributeModifier(
-    /* uuid = */ AttributeLegacyMappings.byKey(id),
-    /* name = */ "REMOVE in 1.21",
+    /* key = */ id.toNamespacedKey,
     /* amount = */ amount,
     /* operation = */ operation.toBukkit(),
 )
 
 fun BukkitAttributeModifier.toNeko() = WakameAttributeModifier(
-    id = AttributeLegacyMappings.byId(uniqueId),
+    id = key,
     amount = amount,
     operation = operation.toNeko(),
 )
