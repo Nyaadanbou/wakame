@@ -72,7 +72,6 @@ object CommonNBT {
 
         mockk<LongArrayTag>().let {
             every { LongArrayTag.create(any<LongArray>()) } returns it
-            every { LongArrayTag.create(any<LongSet>()) } returns it
             every { LongArrayTag.create(any<List<Long>>()) } returns it
         }
 
