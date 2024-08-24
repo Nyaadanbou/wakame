@@ -1,6 +1,5 @@
-package cc.mewcraft.wakame.pack.initializer
+package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.pack.PackException
 import cc.mewcraft.wakame.util.readFromDirectory
 import cc.mewcraft.wakame.util.readFromZipFile
 import team.unnamed.creative.ResourcePack

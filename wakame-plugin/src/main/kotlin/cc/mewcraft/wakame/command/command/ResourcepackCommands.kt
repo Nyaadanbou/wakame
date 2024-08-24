@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.suspendingHandler
-import cc.mewcraft.wakame.pack.ResourcePackFacade
 import cc.mewcraft.wakame.pack.ResourcePackManager
+import cc.mewcraft.wakame.pack.ResourcePackPublisherProvider
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.Command
 import org.incendo.cloud.CommandFactory
@@ -23,31 +23,34 @@ object ResourcepackCommands : KoinComponent, CommandFactory<CommandSender> {
             // /<root> resourcepack generate
             commandManager.commandBuilder(
                 name = CommandConstants.ROOT_COMMAND,
-                description = Description.of("Generates the resourcepack")
+                description = Description.of("Generates a server resourcepack")
             ) {
+                permission(CommandPermissions.RESOURCEPACK)
                 literal(RESOURCEPACK_LITERAL)
                 literal("generate")
                 suspendingHandler { context ->
                     val sender = context.sender()
-                    val resourcePackManager = get<ResourcePackManager>()
-                    resourcePackManager.generate(regenerate = true)
-                        .onSuccess { sender.sendPlainMessage("Resourcepack has been generated successfully") }
-                        .onFailure { sender.sendPlainMessage("Failed to generate resourcepack: $it") }
+                    val manager = get<ResourcePackManager>()
+
+                    manager.generate(regenerate = true)
+                        .onSuccess { sender.sendPlainMessage("Resourcepack has been generated successfully!") }
+                        .onFailure { sender.sendPlainMessage("Failed to generate resourcepack: '${it.message}'") }
                 }
             }.buildAndAdd(this)
 
-            // /<root> resourcepack upload
+            // /<root> resourcepack publish
             commandManager.commandBuilder(
                 name = CommandConstants.ROOT_COMMAND,
-                description = Description.of("Starts the resourcepack service")
+                description = Description.of("Publishes the server resourcepack")
             ) {
                 permission(CommandPermissions.RESOURCEPACK)
                 literal(RESOURCEPACK_LITERAL)
-                literal("upload")
+                literal("publish")
                 suspendingHandler { context ->
                     val sender = context.sender()
-                    ResourcePackFacade.publisher.publish()
-                    sender.sendPlainMessage("Resourcepack service has been started")
+                    val publisher = ResourcePackPublisherProvider.get()
+                    publisher.publish()
+                    sender.sendPlainMessage("Resourcepack has been published successfully!")
                 }
             }.buildAndAdd(this)
         }

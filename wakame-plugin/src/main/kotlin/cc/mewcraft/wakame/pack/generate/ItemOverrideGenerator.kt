@@ -17,13 +17,13 @@ data class ItemModelData(
      * 例如，如果是弓的第二个模型，那么这个值就是 1。
      * 生成出来的 ItemOverride 应该会是:
      * ```json
-     *     {
-     *         "predicate": {
-     *             "pulling": 1,
-     *             "custom_model_data": 10001
-     *         },
-     *         "model": "wakame:item/bow/demo"
-     *     }
+     * {
+     *   "predicate": {
+     *     "pulling": 1,
+     *     "custom_model_data": 10001
+     *   },
+     *   "model": "wakame:item/bow/demo"
+     * }
      * ```
      */
     val index: Int,
@@ -41,26 +41,32 @@ data class ItemModelData(
 
 sealed interface ItemOverrideGenerator {
     val data: ItemModelData
-
     fun generate(): ItemOverride
 }
 
-internal class ItemOverrideGeneratorProxy(
+internal class SimpleItemOverrideGenerator(
     override val data: ItemModelData,
 ) : ItemOverrideGenerator {
 
-    /* Generators */
+    //
+    // Generators
+    //
     private val bowGenerator: BowItemOverrideGenerator by lazy { BowItemOverrideGenerator(this) }
+    // ...
 
     private val generator: ItemOverrideGenerator?
         get() = when (data.material) {
             Material.BOW -> bowGenerator
+            // ...
             else -> null // Default generator
         }
 
     override fun generate(): ItemOverride {
-        if (generator != null)
-            return generator!!.generate()
+        val generator = generator
+        if (generator != null) {
+            return generator.generate()
+        }
+
         // Default generator
         return ItemOverride.of(
             data.key,

@@ -5,15 +5,32 @@ import team.unnamed.creative.ResourcePack
 
 data class GenerationContext(
     /**
-     * 资源包的描述, 给玩家看的.
+     * 参考 [team.unnamed.creative.metadata.pack.PackMeta.description].
      */
     val description: String,
     /**
-     * 最终要生成的资源包.
-     *
+     * 参考 [team.unnamed.creative.metadata.pack.PackFormat.format].
+     */
+    val format: Int,
+    /**
+     * 参考 [team.unnamed.creative.metadata.pack.PackFormat.min].
+     */
+    val min: Int,
+    /**
+     * 参考 [team.unnamed.creative.metadata.pack.PackFormat.max].
+     */
+    val max: Int,
+
+    //
+
+    /**
+     * 最终要生成的资源包 [ResourcePack].
      * 对该对象的任何修改将会应用到生成的资源包上.
      */
-    val resourcePack: ResourcePack,
+    val pack: ResourcePack,
+
+    //
+
     /**
      * 资源包里包含的所有“资源文件”.
      */

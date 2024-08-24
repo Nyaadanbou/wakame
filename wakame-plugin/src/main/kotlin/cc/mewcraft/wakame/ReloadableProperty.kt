@@ -9,6 +9,7 @@ import org.bukkit.event.Listener
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
+// TODO 考虑把萌芽的 reload 逻辑分成几个部分, 每个部分可以独立重载
 /**
  * A property that will be reset using [loader] upon [NekoCommandReloadEvent] being fired.
  *

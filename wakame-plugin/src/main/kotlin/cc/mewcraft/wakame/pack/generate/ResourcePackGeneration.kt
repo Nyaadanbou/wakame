@@ -30,7 +30,7 @@ import java.io.File
 import team.unnamed.creative.model.Model as CreativeModel
 
 sealed class ResourcePackGeneration(
-    protected val args: GenerationContext,
+    protected val context: GenerationContext,
 ) {
     companion object {
         fun chain(vararg generations: ResourcePackGeneration): ResourcePackGeneration {
@@ -44,30 +44,26 @@ sealed class ResourcePackGeneration(
 
     protected var next: ResourcePackGeneration? = null
 
+    protected fun generateNext(): Result<Unit> {
+        return next?.generate() ?: Result.success(Unit)
+    }
+
     /**
-     * 生成资源包.
-     *
-     * 原来的资源包会发生变化.
+     * 生成资源包. 原来的资源包会发生变化.
      *
      * @return 封装了一个结果, 代表资源包生成是否成功
      */
     abstract fun generate(): Result<Unit>
-
-    protected fun generateNext(): Result<Unit> {
-        return next?.generate() ?: Result.success(Unit)
-    }
 }
 
 internal class ResourcePackMetaGeneration(
-    args: GenerationContext,
-) : ResourcePackGeneration(args) {
+    context: GenerationContext,
+) : ResourcePackGeneration(context) {
     override fun generate(): Result<Unit> {
         try {
-            val packMeta = PackMeta.of(
-                PackFormat.format(32, 32, 34),
-                args.description.mini,
-            )
-            args.resourcePack.packMeta(packMeta)
+            val packFormat = PackFormat.format(context.format, context.min, context.max)
+            val packMeta = PackMeta.of(packFormat, context.description.mini)
+            context.pack.packMeta(packMeta)
         } catch (e: Throwable) {
             return Result.failure(e)
         }
@@ -76,13 +72,13 @@ internal class ResourcePackMetaGeneration(
 }
 
 internal class ResourcePackIconGeneration(
-    args: GenerationContext,
-) : ResourcePackGeneration(args), KoinComponent {
+    context: GenerationContext,
+) : ResourcePackGeneration(context), KoinComponent {
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
     override fun generate(): Result<Unit> {
         try {
-            args.resourcePack.icon(Writable.file(assetsDir.resolve("logo.png")))
+            context.pack.icon(Writable.file(assetsDir.resolve("logo.png")))
         } catch (e: Throwable) {
             return Result.failure(e)
         }
@@ -91,8 +87,8 @@ internal class ResourcePackIconGeneration(
 }
 
 internal class ResourcePackExternalGeneration(
-    args: GenerationContext,
-) : ResourcePackGeneration(args) {
+    context: GenerationContext,
+) : ResourcePackGeneration(context) {
     class GenerationCancelledException : Throwable() {
         override val message: String = "Resource pack generation is cancelled"
     }
@@ -112,11 +108,11 @@ internal class ResourcePackExternalGeneration(
 }
 
 internal class ResourcePackRegistryModelGeneration(
-    args: GenerationContext,
-) : ResourcePackGeneration(args) {
+    context: GenerationContext,
+) : ResourcePackGeneration(context) {
     override fun generate(): Result<Unit> {
         try {
-            ModelWriter.resource(RESOURCE_NAMESPACE).write(args.resourcePack, ModelRegistry.models())
+            ModelWriter.resource(RESOURCE_NAMESPACE).write(context.pack, ModelRegistry.models())
         } catch (e: Throwable) {
             return Result.failure(e)
         }
@@ -125,14 +121,14 @@ internal class ResourcePackRegistryModelGeneration(
 }
 
 internal class ResourcePackCustomModelGeneration(
-    args: GenerationContext,
-) : ResourcePackGeneration(args), KoinComponent {
+    context: GenerationContext,
+) : ResourcePackGeneration(context), KoinComponent {
     private val logger: Logger by inject()
     private val config: ItemModelDataLookup by inject()
     private val vanillaResourcePack: VanillaResourcePack by inject()
 
     override fun generate(): Result<Unit> {
-        val assets = args.assets
+        val assets = context.assets
 
         try {
             for (asset in assets) {
@@ -140,7 +136,7 @@ internal class ResourcePackCustomModelGeneration(
                 for ((index, modelFile) in modelFiles.withIndex()) {
                     logger.info("Generating $index model for ${asset.key}, variant ${asset.variant}, path: $modelFile")
                     val customModelData = config.saveCustomModelData(asset.key, asset.variant)
-                    val resourcePack = args.resourcePack
+                    val resourcePack = context.pack
 
                     //<editor-fold desc="Custom Model generation">
                     // Original asset from config
@@ -172,7 +168,7 @@ internal class ResourcePackCustomModelGeneration(
                     val itemTypeKey = asset.itemTypeKey()
 
                     // Override for custom asset data
-                    val overrideGenerator = ItemOverrideGeneratorProxy(
+                    val overrideGenerator = SimpleItemOverrideGenerator(
                         ItemModelData(
                             key = modelKey,
                             material = asset.itemType,

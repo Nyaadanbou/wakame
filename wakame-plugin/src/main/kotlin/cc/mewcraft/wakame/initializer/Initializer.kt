@@ -18,8 +18,8 @@ import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.item.MultipleItemListener
 import cc.mewcraft.wakame.item.SingleItemListener
-import cc.mewcraft.wakame.pack.ResourcePackFacadeListener
-import cc.mewcraft.wakame.pack.ResourcePackListener
+import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
+import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.player.inventory.ItemSlotWatcher
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer.REFORGE_DIR_NAME
@@ -31,8 +31,8 @@ import cc.mewcraft.wakame.registry.ENTITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.KIZAMI_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.user.PaperUserManager
@@ -143,8 +143,8 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
-        registerTerminableListener(get<ResourcePackFacadeListener>()).bindWith(this)
-        registerTerminableListener(get<ResourcePackListener>()).bindWith(this)
+        registerTerminableListener(get<ResourcePackLifecycleListener>()).bindWith(this)
+        registerTerminableListener(get<ResourcePackPlayerListener>()).bindWith(this)
         registerTerminableListener(get<SingleItemListener>()).bindWith(this)
         registerTerminableListener(get<DamageListener>()).bindWith(this)
         registerTerminableListener(get<ItemSlotWatcher>()).bindWith(this)

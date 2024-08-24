@@ -1,18 +1,19 @@
 # 全局配置文件
 
 # 调试模式开关
-# 不支持热重载！
+# 警告: 不支持热重载!
 debug: true
 
 # 玩家等级算法
-# 不支持热重载！
+# 警告: 不支持热重载!
 #
-# 可用选项：
+# 可用选项:
 # ADVENTURE_LEVEL - AdventureLevel 的等级
 # EXPERIENCE_LEVEL - Minecraft 原版经验等级
 player_level_provider: EXPERIENCE_LEVEL
 
 # 性能设置
+# 警告: 不支持热重载!
 performance:
   neko_executor:
     enabled: false

@@ -1,35 +1,95 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.derive
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.github.GithubRepoManager
-import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.ConfigurationOptions
 import java.io.File
-import java.lang.reflect.Type
 
 /**
- * 将资源包推送到第三方, 由第三方系统分发资源包给玩家.
+ * 负责将资源包推送到指定的位置, 比如 Github 仓库.
  */
 interface ResourcePackPublisher {
+    /**
+     * 推送资源包.
+     */
     fun publish()
+
+    /**
+     * 执行清理逻辑.
+     */
+    fun cleanup()
 }
 
-data object NonePublisher : ResourcePackPublisher {
-    override fun publish() {
-        // Do nothing
+/**
+ * 负责提供 [ResourcePackPublisher] 实例给外部使用.
+ */
+object ResourcePackPublisherProvider {
+    private var INSTANCE: ResourcePackPublisher? = null
+
+    /**
+     * 获取当前的 [ResourcePackPublisher] 实例.
+     *
+     * 警告: 非线程安全!
+     */
+    fun get(): ResourcePackPublisher {
+        return INSTANCE ?: loadAndSet()
+    }
+
+    /**
+     * 重新加载并设置新的 [ResourcePackPublisher] 实例.
+     *
+     * 警告: 非线程安全!
+     */
+    fun loadAndSet(): ResourcePackPublisher {
+        val config = RESOURCE_PACK_CONFIG.derive("publisher")
+        val inst = when (
+            val type = config.entry<String>("type").get()
+        ) {
+            "none" -> {
+                NonePublisher
+            }
+
+            "github" -> {
+                val username = config.entry<String>("username").get()
+                val token = config.entry<String>("token").get()
+                val repo = config.entry<String>("repo").get()
+                val branch = config.entry<String>("branch").get()
+                val path = config.entry<String>("path").get()
+                val commitMessage = config.entry<String>("commit_message").get()
+                GithubPublisher(username, token, repo, branch, path, commitMessage)
+            }
+
+            else -> {
+                throw IllegalArgumentException("Unknown publisher type: '$type'")
+            }
+        }
+
+        return inst.also {
+            INSTANCE = it
+        }
     }
 }
 
+/* Internals */
+
+
 /**
- * 将资源包推送到特定 Github 仓库, 再由第三方系统进行分发.
+ * 无操作.
  */
-data class GithubPublisher(
+private data object NonePublisher : ResourcePackPublisher {
+    override fun publish() = Unit
+    override fun cleanup() = Unit
+}
+
+/**
+ * 将资源包推送到特定的 Github 仓库.
+ */
+private data class GithubPublisher(
     private val repo: String,
     private val username: String,
     private val token: String,
@@ -38,10 +98,10 @@ data class GithubPublisher(
     private val commitMessage: String,
 ) : ResourcePackPublisher, KoinComponent {
     private val logger: Logger by inject()
+    private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
 
     override fun publish() {
-        logger.info("Publishing resource pack to Github")
-        val pluginDataDir = PublisherSupport.pluginDataDir
+        logger.info("Publishing resource pack to Github (repo: $repo, branch: $branch, path: $remotePath)")
         val manager = GithubRepoManager(
             localRepoPath = pluginDataDir.resolve("cache").resolve("repo"),
             resourcePackDirPath = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_DIR),
@@ -54,34 +114,11 @@ data class GithubPublisher(
         )
 
         manager.publishPack().onFailure {
-            logger.error("Failed to publish resource pack", it)
+            logger.error("Failed to publish resource pack to Github", it)
         }
     }
 
-}
-
-private object PublisherSupport : KoinComponent {
-    val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
-}
-
-internal object ResourcePackPublisherSerializer : TypeSerializer<ResourcePackPublisher> {
-    override fun deserialize(type: Type, node: ConfigurationNode): ResourcePackPublisher {
-        return when (node.node("type").krequire<String>().lowercase()) {
-            "github" -> {
-                val username = node.node("username").krequire<String>()
-                val token = node.node("token").krequire<String>()
-                val repo = node.node("repo").krequire<String>()
-                val branch = node.node("branch").krequire<String>()
-                val path = node.node("path").krequire<String>()
-                val commitMessage = node.node("commit_message").krequire<String>()
-                return GithubPublisher(username, token, repo, branch, path, commitMessage)
-            }
-
-            else -> NonePublisher
-        }
-    }
-
-    override fun emptyValue(specificType: Type, options: ConfigurationOptions): ResourcePackPublisher? {
-        return NonePublisher
+    override fun cleanup() {
+        logger.info("Cleaning up Github publisher")
     }
 }

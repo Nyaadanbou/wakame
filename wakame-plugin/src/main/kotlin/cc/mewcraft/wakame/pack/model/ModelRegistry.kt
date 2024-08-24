@@ -13,9 +13,8 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-private const val BBMODELS_DIR = "bbmodels"
-
 object ModelRegistry : Initializable, KoinComponent {
+    private const val BBMODELS_DIR = "bbmodels"
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
     private val models: MutableMap<String, Model> = ConcurrentHashMap()
