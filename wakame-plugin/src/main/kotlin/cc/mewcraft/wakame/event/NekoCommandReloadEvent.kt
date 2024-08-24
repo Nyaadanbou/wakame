@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList
 /**
  * 当使用指令重载时触发的事件.
  */
-class NekoCommandReloadEvent : Event(true) {
+class NekoCommandReloadEvent : Event(false) {
     override fun getHandlers(): HandlerList = HANDLER_LIST
 
     companion object {
