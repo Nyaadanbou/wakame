@@ -1,7 +1,7 @@
 generation:
   description: 萌芽
   format: 34
-  min: 34
+  min: 32
   max: 34
 
 service:

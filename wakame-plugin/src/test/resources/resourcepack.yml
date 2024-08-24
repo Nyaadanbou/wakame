@@ -6,7 +6,7 @@ generation:
   # https://minecraft.wiki/w/Pack_format#List_of_resource_pack_formats
   format: 34
   # 最低兼容的资源包版本
-  min: 34
+  min: 32
   # 最高兼容的资源包版本
   max: 34
 
