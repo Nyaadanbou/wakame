@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.wakame.adventure.translator.MessageContacts
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
+import cc.mewcraft.wakame.command.suspendingHandler
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.util.ThreadType
-import me.lucko.helper.text3.arguments
+import cc.mewcraft.wakame.util.coroutine.BukkitMain
+import kotlinx.coroutines.Dispatchers
 import org.bukkit.command.CommandSender
 import org.incendo.cloud.Command
 import org.incendo.cloud.CommandFactory
@@ -30,17 +30,15 @@ object PluginCommands : KoinComponent, CommandFactory<CommandSender> {
                 permission(CommandPermissions.PLUGIN)
                 literal(RELOAD_LITERAL)
                 literal("config")
-                handler { context ->
+                suspendingHandler(context = Dispatchers.BukkitMain) { context ->
                     val sender = context.sender()
-                    sender.sendPlainMessage("Calling reload event ...")
+                    sender.sendPlainMessage("Calling command reload event ...")
                     val event = NekoCommandReloadEvent()
                     val reloadTime = measureTimeMillis {
                         event.callEvent()
-                        ThreadType.REMAIN.launch {
-                            PluginEventBus.get().post(event)
-                        }
+                        PluginEventBus.get().post(event)
                     }
-                    sender.sendMessage(MessageContacts.MSG_RELOADED.arguments(reloadTime.toString()))
+                    sender.sendPlainMessage("Wakame has been reloaded successfully! ${reloadTime}ms elapsed.")
                 }
             }.buildAndAdd(this)
         }

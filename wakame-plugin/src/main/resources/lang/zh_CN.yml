@@ -1,3 +1,4 @@
 # Messages
-msg_open_merging_menu: "<green>打开合并菜单..."
-msg_reloaded: "<green>重载插件成功! 耗时 <arg:0> 毫秒."
+msg_open_merging_menu: "<green>打开合并菜单 ..."
+msg_open_modding_menu: "<green>打开定制菜单 ..."
+msg_open_rerolling_menu: "<green>打开重造菜单 ..."
