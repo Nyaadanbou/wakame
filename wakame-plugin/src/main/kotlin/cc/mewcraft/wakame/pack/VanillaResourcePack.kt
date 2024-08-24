@@ -15,55 +15,57 @@ import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
 import java.io.File
 import java.net.URI
 
-private const val VANILLA_RESOURCE_CACHE = "generated/cache/"
+private const val VANILLA_RESOURCE_PACK_CACHE_DIRECTORY = "generated/cache/"
+private const val VANILLA_RESOURCE_PACK_BASE_DOWNLOAD_URL = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/<version>/"
 
-private const val DOWNLOAD_URL = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/<version>/"
-
-data class CannotDownloadVanillaResourcePackException(
+data class VanillaResourcePackDownloadException(
     override val message: String = "Cannot download vanilla resource pack file.",
     override val cause: Throwable? = null,
-) : PackException()
+) : ResourcePackException()
 
 class VanillaResourcePack : KoinComponent {
     private val logger: ComponentLogger by inject()
-    private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
-
-    private val packDictionary: File = pluginDataDir.resolve(VANILLA_RESOURCE_CACHE)
-    private val downloadUrl: String = DOWNLOAD_URL.replace("<version>", Bukkit.getMinecraftVersion())
+    private val pluginDataDirectory: File by inject(named(PLUGIN_DATA_DIR))
+    private val resourcePackDirectory: File = pluginDataDirectory.resolve(VANILLA_RESOURCE_PACK_CACHE_DIRECTORY)
+    private val versionedDownloadURL: String = VANILLA_RESOURCE_PACK_BASE_DOWNLOAD_URL.replace("<version>", Bukkit.getMinecraftVersion())
 
     fun model(key: Key): Model {
         val modelPath = "assets/${key.namespace()}/models/${key.value()}.json"
-        val modelFile = packDictionary.resolve(modelPath)
-        val downloadModelUrl = downloadUrl + modelPath
+        val modelFile = resourcePackDirectory.resolve(modelPath)
+        val modelDownloadURL = versionedDownloadURL + modelPath
 
         if (!modelFile.exists()) {
             modelFile.parentFile.mkdirs()
-            val file = runCatching { downloadPackFile(downloadModelUrl, modelFile) }
-                .getOrElse { throw CannotDownloadVanillaResourcePackException(cause = it) }
+            val file = runCatching {
+                downloadModelFile(modelDownloadURL, modelFile)
+            }.getOrElse {
+                throw VanillaResourcePackDownloadException(cause = it)
+            }
+
             return ModelSerializer.INSTANCE.deserialize(file.inputStream().buffered(), key)
         }
 
         return ModelSerializer.INSTANCE.deserialize(modelFile.inputStream().buffered(), key)
     }
 
-    private fun downloadPackFile(downloadUrl: String, modelFile: File): File {
-        val versionDownloadUrl: String = downloadUrl.replace("<version>", Bukkit.getMinecraftVersion())
+    private fun downloadModelFile(downloadUrl: String, modelFile: File): File {
+        val versionedDownloadURL = downloadUrl.replace("<version>", Bukkit.getMinecraftVersion())
 
-        logger.info("Downloading vanilla resource pack file from $versionDownloadUrl.")
-        val connection = URI.create(versionDownloadUrl).toURL().openConnection()
+        logger.info("Downloading vanilla resource pack file from $versionedDownloadURL.")
+        val connection = URI.create(versionedDownloadURL).toURL().openConnection()
         val input = connection.getInputStream().buffered()
         val output = modelFile.outputStream().buffered()
 
         try {
-            input.copyTo(output, 1024)
-                .also { logger.info("Downloaded vanilla resource pack file from $versionDownloadUrl to $modelFile. Size: ${modelFile.formatSize()}") }
+            input.copyTo(output)
+            logger.info("Downloaded vanilla resource pack file from $versionedDownloadURL to $modelFile. Size: ${modelFile.formatSize()}")
         } finally {
-            // Close the input and output streams
             output.flush()
             output.close()
             input.close()
         }
 
-        return modelFile.takeIf { it.exists() } ?: throw IllegalStateException("Failed to download vanilla resource pack file from $versionDownloadUrl")
+        return modelFile.takeIf { it.exists() }
+            ?: throw IllegalStateException("Failed to download vanilla resource pack file from $versionedDownloadURL")
     }
 }

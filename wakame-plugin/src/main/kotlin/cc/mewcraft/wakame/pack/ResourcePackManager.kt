@@ -47,14 +47,14 @@ internal class ResourcePackManager(
      * @return 包含生成是否成功的结果
      */
     fun generate(regenerate: Boolean): Result<Unit> {
-        val resourceFile = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
-        val resourcePackDir = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_DIR)
-        val initializeArguments = InitializerArguments(resourceFile, resourcePackDir, packReader)
+        val resourcePackFile = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+        val resourcePackDirectory = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_DIR)
+        val initializerArguments = InitializerArguments(resourcePackFile, resourcePackDirectory, packReader)
 
         val resourcePackResult = runCatching {
-            PackInitializer.chain(
-                ZipPackInitializer(initializeArguments),
-                DirPackInitializer(initializeArguments)
+            ResourcePackInitializer.chain(
+                ZipResourcePackInitializer(initializerArguments),
+                DirResourcePackInitializer(initializerArguments)
             ).initialize()
         }
 
@@ -106,8 +106,8 @@ internal class ResourcePackManager(
 
             // Write the resource pack to the file
             runCatching {
-                packWriter.writeToZipFile(resourceFile.toPath(), resourcePack)
-                packWriter.writeToDirectory(resourcePackDir, resourcePack)
+                packWriter.writeToZipFile(resourcePackFile.toPath(), resourcePack)
+                packWriter.writeToDirectory(resourcePackDirectory, resourcePack)
             }.getOrElse {
                 return Result.failure(it)
             }
@@ -124,7 +124,7 @@ internal class ResourcePackManager(
             builtResourcePack = it
         }
 
-        logger.info("Resource pack has been generated. Size: ${resourceFile.formatSize()}")
+        logger.info("Resource pack has been generated. Size: ${resourcePackFile.formatSize()}")
 
         return Result.success(Unit)
     }

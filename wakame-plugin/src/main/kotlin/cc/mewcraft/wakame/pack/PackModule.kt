@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.pack.model.ModelAnimateTask
-import cc.mewcraft.wakame.pack.model.ModelRegistry
-import cc.mewcraft.wakame.pack.model.ModelViewPersistenceHandlerImpl
+import cc.mewcraft.wakame.pack.entity.ModelAnimateTask
+import cc.mewcraft.wakame.pack.entity.ModelRegistry
+import cc.mewcraft.wakame.pack.entity.ModelViewPersistenceHandlerImpl
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.new
 import org.koin.core.module.dsl.singleOf

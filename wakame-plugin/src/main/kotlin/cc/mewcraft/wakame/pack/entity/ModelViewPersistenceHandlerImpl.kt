@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.pack.model
+package cc.mewcraft.wakame.pack.entity
 
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import org.bukkit.NamespacedKey

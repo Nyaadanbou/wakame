@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.suspendingHandler
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.pack.model.ModelRegistry
-import cc.mewcraft.wakame.pack.model.OnGroundBoneModifier
+import cc.mewcraft.wakame.pack.entity.ModelRegistry
+import cc.mewcraft.wakame.pack.entity.OnGroundBoneModifier
 import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.ListTag
 import cc.mewcraft.wakame.util.ThreadType

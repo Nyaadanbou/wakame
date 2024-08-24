@@ -17,11 +17,11 @@ data class InitializerArguments(
 data class NoSuchResourcePackException(
     override val message: String,
     override val cause: Throwable? = null,
-) : PackException()
+) : ResourcePackException()
 
-sealed class PackInitializer {
+sealed class ResourcePackInitializer {
     companion object {
-        fun chain(vararg initializers: PackInitializer): PackInitializer {
+        fun chain(vararg initializers: ResourcePackInitializer): ResourcePackInitializer {
             initializers.reduce { acc, initializer ->
                 initializer.also { acc.next = initializer }
             }
@@ -40,14 +40,14 @@ sealed class PackInitializer {
         }
     }
 
-    protected var next: PackInitializer? = null
+    protected var next: ResourcePackInitializer? = null
     protected abstract val arg: InitializerArguments
     protected abstract fun init(): ResourcePack
 }
 
-internal class ZipPackInitializer(
+internal class ZipResourcePackInitializer(
     override val arg: InitializerArguments,
-) : PackInitializer() {
+) : ResourcePackInitializer() {
     override fun init(): ResourcePack {
         val resourceFile = initFile()
         val pack = arg.packReader.readFromZipFile(resourceFile)
@@ -74,9 +74,9 @@ internal class ZipPackInitializer(
     //</editor-fold>
 }
 
-internal class DirPackInitializer(
+internal class DirResourcePackInitializer(
     override val arg: InitializerArguments,
-) : PackInitializer() {
+) : ResourcePackInitializer() {
     override fun init(): ResourcePack {
         val resourcePackDir = arg.resourcePackDir
         if (!resourcePackDir.exists()) {

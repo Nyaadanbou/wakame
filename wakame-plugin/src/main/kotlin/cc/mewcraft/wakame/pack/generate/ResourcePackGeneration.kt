@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.itemType
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
-import cc.mewcraft.wakame.pack.model.ModelRegistry
+import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
@@ -94,15 +94,6 @@ internal class ResourcePackExternalGeneration(
     }
 
     override fun generate(): Result<Unit> {
-        // try {
-        //     // TODO: 异步触发事件
-        //     val isCancelled = ResourcePackGenerateEvent(args).callEvent()
-        //     if (isCancelled) {
-        //         return Result.failure(GenerationCancelledException())
-        //     }
-        // } catch (e: Throwable) {
-        //     return Result.failure(e)
-        // }
         return generateNext()
     }
 }
@@ -235,8 +226,8 @@ internal class ResourcePackCustomModelGeneration(
         val layers = textures().layers()
         if (layers.isEmpty()) return this
         val newTextures = layers.map {
-            val key = requireNotNull(it.key()) { "Texture key is null" }
-            val newKey = Key(RESOURCE_NAMESPACE, key.value())
+            val oldKey = requireNotNull(it.key()) { "Texture key is null" }
+            val newKey = Key(RESOURCE_NAMESPACE, oldKey.value())
             ModelTexture.ofKey(newKey)
         }
 

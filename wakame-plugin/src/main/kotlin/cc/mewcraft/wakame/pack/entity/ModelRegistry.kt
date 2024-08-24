@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.pack.model
+package cc.mewcraft.wakame.pack.entity
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.initializer.Initializable

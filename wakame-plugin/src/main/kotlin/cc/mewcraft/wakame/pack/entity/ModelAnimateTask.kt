@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.pack.model
+package cc.mewcraft.wakame.pack.entity
 
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.initializer.Initializable

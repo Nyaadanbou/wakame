@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.pack.model
+package cc.mewcraft.wakame.pack.entity
 
 import org.bukkit.entity.Entity
 import team.unnamed.creative.base.Vector3Float
