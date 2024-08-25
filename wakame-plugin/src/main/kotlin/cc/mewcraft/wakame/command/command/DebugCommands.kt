@@ -1,8 +1,5 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.nbt.IntTag
-import cc.mewcraft.nbt.ShortTag
-import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
@@ -10,20 +7,15 @@ import cc.mewcraft.wakame.command.suspendingHandler
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.pack.entity.OnGroundBoneModifier
-import cc.mewcraft.wakame.util.CompoundTag
-import cc.mewcraft.wakame.util.ListTag
-import cc.mewcraft.wakame.util.ThreadType
-import cc.mewcraft.wakame.util.nyaTag
+import cc.mewcraft.wakame.util.coroutine.BukkitMain
 import cc.mewcraft.wakame.util.nyaTagOrNull
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
-import org.bukkit.Bukkit
-import org.bukkit.Material
+import kotlinx.coroutines.Dispatchers
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Pig
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.incendo.cloud.Command
 import org.incendo.cloud.CommandFactory
 import org.incendo.cloud.CommandManager
@@ -34,7 +26,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import team.unnamed.hephaestus.Model
 import team.unnamed.hephaestus.bukkit.BukkitModelEngine
-import java.util.UUID
 
 
 object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
@@ -52,130 +43,17 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
             // /<root> debug print_wakame_nbt_if_not_null
             commandManager.commandBuilder(
                 name = CommandConstants.ROOT_COMMAND,
-                description = Description.of(
-                    "Prints the `wakame` NBT tag on the item held in main hand; If the NBT tag does not exist, `null` will be printed instead"
-                )
+                description = Description.of("Inspects the `wakame` NBT tag on the item held in main hand")
             ) {
                 senderType<Player>()
                 permission(CommandPermissions.DEBUG)
                 literal(DEBUG_LITERAL)
-                literal("print_wakame_nbt_if_not_null")
+                literal("inspect_wakame")
                 //<editor-fold desc="handler: print_wakame_nbt_if_not_null">
                 handler { context ->
                     val sender = context.sender() as Player
                     val nbtOrNull = sender.inventory.itemInMainHand.nyaTagOrNull
                     sender.sendPlainMessage("NBT: " + nbtOrNull?.asString()?.prettifyJson())
-                }
-                //</editor-fold>
-            }.buildAndAdd(this)
-
-            // /<root> debug print_wakame_nbt_or_create
-            commandManager.commandBuilder(
-                name = CommandConstants.ROOT_COMMAND,
-                description = Description.of(
-                    "Prints the `wakame` NBT tag on the item held in main hand; If the NBT tag does not exist, a new NBT will be saved to the item"
-                )
-            ) {
-                senderType<Player>()
-                permission(CommandPermissions.DEBUG)
-                literal(DEBUG_LITERAL)
-                literal("print_wakame_nbt_or_create")
-                //<editor-fold desc="handler: print_wakame_nbt_or_create">
-                handler { context ->
-                    val sender = context.sender() as Player
-                    val nbt = sender.inventory.itemInMainHand.nyaTag
-                    sender.sendPlainMessage("NBT: " + nbt.asString().prettifyJson())
-                }
-                //</editor-fold>
-            }.buildAndAdd(this)
-
-            // /<root> debug test_shadow_nbt_invocation
-            commandManager.commandBuilder(
-                name = CommandConstants.ROOT_COMMAND,
-                description = Description.of("Invokes the shadow NBT proxies and see if they run as expected")
-            ) {
-                permission(CommandPermissions.DEBUG)
-                literal(DEBUG_LITERAL)
-                literal("test_shadow_nbt_invocation")
-                //<editor-fold desc="handler: test_shadow_nbt_invocation">
-                handler { context ->
-                    val bukkitStack = ItemStack(Material.NETHERITE_SWORD)
-
-                    // test write operations
-                    bukkitStack.nyaTag = CompoundTag {
-                        putString("namespace", "short_sword")
-                        putString("path", "demo")
-                        putByte("variant", 18)
-                        putShort("short", Short.MAX_VALUE)
-                        putInt("int", Int.MAX_VALUE)
-                        putLong("long", Long.MAX_VALUE)
-                        putUUID("uuid", UUID(5, 5))
-                        putFloat("float", Float.MAX_VALUE)
-                        putDouble("double", Double.MAX_VALUE)
-                        putByteArray("byte_array", byteArrayOf(1, 2, 3))
-                        putIntArray("int_array", intArrayOf(1, 2, 3))
-                        putLongArray("long_array", longArrayOf(1, 2, 3))
-                        putBoolean("boolean", true)
-
-                        val listShadowTag1 = ListTag(
-                            IntTag.valueOf(1),
-                        )
-                        put("list1", listShadowTag1)
-
-                        val listShadowTag2 = ListTag {
-                            add(ShortTag.valueOf(1))
-                            add(ShortTag.valueOf(2))
-                            add(ShortTag.valueOf(3))
-                        }
-                        put("list2", listShadowTag2)
-
-                        val compoundShadowTag = CompoundTag {
-                            putByte("k1", 31)
-                        }
-                        put("stats", compoundShadowTag)
-                    }
-
-                    // test read operations (based on what have been written previously)
-                    with(bukkitStack.nyaTag) {
-                        check(getString("namespace") == "short_sword")
-                        check(getString("path") == "demo")
-                        check(getByte("variant") == 18.toByte())
-                        check(getShort("short") == Short.MAX_VALUE)
-                        check(getInt("int") == Int.MAX_VALUE)
-                        check(getLong("long") == Long.MAX_VALUE)
-                        if (hasUUID("uuid")) check(getUUID("uuid") == UUID(5, 5))
-                        check(getFloat("float") == Float.MAX_VALUE)
-                        check(getDouble("double") == Double.MAX_VALUE)
-                        check(getByteArray("byte_array").last() == 3.toByte())
-                        check(getIntArray("int_array").last() == 3)
-                        check(getLongArray("long_array").last() == 3L)
-                        check(getBoolean("boolean"))
-
-                        val intList = getList("list1", TagType.INT)
-                        val shortList = getList("list2", TagType.SHORT)
-
-                        check(intList.getInt(0) == 1)
-                        check(shortList.getShort(2) == 3.toShort())
-
-                        val intShadowTag = intList[0]
-                        check((intShadowTag as IntTag).intValue() == 1)
-
-                        val shortShadowTag = shortList[2]
-                        check((shortShadowTag as ShortTag).intValue() == 3)
-
-                        check(getCompound("stats").getByte("k1") == 31.toByte())
-                    }
-
-                    val sender = context.sender()
-                    if (sender is Player) {
-                        // add to sender's inv if it's a player
-                        sender.inventory.addItem(bukkitStack)
-                    } else {
-                        // otherwise drop it to the overworld spawn
-                        val overworld = Bukkit.getWorlds().first()
-                        val spawnLoc = overworld.spawnLocation
-                        overworld.dropItem(spawnLoc, bukkitStack)
-                    }
                 }
                 //</editor-fold>
             }.buildAndAdd(this)
@@ -219,15 +97,17 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
             ) {
                 senderType<Player>()
                 permission(CommandPermissions.DEBUG)
-                literal("summon_model_engine_entity")
+                literal("summon_entity")
                 //<editor-fold desc="handler: spawn_model_engine_entity">
-                suspendingHandler { context ->
+                suspendingHandler(context = Dispatchers.BukkitMain) { context ->
                     val sender = context.sender() as Player
 
                     fun spawn(player: Player, model: Model) {
                         val engine = get<BukkitModelEngine>()
+
                         // Spawn base entity
                         val pig = player.world.spawn(player.location, Pig::class.java)
+                        // Make the pig invisible
                         pig.isInvisible = true
                         // Create the model view on the pig
                         val view = engine.spawn(model, pig)
@@ -239,10 +119,8 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                         player.sendPlainMessage("Summoned " + model.name())
                     }
 
-                    ThreadType.SYNC.switchContext {
-                        val model = ModelRegistry.models().first()
-                        spawn(sender, model)
-                    }
+                    val model = ModelRegistry.models().first()
+                    spawn(sender, model)
                 }
                 //</editor-fold>
             }

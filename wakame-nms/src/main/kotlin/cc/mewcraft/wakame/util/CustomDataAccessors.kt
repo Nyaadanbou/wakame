@@ -7,17 +7,17 @@ import net.minecraft.world.item.component.CustomData
 
 internal fun ItemStack.getCustomData(): CompoundTag? {
     val customData = this.get(DataComponents.CUSTOM_DATA)
-    return customData?.copyTag() // 返回一个副本
+    return customData?.copyTag()
 }
 
 internal fun ItemStack.getCustomDataOrCreate(): CompoundTag {
     val customData = this.get(DataComponents.CUSTOM_DATA)
-    if (customData === null) {
-        val empty = CustomData.of(CompoundTag())
-        this.set(DataComponents.CUSTOM_DATA, empty)
-        return empty.copyTag() // 返回一个副本
+    if (customData == null) {
+        val newCustomData = CustomData.of(CompoundTag())
+        this.set(DataComponents.CUSTOM_DATA, newCustomData)
+        return newCustomData.copyTag()
     }
-    return customData.copyTag() // 返回一个副本
+    return customData.copyTag()
 }
 
 internal fun ItemStack.setCustomData(tag: CompoundTag) {
@@ -25,17 +25,19 @@ internal fun ItemStack.setCustomData(tag: CompoundTag) {
     this.set(DataComponents.CUSTOM_DATA, customData)
 }
 
+@Deprecated("Breaking immutability", level = DeprecationLevel.WARNING)
 internal fun ItemStack.getUnsafeCustomData(): CompoundTag? {
     val customData = this.get(DataComponents.CUSTOM_DATA)
-    return customData?.unsafe // 直接返回 backing CompoundTag
+    return customData?.unsafe
 }
 
+@Deprecated("Breaking immutability", level = DeprecationLevel.WARNING)
 internal fun ItemStack.getUnsafeCustomDataOrCreate(): CompoundTag {
     val customData = this.get(DataComponents.CUSTOM_DATA)
-    if (customData === null) {
-        val empty = CustomData.of(CompoundTag())
-        this.set(DataComponents.CUSTOM_DATA, empty)
-        return empty.unsafe
+    if (customData == null) {
+        val newCustomData = CustomData.of(CompoundTag())
+        this.set(DataComponents.CUSTOM_DATA, newCustomData)
+        return newCustomData.unsafe
     }
-    return customData.unsafe // 直接返回 backing CompoundTag
+    return customData.unsafe
 }

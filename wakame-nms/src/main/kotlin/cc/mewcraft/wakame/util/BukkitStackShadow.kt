@@ -35,12 +35,12 @@ internal val CompoundShadowTag.unwrap: CompoundTag
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.backingCustomName: Component?
-    get() = this.handle.get(DataComponents.CUSTOM_NAME)?.let(PaperAdventure::asAdventure)
+    get() = this.handle?.get(DataComponents.CUSTOM_NAME)?.let(PaperAdventure::asAdventure)
     set(value) {
         if (value != null) {
-            this.handle.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
+            this.handle?.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
         } else {
-            this.handle.remove(DataComponents.CUSTOM_NAME)
+            this.handle?.remove(DataComponents.CUSTOM_NAME)
         }
     }
 
@@ -48,12 +48,12 @@ var BukkitStack.backingCustomName: Component?
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.backingItemName: Component?
-    get() = this.handle.get(DataComponents.ITEM_NAME)?.let(PaperAdventure::asAdventure)
+    get() = this.handle?.get(DataComponents.ITEM_NAME)?.let(PaperAdventure::asAdventure)
     set(value) {
         if (value != null) {
-            this.handle.set(DataComponents.ITEM_NAME, PaperAdventure.asVanilla(value))
+            this.handle?.set(DataComponents.ITEM_NAME, PaperAdventure.asVanilla(value))
         } else {
-            this.handle.remove(DataComponents.ITEM_NAME)
+            this.handle?.remove(DataComponents.ITEM_NAME)
         }
     }
 
@@ -61,12 +61,12 @@ var BukkitStack.backingItemName: Component?
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.backingLore: List<Component>?
-    get() = this.handle.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
+    get() = this.handle?.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
     set(value) {
         if (value != null) {
-            this.handle.set(DataComponents.LORE, ItemLore(value.map(PaperAdventure::asVanilla)))
+            this.handle?.set(DataComponents.LORE, ItemLore(value.map(PaperAdventure::asVanilla)))
         } else {
-            this.handle.remove(DataComponents.LORE)
+            this.handle?.remove(DataComponents.LORE)
         }
     }
 
@@ -74,25 +74,29 @@ var BukkitStack.backingLore: List<Component>?
  * 设置自定义模型数据. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.backingCustomModelData: Int?
-    get() = this.handle.get(DataComponents.CUSTOM_MODEL_DATA)?.value
+    get() = this.handle?.get(DataComponents.CUSTOM_MODEL_DATA)?.value
     set(value) {
         if (value != null) {
-            this.handle.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(value))
+            this.handle?.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(value))
         } else {
-            this.handle.remove(DataComponents.CUSTOM_MODEL_DATA)
+            this.handle?.remove(DataComponents.CUSTOM_MODEL_DATA)
         }
     }
 
 /**
  * 获取封装的 NMS 对象.
+ * 如果 [isEmpty] 为 `true`, 将会返回 `null`.
+ * 截止至 2024/8/25, 空气不存在封装的 NMS 对象.
  */
-internal val BukkitStack.handle: MojangStack
+internal val BukkitStack.handle: MojangStack?
     get() = if (this is CraftItemStack) {
         this.handle
     } else {
-        val shadow = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
-        val delegate = shadow.craftDelegate
+        val shadow: ShadowItemStack = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
+        val delegate: CraftItemStack = shadow.craftDelegate
         delegate.handle
+    }.takeIf {
+        !it.isEmpty
     }
 //</editor-fold>
 
@@ -103,7 +107,10 @@ var BukkitStack.nyaTag: CompoundShadowTag
      * 如果物品上不存在萌芽标签, 将会创建一个新的萌芽标签并*写入*到物品上.
      */
     get() {
-        val handle = this.handle
+        val handle: MojangStack? = this.handle
+        if (handle == null) {
+            throw IllegalStateException("Can't get NBT tag from empty ItemStack")
+        }
         return handle.nyaTag
     }
     /**
@@ -112,7 +119,10 @@ var BukkitStack.nyaTag: CompoundShadowTag
      * 你也可以传入 `null` 来移除物品上的萌芽标签.
      */
     set(value) {
-        val handle = this.handle
+        val handle: MojangStack? = this.handle
+        if (handle == null) {
+            throw IllegalStateException("Can't set NBT tag for empty ItemStack")
+        }
         handle.nyaTag = value
     }
 
@@ -122,16 +132,16 @@ var BukkitStack.nyaTag: CompoundShadowTag
  */
 val BukkitStack.nyaTagOrNull: CompoundShadowTag?
     get() {
-        val handle = this.handle
-        return handle.nyaTagOrNull
+        val handle: MojangStack? = this.handle
+        return handle?.nyaTagOrNull
     }
 
 /**
  * 移除物品上的萌芽标签.
  */
 fun BukkitStack.removeNyaTag() {
-    val handle = this.handle
-    handle.getUnsafeCustomData()?.remove(NYA_TAG_NAME)
+    val handle: MojangStack? = this.handle
+    handle?.getUnsafeCustomData()?.remove(NYA_TAG_NAME)
 }
 //</editor-fold>
 
@@ -143,12 +153,9 @@ private var MojangStack.nyaTag: CompoundShadowTag
         return nyaTag.wrap
     }
     set(value) {
-        // 替换整个物品组件: `minecraft:custom_data`.
-        // 也就是说一旦该 setter 函数被调用, 那么物品组件
-        // `minecraft:custom_data` 中的其他内容都会被移除.
-        val tag = CompoundTag()
-        tag.put(NYA_TAG_NAME, value.unwrap)
-        this.setCustomData(tag)
+        val customData = this.getCustomDataOrCreate()
+        customData.put(NYA_TAG_NAME, value.unwrap)
+        this.setCustomData(customData)
     }
 
 private val MojangStack.nyaTagOrNull: CompoundShadowTag?
