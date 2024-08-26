@@ -15,9 +15,6 @@ import java.util.function.Predicate;
 public abstract class MixinIngredient implements Predicate<ItemStack> {
 
     @Shadow
-    public boolean exact;
-
-    @Shadow
     public abstract boolean isEmpty();
 
     @Shadow
