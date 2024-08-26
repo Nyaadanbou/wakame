@@ -7,7 +7,10 @@
   "compatibilityLevel": "JAVA_17",
   "server": [
     "MixinIngredient",
+    "MixinRepairItemRecipe",
     "MixinServerLevel",
-    "MixinServerPlayer"
+    "MixinServerPlayer",
+    "MixinStackedContentsExtraMap",
+    "MixinTippedArrowRecipe"
   ]
 }
