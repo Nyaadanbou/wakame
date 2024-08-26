@@ -34,7 +34,7 @@ object ResourcepackCommands : KoinComponent, CommandFactory<CommandSender> {
 
                     manager.generate(regenerate = true)
                         .onSuccess { sender.sendPlainMessage("Resourcepack has been generated successfully!") }
-                        .onFailure { sender.sendPlainMessage("Failed to generate resourcepack: '${it.message}'") }
+                        .onFailure { sender.sendPlainMessage("Failed to generate resourcepack, check the console for more information.") }
                 }
             }.buildAndAdd(this)
 

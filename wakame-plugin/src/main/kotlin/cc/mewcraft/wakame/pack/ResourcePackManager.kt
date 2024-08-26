@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.command.command.ResourcepackCommands
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.lookup.AssetsLookup
@@ -99,6 +100,7 @@ internal class ResourcePackManager(
                 ResourcePackCustomModelGeneration(context),
                 ResourcePackExternalGeneration(context)
             ).generate().getOrElse {
+                logger.warn("Failed to generate resourcepack", it)
                 if (it !is ResourcePackExternalGeneration.GenerationCancelledException) {
                     return Result.failure(it)
                 }

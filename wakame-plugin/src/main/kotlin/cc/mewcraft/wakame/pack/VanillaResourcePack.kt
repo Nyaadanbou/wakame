@@ -15,15 +15,17 @@ import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
 import java.io.File
 import java.net.URI
 
-private const val VANILLA_RESOURCE_PACK_CACHE_DIRECTORY = "generated/cache/"
-private const val VANILLA_RESOURCE_PACK_BASE_DOWNLOAD_URL = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/<version>/"
-
 data class VanillaResourcePackDownloadException(
     override val message: String = "Cannot download vanilla resource pack file.",
     override val cause: Throwable? = null,
 ) : ResourcePackException()
 
 class VanillaResourcePack : KoinComponent {
+    companion object {
+        private const val VANILLA_RESOURCE_PACK_CACHE_DIRECTORY = "generated/cache/"
+        private const val VANILLA_RESOURCE_PACK_BASE_DOWNLOAD_URL = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/<version>/"
+    }
+
     private val logger: ComponentLogger by inject()
     private val pluginDataDirectory: File by inject(named(PLUGIN_DATA_DIR))
     private val resourcePackDirectory: File = pluginDataDirectory.resolve(VANILLA_RESOURCE_PACK_CACHE_DIRECTORY)
