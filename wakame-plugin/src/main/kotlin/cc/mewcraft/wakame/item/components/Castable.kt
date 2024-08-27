@@ -61,7 +61,7 @@ interface Castable : Examinable, TooltipProvider.Single {
         }
 
         override fun write(holder: ItemComponentHolder, value: Castable) {
-            holder.putTag()
+            holder.editTag()
         }
 
         override fun remove(holder: ItemComponentHolder) {

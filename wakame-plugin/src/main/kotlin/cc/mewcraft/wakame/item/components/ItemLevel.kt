@@ -65,9 +65,10 @@ data class ItemLevel(
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemLevel) {
-            val tag = holder.getTagOrCreate()
-            val raw = value.level
-            tag.putShort(TAG_VALUE, raw)
+            holder.editTag { tag ->
+                val raw = value.level
+                tag.putShort(TAG_VALUE, raw)
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {

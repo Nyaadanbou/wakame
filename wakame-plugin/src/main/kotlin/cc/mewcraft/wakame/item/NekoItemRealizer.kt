@@ -9,9 +9,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.toNamespacedKey
-import org.bukkit.Material
 import org.bukkit.Registry
-import org.bukkit.inventory.ItemStack
 
 /**
  * Realizes [NekoItem] into an item which then can be added to the game world.
@@ -141,20 +139,20 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
      * @return a new NekoStack
      */
     private fun realizeByContext(prototype: NekoItem, context: GenerationContext): NekoStack {
-        val itemType: Material = requireNotNull(Registry.MATERIAL.get(prototype.itemType.toNamespacedKey())) {
+        // 获取基础的物品类型
+        val itemType = requireNotNull(Registry.MATERIAL.get(prototype.itemType.toNamespacedKey())) {
             "Can't find org.bukkit.Material by '${prototype.itemType}'"
         }
+        // 创建空的萌芽物品
         val nekoStack = itemType.createNekoStack()
+        // 获取萌芽物品的底层 ItemStack
+        val itemStack = nekoStack.unsafe.handle
 
         // 移除既定的 原版组件
-        nekoStack.editHandle {
-            prototype.removeComponents.applyTo(this)
-        }
-
-        val itemKey = prototype.key
-        val wakameTag = nekoStack.unsafe.nbt
-        NekoStackSupport.setKey(wakameTag, itemKey)
-        NekoStackSupport.setVariant(wakameTag, 0)
+        prototype.removeComponents.applyTo(itemStack)
+        // 设置物品的 id 和 variant
+        NekoStackSupport.setKey(itemStack, prototype.key)
+        NekoStackSupport.setVariant(itemStack, 0)
 
         // 获取 物品组件 的容器
         val components = nekoStack.components
@@ -208,9 +206,5 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.CRATE)
 
         return nekoStack
-    }
-
-    private fun NekoStack.editHandle(block: ItemStack.() -> Unit) {
-        block(unsafe.handle)
     }
 }

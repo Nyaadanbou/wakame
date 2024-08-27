@@ -47,7 +47,7 @@ interface NekoStack : Keyed, Examinable {
     val isEmpty: Boolean
 
     /**
-     * Gets the clone of the wrapped [ItemStack].
+     * 获取底层 [ItemStack] 的克隆.
      */
     @get:Contract(" -> new")
     val itemStack: ItemStack
@@ -127,7 +127,7 @@ interface NekoStack : Keyed, Examinable {
          *
          * 这是 `wakame` NBT 的直接引用, 任何对该对象的修改都会直接影响到物品本身的 NBT 数据.
          */
-        val nbt: CompoundTag
+        val nyaTag: CompoundTag
 
         /**
          * 获取该 [NekoStack] 封装的 [ItemStack].
@@ -265,7 +265,7 @@ private object EmptyNekoStack : NekoStack {
     }
 
     object Unsafe : NekoStack.Unsafe {
-        override val nbt: CompoundTag
+        override val nyaTag: CompoundTag
             get() = CompoundTag.create()
         override val handle: ItemStack
             get() = ItemStack.empty()

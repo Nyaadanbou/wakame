@@ -72,10 +72,11 @@ data class ExtraLore(
         }
 
         override fun write(holder: ItemComponentHolder, value: ExtraLore) {
-            val tag = holder.getTagOrCreate()
-            val stringTagList = value.lore.map(StringTag::valueOf)
-            val stringListTag = ListTag.create(stringTagList, TagType.STRING)
-            tag.put(TAG_VALUE, stringListTag)
+            holder.editTag { tag ->
+                val stringTagList = value.lore.map(StringTag::valueOf)
+                val stringListTag = ListTag.create(stringTagList, TagType.STRING)
+                tag.put(TAG_VALUE, stringListTag)
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {

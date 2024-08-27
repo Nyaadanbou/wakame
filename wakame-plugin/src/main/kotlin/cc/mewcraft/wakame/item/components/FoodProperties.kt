@@ -98,8 +98,14 @@ data class FoodProperties(
                 itemMeta.setFood(craftFood)
             }
 
-            val stringListTag = ListTag { value.skills.map { StringTag.valueOf(it.asString()) }.forEach(::add) }
-            holder.getTagOrCreate().put(TAG_SKILLS, stringListTag)
+            holder.editTag { tag ->
+                val stringListTag = ListTag {
+                    value.skills
+                        .map { StringTag.valueOf(it.asString()) }
+                        .forEach(::add)
+                }
+                tag.put(TAG_SKILLS, stringListTag)
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {

@@ -61,7 +61,7 @@ interface Kizamiable : Examinable, TooltipProvider.Single {
         }
 
         override fun write(holder: ItemComponentHolder, value: Kizamiable) {
-            holder.putTag()
+            holder.editTag()
         }
 
         override fun remove(holder: ItemComponentHolder) {

@@ -73,10 +73,11 @@ data class PortableCore(
         }
 
         override fun write(holder: ItemComponentHolder, value: PortableCore) {
-            val tag = holder.getTagOrCreate()
-            tag.put(TAG_CORE, value.wrapped.serializeAsTag())
-            if (value.penalty > 0) {
-                tag.putInt(TAG_PENALTY, value.penalty)
+            holder.editTag { tag ->
+                tag.put(TAG_CORE, value.wrapped.serializeAsTag())
+                if (value.penalty > 0) {
+                    tag.putInt(TAG_PENALTY, value.penalty)
+                }
             }
         }
 

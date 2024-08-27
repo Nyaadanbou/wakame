@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.Tool.Template
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -62,7 +61,7 @@ interface Skillful : Examinable, TooltipProvider.Single {
         }
 
         override fun write(holder: ItemComponentHolder, value: Skillful) {
-            holder.putTag()
+            holder.editTag()
         }
 
         override fun remove(holder: ItemComponentHolder) {

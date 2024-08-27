@@ -176,12 +176,13 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemTracks) {
-            val tag = holder.getTagOrCreate()
-            tag.clear() // 总是重新写入所有数据
-            for ((trackType, track) in value) {
-                val tagKey = trackType.id
-                val tagValue = track.serializeAsTag()
-                tag.put(tagKey, tagValue)
+            holder.editTag { tag ->
+                tag.clear() // 总是重新写入所有数据
+                for ((trackType, track) in value) {
+                    val tagKey = trackType.id
+                    val tagValue = track.serializeAsTag()
+                    tag.put(tagKey, tagValue)
+                }
             }
         }
 

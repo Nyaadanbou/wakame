@@ -68,8 +68,9 @@ data class ItemRarity(
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemRarity) {
-            val tag = holder.getTagOrCreate()
-            tag.putByte(TAG_VALUE, value.rarity.binaryId)
+            holder.editTag { tag ->
+                tag.putByte(TAG_VALUE, value.rarity.binaryId)
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {

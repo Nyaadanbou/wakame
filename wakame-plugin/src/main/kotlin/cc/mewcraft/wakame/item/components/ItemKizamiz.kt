@@ -108,9 +108,10 @@ data class ItemKizamiz(
 
         override fun write(holder: ItemComponentHolder, value: ItemKizamiz) {
             require(value.kizamiz.isNotEmpty()) { "The set of kizami must be not empty" }
-            val tag = holder.getTagOrCreate()
-            val byteArray = value.kizamiz.mapToByteArray(Kizami::binaryId)
-            tag.putByteArray(TAG_VALUE, byteArray)
+            holder.editTag { tag ->
+                val byteArray = value.kizamiz.mapToByteArray(Kizami::binaryId)
+                tag.putByteArray(TAG_VALUE, byteArray)
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {

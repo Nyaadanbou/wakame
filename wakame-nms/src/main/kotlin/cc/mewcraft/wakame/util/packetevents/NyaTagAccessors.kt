@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util.packetevents
 
-import cc.mewcraft.wakame.util.NYA_TAG_NAME
+import cc.mewcraft.wakame.util.NYA_TAG_KEY
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.wrap
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
@@ -24,7 +24,7 @@ import cc.mewcraft.nbt.CompoundTag as CompoundShadowTag
 val ItemStack.wakameTagOrNull: CompoundShadowTag?
     get() {
         val customData = this.minecraftCustomData
-        val wakameTag = customData?.getCompoundOrNull(NYA_TAG_NAME)
+        val wakameTag = customData?.getCompoundOrNull(NYA_TAG_KEY)
         return wakameTag?.wrap
     }
 

@@ -53,7 +53,7 @@ interface ItemGlowable : Examinable, TooltipProvider.Single {
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemGlowable) {
-            holder.putTag()
+            holder.editTag()
         }
 
         override fun remove(holder: ItemComponentHolder) {

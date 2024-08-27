@@ -150,7 +150,7 @@ class SingleItemListener : KoinComponent, Listener {
     fun onAttack(event: EntityDamageByEntityEvent) {
         val damager = event.damager as? Player ?: return
         val entity = event.entity as? LivingEntity ?: return
-        val item = damager.inventory.itemInMainHand.takeIfNekoStack()
+        val item = damager.inventory.itemInMainHand.takeIfNeko()
 
         skillEventHandler.onAttack(damager, entity, item, event)
     }

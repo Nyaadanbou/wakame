@@ -696,7 +696,7 @@ internal object ReplaceMap {
         }
 
         override fun getPlayerInputs(): List<ItemStack> {
-            return data.values.mapNotNull { it.latestResult.ingredient?.unsafe?.handle }
+            return data.values.mapNotNull { it.latestResult.ingredient?.itemStack }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Replace>> {

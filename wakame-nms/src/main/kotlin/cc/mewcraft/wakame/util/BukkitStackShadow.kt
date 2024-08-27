@@ -17,9 +17,9 @@ import cc.mewcraft.nbt.Tag as ShadowTag
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
-const val NYA_TAG_NAME: String = "wakame"
+const val NYA_TAG_KEY: String = "wakame"
 
-//<editor-fold desc="Shadow un(wrappers)">
+//<editor-fold desc="Shadow bridge">
 internal val Tag.wrap: ShadowTag
     get() = BukkitShadowFactory.global().shadow<ShadowTag>(this)
 internal val ShadowTag.unwrap: Tag
@@ -30,7 +30,23 @@ internal val CompoundShadowTag.unwrap: CompoundTag
     get() = this.shadowTarget as CompoundTag
 //</editor-fold>
 
-//<editor-fold desc="BukkitStack (NMS)">
+//<editor-fold desc="BukkitStack">
+/**
+ * 获取封装的 NMS 对象.
+ * 如果 [isEmpty] 为 `true`, 将会返回 `null`.
+ * 截止至 2024/8/25, 空气不存在封装的 NMS 对象.
+ */
+internal val BukkitStack.handle: MojangStack?
+    get() = if (this is CraftItemStack) {
+        this.handle
+    } else {
+        val shadow: ShadowItemStack = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
+        val delegate: CraftItemStack = shadow.craftDelegate
+        delegate.handle
+    }.takeIf {
+        !it.isEmpty
+    }
+
 /**
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
@@ -84,84 +100,144 @@ var BukkitStack.backingCustomModelData: Int?
     }
 
 /**
- * 获取封装的 NMS 对象.
- * 如果 [isEmpty] 为 `true`, 将会返回 `null`.
- * 截止至 2024/8/25, 空气不存在封装的 NMS 对象.
+ * Safe read/write.
  */
-internal val BukkitStack.handle: MojangStack?
-    get() = if (this is CraftItemStack) {
-        this.handle
-    } else {
-        val shadow: ShadowItemStack = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
-        val delegate: CraftItemStack = shadow.craftDelegate
-        delegate.handle
-    }.takeIf {
-        !it.isEmpty
-    }
-//</editor-fold>
-
-//<editor-fold desc="BukkitStack - Access to nya tags">
-var BukkitStack.nyaTag: CompoundShadowTag
-    /**
-     * 获取萌芽标签.
-     * 如果物品上不存在萌芽标签, 将会创建一个新的萌芽标签并*写入*到物品上.
-     */
+var BukkitStack.nyaTag: CompoundShadowTag?
     get() {
         val handle: MojangStack? = this.handle
-        if (handle == null) {
-            throw IllegalStateException("Can't get NBT tag from empty ItemStack")
-        }
-        return handle.nyaTag
+        return handle?.nyaTag
     }
-    /**
-     * 设置萌芽标签.
-     * 如果物品上已经存在萌芽标签, 将会覆盖掉原有的萌芽标签.
-     * 你也可以传入 `null` 来移除物品上的萌芽标签.
-     */
     set(value) {
         val handle: MojangStack? = this.handle
         if (handle == null) {
-            throw IllegalStateException("Can't set NBT tag for empty ItemStack")
+            throw IllegalStateException("Can't write NBT into empty ItemStack")
         }
         handle.nyaTag = value
     }
 
 /**
- * 获取萌芽标签. 如果物品上不存在萌芽标签, 将会返回 `null`.
- * 与 [nyaTag] 不同, 该函数永远不会修改物品的任何数据.
+ * Safe read.
  */
-val BukkitStack.nyaTagOrNull: CompoundShadowTag?
+val BukkitStack.nyaTagOrThrow: CompoundShadowTag
+    get() = this.nyaTag ?: throw NoSuchElementException("No nyaa tag present on ItemStack")
+
+/**
+ * Safe edit.
+ */
+fun BukkitStack.editNyaTag(block: (CompoundShadowTag) -> Unit) {
+    val nyaTag = this.nyaTag ?: CompoundShadowTag.create()
+    nyaTag.apply(block)
+    this.nyaTag = nyaTag
+}
+
+/**
+ * Unsafe read/write.
+ */
+var BukkitStack.unsafeNyaTag: CompoundShadowTag?
     get() {
         val handle: MojangStack? = this.handle
-        return handle?.nyaTagOrNull
+        return handle?.unsafeNyaTag
+    }
+    set(value) {
+        val handle: MojangStack? = this.handle
+        if (handle == null) {
+            throw IllegalStateException("Can't write NBT into empty ItemStack")
+        }
+        handle.unsafeNyaTag = value
     }
 
 /**
- * 移除物品上的萌芽标签.
+ * Unsafe read.
  */
-fun BukkitStack.removeNyaTag() {
-    val handle: MojangStack? = this.handle
-    handle?.getUnsafeCustomData()?.remove(NYA_TAG_NAME)
+val BukkitStack.unsafeNyaTagOrThrow: CompoundShadowTag
+    get() = this.unsafeNyaTag ?: throw NoSuchElementException("No nya NBT present on ItemStack")
+
+/**
+ * Unsafe edit.
+ */
+fun BukkitStack.unsafeEditNyaTag(block: (CompoundShadowTag) -> Unit) {
+    val nyaTag = this.unsafeNyaTag ?: CompoundShadowTag.create()
+    nyaTag.apply(block)
+    this.unsafeNyaTag = nyaTag
 }
 //</editor-fold>
 
 //<editor-fold desc="MojangStack">
-private var MojangStack.nyaTag: CompoundShadowTag
+/**
+ * Safe read/write.
+ *
+ * ## Read
+ * 读取 `minecraft:custom_data` 的 [CompoundTag] 副本,
+ * 然后返回副本上的萌芽 NBT.
+ *
+ * ## Write
+ * 读取 `minecraft:custom_data` 的 [CompoundTag] 副本,
+ * 然后将萌芽 NBT 写入副本,
+ * 最后将副本写入物品.
+ */
+private var MojangStack.nyaTag: CompoundShadowTag?
     get() {
-        val customData = this.getUnsafeCustomDataOrCreate()
-        val nyaTag = customData.getOrPut(NYA_TAG_NAME, ::CompoundTag)
+        val data = this.getCustomData() /* copy */ ?: return null
+        val nyaTag = data.getCompoundOrNull(NYA_TAG_KEY) ?: return null
         return nyaTag.wrap
     }
     set(value) {
-        val customData = this.getCustomDataOrCreate()
-        customData.put(NYA_TAG_NAME, value.unwrap)
-        this.setCustomData(customData)
+        val data = this.getCustomData() /* copy */
+        if (data == null) {
+            if (value != null) {
+                val tag = CompoundTag()
+                tag.put(NYA_TAG_KEY, value.unwrap)
+                this.setCustomData(tag)
+            }
+        } else {
+            if (value == null) {
+                data.remove(NYA_TAG_KEY)
+            } else {
+                data.put(NYA_TAG_KEY, value.unwrap)
+                this.setCustomData(data)
+            }
+            if (data.isEmpty) {
+                this.unsetCustomData()
+            }
+        }
     }
 
-private val MojangStack.nyaTagOrNull: CompoundShadowTag?
+/**
+ * Unsafe read/write.
+ *
+ * ## Read
+ * 读取 `minecraft:custom_data` 的 [CompoundTag] 引用,
+ * 然后返回引用上的萌芽 NBT.
+ *
+ * ## Write
+ * 读取 `minecraft:custom_data` 的 [CompoundTag] 引用,
+ * 然后将萌芽 NBT 写入引用,
+ * 最后将引用写入物品.
+ */
+private var MojangStack.unsafeNyaTag: CompoundShadowTag?
     get() {
-        val customData = this.getUnsafeCustomData()
-        val nyaTag = customData?.getCompoundOrNull(NYA_TAG_NAME)
-        return nyaTag?.wrap
+        val data = this.getUnsafeCustomData()
+        val nyaTag = data?.getCompoundOrNull(NYA_TAG_KEY) ?: return null
+        return nyaTag.wrap
     }
+    set(value) {
+        val data = this.getUnsafeCustomData()
+        if (data == null) {
+            if (value != null) {
+                val tag = CompoundTag()
+                tag.put(NYA_TAG_KEY, value.unwrap)
+                this.setUnsafeCustomData(tag)
+            }
+        } else {
+            if (value == null) {
+                data.remove(NYA_TAG_KEY)
+            } else {
+                data.put(NYA_TAG_KEY, value.unwrap)
+            }
+            if (data.isEmpty) {
+                this.unsetCustomData()
+            }
+        }
+    }
+
 //</editor-fold>

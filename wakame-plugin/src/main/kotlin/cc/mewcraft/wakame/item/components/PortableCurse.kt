@@ -62,8 +62,9 @@ data class PortableCurse(
         }
 
         override fun write(holder: ItemComponentHolder, value: PortableCurse) {
-            val tag = holder.getTagOrCreate()
-            tag.put(TAG_CURSE, value.wrapped.serializeAsTag())
+            holder.editTag { tag ->
+                tag.put(TAG_CURSE, value.wrapped.serializeAsTag())
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {

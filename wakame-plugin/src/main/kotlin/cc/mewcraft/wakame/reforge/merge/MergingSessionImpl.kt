@@ -50,7 +50,7 @@ internal class SimpleMergingSession(
         val item = when (slot) {
             InputSlot.INPUT1 -> inputItem1
             InputSlot.INPUT2 -> inputItem2
-        }?.unsafe?.handle
+        }?.itemStack
 
         if (item != null) {
             try {

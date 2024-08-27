@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.skill.state
 
 import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
-import cc.mewcraft.wakame.item.takeIfNekoStack
+import cc.mewcraft.wakame.item.takeIfNeko
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.state.display.StateDisplay
 import cc.mewcraft.wakame.skill.tick.PlayerSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
-import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
+import cc.mewcraft.wakame.tick.TickResult
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.toSimpleString
@@ -124,7 +124,7 @@ sealed class AbstractSkillStateInfo(
                 .filter { it.player == state.user.player }
                 .handler { event ->
                     val user = event.player.toUser()
-                    val itemStack = user.player.inventory.itemInMainHand.takeIfNekoStack()
+                    val itemStack = user.player.inventory.itemInMainHand.takeIfNeko()
                     val nekoStack = itemStack?.toNekoStack
                     val result = user.skillState.addTrigger(SingleTrigger.JUMP, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
                     checkResult(result, event)
@@ -135,7 +135,7 @@ sealed class AbstractSkillStateInfo(
                 .filter { it.from.blockX != it.to.blockX || it.from.blockY != it.to.blockY || it.from.blockZ != it.to.blockZ }
                 .handler { event ->
                     val user = event.player.toUser()
-                    val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
+                    val itemStack = event.player.inventory.itemInMainHand.takeIfNeko()
                     val nekoStack = itemStack?.toNekoStack
                     val result = user.skillState.addTrigger(SingleTrigger.MOVE, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
                     checkResult(result, event)
@@ -145,7 +145,7 @@ sealed class AbstractSkillStateInfo(
                 .filter { it.player == state.user.player }
                 .handler { event ->
                     val user = event.player.toUser()
-                    val itemStack = event.player.inventory.itemInMainHand.takeIfNekoStack()
+                    val itemStack = event.player.inventory.itemInMainHand.takeIfNeko()
                     val nekoStack = itemStack?.toNekoStack
                     val result = user.skillState.addTrigger(SingleTrigger.SNEAK, SkillContext(CasterAdapter.adapt(user), TargetAdapter.adapt(user), nekoStack))
                     checkResult(result, event)

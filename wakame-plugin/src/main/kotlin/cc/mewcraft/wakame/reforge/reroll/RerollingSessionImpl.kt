@@ -86,7 +86,7 @@ class SimpleRerollingSession(
 
     override fun getAllPlayerInputs(): Collection<ItemStack> {
         val items = buildList<ItemStack> {
-            sourceItem?.let { add(it.unsafe.handle) }
+            sourceItem?.let { add(it.itemStack) }
         }
         return items
     }

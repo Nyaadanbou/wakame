@@ -119,8 +119,10 @@ data class ItemElements(
 
         override fun write(holder: ItemComponentHolder, value: ItemElements) {
             require(value.elements.isNotEmpty()) { "The set of elements must not be empty" }
-            val byteArray = value.elements.mapToByteArray(Element::binaryId)
-            holder.getTagOrCreate().putByteArray(TAG_VALUE, byteArray)
+            holder.editTag { tag ->
+                val byteArray = value.elements.mapToByteArray(Element::binaryId)
+                tag.putByteArray(TAG_VALUE, byteArray)
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {

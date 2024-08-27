@@ -84,9 +84,10 @@ data class ItemArrow(
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemArrow) {
-            val tag = holder.getTagOrCreate()
-            val pierceLevel = value.pierceLevel
-            tag.putByte(TAG_PIERCE_LEVEL, pierceLevel)
+            holder.editTag { tag ->
+                val pierceLevel = value.pierceLevel
+                tag.putByte(TAG_PIERCE_LEVEL, pierceLevel)
+            }
         }
 
         // 开发日记 2024/6/29

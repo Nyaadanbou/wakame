@@ -11,8 +11,8 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.NYA_TAG_NAME
-import cc.mewcraft.wakame.util.nyaTagOrNull
+import cc.mewcraft.wakame.util.NYA_TAG_KEY
+import cc.mewcraft.wakame.util.unsafeNyaTagOrThrow
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore
 import com.github.retrooper.packetevents.resources.ResourceLocation
@@ -34,7 +34,7 @@ internal val PacketStack.isNeko: Boolean
         if (this.hasComponentPatches()) {
             val customData = this.components.get(ComponentTypes.CUSTOM_DATA)
             if (customData != null) {
-                if (customData.getCompoundTagOrNull(NYA_TAG_NAME) != null) {
+                if (customData.getCompoundTagOrNull(NYA_TAG_KEY) != null) {
                     return true
                 }
             }
@@ -49,7 +49,7 @@ internal val PacketStack.isCustomNeko: Boolean
         if (!this.hasComponentPatches()) {
             return false
         }
-        val ret = this.components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(NYA_TAG_NAME) != null
+        val ret = this.components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(NYA_TAG_KEY) != null
         return ret
     }
 
@@ -68,7 +68,7 @@ internal val PacketStack.tryNekoStack: PacketNekoStack?
         if (this.hasComponentPatches()) {
             val customData = this.components.get(ComponentTypes.CUSTOM_DATA)
             if (customData != null) {
-                val wakameTag = customData.getCompoundTagOrNull(NYA_TAG_NAME)
+                val wakameTag = customData.getCompoundTagOrNull(NYA_TAG_KEY)
                 if (wakameTag != null) {
                     return PacketCustomNekoStack(this)
                 }
@@ -152,9 +152,7 @@ private class PacketCustomNekoStack(
     // 开发日记1: We use property initializer here as it would be called multiple times,
     // and we don't want to do the unnecessary NBT conversion again and again
     // 开发日记2: 该 NBT 标签应该只接受读操作 (虽然可以写, 但不保证生效, 也没啥用应该)
-    val nbt: CompoundTag = requireNotNull(handle.nyaTagOrNull) {
-        "PacketCustomNekoStack should have a wakame tag"
-    }
+    val nyaTag: CompoundTag = handle.unsafeNyaTagOrThrow
 
     override val isEmpty: Boolean
         get() = false
@@ -165,37 +163,37 @@ private class PacketCustomNekoStack(
     override val shouldRender: Boolean
         get() = handle0.getComponent(ComponentTypes.CUSTOM_DATA)
             ?.getOrNull()
-            ?.getCompoundTagOrNull(NYA_TAG_NAME)
+            ?.getCompoundTagOrNull(NYA_TAG_KEY)
             ?.getCompoundTagOrNull(ItemComponentMap.TAG_COMPONENTS)
             ?.getTagOrNull(ItemComponentTypes.SYSTEM_USE.id) == null
 
     override val namespace: String
-        get() = NekoStackSupport.getNamespaceOrThrow(nbt)
+        get() = NekoStackSupport.getNamespaceOrThrow(nyaTag)
 
     override val path: String
-        get() = NekoStackSupport.getPathOrThrow(nbt)
+        get() = NekoStackSupport.getPathOrThrow(nyaTag)
 
     override val key: Key
-        get() = NekoStackSupport.getKeyOrThrow(nbt)
+        get() = NekoStackSupport.getKeyOrThrow(nyaTag)
 
     override var variant: Int
-        get() = NekoStackSupport.getVariant(nbt)
+        get() = NekoStackSupport.getVariant(nyaTag)
         set(_) = abortWrites()
 
     override val slotGroup: ItemSlotGroup
-        get() = NekoStackSupport.getSlotGroup(nbt)
+        get() = NekoStackSupport.getSlotGroup(nyaTag)
 
     override val prototype: NekoItem
-        get() = NekoStackSupport.getPrototypeOrThrow(nbt)
+        get() = NekoStackSupport.getPrototypeOrThrow(nyaTag)
 
     override val components: ItemComponentMap
         get() = NekoStackSupport.getImmutableComponents(handle) // 使用 ImmutableMap 以禁止写入新的组件信息
 
     override val templates: ItemTemplateMap
-        get() = NekoStackSupport.getTemplates(nbt)
+        get() = NekoStackSupport.getTemplates(nyaTag)
 
     override val behaviors: ItemBehaviorMap
-        get() = NekoStackSupport.getBehaviors(nbt)
+        get() = NekoStackSupport.getBehaviors(nyaTag)
 
     override val unsafe: NekoStack.Unsafe
         get() = Unsafe(this)
@@ -217,8 +215,8 @@ private class PacketCustomNekoStack(
     }
 
     class Unsafe(val nekoStack: PacketCustomNekoStack) : NekoStack.Unsafe {
-        override val nbt: CompoundTag
-            get() = nekoStack.nbt
+        override val nyaTag: CompoundTag
+            get() = nekoStack.nyaTag
         override val handle: BukkitStack
             get() = nekoStack.handle
     }

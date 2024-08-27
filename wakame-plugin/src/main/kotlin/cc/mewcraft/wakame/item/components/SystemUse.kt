@@ -40,7 +40,7 @@ interface SystemUse : Examinable {
         }
 
         override fun write(holder: ItemComponentHolder, value: Unit) {
-            holder.putTag()
+            holder.editTag()
         }
 
         override fun remove(holder: ItemComponentHolder) {

@@ -93,10 +93,11 @@ data class ItemName(
             // 因此这里有什么就写入什么. 整体上做到简单, 一致, 无例外.
 
             // 将 raw 写入到 NBT
-            val tag = holder.getTagOrCreate()
             if (value.raw.isNotBlank()) {
                 // 只有当 raw 不为空字符串时才更新 NBT
-                tag.putString(TAG_VALUE, value.raw)
+                holder.editTag { tag ->
+                    tag.putString(TAG_VALUE, value.raw)
+                }
             }
 
             // 将 rich 写入到原版物品组件 `minecraft:item_name`

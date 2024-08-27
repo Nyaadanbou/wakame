@@ -316,13 +316,14 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemCells) {
-            val tag = holder.getTagOrCreate()
-            tag.clear() // 总是重新写入全部数据
-            for ((id, cell) in value) {
-                if (cell.getCore().isNoop) {
-                    continue // 拥有 No-op 核心的词条栏不应该写入物品
+            holder.editTag { tag ->
+                tag.clear() // 总是重新写入全部数据
+                for ((id, cell) in value) {
+                    if (cell.getCore().isNoop) {
+                        continue // 拥有 No-op 核心的词条栏不应该写入物品
+                    }
+                    tag.put(id, cell.serializeAsTag())
                 }
-                tag.put(id, cell.serializeAsTag())
             }
         }
 

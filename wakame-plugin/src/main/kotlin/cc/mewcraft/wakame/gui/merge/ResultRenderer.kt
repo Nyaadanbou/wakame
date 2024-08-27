@@ -20,7 +20,7 @@ internal object ResultRenderer {
         if (result.successful) {
             // 渲染成功的结果
 
-            ret = ItemStack(item.unsafe.handle.type)
+            ret = ItemStack(item.itemStack.type)
             ret.editMeta { meta ->
                 val name = "<white>结果: <green>就绪".mini
                 val lore = buildList<Component> {

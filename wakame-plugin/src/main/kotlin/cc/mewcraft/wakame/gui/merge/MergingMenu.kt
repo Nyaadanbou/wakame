@@ -183,7 +183,7 @@ internal class MergingMenu(
                     }
 
                     // 把合并后的物品递给玩家
-                    val handle = result.item.unsafe.handle
+                    val handle = result.item.itemStack
                     viewer.inventory.addItem(handle)
 
                     // 清空菜单中的物品

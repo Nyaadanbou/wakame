@@ -64,7 +64,9 @@ data class ItemCrate(
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemCrate) {
-            holder.getTagOrCreate().putString(TAG_KEY, value.key.asString())
+            holder.editTag { tag ->
+                tag.putString(TAG_KEY, value.key.asString())
+            }
         }
 
         override fun remove(holder: ItemComponentHolder) {

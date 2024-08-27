@@ -1,11 +1,9 @@
 package cc.mewcraft.wakame.item.component
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.getCompoundOrNull
-import cc.mewcraft.wakame.util.getOrPut
-import cc.mewcraft.wakame.util.nyaTag
 import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.unsafeNyaTagOrThrow
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -52,10 +50,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
         /**
          * 组合两个 [ItemComponentMap], 一个作为默认值, 一个作为对默认值的重写.
          */
-        fun composite(
-            base: ItemComponentMap,
-            overrides: ItemComponentMap,
-        ): ItemComponentMap {
+        fun composite(base: ItemComponentMap, overrides: ItemComponentMap): ItemComponentMap {
             return object : ItemComponentMap {
                 override fun <T> get(type: ItemComponentType<out T>): T? {
                     return overrides.get(type) ?: base.get(type)
@@ -101,18 +96,14 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
          *
          * @param stack 物品堆叠
          */
-        fun wrapStack(
-            stack: BukkitStack,
-        ): ItemComponentMap {
+        fun wrapStack(stack: BukkitStack): ItemComponentMap {
             return ForBukkitStack(stack)
         }
 
         /**
          * 构建一个只允许读操作的 [ItemComponentMap].
          */
-        fun unmodifiable(
-            delegate: ItemComponentMap,
-        ): ItemComponentMap {
+        fun unmodifiable(delegate: ItemComponentMap): ItemComponentMap {
             return ForImmutable(delegate)
         }
 
@@ -320,17 +311,8 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
     private class ForBukkitStack(
         private val stack: BukkitStack,
     ) : ItemComponentMap {
-        // 开发日记 2024/7/7
-        // 由于 ItemStack.editMeta 会直接替换整个 ItemStack.meta,
-        // 导致 meta 内的 customTag 成员的实际引用会一直发生变化,
-        // 因此这里用 getter 而不是 property initializer.
-        private val nbt: CompoundTag
-            get() = stack.nyaTag
-
         override fun <T> get(type: ItemComponentType<out T>): T? {
-            val tag = nbt.getCompoundOrNull(TAG_COMPONENTS) ?: return null
-            val holder = ItemComponentHolder.create(tag, stack, this)
-            return type.read(holder)
+            return type.read(ItemComponentHolder.create(stack))
         }
 
         override fun has(type: ItemComponentType<*>): Boolean {
@@ -338,19 +320,17 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
         }
 
         override fun <T> set(type: ItemComponentType<in T>, value: T) {
-            val tag = nbt.getOrPut(TAG_COMPONENTS, CompoundTag::create) ?: return
-            val holder = ItemComponentHolder.create(tag, stack, this)
-            return type.write(holder, value)
+            type.write(ItemComponentHolder.create(stack), value)
         }
 
         override fun unset(type: ItemComponentType<*>) {
-            val tag = nbt.getCompoundOrNull(TAG_COMPONENTS) ?: return
-            val holder = ItemComponentHolder.create(tag, stack, this)
-            type.remove(holder)
+            type.remove(ItemComponentHolder.create(stack))
         }
 
         override fun keySet(): Set<ItemComponentType<*>> {
-            return nbt.getCompoundOrNull(TAG_COMPONENTS)
+            return stack
+                .unsafeNyaTagOrThrow
+                .getCompoundOrNull(TAG_COMPONENTS)
                 ?.keySet()
                 ?.mapNotNull(ItemComponentRegistry.TYPES::find)
                 ?.let(::ReferenceArraySet)
@@ -362,12 +342,11 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
         }
 
         override fun fuzzySize(): Int {
-            return nbt.getCompoundOrNull(TAG_COMPONENTS)?.size() ?: 0
+            return stack.unsafeNyaTagOrThrow.getCompoundOrNull(TAG_COMPONENTS)?.size() ?: 0
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("stack", stack),
-            ExaminableProperty.of("nbt", nbt)
         )
 
         override fun equals(other: Any?): Boolean {
@@ -377,7 +356,7 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
         }
 
         override fun hashCode(): Int {
-            return stack.hashCode() + nbt.hashCode() * 31
+            return stack.hashCode()
         }
 
         override fun toString(): String {
