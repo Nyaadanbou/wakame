@@ -18,11 +18,6 @@ public class ItemStackStrategy {
             }
 
             int h = 31 + itemStack.getItem().hashCode();
-            for (final TypedDataComponent<?> component : itemStack.getComponents()) {
-                if (component.type() != DataComponents.CUSTOM_DATA) {
-                    h = 31 * h + component.hashCode();
-                }
-            }
 
             CustomData customData = itemStack.get(DataComponents.CUSTOM_DATA);
             if (customData != null) {
@@ -32,9 +27,12 @@ public class ItemStackStrategy {
                     String path = nyaTag.getString("path");
                     h = 31 * h + namespace.hashCode();
                     h = 31 * h + path.hashCode();
-                } else {
-                    h = 31 * h + customData.hashCode();
+                    return h;
                 }
+            }
+
+            for (final TypedDataComponent<?> component : itemStack.getComponents()) {
+                h = 31 * h + component.hashCode();
             }
 
             return h;
