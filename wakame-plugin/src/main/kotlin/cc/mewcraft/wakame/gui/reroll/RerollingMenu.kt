@@ -199,6 +199,9 @@ internal class RerollingMenu(
                 // 把重造后的源物品给玩家
                 viewer.inventory.addItem(result.item.itemStack)
 
+                // 重置会话状态
+                session.reset()
+
                 // 清空菜单内容
                 setInputSlot(null)
                 setOutputSlot(null)
