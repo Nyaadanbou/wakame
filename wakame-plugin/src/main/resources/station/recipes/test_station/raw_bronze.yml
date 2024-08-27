@@ -1,8 +1,0 @@
-input:
-  - item: minecraft:raw_copper
-    amount: 3
-  - item: wakame:material/raw_tin
-    amount: 1
-output:
-  item: wakame:material/raw_bronze
-  amount: 4
