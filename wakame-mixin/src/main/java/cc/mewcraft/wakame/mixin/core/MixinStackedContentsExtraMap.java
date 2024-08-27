@@ -13,8 +13,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(value = StackedContentsExtraMap.class)
 public abstract class MixinStackedContentsExtraMap {
 
+    /**
+     * @author Nailm & Flandre & g2213swo
+     * @reason 让原版无序合成完全支持萌芽物品
+     */
     @Redirect(
-            method = "<init>", // 构造函数
+            method = "<init>",
             at = @At(
                     value = "NEW",
                     target = "Lit/unimi/dsi/fastutil/objects/Object2IntOpenCustomHashMap;",
