@@ -27,7 +27,9 @@ data class SingleRecipeResult(
     val amount: Int
 ) : RecipeResult {
     override fun toBukkitItemStack(): ItemStack {
-        return result.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${result.key}'")
+        val itemStack = result.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${result.key}'")
+        itemStack.amount = amount
+        return itemStack
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
