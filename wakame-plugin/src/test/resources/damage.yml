@@ -14,11 +14,10 @@ vanilla_mappings:
     element: neutral
     defense_penetration: 0.0
     defense_penetration_rate: 1.0
-  # 等到 1.21
-  # campfire:
-  #   element: fire
-  #   defense_penetration: 0.0
-  #   defense_penetration_rate: 1.0
+  campfire:
+    element: fire
+    defense_penetration: 0.0
+    defense_penetration_rate: 1.0
   cramming:
     element: neutral
     defense_penetration: 0.0
@@ -35,6 +34,10 @@ vanilla_mappings:
     element: neutral
     defense_penetration: 0.0
     defense_penetration_rate: 0.0
+  #  ender_pearl:
+  #    element: neutral
+  #    defense_penetration: 0.0
+  #    defense_penetration_rate: 1.0
   explosion:
     element: fire
     defense_penetration: 0.0
@@ -107,6 +110,10 @@ vanilla_mappings:
     element: neutral
     defense_penetration: 0.0
     defense_penetration_rate: 1.0
+  #  mace_smash:
+  #    element: neutral
+  #    defense_penetration: 0.0
+  #    defense_penetration_rate: 0.0
   mob_attack:
     element: neutral
     defense_penetration: 0.0
@@ -179,11 +186,10 @@ vanilla_mappings:
     element: fire
     defense_penetration: 0.0
     defense_penetration_rate: 0.0
-  # 等到 1.21
-  # wind_charge:
-  #   element: wind
-  #   defense_penetration: 0.0
-  #   defense_penetration_rate: 0.0
+  wind_charge:
+    element: wind
+    defense_penetration: 0.0
+    defense_penetration_rate: 0.0
   wither:
     element: neutral
     defense_penetration: 0.0
