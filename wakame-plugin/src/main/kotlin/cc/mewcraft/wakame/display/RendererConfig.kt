@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.display
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
+import cc.mewcraft.wakame.display2.RendererSystemName
+import com.google.common.collect.HashBasedTable
+import com.google.common.collect.Table
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -78,13 +80,21 @@ internal interface DynamicLoreMetaCreator {
  */
 internal class DynamicLoreMetaCreators : KoinComponent {
     private val logger by inject<Logger>()
-    private val creators = Object2ObjectArrayMap<String, DynamicLoreMetaCreator>()
+
+    /**
+     * 所有的 [DynamicLoreMetaCreator].
+     *
+     * R - [cc.mewcraft.wakame.display2.RendererSystemName]
+     * C - rawLine
+     * V - [DynamicLoreMetaCreator]
+     */
+    private val creators: Table<RendererSystemName, String, DynamicLoreMetaCreator> = HashBasedTable.create()
 
     /**
      * 获取所有的 [DynamicLoreMetaCreator].
      */
-    fun entries(): Map<String, DynamicLoreMetaCreator> {
-        return this.creators
+    fun entries(): Set<Map.Entry<String, DynamicLoreMetaCreator>> {
+        return this.creators.rowMap().entries.flatMap { entry -> entry.value.entries }.toSet()
     }
 
     /**
@@ -92,9 +102,9 @@ internal class DynamicLoreMetaCreators : KoinComponent {
      *
      * 会覆盖 [DynamicLoreMetaCreator.namespace] 相同的实例.
      */
-    fun register(creator: DynamicLoreMetaCreator) {
-        this.creators += creator.namespace to creator
-        logger.info("Registered DynamicLoreMetaCreator: {}", creator.namespace)
+    fun register(systemName: RendererSystemName, creator: DynamicLoreMetaCreator) {
+        this.creators.row(systemName)[creator.namespace] = creator
+        logger.info("Registered DynamicLoreMetaCreator: {} in system {}", creator.namespace, systemName)
     }
 
     /**
@@ -104,6 +114,6 @@ internal class DynamicLoreMetaCreators : KoinComponent {
      * @return 返回一个合适的 [DynamicLoreMetaCreator]
      */
     fun getApplicableCreator(rawLine: String): DynamicLoreMetaCreator? {
-        return this.creators.values.firstOrNull { creator -> creator.test(rawLine) }
+        return this.creators.values().firstOrNull { creator -> creator.test(rawLine) }
     }
 }

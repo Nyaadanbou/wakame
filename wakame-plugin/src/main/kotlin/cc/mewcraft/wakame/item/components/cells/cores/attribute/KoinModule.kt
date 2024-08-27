@@ -8,5 +8,4 @@ import org.koin.dsl.module
 
 internal fun coreAttributeModule(): Module = module {
     single<CoreAttributeBootstrap> { CoreAttributeBootstrap } withOptions { bind<Initializable>() }
-    single<CoreAttributeTooltipKeyProvider> { CoreAttributeTooltipKeyProvider(get()) }
 }

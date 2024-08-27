@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -478,7 +479,7 @@ internal object Replace {
         override val display: ItemStack = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
             editMeta { meta ->
                 val name = cell.provideTooltipName().content
-                val lore = cell.provideTooltipLore().content
+                val lore = cell.provideTooltipLore(RendererSystemName.STANDARD).content
                 meta.itemName(name)
                 meta.lore(lore)
                 meta.hideAllFlags()

@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -57,11 +58,11 @@ data class PortableCore(
         private val config = ItemComponentConfig.provide(this)
     }
 
-    override fun provideTooltipLore(): LoreLine {
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
         if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return wrapped.provideTooltipLore()
+        return wrapped.provideTooltipLore(systemName)
     }
 
     private data class Codec(override val id: String) : ItemComponentType<PortableCore> {

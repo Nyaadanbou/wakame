@@ -7,8 +7,7 @@ import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.LoreLineFlatter
 import cc.mewcraft.wakame.display.LoreMeta
 import cc.mewcraft.wakame.display.LoreMetaLookup
-import cc.mewcraft.wakame.display.LoreMetaLookupImpl
-import cc.mewcraft.wakame.display.RENDERER_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.display.RENDERERS_CONFIG_DIR
 import cc.mewcraft.wakame.display.RawTooltipIndex
 import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.RendererConfigImpl
@@ -55,7 +54,7 @@ class LoreLineFlatter2Test : KoinTest {
             )
 
             modules(module {
-                single<RendererConfig> { RendererConfigImpl(Configs.YAML[RENDERER_GLOBAL_CONFIG_FILE]) }
+                single<RendererConfig> { RendererConfigImpl(Configs.YAML[RENDERERS_CONFIG_DIR]) }
             })
         }
     }

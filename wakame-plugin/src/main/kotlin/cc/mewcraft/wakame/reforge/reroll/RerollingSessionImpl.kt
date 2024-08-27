@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -409,7 +410,7 @@ internal object SelectionMap : KoinComponent {
             val display = ItemStack(TemporaryIcons.get(cell.hashCode()))
             display.editMeta {
                 val name = cell.provideTooltipName().content
-                val lore = cell.provideTooltipLore().content
+                val lore = cell.provideTooltipLore(RendererSystemName.STANDARD).content
                 it.itemName(name)
                 it.lore(lore)
                 it.hideAllFlags()

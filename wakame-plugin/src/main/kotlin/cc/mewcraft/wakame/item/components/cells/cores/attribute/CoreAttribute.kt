@@ -14,6 +14,8 @@ import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.NameLine
+import cc.mewcraft.wakame.display2.RendererSystemName
+import cc.mewcraft.wakame.display2.RendererSystems
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.components.cells.Core
@@ -28,7 +30,6 @@ import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.stream.Stream
 
@@ -124,8 +125,8 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierSourc
         return NameLine.simple(tooltipName)
     }
 
-    override fun provideTooltipLore(): LoreLine {
-        val tooltipKey = lineKeyFactory.get(this) ?: return LoreLine.noop()
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
+        val tooltipKey = getLineKeyFactory(systemName).get(this) ?: return LoreLine.noop()
         val tooltipLore = AttributeRegistry.FACADES[key].createTooltipLore(this)
         return LoreLine.simple(tooltipKey, tooltipLore)
     }
@@ -138,7 +139,9 @@ sealed class CoreAttribute : Core, AttributeComponent.Op, AttributeModifierSourc
     override fun toString(): String = toSimpleString()
 
     internal companion object Type : CoreType<CoreAttribute>, KoinComponent {
-        val lineKeyFactory: CoreAttributeTooltipKeyProvider by inject()
+        fun getLineKeyFactory(systemName: RendererSystemName): CoreAttributeTooltipKeyProvider {
+            return RendererSystems[systemName].coreAttributeTooltipKeyProvider
+        }
     }
 }
 

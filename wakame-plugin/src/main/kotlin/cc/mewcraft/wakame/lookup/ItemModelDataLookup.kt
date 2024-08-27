@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
 import net.kyori.adventure.key.Key
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
@@ -18,6 +20,12 @@ internal class ItemModelDataLookup(
     private val logger: Logger,
     private val loader: GsonConfigurationLoader,
 ) : Initializable {
+    companion object : KoinComponent {
+        private val lookup: ItemModelDataLookup by inject()
+
+        operator fun get(key: Key, variant: Int): Int? = lookup[key, variant]
+    }
+
     private val root: BasicConfigurationNode by ReloadableProperty { loader.load() }
 
     /**

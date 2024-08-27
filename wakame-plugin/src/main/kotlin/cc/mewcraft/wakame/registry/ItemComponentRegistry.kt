@@ -1,7 +1,10 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.derive
+import cc.mewcraft.wakame.display.RENDERERS_CONFIG_DIR
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import org.koin.core.component.KoinComponent
@@ -12,6 +15,7 @@ import org.koin.core.component.KoinComponent
 object ItemComponentRegistry : KoinComponent, Initializable {
 
     const val NODE_COMPONENTS = "components"
+    const val RENDERER_SYSTEM_DESCRIPTOR_FILE = "$RENDERERS_CONFIG_DIR/<system>/descriptors.yml"
 
     /**
      * 物品组件的全局配置文件.
@@ -22,4 +26,9 @@ object ItemComponentRegistry : KoinComponent, Initializable {
      * 物品组件类型的注册表.
      */
     internal val TYPES: Registry<String, ItemComponentType<*>> = SimpleRegistry()
+
+    fun getDescriptorsByRendererSystemName(name: RendererSystemName): ConfigProvider {
+        val path = RENDERER_SYSTEM_DESCRIPTOR_FILE.replace("<system>", name.name.lowercase())
+        return Configs.YAML[path].derive(NODE_COMPONENTS)
+    }
 }

@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.NekoStack
@@ -270,12 +271,12 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             return cells.values.any { cell -> cell.getCore().isSimilar(core) }
         }
 
-        override fun provideTooltipLore(): Collection<LoreLine> {
+        override fun provideTooltipLore(systemName: RendererSystemName): Collection<LoreLine> {
             // showInTooltip 由核心各自的配置文件控制
             // if (!config.showInTooltip) {
             //     return emptyList()
             // }
-            return cells.values.map { cell -> cell.provideTooltipLore() }
+            return cells.values.map { cell -> cell.provideTooltipLore(systemName) }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, Cell>> {

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.Cell
@@ -44,7 +45,7 @@ fun stack(stack: NekoStack) {
     val attributable: Attributable? = stack.components.get(ItemComponentTypes.ATTRIBUTABLE)
     // val attributableLoreLine: LoreLine? = nekoStack.components.render(ItemComponentTypes.ATTRIBUTABLE)
     if (attributable != null) {
-        val loreLine: LoreLine = attributable.provideTooltipLore()
+        val loreLine: LoreLine = attributable.provideTooltipLore(RendererSystemName.STANDARD)
     }
 
     // 获取 item_name

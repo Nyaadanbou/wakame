@@ -6,6 +6,7 @@ import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -50,13 +51,14 @@ data class ExtraLore(
         private val tooltip: ItemComponentConfig.LoreTooltip = config.LoreTooltip()
     }
 
-    override fun provideTooltipLore(): LoreLine {
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
         if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        val lines = lore.mapTo(ObjectArrayList(lore.size)) { ItemComponentInjections.miniMessage.deserialize(tooltip.line, Placeholder.parsed("line", it)) }
-        val header = tooltip.header.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.miniMessage::deserialize) }
-        val bottom = tooltip.bottom.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.miniMessage::deserialize) }
+        val tooltipStrings = tooltip.tooltipStrings(systemName)
+        val lines = lore.mapTo(ObjectArrayList(lore.size)) { ItemComponentInjections.miniMessage.deserialize(tooltipStrings.line, Placeholder.parsed("line", it)) }
+        val header = tooltipStrings.header.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.miniMessage::deserialize) }
+        val bottom = tooltipStrings.bottom.run { mapTo(ObjectArrayList(this.size), ItemComponentInjections.miniMessage::deserialize) }
         lines.addAll(0, header)
         lines.addAll(bottom)
         return LoreLine.simple(tooltipKey, lines)

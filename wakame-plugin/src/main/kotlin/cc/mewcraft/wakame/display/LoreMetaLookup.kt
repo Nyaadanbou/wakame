@@ -1,6 +1,15 @@
 package cc.mewcraft.wakame.display
 
 internal interface LoreMetaLookup {
+    companion object {
+        fun create(
+            indexes: Map<TooltipKey, TooltipIndex>,
+            metadata: Map<TooltipKey, LoreMeta>,
+        ): LoreMetaLookup {
+            return LoreMetaLookupImpl(indexes, metadata)
+        }
+    }
+
     /**
      * 获取指定的 [key] 在 Item Lore 中的顺序. 数值越小, 越靠前面.
      *
@@ -27,4 +36,18 @@ internal interface LoreMetaLookup {
      * @see getMeta
      */
     fun <T : LoreMeta> getMetaOrNull(key: TooltipKey): T?
+}
+
+private class LoreMetaLookupImpl(
+    private val indexes: Map<TooltipKey, TooltipIndex>,
+    private val metadata: Map<TooltipKey, LoreMeta>,
+) : LoreMetaLookup {
+    override fun getIndexOrNull(key: TooltipKey): TooltipIndex? {
+        return indexes[key]
+    }
+
+    override fun <T : LoreMeta> getMetaOrNull(key: TooltipKey): T? {
+        @Suppress("UNCHECKED_CAST")
+        return metadata[key] as? T
+    }
 }

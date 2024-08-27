@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.attribute.AttributeComponent
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.display.DisplaySupport
 import cc.mewcraft.wakame.display.DynamicLoreMeta
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
 import cc.mewcraft.wakame.display.DynamicLoreMetaCreators
@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.display.RendererBootstrap
 import cc.mewcraft.wakame.display.RendererConfig
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipKeyProvider
+import cc.mewcraft.wakame.display2.RendererSystems
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
@@ -50,13 +51,17 @@ internal object CoreAttributeBootstrap : Initializable, KoinComponent {
     private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
 
     override fun onPostWorld() {
-        dynamicLoreMetaCreators.register(CoreAttributeLoreMetaCreator())
+        for ((systemName, system) in RendererSystems.entries()) {
+            dynamicLoreMetaCreators.register(systemName, system.coreAttributeLoreMetaCreator)
+        }
     }
 }
 
-internal class CoreAttributeLoreMetaCreator : DynamicLoreMetaCreator {
-    private val operationRawLines = DisplaySupport.RENDERER_GLOBAL_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_KEY, "operation")
-    private val elementRawLines = DisplaySupport.RENDERER_GLOBAL_CONFIG_PROVIDER.entry<List<String>>(DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_KEY, "element")
+internal class CoreAttributeLoreMetaCreator(
+    config: ConfigProvider
+) : DynamicLoreMetaCreator {
+    private val operationRawLines = config.entry<List<String>>("operation")
+    private val elementRawLines = config.entry<List<String>>("element")
 
     override val namespace: String = Namespaces.ATTRIBUTE
 

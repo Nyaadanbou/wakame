@@ -5,6 +5,7 @@ import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementSerializer
@@ -90,11 +91,12 @@ data class ItemElements(
         private val tooltip: ItemComponentConfig.MergedTooltip = config.MergedTooltip()
     }
 
-    override fun provideTooltipLore(): LoreLine {
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
         if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, tooltip.render(elements, Element::displayName))
+        val rendered = tooltip.render(systemName, elements, Element::displayName) ?: return LoreLine.noop()
+        return LoreLine.simple(tooltipKey, rendered)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(

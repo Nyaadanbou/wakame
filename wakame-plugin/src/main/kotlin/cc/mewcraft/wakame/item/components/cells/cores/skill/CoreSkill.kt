@@ -4,6 +4,7 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.NameLine
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.CoreBinaryKeys
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreType
@@ -75,7 +76,7 @@ data class CoreSkill(
         return NameLine.simple(component)
     }
 
-    override fun provideTooltipLore(): LoreLine {
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
         val skill = skill
         val tooltipKey = tooltipKeyProvider.get(this) ?: return LoreLine.noop()
         val tooltipText = skill.displays.tooltips

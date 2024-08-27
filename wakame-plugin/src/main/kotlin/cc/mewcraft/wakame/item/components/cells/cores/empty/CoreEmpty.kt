@@ -1,14 +1,17 @@
 package cc.mewcraft.wakame.item.components.cells.cores.empty
 
-import cc.mewcraft.commons.provider.immutable.map
+import cc.mewcraft.commons.provider.immutable.mapNonNull
+import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.display.CyclingLoreLineProvider
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.NameLine
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreType
@@ -46,8 +49,8 @@ object CoreEmpty : Core, CoreType<CoreEmpty> {
         return nameLine
     }
 
-    override fun provideTooltipLore(): LoreLine {
-        return loreLine.next()
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
+        return getLoreLine(systemName).next()
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
@@ -59,14 +62,14 @@ object CoreEmpty : Core, CoreType<CoreEmpty> {
     }
 
     private val nameLine: NameLine = NameLine.supply(
-        ItemComponentRegistry.CONFIG.derive(ItemConstants.CELLS).entry<Component>("tooltips", "empty_core", "name")
+        ItemComponentRegistry.CONFIG.derive(ItemConstants.CELLS).entry<Component>("tooltip", "empty_core", "name")
     )
 
-    private val loreLine: CyclingLoreLineProvider = CyclingLoreLineProvider(
+    private fun getLoreLine(systemName: RendererSystemName): CyclingLoreLineProvider = CyclingLoreLineProvider(
         CoreEmptyDisplaySupport.MAX_DISPLAY_COUNT
     ) { index ->
         val tooltipKey = CoreEmptyDisplaySupport.derive(GenericKeys.EMPTY, index)
-        val provider = ItemComponentRegistry.CONFIG.derive(ItemConstants.CELLS).entry<Component>("tooltips", "empty_core", "lore").map(::listOf)
+        val provider = ItemComponentRegistry.getDescriptorsByRendererSystemName(systemName).derive(ItemConstants.CELLS).optionalEntry<Component>("tooltips", "empty_core", "lore").mapNonNull(::listOf).orElse(emptyList())
         LoreLine.supply(tooltipKey, provider)
     }
 }

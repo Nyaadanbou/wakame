@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -47,11 +48,12 @@ data class ItemCrate(
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
     }
 
-    override fun provideTooltipLore(): LoreLine {
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
         if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, listOf(tooltip.render(Placeholder.component("key", Component.text(key.asString())))))
+        val rendered = tooltip.render(systemName, Placeholder.component("key", Component.text(key.asString()))) ?: return LoreLine.noop()
+        return LoreLine.simple(tooltipKey, listOf(rendered))
     }
 
     private data class Codec(

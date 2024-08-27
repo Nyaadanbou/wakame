@@ -4,6 +4,7 @@ import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.NameLine
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreType
 import cc.mewcraft.wakame.util.toSimpleString
@@ -27,7 +28,7 @@ object CoreNoop : Core, CoreType<CoreNoop> {
 
     override fun serializeAsTag(): Tag = error()
     override fun provideTooltipName(): NameLine = error()
-    override fun provideTooltipLore(): LoreLine = error()
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine = error()
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(ExaminableProperty.of("key", key))
     override fun toString(): String = toSimpleString()

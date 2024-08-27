@@ -11,6 +11,7 @@ import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
+import kotlin.io.path.Path
 
 val MAIN_CONFIG: ConfigProvider by lazy { YAML["config.yml"] }
 
@@ -46,14 +47,16 @@ sealed class BasicConfigs<T : AbstractConfigurationLoader<*>, B : AbstractConfig
      * Builds a [config provider][ConfigProvider] with the specified options.
      */
     fun build(relPath: String, builder: B.() -> Unit): ConfigProvider {
-        return configProviders.getOrPut(relPath) { createConfigProvider(relPath, builder) }
+        val path = Path(relPath)
+        return configProviders.getOrPut(path.toString()) { createConfigProvider(relPath, builder) }
     }
 
     /**
      * Gets a [config provider][ConfigProvider] with the default options.
      */
     operator fun get(relPath: String): ConfigProvider {
-        return build(relPath) {}
+        val path = Path(relPath)
+        return build(path.toString()) {}
     }
 
     /**

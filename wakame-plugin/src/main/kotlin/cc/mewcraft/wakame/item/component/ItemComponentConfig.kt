@@ -1,14 +1,18 @@
 package cc.mewcraft.wakame.item.component
 
-import cc.mewcraft.commons.provider.immutable.map
+import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.display.RendererConfigReloadEvent
 import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.toSimpleString
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.text.Component
@@ -85,49 +89,38 @@ private constructor(
     // 实例化相应的 inner class.
 
     /**
-     * Tooltips for discrete values.
-     *
-     * @property mappings the format of each discrete value.
-     */
-    inner class DiscreteTooltips : Examinable {
-        val single: String by root.entry<String>("tooltips", "single")
-        val mappings: Map<Int, Component> by root
-            .entry<Map<Int, String>>("mappings")
-            .map { map ->
-                map.withDefault { int ->
-                    "??? ($int)" // fallback for unknown discrete values
-                }.mapValues { (_, v) ->
-                    ItemComponentInjections.miniMessage.deserialize(v)
-                }
-            }
-
-        fun render(value: Int): Component {
-            return ItemComponentInjections.miniMessage.deserialize(single, component("value", mappings.getValue(value)))
-        }
-    }
-
-    /**
      * Tooltips for single text.
      *
      * @property single The format of the single text.
      */
     inner class SingleTooltip : Examinable {
-        val single: String by root.entry<String>("tooltips", "single")
+        private val singles = Object2ObjectArrayMap<RendererSystemName, Provider<String?>>()
 
-        fun render(): Component {
+        fun render(systemName: RendererSystemName): Component? {
+            val single = single(systemName) ?: return null
             return ItemComponentInjections.miniMessage.deserialize(single)
         }
 
-        fun render(resolver: TagResolver): Component {
+        fun render(systemName: RendererSystemName, resolver: TagResolver): Component? {
+            val single = single(systemName) ?: return null
             return ItemComponentInjections.miniMessage.deserialize(single, resolver)
         }
 
-        fun render(vararg resolver: TagResolver): Component {
+        fun render(systemName: RendererSystemName, vararg resolver: TagResolver): Component? {
+            val single = single(systemName) ?: return null
             return ItemComponentInjections.miniMessage.deserialize(single, *resolver)
         }
 
+        private fun single(systemName: RendererSystemName): String? {
+            return singles.computeIfAbsent(systemName) { name: RendererSystemName ->
+                val provider = ItemComponentRegistry.getDescriptorsByRendererSystemName(name).derive(configPath)
+                provider.optionalEntry<String>("tooltip", "single")
+                    .orElse(provider.optionalEntry<String>("tooltip"))
+            }.get()
+        }
+
         override fun examinableProperties(): Stream<out ExaminableProperty> {
-            return Stream.of(ExaminableProperty.of("single", single))
+            return Stream.of(ExaminableProperty.of("singles", singles))
         }
 
         override fun toString(): String {
@@ -137,23 +130,21 @@ private constructor(
 
     /**
      * Tooltips for merged text.
-     *
-     * @property merged The format of all elements joined together.
-     * @property single The format of a single element.
-     * @property separator The format of the separator.
      */
     inner class MergedTooltip : Examinable {
-        val merged: String by root.entry<String>("tooltips", "merged")
-        val single: String by root.entry<String>("tooltips", "single")
-        val separator: String by root.entry<String>("tooltips", "separator")
+        private val merges = Object2ObjectArrayMap<RendererSystemName, TooltipStrings>()
 
         /**
          * A convenience function to stylize a list of objects.
          */
         fun <T> render(
+            systemName: RendererSystemName,
             collection: Collection<T>,
             extractor: (T) -> Component,
-        ): List<Component> {
+        ): List<Component>? {
+            val (merged, single, separator) = tooltipStrings(systemName)
+            if (merged == null || single == null || separator == null)
+                return null
             return collection
                 .mapTo(ObjectArrayList(collection.size)) {
                     ItemComponentInjections.miniMessage.deserialize(single, component("single", extractor(it)))
@@ -167,11 +158,42 @@ private constructor(
                 .let(::listOf)
         }
 
+        private inner class TooltipStrings(
+            merged: Provider<String?>,
+            single: Provider<String?>,
+            separator: Provider<String?>,
+        ) {
+            operator fun component1(): String? {
+                return merged
+            }
+
+            operator fun component2(): String? {
+                return single
+            }
+
+            operator fun component3(): String? {
+                return separator
+            }
+
+            val merged: String? by merged
+            val single: String? by single
+            val separator: String? by separator
+        }
+
+        private fun tooltipStrings(systemName: RendererSystemName): TooltipStrings {
+            return merges.computeIfAbsent(systemName) { name: RendererSystemName ->
+                val provider = ItemComponentRegistry.getDescriptorsByRendererSystemName(name).derive(configPath)
+                TooltipStrings(
+                    provider.optionalEntry<String>("tooltip", "merged"),
+                    provider.optionalEntry<String>("tooltip", "single"),
+                    provider.optionalEntry<String>("tooltip", "separator")
+                )
+            }
+        }
+
         override fun examinableProperties(): Stream<out ExaminableProperty> {
             return Stream.of(
-                ExaminableProperty.of("merged", merged),
-                ExaminableProperty.of("single", single),
-                ExaminableProperty.of("separator", separator)
+                ExaminableProperty.of("merges", merges)
             )
         }
 
@@ -182,21 +204,46 @@ private constructor(
 
     /**
      * Tooltips for lore.
-     *
-     * @property line The format of a single line.
-     * @property header The header list.
-     * @property bottom The bottom list.
      */
     inner class LoreTooltip : Examinable {
-        val line: String by root.entry<String>("tooltips", "line")
-        val header: List<String> by root.entry<List<String>>("tooltips", "header")
-        val bottom: List<String> by root.entry<List<String>>("tooltips", "bottom")
+        private val lores = Object2ObjectArrayMap<RendererSystemName, TooltipStrings>()
+
+        inner class TooltipStrings(
+            line: Provider<String>,
+            header: Provider<List<String>>,
+            bottom: Provider<List<String>>,
+        ) {
+            operator fun component1(): String {
+                return line
+            }
+
+            operator fun component2(): List<String> {
+                return header
+            }
+
+            operator fun component3(): List<String> {
+                return bottom
+            }
+
+            val line: String by line
+            val header: List<String> by header
+            val bottom: List<String> by bottom
+        }
+
+        fun tooltipStrings(systemName: RendererSystemName): TooltipStrings {
+            return lores.computeIfAbsent(systemName) { name: RendererSystemName ->
+                val provider = ItemComponentRegistry.getDescriptorsByRendererSystemName(name).derive(configPath)
+                TooltipStrings(
+                    provider.optionalEntry<String>("tooltip", "line").orElse(""),
+                    provider.optionalEntry<List<String>>("tooltip", "header").orElse(emptyList()),
+                    provider.optionalEntry<List<String>>("tooltip", "bottom").orElse(emptyList())
+                )
+            }
+        }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> {
             return Stream.of(
-                ExaminableProperty.of("line", line),
-                ExaminableProperty.of("header", header),
-                ExaminableProperty.of("bottom", bottom)
+                ExaminableProperty.of("lores", lores)
             )
         }
 

@@ -5,6 +5,7 @@ import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
@@ -91,11 +92,12 @@ data class ItemKizamiz(
         private val tooltip: ItemComponentConfig.MergedTooltip = config.MergedTooltip()
     }
 
-    override fun provideTooltipLore(): LoreLine {
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
         if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, tooltip.render(kizamiz, Kizami::displayName))
+        val rendered = tooltip.render(systemName, kizamiz, Kizami::displayName) ?: return LoreLine.noop()
+        return LoreLine.simple(tooltipKey, rendered)
     }
 
     private data class Codec(

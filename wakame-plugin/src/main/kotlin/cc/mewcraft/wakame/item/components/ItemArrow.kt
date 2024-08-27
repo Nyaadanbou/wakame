@@ -1,5 +1,9 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
+import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -21,9 +25,9 @@ import org.spongepowered.configurate.kotlin.extensions.get
 // 因此添加了更多代码注释, 请留意.
 
 // 开发日记: 2024/9/1 芙兰
-// 经讨论, 箭矢作为一种弹药，可堆叠性很重要
-// 故箭矢没有任何差异化的nbt
-// 现在这是第一个只靠模板的组件
+// 经讨论, 箭矢作为一种弹药, 可堆叠性很重要,
+// 故箭矢应该没有任何差异化的 nbt.
+// 现在这是第一个只靠模板的组件.
 interface ItemArrow : Examinable {
     companion object : ItemComponentBridge<Unit> {
         override fun codec(id: String): ItemComponentType<Unit> {
@@ -79,11 +83,12 @@ interface ItemArrow : Examinable {
     // 调用者需要通过快照来详细的读取物品组件上储存的信息.
     // 需要注意, 该类型还需要实现 TooltipsProvider 接口,
     // 否则其他系统将无法得知如何将该物品组件显示在物品提示框里.
-    override fun provideTooltipLore(): LoreLine {
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
         if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, listOf(tooltip.render(Placeholder.component("pierce_level", Component.text(pierceLevel.toInt())))))
+        val rendered = tooltip.render(systemName, Placeholder.component("pierce_level", Component.text(pierceLevel.toInt()))) ?: return LoreLine.noop()
+        return LoreLine.simple(tooltipKey, listOf(rendered))
     }
 
     // 开发日记: 2024/6/25

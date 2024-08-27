@@ -1,22 +1,23 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.display2.RendererSystems
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.initializer.Initializable
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * 用于初始化渲染器模块.
  */
-internal object RendererBootstrap : Initializable, KoinComponent {
-    private val config: RendererConfig by inject()
-
+internal object RendererBootstrap : Initializable {
     private fun loadLayout0() {
-        config.loadLayout()
+        for ((_, system) in RendererSystems.entries()) {
+            system.config.loadLayout()
+        }
     }
 
     private suspend fun postEvents0() {
-        PluginEventBus.get().post(RendererConfigReloadEvent(config.rawTooltipKeys))
+        for ((_, system) in RendererSystems.entries()) {
+            PluginEventBus.get().post(RendererConfigReloadEvent(system.config.rawTooltipKeys))
+        }
     }
 
     override fun onPostWorld() = loadLayout0()

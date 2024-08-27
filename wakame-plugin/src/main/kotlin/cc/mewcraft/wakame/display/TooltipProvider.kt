@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.display
 
+import cc.mewcraft.wakame.display2.RendererSystemName
+
 /**
  * 代表一个可以生成物品提示框文本的东西.
  */
@@ -9,7 +11,7 @@ sealed interface TooltipProvider {
         /**
          * 提供单个 [LoreLine].
          */
-        fun provideTooltipLore(): LoreLine
+        fun provideTooltipLore(systemName: RendererSystemName): LoreLine
     }
 
     interface SingleWithName : Single {
@@ -23,7 +25,7 @@ sealed interface TooltipProvider {
         /**
          * 提供多个 [LoreLine].
          */
-        fun provideTooltipLore(): Collection<LoreLine>
+        fun provideTooltipLore(systemName: RendererSystemName): Collection<LoreLine>
     }
 
     interface ClusterWithName {

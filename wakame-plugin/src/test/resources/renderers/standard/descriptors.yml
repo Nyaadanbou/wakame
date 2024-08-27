@@ -1,0 +1,186 @@
+# 物品相关
+
+# 物品组件
+components:
+  arrow:
+    single: "<!i>穿透: <pierce_level>"
+
+  attribute_modifiers: { }
+
+  attributable:
+    single: "<!i>提供属性加成"
+
+  bow:
+    display_name: "弓"
+    tooltips: { }
+
+  can_break:
+    display_name: "CAN_BREAK"
+    tooltips: { }
+
+  can_place_on:
+    display_name: "CAN_PLACE_ON"
+    tooltips: { }
+
+  castable:
+    display_name: "可以施放技能"
+    tooltips: "<!i>可以施放技能"
+
+  cells:
+    display_name: "词条栏"
+    # 最多可显示多少个空词条栏
+    max_visible_empty_cores: 10
+    # 这里只负责调整特殊词条栏的设置 (如空词条栏)
+    # 其他词条栏的设置已委托到专门的配置文件
+    tooltips:
+      empty_core:
+        name: "<!i>空词条栏"
+        lore: "<!i><dark_gray>空词条栏"
+
+  crate:
+    display_name: "盲盒"
+    tooltips: "<!i>盲盒: <key>"
+
+  custom_model_data:
+    display_name: "自定义模型数据"
+    tooltips: "<!i>自定义模型数据: <custom_model_data>"
+
+  custom_name:
+    display_name: "自定义名字"
+    # 额外标签
+    # <rarity_name> 稀有度名字
+    # <rarity_style> 稀有度样式
+    tooltips: "<!i><rarity_style><value>"
+
+  damage:
+    display_name: "耐久损耗"
+    tooltips: "<!i>耐久损耗: <damage>"
+
+  damageable:
+    display_name: "耐久度"
+    # 额外标签
+    # <damage> 损耗值
+    # <max_damage> 最大损耗值
+    # <percent> 剩余耐久百分比
+    tooltips: "<!i>耐久度: <damage> / <max_damage>"
+
+  dyed_color:
+    display_name: "染色"
+    tooltips: { }
+
+  elements:
+    display_name: "元素"
+    # 额外标签
+    # <merged> 多个元素合并后的文本
+    # <single> 单个元素
+    tooltips:
+      merged: "<!i>元素: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  enchantments:
+    display_name: "附魔"
+    tooltips: { }
+
+  fire_resistant:
+    display_name: "免疫火焰伤害"
+    tooltips: "<!i>免疫火焰伤害"
+
+  food:
+    display_name: "作为食物"
+    tooltips: { }
+
+  glowable:
+    display_name: "可发光"
+    tooltips: "可发光"
+
+  hide_tooltip:
+    display_name: "隐藏提示框"
+
+  hide_additional_tooltip:
+    display_name: "隐藏额外提示框"
+
+  item_name:
+    display_name: "物品名字"
+    # 额外标签
+    # <rarity_name> 稀有度名字
+    # <rarity_style> 稀有度样式
+    tooltips: "<rarity_style><rarity_name> <value>"
+
+  kizamiz:
+    display_name: "铭刻"
+    # 额外标签
+    # <merged> 多个铭刻合并后的文本
+    # <single> 单个铭刻
+    tooltips:
+      merged: "<!i>铭刻: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  kizamiable:
+    display_name: "提供铭刻加成"
+    tooltips: "<!i>提供铭刻加成"
+
+  level:
+    display_name: "等级"
+    tooltips: "<!i>等级: <value>"
+
+  lore:
+    display_name: "描述"
+    # 额外标签：
+    # <line> 描述内容
+    tooltips:
+      line: "<!i><line>"
+      header: [ ] # 空列表代表完全没有，不代表空行
+      bottom: [ ]
+
+  max_damage:
+    display_name: "最大耐久损耗"
+    tooltips: "<!i>最大耐久损耗: <max_damage>"
+
+  portable_core:
+    display_name: "便携式核心"
+    tooltips: { } # 取决于核心
+
+  portable_curse:
+    display_name: "便携式诅咒"
+    tooltips: { } # 取决于诅咒
+
+  rarity:
+    display_name: "稀有度"
+    tooltips: "<!i>稀有度: <value>"
+
+  skillful:
+    display_name: "提供技能加成"
+    tooltips: "<!i>提供技能加成"
+
+  skin:
+    display_name: "皮肤"
+    tooltips: "<!i>皮肤: <skin_name>"
+
+  skin_owner:
+    display_name: "皮肤所有者"
+    tooltips: "<!i>皮肤所有者: <skin_owner_name>"
+
+  stored_enchantments:
+    display_name: "存储的附魔"
+    tooltips: { }
+
+  system_use:
+    display_name: "系统使用"
+    tooltips: "<!i>系统使用"
+
+  tool:
+    display_name: "工具"
+    tooltips: "<!i>工具"
+
+  tracks:
+    display_name: "信息跟踪"
+    tooltips: { } # 内容过多, 委托到其他配置文件进行设置
+
+  trim:
+    display_name: "纹饰"
+
+  unbreakable:
+    display_name: "无耐久损耗"
+    tooltips: "<!i>无耐久损耗"

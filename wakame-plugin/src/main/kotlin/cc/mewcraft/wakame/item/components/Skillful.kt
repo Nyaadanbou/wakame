@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -46,11 +47,12 @@ interface Skillful : Examinable, TooltipProvider.Single {
     }
 
     private data object Value : Skillful {
-        override fun provideTooltipLore(): LoreLine {
+        override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
             if (!config.showInTooltip) {
                 return LoreLine.noop()
             }
-            return LoreLine.simple(tooltipKey, listOf(tooltip.render()))
+            val rendered = tooltip.render(systemName) ?: return LoreLine.noop()
+            return LoreLine.simple(tooltipKey, listOf(rendered))
         }
     }
 

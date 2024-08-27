@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.display
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.display.DisplaySupport.RENDERER_CONFIG_LAYOUT_NODE_KEY
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.KoinComponent
@@ -37,7 +36,7 @@ internal class RendererConfigImpl(
         defaultLoreLines.clear()
 
         //<editor-fold desc="Implementations of filling up the data above">
-        val primaryRawLines by config.entry<List<String>>(RENDERER_CONFIG_LAYOUT_NODE_KEY, "primary")
+        val primaryRawLines by config.entry<List<String>>("primary")
         val rawLinePattern = RAW_LINE_PATTERN.toPattern()
 
         fun String.convertMiniMessageToComponents(): List<Component> {
@@ -46,7 +45,7 @@ internal class RendererConfigImpl(
 
         fun createDynamicLoreMeta(rawIndex: Int, rawLine: String, default: List<Component>?): DynamicLoreMeta {
             val creator = dynamicLoreMetaCreators.getApplicableCreator(rawLine) ?: throw IllegalArgumentException(
-                "Unrecognized raw line '$rawLine' while loading config '$RENDERER_GLOBAL_CONFIG_FILE'"
+                "Unrecognized raw line '$rawLine' while loading config '${config.relPath}'"
             )
             return creator.create(rawIndex, rawLine, default)
         }
@@ -85,7 +84,7 @@ internal class RendererConfigImpl(
 
                     // 解析为 "(default:{}){}"
                     DynamicLoreMeta.NAMESPACE_DEFAULT -> {
-                        val errorMessage = "Unknown syntax for '(default...)' while load config '$RENDERER_GLOBAL_CONFIG_FILE'. Correct syntax: `(default:'_text_'|blank|empty)_key_`"
+                        val errorMessage = "Unknown syntax for '(default...)' while load config '$RENDERERS_CONFIG_DIR'. Correct syntax: `(default:'_text_'|blank|empty)_key_`"
                         val defaultText = queue.popOr(errorMessage).let {
                             when {
                                 // 解析为 "(default:blank){}", "(default:empty){}", "(default:){}"
@@ -108,7 +107,7 @@ internal class RendererConfigImpl(
 
                     // 配置文件写错了
                     else -> {
-                        error("Unknown option '$params' while loading config '$RENDERER_GLOBAL_CONFIG_FILE'")
+                        error("Unknown option '$params' while loading config '$RENDERERS_CONFIG_DIR'")
                     }
                 }
             } else {

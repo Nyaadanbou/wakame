@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.NameLine
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.components.cells.reforge.ReforgeHistory
 import cc.mewcraft.wakame.util.CompoundTag
 import net.kyori.examination.Examinable
@@ -136,7 +137,7 @@ private data class CellImpl(
     // 暂时.. 词条栏的提示框文本就是核心的.
     // 未来可以再考虑丰富词条栏的提示框文本.
     override fun provideTooltipName(): NameLine = core.provideTooltipName()
-    override fun provideTooltipLore(): LoreLine = core.provideTooltipLore()
+    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine = core.provideTooltipLore(systemName)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("id", id),

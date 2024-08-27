@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.display.RawTooltipIndex
 import cc.mewcraft.wakame.display.RawTooltipKey
 import cc.mewcraft.wakame.display.RendererBootstrap
 import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.display2.RendererSystems
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -30,7 +31,9 @@ internal object ItemMetaBootstrap : Initializable, KoinComponent {
     private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
 
     override fun onPostWorld() {
-        dynamicLoreMetaCreators.register(ItemMetaLoreMetaCreator())
+        for ((systemName, _) in RendererSystems.entries()) {
+            dynamicLoreMetaCreators.register(systemName, ItemMetaLoreMetaCreator())
+        }
     }
 }
 

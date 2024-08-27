@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display2
 
-import cc.mewcraft.wakame.core.Pipeline
+import cc.mewcraft.wakame.core.LorePipeline
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.realize
@@ -43,7 +43,7 @@ class MenuItemHolder(
 class MenuItem(
     private val menuItem: MenuItemHolder
 ) {
-    private var tooltipPipeline: Pipeline<Nothing, NekoStack, ItemStack> = TODO()
+    private var tooltipPipeline: LorePipeline<Nothing, NekoStack, ItemStack> = TODO()
     private val cachedItemStack: ItemStack by lazy {
         val nyaItem = menuItem.template
         if (nyaItem == null) {
@@ -57,7 +57,7 @@ class MenuItem(
     /**
      * 修改菜单图标的渲染设置.
      */
-    fun configure(config: Pipeline<Nothing, NekoStack, ItemStack>) {
+    fun configure(config: LorePipeline<Nothing, NekoStack, ItemStack>) {
         tooltipPipeline = config
     }
 

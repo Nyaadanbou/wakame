@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -52,11 +53,12 @@ interface Attributable : Examinable, TooltipProvider.Single {
     // 这是因为我们 *有可能* 希望那些拥有 Attributable 组件的物品的提示框里
     // 能够显示一行 “提供属性加成” 的文本.
     private data object Value : Attributable {
-        override fun provideTooltipLore(): LoreLine {
+        override fun provideTooltipLore(systemName: RendererSystemName): LoreLine {
             if (!config.showInTooltip) {
                 return LoreLine.noop()
             }
-            return LoreLine.simple(tooltipKey, listOf(tooltip.render()))
+            val rendered = tooltip.render(systemName) ?: return LoreLine.noop()
+            return LoreLine.simple(tooltipKey, listOf(rendered))
         }
     }
 
