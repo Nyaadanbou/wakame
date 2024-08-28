@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package cc.mewcraft.wakame.random3
 
 import me.lucko.helper.random.RandomSelector
@@ -6,7 +8,6 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
-import java.util.stream.Stream
 import kotlin.random.asJavaRandom
 
 /**
@@ -55,76 +56,14 @@ abstract class Pool<S, C : SelectionContext> {
     abstract fun whenSelect(value: S, context: C)
 
     /**
-     * Randomly pick several [S] with given [context].
+     * 基于上下文 [context] 随机选择一个或多个 [S].
      *
-     * Returns an empty list if:
-     * - none of the [filters] are not met, or
-     * - none of the samples meet their own filters
+     * 将返回一个空列表, 如果:
+     * - [filters] 中存在一个条件不满足, 或
+     * - 所有 [samples] 都不满足自己的条件
      */
     open fun select(context: C): List<S> {
         return PoolSupport.select(this, context).onEach { whenSelect(it, context) }
-    }
-
-    /* Internal Implementations */
-
-}
-
-private object PoolSupport {
-    // 结合
-    fun <S, C : SelectionContext> select(pool: Pool<S, C>, context: C): List<S> {
-        return select1(pool, context)
-    }
-
-    // 第一步
-    private fun <S, C : SelectionContext> select0(pool: Pool<S, C>, context: C): Stream<Sample<S, C>> {
-        // 检查进入该池的条件是否全部满足;
-        // 如果没有全部满足, 直接返回空流.
-        if (!pool.filters.all { it.test(context) }) {
-            return Stream.empty()
-        }
-
-        // 筛选出满足条件的所有样本
-        val samples = pool.samples.filter { sample ->
-            sample.filters.all { filter ->
-                filter.test(context)
-            }
-        }
-
-        // 如果没有满足条件的样本, 返回空流
-        if (samples.isEmpty()) {
-            return Stream.empty()
-        }
-
-        // 设置是否重置抽样, 以及要选择的样本个数
-        val stream = if (pool.isReplacement) {
-            RandomSelector.weighted(samples, SampleWeigher)
-                .stream(context.random.asJavaRandom())
-                .limit(pool.amount)
-        } else {
-            // 注意: 虽然循环引用会导致添加重复的Node,
-            //  但是在最终去重的时候好像又只会保留一个?
-            //  这取决于 Sample 的 equals 的具体实现.
-            RandomSelector.weighted(samples, SampleWeigher)
-                .stream(context.random.asJavaRandom())
-                .limit(pool.amount)
-                .distinct()
-        }
-
-        return stream
-    }
-
-    // 第二步
-    private fun <S, C : SelectionContext> select1(pool: Pool<S, C>, context: C): List<S> {
-        return select0(pool, context)
-            .toList()
-            .onEach { it.marks?.run { context.marks += this } }
-            .map { it.data }
-    }
-}
-
-private object SampleWeigher : Weigher<Sample<*, *>> {
-    override fun weigh(element: Sample<*, *>): Double {
-        return element.weight
     }
 }
 
@@ -311,7 +250,9 @@ abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, 
     }
 }
 
+
 /* Implementations */
+
 
 private object PoolEmpty : Pool<Nothing, SelectionContext>() {
     override val amount: Long = 1
@@ -320,4 +261,68 @@ private object PoolEmpty : Pool<Nothing, SelectionContext>() {
     override val isReplacement: Boolean = false
     override fun whenSelect(value: Nothing, context: SelectionContext) = Unit
     override fun select(context: SelectionContext): List<Nothing> = emptyList()
+}
+
+private object PoolSupport {
+    fun <S, C : SelectionContext> select(pool: Pool<S, C>, context: C): List<S> {
+        // 检查进入该池的条件是否全部满足;
+        // 如果没有全部满足, 直接返回空流.
+        if (!pool.filters.all { it.test(context) }) {
+            return emptyList()
+        }
+
+        // 筛选出满足条件的所有样本
+        val correctSamples = pool.samples.filter { sample ->
+            sample.filters.all { filter ->
+                filter.test(context)
+            }
+        }
+
+        // 如果没有满足条件的样本, 返回空流
+        if (correctSamples.isEmpty()) {
+            return emptyList()
+        }
+
+        // 最终要返回的 Sample
+        val finalSamples: MutableList<Sample<S, C>> = arrayListOf()
+
+        // 设置是否重置抽样, 以及要选择的样本个数
+        if (pool.isReplacement) {
+            // 抽取并放回
+
+            val selector = RandomSelector.weighted(correctSamples, WEIGHER)
+            while (finalSamples.size < pool.amount) {
+                finalSamples += selector.pick(context.random.asJavaRandom())
+            }
+
+        } else {
+            // 抽取不放回
+
+            // 创建一个哈希集合, 用于存储已经抽取的样本
+            val picked = hashSetOf<Sample<S, C>>()
+
+            val selector = RandomSelector.weighted(correctSamples, WEIGHER)
+            while (picked.size < pool.amount) {
+                // FIXME 确保不会无限循环
+                val sample = selector.pick(context.random.asJavaRandom())
+                if (sample !in picked) {
+                    picked += sample
+                }
+            }
+
+            finalSamples += picked
+        }
+
+        // 将所有 Sample 的 marks 添加到 context
+        finalSamples.forEach {
+            it.marks?.run { context.marks += this }
+        }
+
+        // 提取 Sample 中包含的数据
+        val finalData = finalSamples.map { it.data }
+
+        return finalData
+    }
+
+    private val WEIGHER = Weigher<Sample<*, *>>(Sample<*, *>::weight)
 }
