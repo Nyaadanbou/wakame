@@ -250,6 +250,65 @@ class VanillaRecipeSerializationTest : KoinTest {
     }
 
     @Test
+    fun `smithing trim recipe serialization`() {
+        key = Key("test:smithing_trim")
+
+        val recipe = VanillaRecipeRegistry.raw[key]
+        assertNotNull(recipe)
+        assertIs<SmithingTrimRecipe>(recipe)
+
+        val base = recipe.base
+        assertIs<SingleRecipeChoice>(base)
+        assertEquals(ItemXMock("wakame:armor/bronze_helmet"), base.choice)
+
+        val addition = recipe.addition
+        assertIs<MultiRecipeChoice>(addition)
+        assertContentEquals(
+            listOf(
+                ItemXMock("minecraft:amethyst_shard"),
+                ItemXMock("minecraft:copper_ingot"),
+                ItemXMock("minecraft:diamond"),
+                ItemXMock("minecraft:emerald"),
+                ItemXMock("minecraft:gold_ingot"),
+                ItemXMock("minecraft:iron_ingot"),
+                ItemXMock("minecraft:lapis_lazuli"),
+                ItemXMock("minecraft:netherite_ingot"),
+                ItemXMock("minecraft:quartz"),
+                ItemXMock("minecraft:redstone")
+            ), addition.choices
+        )
+
+        val template = recipe.template
+        assertIs<MultiRecipeChoice>(template)
+        assertContentEquals(
+            listOf(
+                ItemXMock("minecraft:coast_armor_trim_smithing_template"),
+                ItemXMock("minecraft:dune_armor_trim_smithing_template"),
+                ItemXMock("minecraft:eye_armor_trim_smithing_template"),
+                ItemXMock("minecraft:host_armor_trim_smithing_template"),
+                ItemXMock("minecraft:raiser_armor_trim_smithing_template"),
+                ItemXMock("minecraft:rib_armor_trim_smithing_template"),
+                ItemXMock("minecraft:sentry_armor_trim_smithing_template"),
+                ItemXMock("minecraft:shaper_armor_trim_smithing_template"),
+                ItemXMock("minecraft:silence_armor_trim_smithing_template"),
+                ItemXMock("minecraft:snout_armor_trim_smithing_template"),
+                ItemXMock("minecraft:spire_armor_trim_smithing_template"),
+                ItemXMock("minecraft:tide_armor_trim_smithing_template"),
+                ItemXMock("minecraft:vex_armor_trim_smithing_template"),
+                ItemXMock("minecraft:ward_armor_trim_smithing_template"),
+                ItemXMock("minecraft:wayfinder_armor_trim_smithing_template"),
+                ItemXMock("minecraft:wild_armor_trim_smithing_template"),
+                ItemXMock("minecraft:bolt_armor_trim_smithing_template"),
+                ItemXMock("minecraft:flow_armor_trim_smithing_template")
+            ), template.choices
+        )
+
+
+        val result = recipe.result
+        assertIs<EmptyRecipeResult>(result)
+    }
+
+    @Test
     fun `smoking recipe serialization`() {
         key = Key("test:smoking")
 
