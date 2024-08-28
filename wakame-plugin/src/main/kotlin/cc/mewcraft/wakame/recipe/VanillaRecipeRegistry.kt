@@ -33,6 +33,7 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
     val SHAPED: MutableMap<Key, ShapedRecipe> = mutableMapOf()
     val SHAPELESS: MutableMap<Key, ShapelessRecipe> = mutableMapOf()
     val SMITHING_TRANSFORM: MutableMap<Key, SmithingTransformRecipe> = mutableMapOf()
+    val SMITHING_TRIM: MutableMap<Key, SmithingTrimRecipe> = mutableMapOf()
     val SMOKING: MutableMap<Key, SmokingRecipe> = mutableMapOf()
     val STONECUTTING: MutableMap<Key, StonecuttingRecipe> = mutableMapOf()
 
@@ -89,6 +90,7 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
         SHAPED.clear()
         SHAPELESS.clear()
         SMITHING_TRANSFORM.clear()
+        SMITHING_TRIM.clear()
         SMOKING.clear()
         STONECUTTING.clear()
         raw.forEach {
@@ -130,6 +132,10 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
 
             is SmithingTransformRecipe -> {
                 SMITHING_TRANSFORM[key] = vanillaRecipe
+            }
+
+            is SmithingTrimRecipe -> {
+                SMITHING_TRIM[key] = vanillaRecipe
             }
 
             is SmokingRecipe -> {

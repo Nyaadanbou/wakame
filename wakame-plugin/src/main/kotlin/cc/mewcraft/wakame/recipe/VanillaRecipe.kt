@@ -24,6 +24,7 @@ import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe as BukkitShapredRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
 import org.bukkit.inventory.SmithingTransformRecipe as BukkitSmithingTransformRecipe
+import org.bukkit.inventory.SmithingTrimRecipe as BukkitSmithingTrimRecipe
 import org.bukkit.inventory.SmokingRecipe as BukkitSmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 
@@ -197,7 +198,7 @@ class ShapelessRecipe(
 }
 
 /**
- * 锻造台配方.
+ * 锻造台转化配方.
  */
 class SmithingTransformRecipe(
     override val key: Key,
@@ -221,6 +222,38 @@ class SmithingTransformRecipe(
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("recipe_result", result),
+        ExaminableProperty.of("base", base),
+        ExaminableProperty.of("addition", addition),
+        ExaminableProperty.of("template", template)
+    )
+
+    override fun toString(): String = toSimpleString()
+}
+
+/**
+ * 锻造台纹饰配方.
+ */
+class SmithingTrimRecipe(
+    override val key: Key,
+    val base: RecipeChoice,
+    val addition: RecipeChoice,
+    val template: RecipeChoice,
+) : VanillaRecipe {
+    // 锻造台纹饰配方的结果是原版生成的
+    override val result: RecipeResult = EmptyRecipeResult
+    override fun registerBukkitRecipe(): Boolean {
+        val smithingTrimRecipe = BukkitSmithingTrimRecipe(
+            key.toNamespacedKey,
+            template.toBukkitRecipeChoice(),
+            base.toBukkitRecipeChoice(),
+            addition.toBukkitRecipeChoice(),
+            true
+        )
+        return Bukkit.addRecipe(smithingTrimRecipe)
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("key", key),
         ExaminableProperty.of("base", base),
         ExaminableProperty.of("addition", addition),
         ExaminableProperty.of("template", template)
@@ -409,7 +442,7 @@ enum class RecipeType(
         val addition = node.node("addition").get<RecipeChoice>(EmptyRecipeChoice)
         val template = node.node("template").get<RecipeChoice>(EmptyRecipeChoice)
 
-        //addition和template不能同时是EmptyRecipeChoice
+        // addition和template不能同时是EmptyRecipeChoice
         require(addition != EmptyRecipeChoice || template != EmptyRecipeChoice) {
             "Addition and template cannot be empty at the same time"
         }
@@ -420,6 +453,25 @@ enum class RecipeType(
         SmithingTransformRecipe(
             key = key,
             result = result,
+            base = base,
+            addition = addition,
+            template = template
+        )
+    }),
+    SMITHING_TRIM(RecipeTypeBridge(typeTokenOf()) { _, node ->
+        val base = node.node("base").krequire<RecipeChoice>()
+        val addition = node.node("addition").get<RecipeChoice>(EmptyRecipeChoice)
+        val template = node.node("template").get<RecipeChoice>(EmptyRecipeChoice)
+
+        // addition和template不能同时是EmptyRecipeChoice
+        require(addition != EmptyRecipeChoice || template != EmptyRecipeChoice) {
+            "Addition and template cannot be empty at the same time"
+        }
+
+        val key = node.getRecipeKey()
+
+        SmithingTrimRecipe(
+            key = key,
             base = base,
             addition = addition,
             template = template

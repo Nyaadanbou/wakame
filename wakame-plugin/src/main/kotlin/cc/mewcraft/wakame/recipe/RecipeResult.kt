@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -17,6 +18,18 @@ import java.util.stream.Stream
  */
 interface RecipeResult : Examinable {
     fun toBukkitItemStack(): ItemStack
+}
+
+/**
+ * 空输出.
+ * 正常配方必然存在输出.
+ * 此单例仅作特殊用途.
+ */
+object EmptyRecipeResult : RecipeResult {
+    override fun toBukkitItemStack(): ItemStack {
+        return ItemStack(Material.AIR)
+    }
+
 }
 
 /**
