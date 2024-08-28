@@ -31,55 +31,48 @@ public abstract class MixinIngredient implements Predicate<ItemStack> {
         } else if (this.isEmpty()) {
             return itemstack.isEmpty();
         } else {
-            ItemStack[] aitemstack = this.getItems();
-            int i = aitemstack.length;
+            for (ItemStack itemstack1 : this.getItems()) {
+                // 玩家输入的 `minecraft:custom_data`
+                CustomData customData1 = itemstack.get(DataComponents.CUSTOM_DATA);
+                // 配方中的 `minecraft:custom_data`
+                CustomData customData2 = itemstack1.get(DataComponents.CUSTOM_DATA);
 
-            for (int j = 0; j < i; ++j) {
-                ItemStack itemstack1 = aitemstack[j];
-
-                CustomData userCustomData = itemstack.get(DataComponents.CUSTOM_DATA);
-                CustomData recipeCustomData = itemstack1.get(DataComponents.CUSTOM_DATA);
-
-                if (userCustomData == null && recipeCustomData == null) {
+                if (customData1 == null && customData2 == null) {
                     if (itemstack1.is(itemstack.getItem())) {
                         return true;
-                    } else {
-                        continue;
                     }
-                }
 
-                if (userCustomData == null || recipeCustomData == null) {
                     continue;
                 }
 
-                CompoundTag userTag = userCustomData.getUnsafe();
-                CompoundTag recipeTag = recipeCustomData.getUnsafe();
-
-                boolean doesUserTagHasWakame = userTag.contains("wakame");
-                boolean doesRecipeTagHasWakame = recipeTag.contains("wakame");
-                if (doesUserTagHasWakame ^ doesRecipeTagHasWakame) {
+                if (customData1 == null || customData2 == null) {
                     continue;
                 }
 
-                if (doesUserTagHasWakame) {
-                    CompoundTag userNekoTag = userTag.getCompound("wakame");
-                    CompoundTag recipeNekoTag = recipeTag.getCompound("wakame");
+                // 玩家输入的 `minecraft:custom_data` 中的 CompoundTag
+                CompoundTag tag1 = customData1.getUnsafe();
+                // 配方中的 `minecraft:custom_data` 中的 CompoundTag
+                CompoundTag tag2 = customData2.getUnsafe();
 
-                    String userNamespace = userNekoTag.getString("namespace");
-                    String userPath = userNekoTag.getString("path");
-                    String recipeNamespace = recipeNekoTag.getString("namespace");
-                    String recipePath = recipeNekoTag.getString("path");
-                    if (userNamespace.equals(recipeNamespace) && userPath.equals(recipePath)) {
+                if (tag1.contains("wakame") != tag2.contains("wakame")) {
+                    continue;
+                }
+
+                if (tag1.contains("wakame")) {
+                    CompoundTag nyaTag1 = tag1.getCompound("wakame");
+                    CompoundTag nyaTag2 = tag2.getCompound("wakame");
+
+                    if (nyaTag1.getString("namespace").equals(nyaTag2.getString("namespace")) &&
+                        nyaTag1.getString("path").equals(nyaTag2.getString("path"))) {
                         return true;
-                    } else {
-                        continue;
                     }
+
+                    continue;
                 }
 
                 if (itemstack1.getItem() == itemstack.getItem() && ItemStack.isSameItemSameComponents(itemstack, itemstack1)) {
                     return true;
                 }
-
             }
 
             return false;
