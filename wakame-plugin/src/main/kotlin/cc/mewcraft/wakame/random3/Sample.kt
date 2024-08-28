@@ -31,4 +31,20 @@ class Sample<V, C : SelectionContext>(
      * Gets the [mark][Mark].
      */
     val marks: StringMark?,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Sample<*, *>) return false
+        if (data != other.data) return false
+
+        // if (weight != other.weight) return false
+        // if (filters != other.filters) return false
+        // if (marks != other.marks) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return data.hashCode()
+    }
+}
