@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.commons.collections.enumMap
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import com.google.common.collect.ImmutableSet
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
@@ -277,21 +278,28 @@ object AttributeInstanceFactory {
  */
 private class AttributeInstanceDelegation(
     val attribute: Attribute,
-) : Cloneable {
-    val modifiersById: Object2ObjectArrayMap<Key, AttributeModifier> = Object2ObjectArrayMap()
-    val modifiersByOp: EnumMap<Operation, Object2ObjectOpenHashMap<Key, AttributeModifier>> = EnumMap(Operation::class.java)
-    var dirty: Boolean = true
-
     @get:JvmName("baseValue")
     @set:JvmName("baseValue")
-    var baseValue: Double = attribute.defaultValue // initially set the baseValue to the attribute.defaultValue
-    var cachedValue: Double = 0.0
+    var baseValue: Double = attribute.defaultValue,
+    var modifiersById: Object2ObjectArrayMap<Key, AttributeModifier> = Object2ObjectArrayMap(),
+    var modifiersByOp: EnumMap<Operation, Object2ObjectOpenHashMap<Key, AttributeModifier>> = enumMap(),
+    var cachedValue: Double = 0.0,
+    var dirty: Boolean = true,
+
+    /**
+     * 用于实现 copy-on-write.
+     * 当为 false 时, 表示拥有所有权, 可以直接修改数据.
+     * 当为 true 时, 表示没有所有权, 必须先复制再修改.
+     */
+    var copyOnWrite: Boolean = false,
+) {
 
     fun getBaseValue(): Double {
         return baseValue
     }
 
     fun setBaseValue(baseValue: Double) {
+        ensureDataOwnership()
         if (baseValue != this.baseValue) {
             this.baseValue = baseValue
             this.dirty = true
@@ -324,6 +332,7 @@ private class AttributeInstanceDelegation(
     }
 
     fun addModifier(modifier: AttributeModifier) {
+        ensureDataOwnership()
         if (modifiersById.putIfAbsent(modifier.id, modifier) != null) {
             AttributeSupport.LOGGER.warn("$modifier is already applied on this attribute (same id)")
             return
@@ -336,17 +345,20 @@ private class AttributeInstanceDelegation(
     }
 
     fun removeModifier(modifier: AttributeModifier) {
+        ensureDataOwnership()
         modifiersById.remove(modifier.id)
         modifiersByOp[modifier.operation]?.remove(modifier.id)
         dirty = true
     }
 
     fun removeModifier(id: Key) {
+        ensureDataOwnership()
         getModifier(id)?.let { removeModifier(it) }
         dirty = true
     }
 
     fun removeModifiers() {
+        ensureDataOwnership()
         modifiersById.clear()
         modifiersByOp.clear()
         dirty = true
@@ -363,13 +375,31 @@ private class AttributeInstanceDelegation(
     }
 
     fun copy(): AttributeInstanceDelegation {
-        val ret = AttributeInstanceDelegation(this.attribute)
-        ret.baseValue = this.baseValue
-        ret.modifiersById.putAll(this.modifiersById)
-        this.modifiersByOp.forEach { (op, mod) -> ret.modifiersByOp[op] = Object2ObjectOpenHashMap(mod) }
-        ret.dirty = this.dirty
-        ret.cachedValue = this.cachedValue
-        return ret
+        copyOnWrite = true
+        return AttributeInstanceDelegation(
+            attribute = attribute,
+            baseValue = baseValue,
+            modifiersById = modifiersById,
+            modifiersByOp = modifiersByOp,
+            cachedValue = cachedValue,
+            dirty = dirty,
+            copyOnWrite = true
+        )
+    }
+
+    private fun ensureDataOwnership() {
+        if (copyOnWrite) {
+            // 深度拷贝 modifiersById
+            modifiersById = Object2ObjectArrayMap(modifiersById)
+
+            // 深度拷贝 modifiersByOp
+            val modifiersByOp0 = modifiersByOp
+            modifiersByOp = enumMap()
+            modifiersByOp0.forEach { (op, mod) -> modifiersByOp[op] = Object2ObjectOpenHashMap(mod) }
+
+            // 标记已经拥有所有权
+            copyOnWrite = false
+        }
     }
 
     private fun calculateValue(): Double {
