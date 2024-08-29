@@ -163,12 +163,12 @@ private object AttributeMapSupport : KoinComponent {
  * ## Implementation Notes
  *
  * The [default] is the fallback data to **read** if the requested data is not present
- * in the [data] map. This saves us a lot of memory for the object. However, if we need
- * to write data, for example adding a modifier, we write it into the [data] map.
+ * in the [patch] map. This saves us a lot of memory for the object. However, if we need
+ * to write data, for example adding a modifier, we write it into the [patch] map.
  */
 private class PlayerAttributeMap(
     /**
-     * The fallback values if an attribute is not present in the [data] map.
+     * The fallback values if an attribute is not present in the [patch] map.
      */
     val default: AttributeSupplier,
     /**
@@ -177,11 +177,11 @@ private class PlayerAttributeMap(
     val player: Player,
 ) : AttributeMap {
     /**
-     * The data values.
+     * The data values that are patched onto the [default], i.e., overrides.
      *
      * The values that are the same as the default should not store in this map.
      */
-    val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstance> = Reference2ObjectOpenHashMap()
+    val patch: Reference2ObjectOpenHashMap<Attribute, AttributeInstance> = Reference2ObjectOpenHashMap()
 
     init {
         // VanillaAttributeInstance must synchronize with the world state.
@@ -198,9 +198,7 @@ private class PlayerAttributeMap(
     override fun getSnapshot(): AttributeMapSnapshot {
         val data = Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>()
         for (attribute in getAttributes()) {
-            val instance = requireNotNull(getInstance(attribute)) {
-                "The returned AttributeInstance should not be null. This is a bug!"
-            }
+            val instance = requireNotNull(getInstance(attribute)) { "The returned AttributeInstance should not be null. This is a bug!" }
             val snapshot = instance.getSnapshot()
             data.put(attribute, snapshot)
         }
@@ -208,57 +206,52 @@ private class PlayerAttributeMap(
     }
 
     override fun register(attribute: Attribute) {
-        data[attribute] = AttributeInstanceFactory.createInstance(attribute, player, true)
+        patch[attribute] = AttributeInstanceFactory.createInstance(attribute, player, true)
     }
 
     override fun getInstance(attribute: Attribute): AttributeInstance? {
-        // the implementation has side effect to the player
-        return data.getNullableOrPut(attribute) { default.createInstance(attribute, player) }
+        val instance = patch.get(attribute)
+        if (instance != null) {
+            // 如果 data 已经包含该 Attribute 对应的 AttributeInstance, 直接返回
+            return instance
+        }
+
+        // 注意: 该函数调用会对玩家造成副作用
+        val defaultInstance = default.createInstance(attribute, player)
+
+        if (defaultInstance != null) {
+            // 存在默认属性, 所以将其写入 data
+            patch[attribute] = defaultInstance
+            return defaultInstance
+        }
+
+        return null
     }
 
     override fun getAttributes(): Set<Attribute> {
         val defaultAttributes = default.attributes
-        val customAttributes = data.keys
+        val customAttributes = patch.keys
         return defaultAttributes union customAttributes
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
-        return data[attribute] != null || default.hasAttribute(attribute)
+        return patch[attribute] != null || default.hasAttribute(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, id: Key): Boolean {
-        return data[attribute]?.getModifier(id) != null || default.hasModifier(attribute, id)
+        return patch[attribute]?.getModifier(id) != null || default.hasModifier(attribute, id)
     }
 
     override fun getValue(attribute: Attribute): Double {
-        return data[attribute]?.getValue() ?: default.getValue(attribute, player)
+        return patch[attribute]?.getValue() ?: default.getValue(attribute, player)
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        return data[attribute]?.getBaseValue() ?: default.getBaseValue(attribute, player)
+        return patch[attribute]?.getBaseValue() ?: default.getBaseValue(attribute, player)
     }
 
     override fun getModifierValue(attribute: Attribute, id: Key): Double {
-        return data[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, player)
-    }
-
-    /**
-     * A modified version of [MutableMap.getOrPut] with the difference in that
-     * the lambda [defaultValue] can return `null`. Furthermore, if the [defaultValue]
-     * returns `null`, the [receiver map][this] will remain unchanged and `null` will
-     * be returned for this function.
-     */
-    inline fun <K, V> MutableMap<K, V>.getNullableOrPut(key: K, defaultValue: () -> V?): V? {
-        val value = get(key)
-        return if (value == null) {
-            val answer = defaultValue()
-            if (answer != null) {
-                put(key, answer)
-            }
-            answer
-        } else {
-            value
-        }
+        return patch[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, player)
     }
 }
 
@@ -363,8 +356,8 @@ private object IntangibleAttributeMapPool : KoinComponent {
             for (attribute in default.attributes) {
                 val instance = default.createInstance(attribute) ?: continue
                 val snapshot = instance.getSnapshot()
-                val immutable = snapshot.toIntangible()
-                data[attribute] = immutable
+                val intangible = snapshot.toIntangible()
+                data[attribute] = intangible
             }
             IntangibleAttributeMapImpl(data)
         }
