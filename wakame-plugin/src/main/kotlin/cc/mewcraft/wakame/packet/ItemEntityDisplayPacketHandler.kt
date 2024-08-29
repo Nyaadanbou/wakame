@@ -18,7 +18,7 @@ import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class GlowingItemPacketHandler : PacketListenerAbstract() {
+class ItemEntityDisplayPacketHandler : PacketListenerAbstract() {
 
     private val entityId2entityUniqueId: MutableMap<Int, UUID> = ConcurrentHashMap()
 
@@ -39,7 +39,11 @@ class GlowingItemPacketHandler : PacketListenerAbstract() {
 
                 val metadataPacket = WrapperPlayServerEntityMetadata(
                     entity.entityId,
-                    listOf(EntityData(0, EntityDataTypes.BYTE, 0x40.toByte()))
+                    listOf(
+                        EntityData(0, EntityDataTypes.BYTE, 0x40.toByte()),
+                        EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(nekoStack.components.get(ItemComponentTypes.CUSTOM_NAME)?.rich)),
+                        EntityData(3, EntityDataTypes.BOOLEAN, true)
+                    )
                 )
                 val teamPacket = createTeamPacket(entity, rarityColor)
                 entityId2entityUniqueId[entity.entityId] = entity.uniqueId
