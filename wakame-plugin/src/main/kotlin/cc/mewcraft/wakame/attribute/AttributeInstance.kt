@@ -523,7 +523,7 @@ private class VanillaAttributeInstance(
     }
 
     override fun getModifier(id: Key): AttributeModifier? {
-        return handle.getModifier(AttributeLegacyMappings.byKey(id))?.toNeko()
+        return handle.getModifier(id)?.toNeko()
     }
 
     override fun getModifiers(): Set<AttributeModifier> {
@@ -531,7 +531,7 @@ private class VanillaAttributeInstance(
     }
 
     override fun hasModifier(modifier: AttributeModifier): Boolean {
-        return handle.getModifier(AttributeLegacyMappings.byKey(modifier.id)) != null
+        return handle.getModifier(modifier.id) != null
     }
 
     override fun addModifier(modifier: AttributeModifier) {
@@ -547,11 +547,11 @@ private class VanillaAttributeInstance(
     }
 
     override fun removeModifier(id: Key) {
-        handle.removeModifier(AttributeLegacyMappings.byKey(id))
+        handle.removeModifier(id)
     }
 
     override fun removeModifiers() {
-        handle.modifiers.forEach { removeModifier(AttributeLegacyMappings.byId(it.uniqueId)) }
+        handle.modifiers.forEach { removeModifier(it.key()) }
     }
 
     override fun replace(other: AttributeInstance) {
