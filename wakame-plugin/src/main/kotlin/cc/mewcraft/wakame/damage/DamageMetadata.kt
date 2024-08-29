@@ -7,13 +7,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.User
-import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.Arrow
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
-import org.bukkit.entity.SpectralArrow
-import org.bukkit.entity.Trident
+import org.bukkit.entity.*
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -297,7 +291,7 @@ class DefaultArrowDamageMetadata private constructor(
 
     private fun defaultArrowDamageBundle(): DamageBundle {
         return damageBundle {
-            every {
+            default {
                 min(1.0)
                 max(1.0)
                 rate(0.0)
@@ -346,7 +340,7 @@ class DefaultTridentDamageMetadata(
 
     private fun defaultTridentDamageBundle(): DamageBundle {
         return damageBundle {
-            every {
+            default {
                 min(8.0)
                 max(8.0)
                 rate(0.0)

@@ -9,10 +9,10 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 
 /**
- * 副手射箭会引发一系列问题，包括但不限于：
- * 伤害不对
- * 存在交互优先级问题
- * 经过几个小时的讨论，得出必须要枪毙副手射箭
+ * 副手射箭会引发一系列问题, 包括但不限于:
+ * 伤害不对.
+ * 存在交互优先级问题.
+ * 经过几个小时的讨论, 得出必须要枪毙副手射箭
  */
 class FuckOffHandListener : Listener {
     private val fuckOffHandSet = setOf(

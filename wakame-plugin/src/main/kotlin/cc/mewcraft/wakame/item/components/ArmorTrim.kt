@@ -73,7 +73,6 @@ data class ArmorTrim(
         val pattern: TrimPattern,
         val material: TrimMaterial,
         val showInTooltip: Boolean,
-        val mutable: Boolean,
     ) : ItemTemplate<ArmorTrim> {
         override val componentType: ItemComponentType<ArmorTrim> = ItemComponentTypes.TRIM
 
@@ -94,7 +93,6 @@ data class ArmorTrim(
          *   pattern: <key>
          *   material: <key>
          *   show_in_tooltip: <boolean>
-         *   mutable: <boolean>
          * ```
          */
         override fun decode(node: ConfigurationNode): Template {
@@ -106,9 +104,8 @@ data class ArmorTrim(
             material ?: throw IllegalArgumentException("Unknown trim material key: '$materialKey'")
 
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
-            val mutable = node.node("mutable").getBoolean(true)
 
-            return Template(pattern, material, showInTooltip, mutable)
+            return Template(pattern, material, showInTooltip)
         }
     }
 }
