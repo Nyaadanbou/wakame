@@ -362,7 +362,7 @@ private class AttributeInstanceDelegation(
         this.cachedValue = other.cachedValue
     }
 
-    public override fun clone(): AttributeInstanceDelegation {
+    fun copy(): AttributeInstanceDelegation {
         val ret = AttributeInstanceDelegation(this.attribute)
         ret.baseValue = this.baseValue
         ret.modifiersById.putAll(this.modifiersById)
@@ -399,7 +399,7 @@ private class ProtoAttributeInstance(
         get() = delegation.attribute
 
     override fun getSnapshot(): AttributeInstanceSnapshot =
-        AttributeInstanceSnapshotImpl(delegation.clone())
+        AttributeInstanceSnapshotImpl(delegation.copy())
 
     override fun getValue(): Double =
         delegation.getValue()
@@ -447,7 +447,7 @@ private class WakameAttributeInstance(
         get() = delegation.attribute
 
     override fun getSnapshot(): AttributeInstanceSnapshot =
-        AttributeInstanceSnapshotImpl(delegation.clone())
+        AttributeInstanceSnapshotImpl(delegation.copy())
 
     override fun getValue(): Double =
         delegation.getValue()
@@ -583,7 +583,7 @@ private class IntangibleAttributeInstanceImpl(
         delegation.hasModifier(modifier)
 
     override fun getSnapshot(): AttributeInstanceSnapshot =
-        AttributeInstanceSnapshotImpl(delegation.clone())
+        AttributeInstanceSnapshotImpl(delegation.copy())
 }
 
 private class AttributeInstanceSnapshotImpl(
@@ -623,5 +623,5 @@ private class AttributeInstanceSnapshotImpl(
         delegation.removeModifiers()
 
     override fun toIntangible(): IntangibleAttributeInstance =
-        IntangibleAttributeInstanceImpl(delegation.clone())
+        IntangibleAttributeInstanceImpl(delegation.copy())
 }
