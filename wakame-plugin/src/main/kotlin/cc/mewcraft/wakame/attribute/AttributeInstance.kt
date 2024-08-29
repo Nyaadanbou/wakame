@@ -357,7 +357,7 @@ private class AttributeInstanceDelegation(
         this.modifiersById.clear()
         this.modifiersById.putAll(other.modifiersById)
         this.modifiersByOp.clear()
-        this.modifiersByOp.putAll(other.modifiersByOp)
+        other.modifiersByOp.forEach { (op, mod) -> this.modifiersByOp[op] = Object2ObjectOpenHashMap(mod) }
         this.dirty = other.dirty
         this.cachedValue = other.cachedValue
     }
@@ -366,7 +366,7 @@ private class AttributeInstanceDelegation(
         val ret = AttributeInstanceDelegation(this.attribute)
         ret.baseValue = this.baseValue
         ret.modifiersById.putAll(this.modifiersById)
-        ret.modifiersByOp.putAll(this.modifiersByOp)
+        this.modifiersByOp.forEach { (op, mod) -> ret.modifiersByOp[op] = Object2ObjectOpenHashMap(mod) }
         ret.dirty = this.dirty
         ret.cachedValue = this.cachedValue
         return ret
