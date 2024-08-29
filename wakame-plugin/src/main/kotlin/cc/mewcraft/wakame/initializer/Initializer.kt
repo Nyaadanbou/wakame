@@ -20,21 +20,11 @@ import cc.mewcraft.wakame.item.MultipleItemListener
 import cc.mewcraft.wakame.item.SingleItemListener
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
+import cc.mewcraft.wakame.player.component.ComponentListener
 import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.player.inventory.ItemSlotWatcher
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer.REFORGE_DIR_NAME
-import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.CURSE_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.ELEMENT_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.ENTITY_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.KIZAMI_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
@@ -140,6 +130,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun registerListeners() = with(PLUGIN) {
+        registerTerminableListener(get<ComponentListener>()).bindWith(this)
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
