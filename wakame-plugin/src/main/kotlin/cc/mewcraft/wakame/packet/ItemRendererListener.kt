@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.packet
 import cc.mewcraft.wakame.display.PacketItemRenderer
 import cc.mewcraft.wakame.packet.PacketSupport.handleEntityData
 import cc.mewcraft.wakame.packet.PacketSupport.handleMerchantOffers
+import cc.mewcraft.wakame.packet.PacketSupport.handleSetEquipment
 import cc.mewcraft.wakame.packet.PacketSupport.handleSetSlot
 import cc.mewcraft.wakame.packet.PacketSupport.handleWindowItems
 import cc.mewcraft.wakame.util.bukkitPlayer
@@ -12,8 +13,10 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
+import com.github.retrooper.packetevents.protocol.player.Equipment
 import com.github.retrooper.packetevents.protocol.player.User
 import com.github.retrooper.packetevents.wrapper.PacketWrapper
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
@@ -30,6 +33,7 @@ internal class ItemRendererListener : PacketListenerAbstract() {
         val user = event.user
         val newPacket = when (event.packetType) {
             PacketType.Play.Server.SET_SLOT -> handleSetSlot(user, WrapperPlayServerSetSlot(event))
+            PacketType.Play.Server.ENTITY_EQUIPMENT -> handleSetEquipment(user, WrapperPlayServerEntityEquipment(event))
             PacketType.Play.Server.WINDOW_ITEMS -> handleWindowItems(user, WrapperPlayServerWindowItems(event))
             PacketType.Play.Server.MERCHANT_OFFERS -> handleMerchantOffers(user, WrapperPlayServerMerchantOffers(event))
             PacketType.Play.Server.ENTITY_METADATA -> handleEntityData(user, WrapperPlayServerEntityMetadata(event))
@@ -59,6 +63,29 @@ private object PacketSupport : KoinComponent {
         )
     }
 
+    fun handleSetEquipment(user: User, packet: WrapperPlayServerEntityEquipment): PacketWrapper<*> {
+        val equipments = ArrayList(packet.equipment)
+
+        for ((i, equipment) in equipments.withIndex()) {
+            val item = equipment.item.takeUnlessEmpty()?.tryNekoStack?.takeIf { it.shouldRender }
+            if (item == null) {
+                equipments[i] = equipment
+                continue
+            }
+            updateItem(item, user)
+
+            equipments[i] = Equipment(
+                equipment.slot,
+                item.handle0
+            )
+        }
+
+        return WrapperPlayServerEntityEquipment(
+            packet.entityId,
+            equipments
+        )
+    }
+
     fun handleWindowItems(user: User, packet: WrapperPlayServerWindowItems): PacketWrapper<*> {
         val itemStacks = packet.items
         val newItemStacks = itemStacks.map { item ->
@@ -66,12 +93,14 @@ private object PacketSupport : KoinComponent {
             updateItem(nekoStack, user)
             nekoStack.handle0
         }
+        val newCarriedItem = packet.carriedItem.getOrNull()?.tryNekoStack?.takeIf { it.shouldRender }
+        newCarriedItem?.let { updateItem(it, user) }
 
         return WrapperPlayServerWindowItems(
             packet.windowId,
             packet.stateId,
             newItemStacks,
-            packet.carriedItem.getOrNull()
+            newCarriedItem?.handle0
         )
     }
 
