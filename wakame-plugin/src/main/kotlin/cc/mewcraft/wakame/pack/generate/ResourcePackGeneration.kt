@@ -131,26 +131,59 @@ internal class ResourcePackCustomModelGeneration(
 
                     //<editor-fold desc="Custom Model generation">
                     // Original asset from config
-                    val modelKey = asset.modelKey(index + asset.variant)
+                    val order = index + asset.variant
+                    val modelKey = asset.modelKey(order)
                     val configModelTemplate = ModelSerializer.INSTANCE.deserialize(Readable.file(modelFile), modelKey)
 
-                    val textureData = configModelTemplate.textures().layers()
-                        .mapNotNull { it.key() }
+                    // Get all textures from the model
+                    val textureLayers = configModelTemplate.textures().layers()
+                    val particle = configModelTemplate.textures().particle()
+                    val variables = configModelTemplate.textures().variables()
+
+                    val textureData = textureLayers.mapNotNull { it.key() }
                         .map { validateAssetsPathStringOrThrow("textures/${it.value()}.png") }
                         .map { Writable.file(it) }
+
+                    val particleData = particle?.key()
+                        ?.let { validateAssetsPathStringOrThrow("textures/${it.value()}.png") }
+                        ?.let { Writable.file(it) }
 
                     // Texture file used by custom asset
                     val customTextures = textureData.map {
                         Texture.texture()
-                            .key(asset.modelKey(index + asset.variant, "png"))
+                            .key(asset.modelKey(order, "png"))
                             .data(it)
                             .build()
                     }
+
+                    val customParticle = particleData?.let {
+                        Texture.texture()
+                            .key(asset.modelKey(order, "png"))
+                            .data(it)
+                            .build()
+                    }
+
+                    val customVariables = HashMap<String, Texture>()
+                    for ((variableName, value) in variables) {
+                        val texture = value.key()
+                            ?.let { validateAssetsPathStringOrThrow("textures/${it.value()}.png") }
+                            ?.let { Writable.file(it) }
+
+                        if (texture != null) {
+                            customVariables[variableName] = Texture.texture()
+                                .key(asset.modelKey(order, "png"))
+                                .data(texture)
+                                .build()
+                        }
+                    }
+
                     // Replace the texture key with the custom texture key
                     val configModel = configModelTemplate.toBuilder()
                         .textures(
                             ModelTextures.builder()
                                 .layers(customTextures.map { ModelTexture.ofKey(it.key().removeExtension()) })
+                                .particle(customParticle?.let { ModelTexture.ofKey(it.key().removeExtension()) })
+                                .variables(customVariables.mapValues { ModelTexture.ofKey(it.value.key().removeExtension()) })
                                 .build()
                         )
                         .build()
@@ -184,6 +217,14 @@ internal class ResourcePackCustomModelGeneration(
                     for (texture in customTextures) {
                         resourcePack.texture(texture)
                         logger.info("Texture for ${asset.key}, variant ${asset.variant} generated.")
+                    }
+                    if (customParticle != null) {
+                        resourcePack.texture(customParticle)
+                        logger.info("Particle for ${asset.key}, variant ${asset.variant} generated.")
+                    }
+                    for ((variable, texture) in customVariables) {
+                        resourcePack.texture(texture)
+                        logger.info("Variable $variable for ${asset.key}, variant ${asset.variant} generated.")
                     }
                 }
 
@@ -222,17 +263,38 @@ internal class ResourcePackCustomModelGeneration(
         return Key(value().substringBeforeLast('.'))
     }
 
+    /**
+     * 将 Wakame 的 Key 转换为 Minecraft 的 Key
+     *
+     * 如 `(minecraft:)item/iron_sword_0` 转换为 `wakame:item/iron_sword_0`
+     */
     private fun CreativeModel.toMinecraftFormat(): CreativeModel {
-        val layers = textures().layers()
-        if (layers.isEmpty()) return this
-        val newTextures = layers.map {
+        val newLayers = textures().layers().map {
             val oldKey = requireNotNull(it.key()) { "Texture key is null" }
             val newKey = Key(RESOURCE_NAMESPACE, oldKey.value())
             ModelTexture.ofKey(newKey)
         }
 
+        val newParticle = textures().particle()?.let {
+            val oldKey = requireNotNull(it.key()) { "Texture key is null" }
+            val newKey = Key(RESOURCE_NAMESPACE, oldKey.value())
+            ModelTexture.ofKey(newKey)
+        }
+
+        val newVariables = textures().variables().mapValues { (_, value) ->
+            val oldKey = requireNotNull(value.key()) { "Texture key is null" }
+            val newKey = Key(RESOURCE_NAMESPACE, oldKey.value())
+            ModelTexture.ofKey(newKey)
+        }
+
         return toBuilder()
-            .textures(ModelTextures.builder().layers(newTextures).build())
+            .textures(
+                ModelTextures.builder()
+                    .layers(newLayers)
+                    .particle(newParticle)
+                    .variables(newVariables)
+                    .build()
+            )
             .build()
     }
 }
