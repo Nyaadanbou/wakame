@@ -40,12 +40,10 @@ internal val BukkitStack.handle: MojangStack?
     get() = if (this is CraftItemStack) {
         this.handle
     } else {
-        val shadow: ShadowItemStack = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
-        val delegate: CraftItemStack = shadow.craftDelegate
+        val shadow = BukkitShadowFactory.global().shadow<ShadowItemStack>(this)
+        val delegate = shadow.craftDelegate
         delegate.handle
-    }.takeIf {
-        !it.isEmpty
-    }
+    }?.takeUnless(MojangStack::isEmpty)
 
 /**
  * 设置物品的描述. 你可以传入 `null` 来移除它.
