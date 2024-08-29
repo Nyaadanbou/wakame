@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.command.command.ResourcepackCommands
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.lookup.AssetsLookup
@@ -19,7 +18,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
-import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.ResourcePackWriter
@@ -36,11 +34,11 @@ internal class ResourcePackManager(
     private val pluginDataDirectory: File by inject(named(PLUGIN_DATA_DIR))
     private val generationSettings: ResourcePackGenerationSettings = ResourcePackGenerationSettings()
 
-    /**
-     * 已经生成的资源包.
-     */
-    var builtResourcePack: BuiltResourcePack? = null
-        private set
+    // /**
+    //  * 已经生成的资源包.
+    //  */
+    // var builtResourcePack: BuiltResourcePack? = null
+    //     private set
 
     /**
      * 基于当前所有的配置文件, 生成一个资源包, 并储存到设定好的地方.
@@ -122,9 +120,9 @@ internal class ResourcePackManager(
             MinecraftResourcePackWriter.minecraft().build(resourcePack)
         }.getOrElse {
             return Result.failure(it)
-        }.also {
+        }/* .also {
             builtResourcePack = it
-        }
+        } */
 
         logger.info("Resource pack has been generated. Size: ${resourcePackFile.formatSize()}")
 
