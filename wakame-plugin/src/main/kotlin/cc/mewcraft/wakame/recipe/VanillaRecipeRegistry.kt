@@ -100,6 +100,9 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
                 logger.warn("Can't register vanilla recipe: '${it.key}'", e)
             }
         }
+
+        logger.info("Registered vanilla recipes: {}", ALL.keys.joinToString(transform = Key::asString))
+        logger.info("Registered ${ALL.size} vanilla recipes")
     }
 
     private fun register(key: Key, vanillaRecipe: VanillaRecipe) {
@@ -146,7 +149,6 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
                 STONECUTTING[key] = vanillaRecipe
             }
         }
-        logger.info("Registered vanilla recipe: '${vanillaRecipe.key}'")
     }
 
     override fun onPostWorld() {
