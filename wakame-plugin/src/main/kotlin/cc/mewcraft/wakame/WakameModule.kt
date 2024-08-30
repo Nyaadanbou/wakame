@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame
 
+import com.google.gson.Gson
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
 import me.lucko.helper.plugin.KExtendedJavaPlugin
 import me.lucko.helper.plugin.KHelperPlugin
@@ -38,6 +39,8 @@ fun wakameModule(plugin: WakamePlugin): Module = module {
     single<LifecycleEventManager<Plugin>> { plugin.lifecycleManager }
 
     single<ComponentLogger> { plugin.componentLogger } bind Logger::class
+
+    single<Gson> { Gson() }
 
     // 配置文件
     single<File>(named(PLUGIN_DATA_DIR)) { plugin.dataFolder }

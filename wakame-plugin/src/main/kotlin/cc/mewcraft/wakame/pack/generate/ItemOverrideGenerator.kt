@@ -52,11 +52,13 @@ internal class SimpleItemOverrideGenerator(
     // Generators
     //
     private val bowGenerator: BowItemOverrideGenerator by lazy { BowItemOverrideGenerator(this) }
+    private val shieldGenerator: ShieldItemOverrideGenerator by lazy { ShieldItemOverrideGenerator(this) }
     // ...
 
     private val generator: ItemOverrideGenerator?
         get() = when (data.material) {
             Material.BOW -> bowGenerator
+            Material.SHIELD -> shieldGenerator
             // ...
             else -> null // Default generator
         }
@@ -110,6 +112,31 @@ private class BowItemOverrideGenerator(
             )
 
             else -> throw IllegalArgumentException("Bow model index out of range: $index")
+        }
+    }
+}
+
+private class ShieldItemOverrideGenerator(
+    private val generator: ItemOverrideGenerator,
+) : ItemOverrideGenerator {
+    override val data: ItemModelData
+        get() = generator.data
+
+    override fun generate(): ItemOverride {
+        val (key, index, _, customModelData) = data
+        when (index) {
+            0 -> return ItemOverride.of(
+                key,
+                ItemPredicate.customModelData(customModelData)
+            )
+
+            1 -> return ItemOverride.of(
+                key,
+                ItemPredicate.customModelData(customModelData),
+                ItemPredicate.blocking()
+            )
+
+            else -> throw IllegalArgumentException("Shield model index out of range: $index")
         }
     }
 }

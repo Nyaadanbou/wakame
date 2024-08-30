@@ -2,6 +2,8 @@ package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.WakameInjections
+import com.google.gson.Gson
+import com.google.gson.JsonElement
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import java.io.File
@@ -20,6 +22,10 @@ internal fun validateAssetsPathStringOrThrow(path: String, extension: String = "
     if (extension.isNotEmpty() && file.extension != extension)
         throw IllegalArgumentException("Invalid file extension: $file")
     return file
+}
+
+internal fun File.readTextAndToJson(): JsonElement {
+    return WakameInjections.get<Gson>().fromJson(this.readText(), JsonElement::class.java)
 }
 
 internal fun File.formatSize(): String {

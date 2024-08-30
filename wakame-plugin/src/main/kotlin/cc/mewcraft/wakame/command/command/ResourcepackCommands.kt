@@ -37,7 +37,7 @@ object ResourcepackCommands : KoinComponent, CommandFactory<CommandSender> {
                     val sender = context.sender()
                     val manager = get<ResourcePackManager>()
 
-                    manager.generate(regenerate = true)
+                    manager.generate()
                         .onSuccess { sender.sendPlainMessage("Resourcepack has been generated successfully!") }
                         .onFailure { sender.sendPlainMessage("Failed to generate resourcepack, check the console for more information.") }
                 }

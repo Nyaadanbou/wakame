@@ -76,7 +76,7 @@ class ResourcePackManagerTest : KoinTest {
         )
 
         // Generate the resource pack
-        manager.generate(true).getOrThrow()
+        manager.generate().getOrThrow()
 
         // Verify the behavior of the mocks
         // Only one of the read methods should be called
