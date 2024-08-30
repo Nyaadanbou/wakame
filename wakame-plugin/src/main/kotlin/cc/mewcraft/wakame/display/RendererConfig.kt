@@ -94,7 +94,7 @@ internal class DynamicLoreMetaCreators : KoinComponent {
      */
     fun register(creator: DynamicLoreMetaCreator) {
         this.creators += creator.namespace to creator
-        logger.info("Registered DynamicLoreMetaCreator for '${creator.namespace}'")
+        logger.info("Registered DynamicLoreMetaCreator: {}", creator.namespace)
     }
 
     /**
