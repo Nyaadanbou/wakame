@@ -28,7 +28,7 @@ internal class ItemModelDataLookup(
      * C - 物品的变体.
      * V - CustomModelData 的值.
      */
-    private val customModelDataTable: Table<Key, Int, Int> = Tables.synchronizedTable(HashBasedTable.create())
+    private val customModelDataTable: Table<Key, Int, Int> = HashBasedTable.create()
 
     private fun loadLayout() {
         customModelDataTable.clear()
