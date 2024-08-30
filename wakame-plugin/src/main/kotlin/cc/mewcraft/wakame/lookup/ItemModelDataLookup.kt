@@ -35,7 +35,7 @@ internal class ItemModelDataLookup(
         for ((nodeKey, valueNode) in root.childrenMap()) {
             for ((nodeKey1, valueNode1) in valueNode.childrenMap()) {
                 val itemId = Key(nodeKey.toString())
-                val variant = nodeKey1 as? Int ?: throw IllegalArgumentException("Invalid variant: '$nodeKey1'")
+                val variant = nodeKey1.toString().toIntOrNull() ?: throw IllegalArgumentException("Invalid variant: '$nodeKey1'")
                 val customModelData = valueNode1.krequire<Int>()
                 customModelDataTable.put(itemId, variant, customModelData)
             }
