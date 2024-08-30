@@ -29,7 +29,6 @@ object EmptyRecipeResult : RecipeResult {
     override fun toBukkitItemStack(): ItemStack {
         return ItemStack(Material.AIR)
     }
-
 }
 
 /**

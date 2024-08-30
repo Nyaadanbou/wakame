@@ -98,11 +98,8 @@ data class ArmorTrim(
         override fun decode(node: ConfigurationNode): Template {
             val patternKey = node.node("pattern").krequire<Key>()
             val materialKey = node.node("material").krequire<Key>()
-            val pattern = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_PATTERN).get(patternKey)
-            pattern ?: throw IllegalArgumentException("Unknown trim pattern key: '$patternKey'")
-            val material = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_MATERIAL).get(materialKey)
-            material ?: throw IllegalArgumentException("Unknown trim material key: '$materialKey'")
-
+            val pattern = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_PATTERN).get(patternKey) ?: throw IllegalArgumentException("Unknown trim pattern key: '$patternKey'")
+            val material = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_MATERIAL).get(materialKey) ?: throw IllegalArgumentException("Unknown trim material key: '$materialKey'")
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
 
             return Template(pattern, material, showInTooltip)

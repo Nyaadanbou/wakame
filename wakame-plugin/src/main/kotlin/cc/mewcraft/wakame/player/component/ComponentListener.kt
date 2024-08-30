@@ -10,7 +10,7 @@ import org.bukkit.event.entity.EntityShootBowEvent
 
 class ComponentListener : Listener {
     /**
-     * 实现 Arrow 组件的穿透数量功能.
+     * 实现 [cc.mewcraft.wakame.item.components.ItemArrow] 组件的穿透功能.
      */
     @EventHandler
     fun on(event: EntityShootBowEvent) {
@@ -18,7 +18,7 @@ class ComponentListener : Listener {
         val projectile = event.projectile
         if (projectile !is AbstractArrow) return
         val nekoStack = event.consumable?.tryNekoStack ?: return
-        val arrow = nekoStack.components.get(ItemComponentTypes.ARROW) ?: return
-        projectile.pierceLevel = arrow.pierceLevel.coerceAtLeast(0).toInt()
+        val itemArrow = nekoStack.components.get(ItemComponentTypes.ARROW) ?: return
+        projectile.pierceLevel = itemArrow.pierceLevel.toInt()
     }
 }

@@ -465,7 +465,7 @@ enum class RecipeType(
 
         // addition和template不能同时是EmptyRecipeChoice
         require(addition != EmptyRecipeChoice || template != EmptyRecipeChoice) {
-            "Addition and template cannot be empty at the same time"
+            "`addition` and `template` cannot be empty at the same time"
         }
 
         val key = node.getRecipeKey()
