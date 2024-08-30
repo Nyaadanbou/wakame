@@ -40,7 +40,7 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
     private val logger: Logger by inject()
 
     @VisibleForTesting
-    fun loadConfig() {
+    fun loadRecipes() {
         raw.clear()
 
         val recipeDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_NAME)
@@ -67,7 +67,6 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
                 val vanillaRecipe = recipeNode.krequire<VanillaRecipe>()
                 // 添加进临时注册表
                 raw[key] = vanillaRecipe
-                logger.info("Loading vanilla recipe: '${vanillaRecipe.key}'")
 
             } catch (e: Throwable) {
                 val message = "Can't load vanilla recipe: '${file.relativeTo(recipeDir)}'"
@@ -153,13 +152,13 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
 
     override fun onPostWorld() {
         //TODO 待优化写法
-        loadConfig()
+        loadRecipes()
         runTask { registerRecipes() }
     }
 
     override fun onReload() {
         //TODO 待优化写法
-        loadConfig()
+        loadRecipes()
         runTask {
             registerRecipes()
             //向所有玩家的客户端发送配方刷新数据包
