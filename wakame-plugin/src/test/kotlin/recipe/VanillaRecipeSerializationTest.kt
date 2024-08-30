@@ -27,7 +27,7 @@ class VanillaRecipeSerializationTest : KoinTest {
             }
 
             ItemXBootstrap.init()
-            VanillaRecipeRegistry.loadConfig()
+            VanillaRecipeRegistry.loadRecipes()
         }
 
         @JvmStatic
