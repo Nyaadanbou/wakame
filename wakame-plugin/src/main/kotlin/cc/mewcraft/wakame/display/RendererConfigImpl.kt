@@ -29,8 +29,6 @@ internal class RendererConfigImpl(
     override val defaultLoreLines: ArrayList<LoreLine> = ArrayList()
 
     override fun loadLayout() {
-        logger.info("Loading renderer layout")
-
         // Clear all data first
         rawTooltipKeys.clear()
         loreMetaLookup.clear()
