@@ -61,7 +61,6 @@ object StationRecipeRegistry : Initializable, KoinComponent {
                 val stationRecipe = recipeNode.krequire<StationRecipe>()
                 // 添加进临时注册表
                 raw[key] = stationRecipe
-                logger.info("Loading station recipe: '${stationRecipe.key}'")
 
             } catch (e: Throwable) {
                 val message = "Can't load station recipe: '${file.relativeTo(recipeDir)}'"
@@ -81,11 +80,12 @@ object StationRecipeRegistry : Initializable, KoinComponent {
                 logger.warn("Can't register station recipe: '$key'")
             }
         }
+
         logger.info("Registered station recipes: {}", recipes.keys.joinToString())
+        logger.info("Registered ${recipes.size} station recipes")
 
         PluginEventBus.get().post(StationRecipeLoadEvent)
     }
-
 
     override suspend fun onPostWorldAsync() {
         loadConfig()
