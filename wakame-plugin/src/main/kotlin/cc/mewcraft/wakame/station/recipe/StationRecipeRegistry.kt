@@ -77,11 +77,12 @@ object StationRecipeRegistry : Initializable, KoinComponent {
         raw.forEach { (key, recipe) ->
             if (recipe.isValid()) {
                 recipes[key] = recipe
-                logger.info("Registered station recipe: '$key'")
             } else {
-                logger.warn("Can't registered station recipe: '$key'")
+                logger.warn("Can't register station recipe: '$key'")
             }
         }
+        logger.info("Registered station recipes: {}", recipes.keys.joinToString())
+
         PluginEventBus.get().post(StationRecipeLoadEvent)
     }
 
