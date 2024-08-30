@@ -76,7 +76,7 @@ object ItemSlotRegistry : Initializable, KoinComponent {
      */
     fun register(slot: ItemSlot) {
         if (all.add(slot)) {
-            logger.info("Registered item slot: '$slot'")
+            logger.info("Registered item slot: '${slot.id.asString()}'")
         }
 
         when (slot) {
