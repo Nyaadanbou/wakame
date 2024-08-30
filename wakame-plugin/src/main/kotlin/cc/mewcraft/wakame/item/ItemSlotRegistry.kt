@@ -48,23 +48,26 @@ object ItemSlotRegistry : Initializable, KoinComponent {
 
     /**
      * 获取一个 `Equipment Slot Group` 对应的 [ItemSlot].
+     * 如果不存在, 则返回一个空集合.
      */
     fun get(group: EquipmentSlotGroup): Set<ItemSlot> {
-        return requireNotNull(vanillaByGroup[group]) { "Unknown slot for EquipmentSlotGroup: '$group'" }
+        return vanillaByGroup[group] ?: emptySet()
     }
 
     /**
      * 获取一个 `Equipment Slot` 对应的 [ItemSlot].
+     * 如果不存在, 则返回 `null`.
      */
-    fun get(slot: EquipmentSlot): ItemSlot {
-        return requireNotNull(vanillaBySlot[slot]) { "Unknown slot for EquipmentSlot: '$slot'" }
+    fun get(slot: EquipmentSlot): ItemSlot? {
+        return vanillaBySlot[slot]
     }
 
     /**
      * 获取一个跟 `Slot Number` 对应的 [ItemSlot].
+     * 如果不存在, 则返回 `null`.
      */
-    fun get(slotIndex: Int): ItemSlot {
-        return requireNotNull(custom[slotIndex]) { "Unknown slot for SlotIndex: '$slotIndex'" }
+    fun get(slotIndex: Int): ItemSlot? {
+        return custom[slotIndex]
     }
 
     /**
