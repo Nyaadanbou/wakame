@@ -22,6 +22,8 @@ import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta
+import team.unnamed.creative.model.ItemOverride
+import team.unnamed.creative.model.ItemPredicate
 import team.unnamed.creative.model.ModelTexture
 import team.unnamed.creative.model.ModelTextures
 import team.unnamed.creative.serialize.minecraft.metadata.MetadataSerializer
@@ -215,5 +217,29 @@ internal class ResourcePackCustomModelGeneration(
                     .build()
             )
             .build()
+    }
+}
+
+internal class ResourcePackModelSortGeneration(
+    context: GenerationContext,
+) : ResourcePackGeneration(context) {
+    override fun generate() {
+        val pack = context.pack
+        for (model in pack.models()) {
+            if (model.key().namespace() != Key.MINECRAFT_NAMESPACE) {
+                continue
+            }
+            val newModelBuilder = model.toBuilder()
+            val overrides = model.overrides()
+            val sortedOverrides = overrides.sortedBy { it.customModelData() }
+            newModelBuilder.overrides(sortedOverrides)
+            pack.model(newModelBuilder.build())
+        }
+    }
+
+    private fun ItemOverride.customModelData(): Int? {
+        val predicates = predicate()
+        val customModelData = predicates.find { it.name() == "custom_model_data" }
+        return customModelData?.value() as? Int
     }
 }

@@ -4,10 +4,9 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.lookup.AssetsLookup
-import cc.mewcraft.wakame.pack.generate.GenerationContext
+import cc.mewcraft.wakame.pack.generate.*
 import cc.mewcraft.wakame.pack.generate.ResourcePackCustomModelGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackExternalGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackRegistryModelGeneration
@@ -78,7 +77,8 @@ internal class ResourcePackManager(
             ResourcePackIconGeneration(context),
             ResourcePackRegistryModelGeneration(context),
             ResourcePackCustomModelGeneration(context),
-            ResourcePackExternalGeneration(context)
+            ResourcePackExternalGeneration(context),
+            ResourcePackModelSortGeneration(context)
         )
 
         try {
