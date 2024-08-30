@@ -77,17 +77,10 @@ object SkillRegistry : Initializable, KoinComponent {
         INSTANCES.clear()
 
         val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(SKILL_PROTO_CONFIG_DIR)
-        val namespaceDirs = mutableListOf<File>()
-
-        // first walk each directory, i.e., each namespace
-        dataDirectory.walk().maxDepth(1)
+        val namespaceDirs = dataDirectory.walk().maxDepth(1)
             .drop(1) // exclude the `dataDirectory` itself
             .filter { it.isDirectory }
-            .forEach {
-                namespaceDirs += it.also {
-                    LOGGER.info("Loading skill namespace: {}", it.name)
-                }
-            }
+            .toList()
 
         val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(SKILL_PROTO_CONFIG_LOADER))
 
@@ -96,25 +89,23 @@ object SkillRegistry : Initializable, KoinComponent {
             namespaceDir.walk().maxDepth(1)
                 .drop(1) // exclude the `namespaceDir` itself
                 .filter { it.isFile }
-                .forEach { skillFile ->
+                .forEach { file ->
                     val namespace = namespaceDir.name
-                    val value = skillFile.nameWithoutExtension
-                    val skillKey = Key(Namespaces.SKILL, "${namespace}/$value")
+                    val value = file.nameWithoutExtension
 
-                    val text = skillFile.bufferedReader().use { it.readText() }
+                    val text = file.readText()
                     val node = loaderBuilder.buildAndLoadString(text)
 
+                    val skillId = Key(Namespaces.SKILL, "${namespace}/$value")
                     val type = node.node("type").krequire<String>()
                     val skill = try {
-                        val factory = requireNotNull(SkillFactories[type])
-                        factory.create(skillKey, node)
+                        requireNotNull(SkillFactories[type]).create(skillId, node)
                     } catch (t: Throwable) {
-                        LOGGER.warn("Failed to load skill: $skillKey, Path: ${skillFile.path}", t)
+                        LOGGER.warn("Failed to load skill: '$skillId', Path: '${file.path}'", t)
                         return@forEach
                     }
 
-                    INSTANCES.register(skillKey, skill)
-                    LOGGER.info("Loaded configured skill: {}", skillKey)
+                    INSTANCES.register(skillId, skill)
                 }
         }
     }
