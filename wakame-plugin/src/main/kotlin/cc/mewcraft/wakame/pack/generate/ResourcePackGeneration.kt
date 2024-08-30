@@ -107,9 +107,9 @@ internal class ResourcePackCustomModelGeneration(
                 val particle = configModelTemplate.textures().particle()
                 val variables = configModelTemplate.textures().variables()
 
-                textureLayers.forEach { layer -> setResource(layer.key(), modelKey, layer) }
-                particle?.let { setResource(it.key(), modelKey, particle) }
-                variables.forEach { (_, value) -> setResource(value.key(), modelKey, value) }
+                textureLayers.forEach { layer -> setResource(layer.key(), layer) }
+                particle?.let { setResource(it.key(), particle) }
+                variables.forEach { (_, value) -> setResource(value.key(), value) }
 
                 // Get the item type key for generating the CustomModelData vanilla model
                 val itemTypeKey = asset.itemTypeKey()
@@ -134,7 +134,7 @@ internal class ResourcePackCustomModelGeneration(
                     .addOverride(overrideGenerator.generate())
                     .build()
 
-                resourcePack.model(configModelTemplate.toMinecraftFormat(modelKey))
+                resourcePack.model(configModelTemplate.toMinecraftFormat())
                 resourcePack.model(vanillaCmdOverride)
                 logger.info("Model for ${asset.key}, variant ${asset.variant} generated. CustomModelData: $customModelData")
             }
@@ -161,14 +161,14 @@ internal class ResourcePackCustomModelGeneration(
         return Key("item/${itemType.name.lowercase()}")
     }
 
-    private fun setResource(originKey: Key?, modelKey: Key, model: ModelTexture?) {
+    private fun setResource(originKey: Key?, model: ModelTexture?) {
         model ?: return
         requireNotNull(originKey) { "Origin key must not be null" }
         val textureFile = validateAssetsPathStringOrThrow("textures/${originKey.value()}.png")
         val textureWritable = Writable.file(textureFile)
 
         val texture = Texture.texture()
-            .key(modelKey.value { "$it.png" })
+            .key(originKey.namespace { RESOURCE_NAMESPACE }.value { "$it.png" })
             .data(textureWritable)
 
         val metaFile = textureFile.resolveSibling("${textureFile.name}.mcmeta").takeIf { it.exists() }
@@ -177,7 +177,7 @@ internal class ResourcePackCustomModelGeneration(
             texture.meta(meta)
         }
 
-        logger.info("Texture for $modelKey generated.")
+        logger.info("Texture for $originKey generated.")
 
         context.pack.texture(texture.build())
     }
@@ -187,21 +187,24 @@ internal class ResourcePackCustomModelGeneration(
      *
      * 如 `(minecraft:)item/iron_sword_0` 转换为 `wakame:item/iron_sword_0`
      */
-    private fun CreativeModel.toMinecraftFormat(modelKey: Key): CreativeModel {
+    private fun CreativeModel.toMinecraftFormat(): CreativeModel {
         val newLayers = textures().layers().map {
-            val newKey = modelKey.namespace { RESOURCE_NAMESPACE }
+            val oldKey = it.key()
+            val newKey = oldKey!!.namespace { RESOURCE_NAMESPACE }
             ModelTexture.ofKey(newKey)
         }
 
         val newParticle = textures().particle()?.let {
-            val newKey = modelKey.namespace { RESOURCE_NAMESPACE }
+            val oldKey = it.key()
+            val newKey = oldKey!!.namespace { RESOURCE_NAMESPACE }
             ModelTexture.ofKey(newKey)
         }
 
-        val newVariables = textures().variables().mapValues { (_, value) ->
-            val newKey = modelKey.namespace { RESOURCE_NAMESPACE }
-            ModelTexture.ofKey(newKey)
-        }
+        val newVariables = textures().variables().map { (name, value) ->
+            val oldKey = value.key()
+            val newKey = oldKey!!.namespace { RESOURCE_NAMESPACE }
+            name to ModelTexture.ofKey(newKey)
+        }.toMap()
 
         return toBuilder()
             .textures(
