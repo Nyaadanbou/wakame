@@ -57,7 +57,7 @@ class StationSerializationTest : KoinTest {
     @Test
     fun `simple station serialization`() = runBlocking {
         StationRecipeRegistry.loadConfig() // 单元测试时跳过合成站配方的有效性验证
-        StationRegistry.loadConfig()
+        StationRegistry.loadStations()
 
         val key1 = Key("test:raw_bronze")
 

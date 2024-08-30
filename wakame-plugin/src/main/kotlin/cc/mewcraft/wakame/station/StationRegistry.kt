@@ -35,7 +35,7 @@ object StationRegistry : Initializable, KoinComponent {
     private val logger: Logger by inject()
 
     @VisibleForTesting
-    fun loadConfig() {
+    fun loadStations() {
         stations.clear()
 
         val stationDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(STATION_DIR_NAME)
@@ -69,6 +69,6 @@ object StationRegistry : Initializable, KoinComponent {
     }
 
     override suspend fun onPostWorldAsync() {
-        PluginEventBus.get().subscribe<StationRecipeLoadEvent> { loadConfig() }
+        PluginEventBus.get().subscribe<StationRecipeLoadEvent> { loadStations() }
     }
 }
