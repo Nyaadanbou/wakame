@@ -23,6 +23,14 @@ object ObservableDelegates {
         ObservableMap(source, prefix)
 }
 
+private const val LOG_OBSERVABLE_UPDATES_PROPERTY = "wakame.logObservableUpdates"
+
+private fun log(message: String) {
+    if (System.getProperty(LOG_OBSERVABLE_UPDATES_PROPERTY, "false").toBoolean()) {
+        log(message)
+    }
+}
+
 private object LoggerPrefix {
     /**
      * 使用属性的声明类名作为日志前缀.
@@ -48,7 +56,7 @@ private class ObservableReference<V>(
             // fallback to default value
             prefix = LoggerPrefix.declaringClass(property)
         }
-        println("$prefix Ref: `${property.name}`, Updated: $oldValue -> $newValue")
+        log("$prefix Ref: `${property.name}`, Updated: $oldValue -> $newValue")
     }
 }
 
@@ -123,19 +131,19 @@ private class ObservableCollection0<E>(
     private val prefix: String = prefix ?: "${LoggerPrefix.declaringClass(owner)} Collection: `${owner.name}`, Action:"
 
     override fun clear() =
-        source.clear().also { println("$prefix `clear`") }
+        source.clear().also { log("$prefix `clear`") }
 
     override fun add(element: E): Boolean =
-        source.add(element).also { println("$prefix `add`${failureMark(it)}, Params: $element") }
+        source.add(element).also { log("$prefix `add`${failureMark(it)}, Params: $element") }
 
     override fun addAll(elements: Collection<E>): Boolean =
-        source.addAll(elements).also { println("$prefix `addAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
+        source.addAll(elements).also { log("$prefix `addAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
 
     override fun remove(element: E): Boolean =
-        source.remove(element).also { println("$prefix `remove`${failureMark(it)}, Params: $element") }
+        source.remove(element).also { log("$prefix `remove`${failureMark(it)}, Params: $element") }
 
     override fun removeAll(elements: Collection<E>): Boolean =
-        source.removeAll(elements).also { println("$prefix `removeAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
+        source.removeAll(elements).also { log("$prefix `removeAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
 }
 
 private class ObservableList0<E>(
@@ -148,36 +156,36 @@ private class ObservableList0<E>(
     // Collection
 
     override fun clear() =
-        source.clear().also { println("$prefix `clear`") }
+        source.clear().also { log("$prefix `clear`") }
 
     override fun add(element: E): Boolean =
-        source.add(element).also { println("$prefix `add`${failureMark(it)}, Params: $element") }
+        source.add(element).also { log("$prefix `add`${failureMark(it)}, Params: $element") }
 
     override fun addAll(elements: Collection<E>): Boolean =
-        source.addAll(elements).also { println("$prefix `addAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
+        source.addAll(elements).also { log("$prefix `addAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
 
     override fun remove(element: E): Boolean =
-        source.remove(element).also { println("$prefix `remove`${failureMark(it)}, Params: $element") }
+        source.remove(element).also { log("$prefix `remove`${failureMark(it)}, Params: $element") }
 
     override fun removeAll(elements: Collection<E>): Boolean =
-        source.removeAll(elements).also { println("$prefix `removeAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
+        source.removeAll(elements).also { log("$prefix `removeAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
 
     // MutableList
 
     override fun add(index: Int, element: E) =
-        source.add(index, element).also { println("$prefix `clear`") }
+        source.add(index, element).also { log("$prefix `clear`") }
 
     override fun addAll(index: Int, elements: Collection<E>): Boolean =
-        source.addAll(index, elements).also { println("$prefix `addAll`${failureMark(it)}. Params: ($index, ${elements.joinToString()})") }
+        source.addAll(index, elements).also { log("$prefix `addAll`${failureMark(it)}. Params: ($index, ${elements.joinToString()})") }
 
     override fun removeAt(index: Int): E =
-        source.removeAt(index).also { println("$prefix `removeAt`. Params: $index") }
+        source.removeAt(index).also { log("$prefix `removeAt`. Params: $index") }
 
     override fun set(index: Int, element: E): E =
-        source.set(index, element).also { println("$prefix `set`. Params: ($index, $element)") }
+        source.set(index, element).also { log("$prefix `set`. Params: ($index, $element)") }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<E> =
-        source.subList(fromIndex, toIndex).also { println("$prefix `subList`. Params: [$fromIndex, $toIndex)") }
+        source.subList(fromIndex, toIndex).also { log("$prefix `subList`. Params: [$fromIndex, $toIndex)") }
 }
 
 private class ObservableSet0<E>(
@@ -190,19 +198,19 @@ private class ObservableSet0<E>(
     // MutableSet
 
     override fun clear() =
-        source.clear().also { println("$prefix `clear`") }
+        source.clear().also { log("$prefix `clear`") }
 
     override fun add(element: E): Boolean =
-        source.add(element).also { println("$prefix `add`${failureMark(it)}, Params: $element") }
+        source.add(element).also { log("$prefix `add`${failureMark(it)}, Params: $element") }
 
     override fun addAll(elements: Collection<E>): Boolean =
-        source.addAll(elements).also { println("$prefix `addAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
+        source.addAll(elements).also { log("$prefix `addAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
 
     override fun remove(element: E): Boolean =
-        source.remove(element).also { println("$prefix `remove`${failureMark(it)}, Params: $element") }
+        source.remove(element).also { log("$prefix `remove`${failureMark(it)}, Params: $element") }
 
     override fun removeAll(elements: Collection<E>): Boolean =
-        source.removeAll(elements).also { println("$prefix `removeAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
+        source.removeAll(elements).also { log("$prefix `removeAll`${failureMark(it)}, Params: ${elements.joinToString()}") }
 }
 
 private class ObservableMap0<K, V>(
@@ -213,17 +221,17 @@ private class ObservableMap0<K, V>(
     private val prefix: String = prefix ?: "${LoggerPrefix.declaringClass(owner)} Map: `${owner.name}`, Action:"
 
     override fun clear() =
-        source.clear().also { println("$prefix `clear`") }
+        source.clear().also { log("$prefix `clear`") }
 
     override fun put(key: K, value: V): V? =
-        source.put(key, value).also { println("$prefix `put`${failureMark(it == null)}, Params: ($key, $value)") }
+        source.put(key, value).also { log("$prefix `put`${failureMark(it == null)}, Params: ($key, $value)") }
 
     override fun putAll(from: Map<out K, V>) =
-        source.putAll(from).also { println("$prefix `putAll`, Params: ${from.entries.joinToString { (k, v) -> "($k, $v)" }}") }
+        source.putAll(from).also { log("$prefix `putAll`, Params: ${from.entries.joinToString { (k, v) -> "($k, $v)" }}") }
 
     override fun remove(key: K): V? =
-        source.remove(key).also { println("$prefix `remove`${failureMark(it == null)}, Params: ($key, $it)") }
+        source.remove(key).also { log("$prefix `remove`${failureMark(it == null)}, Params: ($key, $it)") }
 
     override fun remove(key: K, value: V): Boolean =
-        source.remove(key, value).also { println("$prefix `remove`${failureMark(it)}, Params: ($key, $value)") }
+        source.remove(key, value).also { log("$prefix `remove`${failureMark(it)}, Params: ($key, $value)") }
 }
