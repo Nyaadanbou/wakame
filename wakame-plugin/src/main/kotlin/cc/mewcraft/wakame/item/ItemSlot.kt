@@ -174,13 +174,22 @@ data class CustomItemSlot(
 ) : ItemSlot {
     companion object {
         const val NAMESPACE = "custom"
+
+        // 确保对于任意 slotIndex 全局只有一个对应的实例
+        private val alreadyInitialized = mutableSetOf<Int>()
+    }
+
+    init {
+        if (slotIndex in alreadyInitialized) {
+            throw IllegalArgumentException("CustomItemSlot with slotIndex $slotIndex has already been initialized.")
+        }
+        alreadyInitialized.add(slotIndex)
     }
 
     override val id: Key = Key.key("custom", slotIndex.toString())
 
     override fun getItem(player: Player): ItemStack? {
-        // Inventory.getItem(int) 对于不存在的物品会直接返回 `null`.
-        return player.inventory.getItem(slotIndex)/* ?.takeUnlessEmpty() */
+        return player.inventory.getItem(slotIndex) // 不存在的物品会直接返回 `null`
     }
 
     override fun toString(): String {
@@ -215,6 +224,11 @@ internal object ItemSlotSerializer : TypeSerializer<ItemSlot> {
 
             CustomItemSlot.NAMESPACE -> {
                 val slotIndex = keyValue.toIntOrNull() ?: throw SerializationException(node, type, "Invalid input for ItemSlot: '$rawString'")
+
+                val alreadyRegistered = ItemSlotRegistry.get(slotIndex)
+                if (alreadyRegistered != null) {
+                    return alreadyRegistered
+                }
 
                 // 确保 CustomItemSlot 不和 VanillaItemSlot 有重合,
                 // 因此需要排除所有的 EquipmentSlot 代表的物品栏位:
