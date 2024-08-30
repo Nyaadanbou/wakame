@@ -116,7 +116,7 @@ data class ItemArrow(
         override val componentType: ItemComponentType<ItemArrow> = ItemComponentTypes.ARROW
 
         override fun generate(context: GenerationContext): GenerationResult<ItemArrow> {
-            val pierceLevel = pierceLevel.calculate().toStableByte()
+            val pierceLevel = pierceLevel.calculate().toStableByte().coerceIn(0, Byte.MAX_VALUE)
             return GenerationResult.of(ItemArrow(pierceLevel))
         }
     }

@@ -7,11 +7,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 internal fun playerModule(): Module = module {
-    single<FuckOffHandListener> {
-        FuckOffHandListener()
-    }
-    single<ItemSlotWatcher> {
-        ItemSlotWatcher()
-    }
+    single<FuckOffHandListener> { FuckOffHandListener() }
+    single<ItemSlotWatcher> { ItemSlotWatcher() }
     single<ComponentListener> { ComponentListener() }
 }
