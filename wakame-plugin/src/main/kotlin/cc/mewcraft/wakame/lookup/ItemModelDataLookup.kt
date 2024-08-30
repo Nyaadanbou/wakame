@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
-import com.google.common.collect.Tables
 import net.kyori.adventure.key.Key
 import org.slf4j.Logger
 import org.spongepowered.configurate.BasicConfigurationNode
@@ -30,18 +29,19 @@ internal class ItemModelDataLookup(
      */
     private val customModelDataTable: Table<Key, Int, Int> = HashBasedTable.create()
 
-    private fun loadLayout() {
+    private fun loadCustomModelDataTable() {
         customModelDataTable.clear()
-        for (entry in root.childrenMap()) {
-            val key = entry.key.toString()
-            val valueNode = entry.value
-            for (variant in valueNode.childrenMap()) {
-                val variantKey = variant.key.toString().toInt()
-                val variantValue = variant.value.krequire<Int>()
-                customModelDataTable.put(Key(key), variantKey, variantValue)
+
+        for ((nodeKey, valueNode) in root.childrenMap()) {
+            for ((nodeKey1, valueNode1) in valueNode.childrenMap()) {
+                val itemId = Key(nodeKey.toString())
+                val variant = nodeKey1 as? Int ?: throw IllegalArgumentException("Invalid variant: '$nodeKey1'")
+                val customModelData = valueNode1.krequire<Int>()
+                customModelDataTable.put(itemId, variant, customModelData)
             }
         }
-        customModelDataTable.rowKeySet().forEach { logger.info("Loaded custom model data for $it") }
+
+        logger.info("Loaded custom model data for items: {}", customModelDataTable.rowKeySet().map(Key::asString).joinToString())
     }
 
     operator fun get(key: Key, variant: Int): Int? {
@@ -84,10 +84,10 @@ internal class ItemModelDataLookup(
     }
 
     override fun onPreWorld() {
-        loadLayout()
+        loadCustomModelDataTable()
     }
 
     override fun onReload() {
-        loadLayout()
+        loadCustomModelDataTable()
     }
 }
