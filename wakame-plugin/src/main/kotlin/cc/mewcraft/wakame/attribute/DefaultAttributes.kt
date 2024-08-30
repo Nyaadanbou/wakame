@@ -85,7 +85,8 @@ object DefaultAttributes : KoinComponent, Initializable {
         val map = AttributeSupplierDeserializer(node).deserialize()
         map.forEach { (k, v) ->
             addSupplier(k, v)
-            LOGGER.info("Registered attribute supplier: {}", k)
         }
+
+        LOGGER.info("Registered attribute suppliers: {}", map.keys.joinToString(transform = Key::asString))
     }
 }
