@@ -5,6 +5,7 @@ import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
+import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -232,6 +233,7 @@ internal class KizamiSampleNodeFacade(
     override val dataDir: Path,
 ) : SampleNodeFacade<Kizami, GenerationContext>(), Initializable {
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
+        kregister(ElementSerializer)
         kregister(KizamiSerializer)
         kregister(FilterSerializer)
     }.build()
