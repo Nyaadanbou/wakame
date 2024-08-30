@@ -21,6 +21,7 @@ import java.io.File
 object StationRegistry : Initializable, KoinComponent {
     private const val STATION_DIR_NAME = "station/stations"
     private val stations: MutableMap<String, Station> = mutableMapOf()
+    private val logger: Logger by inject()
 
     /**
      * 获取所有合成站的唯一标识.
@@ -32,40 +33,39 @@ object StationRegistry : Initializable, KoinComponent {
         return stations[id]
     }
 
-    private val logger: Logger by inject()
-
     @VisibleForTesting
     fun loadStations() {
         stations.clear()
 
         val stationDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(STATION_DIR_NAME)
-        stationDir.walk().drop(1).filter { it.extension == "yml" }.forEach { file ->
-            try {
-                val fileText = file.readText()
-                val id = file.nameWithoutExtension
+        stationDir.walk()
+            .drop(1)
+            .filter { it.extension == "yml" }
+            .forEach { file ->
+                try {
+                    val fileText = file.readText()
+                    val stationId = file.nameWithoutExtension
+                    val stationNode = yamlConfig {
+                        withDefaults()
+                        serializers {
+                            kregister(StationSerializer)
+                            kregister(MenuLayoutSerializer)
+                        }
+                    }.buildAndLoadString(fileText)
+                    stationNode.hint(StationSerializer.HINT_NODE, stationId)
+                    val station = stationNode.krequire<Station>()
+                    stations[stationId] = station
 
-                val stationNode = yamlConfig {
-                    withDefaults()
-                    serializers {
-                        kregister(StationSerializer)
-                        kregister(MenuLayoutSerializer)
+                } catch (e: Throwable) {
+                    val message = "Can't register station: '${file.relativeTo(stationDir)}'"
+                    if (RunningEnvironment.TEST.isRunning()) {
+                        throw IllegalArgumentException(message, e)
                     }
-                }.buildAndLoadString(fileText)
-
-                stationNode.hint(StationSerializer.HINT_NODE, id)
-                val station = stationNode.krequire<Station>()
-                stations[id] = station
-                logger.info("Registered station: '${station.id}'")
-
-            } catch (e: Throwable) {
-                val message = "Can't register station: '${file.relativeTo(stationDir)}'"
-                if (RunningEnvironment.TEST.isRunning()) {
-                    throw IllegalArgumentException(message, e)
+                    logger.warn(message, e)
                 }
-                logger.warn(message, e)
             }
 
-        }
+        logger.info("Registered stations: {}", stations.keys.joinToString())
     }
 
     override suspend fun onPostWorldAsync() {
