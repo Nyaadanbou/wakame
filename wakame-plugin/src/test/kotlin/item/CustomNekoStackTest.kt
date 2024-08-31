@@ -557,7 +557,7 @@ class CustomNekoStackTest : KoinTest {
                 ElementRegistry.INSTANCES["fire"],
                 ElementRegistry.INSTANCES["wind"],
             )
-            // assertEquals(2, elements.size) // FIXME 有时候2个,有时候1个
+            assertEquals(2, elements.size)
             assertTrue(elements.all { it in possibleElements })
         }
     }
@@ -742,7 +742,7 @@ class CustomNekoStackTest : KoinTest {
 
         unboxed {
             val kizamiz = it.kizamiz
-            // assertEquals(2, kizamiz.size) // FIXME 有时候2个,有时候1个
+            assertEquals(2, kizamiz.size)
             val possibleKizamiz = setOf(
                 KizamiRegistry.INSTANCES["wind_lace"],
                 KizamiRegistry.INSTANCES["antigravity"],
