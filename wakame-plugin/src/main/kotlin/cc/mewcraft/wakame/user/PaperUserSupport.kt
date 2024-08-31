@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
-import cc.mewcraft.wakame.kizami.PlayerKizamiMap
 import cc.mewcraft.wakame.level.PlayerLevelProvider
 import cc.mewcraft.wakame.resource.PlayerResourceMap
 import cc.mewcraft.wakame.resource.ResourceMap
@@ -39,7 +38,7 @@ class PaperUser(
         get() = player.uniqueId
     override val level: Int
         get() = levelProvider.getOrDefault(uniqueId, 1)
-    override val kizamiMap: KizamiMap = PlayerKizamiMap(this)
+    override val kizamiMap: KizamiMap = KizamiMap(this)
     override val attributeMap: AttributeMap = AttributeMap(this)
     override val skillMap: SkillMap = PlayerSkillMap(this)
     override val resourceMap: ResourceMap = PlayerResourceMap(this)
