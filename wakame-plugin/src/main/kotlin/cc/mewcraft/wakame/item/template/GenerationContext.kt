@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.templates.filter.AttributeContextHolder
-import cc.mewcraft.wakame.item.templates.filter.CurseContextHolder
 import cc.mewcraft.wakame.item.templates.filter.SkillContextHolder
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.random3.SelectionContext
@@ -63,11 +62,6 @@ class GenerationContext(
     val kizamiz: MutableCollection<Kizami> by ObservableDelegates.set(HashSet())
 
     /**
-     * 已经生成的 [cc.mewcraft.wakame.item.components.cells.Curse].
-     */
-    val curses: MutableCollection<CurseContextHolder> by ObservableDelegates.set(HashSet())
-
-    /**
      * 已经生成的 [cc.mewcraft.wakame.skill.Skill].
      */
     val skills: MutableCollection<SkillContextHolder> by ObservableDelegates.set(HashSet())
@@ -92,7 +86,6 @@ class GenerationContext(
         ExaminableProperty.of("rarity", rarity),
         ExaminableProperty.of("elements", elements),
         ExaminableProperty.of("kizamiz", kizamiz),
-        ExaminableProperty.of("curses", curses),
         ExaminableProperty.of("skills", skills),
         ExaminableProperty.of("attributes", attributes),
     )

@@ -6,7 +6,6 @@ cells:
   buckets:
     foo:
       core: "with_references"
-      curse: "with_references"
   selectors:
     core_pools: { }
     core_groups:
@@ -14,13 +13,5 @@ cells:
         refs_1:
           - type: global:foo/example_a # 命名空间为 global, 代表引用全局样本
         refs_2:
-          - type: generic:empty
-            weight: 1
-    curse_pools: { }
-    curse_groups:
-      with_references:
-        refs_1:
-          - type: global:everything
-            weight: 1
           - type: generic:empty
             weight: 1

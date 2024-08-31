@@ -9,7 +9,6 @@ cells:
       # 这个词条栏没有诅咒
     bonus:
       core: "base_bonus"
-      curse: "curse_by_kills"
   selectors:
     core_groups:
       base_attack:
@@ -49,29 +48,3 @@ cells:
             - type: attribute:critical_strike_chance
               value: 0.75
               weight: 1
-    curse_groups:
-      curse_by_kills:
-        selects:
-          pool_1:
-            # 物品预设等级是 10,
-            # 但这里的筛选条件设置成了 ≥20,
-            # 因此这个 pool_1 里面的样本永远不可能出现.
-            filters:
-              - type: item:item_level
-                level: "[20,)"
-            entries:
-              - type: curse:entity_kills
-                index: demo_creeps_1
-                count: 5
-                weight: 1
-          pool_2:
-            # pool_1 池肯定不满足, 因此最终选择的诅咒肯定来自 pool_2.
-            filters:
-              - type: item:item_level
-                level: "[10,)"
-            entries:
-              # 这应该是最后生成的诅咒.
-              - type: curse:entity_kills
-                index: demo_creeps_1
-                count: 3
-                weight: 1

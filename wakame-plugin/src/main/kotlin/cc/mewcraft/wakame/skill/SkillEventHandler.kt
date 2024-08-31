@@ -162,7 +162,7 @@ class SkillEventHandler(
             return
         }
         val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
-        val configuredSkills = itemCells.collectConfiguredSkills(this, ignoreCurse = true, ignoreVariant = true) // TODO: no more ignorance if skill module is complete
+        val configuredSkills = itemCells.collectConfiguredSkills(this, ignoreVariant = true) // TODO: no more ignorance if skill module is complete
         val skillMap = player.toUser().skillMap
         skillMap.addSkillsByInstance(configuredSkills)
     }
@@ -179,7 +179,7 @@ class SkillEventHandler(
             return
         }
         val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
-        val configuredSkills = itemCells.collectConfiguredSkills(this, ignoreCurse = true, ignoreVariant = true) // TODO: no more ignorance if skill module is complete
+        val configuredSkills = itemCells.collectConfiguredSkills(this, ignoreVariant = true) // TODO: no more ignorance if skill module is complete
         val skillMap = player.toUser().skillMap
         skillMap.removeSkill(configuredSkills)
     }

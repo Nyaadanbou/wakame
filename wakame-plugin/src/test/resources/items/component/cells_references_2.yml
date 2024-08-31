@@ -17,5 +17,3 @@ cells:
       b:
         zxc:
           - type: global:bar/example_b
-    curse_pools: { }
-    curse_groups: { }

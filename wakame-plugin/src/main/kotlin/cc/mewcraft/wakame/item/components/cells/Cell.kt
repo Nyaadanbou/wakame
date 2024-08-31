@@ -45,23 +45,6 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.SingleWithName 
     fun setCore(core: Core): Cell
 
     /**
-     * 返回词条栏的诅咒.
-     */
-    fun getCurse(): Curse
-
-    /**
-     * 尝试返回指定类型的词条栏诅咒. 如果类型不符合则返回 `null`.
-     */
-    fun <T : Curse> getCurseAs(type: CurseType<T>): T?
-
-    /**
-     * 设置词条栏的诅咒.
-     *
-     * @return 修改过的词条栏对象
-     */
-    fun setCurse(curse: Curse): Cell
-
-    /**
      * 返回词条栏的重铸数据.
      */
     fun getReforgeHistory(): ReforgeHistory
@@ -89,10 +72,9 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.SingleWithName 
         fun of(
             id: String,
             core: Core = Core.empty(),
-            curse: Curse = Curse.empty(),
             reforgeHistory: ReforgeHistory = ReforgeHistory.empty(),
         ): Cell {
-            return CellImpl(id = id, core = core, curse = curse, reforgeHistory = reforgeHistory)
+            return CellImpl(id = id, core = core, reforgeHistory = reforgeHistory)
         }
     }
 }
@@ -103,7 +85,6 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.SingleWithName 
 private data class CellImpl(
     private val id: String,
     private val core: Core,
-    private val curse: Curse,
     private val reforgeHistory: ReforgeHistory,
 ) : Cell {
 
@@ -113,7 +94,6 @@ private data class CellImpl(
     ) : this(
         id = id,
         core = Core.of(nbt.getCompound(TAG_CORE)),
-        curse = Curse.of(nbt.getCompound(TAG_CURSE)),
         reforgeHistory = ReforgeHistory.of(nbt.getCompound(TAG_REFORGE))
     )
 
@@ -140,21 +120,6 @@ private data class CellImpl(
         return copy(core = core)
     }
 
-    override fun getCurse(): Curse {
-        return curse
-    }
-
-    override fun <T : Curse> getCurseAs(type: CurseType<T>): T? {
-        if (curse.type === type) {
-            return curse as T?
-        }
-        return null
-    }
-
-    override fun setCurse(curse: Curse): Cell {
-        return copy(curse = curse)
-    }
-
     override fun getReforgeHistory(): ReforgeHistory {
         return reforgeHistory
     }
@@ -165,7 +130,6 @@ private data class CellImpl(
 
     override fun serializeAsTag(): Tag = CompoundTag {
         put(TAG_CORE, core.serializeAsTag())
-        put(TAG_CURSE, curse.serializeAsTag())
         put(TAG_REFORGE, reforgeHistory.serializeAsTag())
     }
 
@@ -177,13 +141,11 @@ private data class CellImpl(
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("id", id),
         ExaminableProperty.of("core", core),
-        ExaminableProperty.of("curse", curse),
         ExaminableProperty.of("reforge", reforgeHistory),
     )
 
     private companion object {
         const val TAG_CORE = "core"
-        const val TAG_CURSE = "curse"
         const val TAG_REFORGE = "reforge"
     }
 }

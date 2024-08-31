@@ -30,9 +30,6 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 const val CRATE_PROTO_CONFIG_DIR = "crates"
 const val CRATE_PROTO_CONFIG_LOADER = "crate_prototype_config_loader"
 
-const val CURSE_GLOBAL_CONFIG_FILE = "curses.yml"
-const val CURSE_GLOBAL_CONFIG_LOADER = "curse_global_config_loader"
-
 const val ITEM_PROTO_CONFIG_DIR = "items"
 const val ITEM_PROTO_CONFIG_LOADER = "item_prototype_config_loader"
 

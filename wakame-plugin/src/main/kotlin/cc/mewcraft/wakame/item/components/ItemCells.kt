@@ -21,11 +21,7 @@ import cc.mewcraft.wakame.item.components.cells.template.TemplateCellSerializer
 import cc.mewcraft.wakame.item.components.cells.template.TemplateCoreGroupSerializer
 import cc.mewcraft.wakame.item.components.cells.template.TemplateCorePoolSerializer
 import cc.mewcraft.wakame.item.components.cells.template.TemplateCoreSerializer
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCurseGroupSerializer
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCursePoolSerializer
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCurseSerializer
 import cc.mewcraft.wakame.item.components.cells.template.cores.empty.TemplateCoreEmpty
-import cc.mewcraft.wakame.item.components.cells.template.curses.TemplateCurseEmpty
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -137,12 +133,12 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     /**
      * 获取所有词条栏上的 [AttributeModifier].
      */
-    fun collectAttributeModifiers(context: NekoStack, ignoreCurse: Boolean = false): Multimap<Attribute, AttributeModifier>
+    fun collectAttributeModifiers(context: NekoStack): Multimap<Attribute, AttributeModifier>
 
     /**
      * 获取所有词条栏上的 [ConfiguredSkill].
      */
-    fun collectConfiguredSkills(context: NekoStack, ignoreCurse: Boolean = false, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
+    fun collectConfiguredSkills(context: NekoStack, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
 
     /**
      * 忽略数值的前提下, 判断是否包含指定的核心.
@@ -241,12 +237,9 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             }
         }
 
-        override fun collectAttributeModifiers(context: NekoStack, ignoreCurse: Boolean): Multimap<Attribute, AttributeModifier> {
+        override fun collectAttributeModifiers(context: NekoStack): Multimap<Attribute, AttributeModifier> {
             val ret = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
             for ((id, cell) in this) {
-                if (!ignoreCurse && cell.getCurse().isLocked(context)) {
-                    continue // 诅咒还未解锁
-                }
                 val core = cell.getCoreAs(CoreTypes.ATTRIBUTE) ?: continue
                 // 拼接物品 key 和词条栏 id 作为属性修饰符的 id
                 val identity = context.key.value { "$it/$id" }
@@ -256,12 +249,9 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             return ret.build()
         }
 
-        override fun collectConfiguredSkills(context: NekoStack, ignoreCurse: Boolean, ignoreVariant: Boolean): Multimap<Trigger, Skill> {
+        override fun collectConfiguredSkills(context: NekoStack, ignoreVariant: Boolean): Multimap<Trigger, Skill> {
             val ret = ImmutableListMultimap.builder<Trigger, Skill>()
             for ((_, cell) in this) {
-                if (!ignoreCurse && cell.getCurse().isLocked(context)) {
-                    continue // 诅咒还未解锁
-                }
                 val core = cell.getCoreAs(CoreTypes.SKILL) ?: continue
                 val variant = core.variant
                 if (ignoreVariant || variant == TriggerVariant.any()) {
@@ -348,16 +338,8 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
                     val template = selected.firstOrNull() ?: TemplateCoreEmpty
                     template.generate(context)
                 }
-
-                // 生成诅咒
-                val curse = run {
-                    val selected = templateCell.curse.select(context)
-                    val template = selected.firstOrNull() ?: TemplateCurseEmpty
-                    template.generate(context)
-                }
-
                 // collect all and put it into the builder
-                builder.put(id, Cell.of(id, core, curse))
+                builder.put(id, Cell.of(id, core))
             }
             return GenerationResult.of(builder.build())
         }
@@ -375,10 +357,8 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
          *   buckets:
          *     <词条栏 id>:
          *       core: <核心选择器>
-         *       curse: <诅咒选择器>
          *     <词条栏 id>:
          *       core: <核心选择器>
-         *       curse: <诅咒选择器>
          *     ...
          *   selectors:
          *     core_pools:
@@ -386,14 +366,6 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
          *       pool_2: <pool>
          *       ...
          *     core_groups:
-         *       group_1: <group>
-         *       group_2: <group>
-         *       ...
-         *     curse_pools:
-         *       pool_1: <pool>
-         *       pool_2: <pool>
-         *       ...
-         *     curse_groups:
          *       group_1: <group>
          *       group_2: <group>
          *       ...
@@ -431,9 +403,6 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
                 .kregister(TemplateCoreSerializer)
                 .kregister(TemplateCorePoolSerializer)
                 .kregister(TemplateCoreGroupSerializer)
-                .kregister(TemplateCurseSerializer)
-                .kregister(TemplateCursePoolSerializer)
-                .kregister(TemplateCurseGroupSerializer)
 
                 // 技能, 部分核心会用到
                 .registerAll(get(named(SKILL_EXTERNALS)))
