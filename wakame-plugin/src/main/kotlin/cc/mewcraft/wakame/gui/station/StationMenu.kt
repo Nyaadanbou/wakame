@@ -192,8 +192,13 @@ class StationMenu(
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             when (clickType) {
-                // 左键合成
+                // 左键预览
                 ClickType.LEFT -> {
+                    PreviewMenu(recipeMatcherResult.recipe, player, stationMenu).open()
+                }
+
+                // 右键合成
+                ClickType.RIGHT -> {
                     val stationRecipe = recipeMatcherResult.recipe
                     if (stationRecipe.match(player).canCraft) {
                         tryCraft(stationRecipe, player)
@@ -202,11 +207,6 @@ class StationMenu(
                     }
 
                     updateMenu()
-                }
-
-                // 右键预览
-                ClickType.RIGHT -> {
-                    PreviewMenu(recipeMatcherResult.recipe, player, stationMenu).open()
                 }
 
                 // 潜行合成8次
