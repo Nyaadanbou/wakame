@@ -401,9 +401,6 @@ entity_attributes:
     parent: minecraft:damageable
     values: { }
 
-
-
-
   minecraft:all_zero:
     parent: ~
     values:
