@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.util.krequire
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
+import it.unimi.dsi.fastutil.objects.ReferenceSets
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.EquipmentSlotGroup
@@ -98,14 +99,14 @@ internal object ItemSlotGroupSerializer : TypeSerializer<ItemSlotGroup> {
     override fun deserialize(type: Type, node: ConfigurationNode): ItemSlotGroup {
         if (node.rawScalar() != null) {
             val single = node.krequire<ItemSlot>()
-            return SimpleItemSlotGroup(setOf(single))
+            return SimpleItemSlotGroup(ReferenceSets.singleton(single))
         }
 
         val multiple = node.getList<ItemSlot>(emptyList())
 
         return when (multiple.size) {
-            0 -> SimpleItemSlotGroup(emptySet())
-            1 -> SimpleItemSlotGroup(setOf(multiple[0]))
+            0 -> SimpleItemSlotGroup(ReferenceSets.emptySet())
+            1 -> SimpleItemSlotGroup(ReferenceSets.singleton(multiple[0]))
             else -> SimpleItemSlotGroup(ReferenceArraySet(multiple))
         }
     }
