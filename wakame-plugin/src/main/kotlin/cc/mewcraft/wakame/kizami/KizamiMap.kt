@@ -9,20 +9,12 @@ import kotlin.collections.Map
  * and does not involve any operations of the effects provided by kizami. The operations of
  * kizami effects, such as "apply" and "remove", are defined by [KizamiEffect].
  */
-interface KizamiMap : MutableIterable<Map.Entry<Kizami, Int>> {
-    /**
-     * Returns `true` if this map contains no entries.
-     */
-    fun isEmpty(): Boolean
+interface KizamiMap : KizamiMapView, MutableIterable<Map.Entry<Kizami, Int>> {
 
     /**
-     * Get the amount of specific kizami the player owns.
-     *
-     * The return value is always greater or equal to zero.
+     * Get a snapshot of the current kizami map.
      */
-    fun getAmount(kizami: Kizami): Int
-
-    /* These functions should be called by inventory listeners */
+    fun getSnapshot(): KizamiMapSnapshot
 
     /**
      * Increment the amount of each kizami in the [kizami] by one.
@@ -70,9 +62,14 @@ interface KizamiMap : MutableIterable<Map.Entry<Kizami, Int>> {
 }
 
 /**
- * Represents a view of the kizami map. No methods on this interface mutates the map.
+ * Represents a view of the kizami map. This interface is used to provide a read-only view of the kizami map.
  */
-interface KizamiMapView {
+interface KizamiMapView : Iterable<Map.Entry<Kizami, Int>> {
+    /**
+     * Returns `true` if this map contains no entries.
+     */
+    fun isEmpty(): Boolean
+
     /**
      * Get the amount of specific kizami the player owns.
      *
@@ -80,3 +77,8 @@ interface KizamiMapView {
      */
     fun getAmount(kizami: Kizami): Int
 }
+
+/**
+ * Represents a snapshot of the kizami map. No methods on this interface mutates the map.
+ */
+interface KizamiMapSnapshot : KizamiMapView

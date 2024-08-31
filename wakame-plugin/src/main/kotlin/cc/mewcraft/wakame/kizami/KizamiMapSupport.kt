@@ -26,6 +26,10 @@ private class PlayerKizamiMap : KizamiMap {
         return amountMappings.getInt(kizami)
     }
 
+    override fun getSnapshot(): KizamiMapSnapshot {
+        return PlayerKizamiMapSnapshot(amountMappings.clone())
+    }
+
     override fun addOneEach(kizami: Iterable<Kizami>) {
         kizami.forEach(this::addOne)
     }
@@ -48,6 +52,22 @@ private class PlayerKizamiMap : KizamiMap {
 
     override fun subtract(kizami: Kizami, amount: Int) {
         amountMappings.mergeInt(kizami, 0) { oldAmount, givenAmount -> (oldAmount - givenAmount).coerceAtLeast(0) }
+    }
+
+    override fun iterator(): MutableIterator<Map.Entry<Kizami, Int>> {
+        return amountMappings.object2IntEntrySet().fastIterator()
+    }
+}
+
+private class PlayerKizamiMapSnapshot(
+    private val amountMappings: Object2IntOpenHashMap<Kizami>
+) : KizamiMapSnapshot {
+    override fun isEmpty(): Boolean {
+        return amountMappings.isEmpty()
+    }
+
+    override fun getAmount(kizami: Kizami): Int {
+        return amountMappings.getInt(kizami)
     }
 
     override fun iterator(): MutableIterator<Map.Entry<Kizami, Int>> {
