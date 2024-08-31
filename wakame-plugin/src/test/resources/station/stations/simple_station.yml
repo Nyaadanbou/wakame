@@ -53,8 +53,8 @@ layout:
         <!i><gold>合成所需材料:</gold>
         <choices>
         <!i><yellow>===================</yellow>
-        <!i><gold>左键单击</gold> <dark_gray>>></dark_gray> <gold>合成一次</gold>
-        <!i><gold>右键单击</gold> <dark_gray>>></dark_gray> <gold>预览配方</gold>
+        <!i><gold>左键单击</gold> <dark_gray>>></dark_gray> <gold>预览配方</gold>
+        <!i><gold>右键单击</gold> <dark_gray>>></dark_gray> <gold>合成一次</gold>
         <!i><gold>潜行单击</gold> <dark_gray>>></dark_gray> <gold>合成八次</gold>
         <!i><gold><key:key.drop>键丢出</gold> <dark_gray>>></dark_gray> <gold>合成全部</gold>
         <!i><yellow>===================</yellow>
