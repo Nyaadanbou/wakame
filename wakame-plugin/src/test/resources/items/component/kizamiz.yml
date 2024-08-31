@@ -9,9 +9,9 @@ kizamiz:
       - type: item:rarity
         rarity: rare
     entries:
-      - type: kizami:netherite
+      - type: kizami:wind_lace
         weight: 2
-      - type: kizami:luminite
+      - type: kizami:antigravity
         weight: 1
   # 第二个随机池
   pool_b:
@@ -20,9 +20,9 @@ kizamiz:
       - type: item:rarity
         rarity: uncommon
     entries:
-      - type: kizami:gold
+      - type: kizami:berserker
         weight: 3
-      - type: kizami:diamond
+      - type: kizami:guarding
         weight: 2
   # 第三个随机池
   pool_c:
@@ -31,7 +31,7 @@ kizamiz:
       - type: item:rarity
         rarity: common
     entries:
-      - type: kizami:wood
+      - type: kizami:magic_affinity
         weight: 5
-      - type: kizami:iron
+      - type: kizami:vitality
         weight: 4

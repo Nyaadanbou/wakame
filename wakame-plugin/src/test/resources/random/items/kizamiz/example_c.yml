@@ -1,7 +1,7 @@
 nodes:
-  - type: kizami:gold
+  - type: kizami:berserker
     weight: 3
-  - type: kizami:diamond
+  - type: kizami:guarding
     weight: 2
-  - type: kizami:netherite
+  - type: kizami:magic_affinity
     weight: 1

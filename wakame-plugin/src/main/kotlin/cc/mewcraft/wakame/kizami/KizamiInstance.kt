@@ -66,10 +66,8 @@ object KizamiInstanceSerializer : SchemaSerializer<KizamiInstance> {
                     val kizamiEffect = childNode.krequire<KizamiEffect>()
                     this[amount] = kizamiEffect
                 }
-        }.let {
-            // optimize read performance
-            Int2ObjectOpenHashMap(it)
-        }
+        }.let(::Int2ObjectOpenHashMap)
+
         return KizamiInstance(kizami, effectMap)
     }
 }

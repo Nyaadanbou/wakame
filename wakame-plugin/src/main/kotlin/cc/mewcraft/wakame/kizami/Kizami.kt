@@ -75,6 +75,14 @@ private data class KizamiType(
  */
 internal object KizamiSerializer : SchemaSerializer<Kizami> {
     /**
+     * 用来传递铭刻的 id.
+     */
+    // 开发日记 2024/8/31 小米
+    // 因为铭刻现在是“一文件, 一铭刻” 所以文件内部无从得知铭刻的 id.
+    // 我们需要通过 hint 将铭刻 id (也就是文件名) 传递给序列化器.
+    val HINT_ID: RepresentationHint<String> = RepresentationHint.of("id", String::class.java)
+
+    /**
      * The key hint is used to pass the kizami key to the child
      * node deserialization, such as the deserialization of `effects`.
      */
@@ -90,10 +98,10 @@ internal object KizamiSerializer : SchemaSerializer<Kizami> {
         }
 
         // if it's structure 2
-        val key = node.key().toString()
-        val binary = node.node("binary_index").krequire<Int>().toStableByte()
+        val uniqueId = node.hint(HINT_ID) ?: throw IllegalStateException("No provided hint for kizami id. This is a bug!")
+        val binaryId = node.node("binary_index").krequire<Int>().toStableByte()
         val displayName = node.node("display_name").krequire<Component>()
         val styles = node.node("styles").krequire<Array<StyleBuilderApplicable>>()
-        return KizamiType(key, binary, displayName, styles)
+        return KizamiType(uniqueId, binaryId, displayName, styles)
     }
 }
