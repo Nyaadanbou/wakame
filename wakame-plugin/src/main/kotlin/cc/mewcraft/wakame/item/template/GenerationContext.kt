@@ -63,12 +63,12 @@ class GenerationContext(
     val kizamiz: MutableCollection<Kizami> by ObservableDelegates.set(HashSet())
 
     /**
-     * 已经生成的 [Curse].
+     * 已经生成的 [cc.mewcraft.wakame.item.components.cells.Curse].
      */
     val curses: MutableCollection<CurseContextHolder> by ObservableDelegates.set(HashSet())
 
     /**
-     * 已经生成的 [Skill].
+     * 已经生成的 [cc.mewcraft.wakame.skill.Skill].
      */
     val skills: MutableCollection<SkillContextHolder> by ObservableDelegates.set(HashSet())
 
