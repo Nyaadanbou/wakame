@@ -129,11 +129,39 @@ object AttributeRegistry : Initializable {
         +buildFacade("defense_penetration").single().element().bind { DEFENSE_PENETRATION }
         +buildFacade("defense_penetration_rate").single().element().bind { DEFENSE_PENETRATION_RATE }
         +buildFacade("entity_interaction_range").single().bind { ENTITY_INTERACTION_RANGE }
-        +buildFacade("health_regeneration").single().bind { HEALTH_REGENERATION }
+        +buildFacade("health_regeneration").single().bind { HEALTH_REGENERATION }.override {
+            // create closures
+            val tooltips = NumericTooltips(config)
+            // override it
+            createTooltipLore = { core: CoreAttributeS ->
+                val lines = tooltips.line(core.operation)
+                if (core.operation == Operation.ADD) {
+                    val resolver = tooltips.number("value", core.value * 20)
+                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
+                } else {
+                    val resolver = tooltips.number("value", core.value)
+                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
+                }
+            }
+        }
         +buildFacade("incoming_damage_rate").single().element().bind { INCOMING_DAMAGE_RATE }
         +buildFacade("lifesteal").single().bind { LIFESTEAL }
         +buildFacade("mana_consumption_rate").single().bind { MANA_CONSUMPTION_RATE }
-        +buildFacade("mana_regeneration").single().bind { MANA_REGENERATION }
+        +buildFacade("mana_regeneration").single().bind { MANA_REGENERATION }.override {
+            // create closures
+            val tooltips = NumericTooltips(config)
+            // override it
+            createTooltipLore = { core: CoreAttributeS ->
+                val lines = tooltips.line(core.operation)
+                if (core.operation == Operation.ADD) {
+                    val resolver = tooltips.number("value", core.value * 20)
+                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
+                } else {
+                    val resolver = tooltips.number("value", core.value)
+                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
+                }
+            }
+        }
         +buildFacade("manasteal").single().bind { MANASTEAL }
         +buildFacade("max_absorption").single().bind { MAX_ABSORPTION }
         +buildFacade("max_health").single().bind { MAX_HEALTH }
