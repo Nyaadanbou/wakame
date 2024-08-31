@@ -32,15 +32,6 @@ data class KizamiInstance(
     fun getEffectBy(amount: Int): KizamiEffect {
         return effectMap[amount] ?: EmptyKizamiEffect
     }
-
-    /**
-     * Gets the effect by [amount].
-     *
-     * Returns `null` if the [amount] has no defined effect.
-     */
-    fun findEffectBy(amount: Int): KizamiEffect? {
-        return effectMap[amount]
-    }
 }
 
 /**

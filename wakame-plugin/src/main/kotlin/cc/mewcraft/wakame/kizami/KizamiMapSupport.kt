@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.user.User
-import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 
 /**
@@ -17,15 +16,14 @@ fun PlayerKizamiMap(user: User<*>): PlayerKizamiMap {
  * This class records the number of kizami each owned by a player.
  */
 class PlayerKizamiMap : KizamiMap {
-    private val amountMap: Object2IntOpenHashMap<Kizami> = Object2IntOpenHashMap<Kizami>().apply { defaultReturnValue(0) }
+    private val amountMappings: Object2IntOpenHashMap<Kizami> = Object2IntOpenHashMap<Kizami>().apply { defaultReturnValue(0) }
 
-    override val mutableAmountMap: MutableMap<Kizami, Int>
-        get() = amountMap
-    override val immutableAmountMap: Map<Kizami, Int>
-        get() = ImmutableMap.copyOf(amountMap)
+    override fun isEmpty(): Boolean {
+        return amountMappings.isEmpty()
+    }
 
     override fun getAmount(kizami: Kizami): Int {
-        return amountMap.getInt(kizami)
+        return amountMappings.getInt(kizami)
     }
 
     override fun addOneEach(kizami: Iterable<Kizami>) {
@@ -33,11 +31,11 @@ class PlayerKizamiMap : KizamiMap {
     }
 
     override fun addOne(kizami: Kizami) {
-        amountMap.mergeInt(kizami, 1) { oldAmount, _ -> oldAmount + 1 }
+        amountMappings.mergeInt(kizami, 1) { oldAmount, _ -> oldAmount + 1 }
     }
 
     override fun add(kizami: Kizami, amount: Int) {
-        amountMap.mergeInt(kizami, amount) { oldAmount: Int, givenAmount: Int -> oldAmount + givenAmount }
+        amountMappings.mergeInt(kizami, amount) { oldAmount: Int, givenAmount: Int -> oldAmount + givenAmount }
     }
 
     override fun subtractOneEach(kizami: Iterable<Kizami>) {
@@ -45,10 +43,14 @@ class PlayerKizamiMap : KizamiMap {
     }
 
     override fun subtractOne(kizami: Kizami) {
-        amountMap.mergeInt(kizami, 0) { oldAmount, _ -> (oldAmount - 1).coerceAtLeast(0) }
+        amountMappings.mergeInt(kizami, 0) { oldAmount, _ -> (oldAmount - 1).coerceAtLeast(0) }
     }
 
     override fun subtract(kizami: Kizami, amount: Int) {
-        amountMap.mergeInt(kizami, 0) { oldAmount, givenAmount -> (oldAmount - givenAmount).coerceAtLeast(0) }
+        amountMappings.mergeInt(kizami, 0) { oldAmount, givenAmount -> (oldAmount - givenAmount).coerceAtLeast(0) }
+    }
+
+    override fun iterator(): MutableIterator<Map.Entry<Kizami, Int>> {
+        return amountMappings.object2IntEntrySet().fastIterator()
     }
 }

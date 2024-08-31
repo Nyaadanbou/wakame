@@ -1,27 +1,19 @@
 package cc.mewcraft.wakame.kizami
 
+import kotlin.collections.Map
+
 /**
- * Represents a KizamiMap owned by a subject.
+ * Represents a map (kizami -> amount) owned by a subject.
  *
  * This object solely holds the amount of each kizami which is currently owned by the user,
  * and does not involve any operations of the effects provided by kizami. The operations of
  * kizami effects, such as "apply" and "remove", are defined by [KizamiEffect].
  */
-interface KizamiMap {
+interface KizamiMap : MutableIterable<Map.Entry<Kizami, Int>> {
     /**
-     * This is a live object, which means the entries in the map will
-     * vary at any time.
-     *
-     * Gets the mutable amount map, where the `map key` is kizami
-     * and the `map value` is corresponding amount.
+     * Returns `true` if this map contains no entries.
      */
-    val mutableAmountMap: MutableMap<Kizami, Int>
-
-    /**
-     * Gets a copy of current amount map, where the `map key` is kizami
-     * and the `map value` is corresponding amount.
-     */
-    val immutableAmountMap: Map<Kizami, Int>
+    fun isEmpty(): Boolean
 
     /**
      * Get the amount of specific kizami the player owns.
@@ -75,4 +67,16 @@ interface KizamiMap {
      * @param amount the amount to be incremented by
      */
     fun subtract(kizami: Kizami, amount: Int)
+}
+
+/**
+ * Represents a view of the kizami map. No methods on this interface mutates the map.
+ */
+interface KizamiMapView {
+    /**
+     * Get the amount of specific kizami the player owns.
+     *
+     * The return value is always greater or equal to zero.
+     */
+    fun getAmount(kizami: Kizami): Int
 }
