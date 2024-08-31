@@ -28,7 +28,7 @@ class ItemXNeko(
         val context = GenerationContext(
             // 始终以等级 0 生成
             trigger = GenerationTrigger.direct(0),
-            // 生成目标为物品的 key
+            // 设置为物品的 key
             target = key,
             // 随机种子始终为 0
             seed = 0
