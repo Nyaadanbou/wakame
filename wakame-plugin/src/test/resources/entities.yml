@@ -1,41 +1,44 @@
 # 实体 Entities
 
-# 实体的默认属性
+# 实体的默认属性:
 # 你必须在这里定义每种实体所拥有的属性及其数值
 # 如果一个实体没有定义属性X，则该实体没有属性X
 #
-# 例外：
+# 例外的默认属性:
 # 如果一个属性X它是基于原版属性，并且
 # - 在这里没有节点，那么最终将返回X所对应原版属性的数值，而非没有属性X
 # - 在这里存在节点，那么最终将返回这里X指定的值，或X的全局默认值，如果值为空
-#
-# 解释：
-# 没有定义 = 不存在节点(node)
-# 没有数值 = 存在节点但值为空(~)
 entity_attributes:
 
-  minecraft:living: # 这里写实体的 key，也可以是符合命名空间规范的任意值
-    parent: ~ # 父属性配置的 key，必须出现在该属性配置之前。可为空
+  minecraft:living:
+    parent: ~
     values:
-      defense: default # 如果一个属性带元素，并且没有 map 结构，则相当于给该属性的每个元素都指定了一个值
-      max_mana: 100.0 # 如果一个属性不带元素，则直接写标量来指定其数值
+      defense: 1.0 # 所有元素的 defense 属性都为 1.0
+      max_mana: 100.0
+
+  minecraft:mob:
+    parent: minecraft:living
+    values: { } # 属性值 map 可以为空
+
+  minecraft:monster:
+    parent: minecraft:mob
+    values:
+      defense:
+        neutral: .0 # 重写 neutral 元素的 defense 属性; 其他元素的 defense 属性依然继承 parent
 
   minecraft:player:
     parent: minecraft:living
     values:
-      attack_damage: default # default 意为采用全局默认值
-      attack_damage_rate: default
+      attack_damage: default # 采用全局默认值
       attack_effect_chance: default
       attack_speed_level: default
       block_interaction_range: default
       critical_strike_chance: default
       critical_strike_power: default
-      # defense: default # 这里被注释了，但 player 依然拥有 defense 属性。这因为其继承了 living，而 living 拥有 defense 属性
+      damage_reduction_rate: default
       defense_penetration: default
-      defense_penetration_rate: default
       entity_interaction_range: default
       health_regeneration: default
-      incoming_damage_rate: default
       lifesteal: default
       manasteal: default
       mana_consumption_rate: default
@@ -44,393 +47,28 @@ entity_attributes:
       max_health: default
       max_mana: 200.0
       movement_speed: default
-      universal_attack_damage: default
-      universal_attack_damage_rate: default
-      universal_defense: default
-      universal_defense_penetration: default
-      universal_defense_penetration_rate: default
-      universal_incoming_damage_rate: default
-
-  minecraft:mob:
-    parent: minecraft:living
-    values: { } # 属性值 map 可以为空，虽然没什么用
-
-  minecraft:damageable:
-    parent: ~
-    values:
-      attack_damage: 0
-      attack_damage_rate: 0
-      critical_strike_chance: default
-      critical_strike_power: default
-      defense: 0
-      defense_penetration: 0
-      defense_penetration_rate: 0
-      incoming_damage_rate: 0
-      universal_attack_damage: 0
-      universal_attack_damage_rate: 0
-      universal_defense: 0
-      universal_defense_penetration: 0
-      universal_defense_penetration_rate: 0
-      universal_incoming_damage_rate: 0
-
-  minecraft:allay:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:armadillo:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:armor_stand:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:axolotl:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:bat:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:bee:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:blaze:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:bogged:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:breeze:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:camel:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:cat:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:cave_spider:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:chicken:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:cod:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:cow:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:creeper:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:dolphin:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:donkey:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:drowned:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:elder_guardian:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:ender_dragon:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:enderman:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:endermite:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:evoker:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:fox:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:frog:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:ghast:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:giant:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:glow_squid:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:goat:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:guardian:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:hoglin:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:horse:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:husk:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:illusioner:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:iron_golem:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:llama:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:magma_cube:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:mooshroom:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:mule:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:ocelot:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:panda:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:parrot:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:phantom:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:pig:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:piglin:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:piglin_brute:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:pillager:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:polar_bear:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:pufferfish:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:rabbit:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:ravager:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:salmon:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:sheep:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:shulker:
-    parent: minecraft:damageable
-    values: { }
 
   minecraft:skeleton:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:skeleton_horse:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:slime:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:sniffer:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:snow_golem:
-    parent: minecraft:damageable
-    values: { }
+    parent: minecraft:monster
+    values:
+      max_health: 60.0
+      attack_damage:
+        neutral: 5.0 # attack_damage 是由两个属性组成的 (min 和 max). 这里指定的值将同时指定 min 和 max!
 
   minecraft:spider:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:squid:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:stray:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:strider:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:tadpole:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:trader_llama:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:tropical_fish:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:turtle:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:vex:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:villager:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:vindicator:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:wandering_trader:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:warden:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:witch:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:wither:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:wither_skeleton:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:wolf:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:zoglin:
-    parent: minecraft:damageable
-    values: { }
+    parent: minecraft:monster
+    values:
+      max_health: 40.0
+      defense:
+        neutral: 2.0
 
   minecraft:zombie:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:zombie_horse:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:zombie_villager:
-    parent: minecraft:damageable
-    values: { }
-
-  minecraft:zombified_piglin:
-    parent: minecraft:damageable
-    values: { }
-
-
-
-
-  minecraft:all_zero:
-    parent: ~
+    parent: minecraft:monster
     values:
-      attack_damage: 0
-      attack_damage_rate: 0
-      critical_strike_chance: 0
-      critical_strike_power: 0
-      defense_penetration: 0
-      defense_penetration_rate: 0
-      universal_attack_damage: 0
-      universal_attack_damage_rate: 0
-      universal_defense_penetration: 0
-      universal_defense_penetration_rate: 0
-
-  minecraft:arrow:
-    parent: minecraft:all_zero
-    values: { }
-
-  minecraft:trident:
-    parent: minecraft:all_zero
-    values: { }
-
-  minecraft:dispenser:
-    parent: minecraft:all_zero
-    values: { }
-
-
+      max_health: 20.0
+      max_mana: 80.0 # 重写
+      defense:
+        neutral: 4.0
 
 # 实体索引表（目前仅用于条件判断）
 entity_type_holders:
