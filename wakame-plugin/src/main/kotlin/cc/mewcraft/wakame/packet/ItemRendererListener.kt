@@ -93,14 +93,15 @@ private object PacketSupport : KoinComponent {
             updateItem(nekoStack, user)
             nekoStack.handle0
         }
-        val newCarriedItem = packet.carriedItem.getOrNull()?.tryNekoStack?.takeIf { it.shouldRender }
+        val oldCarriedItem = packet.carriedItem.getOrNull()
+        val newCarriedItem = oldCarriedItem?.tryNekoStack?.takeIf { it.shouldRender }
         newCarriedItem?.let { updateItem(it, user) }
 
         return WrapperPlayServerWindowItems(
             packet.windowId,
             packet.stateId,
             newItemStacks,
-            newCarriedItem?.handle0
+            newCarriedItem?.handle0 ?: oldCarriedItem
         )
     }
 
