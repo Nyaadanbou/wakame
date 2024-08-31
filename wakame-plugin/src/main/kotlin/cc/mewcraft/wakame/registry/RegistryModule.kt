@@ -4,14 +4,13 @@ import cc.mewcraft.wakame.adventure.ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS
 import cc.mewcraft.wakame.config.configurate.MaterialSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
+import cc.mewcraft.wakame.damage.DAMAGE_EXTERNAL
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.ITEM_PROTO_SERIALIZERS
-import cc.mewcraft.wakame.kizami.KIZAMI_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
-import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
 import cc.mewcraft.wakame.skill.SKILL_GROUP_SERIALIZERS
 import cc.mewcraft.wakame.skill.SkillSerializer
 import cc.mewcraft.wakame.skill.TriggersConditionsSerializer
@@ -21,7 +20,6 @@ import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
 import cc.mewcraft.wakame.util.buildYamlLoader
 import cc.mewcraft.wakame.util.createYamlLoader
 import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.damage.DAMAGE_EXTERNAL
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -59,9 +57,6 @@ const val PROJECTILE_GLOBAL_CONFIG_LOADER = "projectile_global_config_loader"
 
 const val ELEMENT_GLOBAL_CONFIG_FILE = "elements.yml"
 const val ELEMENT_GLOBAL_CONFIG_LOADER = "element_global_config_loader"
-
-const val KIZAMI_GLOBAL_CONFIG_FILE = "kizami.yml"
-const val KIZAMI_GLOBAL_CONFIG_LOADER = "kizami_global_config_loader"
 
 const val RARITY_GLOBAL_CONFIG_FILE = "rarities.yml"
 const val RARITY_GLOBAL_CONFIG_LOADER = "rarity_global_config_loader"
@@ -105,13 +100,6 @@ internal fun registryModule(): Module = module {
     single<YamlConfigurationLoader>(named(SKIN_GLOBAL_CONFIG_LOADER)) {
         createYamlLoader(SKIN_GLOBAL_CONFIG_FILE) {
             registerAll(get(named(SKIN_SERIALIZERS)))
-        }
-    }
-
-    single<YamlConfigurationLoader>(named(KIZAMI_GLOBAL_CONFIG_LOADER)) {
-        createYamlLoader(KIZAMI_GLOBAL_CONFIG_FILE) {
-            registerAll(get(named(KIZAMI_SERIALIZERS)))
-            registerAll(get(named(SKILL_EXTERNALS)))
         }
     }
 

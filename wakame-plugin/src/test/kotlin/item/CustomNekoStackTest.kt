@@ -744,8 +744,8 @@ class CustomNekoStackTest : KoinTest {
             val kizamiz = it.kizamiz
             // assertEquals(2, kizamiz.size) // FIXME 有时候2个,有时候1个
             val possibleKizamiz = setOf(
-                KizamiRegistry.INSTANCES["netherite"],
-                KizamiRegistry.INSTANCES["luminite"],
+                KizamiRegistry.INSTANCES["wind_lace"],
+                KizamiRegistry.INSTANCES["antigravity"],
             )
             assertTrue(kizamiz.all { it in possibleKizamiz })
         }

@@ -1,7 +1,7 @@
 nodes:
-  - type: kizami:wood
+  - type: kizami:wind_lace
     weight: 3
-  - type: kizami:iron
+  - type: kizami:antigravity
     weight: 2
-  - type: kizami:gold
+  - type: kizami:berserker
     weight: 1

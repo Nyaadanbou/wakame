@@ -1,7 +1,7 @@
 nodes:
-  - type: kizami:iron
+  - type: kizami:antigravity
     weight: 3
-  - type: kizami:gold
+  - type: kizami:berserker
     weight: 2
-  - type: kizami:diamond
+  - type: kizami:guarding
     weight: 1

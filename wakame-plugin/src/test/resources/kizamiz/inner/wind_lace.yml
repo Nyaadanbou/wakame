@@ -1,0 +1,20 @@
+binary_index: 0
+display_name: <green>风灵之纹
+styles: ""
+effects:
+  1:
+    - type: attribute:movement_speed
+      operation: multiply_base
+      value: 0.2
+  2:
+    - type: attribute:movement_speed
+      operation: multiply_base
+      value: 0.4
+  3:
+    - type: attribute:movement_speed
+      operation: multiply_base
+      value: 0.6
+  4:
+    - type: attribute:movement_speed
+      operation: multiply_base
+      value: 0.8

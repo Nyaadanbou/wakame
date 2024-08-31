@@ -25,6 +25,7 @@ import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.player.inventory.ItemSlotWatcher
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer.REFORGE_DIR_NAME
 import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
@@ -111,6 +112,7 @@ object Initializer : KoinComponent, Listener {
         saveDefaultConfig() // config.yml
         saveResourceRecursively(CRATE_PROTO_CONFIG_DIR)
         saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
+        saveResourceRecursively(KIZAMI_DIR_NAME)
         saveResourceRecursively(LANG_PROTO_CONFIG_DIR)
         saveResourceRecursively(REFORGE_DIR_NAME)
         saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
@@ -121,7 +123,6 @@ object Initializer : KoinComponent, Listener {
         saveResource(ELEMENT_GLOBAL_CONFIG_FILE)
         saveResource(ENTITY_GLOBAL_CONFIG_FILE)
         saveResource(ITEM_GLOBAL_CONFIG_FILE)
-        saveResource(KIZAMI_GLOBAL_CONFIG_FILE)
         saveResource(LEVEL_GLOBAL_CONFIG_FILE)
         // saveResource(PROJECTILE_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(RARITY_GLOBAL_CONFIG_FILE)
