@@ -57,7 +57,7 @@ class AttributeEventHandler : KoinComponent {
         }
         val userAttributes = player.toUser().attributeMap
         val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
-        val itemAttributes = itemCells.collectAttributeModifiers(this, ignoreCurse = true) // TODO 等诅咒完成后移除 ignoreCurse
+        val itemAttributes = itemCells.collectAttributeModifiers(this)
         itemAttributes.forEach { attribute, modifier -> userAttributes.getInstance(attribute)?.addModifier(modifier) }
     }
 
@@ -74,7 +74,7 @@ class AttributeEventHandler : KoinComponent {
         }
         val userAttributes = player.toUser().attributeMap
         val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
-        val itemAttributes = itemCells.collectAttributeModifiers(this, ignoreCurse = true)  // TODO 等诅咒完成后移除 ignoreCurse
+        val itemAttributes = itemCells.collectAttributeModifiers(this)
         itemAttributes.forEach { attribute, modifier -> userAttributes.getInstance(attribute)?.removeModifier(modifier) }
     }
 }

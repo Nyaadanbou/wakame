@@ -35,11 +35,6 @@ internal object FilterSerializer : TypeDeserializer<Filter<GenerationContext>> {
                 FilterAttribute(inverted, key, operation, element)
             }
 
-            FilterCurse.TYPE -> {
-                val curse = node.node("key").krequire<Key>()
-                FilterCurse(inverted, curse)
-            }
-
             FilterElement.TYPE -> {
                 val element = node.node("element").krequire<Element>()
                 FilterElement(inverted, element)

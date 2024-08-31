@@ -203,7 +203,7 @@ private constructor(
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return buildDefaultBowArrowDamageBundle()
 
         // 获取属性映射的快照, 将箭矢的属性加上
-        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, true)
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
         val attributeMapSnapshot = userAttributeMap.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
@@ -315,7 +315,7 @@ class DefaultArrowDamageMetadata private constructor(
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return defaultArrowDamageBundle()
 
         // 获取无形属性映射的快照, 将箭矢的属性加上
-        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, true)
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
         val attributeMapSnapshot = attributeMap.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
@@ -359,7 +359,7 @@ class DefaultTridentDamageMetadata(
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return defaultTridentDamageBundle()
 
         // 获取无形属性映射的快照, 将三叉戟的属性加上
-        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, true)
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
         val attributeMapSnapshot = intangibleAttributeMap.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)

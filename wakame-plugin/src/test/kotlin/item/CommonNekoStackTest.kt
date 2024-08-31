@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.components.cells.template.TemplateCoreSampleNodeFacade
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCurseSampleNodeFacade
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
@@ -96,7 +95,6 @@ object CommonNekoStackTest {
             get<ElementSampleNodeFacade>().onPreWorld()
             get<KizamiSampleNodeFacade>().onPreWorld()
             get<TemplateCoreSampleNodeFacade>().onPreWorld()
-            get<TemplateCurseSampleNodeFacade>().onPreWorld()
             get<ItemFilterNodeFacade>().onPreWorld()
         }
     }

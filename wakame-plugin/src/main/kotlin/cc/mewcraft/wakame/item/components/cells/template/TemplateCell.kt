@@ -22,25 +22,19 @@ interface TemplateCell {
     val core: Group<TemplateCore, GenerationContext>
 
     /**
-     * 诅咒的选择器.
-     */
-    val curse: Group<TemplateCurse, GenerationContext>
-
-    /**
      * 包含一些 [TemplateCell] 的构造方法.
      */
     companion object {
         /**
          * 构建一个 [TemplateCell].
          */
-        fun of(core: Group<TemplateCore, GenerationContext>, curse: Group<TemplateCurse, GenerationContext>): TemplateCell {
-            return Impl(core, curse)
+        fun of(core: Group<TemplateCore, GenerationContext>): TemplateCell {
+            return Impl(core)
         }
     }
 
     private data class Impl(
         override val core: Group<TemplateCore, GenerationContext>,
-        override val curse: Group<TemplateCurse, GenerationContext>,
     ) : TemplateCell
 }
 
@@ -49,7 +43,7 @@ interface TemplateCell {
  *
  * 该序列化实现要求给定的节点中已经存在“选择器”的根节点.
  *
- * Note that the `core` and `curse` of a cell in the configuration
+ * Note that the `core` of a cell in the configuration
  * are **scattered** by design, which means they are not necessarily
  * in a common node!
  *
@@ -57,7 +51,6 @@ interface TemplateCell {
  * ```yaml
  * <node>:
  *   core: group_b # it's just a **path** to a group node in the `cells` root
- *   curse: group_b # similar as above
  * ```
  */
 internal object TemplateCellSerializer : TypeDeserializer<TemplateCell> {
@@ -68,7 +61,6 @@ internal object TemplateCellSerializer : TypeDeserializer<TemplateCell> {
      * ```yaml
      * <node>:
      *   core: <group path>
-     *   curse: <group path>
      * ```
      *
      * ## Node structure of the injected ([HINT_NODE_SELECTORS])
@@ -79,14 +71,6 @@ internal object TemplateCellSerializer : TypeDeserializer<TemplateCell> {
      *     pool_2: <pool>
      *     ...
      *   core_groups:
-     *     group_1: <group>
-     *     group_2: <group>
-     *     ...
-     *   curse_pools:
-     *     pool_1: <pool>
-     *     pool_2: <pool>
-     *     ...
-     *   curse_groups:
      *     group_1: <group>
      *     group_2: <group>
      *     ...
@@ -107,9 +91,8 @@ internal object TemplateCellSerializer : TypeDeserializer<TemplateCell> {
                 ?.also { groupNode -> groupNode.hint(GroupSerializer.HINT_NODE_SHARED_POOLS, selectors.node("${path}_pools")) }
 
             val core = node.find("core")?.krequire<Group<TemplateCore, GenerationContext>>() ?: Group.empty()
-            val curse = node.find("curse")?.krequire<Group<TemplateCurse, GenerationContext>>() ?: Group.empty()
 
-            TemplateCell.of(core, curse)
+            TemplateCell.of(core)
         }
 
         return cell

@@ -16,16 +16,12 @@
     - `Compound("core")`
         - `String("id"): "some_namespace:some_path"`
         - `<... 与该核心相匹配的参数>`
-    - `Compound("curse")`
-        - `String("id"): "some_namespace:some_path"`
-        - `<... 与该诅咒相匹配的参数>`
     - `Compound("reforge")`
         - `<... 与重铸相关的参数>`
 
 其中，
 
 - `Compound("core")` 记录了核心的相关信息
-- `Compound("curse")` 记录了诅咒的相关信息
 - `Compound("reforge")` 记录了重铸的相关信息
 
 这里不讨论每个部分的具体内容。
@@ -81,7 +77,6 @@
   <root>:
     create_options:
       core: "core_a"
-      curse: "curse_a"
     modify_options:
       reforgeable: true
       accepted_cores:
@@ -124,13 +119,6 @@
 * type: `string`
 
 该词条栏所使用的核心选择器的唯一标识，必须在根路径下的 `core_groups` 中有定义。
-
----
-
-* path: `create_options.curse`
-* type: `string`
-
-该词条栏所使用的核心选择器的唯一标识，必须在根路径下的 `curse_groups` 中有定义。
 
 ---
 

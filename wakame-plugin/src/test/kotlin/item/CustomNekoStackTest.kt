@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
 import cc.mewcraft.wakame.item.components.HideTooltip
 import cc.mewcraft.wakame.item.components.ItemGlowable
 import cc.mewcraft.wakame.item.components.cells.CoreTypes
-import cc.mewcraft.wakame.item.components.cells.CurseTypes
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeS
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
 import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmpty
@@ -22,7 +21,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.EntityRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import net.kyori.adventure.key.Key
@@ -274,15 +272,6 @@ class CustomNekoStackTest : KoinTest {
                 val mod = modMap[Attributes.CRITICAL_STRIKE_CHANCE]
                 assertNotNull(mod)
                 assertEquals(0.75, mod.amount, 1e-5)
-
-                // 测试诅咒
-                val curseEntityKills = cell.getCurseAs(CurseTypes.ENTITY_KILLS)
-                assertNotNull(curseEntityKills)
-                assertEquals(3, curseEntityKills.count)
-
-                val expectedIndex = EntityRegistry.TYPES["demo_creeps_1"]
-                val actualIndex = curseEntityKills.index
-                assertEquals(expectedIndex, actualIndex)
             }
         }
     }
@@ -359,27 +348,6 @@ class CustomNekoStackTest : KoinTest {
             // CoreNoop 在第一个无条件的池中,
             // 因此生成出来的肯定是 CoreNoop
             assertIs<CoreNoop>(cell.getCore())
-        }
-    }
-
-    @Test
-    fun `component - cells check_curse_registrations`() = componentLifecycleTest(
-        "cells_check_curse_registrations", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
-    ) {
-        serialization {
-            assertNotNull(it)
-        }
-
-        context {
-            it.level = 10
-        }
-
-        result {
-            assertFalse(it.isEmpty())
-        }
-
-        unboxed {
-            // 本 test 主要是用来检查 core 是否注册成功, 能否正常被 pool 调用
         }
     }
 
@@ -851,25 +819,6 @@ class CustomNekoStackTest : KoinTest {
             val core = it.wrapped
             assertNotNull(core)
             assertEquals(Key.key("attribute:attack_damage_rate"), core.key)
-        }
-    }
-
-    @Test
-    fun `component - portable curse`() = componentLifecycleTest(
-        "portable_curse", ItemTemplateTypes.PORTABLE_CURSE, ItemComponentTypes.PORTABLE_CURSE
-    ) {
-        serialization {
-            assertNotNull(it)
-        }
-
-        context {
-            it.level = 10 // 单元测试一次只读取/生成一个模板, 因此这里得手动设置等级
-        }
-
-        unboxed {
-            val curse = it.wrapped
-            assertNotNull(curse)
-            assertEquals(Key.key("curse:entity_kills"), curse.key)
         }
     }
 

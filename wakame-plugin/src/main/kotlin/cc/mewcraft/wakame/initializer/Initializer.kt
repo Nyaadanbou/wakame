@@ -118,7 +118,6 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
-        saveResource(CURSE_GLOBAL_CONFIG_FILE)
         saveResource(DAMAGE_GLOBAL_CONFIG_FILE)
         saveResource(ELEMENT_GLOBAL_CONFIG_FILE)
         saveResource(ENTITY_GLOBAL_CONFIG_FILE)

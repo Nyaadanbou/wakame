@@ -25,25 +25,6 @@ object CoreBinaryKeys {
 }
 
 /**
- * Keys in the `curse` compound.
- */
-object CurseBinaryKeys {
-    const val CURSE_IDENTIFIER = "id"
-}
-
-/**
- * Constants values of Curse.
- */
-object CurseConstants {
-    const val ENTITY_KILLS = "entity_kills"
-    const val PEAK_DAMAGE = "peak_damage"
-
-    inline fun createKey(block: CurseConstants.() -> String): Key {
-        return Key(Namespaces.CURSE, block(this))
-    }
-}
-
-/**
  * Keys in the `reforge` compound.
  */
 object ReforgeBinaryKeys {
@@ -96,7 +77,6 @@ object ItemComponentConstants {
     const val LEVEL = "level"
     const val LORE = "lore"
     const val PORTABLE_CORE = "portable_core"
-    const val PORTABLE_CURSE = "portable_curse"
     const val RARITY = "rarity"
     const val SKILLFUL = "skillful"
     const val SKIN = "skin"

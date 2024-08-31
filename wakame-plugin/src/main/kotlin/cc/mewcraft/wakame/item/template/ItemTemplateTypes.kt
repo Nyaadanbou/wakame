@@ -27,7 +27,6 @@ import cc.mewcraft.wakame.item.components.ItemName
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.Kizamiable
 import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.PortableCurse
 import cc.mewcraft.wakame.item.components.Skillful
 import cc.mewcraft.wakame.item.components.Tool
 import cc.mewcraft.wakame.item.components.Unbreakable
@@ -158,11 +157,6 @@ object ItemTemplateTypes {
      * 组件: [PortableCore]
      */
     val PORTABLE_CORE: ItemTemplateType<PortableCore.Template> = PortableCore.templateType(ItemComponentConstants.PORTABLE_CORE).register()
-
-    /**
-     * 组件: [PortableCurse]
-     */
-    val PORTABLE_CURSE: ItemTemplateType<PortableCurse.Template> = PortableCurse.templateType(ItemComponentConstants.PORTABLE_CURSE).register()
 
     /**
      * 组件: [ItemRarity]
