@@ -15,8 +15,8 @@ import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
-import java.util.stream.Stream
 import java.util.UUID
+import java.util.stream.Stream
 
 /**
  * 技能状态
@@ -50,10 +50,11 @@ sealed interface SkillState<U> : Examinable {
     fun clear()
 }
 
-fun PlayerSkillState(user: User<Player>): PlayerSkillState {
+fun SkillState(user: User<Player>): SkillState<Player> {
     return PlayerSkillState(user.uniqueId)
 }
 
+// TODO 进一步封装 PlayerSkillState
 class PlayerSkillState(
     private val uniqueId: UUID
 ) : SkillState<Player> {

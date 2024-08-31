@@ -82,7 +82,7 @@ inline fun <reified T : Trigger> SkillMap.hasTrigger(): Boolean {
     return hasTrigger(T::class.java)
 }
 
-fun PlayerSkillMap(user: User<Player>): PlayerSkillMap {
+fun SkillMap(user: User<Player>): SkillMap {
     return PlayerSkillMap(user.uniqueId)
 }
 
@@ -92,7 +92,7 @@ fun PlayerSkillMap(user: User<Player>): PlayerSkillMap {
  * It shall be used in the case where you read the input from players and
  * then check whether the input has triggered a skill or not.
  */
-class PlayerSkillMap(
+private class PlayerSkillMap(
     private val uniqueId: UUID
 ) : SkillMap {
     private val skills: Multimap<Trigger, Key> = MultimapBuilder

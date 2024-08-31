@@ -3,11 +3,8 @@ package cc.mewcraft.wakame.user
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.level.PlayerLevelProvider
-import cc.mewcraft.wakame.resource.PlayerResourceMap
 import cc.mewcraft.wakame.resource.ResourceMap
-import cc.mewcraft.wakame.skill.PlayerSkillMap
 import cc.mewcraft.wakame.skill.SkillMap
-import cc.mewcraft.wakame.skill.state.PlayerSkillState
 import cc.mewcraft.wakame.skill.state.SkillState
 import cc.mewcraft.wakame.util.toSimpleString
 import com.github.benmanes.caffeine.cache.Cache
@@ -40,9 +37,9 @@ class PaperUser(
         get() = levelProvider.getOrDefault(uniqueId, 1)
     override val kizamiMap: KizamiMap = KizamiMap(this)
     override val attributeMap: AttributeMap = AttributeMap(this)
-    override val skillMap: SkillMap = PlayerSkillMap(this)
-    override val resourceMap: ResourceMap = PlayerResourceMap(this)
-    override val skillState: SkillState<Player> = PlayerSkillState(this)
+    override val skillMap: SkillMap = SkillMap(this)
+    override val resourceMap: ResourceMap = ResourceMap(this)
+    override val skillState: SkillState<Player> = SkillState(this)
 
     private val levelProvider: PlayerLevelProvider by inject()
 
