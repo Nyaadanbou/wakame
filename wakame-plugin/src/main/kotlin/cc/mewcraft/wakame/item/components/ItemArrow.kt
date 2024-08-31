@@ -1,46 +1,60 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.item.ItemComponentConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentMeta
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.util.RandomizedValue
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toStableByte
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
+import org.bukkit.entity.AbstractArrow.PickupStatus
 import org.spongepowered.configurate.ConfigurationNode
+
 
 // 开发日记: 2024/6/25 小米
 // 这是文件列表里的第一个物品组件,
 // 因此添加了更多代码注释, 请留意.
-data class ItemArrow(
-    /**
-     * 可穿透的实体数.
-     */
-    val pierceLevel: Byte,
-) : Examinable, TooltipProvider.Single {
 
+// 开发日记: 2024/9/1 芙兰
+// 经讨论, 箭矢作为一种弹药，可堆叠性很重要
+// 故箭矢没有任何差异化的nbt
+// 现在这是第一个只靠模板的组件
+interface ItemArrow : Examinable {
+    companion object : ItemComponentBridge<Unit> {
+        override fun codec(id: String): ItemComponentType<Unit> {
+            return Codec(id)
+        }
+
+        override fun templateType(id: String): ItemTemplateType<Template> {
+            return TemplateType(id)
+        }
+    }
+
+    private data class Codec(
+        override val id: String,
+    ) : ItemComponentType<Unit> {
+        override fun read(holder: ItemComponentHolder): Unit? {
+            return if (holder.hasTag()) Unit else null
+        }
+
+        override fun write(holder: ItemComponentHolder, value: Unit) {
+            holder.editTag()
+        }
+
+        override fun remove(holder: ItemComponentHolder) {
+            holder.removeTag()
+        }
+    }
+
+    /*
     // 开发日记: 2024/6/24 小米
     // companion object 将作为组件配置文件的入口,
     // 这些包括了物品提示框渲染的配置文件, 以及未来可能需要的其他东西
     companion object : ItemComponentBridge<ItemArrow>, ItemComponentMeta {
-        fun of(pierceLevel: Int): ItemArrow {
-            return ItemArrow(pierceLevel.toStableByte())
-        }
 
         override fun codec(id: String): ItemComponentType<ItemArrow> {
             return Codec(id)
@@ -106,18 +120,49 @@ data class ItemArrow(
             const val TAG_PIERCE_LEVEL = "pierce_level"
         }
     }
+     */
 
     // 开发日记: 2024/6/25
     // 这是模板类型, 也就是物品组件在配置文件中的封装.
     // 实现需要定义模板的数据结构, 以及模板的(反)序列化函数.
     data class Template(
-        val pierceLevel: RandomizedValue,
-    ) : ItemTemplate<ItemArrow> {
-        override val componentType: ItemComponentType<ItemArrow> = ItemComponentTypes.ARROW
+        /**
+         * 可穿透的实体数.
+         */
+        val pierceLevel: Int,
+        /**
+         * 箭是否能被捡起.
+         * 0表示不可以被玩家捡起.
+         * 1表示可以被玩家在生存或创造模式中捡起.
+         * 2表示仅可以被创造模式的玩家捡起.
+         */
+        val pickupStatus: PickupStatus,
+        /**
+         * 击中实体造成的着火时间.
+         */
+        val fireTicks: Int,
+        /**
+         * 箭是否视觉上正在着火.
+         * 为true时无论箭矢是否真正着火均显示着火.
+         * 为false时根据箭矢真正的着火情况来显示.
+         */
+        val hasVisualFire: Boolean,
+        /**
+         * 击中实体造成的冰冻时间.
+         * 原版细雪的冰冻效果.
+         * (当实体在细雪中时每刻增加1, 离开细雪则每刻减少2)
+         */
+        val frozenTicks: Int,
+        /**
+         * 击中实体造成的发光时间.
+         * 仅在箭矢是光灵箭时有效.
+         */
+        val glowTicks: Int,
+    ) : ItemTemplate<Unit> {
+        override val componentType: ItemComponentType<Unit> = ItemComponentTypes.ARROW
 
-        override fun generate(context: GenerationContext): GenerationResult<ItemArrow> {
-            val pierceLevel = pierceLevel.calculate().toStableByte().coerceIn(0, Byte.MAX_VALUE)
-            return GenerationResult.of(ItemArrow(pierceLevel))
+        override fun generate(context: GenerationContext): GenerationResult<Unit> {
+            return GenerationResult.of(Unit)
         }
     }
 
@@ -130,12 +175,52 @@ data class ItemArrow(
          * ## Node structure
          * ```yaml
          * <node>:
-         *   pierce_level: <randomized_value>
+         *   pierce_level: <int>
+         *   pick_up_status: <int>
+         *   fire_ticks: <int>
+         *   has_visual_fire: <boolean>
+         *   frozen_ticks: <int>
+         *   glow_ticks: <int>
          * ```
          */
         override fun decode(node: ConfigurationNode): Template {
-            val pierceLevel = node.node("pierce_level").krequire<RandomizedValue>()
-            return Template(pierceLevel)
+            val pierceLevel = node.node("pierce_level").getInt(0).apply {
+                require(this >= 0) { "Arrow pierce level should not less than 0" }
+            }
+            val pickUp = node.node("pick_up_status").getInt(1).apply {
+                require(this in 0..2) { "Arrow pick up status should be 0, 1 or 2" }
+            }
+            val pickupStatus = when (pickUp) {
+                0 -> {
+                    PickupStatus.DISALLOWED
+                }
+
+                1 -> {
+                    PickupStatus.ALLOWED
+                }
+
+                else -> {
+                    PickupStatus.CREATIVE_ONLY
+                }
+            }
+            val fireTick = node.node("fire_ticks").getInt(0).apply {
+                require(this >= 0) { "Arrow fire ticks should not less than 0" }
+            }
+            val hasVisualFire = node.node("has_visual_fire").getBoolean(false)
+            val frozenTick = node.node("frozen_ticks").getInt(0).apply {
+                require(this >= 0) { "Arrow frozen ticks should not less than 0" }
+            }
+            val glowTick = node.node("glow_ticks").getInt(0).apply {
+                require(this >= 0) { "Arrow glow ticks should not less than 0" }
+            }
+            return Template(
+                pierceLevel = pierceLevel,
+                pickupStatus = pickupStatus,
+                fireTicks = fireTick,
+                hasVisualFire = hasVisualFire,
+                frozenTicks = frozenTick,
+                glowTicks = glowTick
+            )
         }
     }
 }

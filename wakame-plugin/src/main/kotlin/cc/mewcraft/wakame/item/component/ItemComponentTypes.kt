@@ -44,9 +44,9 @@ import cc.mewcraft.wakame.registry.ItemComponentRegistry
  */
 object ItemComponentTypes {
     /**
-     * 将物品作为弹药.
+     * 将物品作为箭矢.
      */
-    val ARROW: ItemComponentType<ItemArrow> = ItemArrow.codec(ItemComponentConstants.ARROW).register()
+    val ARROW: ItemComponentType<Unit> = ItemArrow.codec(ItemComponentConstants.ARROW).register()
 
     /**
      * 控制物品能否提供属性加成给玩家.

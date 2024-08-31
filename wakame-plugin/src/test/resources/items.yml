@@ -2,12 +2,6 @@
 
 # 物品组件
 components:
-  arrow:
-    enabled: true
-    display_name: "弹药"
-    tooltips:
-      single: "<!i>穿透: <pierce_level>"
-
   attribute_modifiers:
     enabled: true
     display_name: "属性修饰符"

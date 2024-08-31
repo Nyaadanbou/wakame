@@ -2,14 +2,7 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.Attributable
-import cc.mewcraft.wakame.item.components.Damageable
-import cc.mewcraft.wakame.item.components.FireResistant
-import cc.mewcraft.wakame.item.components.ItemArrow
-import cc.mewcraft.wakame.item.components.ItemCells
-import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.ItemName
-import cc.mewcraft.wakame.item.components.Unbreakable
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.CoreType
 import cc.mewcraft.wakame.item.components.cells.CoreTypes
@@ -34,12 +27,6 @@ fun stack(stack: NekoStack) {
     }
     stack.components.set(ItemComponentTypes.CELLS, newItemCells)
 
-    // 射箭...
-    // 获取 arrow
-    val itemArrow: ItemArrow = stack.components.get(ItemComponentTypes.ARROW) ?: return
-    if (itemArrow.pierceLevel == 1.toByte()) {
-        stack.components.set(ItemComponentTypes.ARROW, ItemArrow.of(1))
-    }
 
     // 设置免疫火焰 (对应原版组件: `minecraft:fire_resistant`)
     val fireResistant: FireResistant? = stack.components.get(ItemComponentTypes.FIRE_RESISTANT)
