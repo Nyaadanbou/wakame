@@ -22,8 +22,9 @@ import team.unnamed.hephaestus.bukkit.v1_20_R3.BukkitModelEngine_v1_20_R3
 internal const val RESOURCE_NAMESPACE = "wakame"
 internal const val RESOURCE_PACK_NAME = "wakame"
 internal const val RESOURCE_PACK_ZIP_NAME = "$RESOURCE_PACK_NAME.zip"
-internal const val GENERATED_RESOURCE_PACK_DIR = "generated/$RESOURCE_PACK_NAME"
-internal const val GENERATED_RESOURCE_PACK_ZIP_FILE = "generated/$RESOURCE_PACK_ZIP_NAME"
+internal const val RESOURCE_PACK_GENERATED_DIR = "generated"
+internal const val GENERATED_RESOURCE_PACK_DIR = "$RESOURCE_PACK_GENERATED_DIR/$RESOURCE_PACK_NAME"
+internal const val GENERATED_RESOURCE_PACK_ZIP_FILE = "$RESOURCE_PACK_GENERATED_DIR/$RESOURCE_PACK_ZIP_NAME"
 
 internal val RESOURCE_PACK_CONFIG by lazy { Configs.YAML["resourcepack.yml"] }
 

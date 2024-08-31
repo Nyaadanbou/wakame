@@ -18,10 +18,14 @@ import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.commandBuilder
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import kotlin.jvm.optionals.getOrNull
 
 object ResourcepackCommands : KoinComponent, CommandFactory<CommandSender> {
     private const val RESOURCEPACK_LITERAL = "resourcepack"
+
+    private val logger: Logger by inject()
 
     override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> {
         return buildList {
@@ -37,9 +41,13 @@ object ResourcepackCommands : KoinComponent, CommandFactory<CommandSender> {
                     val sender = context.sender()
                     val manager = get<ResourcePackManager>()
 
-                    manager.generate()
-                        .onSuccess { sender.sendPlainMessage("Resourcepack has been generated successfully!") }
-                        .onFailure { sender.sendPlainMessage("Failed to generate resourcepack, check the console for more information.") }
+                    try {
+                        manager.generate()
+                    } catch (e: Throwable) {
+                        sender.sendPlainMessage("Failed to generate resourcepack, see console for details.")
+                        logger.error("Failed to generate resourcepack", e)
+                        return@suspendingHandler
+                    }
                 }
             }.buildAndAdd(this)
 

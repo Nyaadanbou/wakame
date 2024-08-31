@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.combinedProvider
-import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.util.PathChangeWatcher
 import com.sun.net.httpserver.HttpExchange
 import net.kyori.adventure.resource.ResourcePackInfo
 import net.kyori.adventure.resource.ResourcePackRequest
@@ -153,59 +151,60 @@ private class SelfHostService(
 ) : ResourcePackService, KoinComponent {
     private val logger: Logger by inject()
 
+    // Http 服务器监听的主机名
+    private val host: String by host
+
     // Http 服务器监听的端口
     private val port: Int by port
 
+    private val required: Boolean by required
+    private val prompt: Component by prompt
+
     // Http 服务器的 Executor
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private val executor: ExecutorService = Executors.newCachedThreadPool()
 
     // Http 服务器实例
-    private var server: ResourcePackServer? = null
+    private val server: ResourcePackServer = buildResourcePackServer()
 
     // 资源包请求, 将发送给玩家
-    private val resourcePackRequest: ResourcePackRequest by combinedProvider(
-        required, prompt, host, port
-    ).map { combined ->
-        // 构建下载链接
-        val host = combined.c
-        val port = combined.d
-        val hash = builtResourcePack?.hash() ?: return@map ResourcePackRequest.resourcePackRequest().build()
-        val downloadURL = if (port != 80) {
-            "http://$host:$port"
-        } else {
-            "http://$host"
+    private val resourcePackRequest: ResourcePackRequest
+        get() {
+            // 构建下载链接
+            val hash = builtResourcePack?.hash() ?: return ResourcePackRequest.resourcePackRequest().build()
+            val downloadURL = if (port != 80) {
+                "http://$host:$port"
+            } else {
+                "http://$host"
+            }
+
+            // 构建 ResourcePackInfo
+            val id = UUID.nameUUIDFromBytes(downloadURL.encodeToByteArray())
+            val uri = URI.create(downloadURL)
+            val packInfo = ResourcePackInfo.resourcePackInfo().id(id).uri(uri).hash(hash) // !!! 阻塞
+
+            // 构建 ResourcePackRequest
+            val request = ResourcePackRequest.resourcePackRequest()
+                .packs(packInfo)
+                .required(required)
+                .prompt(prompt)
+                .replace(true)
+                .build()
+
+            return request
         }
-
-        // 构建 ResourcePackInfo
-        val id = UUID.nameUUIDFromBytes(downloadURL.encodeToByteArray())
-        val uri = URI.create(downloadURL)
-        val packInfo = ResourcePackInfo.resourcePackInfo().id(id).uri(uri).hash(hash) // !!! 阻塞
-
-        // 构建 ResourcePackRequest
-        val required = combined.a
-        val prompt = combined.b
-        val request = ResourcePackRequest.resourcePackRequest()
-            .packs(packInfo)
-            .required(required)
-            .prompt(prompt)
-            .replace(true)
-            .build()
-
-        return@map request
-    }
 
     // 当前生成好的资源包
-    private val builtResourcePack: BuiltResourcePack? by ReloadableProperty {
-        val file = get<File>(named(PLUGIN_DATA_DIR)).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
-        if (!file.exists() || !file.isFile) {
-            logger.warn("Resource pack file not found at: '${file.path}'. No resource pack will be sent to players.")
-            return@ReloadableProperty null
-        }
-        val hash = computeHash(file)
-        val data = Writable.file(file)
+    private var builtResourcePack: BuiltResourcePack? = buildResourcePack()
 
-        BuiltResourcePack.of(data, hash)
-    }
+    private val watcher: PathChangeWatcher = PathChangeWatcher(
+        directory = get<File>(named(PLUGIN_DATA_DIR)).resolve(RESOURCE_PACK_GENERATED_DIR).toPath(),
+        specificFile = get<File>(named(PLUGIN_DATA_DIR)).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE).toPath(),
+        executor = executor,
+        onFileChange = {
+            logger.info("Resource pack file changed. Reloading resource pack.")
+            builtResourcePack = buildResourcePack()
+        }
+    )
 
     private fun handleRequest(request: ResourcePackDownloadRequest?, exchange: HttpExchange) {
         // request == null 的情况一般就是用浏览器直接下载资源包.
@@ -258,6 +257,18 @@ private class SelfHostService(
         return bytes.joinToString("") { "%02x".format(it) }
     }
 
+    private fun buildResourcePack(): BuiltResourcePack? {
+        val file = get<File>(named(PLUGIN_DATA_DIR)).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+        if (!file.exists() || !file.isFile) {
+            logger.warn("Resource pack file not found at: '${file.path}'. No resource pack will be sent to players.")
+            return null
+        }
+        val hash = computeHash(file)
+        val data = Writable.file(file)
+
+        return BuiltResourcePack.of(data, hash)
+    }
+
     private fun buildResourcePackServer(): ResourcePackServer =
         ResourcePackServer.server().apply {
 
@@ -274,13 +285,14 @@ private class SelfHostService(
 
     override fun start() {
         logger.info("Starting resource pack http server. Port: $port")
-        server = buildResourcePackServer()
-        server?.start()
+        watcher.watch()
+        server.start()
     }
 
     override fun stop() {
         logger.info("Stopping resource pack http server. Port: $port")
-        server?.stop(0)
+        watcher.stop()
+        server.stop(0)
     }
 
     override fun sendPack(player: Player) {
@@ -299,31 +311,33 @@ private class OnlyURLService(
     downloadURL: Provider<String>,
 ) : ResourcePackService, KoinComponent {
     private val logger: Logger by inject()
-    private val resourcePackRequest: ResourcePackRequest by combinedProvider(
-        required, prompt, downloadURL
-    ).map { combined ->
-        // 构建 ResourcePackInfo
-        val id = UUID.nameUUIDFromBytes(combined.c.encodeToByteArray())
-        val uri = URI.create(combined.c)
-        val packInfo = try {
-            ResourcePackInfo.resourcePackInfo().id(id).uri(uri).computeHashAndBuild().get(10, TimeUnit.SECONDS)
-        } catch (e: Exception) {
-            logger.error("Failed to compute hash for resource pack: '${combined.c}'. No resource pack will be sent to players.", e)
-            // 返回一个空的 ResourcePackRequest
-            return@map ResourcePackRequest.resourcePackRequest().build()
-        }
 
-        // 构建 ResourcePackRequest
-        val required = combined.a
-        val prompt = combined.b
-        val request = ResourcePackRequest.resourcePackRequest()
-            .packs(packInfo)
-            .required(required)
-            .prompt(prompt)
-            .replace(true)
-            .build()
-        request
-    }
+    private val required: Boolean by required
+    private val prompt: Component by prompt
+    private val downloadURL: String by downloadURL
+
+    private val resourcePackRequest: ResourcePackRequest
+        get() {
+            // 构建 ResourcePackInfo
+            val id = UUID.nameUUIDFromBytes(downloadURL.encodeToByteArray())
+            val uri = URI.create(downloadURL)
+            val packInfo = try {
+                ResourcePackInfo.resourcePackInfo().id(id).uri(uri).computeHashAndBuild().get(10, TimeUnit.SECONDS)
+            } catch (e: Exception) {
+                logger.error("Failed to compute hash for resource pack: '$downloadURL'. No resource pack will be sent to players.", e)
+                // 返回一个空的 ResourcePackRequest
+                return ResourcePackRequest.resourcePackRequest().build()
+            }
+
+            // 构建 ResourcePackRequest
+            val request = ResourcePackRequest.resourcePackRequest()
+                .packs(packInfo)
+                .required(required)
+                .prompt(prompt)
+                .replace(true)
+                .build()
+            return request
+        }
 
     override fun start() = Unit // do nothing
     override fun stop() = Unit // do nothing

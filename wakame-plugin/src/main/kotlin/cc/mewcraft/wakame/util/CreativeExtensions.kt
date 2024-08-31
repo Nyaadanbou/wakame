@@ -12,13 +12,23 @@ import java.io.UncheckedIOException
 import java.nio.file.Path
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
-import kotlin.io.path.outputStream
+import kotlin.io.path.*
 
-fun ResourcePackWriter<FileTreeWriter>.writeToZipFile(path: Path, resourcePack: ResourcePack) {
+fun ResourcePackWriter<FileTreeWriter>.writeToZipFile(
+    path: Path,
+    tempPath: Path = path,
+    resourcePack: ResourcePack,
+) {
     try {
-        ZipOutputStream(path.outputStream().buffered()).use { outputStream ->
+        if (!tempPath.exists()) {
+            tempPath.parent.createDirectories()
+            tempPath.createFile()
+        }
+        ZipOutputStream(tempPath.outputStream().buffered()).use { outputStream ->
             write(FileTreeWriter.zip(outputStream), resourcePack)
         }
+        // Move the temporary file to the target path
+        tempPath.moveTo(path, true)
     } catch (e: FileNotFoundException) {
         throw IllegalStateException("Failed to write resource pack to zip file: File not found: $path", e)
     } catch (e: IOException) {
@@ -26,8 +36,17 @@ fun ResourcePackWriter<FileTreeWriter>.writeToZipFile(path: Path, resourcePack: 
     }
 }
 
-fun ResourcePackWriter<FileTreeWriter>.writeToDirectory(directory: File, resourcePack: ResourcePack) {
-    write(FileTreeWriter.directory(directory), resourcePack)
+fun ResourcePackWriter<FileTreeWriter>.writeToDirectory(
+    directory: File,
+    tempDir: File = directory,
+    resourcePack: ResourcePack,
+) {
+    if (!tempDir.exists()) {
+        tempDir.mkdirs()
+    }
+    write(FileTreeWriter.directory(tempDir), resourcePack)
+    // Move the temporary directory to the target directory
+    tempDir.toPath().moveTo(directory.toPath(), true)
 }
 
 /**

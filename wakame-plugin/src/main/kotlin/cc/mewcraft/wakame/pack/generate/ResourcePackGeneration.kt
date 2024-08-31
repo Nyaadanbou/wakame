@@ -60,7 +60,11 @@ internal class ResourcePackIconGeneration(
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
     override fun generate() {
-        context.pack.icon(Writable.file(assetsDir.resolve("logo.png")))
+        val icon = assetsDir.resolve("logo.png")
+        if (!icon.exists()) {
+            return
+        }
+        context.pack.icon(Writable.file(icon))
     }
 }
 

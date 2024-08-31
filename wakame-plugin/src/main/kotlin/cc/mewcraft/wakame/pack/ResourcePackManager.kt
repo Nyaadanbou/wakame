@@ -18,15 +18,12 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import team.unnamed.creative.ResourcePack
-import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.ResourcePackWriter
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
-import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeWriter
 import java.io.File
 
 internal class ResourcePackManager(
-    private val packReader: ResourcePackReader<FileTreeReader>,
     private val packWriter: ResourcePackWriter<FileTreeWriter>,
 ) : KoinComponent {
     private val logger: Logger by inject()
@@ -38,79 +35,57 @@ internal class ResourcePackManager(
      *
      * @return 包含生成是否成功的结果
      */
-    fun generate(): Result<Unit> {
-        val resourcePackFile = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
-        val resourcePackDirectory = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_DIR)
-        val initializerArguments = InitializerArguments(resourcePackFile, resourcePackDirectory, packReader)
-
-        val resourcePackResult = runCatching {
-            ResourcePackInitializer.chain(
-                ZipResourcePackInitializer(initializerArguments),
-                DirResourcePackInitializer(initializerArguments)
-            ).initialize()
-        }
-
-        val isEmptyPack = resourcePackResult.exceptionOrNull() is NoSuchResourcePackException
-
-        // Read the resource pack from the file.
-        // The resource pack may be empty if it's
-        // the first time to generate.
-        val resourcePack = ResourcePack.resourcePack()
-
-        if (!isEmptyPack) {
-            resourcePackFile.deleteRecursively()
-            resourcePackDirectory.deleteRecursively()
-        }
-
-        val context = GenerationContext(
-            description = generationSettings.description,
-            format = generationSettings.format,
-            min = generationSettings.min,
-            max = generationSettings.max,
-            pack = resourcePack,
-            assets = AssetsLookup.allAssets
-        )
-
-        // Generate the resource pack
-        val generations: List<ResourcePackGeneration> = listOf(
-            ResourcePackMetaGeneration(context),
-            ResourcePackIconGeneration(context),
-            ResourcePackRegistryModelGeneration(context),
-            ResourcePackCustomModelGeneration(context),
-            ResourcePackExternalGeneration(context),
-            ResourcePackModelSortGeneration(context)
-        )
-
+    fun generate() {
+        val tempDir = pluginDataDirectory.resolve("temp").apply { mkdirs() }
         try {
-            generations.forEach { it.generate() }
-        } catch (t: Throwable) {
-            logger.warn("Failed to generate resourcepack", t)
-            if (t !is ResourcePackExternalGeneration.GenerationCancelledException) {
-                return Result.failure(t)
+            val resourcePackFile = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+            val resourcePackDirectory = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_DIR)
+
+            resourcePackFile.delete()
+            resourcePackDirectory.deleteRecursively()
+
+            val resourceTempFile = tempDir.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+            val resourceTempDir = tempDir.resolve(GENERATED_RESOURCE_PACK_DIR)
+
+            val resourcePack = ResourcePack.resourcePack()
+            val context = GenerationContext(
+                description = generationSettings.description,
+                format = generationSettings.format,
+                min = generationSettings.min,
+                max = generationSettings.max,
+                pack = resourcePack,
+                assets = AssetsLookup.allAssets
+            )
+
+            // Generate the resource pack
+            val generations: List<ResourcePackGeneration> = listOf(
+                ResourcePackMetaGeneration(context),
+                ResourcePackIconGeneration(context),
+                ResourcePackRegistryModelGeneration(context),
+                ResourcePackCustomModelGeneration(context),
+                ResourcePackExternalGeneration(context),
+                ResourcePackModelSortGeneration(context)
+            )
+
+            try {
+                generations.forEach { it.generate() }
+            } catch (t: Throwable) {
+                logger.warn("Failed to generate resourcepack", t)
             }
-        }
 
-        // Write the resource pack to the file
-        runCatching {
-            packWriter.writeToZipFile(resourcePackFile.toPath(), resourcePack)
-            packWriter.writeToDirectory(resourcePackDirectory, resourcePack)
-        }.getOrElse {
-            return Result.failure(it)
-        }
+            // Write the resource pack to the file
 
-        logger.info("Resource pack has been generated.")
+            packWriter.writeToZipFile(path = resourcePackFile.toPath(), tempPath = resourceTempFile.toPath(), resourcePack = resourcePack)
+            packWriter.writeToDirectory(directory = resourcePackDirectory, tempDir = resourceTempDir, resourcePack = resourcePack)
 
-
-        // Build the resource pack
-        runCatching {
+            logger.info("Resource pack has been generated.")
+            // Build the resource pack to ensure it's valid
             MinecraftResourcePackWriter.minecraft().build(resourcePack)
-        }.getOrElse {
-            return Result.failure(it)
+
+            logger.info("Resource pack has been generated. Size: ${resourcePackFile.formatSize()}")
+        } finally {
+            tempDir.deleteRecursively()
         }
-
-        logger.info("Resource pack has been generated. Size: ${resourcePackFile.formatSize()}")
-
-        return Result.success(Unit)
     }
 }
 
