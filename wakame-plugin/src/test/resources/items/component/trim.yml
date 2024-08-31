@@ -2,4 +2,6 @@ item_type: bedrock
 
 # 盔甲纹饰. 对应原版组件: https://minecraft.wiki/w/Data_component_format#trim
 trim:
+  pattern: minecraft:sentry
+  material: minecraft:quartz
   show_in_tooltip: false
