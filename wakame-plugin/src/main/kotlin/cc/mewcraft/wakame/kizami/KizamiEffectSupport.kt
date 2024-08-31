@@ -20,8 +20,6 @@ import java.lang.reflect.Type
  */
 data object EmptyKizamiEffect : KizamiEffect {
     override val effects: List<KizamiEffect.Single<*>> = emptyList()
-    override fun apply(kizami: Kizami, user: User<*>) {}
-    override fun remove(kizami: Kizami, user: User<*>) {}
 }
 
 /**
@@ -29,8 +27,8 @@ data object EmptyKizamiEffect : KizamiEffect {
  *
  * @property effects
  */
-data class ImmutableKizamiEffect(
-    override val effects: List<KizamiEffect.Single<*>>,
+data class SimpleKizamiEffect(
+    override val effects: List<KizamiEffect.Single<*>>
 ) : KizamiEffect
 
 /**
@@ -81,7 +79,7 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             }
         }
 
-        return ImmutableKizamiEffect(collection)
+        return SimpleKizamiEffect(collection)
     }
 }
 
@@ -91,11 +89,11 @@ object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
 data class KizamiSkill(
     override val effect: ConfiguredSkill,
 ) : KizamiEffect.Single<ConfiguredSkill> {
-    override fun apply(kizami: Kizami, user: User<*>) {
+    override fun apply(user: User<*>) {
         user.skillMap.addSkill(effect)
     }
 
-    override fun remove(kizami: Kizami, user: User<*>) {
+    override fun remove(user: User<*>) {
         user.skillMap.removeSkill(effect.key)
     }
 }
@@ -106,11 +104,11 @@ data class KizamiSkill(
 data class KizamiAttribute(
     override val effect: Map<Attribute, AttributeModifier>,
 ) : KizamiEffect.Single<Map<Attribute, AttributeModifier>> {
-    override fun apply(kizami: Kizami, user: User<*>) {
+    override fun apply(user: User<*>) {
         effect.forEach { (attribute, modifier) -> user.attributeMap.getInstance(attribute)?.addModifier(modifier) }
     }
 
-    override fun remove(kizami: Kizami, user: User<*>) {
+    override fun remove(user: User<*>) {
         effect.forEach { (attribute, modifier) -> user.attributeMap.getInstance(attribute)?.removeModifier(modifier) }
     }
 }
