@@ -14,15 +14,15 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 class ItemEntityDisplayPacketHandler : PacketListenerAbstract() {
 
-    private val teamEntityId2entityUniqueId: MutableMap<Int, UUID> = ConcurrentHashMap()
+    private val teamEntityId2entityUniqueId = Int2ObjectOpenHashMap<UUID>()
 
     override fun onPacketSend(event: PacketSendEvent) {
         if (event.player !is Player) return
