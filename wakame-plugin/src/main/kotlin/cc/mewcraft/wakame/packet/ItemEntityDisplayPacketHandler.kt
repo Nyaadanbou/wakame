@@ -31,11 +31,16 @@ class ItemEntityDisplayPacketHandler : PacketListenerAbstract() {
             PacketType.Play.Server.ENTITY_METADATA -> {
                 val origin = WrapperPlayServerEntityMetadata(event)
                 val entity = SpigotConversionUtil.getEntityById(null, origin.entityId) as? Item ?: return
-                if (sendGlowItemPacket(event, entity)) {
+
+                val entityData = createGlowItemEntityData(entity)
+                val itemNameTagPacket = createItemNameTagPacket(entity)
+                itemNameTagPacket?.let { entityData.add(it) }
+
+                if (entityData.isNotEmpty()) {
+                    val metadataPacket = WrapperPlayServerEntityMetadata(origin.entityId, entityData)
+                    event.user.sendPacketSilently(metadataPacket)
                     sendGlowColorPacket(event, entity)
                 }
-
-                sendItemNameTagPacket(event, entity)
             }
 
             PacketType.Play.Server.DESTROY_ENTITIES -> {
@@ -49,22 +54,25 @@ class ItemEntityDisplayPacketHandler : PacketListenerAbstract() {
         }
     }
 
-    private fun sendGlowItemPacket(event: PacketSendEvent, entity: Item): Boolean {
-        val nekoStack = entity.itemStack.tryNekoStack ?: return false
+    private fun createGlowItemEntityData(entity: Item): ArrayList<EntityData> {
+        val nekoStack = entity.itemStack.tryNekoStack ?: return arrayListOf()
         val itemComponents = nekoStack.components
         if (!itemComponents.has(ItemComponentTypes.GLOWABLE))
-            return false
+            return arrayListOf()
 
-        val metadataPacket = WrapperPlayServerEntityMetadata(
-            entity.entityId,
-            listOf(
-                EntityData(0, EntityDataTypes.BYTE, 0x40.toByte()),
-                EntityData(3, EntityDataTypes.BOOLEAN, true)
-            )
+        return arrayListOf(
+            EntityData(0, EntityDataTypes.BYTE, 0x40.toByte()),
+            EntityData(3, EntityDataTypes.BOOLEAN, true)
         )
+    }
 
-        event.user.sendPacketSilently(metadataPacket)
-        return true
+    private fun createItemNameTagPacket(entity: Item): EntityData? {
+        val itemStack = entity.itemStack
+        if (!itemStack.isNeko) {
+            return null
+        }
+
+        return EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(itemStack.backingItemName))
     }
 
     private fun sendGlowColorPacket(event: PacketSendEvent, entity: Item) {
@@ -76,22 +84,6 @@ class ItemEntityDisplayPacketHandler : PacketListenerAbstract() {
         val teamPacket = createTeamPacket(entity, rarityColor)
         teamEntityId2entityUniqueId[entity.entityId] = entity.uniqueId
         event.user.sendPacketSilently(teamPacket)
-    }
-
-    private fun sendItemNameTagPacket(event: PacketSendEvent, entity: Item) {
-        val itemStack = entity.itemStack
-        if (!itemStack.isNeko) {
-            return
-        }
-
-        val metadataPacket = WrapperPlayServerEntityMetadata(
-            entity.entityId,
-            listOf(
-                EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(itemStack.backingItemName))
-            )
-        )
-
-        event.user.sendPacketSilently(metadataPacket)
     }
 
     private fun createTeamPacket(itemEntity: Item, color: GlowColor): WrapperPlayServerTeams {
