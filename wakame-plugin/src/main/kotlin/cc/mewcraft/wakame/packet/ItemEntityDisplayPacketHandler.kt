@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.isNeko
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.rarity.GlowColor
+import cc.mewcraft.wakame.util.backingItemName
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
@@ -20,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ItemEntityDisplayPacketHandler : PacketListenerAbstract() {
 
-    private val entityId2entityUniqueId: MutableMap<Int, UUID> = ConcurrentHashMap()
+    private val teamEntityId2entityUniqueId: MutableMap<Int, UUID> = ConcurrentHashMap()
 
     override fun onPacketSend(event: PacketSendEvent) {
         if (event.player !is Player) return
@@ -29,40 +31,67 @@ class ItemEntityDisplayPacketHandler : PacketListenerAbstract() {
             PacketType.Play.Server.ENTITY_METADATA -> {
                 val origin = WrapperPlayServerEntityMetadata(event)
                 val entity = SpigotConversionUtil.getEntityById(null, origin.entityId) as? Item ?: return
-                val nekoStack = entity.itemStack.tryNekoStack ?: return
-                val itemComponents = nekoStack.components
-                if (!itemComponents.has(ItemComponentTypes.GLOWABLE))
-                    return
-                val rarityColor = itemComponents.get(ItemComponentTypes.RARITY)?.rarity?.glowColor
-                    ?.takeIf { it != GlowColor.empty() }
-                    ?: return
-
-                val metadataPacket = WrapperPlayServerEntityMetadata(
-                    entity.entityId,
-                    listOf(
-                        EntityData(0, EntityDataTypes.BYTE, 0x40.toByte()),
-                        EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(nekoStack.components.get(ItemComponentTypes.CUSTOM_NAME)?.rich)),
-                        EntityData(3, EntityDataTypes.BOOLEAN, true)
-                    )
-                )
-                val teamPacket = createTeamPacket(entity, rarityColor)
-                entityId2entityUniqueId[entity.entityId] = entity.uniqueId
-
-                with(event.user) {
-                    sendPacketSilently(metadataPacket)
-                    sendPacketSilently(teamPacket)
+                if (sendGlowItemPacket(event, entity)) {
+                    sendGlowColorPacket(event, entity)
                 }
+
+                sendItemNameTagPacket(event, entity)
             }
 
             PacketType.Play.Server.DESTROY_ENTITIES -> {
                 val origin = WrapperPlayServerDestroyEntities(event)
                 origin.entityIds
                     .asSequence()
-                    .mapNotNull { entityId2entityUniqueId.remove(it) }
+                    .mapNotNull { teamEntityId2entityUniqueId.remove(it) }
                     .map { removeTeamPacket(it) }
                     .forEach { event.user.sendPacketSilently(it) }
             }
         }
+    }
+
+    private fun sendGlowItemPacket(event: PacketSendEvent, entity: Item): Boolean {
+        val nekoStack = entity.itemStack.tryNekoStack ?: return false
+        val itemComponents = nekoStack.components
+        if (!itemComponents.has(ItemComponentTypes.GLOWABLE))
+            return false
+
+        val metadataPacket = WrapperPlayServerEntityMetadata(
+            entity.entityId,
+            listOf(
+                EntityData(0, EntityDataTypes.BYTE, 0x40.toByte()),
+                EntityData(3, EntityDataTypes.BOOLEAN, true)
+            )
+        )
+
+        event.user.sendPacketSilently(metadataPacket)
+        return true
+    }
+
+    private fun sendGlowColorPacket(event: PacketSendEvent, entity: Item) {
+        val nekoStack = entity.itemStack.tryNekoStack ?: return
+        val itemComponents = nekoStack.components
+        val rarityColor = itemComponents.get(ItemComponentTypes.RARITY)?.rarity?.glowColor
+            ?.takeIf { it != GlowColor.empty() }
+            ?: return
+        val teamPacket = createTeamPacket(entity, rarityColor)
+        teamEntityId2entityUniqueId[entity.entityId] = entity.uniqueId
+        event.user.sendPacketSilently(teamPacket)
+    }
+
+    private fun sendItemNameTagPacket(event: PacketSendEvent, entity: Item) {
+        val itemStack = entity.itemStack
+        if (!itemStack.isNeko) {
+            return
+        }
+
+        val metadataPacket = WrapperPlayServerEntityMetadata(
+            entity.entityId,
+            listOf(
+                EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(itemStack.backingItemName))
+            )
+        )
+
+        event.user.sendPacketSilently(metadataPacket)
     }
 
     private fun createTeamPacket(itemEntity: Item, color: GlowColor): WrapperPlayServerTeams {
