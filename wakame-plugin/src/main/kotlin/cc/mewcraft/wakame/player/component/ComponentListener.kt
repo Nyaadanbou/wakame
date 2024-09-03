@@ -16,7 +16,7 @@ class ComponentListener : Listener {
      * 实现 [cc.mewcraft.wakame.item.components.ItemArrow] 组件的下列功能:
      * 穿透
      * 拾取
-     * 视觉着火
+     * 箭矢着火时间
      * 发光时间
      */
     @EventHandler
@@ -30,7 +30,7 @@ class ComponentListener : Listener {
         val itemArrow = nekoStack.templates.get(ItemTemplateTypes.ARROW) ?: return
         projectile.pierceLevel = itemArrow.pierceLevel
         projectile.pickupStatus = itemArrow.pickupStatus
-        projectile.isVisualFire = itemArrow.hasVisualFire
+        projectile.fireTicks = itemArrow.fireTicks
 
 
         if (projectile is SpectralArrow) {
@@ -40,8 +40,8 @@ class ComponentListener : Listener {
 
     /**
      * 实现 [cc.mewcraft.wakame.item.components.ItemArrow] 组件的下列功能:
-     * 着火时间
-     * 冰冻时间
+     * 命中着火时间
+     * 命中冰冻时间
      */
     @EventHandler
     fun on(event: ProjectileHitEvent) {
@@ -52,7 +52,7 @@ class ComponentListener : Listener {
 
         val nekoStack = projectile.itemStack.tryNekoStack ?: return
         val itemArrow = nekoStack.templates.get(ItemTemplateTypes.ARROW) ?: return
-        if (hitEntity.fireTicks < itemArrow.fireTicks) hitEntity.fireTicks = itemArrow.fireTicks
-        if (hitEntity.freezeTicks < itemArrow.frozenTicks) hitEntity.freezeTicks = itemArrow.frozenTicks
+        if (hitEntity.fireTicks < itemArrow.hitFireTicks) hitEntity.fireTicks = itemArrow.hitFireTicks
+        if (hitEntity.freezeTicks < itemArrow.hitFrozenTicks) hitEntity.freezeTicks = itemArrow.hitFrozenTicks
     }
 }
