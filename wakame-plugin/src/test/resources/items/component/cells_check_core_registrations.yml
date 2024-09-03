@@ -116,10 +116,6 @@ cells:
             lower: 20
             upper: 30
             weight: 1
-          # 通用元素百分比伤害
-          - type: attribute:universal_attack_damage_rate
-            value: 0.0
-            weight: 1
           # 通用元素防御
           - type: attribute:universal_defense
             value: 0.0
@@ -130,10 +126,6 @@ cells:
             weight: 1
           # 通用元素防御穿透率
           - type: attribute:universal_defense_penetration_rate
-            value: 0.0
-            weight: 1
-          # 通用元素承伤百分比
-          - type: attribute:universal_incoming_damage_rate
             value: 0.0
             weight: 1
         all_skills:
