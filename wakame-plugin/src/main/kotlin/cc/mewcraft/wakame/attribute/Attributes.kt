@@ -50,7 +50,6 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     val UNIVERSAL_DEFENSE_PENETRATION_RATE = RangedAttribute("universal_defense_penetration_rate", .0, 0.0, 1.0).register()
     val UNIVERSAL_MAX_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_max_attack_damage", .0, .0, 16384.0).register()
     val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_min_attack_damage", .0, .0, 16384.0).register()
-    val UNIVERSAL_ATTACK_DAMAGE_RATE = RangedAttribute("universal_attack_damage_rate", .0, -1.0, 16384.0).register()
     val UNIVERSAL_INCOMING_DAMAGE_RATE = RangedAttribute("universal_incoming_damage_rate", .0, -1.0, 16384.0).register()
     //</editor-fold>
 
@@ -114,8 +113,8 @@ class ElementAttributes internal constructor(
     val DEFENSE_PENETRATION_RATE = ElementAttribute("defense_penetration_rate", .0, .0, 1.0, ELEMENT).register()
     val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, ELEMENT).register()
     val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, ELEMENT).register()
-    val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", .0, -1.0, 16384.0, ELEMENT).register()
-    val INCOMING_DAMAGE_RATE = ElementAttribute("incoming_damage_rate", .0, -1.0, 16384.0, ELEMENT).register()
+    val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, ELEMENT).register()
+    val INCOMING_DAMAGE_RATE = ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, ELEMENT).register()
 
     /**
      * Gets all the [ElementAttribute] instances by the [facadeId].

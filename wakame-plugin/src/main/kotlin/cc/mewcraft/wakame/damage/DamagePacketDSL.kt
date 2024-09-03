@@ -2,11 +2,7 @@
 
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeMapLike
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ElementAttribute
-import cc.mewcraft.wakame.attribute.ElementAttributes
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.ElementRegistry
 import org.koin.core.component.KoinComponent
@@ -249,7 +245,7 @@ class DamagePacketDSL(
         override val element: Element, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
-            return value { ATTACK_DAMAGE_RATE } + value(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE)
+            return value { ATTACK_DAMAGE_RATE }
         }
     }
 

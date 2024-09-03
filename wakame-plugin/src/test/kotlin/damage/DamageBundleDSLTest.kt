@@ -86,7 +86,6 @@ class DamageBundleDSLTest : KoinTest {
         every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "defense_penetration_rate" }) } returns 0.1
         every { attriMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) } returns 2.0
         every { attriMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) } returns 2.0
-        every { attriMap.getValue(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE) } returns 0.1
         every { attriMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION) } returns 1.0
         every { attriMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE) } returns 0.1
     }
@@ -103,7 +102,7 @@ class DamageBundleDSLTest : KoinTest {
             every {
                 min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
                 max { value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
-                rate { value { ATTACK_DAMAGE_RATE } + value(Attributes.UNIVERSAL_ATTACK_DAMAGE_RATE) }
+                rate { value { ATTACK_DAMAGE_RATE } }
                 defensePenetration { value { DEFENSE_PENETRATION } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION) }
                 defensePenetrationRate { value { DEFENSE_PENETRATION_RATE } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE) }
             }
