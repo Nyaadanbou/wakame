@@ -5,13 +5,8 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeComponent
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ElementAttribute
-import cc.mewcraft.wakame.attribute.ElementAttributes
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.derive
@@ -20,22 +15,10 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeR
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeRE
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeS
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeSE
-import cc.mewcraft.wakame.item.components.cells.template.cores.attribute.TemplateCoreAttribute
-import cc.mewcraft.wakame.item.components.cells.template.cores.attribute.TemplateCoreAttributeR
-import cc.mewcraft.wakame.item.components.cells.template.cores.attribute.TemplateCoreAttributeRE
-import cc.mewcraft.wakame.item.components.cells.template.cores.attribute.TemplateCoreAttributeS
-import cc.mewcraft.wakame.item.components.cells.template.cores.attribute.TemplateCoreAttributeSE
+import cc.mewcraft.wakame.item.components.cells.cores.attribute.*
+import cc.mewcraft.wakame.item.components.cells.template.cores.attribute.*
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
-import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.RandomizedValue
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.toStableDouble
+import cc.mewcraft.wakame.util.*
 import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -171,8 +154,6 @@ object AttributeRegistry : Initializable {
         +buildFacade("universal_defense").single().bind { UNIVERSAL_DEFENSE }
         +buildFacade("universal_defense_penetration").single().bind { UNIVERSAL_DEFENSE_PENETRATION }
         +buildFacade("universal_defense_penetration_rate").single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
-        +buildFacade("universal_attack_damage_rate").single().bind { UNIVERSAL_ATTACK_DAMAGE_RATE }
-        +buildFacade("universal_incoming_damage_rate").single().bind { UNIVERSAL_INCOMING_DAMAGE_RATE }
     }
 
     override fun onPreWorld() {
