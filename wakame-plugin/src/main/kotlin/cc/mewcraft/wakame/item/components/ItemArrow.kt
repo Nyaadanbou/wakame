@@ -13,6 +13,7 @@ import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.bukkit.entity.AbstractArrow.PickupStatus
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 
 
 // 开发日记: 2024/6/25 小米
@@ -138,21 +139,19 @@ interface ItemArrow : Examinable {
          */
         val pickupStatus: PickupStatus,
         /**
-         * 击中实体造成的着火时间.
+         * 箭矢本身的着火时间.
          */
         val fireTicks: Int,
         /**
-         * 箭是否视觉上正在着火.
-         * 为true时无论箭矢是否真正着火均显示着火.
-         * 为false时根据箭矢真正的着火情况来显示.
+         * 击中实体造成的着火时间.
          */
-        val hasVisualFire: Boolean,
+        val hitFireTicks: Int,
         /**
          * 击中实体造成的冰冻时间.
          * 原版细雪的冰冻效果.
          * (当实体在细雪中时每刻增加1, 离开细雪则每刻减少2)
          */
-        val frozenTicks: Int,
+        val hitFrozenTicks: Int,
         /**
          * 击中实体造成的发光时间.
          * 仅在箭矢是光灵箭时有效.
@@ -176,10 +175,10 @@ interface ItemArrow : Examinable {
          * ```yaml
          * <node>:
          *   pierce_level: <int>
-         *   pick_up_status: <int>
+         *   pick_up_status: <enum>
          *   fire_ticks: <int>
-         *   has_visual_fire: <boolean>
-         *   frozen_ticks: <int>
+         *   hit_fire_ticks: <int>
+         *   hit_frozen_ticks: <int>
          *   glow_ticks: <int>
          * ```
          */
@@ -187,28 +186,15 @@ interface ItemArrow : Examinable {
             val pierceLevel = node.node("pierce_level").getInt(0).apply {
                 require(this >= 0) { "Arrow pierce level should not less than 0" }
             }
-            val pickUp = node.node("pick_up_status").getInt(1).apply {
-                require(this in 0..2) { "Arrow pick up status should be 0, 1 or 2" }
-            }
-            val pickupStatus = when (pickUp) {
-                0 -> {
-                    PickupStatus.DISALLOWED
-                }
-
-                1 -> {
-                    PickupStatus.ALLOWED
-                }
-
-                else -> {
-                    PickupStatus.CREATIVE_ONLY
-                }
-            }
-            val fireTick = node.node("fire_ticks").getInt(0).apply {
+            val pickupStatus = node.node("pick_up_status").get<PickupStatus>(PickupStatus.ALLOWED)
+            val fireTicks = node.node("fire_ticks").getInt(0).apply {
                 require(this >= 0) { "Arrow fire ticks should not less than 0" }
             }
-            val hasVisualFire = node.node("has_visual_fire").getBoolean(false)
-            val frozenTick = node.node("frozen_ticks").getInt(0).apply {
-                require(this >= 0) { "Arrow frozen ticks should not less than 0" }
+            val hitFireTicks = node.node("hit_fire_ticks").getInt(0).apply {
+                require(this >= 0) { "Arrow hit fire ticks should not less than 0" }
+            }
+            val hitFrozenTicks = node.node("hit_frozen_ticks").getInt(0).apply {
+                require(this >= 0) { "Arrow hit frozen ticks should not less than 0" }
             }
             val glowTick = node.node("glow_ticks").getInt(0).apply {
                 require(this >= 0) { "Arrow glow ticks should not less than 0" }
@@ -216,9 +202,9 @@ interface ItemArrow : Examinable {
             return Template(
                 pierceLevel = pierceLevel,
                 pickupStatus = pickupStatus,
-                fireTicks = fireTick,
-                hasVisualFire = hasVisualFire,
-                frozenTicks = frozenTick,
+                fireTicks = fireTicks,
+                hitFireTicks = hitFireTicks,
+                hitFrozenTicks = hitFrozenTicks,
                 glowTicks = glowTick
             )
         }
