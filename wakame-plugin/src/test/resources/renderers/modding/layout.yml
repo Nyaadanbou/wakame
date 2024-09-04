@@ -1,0 +1,34 @@
+# 控制定制台物品的 *渲染布局*.
+
+# FIXME 补充说明
+
+primary:
+  - component:attributable
+  - component:castable
+  - component:cells
+  - component:crate
+  - component:custom_name
+  - component:elements
+  - component:enchantments
+  - component:fire_resistant
+  - component:food
+  - component:glowable
+  - component:item_name
+  - component:kizamiz
+  - component:kizamiable
+  - component:lore
+  - component:portable_core
+  - component:skillful
+
+element:
+  - neutral
+  - fire
+  - water
+  - wind
+  - earth
+  - thunder
+
+operation:
+  - add
+  - multiply_base
+  - multiply_total

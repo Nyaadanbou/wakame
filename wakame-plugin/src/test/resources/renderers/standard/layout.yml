@@ -1,8 +1,7 @@
-# 渲染器
-#
-# 渲染器负责修改 ItemStack 的网络封包,
-# 将其组件 `minecraft:lore` 下的内容
-# 根据此配置文件定义的格式进行修改.
+# 控制标准物品的 *渲染布局*.
+
+# 标准物品也就是玩家平常看到的样子,
+# 例如背包里, 箱子里, 交易菜单等等.
 
 # 渲染布局
 #   定义什么内容应该出现在什么位置,
@@ -34,24 +33,33 @@
 #
 # _namespace:value_
 #   一个占位符, 用于指定特定内容(比如稀有度)的位置;
-#    如果占位符不存在, 但底层数据存在, 则最终不渲染
+#   如果占位符不存在, 但底层数据存在, 则最终不渲染
 primary:
-  - (default:'<!i><gray>无皮肤')meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
-  - (default:blank)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
-  - meta:damageable
-  - meta:attributable
-  - meta:kizamiable
-  - meta:skillful
-  - meta:castable
-  - (fixed:meta)<!i><aqua><b>通用 # 仅当下面存在 meta 命名空间下的内容时才渲染
-  - meta:crate
-  - meta:level
-  - meta:rarity
-  - meta:elements
-  - meta:kizamiz
-  - meta:arrow
-  - meta:lore
-  - (fixed:attribute)<!i><aqua><b>属性 # 仅当下面存在 attribute 命名空间下的内容时才渲染
+
+  # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
+  - (default:'无皮肤')component:skin
+
+  # 为其添加“默认值” - 当源数据不存在时，改用空行替换
+  - (default:blank)component:skin_owner
+
+  - component:damageable
+  - component:attributable
+  - component:kizamiable
+  - component:skillful
+  - component:castable
+
+  # 仅当下面存在 component 命名空间下的内容时才渲染
+  - (fixed:component)通用
+  - component:crate
+  - component:level
+  - component:rarity
+  - component:elements
+  - component:kizamiz
+  - component:arrow
+  - component:lore
+
+  # 仅当下面存在 attribute 命名空间下的内容时才渲染
+  - (fixed:attribute)属性
   - attribute:attack_damage
   - attribute:attack_damage_rate
   - attribute:attack_effect_chance
@@ -79,11 +87,15 @@ primary:
   - attribute:universal_defense_penetration
   - attribute:universal_defense_penetration_rate
   - attribute:universal_incoming_damage_rate
-  - (fixed:skill)<!i><aqua><b>技能 # 仅当下面存在 skill 命名空间下的内容时才渲染
+
+  # 仅当下面存在 skill 命名空间下的内容时才渲染
+  - (fixed:skill)技能
   - skill:blink
   - skill:frost
   - skill:leapfrog
-  - generic:empty # 空词条栏 (用于标记空词条栏的相对位置)
+
+  # 空词条栏 (用于标记空词条栏的相对位置)
+  - cells:empty
 
 # 元素排序
 # 同种属性, 不同元素标识, 都将按照此顺序渲染.

@@ -1,0 +1,131 @@
+# 设置合成站的物品 *渲染内容*.
+
+# 物品组件
+components:
+  # ✔ 正常渲染
+  attributable:
+    namespace: component
+    tooltip: "<!i>提供属性加成"
+
+  # FIXME 无用组件, 到时候移除
+  # ✔ 正常渲染
+  bow:
+    namespace: component
+    tooltip: "<!i>弓武器类型"
+
+  # ✔ 正常渲染
+  castable:
+    namespace: component
+    tooltip: "<!i>可以施放技能"
+
+  # ✔ 正常渲染
+  cells:
+    namespace: component
+    # 额外标签
+    # <min> 最小词条数量
+    # <max> 最大词条数量
+    tooltip: "<!i>词条数量: <min> - <max>"
+
+  # TODO 盲盒系统完成后再重新考虑
+  # ✔ 正常渲染
+  crate:
+    namespace: component
+
+  # ✔ 正常渲染
+  custom_name:
+    namespace: component
+    tooltip: "<!i><value>"
+
+  # ✔ 正常渲染
+  # 元素种类是随机的, 因此需要将所有可能的结果都显示出来.
+  elements:
+    namespace: component
+    # 额外标签
+    # <merged> 多个元素合并后的文本
+    # <single> 单个元素
+    tooltip:
+      merged: "<!i>可能的元素: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  # TODO 附魔系统完成后再重新考虑
+  # ✔ 正常渲染
+  enchantments:
+    namespace: component
+
+  # ✔ 正常渲染
+  fire_resistant:
+    namespace: component
+    tooltip: "<!i>物品免疫火焰"
+
+  # ✔ 正常渲染
+  # 原版 UI 不会显示物品的食物属性,
+  # 所以这部分渲染由萌芽系统提供.
+  food:
+    namespace: component
+    tooltip: "<!i>食物"
+
+  # ✔ 正常渲染
+  glowable:
+    namespace: component
+    tooltip: "<!i>可发光"
+
+  # ✔ 正常渲染
+  # 显示在“名字”上, 而不是“描述”里
+  item_name:
+    namespace: component
+    tooltip: "<value>"
+
+  # ✔ 正常渲染
+  # 铭刻种类是随机的, 因此需要将所有可能的结果都显示出来.
+  kizamiz:
+    namespace: component
+    # 额外标签
+    # <merged> 多个铭刻合并后的文本
+    # <single> 单个铭刻
+    tooltip:
+      merged: "<!i>可能的铭刻: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  # ✔ 正常渲染
+  kizamiable:
+    namespace: component
+    tooltip: "<!i>提供铭刻加成"
+
+  # ✔ 正常渲染
+  lore:
+    namespace: component
+    # 额外标签
+    # <line> 描述内容
+    tooltip:
+      line: "<!i><line>"
+      header: [ ]
+      bottom: [ ]
+
+  # ✔ 正常渲染
+  portable_core:
+    namespace: component
+    tooltip: "<!i><value>"
+
+  # ✔ 正常渲染
+  skillful:
+    namespace: component
+    tooltip: "<!i>提供技能加成"
+
+  # TODO 皮肤系统完成后再重新考虑
+  # ✔ 正常渲染
+  skin:
+    namespace: component
+    tooltip: "<!i>皮肤: <skin_name>"
+
+  # TODO 皮肤系统完成后再重新考虑
+  # ✔ 正常渲染
+  skin_owner:
+    namespace: component
+    tooltip: "<!i>皮肤所有者: <skin_owner_name>"
+
+  # TODO 附魔系统完成后再重新考虑
+  # ✔ 正常渲染
+  stored_enchantments:
+    namespace: component

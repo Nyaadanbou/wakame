@@ -1,0 +1,24 @@
+# 控制重造台物品的 *渲染布局*.
+
+# FIXME 补充说明
+
+primary:
+  - component:cells
+  - component:custom_name
+  - component:elements
+  - component:item_name
+  - component:level
+  - component:lore
+
+element:
+  - neutral
+  - fire
+  - water
+  - wind
+  - earth
+  - thunder
+
+operation:
+  - add
+  - multiply_base
+  - multiply_total
