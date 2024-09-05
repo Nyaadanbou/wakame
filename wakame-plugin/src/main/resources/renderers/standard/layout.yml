@@ -1,57 +1,25 @@
-# 渲染器
-#
-# 渲染器负责修改 ItemStack 的网络封包,
-# 将其组件 `minecraft:lore` 下的内容
-# 根据此配置文件定义的格式进行修改.
-
-# 渲染布局
-#   定义什么内容应该出现在什么位置,
-#   例如想让“攻击力”在“暴击概率”前面.
-#   由于内容可能根本不存在, 因此这里的位置都是相对的.
-#
-# 缺省值
-#   这里不一定要指定所有的占位符, 你可以省略任意的占位符.
-#   如果一个占位符没有写在这里, 则对应内容不会渲染出来.
-#
-# 主体排序
-# 定义各种内容的顺序.
-#
-# 语法说明:
-# (fixed)_文本内容或留空_
-#   始终渲染的内容
-#
-# (fixed:_namespace_)_文本内容或留空_
-#   仅当下面存在 namespace 命名空间下的内容时才渲染
-#
-# (fixed:*)_文本内容或留空_
-#   仅当下面存在任意命名空间下的内容时才渲染
-#
-# (default:'_文本内容_')_namespace:value_
-#   为其添加“默认值” - 当源数据不存在时，改用指定的文本内容替换
-#
-# (default:blank)_namespace:value_
-#   为其添加“默认值” - 当源数据不存在时，改用空行替换
-#
-# _namespace:value_
-#   一个占位符, 用于指定特定内容(比如稀有度)的位置;
-#    如果占位符不存在, 但底层数据存在, 则最终不渲染
 primary:
-  - (default:'<!i><gray>无皮肤')meta:skin # 为其添加“默认值” - 当源数据不存在时，改用 '<!i><gray无皮肤所有者>' 替换
-  - (default:blank)meta:skin_owner # 为其添加“默认值” - 当源数据不存在时，改用空行替换
-  - meta:damageable
-  - meta:attributable
-  - meta:kizamiable
-  - meta:skillful
-  - meta:castable
-  - (fixed:meta)<!i><aqua><b>通用 # 仅当下面存在 meta 命名空间下的内容时才渲染
-  - meta:crate
-  - meta:level
-  - meta:rarity
-  - meta:elements
-  - meta:kizamiz
-  - meta:arrow
-  - meta:lore
-  - (fixed:attribute)<!i><aqua><b>属性 # 仅当下面存在 attribute 命名空间下的内容时才渲染
+
+  - (default:'无皮肤')component:skin
+
+  - (default:blank)component:skin_owner
+
+  - component:damageable
+  - component:attributable
+  - component:kizamiable
+  - component:skillful
+  - component:castable
+
+  - (fixed:component)通用
+  - component:crate
+  - component:level
+  - component:rarity
+  - component:elements
+  - component:kizamiz
+  - component:arrow
+  - component:lore
+
+  - (fixed:attribute)属性
   - attribute:attack_damage
   - attribute:attack_damage_rate
   - attribute:attack_effect_chance
@@ -79,17 +47,14 @@ primary:
   - attribute:universal_defense_penetration
   - attribute:universal_defense_penetration_rate
   - attribute:universal_incoming_damage_rate
-  - (fixed:skill)<!i><aqua><b>技能 # 仅当下面存在 skill 命名空间下的内容时才渲染
+
+  - (fixed:skill)技能
   - skill:blink
   - skill:frost
   - skill:leapfrog
-  - generic:empty # 空词条栏 (用于标记空词条栏的相对位置)
 
-# 元素排序
-# 同种属性, 不同元素标识, 都将按照此顺序渲染.
-#
-# 语法说明:
-#   元素的唯一标识
+  - component:cells/empty
+
 element:
   - neutral
   - fire
@@ -98,11 +63,6 @@ element:
   - earth
   - thunder
 
-# 运算模式排序
-# 同种属性, 不同运算模式, 都将按照此顺序渲染.
-#
-# 语法说明:
-#   运算模式的唯一标识
 operation:
   - add
   - multiply_base

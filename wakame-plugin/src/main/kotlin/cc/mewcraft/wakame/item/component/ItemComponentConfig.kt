@@ -2,15 +2,12 @@ package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
-import cc.mewcraft.wakame.config.derive
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.wakame.config.*
 import cc.mewcraft.wakame.display.RendererConfigReloadEvent
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
-import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList

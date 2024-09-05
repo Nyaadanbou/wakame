@@ -1,0 +1,92 @@
+components:
+  attributable:
+    namespace: component
+    tooltip: "提供属性加成"
+
+  # FIXME 无用组件, 到时候移除
+  bow:
+    namespace: component
+    tooltip: "弓武器类型"
+
+  castable:
+    namespace: component
+    tooltip: "可以施放技能"
+
+  cells:
+    namespace: component
+    tooltip: "词条数量: <min> - <max>"
+
+  crate:
+    namespace: component
+
+  custom_name:
+    namespace: component
+    tooltip: "<value>"
+
+  elements:
+    namespace: component
+    tooltip:
+      merged: "可能的元素: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  # TODO 附魔系统完成后再重新考虑
+  enchantments:
+    namespace: component
+
+  fire_resistant:
+    namespace: component
+    tooltip: "物品免疫火焰"
+
+  food:
+    namespace: component
+    tooltip: "食物"
+
+  glowable:
+    namespace: component
+    tooltip: "可发光"
+
+  item_name:
+    namespace: component
+    tooltip: "<value>"
+
+  kizamiz:
+    namespace: component
+    tooltip:
+      merged: "可能的铭刻: <merged>"
+      single: "<single>"
+      separator: ", "
+
+  kizamiable:
+    namespace: component
+    tooltip: "提供铭刻加成"
+
+  lore:
+    namespace: component
+    tooltip:
+      line: "<line>"
+      header: [ ]
+      bottom: [ ]
+
+  portable_core:
+    namespace: component
+    tooltip: "<value>"
+
+  skillful:
+    namespace: component
+    tooltip: "提供技能加成"
+
+  # TODO 皮肤系统完成后再重新考虑
+  skin:
+    namespace: component
+    tooltip: "皮肤: <skin_name>"
+
+  # TODO 皮肤系统完成后再重新考虑
+  skin_owner:
+    namespace: component
+    tooltip: "皮肤所有者: <skin_owner_name>"
+
+  # TODO 附魔系统完成后再重新考虑
+  stored_enchantments:
+    namespace: component
+    tooltip: "<name> <level>"

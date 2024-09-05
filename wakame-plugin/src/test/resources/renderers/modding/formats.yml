@@ -2,6 +2,7 @@
 
 # 物品组件
 components:
+
   # ✔ 正常渲染
   # 这里只负责调整特殊的词条栏设置 (如空词条栏),
   # 其他词条栏 (如属性) 已委托到专门的配置文件.
@@ -10,9 +11,11 @@ components:
     # 最多可显示多少个空词条栏?
     max_visible_empty_cores: 10
     # *空词条栏* 的渲染格式
-    empty_core:
-      name: "<!i>空词条栏"
-      lore: "<!i>空词条栏"
+    empty_core: "<!i>空词条栏"
+    # *修改过的词条栏* 的渲染格式
+    modded_core: ""
+    # *未修改的词条栏* 的渲染格式
+    unmodded_core: "<dark_gray>"
 
   # ✔ 正常渲染
   custom_name:

@@ -3,161 +3,101 @@
 # 物品组件
 components:
 
-  # ✔ 正常渲染
-  attribute_modifiers:
-    namespace: component
-
-  # ✔ 正常渲染
   attributable:
     namespace: component
     tooltip: "<!i>提供属性加成"
 
-  # TODO 无实际用途, 待移除
-  # ✔ 正常渲染
-  bow:
-    namespace: component
-
-  # ✔ 正常渲染
-  can_break:
-    namespace: component
-
-  # ✔ 正常渲染
-  can_place_on:
-    namespace: component
-
-  # ✔ 正常渲染
   castable:
     namespace: component
     tooltip: "<!i>可以施放技能"
 
-  # ✔ 正常渲染
-  # 这里只负责调整特殊的词条栏设置 (如空词条栏),
-  # 其他词条栏 (如属性) 已委托到专门的配置文件.
   cells:
     namespace: component
-    # 最多可显示多少个空词条栏?
     max_visible_empty_cores: 10
-    # *空词条栏* 的渲染格式
     empty_core:
       name: "<!i>空词条栏"
       lore: "<!i>空词条栏"
 
   # TODO 盲盒系统完成后再重新考虑
-  # ✔ 正常渲染
   crate:
     namespace: component
     tooltip: "<!i>盲盒: <key>"
 
-  # ✔ 正常渲染
-  custom_model_data:
-    namespace: component
-
-  # ✔ 正常渲染
   custom_name:
     namespace: component
-    # 额外标签
-    # <rarity_name> 稀有度名字
-    # <rarity_style> 稀有度样式
     tooltip: "<!i><rarity_style><value>"
 
-  # ✔ 正常渲染
   elements:
     namespace: component
-    # 额外标签
-    # <merged> 多个元素合并后的文本
-    # <single> 单个元素
     tooltip:
       merged: "<!i>元素: <merged>"
       single: "<single>"
       separator: ", "
 
   # TODO 待附魔系统完成后再重新考虑
-  # ✔ 正常渲染
   enchantments:
     namespace: component
     tooltip: "<name> <level>"
 
-  # ✔ 正常渲染
   fire_resistant:
     namespace: component
     tooltip: "<!i>免疫火焰伤害"
 
-  # ✔ 正常渲染
   glowable:
     namespace: component
     tooltip: "可发光"
 
-  # ✔ 正常渲染
   item_name:
     namespace: component
-    # 额外标签
-    # <rarity_name> 稀有度名字
-    # <rarity_style> 稀有度样式
     tooltip: "<rarity_style><rarity_name> <value>"
 
-  # ✔ 正常渲染
   kizamiz:
     namespace: component
-    # 额外标签
-    # <merged> 多个铭刻合并后的文本
-    # <single> 单个铭刻
     tooltip:
       merged: "<!i>铭刻: <merged>"
       single: "<single>"
       separator: ", "
 
-  # ✔ 正常渲染
   kizamiable:
     namespace: component
     tooltip: "<!i>提供铭刻加成"
 
-  # ✔ 正常渲染
   level:
     namespace: component
     tooltip: "<!i>等级: <value>"
 
-  # ✔ 正常渲染
   lore:
     namespace: component
-    # 额外标签：
-    # <line> 描述内容
     tooltip:
       line: "<!i><line>"
       header: [ ] # 空列表代表完全没有，不代表空行
       bottom: [ ]
 
-  # ✔ 正常渲染
   max_damage:
     namespace: component
     tooltip: "<!i>最大耐久损耗: <max_damage>"
 
-  # ✔ 正常渲染
   portable_core:
     namespace: component
     tooltip: { } # 取决于核心
 
-  # ✔ 正常渲染
   rarity:
     namespace: component
     tooltip: "<!i>稀有度: <value>"
 
-  # ✔ 正常渲染
   skillful:
     namespace: component
     tooltip: "<!i>提供技能加成"
 
-  # ✔ 正常渲染
   skin:
     namespace: component
     tooltip: "<!i>皮肤: <skin_name>"
 
-  # ✔ 正常渲染
   skin_owner:
     namespace: component
     tooltip: "<!i>皮肤所有者: <skin_owner_name>"
 
   # TODO 待附魔系统完成后再重新考虑
-  # ✔ 正常渲染
   stored_enchantments:
     namespace: component
     tooltip: "<name> <level>"

@@ -40,7 +40,7 @@ renderers/
 
 ```nbtt
 "elements": {
-	raw: [1, 2, 3]
+    raw: [1, 2, 3]
 }
 ```
 

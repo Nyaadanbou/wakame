@@ -2,16 +2,14 @@ package item
 
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.derive
+import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import commonEnv
 import mainEnv
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.koin.core.context.loadKoinModules
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import org.koin.core.context.*
 import org.koin.test.KoinTest
 import org.spongepowered.configurate.kotlin.extensions.contains
 import testEnv

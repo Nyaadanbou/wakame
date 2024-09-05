@@ -1,18 +1,16 @@
-package cc.mewcraft.wakame.registry
+package cc.mewcraft.wakame.item.component
 
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.derive
+import cc.mewcraft.wakame.config.*
 import cc.mewcraft.wakame.display.RENDERERS_CONFIG_DIR
 import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.registry.*
 import org.koin.core.component.KoinComponent
 
 /**
  * 物品组件相关的注册表.
  */
-object ItemComponentRegistry : KoinComponent, Initializable {
+internal object ItemComponentRegistry : KoinComponent, Initializable {
 
     const val NODE_COMPONENTS = "components"
     const val RENDERER_SYSTEM_DESCRIPTOR_FILE = "$RENDERERS_CONFIG_DIR/<system>/descriptors.yml"

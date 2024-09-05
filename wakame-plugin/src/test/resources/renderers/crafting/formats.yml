@@ -2,6 +2,7 @@
 
 # 物品组件
 components:
+
   # ✔ 正常渲染
   attributable:
     namespace: component
@@ -129,3 +130,4 @@ components:
   # ✔ 正常渲染
   stored_enchantments:
     namespace: component
+    tooltip: "<name> <level>"

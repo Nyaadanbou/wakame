@@ -4,22 +4,10 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
-import cc.mewcraft.wakame.item.component.ItemComponentMap
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.backingCustomModelData
-import cc.mewcraft.wakame.util.backingCustomName
-import cc.mewcraft.wakame.util.backingItemName
-import cc.mewcraft.wakame.util.backingLore
-import cc.mewcraft.wakame.util.editNyaTag
-import cc.mewcraft.wakame.util.getCompoundOrNull
-import cc.mewcraft.wakame.util.nyaTag
-import cc.mewcraft.wakame.util.takeUnlessEmpty
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.unsafeNyaTag
-import cc.mewcraft.wakame.util.unsafeNyaTagOrThrow
+import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
@@ -455,11 +443,11 @@ internal object NekoStackSupport {
     }
 
     fun getComponents(stack: ItemStack): ItemComponentMap {
-        return ItemComponentMap.wrapStack(stack)
+        return ItemComponentMaps.wrapStack(stack)
     }
 
     fun getImmutableComponents(stack: ItemStack): ItemComponentMap {
-        return ItemComponentMap.unmodifiable(getComponents(stack))
+        return ItemComponentMaps.unmodifiable(getComponents(stack))
     }
 
     fun getTemplates(wakameTag: CompoundTag): ItemTemplateMap {

@@ -1,12 +1,8 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.crate.Crate
-import cc.mewcraft.wakame.item.component.ItemComponentMap
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationTrigger
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.component.ItemComponentMaps
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.user.User
 
 /**
@@ -56,14 +52,14 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         // 没 trigger 的 ctx
         val context = GenerationContext(GenerationTrigger.nop(), prototype.id, 0)
         // 获取 物品组件 的构建器
-        val componentMapBuilder = ItemComponentMap.builder()
+        val builder = ItemComponentMaps.builder()
 
         fun <T, S : ItemTemplate<T>> generate(type: ItemTemplateType<S>) {
             val template = prototype.templates.get(type) ?: return
             val generated = template.generate(context)
             if (!generated.isEmpty()) {
                 val value = generated.value
-                componentMapBuilder.set(template.componentType, value)
+                builder.set(template.componentType, value)
             }
         }
 
@@ -81,8 +77,8 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.LORE)
         generate(ItemTemplateTypes.CELLS)
 
-        val components = componentMapBuilder.build()
-        val immutableComponents = ItemComponentMap.unmodifiable(components)
+        val components = builder.build()
+        val immutableComponents = ItemComponentMaps.unmodifiable(components)
 
         val vanillaNekoStack = VanillaNekoStack(
             id = prototype.id,

@@ -1,17 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.display2.RendererSystemName
-import cc.mewcraft.wakame.item.ItemComponentConstants
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable

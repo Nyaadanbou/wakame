@@ -4,6 +4,7 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
+import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -255,7 +256,7 @@ private object EmptyNekoStack : NekoStack {
 
     override val slotGroup: ItemSlotGroup = prototype.slotGroup
 
-    override val components: ItemComponentMap = ItemComponentMap.empty()
+    override val components: ItemComponentMap = ItemComponentMaps.empty()
 
     override val templates: ItemTemplateMap = prototype.templates
 

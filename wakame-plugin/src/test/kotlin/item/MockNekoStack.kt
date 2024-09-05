@@ -1,10 +1,9 @@
 package item
 
-import cc.mewcraft.wakame.item.ItemSlotGroup
-import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
+import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
@@ -35,7 +34,7 @@ class MockNekoStack(
 
     override val slotGroup: ItemSlotGroup = prototype.slotGroup
 
-    override val components: ItemComponentMap = ItemComponentMap.builder().build()
+    override val components: ItemComponentMap = ItemComponentMaps.builder().build()
 
     override val templates: ItemTemplateMap = prototype.templates
 

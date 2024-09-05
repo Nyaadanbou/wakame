@@ -1,21 +1,14 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.util.editMeta
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.util.*
 import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ArmorMeta
 import org.bukkit.inventory.meta.trim.TrimMaterial
 import org.bukkit.inventory.meta.trim.TrimPattern
@@ -55,9 +48,9 @@ data class ArmorTrim(
             holder.item.editMeta<ArmorMeta> {
                 it.trim = org.bukkit.inventory.meta.trim.ArmorTrim(value.material, value.pattern)
                 if (value.showInTooltip) {
-                    it.removeItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ARMOR_TRIM)
+                    it.removeItemFlags(ItemFlag.HIDE_ARMOR_TRIM)
                 } else {
-                    it.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ARMOR_TRIM)
+                    it.addItemFlags(ItemFlag.HIDE_ARMOR_TRIM)
                 }
             }
         }

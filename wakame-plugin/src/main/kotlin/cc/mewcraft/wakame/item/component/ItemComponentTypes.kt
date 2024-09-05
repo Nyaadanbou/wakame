@@ -2,12 +2,11 @@ package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.registry.ItemComponentRegistry
 
 /**
  * 物品组件(wakame)的所有类型.
  */
-object ItemComponentTypes {
+internal object ItemComponentTypes {
     /**
      * 将物品作为箭矢.
      */
