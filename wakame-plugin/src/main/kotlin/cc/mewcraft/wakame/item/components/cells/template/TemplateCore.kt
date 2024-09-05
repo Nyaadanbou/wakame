@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.components.cells.template
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.config.configurate.TypeDeserializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
@@ -65,7 +65,7 @@ interface TemplateCore : Keyed, Examinable {
     fun generate(context: GenerationContext): Core
 }
 
-internal object TemplateCoreSerializer : TypeDeserializer<TemplateCore> {
+internal object TemplateCoreSerializer : TypeSerializer<TemplateCore> {
     override fun deserialize(type: Type, node: ConfigurationNode): TemplateCore {
         val key = node.node("type").krequire<Key>()
         val ret = when {
@@ -78,7 +78,7 @@ internal object TemplateCoreSerializer : TypeDeserializer<TemplateCore> {
             key.namespace() == Namespaces.SKILL -> TemplateCoreSkill(node)
 
             // 大概是配置文件写错了
-            else -> throw IllegalArgumentException("Unknown namespaced key for template core: ${key.namespace()}")
+            else -> throw SerializationException(node, type, "Unknown namespaced key for template core: ${key.namespace()}")
         }
         return ret
     }

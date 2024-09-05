@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.templates.filter
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.config.configurate.TypeDeserializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random3.Filter
@@ -15,7 +15,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
-internal object FilterSerializer : TypeDeserializer<Filter<GenerationContext>> {
+internal object FilterSerializer : TypeSerializer<Filter<GenerationContext>> {
     const val NAMESPACE_FILTER = "item"
 
     override fun deserialize(type: Type, node: ConfigurationNode): Filter<GenerationContext> {

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.vanilla
 
-import cc.mewcraft.wakame.config.configurate.TypeDeserializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.util.EnumLookup
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -44,7 +44,7 @@ interface VanillaComponentRemover : Examinable {
 /**
  * [VanillaComponentRemover] 的序列化器.
  */
-internal object VanillaComponentRemoverSerializer : TypeDeserializer<VanillaComponentRemover> {
+internal object VanillaComponentRemoverSerializer : TypeSerializer<VanillaComponentRemover> {
     override fun deserialize(type: Type, node: ConfigurationNode): VanillaComponentRemover {
         val removes = node.getList<NaiveVanillaComponentRemover.Supported>(emptyList()).toSet()
         return NaiveVanillaComponentRemover(removes)

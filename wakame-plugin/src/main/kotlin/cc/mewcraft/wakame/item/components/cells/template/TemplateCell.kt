@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.components.cells.template
 
-import cc.mewcraft.wakame.config.configurate.TypeDeserializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.random3.Group
@@ -53,7 +53,7 @@ interface TemplateCell {
  *   core: group_b # it's just a **path** to a group node in the `cells` root
  * ```
  */
-internal object TemplateCellSerializer : TypeDeserializer<TemplateCell> {
+internal object TemplateCellSerializer : TypeSerializer<TemplateCell> {
     val HINT_NODE_SELECTORS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_selectors", typeTokenOf())
 
     /**
