@@ -1,12 +1,7 @@
 package cc.mewcraft.wakame.item.components.cells
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.BinarySerializable
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.NameLine
-import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.components.cells.reforge.ReforgeHistory
 import cc.mewcraft.wakame.util.CompoundTag
 import net.kyori.examination.Examinable
@@ -16,7 +11,7 @@ import java.util.stream.Stream
 /**
  * 代表一个词条栏.
  */
-interface Cell : Examinable, BinarySerializable, TooltipProvider.SingleWithName {
+interface Cell : Examinable, BinarySerializable<CompoundTag> {
 
     /**
      * 返回词条栏的 id.
@@ -36,7 +31,7 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.SingleWithName 
     /**
      * 尝试返回指定类型的词条栏核心. 如果类型不符则返回 `null`.
      */
-    fun <T : Core> getCoreAs(type: CoreType<T>): T?
+    fun <T : Core> getCoreAs(type: CoreKind<T>): T?
 
     /**
      * 设置词条栏的核心.
@@ -64,7 +59,7 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.SingleWithName 
          * NBT 标签的结构要求可以参考本项目的 `README`.
          */
         fun of(id: String, nbt: CompoundTag): Cell {
-            return CellImpl(id = id, nbt = nbt)
+            return SimpleCell(id = id, nbt = nbt)
         }
 
         /**
@@ -72,10 +67,10 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.SingleWithName 
          */
         fun of(
             id: String,
-            core: Core = Core.empty(),
+            core: Core = CoreFactory.empty(),
             reforgeHistory: ReforgeHistory = ReforgeHistory.empty(),
         ): Cell {
-            return CellImpl(id = id, core = core, reforgeHistory = reforgeHistory)
+            return SimpleCell(id = id, core = core, reforgeHistory = reforgeHistory)
         }
     }
 }
@@ -83,7 +78,7 @@ interface Cell : Examinable, BinarySerializable, TooltipProvider.SingleWithName 
 // 非空的实现:
 // 如果词条栏真实存在于物品上,
 // 那么实际实现就会是这个.
-private data class CellImpl(
+private data class SimpleCell(
     private val id: String,
     private val core: Core,
     private val reforgeHistory: ReforgeHistory,
@@ -94,8 +89,8 @@ private data class CellImpl(
         nbt: CompoundTag,
     ) : this(
         id = id,
-        core = Core.of(nbt.getCompound(TAG_CORE)),
-        reforgeHistory = ReforgeHistory.of(nbt.getCompound(TAG_REFORGE))
+        core = CoreFactory.deserialize(nbt.getCompound(NBT_CORE)),
+        reforgeHistory = ReforgeHistory.of(nbt.getCompound(NBT_REFORGE))
     )
 
     override fun getId(): String {
@@ -110,8 +105,9 @@ private data class CellImpl(
         return core
     }
 
-    override fun <T : Core> getCoreAs(type: CoreType<T>): T? {
-        if (core.type === type) {
+    override fun <T : Core> getCoreAs(type: CoreKind<T>): T? {
+        if (core.kind === type) {
+            @Suppress("UNCHECKED_CAST")
             return core as T?
         }
         return null
@@ -129,15 +125,10 @@ private data class CellImpl(
         return copy(reforgeHistory = reforgeHistory)
     }
 
-    override fun serializeAsTag(): Tag = CompoundTag {
-        put(TAG_CORE, core.serializeAsTag())
-        put(TAG_REFORGE, reforgeHistory.serializeAsTag())
+    override fun serializeAsTag(): CompoundTag = CompoundTag {
+        put(NBT_CORE, core.serializeAsTag())
+        put(NBT_REFORGE, reforgeHistory.serializeAsTag())
     }
-
-    // 暂时.. 词条栏的提示框文本就是核心的.
-    // 未来可以再考虑丰富词条栏的提示框文本.
-    override fun provideTooltipName(): NameLine = core.provideTooltipName()
-    override fun provideTooltipLore(systemName: RendererSystemName): LoreLine = core.provideTooltipLore(systemName)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("id", id),
@@ -146,7 +137,7 @@ private data class CellImpl(
     )
 
     private companion object {
-        const val TAG_CORE = "core"
-        const val TAG_REFORGE = "reforge"
+        const val NBT_CORE = "core"
+        const val NBT_REFORGE = "reforge"
     }
 }

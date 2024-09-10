@@ -1,22 +1,16 @@
 package cc.mewcraft.wakame.item.components.legacy
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.display.DynamicLoreMeta
-import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
-import cc.mewcraft.wakame.display.DynamicLoreMetaCreators
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.RawTooltipIndex
-import cc.mewcraft.wakame.display.RawTooltipKey
-import cc.mewcraft.wakame.display.RendererBootstrap
-import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.display.*
 import cc.mewcraft.wakame.display2.RendererSystems
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PostWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.initializer.*
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+
+// TODO 迁移到新的渲染系统
+// FIXME namespace 支持自定义
 
 // 文件说明:
 // 这里是 ItemMeta 的所有跟提示框渲染相关的代码
@@ -41,11 +35,11 @@ internal class ItemMetaLoreMetaCreator : DynamicLoreMetaCreator {
     override val namespace: String = Namespaces.ITEM_META
 
     override fun test(rawLine: String): Boolean {
-        return Key(rawLine).namespace() == namespace
+        return Key.key(rawLine).namespace() == namespace
     }
 
     override fun create(rawTooltipIndex: RawTooltipIndex, rawLine: String, default: List<Component>?): DynamicLoreMeta {
-        return ItemMetaLoreMeta(rawTooltipKey = Key(rawLine), rawTooltipIndex = rawTooltipIndex, defaultText = default)
+        return ItemMetaLoreMeta(rawTooltipKey = Key.key(rawLine), rawTooltipIndex = rawTooltipIndex, defaultText = default)
     }
 }
 

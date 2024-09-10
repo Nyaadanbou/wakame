@@ -3,11 +3,7 @@ package cc.mewcraft.wakame.item.component
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.config.*
-import cc.mewcraft.wakame.display.RendererConfigReloadEvent
-import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display2.RendererSystemName
-import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
@@ -28,32 +24,19 @@ import java.util.stream.Stream
 internal class ItemComponentConfig
 private constructor(
     private val configPath: String,
-    private val tooltipKey: TooltipKey,
 ) : KoinComponent {
 
     companion object {
         /**
          * 获取一个 [ItemComponentConfig] 实例.
          *
-         * 用同一个 [component] 多次调用本函数返回的都是同一个实例.
+         * 用同一个 [configKey] 多次调用本函数返回的都是同一个实例.
          *
-         * @param component 物品组件
+         * @param configKey 该组件在配置文件中的路径
          */
-        fun provide(component: ItemComponentMeta): ItemComponentConfig {
-            return provide(component.configPath, component.tooltipKey)
-        }
-
-        /**
-         * 获取一个 [ItemComponentConfig] 实例.
-         *
-         * 用同一个 [configPath] 多次调用本函数返回的都是同一个实例.
-         *
-         * @param configPath 该组件在配置文件中的路径
-         * @param tooltipKey 该组件在提示框中的标识
-         */
-        fun provide(configPath: String, tooltipKey: TooltipKey): ItemComponentConfig {
-            return objectPool.computeIfAbsent(configPath) {
-                ItemComponentConfig(it, tooltipKey)
+        fun provide(configKey: String): ItemComponentConfig {
+            return objectPool.computeIfAbsent(configKey) {
+                ItemComponentConfig(it)
             }
         }
 
@@ -71,15 +54,9 @@ private constructor(
     val enabled by root.entry<Boolean>("enabled")
 
     /**
-     * 该组件的展示名字.
+     * 该组件的显示名字.
      */
     val displayName by root.entry<Component>("display_name")
-
-    /**
-     * 该组件是否显示在提示框中.
-     */
-    var showInTooltip = false
-        private set
 
     // inner class 使用说明:
     // 根据具体的物品组件的配置结构,
@@ -246,13 +223,6 @@ private constructor(
 
         override fun toString(): String {
             return toSimpleString()
-        }
-    }
-
-    init {
-        // 订阅事件: 当 renderer config 重载时刷新 showInTooltip 的值
-        PluginEventBus.get().subscribe<RendererConfigReloadEvent> {
-            showInTooltip = tooltipKey in it.rawTooltipKeys
         }
     }
 }

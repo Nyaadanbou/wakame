@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.components.tracks
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -52,7 +51,7 @@ private class TrackPeakDamageImpl(
         }
     }
 
-    override fun serializeAsTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): CompoundTag = CompoundTag {
         for ((element: Element, damage: Double) in map) {
             putDouble(element.uniqueId, damage)
         }

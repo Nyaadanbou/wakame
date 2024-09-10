@@ -1,29 +1,19 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentConfig
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentMeta
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import net.kyori.adventure.key.Key
+import cc.mewcraft.wakame.item.component.*
 import net.kyori.examination.Examinable
 
 interface SystemUse : Examinable {
+    companion object : ItemComponentBridge<Unit> {
+        /**
+         * 该组件的配置文件.
+         */
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.SYSTEM_USE)
 
-    companion object : ItemComponentBridge<Unit>, ItemComponentMeta {
         override fun codec(id: String): ItemComponentType<Unit> {
             return Codec(id)
         }
-
-        override fun templateType(id: String): Nothing {
-            throw UnsupportedOperationException()
-        }
-
-        override val configPath: String = ItemConstants.SYSTEM_USE
-        override val tooltipKey: Key = ItemConstants.createKey { SYSTEM_USE }
-
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     // 开发日记 2024/6/27

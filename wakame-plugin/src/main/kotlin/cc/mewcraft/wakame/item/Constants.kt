@@ -17,13 +17,6 @@ object BaseBinaryKeys {
 }
 
 /**
- * Keys in the `core` compound.
- */
-object CoreBinaryKeys {
-    const val CORE_IDENTIFIER = "id"
-}
-
-/**
  * Keys in the `reforge` compound.
  */
 object ReforgeBinaryKeys {

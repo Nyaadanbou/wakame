@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.components.tracks
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.item.components.tracks.TrackReforgeHistory.Companion.TAG_SUCCESS_COUNT
 import cc.mewcraft.wakame.item.components.tracks.TrackReforgeHistory.Companion.TAG_TOTAL_COST
@@ -64,7 +63,7 @@ private data class TrackReforgeHistoryImpl(
         return copy(totalCost = this.totalCost + cost)
     }
 
-    override fun serializeAsTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): CompoundTag = CompoundTag {
         putInt(TAG_SUCCESS_COUNT, successCount)
         putDouble(TAG_TOTAL_COST, totalCost)
     }

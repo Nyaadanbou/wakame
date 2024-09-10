@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCore
-import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
 import net.kyori.adventure.text.Component
@@ -154,7 +154,7 @@ interface RerollingSession : Examinable {
         /**
          * 用于重新随机词条栏核心的掉落表.
          */
-        val template: Group<TemplateCore, GenerationContext>
+        val template: Group<CoreBlueprint, ItemGenerationContext>
 
         /**
          * 词条栏在菜单中的图标, 用于告诉玩家这个词条栏是什么.

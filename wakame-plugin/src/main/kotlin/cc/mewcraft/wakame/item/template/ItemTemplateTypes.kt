@@ -1,172 +1,172 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.templates.components.*
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 object ItemTemplateTypes {
     /**
-     * 组件: [ItemArrow]
+     * 组件: n/a
      */
-    val ARROW: ItemTemplateType<ItemArrow.Template> = ItemArrow.templateType(ItemConstants.ARROW).register()
+    val ARROW: ItemTemplateType<ItemArrow> = ItemArrow.codec(ItemConstants.ARROW).register()
 
     /**
-     * 组件: [ItemAttackSpeed]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemAttackSpeed]
      */
-    val ATTACK_SPEED: ItemTemplateType<ItemAttackSpeed.Template> = ItemAttackSpeed.templateType(ItemConstants.ATTACK_SPEED).register()
+    val ATTACK_SPEED: ItemTemplateType<ItemAttackSpeed> = ItemAttackSpeed.codec(ItemConstants.ATTACK_SPEED).register()
 
     /**
-     * 组件: [Attributable]
+     * 组件: n/a
      */
     @Deprecated("与 ItemSlot 有高度重合")
-    val ATTRIBUTABLE: ItemTemplateType<Attributable.Template> = Attributable.templateType(ItemConstants.ATTRIBUTABLE).register()
+    val ATTRIBUTABLE: ItemTemplateType<Attributable> = Attributable.codec(ItemConstants.ATTRIBUTABLE).register()
 
     /**
-     * 组件: [ItemAttributeModifiers]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemAttributeModifiers]
      */
-    val ATTRIBUTE_MODIFIERS: ItemTemplateType<ItemAttributeModifiers.Template> = ItemAttributeModifiers.templateType(ItemConstants.ATTRIBUTE_MODIFIERS).register()
+    val ATTRIBUTE_MODIFIERS: ItemTemplateType<ItemAttributeModifiers> = ItemAttributeModifiers.codec(ItemConstants.ATTRIBUTE_MODIFIERS).register()
 
     /**
-     * 组件: [ItemBow]
+     * 组件: n/a
      */
-    val BOW: ItemTemplateType<ItemBow.Template> = ItemBow.templateType(ItemConstants.BOW).register()
+    val BOW: ItemTemplateType<ItemBow> = ItemBow.codec(ItemConstants.BOW).register()
 
     /**
-     * 组件: [ItemAdventurePredicate]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemAdventurePredicate]
      */
-    val CAN_BREAK: ItemTemplateType<ItemAdventurePredicate.Template> = ItemAdventurePredicate.templateType(ItemConstants.CAN_BREAK).register()
+    val CAN_BREAK: ItemTemplateType<ItemAdventurePredicate> = ItemAdventurePredicate.codec(ItemConstants.CAN_BREAK).register()
 
     /**
-     * 组件: [ItemAdventurePredicate]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemAdventurePredicate]
      */
-    val CAN_PLACE_ON: ItemTemplateType<ItemAdventurePredicate.Template> = ItemAdventurePredicate.templateType(ItemConstants.CAN_PLACE_ON).register()
+    val CAN_PLACE_ON: ItemTemplateType<ItemAdventurePredicate> = ItemAdventurePredicate.codec(ItemConstants.CAN_PLACE_ON).register()
 
     /**
-     * 组件: [Castable]
+     * 组件: n/a
      */
-    val CASTABLE: ItemTemplateType<Castable.Template> = Castable.templateType(ItemConstants.CASTABLE).register()
+    val CASTABLE: ItemTemplateType<Castable> = Castable.codec(ItemConstants.CASTABLE).register()
 
     /**
-     * 组件: [ItemCells]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemCells]
      */
-    val CELLS: ItemTemplateType<ItemCells.Template> = ItemCells.templateType(ItemConstants.CELLS).register()
+    val CELLS: ItemTemplateType<ItemCells> = ItemCells.codec(ItemConstants.CELLS).register()
 
     /**
-     * 组件: [ItemCrate]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemCrate]
      */
-    val CRATE: ItemTemplateType<ItemCrate.Template> = ItemCrate.templateType(ItemConstants.CRATE).register()
+    val CRATE: ItemTemplateType<ItemCrate> = ItemCrate.codec(ItemConstants.CRATE).register()
 
     /**
-     * 组件: [CustomName]
+     * 组件: [cc.mewcraft.wakame.item.components.CustomName]
      */
-    val CUSTOM_NAME: ItemTemplateType<CustomName.Template> = CustomName.templateType(ItemConstants.CUSTOM_NAME).register()
+    val CUSTOM_NAME: ItemTemplateType<CustomName> = CustomName.codec(ItemConstants.CUSTOM_NAME).register()
 
     /**
-     * 组件: [Damageable]
+     * 组件: [cc.mewcraft.wakame.item.components.Damageable]
      */
-    val DAMAGEABLE: ItemTemplateType<Damageable.Template> = Damageable.templateType(ItemConstants.DAMAGEABLE).register()
+    val DAMAGEABLE: ItemTemplateType<Damageable> = Damageable.codec(ItemConstants.DAMAGEABLE).register()
 
     /**
-     * 组件: [ArmorTrim]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemDyeColor]
      */
-    val DYED_COLOR: ItemTemplateType<ItemDyeColor.Template> = ItemDyeColor.templateType(ItemConstants.DYED_COLOR).register()
+    val DYED_COLOR: ItemTemplateType<ItemDyeColor> = ItemDyeColor.codec(ItemConstants.DYED_COLOR).register()
 
     /**
-     * 组件: [ItemElements]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemElements]
      */
-    val ELEMENTS: ItemTemplateType<ItemElements.Template> = ItemElements.templateType(ItemConstants.ELEMENTS).register()
+    val ELEMENTS: ItemTemplateType<ItemElements> = ItemElements.codec(ItemConstants.ELEMENTS).register()
 
     /**
-     * 组件: [ItemEnchantments]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemEnchantments]
      */
-    val ENCHANTMENTS: ItemTemplateType<ItemEnchantments.Template> = ItemEnchantments.templateType(ItemConstants.ENCHANTMENTS).register()
+    val ENCHANTMENTS: ItemTemplateType<ItemEnchantments> = ItemEnchantments.codec(ItemConstants.ENCHANTMENTS).register()
 
     /**
-     * 组件: [FireResistant]
+     * 组件: [cc.mewcraft.wakame.item.components.FireResistant]
      */
-    val FIRE_RESISTANT: ItemTemplateType<FireResistant.Template> = FireResistant.templateType(ItemConstants.FIRE_RESISTANT).register()
+    val FIRE_RESISTANT: ItemTemplateType<FireResistant> = FireResistant.codec(ItemConstants.FIRE_RESISTANT).register()
 
     /**
-     * 组件: [FoodProperties]
+     * 组件: [cc.mewcraft.wakame.item.components.FoodProperties]
      */
-    val FOOD: ItemTemplateType<FoodProperties.Template> = FoodProperties.templateType(ItemConstants.FOOD).register()
+    val FOOD: ItemTemplateType<FoodProperties> = FoodProperties.codec(ItemConstants.FOOD).register()
 
     /**
-     * 组件: [ItemGlowable]
+     * 组件: n/a
      */
-    val GLOWABLE: ItemTemplateType<ItemGlowable.Template> = ItemGlowable.templateType(ItemConstants.GLOWABLE).register()
+    val GLOWABLE: ItemTemplateType<ItemGlowable> = ItemGlowable.codec(ItemConstants.GLOWABLE).register()
 
     /**
-     * 组件: [HideTooltip]
+     * 组件: [cc.mewcraft.wakame.item.components.HideTooltip]
      */
-    val HIDE_TOOLTIP: ItemTemplateType<HideTooltip.Template> = HideTooltip.templateType(ItemConstants.HIDE_TOOLTIP).register()
+    val HIDE_TOOLTIP: ItemTemplateType<HideTooltip> = HideTooltip.codec(ItemConstants.HIDE_TOOLTIP).register()
 
     /**ni
-     * 组件: [HideAdditionalTooltip]
+     * 组件: [cc.mewcraft.wakame.item.components.HideAdditionalTooltip]
      */
-    val HIDE_ADDITIONAL_TOOLTIP: ItemTemplateType<HideAdditionalTooltip.Template> = HideAdditionalTooltip.templateType(ItemConstants.HIDE_ADDITIONAL_TOOLTIP).register()
+    val HIDE_ADDITIONAL_TOOLTIP: ItemTemplateType<HideAdditionalTooltip> = HideAdditionalTooltip.codec(ItemConstants.HIDE_ADDITIONAL_TOOLTIP).register()
 
     /**
-     * 组件: [ItemName]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemName]
      */
-    val ITEM_NAME: ItemTemplateType<ItemName.Template> = ItemName.templateType(ItemConstants.ITEM_NAME).register()
+    val ITEM_NAME: ItemTemplateType<ItemName> = ItemName.codec(ItemConstants.ITEM_NAME).register()
 
     /**
-     * 组件: [ItemKizamiz]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemKizamiz]
      */
-    val KIZAMIZ: ItemTemplateType<ItemKizamiz.Template> = ItemKizamiz.templateType(ItemConstants.KIZAMIZ).register()
+    val KIZAMIZ: ItemTemplateType<ItemKizamiz> = ItemKizamiz.codec(ItemConstants.KIZAMIZ).register()
 
     /**
-     * 组件: [Kizamiable]
+     * 组件: n/a
      */
     @Deprecated("与 ItemSlot 有高度重合")
-    val KIZAMIABLE: ItemTemplateType<Kizamiable.Template> = Kizamiable.templateType(ItemConstants.KIZAMIABLE).register()
+    val KIZAMIABLE: ItemTemplateType<Kizamiable> = Kizamiable.codec(ItemConstants.KIZAMIABLE).register()
 
     /**
-     * 组件: [ItemLevel]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemLevel]
      */
-    val LEVEL: ItemTemplateType<ItemLevel.Template> = ItemLevel.templateType(ItemConstants.LEVEL).register()
+    val LEVEL: ItemTemplateType<ItemLevel> = ItemLevel.codec(ItemConstants.LEVEL).register()
 
     /**
-     * 组件: [ExtraLore]
+     * 组件: [cc.mewcraft.wakame.item.components.ExtraLore]
      */
-    val LORE: ItemTemplateType<ExtraLore.Template> = ExtraLore.templateType(ItemConstants.LORE).register()
+    val LORE: ItemTemplateType<ExtraLore> = ExtraLore.codec(ItemConstants.LORE).register()
 
     /**
-     * 组件: [PortableCore]
+     * 组件: [cc.mewcraft.wakame.item.components.PortableCore]
      */
-    val PORTABLE_CORE: ItemTemplateType<PortableCore.Template> = PortableCore.templateType(ItemConstants.PORTABLE_CORE).register()
+    val PORTABLE_CORE: ItemTemplateType<PortableCore> = PortableCore.codec(ItemConstants.PORTABLE_CORE).register()
 
     /**
-     * 组件: [ItemRarity]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemRarity]
      */
-    val RARITY: ItemTemplateType<ItemRarity.Template> = ItemRarity.templateType(ItemConstants.RARITY).register()
+    val RARITY: ItemTemplateType<ItemRarity> = ItemRarity.codec(ItemConstants.RARITY).register()
 
     /**
-     * 组件: [Skillful]
+     * 组件: n/a
      */
     @Deprecated("与 ItemSlot 有高度重合")
-    val SKILLFUL: ItemTemplateType<Skillful.Template> = Skillful.templateType(ItemConstants.SKILLFUL).register()
+    val SKILLFUL: ItemTemplateType<Skillful> = Skillful.codec(ItemConstants.SKILLFUL).register()
 
     /**
      * 组件: [ItemEnchantments]
      */
-    val STORED_ENCHANTMENTS: ItemTemplateType<ItemEnchantments.Template> = ItemEnchantments.templateType(ItemConstants.STORED_ENCHANTMENTS).register()
+    val STORED_ENCHANTMENTS: ItemTemplateType<ItemEnchantments> = ItemEnchantments.codec(ItemConstants.STORED_ENCHANTMENTS).register()
 
     /**
      * 组件: [Tool]
      */
-    val TOOL: ItemTemplateType<Tool.Template> = Tool.templateType(ItemConstants.TOOL).register()
+    val TOOL: ItemTemplateType<Tool> = Tool.codec(ItemConstants.TOOL).register()
 
     /**
-     * 组件: [ArmorTrim]
+     * 组件: [cc.mewcraft.wakame.item.components.ArmorTrim]
      */
-    val TRIM: ItemTemplateType<ArmorTrim.Template> = ArmorTrim.templateType(ItemConstants.TRIM).register()
+    val TRIM: ItemTemplateType<ArmorTrim> = ArmorTrim.codec(ItemConstants.TRIM).register()
 
     /**
      * 组件: [Unbreakable]
      */
-    val UNBREAKABLE: ItemTemplateType<Unbreakable.Template> = Unbreakable.templateType(ItemConstants.UNBREAKABLE).register()
+    val UNBREAKABLE: ItemTemplateType<Unbreakable> = Unbreakable.codec(ItemConstants.UNBREAKABLE).register()
 
     /**
      * 获取所有模板的序列化器.

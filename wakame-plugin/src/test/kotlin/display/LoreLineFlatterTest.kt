@@ -1,16 +1,7 @@
 package display
 
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.display.BlankConstantLoreMeta
-import cc.mewcraft.wakame.display.CustomConstantLoreMeta
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.LoreLineFlatter
-import cc.mewcraft.wakame.display.LoreMeta
-import cc.mewcraft.wakame.display.LoreMetaLookup
-import cc.mewcraft.wakame.display.RENDERERS_CONFIG_DIR
-import cc.mewcraft.wakame.display.RawTooltipIndex
-import cc.mewcraft.wakame.display.RendererConfig
-import cc.mewcraft.wakame.display.RendererConfigImpl
+import cc.mewcraft.wakame.display.*
 import io.mockk.every
 import io.mockk.mockkClass
 import net.kyori.adventure.key.Key
@@ -22,14 +13,9 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.koin.test.mock.MockProvider
-import org.koin.test.mock.declare
-import org.koin.test.mock.declareMock
+import org.koin.test.mock.*
 import testEnv
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 /**
  * 测试 [LoreLineFlatter].
@@ -135,12 +121,12 @@ class LoreLineFlatter2Test : KoinTest {
             input {
                 // 设置实际的内容.
                 // 直接使用 LoreLine 的各种构建函数来构建实际内容.
-                +simpleLoreLine("a", "2")
-                +simpleLoreLine("a", "1")
-                +simpleLoreLine("b", "2")
-                +simpleLoreLine("b", "1")
-                +simpleLoreLine("a", "3")
-                +simpleLoreLine("c", "1")
+                +simpleCoreLoreLine("a", "2")
+                +simpleCoreLoreLine("a", "1")
+                +simpleCoreLoreLine("b", "2")
+                +simpleCoreLoreLine("b", "1")
+                +simpleCoreLoreLine("a", "3")
+                +simpleCoreLoreLine("c", "1")
             }
         }
     }
@@ -196,9 +182,9 @@ class LoreLineFlatter2Test : KoinTest {
                 simple("fixed", "2")
             }
             input {
-                +simpleLoreLine("a", "2")
-                +simpleLoreLine("a", "3")
-                +simpleLoreLine("b", "2")
+                +simpleCoreLoreLine("a", "2")
+                +simpleCoreLoreLine("a", "3")
+                +simpleCoreLoreLine("b", "2")
             }
         }
     }
@@ -238,7 +224,7 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleLoreLine("b", "1")
+                    +simpleCoreLoreLine("b", "1")
                 }
             }
             runTest { // 交换 a 和 b 的位置
@@ -249,7 +235,7 @@ class LoreLineFlatter2Test : KoinTest {
                     default("b", "1", "bar")
                 }
                 input {
-                    +simpleLoreLine("a", "1")
+                    +simpleCoreLoreLine("a", "1")
                 }
             }
         }
@@ -293,8 +279,8 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleLoreLine("a", "1")
-                    +simpleLoreLine("b", "1")
+                    +simpleCoreLoreLine("a", "1")
+                    +simpleCoreLoreLine("b", "1")
                 }
             }
         }
@@ -327,8 +313,8 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleLoreLine("a", "1")
-                    +simpleLoreLine("b", "1")
+                    +simpleCoreLoreLine("a", "1")
+                    +simpleCoreLoreLine("b", "1")
                 }
             }
             runTest {
@@ -341,7 +327,7 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleLoreLine("b", "1")
+                    +simpleCoreLoreLine("b", "1")
                 }
             }
         }
@@ -383,7 +369,7 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("a", "1")
                 }
                 input {
-                    +simpleLoreLine("a", "1")
+                    +simpleCoreLoreLine("a", "1")
                 }
             }
             runTest {
@@ -395,7 +381,7 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleLoreLine("b", "1")
+                    +simpleCoreLoreLine("b", "1")
                 }
             }
             runTest {
@@ -441,9 +427,9 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("a", "1")
                 }
                 input {
-                    +simpleLoreLine("a", "1")
-                    +simpleLoreLine("a", "1")
-                    +simpleLoreLine("a", "1")
+                    +simpleCoreLoreLine("a", "1")
+                    +simpleCoreLoreLine("a", "1")
+                    +simpleCoreLoreLine("a", "1")
                 }
             }
         }
@@ -463,7 +449,7 @@ private fun listText(vararg text: String): List<Component> =
 private fun noopLoreLine(): LoreLine =
     LoreLine.noop()
 
-private fun simpleLoreLine(namespace: String, value: String): LoreLine =
+private fun simpleCoreLoreLine(namespace: String, value: String): LoreLine =
     LoreLine.simple(key(namespace, value), listText("$namespace:$value"))
 
 private fun defaultLoreLine(namespace: String, value: String, customText: String? = null): LoreLine =
@@ -654,7 +640,7 @@ private class LoreMetaLookupBuilder {
         metadata.putAll(builder.map)
     }
 
-    fun build(): LoreMetaLookup = LoreMetaLookupImpl(indexes, metadata)
+    fun build(): LoreMetaLookup = LoreMetaLookup.create(indexes, metadata)
 
     class IndexBuilder {
         val map = mutableMapOf<Key, Int>()

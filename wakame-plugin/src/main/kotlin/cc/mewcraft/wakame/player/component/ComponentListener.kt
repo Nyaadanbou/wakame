@@ -2,10 +2,7 @@ package cc.mewcraft.wakame.player.component
 
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
-import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.Player
-import org.bukkit.entity.SpectralArrow
-import org.bukkit.entity.Trident
+import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityShootBowEvent
@@ -13,7 +10,7 @@ import org.bukkit.event.entity.ProjectileHitEvent
 
 class ComponentListener : Listener {
     /**
-     * 实现 [cc.mewcraft.wakame.item.components.ItemArrow] 组件的下列功能:
+     * 实现 [cc.mewcraft.wakame.item.templates.components.ItemArrow] 组件的下列功能:
      * 穿透
      * 拾取
      * 箭矢着火时间
@@ -39,7 +36,7 @@ class ComponentListener : Listener {
     }
 
     /**
-     * 实现 [cc.mewcraft.wakame.item.components.ItemArrow] 组件的下列功能:
+     * 实现 [cc.mewcraft.wakame.item.templates.components.ItemArrow] 组件的下列功能:
      * 命中着火时间
      * 命中冰冻时间
      */

@@ -37,7 +37,7 @@ internal fun skillModule(): Module = module {
             .kregister(SkillSerializer)
             .kregister(SkillTriggerSerializer)
             .kregister(ConfiguredSkillSerializer)
-            .kregister(ConfiguredSkillVariantSerializer)
+            .kregister(TriggerVariantSerializer)
             .build()
     }
 

@@ -43,14 +43,14 @@ interface NekoItemRealizer {
      * @param context the context on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(prototype: NekoItem, context: GenerationContext): NekoStack
+    fun realize(prototype: NekoItem, context: ItemGenerationContext): NekoStack
 
 }
 
 internal object VanillaNekoItemRealizer : NekoItemRealizer {
     override fun realize(prototype: NekoItem): VanillaNekoStack {
         // 没 trigger 的 ctx
-        val context = GenerationContext(GenerationTrigger.nop(), prototype.id, 0)
+        val context = ItemGenerationContexts.create(ItemGenerationTriggers.empty(), prototype.id, 0)
         // 获取 物品组件 的构建器
         val builder = ItemComponentMaps.builder()
 
@@ -78,15 +78,13 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.CELLS)
 
         val components = builder.build()
-        val immutableComponents = ItemComponentMaps.unmodifiable(components)
-
-        val vanillaNekoStack = VanillaNekoStack(
+        val nekoStack = VanillaNekoStack(
             id = prototype.id,
             prototype = prototype,
-            components = immutableComponents
+            components = ItemComponentMaps.unmodifiable(components)
         )
 
-        return vanillaNekoStack
+        return nekoStack
     }
 
     override fun realize(prototype: NekoItem, user: User<*>): VanillaNekoStack {
@@ -97,31 +95,31 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         return realize(prototype)
     }
 
-    override fun realize(prototype: NekoItem, context: GenerationContext): VanillaNekoStack {
+    override fun realize(prototype: NekoItem, context: ItemGenerationContext): VanillaNekoStack {
         return realize(prototype)
     }
 }
 
 internal object CustomNekoItemRealizer : NekoItemRealizer {
     override fun realize(prototype: NekoItem): NekoStack {
-        return realizeByTrigger(prototype, GenerationTrigger.nop())
+        return realizeByTrigger(prototype, ItemGenerationTriggers.empty())
     }
 
     override fun realize(prototype: NekoItem, user: User<*>): NekoStack {
-        return realizeByTrigger(prototype, GenerationTrigger.wrap(user))
+        return realizeByTrigger(prototype, ItemGenerationTriggers.wrap(user))
     }
 
     override fun realize(prototype: NekoItem, crate: Crate): NekoStack {
-        return realizeByTrigger(prototype, GenerationTrigger.wrap(crate))
+        return realizeByTrigger(prototype, ItemGenerationTriggers.wrap(crate))
     }
 
-    override fun realize(prototype: NekoItem, context: GenerationContext): NekoStack {
+    override fun realize(prototype: NekoItem, context: ItemGenerationContext): NekoStack {
         return realizeByContext(prototype, context)
     }
 
-    private fun realizeByTrigger(item: NekoItem, trigger: GenerationTrigger): NekoStack {
+    private fun realizeByTrigger(item: NekoItem, trigger: ItemGenerationTrigger): NekoStack {
         val target = item.id
-        val context = GenerationContext(trigger, target)
+        val context = ItemGenerationContexts.create(trigger, target)
         val nekoStack = realizeByContext(item, context)
         return nekoStack
     }
@@ -133,8 +131,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
      * @param context the input context
      * @return a new NekoStack
      */
-    private fun realizeByContext(prototype: NekoItem, context: GenerationContext): NekoStack {
-        // 获取基础的物品类型
+    private fun realizeByContext(prototype: NekoItem, context: ItemGenerationContext): NekoStack {
         // 创建空的萌芽物品
         val nekoStack = prototype.base.createNekoStack()
         // 获取萌芽物品的底层 ItemStack

@@ -3,19 +3,18 @@ package cc.mewcraft.wakame.item.component
 import cc.mewcraft.nbt.CompoundTag
 
 /**
- * 本接口封装了一个物品组件的 *读/写/删* 逻辑.
+ * 本接口封装了一个物品组件的 *读取/写入/删除* 逻辑.
  *
- * @param T 组件的类型, 具有不可变性质
+ * @param T 组件的类型, 设计上应该具有不可变的性质
  */
 interface ItemComponentType<T> {
-
     /**
      * `组件类型`的唯一标识. 用于配置文件和NBT的序列化.
      */
     val id: String
 
     //
-    // 读/写/删物品组件的基本操作
+    // 读取/写入/删除物品组件的基本操作
     //
 
     /**
@@ -56,7 +55,6 @@ interface ItemComponentType<T> {
      * 使用前请先熟悉 [ItemComponentHolder.removeTag].
      */
     fun ItemComponentHolder.removeTag() = this.removeTag(id)
-    //</editor-fold>
 }
 
 // 开发日记 2024/6/26
@@ -67,7 +65,7 @@ interface ItemComponentType<T> {
 // 那怕是 NonValued 也可能需要提供一个固定的 LoreLine,
 // 而 Map 里的 get 函数又直接返回的
 // 这种情况提供 LoreLine
-//
+
 // 开发日记 2024/6/26
 // 叫做 ItemComponentType, 但实际上是 ItemComponentCodec 的作用
 // (因为 read/write/remove).

@@ -2,11 +2,8 @@ package cc.mewcraft.wakame.display2
 
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display.LoreLineFlatter
-import cc.mewcraft.wakame.display.LoreMetaLookup
-import cc.mewcraft.wakame.display.RendererConfig
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeLoreMetaCreator
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeTooltipKeyProvider
+import cc.mewcraft.wakame.item.components.cells.cores.AttributeCoreLoreMetaCreator
+import cc.mewcraft.wakame.item.components.cells.cores.AttributeCoreTooltipKeyProvider
 import java.nio.file.Path
 
 internal interface RendererSystem<in T> {
@@ -42,14 +39,14 @@ internal interface RendererSystem<in T> {
     val loreLineFlatter: LoreLineFlatter
 
     /**
-     * 根据 [config] 的配置, 返回一个 [CoreAttributeLoreMetaCreator].
+     * 根据 [config] 的配置, 返回一个 [AttributeCoreLoreMetaCreator].
      */
-    val coreAttributeLoreMetaCreator: CoreAttributeLoreMetaCreator
+    val attributeCoreLoreMetaCreator: AttributeCoreLoreMetaCreator
 
     /**
-     * 根据 [config] 的配置, 返回一个 [CoreAttributeTooltipKeyProvider].
+     * 根据 [config] 的配置, 返回一个 [AttributeCoreTooltipKeyProvider].
      */
-    val coreAttributeTooltipKeyProvider: CoreAttributeTooltipKeyProvider
+    val attributeCoreTooltipKeyProvider: AttributeCoreTooltipKeyProvider
 
     /**
      * 渲染一个物品 [T].
@@ -69,6 +66,6 @@ private class SimpleRendererSystem<T>(
     override val loreMetaLookup: LoreMetaLookup = LoreMetaLookup.create(config.loreIndexLookup, config.loreMetaLookup)
     override val loreLineFlatter: LoreLineFlatter = LoreLineFlatter(config, loreMetaLookup)
     override val renderer: ItemRenderer<T> = rendererProvider(loreLineFlatter)
-    override val coreAttributeLoreMetaCreator: CoreAttributeLoreMetaCreator = CoreAttributeLoreMetaCreator(provider)
-    override val coreAttributeTooltipKeyProvider: CoreAttributeTooltipKeyProvider = CoreAttributeTooltipKeyProvider(config)
+    override val attributeCoreLoreMetaCreator: AttributeCoreLoreMetaCreator = AttributeCoreLoreMetaCreator(provider)
+    override val attributeCoreTooltipKeyProvider: AttributeCoreTooltipKeyProvider = AttributeCoreTooltipKeyProvider(config)
 }

@@ -55,14 +55,13 @@ object KizamiInstanceSerializer : SchemaSerializer<KizamiInstance> {
     override fun deserialize(type: Type, node: ConfigurationNode): KizamiInstance {
         val kizami = node.krequire<Kizami>()
         val effectMap = buildMap {
+
             // Add entries: <amount> to <effect list>
             node.node("effects")
                 .childrenMap() // Int -> KizamiEffect
                 .mapKeys { it.key.toString().toIntOrNull()?.takeIf { amount -> amount > 0 } ?: throw SerializationException(node, type, "The node key must be a positive integer") }
                 .forEach { (amount, childNode) ->
-                    // add kizami key hint
                     childNode.hint(KizamiSerializer.HINT_KEY, kizami.key)
-                    // add effect mapping
                     val kizamiEffect = childNode.krequire<KizamiEffect>()
                     this[amount] = kizamiEffect
                 }

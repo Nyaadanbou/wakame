@@ -1,10 +1,9 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
-import cc.mewcraft.wakame.attribute.IntangibleAttributeMap
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.User
 import org.bukkit.entity.*
@@ -207,15 +206,15 @@ private constructor(
         val userAttributeMap = user.attributeMap
         val itemStack = projectile.itemStack
         // 如果玩家射出的箭矢
-        // 不是nekoStack, 则为原版箭矢
+        // 不是 NekoStack, 则为原版箭矢
         val nekoStack = itemStack.tryNekoStack ?: return buildDefaultBowArrowDamageBundle()
 
-        // 没有ARROW组件, 视为原版箭矢, 理论上不应该出现这种情况
-        if (!nekoStack.components.has(ItemComponentTypes.ARROW)) {
+        // 没有 ARROW 组件, 视为原版箭矢 (理论上不应该出现这种情况)
+        if (!nekoStack.templates.has(ItemTemplateTypes.ARROW)) {
             return buildDefaultBowArrowDamageBundle()
         }
 
-        // 没有CELLS组件, 视为原版箭矢
+        // 没有 CELLS 组件, 视为原版箭矢
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return buildDefaultBowArrowDamageBundle()
 
         // 获取属性映射的快照, 将箭矢的属性加上
@@ -328,11 +327,12 @@ class DefaultArrowDamageMetadata private constructor(
 
     private fun buildDamageBundle(attributeMap: IntangibleAttributeMap): DamageBundle {
         val itemStack = projectile.itemStack
-        // 不是nekoStack, 则为原版箭矢
+
+        // 不是 NekoStack, 则为原版箭矢
         val nekoStack = itemStack.tryNekoStack ?: return defaultArrowDamageBundle()
 
         // 没有 ARROW 组件, 视为原版箭矢, 理论上不应该出现这种情况
-        if (!nekoStack.components.has(ItemComponentTypes.ARROW)) {
+        if (!nekoStack.templates.has(ItemTemplateTypes.ARROW)) {
             return defaultArrowDamageBundle()
         }
 
@@ -345,7 +345,12 @@ class DefaultArrowDamageMetadata private constructor(
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
         }
-        return damageBundle(attributeMapSnapshot) { every { standard() } }
+
+        return damageBundle(attributeMapSnapshot) {
+            every {
+                standard()
+            }
+        }
     }
 }
 
@@ -377,7 +382,8 @@ class DefaultTridentDamageMetadata(
 
     private fun buildDamageBundle(intangibleAttributeMap: IntangibleAttributeMap): DamageBundle {
         val itemStack = projectile.itemStack
-        // 不是 nekoStack, 则为原版三叉戟
+
+        // 不是 NekoStack, 则为原版三叉戟
         val nekoStack = itemStack.tryNekoStack ?: return defaultTridentDamageBundle()
 
         // 没有 CELLS 组件, 视为原版三叉戟
@@ -389,7 +395,12 @@ class DefaultTridentDamageMetadata(
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
         }
-        return damageBundle(attributeMapSnapshot) { every { standard() } }
+
+        return damageBundle(attributeMapSnapshot) {
+            every {
+                standard()
+            }
+        }
     }
 }
 

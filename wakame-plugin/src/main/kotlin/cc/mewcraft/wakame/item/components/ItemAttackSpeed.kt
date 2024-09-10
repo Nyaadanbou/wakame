@@ -1,49 +1,26 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.TooltipKey
-import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
-import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
-import org.spongepowered.configurate.ConfigurationNode
 
 data class ItemAttackSpeed(
     /**
      * 攻速等级.
      */
-    val level: AttackSpeedLevel
-) : Examinable, TooltipProvider.Single {
+    val level: AttackSpeedLevel,
+) : Examinable {
 
-    companion object : ItemComponentBridge<ItemAttackSpeed>, ItemComponentMeta {
+    companion object : ItemComponentBridge<ItemAttackSpeed> {
+        /**
+         * 该组件的配置文件.
+         */
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.ATTACK_SPEED)
+
         override fun codec(id: String): ItemComponentType<ItemAttackSpeed> {
             return Codec(id)
         }
-
-        override fun templateType(id: String): ItemTemplateType<Template> {
-            return TemplateType(id)
-        }
-
-        override val configPath: String = ItemConstants.ATTACK_SPEED
-        override val tooltipKey: TooltipKey = ItemConstants.createKey { ATTACK_SPEED }
-
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
-        private val tooltip: ItemComponentConfig.DiscreteTooltips = config.DiscreteTooltips()
-    }
-
-    override fun provideTooltipLore(): LoreLine {
-        if (!config.showInTooltip) {
-            return LoreLine.noop()
-        }
-        return LoreLine.simple(tooltipKey, listOf(tooltip.render(level.ordinal)))
     }
 
     private data class Codec(
@@ -67,36 +44,6 @@ data class ItemAttackSpeed(
 
         companion object {
             const val TAG_KEY = "level"
-        }
-    }
-
-    data class Template(
-        /**
-         * 攻速等级.
-         */
-        val level: AttackSpeedLevel
-    ) : ItemTemplate<ItemAttackSpeed> {
-        override val componentType: ItemComponentType<ItemAttackSpeed> = ItemComponentTypes.ATTACK_SPEED
-
-        override fun generate(context: GenerationContext): GenerationResult<ItemAttackSpeed> {
-            return GenerationResult.of(ItemAttackSpeed(level))
-        }
-    }
-
-    private data class TemplateType(
-        override val id: String,
-    ) : ItemTemplateType<Template> {
-        override val type: TypeToken<Template> = typeTokenOf()
-
-        /**
-         * ## Node structure
-         * ```yaml
-         * <node>: <level>
-         * ```
-         */
-        override fun decode(node: ConfigurationNode): Template {
-            val raw = node.krequire<AttackSpeedLevel>()
-            return Template(raw)
         }
     }
 }

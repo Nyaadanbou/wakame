@@ -1,17 +1,14 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
-import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
-import cc.mewcraft.wakame.item.components.cells.template.cores.empty.TemplateCoreEmpty
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationTrigger
-import cc.mewcraft.wakame.item.templates.filter.AttributeContextHolder
-import cc.mewcraft.wakame.item.templates.filter.SkillContextHolder
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreBlueprint
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
@@ -103,7 +100,7 @@ internal class ReforgeOperation(
 
                 // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
                 cellsBuilder.modify(id) { cell ->
-                    val selected = sel.template.select(context).firstOrNull() ?: TemplateCoreEmpty
+                    val selected = sel.template.select(context).firstOrNull() ?: EmptyCoreBlueprint
                     val generated = selected.generate(context)
                     cell.setCore(generated)
                 }
@@ -138,13 +135,13 @@ internal class ReforgeOperation(
         itemElements: Set<Element>,
         itemKizamiz: Set<Kizami>,
         itemCells: ItemCells,
-    ): GenerationContext {
+    ): ItemGenerationContext {
         // 创建一个空的 context
-        val trigger = GenerationTrigger.direct(itemLevel)
-        val context = GenerationContext(trigger, itemId)
+        val trigger = ItemGenerationTriggers.direct(itemLevel)
+        val context = ItemGenerationContexts.create(trigger, itemId)
 
         // 先把*不可由玩家改变的信息*全部写入上下文
-        context.level = itemLevel.toShort()
+        context.level = itemLevel
         context.rarity = itemRarity
         context.elements += itemElements
         context.kizamiz += itemKizamiz
@@ -153,7 +150,7 @@ internal class ReforgeOperation(
 
         // 然后再把*可由玩家改变的信息*全部写入上下文
         itemCells
-            .filterx { cell ->
+            .filter2 { cell ->
                 // 注意, 我们必须跳过玩家选择要重造的词条栏.
                 // 如果不跳过, 那么新的词条栏将无法被正确生成.
                 // 这是因为截止至 2024/8/20, 我们的设计不允许
@@ -164,12 +161,15 @@ internal class ReforgeOperation(
                 when (
                     val core = cell.getCore()
                 ) {
-                    is CoreSkill -> {
-                        context.skills += SkillContextHolder(core.key)
+                    is SkillCore -> {
+                        val skillId = core.id
+                        context.skills += SkillContextData(skillId)
                     }
 
-                    is CoreAttribute -> {
-                        context.attributes += AttributeContextHolder(core.key, core.operation, core.element)
+                    is AttributeCore -> {
+                        val attributeId = core.id.value()
+                        val attribute = core.attribute
+                        context.attributes += AttributeContextData(attributeId, attribute.operation, attribute.element)
                     }
                 }
             }

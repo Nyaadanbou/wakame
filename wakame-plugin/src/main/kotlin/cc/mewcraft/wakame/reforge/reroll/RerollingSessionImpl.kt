@@ -1,18 +1,15 @@
 package cc.mewcraft.wakame.reforge.reroll
 
-import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCore
-import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.common.TemporaryIcons
-import cc.mewcraft.wakame.util.hideAllFlags
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -299,7 +296,7 @@ internal object Selection {
         session: RerollingSession,
         id: String,
         rule: RerollingTable.CellRule,
-        template: Group<TemplateCore, GenerationContext>,
+        template: Group<CoreBlueprint, ItemGenerationContext>,
         display: ItemStack,
     ): RerollingSession.Selection {
         return Simple(session, id, rule, template, display)
@@ -314,7 +311,7 @@ internal object Selection {
             get() = "" // ???
         override val rule: RerollingTable.CellRule
             get() = RerollingTable.CellRule.empty()
-        override val template: Group<TemplateCore, GenerationContext>
+        override val template: Group<CoreBlueprint, ItemGenerationContext>
             get() = Group.empty()
         override val display: ItemStack
             get() = ItemStack.empty()
@@ -334,7 +331,7 @@ internal object Selection {
         override val session: RerollingSession,
         override val id: String,
         override val rule: RerollingTable.CellRule,
-        override val template: Group<TemplateCore, GenerationContext>,
+        override val template: Group<CoreBlueprint, ItemGenerationContext>,
         override val display: ItemStack,
     ) : RerollingSession.Selection, KoinComponent {
         private val logger: Logger by inject()
@@ -409,8 +406,9 @@ internal object SelectionMap : KoinComponent {
 
             val display = ItemStack(TemporaryIcons.get(cell.hashCode()))
             display.editMeta {
-                val name = cell.provideTooltipName().content
-                val lore = cell.provideTooltipLore(RendererSystemName.STANDARD).content
+                // TODO 使用新的渲染器生成文本
+                val name = cell.getId().mini
+                val lore = listOf(cell.getCore().id.asString().mini)
                 it.itemName(name)
                 it.lore(lore)
                 it.hideAllFlags()

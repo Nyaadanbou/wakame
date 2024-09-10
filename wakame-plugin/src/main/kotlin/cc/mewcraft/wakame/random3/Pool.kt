@@ -16,12 +16,12 @@ import kotlin.random.asJavaRandom
  * @param S 样本所携带的实例
  * @param C 条件所需要的上下文
  */
-abstract class Pool<S, C : SelectionContext> {
+abstract class Pool<S, C : RandomSelectorContext> {
     /**
      * 包含一些 [Pool] 的构造方法.
      */
     companion object Factory {
-        fun <S, C : SelectionContext> empty(): Pool<S, C> {
+        fun <S, C : RandomSelectorContext> empty(): Pool<S, C> {
             return PoolEmpty as Pool<S, C>
         }
     }
@@ -132,7 +132,7 @@ abstract class Pool<S, C : SelectionContext> {
  * @param V the type of sample
  * @param C the type of context
  */
-abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, C>> {
+abstract class PoolSerializer<V, C : RandomSelectorContext> : TypeSerializer<Pool<V, C>> {
 
     protected abstract val sampleNodeFacade: SampleNodeFacade<V, C>
     protected abstract val filterNodeFacade: FilterNodeFacade<C>
@@ -254,17 +254,17 @@ abstract class PoolSerializer<V, C : SelectionContext> : TypeSerializer<Pool<V, 
 /* Implementations */
 
 
-private object PoolEmpty : Pool<Nothing, SelectionContext>() {
+private object PoolEmpty : Pool<Nothing, RandomSelectorContext>() {
     override val amount: Long = 1
-    override val samples: NodeContainer<Sample<Nothing, SelectionContext>> = NodeContainer.empty()
-    override val filters: NodeContainer<Filter<SelectionContext>> = NodeContainer.empty()
+    override val samples: NodeContainer<Sample<Nothing, RandomSelectorContext>> = NodeContainer.empty()
+    override val filters: NodeContainer<Filter<RandomSelectorContext>> = NodeContainer.empty()
     override val isReplacement: Boolean = false
-    override fun whenSelect(value: Nothing, context: SelectionContext) = Unit
-    override fun select(context: SelectionContext): List<Nothing> = emptyList()
+    override fun whenSelect(value: Nothing, context: RandomSelectorContext) = Unit
+    override fun select(context: RandomSelectorContext): List<Nothing> = emptyList()
 }
 
 private object PoolSupport {
-    fun <S, C : SelectionContext> select(pool: Pool<S, C>, context: C): List<S> {
+    fun <S, C : RandomSelectorContext> select(pool: Pool<S, C>, context: C): List<S> {
         // 检查进入该池的条件是否全部满足;
         // 如果没有全部满足, 直接返回空流.
         if (!pool.filters.all { it.test(context) }) {

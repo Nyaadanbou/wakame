@@ -19,12 +19,12 @@ import net.kyori.adventure.key.Key
 interface AttributeModifierSource {
     /**
      * Provides one or more [AttributeModifiers][AttributeModifier] from this
-     * object with the given [id] being the modifiers' identifier. The returned
+     * object with the given [sourceId] being the modifiers' identifier. The returned
      * `map key` is an [Attribute] singleton and the `map value` is the attribute
      * modifier associated with the map key.
      *
      * @throws IllegalArgumentException if this provider can't provide such
      *   attribute modifiers
      */
-    fun provideAttributeModifiers(id: Key): Map<Attribute, AttributeModifier>
+    fun provideAttributeModifiers(sourceId: Key): Map<Attribute, AttributeModifier>
 }

@@ -1,43 +1,23 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentMeta
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.ShownInTooltip
+import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.util.editMeta
-import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.typeTokenOf
-import io.leangen.geantyref.TypeToken
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.Color
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.LeatherArmorMeta
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.SerializationException
+
 
 data class ItemDyeColor(
     val rgb: Int,
-    val showInTooltip: Boolean,
-) : Examinable {
+    override val showInTooltip: Boolean,
+) : Examinable, ShownInTooltip {
 
-    companion object : ItemComponentBridge<ItemDyeColor>, ItemComponentMeta {
+    companion object : ItemComponentBridge<ItemDyeColor> {
         override fun codec(id: String): ItemComponentType<ItemDyeColor> {
             return Codec(id)
         }
-
-        override fun templateType(id: String): ItemTemplateType<Template> {
-            return TemplateType(id)
-        }
-
-        override val configPath: String = ItemConstants.DYED_COLOR
-        override val tooltipKey: Key = ItemConstants.createKey { DYED_COLOR }
     }
 
     private data class Codec(
@@ -65,39 +45,6 @@ data class ItemDyeColor(
             holder.item.editMeta<LeatherArmorMeta> {
                 it.setColor(null)
             }
-        }
-    }
-
-    data class Template(
-        val rgb: Int,
-        val showInTooltip: Boolean,
-    ) : ItemTemplate<ItemDyeColor> {
-        override val componentType: ItemComponentType<ItemDyeColor> = ItemComponentTypes.DYED_COLOR
-
-        override fun generate(context: GenerationContext): GenerationResult<ItemDyeColor> {
-            return GenerationResult.of(ItemDyeColor(rgb, showInTooltip))
-        }
-    }
-
-    private data class TemplateType(
-        override val id: String,
-    ) : ItemTemplateType<Template> {
-        override val type: TypeToken<Template> = typeTokenOf()
-
-        /**
-         * ## Node structure
-         * ```yaml
-         * <node>:
-         *   show_in_tooltip: <boolean>
-         * ```
-         */
-        override fun decode(node: ConfigurationNode): Template {
-            val rgb = node.node("rgb").int.takeIf { it in 0x000000..0xFFFFFF } ?: throw SerializationException(node, javaTypeOf<Int>(), "RGB value out of range")
-            val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
-            return Template(
-                rgb = rgb,
-                showInTooltip = showInTooltip
-            )
         }
     }
 }

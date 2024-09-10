@@ -15,7 +15,7 @@ import java.nio.file.Path
 /**
  * 封装了类型 [Sample] 所需要的所有 [Node] 相关的实现.
  */
-abstract class SampleNodeFacade<V, C : SelectionContext> : NodeFacade<Sample<V, C>>() {
+abstract class SampleNodeFacade<V, C : RandomSelectorContext> : NodeFacade<Sample<V, C>>() {
     /**
      * 参考 [NodeFacade.dataDir].
      */
@@ -66,7 +66,7 @@ abstract class SampleNodeFacade<V, C : SelectionContext> : NodeFacade<Sample<V, 
             // 添加内在过滤器
             val intrinsics = intrinsicFilters(data)
             for (filter in intrinsics) {
-                local(filter.type, filter)
+                local(filter.kind, filter)
             }
 
             // 添加配置中的过滤器
@@ -74,7 +74,7 @@ abstract class SampleNodeFacade<V, C : SelectionContext> : NodeFacade<Sample<V, 
                 node(filterNodeFacade.decodeNode(listChild))
             }
         }
-        val marks = node.node("marks").string?.let { StringMark(it) }
+        val marks = node.node("marks").string?.let { Mark(it) }
         return Sample(data, weight, filters, marks)
     }
 }

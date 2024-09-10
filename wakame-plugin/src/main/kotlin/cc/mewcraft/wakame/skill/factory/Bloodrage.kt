@@ -2,22 +2,14 @@ package cc.mewcraft.wakame.skill.factory
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
-import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.skill.Caster
-import cc.mewcraft.wakame.skill.CasterUtils
-import cc.mewcraft.wakame.skill.ConfiguredSkill
-import cc.mewcraft.wakame.skill.PassiveSkill
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillBase
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
 import cc.mewcraft.wakame.skill.tick.AbstractSkillTick
 import cc.mewcraft.wakame.skill.tick.SkillTick
-import cc.mewcraft.wakame.tick.TickResult
-import cc.mewcraft.wakame.tick.Tickable
-import cc.mewcraft.wakame.tick.Ticker
+import cc.mewcraft.wakame.tick.*
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.krequire
 import me.lucko.helper.text3.mini
@@ -179,29 +171,29 @@ sealed interface BloodrageEffect {
 }
 
 private data class SkillBloodrageEffect(
-    val effect: ConfiguredSkill,
+    val skill: ConfiguredSkill,
 ) : BloodrageEffect {
     override fun apply(bloodrage: Bloodrage, context: SkillContext): Boolean {
         val player = CasterUtils.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return false
         val user = player.toUser()
-        user.skillMap.addSkill(effect)
+        user.skillMap.addSkill(skill)
         return true
     }
 
     override fun remove(bloodrage: Bloodrage, context: SkillContext) {
         val player = CasterUtils.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return
         val user = player.toUser()
-        user.skillMap.removeSkill(effect.key)
+        user.skillMap.removeSkill(skill.id)
     }
 }
 
 private data class AttributeBloodrageEffect(
-    val core: CoreAttribute,
+    val attribute: ConstantCompositeAttribute,
 ) : BloodrageEffect {
     override fun apply(bloodrage: Bloodrage, context: SkillContext): Boolean {
         val player = CasterUtils.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return false
         val user = player.toUser()
-        val effect = core.provideAttributeModifiers(bloodrage.key)
+        val effect = attribute.provideAttributeModifiers(bloodrage.key)
         val attributeMap = user.attributeMap
         for ((attribute, modifier) in effect) {
             if (attributeMap.hasModifier(attribute, modifier.id))
@@ -214,7 +206,7 @@ private data class AttributeBloodrageEffect(
     override fun remove(bloodrage: Bloodrage, context: SkillContext) {
         val player = CasterUtils.getCaster<Caster.Single.Player>(context)?.bukkitPlayer ?: return
         val user = player.toUser()
-        val effect = core.provideAttributeModifiers(bloodrage.key)
+        val effect = attribute.provideAttributeModifiers(bloodrage.key)
         effect.forEach { (attribute, modifier) -> user.attributeMap.getInstance(attribute)?.removeModifier(modifier) }
     }
 }
@@ -224,33 +216,36 @@ private object BloodrageSupport : KoinComponent {
 }
 
 /**
- * The serializer of bloodrage effect.
+ * The serializer of [Bloodrage] effect.
  *
  * ## Node structure
  *
  * ```yaml
- * <effect key>
- * <impl_defined>
+ * type: <key>
+ * ...
  * ```
  */
 internal object BloodrageEffectSerializer : SchemaSerializer<BloodrageEffect> {
     override fun deserialize(type: Type, node: ConfigurationNode): BloodrageEffect {
-        val key = node.node("type").krequire<Key>()
-        val namespace = key.namespace()
-        return when (namespace) {
+        val effectType = node.node("type").krequire<Key>()
+        val bloodEffect = when (
+            val namespace = effectType.namespace()
+        ) {
             Namespaces.SKILL -> {
-                val skillCore = CoreSkill(node)
-                SkillBloodrageEffect(ConfiguredSkill(skillCore))
+                val configuredSkill = node.krequire<ConfiguredSkill>()
+                SkillBloodrageEffect(configuredSkill)
             }
 
             Namespaces.ATTRIBUTE -> {
-                val attributeCore = CoreAttribute(node)
-                AttributeBloodrageEffect(attributeCore)
+                val compositeAttributeId = effectType.value()
+                val compositeAttribute = ConstantCompositeAttribute(compositeAttributeId, node)
+                AttributeBloodrageEffect(compositeAttribute)
             }
 
             else -> {
-                throw SerializationException(node, type, "Unknown bloodrage effect key '$key'")
+                throw SerializationException(node, type, "Unknown effect key '$effectType'")
             }
         }
+        return bloodEffect
     }
 }

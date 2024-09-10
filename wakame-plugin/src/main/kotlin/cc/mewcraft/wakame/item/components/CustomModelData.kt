@@ -1,25 +1,23 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.ItemConstants
+import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.util.backingCustomModelData
 import net.kyori.examination.Examinable
+
 
 data class CustomModelData(
     val data: Int,
 ) : Examinable {
 
     companion object : ItemComponentBridge<CustomModelData> {
+        /**
+         * 该组件的配置文件.
+         */
+        private val config = ItemComponentConfig.provide(ItemConstants.CUSTOM_MODEL_DATA)
+
         override fun codec(id: String): ItemComponentType<CustomModelData> {
             return Codec(id)
-        }
-
-        override fun templateType(id: String): Nothing {
-            // 开发日记 2024/7/5
-            // 设计上 CustomModelData 不能由物品的配置文件决定,
-            // 因此这里也没写对应的 Template 实现
-            throw UnsupportedOperationException()
         }
     }
 

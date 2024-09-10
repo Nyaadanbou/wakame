@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.gui.mod
 
-import cc.mewcraft.wakame.display2.RendererSystemName
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.removeItalic
 import me.lucko.helper.text3.mini
@@ -42,7 +41,8 @@ internal object ReplaceRender {
                 rendered.editMeta { meta ->
                     val name = "<white>结果: <green>就绪".mini
                     val lore = buildList<Component> {
-                        result.getPortableCore()?.provideTooltipLore(RendererSystemName.STANDARD)?.content?.let { addAll(it) }
+                        // TODO 使用新的渲染器生成文本
+                        result.getPortableCore()?.wrapped?.id?.asString()?.mini?.let { add(it) }
                         add(Component.empty())
                         add(clickToWithdraw)
                     }

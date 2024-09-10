@@ -27,7 +27,6 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.iterator
 
 /**
  * 攻击速度.
@@ -240,7 +239,7 @@ internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
 
     private fun NekoStack.getSkills(): Multimap<Trigger, Skill>? {
         val cells = components.get(ItemComponentTypes.CELLS) ?: return null
-        val skills = cells.collectConfiguredSkills(this, ignoreVariant = true)
+        val skills = cells.collectSkillInstances(this, ignoreVariant = true)
         return skills
     }
 }

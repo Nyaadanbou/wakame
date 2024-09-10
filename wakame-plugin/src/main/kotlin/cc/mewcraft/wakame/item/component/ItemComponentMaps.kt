@@ -88,7 +88,10 @@ internal object ItemComponentMaps {
 /* Privates */
 
 
-class ItemComponentMapBuilderImpl : Builder {
+/**
+ * [ItemComponentMap.Builder] 的实现.
+ */
+private class ItemComponentMapBuilderImpl : Builder {
     private val map: MutableMap<ItemComponentType<*>, Any> = mutableMapOf()
 
     override fun <T> set(type: ItemComponentType<T>, value: T?): Builder {
@@ -121,7 +124,7 @@ class ItemComponentMapBuilderImpl : Builder {
 }
 
 /**
- * 不可变的空容器.
+ * 空的 [ItemComponentMap] 实现. 不可变.
  */
 private object EmptyItemComponentMap : ItemComponentMap {
     override fun <T> get(type: ItemComponentType<out T>): T? = null
@@ -136,7 +139,9 @@ private object EmptyItemComponentMap : ItemComponentMap {
 }
 
 /**
- * 本实现直接储存了所有组件, 不涉及任何封装和 NBT 操作.
+ * 标准的 [ItemComponentMap] 实现.
+ *
+ * 本实现直接把储存组件的数据储存在 [map], 不涉及封装操作.
  */
 private class SimpleItemComponentMap(
     private val map: MutableMap<ItemComponentType<*>, Any>,
@@ -194,10 +199,9 @@ private class SimpleItemComponentMap(
 }
 
 /**
- * 封装了一个 [BukkitStack].
- *
- * 所有组件的*读取*将从封装的物品上获取;
- * 所有组件的*写入*将应用到封装的物品上.
+ * 该实现用于封装一个 [BukkitStack], 也就是说:
+ * - 所有组件的*读取*将从封装的物品上获取;
+ * - 所有组件的*写入*将应用到封装的物品上.
  */
 private class WrappingItemComponentMap(
     private val stack: BukkitStack,
@@ -256,7 +260,7 @@ private class WrappingItemComponentMap(
 }
 
 /**
- * 本质是个委托, 用于构建一个只读的 [ItemComponentMap].
+ * 该实现本质是个委托, 用于构建一个只读的 [ItemComponentMap].
  */
 private class ImmutableItemComponentMap(
     private val delegate: ItemComponentMap,

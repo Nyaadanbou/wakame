@@ -1,12 +1,13 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeSE
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeS
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeSE
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import me.lucko.helper.text3.mini
 import org.koin.core.component.KoinComponent
@@ -43,13 +44,11 @@ internal class MergeOperation(
         }
 
         // 输入的物品必须是*便携式*属性*核心*
-        val core1 = (inputItem1.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute)
-            ?: return Result.failure("<gray>第一个物品不是属性类核心.".mini)
-        val core2 = (inputItem2.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? CoreAttribute)
-            ?: return Result.failure("<gray>第二个物品不是属性类核心.".mini)
+        val core1 = (inputItem1.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? AttributeCore) ?: return Result.failure("<gray>第一个物品不是属性类核心.".mini)
+        val core2 = (inputItem2.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? AttributeCore) ?: return Result.failure("<gray>第二个物品不是属性类核心.".mini)
 
         // 两个核心除了数值以外, 其余数据必须一致
-        if (!core1.isSimilar(core2)) {
+        if (!core1.similarTo(core2)) {
             logger.info("$PREFIX Trying to merge cores with different attributes.")
             return Result.failure("<gray>两个核心的属性种类不一致.".mini)
         }
@@ -66,12 +65,18 @@ internal class MergeOperation(
             return Result.failure("<gray>核心的等级超出了本合并台的上限.".mini)
         }
 
-        val mergedOp = core1.operation
+        val attribute = core1.attribute
+        val mergedOp = attribute.operation
         val mergeType = MergingTable.NumberMergeFunction.Type.by(mergedOp)
         val mergedValue = session.numberMergeFunction(mergeType).evaluate()
-        val mergedCore = when (core1 /* 或者用 core2, 结果上没有区别 */) {
-            is CoreAttributeS -> core1.copy(value = mergedValue)
-            is CoreAttributeSE -> core1.copy(value = mergedValue)
+        val mergedCore = when (attribute /* 或者用 core2, 结果上没有区别 */) {
+            is ConstantCompositeAttributeS -> {
+                AttributeCore(id = core1.id, attribute = attribute.copy(value = mergedValue))
+            }
+
+            is ConstantCompositeAttributeSE -> {
+                AttributeCore(id = core1.id, attribute = attribute.copy(value = mergedValue))
+            }
 
             // 我们不支持拥有两个数值的核心, 原因:
             // - 实际的游戏设计中, 不太可能设计出合并这种核心
@@ -92,7 +97,7 @@ internal class MergeOperation(
             return Result.failure("<gray>过于昂贵!".mini)
         }
 
-        val mergedLevel = session.outputLevelFunction.evaluate().let(::ceil).toInt().toShort()
+        val mergedLevel = session.outputLevelFunction.evaluate().let(::ceil).toInt()
 
         // 输出的物品直接以 inputItem1 为基础进行修改
         val outputItem: NekoStack = inputItem1

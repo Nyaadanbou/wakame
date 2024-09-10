@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.merge
 
-import cc.mewcraft.wakame.attribute.AttributeComponent
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -123,7 +123,7 @@ internal class SimpleMergingSession(
     @Suppress("UNCHECKED_CAST")
     private fun getValue(inputItem: NekoStack?): Double {
         val comp = inputItem?.components?.get(ItemComponentTypes.PORTABLE_CORE) ?: return .0
-        val value = (comp.wrapped as? AttributeComponent.Fixed<Double>)?.value ?: return .0
+        val value = (comp.wrapped as? CompositeAttributeComponent.Scalar<Double>)?.value ?: return .0
         return value
     }
 

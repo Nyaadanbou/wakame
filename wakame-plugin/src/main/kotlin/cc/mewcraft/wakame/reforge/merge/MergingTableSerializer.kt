@@ -2,20 +2,12 @@ package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
-import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
-import cc.mewcraft.wakame.skill.ConfiguredSkillVariantSerializer
+import cc.mewcraft.wakame.reforge.common.*
+import cc.mewcraft.wakame.skill.TriggerVariantSerializer
 import cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.text.Component
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -75,7 +67,7 @@ internal object MergingTableSerializer : KoinComponent {
                 kregister(CoreMatchRuleSerializer)
                 kregister(CoreMatchRuleContainerSerializer)
                 kregister(SkillTriggerSerializer)
-                kregister(ConfiguredSkillVariantSerializer)
+                kregister(TriggerVariantSerializer)
 
                 kregister(RarityNumberMappingSerializer)
             }

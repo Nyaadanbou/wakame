@@ -2,33 +2,14 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.nbt.StringTag
 import cc.mewcraft.nbt.TagType
-import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
-import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentConfig
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentMeta
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.ListTag
-import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.typeTokenOf
-import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.potion.PotionEffect
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.kotlin.extensions.getList
-import org.spongepowered.configurate.serialize.SerializationException
-import org.spongepowered.configurate.serialize.TypeSerializerCollection
+
 
 data class FoodProperties(
     val nutrition: Int,
@@ -44,19 +25,15 @@ data class FoodProperties(
         val probability: Float,
     )
 
-    companion object : ItemComponentBridge<FoodProperties>, ItemComponentMeta {
+    companion object : ItemComponentBridge<FoodProperties> {
+        /**
+         * 该组件的配置文件.
+         */
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.FOOD)
+
         override fun codec(id: String): ItemComponentType<FoodProperties> {
             return Codec(id)
         }
-
-        override fun templateType(id: String): ItemTemplateType<Template> {
-            return TemplateType(id)
-        }
-
-        override val configPath: String = ItemConstants.FOOD
-        override val tooltipKey: Key = ItemConstants.createKey { FOOD }
-
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     private data class Codec(
@@ -118,69 +95,6 @@ data class FoodProperties(
 
         private companion object {
             const val TAG_SKILLS = "skills"
-        }
-    }
-
-    data class Template(
-        val nutrition: Int,
-        val saturation: Float,
-        val canAlwaysEat: Boolean,
-        val eatSeconds: Float,
-        val effects: List<FoodEffect>,
-        val skills: List<Key>,
-    ) : ItemTemplate<FoodProperties> {
-        override val componentType: ItemComponentType<FoodProperties> = ItemComponentTypes.FOOD
-
-        override fun generate(context: GenerationContext): GenerationResult<FoodProperties> {
-            val foodProperties = FoodProperties(
-                nutrition,
-                saturation,
-                canAlwaysEat,
-                eatSeconds,
-                effects,
-                skills
-            )
-            return GenerationResult.of(foodProperties)
-        }
-    }
-
-    private data class TemplateType(
-        override val id: String,
-    ) : ItemTemplateType<Template> {
-        override val type: TypeToken<Template> = typeTokenOf()
-
-        /**
-         * ## Node structure
-         * ```yaml
-         * <node>:
-         *   nutrition: <int>
-         *   saturation: <float>
-         *   can_always_eat: <boolean>
-         *   eat_seconds: <float>
-         *   effects:
-         *     - probability: <float>
-         *       effect: <potion_effect>
-         * ```
-         */
-        override fun decode(node: ConfigurationNode): Template {
-            val nutrition = node.node("nutrition").getInt(0)
-            val saturation = node.node("saturation").getFloat(0f)
-            val canAlwaysEat = node.node("can_always_eat").getBoolean(false)
-            val eatSeconds = node.node("eat_seconds").getFloat(1.6f)
-            val effects = node.node("effects").childrenList().map { child ->
-                val probability = child.node("probability").getFloat(1f).takeIf { it > 0f && it <= 1f } ?: throw SerializationException(child, javaTypeOf<Float>(), "The probability of a single food effect must between 0 (exclusive) and 1 (inclusive)")
-                val potionEffect = child.get<PotionEffect>() ?: throw SerializationException(child, javaTypeOf<PotionEffect>(), "The potion effect of a single food effect must be specifically set")
-                FoodEffect(potionEffect, probability)
-            }
-            val skills = node.node("skills").getList<Key>(emptyList())
-            return Template(nutrition, saturation, canAlwaysEat, eatSeconds, effects, skills)
-        }
-
-        override fun childrenCodecs(): TypeSerializerCollection {
-            return TypeSerializerCollection.builder()
-                .kregister(PotionEffectSerializer)
-                .kregister(PotionEffectTypeSerializer)
-                .build()
         }
     }
 }

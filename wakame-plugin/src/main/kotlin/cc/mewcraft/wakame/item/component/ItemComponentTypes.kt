@@ -4,24 +4,23 @@ import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.components.*
 
 /**
- * 物品组件(wakame)的所有类型.
+ * 本单例提供了物品组件的所有类型.
  */
 internal object ItemComponentTypes {
     /**
-     * 将物品作为箭矢.
+     * 用于表示一个不存在的物品组件.
      */
-    val ARROW: ItemComponentType<Unit> = ItemArrow.codec(ItemConstants.ARROW).register()
+    val EMPTY: ItemComponentType<Nothing> = object : ItemComponentType<Nothing> {
+        override val id: String = "empty"
+        override fun read(holder: ItemComponentHolder): Nothing? = null
+        override fun remove(holder: ItemComponentHolder) = Unit
+        override fun write(holder: ItemComponentHolder, value: Nothing) = Unit
+    }
 
     /**
-     * 物品的攻速
+     * 物品的攻击速度.
      */
     val ATTACK_SPEED: ItemComponentType<ItemAttackSpeed> = ItemAttackSpeed.codec(ItemConstants.ATTACK_SPEED).register()
-
-    /**
-     * 控制物品能否提供属性加成给玩家.
-     */
-    @Deprecated("与 ItemSlot 有高度重合")
-    val ATTRIBUTABLE: ItemComponentType<Attributable> = Attributable.codec(ItemConstants.ATTRIBUTABLE).register()
 
     /**
      * 物品的属性修饰符.
@@ -29,11 +28,6 @@ internal object ItemComponentTypes {
      * 对应原版组件: [`minecraft:attribute_modifiers`](https://minecraft.wiki/w/Data_component_format#attribute_modifiers)
      */
     val ATTRIBUTE_MODIFIERS: ItemComponentType<ItemAttributeModifiers> = ItemAttributeModifiers.codec(ItemConstants.ATTRIBUTE_MODIFIERS).register()
-
-    /**
-     * 将物品作为弓.
-     */
-    val BOW: ItemComponentType<Unit> = ItemBow.codec(ItemConstants.BOW).register()
 
     /**
      * 冒险模式的玩家使用此物品可以破坏的方块.
@@ -48,11 +42,6 @@ internal object ItemComponentTypes {
      * 对应原版组件: [`minecraft:can_place_on`](https://minecraft.wiki/w/Data_component_format#can_place_on)
      */
     val CAN_PLACE_ON: ItemComponentType<ItemAdventurePredicate> = ItemAdventurePredicate.codec(ItemConstants.CAN_PLACE_ON).register()
-
-    /**
-     * 控制物品能否释放技能.
-     */
-    val CASTABLE: ItemComponentType<Castable> = Castable.codec(ItemConstants.CASTABLE).register()
 
     /**
      * 物品的(所有)词条栏.
@@ -124,11 +113,6 @@ internal object ItemComponentTypes {
     val FOOD: ItemComponentType<FoodProperties> = FoodProperties.codec(ItemConstants.FOOD).register()
 
     /**
-     * 可发光的物品
-     */
-    val GLOWABLE: ItemComponentType<ItemGlowable> = ItemGlowable.codec(ItemConstants.GLOWABLE).register()
-
-    /**
      * 隐藏提示框.
      *
      * 对应原版组件: [`minecraft:hide_tooltip`](https://minecraft.wiki/w/Data_component_format#hide_tooltip)
@@ -153,12 +137,6 @@ internal object ItemComponentTypes {
      * 物品的铭刻.
      */
     val KIZAMIZ: ItemComponentType<ItemKizamiz> = ItemKizamiz.codec(ItemConstants.KIZAMIZ).register()
-
-    /**
-     * 控制物品能否提供铭刻加成给玩家.
-     */
-    @Deprecated("与 ItemSlot 有高度重合")
-    val KIZAMIABLE: ItemComponentType<Kizamiable> = Kizamiable.codec(ItemConstants.KIZAMIABLE).register()
 
     /**
      * 物品的等级.
@@ -186,12 +164,6 @@ internal object ItemComponentTypes {
      * 物品的稀有度.
      */
     val RARITY: ItemComponentType<ItemRarity> = ItemRarity.codec(ItemConstants.RARITY).register()
-
-    /**
-     * 控制物品能否提供技能加成给玩家.
-     */
-    @Deprecated("与 ItemSlot 有高度重合")
-    val SKILLFUL: ItemComponentType<Skillful> = Skillful.codec(ItemConstants.SKILLFUL).register()
 
     /**
      * 物品的皮肤.

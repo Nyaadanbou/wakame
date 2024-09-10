@@ -2,55 +2,29 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.display2.RendererSystemName
-import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentConfig
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentMeta
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.cells.Cell
-import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.CoreTypes
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCell
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCellSerializer
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCoreGroupSerializer
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCorePoolSerializer
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCoreSerializer
-import cc.mewcraft.wakame.item.components.cells.template.cores.empty.TemplateCoreEmpty
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.skill.ConfiguredSkill
-import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
 import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.util.value
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
-import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.qualifier.named
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<String, Cell>> {
 
-    companion object : ItemComponentBridge<ItemCells>, ItemComponentMeta {
+interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
+
+    companion object : ItemComponentBridge<ItemCells> {
+        /**
+         * 该组件的配置文件.
+         */
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.CELLS)
+
         /**
          * 构建一个 [ItemCells] 的实例.
          */
@@ -68,15 +42,6 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
         override fun codec(id: String): ItemComponentType<ItemCells> {
             return Codec(id)
         }
-
-        override fun templateType(id: String): ItemTemplateType<Template> {
-            return TemplateType(id)
-        }
-
-        override val configPath: String = ItemConstants.CELLS
-        override val tooltipKey: Key = ItemConstants.createKey { CELLS }
-
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     /**
@@ -92,7 +57,8 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     /**
      * 过滤出符合条件的词条栏.
      */
-    fun filterx(predicate: (Cell) -> Boolean): ItemCells
+    // 命名为 filter2 是为了避免跟 Iterable#filter 相冲突
+    fun filter2(predicate: (Cell) -> Boolean): ItemCells
 
     /**
      * 检查指定的词条栏是否存在.
@@ -139,7 +105,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     /**
      * 获取所有词条栏上的 [ConfiguredSkill].
      */
-    fun collectConfiguredSkills(context: NekoStack, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
+    fun collectSkillInstances(context: NekoStack, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
 
     /**
      * 忽略数值的前提下, 判断是否包含指定的核心.
@@ -202,7 +168,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             return builder
         }
 
-        override fun filterx(predicate: (Cell) -> Boolean): ItemCells {
+        override fun filter2(predicate: (Cell) -> Boolean): ItemCells {
             return edit { map ->
                 map.entries.removeIf { (_, cell) -> !predicate(cell) }
             }
@@ -241,42 +207,40 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
         override fun collectAttributeModifiers(context: NekoStack): Multimap<Attribute, AttributeModifier> {
             val ret = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
             for ((id, cell) in this) {
-                val core = cell.getCoreAs(CoreTypes.ATTRIBUTE) ?: continue
+                val core = cell.getCoreAs(CoreType.ATTRIBUTE) ?: continue
+                val attribute = core.attribute
+
                 // 拼接物品 key 和词条栏 id 作为属性修饰符的 id
                 val identity = context.id.value { "$it/$id" }
-                val attributeModifiers = core.provideAttributeModifiers(identity)
+
+                val attributeModifiers = attribute.provideAttributeModifiers(identity)
                 ret.putAll(attributeModifiers.entries)
             }
             return ret.build()
         }
 
-        override fun collectConfiguredSkills(context: NekoStack, ignoreVariant: Boolean): Multimap<Trigger, Skill> {
+        override fun collectSkillInstances(context: NekoStack, ignoreVariant: Boolean): Multimap<Trigger, Skill> {
             val ret = ImmutableListMultimap.builder<Trigger, Skill>()
             for ((_, cell) in this) {
-                val core = cell.getCoreAs(CoreTypes.SKILL) ?: continue
-                val variant = core.variant
-                if (ignoreVariant || variant == TriggerVariant.any()) {
-                    ret.put(core.trigger, core.skill)
+                val core = cell.getCoreAs(CoreType.SKILL) ?: continue
+                val skill = core.skill
+
+                val skillVariant = skill.variant
+                val skillInstance = skill.instance
+                if (ignoreVariant || skillVariant == TriggerVariant.any()) {
+                    ret.put(skill.trigger, skillInstance)
                     continue
                 }
-                if (variant.id != context.variant) {
+                if (skillVariant.id != context.variant) {
                     continue
                 }
-                ret.put(core.trigger, core.skill)
+                ret.put(skill.trigger, skillInstance)
             }
             return ret.build()
         }
 
         override fun containSimilarCore(core: Core): Boolean {
-            return cells.values.any { cell -> cell.getCore().isSimilar(core) }
-        }
-
-        override fun provideTooltipLore(systemName: RendererSystemName): Collection<LoreLine> {
-            // showInTooltip 由核心各自的配置文件控制
-            // if (!config.showInTooltip) {
-            //     return emptyList()
-            // }
-            return cells.values.map { cell -> cell.provideTooltipLore(systemName) }
+            return cells.values.any { cell -> cell.getCore().similarTo(core) }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, Cell>> {
@@ -296,23 +260,28 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
     ) : ItemComponentType<ItemCells> {
         override fun read(holder: ItemComponentHolder): ItemCells? {
             val tag = holder.getTag() ?: return null
+
             // 优化: 词条栏绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
             val cells = Object2ObjectArrayMap<String, Cell>(tag.size())
+
             for (id in tag.keySet()) {
                 val nbt = tag.getCompound(id)
                 val cell = Cell.of(id, nbt)
                 cells.put(id, cell)
             }
+
             return Value(cells)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemCells) {
             holder.editTag { tag ->
                 tag.clear() // 总是重新写入全部数据
+
                 for ((id, cell) in value) {
-                    if (cell.getCore().isNoop) {
-                        continue // 拥有 No-op 核心的词条栏不应该写入物品
+                    if (cell.getCore().isVirtual) {
+                        continue // 拥有虚拟核心的词条栏不应该写入物品
                     }
+
                     tag.put(id, cell.serializeAsTag())
                 }
             }
@@ -320,98 +289,6 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
 
         override fun remove(holder: ItemComponentHolder) {
             holder.removeTag()
-        }
-
-        private companion object
-    }
-
-    data class Template(
-        val cells: Map<String, TemplateCell>,
-    ) : ItemTemplate<ItemCells> {
-        override val componentType: ItemComponentType<ItemCells> = ItemComponentTypes.CELLS
-
-        override fun generate(context: GenerationContext): GenerationResult<ItemCells> {
-            val builder = builder()
-            for ((id, templateCell) in this.cells) {
-                // 生成核心
-                val core = run {
-                    val selected = templateCell.core.select(context)
-                    val template = selected.firstOrNull() ?: TemplateCoreEmpty
-                    template.generate(context)
-                }
-                // collect all and put it into the builder
-                builder.put(id, Cell.of(id, core))
-            }
-            return GenerationResult.of(builder.build())
-        }
-    }
-
-    private data class TemplateType(
-        override val id: String,
-    ) : ItemTemplateType<Template>, KoinComponent {
-        override val type: TypeToken<Template> = typeTokenOf()
-
-        /**
-         * ## Node structure
-         * ```yaml
-         * <node>:
-         *   buckets:
-         *     <词条栏 id>:
-         *       core: <核心选择器>
-         *     <词条栏 id>:
-         *       core: <核心选择器>
-         *     ...
-         *   selectors:
-         *     core_pools:
-         *       pool_1: <pool>
-         *       pool_2: <pool>
-         *       ...
-         *     core_groups:
-         *       group_1: <group>
-         *       group_2: <group>
-         *       ...
-         * ```
-         */
-        override fun decode(node: ConfigurationNode): Template {
-            // 先把节点的键 (Any) 转成 String
-            val bucketMap: Map<String, ConfigurationNode> = node
-                .node("buckets")
-                .childrenMap()
-                .mapKeys { (id, _) ->
-                    id.toString()
-                }
-
-            val selectors: ConfigurationNode = node.node("selectors")
-            val templates: LinkedHashMap<String, TemplateCell> = bucketMap
-                .map { (id, node) ->
-                    // 先把节点 “selectors” 注入到节点 “buckets.<id>”
-                    node.hint(TemplateCellSerializer.HINT_NODE_SELECTORS, selectors)
-                    // 再反序列化 “buckets.<id>”, 最后转成 Pair
-                    id to node.krequire<TemplateCell>()
-                }.toMap(
-                    // 显式构建为有序 Map
-                    LinkedHashMap()
-                )
-
-            return Template(templates)
-        }
-
-        override fun childrenCodecs(): TypeSerializerCollection {
-            return TypeSerializerCollection.builder()
-
-                // 随机选择器
-                .kregister(TemplateCellSerializer)
-                .kregister(TemplateCoreSerializer)
-                .kregister(TemplateCorePoolSerializer)
-                .kregister(TemplateCoreGroupSerializer)
-
-                // 技能, 部分核心会用到
-                .registerAll(get(named(SKILL_EXTERNALS)))
-
-                // 实体类型, 部分诅咒会用到
-                .registerAll(get(named(ENTITY_TYPE_HOLDER_EXTERNALS)))
-
-                .build()
         }
     }
 }

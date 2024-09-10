@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.core
 
 import cc.mewcraft.wakame.item.realize
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationTrigger
+import cc.mewcraft.wakame.item.template.ItemGenerationContexts
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.user.toUser
@@ -25,9 +25,9 @@ class ItemXNeko(
     override fun createItemStack(): ItemStack? {
         val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
         val nekoItem = ItemRegistry.CUSTOM.find(nekoItemId)
-        val context = GenerationContext(
+        val context = ItemGenerationContexts.create(
             // 始终以等级 0 生成
-            trigger = GenerationTrigger.direct(0),
+            trigger = ItemGenerationTriggers.direct(0),
             // 设置为物品的 key
             target = nekoItemId,
             // 随机种子始终为 0

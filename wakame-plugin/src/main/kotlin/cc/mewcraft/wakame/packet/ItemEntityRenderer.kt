@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.isNeko
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.rarity.GlowColor
 import cc.mewcraft.wakame.util.backingItemName
@@ -10,14 +11,13 @@ import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
+import com.github.retrooper.packetevents.wrapper.play.server.*
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Item
-import java.util.*
+import java.util.Optional
+import java.util.UUID
 
 /**
  * 修改 [Item].
@@ -75,8 +75,8 @@ internal class ItemEntityRenderer : PacketListenerAbstract() {
      */
     private fun tryAddGlowEffectEntityData(entity: Item, entityData: MutableList<EntityData>): Boolean {
         val nekoStack = entity.itemStack.tryNekoStack ?: return false
-        val components = nekoStack.components
-        if (!components.has(ItemComponentTypes.GLOWABLE))
+        val templates = nekoStack.templates
+        if (!templates.has(ItemTemplateTypes.GLOWABLE))
             return false
 
         // Glow effect flag (0x40)
