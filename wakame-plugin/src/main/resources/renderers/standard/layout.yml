@@ -1,5 +1,4 @@
 primary:
-
   - (default:'无皮肤')component:skin
 
   - (default:blank)component:skin_owner
@@ -42,10 +41,10 @@ primary:
   - attribute:max_mana
   - attribute:movement_speed
   - attribute:universal_attack_damage
-  - attribute:universal_attack_damage_rate
   - attribute:universal_defense
   - attribute:universal_defense_penetration
   - attribute:universal_defense_penetration_rate
+  # FIXME 需要正确的移除 universal_incoming_damage_rate
   - attribute:universal_incoming_damage_rate
 
   - (fixed:skill)技能

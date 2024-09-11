@@ -454,3 +454,16 @@ universal_defense_penetration_rate:
     default: .0
     min: 0.0
     max: 1.0
+
+# FIXME 需要正确的移除 universal_incoming_damage_rate
+universal_incoming_damage_rate:
+  enabled: true
+  display: "通用承伤百分比"
+  tooltips:
+    add: "<!i>通用承伤百分比 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: .0
+    min: 0.0
+    max: 10.0

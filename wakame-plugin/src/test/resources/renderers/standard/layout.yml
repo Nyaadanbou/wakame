@@ -48,10 +48,10 @@ primary:
   - attribute:max_mana
   - attribute:movement_speed
   - attribute:universal_attack_damage
-  - attribute:universal_attack_damage_rate
   - attribute:universal_defense
   - attribute:universal_defense_penetration
   - attribute:universal_defense_penetration_rate
+  # FIXME 需要正确的移除 universal_incoming_damage_rate
   - attribute:universal_incoming_damage_rate
 
   # 仅当下面存在 skill 命名空间下的内容时才渲染
