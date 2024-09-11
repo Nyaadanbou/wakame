@@ -43,10 +43,11 @@ internal class RendererConfigImpl(
             return this.split("\\r").map(miniMessage::deserialize)
         }
 
-        fun createDynamicLoreMeta(rawIndex: Int, rawLine: String, default: List<Component>?): DynamicLoreMeta {
-            val creator = dynamicLoreMetaCreators.getApplicableCreator(rawLine) ?: throw IllegalArgumentException(
-                "Unrecognized raw line '$rawLine' while loading config '${config.relPath}'"
-            )
+        fun createDynamicLoreMeta(rawIndex: Int, rawLine: String, default: List<Component>?): DynamicLoreMeta? {
+            val creator = dynamicLoreMetaCreators.getApplicableCreator(rawLine) ?: run {
+                logger.warn("Unrecognized raw line '$rawLine' while loading config '${config.relPath}'")
+                return null
+            }
             return creator.create(rawIndex, rawLine, default)
         }
 
@@ -57,8 +58,8 @@ internal class RendererConfigImpl(
          * @param rawLine the raw line in the config, without any modification
          * @return a new instance
          */
-        fun createLoreMeta(rawIndex: Int, rawLine: String): LoreMeta {
-            val ret: LoreMeta
+        fun createLoreMeta(rawIndex: Int, rawLine: String): LoreMeta? {
+            val ret: LoreMeta?
             val rawLineMatcher = rawLinePattern.matcher(rawLine)
             if (rawLineMatcher.matches()) {
                 // 统一说明: {} 代表用户输入
@@ -122,7 +123,7 @@ internal class RendererConfigImpl(
 
         // loop through each primary line and initialize LoreMeta
         for ((rawIndex, rawLine) in primaryRawLines.withIndex()) {
-            val loreMeta = createLoreMeta(rawIndex, rawLine)
+            val loreMeta = createLoreMeta(rawIndex, rawLine) ?: continue
 
             // populate the raw tooltip keys
             rawTooltipKeys += loreMeta.rawTooltipKey
