@@ -10,6 +10,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal fun packetModule() = module {
+    // TODO: 将 package 名改成 network
 
     single<PacketEventsAPI<*>> {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(get()))
@@ -17,6 +18,8 @@ internal fun packetModule() = module {
     }
 
     singleOf(::PacketEventsManager) bind Initializable::class
+
+    singleOf(::PacketDispatcher)
 
     singleOf(::FOVPacketHandler) bind PacketListenerCommon::class
     singleOf(::ItemEntityDisplayPacketHandler) bind PacketListenerCommon::class
