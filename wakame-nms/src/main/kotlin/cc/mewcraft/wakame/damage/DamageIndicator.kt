@@ -223,7 +223,7 @@ class DamageIndicator(
 
         val values = ArrayList<DataValue<*>>()
 
-        for (item in BukkitShadowFactory.global().shadow<ShadowSynchedEntityData>(display.entityData).itemById) {
+        for (item in BukkitShadowFactory.global().shadow<ShadowSynchedEntityData>(display.entityData).itemsById) {
             values.add(item.value())
         }
 

@@ -9,6 +9,6 @@ import net.minecraft.network.syncher.SynchedEntityData
 @ClassTarget(SynchedEntityData::class)
 internal interface ShadowSynchedEntityData : Shadow {
     @get:Field
-    @get:Target("itemById")
-    val itemById: Array<SynchedEntityData.DataItem<*>>
+    @get:Target("itemsById")
+    val itemsById: Array<SynchedEntityData.DataItem<*>>
 }
