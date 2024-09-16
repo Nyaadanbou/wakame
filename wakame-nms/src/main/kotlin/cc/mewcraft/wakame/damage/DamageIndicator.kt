@@ -165,10 +165,6 @@ class DamageIndicator(
     }
 
     fun show(player: Player): Boolean {
-//        if (!HologramShowEvent(this, player).callEvent()) {
-//            return false
-//        }
-
         if (this.display == null) {
             create() // try to create it if it doesn't exist every time
         }
@@ -182,13 +178,6 @@ class DamageIndicator(
 
         val serverPlayer = (player as CraftPlayer).handle
 
-        // TODO: cache player protocol version
-        // TODO: fix this
-//        final var protocolVersion = FancyHologramsPlugin.get().isUsingViaVersion() ? Via.getAPI().getPlayerVersion(player.getUniqueId()) : MINIMUM_PROTOCOL_VERSION;
-//        if (protocolVersion < MINIMUM_PROTOCOL_VERSION) {
-//            System.out.println("nope protocol");
-//            return false;
-//        }
         serverPlayer.connection.send(ClientboundAddEntityPacket(display, 0, BlockPos.ZERO))
         this.viewers.add(player.getUniqueId())
         refresh(player)
@@ -197,10 +186,6 @@ class DamageIndicator(
     }
 
     fun hide(player: Player): Boolean {
-//        if (!HologramHideEvent(this, player).callEvent()) {
-//            return false
-//        }
-
         val display = this.display
             ?: return false // doesn't exist, nothing to hide
 

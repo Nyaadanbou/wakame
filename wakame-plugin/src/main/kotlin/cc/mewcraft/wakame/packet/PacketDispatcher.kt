@@ -31,7 +31,7 @@ class PacketDispatcher : Listener {
 
         for (packet in damagePackets) {
             // Get damagee center location
-            val displayLocation = damagee.location.clone().add(Random.nextDouble(-0.5, 0.5), damagee.height / 2 + Random.nextDouble(0.0, 0.5), Random.nextDouble(-0.5, 0.5))
+            val displayLocation = damagee.location.add(Random.nextDouble(-0.5, 0.5), damagee.height / 2 + Random.nextDouble(0.0, 0.5), Random.nextDouble(-0.5, 0.5))
             val displayComponent = if (isCritical) {
                 Component.text("💥 ").color(TextColor.color(0xff9900))
                     .append(Component.text(packet.packetDamage).style(Style.style(*packet.element.styles)))
@@ -53,18 +53,18 @@ private object DamageDisplayHandler {
             true,
             TextDisplay.TextAlignment.CENTER,
             true
-        ).also {
-            it.brightness = Display.Brightness(9, 0)
+        ).apply {
+            brightness = Display.Brightness(9, 0)
         }
         val damageIndicator = DamageIndicator(indicatorData)
         damageIndicator.show(damager)
 
         runTaskLater(2) {
-            indicatorData.also {
-                it.startInterpolation = 0
-                it.interpolationDuration = 20
-                it.translation.add(0.0f, 0.5f, 0f)
-                it.scale.add(0.5f, 0.5f, 0.5f)
+            indicatorData.apply {
+                startInterpolation = 0
+                interpolationDuration = 20
+                translation.add(0.0f, 0.5f, 0f)
+                scale.add(0.5f, 0.5f, 0.5f)
             }
 
             damageIndicator.setEntityData(indicatorData)
