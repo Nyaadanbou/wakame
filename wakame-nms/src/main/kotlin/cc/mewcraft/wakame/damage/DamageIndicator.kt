@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.shadow.network.ShadowSynchedEntityData
-import cc.mewcraft.wakame.shadow.world.ShadowDisplay
 import com.mojang.math.Transformation
 import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.shadow.bukkit.BukkitShadowFactory
@@ -35,7 +34,7 @@ import org.bukkit.entity.Display as BukkitDisplay
  * 一个对于 [MojangDisplay] 的封装, 用于指示伤害.
  */
 class DamageIndicator(
-    private val data: IndicatorData,
+    private var data: IndicatorData,
 ) {
     companion object {
         private const val LINE_WIDTH = 1000
@@ -59,15 +58,13 @@ class DamageIndicator(
             IndicatorData.Type.TEXT -> MojangDisplay.TextDisplay(EntityType.TEXT_DISPLAY, world)
             IndicatorData.Type.BLOCK -> MojangDisplay.BlockDisplay(EntityType.BLOCK_DISPLAY, world)
             IndicatorData.Type.ITEM -> MojangDisplay.ItemDisplay(EntityType.ITEM_DISPLAY, world)
-        }.also {
-            it.entityData.set(ShadowDisplay.DATA_TRANSFORMATION_INTERPOLATION_START_DELTA_TICKS_ID, 0)
-            it.entityData.set(ShadowDisplay.DATA_TRANSFORMATION_INTERPOLATION_DURATION_ID, 1)
         }
 
         update()
     }
 
     fun update() {
+        val data = this.data
         val display = this.display
             ?: return  // doesn't exist, nothing to update
 
@@ -86,13 +83,16 @@ class DamageIndicator(
             display.entityData.set(MojangDisplay.TextDisplay.DATA_LINE_WIDTH_ID, LINE_WIDTH)
 
             // background
-            val background = data.background
-            if (background == null) {
-                display.entityData.set(MojangDisplay.TextDisplay.DATA_BACKGROUND_COLOR_ID, MojangDisplay.TextDisplay.INITIAL_BACKGROUND)
-            } else if (background == TRANSPARENT) {
-                display.entityData.set(MojangDisplay.TextDisplay.DATA_BACKGROUND_COLOR_ID, 0)
-            } else {
-                display.entityData.set(MojangDisplay.TextDisplay.DATA_BACKGROUND_COLOR_ID, background.asARGB())
+            when (val background = data.background) {
+                null -> {
+                    display.entityData.set(MojangDisplay.TextDisplay.DATA_BACKGROUND_COLOR_ID, MojangDisplay.TextDisplay.INITIAL_BACKGROUND)
+                }
+                TRANSPARENT -> {
+                    display.entityData.set(MojangDisplay.TextDisplay.DATA_BACKGROUND_COLOR_ID, 0)
+                }
+                else -> {
+                    display.entityData.set(MojangDisplay.TextDisplay.DATA_BACKGROUND_COLOR_ID, background.asARGB())
+                }
             }
 
             // text shadow
@@ -157,6 +157,10 @@ class DamageIndicator(
             // entity shadow
             display.shadowRadius = data.shadowRadius
             display.shadowStrength = data.shadowStrength
+
+            // entity interpolation
+            display.transformationInterpolationDelay = data.startInterpolation
+            display.transformationInterpolationDuration = data.interpolationDuration
         }
     }
 
@@ -208,6 +212,7 @@ class DamageIndicator(
 
 
     fun refresh(player: Player) {
+        val data = this.data
         val display = this.display
             ?: return  // doesn't exist, nothing to refresh
 
@@ -215,7 +220,11 @@ class DamageIndicator(
             return
         }
 
-        (player as CraftPlayer).handle.connection.send(ClientboundTeleportEntityPacket(display))
+        if (player !is CraftPlayer) {
+            return
+        }
+
+        player.handle.connection.send(ClientboundTeleportEntityPacket(display))
 
         if (display is MojangDisplay.TextDisplay && data is TextIndicatorData) {
             display.text = PaperAdventure.asVanilla(data.text)
@@ -228,5 +237,10 @@ class DamageIndicator(
         }
 
         player.handle.connection.send(ClientboundSetEntityDataPacket(display.id, values))
+    }
+
+    fun setEntityData(data: IndicatorData) {
+        this.data = data
+        update()
     }
 }
