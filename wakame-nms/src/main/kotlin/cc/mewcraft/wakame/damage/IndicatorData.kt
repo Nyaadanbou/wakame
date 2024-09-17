@@ -52,7 +52,14 @@ class TextIndicatorData(
     val hasTextShadow: Boolean,
     val textAlignment: TextDisplay.TextAlignment,
     val isSeeThrough: Boolean,
-) : DisplayIndicatorData(IndicatorData.Type.TEXT, location)
+) : DisplayIndicatorData(IndicatorData.Type.TEXT, location) {
+    // 此属性因 Mojang 的 bug 无法进行线性插值 https://bugs.mojang.com/browse/MC-259823
+    var opacity: Byte = DEFAULT_OPACITY
+
+    companion object {
+        const val DEFAULT_OPACITY: Byte = -1
+    }
+}
 
 class ItemIndicatorData(
     location: Location,

@@ -87,9 +87,11 @@ class DamageIndicator(
                 null -> {
                     display.entityData.set(MojangDisplay.TextDisplay.DATA_BACKGROUND_COLOR_ID, MojangDisplay.TextDisplay.INITIAL_BACKGROUND)
                 }
+
                 TRANSPARENT -> {
                     display.entityData.set(MojangDisplay.TextDisplay.DATA_BACKGROUND_COLOR_ID, 0)
                 }
+
                 else -> {
                     display.entityData.set(MojangDisplay.TextDisplay.DATA_BACKGROUND_COLOR_ID, background.asARGB())
                 }
@@ -121,6 +123,9 @@ class DamageIndicator(
             } else {
                 display.flags = (display.flags and MojangDisplay.TextDisplay.FLAG_ALIGN_RIGHT.inv())
             }
+
+            // text opacity
+            display.textOpacity = data.opacity
         } else if (display is MojangDisplay.ItemDisplay && data is ItemIndicatorData) {
             // item
             display.itemStack = MojangStack.fromBukkitCopy(data.itemStack)
@@ -172,13 +177,14 @@ class DamageIndicator(
         val display = this.display
             ?: return false // could not be created, nothing to show
 
-        if (data.location.world.name != player.location.getWorld().name) {
+        val location = data.location
+        if (location.world.name != player.location.getWorld().name) {
             return false
         }
 
         val serverPlayer = (player as CraftPlayer).handle
 
-        serverPlayer.connection.send(ClientboundAddEntityPacket(display, 0, BlockPos.ZERO))
+        serverPlayer.connection.send(ClientboundAddEntityPacket(display, 0, BlockPos.containing(location.x, location.y, location.z)))
         this.viewers.add(player.getUniqueId())
         refresh(player)
 
