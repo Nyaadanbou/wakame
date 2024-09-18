@@ -20,6 +20,10 @@ data class GenerationContext(
      * 参考 [team.unnamed.creative.metadata.pack.PackFormat.max].
      */
     val max: Int,
+    /**
+     * 需要合并的资源包路径.
+     */
+    val mergePacks: List<String>,
 
     //
 

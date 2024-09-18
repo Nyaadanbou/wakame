@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
+import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.lookup.Assets
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.itemType
@@ -10,8 +11,6 @@ import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.util.*
-import cc.mewcraft.wakame.util.readTextAndToJson
-import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -23,9 +22,11 @@ import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta
 import team.unnamed.creative.model.ItemOverride
-import team.unnamed.creative.model.ItemPredicate
 import team.unnamed.creative.model.ModelTexture
 import team.unnamed.creative.model.ModelTextures
+import team.unnamed.creative.resources.MergeStrategy
+import team.unnamed.creative.serialize.ResourcePackReader
+import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import team.unnamed.creative.serialize.minecraft.metadata.MetadataSerializer
 import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
 import team.unnamed.creative.texture.Texture
@@ -221,6 +222,44 @@ internal class ResourcePackCustomModelGeneration(
                     .build()
             )
             .build()
+    }
+}
+
+internal class ResourcePackMergePackGeneration(
+    context: GenerationContext,
+    private val packReader: ResourcePackReader<FileTreeReader>,
+) : ResourcePackGeneration(context), KoinComponent {
+    private val logger: Logger by inject()
+    private val pluginDir: File by inject(named(PLUGIN_DATA_DIR))
+
+    override fun generate() {
+        val pluginsDir = pluginDir.parentFile
+        val pack = context.pack
+        val mergePacks = context.mergePacks
+            .mapNotNull {
+                val file = pluginsDir.resolve(it)
+                logger.info("Merging pack... path: $file")
+                if (!file.exists()) {
+                    logger.warn("Merge pack not found: $it")
+                    return@mapNotNull null
+                }
+                file
+            }
+            .mapNotNull {
+                if (it.isDirectory) {
+                    packReader.readFromDirectory(it)
+                } else {
+                    if (it.extension != "zip") {
+                        logger.warn("Invalid file extension for merge pack: ${it.extension}")
+                        return@mapNotNull null
+                    }
+                    packReader.readFromZipFile(it)
+                }
+            }
+
+        for (mergePack in mergePacks) {
+            pack.merge(mergePack, MergeStrategy.mergeAndKeepFirstOnError())
+        }
     }
 }
 

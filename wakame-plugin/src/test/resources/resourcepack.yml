@@ -9,6 +9,10 @@ generation:
   min: 32
   # 最高兼容的资源包版本
   max: 34
+  # 需要合并的资源包路径 (文件夹或 zip 文件), 相对于 plugins 目录.
+  merge_packs:
+    - "ModelEngine/resource pack"
+    - "g22/texture.zip"
 
 # 资源包分发
 # 当玩家进入服务器时自动向玩家分发资源包.
