@@ -59,6 +59,24 @@ class WakameEntityDamageEvent(
         return elementFinalDamageMap.values.sumOf { it }
     }
 
+    /**
+     * 获取本次伤害是否为正暴击.
+     * 未暴击将返回false.
+     * 暴击了但伤害未变化(即暴击倍率为1.0时)算未暴击.
+     */
+    fun isPositiveCriticalStrike(): Boolean {
+        return damageMetadata.isCritical && damageMetadata.criticalPower > 1
+    }
+
+    /**
+     * 获取本次伤害是否为负暴击.
+     * 未暴击将返回false.
+     * 暴击了但伤害未变化(即暴击倍率为1.0时)算未暴击.
+     */
+    fun isNegativeCriticalStrike(): Boolean {
+        return damageMetadata.isCritical && damageMetadata.criticalPower < 1
+    }
+
     override fun isCancelled(): Boolean {
         return cancel
     }
