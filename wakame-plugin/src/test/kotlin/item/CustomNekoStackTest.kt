@@ -1,6 +1,7 @@
 package item
 
 import assertAny
+import cc.mewcraft.wakame.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -116,7 +117,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(ItemAttackSpeed.Level.NORMAL, it.level)
+            assertEquals(AttackSpeedLevel.NORMAL, it.level)
         }
     }
 

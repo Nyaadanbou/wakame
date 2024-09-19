@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.user
 
+import cc.mewcraft.wakame.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.resource.ResourceMap
@@ -55,4 +56,9 @@ interface User<P> {
      * Skill State Manager of the player.
      */
     val skillState: SkillState<P>
+
+    /**
+     * Attack Speed of the player.
+     */
+    val attackSpeed: AttackSpeed
 }

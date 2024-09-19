@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.attackspeed.AttackSpeedEventHandler
 import cc.mewcraft.wakame.attribute.AttributeEventHandler
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
@@ -13,6 +14,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
@@ -23,6 +25,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class MultipleItemListener : KoinComponent, Listener {
+    private val attackSpeedEventHandler: AttackSpeedEventHandler by inject()
     private val attributeEventHandler: AttributeEventHandler by inject()
     private val kizamiEventHandler: KizamiEventHandler by inject()
     private val skillEventHandler: SkillEventHandler by inject()
@@ -34,6 +37,7 @@ class MultipleItemListener : KoinComponent, Listener {
         val oldItem = event.oldItemStack
         val newItem = event.newItemStack
 
+        attackSpeedEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
         attributeEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
         kizamiEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
         skillEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
@@ -44,6 +48,7 @@ class MultipleItemListener : KoinComponent, Listener {
  * 此监听器包含的事件仅涉及到一个物品.
  */
 class SingleItemListener : KoinComponent, Listener {
+    private val attackSpeedEventHandler: AttackSpeedEventHandler by inject()
     private val skillEventHandler: SkillEventHandler by inject()
 
     /* Item Behavior Event Handlers */
@@ -114,6 +119,24 @@ class SingleItemListener : KoinComponent, Listener {
         }
     }
 
+    /* Attack Speed Event Handlers */
+
+    @EventHandler
+    fun onAttack1(event: EntityDamageByEntityEvent) {
+        val damager = event.damager as? Player ?: return
+        val item = damager.inventory.itemInMainHand
+        item.tryNekoStack ?: return
+        attackSpeedEventHandler.handlePlayerAttackEntity(damager, item, event)
+    }
+
+    @EventHandler
+    fun onShoot(event: EntityShootBowEvent) {
+        val shooter = event.entity as? Player ?: return
+        val item = event.bow
+        item?.tryNekoStack ?: return
+        attackSpeedEventHandler.handlePlayerShootBow(shooter, item, event)
+    }
+
     /* Skill Event Handlers */
 
     @EventHandler
@@ -147,7 +170,7 @@ class SingleItemListener : KoinComponent, Listener {
     }
 
     @EventHandler
-    fun onAttack(event: EntityDamageByEntityEvent) {
+    fun onAttack2(event: EntityDamageByEntityEvent) {
         val damager = event.damager as? Player ?: return
         val entity = event.entity as? LivingEntity ?: return
         val item = damager.inventory.itemInMainHand.takeIfNeko()

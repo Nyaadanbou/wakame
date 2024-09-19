@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
@@ -21,16 +22,8 @@ data class ItemAttackSpeed(
     /**
      * 攻速等级.
      */
-    val level: Level
+    val level: AttackSpeedLevel
 ) : Examinable, TooltipProvider.Single {
-
-    enum class Level {
-        SLOWEST,
-        SLOWER,
-        NORMAL,
-        FASTER,
-        FASTEST
-    }
 
     companion object : ItemComponentBridge<ItemAttackSpeed>, ItemComponentMeta {
         override fun codec(id: String): ItemComponentType<ItemAttackSpeed> {
@@ -61,7 +54,7 @@ data class ItemAttackSpeed(
         override fun read(holder: ItemComponentHolder): ItemAttackSpeed? {
             val tag = holder.getTag() ?: return null
             val level = tag.getByte(TAG_KEY)
-            return ItemAttackSpeed(Level.entries[level.toInt()])
+            return ItemAttackSpeed(AttackSpeedLevel.entries[level.toInt()])
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemAttackSpeed) {
@@ -83,7 +76,7 @@ data class ItemAttackSpeed(
         /**
          * 攻速等级.
          */
-        val level: Level
+        val level: AttackSpeedLevel
     ) : ItemTemplate<ItemAttackSpeed> {
         override val componentType: ItemComponentType<ItemAttackSpeed> = ItemComponentTypes.ATTACK_SPEED
 
@@ -105,7 +98,7 @@ data class ItemAttackSpeed(
          * ```
          */
         override fun decode(node: ConfigurationNode): Template {
-            val raw = node.node("level").krequire<Level>()
+            val raw = node.node("level").krequire<AttackSpeedLevel>()
             return Template(raw)
         }
     }
