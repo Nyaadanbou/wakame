@@ -188,6 +188,7 @@ object NekoItemFactory : KoinComponent {
             }
 
             tryAdd("arrow", ItemTemplateTypes.ARROW)
+            tryAdd("attack_speed", ItemTemplateTypes.ATTACK_SPEED)
             tryAdd("attributable", ItemTemplateTypes.ATTRIBUTABLE)
             tryAdd("attribute_modifiers", ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
             tryAdd("bow", ItemTemplateTypes.BOW)

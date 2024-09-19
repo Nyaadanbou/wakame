@@ -1,0 +1,5 @@
+item_type: wooden_sword
+
+# 标记该物品可以为玩家提供属性加成
+attack_speed:
+  level: NORMAL

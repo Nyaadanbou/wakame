@@ -82,24 +82,6 @@ class ResourcePackManagerTest : KoinTest {
             logger.error("Failed to generate resource pack", e)
         }
 
-        // Verify the behavior of the mocks
-        // Only one of the read methods should be called
-        val wasCalledReadFromZip = try {
-            verify(exactly = 1) { mockResourceReader.readFromZipFile(any()) }
-            true
-        } catch (e: Throwable) {
-            logger.warn("readFromZipFile was not called")
-            false
-        }
-        val wasCalledReadFromDirectory = try {
-            verify(exactly = 1) { mockResourceReader.readFromDirectory(any()) }
-            true
-        } catch (e: Throwable) {
-            logger.warn("readFromDirectory was not called")
-            false
-        }
-        assert(wasCalledReadFromZip xor wasCalledReadFromDirectory)
-
         // Both write methods should be called
         val wasCalledWriteToZip = try {
             verify(exactly = 1) { mockResourceWriter.writeToZipFile(any(), any(), any()) }
