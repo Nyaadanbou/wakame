@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.element.Element
 
 /**
  * 防御元数据.
@@ -10,7 +11,11 @@ import cc.mewcraft.wakame.attribute.Attributes
  */
 sealed interface DefenseMetadata {
     val damageeAttributeMap: AttributeMap
-    fun calculateFinalDamage(damageMetadata: DamageMetadata): Double
+
+    /**
+     * 计算各元素最终伤害的方法.
+     */
+    fun calculateFinalDamage(element: Element, damageMetadata: DamageMetadata): Double
 }
 
 /**
@@ -19,25 +24,25 @@ sealed interface DefenseMetadata {
 class EntityDefenseMetadata(
     override val damageeAttributeMap: AttributeMap,
 ) : DefenseMetadata {
-    override fun calculateFinalDamage(damageMetadata: DamageMetadata): Double {
-        var totalElementDamage = 0.0
+    override fun calculateFinalDamage(element: Element, damageMetadata: DamageMetadata): Double {
+        // 当该元素的伤害包不存在时，返回0.0
+        val packet = damageMetadata.damageBundle.get(element) ?: return 0.0
+
+        // 计算防御后伤害
+        val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
+            packet.packetDamage,
+            (damageeAttributeMap.getValue(Attributes.element(element).DEFENSE) + damageeAttributeMap.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0),
+            packet.defensePenetration,
+            packet.defensePenetrationRate
+        )
+
+        // 依次考虑防御力、元素伤害倍率、百分比伤害修正
+        // 考虑最小伤害为1后再计算暴击倍率(这样1伤害时暴击可以打出2伤害)
         val criticalPower = if (damageMetadata.isCritical) damageMetadata.criticalPower else 1.0
-        for (packet in damageMetadata.damageBundle.packets()) {
-            val element = packet.element
-            val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
-                packet.packetDamage,
-                (damageeAttributeMap.getValue(Attributes.element(element).DEFENSE) + damageeAttributeMap.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0),
-                packet.defensePenetration,
-                packet.defensePenetrationRate
-            )
-            val incomingDamageRate = damageeAttributeMap.getValue(Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE) +
-                    damageeAttributeMap.getValue(Attributes.element(element).INCOMING_DAMAGE_RATE)
-            // 依次计算防御力、元素伤害倍率、百分比伤害修正
-            // 考虑最小伤害为1后再计算暴击倍率(这样1伤害时暴击可以打出2伤害)
-            totalElementDamage += (damageAfterDefense * packet.rate * incomingDamageRate)
-                .coerceAtLeast(if (packet.packetDamage > 0) 1.0 else 0.0) *
-                    criticalPower
-        }
-        return totalElementDamage
+        val incomingDamageRate = damageeAttributeMap.getValue(Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE) +
+                damageeAttributeMap.getValue(Attributes.element(element).INCOMING_DAMAGE_RATE)
+
+        return (damageAfterDefense * packet.rate * incomingDamageRate)
+            .coerceAtLeast(if (packet.packetDamage > 0) 1.0 else 0.0) * criticalPower
     }
 }

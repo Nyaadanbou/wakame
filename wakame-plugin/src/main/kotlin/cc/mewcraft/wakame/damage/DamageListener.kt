@@ -36,13 +36,13 @@ object DamageListener : Listener, KoinComponent {
         }
         val damageMetadata = DamageManager.generateDamageMetadata(event)
         val defenseMetadata = DamageManager.generateDefenseMetadata(event)
-        val wakameEntityDamageEvent = WakameEntityDamageEvent(damageMetadata, defenseMetadata)
+        val wakameEntityDamageEvent = WakameEntityDamageEvent(event.damageSource, damageMetadata, defenseMetadata)
         if (!wakameEntityDamageEvent.callEvent()) {
             return // 如果伤害事件被取消, 什么也不做
         }
 
         // 修改最终伤害
-        event.damage = wakameEntityDamageEvent.finalDamage
+        event.damage = wakameEntityDamageEvent.getFinalDamage()
 
         // 记录日志
         logger.info("${entity.type}(${entity.uniqueId}) 受到了 ${event.damage} 点伤害")
