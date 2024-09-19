@@ -108,6 +108,7 @@ object AttributeRegistry : Initializable {
         +buildFacade("block_interaction_range").single().bind { BLOCK_INTERACTION_RANGE }
         +buildFacade("critical_strike_chance").single().bind { CRITICAL_STRIKE_CHANCE }
         +buildFacade("critical_strike_power").single().bind { CRITICAL_STRIKE_POWER }
+        +buildFacade("negative_critical_strike_power").single().bind { NEGATIVE_CRITICAL_STRIKE_POWER }
         +buildFacade("defense").single().element().bind { DEFENSE }
         +buildFacade("defense_penetration").single().element().bind { DEFENSE_PENETRATION }
         +buildFacade("defense_penetration_rate").single().element().bind { DEFENSE_PENETRATION_RATE }

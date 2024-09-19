@@ -148,8 +148,8 @@ critical_strike_chance:
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
-    default: .01
-    min: .0
+    default: .0
+    min: -1.0
     max: 1.0
 
 critical_strike_power:
@@ -161,8 +161,21 @@ critical_strike_power:
     multiply_total: "<red>DO_NOT_USE"
   values:
     default: 1.0
-    min: .0
-    max: 5.0
+    min: 1.0
+    max: 16384.0
+
+
+negative_critical_strike_power:
+  enabled: true
+  display_name: "<!i>负暴击伤害"
+  tooltips:
+    add: "<!i>负暴击伤害 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: 1.0
+    min: 0.0
+    max: 1.0
 
 
 defense:
