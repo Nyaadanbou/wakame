@@ -26,7 +26,6 @@ entity_attributes:
       attack_damage: default # default 意为采用全局默认值
       attack_damage_rate: default
       attack_effect_chance: default
-      attack_speed_level: default
       block_interaction_range: default
       critical_strike_chance: default
       critical_strike_power: default

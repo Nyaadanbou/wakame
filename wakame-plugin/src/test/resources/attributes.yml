@@ -106,28 +106,6 @@ attack_effect_chance:
     min: .0 # 最小值
     max: 1.0 # 最大值
 
-attack_speed_level:
-  enabled: true
-  display: "攻击速度"
-  tooltips:
-    add: "<!i>攻击速度 <value>"
-    multiply_base: "<red>DO_NOT_USE"
-    multiply_total: "<red>DO_NOT_USE"
-  mappings:
-    0: "<red>究极慢"
-    1: "超级慢"
-    2: "很慢"
-    3: "慢"
-    4: "普通"
-    5: "快"
-    6: "非常快"
-    7: "超级快"
-    8: "<green>究极快"
-  values:
-    default: .0
-    min: .0
-    max: 8.0
-
 block_interaction_range:
   enabled: true
   display: "方块交互距离"
