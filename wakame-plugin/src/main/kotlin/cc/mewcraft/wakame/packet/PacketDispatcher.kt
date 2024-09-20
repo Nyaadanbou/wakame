@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.event.WakameEntityDamageEvent
+import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.hologram.Hologram
 import cc.mewcraft.wakame.hologram.TextHologramData
 import cc.mewcraft.wakame.util.runTaskLater
@@ -11,7 +11,6 @@ import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.entity.Display
 import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
 import org.bukkit.entity.TextDisplay
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -21,14 +20,14 @@ import kotlin.random.Random
 
 class PacketDispatcher : Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    private fun onWakameEntityDamage(event: WakameEntityDamageEvent) {
-        val damager = when (val damager = event.damager) {
-            is Player -> damager
-            is Projectile -> damager.shooter as? Player ?: return
-            else -> return
-        }
+    private fun onWakameEntityDamage(event: NekoEntityDamageEvent) {
+        val source = event.damageSource
+        val damager = source.causingEntity as? Player ?: return
 
         val damagee = event.damagee
+
+        val damageLocation = source.damageLocation ?: damagee.location.add(0.0, damagee.height / 2, 0.0)
+
         val damagePackets = event.damageMetadata.damageBundle.packets()
 
         val isCritical = event.damageMetadata.isCritical
@@ -39,7 +38,7 @@ class PacketDispatcher : Listener {
                 ?: continue
 
             // Get damagee center location
-            val displayLocation = damagee.location.add(Random.nextDouble(-1.0, 1.0), damagee.height / 2 + Random.nextDouble(-0.5, 0.5), Random.nextDouble(-1.0, 1.0))
+            val displayLocation = damageLocation.add(Random.nextDouble(-1.0, 1.0), Random.nextDouble(-0.5, 0.5), Random.nextDouble(-1.0, 1.0))
             val elementDamageText = text {
                 content(packetDamage)
                 style(packet.element.displayName.style())

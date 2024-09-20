@@ -5,9 +5,11 @@ import cc.mewcraft.wakame.damage.DefenseMetadata
 import cc.mewcraft.wakame.element.Element
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import org.bukkit.damage.DamageSource
+import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
+import org.bukkit.event.entity.EntityDamageEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
@@ -15,7 +17,8 @@ import org.slf4j.Logger
 class NekoEntityDamageEvent(
     val damageSource: DamageSource,
     val damageMetadata: DamageMetadata,
-    val defenseMetadata: DefenseMetadata
+    val defenseMetadata: DefenseMetadata,
+    val bukkitEvent: EntityDamageEvent
 ) : Event(), Cancellable, KoinComponent {
     private var cancel: Boolean = false
     private val perElementFinalDamage: Reference2DoubleOpenHashMap<Element>
@@ -34,6 +37,9 @@ class NekoEntityDamageEvent(
             }
         }
     }
+
+    val damagee: Entity
+        get() = bukkitEvent.entity
 
     /**
      * 本次事件中是否含有某元素类型的伤害.
@@ -74,11 +80,12 @@ class NekoEntityDamageEvent(
     }
 
     override fun isCancelled(): Boolean {
-        return cancel
+        return cancel || bukkitEvent.isCancelled
     }
 
     override fun setCancelled(cancel: Boolean) {
         this.cancel = cancel
+        bukkitEvent.isCancelled = cancel
     }
 
     override fun getHandlers(): HandlerList = HANDLER_LIST
