@@ -8,7 +8,7 @@ import me.lucko.helper.random.VariableAmount
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 import java.util.stream.Stream
 
@@ -80,7 +80,6 @@ data class DamagePacket(
  * 伤害捆绑包, 封装了一个或多个 [DamagePacket].
  */
 class DamageBundle : Examinable, KoinComponent {
-    private val logger: Logger by inject()
     private val packets = Reference2ObjectArrayMap<Element, DamagePacket>()
 
     /**
@@ -95,7 +94,7 @@ class DamageBundle : Examinable, KoinComponent {
         val element = packet.element
         val previous = packets.put(element, packet)
         if (previous != null) {
-            logger.warn("Overwrote a packet of the same element type: '${element.uniqueId}'")
+            get<Logger>().warn("Overwrote a packet of the same element type: '${element.uniqueId}'")
         }
     }
 
@@ -145,7 +144,7 @@ class DamageBundle : Examinable, KoinComponent {
 
     private fun getElementById(id: String): Element? {
         return ElementRegistry.INSTANCES.find(id) ?: run {
-            logger.warn("Element '$id' not found")
+            get<Logger>().warn("Element '$id' not found")
             return null
         }
     }
