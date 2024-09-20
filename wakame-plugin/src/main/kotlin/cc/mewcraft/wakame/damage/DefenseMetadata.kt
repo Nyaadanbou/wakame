@@ -25,7 +25,7 @@ class EntityDefenseMetadata(
     override val damageeAttributeMap: AttributeMap,
 ) : DefenseMetadata {
     override fun calculateFinalDamage(element: Element, damageMetadata: DamageMetadata): Double {
-        // 当该元素的伤害包不存在时，返回0.0
+        // 当该元素的伤害包不存在时, 返回 0.0
         val packet = damageMetadata.damageBundle.get(element) ?: return 0.0
 
         // 计算防御后伤害
@@ -37,12 +37,10 @@ class EntityDefenseMetadata(
         )
 
         // 依次考虑防御力、元素伤害倍率、百分比伤害修正
-        // 考虑最小伤害为1后再计算暴击倍率(这样1伤害时暴击可以打出2伤害)
+        // 考虑最小伤害为1后再计算暴击倍率 (这样1伤害时暴击可以打出2伤害)
         val criticalPower = if (damageMetadata.isCritical) damageMetadata.criticalPower else 1.0
-        val incomingDamageRate = damageeAttributeMap.getValue(Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE) +
-                damageeAttributeMap.getValue(Attributes.element(element).INCOMING_DAMAGE_RATE)
+        val incomingDamageRate = damageeAttributeMap.getValue(Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE) + damageeAttributeMap.getValue(Attributes.element(element).INCOMING_DAMAGE_RATE)
 
-        return (damageAfterDefense * packet.rate * incomingDamageRate)
-            .coerceAtLeast(if (packet.packetDamage > 0) 1.0 else 0.0) * criticalPower
+        return (damageAfterDefense * packet.rate * incomingDamageRate).coerceAtLeast(if (packet.packetDamage > 0) 1.0 else 0.0) * criticalPower
     }
 }

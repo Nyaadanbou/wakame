@@ -417,6 +417,18 @@ movement_speed:
     min: -1.0
     max: 4.0
 
+negative_critical_strike_power:
+  enabled: true
+  display_name: "<!i>负暴击伤害"
+  tooltips:
+    add: "<!i>负暴击伤害 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: 1.0
+    min: 0.0
+    max: 1.0
+
 universal_attack_damage:
   enabled: true
   display: "通用攻击力"
