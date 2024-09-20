@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -66,9 +65,9 @@ class KizamiEventHandler {
         }
 
         // debug message - remove it when all done
-        if (!kizamiMap.isEmpty()) {
-            player.sendMessage("${Bukkit.getCurrentTick()} - 铭刻 (旧): " + kizamiMap.map { "${it.key.uniqueId}: ${it.value}" }.joinToString(", "))
-        }
+        // if (!kizamiMap.isEmpty()) {
+        //     player.sendMessage("${Bukkit.getCurrentTick()} - 铭刻 (旧): " + kizamiMap.map { "${it.key.uniqueId}: ${it.value}" }.joinToString(", "))
+        // }
 
         // Recalculate the kizami map:
         // subtract kizami amount, based on the old item,
@@ -89,9 +88,9 @@ class KizamiEventHandler {
         }
 
         // debug message - remove it when all done
-        if (!kizamiMap.isEmpty()) {
-            player.sendMessage("${Bukkit.getCurrentTick()} - 铭刻 (新): " + kizamiMap.map { "${it.key.uniqueId}: ${it.value}" }.joinToString(", "))
-        }
+        // if (!kizamiMap.isEmpty()) {
+        //     player.sendMessage("${Bukkit.getCurrentTick()} - 铭刻 (新): " + kizamiMap.map { "${it.key.uniqueId}: ${it.value}" }.joinToString(", "))
+        // }
     }
 
     /**
