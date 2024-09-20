@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.damage.DamageIndicator
-import cc.mewcraft.wakame.damage.TextIndicatorData
 import cc.mewcraft.wakame.event.WakameEntityDamageEvent
+import cc.mewcraft.wakame.hologram.Hologram
+import cc.mewcraft.wakame.hologram.TextHologramData
 import cc.mewcraft.wakame.util.runTaskLater
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
@@ -70,7 +70,7 @@ private object DamageDisplayHandler {
         scale: Vector3f,
         player: Player,
     ) {
-        val indicatorData = TextIndicatorData(
+        val hologramData = TextHologramData(
             location,
             text,
             Color.fromARGB(0),
@@ -81,35 +81,33 @@ private object DamageDisplayHandler {
             this.scale = scale
             this.brightness = Display.Brightness(15, 0)
         }
-        val damageIndicator = DamageIndicator(indicatorData)
-        damageIndicator.show(player)
+        val hologram = Hologram(hologramData)
+        hologram.show(player)
 
         runTaskLater(2) {
-            indicatorData.apply {
+            hologramData.apply {
                 this.startInterpolation = 0
                 this.interpolationDuration = 5
-                this.translation.add(0.0f, 0.5f, 0f)
-                this.scale.set(2f, 2f, 2f)
+                this.translation.add(0.0f, 0.5f, 0.0f)
+                this.scale.set(2.0f, 2.0f, 2.0f)
             }
-
-            damageIndicator.setEntityData(indicatorData)
-            damageIndicator.refresh(player)
+            hologram.setEntityData(hologramData)
+            hologram.refresh(player)
         }
 
         runTaskLater(8) {
-            indicatorData.apply {
+            hologramData.apply {
                 this.startInterpolation = 0
                 this.interpolationDuration = 15
-                this.translation.add(0.0f, 1f, 0f)
+                this.translation.add(0.0f, 1.0f, 0.0f)
                 this.scale.set(0.0f, 0.0f, 0.0f)
             }
-
-            damageIndicator.setEntityData(indicatorData)
-            damageIndicator.refresh(player)
+            hologram.setEntityData(hologramData)
+            hologram.refresh(player)
         }
 
-        runTaskLater(26) {
-            damageIndicator.hide(player)
+        runTaskLater(24) {
+            hologram.hide(player)
         }
     }
 }

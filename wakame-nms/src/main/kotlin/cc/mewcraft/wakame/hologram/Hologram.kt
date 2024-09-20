@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.damage
+package cc.mewcraft.wakame.hologram
 
 import cc.mewcraft.wakame.shadow.network.ShadowSynchedEntityData
 import com.mojang.math.Transformation
@@ -31,10 +31,10 @@ import org.bukkit.entity.Display as BukkitDisplay
 
 
 /**
- * 一个对于 [MojangDisplay] 的封装, 用于指示伤害.
+ * 一个对于 [MojangDisplay] 的封装.
  */
-class DamageIndicator(
-    private var data: IndicatorData,
+class Hologram(
+    private var data: HologramData,
 ) {
     companion object {
         private const val LINE_WIDTH = 1000
@@ -55,9 +55,9 @@ class DamageIndicator(
         val world = (location.world as CraftWorld).handle
 
         display = when (data.type) {
-            IndicatorData.Type.TEXT -> MojangDisplay.TextDisplay(EntityType.TEXT_DISPLAY, world)
-            IndicatorData.Type.BLOCK -> MojangDisplay.BlockDisplay(EntityType.BLOCK_DISPLAY, world)
-            IndicatorData.Type.ITEM -> MojangDisplay.ItemDisplay(EntityType.ITEM_DISPLAY, world)
+            HologramData.Type.TEXT -> MojangDisplay.TextDisplay(EntityType.TEXT_DISPLAY, world)
+            HologramData.Type.BLOCK -> MojangDisplay.BlockDisplay(EntityType.BLOCK_DISPLAY, world)
+            HologramData.Type.ITEM -> MojangDisplay.ItemDisplay(EntityType.ITEM_DISPLAY, world)
         }
 
         update()
@@ -78,7 +78,7 @@ class DamageIndicator(
             display.xRot = location.pitch
         }
 
-        if (display is MojangDisplay.TextDisplay && data is TextIndicatorData) {
+        if (display is MojangDisplay.TextDisplay && data is TextHologramData) {
             // line width
             display.entityData.set(MojangDisplay.TextDisplay.DATA_LINE_WIDTH_ID, LINE_WIDTH)
 
@@ -126,15 +126,15 @@ class DamageIndicator(
 
             // text opacity
             display.textOpacity = data.opacity
-        } else if (display is MojangDisplay.ItemDisplay && data is ItemIndicatorData) {
+        } else if (display is MojangDisplay.ItemDisplay && data is ItemHologramData) {
             // item
             display.itemStack = MojangStack.fromBukkitCopy(data.itemStack)
-        } else if (display is MojangDisplay.BlockDisplay && data is BlockIndicatorData) {
+        } else if (display is MojangDisplay.BlockDisplay && data is BlockHologramData) {
             val block = BuiltInRegistries.BLOCK.get(ResourceLocation.bySeparator("minecraft:" + data.block.name.lowercase(), ':'))
             display.blockState = block.defaultBlockState()
         }
 
-        if (data is DisplayIndicatorData) {
+        if (data is DisplayHologramData) {
             // billboard data
             display.billboardConstraints = when (data.billboard) {
                 BukkitDisplay.Billboard.FIXED -> MojangDisplay.BillboardConstraints.FIXED
@@ -185,7 +185,7 @@ class DamageIndicator(
         val serverPlayer = (player as CraftPlayer).handle
 
         serverPlayer.connection.send(ClientboundAddEntityPacket(display, 0, BlockPos.containing(location.x, location.y, location.z)))
-        this.viewers.add(player.getUniqueId())
+        this.viewers.add(player.uniqueId)
         refresh(player)
 
         return true
@@ -217,7 +217,7 @@ class DamageIndicator(
 
         player.handle.connection.send(ClientboundTeleportEntityPacket(display))
 
-        if (display is MojangDisplay.TextDisplay && data is TextIndicatorData) {
+        if (display is MojangDisplay.TextDisplay && data is TextHologramData) {
             display.text = PaperAdventure.asVanilla(data.text)
         }
 
@@ -230,7 +230,7 @@ class DamageIndicator(
         player.handle.connection.send(ClientboundSetEntityDataPacket(display.id, values))
     }
 
-    fun setEntityData(data: IndicatorData) {
+    fun setEntityData(data: HologramData) {
         this.data = data
         update()
     }

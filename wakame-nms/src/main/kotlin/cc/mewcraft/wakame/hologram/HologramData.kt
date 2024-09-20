@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.damage
+package cc.mewcraft.wakame.hologram
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Color
@@ -10,7 +10,7 @@ import org.bukkit.entity.TextDisplay
 import org.bukkit.inventory.ItemStack
 import org.joml.Vector3f
 
-interface IndicatorData {
+interface HologramData {
     val location: Location
     val type: Type
 
@@ -21,10 +21,10 @@ interface IndicatorData {
     }
 }
 
-abstract class DisplayIndicatorData(
-    override val type: IndicatorData.Type,
+abstract class DisplayHologramData(
+    override val type: HologramData.Type,
     final override val location: Location,
-) : IndicatorData {
+) : HologramData {
     var billboard: Billboard = DEFAULT_BILLBOARD
     var scale: Vector3f = Vector3f(DEFAULT_SCALE)
     var translation: Vector3f = Vector3f(DEFAULT_TRANSLATION)
@@ -45,15 +45,16 @@ abstract class DisplayIndicatorData(
     }
 }
 
-class TextIndicatorData(
+class TextHologramData(
     location: Location,
     val text: Component,
     val background: Color?,
     val hasTextShadow: Boolean,
     val textAlignment: TextDisplay.TextAlignment,
     val isSeeThrough: Boolean,
-) : DisplayIndicatorData(IndicatorData.Type.TEXT, location) {
-    // 此属性因 Mojang 的 bug 无法进行线性插值 https://bugs.mojang.com/browse/MC-259823
+) : DisplayHologramData(HologramData.Type.TEXT, location) {
+    // 此属性的数值无法跟 alpha-value 的正确效果相匹配
+    // https://bugs.mojang.com/browse/MC-259823
     var opacity: Byte = DEFAULT_OPACITY
 
     companion object {
@@ -61,9 +62,9 @@ class TextIndicatorData(
     }
 }
 
-class ItemIndicatorData(
+class ItemHologramData(
     location: Location,
-) : DisplayIndicatorData(IndicatorData.Type.ITEM, location) {
+) : DisplayHologramData(HologramData.Type.ITEM, location) {
     var itemStack: ItemStack = DEFAULT_ITEM
         set(item) {
             if (field != item) {
@@ -76,9 +77,9 @@ class ItemIndicatorData(
     }
 }
 
-class BlockIndicatorData(
+class BlockHologramData(
     location: Location,
-) : DisplayIndicatorData(IndicatorData.Type.BLOCK, location) {
+) : DisplayHologramData(HologramData.Type.BLOCK, location) {
     var block: Material = DEFAULT_BLOCK
 
     companion object {
