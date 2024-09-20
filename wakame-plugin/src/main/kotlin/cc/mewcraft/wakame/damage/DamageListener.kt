@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.event.WakameEntityDamageEvent
+import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import io.papermc.paper.event.entity.EntityKnockbackEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.text
@@ -36,13 +36,13 @@ object DamageListener : Listener, KoinComponent {
         }
         val damageMetadata = DamageManager.generateDamageMetadata(event)
         val defenseMetadata = DamageManager.generateDefenseMetadata(event)
-        val wakameEntityDamageEvent = WakameEntityDamageEvent(event.damageSource, damageMetadata, defenseMetadata)
-        if (!wakameEntityDamageEvent.callEvent()) {
+        val nekoEntityDamageEvent = NekoEntityDamageEvent(event.damageSource, damageMetadata, defenseMetadata)
+        if (!nekoEntityDamageEvent.callEvent()) {
             return // 如果伤害事件被取消, 什么也不做
         }
 
         // 修改最终伤害
-        event.damage = wakameEntityDamageEvent.getFinalDamage()
+        event.damage = nekoEntityDamageEvent.getFinalDamage()
 
         // 记录日志
         logger.info("${entity.type}(${entity.uniqueId}) 受到了 ${event.damage} 点伤害")

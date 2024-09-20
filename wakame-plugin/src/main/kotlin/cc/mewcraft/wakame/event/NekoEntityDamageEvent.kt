@@ -9,30 +9,29 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 
-class WakameEntityDamageEvent(
+class NekoEntityDamageEvent(
     val damageSource: DamageSource,
     val damageMetadata: DamageMetadata,
     val defenseMetadata: DefenseMetadata
 ) : Event(), Cancellable, KoinComponent {
-    private val logger: Logger by inject()
     private var cancel: Boolean = false
-    private val elementFinalDamageMap: Reference2DoubleOpenHashMap<Element>
+    private val perElementFinalDamage: Reference2DoubleOpenHashMap<Element>
 
     init {
         val damagePackets = damageMetadata.damageBundle.packets()
+        perElementFinalDamage = Reference2DoubleOpenHashMap()
         if (damagePackets.isEmpty()) {
-            // 对空伤害包进行警告
-            logger.warn("Empty Damage Bundle!")
-            elementFinalDamageMap = Reference2DoubleOpenHashMap()
+            // 记录空伤害包以方便定位问题
+            get<Logger>().warn("Empty damage bundle!")
         } else {
-            elementFinalDamageMap = Reference2DoubleOpenHashMap(
-                damagePackets.associate {
-                    it.element to defenseMetadata.calculateFinalDamage(it.element, damageMetadata)
-                }
-            )
+            damagePackets.forEach { packet ->
+                val element = packet.element
+                val damage = defenseMetadata.calculateFinalDamage(element, damageMetadata)
+                perElementFinalDamage[element] = damage
+            }
         }
     }
 
@@ -48,30 +47,27 @@ class WakameEntityDamageEvent(
      * 若元素不存在则返回0.
      */
     fun getFinalDamage(element: Element): Double {
-        return elementFinalDamageMap.getDouble(element)
+        return perElementFinalDamage.getDouble(element)
     }
 
     /**
-     * 获取本次伤害事件的最终伤害的值.
-     * 是各元素伤害的简单相加.
+     * 获取本次伤害事件的最终伤害的值 (各元素伤害的简单相加).
      */
     fun getFinalDamage(): Double {
-        return elementFinalDamageMap.values.sumOf { it }
+        return perElementFinalDamage.values.sumOf { it }
     }
 
     /**
-     * 获取本次伤害是否为正暴击.
-     * 未暴击将返回false.
-     * 暴击了但伤害未变化(即暴击倍率为1.0时)算未暴击.
+     * 获取本次伤害是否为正暴击, 未暴击将返回 `false`.
+     * 暴击了但伤害未变化 (即暴击倍率为1.0时) 算未暴击.
      */
     fun isPositiveCriticalStrike(): Boolean {
         return damageMetadata.isCritical && damageMetadata.criticalPower > 1
     }
 
     /**
-     * 获取本次伤害是否为负暴击.
-     * 未暴击将返回false.
-     * 暴击了但伤害未变化(即暴击倍率为1.0时)算未暴击.
+     * 获取本次伤害是否为负暴击, 未暴击将返回 `false`.
+     * 暴击了但伤害未变化 (即暴击倍率为1.0时) 算未暴击.
      */
     fun isNegativeCriticalStrike(): Boolean {
         return damageMetadata.isCritical && damageMetadata.criticalPower < 1

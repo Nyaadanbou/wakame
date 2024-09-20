@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
 import cc.mewcraft.wakame.attribute.IntangibleAttributeMaps
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.entity.*
@@ -232,13 +233,13 @@ object DamageManager {
     fun unmarkCancelKnockback(uuid: UUID): Boolean {
         return cancelKnockbackSet.remove(uuid)
     }
-    //TODO 更通用的临时标记工具类
+    // TODO 更通用的临时标记工具类
 }
 
 /**
  * 对该实体造成萌芽伤害.
  */
-fun LivingEntity.hurt(customDamageMetadata: CustomDamageMetadata, originEntity: LivingEntity?) {
+fun LivingEntity.hurt(customDamageMetadata: CustomDamageMetadata, source: LivingEntity?) {
     val defenseMetadata = when (
         val damagee = this
     ) {
@@ -250,9 +251,10 @@ fun LivingEntity.hurt(customDamageMetadata: CustomDamageMetadata, originEntity: 
             EntityDefenseMetadata(EntityAttributeAccessor.getAttributeMap(damagee))
         }
     }
-    val finalDamage = defenseMetadata.calculateFinalDamage(customDamageMetadata)
+    // FIXME xiaofumo
+    val finalDamage = ElementRegistry.INSTANCES.values.sumOf { defenseMetadata.calculateFinalDamage(it, customDamageMetadata) }
     DamageManager.putCustomDamageMetadata(this.uniqueId, customDamageMetadata)
-    this.damage(finalDamage, originEntity)
+    this.damage(finalDamage, source)
 }
 
 /**

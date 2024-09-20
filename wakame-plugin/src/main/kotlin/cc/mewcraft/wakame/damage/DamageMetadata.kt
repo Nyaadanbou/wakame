@@ -28,8 +28,7 @@ sealed interface DamageMetadata {
     val damageValue: Double
 
     /**
-     * 这次伤害暴击时暴击倍率的值.
-     * 小于1的值表示负暴击.
+     * 这次伤害暴击时暴击倍率的值. 小于1的值表示负暴击.
      */
     val criticalPower: Double
 

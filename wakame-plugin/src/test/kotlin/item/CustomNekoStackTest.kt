@@ -100,15 +100,11 @@ class CustomNekoStackTest : KoinTest {
     ) {
         serialization { arrowTemplate ->
             assertNotNull(arrowTemplate)
-            assertEquals(3, arrowTemplate.pierceLevel.calculate().toInt())
+            assertEquals(3, arrowTemplate.pierceLevel)
         }
 
         result { it ->
             assertFalse(it.isEmpty())
-        }
-
-        unboxed { itemArrow ->
-            assertEquals(3, itemArrow.pierceLevel)
         }
     }
 

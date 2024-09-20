@@ -62,11 +62,11 @@ entity_attributes:
       attack_damage_rate: 0
       critical_strike_chance: default
       critical_strike_power: default
-      negative_critical_strike_power: default
       defense: 0
       defense_penetration: 0
       defense_penetration_rate: 0
       incoming_damage_rate: 0
+      negative_critical_strike_power: default
       universal_attack_damage: 0
       universal_attack_damage_rate: 0
       universal_defense: 0
