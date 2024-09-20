@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
+import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
 import kotlin.properties.ReadOnlyProperty
@@ -45,6 +46,11 @@ interface NekoStack : Keyed, Examinable {
      * 空物品没有任何作用, 也不会真的出现在世界状态中.
      */
     val isEmpty: Boolean
+
+    /**
+     * 获取底层物品的类型.
+     */
+    val itemType: Material
 
     /**
      * 获取底层 [ItemStack] 的克隆.
@@ -230,6 +236,8 @@ object NekoStackDelegates {
 
 private object EmptyNekoStack : NekoStack {
     override val isEmpty: Boolean = true
+
+    override val itemType: Material = Material.AIR
 
     override val itemStack: ItemStack
         get() = ItemStack.empty()

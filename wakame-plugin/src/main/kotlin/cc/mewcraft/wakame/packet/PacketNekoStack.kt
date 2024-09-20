@@ -19,6 +19,7 @@ import com.github.retrooper.packetevents.resources.ResourceLocation
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import org.bukkit.Material
 import kotlin.jvm.optionals.getOrNull
 import com.github.retrooper.packetevents.protocol.item.ItemStack as PacketStack
 import org.bukkit.inventory.ItemStack as BukkitStack
@@ -157,6 +158,9 @@ private class PacketCustomNekoStack(
     override val isEmpty: Boolean
         get() = false
 
+    override val itemType: Material
+        get() = handle.type
+
     override val itemStack: BukkitStack
         get() = abortReads()
 
@@ -230,6 +234,9 @@ private class PacketVanillaNekoStack(
 ) : PacketNekoStack {
     override val isEmpty: Boolean
         get() = false
+
+    override val itemType: Material
+        get() = SpigotConversionUtil.toBukkitItemMaterial(handle0.type)
 
     override val itemStack: BukkitStack
         get() = abortReads()
