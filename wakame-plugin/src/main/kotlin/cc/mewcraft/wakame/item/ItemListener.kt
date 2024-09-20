@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.attackspeed.AttackSpeedEventHandler
 import cc.mewcraft.wakame.attribute.AttributeEventHandler
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
+import cc.mewcraft.wakame.player.attackspeed.AttackSpeedEventHandler
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import org.bukkit.entity.LivingEntity

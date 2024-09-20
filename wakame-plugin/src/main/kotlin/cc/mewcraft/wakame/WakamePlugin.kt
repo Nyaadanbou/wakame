@@ -2,7 +2,6 @@ package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attack.attackModule
-import cc.mewcraft.wakame.attackspeed.attackSpeedModule
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.crate.crateModule
@@ -65,7 +64,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 // sub modules (by alphabet order)
                 adventureModule(),
                 attackModule(),
-                attackSpeedModule(),
                 attributeModule(),
                 crateModule(),
                 damageModule(),

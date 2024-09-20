@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attackspeed
+package cc.mewcraft.wakame.player.attackspeed
 
 enum class AttackSpeedLevel(
     /**

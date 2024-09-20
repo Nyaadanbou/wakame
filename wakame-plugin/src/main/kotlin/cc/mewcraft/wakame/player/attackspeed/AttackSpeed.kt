@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attackspeed
+package cc.mewcraft.wakame.player.attackspeed
 
 import cc.mewcraft.wakame.user.User
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap

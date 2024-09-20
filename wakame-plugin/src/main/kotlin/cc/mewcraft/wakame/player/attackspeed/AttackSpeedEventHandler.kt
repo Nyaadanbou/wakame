@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attackspeed
+package cc.mewcraft.wakame.player.attackspeed
 
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack

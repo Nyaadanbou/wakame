@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.user
 
-import cc.mewcraft.wakame.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
+import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
 import cc.mewcraft.wakame.skill.SkillMap
 import cc.mewcraft.wakame.skill.state.SkillState
