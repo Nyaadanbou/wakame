@@ -6,11 +6,14 @@ import cc.mewcraft.wakame.hologram.Hologram
 import cc.mewcraft.wakame.hologram.TextHologramData
 import cc.mewcraft.wakame.util.runTaskLater
 import net.kyori.adventure.extra.kotlin.text
+import net.kyori.adventure.sound.Sound.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Color
 import org.bukkit.Location
+import org.bukkit.Sound
 import org.bukkit.entity.Display
 import org.bukkit.entity.Player
 import org.bukkit.entity.TextDisplay
@@ -52,9 +55,11 @@ class DamageDisplayHandler : Listener {
                     element.styles.forEach { applicableApply(it) }
                 }
                 if (isCritical) {
+                    damager.playSound(sound(Sound.ENTITY_PLAYER_ATTACK_CRIT, Source.PLAYER, 1f, 1f), Emitter.self())
                     text {
                         content("\ud83d\udca5 ")
                         color(TextColor.color(0xff9900))
+                        style { decorate(TextDecoration.BOLD) }
                         append(damageText)
                     }
                 } else {
