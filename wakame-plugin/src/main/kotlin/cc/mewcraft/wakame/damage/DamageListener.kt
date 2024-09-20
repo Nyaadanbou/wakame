@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import io.papermc.paper.event.entity.EntityKnockbackEvent
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.LinearComponents
@@ -68,7 +67,7 @@ object DamageListener : Listener, KoinComponent {
         ).hoverEvent(
             damageMetadata.damageBundle.packets()
                 .map { packet -> LinearComponents.linear(packet.element.displayName, text(": "), text(packet.packetDamage)) }
-                .let { components -> Component.join(JoinConfiguration.newlines(), components) }
+                .let { components -> join(JoinConfiguration.newlines(), components) }
                 .let { component ->
                     HoverEvent.showText(
                         component

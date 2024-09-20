@@ -21,11 +21,14 @@ class NekoEntityDamageEvent(
     val bukkitEvent: EntityDamageEvent
 ) : Event(), Cancellable, KoinComponent {
     private var cancel: Boolean = false
-    private val perElementFinalDamage: Reference2DoubleOpenHashMap<Element>
+
+    /**
+     * 记录了每种伤害在计算防御后的最终数值.
+     */
+    private val finalDamagePerElement: Reference2DoubleOpenHashMap<Element> = Reference2DoubleOpenHashMap()
 
     init {
         val damagePackets = damageMetadata.damageBundle.packets()
-        perElementFinalDamage = Reference2DoubleOpenHashMap()
         if (damagePackets.isEmpty()) {
             // 记录空伤害包以方便定位问题
             get<Logger>().warn("Empty damage bundle!")
@@ -33,39 +36,53 @@ class NekoEntityDamageEvent(
             damagePackets.forEach { packet ->
                 val element = packet.element
                 val damage = defenseMetadata.calculateFinalDamage(element, damageMetadata)
-                perElementFinalDamage[element] = damage
+                finalDamagePerElement[element] = damage
             }
         }
     }
 
+    /**
+     * 受伤的实体.
+     */
     val damagee: Entity
         get() = bukkitEvent.entity
 
     /**
-     * 本次事件中是否含有某元素类型的伤害.
+     * 查询本次事件中是否含有指定元素类型的伤害.
      */
     fun hasElement(element: Element): Boolean {
         return damageMetadata.damageBundle.get(element) != null
     }
 
     /**
-     * 获取本次伤害事件中某一元素的最终伤害的值.
-     * 若元素不存在则返回0.
+     * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 0.0.
      */
     fun getFinalDamage(element: Element): Double {
-        return perElementFinalDamage.getDouble(element)
+        return finalDamagePerElement.getDouble(element)
     }
 
     /**
-     * 获取本次伤害事件的最终伤害的值 (各元素伤害的简单相加).
+     * 获取本次伤害事件的最终伤害的值 (即各元素的最终伤害的简单相加).
      */
     fun getFinalDamage(): Double {
-        return perElementFinalDamage.values.sumOf { it }
+        return finalDamagePerElement.values.sumOf { it }
+    }
+
+    /**
+     * 获取一个包含了每种元素的最终伤害值的映射.
+     * 注意, 返回的映射包含数值为零的伤害.
+     */
+    fun getFinalDamageMap(excludeZeroDamage: Boolean = false): Map<Element, Double> {
+        return if (excludeZeroDamage) {
+            finalDamagePerElement.filter { it.value > 0.0 }
+        } else {
+            finalDamagePerElement
+        }
     }
 
     /**
      * 获取本次伤害是否为正暴击, 未暴击将返回 `false`.
-     * 暴击了但伤害未变化 (即暴击倍率为1.0时) 算未暴击.
+     * 暴击了但伤害未变化 (即暴击倍率为 `1.0` 时) 算未暴击.
      */
     fun isPositiveCriticalStrike(): Boolean {
         return damageMetadata.isCritical && damageMetadata.criticalPower > 1
@@ -73,7 +90,7 @@ class NekoEntityDamageEvent(
 
     /**
      * 获取本次伤害是否为负暴击, 未暴击将返回 `false`.
-     * 暴击了但伤害未变化 (即暴击倍率为1.0时) 算未暴击.
+     * 暴击了但伤害未变化 (即暴击倍率为 `1.0` 时) 算未暴击.
      */
     fun isNegativeCriticalStrike(): Boolean {
         return damageMetadata.isCritical && damageMetadata.criticalPower < 1
