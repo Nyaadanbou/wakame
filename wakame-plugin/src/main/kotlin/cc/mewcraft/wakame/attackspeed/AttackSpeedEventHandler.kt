@@ -23,7 +23,7 @@ class AttackSpeedEventHandler {
             event.isCancelled = true
             return
         }
-        setCooldown(user, nekoStack)
+        tryApplyCooldown(user, nekoStack)
     }
 
     fun handlePlayerShootBow(damager: Player, item: ItemStack, event: EntityShootBowEvent) {
@@ -33,7 +33,7 @@ class AttackSpeedEventHandler {
             event.isCancelled = true
             return
         }
-        setCooldown(user, nekoStack)
+        tryApplyCooldown(user, nekoStack)
     }
 
     fun handlePlayerSlotChange(player: Player, slot: ItemSlot, oldItem: ItemStack?, newItem: ItemStack?) {
@@ -47,7 +47,7 @@ class AttackSpeedEventHandler {
         if (newItem != null) {
             val newStack = newItem.tryNekoStack ?: return
             val attackSpeedLevel = getAttackSpeedLevel(newStack) ?: return
-            setCooldown(user, newStack)
+            tryApplyCooldown(user, newStack)
             sendEffect(player, attackSpeedLevel)
         }
     }
@@ -56,9 +56,12 @@ class AttackSpeedEventHandler {
         return stack.components.get(ItemComponentTypes.ATTACK_SPEED)?.level
     }
 
-    private fun setCooldown(user: User<*>, stack: NekoStack) {
+    private fun tryApplyCooldown(user: User<Player>, stack: NekoStack) {
         val attackSpeedLevel = getAttackSpeedLevel(stack) ?: return
+        // 设置实际冷却
         user.attackSpeed.activate(stack.key, attackSpeedLevel)
+        // 应用视觉冷却
+        user.player.setCooldown(stack.itemType, attackSpeedLevel.cooldown)
     }
 
     private fun sendEffect(player: Player, level: AttackSpeedLevel) {
