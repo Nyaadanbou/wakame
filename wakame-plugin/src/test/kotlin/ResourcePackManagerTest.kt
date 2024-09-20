@@ -71,6 +71,7 @@ class ResourcePackManagerTest : KoinTest {
 
         // Create the manager
         val manager = ResourcePackManager(
+            mockResourceReader,
             mockResourceWriter,
         )
 

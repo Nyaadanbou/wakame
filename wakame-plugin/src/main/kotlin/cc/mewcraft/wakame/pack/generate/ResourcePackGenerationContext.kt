@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.pack.generate
 import cc.mewcraft.wakame.lookup.Assets
 import team.unnamed.creative.ResourcePack
 
-data class GenerationContext(
+data class ResourcePackGenerationContext(
     /**
      * 参考 [team.unnamed.creative.metadata.pack.PackMeta.description].
      */
@@ -24,10 +24,9 @@ data class GenerationContext(
     //
 
     /**
-     * 最终要生成的资源包 [ResourcePack].
-     * 对该对象的任何修改将会应用到生成的资源包上.
+     * 需要合并的资源包路径.
      */
-    val pack: ResourcePack,
+    val mergePacks: List<String>,
 
     //
 
@@ -35,4 +34,13 @@ data class GenerationContext(
      * 资源包里包含的所有“资源文件”.
      */
     val assets: Collection<Assets>,
+
+    //
+
+    /**
+     * 本程序最终要生成的资源包 [ResourcePack].
+     * 该实例的状态是*可变的*, 设计上应该被按需更新.
+     * 例如, 往资源包里添加元数据, 材质, 模型, 声音.
+     */
+    val resourcePack: ResourcePack,
 )

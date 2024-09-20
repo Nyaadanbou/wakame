@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.pack
 
+import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
 import cc.mewcraft.wakame.pack.generate.ResourcePackCustomModelGeneration
@@ -18,12 +20,15 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import team.unnamed.creative.ResourcePack
+import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.ResourcePackWriter
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
+import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeWriter
 import java.io.File
 
 internal class ResourcePackManager(
+    private val packReader: ResourcePackReader<FileTreeReader>,
     private val packWriter: ResourcePackWriter<FileTreeWriter>,
 ) : KoinComponent {
     private val logger: Logger by inject()
@@ -48,12 +53,13 @@ internal class ResourcePackManager(
             val resourceTempDir = tempDir.resolve(GENERATED_RESOURCE_PACK_DIR)
 
             val resourcePack = ResourcePack.resourcePack()
-            val context = GenerationContext(
+            val context = ResourcePackGenerationContext(
                 description = generationSettings.description,
                 format = generationSettings.format,
                 min = generationSettings.min,
                 max = generationSettings.max,
-                pack = resourcePack,
+                mergePacks = generationSettings.mergePacks,
+                resourcePack = resourcePack,
                 assets = AssetsLookup.allAssets
             )
 
@@ -64,11 +70,12 @@ internal class ResourcePackManager(
                 ResourcePackRegistryModelGeneration(context),
                 ResourcePackCustomModelGeneration(context),
                 ResourcePackExternalGeneration(context),
+                ResourcePackMergePackGeneration(context, packReader),
                 ResourcePackModelSortGeneration(context)
             )
 
             try {
-                generations.forEach { it.generate() }
+                generations.forEach { it.process() }
             } catch (t: Throwable) {
                 logger.warn("Failed to generate resourcepack", t)
             }
@@ -92,8 +99,9 @@ internal class ResourcePackManager(
 private class ResourcePackGenerationSettings {
     private val config = RESOURCE_PACK_CONFIG.derive("generation")
 
-    val description by config.entry<String>("description")
-    val format by config.entry<Int>("format")
-    val min by config.entry<Int>("min")
-    val max by config.entry<Int>("max")
+    val description: String by config.entry<String>("description")
+    val format: Int by config.entry<Int>("format")
+    val min: Int by config.entry<Int>("min")
+    val max: Int by config.entry<Int>("max")
+    val mergePacks: List<String> by config.optionalEntry<List<String>>("merge_packs").orElse(emptyList())
 }

@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
+import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.lookup.Assets
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.lookup.itemType
@@ -10,8 +11,6 @@ import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.util.*
-import cc.mewcraft.wakame.util.readTextAndToJson
-import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -23,9 +22,11 @@ import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta
 import team.unnamed.creative.model.ItemOverride
-import team.unnamed.creative.model.ItemPredicate
 import team.unnamed.creative.model.ModelTexture
 import team.unnamed.creative.model.ModelTextures
+import team.unnamed.creative.resources.MergeStrategy
+import team.unnamed.creative.serialize.ResourcePackReader
+import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import team.unnamed.creative.serialize.minecraft.metadata.MetadataSerializer
 import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
 import team.unnamed.creative.texture.Texture
@@ -33,74 +34,81 @@ import team.unnamed.hephaestus.writer.ModelWriter
 import java.io.File
 import team.unnamed.creative.model.Model as CreativeModel
 
+/**
+ * 封装了一个独立的资源包生成逻辑.
+ *
+ * 本类的每个实现仅代表*一部分*资源包生成的逻辑, 以实现更好的解耦.
+ * 实现类可以访问 [context] ([ResourcePackGenerationContext]) 来读取当前的状态,
+ * 并选择性的更新最终要生成的资源包实例 [team.unnamed.creative.ResourcePack].
+ *
+ * 如果 [process] 抛出异常, 将会被外部捕获并记录.
+ */
 sealed class ResourcePackGeneration(
-    protected val context: GenerationContext,
+    protected val context: ResourcePackGenerationContext,
 ) {
     /**
-     * 生成资源包. 原来的资源包会发生变化.
-     *
-     * @return 封装了一个结果, 代表资源包生成是否成功
+     * 执行资源包的生成逻辑, 更新 [context].
      */
-    abstract fun generate()
+    abstract fun process()
 }
 
 internal class ResourcePackMetaGeneration(
-    context: GenerationContext,
+    context: ResourcePackGenerationContext,
 ) : ResourcePackGeneration(context) {
-    override fun generate() {
+    override fun process() {
         val packFormat = PackFormat.format(context.format, context.min, context.max)
         val packMeta = PackMeta.of(packFormat, context.description.mini)
-        context.pack.packMeta(packMeta)
+        context.resourcePack.packMeta(packMeta)
     }
 }
 
 internal class ResourcePackIconGeneration(
-    context: GenerationContext,
+    context: ResourcePackGenerationContext,
 ) : ResourcePackGeneration(context), KoinComponent {
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
-    override fun generate() {
+    override fun process() {
         val icon = assetsDir.resolve("logo.png")
         if (!icon.exists()) {
             return
         }
-        context.pack.icon(Writable.file(icon))
+        context.resourcePack.icon(Writable.file(icon))
     }
 }
 
 internal class ResourcePackExternalGeneration(
-    context: GenerationContext,
+    context: ResourcePackGenerationContext,
 ) : ResourcePackGeneration(context) {
     class GenerationCancelledException : Throwable() {
         override val message: String = "Resource pack generation is cancelled"
     }
 
-    override fun generate() {} // TODO: External generation
+    override fun process() {} // TODO: External generation
 }
 
 internal class ResourcePackRegistryModelGeneration(
-    context: GenerationContext,
+    context: ResourcePackGenerationContext,
 ) : ResourcePackGeneration(context) {
-    override fun generate() {
-        ModelWriter.resource(RESOURCE_NAMESPACE).write(context.pack, ModelRegistry.models())
+    override fun process() {
+        ModelWriter.resource(RESOURCE_NAMESPACE).write(context.resourcePack, ModelRegistry.models())
     }
 }
 
 internal class ResourcePackCustomModelGeneration(
-    context: GenerationContext,
+    context: ResourcePackGenerationContext,
 ) : ResourcePackGeneration(context), KoinComponent {
     private val logger: Logger by inject()
     private val config: ItemModelDataLookup by inject()
     private val vanillaResourcePack: VanillaResourcePack by inject()
 
-    override fun generate() {
+    override fun process() {
         val assets = context.assets
         for (asset in assets) {
             val modelFiles = asset.files.takeIf { it.isNotEmpty() } ?: continue
             for ((index, modelFile) in modelFiles.withIndex()) {
                 logger.info("Generating $index model for ${asset.key}, variant ${asset.variant}, path: $modelFile")
                 val customModelData = config.saveCustomModelData(asset.key, asset.variant)
-                val resourcePack = context.pack
+                val resourcePack = context.resourcePack
 
                 //<editor-fold desc="Custom Model generation">
                 // Original asset from config
@@ -185,7 +193,7 @@ internal class ResourcePackCustomModelGeneration(
 
         logger.info("Texture for $originKey generated.")
 
-        context.pack.texture(texture.build())
+        context.resourcePack.texture(texture.build())
     }
 
     /**
@@ -224,12 +232,50 @@ internal class ResourcePackCustomModelGeneration(
     }
 }
 
+internal class ResourcePackMergePackGeneration(
+    context: ResourcePackGenerationContext,
+    private val packReader: ResourcePackReader<FileTreeReader>,
+) : ResourcePackGeneration(context), KoinComponent {
+    private val logger: Logger by inject()
+    private val pluginDirectory: File by inject(named(PLUGIN_DATA_DIR))
+
+    override fun process() {
+        val serverPluginDirectory = pluginDirectory.parentFile
+        val resourcePack = context.resourcePack
+        val mergePacks = context.mergePacks
+            .mapNotNull {
+                val file = serverPluginDirectory.resolve(it)
+                logger.info("Merging pack... path: $file")
+                if (!file.exists()) {
+                    logger.warn("Merge pack not found: $it")
+                    return@mapNotNull null
+                }
+                file
+            }
+            .mapNotNull {
+                if (it.isDirectory) {
+                    packReader.readFromDirectory(it)
+                } else {
+                    if (it.extension != "zip") {
+                        logger.warn("Invalid file extension for merge pack: ${it.extension}")
+                        return@mapNotNull null
+                    }
+                    packReader.readFromZipFile(it)
+                }
+            }
+
+        for (mergePack in mergePacks) {
+            resourcePack.merge(mergePack, MergeStrategy.mergeAndKeepFirstOnError())
+        }
+    }
+}
+
 internal class ResourcePackModelSortGeneration(
-    context: GenerationContext,
+    context: ResourcePackGenerationContext,
 ) : ResourcePackGeneration(context) {
-    override fun generate() {
-        val pack = context.pack
-        for (model in pack.models()) {
+    override fun process() {
+        val resourcePack = context.resourcePack
+        for (model in resourcePack.models()) {
             if (model.key().namespace() != Key.MINECRAFT_NAMESPACE) {
                 continue
             }
@@ -237,7 +283,7 @@ internal class ResourcePackModelSortGeneration(
             val overrides = model.overrides()
             val sortedOverrides = overrides.sortedBy { it.customModelData() }
             newModelBuilder.overrides(sortedOverrides)
-            pack.model(newModelBuilder.build())
+            resourcePack.model(newModelBuilder.build())
         }
     }
 
