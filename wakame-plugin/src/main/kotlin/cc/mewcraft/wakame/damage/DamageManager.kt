@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
 import cc.mewcraft.wakame.attribute.IntangibleAttributeMaps
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.entity.*
@@ -251,8 +250,9 @@ fun LivingEntity.hurt(customDamageMetadata: CustomDamageMetadata, source: Living
             EntityDefenseMetadata(EntityAttributeAccessor.getAttributeMap(damagee))
         }
     }
-    // FIXME xiaofumo
-    val finalDamage = ElementRegistry.INSTANCES.values.sumOf { defenseMetadata.calculateFinalDamage(it, customDamageMetadata) }
+    val finalDamage = customDamageMetadata.damageBundle.packets().sumOf {
+        defenseMetadata.calculateFinalDamage(it.element, customDamageMetadata)
+    }
     DamageManager.putCustomDamageMetadata(this.uniqueId, customDamageMetadata)
     this.damage(finalDamage, source)
 }
