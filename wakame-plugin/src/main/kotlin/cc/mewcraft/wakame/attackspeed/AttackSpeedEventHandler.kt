@@ -19,7 +19,7 @@ class AttackSpeedEventHandler {
     fun handlePlayerAttackEntity(damager: Player, item: ItemStack, event: EntityDamageByEntityEvent) {
         val nekoStack = item.tryNekoStack ?: return
         val user = damager.toUser()
-        if (user.attackSpeed.isCooldown(nekoStack.key)) {
+        if (user.attackSpeed.isActive(nekoStack.key)) {
             event.isCancelled = true
             return
         }
@@ -29,8 +29,7 @@ class AttackSpeedEventHandler {
     fun handlePlayerShootBow(damager: Player, item: ItemStack, event: EntityShootBowEvent) {
         val nekoStack = item.tryNekoStack ?: return
         val user = damager.toUser()
-
-        if (user.attackSpeed.isCooldown(nekoStack.key)) {
+        if (user.attackSpeed.isActive(nekoStack.key)) {
             event.isCancelled = true
             return
         }
@@ -41,38 +40,37 @@ class AttackSpeedEventHandler {
         val user = player.toUser()
         if (oldItem != null) {
             val oldStack = oldItem.tryNekoStack ?: return
-            getItemAttackSpeedLevel(oldStack) ?: return
-            user.attackSpeed.removeCooldown(oldStack.key)
+            val attackSpeedLevel = getAttackSpeedLevel(oldStack) ?: return
+            user.attackSpeed.reset(oldStack.key)
             removeEffect(player)
         }
         if (newItem != null) {
             val newStack = newItem.tryNekoStack ?: return
-            val attackSpeedLevel = getItemAttackSpeedLevel(newStack) ?: return
+            val attackSpeedLevel = getAttackSpeedLevel(newStack) ?: return
             setCooldown(user, newStack)
             sendEffect(player, attackSpeedLevel)
         }
     }
 
-    private fun getItemAttackSpeedLevel(stack: NekoStack): AttackSpeedLevel? {
+    private fun getAttackSpeedLevel(stack: NekoStack): AttackSpeedLevel? {
         return stack.components.get(ItemComponentTypes.ATTACK_SPEED)?.level
     }
 
     private fun setCooldown(user: User<*>, stack: NekoStack) {
-        val attackSpeedLevel = getItemAttackSpeedLevel(stack) ?: return
-        user.attackSpeed.setCooldown(stack.key, attackSpeedLevel)
+        val attackSpeedLevel = getAttackSpeedLevel(stack) ?: return
+        user.attackSpeed.activate(stack.key, attackSpeedLevel)
     }
 
     private fun sendEffect(player: Player, level: AttackSpeedLevel) {
         val fatigueLevel = level.fatigueLevel ?: return
         val miningFatigueEffect = PotionEffect(
-            PotionEffectType.MINING_FATIGUE,
-            -1,
-            fatigueLevel,
-            false,
-            false,
-            false
+            /* type = */ PotionEffectType.MINING_FATIGUE,
+            /* duration = */ -1,
+            /* amplifier = */ fatigueLevel,
+            /* ambient = */ false,
+            /* particles = */ false,
+            /* icon = */ false
         )
-
         SendPacketUtil.sendPlayerPotionEffect(player, miningFatigueEffect)
     }
 
