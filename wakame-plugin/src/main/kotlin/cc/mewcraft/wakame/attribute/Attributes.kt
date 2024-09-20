@@ -36,7 +36,6 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     // 这些属性需要我们自己实现才能在游戏中生效. 所谓“自己实现”,
     // 就是说, 我们需要通过自定义监听器或调度器等方式来实现它们.
     val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0).register()
-    val ATTACK_SPEED_LEVEL = RangedAttribute("attack_speed_level", .0, .0, 8.0).register() // !!! can only take integer
     val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", 0.0, -1.0, 1.0).register()
     val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, 1.0, 16384.0).register()
     val HEALTH_REGENERATION = RangedAttribute("health_regeneration", 1.0, .0, 16384.0).register()

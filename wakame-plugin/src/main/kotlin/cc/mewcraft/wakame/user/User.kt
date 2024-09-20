@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
+import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
 import cc.mewcraft.wakame.skill.SkillMap
 import cc.mewcraft.wakame.skill.state.SkillState
@@ -22,7 +23,7 @@ interface User<P> {
     val player: P
 
     /**
-     * Unique identifier of the player.
+     * UUID of the player.
      */
     val uniqueId: UUID
 
@@ -55,4 +56,9 @@ interface User<P> {
      * Skill State Manager of the player.
      */
     val skillState: SkillState<P>
+
+    /**
+     * Attack Speed of the player.
+     */
+    val attackSpeed: AttackSpeed
 }

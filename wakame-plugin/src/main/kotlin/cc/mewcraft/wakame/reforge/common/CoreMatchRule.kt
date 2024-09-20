@@ -33,7 +33,7 @@ import java.util.stream.Stream
 // 但是, 如果 namespace 不是 *, 那么 namespace 就是确定的.
 // 这种情况下, path 所指的就是这一类核心中的某一类核心.
 // 例如, 已经确定 namespace 为 attribute,
-// 那么就需要接着指定在其之下的 path, 例如 attack_damage, attack_speed_level 等等.
+// 那么就需要接着指定在其之下的 path, 例如 attack_damage 等等.
 //
 // 结论:
 // 1. 如果 namespace 是 *, 那么 path 是不重要的. 这时应该直接返回一个 CoreMatchRuleAny

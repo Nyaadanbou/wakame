@@ -95,16 +95,6 @@ object AttributeRegistry : Initializable {
         +buildFacade("attack_damage").ranged().element().bind({ MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE })
         +buildFacade("attack_damage_rate").single().element().bind { ATTACK_DAMAGE_RATE }
         +buildFacade("attack_effect_chance").single().bind { ATTACK_EFFECT_CHANCE }
-        +buildFacade("attack_speed_level").single().bind { ATTACK_SPEED_LEVEL }.override {
-            // create closures
-            val tooltips = DiscreteTooltips(config)
-            // override it
-            createTooltipLore = { core: CoreAttributeS ->
-                val lines = tooltips.line(core.operation)
-                val resolver = tooltips.value("value", core.value.toInt())
-                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-            }
-        }
         +buildFacade("block_interaction_range").single().bind { BLOCK_INTERACTION_RANGE }
         +buildFacade("critical_strike_chance").single().bind { CRITICAL_STRIKE_CHANCE }
         +buildFacade("critical_strike_power").single().bind { CRITICAL_STRIKE_POWER }

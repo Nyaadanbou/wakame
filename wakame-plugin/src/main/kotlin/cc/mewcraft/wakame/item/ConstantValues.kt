@@ -50,6 +50,7 @@ object StatisticsConstants {
  */
 object ItemComponentConstants {
     const val ARROW = "arrow"
+    const val ATTACK_SPEED = "attack_speed"
     const val ATTRIBUTE_MODIFIERS = "attribute_modifiers"
     const val ATTRIBUTABLE = "attributable"
     const val BOW = "bow"

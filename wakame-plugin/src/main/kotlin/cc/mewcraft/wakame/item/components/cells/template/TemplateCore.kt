@@ -103,9 +103,6 @@ internal class TemplateCorePool(
  *
  * ```yaml
  * <node>:
- *   - type: attribute:attack_speed_level
- *     weight: 1
- *     value: 4
  *   - type: attribute:movement_speed
  *     weight: 1
  *     value: 0.4
@@ -122,9 +119,6 @@ internal class TemplateCorePool(
  *     - type: item:rarity
  *       rarity: rare
  *   entries:
- *     - type: attribute:attack_speed_level
- *       weight: 1
- *       value: 4
  *     - type: attribute:movement_speed
  *       weight: 1
  *       value: 0.4

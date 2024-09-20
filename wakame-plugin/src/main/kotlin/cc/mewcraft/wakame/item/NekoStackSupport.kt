@@ -210,6 +210,9 @@ private class CustomNekoStack(
     override val isEmpty: Boolean
         get() = false
 
+    override val itemType: Material
+        get() = handle.type
+
     override val itemStack: ItemStack
         get() = handle.clone()
 
@@ -284,6 +287,8 @@ internal class VanillaNekoStack(
     override val components: ItemComponentMap,
 ) : NekoStack {
     override val isEmpty: Boolean = false
+    override val itemType: Material
+        get() = unsupported()
     override val itemStack: ItemStack
         get() = unsupported()
 

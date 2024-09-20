@@ -33,10 +33,6 @@ cells:
           - type: attribute:attack_effect_chance
             value: 0.01
             weight: 1
-          # 攻击速度
-          - type: attribute:attack_speed_level
-            value: 0
-            weight: 1
           # 方块交互范围
           - type: attribute:block_interaction_range
             value: 4.5

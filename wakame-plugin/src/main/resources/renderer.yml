@@ -21,7 +21,6 @@ renderer_layout:
     - attribute:attack_damage
     - attribute:attack_damage_rate
     - attribute:attack_effect_chance
-    - attribute:attack_speed_level
     - attribute:block_interaction_range
     - attribute:critical_strike_chance
     - attribute:critical_strike_power

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.user
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.level.PlayerLevelProvider
+import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
 import cc.mewcraft.wakame.skill.SkillMap
 import cc.mewcraft.wakame.skill.state.SkillState
@@ -40,6 +41,7 @@ class PaperUser(
     override val skillMap: SkillMap = SkillMap(this)
     override val resourceMap: ResourceMap = ResourceMap(this)
     override val skillState: SkillState<Player> = SkillState(this)
+    override val attackSpeed: AttackSpeed = AttackSpeed(this)
 
     private val levelProvider: PlayerLevelProvider by inject()
 

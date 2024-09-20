@@ -5,12 +5,7 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.Attributable
-import cc.mewcraft.wakame.item.components.Castable
-import cc.mewcraft.wakame.item.components.FireResistant
-import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
-import cc.mewcraft.wakame.item.components.HideTooltip
-import cc.mewcraft.wakame.item.components.ItemGlowable
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.CoreTypes
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeS
 import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
@@ -20,6 +15,7 @@ import cc.mewcraft.wakame.item.template.GenerationTrigger
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
@@ -105,6 +101,23 @@ class CustomNekoStackTest : KoinTest {
 
         result { it ->
             assertFalse(it.isEmpty())
+        }
+    }
+
+    @Test
+    fun `component - attack_speed`() = componentLifecycleTest(
+        "attack_speed", ItemTemplateTypes.ATTACK_SPEED, ItemComponentTypes.ATTACK_SPEED
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
+
+        unboxed {
+            assertEquals(AttackSpeedLevel.NORMAL, it.level)
         }
     }
 

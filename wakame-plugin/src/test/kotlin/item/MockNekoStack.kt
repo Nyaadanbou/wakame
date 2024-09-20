@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
+import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.stream.Stream
 
@@ -17,6 +18,9 @@ class MockNekoStack(
 ) : NekoStack {
     override val isEmpty: Boolean
         get() = false
+
+    override val itemType: Material
+        get() = throw NotImplementedError("Not implemented")
 
     override val itemStack: ItemStack
         get() = throw NotImplementedError("Not implemented")
