@@ -2,10 +2,7 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import io.papermc.paper.event.entity.EntityKnockbackEvent
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.empty
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.Component.translatable
+import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.LinearComponents
 import net.kyori.adventure.text.event.ClickEvent
@@ -46,7 +43,7 @@ object DamageListener : Listener, KoinComponent {
         val damageMetadata = DamageManager.generateDamageMetadata(event)
         val defenseMetadata = DamageManager.generateDefenseMetadata(event)
 
-        val nekoEntityDamageEvent = NekoEntityDamageEvent(event.damageSource, damageMetadata, defenseMetadata)
+        val nekoEntityDamageEvent = NekoEntityDamageEvent(event.damageSource, damageMetadata, defenseMetadata, event)
         if (!nekoEntityDamageEvent.callEvent()) {
             event.isCancelled = true // 同时取消 EntityDamageEvent
             return
@@ -70,7 +67,7 @@ object DamageListener : Listener, KoinComponent {
         ).hoverEvent(
             damageMetadata.damageBundle.packets()
                 .map { packet -> LinearComponents.linear(packet.element.displayName, text(": "), text(packet.packetDamage)) }
-                .let { components -> Component.join(JoinConfiguration.newlines(), components) }
+                .let { components -> join(JoinConfiguration.newlines(), components) }
                 .let { component ->
                     HoverEvent.showText(
                         component
