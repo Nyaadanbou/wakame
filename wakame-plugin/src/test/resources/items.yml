@@ -12,6 +12,12 @@ components:
     display_name: "攻击速度"
     tooltips:
       single: "<!i>攻击速度: <value>"
+    mappings:
+      0: "非常慢"
+      1: "慢"
+      2: "普通"
+      3: "快"
+      4: "非常快"
 
   attribute_modifiers:
     enabled: true

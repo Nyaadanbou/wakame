@@ -13,8 +13,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -38,14 +36,14 @@ data class ItemAttackSpeed(
         override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ATTACK_SPEED }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
-        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
+        private val tooltip: ItemComponentConfig.DiscreteTooltips = config.DiscreteTooltips()
     }
 
     override fun provideTooltipLore(): LoreLine {
         if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, listOf(tooltip.render(Placeholder.component("value", Component.text(level.name)))))
+        return LoreLine.simple(tooltipKey, listOf(tooltip.render(level.ordinal)))
     }
 
     private data class Codec(
@@ -67,8 +65,8 @@ data class ItemAttackSpeed(
             holder.removeTag()
         }
 
-        private companion object {
-            val TAG_KEY = "level"
+        companion object {
+            const val TAG_KEY = "level"
         }
     }
 
@@ -93,12 +91,11 @@ data class ItemAttackSpeed(
         /**
          * ## Node structure
          * ```yaml
-         * <node>:
-         *   level: <Level>
+         * <node>: <level>
          * ```
          */
         override fun decode(node: ConfigurationNode): Template {
-            val raw = node.node("level").krequire<AttackSpeedLevel>()
+            val raw = node.krequire<AttackSpeedLevel>()
             return Template(raw)
         }
     }

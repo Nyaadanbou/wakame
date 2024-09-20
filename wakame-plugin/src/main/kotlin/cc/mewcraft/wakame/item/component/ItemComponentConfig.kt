@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.component
 
+import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.RendererConfigReloadEvent
@@ -82,6 +83,28 @@ private constructor(
     // inner class 使用说明:
     // 根据具体的物品组件的配置结构,
     // 实例化相应的 inner class.
+
+    /**
+     * Tooltips for discrete values.
+     *
+     * @property mappings the format of each discrete value.
+     */
+    inner class DiscreteTooltips : Examinable {
+        val single: String by root.entry<String>("tooltips", "single")
+        val mappings: Map<Int, Component> by root
+            .entry<Map<Int, String>>("mappings")
+            .map { map ->
+                map.withDefault { int ->
+                    "??? ($int)" // fallback for unknown discrete values
+                }.mapValues { (_, v) ->
+                    ItemComponentInjections.miniMessage.deserialize(v)
+                }
+            }
+
+        fun render(value: Int): Component {
+            return ItemComponentInjections.miniMessage.deserialize(single, component("value", mappings.getValue(value)))
+        }
+    }
 
     /**
      * Tooltips for single text.
