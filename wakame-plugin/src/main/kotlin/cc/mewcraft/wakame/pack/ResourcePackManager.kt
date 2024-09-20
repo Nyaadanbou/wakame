@@ -53,13 +53,13 @@ internal class ResourcePackManager(
             val resourceTempDir = tempDir.resolve(GENERATED_RESOURCE_PACK_DIR)
 
             val resourcePack = ResourcePack.resourcePack()
-            val context = GenerationContext(
+            val context = ResourcePackGenerationContext(
                 description = generationSettings.description,
                 format = generationSettings.format,
                 min = generationSettings.min,
                 max = generationSettings.max,
                 mergePacks = generationSettings.mergePacks,
-                pack = resourcePack,
+                resourcePack = resourcePack,
                 assets = AssetsLookup.allAssets
             )
 
@@ -75,7 +75,7 @@ internal class ResourcePackManager(
             )
 
             try {
-                generations.forEach { it.generate() }
+                generations.forEach { it.process() }
             } catch (t: Throwable) {
                 logger.warn("Failed to generate resourcepack", t)
             }
@@ -99,9 +99,9 @@ internal class ResourcePackManager(
 private class ResourcePackGenerationSettings {
     private val config = RESOURCE_PACK_CONFIG.derive("generation")
 
-    val description: String by config.entry("description")
-    val format: Int by config.entry("format")
-    val min: Int by config.entry("min")
-    val max: Int by config.entry("max")
+    val description: String by config.entry<String>("description")
+    val format: Int by config.entry<Int>("format")
+    val min: Int by config.entry<Int>("min")
+    val max: Int by config.entry<Int>("max")
     val mergePacks: List<String> by config.optionalEntry<List<String>>("merge_packs").orElse(emptyList())
 }
