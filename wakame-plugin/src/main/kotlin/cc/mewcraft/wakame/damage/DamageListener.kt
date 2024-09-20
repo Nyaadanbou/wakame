@@ -3,15 +3,19 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import io.papermc.paper.event.entity.EntityKnockbackEvent
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.empty
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.Component.translatable
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.LinearComponents
+import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import org.bukkit.Server
 import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityShootBowEvent
@@ -28,17 +32,24 @@ object DamageListener : Listener, KoinComponent {
     private val logger: Logger by inject()
     private val server: Server by inject()
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun on(event: EntityDamageEvent) {
+        if (event.isCancelled) {
+            return
+        }
+
         val entity = event.entity
         if (entity !is LivingEntity) {
             return
         }
+
         val damageMetadata = DamageManager.generateDamageMetadata(event)
         val defenseMetadata = DamageManager.generateDefenseMetadata(event)
+
         val nekoEntityDamageEvent = NekoEntityDamageEvent(event.damageSource, damageMetadata, defenseMetadata)
         if (!nekoEntityDamageEvent.callEvent()) {
-            return // 如果伤害事件被取消, 什么也不做
+            event.isCancelled = true // 同时取消 EntityDamageEvent
+            return
         }
 
         // 修改最终伤害
@@ -52,23 +63,29 @@ object DamageListener : Listener, KoinComponent {
         // 我承认, 我很复古.
         val message = LinearComponents.linear(
             translatable(entity.type),
-            text("(${entity.uniqueId})"),
-            text("受到了 "),
-            text(event.damage),
-            text(" 点伤害")
+            if (entity is Player) text(" ${entity.name} ") else empty(),
+            text("受到了"),
+            text(" ${event.damage} "),
+            text("点伤害")
         ).hoverEvent(
             damageMetadata.damageBundle.packets()
-                .map {
-                    LinearComponents.linear(it.element.displayName, text(": "), text(it.packetDamage))
+                .map { packet -> LinearComponents.linear(packet.element.displayName, text(": "), text(packet.packetDamage)) }
+                .let { components -> Component.join(JoinConfiguration.newlines(), components) }
+                .let { component ->
+                    HoverEvent.showText(
+                        component
+                            .appendNewline()
+                            .appendNewline()
+                            .append(text("伤害未计算防御阶段"))
+                            .appendNewline()
+                            .append(text("点击复制实体的 UUID"))
+                    )
                 }
-                .let {
-                    Component.join(JoinConfiguration.newlines(), it)
-                }
-                .let {
-                    HoverEvent.showText(it.appendNewline().append(text("(各元素未计算防御阶段)")))
-                }
+        ).clickEvent(
+            ClickEvent.copyToClipboard(entity.uniqueId.toString())
         )
-        server.sendMessage(message)
+
+        server.filterAudience { it is Player }.sendMessage(message)
     }
 
     /**
