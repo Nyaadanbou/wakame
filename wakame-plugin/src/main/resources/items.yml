@@ -11,7 +11,7 @@ components:
     enabled: true
     display_name: "攻击速度"
     tooltips:
-      single: "<!i>攻击速度: <level>"
+      single: "<!i>攻击速度: <value>"
   
   attribute_modifiers:
     enabled: true

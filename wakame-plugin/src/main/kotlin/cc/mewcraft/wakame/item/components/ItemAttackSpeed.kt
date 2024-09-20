@@ -45,7 +45,7 @@ data class ItemAttackSpeed(
         if (!config.showInTooltip) {
             return LoreLine.noop()
         }
-        return LoreLine.simple(tooltipKey, listOf(tooltip.render(Placeholder.component("level", Component.text(level.name)))))
+        return LoreLine.simple(tooltipKey, listOf(tooltip.render(Placeholder.component("value", Component.text(level.name)))))
     }
 
     private data class Codec(
