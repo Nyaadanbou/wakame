@@ -23,7 +23,7 @@ interface User<P> {
     val player: P
 
     /**
-     * Unique identifier of the player.
+     * UUID of the player.
      */
     val uniqueId: UUID
 

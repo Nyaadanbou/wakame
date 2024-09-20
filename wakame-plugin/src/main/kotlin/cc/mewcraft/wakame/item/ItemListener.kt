@@ -20,7 +20,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
-import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -66,7 +65,7 @@ class SingleItemListener : KoinComponent, Listener {
     fun onDamageEntity(event: EntityDamageByEntityEvent) {
         // TODO: 这是一个 POC，可能需要考虑背包内的所有 Neko 物品
         val damager = event.damager as? Player ?: return
-        val item = damager.inventory.itemInMainHand
+        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleAttackEntity(damager, item, event.entity, event)
@@ -76,7 +75,7 @@ class SingleItemListener : KoinComponent, Listener {
     @EventHandler
     fun onItemBreakBlock(event: BlockBreakEvent) {
         val player = event.player
-        val item = player.inventory.itemInMainHand.takeIf { !it.isEmpty } ?: return
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleBreakBlock(player, item, event)
@@ -85,7 +84,7 @@ class SingleItemListener : KoinComponent, Listener {
 
     @EventHandler
     fun onItemDamage(event: PlayerItemDamageEvent) {
-        val item = event.item
+        val item = event.item.takeUnlessEmpty() ?: return
         val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleDamage(event.player, item, event)
@@ -94,7 +93,7 @@ class SingleItemListener : KoinComponent, Listener {
 
     @EventHandler
     fun onItemBreak(event: PlayerItemBreakEvent) {
-        val item = event.brokenItem
+        val item = event.brokenItem.takeUnlessEmpty() ?: return
         val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleBreak(event.player, item, event)
@@ -103,7 +102,7 @@ class SingleItemListener : KoinComponent, Listener {
 
     @EventHandler
     fun onItemConsume(event: PlayerItemConsumeEvent) {
-        val item = event.item
+        val item = event.item.takeUnlessEmpty() ?: return
         val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleConsume(event.player, item, event)
@@ -112,8 +111,8 @@ class SingleItemListener : KoinComponent, Listener {
 
     @EventHandler
     fun onSkillPrepareCast(event: PlayerSkillPrepareCastEvent) {
-        val item = event.item
-        val nekoStack = item?.tryNekoStack ?: return
+        val item = event.item ?: return
+        val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleSkillPrepareCast(event.caster, item, event.skill, event)
         }
@@ -124,16 +123,14 @@ class SingleItemListener : KoinComponent, Listener {
     @EventHandler
     fun onAttack1(event: EntityDamageByEntityEvent) {
         val damager = event.damager as? Player ?: return
-        val item = damager.inventory.itemInMainHand
-        item.tryNekoStack ?: return
+        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         attackSpeedEventHandler.handlePlayerAttackEntity(damager, item, event)
     }
 
     @EventHandler
     fun onShoot(event: EntityShootBowEvent) {
         val shooter = event.entity as? Player ?: return
-        val item = event.bow
-        item?.tryNekoStack ?: return
+        val item = event.bow ?: return
         attackSpeedEventHandler.handlePlayerShootBow(shooter, item, event)
     }
 
@@ -141,10 +138,10 @@ class SingleItemListener : KoinComponent, Listener {
 
     @EventHandler
     fun onClick(event: PlayerInteractEvent) {
-        val player = event.player
         val slot = event.hand ?: return
-        val item: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
-        val nekoStack = item?.tryNekoStack ?: return
+        val player = event.player
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val nekoStack = item.tryNekoStack ?: return
         if (!nekoStack.slotGroup.test(slot))
             return
 
@@ -173,7 +170,7 @@ class SingleItemListener : KoinComponent, Listener {
     fun onAttack2(event: EntityDamageByEntityEvent) {
         val damager = event.damager as? Player ?: return
         val entity = event.entity as? LivingEntity ?: return
-        val item = damager.inventory.itemInMainHand.takeIfNeko()
+        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
 
         skillEventHandler.onAttack(damager, entity, item, event)
     }

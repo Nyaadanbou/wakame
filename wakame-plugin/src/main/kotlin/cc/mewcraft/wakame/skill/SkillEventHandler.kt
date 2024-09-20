@@ -95,7 +95,7 @@ class SkillEventHandler(
 
     fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack?, event: EntityDamageByEntityEvent) {
         val user = player.toUser()
-        val nekoStack = itemStack?.tryNekoStack
+        val nekoStack = itemStack?.tryNekoStack ?: return // 非萌芽物品应该完全不用处理吧?
         val result = user.skillState.addTrigger(SingleTrigger.ATTACK, SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(entity), nekoStack))
         checkResult(result, event)
     }
