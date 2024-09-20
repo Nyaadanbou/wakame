@@ -1,28 +1,38 @@
 package cc.mewcraft.wakame.resource
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.tick.Tickable
-import cc.mewcraft.wakame.tick.Ticker
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.runTaskTimer
+import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.Server
+import org.bukkit.scheduler.BukkitTask
 
 class ResourceTicker(
     private val server: Server
 ) : Initializable {
-    private var taskId: Int? = null
+    private var resourceTickTask: BukkitTask? = null
 
     fun start() {
-        taskId = Ticker.INSTANCE.schedule(Tickable.always {
-            server.onlinePlayers.forEach {
-                val user = it.toUser()
+        runTaskTimer(0, 1) {
+            server.onlinePlayers.forEach { player ->
+                val user = player.toUser()
+
+                // 原型: 恢复魔法值
                 user.resourceMap.add(ResourceTypeRegistry.MANA, 1)
-                user.player.level = user.resourceMap.current(ResourceTypeRegistry.MANA)
+
+                // 原型: 显示魔法值
+                if (Bukkit.getServer().currentTick % 10 == 0) {
+                    player.sendActionBar(Component.text("魔法值: ${user.resourceMap.current(ResourceTypeRegistry.MANA)}"))
+                }
             }
-        })
+        }.also {
+            resourceTickTask = it
+        }
     }
 
     override fun close() {
-        taskId?.let { Ticker.INSTANCE.stopTick(it) }
+        resourceTickTask?.cancel()
     }
 
     override fun onPreWorld() {
