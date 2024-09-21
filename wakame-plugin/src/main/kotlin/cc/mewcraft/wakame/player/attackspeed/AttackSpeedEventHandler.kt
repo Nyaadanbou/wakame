@@ -37,25 +37,22 @@ class AttackSpeedEventHandler {
     }
 
     fun handlePlayerSlotChange(player: Player, slot: ItemSlot, oldItem: ItemStack?, newItem: ItemStack?) {
-        val user = player.toUser()
         if (oldItem != null) {
-            val oldStack = oldItem.tryNekoStack ?: return
-            getAttackSpeedLevel(oldStack) ?: return
+            oldItem.tryNekoStack?.getAttackSpeedLevel() ?: return
             removeEffect(player)
         }
         if (newItem != null) {
-            val newStack = newItem.tryNekoStack ?: return
-            val attackSpeedLevel = getAttackSpeedLevel(newStack) ?: return
+            val attackSpeedLevel = newItem.tryNekoStack?.getAttackSpeedLevel() ?: return
             sendEffect(player, attackSpeedLevel)
         }
     }
 
-    private fun getAttackSpeedLevel(stack: NekoStack): AttackSpeedLevel? {
-        return stack.components.get(ItemComponentTypes.ATTACK_SPEED)?.level
+    private fun NekoStack.getAttackSpeedLevel(): AttackSpeedLevel? {
+        return components.get(ItemComponentTypes.ATTACK_SPEED)?.level
     }
 
     private fun tryApplyCooldown(user: User<Player>, stack: NekoStack) {
-        val attackSpeedLevel = getAttackSpeedLevel(stack) ?: return
+        val attackSpeedLevel = stack.getAttackSpeedLevel() ?: return
         // 设置实际冷却
         user.attackSpeed.activate(stack.key, attackSpeedLevel)
         // 应用视觉冷却
