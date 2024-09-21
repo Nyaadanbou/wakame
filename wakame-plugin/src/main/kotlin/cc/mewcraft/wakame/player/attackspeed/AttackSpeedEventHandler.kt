@@ -37,21 +37,15 @@ class AttackSpeedEventHandler {
     }
 
     fun handlePlayerSlotChange(player: Player, slot: ItemSlot, oldItem: ItemStack?, newItem: ItemStack?) {
-        oldItem?.tryNekoStack?.removeAttackSpeed(player)
-        newItem?.tryNekoStack?.applyAttackSpeed(player)
-    }
-
-    private fun NekoStack.removeAttackSpeed(player: Player) {
         val user = player.toUser()
-        user.attackSpeed.reset(key)
-        removeEffect(player)
-    }
-
-    private fun NekoStack.applyAttackSpeed(player: Player) {
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(key)) {
-            val attackSpeedLevel = getAttackSpeedLevel(this) ?: return
-            tryApplyCooldown(user, this)
+        if (oldItem != null) {
+            val oldStack = oldItem.tryNekoStack ?: return
+            getAttackSpeedLevel(oldStack) ?: return
+            removeEffect(player)
+        }
+        if (newItem != null) {
+            val newStack = newItem.tryNekoStack ?: return
+            val attackSpeedLevel = getAttackSpeedLevel(newStack) ?: return
             sendEffect(player, attackSpeedLevel)
         }
     }
