@@ -149,12 +149,12 @@ object ItemTemplateTypes {
     val SKILLFUL: ItemTemplateType<Skillful> = Skillful.codec(ItemConstants.SKILLFUL).register()
 
     /**
-     * 组件: [ItemEnchantments]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemEnchantments]
      */
     val STORED_ENCHANTMENTS: ItemTemplateType<ItemEnchantments> = ItemEnchantments.codec(ItemConstants.STORED_ENCHANTMENTS).register()
 
     /**
-     * 组件: [Tool]
+     * 组件: [cc.mewcraft.wakame.item.components.Tool]
      */
     val TOOL: ItemTemplateType<Tool> = Tool.codec(ItemConstants.TOOL).register()
 
@@ -164,7 +164,7 @@ object ItemTemplateTypes {
     val TRIM: ItemTemplateType<ArmorTrim> = ArmorTrim.codec(ItemConstants.TRIM).register()
 
     /**
-     * 组件: [Unbreakable]
+     * 组件: [cc.mewcraft.wakame.item.components.Unbreakable]
      */
     val UNBREAKABLE: ItemTemplateType<Unbreakable> = Unbreakable.codec(ItemConstants.UNBREAKABLE).register()
 
