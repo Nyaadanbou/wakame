@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
@@ -434,34 +433,6 @@ private class NumericTooltips(
      */
     fun component(key: String, value: Component): TagResolver {
         return Placeholder.component(key, value)
-    }
-}
-
-/**
- * Encapsulation of the tooltips for an attribute facade.
- *
- * Unlike [NumericTooltips], this is for the attributes with discrete values.
- *
- * @param config the config of the attribute facade
- */
-private class DiscreteTooltips(
-    config: ConfigProvider,
-) : Tooltips(config), Examinable {
-    val mappings: Map<Int, Component> by config
-        .entry<Map<Int, String>>("mappings")
-        .map { map ->
-            map.mapValues { (_, v) ->
-                AttributeRegistrySupport.miniMessage.deserialize(v)
-            }.withDefault<Int, Component> { int ->
-                Component.text("??? ($int)") // fallback for unknown discrete values
-            }
-        }
-
-    /**
-     * Creates a [TagResolver] for the tooltips.
-     */
-    fun value(key: String, value: Int): TagResolver {
-        return Placeholder.component(key, mappings.getValue(value))
     }
 }
 
