@@ -22,16 +22,16 @@ internal class RendererConfigImpl(
     private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
 
     override val rawTooltipKeys: HashSet<RawTooltipKey> = HashSet()
-    override val loreMetaLookup: HashMap<TooltipKey, LoreMeta> = HashMap()
-    override val loreIndexLookup: HashMap<TooltipKey, TooltipIndex> = HashMap()
+    override val loreMetaMap: HashMap<TooltipKey, LoreMeta> = HashMap()
+    override val loreIndexMap: HashMap<TooltipKey, TooltipIndex> = HashMap()
     override val constantLoreLines: ArrayList<LoreLine> = ArrayList()
     override val defaultLoreLines: ArrayList<LoreLine> = ArrayList()
 
     override fun loadLayout() {
         // Clear all data first
         rawTooltipKeys.clear()
-        loreMetaLookup.clear()
-        loreIndexLookup.clear()
+        loreMetaMap.clear()
+        loreIndexMap.clear()
         constantLoreLines.clear()
         defaultLoreLines.clear()
 
@@ -130,11 +130,11 @@ internal class RendererConfigImpl(
 
             val fullIndexes = loreMeta.generateTooltipKeyIndexes(accIndexOffset).onEach { (fullKey, fullIndex) ->
                 // populate the index lookup
-                val absent = (loreIndexLookup.putIfAbsent(fullKey, fullIndex) == null)
+                val absent = (loreIndexMap.putIfAbsent(fullKey, fullIndex) == null)
                 require(absent) { "Key '$fullKey' has already been added to indexes" }
 
                 // populate the meta lookup
-                loreMetaLookup[fullKey] = loreMeta
+                loreMetaMap[fullKey] = loreMeta
             }
             // Accumulate the number of derived lines.
             // Minus one to neglect non-derived lines.

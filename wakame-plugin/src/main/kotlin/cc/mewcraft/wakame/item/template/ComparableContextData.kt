@@ -29,7 +29,7 @@ class AttributeContextData(
 ) : ComparableContextData {
     override fun examinableProperties(): Stream<out ExaminableProperty?> {
         return Stream.of(
-            ExaminableProperty.of("type", id),
+            ExaminableProperty.of("id", id),
             ExaminableProperty.of("operation", operation),
             ExaminableProperty.of("element", element),
         )
@@ -71,7 +71,7 @@ class SkillContextData(
 ) : ComparableContextData {
     override fun examinableProperties(): Stream<out ExaminableProperty?> {
         return Stream.of(
-            ExaminableProperty.of("type", id),
+            ExaminableProperty.of("id", id),
         )
     }
 

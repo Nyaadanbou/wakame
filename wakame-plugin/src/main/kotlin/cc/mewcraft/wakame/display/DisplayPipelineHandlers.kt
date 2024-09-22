@@ -1,15 +1,12 @@
-package cc.mewcraft.wakame.display2
+package cc.mewcraft.wakame.display
 
 import cc.mewcraft.wakame.core.PipelineHandler
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.LoreLineFlatter
-import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.NekoStack
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.text.Component
 
 internal object DisplayPipelineHandlers {
-    val EXTRACT_LORE_LINES: (RendererSystemName) -> PipelineHandler.Stateless<NekoStack, Collection<LoreLine>> = ::ExtractLoreLines
+    val EXTRACT_LORE_LINES: (ItemRendererType) -> PipelineHandler.Stateless<NekoStack, Collection<LoreLine>> = ::ExtractLoreLines
     val MAP_TO_COMPONENTS: (LoreLineFlatter) -> PipelineHandler.Stateless<Collection<LoreLine>, List<Component>> = ::MapToComponents
 }
 
@@ -17,7 +14,7 @@ internal object DisplayPipelineHandlers {
  * 提取物品上所有的 [LoreLine].
  */
 private class ExtractLoreLines(
-    private val systemName: RendererSystemName
+    private val systemName: ItemRendererType
 ) : PipelineHandler.Stateless<NekoStack, Collection<LoreLine>> {
     override fun process(input: NekoStack): Collection<LoreLine> {
         val components = input.components

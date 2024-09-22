@@ -28,9 +28,6 @@ const val CRATE_PROTO_CONFIG_LOADER = "crate_prototype_config_loader"
 const val ITEM_PROTO_CONFIG_DIR = "items"
 const val ITEM_PROTO_CONFIG_LOADER = "item_prototype_config_loader"
 
-const val ITEM_GLOBAL_CONFIG_FILE = "items.yml"
-const val ITEM_GLOBAL_CONFIG_LOADER = "item_global_config_loader"
-
 const val LANG_PROTO_CONFIG_DIR = "lang"
 const val LANG_PROTO_CONFIG_LOADER = "lang_prototype_config_loader"
 

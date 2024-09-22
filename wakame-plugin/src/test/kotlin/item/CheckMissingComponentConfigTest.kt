@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.registry.ITEM_GLOBAL_CONFIG_FILE
 import commonEnv
 import mainEnv
 import org.junit.jupiter.api.AfterEach
@@ -56,7 +55,7 @@ class CheckMissingComponentConfigTest : KoinTest {
         // ConfigurationNode: `components`.
         // 必须完全重新构建 ConfigProvider 的实例,
         // 否则会一直使用 main/test 之一的配置文件
-        val config = Configs.YAML[ITEM_GLOBAL_CONFIG_FILE].derive(ItemComponentRegistry.NODE_COMPONENTS)
+        val config = Configs.YAML[ItemComponentRegistry.CONFIG_FILE_NAME].derive(ItemComponentRegistry.NODE_COMPONENTS)
         // 所有已注册的物品组件类型
         val types = ItemComponentRegistry.TYPES
         // 未在配置文件中的物品组件类型

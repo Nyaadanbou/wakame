@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display2.RendererSystems
+import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
@@ -41,7 +41,7 @@ internal object AttributeCoreBootstrap : Initializable, KoinComponent {
     private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
 
     override fun onPostWorld() {
-        for ((systemName, system) in RendererSystems.entries()) {
+        for ((systemName, system) in ItemRenderers.entries()) {
             dynamicLoreMetaCreators.register(systemName, system.attributeCoreLoreMetaCreator)
         }
     }

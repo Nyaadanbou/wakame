@@ -8,10 +8,28 @@ import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.templates.components.cells.cores.*
-import cc.mewcraft.wakame.item.templates.filters.*
-import cc.mewcraft.wakame.random3.*
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreBlueprint
+import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreBlueprint
+import cc.mewcraft.wakame.item.templates.components.cells.cores.SkillCoreBlueprint
+import cc.mewcraft.wakame.item.templates.components.cells.cores.VirtualCoreBlueprint
+import cc.mewcraft.wakame.item.templates.filters.AttributeFilter
+import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
+import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
+import cc.mewcraft.wakame.item.templates.filters.SkillFilter
+import cc.mewcraft.wakame.random3.Filter
+import cc.mewcraft.wakame.random3.GroupSerializer
+import cc.mewcraft.wakame.random3.Node
+import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.NodeFacadeSupport
+import cc.mewcraft.wakame.random3.NodeRepository
+import cc.mewcraft.wakame.random3.Pool
+import cc.mewcraft.wakame.random3.PoolSerializer
+import cc.mewcraft.wakame.random3.Sample
+import cc.mewcraft.wakame.random3.SampleNodeFacade
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
 import cc.mewcraft.wakame.util.*
 import io.leangen.geantyref.TypeToken
@@ -66,7 +84,7 @@ internal object CoreBlueprintSerializer : TypeSerializer<CoreBlueprint> {
 
             type1.namespace() == Namespaces.ATTRIBUTE -> {
                 val attributeId = type1
-                AttributeCoreTemplate(attributeId, node)
+                AttributeCoreBlueprint(attributeId, node)
             }
 
             type1.namespace() == Namespaces.SKILL -> {

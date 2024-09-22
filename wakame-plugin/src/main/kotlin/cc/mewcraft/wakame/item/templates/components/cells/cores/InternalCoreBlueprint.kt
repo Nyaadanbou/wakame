@@ -12,7 +12,7 @@ import java.util.stream.Stream
 
 
 /**
- * 代表一个无操作的核心模板.
+ * 代表一个无操作核心 [cc.mewcraft.wakame.item.components.cells.VirtualCore] 的模板.
  *
  * 设计上, 无操作核心不会写入到物品上.
  */
@@ -36,7 +36,7 @@ data object VirtualCoreBlueprint : CoreBlueprint {
 }
 
 /**
- * 代表一个空的核心模板.
+ * 代表一个空核心 [cc.mewcraft.wakame.item.components.cells.EmptyCore] 的模板.
  *
  * “词条栏里有空核心” 在玩家看来就是 “词条栏里没有核心”.
  * 如果词条栏没有核心, 那也就意味着可以被替换成其他的.

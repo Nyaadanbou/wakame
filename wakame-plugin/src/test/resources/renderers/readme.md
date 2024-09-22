@@ -19,7 +19,7 @@
 
 ```
 renderers/
-├── crafting/
+├── crafting_station/
 │   ├── formats.yml
 │   └── layout.yml
 ├── standard/

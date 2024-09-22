@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.component
 
-import cc.mewcraft.wakame.config.*
-import cc.mewcraft.wakame.display.RENDERERS_CONFIG_DIR
-import cc.mewcraft.wakame.display2.RendererSystemName
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.Registry
+import cc.mewcraft.wakame.registry.SimpleRegistry
 import org.koin.core.component.KoinComponent
 
 /**
@@ -12,21 +12,16 @@ import org.koin.core.component.KoinComponent
  */
 internal object ItemComponentRegistry : KoinComponent, Initializable {
 
+    const val CONFIG_FILE_NAME = "items.yml"
     const val NODE_COMPONENTS = "components"
-    const val RENDERER_SYSTEM_DESCRIPTOR_FILE = "$RENDERERS_CONFIG_DIR/<system>/descriptors.yml"
 
     /**
      * 物品组件的全局配置文件.
      */
-    internal val CONFIG = Configs.YAML[ITEM_GLOBAL_CONFIG_FILE].derive(NODE_COMPONENTS)
+    internal val CONFIG = Configs.YAML[CONFIG_FILE_NAME].derive(NODE_COMPONENTS)
 
     /**
      * 物品组件类型的注册表.
      */
     internal val TYPES: Registry<String, ItemComponentType<*>> = SimpleRegistry()
-
-    fun getDescriptorsByRendererSystemName(name: RendererSystemName): ConfigProvider {
-        val path = RENDERER_SYSTEM_DESCRIPTOR_FILE.replace("<system>", name.name.lowercase())
-        return Configs.YAML[path].derive(NODE_COMPONENTS)
-    }
 }

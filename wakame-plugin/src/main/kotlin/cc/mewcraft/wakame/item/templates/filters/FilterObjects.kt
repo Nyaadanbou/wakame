@@ -22,7 +22,7 @@ import kotlin.random.Random
  * Checks the population of *attribute*.
  *
  * @property invert whether to invert the original result
- * @property id the type of the attribute to check with
+ * @property id the identifier of the attribute to check with
  * @property operation the operation of the attribute to check with
  * @property element the element of the attribute to check with
  *
@@ -50,7 +50,7 @@ data class AttributeFilter(
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("invert", invert),
-            ExaminableProperty.of("type", id),
+            ExaminableProperty.of("id", id),
             ExaminableProperty.of("operation", operation),
             ExaminableProperty.of("element", element),
         )
@@ -251,7 +251,7 @@ data class SkillFilter(
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("invert", invert),
-            ExaminableProperty.of("key", id),
+            ExaminableProperty.of("id", id),
         )
     }
 

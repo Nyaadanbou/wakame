@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.display2.RendererSystemName
-import com.google.common.collect.HashBasedTable
-import com.google.common.collect.Table
+import cc.mewcraft.wakame.display2.ItemRendererType
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -19,12 +17,12 @@ internal interface RendererConfig {
     /**
      * 用于查询指定内容的 [LoreMeta].
      */
-    val loreMetaLookup: Map<TooltipKey, LoreMeta>
+    val loreMetaMap: Map<TooltipKey, LoreMeta>
 
     /**
      * 用于查询指定内容的 [TooltipIndex].
      */
-    val loreIndexLookup: Map<TooltipKey, TooltipIndex>
+    val loreIndexMap: Map<TooltipKey, TooltipIndex>
 
     /**
      * 始终要渲染的内容. 这些内容的文本在物品中始终不变.
@@ -84,11 +82,10 @@ internal class DynamicLoreMetaCreators : KoinComponent {
     /**
      * 所有的 [DynamicLoreMetaCreator].
      *
-     * R - [cc.mewcraft.wakame.display2.RendererSystemName]
-     * C - rawLine
+     * K - 原始的
      * V - [DynamicLoreMetaCreator]
      */
-    private val creators: Table<RendererSystemName, String, DynamicLoreMetaCreator> = HashBasedTable.create()
+    private val creators: HashMap<String, DynamicLoreMetaCreator> = HashMap()
 
     /**
      * 获取所有的 [DynamicLoreMetaCreator].
@@ -102,7 +99,7 @@ internal class DynamicLoreMetaCreators : KoinComponent {
      *
      * 会覆盖 [DynamicLoreMetaCreator.namespace] 相同的实例.
      */
-    fun register(systemName: RendererSystemName, creator: DynamicLoreMetaCreator) {
+    fun register(systemName: ItemRendererType, creator: DynamicLoreMetaCreator) {
         this.creators.row(systemName)[creator.namespace] = creator
         logger.info("Registered DynamicLoreMetaCreator: {} in system {}", creator.namespace, systemName)
     }

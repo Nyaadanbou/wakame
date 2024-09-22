@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.display2.RendererSystems
+import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.initializer.Initializable
 
 /**
@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.initializer.Initializable
  */
 internal object RendererBootstrap : Initializable {
     private fun loadLayout0() {
-        for ((_, system) in RendererSystems.entries()) {
+        for ((_, system) in ItemRenderers.entries()) {
             system.config.loadLayout()
         }
     }

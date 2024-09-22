@@ -3,9 +3,18 @@ package cc.mewcraft.wakame.item.components.cells.cores
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display2.RendererSystems
-import cc.mewcraft.wakame.initializer.*
+import cc.mewcraft.wakame.display.DynamicLoreMeta
+import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
+import cc.mewcraft.wakame.display.DynamicLoreMetaCreators
+import cc.mewcraft.wakame.display.LoreLine
+import cc.mewcraft.wakame.display.RawTooltipIndex
+import cc.mewcraft.wakame.display.RawTooltipKey
+import cc.mewcraft.wakame.display.RendererBootstrap
+import cc.mewcraft.wakame.display.TooltipKey
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PostWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.util.Key
@@ -42,7 +51,7 @@ internal object EmptyCoreBootstrap : Initializable, KoinComponent {
     private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
 
     override fun onPostWorld() {
-        for ((systemName, _) in RendererSystems.entries()) {
+        for ((systemName, _) in ItemRenderers.entries()) {
             dynamicLoreMetaCreators.register(systemName, EmptyCoreLoreMetaCreator())
         }
     }

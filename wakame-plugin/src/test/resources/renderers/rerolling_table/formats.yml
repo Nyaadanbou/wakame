@@ -1,0 +1,49 @@
+# 在这里设置重造台的物品 *渲染内容*.
+
+# ✔ 正常渲染
+# 这里只负责调整特殊的词条栏设置 (如空词条栏),
+# 其他词条栏 (如属性) 已委托到专门的配置文件.
+cells:
+  namespace: component
+  # 最多可显示多少个空词条栏?
+  max_visible_empty_cores: 10
+  # *空词条栏* 的渲染格式
+  empty_core:
+    name: "<!i>空词条栏"
+    lore: "<!i>空词条栏"
+
+# ✔ 正常渲染
+custom_name:
+  namespace: "component"
+  tooltip: "<!i><value>"
+
+# ✔ 正常渲染
+elements:
+  namespace: component
+  # 额外标签
+  # <merged> 多个元素合并后的文本
+  # <single> 单个元素
+  tooltip:
+    merged: "<!i>元素: <merged>"
+    single: "<single>"
+    separator: ", "
+
+# ✔ 正常渲染
+item_name:
+  namespace: "component"
+  tooltip: "<value>"
+
+# ✔ 正常渲染
+level:
+  namespace: "component"
+  tooltip: "<!i>等级: <value>"
+
+# ✔ 正常渲染
+lore:
+  namespace: "component"
+  # 额外标签
+  # <line> 描述内容
+  tooltip:
+    line: "<!i><line>"
+    header: [ ]
+    bottom: [ ]

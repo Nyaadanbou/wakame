@@ -14,14 +14,14 @@ import java.util.stream.Stream
 
 
 /**
- * 从配置文件构建 [AttributeCoreTemplate].
+ * 从配置文件构建 [AttributeCoreBlueprint].
  *
  * @param id 核心的唯一标识, 也就是 [CoreBlueprint.id]
  * @param node 包含该核心数据的配置节点
  *
- * @return 从配置文件构建的 [AttributeCoreTemplate]
+ * @return 从配置文件构建的 [AttributeCoreBlueprint]
  */
-fun AttributeCoreTemplate(
+fun AttributeCoreBlueprint(
     id: Key,
     node: ConfigurationNode
 ): AttributeCoreBlueprint {

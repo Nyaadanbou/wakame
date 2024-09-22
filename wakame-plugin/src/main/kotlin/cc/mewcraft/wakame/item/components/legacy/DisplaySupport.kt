@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.components.legacy
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display2.RendererSystems
+import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.initializer.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -25,7 +25,7 @@ internal object ItemMetaBootstrap : Initializable, KoinComponent {
     private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
 
     override fun onPostWorld() {
-        for ((systemName, _) in RendererSystems.entries()) {
+        for ((systemName, _) in ItemRenderers.entries()) {
             dynamicLoreMetaCreators.register(systemName, ItemMetaLoreMetaCreator())
         }
     }

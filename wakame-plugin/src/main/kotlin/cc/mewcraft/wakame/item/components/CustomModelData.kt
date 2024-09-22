@@ -21,7 +21,7 @@ data class CustomModelData(
         }
     }
 
-    data class Codec(
+    private data class Codec(
         override val id: String,
     ) : ItemComponentType<CustomModelData> {
         override fun read(holder: ItemComponentHolder): CustomModelData? {

@@ -28,7 +28,7 @@ fun SkillCoreBlueprint(
 }
 
 /**
- * 代表一个技能核心的模板.
+ * 代表一个技能核心 [SkillCore] 的模板.
  */
 interface SkillCoreBlueprint : CoreBlueprint {
     /**
