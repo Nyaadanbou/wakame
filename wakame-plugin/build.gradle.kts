@@ -117,6 +117,10 @@ paper {
         }
     }
     serverDependencies {
+        register("Kotlin") {
+            required = true
+            load = RelativeLoadOrder.BEFORE
+        }
         register("helper") {
             required = true
             load = RelativeLoadOrder.BEFORE
