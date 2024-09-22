@@ -26,8 +26,6 @@ class ItemEntityDisplayPacketHandler : PacketListenerAbstract() {
     private val teamEntityId2entityUniqueId = Int2ObjectOpenHashMap<UUID>()
 
     override fun onPacketSend(event: PacketSendEvent) {
-        if (event.player !is Player) return
-
         when (event.packetType) {
             PacketType.Play.Server.ENTITY_METADATA -> {
                 val origin = WrapperPlayServerEntityMetadata(event)

@@ -40,7 +40,7 @@ private val CompoundTag.toPacket: NBTCompound
         val dataOutputStream = DataOutputStream(arrayOutputStream)
         NbtIo.write(this, dataOutputStream)
         val dataInputStream: DataInput = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
-        return DefaultNBTSerializer.INSTANCE.deserializeTag(NBTLimiter(), dataInputStream) as NBTCompound
+        return DefaultNBTSerializer.INSTANCE.deserializeTag(NBTLimiter.noop(), dataInputStream) as NBTCompound
     }
 
 // Convert PacketEvents compound to NMS compound

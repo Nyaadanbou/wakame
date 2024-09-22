@@ -19,7 +19,7 @@ class FOVPacketHandler : PacketListenerAbstract() {
     override fun onPacketSend(event: PacketSendEvent) {
         if (event.isCancelled)
             return
-        val bukkitPlayer = event.player as? Player ?: return // 不是玩家
+        val bukkitPlayer = event.getPlayer<Player>()  // 不是玩家
         val nekoUser = bukkitPlayer.toUser()
         if (event.packetType != PacketType.Play.Server.UPDATE_ATTRIBUTES)
             return
