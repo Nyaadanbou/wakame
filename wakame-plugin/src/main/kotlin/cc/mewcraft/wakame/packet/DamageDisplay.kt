@@ -15,13 +15,16 @@ import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Display
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.TextDisplay
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.joml.Vector3f
-import kotlin.random.Random
+import java.util.WeakHashMap
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * 以悬浮文字显示玩家造成的伤害.
@@ -30,26 +33,24 @@ internal class DamageDisplay : Listener {
 
     companion object {
         // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
-
-        private val CRITICAL_SCALE = Vector3f(4f, 4f, 4f)
-        private val NON_CRITICAL_SCALE = Vector3f(2f, 2f, 2f)
-
+        private val ZERO = Vector3f(0f, 0f, 0f)
+        private val ONE = Vector3f(1f, 1f, 1f)
         private val BASE_I = Vector3f(1f, 0f, 0f)
         private val BASE_J = Vector3f(0f, 1f, 0f)
         private val BASE_K = Vector3f(0f, 0f, 1f)
+
+        // 用于辅助生成*伪随机*的伤害悬浮文字的坐标位置
+        private val RADIAL_POINT_GENERATOR = RadialPointGenerator(8, 1f)
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun onWakameEntityDamage(event: NekoEntityDamageEvent) {
         val damageSource = event.damageSource
         val damager = damageSource.causingEntity as? Player ?: return
-        val damagee = event.damagee
-        val damageeLocation = damagee.location.add(0.0, damagee.height / 4, 0.0) // 获取受伤实体的中心位置
         val damageValueMap = event.getFinalDamageMap(excludeZeroDamage = true)
         val isCritical = event.damageMetadata.isCritical
 
-        val hologramLoc = findCBetweenAB(a0 = damager.location, b0 = damageeLocation, t0 = 1.25, r0 = 0.5)
-        val hologramScale = if (isCritical) CRITICAL_SCALE else NON_CRITICAL_SCALE
+        val hologramLoc = calculateHologramLocation(damager = damager, d = 3f)
         val hologramText = damageValueMap
             .map { (element, value) ->
                 val damageValue = "%.1f".format(value)
@@ -72,54 +73,40 @@ internal class DamageDisplay : Listener {
                 Component.join(JoinConfiguration.spaces(), components)
             }
 
-        sendDamageHologram(damager, hologramLoc, hologramScale, hologramText)
+        sendDamageHologram(damager, hologramLoc, isCritical, hologramText)
     }
 
     /**
-     * 计算坐标 `C`, 使得 `C` 落在点 `A` 和点 `B` 之间.
+     * 计算一个坐标 `C`, 使其落在 [玩家][damager] 的视线向量 `AB` 上,
+     * 并且保证与玩家的 [眼睛][Player.getEyeLocation] 的距离为 [d].
      *
      * 具体来说, 我们先找到一个平面 `P`, 使得平面垂直于 `AB` 向量.
-     * 平面 `P` 更靠近点 `A` 还是更靠近点 `B` 取决于 [t0] 的取值.
-     * 然后我们在平面 `P` 上找到点 `C`, 其随机程度由 [r0] 决定.
+     * 平面 `P` 与点 `A` (眼睛) 之间的距离由给定的参数 [d] 决定.
      *
-     * [t0] 的取值应该在 `[0.0, 1.0]` 之间.
-     * 如果 [t0] 接近于 `0.0`, 则 `C` 更靠近 `A`.
-     * 如果 [t0] 接近于 `1.0`, 则 `C` 更靠近 `B`.
-     *
-     * @param a0 坐标
-     * @param b0 坐标
-     * @param t0 取值范围 `[0.0, 1.0]`
-     * @param r0 取值范围不限
+     * 本算法的优点: 即使玩家使用远程武器, 也能够清晰的看到伤害值.
      */
-    private fun findCBetweenAB(
-        a0: Location,
-        b0: Location,
-        t0: Double,
-        r0: Double,
+    private fun calculateHologramLocation(
+        damager: Player,
+        d: Float,
     ): Location {
-        val t = t0.toFloat()
-
-        val a = a0.toVector3f()
-        val b = b0.toVector3f()
-        val ab = b.copy() - a
+        val a = damager.eyeLocation.toVector3f()
+        val ab = damager.eyeLocation.direction.toVector3f()
+        val c0 = a + (ab mul d)
 
         // 生成不平行于 AB 的任意向量
-        val vx = if (ab.x != 0f || ab.z != 0f) BASE_J.copy() else BASE_I.copy()
+        val vx = if (ab.x != 0f || ab.z != 0f) BASE_J else BASE_I
 
         // 生成平面 P 的基向量
-        // v1=(1,0,0)×AB=(0,dz,−dy)
-        // v2=AB×v1
-        val v1 = (vx cross ab).normalize()
+        val v1 = (ab cross vx).normalize()
         val v2 = (ab cross v1).normalize()
 
         // 生成垂直平面的随机因子
-        val r1 = Random.nextDouble(-r0, r0).toFloat()
-        val r2 = Random.nextDouble(-r0, r0).toFloat()
+        val (r1, r2) = RADIAL_POINT_GENERATOR.next(damager)
 
-        // 计算 C: C=A+t⋅(B−A)+r1⋅v1+r2⋅v2
-        val c = a + ((b - a) mul t) + (v1 mul r1) + (v2 mul r2)
+        // 计算 C
+        val c = c0 + (v1 mul r1) + (v2 mul r2)
 
-        return c.toLocation(a0.world)
+        return c.toLocation(damager.world)
     }
 
     /**
@@ -128,7 +115,7 @@ internal class DamageDisplay : Listener {
     private fun sendDamageHologram(
         hologramViewer: Player,
         hologramLocation: Location,
-        initialScale: Vector3f,
+        isCritical: Boolean,
         damageText: Component,
     ) {
         val hologramData = TextHologramData(
@@ -139,7 +126,8 @@ internal class DamageDisplay : Listener {
             TextDisplay.TextAlignment.CENTER,
             true
         ).apply {
-            this.scale = initialScale
+            this.scale.mul(1.5f) // 初始大小
+            this.translation.add(0f, -1f, 0f) // 初始位置偏下
             this.brightness = Display.Brightness(15, 0)
         }
         val hologram = Hologram(hologramData)
@@ -150,8 +138,12 @@ internal class DamageDisplay : Listener {
             hologramData.apply {
                 this.startInterpolation = 0
                 this.interpolationDuration = 5
-                this.translation.add(0.0f, 0.5f, 0.0f)
-                this.scale.set(6.0f, 6.0f, 6.0f)
+                this.translation.add(0f, .5f, 0f)
+                if (isCritical) {
+                    this.scale.add(3f, 3f, 3f)
+                } else {
+                    this.scale.add(1f, 1f, 1f)
+                }
             }
             hologram.setEntityData(hologramData)
             hologram.refresh(hologramViewer)
@@ -160,16 +152,54 @@ internal class DamageDisplay : Listener {
         runTaskLater(8) {
             hologramData.apply {
                 this.startInterpolation = 0
-                this.interpolationDuration = 15
-                this.translation.add(0.0f, 1.0f, 0.0f)
-                this.scale.set(0.0f, 0.0f, 0.0f)
+                this.interpolationDuration = 20
+                this.scale.set(1f, 1f, 1f)
+                this.translation.add(0f, 2f, 0f)
             }
             hologram.setEntityData(hologramData)
             hologram.refresh(hologramViewer)
         }
 
-        runTaskLater(24) {
+        runTaskLater(32) {
             hologram.hide(hologramViewer)
         }
+    }
+}
+
+/**
+ * @param divisions 分割数
+ * @param radius 半径
+ */
+private class RadialPointGenerator(
+    divisions: Int,
+    radius: Float
+) {
+    private val points: List<Pair<Float, Float>> = createCirclePoints(divisions, radius)
+    private val currentIndexMap = WeakHashMap<Entity, Int>() // race-condition 就算发生也没什么大问题
+
+    // 获取当前索引的点对
+    fun next(viewer: Entity): Pair<Float, Float> {
+        val currentIndex = currentIndexMap.getOrPut(viewer) { 0 }
+        val pair = points[currentIndex]
+
+        // 让索引每次步进到对立位置，确保下一次获取时是“对立点”
+        currentIndexMap[viewer] = (currentIndex + points.size / 2) % points.size
+
+        return pair
+    }
+
+    // 初始化生成一组在圆上均匀分布的点对
+    private fun createCirclePoints(divisions: Int, radius: Float): List<Pair<Float, Float>> {
+        val points = mutableListOf<Pair<Float, Float>>()
+        val step = (2 * Math.PI / divisions).toFloat()
+
+        for (i in 0 until divisions) {
+            val angle = step * i
+            val r1 = radius * cos(angle)
+            val r2 = radius * sin(angle)
+            points.add(Pair(r1, r2))
+        }
+
+        return points
     }
 }

@@ -7,7 +7,10 @@ import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.network.protocol.game.ClientboundBundlePacket
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
@@ -66,7 +69,9 @@ class Hologram(
     fun update() {
         val data = this.data
         val display = this.display
-            ?: return  // doesn't exist, nothing to update
+        if (display == null) {
+            return // doesn't exist, nothing to update
+        }
 
         // location data
         val location = data.location
@@ -175,7 +180,9 @@ class Hologram(
         }
 
         val display = this.display
-            ?: return false // could not be created, nothing to show
+        if (display == null) {
+            return false // could not be created, nothing to show
+        }
 
         val location = data.location
         if (location.world.name != player.location.getWorld().name) {
@@ -193,7 +200,9 @@ class Hologram(
 
     fun hide(player: Player): Boolean {
         val display = this.display
-            ?: return false // doesn't exist, nothing to hide
+        if (display == null) {
+            return false // doesn't exist, nothing to hide
+        }
 
         (player as CraftPlayer).handle.connection.send(ClientboundRemoveEntitiesPacket(display.id))
 
@@ -205,9 +214,11 @@ class Hologram(
     fun refresh(player: Player) {
         val data = this.data
         val display = this.display
-            ?: return  // doesn't exist, nothing to refresh
+        if (display == null) {
+            return // doesn't exist, nothing to refresh
+        }
 
-        if (!viewers.contains(player.uniqueId)) {
+        if (!this.viewers.contains(player.uniqueId)) {
             return
         }
 
@@ -215,19 +226,22 @@ class Hologram(
             return
         }
 
-        player.handle.connection.send(ClientboundTeleportEntityPacket(display))
+        // we use bundle packet to send it all at once
+        val packets = ArrayList<Packet<ClientGamePacketListener>>()
+        packets += ClientboundTeleportEntityPacket(display)
 
         if (display is MojangDisplay.TextDisplay && data is TextHologramData) {
             display.text = PaperAdventure.asVanilla(data.text)
         }
 
         val values = ArrayList<DataValue<*>>()
-
         for (item in BukkitShadowFactory.global().shadow<ShadowSynchedEntityData>(display.entityData).itemsById) {
             values.add(item.value())
         }
 
-        player.handle.connection.send(ClientboundSetEntityDataPacket(display.id, values))
+        packets += ClientboundSetEntityDataPacket(display.id, values)
+
+        player.handle.connection.send(ClientboundBundlePacket(packets))
     }
 
     fun setEntityData(data: HologramData) {

@@ -22,7 +22,7 @@ interface HologramData {
 }
 
 abstract class DisplayHologramData(
-    override val type: HologramData.Type,
+    final override val type: HologramData.Type,
     final override val location: Location,
 ) : HologramData {
     var billboard: Billboard = DEFAULT_BILLBOARD
