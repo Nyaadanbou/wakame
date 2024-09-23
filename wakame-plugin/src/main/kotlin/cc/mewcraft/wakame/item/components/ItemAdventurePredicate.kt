@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -22,8 +22,8 @@ data class ItemAdventurePredicate(
     companion object : ItemComponentBridge<ItemAdventurePredicate> {
         override fun codec(id: String): ItemComponentType<ItemAdventurePredicate> {
             return when (id) {
-                ItemComponentConstants.CAN_BREAK -> CodecForCanBreak(id)
-                ItemComponentConstants.CAN_PLACE_ON -> CodecForCanPlaceOn(id)
+                ItemConstants.CAN_BREAK -> CodecForCanBreak(id)
+                ItemConstants.CAN_PLACE_ON -> CodecForCanPlaceOn(id)
                 else -> throw IllegalArgumentException("Unknown codec id: '$id'")
             }
         }
@@ -109,8 +109,8 @@ data class ItemAdventurePredicate(
         override fun decode(node: ConfigurationNode): Template {
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
             return when (id) {
-                ItemComponentConstants.CAN_BREAK -> Template(ItemComponentTypes.CAN_BREAK, showInTooltip)
-                ItemComponentConstants.CAN_PLACE_ON -> Template(ItemComponentTypes.CAN_PLACE_ON, showInTooltip)
+                ItemConstants.CAN_BREAK -> Template(ItemComponentTypes.CAN_BREAK, showInTooltip)
+                ItemConstants.CAN_PLACE_ON -> Template(ItemComponentTypes.CAN_PLACE_ON, showInTooltip)
                 else -> throw IllegalArgumentException("Unknown template id: '$id'")
             }
         }

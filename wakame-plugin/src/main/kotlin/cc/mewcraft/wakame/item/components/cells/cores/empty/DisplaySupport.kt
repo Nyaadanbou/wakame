@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
@@ -28,7 +28,7 @@ internal object CoreEmptyDisplaySupport {
     /**
      * 最多能有几个空核心被渲染出来.
      */
-    val MAX_DISPLAY_COUNT by ItemComponentRegistry.CONFIG.derive(ItemComponentConstants.CELLS).entry<Int>("max_visible_empty_cores")
+    val MAX_DISPLAY_COUNT by ItemComponentRegistry.CONFIG.derive(ItemConstants.CELLS).entry<Int>("max_visible_empty_cores")
 
     /**
      * 根据索引生成对应的 [TooltipKey].

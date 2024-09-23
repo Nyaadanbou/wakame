@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.CyclingLoreLineProvider
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.NameLine
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreType
 import cc.mewcraft.wakame.registry.ItemComponentRegistry
@@ -59,14 +59,14 @@ object CoreEmpty : Core, CoreType<CoreEmpty> {
     }
 
     private val nameLine: NameLine = NameLine.supply(
-        ItemComponentRegistry.CONFIG.derive(ItemComponentConstants.CELLS).entry<Component>("tooltips", "empty_core", "name")
+        ItemComponentRegistry.CONFIG.derive(ItemConstants.CELLS).entry<Component>("tooltips", "empty_core", "name")
     )
 
     private val loreLine: CyclingLoreLineProvider = CyclingLoreLineProvider(
         CoreEmptyDisplaySupport.MAX_DISPLAY_COUNT
     ) { index ->
         val tooltipKey = CoreEmptyDisplaySupport.derive(GenericKeys.EMPTY, index)
-        val provider = ItemComponentRegistry.CONFIG.derive(ItemComponentConstants.CELLS).entry<Component>("tooltips", "empty_core", "lore").map(::listOf)
+        val provider = ItemComponentRegistry.CONFIG.derive(ItemConstants.CELLS).entry<Component>("tooltips", "empty_core", "lore").map(::listOf)
         LoreLine.supply(tooltipKey, provider)
     }
 }

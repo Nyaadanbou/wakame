@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -84,8 +84,8 @@ data class ItemKizamiz(
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.KIZAMIZ
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { KIZAMIZ }
+        override val configPath: String = ItemConstants.KIZAMIZ
+        override val tooltipKey: TooltipKey = ItemConstants.createKey { KIZAMIZ }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.MergedTooltip = config.MergedTooltip()

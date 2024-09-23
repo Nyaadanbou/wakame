@@ -6,7 +6,7 @@ import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -43,8 +43,8 @@ data class ExtraLore(
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.LORE
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { LORE }
+        override val configPath: String = ItemConstants.LORE
+        override val tooltipKey: TooltipKey = ItemConstants.createKey { LORE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.LoreTooltip = config.LoreTooltip()

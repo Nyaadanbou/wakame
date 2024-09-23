@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -29,8 +29,8 @@ interface ItemGlowable : Examinable, TooltipProvider.Single {
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.GLOWABLE
-        override val tooltipKey: Key = ItemComponentConstants.createKey { GLOWABLE }
+        override val configPath: String = ItemConstants.GLOWABLE
+        override val tooltipKey: Key = ItemConstants.createKey { GLOWABLE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

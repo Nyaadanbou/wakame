@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util.packetevents
 
-import cc.mewcraft.wakame.util.NYA_TAG_KEY
+import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.wrap
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
@@ -12,7 +12,6 @@ import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
-import java.io.DataInput
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import kotlin.jvm.optionals.getOrNull
@@ -24,7 +23,7 @@ import cc.mewcraft.nbt.CompoundTag as CompoundShadowTag
 val ItemStack.wakameTagOrNull: CompoundShadowTag?
     get() {
         val customData = this.minecraftCustomData
-        val wakameTag = customData?.getCompoundOrNull(NYA_TAG_KEY)
+        val wakameTag = customData?.getCompoundOrNull(SharedConstants.PLUGIN_NAME)
         return wakameTag?.wrap
     }
 
@@ -33,14 +32,16 @@ private val ItemStack.minecraftCustomData: CompoundTag?
         return this.getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.toMinecraft
     }
 
+private val NOOP_NBT_LIMITER = NBTLimiter.noop()
+
 // Convert NMS compound to PacketEvents compound
 private val CompoundTag.toPacket: NBTCompound
     get() {
         val arrayOutputStream = FastByteArrayOutputStream()
         val dataOutputStream = DataOutputStream(arrayOutputStream)
         NbtIo.write(this, dataOutputStream)
-        val dataInputStream: DataInput = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
-        return DefaultNBTSerializer.INSTANCE.deserializeTag(NBTLimiter.noop(), dataInputStream) as NBTCompound
+        val dataInputStream = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
+        return DefaultNBTSerializer.INSTANCE.deserializeTag(NOOP_NBT_LIMITER, dataInputStream) as NBTCompound
     }
 
 // Convert PacketEvents compound to NMS compound
@@ -49,6 +50,6 @@ private val NBTCompound.toMinecraft: CompoundTag
         val arrayOutputStream = FastByteArrayOutputStream()
         val dataOutputStream = DataOutputStream(arrayOutputStream)
         DefaultNBTSerializer.INSTANCE.serializeTag(dataOutputStream, this)
-        val dataInputStream: DataInput = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
+        val dataInputStream = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
         return NbtIo.read(dataInputStream)
     }

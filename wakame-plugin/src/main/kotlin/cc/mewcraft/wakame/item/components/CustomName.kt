@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.TooltipKey
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -65,8 +65,8 @@ data class CustomName(
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.CUSTOM_NAME
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { CUSTOM_NAME }
+        override val configPath: String = ItemConstants.CUSTOM_NAME
+        override val tooltipKey: TooltipKey = ItemConstants.createKey { CUSTOM_NAME }
 
         private val miniMessage by inject<MiniMessage>()
         private val config = ItemComponentConfig.provide(this)

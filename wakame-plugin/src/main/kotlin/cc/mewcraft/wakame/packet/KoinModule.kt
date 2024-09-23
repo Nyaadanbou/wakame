@@ -18,8 +18,8 @@ internal fun packetModule() = module {
     }
 
     singleOf(::PacketEventsManager) bind Initializable::class
-    singleOf(::DamageDisplayHandler)
-    singleOf(::FOVPacketHandler) bind PacketListenerCommon::class
-    singleOf(::ItemEntityDisplayPacketHandler) bind PacketListenerCommon::class
-    singleOf(::ItemRendererListener) bind PacketListenerCommon::class
+    singleOf(::DamageDisplay)
+    singleOf(::FOVLimiter) bind PacketListenerCommon::class
+    singleOf(::ItemEntityRenderer) bind PacketListenerCommon::class
+    singleOf(::ItemStackRenderer) bind PacketListenerCommon::class
 }

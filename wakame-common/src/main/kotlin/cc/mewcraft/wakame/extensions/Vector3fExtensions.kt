@@ -17,29 +17,29 @@ fun Vector3f.copy(): Vector3f {
 }
 
 infix fun Vector3f.sub(other: Vector3f): Vector3f {
-    return this.sub(other)
+    return this.copy().sub(other)
 }
 
 infix operator fun Vector3f.minus(other: Vector3f): Vector3f {
-    return this.sub(other)
+    return this.copy().sub(other)
 }
 
 infix fun Vector3f.add(other: Vector3f): Vector3f {
-    return this.add(other)
+    return this.copy().add(other)
 }
 
 infix operator fun Vector3f.plus(other: Vector3f): Vector3f {
-    return this.add(other)
+    return this.copy().add(other)
 }
 
 infix fun Vector3f.mul(scalar: Float): Vector3f {
-    return this.mul(scalar)
+    return this.copy().mul(scalar)
 }
 
 infix fun Vector3f.mul(other: Vector3f): Vector3f {
-    return this.mul(other)
+    return this.copy().mul(other)
 }
 
 infix fun Vector3f.cross(other: Vector3f): Vector3f {
-    return this.cross(other)
+    return this.copy().cross(other)
 }

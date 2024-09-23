@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentMeta
@@ -34,8 +34,8 @@ interface HideTooltip : Examinable {
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.HIDE_TOOLTIP
-        override val tooltipKey: Key = ItemComponentConstants.createKey { HIDE_TOOLTIP }
+        override val configPath: String = ItemConstants.HIDE_TOOLTIP
+        override val tooltipKey: Key = ItemConstants.createKey { HIDE_TOOLTIP }
     }
 
     private data object Value : HideTooltip

@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -72,8 +72,8 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.CELLS
-        override val tooltipKey: Key = ItemComponentConstants.createKey { CELLS }
+        override val configPath: String = ItemConstants.CELLS
+        override val tooltipKey: Key = ItemConstants.createKey { CELLS }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

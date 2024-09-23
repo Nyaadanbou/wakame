@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentMeta
@@ -36,8 +36,8 @@ data class ItemDyeColor(
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.DYED_COLOR
-        override val tooltipKey: Key = ItemComponentConstants.createKey { DYED_COLOR }
+        override val configPath: String = ItemConstants.DYED_COLOR
+        override val tooltipKey: Key = ItemConstants.createKey { DYED_COLOR }
     }
 
     private data class Codec(
