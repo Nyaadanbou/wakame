@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -83,8 +83,8 @@ data class ItemElements(
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.ELEMENTS
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ELEMENTS }
+        override val configPath: String = ItemConstants.ELEMENTS
+        override val tooltipKey: TooltipKey = ItemConstants.createKey { ELEMENTS }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.MergedTooltip = config.MergedTooltip()

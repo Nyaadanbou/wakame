@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -37,8 +37,8 @@ interface Skillful : Examinable, TooltipProvider.Single {
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.SKILLFUL
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { SKILLFUL }
+        override val configPath: String = ItemConstants.SKILLFUL
+        override val tooltipKey: TooltipKey = ItemConstants.createKey { SKILLFUL }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

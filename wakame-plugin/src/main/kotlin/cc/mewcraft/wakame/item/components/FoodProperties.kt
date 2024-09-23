@@ -4,7 +4,7 @@ import cc.mewcraft.nbt.StringTag
 import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -53,8 +53,8 @@ data class FoodProperties(
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.FOOD
-        override val tooltipKey: Key = ItemComponentConstants.createKey { FOOD }
+        override val configPath: String = ItemConstants.FOOD
+        override val tooltipKey: Key = ItemConstants.createKey { FOOD }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

@@ -65,8 +65,8 @@ interface ItemArrow : Examinable {
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.ARROW
-        override val tooltipKey: Key = ItemComponentConstants.createKey { ARROW }
+        override val configPath: String = ItemConstants.ARROW
+        override val tooltipKey: Key = ItemConstants.createKey { ARROW }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()

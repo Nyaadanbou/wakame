@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -101,8 +101,8 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
             throw UnsupportedOperationException()
         }
 
-        override val configPath: String = ItemComponentConstants.TRACKABLE
-        override val tooltipKey: Key = ItemComponentConstants.createKey { TRACKABLE }
+        override val configPath: String = ItemConstants.TRACKABLE
+        override val tooltipKey: Key = ItemConstants.createKey { TRACKABLE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.shadow.inventory.ShadowItemStack
 import io.papermc.paper.adventure.*
 import me.lucko.shadow.*
@@ -16,8 +17,6 @@ import cc.mewcraft.nbt.CompoundTag as CompoundShadowTag
 import cc.mewcraft.nbt.Tag as ShadowTag
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
-
-const val NYA_TAG_KEY: String = "wakame"
 
 //<editor-fold desc="Shadow bridge">
 internal val Tag.wrap: ShadowTag
@@ -176,7 +175,7 @@ fun BukkitStack.unsafeEditNyaTag(block: (CompoundShadowTag) -> Unit) {
 private var MojangStack.nyaTag: CompoundShadowTag?
     get() {
         val data = this.getCustomData() /* copy */ ?: return null
-        val nyaTag = data.getCompoundOrNull(NYA_TAG_KEY) ?: return null
+        val nyaTag = data.getCompoundOrNull(SharedConstants.PLUGIN_NAME) ?: return null
         return nyaTag.wrap
     }
     set(value) {
@@ -184,14 +183,14 @@ private var MojangStack.nyaTag: CompoundShadowTag?
         if (data == null) {
             if (value != null) {
                 val tag = CompoundTag()
-                tag.put(NYA_TAG_KEY, value.unwrap)
+                tag.put(SharedConstants.PLUGIN_NAME, value.unwrap)
                 this.setCustomData(tag)
             }
         } else {
             if (value == null) {
-                data.remove(NYA_TAG_KEY)
+                data.remove(SharedConstants.PLUGIN_NAME)
             } else {
-                data.put(NYA_TAG_KEY, value.unwrap)
+                data.put(SharedConstants.PLUGIN_NAME, value.unwrap)
                 this.setCustomData(data)
             }
             if (data.isEmpty) {
@@ -215,7 +214,7 @@ private var MojangStack.nyaTag: CompoundShadowTag?
 private var MojangStack.unsafeNyaTag: CompoundShadowTag?
     get() {
         val data = this.getUnsafeCustomData()
-        val nyaTag = data?.getCompoundOrNull(NYA_TAG_KEY) ?: return null
+        val nyaTag = data?.getCompoundOrNull(SharedConstants.PLUGIN_NAME) ?: return null
         return nyaTag.wrap
     }
     set(value) {
@@ -223,14 +222,14 @@ private var MojangStack.unsafeNyaTag: CompoundShadowTag?
         if (data == null) {
             if (value != null) {
                 val tag = CompoundTag()
-                tag.put(NYA_TAG_KEY, value.unwrap)
+                tag.put(SharedConstants.PLUGIN_NAME, value.unwrap)
                 this.setUnsafeCustomData(tag)
             }
         } else {
             if (value == null) {
-                data.remove(NYA_TAG_KEY)
+                data.remove(SharedConstants.PLUGIN_NAME)
             } else {
-                data.put(NYA_TAG_KEY, value.unwrap)
+                data.put(SharedConstants.PLUGIN_NAME, value.unwrap)
             }
             if (data.isEmpty) {
                 this.unsetCustomData()

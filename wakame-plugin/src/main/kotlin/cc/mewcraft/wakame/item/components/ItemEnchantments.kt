@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -32,8 +32,8 @@ data class ItemEnchantments(
     companion object : ItemComponentBridge<ItemEnchantments> {
         override fun codec(id: String): ItemComponentType<ItemEnchantments> {
             return when (id) {
-                ItemComponentConstants.ENCHANTMENTS -> CodecForEnchantments(id)
-                ItemComponentConstants.STORED_ENCHANTMENTS -> CodecForStoredEnchantments(id)
+                ItemConstants.ENCHANTMENTS -> CodecForEnchantments(id)
+                ItemConstants.STORED_ENCHANTMENTS -> CodecForStoredEnchantments(id)
                 else -> throw IllegalArgumentException("Unknown codec id: '$id'")
             }
         }
@@ -150,11 +150,11 @@ data class ItemEnchantments(
                 }
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
             return when (id) {
-                ItemComponentConstants.ENCHANTMENTS -> {
+                ItemConstants.ENCHANTMENTS -> {
                     Template(ItemComponentTypes.ENCHANTMENTS, enchantments, showInTooltip)
                 }
 
-                ItemComponentConstants.STORED_ENCHANTMENTS -> {
+                ItemConstants.STORED_ENCHANTMENTS -> {
                     Template(ItemComponentTypes.STORED_ENCHANTMENTS, enchantments, showInTooltip)
                 }
 

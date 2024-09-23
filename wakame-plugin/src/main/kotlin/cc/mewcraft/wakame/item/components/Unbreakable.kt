@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -43,8 +43,8 @@ interface Unbreakable : Examinable {
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.UNBREAKABLE
-        override val tooltipKey: Key = ItemComponentConstants.createKey { UNBREAKABLE }
+        override val configPath: String = ItemConstants.UNBREAKABLE
+        override val tooltipKey: Key = ItemConstants.createKey { UNBREAKABLE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

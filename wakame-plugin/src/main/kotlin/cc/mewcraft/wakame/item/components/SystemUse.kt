@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -20,8 +20,8 @@ interface SystemUse : Examinable {
             throw UnsupportedOperationException()
         }
 
-        override val configPath: String = ItemComponentConstants.SYSTEM_USE
-        override val tooltipKey: Key = ItemComponentConstants.createKey { SYSTEM_USE }
+        override val configPath: String = ItemConstants.SYSTEM_USE
+        override val tooltipKey: Key = ItemConstants.createKey { SYSTEM_USE }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.display.TooltipKey
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
@@ -43,8 +43,8 @@ data class Tool(
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.TOOL
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { TOOL }
+        override val configPath: String = ItemConstants.TOOL
+        override val tooltipKey: TooltipKey = ItemConstants.createKey { TOOL }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }

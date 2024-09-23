@@ -371,7 +371,7 @@ internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
  */
 internal object NekoStackSupport {
     fun isSystemUse(wakameTag: CompoundTag): Boolean {
-        return wakameTag.getCompoundOrNull(ItemComponentMap.TAG_COMPONENTS)?.contains(ItemComponentConstants.SYSTEM_USE) == true
+        return wakameTag.getCompoundOrNull(ItemComponentMap.TAG_COMPONENTS)?.contains(ItemConstants.SYSTEM_USE) == true
     }
 
     fun getNamespace(wakameTag: CompoundTag): String? {

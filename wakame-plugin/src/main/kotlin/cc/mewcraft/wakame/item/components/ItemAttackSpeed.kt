@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.wakame.display.LoreLine
 import cc.mewcraft.wakame.display.TooltipKey
 import cc.mewcraft.wakame.display.TooltipProvider
-import cc.mewcraft.wakame.item.ItemComponentConstants
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.GenerationResult
@@ -32,8 +32,8 @@ data class ItemAttackSpeed(
             return TemplateType(id)
         }
 
-        override val configPath: String = ItemComponentConstants.ATTACK_SPEED
-        override val tooltipKey: TooltipKey = ItemComponentConstants.createKey { ATTACK_SPEED }
+        override val configPath: String = ItemConstants.ATTACK_SPEED
+        override val tooltipKey: TooltipKey = ItemConstants.createKey { ATTACK_SPEED }
 
         private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
         private val tooltip: ItemComponentConfig.DiscreteTooltips = config.DiscreteTooltips()

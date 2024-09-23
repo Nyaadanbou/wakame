@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame
 
-import cc.mewcraft.wakame.util.Key
+import net.kyori.adventure.key.Key
 
 object GenericKeys {
-    val NOOP = Key(Namespaces.GENERIC, Constants.NOOP)
-    val EMPTY = Key(Namespaces.GENERIC, Constants.EMPTY)
-    val TRUE = Key(Namespaces.GENERIC, Constants.TRUE)
-    val FALSE = Key(Namespaces.GENERIC, Constants.FALSE)
+    val NOOP = Key.key(Namespaces.GENERIC, "noop")
+    val EMPTY = Key.key(Namespaces.GENERIC, "empty")
+    val TRUE = Key.key(Namespaces.GENERIC, "true")
+    val FALSE = Key.key(Namespaces.GENERIC, "false")
 }

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 
 //
@@ -41,14 +40,14 @@ object StatisticsConstants {
     const val REFORGE_HISTORY = "reforge_history"
 
     inline fun createKey(block: StatisticsConstants.() -> String): Key {
-        return Key(Namespaces.STATISTICS, block(this))
+        return Key.key(Namespaces.STATISTICS, block(this))
     }
 }
 
 /**
  * Constant values of ItemComponent.
  */
-object ItemComponentConstants {
+object ItemConstants {
     const val ARROW = "arrow"
     const val ATTACK_SPEED = "attack_speed"
     const val ATTRIBUTE_MODIFIERS = "attribute_modifiers"
@@ -89,7 +88,7 @@ object ItemComponentConstants {
     const val TRIM = "trim"
     const val UNBREAKABLE = "unbreakable"
 
-    inline fun createKey(block: ItemComponentConstants.() -> String): Key {
-        return Key(Namespaces.ITEM_META, block(this))
+    inline fun createKey(block: ItemConstants.() -> String): Key {
+        return Key.key(Namespaces.ITEM_META, block(this))
     }
 }
