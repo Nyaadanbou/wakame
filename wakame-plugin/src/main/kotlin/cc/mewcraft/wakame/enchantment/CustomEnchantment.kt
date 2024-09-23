@@ -26,6 +26,11 @@ interface CustomEnchantment : Keyed {
      */
     fun getRegister(): CustomEnchantmentRegister
 
+    /**
+     * 获取附魔效果.
+     */
+    fun getEffects(level: Int): Collection<EnchantmentEffect>
+
     override val key: Key
         get() = enchantmentKey.key()
 
