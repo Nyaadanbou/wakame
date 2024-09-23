@@ -24,7 +24,7 @@ class CustomEnchantment(
     /**
      * 用于构建附魔的 [EnchantmentRegistryEntry.Builder].
      */
-    private val builder: EnchantmentRegistryEntry.Builder.(RegistryFreezeEvent<Enchantment, EnchantmentRegistryEntry.Builder>) -> Unit,
+    private val builder: EnchantmentRegistryEntry.Builder.(RegistryFreezeEvent<Enchantment, EnchantmentRegistryEntry.Builder>, TypedKey<Enchantment>) -> Unit,
 ) : Keyed {
     override val key: Key
         get() = enchantmentKey.key()
@@ -38,7 +38,7 @@ class CustomEnchantment(
 
     fun register(event: RegistryFreezeEvent<Enchantment, EnchantmentRegistryEntry.Builder>) {
         event.registry().register(enchantmentKey) {
-            builder(it, event)
+            builder(it, event, enchantmentKey)
         }
     }
 }

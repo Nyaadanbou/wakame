@@ -27,6 +27,7 @@ class WakameEnchantments(
     companion object {
         private val _ALL = ObjectArraySet<CustomEnchantment>()
 
+        // 当这些标签从附魔上移除时，附魔将起到被禁用的效果 (即无法通过生存模式获取)
         private val VANILLA_BANNED_TAGS = arrayOf(
             EnchantmentTagKeys.IN_ENCHANTING_TABLE,
             EnchantmentTagKeys.ON_MOB_SPAWN_EQUIPMENT,
@@ -35,6 +36,7 @@ class WakameEnchantments(
             EnchantmentTagKeys.TRADEABLE
         )
 
+        // 允许的附魔
         private val ALLOWED_ENCHANTMENTS = arrayOf(
             EnchantmentKeys.RESPIRATION,       // 水下呼吸
             EnchantmentKeys.DEPTH_STRIDER,     // 深海探索者
@@ -61,28 +63,66 @@ class WakameEnchantments(
         private fun createEnchantment(
             enchantmentKey: TypedKey<Enchantment>,
             tags: Collection<TagKey<Enchantment>>,
-            builder: EnchantmentRegistryEntry.Builder.(RegistryFreezeEvent<Enchantment, EnchantmentRegistryEntry.Builder>) -> Unit,
+            builder: EnchantmentRegistryEntry.Builder.(RegistryFreezeEvent<Enchantment, EnchantmentRegistryEntry.Builder>, TypedKey<Enchantment>) -> Unit,
         ): CustomEnchantment {
             val enchantment = CustomEnchantment(enchantmentKey, tags, builder)
             _ALL.add(enchantment)
             return enchantment
         }
 
+        private fun getTranslateKey(key: TypedKey<*>): String {
+            val enchantmentKey = key.key()
+            return "enchantment.${enchantmentKey.namespace()}.${enchantmentKey.value()}"
+        }
+
+        private fun EnchantmentRegistryEntry.Builder.applyCommonProperties(
+            enchantmentKey: TypedKey<Enchantment>,
+            maxLevel: Int = 1,
+        ) {
+            description(Component.translatable(getTranslateKey(enchantmentKey)))
+            maxLevel(maxLevel)
+        }
+
+        private fun EnchantmentRegistryEntry.Builder.protectionProperties(
+            event: RegistryFreezeEvent<Enchantment, EnchantmentRegistryEntry.Builder>,
+        ) {
+            activeSlots(EquipmentSlotGroup.ARMOR)
+            exclusiveWith(event.getOrCreateTag(EnchantmentTagKeys.EXCLUSIVE_SET_ARMOR))
+        }
+
         val ALL: Set<CustomEnchantment>
             get() = _ALL
 
-        val CUSTOM_ENCHANT: CustomEnchantment = createEnchantment(
-            enchantmentKey = TypedKey.create(RegistryKey.ENCHANTMENT, Key.key("test", "enchant")),
-            tags = listOf(EnchantmentTagKeys.IN_ENCHANTING_TABLE),
-        ) { event ->
-            description(Component.text("Pointy"))
-            supportedItems(event.getOrCreateTag(ItemTypeTagKeys.SWORDS))
+        val UNIVERSAL_INCOMING_DAMAGE_RATE: CustomEnchantment = createEnchantment(
+            enchantmentKey = TypedKey.create(RegistryKey.ENCHANTMENT, Key.key("wakame", "universal_incoming_damage_rate")),
+            tags = listOf(
+                *VANILLA_BANNED_TAGS,
+                EnchantmentTagKeys.EXCLUSIVE_SET_ARMOR
+            ),
+        ) { event, enchantmentKey ->
+            applyCommonProperties(enchantmentKey, 1)
+            protectionProperties(event)
+            supportedItems(event.getOrCreateTag(ItemTypeTagKeys.ENCHANTABLE_ARMOR))
             anvilCost(1)
-            maxLevel(25)
             weight(10)
             minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(1, 1))
             maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(3, 1))
-            activeSlots(EquipmentSlotGroup.ANY)
+        }
+
+        val FIRE_INCOMING_DAMAGE_RATE: CustomEnchantment = createEnchantment(
+            enchantmentKey = TypedKey.create(RegistryKey.ENCHANTMENT, Key.key("wakame", "incoming_damage_rate/fire")),
+            tags = listOf(
+                *VANILLA_BANNED_TAGS,
+                EnchantmentTagKeys.EXCLUSIVE_SET_ARMOR
+            ),
+        ) { event, enchantmentKey ->
+            applyCommonProperties(enchantmentKey, 4)
+            protectionProperties(event)
+            supportedItems(event.getOrCreateTag(ItemTypeTagKeys.ENCHANTABLE_ARMOR))
+            anvilCost(1)
+            weight(10)
+            minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(1, 1))
+            maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(3, 1))
         }
     }
 
@@ -101,7 +141,7 @@ class WakameEnchantments(
                 event.builder()
                     .description(
                         Component.text()
-                            .content("HAS_BEEN_REMOVED")
+                            .content("DO_NOT_USE")
                             .color(NamedTextColor.RED)
                             .append(Component.text("-"))
                             .append(Component.translatable(getTranslateKey(event.key())).color(NamedTextColor.GRAY))
@@ -126,13 +166,8 @@ class WakameEnchantments(
         }
     }
 
-    private fun getTranslateKey(key: TypedKey<*>): String {
-        val enchantmentKey = key.key()
-        return "enchantment.${enchantmentKey.namespace()}.${enchantmentKey.value()}"
-    }
-
     private fun isAllowedEnchantment(enchantmentKey: TypedKey<Enchantment>): Boolean {
-        if (enchantmentKey.key() == CUSTOM_ENCHANT.enchantmentKey.key()) {
+        if (ALL.any { it.enchantmentKey == enchantmentKey }) {
             // 自定义附魔肯定是允许的
             return true
         }
