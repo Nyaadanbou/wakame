@@ -5,14 +5,13 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.protocol.player.User
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
-import it.unimi.dsi.fastutil.objects.ObjectArraySet
+import org.bukkit.GameMode
+import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
@@ -25,29 +24,18 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
     private val logger: Logger by inject()
     private val renderer: PacketItemRenderer by inject()
 
-    // 一个服务器里同时在线的创造模式玩家通常小于 4 个,
-    // 因此用 ObjectArraySet 可以获得更好的实际性能.
-    private val creativeUsers: ObjectArraySet<User> = ObjectArraySet() // use CMH?
-
     override fun onPacketSend(event: PacketSendEvent) {
-        val user = event.user
-
-        // 更新当前创造模式玩家的列表
-        if (event.packetType == PacketType.Play.Server.CHANGE_GAME_STATE) {
-            handleChangeGameState(user, event)
-        }
-
         // 不修改发给创造模式玩家的物品包
-        if (isCreative(user))
+        if (isCreative(event))
             return
 
         // 修改发给非创造模式玩家的物品包
         val changed = when (event.packetType) {
-            PacketType.Play.Server.SET_SLOT -> handleSetSlot(user, event)
-            PacketType.Play.Server.WINDOW_ITEMS -> handleWindowItems(user, event)
-            PacketType.Play.Server.ENTITY_METADATA -> handleEntityData(user, event)
-            PacketType.Play.Server.ENTITY_EQUIPMENT -> handleSetEquipment(user, event)
-            PacketType.Play.Server.MERCHANT_OFFERS -> handleMerchantOffers(user, event)
+            PacketType.Play.Server.SET_SLOT -> handleSetSlot(event)
+            PacketType.Play.Server.WINDOW_ITEMS -> handleWindowItems(event)
+            PacketType.Play.Server.ENTITY_METADATA -> handleEntityData(event)
+            PacketType.Play.Server.ENTITY_EQUIPMENT -> handleSetEquipment(event)
+            PacketType.Play.Server.MERCHANT_OFFERS -> handleMerchantOffers(event)
             else -> false
         }
         if (changed) {
@@ -55,24 +43,13 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
         }
     }
 
-    private fun handleChangeGameState(user: User, event: PacketSendEvent) {
-        val wrapper = WrapperPlayServerChangeGameState(event)
-        if (wrapper.reason == WrapperPlayServerChangeGameState.Reason.CHANGE_GAME_MODE) {
-            if (wrapper.value == 1f) { // 0: Survival, 1: Creative, 2: Adventure, 3: Spectator.
-                creativeUsers.add(user)
-            } else {
-                creativeUsers.remove(user)
-            }
-        }
-    }
-
-    private fun handleSetSlot(user: User, event: PacketSendEvent): Boolean {
+    private fun handleSetSlot(event: PacketSendEvent): Boolean {
         val wrapper = WrapperPlayServerSetSlot(event)
         var changed = wrapper.item.modify()
         return changed
     }
 
-    private fun handleSetEquipment(user: User, event: PacketSendEvent): Boolean {
+    private fun handleSetEquipment(event: PacketSendEvent): Boolean {
         val wrapper = WrapperPlayServerEntityEquipment(event)
         var changed = false
 
@@ -83,7 +60,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
         return changed
     }
 
-    private fun handleWindowItems(user: User, event: PacketSendEvent): Boolean {
+    private fun handleWindowItems(event: PacketSendEvent): Boolean {
         val wrapper = WrapperPlayServerWindowItems(event)
         var changed = false
 
@@ -97,7 +74,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
         return changed
     }
 
-    private fun handleMerchantOffers(user: User, event: PacketSendEvent): Boolean {
+    private fun handleMerchantOffers(event: PacketSendEvent): Boolean {
         val wrapper = WrapperPlayServerMerchantOffers(event)
         var changed = false
 
@@ -110,7 +87,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
         return changed
     }
 
-    private fun handleEntityData(user: User, event: PacketSendEvent): Boolean {
+    private fun handleEntityData(event: PacketSendEvent): Boolean {
         val wrapper = WrapperPlayServerEntityMetadata(event)
         var changed = false
 
@@ -125,7 +102,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
         return changed
     }
 
-    private fun isCreative(user: User): Boolean {
+    private fun isCreative(event: PacketSendEvent): Boolean {
         // 创造模式会1:1复制它接收到的物品到客户端本地,
         // 而我们发给客户端的萌芽物品并不是原始物品, 而是修改过的.
         // 问题在于, 修改过的萌芽物品并不包含任何 wakame 数据,
@@ -136,7 +113,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
         //
         // 因此, 我们现阶段能做的就是忽略该问题.
 
-        return user in creativeUsers
+        return event.getPlayer<Player>()?.gameMode == GameMode.CREATIVE
     }
 
     /**
