@@ -3,6 +3,11 @@
 package cc.mewcraft.wakame.enchantment
 
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attributes
+import com.google.common.collect.ImmutableMultimap
+import com.google.common.collect.Multimap
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
@@ -40,5 +45,18 @@ class CustomEnchantment(
         event.registry().register(enchantmentKey) {
             builder(it, event, enchantmentKey)
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CustomEnchantment) return false
+
+        if (enchantmentKey != other.enchantmentKey) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return enchantmentKey.hashCode()
     }
 }
