@@ -20,7 +20,7 @@ import cc.mewcraft.wakame.item.MultipleItemListener
 import cc.mewcraft.wakame.item.SingleItemListener
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
-import cc.mewcraft.wakame.packet.DamageDisplayHandler
+import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.component.ComponentListener
 import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.player.inventory.ItemSlotWatcher
@@ -134,7 +134,7 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<ComponentListener>()).bindWith(this)
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
-        registerTerminableListener(get<DamageDisplayHandler>()).bindWith(this)
+        registerTerminableListener(get<DamageDisplay>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackLifecycleListener>()).bindWith(this)
         registerTerminableListener(get<ResourcePackPlayerListener>()).bindWith(this)

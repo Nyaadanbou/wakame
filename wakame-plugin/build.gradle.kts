@@ -80,8 +80,8 @@ tasks {
         relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
         relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
         relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
-        relocate("com.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.api")
-        relocate("io.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.impl")
+        // relocate("com.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.api")
+        // relocate("io.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.impl")
 
         // cloud
         relocate("org.incendo.cloud", "cc.mewcraft.wakame.external.cloud") // We don't relocate cloud itself in this example, but you still should

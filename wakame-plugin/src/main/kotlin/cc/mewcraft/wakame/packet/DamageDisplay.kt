@@ -23,7 +23,10 @@ import org.bukkit.event.Listener
 import org.joml.Vector3f
 import kotlin.random.Random
 
-class DamageDisplayHandler : Listener {
+/**
+ * 以悬浮文字显示玩家造成的伤害.
+ */
+internal class DamageDisplay : Listener {
 
     companion object {
         // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!

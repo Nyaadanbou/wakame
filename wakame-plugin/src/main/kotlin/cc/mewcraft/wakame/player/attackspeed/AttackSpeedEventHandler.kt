@@ -4,7 +4,8 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.packet.SendPacketUtil
+import cc.mewcraft.wakame.packet.addFakePotionEffect
+import cc.mewcraft.wakame.packet.removeFakePotionEffect
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.Player
@@ -69,10 +70,10 @@ class AttackSpeedEventHandler {
             /* particles = */ false,
             /* icon = */ false
         )
-        SendPacketUtil.sendPlayerPotionEffect(player, miningFatigueEffect)
+        player.addFakePotionEffect(miningFatigueEffect)
     }
 
     private fun removeEffect(player: Player) {
-        SendPacketUtil.removePlayerPotionEffect(player, PotionEffectType.MINING_FATIGUE)
+        player.removeFakePotionEffect(PotionEffectType.MINING_FATIGUE)
     }
 }
