@@ -57,7 +57,7 @@ sealed interface AttributeMapLike {
 /**
  * 代表一个 [AttributeMapLike] 的快照, 支持读/写, 用于临时的数值储存和计算.
  */
-sealed interface AttributeMapSnapshot : AttributeMapLike {
+sealed interface AttributeMapSnapshot : AttributeMapLike, Iterable<Map.Entry<Attribute, AttributeInstanceSnapshot>> {
     /**
      * 获取指定 [attribute] 的实例快照.
      *
@@ -461,5 +461,9 @@ private class AttributeMapSnapshotImpl(
 
     override fun getModifierValue(attribute: Attribute, id: Key): Double {
         return data[attribute]?.getModifier(id)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in AttributeMapSnapshot")
+    }
+
+    override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstanceSnapshot>> {
+        return data.reference2ObjectEntrySet().fastIterator()
     }
 }

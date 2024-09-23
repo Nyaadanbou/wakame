@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.command
 import org.incendo.cloud.permission.Permission
 
 object CommandPermissions {
+    val ATTRIBUTE = Permission.of("wakame.command.attribute")
     val CRAFT = Permission.of("wakame.command.craft")
     val DEBUG = Permission.of("wakame.command.debug")
     val HEPHAESTUS = Permission.of("wakame.command.hephaestus")

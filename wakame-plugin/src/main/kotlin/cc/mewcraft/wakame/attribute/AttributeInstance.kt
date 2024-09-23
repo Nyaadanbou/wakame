@@ -127,7 +127,7 @@ sealed interface IntangibleAttributeInstance : AttributeInstanceSnapshotable {
 /**
  * 代表一个属性实例的快照 (支持读/写), 用于临时的数值储存和计算.
  */
-sealed interface AttributeInstanceSnapshot {
+sealed interface AttributeInstanceSnapshot : Iterable<AttributeModifier> {
     /**
      * 该属性实例的 [Attribute].
      */
@@ -654,4 +654,8 @@ private class AttributeInstanceSnapshotImpl(
 
     override fun toIntangible(): IntangibleAttributeInstance =
         IntangibleAttributeInstanceImpl(delegation.copy())
+
+    override fun iterator(): Iterator<AttributeModifier> {
+        return delegation.getModifiers().iterator()
+    }
 }
