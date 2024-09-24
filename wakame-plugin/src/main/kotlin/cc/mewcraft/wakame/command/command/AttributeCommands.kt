@@ -4,13 +4,13 @@ import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
-import cc.mewcraft.wakame.util.removeItalic
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.InventoryHolder
@@ -27,6 +27,8 @@ import org.incendo.cloud.kotlin.extension.commandBuilder
 import org.incendo.cloud.kotlin.extension.getOrNull
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+
+private const val ATTRIBUTE_PER_PAGE = 14
 
 object AttributeCommands : CommandFactory<CommandSender> {
     private const val ATTRIBUTE_LITERAL = "attribute"
@@ -58,6 +60,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                             is LivingEntity -> null // EntityAttributeAccessor.getAttributeMap(recipient).getSnapshot()
                             else -> null
                         }?.toSortedSet(compareBy { getAttributeId(it.key) })
+
                         if (attributeMapSnapshot == null) {
                             sender.sendMessage(
                                 Component.text("No attribute map found for ${recipient.name()}")
@@ -65,16 +68,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                             continue
                         }
 
-                        val attributeMessage = text {
-                            content("Attribute map for ")
-                            append(recipient.name())
-                            hoverEvent {
-                                val hoverText = generateHoverText(attributeMapSnapshot)
-                                @Suppress("UNCHECKED_CAST")
-                                HoverEvent.showText(hoverText) as HoverEvent<Any>
-                            }
-                        }
-
+                        val attributeMessage = generateAttributeMessage(recipient, attributeMapSnapshot)
                         sender.sendMessage(attributeMessage)
 
                         if (isPrintBook && sender is InventoryHolder) {
@@ -91,7 +85,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                                     }
                                 }
 
-                                meta.displayName(displayName)
+                                meta.itemName(displayName)
                                 meta.author(sender.name())
                                 meta.pages(generateBookPages(attributeMapSnapshot))
                             }
@@ -104,72 +98,40 @@ object AttributeCommands : CommandFactory<CommandSender> {
         }
     }
 
-    private fun generateHoverText(attributeMapSnapShot: Set<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
+    private fun generateAttributeMessage(recipient: Entity, attributeMapSnapShot: Set<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
         return text {
-            for ((attribute, instances) in attributeMapSnapShot) {
-                append {
-                    Component.text(getAttributeId(attribute) + ": ")
-                        .color(NamedTextColor.GREEN)
-                }
-                appendNewline()
-                append {
-                    Component.text("  Base: ${instances.getBaseValue()}")
-                        .color(NamedTextColor.WHITE)
-                }
-                appendNewline()
-                for (modifier in instances) {
-                    append {
-                        Component.text("  ${modifier.operation} ${modifier.amount} from ${modifier.id}")
-                            .color(NamedTextColor.GRAY)
-                    }
-                    appendNewline()
-                }
-            }
-        }
-    }
-
-    /**
-     * 每页最多显示 14 个属性 FIXME: 算法有问题
-     */
-    private fun generateBookPages(attributeMapSnapShot: Set<Map.Entry<Attribute, AttributeInstanceSnapshot>>): List<Component> {
-        val attributeMapSnapShotList = attributeMapSnapShot.toMutableList()
-        val result = mutableListOf<Component>()
-        val attributePerPage = 14
-        // 14 attributes per page
-        for ((index, i) in (0 until attributeMapSnapShotList.size - attributePerPage).withIndex()) {
-            if (index % attributePerPage == 0) {
-                val page = generateBookPage(attributeMapSnapShotList.subList(i, i + attributePerPage))
-                result.add(page)
-            }
-        }
-        return result
-    }
-
-    private fun generateBookPage(attributeMapSnapShot: List<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
-        return text {
-            for ((attribute, instances) in attributeMapSnapShot) {
-                append {
-                    Component.text(getAttributeId(attribute))
-                        .color(NamedTextColor.GREEN)
-                    hoverEvent {
-                        val hoverText = text {
+            text {
+                content("Attribute map for ")
+                append(recipient.name())
+                hoverEvent {
+                    val hoverText = text {
+                        for ((attribute, instance) in attributeMapSnapShot) {
                             append {
-                                Component.text("  Base: ${instances.getBaseValue()}")
-                                    .color(NamedTextColor.WHITE)
+                                Component.text(getAttributeId(attribute) + ": ")
+                                    .color(NamedTextColor.GREEN)
                             }
                             appendNewline()
-                            for (modifier in instances) {
-                                append {
-                                    Component.text("  ${modifier.operation} ${modifier.amount} from ${modifier.id}")
-                                        .color(NamedTextColor.GRAY)
-                                }
-                                appendNewline()
-                            }
+                            append(generateAttributeInstanceText(instance))
                         }
-                        @Suppress("UNCHECKED_CAST")
-                        HoverEvent.showText(hoverText) as HoverEvent<Any>
                     }
-                    build()
+                    @Suppress("UNCHECKED_CAST")
+                    HoverEvent.showText(hoverText) as HoverEvent<Any>
+                }
+            }
+        }
+    }
+
+    private fun generateAttributeInstanceText(instances: AttributeInstanceSnapshot): Component {
+        return text {
+            append {
+                Component.text("  Base: ${instances.getBaseValue()}")
+                    .color(NamedTextColor.WHITE)
+            }
+            for (modifier in instances) {
+                appendNewline()
+                append {
+                    Component.text("  ${modifier.operation} ${modifier.amount} from ${modifier.id}")
+                        .color(NamedTextColor.GRAY)
                 }
             }
         }
@@ -186,5 +148,39 @@ object AttributeCommands : CommandFactory<CommandSender> {
         val currentTime = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         return currentTime.format(formatter)
+    }
+
+    private fun generateBookPages(attributeMapSnapShot: Set<Map.Entry<Attribute, AttributeInstanceSnapshot>>): List<Component> {
+        val result = mutableListOf<Component>()
+        val pages = attributeMapSnapShot.chunked(ATTRIBUTE_PER_PAGE)
+        for (page in pages) {
+            result.add(generateBookPage(page))
+        }
+        return result
+    }
+
+    private fun generateBookPage(attributeMapSnapShot: List<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
+        return text {
+            for ((attribute, instance) in attributeMapSnapShot) {
+                append {
+                    if (getAttributeId(attribute).length > 20) {
+                        Component.text(getAttributeId(attribute).substring(0, 17) + "...")
+                            .color(NamedTextColor.DARK_GREEN)
+                    } else {
+                        Component.text(getAttributeId(attribute))
+                            .color(NamedTextColor.DARK_GREEN)
+                    }.hoverEvent {
+                        val hoverText = text {
+                            append(Component.text("${getAttributeId(attribute)}: ").color(NamedTextColor.GREEN))
+                            appendNewline()
+                            append(generateAttributeInstanceText(instance))
+                        }
+                        @Suppress("UNCHECKED_CAST")
+                        HoverEvent.showText(hoverText) as HoverEvent<Any>
+                    }
+                }
+                appendNewline()
+            }
+        }
     }
 }
