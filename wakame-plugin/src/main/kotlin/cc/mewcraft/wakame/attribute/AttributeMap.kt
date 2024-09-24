@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.user.User
+import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.EntityType
@@ -464,6 +465,6 @@ private class AttributeMapSnapshotImpl(
     }
 
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstanceSnapshot>> {
-        return data.reference2ObjectEntrySet().fastIterator()
+        return ImmutableMap.copyOf(data).entries.iterator()
     }
 }
