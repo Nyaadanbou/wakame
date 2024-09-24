@@ -6,15 +6,15 @@ pluginManagement {
         maven("https://repo.mewcraft.cc/releases")
         maven("https://repo.mewcraft.cc/private") {
             credentials {
-                username = providers.gradleProperty("nyaadanbouUsername").getOrElse("")
-                password = providers.gradleProperty("nyaadanbouPassword").getOrElse("")
+                username = providers.gradleProperty("nyaadanbou.mavenUsername").orNull
+                password = providers.gradleProperty("nyaadanbou.mavenPassword").orNull
             }
         }
     }
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 dependencyResolutionManagement {

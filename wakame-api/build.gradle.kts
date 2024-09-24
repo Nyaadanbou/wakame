@@ -1,6 +1,6 @@
 plugins {
     id("neko-java")
-    id("neko.repositories") version "1.0-SNAPSHOT"
+    id("nyaadanbou-conventions.repositories")
 }
 
 group = "cc.mewcraft.wakame"

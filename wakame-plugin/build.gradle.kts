@@ -3,17 +3,16 @@ import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
 import org.gradle.kotlin.dsl.paper
 
 plugins {
-    id("neko.repositories") version "1.0-SNAPSHOT"
     id("neko-kotlin")
     id("neko-koin")
+    id("nyaadanbou-conventions.repositories")
+    id("nyaadanbou-conventions.copy-jar")
     alias(libs.plugins.pluginyml.paper)
 }
 
-project.ext.set("name", "Wakame")
-
 group = "cc.mewcraft.wakame"
 version = "1.0.0-SNAPSHOT"
-description = "Add custom stuff to server"
+description = "The core plugin of Nyaadanbou"
 
 dependencies {
     // internal
@@ -28,8 +27,6 @@ dependencies {
     // libraries
     compileOnly(local.paper)
     compileOnly(local.helper)
-    compileOnly(libs.asm) // runtime is provided by paper
-    compileOnly(libs.asm.commons) // ^
     implementation(libs.commons.collections)
     implementation(libs.commons.provider)
     implementation(libs.mocha)
@@ -97,34 +94,9 @@ tasks {
         relocate("xyz.xenondevs.invui", "cc.mewcraft.wakame.external.invui")
         relocate("xyz.xenondevs.inventoryaccess", "cc.mewcraft.wakame.external.invui.inventoryaccess")
     }
-
-    val inputJarPath by lazy { shadowJar.get().archiveFile.get().asFile.absolutePath }
-    val finalJarName by lazy { "${ext.get("name")}-${project.version}.jar" }
-    val finalJarPath by lazy { layout.buildDirectory.file(finalJarName).get().asFile.absolutePath }
-    val deployTargetPath = rootProject.file(".deploy_config").takeIf { it.exists() }?.readLines().orEmpty().filter { !it.startsWith('#') }
-    register<Copy>("copyJar") {
-        group = "mewcraft"
-        dependsOn(assemble)
-        from(inputJarPath)
-        into(layout.buildDirectory)
-        rename("(?i)${project.name}.*\\.jar", finalJarName)
-    }
-    register<Task>("deployJar") {
-        group = "mewcraft"
-        dependsOn(named("copyJar"))
-        doLast {
-            if (deployTargetPath.isEmpty()) {
-                logger.lifecycle("No deploy target path found, skipping deployment")
-                return@doLast
-            }
-
-            for (s in deployTargetPath) {
-                logger.lifecycle("Deploying to $s...")
-                exec {
-                    commandLine("rsync", finalJarPath, s)
-                }
-            }
-        }
+    copyJar {
+        environment = "paper"
+        jarFileName = "wakame-${project.version}.jar"
     }
 }
 
@@ -132,7 +104,7 @@ paper {
     main = "cc.mewcraft.wakame.WakamePlugin"
     // loader = "cc.mewcraft.wakame.loader.WakameLoader"
     // bootstrapper = "cc.mewcraft.wakame.loader.WakameBootstrapper"
-    name = project.ext.get("name") as String
+    name = "Wakame"
     version = "${project.version}"
     description = project.description
     apiVersion = "1.21"

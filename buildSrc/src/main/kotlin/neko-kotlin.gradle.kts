@@ -35,7 +35,6 @@ tasks {
             exclude("META-INF/NOTICE.txt")
             exclude("META-INF/maven/**")
             exclude("META-INF/versions/**")
-            exclude("META-INF/**.kotlin_module")
         }
     }
     test {
