@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.user.User
-import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.EntityType
@@ -65,6 +64,13 @@ sealed interface AttributeMapSnapshot : AttributeMapLike, Iterable<Map.Entry<Att
      * 如果指定的 [attribute] 不存在, 则返回 `null`.
      */
     fun getInstance(attribute: Attribute): AttributeInstanceSnapshot?
+
+    /**
+     * 优化: 返回的迭代器中所使用的 [Map.Entry] 始终为同一个实例 (也就是, 实际可变的).
+     *
+     * @see it.unimi.dsi.fastutil.objects.Reference2ObjectMap.FastEntrySet
+     */
+    override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstanceSnapshot>>
 }
 
 /**
@@ -465,6 +471,6 @@ private class AttributeMapSnapshotImpl(
     }
 
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstanceSnapshot>> {
-        return ImmutableMap.copyOf(data).entries.iterator()
+        return data.reference2ObjectEntrySet().fastIterator()
     }
 }
