@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.display.PacketItemRenderer
+import cc.mewcraft.wakame.display2.ItemRenderers
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.ItemStack
@@ -22,7 +22,6 @@ import kotlin.jvm.optionals.getOrNull
  */
 internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
     private val logger: Logger by inject()
-    private val renderer: PacketItemRenderer by inject()
 
     override fun onPacketSend(event: PacketSendEvent) {
         // 不修改发给创造模式玩家的物品包
@@ -125,7 +124,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
             return false
         }
         try {
-            renderer.render(nekoStack)
+            ItemRenderers.STANDARD.render(nekoStack)
         } catch (e: Throwable) {
             logger.error("An error occurred while rendering NekoStack: $this", e)
             return false

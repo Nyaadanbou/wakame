@@ -23,7 +23,7 @@ internal abstract class AbstractRendererFormats : RendererFormats {
     abstract fun <T : RendererFormat> set(id: String, format: T)
 }
 
-//<editor-fold desc="RendererFormat">
+//<editor-fold desc="Concrete classes of RendererFormat">
 /**
  * 一种最简单的渲染格式.
  *
