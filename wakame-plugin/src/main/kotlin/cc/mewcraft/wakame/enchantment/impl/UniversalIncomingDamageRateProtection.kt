@@ -2,16 +2,14 @@
 
 package cc.mewcraft.wakame.enchantment.impl
 
-import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.enchantment.CustomEnchantment
-import cc.mewcraft.wakame.enchantment.CustomEnchantmentRegister
+import cc.mewcraft.wakame.enchantment.register.CustomEnchantment
+import cc.mewcraft.wakame.enchantment.register.CustomEnchantmentRegister
 import cc.mewcraft.wakame.enchantment.EnchantmentEffect
 import cc.mewcraft.wakame.enchantment.WakameEnchantmentsSupport
 import cc.mewcraft.wakame.enchantment.WakameEnchantmentsSupport.applyCommonProperties
 import cc.mewcraft.wakame.enchantment.WakameEnchantmentsSupport.protectionProperties
-import cc.mewcraft.wakame.registry.ElementRegistry
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry

@@ -1,14 +1,16 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.enchantment
+package cc.mewcraft.wakame.enchantment.register
 
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.enchantment.EnchantmentEffect
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.EquipmentSlotGroup
 
 interface CustomEnchantment : Keyed {
     /**
@@ -40,4 +42,7 @@ interface CustomEnchantment : Keyed {
                 .getRegistry(RegistryKey.ENCHANTMENT)
                 .getOrThrow(TypedKey.create(RegistryKey.ENCHANTMENT, key))
         }
+
+    val equipmentSlotGroups: Set<EquipmentSlotGroup>
+        get() = enchantment.activeSlotGroups
 }

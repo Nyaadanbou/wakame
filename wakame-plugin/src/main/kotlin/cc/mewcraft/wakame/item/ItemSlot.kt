@@ -67,6 +67,12 @@ sealed interface ItemSlot : Examinable {
         false // default returns false
 
     /**
+     * 检查给定的 [EquipmentSlotGroup] 集合是否为有效的栏位.
+     */
+    fun testEquipmentSlotGroups(groups: Collection<EquipmentSlotGroup>): Boolean =
+        groups.any { testEquipmentSlotGroup(it) }
+
+    /**
      * 获取该 [ItemSlot] 所对应的玩家背包里的物品.
      *
      * 该函数不返回 [ItemStack.isEmpty] 为 `true` 的物品.
@@ -133,6 +139,10 @@ enum class VanillaItemSlot(
 
     companion object {
         const val NAMESPACE = "vanilla"
+
+        fun fromEquipmentSlotGroup(group: EquipmentSlotGroup): List<VanillaItemSlot> {
+            return entries.filter { group.test(it.slot) }
+        }
     }
 
     override val id: Key = Key.key("vanilla", name.lowercase())

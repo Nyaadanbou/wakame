@@ -1,7 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.enchantment
+package cc.mewcraft.wakame.enchantment.register
 
+import cc.mewcraft.wakame.enchantment.WakameEnchantments
+import cc.mewcraft.wakame.enchantment.WakameEnchantmentsSupport
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import io.papermc.paper.registry.RegistryKey
@@ -17,7 +19,7 @@ class EnchantmentRegister(
     fun register() {
         val manager = context.lifecycleManager
         manager.registerEventHandler(RegistryEvents.ENCHANTMENT.freeze()) {
-            for (enchantment in WakameEnchantments.ALL) {
+            for (enchantment in WakameEnchantments.all()) {
                 enchantment.getRegister().register(it)
             }
         }
@@ -49,7 +51,7 @@ class EnchantmentRegister(
                 registrar.setTag(it, enchantments.filter(::isAllowedEnchantment))
             }
             // Clear enchantment banned tags
-            for (customEnchantment in WakameEnchantments.ALL) {
+            for (customEnchantment in WakameEnchantments.all()) {
                 customEnchantment.tags.forEach { registrar.addToTag(it, listOf(customEnchantment.enchantmentKey)) }
             }
         }
@@ -57,7 +59,7 @@ class EnchantmentRegister(
 
 
     private fun isAllowedEnchantment(enchantmentKey: TypedKey<Enchantment>): Boolean {
-        if (WakameEnchantments.ALL.any { it.enchantmentKey == enchantmentKey }) {
+        if (WakameEnchantments.all().any { it.enchantmentKey == enchantmentKey }) {
             // 自定义附魔肯定是允许的
             return true
         }

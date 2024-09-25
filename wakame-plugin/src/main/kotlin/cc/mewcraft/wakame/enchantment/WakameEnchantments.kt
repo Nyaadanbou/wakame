@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.enchantment
 
 import cc.mewcraft.wakame.enchantment.impl.FireIncomingDamageRateProtection
 import cc.mewcraft.wakame.enchantment.impl.UniversalIncomingDamageRateProtection
+import cc.mewcraft.wakame.enchantment.register.CustomEnchantment
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
@@ -17,8 +18,9 @@ object WakameEnchantments {
         return enchantment
     }
 
-    val ALL: Set<CustomEnchantment>
-        get() = _ALL
+    fun all(): Set<CustomEnchantment> {
+        return _ALL
+    }
 
     val UNIVERSAL_INCOMING_DAMAGE_RATE: CustomEnchantment = createEnchantment(UniversalIncomingDamageRateProtection)
     val FIRE_INCOMING_DAMAGE_RATE: CustomEnchantment = createEnchantment(FireIncomingDamageRateProtection)
@@ -27,7 +29,7 @@ object WakameEnchantments {
      * 获取自定义附魔.
      */
     fun get(key: TypedKey<Enchantment>): CustomEnchantment? {
-        return ALL.find { it.enchantmentKey == key }
+        return all().find { it.enchantmentKey == key }
     }
 
     /**

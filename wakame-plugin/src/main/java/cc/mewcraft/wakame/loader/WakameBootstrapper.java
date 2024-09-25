@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.loader;
 
-import cc.mewcraft.wakame.enchantment.EnchantmentRegister;
+import cc.mewcraft.wakame.enchantment.register.EnchantmentRegister;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import org.jetbrains.annotations.NotNull;
