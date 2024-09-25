@@ -70,29 +70,29 @@ attack_damage_rate:
     multiply_total: "<red>DO_NOT_USE"
   values:
     neutral:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     fire:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     water:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     wind:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     earth:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     thunder:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
 
 attack_effect_chance:
   enabled: true
@@ -274,29 +274,29 @@ incoming_damage_rate:
     multiply_total: "<red>DO_NOT_USE"
   values:
     neutral:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     fire:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     water:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     wind:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     earth:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     thunder:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
 
 lifesteal:
   enabled: true

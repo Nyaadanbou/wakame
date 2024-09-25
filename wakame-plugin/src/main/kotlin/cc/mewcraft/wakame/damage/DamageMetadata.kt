@@ -62,7 +62,7 @@ class VanillaDamageMetadata(
         single(element) {
             min(damageValue)
             max(damageValue)
-            rate(0.0)
+            rate(1.0)
             defensePenetration(defensePenetration)
             defensePenetrationRate(defensePenetrationRate)
         }
@@ -319,7 +319,7 @@ class DefaultArrowDamageMetadata private constructor(
             default {
                 min(1.0)
                 max(1.0)
-                rate(0.0)
+                rate(1.0)
                 defensePenetration(0.0)
                 defensePenetrationRate(0.0)
             }
@@ -368,7 +368,7 @@ class DefaultTridentDamageMetadata(
             default {
                 min(8.0)
                 max(8.0)
-                rate(0.0)
+                rate(1.0)
                 defensePenetration(0.0)
                 defensePenetrationRate(0.0)
             }

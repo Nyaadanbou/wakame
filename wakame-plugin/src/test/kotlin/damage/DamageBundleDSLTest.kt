@@ -170,7 +170,7 @@ class DamageBundleDSLTest : KoinTest {
             every {
                 min(damageValue) // 也可以直接传入一个值, 不一定要用 lambda
                 max(damageValue)
-                rate(.0)
+                rate(1.0)
                 defensePenetration(defensePenetration)
                 defensePenetrationRate(defensePenetrationRate)
             }
@@ -230,7 +230,7 @@ class DamageBundleDSLTest : KoinTest {
             default {
                 min(damageValue)
                 max(damageValue)
-                rate(.0)
+                rate(1.0)
                 defensePenetration(.0)
                 defensePenetrationRate(.0)
             }
