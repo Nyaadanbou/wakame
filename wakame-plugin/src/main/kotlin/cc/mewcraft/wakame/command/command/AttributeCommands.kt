@@ -121,13 +121,13 @@ object AttributeCommands : CommandFactory<CommandSender> {
         }
     }
 
-    private fun generateAttributeInstanceText(instances: AttributeInstanceSnapshot): Component {
+    private fun generateAttributeInstanceText(attributeInstanceSnapshot: AttributeInstanceSnapshot): Component {
         return text {
             append {
-                Component.text("  Base: ${instances.getBaseValue()}")
+                Component.text("  Base: ${attributeInstanceSnapshot.getBaseValue()}")
                     .color(NamedTextColor.WHITE)
             }
-            for (modifier in instances) {
+            for (modifier in attributeInstanceSnapshot.getModifiers()) {
                 appendNewline()
                 append {
                     Component.text("  ${modifier.operation} ${modifier.amount} from ${modifier.id}")
