@@ -59,7 +59,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                         is Player -> PlayerAttributeAccessor.getAttributeMap(recipient).getSnapshot()
                         is LivingEntity -> EntityAttributeAccessor.getAttributeMap(recipient).getSnapshot()
                         else -> null
-                    }?.toSortedSet(compareBy { (type, _) -> type.descriptionId })
+                    }?.sortedBy { (type, _) -> type.descriptionId }
                     if (attributeMap == null) {
                         val recipientName = recipient.name()
                             .hoverEvent(HoverEvent.showText(Component.text("Click to copy the UUID of this entity")))
@@ -95,7 +95,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
         }
     }
 
-    private fun generateWholeText(recipient: Entity, attributeMap: Set<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
+    private fun generateWholeText(recipient: Entity, attributeMap: List<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
         return text {
             content("Attributes of ")
             append(recipient.name())
@@ -141,7 +141,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
         return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
     }
 
-    private fun generateBookPages(attributeMapSnapShot: Set<Map.Entry<Attribute, AttributeInstanceSnapshot>>): List<Component> {
+    private fun generateBookPages(attributeMapSnapShot: List<Map.Entry<Attribute, AttributeInstanceSnapshot>>): List<Component> {
         val result = mutableListOf<Component>()
         val chunked = attributeMapSnapShot.chunked(ATTRIBUTE_COUNT_PER_PAGE)
         for (chunk in chunked) {
