@@ -2,11 +2,16 @@
 
 package cc.mewcraft.wakame.enchantment.impl
 
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.enchantment.CustomEnchantment
 import cc.mewcraft.wakame.enchantment.CustomEnchantmentRegister
+import cc.mewcraft.wakame.enchantment.EnchantmentEffect
 import cc.mewcraft.wakame.enchantment.WakameEnchantmentsSupport
 import cc.mewcraft.wakame.enchantment.WakameEnchantmentsSupport.applyCommonProperties
 import cc.mewcraft.wakame.enchantment.WakameEnchantmentsSupport.protectionProperties
+import cc.mewcraft.wakame.registry.ElementRegistry
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry
@@ -26,6 +31,16 @@ data object UniversalIncomingDamageRateProtection : CustomEnchantment {
 
     override fun getRegister(): CustomEnchantmentRegister {
         return UniversalIncomingDamageRateProtectionRegister(this)
+    }
+
+    override fun getEffects(level: Int): Collection<EnchantmentEffect> {
+        val universalDefence = mapOf(
+            Attributes.UNIVERSAL_INCOMING_DAMAGE_RATE to AttributeModifier(key, level * 0.5, AttributeModifier.Operation.MULTIPLY_TOTAL)
+        )
+
+        return listOf(
+            EnchantmentEffect.attribute(universalDefence)
+        )
     }
 }
 
