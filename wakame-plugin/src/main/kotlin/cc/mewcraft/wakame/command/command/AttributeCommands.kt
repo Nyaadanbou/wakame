@@ -4,8 +4,10 @@ import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
+import cc.mewcraft.wakame.util.editMeta
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
@@ -19,8 +21,8 @@ import org.bukkit.inventory.meta.BookMeta
 import org.incendo.cloud.Command
 import org.incendo.cloud.CommandFactory
 import org.incendo.cloud.CommandManager
-import org.incendo.cloud.bukkit.data.MultipleEntitySelector
-import org.incendo.cloud.bukkit.parser.selector.MultipleEntitySelectorParser
+import org.incendo.cloud.bukkit.data.SingleEntitySelector
+import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.coroutines.extension.suspendingHandler
 import org.incendo.cloud.kotlin.extension.commandBuilder
@@ -28,7 +30,7 @@ import org.incendo.cloud.kotlin.extension.getOrNull
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-private const val ATTRIBUTE_PER_PAGE = 14
+private const val ATTRIBUTE_COUNT_PER_PAGE = 14
 
 object AttributeCommands : CommandFactory<CommandSender> {
     private const val ATTRIBUTE_LITERAL = "attribute"
@@ -42,141 +44,131 @@ object AttributeCommands : CommandFactory<CommandSender> {
             ) {
                 permission(CommandPermissions.ATTRIBUTE)
                 literal(ATTRIBUTE_LITERAL)
-                optional("entity", MultipleEntitySelectorParser.multipleEntitySelectorParser())
-                flag(
-                    name = "print_book",
-                    description = Description.of("Give the result to the sender as a book")
-                )
+                optional("entity", SingleEntitySelectorParser.singleEntitySelectorParser())
+                flag("print", description = Description.of("Generate a book containing the result to the recipient's inventory"))
                 suspendingHandler { context ->
                     val sender = context.sender()
-                    val isPrintBook = context.flags().contains("print_book")
-                    val recipients = context.getOrNull<MultipleEntitySelector>("entity")?.values()
-                        ?: (sender as? Player)?.let(::listOf)
-                        ?: emptyList()
+                    val isPrinting = context.flags().contains("print")
+                    val recipient = context.getOrNull<SingleEntitySelector>("entity")?.single() ?: (sender as? Player)
+                    if (recipient == null) {
+                        sender.sendMessage(Component.text("No entity found."))
+                        return@suspendingHandler
+                    }
 
-                    for (recipient in recipients) {
-                        val attributeMapSnapshot = when (recipient) {
-                            is Player -> PlayerAttributeAccessor.getAttributeMap(recipient).getSnapshot()
-                            is LivingEntity -> null // EntityAttributeAccessor.getAttributeMap(recipient).getSnapshot()
-                            else -> null
-                        }?.toSortedSet(compareBy { getAttributeId(it.key) })
+                    val attributeMap = when (recipient) {
+                        is Player -> PlayerAttributeAccessor.getAttributeMap(recipient).getSnapshot()
+                        is LivingEntity -> EntityAttributeAccessor.getAttributeMap(recipient).getSnapshot()
+                        else -> null
+                    }?.toSortedSet(compareBy { (type, _) -> type.descriptionId })
+                    if (attributeMap == null) {
+                        val recipientName = recipient.name()
+                            .hoverEvent(HoverEvent.showText(Component.text("Click to copy the UUID of this entity")))
+                            .clickEvent(ClickEvent.copyToClipboard(recipient.uniqueId.toString()))
+                        sender.sendMessage(recipientName.append(Component.text(" has no attributes.")))
+                        return@suspendingHandler
+                    }
 
-                        if (attributeMapSnapshot == null) {
-                            sender.sendMessage(
-                                Component.text("No attribute map found for ${recipient.name()}")
-                            )
-                            continue
-                        }
+                    val wholeResultText = generateWholeText(recipient, attributeMap)
+                    sender.sendMessage(wholeResultText)
 
-                        val attributeMessage = generateAttributeMessage(recipient, attributeMapSnapshot)
-                        sender.sendMessage(attributeMessage)
-
-                        if (isPrintBook && sender is InventoryHolder) {
-                            val resultItem = ItemStack.of(Material.WRITTEN_BOOK)
-                            resultItem.editMeta { meta ->
-                                meta as BookMeta
-                                val displayName = text {
-                                    content("Attribute map for ")
-                                    append(recipient.name())
-                                    appendSpace()
-                                    append {
-                                        Component.text("Generated at ${getCurrentTime()}")
-                                            .color(NamedTextColor.GRAY)
+                    if (isPrinting && sender is InventoryHolder) {
+                        val bookItem = ItemStack.of(Material.WRITTEN_BOOK)
+                        bookItem.editMeta<BookMeta> { meta ->
+                            meta.itemName(text {
+                                content("属性报告之 ")
+                                append(recipient.name())
+                                append {
+                                    text {
+                                        content(" 于 ${getCurrentTime()}")
+                                        color(NamedTextColor.GRAY)
                                     }
                                 }
-
-                                meta.itemName(displayName)
-                                meta.author(sender.name())
-                                meta.pages(generateBookPages(attributeMapSnapshot))
-                            }
-
-                            sender.inventory.addItem(resultItem)
+                            })
+                            meta.author(sender.name())
+                            meta.pages(generateBookPages(attributeMap))
                         }
+
+                        sender.inventory.addItem(bookItem)
                     }
                 }
             }.buildAndAdd(this)
         }
     }
 
-    private fun generateAttributeMessage(recipient: Entity, attributeMapSnapShot: Set<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
+    private fun generateWholeText(recipient: Entity, attributeMap: Set<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
         return text {
-            text {
-                content("Attribute map for ")
-                append(recipient.name())
-                hoverEvent {
-                    val hoverText = text {
-                        for ((attribute, instance) in attributeMapSnapShot) {
-                            append {
-                                Component.text(getAttributeId(attribute) + ": ")
-                                    .color(NamedTextColor.GREEN)
+            content("Attributes of ")
+            append(recipient.name())
+            appendNewline()
+            hoverEvent {
+                HoverEvent.showText(text {
+                    for ((type, instance) in attributeMap) {
+                        append {
+                            text {
+                                content(type.descriptionId + ": ")
+                                color(NamedTextColor.GREEN)
                             }
-                            appendNewline()
-                            append(generateAttributeInstanceText(instance))
                         }
+                        appendNewline()
+                        append(generateAttributeInstanceText(instance))
                     }
-                    @Suppress("UNCHECKED_CAST")
-                    HoverEvent.showText(hoverText) as HoverEvent<Any>
-                }
+                }) as HoverEvent<Any>
             }
         }
     }
 
-    private fun generateAttributeInstanceText(attributeInstanceSnapshot: AttributeInstanceSnapshot): Component {
+    private fun generateAttributeInstanceText(instance: AttributeInstanceSnapshot): Component {
         return text {
             append {
-                Component.text("  Base: ${attributeInstanceSnapshot.getBaseValue()}")
-                    .color(NamedTextColor.WHITE)
-            }
-            for (modifier in attributeInstanceSnapshot.getModifiers()) {
-                appendNewline()
-                append {
-                    Component.text("  ${modifier.operation} ${modifier.amount} from ${modifier.id}")
-                        .color(NamedTextColor.GRAY)
+                text {
+                    content("  Base: ${instance.getBaseValue()}")
+                    color(NamedTextColor.WHITE)
                 }
             }
-        }
-    }
-
-    private fun getAttributeId(attribute: Attribute): String {
-        return when (attribute) {
-            is ElementAttribute -> "${attribute.descriptionId}/${attribute.element.uniqueId}"
-            else -> attribute.descriptionId
+            for (modifier in instance.getModifiers()) {
+                appendNewline()
+                append {
+                    text {
+                        content("  ${modifier.operation} ${modifier.amount} from ${modifier.id}")
+                        color(NamedTextColor.GRAY)
+                    }
+                }
+            }
         }
     }
 
     private fun getCurrentTime(): String {
-        val currentTime = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        return currentTime.format(formatter)
+        return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
     }
 
     private fun generateBookPages(attributeMapSnapShot: Set<Map.Entry<Attribute, AttributeInstanceSnapshot>>): List<Component> {
         val result = mutableListOf<Component>()
-        val pages = attributeMapSnapShot.chunked(ATTRIBUTE_PER_PAGE)
-        for (page in pages) {
-            result.add(generateBookPage(page))
+        val chunked = attributeMapSnapShot.chunked(ATTRIBUTE_COUNT_PER_PAGE)
+        for (chunk in chunked) {
+            result.add(generateBookPage(chunk))
         }
-        return result
+        return result // 列表中的每个元素代表书的一页
     }
 
-    private fun generateBookPage(attributeMapSnapShot: List<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
+    private fun generateBookPage(attributeList: List<Map.Entry<Attribute, AttributeInstanceSnapshot>>): Component {
         return text {
-            for ((attribute, instance) in attributeMapSnapShot) {
+            for ((type, instance) in attributeList) {
                 append {
-                    if (getAttributeId(attribute).length > 20) {
-                        Component.text(getAttributeId(attribute).substring(0, 17) + "...")
-                            .color(NamedTextColor.DARK_GREEN)
-                    } else {
-                        Component.text(getAttributeId(attribute))
-                            .color(NamedTextColor.DARK_GREEN)
-                    }.hoverEvent {
-                        val hoverText = text {
-                            append(Component.text("${getAttributeId(attribute)}: ").color(NamedTextColor.GREEN))
-                            appendNewline()
-                            append(generateAttributeInstanceText(instance))
+                    text {
+                        if (type.descriptionId.length > 20) {
+                            content(type.descriptionId.substring(0, 17) + "...")
+                            color(NamedTextColor.DARK_GREEN)
+                        } else {
+                            content(type.descriptionId)
+                            color(NamedTextColor.DARK_GREEN)
                         }
-                        @Suppress("UNCHECKED_CAST")
-                        HoverEvent.showText(hoverText) as HoverEvent<Any>
+                        hoverEvent {
+                            HoverEvent.showText(text {
+                                append(Component.text("${type.descriptionId}: ").color(NamedTextColor.GREEN))
+                                appendNewline()
+                                append(generateAttributeInstanceText(instance))
+                            }) as HoverEvent<Any>
+                        }
                     }
                 }
                 appendNewline()

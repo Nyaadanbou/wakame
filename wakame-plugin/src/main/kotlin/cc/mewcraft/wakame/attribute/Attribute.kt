@@ -223,7 +223,7 @@ protected constructor(
     vanilla: Boolean = false,
 ) : RangedAttribute(
     facadeId,
-    descriptionId,
+    descriptionId + "/" + element.uniqueId,
     defaultValue,
     minValue,
     maxValue,
