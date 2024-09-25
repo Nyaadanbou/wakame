@@ -27,6 +27,7 @@ class CommandManager(
         settings().set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true)
 
         // Register commands
+        command(AttributeCommands)
         command(CraftCommands)
         command(DebugCommands)
         command(HephaestusCommands)

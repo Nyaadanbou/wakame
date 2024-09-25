@@ -72,27 +72,27 @@ tasks {
             attributes["paperweight-mappings-namespace"] = "spigot"
         }
 
-        relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
-        relocate("org.koin", "cc.mewcraft.wakame.external.koin")
+        // relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
+        // relocate("org.koin", "cc.mewcraft.wakame.external.koin")
         relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
-        relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
-        relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
+        // relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
+        // relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
         // relocate("com.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.api")
         // relocate("io.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.impl")
 
         // cloud
-        relocate("org.incendo.cloud", "cc.mewcraft.wakame.external.cloud") // We don't relocate cloud itself in this example, but you still should
+        // relocate("org.incendo.cloud", "cc.mewcraft.wakame.external.cloud") // We don't relocate cloud itself in this example, but you still should
 
         // cloud & configurate dependency
-        relocate("io.leangen.geantyref", "cc.mewcraft.wakame.external.geantyref")
+        // relocate("io.leangen.geantyref", "cc.mewcraft.wakame.external.geantyref")
 
         // cloud-paper dependencies
-        relocate("xyz.jpenilla.reflectionremapper", "cc.mewcraft.wakame.external.reflectionremapper")
-        relocate("net.fabricmc.mappingio", "cc.mewcraft.wakame.external.mappingio")
+        // relocate("xyz.jpenilla.reflectionremapper", "cc.mewcraft.wakame.external.reflectionremapper")
+        // relocate("net.fabricmc.mappingio", "cc.mewcraft.wakame.external.mappingio")
 
         // invui
-        relocate("xyz.xenondevs.invui", "cc.mewcraft.wakame.external.invui")
-        relocate("xyz.xenondevs.inventoryaccess", "cc.mewcraft.wakame.external.invui.inventoryaccess")
+        // relocate("xyz.xenondevs.invui", "cc.mewcraft.wakame.external.invui")
+        // relocate("xyz.xenondevs.inventoryaccess", "cc.mewcraft.wakame.external.invui.inventoryaccess")
     }
     copyJar {
         environment = "paper"
