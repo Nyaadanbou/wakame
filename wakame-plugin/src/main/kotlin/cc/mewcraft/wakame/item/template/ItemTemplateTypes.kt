@@ -180,6 +180,13 @@ object ItemTemplateTypes {
     val UNBREAKABLE: ItemTemplateType<Unbreakable> = Unbreakable.codec(ItemConstants.UNBREAKABLE).register()
 
     /**
+     * 组件: [ItemWeapon]
+     */
+    val WEAPON: ItemTemplateType<ItemWeapon.Template> = ItemWeapon.templateType(ItemConstants.WEAPON).register()
+
+
+
+    /**
      * 获取所有模板的序列化器.
      */
     internal fun collectTypeSerializers(): TypeSerializerCollection {

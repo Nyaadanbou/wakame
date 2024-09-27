@@ -78,6 +78,7 @@ object ItemConstants {
     const val TRACKABLE = "tracks"
     const val TRIM = "trim"
     const val UNBREAKABLE = "unbreakable"
+    const val WEAPON = "weapon"
 
     inline fun createKey(block: ItemConstants.() -> String): Key {
         return Key.key(Namespaces.ITEM_META, block(this))
