@@ -1,0 +1,16 @@
+{
+  "values": [
+    "wakame:earth_damage",
+    "wakame:earth_protection",
+    "wakame:fire_damage",
+    "wakame:fire_protection",
+    "wakame:neutral_damage",
+    "wakame:neutral_protection",
+    "wakame:thunder_damage",
+    "wakame:thunder_protection",
+    "wakame:water_damage",
+    "wakame:water_protection",
+    "wakame:wind_damage",
+    "wakame:wind_protection"
+  ]
+}
