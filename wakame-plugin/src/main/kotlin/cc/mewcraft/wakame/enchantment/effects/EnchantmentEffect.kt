@@ -14,7 +14,7 @@ internal sealed interface EnchantmentEffect {
             return AttributeEnchantmentEffect(modifiers)
         }
 
-        fun skill(todo: Nothing): EnchantmentEffect {
+        fun skill(params: Nothing): EnchantmentEffect {
             TODO()
         }
     }
