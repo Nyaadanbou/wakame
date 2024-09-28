@@ -192,9 +192,7 @@ private object ElementAttributeInternals {
     private val ELEMENT_ATTRIBUTES: ConcurrentHashMap<Element, ElementAttributes> = ConcurrentHashMap()
 
     fun getElementAttributes(element: Element): ElementAttributes {
-        return ELEMENT_ATTRIBUTES.computeIfAbsent(element) {
-            ElementAttributes(element)
-        }
+        return ELEMENT_ATTRIBUTES.computeIfAbsent(element, ::ElementAttributes)
     }
 }
 
