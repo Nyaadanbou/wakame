@@ -89,7 +89,7 @@ sealed interface ItemSlot : Examinable {
         /**
          * 代表一个不应该被使用的 [slotIndex].
          */
-        const val VOID_SLOT_INDEX = -1
+        const val EMPTY_SLOT_INDEX = -1
 
         /**
          * 获取一个无操作 [ItemSlot].
@@ -106,7 +106,7 @@ sealed interface ItemSlot : Examinable {
      */
     private data object Noop : ItemSlot {
         override val id: Key = GenericKeys.NOOP
-        override val slotIndex: Int = VOID_SLOT_INDEX
+        override val slotIndex: Int = EMPTY_SLOT_INDEX
 
         override fun getItem(player: Player): ItemStack? {
             return null
@@ -129,7 +129,7 @@ enum class VanillaItemSlot(
     override val slotIndex: Int,
     val slot: EquipmentSlot,
 ) : ItemSlot {
-    MAINHAND(ItemSlot.VOID_SLOT_INDEX, EquipmentSlot.HAND),
+    MAINHAND(ItemSlot.EMPTY_SLOT_INDEX, EquipmentSlot.HAND),
     OFFHAND(40, EquipmentSlot.OFF_HAND),
     HEAD(39, EquipmentSlot.HEAD),
     CHEST(38, EquipmentSlot.CHEST),
@@ -140,8 +140,8 @@ enum class VanillaItemSlot(
     companion object {
         const val NAMESPACE = "vanilla"
 
-        fun fromEquipmentSlotGroup(group: EquipmentSlotGroup): List<VanillaItemSlot> {
-            return entries.filter { group.test(it.slot) }
+        fun fromEquipmentSlotGroup(group: EquipmentSlotGroup): Set<VanillaItemSlot> {
+            return entries.filterTo(HashSet()) { group.test(it.slot) }
         }
     }
 
