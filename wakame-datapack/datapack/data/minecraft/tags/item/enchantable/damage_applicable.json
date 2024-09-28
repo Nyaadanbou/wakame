@@ -1,6 +1,6 @@
 {
   "values": [
     "#minecraft:enchantable/armor",
-    "#minecraft:enchantable/weapon"
+    "#minecraft:enchantable/all_weapon"
   ]
 }

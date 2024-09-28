@@ -2,7 +2,7 @@
   "description": {
     "translate": "enchantment.wakame.critical_hit"
   },
-  "supported_items": "#minecraft:enchantable/weapon",
+  "supported_items": "#minecraft:enchantable/all_weapon",
   "slots": [
     "mainhand"
   ],
