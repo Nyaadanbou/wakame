@@ -103,7 +103,7 @@ tasks {
 paper {
     main = "cc.mewcraft.wakame.WakamePlugin"
     // loader = "cc.mewcraft.wakame.loader.WakameLoader"
-    bootstrapper = "cc.mewcraft.wakame.loader.WakameBootstrapper"
+    // bootstrapper = "cc.mewcraft.wakame.loader.WakameBootstrapper"
     name = "Wakame"
     version = "${project.version}"
     description = project.description
