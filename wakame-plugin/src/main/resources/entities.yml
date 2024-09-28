@@ -43,6 +43,8 @@ entity_attributes:
       max_health: default
       max_mana: 200.0
       movement_speed: default
+      negative_critical_strike_power: default
+      sweeping_damage_ratio: default
       universal_attack_damage: default
       universal_defense: default
       universal_defense_penetration: default

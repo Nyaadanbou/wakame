@@ -110,11 +110,8 @@ class PlayerMeleeAttackMetadata(
         return if (isSweep) {
             damageBundle(attributeMap) {
                 every {
-                    min(1.0)
-                    max(1.0)
-                    rate { standard() }
-                    defensePenetration { standard() }
-                    defensePenetrationRate { standard() }
+                    standard()
+                    rate { standard() * attributeMap.getValue(Attributes.SWEEPING_DAMAGE_RATIO) }
                 }
             }
         } else {

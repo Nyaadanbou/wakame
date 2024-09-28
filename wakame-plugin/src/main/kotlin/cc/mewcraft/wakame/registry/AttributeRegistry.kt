@@ -112,6 +112,7 @@ object AttributeRegistry : Initializable {
         +buildComposite("safe_fall_distance").single().bind { SAFE_FALL_DISTANCE }
         +buildComposite("scale").single().bind { SCALE }
         +buildComposite("step_height").single().bind { STEP_HEIGHT }
+        +buildComposite("sweeping_damage_ratio").single().bind { SWEEPING_DAMAGE_RATIO }
         +buildComposite("universal_attack_damage").ranged().bind({ UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE })
         +buildComposite("universal_defense").single().bind { UNIVERSAL_DEFENSE }
         +buildComposite("universal_defense_penetration").single().bind { UNIVERSAL_DEFENSE_PENETRATION }

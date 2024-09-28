@@ -40,7 +40,7 @@ object DamageListener : Listener, KoinComponent {
             return
         }
 
-        val damageMetadata = DamageManager.generateDamageMetadata(event)
+        val damageMetadata = DamageManager.generateDamageMetadata(event) ?: return
         val defenseMetadata = DamageManager.generateDefenseMetadata(event)
 
         val nekoEntityDamageEvent = NekoEntityDamageEvent(event.damageSource, damageMetadata, defenseMetadata, event)

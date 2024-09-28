@@ -242,11 +242,6 @@ internal object ItemComponentTypes {
     val UNBREAKABLE: ItemComponentType<Unbreakable> = Unbreakable.codec(ItemConstants.UNBREAKABLE).register()
 
     /**
-     * 将物品作为有攻击效果的武器.
-     */
-    val WEAPON: ItemComponentType<Unit> = ItemWeapon.codec(ItemConstants.WEAPON).register()
-
-    /**
      * 注册该组件类型.
      *
      * 注意事项: 每个组件都需要注册, 不然有些功能会无法使用.

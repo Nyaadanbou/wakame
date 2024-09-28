@@ -43,9 +43,9 @@ object StatisticsConstants {
  */
 object ItemConstants {
     const val ARROW = "arrow"
+    const val ATTACK = "attack"
     const val ATTACK_SPEED = "attack_speed"
     const val ATTRIBUTE_MODIFIERS = "attribute_modifiers"
-    const val BOW = "bow"
     const val CAN_BREAK = "can_break"
     const val CAN_PLACE_ON = "can_place_on"
     const val CASTABLE = "castable"
@@ -78,7 +78,6 @@ object ItemConstants {
     const val TRACKABLE = "tracks"
     const val TRIM = "trim"
     const val UNBREAKABLE = "unbreakable"
-    const val WEAPON = "weapon"
 
     inline fun createKey(block: ItemConstants.() -> String): Key {
         return Key.key(Namespaces.ITEM_META, block(this))

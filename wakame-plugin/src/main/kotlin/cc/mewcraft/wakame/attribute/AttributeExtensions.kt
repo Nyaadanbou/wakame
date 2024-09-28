@@ -32,6 +32,7 @@ private val MAPPINGS: ImmutableBiMap<NekoAttribute, BukkitAttribute> = Immutable
     .put(Attributes.SAFE_FALL_DISTANCE, BukkitAttribute.GENERIC_SAFE_FALL_DISTANCE)
     .put(Attributes.SCALE, BukkitAttribute.GENERIC_SCALE)
     .put(Attributes.STEP_HEIGHT, BukkitAttribute.GENERIC_STEP_HEIGHT)
+    .put(Attributes.SWEEPING_DAMAGE_RATIO, BukkitAttribute.PLAYER_SWEEPING_DAMAGE_RATIO)
     .build()
 
 fun NekoAttribute.toBukkit(): BukkitAttribute {

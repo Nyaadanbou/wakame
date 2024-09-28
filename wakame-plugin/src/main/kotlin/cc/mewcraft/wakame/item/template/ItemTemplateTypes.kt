@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.item.ItemConstants
+import cc.mewcraft.wakame.item.components.ItemAttack
 import cc.mewcraft.wakame.item.templates.components.*
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -10,6 +11,12 @@ object ItemTemplateTypes {
      */
     @JvmField
     val ARROW: ItemTemplateType<ItemArrow> = ItemArrow.codec(ItemConstants.ARROW).register()
+
+    /**
+     * 组件: n/a
+     */
+    @JvmField
+    val ATTACK: ItemTemplateType<ItemAttack> = ItemAttack.codec(ItemConstants.ATTACK).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.ItemAttackSpeed]
@@ -22,12 +29,6 @@ object ItemTemplateTypes {
      */
     @JvmField
     val ATTRIBUTE_MODIFIERS: ItemTemplateType<ItemAttributeModifiers> = ItemAttributeModifiers.codec(ItemConstants.ATTRIBUTE_MODIFIERS).register()
-
-    /**
-     * 组件: n/a
-     */
-    @JvmField
-    val BOW: ItemTemplateType<ItemBow> = ItemBow.codec(ItemConstants.BOW).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.ItemAdventurePredicate]
@@ -178,11 +179,6 @@ object ItemTemplateTypes {
      */
     @JvmField
     val UNBREAKABLE: ItemTemplateType<Unbreakable> = Unbreakable.codec(ItemConstants.UNBREAKABLE).register()
-
-    /**
-     * 组件: [ItemWeapon]
-     */
-    val WEAPON: ItemTemplateType<ItemWeapon.Template> = ItemWeapon.templateType(ItemConstants.WEAPON).register()
 
 
 

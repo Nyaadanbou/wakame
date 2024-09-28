@@ -24,6 +24,7 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     // 这些属性需要原版属性作为后端才能在游戏中生效.
     val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", 4.5, 1.0, 64.0, true).register()
     val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", 3.0, 1.0, 64.0, true).register()
+    val SWEEPING_DAMAGE_RATIO = RangedAttribute("sweeping_damage_ratio", 0.1, 0.0, 1.0, true).register()
     val MAX_ABSORPTION = RangedAttribute("max_absorption", .0, .0, 2048.0, true).register()
     val MAX_HEALTH = RangedAttribute("max_health", 20.0, 1.0, 16384.0, true).register()
     val MINING_EFFICIENCY = RangedAttribute("mining_efficiency", .0, .0, 1024.0, true).register()

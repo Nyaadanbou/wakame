@@ -15,7 +15,7 @@ import org.koin.core.component.get
 import org.slf4j.Logger
 
 class NekoEntityDamageEvent(
-    val damageSource: DamageSource,
+    val damageSource: DamageSource,//TODO 移除
     val damageMetadata: DamageMetadata,
     val defenseMetadata: DefenseMetadata,
     val bukkitEvent: EntityDamageEvent
@@ -71,6 +71,7 @@ class NekoEntityDamageEvent(
     /**
      * 获取一个包含了每种元素的最终伤害值的映射.
      * 注意, 返回的映射包含数值为零的伤害.
+     * TODO 有关0伤害的处理
      */
     fun getFinalDamageMap(excludeZeroDamage: Boolean = false): Map<Element, Double> {
         return if (excludeZeroDamage) {

@@ -2,7 +2,10 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.EntityAttributeMapAccess
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
+import cc.mewcraft.wakame.item.components.BluntAttack
+import cc.mewcraft.wakame.item.components.NormalAttack
+import cc.mewcraft.wakame.item.components.SweepAttack
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -14,7 +17,7 @@ import java.time.Duration
 import java.util.UUID
 
 object DamageManager {
-    fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
+    fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata? {
         // 先检查是不是自定义伤害; 若是, 则直接返回自定义伤害信息
         val uuid = event.entity.uniqueId
         val customDamageMetadata = findCustomDamageMetadata(uuid)
@@ -35,17 +38,39 @@ object DamageManager {
                 is Player -> {
                     val itemStack = damager.inventory.itemInMainHand
                     // 玩家手中的物品是 Attack
-                    if (itemStack.tryNekoStack?.behaviors?.has(ItemBehaviorTypes.ATTACK) == true) {
+                    val attack = itemStack.tryNekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
+                    if (attack != null) {
                         when (event.cause) {
                             DamageCause.ENTITY_ATTACK -> {
-                                return PlayerMeleeAttackMetadata(damager.toUser(), false)
+                                when (attack.attackType) {
+                                    is SweepAttack, is BluntAttack, is NormalAttack -> {
+                                        return PlayerMeleeAttackMetadata(damager.toUser(), false)
+                                    }
+
+                                    else -> {
+                                        // 玩家使用无需根据AttributeMap计算伤害的Attack物品攻击
+                                        // 如：使用弓、弩左键点击造成伤害
+                                        // 留到最后视为原版伤害处理
+                                    }
+                                }
                             }
 
                             DamageCause.ENTITY_SWEEP_ATTACK -> {
-                                return PlayerMeleeAttackMetadata(damager.toUser(), true)
+                                // 需要Attack物品的攻击特效是“sweep_attack”才能打出横扫伤害
+                                if (attack.attackType is SweepAttack) {
+                                    return PlayerMeleeAttackMetadata(damager.toUser(), true)
+                                } else {
+                                    // 取消Bukkit伤害事件
+                                    event.isCancelled = true
+                                    // 返回null是为了供外部识别以不触发neko伤害事件
+                                    return null
+                                }
                             }
 
-                            else -> {}
+                            else -> {
+                                // 其他Cause的玩家伤害
+                                // 留到最后视为原版伤害处理
+                            }
                         }
                     }
                 }
@@ -91,7 +116,7 @@ object DamageManager {
         /*
         如果:
          - 伤害没有攻击者
-         - 玩家使用无Attack行为物品甚至非neko物品攻击
+         - 玩家使用无Attack组件(模板)物品甚至非neko物品攻击
          - 伤害攻击者非玩家、living实体、弹射物
          - 伤害攻击者是弹射物, 但没有记录, 也不是箭矢和三叉戟
         则视为原版伤害, 使用原版伤害映射
