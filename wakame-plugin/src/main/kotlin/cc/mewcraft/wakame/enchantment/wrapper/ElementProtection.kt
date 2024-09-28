@@ -30,7 +30,7 @@ internal class ElementProtection(
             .getOrPut(slot) {
                 val id = handle.key.value() + "/" + slot.slotIndex
                 val amount = baseValue + perLevelAboveFirst * (level - 1)
-                val operation = AttributeModifier.Operation.ADD
+                val operation = AttributeModifier.Operation.MULTIPLY_TOTAL
                 val modifier = AttributeModifier(
                     id = Key.key(ATTRIBUTE_MODIFIER_NAMESPACE, id),
                     amount = amount,
