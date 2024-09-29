@@ -32,7 +32,8 @@ data class EvaluableDamageMetadata(
             criticalPower = criticalPower.evaluate(engine),
             isCritical = isCritical.evaluate(engine) > 0.0,
             knockback = knockback.evaluate(engine) > 0.0,
-            damageBundle = damageBundle { damagePackets.forEach { single(it.evaluate(engine)) } }
+            damageBundle = damageBundle { damagePackets.forEach { single(it.evaluate(engine)) } },
+            damageTags = DamageTags()//TODO 自定义伤害的伤害标签集的evaluate
         )
     }
 }

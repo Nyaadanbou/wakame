@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.User
 import org.bukkit.entity.*
+import org.bukkit.projectiles.BlockProjectileSource
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.lang.ref.WeakReference
@@ -24,6 +25,11 @@ sealed interface DamageMetadata {
      * 伤害捆绑包, 包含了这次伤害中各元素伤害值的信息.
      */
     val damageBundle: DamageBundle
+
+    /**
+     * 伤害标签集, 包含了这次伤害的特征标签.
+     */
+    val damageTags: DamageTags
 
     /**
      * 攻击阶段伤害的终值.
@@ -72,6 +78,7 @@ class VanillaDamageMetadata(
             defensePenetrationRate(defensePenetrationRate)
         }
     }
+    override val damageTags: DamageTags = DamageTags()
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
 }
@@ -82,10 +89,7 @@ class VanillaDamageMetadata(
  */
 class PlayerMeleeAttackMetadata(
     user: User<Player>,
-    /**
-     * 这次伤害是否由横扫造成的, 会根据横扫的逻辑削弱伤害.
-     */
-    private val isSweep: Boolean,
+    override val damageTags: DamageTags
 ) : DamageMetadata {
     private val weakUser: WeakReference<User<Player>> = WeakReference(user)
 
@@ -107,7 +111,8 @@ class PlayerMeleeAttackMetadata(
 
     private fun buildDamageBundle(): DamageBundle {
         val attributeMap = user.attributeMap
-        return if (isSweep) {
+        return if (damageTags.contains(DamageTag.EXTRA) && damageTags.contains(DamageTag.SWORD)) {
+            // 是横扫范围伤害
             damageBundle(attributeMap) {
                 every {
                     standard()
@@ -138,6 +143,7 @@ class EntityMeleeAttackMetadata(
         get() = weakEntity.get() ?: throw IllegalStateException("LivingEntity reference no longer exists!")
 
     override val damageBundle: DamageBundle
+    override val damageTags: DamageTags = DamageTags()
     override val damageValue: Double
     override val criticalPower: Double
     override val isCritical: Boolean
@@ -175,9 +181,10 @@ private constructor(
     user: User<Player>,
     override val projectile: AbstractArrow,
     private val force: Float,
+    override val damageTags: DamageTags
 ) : ProjectileDamageMetadata {
-    constructor(user: User<Player>, arrow: Arrow, force: Float) : this(user, arrow as AbstractArrow, force)
-    constructor(user: User<Player>, arrow: SpectralArrow, force: Float) : this(user, arrow as AbstractArrow, force)
+    constructor(user: User<Player>, arrow: Arrow, force: Float, damageTags: DamageTags) : this(user, arrow as AbstractArrow, force, damageTags)
+    constructor(user: User<Player>, arrow: SpectralArrow, force: Float, damageTags: DamageTags) : this(user, arrow as AbstractArrow, force, damageTags)
 
     private val weakUser: WeakReference<User<Player>> = WeakReference(user)
 
@@ -245,6 +252,7 @@ private constructor(
 class PlayerTridentDamageMetadata(
     user: User<Player>,
     override val projectile: Trident,
+    override val damageTags: DamageTags
 ) : ProjectileDamageMetadata {
     private val weakUser: WeakReference<User<Player>> = WeakReference(user)
 
@@ -283,6 +291,7 @@ class EntityProjectileDamageMetadata(
         get() = weakEntity.get() ?: throw IllegalStateException("LivingEntity reference no longer exists!")
 
     override val damageBundle: DamageBundle
+    override val damageTags: DamageTags = DamageTags()
     override val damageValue: Double
     override val criticalPower: Double
     override val isCritical: Boolean
@@ -304,21 +313,43 @@ class EntityProjectileDamageMetadata(
 }
 
 /**
- * 默认情况下箭矢造成的伤害元数据.
- * 用于处理未记录伤害的箭矢等特殊情况.
- * 如: 箭矢落地后再次命中, 发射器发射的箭矢命中.
+ * 默认情况下弹射物造成的伤害元数据.
+ * 用途:
+ * 1.处理未记录伤害的箭矢等特殊情况.
+ *   如: 箭矢落地后再次命中, 发射器发射的箭矢命中.
+ * 2.处理未记录伤害的三叉戟等特殊情况.
+ *   如: 三叉戟落地后再次命中(原版无此特性).
  */
-class DefaultArrowDamageMetadata private constructor(
-    imaginaryAttributeMap: ImaginaryAttributeMap,
+class DefaultProjectileDamageMetadata(
     override val projectile: AbstractArrow,
 ) : ProjectileDamageMetadata {
-    constructor(attributeMap: ImaginaryAttributeMap, arrow: Arrow) : this(attributeMap, arrow as AbstractArrow)
-    constructor(attributeMap: ImaginaryAttributeMap, arrow: SpectralArrow) : this(attributeMap, arrow as AbstractArrow)
-
-    override val damageBundle: DamageBundle = buildDamageBundle(imaginaryAttributeMap)
+    override val damageBundle: DamageBundle = buildDamageBundle()
+    override val damageTags: DamageTags = DamageTags()
     override val damageValue: Double = damageBundle.damageSum
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
+
+    private fun buildDamageBundle(): DamageBundle {
+        when (projectile) {
+            is Arrow, is SpectralArrow -> {
+                return buildArrowDamageBundle(
+                    if (projectile.shooter is BlockProjectileSource) {
+                        ImaginaryAttributeMaps.DISPENSER
+                    } else {
+                        ImaginaryAttributeMaps.ARROW
+                    }
+                )
+            }
+
+            is Trident -> {
+                return buildTridentDamageBundle()
+            }
+
+            else ->{
+                throw IllegalArgumentException("AbstractArrow is not Arrow, SpectralArrow, or Trident, so what is it?")
+            }
+        }
+    }
 
     private fun defaultArrowDamageBundle(): DamageBundle {
         return damageBundle {
@@ -332,7 +363,19 @@ class DefaultArrowDamageMetadata private constructor(
         }
     }
 
-    private fun buildDamageBundle(imaginaryAttributeMap: ImaginaryAttributeMap): DamageBundle {
+    private fun defaultTridentDamageBundle(): DamageBundle {
+        return damageBundle {
+            default {
+                min(8.0)
+                max(8.0)
+                rate(1.0)
+                defensePenetration(0.0)
+                defensePenetrationRate(0.0)
+            }
+        }
+    }
+
+    private fun buildArrowDamageBundle(imaginaryAttributeMap: ImaginaryAttributeMap): DamageBundle {
         val itemStack = projectile.itemStack
 
         // 不是 NekoStack, 则为原版箭矢
@@ -359,35 +402,8 @@ class DefaultArrowDamageMetadata private constructor(
             }
         }
     }
-}
 
-/**
- * 默认情况下三叉戟造成的伤害元数据.
- * 用于处理未记录伤害的三叉戟等特殊情况.
- * 如: 三叉戟落地后再次命中(原版无此特性).
- */
-class DefaultTridentDamageMetadata(
-    imaginaryAttributeMap: ImaginaryAttributeMap,
-    override val projectile: Trident,
-) : ProjectileDamageMetadata {
-    override val damageBundle: DamageBundle = buildDamageBundle(imaginaryAttributeMap)
-    override val damageValue: Double = damageBundle.damageSum
-    override val criticalPower: Double = 1.0
-    override val isCritical: Boolean = false
-
-    private fun defaultTridentDamageBundle(): DamageBundle {
-        return damageBundle {
-            default {
-                min(8.0)
-                max(8.0)
-                rate(1.0)
-                defensePenetration(0.0)
-                defensePenetrationRate(0.0)
-            }
-        }
-    }
-
-    private fun buildDamageBundle(imaginaryAttributeMap: ImaginaryAttributeMap): DamageBundle {
+    private fun buildTridentDamageBundle(): DamageBundle {
         val itemStack = projectile.itemStack
 
         // 不是 NekoStack, 则为原版三叉戟
@@ -398,7 +414,7 @@ class DefaultTridentDamageMetadata(
 
         // 获取无形属性映射的快照, 将三叉戟的属性加上
         val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
-        val attributeMapSnapshot = imaginaryAttributeMap.getSnapshot()
+        val attributeMapSnapshot = ImaginaryAttributeMaps.TRIDENT.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
         }
@@ -413,13 +429,14 @@ class DefaultTridentDamageMetadata(
 
 /**
  * 自定义的伤害元数据.
- * 如: 技能造成的伤害.
+ * 如: 技能造成的伤害, 锤类武器的额外范围伤害
  */
 class CustomDamageMetadata(
     override val criticalPower: Double,
     override val isCritical: Boolean,
     val knockback: Boolean,
     override val damageBundle: DamageBundle,
+    override val damageTags: DamageTags,
 ) : DamageMetadata {
     override val damageValue: Double = damageBundle.damageSum
 }

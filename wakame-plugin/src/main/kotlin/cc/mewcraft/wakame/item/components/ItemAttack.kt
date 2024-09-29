@@ -76,9 +76,12 @@ data class ItemAttack(
     }
 }
 
-sealed interface AttackType {
-
-}
+/**
+ * 攻击类型.
+ * 其实现类先不要写成单例.
+ * 未来确认是无参数的实现再写成单例.
+ */
+sealed interface AttackType
 
 /**
  * 原版剑横扫攻击.
@@ -86,28 +89,27 @@ sealed interface AttackType {
  * ## Node structure
  * ```yaml
  * <node>:
- *   type: sweep_attack
+ *   type: sword
  * ```
  */
-class SweepAttack : AttackType {
+class SwordAttack : AttackType {
     companion object {
-        const val NAME = "sweep_attack"
+        const val NAME = "sword"
     }
 }
 
 /**
  * 原版斧单体攻击.
- * 或作为默认值使用.
  *
  * ## Node structure
  * ```yaml
  * <node>:
- *   type: normal_attack
+ *   type: axe
  * ```
  */
-class NormalAttack : AttackType {
+class AxeAttack : AttackType {
     companion object {
-        const val NAME = "normal_attack"
+        const val NAME = "axe"
     }
 }
 
@@ -117,12 +119,12 @@ class NormalAttack : AttackType {
  * ## Node structure
  * ```yaml
  * <node>:
- *   type: bow_shoot
+ *   type: bow
  * ```
  */
 class BowShoot : AttackType {
     companion object {
-        const val NAME = "bow_shoot"
+        const val NAME = "bow"
     }
 }
 
@@ -132,28 +134,59 @@ class BowShoot : AttackType {
  * ## Node structure
  * ```yaml
  * <node>:
- *   type: crossbow_shoot
+ *   type: crossbow
  * ```
  */
 class CrossbowShoot : AttackType {
     companion object {
-        const val NAME = "crossbow_shoot"
+        const val NAME = "crossbow"
     }
 }
 
 /**
- * 钝击, 对直接攻击到的实体造成面板伤害.
+ * 原版三叉戟攻击.
+ *
+ * ## Node structure
+ * ```yaml
+ * <node>:
+ *   type: trident
+ * ```
+ */
+class TridentAttack : AttackType {
+    companion object {
+        const val NAME = "trident"
+    }
+}
+
+/**
+ * 原版重锤攻击.
+ *
+ * ## Node structure
+ * ```yaml
+ * <node>:
+ *   type: mace
+ * ```
+ */
+class MaceAttack : AttackType {
+    companion object {
+        const val NAME = "mace"
+    }
+}
+
+/**
+ * 自定义锤攻击.
+ * 对直接攻击到的实体造成面板伤害.
  * 对 锤击半径 内的实体造成 锤击威力*面板 的伤害.
  *
  * ## Node structure
  * ```yaml
  * <node>:
- *   type: blunt_attack
+ *   type: hammer
  * ```
  */
-class BluntAttack : AttackType {
+class HammerAttack : AttackType {
     companion object {
-        const val NAME = "blunt_attack"
+        const val NAME = "hammer"
     }
 }
 
@@ -161,16 +194,16 @@ class BluntAttack : AttackType {
 /**
  * [AttackType] 的序列化器.
  */
-internal object AttackTypeSerializer : TypeSerializer<AttackType>{
+internal object AttackTypeSerializer : TypeSerializer<AttackType> {
     override fun deserialize(type: Type, node: ConfigurationNode): AttackType {
         val attackType = node.node("type").krequire<String>()
         return when (attackType) {
-            SweepAttack.NAME -> {
-                SweepAttack()
+            SwordAttack.NAME -> {
+                SwordAttack()
             }
 
-            NormalAttack.NAME -> {
-                NormalAttack()
+            AxeAttack.NAME -> {
+                AxeAttack()
             }
 
             BowShoot.NAME -> {
@@ -181,8 +214,16 @@ internal object AttackTypeSerializer : TypeSerializer<AttackType>{
                 CrossbowShoot()
             }
 
-            BluntAttack.NAME -> {
-                BluntAttack()
+            TridentAttack.NAME -> {
+                TridentAttack()
+            }
+
+            MaceAttack.NAME -> {
+                MaceAttack()
+            }
+
+            HammerAttack.NAME -> {
+                HammerAttack()
             }
 
             else -> {

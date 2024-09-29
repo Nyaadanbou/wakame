@@ -1,18 +1,19 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.EntityAttributeMapAccess
-import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
-import cc.mewcraft.wakame.item.components.BluntAttack
-import cc.mewcraft.wakame.item.components.NormalAttack
-import cc.mewcraft.wakame.item.components.SweepAttack
+import cc.mewcraft.wakame.attack.*
+import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
+import org.bukkit.Material
 import org.bukkit.entity.*
-import org.bukkit.event.entity.*
-import org.bukkit.event.entity.EntityDamageEvent.*
-import org.bukkit.projectiles.BlockProjectileSource
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause
+import org.bukkit.event.entity.EntityShootBowEvent
+import org.bukkit.event.entity.ProjectileLaunchEvent
 import java.time.Duration
 import java.util.UUID
 
@@ -43,12 +44,28 @@ object DamageManager {
                         when (event.cause) {
                             DamageCause.ENTITY_ATTACK -> {
                                 when (attack.attackType) {
-                                    is SweepAttack, is BluntAttack, is NormalAttack -> {
-                                        return PlayerMeleeAttackMetadata(damager.toUser(), false)
+                                    is SwordAttack -> {
+                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.SWORD))
+                                    }
+
+                                    is AxeAttack -> {
+                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.AXE))
+                                    }
+
+                                    is TridentAttack -> {
+                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.TRIDENT))
+                                    }
+
+                                    is MaceAttack -> {
+                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.MACE))
+                                    }
+
+                                    is HammerAttack -> {
+                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.HAMMER))
                                     }
 
                                     else -> {
-                                        // 玩家使用无需根据AttributeMap计算伤害的Attack物品攻击
+                                        // 玩家使用非直接攻击实体的攻击特效的物品
                                         // 如：使用弓、弩左键点击造成伤害
                                         // 留到最后视为原版伤害处理
                                     }
@@ -56,9 +73,9 @@ object DamageManager {
                             }
 
                             DamageCause.ENTITY_SWEEP_ATTACK -> {
-                                // 需要Attack物品的攻击特效是“sweep_attack”才能打出横扫伤害
-                                if (attack.attackType is SweepAttack) {
-                                    return PlayerMeleeAttackMetadata(damager.toUser(), true)
+                                // 需要Attack物品的攻击特效是“sword”才能打出横扫伤害
+                                if (attack.attackType is SwordAttack) {
+                                    return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.SWORD, DamageTag.EXTRA))
                                 } else {
                                     // 取消Bukkit伤害事件
                                     event.isCancelled = true
@@ -70,6 +87,8 @@ object DamageManager {
                             else -> {
                                 // 其他Cause的玩家伤害
                                 // 留到最后视为原版伤害处理
+                                // 理论上来说只有玩家丢伤害药水进入这个else
+                                // 或使用非常规手段使玩家造成异常类型的伤害
                             }
                         }
                     }
@@ -86,28 +105,9 @@ object DamageManager {
                 is Projectile -> {
                     val projectileDamageMetadata = findProjectileDamageMetadata(damager.uniqueId)
                     if (projectileDamageMetadata != null) return projectileDamageMetadata
-                    when (damager) {
-                        is Arrow -> {
-                            val attributeMap = if (damager.shooter is BlockProjectileSource) {
-                                ImaginaryAttributeMaps.DISPENSER
-                            } else {
-                                ImaginaryAttributeMaps.ARROW
-                            }
-                            return DefaultArrowDamageMetadata(attributeMap, damager)
-                        }
 
-                        is SpectralArrow -> {
-                            val attributeMap = if (damager.shooter is BlockProjectileSource) {
-                                ImaginaryAttributeMaps.DISPENSER
-                            } else {
-                                ImaginaryAttributeMaps.ARROW
-                            }
-                            return DefaultArrowDamageMetadata(attributeMap, damager)
-                        }
-
-                        is Trident -> {
-                            return DefaultTridentDamageMetadata(ImaginaryAttributeMaps.TRIDENT, damager)
-                        }
+                    if (damager is AbstractArrow) {
+                        return DefaultProjectileDamageMetadata(damager)
                     }
                 }
             }
@@ -116,8 +116,8 @@ object DamageManager {
         /*
         如果:
          - 伤害没有攻击者
-         - 玩家使用无Attack组件(模板)物品甚至非neko物品攻击
-         - 伤害攻击者非玩家、living实体、弹射物
+         - 玩家使用无Attack组件物品、非直接攻击实体的攻击特效的物品（弓等）、非neko物品攻击
+         - 伤害攻击者非玩家、living实体、弹射物三者之一
          - 伤害攻击者是弹射物, 但没有记录, 也不是箭矢和三叉戟
         则视为原版伤害, 使用原版伤害映射
         */
@@ -172,7 +172,7 @@ object DamageManager {
                     is Trident -> {
                         putProjectileDamageMetadata(
                             projectile.uniqueId,
-                            PlayerTridentDamageMetadata(shooter.toUser(), projectile)
+                            PlayerTridentDamageMetadata(shooter.toUser(), projectile, DamageTags(DamageTag.PROJECTILE, DamageTag.TRIDENT))
                         )
                     }
 
@@ -201,18 +201,27 @@ object DamageManager {
         val projectile = event.projectile
         // 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
         val force = DamageRules.calculateBowForce(72000 - entity.itemUseRemainingTime)
+
+        val damageTags = DamageTags(DamageTag.PROJECTILE)
+        val bowMaterial = event.bow?.type
+        if (bowMaterial == Material.BOW) {
+            damageTags.add(DamageTag.BOW)
+        } else if (bowMaterial == Material.CROSSBOW) {
+            damageTags.add(DamageTag.CROSSBOW)
+        }
+
         when (projectile) {
             is Arrow -> {
                 putProjectileDamageMetadata(
                     projectile.uniqueId,
-                    PlayerArrowDamageMetadata(entity.toUser(), projectile, force)
+                    PlayerArrowDamageMetadata(entity.toUser(), projectile, force, damageTags)
                 )
             }
 
             is SpectralArrow -> {
                 putProjectileDamageMetadata(
                     projectile.uniqueId,
-                    PlayerArrowDamageMetadata(entity.toUser(), projectile, force)
+                    PlayerArrowDamageMetadata(entity.toUser(), projectile, force, damageTags)
                 )
             }
         }
