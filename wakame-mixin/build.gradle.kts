@@ -1,11 +1,12 @@
 plugins {
     id("neko-kotlin")
     id("nyaadanbou-conventions.repositories")
+    id("nyaadanbou-conventions.copy-jar")
     alias(libs.plugins.paperdev)
 }
 
 group = "cc.mewcraft.wakame"
-version = "1.0"
+version = "1.0.0"
 description = "The mixin part"
 
 dependencies {
@@ -17,7 +18,15 @@ dependencies {
     compileOnly(local.mixin)
     compileOnly(local.mixin.extras)
 
+    compileOnly(project(":wakame-api"))
     compileOnly(project(":wakame-common"))
+}
+
+tasks {
+    copyJar {
+        environment = "paperMixin"
+        jarFileName = "wakame-${project.version}.jar"
+    }
 }
 
 paperweight {
