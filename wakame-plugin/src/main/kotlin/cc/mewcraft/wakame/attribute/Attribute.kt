@@ -105,15 +105,17 @@ protected constructor(
         )
     }
 
-    // override fun hashCode(): Int {
-    //     return descriptionId.hashCode()
-    // }
-    //
-    // override fun equals(other: Any?): Boolean {
-    //     if (this === other) return true
-    //     if (other is Attribute) return descriptionId == other.descriptionId
-    //     return false
-    // }
+    override fun equals(other: Any?): Boolean {
+        if (this === other)
+            return true
+        if (other is Attribute)
+            return descriptionId == other.descriptionId
+        return false
+    }
+
+    override fun hashCode(): Int {
+        return descriptionId.hashCode()
+    }
 
     override fun toString(): String {
         return toSimpleString()
@@ -207,6 +209,20 @@ protected constructor(
             ),
         )
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other)
+            return true
+        if (other is RangedAttribute)
+            return descriptionId == other.descriptionId /* && element == other.element */
+        return false
+    }
+
+    override fun hashCode(): Int {
+        var result = descriptionId.hashCode()
+        // result = (31 * result) + element.hashCode()
+        return result
+    }
 }
 
 /**
@@ -281,15 +297,17 @@ protected constructor(
         )
     }
 
-    // override fun equals(other: Any?): Boolean {
-    //     if (this === other) return true
-    //     if (other is ElementAttribute) return descriptionId == other.descriptionId && element == other.element
-    //     return false
-    // }
+    override fun equals(other: Any?): Boolean {
+        if (this === other)
+            return true
+        if (other is ElementAttribute)
+            return descriptionId == other.descriptionId /* && element == other.element */
+        return false
+    }
 
-    // override fun hashCode(): Int {
-    //     var result = descriptionId.hashCode()
-    //     result = (31 * result) + element.hashCode()
-    //     return result
-    // }
+    override fun hashCode(): Int {
+        var result = descriptionId.hashCode()
+        // result = (31 * result) + element.hashCode()
+        return result
+    }
 }

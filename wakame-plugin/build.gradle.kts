@@ -110,6 +110,12 @@ paper {
     apiVersion = "1.21"
     author = "Nailm"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
+    bootstrapDependencies {
+        register("Kotlin") {
+            required = true
+            load = RelativeLoadOrder.BEFORE
+        }
+    }
     serverDependencies {
         register("Kotlin") {
             required = true

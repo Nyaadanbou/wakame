@@ -17,7 +17,7 @@ import org.slf4j.Logger
  *
  * [ItemSlot] 的实例在设计上是*按需创建*的. 每当序列化一个 [ItemSlot] 时,
  * 会自动注册到这个注册表中. 也就是说, 如果一个 [ItemSlot] 从未被序列化过,
- * 那么它就不会被注册到这个注册表中.
+ * 那么它就不会被注册到这个注册表中. 这么做是为了优化遍历性能.
  */
 object ItemSlotRegistry : Initializable, KoinComponent {
     private val logger: Logger by inject()
@@ -27,8 +27,8 @@ object ItemSlotRegistry : Initializable, KoinComponent {
     private val all: ObjectArraySet<ItemSlot> = ObjectArraySet()
 
     // 储存了 Minecraft 原版槽位的 ItemSlot
-    private val vanillaBySlot: MutableMap<EquipmentSlot, ItemSlot> = Reference2ReferenceOpenHashMap()
-    private val vanillaByGroup: MutableMap<EquipmentSlotGroup, ObjectArraySet<ItemSlot>> = Reference2ReferenceOpenHashMap()
+    private val vanillaBySlot: Reference2ReferenceOpenHashMap<EquipmentSlot, ItemSlot> = Reference2ReferenceOpenHashMap()
+    private val vanillaByGroup: Reference2ReferenceOpenHashMap<EquipmentSlotGroup, ObjectArraySet<ItemSlot>> = Reference2ReferenceOpenHashMap()
 
     // 储存了除 Vanilla 之外的所有 ItemSlot
     private val custom: Int2ObjectOpenHashMap<ItemSlot> = Int2ObjectOpenHashMap()
@@ -40,14 +40,14 @@ object ItemSlotRegistry : Initializable, KoinComponent {
         get() = all.size
 
     /**
-     * 获取所有的 [ItemSlot].
+     * 获取当前所有已经注册的 [ItemSlot].
      */
     fun all(): Set<ItemSlot> {
         return all
     }
 
     /**
-     * 获取一个 `Equipment Slot Group` 对应的 [ItemSlot].
+     * 获取一个 [EquipmentSlotGroup] 所对应的 [ItemSlot].
      * 如果不存在, 则返回一个空集合.
      */
     fun get(group: EquipmentSlotGroup): Set<ItemSlot> {
@@ -55,7 +55,7 @@ object ItemSlotRegistry : Initializable, KoinComponent {
     }
 
     /**
-     * 获取一个 `Equipment Slot` 对应的 [ItemSlot].
+     * 获取一个 [EquipmentSlot] 所对应的 [ItemSlot].
      * 如果不存在, 则返回 `null`.
      */
     fun get(slot: EquipmentSlot): ItemSlot? {
@@ -63,7 +63,7 @@ object ItemSlotRegistry : Initializable, KoinComponent {
     }
 
     /**
-     * 获取一个跟 `Slot Number` 对应的 [ItemSlot].
+     * 获取一个跟 [ItemSlot.slotIndex] 所对应的 [ItemSlot].
      * 如果不存在, 则返回 `null`.
      */
     fun get(slotIndex: Int): ItemSlot? {

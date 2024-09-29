@@ -1,0 +1,21 @@
+{
+  "description": {
+    "translate": "enchantment.wakame.fire_damage"
+  },
+  "supported_items": "#minecraft:enchantable/damage_applicable",
+  "slots": [
+    "mainhand",
+    "armor"
+  ],
+  "max_level": 5,
+  "min_cost": {
+    "base": 1,
+    "per_level_above_first": 11
+  },
+  "max_cost": {
+    "base": 21,
+    "per_level_above_first": 11
+  },
+  "anvil_cost": 4,
+  "weight": 10
+}

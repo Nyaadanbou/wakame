@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.attribute.AttributeEventHandler
+import cc.mewcraft.wakame.enchantment.EnchantmentEventHandler
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
@@ -26,6 +27,7 @@ import org.koin.core.component.inject
 class MultipleItemListener : KoinComponent, Listener {
     private val attackSpeedEventHandler: AttackSpeedEventHandler by inject()
     private val attributeEventHandler: AttributeEventHandler by inject()
+    private val enchantmentEventHandler: EnchantmentEventHandler by inject()
     private val kizamiEventHandler: KizamiEventHandler by inject()
     private val skillEventHandler: SkillEventHandler by inject()
 
@@ -38,6 +40,7 @@ class MultipleItemListener : KoinComponent, Listener {
 
         attackSpeedEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
         attributeEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
+        enchantmentEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
         kizamiEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
         skillEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
     }

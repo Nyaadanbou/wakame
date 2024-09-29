@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display.displayModule
 import cc.mewcraft.wakame.element.elementModule
+import cc.mewcraft.wakame.enchantment.enchantmentModule
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
 import cc.mewcraft.wakame.initializer.Initializer
@@ -69,6 +70,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 damageModule(),
                 displayModule(),
                 elementModule(),
+                enchantmentModule(),
                 entityModule(),
                 guiModule(),
                 initializerModule(),
