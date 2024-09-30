@@ -28,7 +28,6 @@ public class LootNekoItem extends LootPoolSingletonContainer {
     private LootNekoItem(Holder<Item> item, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
         super(weight, quality, conditions, functions);
         this.item = item;
-        //new DuckClass(); // TODO ClassNotFound
     }
 
     @Override
