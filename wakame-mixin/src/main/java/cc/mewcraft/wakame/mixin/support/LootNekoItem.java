@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
+import cc.mewcraft.wakame.DummyClass;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
@@ -38,6 +39,7 @@ public class LootNekoItem extends LootPoolSingletonContainer {
     @Override
     public void createItemStack(Consumer<ItemStack> lootConsumer, @NotNull LootContext context) {
         lootConsumer.accept(new ItemStack(this.item));
+        System.out.println(DummyClass.DUMMY + " is called from System Classloader!");
     }
 
     public static LootPoolSingletonContainer.Builder<?> lootTableItem(ItemLike drop) {

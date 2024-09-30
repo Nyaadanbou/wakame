@@ -1,3 +1,5 @@
+version = "0.0.1"
+
 val zipFileName = "wakame.zip"
 
 tasks {

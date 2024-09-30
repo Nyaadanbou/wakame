@@ -108,6 +108,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
 
     override suspend fun enable() {
         Initializer.start()
+        logger.warning("${DummyClass.DUMMY} is called from PaperPluginLoader!")
     }
 
     override suspend fun disable() {
