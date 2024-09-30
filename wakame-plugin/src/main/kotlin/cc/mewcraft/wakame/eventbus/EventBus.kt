@@ -7,7 +7,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import me.lucko.helper.terminable.Terminable
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
@@ -22,7 +21,7 @@ import kotlin.reflect.cast
  */
 class EventBus(
     private val scope: CoroutineScope,
-) : Terminable {
+) {
     // 必须使用 MutableSharedFlow, 这样发布的事件才可以被多次消费
     private val eventFlow = MutableSharedFlow<Any>(replay = 1)
 
@@ -58,9 +57,9 @@ class EventBus(
     }
 
     /**
-     * 关闭事件总线, 取消所有协程.
+     * 关闭事件总线, 取消所有等待中的协程.
      */
-    override fun close() {
+    fun close() {
         scope.cancel()
     }
 }
