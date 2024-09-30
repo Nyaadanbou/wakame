@@ -1,9 +1,0 @@
-# 忽略掉落表, 按照原版掉落设置
-respect_silk_touch: true
-
-# 方块破坏后, 应用的掉落表
-selects:
-  - pool: block:gold_ore_extras_1
-    rolls: 2
-  - pool: block:gold_ore_extras_2
-    rolls: 1
