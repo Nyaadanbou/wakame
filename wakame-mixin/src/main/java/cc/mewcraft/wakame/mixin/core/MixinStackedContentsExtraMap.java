@@ -26,6 +26,6 @@ public abstract class MixinStackedContentsExtraMap {
             )
     )
     public Object2IntOpenCustomHashMap<ItemStack> redirect(final Hash.Strategy<ItemStack> strategy) {
-        return new Object2IntOpenCustomHashMap<>(ItemStackStrategy.TYPE_AND_TAG);
+        return new Object2IntOpenCustomHashMap<>(ItemStackStrategy.CUSTOM_STRATEGY);
     }
 }

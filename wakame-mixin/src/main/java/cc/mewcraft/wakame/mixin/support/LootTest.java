@@ -17,6 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * 用于测试能不能新增加一个 {@link LootPoolEntryType}.
+ */
 public class LootTest extends LootPoolSingletonContainer {
     public static final MapCodec<LootTest> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(BuiltInRegistries.ITEM.holderByNameCodec().fieldOf("name").forGetter(entry -> entry.item))

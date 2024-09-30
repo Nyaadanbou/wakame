@@ -9,7 +9,6 @@
     "MixinIngredient",
     "MixinLootPoolEntries",
     "MixinRepairItemRecipe",
-    "MixinServerLevel",
     "MixinServerPlayer",
     "MixinStackedContentsExtraMap",
     "MixinTippedArrowRecipe"

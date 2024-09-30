@@ -19,6 +19,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * 新增的战利品条目类型, 用于直接生成萌芽物品.
+ * <p>
+ * 本实现相当于新增了一个 {@code Singleton Entry}. 具体请参考 <a href="https://minecraft.wiki/w/Loot_table#Singleton_entry">Loot table</a>.
+ */
 public class LootNekoItem extends LootPoolSingletonContainer {
     public static final MapCodec<LootNekoItem> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(ResourceLocation.CODEC.fieldOf("id").forGetter(entry -> entry.id))
