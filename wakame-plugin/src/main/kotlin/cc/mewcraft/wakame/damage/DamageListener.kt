@@ -43,11 +43,10 @@ object DamageListener : Listener, KoinComponent {
         val damageMetadata = DamageManager.generateDamageMetadata(event) ?: return
         val defenseMetadata = DamageManager.generateDefenseMetadata(event)
 
-        val nekoEntityDamageEvent = NekoEntityDamageEvent(event.damageSource, damageMetadata, defenseMetadata, event)
-        if (!nekoEntityDamageEvent.callEvent()) {
-            event.isCancelled = true // 同时取消 EntityDamageEvent
-            return
-        }
+        val nekoEntityDamageEvent = NekoEntityDamageEvent(damageMetadata, defenseMetadata, event)
+        // neko伤害事件被取消, 则直接返回
+        // neko伤害事件被取消时，其内部的Bukkit伤害事件必然是取消的状态
+        if (!nekoEntityDamageEvent.callEvent()) return
 
         // 修改最终伤害
         event.damage = nekoEntityDamageEvent.getFinalDamage()
@@ -75,7 +74,7 @@ object DamageListener : Listener, KoinComponent {
                             .appendNewline()
                             .append(text("伤害未计算防御阶段"))
                             .appendNewline()
-                            .append(text("点击复制实体的 UUID"))
+                            .append(text("点击复制实体 UUID"))
                     )
                 }
         ).clickEvent(

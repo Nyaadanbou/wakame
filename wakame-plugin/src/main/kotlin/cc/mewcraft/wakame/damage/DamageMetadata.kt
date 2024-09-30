@@ -37,14 +37,34 @@ sealed interface DamageMetadata {
     val damageValue: Double
 
     /**
-     * 这次伤害暴击时暴击倍率的值. 小于1的值表示负暴击.
+     * 这次伤害暴击时暴击倍率的值.
      */
     val criticalPower: Double
 
     /**
-     * 这次伤害是否暴击.
+     * 这次伤害的暴击状态.
      */
-    val isCritical: Boolean
+    val criticalState: CriticalState
+}
+
+/**
+ * 暴击状态.
+ */
+enum class CriticalState {
+    /**
+     * 正暴击.
+     */
+    POSITIVE,
+
+    /**
+     * 负暴击.
+     */
+    NEGATIVE,
+
+    /**
+     * 无暴击.
+     */
+    NONE
 }
 
 private val logger: Logger by Injector.inject()
@@ -80,7 +100,7 @@ class VanillaDamageMetadata(
     }
     override val damageTags: DamageTags = DamageTags()
     override val criticalPower: Double = 1.0
-    override val isCritical: Boolean = false
+    override val criticalState: CriticalState = CriticalState.NONE
 }
 
 /**
@@ -99,20 +119,37 @@ class PlayerMeleeAttackMetadata(
     val user: User<Player>
         get() = weakUser.get() ?: throw IllegalStateException("User<Player> reference no longer exists!")
 
-    override val damageBundle: DamageBundle = buildDamageBundle()
-    override val damageValue: Double = damageBundle.damageSum
-    override val criticalPower: Double =
-        if (user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE) < 0) {
-            user.attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+    override val damageBundle: DamageBundle
+    override val damageValue: Double
+    override val criticalPower: Double
+    override val criticalState: CriticalState
+
+    init {
+        val attributeMap = user.attributeMap
+        this.damageBundle = buildDamageBundle()
+        this.damageValue = damageBundle.damageSum
+        val chance = attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+        if (chance < 0) {
+            criticalPower = attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance.absoluteValue) {
+                this.criticalState = CriticalState.NEGATIVE
+            } else {
+                this.criticalState = CriticalState.NONE
+            }
         } else {
-            user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+            criticalPower = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance) {
+                this.criticalState = CriticalState.POSITIVE
+            } else {
+                this.criticalState = CriticalState.NONE
+            }
         }
-    override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE).absoluteValue
+    }
 
     private fun buildDamageBundle(): DamageBundle {
         val attributeMap = user.attributeMap
         return if (damageTags.contains(DamageTag.EXTRA) && damageTags.contains(DamageTag.SWORD)) {
-            // 是横扫范围伤害
+            // 是原版剑横扫攻击产生的范围伤害
             damageBundle(attributeMap) {
                 every {
                     standard()
@@ -143,25 +180,36 @@ class EntityMeleeAttackMetadata(
         get() = weakEntity.get() ?: throw IllegalStateException("LivingEntity reference no longer exists!")
 
     override val damageBundle: DamageBundle
-    override val damageTags: DamageTags = DamageTags()
+    override val damageTags: DamageTags
     override val damageValue: Double
     override val criticalPower: Double
-    override val isCritical: Boolean
+    override val criticalState: CriticalState
 
     init {
         val attributeMap = EntityAttributeMapAccess.get(entity).getOrElse {
             error("Failed to initialize EntityMeleeAttackMetadata because the entity does not have an attribute map: ${it.message}")
         }
         this.damageBundle = damageBundle(attributeMap) { every { standard() } }
+        this.damageTags = DamageTags()
         this.damageValue = this.damageBundle.damageSum
-        this.criticalPower =
-            if (attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE) < 0) {
-                attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+        val chance = attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+        if (chance < 0) {
+            criticalPower = attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance.absoluteValue) {
+                this.criticalState = CriticalState.NEGATIVE
             } else {
-                attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+                this.criticalState = CriticalState.NONE
             }
-        this.isCritical = Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE).absoluteValue
+        } else {
+            criticalPower = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance) {
+                this.criticalState = CriticalState.POSITIVE
+            } else {
+                this.criticalState = CriticalState.NONE
+            }
+        }
     }
+
 }
 
 sealed interface ProjectileDamageMetadata : DamageMetadata {
@@ -194,15 +242,32 @@ private constructor(
     val user: User<Player>
         get() = weakUser.get() ?: throw IllegalStateException("User<Player> reference no longer exists!")
 
-    override val damageBundle: DamageBundle = buildDamageBundle()
-    override val damageValue: Double = damageBundle.damageSum
-    override val criticalPower: Double =
-        if (user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE) < 0) {
-            user.attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+    override val damageBundle: DamageBundle
+    override val damageValue: Double
+    override val criticalPower: Double
+    override val criticalState: CriticalState
+
+    init {
+        val attributeMap = user.attributeMap
+        this.damageBundle = buildDamageBundle()
+        this.damageValue = this.damageBundle.damageSum
+        val chance = attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+        if (chance < 0) {
+            criticalPower = attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance.absoluteValue) {
+                this.criticalState = CriticalState.NEGATIVE
+            } else {
+                this.criticalState = CriticalState.NONE
+            }
         } else {
-            user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+            criticalPower = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance) {
+                this.criticalState = CriticalState.POSITIVE
+            } else {
+                this.criticalState = CriticalState.NONE
+            }
         }
-    override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE).absoluteValue
+    }
 
     private fun buildDefaultBowArrowDamageBundle(): DamageBundle {
         return damageBundle(user.attributeMap) {
@@ -262,15 +327,32 @@ class PlayerTridentDamageMetadata(
     val user: User<Player>
         get() = weakUser.get() ?: throw IllegalStateException("User<Player> reference no longer exists!")
 
-    override val damageBundle: DamageBundle = damageBundle(user.attributeMap) { every { standard() } }
-    override val damageValue: Double = damageBundle.damageSum
-    override val criticalPower: Double =
-        if (user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE) < 0) {
-            user.attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+    override val damageBundle: DamageBundle
+    override val damageValue: Double
+    override val criticalPower: Double
+    override val criticalState: CriticalState
+
+    init {
+        val attributeMap = user.attributeMap
+        this.damageBundle = damageBundle(attributeMap) { every { standard() } }
+        this.damageValue = this.damageBundle.damageSum
+        val chance = attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+        if (chance < 0) {
+            criticalPower = attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance.absoluteValue) {
+                this.criticalState = CriticalState.NEGATIVE
+            } else {
+                this.criticalState = CriticalState.NONE
+            }
         } else {
-            user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+            criticalPower = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance) {
+                this.criticalState = CriticalState.POSITIVE
+            } else {
+                this.criticalState = CriticalState.NONE
+            }
         }
-    override val isCritical: Boolean = Random.nextDouble() < user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE).absoluteValue
+    }
 }
 
 /**
@@ -291,24 +373,34 @@ class EntityProjectileDamageMetadata(
         get() = weakEntity.get() ?: throw IllegalStateException("LivingEntity reference no longer exists!")
 
     override val damageBundle: DamageBundle
-    override val damageTags: DamageTags = DamageTags()
+    override val damageTags: DamageTags
     override val damageValue: Double
     override val criticalPower: Double
-    override val isCritical: Boolean
+    override val criticalState: CriticalState
 
     init {
         val attributeMap = EntityAttributeMapAccess.get(entity).getOrElse {
             error("Failed to initialize EntityProjectileDamageMetadata because the entity does not have an attribute map: ${it.message}")
         }
         this.damageBundle = damageBundle(attributeMap) { every { standard() } }
+        this.damageTags = DamageTags()
         this.damageValue = this.damageBundle.damageSum
-        this.criticalPower =
-            if (attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE) < 0) {
-                attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+        val chance = attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE)
+        if (chance < 0) {
+            criticalPower = attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance.absoluteValue) {
+                this.criticalState = CriticalState.NEGATIVE
             } else {
-                attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+                this.criticalState = CriticalState.NONE
             }
-        this.isCritical = Random.nextDouble() < attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE).absoluteValue
+        } else {
+            criticalPower = attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER)
+            if (Random.nextDouble() < chance) {
+                this.criticalState = CriticalState.POSITIVE
+            } else {
+                this.criticalState = CriticalState.NONE
+            }
+        }
     }
 }
 
@@ -327,7 +419,7 @@ class DefaultProjectileDamageMetadata(
     override val damageTags: DamageTags = DamageTags()
     override val damageValue: Double = damageBundle.damageSum
     override val criticalPower: Double = 1.0
-    override val isCritical: Boolean = false
+    override val criticalState: CriticalState = CriticalState.NONE
 
     private fun buildDamageBundle(): DamageBundle {
         when (projectile) {
@@ -345,7 +437,7 @@ class DefaultProjectileDamageMetadata(
                 return buildTridentDamageBundle()
             }
 
-            else ->{
+            else -> {
                 throw IllegalArgumentException("AbstractArrow is not Arrow, SpectralArrow, or Trident, so what is it?")
             }
         }
@@ -433,7 +525,7 @@ class DefaultProjectileDamageMetadata(
  */
 class CustomDamageMetadata(
     override val criticalPower: Double,
-    override val isCritical: Boolean,
+    override val criticalState: CriticalState,
     val knockback: Boolean,
     override val damageBundle: DamageBundle,
     override val damageTags: DamageTags,

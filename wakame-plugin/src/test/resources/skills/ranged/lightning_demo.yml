@@ -10,7 +10,7 @@ target_type: ENTITY
 damage_metadata:
   # 暴击倍率
   critical_power: 2.0
-  is_critical: false
+  critical_state: positive
   # 是否击退
   knockback: true
   # 伤害值

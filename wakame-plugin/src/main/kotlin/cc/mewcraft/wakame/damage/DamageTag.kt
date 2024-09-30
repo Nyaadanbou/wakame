@@ -10,6 +10,12 @@ class DamageTags(
 ) {
     private val tagSet: MutableSet<DamageTag> = mutableSetOf()
 
+    companion object {
+        private val EMPTY = DamageTags()
+
+        fun empty(): DamageTags = EMPTY
+    }
+
     init {
         tagSet.addAll(tags)
     }

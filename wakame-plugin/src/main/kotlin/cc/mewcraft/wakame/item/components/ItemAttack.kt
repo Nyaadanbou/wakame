@@ -64,7 +64,7 @@ data class ItemAttack(
         override val type: TypeToken<Template> = typeTokenOf()
 
         override fun decode(node: ConfigurationNode): Template {
-            val attackType = node.node("attack_type").krequire<AttackType>()
+            val attackType = node.krequire<AttackType>()
             return Template(attackType)
         }
 

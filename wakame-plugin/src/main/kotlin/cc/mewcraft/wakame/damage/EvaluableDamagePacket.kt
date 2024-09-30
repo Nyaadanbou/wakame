@@ -6,23 +6,27 @@ import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
+import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import team.unnamed.mocha.MochaEngine
 import java.lang.reflect.Type
 
 data class EvaluableDamageMetadata(
     private val criticalPower: Evaluable<*>,
-    private val isCritical: Evaluable<*>,
+    private val criticalState: CriticalState,
     private val knockback: Evaluable<*>,
-    private val damagePackets: List<EvaluableDamagePacket>
+    private val damagePackets: List<EvaluableDamagePacket>,
+    private val damageTags: DamageTags,
 ) {
     companion object {
         fun default(): EvaluableDamageMetadata {
             return EvaluableDamageMetadata(
                 criticalPower = Evaluable.parseNumber(1.0),
-                isCritical = Evaluable.parseNumber(0.0),
+                criticalState = CriticalState.NONE,
                 knockback = Evaluable.parseNumber(0.0),
-                damagePackets = emptyList()
+                damagePackets = listOf(DefaultEvaluableDamagePacket),
+                damageTags = DamageTags.empty()
             )
         }
     }
@@ -30,23 +34,41 @@ data class EvaluableDamageMetadata(
     fun evaluate(engine: MochaEngine<*>): CustomDamageMetadata {
         return CustomDamageMetadata(
             criticalPower = criticalPower.evaluate(engine),
-            isCritical = isCritical.evaluate(engine) > 0.0,
+            criticalState = criticalState,
             knockback = knockback.evaluate(engine) > 0.0,
             damageBundle = damageBundle { damagePackets.forEach { single(it.evaluate(engine)) } },
-            damageTags = DamageTags()//TODO 自定义伤害的伤害标签集的evaluate
+            damageTags = damageTags
         )
     }
 }
 
-data class EvaluableDamagePacket(
+interface EvaluableDamagePacket {
+    fun evaluate(engine: MochaEngine<*>): DamagePacket
+}
+
+private data object DefaultEvaluableDamagePacket: EvaluableDamagePacket {
+    private val DEFAULT_PACKET by lazy {
+        damagePacket(ElementRegistry.DEFAULT) {
+            min(1.0)
+            max(1.0)
+            rate(1.0)
+            defensePenetration(.0)
+            defensePenetrationRate(.0)
+        }
+    }
+
+    override fun evaluate(engine: MochaEngine<*>): DamagePacket = DEFAULT_PACKET
+}
+
+private data class EvaluableDamagePacketImpl(
     val element: Element,
     val min: Evaluable<*>,
     val max: Evaluable<*>,
     val rate: Evaluable<*>,
     val defensePenetration: Evaluable<*>,
     val defensePenetrationRate: Evaluable<*>,
-) {
-    fun evaluate(engine: MochaEngine<*>): DamagePacket {
+): EvaluableDamagePacket {
+    override fun evaluate(engine: MochaEngine<*>): DamagePacket {
         return damagePacket(element) {
             min(min.evaluate(engine))
             max(max.evaluate(engine))
@@ -59,11 +81,15 @@ data class EvaluableDamagePacket(
 
 internal object EvaluableDamageBundleSerializer : SchemaSerializer<EvaluableDamageMetadata> {
     override fun deserialize(type: Type, node: ConfigurationNode): EvaluableDamageMetadata {
+        val damageTagList = node.node("damage_tags").getList<DamageTag>(emptyList())
+        val damageTags = DamageTags(damageTagList)
+
         return EvaluableDamageMetadata(
             criticalPower = node.node("critical_power").krequire(),
-            isCritical = node.node("is_critical").krequire(),
+            criticalState = node.node("critical_state").get<CriticalState>(CriticalState.NONE),
             knockback = node.node("knockback").krequire(),
-            damagePackets = node.node("damage_packets").childrenList().map { it.krequire<EvaluableDamagePacket>() }
+            damagePackets = node.node("damage_packets").childrenList().map { it.krequire<EvaluableDamagePacket>() },
+            damageTags = damageTags
         )
     }
 }
@@ -71,7 +97,7 @@ internal object EvaluableDamageBundleSerializer : SchemaSerializer<EvaluableDama
 internal object EvaluableDamagePacketSerializer : SchemaSerializer<EvaluableDamagePacket> {
     override fun deserialize(type: Type, node: ConfigurationNode): EvaluableDamagePacket {
         val element = node.key()?.toString()?.let { ElementRegistry.INSTANCES.find(it) } ?: throw SerializationException(node, type, "Element ${node.key()} not found")
-        return EvaluableDamagePacket(
+        return EvaluableDamagePacketImpl(
             element = element,
             min = node.node("min").krequire(),
             max = node.node("max").krequire(),

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.event
 
+import cc.mewcraft.wakame.damage.CriticalState
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DefenseMetadata
 import cc.mewcraft.wakame.element.Element
@@ -15,12 +16,10 @@ import org.koin.core.component.get
 import org.slf4j.Logger
 
 class NekoEntityDamageEvent(
-    val damageSource: DamageSource,//TODO 移除
     val damageMetadata: DamageMetadata,
     val defenseMetadata: DefenseMetadata,
-    val bukkitEvent: EntityDamageEvent
+    private val bukkitEvent: EntityDamageEvent
 ) : Event(), Cancellable, KoinComponent {
-    private var cancel: Boolean = false
 
     /**
      * 记录了每种伤害在计算防御后的最终数值.
@@ -36,7 +35,9 @@ class NekoEntityDamageEvent(
             damagePackets.forEach { packet ->
                 val element = packet.element
                 val damage = defenseMetadata.calculateFinalDamage(element, damageMetadata)
-                finalDamagePerElement[element] = damage
+                if (damage > 0) {
+                    finalDamagePerElement[element] = damage
+                }
             }
         }
     }
@@ -48,16 +49,19 @@ class NekoEntityDamageEvent(
         get() = bukkitEvent.entity
 
     /**
-     * 查询本次事件中是否含有指定元素类型的伤害.
+     * 伤害来源.
+     * 可能是坐标也可能是实体.
      */
-    fun hasElement(element: Element): Boolean {
-        return damageMetadata.damageBundle.get(element) != null
-    }
+    val damageSource: DamageSource
+        get() = bukkitEvent.damageSource
 
     /**
-     * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 0.0.
+     * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 null.
      */
-    fun getFinalDamage(element: Element): Double {
+    fun getFinalDamage(element: Element): Double? {
+        if (!finalDamagePerElement.containsKey(element)) {
+            return null
+        }
         return finalDamagePerElement.getDouble(element)
     }
 
@@ -70,39 +74,30 @@ class NekoEntityDamageEvent(
 
     /**
      * 获取一个包含了每种元素的最终伤害值的映射.
-     * 注意, 返回的映射包含数值为零的伤害.
-     * TODO 有关0伤害的处理
      */
-    fun getFinalDamageMap(excludeZeroDamage: Boolean = false): Map<Element, Double> {
-        return if (excludeZeroDamage) {
-            finalDamagePerElement.filter { it.value > 0.0 }
-        } else {
-            finalDamagePerElement
-        }
+    fun getFinalDamageMap(): Map<Element, Double> {
+        return finalDamagePerElement
     }
 
     /**
-     * 获取本次伤害是否为正暴击, 未暴击将返回 `false`.
-     * 暴击了但伤害未变化 (即暴击倍率为 `1.0` 时) 算未暴击.
+     * 获取本次伤害的暴击状态.
      */
-    fun isPositiveCriticalStrike(): Boolean {
-        return damageMetadata.isCritical && damageMetadata.criticalPower > 1
+    fun getCriticalState(): CriticalState {
+        return damageMetadata.criticalState
     }
 
     /**
-     * 获取本次伤害是否为负暴击, 未暴击将返回 `false`.
-     * 暴击了但伤害未变化 (即暴击倍率为 `1.0` 时) 算未暴击.
+     * 获取本次伤害的暴击倍率.
      */
-    fun isNegativeCriticalStrike(): Boolean {
-        return damageMetadata.isCritical && damageMetadata.criticalPower < 1
+    fun getCriticalPower(): Double {
+        return damageMetadata.criticalPower
     }
 
     override fun isCancelled(): Boolean {
-        return cancel || bukkitEvent.isCancelled
+        return bukkitEvent.isCancelled
     }
 
     override fun setCancelled(cancel: Boolean) {
-        this.cancel = cancel
         bukkitEvent.isCancelled = cancel
     }
 

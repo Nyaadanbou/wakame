@@ -22,10 +22,10 @@
 
 (这个列表可能会随着插件的更新而变化)
 
+- `attack`
 - `castable`
 - `glowable`
 - `arrow`
-- `bow`
 - `level` (只能使用固定的等级)
 - `rarity` (只能使用固定的稀有度)
 - `elements` (必须使生成结果固定, 不要使生成结果随机)

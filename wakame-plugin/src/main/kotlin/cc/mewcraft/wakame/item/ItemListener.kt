@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
@@ -66,12 +67,12 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
     }
 
     @EventHandler
-    fun on(event: EntityDamageByEntityEvent) {
-        val damager = event.damager as? Player ?: return
-        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+    fun onDamageEntity(event: NekoEntityDamageEvent) {
+        val player = event.damageSource.causingEntity as? Player ?: return
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
-            behavior.handleAttackEntity(damager, item, event.entity, event)
+            behavior.handleAttackEntity(player, item, event.damagee, event)
         }
     }
 

@@ -67,7 +67,7 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.GLOWABLE)
 
         generate(ItemTemplateTypes.ARROW)
-        generate(ItemTemplateTypes.BOW)
+        generate(ItemTemplateTypes.ATTACK)
 
         generate(ItemTemplateTypes.LEVEL)
         generate(ItemTemplateTypes.RARITY)
@@ -170,6 +170,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.ITEM_NAME)
         generate(ItemTemplateTypes.LORE)
 
+        generate(ItemTemplateTypes.ATTACK)
         generate(ItemTemplateTypes.ATTACK_SPEED)
         generate(ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
         generate(ItemTemplateTypes.FIRE_RESISTANT)
