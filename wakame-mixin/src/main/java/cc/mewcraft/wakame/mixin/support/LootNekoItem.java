@@ -69,8 +69,8 @@ public class LootNekoItem extends LootPoolSingletonContainer {
         }
 
         var lastDamagePlayer = context.getParamOrNull(LootContextParams.LAST_DAMAGE_PLAYER);
-        if (lastDamagePlayer != null) {
-            return (ServerPlayer) lastDamagePlayer;
+        if (lastDamagePlayer instanceof ServerPlayer serverPlayer) {
+            return serverPlayer;
         }
 
         var attackingEntity = context.getParamOrNull(LootContextParams.ATTACKING_ENTITY);
