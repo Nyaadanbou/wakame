@@ -1,18 +1,18 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.Nekoo;
 import cc.mewcraft.wakame.NekooProvider;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,13 +44,13 @@ public class LootNekoItem extends LootPoolSingletonContainer {
 
     @Override
     public void createItemStack(Consumer<ItemStack> lootConsumer, @NotNull LootContext context) {
-        Nekoo nekoo = NekooProvider.get();
+        var nekoo = NekooProvider.get();
 
-        String namespace = id.getNamespace();
-        String path = id.getPath();
-        Player player = getLootingPlayer(context);
+        var namespace = id.getNamespace();
+        var path = id.getPath();
+        var player = getLootingPlayer(context);
 
-        var bukkitItemStack = nekoo.createItemStack(namespace, path, player);
+        var bukkitItemStack = nekoo.createItemStack(namespace, path, player.getBukkitEntity());
         var nmsItemStack = CraftItemStack.unwrap(bukkitItemStack);
 
         lootConsumer.accept(nmsItemStack);
@@ -62,8 +62,22 @@ public class LootNekoItem extends LootPoolSingletonContainer {
      * @param context 战利品的上下文
      * @return 应该得到战利品的玩家
      */
-    private @Nullable Player getLootingPlayer(LootContext context) {
-        // TODO 分析所有可能的情况, 从 loot context 中提取出应该得到该战利品的 player
+    private @Nullable ServerPlayer getLootingPlayer(LootContext context) {
+        var thisEntity = context.getParamOrNull(LootContextParams.THIS_ENTITY);
+        if (thisEntity instanceof ServerPlayer serverPlayer) {
+            return serverPlayer;
+        }
+
+        var lastDamagePlayer = context.getParamOrNull(LootContextParams.LAST_DAMAGE_PLAYER);
+        if (lastDamagePlayer != null) {
+            return (ServerPlayer) lastDamagePlayer;
+        }
+
+        var attackingEntity = context.getParamOrNull(LootContextParams.ATTACKING_ENTITY);
+        if (attackingEntity instanceof ServerPlayer serverPlayer) {
+            return serverPlayer;
+        }
+
         return null;
     }
 }
