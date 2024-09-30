@@ -1,34 +1,35 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.DummyClass;
+import cc.mewcraft.wakame.Nekoo;
+import cc.mewcraft.wakame.NekooProvider;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.Item;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 public class LootNekoItem extends LootPoolSingletonContainer {
     public static final MapCodec<LootNekoItem> CODEC = RecordCodecBuilder.mapCodec(
-            instance -> instance.group(BuiltInRegistries.ITEM.holderByNameCodec().fieldOf("name").forGetter(entry -> entry.item))
+            instance -> instance.group(ResourceLocation.CODEC.fieldOf("id").forGetter(entry -> entry.id))
                     .and(singletonFields(instance))
                     .apply(instance, LootNekoItem::new)
     );
-    private final Holder<Item> item;
+    private final ResourceLocation id;
 
-    private LootNekoItem(Holder<Item> item, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
+    private LootNekoItem(ResourceLocation id, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
         super(weight, quality, conditions, functions);
-        this.item = item;
+        this.id = id;
     }
 
     @Override
@@ -38,13 +39,26 @@ public class LootNekoItem extends LootPoolSingletonContainer {
 
     @Override
     public void createItemStack(Consumer<ItemStack> lootConsumer, @NotNull LootContext context) {
-        lootConsumer.accept(new ItemStack(this.item));
-        System.out.println(DummyClass.DUMMY + " is called from System Classloader!");
+        Nekoo nekoo = NekooProvider.get();
+
+        String namespace = id.getNamespace();
+        String path = id.getPath();
+        Player player = getLootingPlayer(context);
+
+        var bukkitItemStack = nekoo.createItemStack(namespace, path, player);
+        var nmsItemStack = CraftItemStack.unwrap(bukkitItemStack);
+
+        lootConsumer.accept(nmsItemStack);
     }
 
-    public static LootPoolSingletonContainer.Builder<?> lootTableItem(ItemLike drop) {
-        return simpleBuilder(
-                (weight, quality, conditions, functions) -> new LootNekoItem(drop.asItem().builtInRegistryHolder(), weight, quality, conditions, functions)
-        );
+    /**
+     * 从 {@link LootContext} 中提取出应该得到该战利品的玩家.
+     *
+     * @param context 战利品的上下文
+     * @return 应该得到战利品的玩家
+     */
+    private @Nullable Player getLootingPlayer(LootContext context) {
+        // TODO 分析所有可能的情况, 从 loot context 中提取出应该得到该战利品的 player
+        return null;
     }
 }

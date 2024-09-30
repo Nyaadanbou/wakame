@@ -8,6 +8,7 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 
 public class LootPoolEntryInitializer {
+    public static final LootPoolEntryType TEST = register("test", LootTest.CODEC);
     public static final LootPoolEntryType NEKO_ITEM = register("neko_item", LootNekoItem.CODEC);
 
     public static void bootstrap() {

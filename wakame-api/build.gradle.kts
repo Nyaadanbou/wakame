@@ -1,5 +1,5 @@
 plugins {
-    id("neko-java")
+    id("neko-kotlin")
     id("nyaadanbou-conventions.repositories")
 }
 

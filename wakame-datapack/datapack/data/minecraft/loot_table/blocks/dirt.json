@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:neko_item",
-          "name": "minecraft:dirt"
+          "id": "material:gold_bearing_dirt"
         }
       ],
       "rolls": 1.0
