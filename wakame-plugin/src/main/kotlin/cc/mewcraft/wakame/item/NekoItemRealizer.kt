@@ -56,7 +56,7 @@ interface NekoItemRealizer {
 internal object VanillaNekoItemRealizer : NekoItemRealizer {
     override fun realize(prototype: NekoItem): VanillaNekoStack {
         // 没 trigger 的 ctx
-        val context = GenerationContext(GenerationTrigger.nop(), prototype.key, 0)
+        val context = GenerationContext(GenerationTrigger.nop(), prototype.id, 0)
         // 获取 物品组件 的构建器
         val componentMapBuilder = ItemComponentMap.builder()
 
@@ -87,7 +87,7 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         val immutableComponents = ItemComponentMap.unmodifiable(components)
 
         val vanillaNekoStack = VanillaNekoStack(
-            key = prototype.key,
+            id = prototype.id,
             prototype = prototype,
             components = immutableComponents
         )
@@ -125,7 +125,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
     }
 
     private fun realizeByTrigger(item: NekoItem, trigger: GenerationTrigger): NekoStack {
-        val target = item.key
+        val target = item.id
         val context = GenerationContext(trigger, target)
         val nekoStack = realizeByContext(item, context)
         return nekoStack
@@ -151,7 +151,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         // 移除既定的 原版组件
         prototype.removeComponents.applyTo(itemStack)
         // 设置物品的 id 和 variant
-        NekoStackSupport.setKey(itemStack, prototype.key)
+        NekoStackSupport.setKey(itemStack, prototype.id)
         NekoStackSupport.setVariant(itemStack, 0)
 
         // 获取 物品组件 的容器

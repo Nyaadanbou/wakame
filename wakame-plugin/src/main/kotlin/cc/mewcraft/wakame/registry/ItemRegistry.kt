@@ -53,7 +53,7 @@ object ItemRegistry : KoinComponent, Initializable {
      * All namespaces of loaded items.
      */
     val NAMESPACES: List<String> by ReloadableProperty {
-        CUSTOM.values.map { it.key.namespace() }.distinct().sorted()
+        CUSTOM.values.map { it.id.namespace() }.distinct().sorted()
     }
 
     /**
@@ -62,8 +62,8 @@ object ItemRegistry : KoinComponent, Initializable {
     val PATHS_BY_NAMESPACE: Map<String, List<String>> by ReloadableProperty {
         val ret = hashMapOf<String, MutableList<String>>()
         CUSTOM.values.forEach {
-            val namespace = it.key.namespace()
-            val path = it.key.value()
+            val namespace = it.id.namespace()
+            val path = it.id.value()
             ret.getOrPut(namespace, ::ArrayList).add(path)
         }
         ret

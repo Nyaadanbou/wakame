@@ -242,7 +242,7 @@ interface ItemCells : Examinable, TooltipProvider.Cluster, Iterable<Map.Entry<St
             for ((id, cell) in this) {
                 val core = cell.getCoreAs(CoreTypes.ATTRIBUTE) ?: continue
                 // 拼接物品 key 和词条栏 id 作为属性修饰符的 id
-                val identity = context.key.value { "$it/$id" }
+                val identity = context.id.value { "$it/$id" }
                 val attributeModifiers = core.provideAttributeModifiers(identity)
                 ret.putAll(attributeModifiers.entries)
             }

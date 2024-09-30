@@ -221,10 +221,10 @@ internal class SimpleModdingSession(
             val clone = value?.clone()
             _value = clone
 
-            logger.info("$PREFIX Session's source item updated: ${_value?.key} -> ${value?.key}")
+            logger.info("$PREFIX Session's source item updated: ${_value?.id} -> ${value?.id}")
 
             val sourceCells = clone?.components?.get(ItemComponentTypes.CELLS)
-            val sourceItemRule = clone?.let { table.itemRules[it.key] }
+            val sourceItemRule = clone?.let { table.itemRules[it.id] }
 
             if (
                 clone == null // 源物品不存在

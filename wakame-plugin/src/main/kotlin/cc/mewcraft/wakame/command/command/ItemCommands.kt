@@ -57,7 +57,7 @@ object ItemCommands : CommandFactory<CommandSender> {
 
                         withContext(Dispatchers.BukkitMain) {
                             player.inventory.addItem(*itemStacks)
-                            player.sendPlainMessage("You received $amount item(s): ${item.key}")
+                            player.sendPlainMessage("You received $amount item(s): ${item.id}")
                         }
                     }
                 }

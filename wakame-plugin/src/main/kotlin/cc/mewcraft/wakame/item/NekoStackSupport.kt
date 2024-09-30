@@ -225,7 +225,7 @@ private class CustomNekoStack(
     override val path: String
         get() = NekoStackSupport.getPathOrThrow(unsafeNyaTag)
 
-    override val key: Key
+    override val id: Key
         get() = NekoStackSupport.getKeyOrThrow(unsafeNyaTag)
 
     override var variant: Int
@@ -256,7 +256,7 @@ private class CustomNekoStack(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key.asString()),
+        ExaminableProperty.of("id", id.asString()),
         ExaminableProperty.of("variant", variant),
     )
 
@@ -282,7 +282,7 @@ private class CustomNekoStack(
  * 该实现是不可变的, 也就是说不能修改其中的任何属性.
  */
 internal class VanillaNekoStack(
-    override val key: Key,
+    override val id: Key,
     override val prototype: NekoItem,
     override val components: ItemComponentMap,
 ) : NekoStack {
@@ -292,8 +292,8 @@ internal class VanillaNekoStack(
     override val itemStack: ItemStack
         get() = unsupported()
 
-    override val namespace: String = key.namespace()
-    override val path: String = key.value()
+    override val namespace: String = id.namespace()
+    override val path: String = id.value()
 
     override var variant: Int = 0 // 变体永远都是 0
     override val slotGroup: ItemSlotGroup = prototype.slotGroup
@@ -310,7 +310,7 @@ internal class VanillaNekoStack(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> =
         Stream.of(
-            ExaminableProperty.of("key", key.asString()),
+            ExaminableProperty.of("id", id.asString()),
             ExaminableProperty.of("variant", variant),
         )
 

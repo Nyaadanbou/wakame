@@ -69,7 +69,7 @@ internal class ReforgeOperation(
         val output = sourceItem.clone()
 
         // 获取必要的物品组件
-        val itemId = sourceItem.key
+        val itemId = sourceItem.id
         val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: return Result.failure("<gray>物品不可重造".mini)
         val itemCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return Result.failure("<gray>物品不可重造".mini)
 

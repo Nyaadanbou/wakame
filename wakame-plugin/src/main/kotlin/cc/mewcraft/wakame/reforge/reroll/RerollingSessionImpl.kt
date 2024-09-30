@@ -378,7 +378,7 @@ internal object SelectionMap : KoinComponent {
         // 获取源物品
         // 如果源物品不存在, 则直接返回空容器
         val sourceItem = session.sourceItem ?: return empty(session)
-        val sourceItemId = sourceItem.key
+        val sourceItemId = sourceItem.id
 
         // 获取源物品的词条栏模板
         // 如果源物品没有词条栏*模板*, 则判定整个物品不支持重造

@@ -20,7 +20,7 @@ internal class PacketItemRenderer : KoinComponent, ItemRenderer<PacketNekoStack>
         val lore = loreLineFlatter.flatten(loreLineList) // flatten the lore lines
         item.lore(lore)
 
-        val customModelData = itemModelDataLookup[item.key, item.variant]
+        val customModelData = itemModelDataLookup[item.id, item.variant]
         item.customModelData(customModelData)
 
         item.erase() // 为了麦若, 去掉 `minecraft:custom_data`

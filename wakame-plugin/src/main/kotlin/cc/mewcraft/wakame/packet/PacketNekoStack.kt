@@ -176,7 +176,7 @@ private class PacketCustomNekoStack(
     override val path: String
         get() = NekoStackSupport.getPathOrThrow(nyaTag)
 
-    override val key: Key
+    override val id: Key
         get() = NekoStackSupport.getKeyOrThrow(nyaTag)
 
     override var variant: Int
@@ -227,7 +227,7 @@ private class PacketCustomNekoStack(
 
 private class PacketVanillaNekoStack(
     override val packetItemStack: ItemStack,
-    override val key: Key,
+    override val id: Key,
     override val prototype: NekoItem,
     override val components: ItemComponentMap,
 ) : PacketNekoStack {
@@ -241,10 +241,10 @@ private class PacketVanillaNekoStack(
         get() = abortReads()
 
     override val namespace: String
-        get() = key.namespace()
+        get() = id.namespace()
 
     override val path: String
-        get() = key.value()
+        get() = id.value()
 
     override var variant: Int
         get() = 0

@@ -6,9 +6,9 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
+import net.kyori.examination.string.StringExaminer
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.stream.Stream
@@ -25,11 +25,11 @@ class MockNekoStack(
     override val itemStack: ItemStack
         get() = throw NotImplementedError("Not implemented")
 
-    override val namespace: String = prototype.key.namespace()
+    override val namespace: String = prototype.id.namespace()
 
-    override val path: String = prototype.key.value()
+    override val path: String = prototype.id.value()
 
-    override val key: Key = prototype.key
+    override val id: Key = prototype.id
 
     override var variant: Int = 0
 
@@ -51,11 +51,10 @@ class MockNekoStack(
         Unit
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key.asString()),
+        ExaminableProperty.of("key", id.asString()),
         ExaminableProperty.of("components", components),
         ExaminableProperty.of("behaviors", behaviors),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String = StringExaminer.simpleEscaping().examine(this)
 }
