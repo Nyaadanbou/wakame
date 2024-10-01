@@ -34,7 +34,7 @@ internal class NekooApiProvider : Nekoo, KoinComponent {
     ): ItemStack {
         val nekoItem = ItemRegistry.CUSTOM.find(Key.key(namespace, path))
         if (nekoItem == null) {
-            return createErrorItem()
+            return ERROR_ITEM_STACK.clone()
         }
 
         val nekoStack: NekoStack
@@ -48,15 +48,14 @@ internal class NekooApiProvider : Nekoo, KoinComponent {
         return nekoStack.unsafe.handle
     }
 
-    private fun createErrorItem(): ItemStack {
-        val error = ItemStack.of(Material.STONE).apply {
-            editMeta {
-                it.itemName(text {
+    companion object {
+        private val ERROR_ITEM_STACK: ItemStack = ItemStack.of(Material.STONE).apply {
+            editMeta { im ->
+                im.itemName(text {
                     content("ERROR")
                     color(NamedTextColor.RED)
                 })
             }
         }
-        return error
     }
 }
