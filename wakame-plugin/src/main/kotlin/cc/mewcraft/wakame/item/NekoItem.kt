@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.template.GenerationContext
@@ -27,7 +25,7 @@ import org.koin.core.component.inject
  *
  * @see NekoStack
  */
-interface NekoItem : Keyed, Examinable {
+interface NekoItem : Examinable {
 
     /**
      * 包含快速获取特殊 [NekoItem] 实例的函数.
@@ -42,19 +40,14 @@ interface NekoItem : Keyed, Examinable {
     }
 
     /**
-     * The [key][Key] of this item, where:
+     * The namespaced identifier of this item, where:
      * - [namespace][Key.namespace] is the name of the directory which contains the config file
      * - [value][Key.value] is the name of the config file itself (without the file extension)
      */
-    override val key: Key
+    val id: Key
 
     /**
-     * The [config provider][ConfigProvider] of this item.
-     */
-    val config: ConfigProvider
-
-    /**
-     * The [key][Key] to the ItemType of this item.
+     * The [key][Key] to the [org.bukkit.inventory.ItemType] of this item.
      */
     val itemType: Key
 

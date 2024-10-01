@@ -18,18 +18,18 @@ class ItemXNeko(
     }
 
     override fun isValid(): Boolean {
-        val key = Key.key(identifier.replaceFirst('/', ':'))
-        return ItemRegistry.CUSTOM.find(key) != null
+        val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
+        return ItemRegistry.CUSTOM.find(nekoItemId) != null
     }
 
     override fun createItemStack(): ItemStack? {
-        val key = Key.key(identifier.replaceFirst('/', ':'))
-        val nekoItem = ItemRegistry.CUSTOM.find(key)
+        val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
+        val nekoItem = ItemRegistry.CUSTOM.find(nekoItemId)
         val context = GenerationContext(
             // 始终以等级 0 生成
             trigger = GenerationTrigger.direct(0),
             // 设置为物品的 key
-            target = key,
+            target = nekoItemId,
             // 随机种子始终为 0
             seed = 0
         )
@@ -39,8 +39,8 @@ class ItemXNeko(
     }
 
     override fun createItemStack(player: Player): ItemStack? {
-        val key = Key.key(identifier.replaceFirst('/', ':'))
-        val nekoItem = ItemRegistry.CUSTOM.find(key)
+        val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
+        val nekoItem = ItemRegistry.CUSTOM.find(nekoItemId)
         val nekoStack = nekoItem?.realize(player.toUser())
         val itemStack = nekoStack?.itemStack
         return itemStack
@@ -48,14 +48,14 @@ class ItemXNeko(
 
     override fun matches(itemStack: ItemStack): Boolean {
         val nekoStack = itemStack.tryNekoStack ?: return false
-        val key = nekoStack.key
-        return "${key.namespace()}/${key.value()}" == identifier
+        val nekoStackId = nekoStack.id
+        return "${nekoStackId.namespace()}/${nekoStackId.value()}" == identifier
     }
 
     override fun renderName(): String {
-        val key = Key.key(identifier.replaceFirst('/', ':'))
-        val nekoItem = ItemRegistry.CUSTOM.find(key) ?: return DEFAULT_RENDER_NAME
-        return key.asString() // TODO
+        val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
+        val nekoItem = ItemRegistry.CUSTOM.find(nekoItemId) ?: return DEFAULT_RENDER_NAME
+        return nekoItemId.asString() // TODO
     }
 }
 
@@ -66,8 +66,8 @@ object ItemXFactoryNeko : ItemXFactory {
 
     override fun byItemStack(itemStack: ItemStack): ItemXNeko? {
         val nekoStack = itemStack.tryNekoStack ?: return null
-        val key = nekoStack.key()
-        return ItemXNeko("${key.namespace()}/${key.value()}")
+        val nekoStackId = nekoStack.id
+        return ItemXNeko("${nekoStackId.namespace()}/${nekoStackId.value()}")
     }
 
     override fun byUid(plugin: String, identifier: String): ItemXNeko? {

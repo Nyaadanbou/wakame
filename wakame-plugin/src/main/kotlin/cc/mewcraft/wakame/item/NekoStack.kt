@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
-import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
@@ -23,7 +22,7 @@ import kotlin.reflect.KProperty
  * probably will not directly work with this interface. Instead, you
  * will likely use the subclasses. Use your IDE to navigate them.
  */
-interface NekoStack : Keyed, Examinable {
+interface NekoStack : Examinable {
 
     /**
      * 包含了获取特殊 [NekoStack] 实例的函数.
@@ -75,7 +74,7 @@ interface NekoStack : Keyed, Examinable {
     /**
      * The namespaced identifier of this item.
      */
-    override val key: Key
+    val id: Key
 
     /**
      * The variant of this item.
@@ -242,11 +241,11 @@ private object EmptyNekoStack : NekoStack {
     override val itemStack: ItemStack
         get() = ItemStack.empty()
 
-    override val key: Key = GenericKeys.EMPTY
+    override val id: Key = GenericKeys.EMPTY
 
-    override val namespace: String = key.namespace()
+    override val namespace: String = id.namespace()
 
-    override val path: String = key.value()
+    override val path: String = id.value()
 
     override var variant: Int
         get() = 0

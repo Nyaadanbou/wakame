@@ -1,11 +1,12 @@
 plugins {
     id("neko-kotlin")
     id("nyaadanbou-conventions.repositories")
+    id("nyaadanbou-conventions.copy-jar")
     alias(libs.plugins.paperdev)
 }
 
 group = "cc.mewcraft.wakame"
-version = "1.0"
+version = "1.0.0"
 description = "The mixin part"
 
 dependencies {
@@ -17,7 +18,22 @@ dependencies {
     compileOnly(local.mixin)
     compileOnly(local.mixin.extras)
 
-    compileOnly(project(":wakame-common"))
+    // 在本 mixin 中添加为 implementation 的依赖意味着
+    // 该依赖会直接由服务端的 system classloader 加载,
+    // 可以直接被服务端 (nms) 和 *任意插件* 直接访问.
+    implementation(project(":wakame-api")) // 提供运行时依赖
+    implementation(project(":wakame-common")) // 同上
+    implementation(local.shadow.nbt)
+}
+
+tasks {
+    copyJar {
+        environment = "paperMixin"
+        jarFileName = "wakame-${project.version}.jar"
+    }
+    processResources {
+        expand(project.properties)
+    }
 }
 
 paperweight {

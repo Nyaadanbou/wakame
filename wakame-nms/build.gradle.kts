@@ -6,20 +6,15 @@ plugins {
     alias(libs.plugins.paperdev)
 }
 
-group = "cc.mewcraft.wakame"
-version = "1.0.0"
-description = "Add custom stuff to server"
+version = "0.0.1"
 
 dependencies {
     // server
     paperweight.paperDevBundle(local.versions.paper)
 
-    // helper
-    compileOnly(local.helper)
-    compileOnly(local.shadow.nbt)
-
     // internal
     compileOnly(project(":wakame-common"))
+    compileOnly(local.shadow.nbt)
     compileOnly(platform(libs.bom.adventure))
     compileOnly(platform(libs.bom.packetevents.spigot))
 }

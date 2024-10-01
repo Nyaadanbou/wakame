@@ -2,7 +2,6 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.config.NodeConfigProvider
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
@@ -41,8 +40,6 @@ internal class VanillaItemTemplateValidator {
 
 object NekoItemFactory : KoinComponent {
     fun createVanilla(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
-        val provider = NodeConfigProvider(root, relPath.toString())
-
         // read all basic info
         val itemType = key.takeIf { Material.matchMaterial(key.asString()) != null } ?: throw SerializationException("Invalid item type: '$key'. Usually it's the incorrect file name")
         val removeComponents = VanillaComponentRemover.nop()
@@ -131,8 +128,7 @@ object NekoItemFactory : KoinComponent {
         }
 
         return SimpleNekoItem(
-            key = key,
-            config = provider,
+            id = key,
             itemType = itemType,
             slotGroup = slotGroup,
             removeComponents = removeComponents,
@@ -154,8 +150,6 @@ object NekoItemFactory : KoinComponent {
      * @return a new [NekoItem]
      */
     fun create(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
-        val provider = NodeConfigProvider(root, relPath.toString())
-
         // read all basic info
         val itemType = root.node("item_type").krequire<Key>()
         val removeComponents = root.node("remove_components").krequire<VanillaComponentRemover>()
@@ -224,8 +218,7 @@ object NekoItemFactory : KoinComponent {
         }
 
         return SimpleNekoItem(
-            key = key,
-            config = provider,
+            id = key,
             itemType = itemType,
             slotGroup = slotGroup,
             removeComponents = removeComponents,

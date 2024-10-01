@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.adventure.adventureModule
+import cc.mewcraft.wakame.api.NekooApiProvider
 import cc.mewcraft.wakame.attack.attackModule
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
@@ -105,13 +106,19 @@ class WakamePlugin : KExtendedJavaPlugin() {
     }
 
     override suspend fun enable() {
+        // 初始化插件
         Initializer.start()
+
+        // 注册 Nekoo API
+        NekooProvider.register(NekooApiProvider())
+
+        logger.warning("${DummyClass.DUMMY} is called from PaperPluginLoader!")
     }
 
     override suspend fun disable() {
         Initializer.disable()
         stopKoin()
         INSTANCE = null
+        NekooProvider.unregister()
     }
-
 }

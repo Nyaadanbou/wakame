@@ -16,13 +16,12 @@ description = "The core plugin of Nyaadanbou"
 
 dependencies {
     // internal
-    implementation(project(":wakame-api"))
-    implementation(project(":wakame-common"))
+    compileOnly(project(":wakame-api")) // 运行时由 wakame-mixin 提供
+    compileOnly(project(":wakame-common")) // 同上
     implementation(project(":wakame-ext"))
     implementation(project(":wakame-git"))
     compileOnly(project(":wakame-nms"))
-    // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
-    runtimeOnly(project(path = ":wakame-nms", configuration = "reobf"))
+    runtimeOnly(project(path = ":wakame-nms", configuration = "reobf")) // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
 
     // libraries
     compileOnly(local.paper)
@@ -30,7 +29,7 @@ dependencies {
     implementation(libs.commons.collections)
     implementation(libs.commons.provider)
     implementation(libs.mocha)
-    implementation(local.shadow.nbt)
+    compileOnly(local.shadow.nbt) // 运行时由 wakame-mixin 提供
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
@@ -110,17 +109,7 @@ paper {
     apiVersion = "1.21"
     author = "Nailm"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
-    bootstrapDependencies {
-        register("Kotlin") {
-            required = true
-            load = RelativeLoadOrder.BEFORE
-        }
-    }
     serverDependencies {
-        register("Kotlin") {
-            required = true
-            load = RelativeLoadOrder.BEFORE
-        }
         register("helper") {
             required = true
             load = RelativeLoadOrder.BEFORE
