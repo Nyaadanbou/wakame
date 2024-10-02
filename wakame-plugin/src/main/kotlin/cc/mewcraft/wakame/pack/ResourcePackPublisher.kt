@@ -61,7 +61,14 @@ object ResourcePackPublisherProvider {
                 val branch = config.entry<String>("branch").get()
                 val path = config.entry<String>("path").get()
                 val commitMessage = config.entry<String>("commit_message").get()
-                GithubPublisher(username, token, repo, branch, path, commitMessage)
+                GithubPublisher(
+                    repo = repo,
+                    username = username,
+                    token = token,
+                    remotePath = path,
+                    branch = branch,
+                    commitMessage = commitMessage
+                )
             }
 
             else -> {
