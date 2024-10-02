@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.kizami.KizamiEventHandler
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedEventHandler
+import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import org.bukkit.entity.LivingEntity
@@ -43,6 +44,13 @@ class MultipleItemListener : KoinComponent, Listener {
         enchantmentEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
         kizamiEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
         skillEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
+    }
+
+    @EventHandler
+    fun onArmorEquipment(event: ArmorChangeEvent) {
+        val player = event.player
+        player.sendMessage("ArmorChangeEvent: 评价为 g22")
+        event.isCancelled = true
     }
 }
 

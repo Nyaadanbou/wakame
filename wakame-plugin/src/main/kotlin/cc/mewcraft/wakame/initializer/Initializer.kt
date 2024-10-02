@@ -22,6 +22,7 @@ import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.component.ComponentListener
+import cc.mewcraft.wakame.player.equipment.ArmorChangeListener
 import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.player.inventory.ItemSlotWatcher
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer.REFORGE_DIR_NAME
@@ -131,6 +132,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun registerListeners() = with(PLUGIN) {
+        registerTerminableListener(get<ArmorChangeListener>()).bindWith(this)
         registerTerminableListener(get<ComponentListener>()).bindWith(this)
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
         registerTerminableListener(get<MultipleItemListener>()).bindWith(this)

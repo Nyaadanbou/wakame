@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.behavior
 
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
-import cc.mewcraft.wakame.player.equipment.ArmorEquipEvent
+import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.skill.Skill
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
@@ -56,7 +56,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
     fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
     fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
-    fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) = Unit
+    fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) = Unit
     fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
