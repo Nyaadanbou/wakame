@@ -1,7 +1,4 @@
-item_type: stone_sword
-remove_components:
-  - attribute_modifiers
-  - tool
+base: stone_sword[!attribute_modifiers,!tool]
 slot: vanilla:mainhand
 item_name: "<rarity:style><rarity:name> Shoot!"
 rarity: mapping:demo_1

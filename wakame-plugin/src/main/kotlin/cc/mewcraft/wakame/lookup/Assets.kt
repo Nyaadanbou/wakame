@@ -2,11 +2,9 @@ package cc.mewcraft.wakame.lookup
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.toNamespacedKey
 import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
-import org.bukkit.Registry
 import java.io.File
 
 sealed interface Assets : Keyed {
@@ -30,8 +28,6 @@ data class ItemAssets(
 }
 
 internal val Assets.itemType: Material
-    get() = requireNotNull(
-        Registry.MATERIAL.get(ItemRegistry.CUSTOM[key].itemType.toNamespacedKey())
-    ) {
-        "Can't find material by key: $key"
+    get() = requireNotNull(ItemRegistry.CUSTOM.find(key)?.base?.type) {
+        "ItemType not found for item id: $key"
     }

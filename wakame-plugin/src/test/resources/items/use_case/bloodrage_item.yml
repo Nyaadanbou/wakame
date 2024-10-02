@@ -1,6 +1,4 @@
-item_type: golden_sword
-  - attribute_modifiers
-  - tool
+base: golden_sword[!attribute_modifiers,!tool]
 slot: vanilla:mainhand
 item_name: "<rarity:style><rarity:name> 红温武器"
 rarity: mapping:demo_1

@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 假设物品等级为 10
 # 引用了全局的数据.

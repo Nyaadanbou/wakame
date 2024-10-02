@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 模型设置
 # 基本概念: 每个物品有一个或多个变体, 每个变体可以指定一个模型

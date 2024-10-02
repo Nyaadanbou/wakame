@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 包含所有可能的核心
 cells:

@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 物品额外的描述
 lore:

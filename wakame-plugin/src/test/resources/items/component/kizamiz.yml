@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 物品的铭刻标识
 kizamiz:

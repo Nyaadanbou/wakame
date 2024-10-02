@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 阻止物品损失耐久度. 对应原版组件: https://minecraft.wiki/w/Data_component_format#unbreakable
 unbreakable:

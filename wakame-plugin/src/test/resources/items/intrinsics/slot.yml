@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 物品的生效栏位
 # 可选, 默认: 无

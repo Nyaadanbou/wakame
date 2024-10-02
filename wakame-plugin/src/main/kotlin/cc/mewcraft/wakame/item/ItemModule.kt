@@ -7,8 +7,6 @@ import cc.mewcraft.wakame.item.components.componentsModule
 import cc.mewcraft.wakame.item.template.ITEM_COMPONENT_TEMPLATE_SERIALIZERS
 import cc.mewcraft.wakame.item.template.templateModule
 import cc.mewcraft.wakame.item.templates.templatesModule
-import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemoverSerializer
-import cc.mewcraft.wakame.item.vanilla.vanillaModule
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
@@ -24,7 +22,6 @@ internal fun itemModule(): Module = module {
         componentsModule(),
         templateModule(),
         templatesModule(),
-        vanillaModule(),
     )
 
     single { ItemSlotRegistry } bind Initializable::class
@@ -42,8 +39,8 @@ internal fun itemModule(): Module = module {
             .kregister(ItemSlotSerializer)
             // item slot group
             .kregister(ItemSlotGroupSerializer)
-            // vanilla component remover
-            .kregister(VanillaComponentRemoverSerializer)
+            // item data modifier
+            .kregister(ItemBaseSerializer)
             // item component templates
             .registerAll(get(named(ITEM_COMPONENT_TEMPLATE_SERIALIZERS)))
 

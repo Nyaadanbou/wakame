@@ -1,4 +1,4 @@
-item_type: bow
+base: bow
 
 # 将物品作为弓.
 bow: { }

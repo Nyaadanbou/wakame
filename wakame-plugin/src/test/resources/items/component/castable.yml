@@ -1,4 +1,4 @@
-item_type: stick
+base: stick
 
 # 标记该物品可以被玩家用来施放技能
 castable: { }

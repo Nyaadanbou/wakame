@@ -1,6 +1,6 @@
 # Use case: 一个标准的, 仅作为合成材料使用的物品模板
 
-item_type: shulker_shell
+base: shulker_shell
 
 # 材料类物品应该使用 `minecraft:item_name` 作为其物品名字
 item_name: "<aqua>毛毛帽"

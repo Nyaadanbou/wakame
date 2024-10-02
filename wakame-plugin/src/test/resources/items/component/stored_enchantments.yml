@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 附魔书内存储的魔咒. 对应原版组件: https://minecraft.wiki/w/Data_component_format#stored_enchantments
 stored_enchantments:
