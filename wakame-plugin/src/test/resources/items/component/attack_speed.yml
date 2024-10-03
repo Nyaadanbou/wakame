@@ -1,4 +1,4 @@
-item_type: wooden_sword
+base: wooden_sword
 
 # 让该武器具有攻击冷却时间
 # 可用值:

@@ -1,4 +1,4 @@
-item_type: arrow
+base: arrow
 
 # 将物品变成弓的弹药
 arrow:

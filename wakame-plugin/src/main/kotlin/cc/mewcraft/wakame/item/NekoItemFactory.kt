@@ -10,17 +10,14 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemover
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
-import org.bukkit.Material
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.contains
-import org.spongepowered.configurate.serialize.SerializationException
 import java.nio.file.Path
 
 internal class RestrictedItemTemplateException : Throwable()
@@ -41,8 +38,7 @@ internal class VanillaItemTemplateValidator {
 object NekoItemFactory : KoinComponent {
     fun createVanilla(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
         // read all basic info
-        val itemType = key.takeIf { Material.matchMaterial(key.asString()) != null } ?: throw SerializationException("Invalid item type: '$key'. Usually it's the incorrect file name")
-        val removeComponents = VanillaComponentRemover.nop()
+        val itemBase = root.node("base").krequire<ItemBase>()
         val slotGroup = root.node("slot").krequire<ItemSlotGroup>()
 
         // read all item behaviors
@@ -129,9 +125,8 @@ object NekoItemFactory : KoinComponent {
 
         return SimpleNekoItem(
             id = key,
-            itemType = itemType,
+            base = itemBase,
             slotGroup = slotGroup,
-            removeComponents = removeComponents,
             templates = templateMap,
             behaviors = behaviorMap
         )
@@ -151,8 +146,7 @@ object NekoItemFactory : KoinComponent {
      */
     fun create(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
         // read all basic info
-        val itemType = root.node("item_type").krequire<Key>()
-        val removeComponents = root.node("remove_components").krequire<VanillaComponentRemover>()
+        val itemBase = root.node("base").krequire<ItemBase>()
         val slotGroup = root.node("slot").krequire<ItemSlotGroup>()
 
         // read all item behaviors
@@ -219,9 +213,8 @@ object NekoItemFactory : KoinComponent {
 
         return SimpleNekoItem(
             id = key,
-            itemType = itemType,
+            base = itemBase,
             slotGroup = slotGroup,
-            removeComponents = removeComponents,
             templates = templateMap,
             behaviors = behaviorMap
         )

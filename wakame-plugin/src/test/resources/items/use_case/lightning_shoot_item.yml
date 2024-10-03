@@ -1,7 +1,4 @@
-item_type: stick
-remove_components:
-  - attribute_modifiers
-  - tool
+base: stick[!attribute_modifiers,!tool]
 slot: vanilla:mainhand
 item_name: "<rarity:style><rarity:name> 射雷"
 rarity: mapping:demo_1

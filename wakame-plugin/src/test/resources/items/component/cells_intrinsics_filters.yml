@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 两个词条栏, 各自生成的属性是完全同类的.
 # 那么最终只有第一个词条栏里的属性会生成.

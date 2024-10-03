@@ -1,4 +1,4 @@
-item_type: netherite_pickaxe
+base: netherite_pickaxe
 
 # 物品的耐久度
 damageable:

@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 只有一个空的词条栏
 cells:

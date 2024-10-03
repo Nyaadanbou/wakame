@@ -1,4 +1,4 @@
-item_type: stick
+base: stick
 
 # 开发日记: 2024/6/24
 # 按照小福米说的, wakame 应该始终是底层代码的抽象.

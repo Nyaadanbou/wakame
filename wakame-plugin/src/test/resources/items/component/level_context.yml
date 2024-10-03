@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 等级
 # A. 如果写 CONTEXT，则根据上下文生成（玩家或盲盒）

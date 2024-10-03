@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 稀有度
 # 如果写 "mapping:<唯一标识>"，则根据唯一标识对应的映射生成

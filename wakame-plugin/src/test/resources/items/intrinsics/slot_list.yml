@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 写成列表
 slot:

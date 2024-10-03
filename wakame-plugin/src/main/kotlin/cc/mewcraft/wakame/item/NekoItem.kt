@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.template.GenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import cc.mewcraft.wakame.item.vanilla.VanillaComponentRemover
 import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -41,25 +40,20 @@ interface NekoItem : Examinable {
 
     /**
      * The namespaced identifier of this item, where:
-     * - [namespace][Key.namespace] is the name of the directory which contains the config file
-     * - [value][Key.value] is the name of the config file itself (without the file extension)
+     * - *namespace* is the name of the directory which contains the config file
+     * - *value* is the name of the config file itself (without the file extension)
      */
     val id: Key
 
     /**
-     * The [key][Key] to the [org.bukkit.inventory.ItemType] of this item.
+     * 物品的基底.
      */
-    val itemType: Key
+    val base: ItemBase
 
     /**
      * The item slot group where this item can take effect.
      */
     val slotGroup: ItemSlotGroup
-
-    /**
-     * 需要移除的原版物品组件.
-     */
-    val removeComponents: VanillaComponentRemover
 
     /**
      * 物品组件的模板.

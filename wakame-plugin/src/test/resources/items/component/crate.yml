@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 将物品作为盲盒
 crate:

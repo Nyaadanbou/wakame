@@ -144,8 +144,8 @@ fun ItemStack.takeIfNeko(): ItemStack? {
  * Otherwise, undefined behaviors can occur.
  */
 @Contract(pure = true)
-internal fun Material.createNekoStack(): NekoStack {
-    return CustomNekoStack(this)
+internal fun ItemBase.createNekoStack(): NekoStack {
+    return CustomNekoStack(createItemStack())
 }
 
 @Contract(pure = true)
@@ -197,11 +197,6 @@ fun NekoStack.unsetSystemUse() {
 private class CustomNekoStack(
     val handle: ItemStack,
 ) : NekoStack {
-
-    // 该构造器接受一个 ItemType, 用于从零开始创建一个物品
-    constructor(mat: Material) : this(
-        handle = ItemStack(mat),
-    )
 
     // 所有访问该对象的代码应该只能读取其状态, 禁止写入
     private val unsafeNyaTag: CompoundTag

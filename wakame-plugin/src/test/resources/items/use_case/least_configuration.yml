@@ -2,4 +2,4 @@
 
 # 原版的物品类型
 # 参考 Minecraft Wiki 上的物品数据值
-item_type: wooden_sword
+base: wooden_sword

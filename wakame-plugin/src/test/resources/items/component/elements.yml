@@ -1,4 +1,4 @@
-item_type: diamond_sword
+base: diamond_sword
 
 # 物品的元素标识
 elements:

@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 为物品添加词条栏
 # TBD 添加更多文档

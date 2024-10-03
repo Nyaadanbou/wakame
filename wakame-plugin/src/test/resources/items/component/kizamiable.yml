@@ -1,4 +1,4 @@
-item_type: bedrock
+base: bedrock
 
 # 标记该物品可以为玩家提供铭刻加成
 kizamiable: { }
