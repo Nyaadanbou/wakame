@@ -18,7 +18,6 @@ dependencies {
 
     // external
     compileOnly(libs.jgit)
-    compileOnly(libs.mythicmobs) {
-        isTransitive = false // we don't want trash from the MM jar
-    }
+    compileOnly(libs.mythicmobs) { isTransitive = false /* we don't want trash from the MM jar */ }
+    compileOnly(libs.adventurelevel)
 }

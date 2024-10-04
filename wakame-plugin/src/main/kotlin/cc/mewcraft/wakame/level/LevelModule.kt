@@ -26,7 +26,7 @@ internal fun levelModule(): Module = module {
         val type = config.node("player_level_provider").krequire<PlayerLevelType>()
         when (type) {
             PlayerLevelType.ADVENTURE_LEVEL -> {
-                takeIfPresent("AdventureLevel") { new(::AdventureLevelProvider) }
+                takeIfPresent("AdventureLevel") { new(::AdventurePlayerLevelProvider) }
             }
 
             PlayerLevelType.EXPERIENCE_LEVEL -> {
