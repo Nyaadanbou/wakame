@@ -1,33 +1,69 @@
 package cc.mewcraft.wakame.resource
 
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.runTaskTimer
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.bossbar.BossBar
+import net.kyori.adventure.extra.kotlin.text
 import org.bukkit.Bukkit
 import org.bukkit.Server
+import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
+import java.util.WeakHashMap
 
 class ResourceTicker(
-    private val server: Server
+    private val server: Server,
 ) : Initializable {
+    private val bossBarMap: WeakHashMap<Player, BossBar> = WeakHashMap()
     private var resourceTickTask: BukkitTask? = null
 
     fun start() {
-        runTaskTimer(0, 1) {
+        // 开始一个每 t 执行一次的循环任务,
+        // 每次任务执行时:
+        // * 恢复定量魔法值
+        // * 显示当前魔法值
+
+        runTaskTimer(
+            delay = 0,
+            period = 1
+        ) {
             server.onlinePlayers.forEach { player ->
                 val user = player.toUser()
-
-                // 原型: 恢复魔法值
-                user.resourceMap.add(ResourceTypeRegistry.MANA, 1)
-
-                // 原型: 显示魔法值
-                if (Bukkit.getServer().currentTick % 10 == 0) {
-                    player.sendActionBar(Component.text("魔法值: ${user.resourceMap.current(ResourceTypeRegistry.MANA)}"))
-                }
+                regenMana(user)
+                showMana(user)
             }
         }.also {
             resourceTickTask = it
+        }
+    }
+
+    private fun regenMana(user: User<Player>) {
+        user.resourceMap.add(ResourceTypeRegistry.MANA, 1)
+    }
+
+    private fun showMana(user: User<Player>) {
+        val player = user.player
+        val current = user.resourceMap.current(ResourceTypeRegistry.MANA)
+        val maximum = user.resourceMap.maximum(ResourceTypeRegistry.MANA)
+        val progress = current.toFloat() / maximum.toFloat()
+        val text = text { content("魔法值 $current / $maximum") }
+
+        if (Bukkit.getServer().currentTick % 20 == 0) {
+            val bossBar = bossBarMap.getOrPut(player) {
+                BossBar.bossBar(
+                    text,
+                    progress,
+                    BossBar.Color.BLUE,
+                    BossBar.Overlay.PROGRESS,
+                )
+            }
+
+            // 更新玩家的 bossBar (如果有需要)
+            bossBar.name(text)
+
+            // 展示给该玩家
+            bossBar.addViewer(player)
         }
     }
 
