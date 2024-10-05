@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.runTaskTimer
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.extra.kotlin.text
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Server
 import org.bukkit.entity.Player
@@ -51,16 +52,12 @@ class ResourceTicker(
 
         if (Bukkit.getServer().currentTick % 20 == 0) {
             val bossBar = bossBarMap.getOrPut(player) {
-                BossBar.bossBar(
-                    text,
-                    progress,
-                    BossBar.Color.BLUE,
-                    BossBar.Overlay.PROGRESS,
-                )
+                BossBar.bossBar(Component.empty(), 0f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS)
             }
 
-            // 更新玩家的 bossBar (如果有需要)
+            // 更新玩家的 bossBar
             bossBar.name(text)
+            bossBar.progress(progress)
 
             // 展示给该玩家
             bossBar.addViewer(player)
