@@ -18,9 +18,7 @@ class ArmorChangeEvent internal constructor(
 
     override fun getHandlers(): HandlerList = HANDLER_LIST
 
-    override fun isCancelled(): Boolean {
-        return cancel
-    }
+    override fun isCancelled(): Boolean = cancel
 
     override fun setCancelled(cancel: Boolean) {
         this.cancel = cancel

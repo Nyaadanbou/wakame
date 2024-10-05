@@ -1,0 +1,79 @@
+package cc.mewcraft.wakame.item.behaviors
+
+import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
+import cc.mewcraft.wakame.item.behavior.ItemBehavior
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.user.toUser
+import net.kyori.adventure.extra.kotlin.text
+import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
+import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.ItemStack
+
+interface LevelBarrier : ItemBehavior {
+    private object Default : LevelBarrier {
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
+            tryCancelEvent(itemStack, player, wrappedEvent)
+        }
+
+        override fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleSkillPrepareCast(caster: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
+            tryCancelEvent(itemStack, caster, event)
+        }
+
+        private val Player.levelOrZero: Int
+            get() = this.toUser().level
+
+        private val ItemStack.levelOrZero: Int
+            get() = tryNekoStack?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
+
+        private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {
+            val itemLevel = itemStack.levelOrZero
+            val playerLevel = player.levelOrZero
+            if (itemLevel > playerLevel) {
+                player.sendActionBar(text { content("你的冒险等级不足以使用这个物品") })
+                e.isCancelled = true
+            }
+        }
+    }
+
+    companion object Type : ItemBehaviorType<LevelBarrier> {
+        override fun create(): LevelBarrier {
+            return Default
+        }
+    }
+}

@@ -16,8 +16,9 @@ import cc.mewcraft.wakame.display.RENDERER_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.item.MultipleItemListener
-import cc.mewcraft.wakame.item.SingleItemListener
+import cc.mewcraft.wakame.item.ItemBehaviorListener
+import cc.mewcraft.wakame.item.ItemChangeListener
+import cc.mewcraft.wakame.item.ItemMiscellaneousListener
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
@@ -135,12 +136,13 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<ArmorChangeListener>()).bindWith(this)
         registerTerminableListener(get<ComponentListener>()).bindWith(this)
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
-        registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
+        registerTerminableListener(get<ItemChangeListener>()).bindWith(this)
         registerTerminableListener(get<DamageDisplay>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackLifecycleListener>()).bindWith(this)
         registerTerminableListener(get<ResourcePackPlayerListener>()).bindWith(this)
-        registerTerminableListener(get<SingleItemListener>()).bindWith(this)
+        registerTerminableListener(get<ItemBehaviorListener>()).bindWith(this)
+        registerTerminableListener(get<ItemMiscellaneousListener>()).bindWith(this)
         registerTerminableListener(get<DamageListener>()).bindWith(this)
         registerTerminableListener(get<ItemSlotWatcher>()).bindWith(this)
     }

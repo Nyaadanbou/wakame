@@ -47,6 +47,7 @@ internal fun itemModule(): Module = module {
             .build()
     }
 
-    single { MultipleItemListener() }
-    single { SingleItemListener() }
+    single { ItemChangeListener() }
+    single { ItemBehaviorListener() }
+    single { ItemMiscellaneousListener() }
 }
