@@ -19,13 +19,13 @@ import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.item.ItemBehaviorListener
 import cc.mewcraft.wakame.item.ItemChangeListener
 import cc.mewcraft.wakame.item.ItemMiscellaneousListener
+import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.component.ComponentListener
 import cc.mewcraft.wakame.player.equipment.ArmorChangeListener
 import cc.mewcraft.wakame.player.interact.FuckOffHandListener
-import cc.mewcraft.wakame.player.inventory.ItemSlotWatcher
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer.REFORGE_DIR_NAME
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
@@ -144,7 +144,7 @@ object Initializer : KoinComponent, Listener {
         registerTerminableListener(get<ItemBehaviorListener>()).bindWith(this)
         registerTerminableListener(get<ItemMiscellaneousListener>()).bindWith(this)
         registerTerminableListener(get<DamageListener>()).bindWith(this)
-        registerTerminableListener(get<ItemSlotWatcher>()).bindWith(this)
+        registerTerminableListener(get<ItemSlotChangeMonitor>()).bindWith(this)
     }
 
     private fun registerCommands() {

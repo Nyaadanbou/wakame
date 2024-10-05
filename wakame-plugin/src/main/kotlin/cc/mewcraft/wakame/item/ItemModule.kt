@@ -4,11 +4,14 @@ import cc.mewcraft.wakame.config.configurate.MaterialSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.component.componentModule
 import cc.mewcraft.wakame.item.components.componentsModule
+import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
+import cc.mewcraft.wakame.item.logic.logicModule
 import cc.mewcraft.wakame.item.template.ITEM_COMPONENT_TEMPLATE_SERIALIZERS
 import cc.mewcraft.wakame.item.template.templateModule
 import cc.mewcraft.wakame.item.templates.templatesModule
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -20,6 +23,7 @@ internal fun itemModule(): Module = module {
     includes(
         componentModule(),
         componentsModule(),
+        logicModule(),
         templateModule(),
         templatesModule(),
     )
@@ -47,7 +51,8 @@ internal fun itemModule(): Module = module {
             .build()
     }
 
-    single { ItemChangeListener() }
-    single { ItemBehaviorListener() }
-    single { ItemMiscellaneousListener() }
+    singleOf(::ItemChangeListener)
+    singleOf(::ItemBehaviorListener)
+    singleOf(::ItemMiscellaneousListener)
+    singleOf(::ItemSlotChangeMonitor)
 }

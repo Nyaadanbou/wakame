@@ -58,7 +58,9 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
     fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
     fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
+    // FIXME 移除
     fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) = Unit
+    // FIXME 移除
     fun handleSlotChange(player: Player, itemStack: ItemStack, previous: Boolean, slot: ItemSlot, event: PlayerItemSlotChangeEvent) = Unit
     fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit

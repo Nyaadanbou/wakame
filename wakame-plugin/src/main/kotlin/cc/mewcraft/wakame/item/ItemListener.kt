@@ -1,12 +1,9 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.attribute.AttributeEventHandler
-import cc.mewcraft.wakame.enchantment.EnchantmentEventHandler
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
-import cc.mewcraft.wakame.kizami.KizamiEventHandler
+import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedEventHandler
-import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import org.bukkit.entity.LivingEntity
@@ -33,30 +30,15 @@ import org.koin.core.component.inject
  * 这些事件都有 “新/旧物品” 两个变量.
  */
 internal class ItemChangeListener : KoinComponent, Listener {
-    private val attackSpeedEventHandler: AttackSpeedEventHandler by inject()
-    private val attributeEventHandler: AttributeEventHandler by inject()
-    private val enchantmentEventHandler: EnchantmentEventHandler by inject()
-    private val kizamiEventHandler: KizamiEventHandler by inject()
-    private val skillEventHandler: SkillEventHandler by inject()
-
     @EventHandler
     fun on(event: PlayerItemSlotChangeEvent) {
-        val player = event.player
-        val itemSlot = event.slot
-        val oldItem = event.oldItemStack
-        val newItem = event.newItemStack
-
-        attackSpeedEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
-        attributeEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
-        enchantmentEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
-        kizamiEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
-        skillEventHandler.handlePlayerSlotChange(player, itemSlot, oldItem, newItem)
+        ItemSlotChangeRegistry.listeners().forEach { listener -> listener.handleEvent(event) }
     }
 }
 
 /**
  * 监听物品与世界发生的交互事件.
- * 这些都是 [cc.mewcraft.wakame.item.behavior.ItemBehavior] 实现的一部分.
+ * 这些都是 *物品行为* 的一部分.
  */
 internal class ItemBehaviorListener : KoinComponent, Listener {
     @EventHandler
@@ -106,35 +88,6 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
         }
     }
 
-    @EventHandler
-    fun on(event: ArmorChangeEvent) {
-        val player = event.player
-        val unequippedItem = event.previous
-        val equippedItem = event.current
-
-        unequippedItem?.tryNekoStack?.behaviors?.forEach { behavior ->
-            behavior.handleEquip(player, unequippedItem, false, event)
-        }
-        equippedItem?.tryNekoStack?.behaviors?.forEach { behavior ->
-            behavior.handleEquip(player, equippedItem, true, event)
-        }
-    }
-
-    @EventHandler
-    fun on(event: PlayerItemSlotChangeEvent) {
-        val player = event.player
-        val slot = event.slot
-        val oldItem = event.oldItemStack
-        val newItem = event.newItemStack
-
-        oldItem?.tryNekoStack?.behaviors?.forEach { behavior ->
-            behavior.handleSlotChange(player, oldItem, true, slot, event)
-        }
-        newItem?.tryNekoStack?.behaviors?.forEach { behavior ->
-            behavior.handleSlotChange(player, newItem, false, slot, event)
-        }
-    }
-
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     fun on(event: InventoryClickEvent) {
         val player = event.whoClicked as Player
@@ -179,6 +132,7 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
  * 无法被分类到 [ItemChangeListener] 和 [ItemBehaviorListener] 的监听逻辑.
  * 最终这些都应该合并到 [ItemChangeListener] 或 [ItemBehaviorListener] 中去.
  */
+// FIXME 合并到 [ItemChangeListener] 或 [ItemBehaviorListener] 中去
 internal class ItemMiscellaneousListener : KoinComponent, Listener {
     private val attackSpeedEventHandler: AttackSpeedEventHandler by inject()
     private val skillEventHandler: SkillEventHandler by inject()

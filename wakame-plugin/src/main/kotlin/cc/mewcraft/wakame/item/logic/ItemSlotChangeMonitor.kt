@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.player.inventory
+package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.ItemSlot
@@ -17,13 +17,13 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 /**
- * 负责扫描玩家背包里的物品变化.
+ * 负责扫描玩家背包的变化, 根据情况触发 [PlayerItemSlotChangeEvent].
  *
  * 我们每 tick 扫描每个玩家背包里的特定槽位上的物品.
  * 如果第 `n` tick 扫描的结果和第 `n-1` tick 扫描的结果不同,
  * 则认为这个槽位发生了变化, 那么此时就会触发一个事件.
  */
-class ItemSlotWatcher : Listener, KoinComponent {
+internal class ItemSlotChangeMonitor : Listener, KoinComponent {
     private val server: Server by inject()
     private val lastItemRecords: LoadingCache<Player, LastItemRecord> = Caffeine
         .newBuilder()

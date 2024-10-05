@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.skill
 
-import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.skill.context.SkillContext
@@ -117,70 +114,5 @@ class SkillEventHandler(
         if (result == SkillStateResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
-    }
-
-    /* 玩家的技能添加/移除逻辑 */
-
-    /**
-     * 当玩家装备的物品发生变化时, 执行的逻辑.
-     */
-    fun handlePlayerSlotChange(player: Player, slot: ItemSlot, oldItem: ItemStack?, newItem: ItemStack?) {
-        updateSkills(player, oldItem, newItem) {
-            it.slotGroup.contains(slot) && it.templates.has(ItemTemplateTypes.CASTABLE)
-        }
-    }
-
-    /**
-     * 根据玩家之前“激活”的物品和当前“激活”的物品所提供的属性, 更新玩家的铭技能
-     *
-     * 这里的新/旧指的是玩家先前“激活”的物品和当前“激活”的物品.
-     *
-     * @param player 玩家
-     * @param oldItem 之前“激活”的物品; 如果为空气, 则应该传入 `null`
-     * @param newItem 当前“激活”的物品; 如果为空气, 则应该传入 `null`
-     * @param predicate 判断物品能否提供技能的谓词
-     */
-    private fun updateSkills(
-        player: Player,
-        oldItem: ItemStack?,
-        newItem: ItemStack?,
-        predicate: (NekoStack) -> Boolean,
-    ) {
-        oldItem?.tryNekoStack?.removeSkills(player, predicate)
-        newItem?.tryNekoStack?.attachSkills(player, predicate)
-    }
-
-    /**
-     * 把物品提供的技能添加到 [player] 身上.
-     *
-     * @param player 要添加技能的玩家
-     * @param predicate 判断物品能否提供技能的谓词
-     * @receiver 可能提供技能的物品
-     */
-    private fun NekoStack.attachSkills(player: Player, predicate: (NekoStack) -> Boolean) {
-        if (!predicate(this)) {
-            return
-        }
-        val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
-        val configuredSkills = itemCells.collectConfiguredSkills(this, ignoreVariant = true) // TODO: no more ignorance if skill module is complete
-        val skillMap = player.toUser().skillMap
-        skillMap.addSkillsByInstance(configuredSkills)
-    }
-
-    /**
-     * 把物品提供的技能从 [player] 身上移除.
-     *
-     * @param player 要移除技能的玩家
-     * @param predicate 判断物品能否提供技能的谓词
-     * @receiver 可能提供技能的物品
-     */
-    private fun NekoStack.removeSkills(player: Player, predicate: (NekoStack) -> Boolean) {
-        if (!predicate(this)) {
-            return
-        }
-        val itemCells = this.components.get(ItemComponentTypes.CELLS) ?: return
-        val configuredSkills = itemCells.collectConfiguredSkills(this, ignoreVariant = true) // TODO: no more ignorance if skill module is complete
-        val skillMap = player.toUser().skillMap
-        skillMap.removeSkill(configuredSkills)
     }
 }
