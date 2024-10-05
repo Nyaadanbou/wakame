@@ -253,6 +253,30 @@ entity_interaction_range:
     min: 1.0
     max: 64.0
 
+hammer_damage_range:
+  enabled: true
+  display_name: "<!i>锤击范围"
+  tooltips:
+    add: "<!i>锤击范围 <value:+#.#;-.>"
+    multiply_base: "<!i>锤击范围 <value:+#%;-.%>"
+    multiply_total: "<!i>锤击范围 ×<value:+#%;-.%>"
+  values:
+    default: 0.0
+    min: 0.0
+    max: 64.0
+
+hammer_damage_ratio:
+  enabled: true
+  display_name: "<!i>锤击比率"
+  tooltips:
+    add: "<!i>锤击比率 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: 0.0
+    min: 0.0
+    max: 1.0
+
 health_regeneration:
   enabled: true
   display: "<!i>生命恢复"

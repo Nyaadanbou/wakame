@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -61,6 +62,12 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
     fun on(event: PlayerInteractEvent) {
         val item = event.item ?: return
         val nekoStack = item.tryNekoStack ?: return
+        //TODO 主副手交互冲突问题
+        if (event.hand == EquipmentSlot.OFF_HAND) {
+            if (event.player.inventory.itemInMainHand.tryNekoStack?.behaviors != null) {
+                return
+            }
+        }
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleInteract(event.player, item, event.action, event)
         }

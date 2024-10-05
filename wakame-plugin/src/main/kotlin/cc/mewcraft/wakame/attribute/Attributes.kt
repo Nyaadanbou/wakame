@@ -42,6 +42,8 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0).register()
     val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", .0, -1.0, 1.0).register()
     val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, 1.0, 16384.0).register()
+    val HAMMER_DAMAGE_RANGE = RangedAttribute("hammer_damage_range", 0.0, 0.0, 64.0).register()
+    val HAMMER_DAMAGE_RATIO = RangedAttribute("hammer_damage_ratio", 0.0, 0.0, 1.0).register()
     val HEALTH_REGENERATION = RangedAttribute("health_regeneration", 1.0, .0, 16384.0).register()
     val LIFESTEAL = RangedAttribute("lifesteal", .0, .0, 16384.0).register()
     val MANASTEAL = RangedAttribute("manasteal", .0, .0, 16384.0).register()

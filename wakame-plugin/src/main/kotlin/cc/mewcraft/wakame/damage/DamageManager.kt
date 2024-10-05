@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attack.*
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
-import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
@@ -44,24 +43,24 @@ object DamageManager {
                         when (event.cause) {
                             DamageCause.ENTITY_ATTACK -> {
                                 when (attack.attackType) {
-                                    is SwordAttack -> {
-                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.SWORD))
-                                    }
-
                                     is AxeAttack -> {
                                         return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.AXE))
                                     }
 
-                                    is TridentAttack -> {
-                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.TRIDENT))
+                                    is HammerAttack -> {
+                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.HAMMER))
                                     }
 
                                     is MaceAttack -> {
                                         return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.MACE))
                                     }
 
-                                    is HammerAttack -> {
-                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.HAMMER))
+                                    is SwordAttack -> {
+                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.SWORD))
+                                    }
+
+                                    is TridentAttack -> {
+                                        return PlayerMeleeAttackMetadata(damager.toUser(), DamageTags(DamageTag.MELEE, DamageTag.TRIDENT))
                                     }
 
                                     else -> {

@@ -33,6 +33,8 @@ entity_attributes:
       defense_penetration: default
       defense_penetration_rate: default
       entity_interaction_range: default
+      hammer_damage_range: default
+      hammer_damage_ratio: default
       health_regeneration: default
       incoming_damage_rate: default
       lifesteal: default

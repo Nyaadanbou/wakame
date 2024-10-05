@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -54,6 +55,13 @@ class NekoEntityDamageEvent(
      */
     val damageSource: DamageSource
         get() = bukkitEvent.damageSource
+
+    /**
+     * 获取本次伤害是否是玩家跳劈.
+     */
+    fun isJumpCriticalHit(): Boolean {
+        return bukkitEvent is EntityDamageByEntityEvent && bukkitEvent.isCritical
+    }
 
     /**
      * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 null.
