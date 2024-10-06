@@ -16,10 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(value = Inventory.class)
-public abstract class MixinInventory implements Container, Nameable {
-    @Final
-    @Shadow
-    @Mutable
+public abstract class MixinPlayerInventory implements Container, Nameable {
+    @Shadow @Final @Mutable
     public NonNullList<ItemStack> armor;
 
     @Redirect(
@@ -30,7 +28,7 @@ public abstract class MixinInventory implements Container, Nameable {
                     target = "Lnet/minecraft/world/entity/player/Inventory;armor:Lnet/minecraft/core/NonNullList;"
             )
     )
-    private void redirectArmorAssignment(Inventory instance, NonNullList<ItemStack> originalArmor, Player player) {
+    private void redirect(Inventory instance, NonNullList<ItemStack> originalArmor, Player player) {
         // 替换为 WatchedArmorList
         this.armor = new WatchedArmorList(player);
     }
