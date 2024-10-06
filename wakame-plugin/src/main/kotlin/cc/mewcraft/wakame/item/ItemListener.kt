@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedEventHandler
+import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import org.bukkit.entity.LivingEntity
@@ -33,6 +34,11 @@ internal class ItemChangeListener : KoinComponent, Listener {
     @EventHandler
     fun on(event: PlayerItemSlotChangeEvent) {
         ItemSlotChangeRegistry.listeners().forEach { listener -> listener.handleEvent(event) }
+    }
+
+    @EventHandler
+    fun on(event: ArmorChangeEvent) {
+        TODO()
     }
 }
 
