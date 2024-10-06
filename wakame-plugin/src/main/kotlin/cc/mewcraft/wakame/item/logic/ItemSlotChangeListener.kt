@@ -117,9 +117,6 @@ internal abstract class ItemSlotChangeListener {
 
         val oldNekoStack = oldItemStack?.tryNekoStack
         val newNekoStack = newItemStack?.tryNekoStack
-        if (oldNekoStack == null && newNekoStack == null) {
-            return // fast-return
-        }
 
         onBegin(player)
 
