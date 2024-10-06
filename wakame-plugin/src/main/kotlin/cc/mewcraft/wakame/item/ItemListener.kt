@@ -35,11 +35,6 @@ internal class ItemChangeListener : KoinComponent, Listener {
     fun on(event: PlayerItemSlotChangeEvent) {
         ItemSlotChangeRegistry.listeners().forEach { listener -> listener.handleEvent(event) }
     }
-
-    @EventHandler
-    fun on(event: ArmorChangeEvent) {
-        TODO()
-    }
 }
 
 /**
@@ -47,6 +42,20 @@ internal class ItemChangeListener : KoinComponent, Listener {
  * 这些都是 *物品行为* 的一部分.
  */
 internal class ItemBehaviorListener : KoinComponent, Listener {
+    @EventHandler
+    fun on(event: ArmorChangeEvent) {
+        val player = event.player
+        val previous = event.previous?.takeUnlessEmpty()
+        val current = event.current?.takeUnlessEmpty()
+
+        previous?.tryNekoStack?.behaviors?.forEach { behavior ->
+            behavior.handleEquip(player, previous, false, event)
+        }
+        current?.tryNekoStack?.behaviors?.forEach { behavior ->
+            behavior.handleEquip(player, current, true, event)
+        }
+    }
+
     @EventHandler
     fun on(event: PlayerInteractEvent) {
         val item = event.item ?: return
