@@ -114,9 +114,13 @@ paper {
             required = true
             load = RelativeLoadOrder.BEFORE
         }
+        register("AdventureLevel") {
+            required = false
+            load = RelativeLoadOrder.OMIT // 懒加载 class
+        }
         register("MythicMobs") {
             required = false
-            load = RelativeLoadOrder.OMIT
+            load = RelativeLoadOrder.OMIT // 懒加载 class
         }
     }
 }
