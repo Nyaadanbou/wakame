@@ -7,7 +7,7 @@ import java.util.UUID
 /**
  * Gets the adventure level from specific player.
  */
-class AdventurePlayerLevelProvider : PlayerLevelProvider {
+class AdventureLevelProvider : PlayerLevelProvider {
 
     override fun get(uuid: UUID): Int? {
         val api = AdventureLevelProvider.get()

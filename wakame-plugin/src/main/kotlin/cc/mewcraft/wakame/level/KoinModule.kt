@@ -19,14 +19,14 @@ internal fun levelModule(): Module = module {
             return if (get<PluginManager>().isPluginEnabled(plugin)) {
                 constructor()
             } else {
-                NoopLevelProvider // fallback to noop if required plugin is not enabled on the server
+                ZeroLevelProvider // fallback to noop if required plugin is not enabled on the server
             }
         }
 
         val type = config.node("player_level_provider").krequire<PlayerLevelType>()
         when (type) {
             PlayerLevelType.ADVENTURE_LEVEL -> {
-                takeIfPresent("AdventureLevel") { new(::AdventurePlayerLevelProvider) }
+                takeIfPresent("AdventureLevel") { new(::AdventureLevelProvider) }
             }
 
             PlayerLevelType.EXPERIENCE_LEVEL -> {
@@ -34,7 +34,7 @@ internal fun levelModule(): Module = module {
             }
 
             else -> {
-                NoopLevelProvider
+                ZeroLevelProvider
             }
         }
     }

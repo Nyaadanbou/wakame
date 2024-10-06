@@ -33,3 +33,4 @@ helper = { group = "me.lucko", name = "helper", version = "6.0.0" }
 
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
+adventurelevel = { group = "cc.mewcraft.adventurelevel", name = "api", version = "1.2.0" }

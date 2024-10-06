@@ -52,6 +52,9 @@ dependencies {
     implementation(platform(libs.bom.jgit))
     implementation(platform(libs.bom.packetevents.spigot))
 
+    // other plugins (without ide pollution)
+    compileOnly(local.adventurelevel)
+
     // test
     testImplementation(local.paper)
     testImplementation(local.helper)
