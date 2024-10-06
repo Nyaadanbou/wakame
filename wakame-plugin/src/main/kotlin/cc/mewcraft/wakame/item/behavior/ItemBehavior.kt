@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
-import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.skill.Skill
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
@@ -48,6 +46,8 @@ sealed interface ItemBehaviorHolder
  * 然后服务端会一个一个根据地图存档里的数据, 将背包里的物品一个一个填充回去.
  * 也就是说, 玩家登录时对于背包里的每个非空气物品都会触发一次该事件.
  */
+// FIXME 即然 ItemBehavior 在我们的设计中只是行为, 而不储存任何数据,
+//  那么 ItemBehavior 的实现应该都直接写为 object, 而不是 class.
 interface ItemBehavior : ItemBehaviorHolder {
 
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 NekoItem
@@ -58,10 +58,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
     fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
     fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
-    // FIXME 移除
     fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) = Unit
-    // FIXME 移除
-    fun handleSlotChange(player: Player, itemStack: ItemStack, previous: Boolean, slot: ItemSlot, event: PlayerItemSlotChangeEvent) = Unit
     fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
