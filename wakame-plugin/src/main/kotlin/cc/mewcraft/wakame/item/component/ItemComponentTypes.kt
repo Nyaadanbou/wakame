@@ -21,6 +21,7 @@ object ItemComponentTypes {
     /**
      * 控制物品能否提供属性加成给玩家.
      */
+    @Deprecated("与 ItemSlot 有高度重合")
     val ATTRIBUTABLE: ItemComponentType<Attributable> = Attributable.codec(ItemConstants.ATTRIBUTABLE).register()
 
     /**
@@ -157,6 +158,7 @@ object ItemComponentTypes {
     /**
      * 控制物品能否提供铭刻加成给玩家.
      */
+    @Deprecated("与 ItemSlot 有高度重合")
     val KIZAMIABLE: ItemComponentType<Kizamiable> = Kizamiable.codec(ItemConstants.KIZAMIABLE).register()
 
     /**
@@ -189,6 +191,7 @@ object ItemComponentTypes {
     /**
      * 控制物品能否提供技能加成给玩家.
      */
+    @Deprecated("与 ItemSlot 有高度重合")
     val SKILLFUL: ItemComponentType<Skillful> = Skillful.codec(ItemConstants.SKILLFUL).register()
 
     /**

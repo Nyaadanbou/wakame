@@ -19,6 +19,7 @@ import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.ConfigurationNode
 
+@Deprecated("与 ItemSlot 有高度重合")
 interface Kizamiable : Examinable, TooltipProvider.Single {
 
     companion object : ItemComponentBridge<Kizamiable>, ItemComponentMeta {
