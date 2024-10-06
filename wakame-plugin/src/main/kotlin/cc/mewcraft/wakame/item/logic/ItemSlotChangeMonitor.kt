@@ -52,7 +52,7 @@ internal class ItemSlotChangeMonitor : Listener, KoinComponent {
     }
 }
 
-class LastItemRecord {
+private class LastItemRecord {
     /**
      * 保存了每个槽位在 `t-1` 刻的物品.
      *

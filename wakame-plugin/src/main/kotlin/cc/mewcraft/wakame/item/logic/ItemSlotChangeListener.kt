@@ -16,22 +16,22 @@ import org.bukkit.inventory.ItemStack
 // 所以就写了个抽象类, 减少重复的逻辑.
 
 /**
- * 代表一个监听物品在玩家背包里发生变化的逻辑.
- * 注意这里只负责监听, 而不应该去修改变化的结果.
+ * 代表一个监听玩家背包里物品发生的变化的逻辑.
+ * 这里只负责监听, 而不应该去修改物品变化的结果.
  *
  * ### 逻辑和流程
  *
- * 各个抽象函数的执行逻辑如下 (标注为 `*` 是看情况执行):
- * 1. [onBegin] : 开始时执行的逻辑
- * 2. [handlePreviousItem]* : 处理旧物品的逻辑
- * 3. [handleCurrentItem]* : 处理新物品的逻辑
+ * 各个抽象函数的执行顺序如下 (标注为 `*` 是看情况执行):
+ * 1. [onBegin] : 最开始执行的逻辑
+ * 2. [handlePreviousItem]* : 处理变化之前的物品的逻辑
+ * 3. [handleCurrentItem]* : 处理变化之后的物品的逻辑
  * 4. [onEnd] : 结束时执行的逻辑
  *
  * 其中 [handlePreviousItem] 和 [handleCurrentItem]
  * 是否执行最终取决于 [test] 的返回值. 如果返回 `false`,
  * 则不执行; 反之则执行.
  *
- * 关于代码, 请看 [handleEvent].
+ * 关于以上流程的默认实现, 请看 [handleEvent].
  */
 internal abstract class ItemSlotChangeListener {
 
@@ -53,6 +53,10 @@ internal abstract class ItemSlotChangeListener {
     protected open fun onBegin(player: Player) = Unit
 
     /**
+     * 处理变化之前的物品.
+     *
+     * 通常是把物品效果从玩家身上 *移除* 的逻辑.
+     *
      * @param player 涉及的玩家
      * @param slot 涉及的物品槽
      * @param itemStack 涉及的物品, 保证不为空气
@@ -61,6 +65,10 @@ internal abstract class ItemSlotChangeListener {
     protected abstract fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?)
 
     /**
+     * 处理变化之后的物品.
+     *
+     * 通常是把物品效果 *添加* 到玩家身上的逻辑.
+     *
      * @param player 涉及的玩家
      * @param slot 涉及的物品槽
      * @param itemStack 涉及的物品, 保证不为空气
@@ -76,7 +84,7 @@ internal abstract class ItemSlotChangeListener {
     protected open fun onEnd(player: Player) = Unit
 
     /**
-     * 检查物品槽.
+     * 检查物品 [itemStack] 是否在“正确”的物品槽.
      */
     protected fun testSlot(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
         if (nekoStack == null) {
