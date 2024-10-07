@@ -35,10 +35,10 @@ internal class DamageDisplay : Listener {
     companion object {
         // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
         private val ZERO = Vector3f(0f, 0f, 0f)
+        private val UNIT_X = Vector3f(1f, 0f, 0f)
+        private val UNIT_Y = Vector3f(0f, 1f, 0f)
+        private val UNIT_Z = Vector3f(0f, 0f, 1f)
         private val ONE = Vector3f(1f, 1f, 1f)
-        private val BASE_I = Vector3f(1f, 0f, 0f)
-        private val BASE_J = Vector3f(0f, 1f, 0f)
-        private val BASE_K = Vector3f(0f, 0f, 1f)
 
         // 用于辅助生成*伪随机*的伤害悬浮文字的坐标位置
         private val RADIAL_POINT_CYCLE = RadialPointCycle(8, 1f)
@@ -51,7 +51,7 @@ internal class DamageDisplay : Listener {
         val damageValueMap = event.getFinalDamageMap(excludeZeroDamage = true)
         val isCritical = event.damageMetadata.isCritical
 
-        val hologramLoc = calculateHologramLocation(damager = damager, d = 3f)
+        val hologramLoc = calculateHologramLocation(damager = damager, distance = 3f)
         val hologramText = damageValueMap
             .map { (element, value) ->
                 val damageValue = "%.1f".format(value)
@@ -74,35 +74,38 @@ internal class DamageDisplay : Listener {
                 Component.join(JoinConfiguration.spaces(), components)
             }
 
-        sendDamageHologram(damager, hologramLoc, isCritical, hologramText)
+        sendDamageHologram(damager, hologramLoc, hologramText, isCritical)
     }
 
     /**
      * 计算一个坐标 `C`, 使其落在 [玩家][damager] 的视线向量 `AB` 上,
-     * 并且保证与玩家的 [眼睛][Player.getEyeLocation] 的距离为 [d].
+     * 并且与玩家的 [眼睛][Player.getEyeLocation] 的距离为 [distance].
      *
      * 具体来说, 我们先找到一个平面 `P`, 使得平面垂直于 `AB` 向量.
-     * 平面 `P` 与点 `A` (眼睛) 之间的距离由给定的参数 [d] 决定.
+     * 平面 `P` 与点 `A` (眼睛) 之间的距离由参数 [distance] 决定.
      *
-     * 本算法的优点: 即使玩家使用远程武器, 也能够清晰的看到伤害值.
+     * 本算法的优点:
+     * - 即使玩家使用远程武器, 也能够清晰的看到伤害信息
+     * - 即使玩家零距离攻击怪物, 也能够清晰的看到伤害信息
+     * - 无论玩家以什么角度发起攻击, 伤害信息始终都在正前方
      */
     private fun calculateHologramLocation(
         damager: Player,
-        d: Float,
+        distance: Float,
     ): Location {
         val a = damager.eyeLocation.toVector3f()
         val ab = damager.eyeLocation.direction.toVector3f()
-        val c0 = a + (ab mul d)
+        val c0 = a + (ab mul distance)
 
         // 生成不平行于 AB 的任意向量
-        val vx = if (ab.x != 0f || ab.z != 0f) BASE_J else BASE_I
+        val vx = if (ab.x != 0f || ab.z != 0f) UNIT_Y else UNIT_X
 
         // 生成平面 P 的基向量
         val v1 = (ab cross vx).normalize()
         val v2 = (ab cross v1).normalize()
 
         // 生成垂直平面的随机因子
-        val (r1, r2) = RADIAL_POINT_GENERATOR.next(damager)
+        val (r1, r2) = RADIAL_POINT_CYCLE.next(damager)
 
         // 计算 C
         val c = c0 + (v1 mul r1) + (v2 mul r2)
@@ -116,16 +119,16 @@ internal class DamageDisplay : Listener {
     private fun sendDamageHologram(
         hologramViewer: Player,
         hologramLocation: Location,
-        isCritical: Boolean,
         damageText: Component,
+        isCritical: Boolean,
     ) {
         val hologramData = TextHologramData(
-            hologramLocation,
-            damageText,
-            Color.fromARGB(0),
-            false,
-            TextDisplay.TextAlignment.CENTER,
-            true
+            location = hologramLocation,
+            text = damageText,
+            background = Color.fromARGB(0),
+            hasTextShadow = false,
+            textAlignment = TextDisplay.TextAlignment.CENTER,
+            isSeeThrough = true
         ).apply {
             this.scale.mul(1.5f) // 初始大小
             this.translation.add(0f, -1f, 0f) // 初始位置偏下
@@ -155,7 +158,7 @@ internal class DamageDisplay : Listener {
                 this.startInterpolation = 0
                 this.interpolationDuration = 20
                 this.scale.set(1f, 1f, 1f)
-                this.translation.add(0f, 2f, 0f)
+                this.translation.add(0f, 1f, 0f)
             }
             hologram.setEntityData(hologramData)
             hologram.refresh(hologramViewer)
