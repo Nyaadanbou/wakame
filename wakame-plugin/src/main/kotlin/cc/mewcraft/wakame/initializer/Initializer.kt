@@ -134,7 +134,7 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun registerListeners() = with(PLUGIN) {
-        registerTerminableSuspendListener(get<AdventureLevelHotfix>()).bindWith(this)
+        registerTerminableListener(get<AdventureLevelHotfix>()).bindWith(this)
         registerTerminableListener(get<ArmorChangeEventSupport>()).bindWith(this)
         registerTerminableListener(get<ComponentListener>()).bindWith(this)
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)

@@ -18,7 +18,8 @@ class AdventureLevelProvider : PlayerLevelProvider {
             return null
         }
 
-        return playerData.getLevel(LevelCategory.MAIN).level
+        val primaryLevel = playerData.getLevel(LevelCategory.PRIMARY)
+        return primaryLevel.level
     }
 
 }
