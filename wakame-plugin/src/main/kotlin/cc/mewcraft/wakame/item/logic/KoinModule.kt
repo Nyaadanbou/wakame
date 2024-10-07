@@ -6,5 +6,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal fun logicModule(): Module = module {
+    single { AdventureLevelHotfix }
     single { ItemSlotChangeRegistry } bind Initializable::class
 }

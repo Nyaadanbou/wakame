@@ -19,12 +19,13 @@ import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.item.ItemBehaviorListener
 import cc.mewcraft.wakame.item.ItemChangeListener
 import cc.mewcraft.wakame.item.ItemMiscellaneousListener
+import cc.mewcraft.wakame.item.logic.AdventureLevelHotfix
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.component.ComponentListener
-import cc.mewcraft.wakame.player.equipment.ArmorChangeListener
+import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
 import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer.REFORGE_DIR_NAME
 import cc.mewcraft.wakame.registry.*
@@ -133,7 +134,8 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun registerListeners() = with(PLUGIN) {
-        registerTerminableListener(get<ArmorChangeListener>()).bindWith(this)
+        registerTerminableSuspendListener(get<AdventureLevelHotfix>()).bindWith(this)
+        registerTerminableListener(get<ArmorChangeEventSupport>()).bindWith(this)
         registerTerminableListener(get<ComponentListener>()).bindWith(this)
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
         registerTerminableListener(get<ItemChangeListener>()).bindWith(this)

@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
@@ -113,6 +114,27 @@ internal abstract class ItemSlotChangeListener {
 
     ///
 
+    /**
+     * 用于在特殊时机强制更新物品提供给玩家的效果.
+     */
+    fun forceUpdate(player: Player) {
+        val everyItemSlot = ItemSlotRegistry.all()
+        for (itemSlot in everyItemSlot) {
+            val itemStack = itemSlot.getItem(player) ?: continue
+            val nekoStack = itemStack.tryNekoStack
+            if (test(player, itemSlot, itemStack, nekoStack)) {
+                // 这里我们对同一个物品进行两次操作:
+                // 先从玩家身上移除物品“自己”的效果,
+                // 然后再把物品的效果添加到玩家身上.
+                handlePreviousItem(player, itemSlot, itemStack, nekoStack)
+                handleCurrentItem(player, itemSlot, itemStack, nekoStack)
+            }
+        }
+    }
+
+    /**
+     * 用于正常处理 [PlayerItemSlotChangeEvent].
+     */
     fun handleEvent(event: PlayerItemSlotChangeEvent) {
         val player = event.player
         val slot = event.slot

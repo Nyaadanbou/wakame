@@ -36,21 +36,28 @@ import kotlin.collections.iterator
  */
 internal object AttackSpeedItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
-        return testSlot(player, slot, itemStack, nekoStack) && testLevel(player, slot, itemStack, nekoStack)
+        return testSlot(player, slot, itemStack, nekoStack) &&
+                testLevel(player, slot, itemStack, nekoStack)
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        val attackSpeedLevel = nekoStack?.getAttackSpeedLevel() ?: return
-        removeFakeEffect(player, attackSpeedLevel)
+        nekoStack?.getAttackSpeedLevel()?.let { level ->
+            removeFakeEffect(player, level)
+        }
     }
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        val attackSpeedLevel = nekoStack?.getAttackSpeedLevel() ?: return
-        addFakeEffect(player, attackSpeedLevel)
+        nekoStack?.getAttackSpeedLevel()?.let { level ->
+            addFakeEffect(player, level)
+        }
     }
 
     private fun NekoStack.getAttackSpeedLevel(): AttackSpeedLevel? {
         return components.get(ItemComponentTypes.ATTACK_SPEED)?.level
+    }
+
+    private fun NekoStack.getAttackSpeedLevelOrThrow(): AttackSpeedLevel {
+        return getAttackSpeedLevel() ?: throw IllegalStateException("AttackSpeedLevel is null")
     }
 
     private fun addFakeEffect(player: Player, level: AttackSpeedLevel) {
@@ -78,7 +85,8 @@ internal object AttackSpeedItemSlotChangeListener : ItemSlotChangeListener() {
  */
 internal object AttributeItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
-        return testSlot(player, slot, itemStack, nekoStack) && testLevel(player, slot, itemStack, nekoStack)
+        return testSlot(player, slot, itemStack, nekoStack) &&
+                testLevel(player, slot, itemStack, nekoStack)
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
@@ -127,17 +135,18 @@ internal object EnchantmentItemSlotChangeListener : ItemSlotChangeListener() {
         val user = player.toUser()
         val customEnchantments = itemStack.customEnchantments
         for ((enchantment, level) in customEnchantments) {
-            if (!testEnchantmentSlot(slot, enchantment))
+            if (!testEnchantmentSlot(slot, enchantment)) {
+                // 附魔是否生效, 取决于附魔(nms)本身的 slots 设置,
+                // 但这样就无法支持原版之外的 slot (例如让饰品附魔生效).
+                // 到底该设计成什么样还有待进一步讨论???
                 continue
+            }
             for (effect in enchantment.getEffects(level, slot)) {
                 update(effect, user)
             }
         }
     }
 
-    // 附魔是否生效, 取决于附魔(nms)本身的 slots 设置,
-    // 但这样就无法支持原版之外的 slot (例如让饰品附魔生效).
-    // 到底该设计成什么样还有待进一步讨论.
     private fun testEnchantmentSlot(slot: ItemSlot, enchantment: CustomEnchantment): Boolean {
         return slot.testEquipmentSlotGroup(enchantment.handle.activeSlotGroups)
     }
