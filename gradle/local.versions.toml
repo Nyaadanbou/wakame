@@ -12,9 +12,7 @@ shadow-nbt = "1.21.1-SNAPSHOT"
 
 # Gradle plugins
 
-plugin-kotlin-jvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
-plugin-kotlinx-serialization = { group = "org.jetbrains.kotlin.plugin.serialization", name = "org.jetbrains.kotlin.plugin.serialization.gradle.plugin", version.ref = "kotlin" }
-plugin-kotlinx-atomicfu = { group = "org.jetbrains.kotlin.plugin.atomicfu", name = "org.jetbrains.kotlin.plugin.atomicfu.gradle.plugin", version.ref = "kotlin" }
+plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-nyaadanbou-conventions = { group = "cc.mewcraft.gradle", name = "conventions", version = "1.0-SNAPSHOT" }
 
 # Code dependencies
