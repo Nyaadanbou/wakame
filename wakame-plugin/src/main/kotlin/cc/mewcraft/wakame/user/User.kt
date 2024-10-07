@@ -28,7 +28,7 @@ interface User<P> {
     val uniqueId: UUID
 
     /**
-     * Level of the player.
+     * Main Level of the player.
      */
     val level: Int
 

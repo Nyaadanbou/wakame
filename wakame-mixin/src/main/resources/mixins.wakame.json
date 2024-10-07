@@ -8,6 +8,7 @@
   "server": [
     "MixinIngredient",
     "MixinLootPoolEntries",
+    "MixinPlayerInventory",
     "MixinRepairItemRecipe",
     "MixinServerPlayer",
     "MixinStackedContentsExtraMap",

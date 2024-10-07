@@ -29,7 +29,8 @@ koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin"
 koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
 koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5", version.ref = "koin" }
 
-helper = { group = "me.lucko", name = "helper", version = "6.0.0-SNAPSHOT" }
+helper = { group = "me.lucko", name = "helper", version = "6.0.0" }
 
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
+adventurelevel = { group = "cc.mewcraft.adventurelevel", name = "api", version = "1.4.0" }

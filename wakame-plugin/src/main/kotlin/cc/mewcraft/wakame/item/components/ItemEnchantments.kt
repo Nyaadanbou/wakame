@@ -14,11 +14,11 @@ import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
-import org.bukkit.NamespacedKey
-import org.bukkit.Registry
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
@@ -113,9 +113,8 @@ data class ItemEnchantments(
     ) : ItemTemplate<ItemEnchantments> {
         override fun generate(context: GenerationContext): GenerationResult<ItemEnchantments> {
             val enchantments = this.enchantments.mapKeys { (key, _) ->
-                val enchantKey = NamespacedKey.fromString(key.toString()) ?: throw IllegalArgumentException("Malformed enchantment key: '$key'")
-                val enchantment = Registry.ENCHANTMENT.get(enchantKey) ?: throw IllegalArgumentException("Unknown enchantment key: '$enchantKey'")
-                enchantment
+                val registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)
+                registry.get(key) ?: throw IllegalArgumentException("Unknown enchantment: '$key'")
             }
             return GenerationResult.of(ItemEnchantments(enchantments, this.showInTooltip))
         }

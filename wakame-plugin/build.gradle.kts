@@ -52,6 +52,9 @@ dependencies {
     implementation(platform(libs.bom.jgit))
     implementation(platform(libs.bom.packetevents.spigot))
 
+    // other plugins (without ide pollution)
+    compileOnly(local.adventurelevel)
+
     // test
     testImplementation(local.paper)
     testImplementation(local.helper)
@@ -114,9 +117,13 @@ paper {
             required = true
             load = RelativeLoadOrder.BEFORE
         }
+        register("AdventureLevel") {
+            required = false
+            load = RelativeLoadOrder.OMIT // 懒加载 class
+        }
         register("MythicMobs") {
             required = false
-            load = RelativeLoadOrder.OMIT
+            load = RelativeLoadOrder.OMIT // 懒加载 class
         }
     }
 }

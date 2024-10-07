@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap.Companion.TAG_COMPONEN
 import cc.mewcraft.wakame.util.editNyaTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
-import cc.mewcraft.wakame.util.unsafeNyaTagOrThrow
+import cc.mewcraft.wakame.util.unsafeNyaTag
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -134,7 +134,7 @@ private class ItemComponentHolderImpl(
      * 该函数返回的是直接引用, 禁止修改其任何状态!
      */
     private fun getUnsafeComponents(): CompoundTag? {
-        val nyaTag = item.unsafeNyaTagOrThrow
+        val nyaTag = item.unsafeNyaTag ?: return null // 并发环境下可能为 null
         val components = nyaTag.getCompoundOrNull(TAG_COMPONENTS)
         return components
     }

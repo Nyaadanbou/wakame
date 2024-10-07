@@ -104,6 +104,7 @@ internal object ItemBaseSerializer : TypeSerializer<ItemBase> {
         val format =
             if (i == -1) ""
             else arguments.substring(i, arguments.length)
+
         return ItemBaseImpl(type, format)
     }
 

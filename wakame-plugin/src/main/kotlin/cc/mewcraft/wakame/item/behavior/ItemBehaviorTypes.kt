@@ -10,6 +10,7 @@ object ItemBehaviorTypes {
      * 物品发动攻击的逻辑.
      */
     val ATTACK: ItemBehaviorType<Attack> = Attack
+
     /**
      * 物品施放技能的逻辑.
      */
@@ -34,6 +35,11 @@ object ItemBehaviorTypes {
      * 可食用物品的逻辑.
      */
     val FOOD: ItemBehaviorType<Food> = Food
+
+    /**
+     * 当玩家的冒险等级 < 物品等级时, 禁用物品的逻辑.
+     */
+    val LEVEL_BARRIER: ItemBehaviorType<LevelBarrier> = LevelBarrier
 
     /**
      * 物品作为工具的逻辑.

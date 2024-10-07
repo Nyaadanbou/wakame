@@ -19,7 +19,7 @@ internal fun levelModule(): Module = module {
             return if (get<PluginManager>().isPluginEnabled(plugin)) {
                 constructor()
             } else {
-                NoopLevelProvider // fallback to noop if required plugin is not enabled on the server
+                ZeroLevelProvider // fallback to noop if required plugin is not enabled on the server
             }
         }
 
@@ -34,7 +34,7 @@ internal fun levelModule(): Module = module {
             }
 
             else -> {
-                NoopLevelProvider
+                ZeroLevelProvider
             }
         }
     }

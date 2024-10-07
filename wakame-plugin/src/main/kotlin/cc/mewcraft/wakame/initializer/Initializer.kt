@@ -16,14 +16,17 @@ import cc.mewcraft.wakame.display.RENDERER_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.item.MultipleItemListener
-import cc.mewcraft.wakame.item.SingleItemListener
+import cc.mewcraft.wakame.item.ItemBehaviorListener
+import cc.mewcraft.wakame.item.ItemChangeListener
+import cc.mewcraft.wakame.item.ItemMiscellaneousListener
+import cc.mewcraft.wakame.item.logic.AdventureLevelHotfix
+import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.component.ComponentListener
+import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
 import cc.mewcraft.wakame.player.interact.FuckOffHandListener
-import cc.mewcraft.wakame.player.inventory.ItemSlotWatcher
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer.REFORGE_DIR_NAME
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
@@ -131,16 +134,19 @@ object Initializer : KoinComponent, Listener {
     }
 
     private fun registerListeners() = with(PLUGIN) {
+        registerTerminableListener(get<AdventureLevelHotfix>()).bindWith(this)
+        registerTerminableListener(get<ArmorChangeEventSupport>()).bindWith(this)
         registerTerminableListener(get<ComponentListener>()).bindWith(this)
         registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
-        registerTerminableListener(get<MultipleItemListener>()).bindWith(this)
+        registerTerminableListener(get<ItemChangeListener>()).bindWith(this)
         registerTerminableListener(get<DamageDisplay>()).bindWith(this)
         registerTerminableListener(get<PaperUserManager>()).bindWith(this)
         registerTerminableListener(get<ResourcePackLifecycleListener>()).bindWith(this)
         registerTerminableListener(get<ResourcePackPlayerListener>()).bindWith(this)
-        registerTerminableListener(get<SingleItemListener>()).bindWith(this)
+        registerTerminableListener(get<ItemBehaviorListener>()).bindWith(this)
+        registerTerminableListener(get<ItemMiscellaneousListener>()).bindWith(this)
         registerTerminableListener(get<DamageListener>()).bindWith(this)
-        registerTerminableListener(get<ItemSlotWatcher>()).bindWith(this)
+        registerTerminableListener(get<ItemSlotChangeMonitor>()).bindWith(this)
     }
 
     private fun registerCommands() {

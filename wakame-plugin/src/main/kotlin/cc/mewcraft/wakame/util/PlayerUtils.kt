@@ -10,10 +10,12 @@ import org.bukkit.inventory.ItemStack
  * 添加失败的物品会自动掉在地上.
  */
 fun Player.giveItemStack(vararg itemStacks: ItemStack?) {
-    val player = this
-    val notFitItems = player.inventory.addItem(*itemStacks.filterNotNull().toTypedArray())
-    notFitItems.values.forEach {
-        player.world.dropItem(player.location, it)
+    for (itemStack in itemStacks) {
+        if (itemStack == null || itemStack.isEmpty)
+            continue
+        val item = location.world.dropItemNaturally(location, itemStack)
+        item.owner = uniqueId
+        item.pickupDelay = 0
     }
 }
 

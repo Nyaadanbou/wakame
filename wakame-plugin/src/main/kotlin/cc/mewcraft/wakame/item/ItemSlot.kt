@@ -69,7 +69,7 @@ sealed interface ItemSlot : Examinable {
     /**
      * 检查给定的 [EquipmentSlotGroup] 集合是否为有效的栏位.
      */
-    fun testEquipmentSlotGroups(groups: Set<EquipmentSlotGroup>): Boolean =
+    fun testEquipmentSlotGroup(groups: Set<EquipmentSlotGroup>): Boolean =
         groups.any { testEquipmentSlotGroup(it) }
 
     /**

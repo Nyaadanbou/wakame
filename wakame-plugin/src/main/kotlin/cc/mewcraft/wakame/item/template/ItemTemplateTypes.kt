@@ -18,6 +18,7 @@ object ItemTemplateTypes {
     /**
      * 组件: [Attributable]
      */
+    @Deprecated("与 ItemSlot 有高度重合")
     val ATTRIBUTABLE: ItemTemplateType<Attributable.Template> = Attributable.templateType(ItemConstants.ATTRIBUTABLE).register()
 
     /**
@@ -118,6 +119,7 @@ object ItemTemplateTypes {
     /**
      * 组件: [Kizamiable]
      */
+    @Deprecated("与 ItemSlot 有高度重合")
     val KIZAMIABLE: ItemTemplateType<Kizamiable.Template> = Kizamiable.templateType(ItemConstants.KIZAMIABLE).register()
 
     /**
@@ -143,6 +145,7 @@ object ItemTemplateTypes {
     /**
      * 组件: [Skillful]
      */
+    @Deprecated("与 ItemSlot 有高度重合")
     val SKILLFUL: ItemTemplateType<Skillful.Template> = Skillful.templateType(ItemConstants.SKILLFUL).register()
 
     /**
