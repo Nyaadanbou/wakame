@@ -24,6 +24,7 @@ import org.bukkit.event.Listener
 import org.joml.Vector3f
 import java.util.WeakHashMap
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.sin
 
 /**
@@ -40,7 +41,7 @@ internal class DamageDisplay : Listener {
         private val BASE_K = Vector3f(0f, 0f, 1f)
 
         // 用于辅助生成*伪随机*的伤害悬浮文字的坐标位置
-        private val RADIAL_POINT_GENERATOR = RadialPointGenerator(8, 1f)
+        private val RADIAL_POINT_CYCLE = RadialPointCycle(8, 1f)
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -167,29 +168,36 @@ internal class DamageDisplay : Listener {
 }
 
 /**
- * @param divisions 分割数
+ * @param slices 分割数
  * @param radius 半径
  */
-private class RadialPointGenerator(
-    divisions: Int,
-    radius: Float
-) {
-    private val points: List<Pair<Float, Float>> = createCirclePoints(divisions, radius)
-    private val currentIndexMap = WeakHashMap<Entity, Int>() // race-condition 就算发生也没什么大问题
+internal class RadialPointCycle {
+    private val slices: Int
+    private val radius: Float
+    private val points: List<Pair<Float, Float>>
+
+    constructor(divisions: Int, radius: Float) {
+        // 分割数量, 必须为偶数
+        this.slices = max(2, if (divisions % 2 == 0) divisions else divisions + 1)
+        // 最小半径, 必须大于等于 0
+        this.radius = max(0f, radius)
+        // 根据给定的参数生成一组均匀分布的点对
+        this.points = createPoints(divisions, radius)
+    }
 
     // 获取当前索引的点对
+    // 每个实体对应的 "trace"
+    private val traceMap = WeakHashMap<Entity, Trace>() // race-condition 就算发生也没什么大问题
+
+    // 获取下一个点对
     fun next(viewer: Entity): Pair<Float, Float> {
-        val currentIndex = currentIndexMap.getOrPut(viewer) { 0 }
-        val pair = points[currentIndex]
-
-        // 让索引每次步进到对立位置，确保下一次获取时是“对立点”
-        currentIndexMap[viewer] = (currentIndex + points.size / 2) % points.size
-
+        val trace = traceMap.getOrPut(viewer) { Trace(index1 = 0, index2 = slices / 2, invert = false) }
+        val pair = points[trace.next()]
         return pair
     }
 
     // 初始化生成一组在圆上均匀分布的点对
-    private fun createCirclePoints(divisions: Int, radius: Float): List<Pair<Float, Float>> {
+    private fun createPoints(divisions: Int, radius: Float): List<Pair<Float, Float>> {
         val points = mutableListOf<Pair<Float, Float>>()
         val step = (2 * Math.PI / divisions).toFloat()
 
@@ -201,5 +209,28 @@ private class RadialPointGenerator(
         }
 
         return points
+    }
+
+    /**
+     * 封装一些状态, 用于计算下个点对的位置.
+     */
+    private inner class Trace(
+        private var index1: Int,
+        private var index2: Int,
+        private var invert: Boolean,
+    ) {
+        fun next(): Int {
+            val i1 = index1
+            val i2 = index2
+            val inv = invert
+            val ret = if (inv) i1 else i2
+
+            // 更新状态, 步进到下一个位置
+            if (inv) index1 = (i1 + 1) % slices
+            else index2 = (i2 + 1) % slices
+            invert = !inv
+
+            return ret
+        }
     }
 }
