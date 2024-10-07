@@ -56,6 +56,7 @@ dependencies {
     compileOnly(local.adventurelevel)
 
     // test
+    testImplementation(project(":wakame-common"))
     testImplementation(local.paper)
     testImplementation(local.helper)
     testImplementation(libs.configurate.yaml)
@@ -63,6 +64,7 @@ dependencies {
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
     testImplementation(libs.mockbukkit)
+    testImplementation(local.shadow.nbt)
 }
 
 tasks {

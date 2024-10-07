@@ -94,7 +94,7 @@ class DamageBundle : Examinable, KoinComponent {
         val element = packet.element
         val previous = packets.put(element, packet)
         if (previous != null) {
-            get<Logger>().warn("Overwrote a packet of the same element type: '${element.uniqueId}'")
+            get<Logger>().warn("Failed to overwrite a packet of the same element type: '${element.uniqueId}'")
         }
     }
 

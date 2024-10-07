@@ -63,12 +63,11 @@ class CustomNekoStackTest : KoinTest {
 
     //<editor-fold desc="Intrinsic Properties">
     @Test
-    fun `intrinsics - remove_components`() {
-        val item = readCustomPrototype("intrinsics", "remove_components")
-        val removeComponents = item.removeComponents
-        assertTrue { removeComponents.has("attribute_modifiers") }
-        assertTrue { removeComponents.has("food") }
-        assertTrue { removeComponents.has("tool") }
+    fun `intrinsics - base`() {
+        val item = readCustomPrototype("intrinsics", "base")
+        val base = item.base
+        assertEquals(Material.BEDROCK, base.type)
+        assertEquals("[!attribute_modifiers,!food,!tool]", base.format)
     }
 
     @Test
@@ -952,7 +951,7 @@ class CustomNekoStackTest : KoinTest {
     @Test
     fun `use case - least configuration`() {
         val item = readCustomPrototype("use_case", "least_configuration")
-        assertEquals(Key.key("wooden_sword"), item.itemType)
+        assertEquals(Material.WOODEN_SWORD, item.base.type)
     }
 
     @Test

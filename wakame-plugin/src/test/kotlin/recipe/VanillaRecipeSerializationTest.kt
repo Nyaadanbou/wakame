@@ -2,7 +2,6 @@ package recipe
 
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.recipe.*
-import cc.mewcraft.wakame.util.Key
 import core.ItemXMock
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
@@ -52,7 +51,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @Test
     fun `blasting recipe serialization`() {
-        key = Key("test:blasting")
+        key = Key.key("test:blasting")
 
         val recipe = VanillaRecipeRegistry.raw[key]
         assertNotNull(recipe)
@@ -97,7 +96,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @Test
     fun `campfire recipe serialization`() {
-        key = Key("test:campfire")
+        key = Key.key("test:campfire")
 
         val recipe = VanillaRecipeRegistry.raw[key]
         assertNotNull(recipe)
@@ -121,7 +120,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @Test
     fun `furnace recipe serialization`() {
-        key = Key("test:furnace")
+        key = Key.key("test:furnace")
 
         val recipe = VanillaRecipeRegistry.raw[key]
         assertNotNull(recipe)
@@ -145,7 +144,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @Test
     fun `shaped recipe serialization`() {
-        key = Key("test:shaped")
+        key = Key.key("test:shaped")
 
         val recipe = VanillaRecipeRegistry.raw[key]
         assertNotNull(recipe)
@@ -182,7 +181,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @Test
     fun `shapeless recipe serialization`() {
-        key = Key("test:shapeless")
+        key = Key.key("test:shapeless")
 
         val recipe = VanillaRecipeRegistry.raw[key]
         assertNotNull(recipe)
@@ -219,7 +218,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @Test
     fun `smithing transform recipe serialization`() {
-        key = Key("test:smithing_transform")
+        key = Key.key("test:smithing_transform")
 
         val recipe = VanillaRecipeRegistry.raw[key]
         assertNotNull(recipe)
@@ -251,7 +250,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @Test
     fun `smithing trim recipe serialization`() {
-        key = Key("test:smithing_trim")
+        key = Key.key("test:smithing_trim")
 
         val recipe = VanillaRecipeRegistry.raw[key]
         assertNotNull(recipe)
@@ -310,7 +309,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @Test
     fun `smoking recipe serialization`() {
-        key = Key("test:smoking")
+        key = Key.key("test:smoking")
 
         val recipe = VanillaRecipeRegistry.raw[key]
         assertNotNull(recipe)
@@ -334,7 +333,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @Test
     fun `stonecutting recipe serialization`() {
-        key = Key("test:stonecutting")
+        key = Key.key("test:stonecutting")
 
         val recipe = VanillaRecipeRegistry.raw[key]
         assertNotNull(recipe)

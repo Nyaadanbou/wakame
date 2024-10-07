@@ -3,7 +3,6 @@ package damage
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.damage.DamageBundle
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.element.Element
@@ -60,7 +59,6 @@ class DamageBundleDSLTest : KoinTest {
         fun afterAll() {
             stopKoin()
         }
-
     }
 
     private val logger: Logger by inject()
@@ -79,11 +77,11 @@ class DamageBundleDSLTest : KoinTest {
 
         // 初始化 AttributeMap 的摹刻, 用于测试
         attriMap = mockk()
-        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "min_attack_damage" }) } returns 8.0
-        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "max_attack_damage" }) } returns 8.0
-        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "attack_damage_rate" }) } returns 0.1
-        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "defense_penetration" }) } returns 1.0
-        every { attriMap.getValue(match { it is ElementAttribute && it.descriptionId == "defense_penetration_rate" }) } returns 0.1
+        every { attriMap.getValue(match { it.descriptionId.contains("min_attack_damage") }) } returns 8.0
+        every { attriMap.getValue(match { it.descriptionId.contains("max_attack_damage") }) } returns 8.0
+        every { attriMap.getValue(match { it.descriptionId.contains("attack_damage_rate") }) } returns 0.1
+        every { attriMap.getValue(match { it.descriptionId.contains("defense_penetration") }) } returns 1.0
+        every { attriMap.getValue(match { it.descriptionId.contains("defense_penetration_rate") }) } returns 0.1
         every { attriMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) } returns 2.0
         every { attriMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) } returns 2.0
         every { attriMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION) } returns 1.0
@@ -91,13 +89,13 @@ class DamageBundleDSLTest : KoinTest {
     }
 
     private fun printBundle(id: String, bundle: DamageBundle) {
-        bundle.packets().forEach { logger.info("Packet ($id): $it") }
+        bundle.packets().forEach { logger.info("($id) $it") }
     }
 
     // 标准的伤害包构建方式
     @Test
     fun `use case 1`() {
-        val bundle: DamageBundle = damageBundle(attriMap) {
+        val bundle1: DamageBundle = damageBundle(attriMap) {
             // 使用 every() 为*每个*已知的元素构建伤害包
             every {
                 min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
@@ -127,7 +125,7 @@ class DamageBundleDSLTest : KoinTest {
             }
         }
 
-        printBundle("1", bundle)
+        printBundle("1", bundle1)
     }
 
     // 如果伤害包的构建方式与“标准”的相同,
@@ -166,7 +164,7 @@ class DamageBundleDSLTest : KoinTest {
         val damageValue = 12.0
         val defensePenetration = 3.0
         val defensePenetrationRate = 0.1
-        val bundle: DamageBundle = damageBundle {
+        val bundle1: DamageBundle = damageBundle {
             every {
                 min(damageValue) // 也可以直接传入一个值, 不一定要用 lambda
                 max(damageValue)
@@ -176,7 +174,7 @@ class DamageBundleDSLTest : KoinTest {
             }
         }
 
-        printBundle("1", bundle)
+        printBundle("1", bundle1)
     }
 
     // 有些伤害包的构造依赖了 AttributeMap,
@@ -184,7 +182,7 @@ class DamageBundleDSLTest : KoinTest {
     // 这种情况可以混合使用两种 DSL.
     @Test
     fun `use case 4`() {
-        val bundle: DamageBundle = damageBundle(attriMap) {
+        val bundle1: DamageBundle = damageBundle(attriMap) {
             every {
                 // 最小/最大设置为 1.0
                 min(1.0)
@@ -196,7 +194,7 @@ class DamageBundleDSLTest : KoinTest {
             }
         }
 
-        printBundle("1", bundle)
+        printBundle("1", bundle1)
     }
 
     // 有些伤害包的构造依赖了 AttributeMap,
@@ -205,7 +203,7 @@ class DamageBundleDSLTest : KoinTest {
     @Test
     fun `use case 5`() {
         val force = 0.8
-        val bundle: DamageBundle = damageBundle(attriMap) {
+        val bundle1: DamageBundle = damageBundle(attriMap) {
             every {
                 // 先把所有数值用“标准”方式计算出来,
                 // 这样可以省去写 defense 的步骤.
@@ -217,7 +215,7 @@ class DamageBundleDSLTest : KoinTest {
             }
         }
 
-        printBundle("1", bundle)
+        printBundle("1", bundle1)
     }
 
     // 有些伤害包只需要包含默认元素, 并且也不依赖 AttrMap.
@@ -226,7 +224,7 @@ class DamageBundleDSLTest : KoinTest {
     @Test
     fun `use case 6`() {
         val damageValue = 1.0
-        val bundle: DamageBundle = damageBundle {
+        val bundle1: DamageBundle = damageBundle {
             default {
                 min(damageValue)
                 max(damageValue)
@@ -236,6 +234,6 @@ class DamageBundleDSLTest : KoinTest {
             }
         }
 
-        printBundle("1", bundle)
+        printBundle("1", bundle1)
     }
 }

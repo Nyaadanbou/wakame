@@ -7,16 +7,14 @@ import cc.mewcraft.wakame.station.recipe.ExpChoice
 import cc.mewcraft.wakame.station.recipe.ItemChoice
 import cc.mewcraft.wakame.station.recipe.ItemResult
 import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
-import cc.mewcraft.wakame.util.Key
 import core.ItemXMock
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
-import org.koin.test.inject
-import org.slf4j.Logger
 import testEnv
 import kotlin.test.*
 
@@ -42,24 +40,12 @@ class StationSerializationTest : KoinTest {
         }
     }
 
-    private val logger: Logger by inject()
-
-//    @BeforeTest
-//    fun beforeEach() {
-//
-//    }
-//
-//    @AfterTest
-//    fun afterTest() {
-//
-//    }
-
     @Test
     fun `simple station serialization`() = runBlocking {
         StationRecipeRegistry.loadConfig() // 单元测试时跳过合成站配方的有效性验证
         StationRegistry.loadStations()
 
-        val key1 = Key("test:raw_bronze")
+        val key1 = Key.key("test:raw_bronze")
 
         val recipe1 = StationRecipeRegistry.raw[key1]
         assertNotNull(recipe1)
@@ -77,7 +63,7 @@ class StationSerializationTest : KoinTest {
         assertEquals(ItemResult(ItemXMock("wakame:material/raw_bronze"), 4), output1)
 
 
-        val key2 = Key("test:amethyst_dust")
+        val key2 = Key.key("test:amethyst_dust")
 
         val recipe2 = StationRecipeRegistry.raw[key2]
         assertNotNull(recipe2)
