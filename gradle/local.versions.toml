@@ -2,7 +2,7 @@
 kotlin = "2.0.20"
 kotlinx-coroutines-core = "1.9.0-RC.2"
 koin = "3.5.3"
-ignite = "1.0.1"
+ignite = "1.1.0"
 mixin = "0.8.6"
 mixin-extras = "0.3.6"
 paper = "1.21.1-R0.1-SNAPSHOT"
@@ -12,9 +12,7 @@ shadow-nbt = "1.21.1-SNAPSHOT"
 
 # Gradle plugins
 
-plugin-kotlin-jvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
-plugin-kotlinx-serialization = { group = "org.jetbrains.kotlin.plugin.serialization", name = "org.jetbrains.kotlin.plugin.serialization.gradle.plugin", version.ref = "kotlin" }
-plugin-kotlinx-atomicfu = { group = "org.jetbrains.kotlin.plugin.atomicfu", name = "org.jetbrains.kotlin.plugin.atomicfu.gradle.plugin", version.ref = "kotlin" }
+plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-nyaadanbou-conventions = { group = "cc.mewcraft.gradle", name = "conventions", version = "1.0-SNAPSHOT" }
 
 # Code dependencies

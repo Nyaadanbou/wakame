@@ -9,8 +9,8 @@
     <!-- 定义日志级别 -->
     <logger name="cc.mewcraft" level="DEBUG"/>
 
-    <!-- 设置根日志级别为DEBUG，并添加STDOUT -->
-    <root level="DEBUG">
+    <!-- 设置根日志级别为INFO，并添加STDOUT -->
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 
