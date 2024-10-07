@@ -37,7 +37,8 @@ import kotlin.collections.iterator
 internal object AttackSpeedItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
         return testSlot(player, slot, itemStack, nekoStack) &&
-                testLevel(player, slot, itemStack, nekoStack)
+                testLevel(player, slot, itemStack, nekoStack) &&
+                testDurability(player, slot, itemStack, nekoStack)
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
@@ -86,7 +87,8 @@ internal object AttackSpeedItemSlotChangeListener : ItemSlotChangeListener() {
 internal object AttributeItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
         return testSlot(player, slot, itemStack, nekoStack) &&
-                testLevel(player, slot, itemStack, nekoStack)
+                testLevel(player, slot, itemStack, nekoStack) &&
+                testDurability(player, slot, itemStack, nekoStack)
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
@@ -120,7 +122,8 @@ internal object EnchantmentItemSlotChangeListener : ItemSlotChangeListener() {
     // 唯一需要处理的就是监听物品栏发生的变化, 以应用附魔的效果.
 
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
-        return testLevel(player, slot, itemStack, nekoStack)
+        return testLevel(player, slot, itemStack, nekoStack) &&
+                testDurability(player, slot, itemStack, nekoStack)
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
@@ -159,7 +162,9 @@ internal object EnchantmentItemSlotChangeListener : ItemSlotChangeListener() {
  */
 internal object KizamiItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
-        return testSlot(player, slot, itemStack, nekoStack) && testLevel(player, slot, itemStack, nekoStack)
+        return testSlot(player, slot, itemStack, nekoStack) &&
+                testLevel(player, slot, itemStack, nekoStack) &&
+                testDurability(player, slot, itemStack, nekoStack)
     }
 
     // 首先, 从玩家身上移除所有已有的铭刻效果.
@@ -214,7 +219,9 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeListener() {
  */
 internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
-        return testSlot(player, slot, itemStack, nekoStack) && testLevel(player, slot, itemStack, nekoStack)
+        return testSlot(player, slot, itemStack, nekoStack) &&
+                testLevel(player, slot, itemStack, nekoStack) &&
+                testDurability(player, slot, itemStack, nekoStack)
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
