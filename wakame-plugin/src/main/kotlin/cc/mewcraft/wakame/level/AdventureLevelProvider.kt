@@ -11,7 +11,7 @@ class AdventureLevelProvider : PlayerLevelProvider {
 
     override fun get(uuid: UUID): Int? {
         val api = AdventureLevelProvider.get()
-        val playerDataManager = api.playerDataManager
+        val playerDataManager = api.playerDataManager()
         val playerData = playerDataManager.load(uuid)
 
         if (!playerData.complete()) {
