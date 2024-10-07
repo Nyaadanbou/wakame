@@ -185,7 +185,6 @@ internal class RadialPointCycle {
         this.points = createPoints(divisions, radius)
     }
 
-    // 获取当前索引的点对
     // 每个实体对应的 "trace"
     private val traceMap = WeakHashMap<Entity, Trace>() // race-condition 就算发生也没什么大问题
 
