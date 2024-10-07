@@ -2,7 +2,7 @@
 kotlin = "2.0.20"
 kotlinx-coroutines-core = "1.9.0-RC.2"
 koin = "3.5.3"
-ignite = "1.0.1"
+ignite = "1.1.0"
 mixin = "0.8.6"
 mixin-extras = "0.3.6"
 paper = "1.21.1-R0.1-SNAPSHOT"
