@@ -20,7 +20,6 @@ import cc.mewcraft.wakame.lang.langModule
 import cc.mewcraft.wakame.level.levelModule
 import cc.mewcraft.wakame.lookup.lookupModule
 import cc.mewcraft.wakame.molang.molangModule
-import cc.mewcraft.wakame.monetary.monetaryModule
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.packet.packetModule
 import cc.mewcraft.wakame.player.playerModule
@@ -81,7 +80,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 levelModule(),
                 lookupModule(),
                 molangModule(),
-                monetaryModule(),
                 packetModule(),
                 packModule(),
                 playerModule(),

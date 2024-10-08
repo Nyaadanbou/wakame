@@ -8,9 +8,9 @@ import cc.mewcraft.wakame.display2.RendererLayout
 import cc.mewcraft.wakame.item.NekoStack
 import java.nio.file.Path
 
-internal class SellingStationContext
+internal class RecyclingStationContext
 
-internal object SellingStationItemRenderer : AbstractItemRenderer<NekoStack, SellingStationContext>() {
+internal object RecyclingStationItemRenderer : AbstractItemRenderer<NekoStack, RecyclingStationContext>() {
     override val rendererLayout: RendererLayout
         get() = TODO()
     override val rendererFormats: RendererFormats
@@ -20,7 +20,7 @@ internal object SellingStationItemRenderer : AbstractItemRenderer<NekoStack, Sel
         TODO()
     }
 
-    override fun render(item: NekoStack, context: SellingStationContext?) {
+    override fun render(item: NekoStack, context: RecyclingStationContext?) {
         TODO()
     }
 }

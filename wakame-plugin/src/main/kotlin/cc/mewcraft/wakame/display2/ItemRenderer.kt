@@ -25,7 +25,7 @@ internal object ItemRenderers {
     val REROLLING_TABLE: ItemRenderer<NekoStack, RerollingTableContext> = RerollingTableItemRenderer
 
     @JvmField
-    val SELLING_STATION: ItemRenderer<NekoStack, SellingStationContext> = SellingStationItemRenderer
+    val RECYCLING_STATION: ItemRenderer<NekoStack, RecyclingStationContext> = RecyclingStationItemRenderer
 }
 
 /**
