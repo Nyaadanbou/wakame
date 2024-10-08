@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.gui
 
-import cc.mewcraft.wakame.gui.merge.mergingModule
-import cc.mewcraft.wakame.gui.mod.moddingModule
-import cc.mewcraft.wakame.gui.reroll.rerollingModule
-import cc.mewcraft.wakame.gui.sell.sellingModule
-import org.koin.dsl.module
+import cc.mewcraft.wakame.gui.merge.*
+import cc.mewcraft.wakame.gui.mod.*
+import cc.mewcraft.wakame.gui.recycle.*
+import cc.mewcraft.wakame.gui.reroll.*
+import org.koin.dsl.*
 
 internal fun guiModule() = module {
     includes(
         mergingModule(),
         moddingModule(),
         rerollingModule(),
-        sellingModule()
+        recyclingModule()
     )
 }
