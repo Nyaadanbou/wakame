@@ -1,5 +1,11 @@
 # 在这里设置合成站的物品 *渲染内容*.
 
+attack_speed:
+  namespace: topmost
+  # 可用标签
+  # <value> 攻击速度值
+  tooltip: "<!i>攻击速度: <value>"
+
 cells:
   namespace: general
   # 可用标签

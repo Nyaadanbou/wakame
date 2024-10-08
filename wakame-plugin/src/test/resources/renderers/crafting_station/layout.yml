@@ -7,6 +7,8 @@
 primary:
   - general:item_name
 
+  - (default:blank)topmost:attack_speed
+
   - (fixed:general)
   - general:cells
   - general:elements
