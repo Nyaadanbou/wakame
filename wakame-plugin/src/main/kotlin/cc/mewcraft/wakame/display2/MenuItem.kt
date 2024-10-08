@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.display2
 
 import cc.mewcraft.wakame.core.LorePipeline
-import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.realize
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.registry.ItemRegistry
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
@@ -41,7 +39,7 @@ class MenuItemHolder(
  * - 将已存在的 [NekoStack] 转换为一个 [ItemStack] 用于菜单图标.
  */
 class MenuItem(
-    private val menuItem: MenuItemHolder
+    private val menuItem: MenuItemHolder,
 ) {
     private var tooltipPipeline: LorePipeline<Nothing, NekoStack, ItemStack> = TODO()
     private val cachedItemStack: ItemStack by lazy {
