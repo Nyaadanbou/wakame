@@ -19,7 +19,7 @@ crate:
   # 可用标签
   # <id> 盲盒的标识
   # <name> 盲盒的名字
-  tooltip: "<!i>盲盒: <name>"
+  tooltip: "<!i>盲盒: <name>(<id>)"
 
 custom_name:
   namespace: general
@@ -31,10 +31,11 @@ custom_name:
 elements:
   namespace: general
   # 可用标签
+  # <count> 元素数量
   # <merged> 多个元素合并后的文本
   # <single> 单个元素
   tooltip:
-    merged: "<!i>可能的元素: <merged>"
+    merged: "<!i>可能的元素(<count>): <merged>"
     single: "<single>"
     separator: ", "
 
@@ -63,10 +64,11 @@ item_name:
 kizamiz:
   namespace: general
   # 可用标签
+  # <count> 铭刻数量
   # <merged> 多个铭刻合并后的文本
   # <single> 单个铭刻
   tooltip:
-    merged: "<!i>可能的铭刻: <merged>"
+    merged: "<!i>可能的铭刻(<count>): <merged>"
     single: "<single>"
     separator: ", "
 
@@ -81,6 +83,3 @@ lore:
 
 portable_core:
   namespace: special
-  # 可用标签
-  # <value> 物品的 `minecraft:custom_name`
-  tooltip: "<!i><value>"
