@@ -10,7 +10,7 @@ import java.nio.file.Path
  */
 internal object ItemRenderers {
     @JvmField // 省去无用的函数调用
-    val STANDARD: ItemRenderer<PacketNekoStack, Nothing> = StandardItemRenderer
+    val STANDARD: ItemRenderer<PacketNekoStack, StandardContext> = StandardItemRenderer
 
     @JvmField
     val CRAFTING_STATION: ItemRenderer<NekoStack, CraftingStationContext> = CraftingStationItemRenderer
@@ -44,22 +44,10 @@ internal object ItemRenderers {
  * - `minecraft:enchantments`
  * - `minecraft:trim`
  *
- *
- *
  * @param T 被渲染的物品的类型
  * @param C 渲染的上下文的类型
  */
 internal interface ItemRenderer<in T, in C> {
-    /**
-     * 渲染布局.
-     */
-    val rendererLayout: RendererLayout
-
-    /**
-     * 渲染格式.
-     */
-    val rendererFormats: RendererFormats
-
     /**
      * 初始化该渲染器.
      *

@@ -11,10 +11,12 @@ import java.nio.file.Path
 internal class RecyclingStationContext
 
 internal object RecyclingStationItemRenderer : AbstractItemRenderer<NekoStack, RecyclingStationContext>() {
-    override val rendererLayout: RendererLayout
+    override var rendererLayout: RendererLayout
         get() = TODO()
-    override val rendererFormats: RendererFormats
+        set(value) {}
+    override var rendererFormats: RendererFormats
         get() = TODO()
+        set(value) {}
 
     override fun initialize(layoutPath: Path, formatPath: Path) {
         TODO()

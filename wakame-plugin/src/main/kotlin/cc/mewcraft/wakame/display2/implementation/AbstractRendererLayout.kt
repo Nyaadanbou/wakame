@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.wakame.display2.DerivedTooltipIndex
-import cc.mewcraft.wakame.display2.DerivedTooltipOrdinal
-import cc.mewcraft.wakame.display2.RendererLayout
-import cc.mewcraft.wakame.display2.TextMeta
+import cc.mewcraft.wakame.display2.*
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import org.koin.core.component.KoinComponent
@@ -12,7 +9,6 @@ import org.slf4j.Logger
 
 internal abstract class AbstractRendererLayout : RendererLayout, KoinComponent {
     protected val logger: Logger by inject()
-
     protected val textOrdinalMap: Object2IntOpenHashMap<DerivedTooltipIndex> = Object2IntOpenHashMap()
     protected val textMetadataMap: Object2ObjectOpenHashMap<DerivedTooltipIndex, TextMeta> = Object2ObjectOpenHashMap()
 

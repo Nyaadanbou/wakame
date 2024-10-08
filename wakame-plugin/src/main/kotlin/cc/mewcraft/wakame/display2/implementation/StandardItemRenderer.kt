@@ -3,83 +3,91 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.SkillCore
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.packet.PacketNekoStack
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.skill.ConfiguredSkill
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
-import me.lucko.helper.text3.mini
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import java.nio.file.Path
+import kotlin.properties.Delegates
 
 internal class StandardRendererLayout : AbstractRendererLayout() {
-    override var staticIndexedTextList: List<IndexedText> = ArrayList()
-    override var defaultIndexedTextList: List<IndexedText> = ArrayList()
+    override var staticIndexedTextList: List<IndexedText> = ArrayList() // TODO display2
+    override var defaultIndexedTextList: List<IndexedText> = ArrayList() // TODO display2
 }
 
 internal class StandardRendererFormats : AbstractRendererFormats() {
     override fun <T : RendererFormat> get(id: String): T? {
-        TODO("Not yet implemented")
+        TODO("display2")
     }
 
     override fun <T : RendererFormat> set(id: String, format: T) {
-        TODO("Not yet implemented")
+        TODO("display2")
     }
 }
 
-internal object StandardItemRenderer : ItemRenderer<PacketNekoStack, Nothing>, KoinComponent {
-    override var rendererLayout: RendererLayout
-        get() = TODO()
-        set(value) {}
+internal class StandardContext
 
-    override var rendererFormats: RendererFormats
-        get() = TODO()
-        set(value) {}
-
-    private var indexedLineFlatter: IndexedTextFlatter
-        get() = TODO()
-        set(value) {}
+internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>(), KoinComponent {
+    override var rendererLayout: RendererLayout by Delegates.notNull()
+    override var rendererFormats: RendererFormats by Delegates.notNull()
+    private var indexedLineFlatter: IndexedTextFlatter by Delegates.notNull()
 
     override fun initialize(
         layoutPath: Path,
-        formatPath: Path
+        formatPath: Path,
     ) {
         // TODO 读取配置文件, 初始化:
-        //   rendererLayout, rendererFormats, indexedLineFlatter
-        rendererLayout = TODO()
-        rendererFormats = TODO()
+        //   rendererLayout, rendererFormats
+        rendererLayout = StandardRendererLayout() // TODO display2
+        rendererFormats = StandardRendererFormats() // TODO display2
         indexedLineFlatter = IndexedTextFlatter(rendererLayout)
-        standardRenderingUnits = createStandardRenderingUnits()
     }
 
-    override fun render(item: PacketNekoStack, context: Nothing?) {
+    override fun render(item: PacketNekoStack, context: StandardContext?) {
         val components = item.components
-        val unprocessed = ObjectArrayList<IndexedText>()
-        val renderingUnits = standardRenderingUnits
+        val collector = ObjectArrayList<IndexedText>()
 
-        fun <T> process(componentType: ItemComponentType<T>) {
-            val unit = renderingUnits[componentType]
-            unit.process(unprocessed, components)
+        process(components, ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingParts.ATTACK_SPEED.process(collector, data) }
+        process(components, ItemComponentTypes.CELLS) { data ->
+            for ((_, cell) in data) {
+                when (
+                    val core = cell.getCore()
+                ) {
+                    is AttributeCore -> StandardRenderingParts.CELLULAR_ATTRIBUTE.process(collector, core.attribute)
+                    is SkillCore -> StandardRenderingParts.CELLULAR_SKILL.process(collector, core.skill)
+                    else -> StandardRenderingParts.CELLULAR_EMPTY.process(collector, null)
+                }
+            }
         }
+        process(components, ItemComponentTypes.CRATE) { data -> StandardRenderingParts.CRATE.process(collector, data) }
+        process(components, ItemComponentTypes.CUSTOM_NAME) { data -> StandardRenderingParts.CUSTOM_NAME.process(collector, data) }
+        process(components, ItemComponentTypes.ELEMENTS) { data -> StandardRenderingParts.ELEMENTS.process(collector, data) }
+        process(components, ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
+        process(components, ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, data) }
+        process(components, ItemComponentTypes.FOOD) { data -> StandardRenderingParts.FOOD.process(collector, data) }
+        process(components, ItemComponentTypes.ITEM_NAME) { data -> StandardRenderingParts.ITEM_NAME.process(collector, data) }
+        process(components, ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingParts.KIZAMIZ.process(collector, data) }
+        process(components, ItemComponentTypes.LEVEL) { data -> StandardRenderingParts.LEVEL.process(collector, data) }
+        process(components, ItemComponentTypes.LORE) { data -> StandardRenderingParts.LORE.process(collector, data) }
+        process(components, ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingParts.PORTABLE_CORE.process(collector, data) }
+        process(components, ItemComponentTypes.RARITY) { data -> StandardRenderingParts.RARITY.process(collector, data) }
 
-        process(ItemComponentTypes.ATTACK_SPEED)
-        process(ItemComponentTypes.CELLS)
-        process(ItemComponentTypes.ELEMENTS)
-        process(ItemComponentTypes.ENCHANTMENTS)
-        process(ItemComponentTypes.KIZAMIZ)
-        process(ItemComponentTypes.LEVEL)
-        process(ItemComponentTypes.LORE)
-        process(ItemComponentTypes.PORTABLE_CORE)
-        process(ItemComponentTypes.RARITY)
-
-        val lore = indexedLineFlatter.flatten(unprocessed)
+        val lore = indexedLineFlatter.flatten(collector)
         val cmd = ItemModelDataLookup[item.id, item.variant]
 
         // 修改物品(原地)
@@ -87,171 +95,15 @@ internal object StandardItemRenderer : ItemRenderer<PacketNekoStack, Nothing>, K
         item.customModelData(cmd)
     }
 
-    // TODO 为什么不把每个 renderer 的实现直接作为这个 ItemRenderer 的成员?
-    //  这样直接省去了 hash 函数的开销, 写起来,引用起来, 也更加直接
-    //  不能这样! 因为这要求每个对象支持 reload.
-    //  而如果用 map 这种容器的话, reload 的时候只需要重新构建 map 即可.
-
-    private var standardRenderingUnits: RenderingUnitMap = createStandardRenderingUnits()
-    private fun createStandardRenderingUnits(): RenderingUnitMap = RenderingUnitMap(this) {
-        define<ItemAttackSpeed, SingleValueRendererFormat>(ItemComponentTypes.ATTACK_SPEED) { data, format ->
-            val level = data.level
-            val text = format.render(Placeholder.component("value", Component.text(level.name)))
-            listOf(SimpleIndexedText(format.index, listOf(text)))
-        }
-
-        define<ItemCells, ItemCellsRendererFormat>(ItemComponentTypes.CELLS) { data, format ->
-            // TODO 词条栏的渲染逻辑很复杂, 需要分离出它自己的逻辑
-            format.render(data)
-        }
-
-        define<ItemElements, CollectionRendererFormat>(ItemComponentTypes.ELEMENTS) { data, format ->
-            val elements = data.elements
-            val text = format.render(elements, Element::displayName)
-            listOf(SimpleIndexedText(format.index, text))
-        }
-
-        define<ItemEnchantments, ItemEnchantmentsRendererFormat>(ItemComponentTypes.ENCHANTMENTS) { data, format ->
-            // TODO 附魔的渲染逻辑较为复杂, 需要分离出它自己的逻辑
-            format.render(data)
-        }
-
-        define<ItemKizamiz, CollectionRendererFormat>(ItemComponentTypes.KIZAMIZ) { data, format ->
-            val kizamiz = data.kizamiz
-            val text = format.render(kizamiz, Kizami::displayName)
-            listOf(SimpleIndexedText(format.index, text))
-        }
-
-        define<ItemLevel, SingleValueRendererFormat>(ItemComponentTypes.LEVEL) { data, format ->
-            val level = data.level
-            val text = format.render(Placeholder.component("value", Component.text(level)))
-            listOf(SimpleIndexedText(format.index, listOf(text)))
-        }
-
-        define<ItemRarity, SingleValueRendererFormat>(ItemComponentTypes.RARITY) { data, format ->
-            val rarity = data.rarity
-            val text = format.render(Placeholder.component("value", rarity.displayName))
-            listOf(SimpleIndexedText(format.index, listOf(text)))
-        }
-
-        define<ExtraLore, CollectionRendererFormat>(ItemComponentTypes.LORE) { data, format ->
-            val lore = data.lore
-            val text = format.render(lore, String::mini)
-            listOf(SimpleIndexedText(format.index, text))
-        }
-
-        define<PortableCore, SingleValueRendererFormat>(ItemComponentTypes.PORTABLE_CORE) { data, format ->
-            // TODO 把核心的渲染逻辑分离出来, 不仅可以在这里 (PortableCore) 使用, 还可以在 ItemCells 使用
-            val text = format.render(Placeholder.component("value", TODO()))
-            listOf(SimpleIndexedText(format.index, listOf(text)))
-        }
-
-        // TODO add more DataComponentRenderer ...
-    }
-
-
-    //////
-
-
-    /**
-     * 聚合了渲染一种物品数据所需要的数据和逻辑.
-     *
-     * @param T 被渲染的数据类型
-     * @param F 渲染格式的类型
-     */
-    interface RenderingUnit<T, F : RendererFormat> {
-        val rendererFormat: F
-        val componentType: ItemComponentType<T>
-        val dataRenderer: DataComponentRenderer<T, F>
-
-        /**
-         * @param collector 用于收集渲染结果的容器
-         * @param components 存放了物品所有组件的容器
-         */
-        fun process(collector: MutableList<IndexedText>, components: ItemComponentMap)
-    }
-
-    object EmptyRenderingUnit : RenderingUnit<Nothing, Nothing> {
-        override val rendererFormat: Nothing
-            get() = error("EmptyRenderingUnit does not have a rendererFormat.")
-        override val componentType: Nothing
-            get() = error("EmptyRenderingUnit does not have a componentType.")
-        override val dataRenderer: Nothing
-            get() = error("EmptyRenderingUnit does not have a dataRenderer.")
-
-        override fun process(collector: MutableList<IndexedText>, components: ItemComponentMap) = Unit
-    }
-
-    class SimpleRenderingUnit<T, F : RendererFormat>(
-        override val rendererFormat: F,
-        override val componentType: ItemComponentType<T>,
-        override val dataRenderer: DataComponentRenderer<T, F>
-    ) : RenderingUnit<T, F> {
-        override fun process(collector: MutableList<IndexedText>, components: ItemComponentMap) {
-            val component = components.get(componentType) ?: return // 如果没有这个组件, 则不渲染
-            val rendered = dataRenderer.render(component, rendererFormat)
-            collector += rendered
-        }
-    }
-
-
-    //////
-
-
-    fun <S, C> RenderingUnitMap(
-        renderer: ItemRenderer<S, C>,
-        block: RenderingUnitMapDSL<S, C>.() -> Unit
-    ): RenderingUnitMap {
-        return RenderingUnitMapDSL<S, C>(renderer).apply(block).build()
-    }
-
-    /**
-     * 用于构建 [RenderingUnitMap].
-     *
-     * @param S 物品的类型
-     * @param C 上下文的类型
-     */
-    class RenderingUnitMapDSL<in S, in C>(
-        private val renderer: ItemRenderer<S, C>,
-    ) {
-        private val data = Reference2ReferenceOpenHashMap<ItemComponentType<*>, RenderingUnit<*, *>>()
-        private val rendererLayout = renderer.rendererLayout // 重新赋值, 避免 partial reads
-        private val rendererFormats = renderer.rendererFormats // 重新赋值, 避免 partial reads
-
-        @Suppress("UNCHECKED_CAST")
-        fun <T, F : RendererFormat> define(
-            componentType: ItemComponentType<T>,
-            renderingLogic: (T, F) -> Collection<IndexedText>,
-        ): RenderingUnit<T, F> {
-            val id = componentType.id
-            val format = rendererFormats.get<F>(id) ?: return EmptyRenderingUnit as RenderingUnit<T, F>
-            val renderer = DataComponentRenderer<T, F> { data, format -> renderingLogic(data, format) }
-            return SimpleRenderingUnit(format, componentType, renderer)
-        }
-
-        fun build(): RenderingUnitMap {
-            return RenderingUnitMap(data)
-        }
-    }
-
-    class RenderingUnitMap(
-        map: Map<ItemComponentType<*>, RenderingUnit<*, *>>,
-    ) {
-        private val data = Reference2ReferenceOpenHashMap<ItemComponentType<*>, RenderingUnit<*, *>>(map)
-
-        operator fun <T> get(
-            componentType: ItemComponentType<T>
-        ): RenderingUnit<T, *> {
-            @Suppress("UNCHECKED_CAST")
-            return data[componentType] as RenderingUnit<T, *>
-        }
+    private inline fun <T> process(components: ItemComponentMap, type: ItemComponentType<T>, block: (T) -> Unit) {
+        components.get(type)?.apply(block)
     }
 }
 
 /**
  * 用于(反)序列化渲染器的配置文件.
  */
-object StandardRendererConfigSerializer {
+internal object StandardRendererConfigSerializer {
 
 }
 
@@ -259,37 +111,216 @@ object StandardRendererConfigSerializer {
 //////
 
 
+//<editor-fold desc="RenderingPart">
+internal object StandardRenderingParts {
+    @JvmField
+    val ATTACK_SPEED = configure<ItemAttackSpeed, SingleValueRendererFormat>("attack_speed") { data, format ->
+        val level = data.level
+        val text = format.render(Placeholder.component("value", Component.text(level.name)))
+        listOf(SimpleIndexedText(format.index, listOf(text)))
+    }
+
+    @JvmField
+    val CELLULAR_ATTRIBUTE = configure<ConstantCompositeAttribute, CellularAttributeRendererFormat>("cells/attributes") { data, format ->
+        val text = format.render(data)
+        val idx = format.computeIndex(data)
+        listOf(SimpleIndexedText(idx, text))
+    }
+
+    @JvmField
+    val CELLULAR_SKILL = configure<ConfiguredSkill, CellularSkillRendererFormat>("cells/skills") { data, format ->
+        val text = format.render(data)
+        val idx = format.computeIndex(data)
+        listOf(SimpleIndexedText(idx, text))
+    }
+
+    @JvmField
+    val CELLULAR_EMPTY = configure<Nothing?, CellularEmptyRendererFormat>("cells/empty") { _, format ->
+        val text = format.render()
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, text))
+    }
+
+    @JvmField
+    val CRATE = configure<ItemCrate, AggregateValueRendererFormat>("crate") { _, _ ->
+        emptyList() // TODO display2
+    }
+
+    @JvmField
+    val CUSTOM_NAME = configure<CustomName, SingleValueRendererFormat>("custom_name") { data, format ->
+        val text = format.render(Placeholder.component("value", data.rich))
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, listOf(text)))
+    }
+
+    @JvmField
+    val ELEMENTS = configure<ItemElements, AggregateValueRendererFormat>("elements") { data, format ->
+        val text = format.render(data.elements, Element::displayName)
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, text))
+    }
+
+    @JvmField
+    val ENCHANTMENTS = configure<ItemEnchantments, EnchantmentRendererFormat>("enchantments") { data, format ->
+        val text = format.render(data.enchantments)
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, text))
+    }
+
+    @JvmField
+    val FIRE_RESISTANT = configure<FireResistant, SingleValueRendererFormat>("fire_resistant") { data, format ->
+        val text = format.render()
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, listOf(text)))
+    }
+
+    @JvmField
+    val FOOD = configure<FoodProperties, FoodPropertiesRendererFormat>("food") { data, format ->
+        val text = format.render(data)
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, text))
+    }
+
+    @JvmField
+    val ITEM_NAME = configure<ItemName, SingleValueRendererFormat>("item_name") { data, format ->
+        val text = format.render(Placeholder.component("value", data.rich))
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, listOf(text)))
+    }
+
+    @JvmField
+    val KIZAMIZ = configure<ItemKizamiz, AggregateValueRendererFormat>("kizamiz") { data, format ->
+        val text = format.render(data.kizamiz, Kizami::displayName)
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, text))
+    }
+
+    @JvmField
+    val LEVEL = configure<ItemLevel, SingleValueRendererFormat>("level") { data, format ->
+        val text = format.render(Placeholder.component("value", Component.text(data.level)))
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, listOf(text)))
+    }
+
+    @JvmField
+    val LORE = configure<ExtraLore, ExtraLoreRendererFormat>("lore") { data, format ->
+        val text = format.render(data.lore)
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, text))
+    }
+
+    @JvmField
+    val PORTABLE_CORE = configure<PortableCore, SingleValueRendererFormat>("portable_core") { data, format ->
+        emptyList() // TODO display2 // 把核心的渲染逻辑分离出来, 不仅可以在这里 (PortableCore) 使用, 还可以在 ItemCells 使用
+    }
+
+    @JvmField
+    val RARITY = configure<ItemRarity, SingleValueRendererFormat>("rarity") { data, format ->
+        val text = format.render(Placeholder.component("value", data.rarity.displayName))
+        val idx = format.index
+        listOf(SimpleIndexedText(idx, listOf(text)))
+    }
+
+    private fun <T, F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): StandardRenderingPart<T, F> {
+        TODO("display2")
+    }
+
+    private fun <T1, T2, F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): StandardRenderingPart2<T1, T2, F> {
+        TODO("display2")
+    }
+
+    private fun <T1, T2, T3, F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): StandardRenderingPart3<T1, T2, T3, F> {
+        TODO("display2")
+    }
+}
+
+/**
+ * 聚合了渲染一种物品数据所需要的数据和逻辑.
+ *
+ * @param T 被渲染的数据类型
+ * @param F 渲染格式的类型
+ */
+internal class StandardRenderingPart<T, F : RendererFormat>(
+    override val format: F,
+    override val renderer: IndexedDataRenderer<T, F>,
+) : RenderingPart<T, F> {
+    fun process(collector: MutableList<IndexedText>, data: T) {
+        collector += renderer.render(data, format)
+    }
+}
+
+internal class StandardRenderingPart2<T1, T2, F : RendererFormat>(
+    override val format: F,
+    override val renderer: IndexedDataRenderer2<T1, T2, F>,
+) : RenderingPart2<T1, T2, F> {
+    fun process(collector: MutableList<IndexedText>, data1: T1, data2: T2) {
+        collector += renderer.render(data1, data2, format)
+    }
+}
+
+internal class StandardRenderingPart3<T1, T2, T3, F : RendererFormat>(
+    override val format: F,
+    override val renderer: IndexedDataRenderer3<T1, T2, T3, F>,
+) : RenderingPart3<T1, T2, T3, F> {
+    fun process(collector: MutableList<IndexedText>, data1: T1, data2: T2, data3: T3) {
+        collector += renderer.render(data1, data2, data3, format)
+    }
+}
+//</editor-fold>
+
+
+//////
+
+
 //<editor-fold desc="RendererFormat">
-/**
- * @see Core
- */
-private class ItemCoresRendererFormat(
-    override val index: DerivedTooltipIndex
-) : RendererFormat {
-    fun render(core: Core): Collection<IndexedText> {
-        return emptyList()
+internal class CellularAttributeRendererFormat(
+    override val namespace: String,
+) : RendererFormat.Dynamic<ConstantCompositeAttribute> {
+    override fun computeIndex(source: ConstantCompositeAttribute): Key {
+        TODO("display2")
+    }
+
+    fun render(attribute: ConstantCompositeAttribute): List<Component> {
+        val facade = AttributeRegistry.FACADES[attribute.id]
+        return facade.createTooltipLore(attribute)
     }
 }
 
-/**
- * @see ItemCells
- */
-private class ItemCellsRendererFormat(
-    override val index: DerivedTooltipIndex
-) : RendererFormat {
-    fun render(cells: ItemCells): Collection<IndexedText> {
-        return emptyList()
+internal class CellularSkillRendererFormat(
+    override val namespace: String,
+) : RendererFormat.Dynamic<ConfiguredSkill>, KoinComponent {
+    private val miniMessage = get<MiniMessage>()
+
+    override fun computeIndex(source: ConfiguredSkill): Key {
+        val sourceId = source.id
+        return Key.key(namespace, sourceId.namespace() + "/" + sourceId.key())
+    }
+
+    fun render(skill: ConfiguredSkill): List<Component> {
+        val skillObject = skill.instance
+        return skillObject.displays.tooltips.map(miniMessage::deserialize)
     }
 }
 
-/**
- * @see ItemEnchantments
- */
-private class ItemEnchantmentsRendererFormat(
-    override val index: DerivedTooltipIndex
-) : RendererFormat, KoinComponent {
-    fun render(enchantments: ItemEnchantments): Collection<IndexedText> {
-        return emptyList()
+internal class CellularEmptyRendererFormat(
+    override val namespace: String,
+    private val fallback: List<Component>,
+) : RendererFormat.Simple {
+    override val index: Key = Key.key(namespace, "cells/empty")
+
+    fun render(): List<Component> {
+        return fallback
+    }
+}
+
+internal class FoodPropertiesRendererFormat(
+    override val namespace: String,
+    private val lines: List<String>,
+) : RendererFormat.Simple {
+    override val index: Key = Key.key(namespace, "food")
+
+    fun render(food: FoodProperties): List<Component> {
+        return emptyList() // TODO display2
     }
 }
 //</editor-fold>

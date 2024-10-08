@@ -22,13 +22,23 @@ interface RendererFormats {
  */
 interface RendererFormat {
     /**
-     * 该内容的索引, 由 [Key] 来表示.
-     *
-     * 该索引的构成为:
-     * - [Key.namespace] 为该内容的索引的命名空间
-     *   *由用户自行定义*
-     * - [Key.value] 为该内容的唯一标识
-     *   *编译时已经确定*
+     * 该内容的命名空间, 由用户提供.
      */
-    val index: DerivedTooltipIndex
+    val namespace: String
+
+    /**
+     * 代表一个索引在编译时已经确定的 [RendererFormat].
+     */
+    interface Simple : RendererFormat {
+        val index: Key
+    }
+
+    /**
+     * 代表一个索引会在运行时动态生成的 [RendererFormat].
+     *
+     * @param T 动态内容的类型
+     */
+    interface Dynamic<T> : RendererFormat {
+        fun computeIndex(source: T): Key
+    }
 }

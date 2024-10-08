@@ -10,11 +10,13 @@ import java.nio.file.Path
 
 internal class RerollingTableContext
 
-internal object RerollingTableItemRenderer: AbstractItemRenderer<NekoStack, RerollingTableContext>() {
-    override val rendererLayout: RendererLayout
+internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, RerollingTableContext>() {
+    override var rendererLayout: RendererLayout
         get() = TODO("Not yet implemented")
-    override val rendererFormats: RendererFormats
+        set(value) {}
+    override var rendererFormats: RendererFormats
         get() = TODO("Not yet implemented")
+        set(value) {}
 
     override fun initialize(layoutPath: Path, formatPath: Path) {
         TODO("Not yet implemented")

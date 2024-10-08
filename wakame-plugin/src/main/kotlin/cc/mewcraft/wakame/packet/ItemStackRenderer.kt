@@ -1,15 +1,12 @@
 package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.StandardContext
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
+import com.github.retrooper.packetevents.wrapper.play.server.*
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
@@ -124,7 +121,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
             return false
         }
         try {
-            ItemRenderers.STANDARD.render(nekoStack)
+            ItemRenderers.STANDARD.render(nekoStack, StandardContext())
         } catch (e: Throwable) {
             logger.error("An error occurred while rendering NekoStack: $this", e)
             return false

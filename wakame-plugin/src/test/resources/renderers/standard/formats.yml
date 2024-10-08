@@ -31,9 +31,8 @@ crate:
 custom_name:
   namespace: general
   # 可用标签
-  # <rarity_name> 稀有度名字
-  # <rarity_style> 稀有度样式
-  tooltip: "<!i><rarity_style><value>"
+  # <value> 物品的 `minecraft:custom_name`
+  tooltip: "<value>"
 
 elements:
   namespace: general
@@ -73,9 +72,8 @@ food:
 item_name:
   namespace: general
   # 可用标签
-  # <rarity_name> 稀有度名字
-  # <rarity_style> 稀有度样式
-  tooltip: "<rarity_style><rarity_name> <value>"
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<value>"
 
 kizamiz:
   namespace: general
