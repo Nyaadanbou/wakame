@@ -14,7 +14,7 @@ package cc.mewcraft.wakame.display2
  */
 class RenderingBundle<T, F : RendererFormat>(
     val rendererFormat: F,
-    val dataRenderer: DataComponentRenderer<T>
+    val dataRenderer: DataComponentRenderer<T, T>
 ) {
 
 }

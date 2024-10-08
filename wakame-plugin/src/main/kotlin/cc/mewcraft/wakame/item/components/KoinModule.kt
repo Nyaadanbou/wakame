@@ -1,17 +1,15 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.components.cells.moduleCells
-import cc.mewcraft.wakame.item.components.crates.moduleCrates
-import cc.mewcraft.wakame.item.components.legacy.moduleLegacy
-import cc.mewcraft.wakame.item.components.tracks.moduleTracks
+import cc.mewcraft.wakame.item.components.crates.cratesModule
+import cc.mewcraft.wakame.item.components.legacy.legacyModule
+import cc.mewcraft.wakame.item.components.tracks.tracksModule
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
 internal fun componentsModule(): Module = module {
     includes(
-        moduleCells(),
-        moduleCrates(),
-        moduleLegacy(),
-        moduleTracks(),
+        cratesModule(),
+        legacyModule(),
+        tracksModule(),
     )
 }

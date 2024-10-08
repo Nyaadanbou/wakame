@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.display
 
-import cc.mewcraft.wakame.display2.ItemRendererType
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -91,7 +90,7 @@ internal class DynamicLoreMetaCreators : KoinComponent {
      * 获取所有的 [DynamicLoreMetaCreator].
      */
     fun entries(): Set<Map.Entry<String, DynamicLoreMetaCreator>> {
-        return this.creators.rowMap().entries.flatMap { entry -> entry.value.entries }.toSet()
+        return this.creators.entries
     }
 
     /**
@@ -99,9 +98,9 @@ internal class DynamicLoreMetaCreators : KoinComponent {
      *
      * 会覆盖 [DynamicLoreMetaCreator.namespace] 相同的实例.
      */
-    fun register(systemName: ItemRendererType, creator: DynamicLoreMetaCreator) {
-        this.creators.row(systemName)[creator.namespace] = creator
-        logger.info("Registered DynamicLoreMetaCreator: {} in system {}", creator.namespace, systemName)
+    fun register(creator: DynamicLoreMetaCreator) {
+        this.creators += creator.namespace to creator
+        logger.info("Registered DynamicLoreMetaCreator: {}", creator.namespace)
     }
 
     /**
@@ -111,6 +110,6 @@ internal class DynamicLoreMetaCreators : KoinComponent {
      * @return 返回一个合适的 [DynamicLoreMetaCreator]
      */
     fun getApplicableCreator(rawLine: String): DynamicLoreMetaCreator? {
-        return this.creators.values().firstOrNull { creator -> creator.test(rawLine) }
+        return this.creators.values.firstOrNull { creator -> creator.test(rawLine) }
     }
 }

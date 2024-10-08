@@ -138,8 +138,6 @@ object AttributeRegistry : Initializable {
         +buildFacade("universal_defense").single().bind { UNIVERSAL_DEFENSE }
         +buildFacade("universal_defense_penetration").single().bind { UNIVERSAL_DEFENSE_PENETRATION }
         +buildFacade("universal_defense_penetration_rate").single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
-        // FIXME 需要正确的移除 universal_incoming_damage_rate
-        +buildFacade("universal_incoming_damage_rate").single().bind { UNIVERSAL_INCOMING_DAMAGE_RATE }
     }
 
     override fun onPreWorld() {

@@ -2,34 +2,14 @@ package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.item.components.cells.SkillCore
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 // TODO 移动到专门的渲染系统里
 
 // 文件说明:
 // 这里是 CoreSkill 所有跟提示框渲染相关的代码
-
-@ReloadDependency(
-    runAfter = [RendererBootstrap::class]
-)
-@PostWorldDependency(
-    runAfter = [RendererBootstrap::class]
-)
-internal object SkillCoreBootstrap : Initializable, KoinComponent {
-    private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
-
-    override fun onPostWorld() {
-        for ((systemName, _) in ItemRenderers.entries()) {
-            dynamicLoreMetaCreators.register(systemName, SkillCoreLoreMetaCreator())
-        }
-    }
-}
 
 internal class SkillCoreLoreMetaCreator : DynamicLoreMetaCreator {
     override val namespace: String = Namespaces.SKILL

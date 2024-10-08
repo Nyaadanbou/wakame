@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.logic.AdventureLevelHotfix
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
@@ -30,10 +31,7 @@ import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.*
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor

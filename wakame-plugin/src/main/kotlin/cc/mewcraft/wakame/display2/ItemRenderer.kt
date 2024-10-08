@@ -1,11 +1,6 @@
 package cc.mewcraft.wakame.display2
 
-import cc.mewcraft.wakame.display2.implementation.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.MergingTableContext
-import cc.mewcraft.wakame.display2.implementation.ModdingTableContext
-import cc.mewcraft.wakame.display2.implementation.RerollingTableContext
-import cc.mewcraft.wakame.display2.implementation.SellingStationContext
-import cc.mewcraft.wakame.display2.implementation.StandardItemRenderer
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.packet.PacketNekoStack
 import java.nio.file.Path
@@ -14,12 +9,23 @@ import java.nio.file.Path
  * 所有的 [ItemRenderers] 实例.
  */
 internal object ItemRenderers {
+    @JvmField // 省去无用的函数调用
     val STANDARD: ItemRenderer<PacketNekoStack, Nothing> = StandardItemRenderer
-    val CRAFTING_STATION: ItemRenderer<NekoStack, CraftingStationContext> = TODO()
-    val MERGING_TABLE: ItemRenderer<NekoStack, MergingTableContext> = TODO()
-    val MODDING_TABLE: ItemRenderer<NekoStack, ModdingTableContext> = TODO()
-    val REROLLING_TABLE: ItemRenderer<NekoStack, RerollingTableContext> = TODO()
-    val SELLING_STATION: ItemRenderer<NekoStack, SellingStationContext> = TODO()
+
+    @JvmField
+    val CRAFTING_STATION: ItemRenderer<NekoStack, CraftingStationContext> = CraftingStationItemRenderer
+
+    @JvmField
+    val MERGING_TABLE: ItemRenderer<NekoStack, MergingTableContext> = MergingTableItemRenderer
+
+    @JvmField
+    val MODDING_TABLE: ItemRenderer<NekoStack, ModdingTableContext> = ModdingTableItemRenderer
+
+    @JvmField
+    val REROLLING_TABLE: ItemRenderer<NekoStack, RerollingTableContext> = RerollingTableItemRenderer
+
+    @JvmField
+    val SELLING_STATION: ItemRenderer<NekoStack, SellingStationContext> = SellingStationItemRenderer
 }
 
 /**
@@ -64,7 +70,7 @@ internal interface ItemRenderer<in T, in C> {
      */
     fun initialize(
         layoutPath: Path,
-        formatPath: Path
+        formatPath: Path,
     )
 
     /**

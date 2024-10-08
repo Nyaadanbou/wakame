@@ -3,7 +3,24 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
+import cc.mewcraft.wakame.display2.RendererFormats
+import cc.mewcraft.wakame.display2.RendererLayout
+import cc.mewcraft.wakame.item.NekoStack
+import java.nio.file.Path
+
 internal class SellingStationContext
 
-internal class SellingStationItemRenderer {
+internal object SellingStationItemRenderer : AbstractItemRenderer<NekoStack, SellingStationContext>() {
+    override val rendererLayout: RendererLayout
+        get() = TODO()
+    override val rendererFormats: RendererFormats
+        get() = TODO()
+
+    override fun initialize(layoutPath: Path, formatPath: Path) {
+        TODO()
+    }
+
+    override fun render(item: NekoStack, context: SellingStationContext?) {
+        TODO()
+    }
 }

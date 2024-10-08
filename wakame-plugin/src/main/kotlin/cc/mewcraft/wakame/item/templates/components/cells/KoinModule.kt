@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.templates.components.cells
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.item.components.cells.cores.moduleCores
 import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import org.koin.core.module.Module
@@ -9,11 +8,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import kotlin.io.path.Path
 
-internal fun moduleCells(): Module = module {
-    includes(
-        moduleCores(),
-    )
-
+internal fun cellsModule(): Module = module {
     // Cores ...
     single<CoreBlueprintSampleNodeFacade> {
         CoreBlueprintSampleNodeFacade(Path("random/items/cores"))

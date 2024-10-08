@@ -9,9 +9,7 @@ import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.util.StringCombiner
@@ -22,8 +20,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.stream.Stream
 
 // TODO 移动到专门的渲染系统里
@@ -31,24 +27,8 @@ import java.util.stream.Stream
 // 文件说明:
 // 这里是 CoreAttribute 的所有跟提示框渲染相关的代码
 
-@ReloadDependency(
-    runAfter = [RendererBootstrap::class]
-)
-@PostWorldDependency(
-    runAfter = [RendererBootstrap::class]
-)
-internal object AttributeCoreBootstrap : Initializable, KoinComponent {
-    private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
-
-    override fun onPostWorld() {
-        for ((systemName, system) in ItemRenderers.entries()) {
-            dynamicLoreMetaCreators.register(systemName, system.attributeCoreLoreMetaCreator)
-        }
-    }
-}
-
 internal class AttributeCoreLoreMetaCreator(
-    config: ConfigProvider
+    config: ConfigProvider,
 ) : DynamicLoreMetaCreator {
     private val operationRawLines = config.entry<List<String>>("operation")
     private val elementRawLines = config.entry<List<String>>("element")

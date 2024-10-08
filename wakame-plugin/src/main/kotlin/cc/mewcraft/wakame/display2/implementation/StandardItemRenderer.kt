@@ -3,28 +3,10 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.wakame.display2.DataComponentRenderer
-import cc.mewcraft.wakame.display2.DerivedTooltipIndex
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.IndexedTextFlatter
-import cc.mewcraft.wakame.display2.ItemRenderer
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.RendererFormats
-import cc.mewcraft.wakame.display2.RendererLayout
-import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.component.ItemComponentMap
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.ExtraLore
-import cc.mewcraft.wakame.item.components.ItemAttackSpeed
-import cc.mewcraft.wakame.item.components.ItemCells
-import cc.mewcraft.wakame.item.components.ItemElements
-import cc.mewcraft.wakame.item.components.ItemEnchantments
-import cc.mewcraft.wakame.item.components.ItemKizamiz
-import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.ItemRarity
-import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
@@ -98,7 +80,7 @@ internal object StandardItemRenderer : ItemRenderer<PacketNekoStack, Nothing>, K
         process(ItemComponentTypes.RARITY)
 
         val lore = indexedLineFlatter.flatten(unprocessed)
-        val cmd = ItemModelDataLookup[item.key, item.variant]
+        val cmd = ItemModelDataLookup[item.id, item.variant]
 
         // 修改物品(原地)
         item.lore(lore)
@@ -311,4 +293,3 @@ private class ItemEnchantmentsRendererFormat(
     }
 }
 //</editor-fold>
-

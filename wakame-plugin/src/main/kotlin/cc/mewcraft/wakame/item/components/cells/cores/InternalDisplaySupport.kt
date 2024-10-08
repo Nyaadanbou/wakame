@@ -3,24 +3,11 @@ package cc.mewcraft.wakame.item.components.cells.cores
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.display.DynamicLoreMeta
-import cc.mewcraft.wakame.display.DynamicLoreMetaCreator
-import cc.mewcraft.wakame.display.DynamicLoreMetaCreators
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.RawTooltipIndex
-import cc.mewcraft.wakame.display.RawTooltipKey
-import cc.mewcraft.wakame.display.RendererBootstrap
-import cc.mewcraft.wakame.display.TooltipKey
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PostWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.display.*
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.text.Component
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 // TODO 移动到专门的渲染系统里
 
@@ -38,22 +25,6 @@ internal object EmptyCoreDisplaySupport {
      */
     fun derive(rawTooltipKey: RawTooltipKey, index: Int): TooltipKey {
         return Key("${rawTooltipKey.namespace()}:${rawTooltipKey.value()}/$index")
-    }
-}
-
-@ReloadDependency(
-    runAfter = [RendererBootstrap::class]
-)
-@PostWorldDependency(
-    runAfter = [RendererBootstrap::class]
-)
-internal object EmptyCoreBootstrap : Initializable, KoinComponent {
-    private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
-
-    override fun onPostWorld() {
-        for ((systemName, _) in ItemRenderers.entries()) {
-            dynamicLoreMetaCreators.register(systemName, EmptyCoreLoreMetaCreator())
-        }
     }
 }
 

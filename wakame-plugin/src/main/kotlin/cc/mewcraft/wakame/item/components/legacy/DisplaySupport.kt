@@ -2,34 +2,14 @@ package cc.mewcraft.wakame.item.components.legacy
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.display.*
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.initializer.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 // TODO 迁移到新的渲染系统
 // FIXME namespace 支持自定义
 
 // 文件说明:
 // 这里是 ItemMeta 的所有跟提示框渲染相关的代码
-
-@PostWorldDependency(
-    runAfter = [RendererBootstrap::class]
-)
-@ReloadDependency(
-    runAfter = [RendererBootstrap::class]
-)
-internal object ItemMetaBootstrap : Initializable, KoinComponent {
-    private val dynamicLoreMetaCreators by inject<DynamicLoreMetaCreators>()
-
-    override fun onPostWorld() {
-        for ((systemName, _) in ItemRenderers.entries()) {
-            dynamicLoreMetaCreators.register(systemName, ItemMetaLoreMetaCreator())
-        }
-    }
-}
 
 internal class ItemMetaLoreMetaCreator : DynamicLoreMetaCreator {
     override val namespace: String = Namespaces.ITEM_META
