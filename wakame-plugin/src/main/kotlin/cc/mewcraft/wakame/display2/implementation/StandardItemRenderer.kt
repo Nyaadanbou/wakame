@@ -114,122 +114,122 @@ internal object StandardRendererConfigSerializer {
 //<editor-fold desc="RenderingPart">
 internal object StandardRenderingParts {
     @JvmField
-    val ATTACK_SPEED = configure<ItemAttackSpeed, SingleValueRendererFormat>("attack_speed") { data, format ->
+    val ATTACK_SPEED: StandardRenderingPart<ItemAttackSpeed, SingleValueRendererFormat> = configure("attack_speed") { data, format ->
         val level = data.level
         val text = format.render(Placeholder.component("value", Component.text(level.name)))
         listOf(SimpleIndexedText(format.index, listOf(text)))
     }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE = configure<ConstantCompositeAttribute, CellularAttributeRendererFormat>("cells/attributes") { data, format ->
+    val CELLULAR_ATTRIBUTE: StandardRenderingPart<ConstantCompositeAttribute, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
         val text = format.render(data)
         val idx = format.computeIndex(data)
         listOf(SimpleIndexedText(idx, text))
     }
 
     @JvmField
-    val CELLULAR_SKILL = configure<ConfiguredSkill, CellularSkillRendererFormat>("cells/skills") { data, format ->
+    val CELLULAR_SKILL: StandardRenderingPart<ConfiguredSkill, CellularSkillRendererFormat> = configure("cells/skills") { data, format ->
         val text = format.render(data)
         val idx = format.computeIndex(data)
         listOf(SimpleIndexedText(idx, text))
     }
 
     @JvmField
-    val CELLULAR_EMPTY = configure<Nothing?, CellularEmptyRendererFormat>("cells/empty") { _, format ->
+    val CELLULAR_EMPTY: StandardRenderingPart<Nothing?, CellularEmptyRendererFormat> = configure("cells/empty") { _, format ->
         val text = format.render()
         val idx = format.index
         listOf(SimpleIndexedText(idx, text))
     }
 
     @JvmField
-    val CRATE = configure<ItemCrate, AggregateValueRendererFormat>("crate") { _, _ ->
+    val CRATE: StandardRenderingPart<ItemCrate, AggregateValueRendererFormat> = configure("crate") { data, format ->
         emptyList() // TODO display2
     }
 
     @JvmField
-    val CUSTOM_NAME = configure<CustomName, SingleValueRendererFormat>("custom_name") { data, format ->
+    val CUSTOM_NAME: StandardRenderingPart<CustomName, SingleValueRendererFormat> = configure("custom_name") { data, format ->
         val text = format.render(Placeholder.component("value", data.rich))
         val idx = format.index
         listOf(SimpleIndexedText(idx, listOf(text)))
     }
 
     @JvmField
-    val ELEMENTS = configure<ItemElements, AggregateValueRendererFormat>("elements") { data, format ->
+    val ELEMENTS: StandardRenderingPart<ItemElements, AggregateValueRendererFormat> = configure("elements") { data, format ->
         val text = format.render(data.elements, Element::displayName)
         val idx = format.index
         listOf(SimpleIndexedText(idx, text))
     }
 
     @JvmField
-    val ENCHANTMENTS = configure<ItemEnchantments, EnchantmentRendererFormat>("enchantments") { data, format ->
+    val ENCHANTMENTS: StandardRenderingPart<ItemEnchantments, EnchantmentRendererFormat> = configure("enchantments") { data, format ->
         val text = format.render(data.enchantments)
         val idx = format.index
         listOf(SimpleIndexedText(idx, text))
     }
 
     @JvmField
-    val FIRE_RESISTANT = configure<FireResistant, SingleValueRendererFormat>("fire_resistant") { data, format ->
+    val FIRE_RESISTANT: StandardRenderingPart<FireResistant, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
         val text = format.render()
         val idx = format.index
         listOf(SimpleIndexedText(idx, listOf(text)))
     }
 
     @JvmField
-    val FOOD = configure<FoodProperties, FoodPropertiesRendererFormat>("food") { data, format ->
+    val FOOD: StandardRenderingPart<FoodProperties, FoodPropertiesRendererFormat> = configure("food") { data, format ->
         val text = format.render(data)
         val idx = format.index
         listOf(SimpleIndexedText(idx, text))
     }
 
     @JvmField
-    val ITEM_NAME = configure<ItemName, SingleValueRendererFormat>("item_name") { data, format ->
+    val ITEM_NAME: StandardRenderingPart<ItemName, SingleValueRendererFormat> = configure("item_name") { data, format ->
         val text = format.render(Placeholder.component("value", data.rich))
         val idx = format.index
         listOf(SimpleIndexedText(idx, listOf(text)))
     }
 
     @JvmField
-    val KIZAMIZ = configure<ItemKizamiz, AggregateValueRendererFormat>("kizamiz") { data, format ->
+    val KIZAMIZ: StandardRenderingPart<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
         val text = format.render(data.kizamiz, Kizami::displayName)
         val idx = format.index
         listOf(SimpleIndexedText(idx, text))
     }
 
     @JvmField
-    val LEVEL = configure<ItemLevel, SingleValueRendererFormat>("level") { data, format ->
+    val LEVEL: StandardRenderingPart<ItemLevel, SingleValueRendererFormat> = configure("level") { data, format ->
         val text = format.render(Placeholder.component("value", Component.text(data.level)))
         val idx = format.index
         listOf(SimpleIndexedText(idx, listOf(text)))
     }
 
     @JvmField
-    val LORE = configure<ExtraLore, ExtraLoreRendererFormat>("lore") { data, format ->
+    val LORE: StandardRenderingPart<ExtraLore, ExtraLoreRendererFormat> = configure("lore") { data, format ->
         val text = format.render(data.lore)
         val idx = format.index
         listOf(SimpleIndexedText(idx, text))
     }
 
     @JvmField
-    val PORTABLE_CORE = configure<PortableCore, SingleValueRendererFormat>("portable_core") { data, format ->
+    val PORTABLE_CORE: StandardRenderingPart<PortableCore, SingleValueRendererFormat> = configure("portable_core") { data, format ->
         emptyList() // TODO display2 // 把核心的渲染逻辑分离出来, 不仅可以在这里 (PortableCore) 使用, 还可以在 ItemCells 使用
     }
 
     @JvmField
-    val RARITY = configure<ItemRarity, SingleValueRendererFormat>("rarity") { data, format ->
+    val RARITY: StandardRenderingPart<ItemRarity, SingleValueRendererFormat> = configure("rarity") { data, format ->
         val text = format.render(Placeholder.component("value", data.rarity.displayName))
         val idx = format.index
         listOf(SimpleIndexedText(idx, listOf(text)))
     }
 
-    private fun <T, F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): StandardRenderingPart<T, F> {
+    private inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): StandardRenderingPart<T, F> {
         TODO("display2")
     }
 
-    private fun <T1, T2, F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): StandardRenderingPart2<T1, T2, F> {
+    private inline fun <T1, T2, reified F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): StandardRenderingPart2<T1, T2, F> {
         TODO("display2")
     }
 
-    private fun <T1, T2, T3, F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): StandardRenderingPart3<T1, T2, T3, F> {
+    private inline fun <T1, T2, T3, reified F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): StandardRenderingPart3<T1, T2, T3, F> {
         TODO("display2")
     }
 }
