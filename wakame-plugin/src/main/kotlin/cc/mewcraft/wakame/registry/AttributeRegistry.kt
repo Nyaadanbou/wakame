@@ -23,7 +23,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -96,39 +96,11 @@ object AttributeRegistry : Initializable {
         +buildFacade("defense_penetration").single().element().bind { DEFENSE_PENETRATION }
         +buildFacade("defense_penetration_rate").single().element().bind { DEFENSE_PENETRATION_RATE }
         +buildFacade("entity_interaction_range").single().bind { ENTITY_INTERACTION_RANGE }
-        +buildFacade("health_regeneration").single().bind { HEALTH_REGENERATION }.override {
-            // create closures
-            val tooltips = NumericTooltips(config)
-            // override it
-            createTooltipLore = { core: ConstantCompositeAttributeS ->
-                val lines = tooltips.line(core.operation)
-                if (core.operation == Operation.ADD) {
-                    val resolver = tooltips.number("value", core.value * 20)
-                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-                } else {
-                    val resolver = tooltips.number("value", core.value)
-                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-                }
-            }
-        }
+        +buildFacade("health_regeneration").single().bind { HEALTH_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
         +buildFacade("incoming_damage_rate").single().element().bind { INCOMING_DAMAGE_RATE }
         +buildFacade("lifesteal").single().bind { LIFESTEAL }
         +buildFacade("mana_consumption_rate").single().bind { MANA_CONSUMPTION_RATE }
-        +buildFacade("mana_regeneration").single().bind { MANA_REGENERATION }.override {
-            // create closures
-            val tooltips = NumericTooltips(config)
-            // override it
-            createTooltipLore = { core: ConstantCompositeAttributeS ->
-                val lines = tooltips.line(core.operation)
-                if (core.operation == Operation.ADD) {
-                    val resolver = tooltips.number("value", core.value * 20)
-                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-                } else {
-                    val resolver = tooltips.number("value", core.value)
-                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-                }
-            }
-        }
+        +buildFacade("mana_regeneration").single().bind { MANA_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
         +buildFacade("manasteal").single().bind { MANASTEAL }
         +buildFacade("max_absorption").single().bind { MAX_ABSORPTION }
         +buildFacade("max_health").single().bind { MAX_HEALTH }
@@ -316,7 +288,7 @@ private class AttributeFacadeOverride<S : ConstantCompositeAttribute, V : Variab
 
 //<editor-fold desc="Implementations">
 private object AttributeRegistrySupport : KoinComponent {
-    val miniMessage: MiniMessage by inject()
+    val miniMessage = get<MiniMessage>()
 }
 
 /**
@@ -707,3 +679,25 @@ private fun ConfigurationNode.getVariableMax(): RandomizedValue {
     return node("upper").krequire<RandomizedValue>()
 }
 //</editor-fold>
+
+private fun mutateTooltipLoreCreator1(
+    facade: MutableCompositeAttributeFacade<ConstantCompositeAttributeS, VariableCompositeAttributeS>,
+    scale: Int,
+) {
+    val tooltips = NumericTooltips(facade.config)
+    val creator = { core: ConstantCompositeAttributeS ->
+        val lines = tooltips.line(core.operation)
+        val resolver = if (core.operation == Operation.ADD) {
+            tooltips.number("value", core.value * scale)
+        } else {
+            tooltips.number("value", core.value)
+        }
+        listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
+    }
+    facade.createTooltipLore = creator
+}
+
+private fun mutateTooltipLoreCreator2(
+    facade: MutableCompositeAttributeFacade<ConstantCompositeAttributeR, VariableCompositeAttributeR>,
+    params: Nothing,
+) = Unit
