@@ -1,38 +1,85 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.toNekoStack
+import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
+import cc.mewcraft.wakame.skill.Skill
+import net.kyori.adventure.extra.kotlin.text
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
+import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
-import cc.mewcraft.wakame.item.components.Damageable as DamageableComponent
 
 interface Damageable : ItemBehavior {
     private object Default : Damageable {
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
+            tryCancelEvent(itemStack, player, wrappedEvent)
+        }
+
+        override fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
         override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
             if (event.isCancelled) {
                 return
             }
 
-            val stack: NekoStack = itemStack.toNekoStack
-            val damageable: DamageableComponent = stack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return
+            val nekoStack = itemStack.toNekoStack
+            val damageableComponent = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return
+            val damageableTemplate = nekoStack.templates.get(ItemTemplateTypes.DAMAGEABLE) ?: return
 
-            // 获取当前损耗
-            val damage: Int = damageable.damage
-            // 获取最大损耗
-            val maxDamage: Int = damageable.maxDamage
-            // 获取达到最大损耗时物品是否消失
-            val disappearWhenBroken: Boolean = stack.templates.get(ItemTemplateTypes.DAMAGEABLE)?.disappearWhenBroken ?: return
+            // 如果有损耗, 设置损耗为固定值 1
+            event.damage = 1
 
-            if (damage >= maxDamage && !disappearWhenBroken) {
-                // 已达到最大损耗, 物品设置了达到最大损耗时不消失
+            val currentDamage = damageableComponent.damage
+            val maximumDamage = damageableComponent.maxDamage
+            val disappearWhenBroken = damageableTemplate.disappearWhenBroken
+            if (currentDamage >= maximumDamage && !disappearWhenBroken) {
+                // 物品将会在下一 tick 消失, 但是萌芽设置了不消失, 于是取消事件
+                event.isCancelled = true
+            }
+        }
 
-                // 回滚损耗让物品不坏掉
-                stack.components.set(ItemComponentTypes.DAMAGE, damage - event.damage)
+        override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
+            tryCancelEvent(itemStack, player, event)
+        }
+
+        override fun handleSkillPrepareCast(caster: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
+            tryCancelEvent(itemStack, caster, event)
+        }
+
+        private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {
+            val nekoStack = itemStack.tryNekoStack ?: return
+            val maximumDamage = nekoStack.components.get(ItemComponentTypes.MAX_DAMAGE) ?: return
+            val currentDamage = nekoStack.components.get(ItemComponentTypes.DAMAGE) ?: return
+            if (currentDamage + 1 >= maximumDamage) {
+                player.sendActionBar(text { content("无法使用完全损坏的物品") })
+                e.isCancelled = true
             }
         }
     }

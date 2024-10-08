@@ -112,6 +112,23 @@ internal abstract class ItemSlotChangeListener {
         return itemLevel <= playerLevel
     }
 
+    protected fun testDurability(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
+        if (nekoStack == null) {
+            return true // 如果不是萌芽物品, 那么该物品应该按照游戏原版的逻辑处理
+        }
+
+        val damageableComponent = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE)
+        if (damageableComponent == null) {
+            return true // 如果物品没有 damageable 组件, 那么物品则没有耐久度, 应该返回 true
+        }
+
+        if (damageableComponent.damage + 1 >= damageableComponent.maxDamage) {
+            return false // 如果物品已经损坏, 那么应该返回 false
+        }
+
+        return true
+    }
+
     ///
 
     /**

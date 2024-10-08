@@ -30,7 +30,6 @@ data class Damageable(
      * 当前损耗.
      */
     val damage: Int,
-
     /**
      * 最大损耗.
      */
@@ -64,7 +63,7 @@ data class Damageable(
         override val id: String,
     ) : ItemComponentType<Damageable> {
         override fun read(holder: ItemComponentHolder): Damageable? {
-            val itemMeta = (holder.item.itemMeta as? CraftDamageable) ?: return null
+            val itemMeta = (holder.item.itemMeta as? CraftDamageable)?.takeIf { it.hasMaxDamage() } ?: return null
             return Damageable(
                 damage = itemMeta.damage,
                 maxDamage = itemMeta.maxDamage,

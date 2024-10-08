@@ -24,7 +24,7 @@ interface ItemMaxDamage : Examinable {
         override val id: String,
     ) : ItemComponentType<Int> {
         override fun read(holder: ItemComponentHolder): Int? {
-            return (holder.item.itemMeta as? CraftDamageable)?.maxDamage
+            return (holder.item.itemMeta as? CraftDamageable)?.takeIf { it.hasMaxDamage() }?.maxDamage
         }
 
         override fun write(holder: ItemComponentHolder, value: Int) {
