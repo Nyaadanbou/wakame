@@ -16,7 +16,6 @@
 - cells
 - elements
 - level
-- lore
 - rarity
 
 所以除了以上信息, 其他的内容都可以不予显示.

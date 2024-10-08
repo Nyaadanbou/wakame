@@ -13,5 +13,4 @@
 因此整个重造过程中需要用到的物品信息大概是这些:
 - cells
 - level
-- lore
 - rarity

@@ -3,6 +3,5 @@
 # FIXME 补充说明
 
 primary:
-  - component:custom_name
-  - component:item_name
-  - component:lore
+  - general:item_name
+  - general:worth

@@ -4,72 +4,40 @@
 #   一级节点本身的 key 将成为 RendererFormat.id
 #   一级节点的内容将成为 RendererFormat 的属性
 
-# ✔ 正常渲染
 attack_speed:
-  namespace: component
+  namespace: topmost
+  # 可用标签
+  # <value> 攻击速度值
   tooltip: "<!i>攻击速度: <value>"
 
-# ✔ 正常渲染
-attribute_modifiers:
-  namespace: component
+cells/attributes:
+  namespace: attribute
 
-# ✔ 正常渲染
-attributable:
-  namespace: component
-  tooltip: "<!i>提供属性加成"
+cells/skills:
+  namespace: skill
 
-# TODO 无实际用途, 待移除
-# ✔ 正常渲染
-bow:
-  namespace: component
+cells/empty:
+  namespace: stash
+  tooltip: "<!i>[ 空词条栏 ]"
 
-# ✔ 正常渲染
-can_break:
-  namespace: component
-
-# ✔ 正常渲染
-can_place_on:
-  namespace: component
-
-# ✔ 正常渲染
-castable:
-  namespace: component
-  tooltip: "<!i>可以施放技能"
-
-# ✔ 正常渲染
-# 这里只负责调整特殊的词条栏设置 (如空词条栏),
-# 其他词条栏 (如属性) 已委托到专门的配置文件.
-cells:
-  namespace: component
-  # 最多可显示多少个空词条栏?
-  max_visible_empty_cores: 10
-  # *空词条栏* 的渲染格式
-  empty_core:
-    name: "<!i>空词条栏"
-    lore: "<!i>空词条栏"
-
-# TODO 盲盒系统完成后再重新考虑
-# ✔ 正常渲染
+# TODO 盲盒系统完成后重新考虑
 crate:
-  namespace: component
-  tooltip: "<!i>盲盒: <key>"
+  namespace: special
+  # 可用标签
+  # <id> 盲盒的标识
+  # <name> 盲盒的名字
+  tooltip: "<!i>盲盒: <name>"
 
-# ✔ 正常渲染
-custom_model_data:
-  namespace: component
-
-# ✔ 正常渲染
 custom_name:
-  namespace: component
-  # 额外标签
+  namespace: general
+  # 可用标签
   # <rarity_name> 稀有度名字
   # <rarity_style> 稀有度样式
   tooltip: "<!i><rarity_style><value>"
 
-# ✔ 正常渲染
 elements:
-  namespace: component
-  # 额外标签
+  namespace: general
+  # 可用标签
   # <merged> 多个元素合并后的文本
   # <single> 单个元素
   tooltip:
@@ -77,34 +45,41 @@ elements:
     single: "<single>"
     separator: ", "
 
-# TODO 待附魔系统完成后再重新考虑
-# ✔ 正常渲染
+# 同时负责 `enchantments` 和 `stored_enchantments`
 enchantments:
-  namespace: component
-  tooltip: "<name> <level>"
+  namespace: vanilla
+  # 可用标签
+  # <name> 附魔名字
+  # <level> 附魔等级
+  tooltip: "<!i><name> <level>"
 
-# ✔ 正常渲染
 fire_resistant:
-  namespace: component
+  namespace: general
   tooltip: "<!i>免疫火焰伤害"
 
-# ✔ 正常渲染
-glowable:
-  namespace: component
-  tooltip: "可发光"
+# 原版 UI 不会显示物品的食物属性,
+# 所以这部分渲染由萌芽系统提供.
+food:
+  namespace: general
+  # 可用标签
+  # <nutrition> 食物增加的饥饿值
+  # <saturation> 食物增加的饱和度
+  # <eat_seconds> 食用所需要的时间
+  tooltip:
+    - "<!i>饥饿值: <nutrition>"
+    - "<!i>饱和度: <saturation>"
+    - "<!i>食用时间: <eat_seconds>"
 
-# ✔ 正常渲染
 item_name:
-  namespace: component
-  # 额外标签
+  namespace: general
+  # 可用标签
   # <rarity_name> 稀有度名字
   # <rarity_style> 稀有度样式
   tooltip: "<rarity_style><rarity_name> <value>"
 
-# ✔ 正常渲染
 kizamiz:
-  namespace: component
-  # 额外标签
+  namespace: general
+  # 可用标签
   # <merged> 多个铭刻合并后的文本
   # <single> 单个铭刻
   tooltip:
@@ -112,58 +87,26 @@ kizamiz:
     single: "<single>"
     separator: ", "
 
-# ✔ 正常渲染
-kizamiable:
-  namespace: component
-  tooltip: "<!i>提供铭刻加成"
-
-# ✔ 正常渲染
 level:
-  namespace: component
+  namespace: general
+  # 可用标签
+  # <value> 等级值
   tooltip: "<!i>等级: <value>"
 
-# ✔ 正常渲染
 lore:
-  namespace: component
-  # 额外标签：
+  namespace: general
+  # 可用标签：
   # <line> 描述内容
   tooltip:
     line: "<!i><line>"
     header: [ ] # 空列表代表完全没有，不代表空行
     bottom: [ ]
 
-# ✔ 正常渲染
-max_damage:
-  namespace: component
-  tooltip: "<!i>最大耐久损耗: <max_damage>"
-
-# ✔ 正常渲染
 portable_core:
-  namespace: component
-  tooltip: { } # 取决于核心
+  namespace: special
 
-# ✔ 正常渲染
 rarity:
-  namespace: component
+  namespace: general
+  # 可用标签
+  # <value> 稀有度的名字
   tooltip: "<!i>稀有度: <value>"
-
-# ✔ 正常渲染
-skillful:
-  namespace: component
-  tooltip: "<!i>提供技能加成"
-
-# ✔ 正常渲染
-skin:
-  namespace: component
-  tooltip: "<!i>皮肤: <skin_name>"
-
-# ✔ 正常渲染
-skin_owner:
-  namespace: component
-  tooltip: "<!i>皮肤所有者: <skin_owner_name>"
-
-# TODO 待附魔系统完成后再重新考虑
-# ✔ 正常渲染
-stored_enchantments:
-  namespace: component
-  tooltip: "<name> <level>"

@@ -1,21 +1,19 @@
 # 在这里设置收购站的物品 *渲染内容*.
 
-# ✔ 正常渲染
 custom_name:
-  namespace: "component"
-  tooltip: "<!i><value>"
-
-# ✔ 正常渲染
-item_name:
-  namespace: "component"
+  namespace: "general"
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
   tooltip: "<value>"
 
-# ✔ 正常渲染
-lore:
-  namespace: "component"
-  # 额外标签
-  # <line> 描述内容
-  tooltip:
-    line: "<!i><line>"
-    header: [ ]
-    bottom: [ ]
+item_name:
+  namespace: "general"
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<value>"
+
+worth:
+  namespace: "general"
+  # 可用标签
+  # <value> 物品的价值
+  tooltip: "<!i>价值: <value>"

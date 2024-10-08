@@ -1,36 +1,36 @@
 # 在这里设置合并台的物品 *渲染内容*.
 
-# ✔ 正常渲染
 custom_name:
-  namespace: "component"
-  tooltip: "<!i><value>"
-
-# ✔ 正常渲染
-item_name:
-  namespace: "component"
+  namespace: "general"
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
   tooltip: "<value>"
 
-# ✔ 正常渲染
-level:
-  namespace: "component"
-  tooltip: "<!i><gray>等级: <value>"
-
-# ✔ 正常渲染
-lore:
-  namespace: "component"
-  # 额外标签
-  # <line> 描述内容
+elements:
+  namespace: general
+  # 可用标签
+  # <merged> 多个元素合并后的文本
+  # <single> 单个元素
   tooltip:
-    line: "<!i><gray><line>"
-    header: [ ]
-    bottom: [ ]
+    merged: "<!i>元素: <merged>"
+    single: "<single>"
+    separator: ", "
 
-# ✔ 正常渲染
+item_name:
+  namespace: "general"
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<value>"
+
+level:
+  namespace: "general"
+  # 可用标签
+  # <value> 等级值
+  tooltip: "<!i>等级: <value>"
+
 portable_core:
-  namespace: component
-  tooltip: "<!i><gray><value>"
+  namespace: general
 
-# ✔ 正常渲染
 rarity:
-  namespace: "component"
-  tooltip: "<!i><gray>稀有度: <value>"
+  namespace: "general"
+  tooltip: "<!i>稀有度: <value>"

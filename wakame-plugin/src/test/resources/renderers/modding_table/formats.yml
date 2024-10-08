@@ -1,40 +1,45 @@
 # 在这里设置定制台的物品 *渲染内容*.
 
-# ✔ 正常渲染
-# 这里只负责调整特殊的词条栏设置 (如空词条栏),
-# 其他词条栏 (如属性) 已委托到专门的配置文件.
-cells:
-  namespace: component
-  # 最多可显示多少个空词条栏?
-  max_visible_empty_cores: 10
-  # *空词条栏* 的渲染格式
-  empty_core: "<!i>空词条栏"
-  # *修改过的词条栏* 的渲染格式
-  modded_core: ""
-  # *未修改的词条栏* 的渲染格式
-  unmodded_core: "<dark_gray>"
+cells/attributes:
+  namespace: attribute
 
-# ✔ 正常渲染
+cells/skills:
+  namespace: skill
+
+cells/empty:
+  namespace: stash
+  tooltip: "<!i>[ 空词条栏 ]"
+
 custom_name:
-  namespace: "component"
-  tooltip: "<!i><value>"
-
-# ✔ 正常渲染
-item_name:
-  namespace: "component"
+  namespace: "general"
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
   tooltip: "<value>"
 
-# ✔ 正常渲染
+elements:
+  namespace: general
+  # 可用标签
+  # <merged> 多个元素合并后的文本
+  # <single> 单个元素
+  tooltip:
+    merged: "<!i>元素: <merged>"
+    single: "<single>"
+    separator: ", "
+
+item_name:
+  namespace: "general"
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<value>"
+
 level:
-  namespace: "component"
+  namespace: "general"
+  # 可用标签
+  # <value> 等级值
   tooltip: "<!i>等级: <value>"
 
-# ✔ 正常渲染
-lore:
-  namespace: "component"
-  # 额外标签
-  # <line> 描述内容
-  tooltip:
-    line: "<!i><line>"
-    header: [ ]
-    bottom: [ ]
+rarity:
+  namespace: general
+  # 可用标签
+  # <value> 稀有度的名字
+  tooltip: "<!i>稀有度: <value>"

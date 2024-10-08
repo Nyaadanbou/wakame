@@ -5,22 +5,24 @@
 # - 合成结果
 
 primary:
-  - component:attributable
-  - component:castable
-  - component:cells
-  - component:crate
-  - component:custom_name
-  - component:elements
-  - component:enchantments
-  - component:fire_resistant
-  - component:food
-  - component:glowable
-  - component:item_name
-  - component:kizamiz
-  - component:kizamiable
-  - component:lore
-  - component:portable_core
-  - component:skillful
+  - general:item_name
+
+  - (fixed:general)
+  - general:cells
+  - general:elements
+  - general:fire_resistant
+  - general:food
+  - general:kizamiz
+
+  - (fixed:vanilla)
+  - vanilla:enchantments
+
+  - (fixed:special)
+  - special:crate
+  - special:portable_core
+
+  - (fixed:general)
+  - general:lore
 
 element:
   - neutral

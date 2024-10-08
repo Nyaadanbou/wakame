@@ -3,22 +3,23 @@
 # FIXME 补充说明
 
 primary:
-  - component:attributable
-  - component:castable
-  - component:cells
-  - component:crate
-  - component:custom_name
-  - component:elements
-  - component:enchantments
-  - component:fire_resistant
-  - component:food
-  - component:glowable
-  - component:item_name
-  - component:kizamiz
-  - component:kizamiable
-  - component:lore
-  - component:portable_core
-  - component:skillful
+  - general:item_name
+
+  - (fixed:general)
+  - general:level
+  - general:rarity
+  - general:elements
+
+  - (fixed:attribute)
+  - attribute:attack_damage
+  - attribute:block_interaction_range
+  - attribute:critical_strike_chance
+  - attribute:defense
+  - attribute:entity_interaction_range
+  - attribute:max_health
+  - attribute:movement_speed
+
+  - stash:cells/empty
 
 element:
   - neutral
