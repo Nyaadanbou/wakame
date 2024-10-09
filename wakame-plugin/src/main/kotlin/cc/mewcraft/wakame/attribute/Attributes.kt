@@ -87,6 +87,10 @@ object Attributes : AttributeCollectionProvider<Attribute> {
         return AttributeNameInternals.getNamesOfElement()
     }
 
+    override fun getAttributeByDescription(descriptionId: String): Attribute? {
+        return AttributeInternals.byDescription(descriptionId) ?: ElementAttributeInternals.byDescription(descriptionId)
+    }
+
     /**
      * Gets specific [Attribute] instances by the [facadeId].
      *
@@ -119,6 +123,10 @@ class ElementAttributes internal constructor(
     val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, ELEMENT).register()
     val INCOMING_DAMAGE_RATE = ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, ELEMENT).register()
 
+    override fun getAttributeByDescription(descriptionId: String): ElementAttribute? {
+        return ElementAttributeInternals.byDescription(descriptionId)
+    }
+
     /**
      * Gets all the [ElementAttribute] instances by the [facadeId].
      */
@@ -135,6 +143,20 @@ class ElementAttributes internal constructor(
  * Holds one or more instances of [Attribute].
  */
 interface AttributeCollectionProvider<T : Attribute> {
+    /**
+     * Gets an [Attribute] by [descriptionId].
+     */
+    fun getAttributeByDescription(descriptionId: String): T?
+
+    /**
+     * Gets an [Attribute] by [descriptionId] or throws an exception if not found.
+     *
+     * @throws IllegalArgumentException if the attribute is not found
+     */
+    fun getAttributeByDescriptionOrThrow(descriptionId: String): T {
+        return getAttributeByDescription(descriptionId) ?: throw IllegalArgumentException("Unknown attribute description identity: '$descriptionId'")
+    }
+
     /**
      * Gets zero or more [Attribute]s by [facadeId].
      *
@@ -161,11 +183,15 @@ interface AttributeCollectionProvider<T : Attribute> {
 
 // 封装了一些内部状态, 以提供更好的接口体验
 private object AttributeInternals {
+    // 从 descriptionId 映射到 Attribute
+    private val BY_DESCRIPTION_ID: ConcurrentHashMap<String, Attribute> = ConcurrentHashMap()
+
     // 从 facadeId 映射到若干个 Attribute
     private val BY_FACADE_ID: Multimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
 
     fun register(attribute: Attribute): Attribute {
         BY_FACADE_ID.put(attribute.facadeId, attribute)
+        BY_DESCRIPTION_ID[attribute.descriptionId] = attribute
         AttributeNameInternals.register(attribute)
         return attribute
     }
@@ -173,10 +199,16 @@ private object AttributeInternals {
     fun byFacade(facadeId: String): Collection<Attribute> {
         return BY_FACADE_ID.get(facadeId)
     }
+
+    fun byDescription(descriptionId: String): Attribute? {
+        return BY_DESCRIPTION_ID[descriptionId]
+    }
 }
 
 // 封装了一些内部状态, 以提供更好的接口体验
 private object ElementAttributeInternals {
+    // 从 descriptionId 映射到 ElementAttribute
+    private val BY_DESCRIPTION_ID: ConcurrentHashMap<String, ElementAttribute> = ConcurrentHashMap()
     // 从 Element 映射到若干个 ElementAttribute
     private val BY_FACADE_ID: ConcurrentHashMap<Element, Multimap<String, ElementAttribute>> = ConcurrentHashMap()
 
@@ -184,12 +216,17 @@ private object ElementAttributeInternals {
         BY_FACADE_ID.computeIfAbsent(attribute.element) {
             MultimapBuilder.hashKeys().linkedHashSetValues().build()
         }.put(attribute.facadeId, attribute)
+        BY_DESCRIPTION_ID[attribute.descriptionId] = attribute
         AttributeNameInternals.register(attribute)
         return attribute
     }
 
     fun byFacade(element: Element, facadeId: String): Collection<ElementAttribute> {
         return BY_FACADE_ID[element]?.get(facadeId) ?: throw IllegalArgumentException("Unknown facade identity: '$facadeId'")
+    }
+
+    fun byDescription(descriptionId: String): ElementAttribute? {
+        return BY_DESCRIPTION_ID[descriptionId]
     }
 
     // 从 Element 映射到 ElementAttributes

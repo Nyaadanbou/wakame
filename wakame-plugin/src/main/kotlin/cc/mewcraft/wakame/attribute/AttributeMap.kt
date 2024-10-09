@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.util.toNamespacedKey
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.EntityType
@@ -263,17 +264,16 @@ private class PlayerAttributeMap(
  * By design, the underlying attribute data is actually stored in the entity's NBT storage.
  */
 // TODO EntityAttributeMap 支持 overrides
-private class EntityAttributeMap : AttributeMap {
-    constructor(default: AttributeSupplier, entity: LivingEntity) {
-        require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
-        this.default = default
-        this.weakEntity = WeakReference(entity)
-    }
-
+private class EntityAttributeMap(
     /**
      * 默认属性的提供器.
      */
-    val default: AttributeSupplier
+    val default: AttributeSupplier,
+    entity: LivingEntity,
+) : AttributeMap {
+    companion object {
+        private val DATA_KEY = Key.key("wakame:entity_attribute_map").toNamespacedKey
+    }
 
     /**
      * 弱引用封装的实体对象.
@@ -292,6 +292,23 @@ private class EntityAttributeMap : AttributeMap {
     val pdc: PersistentDataContainer
         get() = entity.persistentDataContainer
 
+    val patch: PdcAttributePatch
+        get() {
+            if (pdc.has(DATA_KEY, PdcAttributePatch.TYPE)) {
+                return pdc.get(DATA_KEY, PdcAttributePatch.TYPE)!!
+            } else {
+                val patch = PdcAttributePatch()
+                patch.saveTo(DATA_KEY, pdc)
+                return patch
+            }
+        }
+
+    init {
+        require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
+        this.weakEntity = WeakReference(entity)
+        this.default.attributes.filter(Attribute::vanilla).forEach(::getInstance)
+    }
+
     // Some thoughts about implementation:
     //  The AttributeMap data should be stored in the entity's NBT storage,
     //  not in a property of `this`, since we want the data to be persistent
@@ -304,7 +321,13 @@ private class EntityAttributeMap : AttributeMap {
     //  must be persistent.
 
     override fun getSnapshot(): AttributeMapSnapshot {
-        throw NotImplementedError("Not yet implemented")
+        val data = Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>()
+        for (attribute in getAttributes()) {
+            val instance = requireNotNull(getInstance(attribute)) { "The returned AttributeInstance should not be null. This is a bug!" }
+            val snapshot = instance.getSnapshot()
+            data.put(attribute, snapshot)
+        }
+        return AttributeMapSnapshotImpl(data)
     }
 
     // 开发日记: 2024/6/24 小米
@@ -313,35 +336,54 @@ private class EntityAttributeMap : AttributeMap {
     // 需要注意, 读取时如果默认属性不存在, 那么会直接抛异常. 因此测试前需要先准备好配置文件.
 
     override fun register(attribute: Attribute) {
-        throw NotImplementedError("Not yet implemented")
+        patch[attribute] = AttributeInstanceFactory.createInstance(attribute, entity, true)
+        patch.saveTo(DATA_KEY, pdc)
     }
 
     override fun getInstance(attribute: Attribute): AttributeInstance? {
-        throw NotImplementedError("Not yet implemented")
+        val instance = patch[attribute]
+        if (instance != null) {
+            // 如果 data 已经包含该 Attribute 对应的 AttributeInstance, 直接返回
+            return instance
+        }
+
+        // 注意: 该函数调用会对生物造成副作用
+        val defaultInstance = default.createInstance(attribute, entity)
+
+        if (defaultInstance != null) {
+            // 存在默认属性, 所以将其写入 data
+            patch[attribute] = defaultInstance
+            patch.saveTo(DATA_KEY, pdc)
+            return defaultInstance
+        }
+
+        return null
     }
 
     override fun getAttributes(): Set<Attribute> {
-        throw NotImplementedError("Not yet implemented")
+        val defaultAttributes = default.attributes
+        val customAttributes = patch.keys
+        return defaultAttributes union customAttributes
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
-        return default.hasAttribute(attribute)
+        return patch[attribute] != null || default.hasAttribute(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, id: Key): Boolean {
-        return default.hasModifier(attribute, id)
+        return patch[attribute]?.getModifier(id) != null || default.hasModifier(attribute, id)
     }
 
     override fun getValue(attribute: Attribute): Double {
-        return default.getValue(attribute, entity)
+        return patch[attribute]?.getValue() ?: default.getValue(attribute, entity)
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        return default.getBaseValue(attribute, entity)
+        return patch[attribute]?.getBaseValue() ?: default.getBaseValue(attribute, entity)
     }
 
     override fun getModifierValue(attribute: Attribute, id: Key): Double {
-        return default.getModifierValue(attribute, id, entity)
+        return patch[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, entity)
     }
 }
 

@@ -39,7 +39,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
 
     override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> {
         return buildList {
-            // /<root> attribute [entity] [--result_paper]
+            // /<root> attribute [entity] [--print]
             commandManager.commandBuilder(
                 name = CommandConstants.ROOT_COMMAND,
                 description = Description.of("Show the entity(s) attributes")
