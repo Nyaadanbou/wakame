@@ -10,9 +10,9 @@ enum class AttackSpeedLevel(
      */
     val fatigueLevel: Int?
 ) {
-    VERY_SLOW(50, 8),
-    SLOW(40, 7),
-    NORMAL(30, 5),
-    FAST(20, 1),
+    VERY_SLOW(30, 7),
+    SLOW(25, 5),
+    NORMAL(20, 3),
+    FAST(15, 1),
     VERY_FAST(10, null)
 }
