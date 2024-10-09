@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import it.unimi.dsi.fastutil.objects.*
@@ -14,6 +15,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
 import org.bukkit.persistence.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.*
 import java.util.UUID
 
@@ -72,14 +75,21 @@ internal object AttributeMapPatchAccess {
     }
 }
 
-internal class AttributeMapPatchListener : Listener {
+internal class AttributeMapPatchListener : Listener, KoinComponent {
+    private val entityKeyLookup: EntityKeyLookup by inject()
+
     // 当实体加载时, 读取 PDC 中的 AttributeMapPatch
     @EventHandler
     fun on(e: EntitiesLoadEvent) {
         for (entity in e.entities) {
             if (entity !is Attributable) continue // FIXME check Player???
+
             val pdc = entity.persistentDataContainer
             val patch = AttributeMapPatch.decode(entity, pdc) ?: continue
+            val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
+
+            patch.trimBy(default)
+
             AttributeMapPatchAccess.put(entity.uniqueId, patch)
         }
     }
@@ -89,9 +99,14 @@ internal class AttributeMapPatchListener : Listener {
     fun on(e: EntitiesUnloadEvent) {
         for (entity in e.entities) {
             if (entity !is Attributable) continue
-            val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: continue
+
             val pdc = entity.persistentDataContainer
+            val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: continue
+            val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
+
+            patch.trimBy(default)
             patch.saveTo(entity, pdc)
+
             AttributeMapPatchAccess.remove(entity.uniqueId)
         }
     }
