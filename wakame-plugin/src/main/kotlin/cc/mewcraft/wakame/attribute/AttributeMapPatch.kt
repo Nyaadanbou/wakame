@@ -43,6 +43,10 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
         pdc.set(PDC_KEY, AttributeMapPatchType.with(owner), this)
     }
 
+    fun trimBy(default: AttributeSupplier) {
+        // TODO 将 AttributeMapPatch (本对象) 中已经存在于 AttributeSupplier 中的数据移除
+    }
+
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> {
         return data.reference2ObjectEntrySet().iterator()
     }
