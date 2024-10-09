@@ -272,7 +272,7 @@ private class EntityAttributeMap(
     entity: LivingEntity,
 ) : AttributeMap {
     companion object {
-        private val DATA_KEY = Key.key("wakame:entity_attribute_map").toNamespacedKey
+        private val DATA_KEY = Key.key("wakame:attribute_modifiers").toNamespacedKey
     }
 
     /**
