@@ -62,8 +62,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         val components = item.components
         val collector = ObjectArrayList<IndexedText>()
 
-        process(components, ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingParts.ATTACK_SPEED.process(collector, data) }
-        process(components, ItemComponentTypes.CELLS) { data ->
+        components.process(ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingParts.ATTACK_SPEED.process(collector, data) }
+        components.process(ItemComponentTypes.CELLS) { data ->
             for ((_, cell) in data) {
                 when (
                     val core = cell.getCore()
@@ -74,18 +74,18 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
                 }
             }
         }
-        process(components, ItemComponentTypes.CRATE) { data -> StandardRenderingParts.CRATE.process(collector, data) }
-        process(components, ItemComponentTypes.CUSTOM_NAME) { data -> StandardRenderingParts.CUSTOM_NAME.process(collector, data) }
-        process(components, ItemComponentTypes.ELEMENTS) { data -> StandardRenderingParts.ELEMENTS.process(collector, data) }
-        process(components, ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
-        process(components, ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, data) }
-        process(components, ItemComponentTypes.FOOD) { data -> StandardRenderingParts.FOOD.process(collector, data) }
-        process(components, ItemComponentTypes.ITEM_NAME) { data -> StandardRenderingParts.ITEM_NAME.process(collector, data) }
-        process(components, ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingParts.KIZAMIZ.process(collector, data) }
-        process(components, ItemComponentTypes.LEVEL) { data -> StandardRenderingParts.LEVEL.process(collector, data) }
-        process(components, ItemComponentTypes.LORE) { data -> StandardRenderingParts.LORE.process(collector, data) }
-        process(components, ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingParts.PORTABLE_CORE.process(collector, data) }
-        process(components, ItemComponentTypes.RARITY) { data -> StandardRenderingParts.RARITY.process(collector, data) }
+        components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingParts.CRATE.process(collector, data) }
+        components.process(ItemComponentTypes.CUSTOM_NAME) { data -> StandardRenderingParts.CUSTOM_NAME.process(collector, data) }
+        components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingParts.ELEMENTS.process(collector, data) }
+        components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
+        components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, data) }
+        components.process(ItemComponentTypes.FOOD) { data -> StandardRenderingParts.FOOD.process(collector, data) }
+        components.process(ItemComponentTypes.ITEM_NAME) { data -> StandardRenderingParts.ITEM_NAME.process(collector, data) }
+        components.process(ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingParts.KIZAMIZ.process(collector, data) }
+        components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingParts.LEVEL.process(collector, data) }
+        components.process(ItemComponentTypes.LORE) { data -> StandardRenderingParts.LORE.process(collector, data) }
+        components.process(ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingParts.PORTABLE_CORE.process(collector, data) }
+        components.process(ItemComponentTypes.RARITY) { data -> StandardRenderingParts.RARITY.process(collector, data) }
 
         val lore = indexedLineFlatter.flatten(collector)
         val cmd = ItemModelDataLookup[item.id, item.variant]
@@ -95,8 +95,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         item.customModelData(cmd)
     }
 
-    private inline fun <T> process(components: ItemComponentMap, type: ItemComponentType<T>, block: (T) -> Unit) {
-        components.get(type)?.apply(block)
+    private inline fun <T> ItemComponentMap.process(type: ItemComponentType<T>, block: (T) -> Unit) {
+        get(type)?.apply(block)
     }
 }
 
