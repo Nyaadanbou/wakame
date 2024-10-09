@@ -6,5 +6,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal fun attributeModule(): Module = module {
+    single { AttributeMapPatchListener() }
     single { DefaultAttributes } bind Initializable::class
 }
