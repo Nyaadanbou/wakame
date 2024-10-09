@@ -12,6 +12,7 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +51,7 @@ public class LootNekoItem extends LootPoolSingletonContainer {
         var path = id.getPath();
         var player = getLootingPlayer(context);
 
-        var bukkitItemStack = nekoo.createItemStack(namespace, path, player.getBukkitEntity());
+        var bukkitItemStack = nekoo.createItemStack(namespace, path, player);
         var nmsItemStack = CraftItemStack.unwrap(bukkitItemStack);
 
         lootConsumer.accept(nmsItemStack);
@@ -62,20 +63,20 @@ public class LootNekoItem extends LootPoolSingletonContainer {
      * @param context 战利品的上下文
      * @return 应该得到战利品的玩家
      */
-    private @Nullable ServerPlayer getLootingPlayer(LootContext context) {
+    private @Nullable CraftPlayer getLootingPlayer(LootContext context) {
         var thisEntity = context.getParamOrNull(LootContextParams.THIS_ENTITY);
         if (thisEntity instanceof ServerPlayer serverPlayer) {
-            return serverPlayer;
+            return serverPlayer.getBukkitEntity();
         }
 
         var lastDamagePlayer = context.getParamOrNull(LootContextParams.LAST_DAMAGE_PLAYER);
         if (lastDamagePlayer instanceof ServerPlayer serverPlayer) {
-            return serverPlayer;
+            return serverPlayer.getBukkitEntity();
         }
 
         var attackingEntity = context.getParamOrNull(LootContextParams.ATTACKING_ENTITY);
         if (attackingEntity instanceof ServerPlayer serverPlayer) {
-            return serverPlayer;
+            return serverPlayer.getBukkitEntity();
         }
 
         return null;
