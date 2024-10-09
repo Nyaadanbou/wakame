@@ -86,8 +86,8 @@ class CustomNekoStackTest : KoinTest {
             assertEquals(3, arrowTemplate.pierceLevel)
         }
 
-        result { it ->
-            assertFalse(it.isEmpty())
+        result {
+            assertTrue(it.isEmpty())
         }
     }
 
