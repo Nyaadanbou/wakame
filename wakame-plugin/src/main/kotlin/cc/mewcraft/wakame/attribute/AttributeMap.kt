@@ -6,13 +6,9 @@ import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.toNamespacedKey
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.persistence.PersistentDataContainer
+import org.bukkit.entity.*
 import org.jetbrains.annotations.ApiStatus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -101,6 +97,7 @@ sealed interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable {
 /**
  * 代表一个不可变的 [AttributeMapLike], 不支持任何写入.
  */
+// TODO 改名为 ImaginaryAttributeMap
 sealed interface IntangibleAttributeMap : AttributeMapLike, AttributeMapSnapshotable {
     /**
      * 获取指定 [attribute] 的 [IntangibleAttributeInstance].
@@ -207,18 +204,19 @@ private class PlayerAttributeMap(
     }
 
     override fun register(attribute: Attribute) {
-        patch[attribute] = AttributeInstanceFactory.createInstance(attribute, player, true)
+        patch[attribute] = AttributeInstanceFactory.createLiveInstance(attribute, player, true)
     }
 
+    @Suppress("DuplicatedCode")
     override fun getInstance(attribute: Attribute): AttributeInstance? {
-        val instance = patch.get(attribute)
-        if (instance != null) {
-            // 如果 data 已经包含该 Attribute 对应的 AttributeInstance, 直接返回
-            return instance
+        val patchedInstance = patch[attribute]
+        if (patchedInstance != null) {
+            // 如果 patch 已经包含该 Attribute 对应的 AttributeInstance, 直接返回
+            return patchedInstance
         }
 
         // 注意: 该函数调用会对玩家造成副作用
-        val defaultInstance = default.createInstance(attribute, player)
+        val defaultInstance = default.createLiveInstance(attribute, player)
 
         if (defaultInstance != null) {
             // 存在默认属性, 所以将其写入 data
@@ -259,101 +257,73 @@ private class PlayerAttributeMap(
 /**
  * This is a live object.
  *
- * The object does not actually store any attribute data about a non-player entity.
- * Instead, it works as an "accessor" to the underlying attribute data about an entity.
- * By design, the underlying attribute data is actually stored in the entity's NBT storage.
+ * The object does not actually store any attribute data of the owner - the [entity].
+ * Instead, it works as an "accessor" to the underlying attribute data about the [entity].
+ * The underlying attribute data is stored in the entity's NBT storage, so it's persistent
+ * over server restarts.
  */
-// TODO EntityAttributeMap 支持 overrides
 private class EntityAttributeMap(
     /**
      * 默认属性的提供器.
      */
-    val default: AttributeSupplier,
+    private val default: AttributeSupplier,
     entity: LivingEntity,
 ) : AttributeMap {
-    companion object {
-        private val DATA_KEY = Key.key("wakame:attribute_modifiers").toNamespacedKey
-    }
-
-    /**
-     * 弱引用封装的实体对象.
-     */
-    val weakEntity: WeakReference<LivingEntity> // use WeakRef to prevent memory leak
-
-    /**
-     * 实体对象.
-     */
-    val entity: LivingEntity
-        get() = requireNotNull(weakEntity.get()) { "The entity reference no longer exists" }
-
-    /**
-     * The persistent data values.
-     */
-    val pdc: PersistentDataContainer
-        get() = entity.persistentDataContainer
-
-    val patch: PdcAttributePatch
-        get() {
-            if (pdc.has(DATA_KEY, PdcAttributePatch.TYPE)) {
-                return pdc.get(DATA_KEY, PdcAttributePatch.TYPE)!!
-            } else {
-                val patch = PdcAttributePatch()
-                patch.saveTo(DATA_KEY, pdc)
-                return patch
-            }
-        }
-
     init {
         require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
-        this.weakEntity = WeakReference(entity)
-        this.default.attributes.filter(Attribute::vanilla).forEach(::getInstance)
+        default.attributes.filter { attr -> attr.vanilla }.forEach { attr -> getInstance(attr) }
     }
 
-    // Some thoughts about implementation:
-    //  The AttributeMap data should be stored in the entity's NBT storage,
-    //  not in a property of `this`, since we want the data to be persistent
-    //  on server restart.
-    //  The root reason for this is that the items equipped on non-player
-    //  entities are purely visual by design - they do not provide any effects. As such
-    //  the attribute data are therefore provided by external sources, such as
-    //  scripts and configs. That is, the attribute data are provided only ONCE,
-    //  usually upon the entity is spawned. As a result, the attributes data
-    //  must be persistent.
+    private val entityRef: WeakReference<LivingEntity> = WeakReference(entity) // use WeakRef to prevent memory leak
+    private val entity: LivingEntity
+        get() {
+            val entity = entityRef.get()
+            requireNotNull(entity) { "The entity ref no longer exists" }
+            require(entity.isValid) { "The entity is no longer valid" }
+            return entity
+        }
 
+    /**
+     * The data patch that are patched onto the [default], i.e., overrides.
+     */
+    private val patch: AttributeMapPatch?
+        get() = AttributeMapPatchAccess.get(entity.uniqueId)
+
+    /**
+     * Returns the patch or creates a new one if it does not exist.
+     */
+    private val patchOrCreate: AttributeMapPatch
+        get() = AttributeMapPatchAccess.getOrCreate(entity.uniqueId)
+
+
+    @Suppress("DuplicatedCode")
     override fun getSnapshot(): AttributeMapSnapshot {
         val data = Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>()
-        for (attribute in getAttributes()) {
-            val instance = requireNotNull(getInstance(attribute)) { "The returned AttributeInstance should not be null. This is a bug!" }
+        for (type in getAttributes()) {
+            val instance = requireNotNull(getInstance(type)) { "The returned AttributeInstance should not be null. This is a bug!" }
             val snapshot = instance.getSnapshot()
-            data.put(attribute, snapshot)
+            data.put(type, snapshot)
         }
         return AttributeMapSnapshotImpl(data)
     }
 
-    // 开发日记: 2024/6/24 小米
-    // 为了能够测试伤害系统, 暂时先把 EntityAttributeMap 的读取操作的一部分给实现了, 写入操作目前还完全没有实现.
-    // 具体来说, 现在的读取实际上总是会读取的实体的默认属性. 默认属性可以在配置文件中自由调整.
-    // 需要注意, 读取时如果默认属性不存在, 那么会直接抛异常. 因此测试前需要先准备好配置文件.
-
     override fun register(attribute: Attribute) {
-        patch[attribute] = AttributeInstanceFactory.createInstance(attribute, entity, true)
-        patch.saveTo(DATA_KEY, pdc)
+        patchOrCreate[attribute] = AttributeInstanceFactory.createLiveInstance(attribute, entity, true)
     }
 
+    @Suppress("DuplicatedCode")
     override fun getInstance(attribute: Attribute): AttributeInstance? {
-        val instance = patch[attribute]
-        if (instance != null) {
-            // 如果 data 已经包含该 Attribute 对应的 AttributeInstance, 直接返回
-            return instance
+        val patch0 = patchOrCreate
+        val patchedInstance = patch0[attribute]
+        if (patchedInstance != null) {
+            // patch 已有实例, 则返回 patch 的实例
+            return patchedInstance
         }
 
-        // 注意: 该函数调用会对生物造成副作用
-        val defaultInstance = default.createInstance(attribute, entity)
-
+        // patch 没有实例, 则返回 default 的实例
+        val defaultInstance = default.createLiveInstance(attribute, entity)
         if (defaultInstance != null) {
-            // 存在默认属性, 所以将其写入 data
-            patch[attribute] = defaultInstance
-            patch.saveTo(DATA_KEY, pdc)
+            patch0[attribute] = defaultInstance
             return defaultInstance
         }
 
@@ -362,28 +332,28 @@ private class EntityAttributeMap(
 
     override fun getAttributes(): Set<Attribute> {
         val defaultAttributes = default.attributes
-        val customAttributes = patch.keys
-        return defaultAttributes union customAttributes
+        val patchedAttributes = patch?.attributes ?: emptySet()
+        return defaultAttributes union patchedAttributes
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
-        return patch[attribute] != null || default.hasAttribute(attribute)
+        return patch?.get(attribute) != null || default.hasAttribute(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, id: Key): Boolean {
-        return patch[attribute]?.getModifier(id) != null || default.hasModifier(attribute, id)
+        return patch?.get(attribute)?.getModifier(id) != null || default.hasModifier(attribute, id)
     }
 
     override fun getValue(attribute: Attribute): Double {
-        return patch[attribute]?.getValue() ?: default.getValue(attribute, entity)
+        return patch?.get(attribute)?.getValue() ?: default.getValue(attribute, entity)
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        return patch[attribute]?.getBaseValue() ?: default.getBaseValue(attribute, entity)
+        return patch?.get(attribute)?.getBaseValue() ?: default.getBaseValue(attribute, entity)
     }
 
     override fun getModifierValue(attribute: Attribute, id: Key): Double {
-        return patch[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, entity)
+        return patch?.get(attribute)?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, entity)
     }
 }
 
@@ -396,7 +366,7 @@ private object IntangibleAttributeMapPool : KoinComponent {
             val default = DefaultAttributes.getSupplier(it)
             val data = Reference2ObjectOpenHashMap<Attribute, IntangibleAttributeInstance>()
             for (attribute in default.attributes) {
-                val instance = default.createInstance(attribute) ?: continue
+                val instance = default.createImaginaryInstance(attribute) ?: continue
                 val snapshot = instance.getSnapshot()
                 val intangible = snapshot.toIntangible()
                 data[attribute] = intangible

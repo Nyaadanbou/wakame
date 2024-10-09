@@ -1,13 +1,9 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.commons.collections.enumMap
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import com.google.common.collect.ImmutableSet
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import it.unimi.dsi.fastutil.objects.ObjectArraySet
-import it.unimi.dsi.fastutil.objects.ObjectCollection
-import it.unimi.dsi.fastutil.objects.ObjectSets
+import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
 import org.jetbrains.annotations.VisibleForTesting
@@ -92,6 +88,7 @@ sealed interface AttributeInstance : AttributeInstanceSnapshotable {
 /**
  * 代表一个无形的属性实例. 该实例不可变, 并且不会对世界状态产生任何副作用.
  */
+// TODO 改名为 ImaginaryAttributeInstance
 sealed interface IntangibleAttributeInstance : AttributeInstanceSnapshotable {
     /**
      * 该属性实例的 [Attribute].
@@ -218,7 +215,7 @@ object AttributeInstanceFactory {
      *
      * @param attribute
      */
-    fun createInstance(attribute: Attribute): AttributeInstance {
+    fun createDataInstance(attribute: Attribute): AttributeInstance {
         return WakameAttributeInstance(AttributeInstanceDelegation(attribute))
     }
 
@@ -232,7 +229,7 @@ object AttributeInstanceFactory {
      * @param attributable 世界状态中需要创建 [AttributeInstance] 的对象
      * @param registerVanilla 是否在世界状态中为 [attributable] 注册属性
      */
-    fun createInstance(attribute: Attribute, attributable: Attributable, registerVanilla: Boolean): AttributeInstance {
+    fun createLiveInstance(attribute: Attribute, attributable: Attributable, registerVanilla: Boolean): AttributeInstance {
         if (!attribute.vanilla) {
             // 是我们自己的萌芽属性, 直接创建实例即可
             return WakameAttributeInstance(AttributeInstanceDelegation(attribute))
@@ -278,20 +275,18 @@ object AttributeInstanceFactory {
  */
 private class AttributeInstanceDelegation(
     val attribute: Attribute,
-    @get:JvmName("baseValue")
-    @set:JvmName("baseValue")
-    var baseValue: Double = attribute.defaultValue,
-    var modifiersById: Object2ObjectArrayMap<Key, AttributeModifier> = Object2ObjectArrayMap(),
-    var modifiersByOp: EnumMap<Operation, Object2ObjectOpenHashMap<Key, AttributeModifier>> = enumMap(),
-    var cachedValue: Double = 0.0,
-    var dirty: Boolean = true,
+    private var baseValue: Double = attribute.defaultValue,
+    private var modifiersById: Object2ObjectArrayMap<Key, AttributeModifier> = Object2ObjectArrayMap(),
+    private var modifiersByOp: EnumMap<Operation, Object2ObjectOpenHashMap<Key, AttributeModifier>> = enumMap(),
+    private var cachedValue: Double = 0.0,
+    private var dirty: Boolean = true,
 
     /**
      * 用于实现 copy-on-write.
      * 当为 false 时, 表示拥有所有权, 可以直接修改数据.
      * 当为 true 时, 表示没有所有权, 必须先复制再修改.
      */
-    var copyOnWrite: Boolean = false,
+    private var copyOnWrite: Boolean = false,
 ) {
 
     fun getBaseValue(): Double {
@@ -423,7 +418,7 @@ private class AttributeInstanceDelegation(
  * [WakameAttributeInstance], and should not be stored in the world state.
  */
 private class ProtoAttributeInstance(
-    val delegation: AttributeInstanceDelegation,
+    private val delegation: AttributeInstanceDelegation,
 ) : AttributeInstance {
     override val attribute: Attribute
         get() = delegation.attribute
@@ -471,7 +466,7 @@ private class ProtoAttributeInstance(
  * This class represents the concrete attribute instance in our own system.
  */
 private class WakameAttributeInstance(
-    val delegation: AttributeInstanceDelegation,
+    private val delegation: AttributeInstanceDelegation,
 ) : AttributeInstance {
     override val attribute: Attribute
         get() = delegation.attribute
@@ -528,7 +523,7 @@ private class WakameAttributeInstance(
  * [BukkitAttributeInstance].
  */
 private class VanillaAttributeInstance(
-    val handle: BukkitAttributeInstance, // 封装的世界状态中的对象
+    private val handle: BukkitAttributeInstance, // 封装的世界状态中的对象
 ) : AttributeInstance {
     override val attribute: Attribute
         get() = handle.attribute.toNeko()
@@ -592,7 +587,7 @@ private class VanillaAttributeInstance(
 }
 
 private class IntangibleAttributeInstanceImpl(
-    val delegation: AttributeInstanceDelegation,
+    private val delegation: AttributeInstanceDelegation,
 ) : IntangibleAttributeInstance {
     override val attribute: Attribute
         get() = delegation.attribute
@@ -617,7 +612,7 @@ private class IntangibleAttributeInstanceImpl(
 }
 
 private class AttributeInstanceSnapshotImpl(
-    val delegation: AttributeInstanceDelegation,
+    private val delegation: AttributeInstanceDelegation,
 ) : AttributeInstanceSnapshot {
     override val attribute: Attribute
         get() = delegation.attribute

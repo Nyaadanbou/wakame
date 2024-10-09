@@ -23,7 +23,7 @@ internal constructor(
     val attributes: Set<Attribute> = prototypes.keys
 
     /**
-     * Creates a new [AttributeInstance] from this supplier.
+     * Creates a new live [AttributeInstance] from this supplier.
      *
      * Returns `null` if the [type] is not supported by this supplier.
      *
@@ -31,25 +31,35 @@ internal constructor(
 
      * @param type the attribute type
      * @param attributable the object which holds the vanilla attribute instances in the world state
-     * @return a new instance of [AttributeInstance].
+     * @return a new instance of [AttributeInstance]
      */
-    fun createInstance(type: Attribute, attributable: Attributable): AttributeInstance? {
+    fun createLiveInstance(type: Attribute, attributable: Attributable): AttributeInstance? {
         if (isAbsoluteVanilla(type)) {
             // 如果指定的属性是 absolute-vanilla，那么
             // - 该函数应该直接采用原版属性的值, 而非返回空值
             // - 该函数不能覆盖原版属性的任何值, 应该仅作为原版属性的代理
-            return AttributeInstanceFactory.createInstance(type, attributable, false)
+            return AttributeInstanceFactory.createLiveInstance(type, attributable, false)
         }
 
         val prototype = prototypes[type] ?: return null
-        val product = AttributeInstanceFactory.createInstance(type, attributable, true)
+        val product = AttributeInstanceFactory.createLiveInstance(type, attributable, true)
         product.replace(prototype) // 将实例的值替换为原型的值
         return product
     }
 
-    fun createInstance(type: Attribute): IntangibleAttributeInstance? {
+    /**
+     * Creates a new persistent [AttributeInstance] from this supplier.
+     */
+    fun createPersistentInstance(type: Attribute): AttributeInstance? {
+        TODO("创建“活的”实例")
+    }
+
+    /**
+     * Creates a new [IntangibleAttributeInstance] from this supplier.
+     */
+    fun createImaginaryInstance(type: Attribute): IntangibleAttributeInstance? {
         val prototype = prototypes[type] ?: return null
-        val product = AttributeInstanceFactory.createInstance(type)
+        val product = AttributeInstanceFactory.createDataInstance(type)
         product.replace(prototype)
         val snapshot = product.getSnapshot() // 创建快照
         return snapshot.toIntangible() // 转为不可变
@@ -140,7 +150,7 @@ internal constructor(
      */
     private fun getDefault(type: Attribute, attributable: Attributable): AttributeInstance {
         return if (isAbsoluteVanilla(type)) {
-            AttributeInstanceFactory.createInstance(type, attributable, false)
+            AttributeInstanceFactory.createLiveInstance(type, attributable, false)
         } else {
             requireNotNull(prototypes[type]) {
                 val id = type.descriptionId
@@ -346,7 +356,7 @@ internal class AttributeSupplierDeserializer(
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            val attributes = Attributes.element(ElementRegistry.INSTANCES[elementId]).getAttributesByFacade(facadeId)
+                            val attributes = Attributes.element(ElementRegistry.INSTANCES[elementId]).getCollectionBy(facadeId)
                             builder.add(attributes, valueNodeInMap)
                         }
                     } else {
@@ -354,7 +364,7 @@ internal class AttributeSupplierDeserializer(
                         // the value node is used for every single element available in the system
 
                         for ((_, elementType) in ElementRegistry.INSTANCES) {
-                            val attributes = Attributes.element(elementType).getAttributesByFacade(facadeId)
+                            val attributes = Attributes.element(elementType).getCollectionBy(facadeId)
                             builder.add(attributes, valueNode)
                         }
                     }
@@ -362,7 +372,7 @@ internal class AttributeSupplierDeserializer(
                 } else {
                     // it's a node for any other attributes
 
-                    val attributes = Attributes.getAttributesByFacade(facadeId)
+                    val attributes = Attributes.getCollectionBy(facadeId)
                     builder.add(attributes, valueNode)
                 }
             }
