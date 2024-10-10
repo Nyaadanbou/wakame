@@ -11,21 +11,12 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.Color
-import org.bukkit.Location
-import org.bukkit.Sound
-import org.bukkit.entity.Display
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.entity.TextDisplay
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
+import org.bukkit.*
+import org.bukkit.entity.*
+import org.bukkit.event.*
 import org.joml.Vector3f
 import java.util.WeakHashMap
-import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.sin
+import kotlin.math.*
 
 /**
  * 以悬浮文字显示玩家造成的伤害.
@@ -170,22 +161,22 @@ internal class DamageDisplay : Listener {
     }
 }
 
-/**
- * @param slices 分割数
- * @param radius 半径
- */
 internal class RadialPointCycle {
     private val slices: Int
     private val radius: Float
     private val points: List<Pair<Float, Float>>
 
-    constructor(divisions: Int, radius: Float) {
+    /**
+     * @param slices 分割数
+     * @param radius 半径
+     */
+    constructor(slices: Int, radius: Float) {
         // 分割数量, 必须为偶数
-        this.slices = max(2, if (divisions % 2 == 0) divisions else divisions + 1)
+        this.slices = max(2, if (slices % 2 == 0) slices else slices + 1)
         // 最小半径, 必须大于等于 0
         this.radius = max(0f, radius)
         // 根据给定的参数生成一组均匀分布的点对
-        this.points = createPoints(divisions, radius)
+        this.points = createPoints(this.slices, this.radius)
     }
 
     // 每个实体对应的 "trace"
@@ -199,11 +190,11 @@ internal class RadialPointCycle {
     }
 
     // 初始化生成一组在圆上均匀分布的点对
-    private fun createPoints(divisions: Int, radius: Float): List<Pair<Float, Float>> {
+    private fun createPoints(slices: Int, radius: Float): List<Pair<Float, Float>> {
         val points = mutableListOf<Pair<Float, Float>>()
-        val step = (2 * Math.PI / divisions).toFloat()
+        val step = (2 * Math.PI / slices).toFloat()
 
-        for (i in 0 until divisions) {
+        for (i in 0 until slices) {
             val angle = step * i
             val r1 = radius * cos(angle)
             val r2 = radius * sin(angle)
