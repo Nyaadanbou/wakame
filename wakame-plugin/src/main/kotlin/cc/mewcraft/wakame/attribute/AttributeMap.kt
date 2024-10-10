@@ -8,7 +8,10 @@ import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.user.User
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
-import org.bukkit.entity.*
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.ApiStatus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -262,25 +265,26 @@ private class PlayerAttributeMap(
  * The underlying attribute data is stored in the entity's NBT storage, so it's persistent
  * over server restarts.
  */
-private class EntityAttributeMap(
-    /**
-     * 默认属性的提供器.
-     */
-    private val default: AttributeSupplier,
-    entity: LivingEntity,
-) : AttributeMap {
-    init {
-        require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
+private class EntityAttributeMap : AttributeMap {
+    constructor(default: AttributeSupplier, entity: LivingEntity) {
+        checkEntityIsValid(entity)
+        this.default = default
+        this.entityRef = WeakReference(entity)
         default.attributes.filter { attr -> attr.vanilla }.forEach { attr -> getInstance(attr) }
     }
 
-    private val entityRef: WeakReference<LivingEntity> = WeakReference(entity) // use WeakRef to prevent memory leak
+    /**
+     * 默认属性的提供器.
+     */
+    private val default: AttributeSupplier
+
+    private val entityRef: WeakReference<LivingEntity>   // use WeakRef to prevent memory leak
+
     private val entity: LivingEntity
         get() {
             val entity = entityRef.get()
-            requireNotNull(entity) { "The entity ref no longer exists" }
-            require(entity.isValid) { "The entity is no longer valid" }
-            return entity
+            checkEntityIsValid(entity)
+            return entity!!
         }
 
     /**
@@ -295,6 +299,11 @@ private class EntityAttributeMap(
     private val patchOrCreate: AttributeMapPatch
         get() = AttributeMapPatchAccess.getOrCreate(entity.uniqueId)
 
+    private fun checkEntityIsValid(entity: Entity?) {
+        requireNotNull(entity) { "The entity ref no longer exists" }
+        require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
+        require(entity.isValid) { "The entity is no longer valid" }
+    }
 
     @Suppress("DuplicatedCode")
     override fun getSnapshot(): AttributeMapSnapshot {

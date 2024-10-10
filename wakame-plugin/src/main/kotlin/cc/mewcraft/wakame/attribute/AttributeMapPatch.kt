@@ -3,22 +3,29 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
-import it.unimi.dsi.fastutil.objects.*
+import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.BinaryTagTypes
 import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.util.Codec
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attributable
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
-import org.bukkit.persistence.*
+import org.bukkit.persistence.PersistentDataAdapterContext
+import org.bukkit.persistence.PersistentDataContainer
+import org.bukkit.persistence.PersistentDataType
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.*
-import java.util.UUID
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.io.IOException
+import java.util.*
 
 internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
     companion object {
@@ -47,7 +54,9 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
     }
 
     fun trimBy(default: AttributeSupplier) {
-        // TODO 将 AttributeMapPatch (本对象) 中已经存在于 AttributeSupplier 中的数据移除
+        for (attribute in default.attributes) {
+            data.remove(attribute)
+        }
     }
 
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> {
@@ -82,12 +91,12 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
     @EventHandler
     fun on(e: EntitiesLoadEvent) {
         for (entity in e.entities) {
-            if (entity !is Attributable) continue // FIXME check Player???
+            if (entity is Player) continue
+            if (entity !is Attributable) continue
 
             val pdc = entity.persistentDataContainer
             val patch = AttributeMapPatch.decode(entity, pdc) ?: continue
             val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
-
             patch.trimBy(default)
 
             AttributeMapPatchAccess.put(entity.uniqueId, patch)
@@ -98,6 +107,7 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
     @EventHandler
     fun on(e: EntitiesUnloadEvent) {
         for (entity in e.entities) {
+            if (entity is Player) continue
             if (entity !is Attributable) continue
 
             val pdc = entity.persistentDataContainer
@@ -200,8 +210,6 @@ private data class SerializableAttributeInstance(
 
     fun toAttributeInstance(owner: Attributable): AttributeInstance? {
         val attribute = Attributes.getBy(id) ?: return null
-        // FIXME g22 必须用 AttributeInstanceFactory.createLiveInstance(...), 否则跟原版的属性实例不会与世界状态同步
-        //  也就是说, toAttributeInstance 这个函数必须传入一个 Entity 否则似乎无法实现这个功能 ???
         val attributeInstance = AttributeInstanceFactory.createLiveInstance(attribute, owner, true).apply {
             setBaseValue(base)
         }
