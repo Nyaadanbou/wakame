@@ -55,9 +55,9 @@ internal constructor(
     }
 
     /**
-     * Creates a new [IntangibleAttributeInstance] from this supplier.
+     * Creates a new [ImaginaryAttributeInstance] from this supplier.
      */
-    fun createImaginaryInstance(type: Attribute): IntangibleAttributeInstance? {
+    fun createImaginaryInstance(type: Attribute): ImaginaryAttributeInstance? {
         val prototype = prototypes[type] ?: return null
         val product = AttributeInstanceFactory.createDataInstance(type)
         product.replace(prototype)

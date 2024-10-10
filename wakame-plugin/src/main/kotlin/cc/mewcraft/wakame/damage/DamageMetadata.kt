@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
+import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
+import cc.mewcraft.wakame.attribute.IntangibleAttributeMap
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -303,11 +306,11 @@ class EntityProjectileDamageMetadata(
  * 如: 箭矢落地后再次命中, 发射器发射的箭矢命中.
  */
 class DefaultArrowDamageMetadata private constructor(
-    imaginaryAttributeMap: IntangibleAttributeMap,
+    imaginaryAttributeMap: ImaginaryAttributeMap,
     override val projectile: AbstractArrow,
 ) : ProjectileDamageMetadata {
-    constructor(attributeMap: IntangibleAttributeMap, arrow: Arrow) : this(attributeMap, arrow as AbstractArrow)
-    constructor(attributeMap: IntangibleAttributeMap, arrow: SpectralArrow) : this(attributeMap, arrow as AbstractArrow)
+    constructor(attributeMap: ImaginaryAttributeMap, arrow: Arrow) : this(attributeMap, arrow as AbstractArrow)
+    constructor(attributeMap: ImaginaryAttributeMap, arrow: SpectralArrow) : this(attributeMap, arrow as AbstractArrow)
 
     override val damageBundle: DamageBundle = buildDamageBundle(imaginaryAttributeMap)
     override val damageValue: Double = damageBundle.damageSum
@@ -326,7 +329,7 @@ class DefaultArrowDamageMetadata private constructor(
         }
     }
 
-    private fun buildDamageBundle(imaginaryAttributeMap: IntangibleAttributeMap): DamageBundle {
+    private fun buildDamageBundle(imaginaryAttributeMap: ImaginaryAttributeMap): DamageBundle {
         val itemStack = projectile.itemStack
 
         // 不是 NekoStack, 则为原版箭矢
@@ -361,7 +364,7 @@ class DefaultArrowDamageMetadata private constructor(
  * 如: 三叉戟落地后再次命中(原版无此特性).
  */
 class DefaultTridentDamageMetadata(
-    imaginaryAttributeMap: IntangibleAttributeMap,
+    imaginaryAttributeMap: ImaginaryAttributeMap,
     override val projectile: Trident,
 ) : ProjectileDamageMetadata {
     override val damageBundle: DamageBundle = buildDamageBundle(imaginaryAttributeMap)
@@ -381,7 +384,7 @@ class DefaultTridentDamageMetadata(
         }
     }
 
-    private fun buildDamageBundle(intangibleAttributeMap: IntangibleAttributeMap): DamageBundle {
+    private fun buildDamageBundle(imaginaryAttributeMap: ImaginaryAttributeMap): DamageBundle {
         val itemStack = projectile.itemStack
 
         // 不是 NekoStack, 则为原版三叉戟
@@ -392,7 +395,7 @@ class DefaultTridentDamageMetadata(
 
         // 获取无形属性映射的快照, 将三叉戟的属性加上
         val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
-        val attributeMapSnapshot = intangibleAttributeMap.getSnapshot()
+        val attributeMapSnapshot = imaginaryAttributeMap.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
         }

@@ -43,17 +43,26 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
         return data[attribute]
     }
 
+    /**
+     * 保存到 PDC.
+     */
     fun saveTo(owner: Attributable, pdc: PersistentDataContainer) {
         pdc.set(PDC_KEY, AttributeMapPatchType.with(owner), this)
     }
 
+    /**
+     * 从默认属性中移除所有未被修改的属性.
+     */
     fun trimBy(default: AttributeSupplier) {
-        // FIXME 这部分代码没有这么简单
-        //  Attribute 只是个类型, 它真正有用的数据是对应的 AttributeInstance 里面的 baseValue 和 modifiers
-        //  只有当 patch 里面的 AttributeInstance 跟 default 里面的 AttributeInstance 完全一样时,
-        //  才能删除 patch 里面的 AttributeInstance
         for (attribute in default.attributes) {
-            data.remove(attribute)
+            val patchedInstance = data[attribute] ?: continue
+            val defaultBaseValue = default.getBaseValue(attribute)
+            // 如果 patch 的 AttributeInstance 基值与默认基值相同,
+            // 且 patch 的 AttributeInstance 没有任何 AttributeModifier,
+            // 代表 patch 与默认提供完全一致, 移除 patch.
+            if (patchedInstance.getBaseValue() != defaultBaseValue && patchedInstance.getModifiers().isEmpty()) {
+                data.remove(attribute)
+            }
         }
     }
 

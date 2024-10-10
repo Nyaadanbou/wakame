@@ -88,8 +88,7 @@ sealed interface AttributeInstance : AttributeInstanceSnapshotable {
 /**
  * 代表一个无形的属性实例. 该实例不可变, 并且不会对世界状态产生任何副作用.
  */
-// TODO 改名为 ImaginaryAttributeInstance
-sealed interface IntangibleAttributeInstance : AttributeInstanceSnapshotable {
+sealed interface ImaginaryAttributeInstance : AttributeInstanceSnapshotable {
     /**
      * 该属性实例的 [Attribute].
      */
@@ -181,9 +180,9 @@ sealed interface AttributeInstanceSnapshot {
     fun removeModifiers()
 
     /**
-     * 将本实例转换为一个 [IntangibleAttributeInstance].
+     * 将本实例转换为一个 [ImaginaryAttributeInstance].
      */
-    fun toIntangible(): IntangibleAttributeInstance
+    fun toIntangible(): ImaginaryAttributeInstance
 }
 
 /**
@@ -586,9 +585,9 @@ private class VanillaAttributeInstance(
     }
 }
 
-private class IntangibleAttributeInstanceImpl(
+private class ImaginaryAttributeInstanceImpl(
     private val delegation: AttributeInstanceDelegation,
-) : IntangibleAttributeInstance {
+) : ImaginaryAttributeInstance {
     override val attribute: Attribute
         get() = delegation.attribute
 
@@ -647,6 +646,6 @@ private class AttributeInstanceSnapshotImpl(
     override fun removeModifiers() =
         delegation.removeModifiers()
 
-    override fun toIntangible(): IntangibleAttributeInstance =
-        IntangibleAttributeInstanceImpl(delegation.copy())
+    override fun toIntangible(): ImaginaryAttributeInstance =
+        ImaginaryAttributeInstanceImpl(delegation.copy())
 }
