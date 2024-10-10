@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import cc.mewcraft.wakame.item.components.ItemCrate as ItemCrateData
 
@@ -14,12 +13,12 @@ data class ItemCrate(
     /**
      * 盲盒的唯一标识.
      */
-    val key: Key,
+    val identity: String,
 ) : ItemTemplate<ItemCrateData> {
     override val componentType: ItemComponentType<ItemCrateData> = ItemComponentTypes.CRATE
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<ItemCrateData> {
-        return ItemGenerationResult.of(ItemCrateData(key = key))
+        return ItemGenerationResult.of(ItemCrateData(identity = identity))
     }
 
     companion object : ItemTemplateBridge<ItemCrate> {
@@ -41,7 +40,7 @@ data class ItemCrate(
          * ```
          */
         override fun decode(node: ConfigurationNode): ItemCrate {
-            val raw = node.node("key").krequire<Key>()
+            val raw = node.node("id").krequire<String>()
             return ItemCrate(raw)
         }
     }

@@ -401,7 +401,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(Key.key("foo:bar"), it.key)
+            assertEquals("foo", it.identity)
         }
     }
 

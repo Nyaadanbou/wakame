@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.util.Key
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 
 
@@ -11,7 +9,7 @@ data class ItemCrate(
     /**
      * 盲盒的唯一标识.
      */
-    val key: Key,
+    val identity: String,
 ) : Examinable {
 
     companion object : ItemComponentBridge<ItemCrate> {
@@ -30,13 +28,13 @@ data class ItemCrate(
     ) : ItemComponentType<ItemCrate> {
         override fun read(holder: ItemComponentHolder): ItemCrate? {
             val tag = holder.getTag() ?: return null
-            val key = Key(tag.getString(TAG_KEY))
-            return ItemCrate(key = key)
+            val key = tag.getString(TAG_ID)
+            return ItemCrate(identity = key)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemCrate) {
             holder.editTag { tag ->
-                tag.putString(TAG_KEY, value.key.asString())
+                tag.putString(TAG_ID, value.identity)
             }
         }
 
@@ -45,7 +43,7 @@ data class ItemCrate(
         }
 
         private companion object {
-            const val TAG_KEY = "key"
+            const val TAG_ID = "id"
         }
     }
 }
