@@ -3,9 +3,7 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
-import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.BinaryTagTypes
 import net.kyori.adventure.nbt.CompoundBinaryTag
@@ -17,15 +15,11 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
-import org.bukkit.persistence.PersistentDataAdapterContext
-import org.bukkit.persistence.PersistentDataContainer
-import org.bukkit.persistence.PersistentDataType
+import org.bukkit.persistence.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
-import java.util.*
+import java.io.*
+import java.util.UUID
 
 internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
     companion object {
@@ -54,6 +48,10 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
     }
 
     fun trimBy(default: AttributeSupplier) {
+        // FIXME 这部分代码没有这么简单
+        //  Attribute 只是个类型, 它真正有用的数据是对应的 AttributeInstance 里面的 baseValue 和 modifiers
+        //  只有当 patch 里面的 AttributeInstance 跟 default 里面的 AttributeInstance 完全一样时,
+        //  才能删除 patch 里面的 AttributeInstance
         for (attribute in default.attributes) {
             data.remove(attribute)
         }
