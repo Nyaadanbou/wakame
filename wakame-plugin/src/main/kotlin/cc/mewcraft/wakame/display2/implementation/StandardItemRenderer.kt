@@ -3,7 +3,9 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
+import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.*
@@ -117,9 +119,9 @@ internal object StandardRendererConfigSerializer {
 //<editor-fold desc="RenderingPart">
 internal object StandardRenderingParts {
     @JvmField
-    val ATTACK_SPEED: StandardRenderingPart<ItemAttackSpeed, SingleValueRendererFormat> =
+    val ATTACK_SPEED: StandardRenderingPart<ItemAttackSpeed, AttackSpeedRendererFormat> =
         configure("attack_speed") { data, format ->
-            listOf(format.render(Placeholder.component("value", Component.text(data.level.name))))
+            listOf(format.render(data))
         }
 
     @JvmField
@@ -171,9 +173,14 @@ internal object StandardRenderingParts {
         }
 
     @JvmField
-    val FOOD: StandardRenderingPart<FoodProperties, FoodPropertiesRendererFormat> =
+    val FOOD: StandardRenderingPart<FoodProperties, ListValueRendererFormat> =
         configure("food") { data, format ->
-            listOf(format.render(data))
+            val resolver = TagResolver.resolver(
+                Placeholder.component("nutrition", Component.text(data.nutrition)),
+                Placeholder.component("saturation", Component.text(data.saturation)),
+                Placeholder.component("eat_seconds", Component.text(data.eatSeconds)),
+            )
+            listOf(format.render(resolver))
         }
 
     @JvmField
@@ -198,8 +205,8 @@ internal object StandardRenderingParts {
     }
 
     @JvmField
-    val PORTABLE_CORE: StandardRenderingPart<PortableCore, SingleValueRendererFormat> = configure("portable_core") { data, format ->
-        listOf() // TODO display2 // 把核心的渲染逻辑分离出来, 不仅可以在这里 (PortableCore) 使用, 还可以在 ItemCells 使用
+    val PORTABLE_CORE: StandardRenderingPart<PortableCore, PortableCoreRendererFormat> = configure("portable_core") { data, format ->
+        listOf(format.render(data)) // TODO display2 // 把核心的渲染逻辑分离出来, 不仅可以在这里 (PortableCore) 使用, 还可以在 ItemCells 使用
     }
 
     @JvmField
@@ -207,18 +214,28 @@ internal object StandardRenderingParts {
         listOf(format.render(Placeholder.component("value", data.rarity.displayName)))
     }
 
+    /**
+     * @param id 用来定位配置文件中的节点
+     * @param block 将数据渲染成文本的逻辑
+     */
     private inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): StandardRenderingPart<T, F> {
         val format = StandardItemRenderer.rendererFormats.get<F>(id) ?: throw IllegalArgumentException("renderer format '$id' not found")
         val part = StandardRenderingPart(format, block)
         return part
     }
 
+    /**
+     * @see configure
+     */
     private inline fun <T1, T2, reified F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): StandardRenderingPart2<T1, T2, F> {
         val format = StandardItemRenderer.rendererFormats.get<F>(id) ?: throw IllegalArgumentException("renderer format '$id' not found")
         val part = StandardRenderingPart2(format, block)
         return part
     }
 
+    /**
+     * @see configure
+     */
     private inline fun <T1, T2, T3, reified F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): StandardRenderingPart3<T1, T2, T3, F> {
         val format = StandardItemRenderer.rendererFormats.get<F>(id) ?: throw IllegalArgumentException("renderer format '$id' not found")
         val part = StandardRenderingPart3(format, block)
@@ -266,17 +283,45 @@ internal class StandardRenderingPart3<T1, T2, T3, F : RendererFormat>(
 
 //<editor-fold desc="RendererFormat">
 @ConfigSerializable
+internal data class AttackSpeedRendererFormat(
+    @Setting override val namespace: String,
+    @Setting override val tooltip: String,
+) : SingleValueRendererFormat {
+    override val id = "attack_speed"
+    override val index: Key = createIndex()
+
+    // TODO display2 mapping ENUM to String
+    fun render(data: ItemAttackSpeed): IndexedText {
+        val resolver = Placeholder.component("value", Component.text(data.level.name))
+        return SimpleIndexedText(index, listOf(MM.deserialize(tooltip, resolver)))
+    }
+
+    companion object Shared {
+        private val MM = Injector.get<MiniMessage>()
+    }
+}
+
+@ConfigSerializable
 internal data class CellularAttributeRendererFormat(
     @Setting override val namespace: String,
 ) : RendererFormat.Dynamic<ConstantCompositeAttribute> {
     override fun computeIndex(source: ConstantCompositeAttribute): Key {
-        TODO("display2")
+        val id = buildString {
+            append(source.id)
+            append('.')
+            append(source.operation)
+            source.element?.let {
+                append('.')
+                append(it.uniqueId)
+            }
+        }
+        return Key.key(namespace, id)
     }
 
     fun render(attribute: ConstantCompositeAttribute): IndexedText {
         val facade = AttributeRegistry.FACADES[attribute.id]
-        val text = facade.createTooltipLore(attribute)
-        return SimpleIndexedText(computeIndex(attribute), text)
+        val tooltip = facade.createTooltipLore(attribute)
+        return SimpleIndexedText(computeIndex(attribute), tooltip)
     }
 }
 
@@ -284,17 +329,19 @@ internal data class CellularAttributeRendererFormat(
 internal data class CellularSkillRendererFormat(
     @Setting override val namespace: String,
 ) : RendererFormat.Dynamic<ConfiguredSkill>, KoinComponent {
-    private val mini = get<MiniMessage>()
-
     override fun computeIndex(source: ConfiguredSkill): Key {
         val sourceId = source.id
-        return Key.key(namespace, sourceId.namespace() + "/" + sourceId.key())
+        return Key.key(namespace, sourceId.namespace() + "/" + sourceId.value())
     }
 
     fun render(skill: ConfiguredSkill): IndexedText {
-        val skillObject = skill.instance
-        val text = skillObject.displays.tooltips.map(mini::deserialize)
-        return SimpleIndexedText(computeIndex(skill), text)
+        val instance = skill.instance
+        val tooltip = instance.displays.tooltips.map(MM::deserialize)
+        return SimpleIndexedText(computeIndex(skill), tooltip)
+    }
+
+    companion object Shared {
+        private val MM = Injector.get<MiniMessage>()
     }
 }
 
@@ -303,28 +350,103 @@ internal data class CellularEmptyRendererFormat(
     @Setting override val namespace: String,
     @Setting private val tooltip: List<Component>,
 ) : RendererFormat.Simple {
-    override val index: Key = Key.key(namespace, "cells/empty")
+    override val id: String = "cells/empty"
+    override val index: Key = createIndex()
 
     fun render(): IndexedText {
         return SimpleIndexedText(index, tooltip)
     }
 }
 
-@ConfigSerializable
-internal data class FoodPropertiesRendererFormat(
-    @Setting override val namespace: String,
-    @Setting private val tooltip: List<String>,
-) : RendererFormat.Simple, KoinComponent {
-    private val mini = get<MiniMessage>()
-    override val index: Key = Key.key(namespace, "food")
+// @ConfigSerializable
+// internal data class CrateRendererFormat(
+//     @Setting override val namespace: String,
+//     @Setting override val tooltip: String,
+// ) : SingleValueRendererFormat {
+//     override val id = "crate"
+//     override val index: Key = createIndex()
+// }
 
-    fun render(foodProperties: FoodProperties): IndexedText {
-        val resolver = TagResolver.resolver(
-            Placeholder.component("nutrition", Component.text(foodProperties.nutrition)),
-            Placeholder.component("saturation", Component.text(foodProperties.saturation)),
-            Placeholder.component("eat_seconds", Component.text(foodProperties.eatSeconds)),
-        )
-        return SimpleIndexedText(index, tooltip.map { mini.deserialize(it, resolver) }) // TODO display2
+// @ConfigSerializable
+// internal data class CustomNameRendererFormat(
+//     @Setting override val namespace: String,
+//     @Setting override val tooltip: String,
+// ) : SingleValueRendererFormat {
+//     override val id = "custom_name"
+//     override val index: Key = createIndex()
+// }
+//
+// @ConfigSerializable
+// internal data class ElementsRendererFormat(
+//     @Setting override val namespace: String,
+//     @Setting override val tooltip: AggregateValueRendererFormat.Tooltip,
+// ) : AggregateValueRendererFormat {
+//     override val id = "elements"
+//     override val index: Key = createIndex()
+// }
+//
+// @ConfigSerializable
+// internal data class FireResistantRendererFormat(
+//     @Setting override val namespace: String,
+//     @Setting override val tooltip: String,
+// ) : SingleValueRendererFormat {
+//     override val id = "fire_resistant"
+//     override val index: Key = createIndex()
+// }
+//
+// @ConfigSerializable
+// internal data class ItemNameRendererFormat(
+//     @Setting override val namespace: String,
+//     @Setting override val tooltip: String,
+// ) : SingleValueRendererFormat {
+//     override val id = "item_name"
+//     override val index = createIndex()
+// }
+//
+// @ConfigSerializable
+// internal data class KizamizRendererFormat(
+//     @Setting override val namespace: String,
+//     @Setting override val tooltip: AggregateValueRendererFormat.Tooltip,
+// ) : AggregateValueRendererFormat {
+//     override val id = "kizamiz"
+//     override val index = createIndex()
+// }
+//
+// @ConfigSerializable
+// internal data class LevelRendererFormat(
+//     @Setting override val namespace: String,
+//     @Setting override val tooltip: String,
+// ) : SingleValueRendererFormat {
+//     override val id = "level"
+//     override val index = createIndex()
+// }
+
+@ConfigSerializable
+internal data class PortableCoreRendererFormat(
+    @Setting override val namespace: String,
+) : RendererFormat.Dynamic<PortableCore> {
+    private val unknownIndex = Key.key(namespace, "unknown")
+
+    override fun computeIndex(source: PortableCore): Key {
+        val core = source.wrapped as? AttributeCore ?: return unknownIndex
+        val id = core.attribute.id
+        return Key.key(namespace, id)
+    }
+
+    fun render(data: PortableCore): IndexedText {
+        val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
+        val facade = AttributeRegistry.FACADES[core.attribute.id]
+        val tooltip = facade.createTooltipLore(core.attribute)
+        return SimpleIndexedText(computeIndex(data), tooltip)
     }
 }
+
+// @ConfigSerializable
+// internal data class RarityRendererFormat(
+//     @Setting override val namespace: String,
+//     @Setting override val tooltip: String,
+// ) : SingleValueRendererFormat {
+//     override val id = "rarity"
+//     override val index: Key = createIndex()
+// }
 //</editor-fold>

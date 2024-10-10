@@ -30,13 +30,13 @@ interface RendererFormat {
      * 代表一个索引在编译时已经确定的 [RendererFormat].
      */
     interface Simple : RendererFormat {
-        val index: Key
+        val id: String
+        val index: Key // namespace + id
+        fun createIndex(): Key = Key.key(namespace, id)
     }
 
     /**
      * 代表一个索引会在运行时动态生成的 [RendererFormat].
-     *
-     * @param T 动态内容的类型
      */
     interface Dynamic<T> : RendererFormat {
         fun computeIndex(source: T): Key

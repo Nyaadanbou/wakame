@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.commons.collections.takeUnlessEmpty
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.*
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.extra.kotlin.join
@@ -11,59 +12,83 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.*
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.enchantments.Enchantment
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 import kotlin.collections.component1
 import kotlin.collections.component2
 
+/* 这里定义了常见的 RendererFormat 的实现/接口 */
+
 /**
  * 一种最简单的渲染格式.
  *
- * 只有一个格式 [tooltip], 里面可包含多个占位符.
- * 当生成最终内容时, 只需要进行一次替换即可.
- *
- * @param namespace 命名空间
- * @param id
- * @param tooltip 内容的格式, 可能包含多个占位符
+ * 只有一个格式 [tooltip], 可以包含占位符.
+ * 当生成内容时, 将对整个文本填充一次占位符.
  */
-@ConfigSerializable
-internal data class SingleValueRendererFormat(
-    @Setting override val namespace: String,
-    private val id: String,
-    @Setting private val tooltip: String, // mini
-) : RendererFormat.Simple, KoinComponent {
-    override val index: Key = Key.key(namespace, id)
-    private val miniMessage = get<MiniMessage>()
+internal interface SingleValueRendererFormat : RendererFormat.Simple {
+    override val namespace: String
+    override val id: String
+    override val index: Key
+
+    val tooltip: String // mini message format
 
     fun render(): IndexedText {
-        return SimpleIndexedText(index, listOf(miniMessage.deserialize(tooltip)))
+        return SimpleIndexedText(index, listOf(MM.deserialize(tooltip)))
     }
 
     fun render(resolver: TagResolver): IndexedText {
-        return SimpleIndexedText(index, listOf(miniMessage.deserialize(tooltip, resolver)))
+        return SimpleIndexedText(index, listOf(MM.deserialize(tooltip, resolver)))
     }
 
     fun render(vararg resolver: TagResolver): IndexedText {
-        return SimpleIndexedText(index, listOf(miniMessage.deserialize(tooltip, *resolver)))
+        return SimpleIndexedText(index, listOf(MM.deserialize(tooltip, *resolver)))
+    }
+
+    companion object Shared {
+        private val MM = Injector.get<MiniMessage>()
+    }
+}
+
+/**
+ * 跟 [SingleValueRendererFormat] 类似, 只不过可以拥有多行.
+ *
+ * 只有一个格式 [tooltip], 可以包含占位符.
+ * 当生成内容时, 将对整个文本填充一次占位符.
+ */
+internal interface ListValueRendererFormat : RendererFormat.Simple {
+    override val namespace: String
+    override val id: String
+    override val index: Key
+
+    val tooltip: List<String> // mini message format
+
+    fun render(): IndexedText {
+        return SimpleIndexedText(index, tooltip.map(MM::deserialize))
+    }
+
+    fun render(resolver: TagResolver): IndexedText {
+        return SimpleIndexedText(index, tooltip.map { MM.deserialize(it, resolver) })
+    }
+
+    fun render(vararg resolver: TagResolver): IndexedText {
+        return SimpleIndexedText(index, tooltip.map { MM.deserialize(it, *resolver) })
+    }
+
+    companion object Shared {
+        private val MM = Injector.get<MiniMessage>()
     }
 }
 
 /**
  * 一种需要将多个对象合并成一个字符串的渲染格式.
- *
- * @param namespace
- * @param id
  */
-@ConfigSerializable
-internal data class AggregateValueRendererFormat(
-    @Setting override val namespace: String,
-    private val id: String,
-    @Setting private val tooltip: Tooltip,
-) : RendererFormat.Simple, KoinComponent {
-    override val index: Key = Key.key(namespace, id)
-    private val miniMessage = get<MiniMessage>()
+internal interface AggregateValueRendererFormat : RendererFormat.Simple {
+    override val namespace: String
+    override val id: String
+    override val index: Key
+
+    val tooltip: Tooltip // mini message format
 
     /**
      * A convenience function to stylize a list of objects.
@@ -73,9 +98,9 @@ internal data class AggregateValueRendererFormat(
         transform: (T) -> Component,
     ): IndexedText {
         val merged = collection
-            .mapTo(ObjectArrayList(collection.size)) { miniMessage.deserialize(tooltip.single, component("single", transform(it))) }
-            .join(JoinConfiguration.separator(miniMessage.deserialize(tooltip.separator)))
-            .let { miniMessage.deserialize(tooltip.merged, component("merged", it)) }
+            .mapTo(ObjectArrayList(collection.size)) { MM.deserialize(tooltip.single, component("single", transform(it))) }
+            .join(JoinConfiguration.separator(MM.deserialize(tooltip.separator)))
+            .let { MM.deserialize(tooltip.merged, component("merged", it)) }
             .let(::listOf)
         return SimpleIndexedText(index, merged)
     }
@@ -91,26 +116,30 @@ internal data class AggregateValueRendererFormat(
         @Setting val separator: String,
         @Setting val merged: String,
     )
+
+    companion object Shared {
+        private val MM = Injector.get<MiniMessage>()
+    }
 }
 
 /**
  * 一种专用于额外的物品描述 (lore) 的渲染格式.
  *
- * @param namespace
+ * @param tooltip 内容的格式, 不支持任何占位符
  */
 @ConfigSerializable
 internal class ExtraLoreRendererFormat(
     @Setting override val namespace: String,
     @Setting private val tooltip: Tooltip,
-) : RendererFormat.Simple, KoinComponent {
-    override val index: Key = Key.key(namespace, "lore")
-    private val miniMessage = get<MiniMessage>()
+) : RendererFormat.Simple {
+    override val id: String = "lore"
+    override val index: Key = Key.key(namespace, id)
 
     fun render(lore: List<String>): IndexedText {
         val size = tooltip.header.size + lore.size + tooltip.bottom.size
-        val lines = lore.mapTo(ObjectArrayList(size)) { miniMessage.deserialize(tooltip.line, parsed("line", it)) }
-        val header = tooltip.header.takeUnlessEmpty()?.run { mapTo(ObjectArrayList(this.size), miniMessage::deserialize) }
-        val bottom = tooltip.bottom.takeUnlessEmpty()?.run { mapTo(ObjectArrayList(this.size), miniMessage::deserialize) }
+        val lines = lore.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, parsed("line", it)) }
+        val header = tooltip.header.takeUnlessEmpty()?.run { mapTo(ObjectArrayList(this.size), MM::deserialize) }
+        val bottom = tooltip.bottom.takeUnlessEmpty()?.run { mapTo(ObjectArrayList(this.size), MM::deserialize) }
         lines.addAll(0, header)
         lines.addAll(bottom)
         return SimpleIndexedText(index, lines)
@@ -127,6 +156,10 @@ internal class ExtraLoreRendererFormat(
         @Setting val header: List<String>,
         @Setting val bottom: List<String>,
     )
+
+    companion object Shared {
+        private val MM = Injector.get<MiniMessage>()
+    }
 }
 
 /**
@@ -135,8 +168,9 @@ internal class ExtraLoreRendererFormat(
 @ConfigSerializable
 internal class EnchantmentRendererFormat(
     @Setting override val namespace: String,
-) : RendererFormat.Simple, KoinComponent {
-    override val index: Key = Key.key(namespace, "enchantments")
+) : RendererFormat.Simple {
+    override val id: String = "enchantments"
+    override val index: Key = Key.key(namespace, id)
 
     fun render(enchantments: Map<Enchantment, Int>): IndexedText {
         return SimpleIndexedText(index, enchantments.map { (enchantment, level) -> enchantment.displayName(level) })

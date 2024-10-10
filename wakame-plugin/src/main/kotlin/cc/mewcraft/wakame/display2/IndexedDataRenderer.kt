@@ -14,7 +14,7 @@ fun interface IndexedDataRenderer<in T, in F> {
      * 如果没有需要渲染的内容, 返回空集合.
      *
      * @param data 被渲染的数据
-     * @param spec 渲染的格式
+     * @param spec 特定的渲染格式
      *
      * @return 渲染后的文本
      */
