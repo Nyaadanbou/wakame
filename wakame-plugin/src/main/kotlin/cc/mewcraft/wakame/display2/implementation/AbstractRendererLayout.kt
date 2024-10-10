@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
+import java.nio.file.Path
 
 internal abstract class AbstractRendererLayout : RendererLayout, KoinComponent {
     protected val logger: Logger by inject()
@@ -14,6 +15,10 @@ internal abstract class AbstractRendererLayout : RendererLayout, KoinComponent {
 
     init {
         textOrdinalMap.defaultReturnValue(-1)
+    }
+
+    fun initialize(layoutPath: Path) {
+
     }
 
     /**

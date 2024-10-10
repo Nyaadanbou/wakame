@@ -20,10 +20,12 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.Setting
 import java.nio.file.Path
-import kotlin.properties.Delegates
 
 internal class StandardRendererLayout : AbstractRendererLayout() {
     override var staticIndexedTextList: List<IndexedText> = ArrayList() // TODO display2
@@ -43,9 +45,9 @@ internal class StandardRendererFormats : AbstractRendererFormats() {
 internal class StandardContext
 
 internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>(), KoinComponent {
-    override var rendererLayout: RendererLayout by Delegates.notNull()
-    override var rendererFormats: RendererFormats by Delegates.notNull()
-    private var indexedLineFlatter: IndexedTextFlatter by Delegates.notNull()
+    override val rendererLayout: AbstractRendererLayout = StandardRendererLayout()
+    override val rendererFormats: AbstractRendererFormats = StandardRendererFormats()
+    private val indexedTextFlatter: IndexedTextFlatter = IndexedTextFlatter(rendererLayout)
 
     override fun initialize(
         layoutPath: Path,
@@ -53,12 +55,13 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
     ) {
         // TODO 读取配置文件, 初始化:
         //   rendererLayout, rendererFormats
-        rendererLayout = StandardRendererLayout() // TODO display2
-        rendererFormats = StandardRendererFormats() // TODO display2
-        indexedLineFlatter = IndexedTextFlatter(rendererLayout)
+        rendererLayout.initialize(layoutPath) // TODO display2
+        rendererFormats.initialize(formatPath) // TODO display2
     }
 
     override fun render(item: PacketNekoStack, context: StandardContext?) {
+        requireNotNull(context) { "context" }
+
         val components = item.components
         val collector = ObjectArrayList<IndexedText>()
 
@@ -87,7 +90,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingParts.PORTABLE_CORE.process(collector, data) }
         components.process(ItemComponentTypes.RARITY) { data -> StandardRenderingParts.RARITY.process(collector, data) }
 
-        val lore = indexedLineFlatter.flatten(collector)
+        val lore = indexedTextFlatter.flatten(collector)
         val cmd = ItemModelDataLookup[item.id, item.variant]
 
         // 修改物品(原地)
@@ -114,123 +117,112 @@ internal object StandardRendererConfigSerializer {
 //<editor-fold desc="RenderingPart">
 internal object StandardRenderingParts {
     @JvmField
-    val ATTACK_SPEED: StandardRenderingPart<ItemAttackSpeed, SingleValueRendererFormat> = configure("attack_speed") { data, format ->
-        val level = data.level
-        val text = format.render(Placeholder.component("value", Component.text(level.name)))
-        listOf(SimpleIndexedText(format.index, listOf(text)))
-    }
+    val ATTACK_SPEED: StandardRenderingPart<ItemAttackSpeed, SingleValueRendererFormat> =
+        configure("attack_speed") { data, format ->
+            listOf(format.render(Placeholder.component("value", Component.text(data.level.name))))
+        }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE: StandardRenderingPart<ConstantCompositeAttribute, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
-        val text = format.render(data)
-        val idx = format.computeIndex(data)
-        listOf(SimpleIndexedText(idx, text))
-    }
+    val CELLULAR_ATTRIBUTE: StandardRenderingPart<ConstantCompositeAttribute, CellularAttributeRendererFormat> =
+        configure("cells/attributes") { data, format ->
+            listOf(format.render(data))
+        }
 
     @JvmField
-    val CELLULAR_SKILL: StandardRenderingPart<ConfiguredSkill, CellularSkillRendererFormat> = configure("cells/skills") { data, format ->
-        val text = format.render(data)
-        val idx = format.computeIndex(data)
-        listOf(SimpleIndexedText(idx, text))
-    }
+    val CELLULAR_SKILL: StandardRenderingPart<ConfiguredSkill, CellularSkillRendererFormat> =
+        configure("cells/skills") { data, format ->
+            listOf(format.render(data))
+        }
 
     @JvmField
-    val CELLULAR_EMPTY: StandardRenderingPart<Nothing?, CellularEmptyRendererFormat> = configure("cells/empty") { _, format ->
-        val text = format.render()
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, text))
-    }
+    val CELLULAR_EMPTY: StandardRenderingPart<Nothing?, CellularEmptyRendererFormat> =
+        configure("cells/empty") { _, format ->
+            listOf(format.render())
+        }
 
     @JvmField
-    val CRATE: StandardRenderingPart<ItemCrate, AggregateValueRendererFormat> = configure("crate") { data, format ->
-        emptyList() // TODO display2
-    }
+    val CRATE: StandardRenderingPart<ItemCrate, AggregateValueRendererFormat> =
+        configure("crate") { data, format ->
+            listOf() // TODO display2
+        }
 
     @JvmField
-    val CUSTOM_NAME: StandardRenderingPart<CustomName, SingleValueRendererFormat> = configure("custom_name") { data, format ->
-        val text = format.render(Placeholder.component("value", data.rich))
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, listOf(text)))
-    }
+    val CUSTOM_NAME: StandardRenderingPart<CustomName, SingleValueRendererFormat> =
+        configure("custom_name") { data, format ->
+            listOf(format.render(Placeholder.component("value", data.rich)))
+        }
 
     @JvmField
-    val ELEMENTS: StandardRenderingPart<ItemElements, AggregateValueRendererFormat> = configure("elements") { data, format ->
-        val text = format.render(data.elements, Element::displayName)
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, text))
-    }
+    val ELEMENTS: StandardRenderingPart<ItemElements, AggregateValueRendererFormat> =
+        configure("elements") { data, format ->
+            listOf(format.render(data.elements, Element::displayName))
+        }
 
     @JvmField
-    val ENCHANTMENTS: StandardRenderingPart<ItemEnchantments, EnchantmentRendererFormat> = configure("enchantments") { data, format ->
-        val text = format.render(data.enchantments)
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, text))
-    }
+    val ENCHANTMENTS: StandardRenderingPart<ItemEnchantments, EnchantmentRendererFormat> =
+        configure("enchantments") { data, format ->
+            listOf(format.render(data.enchantments))
+        }
 
     @JvmField
-    val FIRE_RESISTANT: StandardRenderingPart<FireResistant, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
-        val text = format.render()
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, listOf(text)))
-    }
+    val FIRE_RESISTANT: StandardRenderingPart<FireResistant, SingleValueRendererFormat> =
+        configure("fire_resistant") { _, format ->
+            listOf(format.render())
+        }
 
     @JvmField
-    val FOOD: StandardRenderingPart<FoodProperties, FoodPropertiesRendererFormat> = configure("food") { data, format ->
-        val text = format.render(data)
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, text))
-    }
+    val FOOD: StandardRenderingPart<FoodProperties, FoodPropertiesRendererFormat> =
+        configure("food") { data, format ->
+            listOf(format.render(data))
+        }
 
     @JvmField
-    val ITEM_NAME: StandardRenderingPart<ItemName, SingleValueRendererFormat> = configure("item_name") { data, format ->
-        val text = format.render(Placeholder.component("value", data.rich))
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, listOf(text)))
-    }
+    val ITEM_NAME: StandardRenderingPart<ItemName, SingleValueRendererFormat> =
+        configure("item_name") { data, format ->
+            listOf(format.render(Placeholder.component("value", data.rich)))
+        }
 
     @JvmField
     val KIZAMIZ: StandardRenderingPart<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
-        val text = format.render(data.kizamiz, Kizami::displayName)
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, text))
+        listOf(format.render(data.kizamiz, Kizami::displayName))
     }
 
     @JvmField
     val LEVEL: StandardRenderingPart<ItemLevel, SingleValueRendererFormat> = configure("level") { data, format ->
-        val text = format.render(Placeholder.component("value", Component.text(data.level)))
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, listOf(text)))
+        listOf(format.render(Placeholder.component("value", Component.text(data.level))))
     }
 
     @JvmField
     val LORE: StandardRenderingPart<ExtraLore, ExtraLoreRendererFormat> = configure("lore") { data, format ->
-        val text = format.render(data.lore)
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, text))
+        listOf(format.render(data.lore))
     }
 
     @JvmField
     val PORTABLE_CORE: StandardRenderingPart<PortableCore, SingleValueRendererFormat> = configure("portable_core") { data, format ->
-        emptyList() // TODO display2 // 把核心的渲染逻辑分离出来, 不仅可以在这里 (PortableCore) 使用, 还可以在 ItemCells 使用
+        listOf() // TODO display2 // 把核心的渲染逻辑分离出来, 不仅可以在这里 (PortableCore) 使用, 还可以在 ItemCells 使用
     }
 
     @JvmField
     val RARITY: StandardRenderingPart<ItemRarity, SingleValueRendererFormat> = configure("rarity") { data, format ->
-        val text = format.render(Placeholder.component("value", data.rarity.displayName))
-        val idx = format.index
-        listOf(SimpleIndexedText(idx, listOf(text)))
+        listOf(format.render(Placeholder.component("value", data.rarity.displayName)))
     }
 
     private inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): StandardRenderingPart<T, F> {
-        TODO("display2")
+        val format = StandardItemRenderer.rendererFormats.get<F>(id) ?: throw IllegalArgumentException("renderer format '$id' not found")
+        val part = StandardRenderingPart(format, block)
+        return part
     }
 
     private inline fun <T1, T2, reified F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): StandardRenderingPart2<T1, T2, F> {
-        TODO("display2")
+        val format = StandardItemRenderer.rendererFormats.get<F>(id) ?: throw IllegalArgumentException("renderer format '$id' not found")
+        val part = StandardRenderingPart2(format, block)
+        return part
     }
 
     private inline fun <T1, T2, T3, reified F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): StandardRenderingPart3<T1, T2, T3, F> {
-        TODO("display2")
+        val format = StandardItemRenderer.rendererFormats.get<F>(id) ?: throw IllegalArgumentException("renderer format '$id' not found")
+        val part = StandardRenderingPart3(format, block)
+        return part
     }
 }
 
@@ -273,54 +265,66 @@ internal class StandardRenderingPart3<T1, T2, T3, F : RendererFormat>(
 
 
 //<editor-fold desc="RendererFormat">
-internal class CellularAttributeRendererFormat(
-    override val namespace: String,
+@ConfigSerializable
+internal data class CellularAttributeRendererFormat(
+    @Setting override val namespace: String,
 ) : RendererFormat.Dynamic<ConstantCompositeAttribute> {
     override fun computeIndex(source: ConstantCompositeAttribute): Key {
         TODO("display2")
     }
 
-    fun render(attribute: ConstantCompositeAttribute): List<Component> {
+    fun render(attribute: ConstantCompositeAttribute): IndexedText {
         val facade = AttributeRegistry.FACADES[attribute.id]
-        return facade.createTooltipLore(attribute)
+        val text = facade.createTooltipLore(attribute)
+        return SimpleIndexedText(computeIndex(attribute), text)
     }
 }
 
-internal class CellularSkillRendererFormat(
-    override val namespace: String,
+@ConfigSerializable
+internal data class CellularSkillRendererFormat(
+    @Setting override val namespace: String,
 ) : RendererFormat.Dynamic<ConfiguredSkill>, KoinComponent {
-    private val miniMessage = get<MiniMessage>()
+    private val mini = get<MiniMessage>()
 
     override fun computeIndex(source: ConfiguredSkill): Key {
         val sourceId = source.id
         return Key.key(namespace, sourceId.namespace() + "/" + sourceId.key())
     }
 
-    fun render(skill: ConfiguredSkill): List<Component> {
+    fun render(skill: ConfiguredSkill): IndexedText {
         val skillObject = skill.instance
-        return skillObject.displays.tooltips.map(miniMessage::deserialize)
+        val text = skillObject.displays.tooltips.map(mini::deserialize)
+        return SimpleIndexedText(computeIndex(skill), text)
     }
 }
 
-internal class CellularEmptyRendererFormat(
-    override val namespace: String,
-    private val fallback: List<Component>,
+@ConfigSerializable
+internal data class CellularEmptyRendererFormat(
+    @Setting override val namespace: String,
+    @Setting private val tooltip: List<Component>,
 ) : RendererFormat.Simple {
     override val index: Key = Key.key(namespace, "cells/empty")
 
-    fun render(): List<Component> {
-        return fallback
+    fun render(): IndexedText {
+        return SimpleIndexedText(index, tooltip)
     }
 }
 
-internal class FoodPropertiesRendererFormat(
-    override val namespace: String,
-    private val lines: List<String>,
-) : RendererFormat.Simple {
+@ConfigSerializable
+internal data class FoodPropertiesRendererFormat(
+    @Setting override val namespace: String,
+    @Setting private val tooltip: List<String>,
+) : RendererFormat.Simple, KoinComponent {
+    private val mini = get<MiniMessage>()
     override val index: Key = Key.key(namespace, "food")
 
-    fun render(food: FoodProperties): List<Component> {
-        return emptyList() // TODO display2
+    fun render(foodProperties: FoodProperties): IndexedText {
+        val resolver = TagResolver.resolver(
+            Placeholder.component("nutrition", Component.text(foodProperties.nutrition)),
+            Placeholder.component("saturation", Component.text(foodProperties.saturation)),
+            Placeholder.component("eat_seconds", Component.text(foodProperties.eatSeconds)),
+        )
+        return SimpleIndexedText(index, tooltip.map { mini.deserialize(it, resolver) }) // TODO display2
     }
 }
 //</editor-fold>
