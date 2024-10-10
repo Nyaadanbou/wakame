@@ -41,10 +41,6 @@ elements:
 
 enchantments:
   namespace: vanilla
-  # 可用标签
-  # <name> 附魔名字
-  # <level> 附魔等级
-  tooltip: "<!i><name> <level>"
 
 fire_resistant:
   namespace: general

@@ -18,7 +18,8 @@ cells/skills:
 
 cells/empty:
   namespace: stash
-  tooltip: "<!i>[ 空词条栏 ]"
+  tooltip:
+    - "<!i>[ 空词条栏 ]"
 
 # TODO 盲盒系统完成后重新考虑
 crate:
@@ -47,10 +48,6 @@ elements:
 # 同时负责 `enchantments` 和 `stored_enchantments`
 enchantments:
   namespace: vanilla
-  # 可用标签
-  # <name> 附魔名字
-  # <level> 附魔等级
-  tooltip: "<!i><name> <level>"
 
 fire_resistant:
   namespace: general
