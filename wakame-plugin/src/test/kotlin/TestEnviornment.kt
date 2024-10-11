@@ -7,20 +7,24 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.absolute
 
 /* Common environment for running unit tests */
 
 fun commonEnv(): Module = module {
     single<Logger> { LoggerFactory.getLogger("TestEnv") }
-    single<File>(named(PLUGIN_ASSETS_DIR)) { get<File>(named(PLUGIN_DATA_DIR)).resolve("assets") }
+    single<Path>(named(PLUGIN_ASSETS_DIR)) { get<Path>(named(PLUGIN_DATA_DIR)).absolute() }
+    single<File>(named(PLUGIN_ASSETS_DIR)) { get<Path>(named(PLUGIN_ASSETS_DIR)).toFile() }
 }
 
 fun mainEnv(): Module = module {
     includes(commonEnv())
-    single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/main/resources").toFile().absoluteFile }
+    single<Path>(named(PLUGIN_DATA_DIR)) { Path.of("src/main/resources").absolute() }
+    single<File>(named(PLUGIN_DATA_DIR)) { get<Path>(named(PLUGIN_DATA_DIR)).toFile() }
 }
 
 fun testEnv(): Module = module {
     includes(commonEnv())
-    single<File>(named(PLUGIN_DATA_DIR)) { Path.of("src/test/resources").toFile().absoluteFile }
+    single<Path>(named(PLUGIN_DATA_DIR)) { Path.of("src/test/resources").absolute() }
+    single<File>(named(PLUGIN_DATA_DIR)) { get<Path>(named(PLUGIN_DATA_DIR)).toFile() }
 }
