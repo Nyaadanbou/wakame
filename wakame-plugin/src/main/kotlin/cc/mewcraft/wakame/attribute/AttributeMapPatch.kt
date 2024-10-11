@@ -2,6 +2,8 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.util.*
+import io.papermc.paper.persistence.PersistentDataViewHolder
+import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.key.Key
@@ -10,6 +12,7 @@ import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.util.Codec
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attributable
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -25,8 +28,10 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
     companion object {
         private val PDC_KEY = NamespacedKey.fromString("wakame:attribute_modifiers") ?: error("Spoogot")
 
-        fun decode(owner: Attributable, pdc: PersistentDataContainer): AttributeMapPatch? {
-            return pdc.get(PDC_KEY, AttributeMapPatchType.with(owner))
+        fun decode(owner: Attributable): AttributeMapPatch? {
+            if (owner !is PersistentDataViewHolder)
+                return null
+            return owner.persistentDataContainer.get(PDC_KEY, AttributeMapPatchType.with(owner))
         }
     }
 
@@ -46,7 +51,10 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
     /**
      * 保存到 PDC.
      */
-    fun saveTo(owner: Attributable, pdc: PersistentDataContainer) {
+    fun saveTo(owner: Attributable) {
+        if (owner !is PersistentDataHolder)
+            return
+        val pdc = owner.persistentDataContainer
         pdc.set(PDC_KEY, AttributeMapPatchType.with(owner), this)
     }
 
@@ -101,12 +109,12 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
             if (entity is Player) continue
             if (entity !is Attributable) continue
 
-            val pdc = entity.persistentDataContainer
-            val patch = AttributeMapPatch.decode(entity, pdc) ?: continue
+            val patch = AttributeMapPatch.decode(entity) ?: continue
             val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
             patch.trimBy(default)
 
             AttributeMapPatchAccess.put(entity.uniqueId, patch)
+            EntityAttributeAccessor.getAttributeMap(entity as LivingEntity) // 初始化 AttributeMap
         }
     }
 
@@ -117,12 +125,11 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
             if (entity is Player) continue
             if (entity !is Attributable) continue
 
-            val pdc = entity.persistentDataContainer
             val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: continue
             val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
 
             patch.trimBy(default)
-            patch.saveTo(entity, pdc)
+            patch.saveTo(entity)
 
             AttributeMapPatchAccess.remove(entity.uniqueId)
         }
@@ -169,7 +176,8 @@ private object AttributeMapPatchType {
             }
 
             override fun fromPrimitive(primitive: ByteArray, context: PersistentDataAdapterContext): AttributeMapPatch {
-                val listTag = BinaryTagTypes.LIST.read(DataInputStream(primitive.inputStream()))
+                val inputStream = DataInputStream(FastByteArrayInputStream(primitive))
+                val listTag = BinaryTagTypes.LIST.read(inputStream)
                 require(listTag.size() != 0) { "list is empty" }
                 require(listTag.elementType() == BinaryTagTypes.COMPOUND) { "element type is not compound" }
                 val patch = AttributeMapPatch()
