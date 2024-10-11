@@ -221,7 +221,6 @@ private class PlayerAttributeMap(
         val defaultInstance = default.createLiveInstance(attribute, player)
 
         if (defaultInstance != null) {
-            // 存在默认属性, 所以将其写入 data
             patch[attribute] = defaultInstance
             return defaultInstance
         }
@@ -287,15 +286,9 @@ private class EntityAttributeMap : AttributeMap {
         }
 
     /**
-     * The data patch that are patched onto the [default], i.e., overrides.
+     * Returns the patch that are patched onto the [default] or creates a new one if it does not exist.
      */
-    private val patch: AttributeMapPatch?
-        get() = AttributeMapPatchAccess.get(entity.uniqueId)
-
-    /**
-     * Returns the patch or creates a new one if it does not exist.
-     */
-    private val patchOrCreate: AttributeMapPatch
+    private val patch: AttributeMapPatch
         get() = AttributeMapPatchAccess.getOrCreate(entity.uniqueId)
 
     private fun checkEntityIsValid(entity: Entity?) {
@@ -316,22 +309,22 @@ private class EntityAttributeMap : AttributeMap {
     }
 
     override fun register(attribute: Attribute) {
-        patchOrCreate[attribute] = AttributeInstanceFactory.createLiveInstance(attribute, entity, true)
+        patch[attribute] = AttributeInstanceFactory.createLiveInstance(attribute, entity, true)
     }
 
     @Suppress("DuplicatedCode")
     override fun getInstance(attribute: Attribute): AttributeInstance? {
-        val patch0 = patchOrCreate
-        val patchedInstance = patch0[attribute]
+        val patchedInstance = patch[attribute]
         if (patchedInstance != null) {
             // patch 已有实例, 则返回 patch 的实例
             return patchedInstance
         }
 
         // patch 没有实例, 则返回 default 的实例
+        // 注意: 该函数调用会对实体造成副作用
         val defaultInstance = default.createLiveInstance(attribute, entity)
         if (defaultInstance != null) {
-            patch0[attribute] = defaultInstance
+            patch[attribute] = defaultInstance
             return defaultInstance
         }
 
@@ -340,28 +333,28 @@ private class EntityAttributeMap : AttributeMap {
 
     override fun getAttributes(): Set<Attribute> {
         val defaultAttributes = default.attributes
-        val patchedAttributes = patch?.attributes ?: emptySet()
+        val patchedAttributes = patch.attributes
         return defaultAttributes union patchedAttributes
     }
 
     override fun hasAttribute(attribute: Attribute): Boolean {
-        return patch?.get(attribute) != null || default.hasAttribute(attribute)
+        return patch[attribute] != null || default.hasAttribute(attribute)
     }
 
     override fun hasModifier(attribute: Attribute, id: Key): Boolean {
-        return patch?.get(attribute)?.getModifier(id) != null || default.hasModifier(attribute, id)
+        return patch[attribute]?.getModifier(id) != null || default.hasModifier(attribute, id)
     }
 
     override fun getValue(attribute: Attribute): Double {
-        return patch?.get(attribute)?.getValue() ?: default.getValue(attribute, entity)
+        return patch[attribute]?.getValue() ?: default.getValue(attribute, entity)
     }
 
     override fun getBaseValue(attribute: Attribute): Double {
-        return patch?.get(attribute)?.getBaseValue() ?: default.getBaseValue(attribute, entity)
+        return patch[attribute]?.getBaseValue() ?: default.getBaseValue(attribute, entity)
     }
 
     override fun getModifierValue(attribute: Attribute, id: Key): Double {
-        return patch?.get(attribute)?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, entity)
+        return patch[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, entity)
     }
 }
 

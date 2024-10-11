@@ -2,10 +2,11 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.util.*
-import io.papermc.paper.persistence.PersistentDataViewHolder
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
-import it.unimi.dsi.fastutil.objects.*
+import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.BinaryTagTypes
 import net.kyori.adventure.nbt.CompoundBinaryTag
@@ -18,20 +19,30 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
-import org.bukkit.persistence.*
+import org.bukkit.persistence.PersistentDataAdapterContext
+import org.bukkit.persistence.PersistentDataHolder
+import org.bukkit.persistence.PersistentDataType
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.*
-import java.util.UUID
+import org.slf4j.Logger
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.io.IOException
+import java.util.*
 
 internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
     companion object {
         private val PDC_KEY = NamespacedKey.fromString("wakame:attribute_modifiers") ?: error("Spoogot")
 
         fun decode(owner: Attributable): AttributeMapPatch? {
-            if (owner !is PersistentDataViewHolder)
+            if (owner !is PersistentDataHolder)
                 return null
-            return owner.persistentDataContainer.get(PDC_KEY, AttributeMapPatchType.with(owner))
+            return runCatching { owner.persistentDataContainer.get(PDC_KEY, AttributeMapPatchType.with(owner)) }
+                .onFailure {
+                    owner.persistentDataContainer.remove(PDC_KEY)
+                    AttributeMapPatchSupport.logger.error("Failed to decode AttributeMapPatch", it)
+                }
+                .getOrNull()
         }
     }
 
@@ -72,6 +83,10 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
                 data.remove(attribute)
             }
         }
+    }
+
+    fun isEmpty(): Boolean {
+        return data.isEmpty()
     }
 
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> {
@@ -126,6 +141,8 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
             if (entity !is Attributable) continue
 
             val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: continue
+            if (patch.isEmpty())
+                continue
             val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
 
             patch.trimBy(default)
@@ -262,4 +279,8 @@ private data class SerializableAttributeModifier(
     fun toAttributeModifier(): AttributeModifier {
         return AttributeModifier(Key.key(id), amount, AttributeModifier.Operation.byIdOrThrow(operation.toInt()))
     }
+}
+
+private object AttributeMapPatchSupport : KoinComponent {
+    val logger: Logger by inject()
 }
