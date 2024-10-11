@@ -12,70 +12,70 @@ interface TextMeta {
     /**
      * 原始索引 (即配置文件的列表中, 未经衍生的字符串值).
      */
-    val sourceTooltipIndex: DerivedTooltipIndex
+    val sourceIndex: DerivedIndex
 
     /**
      * 原始序数 (即配置文件的列表中, 所在的顺序位置).
      */
-    val sourceTooltipOrdinal: DerivedTooltipOrdinal
+    val sourceOrdinal: DerivedOrdinal
 
     /**
-     * 生成全部的 [DerivedTooltipIndex].
+     * 生成全部的 [DerivedIndex].
      *
      * ## 用途
-     * [DerivedTooltipIndex] 将被直接用于查询 [IndexedText] 的顺序.
+     * [DerivedIndex] 将被直接用于查询 [IndexedText] 的顺序.
      *
      * ## 来源
-     * [DerivedTooltipIndex] 是由 [SourceTooltipIndex] 经过一系列规则衍生出来的一个或多个值.
+     * [DerivedIndex] 是由 [SourceIndex] 经过一系列规则衍生出来的一个或多个值.
      *
      * ## 性质
-     * 某些 [SourceTooltipIndex] 没有衍生规则, 因此这些 [SourceTooltipIndex] 在结果上与 [DerivedTooltipIndex]
-     * 完全一致. 这种情况下 [DerivedTooltipIndex] 只是个单例列表. 而有些 [SourceTooltipIndex]
-     * 存在衍生规则, 因此它们的 [SourceTooltipIndex] 就与 [DerivedTooltipIndex] 不一致.
+     * 某些 [SourceIndex] 没有衍生规则, 因此这些 [SourceIndex] 在结果上与 [DerivedIndex]
+     * 完全一致. 这种情况下 [DerivedIndex] 只是个单例列表. 而有些 [SourceIndex]
+     * 存在衍生规则, 因此它们的 [SourceIndex] 就与 [DerivedIndex] 不一致.
      */
-    fun generateTooltipIndexes(): List<DerivedTooltipIndex>
+    fun generateIndexes(): List<DerivedIndex>
 
     /**
-     * 生成从 [DerivedTooltipIndex] 到 [DerivedTooltipOrdinal] 的映射.
+     * 生成从 [DerivedIndex] 到 [DerivedOrdinal] 的映射.
      *
      * 该映射将被直接用于查询 [IndexedText] 在物品提示框中的顺序.
      *
-     * 该函数的参数 [offset] 为索引的偏移量. 你必须传入正确的 [offset], 否则该函数生成的 [DerivedTooltipOrdinal] 将是错的.
+     * 该函数的参数 [offset] 为索引的偏移量. 你必须传入正确的 [offset], 否则该函数生成的 [DerivedOrdinal] 将是错的.
      *
-     * 为了更好的理解 [offset] 的取值, 这里举个例子. 假设配置文件中有以下三行内容, 我们标记好各自的 [SourceTooltipOrdinal]:
-     * - a ([SourceTooltipOrdinal] = 1)
-     * - b ([SourceTooltipOrdinal] = 2)
-     * - c ([SourceTooltipOrdinal] = 3)
+     * 为了更好的理解 [offset] 的取值, 这里举个例子. 假设配置文件中有以下三行内容, 我们标记好各自的 [SourceOrdinal]:
+     * - a ([SourceOrdinal] = 1)
+     * - b ([SourceOrdinal] = 2)
+     * - c ([SourceOrdinal] = 3)
      *
      * 经过衍生后的内容如下：
-     * - a.1 ([SourceTooltipOrdinal] = 1)
-     * - a.2 ([SourceTooltipOrdinal] = 1)
-     * - b.1 ([SourceTooltipOrdinal] = 2)
-     * - b.2 ([SourceTooltipOrdinal] = 2)
-     * - c   ([SourceTooltipOrdinal] = 3)
+     * - a.1 ([SourceOrdinal] = 1)
+     * - a.2 ([SourceOrdinal] = 1)
+     * - b.1 ([SourceOrdinal] = 2)
+     * - b.2 ([SourceOrdinal] = 2)
+     * - c   ([SourceOrdinal] = 3)
      *
-     * [DerivedTooltipOrdinal] 的计算方式为 [SourceTooltipOrdinal] + `local index` + `offset`. 其中 `local index` 是
-     * [DerivedTooltipOrdinal] 的索引值. 假设 [offset] 为 0；现在基于 [SourceTooltipOrdinal], 为每个内容生成 [DerivedTooltipOrdinal]:
-     * - a.1 ([SourceTooltipOrdinal] = 1, `offset` = 0 -> [DerivedTooltipOrdinal] = 1)
-     * - a.2 ([SourceTooltipOrdinal] = 1, `offset` = 0 -> [DerivedTooltipOrdinal] = 2)
-     * - b.1 ([SourceTooltipOrdinal] = 2, `offset` = 0 -> [DerivedTooltipOrdinal] = 2)
-     * - b.2 ([SourceTooltipOrdinal] = 2, `offset` = 0 -> [DerivedTooltipOrdinal] = 3)
-     * - c   ([SourceTooltipOrdinal] = 3, `offset` = 0 -> [DerivedTooltipOrdinal] = 3)
+     * [DerivedOrdinal] 的计算方式为 [SourceOrdinal] + `local index` + `offset`. 其中 `local index` 是
+     * [DerivedOrdinal] 的索引值. 假设 [offset] 为 0；现在基于 [SourceOrdinal], 为每个内容生成 [DerivedOrdinal]:
+     * - a.1 ([SourceOrdinal] = 1, `offset` = 0 -> [DerivedOrdinal] = 1)
+     * - a.2 ([SourceOrdinal] = 1, `offset` = 0 -> [DerivedOrdinal] = 2)
+     * - b.1 ([SourceOrdinal] = 2, `offset` = 0 -> [DerivedOrdinal] = 2)
+     * - b.2 ([SourceOrdinal] = 2, `offset` = 0 -> [DerivedOrdinal] = 3)
+     * - c   ([SourceOrdinal] = 3, `offset` = 0 -> [DerivedOrdinal] = 3)
      *
-     * 可以看到这里重复的 [DerivedTooltipOrdinal], 而这显然是错的. 导致该问题的原因是每一个内容的生成都假设它之前**不存在**衍生的内容.
+     * 可以看到这里重复的 [DerivedOrdinal], 而这显然是错的. 导致该问题的原因是每一个内容的生成都假设它之前**不存在**衍生的内容.
      *
-     * 为了解决这个问题, 我们引入 [offset] 的概念, 用来对生成的 [DerivedTooltipOrdinal] 进行偏移, 以实现整体上的正确性.
+     * 为了解决这个问题, 我们引入 [offset] 的概念, 用来对生成的 [DerivedOrdinal] 进行偏移, 以实现整体上的正确性.
      *
      * 假设给定的 [offset] 都是正确的, 那么重新生成以上内容应该得到:
-     * - a.1 ([SourceTooltipOrdinal] = 1, `offset` = 0 -> [DerivedTooltipOrdinal] = 1)
-     * - a.2 ([SourceTooltipOrdinal] = 1, `offset` = 0 -> [DerivedTooltipOrdinal] = 2)
-     * - b.1 ([SourceTooltipOrdinal] = 2, `offset` = 1 -> [DerivedTooltipOrdinal] = 3)
-     * - b.2 ([SourceTooltipOrdinal] = 2, `offset` = 1 -> [DerivedTooltipOrdinal] = 4)
-     * - c   ([SourceTooltipOrdinal] = 3, `offset` = 2 -> [DerivedTooltipOrdinal] = 5)
+     * - a.1 ([SourceOrdinal] = 1, `offset` = 0 -> [DerivedOrdinal] = 1)
+     * - a.2 ([SourceOrdinal] = 1, `offset` = 0 -> [DerivedOrdinal] = 2)
+     * - b.1 ([SourceOrdinal] = 2, `offset` = 1 -> [DerivedOrdinal] = 3)
+     * - b.2 ([SourceOrdinal] = 2, `offset` = 1 -> [DerivedOrdinal] = 4)
+     * - c   ([SourceOrdinal] = 3, `offset` = 2 -> [DerivedOrdinal] = 5)
      *
-     * @param offset [DerivedTooltipOrdinal] 的偏移量
+     * @param offset [DerivedOrdinal] 的偏移量
      */
-    fun generateTooltipOrdinals(offset: Int): Map<DerivedTooltipIndex, DerivedTooltipOrdinal>
+    fun generateOrdinals(offset: Int): Map<DerivedIndex, DerivedOrdinal>
 }
 
 /**
@@ -98,7 +98,7 @@ interface SimpleTextMeta : TextMeta {
      */
     fun createDefault(): List<IndexedText>
 
-    companion object {
+    companion object Shared {
         const val NAMESPACE_DEFAULT = "default"
     }
 }
@@ -124,21 +124,21 @@ interface StaticTextMeta : TextMeta {
      */
     val companionNamespace: String?
 
-    override val sourceTooltipIndex: DerivedTooltipIndex
-        // 经综合考虑, 固定内容的 RawTooltipIndex 最好就是其在配置文件中原始索引的字符串形式
-        // 例如, 这行固定内容位于列表中的第 3 个, 那么其 RawTooltipIndex 就是 "fixed:3"
-        // 这样刚好能保证不同的固定内容行都有唯一的 TooltipIndex
-        get() = Key.key(NAMESPACE_CONSTANT, sourceTooltipIndex.toString())
+    override val sourceIndex: DerivedIndex
+        // 经综合考虑, 固定内容的 SourceIndex 最好就是其在配置文件中原始索引的字符串形式
+        // 例如, 这行固定内容位于列表中的第 3 个, 那么其 SourceIndex 就是 "fixed:3"
+        // 这样刚好能保证不同的固定内容行都有唯一的 Index
+        get() = Key.key(NAMESPACE_CONSTANT, sourceIndex.toString())
 
-    override fun generateTooltipIndexes(): List<DerivedTooltipIndex> {
-        return listOf(sourceTooltipIndex)
+    override fun generateIndexes(): List<DerivedIndex> {
+        return listOf(sourceIndex)
     }
 
-    override fun generateTooltipOrdinals(offset: Int): Map<DerivedTooltipIndex, DerivedTooltipOrdinal> {
-        return mapOf(sourceTooltipIndex to sourceTooltipOrdinal + offset)
+    override fun generateOrdinals(offset: Int): Map<DerivedIndex, DerivedOrdinal> {
+        return mapOf(sourceIndex to sourceOrdinal + offset)
     }
 
-    companion object {
+    companion object Shared {
         const val NAMESPACE_CONSTANT = "fixed"
     }
 }
@@ -147,7 +147,7 @@ interface StaticTextMeta : TextMeta {
  * 代表一个拥有自定义内容的 [StaticTextMeta].
  */
 data class CustomStaticTextMeta(
-    override val sourceTooltipOrdinal: SourceTooltipOrdinal,
+    override val sourceOrdinal: SourceOrdinal,
     override val companionNamespace: String?,
     override val components: List<Component>,
 ) : StaticTextMeta
@@ -156,7 +156,7 @@ data class CustomStaticTextMeta(
  * 代表一个其内容为“空白”的 [StaticTextMeta].
  */
 data class BlankStaticTextMeta(
-    override val sourceTooltipOrdinal: SourceTooltipOrdinal,
+    override val sourceOrdinal: SourceOrdinal,
     override val companionNamespace: String?,
 ) : StaticTextMeta {
     override val components: List<Component> = listOf(Component.empty())

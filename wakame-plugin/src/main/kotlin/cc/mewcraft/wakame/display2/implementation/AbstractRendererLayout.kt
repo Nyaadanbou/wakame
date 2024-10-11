@@ -11,8 +11,8 @@ import java.nio.file.Path
 internal abstract class AbstractRendererLayout : RendererLayout, KoinComponent {
     protected val logger: Logger by inject()
 
-    protected val textOrdinalMap: Object2IntOpenHashMap<DerivedTooltipIndex> = Object2IntOpenHashMap()
-    protected val textMetadataMap: Object2ObjectOpenHashMap<DerivedTooltipIndex, TextMeta> = Object2ObjectOpenHashMap()
+    protected val textOrdinalMap: Object2IntOpenHashMap<DerivedIndex> = Object2IntOpenHashMap()
+    protected val textMetadataMap: Object2ObjectOpenHashMap<DerivedIndex, TextMeta> = Object2ObjectOpenHashMap()
 
     init {
         textOrdinalMap.defaultReturnValue(-1)
@@ -24,11 +24,11 @@ internal abstract class AbstractRendererLayout : RendererLayout, KoinComponent {
 
     /**
      * 获取指定的 [index] 对应的*位置顺序*.
-     * 位置顺序由 [DerivedTooltipOrdinal] 表示, 数值越小, 越靠前面.
+     * 位置顺序由 [DerivedOrdinal] 表示, 数值越小, 越靠前面.
      *
      * 如果 [index] 没有对应的位置顺序, 返回 `null`.
      */
-    override fun getOrdinal(index: DerivedTooltipIndex): DerivedTooltipOrdinal? {
+    override fun getOrdinal(index: DerivedIndex): DerivedOrdinal? {
         val ret = textOrdinalMap.getInt(index)
         if (ret == -1) {
             logger.warn("Can't find ordinal for tooltip index '$index'")
@@ -42,7 +42,7 @@ internal abstract class AbstractRendererLayout : RendererLayout, KoinComponent {
      *
      * 如果 [index] 没有对应的元数据, 返回 `null`.
      */
-    override fun <T : TextMeta> getMetadata(index: DerivedTooltipIndex): T? {
+    override fun <T : TextMeta> getMetadata(index: DerivedIndex): T? {
         @Suppress("UNCHECKED_CAST")
         val ret = textMetadataMap[index] as T?
         if (ret == null) {

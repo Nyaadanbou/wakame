@@ -21,12 +21,14 @@ import kotlin.collections.set
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.reflect.KType
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.typeOf
 
 internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent {
     protected val logger = get<Logger>()
 
     /**
-     * 储存的所有 [RendererFormat] 实例.
+     * 所有已加载的 [RendererFormat] 实例.
      */
     private val directFormats = HashMap<String, RendererFormat>()
     private val wrappedFormats = HashSet<Provider<RendererFormat>>()
@@ -54,7 +56,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
             if (node.virtual()) {
                 logger.warn("Renderer format '$id' is not found in '${formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))}'. Fallback to default format.")
             }
-            directFormats[id] = node.krequire(type)
+            directFormats[id] = node.krequire(type) // overwrite existing
         }
 
         // reload all renderer formats of this renderer
@@ -62,6 +64,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
     }
 
     fun register(id: String, type: KType): Boolean {
+        check(type.isSubtypeOf(typeOf<RendererFormat>())) { "Type '$type' is not a subtype of ${RendererFormat::class.simpleName}" }
         val previous = typeById.put(id, type)
         if (previous != null) {
             logger.warn("Renderer format '$id' is already registered with type $previous")
@@ -71,12 +74,14 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
     }
 
     fun <F : RendererFormat> get0(id: String): Provider<F> {
-        val provider = provider { (directFormats[id] ?: error("directFormats['$id']")) as F }
+        // safe unchecked casts
+        val provider = provider { checkNotNull(directFormats[id]) { "directFormats['$id']" } as F }
         wrappedFormats += provider as Provider<RendererFormat>
         return provider
     }
 
     override fun <F : RendererFormat> get(id: String): F? {
+        // safe unchecked casts
         return directFormats[id] as F?
     }
 

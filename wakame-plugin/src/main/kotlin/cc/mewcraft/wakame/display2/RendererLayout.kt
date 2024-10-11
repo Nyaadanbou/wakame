@@ -25,16 +25,16 @@ interface RendererLayout : Examinable {
 
     /**
      * 获取指定的 [index] 对应的*位置顺序*.
-     * 位置顺序由 [DerivedTooltipOrdinal] 表示, 数值越小, 越靠前面.
+     * 位置顺序由 [DerivedOrdinal] 表示, 数值越小, 越靠前面.
      *
      * 如果 [index] 没有对应的位置顺序, 返回 `null`.
      */
-    fun getOrdinal(index: DerivedTooltipIndex): DerivedTooltipOrdinal?
+    fun getOrdinal(index: DerivedIndex): DerivedOrdinal?
 
     /**
      * 获取指定的 [index] 对应的*元数据*.
      *
      * 如果 [index] 没有对应的元数据, 返回 `null`.
      */
-    fun <T : TextMeta> getMetadata(index: DerivedTooltipIndex): T?
+    fun <T : TextMeta> getMetadata(index: DerivedIndex): T?
 }

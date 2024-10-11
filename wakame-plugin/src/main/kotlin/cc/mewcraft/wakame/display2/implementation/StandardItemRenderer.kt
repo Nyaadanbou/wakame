@@ -48,10 +48,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         layoutPath: Path,
         formatPath: Path,
     ) {
-        // TODO 读取配置文件, 初始化:
-        //   rendererLayout, rendererFormats
         StandardRenderingParts.bootstrap()
-        rendererLayout.initialize(layoutPath)
+        rendererLayout.initialize(layoutPath) // TODO display2
         rendererFormats.initialize(formatPath)
     }
 
@@ -208,7 +206,7 @@ internal object StandardRenderingParts {
     @JvmField
     val PORTABLE_CORE: SimpleRenderingPart<PortableCore, PortableCoreRendererFormat> =
         configure("portable_core") { data, format ->
-            format.render(data) // TODO display2 // 把核心的渲染逻辑分离出来, 不仅可以在这里 (PortableCore) 使用, 还可以在 ItemCells 使用
+            format.render(data)
         }
 
     @JvmField
@@ -350,16 +348,15 @@ internal data class PortableCoreRendererFormat(
     private val unknownIndex = Key.key(namespace, "unknown")
 
     override fun computeIndex(data: PortableCore): Key {
-        val core = data.wrapped as? AttributeCore ?: return unknownIndex
-        val id = core.attribute.id
-        return Key.key(namespace, id)
+        throw UnsupportedOperationException() // 直接在 render 函数中处理
     }
 
     fun render(data: PortableCore): IndexedText {
         val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
+        val index = Key.key(namespace, core.attribute.id)
         val facade = AttributeRegistry.FACADES[core.attribute.id]
         val tooltip = facade.createTooltipLore(core.attribute)
-        return SimpleIndexedText(computeIndex(data), tooltip)
+        return SimpleIndexedText(index, tooltip)
     }
 }
 //</editor-fold>
