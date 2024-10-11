@@ -12,17 +12,17 @@ internal class ModdingTableContext
 
 internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, ModdingTableContext>() {
     override var rendererLayout: RendererLayout
-        get() = TODO("Not yet implemented")
+        get() = TODO("display2 ModdingTable")
         set(value) {}
     override var rendererFormats: RendererFormats
-        get() = TODO("Not yet implemented")
+        get() = TODO("display2 ModdingTable")
         set(value) {}
 
     override fun initialize(layoutPath: Path, formatPath: Path) {
-        TODO("Not yet implemented")
+        // TODO display2 ModdingTable
     }
 
     override fun render(item: NekoStack, context: ModdingTableContext?) {
-        TODO("Not yet implemented")
+        // TODO display2 ModdingTable
     }
 }

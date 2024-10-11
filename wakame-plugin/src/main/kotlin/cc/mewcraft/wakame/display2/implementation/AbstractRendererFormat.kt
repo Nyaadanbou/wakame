@@ -14,7 +14,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.enchantments.Enchantment
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Setting
+import org.spongepowered.configurate.objectmapping.meta.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 
@@ -23,15 +23,19 @@ import kotlin.collections.component2
 /**
  * 一种最简单的渲染格式.
  *
- * 只有一个格式 [tooltip], 可以包含占位符.
- * 当生成内容时, 将对整个文本填充一次占位符.
+ * 只有一个格式 [tooltip], 可以包含任意占位符.
+ * 当生成内容时, 将对 [tooltip] 填充一次占位符.
  */
-internal interface SingleValueRendererFormat : RendererFormat.Simple {
-    override val namespace: String
-    override val id: String
-    override val index: Key
-
-    val tooltip: String // mini message format
+@ConfigSerializable
+internal data class SingleValueRendererFormat(
+    @Setting @Required
+    override val namespace: String,
+    @Setting @NodeKey
+    override val id: String,
+    @Setting
+    private val tooltip: String, // mini message format
+) : RendererFormat.Simple {
+    override val index: Key = createIndex()
 
     fun render(): IndexedText {
         return SimpleIndexedText(index, listOf(MM.deserialize(tooltip)))
@@ -53,15 +57,19 @@ internal interface SingleValueRendererFormat : RendererFormat.Simple {
 /**
  * 跟 [SingleValueRendererFormat] 类似, 只不过可以拥有多行.
  *
- * 只有一个格式 [tooltip], 可以包含占位符.
- * 当生成内容时, 将对整个文本填充一次占位符.
+ * 只有一个格式 [tooltip], 可以包含任意占位符.
+ * 当生成内容时, 将对 [tooltip] 填充一次占位符.
  */
-internal interface ListValueRendererFormat : RendererFormat.Simple {
-    override val namespace: String
-    override val id: String
-    override val index: Key
-
-    val tooltip: List<String> // mini message format
+@ConfigSerializable
+internal data class ListValueRendererFormat(
+    @Setting @Required
+    override val namespace: String,
+    @Setting @NodeKey
+    override val id: String,
+    @Setting
+    private val tooltip: List<String>, // mini message format,
+) : RendererFormat.Simple {
+    override val index: Key = createIndex()
 
     fun render(): IndexedText {
         return SimpleIndexedText(index, tooltip.map(MM::deserialize))
@@ -83,12 +91,16 @@ internal interface ListValueRendererFormat : RendererFormat.Simple {
 /**
  * 一种需要将多个对象合并成一个字符串的渲染格式.
  */
-internal interface AggregateValueRendererFormat : RendererFormat.Simple {
-    override val namespace: String
-    override val id: String
-    override val index: Key
-
-    val tooltip: Tooltip // mini message format
+@ConfigSerializable
+internal data class AggregateValueRendererFormat(
+    @Setting @Required
+    override val namespace: String,
+    @Setting @NodeKey
+    override val id: String,
+    @Setting
+    private val tooltip: Tooltip, // mini message format
+) : RendererFormat.Simple {
+    override val index: Key = createIndex()
 
     /**
      * A convenience function to stylize a list of objects.
@@ -112,9 +124,12 @@ internal interface AggregateValueRendererFormat : RendererFormat.Simple {
      */
     @ConfigSerializable
     data class Tooltip(
-        @Setting val single: String,
-        @Setting val separator: String,
-        @Setting val merged: String,
+        @Setting
+        val single: String = "<single>",
+        @Setting
+        val separator: String = ", ",
+        @Setting
+        val merged: String = "FIXME: <merged>",
     )
 
     companion object Shared {
@@ -128,9 +143,11 @@ internal interface AggregateValueRendererFormat : RendererFormat.Simple {
  * @param tooltip 内容的格式, 不支持任何占位符
  */
 @ConfigSerializable
-internal class ExtraLoreRendererFormat(
-    @Setting override val namespace: String,
-    @Setting private val tooltip: Tooltip,
+internal data class ExtraLoreRendererFormat(
+    @Setting @Required
+    override val namespace: String,
+    @Setting
+    private val tooltip: Tooltip = Tooltip(),
 ) : RendererFormat.Simple {
     override val id: String = "lore"
     override val index: Key = Key.key(namespace, id)
@@ -152,9 +169,12 @@ internal class ExtraLoreRendererFormat(
      */
     @ConfigSerializable
     data class Tooltip(
-        @Setting val line: String,
-        @Setting val header: List<String>,
-        @Setting val bottom: List<String>,
+        @Setting
+        val line: String = "<line>",
+        @Setting
+        val header: List<String> = listOf(),
+        @Setting
+        val bottom: List<String> = listOf(),
     )
 
     companion object Shared {
@@ -166,8 +186,9 @@ internal class ExtraLoreRendererFormat(
  * 一种专用于物品魔咒 (enchantments) 的渲染格式.
  */
 @ConfigSerializable
-internal class EnchantmentRendererFormat(
-    @Setting override val namespace: String,
+internal data class EnchantmentRendererFormat(
+    @Setting @Required
+    override val namespace: String,
 ) : RendererFormat.Simple {
     override val id: String = "enchantments"
     override val index: Key = Key.key(namespace, id)

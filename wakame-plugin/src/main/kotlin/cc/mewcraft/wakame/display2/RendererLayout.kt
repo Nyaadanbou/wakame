@@ -7,14 +7,21 @@ import net.kyori.examination.Examinable
  */
 interface RendererLayout : Examinable {
     /**
-     * 静态的渲染内容. 这些内容完全由配置决定, 而非物品本身.
+     * 静态的渲染内容.
+     *
+     * 这些内容 *本身* 完全由配置决定, 而非物品堆叠.
+     * 但这些内容可以根据物品的具体数据而选择不显示.
      */
-    val staticIndexedTextList: List<IndexedText>
+    val staticIndexedTexts: List<IndexedText>
 
     /**
-     * 默认的渲染内容. 当源数据不存在时将采用这里的默认值.
+     * 默认的渲染内容. 规则如下:
+     *
+     * - 当物品上的特定数据不存在时, 将采用这里的默认值.
+     * - 如果物品上的特定数据存在时, 默认值将不会被使用 (显然).
+     * - 如果物品上的特定数据不存在, 同时默认值也不存在, 将不会显示任何内容.
      */
-    val defaultIndexedTextList: List<IndexedText>
+    val defaultIndexedTexts: List<IndexedText>
 
     /**
      * 获取指定的 [index] 对应的*位置顺序*.

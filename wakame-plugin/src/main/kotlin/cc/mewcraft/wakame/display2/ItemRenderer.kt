@@ -62,9 +62,11 @@ internal interface ItemRenderer<in T, in C> {
     )
 
     /**
-     * 原地修改 [item] 使其变成配置中指定的样子.
+     * 原地渲染物品 [item].
      *
-     * @param item 服务端上的物品
+     * 实现上会根据上下文 [context] 产生不同结果.
+     *
+     * @param item 服务端上的物品堆叠
      * @param context 本次渲染的上下文
      */
     fun render(item: T, context: C? = null)

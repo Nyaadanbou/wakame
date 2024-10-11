@@ -19,6 +19,11 @@ interface RendererFormats {
  * 代表一种内容的渲染格式.
  *
  * 这只是一个顶级接口, 实现需要根据具体的渲染内容, 增加属性和函数.
+ *
+ * ### 实现建议
+ *
+ * - 使用 `data class` 以便使用 ObjectMapper 来实现快速序列化
+ * - 所有属性(property)应该提供默认值, 以便应对配置文件缺省的情况
  */
 interface RendererFormat {
     /**
@@ -38,7 +43,26 @@ interface RendererFormat {
     /**
      * 代表一个索引会在运行时动态生成的 [RendererFormat].
      */
-    interface Dynamic<T> : RendererFormat {
-        fun computeIndex(source: T): Key
+    interface Dynamic<in T> : RendererFormat {
+        fun computeIndex(data: T): Key
+    }
+
+    companion object Shared {
+        /**
+         * 当一个 [RendererFormat] 的配置缺省时使用的字符串.
+         */
+        const val FIXME = "fixme"
+
+        /**
+         * 获取一个空的 [RendererFormat].
+         */
+        fun empty(): RendererFormat = EMPTY
+
+        private val EMPTY = object : Simple, Dynamic<Nothing> {
+            override val namespace: String = "internal"
+            override val id: String = "empty"
+            override val index: Key = createIndex()
+            override fun computeIndex(data: Nothing): Key = index
+        }
     }
 }

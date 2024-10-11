@@ -10,6 +10,7 @@ import java.nio.file.Path
 
 internal abstract class AbstractRendererLayout : RendererLayout, KoinComponent {
     protected val logger: Logger by inject()
+
     protected val textOrdinalMap: Object2IntOpenHashMap<DerivedTooltipIndex> = Object2IntOpenHashMap()
     protected val textMetadataMap: Object2ObjectOpenHashMap<DerivedTooltipIndex, TextMeta> = Object2ObjectOpenHashMap()
 

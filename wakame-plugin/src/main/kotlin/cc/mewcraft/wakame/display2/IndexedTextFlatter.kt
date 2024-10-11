@@ -36,12 +36,12 @@ internal class IndexedTextFlatter(
         // 首先添加传入的 lore lines
         tree.addAll(indexedTexts)
         // 然后添加 renderer config 中的固定内容
-        tree.addAll(rendererLayout.staticIndexedTextList)
+        tree.addAll(rendererLayout.staticIndexedTexts)
         // 最后添加 renderer config 中的默认内容
         // 这里利用了集合的特性，即重复元素(重复键值)不会被添加.
         // 因此，如果这些内容已经存在，那么默认内容就不会被添加.
         // 相反, 如果不存在, 那么默认内容就会被添加.
-        tree.addAll(rendererLayout.defaultIndexedTextList)
+        tree.addAll(rendererLayout.defaultIndexedTexts)
 
         // 接下来要清理固定内容. 整体策略:
         // 1. 遍历整个 tree

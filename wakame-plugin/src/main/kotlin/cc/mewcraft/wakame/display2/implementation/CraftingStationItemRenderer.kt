@@ -19,10 +19,10 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         set(value) {}
 
     override fun initialize(layoutPath: Path, formatPath: Path) {
-        TODO("Not yet implemented")
+        // TODO display2 CraftingStation
     }
 
     override fun render(item: NekoStack, context: CraftingStationContext?) {
-        TODO("Not yet implemented")
+        // TODO display2 CraftingStation
     }
 }

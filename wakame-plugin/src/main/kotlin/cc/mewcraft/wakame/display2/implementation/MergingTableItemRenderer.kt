@@ -12,17 +12,17 @@ internal class MergingTableContext
 
 internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, MergingTableContext>() {
     override var rendererLayout: RendererLayout
-        get() = TODO("Not yet implemented")
+        get() = TODO("display2 MeringTable")
         set(value) {}
     override var rendererFormats: RendererFormats
-        get() = TODO("Not yet implemented")
+        get() = TODO("display2 MeringTable")
         set(value) {}
 
     override fun initialize(layoutPath: Path, formatPath: Path) {
-        TODO("Not yet implemented")
+        // TODO display2 MergingTable
     }
 
     override fun render(item: NekoStack, context: MergingTableContext?) {
-        TODO("Not yet implemented")
+        // TODO display2 MergingTable
     }
 }

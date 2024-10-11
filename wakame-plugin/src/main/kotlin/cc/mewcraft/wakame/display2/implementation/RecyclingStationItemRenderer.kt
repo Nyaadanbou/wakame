@@ -12,17 +12,17 @@ internal class RecyclingStationContext
 
 internal object RecyclingStationItemRenderer : AbstractItemRenderer<NekoStack, RecyclingStationContext>() {
     override var rendererLayout: RendererLayout
-        get() = TODO()
+        get() = TODO("display2 RecyclingStation")
         set(value) {}
     override var rendererFormats: RendererFormats
-        get() = TODO()
+        get() = TODO("display2 RecyclingStation")
         set(value) {}
 
     override fun initialize(layoutPath: Path, formatPath: Path) {
-        TODO()
+        // TODO display2 RecyclingStation
     }
 
     override fun render(item: NekoStack, context: RecyclingStationContext?) {
-        TODO()
+        // TODO display2 RecyclingStation
     }
 }
