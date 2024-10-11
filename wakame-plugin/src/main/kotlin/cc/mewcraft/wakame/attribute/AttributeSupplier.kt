@@ -48,13 +48,6 @@ internal constructor(
     }
 
     /**
-     * Creates a new persistent [AttributeInstance] from this supplier.
-     */
-    fun createPersistentInstance(type: Attribute): AttributeInstance? {
-        TODO("创建“活的”实例")
-    }
-
-    /**
      * Creates a new [ImaginaryAttributeInstance] from this supplier.
      */
     fun createImaginaryInstance(type: Attribute): ImaginaryAttributeInstance? {
