@@ -35,25 +35,23 @@ primary:
   - (fixed:general)
   - general:lore
 
-# 元素排序
-# 同种属性, 不同元素标识, 都将按照此顺序渲染.
-#
-# 语法说明:
-#   元素的唯一标识
-element:
-  - neutral
-  - fire
-  - water
-  - wind
-  - earth
-  - thunder
+# 属性的相关设置
+attribute:
 
-# 运算模式排序
-# 同种属性, 不同运算模式, 都将按照此顺序渲染.
-#
-# 语法说明:
-#   运算模式的唯一标识
-operation:
-  - add
-  - multiply_base
-  - multiply_total
+  # 元素排序
+  element:
+    - neutral
+    - fire
+    - water
+    - wind
+    - earth
+    - thunder
+
+  # 运算模式排序
+  operation:
+    - add
+    - multiply_base
+    - multiply_total
+
+# 技能的相关设置
+skill: { }

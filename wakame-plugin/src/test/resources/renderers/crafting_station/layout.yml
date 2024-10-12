@@ -25,16 +25,3 @@ primary:
 
   - (fixed:general)
   - general:lore
-
-element:
-  - neutral
-  - fire
-  - water
-  - wind
-  - earth
-  - thunder
-
-operation:
-  - add
-  - multiply_base
-  - multiply_total

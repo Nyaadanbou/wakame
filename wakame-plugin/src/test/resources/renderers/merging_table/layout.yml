@@ -13,16 +13,3 @@ primary:
 
   - (fixed:special)
   - special:portable_core
-
-element:
-  - neutral
-  - fire
-  - water
-  - wind
-  - earth
-  - thunder
-
-operation:
-  - add
-  - multiply_base
-  - multiply_total

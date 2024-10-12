@@ -21,15 +21,17 @@ primary:
 
   - stash:cells/empty
 
-element:
-  - neutral
-  - fire
-  - water
-  - wind
-  - earth
-  - thunder
+attribute:
+  element:
+    - neutral
+    - fire
+    - water
+    - wind
+    - earth
+    - thunder
+  operation:
+    - add
+    - multiply_base
+    - multiply_total
 
-operation:
-  - add
-  - multiply_base
-  - multiply_total
+skill: { }
