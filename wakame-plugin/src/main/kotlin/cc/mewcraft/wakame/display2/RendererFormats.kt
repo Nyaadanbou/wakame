@@ -31,6 +31,13 @@ interface RendererFormat {
      */
     val namespace: String
 
+    // TODO display2 设计上这里应该包含一个 TextMetaFactory 的实例, 用于生成 TextMeta.
+    //  这是因为创建 TextMeta 要求已知 namespace, 而 namespace
+    //  只有在 RendererFormat 创建好之后才能知道. 因此获取 TextMetaFactory
+    //  的职责由 RendererFormat 来承担就比较合适了.
+
+    // fun createTextMetaFactory(): TextMetaFactory
+
     /**
      * 代表一个索引在编译时已经确定的 [RendererFormat].
      */

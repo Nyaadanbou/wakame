@@ -25,6 +25,8 @@ import kotlin.collections.component2
  *
  * 只有一个格式 [tooltip], 可以包含任意占位符.
  * 当生成内容时, 将对 [tooltip] 填充一次占位符.
+ *
+ * @param tooltip 内容的格式
  */
 @ConfigSerializable
 internal data class SingleValueRendererFormat(
@@ -59,6 +61,8 @@ internal data class SingleValueRendererFormat(
  *
  * 只有一个格式 [tooltip], 可以包含任意占位符.
  * 当生成内容时, 将对 [tooltip] 填充一次占位符.
+ *
+ * @param tooltip 内容的格式
  */
 @ConfigSerializable
 internal data class ListValueRendererFormat(
@@ -90,6 +94,8 @@ internal data class ListValueRendererFormat(
 
 /**
  * 一种需要将多个对象合并成一个字符串的渲染格式.
+ *
+ * @param tooltip 内容的格式
  */
 @ConfigSerializable
 internal data class AggregateValueRendererFormat(
@@ -113,8 +119,7 @@ internal data class AggregateValueRendererFormat(
             .mapTo(ObjectArrayList(collection.size)) { MM.deserialize(tooltip.single, component("single", transform(it))) }
             .join(JoinConfiguration.separator(MM.deserialize(tooltip.separator)))
             .let { MM.deserialize(tooltip.merged, component("merged", it)) }
-            .let(::listOf)
-        return SimpleIndexedText(index, merged)
+        return SimpleIndexedText(index, listOf(merged))
     }
 
     /**
@@ -140,7 +145,7 @@ internal data class AggregateValueRendererFormat(
 /**
  * 一种专用于额外的物品描述 (lore) 的渲染格式.
  *
- * @param tooltip 内容的格式, 不支持任何占位符
+ * @param tooltip 内容的格式
  */
 @ConfigSerializable
 internal data class ExtraLoreRendererFormat(
@@ -152,9 +157,12 @@ internal data class ExtraLoreRendererFormat(
     override val id: String = "lore"
     override val index: Key = Key.key(namespace, id)
 
-    fun render(lore: List<String>): IndexedText {
-        val size = tooltip.header.size + lore.size + tooltip.bottom.size
-        val lines = lore.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, parsed("line", it)) }
+    /**
+     * @param data 额外的物品描述
+     */
+    fun render(data: List<String>): IndexedText {
+        val size = tooltip.header.size + data.size + tooltip.bottom.size
+        val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, parsed("line", it)) }
         val header = tooltip.header.takeUnlessEmpty()?.run { mapTo(ObjectArrayList(this.size), MM::deserialize) }
         val bottom = tooltip.bottom.takeUnlessEmpty()?.run { mapTo(ObjectArrayList(this.size), MM::deserialize) }
         lines.addAll(0, header)
@@ -193,7 +201,10 @@ internal data class EnchantmentRendererFormat(
     override val id: String = "enchantments"
     override val index: Key = Key.key(namespace, id)
 
-    fun render(enchantments: Map<Enchantment, Int>): IndexedText {
-        return SimpleIndexedText(index, enchantments.map { (enchantment, level) -> enchantment.displayName(level) })
+    /**
+     * @param data 魔咒和等级的映射
+     */
+    fun render(data: Map<Enchantment, Int>): IndexedText {
+        return SimpleIndexedText(index, data.map { (enchantment, level) -> enchantment.displayName(level) })
     }
 }

@@ -18,8 +18,7 @@ import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
-import kotlin.io.path.readText
-import kotlin.io.path.relativeTo
+import kotlin.io.path.*
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.typeOf
@@ -54,9 +53,11 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
         for ((id, type) in typeById) {
             val node = root.node(id)
             if (node.virtual()) {
+                // TODO display2 当配置文件有缺省时, 支持回退到默认格式, 而不是直接抛异常
                 logger.warn("Renderer format '$id' is not found in '${formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))}'. Fallback to default format.")
             }
-            directFormats[id] = node.krequire(type) // overwrite existing
+            directFormats[id] = node.krequire(type) // will overwrite the one already existing
+            logger.info("Loaded renderer format (${formatPath.parent.name}): $id")
         }
 
         // reload all renderer formats of this renderer
@@ -73,15 +74,15 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
         return true
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun <F : RendererFormat> get0(id: String): Provider<F> {
-        // safe unchecked casts
         val provider = provider { checkNotNull(directFormats[id]) { "directFormats['$id']" } as F }
         wrappedFormats += provider as Provider<RendererFormat>
         return provider
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <F : RendererFormat> get(id: String): F? {
-        // safe unchecked casts
         return directFormats[id] as F?
     }
 

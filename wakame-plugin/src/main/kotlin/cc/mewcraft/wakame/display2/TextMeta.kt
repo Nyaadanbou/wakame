@@ -12,12 +12,12 @@ interface TextMeta {
     /**
      * 原始索引 (即配置文件的列表中, 未经衍生的字符串值).
      */
-    val sourceIndex: DerivedIndex
+    val sourceIndex: SourceIndex
 
     /**
      * 原始序数 (即配置文件的列表中, 所在的顺序位置).
      */
-    val sourceOrdinal: DerivedOrdinal
+    val sourceOrdinal: SourceOrdinal
 
     /**
      * 生成全部的 [DerivedIndex].
@@ -75,11 +75,19 @@ interface TextMeta {
      *
      * @param offset [DerivedOrdinal] 的偏移量
      */
-    fun generateOrdinals(offset: Int): Map<DerivedIndex, DerivedOrdinal>
+    fun generateOrdinals(offset: Int): Map<DerivedIndex, DerivedOrdinal> {
+        val index2Ordinal = LinkedHashMap<DerivedIndex, DerivedOrdinal>() // for debug inspection
+        for ((localOrdinal, fullKey) in generateIndexes().withIndex()) {
+            index2Ordinal[fullKey] = sourceOrdinal + localOrdinal + offset
+        }
+        return index2Ordinal
+    }
 }
 
 /**
- * 代表一个标准的 [TextMeta].
+ * 用来描述数据来源于物品堆叠本身的 [IndexedText].
+ *
+ * 这基本包括了物品的 `lore`, `level` 等一切
  */
 interface SimpleTextMeta : TextMeta {
     /**
@@ -96,21 +104,27 @@ interface SimpleTextMeta : TextMeta {
     /**
      * Creates default lore line (if the [defaultText] is not `null`).
      */
-    fun createDefault(): List<IndexedText>
+    fun createDefault(): List<IndexedText>? {
+        return defaultText?.let { listOf(SimpleIndexedText(sourceIndex, it)) }
+    }
 
     companion object Shared {
-        const val NAMESPACE_DEFAULT = "default"
+        const val DEFAULT_IDENTIFIER = "default"
     }
 }
 
 /**
- * 代表一个在配置文件中就已预设好的 [IndexedText].
+ * 用来描述在配置文件中就已预设好的 [IndexedText].
+ *
+ * 这些 [IndexedText] 的内容是预设的, 但最终是否渲染取决于物品(堆叠)本身的状态.
+ * 使用场景包括但不限于在 `lore` 上面显示固定的一行空白, 或者显示一个固定的文本;
+ * 如果物品堆叠本身不存在 `lore`, 则可以选择不渲染这一行空白文字.
  */
 interface StaticTextMeta : TextMeta {
     /**
      * 该固定内容的文本.
      */
-    val components: List<Component>
+    val contents: List<Component>
 
     /**
      * 用于判断本内容是否应该被渲染.
@@ -128,7 +142,7 @@ interface StaticTextMeta : TextMeta {
         // 经综合考虑, 固定内容的 SourceIndex 最好就是其在配置文件中原始索引的字符串形式
         // 例如, 这行固定内容位于列表中的第 3 个, 那么其 SourceIndex 就是 "fixed:3"
         // 这样刚好能保证不同的固定内容行都有唯一的 Index
-        get() = Key.key(NAMESPACE_CONSTANT, sourceIndex.toString())
+        get() = Key.key(STATIC_IDENTIFIER, sourceIndex.toString())
 
     override fun generateIndexes(): List<DerivedIndex> {
         return listOf(sourceIndex)
@@ -139,25 +153,6 @@ interface StaticTextMeta : TextMeta {
     }
 
     companion object Shared {
-        const val NAMESPACE_CONSTANT = "fixed"
+        const val STATIC_IDENTIFIER = "fixed"
     }
-}
-
-/**
- * 代表一个拥有自定义内容的 [StaticTextMeta].
- */
-data class CustomStaticTextMeta(
-    override val sourceOrdinal: SourceOrdinal,
-    override val companionNamespace: String?,
-    override val components: List<Component>,
-) : StaticTextMeta
-
-/**
- * 代表一个其内容为“空白”的 [StaticTextMeta].
- */
-data class BlankStaticTextMeta(
-    override val sourceOrdinal: SourceOrdinal,
-    override val companionNamespace: String?,
-) : StaticTextMeta {
-    override val components: List<Component> = listOf(Component.empty())
 }

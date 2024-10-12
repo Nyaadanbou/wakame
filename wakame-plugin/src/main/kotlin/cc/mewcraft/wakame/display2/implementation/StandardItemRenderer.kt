@@ -3,20 +3,24 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
+import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.attribute.composite.element
+import cc.mewcraft.wakame.argument.StringArgumentQueue
+import cc.mewcraft.wakame.attribute.AttributeModifier.*
+import cc.mewcraft.wakame.attribute.composite.*
+import cc.mewcraft.wakame.display.*
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.packet.PacketNekoStack
-import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.util.StringCombiner
+import cc.mewcraft.wakame.util.yamlConfig
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -24,10 +28,12 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.koin.core.component.get
+import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
 import java.nio.file.Path
+import kotlin.io.path.readText
 import kotlin.reflect.typeOf
 
 internal class StandardRendererLayout : AbstractRendererLayout() {
@@ -36,7 +42,6 @@ internal class StandardRendererLayout : AbstractRendererLayout() {
 }
 
 internal class StandardRendererFormats : AbstractRendererFormats()
-
 internal class StandardContext
 
 internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
@@ -67,7 +72,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
                 ) {
                     is AttributeCore -> StandardRenderingParts.CELLULAR_ATTRIBUTE.process(collector, core.attribute)
                     is SkillCore -> StandardRenderingParts.CELLULAR_SKILL.process(collector, core.skill)
-                    else -> StandardRenderingParts.CELLULAR_EMPTY.process(collector, null)
+                    is EmptyCore -> StandardRenderingParts.CELLULAR_EMPTY.process(collector, null)
                 }
             }
         }
@@ -97,123 +102,99 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
     }
 }
 
-// /**
-//  * 用于(反)序列化渲染器的配置文件.
-//  */
-// internal object StandardRendererConfigSerializer {
-//
-// }
-
 
 //////
 
 
-//<editor-fold desc="RenderingPart">
 internal object StandardRenderingParts {
     @JvmField
-    val ATTACK_SPEED: SimpleRenderingPart<ItemAttackSpeed, AttackSpeedRendererFormat> =
-        configure("attack_speed") { data, format ->
-            format.render(data)
-        }
+    val ATTACK_SPEED: SimpleRenderingPart<ItemAttackSpeed, AttackSpeedRendererFormat> = configure("attack_speed") { data, format ->
+        format.render(data)
+    }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE: SimpleRenderingPart<ConstantCompositeAttribute, CellularAttributeRendererFormat> =
-        configure("cells/attributes") { data, format ->
-            format.render(data)
-        }
+    val CELLULAR_ATTRIBUTE: SimpleRenderingPart<ConstantCompositeAttribute, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
+        format.render(data)
+    }
 
     @JvmField
-    val CELLULAR_SKILL: SimpleRenderingPart<ConfiguredSkill, CellularSkillRendererFormat> =
-        configure("cells/skills") { data, format ->
-            format.render(data)
-        }
+    val CELLULAR_SKILL: SimpleRenderingPart<ConfiguredSkill, CellularSkillRendererFormat> = configure("cells/skills") { data, format ->
+        format.render(data)
+    }
 
     @JvmField
-    val CELLULAR_EMPTY: SimpleRenderingPart<Nothing?, CellularEmptyRendererFormat> =
-        configure("cells/empty") { _, format ->
-            format.render()
-        }
+    val CELLULAR_EMPTY: SimpleRenderingPart<Nothing?, CellularEmptyRendererFormat> = configure("cells/empty") { _, format ->
+        format.render()
+    }
 
     @JvmField
-    val CRATE: SimpleRenderingPart<ItemCrate, SingleValueRendererFormat> =
-        configure("crate") { data, format ->
-            val resolver = TagResolver.resolver(
-                Placeholder.component("id", Component.text(data.identity)),
-                Placeholder.component("name", Component.text(data.identity)),
-            )
-            format.render(resolver) // TODO display2
-        }
+    val CRATE: SimpleRenderingPart<ItemCrate, SingleValueRendererFormat> = configure("crate") { data, format ->
+        val resolver = TagResolver.resolver(
+            Placeholder.component("id", Component.text(data.identity)),
+            Placeholder.component("name", Component.text(data.identity)), // TODO display2 盲盒完成时再写这里
+        )
+        format.render(resolver)
+    }
 
     @JvmField
-    val CUSTOM_NAME: SimpleRenderingPart<CustomName, SingleValueRendererFormat> =
-        configure("custom_name") { data, format ->
-            format.render(Placeholder.component("value", data.rich))
-        }
+    val CUSTOM_NAME: SimpleRenderingPart<CustomName, SingleValueRendererFormat> = configure("custom_name") { data, format ->
+        format.render(Placeholder.component("value", data.rich))
+    }
 
     @JvmField
-    val ELEMENTS: SimpleRenderingPart<ItemElements, AggregateValueRendererFormat> =
-        configure("elements") { data, format ->
-            format.render(data.elements, Element::displayName)
-        }
+    val ELEMENTS: SimpleRenderingPart<ItemElements, AggregateValueRendererFormat> = configure("elements") { data, format ->
+        format.render(data.elements, Element::displayName)
+    }
 
     @JvmField
-    val ENCHANTMENTS: SimpleRenderingPart<ItemEnchantments, EnchantmentRendererFormat> =
-        configure("enchantments") { data, format ->
-            format.render(data.enchantments)
-        }
+    val ENCHANTMENTS: SimpleRenderingPart<ItemEnchantments, EnchantmentRendererFormat> = configure("enchantments") { data, format ->
+        format.render(data.enchantments)
+    }
 
     @JvmField
-    val FIRE_RESISTANT: SimpleRenderingPart<FireResistant, SingleValueRendererFormat> =
-        configure("fire_resistant") { _, format ->
-            format.render()
-        }
+    val FIRE_RESISTANT: SimpleRenderingPart<FireResistant, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
+        format.render()
+    }
 
     @JvmField
-    val FOOD: SimpleRenderingPart<FoodProperties, ListValueRendererFormat> =
-        configure("food") { data, format ->
-            val resolver = TagResolver.resolver(
-                Placeholder.component("nutrition", Component.text(data.nutrition)),
-                Placeholder.component("saturation", Component.text(data.saturation)),
-                Placeholder.component("eat_seconds", Component.text(data.eatSeconds)),
-            )
-            format.render(resolver)
-        }
+    val FOOD: SimpleRenderingPart<FoodProperties, ListValueRendererFormat> = configure("food") { data, format ->
+        val resolver = TagResolver.resolver(
+            Placeholder.component("nutrition", Component.text(data.nutrition)),
+            Placeholder.component("saturation", Component.text(data.saturation)),
+            Placeholder.component("eat_seconds", Component.text(data.eatSeconds)),
+        )
+        format.render(resolver)
+    }
 
     @JvmField
-    val ITEM_NAME: SimpleRenderingPart<ItemName, SingleValueRendererFormat> =
-        configure("item_name") { data, format ->
-            format.render(Placeholder.component("value", data.rich))
-        }
+    val ITEM_NAME: SimpleRenderingPart<ItemName, SingleValueRendererFormat> = configure("item_name") { data, format ->
+        format.render(Placeholder.component("value", data.rich))
+    }
 
     @JvmField
-    val KIZAMIZ: SimpleRenderingPart<ItemKizamiz, AggregateValueRendererFormat> =
-        configure("kizamiz") { data, format ->
-            format.render(data.kizamiz, Kizami::displayName)
-        }
+    val KIZAMIZ: SimpleRenderingPart<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
+        format.render(data.kizamiz, Kizami::displayName)
+    }
 
     @JvmField
-    val LEVEL: SimpleRenderingPart<ItemLevel, SingleValueRendererFormat> =
-        configure("level") { data, format ->
-            format.render(Placeholder.component("value", Component.text(data.level)))
-        }
+    val LEVEL: SimpleRenderingPart<ItemLevel, SingleValueRendererFormat> = configure("level") { data, format ->
+        format.render(Placeholder.component("value", Component.text(data.level)))
+    }
 
     @JvmField
-    val LORE: SimpleRenderingPart<ExtraLore, ExtraLoreRendererFormat> =
-        configure("lore") { data, format ->
-            format.render(data.lore)
-        }
+    val LORE: SimpleRenderingPart<ExtraLore, ExtraLoreRendererFormat> = configure("lore") { data, format ->
+        format.render(data.lore)
+    }
 
     @JvmField
-    val PORTABLE_CORE: SimpleRenderingPart<PortableCore, PortableCoreRendererFormat> =
-        configure("portable_core") { data, format ->
-            format.render(data)
-        }
+    val PORTABLE_CORE: SimpleRenderingPart<PortableCore, PortableCoreRendererFormat> = configure("portable_core") { data, format ->
+        format.render(data)
+    }
 
     @JvmField
-    val RARITY: SimpleRenderingPart<ItemRarity, SingleValueRendererFormat> =
-        configure("rarity") { data, format ->
-            format.render(Placeholder.component("value", data.rarity.displayName))
-        }
+    val RARITY: SimpleRenderingPart<ItemRarity, SingleValueRendererFormat> = configure("rarity") { data, format ->
+        format.render(Placeholder.component("value", data.rarity.displayName))
+    }
 
     fun bootstrap() = Unit // to explicitly initialize static block
 
@@ -222,33 +203,24 @@ internal object StandardRenderingParts {
      * @param block 将数据渲染成文本的逻辑
      */
     private inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): SimpleRenderingPart<T, F> =
-        try {
-            val added = StandardItemRenderer.rendererFormats.register(id, typeOf<F>())
-            val format = StandardItemRenderer.rendererFormats.get0<F>(id)
-            SimpleRenderingPart(format, block)
-        } catch (e: Throwable) {
-            throw ExceptionInInitializerError(e)
-        }
+        SimpleRenderingPart(provideFormat<F>(id), block)
 
     private inline fun <T1, T2, reified F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): SimpleRenderingPart2<T1, T2, F> =
-        try {
-            val added = StandardItemRenderer.rendererFormats.register(id, typeOf<F>())
-            val format = StandardItemRenderer.rendererFormats.get0<F>(id)
-            SimpleRenderingPart2(format, block)
-        } catch (e: Throwable) {
-            throw ExceptionInInitializerError(e)
-        }
+        SimpleRenderingPart2(provideFormat<F>(id), block)
 
     private inline fun <T1, T2, T3, reified F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): SimpleRenderingPart3<T1, T2, T3, F> =
+        SimpleRenderingPart3(provideFormat<F>(id), block)
+
+    private inline fun <reified F : RendererFormat> provideFormat(id: String): Provider<F> {
         try {
             val added = StandardItemRenderer.rendererFormats.register(id, typeOf<F>())
             val format = StandardItemRenderer.rendererFormats.get0<F>(id)
-            SimpleRenderingPart3(format, block)
-        } catch (e: Throwable) {
+            return format
+        } catch (e: Exception) {
             throw ExceptionInInitializerError(e)
         }
+    }
 }
-//</editor-fold>
 
 
 //////
@@ -294,10 +266,10 @@ internal data class CellularAttributeRendererFormat(
         return Key.key(namespace, indexId)
     }
 
-    fun render(attribute: ConstantCompositeAttribute): IndexedText {
-        val facade = AttributeRegistry.FACADES[attribute.id]
-        val tooltip = facade.createTooltipLore(attribute)
-        return SimpleIndexedText(computeIndex(attribute), tooltip)
+    fun render(data: ConstantCompositeAttribute): IndexedText {
+        val facade = AttributeRegistry.FACADES[data.id]
+        val tooltip = facade.createTooltipLore(data)
+        return SimpleIndexedText(computeIndex(data), tooltip)
     }
 }
 
@@ -312,10 +284,10 @@ internal data class CellularSkillRendererFormat(
         return Key.key(namespace, indexId)
     }
 
-    fun render(skill: ConfiguredSkill): IndexedText {
-        val instance = skill.instance
+    fun render(data: ConfiguredSkill): IndexedText {
+        val instance = data.instance
         val tooltip = instance.displays.tooltips.map(MM::deserialize)
-        return SimpleIndexedText(computeIndex(skill), tooltip)
+        return SimpleIndexedText(computeIndex(data), tooltip)
     }
 
     companion object Shared {
