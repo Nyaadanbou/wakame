@@ -82,7 +82,7 @@ sealed interface AttributeMapSnapshotable {
  * 该对象在实现上必须与一个主体绑定, 例如玩家,怪物等.
  * **任何对该对象的修改都应该实时反应到绑定的主体上!**
  */
-sealed interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable {
+sealed interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable, Iterable<Map.Entry<Attribute, AttributeInstance>> {
     /**
      * 获取指定 [attribute] 的 [AttributeInstance].
      *
@@ -253,6 +253,10 @@ private class PlayerAttributeMap(
     override fun getModifierValue(attribute: Attribute, id: Key): Double {
         return patch[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, player)
     }
+
+    override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> {
+        return patch.reference2ObjectEntrySet().iterator()
+    }
 }
 
 /**
@@ -294,7 +298,6 @@ private class EntityAttributeMap : AttributeMap {
     private fun checkEntityIsValid(entity: Entity?) {
         requireNotNull(entity) { "The entity ref no longer exists" }
         require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
-        require(entity.isValid) { "The entity is no longer valid" }
     }
 
     @Suppress("DuplicatedCode")
@@ -355,6 +358,10 @@ private class EntityAttributeMap : AttributeMap {
 
     override fun getModifierValue(attribute: Attribute, id: Key): Double {
         return patch[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, entity)
+    }
+
+    override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> {
+        return patch.iterator()
     }
 }
 

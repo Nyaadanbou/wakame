@@ -99,6 +99,10 @@ object Attributes : AttributeCollectionProvider<Attribute> {
         return AttributeInternals.getCollectionBy(facadeId)
     }
 
+    override fun allDescriptionId(): Collection<String> {
+        return AttributeInternals.allDescriptionId() + ElementAttributeInternals.allDescriptionId()
+    }
+
     //////
 
     private fun Attribute.register(): Attribute {
@@ -130,6 +134,10 @@ class ElementAttributes internal constructor(
 
     override fun getCollectionBy(facadeId: String): Collection<ElementAttribute> {
         return ElementAttributeInternals.getCollectionBy(ELEMENT, facadeId)
+    }
+
+    override fun allDescriptionId(): Collection<String> {
+        return ElementAttributeInternals.allDescriptionId()
     }
 
     private fun ElementAttribute.register(): ElementAttribute {
@@ -164,6 +172,11 @@ interface AttributeCollectionProvider<T : Attribute> {
      * @return zero or more attributes
      */
     fun getCollectionBy(facadeId: String): Collection<T>
+
+    /**
+     * Gets all [Attribute.descriptionId] of the attributes.
+     */
+    fun allDescriptionId(): Collection<String>
 }
 
 
@@ -193,6 +206,10 @@ private object AttributeInternals {
     fun getCollectionBy(facadeId: String): Collection<Attribute> {
         return BY_FACADE_ID.get(facadeId)
     }
+
+    fun allDescriptionId(): Collection<String> {
+        return BY_DESCRIPTION_ID.keys
+    }
 }
 
 // 封装了一些内部状态, 以提供更好的接口体验
@@ -217,6 +234,10 @@ private object ElementAttributeInternals {
 
     fun getCollectionBy(element: Element, facadeId: String): Collection<ElementAttribute> {
         return BY_FACADE_ID.get(element, facadeId) ?: throw IllegalArgumentException("Unknown facade identity: '$facadeId'")
+    }
+
+    fun allDescriptionId(): Collection<String> {
+        return BY_DESCRIPTION_ID.keys
     }
 
     // 从 Element 映射到 ElementAttributes

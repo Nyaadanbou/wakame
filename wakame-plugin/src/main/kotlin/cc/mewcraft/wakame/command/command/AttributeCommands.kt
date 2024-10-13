@@ -4,6 +4,9 @@ import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
+import cc.mewcraft.wakame.command.parser.AttributeModifierParser
+import cc.mewcraft.wakame.command.parser.AttributeParser
+import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.extra.kotlin.translatable
@@ -13,6 +16,7 @@ import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.NamespacedKey
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -21,11 +25,13 @@ import org.incendo.cloud.Command
 import org.incendo.cloud.CommandFactory
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.bukkit.data.SingleEntitySelector
+import org.incendo.cloud.bukkit.parser.NamespacedKeyParser
 import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.coroutines.extension.suspendingHandler
 import org.incendo.cloud.kotlin.extension.commandBuilder
 import org.incendo.cloud.kotlin.extension.getOrNull
+import org.incendo.cloud.parser.standard.DoubleParser
 import java.text.DecimalFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -37,9 +43,195 @@ private const val ATTRIBUTE_COUNT_PER_PAGE = 14
 object AttributeCommands : CommandFactory<CommandSender> {
     private const val ATTRIBUTE_LITERAL = "attribute"
 
+    private fun sendNoAttributeMessage(sender: CommandSender, source: Entity) {
+        sender.sendMessage(text {
+            color(NamedTextColor.RED)
+            content("The entity has no custom attributes.")
+            hoverEvent(HoverEvent.showText(Component.text("Click to copy the UUID of this entity")))
+            clickEvent(ClickEvent.copyToClipboard(source.uniqueId.toString()))
+        })
+    }
+
+    private fun sendNoAttributeInstanceMessage(sender: CommandSender, source: Entity, attribute: Attribute) {
+        sender.sendMessage(text {
+            append("The entity does not have the attribute ".mini)
+            append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+            append(".".mini)
+            hoverEvent(HoverEvent.showText(Component.text("Click to copy the UUID of this entity")))
+            clickEvent(ClickEvent.copyToClipboard(source.uniqueId.toString()))
+        })
+    }
+
     override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> {
         return buildList {
-            // /<root> attribute [entity] [--print]
+            // /<root> attribute base get [entity] [attribute]
+            commandManager.commandBuilder(
+                name = CommandConstants.ROOT_COMMAND,
+                description = Description.of("Get the base value of an attribute")
+            ) {
+                permission(CommandPermissions.ATTRIBUTE)
+                literal(ATTRIBUTE_LITERAL)
+                literal("base")
+                literal("get")
+                required("source", SingleEntitySelectorParser.singleEntitySelectorParser())
+                required("attribute", AttributeParser.attributeParser())
+                suspendingHandler { context ->
+                    val sender = context.sender()
+                    val source = context.get<SingleEntitySelector>("source").single()
+                    val attribute = context.get<Attribute>("attribute")
+
+                    val attributeMap = getAttributeMap(source) {
+                        sendNoAttributeMessage(sender, source)
+                        return@suspendingHandler
+                    }.getSnapshot()
+
+                    val baseValue = attributeMap.getBaseValue(attribute)
+
+                    sender.sendMessage(text {
+                        append("The base value of ".mini)
+                        append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                        append(" is ".mini)
+                        append(Component.text(DecimalFormat("#.##").format(baseValue)).color(NamedTextColor.GREEN))
+                    })
+                }
+            }.buildAndAdd(this)
+
+            // /<root> attribute base set [entity] [attribute] [value]
+            commandManager.commandBuilder(
+                name = CommandConstants.ROOT_COMMAND,
+                description = Description.of("Set the base value of an attribute")
+            ) {
+                permission(CommandPermissions.ATTRIBUTE)
+                literal(ATTRIBUTE_LITERAL)
+                literal("base")
+                literal("set")
+                required("source", SingleEntitySelectorParser.singleEntitySelectorParser())
+                required("attribute", AttributeParser.attributeParser())
+                required("value", DoubleParser.doubleParser())
+                suspendingHandler { context ->
+                    val sender = context.sender()
+                    val source = context.get<SingleEntitySelector>("source").single()
+                    val attribute = context.get<Attribute>("attribute")
+                    val value = context.get<Double>("value")
+
+                    val attributeMap = getAttributeMap(source) {
+                        sendNoAttributeMessage(sender, source)
+                        return@suspendingHandler
+                    }
+
+                    val instance = attributeMap.getInstance(attribute)
+
+                    if (instance == null) {
+                        sendNoAttributeInstanceMessage(sender, source, attribute)
+                        return@suspendingHandler
+                    }
+
+                    instance.setBaseValue(value)
+                    sender.sendMessage(text {
+                        append("The base value of ".mini)
+                        append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                        append(" has been set to ".mini)
+                        append(Component.text(DecimalFormat("#.##").format(value)).color(NamedTextColor.GREEN))
+                    })
+                }
+            }.buildAndAdd(this)
+
+            // /<root> attribute modifier add [entity] [attribute] [id] [operation] [source]
+            commandManager.commandBuilder(
+                name = CommandConstants.ROOT_COMMAND,
+                description = Description.of("Add a modifier to an attribute")
+            ) {
+                permission(CommandPermissions.ATTRIBUTE)
+                literal(ATTRIBUTE_LITERAL)
+                literal("modifier")
+                literal("add")
+                required("source", SingleEntitySelectorParser.singleEntitySelectorParser())
+                required("attribute", AttributeParser.attributeParser())
+                required("modifier", AttributeModifierParser.attributeModifierParser())
+                suspendingHandler { context ->
+                    val sender = context.sender()
+                    val source = context.get<SingleEntitySelector>("source").single()
+                    val attribute = context.get<Attribute>("attribute")
+                    val modifier = context.get<AttributeModifier>("modifier")
+
+                    val attributeMap = getAttributeMap(source) {
+                        sendNoAttributeMessage(sender, source)
+                        return@suspendingHandler
+                    }
+
+                    val instance = attributeMap.getInstance(attribute)
+
+                    if (instance == null) {
+                        sendNoAttributeInstanceMessage(sender, source, attribute)
+                        return@suspendingHandler
+                    }
+
+                    instance.addModifier(modifier)
+                    sender.sendMessage(text {
+                        append("A modifier has been added to ".mini)
+                        append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                        append(" with ".mini)
+                        append(Component.text(modifier.id.asString()).color(NamedTextColor.GREEN))
+                        append(" ".mini)
+                        append(Component.text(modifier.operation.name).color(NamedTextColor.GREEN))
+                        append(" ".mini)
+                        append(Component.text(DecimalFormat("#.##").format(modifier.amount)).color(NamedTextColor.GREEN))
+                    })
+                }
+            }.buildAndAdd(this)
+
+            // /<root> attribute modifier remove [entity] [attribute] [id]
+            commandManager.commandBuilder(
+                name = CommandConstants.ROOT_COMMAND,
+                description = Description.of("Remove a modifier from an attribute")
+            ) {
+                permission(CommandPermissions.ATTRIBUTE)
+                literal(ATTRIBUTE_LITERAL)
+                literal("modifier")
+                literal("remove")
+                required("source", SingleEntitySelectorParser.singleEntitySelectorParser())
+                required("attribute", AttributeParser.attributeParser())
+                required("id", NamespacedKeyParser.namespacedKeyParser())
+                suspendingHandler { context ->
+                    val sender = context.sender()
+                    val source = context.get<SingleEntitySelector>("source").single()
+                    val attribute = context.get<Attribute>("attribute")
+                    val id = context.get<NamespacedKey>("id")
+
+                    val attributeMap = getAttributeMap(source) {
+                        sendNoAttributeMessage(sender, source)
+                        return@suspendingHandler
+                    }
+
+                    val instance = attributeMap.getInstance(attribute)
+
+                    if (instance == null) {
+                        sendNoAttributeInstanceMessage(sender, source, attribute)
+                        return@suspendingHandler
+                    }
+
+                    if (instance.getModifiers().none { it.id == id }) {
+                        sender.sendMessage(text {
+                            append("The attribute ".mini)
+                            append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                            append(" does not have a modifier with the id ".mini)
+                            append(Component.text(id.asString()).color(NamedTextColor.RED))
+                            append(".".mini)
+                        })
+                        return@suspendingHandler
+                    }
+
+                    instance.removeModifier(id)
+                    sender.sendMessage(text {
+                        append("The modifier with the id ".mini)
+                        append(Component.text(id.asString()).color(NamedTextColor.GREEN))
+                        append(" has been removed from ".mini)
+                        append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                    })
+                }
+            }.buildAndAdd(this)
+
+            // /<root> attribute report [entity] [--print]
             commandManager.commandBuilder(
                 name = CommandConstants.ROOT_COMMAND,
                 description = Description.of("Show the entity(s) attributes")
@@ -65,18 +257,8 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     // val recipients = context.getOrNull<MultiplePlayerSelector>("recipient")?.values()
                     //     ?: (if (sender is Player) listOf(sender) else emptyList())
 
-                    val attributeMap = when (source) {
-                        is Player -> PlayerAttributeAccessor.getAttributeMap(source).getSnapshot()
-                        is LivingEntity -> EntityAttributeAccessor.getAttributeMap(source).getSnapshot()
-                        else -> null
-                    }
-                    if (attributeMap == null) {
-                        sender.sendMessage(text {
-                            color(NamedTextColor.RED)
-                            content("The entity has no custom attributes.")
-                            hoverEvent(HoverEvent.showText(Component.text("Click to copy the UUID of this entity")))
-                            clickEvent(ClickEvent.copyToClipboard(source.uniqueId.toString()))
-                        })
+                    val attributeMap = getAttributeMap(source) {
+                        sendNoAttributeMessage(sender, source)
                         return@suspendingHandler
                     }
 
@@ -89,6 +271,14 @@ object AttributeCommands : CommandFactory<CommandSender> {
             }.buildAndAdd(this)
         }
     }
+
+    private inline fun getAttributeMap(entity: Entity, default: () -> AttributeMap): AttributeMap {
+        return when (entity) {
+            is Player -> PlayerAttributeAccessor.getAttributeMap(entity)
+            is LivingEntity -> EntityAttributeAccessor.getAttributeMap(entity)
+            else -> default()
+        }
+    }
 }
 
 object AttributeReport {
@@ -97,7 +287,7 @@ object AttributeReport {
 
     fun generateBook(
         source: Entity,
-        attributes: AttributeMapSnapshot,
+        attributes: AttributeMap,
     ): Book {
         val sortedAttributes = attributes.sortedBy { (type, _) -> type.descriptionId }
         val pages = generateBookPages(sortedAttributes)
@@ -121,7 +311,7 @@ object AttributeReport {
 
     fun generateText(
         source: Entity,
-        attributes: AttributeMapSnapshot,
+        attributes: AttributeMap,
     ): Component {
         val sorted = attributes.sortedBy { (type, _) -> type.descriptionId }
         val result = text {
@@ -139,14 +329,14 @@ object AttributeReport {
     }
 
     fun generateSingleText(
-        instance: AttributeInstanceSnapshot,
+        instance: AttributeInstance,
     ): Component {
         return text {
             content(instance.attribute.descriptionId + ": ")
             color(NamedTextColor.GREEN)
             append {
                 text {
-                    content("${DECIMAL_FORMAT.format(instance.getValue())}")
+                    content(DECIMAL_FORMAT.format(instance.getValue()))
                     color(NamedTextColor.YELLOW)
                 }
             }
@@ -177,7 +367,7 @@ object AttributeReport {
     }
 
     private fun generateBookPages(
-        attributeList: List<Map.Entry<Attribute, AttributeInstanceSnapshot>>
+        attributeList: List<Map.Entry<Attribute, AttributeInstance>>,
     ): List<Component> {
         val result = attributeList
             .chunked(ATTRIBUTE_COUNT_PER_PAGE)
