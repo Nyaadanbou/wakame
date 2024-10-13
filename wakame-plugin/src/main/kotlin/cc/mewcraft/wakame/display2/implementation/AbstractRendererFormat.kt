@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.display2.implementation
 import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.util.removeItalic
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.key.Key
@@ -179,8 +180,8 @@ internal data class ExtraLoreRendererFormat(
     fun render(data: List<String>): IndexedText {
         val size = tooltip.header.size + data.size + tooltip.bottom.size
         val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, parsed("line", it)) }
-        val header = tooltip.header.takeUnlessEmpty()?.run { mapTo(ObjectArrayList(this.size), MM::deserialize) }
-        val bottom = tooltip.bottom.takeUnlessEmpty()?.run { mapTo(ObjectArrayList(this.size), MM::deserialize) }
+        val header = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: emptyList()
+        val bottom = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: emptyList()
         lines.addAll(0, header)
         lines.addAll(bottom)
         return SimpleIndexedText(index, lines)
@@ -225,6 +226,6 @@ internal data class EnchantmentRendererFormat(
      * @param data 魔咒和等级的映射
      */
     fun render(data: Map<Enchantment, Int>): IndexedText {
-        return SimpleIndexedText(index, data.map { (enchantment, level) -> enchantment.displayName(level) })
+        return SimpleIndexedText(index, data.map { (enchantment, level) -> enchantment.displayName(level).removeItalic })
     }
 }

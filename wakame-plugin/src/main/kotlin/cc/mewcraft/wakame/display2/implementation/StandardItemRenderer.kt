@@ -69,12 +69,12 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
             }
         }
         components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingParts.CRATE.process(collector, data) }
-        components.process(ItemComponentTypes.CUSTOM_NAME) { data -> StandardRenderingParts.CUSTOM_NAME.process(collector, data) }
+        // components.process(ItemComponentTypes.CUSTOM_NAME) { data -> StandardRenderingParts.CUSTOM_NAME.process(collector, data) }
         components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingParts.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
         components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, data) }
         components.process(ItemComponentTypes.FOOD) { data -> StandardRenderingParts.FOOD.process(collector, data) }
-        components.process(ItemComponentTypes.ITEM_NAME) { data -> StandardRenderingParts.ITEM_NAME.process(collector, data) }
+        // components.process(ItemComponentTypes.ITEM_NAME) { data -> StandardRenderingParts.ITEM_NAME.process(collector, data) }
         components.process(ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingParts.KIZAMIZ.process(collector, data) }
         components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingParts.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.LORE) { data -> StandardRenderingParts.LORE.process(collector, data) }
@@ -84,9 +84,25 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         val minecraftLore = textFlatter.flatten(collector)
         val minecraftCmd = ItemModelDataLookup[item.id, item.variant]
 
-        // 修改物品(原地)
+        // 更新描述
         item.lore(minecraftLore)
+
+        // 更新模型
         item.customModelData(minecraftCmd)
+
+        // 擦除萌芽NBT
+        // item.erase()
+
+        // 隐藏客户端渲染
+        item.showAttributeModifiers(false)
+        // item.showCanBreak(false)
+        // item.showCanPlaceOn(false)
+        // item.showDyedColor(false)
+        item.showEnchantments(false)
+        // item.showJukeboxPlayable(false)
+        // item.showStoredEnchantments(false)
+        // item.showTrim(false)
+        // item.showUnbreakable(false)
     }
 
     private inline fun <T> ItemComponentMap.process(type: ItemComponentType<T>, block: (T) -> Unit) {
@@ -249,7 +265,7 @@ internal data class CellularAttributeRendererFormat(
         val indexId = buildString {
             append(data.id)
             append('.')
-            append(data.operation)
+            append(data.operation.key)
             data.element?.let {
                 append('.')
                 append(it.uniqueId)
@@ -409,10 +425,14 @@ internal data class SkillCoreTextMetaFactory(
     override val namespace: String,
 ) : TextMetaFactory {
     override fun test(sourceIndex: SourceIndex): Boolean {
-        val key = Key.key( // 技能的标识
-            sourceIndex.value().substringBefore('/'),
-            sourceIndex.value().substringAfter('/')
-        )
+        // val key = Key.key( // 技能的标识
+        //     sourceIndex.value().substringBefore('/'),
+        //     sourceIndex.value().substringAfter('/')
+        // )
+        // FIXME 临时方案, 理想中的技能 key 应该如上面注释所示
+        //  也就是说, 如果 sourceIndex 是 skill:buff/potion_drop,
+        //  那么对应的技能的 key 应该是 buff:potion_drop (???)
+        val key = sourceIndex
         return sourceIndex.namespace() == namespace && SkillRegistry.INSTANCES.has(key)
     }
 

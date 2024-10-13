@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.display2.implementation.BlankStaticTextMeta
 import cc.mewcraft.wakame.display2.implementation.CustomStaticTextMeta
 import io.mockk.every
 import io.mockk.mockkClass
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Key.*
 import net.kyori.adventure.text.Component
@@ -504,7 +505,7 @@ private class IndexedTextFlatterLifecycle : KoinTest {
 
         // run runners
         for (runner in runners) {
-            val actual = flatter.flatten(runner.input)
+            val actual = flatter.flatten(ObjectArrayList(runner.input))
             val expected = runner.expected
             assertEquals0(expected, actual)
         }

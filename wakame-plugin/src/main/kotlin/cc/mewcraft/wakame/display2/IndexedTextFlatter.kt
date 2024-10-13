@@ -29,7 +29,7 @@ internal class IndexedTextFlatter(
      * @param indexedTexts a collection of [IndexedText] to be flattened
      * @return a sorted list of [Component]
      */
-    fun flatten(indexedTexts: Collection<IndexedText>): List<Component> {
+    fun flatten(indexedTexts: ObjectArrayList<IndexedText>): List<Component> {
         // 因为要排序, 并且更多的是插入操作, 所以使用 RBTreeSet
         val tree = ObjectRBTreeSet(textComparator)
 

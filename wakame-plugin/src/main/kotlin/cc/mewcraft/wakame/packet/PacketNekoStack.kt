@@ -2,12 +2,7 @@ package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.ItemSlotGroup
-import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.NekoStackSupport
-import cc.mewcraft.wakame.item.VanillaNekoStackRegistry
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
@@ -145,6 +140,44 @@ internal interface PacketNekoStack : NekoStack {
             packetItemStack.unsetComponent(ComponentTypes.CUSTOM_MODEL_DATA)
         }
     }
+
+    //<editor-fold desc="Show In Tooltip">
+    fun showAttributeModifiers(value: Boolean) {
+        packetItemStack.getComponent(ComponentTypes.ATTRIBUTE_MODIFIERS).getOrNull()?.takeUnless { it.modifiers.isEmpty() }?.isShowInTooltip = value
+    }
+
+    fun showCanBreak(value: Boolean) {
+        packetItemStack.getComponent(ComponentTypes.CAN_BREAK).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showCanPlaceOn(value: Boolean) {
+        packetItemStack.getComponent(ComponentTypes.CAN_PLACE_ON).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showDyedColor(value: Boolean) {
+        packetItemStack.getComponent(ComponentTypes.DYED_COLOR).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showEnchantments(value: Boolean) {
+        packetItemStack.getComponent(ComponentTypes.ENCHANTMENTS).getOrNull()?.takeUnless { it.isEmpty }?.isShowInTooltip = value
+    }
+
+    fun showJukeboxPlayable(value: Boolean) {
+        packetItemStack.getComponent(ComponentTypes.JUKEBOX_PLAYABLE).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showStoredEnchantments(value: Boolean) {
+        packetItemStack.getComponent(ComponentTypes.STORED_ENCHANTMENTS).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showTrim(value: Boolean) {
+        packetItemStack.getComponent(ComponentTypes.TRIM).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showUnbreakable(value: Boolean) {
+        // FIXME packetevents 不支持
+    }
+    //</editor-fold>
 }
 
 // 开发日记:

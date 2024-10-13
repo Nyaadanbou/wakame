@@ -119,7 +119,7 @@ object Initializer : KoinComponent, Listener {
         saveResource(LEVEL_GLOBAL_CONFIG_FILE)
         // saveResource(PROJECTILE_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(RARITY_GLOBAL_CONFIG_FILE)
-        saveResource(RENDERERS_CONFIG_DIR)
+        saveResourceRecursively(RENDERERS_CONFIG_DIR)
         // saveResource(SKIN_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
     }
 
