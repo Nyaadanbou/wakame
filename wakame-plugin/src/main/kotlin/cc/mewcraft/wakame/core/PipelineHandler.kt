@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.core
 
 /**
- * [cc.mewcraft.wakame.core.LorePipeline] 中的一环.
+ * [cc.mewcraft.wakame.core.Pipeline] 中的一环.
  */
 fun interface PipelineHandler<in C, in I, out O> {
 

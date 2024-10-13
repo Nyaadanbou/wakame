@@ -1,19 +1,19 @@
-package display
+package core
 
-import cc.mewcraft.wakame.core.LorePipeline
+import cc.mewcraft.wakame.core.Pipeline
 import cc.mewcraft.wakame.core.PipelineHandler
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class LorePipelineTest {
+class PipelineTest {
     @Test
     fun `test pipeline handler`() {
-        val pipelineResult1 = LorePipeline.create(StateLessHandler1)
+        val pipelineResult1 = Pipeline.create(StateLessHandler1)
             .concat(StateLessHandler2("Handler2"))
             .execute("Hello")
         assertEquals(Unit, pipelineResult1)
 
-        val pipelineResult2 = LorePipeline.create(StateHandler1)
+        val pipelineResult2 = Pipeline.create(StateHandler1)
             .concat(StateHandler2("Handler2"))
             .execute("Hello", "World")
         assertEquals("Hello World Hello", pipelineResult2)
