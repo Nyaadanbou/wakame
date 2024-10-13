@@ -1,3 +1,8 @@
+arrow:
+  namespace: ammo
+  tooltip:
+    - "<!i>穿透: <pierce_level>"
+
 attack_speed:
   namespace: topmost
   tooltip:
@@ -30,7 +35,7 @@ cells/skills:
 cells/empty:
   namespace: stash
   tooltip:
-    - "<!i>[ 空词条栏 ]"
+    - "[ 空词条栏 ]"
 
 crate:
   namespace: special

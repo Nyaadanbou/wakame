@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
 import net.kyori.adventure.text.Component
 
 internal class IndexedTextFlatter(
-    private val rendererLayout: RendererLayout
+    private val rendererLayout: RendererLayout,
 ) {
 
     private val textComparator: Comparator<IndexedText> = Comparator { o1, o2 ->

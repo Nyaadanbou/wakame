@@ -4,6 +4,18 @@
 #  一级节点本身的 key 将成为 RendererFormat#id
 #  一级节点的内容将成为 RendererFormat 的 property
 
+# id: `arrow`
+arrow:
+  namespace: ammo
+  # 可用标签
+  # <pierce_level> 穿透等级
+  # <fire_ticks> 箭矢本身的着火时间
+  # <hit_fire_ticks> 击中实体造成的着火时间
+  # <hit_frozen_ticks> 击中实体造成的冰冻时间
+  # <glow_ticks> 击中实体造成的发光时间
+  tooltip:
+    - "<!i>穿透: <pierce_level>"
+
 # id: `attack_speed`
 attack_speed:
   namespace: topmost
@@ -46,7 +58,7 @@ cells/skills:
 cells/empty:
   namespace: stash
   tooltip:
-    - "<!i>[ 空词条栏 ]"
+    - "[ 空词条栏 ]"
 
 # TODO 盲盒系统完成后重新考虑
 # id: `crate`

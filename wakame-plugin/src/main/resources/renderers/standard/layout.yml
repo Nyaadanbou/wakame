@@ -1,6 +1,9 @@
 primary:
   - (default:blank)topmost:attack_speed
 
+  - (fixed:ammo)
+  - ammo:arrow
+
   - (fixed:special)
   - special:crate
   - special:portable_core

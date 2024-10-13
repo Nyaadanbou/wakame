@@ -11,6 +11,8 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.templates.components.ItemArrow
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.packet.PacketNekoStack
@@ -54,9 +56,12 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
     override fun render(item: PacketNekoStack, context: StandardContext?) {
         requireNotNull(context) { "context" }
 
-        val components = item.components
         val collector = ObjectArrayList<IndexedText>()
 
+        val templates = item.templates
+        templates.process(ItemTemplateTypes.ARROW) { data -> StandardRenderingParts.ARROW.process(collector, data) }
+
+        val components = item.components
         components.process(ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingParts.ATTACK_SPEED.process(collector, data) }
         components.process(ItemComponentTypes.CELLS) { data ->
             for ((_, cell) in data) {
@@ -106,6 +111,10 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         // item.showUnbreakable(false)
     }
 
+    private inline fun <T : ItemTemplate<*>> ItemTemplateMap.process(type: ItemTemplateType<T>, block: (T) -> Unit) {
+        get(type)?.apply(block)
+    }
+
     private inline fun <T> ItemComponentMap.process(type: ItemComponentType<T>, block: (T) -> Unit) {
         get(type)?.apply(block)
     }
@@ -116,6 +125,17 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
 
 
 internal object StandardRenderingParts : RenderingParts() {
+    @JvmField
+    val ARROW: RenderingPart<ItemArrow, ListValueRendererFormat> = configure("arrow") { data, format ->
+        format.render(
+            Placeholder.component("pierce_level", Component.text(data.pierceLevel)),
+            Placeholder.component("fire_ticks", Component.text(data.fireTicks)),
+            Placeholder.component("hit_fire_ticks", Component.text(data.hitFireTicks)),
+            Placeholder.component("hit_frozen_ticks", Component.text(data.hitFrozenTicks)),
+            Placeholder.component("glow_ticks", Component.text(data.glowTicks)),
+        )
+    }
+
     @JvmField
     val ATTACK_SPEED: RenderingPart<ItemAttackSpeed, AttackSpeedRendererFormat> = configure("attack_speed") { data, format ->
         format.render(data.level)
@@ -426,7 +446,7 @@ internal data class SkillCoreTextMetaFactory(
     override val namespace: String,
 ) : TextMetaFactory {
     override fun test(sourceIndex: SourceIndex): Boolean {
-        // val key = Key.key( // 技能的标识
+        // val key = Key.key(
         //     sourceIndex.value().substringBefore('/'),
         //     sourceIndex.value().substringAfter('/')
         // )

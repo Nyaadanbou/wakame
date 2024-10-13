@@ -3,6 +3,9 @@
 primary:
   - (default:blank)topmost:attack_speed
 
+  - (fixed:ammo)000
+  - ammo:arrow
+
   - (fixed:general)111
   - general:level
   - general:rarity
