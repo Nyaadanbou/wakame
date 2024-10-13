@@ -81,8 +81,8 @@ internal abstract class RenderingParts {
 
     private inline fun <reified F : RendererFormat> provideFormat(id: String): Provider<F> {
         try {
-            val added = StandardItemRenderer.rendererFormats.register(id, typeOf<F>())
-            val format = StandardItemRenderer.rendererFormats.get0<F>(id)
+            val added = StandardItemRenderer.rendererFormats.registerType(id, typeOf<F>())
+            val format = StandardItemRenderer.rendererFormats.getProvider<F>(id)
             return format
         } catch (e: Exception) {
             throw ExceptionInInitializerError(e)

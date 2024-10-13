@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.*
+import cc.mewcraft.commons.provider.immutable.provider
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.util.krequire
@@ -30,7 +30,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
     /**
      * 所有已加载的 [RendererFormat] 实例.
      */
-    private val registeredFormats = HashMap<String, RendererFormat>()
+    private val registeredRendererFormats = HashMap<String, RendererFormat>()
 
     /**
      * 所有已加载的 [Provider] 实例, 记录引用以支持热重载渲染器.
@@ -40,7 +40,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
     /**
      * 配置文件 `id` -> 类型. 用于引导配置文件的序列化过程.
      */
-    private val formatTypeById = HashMap<String, KType>()
+    private val rendererFormatTypeById = HashMap<String, KType>()
 
     /**
      * 所有已加载的 [TextMetaFactory] 实例.
@@ -48,7 +48,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
     val textMetaFactoryRegistry = TextMetaFactoryRegistry()
 
     private fun cleanup() {
-        registeredFormats.clear()
+        registeredRendererFormats.clear()
         textMetaFactoryRegistry.reset()
     }
 
@@ -73,7 +73,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
         }
         val root = loader.buildAndLoadString(formatPath.readText())
 
-        for ((id, type) in formatTypeById) {
+        for ((id, type) in rendererFormatTypeById) {
             val node = root.node(id)
             if (node.virtual()) {
                 // TODO display2 当配置文件有缺省时, 支持回退到默认格式, 而不是直接抛异常
@@ -82,7 +82,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
             val format = node.krequire<RendererFormat>(type)
 
             // will overwrite the one already existing
-            registeredFormats[id] = format
+            registeredRendererFormats[id] = format
             // create & register the text meta factory
             textMetaFactoryRegistry.registerFactory(format.createTextMetaFactory()) // FIXME 传入必要的参数
 
@@ -93,9 +93,9 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
         registeredFormatProviders.forEach { provider -> provider.update() }
     }
 
-    fun register(id: String, type: KType): Boolean {
+    fun registerType(id: String, type: KType): Boolean {
         check(type.isSubtypeOf(typeOf<RendererFormat>())) { "Type '$type' is not a subtype of ${RendererFormat::class.simpleName}" }
-        val previous = formatTypeById.put(id, type)
+        val previous = rendererFormatTypeById.put(id, type)
         if (previous != null) {
             logger.warn("Renderer format '$id' is already registered with type $previous")
             return false
@@ -103,21 +103,21 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
         return true
     }
 
+    // 必须外面套个函数来访问 registeredFormats[id] 否则
+    // lambda 好像会被自动 inline ??? 有时间再摸索一下
     @Suppress("UNCHECKED_CAST")
-    fun <F : RendererFormat> get0(id: String): Provider<F> {
-        val provider = provider { registeredFormats[id] }
-            .requireNonNull("registeredFormats['$id']")
-            .map { it as F }
+    private fun <F : RendererFormat> getRegisteredFormat(id: String): F {
+        return (registeredRendererFormats[id] as F?) ?: error("Renderer format '$id' is not registered")
+    }
+
+    fun <F : RendererFormat> getProvider(id: String): Provider<F> {
+        val provider = provider { getRegisteredFormat<F>(id) }
         registeredFormatProviders += provider
         return provider
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun <F : RendererFormat> get(id: String): F? {
-        return registeredFormats[id] as F?
-    }
-
-    fun <T : RendererFormat> set(id: String, format: T) {
-        registeredFormats[id] = format
+        return registeredRendererFormats[id] as F?
     }
 }
