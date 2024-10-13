@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.util
 /**
  * 一个线程安全的计数器, 用于循环计数.
  */
-class ThreadLocalCyclingCounter(
+class ThreadLocalCounterCycle(
     private val limit: Int,
 ) {
     private companion object {
