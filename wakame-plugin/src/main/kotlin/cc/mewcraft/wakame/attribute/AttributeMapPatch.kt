@@ -17,6 +17,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
 import org.bukkit.persistence.PersistentDataAdapterContext
@@ -30,62 +31,104 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.util.*
 
-internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
+interface AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
     companion object {
-        private val PDC_KEY = NamespacedKey.fromString("wakame:attribute_modifiers") ?: error("Spoogot")
+        val PDC_KEY = NamespacedKey.fromString("wakame:attribute_modifiers") ?: error("Spoogot")
 
-        fun decode(owner: Attributable): AttributeMapPatch? {
+        fun create(): AttributeMapPatch {
+            return AttributeMapPatchImpl()
+        }
+
+        fun decode(owner: Attributable): AttributeMapPatch {
             if (owner !is PersistentDataHolder)
-                return null
-            return runCatching { owner.persistentDataContainer.get(PDC_KEY, AttributeMapPatchType.with(owner)) }
+                return create()
+            return runCatching { owner.persistentDataContainer.get(PDC_KEY, AttributeMapPatchType.with(owner)) ?: create() }
                 .onFailure {
                     owner.persistentDataContainer.remove(PDC_KEY)
                     AttributeMapPatchSupport.logger.error("Failed to decode AttributeMapPatch", it)
                 }
-                .getOrNull()
+                .getOrDefault(create())
         }
     }
 
-    private val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstance> = Reference2ObjectOpenHashMap()
-
+    /**
+     * 获取所有属性.
+     */
     val attributes: Set<Attribute>
-        get() = data.keys
-
-    operator fun set(attribute: Attribute, value: AttributeInstance) {
-        data[attribute] = value
-    }
-
-    operator fun get(attribute: Attribute): AttributeInstance? {
-        return data[attribute]
-    }
 
     /**
-     * 保存到 PDC.
+     * 设置指定属性的 AttributeInstance.
      */
-    fun saveTo(owner: Attributable) {
-        if (owner !is PersistentDataHolder)
-            return
-        val pdc = owner.persistentDataContainer
-        pdc.set(PDC_KEY, AttributeMapPatchType.with(owner), this)
-    }
+    operator fun set(attribute: Attribute, value: AttributeInstance)
+
+    /**
+     * 获取指定属性的 AttributeInstance.
+     */
+    operator fun get(attribute: Attribute): AttributeInstance?
+
+    /**
+     * 将本对象保存到 PDC.
+     */
+    fun saveTo(owner: Attributable)
+
+    /**
+     * 从指定的 [Attributable] 中移除所有属性.
+     */
+    fun removeFrom(owner: Attributable)
 
     /**
      * 从默认属性中移除所有未被修改的属性.
      */
-    fun trimBy(default: AttributeSupplier) {
+    fun trimBy(default: AttributeSupplier)
+
+    /**
+     * 判断是否为空.
+     */
+    fun isEmpty(): Boolean
+}
+
+private class AttributeMapPatchImpl : AttributeMapPatch {
+    private val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstance> = Reference2ObjectOpenHashMap()
+
+    override val attributes: Set<Attribute>
+        get() = data.keys
+
+    override operator fun set(attribute: Attribute, value: AttributeInstance) {
+        data[attribute] = value
+    }
+
+    override operator fun get(attribute: Attribute): AttributeInstance? {
+        return data[attribute]
+    }
+
+    override fun saveTo(owner: Attributable) {
+        if (owner !is PersistentDataHolder)
+            return
+        val pdc = owner.persistentDataContainer
+        pdc.set(AttributeMapPatch.PDC_KEY, AttributeMapPatchType.with(owner), this)
+    }
+
+    override fun removeFrom(owner: Attributable) {
+        if (owner !is PersistentDataHolder)
+            return
+        val pdc = owner.persistentDataContainer
+        pdc.remove(AttributeMapPatch.PDC_KEY)
+    }
+
+    override fun trimBy(default: AttributeSupplier) {
         for (attribute in default.attributes) {
             val patchedInstance = data[attribute] ?: continue
             val defaultBaseValue = default.getBaseValue(attribute)
             // 如果 patch 的 AttributeInstance 基值与默认基值相同,
             // 且 patch 的 AttributeInstance 没有任何 AttributeModifier,
             // 代表 patch 与默认提供完全一致, 移除 patch.
-            if (patchedInstance.getBaseValue() != defaultBaseValue && patchedInstance.getModifiers().isEmpty()) {
+            if (patchedInstance.getBaseValue() == defaultBaseValue && patchedInstance.getModifiers().isEmpty()) {
                 data.remove(attribute)
             }
         }
     }
 
-    fun isEmpty(): Boolean {
+    override fun isEmpty(): Boolean {
         return data.isEmpty()
     }
 
@@ -102,7 +145,7 @@ internal object AttributeMapPatchAccess {
     }
 
     fun getOrCreate(attributable: UUID): AttributeMapPatch {
-        return patches.computeIfAbsent(attributable, Object2ObjectFunction { AttributeMapPatch() })
+        return patches.computeIfAbsent(attributable, Object2ObjectFunction { AttributeMapPatch.create() })
     }
 
     fun put(attributable: UUID, patch: AttributeMapPatch) {
@@ -124,7 +167,7 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
             if (entity is Player) continue
             if (entity !is Attributable) continue
 
-            val patch = AttributeMapPatch.decode(entity) ?: continue
+            val patch = AttributeMapPatch.decode(entity)
             val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
             patch.trimBy(default)
 
@@ -133,16 +176,26 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
         }
     }
 
+    @EventHandler
+    fun on(e: CreatureSpawnEvent) {
+        // 玩家在世界中的生成不会触发 CreaturesSpawnEvent
+        val entity = e.entity
+        EntityAttributeAccessor.getAttributeMap(entity) // 初始化 AttributeMap
+    }
+
     // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
     @EventHandler
     fun on(e: EntitiesUnloadEvent) {
         for (entity in e.entities) {
             if (entity is Player) continue
             if (entity !is Attributable) continue
-
+            if (entity.customName() == null) continue
             val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: continue
-            if (patch.isEmpty())
+            if (patch.isEmpty()) {
+                patch.removeFrom(entity)
+                AttributeMapPatchAccess.remove(entity.uniqueId)
                 continue
+            }
             val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
 
             patch.trimBy(default)
@@ -197,7 +250,7 @@ private object AttributeMapPatchType {
                 val listTag = BinaryTagTypes.LIST.read(inputStream)
                 require(listTag.size() != 0) { "list is empty" }
                 require(listTag.elementType() == BinaryTagTypes.COMPOUND) { "element type is not compound" }
-                val patch = AttributeMapPatch()
+                val patch = AttributeMapPatch.create()
                 for (tag in listTag) {
                     val compound = tag as CompoundBinaryTag
                     val serializable = SerializableAttributeInstance.NBT_CODEC.decode(compound)
