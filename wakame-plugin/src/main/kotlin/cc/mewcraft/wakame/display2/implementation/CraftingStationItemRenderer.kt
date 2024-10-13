@@ -11,12 +11,11 @@ import java.nio.file.Path
 internal class CraftingStationContext
 
 internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, CraftingStationContext>() {
-    override var rendererLayout: RendererLayout
+    override val name: String = "crafting_station"
+    override val rendererLayout: RendererLayout
         get() = TODO("Not yet implemented")
-        set(value) {}
-    override var rendererFormats: RendererFormats
+    override val rendererFormats: RendererFormats
         get() = TODO("Not yet implemented")
-        set(value) {}
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 CraftingStation

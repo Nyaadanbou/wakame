@@ -36,6 +36,7 @@ internal class StandardRendererLayout(formats: AbstractRendererFormats) : Abstra
 internal object StandardContext // 等之后需要的时候, 改成 class 即可
 
 internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
+    override val name = "standard"
     override val rendererFormats = StandardRendererFormats()
     override val rendererLayout = StandardRendererLayout(rendererFormats)
     private val textFlatter = IndexedTextFlatter(rendererLayout)

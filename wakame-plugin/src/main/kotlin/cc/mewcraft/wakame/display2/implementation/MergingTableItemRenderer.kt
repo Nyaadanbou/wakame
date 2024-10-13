@@ -11,12 +11,11 @@ import java.nio.file.Path
 internal class MergingTableContext
 
 internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, MergingTableContext>() {
-    override var rendererLayout: RendererLayout
+    override val name: String = "merging_table"
+    override val rendererLayout: RendererLayout
         get() = TODO("display2 MeringTable")
-        set(value) {}
-    override var rendererFormats: RendererFormats
+    override val rendererFormats: RendererFormats
         get() = TODO("display2 MeringTable")
-        set(value) {}
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 MergingTable

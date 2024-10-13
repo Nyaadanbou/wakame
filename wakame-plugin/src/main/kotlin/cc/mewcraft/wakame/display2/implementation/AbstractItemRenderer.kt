@@ -4,16 +4,26 @@
 package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.commons.provider.Provider
+import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.initializer.Initializable
+import org.jetbrains.annotations.TestOnly
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.qualifier.named
 import org.slf4j.Logger
+import java.nio.file.Path
 import kotlin.reflect.typeOf
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */
 
-internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, KoinComponent {
+internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, Initializable, KoinComponent {
     protected val logger = get<Logger>()
+
+    /**
+     * 渲染器的名字, 用来定位配置文件和生成日志.
+     */
+    abstract val name: String
 
     /**
      * 渲染格式.
@@ -24,6 +34,22 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, K
      * 渲染布局.
      */
     abstract val rendererLayout: RendererLayout
+
+    override fun onPostWorld() = initialize0()
+    override fun onReload() = initialize0()
+
+    @TestOnly
+    fun initialize0() {
+        val renderersDirectory = get<Path>(named(PLUGIN_DATA_DIR)).resolve("renderers")
+        val formatPath = renderersDirectory.resolve(name).resolve(FORMAT_FILE_NAME)
+        val layoutPath = renderersDirectory.resolve(name).resolve(LAYOUT_FILE_NAME)
+        initialize(formatPath, layoutPath)
+    }
+
+    companion object {
+        const val LAYOUT_FILE_NAME = "layout.yml"
+        const val FORMAT_FILE_NAME = "formats.yml"
+    }
 }
 
 /* RenderingParts: 包含通用的代码 */

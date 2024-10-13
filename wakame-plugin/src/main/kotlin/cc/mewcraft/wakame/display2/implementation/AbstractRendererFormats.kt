@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.provider
+import cc.mewcraft.commons.provider.immutable.*
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.util.krequire
@@ -35,7 +35,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
     /**
      * 所有已加载的 [Provider] 实例, 记录引用以支持热重载渲染器.
      */
-    private val registeredFormatProviders = HashSet<Provider<RendererFormat>>()
+    private val registeredFormatProviders = HashSet<Provider<out RendererFormat>>()
 
     /**
      * 配置文件 `id` -> 类型. 用于引导配置文件的序列化过程.
@@ -47,9 +47,9 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
      */
     val textMetaFactoryRegistry = TextMetaFactoryRegistry()
 
-    fun cleanup() {
+    private fun cleanup() {
         registeredFormats.clear()
-        textMetaFactoryRegistry.clear()
+        textMetaFactoryRegistry.reset()
     }
 
     /**
@@ -58,15 +58,18 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
     fun initialize(formatPath: Path) {
         cleanup()
 
-        val factory = ObjectMapper.factoryBuilder()
-            .addNodeResolver(NodeResolver.nodeKey())
-            .addNodeResolver(NodeResolver.onlyWithSetting())
-            .addConstraint(Required::class.java, Constraint.required())
-            .addDiscoverer(dataClassFieldDiscoverer())
-            .build()
         val loader = yamlConfig {
             withDefaults()
-            serializers { registerAnnotatedObjects(factory) }
+            serializers {
+                registerAnnotatedObjects(
+                    ObjectMapper.factoryBuilder()
+                        .addNodeResolver(NodeResolver.nodeKey())
+                        .addNodeResolver(NodeResolver.onlyWithSetting())
+                        .addConstraint(Required::class.java, Constraint.required())
+                        .addDiscoverer(dataClassFieldDiscoverer())
+                        .build()
+                )
+            }
         }
         val root = loader.buildAndLoadString(formatPath.readText())
 
@@ -102,11 +105,10 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
 
     @Suppress("UNCHECKED_CAST")
     fun <F : RendererFormat> get0(id: String): Provider<F> {
-        val provider = provider {
-            val format = checkNotNull(registeredFormats[id]) { "registeredFormats['$id']" }
-            return@provider format as F
-        }
-        registeredFormatProviders += provider as Provider<RendererFormat>
+        val provider = provider { registeredFormats[id] }
+            .requireNonNull("registeredFormats['$id']")
+            .map { it as F }
+        registeredFormatProviders += provider
         return provider
     }
 

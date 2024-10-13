@@ -160,7 +160,7 @@ internal abstract class AbstractRendererLayout(
     private fun createTextMeta0(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): TextMeta? {
         val factory = rendererFormats.textMetaFactoryRegistry.getApplicableFactory(sourceIndex)
         if (factory == null) {
-            logger.warn("Can't find a valid text meta factory for source index '$sourceIndex'")
+            logger.warn("Can't find a valid TextMetaFactory for source index '$sourceIndex'")
             return null
         }
         return factory.create(sourceIndex, sourceOrdinal, defaultText)

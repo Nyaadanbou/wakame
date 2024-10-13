@@ -11,12 +11,11 @@ import java.nio.file.Path
 internal class ModdingTableContext
 
 internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, ModdingTableContext>() {
-    override var rendererLayout: RendererLayout
+    override val name: String = "modding_table"
+    override val rendererLayout: RendererLayout
         get() = TODO("display2 ModdingTable")
-        set(value) {}
-    override var rendererFormats: RendererFormats
+    override val rendererFormats: RendererFormats
         get() = TODO("display2 ModdingTable")
-        set(value) {}
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 ModdingTable

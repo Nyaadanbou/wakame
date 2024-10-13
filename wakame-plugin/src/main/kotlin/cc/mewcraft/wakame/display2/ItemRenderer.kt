@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.display2
 
 import cc.mewcraft.wakame.display2.implementation.*
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.packet.PacketNekoStack
 import java.nio.file.Path
 
 /**
@@ -10,22 +8,22 @@ import java.nio.file.Path
  */
 internal object ItemRenderers {
     @JvmField // 省去无用的函数调用
-    val STANDARD: ItemRenderer<PacketNekoStack, StandardContext> = StandardItemRenderer
+    val STANDARD = StandardItemRenderer
 
     @JvmField
-    val CRAFTING_STATION: ItemRenderer<NekoStack, CraftingStationContext> = CraftingStationItemRenderer
+    val CRAFTING_STATION = CraftingStationItemRenderer
 
     @JvmField
-    val MERGING_TABLE: ItemRenderer<NekoStack, MergingTableContext> = MergingTableItemRenderer
+    val MERGING_TABLE = MergingTableItemRenderer
 
     @JvmField
-    val MODDING_TABLE: ItemRenderer<NekoStack, ModdingTableContext> = ModdingTableItemRenderer
+    val MODDING_TABLE = ModdingTableItemRenderer
 
     @JvmField
-    val REROLLING_TABLE: ItemRenderer<NekoStack, RerollingTableContext> = RerollingTableItemRenderer
+    val REROLLING_TABLE = RerollingTableItemRenderer
 
     @JvmField
-    val RECYCLING_STATION: ItemRenderer<NekoStack, RecyclingStationContext> = RecyclingStationItemRenderer
+    val RECYCLING_STATION = RecyclingStationItemRenderer
 }
 
 /**
