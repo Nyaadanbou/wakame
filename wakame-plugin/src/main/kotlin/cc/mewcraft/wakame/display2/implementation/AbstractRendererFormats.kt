@@ -84,7 +84,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
             // will overwrite the one already existing
             registeredRendererFormats[id] = format
             // create & register the text meta factory
-            textMetaFactoryRegistry.registerFactory(format.createTextMetaFactory()) // FIXME 传入必要的参数
+            textMetaFactoryRegistry.registerFactory(format.createTextMetaFactory())
 
             logger.info("Loaded renderer format (${formatPath.parent.name}): $id")
         }
