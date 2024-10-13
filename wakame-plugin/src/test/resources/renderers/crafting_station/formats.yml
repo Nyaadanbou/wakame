@@ -51,12 +51,12 @@ enchantments:
 
 # id: `fire_resistant`
 fire_resistant:
-  namespace: general
+  namespace: vanilla
   tooltip: "<!i>免疫火焰"
 
 # id: `food`
 food:
-  namespace: general
+  namespace: vanilla
   tooltip: "<!i>可以食用"
 
 # id: `item_name`

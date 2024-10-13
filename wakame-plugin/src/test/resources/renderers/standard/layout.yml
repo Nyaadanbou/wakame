@@ -3,14 +3,11 @@
 primary:
   - (default:blank)topmost:attack_speed
 
-  - (fixed:general)通用
+  - (fixed:general)111
   - general:level
   - general:rarity
   - general:elements
   - general:kizamiz
-  - general:fire_resistant
-  - general:food
-  - (default:'无描述')general:lore
 
   - attribute:attack_damage
   - attribute:block_interaction_range
@@ -25,12 +22,14 @@ primary:
 
   - stash:cells/empty
 
-  - (fixed:vanilla)
+  - (fixed:vanilla)222
   - vanilla:enchantments
+  - vanilla:fire_resistant
+  - vanilla:food
 
-  - (fixed:special)其他
+  - (fixed:special)333
   - special:crate
   - special:portable_core
 
   - (fixed:general)
-  - general:lore
+  - (default:'无描述')general:lore

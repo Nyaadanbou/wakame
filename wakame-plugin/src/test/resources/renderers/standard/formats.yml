@@ -81,12 +81,12 @@ enchantments:
 
 # id: `fire_resistant`
 fire_resistant:
-  namespace: general
+  namespace: vanilla
   tooltip: "<!i>免疫火焰伤害"
 
 # id: `food`
 food:
-  namespace: general
+  namespace: vanilla
   # 原版 UI 不会显示物品的食物属性,
   # 所以这部分渲染由萌芽系统提供.
   #

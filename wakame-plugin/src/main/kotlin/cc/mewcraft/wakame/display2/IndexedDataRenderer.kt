@@ -18,7 +18,7 @@ fun interface IndexedDataRenderer<in T, in F> {
      *
      * @return 渲染后的文本
      */
-    fun render(data: T, spec: F): IndexedText // TODO: 考虑返回一个 Array<LoreLine> 来节省内存?
+    fun render(data: T, spec: F): IndexedText
 
 }
 

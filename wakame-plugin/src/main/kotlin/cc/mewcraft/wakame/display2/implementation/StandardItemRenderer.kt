@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.packet.PacketNekoStack
+import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.StringCombiner
@@ -117,7 +118,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
 internal object StandardRenderingParts : RenderingParts() {
     @JvmField
     val ATTACK_SPEED: RenderingPart<ItemAttackSpeed, AttackSpeedRendererFormat> = configure("attack_speed") { data, format ->
-        format.render(data)
+        format.render(data.level)
     }
 
     @JvmField
@@ -222,8 +223,8 @@ internal data class AttackSpeedRendererFormat(
         return SingleSimpleTextMetaFactory(namespace, id)
     }
 
-    fun render(data: ItemAttackSpeed): IndexedText {
-        val resolver = Placeholder.component("value", tooltip.level.getOrDefault(data.level.ordinal, UNKNOWN_LEVEL))
+    fun render(data: AttackSpeedLevel): IndexedText {
+        val resolver = Placeholder.component("value", tooltip.level.getOrDefault(data.ordinal, UNKNOWN_LEVEL))
         return SimpleIndexedText(index, listOf(MM.deserialize(tooltip.line, resolver)))
     }
 
