@@ -180,7 +180,7 @@ fun NekoStack.unsetSystemUse() {
  *
  * 底层物品必须拥有 `minecraft:custom_data` 组件, 并且其中存在 `wakame` 的复合标签.
  *
- * 该实现是可变的, 也就是说可以修改其中的属性.
+ * 该实现是 *可变的*.
  */
 private class CustomNekoStack(
     val handle: ItemStack,
@@ -192,6 +192,13 @@ private class CustomNekoStack(
 
     override val isEmpty: Boolean
         get() = false
+
+    override var isClientSide: Boolean
+        // 只要有这个标签就返回 true; 标签的类型可以用 ByteTag
+        get() = unsafeNyaTag.contains(NekoStack.CLIENT_SIDE_KEY)
+        set(value) =
+            if (value) unsafeNyaTag.putByte(NekoStack.CLIENT_SIDE_KEY, 0)
+            else unsafeNyaTag.remove(NekoStack.CLIENT_SIDE_KEY)
 
     override val itemType: Material
         get() = handle.type
@@ -262,7 +269,7 @@ private class CustomNekoStack(
  *
  * 仅用于封装原版物品的*类型*, 以便让原版物品拥有默认的萌芽特性.
  *
- * 该实现是不可变的, 也就是说不能修改其中的任何属性.
+ * 该实现是 *不可变的*.
  */
 internal class VanillaNekoStack(
     override val id: Key,
@@ -270,6 +277,10 @@ internal class VanillaNekoStack(
     override val components: ItemComponentMap,
 ) : NekoStack {
     override val isEmpty: Boolean = false
+    override var isClientSide: Boolean
+        get() = true
+        set(_) = unsupported()
+
     override val itemType: Material
         get() = unsupported()
     override val itemStack: ItemStack

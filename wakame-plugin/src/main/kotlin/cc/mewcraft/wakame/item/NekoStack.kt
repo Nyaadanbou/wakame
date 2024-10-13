@@ -29,6 +29,8 @@ interface NekoStack : Examinable {
      * 包含了获取特殊 [NekoStack] 实例的函数.
      */
     companion object {
+        const val CLIENT_SIDE_KEY = "client_side"
+
         /**
          * 获取一个空的 [NekoStack], 底层为 `minecraft:air`.
          *
@@ -46,6 +48,13 @@ interface NekoStack : Examinable {
      * 空物品没有任何作用, 也不会真的出现在世界状态中.
      */
     val isEmpty: Boolean
+
+    /**
+     * 检查该物品的样子是否仅存在于客户端.
+     * 如果为 `true`, 发包系统将修改此物品.
+     * 如果为 `false`, 发包系统将不会修改此物品.
+     */
+    var isClientSide: Boolean
 
     /**
      * 获取底层物品的类型.
@@ -236,6 +245,10 @@ object NekoStackDelegates {
 
 private object EmptyNekoStack : NekoStack {
     override val isEmpty: Boolean = true
+
+    override var isClientSide: Boolean
+        get() = false // 空物品不应该渲染
+        set(_) {}
 
     override val itemType: Material = Material.AIR
 

@@ -18,6 +18,10 @@ class MockNekoStack(
     override val isEmpty: Boolean
         get() = false
 
+    override var isClientSide: Boolean
+        get() = false
+        set(_) {}
+
     override val itemType: Material
         get() = throw NotImplementedError("Not implemented")
 
@@ -46,8 +50,7 @@ class MockNekoStack(
     override fun clone(): NekoStack =
         throw NotImplementedError("Not implemented")
 
-    override fun erase() =
-        Unit
+    override fun erase() = Unit
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", id.asString()),
