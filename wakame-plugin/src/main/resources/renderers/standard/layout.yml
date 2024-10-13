@@ -1,68 +1,33 @@
 primary:
-  - (default:'无皮肤')component:skin
+  - (default:blank)topmost:attack_speed
 
-  - (default:blank)component:skin_owner
+  - (fixed:general)通用
+  - general:level
+  - general:rarity
+  - general:elements
+  - general:kizamiz
+  - general:fire_resistant
+  - general:food
+  - (default:'无描述')general:lore
 
-  - component:damageable
-  - component:attributable
-  - component:kizamiable
-  - component:skillful
-  - component:castable
-
-  - (fixed:component)通用
-  - component:crate
-  - component:level
-  - component:rarity
-  - component:elements
-  - component:kizamiz
-  - component:arrow
-  - component:lore
-
-  - (fixed:attribute)属性
   - attribute:attack_damage
-  - attribute:attack_damage_rate
-  - attribute:attack_effect_chance
-  - attribute:attack_speed_level
   - attribute:block_interaction_range
   - attribute:critical_strike_chance
-  - attribute:critical_strike_power
   - attribute:defense
-  - attribute:defense_penetration
-  - attribute:defense_penetration_rate
   - attribute:entity_interaction_range
-  - attribute:health_regeneration
-  - attribute:incoming_damage_rate
-  - attribute:lifesteal
-  - attribute:manasteal
-  - attribute:mana_consumption_rate
-  - attribute:mana_regeneration
-  - attribute:max_absorption
   - attribute:max_health
-  - attribute:max_mana
   - attribute:movement_speed
-  - attribute:universal_attack_damage
-  - attribute:universal_defense
-  - attribute:universal_defense_penetration
-  - attribute:universal_defense_penetration_rate
-  # FIXME 需要正确的移除 universal_incoming_damage_rate
-  - attribute:universal_incoming_damage_rate
 
-  - (fixed:skill)技能
-  - skill:blink
-  - skill:frost
-  - skill:leapfrog
+  - skill:buff/potion_drop
 
-  - component:cells/empty
+  - stash:cells/empty
 
-element:
-  - neutral
-  - fire
-  - water
-  - wind
-  - earth
-  - thunder
+  - (fixed:vanilla)
+  - vanilla:enchantments
 
-operation:
-  - add
-  - multiply_base
-  - multiply_total
+  - (fixed:special)其他
+  - special:crate
+  - special:portable_core
+
+  - (fixed:general)
+  - general:lore

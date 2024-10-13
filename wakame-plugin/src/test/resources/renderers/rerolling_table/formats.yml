@@ -1,5 +1,6 @@
 # 在这里设置重造台的物品 *渲染内容*.
 
+# id: <有效的属性 id>
 cells/attributes:
   namespace: attribute
   ordinal:
@@ -15,19 +16,23 @@ cells/attributes:
       - multiply_base
       - multiply_total
 
+# id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
 cells/skills:
   namespace: skill
 
+# id: `cells/empty`
 cells/empty:
   namespace: stash
   tooltip: "<!i>[ 空词条栏 ]"
 
+# id: `custom_name`
 custom_name:
   namespace: "general"
   # 可用标签
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "<value>"
 
+# id: `elements`
 elements:
   namespace: general
   # 可用标签
@@ -38,18 +43,21 @@ elements:
     single: "<single>"
     separator: ", "
 
+# id: `item_name`
 item_name:
   namespace: "general"
   # 可用标签
   # <value> 物品的 `minecraft:item_name`
   tooltip: "<value>"
 
+# id: `level`
 level:
   namespace: "general"
   # 可用标签
   # <value> 等级值
   tooltip: "<!i>等级: <value>"
 
+# id: `rarity`
 rarity:
   namespace: general
   # 可用标签

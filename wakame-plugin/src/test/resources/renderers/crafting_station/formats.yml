@@ -1,11 +1,13 @@
 # 在这里设置合成站的物品 *渲染内容*.
 
+# id: `attack_speed`
 attack_speed:
   namespace: topmost
   # 可用标签
   # <value> 攻击速度值
   tooltip: "<!i>攻击速度: <value>"
 
+# id: `cells`
 cells:
   namespace: general
   # 可用标签
@@ -14,6 +16,7 @@ cells:
   tooltip: "<!i>词条数量: <min> - <max>"
 
 # TODO 盲盒系统完成后再重新考虑
+# id: `crate`
 crate:
   namespace: special
   # 可用标签
@@ -21,15 +24,18 @@ crate:
   # <name> 盲盒的名字
   tooltip: "<!i>盲盒: <name>(<id>)"
 
+# id: `custom_name`
 custom_name:
   namespace: general
   # 可用标签
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "<value>"
 
-# 元素种类是随机的, 因此需要将所有可能的结果都显示出来.
+# id: `elements`
 elements:
   namespace: general
+  # 元素种类是随机的, 因此需要将所有可能的结果都显示出来.
+  #
   # 可用标签
   # <count> 元素数量
   # <merged> 多个元素合并后的文本
@@ -39,26 +45,32 @@ elements:
     single: "<single>"
     separator: ", "
 
+# id: `enchantments`
 enchantments:
   namespace: vanilla
 
+# id: `fire_resistant`
 fire_resistant:
   namespace: general
   tooltip: "<!i>免疫火焰"
 
+# id: `food`
 food:
   namespace: general
   tooltip: "<!i>可以食用"
 
+# id: `item_name`
 item_name:
   namespace: general
   # 可用标签
   # <value> 物品的 `minecraft:item_name`
   tooltip: "<value>"
 
-# 铭刻种类是随机的, 因此需要将所有可能的结果都显示出来.
+# id: `kizamiz`
 kizamiz:
   namespace: general
+  # 铭刻种类是随机的, 因此需要将所有可能的结果都显示出来.
+  #
   # 可用标签
   # <count> 铭刻数量
   # <merged> 多个铭刻合并后的文本
@@ -68,6 +80,7 @@ kizamiz:
     single: "<single>"
     separator: ", "
 
+# id: `lore`
 lore:
   namespace: general
   # 可用标签
@@ -77,5 +90,6 @@ lore:
     header: [ ]
     bottom: [ ]
 
+# id: `portable_core`
 portable_core:
   namespace: special

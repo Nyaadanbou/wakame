@@ -1,103 +1,91 @@
-# 控制标准物品的 *渲染格式*.
+attack_speed:
+  namespace: topmost
+  tooltip:
+    line: "<!i>攻击速度: <value>"
+    level:
+      0: "非常慢"
+      1: "慢"
+      2: "普通"
+      3: "快"
+      4: "非常快"
 
-# 物品组件
-components:
+cells/attributes:
+  namespace: attribute
+  ordinal:
+    element:
+      - neutral
+      - fire
+      - water
+      - wind
+      - earth
+      - thunder
+    operation:
+      - add
+      - multiply_base
+      - multiply_total
 
-  attributable:
-    namespace: component
-    tooltip: "<!i>提供属性加成"
+cells/skills:
+  namespace: skill
 
-  castable:
-    namespace: component
-    tooltip: "<!i>可以施放技能"
+cells/empty:
+  namespace: stash
+  tooltip:
+    - "<!i>[ 空词条栏 ]"
 
-  cells:
-    namespace: component
-    max_visible_empty_cores: 10
-    empty_core:
-      name: "<!i>空词条栏"
-      lore: "<!i>空词条栏"
+crate:
+  namespace: special
+  tooltip: "<!i>盲盒: <name>"
 
-  # TODO 盲盒系统完成后再重新考虑
-  crate:
-    namespace: component
-    tooltip: "<!i>盲盒: <key>"
+custom_name:
+  namespace: general
+  tooltip: "<value>"
 
-  custom_name:
-    namespace: component
-    tooltip: "<!i><rarity_style><value>"
+elements:
+  namespace: general
+  tooltip:
+    merged: "<!i>元素: <merged>"
+    single: "<single>"
+    separator: ", "
 
-  elements:
-    namespace: component
-    tooltip:
-      merged: "<!i>元素: <merged>"
-      single: "<single>"
-      separator: ", "
+enchantments:
+  namespace: vanilla
 
-  # TODO 待附魔系统完成后再重新考虑
-  enchantments:
-    namespace: component
-    tooltip: "<name> <level>"
+fire_resistant:
+  namespace: general
+  tooltip: "<!i>免疫火焰伤害"
 
-  fire_resistant:
-    namespace: component
-    tooltip: "<!i>免疫火焰伤害"
+food:
+  namespace: general
+  tooltip:
+    - "<!i>饥饿值: <nutrition>"
+    - "<!i>饱和度: <saturation>"
+    - "<!i>食用时间: <eat_seconds>"
 
-  glowable:
-    namespace: component
-    tooltip: "可发光"
+item_name:
+  namespace: general
+  tooltip: "<value>"
 
-  item_name:
-    namespace: component
-    tooltip: "<rarity_style><rarity_name> <value>"
+kizamiz:
+  namespace: general
+  tooltip:
+    merged: "<!i>铭刻: <merged>"
+    single: "<single>"
+    separator: ", "
 
-  kizamiz:
-    namespace: component
-    tooltip:
-      merged: "<!i>铭刻: <merged>"
-      single: "<single>"
-      separator: ", "
+level:
+  namespace: general
+  tooltip: "<!i>等级: <value>"
 
-  kizamiable:
-    namespace: component
-    tooltip: "<!i>提供铭刻加成"
+lore:
+  namespace: general
+  tooltip:
+    line: "<!i><line>"
+    header: [ ] # 空列表代表完全没有，不代表空行
+    bottom: [ ]
 
-  level:
-    namespace: component
-    tooltip: "<!i>等级: <value>"
+portable_core:
+  namespace: special
 
-  lore:
-    namespace: component
-    tooltip:
-      line: "<!i><line>"
-      header: [ ] # 空列表代表完全没有，不代表空行
-      bottom: [ ]
-
-  max_damage:
-    namespace: component
-    tooltip: "<!i>最大耐久损耗: <max_damage>"
-
-  portable_core:
-    namespace: component
-    tooltip: { } # 取决于核心
-
-  rarity:
-    namespace: component
-    tooltip: "<!i>稀有度: <value>"
-
-  skillful:
-    namespace: component
-    tooltip: "<!i>提供技能加成"
-
-  skin:
-    namespace: component
-    tooltip: "<!i>皮肤: <skin_name>"
-
-  skin_owner:
-    namespace: component
-    tooltip: "<!i>皮肤所有者: <skin_owner_name>"
-
-  # TODO 待附魔系统完成后再重新考虑
-  stored_enchantments:
-    namespace: component
-    tooltip: "<name> <level>"
+rarity:
+  namespace: general
+  tooltip: "<!i>稀有度: <value>"

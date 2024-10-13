@@ -4,6 +4,7 @@
 #  一级节点本身的 key 将成为 RendererFormat#id
 #  一级节点的内容将成为 RendererFormat 的 property
 
+# id: `attack_speed`
 attack_speed:
   namespace: topmost
   tooltip:
@@ -18,6 +19,7 @@ attack_speed:
       3: "快"
       4: "非常快"
 
+# id: <有效的属性 id>
 cells/attributes:
   namespace: attribute
   # 排序相关设置
@@ -36,15 +38,18 @@ cells/attributes:
       - multiply_base
       - multiply_total
 
+# id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
 cells/skills:
   namespace: skill
 
+# id: `cells/empty`
 cells/empty:
   namespace: stash
   tooltip:
     - "<!i>[ 空词条栏 ]"
 
 # TODO 盲盒系统完成后重新考虑
+# id: `crate`
 crate:
   namespace: special
   # 可用标签
@@ -52,12 +57,14 @@ crate:
   # <name> 盲盒的名字
   tooltip: "<!i>盲盒: <name>"
 
+# id: `custom_name`
 custom_name:
   namespace: general
   # 可用标签
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "<value>"
 
+# id: `elements`
 elements:
   namespace: general
   # 可用标签
@@ -68,18 +75,21 @@ elements:
     single: "<single>"
     separator: ", "
 
-# 同时负责 `enchantments` 和 `stored_enchantments`
+# id: `enchantments`
 enchantments:
   namespace: vanilla
 
+# id: `fire_resistant`
 fire_resistant:
   namespace: general
   tooltip: "<!i>免疫火焰伤害"
 
-# 原版 UI 不会显示物品的食物属性,
-# 所以这部分渲染由萌芽系统提供.
+# id: `food`
 food:
   namespace: general
+  # 原版 UI 不会显示物品的食物属性,
+  # 所以这部分渲染由萌芽系统提供.
+  #
   # 可用标签
   # <nutrition> 食物增加的饥饿值
   # <saturation> 食物增加的饱和度
@@ -89,12 +99,14 @@ food:
     - "<!i>饱和度: <saturation>"
     - "<!i>食用时间: <eat_seconds>"
 
+# id: `item_name`
 item_name:
   namespace: general
   # 可用标签
   # <value> 物品的 `minecraft:item_name`
   tooltip: "<value>"
 
+# id: `kizamiz`
 kizamiz:
   namespace: general
   # 可用标签
@@ -105,12 +117,14 @@ kizamiz:
     single: "<single>"
     separator: ", "
 
+# id: `level`
 level:
   namespace: general
   # 可用标签
   # <value> 等级值
   tooltip: "<!i>等级: <value>"
 
+# id: `lore`
 lore:
   namespace: general
   # 可用标签：
@@ -120,9 +134,11 @@ lore:
     header: [ ] # 空列表代表完全没有，不代表空行
     bottom: [ ]
 
+# id: `portable_core`
 portable_core:
   namespace: special
 
+# id: `rarity`
 rarity:
   namespace: general
   # 可用标签
