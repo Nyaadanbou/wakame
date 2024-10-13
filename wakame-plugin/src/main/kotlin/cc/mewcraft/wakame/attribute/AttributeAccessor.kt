@@ -41,7 +41,6 @@ data object PlayerAttributeAccessor : KoinComponent, AttributeAccessor<Player>()
  */
 data object EntityAttributeAccessor : AttributeAccessor<LivingEntity>() {
     override fun getAttributeMap(subject: LivingEntity): AttributeMap {
-        // TODO add support for MythicMobs mobs
         return AttributeMap(subject)
     }
 }

@@ -326,8 +326,6 @@ internal class AttributeSupplierDeserializer(
         }
 
         fun build(): AttributeSupplierBuilder {
-            // TODO add support for MythicMobs entities
-
             // Create the builder. Inherit the parent builder if specified
             val builder = if (parentKey != null) {
                 requireNotNull(

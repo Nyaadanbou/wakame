@@ -189,7 +189,6 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
         for (entity in e.entities) {
             if (entity is Player) continue
             if (entity !is Attributable) continue
-            if (entity.customName() == null) continue
             val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: continue
             if (patch.isEmpty()) {
                 patch.removeFrom(entity)
