@@ -143,7 +143,7 @@ internal interface PacketNekoStack : NekoStack {
 
     //<editor-fold desc="Show In Tooltip">
     fun showAttributeModifiers(value: Boolean) {
-        packetItemStack.getComponent(ComponentTypes.ATTRIBUTE_MODIFIERS).getOrNull()?.takeUnless { it.modifiers.isEmpty() }?.isShowInTooltip = value
+        packetItemStack.getComponent(ComponentTypes.ATTRIBUTE_MODIFIERS).getOrNull()?.takeIf { it.modifiers.isNotEmpty() }?.isShowInTooltip = value
     }
 
     fun showCanBreak(value: Boolean) {
@@ -159,7 +159,7 @@ internal interface PacketNekoStack : NekoStack {
     }
 
     fun showEnchantments(value: Boolean) {
-        packetItemStack.getComponent(ComponentTypes.ENCHANTMENTS).getOrNull()?.takeUnless { it.isEmpty }?.isShowInTooltip = value
+        packetItemStack.getComponent(ComponentTypes.ENCHANTMENTS).getOrNull()?.takeIf { !it.isEmpty }?.isShowInTooltip = value
     }
 
     fun showJukeboxPlayable(value: Boolean) {
@@ -175,7 +175,7 @@ internal interface PacketNekoStack : NekoStack {
     }
 
     fun showUnbreakable(value: Boolean) {
-        // FIXME packetevents 不支持
+        // FIXME packetevents 不支持设置 `minecraft:unbreakable` 的 `show_in_tooltip`
     }
     //</editor-fold>
 }

@@ -29,7 +29,7 @@ data class ItemEnchantments(
     ) : ItemComponentType<ItemEnchantments> {
         override fun read(holder: ItemComponentHolder): ItemEnchantments? {
             val im = holder.item.itemMeta ?: return null
-            val enchantments = im.enchants
+            val enchantments = im.enchants.takeIf { it.isNotEmpty() } ?: return null
             val showInTooltip = !im.hasItemFlag(ItemFlag.HIDE_ENCHANTS)
             return ItemEnchantments(enchantments, showInTooltip)
         }
@@ -57,7 +57,7 @@ data class ItemEnchantments(
     ) : ItemComponentType<ItemEnchantments> {
         override fun read(holder: ItemComponentHolder): ItemEnchantments? {
             val im = holder.item.itemMeta as? EnchantmentStorageMeta ?: return null
-            val enchantments = im.enchants
+            val enchantments = im.enchants.takeIf { it.isNotEmpty() } ?: return null
             val showInTooltip = !im.hasItemFlag(ItemFlag.HIDE_STORED_ENCHANTS)
             return ItemEnchantments(enchantments, showInTooltip)
         }
