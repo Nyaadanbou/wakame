@@ -9,6 +9,7 @@ import org.slf4j.Logger
  * - 文本在提示框里的位置顺序 ([DerivedOrdinal])
  * - 文本在配置文件里的元数据 ([TextMeta])
  */
+@Deprecated("暂时无用, 相关接口已整合到 RendererLayout")
 class TextMetaQuery(
     private val ordinalMap: Map<DerivedIndex, DerivedOrdinal>,
     private val metadataMap: Map<DerivedIndex, TextMeta>,

@@ -6,21 +6,21 @@ package cc.mewcraft.wakame.display2.implementation
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.display2.*
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 
 internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, KoinComponent {
-    protected val logger by inject<Logger>()
-
-    /**
-     * 渲染布局.
-     */
-    abstract val rendererLayout: RendererLayout
+    protected val logger = get<Logger>()
 
     /**
      * 渲染格式.
      */
     abstract val rendererFormats: RendererFormats
+
+    /**
+     * 渲染布局.
+     */
+    abstract val rendererLayout: RendererLayout
 }
 
 /* RenderingPart */

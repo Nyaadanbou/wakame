@@ -18,7 +18,7 @@ internal object RecyclingStationItemRenderer : AbstractItemRenderer<NekoStack, R
         get() = TODO("display2 RecyclingStation")
         set(value) {}
 
-    override fun initialize(layoutPath: Path, formatPath: Path) {
+    override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 RecyclingStation
     }
 

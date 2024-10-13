@@ -1,28 +1,29 @@
-package display
+package display2
 
-import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.display.*
+import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.implementation.BlankStaticTextMeta
+import cc.mewcraft.wakame.display2.implementation.CustomStaticTextMeta
 import io.mockk.every
 import io.mockk.mockkClass
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Key.key
+import net.kyori.adventure.key.Key.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.koin.test.mock.*
+import org.koin.test.mock.MockProvider
+import org.koin.test.mock.declareMock
 import testEnv
 import kotlin.test.*
 
 /**
- * 测试 [LoreLineFlatter].
+ * 测试 [IndexedTextFlatter].
  *
- * 本测试使用了 [LoreLineFlatterLifecycle] 来快速构建测试用例.
+ * 本测试使用了 [IndexedTextFlatterLifecycle] 来快速构建测试用例.
  */
-class LoreLineFlatter2Test : KoinTest {
+class IndexedTextFlatterTest : KoinTest {
 
     // 每个 test 用到了不同的 RendererConfig 和
     // LoreMetaLookup, 因此需要在每个 test 前后
@@ -38,10 +39,6 @@ class LoreLineFlatter2Test : KoinTest {
             modules(
                 testEnv(),
             )
-
-            modules(module {
-                single<RendererConfig> { RendererConfigImpl(Configs.YAML[RENDERERS_CONFIG_DIR]) }
-            })
         }
     }
 
@@ -51,38 +48,37 @@ class LoreLineFlatter2Test : KoinTest {
     }
 
     // 每个测试都是手动定义好:
-    // - renderer config:
-    //   default lore lines
-    //   constant lore lines
-    // - lore meta lookup
-    // 不用配置文件生成的结果.
+    // - default indexed texts
+    //   static indexed texts
+    // - text ordinal map
+    //   text metadata map
+    //
+    // 而不用配置文件生成的结果,
     // 配置文件生成应该另外测试.
 
     /**
      * 情况:
-     * - input 覆盖了所有可能出现的 lore line
+     * - input 覆盖了所有可能出现的 indexed texts
      * 结果:
      * - 排列顺序完全正确
      * - 应该完全不采用默认值
      */
     @Test
-    fun `case 1`(): Unit = loreLineFlatterLifecycle {
-        rendererConfig {
+    fun `case 1`(): Unit = indexedTextFlatterLifecycle {
+        configure {
+            static {
+                // 添加两个固定的内容行.
+                // 不要忘记为它们配置好 text meta.
+                +staticIndexedText("fixed", "1")
+                +staticIndexedText("fixed", "2")
+            }
             default {
                 // 为 "a:1", "b:1", "c:1" 添加默认值;
                 // 如果这些数据不存在, 将采用这里的默认值;
-                +defaultLoreLine("a", "1")
-                +defaultLoreLine("b", "1")
-                +defaultLoreLine("c", "1")
+                +defaultIndexedText("a", "1")
+                +defaultIndexedText("b", "1")
+                +defaultIndexedText("c", "1")
             }
-            constant {
-                // 添加两个固定的内容行.
-                // 不要忘记为它们配置好 lore meta.
-                +constantLoreLine("fixed", "1")
-                +constantLoreLine("fixed", "2")
-            }
-        }
-        loreMetaLookup {
             index {
                 // 为每一个可能出现的内容指定好相对位置.
                 put("a", "1", 1)
@@ -98,10 +94,9 @@ class LoreLineFlatter2Test : KoinTest {
                 // 为每一个固定的内容行指定好元数据;
                 // 动态的内容行无需指定元数据, 因为它们仅仅是用来生成 renderer config,
                 // 而 renderer config 在这个测试中是完全手动定义的.
-                put("fixed", "1", LoreMetaBuilder.blankConstant(-1, null))
-                put("fixed", "2", LoreMetaBuilder.blankConstant(-1, null))
+                put("fixed", "1", TextMetaBuilder.blankStatic(-1, null))
+                put("fixed", "2", TextMetaBuilder.blankStatic(-1, null))
             }
-
         }
         runTest {
             expected {
@@ -120,13 +115,13 @@ class LoreLineFlatter2Test : KoinTest {
             }
             input {
                 // 设置实际的内容.
-                // 直接使用 LoreLine 的各种构建函数来构建实际内容.
-                +simpleCoreLoreLine("a", "2")
-                +simpleCoreLoreLine("a", "1")
-                +simpleCoreLoreLine("b", "2")
-                +simpleCoreLoreLine("b", "1")
-                +simpleCoreLoreLine("a", "3")
-                +simpleCoreLoreLine("c", "1")
+                // 直接使用 IndexedText 的各种构建函数来构建实际内容.
+                +plainIndexedText("a", "2")
+                +plainIndexedText("a", "1")
+                +plainIndexedText("b", "2")
+                +plainIndexedText("b", "1")
+                +plainIndexedText("a", "3")
+                +plainIndexedText("c", "1")
             }
         }
     }
@@ -134,27 +129,25 @@ class LoreLineFlatter2Test : KoinTest {
 
     /**
      * 情况:
-     * - input 没有覆盖所有可能的 lore line
+     * - input 没有覆盖所有可能的 indexed text
      * - 某些 input 在 renderer config 中拥有默认值
      * 结果:
      * - 排列顺序完全正确
-     * - 有 input 的 lore line 应该采用 input 本身的值
-     * - 没有 input 的 lore line 应该采用默认值
+     * - 有 input 的 indexed text 应该采用 input 本身的值
+     * - 没有 input 的 indexed text 应该采用默认值
      */
     @Test
-    fun `case 2`(): Unit = loreLineFlatterLifecycle {
-        rendererConfig {
+    fun `case 2`(): Unit = indexedTextFlatterLifecycle {
+        configure {
+            static {
+                +staticIndexedText("fixed", "1")
+                +staticIndexedText("fixed", "2")
+            }
             default {
-                +defaultLoreLine("a", "1")
-                +defaultLoreLine("b", "1")
-                +defaultLoreLine("c", "1")
+                +defaultIndexedText("a", "1")
+                +defaultIndexedText("b", "1")
+                +defaultIndexedText("c", "1")
             }
-            constant {
-                +constantLoreLine("fixed", "1")
-                +constantLoreLine("fixed", "2")
-            }
-        }
-        loreMetaLookup {
             index {
                 put("a", "1", 1)
                 put("a", "2", 2)
@@ -166,8 +159,8 @@ class LoreLineFlatter2Test : KoinTest {
                 put("fixed", "2", 8)
             }
             meta {
-                put("fixed", "1", LoreMetaBuilder.blankConstant(-1, null))
-                put("fixed", "2", LoreMetaBuilder.blankConstant(-1, null))
+                put("fixed", "1", TextMetaBuilder.blankStatic(-1, null))
+                put("fixed", "2", TextMetaBuilder.blankStatic(-1, null))
             }
         }
         runTest {
@@ -182,9 +175,9 @@ class LoreLineFlatter2Test : KoinTest {
                 simple("fixed", "2")
             }
             input {
-                +simpleCoreLoreLine("a", "2")
-                +simpleCoreLoreLine("a", "3")
-                +simpleCoreLoreLine("b", "2")
+                +plainIndexedText("a", "2")
+                +plainIndexedText("a", "3")
+                +plainIndexedText("b", "2")
             }
         }
     }
@@ -197,17 +190,15 @@ class LoreLineFlatter2Test : KoinTest {
      */
     @Test
     fun `case 3`() {
-        loreLineFlatterLifecycle {
-            rendererConfig {
-                default {
-                    +defaultLoreLine("a", "1", "foo")
-                    +defaultLoreLine("b", "1", "bar")
-                }
-                constant {
+        indexedTextFlatterLifecycle {
+            configure {
+                static {
                     // 没有固定内容
                 }
-            }
-            loreMetaLookup {
+                default {
+                    +defaultIndexedText("a", "1", "foo")
+                    +defaultIndexedText("b", "1", "bar")
+                }
                 index {
                     put("a", "1", 1)
                     put("b", "1", 2)
@@ -224,7 +215,7 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleCoreLoreLine("b", "1")
+                    +plainIndexedText("b", "1")
                 }
             }
             runTest { // 交换 a 和 b 的位置
@@ -235,7 +226,7 @@ class LoreLineFlatter2Test : KoinTest {
                     default("b", "1", "bar")
                 }
                 input {
-                    +simpleCoreLoreLine("a", "1")
+                    +plainIndexedText("a", "1")
                 }
             }
         }
@@ -249,24 +240,22 @@ class LoreLineFlatter2Test : KoinTest {
      */
     @Test
     fun `case 4`() {
-        loreLineFlatterLifecycle {
-            rendererConfig {
+        indexedTextFlatterLifecycle {
+            configure {
+                static {
+                    +staticIndexedText("fixed", "1")
+                }
                 default {
-                    +defaultLoreLine("a", "1")
-                    +defaultLoreLine("b", "1")
+                    +defaultIndexedText("a", "1")
+                    +defaultIndexedText("b", "1")
                 }
-                constant {
-                    +constantLoreLine("fixed", "1")
-                }
-            }
-            loreMetaLookup {
                 index {
                     put("fixed", "1", 1)
                     put("a", "1", 2)
                     put("b", "1", 3)
                 }
                 meta {
-                    put("fixed", "1", LoreMetaBuilder.blankConstant(-1, "a"))
+                    put("fixed", "1", TextMetaBuilder.blankStatic(-1, "a"))
                 }
             }
             runTest {
@@ -279,29 +268,27 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleCoreLoreLine("a", "1")
-                    +simpleCoreLoreLine("b", "1")
+                    +plainIndexedText("a", "1")
+                    +plainIndexedText("b", "1")
                 }
             }
         }
 
-        loreLineFlatterLifecycle {
-            rendererConfig {
+        indexedTextFlatterLifecycle {
+            configure {
+                static {
+                    +staticIndexedText("fixed", "1")
+                }
                 default {
-                    +defaultLoreLine("b", "1")
+                    +defaultIndexedText("b", "1")
                 }
-                constant {
-                    +constantLoreLine("fixed", "1")
-                }
-            }
-            loreMetaLookup {
                 index {
                     put("fixed", "1", 1)
                     put("a", "1", 2)
                     put("b", "1", 3)
                 }
                 meta {
-                    put("fixed", "1", LoreMetaBuilder.blankConstant(-1, "b"))
+                    put("fixed", "1", TextMetaBuilder.blankStatic(-1, "b"))
                 }
             }
             runTest {
@@ -313,8 +300,8 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleCoreLoreLine("a", "1")
-                    +simpleCoreLoreLine("b", "1")
+                    +plainIndexedText("a", "1")
+                    +plainIndexedText("b", "1")
                 }
             }
             runTest {
@@ -327,7 +314,7 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleCoreLoreLine("b", "1")
+                    +plainIndexedText("b", "1")
                 }
             }
         }
@@ -341,23 +328,21 @@ class LoreLineFlatter2Test : KoinTest {
      */
     @Test
     fun `case 5`() {
-        loreLineFlatterLifecycle {
-            rendererConfig {
+        indexedTextFlatterLifecycle {
+            configure {
+                static {
+                    +staticIndexedText("fixed", "1")
+                }
                 default {
                     // 无默认值
                 }
-                constant {
-                    +constantLoreLine("fixed", "1")
-                }
-            }
-            loreMetaLookup {
                 index {
                     put("fixed", "1", 1)
                     put("a", "1", 2)
                     put("b", "1", 3)
                 }
                 meta {
-                    put("fixed", "1", LoreMetaBuilder.blankConstant(-1, "*"))
+                    put("fixed", "1", TextMetaBuilder.blankStatic(-1, "*"))
                 }
             }
             runTest {
@@ -369,7 +354,7 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("a", "1")
                 }
                 input {
-                    +simpleCoreLoreLine("a", "1")
+                    +plainIndexedText("a", "1")
                 }
             }
             runTest {
@@ -381,7 +366,7 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("b", "1")
                 }
                 input {
-                    +simpleCoreLoreLine("b", "1")
+                    +plainIndexedText("b", "1")
                 }
             }
             runTest {
@@ -398,22 +383,21 @@ class LoreLineFlatter2Test : KoinTest {
 
     /**
      * 情况:
-     * - 添加多个完全相同的 lore line
+     * - 添加多个完全相同的 indexed text
      * 结果:
-     * - 应该只有一个 lore line 会被渲染
+     * - 应该只有一个 indexed text 会被渲染
      */
     @Test
     fun `case 6`() {
-        loreLineFlatterLifecycle {
-            rendererConfig {
-                default {
-                    +defaultLoreLine("a", "1")
-                }
-                constant {
+        indexedTextFlatterLifecycle {
+            configure {
+                static {
                     // 无固定内容
                 }
-            }
-            loreMetaLookup {
+                default {
+                    +defaultIndexedText("a", "1")
+                }
+
                 index {
                     put("a", "1", 1)
                 }
@@ -427,9 +411,9 @@ class LoreLineFlatter2Test : KoinTest {
                     simple("a", "1")
                 }
                 input {
-                    +simpleCoreLoreLine("a", "1")
-                    +simpleCoreLoreLine("a", "1")
-                    +simpleCoreLoreLine("a", "1")
+                    +plainIndexedText("a", "1")
+                    +plainIndexedText("a", "1")
+                    +plainIndexedText("a", "1")
                 }
             }
         }
@@ -444,19 +428,16 @@ private val Component.plain: String
 private fun listText(vararg text: String): List<Component> =
     text.map { Component.text(it) }
 
-// LoreLine 的构造函数
+// IndexedText 的构造函数
 
-private fun noopLoreLine(): LoreLine =
-    LoreLine.noop()
+private fun plainIndexedText(namespace: String, value: String): IndexedText =
+    SimpleIndexedText(key(namespace, value), listText("$namespace:$value"))
 
-private fun simpleCoreLoreLine(namespace: String, value: String): LoreLine =
-    LoreLine.simple(key(namespace, value), listText("$namespace:$value"))
+private fun defaultIndexedText(namespace: String, value: String, customText: String? = null): IndexedText =
+    SimpleIndexedText(key(namespace, value), listText("$namespace:$value@" + (customText ?: "default")))
 
-private fun defaultLoreLine(namespace: String, value: String, customText: String? = null): LoreLine =
-    LoreLine.simple(key(namespace, value), listText("$namespace:$value@" + (customText ?: "default")))
-
-private fun constantLoreLine(namespace: String, value: String): LoreLine =
-    LoreLine.constant(key(namespace, value), listText("$namespace:$value"))
+private fun staticIndexedText(namespace: String, value: String): IndexedText =
+    StaticIndexedText(key(namespace, value), listText("$namespace:$value"))
 
 // Assertion 扩展
 
@@ -470,46 +451,38 @@ private fun assertEquals0(expected: List<Component>, actual: List<Component>) {
 
 // 构建测试
 
-private fun loreLineFlatterLifecycle(init: LoreLineFlatterLifecycle.() -> Unit) {
-    LoreLineFlatterLifecycle().apply(init).buildAndTest()
+private fun indexedTextFlatterLifecycle(init: IndexedTextFlatterLifecycle.() -> Unit) {
+    IndexedTextFlatterLifecycle().apply(init).buildAndTest()
 }
 
 /**
- * 用于构建测试用例的辅助类. 使用 [loreLineFlatterLifecycle] 来构建测试用例.
+ * 用于构建测试用例的辅助类. 使用 [indexedTextFlatterLifecycle] 来构建测试用例.
  */
-@LoreLineFlatterDsl
-private class LoreLineFlatterLifecycle : KoinTest {
-    // renderer config
-    private lateinit var defaultLines: List<LoreLine>
-    private lateinit var constantLines: List<LoreLine>
+@IndexedTextFlatterDsl
+private class IndexedTextFlatterLifecycle : KoinTest {
+    // built configurations
+    private lateinit var defaultTexts: List<IndexedText>
+    private lateinit var staticTexts: List<IndexedText>
+    private lateinit var ordinalMap: Map<Key, Int>
+    private lateinit var metadataMap: Map<Key, TextMeta>
 
-    // lore meta lookup
-    private lateinit var loreMetaLookup: LoreMetaLookup
-
-    // all test runners
+    // built test runners
     private val runners: MutableList<TestRunner> = mutableListOf()
 
     // 构建 RendererConfig.
     // 目前的实现只需要构建:
-    // defaultLines - 拥有默认内容的 (Dynamic)LoreLine - 如果这些没有在 input 中出现, 在 makeFlatten 后将会变成 'namespace:value@default'
-    // constantLines - 始终要渲染的 (Constant)LoreLine - 无论 input 是什么, 都需要渲染的 LoreLine; 当然, 有些是有 companionNamespace 的
-    fun rendererConfig(block: RendererConfigBuilder.() -> Unit) {
-        val builder = RendererConfigBuilder().apply(block)
-        defaultLines = builder.defaultLines
-        constantLines = builder.constantLines
+    // defaultTexts - 拥有默认内容的 (Simple)IndexedText - 如果这些没有在 input 中出现, 在进行 flatten 后将会变成 'namespace:value@default'
+    // staticTexts - 始终要渲染的 (Static)IndexedText - 无论 input 是什么, 都需要渲染的 IndexedText; 当然, 有些是有 companionNamespace 的
+    fun configure(block: RendererLayoutBuilder.() -> Unit) {
+        val builder = RendererLayoutBuilder().apply(block)
+        defaultTexts = builder.defaultTexts
+        staticTexts = builder.staticTexts
+        ordinalMap = builder.ordinalMap
+        metadataMap = builder.metadataMap
     }
-
-    // 构建 LoreMetaLookup.
-    // 用于指定每个 LoreLine 的索引和元数据
-    fun loreMetaLookup(block: LoreMetaLookupBuilder.() -> Unit) {
-        val builder = LoreMetaLookupBuilder().apply(block)
-        loreMetaLookup = builder.build()
-    }
-
 
     fun runTest(block: TestRunner.() -> Unit) {
-        val runner = TestRunner().apply(block)
-        runners += runner
+        runners += TestRunner().apply(block)
     }
 
     // 用上面构建好的配置, 运行测试
@@ -517,18 +490,16 @@ private class LoreLineFlatterLifecycle : KoinTest {
         println()
 
         // configure injections
-        declareMock<RendererConfig> {
-            every { defaultLoreLines } returns defaultLines
-            every { constantLoreLines } returns constantLines
-        }
-        declare<LoreMetaLookup> {
-            loreMetaLookup
+        declareMock<RendererLayout> {
+            every { defaultIndexedTexts } returns defaultTexts
+            every { staticIndexedTexts } returns staticTexts
+            every { getOrdinal(any()) } answers { ordinalMap.getValue(firstArg()) }
+            every { getMetadata<TextMeta>(any()) } answers { metadataMap.getValue(firstArg()) }
         }
 
         // create flatter
-        val flatter = LoreLineFlatter(
-            rendererConfig = get(),
-            loreMetaLookup = get()
+        val flatter = IndexedTextFlatter(
+            rendererLayout = get(),
         )
 
         // run runners
@@ -539,109 +510,53 @@ private class LoreLineFlatterLifecycle : KoinTest {
         }
     }
 
-    @LoreLineFlatterDsl
-    class RendererConfigBuilder {
-        val defaultLines = mutableListOf<LoreLine>()
-        val constantLines = mutableListOf<LoreLine>()
+    @IndexedTextFlatterDsl
+    class RendererLayoutBuilder {
+        val defaultTexts = mutableListOf<IndexedText>()
+        val staticTexts = mutableListOf<IndexedText>()
+        val ordinalMap = mutableMapOf<Key, Int>() // key -> ordinal
+        val metadataMap = mutableMapOf<Key, TextMeta>() // key -> metadata
 
-        fun default(init: DefaultLineBuilder.() -> Unit) {
-            DefaultLineBuilder().apply(init).lines.forEach { defaultLines.add(it) }
+        fun meta(init: MetadataBuilder.() -> Unit) {
+            val builder = MetadataBuilder()
+            builder.init()
+            metadataMap.putAll(builder.map)
         }
 
-        fun constant(init: ConstantLineBuilder.() -> Unit) {
-            ConstantLineBuilder().apply(init).lines.forEach { constantLines.add(it) }
+        fun index(init: IndexBuilder.() -> Unit) {
+            val builder = IndexBuilder()
+            builder.init()
+            ordinalMap.putAll(builder.map)
         }
-    }
 
-    @LoreLineFlatterDsl
-    class DefaultLineBuilder {
-        val lines = mutableListOf<LoreLine>()
-
-        operator fun LoreLine.unaryPlus() {
-            lines.add(this)
+        fun static(init: ConstantTextBuilder.() -> Unit) {
+            ConstantTextBuilder().apply(init).texts.forEach { staticTexts.add(it) }
         }
-    }
 
-    @LoreLineFlatterDsl
-    class ConstantLineBuilder {
-        val lines = mutableListOf<LoreLine>()
-
-        operator fun LoreLine.unaryPlus() {
-            lines.add(this)
+        fun default(init: DefaultTextBuilder.() -> Unit) {
+            DefaultTextBuilder().apply(init).texts.forEach { defaultTexts.add(it) }
         }
     }
 
-    @LoreLineFlatterDsl
-    class ActualBuilder {
-        val lines = mutableListOf<LoreLine>()
+    @IndexedTextFlatterDsl
+    class DefaultTextBuilder {
+        val texts = mutableListOf<IndexedText>()
 
-        operator fun LoreLine.unaryPlus() {
-            // 不能直接在这里 makeFlatten, 因为 flatten
-            // 需要用到 renderer config 和 lore meta lookup,
-            // 而到这里还没有注入好这两个对象.
-            lines.add(this)
+        operator fun IndexedText.unaryPlus() {
+            texts.add(this)
         }
     }
 
-    @LoreLineFlatterDsl
-    class ExpectedBuilder {
-        val lines = mutableListOf<String>()
+    @IndexedTextFlatterDsl
+    class ConstantTextBuilder {
+        val texts = mutableListOf<IndexedText>()
 
-        // 内容存在于 input
-        fun simple(namespace: String, value: String) {
-            lines += "$namespace:$value"
-        }
-
-        // 内容不存在于 input, 但是 renderer config 里有默认值
-        fun default(namespace: String, value: String, customText: String? = null) {
-            lines += "$namespace:$value@" + (customText ?: "default")
+        operator fun IndexedText.unaryPlus() {
+            texts.add(this)
         }
     }
 
-    @LoreLineFlatterDsl
-    class TestRunner {
-        // expected & input
-        lateinit var expected: List<Component>
-        lateinit var input: List<LoreLine>
-
-        // 构建 input.
-        // 你需要把所有要渲染的 (Dynamic)LoreLine 通过这个函数添加;
-        // 注意不要添加 ConstantLoreLine, 这些会由 flatter 自己添加.
-        fun input(block: ActualBuilder.() -> Unit) {
-            val builder = ActualBuilder().apply(block)
-            input = builder.lines
-        }
-
-        // 构建 expected.
-        // 你需要指定最终渲染出来的文本内容*应该*是什么样子
-        fun expected(block: ExpectedBuilder.() -> Unit) {
-            val builder = ExpectedBuilder().apply(block)
-            expected = builder.lines.map { Component.text(it) }
-        }
-    }
-}
-
-/**
- * 用于构建 [LoreMetaLookup] 的辅助类, 配合 [buildLoreMetaLookup] 使用.
- */
-private class LoreMetaLookupBuilder {
-    private val indexes = mutableMapOf<Key, Int>()
-    private val metadata = mutableMapOf<Key, LoreMeta>()
-
-    fun index(init: IndexBuilder.() -> Unit) {
-        val builder = IndexBuilder()
-        builder.init()
-        indexes.putAll(builder.map)
-    }
-
-    fun meta(init: MetadataBuilder.() -> Unit) {
-        val builder = MetadataBuilder()
-        builder.init()
-        metadata.putAll(builder.map)
-    }
-
-    fun build(): LoreMetaLookup = LoreMetaLookup.create(indexes, metadata)
-
+    @IndexedTextFlatterDsl
     class IndexBuilder {
         val map = mutableMapOf<Key, Int>()
 
@@ -650,42 +565,85 @@ private class LoreMetaLookupBuilder {
         }
     }
 
+    @IndexedTextFlatterDsl
     class MetadataBuilder {
-        val map = mutableMapOf<Key, LoreMeta>()
+        val map = mutableMapOf<Key, TextMeta>()
 
-        fun put(namespace: String, value: String, meta: LoreMeta) {
+        fun put(namespace: String, value: String, meta: TextMeta) {
             map[key(namespace, value)] = meta
+        }
+    }
+
+    @IndexedTextFlatterDsl
+    class ActualBuilder {
+        val texts = mutableListOf<IndexedText>()
+
+        operator fun IndexedText.unaryPlus() {
+            // 不能直接在这里进行 flatten 操作, 因为 flatten
+            // 需要用到渲染的配置和 ordinal/metadata map,
+            // 而到这里还没有注入好这两个对象.
+            texts.add(this)
+        }
+    }
+
+    @IndexedTextFlatterDsl
+    class ExpectedBuilder {
+        val texts = mutableListOf<String>()
+
+        // 内容存在于 input
+        fun simple(namespace: String, value: String) {
+            texts += "$namespace:$value"
+        }
+
+        // 内容不存在于 input, 但是 renderer config 里有默认值
+        fun default(namespace: String, value: String, customText: String? = null) {
+            texts += "$namespace:$value@" + (customText ?: "default")
+        }
+    }
+
+    @IndexedTextFlatterDsl
+    class TestRunner {
+        // expected & input
+        lateinit var expected: List<Component>
+        lateinit var input: List<IndexedText>
+
+        // 构建 input.
+        // 你需要把所有要渲染的 (Simple)IndexedText 通过这个函数添加;
+        // 注意不要添加 (Static)IndexedText, 这些会由 flatter 自己添加.
+        fun input(block: ActualBuilder.() -> Unit) {
+            val builder = ActualBuilder().apply(block)
+            input = builder.texts
+        }
+
+        // 构建 expected.
+        // 你需要指定最终渲染出来的文本内容*应该*是什么样子
+        fun expected(block: ExpectedBuilder.() -> Unit) {
+            val builder = ExpectedBuilder().apply(block)
+            expected = builder.texts.map { Component.text(it) }
         }
     }
 }
 
 /**
- * 快速构建 [LoreMetaLookup].
+ * 快速构建 [TextMeta].
  */
-private fun buildLoreMetaLookup(init: LoreMetaLookupBuilder.() -> Unit): LoreMetaLookup {
-    return LoreMetaLookupBuilder().apply(init).build()
-}
-
-/**
- * 快速构建 [LoreMeta].
- */
-private object LoreMetaBuilder {
+private object TextMetaBuilder {
     // 固定的空白内容行
-    // 对于一个手动定义的 renderer config 来说,
-    // 这里的 rawTooltipIndex 实际上没有作用.
-    fun blankConstant(rawTooltipIndex: RawTooltipIndex, companionNamespace: String?): LoreMeta =
-        BlankConstantLoreMeta(rawTooltipIndex, companionNamespace)
+    // 对于一个手动定义的渲染配置来说,
+    // 这里的 source ordinal 实际上没有作用.
+    fun blankStatic(sourceOrdinal: SourceOrdinal, companionNamespace: String?): TextMeta =
+        BlankStaticTextMeta(sourceOrdinal, companionNamespace)
 
     // 固定的自定义内容行
-    // 对于一个手动定义的 renderer config 来说,
-    // 这里的 rawTooltipIndex 实际上没有作用.
-    fun customConstant(rawTooltipIndex: RawTooltipIndex, companionNamespace: String, vararg text: String): LoreMeta =
-        CustomConstantLoreMeta(rawTooltipIndex, companionNamespace, listText(*text))
+    // 对于一个手动定义的渲染配置来说,
+    // 这里的 source ordinal 实际上没有作用.
+    fun customStatic(sourceOrdinal: SourceOrdinal, companionNamespace: String, vararg text: String): TextMeta =
+        CustomStaticTextMeta(sourceOrdinal, companionNamespace, listText(*text))
 
     // 按照物品的数据动态生成的内容行
-    fun dynamic(): LoreMeta =
-        throw NotImplementedError() // 实际上不需要定义 dynamic lore meta, 因为这只是用来生成配置文件
+    fun simple(): TextMeta =
+        throw NotImplementedError() // 实际上不需要定义 simple text meta, 因为这只是用来生成配置文件
 }
 
 @DslMarker
-private annotation class LoreLineFlatterDsl
+private annotation class IndexedTextFlatterDsl

@@ -15,7 +15,7 @@ import testEnv
 import java.nio.file.Path
 import kotlin.test.Test
 
-class RendererFormatSerializationTest : KoinTest {
+class ItemRendererConfigTest : KoinTest {
     companion object {
         @JvmStatic
         @BeforeAll
@@ -68,8 +68,8 @@ class RendererFormatSerializationTest : KoinTest {
 
     private fun initialize(renderer: ItemRenderer<*, *>, id: String) {
         renderer.initialize(
-            layoutPath = renderersDirectory.resolve(id).resolve(LAYOUT_FILE),
-            formatPath = renderersDirectory.resolve(id).resolve(FORMATS_FILE)
+            formatPath = renderersDirectory.resolve(id).resolve(FORMATS_FILE),
+            layoutPath = renderersDirectory.resolve(id).resolve(LAYOUT_FILE)
         )
     }
 }

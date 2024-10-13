@@ -18,7 +18,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         get() = TODO("display2 ModdingTable")
         set(value) {}
 
-    override fun initialize(layoutPath: Path, formatPath: Path) {
+    override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 ModdingTable
     }
 

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.display2
 
+import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import net.kyori.adventure.key.Key
 
 // 开发日记 2024/9/17
@@ -31,12 +32,13 @@ interface RendererFormat {
      */
     val namespace: String
 
-    // TODO display2 设计上这里应该包含一个 TextMetaFactory 的实例, 用于生成 TextMeta.
+    // 开发日记 2024/10/13 小米
+    //  设计上这里应该包含一个 TextMetaFactory 的实例, 用于生成 TextMeta.
     //  这是因为创建 TextMeta 要求已知 namespace, 而 namespace
     //  只有在 RendererFormat 创建好之后才能知道. 因此获取 TextMetaFactory
     //  的职责由 RendererFormat 来承担就比较合适了.
 
-    // fun createTextMetaFactory(): TextMetaFactory
+    fun createTextMetaFactory(): TextMetaFactory
 
     /**
      * 代表一个索引在编译时已经确定的 [RendererFormat].
@@ -70,6 +72,7 @@ interface RendererFormat {
             override val id: String = "empty"
             override val index: Key = createIndex()
             override fun computeIndex(data: Nothing): Key = index
+            override fun createTextMetaFactory(): TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
         }
     }
 }

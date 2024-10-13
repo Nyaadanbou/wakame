@@ -53,12 +53,12 @@ internal interface ItemRenderer<in T, in C> {
      *
      * 实现必须读取配置文件, 然后更新实例的相应状态.
      *
-     * @param layoutPath *渲染布局* 的配置文件路径, 相对于插件数据文件夹
      * @param formatPath *渲染格式* 的配置文件路径, 相对于插件数据文件夹
+     * @param layoutPath *渲染布局* 的配置文件路径, 相对于插件数据文件夹
      */
     fun initialize(
-        layoutPath: Path,
         formatPath: Path,
+        layoutPath: Path,
     )
 
     /**

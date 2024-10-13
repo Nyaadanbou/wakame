@@ -10,12 +10,12 @@ import net.kyori.adventure.text.Component
  */
 interface TextMeta {
     /**
-     * 原始索引 (即配置文件的列表中, 未经衍生的字符串值).
+     * 原始索引 (即配置文件的列表中未经衍生的字符串).
      */
     val sourceIndex: SourceIndex
 
     /**
-     * 原始序数 (即配置文件的列表中, 所在的顺序位置).
+     * 原始序数 (即配置文件的列表中字符串所在的顺序).
      */
     val sourceOrdinal: SourceOrdinal
 
@@ -142,7 +142,7 @@ interface StaticTextMeta : TextMeta {
         // 经综合考虑, 固定内容的 SourceIndex 最好就是其在配置文件中原始索引的字符串形式
         // 例如, 这行固定内容位于列表中的第 3 个, 那么其 SourceIndex 就是 "fixed:3"
         // 这样刚好能保证不同的固定内容行都有唯一的 Index
-        get() = Key.key(STATIC_IDENTIFIER, sourceIndex.toString())
+        get() = Key.key(STATIC_IDENTIFIER, sourceOrdinal.toString())
 
     override fun generateIndexes(): List<DerivedIndex> {
         return listOf(sourceIndex)

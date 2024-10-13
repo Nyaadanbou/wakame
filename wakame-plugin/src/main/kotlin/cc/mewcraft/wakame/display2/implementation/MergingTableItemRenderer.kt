@@ -18,7 +18,7 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
         get() = TODO("display2 MeringTable")
         set(value) {}
 
-    override fun initialize(layoutPath: Path, formatPath: Path) {
+    override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 MergingTable
     }
 

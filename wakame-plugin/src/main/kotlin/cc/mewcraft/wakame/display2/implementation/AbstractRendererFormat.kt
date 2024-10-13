@@ -39,6 +39,10 @@ internal data class SingleValueRendererFormat(
 ) : RendererFormat.Simple {
     override val index: Key = createIndex()
 
+    override fun createTextMetaFactory(): TextMetaFactory {
+        return SingleSimpleTextMetaFactory(namespace, id)
+    }
+
     fun render(): IndexedText {
         return SimpleIndexedText(index, listOf(MM.deserialize(tooltip)))
     }
@@ -75,6 +79,10 @@ internal data class ListValueRendererFormat(
 ) : RendererFormat.Simple {
     override val index: Key = createIndex()
 
+    override fun createTextMetaFactory(): TextMetaFactory {
+        return SingleSimpleTextMetaFactory(namespace, id)
+    }
+
     fun render(): IndexedText {
         return SimpleIndexedText(index, tooltip.map(MM::deserialize))
     }
@@ -107,6 +115,10 @@ internal data class AggregateValueRendererFormat(
     private val tooltip: Tooltip, // mini message format
 ) : RendererFormat.Simple {
     override val index: Key = createIndex()
+
+    override fun createTextMetaFactory(): TextMetaFactory {
+        return SingleSimpleTextMetaFactory(namespace, id)
+    }
 
     /**
      * A convenience function to stylize a list of objects.
@@ -157,6 +169,10 @@ internal data class ExtraLoreRendererFormat(
     override val id: String = "lore"
     override val index: Key = Key.key(namespace, id)
 
+    override fun createTextMetaFactory(): TextMetaFactory {
+        return SingleSimpleTextMetaFactory(namespace, id)
+    }
+
     /**
      * @param data 额外的物品描述
      */
@@ -200,6 +216,10 @@ internal data class EnchantmentRendererFormat(
 ) : RendererFormat.Simple {
     override val id: String = "enchantments"
     override val index: Key = Key.key(namespace, id)
+
+    override fun createTextMetaFactory(): TextMetaFactory {
+        return SingleSimpleTextMetaFactory(namespace, id)
+    }
 
     /**
      * @param data 魔咒和等级的映射
