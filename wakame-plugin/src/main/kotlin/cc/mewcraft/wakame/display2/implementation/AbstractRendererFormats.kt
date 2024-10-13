@@ -93,7 +93,7 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
         registeredFormatProviders.forEach { provider -> provider.update() }
     }
 
-    fun registerType(id: String, type: KType): Boolean {
+    fun registerRendererFormatType(id: String, type: KType): Boolean {
         check(type.isSubtypeOf(typeOf<RendererFormat>())) { "Type '$type' is not a subtype of ${RendererFormat::class.simpleName}" }
         val previous = rendererFormatTypeById.put(id, type)
         if (previous != null) {
@@ -106,12 +106,12 @@ internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent
     // 必须外面套个函数来访问 registeredFormats[id] 否则
     // lambda 好像会被自动 inline ??? 有时间再摸索一下
     @Suppress("UNCHECKED_CAST")
-    private fun <F : RendererFormat> getRegisteredFormat(id: String): F {
+    private fun <F : RendererFormat> getRegisteredRendererFormat(id: String): F {
         return (registeredRendererFormats[id] as F?) ?: error("Renderer format '$id' is not registered")
     }
 
     fun <F : RendererFormat> getProvider(id: String): Provider<F> {
-        val provider = provider { getRegisteredFormat<F>(id) }
+        val provider = provider { getRegisteredRendererFormat<F>(id) }
         registeredFormatProviders += provider
         return provider
     }
