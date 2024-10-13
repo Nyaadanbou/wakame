@@ -1,14 +1,22 @@
 # 在这里设置标准物品的 *渲染格式*.
 
 # dev: 每个一级节点在代码里是一个 RendererFormat 对象
-#   一级节点本身的 key 将成为 RendererFormat.id
-#   一级节点的内容将成为 RendererFormat 的属性
+#  一级节点本身的 key 将成为 RendererFormat#id
+#  一级节点的内容将成为 RendererFormat 的 property
 
 attack_speed:
   namespace: topmost
-  # 可用标签
-  # <value> 攻击速度值
-  tooltip: "<!i>攻击速度: <value>"
+  tooltip:
+    # 可用标签
+    # <value> 攻击速度值
+    line: "<!i>攻击速度: <value>"
+    # 数值对应的描述
+    level:
+      0: "非常慢"
+      1: "慢"
+      2: "普通"
+      3: "快"
+      4: "非常快"
 
 cells/attributes:
   namespace: attribute

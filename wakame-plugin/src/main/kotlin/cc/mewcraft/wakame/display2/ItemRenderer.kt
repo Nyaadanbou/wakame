@@ -29,7 +29,7 @@ internal object ItemRenderers {
 }
 
 /**
- * 该接口是其他系统与渲染系统进行交互的入口.
+ * 该接口是其他系统与渲染系统进行交互的主要接口之一.
  *
  * 物品渲染器 [ItemRenderer] 负责修改物品的 *可见组件*,
  * 以便让玩家在特定的情景中, 能够了解到这个物品的基本信息.
@@ -64,10 +64,10 @@ internal interface ItemRenderer<in T, in C> {
     /**
      * 原地渲染物品 [item].
      *
-     * 实现上会根据上下文 [context] 产生不同结果.
+     * 实现上, 如果有需要, 可以根据 [context] 产生不同的渲染结果.
      *
-     * @param item 服务端上的物品堆叠
-     * @param context 本次渲染的上下文
+     * @param item 服务端上的物品堆叠, 也是需要被渲染的物品
+     * @param context 本次渲染的上下文, 是否可为 `null` 取决于实现
      */
     fun render(item: T, context: C? = null)
 }
@@ -79,4 +79,4 @@ internal interface ItemRenderer<in T, in C> {
 // 而有些 ItemRenderer 可能是基于 ItemComponent 和 ItemTemplate 两者的结合产生若干个 IndexedText.
 //
 // 作为 ItemRenderer 的用户, 99% 的情况下只需要 render 函数.
-// 当然, 用户必须传入正确的 context, 否则渲染不会生效 (无操作 + 记录).
+// 当然, 用户必须传入正确的 context, 否则渲染不会生效 (NoOp+Log).

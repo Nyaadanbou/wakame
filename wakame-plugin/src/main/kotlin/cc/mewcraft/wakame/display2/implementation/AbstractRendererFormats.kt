@@ -22,6 +22,8 @@ import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.typeOf
 
+/* 这里定义了可以在不同渲染器之间通用的 RendererFormats 实现 */
+
 internal abstract class AbstractRendererFormats : RendererFormats, KoinComponent {
     protected val logger = get<Logger>()
 

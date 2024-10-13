@@ -18,7 +18,7 @@ import org.spongepowered.configurate.objectmapping.meta.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 
-/* 这里定义了常见的 RendererFormat 的实现/接口 */
+/* 这里定义了可以在不同渲染器之间通用的 RendererFormat 实现 */
 
 /**
  * 一种最简单的渲染格式.

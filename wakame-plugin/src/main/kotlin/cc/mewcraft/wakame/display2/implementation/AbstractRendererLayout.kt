@@ -15,6 +15,8 @@ import org.spongepowered.configurate.kotlin.extensions.getList
 import java.nio.file.Path
 import kotlin.io.path.readText
 
+/* 这里定义了可以在不同渲染器之间通用的 RendererLayout 实现 */
+
 internal abstract class AbstractRendererLayout(
     protected val rendererFormats: AbstractRendererFormats,
 ) : RendererLayout, KoinComponent {
@@ -22,13 +24,13 @@ internal abstract class AbstractRendererLayout(
         val UNPROCESSED_PRIMARY_LINE_PATTERN = "^(?>\\((.+?)\\))?(.*)$".toPattern()
     }
 
-    override val staticIndexedTexts: ArrayList<IndexedText> = ArrayList()
-    override val defaultIndexedTexts: ArrayList<IndexedText> = ArrayList()
-
     protected val mm = get<MiniMessage>()
     protected val logger = get<Logger>()
-    protected val textOrdinalMap = Object2IntOpenHashMap<DerivedIndex>().apply { defaultReturnValue(-1) }
-    protected val textMetadataMap = Object2ObjectOpenHashMap<DerivedIndex, TextMeta>()
+
+    override val staticIndexedTexts: ArrayList<IndexedText> = ArrayList()
+    override val defaultIndexedTexts: ArrayList<IndexedText> = ArrayList()
+    private val textOrdinalMap = Object2IntOpenHashMap<DerivedIndex>().apply { defaultReturnValue(-1) }
+    private val textMetadataMap = Object2ObjectOpenHashMap<DerivedIndex, TextMeta>()
 
     /**
      * 初始化本实例的所有状态.
@@ -65,9 +67,8 @@ internal abstract class AbstractRendererLayout(
                 val txt = textMeta.contents
                 staticIndexedTexts += StaticIndexedText(idx, txt)
             }
-
             // populate the indexed text with default contents
-            if (textMeta is SimpleTextMeta) {
+            else if (textMeta is SimpleTextMeta) {
                 val defaultIndexedText = textMeta.createDefault()
                 if (defaultIndexedText != null) {
                     defaultIndexedTexts += defaultIndexedText

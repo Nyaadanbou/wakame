@@ -121,7 +121,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
             return false
         }
         try {
-            ItemRenderers.STANDARD.render(nekoStack, StandardContext())
+            ItemRenderers.STANDARD.render(nekoStack, StandardContext)
         } catch (e: Throwable) {
             logger.error("An error occurred while rendering NekoStack: $this", e)
             return false
