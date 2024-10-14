@@ -11,7 +11,7 @@ import org.spongepowered.configurate.objectmapping.meta.Setting;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class AdvancedConfigTest {
+class ObjectMapperTest {
 
     @ConfigSerializable
     static class DatabaseConfig {
