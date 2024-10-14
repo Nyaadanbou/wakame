@@ -3,19 +3,19 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.wakame.display2.RendererFormats
-import cc.mewcraft.wakame.display2.RendererLayout
 import cc.mewcraft.wakame.item.NekoStack
 import java.nio.file.Path
+
+internal class MergingTableRendererFormats(renderer: MergingTableItemRenderer) : AbstractRendererFormats(renderer)
+
+internal class MergingTableRendererLayout(renderer: MergingTableItemRenderer) : AbstractRendererLayout(renderer)
 
 internal class MergingTableContext
 
 internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, MergingTableContext>() {
     override val name: String = "merging_table"
-    override val rendererLayout: RendererLayout
-        get() = TODO("display2 MeringTable")
-    override val rendererFormats: RendererFormats
-        get() = TODO("display2 MeringTable")
+    override val rendererFormats = MergingTableRendererFormats(this)
+    override val rendererLayout = MergingTableRendererLayout(this)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 MergingTable

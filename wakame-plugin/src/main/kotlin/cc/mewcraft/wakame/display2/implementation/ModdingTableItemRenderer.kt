@@ -3,19 +3,19 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.wakame.display2.RendererFormats
-import cc.mewcraft.wakame.display2.RendererLayout
 import cc.mewcraft.wakame.item.NekoStack
 import java.nio.file.Path
+
+internal class ModdingTableRendererFormats(renderer: ModdingTableItemRenderer) : AbstractRendererFormats(renderer)
+
+internal class ModdingTableRendererLayout(renderer: ModdingTableItemRenderer) : AbstractRendererLayout(renderer)
 
 internal class ModdingTableContext
 
 internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, ModdingTableContext>() {
     override val name: String = "modding_table"
-    override val rendererLayout: RendererLayout
-        get() = TODO("display2 ModdingTable")
-    override val rendererFormats: RendererFormats
-        get() = TODO("display2 ModdingTable")
+    override val rendererFormats = ModdingTableRendererFormats(this)
+    override val rendererLayout = ModdingTableRendererLayout(this)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 ModdingTable

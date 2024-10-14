@@ -28,12 +28,12 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, I
     /**
      * 渲染格式.
      */
-    abstract val rendererFormats: RendererFormats
+    abstract val rendererFormats: AbstractRendererFormats
 
     /**
      * 渲染布局.
      */
-    abstract val rendererLayout: RendererLayout
+    abstract val rendererLayout: AbstractRendererLayout
 
     @TestOnly
     fun initialize0() {

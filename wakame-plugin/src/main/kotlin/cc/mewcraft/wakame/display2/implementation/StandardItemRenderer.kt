@@ -32,16 +32,16 @@ import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
 import java.nio.file.Path
 
-internal class StandardRendererFormats : AbstractRendererFormats()
+internal class StandardRendererFormats(renderer: StandardItemRenderer) : AbstractRendererFormats(renderer)
 
-internal class StandardRendererLayout(formats: AbstractRendererFormats) : AbstractRendererLayout(formats)
+internal class StandardRendererLayout(renderer: StandardItemRenderer) : AbstractRendererLayout(renderer)
 
 internal data object StandardContext // 等之后需要的时候, 改成 class 即可
 
 internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
     override val name = "standard"
-    override val rendererFormats = StandardRendererFormats()
-    override val rendererLayout = StandardRendererLayout(rendererFormats)
+    override val rendererFormats = StandardRendererFormats(this)
+    override val rendererLayout = StandardRendererLayout(this)
     private val textFlatter = IndexedTextFlatter(rendererLayout)
 
     override fun initialize(

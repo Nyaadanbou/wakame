@@ -18,7 +18,7 @@ import kotlin.io.path.readText
 /* 这里定义了可以在不同渲染器之间通用的 RendererLayout 实现 */
 
 internal abstract class AbstractRendererLayout(
-    protected val rendererFormats: AbstractRendererFormats,
+    protected val renderer: AbstractItemRenderer<*, *>,
 ) : RendererLayout, KoinComponent {
     companion object Shared {
         val UNPROCESSED_PRIMARY_LINE_PATTERN = "^(?>\\((.+?)\\))?(.*)$".toPattern()
@@ -158,7 +158,7 @@ internal abstract class AbstractRendererLayout(
     }
 
     private fun createTextMeta0(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): TextMeta? {
-        val factory = rendererFormats.textMetaFactoryRegistry.getApplicableFactory(sourceIndex)
+        val factory = renderer.rendererFormats.textMetaFactoryRegistry.getApplicableFactory(sourceIndex)
         if (factory == null) {
             logger.warn("Can't find a valid TextMetaFactory for source index '$sourceIndex'")
             return null
