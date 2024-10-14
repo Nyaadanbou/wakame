@@ -8,10 +8,10 @@ import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import cc.mewcraft.wakame.attribute.composite.*
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.*
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.ItemArrow
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
@@ -42,7 +42,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
     override val name = "standard"
     override val rendererFormats = StandardRendererFormats(this)
     override val rendererLayout = StandardRendererLayout(this)
-    private val textFlatter = IndexedTextFlatter(rendererLayout)
+    private val indexedTextListTransformer = IndexedTextListTransformer(rendererLayout)
 
     override fun initialize(
         formatPath: Path,
@@ -87,36 +87,22 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingParts.PORTABLE_CORE.process(collector, data) }
         components.process(ItemComponentTypes.RARITY) { data -> StandardRenderingParts.RARITY.process(collector, data) }
 
-        val minecraftLore = textFlatter.flatten(collector)
+        val minecraftLore = indexedTextListTransformer.flatten(collector)
         val minecraftCmd = ItemModelDataLookup[item.id, item.variant]
 
-        // 更新描述
-        item.lore(minecraftLore)
-
-        // 更新模型
-        item.customModelData(minecraftCmd)
-
-        // 擦除萌芽NBT
         // item.erase()
 
-        // 隐藏客户端渲染
+        item.lore(minecraftLore)
+        item.customModelData(minecraftCmd)
         item.showAttributeModifiers(false)
         // item.showCanBreak(false)
         // item.showCanPlaceOn(false)
         // item.showDyedColor(false)
         item.showEnchantments(false)
         // item.showJukeboxPlayable(false)
-        // item.showStoredEnchantments(false)
+        item.showStoredEnchantments(false)
         // item.showTrim(false)
         // item.showUnbreakable(false)
-    }
-
-    private inline fun <T> ItemTemplateMap.process(type: ItemTemplateType<T>, block: (T) -> Unit) {
-        get(type)?.apply(block)
-    }
-
-    private inline fun <T> ItemComponentMap.process(type: ItemComponentType<T>, block: (T) -> Unit) {
-        get(type)?.apply(block)
     }
 }
 

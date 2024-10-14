@@ -57,7 +57,6 @@ class StationMenu(
      */
     val stationSession = StationSession(station, viewer)
 
-
     /**
      * 合成站菜单的 [Gui].
      * 'X': background
@@ -108,7 +107,6 @@ class StationMenu(
     init {
         update()
     }
-
 
     /**
      * 背景占位的图标 [Item].

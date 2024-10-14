@@ -7,6 +7,10 @@ import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.item.component.ItemComponentMap
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.template.ItemTemplateMap
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import org.jetbrains.annotations.TestOnly
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -33,6 +37,20 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, I
      * 渲染布局.
      */
     abstract val rendererLayout: AbstractRendererLayout
+
+    /**
+     * 方便函数.
+     */
+    protected inline fun <T> ItemTemplateMap.process(type: ItemTemplateType<T>, block: (T) -> Unit) {
+        get(type)?.apply(block)
+    }
+
+    /**
+     * 方便函数.
+     */
+    protected inline fun <T> ItemComponentMap.process(type: ItemComponentType<T>, block: (T) -> Unit) {
+        get(type)?.apply(block)
+    }
 
     @TestOnly
     fun initialize0() {

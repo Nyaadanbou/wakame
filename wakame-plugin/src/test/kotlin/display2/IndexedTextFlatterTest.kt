@@ -20,7 +20,7 @@ import testEnv
 import kotlin.test.*
 
 /**
- * 测试 [IndexedTextFlatter].
+ * 测试 [IndexedTextListTransformer].
  *
  * 本测试使用了 [IndexedTextFlatterLifecycle] 来快速构建测试用例.
  */
@@ -499,7 +499,7 @@ private class IndexedTextFlatterLifecycle : KoinTest {
         }
 
         // create flatter
-        val flatter = IndexedTextFlatter(
+        val flatter = IndexedTextListTransformer(
             rendererLayout = get(),
         )
 

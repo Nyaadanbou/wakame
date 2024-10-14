@@ -7,14 +7,14 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.CustomName
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.ItemName
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.FireResistant
 import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
@@ -25,8 +25,7 @@ import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.util.backingCustomModelData
-import cc.mewcraft.wakame.util.backingLore
+import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -61,7 +60,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
     override val name: String = "crafting_station"
     override val rendererFormats = CraftingStationRendererFormats(this)
     override val rendererLayout = CraftingStationRendererLayout(this)
-    private val indexedTextFlatter = IndexedTextFlatter(rendererLayout)
+    private val indexedTextListTransformer = IndexedTextListTransformer(rendererLayout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         CraftingStationRenderingParts.bootstrap()
@@ -82,6 +81,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         templates.process(ItemTemplateTypes.CRATE) { data -> CraftingStationRenderingParts.CRATE.process(collector, data) }
         templates.process(ItemTemplateTypes.ELEMENTS) { data -> CraftingStationRenderingParts.ELEMENTS.process(collector, data) }
         templates.process(ItemTemplateTypes.FIRE_RESISTANT) { data -> CraftingStationRenderingParts.FIRE_RESISTANT.process(collector, data) }
+        templates.process(ItemTemplateTypes.KIZAMIZ) { data -> CraftingStationRenderingParts.KIZAMIZ.process(collector, data) }
         templates.process(ItemTemplateTypes.LORE) { data -> CraftingStationRenderingParts.LORE.process(collector, data) }
 
         val components = item.components
@@ -91,21 +91,23 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         components.process(ItemComponentTypes.ITEM_NAME) { data -> CraftingStationRenderingParts.ITEM_NAME.process(collector, data) }
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> CraftingStationRenderingParts.PORTABLE_CORE.process(collector, data) }
 
-        val minecraftLore = indexedTextFlatter.flatten(collector)
+        val minecraftLore = indexedTextListTransformer.flatten(collector)
         val minecraftCmd = ItemModelDataLookup[item.id, item.variant]
+
+        // item.erase()
 
         val handle = item.unsafe.handle
         handle.backingLore = minecraftLore
         handle.backingCustomModelData = minecraftCmd
-        // item.erase()
-    }
-
-    private inline fun <T> ItemTemplateMap.process(type: ItemTemplateType<T>, block: (T) -> Unit) {
-        get(type)?.apply(block)
-    }
-
-    private inline fun <T> ItemComponentMap.process(type: ItemComponentType<T>, block: (T) -> Unit) {
-        get(type)?.apply(block)
+        handle.showAttributeModifiers(false)
+        // handle.showCanBreak(false)
+        // handle.showCanPlaceOn(false)
+        // handle.showDyedColor(false)
+        handle.showEnchantments(false)
+        // handle.showJukeboxPlayable(false)
+        handle.showStoredEnchantments(false)
+        // handle.showTrim(false)
+        // handle.showUnbreakable(false)
     }
 }
 
