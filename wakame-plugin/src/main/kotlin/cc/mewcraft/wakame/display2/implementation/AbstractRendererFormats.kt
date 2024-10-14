@@ -19,7 +19,6 @@ import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.io.path.*
 import kotlin.reflect.KType
-import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.typeOf
 
 /* 这里定义了可以在不同渲染器之间通用的 RendererFormats 实现 */
@@ -95,9 +94,8 @@ internal abstract class AbstractRendererFormats(
         registeredFormatProviders.forEach { provider -> provider.update() }
     }
 
-    fun registerRendererFormatType(id: String, type: KType): Boolean {
-        check(type.isSubtypeOf(typeOf<RendererFormat>())) { "Type '$type' is not a subtype of ${RendererFormat::class.simpleName}" }
-        val previous = rendererFormatTypeById.put(id, type)
+    inline fun <reified F : RendererFormat> registerRendererFormat(id: String): Boolean {
+        val previous = rendererFormatTypeById.put(id, typeOf<F>())
         if (previous != null) {
             logger.warn("Renderer format '$id' is already registered with type $previous")
             return false
@@ -112,7 +110,7 @@ internal abstract class AbstractRendererFormats(
         return (registeredRendererFormats[id] as F?) ?: error("Renderer format '$id' is not registered")
     }
 
-    fun <F : RendererFormat> getProvider(id: String): Provider<F> {
+    fun <F : RendererFormat> getRendererFormatProvider(id: String): Provider<F> {
         val provider = provider { getRegisteredRendererFormat<F>(id) }
         registeredFormatProviders += provider
         return provider

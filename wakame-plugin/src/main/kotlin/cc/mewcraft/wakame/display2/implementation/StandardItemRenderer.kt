@@ -124,7 +124,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
 //////
 
 
-internal object StandardRenderingParts : RenderingParts() {
+internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     @JvmField
     val ARROW: RenderingPart<ItemArrow, ListValueRendererFormat> = configure("arrow") { data, format ->
         format.render(

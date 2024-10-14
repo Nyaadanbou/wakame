@@ -72,6 +72,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
 
 
 internal object CraftingStationRenderingParts : RenderingParts() {
+internal object CraftingStationRenderingParts : RenderingParts(CraftingStationItemRenderer) {
 
 }
 

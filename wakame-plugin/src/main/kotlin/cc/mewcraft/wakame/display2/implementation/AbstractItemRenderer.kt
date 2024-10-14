@@ -13,7 +13,6 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.nio.file.Path
-import kotlin.reflect.typeOf
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */
 
@@ -59,7 +58,9 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, I
 
 /* RenderingParts: 包含通用的代码 */
 
-internal abstract class RenderingParts {
+internal abstract class RenderingParts(
+    private val renderer: AbstractItemRenderer<*, *>,
+) {
     fun bootstrap() = Unit // to explicitly initialize static block
 
     /**
@@ -86,8 +87,8 @@ internal abstract class RenderingParts {
 
     private inline fun <reified F : RendererFormat> provideFormat(id: String): Provider<F> {
         try {
-            val added = StandardItemRenderer.rendererFormats.registerRendererFormatType(id, typeOf<F>())
-            val format = StandardItemRenderer.rendererFormats.getProvider<F>(id)
+            val added = renderer.rendererFormats.registerRendererFormat<F>(id)
+            val format = renderer.rendererFormats.getRendererFormatProvider<F>(id)
             return format
         } catch (e: Exception) {
             throw ExceptionInInitializerError(e)
