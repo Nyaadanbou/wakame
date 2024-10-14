@@ -63,7 +63,6 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
             }
         }
 
-        generate(ItemTemplateTypes.ATTRIBUTABLE)
         generate(ItemTemplateTypes.CASTABLE)
         generate(ItemTemplateTypes.GLOWABLE)
 
@@ -158,7 +157,6 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         // 下面按照从上到下的顺序, 实例化每个模板
         // 因此, 如果A依赖B, 应该把A写在B的下面
 
-        generate(ItemTemplateTypes.ATTRIBUTABLE)
         generate(ItemTemplateTypes.CASTABLE)
         generate(ItemTemplateTypes.GLOWABLE)
 

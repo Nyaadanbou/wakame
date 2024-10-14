@@ -22,14 +22,6 @@ components:
     enabled: true
     display_name: "属性修饰符"
 
-  attributable:
-    enabled: true
-    display_name: "提供属性加成"
-
-  bow:
-    enabled: true
-    display_name: "弓"
-
   can_break:
     enabled: true
     display_name: "CAN_BREAK"
@@ -108,10 +100,6 @@ components:
     enabled: true
     display_name: "铭刻"
 
-  kizamiable:
-    enabled: true
-    display_name: "提供铭刻加成"
-
   level:
     enabled: true
     display_name: "等级"
@@ -131,10 +119,6 @@ components:
   rarity:
     enabled: true
     display_name: "稀有度"
-
-  skillful:
-    enabled: true
-    display_name: "提供技能加成"
 
   skin:
     enabled: true

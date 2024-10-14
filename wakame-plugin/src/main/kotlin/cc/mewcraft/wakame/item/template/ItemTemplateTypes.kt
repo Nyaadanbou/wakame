@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.template
 
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.templates.components.*
-import org.spongepowered.configurate.serialize.*
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 object ItemTemplateTypes {
     /**
@@ -16,13 +16,6 @@ object ItemTemplateTypes {
      */
     @JvmField
     val ATTACK_SPEED: ItemTemplateType<ItemAttackSpeed> = ItemAttackSpeed.codec(ItemConstants.ATTACK_SPEED).register()
-
-    /**
-     * 组件: n/a
-     */
-    @Deprecated("与 ItemSlot 有高度重合")
-    @JvmField
-    val ATTRIBUTABLE: ItemTemplateType<Attributable> = Attributable.codec(ItemConstants.ATTRIBUTABLE).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.ItemAttributeModifiers]
@@ -139,13 +132,6 @@ object ItemTemplateTypes {
     val KIZAMIZ: ItemTemplateType<ItemKizamiz> = ItemKizamiz.codec(ItemConstants.KIZAMIZ).register()
 
     /**
-     * 组件: n/a
-     */
-    @Deprecated("与 ItemSlot 有高度重合")
-    @JvmField
-    val KIZAMIABLE: ItemTemplateType<Kizamiable> = Kizamiable.codec(ItemConstants.KIZAMIABLE).register()
-
-    /**
      * 组件: [cc.mewcraft.wakame.item.components.ItemLevel]
      */
     @JvmField
@@ -168,13 +154,6 @@ object ItemTemplateTypes {
      */
     @JvmField
     val RARITY: ItemTemplateType<ItemRarity> = ItemRarity.codec(ItemConstants.RARITY).register()
-
-    /**
-     * 组件: n/a
-     */
-    @Deprecated("与 ItemSlot 有高度重合")
-    @JvmField
-    val SKILLFUL: ItemTemplateType<Skillful> = Skillful.codec(ItemConstants.SKILLFUL).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.ItemEnchantments]

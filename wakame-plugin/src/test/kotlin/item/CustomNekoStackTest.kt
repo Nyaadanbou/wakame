@@ -108,19 +108,6 @@ class CustomNekoStackTest : KoinTest {
         }
     }
 
-    @Test
-    fun `component - attributable`() = componentLifecycleTest(
-        "attributable", ItemTemplateTypes.ATTRIBUTABLE, ItemComponentTypes.EMPTY
-    ) {
-        serialization {
-            assertNotNull(it)
-        }
-
-        result {
-            assertTrue(it.isEmpty())
-        }
-    }
-
     // 针对 attribute_modifiers 写下一个 test
     @Test
     fun `component - attribute_modifiers`() = componentLifecycleTest(
@@ -700,19 +687,6 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
-    fun `component - kizamiable`() = componentLifecycleTest(
-        "kizamiable", ItemTemplateTypes.KIZAMIABLE, ItemComponentTypes.EMPTY,
-    ) {
-        serialization {
-            assertNotNull(it)
-        }
-
-        result {
-            assertTrue(it.isEmpty())
-        }
-    }
-
-    @Test
     fun `component - level exact`() = componentLifecycleTest(
         "level_exact", ItemTemplateTypes.LEVEL, ItemComponentTypes.LEVEL,
     ) {
@@ -816,19 +790,6 @@ class CustomNekoStackTest : KoinTest {
 
         unboxed {
 
-        }
-    }
-
-    @Test
-    fun `component - skillful`() = componentLifecycleTest(
-        "skillful", ItemTemplateTypes.SKILLFUL, ItemComponentTypes.EMPTY,
-    ) {
-        serialization {
-            assertNotNull(it)
-        }
-
-        result {
-            assertTrue(it.isEmpty())
         }
     }
 
