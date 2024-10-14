@@ -1,12 +1,12 @@
 arrow:
   namespace: ammo
   tooltip:
-    - "<!i>穿透: <pierce_level>"
+    - "穿透: <pierce_level>"
 
 attack_speed:
   namespace: topmost
   tooltip:
-    line: "<!i>攻击速度: <value>"
+    line: "攻击速度: <value>"
     level:
       0: "非常慢"
       1: "慢"
@@ -39,16 +39,16 @@ cells/empty:
 
 crate:
   namespace: special
-  tooltip: "<!i>盲盒: <name>"
+  tooltip: "盲盒: <name>"
 
 custom_name:
-  namespace: general
-  tooltip: "<value>"
+  namespace: vanilla
+  tooltip: "定制名: <value>"
 
 elements:
   namespace: general
   tooltip:
-    merged: "<!i>元素: <merged>"
+    merged: "元素: <merged>"
     single: "<single>"
     separator: ", "
 
@@ -57,34 +57,34 @@ enchantments:
 
 fire_resistant:
   namespace: general
-  tooltip: "<!i>免疫火焰伤害"
+  tooltip: "免疫火焰伤害"
 
 food:
   namespace: general
   tooltip:
-    - "<!i>饥饿值: <nutrition>"
-    - "<!i>饱和度: <saturation>"
-    - "<!i>食用时间: <eat_seconds>"
+    - "饥饿值: <nutrition>"
+    - "饱和度: <saturation>"
+    - "食用时间: <eat_seconds>"
 
 item_name:
-  namespace: general
-  tooltip: "<value>"
+  namespace: vanilla
+  tooltip: "物品名: <value>"
 
 kizamiz:
   namespace: general
   tooltip:
-    merged: "<!i>铭刻: <merged>"
+    merged: "铭刻: <merged>"
     single: "<single>"
     separator: ", "
 
 level:
   namespace: general
-  tooltip: "<!i>等级: <value>"
+  tooltip: "等级: <value>"
 
 lore:
   namespace: general
   tooltip:
-    line: "<!i><line>"
+    line: "<line>"
     header: [ ] # 空列表代表完全没有，不代表空行
     bottom: [ ]
 
@@ -93,4 +93,4 @@ portable_core:
 
 rarity:
   namespace: general
-  tooltip: "<!i>稀有度: <value>"
+  tooltip: "稀有度: <value>"

@@ -23,14 +23,14 @@ cells/skills:
 # id: `cells/empty`
 cells/empty:
   namespace: stash
-  tooltip: "<!i>[ 空词条栏 ]"
+  tooltip: "[ 空词条栏 ]"
 
 # id: `custom_name`
 custom_name:
   namespace: "general"
   # 可用标签
   # <value> 物品的 `minecraft:custom_name`
-  tooltip: "<value>"
+  tooltip: "定制名: <value>"
 
 # id: `elements`
 elements:
@@ -39,27 +39,27 @@ elements:
   # <merged> 多个元素合并后的文本
   # <single> 单个元素
   tooltip:
-    merged: "<!i>元素: <merged>"
+    merged: "元素: <merged>"
     single: "<single>"
     separator: ", "
 
 # id: `item_name`
 item_name:
-  namespace: "general"
+  namespace: "vanilla"
   # 可用标签
   # <value> 物品的 `minecraft:item_name`
-  tooltip: "<value>"
+  tooltip: "物品名: <value>"
 
 # id: `level`
 level:
   namespace: "general"
   # 可用标签
   # <value> 等级值
-  tooltip: "<!i>等级: <value>"
+  tooltip: "等级: <value>"
 
 # id: `rarity`
 rarity:
   namespace: general
   # 可用标签
   # <value> 稀有度的名字
-  tooltip: "<!i>稀有度: <value>"
+  tooltip: "稀有度: <value>"

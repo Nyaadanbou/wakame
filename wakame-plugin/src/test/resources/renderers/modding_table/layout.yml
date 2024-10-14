@@ -3,8 +3,6 @@
 # FIXME 补充说明
 
 primary:
-  - general:item_name
-
   - (fixed:general)
   - general:level
   - general:rarity
@@ -18,5 +16,6 @@ primary:
   - attribute:entity_interaction_range
   - attribute:max_health
   - attribute:movement_speed
-
   - stash:cells/empty
+
+  - vanilla:item_name

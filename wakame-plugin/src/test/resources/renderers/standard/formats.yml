@@ -14,7 +14,7 @@ arrow:
   # <hit_frozen_ticks> 击中实体造成的冰冻时间
   # <glow_ticks> 击中实体造成的发光时间
   tooltip:
-    - "<!i>穿透: <pierce_level>"
+    - "穿透: <pierce_level>"
 
 # id: `attack_speed`
 attack_speed:
@@ -22,7 +22,7 @@ attack_speed:
   tooltip:
     # 可用标签
     # <value> 攻击速度值
-    line: "<!i>攻击速度: <value>"
+    line: "攻击速度: <value>"
     # 数值对应的描述
     level:
       0: "非常慢"
@@ -67,14 +67,14 @@ crate:
   # 可用标签
   # <id> 盲盒的标识
   # <name> 盲盒的名字
-  tooltip: "<!i>盲盒: <name>"
+  tooltip: "盲盒: <name>"
 
 # id: `custom_name`
 custom_name:
-  namespace: general
+  namespace: vanilla
   # 可用标签
   # <value> 物品的 `minecraft:custom_name`
-  tooltip: "<value>"
+  tooltip: "定制名: <value>"
 
 # id: `elements`
 elements:
@@ -83,7 +83,7 @@ elements:
   # <merged> 多个元素合并后的文本
   # <single> 单个元素
   tooltip:
-    merged: "<!i>元素: <merged>"
+    merged: "元素: <merged>"
     single: "<single>"
     separator: ", "
 
@@ -94,7 +94,7 @@ enchantments:
 # id: `fire_resistant`
 fire_resistant:
   namespace: vanilla
-  tooltip: "<!i>免疫火焰伤害"
+  tooltip: "免疫火焰伤害"
 
 # id: `food`
 food:
@@ -107,16 +107,16 @@ food:
   # <saturation> 食物增加的饱和度
   # <eat_seconds> 食用所需要的时间
   tooltip:
-    - "<!i>饥饿值: <nutrition>"
-    - "<!i>饱和度: <saturation>"
-    - "<!i>食用时间: <eat_seconds>"
+    - "饥饿值: <nutrition>"
+    - "饱和度: <saturation>"
+    - "食用时间: <eat_seconds>"
 
 # id: `item_name`
 item_name:
-  namespace: general
+  namespace: vanilla
   # 可用标签
   # <value> 物品的 `minecraft:item_name`
-  tooltip: "<value>"
+  tooltip: "物品名: <value>"
 
 # id: `kizamiz`
 kizamiz:
@@ -125,7 +125,7 @@ kizamiz:
   # <merged> 多个铭刻合并后的文本
   # <single> 单个铭刻
   tooltip:
-    merged: "<!i>铭刻: <merged>"
+    merged: "铭刻: <merged>"
     single: "<single>"
     separator: ", "
 
@@ -134,7 +134,7 @@ level:
   namespace: general
   # 可用标签
   # <value> 等级值
-  tooltip: "<!i>等级: <value>"
+  tooltip: "等级: <value>"
 
 # id: `lore`
 lore:
@@ -142,7 +142,7 @@ lore:
   # 可用标签：
   # <line> 描述内容
   tooltip:
-    line: "<!i><line>"
+    line: "<line>"
     header: [ ] # 空列表代表完全没有，不代表空行
     bottom: [ ]
 
@@ -155,4 +155,4 @@ rarity:
   namespace: general
   # 可用标签
   # <value> 稀有度的名字
-  tooltip: "<!i>稀有度: <value>"
+  tooltip: "稀有度: <value>"

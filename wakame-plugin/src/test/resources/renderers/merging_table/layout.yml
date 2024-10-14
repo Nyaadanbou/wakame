@@ -4,12 +4,13 @@
 # 一些过于复杂或随机的信息不会显示在合成站菜单中.
 
 primary:
-  - general:item_name
+  - (fixed:special)
+  - special:portable_core
 
   - (fixed:general)
   - general:level
   - general:rarity
   - general:elements
 
-  - (fixed:special)
-  - special:portable_core
+  - (fixed:vanilla)
+  - vanilla:item_name

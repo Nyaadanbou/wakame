@@ -3,14 +3,12 @@
 # FIXME 补充说明
 
 primary:
-  - general:item_name
-
-  - (fixed:general)
+  - (fixed:general)1
   - general:level
   - general:rarity
   - general:elements
 
-  - (fixed:attribute)
+  - (fixed:attribute)2
   - attribute:attack_damage
   - attribute:block_interaction_range
   - attribute:critical_strike_chance
@@ -18,5 +16,7 @@ primary:
   - attribute:entity_interaction_range
   - attribute:max_health
   - attribute:movement_speed
-
   - stash:cells/empty
+
+  - (fixed:vanilla)3
+  - vanilla:item_name
