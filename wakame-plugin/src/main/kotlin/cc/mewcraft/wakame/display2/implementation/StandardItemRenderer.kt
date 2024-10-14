@@ -86,6 +86,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.LORE) { data -> StandardRenderingParts.LORE.process(collector, data) }
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingParts.PORTABLE_CORE.process(collector, data) }
         components.process(ItemComponentTypes.RARITY) { data -> StandardRenderingParts.RARITY.process(collector, data) }
+        components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
 
         val minecraftLore = indexedTextListTransformer.flatten(collector)
         val minecraftCmd = ItemModelDataLookup[item.id, item.variant]
@@ -355,8 +356,7 @@ internal data class PortableCoreRendererFormat(
     fun render(data: PortableCore): IndexedText {
         val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
         val index = Key.key(namespace, core.attribute.id)
-        val facade = AttributeRegistry.FACADES[core.attribute.id]
-        val tooltip = facade.createTooltipLore(core.attribute)
+        val tooltip = AttributeRegistry.FACADES[core.attribute.id].createTooltipLore(core.attribute)
         return SimpleIndexedText(index, tooltip)
     }
 

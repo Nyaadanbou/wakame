@@ -90,6 +90,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         components.process(ItemComponentTypes.FOOD) { data -> CraftingStationRenderingParts.FOOD.process(collector, data) }
         components.process(ItemComponentTypes.ITEM_NAME) { data -> CraftingStationRenderingParts.ITEM_NAME.process(collector, data) }
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> CraftingStationRenderingParts.PORTABLE_CORE.process(collector, data) }
+        components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> CraftingStationRenderingParts.ENCHANTMENTS.process(collector, data) }
 
         val minecraftLore = indexedTextListTransformer.flatten(collector)
         val minecraftCmd = ItemModelDataLookup[item.id, item.variant]
@@ -202,8 +203,8 @@ internal data class FuzzyEnchantmentRendererFormat(
     @Setting
     private val tooltip: String = "<name> <level>",
 ) : RendererFormat.Simple {
-    override val id: String = "enchantments"
-    override val index: Key = Key.key(namespace, id)
+    override val id = "enchantments"
+    override val index = Key.key(namespace, id)
 
     override fun createTextMetaFactory(): TextMetaFactory {
         return SingleSimpleTextMetaFactory(namespace, id)
@@ -238,8 +239,7 @@ internal data class FuzzyPortableCoreRendererFormat(
     fun render(data: PortableCore): IndexedText {
         val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
         val index = Key.key(namespace, core.attribute.id)
-        val facade = AttributeRegistry.FACADES[core.attribute.id]
-        val tooltip = facade.createTooltipLore(core.attribute)
+        val tooltip = AttributeRegistry.FACADES[core.attribute.id].createTooltipLore(core.attribute)
         return SimpleIndexedText(index, tooltip)
     }
 
