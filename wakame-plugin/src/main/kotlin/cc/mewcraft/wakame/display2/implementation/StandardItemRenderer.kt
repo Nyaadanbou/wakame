@@ -111,7 +111,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         // item.showUnbreakable(false)
     }
 
-    private inline fun <T : ItemTemplate<*>> ItemTemplateMap.process(type: ItemTemplateType<T>, block: (T) -> Unit) {
+    private inline fun <T> ItemTemplateMap.process(type: ItemTemplateType<T>, block: (T) -> Unit) {
         get(type)?.apply(block)
     }
 
