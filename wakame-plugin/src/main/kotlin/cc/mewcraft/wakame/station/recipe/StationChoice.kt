@@ -3,8 +3,10 @@ package cc.mewcraft.wakame.station.recipe
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.core.ItemXNeko
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.CraftingStationContext
+import cc.mewcraft.wakame.display2.implementation.CraftingStationContext.*
 import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.item.setSystemUse
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
@@ -108,9 +110,7 @@ internal data class ItemChoice(
     override fun displayItemStack(): ItemStack {
         // TODO gui物品
         val displayItemStack = item.createItemStack() ?: ItemStack(Material.BARRIER)
-        if (item is ItemXNeko) {
-            displayItemStack.tryNekoStack?.setSystemUse()
-        }
+        if (item is ItemXNeko) displayItemStack.render()
         displayItemStack.amount = amount
         return displayItemStack
     }
@@ -128,7 +128,7 @@ internal data class ItemChoice(
  * 经验值类型的合成站输入.
  */
 internal data class ExpChoice(
-    val amount: Int
+    val amount: Int,
 ) : StationChoice {
     companion object {
         const val TYPE: String = "exp"
@@ -198,4 +198,13 @@ internal object StationChoiceSerializer : TypeSerializer<StationChoice> {
             }
         }
     }
+}
+
+/**
+ * 方便函数.
+ */
+private fun ItemStack.render() {
+    val nekoStack = tryNekoStack ?: return
+    val context = CraftingStationContext(Pos.CHOICE)
+    ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
 }

@@ -35,15 +35,20 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, I
      */
     abstract val rendererLayout: RendererLayout
 
-    override fun onPostWorld() = initialize0()
-    override fun onReload() = initialize0()
-
     @TestOnly
     fun initialize0() {
         val renderersDirectory = get<Path>(named(PLUGIN_DATA_DIR)).resolve("renderers")
         val formatPath = renderersDirectory.resolve(name).resolve(FORMAT_FILE_NAME)
         val layoutPath = renderersDirectory.resolve(name).resolve(LAYOUT_FILE_NAME)
         initialize(formatPath, layoutPath)
+    }
+
+    override fun onPostWorld() {
+        initialize0()
+    }
+
+    override fun onReload() {
+        initialize0()
     }
 
     companion object {

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.component
 
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.components.*
 
 /**
@@ -209,17 +209,6 @@ internal object ItemComponentTypes {
      */
     @JvmField
     val STORED_ENCHANTMENTS: ItemComponentType<ItemEnchantments> = ItemEnchantments.codec(ItemConstants.STORED_ENCHANTMENTS).register()
-
-    /**
-     * 将物品作为系统物品. 系统物品的机制:
-     * - 玩家不允许获取和使用
-     * - 不会被物品发包系统修改
-     * - 专门用于, 例如GUI容器内的物品
-     *
-     * 这也意味着系统物品的提示框文本完全取决于之上的原版组件.
-     */
-    @JvmField
-    val SYSTEM_USE: ItemComponentType<Unit> = SystemUse.codec(ItemConstants.SYSTEM_USE).register()
 
     /**
      * 将物品作为工具.

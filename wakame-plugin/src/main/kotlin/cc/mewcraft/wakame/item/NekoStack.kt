@@ -50,9 +50,10 @@ interface NekoStack : Examinable {
     val isEmpty: Boolean
 
     /**
-     * 检查该物品的样子是否仅存在于客户端.
-     * 如果为 `true`, 发包系统将修改此物品.
-     * 如果为 `false`, 发包系统将不会修改此物品.
+     * 记录了该物品的样子是否仅存在于客户端.
+     *
+     * 如果为 `true`, 法宝渲染系统将修改此物品.
+     * 如果为 `false`, 发包渲染系统将不会修改此物品.
      */
     var isClientSide: Boolean
 
@@ -117,7 +118,7 @@ interface NekoStack : Examinable {
     val behaviors: ItemBehaviorMap
 
     /**
-     * ‘不安全’操作. 使用前请先阅读文档.
+     * 不安全的操作. 使用前请先阅读文档.
      */
     val unsafe: Unsafe
 

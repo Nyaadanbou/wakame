@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.gui.station
 
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.CraftingStationContext
 import cc.mewcraft.wakame.gui.MenuLayout
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.realize
-import cc.mewcraft.wakame.item.setSystemUse
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.station.Station
 import cc.mewcraft.wakame.station.StationSession
@@ -22,9 +24,7 @@ import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
-import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.*
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
@@ -91,7 +91,7 @@ class StationMenu(
         }
         primaryGui.setContent(recipeItems)
         val title = layout.title
-        //TODO slot背景颜色红绿显示
+        // TODO slot背景颜色红绿显示
         primaryWindow.setTitle(title)
     }
 
@@ -114,19 +114,20 @@ class StationMenu(
      * 背景占位的图标 [Item].
      */
     class BackgroundItem(
-        private val layout: MenuLayout
+        private val layout: MenuLayout,
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            //TODO gui物品
+            // TODO gui物品
             val key = layout.getIcon("background")
-            val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
-            nekoStack ?: return ItemWrapper(ItemStack(Material.GRAY_STAINED_GLASS_PANE).hideTooltip(true))
-            nekoStack.setSystemUse()
+            val nekoStack = ItemRegistry.CUSTOM.find(key)
+                ?.realize()
+                ?.render()
+                ?: return ItemWrapper(ItemStack(Material.GRAY_STAINED_GLASS_PANE).hideTooltip(true))
             return ItemWrapper(nekoStack.itemStack)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            //do nothing
+            // do nothing
         }
     }
 
@@ -137,16 +138,16 @@ class StationMenu(
         private val stationMenu: StationMenu,
     ) : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            //TODO gui物品
+            // TODO gui物品
             val layout = stationMenu.layout
             if (!stationMenu.primaryGui.hasPreviousPage()) {
                 return BackgroundItem(layout).itemProvider
             }
             val key = layout.getIcon("prev_page")
-            val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
-            nekoStack ?: return ItemBuilder(Material.SOUL_SAND)
-                .setDisplayName(Component.text("上一页").color(NamedTextColor.AQUA))
-            nekoStack.setSystemUse()
+            val nekoStack = ItemRegistry.CUSTOM.find(key)
+                ?.realize()
+                ?.render()
+                ?: return ItemBuilder(Material.SOUL_SAND).setDisplayName(Component.text("上一页").color(NamedTextColor.AQUA))
             return ItemWrapper(nekoStack.itemStack)
         }
     }
@@ -158,16 +159,16 @@ class StationMenu(
         private val stationMenu: StationMenu,
     ) : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            //TODO gui物品
+            // TODO gui物品
             val layout = stationMenu.layout
             if (!stationMenu.primaryGui.hasNextPage()) {
                 return BackgroundItem(layout).itemProvider
             }
             val key = layout.getIcon("next_page")
-            val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
-            nekoStack ?: return ItemBuilder(Material.MAGMA_BLOCK)
-                .setDisplayName(Component.text("下一页").color(NamedTextColor.AQUA))
-            nekoStack.setSystemUse()
+            val nekoStack = ItemRegistry.CUSTOM.find(key)
+                ?.realize()
+                ?.render()
+                ?: return ItemBuilder(Material.MAGMA_BLOCK).setDisplayName(Component.text("下一页").color(NamedTextColor.AQUA))
             return ItemWrapper(nekoStack.itemStack)
         }
     }
@@ -177,7 +178,7 @@ class StationMenu(
      */
     class RecipeItem(
         private val stationMenu: StationMenu,
-        private val recipeMatcherResult: RecipeMatcherResult
+        private val recipeMatcherResult: RecipeMatcherResult,
     ) : AbstractCraftItem() {
         override fun getItemProvider(): ItemProvider {
             return ItemWrapper(recipeMatcherResult.displayItemStack(stationMenu.layout))
@@ -240,7 +241,7 @@ class StationMenu(
                 }
 
                 else -> {
-                    //do nothing
+                    // do nothing
                 }
             }
         }
@@ -274,4 +275,10 @@ abstract class AbstractCraftItem : AbstractItem() {
         )
     }
 
+}
+
+private fun NekoStack.render(): NekoStack {
+    val context = CraftingStationContext(CraftingStationContext.Pos.OVERVIEW)
+    ItemRenderers.CRAFTING_STATION.render(this, context)
+    return this
 }

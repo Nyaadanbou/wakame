@@ -26,26 +26,22 @@ internal fun ResourceLocation.toKey(): Key =
 
 internal val ItemStack.isNeko: Boolean
     get() {
-        if (this.hasComponentPatches()) {
-            val customData = this.components.get(ComponentTypes.CUSTOM_DATA)
-            if (customData != null) {
-                if (customData.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME) != null) {
-                    return true
-                }
+        if (hasComponentPatches()) {
+            if (components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME) != null) {
+                return true
             }
         }
-        val key = this.type.name.toKey()
-        val ret = VanillaNekoStackRegistry.has(key)
-        return ret
+        val nekoStackId = type.name.toKey()
+        return VanillaNekoStackRegistry.has(nekoStackId)
     }
 
 internal val ItemStack.isCustomNeko: Boolean
     get() {
-        if (!this.hasComponentPatches()) {
+        if (!hasComponentPatches()) {
             return false
         }
-        val ret = this.components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME) != null
-        return ret
+        return components.get(ComponentTypes.CUSTOM_DATA)
+            ?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME) != null
     }
 
 internal val ItemStack.isVanillaNeko: Boolean
@@ -53,37 +49,36 @@ internal val ItemStack.isVanillaNeko: Boolean
         if (isCustomNeko) {
             return false
         }
-        val key = this.type.name.toKey()
-        val ret = VanillaNekoStackRegistry.has(key)
-        return ret
+        val nekoStackId = type.name.toKey()
+        return VanillaNekoStackRegistry.has(nekoStackId)
     }
 
-internal val ItemStack.isRenderable: Boolean
-    get() = getComponent(ComponentTypes.CUSTOM_DATA)
-        ?.getOrNull()
+internal val ItemStack.isClientSide: Boolean
+    get() = getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()
         ?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME)
-        ?.getCompoundTagOrNull(ItemComponentMap.TAG_COMPONENTS)
-        ?.getTagOrNull(ItemConstants.SYSTEM_USE) == null
+        ?.getTagOrNull(NekoStack.CLIENT_SIDE_KEY) == null
 
 /**
  * 尝试将 ItemStack 转换为 NekoStack, 用作渲染.
+ * 返回 `null` 则说明该物品堆叠不需要被发包渲染接管.
  */
 internal val ItemStack.tryNekoStack: PacketNekoStack?
     get() {
         if (isEmpty)
             return null
-        if (!isRenderable)
+        if (!isClientSide)
             return null
 
-        val wakameTag = getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME)
+        val wakameTag = getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()
+            ?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME)
         if (wakameTag != null) {
             return PacketCustomNekoStack(this)
         }
 
-        val itemTypeKey = type.name.toKey()
-        val vanillaNekoStack = VanillaNekoStackRegistry.get(itemTypeKey)
-        if (vanillaNekoStack != null) {
-            return PacketVanillaNekoStack(this, itemTypeKey, vanillaNekoStack.prototype, vanillaNekoStack.components)
+        val nekoStackId = type.name.toKey()
+        val nekoStack = VanillaNekoStackRegistry.get(nekoStackId)
+        if (nekoStack != null) {
+            return PacketVanillaNekoStack(this, nekoStack)
         }
 
         return null
@@ -201,7 +196,7 @@ private class PacketCustomNekoStack(
         // 返回 true 还是 false 完全取决于这个 NBT 的状态,
         // 例如合成站里的物品就可以把这个设置为 false, 这样
         // 发包渲染系统就不会接管这个物品了.
-        get() = !nyaTag.contains(NekoStack.CLIENT_SIDE_KEY)
+        get() = NekoStackSupport.isClientSide(nyaTag)
         // 本实现为发包物品, 这里修改此值没有意义
         set(_) = abortWrites()
 
@@ -266,12 +261,23 @@ private class PacketCustomNekoStack(
     }
 }
 
-private class PacketVanillaNekoStack(
+private class PacketVanillaNekoStack
+private constructor(
     override val packetItem: ItemStack,
     override val id: Key,
     override val prototype: NekoItem,
     override val components: ItemComponentMap,
 ) : PacketNekoStack {
+    constructor(
+        packetItem: ItemStack,
+        nekoStack: VanillaNekoStack,
+    ) : this(
+        packetItem,
+        nekoStack.id,
+        nekoStack.prototype,
+        nekoStack.components
+    )
+
     override val isEmpty: Boolean
         get() = false
 

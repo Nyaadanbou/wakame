@@ -161,7 +161,4 @@ Compound('wakame')
             Compound('reforge')
                 Byte('count'): 38b // 重铸总次数
                 Short('cost'): 32767s // 重铸总花费
-         
-        // 作为系统物品
-        Compound('system_use')
 ```

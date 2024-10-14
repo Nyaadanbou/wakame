@@ -816,11 +816,6 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
-    fun `component - system_use`() {
-
-    }
-
-    @Test
     fun `component - tool`() = componentLifecycleTest(
         "tool", ItemTemplateTypes.TOOL, ItemComponentTypes.TOOL,
     ) {

@@ -110,10 +110,6 @@ components:
     enabled: true
     display_name: "<!i><white>存储的附魔"
 
-  system_use:
-    enabled: true
-    display_name: "<!i><white>系统使用"
-
   tool:
     enabled: true
     display_name: "<!i><white>工具"

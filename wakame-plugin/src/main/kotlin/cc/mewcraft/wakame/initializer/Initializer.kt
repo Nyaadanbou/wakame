@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.damage.DamageListener
 import cc.mewcraft.wakame.damage.VanillaDamageMappings.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
-import cc.mewcraft.wakame.display2.RENDERERS_CONFIG_DIR
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
@@ -119,7 +118,8 @@ object Initializer : KoinComponent, Listener {
         saveResource(LEVEL_GLOBAL_CONFIG_FILE)
         // saveResource(PROJECTILE_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(RARITY_GLOBAL_CONFIG_FILE)
-        saveResourceRecursively(RENDERERS_CONFIG_DIR)
+        saveResourceRecursively("renderers")
+        saveResourceRecursively("stations")
         // saveResource(SKIN_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
     }
 

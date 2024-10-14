@@ -11,7 +11,7 @@ import java.util.stream.Stream
 // 开发日记 2024/7/5
 // 这里的类型 T 不能设置 upper bounds,
 // 因为存在数据类型为 primitive 的组件,
-// 例如 ItemDamage, ItemMaxDamage, ItemTracks, SystemUse.
+// 例如 ItemDamage, ItemMaxDamage.
 
 /**
  * 模板的“类型”. 该接口有两个作用:

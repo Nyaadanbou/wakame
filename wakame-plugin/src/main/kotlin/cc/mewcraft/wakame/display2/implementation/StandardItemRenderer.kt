@@ -36,7 +36,7 @@ internal class StandardRendererFormats : AbstractRendererFormats()
 
 internal class StandardRendererLayout(formats: AbstractRendererFormats) : AbstractRendererLayout(formats)
 
-internal object StandardContext // 等之后需要的时候, 改成 class 即可
+internal data object StandardContext // 等之后需要的时候, 改成 class 即可
 
 internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
     override val name = "standard"
@@ -453,8 +453,7 @@ internal data class SkillCoreTextMetaFactory(
         // FIXME 临时方案, 理想中的技能 key 应该如上面注释所示
         //  也就是说, 如果 sourceIndex 是 skill:buff/potion_drop,
         //  那么对应的技能的 key 应该是 buff:potion_drop (???)
-        val key = sourceIndex
-        return sourceIndex.namespace() == namespace && SkillRegistry.INSTANCES.has(key)
+        return sourceIndex.namespace() == namespace && SkillRegistry.INSTANCES.has(sourceIndex)
     }
 
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {

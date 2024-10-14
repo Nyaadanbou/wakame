@@ -72,7 +72,6 @@ object ItemConstants {
     const val SKIN = "skin"
     const val SKIN_OWNER = "skin_owner"
     const val STORED_ENCHANTMENTS = "stored_enchantments"
-    const val SYSTEM_USE = "system_use"
     const val TOOL = "tool"
     const val TRACKABLE = "tracks"
     const val TRIM = "trim"

@@ -4,7 +4,8 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.component.ItemComponentMap
+import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.*
@@ -26,8 +27,7 @@ val ItemStack.isNeko: Boolean
     get() {
         val tag = this.unsafeNyaTag
         if (tag != null) {
-            val prototype = NekoStackSupport.getPrototype(tag)
-            if (prototype != null) {
+            if (NekoStackSupport.getPrototype(tag) != null) {
                 return true
             }
         }
@@ -41,8 +41,7 @@ val ItemStack.isNeko: Boolean
 val ItemStack.isCustomNeko: Boolean
     get() {
         val tag = this.unsafeNyaTag ?: return false
-        val prototype = NekoStackSupport.getPrototype(tag)
-        return prototype != null
+        return NekoStackSupport.getPrototype(tag) != null
     }
 
 /**
@@ -66,11 +65,8 @@ val ItemStack.tryNekoStack: NekoStack?
     get() {
         val tag = this.unsafeNyaTag
         if (tag != null) {
-            val prototype = NekoStackSupport.getPrototype(tag)
-            if (prototype != null) {
-                if (!NekoStackSupport.isSystemUse(tag)) {
-                    return CustomNekoStack(this)
-                }
+            if (NekoStackSupport.getPrototype(tag) != null) {
+                return CustomNekoStack(this)
             }
         }
         return VanillaNekoStackRegistry.get(this.type)
@@ -86,30 +82,6 @@ val ItemStack.tryNekoStack: NekoStack?
 val ItemStack.toNekoStack: NekoStack
     get() {
         return requireNotNull(this.tryNekoStack) { "The ItemStack is not a NekoStack" }
-    }
-
-@Deprecated("Use ItemStack#tryNekoStack instead", ReplaceWith("this.tryNekoStack"))
-@get:Contract(pure = true)
-val ItemStack.trySystemStack: NekoStack?
-    get() {
-        if (!this.isCustomNeko) {
-            return null
-        }
-        return CustomNekoStack(this.clone()).takeIf {
-            it.isSystemUse()
-        }
-    }
-
-@Deprecated("Use ItemStack#toNekoStack instead", ReplaceWith("this.toNekoStack"))
-@get:Contract(pure = true)
-val ItemStack.toSystemStack: NekoStack
-    get() {
-        require(this.isCustomNeko) {
-            "The ItemStack is not a CustomNekoStack"
-        }
-        return CustomNekoStack(this.clone()).apply {
-            require(this.isSystemUse()) { "The ItemStack is not of system-use" }
-        }
     }
 
 /**
@@ -136,45 +108,6 @@ internal fun ItemBase.createNekoStack(): NekoStack {
     return CustomNekoStack(createItemStack())
 }
 
-@Contract(pure = true)
-fun NekoStack.bypassPacket(): Boolean {
-    return components.has(ItemComponentTypes.SYSTEM_USE)
-}
-
-@Contract(pure = false)
-fun NekoStack.bypassPacket(bypass: Boolean) {
-    if (bypass) {
-        components.set(ItemComponentTypes.SYSTEM_USE, Unit)
-    } else {
-        val handle = this.unsafe.handle
-
-        handle.backingItemName = null
-        handle.backingCustomName = null
-        handle.backingCustomModelData = null
-        handle.backingLore = null
-
-        components.unset(ItemComponentTypes.SYSTEM_USE)
-    }
-}
-
-@Deprecated("Use NekoStack#bypassPacket instead", ReplaceWith("this.bypassPacket()"))
-@Contract(pure = true)
-fun NekoStack.isSystemUse(): Boolean {
-    return bypassPacket()
-}
-
-@Deprecated("Use NekoStack#bypassPacket instead", ReplaceWith("this.bypassPacket(bypass)"))
-@Contract(pure = false)
-fun NekoStack.setSystemUse() {
-    bypassPacket(true)
-}
-
-@Deprecated("Use NekoStack#bypassPacket instead", ReplaceWith("this.bypassPacket(bypass)"))
-@Contract(pure = false)
-fun NekoStack.unsetSystemUse() {
-    bypassPacket(false)
-}
-
 /**
  * 一个标准的 [NekoStack] 实现.
  *
@@ -195,10 +128,8 @@ private class CustomNekoStack(
 
     override var isClientSide: Boolean
         // 只要*没有*这个标签就返回 true; 标签的类型可以用 ByteTag
-        get() = !unsafeNyaTag.contains(NekoStack.CLIENT_SIDE_KEY)
-        set(value) =
-            if (value) unsafeNyaTag.remove(NekoStack.CLIENT_SIDE_KEY)
-            else unsafeNyaTag.putByte(NekoStack.CLIENT_SIDE_KEY, 0)
+        get() = NekoStackSupport.isClientSide(unsafeNyaTag)
+        set(value) = NekoStackSupport.setClientSide(handle, value)
 
     override val itemType: Material
         get() = handle.type
@@ -302,14 +233,12 @@ internal class VanillaNekoStack(
     override fun erase(): Unit =
         unsupported()
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> =
-        Stream.of(
-            ExaminableProperty.of("id", id.asString()),
-            ExaminableProperty.of("variant", variant),
-        )
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("id", id.asString()),
+        ExaminableProperty.of("variant", variant),
+    )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String = toSimpleString()
 
     private fun unsupported(): Nothing {
         throw UnsupportedOperationException("This operation is not supported on ${this::class.simpleName}")
@@ -364,8 +293,18 @@ internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
  * Common implementations related to [NekoStack].
  */
 internal object NekoStackSupport {
-    fun isSystemUse(wakameTag: CompoundTag): Boolean {
-        return wakameTag.getCompoundOrNull(ItemComponentMap.TAG_COMPONENTS)?.contains(ItemConstants.SYSTEM_USE) == true
+    fun isClientSide(wakameTag: CompoundTag): Boolean {
+        return !wakameTag.contains(NekoStack.CLIENT_SIDE_KEY)
+    }
+
+    fun setClientSide(handle: ItemStack, clientSide: Boolean) {
+        handle.editNyaTag { tag ->
+            if (clientSide) {
+                tag.remove(NekoStack.CLIENT_SIDE_KEY)
+            } else {
+                tag.putByte(NekoStack.CLIENT_SIDE_KEY, 0)
+            }
+        }
     }
 
     fun getNamespace(wakameTag: CompoundTag): String? {
@@ -471,7 +410,3 @@ internal object NekoStackSupport {
         return prototype.behaviors
     }
 }
-
-// private object NekoStackInjections : KoinComponent {
-//     val logger: Logger by inject()
-// }
