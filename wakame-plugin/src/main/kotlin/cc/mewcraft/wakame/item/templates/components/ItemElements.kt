@@ -25,6 +25,8 @@ import cc.mewcraft.wakame.item.components.ItemElements as ItemElementsData
 data class ItemElements(
     private val selector: Pool<Element, ItemGenerationContext>,
 ) : ItemTemplate<ItemElementsData> {
+    val possibleElements: Collection<Element> = selector.samples.map { sample -> sample.data }.distinct()
+
     override val componentType: ItemComponentType<ItemElementsData> = ItemComponentTypes.ELEMENTS
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<ItemElementsData> {

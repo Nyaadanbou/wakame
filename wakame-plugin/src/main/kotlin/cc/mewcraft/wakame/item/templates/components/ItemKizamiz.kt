@@ -27,6 +27,10 @@ import cc.mewcraft.wakame.item.components.ItemKizamiz as ItemKizamizData
 data class ItemKizamiz(
     private val selector: Group<Kizami, ItemGenerationContext>,
 ) : ItemTemplate<ItemKizamizData> {
+    val possibleKizamiz: Collection<Kizami> = selector.pools.flatMap { pool ->
+        pool.value.samples.values().map { sample -> sample.data }.distinct()
+    }
+
     override val componentType: ItemComponentType<ItemKizamizData> = ItemComponentTypes.KIZAMIZ
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<ItemKizamizData> {

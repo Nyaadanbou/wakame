@@ -13,7 +13,7 @@ cells:
   # 可用标签
   # <min> 最小词条数量
   # <max> 最大词条数量
-  tooltip: "<!i>词条数量: <min> - <max>"
+  tooltip: "<!i>核孔数量: <min> - <max>"
 
 # TODO 盲盒系统完成后再重新考虑
 # id: `crate`
@@ -48,6 +48,10 @@ elements:
 # id: `enchantments`
 enchantments:
   namespace: vanilla
+  # 可用标签
+  # <name> 魔咒的名字
+  # <level> 魔咒的等级
+  tooltip: "<!i><name> <level>"
 
 # id: `fire_resistant`
 fire_resistant:
@@ -57,7 +61,14 @@ fire_resistant:
 # id: `food`
 food:
   namespace: vanilla
-  tooltip: "<!i>可以食用"
+  # 可用标签
+  # <nutrition> 食物增加的饥饿值
+  # <saturation> 食物增加的饱和度
+  # <eat_seconds> 食用所需要的时间
+  tooltip:
+    - "<!i>饥饿值: <nutrition>"
+    - "<!i>饱和度: <saturation>"
+    - "<!i>食用时间: <eat_seconds>"
 
 # id: `item_name`
 item_name:

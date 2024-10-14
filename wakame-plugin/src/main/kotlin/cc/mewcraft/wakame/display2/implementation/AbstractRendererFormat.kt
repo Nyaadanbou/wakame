@@ -128,11 +128,31 @@ internal data class AggregateValueRendererFormat(
         collection: Collection<T>,
         transform: (T) -> Component,
     ): IndexedText {
+        val merged = merge(collection, transform)
+        return SimpleIndexedText(index, listOf(merged))
+    }
+
+    /**
+     * A convenience function to stylize a list of objects.
+     */
+    fun <T> render(
+        collection: Collection<T>,
+        transform: (T) -> Component,
+        vararg resolver: TagResolver, // 应用在 merge 之后
+    ): IndexedText {
+        val merged = merge(collection, transform, *resolver)
+        return SimpleIndexedText(index, listOf(merged))
+    }
+
+    private fun <T> merge(
+        collection: Collection<T>,
+        transform: (T) -> Component,
+        vararg resolver: TagResolver,
+    ): Component {
         val merged = collection
             .mapTo(ObjectArrayList(collection.size)) { MM.deserialize(tooltip.single, component("single", transform(it))) }
             .join(JoinConfiguration.separator(MM.deserialize(tooltip.separator)))
-            .let { MM.deserialize(tooltip.merged, component("merged", it)) }
-        return SimpleIndexedText(index, listOf(merged))
+        return MM.deserialize(tooltip.merged, component("merged", merged), *resolver)
     }
 
     /**

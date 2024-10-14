@@ -21,6 +21,9 @@ import cc.mewcraft.wakame.item.components.ItemCells as ItemCellsData
 data class ItemCells(
     val cells: Map<String, CellBlueprint>,
 ) : ItemTemplate<ItemCellsData> {
+    val minimumSlotAmount: Int = 1 // 更加合理的最小值?
+    val maximumSlotAmount: Int = cells.size
+
     override val componentType: ItemComponentType<ItemCellsData> = ItemComponentTypes.CELLS
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<ItemCellsData> {
