@@ -194,11 +194,11 @@ private class CustomNekoStack(
         get() = false
 
     override var isClientSide: Boolean
-        // 只要有这个标签就返回 true; 标签的类型可以用 ByteTag
-        get() = unsafeNyaTag.contains(NekoStack.CLIENT_SIDE_KEY)
+        // 只要*没有*这个标签就返回 true; 标签的类型可以用 ByteTag
+        get() = !unsafeNyaTag.contains(NekoStack.CLIENT_SIDE_KEY)
         set(value) =
-            if (value) unsafeNyaTag.putByte(NekoStack.CLIENT_SIDE_KEY, 0)
-            else unsafeNyaTag.remove(NekoStack.CLIENT_SIDE_KEY)
+            if (value) unsafeNyaTag.remove(NekoStack.CLIENT_SIDE_KEY)
+            else unsafeNyaTag.putByte(NekoStack.CLIENT_SIDE_KEY, 0)
 
     override val itemType: Material
         get() = handle.type

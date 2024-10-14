@@ -201,8 +201,8 @@ private class PacketCustomNekoStack(
         // 返回 true 还是 false 完全取决于这个 NBT 的状态,
         // 例如合成站里的物品就可以把这个设置为 false, 这样
         // 发包渲染系统就不会接管这个物品了.
-        get() = nyaTag.contains(NekoStack.CLIENT_SIDE_KEY)
-        // 发包物品, 这里修改此值没有意义
+        get() = !nyaTag.contains(NekoStack.CLIENT_SIDE_KEY)
+        // 本实现为发包物品, 这里修改此值没有意义
         set(_) = abortWrites()
 
     override val itemType: Material
