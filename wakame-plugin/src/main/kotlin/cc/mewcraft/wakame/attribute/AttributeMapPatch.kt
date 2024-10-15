@@ -16,6 +16,7 @@ import org.bukkit.attribute.Attributable
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.world.EntitiesLoadEvent
@@ -184,20 +185,22 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
     }
 
     // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun on(e: EntitiesUnloadEvent) {
         for (entity in e.entities) {
             if (entity is Player) continue
             if (entity !is Attributable) continue
+            if (entity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH)!!.value < 500.0) continue
             val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: continue
+            val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
+
+            patch.trimBy(default)
+            // 如果移除默认已有的属性之后的 patch 为空, 表示生物并没有 patch, 移除 PDC
             if (patch.isEmpty()) {
                 patch.removeFrom(entity)
                 AttributeMapPatchAccess.remove(entity.uniqueId)
                 continue
             }
-            val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
-
-            patch.trimBy(default)
             patch.saveTo(entity)
 
             AttributeMapPatchAccess.remove(entity.uniqueId)

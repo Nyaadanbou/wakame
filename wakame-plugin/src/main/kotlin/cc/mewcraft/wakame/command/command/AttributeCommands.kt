@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
-import cc.mewcraft.wakame.command.parser.AttributeModifierParser
+import cc.mewcraft.wakame.command.parser.AttributeModifierOperationParser
 import cc.mewcraft.wakame.command.parser.AttributeParser
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.join
@@ -147,12 +147,17 @@ object AttributeCommands : CommandFactory<CommandSender> {
                 literal("add")
                 required("source", SingleEntitySelectorParser.singleEntitySelectorParser())
                 required("attribute", AttributeParser.attributeParser())
-                required("modifier", AttributeModifierParser.attributeModifierParser())
+                required("id", NamespacedKeyParser.namespacedKeyParser())
+                required("operation", AttributeModifierOperationParser.attributeModifierOperationParser())
+                required("amount", DoubleParser.doubleParser())
                 suspendingHandler { context ->
                     val sender = context.sender()
                     val source = context.get<SingleEntitySelector>("source").single()
                     val attribute = context.get<Attribute>("attribute")
-                    val modifier = context.get<AttributeModifier>("modifier")
+                    val id = context.get<NamespacedKey>("id")
+                    val operation = context.get<AttributeModifier.Operation>("operation")
+                    val amount = context.get<Double>("amount")
+                    val modifier = AttributeModifier(id, amount, operation)
 
                     val attributeMap = getAttributeMap(source) {
                         sendNoAttributeMessage(sender, source)

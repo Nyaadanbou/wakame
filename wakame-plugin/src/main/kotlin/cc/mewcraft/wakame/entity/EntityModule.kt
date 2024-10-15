@@ -24,7 +24,7 @@ internal fun entityModule(): Module = module {
         }
 
         EntityKeyLookupImpl(buildList {
-            registerImplementation("MythicMobs", this, ::MythicMobsEntityKeyLookup)
+//            registerImplementation("MythicMobs", this, ::MythicMobsEntityKeyLookup)
         })
     }
 
