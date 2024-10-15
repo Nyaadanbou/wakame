@@ -14,8 +14,8 @@ internal class MergingTableContext
 
 internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, MergingTableContext>() {
     override val name: String = "merging_table"
-    override val rendererFormats = MergingTableRendererFormats(this)
-    override val rendererLayout = MergingTableRendererLayout(this)
+    override val formats = MergingTableRendererFormats(this)
+    override val layout = MergingTableRendererLayout(this)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 MergingTable

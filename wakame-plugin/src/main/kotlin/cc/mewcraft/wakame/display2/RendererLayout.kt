@@ -12,7 +12,7 @@ interface RendererLayout : Examinable {
      * 这些内容 *本身* 完全由配置决定, 而非物品堆叠.
      * 但这些内容可以根据物品的具体数据而选择不显示.
      */
-    val staticIndexedTexts: List<IndexedText>
+    val staticIndexedTextList: List<IndexedText>
 
     /**
      * 默认的渲染内容. 规则如下:
@@ -21,7 +21,7 @@ interface RendererLayout : Examinable {
      * - 如果物品上的特定数据存在时, 默认值将不会被使用 (显然).
      * - 如果物品上的特定数据不存在, 同时默认值也不存在, 将不会显示任何内容.
      */
-    val defaultIndexedTexts: List<IndexedText>
+    val defaultIndexedTextList: List<IndexedText>
 
     /**
      * 获取指定的 [index] 对应的*位置顺序*.

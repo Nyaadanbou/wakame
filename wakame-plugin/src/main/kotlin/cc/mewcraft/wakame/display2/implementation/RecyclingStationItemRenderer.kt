@@ -14,8 +14,8 @@ internal class RecyclingStationContext
 
 internal object RecyclingStationItemRenderer : AbstractItemRenderer<NekoStack, RecyclingStationContext>() {
     override val name: String = "recycling_station"
-    override val rendererFormats = RecyclingStationRendererFormats(this)
-    override val rendererLayout: AbstractRendererLayout = RecyclingStationRendererLayout(this)
+    override val formats = RecyclingStationRendererFormats(this)
+    override val layout: AbstractRendererLayout = RecyclingStationRendererLayout(this)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 RecyclingStation

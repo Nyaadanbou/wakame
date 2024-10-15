@@ -29,6 +29,13 @@ internal abstract class AbstractRendererFormats(
     protected val logger = get<Logger>()
 
     /**
+     * `配置中的节点路径` -> `typeOf<RendererFormat>`, 用于引导配置文件的序列化.
+     *
+     * 该映射在 [RenderingParts.bootstrap] 执行时就已经确定和冻结, 后续禁止更新!
+     */
+    private val rendererFormatTypeById = HashMap<String, KType>()
+
+    /**
      * 所有已加载的 [RendererFormat] 实例.
      */
     private val registeredRendererFormats = HashMap<String, RendererFormat>()
@@ -36,12 +43,7 @@ internal abstract class AbstractRendererFormats(
     /**
      * 所有已加载的 [Provider] 实例, 记录引用以支持热重载渲染器.
      */
-    private val registeredFormatProviders = HashSet<Provider<out RendererFormat>>()
-
-    /**
-     * 配置文件 `id` -> 类型. 用于引导配置文件的序列化过程.
-     */
-    private val rendererFormatTypeById = HashMap<String, KType>()
+    private val registeredFormatProviders = HashMap<String, Provider<RendererFormat>>()
 
     /**
      * 所有已加载的 [TextMetaFactory] 实例.
@@ -77,27 +79,26 @@ internal abstract class AbstractRendererFormats(
         for ((id, type) in rendererFormatTypeById) {
             val node = root.node(id)
             if (node.virtual()) {
-                // TODO display2 当配置文件有缺省时, 支持回退到默认格式, 而不是直接抛异常
-                logger.warn("Renderer format '$id' is not found in '${formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))}'. Fallback to default format.")
+                logger.warn("Renderer format '$id' is not found in '${formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))}'")
             }
             val format = node.krequire<RendererFormat>(type)
 
             // will overwrite the one already existing
             registeredRendererFormats[id] = format
             // create & register the text meta factory
-            textMetaFactoryRegistry.registerFactory(format.createTextMetaFactory())
+            textMetaFactoryRegistry.registerFactory(format.textMetaFactory)
 
             logger.info("Loaded renderer format (${formatPath.parent.name}): $id")
         }
 
         // reload all renderer formats of this renderer
-        registeredFormatProviders.forEach { provider -> provider.update() }
+        registeredFormatProviders.values.forEach { provider -> provider.update() }
     }
 
     inline fun <reified F : RendererFormat> registerRendererFormat(id: String): Boolean {
         val previous = rendererFormatTypeById.put(id, typeOf<F>())
         if (previous != null) {
-            logger.warn("Renderer format '$id' is already registered with type $previous")
+            logger.error("Renderer format '$id' is already registered with type $previous. This is a bug!")
             return false
         }
         return true
@@ -110,10 +111,14 @@ internal abstract class AbstractRendererFormats(
         return (registeredRendererFormats[id] as F?) ?: error("Renderer format '$id' is not registered")
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun <F : RendererFormat> getRendererFormatProvider(id: String): Provider<F> {
-        val provider = provider { getRegisteredRendererFormat<F>(id) }
-        registeredFormatProviders += provider
-        return provider
+        val provider = registeredFormatProviders.getOrPut(id) {
+            provider {
+                getRegisteredRendererFormat<F>(id)
+            }
+        }
+        return provider as Provider<F>
     }
 
     @Suppress("UNCHECKED_CAST")

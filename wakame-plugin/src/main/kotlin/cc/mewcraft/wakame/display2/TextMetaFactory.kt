@@ -64,8 +64,7 @@ class TextMetaFactoryRegistry : KoinComponent {
      * 返回所有已知的 [TextMetaFactory].
      */
     fun getKnownFactories(): Set<TextMetaFactory> {
-        // namespace -> factory
-        return factories
+        return factories // namespace -> factory
     }
 
     /**

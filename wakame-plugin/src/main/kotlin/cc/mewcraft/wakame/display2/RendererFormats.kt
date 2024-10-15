@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.display2
 
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import net.kyori.adventure.key.Key
 
 // 开发日记 2024/9/17
@@ -38,41 +37,27 @@ interface RendererFormat {
     //  只有在 RendererFormat 创建好之后才能知道. 因此获取 TextMetaFactory
     //  的职责由 RendererFormat 来承担就比较合适了.
 
-    fun createTextMetaFactory(): TextMetaFactory
+    /**
+     * 该内容对应的 [TextMetaFactory] 实例.
+     */
+    val textMetaFactory: TextMetaFactory
 
     /**
      * 代表一个索引在编译时已经确定的 [RendererFormat].
      */
     interface Simple : RendererFormat {
         val id: String
-        val index: Key // namespace + id
-        fun createIndex(): Key = Key.key(namespace, id)
+        val index: DerivedIndex // namespace + id
+        fun createIndex(): DerivedIndex = Key.key(namespace, id)
     }
 
     /**
      * 代表一个索引会在运行时动态生成的 [RendererFormat].
+     *
+     * 实现上, 动态生成的索引必须是对应 [TextMeta.derivedIndexes]
+     * 里面的子集, 否则会出现无法找到对应索引的序数和元数据等等问题.
      */
     interface Dynamic<in T> : RendererFormat {
-        fun computeIndex(data: T): Key
-    }
-
-    companion object Shared {
-        /**
-         * 当一个 [RendererFormat] 的配置缺省时使用的字符串.
-         */
-        const val FIXME = "fixme"
-
-        /**
-         * 获取一个空的 [RendererFormat].
-         */
-        fun empty(): RendererFormat = EMPTY
-
-        private val EMPTY = object : Simple, Dynamic<Nothing> {
-            override val namespace: String = "internal"
-            override val id: String = "empty"
-            override val index: Key = createIndex()
-            override fun computeIndex(data: Nothing): Key = index
-            override fun createTextMetaFactory(): TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
-        }
+        fun computeIndex(data: T): DerivedIndex
     }
 }

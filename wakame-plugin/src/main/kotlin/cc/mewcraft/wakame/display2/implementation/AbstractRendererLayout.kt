@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.display2.implementation
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.util.yamlConfig
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.*
+import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -20,17 +20,41 @@ import kotlin.io.path.readText
 internal abstract class AbstractRendererLayout(
     protected val renderer: AbstractItemRenderer<*, *>,
 ) : RendererLayout, KoinComponent {
+
     companion object Shared {
         val UNPROCESSED_PRIMARY_LINE_PATTERN = "^(?>\\((.+?)\\))?(.*)$".toPattern()
     }
 
+    override val staticIndexedTextList: ArrayList<IndexedText> = ArrayList()
+    override val defaultIndexedTextList: ArrayList<IndexedText> = ArrayList()
+
     protected val mm = get<MiniMessage>()
     protected val logger = get<Logger>()
 
-    override val staticIndexedTexts: ArrayList<IndexedText> = ArrayList()
-    override val defaultIndexedTexts: ArrayList<IndexedText> = ArrayList()
-    private val textOrdinalMap = Object2IntOpenHashMap<DerivedIndex>().apply { defaultReturnValue(-1) }
-    private val textMetadataMap = Object2ObjectOpenHashMap<DerivedIndex, TextMeta>()
+    // derived index (key) -> ordinal (int)
+    private val indexedTextOrdinalMap = Object2IntOpenHashMap<DerivedIndex>().apply { defaultReturnValue(-1) }
+
+    // derived index (key) -> text meta
+    private val indexedTextMetadataMap = Object2ObjectOpenHashMap<DerivedIndex, TextMeta>()
+
+    // 不包含 StaticIndexedText
+    private val bakedIndexSet = ObjectOpenHashSet<DerivedIndex>()
+
+    // 不包含 StaticIndexedText
+    private val bakedIndexNamespaceSet = ObjectOpenHashSet<String>()
+
+    // 不包含 StaticIndexedText
+    private val bakedIndexIdSet = ObjectOpenHashSet<String>()
+
+    /**
+     * 重置本实例的所有状态.
+     */
+    protected fun reset() {
+        staticIndexedTextList.clear()
+        defaultIndexedTextList.clear()
+        indexedTextOrdinalMap.clear()
+        indexedTextMetadataMap.clear()
+    }
 
     /**
      * 初始化本实例的所有状态.
@@ -49,13 +73,20 @@ internal abstract class AbstractRendererLayout(
         // create corresponding TextMeta for each of them
         for ((sourceIndex, unprocessedLine) in unprocessedPrimary.withIndex()) {
             val textMeta = createTextMeta(unprocessedLine, sourceIndex) ?: continue
-            val derivedOrdinals = textMeta.generateOrdinals(accIndexOffset)
-                .onEach { (derivedIndex, derivedOrdinal) ->
-                    // populate the ordinal lookup
-                    textOrdinalMap[derivedIndex] = derivedOrdinal
-                    // populate the metadata lookup
-                    textMetadataMap[derivedIndex] = textMeta
-                }
+
+            val derivedOrdinals = textMeta.deriveOrdinals(accIndexOffset).onEach { (derivedIndex, derivedOrdinal) ->
+                // populate the ordinal lookup
+                indexedTextOrdinalMap[derivedIndex] = derivedOrdinal
+                // populate the metadata lookup
+                indexedTextMetadataMap[derivedIndex] = textMeta
+
+                // populate the set of baked indexes
+                bakedIndexSet += derivedIndex
+                // populate the set of baked index namespaces
+                bakedIndexNamespaceSet += derivedIndex.namespace()
+                // populate the set of baked index ids
+                bakedIndexIdSet += derivedIndex.value()
+            }
 
             // Accumulate the number of derived lines so far.
             // Do -1 to neglect the unprocessed line itself.
@@ -63,15 +94,15 @@ internal abstract class AbstractRendererLayout(
 
             // populate the static indexed text
             if (textMeta is StaticTextMeta) {
-                val idx = textMeta.generateIndexes().first()
+                val idx = textMeta.derivedIndexes.first()
                 val txt = textMeta.contents
-                staticIndexedTexts += StaticIndexedText(idx, txt)
+                staticIndexedTextList += StaticIndexedText(idx, txt)
             }
             // populate the indexed text with default contents
             else if (textMeta is SimpleTextMeta) {
                 val defaultIndexedText = textMeta.createDefault()
                 if (defaultIndexedText != null) {
-                    defaultIndexedTexts += defaultIndexedText
+                    defaultIndexedTextList += defaultIndexedText
                 }
             }
         }
@@ -130,10 +161,7 @@ internal abstract class AbstractRendererLayout(
                                 }
                             }
                         }
-                        val sourceIndex = runCatching { Key.key(group2) }.getOrElse {
-                            logger.warn("Invalid source index while reading line '$unprocessedLine'")
-                            return null
-                        }
+                        val sourceIndex = parseSourceIndex(group2) ?: return null
                         return createTextMeta0(sourceIndex, sourceOrdinal, defaultText)
                     }
 
@@ -146,10 +174,7 @@ internal abstract class AbstractRendererLayout(
 
             // 字符串不包含参数, 模式为 "{}"
             group2 != null -> {
-                val sourceIndex = runCatching { Key.key(group2) }.getOrElse {
-                    logger.warn("Invalid source index while reading line '$unprocessedLine'")
-                    return null
-                }
+                val sourceIndex = parseSourceIndex(group2) ?: return null
                 return createTextMeta0(sourceIndex, sourceOrdinal, null)
             }
         }
@@ -158,7 +183,7 @@ internal abstract class AbstractRendererLayout(
     }
 
     private fun createTextMeta0(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): TextMeta? {
-        val factory = renderer.rendererFormats.textMetaFactoryRegistry.getApplicableFactory(sourceIndex)
+        val factory = renderer.formats.textMetaFactoryRegistry.getApplicableFactory(sourceIndex)
         if (factory == null) {
             logger.warn("Can't find a valid TextMetaFactory for source index '$sourceIndex'")
             return null
@@ -166,18 +191,17 @@ internal abstract class AbstractRendererLayout(
         return factory.create(sourceIndex, sourceOrdinal, defaultText)
     }
 
-    private fun deserializeToComponents(text: String): List<Component> {
-        return text.split("\\r").map(mm::deserialize)
+    private fun parseSourceIndex(unprocessed: String): Key? {
+        try {
+            return Key.key(unprocessed)
+        } catch (e: InvalidKeyException) {
+            logger.warn("Invalid source index while reading line '$unprocessed'")
+            return null
+        }
     }
 
-    /**
-     * 重置本实例的所有状态.
-     */
-    protected fun reset() {
-        staticIndexedTexts.clear()
-        defaultIndexedTexts.clear()
-        textOrdinalMap.clear()
-        textMetadataMap.clear()
+    private fun deserializeToComponents(text: String): List<Component> {
+        return text.split("\\r").map(mm::deserialize)
     }
 
     /**
@@ -186,7 +210,7 @@ internal abstract class AbstractRendererLayout(
      * 如果 [index] 没有对应的顺序, 则返回 `null`.
      */
     override fun getOrdinal(index: DerivedIndex): DerivedOrdinal? {
-        val ret = textOrdinalMap.getInt(index)
+        val ret = indexedTextOrdinalMap.getInt(index)
         if (ret == -1) {
             logger.warn("Can't find ordinal for derived index '$index'")
             return null
@@ -201,7 +225,7 @@ internal abstract class AbstractRendererLayout(
      */
     override fun <T : TextMeta> getMetadata(index: DerivedIndex): T? {
         @Suppress("UNCHECKED_CAST")
-        val ret = textMetadataMap[index] as T?
+        val ret = indexedTextMetadataMap[index] as T?
         if (ret == null) {
             logger.warn("Can't find metadata for derived index '$index'")
         }
@@ -212,7 +236,8 @@ internal abstract class AbstractRendererLayout(
 /**
  * 用来描述不会衍生并且只有一个 [SourceIndex] 的 [IndexedText].
  *
- * 例如: 标准渲染器中的 `lore` 和 `level`.
+ * 例如: 标准渲染器中的 `lore`, `level`, `enchantment` 等.
+ * 与之相反的是那些会衍生的 [IndexedText], 例如 `attribute`.
  */
 internal data class SingleSimpleTextMeta(
     override val sourceIndex: SourceIndex,
@@ -223,7 +248,9 @@ internal data class SingleSimpleTextMeta(
         return defaultText?.let { listOf(SimpleIndexedText(sourceIndex, it)) }
     }
 
-    override fun generateIndexes(): List<DerivedIndex> {
+    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
+
+    override fun deriveIndexes(): List<DerivedIndex> {
         return listOf(sourceIndex)
     }
 }
@@ -256,7 +283,9 @@ internal data class CustomStaticTextMeta(
     override val sourceOrdinal: SourceOrdinal,
     override val companionNamespace: String?,
     override val contents: List<Component>,
-) : StaticTextMeta
+) : StaticTextMeta {
+    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
+}
 
 /**
  * 用来描述其内容为“空白”的 [StaticIndexedText].
@@ -267,4 +296,5 @@ internal data class BlankStaticTextMeta(
     override val companionNamespace: String?,
 ) : StaticTextMeta {
     override val contents: List<Component> = listOf(Component.empty())
+    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
 }

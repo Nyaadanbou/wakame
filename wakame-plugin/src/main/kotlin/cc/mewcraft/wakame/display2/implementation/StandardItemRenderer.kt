@@ -40,17 +40,17 @@ internal data object StandardContext // 等之后需要的时候, 改成 class �
 
 internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
     override val name = "standard"
-    override val rendererFormats = StandardRendererFormats(this)
-    override val rendererLayout = StandardRendererLayout(this)
-    private val indexedTextListTransformer = IndexedTextListTransformer(rendererLayout)
+    override val formats = StandardRendererFormats(this)
+    override val layout = StandardRendererLayout(this)
+    private val textAssembler = TextAssembler(layout)
 
     override fun initialize(
         formatPath: Path,
         layoutPath: Path,
     ) {
         StandardRenderingParts.bootstrap()
-        rendererFormats.initialize(formatPath) // formats 必须在 layout 之前初始化
-        rendererLayout.initialize(layoutPath)
+        formats.initialize(formatPath) // formats 必须在 layout 之前初始化
+        layout.initialize(layoutPath)
     }
 
     override fun render(item: PacketNekoStack, context: StandardContext?) {
@@ -88,13 +88,13 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.RARITY) { data -> StandardRenderingParts.RARITY.process(collector, data) }
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
 
-        val minecraftLore = indexedTextListTransformer.flatten(collector)
-        val minecraftCmd = ItemModelDataLookup[item.id, item.variant]
+        val itemLore = textAssembler.assemble(collector)
+        val itemCmd = ItemModelDataLookup[item.id, item.variant]
 
         // item.erase()
 
-        item.lore(minecraftLore)
-        item.customModelData(minecraftCmd)
+        item.lore(itemLore)
+        item.customModelData(itemCmd)
         item.showAttributeModifiers(false)
         // item.showCanBreak(false)
         // item.showCanPlaceOn(false)
@@ -225,10 +225,7 @@ internal data class AttackSpeedRendererFormat(
 ) : RendererFormat.Simple {
     override val id = "attack_speed"
     override val index = createIndex()
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return SingleSimpleTextMetaFactory(namespace, id)
-    }
+    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
     fun render(data: AttackSpeedLevel): IndexedText {
         val resolver = Placeholder.component("value", tooltip.level.getOrDefault(data.ordinal, UNKNOWN_LEVEL))
@@ -263,12 +260,17 @@ internal data class CellularAttributeRendererFormat(
     @Setting @Required
     private val ordinal: Ordinal,
 ) : RendererFormat.Dynamic<ConstantCompositeAttribute> {
+    override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
+
     fun render(data: ConstantCompositeAttribute): IndexedText {
         val facade = AttributeRegistry.FACADES[data.id]
         val tooltip = facade.createTooltipLore(data)
         return SimpleIndexedText(computeIndex(data), tooltip)
     }
 
+    /**
+     * 实现要求: 返回值必须是 [AttributeCoreTextMeta.derivedIndexes] 的子集.
+     */
     override fun computeIndex(data: ConstantCompositeAttribute): Key {
         val indexId = buildString {
             append(data.id)
@@ -280,10 +282,6 @@ internal data class CellularAttributeRendererFormat(
             }
         }
         return Key.key(namespace, indexId)
-    }
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
     }
 
     @ConfigSerializable
@@ -300,6 +298,8 @@ internal data class CellularSkillRendererFormat(
     @Setting @Required
     override val namespace: String,
 ) : RendererFormat.Dynamic<ConfiguredSkill> {
+    override val textMetaFactory = SkillCoreTextMetaFactory(namespace)
+
     fun render(data: ConfiguredSkill): IndexedText {
         val instance = data.instance
         val tooltip = instance.displays.tooltips.map(MM::deserialize)
@@ -310,10 +310,6 @@ internal data class CellularSkillRendererFormat(
         val dataId = data.id
         val indexId = dataId.namespace() + "/" + dataId.value()
         return Key.key(namespace, indexId)
-    }
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return SkillCoreTextMetaFactory(namespace)
     }
 
     companion object Shared {
@@ -330,19 +326,16 @@ internal data class CellularEmptyRendererFormat(
 ) : RendererFormat.Simple {
     override val id = "cells/empty"
     override val index = createIndex()
+    override val textMetaFactory = EmptyCoreTextMetaFactory(namespace)
 
-    // 由于索引相同的 IndexedText 经过 IndexedTextFlatter 的处理后会去重,
-    // 这里使用一个简单的算法, 来产生带有序数的 IndexedText 使得索引不再重复.
+    // 由于索引相同的 IndexedText 经过 TextAssembler 的处理后会去重,
+    // 这里循环产生在末尾带有序数的 IndexedText#idx 使得索引不再重复.
     private val tooltipCycle = IndexedTextCycle(limit = EmptyCoreTextMeta.MAX_DISPLAY_COUNT) { i ->
         SimpleIndexedText(index.value { v -> "$v/$i" }, tooltip)
     }
 
     fun render(): IndexedText {
         return tooltipCycle.next()
-    }
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return EmptyCoreTextMetaFactory(namespace)
     }
 }
 
@@ -352,6 +345,7 @@ internal data class PortableCoreRendererFormat(
     override val namespace: String,
 ) : RendererFormat.Dynamic<PortableCore> {
     private val unknownIndex = Key.key(namespace, "unknown")
+    override val textMetaFactory = PortableCoreTextMetaFactory(namespace)
 
     fun render(data: PortableCore): IndexedText {
         val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
@@ -362,10 +356,6 @@ internal data class PortableCoreRendererFormat(
 
     override fun computeIndex(data: PortableCore): Key {
         throw UnsupportedOperationException() // 直接在 render(...) 函数中处理
-    }
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return PortableCoreTextMetaFactory(namespace)
     }
 }
 //</editor-fold>
@@ -379,26 +369,31 @@ internal data class AttributeCoreTextMeta(
     override val sourceIndex: SourceIndex,
     override val sourceOrdinal: SourceOrdinal,
     override val defaultText: List<Component>?,
-    private val derived: Derived,
+    private val derivation: DerivationRule,
 ) : SimpleTextMeta {
-    override fun generateIndexes(): List<DerivedIndex> {
+    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
+
+    /**
+     * 实现要求: 返回的列表必须是 [CellularAttributeRendererFormat.computeIndex] 的超集.
+     */
+    override fun deriveIndexes(): List<DerivedIndex> {
         val sourceNamespace = sourceIndex.namespace()
         val sourceId = sourceIndex.value()
         val combiner = StringCombiner(sourceId, ".") {
-            addList(derived.operationIndex)
-            addList(derived.elementIndex, AttributeRegistry.FACADES[sourceId].components.hasComponent<CompositeAttributeComponent.Element>())
+            addList(derivation.operationIndex)
+            addList(derivation.elementIndex, AttributeRegistry.FACADES[sourceId].components.hasComponent<CompositeAttributeComponent.Element>())
         }
         val combinations = combiner.combine()
         return combinations.map { Key.key(sourceNamespace, it) }
     }
 
-    data class Derived(
+    data class DerivationRule(
         val operationIndex: List<String>,
         val elementIndex: List<String>,
     ) {
         init { // validate values
-            this.operationIndex.forEach { Operation.byKeyOrThrow(it) }
-            this.elementIndex.forEach { ElementRegistry.INSTANCES[it] }
+            this.operationIndex.forEach { Operation.byKey(it) ?: error("'$it' is not a valid operation, check your renderer config") }
+            this.elementIndex.forEach { ElementRegistry.INSTANCES.find(it) ?: error("'$it' is not a valid element, check your renderer config") }
         }
     }
 }
@@ -413,8 +408,8 @@ internal data class AttributeCoreTextMetaFactory(
     }
 
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        val derived = AttributeCoreTextMeta.Derived(operationIndex, elementIndex)
-        return AttributeCoreTextMeta(sourceIndex, sourceOrdinal, defaultText, derived)
+        val derivationRule = AttributeCoreTextMeta.DerivationRule(operationIndex, elementIndex)
+        return AttributeCoreTextMeta(sourceIndex, sourceOrdinal, defaultText, derivationRule)
     }
 }
 
@@ -423,7 +418,9 @@ internal data class SkillCoreTextMeta(
     override val sourceOrdinal: SourceOrdinal,
     override val defaultText: List<Component>?,
 ) : SimpleTextMeta {
-    override fun generateIndexes(): List<DerivedIndex> {
+    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
+
+    override fun deriveIndexes(): List<DerivedIndex> {
         return listOf(sourceIndex)
     }
 }
@@ -452,12 +449,14 @@ internal data class EmptyCoreTextMeta(
     override val sourceOrdinal: SourceOrdinal,
     override val defaultText: List<Component>?,
 ) : SimpleTextMeta {
+    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
+
     // 根据 MAX_DISPLAY_COUNT 生成对应数量的 DerivedIndex. 格式为:
     // "namespace:value/0",
     // "namespace:value/1",
     // "namespace:value/2",
     // ...
-    override fun generateIndexes(): List<DerivedIndex> {
+    override fun deriveIndexes(): List<DerivedIndex> {
         val ret = mutableListOf<DerivedIndex>()
         for (i in 0 until MAX_DISPLAY_COUNT) {
             ret += derive(sourceIndex, i)

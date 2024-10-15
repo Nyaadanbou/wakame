@@ -14,8 +14,8 @@ internal class ModdingTableContext
 
 internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, ModdingTableContext>() {
     override val name: String = "modding_table"
-    override val rendererFormats = ModdingTableRendererFormats(this)
-    override val rendererLayout = ModdingTableRendererLayout(this)
+    override val formats = ModdingTableRendererFormats(this)
+    override val layout = ModdingTableRendererLayout(this)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 ModdingTable

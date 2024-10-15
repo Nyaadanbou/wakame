@@ -10,7 +10,7 @@ import org.koin.test.KoinTest
 import testEnv
 import kotlin.test.Test
 
-class RendererInitializationTest : KoinTest {
+class ItemRendererInitTest : KoinTest {
     companion object {
         @JvmStatic
         @BeforeAll

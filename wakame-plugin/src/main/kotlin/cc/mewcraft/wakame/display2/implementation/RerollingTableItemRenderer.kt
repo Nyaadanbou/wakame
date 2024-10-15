@@ -14,8 +14,8 @@ internal class RerollingTableContext
 
 internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, RerollingTableContext>() {
     override val name: String = "rerolling_table"
-    override val rendererFormats = RerollingTableRendererFormats(this)
-    override val rendererLayout = RerollingTableRendererLayout(this)
+    override val formats = RerollingTableRendererFormats(this)
+    override val layout = RerollingTableRendererLayout(this)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         // TODO display2 RerollingTable

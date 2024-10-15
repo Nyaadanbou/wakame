@@ -58,14 +58,14 @@ internal data class CraftingStationContext(
 
 internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, CraftingStationContext>() {
     override val name: String = "crafting_station"
-    override val rendererFormats = CraftingStationRendererFormats(this)
-    override val rendererLayout = CraftingStationRendererLayout(this)
-    private val indexedTextListTransformer = IndexedTextListTransformer(rendererLayout)
+    override val formats = CraftingStationRendererFormats(this)
+    override val layout = CraftingStationRendererLayout(this)
+    private val textAssembler = TextAssembler(layout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         CraftingStationRenderingParts.bootstrap()
-        rendererFormats.initialize(formatPath)
-        rendererLayout.initialize(layoutPath)
+        formats.initialize(formatPath)
+        layout.initialize(layoutPath)
     }
 
     override fun render(item: NekoStack, context: CraftingStationContext?) {
@@ -92,14 +92,14 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> CraftingStationRenderingParts.PORTABLE_CORE.process(collector, data) }
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> CraftingStationRenderingParts.ENCHANTMENTS.process(collector, data) }
 
-        val minecraftLore = indexedTextListTransformer.flatten(collector)
-        val minecraftCmd = ItemModelDataLookup[item.id, item.variant]
+        val itemLore = textAssembler.assemble(collector)
+        val itemCmd = ItemModelDataLookup[item.id, item.variant]
 
         // item.erase()
 
         val handle = item.unsafe.handle
-        handle.backingLore = minecraftLore
-        handle.backingCustomModelData = minecraftCmd
+        handle.backingLore = itemLore
+        handle.backingCustomModelData = itemCmd
         handle.showAttributeModifiers(false)
         // handle.showCanBreak(false)
         // handle.showCanPlaceOn(false)
@@ -205,10 +205,7 @@ internal data class FuzzyEnchantmentRendererFormat(
 ) : RendererFormat.Simple {
     override val id = "enchantments"
     override val index = Key.key(namespace, id)
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return SingleSimpleTextMetaFactory(namespace, id)
-    }
+    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
     /**
      * @param data 魔咒和等级的映射
@@ -235,6 +232,7 @@ internal data class FuzzyPortableCoreRendererFormat(
     override val namespace: String,
 ) : RendererFormat.Dynamic<PortableCore> {
     private val unknownIndex = Key.key(namespace, "unknown")
+    override val textMetaFactory = FuzzyPortableCoreTextMetaFactory(namespace)
 
     fun render(data: PortableCore): IndexedText {
         val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
@@ -245,10 +243,6 @@ internal data class FuzzyPortableCoreRendererFormat(
 
     override fun computeIndex(data: PortableCore): Key {
         throw UnsupportedOperationException() // 直接在 render(...) 函数中处理
-    }
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return FuzzyPortableCoreTextMetaFactory(namespace)
     }
 }
 //</editor-fold>

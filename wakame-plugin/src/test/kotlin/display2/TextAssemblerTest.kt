@@ -20,11 +20,11 @@ import testEnv
 import kotlin.test.*
 
 /**
- * 测试 [IndexedTextListTransformer].
+ * 测试 [TextAssembler].
  *
- * 本测试使用了 [IndexedTextFlatterLifecycle] 来快速构建测试用例.
+ * 本测试使用了 [TextAssemblerTestLifecycle] 来快速构建测试用例.
  */
-class IndexedTextFlatterTest : KoinTest {
+class TextAssemblerTest : KoinTest {
 
     // 每个 test 用到了不同的 RendererConfig 和
     // LoreMetaLookup, 因此需要在每个 test 前后
@@ -65,7 +65,7 @@ class IndexedTextFlatterTest : KoinTest {
      * - 应该完全不采用默认值
      */
     @Test
-    fun `case 1`(): Unit = indexedTextFlatterLifecycle {
+    fun `case 1`(): Unit = textAssemblerTestLifecycle {
         configure {
             static {
                 // 添加两个固定的内容行.
@@ -138,7 +138,7 @@ class IndexedTextFlatterTest : KoinTest {
      * - 没有 input 的 indexed text 应该采用默认值
      */
     @Test
-    fun `case 2`(): Unit = indexedTextFlatterLifecycle {
+    fun `case 2`(): Unit = textAssemblerTestLifecycle {
         configure {
             static {
                 +staticIndexedText("fixed", "1")
@@ -191,7 +191,7 @@ class IndexedTextFlatterTest : KoinTest {
      */
     @Test
     fun `case 3`() {
-        indexedTextFlatterLifecycle {
+        textAssemblerTestLifecycle {
             configure {
                 static {
                     // 没有固定内容
@@ -241,7 +241,7 @@ class IndexedTextFlatterTest : KoinTest {
      */
     @Test
     fun `case 4`() {
-        indexedTextFlatterLifecycle {
+        textAssemblerTestLifecycle {
             configure {
                 static {
                     +staticIndexedText("fixed", "1")
@@ -275,7 +275,7 @@ class IndexedTextFlatterTest : KoinTest {
             }
         }
 
-        indexedTextFlatterLifecycle {
+        textAssemblerTestLifecycle {
             configure {
                 static {
                     +staticIndexedText("fixed", "1")
@@ -329,7 +329,7 @@ class IndexedTextFlatterTest : KoinTest {
      */
     @Test
     fun `case 5`() {
-        indexedTextFlatterLifecycle {
+        textAssemblerTestLifecycle {
             configure {
                 static {
                     +staticIndexedText("fixed", "1")
@@ -390,7 +390,7 @@ class IndexedTextFlatterTest : KoinTest {
      */
     @Test
     fun `case 6`() {
-        indexedTextFlatterLifecycle {
+        textAssemblerTestLifecycle {
             configure {
                 static {
                     // 无固定内容
@@ -452,15 +452,15 @@ private fun assertEquals0(expected: List<Component>, actual: List<Component>) {
 
 // 构建测试
 
-private fun indexedTextFlatterLifecycle(init: IndexedTextFlatterLifecycle.() -> Unit) {
-    IndexedTextFlatterLifecycle().apply(init).buildAndTest()
+private fun textAssemblerTestLifecycle(init: TextAssemblerTestLifecycle.() -> Unit) {
+    TextAssemblerTestLifecycle().apply(init).buildAndTest()
 }
 
 /**
- * 用于构建测试用例的辅助类. 使用 [indexedTextFlatterLifecycle] 来构建测试用例.
+ * 用于构建测试用例的辅助类. 使用 [textAssemblerTestLifecycle] 来构建测试用例.
  */
-@IndexedTextFlatterDsl
-private class IndexedTextFlatterLifecycle : KoinTest {
+@TextAssemblerTestLifecycleDsl
+private class TextAssemblerTestLifecycle : KoinTest {
     // built configurations
     private lateinit var defaultTexts: List<IndexedText>
     private lateinit var staticTexts: List<IndexedText>
@@ -472,7 +472,7 @@ private class IndexedTextFlatterLifecycle : KoinTest {
 
     // 构建 RendererConfig.
     // 目前的实现只需要构建:
-    // defaultTexts - 拥有默认内容的 (Simple)IndexedText - 如果这些没有在 input 中出现, 在进行 flatten 后将会变成 'namespace:value@default'
+    // defaultTexts - 拥有默认内容的 (Simple)IndexedText - 如果这些没有在 input 中出现, 在进行 assemble 后将会变成 'namespace:value@default'
     // staticTexts - 始终要渲染的 (Static)IndexedText - 无论 input 是什么, 都需要渲染的 IndexedText; 当然, 有些是有 companionNamespace 的
     fun configure(block: RendererLayoutBuilder.() -> Unit) {
         val builder = RendererLayoutBuilder().apply(block)
@@ -492,26 +492,26 @@ private class IndexedTextFlatterLifecycle : KoinTest {
 
         // configure injections
         declareMock<RendererLayout> {
-            every { defaultIndexedTexts } returns defaultTexts
-            every { staticIndexedTexts } returns staticTexts
+            every { defaultIndexedTextList } returns defaultTexts
+            every { staticIndexedTextList } returns staticTexts
             every { getOrdinal(any()) } answers { ordinalMap.getValue(firstArg()) }
             every { getMetadata<TextMeta>(any()) } answers { metadataMap.getValue(firstArg()) }
         }
 
-        // create flatter
-        val flatter = IndexedTextListTransformer(
+        // create assembler
+        val assembler = TextAssembler(
             rendererLayout = get(),
         )
 
         // run runners
         for (runner in runners) {
-            val actual = flatter.flatten(ObjectArrayList(runner.input))
+            val actual = assembler.assemble(ObjectArrayList(runner.input))
             val expected = runner.expected
             assertEquals0(expected, actual)
         }
     }
 
-    @IndexedTextFlatterDsl
+    @TextAssemblerTestLifecycleDsl
     class RendererLayoutBuilder {
         val defaultTexts = mutableListOf<IndexedText>()
         val staticTexts = mutableListOf<IndexedText>()
@@ -539,7 +539,7 @@ private class IndexedTextFlatterLifecycle : KoinTest {
         }
     }
 
-    @IndexedTextFlatterDsl
+    @TextAssemblerTestLifecycleDsl
     class DefaultTextBuilder {
         val texts = mutableListOf<IndexedText>()
 
@@ -548,7 +548,7 @@ private class IndexedTextFlatterLifecycle : KoinTest {
         }
     }
 
-    @IndexedTextFlatterDsl
+    @TextAssemblerTestLifecycleDsl
     class ConstantTextBuilder {
         val texts = mutableListOf<IndexedText>()
 
@@ -557,7 +557,7 @@ private class IndexedTextFlatterLifecycle : KoinTest {
         }
     }
 
-    @IndexedTextFlatterDsl
+    @TextAssemblerTestLifecycleDsl
     class IndexBuilder {
         val map = mutableMapOf<Key, Int>()
 
@@ -566,7 +566,7 @@ private class IndexedTextFlatterLifecycle : KoinTest {
         }
     }
 
-    @IndexedTextFlatterDsl
+    @TextAssemblerTestLifecycleDsl
     class MetadataBuilder {
         val map = mutableMapOf<Key, TextMeta>()
 
@@ -575,19 +575,19 @@ private class IndexedTextFlatterLifecycle : KoinTest {
         }
     }
 
-    @IndexedTextFlatterDsl
+    @TextAssemblerTestLifecycleDsl
     class ActualBuilder {
         val texts = mutableListOf<IndexedText>()
 
         operator fun IndexedText.unaryPlus() {
-            // 不能直接在这里进行 flatten 操作, 因为 flatten
+            // 不能直接在这里进行 assemble 操作, 因为 assemble
             // 需要用到渲染的配置和 ordinal/metadata map,
             // 而到这里还没有注入好这两个对象.
             texts.add(this)
         }
     }
 
-    @IndexedTextFlatterDsl
+    @TextAssemblerTestLifecycleDsl
     class ExpectedBuilder {
         val texts = mutableListOf<String>()
 
@@ -602,7 +602,7 @@ private class IndexedTextFlatterLifecycle : KoinTest {
         }
     }
 
-    @IndexedTextFlatterDsl
+    @TextAssemblerTestLifecycleDsl
     class TestRunner {
         // expected & input
         lateinit var expected: List<Component>
@@ -610,7 +610,7 @@ private class IndexedTextFlatterLifecycle : KoinTest {
 
         // 构建 input.
         // 你需要把所有要渲染的 (Simple)IndexedText 通过这个函数添加;
-        // 注意不要添加 (Static)IndexedText, 这些会由 flatter 自己添加.
+        // 注意不要添加 (Static)IndexedText, 这些会由 assembler 自己添加.
         fun input(block: ActualBuilder.() -> Unit) {
             val builder = ActualBuilder().apply(block)
             input = builder.texts
@@ -647,4 +647,4 @@ private object TextMetaBuilder {
 }
 
 @DslMarker
-private annotation class IndexedTextFlatterDsl
+private annotation class TextAssemblerTestLifecycleDsl

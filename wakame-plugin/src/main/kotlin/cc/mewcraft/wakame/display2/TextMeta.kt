@@ -4,9 +4,9 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 
 /**
- * 代表 [IndexedText] 的元数据.
+ * [IndexedText] 的额外信息.
  *
- * 元数据指的是用户给特定内容.
+ * 这些信息来自用户输入, 将用于初始化 [RendererLayout].
  */
 interface TextMeta {
     /**
@@ -18,6 +18,11 @@ interface TextMeta {
      * 原始序数 (即配置文件的列表中字符串所在的顺序).
      */
     val sourceOrdinal: SourceOrdinal
+
+    /**
+     * @see deriveIndexes
+     */
+    val derivedIndexes: List<DerivedIndex>
 
     /**
      * 生成全部的 [DerivedIndex].
@@ -33,7 +38,7 @@ interface TextMeta {
      * 完全一致. 这种情况下 [DerivedIndex] 只是个单例列表. 而有些 [SourceIndex]
      * 存在衍生规则, 因此它们的 [SourceIndex] 就与 [DerivedIndex] 不一致.
      */
-    fun generateIndexes(): List<DerivedIndex>
+    fun deriveIndexes(): List<DerivedIndex>
 
     /**
      * 生成从 [DerivedIndex] 到 [DerivedOrdinal] 的映射.
@@ -75,9 +80,9 @@ interface TextMeta {
      *
      * @param offset [DerivedOrdinal] 的偏移量
      */
-    fun generateOrdinals(offset: Int): Map<DerivedIndex, DerivedOrdinal> {
+    fun deriveOrdinals(offset: Int): Map<DerivedIndex, DerivedOrdinal> {
         val index2Ordinal = LinkedHashMap<DerivedIndex, DerivedOrdinal>() // for debug inspection
-        for ((localOrdinal, fullKey) in generateIndexes().withIndex()) {
+        for ((localOrdinal, fullKey) in derivedIndexes.withIndex()) {
             index2Ordinal[fullKey] = sourceOrdinal + localOrdinal + offset
         }
         return index2Ordinal
@@ -144,11 +149,11 @@ interface StaticTextMeta : TextMeta {
         // 这样刚好能保证不同的固定内容行都有唯一的 Index
         get() = Key.key(STATIC_IDENTIFIER, sourceOrdinal.toString())
 
-    override fun generateIndexes(): List<DerivedIndex> {
+    override fun deriveIndexes(): List<DerivedIndex> {
         return listOf(sourceIndex)
     }
 
-    override fun generateOrdinals(offset: Int): Map<DerivedIndex, DerivedOrdinal> {
+    override fun deriveOrdinals(offset: Int): Map<DerivedIndex, DerivedOrdinal> {
         return mapOf(sourceIndex to sourceOrdinal + offset)
     }
 

@@ -4,39 +4,37 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
 import net.kyori.adventure.text.Component
 
-internal class IndexedTextListTransformer(
+internal class TextAssembler(
     private val rendererLayout: RendererLayout,
 ) {
-    private val textComparator: Comparator<IndexedText> = TextComparator()
-
     /**
-     * Flattens the given [dataList] so that it's converted to a list
-     * of [Component], which then is ready to be put on an item
-     * as the content of component `minecraft:lore`.
+     * Assembles the [dataList] so that it's converted to a list
+     * of [Component], which is ready to be put on an ItemStack
+     * as the content of data component `minecraft:lore`.
      *
-     * The flattening process includes the following (but not least):
+     * The assembling process includes the following (but not least):
      * - sorting the lines by certain order
      * - inserting extra lines into the lore
      * - ...
      *
      * See the implementation for more details.
      *
-     * @param dataList a collection of [IndexedText] to be flattened
+     * @param dataList a collection of [IndexedText] to be assembled
      * @return a sorted list of [Component]
      */
-    fun flatten(dataList: ObjectArrayList<IndexedText>): List<Component> {
+    fun assemble(dataList: ObjectArrayList<IndexedText>): List<Component> {
         // 因为要排序, 并且更多的是插入操作, 所以使用 RBTreeSet
-        val tree = ObjectRBTreeSet(textComparator)
+        val tree = ObjectRBTreeSet(indexComparator)
 
-        // 首先添加传入的 lore lines
+        // 首先添加传入的 indexed text
         tree.addAll(dataList)
-        // 然后添加 renderer config 中的固定内容
-        tree.addAll(rendererLayout.staticIndexedTexts)
-        // 最后添加 renderer config 中的默认内容
+        // 然后添加 layout 中的固定内容
+        tree.addAll(rendererLayout.staticIndexedTextList)
+        // 最后添加 layout 中的默认内容
         // 这里利用了集合的特性，即重复元素(重复键值)不会被添加.
         // 因此，如果这些内容已经存在，那么默认内容就不会被添加.
         // 相反, 如果不存在, 那么默认内容就会被添加.
-        tree.addAll(rendererLayout.defaultIndexedTexts)
+        tree.addAll(rendererLayout.defaultIndexedTextList)
 
         // 接下来要清理固定内容. 整体策略:
         // 1. 遍历整个 tree
@@ -86,6 +84,8 @@ internal class IndexedTextListTransformer(
 
         return tree.flatMapTo(ObjectArrayList(loreSize)) { it.text }
     }
+
+    private val indexComparator: Comparator<IndexedText> = TextComparator()
 
     private inner class TextComparator : Comparator<IndexedText> {
         override fun compare(o1: IndexedText, o2: IndexedText): Int {

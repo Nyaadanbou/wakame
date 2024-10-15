@@ -38,11 +38,8 @@ internal data class SingleValueRendererFormat(
     @Setting
     private val tooltip: String, // mini message format
 ) : RendererFormat.Simple {
-    override val index: Key = createIndex()
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return SingleSimpleTextMetaFactory(namespace, id)
-    }
+    override val index = createIndex()
+    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
     fun render(): IndexedText {
         return SimpleIndexedText(index, listOf(MM.deserialize(tooltip)))
@@ -78,11 +75,8 @@ internal data class ListValueRendererFormat(
     @Setting
     private val tooltip: List<String>, // mini message format,
 ) : RendererFormat.Simple {
-    override val index: Key = createIndex()
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return SingleSimpleTextMetaFactory(namespace, id)
-    }
+    override val index = createIndex()
+    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
     fun render(): IndexedText {
         return SimpleIndexedText(index, tooltip.map(MM::deserialize))
@@ -115,11 +109,8 @@ internal data class AggregateValueRendererFormat(
     @Setting
     private val tooltip: Tooltip, // mini message format
 ) : RendererFormat.Simple {
-    override val index: Key = createIndex()
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return SingleSimpleTextMetaFactory(namespace, id)
-    }
+    override val index = createIndex()
+    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
     /**
      * A convenience function to stylize a list of objects.
@@ -187,12 +178,9 @@ internal data class ExtraLoreRendererFormat(
     @Setting
     private val tooltip: Tooltip = Tooltip(),
 ) : RendererFormat.Simple {
-    override val id: String = "lore"
-    override val index: Key = Key.key(namespace, id)
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return SingleSimpleTextMetaFactory(namespace, id)
-    }
+    override val id = "lore"
+    override val index = Key.key(namespace, id)
+    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
     /**
      * @param data 额外的物品描述
@@ -235,12 +223,9 @@ internal data class EnchantmentRendererFormat(
     @Setting @Required
     override val namespace: String,
 ) : RendererFormat.Simple {
-    override val id: String = "enchantments"
-    override val index: Key = Key.key(namespace, id)
-
-    override fun createTextMetaFactory(): TextMetaFactory {
-        return SingleSimpleTextMetaFactory(namespace, id)
-    }
+    override val id = "enchantments"
+    override val index = Key.key(namespace, id)
+    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
     /**
      * @param data 魔咒和等级的映射

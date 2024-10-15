@@ -6,10 +6,10 @@ import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.NodeKey;
+import org.spongepowered.configurate.objectmapping.meta.PostProcess;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ObjectMapperTest {
 
@@ -31,6 +31,13 @@ class ObjectMapperTest {
         @Setting DatabaseConfig database;
         @Setting ApiConfig api;
         @NodeKey String key;
+
+        boolean disabled;
+
+        @PostProcess
+        void callback() {
+            disabled = true;
+        }
     }
 
     @Test
@@ -50,6 +57,7 @@ class ObjectMapperTest {
         // Loading the configuration into AppConfig
         final AppConfig config = root.node("app").get(AppConfig.class);
         assertNotNull(config);
+        assertTrue(config.disabled);
 
         // Asserting database configuration
         assertEquals("jdbc:mysql://localhost:3306/mydb", config.database.url);
