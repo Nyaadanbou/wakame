@@ -293,7 +293,7 @@ private data class SerializableAttributeInstance(
     }
 
     fun toAttributeInstance(owner: Attributable): AttributeInstance? {
-        val attribute = Attributes.getBy(id) ?: return null
+        val attribute = AttributeMapPatchSupport.attributeProvider.getBy(id) ?: return null
         val attributeInstance = AttributeInstanceFactory.createLiveInstance(attribute, owner, true).apply {
             setBaseValue(base)
         }
@@ -335,4 +335,5 @@ private data class SerializableAttributeModifier(
 
 private object AttributeMapPatchSupport : KoinComponent {
     val logger: Logger by inject()
+    val attributeProvider: AttributeProvider by inject()
 }

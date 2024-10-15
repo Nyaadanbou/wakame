@@ -16,6 +16,10 @@ import net.kyori.examination.ExaminableProperty
 import org.intellij.lang.annotations.Pattern
 import java.util.stream.Stream
 
+fun Attribute(descriptionId: String, defaultValue: Double, vanilla: Boolean = false): Attribute {
+    return AttributeImpl(descriptionId, defaultValue, vanilla)
+}
+
 /**
  * An attribute type with a numerical default value.
  *
@@ -33,16 +37,16 @@ import java.util.stream.Stream
  * @see RangedAttribute
  * @see ElementAttribute
  */
-open class Attribute
+open class AttributeImpl
 /**
  * @param defaultValue 属性的默认数值 ([Provider])
  */
 protected constructor(
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) val facadeId: String,
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) val descriptionId: String,
+    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) final override val facadeId: String,
+    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) final override val descriptionId: String,
     defaultValue: Provider<Double>,
-    val vanilla: Boolean = false,
-) : Keyed, Examinable {
+    override val vanilla: Boolean = false,
+) : Examinable, Attribute {
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
@@ -83,15 +87,9 @@ protected constructor(
     // 这也意味着，我们也不需要再写一个 defaultValueProvider 的 property
     //
     // 这里说的同样也适用于该文件其他用到 `by` 的地方
-    val defaultValue: Double by defaultValue
+    final override val defaultValue: Double by defaultValue
 
-    /**
-     * 清理给定的数值，使其落在该属性的合理数值范围内。
-     *
-     * @param value 要清理的数值
-     * @return 清理好的数值
-     */
-    open fun sanitizeValue(value: Double): Double {
+    override fun sanitizeValue(value: Double): Double {
         return value
     }
 
@@ -140,7 +138,7 @@ protected constructor(
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
     vanilla: Boolean = false,
-) : Attribute(facadeId, descriptionId, defaultValue, vanilla) {
+) : AttributeImpl(facadeId, descriptionId, defaultValue, vanilla) {
     val minValue: Double by minValue
     val maxValue: Double by maxValue
 

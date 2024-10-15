@@ -87,7 +87,7 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     }
 
     override fun getBy(descriptionId: String): Attribute? {
-        return AttributeInternals.getBy(descriptionId) ?: ElementAttributeInternals.getBy(descriptionId)
+        return AttributeInternals.getBy(descriptionId)
     }
 
     /**
@@ -100,7 +100,7 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     }
 
     override fun allDescriptionId(): Collection<String> {
-        return AttributeInternals.allDescriptionId() + ElementAttributeInternals.allDescriptionId()
+        return AttributeInternals.allDescriptionId()
     }
 
     //////

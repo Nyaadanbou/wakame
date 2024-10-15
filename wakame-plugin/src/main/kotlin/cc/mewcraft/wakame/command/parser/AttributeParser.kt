@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.AttributeProvider
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
@@ -12,6 +12,8 @@ import org.incendo.cloud.parser.ArgumentParseResult
 import org.incendo.cloud.parser.ArgumentParser
 import org.incendo.cloud.parser.ParserDescriptor
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class AttributeParser<C : Any> : ArgumentParser<C, Attribute>, BlockingSuggestionProvider.Strings<C> {
     companion object Factory {
@@ -26,7 +28,7 @@ class AttributeParser<C : Any> : ArgumentParser<C, Attribute>, BlockingSuggestio
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<Attribute> {
         val peekString = commandInput.peekString()
-        val attribute = Attributes.getBy(peekString)
+        val attribute = AttributeParserSupport.attributeProvider.getBy(peekString)
             ?: return ArgumentParseResult.failure(AttributeParseException(commandContext))
 
         commandInput.readString()
@@ -35,7 +37,7 @@ class AttributeParser<C : Any> : ArgumentParser<C, Attribute>, BlockingSuggestio
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return Attributes.allDescriptionId()
+        return AttributeParserSupport.attributeProvider.allDescriptionId()
     }
 }
 
@@ -46,3 +48,7 @@ class AttributeParseException(
     context,
     StandardCaptionKeys.EXCEPTION_INVALID_ARGUMENT
 )
+
+private object AttributeParserSupport : KoinComponent {
+    val attributeProvider: AttributeProvider by inject()
+}
