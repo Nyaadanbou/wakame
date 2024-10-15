@@ -6,19 +6,14 @@ import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.gui.MenuLayoutSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.station.recipe.StationRecipeLoadEvent
-import cc.mewcraft.wakame.util.RunningEnvironment
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.util.*
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
 
-object StationRegistry : Initializable, KoinComponent {
+internal object StationRegistry : Initializable, KoinComponent {
     private const val STATION_DIR_NAME = "station/stations"
     private val stations: MutableMap<String, Station> = mutableMapOf()
     private val logger: Logger by inject()

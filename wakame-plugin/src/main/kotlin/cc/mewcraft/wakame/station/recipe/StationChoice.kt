@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.station.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.core.ItemXNeko
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.CraftingStationContext.*
@@ -22,36 +21,36 @@ import java.util.stream.Stream
 /**
  * 合成站的一项输入要求.
  */
-sealed interface StationChoice : Examinable {
+internal sealed interface StationChoice : Examinable {
     val checker: ChoiceChecker<*>
     val consumer: ChoiceConsumer<*>
 
     /**
-     * 通过上下文检查此 [StationChoice] 的满足与否
-     * 上下文依靠 [ChoiceCheckerContextMap] 获取
+     * 通过上下文检查此 [StationChoice] 的满足与否.
+     * 上下文依靠 [ChoiceCheckerContextMap] 获取.
      */
     fun check(contextMap: ChoiceCheckerContextMap): Boolean
 
     /**
-     * 将此 [StationChoice] 的消耗添加到上下文中
-     * 上下文依靠 [ChoiceConsumerContextMap] 获取
+     * 将此 [StationChoice] 的消耗添加到上下文中.
+     * 上下文依靠 [ChoiceConsumerContextMap] 获取.
      */
     fun consume(contextMap: ChoiceConsumerContextMap)
 
     /**
-     * 该 [StationChoice] 是否有效
-     * 用于延迟验证配方是否能够注册
+     * 该 [StationChoice] 是否有效.
+     * 用于延迟验证配方是否能够注册.
      */
     fun isValid(): Boolean
 
     /**
-     * 获取此 [StationChoice] 的描述
-     * 使用MiniMessage格式的字符串
+     * 获取此 [StationChoice] 的描述.
+     * 使用 MiniMessage 格式的字符串.
      */
     fun description(layout: MenuLayout): String
 
     /**
-     * 获取此 [StationChoice] 的展示物品
+     * 获取此 [StationChoice] 的展示物品.
      */
     fun displayItemStack(): ItemStack
 }
@@ -102,15 +101,15 @@ internal data class ItemChoice(
     override fun description(layout: MenuLayout): String {
         // 缺省构建格式: "<prefix> 材料 ×1"
         return layout.getLang("choices.item")
-            ?.replace("<render_name>", item.renderName())
+            ?.replace("<name>", item.displayName())
             ?.replace("<amount>", amount.toString())
-            ?: "<prefix> ${item.renderName()} ×$amount"
+            ?: "<prefix> ${item.displayName()} ×$amount"
     }
 
     override fun displayItemStack(): ItemStack {
-        // TODO gui物品
-        val displayItemStack = item.createItemStack() ?: ItemStack(Material.BARRIER)
-        if (item is ItemXNeko) displayItemStack.render()
+        val displayItemStack = item.createItemStack()
+            ?: ItemStack(Material.BARRIER)
+        displayItemStack.render0()
         displayItemStack.amount = amount
         return displayItemStack
     }
@@ -203,8 +202,9 @@ internal object StationChoiceSerializer : TypeSerializer<StationChoice> {
 /**
  * 方便函数.
  */
-private fun ItemStack.render() {
-    val nekoStack = tryNekoStack ?: return
-    val context = CraftingStationContext(Pos.CHOICE)
+private fun ItemStack.render0(): ItemStack {
+    val nekoStack = tryNekoStack ?: return this
+    val context = CraftingStationContext(Pos.CHOICE, erase = true)
     ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
+    return this
 }

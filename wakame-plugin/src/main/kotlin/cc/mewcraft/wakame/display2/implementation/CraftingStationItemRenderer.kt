@@ -44,9 +44,11 @@ internal class CraftingStationRendererLayout(renderer: CraftingStationItemRender
 
 /**
  * @param pos 物品出现的位置
+ * @param erase 是否移除萌芽标签
  */
 internal data class CraftingStationContext(
     val pos: Pos,
+    val erase: Boolean = false,
 ) {
     enum class Pos {
         OVERVIEW, // 合成站的主要菜单
@@ -95,7 +97,9 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         val itemLore = textAssembler.assemble(collector)
         val itemCmd = ItemModelDataLookup[item.id, item.variant]
 
-        // item.erase()
+        if (context.erase) {
+            item.erase()
+        }
 
         val handle = item.unsafe.handle
         handle.backingLore = itemLore

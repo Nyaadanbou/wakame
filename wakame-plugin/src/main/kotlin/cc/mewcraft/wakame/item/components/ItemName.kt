@@ -11,8 +11,6 @@ import org.koin.core.component.inject
 
 data class ItemName(
     /**
-     * 原始字符串, 格式为 MiniMessage.
-     *
      * 这部分是直接存在 NBT 里的原始字符串.
      */
     val raw: String,

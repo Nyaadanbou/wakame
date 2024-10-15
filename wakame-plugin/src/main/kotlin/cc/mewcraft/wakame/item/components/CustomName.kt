@@ -15,15 +15,15 @@ import org.koin.core.component.inject
 // 3. 在后台模板上存什么;
 data class CustomName(
     /**
-     * 原始字符串, 格式为 MiniMessage.
-     *
      * 这部分是直接存在 NBT 里的原始字符串.
      */
     val raw: String,
     /**
-     * 原始字符串, 格式为 MiniMessage.
+     * 原始字符串 [raw] 经解析之后的产生的 [Component].
      *
-     * 这部分是直接存在 NBT 里的原始字符串.
+     * 这部分是直接存在原版物品组件 `minecraft:custom_name` 上的.
+     * 因此, 如果之后有修改过该组件的值, 那么该文本可能与 [raw]
+     * 一开始生成出来的富文本有所差别.
      */
     val rich: Component,
 ) : Examinable {

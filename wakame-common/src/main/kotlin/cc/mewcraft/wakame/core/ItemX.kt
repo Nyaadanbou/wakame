@@ -69,7 +69,7 @@ sealed interface ItemX : Keyed, Examinable {
     /**
      * 该物品的渲染时的名字.
      */
-    fun renderName(): String
+    fun displayName(): String
 }
 
 /**

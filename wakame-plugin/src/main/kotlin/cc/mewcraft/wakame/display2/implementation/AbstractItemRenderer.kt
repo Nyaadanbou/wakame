@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
-import org.jetbrains.annotations.TestOnly
+import org.jetbrains.annotations.VisibleForTesting
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -54,7 +54,7 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, I
         get(type)?.apply(block)
     }
 
-    @TestOnly
+    @VisibleForTesting
     fun initialize0() {
         val renderersDirectory = get<Path>(named(PLUGIN_DATA_DIR)).resolve("renderers")
         val formatPath = renderersDirectory.resolve(name).resolve(FORMAT_FILE_NAME)

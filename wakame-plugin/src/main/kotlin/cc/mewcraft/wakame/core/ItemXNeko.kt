@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.core
 
 import cc.mewcraft.wakame.item.realize
-import cc.mewcraft.wakame.item.template.ItemGenerationContexts
-import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.user.toUser
@@ -14,7 +13,7 @@ class ItemXNeko(
     identifier: String,
 ) : ItemXAbstract(ItemXFactoryNeko.plugin, identifier) {
     companion object {
-        const val DEFAULT_RENDER_NAME = "<white>UNKNOWN</white>"
+        const val DEFAULT_DISPLAY_NAME = "<white>UNKNOWN</white>"
     }
 
     override fun isValid(): Boolean {
@@ -52,16 +51,15 @@ class ItemXNeko(
         return "${nekoStackId.namespace()}/${nekoStackId.value()}" == identifier
     }
 
-    override fun renderName(): String {
+    override fun displayName(): String {
         val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
-        val nekoItem = ItemRegistry.CUSTOM.find(nekoItemId) ?: return DEFAULT_RENDER_NAME
-        return nekoItemId.asString() // TODO
+        val nekoItem = ItemRegistry.CUSTOM.find(nekoItemId) ?: return DEFAULT_DISPLAY_NAME
+        return nekoItem.templates.get(ItemTemplateTypes.ITEM_NAME)?.plainName ?: DEFAULT_DISPLAY_NAME
     }
 }
 
 object ItemXFactoryNeko : ItemXFactory {
     override val plugin: String = "wakame"
-
     override val isValid: Boolean = true
 
     override fun byItemStack(itemStack: ItemStack): ItemXNeko? {

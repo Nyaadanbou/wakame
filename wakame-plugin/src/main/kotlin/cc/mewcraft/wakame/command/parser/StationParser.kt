@@ -8,12 +8,10 @@ import org.incendo.cloud.component.CommandComponent
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.context.CommandInput
 import org.incendo.cloud.exception.parsing.ParserException
-import org.incendo.cloud.parser.ArgumentParseResult
-import org.incendo.cloud.parser.ArgumentParser
-import org.incendo.cloud.parser.ParserDescriptor
+import org.incendo.cloud.parser.*
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 
-class StationParser<C : Any> : ArgumentParser<C, Station>, BlockingSuggestionProvider.Strings<C> {
+internal class StationParser<C : Any> : ArgumentParser<C, Station>, BlockingSuggestionProvider.Strings<C> {
     companion object Factory {
         fun <C : Any> stationParser(): ParserDescriptor<C, Station> {
             return ParserDescriptor.of(StationParser(), typeTokenOf<Station>())

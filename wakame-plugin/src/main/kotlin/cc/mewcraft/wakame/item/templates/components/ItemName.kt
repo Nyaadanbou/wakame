@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.text.minimessage.Context
@@ -13,18 +14,12 @@ import cc.mewcraft.wakame.item.components.ItemName as ItemNameData
 
 
 data class ItemName(
-    /**
-     * A MiniMessage string.
-     */
-    val itemName: String?,
+    val plainName: String, // 纯文本
+    val fancyName: String, // MM格式
 ) : ItemTemplate<ItemNameData> {
     override val componentType: ItemComponentType<ItemNameData> = ItemComponentTypes.ITEM_NAME
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<ItemNameData> {
-        if (itemName == null) {
-            return ItemGenerationResult.empty()
-        }
-
         // 开发日记 2024/6/29
         // 根据设计, custom_name 和 item_name 都不经过发包系统处理.
         // 因此, 生成 custom_name 的时候就需要把 CustomName.rich
@@ -48,8 +43,8 @@ data class ItemName(
                 }
             }
         }
-        val raw = itemName
-        val rich = ItemComponentInjections.miniMessage.deserialize(itemName, resolver.build())
+        val raw = fancyName
+        val rich = ItemComponentInjections.mm.deserialize(fancyName, resolver.build())
 
         return ItemGenerationResult.of(ItemNameData(raw = raw, rich = rich))
     }
@@ -66,13 +61,29 @@ data class ItemName(
         override val type: TypeToken<ItemName> = typeTokenOf()
 
         /**
-         * ## Node structure
+         * ## Node structure 1
          * ```yaml
          * <node>: <string>
          * ```
+         *
+         * ## Node structure 2
+         * ```yaml
+         * <node>:
+         *   plain: <string>
+         *   fancy: <string>
+         * ```
          */
         override fun decode(node: ConfigurationNode): ItemName {
-            return ItemName(node.string)
+            val scalar = node.string
+            if (scalar != null) {
+                // assume it's a scalar
+                return ItemName(plainName = scalar, fancyName = scalar)
+            } else {
+                // some other format
+                val plain = node.node("plain").krequire<String>()
+                val fancy = node.node("fancy").string ?: plain
+                return ItemName(plainName = plain, fancyName = fancy)
+            }
         }
     }
 }

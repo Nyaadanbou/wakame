@@ -1,7 +1,7 @@
 package display2
 
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.ItemRenderers
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -41,11 +41,11 @@ class ItemRendererInitTest : KoinTest {
 
     @Test
     fun `initialize item renderers`() {
-        StandardItemRenderer.initialize0()
-        CraftingStationItemRenderer.initialize0()
-        MergingTableItemRenderer.initialize0()
-        ModdingTableItemRenderer.initialize0()
-        RecyclingStationItemRenderer.initialize0()
-        RerollingTableItemRenderer.initialize0()
+        ItemRenderers.STANDARD.initialize0()
+        ItemRenderers.CRAFTING_STATION.initialize0()
+        ItemRenderers.MERGING_TABLE.initialize0()
+        ItemRenderers.MODDING_TABLE.initialize0()
+        ItemRenderers.REROLLING_TABLE.initialize0()
+        ItemRenderers.RECYCLING_STATION.initialize0()
     }
 }

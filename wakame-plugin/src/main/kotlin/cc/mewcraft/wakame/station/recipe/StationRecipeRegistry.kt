@@ -9,9 +9,7 @@ import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
@@ -19,7 +17,7 @@ import java.io.File
 @ReloadDependency(
     runBefore = [ItemRegistry::class]
 )
-object StationRecipeRegistry : Initializable, KoinComponent {
+internal object StationRecipeRegistry : Initializable, KoinComponent {
     private const val RECIPE_DIR_NAME = "station/recipes"
 
     @VisibleForTesting

@@ -28,7 +28,7 @@ class ItemXMock(
         throw NotImplementedError()
     }
 
-    override fun renderName(): String {
+    override fun displayName(): String {
         throw NotImplementedError()
     }
 }
