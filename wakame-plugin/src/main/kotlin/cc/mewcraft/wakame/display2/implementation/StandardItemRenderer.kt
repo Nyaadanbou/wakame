@@ -21,7 +21,7 @@ import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.StringCombiner
 import cc.mewcraft.wakame.util.value
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -56,7 +56,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
     override fun render(item: PacketNekoStack, context: StandardContext?) {
         requireNotNull(context) { "context" }
 
-        val collector = ObjectArrayList<IndexedText>()
+        val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
         templates.process(ItemTemplateTypes.ARROW) { data -> StandardRenderingParts.ARROW.process(collector, data) }

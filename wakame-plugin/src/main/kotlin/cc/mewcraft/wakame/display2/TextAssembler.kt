@@ -1,14 +1,13 @@
 package cc.mewcraft.wakame.display2
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
+import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.text.Component
 
 internal class TextAssembler(
     private val rendererLayout: RendererLayout,
 ) {
     /**
-     * Assembles the [dataList] so that it's converted to a list
+     * Assembles the [data] so that it's converted to a list
      * of [Component], which is ready to be put on an ItemStack
      * as the content of data component `minecraft:lore`.
      *
@@ -19,15 +18,28 @@ internal class TextAssembler(
      *
      * See the implementation for more details.
      *
-     * @param dataList a collection of [IndexedText] to be assembled
+     * @param data a collection of [IndexedText] to be assembled
      * @return a sorted list of [Component]
      */
-    fun assemble(dataList: ObjectArrayList<IndexedText>): List<Component> {
+    fun assemble(data: ReferenceOpenHashSet<IndexedText>): List<Component> {
+        // TODO 理想的实现应该是在数据被完全渲染之前, 就应该知道要不要渲染,
+        //  而不是渲染完毕之后, 再在这里进行一次过滤. 在这里过滤的好处就是
+        //  实现起来简单, 但会渲染一些实际不需要的内容 (相当于白渲染了).
+
+        // 首先过滤掉不存在于 layout 中的内容
+        val setIterator = data.iterator()
+        while (setIterator.hasNext()) {
+            val curr = setIterator.next()
+            if (rendererLayout.getOrdinal(curr.idx) == -1) {
+                setIterator.remove()
+            }
+        }
+
         // 因为要排序, 并且更多的是插入操作, 所以使用 RBTreeSet
         val tree = ObjectRBTreeSet(indexComparator)
 
         // 首先添加传入的 indexed text
-        tree.addAll(dataList)
+        tree.addAll(data)
         // 然后添加 layout 中的固定内容
         tree.addAll(rendererLayout.staticIndexedTextList)
         // 最后添加 layout 中的默认内容
@@ -42,10 +54,10 @@ internal class TextAssembler(
         //  - 如果下面*没有*符合要求的 IndexedText, 那么移除当前遍历的 StaticIndexedText
         //  - 如果下面*有*符合要求的 IndexedText, 那么保留当前遍历的 StaticIndexedText
 
-        var loreSize = 0 // 用于记录最终的 lore size
-        val iterator = tree.iterator()
-        while (iterator.hasNext()) {
-            val curr = iterator.next()
+        var loreSize = 0 // 用于记录最终的 lore size, 以一次性分配足够大的 array
+        val treeIterator = tree.iterator()
+        while (treeIterator.hasNext()) {
+            val curr = treeIterator.next()
             loreSize += curr.text.size
             if (curr !is StaticIndexedText) {
                 continue
@@ -58,9 +70,8 @@ internal class TextAssembler(
                 continue
             }
 
-            if (!iterator.hasNext()) {
-                iterator.remove() // curr 要求下面有内容 (`*` 或指定的 `namespace`)，但下面没有 - 移除 curr 然后 continue
-                loreSize -= curr.text.size
+            if (!treeIterator.hasNext()) {
+                treeIterator.remove() // curr 要求下面有内容 (`*` 或指定的 `namespace`)，但下面没有 - 移除 curr 然后 continue
                 continue
             }
 
@@ -70,15 +81,14 @@ internal class TextAssembler(
                 continue
             }
 
-            val larger = iterator.next() // curr 的下面一行
+            val larger = treeIterator.next() // curr 的下面一行
             if (larger.idx.namespace() != companionNamespace) {
                 // larger 不符合 curr 对 namespace 的要求
-                iterator.back(2) // 回到 curr
-                iterator.remove() // 移除 curr
-                loreSize -= curr.text.size
+                treeIterator.back(2) // 回到 curr
+                treeIterator.remove() // 移除 curr
             } else {
                 // larger 符合 curr 对 namespace 的要求
-                iterator.back(1) // 回到 curr
+                treeIterator.back(1) // 回到 curr
             }
         }
 
@@ -89,8 +99,8 @@ internal class TextAssembler(
 
     private inner class TextComparator : Comparator<IndexedText> {
         override fun compare(o1: IndexedText, o2: IndexedText): Int {
-            val o1Idx = rendererLayout.getOrdinal(o1.idx) ?: return -1
-            val o2Idx = rendererLayout.getOrdinal(o2.idx) ?: return -1
+            val o1Idx = rendererLayout.getOrdinal(o1.idx)
+            val o2Idx = rendererLayout.getOrdinal(o2.idx)
             return if (o1Idx < o2Idx) -1 else if (o1Idx > o2Idx) 1 else 0
         }
     }

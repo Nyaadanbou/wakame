@@ -26,7 +26,7 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.*
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -73,7 +73,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
 
         item.isClientSide = false
 
-        val collector = ObjectArrayList<IndexedText>()
+        val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
         templates.process(ItemTemplateTypes.ATTACK_SPEED) { data -> CraftingStationRenderingParts.ATTACK_SPEED.process(collector, data) }

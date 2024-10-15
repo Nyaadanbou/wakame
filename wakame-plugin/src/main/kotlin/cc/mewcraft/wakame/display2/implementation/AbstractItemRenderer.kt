@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.jetbrains.annotations.TestOnly
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -162,8 +163,8 @@ internal class RenderingPart<T, F : RendererFormat>(
     private val show by show
     private val format by format
     private val renderer = renderer
-    fun process(collector: MutableList<IndexedText>, data: T) {
-        if (!show) return
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data: T) {
+        // if (!show) return
         collector += renderer.render(data, format)
     }
 }
@@ -176,8 +177,8 @@ internal class RenderingPart2<T1, T2, F : RendererFormat>(
     private val show by show
     private val format by format
     private val renderer = renderer
-    fun process(collector: MutableList<IndexedText>, data1: T1, data2: T2) {
-        if (!show) return
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2) {
+        // if (!show) return
         collector += renderer.render(data1, data2, format)
     }
 }
@@ -190,8 +191,8 @@ internal class RenderingPart3<T1, T2, T3, F : RendererFormat>(
     private val show by show
     private val format by format
     private val renderer = renderer
-    fun process(collector: MutableList<IndexedText>, data1: T1, data2: T2, data3: T3) {
-        if (!show) return
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3) {
+        // if (!show) return
         collector += renderer.render(data1, data2, data3, format)
     }
 }
@@ -204,8 +205,8 @@ internal class RenderingPart4<T1, T2, T3, T4, F : RendererFormat>(
     private val show by show
     private val format by format
     private val renderer = renderer
-    fun process(collector: MutableList<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4) {
-        if (!show) return
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4) {
+        // if (!show) return
         collector += renderer.render(data1, data2, data3, data4, format)
     }
 }
@@ -218,8 +219,8 @@ internal class RenderingPart5<T1, T2, T3, T4, T5, F : RendererFormat>(
     private val show by show
     private val format by format
     private val renderer = renderer
-    fun process(collector: MutableList<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4, data5: T5) {
-        if (!show) return
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4, data5: T5) {
+        // if (!show) return
         collector += renderer.render(data1, data2, data3, data4, data5, format)
     }
 }
@@ -232,8 +233,8 @@ internal class RenderingPart6<T1, T2, T3, T4, T5, T6, F : RendererFormat>(
     private val show by show
     private val format by format
     private val renderer = renderer
-    fun process(collector: MutableList<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4, data5: T5, data6: T6) {
-        if (!show) return
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4, data5: T5, data6: T6) {
+        // if (!show) return
         collector += renderer.render(data1, data2, data3, data4, data5, data6, format)
     }
 }

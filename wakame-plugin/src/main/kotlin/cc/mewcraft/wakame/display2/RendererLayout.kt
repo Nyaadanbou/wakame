@@ -24,15 +24,16 @@ interface RendererLayout : Examinable {
     val defaultIndexedTextList: List<IndexedText>
 
     /**
-     * 获取指定的 [index] 对应的*位置顺序*.
-     * 位置顺序由 [DerivedOrdinal] 表示, 数值越小, 越靠前面.
+     * 获取指定的 [index] 对应的 *位置顺序*.
+     * 返回的数值越小, 越靠近物品提示框的顶端;
+     * 返回的数值越大, 越靠近物品提示框的底端.
      *
-     * 如果 [index] 没有对应的位置顺序, 返回 `null`.
+     * 如果 [index] 没有对应的位置顺序, 返回 `-1`.
      */
-    fun getOrdinal(index: DerivedIndex): DerivedOrdinal?
+    fun getOrdinal(index: DerivedIndex): DerivedOrdinal
 
     /**
-     * 获取指定的 [index] 对应的*元数据*.
+     * 获取指定的 [index] 对应的 *元数据*.
      *
      * 如果 [index] 没有对应的元数据, 返回 `null`.
      */

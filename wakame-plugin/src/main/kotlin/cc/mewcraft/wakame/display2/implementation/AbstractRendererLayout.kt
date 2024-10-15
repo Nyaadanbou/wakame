@@ -204,32 +204,17 @@ internal abstract class AbstractRendererLayout(
         return text.split("\\r").map(mm::deserialize)
     }
 
-    /**
-     * 获取指定的 [index] 对应的*顺序*. 数值越小越靠前.
-     *
-     * 如果 [index] 没有对应的顺序, 则返回 `null`.
-     */
-    override fun getOrdinal(index: DerivedIndex): DerivedOrdinal? {
-        val ret = indexedTextOrdinalMap.getInt(index)
-        if (ret == -1) {
-            logger.warn("Can't find ordinal for derived index '$index'")
-            return null
-        }
-        return ret
+    override fun getOrdinal(index: DerivedIndex): DerivedOrdinal {
+        return indexedTextOrdinalMap.getInt(index)
     }
 
-    /**
-     * 获取指定的 [index] 对应的*元数据*.
-     *
-     * 如果 [index] 没有对应的元数据, 则返回 `null`.
-     */
+    @Suppress("UNCHECKED_CAST")
     override fun <T : TextMeta> getMetadata(index: DerivedIndex): T? {
-        @Suppress("UNCHECKED_CAST")
-        val ret = indexedTextMetadataMap[index] as T?
+        val ret = indexedTextMetadataMap[index]
         if (ret == null) {
             logger.warn("Can't find metadata for derived index '$index'")
         }
-        return ret
+        return ret as T?
     }
 }
 
