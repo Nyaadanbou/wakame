@@ -102,8 +102,8 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         }
 
         val handle = item.unsafe.handle
-        handle.backingLore = itemLore
-        handle.backingCustomModelData = itemCmd
+        handle.lore0 = itemLore
+        handle.customModelData0 = itemCmd
         handle.showAttributeModifiers(false)
         // handle.showCanBreak(false)
         // handle.showCanPlaceOn(false)

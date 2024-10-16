@@ -128,7 +128,7 @@ private class CustomNekoStack(
 
     override var isClientSide: Boolean
         // 只要*没有*这个标签就返回 true; 标签的类型可以用 ByteTag
-        get() = NekoStackSupport.isClientSide(unsafeNyaTag)
+        get() = NekoStackSupport.isClientSide(handle)
         set(value) = NekoStackSupport.setClientSide(handle, value)
 
     override val itemType: Material
@@ -293,12 +293,13 @@ internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
  * Common implementations related to [NekoStack].
  */
 internal object NekoStackSupport {
-    fun isClientSide(wakameTag: CompoundTag): Boolean {
-        return !wakameTag.contains(NekoStack.CLIENT_SIDE_KEY)
+    fun isClientSide(handle: ItemStack): Boolean {
+        val nbt = handle.unsafeNbt ?: return true
+        return !nbt.contains(NekoStack.CLIENT_SIDE_KEY)
     }
 
     fun setClientSide(handle: ItemStack, clientSide: Boolean) {
-        handle.editNyaTag { tag ->
+        handle.editNbt { tag ->
             if (clientSide) {
                 tag.remove(NekoStack.CLIENT_SIDE_KEY)
             } else {

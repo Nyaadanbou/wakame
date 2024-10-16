@@ -128,7 +128,7 @@ interface NekoStack : Examinable {
     fun clone(): NekoStack
 
     /**
-     * Removes all the custom tags from the item.
+     * Removes all the custom tags about `wakame` from the item.
      *
      * This will make the item a vanilla item, where [ItemStack.isNeko] returns `false`.
      */

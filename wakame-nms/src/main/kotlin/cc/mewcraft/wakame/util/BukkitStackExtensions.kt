@@ -2,30 +2,24 @@ package cc.mewcraft.wakame.util
 
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
-import org.bukkit.craftbukkit.inventory.CraftItemStack
+import net.minecraft.world.item.component.ItemAttributeModifiers
+import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.inventory.ItemStack
 import net.minecraft.world.item.ItemStack as MojangStack
 
-/**
- * Checks if `this` [ItemStack] has a backing NMS object.
- */
-val ItemStack.isNms: Boolean
-    get() {
-        return if (this is CraftItemStack) {
-            this.handle !== null
-        } else {
-            false
-        }
-    }
-
-fun <T> MojangStack.modify(type: DataComponentType<T>, block: (T) -> T) {
+private fun <T> MojangStack.modify(type: DataComponentType<T>, block: (T) -> T) {
     val oldData = get(type) ?: return
     val newData = block(oldData)
     set(type, newData)
 }
 
 fun ItemStack.showAttributeModifiers(value: Boolean) {
-    handle?.modify(DataComponents.ATTRIBUTE_MODIFIERS) { data -> data.withTooltip(value) }
+    val handle = this.handle ?: return
+    val data = handle.get(DataComponents.ATTRIBUTE_MODIFIERS) ?: return
+    if (data === ItemAttributeModifiers.EMPTY || data.modifiers.isEmpty()) {
+        return
+    }
+    handle.modify(DataComponents.ATTRIBUTE_MODIFIERS) { data1 -> data1.withTooltip(value) }
 }
 
 fun ItemStack.showCanBreak(value: Boolean) {
@@ -41,7 +35,12 @@ fun ItemStack.showDyedColor(value: Boolean) {
 }
 
 fun ItemStack.showEnchantments(value: Boolean) {
-    handle?.modify(DataComponents.ENCHANTMENTS) { data -> data.withTooltip(value) }
+    val handle = this.handle ?: return
+    val data = handle.get(DataComponents.ENCHANTMENTS) ?: return
+    if (data === ItemEnchantments.EMPTY || data.isEmpty) {
+        return
+    }
+    handle.modify(DataComponents.ENCHANTMENTS) { data1 -> data1.withTooltip(value) }
 }
 
 fun ItemStack.showJukeboxPlayable(value: Boolean) {

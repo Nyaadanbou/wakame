@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.isNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.rarity.GlowColor
-import cc.mewcraft.wakame.util.backingItemName
+import cc.mewcraft.wakame.util.itemName0
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
@@ -94,7 +94,7 @@ internal class ItemEntityRenderer : PacketListenerAbstract() {
             return false
 
         // CustomName
-        entityData.add(EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(itemStack.backingItemName)))
+        entityData.add(EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(itemStack.itemName0)))
 
         // CustomNameVisible
         entityData.add(EntityData(3, EntityDataTypes.BOOLEAN, true))

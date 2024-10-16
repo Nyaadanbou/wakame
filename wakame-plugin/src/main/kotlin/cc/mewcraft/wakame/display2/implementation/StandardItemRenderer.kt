@@ -91,7 +91,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         val itemLore = textAssembler.assemble(collector)
         val itemCmd = ItemModelDataLookup[item.id, item.variant]
 
-        // item.erase()
+        item.erase()
 
         item.lore(itemLore)
         item.customModelData(itemCmd)

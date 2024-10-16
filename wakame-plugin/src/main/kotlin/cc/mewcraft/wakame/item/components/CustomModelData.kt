@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.util.backingCustomModelData
+import cc.mewcraft.wakame.util.customModelData0
 import net.kyori.examination.Examinable
 
 
@@ -25,15 +25,15 @@ data class CustomModelData(
         override val id: String,
     ) : ItemComponentType<CustomModelData> {
         override fun read(holder: ItemComponentHolder): CustomModelData? {
-            return holder.item.backingCustomModelData?.let { CustomModelData(it) }
+            return holder.item.customModelData0?.let { CustomModelData(it) }
         }
 
         override fun write(holder: ItemComponentHolder, value: CustomModelData) {
-            holder.item.backingCustomModelData = value.data
+            holder.item.customModelData0 = value.data
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.backingCustomModelData = null
+            holder.item.customModelData0 = null
         }
     }
 }

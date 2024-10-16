@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.StandardContext
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
+import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.server.*
@@ -116,16 +117,21 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
      * @return 如果物品发生了变化则返回 `true`, 否则返回 `false`
      */
     private fun ItemStack.modify(): Boolean {
+        var changed = false
+
+        // 移除任意物品的 PDC
+        changed = changed || getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.removeTag("PublicBukkitValues") != null
+
         val nekoStack = tryNekoStack
-        if (nekoStack == null) {
-            return false
+        if (nekoStack != null) {
+            try {
+                ItemRenderers.STANDARD.render(nekoStack, StandardContext)
+                changed = true
+            } catch (e: Throwable) {
+                logger.error("An error occurred while rendering NekoStack: $this", e)
+            }
         }
-        try {
-            ItemRenderers.STANDARD.render(nekoStack, StandardContext)
-        } catch (e: Throwable) {
-            logger.error("An error occurred while rendering NekoStack: $this", e)
-            return false
-        }
-        return true
+
+        return changed
     }
 }
