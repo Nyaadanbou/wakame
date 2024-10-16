@@ -15,7 +15,7 @@ internal interface CustomEnchantment : Keyed {
     val handle: Enchantment
 
     /**
-     * 获取该魔咒指定 [level] 的 [cc.mewcraft.wakame.enchantment.effects.EnchantmentEffect].
+     * 获取该魔咒指定 [level] 的 [EnchantmentEffect].
      *
      * @param level 魔咒的等级
      * @param slot 魔咒的槽位, 例如来自头盔的魔咒, 那这个就是代表头盔的 [ItemSlot]

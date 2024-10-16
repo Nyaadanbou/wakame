@@ -5,7 +5,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
 
 internal abstract class AbstractEnchantment(
-    override val handle: Enchantment,
+    final override val handle: Enchantment,
 ) : CustomEnchantment {
-    override val key: Key get() = handle.key
+    final override val key: Key = handle.key
 }

@@ -22,9 +22,7 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.enchantments.EnchantmentTarget
 import org.bukkit.entity.EntityCategory
 import org.bukkit.entity.EntityType
-import org.bukkit.inventory.EquipmentSlotGroup
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.ItemType
+import org.bukkit.inventory.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
@@ -38,7 +36,10 @@ import org.slf4j.Logger
 /* public */ object Enchantments : KoinComponent {
 
     /* 新增加的魔咒 */
+    val AGILITY = getCustom("agility")
     val CRITICAL_HIT = getCustom("critical_hit")
+    val DEEP_SEARCH = getCustom("deep_search")
+    val DISARRAY = getCustom("disarray")
     val EARTH_DAMAGE = getCustom("earth_damage")
     val EARTH_PROTECTION = getCustom("earth_protection")
     val FIRE_DAMAGE = getCustom("fire_damage")
@@ -47,29 +48,38 @@ import org.slf4j.Logger
     val NEUTRAL_PROTECTION = getCustom("neutral_protection")
     val THUNDER_DAMAGE = getCustom("thunder_damage")
     val THUNDER_PROTECTION = getCustom("thunder_protection")
+    val VITALITY = getCustom("vitality")
     val WATER_DAMAGE = getCustom("water_damage")
     val WATER_PROTECTION = getCustom("water_protection")
     val WIND_DAMAGE = getCustom("wind_damage")
     val WIND_PROTECTION = getCustom("wind_protection")
 
     /* 修改过的魔咒 */
-    val MINECRAFT_KNOCKBACK = getMinecraft("knockback")
-    val MINECRAFT_PUNCH = getMinecraft("punch")
+    val MC_KNOCKBACK = getMinecraft("knockback")
+    val MC_PUNCH = getMinecraft("punch")
 
     /* 移除掉的魔咒 */
-    val MINECRAFT_BANE_OF_ARTHROPODS = getMinecraft("bane_of_arthropods")
-    val MINECRAFT_BLAST_PROTECTION = getMinecraft("blast_protection")
-    val MINECRAFT_FEATHER_FALLING = getMinecraft("feather_falling")
-    val MINECRAFT_FIRE_PROTECTION = getMinecraft("fire_protection")
-    val MINECRAFT_IMPALING = getMinecraft("impaling")
-    val MINECRAFT_INFINITY = getMinecraft("infinity")
-    val MINECRAFT_MENDING = getMinecraft("mending")
-    val MINECRAFT_MULTISHOT = getMinecraft("multishot")
-    val MINECRAFT_PIERCING = getMinecraft("piercing")
-    val MINECRAFT_POWER = getMinecraft("power")
-    val MINECRAFT_PROJECTILE_PROTECTION = getMinecraft("projectile_protection")
-    val MINECRAFT_SMITE = getMinecraft("smite")
-    val MINECRAFT_THORNS = getMinecraft("thorns")
+    val MC_BANE_OF_ARTHROPODS = getMinecraft("bane_of_arthropods")
+    val MC_BLAST_PROTECTION = getMinecraft("blast_protection")
+    val MC_BREACH = getMinecraft("breach")
+    val MC_DENSITY = getMinecraft("density")
+    val MC_FEATHER_FALLING = getMinecraft("feather_falling")
+    val MC_FIRE_PROTECTION = getMinecraft("fire_protection")
+    val MC_IMPALING = getMinecraft("impaling")
+    val MC_INFINITY = getMinecraft("infinity")
+    val MC_MENDING = getMinecraft("mending")
+    val MC_MULTISHOT = getMinecraft("multishot")
+    val MC_PIERCING = getMinecraft("piercing")
+    val MC_POWER = getMinecraft("power")
+    val MC_PROJECTILE_PROTECTION = getMinecraft("projectile_protection")
+    val MC_PROTECTION = getMinecraft("protection")
+    val MC_SHARPNESS = getMinecraft("sharpness")
+    val MC_SMITE = getMinecraft("smite")
+    val MC_THORNS = getMinecraft("thorns")
+
+    fun getBy(id: String): Enchantment {
+        return getCustom(id)
+    }
 
     /**
      * 获取指定的魔咒. 只有在服务器运行时才能成功返回.
@@ -77,7 +87,7 @@ import org.slf4j.Logger
     private fun get(namespace: String, path: String): Enchantment {
         val key = Key.key(namespace, path)
         val registry = try {
-            RegistryAccess.registryAccess().getRegistry<Enchantment>(RegistryKey.ENCHANTMENT)
+            RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)
         } catch (e: Exception) {
             get<Logger>().error("Can't get enchantment registry, returning empty for '$key'", e)
             return EmptyEnchantment
