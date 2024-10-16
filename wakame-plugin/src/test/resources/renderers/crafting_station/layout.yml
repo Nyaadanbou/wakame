@@ -1,0 +1,26 @@
+# 在这里设置合成站物品的 *渲染布局*.
+
+# 合成站物品包括:
+# - 合成材料
+# - 合成结果
+
+primary:
+  - (fixed:special)
+  - special:crate
+  - special:portable_core
+
+  - (default:blank)topmost:attack_speed
+
+  - (fixed:general)
+  - general:cells
+  - general:elements
+  - general:kizamiz
+
+  - (fixed:vanilla)
+  - vanilla:item_name
+  - vanilla:enchantments
+  - vanilla:fire_resistant
+  - vanilla:food
+
+  - (fixed:general)
+  - general:lore

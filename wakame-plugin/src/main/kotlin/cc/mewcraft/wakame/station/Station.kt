@@ -4,9 +4,7 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.station.recipe.StationRecipe
 import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
-import cc.mewcraft.wakame.util.RunningEnvironment
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -20,19 +18,18 @@ import java.lang.reflect.Type
 /**
  * 合成站.
  */
-sealed interface Station : Iterable<StationRecipe> {
+internal sealed interface Station : Iterable<StationRecipe> {
     val id: String
     val layout: MenuLayout
     val previewLayout: MenuLayout
     fun addRecipe(recipe: StationRecipe): Boolean
     fun removeRecipe(key: Key): StationRecipe?
-
 }
 
 /**
  * 无分类合成站的实现.
  */
-class SimpleStation(
+internal class SimpleStation(
     override val id: String,
     override val layout: MenuLayout,
     override val previewLayout: MenuLayout

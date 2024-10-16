@@ -2,9 +2,7 @@ package cc.mewcraft.wakame.station.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -21,13 +19,13 @@ import java.util.stream.Stream
  * 合成站配方.
  * 包含若干项输入与若干项输出.
  */
-sealed interface StationRecipe : Keyed, Examinable {
+internal sealed interface StationRecipe : Keyed, Examinable {
     val input: List<StationChoice>
     val output: StationResult
 
     /**
-     * 该 [StationRecipe] 是否有效
-     * 用于延迟验证配方是否能够注册
+     * 检查该 [StationRecipe] 是否有效.
+     * 用于延迟验证配方是否能够注册.
      */
     fun isValid(): Boolean
 

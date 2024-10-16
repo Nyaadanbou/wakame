@@ -2,45 +2,42 @@ package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.registry.ItemComponentRegistry
 
 /**
- * 物品组件(wakame)的所有类型.
+ * 本单例提供了物品组件的所有类型.
  */
-object ItemComponentTypes {
+internal object ItemComponentTypes {
     /**
-     * 将物品作为箭矢.
+     * 用于表示一个不存在的物品组件.
      */
-    val ARROW: ItemComponentType<Unit> = ItemArrow.codec(ItemConstants.ARROW).register()
+    @JvmField
+    val EMPTY: ItemComponentType<Nothing> = object : ItemComponentType<Nothing> {
+        override val id: String = "empty"
+        override fun read(holder: ItemComponentHolder): Nothing? = null
+        override fun remove(holder: ItemComponentHolder) = Unit
+        override fun write(holder: ItemComponentHolder, value: Nothing) = Unit
+    }
 
     /**
-     * 物品的攻速
+     * 物品的攻击速度.
      */
+    @JvmField
     val ATTACK_SPEED: ItemComponentType<ItemAttackSpeed> = ItemAttackSpeed.codec(ItemConstants.ATTACK_SPEED).register()
-
-    /**
-     * 控制物品能否提供属性加成给玩家.
-     */
-    @Deprecated("与 ItemSlot 有高度重合")
-    val ATTRIBUTABLE: ItemComponentType<Attributable> = Attributable.codec(ItemConstants.ATTRIBUTABLE).register()
 
     /**
      * 物品的属性修饰符.
      *
      * 对应原版组件: [`minecraft:attribute_modifiers`](https://minecraft.wiki/w/Data_component_format#attribute_modifiers)
      */
+    @JvmField
     val ATTRIBUTE_MODIFIERS: ItemComponentType<ItemAttributeModifiers> = ItemAttributeModifiers.codec(ItemConstants.ATTRIBUTE_MODIFIERS).register()
-
-    /**
-     * 将物品作为弓.
-     */
-    val BOW: ItemComponentType<Unit> = ItemBow.codec(ItemConstants.BOW).register()
 
     /**
      * 冒险模式的玩家使用此物品可以破坏的方块.
      *
      * 对应原版组件: [`minecraft:can_break`](https://minecraft.wiki/w/Data_component_format#can_break)
      */
+    @JvmField
     val CAN_BREAK: ItemComponentType<ItemAdventurePredicate> = ItemAdventurePredicate.codec(ItemConstants.CAN_BREAK).register()
 
     /**
@@ -48,21 +45,19 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:can_place_on`](https://minecraft.wiki/w/Data_component_format#can_place_on)
      */
+    @JvmField
     val CAN_PLACE_ON: ItemComponentType<ItemAdventurePredicate> = ItemAdventurePredicate.codec(ItemConstants.CAN_PLACE_ON).register()
-
-    /**
-     * 控制物品能否释放技能.
-     */
-    val CASTABLE: ItemComponentType<Castable> = Castable.codec(ItemConstants.CASTABLE).register()
 
     /**
      * 物品的(所有)词条栏.
      */
+    @JvmField
     val CELLS: ItemComponentType<ItemCells> = ItemCells.codec(ItemConstants.CELLS).register()
 
     /**
      * 将物品作为盲盒.
      */
+    @JvmField
     val CRATE: ItemComponentType<ItemCrate> = ItemCrate.codec(ItemConstants.CRATE).register()
 
     /**
@@ -70,6 +65,7 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:custom_model_data`](https://minecraft.wiki/w/Data_component_format#custom_model_data)
      */
+    @JvmField
     val CUSTOM_MODEL_DATA: ItemComponentType<CustomModelData> = CustomModelData.codec(ItemConstants.CUSTOM_MODEL_DATA).register()
 
     /**
@@ -77,6 +73,7 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:custom_name`](https://minecraft.wiki/w/Data_component_format#custom_name)
      */
+    @JvmField
     val CUSTOM_NAME: ItemComponentType<CustomName> = CustomName.codec(ItemConstants.CUSTOM_NAME).register()
 
     /**
@@ -84,11 +81,13 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:damage`](https://minecraft.wiki/w/Data_component_format#damage)
      */
+    @JvmField
     val DAMAGE: ItemComponentType<Int> = ItemDamage.codec(ItemConstants.DAMAGE).register()
 
     /**
      * 物品组件 [DAMAGE], [MAX_DAMAGE], [UNBREAKABLE] 的整合.
      */
+    @JvmField
     val DAMAGEABLE: ItemComponentType<Damageable> = Damageable.codec(ItemConstants.DAMAGEABLE).register()
 
     /**
@@ -96,11 +95,13 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:dyed_color`](https://minecraft.wiki/w/Data_component_format#dyed_color)
      */
+    @JvmField
     val DYED_COLOR: ItemComponentType<ItemDyeColor> = ItemDyeColor.codec(ItemConstants.DYED_COLOR).register()
 
     /**
      * 物品的元素.
      */
+    @JvmField
     val ELEMENTS: ItemComponentType<ItemElements> = ItemElements.codec(ItemConstants.ELEMENTS).register()
 
     /**
@@ -108,6 +109,7 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:enchantments`](https://minecraft.wiki/w/Data_component_format#enchantments)
      */
+    @JvmField
     val ENCHANTMENTS: ItemComponentType<ItemEnchantments> = ItemEnchantments.codec(ItemConstants.ENCHANTMENTS).register()
 
     /**
@@ -115,6 +117,7 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:fire_resistant`](https://minecraft.wiki/w/Data_component_format#fire_resistant)
      */
+    @JvmField
     val FIRE_RESISTANT: ItemComponentType<FireResistant> = FireResistant.codec(ItemConstants.FIRE_RESISTANT).register()
 
     /**
@@ -122,18 +125,15 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:food`](https://minecraft.wiki/w/Data_component_format#food)
      */
+    @JvmField
     val FOOD: ItemComponentType<FoodProperties> = FoodProperties.codec(ItemConstants.FOOD).register()
-
-    /**
-     * 可发光的物品
-     */
-    val GLOWABLE: ItemComponentType<ItemGlowable> = ItemGlowable.codec(ItemConstants.GLOWABLE).register()
 
     /**
      * 隐藏提示框.
      *
      * 对应原版组件: [`minecraft:hide_tooltip`](https://minecraft.wiki/w/Data_component_format#hide_tooltip)
      */
+    @JvmField
     val HIDE_TOOLTIP: ItemComponentType<HideTooltip> = HideTooltip.codec(ItemConstants.HIDE_TOOLTIP).register()
 
     /**
@@ -141,6 +141,7 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:hide_additional_tooltip`](https://minecraft.wiki/w/Data_component_format#hide_additional_tooltip)
      */
+    @JvmField
     val HIDE_ADDITIONAL_TOOLTIP: ItemComponentType<HideAdditionalTooltip> = HideAdditionalTooltip.codec(ItemConstants.HIDE_ADDITIONAL_TOOLTIP).register()
 
     /**
@@ -148,27 +149,25 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:item_name`](https://minecraft.wiki/w/Data_component_format#item_name)
      */
+    @JvmField
     val ITEM_NAME: ItemComponentType<ItemName> = ItemName.codec(ItemConstants.ITEM_NAME).register()
 
     /**
      * 物品的铭刻.
      */
+    @JvmField
     val KIZAMIZ: ItemComponentType<ItemKizamiz> = ItemKizamiz.codec(ItemConstants.KIZAMIZ).register()
-
-    /**
-     * 控制物品能否提供铭刻加成给玩家.
-     */
-    @Deprecated("与 ItemSlot 有高度重合")
-    val KIZAMIABLE: ItemComponentType<Kizamiable> = Kizamiable.codec(ItemConstants.KIZAMIABLE).register()
 
     /**
      * 物品的等级.
      */
+    @JvmField
     val LEVEL: ItemComponentType<ItemLevel> = ItemLevel.codec(ItemConstants.LEVEL).register()
 
     /**
      * 物品的描述 (不同于原版物品组件 `minecraft:lore`).
      */
+    @JvmField
     val LORE: ItemComponentType<ExtraLore> = ExtraLore.codec(ItemConstants.LORE).register()
 
     /**
@@ -176,32 +175,31 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:max_damage`](https://minecraft.wiki/w/Data_component_format#max_damage)
      */
+    @JvmField
     val MAX_DAMAGE: ItemComponentType<Int> = ItemMaxDamage.codec(ItemConstants.MAX_DAMAGE).register()
 
     /**
      * 将物品作为便携式核心, 用于重铸系统.
      */
+    @JvmField
     val PORTABLE_CORE: ItemComponentType<PortableCore> = PortableCore.codec(ItemConstants.PORTABLE_CORE).register()
 
     /**
      * 物品的稀有度.
      */
+    @JvmField
     val RARITY: ItemComponentType<ItemRarity> = ItemRarity.codec(ItemConstants.RARITY).register()
-
-    /**
-     * 控制物品能否提供技能加成给玩家.
-     */
-    @Deprecated("与 ItemSlot 有高度重合")
-    val SKILLFUL: ItemComponentType<Skillful> = Skillful.codec(ItemConstants.SKILLFUL).register()
 
     /**
      * 物品的皮肤.
      */
+    @JvmField
     val SKIN: ItemComponentType<ItemSkin> = dummy<ItemSkin>(ItemConstants.SKIN).register()
 
     /**
      * 物品的皮肤的所有者.
      */
+    @JvmField
     val SKIN_OWNER: ItemComponentType<ItemSkinOwner> = dummy<ItemSkinOwner>(ItemConstants.SKIN_OWNER).register()
 
     /**
@@ -209,28 +207,21 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:stored_enchantments`](https://minecraft.wiki/w/Data_component_format#stored_enchantments)
      */
+    @JvmField
     val STORED_ENCHANTMENTS: ItemComponentType<ItemEnchantments> = ItemEnchantments.codec(ItemConstants.STORED_ENCHANTMENTS).register()
-
-    /**
-     * 将物品作为系统物品. 系统物品的机制:
-     * - 玩家不允许获取和使用
-     * - 不会被物品发包系统修改
-     * - 专门用于, 例如GUI容器内的物品
-     *
-     * 这也意味着系统物品的提示框文本完全取决于之上的原版组件.
-     */
-    val SYSTEM_USE: ItemComponentType<Unit> = SystemUse.codec(ItemConstants.SYSTEM_USE).register()
 
     /**
      * 将物品作为工具.
      *
      * 对应原版组件: [`minecraft:tool`](https://minecraft.wiki/w/Data_component_format#tool)
      */
+    @JvmField
     val TOOL: ItemComponentType<Tool> = Tool.codec(ItemConstants.TOOL).register()
 
     /**
      * 记录了物品的统计数据. 如果拥有此组件, 各种信息将被记录到物品之上.
      */
+    @JvmField
     val TRACKS: ItemComponentType<ItemTracks> = ItemTracks.codec(ItemConstants.TRACKABLE).register()
 
     /**
@@ -238,6 +229,7 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:trim`](https://minecraft.wiki/w/Data_component_format#trim)
      */
+    @JvmField
     val TRIM: ItemComponentType<ArmorTrim> = ArmorTrim.codec(ItemConstants.TRIM).register()
 
     /**
@@ -245,6 +237,7 @@ object ItemComponentTypes {
      *
      * 对应原版组件: [`minecraft:unbreakable`](https://minecraft.wiki/w/Data_component_format#unbreakable)
      */
+    @JvmField
     val UNBREAKABLE: ItemComponentType<Unbreakable> = Unbreakable.codec(ItemConstants.UNBREAKABLE).register()
 
     /**

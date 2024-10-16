@@ -5,20 +5,16 @@ package cc.mewcraft.wakame.initializer
 import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.command.CommandManager
-import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.*
 import cc.mewcraft.wakame.damage.DamageListener
 import cc.mewcraft.wakame.damage.VanillaDamageMappings.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
-import cc.mewcraft.wakame.display.RENDERER_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.item.ItemBehaviorListener
-import cc.mewcraft.wakame.item.ItemChangeListener
-import cc.mewcraft.wakame.item.ItemMiscellaneousListener
+import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.logic.AdventureLevelHotfix
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
@@ -34,23 +30,16 @@ import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.*
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
+import org.bukkit.event.*
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 
 /**
  * @see Initializable
@@ -125,11 +114,12 @@ object Initializer : KoinComponent, Listener {
         saveResource(DAMAGE_GLOBAL_CONFIG_FILE)
         saveResource(ELEMENT_GLOBAL_CONFIG_FILE)
         saveResource(ENTITY_GLOBAL_CONFIG_FILE)
-        saveResource(ITEM_GLOBAL_CONFIG_FILE)
+        saveResource(ItemComponentRegistry.CONFIG_FILE_NAME)
         saveResource(LEVEL_GLOBAL_CONFIG_FILE)
         // saveResource(PROJECTILE_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(RARITY_GLOBAL_CONFIG_FILE)
-        saveResource(RENDERER_GLOBAL_CONFIG_FILE)
+        saveResourceRecursively("renderers")
+        saveResourceRecursively("station")
         // saveResource(SKIN_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
     }
 

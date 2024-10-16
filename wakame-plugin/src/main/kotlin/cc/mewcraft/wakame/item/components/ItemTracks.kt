@@ -3,20 +3,9 @@ package cc.mewcraft.wakame.item.components
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.StatisticsConstants
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentConfig
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentInjections
-import cc.mewcraft.wakame.item.component.ItemComponentMeta
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.components.tracks.Track
-import cc.mewcraft.wakame.item.components.tracks.TrackEntityKills
-import cc.mewcraft.wakame.item.components.tracks.TrackPeakDamage
-import cc.mewcraft.wakame.item.components.tracks.TrackReforgeHistory
-import cc.mewcraft.wakame.item.components.tracks.TrackType
-import cc.mewcraft.wakame.item.components.tracks.TrackTypes
+import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.components.tracks.*
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 
 interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
@@ -50,7 +39,12 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
         fun build(): ItemTracks
     }
 
-    companion object : ItemComponentBridge<ItemTracks>, ItemComponentMeta {
+    companion object : ItemComponentBridge<ItemTracks> {
+        /**
+         * 该组件的配置文件
+         */
+        private val config = ItemComponentConfig.provide(ItemConstants.TRACKABLE)
+
         /**
          * 返回一个空的 [ItemTracks] 实例.
          */
@@ -96,15 +90,6 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
         override fun codec(id: String): ItemComponentType<ItemTracks> {
             return Codec(id)
         }
-
-        override fun templateType(id: String): Nothing {
-            throw UnsupportedOperationException()
-        }
-
-        override val configPath: String = ItemConstants.TRACKABLE
-        override val tooltipKey: Key = ItemConstants.createKey { TRACKABLE }
-
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
     }
 
     private class BuilderImpl : Builder {
@@ -115,10 +100,12 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
         }
 
         override fun <T : Track> get(type: TrackType<T>): T? {
+            @Suppress("UNCHECKED_CAST")
             return map[type] as T?
         }
 
         override fun <T : Track> set(type: TrackType<T>, value: T): T? {
+            @Suppress("UNCHECKED_CAST")
             return map.put(type, value) as T?
         }
 
@@ -135,6 +122,7 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
         }
 
         override fun <T : Track> get(type: TrackType<T>): T? {
+            @Suppress("UNCHECKED_CAST")
             return map[type] as T?
         }
 
@@ -148,6 +136,7 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
             return edit { map ->
                 val track = map[type]
                 if (track != null) {
+                    @Suppress("UNCHECKED_CAST")
                     val newTrack = block(track as T)
                     map[type] = newTrack
                 }

@@ -5,32 +5,19 @@ import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.entity.entityModule
-import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.NekoItemFactory
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.components.ElementSampleNodeFacade
-import cc.mewcraft.wakame.item.components.KizamiSampleNodeFacade
-import cc.mewcraft.wakame.item.components.cells.template.TemplateCoreSampleNodeFacade
-import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.GenerationTrigger
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.templates.filter.ItemFilterNodeFacade
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
+import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
+import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprintSampleNodeFacade
+import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.level.levelModule
 import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.EntityRegistry
-import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
-import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.registry.LevelMappingRegistry
-import cc.mewcraft.wakame.registry.RarityRegistry
-import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.registry.registryModule
+import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
@@ -38,9 +25,7 @@ import net.kyori.adventure.key.Key
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.qualifier.named
-import org.koin.test.KoinTest
-import org.koin.test.get
-import org.koin.test.inject
+import org.koin.test.*
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
@@ -94,7 +79,7 @@ object CommonNekoStackTest {
         with(app.koin) {
             get<ElementSampleNodeFacade>().onPreWorld()
             get<KizamiSampleNodeFacade>().onPreWorld()
-            get<TemplateCoreSampleNodeFacade>().onPreWorld()
+            get<CoreBlueprintSampleNodeFacade>().onPreWorld()
             get<ItemFilterNodeFacade>().onPreWorld()
         }
     }
@@ -183,40 +168,46 @@ class ItemComponentLifecycleTest<T, S : ItemTemplate<T>>(
         // 消费 GenerationResult
         lifecycle.consumeGenerationResult(result)
 
-        val unboxed = result.value
-        nekoStack.components.set(componentType, unboxed)
-        nekoStack.components.get(componentType) ?: fail("Failed to get the component from the map")
+        var unboxed: T? = null
+        if (componentType != ItemComponentTypes.EMPTY) {
+            // 只有当模板拥有对应的组件时, 才会进行下面的测试
+
+            unboxed = result.value
+            nekoStack.components.set(componentType, unboxed)
+            nekoStack.components.get(componentType) ?: fail("Failed to get the component from the map")
+        }
 
         // 消费 GenerationResult 所封装的值
-        lifecycle.consumeUnboxed(unboxed)
+        unboxed?.let { lifecycle.consumeUnboxed(it) }
 
+        // 打印物品生成的结果
         logger.info("")
         logger.info(prototype.toString())
         logger.info("")
         logger.info(nekoStack.toString())
         logger.info("")
-        logger.info(unboxed.toString())
+        unboxed?.let { logger.info(it.toString()) }
     }
 
     interface Lifecycle<T, S : ItemTemplate<T>> {
         fun serialization(block: (S?) -> Unit)
         fun bootstrap(block: LifecycleBootstrap.() -> Unit)
-        fun context(block: (GenerationContext) -> Unit)
-        fun result(block: (GenerationResult<T>) -> Unit)
+        fun context(block: (ItemGenerationContext) -> Unit)
+        fun result(block: (ItemGenerationResult<T>) -> Unit)
         fun unboxed(block: (T) -> Unit)
     }
 
     interface LifecycleBootstrap {
-        fun createContext(block: () -> GenerationContext)
+        fun createContext(block: () -> ItemGenerationContext)
     }
 
     private class LifecycleImpl<T, S : ItemTemplate<T>>(
         val target: Key,
     ) : Lifecycle<T, S> {
         var bootstrap: LifecycleBootstrapImpl = LifecycleBootstrapImpl(target)
-        var consumeGenerationContext: (GenerationContext) -> Unit = {}
+        var consumeGenerationContext: (ItemGenerationContext) -> Unit = {}
         var consumeSerialization: (S?) -> Unit = {}
-        var consumeGenerationResult: (GenerationResult<T>) -> Unit = {}
+        var consumeGenerationResult: (ItemGenerationResult<T>) -> Unit = {}
         var consumeUnboxed: (T) -> Unit = {}
 
         override fun bootstrap(block: LifecycleBootstrap.() -> Unit) {
@@ -227,11 +218,11 @@ class ItemComponentLifecycleTest<T, S : ItemTemplate<T>>(
             consumeSerialization = block
         }
 
-        override fun context(block: (GenerationContext) -> Unit) {
+        override fun context(block: (ItemGenerationContext) -> Unit) {
             consumeGenerationContext = block
         }
 
-        override fun result(block: (GenerationResult<T>) -> Unit) {
+        override fun result(block: (ItemGenerationResult<T>) -> Unit) {
             consumeGenerationResult = block
         }
 
@@ -244,13 +235,13 @@ class ItemComponentLifecycleTest<T, S : ItemTemplate<T>>(
         val target: Key,
     ) : LifecycleBootstrap {
         // 初始为默认的 GenerationContext 生成函数
-        var newContext: () -> GenerationContext = {
+        var newContext: () -> ItemGenerationContext = {
             val target = this.target
-            val trigger = GenerationTrigger.direct(10)
+            val trigger = ItemGenerationTriggers.direct(10)
             MockGenerationContext.create(target, trigger)
         }
 
-        override fun createContext(block: () -> GenerationContext) {
+        override fun createContext(block: () -> ItemGenerationContext) {
             newContext = block
         }
     }

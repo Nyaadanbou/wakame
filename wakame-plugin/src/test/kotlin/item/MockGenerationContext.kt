@@ -1,14 +1,13 @@
 package item
 
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationTrigger
+import cc.mewcraft.wakame.item.template.*
 import net.kyori.adventure.key.Key
 import kotlin.random.Random
 
 class MockGenerationContext {
     companion object {
-        fun create(target: Key, trigger: GenerationTrigger): GenerationContext {
-            return GenerationContext(trigger, target, Random.nextLong())
+        fun create(target: Key, trigger: ItemGenerationTrigger): ItemGenerationContext {
+            return ItemGenerationContexts.create(trigger, target, Random.nextLong())
         }
     }
 }

@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
  * 当玩家打开合成站时创建的会话
  * 封装了 打开合成站 到 关闭合成站 这期间所需要的所有状态
  */
-class StationSession(
+internal class StationSession(
     val station: Station,
     val player: Player,
 ) : Iterable<RecipeMatcherResult> {

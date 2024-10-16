@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.item.templates.filter.ItemFilterNodeFacade
+import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind

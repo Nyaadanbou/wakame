@@ -1,0 +1,32 @@
+# 在这里设置收购站的物品 *渲染内容*.
+
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
+  tooltip: "定制名: <value>"
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "物品名: <value>"
+
+# id: `lore`
+lore:
+  namespace: general
+  # 可用标签
+  # <line> 描述内容
+  tooltip:
+    line: "<line>"
+    header: [ ]
+    bottom: [ ]
+
+# id: `worth`
+worth:
+  namespace: general
+  # 可用标签
+  # <value> 物品的价值
+  tooltip: "价值: <value>"

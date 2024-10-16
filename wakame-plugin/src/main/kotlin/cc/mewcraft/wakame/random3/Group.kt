@@ -19,13 +19,13 @@ import java.util.Collections
  * @param S 样本所携带的实例
  * @param C 条件所需要的上下文
  */
-interface Group<S, C : SelectionContext> {
+interface Group<S, C : RandomSelectorContext> {
 
     /**
      * 包含一些 [Group] 的构造方法.
      */
     companion object Factory {
-        fun <S, C : SelectionContext> empty(): Group<S, C> {
+        fun <S, C : RandomSelectorContext> empty(): Group<S, C> {
             return GroupEmpty as Group<S, C>
         }
     }
@@ -65,7 +65,7 @@ interface Group<S, C : SelectionContext> {
     fun select(context: C): List<S>
 }
 
-interface GroupBuilder<S, C : SelectionContext> {
+interface GroupBuilder<S, C : RandomSelectorContext> {
     val pools: MutableMap<String, Pool<S, C>>
     val filters: NodeContainer<Filter<C>>
     var default: Pool<S, C>
@@ -100,7 +100,7 @@ interface GroupBuilder<S, C : SelectionContext> {
  * @param V the type of content
  * @param C the type of context
  */
-abstract class GroupSerializer<V, C : SelectionContext> : SchemaSerializer<Group<V, C>> {
+abstract class GroupSerializer<V, C : RandomSelectorContext> : SchemaSerializer<Group<V, C>> {
     companion object Constants {
         val HINT_NODE_SHARED_POOLS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_shared_pools", typeTokenOf<ConfigurationNode>())
         private const val PATH_FILTERS = "filters"
@@ -192,14 +192,14 @@ abstract class GroupSerializer<V, C : SelectionContext> : SchemaSerializer<Group
 /* Implementations */
 
 
-private object GroupEmpty : Group<Nothing, SelectionContext> {
-    override val pools: Map<String, Pool<Nothing, SelectionContext>> = emptyMap()
-    override val filters: NodeContainer<Filter<SelectionContext>> = NodeContainer.empty()
-    override val default: Pool<Nothing, SelectionContext> = Pool.empty()
-    override fun select(context: SelectionContext): List<Nothing> = Collections.emptyList()
+private object GroupEmpty : Group<Nothing, RandomSelectorContext> {
+    override val pools: Map<String, Pool<Nothing, RandomSelectorContext>> = emptyMap()
+    override val filters: NodeContainer<Filter<RandomSelectorContext>> = NodeContainer.empty()
+    override val default: Pool<Nothing, RandomSelectorContext> = Pool.empty()
+    override fun select(context: RandomSelectorContext): List<Nothing> = Collections.emptyList()
 }
 
-private class GroupImpl<S, C : SelectionContext>(
+private class GroupImpl<S, C : RandomSelectorContext>(
     override val pools: Map<String, Pool<S, C>>,
     override val filters: NodeContainer<Filter<C>>,
     override val default: Pool<S, C>,

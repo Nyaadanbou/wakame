@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
-import cc.mewcraft.wakame.item.template.GenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
@@ -70,7 +70,7 @@ fun NekoItem.realize(): NekoStack {
     return NekoItemInjections.realizer.realize(this)
 }
 
-fun NekoItem.realize(context: GenerationContext): NekoStack {
+fun NekoItem.realize(context: ItemGenerationContext): NekoStack {
     return NekoItemInjections.realizer.realize(this, context)
 }
 

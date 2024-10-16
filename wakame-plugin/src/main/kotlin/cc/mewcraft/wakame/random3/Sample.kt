@@ -6,19 +6,19 @@ package cc.mewcraft.wakame.random3
  * @param V 样本所携带的实例
  * @param C 条件所需要的上下文
  */
-class Sample<V, C : SelectionContext>(
+class Sample<V, C : RandomSelectorContext>(
     /**
-     * The data wrapped within `this` [Sample].
+     * 封装的数据.
      */
     val data: V,
 
     /**
-     * The weight of `this` sample. Must be non-null.
+     * 本样本的权重.
      */
     val weight: Double,
 
     /**
-     * 该 [Sample] 被选中必须满足的条件. 如果条件不满足, 则该 [Sample] 不会进入最终的样本空间当中.
+     * 该样本被选中必须满足的条件. 如果条件不满足, 则该样本不会进入最终的样本空间当中.
      *
      * ## 条件将对样本概率产生直接影响
      *
@@ -28,19 +28,21 @@ class Sample<V, C : SelectionContext>(
     val filters: NodeContainer<Filter<C>>,
 
     /**
-     * Gets the [mark][Mark].
+     * 返回该样本的 [Mark].
      */
-    val marks: StringMark?,
+    val marks: Mark?,
 ) {
+
+    // 开发日记 2024/9/7
+    // equals 和 hashCode 只比较 data
+
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Sample<*, *>) return false
-        if (data != other.data) return false
-
-        // if (weight != other.weight) return false
-        // if (filters != other.filters) return false
-        // if (marks != other.marks) return false
-
+        if (this === other)
+            return true
+        if (other !is Sample<*, *>)
+            return false
+        if (data != other.data)
+            return false
         return true
     }
 

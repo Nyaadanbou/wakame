@@ -4,6 +4,7 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
+import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -28,6 +29,8 @@ interface NekoStack : Examinable {
      * 包含了获取特殊 [NekoStack] 实例的函数.
      */
     companion object {
+        const val CLIENT_SIDE_KEY = "client_side"
+
         /**
          * 获取一个空的 [NekoStack], 底层为 `minecraft:air`.
          *
@@ -47,6 +50,14 @@ interface NekoStack : Examinable {
     val isEmpty: Boolean
 
     /**
+     * 记录了该物品的样子是否仅存在于客户端.
+     *
+     * 如果为 `true`, 法宝渲染系统将修改此物品.
+     * 如果为 `false`, 发包渲染系统将不会修改此物品.
+     */
+    var isClientSide: Boolean
+
+    /**
      * 获取底层物品的类型.
      */
     val itemType: Material
@@ -58,21 +69,10 @@ interface NekoStack : Examinable {
     val itemStack: ItemStack
 
     /**
-     * The `namespace` of this item.
+     * The namespaced identifier of this item.
      *
      * The `namespace` is the name of the directory in which the item is defined in the config.
-     */
-    val namespace: String
-
-    /**
-     * The `path` of this item.
-     *
-     * The `path` is the name of the file in which the item is defined in the config.
-     */
-    val path: String
-
-    /**
-     * The namespaced identifier of this item.
+     * The `path` is the name of the file (w/o extension) in which the item is defined in the config.
      */
     val id: Key
 
@@ -107,7 +107,7 @@ interface NekoStack : Examinable {
     val behaviors: ItemBehaviorMap
 
     /**
-     * ‘不安全’操作. 使用前请先阅读文档.
+     * 不安全的操作. 使用前请先阅读文档.
      */
     val unsafe: Unsafe
 
@@ -117,7 +117,7 @@ interface NekoStack : Examinable {
     fun clone(): NekoStack
 
     /**
-     * Removes all the custom tags from the item.
+     * Removes all the custom tags about `wakame` from the item.
      *
      * This will make the item a vanilla item, where [ItemStack.isNeko] returns `false`.
      */
@@ -236,16 +236,16 @@ object NekoStackDelegates {
 private object EmptyNekoStack : NekoStack {
     override val isEmpty: Boolean = true
 
+    override var isClientSide: Boolean
+        get() = false // 空物品不应该渲染
+        set(_) {}
+
     override val itemType: Material = Material.AIR
 
     override val itemStack: ItemStack
         get() = ItemStack.empty()
 
     override val id: Key = GenericKeys.EMPTY
-
-    override val namespace: String = id.namespace()
-
-    override val path: String = id.value()
 
     override var variant: Int
         get() = 0
@@ -255,7 +255,7 @@ private object EmptyNekoStack : NekoStack {
 
     override val slotGroup: ItemSlotGroup = prototype.slotGroup
 
-    override val components: ItemComponentMap = ItemComponentMap.empty()
+    override val components: ItemComponentMap = ItemComponentMaps.empty()
 
     override val templates: ItemTemplateMap = prototype.templates
 

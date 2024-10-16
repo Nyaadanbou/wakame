@@ -1,38 +1,31 @@
 package cc.mewcraft.wakame.gui.station
 
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.CraftingStationContext
+import cc.mewcraft.wakame.display2.implementation.CraftingStationContext.*
 import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.item.realize
-import cc.mewcraft.wakame.item.setSystemUse
-import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.gui.toItemProvider
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.station.Station
 import cc.mewcraft.wakame.station.StationSession
 import cc.mewcraft.wakame.station.recipe.RecipeMatcherResult
 import cc.mewcraft.wakame.station.recipe.StationRecipe
-import cc.mewcraft.wakame.util.hideTooltip
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
-import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.builder.setDisplayName
+import xyz.xenondevs.invui.item.*
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 
-class StationMenu(
+internal class StationMenu(
     /**
      * 该菜单所依赖的合成站.
      */
@@ -43,12 +36,11 @@ class StationMenu(
      */
     val viewer: Player,
 ) : KoinComponent {
-    private val logger: Logger by inject()
-
     /**
      * 该菜单的布局
      */
-    private val layout: MenuLayout = station.layout
+    private val layout: MenuLayout
+        get() = station.layout
 
     /**
      * 合成站的会话.
@@ -57,19 +49,19 @@ class StationMenu(
      */
     val stationSession = StationSession(station, viewer)
 
-
     /**
      * 合成站菜单的 [Gui].
-     * 'X': background
-     * '.': recipe
-     * '<': prev_page
-     * '>': next_page
+     *
+     * - `X`: background
+     * - `.`: recipe
+     * - `<`: prev_page
+     * - `>`: next_page
      */
     private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
-        builder.setStructure(*layout.structure.toTypedArray())
-        builder.addIngredient('X', BackgroundItem(layout))
-        builder.addIngredient('<', PrevItem(this))
-        builder.addIngredient('>', NextItem(this))
+        builder.setStructure(*layout.structure)
+        builder.addIngredient('X', BackgroundItem())
+        builder.addIngredient('<', PrevItem())
+        builder.addIngredient('>', NextItem())
         builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
     }
 
@@ -81,17 +73,15 @@ class StationMenu(
     }
 
     /**
-     * 刷新Gui.
+     * 刷新 Gui.
      * 根据 [StationSession] 的内容刷新展示配方的物品以及标题.
      */
     fun update() {
         // 排序已在 StationSession 的迭代器中实现
-        val recipeItems = stationSession.map {
-            RecipeItem(this, it)
-        }
+        val recipeItems = stationSession.map(::RecipeItem)
         primaryGui.setContent(recipeItems)
         val title = layout.title
-        //TODO slot背景颜色红绿显示
+        // TODO slot 背景颜色红绿显示
         primaryWindow.setTitle(title)
     }
 
@@ -109,92 +99,59 @@ class StationMenu(
         update()
     }
 
-
     /**
-     * 背景占位的图标 [Item].
+     * 背景占位的图标.
      */
-    class BackgroundItem(
-        private val layout: MenuLayout
-    ) : AbstractItem() {
+    inner class BackgroundItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            //TODO gui物品
-            val key = layout.getIcon("background")
-            val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
-            nekoStack ?: return ItemWrapper(ItemStack(Material.GRAY_STAINED_GLASS_PANE).hideTooltip(true))
-            nekoStack.setSystemUse()
-            return ItemWrapper(nekoStack.itemStack)
+            return layout.getIcon("background").render0().toItemProvider()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            //do nothing
+            // do nothing
         }
     }
 
     /**
-     * 上一页的图标 [Item].
+     * 上一页的图标.
      */
-    class PrevItem(
-        private val stationMenu: StationMenu,
-    ) : PageItem(false) {
+    inner class PrevItem : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            //TODO gui物品
-            val layout = stationMenu.layout
-            if (!stationMenu.primaryGui.hasPreviousPage()) {
-                return BackgroundItem(layout).itemProvider
-            }
-            val key = layout.getIcon("prev_page")
-            val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
-            nekoStack ?: return ItemBuilder(Material.SOUL_SAND)
-                .setDisplayName(Component.text("上一页").color(NamedTextColor.AQUA))
-            nekoStack.setSystemUse()
-            return ItemWrapper(nekoStack.itemStack)
+            return layout.getIcon("prev_page").render0().toItemProvider()
         }
     }
 
     /**
-     * 下一页的图标 [Item].
+     * 下一页的图标.
      */
-    class NextItem(
-        private val stationMenu: StationMenu,
-    ) : PageItem(true) {
+    inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            //TODO gui物品
-            val layout = stationMenu.layout
-            if (!stationMenu.primaryGui.hasNextPage()) {
-                return BackgroundItem(layout).itemProvider
-            }
-            val key = layout.getIcon("next_page")
-            val nekoStack = ItemRegistry.CUSTOM.find(key)?.realize()
-            nekoStack ?: return ItemBuilder(Material.MAGMA_BLOCK)
-                .setDisplayName(Component.text("下一页").color(NamedTextColor.AQUA))
-            nekoStack.setSystemUse()
-            return ItemWrapper(nekoStack.itemStack)
+            return layout.getIcon("next_page").render0().toItemProvider()
         }
     }
 
     /**
-     * 展示一个配方的图标 [Item].
+     * 展示一个配方的图标.
      */
-    class RecipeItem(
-        private val stationMenu: StationMenu,
-        private val recipeMatcherResult: RecipeMatcherResult
+    inner class RecipeItem(
+        private val recipeMatcherResult: RecipeMatcherResult,
     ) : AbstractCraftItem() {
         override fun getItemProvider(): ItemProvider {
-            return ItemWrapper(recipeMatcherResult.displayItemStack(stationMenu.layout))
+            return ItemWrapper(recipeMatcherResult.displayItemStack(layout))
         }
 
         private fun updateMenu() {
             // 刷新会话中的配方匹配结果
-            stationMenu.stationSession.updateRecipeMatcherResults()
+            stationSession.updateRecipeMatcherResults()
             // 刷新菜单Gui
-            stationMenu.update()
+            update()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             when (clickType) {
                 // 左键预览
                 ClickType.LEFT -> {
-                    PreviewMenu(recipeMatcherResult.recipe, player, stationMenu).open()
+                    PreviewMenu(recipeMatcherResult.recipe, player, this@StationMenu).open()
                 }
 
                 // 右键合成
@@ -240,18 +197,17 @@ class StationMenu(
                 }
 
                 else -> {
-                    //do nothing
+                    // do nothing
                 }
             }
         }
-
     }
 }
 
 /**
  * 封装了合成逻辑的一个抽象 [Item].
  */
-abstract class AbstractCraftItem : AbstractItem() {
+internal abstract class AbstractCraftItem : AbstractItem() {
     fun tryCraft(stationRecipe: StationRecipe, player: Player) {
         // 无法正常执行消耗就抛出异常中断代码执行
         // 不给玩家执行合成的结果
@@ -259,19 +215,27 @@ abstract class AbstractCraftItem : AbstractItem() {
             stationRecipe.consume(player)
             stationRecipe.output.apply(player)
         } catch (e: RuntimeException) {
-            player.sendMessage(
-                Component.text("发生了一个内部错误，请汇报给管理员!")
-                    .color(NamedTextColor.RED)
-            )
             e.printStackTrace()
+            player.sendMessage(text {
+                content("发生了一个内部错误, 请汇报给管理员!")
+                color(NamedTextColor.RED)
+            })
         }
     }
 
     fun notifyFail(player: Player) {
-        player.sendMessage(
-            Component.text("你没有足够的材料来合成这个物品!")
-                .color(NamedTextColor.RED)
-        )
+        player.sendMessage(text {
+            content("你没有足够的材料来合成这个物品!")
+            color(NamedTextColor.RED)
+        })
     }
+}
 
+/**
+ * 方便函数.
+ */
+private fun NekoStack.render0(): NekoStack {
+    val context = CraftingStationContext(Pos.OVERVIEW, erase = true)
+    ItemRenderers.CRAFTING_STATION.render(this, context)
+    return this
 }

@@ -2,17 +2,12 @@ package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
-import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmpty
-import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkill
+import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
-import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -69,7 +64,7 @@ interface CoreMatchRule : Examinable {
  *
  * 依赖的序列化器:
  * - [cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer]
- * - [cc.mewcraft.wakame.skill.ConfiguredSkillVariantSerializer]
+ * - [cc.mewcraft.wakame.skill.TriggerVariantSerializer]
  */
 internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {
@@ -128,7 +123,7 @@ private data object CoreMatchRuleEmpty : CoreMatchRule {
     override val path: Pattern = "empty".toPattern()
     override val priority: Int = Int.MIN_VALUE + 1
     override fun test(core: Core): Boolean {
-        return core is CoreEmpty
+        return core.isEmpty
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -177,20 +172,21 @@ private class CoreMatchRuleAttribute(
         // 单独处理 Any Core 的情况, 设计一个专门的实现.
         // 这里只负责处理已经是 CoreAttribute 的情况.
 
-        if (core !is CoreAttribute) {
+        if (core !is AttributeCore) {
             return false
         }
 
-        val matcher = path.matcher(core.key.value())
+        val matcher = path.matcher(core.id.value())
         if (!matcher.matches()) {
             return false
         }
 
-        if (operation != null && core.operation != operation) {
+        val attribute = core.attribute
+        if (operation != null && attribute.operation != operation) {
             return false
         }
 
-        if (element != null && element != core.element?.key) {
+        if (element != null && element != attribute.element?.key) {
             return false
         }
 
@@ -218,16 +214,18 @@ private class CoreMatchRuleSkill(
     override val priority: Int = 2
 
     override fun test(core: Core): Boolean {
-        if (core !is CoreSkill) {
+        if (core !is SkillCore) {
             return false
         }
 
-        val matcher = path.matcher(core.key.value())
+        val matcher = path.matcher(core.id.value())
         if (!matcher.matches()) {
             return false
         }
 
-        return trigger == core.trigger && variant == core.variant
+        val skill = core.skill
+
+        return trigger == skill.trigger && variant == skill.variant
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

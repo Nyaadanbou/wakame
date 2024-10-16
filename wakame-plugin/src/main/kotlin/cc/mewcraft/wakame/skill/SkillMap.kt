@@ -11,7 +11,7 @@ import com.google.common.collect.MultimapBuilder
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
-import java.util.*
+import java.util.UUID
 
 /**
  * Represents a skill map owned by a subject.
@@ -103,8 +103,8 @@ private class PlayerSkillMap(
     private val skill2Ticks: Object2IntOpenHashMap<Key> = Object2IntOpenHashMap()
 
     override fun addSkill(skill: ConfiguredSkill) {
-        this.skills.put(skill.trigger, skill.key)
-        val skillInstance = getSkillByKey(skill.key)
+        this.skills.put(skill.trigger, skill.id)
+        val skillInstance = getSkillByKey(skill.id)
         registerSkillTick(skillInstance)
     }
 

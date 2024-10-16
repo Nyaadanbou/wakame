@@ -1,0 +1,20 @@
+primary:
+  - (fixed:special)
+  - special:crate
+  - special:portable_core
+
+  - (default:blank)topmost:attack_speed
+
+  - (fixed:general)
+  - general:cells
+  - general:elements
+  - general:kizamiz
+
+  - (fixed:vanilla)
+  - vanilla:item_name
+  - vanilla:enchantments
+  - vanilla:fire_resistant
+  - vanilla:food
+
+  - (fixed:general)
+  - general:lore

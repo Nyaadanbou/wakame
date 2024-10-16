@@ -4,16 +4,11 @@ import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.registryModule
+import cc.mewcraft.wakame.registry.*
 import mainEnv
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.koin.core.context.loadKoinModules
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import org.koin.core.context.*
 import org.koin.test.KoinTest
 import org.spongepowered.configurate.kotlin.extensions.contains
 import testEnv
@@ -63,8 +58,8 @@ class CheckMissingAttributeConfigTest : KoinTest {
         val missingConfigs = mutableListOf<String>()
 
         for ((key, _) in AttributeRegistry.FACADES) {
-            if (!config.get().contains(key.value())) {
-                missingConfigs.add(key.asString())
+            if (!config.get().contains(key)) {
+                missingConfigs.add(key)
             }
         }
 

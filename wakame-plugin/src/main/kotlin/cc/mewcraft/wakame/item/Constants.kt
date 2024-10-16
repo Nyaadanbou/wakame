@@ -11,16 +11,10 @@ import net.kyori.adventure.key.Key
  * Keys in the `wakame` compound.
  */
 object BaseBinaryKeys {
+    const val ID = "id"
     const val NAMESPACE = "namespace"
     const val PATH = "path"
     const val VARIANT = "sid"
-}
-
-/**
- * Keys in the `core` compound.
- */
-object CoreBinaryKeys {
-    const val CORE_IDENTIFIER = "id"
 }
 
 /**
@@ -51,7 +45,6 @@ object ItemConstants {
     const val ARROW = "arrow"
     const val ATTACK_SPEED = "attack_speed"
     const val ATTRIBUTE_MODIFIERS = "attribute_modifiers"
-    const val ATTRIBUTABLE = "attributable"
     const val BOW = "bow"
     const val CAN_BREAK = "can_break"
     const val CAN_PLACE_ON = "can_place_on"
@@ -73,16 +66,13 @@ object ItemConstants {
     const val HIDE_ADDITIONAL_TOOLTIP = "hide_additional_tooltip"
     const val ITEM_NAME = "item_name"
     const val KIZAMIZ = "kizamiz"
-    const val KIZAMIABLE = "kizamiable"
     const val LEVEL = "level"
     const val LORE = "lore"
     const val PORTABLE_CORE = "portable_core"
     const val RARITY = "rarity"
-    const val SKILLFUL = "skillful"
     const val SKIN = "skin"
     const val SKIN_OWNER = "skin_owner"
     const val STORED_ENCHANTMENTS = "stored_enchantments"
-    const val SYSTEM_USE = "system_use"
     const val TOOL = "tool"
     const val TRACKABLE = "tracks"
     const val TRIM = "trim"

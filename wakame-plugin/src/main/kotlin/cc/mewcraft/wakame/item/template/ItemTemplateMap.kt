@@ -44,18 +44,9 @@ import java.util.stream.Stream
  */
 interface ItemTemplateMap : Examinable {
 
-    fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T?
+    fun <T> get(type: ItemTemplateType<T>): T?
 
-    fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean
-
-    // 开发日记 2024/6/26
-    // 模板的应用讲究顺序, 而顺序是由储存在模板内部的数据结构决定的.
-    // 开发日记 2024/7/4
-    // 模板应用到物品的逻辑已经在 NekoItemRealizer 实现
-    // /**
-    //  * 将模板全部应用到物品上.
-    //  */
-    // fun applyTo(item: ItemStack)
+    fun <T> has(type: ItemTemplateType<T>): Boolean
 
     companion object {
         /**
@@ -89,8 +80,8 @@ interface ItemTemplateMap : Examinable {
     }
 
     private object EmptyMap : ItemTemplateMap {
-        override fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T? = null
-        override fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean = false
+        override fun <T> get(type: ItemTemplateType<T>): T? = null
+        override fun <T> has(type: ItemTemplateType<T>): Boolean = false
         override fun toString(): String = toSimpleString()
     }
 
@@ -99,11 +90,12 @@ interface ItemTemplateMap : Examinable {
     ) : ItemTemplateMap {
         private val map: LinkedHashMap<ItemTemplateType<*>, ItemTemplate<*>> = LinkedHashMap(map)
 
-        override fun <T : ItemTemplate<*>> get(type: ItemTemplateType<T>): T? {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T> get(type: ItemTemplateType<T>): T? {
             return map[type] as T?
         }
 
-        override fun <T : ItemTemplate<*>> has(type: ItemTemplateType<T>): Boolean {
+        override fun <T> has(type: ItemTemplateType<T>): Boolean {
             return map.containsKey(type)
         }
 

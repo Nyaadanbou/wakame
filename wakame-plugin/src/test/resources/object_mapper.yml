@@ -1,0 +1,9 @@
+itemName: Steve
+# Here is a comment to describe the purpose of this field
+filter: cars?
+sections:
+-   name: foo
+    id: f2b2ba43-b7d6-401d-857a-bebb9365391c
+-   name: bar
+    id: 6598316c-d4b6-4612-a8b4-eae20af62cc2
+item-name: Steve

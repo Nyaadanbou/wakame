@@ -11,7 +11,7 @@ import java.util.stream.Stream
 // 开发日记 2024/7/5
 // 这里的类型 T 不能设置 upper bounds,
 // 因为存在数据类型为 primitive 的组件,
-// 例如 ItemDamage, ItemMaxDamage, ItemTracks, SystemUse.
+// 例如 ItemDamage, ItemMaxDamage.
 
 /**
  * 模板的“类型”. 该接口有两个作用:
@@ -19,9 +19,9 @@ import java.util.stream.Stream
  * - 充当 [TypeSerializer]
  * - 作为 [ItemTemplateMap] 的索引
  *
- * @param T 物品模板的类型
+ * @param T 物品模板的类型, 必须实现 [ItemTemplate]
  */
-interface ItemTemplateType<T : ItemTemplate<*>> : Examinable {
+interface ItemTemplateType<T> : Examinable {
     /**
      * 模板的唯一标识.
      */
@@ -37,12 +37,12 @@ interface ItemTemplateType<T : ItemTemplate<*>> : Examinable {
      */
     fun decode(node: ConfigurationNode): T
 
-    /**
-     * 定义如何将 [T] 写入到 [node].
-     */
-    fun encode(obj: T?, node: ConfigurationNode) {
-        throw UnsupportedOperationException()
-    }
+    // /**
+    //  * 定义如何将 [T] 写入到 [node].
+    //  */
+    // fun encode(obj: T?, node: ConfigurationNode) {
+    //     throw UnsupportedOperationException()
+    // }
 
     /**
      * 该序列化会用到的子序列化器.

@@ -1,0 +1,158 @@
+# 在这里设置标准物品的 *渲染格式*.
+
+# dev: 每个一级节点在代码里是一个 RendererFormat 对象
+#  一级节点本身的 key 将成为 RendererFormat#id
+#  一级节点的内容将成为 RendererFormat 的 property
+
+# id: `arrow`
+arrow:
+  namespace: ammo
+  # 可用标签
+  # <pierce_level> 穿透等级
+  # <fire_ticks> 箭矢本身的着火时间
+  # <hit_fire_ticks> 击中实体造成的着火时间
+  # <hit_frozen_ticks> 击中实体造成的冰冻时间
+  # <glow_ticks> 击中实体造成的发光时间
+  tooltip:
+    - "穿透: <pierce_level>"
+
+# id: `attack_speed`
+attack_speed:
+  namespace: topmost
+  tooltip:
+    # 可用标签
+    # <value> 攻击速度值
+    line: "攻击速度: <value>"
+    # 数值对应的描述
+    level:
+      0: "非常慢"
+      1: "慢"
+      2: "普通"
+      3: "快"
+      4: "非常快"
+
+# id: <有效的属性 id>
+cells/attributes:
+  namespace: attribute
+  # 排序相关设置
+  ordinal:
+    # 元素排序
+    element:
+      - neutral
+      - fire
+      - water
+      - wind
+      - earth
+      - thunder
+    # 运算模式排序
+    operation:
+      - add
+      - multiply_base
+      - multiply_total
+
+# id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
+cells/skills:
+  namespace: skill
+
+# id: `cells/empty`
+cells/empty:
+  namespace: stash
+  tooltip:
+    - "[ 空词条栏 ]"
+
+# TODO 盲盒系统完成后重新考虑
+# id: `crate`
+crate:
+  namespace: special
+  # 可用标签
+  # <id> 盲盒的标识
+  # <name> 盲盒的名字
+  tooltip: "盲盒: <name>"
+
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
+  tooltip: "定制名: <value>"
+
+# id: `elements`
+elements:
+  namespace: general
+  # 可用标签
+  # <merged> 多个元素合并后的文本
+  # <single> 单个元素
+  tooltip:
+    merged: "元素: <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `enchantments`
+enchantments:
+  namespace: vanilla
+
+# id: `fire_resistant`
+fire_resistant:
+  namespace: vanilla
+  tooltip: "免疫火焰伤害"
+
+# id: `food`
+food:
+  namespace: vanilla
+  # 原版 UI 不会显示物品的食物属性,
+  # 所以这部分渲染由萌芽系统提供.
+  #
+  # 可用标签
+  # <nutrition> 食物增加的饥饿值
+  # <saturation> 食物增加的饱和度
+  # <eat_seconds> 食用所需要的时间
+  tooltip:
+    - "饥饿值: <nutrition>"
+    - "饱和度: <saturation>"
+    - "食用时间: <eat_seconds>"
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "物品名: <value>"
+
+# id: `kizamiz`
+kizamiz:
+  namespace: general
+  # 可用标签
+  # <merged> 多个铭刻合并后的文本
+  # <single> 单个铭刻
+  tooltip:
+    merged: "铭刻: <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `level`
+level:
+  namespace: general
+  # 可用标签
+  # <value> 等级值
+  tooltip: "等级: <value>"
+
+# id: `lore`
+lore:
+  namespace: general
+  # 可用标签：
+  # <line> 描述内容
+  tooltip:
+    line: "<line>"
+    header: [ ] # 空列表代表完全没有，不代表空行
+    bottom: [ ]
+
+# id: `portable_core`
+portable_core:
+  namespace: special
+
+# id: `rarity`
+rarity:
+  namespace: general
+  # 可用标签
+  # <value> 稀有度的名字
+  tooltip: "稀有度: <value>"

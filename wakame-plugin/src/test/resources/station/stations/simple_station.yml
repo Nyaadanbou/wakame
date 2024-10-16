@@ -31,17 +31,17 @@ layout:
     choices:
       # 可用占位符:
       # <prefix>
-      # <render_name>
+      # <name>
       # <amount>
-      item: "<!i><prefix> <render_name> <gray>*<amount></gray>"
+      item: "<!i><prefix> <name> <gray>*<amount></gray>"
       # 可用占位符:
       # <amount>
       exp: "<!i><prefix> <white>EXP</white> <gray>*<amount></gray>"
     results:
       # 可用占位符:
-      # <render_name>
+      # <name>
       # <amount>
-      item: "<render_name> <gray>*<amount></gray>"
+      item: "<name> <gray>*<amount></gray>"
     recipe:
       # 可用占位符:
       # - <result>

@@ -1,25 +1,20 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.adventure.ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS
-import cc.mewcraft.wakame.config.configurate.MaterialSerializer
-import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
-import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
+import cc.mewcraft.wakame.config.configurate.*
 import cc.mewcraft.wakame.damage.DAMAGE_EXTERNAL
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.ITEM_PROTO_SERIALIZERS
+import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
-import cc.mewcraft.wakame.skill.SKILL_GROUP_SERIALIZERS
-import cc.mewcraft.wakame.skill.SkillSerializer
-import cc.mewcraft.wakame.skill.TriggersConditionsSerializer
+import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.factory.SKILL_FACTORY_SERIALIZERS
 import cc.mewcraft.wakame.skill.trigger.SKILL_TRIGGER_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
-import cc.mewcraft.wakame.util.buildYamlLoader
-import cc.mewcraft.wakame.util.createYamlLoader
-import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.*
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -32,9 +27,6 @@ const val CRATE_PROTO_CONFIG_LOADER = "crate_prototype_config_loader"
 
 const val ITEM_PROTO_CONFIG_DIR = "items"
 const val ITEM_PROTO_CONFIG_LOADER = "item_prototype_config_loader"
-
-const val ITEM_GLOBAL_CONFIG_FILE = "items.yml"
-const val ITEM_GLOBAL_CONFIG_LOADER = "item_global_config_loader"
 
 const val LANG_PROTO_CONFIG_DIR = "lang"
 const val LANG_PROTO_CONFIG_LOADER = "lang_prototype_config_loader"

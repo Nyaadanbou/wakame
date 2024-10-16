@@ -6,7 +6,7 @@ import org.bukkit.entity.Player
  * [StationRecipe] 的消耗器.
  * 消耗一特定玩家某配方的各项要求.
  */
-object RecipeConsumer {
+internal object RecipeConsumer {
     fun consume(recipe: StationRecipe, player: Player) {
         val choices = recipe.input
 

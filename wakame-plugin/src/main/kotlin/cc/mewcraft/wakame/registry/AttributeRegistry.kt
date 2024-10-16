@@ -1,22 +1,15 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.config.ConfigProvider
-import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.derive
-import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.attribute.composite.*
+import cc.mewcraft.wakame.config.*
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.*
-import cc.mewcraft.wakame.item.components.cells.template.cores.attribute.*
+import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
 import cc.mewcraft.wakame.util.*
 import com.google.common.collect.ImmutableMap
@@ -30,7 +23,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -44,7 +37,7 @@ import kotlin.reflect.KClass
 /**
  * This singleton holds various implementations for **each** attribute.
  *
- * Check the [AttributeFacade] for more details.
+ * Check the [CompositeAttributeFacade] for more details.
  */
 @PreWorldDependency(
     runBefore = [ElementRegistry::class]
@@ -62,7 +55,7 @@ object AttributeRegistry : Initializable {
     /**
      * The facades of all attributes.
      */
-    val FACADES: Registry<Key, AttributeFacade<CoreAttribute, TemplateCoreAttribute>> = SimpleRegistry()
+    val FACADES: Registry<String, CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>> = SimpleRegistry()
 
     /**
      * The config of all attributes.
@@ -72,17 +65,17 @@ object AttributeRegistry : Initializable {
     /**
      * Builds an attribute facade.
      *
-     * 注意, 参数 [key] 仅仅是词条在 NBT/模板 中的唯一标识.
-     * 底层由多个对象组成的词条标识就与这里的 [key] 不同.
+     * 注意, 参数 [id] 仅仅是词条在 NBT/模板 中的唯一标识.
+     * 底层由多个对象组成的词条标识就与这里的 [id] 不同.
      *
      * 例如攻击力这个属性词条, 底层实际上是由两个属性组成的, 分别是 `MIN_ATTACK_DAMAGE` 和
      * `MAX_ATTACK_DAMAGE`, 但攻击力属性词条在 NBT/模板中的标识是一个经过“合并”得到的
      * `attribute:attack_damage`.
      *
-     * @param key 词条在 NBT/模板 中的唯一标识
+     * @param id 词条在 NBT/模板 中的唯一标识
      */
-    private fun buildFacade(key: String): FormatSelection {
-        return FormatSelectionImpl(Key(Namespaces.ATTRIBUTE, key))
+    private fun buildFacade(id: String): FormatSelection {
+        return FormatSelectionImpl(id)
     }
 
     /**
@@ -103,39 +96,11 @@ object AttributeRegistry : Initializable {
         +buildFacade("defense_penetration").single().element().bind { DEFENSE_PENETRATION }
         +buildFacade("defense_penetration_rate").single().element().bind { DEFENSE_PENETRATION_RATE }
         +buildFacade("entity_interaction_range").single().bind { ENTITY_INTERACTION_RANGE }
-        +buildFacade("health_regeneration").single().bind { HEALTH_REGENERATION }.override {
-            // create closures
-            val tooltips = NumericTooltips(config)
-            // override it
-            createTooltipLore = { core: CoreAttributeS ->
-                val lines = tooltips.line(core.operation)
-                if (core.operation == Operation.ADD) {
-                    val resolver = tooltips.number("value", core.value * 20)
-                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-                } else {
-                    val resolver = tooltips.number("value", core.value)
-                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-                }
-            }
-        }
+        +buildFacade("health_regeneration").single().bind { HEALTH_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
         +buildFacade("incoming_damage_rate").single().element().bind { INCOMING_DAMAGE_RATE }
         +buildFacade("lifesteal").single().bind { LIFESTEAL }
         +buildFacade("mana_consumption_rate").single().bind { MANA_CONSUMPTION_RATE }
-        +buildFacade("mana_regeneration").single().bind { MANA_REGENERATION }.override {
-            // create closures
-            val tooltips = NumericTooltips(config)
-            // override it
-            createTooltipLore = { core: CoreAttributeS ->
-                val lines = tooltips.line(core.operation)
-                if (core.operation == Operation.ADD) {
-                    val resolver = tooltips.number("value", core.value * 20)
-                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-                } else {
-                    val resolver = tooltips.number("value", core.value)
-                    listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-                }
-            }
-        }
+        +buildFacade("mana_regeneration").single().bind { MANA_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
         +buildFacade("manasteal").single().bind { MANASTEAL }
         +buildFacade("max_absorption").single().bind { MAX_ABSORPTION }
         +buildFacade("max_health").single().bind { MAX_HEALTH }
@@ -158,32 +123,30 @@ object AttributeRegistry : Initializable {
 }
 
 /**
- * 包含了一个属性的各种操作和实现。
+ * 包含了一个 [cc.mewcraft.wakame.attribute.composite.CompositeAttribute] 所相关的各种字段和操作.
  *
- * 这里将各种操作和实现放在一起以方便外部统一调用。
- *
- * @param T the type of [CoreAttribute]
- * @param S the type of [TemplateCoreAttribute]
+ * @param T [ConstantCompositeAttribute] 的一个子类
+ * @param S [VariableCompositeAttribute] 的一个子类
  */
-interface AttributeFacade<T : CoreAttribute, S : TemplateCoreAttribute> : Keyed {
+interface CompositeAttributeFacade<T : ConstantCompositeAttribute, S : VariableCompositeAttribute> : Keyed {
     /**
-     * 该属性的全局配置文件.
+     * 本实例的全局配置文件.
      */
     val config: ConfigProvider
 
     /**
-     * 属性 facade 的唯一标识。
+     * 属性的唯一标识.
      *
-     * 属性 facade 的唯一标识与单个属性的唯一标识不一定相同。
-     * 当一个属性的 facade 是由多个属性构成时（例如攻击力），
-     * 它们的唯一标识就略微不同。
+     * 属性 facade 的唯一标识与单个属性的唯一标识不一定相同,
+     * 当一个属性的 facade 是由多个属性构成时(例如攻击力),
+     * 它们的唯一标识就不一样.
      */
-    val facadeId: Key
+    val id: String
 
     /**
      * Holds metadata about the attribute components.
      */
-    val components: AttributeComponentMetadata
+    val components: CompositeAttributeMetadata
 
     /**
      * A creator for attribute modifiers.
@@ -191,19 +154,19 @@ interface AttributeFacade<T : CoreAttribute, S : TemplateCoreAttribute> : Keyed 
     val createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>
 
     /**
-     * A creator for [TemplateCoreAttribute].
+     * A creator for [cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreBlueprint].
      */
-    val convertNode2Template: (ConfigurationNode) -> S
+    val convertNode2Variable: (ConfigurationNode) -> S
 
     /**
-     * A creator for [CoreAttribute].
+     * A creator for [cc.mewcraft.wakame.item.components.cells.AttributeCore].
      */
-    val convertNode2Instance: (ConfigurationNode) -> T
+    val convertNode2Constant: (ConfigurationNode) -> T
 
     /**
-     * A creator for [CoreAttribute].
+     * A creator for [cc.mewcraft.wakame.item.components.cells.AttributeCore].
      */
-    val convertNBT2Instance: (CompoundTag) -> T
+    val convertNBT2Constant: (CompoundTag) -> T
 
     /**
      * A creator for tooltip name.
@@ -219,7 +182,7 @@ interface AttributeFacade<T : CoreAttribute, S : TemplateCoreAttribute> : Keyed 
 /**
  * 一个属性的组件相关信息。
  */
-interface AttributeComponentMetadata {
+interface CompositeAttributeMetadata {
     /**
      * 查询该属性是否有指定的组件。
      *
@@ -227,13 +190,13 @@ interface AttributeComponentMetadata {
      * @param componentClass 组件的接口类
      * @return 如果该属性拥有该组件，则返回 `true`
      */
-    fun <T : AttributeComponent> hasComponent(componentClass: KClass<T>): Boolean
+    fun <T : CompositeAttributeComponent> hasComponent(componentClass: KClass<T>): Boolean
 }
 
 /**
- * @see AttributeComponentMetadata.hasComponent
+ * @see CompositeAttributeMetadata.hasComponent
  */
-inline fun <reified T : AttributeComponent> AttributeComponentMetadata.hasComponent(): Boolean {
+inline fun <reified T : CompositeAttributeComponent> CompositeAttributeMetadata.hasComponent(): Boolean {
     return hasComponent(T::class)
 }
 
@@ -241,14 +204,14 @@ inline fun <reified T : AttributeComponent> AttributeComponentMetadata.hasCompon
 // Mini DSL for building an attribute facade
 //
 
-private operator fun AttributeFacade<*, *>.unaryPlus() {
+private operator fun CompositeAttributeFacade<*, *>.unaryPlus() {
     @Suppress("UNCHECKED_CAST")
-    FACADES.register(this.facadeId, this as AttributeFacade<CoreAttribute, TemplateCoreAttribute>)
+    FACADES.register(this.id, this as CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>)
 }
 
 private operator fun AttributeFacadeOverride<*, *>.unaryPlus() {
     @Suppress("UNCHECKED_CAST")
-    FACADES.register(this.prototype.facadeId, this.prototype as AttributeFacade<CoreAttribute, TemplateCoreAttribute>)
+    FACADES.register(this.prototype.id, this.prototype as CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>)
 }
 
 /**
@@ -279,7 +242,7 @@ private interface RangedSelection : RangedAttributeBinder {
 private interface SingleAttributeBinder {
     fun bind(
         component: Attributes.() -> Attribute,
-    ): AttributeFacadeOverride<CoreAttributeS, TemplateCoreAttributeS>
+    ): AttributeFacadeOverride<ConstantCompositeAttributeS, VariableCompositeAttributeS>
 }
 
 /**
@@ -289,7 +252,7 @@ private interface RangedAttributeBinder {
     fun bind(
         component1: Attributes.() -> Attribute,
         component2: Attributes.() -> Attribute,
-    ): AttributeFacadeOverride<CoreAttributeR, TemplateCoreAttributeR>
+    ): AttributeFacadeOverride<ConstantCompositeAttributeR, VariableCompositeAttributeR>
 }
 
 /**
@@ -298,7 +261,7 @@ private interface RangedAttributeBinder {
 private interface SingleElementAttributeBinder {
     fun bind(
         component: ElementAttributes.() -> ElementAttribute,
-    ): AttributeFacadeOverride<CoreAttributeSE, TemplateCoreAttributeSE>
+    ): AttributeFacadeOverride<ConstantCompositeAttributeSE, VariableCompositeAttributeSE>
 }
 
 /**
@@ -308,13 +271,13 @@ private interface RangedElementAttributeBinder {
     fun bind(
         component1: ElementAttributes.() -> ElementAttribute,
         component2: ElementAttributes.() -> ElementAttribute,
-    ): AttributeFacadeOverride<CoreAttributeRE, TemplateCoreAttributeRE>
+    ): AttributeFacadeOverride<ConstantCompositeAttributeRE, VariableCompositeAttributeRE>
 }
 
-private class AttributeFacadeOverride<BC : CoreAttribute, SC : TemplateCoreAttribute>(
-    val prototype: MutableAttributeFacade<BC, SC>,
+private class AttributeFacadeOverride<S : ConstantCompositeAttribute, V : VariableCompositeAttribute>(
+    val prototype: MutableCompositeAttributeFacade<S, V>,
 ) {
-    fun override(mutator: MutableAttributeFacade<BC, SC>.() -> Unit): AttributeFacade<BC, SC> {
+    fun override(mutator: MutableCompositeAttributeFacade<S, V>.() -> Unit): CompositeAttributeFacade<S, V> {
         return prototype.apply(mutator)
     }
 }
@@ -325,37 +288,39 @@ private class AttributeFacadeOverride<BC : CoreAttribute, SC : TemplateCoreAttri
 
 //<editor-fold desc="Implementations">
 private object AttributeRegistrySupport : KoinComponent {
-    val miniMessage: MiniMessage by inject()
+    val miniMessage = get<MiniMessage>()
 }
 
 /**
- * A mutable [AttributeFacade] (except the property [facadeId]).
+ * A mutable [CompositeAttributeFacade] (except the property [id]).
  */
-private class MutableAttributeFacade<T : CoreAttribute, S : TemplateCoreAttribute>(
+private class MutableCompositeAttributeFacade<T : ConstantCompositeAttribute, S : VariableCompositeAttribute>(
     // the config provider of this facade
     override val config: ConfigProvider,
+
     // this should be immutable
-    override val facadeId: Key,
+    override val id: String,
+
     // these are mutable through override() in DSL
-    override var components: AttributeComponentMetadata,
+    override var components: CompositeAttributeMetadata,
     override var createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>,
-    override var convertNode2Template: (ConfigurationNode) -> S,
-    override var convertNode2Instance: (ConfigurationNode) -> T,
-    override var convertNBT2Instance: (CompoundTag) -> T,
+    override var convertNode2Variable: (ConfigurationNode) -> S,
+    override var convertNode2Constant: (ConfigurationNode) -> T,
+    override var convertNBT2Constant: (CompoundTag) -> T,
     override var createTooltipName: (T) -> Component,
     override var createTooltipLore: (T) -> List<Component>,
-) : AttributeFacade<T, S> {
-    override val key: Key = facadeId
+) : CompositeAttributeFacade<T, S> {
+    override val key: Key = Key.key(Namespaces.ATTRIBUTE, id)
 }
 
-private class AttributeComponentMetadataImpl private constructor(
-    components: Set<KClass<out AttributeComponent>>,
-) : AttributeComponentMetadata {
-    constructor(vararg components: KClass<out AttributeComponent>) : this(components.toHashSet())
+private class CompositeAttributeMetadataImpl private constructor(
+    components: Set<KClass<out CompositeAttributeComponent>>,
+) : CompositeAttributeMetadata {
+    constructor(vararg components: KClass<out CompositeAttributeComponent>) : this(components.toHashSet())
 
-    private val components: Set<KClass<out AttributeComponent>> = components.toHashSet()
+    private val components: Set<KClass<out CompositeAttributeComponent>> = components.toHashSet()
 
-    override fun <T : AttributeComponent> hasComponent(componentClass: KClass<T>): Boolean {
+    override fun <T : CompositeAttributeComponent> hasComponent(componentClass: KClass<T>): Boolean {
         return componentClass in components
     }
 }
@@ -441,89 +406,61 @@ private class NumericTooltips(
     }
 }
 
-/**
- * Encapsulation of the tooltips for an attribute facade.
- *
- * Unlike [NumericTooltips], this is for the attributes with discrete values.
- *
- * @param config the config of the attribute facade
- */
-private class DiscreteTooltips(
-    config: ConfigProvider,
-) : Tooltips(config), Examinable {
-    val mappings: Map<Int, Component> by config
-        .entry<Map<Int, String>>("mappings")
-        .map { map ->
-            map.withDefault { int ->
-                "??? ($int)" // fallback for unknown discrete values
-            }.mapValues { (_, v) ->
-                AttributeRegistrySupport.miniMessage.deserialize(v)
-            }
-        }
-
-    /**
-     * Creates a [TagResolver] for the tooltips.
-     */
-    fun value(key: String, value: Int): TagResolver {
-        return Placeholder.component(key, mappings.getValue(value))
-    }
-}
-
 private class FormatSelectionImpl(
-    private val facadeId: Key,
+    private val id: String,
 ) : FormatSelection {
     override fun single(): SingleSelection {
-        return SingleSelectionImpl(facadeId)
+        return SingleSelectionImpl(id)
     }
 
     override fun ranged(): RangedSelection {
-        return RangedSelectionImpl(facadeId)
+        return RangedSelectionImpl(id)
     }
 }
 
 private class SingleSelectionImpl(
-    private val facadeId: Key,
+    private val id: String,
 ) : SingleSelection {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(this@SingleSelectionImpl.id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): SingleElementAttributeBinder {
-        return SingleElementAttributeBinderImpl(facadeId)
+        return SingleElementAttributeBinderImpl(this@SingleSelectionImpl.id)
     }
 
     /**
      * Components: Operation, Single
      */
-    override fun bind(component: Attributes.() -> Attribute): AttributeFacadeOverride<CoreAttributeS, TemplateCoreAttributeS> {
-        val facade = MutableAttributeFacade(
+    override fun bind(component: Attributes.() -> Attribute): AttributeFacadeOverride<ConstantCompositeAttributeS, VariableCompositeAttributeS> {
+        val facade = MutableCompositeAttributeFacade(
             config = config,
-            facadeId = facadeId,
-            components = AttributeComponentMetadataImpl(
-                AttributeComponent.Op::class, AttributeComponent.Fixed::class
+            id = this@SingleSelectionImpl.id,
+            components = CompositeAttributeMetadataImpl(
+                CompositeAttributeComponent.Operation::class, CompositeAttributeComponent.Scalar::class
             ),
-            createAttributeModifiers = { id: Key, core: CoreAttributeS ->
+            createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeS ->
                 ImmutableMap.of(
                     Attributes.component(), AttributeModifier(id, core.value.toStableDouble(), core.operation)
                 )
             },
-            convertNode2Template = { node: ConfigurationNode ->
+            convertNode2Variable = { node: ConfigurationNode ->
                 val operation = node.getOperation()
-                val value = node.getTemplateSingle()
-                TemplateCoreAttributeS(facadeId, operation, value)
+                val value = node.getVariableScalar()
+                VariableCompositeAttributeS(id, operation, value)
             },
-            convertNode2Instance = { node: ConfigurationNode ->
+            convertNode2Constant = { node: ConfigurationNode ->
                 val operation = node.getOperation()
-                val value = node.getSingle()
-                CoreAttributeS(facadeId, operation, value)
+                val value = node.getSimpleScalar()
+                ConstantCompositeAttributeS(id, operation, value)
             },
-            convertNBT2Instance = { tag: CompoundTag ->
-                CoreAttributeS(tag)
+            convertNBT2Constant = { tag: CompoundTag ->
+                ConstantCompositeAttributeS(id, tag)
             },
             createTooltipName = {
                 AttributeRegistrySupport.miniMessage.deserialize(displayName)
             },
-            createTooltipLore = { core: CoreAttributeS ->
+            createTooltipLore = { core: ConstantCompositeAttributeS ->
                 val lines = tooltips.line(core.operation)
                 val resolver = tooltips.number("value", core.value)
                 listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
@@ -535,14 +472,14 @@ private class SingleSelectionImpl(
 }
 
 private class RangedSelectionImpl(
-    private val facadeId: Key,
+    private val id: String,
 ) : RangedSelection {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): RangedElementAttributeBinder {
-        return RangedElementAttributeBinderImpl(facadeId)
+        return RangedElementAttributeBinderImpl(id)
     }
 
     /**
@@ -551,38 +488,38 @@ private class RangedSelectionImpl(
     override fun bind(
         component1: Attributes.() -> Attribute,
         component2: Attributes.() -> Attribute,
-    ): AttributeFacadeOverride<CoreAttributeR, TemplateCoreAttributeR> {
-        val facade = MutableAttributeFacade(
+    ): AttributeFacadeOverride<ConstantCompositeAttributeR, VariableCompositeAttributeR> {
+        val facade = MutableCompositeAttributeFacade(
             config = config,
-            facadeId = facadeId,
-            components = AttributeComponentMetadataImpl(
-                AttributeComponent.Op::class, AttributeComponent.Ranged::class
+            id = id,
+            components = CompositeAttributeMetadataImpl(
+                CompositeAttributeComponent.Operation::class, CompositeAttributeComponent.Ranged::class
             ),
-            createAttributeModifiers = { id: Key, core: CoreAttributeR ->
+            createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeR ->
                 ImmutableMap.of(
                     Attributes.component1(), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
                     Attributes.component2(), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
                 )
             },
-            convertNode2Template = { node: ConfigurationNode ->
+            convertNode2Variable = { node: ConfigurationNode ->
                 val operation = node.getOperation()
-                val lower = node.getTemplateLower()
-                val upper = node.getTemplateUpper()
-                TemplateCoreAttributeR(facadeId, operation, lower, upper)
+                val lower = node.getVariableMin()
+                val upper = node.getVariableMax()
+                VariableCompositeAttributeR(id, operation, lower, upper)
             },
-            convertNode2Instance = { node: ConfigurationNode ->
+            convertNode2Constant = { node: ConfigurationNode ->
                 val operation = node.getOperation()
-                val lower = node.getLower()
-                val upper = node.getUpper()
-                CoreAttributeR(facadeId, operation, lower, upper)
+                val lower = node.getSimpleMin()
+                val upper = node.getSimpleMax()
+                ConstantCompositeAttributeR(id, operation, lower, upper)
             },
-            convertNBT2Instance = { tag: CompoundTag ->
-                CoreAttributeR(tag)
+            convertNBT2Constant = { tag: CompoundTag ->
+                ConstantCompositeAttributeR(id, tag)
             },
             createTooltipName = {
                 AttributeRegistrySupport.miniMessage.deserialize(displayName)
             },
-            createTooltipLore = { core: CoreAttributeR ->
+            createTooltipLore = { core: ConstantCompositeAttributeR ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
@@ -595,47 +532,47 @@ private class RangedSelectionImpl(
 }
 
 private class SingleElementAttributeBinderImpl(
-    private val facadeId: Key,
+    private val id: String,
 ) : SingleElementAttributeBinder {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     /**
      * Components: Operation, Single, Element
      */
-    override fun bind(component: ElementAttributes.() -> ElementAttribute): AttributeFacadeOverride<CoreAttributeSE, TemplateCoreAttributeSE> {
-        val facade = MutableAttributeFacade(
+    override fun bind(component: ElementAttributes.() -> ElementAttribute): AttributeFacadeOverride<ConstantCompositeAttributeSE, VariableCompositeAttributeSE> {
+        val facade = MutableCompositeAttributeFacade(
             config = config,
-            facadeId = facadeId,
-            components = AttributeComponentMetadataImpl(
-                AttributeComponent.Op::class, AttributeComponent.Fixed::class, AttributeComponent.Element::class
+            id = id,
+            components = CompositeAttributeMetadataImpl(
+                CompositeAttributeComponent.Operation::class, CompositeAttributeComponent.Scalar::class, CompositeAttributeComponent.Element::class
             ),
-            createAttributeModifiers = { id: Key, core: CoreAttributeSE ->
+            createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeSE ->
                 ImmutableMap.of(
                     Attributes.element(core.element).component(), AttributeModifier(id, core.value.toStableDouble(), core.operation)
                 )
             },
-            convertNode2Template = { node: ConfigurationNode ->
+            convertNode2Variable = { node: ConfigurationNode ->
                 val operation = node.getOperation()
-                val value = node.getTemplateSingle()
+                val value = node.getVariableScalar()
                 val element = node.getElement()
-                TemplateCoreAttributeSE(facadeId, operation, value, element)
+                VariableCompositeAttributeSE(id, operation, value, element)
             },
-            convertNode2Instance = { node: ConfigurationNode ->
+            convertNode2Constant = { node: ConfigurationNode ->
                 val operation = node.getOperation()
-                val value = node.getSingle()
+                val value = node.getSimpleScalar()
                 val element = node.getElement()
-                CoreAttributeSE(facadeId, operation, value, element)
+                ConstantCompositeAttributeSE(id, operation, value, element)
             },
-            convertNBT2Instance = { tag: CompoundTag ->
-                CoreAttributeSE(tag)
+            convertNBT2Constant = { tag: CompoundTag ->
+                ConstantCompositeAttributeSE(id, tag)
             },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.displayName)
                 AttributeRegistrySupport.miniMessage.deserialize(displayName, resolver)
             },
-            createTooltipLore = { core: CoreAttributeSE ->
+            createTooltipLore = { core: ConstantCompositeAttributeSE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("value", core.value)
                 val resolver2 = tooltips.component("element", core.element.displayName)
@@ -648,9 +585,9 @@ private class SingleElementAttributeBinderImpl(
 }
 
 private class RangedElementAttributeBinderImpl(
-    private val facadeId: Key,
+    private val id: String,
 ) : RangedElementAttributeBinder {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(facadeId.value())
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
@@ -660,41 +597,41 @@ private class RangedElementAttributeBinderImpl(
     override fun bind(
         component1: ElementAttributes.() -> ElementAttribute,
         component2: ElementAttributes.() -> ElementAttribute,
-    ): AttributeFacadeOverride<CoreAttributeRE, TemplateCoreAttributeRE> {
-        val facade = MutableAttributeFacade(
+    ): AttributeFacadeOverride<ConstantCompositeAttributeRE, VariableCompositeAttributeRE> {
+        val facade = MutableCompositeAttributeFacade(
             config = config,
-            facadeId = facadeId,
-            components = AttributeComponentMetadataImpl(
-                AttributeComponent.Op::class, AttributeComponent.Ranged::class, AttributeComponent.Element::class
+            id = id,
+            components = CompositeAttributeMetadataImpl(
+                CompositeAttributeComponent.Operation::class, CompositeAttributeComponent.Ranged::class, CompositeAttributeComponent.Element::class
             ),
-            createAttributeModifiers = { id: Key, core: CoreAttributeRE ->
+            createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeRE ->
                 ImmutableMap.of(
                     Attributes.element(core.element).component1(), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
                     Attributes.element(core.element).component2(), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
                 )
             },
-            convertNode2Template = { node: ConfigurationNode ->
+            convertNode2Variable = { node: ConfigurationNode ->
                 val operation = node.getOperation()
-                val lower = node.getTemplateLower()
-                val upper = node.getTemplateUpper()
+                val lower = node.getVariableMin()
+                val upper = node.getVariableMax()
                 val element = node.getElement()
-                TemplateCoreAttributeRE(facadeId, operation, lower, upper, element)
+                VariableCompositeAttributeRE(id, operation, lower, upper, element)
             },
-            convertNode2Instance = { node: ConfigurationNode ->
+            convertNode2Constant = { node: ConfigurationNode ->
                 val operation = node.getOperation()
-                val lower = node.getLower()
-                val upper = node.getUpper()
+                val lower = node.getSimpleMin()
+                val upper = node.getSimpleMax()
                 val element = node.getElement()
-                CoreAttributeRE(facadeId, operation, lower, upper, element)
+                ConstantCompositeAttributeRE(id, operation, lower, upper, element)
             },
-            convertNBT2Instance = { tag: CompoundTag ->
-                CoreAttributeRE(tag)
+            convertNBT2Constant = { tag: CompoundTag ->
+                ConstantCompositeAttributeRE(id, tag)
             },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.displayName)
                 AttributeRegistrySupport.miniMessage.deserialize(displayName, resolver)
             },
-            createTooltipLore = { core: CoreAttributeRE ->
+            createTooltipLore = { core: ConstantCompositeAttributeRE ->
                 val lines = tooltips.line(core.operation)
                 val resolver1 = tooltips.number("min", core.lower)
                 val resolver2 = tooltips.number("max", core.upper)
@@ -709,35 +646,58 @@ private class RangedElementAttributeBinderImpl(
 
 /* Specialized Configuration Operations */
 
-private fun ConfigurationNode.getSingle(): Double {
-    return node("value").krequire<Double>()
-}
 
-private fun ConfigurationNode.getLower(): Double {
-    return node("lower").krequire<Double>()
-}
-
-private fun ConfigurationNode.getUpper(): Double {
-    return node("upper").krequire<Double>()
-}
-
-private fun ConfigurationNode.getTemplateSingle(): RandomizedValue {
-    return node("value").krequire<RandomizedValue>()
-}
-
-private fun ConfigurationNode.getTemplateLower(): RandomizedValue {
-    return node("lower").krequire<RandomizedValue>()
-}
-
-private fun ConfigurationNode.getTemplateUpper(): RandomizedValue {
-    return node("upper").krequire<RandomizedValue>()
+private fun ConfigurationNode.getOperation(): Operation {
+    return node("operation").string?.let { Operation.byKeyOrThrow(it) } ?: Operation.ADD
 }
 
 private fun ConfigurationNode.getElement(): Element {
     return node("element").krequire<Element>()
 }
 
-private fun ConfigurationNode.getOperation(): Operation {
-    return node("operation").string?.let { Operation.byKeyOrThrow(it) } ?: Operation.ADD
+private fun ConfigurationNode.getSimpleScalar(): Double {
+    return node("value").krequire<Double>()
+}
+
+private fun ConfigurationNode.getSimpleMin(): Double {
+    return node("lower").krequire<Double>()
+}
+
+private fun ConfigurationNode.getSimpleMax(): Double {
+    return node("upper").krequire<Double>()
+}
+
+private fun ConfigurationNode.getVariableScalar(): RandomizedValue {
+    return node("value").krequire<RandomizedValue>()
+}
+
+private fun ConfigurationNode.getVariableMin(): RandomizedValue {
+    return node("lower").krequire<RandomizedValue>()
+}
+
+private fun ConfigurationNode.getVariableMax(): RandomizedValue {
+    return node("upper").krequire<RandomizedValue>()
 }
 //</editor-fold>
+
+private fun mutateTooltipLoreCreator1(
+    facade: MutableCompositeAttributeFacade<ConstantCompositeAttributeS, VariableCompositeAttributeS>,
+    scale: Int,
+) {
+    val tooltips = NumericTooltips(facade.config)
+    val creator = { core: ConstantCompositeAttributeS ->
+        val lines = tooltips.line(core.operation)
+        val resolver = if (core.operation == Operation.ADD) {
+            tooltips.number("value", core.value * scale)
+        } else {
+            tooltips.number("value", core.value)
+        }
+        listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
+    }
+    facade.createTooltipLore = creator
+}
+
+private fun mutateTooltipLoreCreator2(
+    facade: MutableCompositeAttributeFacade<ConstantCompositeAttributeR, VariableCompositeAttributeR>,
+    params: Nothing,
+) = Unit

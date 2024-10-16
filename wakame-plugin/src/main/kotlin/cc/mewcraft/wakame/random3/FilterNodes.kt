@@ -13,7 +13,7 @@ import java.nio.file.Path
 /**
  * 封装了类型 [Filter] 所需要的所有 [Node] 相关的实现.
  */
-abstract class FilterNodeFacade<C : SelectionContext> : NodeFacade<Filter<C>>() {
+abstract class FilterNodeFacade<C : RandomSelectorContext> : NodeFacade<Filter<C>>() {
     abstract override val dataDir: Path
     abstract override val serializers: TypeSerializerCollection
     abstract override val repository: NodeRepository<Filter<C>>

@@ -22,7 +22,6 @@
 
 (这个列表可能会随着插件的更新而变化)
 
-- `attributable`
 - `castable`
 - `glowable`
 - `arrow`

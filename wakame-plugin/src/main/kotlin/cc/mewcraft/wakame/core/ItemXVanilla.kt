@@ -8,7 +8,7 @@ class ItemXVanilla(
     identifier: String,
 ) : ItemXAbstract(ItemXFactoryVanilla.plugin, identifier) {
     companion object {
-        const val DEFAULT_RENDER_NAME = "<white>UNKNOWN</white>"
+        const val DEFAULT_DISPLAY_NAME = "<white>UNKNOWN</white>"
     }
 
     override fun isValid(): Boolean {
@@ -29,8 +29,8 @@ class ItemXVanilla(
         return !itemStack.hasItemMeta() && itemStack.type == Material.matchMaterial(identifier, false)
     }
 
-    override fun renderName(): String {
-        val material = Material.matchMaterial(identifier, false) ?: return DEFAULT_RENDER_NAME
+    override fun displayName(): String {
+        val material = Material.matchMaterial(identifier, false) ?: return DEFAULT_DISPLAY_NAME
         return "<tr:${material.translationKey()}>"
     }
 }

@@ -1,19 +1,15 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.cells.Cell
-import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttribute
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
+import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.common.TemporaryIcons
-import cc.mewcraft.wakame.util.hideAllFlags
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -425,9 +421,10 @@ internal object Replace {
         override val rule
             get() = ModdingTable.CellRule.empty()
         override val display = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
-            val unchangeable = "<red>(不可修改)".mini
+            val unchangeable = "<red>(不可修改)"
             editMeta { meta ->
-                val name = cell.provideTooltipName().content.appendSpace().append(unchangeable)
+                // TODO 使用新的渲染器生成文本
+                val name = "${cell.getCore().id.asString()} $unchangeable".mini
                 meta.itemName(name)
                 meta.hideAllFlags()
             }
@@ -477,8 +474,9 @@ internal object Replace {
 
         override val display: ItemStack = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
             editMeta { meta ->
-                val name = cell.provideTooltipName().content
-                val lore = cell.provideTooltipLore().content
+                // TODO 使用新的渲染器生成文本
+                val name = cell.getId().mini
+                val lore = listOf(cell.getCore().id.asString().mini)
                 meta.itemName(name)
                 meta.lore(lore)
                 meta.hideAllFlags()
@@ -523,7 +521,7 @@ internal object Replace {
             }
 
             // 源物品的词条栏上 必须没有与便携核心相似的核心
-            val sourceCellsExcludingThis = sourceCells.filterx { it.getId() != cell.getId() }
+            val sourceCellsExcludingThis = sourceCells.filter2 { it.getId() != cell.getId() }
             if (sourceCellsExcludingThis.containSimilarCore(portableCore.wrapped)) {
                 return ReplaceResult.failure(ingredient, "<gray>源物品上存在相似的便携核心".mini)
             }
@@ -541,7 +539,7 @@ internal object Replace {
             if (rule.requireElementMatch) {
                 val elementsOnSource = sourceItem.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
-                val elementOnIngredient = (portableCore.wrapped as? CoreAttribute)?.element
+                val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.attribute?.element
                 if (elementOnIngredient != null && elementOnIngredient !in elementsOnSource) {
                     return ReplaceResult.failure(ingredient, "<gray>便携核心的元素跟源物品的不相融".mini)
                 }
@@ -691,7 +689,7 @@ internal object ReplaceMap {
                     ?.components
                     ?.get(ItemComponentTypes.PORTABLE_CORE)
                     ?.wrapped
-                    ?.isSimilar(core) == true
+                    ?.similarTo(core) == true
             }
         }
 

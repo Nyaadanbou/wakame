@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
-import cc.mewcraft.wakame.display.displayModule
+import cc.mewcraft.wakame.display2.display2Module
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.enchantment.enchantmentModule
 import cc.mewcraft.wakame.entity.entityModule
@@ -20,7 +20,6 @@ import cc.mewcraft.wakame.lang.langModule
 import cc.mewcraft.wakame.level.levelModule
 import cc.mewcraft.wakame.lookup.lookupModule
 import cc.mewcraft.wakame.molang.molangModule
-import cc.mewcraft.wakame.monetary.monetaryModule
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.packet.packetModule
 import cc.mewcraft.wakame.player.playerModule
@@ -69,7 +68,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 attributeModule(),
                 crateModule(),
                 damageModule(),
-                displayModule(),
+                display2Module(),
                 elementModule(),
                 enchantmentModule(),
                 entityModule(),
@@ -81,7 +80,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 levelModule(),
                 lookupModule(),
                 molangModule(),
-                monetaryModule(),
                 packetModule(),
                 packModule(),
                 playerModule(),

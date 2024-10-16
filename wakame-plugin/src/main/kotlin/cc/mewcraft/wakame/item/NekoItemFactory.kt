@@ -2,14 +2,8 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.item.behavior.ItemBehavior
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.behavior.*
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -90,7 +84,6 @@ object NekoItemFactory : KoinComponent {
             }
 
             tryAdd("arrow", ItemTemplateTypes.ARROW)
-            tryAdd("attributable", ItemTemplateTypes.ATTRIBUTABLE)
             tryAdd("attribute_modifiers", ItemTemplateTypes.ATTRIBUTE_MODIFIERS) { unsupported() }
             tryAdd("bow", ItemTemplateTypes.BOW)
             tryAdd("can_break", ItemTemplateTypes.CAN_BREAK) { unsupported() }
@@ -110,14 +103,12 @@ object NekoItemFactory : KoinComponent {
             tryAdd("hide_additional_tooltip", ItemTemplateTypes.HIDE_ADDITIONAL_TOOLTIP) { unsupported() }
             tryAdd("item_name", ItemTemplateTypes.ITEM_NAME) { unsupported() }
             tryAdd("kizamiz", ItemTemplateTypes.KIZAMIZ)
-            tryAdd("kizamiable", ItemTemplateTypes.KIZAMIABLE)
             tryAdd("level", ItemTemplateTypes.LEVEL) { restricted { !it.isConstant } } // 对于 VanillaNekoItem, LEVEL 应该始终采用固定值
             tryAdd("lore", ItemTemplateTypes.LORE)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE) { unsupported() }
             tryAdd("rarity", ItemTemplateTypes.RARITY) { restricted { !it.isStatic } } // 对于 VanillaNekoItem, RARITY 应该始终采用固定值
             // tryAdd("skin", ItemTemplateTypes.SKIN) { unsupported() }
             // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER) { unsupported() }
-            tryAdd("skillful", ItemTemplateTypes.SKILLFUL)
             tryAdd("stored_enchantments", ItemTemplateTypes.STORED_ENCHANTMENTS) { unsupported() }
             tryAdd("tool", ItemTemplateTypes.TOOL) { unsupported() }
             tryAdd("trim", ItemTemplateTypes.TRIM) { unsupported() }
@@ -179,7 +170,6 @@ object NekoItemFactory : KoinComponent {
 
             tryAdd("arrow", ItemTemplateTypes.ARROW)
             tryAdd("attack_speed", ItemTemplateTypes.ATTACK_SPEED)
-            tryAdd("attributable", ItemTemplateTypes.ATTRIBUTABLE)
             tryAdd("attribute_modifiers", ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
             tryAdd("bow", ItemTemplateTypes.BOW)
             tryAdd("can_break", ItemTemplateTypes.CAN_BREAK)
@@ -199,14 +189,12 @@ object NekoItemFactory : KoinComponent {
             tryAdd("hide_additional_tooltip", ItemTemplateTypes.HIDE_ADDITIONAL_TOOLTIP)
             tryAdd("item_name", ItemTemplateTypes.ITEM_NAME)
             tryAdd("kizamiz", ItemTemplateTypes.KIZAMIZ)
-            tryAdd("kizamiable", ItemTemplateTypes.KIZAMIABLE)
             tryAdd("level", ItemTemplateTypes.LEVEL)
             tryAdd("lore", ItemTemplateTypes.LORE)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE)
             tryAdd("rarity", ItemTemplateTypes.RARITY)
             // tryAdd("skin", ItemTemplateTypes.SKIN)
             // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER)
-            tryAdd("skillful", ItemTemplateTypes.SKILLFUL)
             tryAdd("stored_enchantments", ItemTemplateTypes.STORED_ENCHANTMENTS)
             tryAdd("tool", ItemTemplateTypes.TOOL)
             tryAdd("trim", ItemTemplateTypes.TRIM)

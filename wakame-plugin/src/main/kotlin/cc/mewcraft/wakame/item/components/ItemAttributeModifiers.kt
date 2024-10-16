@@ -1,38 +1,19 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentMeta
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.item.component.*
 import com.google.common.collect.ImmutableMultimap
-import io.leangen.geantyref.TypeToken
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.inventory.ItemFlag
-import org.spongepowered.configurate.ConfigurationNode
+
 
 data class ItemAttributeModifiers(
     val showInTooltip: Boolean,
 ) : Examinable {
 
-    companion object : ItemComponentBridge<ItemAttributeModifiers>, ItemComponentMeta {
+    companion object : ItemComponentBridge<ItemAttributeModifiers> {
         override fun codec(id: String): ItemComponentType<ItemAttributeModifiers> {
             return Codec(id)
         }
-
-        override fun templateType(id: String): ItemTemplateType<Template> {
-            return TemplateType(id)
-        }
-
-        override val configPath: String = ItemConstants.ATTRIBUTE_MODIFIERS
-        override val tooltipKey: Key = ItemConstants.createKey { ATTRIBUTE_MODIFIERS }
     }
 
     private data class Codec(
@@ -62,34 +43,6 @@ data class ItemAttributeModifiers(
                     it.addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
                 }
             }
-        }
-    }
-
-    data class Template(
-        val showInTooltip: Boolean,
-    ) : ItemTemplate<ItemAttributeModifiers> {
-        override val componentType: ItemComponentType<ItemAttributeModifiers> = ItemComponentTypes.ATTRIBUTE_MODIFIERS
-
-        override fun generate(context: GenerationContext): GenerationResult<ItemAttributeModifiers> {
-            return GenerationResult.of(ItemAttributeModifiers(showInTooltip))
-        }
-    }
-
-    private data class TemplateType(
-        override val id: String,
-    ) : ItemTemplateType<Template> {
-        override val type: TypeToken<Template> = typeTokenOf()
-
-        /**
-         * ## Node structure
-         * ```yaml
-         * <node>:
-         *   show_in_tooltip: <boolean>
-         * ```
-         */
-        override fun decode(node: ConfigurationNode): Template {
-            val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
-            return Template(showInTooltip)
         }
     }
 }

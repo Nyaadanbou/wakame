@@ -2,23 +2,16 @@ package item
 
 import assertAny
 import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
+import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.CoreTypes
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeS
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.element
-import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmpty
-import cc.mewcraft.wakame.item.components.cells.cores.noop.CoreNoop
-import cc.mewcraft.wakame.item.template.GenerationTrigger
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.registry.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
@@ -26,12 +19,7 @@ import org.bukkit.Material
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.test.KoinTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertIs
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class CustomNekoStackTest : KoinTest {
     companion object {
@@ -91,15 +79,15 @@ class CustomNekoStackTest : KoinTest {
     //<editor-fold desc="Item Components">
     @Test
     fun `component - arrow`() = componentLifecycleTest(
-        "arrow", ItemTemplateTypes.ARROW, ItemComponentTypes.ARROW
+        "arrow", ItemTemplateTypes.ARROW, ItemComponentTypes.EMPTY
     ) {
         serialization { arrowTemplate ->
             assertNotNull(arrowTemplate)
             assertEquals(3, arrowTemplate.pierceLevel)
         }
 
-        result { it ->
-            assertFalse(it.isEmpty())
+        result {
+            assertTrue(it.isEmpty())
         }
     }
 
@@ -117,23 +105,6 @@ class CustomNekoStackTest : KoinTest {
 
         unboxed {
             assertEquals(AttackSpeedLevel.NORMAL, it.level)
-        }
-    }
-
-    @Test
-    fun `component - attributable`() = componentLifecycleTest(
-        "attributable", ItemTemplateTypes.ATTRIBUTABLE, ItemComponentTypes.ATTRIBUTABLE
-    ) {
-        serialization {
-            assertNotNull(it)
-        }
-
-        result {
-            assertFalse(it.isEmpty())
-        }
-
-        unboxed {
-            assertEquals(Attributable.of(), it)
         }
     }
 
@@ -157,18 +128,14 @@ class CustomNekoStackTest : KoinTest {
 
     @Test
     fun `component - bow`() = componentLifecycleTest(
-        "bow", ItemTemplateTypes.BOW, ItemComponentTypes.BOW
+        "bow", ItemTemplateTypes.BOW, ItemComponentTypes.EMPTY
     ) {
         serialization {
             assertNotNull(it)
         }
 
         result {
-            assertFalse(it.isEmpty())
-        }
-
-        unboxed {
-            assertEquals(Unit, it)
+            assertTrue(it.isEmpty())
         }
     }
 
@@ -208,18 +175,14 @@ class CustomNekoStackTest : KoinTest {
 
     @Test
     fun `component - castable`() = componentLifecycleTest(
-        "castable", ItemTemplateTypes.CASTABLE, ItemComponentTypes.CASTABLE
+        "castable", ItemTemplateTypes.CASTABLE, ItemComponentTypes.EMPTY
     ) {
         serialization {
             assertNotNull(it)
         }
 
         result {
-            assertFalse(it.isEmpty())
-        }
-
-        unboxed {
-            assertEquals(Castable.of(), it)
+            assertTrue(it.isEmpty())
         }
     }
 
@@ -246,11 +209,11 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getCoreAs(CoreTypes.ATTRIBUTE)
+                val core = cell.getCoreAs(CoreType.ATTRIBUTE)
                 assertNotNull(core)
 
                 fun assert(element: Element, expectedMin: Double, expectedMax: Double) {
-                    val modMap = core.provideAttributeModifiers(ZERO_KEY)
+                    val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
                     val modMin = modMap[Attributes.element(element).MIN_ATTACK_DAMAGE]
                     val modMax = modMap[Attributes.element(element).MAX_ATTACK_DAMAGE]
                     assertNotNull(modMin)
@@ -261,7 +224,7 @@ class CustomNekoStackTest : KoinTest {
 
                 val fire = ElementRegistry.INSTANCES["fire"]
                 val water = ElementRegistry.INSTANCES["water"]
-                when (val actual = core.element) {
+                when (val actual = core.attribute.element) {
                     fire -> assert(actual, 15.0, 20.0)
                     water -> assert(actual, 20.0, 25.0)
                 }
@@ -273,10 +236,10 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getCoreAs(CoreTypes.ATTRIBUTE)
+                val core = cell.getCoreAs(CoreType.ATTRIBUTE)
                 assertNotNull(core)
 
-                val modMap = core.provideAttributeModifiers(ZERO_KEY)
+                val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
                 val mod = modMap[Attributes.CRITICAL_STRIKE_CHANCE]
                 assertNotNull(mod)
                 assertEquals(0.75, mod.amount, 1e-5)
@@ -303,10 +266,10 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             assertEquals(2, it.size)
             val cell1 = assertNotNull(it.get("foo_1"))
-            val core1 = assertIs<CoreAttributeS>(cell1.getCore())
+            val core1 = assertIs<ConstantCompositeAttributeS>(cell1.getCoreAs(CoreType.ATTRIBUTE)?.attribute)
             assertEquals(5.0, core1.value)
             val cell2 = assertNotNull(it.get("foo_2"))
-            val core2 = assertIs<CoreEmpty>(cell2.getCore())
+            val core2 = assertIs<EmptyCore>(cell2.getCore())
         }
     }
 
@@ -327,8 +290,8 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(cell)
             assertAny(
                 // 要么是 noop, 要么是 empty
-                { assertIs<CoreNoop>(cell.getCore()) },
-                { assertIs<CoreEmpty>(cell.getCore()) },
+                { assertIs<VirtualCore>(cell.getCore()) },
+                { assertIs<EmptyCore>(cell.getCore()) },
             )
         }
     }
@@ -355,7 +318,7 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(cell)
             // CoreNoop 在第一个无条件的池中,
             // 因此生成出来的肯定是 CoreNoop
-            assertIs<CoreNoop>(cell.getCore())
+            assertIs<VirtualCore>(cell.getCore())
         }
     }
 
@@ -378,9 +341,9 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo")
             assertNotNull(cell)
-            val core = cell.getCoreAs(CoreTypes.ATTRIBUTE)
+            val core = cell.getCoreAs(CoreType.ATTRIBUTE)
             assertNotNull(core)
-            assertEquals(Key.key("attribute:attack_damage_rate"), core.key)
+            assertEquals(Key.key("attribute:attack_damage_rate"), core.id)
         }
     }
 
@@ -403,11 +366,11 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo_b")
             assertNotNull(cell)
-            val core = cell.getCoreAs(CoreTypes.ATTRIBUTE)
+            val core = cell.getCoreAs(CoreType.ATTRIBUTE)
             assertNotNull(core)
             assertAny(
-                { assertEquals(Key.key("attribute:critical_strike_chance"), core.key) },
-                { assertEquals(Key.key("attribute:critical_strike_power"), core.key) }
+                { assertEquals(Key.key("attribute:critical_strike_chance"), core.id) },
+                { assertEquals(Key.key("attribute:critical_strike_power"), core.id) }
             )
         }
     }
@@ -425,7 +388,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(Key.key("foo:bar"), it.key)
+            assertEquals("foo", it.identity)
         }
     }
 
@@ -563,7 +526,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(FireResistant.of(), it)
+            assertEquals(FireResistant.instance(), it)
         }
     }
 
@@ -625,18 +588,14 @@ class CustomNekoStackTest : KoinTest {
 
     @Test
     fun `component - glowable`() = componentLifecycleTest(
-        "glowable", ItemTemplateTypes.GLOWABLE, ItemComponentTypes.GLOWABLE,
+        "glowable", ItemTemplateTypes.GLOWABLE, ItemComponentTypes.EMPTY,
     ) {
         serialization {
             assertNotNull(it)
         }
 
         result {
-            assertFalse(it.isEmpty())
-        }
-
-        unboxed {
-            assertEquals(ItemGlowable.of(), it)
+            assertTrue(it.isEmpty())
         }
     }
 
@@ -653,7 +612,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(HideAdditionalTooltip.of(), it)
+            assertEquals(HideAdditionalTooltip.instance(), it)
         }
     }
 
@@ -670,7 +629,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(HideTooltip.of(), it)
+            assertEquals(HideTooltip.instance(), it)
         }
     }
 
@@ -728,19 +687,6 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
-    fun `component - kizamiable`() = componentLifecycleTest(
-        "kizamiable", ItemTemplateTypes.KIZAMIABLE, ItemComponentTypes.KIZAMIABLE,
-    ) {
-        serialization {
-            assertNotNull(it)
-        }
-
-        result {
-            assertFalse(it.isEmpty())
-        }
-    }
-
-    @Test
     fun `component - level exact`() = componentLifecycleTest(
         "level_exact", ItemTemplateTypes.LEVEL, ItemComponentTypes.LEVEL,
     ) {
@@ -755,7 +701,7 @@ class CustomNekoStackTest : KoinTest {
             createContext {
                 MockGenerationContext.create(
                     Key.key("component:level_exact"),
-                    GenerationTrigger.direct(1) // 故意设置源等级为 1
+                    ItemGenerationTriggers.direct(1) // 故意设置源等级为 1
                 )
             }
         }
@@ -788,7 +734,7 @@ class CustomNekoStackTest : KoinTest {
             createContext {
                 MockGenerationContext.create(
                     Key.key("component:level_context"),
-                    GenerationTrigger.direct(4) // 设置源等级为 4, 如果一切正确, 最后的等级就是 4 级
+                    ItemGenerationTriggers.direct(4) // 设置源等级为 4, 如果一切正确, 最后的等级就是 4 级
                 )
             }
         }
@@ -826,7 +772,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val core = it.wrapped
             assertNotNull(core)
-            assertEquals(Key.key("attribute:attack_damage_rate"), core.key)
+            assertEquals(Key.key("attribute:attack_damage_rate"), core.id)
         }
     }
 
@@ -844,15 +790,6 @@ class CustomNekoStackTest : KoinTest {
 
         unboxed {
 
-        }
-    }
-
-    @Test
-    fun `component - skillful`() = componentLifecycleTest(
-        "skillful", ItemTemplateTypes.SKILLFUL, ItemComponentTypes.SKILLFUL,
-    ) {
-        serialization {
-            assertNotNull(it)
         }
     }
 
@@ -876,11 +813,6 @@ class CustomNekoStackTest : KoinTest {
         assertEquals(2, template.enchantments.size)
         assertEquals(1, template.enchantments[Key.key("sharpness")])
         assertEquals(2, template.enchantments[Key.key("knockback")])
-    }
-
-    @Test
-    fun `component - system_use`() {
-
     }
 
     @Test

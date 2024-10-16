@@ -1,34 +1,19 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.ShownInTooltip
+import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.util.editMeta
-import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
-import io.leangen.geantyref.TypeToken
-import io.papermc.paper.registry.RegistryAccess
-import io.papermc.paper.registry.RegistryKey
-import net.kyori.adventure.key.InvalidKeyException
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.SerializationException
+
 
 data class ItemEnchantments(
     val enchantments: Map<Enchantment, Int>,
-    val showInTooltip: Boolean,
-) : Examinable {
+    override val showInTooltip: Boolean,
+) : Examinable, ShownInTooltip {
     companion object : ItemComponentBridge<ItemEnchantments> {
         override fun codec(id: String): ItemComponentType<ItemEnchantments> {
             return when (id) {
@@ -37,10 +22,6 @@ data class ItemEnchantments(
                 else -> throw IllegalArgumentException("Unknown codec id: '$id'")
             }
         }
-
-        override fun templateType(id: String): ItemTemplateType<Template> {
-            return TemplateType(id)
-        }
     }
 
     private data class CodecForEnchantments(
@@ -48,7 +29,7 @@ data class ItemEnchantments(
     ) : ItemComponentType<ItemEnchantments> {
         override fun read(holder: ItemComponentHolder): ItemEnchantments? {
             val im = holder.item.itemMeta ?: return null
-            val enchantments = im.enchants
+            val enchantments = im.enchants.takeIf { it.isNotEmpty() } ?: return null
             val showInTooltip = !im.hasItemFlag(ItemFlag.HIDE_ENCHANTS)
             return ItemEnchantments(enchantments, showInTooltip)
         }
@@ -76,7 +57,7 @@ data class ItemEnchantments(
     ) : ItemComponentType<ItemEnchantments> {
         override fun read(holder: ItemComponentHolder): ItemEnchantments? {
             val im = holder.item.itemMeta as? EnchantmentStorageMeta ?: return null
-            val enchantments = im.enchants
+            val enchantments = im.enchants.takeIf { it.isNotEmpty() } ?: return null
             val showInTooltip = !im.hasItemFlag(ItemFlag.HIDE_STORED_ENCHANTS)
             return ItemEnchantments(enchantments, showInTooltip)
         }
@@ -101,64 +82,6 @@ data class ItemEnchantments(
             holder.item.editMeta<EnchantmentStorageMeta> {
                 for ((storedEnchant, _) in it.storedEnchants) {
                     it.removeStoredEnchant(storedEnchant)
-                }
-            }
-        }
-    }
-
-    data class Template(
-        override val componentType: ItemComponentType<ItemEnchantments>,
-        val enchantments: Map<Key, Int>,
-        val showInTooltip: Boolean,
-    ) : ItemTemplate<ItemEnchantments> {
-        override fun generate(context: GenerationContext): GenerationResult<ItemEnchantments> {
-            val enchantments = this.enchantments.mapKeys { (key, _) ->
-                val registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)
-                registry.get(key) ?: throw IllegalArgumentException("Unknown enchantment: '$key'")
-            }
-            return GenerationResult.of(ItemEnchantments(enchantments, this.showInTooltip))
-        }
-    }
-
-    private data class TemplateType(
-        override val id: String,
-    ) : ItemTemplateType<Template> {
-        override val type: TypeToken<Template> = typeTokenOf()
-
-        /**
-         * ## Node structure
-         * ```yaml
-         * <node>:
-         *   show_in_tooltip: <boolean>
-         *   entries:
-         *     <key>: <level>
-         *     <key>: <level>
-         * ```
-         */
-        override fun decode(node: ConfigurationNode): Template {
-            val enchantments = node.node("entries").childrenMap()
-                .mapKeys { (key, _) ->
-                    try {
-                        Key.key(key.toString())
-                    } catch (e: InvalidKeyException) {
-                        throw SerializationException(node, javaTypeOf<Template>(), "Malformed enchantment key: '$key'", e)
-                    }
-                }
-                .mapValues { (_, node) ->
-                    node.krequire<Int>()
-                }
-            val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
-            return when (id) {
-                ItemConstants.ENCHANTMENTS -> {
-                    Template(ItemComponentTypes.ENCHANTMENTS, enchantments, showInTooltip)
-                }
-
-                ItemConstants.STORED_ENCHANTMENTS -> {
-                    Template(ItemComponentTypes.STORED_ENCHANTMENTS, enchantments, showInTooltip)
-                }
-
-                else -> {
-                    throw IllegalArgumentException("Unknown template id: '$id'")
                 }
             }
         }

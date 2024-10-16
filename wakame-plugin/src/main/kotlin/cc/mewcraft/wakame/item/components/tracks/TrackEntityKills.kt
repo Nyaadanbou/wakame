@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.components.tracks
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.util.CompoundTag
@@ -70,7 +69,7 @@ private class TrackEntityKillsImpl(
         return set(key, get(key) + count)
     }
 
-    override fun serializeAsTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): CompoundTag = CompoundTag {
         for ((entityKey, kills) in map) {
             putInt(entityKey.asString(), kills)
         }

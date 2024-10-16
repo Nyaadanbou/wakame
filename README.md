@@ -34,17 +34,6 @@ Compound('wakame')
     // 物品的组件
     // 以下组件按照字母顺序排序
     Compound('components')
-    
-        // 提供属性加成?
-        Compound('attributable')
-            // 空
-
-        // 弹药信息
-        Compound('arrow')
-            // 空
-        
-        Compound('bow')
-            // 空
         
         // 可以释放技能?
         Compound('castable')
@@ -129,10 +118,6 @@ Compound('wakame')
         Compound('kizamiz')
             ByteArray('raw'): [0b, 3b]
 
-        // 提供铭刻加成?
-        Compound('kizamiable')
-            // 空
-
         // 物品等级
         Compound('level')
             Byte('raw'): 12b
@@ -147,9 +132,6 @@ Compound('wakame')
         // 物品稀有度
         Compound('rarity')
             Byte('raw'): 0b
-
-        // 提供技能加成?
-        Compound('skillful')
         
         // 物品皮肤
         Compound('skin')
@@ -179,7 +161,4 @@ Compound('wakame')
             Compound('reforge')
                 Byte('count'): 38b // 重铸总次数
                 Short('cost'): 32767s // 重铸总花费
-         
-        // 作为系统物品
-        Compound('system_use')
 ```

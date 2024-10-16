@@ -1,36 +1,26 @@
 package display
 
+// TODO 新渲染系统完成后, 重写 RendererConfigTest
+/*
+import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.damage.damageModule
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.LoreLineFlatter
-import cc.mewcraft.wakame.display.RendererBootstrap
-import cc.mewcraft.wakame.display.displayModule
+import cc.mewcraft.wakame.display.*
 import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.item.components.cells.cores.attribute.CoreAttributeBootstrap
-import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmpty
-import cc.mewcraft.wakame.item.components.cells.cores.empty.CoreEmptyBootstrap
-import cc.mewcraft.wakame.item.components.cells.cores.skill.CoreSkillBootstrap
+import cc.mewcraft.wakame.item.components.cells.cores.*
 import cc.mewcraft.wakame.item.components.legacy.ItemMetaBootstrap
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.registry.RarityRegistry
-import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.registry.registryModule
+import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.world.worldModule
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
@@ -41,9 +31,9 @@ import kotlin.time.measureTimedValue
 
 private val Component.plain: String get() = PlainTextComponentSerializer.plainText().serialize(this)
 private fun listText(vararg text: String): List<Component> = text.map { Component.text(it) }
-private fun coreEmptyLore(): LoreLine = CoreEmpty.provideTooltipLore()
-private fun coreSimpleLore(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
-private fun metaSimpleLore(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
+private fun emptyCoreLoreLine(): LoreLine = LoreLine.simple(GenericKeys.EMPTY, listText("empty core"))
+private fun simpleCoreLoreLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
+private fun componentLoreLine(x: String): LoreLine = LoreLine.simple(Key(x), listText(x))
 
 class RendererConfigTest : KoinTest {
 
@@ -82,9 +72,9 @@ class RendererConfigTest : KoinTest {
             RarityRegistry.onPreWorld()
 
             // item cells
-            CoreAttributeBootstrap.onPostWorld()
-            CoreEmptyBootstrap.onPostWorld()
-            CoreSkillBootstrap.onPostWorld()
+            AttributeCoreBootstrap.onPostWorld()
+            EmptyCoreBootstrap.onPostWorld()
+            SkillCoreBootstrap.onPostWorld()
 
             // item meta
             ItemMetaBootstrap.onPostWorld()
@@ -113,92 +103,92 @@ class RendererConfigTest : KoinTest {
     @Test
     fun `test flatten lore lines 1`() {
         buildTest(
-            metaSimpleLore("meta:level"),
-            metaSimpleLore("meta:rarity"),
-            metaSimpleLore("meta:elements"),
-            metaSimpleLore("meta:kizamiz"),
-            metaSimpleLore("meta:lore"),
+            componentLoreLine("meta:level"),
+            componentLoreLine("meta:rarity"),
+            componentLoreLine("meta:elements"),
+            componentLoreLine("meta:kizamiz"),
+            componentLoreLine("meta:lore"),
         )
     }
 
     @Test
     fun `test flatten lore lines 2`() {
         buildTest(
-            metaSimpleLore("meta:level"),
-            metaSimpleLore("meta:rarity"),
-            metaSimpleLore("meta:elements"),
-            metaSimpleLore("meta:kizamiz"),
-            metaSimpleLore("meta:lore"),
-            coreSimpleLore("attribute:attack_effect_chance.add"),
-            coreSimpleLore("attribute:critical_strike_chance.add"),
-            coreSimpleLore("attribute:max_mana.add"),
-            coreEmptyLore(),
-            coreEmptyLore(),
-            coreEmptyLore(),
+            componentLoreLine("meta:level"),
+            componentLoreLine("meta:rarity"),
+            componentLoreLine("meta:elements"),
+            componentLoreLine("meta:kizamiz"),
+            componentLoreLine("meta:lore"),
+            simpleCoreLoreLine("attribute:attack_effect_chance.add"),
+            simpleCoreLoreLine("attribute:critical_strike_chance.add"),
+            simpleCoreLoreLine("attribute:max_mana.add"),
+            emptyCoreLoreLine(),
+            emptyCoreLoreLine(),
+            emptyCoreLoreLine(),
         )
     }
 
     @Test
     fun `test flatten lore lines 3`() {
         buildTest(
-            metaSimpleLore("meta:level"),
-            metaSimpleLore("meta:rarity"),
-            metaSimpleLore("meta:elements"),
-            metaSimpleLore("meta:kizamiz"),
-            metaSimpleLore("meta:lore"),
-            coreSimpleLore("attribute:attack_effect_chance.add"),
-            coreSimpleLore("attribute:critical_strike_chance.add"),
-            coreSimpleLore("attribute:max_mana.add"),
-            coreSimpleLore("skill:blink"),
-            coreSimpleLore("skill:frost"),
-            coreSimpleLore("skill:leapfrog"),
-            coreEmptyLore(),
-            coreEmptyLore(),
+            componentLoreLine("meta:level"),
+            componentLoreLine("meta:rarity"),
+            componentLoreLine("meta:elements"),
+            componentLoreLine("meta:kizamiz"),
+            componentLoreLine("meta:lore"),
+            simpleCoreLoreLine("attribute:attack_effect_chance.add"),
+            simpleCoreLoreLine("attribute:critical_strike_chance.add"),
+            simpleCoreLoreLine("attribute:max_mana.add"),
+            simpleCoreLoreLine("skill:blink"),
+            simpleCoreLoreLine("skill:frost"),
+            simpleCoreLoreLine("skill:leapfrog"),
+            emptyCoreLoreLine(),
+            emptyCoreLoreLine(),
         )
     }
 
     @Test
     fun `test flatten lore lines 4`() {
         buildTest(
-            metaSimpleLore("meta:level"),
-            metaSimpleLore("meta:rarity"),
-            coreSimpleLore("attribute:max_health.add"),
-            coreSimpleLore("attribute:max_mana.add"),
-            coreSimpleLore("skill:frost"),
-            coreEmptyLore(),
-            coreEmptyLore(),
+            componentLoreLine("meta:level"),
+            componentLoreLine("meta:rarity"),
+            simpleCoreLoreLine("attribute:max_health.add"),
+            simpleCoreLoreLine("attribute:max_mana.add"),
+            simpleCoreLoreLine("skill:frost"),
+            emptyCoreLoreLine(),
+            emptyCoreLoreLine(),
         )
     }
 
     @Test
     fun `test flatten lore lines 5`() {
         buildTest(
-            metaSimpleLore("meta:level"),
-            metaSimpleLore("meta:rarity"),
-            coreSimpleLore("attribute:attack_damage.add.fire"),
-            coreSimpleLore("attribute:attack_damage.add.water"),
-            coreSimpleLore("attribute:attack_damage.multiply_base.fire"),
-            coreSimpleLore("attribute:attack_damage.multiply_base.water"),
-            coreSimpleLore("attribute:attack_effect_chance.add"),
-            coreSimpleLore("skill:frost"),
-            coreEmptyLore(),
-            coreEmptyLore(),
+            componentLoreLine("meta:level"),
+            componentLoreLine("meta:rarity"),
+            simpleCoreLoreLine("attribute:attack_damage.add.fire"),
+            simpleCoreLoreLine("attribute:attack_damage.add.water"),
+            simpleCoreLoreLine("attribute:attack_damage.multiply_base.fire"),
+            simpleCoreLoreLine("attribute:attack_damage.multiply_base.water"),
+            simpleCoreLoreLine("attribute:attack_effect_chance.add"),
+            simpleCoreLoreLine("skill:frost"),
+            emptyCoreLoreLine(),
+            emptyCoreLoreLine(),
         )
     }
 
     @Test
     fun `test flatten lore lines 6`() {
         buildTest(
-            metaSimpleLore("meta:level"),
-            metaSimpleLore("meta:rarity"),
-            coreSimpleLore("attribute:attack_damage.add.fire"),
-            coreSimpleLore("attribute:attack_damage.add.water"),
-            coreSimpleLore("attribute:attack_damage.multiply_base.fire"),
-            coreSimpleLore("attribute:attack_damage.multiply_base.water"),
-            coreSimpleLore("attribute:attack_effect_chance.add"),
-            coreSimpleLore("skill:frost"),
-            coreEmptyLore(),
-            coreEmptyLore(),
+            componentLoreLine("meta:level"),
+            componentLoreLine("meta:rarity"),
+            simpleCoreLoreLine("attribute:attack_damage.add.fire"),
+            simpleCoreLoreLine("attribute:attack_damage.add.water"),
+            simpleCoreLoreLine("attribute:attack_damage.multiply_base.fire"),
+            simpleCoreLoreLine("attribute:attack_damage.multiply_base.water"),
+            simpleCoreLoreLine("attribute:attack_effect_chance.add"),
+            simpleCoreLoreLine("skill:frost"),
+            emptyCoreLoreLine(),
+            emptyCoreLoreLine(),
         )
     }
-}
+}*/

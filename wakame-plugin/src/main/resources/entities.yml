@@ -44,7 +44,6 @@ entity_attributes:
       max_mana: 200.0
       movement_speed: default
       universal_attack_damage: default
-      universal_attack_damage_rate: default
       universal_defense: default
       universal_defense_penetration: default
       universal_defense_penetration_rate: default
@@ -67,7 +66,6 @@ entity_attributes:
       incoming_damage_rate: 1.0
       negative_critical_strike_power: default
       universal_attack_damage: 0
-      universal_attack_damage_rate: 0
       universal_defense: 0
       universal_defense_penetration: 0
       universal_defense_penetration_rate: 0
@@ -411,7 +409,6 @@ entity_attributes:
       defense_penetration: 0
       defense_penetration_rate: 0
       universal_attack_damage: 0
-      universal_attack_damage_rate: 0
       universal_defense_penetration: 0
       universal_defense_penetration_rate: 0
 

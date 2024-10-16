@@ -1,29 +1,11 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.display.LoreLine
-import cc.mewcraft.wakame.display.TooltipKey
-import cc.mewcraft.wakame.display.TooltipProvider
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.ItemComponentBridge
-import cc.mewcraft.wakame.item.component.ItemComponentConfig
-import cc.mewcraft.wakame.item.component.ItemComponentHolder
-import cc.mewcraft.wakame.item.component.ItemComponentInjections
-import cc.mewcraft.wakame.item.component.ItemComponentMeta
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.GenerationContext
-import cc.mewcraft.wakame.item.template.GenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.util.RandomizedValue
+import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.util.editMeta
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toStableInt
-import cc.mewcraft.wakame.util.typeTokenOf
-import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
-import org.spongepowered.configurate.ConfigurationNode
 import org.bukkit.inventory.meta.Damageable as CraftDamageable
+
 
 data class Damageable(
     /**
@@ -34,29 +16,17 @@ data class Damageable(
      * 最大损耗.
      */
     val maxDamage: Int,
-) : Examinable, TooltipProvider.Single {
+) : Examinable {
 
-    companion object : ItemComponentBridge<Damageable>, ItemComponentMeta {
+    companion object : ItemComponentBridge<Damageable> {
+        /**
+         * 该组件的配置文件.
+         */
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.DAMAGEABLE)
+
         override fun codec(id: String): ItemComponentType<Damageable> {
             return Codec(id)
         }
-
-        override fun templateType(id: String): ItemTemplateType<Template> {
-            return TemplateType(id)
-        }
-
-        override val configPath: String = ItemConstants.DAMAGEABLE
-        override val tooltipKey: TooltipKey = ItemConstants.createKey { DAMAGEABLE }
-
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(this)
-        private val tooltip: ItemComponentConfig.SingleTooltip = config.SingleTooltip()
-    }
-
-    override fun provideTooltipLore(): LoreLine {
-        if (!config.showInTooltip) {
-            return LoreLine.noop()
-        }
-        return LoreLine.simple(tooltipKey, listOf(tooltip.render()))
     }
 
     private data class Codec(
@@ -81,59 +51,6 @@ data class Damageable(
             holder.item.editMeta<CraftDamageable> { itemMeta ->
                 itemMeta.setMaxDamage(null)
             }
-        }
-
-        private companion object
-    }
-
-    // 开发日记 2024/6/28
-    // 这个 disappearWhenBroken 并不会写入物品 NBT,
-    // 但可以通过物品的 ItemTemplateMap 获取该数据.
-    data class Template(
-        /**
-         * 初始损耗.
-         */
-        val damage: RandomizedValue,
-        /**
-         * 最大损耗.
-         */
-        val maxDamage: RandomizedValue,
-        /**
-         * 当物品的当前损耗值大于最大损耗值时, 物品是否消失?
-         */
-        val disappearWhenBroken: Boolean,
-    ) : ItemTemplate<Damageable> {
-        override val componentType: ItemComponentType<Damageable> = ItemComponentTypes.DAMAGEABLE
-
-        override fun generate(context: GenerationContext): GenerationResult<Damageable> {
-            val damage = this.damage.calculate().toStableInt()
-            val maxDamage = this.maxDamage.calculate().toStableInt()
-            if (damage >= maxDamage) {
-                ItemComponentInjections.logger.warn("Detected possible malformed item generation: 'minecraft:damage' >= 'minecraft:max_damage'. Template: $this, Context: $context")
-            }
-            return GenerationResult.of(Damageable(damage, maxDamage))
-        }
-    }
-
-    private data class TemplateType(
-        override val id: String,
-    ) : ItemTemplateType<Template> {
-        override val type: TypeToken<Template> = typeTokenOf()
-
-        /**
-         * ## Node structure
-         * ```yaml
-         * <node>:
-         *   damage: <randomized_value>
-         *   max_damage: <randomized_value>
-         *   disappear_when_broken: <boolean>
-         * ```
-         */
-        override fun decode(node: ConfigurationNode): Template {
-            val damage = node.node("damage").krequire<RandomizedValue>()
-            val maxDamage = node.node("max_damage").krequire<RandomizedValue>()
-            val disappearWhenBroken = node.node("disappear_when_broken").krequire<Boolean>()
-            return Template(damage, maxDamage, disappearWhenBroken)
         }
     }
 }

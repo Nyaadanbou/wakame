@@ -1,0 +1,7 @@
+# 在这里设置收购站物品的 *渲染布局*.
+
+# FIXME 补充说明
+
+primary:
+  - general:lore
+  - general:worth

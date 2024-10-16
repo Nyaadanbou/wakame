@@ -26,7 +26,7 @@ interface ItemTemplate<T> : Examinable {
     /**
      * 生成一个该模板的实例.
      *
-     * 返回值的要求见 [GenerationResult].
+     * 返回值的要求见 [ItemGenerationResult].
      */
-    fun generate(context: GenerationContext): GenerationResult<T>
+    fun generate(context: ItemGenerationContext): ItemGenerationResult<T>
 }

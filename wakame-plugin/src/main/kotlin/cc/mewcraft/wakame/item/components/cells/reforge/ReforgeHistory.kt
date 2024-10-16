@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.components.cells.reforge
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.nbt.Tag
 import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.item.ReforgeBinaryKeys
 import cc.mewcraft.wakame.util.CompoundTag
@@ -17,7 +16,7 @@ import cc.mewcraft.wakame.util.CompoundTag
  *
  * 该对象不可变, 所有的修改操作都会返回一个新的 [ReforgeHistory] 实例.
  */
-interface ReforgeHistory : BinarySerializable {
+interface ReforgeHistory : BinarySerializable<CompoundTag> {
     /**
      * 检查该重铸数据是否为空.
      */
@@ -82,7 +81,7 @@ interface ReforgeHistory : BinarySerializable {
         override val rerollCount: Int = 0
         override fun setRerollCount(value: Int): ReforgeHistory = ReforgeHistoryImpl(modCount, value)
         override fun addRerollCount(value: Int): ReforgeHistory = setRerollCount(rerollCount + value)
-        override fun serializeAsTag(): Tag = CompoundTag.create()
+        override fun serializeAsTag(): CompoundTag = CompoundTag.create()
     }
 }
 
@@ -112,7 +111,7 @@ private data class ReforgeHistoryImpl(
         return setRerollCount(rerollCount + value)
     }
 
-    override fun serializeAsTag(): Tag = CompoundTag {
+    override fun serializeAsTag(): CompoundTag = CompoundTag {
         putInt(ReforgeBinaryKeys.MOD_COUNT, modCount)
         putInt(ReforgeBinaryKeys.REROLL_COUNT, rerollCount)
     }

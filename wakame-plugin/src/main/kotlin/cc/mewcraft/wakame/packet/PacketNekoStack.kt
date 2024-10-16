@@ -2,12 +2,7 @@ package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.ItemSlotGroup
-import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.NekoStackSupport
-import cc.mewcraft.wakame.item.VanillaNekoStackRegistry
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
@@ -31,26 +26,22 @@ internal fun ResourceLocation.toKey(): Key =
 
 internal val ItemStack.isNeko: Boolean
     get() {
-        if (this.hasComponentPatches()) {
-            val customData = this.components.get(ComponentTypes.CUSTOM_DATA)
-            if (customData != null) {
-                if (customData.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME) != null) {
-                    return true
-                }
+        if (hasComponentPatches()) {
+            if (components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME) != null) {
+                return true
             }
         }
-        val key = this.type.name.toKey()
-        val ret = VanillaNekoStackRegistry.has(key)
-        return ret
+        val nekoStackId = type.name.toKey()
+        return VanillaNekoStackRegistry.has(nekoStackId)
     }
 
 internal val ItemStack.isCustomNeko: Boolean
     get() {
-        if (!this.hasComponentPatches()) {
+        if (!hasComponentPatches()) {
             return false
         }
-        val ret = this.components.get(ComponentTypes.CUSTOM_DATA)?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME) != null
-        return ret
+        return components.get(ComponentTypes.CUSTOM_DATA)
+            ?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME) != null
     }
 
 internal val ItemStack.isVanillaNeko: Boolean
@@ -58,37 +49,35 @@ internal val ItemStack.isVanillaNeko: Boolean
         if (isCustomNeko) {
             return false
         }
-        val key = this.type.name.toKey()
-        val ret = VanillaNekoStackRegistry.has(key)
-        return ret
+        val nekoStackId = type.name.toKey()
+        return VanillaNekoStackRegistry.has(nekoStackId)
     }
 
-internal val ItemStack.isRenderable: Boolean
-    get() = getComponent(ComponentTypes.CUSTOM_DATA)
-        ?.getOrNull()
-        ?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME)
-        ?.getCompoundTagOrNull(ItemComponentMap.TAG_COMPONENTS)
-        ?.getTagOrNull(ItemConstants.SYSTEM_USE) == null
+internal val ItemStack.isClientSide: Boolean
+    get() = getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()
+        ?.getTagOrNull(NekoStack.CLIENT_SIDE_KEY) == null
 
 /**
  * 尝试将 ItemStack 转换为 NekoStack, 用作渲染.
+ * 返回 `null` 则说明该物品堆叠不需要被发包渲染接管.
  */
 internal val ItemStack.tryNekoStack: PacketNekoStack?
     get() {
         if (isEmpty)
             return null
-        if (!isRenderable)
+        if (!isClientSide)
             return null
 
-        val wakameTag = getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME)
+        val wakameTag = getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()
+            ?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME)
         if (wakameTag != null) {
             return PacketCustomNekoStack(this)
         }
 
-        val itemTypeKey = type.name.toKey()
-        val vanillaNekoStack = VanillaNekoStackRegistry.get(itemTypeKey)
-        if (vanillaNekoStack != null) {
-            return PacketVanillaNekoStack(this, itemTypeKey, vanillaNekoStack.prototype, vanillaNekoStack.components)
+        val nekoStackId = type.name.toKey()
+        val nekoStack = VanillaNekoStackRegistry.get(nekoStackId)
+        if (nekoStack != null) {
+            return PacketVanillaNekoStack(this, nekoStack)
         }
 
         return null
@@ -100,16 +89,16 @@ internal interface PacketNekoStack : NekoStack {
     /**
      * 该成员仅用于直接构建 [com.github.retrooper.packetevents.wrapper.PacketWrapper].
      */
-    val packetItemStack: ItemStack
+    val packetItem: ItemStack
 
     /**
      * 设置自定义名称. 您可以传递 `null` 来移除名称.
      */
     fun customName(value: Component?) {
         if (value != null) {
-            packetItemStack.setComponent(ComponentTypes.CUSTOM_NAME, value)
+            packetItem.setComponent(ComponentTypes.CUSTOM_NAME, value)
         } else {
-            packetItemStack.unsetComponent(ComponentTypes.CUSTOM_NAME)
+            packetItem.unsetComponent(ComponentTypes.CUSTOM_NAME)
         }
     }
 
@@ -118,9 +107,9 @@ internal interface PacketNekoStack : NekoStack {
      */
     fun itemName(value: Component?) {
         if (value != null) {
-            packetItemStack.setComponent(ComponentTypes.ITEM_NAME, value)
+            packetItem.setComponent(ComponentTypes.ITEM_NAME, value)
         } else {
-            packetItemStack.unsetComponent(ComponentTypes.ITEM_NAME)
+            packetItem.unsetComponent(ComponentTypes.ITEM_NAME)
         }
     }
 
@@ -129,9 +118,9 @@ internal interface PacketNekoStack : NekoStack {
      */
     fun lore(value: List<Component>?) {
         if (value != null) {
-            packetItemStack.setComponent(ComponentTypes.LORE, ItemLore(value))
+            packetItem.setComponent(ComponentTypes.LORE, ItemLore(value))
         } else {
-            packetItemStack.unsetComponent(ComponentTypes.LORE)
+            packetItem.unsetComponent(ComponentTypes.LORE)
         }
     }
 
@@ -140,21 +129,59 @@ internal interface PacketNekoStack : NekoStack {
      */
     fun customModelData(value: Int?) {
         if (value != null) {
-            packetItemStack.setComponent(ComponentTypes.CUSTOM_MODEL_DATA, value)
+            packetItem.setComponent(ComponentTypes.CUSTOM_MODEL_DATA, value)
         } else {
-            packetItemStack.unsetComponent(ComponentTypes.CUSTOM_MODEL_DATA)
+            packetItem.unsetComponent(ComponentTypes.CUSTOM_MODEL_DATA)
         }
     }
+
+    //<editor-fold desc="Show In Tooltip">
+    fun showAttributeModifiers(value: Boolean) {
+        packetItem.getComponent(ComponentTypes.ATTRIBUTE_MODIFIERS).getOrNull()?.takeIf { it.modifiers.isNotEmpty() }?.isShowInTooltip = value
+    }
+
+    fun showCanBreak(value: Boolean) {
+        packetItem.getComponent(ComponentTypes.CAN_BREAK).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showCanPlaceOn(value: Boolean) {
+        packetItem.getComponent(ComponentTypes.CAN_PLACE_ON).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showDyedColor(value: Boolean) {
+        packetItem.getComponent(ComponentTypes.DYED_COLOR).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showEnchantments(value: Boolean) {
+        packetItem.getComponent(ComponentTypes.ENCHANTMENTS).getOrNull()?.takeIf { !it.isEmpty }?.isShowInTooltip = value
+    }
+
+    fun showJukeboxPlayable(value: Boolean) {
+        packetItem.getComponent(ComponentTypes.JUKEBOX_PLAYABLE).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showStoredEnchantments(value: Boolean) {
+        packetItem.getComponent(ComponentTypes.STORED_ENCHANTMENTS).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showTrim(value: Boolean) {
+        packetItem.getComponent(ComponentTypes.TRIM).getOrNull()?.isShowInTooltip = value
+    }
+
+    fun showUnbreakable(value: Boolean) {
+        // FIXME packetevents 不支持设置 `minecraft:unbreakable` 的 `show_in_tooltip`
+    }
+    //</editor-fold>
 }
 
 // 开发日记:
 // 该 NekoStack 仅用于物品发包系统内部.
 private class PacketCustomNekoStack(
-    override val packetItemStack: ItemStack,
+    override val packetItem: ItemStack,
 ) : PacketNekoStack {
     // 开发日记:
     // 由于 ItemComponentMap 对 BukkitStack 有直接依赖, 我们需要转换一个
-    private val handle: BukkitStack = SpigotConversionUtil.toBukkitItemStack(packetItemStack)
+    private val handle: BukkitStack = SpigotConversionUtil.toBukkitItemStack(packetItem)
 
     // 开发日记1: We use property initializer here as it would be called multiple times,
     // and we don't want to do the unnecessary NBT conversion again and again
@@ -164,20 +191,18 @@ private class PacketCustomNekoStack(
     override val isEmpty: Boolean
         get() = false
 
+    override var isClientSide: Boolean
+        get() = abortWrites() // 实际不会调用这里, 而是外部直接读取
+        set(_) = abortWrites()
+
     override val itemType: Material
         get() = handle.type
 
     override val itemStack: BukkitStack
         get() = abortReads()
 
-    override val namespace: String
-        get() = NekoStackSupport.getNamespaceOrThrow(nyaTag)
-
-    override val path: String
-        get() = NekoStackSupport.getPathOrThrow(nyaTag)
-
     override val id: Key
-        get() = NekoStackSupport.getKeyOrThrow(nyaTag)
+        get() = NekoStackSupport.getIdOrThrow(nyaTag)
 
     override var variant: Int
         get() = NekoStackSupport.getVariant(nyaTag)
@@ -206,7 +231,10 @@ private class PacketCustomNekoStack(
     }
 
     override fun erase() {
-        packetItemStack.unsetComponent(ComponentTypes.CUSTOM_DATA)
+        // 网络发包是物品渲染的最后一环,
+        // 不会再有其他系统读取这个物品的自定义数据,
+        // 所以可以直接移除整个 `custom_data`.
+        packetItem.unsetComponent(ComponentTypes.CUSTOM_DATA)
     }
 
     private fun abortReads(): Nothing {
@@ -225,26 +253,37 @@ private class PacketCustomNekoStack(
     }
 }
 
-private class PacketVanillaNekoStack(
-    override val packetItemStack: ItemStack,
+private class PacketVanillaNekoStack
+private constructor(
+    override val packetItem: ItemStack,
     override val id: Key,
     override val prototype: NekoItem,
     override val components: ItemComponentMap,
 ) : PacketNekoStack {
+    constructor(
+        packetItem: ItemStack,
+        nekoStack: VanillaNekoStack,
+    ) : this(
+        packetItem,
+        nekoStack.id,
+        nekoStack.prototype,
+        nekoStack.components
+    )
+
     override val isEmpty: Boolean
         get() = false
 
+    override var isClientSide: Boolean
+        // 我们无法修改原版物品, 但又必须要渲染原版物品,
+        // 所以这里必须返回 true, 发包渲染系统才能接管.
+        get() = true
+        set(_) = abortWrites()
+
     override val itemType: Material
-        get() = SpigotConversionUtil.toBukkitItemMaterial(packetItemStack.type)
+        get() = SpigotConversionUtil.toBukkitItemMaterial(packetItem.type)
 
     override val itemStack: BukkitStack
         get() = abortReads()
-
-    override val namespace: String
-        get() = id.namespace()
-
-    override val path: String
-        get() = id.value()
 
     override var variant: Int
         get() = 0

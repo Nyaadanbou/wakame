@@ -29,7 +29,7 @@ interface Filter<in C> {
     /**
      * 类型标识. 每个 [Filter] 的实现必须保证该标识的唯一性.
      */
-    val type: Key
+    val kind: Key
 
     /**
      * Should this filter invert its original output?
@@ -51,13 +51,13 @@ interface Filter<in C> {
     }
 
     private object AlwaysTrue : Filter<Any?> {
-        override val type: Key = GenericKeys.TRUE
+        override val kind: Key = GenericKeys.TRUE
         override val invert: Boolean = false
         override fun testOriginal(context: Any?): Boolean = true
     }
 
     private object AlwaysFalse : Filter<Any?> {
-        override val type: Key = GenericKeys.FALSE
+        override val kind: Key = GenericKeys.FALSE
         override val invert: Boolean = false
         override fun testOriginal(context: Any?): Boolean = false
     }

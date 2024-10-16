@@ -1,15 +1,13 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.display.PacketItemRenderer
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.StandardContext
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
+import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
+import com.github.retrooper.packetevents.wrapper.play.server.*
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
@@ -22,7 +20,6 @@ import kotlin.jvm.optionals.getOrNull
  */
 internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
     private val logger: Logger by inject()
-    private val renderer: PacketItemRenderer by inject()
 
     override fun onPacketSend(event: PacketSendEvent) {
         // 不修改发给创造模式玩家的物品包
@@ -120,16 +117,21 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
      * @return 如果物品发生了变化则返回 `true`, 否则返回 `false`
      */
     private fun ItemStack.modify(): Boolean {
+        var changed = false
+
+        // 移除任意物品的 PDC
+        changed = changed || getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.removeTag("PublicBukkitValues") != null
+
         val nekoStack = tryNekoStack
-        if (nekoStack == null) {
-            return false
+        if (nekoStack != null) {
+            try {
+                ItemRenderers.STANDARD.render(nekoStack, StandardContext)
+                changed = true
+            } catch (e: Throwable) {
+                logger.error("An error occurred while rendering NekoStack: $this", e)
+            }
         }
-        try {
-            renderer.render(nekoStack)
-        } catch (e: Throwable) {
-            logger.error("An error occurred while rendering NekoStack: $this", e)
-            return false
-        }
-        return true
+
+        return changed
     }
 }

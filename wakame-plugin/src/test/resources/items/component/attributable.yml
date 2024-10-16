@@ -1,4 +1,0 @@
-base: wooden_sword
-
-# 标记该物品可以为玩家提供属性加成
-attributable: { }
