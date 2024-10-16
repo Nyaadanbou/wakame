@@ -137,7 +137,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         val itemStack = nekoStack.unsafe.handle
 
         // 设置物品的 id 和 variant
-        NekoStackSupport.setKey(itemStack, prototype.id)
+        NekoStackSupport.setId(itemStack, prototype.id)
         NekoStackSupport.setVariant(itemStack, 0)
 
         // 获取 物品组件 的容器

@@ -201,14 +201,8 @@ private class PacketCustomNekoStack(
     override val itemStack: BukkitStack
         get() = abortReads()
 
-    override val namespace: String
-        get() = NekoStackSupport.getNamespaceOrThrow(nyaTag)
-
-    override val path: String
-        get() = NekoStackSupport.getPathOrThrow(nyaTag)
-
     override val id: Key
-        get() = NekoStackSupport.getKeyOrThrow(nyaTag)
+        get() = NekoStackSupport.getIdOrThrow(nyaTag)
 
     override var variant: Int
         get() = NekoStackSupport.getVariant(nyaTag)
@@ -290,12 +284,6 @@ private constructor(
 
     override val itemStack: BukkitStack
         get() = abortReads()
-
-    override val namespace: String
-        get() = id.namespace()
-
-    override val path: String
-        get() = id.value()
 
     override var variant: Int
         get() = 0

@@ -11,6 +11,7 @@ import net.kyori.adventure.key.Key
  * Keys in the `wakame` compound.
  */
 object BaseBinaryKeys {
+    const val ID = "id"
     const val NAMESPACE = "namespace"
     const val PATH = "path"
     const val VARIANT = "sid"

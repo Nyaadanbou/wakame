@@ -69,21 +69,10 @@ interface NekoStack : Examinable {
     val itemStack: ItemStack
 
     /**
-     * The `namespace` of this item.
+     * The namespaced identifier of this item.
      *
      * The `namespace` is the name of the directory in which the item is defined in the config.
-     */
-    val namespace: String
-
-    /**
-     * The `path` of this item.
-     *
-     * The `path` is the name of the file in which the item is defined in the config.
-     */
-    val path: String
-
-    /**
-     * The namespaced identifier of this item.
+     * The `path` is the name of the file (w/o extension) in which the item is defined in the config.
      */
     val id: Key
 
@@ -257,10 +246,6 @@ private object EmptyNekoStack : NekoStack {
         get() = ItemStack.empty()
 
     override val id: Key = GenericKeys.EMPTY
-
-    override val namespace: String = id.namespace()
-
-    override val path: String = id.value()
 
     override var variant: Int
         get() = 0

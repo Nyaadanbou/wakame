@@ -140,14 +140,8 @@ private class CustomNekoStack(
     override val prototype: NekoItem
         get() = NekoStackSupport.getPrototypeOrThrow(unsafeNyaTag)
 
-    override val namespace: String
-        get() = NekoStackSupport.getNamespaceOrThrow(unsafeNyaTag)
-
-    override val path: String
-        get() = NekoStackSupport.getPathOrThrow(unsafeNyaTag)
-
     override val id: Key
-        get() = NekoStackSupport.getKeyOrThrow(unsafeNyaTag)
+        get() = NekoStackSupport.getIdOrThrow(unsafeNyaTag)
 
     override var variant: Int
         get() = NekoStackSupport.getVariant(unsafeNyaTag)
@@ -217,9 +211,6 @@ internal class VanillaNekoStack(
     override val itemStack: ItemStack
         get() = unsupported()
 
-    override val namespace: String = id.namespace()
-    override val path: String = id.value()
-
     override var variant: Int = 0 // 变体永远都是 0
     override val slotGroup: ItemSlotGroup = prototype.slotGroup
     override val templates: ItemTemplateMap = prototype.templates
@@ -256,20 +247,20 @@ internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
         return has(material.key())
     }
 
-    fun has(key: Key): Boolean {
-        return registry.containsKey(key)
+    fun has(id: Key): Boolean {
+        return registry.containsKey(id)
     }
 
     fun get(material: Material): VanillaNekoStack? {
         return get(material.key())
     }
 
-    fun get(key: Key): VanillaNekoStack? {
-        return registry[key]
+    fun get(id: Key): VanillaNekoStack? {
+        return registry[id]
     }
 
-    fun register(key: Key, stack: VanillaNekoStack) {
-        registry[key] = stack
+    fun register(id: Key, stack: VanillaNekoStack) {
+        registry[id] = stack
     }
 
     override fun onPostWorld() {
@@ -282,9 +273,9 @@ internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
 
     private fun realizeAndRegister() {
         registry.clear()
-        for ((key, prototype) in ItemRegistry.VANILLA) {
+        for ((id, prototype) in ItemRegistry.VANILLA) {
             val stack = realizer.realize(prototype)
-            register(key, stack)
+            register(id, stack)
         }
     }
 }
@@ -308,53 +299,38 @@ internal object NekoStackSupport {
         }
     }
 
+    @Deprecated("Use 'getId' instead", ReplaceWith("getId(wakameTag)"))
     fun getNamespace(wakameTag: CompoundTag): String? {
         return wakameTag.getString(BaseBinaryKeys.NAMESPACE)
     }
 
-    fun getNamespaceOrThrow(wakameTag: CompoundTag): String {
-        return requireNotNull(getNamespace(wakameTag)) { "Can't find 'namespace' on item NBT" }
-    }
-
-    fun setNamespace(handle: ItemStack, namespace: String) {
-        handle.editNyaTag { tag -> setNamespace0(tag, namespace) }
-    }
-
-    private fun setNamespace0(wakameTag: CompoundTag, namespace: String) {
-        wakameTag.putString(BaseBinaryKeys.NAMESPACE, namespace)
-    }
-
+    @Deprecated("Use 'getId' instead", ReplaceWith("getId(wakameTag)"))
     fun getPath(wakameTag: CompoundTag): String? {
         return wakameTag.getString(BaseBinaryKeys.PATH)
     }
 
-    fun getPathOrThrow(wakameTag: CompoundTag): String {
-        return requireNotNull(getPath(wakameTag)) { "Can't find 'path' on item NBT" }
+    fun getId(wakameTag: CompoundTag): Key? {
+        return wakameTag.getString(BaseBinaryKeys.ID)
+            .takeIf(String::isNotEmpty)
+            ?.runCatching { Key.key(this) }
+            ?.getOrNull()
+            ?: getNamespace(wakameTag)?.let { namespace ->
+                getPath(wakameTag)?.let { path ->
+                    Key.key(namespace, path)
+                }
+            }
     }
 
-    fun setPath(handle: ItemStack, path: String) {
-        handle.editNyaTag { tag -> setPath0(tag, path) }
+    fun getIdOrThrow(wakameTag: CompoundTag): Key {
+        return requireNotNull(getId(wakameTag)) { "Can' find 'id' on item NBT" }
     }
 
-    private fun setPath0(wakameTag: CompoundTag, path: String) {
-        wakameTag.putString(BaseBinaryKeys.PATH, path)
+    fun setId(handle: ItemStack, id: Key) {
+        handle.editNyaTag { tag -> setId0(tag, id) }
     }
 
-    fun getKey(wakameTag: CompoundTag): Key? {
-        return getNamespace(wakameTag)?.let { namespace -> getPath(wakameTag)?.let { path -> Key(namespace, path) } }
-    }
-
-    fun getKeyOrThrow(wakameTag: CompoundTag): Key {
-        return requireNotNull(getKey(wakameTag)) { "Can' find 'key' on item NBT" }
-    }
-
-    fun setKey(handle: ItemStack, key: Key) {
-        handle.editNyaTag { tag -> setKey0(tag, key) }
-    }
-
-    private fun setKey0(wakameTag: CompoundTag, key: Key) {
-        setNamespace0(wakameTag, key.namespace())
-        setPath0(wakameTag, key.value())
+    private fun setId0(wakameTag: CompoundTag, id: Key) {
+        wakameTag.putString(BaseBinaryKeys.ID, id.asString())
     }
 
     fun getVariant(wakameTag: CompoundTag): Int {
@@ -382,14 +358,14 @@ internal object NekoStackSupport {
     }
 
     fun getPrototype(wakameTag: CompoundTag): NekoItem? {
-        val key = getKeyOrThrow(wakameTag)
-        val prototype = ItemRegistry.CUSTOM.find(key)
+        val id = getIdOrThrow(wakameTag)
+        val prototype = ItemRegistry.CUSTOM.find(id)
         return prototype
     }
 
     fun getPrototypeOrThrow(wakameTag: CompoundTag): NekoItem {
-        val key = getKeyOrThrow(wakameTag)
-        val prototype = requireNotNull(ItemRegistry.CUSTOM.find(key)) { "Can't find a prototype by '$key'" }
+        val id = getIdOrThrow(wakameTag)
+        val prototype = requireNotNull(ItemRegistry.CUSTOM.find(id)) { "Can't find item prototype by id '$id'" }
         return prototype
     }
 

@@ -28,10 +28,6 @@ class MockNekoStack(
     override val itemStack: ItemStack
         get() = throw NotImplementedError("Not implemented")
 
-    override val namespace: String = prototype.id.namespace()
-
-    override val path: String = prototype.id.value()
-
     override val id: Key = prototype.id
 
     override var variant: Int = 0
