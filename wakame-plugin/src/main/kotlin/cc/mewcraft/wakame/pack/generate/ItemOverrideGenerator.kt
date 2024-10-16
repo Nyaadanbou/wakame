@@ -53,12 +53,14 @@ internal class SimpleItemOverrideGenerator(
     //
     private val bowGenerator: BowItemOverrideGenerator by lazy { BowItemOverrideGenerator(this) }
     private val shieldGenerator: ShieldItemOverrideGenerator by lazy { ShieldItemOverrideGenerator(this) }
+    private val crossBowGenerator: CrossBowItemOverrideGenerator by lazy { CrossBowItemOverrideGenerator(this) }
     // ...
 
     private val generator: ItemOverrideGenerator?
         get() = when (data.material) {
             Material.BOW -> bowGenerator
             Material.SHIELD -> shieldGenerator
+            Material.CROSSBOW -> crossBowGenerator
             // ...
             else -> null // Default generator
         }
@@ -137,6 +139,58 @@ private class ShieldItemOverrideGenerator(
             )
 
             else -> throw IllegalArgumentException("Shield model index out of range: $index")
+        }
+    }
+}
+
+private class CrossBowItemOverrideGenerator(
+    private val generator: ItemOverrideGenerator,
+) : ItemOverrideGenerator {
+    override val data: ItemModelData
+        get() = generator.data
+
+    override fun generate(): ItemOverride {
+        val (key, index, _, customModelData) = data
+        when (index) {
+            0 -> return ItemOverride.of(
+                key,
+                ItemPredicate.customModelData(customModelData)
+            )
+
+            1 -> return ItemOverride.of(
+                key,
+                ItemPredicate.pulling(),
+                ItemPredicate.customModelData(customModelData)
+            )
+
+            2 -> return ItemOverride.of(
+                key,
+                ItemPredicate.pulling(),
+                ItemPredicate.pull(0.58F),
+                ItemPredicate.customModelData(customModelData)
+            )
+
+            3 -> return ItemOverride.of(
+                key,
+                ItemPredicate.pulling(),
+                ItemPredicate.pull(1.0F),
+                ItemPredicate.customModelData(customModelData)
+            )
+
+            4 -> return ItemOverride.of(
+                key,
+                ItemPredicate.charged(),
+                ItemPredicate.customModelData(customModelData)
+            )
+
+            5 -> return ItemOverride.of(
+                key,
+                ItemPredicate.charged(),
+                ItemPredicate.firework(),
+                ItemPredicate.customModelData(customModelData)
+            )
+
+            else -> throw IllegalArgumentException("CrossBow model index out of range: $index")
         }
     }
 }
