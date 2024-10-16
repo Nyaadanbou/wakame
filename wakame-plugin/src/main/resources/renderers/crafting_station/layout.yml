@@ -1,9 +1,3 @@
-# 在这里设置合成站物品的 *渲染布局*.
-
-# 合成站物品包括:
-# - 合成材料
-# - 合成结果
-
 primary:
   - (fixed:special)
   - special:crate
