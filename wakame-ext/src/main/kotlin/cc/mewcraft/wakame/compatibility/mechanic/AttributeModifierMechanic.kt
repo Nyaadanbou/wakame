@@ -48,7 +48,7 @@ class AttributeModifierMechanic(
     }
 
     private fun addModifierAndScheduleRemoval(attributeInstance: AttributeInstance, modifier: AttributeModifier, duration: Int) {
-        attributeInstance.addTransientModifier(modifier)
+        attributeInstance.addModifier(modifier)
         if (duration > 0) {
             Schedulers.sync().runLater({
                 attributeInstance.removeModifier(modifier)

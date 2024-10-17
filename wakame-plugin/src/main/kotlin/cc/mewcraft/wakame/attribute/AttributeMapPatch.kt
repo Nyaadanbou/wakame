@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
@@ -11,10 +12,12 @@ import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.util.Codec
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attributable
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.*
 import org.bukkit.event.entity.CreatureSpawnEvent
+import org.bukkit.event.server.PluginDisableEvent
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
 import org.bukkit.persistence.*
@@ -169,24 +172,33 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
     // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
     @EventHandler
     fun on(e: EntitiesUnloadEvent) {
-        for (entity in e.entities) {
-            if (entity is Player) continue
-            if (entity !is Attributable) continue
-            val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: continue
-            val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
+        e.entities.forEach(::entityUnloaded)
+    }
 
-            patch.trimBy(default)
-            patch.filter { attribute, _ -> !attribute.vanilla }
-            // 如果移除默认已有的属性之后的 patch 为空, 表示生物并没有 patch, 移除 PDC
-            if (patch.isEmpty()) {
-                patch.removeFrom(entity)
-                AttributeMapPatchAccess.remove(entity.uniqueId)
-                continue
-            }
-            patch.saveTo(entity)
+    @EventHandler
+    fun on(e: PluginDisableEvent) {
+        if (e.plugin != AttributeMapPatchSupport.plugin)
+            return
+        e.plugin.server.worlds.flatMap { it.entities }.forEach(::entityUnloaded)
+    }
 
+    private fun entityUnloaded(entity: Entity) {
+        if (entity is Player) return
+        if (entity !is Attributable) return
+        val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: return
+        val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
+
+        patch.trimBy(default)
+        patch.filter { attribute, _ -> !attribute.vanilla }
+        // 如果移除默认已有的属性之后的 patch 为空, 表示生物并没有 patch, 移除 PDC
+        if (patch.isEmpty()) {
+            patch.removeFrom(entity)
             AttributeMapPatchAccess.remove(entity.uniqueId)
+            return
         }
+        patch.saveTo(entity)
+
+        AttributeMapPatchAccess.remove(entity.uniqueId)
     }
 }
 
@@ -321,4 +333,5 @@ private data class SerializableAttributeModifier(
 private object AttributeMapPatchSupport : KoinComponent {
     val logger: Logger by inject()
     val attributeProvider: AttributeProvider by inject()
+    val plugin: WakamePlugin by inject()
 }

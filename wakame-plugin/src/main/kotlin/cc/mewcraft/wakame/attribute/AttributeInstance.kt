@@ -142,7 +142,8 @@ private class AttributeInstanceDelegation(
     }
 
     fun addModifier(modifier: AttributeModifier) {
-        TODO("尚未实现 WakameAttributeInstance#addModifier")
+        // FIXME 因为尚未实现 WakameAttributeInstance 的持久化, 所以暂时不支持添加持久化的 modifier
+        this.addTransientModifier(modifier)
     }
 
     fun addTransientModifier(modifier: AttributeModifier) {
