@@ -167,6 +167,7 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
     }
 
     // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
+    @EventHandler
     fun on(e: EntitiesUnloadEvent) {
         for (entity in e.entities) {
             if (entity is Player) continue
