@@ -14,7 +14,7 @@ internal class AttributeEnchantmentEffect(
     private val attributeModifier: AttributeModifier,
 ) : EnchantmentEffect {
     override fun applyTo(user: User<Player>) {
-        user.attributeMap.getInstance(attribute)?.addModifier(attributeModifier)
+        user.attributeMap.getInstance(attribute)?.addTransientModifier(attributeModifier)
     }
 
     override fun removeFrom(user: User<Player>) {

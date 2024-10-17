@@ -142,6 +142,10 @@ private class AttributeInstanceDelegation(
     }
 
     fun addModifier(modifier: AttributeModifier) {
+        TODO("尚未实现 WakameAttributeInstance#addModifier")
+    }
+
+    fun addTransientModifier(modifier: AttributeModifier) {
         ensureDataOwnership()
         if (modifiersById.putIfAbsent(modifier.id, modifier) != null) {
             AttributeSupport.LOGGER.warn("$modifier is already applied on this attribute (same id)")
@@ -262,6 +266,9 @@ private class ProtoAttributeInstance(
     override fun addModifier(modifier: AttributeModifier) =
         delegation.addModifier(modifier)
 
+    override fun addTransientModifier(modifier: AttributeModifier) =
+        delegation.addTransientModifier(modifier)
+
     override fun removeModifier(modifier: AttributeModifier) =
         delegation.removeModifier(modifier)
 
@@ -270,6 +277,10 @@ private class ProtoAttributeInstance(
 
     override fun removeModifiers() =
         delegation.removeModifiers()
+
+    override fun replaceBaseValue(other: AttributeInstance) {
+        delegation.setBaseValue(other.getBaseValue())
+    }
 
     override fun replace(other: AttributeInstance): Unit =
         throw UnsupportedOperationException("This operation is not supported for prototype instances.")
@@ -310,6 +321,9 @@ private class WakameAttributeInstance(
     override fun addModifier(modifier: AttributeModifier) =
         delegation.addModifier(modifier)
 
+    override fun addTransientModifier(modifier: AttributeModifier) =
+        delegation.addTransientModifier(modifier)
+
     override fun removeModifier(modifier: AttributeModifier) =
         delegation.removeModifier(modifier)
 
@@ -319,13 +333,17 @@ private class WakameAttributeInstance(
     override fun removeModifiers() =
         delegation.removeModifiers()
 
+    override fun replaceBaseValue(other: AttributeInstance) {
+        delegation.setBaseValue(other.getBaseValue())
+    }
+
     override fun replace(other: AttributeInstance) {
         if (other is WakameAttributeInstance) {
             delegation.replace(other.delegation)
         } else {
             this.setBaseValue(other.getBaseValue())
             this.getModifiers().forEach { this.removeModifier(it) }
-            other.getModifiers().forEach { this.addModifier(it) }
+            other.getModifiers().forEach { this.addTransientModifier(it) }
         }
     }
 }
@@ -389,6 +407,10 @@ private class VanillaAttributeInstance(
         }
     }
 
+    override fun addTransientModifier(modifier: AttributeModifier) {
+        handle.addTransientModifier(modifier.toBukkit())
+    }
+
     override fun removeModifier(modifier: AttributeModifier) {
         handle.removeModifier(modifier.toBukkit())
     }
@@ -401,10 +423,14 @@ private class VanillaAttributeInstance(
         handle.modifiers.forEach { removeModifier(it.key()) }
     }
 
+    override fun replaceBaseValue(other: AttributeInstance) {
+        handle.baseValue = other.getBaseValue()
+    }
+
     override fun replace(other: AttributeInstance) {
         setBaseValue(other.getBaseValue())
         this.getModifiers().forEach { removeModifier(it) }
-        other.getModifiers().forEach { addModifier(it) }
+        other.getModifiers().forEach { addTransientModifier(it) }
     }
 }
 

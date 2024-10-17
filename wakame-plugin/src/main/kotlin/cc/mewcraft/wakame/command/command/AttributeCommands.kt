@@ -1,15 +1,11 @@
 package cc.mewcraft.wakame.command.command
 
 import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.command.CommandConstants
-import cc.mewcraft.wakame.command.CommandPermissions
-import cc.mewcraft.wakame.command.buildAndAdd
+import cc.mewcraft.wakame.command.*
 import cc.mewcraft.wakame.command.parser.AttributeModifierOperationParser
 import cc.mewcraft.wakame.command.parser.AttributeParser
 import me.lucko.helper.text3.mini
-import net.kyori.adventure.extra.kotlin.join
-import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.extra.kotlin.translatable
+import net.kyori.adventure.extra.kotlin.*
 import net.kyori.adventure.inventory.Book
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
@@ -18,11 +14,8 @@ import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.NamespacedKey
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.incendo.cloud.Command
-import org.incendo.cloud.CommandFactory
+import org.bukkit.entity.*
+import org.incendo.cloud.*
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.bukkit.data.SingleEntitySelector
 import org.incendo.cloud.bukkit.parser.NamespacedKeyParser
@@ -182,7 +175,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
-                    instance.addModifier(modifier)
+                    instance.addTransientModifier(modifier)
                     sender.sendMessage(text {
                         append("A modifier has been added to ".mini)
                         append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))

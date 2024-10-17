@@ -4,9 +4,7 @@ import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
-import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.BinaryTagTypes
 import net.kyori.adventure.nbt.CompoundBinaryTag
@@ -15,22 +13,16 @@ import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attributable
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
+import org.bukkit.event.*
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
-import org.bukkit.persistence.PersistentDataAdapterContext
-import org.bukkit.persistence.PersistentDataHolder
-import org.bukkit.persistence.PersistentDataType
+import org.bukkit.persistence.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
-import java.util.*
+import java.io.*
+import java.util.UUID
 
 class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
     companion object {
@@ -152,7 +144,7 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
     private val entityKeyLookup: EntityKeyLookup by inject()
 
     // 当实体加载时, 读取 PDC 中的 AttributeMapPatch
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun on(e: EntitiesLoadEvent) {
         for (entity in e.entities) {
             if (entity is Player) continue
@@ -175,12 +167,10 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
     }
 
     // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
-    @EventHandler(priority = EventPriority.LOWEST)
     fun on(e: EntitiesUnloadEvent) {
         for (entity in e.entities) {
             if (entity is Player) continue
             if (entity !is Attributable) continue
-            if (entity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH)!!.value < 500.0) continue
             val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: continue
             val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
 
@@ -292,7 +282,7 @@ private data class SerializableAttributeInstance(
             setBaseValue(base)
         }
         for (serializable in modifiers) {
-            attributeInstance.addModifier(serializable.toAttributeModifier())
+            attributeInstance.addTransientModifier(serializable.toAttributeModifier())
         }
         return attributeInstance
     }

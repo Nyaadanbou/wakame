@@ -95,7 +95,7 @@ internal object AttributeItemSlotChangeListener : ItemSlotChangeListener() {
     }
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyAttributeMap(player, slot, nekoStack) { instance, modifier -> instance.addModifier(modifier) }
+        modifyAttributeMap(player, slot, nekoStack) { instance, modifier -> instance.addTransientModifier(modifier) }
     }
 
     private fun modifyAttributeMap(player: Player, slot: ItemSlot, nekoStack: NekoStack?, update: (AttributeInstance, AttributeModifier) -> Unit) {

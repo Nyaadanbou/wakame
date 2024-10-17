@@ -57,6 +57,11 @@ interface AttributeInstance : AttributeInstanceSnapshotable {
     fun addModifier(modifier: AttributeModifier)
 
     /**
+     * 添加一个短暂的 [AttributeModifier] 到该属性实例.
+     */
+    fun addTransientModifier(modifier: AttributeModifier)
+
+    /**
      * 移除指定的 [AttributeModifier].
      */
     fun removeModifier(modifier: AttributeModifier)
@@ -70,6 +75,17 @@ interface AttributeInstance : AttributeInstanceSnapshotable {
      * 移除所有 [AttributeModifier].
      */
     fun removeModifiers()
+
+    /*
+       开发日记 2024/10/17
+       此方法的存在是为了解决一个问题: 原本的 replace 方法会导致实例的基值与 modifier 一起被替换,
+       但是应用它的地方都是在需要保留 modifier 的情况下才能运作 (如 AttributeSupplier 的应用).
+       因此, 我们需要一个来替换实例的基值, 但是保留 modifier 的方法.
+     */
+    /**
+     * 将本实例的基值替换为 [other] 的基值.
+     */
+    fun replaceBaseValue(other: AttributeInstance)
 
     /**
      * 将本实例的状态替换为 [other] 的状态.

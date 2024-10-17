@@ -198,7 +198,7 @@ private data class AttributeBloodrageEffect(
         for ((attribute, modifier) in effect) {
             if (attributeMap.hasModifier(attribute, modifier.id))
                 return false
-            attributeMap.getInstance(attribute)?.addModifier(modifier)
+            attributeMap.getInstance(attribute)?.addTransientModifier(modifier)
         }
         return true
     }

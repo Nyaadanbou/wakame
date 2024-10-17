@@ -1,19 +1,11 @@
 package cc.mewcraft.wakame.compatibility.mechanic
 
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeInstance
-import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.attribute.get
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.util.Key
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
-import io.lumine.mythic.api.skills.INoTargetSkill
-import io.lumine.mythic.api.skills.ITargetedEntitySkill
-import io.lumine.mythic.api.skills.SkillMetadata
-import io.lumine.mythic.api.skills.SkillResult
-import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble
-import io.lumine.mythic.api.skills.placeholders.PlaceholderInt
-import io.lumine.mythic.api.skills.placeholders.PlaceholderString
+import io.lumine.mythic.api.skills.*
+import io.lumine.mythic.api.skills.placeholders.*
 import io.lumine.mythic.bukkit.utils.Schedulers
 import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
@@ -56,7 +48,7 @@ class AttributeModifierMechanic(
     }
 
     private fun addModifierAndScheduleRemoval(attributeInstance: AttributeInstance, modifier: AttributeModifier, duration: Int) {
-        attributeInstance.addModifier(modifier)
+        attributeInstance.addTransientModifier(modifier)
         if (duration > 0) {
             Schedulers.sync().runLater({
                 attributeInstance.removeModifier(modifier)

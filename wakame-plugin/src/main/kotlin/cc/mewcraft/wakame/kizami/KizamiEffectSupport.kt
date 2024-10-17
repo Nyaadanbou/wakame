@@ -108,7 +108,7 @@ internal data class KizamiAttribute(
     override val effect: Map<Attribute, AttributeModifier>,
 ) : KizamiEffect.Single<Map<Attribute, AttributeModifier>> {
     override fun apply(user: User<*>) {
-        effect.forEach { (attribute, modifier) -> user.attributeMap.getInstance(attribute)?.addModifier(modifier) }
+        effect.forEach { (attribute, modifier) -> user.attributeMap.getInstance(attribute)?.addTransientModifier(modifier) }
     }
 
     override fun remove(user: User<*>) {

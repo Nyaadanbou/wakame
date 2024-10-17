@@ -43,7 +43,7 @@ internal constructor(
 
         val prototype = prototypes[type] ?: return null
         val product = AttributeInstanceFactory.createLiveInstance(type, attributable, true)
-        product.replace(prototype) // 将实例的值替换为原型的值
+        product.replaceBaseValue(prototype) // 将实例的值替换为原型的值
         return product
     }
 
@@ -53,7 +53,7 @@ internal constructor(
     fun createImaginaryInstance(type: Attribute): ImaginaryAttributeInstance? {
         val prototype = prototypes[type] ?: return null
         val product = AttributeInstanceFactory.createDataInstance(type)
-        product.replace(prototype)
+        product.replaceBaseValue(prototype)
         val snapshot = product.getSnapshot() // 创建快照
         return snapshot.toIntangible() // 转为不可变
     }
