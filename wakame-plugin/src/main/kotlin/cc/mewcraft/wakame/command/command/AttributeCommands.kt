@@ -171,6 +171,17 @@ object AttributeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
+                    if (instance.hasModifier(modifier)) {
+                        sender.sendMessage(text {
+                            append("The attribute ".mini)
+                            append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                            append(" already has a modifier with the id ".mini)
+                            append(Component.text(id.asString()).color(NamedTextColor.RED))
+                            append(".".mini)
+                        })
+                        return@suspendingHandler
+                    }
+
                     instance.addModifier(modifier)
                     sender.sendMessage(text {
                         append("A modifier has been added to ".mini)

@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet
 import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.VisibleForTesting
 import java.util.EnumMap
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
@@ -76,7 +77,7 @@ object AttributeInstanceFactory {
             return@run attributable.getAttribute(bukkitAttribute)!!
         }
 
-        return VanillaAttributeInstance(handle)
+        return VanillaAttributeInstance(handle, attributable is Player)
     }
 }
 
@@ -338,6 +339,7 @@ private class WakameAttributeInstance(
  */
 private class VanillaAttributeInstance(
     private val handle: BukkitAttributeInstance, // 封装的世界状态中的对象
+    private val forPlayer: Boolean, // 是否是玩家的属性
 ) : AttributeInstance {
     override val attribute: Attribute
         get() = handle.attribute.toNeko()
@@ -374,11 +376,17 @@ private class VanillaAttributeInstance(
     }
 
     override fun addModifier(modifier: AttributeModifier) {
-        // 如果玩家手持 wakame 物品, 并且 wakame 物品上有增加最大生命值的属性 (原版属性),
-        // 那么当玩家先离线, 然后再上线, 后台会抛异常: “Modifier is already applied on this attribute!”
-        // 这是因为玩家下线时, 并不会触发移除物品属性的逻辑, 导致属性被永久保存到 NBT 了.
-        // 解决办法: addTransientModifier
-        handle.addTransientModifier(modifier.toBukkit())
+        if (forPlayer) {
+            // 如果玩家手持 wakame 物品, 并且 wakame 物品上有增加最大生命值的属性 (原版属性),
+            // 那么当玩家先离线, 然后再上线, 后台会抛异常: “Modifier is already applied on this attribute!”
+            // 这是因为玩家下线时, 并不会触发移除物品属性的逻辑, 导致属性被永久保存到 NBT 了.
+            // 解决办法: addTransientModifier
+            handle.addTransientModifier(modifier.toBukkit())
+        } else {
+            // 如果不是玩家, 直接添加永久的 modifier 即可
+            // 这样, 生物原版属性不由 wakame 应用, 通过原版的系统来应用.
+            handle.addModifier(modifier.toBukkit())
+        }
     }
 
     override fun removeModifier(modifier: AttributeModifier) {

@@ -12,11 +12,11 @@ import cc.mewcraft.wakame.damage.DamageListener
 import cc.mewcraft.wakame.damage.VanillaDamageMappings.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
-import cc.mewcraft.wakame.display.RENDERER_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.logic.AdventureLevelHotfix
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener

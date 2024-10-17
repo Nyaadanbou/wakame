@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
-import cc.mewcraft.wakame.attribute.IntangibleAttributeMap
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes

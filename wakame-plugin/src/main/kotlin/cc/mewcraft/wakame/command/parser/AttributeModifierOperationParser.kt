@@ -27,6 +27,7 @@ class AttributeModifierOperationParser<C : Any> : ArgumentParser<C, AttributeMod
         val input = commandInput.peekString()
         val operation = AttributeModifier.Operation.byKey(input) ?: return ArgumentParseResult.failure(AttributeModifierOperationParseException(commandContext))
 
+        commandInput.readString()
         return ArgumentParseResult.success(operation)
     }
 
