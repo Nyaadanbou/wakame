@@ -298,7 +298,7 @@ class CustomNekoStackTest : KoinTest {
 
     @Test
     fun `component - cells check_core_registrations`() = componentLifecycleTest(
-        "cells_check_core_registrations", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
+        "cells_core_registrations", ItemTemplateTypes.CELLS, ItemComponentTypes.CELLS
     ) {
         serialization {
             assertNotNull(it)

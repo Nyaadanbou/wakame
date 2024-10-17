@@ -142,7 +142,6 @@ critical_strike_power:
     min: .0
     max: 5.0
 
-
 defense:
   enabled: true
   display: "<element>防御力"
@@ -383,6 +382,18 @@ max_mana:
     min: .0
     max: 16384.0
 
+mining_efficiency:
+  enabled: true
+  display: "挖掘效率"
+  tooltips:
+    add: "<!i>挖掘效率 <value:+#;-.>"
+    multiply_base: "<!i>挖掘效率 <value:+#%;-.%>"
+    multiply_total: "<!i>挖掘效率 ×<value:+#%;-.%>"
+  values:
+    default: .0
+    min: .0
+    max: 1024.0
+
 movement_speed:
   enabled: true
   display: "移动速度"
@@ -406,6 +417,42 @@ negative_critical_strike_power:
     default: 1.0
     min: 0.0
     max: 1.0
+
+safe_fall_distance:
+  enabled: true
+  display: "安全摔落高度"
+  tooltips:
+    add: "<!i>安全摔落高度 <value:+#.#;-.>"
+    multiply_base: "<!i>安全摔落高度 <value:+#%;-.%>"
+    multiply_total: "<!i>安全摔落高度 ×<value:+#%;-.%>"
+  values:
+    default: 3.0
+    min: -1024.0
+    max: 1024.0
+
+scale:
+  enabled: true
+  display: "尺寸"
+  tooltips:
+    add: "<!i>尺寸 <value:+#.#;-.>"
+    multiply_base: "<!i>尺寸 <value:+#%;-.%>"
+    multiply_total: "<!i>尺寸 ×<value:+#%;-.%>"
+  values:
+    default: 1.0
+    min: 0.0625
+    max: 16.0
+
+step_height:
+  enabled: true
+  display: "行走高度"
+  tooltips:
+    add: "<!i>行走高度 <value:+#.#;-.>"
+    multiply_base: "<!i>行走高度 <value:+#%;-.%>"
+    multiply_total: "<!i>行走高度 ×<value:+#%;-.%>"
+  values:
+    default: 0.6
+    min: .0
+    max: 10.0
 
 universal_attack_damage:
   enabled: true

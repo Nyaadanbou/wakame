@@ -47,7 +47,6 @@ entity_attributes:
       universal_defense: default
       universal_defense_penetration: default
       universal_defense_penetration_rate: default
-      universal_incoming_damage_rate: default
 
   minecraft:mob:
     parent: minecraft:living
@@ -69,7 +68,6 @@ entity_attributes:
       universal_defense: 0
       universal_defense_penetration: 0
       universal_defense_penetration_rate: 0
-      universal_incoming_damage_rate: 0
 
   minecraft:allay:
     parent: minecraft:damageable
