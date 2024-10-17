@@ -13,13 +13,26 @@ private fun <T> MojangStack.modify(type: DataComponentType<T>, block: (T) -> T) 
     set(type, newData)
 }
 
+private val EMPTY_ATTRIBUTE_MODIFIERS = ItemAttributeModifiers.EMPTY.withTooltip(false)
+
+// FIXME 等 Mojang 修复: https://bugs.mojang.com/browse/MC-271826.
+//  目前我们无法通过正常的途径 `!attribute_modifiers` 移除盔甲上的默认属性.
+//  暂时一刀切, 无论什么情况都改为空属性修饰符+不显示, 等 Mojang 修复后再优化.
 fun ItemStack.showAttributeModifiers(value: Boolean) {
     val handle = this.handle ?: return
-    val data = handle.get(DataComponents.ATTRIBUTE_MODIFIERS) ?: return
-    if (data === ItemAttributeModifiers.EMPTY || data.modifiers.isEmpty()) {
+
+    /* val data = handle.get(DataComponents.ATTRIBUTE_MODIFIERS) ?: return
+    // 对于所有盔甲物品, 即使它们有属性修饰符的加成, 但这里获取到的依然是 `EMPTY` (MC-271826).
+    // 也就是说, 我们无法准确的通过 ItemAttributeModifiers 来判断一个盔甲物品是否有属性修饰符.
+    if ((data === ItemAttributeModifiers.EMPTY || data.modifiers.isEmpty()) && handle.item !is ArmorItem) {
         return
+    } */
+
+    if (value) {
+        handle.modify(DataComponents.ATTRIBUTE_MODIFIERS) { data -> data.withTooltip(true) }
+    } else {
+        handle.set(DataComponents.ATTRIBUTE_MODIFIERS, EMPTY_ATTRIBUTE_MODIFIERS)
     }
-    handle.modify(DataComponents.ATTRIBUTE_MODIFIERS) { data1 -> data1.withTooltip(value) }
 }
 
 fun ItemStack.showCanBreak(value: Boolean) {

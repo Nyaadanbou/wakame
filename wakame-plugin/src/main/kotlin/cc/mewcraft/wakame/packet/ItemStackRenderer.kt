@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.StandardContext
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
-import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.server.*
@@ -120,7 +119,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
         var changed = false
 
         // 移除任意物品的 PDC
-        changed = changed || getComponent(ComponentTypes.CUSTOM_DATA).getOrNull()?.removeTag("PublicBukkitValues") != null
+        changed = changed || customData?.removeTag("PublicBukkitValues") != null
 
         val nekoStack = tryNekoStack
         if (nekoStack != null) {
