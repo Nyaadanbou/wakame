@@ -37,7 +37,7 @@ import org.slf4j.Logger
 
     /* 新增加的魔咒 */
     val AGILITY = getCustom("agility")
-    val CRITICAL_HIT = getCustom("critical_hit")
+    val CLEAVE = getCustom("cleave")
     val DEEP_SEARCH = getCustom("deep_search")
     val DISARRAY = getCustom("disarray")
     val EARTH_DAMAGE = getCustom("earth_damage")
@@ -46,6 +46,7 @@ import org.slf4j.Logger
     val FIRE_PROTECTION = getCustom("fire_protection")
     val NEUTRAL_DAMAGE = getCustom("neutral_damage")
     val NEUTRAL_PROTECTION = getCustom("neutral_protection")
+    val PINPOINT = getCustom("pinpoint")
     val THUNDER_DAMAGE = getCustom("thunder_damage")
     val THUNDER_PROTECTION = getCustom("thunder_protection")
     val VITALITY = getCustom("vitality")

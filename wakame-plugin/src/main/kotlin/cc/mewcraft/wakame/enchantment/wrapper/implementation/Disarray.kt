@@ -10,12 +10,13 @@ import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent.*
 import cc.mewcraft.wakame.item.ItemSlot
 
 internal class Disarray : AbstractEnchantment(Enchantments.DISARRAY) {
-    private val component1: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
-        handle,
-        setOf(Part(Attributes.CRITICAL_STRIKE_CHANCE, -0.05, -0.05, Operation.ADD))
+    private val attribute: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
+        this, setOf(
+            Part(Attributes.CRITICAL_STRIKE_CHANCE, -0.05, -0.05, Operation.ADD)
+        )
     )
 
     override fun getEffects(level: Int, slot: ItemSlot): Collection<EnchantmentEffect> {
-        return component1.getEffects(level, slot)
+        return attribute.getEffects(level, slot)
     }
 }

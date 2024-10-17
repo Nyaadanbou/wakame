@@ -9,16 +9,17 @@ import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
 
 internal abstract class ElementEnchantment(
-    enchantmentId: ElementEnchantmentId,
+    identity: Identity,
 ) : CustomEnchantment {
-    protected val elementProvider: Provider<Element> = ElementRegistry.getProvider(enchantmentId.elementId)
-    final override val handle: Enchantment = Enchantments.getBy(enchantmentId.id)
+    final override val handle: Enchantment = Enchantments.getBy(identity.registryId)
     final override val key: Key = handle.key
-}
 
-internal data class ElementEnchantmentId(
-    val elementId: String,
-    val enchantId: String,
-) {
-    val id: String = elementId + "_" + enchantId
+    protected val element: Provider<Element> = ElementRegistry.getProvider(identity.elementId)
+
+    internal data class Identity(
+        val elementId: String,
+        val enchantId: String,
+    ) {
+        val registryId: String = elementId + "_" + enchantId
+    }
 }

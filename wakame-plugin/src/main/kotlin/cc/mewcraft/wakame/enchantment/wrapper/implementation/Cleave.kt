@@ -6,13 +6,12 @@ import cc.mewcraft.wakame.enchantment.Enchantments
 import cc.mewcraft.wakame.enchantment.effects.EnchantmentEffect
 import cc.mewcraft.wakame.enchantment.wrapper.AbstractEnchantment
 import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent
-import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent.*
 import cc.mewcraft.wakame.item.ItemSlot
 
-internal class Vitality : AbstractEnchantment(Enchantments.VITALITY) {
+internal class Cleave : AbstractEnchantment(Enchantments.CLEAVE) {
     private val attribute: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
         this, setOf(
-            Part(Attributes.MAX_HEALTH, 0.05, 0.05, Operation.MULTIPLY_TOTAL)
+            EnchantmentAttributeComponent.Part(Attributes.CRITICAL_STRIKE_POWER, 0.05, 0.1, Operation.ADD)
         )
     )
 

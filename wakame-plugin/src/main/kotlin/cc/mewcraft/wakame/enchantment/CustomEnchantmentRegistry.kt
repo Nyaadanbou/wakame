@@ -55,7 +55,8 @@ private object CustomEnchantmentInternals {
         // 有点 hardcode, 能用就行(
 
         register(Agility())
-        register(CriticalHit())
+        register(Cleave())
+        register(Pinpoint())
         register(DeepSearch())
         register(Disarray())
         register(ElementDamage("earth"))

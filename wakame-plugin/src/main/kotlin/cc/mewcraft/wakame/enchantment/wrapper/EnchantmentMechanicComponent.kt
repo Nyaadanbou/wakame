@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.enchantment.wrapper
 
-import org.bukkit.enchantments.Enchantment
+import cc.mewcraft.wakame.enchantment.CustomEnchantment
 
 internal class EnchantmentMechanicComponent(
-    private val handle: Enchantment,
-) {
+    owner: CustomEnchantment,
+) : EnchantmentComponent(owner) {
 }

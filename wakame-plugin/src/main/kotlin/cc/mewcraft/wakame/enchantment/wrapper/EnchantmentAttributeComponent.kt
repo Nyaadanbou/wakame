@@ -2,21 +2,17 @@ package cc.mewcraft.wakame.enchantment.wrapper
 
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.enchantment.CustomEnchantment
 import cc.mewcraft.wakame.enchantment.effects.EnchantmentEffect
 import cc.mewcraft.wakame.enchantment.effects.implementation.AttributeEnchantmentEffect
 import cc.mewcraft.wakame.item.ItemSlot
 import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
 
-internal data class EnchantmentAttributeComponent(
-    private val handle: Enchantment,
+internal class EnchantmentAttributeComponent(
+    owner: CustomEnchantment,
     private val parts: Set<Part>,
-) {
-
-    companion object {
-        private const val ATTRIBUTE_MODIFIER_NAMESPACE = "enchantment"
-    }
-
+) : EnchantmentComponent(owner) {
     // (level, item_slot) -> effects
     private val cache = HashMap<Int, HashMap<ItemSlot, Collection<EnchantmentEffect>>>()
 
@@ -31,7 +27,7 @@ internal data class EnchantmentAttributeComponent(
             .getOrPut(level, ::HashMap)
             .getOrPut(slot) {
                 parts.map { part ->
-                    part.createEffect(handle.key.value(), level, slot)
+                    part.createEffect(owner.handle, level, slot)
                 }.map { (attribute, modifier) ->
                     AttributeEnchantmentEffect(attribute, modifier)
                 }
@@ -57,12 +53,12 @@ internal data class EnchantmentAttributeComponent(
         /**
          * 用给定参数创建一个 [Attribute] 到 [AttributeModifier] 的映射.
          *
-         * @param id 写附魔的 id
+         * @param handle 附魔
          * @param level 附魔等级
          * @param slot 物品槽位
          */
-        fun createEffect(id: String, level: Int, slot: ItemSlot): Pair<Attribute, AttributeModifier> {
-            val id2 = id + "/" + slot.slotIndex
+        fun createEffect(handle: Enchantment, level: Int, slot: ItemSlot): Pair<Attribute, AttributeModifier> {
+            val id2 = handle.key.value() + "/" + slot.slotIndex
             val amount = baseValue + perLevel * (level - 1)
             val modifier = AttributeModifier(Key.key(ATTRIBUTE_MODIFIER_NAMESPACE, id2), amount, operation)
             return attribute to modifier
@@ -77,6 +73,10 @@ internal data class EnchantmentAttributeComponent(
             if (other !is Part) return false
             if (attribute != other.attribute) return false
             return true
+        }
+
+        companion object Constants {
+            private const val ATTRIBUTE_MODIFIER_NAMESPACE = "enchantment"
         }
     }
 }

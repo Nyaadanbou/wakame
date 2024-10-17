@@ -9,12 +9,13 @@ import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent
 import cc.mewcraft.wakame.item.ItemSlot
 
 internal class Agility : AbstractEnchantment(Enchantments.AGILITY) {
-    private val component1: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
-        handle,
-        setOf(EnchantmentAttributeComponent.Part(Attributes.MOVEMENT_SPEED, 0.05, 0.05, Operation.MULTIPLY_TOTAL))
+    private val attribute: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
+        this, setOf(
+            EnchantmentAttributeComponent.Part(Attributes.MOVEMENT_SPEED, 0.05, 0.05, Operation.MULTIPLY_TOTAL)
+        )
     )
 
     override fun getEffects(level: Int, slot: ItemSlot): Collection<EnchantmentEffect> {
-        return component1.getEffects(level, slot)
+        return attribute.getEffects(level, slot)
     }
 }
