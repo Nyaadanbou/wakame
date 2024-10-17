@@ -27,7 +27,11 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", 3.0, 1.0, 64.0, true).register()
     val MAX_ABSORPTION = RangedAttribute("max_absorption", .0, .0, 2048.0, true).register()
     val MAX_HEALTH = RangedAttribute("max_health", 20.0, 1.0, 16384.0, true).register()
+    val MINING_EFFICIENCY = RangedAttribute("mining_efficiency", .0, .0, 1024.0, true).register()
     val MOVEMENT_SPEED = RangedAttribute("movement_speed", .0, -1.0, 4.0, true).register()
+    val SAFE_FALL_DISTANCE = RangedAttribute("safe_fall_distance", 3.0, -1024.0, 1024.0, true).register()
+    val SCALE = RangedAttribute("scale", 1.0, 0.0625, 16.0, true).register()
+    val STEP_HEIGHT = RangedAttribute("step_height", 0.6, .0, 10.0, true).register()
     //</editor-fold>
 
     //<editor-fold desc="萌芽属性">
@@ -36,7 +40,7 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     // 这些属性需要我们自己实现才能在游戏中生效. 所谓“自己实现”,
     // 就是说, 我们需要通过自定义监听器或调度器等方式来实现它们.
     val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0).register()
-    val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", 0.0, -1.0, 1.0).register()
+    val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", .0, -1.0, 1.0).register()
     val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, 1.0, 16384.0).register()
     val HEALTH_REGENERATION = RangedAttribute("health_regeneration", 1.0, .0, 16384.0).register()
     val LIFESTEAL = RangedAttribute("lifesteal", .0, .0, 16384.0).register()
@@ -47,7 +51,7 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     val NEGATIVE_CRITICAL_STRIKE_POWER = RangedAttribute("negative_critical_strike_power", 1.0, .0, 1.0).register()
     val UNIVERSAL_DEFENSE = RangedAttribute("universal_defense", .0, -16384.0, 16384.0).register()
     val UNIVERSAL_DEFENSE_PENETRATION = RangedAttribute("universal_defense_penetration", .0, -16384.0, 16384.0).register()
-    val UNIVERSAL_DEFENSE_PENETRATION_RATE = RangedAttribute("universal_defense_penetration_rate", .0, 0.0, 1.0).register()
+    val UNIVERSAL_DEFENSE_PENETRATION_RATE = RangedAttribute("universal_defense_penetration_rate", .0, .0, 1.0).register()
     val UNIVERSAL_MAX_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_max_attack_damage", .0, .0, 16384.0).register()
     val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_min_attack_damage", .0, .0, 16384.0).register()
     //</editor-fold>

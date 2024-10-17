@@ -1,54 +1,44 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.util.toNamespacedKey
-import cc.mewcraft.wakame.attribute.Attribute as WakameAttribute
-import cc.mewcraft.wakame.attribute.AttributeModifier as WakameAttributeModifier
+import com.google.common.collect.ImmutableBiMap
+import cc.mewcraft.wakame.attribute.Attribute as NekoAttribute
+import cc.mewcraft.wakame.attribute.AttributeModifier as NekoAttributeModifier
 import org.bukkit.attribute.Attribute as BukkitAttribute
 import org.bukkit.attribute.AttributeModifier as BukkitAttributeModifier
 
-fun WakameAttributeModifier.Operation.toBukkit() = when (this) {
-    WakameAttributeModifier.Operation.ADD -> BukkitAttributeModifier.Operation.ADD_NUMBER
-    WakameAttributeModifier.Operation.MULTIPLY_BASE -> BukkitAttributeModifier.Operation.ADD_SCALAR
-    WakameAttributeModifier.Operation.MULTIPLY_TOTAL -> BukkitAttributeModifier.Operation.MULTIPLY_SCALAR_1
+fun NekoAttributeModifier.Operation.toBukkit() = when (this) {
+    NekoAttributeModifier.Operation.ADD -> BukkitAttributeModifier.Operation.ADD_NUMBER
+    NekoAttributeModifier.Operation.MULTIPLY_BASE -> BukkitAttributeModifier.Operation.ADD_SCALAR
+    NekoAttributeModifier.Operation.MULTIPLY_TOTAL -> BukkitAttributeModifier.Operation.MULTIPLY_SCALAR_1
 }
 
 fun BukkitAttributeModifier.Operation.toNeko() = when (this) {
-    BukkitAttributeModifier.Operation.ADD_NUMBER -> WakameAttributeModifier.Operation.ADD
-    BukkitAttributeModifier.Operation.ADD_SCALAR -> WakameAttributeModifier.Operation.MULTIPLY_BASE
-    BukkitAttributeModifier.Operation.MULTIPLY_SCALAR_1 -> WakameAttributeModifier.Operation.MULTIPLY_TOTAL
+    BukkitAttributeModifier.Operation.ADD_NUMBER -> NekoAttributeModifier.Operation.ADD
+    BukkitAttributeModifier.Operation.ADD_SCALAR -> NekoAttributeModifier.Operation.MULTIPLY_BASE
+    BukkitAttributeModifier.Operation.MULTIPLY_SCALAR_1 -> NekoAttributeModifier.Operation.MULTIPLY_TOTAL
 }
 
-fun WakameAttributeModifier.toBukkit() = BukkitAttributeModifier(
-    /* key = */ id.toNamespacedKey,
-    /* amount = */ amount,
-    /* operation = */ operation.toBukkit(),
-)
+fun NekoAttributeModifier.toBukkit() = BukkitAttributeModifier(id.toNamespacedKey, amount, operation.toBukkit())
+fun BukkitAttributeModifier.toNeko() = NekoAttributeModifier(key, amount, operation.toNeko())
 
-fun BukkitAttributeModifier.toNeko() = WakameAttributeModifier(
-    id = key,
-    amount = amount,
-    operation = operation.toNeko(),
-)
+private val MAPPINGS: ImmutableBiMap<NekoAttribute, BukkitAttribute> = ImmutableBiMap.builder<NekoAttribute, BukkitAttribute>()
+    .put(Attributes.BLOCK_INTERACTION_RANGE, BukkitAttribute.PLAYER_BLOCK_INTERACTION_RANGE)
+    .put(Attributes.ENTITY_INTERACTION_RANGE, BukkitAttribute.PLAYER_ENTITY_INTERACTION_RANGE)
+    .put(Attributes.MAX_HEALTH, BukkitAttribute.GENERIC_MAX_HEALTH)
+    .put(Attributes.MAX_ABSORPTION, BukkitAttribute.GENERIC_MAX_ABSORPTION)
+    .put(Attributes.MINING_EFFICIENCY, BukkitAttribute.PLAYER_MINING_EFFICIENCY)
+    .put(Attributes.MOVEMENT_SPEED, BukkitAttribute.GENERIC_MOVEMENT_SPEED)
+    .put(Attributes.SAFE_FALL_DISTANCE, BukkitAttribute.GENERIC_SAFE_FALL_DISTANCE)
+    .put(Attributes.SCALE, BukkitAttribute.GENERIC_SCALE)
+    .put(Attributes.STEP_HEIGHT, BukkitAttribute.GENERIC_STEP_HEIGHT)
+    .build()
 
-fun WakameAttribute.toBukkit(): BukkitAttribute {
+fun NekoAttribute.toBukkit(): BukkitAttribute {
     require(this.vanilla) { "Can't convert non-vanilla attribute to Bukkit" }
-    return when (this) {
-        Attributes.MAX_HEALTH -> BukkitAttribute.GENERIC_MAX_HEALTH
-        Attributes.MAX_ABSORPTION -> BukkitAttribute.GENERIC_MAX_ABSORPTION
-        Attributes.MOVEMENT_SPEED -> BukkitAttribute.GENERIC_MOVEMENT_SPEED
-        Attributes.BLOCK_INTERACTION_RANGE -> BukkitAttribute.PLAYER_BLOCK_INTERACTION_RANGE
-        Attributes.ENTITY_INTERACTION_RANGE -> BukkitAttribute.PLAYER_ENTITY_INTERACTION_RANGE
-        else -> throw IllegalArgumentException("Can't find bukkit attribute for $this")
-    }
+    return MAPPINGS[this] ?: throw IllegalArgumentException("Can't convert ${this.descriptionId} to Bukkit attribute")
 }
 
-fun BukkitAttribute.toNeko(): WakameAttribute {
-    return when (this) {
-        BukkitAttribute.GENERIC_MAX_HEALTH -> Attributes.MAX_HEALTH
-        BukkitAttribute.GENERIC_MAX_ABSORPTION -> Attributes.MAX_ABSORPTION
-        BukkitAttribute.GENERIC_MOVEMENT_SPEED -> Attributes.MOVEMENT_SPEED
-        BukkitAttribute.PLAYER_BLOCK_INTERACTION_RANGE -> Attributes.BLOCK_INTERACTION_RANGE
-        BukkitAttribute.PLAYER_ENTITY_INTERACTION_RANGE -> Attributes.ENTITY_INTERACTION_RANGE
-        else -> throw IllegalArgumentException("Can't find wakame attribute for $this")
-    }
+fun BukkitAttribute.toNeko(): NekoAttribute {
+    return MAPPINGS.inverse()[this] ?: throw IllegalArgumentException("Can't convert ${this.name} to Neko attribute")
 }

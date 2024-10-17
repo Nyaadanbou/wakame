@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import cc.mewcraft.wakame.attribute.composite.*
 import cc.mewcraft.wakame.config.*
 import cc.mewcraft.wakame.element.Element
@@ -84,6 +84,7 @@ object AttributeRegistry : Initializable {
     private fun registerFacades() {
         // Register special attribute
         +buildFacade("empty").single().bind { EMPTY }
+
         // Registry more attribute facades here ...
         +buildFacade("attack_damage").ranged().element().bind({ MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE })
         +buildFacade("attack_damage_rate").single().element().bind { ATTACK_DAMAGE_RATE }
@@ -105,7 +106,11 @@ object AttributeRegistry : Initializable {
         +buildFacade("max_absorption").single().bind { MAX_ABSORPTION }
         +buildFacade("max_health").single().bind { MAX_HEALTH }
         +buildFacade("max_mana").single().bind { MAX_MANA }
+        +buildFacade("mining_efficiency").single().bind { MINING_EFFICIENCY }
         +buildFacade("movement_speed").single().bind { MOVEMENT_SPEED }
+        +buildFacade("safe_fall_distance").single().bind { SAFE_FALL_DISTANCE }
+        +buildFacade("scale").single().bind { SCALE }
+        +buildFacade("step_height").single().bind { STEP_HEIGHT }
         +buildFacade("universal_attack_damage").ranged().bind({ UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE })
         +buildFacade("universal_defense").single().bind { UNIVERSAL_DEFENSE }
         +buildFacade("universal_defense_penetration").single().bind { UNIVERSAL_DEFENSE_PENETRATION }
@@ -421,12 +426,12 @@ private class FormatSelectionImpl(
 private class SingleSelectionImpl(
     private val id: String,
 ) : SingleSelection {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(this@SingleSelectionImpl.id)
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
     override fun element(): SingleElementAttributeBinder {
-        return SingleElementAttributeBinderImpl(this@SingleSelectionImpl.id)
+        return SingleElementAttributeBinderImpl(id)
     }
 
     /**
@@ -435,7 +440,7 @@ private class SingleSelectionImpl(
     override fun bind(component: Attributes.() -> Attribute): AttributeFacadeOverride<ConstantCompositeAttributeS, VariableCompositeAttributeS> {
         val facade = MutableCompositeAttributeFacade(
             config = config,
-            id = this@SingleSelectionImpl.id,
+            id = id,
             components = CompositeAttributeMetadataImpl(
                 CompositeAttributeComponent.Operation::class, CompositeAttributeComponent.Scalar::class
             ),
