@@ -3,19 +3,15 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.GenericKeys
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.EnumLookup
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.takeUnlessEmpty
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
-import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.EquipmentSlotGroup
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.*
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.SerializationException
@@ -29,7 +25,7 @@ import java.util.stream.Stream
  * 如果一个物品在这个栏位里, 那么这个物品就应该被认为是“生效的”,
  * 所有的属性、技能、铭刻等都应该对当前物品的拥有者 (即玩家) 生效.
  *
- * 如果一个物品没有生效的栏位, 使用 [ItemSlot.noop] 单例.
+ * 如果一个物品没有生效的栏位, 使用 [ItemSlot.empty] 单例.
  */
 sealed interface ItemSlot : Examinable {
     /**
@@ -87,26 +83,54 @@ sealed interface ItemSlot : Examinable {
 
     companion object {
         /**
-         * 代表一个不应该被使用的 [slotIndex].
+         * 代表一个不存在的 [slotIndex].
          */
         const val EMPTY_SLOT_INDEX = -1
 
         /**
-         * 获取一个无操作 [ItemSlot].
+         * 获取一个不存在的 [ItemSlot] 实例.
+         *
+         * 当一个物品对于玩家来说没有生效的栏位时, 应该使用这个.
          */
-        fun noop(): ItemSlot {
-            return Noop
+        fun empty(): ItemSlot {
+            return Empty
+        }
+
+        /**
+         * 获取一个虚拟的 [ItemSlot] 实例.
+         *
+         * 该实例不用于配置文件序列化, 也不用于和其他系统的交互.
+         * 目前仅用于生成属性修饰符的名字, 未来技能应该也会用到.
+         */
+        fun imaginary(): ItemSlot {
+            return Imaginary
         }
     }
 
     /**
-     * 代表一个无操作的 [ItemSlot].
+     * 代表一个不存在的 [ItemSlot].
      *
-     * 一些对玩家没有任何效果的物品, 例如材料, 应该使用这个 [ItemSlot].
+     * 对玩家没有任何效果的物品 (例如材料) 应该使用这个 [ItemSlot].
      */
-    private data object Noop : ItemSlot {
+    private data object Empty : ItemSlot {
         override val id: Key = GenericKeys.NOOP
         override val slotIndex: Int = EMPTY_SLOT_INDEX
+
+        override fun getItem(player: Player): ItemStack? {
+            return null
+        }
+
+        override fun toString(): String {
+            return toSimpleString()
+        }
+    }
+
+    /**
+     * 代表一个虚拟的 [ItemSlot].
+     */
+    private data object Imaginary : ItemSlot {
+        override val id: Key = Key.key(Namespaces.GENERIC, "imaginary")
+        override val slotIndex: Int = 99
 
         override fun getItem(player: Player): ItemStack? {
             return null
@@ -212,7 +236,7 @@ data class CustomItemSlot(
  */
 internal object ItemSlotSerializer : TypeSerializer<ItemSlot> {
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): ItemSlot {
-        return ItemSlot.noop()
+        return ItemSlot.empty()
     }
 
     override fun deserialize(type: Type, node: ConfigurationNode): ItemSlot {
