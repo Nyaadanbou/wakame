@@ -55,6 +55,8 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_min_attack_damage", .0, .0, 16384.0).register()
     //</editor-fold>
 
+    // TODO 想办法把元素属性也放在这里, element 这个函数就不要了
+
     /**
      * Gets specific [ElementAttributes] by the [element].
      *
@@ -87,19 +89,22 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     }
 
     /**
-     * Gets all [Attribute.descriptionId] of known attributes (including element attributes).
+     * Gets all [Attribute.descriptionId] of known attributes (including [ElementAttribute]).
      */
     val descriptionIds: Set<String>
         get() = AttributeInternals.descriptionIds + ElementAttributeInternals.descriptionIds
 
+    /**
+     * Gets specific [Attribute] instances by the [descriptionId] (including [ElementAttribute]).
+     */
     override fun getBy(descriptionId: String): Attribute? {
-        return AttributeInternals.getBy(descriptionId)
+        return AttributeInternals.getBy(descriptionId) ?: ElementAttributeInternals.getBy(descriptionId)
     }
 
     /**
-     * Gets specific [Attribute] instances by the [compositeId].
-     * The returned list does not contain [ElementAttribute]s.
-     * To get [ElementAttribute]s, use [element] instead.
+     * Gets specific [Attribute] instances by the [compositeId] (not including [ElementAttribute]).
+     *
+     * To get a collection of [ElementAttribute], use [Attributes.element] instead.
      */
     override fun getCollectionBy(compositeId: String): Collection<Attribute> {
         return AttributeInternals.getCollectionBy(compositeId)

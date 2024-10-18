@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
@@ -12,6 +11,7 @@ import net.kyori.adventure.nbt.BinaryTagTypes
 import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.util.Codec
 import org.bukkit.NamespacedKey
+import org.bukkit.Server
 import org.bukkit.attribute.Attributable
 import org.bukkit.entity.*
 import org.bukkit.event.*
@@ -19,25 +19,27 @@ import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
 import org.bukkit.persistence.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.*
 import org.slf4j.Logger
 import java.io.*
 import java.util.UUID
 
 class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
-    companion object {
-        val PDC_KEY = NamespacedKey.fromString("wakame:attribute_modifiers") ?: error("Spoogot")
+    companion object Constants : KoinComponent {
+        private val LOGGER = get<Logger>()
+        private val PDC_KEY = NamespacedKey.fromString("wakame:attributes") ?: error("Spoogot")
 
         fun decode(owner: Attributable): AttributeMapPatch {
-            if (owner !is PersistentDataHolder)
+            if (owner !is PersistentDataHolder) {
                 return AttributeMapPatch()
-            return runCatching { owner.persistentDataContainer.get(PDC_KEY, AttributeMapPatchType.with(owner)) ?: AttributeMapPatch() }
-                .onFailure {
-                    owner.persistentDataContainer.remove(PDC_KEY)
-                    AttributeMapPatchSupport.logger.error("Failed to decode AttributeMapPatch", it)
-                }
-                .getOrDefault(AttributeMapPatch())
+            }
+            return try {
+                owner.persistentDataContainer.get(PDC_KEY, AttributeMapPatchType.with(owner)) ?: AttributeMapPatch()
+            } catch (e: Exception) {
+                owner.persistentDataContainer.remove(PDC_KEY)
+                LOGGER.error("Failed to decode attribute map patch", e)
+                AttributeMapPatch() // return empty by default
+            }
         }
     }
 
@@ -142,11 +144,8 @@ internal object AttributeMapPatchAccess {
 }
 
 internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
+    private val server: Server by inject()
     private val entityKeyLookup: EntityKeyLookup by inject()
-
-    init {
-        this.bindWith(AttributeMapPatchSupport.plugin)
-    }
 
     // 当实体加载时, 读取 PDC 中的 AttributeMapPatch
     @EventHandler(priority = EventPriority.LOWEST)
@@ -166,9 +165,10 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
 
     @EventHandler
     fun on(e: CreatureSpawnEvent) {
-        // 玩家在世界中的生成不会触发 CreaturesSpawnEvent
-        val entity = e.entity
-        EntityAttributeMapAccess.get(entity) // 初始化 AttributeMap
+        // Note: 玩家在世界中的生成不会触发 CreaturesSpawnEvent
+
+        // 触发 AttributeMap 的初始化, 例如应用默认属性
+        EntityAttributeMapAccess.get(e.entity)
     }
 
     // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
@@ -178,7 +178,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
     }
 
     override fun close() {
-        AttributeMapPatchSupport.plugin.server.worlds.flatMap { it.entities }.forEach(::entityUnloaded)
+        server.worlds.flatMap { it.entities }.forEach(::entityUnloaded)
     }
 
     private fun entityUnloaded(entity: Entity) {
@@ -201,7 +201,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
     }
 }
 
-private object AttributeMapPatchType {
+private data object AttributeMapPatchType {
     fun with(owner: Attributable): PersistentDataType<ByteArray, AttributeMapPatch> {
         return object : PersistentDataType<ByteArray, AttributeMapPatch> {
             override fun getPrimitiveType(): Class<ByteArray> {
@@ -263,7 +263,7 @@ private data class SerializableAttributeInstance(
     val base: Double,
     val modifiers: List<SerializableAttributeModifier>,
 ) {
-    companion object {
+    companion object Constants : KoinComponent {
         @JvmField
         val NBT_CODEC = Codec.codec<SerializableAttributeInstance, CompoundBinaryTag, IOException, IOException>(
             /* decoder = */ { nbt ->
@@ -289,7 +289,7 @@ private data class SerializableAttributeInstance(
     }
 
     fun toAttributeInstance(owner: Attributable): AttributeInstance? {
-        val attribute = AttributeMapPatchSupport.attributeProvider.getBy(id) ?: return null
+        val attribute = Attributes.getBy(id) ?: return null
         val attributeInstance = AttributeInstanceFactory.createLiveInstance(attribute, owner, true).apply {
             setBaseValue(base)
         }
@@ -330,10 +330,4 @@ private data class SerializableAttributeModifier(
         val operation = AttributeModifier.Operation.byId(operationId) ?: error("Invalid operation id: $operationId")
         return AttributeModifier(modifierId, amount, operation)
     }
-}
-
-private object AttributeMapPatchSupport : KoinComponent {
-    val logger: Logger by inject()
-    val attributeProvider: AttributeProvider by inject()
-    val plugin: WakamePlugin by inject()
 }
