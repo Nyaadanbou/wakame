@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.ReloadableProperty
@@ -8,15 +10,14 @@ import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.user.User
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.bukkit.entity.*
+import org.koin.core.component.*
 import org.slf4j.Logger
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.set
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 /**
  * A constructor function of [AttributeMap].
@@ -46,9 +47,9 @@ fun AttributeMap(entity: LivingEntity): AttributeMap {
  * [ImaginaryAttributeMap] 的实例.
  */
 object IntangibleAttributeMaps {
-    val ARROW: ImaginaryAttributeMap by ReloadableProperty { IntangibleAttributeMapPool.get(Key.key("arrow")) }
-    val TRIDENT: ImaginaryAttributeMap by ReloadableProperty { IntangibleAttributeMapPool.get(Key.key("trident")) }
-    val DISPENSER: ImaginaryAttributeMap by ReloadableProperty { IntangibleAttributeMapPool.get(Key.key("dispenser")) }
+    val ARROW: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("arrow")) }
+    val TRIDENT: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("trident")) }
+    val DISPENSER: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("dispenser")) }
 }
 
 
@@ -114,7 +115,7 @@ private class PlayerAttributeMap(
         return AttributeMapSnapshotImpl(data)
     }
 
-    override fun register(attribute: Attribute) {
+    override fun registerInstance(attribute: Attribute) {
         patch[attribute] = AttributeInstanceFactory.createLiveInstance(attribute, player, true)
     }
 
@@ -178,10 +179,19 @@ private class PlayerAttributeMap(
  */
 private class EntityAttributeMap : AttributeMap {
     constructor(default: AttributeSupplier, entity: LivingEntity) {
-        checkEntityIsValid(entity)
+        validateEntity(entity)
+
         this.default = default
         this.entityRef = WeakReference(entity)
-        default.attributes.filter { attr -> attr.vanilla }.forEach { attr -> getInstance(attr) }
+        default.attributes
+            .filter { attr -> attr.vanilla }
+            .forEach { attr -> getInstance(attr) }
+    }
+
+    private fun validateEntity(entity: Entity?) {
+        contract { returns() implies (entity != null) }
+        requireNotNull(entity) { "The entity ref no longer exists" }
+        require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
     }
 
     /**
@@ -194,8 +204,8 @@ private class EntityAttributeMap : AttributeMap {
     private val entity: LivingEntity
         get() {
             val entity = entityRef.get()
-            checkEntityIsValid(entity)
-            return entity!!
+            validateEntity(entity)
+            return entity
         }
 
     /**
@@ -203,11 +213,6 @@ private class EntityAttributeMap : AttributeMap {
      */
     private val patch: AttributeMapPatch
         get() = AttributeMapPatchAccess.getOrCreate(entity.uniqueId)
-
-    private fun checkEntityIsValid(entity: Entity?) {
-        requireNotNull(entity) { "The entity ref no longer exists" }
-        require(entity !is Player) { "EntityAttributeMap can only be used for non-player living entities" }
-    }
 
     @Suppress("DuplicatedCode")
     override fun getSnapshot(): AttributeMapSnapshot {
@@ -220,7 +225,7 @@ private class EntityAttributeMap : AttributeMap {
         return AttributeMapSnapshotImpl(data)
     }
 
-    override fun register(attribute: Attribute) {
+    override fun registerInstance(attribute: Attribute) {
         patch[attribute] = AttributeInstanceFactory.createLiveInstance(attribute, entity, true)
     }
 
@@ -274,18 +279,18 @@ private class EntityAttributeMap : AttributeMap {
     }
 }
 
-private object IntangibleAttributeMapPool : KoinComponent {
-    val logger: Logger by inject()
-    val pool: ConcurrentHashMap<Key, ImaginaryAttributeMap> = ConcurrentHashMap()
+private object ImaginaryAttributeMapRegistry : KoinComponent {
+    private val logger = get<Logger>()
+    private val pool = ConcurrentHashMap<Key, ImaginaryAttributeMap>()
 
     fun get(key: Key): ImaginaryAttributeMap {
-        return pool.computeIfAbsent(key) {
-            val default = DefaultAttributes.getSupplier(it)
+        return pool.computeIfAbsent(key) { k ->
+            val default = DefaultAttributes.getSupplier(k)
             val data = Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>()
             for (attribute in default.attributes) {
                 val instance = default.createImaginaryInstance(attribute) ?: continue
                 val snapshot = instance.getSnapshot()
-                val intangible = snapshot.toIntangible()
+                val intangible = snapshot.toImaginary()
                 data[attribute] = intangible
             }
             ImaginaryAttributeMapImpl(data)

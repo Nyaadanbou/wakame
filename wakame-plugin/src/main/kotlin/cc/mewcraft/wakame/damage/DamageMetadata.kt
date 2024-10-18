@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
-import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -143,7 +141,7 @@ class EntityMeleeAttackMetadata(
     override val isCritical: Boolean
 
     init {
-        val attributeMap = EntityAttributeAccessor.getAttributeMap(entity)
+        val attributeMap = EntityAttributeMapAccess.get(entity)
         this.damageBundle = damageBundle(attributeMap) { every { standard() } }
         this.damageValue = this.damageBundle.damageSum
         this.criticalPower =
@@ -286,7 +284,7 @@ class EntityProjectileDamageMetadata(
     override val isCritical: Boolean
 
     init {
-        val attributeMap = EntityAttributeAccessor.getAttributeMap(entity)
+        val attributeMap = EntityAttributeMapAccess.get(entity)
         this.damageBundle = damageBundle(attributeMap) { every { standard() } }
         this.damageValue = this.damageBundle.damageSum
         this.criticalPower =

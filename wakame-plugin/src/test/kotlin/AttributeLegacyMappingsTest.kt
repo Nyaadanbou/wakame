@@ -6,26 +6,26 @@ import kotlin.test.assertEquals
 class AttributeLegacyMappingsTest {
 
     @Test
-    fun testByKey() {
-        val key = Key.key("test:foo")
-        val uuid = AttributeLegacyMappings.byKey(key)
-        assertEquals(uuid, AttributeLegacyMappings.byKey(key))
+    fun testByName() {
+        val name = Key.key("test:foo")
+        val uuid = AttributeLegacyMappings.byName(name)
+        assertEquals(uuid, AttributeLegacyMappings.byName(name))
     }
 
     @Test
     fun testById() {
-        val key = Key.key("test:bar")
-        val uuid = AttributeLegacyMappings.byKey(key)
-        assertEquals(key, AttributeLegacyMappings.byId(uuid))
+        val name = Key.key("test:bar")
+        val uuid = AttributeLegacyMappings.byName(name)
+        assertEquals(name, AttributeLegacyMappings.byId(uuid))
     }
 
     @Test
     fun testBidirectionalMapping() {
-        val key = Key.key("test:baz")
-        val uuid = AttributeLegacyMappings.byKey(key)
+        val name = Key.key("test:baz")
+        val uuid = AttributeLegacyMappings.byName(name)
         // Ensure that the reverse mapping exists
-        assertEquals(key, AttributeLegacyMappings.byId(uuid))
-        // Ensure that the UUID obtained from the Key can be used to retrieve the same Key
-        assertEquals(uuid, AttributeLegacyMappings.byKey(key))
+        assertEquals(name, AttributeLegacyMappings.byId(uuid))
+        // Ensure that the UUID obtained from the name can be used to retrieve the same name
+        assertEquals(uuid, AttributeLegacyMappings.byName(name))
     }
 }

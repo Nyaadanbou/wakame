@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.attribute.AttributeMapPatchListener
 import cc.mewcraft.wakame.command.CommandManager
-import cc.mewcraft.wakame.compatibility.MythicMobsCompatibilityListener
+import cc.mewcraft.wakame.compatibility.mythicmobs.MythicMobsCompatibilityListener
 import cc.mewcraft.wakame.config.*
 import cc.mewcraft.wakame.damage.DamageListener
 import cc.mewcraft.wakame.damage.VanillaDamageMappings.DAMAGE_GLOBAL_CONFIG_FILE

@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.attribute
 import net.kyori.adventure.key.Key
 
 /**
- * 属性实例 ([AttributeInstance]) 本质上是一个用于数值计算的容器, 里面包含了一个
+ * *属性实例* ([AttributeInstance]) 本质上是一个用于数值计算的容器, 里面包含了一个
  * [Attribute] 和多个与之关联的 [AttributeModifier]. 每一个 [AttributeModifier]
  * 在概念上都是对 [Attribute] 的修饰, 会影响 [AttributeInstance] 的数值计算结果.
  *
@@ -76,21 +76,21 @@ interface AttributeInstance : AttributeInstanceSnapshotable {
      */
     fun removeModifiers()
 
+    /**
+     * 将本实例的所有状态替换为 [other] 的状态.
+     */
+    fun replace(other: AttributeInstance)
+
     /*
        开发日记 2024/10/17
        此方法的存在是为了解决一个问题: 原本的 replace 方法会导致实例的基值与 modifier 一起被替换,
        但是应用它的地方都是在需要保留 modifier 的情况下才能运作 (如 AttributeSupplier 的应用).
-       因此, 我们需要一个来替换实例的基值, 但是保留 modifier 的方法.
-     */
+       因此, 我们需要一个来替换实例的基值但保留 modifier 的方法.
+    */
     /**
      * 将本实例的基值替换为 [other] 的基值.
      */
     fun replaceBaseValue(other: AttributeInstance)
-
-    /**
-     * 将本实例的状态替换为 [other] 的状态.
-     */
-    fun replace(other: AttributeInstance)
 }
 
 /**
@@ -190,7 +190,7 @@ interface AttributeInstanceSnapshot {
     /**
      * 将本实例转换为一个 [ImaginaryAttributeInstance].
      */
-    fun toIntangible(): ImaginaryAttributeInstance
+    fun toImaginary(): ImaginaryAttributeInstance
 }
 
 /**

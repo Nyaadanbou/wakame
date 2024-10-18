@@ -160,7 +160,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
             patch.trimBy(default)
 
             AttributeMapPatchAccess.put(entity.uniqueId, patch)
-            EntityAttributeAccessor.getAttributeMap(entity as LivingEntity) // 初始化 AttributeMap
+            EntityAttributeMapAccess.get(entity as LivingEntity) // 初始化 AttributeMap
         }
     }
 
@@ -168,7 +168,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
     fun on(e: CreatureSpawnEvent) {
         // 玩家在世界中的生成不会触发 CreaturesSpawnEvent
         val entity = e.entity
-        EntityAttributeAccessor.getAttributeMap(entity) // 初始化 AttributeMap
+        EntityAttributeMapAccess.get(entity) // 初始化 AttributeMap
     }
 
     // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
@@ -325,7 +325,10 @@ private data class SerializableAttributeModifier(
     }
 
     fun toAttributeModifier(): AttributeModifier {
-        return AttributeModifier(Key.key(id), amount, AttributeModifier.Operation.byIdOrThrow(operation.toInt()))
+        val modifierId = Key.key(id)
+        val operationId = operation.toInt()
+        val operation = AttributeModifier.Operation.byId(operationId) ?: error("Invalid operation id: $operationId")
+        return AttributeModifier(modifierId, amount, operation)
     }
 }
 

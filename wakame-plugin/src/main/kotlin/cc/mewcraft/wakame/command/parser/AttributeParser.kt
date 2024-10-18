@@ -8,9 +8,7 @@ import org.incendo.cloud.component.CommandComponent
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.context.CommandInput
 import org.incendo.cloud.exception.parsing.ParserException
-import org.incendo.cloud.parser.ArgumentParseResult
-import org.incendo.cloud.parser.ArgumentParser
-import org.incendo.cloud.parser.ParserDescriptor
+import org.incendo.cloud.parser.*
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -37,7 +35,7 @@ class AttributeParser<C : Any> : ArgumentParser<C, Attribute>, BlockingSuggestio
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return AttributeParserSupport.attributeProvider.allDescriptionId()
+        return AttributeParserSupport.attributeProvider.descriptionIds
     }
 }
 

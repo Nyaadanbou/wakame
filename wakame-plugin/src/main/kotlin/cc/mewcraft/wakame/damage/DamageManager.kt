@@ -1,20 +1,17 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
+import cc.mewcraft.wakame.attribute.EntityAttributeMapAccess
 import cc.mewcraft.wakame.attribute.IntangibleAttributeMaps
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.entity.*
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
-import org.bukkit.event.entity.EntityShootBowEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.bukkit.event.entity.*
+import org.bukkit.event.entity.EntityDamageEvent.*
 import org.bukkit.projectiles.BlockProjectileSource
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 
 object DamageManager {
     fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
@@ -112,7 +109,7 @@ object DamageManager {
             }
 
             is LivingEntity -> {
-                EntityDefenseMetadata(EntityAttributeAccessor.getAttributeMap(damagee))
+                EntityDefenseMetadata(EntityAttributeMapAccess.get(damagee))
             }
 
             else -> {
@@ -247,7 +244,7 @@ fun LivingEntity.hurt(customDamageMetadata: CustomDamageMetadata, source: Living
         }
 
         else -> {
-            EntityDefenseMetadata(EntityAttributeAccessor.getAttributeMap(damagee))
+            EntityDefenseMetadata(EntityAttributeMapAccess.get(damagee))
         }
     }
     val finalDamage = customDamageMetadata.damageBundle.packets().sumOf {

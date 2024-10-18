@@ -283,8 +283,8 @@ object AttributeCommands : CommandFactory<CommandSender> {
 
     private inline fun getAttributeMap(entity: Entity, default: () -> AttributeMap): AttributeMap {
         return when (entity) {
-            is Player -> PlayerAttributeAccessor.getAttributeMap(entity)
-            is LivingEntity -> EntityAttributeAccessor.getAttributeMap(entity)
+            is Player -> PlayerAttributeMapAccess.get(entity)
+            is LivingEntity -> EntityAttributeMapAccess.get(entity)
             else -> default()
         }
     }

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
 import net.kyori.adventure.key.Key
-import org.jetbrains.annotations.ApiStatus
 
 /**
  * 代表一个从 [属性类型][Attribute] 到 [属性实例][AttributeInstance] 的映射.
@@ -75,14 +74,13 @@ interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable, Iterable<Ma
     fun getInstance(attribute: Attribute): AttributeInstance?
 
     /**
-     * 将指定 [attribute] 注册到该容器. 这将覆盖任何已存在的实例.
+     * 注册指定 [attribute]. 这将覆盖任何已存在的 [AttributeInstance].
      */
-    @ApiStatus.Internal
-    fun register(attribute: Attribute)
+    fun registerInstance(attribute: Attribute)
 }
 
 /**
- * 代表一个不可变的 [AttributeMapLike], 不支持任何写入.
+ * 代表一个虚拟的 [AttributeMapLike], 不支持任何写入.
  */
 interface ImaginaryAttributeMap : AttributeMapLike, AttributeMapSnapshotable {
     /**

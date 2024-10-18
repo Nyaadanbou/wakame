@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.attribute.composite
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -304,7 +304,8 @@ private fun CompoundTag.readElement(): Element {
 }
 
 private fun CompoundTag.readOperation(): Operation {
-    return Operation.byIdOrThrow(this.getInt(AttributeBinaryKeys.OPERATION_TYPE))
+    val id = this.getInt(AttributeBinaryKeys.OPERATION_TYPE)
+    return Operation.byId(id) ?: error("Can't find operation with id '$id'")
 }
 
 private fun CompoundTag.readNumber(key: String): Double {

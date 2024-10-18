@@ -5,20 +5,14 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.intellij.lang.annotations.Pattern
 import java.util.stream.Stream
-
-fun Attribute(descriptionId: String, defaultValue: Double, vanilla: Boolean = false): Attribute {
-    return AttributeImpl(descriptionId, defaultValue, vanilla)
-}
 
 /**
  * An attribute type with a numerical default value.
@@ -29,7 +23,7 @@ fun Attribute(descriptionId: String, defaultValue: Double, vanilla: Boolean = fa
  * are generally used as conceptual types. Instead, use the singleton [Attributes]
  * to get the instances. The same also applies to its subtypes.
  *
- * @property facadeId
+ * @property compositeId
  * @property descriptionId 属性的唯一标识
  * @property defaultValue 属性的默认数值 (非 [Provider])
  * @property vanilla 属性是否由原版属性实现
@@ -37,16 +31,31 @@ fun Attribute(descriptionId: String, defaultValue: Double, vanilla: Boolean = fa
  * @see RangedAttribute
  * @see ElementAttribute
  */
-open class AttributeImpl
+open class SimpleAttribute
 /**
  * @param defaultValue 属性的默认数值 ([Provider])
  */
 protected constructor(
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) final override val facadeId: String,
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) final override val descriptionId: String,
+    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING)
+    final override val compositeId: String,
+    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING)
+    final override val descriptionId: String,
     defaultValue: Provider<Double>,
-    override val vanilla: Boolean = false,
+    final override val vanilla: Boolean = false,
 ) : Examinable, Attribute {
+
+    // 需要注意 (kotlin 委托基础)
+    // 当一个 property 将值委托给 provider 时，其返回的是 provider 的值，而不是 provider
+    // 也就是说，从 defaultValue 拿到的值它是常量，是不会自动更新的
+    // 或者，你也可以简单的理解成因为 double 是常量，所以不会自动更新
+    //
+    // 所以说，当你想要 AttributeInstance#getBaseValue 的值能自动更新，
+    // 你应该直接返回 Attribute#defaultValue 的值，而不是赋值给其他 val 然后返回那个 val
+    // 这也意味着，我们也不需要再写一个 defaultValueProvider 的 property
+    //
+    // 这里说的同样也适用于该文件其他用到 `by` 的地方
+    final override val defaultValue: Double by defaultValue
+
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
@@ -60,7 +69,7 @@ protected constructor(
         defaultValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = facadeId,
+        compositeId = facadeId,
         descriptionId = descriptionId,
         defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
         vanilla = vanilla
@@ -77,23 +86,11 @@ protected constructor(
         vanilla = vanilla,
     )
 
-    // 需要注意 (kotlin 委托基础)
-    // 当一个 property 将值委托给 provider 时，其返回的是 provider 的值，而不是 provider
-    // 也就是说，从 defaultValue 拿到的值它是常量，是不会自动更新的
-    // 或者，你也可以简单的理解成因为 double 是常量，所以不会自动更新
-    //
-    // 所以说，当你想要 AttributeInstance#getBaseValue 的值能自动更新，
-    // 你应该直接返回 Attribute#defaultValue 的值，而不是赋值给其他 val 然后返回那个 val
-    // 这也意味着，我们也不需要再写一个 defaultValueProvider 的 property
-    //
-    // 这里说的同样也适用于该文件其他用到 `by` 的地方
-    final override val defaultValue: Double by defaultValue
-
     override fun sanitizeValue(value: Double): Double {
         return value
     }
 
-    override val key: Key = Key(Namespaces.ATTRIBUTE, descriptionId)
+    override val key: Key = Key.key(Namespaces.ATTRIBUTE, descriptionId)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
@@ -138,7 +135,7 @@ protected constructor(
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
     vanilla: Boolean = false,
-) : AttributeImpl(facadeId, descriptionId, defaultValue, vanilla) {
+) : SimpleAttribute(facadeId, descriptionId, defaultValue, vanilla) {
     val minValue: Double by minValue
     val maxValue: Double by maxValue
 
@@ -217,7 +214,7 @@ protected constructor(
     }
 
     override fun hashCode(): Int {
-        var result = descriptionId.hashCode()
+        val result = descriptionId.hashCode()
         // result = (31 * result) + element.hashCode()
         return result
     }
@@ -304,7 +301,7 @@ protected constructor(
     }
 
     override fun hashCode(): Int {
-        var result = descriptionId.hashCode()
+        val result = descriptionId.hashCode()
         // result = (31 * result) + element.hashCode()
         return result
     }

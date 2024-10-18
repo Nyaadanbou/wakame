@@ -394,18 +394,19 @@ private class VanillaAttributeInstance(
         return handle.getModifier(modifier.id) != null
     }
 
+    // 开发日记 2024/10/18
+    // 选择 addModifier 还是 addTransientModifier?
+    //
+    // 如果玩家手持 wakame 物品, 并且 wakame 物品上有增加最大生命值的属性 (原版属性),
+    // 那么当玩家先离线, 然后再上线, 后台会抛异常: “Modifier is already applied on this attribute!”
+    // 这是因为玩家下线时, 并不会触发移除物品属性的逻辑, 导致属性被永久保存到 NBT 了.
+    // 解决办法: addTransientModifier
+    //
+    // 如果不是玩家, 直接添加永久 modifier 即可.
+    // 这样, 生物的原版属性将由原版来应用和持久化.
+
     override fun addModifier(modifier: AttributeModifier) {
-        if (forPlayer) {
-            // 如果玩家手持 wakame 物品, 并且 wakame 物品上有增加最大生命值的属性 (原版属性),
-            // 那么当玩家先离线, 然后再上线, 后台会抛异常: “Modifier is already applied on this attribute!”
-            // 这是因为玩家下线时, 并不会触发移除物品属性的逻辑, 导致属性被永久保存到 NBT 了.
-            // 解决办法: addTransientModifier
-            handle.addTransientModifier(modifier.toBukkit())
-        } else {
-            // 如果不是玩家, 直接添加永久的 modifier 即可
-            // 这样, 生物原版属性不由 wakame 应用, 通过原版的系统来应用.
-            handle.addModifier(modifier.toBukkit())
-        }
+        handle.addModifier(modifier.toBukkit())
     }
 
     override fun addTransientModifier(modifier: AttributeModifier) {
@@ -424,14 +425,14 @@ private class VanillaAttributeInstance(
         handle.modifiers.forEach { removeModifier(it.key()) }
     }
 
-    override fun replaceBaseValue(other: AttributeInstance) {
-        handle.baseValue = other.getBaseValue()
-    }
-
     override fun replace(other: AttributeInstance) {
         setBaseValue(other.getBaseValue())
         this.getModifiers().forEach { removeModifier(it) }
         other.getModifiers().forEach { addTransientModifier(it) }
+    }
+
+    override fun replaceBaseValue(other: AttributeInstance) {
+        setBaseValue(other.getBaseValue())
     }
 }
 
@@ -496,6 +497,6 @@ private class AttributeInstanceSnapshotImpl(
     override fun removeModifiers() =
         delegation.removeModifiers()
 
-    override fun toIntangible(): ImaginaryAttributeInstance =
+    override fun toImaginary(): ImaginaryAttributeInstance =
         ImaginaryAttributeInstanceImpl(delegation.copy())
 }

@@ -55,7 +55,7 @@ internal constructor(
         val product = AttributeInstanceFactory.createDataInstance(type)
         product.replaceBaseValue(prototype)
         val snapshot = product.getSnapshot() // 创建快照
-        return snapshot.toIntangible() // 转为不可变
+        return snapshot.toImaginary() // 转为不可变
     }
 
     /**

@@ -653,7 +653,7 @@ private class RangedElementAttributeBinderImpl(
 
 
 private fun ConfigurationNode.getOperation(): Operation {
-    return node("operation").string?.let { Operation.byKeyOrThrow(it) } ?: Operation.ADD
+    return node("operation").string?.let { Operation.byName(it) } ?: Operation.ADD
 }
 
 private fun ConfigurationNode.getElement(): Element {

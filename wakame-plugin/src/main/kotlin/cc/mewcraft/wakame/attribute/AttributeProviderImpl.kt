@@ -3,32 +3,22 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.registry.ElementRegistry
 
 internal class AttributeProviderImpl : AttributeProvider {
+    override val descriptionIds: Set<String>
+        get() = Attributes.descriptionIds
+
     override fun getBy(descriptionId: String): Attribute? {
-        val simpleAttribute =  Attributes.getBy(descriptionId)
+        val simpleAttribute = Attributes.getBy(descriptionId)
         if (simpleAttribute != null) {
             return simpleAttribute
         }
 
-        for (element in ElementRegistry.INSTANCES.values) {
-            val elementAttributes = Attributes.element(element)
-            val attribute = elementAttributes.getBy(descriptionId)
-            if (attribute != null) {
-                return attribute
+        for ((_, element) in ElementRegistry.INSTANCES) {
+            val elementAttribute = Attributes.element(element).getBy(descriptionId)
+            if (elementAttribute != null) {
+                return elementAttribute
             }
         }
 
         return null
-    }
-
-    override fun allDescriptionId(): List<String> {
-        val simpleAttributeIds = Attributes.allDescriptionId().toMutableList()
-        for (element in ElementRegistry.INSTANCES.values) {
-            simpleAttributeIds.addAll(Attributes.element(element).allDescriptionId())
-        }
-        return simpleAttributeIds
-    }
-
-    override fun empty(): Attribute {
-        return Attributes.EMPTY
     }
 }

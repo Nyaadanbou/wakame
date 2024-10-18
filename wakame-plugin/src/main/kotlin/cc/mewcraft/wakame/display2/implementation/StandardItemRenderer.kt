@@ -393,7 +393,7 @@ internal data class AttributeCoreTextMeta(
         val elementIndex: List<String>,
     ) {
         init { // validate values
-            this.operationIndex.forEach { Operation.byKey(it) ?: error("'$it' is not a valid operation, check your renderer config") }
+            this.operationIndex.forEach { Operation.byName(it) ?: error("'$it' is not a valid operation, check your renderer config") }
             this.elementIndex.forEach { ElementRegistry.INSTANCES.find(it) ?: error("'$it' is not a valid element, check your renderer config") }
         }
     }

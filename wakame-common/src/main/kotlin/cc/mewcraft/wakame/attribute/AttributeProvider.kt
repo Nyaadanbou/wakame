@@ -1,21 +1,16 @@
 package cc.mewcraft.wakame.attribute
 
 /**
- * The interface for providing attributes.
+ * The interface for getting instances of [Attribute].
  */
 interface AttributeProvider {
     /**
-     * Returns an attribute by the description ID.
+     * 返回所有已知的 [Attribute.descriptionId] (包括元素属性的).
+     */
+    val descriptionIds: Set<String>
+
+    /**
+     * 返回一个 [descriptionId] 对应的 [Attribute] 实例.
      */
     fun getBy(descriptionId: String): Attribute?
-
-    /**
-     * Returns all description IDs.
-     */
-    fun allDescriptionId(): List<String>
-
-    /**
-     * Returns an empty attribute.
-     */
-    fun empty(): Attribute
 }

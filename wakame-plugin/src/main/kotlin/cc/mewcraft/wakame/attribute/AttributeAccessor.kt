@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.user.PlayerAdapter
-import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.UserManager
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -10,16 +8,12 @@ import org.koin.core.component.inject
 
 /**
  * Provides the access to the [AttributeMap] of all (online) players.
- *
- * To get the [AttributeMap] of a player, it's recommended using the
- * [PlayerAdapter] (instead of [PlayerAttributeAccessor]) to get the [User]
- * instance, from which you can get the [AttributeMap] for that player.
  */
-data object PlayerAttributeAccessor : KoinComponent, AttributeAccessor<Player> {
+data object PlayerAttributeMapAccess : KoinComponent, AttributeMapAccess<Player> {
     private val userManager: UserManager<Player> by inject()
 
-    override fun getAttributeMap(subject: Player): AttributeMap {
-        // the implementation simply redirect calls to the UserManager
+    override fun get(subject: Player): AttributeMap {
+        // 该实现仅仅把对函数的调用转发到对应的 User 实例之下
         return userManager.getPlayer(subject).attributeMap
     }
 }
@@ -27,8 +21,8 @@ data object PlayerAttributeAccessor : KoinComponent, AttributeAccessor<Player> {
 /**
  * Provides the access to [AttributeMap] of all non-player entities.
  */
-data object EntityAttributeAccessor : AttributeAccessor<LivingEntity> {
-    override fun getAttributeMap(subject: LivingEntity): AttributeMap {
+data object EntityAttributeMapAccess : AttributeMapAccess<LivingEntity> {
+    override fun get(subject: LivingEntity): AttributeMap {
         return AttributeMap(subject)
     }
 }
