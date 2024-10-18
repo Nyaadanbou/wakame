@@ -6,18 +6,16 @@ import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import it.unimi.dsi.fastutil.objects.*
+import me.lucko.helper.terminable.Terminable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.BinaryTagTypes
 import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.util.Codec
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attributable
-import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
+import org.bukkit.entity.*
 import org.bukkit.event.*
 import org.bukkit.event.entity.CreatureSpawnEvent
-import org.bukkit.event.server.PluginDisableEvent
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
 import org.bukkit.persistence.*
@@ -143,8 +141,12 @@ internal object AttributeMapPatchAccess {
     }
 }
 
-internal class AttributeMapPatchListener : Listener, KoinComponent {
+internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
     private val entityKeyLookup: EntityKeyLookup by inject()
+
+    init {
+        this.bindWith(AttributeMapPatchSupport.plugin)
+    }
 
     // 当实体加载时, 读取 PDC 中的 AttributeMapPatch
     @EventHandler(priority = EventPriority.LOWEST)
@@ -175,11 +177,8 @@ internal class AttributeMapPatchListener : Listener, KoinComponent {
         e.entities.forEach(::entityUnloaded)
     }
 
-    @EventHandler
-    fun on(e: PluginDisableEvent) {
-        if (e.plugin != AttributeMapPatchSupport.plugin)
-            return
-        e.plugin.server.worlds.flatMap { it.entities }.forEach(::entityUnloaded)
+    override fun close() {
+        AttributeMapPatchSupport.plugin.server.worlds.flatMap { it.entities }.forEach(::entityUnloaded)
     }
 
     private fun entityUnloaded(entity: Entity) {
