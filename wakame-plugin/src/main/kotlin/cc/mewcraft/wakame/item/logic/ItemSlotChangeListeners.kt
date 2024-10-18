@@ -91,18 +91,18 @@ internal object AttributeItemSlotChangeListener : ItemSlotChangeListener() {
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyAttributeMap(player, nekoStack) { instance, modifier -> instance.removeModifier(modifier) }
+        modifyAttributeMap(player, slot, nekoStack) { instance, modifier -> instance.removeModifier(modifier) }
     }
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyAttributeMap(player, nekoStack) { instance, modifier -> instance.addModifier(modifier) }
+        modifyAttributeMap(player, slot, nekoStack) { instance, modifier -> instance.addModifier(modifier) }
     }
 
-    private fun modifyAttributeMap(player: Player, nekoStack: NekoStack?, update: (AttributeInstance, AttributeModifier) -> Unit) {
+    private fun modifyAttributeMap(player: Player, slot: ItemSlot, nekoStack: NekoStack?, update: (AttributeInstance, AttributeModifier) -> Unit) {
         if (nekoStack == null)
             return
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return
-        val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, slot)
         val attributeMap = player.toUser().attributeMap
         attributeModifiers.forEach { type, modifier ->
             attributeMap.getInstance(type)?.let { instance -> update(instance, modifier) }
@@ -239,7 +239,8 @@ internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
 
     private fun NekoStack.getSkills(): Multimap<Trigger, Skill>? {
         val cells = components.get(ItemComponentTypes.CELLS) ?: return null
-        val skills = cells.collectSkillInstances(this, ignoreVariant = true)
+        // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
+        val skills = cells.collectSkillModifiers(this, ItemSlot.imaginary())
         return skills
     }
 }

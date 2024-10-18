@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.skill
 
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.toNekoStack
-import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.state.SkillStateResult
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
@@ -98,7 +97,8 @@ class SkillEventHandler(
             is AbstractArrow -> {
                 val nekoStack = projectile.itemStack.tryNekoStack ?: return
                 val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return
-                val skills = cells.collectSkillInstances(nekoStack)
+                // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
+                val skills = cells.collectSkillModifiers(nekoStack, ItemSlot.imaginary())
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
                 val context = SkillContext(CasterAdapter.adapt(projectile), target, nekoStack)
                 skills.values().map { it.cast(context) }.forEach { ticker.schedule(it) }

@@ -2,8 +2,7 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.skill.ConfiguredSkill
@@ -100,12 +99,12 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
     /**
      * 获取所有词条栏上的 [AttributeModifier].
      */
-    fun collectAttributeModifiers(context: NekoStack): Multimap<Attribute, AttributeModifier>
+    fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier>
 
     /**
      * 获取所有词条栏上的 [ConfiguredSkill].
      */
-    fun collectSkillInstances(context: NekoStack, ignoreVariant: Boolean = false): Multimap<Trigger, Skill>
+    fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Multimap<Trigger, Skill>
 
     /**
      * 忽略数值的前提下, 判断是否包含指定的核心.
@@ -204,22 +203,19 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             }
         }
 
-        override fun collectAttributeModifiers(context: NekoStack): Multimap<Attribute, AttributeModifier> {
+        override fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier> {
             val ret = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
             for ((id, cell) in this) {
                 val core = cell.getCoreAs(CoreType.ATTRIBUTE) ?: continue
                 val attribute = core.attribute
-
-                // 拼接物品 key 和词条栏 id 作为属性修饰符的 id
-                val identity = context.id.value { "$it/$id" }
-
-                val attributeModifiers = attribute.provideAttributeModifiers(identity)
+                val sourceId = context.id.value { value -> "$value/${slot.slotIndex}/$id" }
+                val attributeModifiers = attribute.provideAttributeModifiers(sourceId)
                 ret.putAll(attributeModifiers.entries)
             }
             return ret.build()
         }
 
-        override fun collectSkillInstances(context: NekoStack, ignoreVariant: Boolean): Multimap<Trigger, Skill> {
+        override fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Multimap<Trigger, Skill> {
             val ret = ImmutableListMultimap.builder<Trigger, Skill>()
             for ((_, cell) in this) {
                 val core = cell.getCoreAs(CoreType.SKILL) ?: continue
@@ -227,7 +223,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
 
                 val skillVariant = skill.variant
                 val skillInstance = skill.instance
-                if (ignoreVariant || skillVariant == TriggerVariant.any()) {
+                if (skillVariant == TriggerVariant.any()) {
                     ret.put(skill.trigger, skillInstance)
                     continue
                 }

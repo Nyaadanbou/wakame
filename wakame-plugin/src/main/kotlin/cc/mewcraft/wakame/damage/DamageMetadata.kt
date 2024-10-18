@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
@@ -203,7 +204,7 @@ private constructor(
     }
 
     private fun buildDamageBundle(): DamageBundle {
-        val userAttributeMap = user.attributeMap
+        val playerAttributeMap = user.attributeMap
         val itemStack = projectile.itemStack
         // 如果玩家射出的箭矢
         // 不是 NekoStack, 则为原版箭矢
@@ -218,8 +219,8 @@ private constructor(
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return buildDefaultBowArrowDamageBundle()
 
         // 获取属性映射的快照, 将箭矢的属性加上
-        val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
-        val attributeMapSnapshot = userAttributeMap.getSnapshot()
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
+        val attributeMapSnapshot = playerAttributeMap.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
         }
@@ -302,13 +303,13 @@ class EntityProjectileDamageMetadata(
  * 如: 箭矢落地后再次命中, 发射器发射的箭矢命中.
  */
 class DefaultArrowDamageMetadata private constructor(
-    attributeMap: IntangibleAttributeMap,
+    imaginaryAttributeMap: IntangibleAttributeMap,
     override val projectile: AbstractArrow,
 ) : ProjectileDamageMetadata {
     constructor(attributeMap: IntangibleAttributeMap, arrow: Arrow) : this(attributeMap, arrow as AbstractArrow)
     constructor(attributeMap: IntangibleAttributeMap, arrow: SpectralArrow) : this(attributeMap, arrow as AbstractArrow)
 
-    override val damageBundle: DamageBundle = buildDamageBundle(attributeMap)
+    override val damageBundle: DamageBundle = buildDamageBundle(imaginaryAttributeMap)
     override val damageValue: Double = damageBundle.damageSum
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
@@ -325,7 +326,7 @@ class DefaultArrowDamageMetadata private constructor(
         }
     }
 
-    private fun buildDamageBundle(attributeMap: IntangibleAttributeMap): DamageBundle {
+    private fun buildDamageBundle(imaginaryAttributeMap: IntangibleAttributeMap): DamageBundle {
         val itemStack = projectile.itemStack
 
         // 不是 NekoStack, 则为原版箭矢
@@ -340,8 +341,8 @@ class DefaultArrowDamageMetadata private constructor(
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return defaultArrowDamageBundle()
 
         // 获取无形属性映射的快照, 将箭矢的属性加上
-        val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
-        val attributeMapSnapshot = attributeMap.getSnapshot()
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
+        val attributeMapSnapshot = imaginaryAttributeMap.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
         }
@@ -360,10 +361,10 @@ class DefaultArrowDamageMetadata private constructor(
  * 如: 三叉戟落地后再次命中(原版无此特性).
  */
 class DefaultTridentDamageMetadata(
-    attributeMap: IntangibleAttributeMap,
+    imaginaryAttributeMap: IntangibleAttributeMap,
     override val projectile: Trident,
 ) : ProjectileDamageMetadata {
-    override val damageBundle: DamageBundle = buildDamageBundle(attributeMap)
+    override val damageBundle: DamageBundle = buildDamageBundle(imaginaryAttributeMap)
     override val damageValue: Double = damageBundle.damageSum
     override val criticalPower: Double = 1.0
     override val isCritical: Boolean = false
@@ -390,7 +391,7 @@ class DefaultTridentDamageMetadata(
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return defaultTridentDamageBundle()
 
         // 获取无形属性映射的快照, 将三叉戟的属性加上
-        val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
         val attributeMapSnapshot = intangibleAttributeMap.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
