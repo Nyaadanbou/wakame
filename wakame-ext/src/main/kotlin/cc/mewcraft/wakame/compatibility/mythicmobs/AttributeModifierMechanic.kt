@@ -29,7 +29,7 @@ class AttributeModifierMechanic(
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
     private val name: PlaceholderString = mlc.getPlaceholderString(arrayOf("name"), null, *emptyArray())
         ?: throw IllegalArgumentException("Invalid attribute modifier name from line: $line")
-    private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount"), .0, *emptyArray())
+    private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), .0, *emptyArray())
     private val operation: AttributeModifier.Operation = mlc.getEnum(arrayOf("operation", "op"), AttributeModifier.Operation::class.java, AttributeModifier.Operation.ADD)
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration"), 0, *emptyArray())
 
