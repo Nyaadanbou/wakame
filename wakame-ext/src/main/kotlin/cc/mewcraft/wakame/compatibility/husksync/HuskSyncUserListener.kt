@@ -16,7 +16,7 @@ class HuskSyncUserListener : UserListener, KoinComponent {
     private fun onDataSave(e: BukkitDataSaveEvent) {
         val player = (e.user as? BukkitUser)?.player ?: return
         for (executor in saveLoadExecutors) {
-            executor.loadFrom(player.persistentDataContainer)
+            executor.saveTo(player)
         }
     }
 
@@ -26,15 +26,15 @@ class HuskSyncUserListener : UserListener, KoinComponent {
         val player = (e.user as? BukkitUser)?.player ?: return
 
         for (executor in saveLoadExecutors) {
-            executor.saveTo(player.persistentDataContainer)
+            executor.loadFrom(player)
         }
     }
 
-    override fun registerUserPersistentDataAccessor(executor: SaveLoadExecutor) {
+    override fun registerSaveLoadExecutor(executor: SaveLoadExecutor) {
         saveLoadExecutors.add(executor)
     }
 
-    override fun unregisterUserPersistentDataAccessor(executor: SaveLoadExecutor) {
+    override fun unregisterSaveLoadExecutor(executor: SaveLoadExecutor) {
         saveLoadExecutors.remove(executor)
     }
 }

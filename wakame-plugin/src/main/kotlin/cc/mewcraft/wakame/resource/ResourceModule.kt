@@ -7,4 +7,5 @@ import org.koin.dsl.module
 
 internal fun resourceModule() = module {
     singleOf(::ResourceTicker) bind Initializable::class
+    single { ResourceStoreManager } bind Initializable::class
 }

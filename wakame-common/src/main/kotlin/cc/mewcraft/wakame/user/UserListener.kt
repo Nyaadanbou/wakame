@@ -6,10 +6,10 @@ interface UserListener : Listener {
     /**
      * Register the [SaveLoadExecutor] to the [UserListener].
      */
-    fun registerUserPersistentDataAccessor(executor: SaveLoadExecutor)
+    fun registerSaveLoadExecutor(executor: SaveLoadExecutor)
 
     /**
      * Unregister the [SaveLoadExecutor] from the [UserListener].
      */
-    fun unregisterUserPersistentDataAccessor(executor: SaveLoadExecutor)
+    fun unregisterSaveLoadExecutor(executor: SaveLoadExecutor)
 }

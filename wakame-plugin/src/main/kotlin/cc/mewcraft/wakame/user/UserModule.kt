@@ -9,13 +9,13 @@ import org.koin.dsl.module
 
 internal fun userModule(): Module = module {
     single<PlayerAdapter<Player>> { PaperPlayerAdapter() } binds arrayOf(PaperPlayerAdapter::class)
-    single<UserManager<Player>> { PaperUserManager() }
+    single<UserManager<Player>> { PaperUserManager() } binds arrayOf(PaperUserManager::class)
 
     single<UserListener> {
         if (get<WakamePlugin>().isPluginPresent("HuskSync")) {
-            get<HuskSyncUserListener>()
+            HuskSyncUserListener()
         } else {
-            get<PaperUserListener>()
+            PaperUserListener()
         }
     }
 }

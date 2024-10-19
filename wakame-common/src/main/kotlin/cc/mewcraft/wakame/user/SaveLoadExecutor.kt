@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.user
 
-import io.papermc.paper.persistence.PersistentDataContainerView
-import org.bukkit.persistence.PersistentDataContainer
+import org.bukkit.entity.Player
 
 interface SaveLoadExecutor {
-    fun saveTo(pdc: PersistentDataContainer)
-    fun loadFrom(pdc: PersistentDataContainerView)
+    fun saveTo(player: Player)
+    fun loadFrom(player: Player)
 }

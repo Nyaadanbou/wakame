@@ -16,25 +16,25 @@ class PaperUserListener : UserListener, KoinComponent {
     private fun onQuit(e: PlayerQuitEvent) {
         val player = e.player
         for (executor in saveLoadExecutors) {
-            executor.loadFrom(player.persistentDataContainer)
+            executor.saveTo(player)
         }
     }
 
     @EventHandler
-    private fun onJoin(e: PlayerJoinEvent) {
+    private fun onSlotChange(e: PlayerJoinEvent) {
         // create user data for the player
         val player = e.player
 
         for (executor in saveLoadExecutors) {
-            executor.saveTo(player.persistentDataContainer)
+            executor.loadFrom(player)
         }
     }
 
-    override fun registerUserPersistentDataAccessor(executor: SaveLoadExecutor) {
+    override fun registerSaveLoadExecutor(executor: SaveLoadExecutor) {
         saveLoadExecutors.add(executor)
     }
 
-    override fun unregisterUserPersistentDataAccessor(executor: SaveLoadExecutor) {
+    override fun unregisterSaveLoadExecutor(executor: SaveLoadExecutor) {
         saveLoadExecutors.remove(executor)
     }
 }
