@@ -16,21 +16,25 @@ import cc.mewcraft.wakame.registry.RarityRegistry
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 
 /**
  * 封装了一个标准的, 独立的, 重造流程.
  */
-internal class ReforgeOperation(
+internal class ReforgeOperation
+private constructor(
     private val session: RerollingSession,
-) : KoinComponent {
+) {
 
-    companion object {
+    companion object : KoinComponent {
         private const val PREFIX = ReforgeLoggerPrefix.REROLL
-    }
+        private val LOGGER = get<Logger>()
 
-    private val logger: Logger by inject()
+        operator fun invoke(session: RerollingSession): RerollingSession.Result {
+            return ReforgeOperation(session).execute()
+        }
+    }
 
     /**
      * 要被重造的物品; 我们将原地对该实例进行修改.
@@ -40,9 +44,9 @@ internal class ReforgeOperation(
     /**
      * 基于 [session] 和 [sourceItem] 执行一次重造流程, 并返回一个 [RerollingSession.Result].
      */
-    fun execute(): RerollingSession.Result {
+    private fun execute(): RerollingSession.Result {
         if (session.frozen) {
-            logger.error("$PREFIX Trying to refresh output in a frozen session. This is a bug!")
+            LOGGER.error("$PREFIX Trying to refresh output in a frozen session. This is a bug!")
             return Result.error()
         }
 
@@ -67,7 +71,7 @@ internal class ReforgeOperation(
 
         // 获取必要的物品组件
         val itemId = sourceItem.id
-        val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: return Result.failure("<gray>物品不可重造".mini)
+        val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level ?: return Result.failure("<gray>物品不可重造".mini)
         val itemCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return Result.failure("<gray>物品不可重造".mini)
 
         // 获取可有可无的物品组件
@@ -86,7 +90,7 @@ internal class ReforgeOperation(
                 itemCells
             )
         } catch (e: Exception) { // 有必要 try-catch?
-            logger.error("$PREFIX Unexpected error while preparing generation context", e)
+            LOGGER.error("$PREFIX Unexpected error while preparing generation context", e)
             return Result.error()
         }
 
@@ -150,26 +154,21 @@ internal class ReforgeOperation(
 
         // 然后再把*可由玩家改变的信息*全部写入上下文
         itemCells
-            .filter2 { cell ->
-                // 注意, 我们必须跳过玩家选择要重造的词条栏.
-                // 如果不跳过, 那么新的词条栏将无法被正确生成.
-                // 这是因为截止至 2024/8/20, 我们的设计不允许
-                // 相似的核心出现在同一个物品上.
-                selectionMap[cell.getId()]?.selected == false
-            }
+            // 注意, 我们必须跳过玩家选择要重造的词条栏.
+            // 如果不跳过, 那么新的词条栏将无法被正确生成.
+            // 这是因为截止至 2024/8/20, 我们的设计不允许
+            // 相似的核心出现在同一个物品上.
+            .filter2 { cell -> selectionMap[cell.getId()]?.selected == false }
             .forEach { (_, cell) ->
                 when (
                     val core = cell.getCore()
                 ) {
                     is SkillCore -> {
-                        val skillId = core.id
-                        context.skills += SkillContextData(skillId)
+                        context.skills += SkillContextData(id = core.id)
                     }
 
                     is AttributeCore -> {
-                        val attributeId = core.id.value()
-                        val attribute = core.attribute
-                        context.attributes += AttributeContextData(attributeId, attribute.operation, attribute.element)
+                        context.attributes += AttributeContextData(id = core.id.value(), operation = core.attribute.operation, element = core.attribute.element)
                     }
                 }
             }

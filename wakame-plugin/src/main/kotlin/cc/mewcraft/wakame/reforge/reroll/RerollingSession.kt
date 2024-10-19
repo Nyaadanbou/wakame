@@ -205,6 +205,7 @@ interface RerollingSession : Examinable {
         val size: Int
         val keys: Set<String>
         val values: Collection<Selection>
+
         val isEmpty: Boolean
 
         operator fun get(id: String): Selection?

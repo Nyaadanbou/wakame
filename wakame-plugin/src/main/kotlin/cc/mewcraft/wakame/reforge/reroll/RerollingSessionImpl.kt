@@ -62,7 +62,7 @@ class SimpleRerollingSession(
 
     private fun executeReforge0(): RerollingSession.Result {
         val result = try {
-            ReforgeOperation(this).execute()
+            ReforgeOperation(this)
         } catch (e: Exception) {
             logger.error("$PREFIX An unknown error occurred while rerolling an item", e)
             Result.error()
@@ -83,10 +83,9 @@ class SimpleRerollingSession(
     }
 
     override fun getAllPlayerInputs(): Collection<ItemStack> {
-        val items = buildList<ItemStack> {
-            sourceItem?.let { add(it.itemStack) }
+        return buildList {
+            sourceItem?.itemStack?.let(::add)
         }
-        return items
     }
 
     override fun getUnusedPlayerInputs(): Collection<ItemStack> {
@@ -232,7 +231,7 @@ internal object Cost {
      * 正常的花费; 当重造已经准备就绪时, 使用这个.
      */
     fun simple(
-        currencyAmount: Double
+        currencyAmount: Double,
     ): RerollingSession.Cost {
         return Simple(currencyAmount)
     }
@@ -370,18 +369,17 @@ internal object SelectionMap : KoinComponent {
     /**
      * 创建一个普通的 [SelectionMap].
      *
-     * 该函数会根据 [session] 的具体状态, 选择性的调用 [empty] 并返回.
+     * 该函数会根据 [session] 的具体状态, 选择性返回空的 [SelectionMap].
      */
     fun simple(session: RerollingSession): RerollingSession.SelectionMap {
         // 获取源物品
         // 如果源物品不存在, 则直接返回空容器
         val sourceItem = session.sourceItem ?: return empty(session)
-        val sourceItemId = sourceItem.id
 
         // 获取源物品的词条栏模板
         // 如果源物品没有词条栏*模板*, 则判定整个物品不支持重造
         val templates = sourceItem.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
-            LOGGER.info("$PREFIX Source item has no `cells` templates.")
+            LOGGER.info("$PREFIX Source item has no `cells` template.")
             return empty(session)
         }
 
@@ -391,7 +389,7 @@ internal object SelectionMap : KoinComponent {
 
         // 获取源物品的重造规则
         // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
-        val itemRule = session.table.itemRuleMap[sourceItemId] ?: return empty(session)
+        val itemRule = session.table.itemRuleMap[sourceItem.id] ?: return empty(session)
 
         val selectionMap = Simple(session)
         for ((id, cell) in cells) {
@@ -406,7 +404,7 @@ internal object SelectionMap : KoinComponent {
 
             val display = ItemStack(TemporaryIcons.get(cell.hashCode()))
             display.editMeta {
-                // TODO 使用新的渲染器生成文本
+                // TODO reforge2
                 val name = cell.getId().mini
                 val lore = listOf(cell.getCore().id.asString().mini)
                 it.itemName(name)
@@ -432,7 +430,7 @@ internal object SelectionMap : KoinComponent {
     private val LOGGER: Logger by inject()
 
     private class Empty(
-        override val session: RerollingSession
+        override val session: RerollingSession,
     ) : RerollingSession.SelectionMap {
         override val size: Int
             get() = 0
@@ -443,9 +441,15 @@ internal object SelectionMap : KoinComponent {
         override val isEmpty: Boolean
             get() = true
 
-        override fun get(id: String): RerollingSession.Selection? = null
-        override fun contains(id: String): Boolean = false
-        override fun iterator(): Iterator<Map.Entry<String, RerollingSession.Selection>> = emptyMap<String, RerollingSession.Selection>().iterator()
+        override fun get(id: String): RerollingSession.Selection? =
+            null
+
+        override fun contains(id: String): Boolean =
+            false
+
+        override fun iterator(): Iterator<Map.Entry<String, RerollingSession.Selection>> =
+            emptyMap<String, RerollingSession.Selection>().iterator()
+
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("session", session),
         )
@@ -456,36 +460,37 @@ internal object SelectionMap : KoinComponent {
     private class Simple(
         override val session: RerollingSession,
     ) : RerollingSession.SelectionMap, KoinComponent {
-        private val map: MutableMap<String, RerollingSession.Selection> = HashMap()
+        private val data: HashMap<String, RerollingSession.Selection> = HashMap()
 
         override val size: Int
-            get() = map.size
+            get() = data.size
         override val keys: Set<String>
-            get() = map.keys
+            get() = data.keys
         override val values: Collection<RerollingSession.Selection>
-            get() = map.values
+            get() = data.values
         override val isEmpty: Boolean
-            get() = map.isEmpty()
+            get() = data.isEmpty()
 
         override fun get(id: String): RerollingSession.Selection? {
-            return map[id]
+            return data[id]
         }
 
+        // exposed for implementation
         operator fun set(id: String, selection: RerollingSession.Selection) {
-            map[id] = selection
+            data[id] = selection
         }
 
         override fun contains(id: String): Boolean {
-            return map.containsKey(id)
+            return data.containsKey(id)
         }
 
         override fun iterator(): Iterator<Map.Entry<String, RerollingSession.Selection>> {
-            return map.iterator()
+            return data.iterator()
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("session", session),
-            ExaminableProperty.of("map", map),
+            ExaminableProperty.of("data", data),
         )
 
         override fun toString(): String = toSimpleString()

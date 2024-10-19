@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.initializer.Initializable
 /**
  * 重造台的注册表.
  */
-object RerollingTables : Initializable {
+object RerollingTableRegistry : Initializable {
     private val tables = HashMap<String, RerollingTable>()
 
     /**

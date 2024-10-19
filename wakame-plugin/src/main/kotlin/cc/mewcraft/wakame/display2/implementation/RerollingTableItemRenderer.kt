@@ -23,5 +23,6 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
     override fun render(item: NekoStack, context: RerollingTableContext?) {
         // TODO display2 RerollingTable
+        // Selection#display
     }
 }
