@@ -5,4 +5,6 @@ base: bedrock
 # 额外标签:
 # <rarity:name> 稀有度名字
 # <rarity:style> 稀有度样式
-custom_name: "<!i><rarity:style>Foo"
+custom_name:
+  plain: <!i>Foo
+  fancy: <!i><rarity:style>Foo

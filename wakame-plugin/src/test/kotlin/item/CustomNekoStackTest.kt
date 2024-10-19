@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.*
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
@@ -411,12 +412,13 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(it.raw, "<!i><rarity:style>Foo")
+            assertIs<TextComponent>(it)
+            assertEquals("Foo", it.content())
 
             val expectedStyle = Style.style(*common.styles)
-            val actualStyle = it.rich.style().edit {
+            val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
-                it.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
+                builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
             }
             assertEquals(expectedStyle, actualStyle)
         }
@@ -651,12 +653,13 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals("<rarity:style><rarity:name>Foo", it.raw)
+            assertIs<TextComponent>(it)
+            assertEquals("普通", it.content())
 
             val expectedStyle = Style.style(*common.styles)
-            val actualStyle = it.rich.style().edit {
+            val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
-                it.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
+                builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
             }
             assertEquals(expectedStyle, actualStyle)
         }
