@@ -31,7 +31,7 @@ class AttributeModifierMechanic(
         ?: throw IllegalArgumentException("Invalid attribute modifier name from line: $line")
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), .0, *emptyArray())
     private val operation: AttributeModifier.Operation = mlc.getEnum(arrayOf("operation", "op"), AttributeModifier.Operation::class.java, AttributeModifier.Operation.ADD)
-    private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration"), 0, *emptyArray())
+    private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *emptyArray())
 
     override fun cast(data: SkillMetadata): SkillResult {
         val targetEntity = data.caster.entity.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
