@@ -62,7 +62,7 @@ interface AttributeMapSnapshotable {
 /**
  * 代表一个标准的 [AttributeMapLike], 支持读/写.
  *
- * 该对象在实现上必须与一个主体绑定, 例如玩家,怪物等.
+ * 该对象在实现上必须与一个主体绑定, 例如玩家, 怪物等.
  * **任何对该对象的修改都应该实时反应到绑定的主体上!**
  */
 interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable, Iterable<Map.Entry<Attribute, AttributeInstance>> {
@@ -80,7 +80,9 @@ interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable, Iterable<Ma
 }
 
 /**
- * 代表一个虚拟的 [AttributeMapLike], 不支持任何写入.
+ * 代表一个虚拟的 [AttributeMapLike], 不支持写入.
+ *
+ * @see ImaginaryAttributeInstance
  */
 interface ImaginaryAttributeMap : AttributeMapLike, AttributeMapSnapshotable {
     /**

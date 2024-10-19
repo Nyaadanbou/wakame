@@ -249,16 +249,16 @@ class AttributeSupplierBuilder(
  *   minecraft:living:
  *     parent: ~
  *     values:
- *       <attribute_facade_id_1>: ~
- *       <attribute_facade_id_2>: ~
- *       <attribute_facade_id_3>:
+ *       <composite_attribute_id_1>: ~
+ *       <composite_attribute_id_2>: ~
+ *       <composite_attribute_id_3>:
  *         <element_id_1>: ~
  *         <element_id_2>: ~
  *   minecraft:mob:
  *     parent: minecraft:living
  *     values:
- *       <attribute_facade_id_4>: ~
- *       <attribute_facade_id_5>: ~
+ *       <composite_attribute_id_4>: ~
+ *       <composite_attribute_id_5>: ~
  * ```
  */
 internal class AttributeSupplierDeserializer(
@@ -308,7 +308,7 @@ internal class AttributeSupplierDeserializer(
 
         // Just an extension to reduce duplicates
         private fun AttributeSupplierBuilder.add(
-            /* all from the same facade */ attributes: Collection<Attribute>,
+            /* all from the composite attribute */ attributes: Collection<Attribute>,
             /* the node holding the value */ valueNode: ConfigurationNode,
         ): AttributeSupplierBuilder {
             for (attribute in attributes) {
@@ -338,8 +338,8 @@ internal class AttributeSupplierDeserializer(
             }
 
             // Put data into the builder
-            for ((facadeId, valueNode) in valuesMap) {
-                if (facadeId in Attributes.getElementAttributeNames()) {
+            for ((compositeId, valueNode) in valuesMap) {
+                if (compositeId in Attributes.getElementAttributeNames()) {
                     // it's a node for elemental attributes
 
                     if (valueNode.isMap) {
@@ -347,7 +347,7 @@ internal class AttributeSupplierDeserializer(
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            val attributes = Attributes.element(ElementRegistry.INSTANCES[elementId]).getCollectionBy(facadeId)
+                            val attributes = Attributes.element(ElementRegistry.INSTANCES[elementId]).getCollectionBy(compositeId)
                             builder.add(attributes, valueNodeInMap)
                         }
                     } else {
@@ -355,7 +355,7 @@ internal class AttributeSupplierDeserializer(
                         // the value node is used for every single element available in the system
 
                         for ((_, elementType) in ElementRegistry.INSTANCES) {
-                            val attributes = Attributes.element(elementType).getCollectionBy(facadeId)
+                            val attributes = Attributes.element(elementType).getCollectionBy(compositeId)
                             builder.add(attributes, valueNode)
                         }
                     }
@@ -363,7 +363,7 @@ internal class AttributeSupplierDeserializer(
                 } else {
                     // it's a node for any other attributes
 
-                    val attributes = Attributes.getCollectionBy(facadeId)
+                    val attributes = Attributes.getCollectionBy(compositeId)
                     builder.add(attributes, valueNode)
                 }
             }
@@ -381,14 +381,14 @@ internal class AttributeSupplierDeserializer(
      */
     private fun validateValuesMap(valuesMap: Map<String, ConfigurationNode>): Map<String, ConfigurationNode> {
         // This will validate two things:
-        // 1. The format of the facade id is correct
+        // 1. The format of the composite id is correct
         // 2. The config node has correct structure
-        for ((facadeId, valueNode) in valuesMap) {
-            if (!AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(facadeId)) {
-                error("The facade ID '$facadeId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")
+        for ((compositeId, valueNode) in valuesMap) {
+            if (!AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(compositeId)) {
+                error("The composite id '$compositeId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")
             }
-            if (facadeId in Attributes.getElementAttributeNames() && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
-                error("The attribute '$facadeId' has neither a map structure, nor a scalar value, nor a null")
+            if (compositeId in Attributes.getElementAttributeNames() && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
+                error("The attribute '$compositeId' has neither a map structure, nor a scalar value, nor a null")
             }
         }
 

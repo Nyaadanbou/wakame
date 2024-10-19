@@ -59,28 +59,27 @@ protected constructor(
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
-     * This constructor is used if the [facadeId] is different from the [descriptionId].
+     * This constructor is used if the [compositeId] is different from the [descriptionId].
      *
-     * @param facadeId the ID of the attribute facade to which this attribute is related
+     * @param compositeId the ID of the composite attribute to which this attribute is related
      */
     internal constructor(
-        facadeId: String,
+        compositeId: String,
         descriptionId: String,
         defaultValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        compositeId = facadeId,
+        compositeId = compositeId,
         descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
-        vanilla = vanilla
-    )
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", "default").orElse(defaultValue),
+        vanilla = vanilla    )
 
     internal constructor(
         descriptionId: String,
         defaultValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = descriptionId,
+        compositeId = descriptionId,
         descriptionId = descriptionId,
         defaultValue = defaultValue,
         vanilla = vanilla,
@@ -129,36 +128,36 @@ open class RangedAttribute
  * @param maxValue 该属性允许的最大数值（[Provider]）
  */
 protected constructor(
-    facadeId: String,
+    compositeId: String,
     descriptionId: String,
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
     vanilla: Boolean = false,
-) : SimpleAttribute(facadeId, descriptionId, defaultValue, vanilla) {
+) : SimpleAttribute(compositeId, descriptionId, defaultValue, vanilla) {
     val minValue: Double by minValue
     val maxValue: Double by maxValue
 
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
-     * This constructor is used if the [facadeId] is different from the [descriptionId].
+     * This constructor is used if the [compositeId] is different from the [descriptionId].
      *
-     * @param facadeId the ID of the attribute facade to which this attribute is related
+     * @param compositeId the ID of the composite attribute to which this attribute is related
      */
     internal constructor(
-        facadeId: String,
+        compositeId: String,
         descriptionId: String,
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = facadeId,
+        compositeId = compositeId,
         descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
-        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "min").orElse(minValue),
-        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "max").orElse(maxValue),
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", "default").orElse(defaultValue),
+        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", "min").orElse(minValue),
+        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", "max").orElse(maxValue),
         vanilla = vanilla
     )
 
@@ -169,7 +168,7 @@ protected constructor(
         maxValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = descriptionId,
+        compositeId = descriptionId,
         descriptionId = descriptionId,
         defaultValue = defaultValue,
         minValue = minValue,
@@ -225,7 +224,7 @@ protected constructor(
  */
 open class ElementAttribute
 protected constructor(
-    facadeId: String,
+    compositeId: String,
     descriptionId: String,
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
@@ -233,7 +232,7 @@ protected constructor(
     val element: Element,
     vanilla: Boolean = false,
 ) : RangedAttribute(
-    facadeId,
+    compositeId,
     descriptionId + "/" + element.uniqueId,
     defaultValue,
     minValue,
@@ -244,12 +243,12 @@ protected constructor(
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
-     * This constructor is used if the [facadeId] is different from the [descriptionId].
+     * This constructor is used if the [compositeId] is different from the [descriptionId].
      *
-     * @param facadeId the ID of the attribute facade to which this attribute is related
+     * @param compositeId the ID of the composite attribute to which this attribute is related
      */
     internal constructor(
-        facadeId: String,
+        compositeId: String,
         descriptionId: String,
         defaultValue: Double,
         minValue: Double,
@@ -257,11 +256,11 @@ protected constructor(
         element: Element,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = facadeId,
+        compositeId = compositeId,
         descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "default").orElse(defaultValue),
-        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "min").orElse(minValue),
-        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "max").orElse(maxValue),
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", element.uniqueId, "default").orElse(defaultValue),
+        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", element.uniqueId, "min").orElse(minValue),
+        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", element.uniqueId, "max").orElse(maxValue),
         element = element,
         vanilla = vanilla
     )
@@ -274,7 +273,7 @@ protected constructor(
         element: Element,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = descriptionId,
+        compositeId = descriptionId,
         descriptionId = descriptionId,
         defaultValue = defaultValue,
         minValue = minValue,

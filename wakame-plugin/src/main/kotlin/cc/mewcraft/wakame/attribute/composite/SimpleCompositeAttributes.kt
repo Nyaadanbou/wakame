@@ -292,7 +292,6 @@ internal data class ConstantCompositeAttributeRE(
     )
 }
 
-//<editor-fold desc="Convenient extension functions">
 // private const val NBT_TYPE_ID = "id"
 
 // private fun CompoundTag.readType(): Key {

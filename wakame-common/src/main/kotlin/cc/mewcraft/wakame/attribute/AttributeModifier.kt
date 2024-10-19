@@ -4,8 +4,8 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap
 import net.kyori.adventure.key.Key
 
 /**
- * An [AttributeModifier] is responsible to modify an [Attribute]. By
- * design, all the instance creators of [AttributeModifier] must provide a
+ * An [AttributeModifier] is responsible to conceptually modify an [Attribute].
+ * By design, all the instance creators of [AttributeModifier] must provide a
  * [Key], which is then used to distinguish the "source" of the modifier.
  */
 data class AttributeModifier(

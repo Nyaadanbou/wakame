@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.attribute
 import net.kyori.adventure.key.Key
 
 /**
- * *属性实例* ([AttributeInstance]) 本质上是一个用于数值计算的容器, 里面包含了一个
+ * *属性实例* [AttributeInstance] 本质上是一个用于数值计算的容器, 里面包含了一个
  * [Attribute] 和多个与之关联的 [AttributeModifier]. 每一个 [AttributeModifier]
  * 在概念上都是对 [Attribute] 的修饰, 会影响 [AttributeInstance] 的数值计算结果.
  *
@@ -94,7 +94,11 @@ interface AttributeInstance : AttributeInstanceSnapshotable {
 }
 
 /**
- * 代表一个无形的属性实例. 该实例不可变, 并且不会对世界状态产生任何副作用.
+ * 虚拟的属性实例.
+ * 目前用于实体本身没有属性, 但是需要计算属性的场景.
+ * 例如: 箭矢提供的额外伤害, 三叉戟本身的伤害数值.
+ *
+ * 该实例不可变, 并且不会对世界状态产生任何副作用.
  */
 interface ImaginaryAttributeInstance : AttributeInstanceSnapshotable {
     /**
