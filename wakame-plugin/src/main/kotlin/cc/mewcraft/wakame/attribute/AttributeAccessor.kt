@@ -12,9 +12,9 @@ import org.koin.core.component.inject
 data object PlayerAttributeMapAccess : KoinComponent, AttributeMapAccess<Player> {
     private val userManager: UserManager<Player> by inject()
 
-    override fun get(subject: Player): AttributeMap {
+    override fun get(subject: Player): Result<AttributeMap> {
         // 该实现仅仅把对函数的调用转发到对应的 User 实例之下
-        return userManager.getPlayer(subject).attributeMap
+        return runCatching { userManager.getPlayer(subject).attributeMap }
     }
 }
 
@@ -22,7 +22,7 @@ data object PlayerAttributeMapAccess : KoinComponent, AttributeMapAccess<Player>
  * Provides the access to [AttributeMap] of all non-player entities.
  */
 data object EntityAttributeMapAccess : AttributeMapAccess<LivingEntity> {
-    override fun get(subject: LivingEntity): AttributeMap {
-        return AttributeMap(subject)
+    override fun get(subject: LivingEntity): Result<AttributeMap> {
+        return runCatching { AttributeMap(subject) }
     }
 }

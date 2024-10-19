@@ -29,16 +29,16 @@ class AttributeMechanic(
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
 
     override fun cast(data: SkillMetadata): SkillResult {
-        val entity = data.caster?.entity?.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = attributeMapAccess.get(entity)
+        val targetEntity = data.caster?.entity?.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
+        val attributeMap = attributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.ERROR
         setBaseValueAndScheduleReset(attributeInstance, amount[data], duration[data])
         return SkillResult.SUCCESS
     }
 
     override fun castAtEntity(data: SkillMetadata, target: AbstractEntity): SkillResult {
-        val entity = target.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = attributeMapAccess.get(entity)
+        val targetEntity = target.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
+        val attributeMap = attributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.ERROR
         setBaseValueAndScheduleReset(attributeInstance, amount[data], duration[data])
         return SkillResult.SUCCESS

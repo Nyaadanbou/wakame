@@ -46,7 +46,7 @@ fun AttributeMap(entity: LivingEntity): AttributeMap {
 /**
  * [ImaginaryAttributeMap] 的实例.
  */
-object IntangibleAttributeMaps {
+object ImaginaryAttributeMaps {
     val ARROW: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("arrow")) }
     val TRIDENT: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("trident")) }
     val DISPENSER: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("dispenser")) }
@@ -290,8 +290,8 @@ private object ImaginaryAttributeMapRegistry : KoinComponent {
             for (attribute in default.attributes) {
                 val instance = default.createImaginaryInstance(attribute) ?: continue
                 val snapshot = instance.getSnapshot()
-                val intangible = snapshot.toImaginary()
-                data[attribute] = intangible
+                val imaginary = snapshot.toImaginary()
+                data[attribute] = imaginary
             }
             ImaginaryAttributeMapImpl(data)
         }

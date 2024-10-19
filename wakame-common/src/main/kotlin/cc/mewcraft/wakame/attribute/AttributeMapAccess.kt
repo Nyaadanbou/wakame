@@ -9,7 +9,7 @@ interface AttributeMapAccess<T> {
     /**
      * Gets the [AttributeMap] for the [subject].
      */
-    fun get(subject: T): AttributeMap
+    fun get(subject: T): Result<AttributeMap>
 
     companion object Constants {
         const val FOR_PLAYER = "for_player"

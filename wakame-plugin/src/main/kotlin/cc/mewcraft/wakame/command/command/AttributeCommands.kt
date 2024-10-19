@@ -25,6 +25,9 @@ import org.incendo.cloud.kotlin.coroutines.extension.suspendingHandler
 import org.incendo.cloud.kotlin.extension.commandBuilder
 import org.incendo.cloud.kotlin.extension.getOrNull
 import org.incendo.cloud.parser.standard.DoubleParser
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.slf4j.Logger
 import java.text.DecimalFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -33,8 +36,9 @@ import kotlin.collections.component2
 
 private const val ATTRIBUTE_COUNT_PER_PAGE = 14
 
-object AttributeCommands : CommandFactory<CommandSender> {
+object AttributeCommands : CommandFactory<CommandSender>, KoinComponent {
     private const val ATTRIBUTE_LITERAL = "attribute"
+    private val LOGGER = get<Logger>()
 
     private fun sendNoAttributeMessage(sender: CommandSender, source: Entity) {
         sender.sendMessage(text {
@@ -73,10 +77,10 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     val source = context.get<SingleEntitySelector>("source").single()
                     val attribute = context.get<Attribute>("attribute")
 
-                    val attributeMap = getAttributeMap(source) {
+                    val attributeMap = getAttributeMap(source)?.getSnapshot() ?: run {
                         sendNoAttributeMessage(sender, source)
                         return@suspendingHandler
-                    }.getSnapshot()
+                    }
 
                     val baseValue = attributeMap.getBaseValue(attribute)
 
@@ -107,7 +111,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     val attribute = context.get<Attribute>("attribute")
                     val value = context.get<Double>("value")
 
-                    val attributeMap = getAttributeMap(source) {
+                    val attributeMap = getAttributeMap(source) ?: run {
                         sendNoAttributeMessage(sender, source)
                         return@suspendingHandler
                     }
@@ -152,7 +156,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     val amount = context.get<Double>("amount")
                     val modifier = AttributeModifier(id, amount, operation)
 
-                    val attributeMap = getAttributeMap(source) {
+                    val attributeMap = getAttributeMap(source) ?: run {
                         sendNoAttributeMessage(sender, source)
                         return@suspendingHandler
                     }
@@ -207,7 +211,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     val attribute = context.get<Attribute>("attribute")
                     val id = context.get<NamespacedKey>("id")
 
-                    val attributeMap = getAttributeMap(source) {
+                    val attributeMap = getAttributeMap(source) ?: run {
                         sendNoAttributeMessage(sender, source)
                         return@suspendingHandler
                     }
@@ -266,7 +270,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     // val recipients = context.getOrNull<MultiplePlayerSelector>("recipient")?.values()
                     //     ?: (if (sender is Player) listOf(sender) else emptyList())
 
-                    val attributeMap = getAttributeMap(source) {
+                    val attributeMap = getAttributeMap(source) ?: run {
                         sendNoAttributeMessage(sender, source)
                         return@suspendingHandler
                     }
@@ -281,11 +285,11 @@ object AttributeCommands : CommandFactory<CommandSender> {
         }
     }
 
-    private inline fun getAttributeMap(entity: Entity, default: () -> AttributeMap): AttributeMap {
+    private fun getAttributeMap(entity: Entity): AttributeMap? {
         return when (entity) {
-            is Player -> PlayerAttributeMapAccess.get(entity)
-            is LivingEntity -> EntityAttributeMapAccess.get(entity)
-            else -> default()
+            is Player -> PlayerAttributeMapAccess.get(entity).getOrNull()
+            is LivingEntity -> EntityAttributeMapAccess.get(entity).getOrNull()
+            else -> null
         }
     }
 }

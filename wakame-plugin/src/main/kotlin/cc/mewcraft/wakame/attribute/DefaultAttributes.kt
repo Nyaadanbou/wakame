@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
@@ -63,6 +61,7 @@ object DefaultAttributes : KoinComponent, Initializable {
      *
      * @param key the subject key
      * @param supplier the attribute supplier
+     * @return the previous supplier, if any
      */
     fun addSupplier(key: Key, supplier: AttributeSupplier): AttributeSupplier? {
         return SUPPLIERS.put(key, supplier)

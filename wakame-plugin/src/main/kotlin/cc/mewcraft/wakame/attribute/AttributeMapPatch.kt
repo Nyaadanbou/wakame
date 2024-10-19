@@ -92,9 +92,9 @@ class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
         for (attribute in default.attributes) {
             val patchedInstance = data[attribute] ?: continue
             val defaultBaseValue = default.getBaseValue(attribute)
-            // 如果 patch 的 AttributeInstance 基值与默认基值相同,
-            // 且 patch 的 AttributeInstance 没有任何 AttributeModifier,
-            // 代表 patch 与默认提供完全一致, 移除 patch.
+            // 如果 patch 的 AttributeInstance 的 baseValue 与默认基值相同,
+            // 并且 patch 的 AttributeInstance 没有任何 AttributeModifier,
+            // 意味着 patch 与默认的完全一致, 可以移除 patch 中的数据.
             if (patchedInstance.getBaseValue() == defaultBaseValue && patchedInstance.getModifiers().isEmpty()) {
                 data.remove(attribute)
             }
@@ -144,6 +144,7 @@ internal object AttributeMapPatchAccess {
 }
 
 internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
+    private val logger: Logger by inject()
     private val server: Server by inject()
     private val entityKeyLookup: EntityKeyLookup by inject()
 
@@ -152,14 +153,16 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
     fun on(e: EntitiesLoadEvent) {
         for (entity in e.entities) {
             if (entity is Player) continue
-            if (entity !is Attributable) continue
+            if (entity !is LivingEntity) continue
 
             val patch = AttributeMapPatch.decode(entity)
-            val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
-            patch.trimBy(default)
 
             AttributeMapPatchAccess.put(entity.uniqueId, patch)
-            EntityAttributeMapAccess.get(entity as LivingEntity) // 初始化 AttributeMap
+
+            // 触发 AttributeMap 的初始化, 例如应用原版属性
+            EntityAttributeMapAccess.get(entity).onFailure {
+                logger.error("Failed to initialize the attribute map for entity ${entity}: ${it.message}")
+            }
         }
     }
 
@@ -167,8 +170,10 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
     fun on(e: CreatureSpawnEvent) {
         // Note: 玩家在世界中的生成不会触发 CreaturesSpawnEvent
 
-        // 触发 AttributeMap 的初始化, 例如应用默认属性
-        EntityAttributeMapAccess.get(e.entity)
+        // 触发 AttributeMap 的初始化, 例如应用原版属性
+        EntityAttributeMapAccess.get(e.entity).onFailure {
+            logger.error("Failed to initialize the attribute map for entity ${e.entity}: ${it.message}")
+        }
     }
 
     // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
@@ -183,18 +188,24 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
 
     private fun entityUnloaded(entity: Entity) {
         if (entity is Player) return
-        if (entity !is Attributable) return
+        if (entity !is LivingEntity) return
+
         val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: return
         val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
 
+        // 把跟默认属性一样的属性移除
         patch.trimBy(default)
+
+        // 把原版属性移除, 这部分由 nms 自己处理
         patch.filter { attribute, _ -> !attribute.vanilla }
-        // 如果移除默认已有的属性之后的 patch 为空, 表示生物并没有 patch, 移除 PDC
+
+        // 如果经过以上操作后的 patch 为空, 表示生物并没有 patch, 移除 PDC
         if (patch.isEmpty()) {
             patch.removeFrom(entity)
             AttributeMapPatchAccess.remove(entity.uniqueId)
             return
         }
+
         patch.saveTo(entity)
 
         AttributeMapPatchAccess.remove(entity.uniqueId)

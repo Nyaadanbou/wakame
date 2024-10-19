@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.damage
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemSlot
@@ -8,6 +9,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.User
 import org.bukkit.entity.*
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import java.lang.ref.WeakReference
 import kotlin.math.absoluteValue
 import kotlin.random.Random
@@ -37,6 +40,8 @@ sealed interface DamageMetadata {
      */
     val isCritical: Boolean
 }
+
+private val logger: Logger by Injector.inject()
 
 /**
  * 原版产生的伤害元数据.
@@ -141,7 +146,9 @@ class EntityMeleeAttackMetadata(
     override val isCritical: Boolean
 
     init {
-        val attributeMap = EntityAttributeMapAccess.get(entity)
+        val attributeMap = EntityAttributeMapAccess.get(entity).getOrElse {
+            error("Failed to initialize EntityMeleeAttackMetadata because the entity does not have an attribute map: ${it.message}")
+        }
         this.damageBundle = damageBundle(attributeMap) { every { standard() } }
         this.damageValue = this.damageBundle.damageSum
         this.criticalPower =
@@ -284,7 +291,9 @@ class EntityProjectileDamageMetadata(
     override val isCritical: Boolean
 
     init {
-        val attributeMap = EntityAttributeMapAccess.get(entity)
+        val attributeMap = EntityAttributeMapAccess.get(entity).getOrElse {
+            error("Failed to initialize EntityProjectileDamageMetadata because the entity does not have an attribute map: ${it.message}")
+        }
         this.damageBundle = damageBundle(attributeMap) { every { standard() } }
         this.damageValue = this.damageBundle.damageSum
         this.criticalPower =
