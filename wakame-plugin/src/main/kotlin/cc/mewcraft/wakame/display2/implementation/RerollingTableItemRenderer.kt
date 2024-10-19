@@ -23,6 +23,6 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
     override fun render(item: NekoStack, context: RerollingTableContext?) {
         // TODO display2 RerollingTable
-        // Selection#display
+        // Selection#display 渲染核心本身,渲染已重造次数,渲染最大重造次数
     }
 }

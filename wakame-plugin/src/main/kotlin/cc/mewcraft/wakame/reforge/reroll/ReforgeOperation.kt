@@ -58,21 +58,27 @@ private constructor(
         // 如果没有可重造的词条栏, 返回一个失败结果
         val selectionMap = session.selectionMap
         if (selectionMap.isEmpty || selectionMap.values.all { !it.changeable }) {
-            return Result.failure("<gray>没有可重造的词条栏".mini)
+            return Result.failure("<gray>没有可重造的核孔".mini)
         }
 
         // 如果没有选择任何词条栏, 返回一个失败结果
         if (selectionMap.values.all { !it.selected }) {
-            return Result.failure("<gray>没有选择任何词条栏".mini)
+            return Result.failure("<gray>没有要重造的核孔".mini)
         }
-
-        // region 准备作为输出的物品
-        val output = sourceItem.clone()
 
         // 获取必要的物品组件
         val itemId = sourceItem.id
         val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level ?: return Result.failure("<gray>物品不可重造".mini)
         val itemCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return Result.failure("<gray>物品不可重造".mini)
+
+        // 检查在已选择的核孔当中, 是否有超过了重造次数上限的核孔
+        for (selection in selectionMap.values.filter { it.selected }) {
+            val cell = itemCells.get(selection.id) ?: return Result.error()
+            val rerollCount = cell.getReforgeHistory().rerollCount
+            if (rerollCount >= selection.rule.maxReroll) {
+                return Result.failure("<gray>核孔已经消磨殆尽".mini)
+            }
+        }
 
         // 获取可有可无的物品组件
         val itemRarity = sourceItem.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
@@ -81,7 +87,7 @@ private constructor(
 
         // 准备生成核心用的上下文
         val context = try {
-            generateContext(
+            initializeContext(
                 itemId,
                 itemLevel,
                 itemRarity,
@@ -94,37 +100,38 @@ private constructor(
             return Result.error()
         }
 
-        val cellsBuilder = itemCells.builder()
+        val modifiedItemCells = itemCells.builder().apply {
+            // 遍历每一个选择:
+            for ((id, sel) in selectionMap) {
 
-        // 遍历每一个选择:
-        for ((id, sel) in selectionMap) {
+                // 如果玩家选择了该词条栏:
+                if (sel.selected) {
 
-            // 如果玩家选择了该词条栏:
-            if (sel.selected) {
+                    // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
+                    modify(id) { cell ->
+                        val selected = sel.template.select(context).firstOrNull() ?: EmptyCoreBlueprint
+                        val generated = selected.generate(context)
+                        cell.setCore(generated)
+                    }
 
-                // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
-                cellsBuilder.modify(id) { cell ->
-                    val selected = sel.template.select(context).firstOrNull() ?: EmptyCoreBlueprint
-                    val generated = selected.generate(context)
-                    cell.setCore(generated)
-                }
-
-                // 为重造过的词条栏 +1 重造次数
-                cellsBuilder.modify(id) { cell ->
-                    val oldValue = cell.getReforgeHistory()
-                    val newValue = oldValue.addRerollCount(1)
-                    cell.setReforgeHistory(newValue)
+                    // 为重造过的词条栏 +1 重造次数
+                    modify(id) { cell ->
+                        val oldValue = cell.getReforgeHistory()
+                        val newValue = oldValue.addRerollCount(1)
+                        cell.setReforgeHistory(newValue)
+                    }
                 }
             }
-        }
+        }.build()
+
+        // 准备作为输出的物品
+        val output = sourceItem.clone()
 
         // 将新的词条栏组件写入物品
-        output.components.set(ItemComponentTypes.CELLS, cellsBuilder.build())
-        // endregion
+        output.components.set(ItemComponentTypes.CELLS, modifiedItemCells)
 
-        // region 计算重造物品的总花费
+        // 计算重造物品的总花费
         val total = Cost.simple(session.total.evaluate())
-        // endregion
 
         return Result.success(output, total)
     }
@@ -132,7 +139,7 @@ private constructor(
     /**
      * 初始化物品生成的上下文.
      */
-    private fun generateContext(
+    private fun initializeContext(
         itemId: Key,
         itemLevel: Int,
         itemRarity: Rarity,
@@ -164,11 +171,17 @@ private constructor(
                     val core = cell.getCore()
                 ) {
                     is SkillCore -> {
-                        context.skills += SkillContextData(id = core.id)
+                        context.skills += SkillContextData(
+                            id = core.id
+                        )
                     }
 
                     is AttributeCore -> {
-                        context.attributes += AttributeContextData(id = core.id.value(), operation = core.attribute.operation, element = core.attribute.element)
+                        context.attributes += AttributeContextData(
+                            id = core.id.value(),
+                            operation = core.attribute.operation,
+                            element = core.attribute.element
+                        )
                     }
                 }
             }
