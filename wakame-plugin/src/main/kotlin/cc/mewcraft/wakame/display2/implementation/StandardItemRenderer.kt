@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.item.templates.components.CustomName
-import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
@@ -210,7 +209,7 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
 
     @JvmField
     val LORE: RenderingPart<ExtraLore, ExtraLoreRendererFormat> = configure("lore") { data, format ->
-        format.render(data.lore)
+        format.render(data.processedLore)
     }
 
     @JvmField

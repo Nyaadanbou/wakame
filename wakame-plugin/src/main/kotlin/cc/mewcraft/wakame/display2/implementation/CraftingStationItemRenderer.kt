@@ -13,8 +13,8 @@ import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.item.templates.components.CustomName
-import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.FireResistant
 import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
 import cc.mewcraft.wakame.item.templates.components.ItemCells
@@ -186,7 +186,7 @@ internal object CraftingStationRenderingParts : RenderingParts(CraftingStationIt
 
     @JvmField
     val LORE: RenderingPart<ExtraLore, ExtraLoreRendererFormat> = configure("lore") { data, format ->
-        format.render(data.lore)
+        format.render(data.processedLore)
     }
 
     @JvmField

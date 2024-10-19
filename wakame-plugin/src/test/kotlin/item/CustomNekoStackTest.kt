@@ -753,7 +753,7 @@ class CustomNekoStackTest : KoinTest {
 
     @Test
     fun `component - lore`() = componentLifecycleTest(
-        "lore", ItemTemplateTypes.LORE, ItemComponentTypes.LORE,
+        "lore", ItemTemplateTypes.LORE, ItemComponentTypes.EMPTY,
     ) {
         serialization {
             assertNotNull(it)

@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.util.removeItalic
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -185,11 +186,11 @@ internal data class ExtraLoreRendererFormat(
     /**
      * @param data 额外的物品描述
      */
-    fun render(data: List<String>): IndexedText {
+    fun render(data: List<Component>): IndexedText {
         val size = tooltip.header.size + data.size + tooltip.bottom.size
-        val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, parsed("line", it)) }
-        val header = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: emptyList()
-        val bottom = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: emptyList()
+        val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, component("line", it)) }
+        val header = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: ObjectImmutableList.of()
+        val bottom = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: ObjectImmutableList.of()
         lines.addAll(0, header)
         lines.addAll(bottom)
         return SimpleIndexedText(index, lines)
