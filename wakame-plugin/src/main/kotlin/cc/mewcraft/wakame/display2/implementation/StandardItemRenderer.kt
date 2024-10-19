@@ -9,11 +9,22 @@ import cc.mewcraft.wakame.attribute.composite.*
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.components.FireResistant
+import cc.mewcraft.wakame.item.components.FoodProperties
+import cc.mewcraft.wakame.item.components.ItemAttackSpeed
+import cc.mewcraft.wakame.item.components.ItemCrate
+import cc.mewcraft.wakame.item.components.ItemElements
+import cc.mewcraft.wakame.item.components.ItemEnchantments
+import cc.mewcraft.wakame.item.components.ItemKizamiz
+import cc.mewcraft.wakame.item.components.ItemLevel
+import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.templates.components.*
+import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
-import cc.mewcraft.wakame.item.templates.components.ItemArrow
+import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.packet.PacketNekoStack
@@ -61,6 +72,9 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
 
         val templates = item.templates
         templates.process(ItemTemplateTypes.ARROW) { data -> StandardRenderingParts.ARROW.process(collector, data) }
+        // 最可能需要频繁修改的 `custom_name`, `item_name`, `lore` 直接读取配置模板
+        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> StandardRenderingParts.CUSTOM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> StandardRenderingParts.ITEM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.LORE) { data -> StandardRenderingParts.LORE.process(collector, data) }
 
         val components = item.components
@@ -77,12 +91,10 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
             }
         }
         components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingParts.CRATE.process(collector, data) }
-        // components.process(ItemComponentTypes.CUSTOM_NAME) { data -> StandardRenderingParts.CUSTOM_NAME.process(collector, data) }
         components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingParts.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
         components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, data) }
         components.process(ItemComponentTypes.FOOD) { data -> StandardRenderingParts.FOOD.process(collector, data) }
-        // components.process(ItemComponentTypes.ITEM_NAME) { data -> StandardRenderingParts.ITEM_NAME.process(collector, data) }
         components.process(ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingParts.KIZAMIZ.process(collector, data) }
         components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingParts.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingParts.PORTABLE_CORE.process(collector, data) }
@@ -154,7 +166,7 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
 
     @JvmField
     val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = configure("custom_name") { data, format ->
-        format.render(Placeholder.component("value", data.rich))
+        format.render(Placeholder.parsed("value", data.plainName))
     }
 
     @JvmField
@@ -183,7 +195,7 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
 
     @JvmField
     val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = configure("item_name") { data, format ->
-        format.render(Placeholder.component("value", data.rich))
+        format.render(Placeholder.parsed("value", data.plainName))
     }
 
     @JvmField

@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.components.*
+import net.kyori.adventure.text.Component
 
 /**
  * 本单例提供了物品组件的所有类型.
@@ -74,7 +75,7 @@ internal object ItemComponentTypes {
      * 对应原版组件: [`minecraft:custom_name`](https://minecraft.wiki/w/Data_component_format#custom_name)
      */
     @JvmField
-    val CUSTOM_NAME: ItemComponentType<CustomName> = CustomName.codec(ItemConstants.CUSTOM_NAME).register()
+    val CUSTOM_NAME: ItemComponentType<Component> = CustomName.codec(ItemConstants.CUSTOM_NAME).register()
 
     /**
      * 物品已经损失的耐久.
@@ -150,7 +151,7 @@ internal object ItemComponentTypes {
      * 对应原版组件: [`minecraft:item_name`](https://minecraft.wiki/w/Data_component_format#item_name)
      */
     @JvmField
-    val ITEM_NAME: ItemComponentType<ItemName> = ItemName.codec(ItemConstants.ITEM_NAME).register()
+    val ITEM_NAME: ItemComponentType<Component> = ItemName.codec(ItemConstants.ITEM_NAME).register()
 
     /**
      * 物品的铭刻.

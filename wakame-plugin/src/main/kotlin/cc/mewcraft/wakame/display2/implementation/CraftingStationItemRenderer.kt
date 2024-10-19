@@ -8,13 +8,12 @@ import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.CustomName
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemEnchantments
-import cc.mewcraft.wakame.item.components.ItemName
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.FireResistant
 import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
@@ -22,6 +21,7 @@ import cc.mewcraft.wakame.item.templates.components.ItemCells
 import cc.mewcraft.wakame.item.templates.components.ItemCrate
 import cc.mewcraft.wakame.item.templates.components.ItemElements
 import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
+import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.registry.AttributeRegistry
@@ -81,16 +81,16 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         templates.process(ItemTemplateTypes.ATTACK_SPEED) { data -> CraftingStationRenderingParts.ATTACK_SPEED.process(collector, data) }
         templates.process(ItemTemplateTypes.CELLS) { data -> CraftingStationRenderingParts.CELLS.process(collector, data) }
         templates.process(ItemTemplateTypes.CRATE) { data -> CraftingStationRenderingParts.CRATE.process(collector, data) }
+        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> CraftingStationRenderingParts.CUSTOM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.ELEMENTS) { data -> CraftingStationRenderingParts.ELEMENTS.process(collector, data) }
         templates.process(ItemTemplateTypes.FIRE_RESISTANT) { data -> CraftingStationRenderingParts.FIRE_RESISTANT.process(collector, data) }
+        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> CraftingStationRenderingParts.ITEM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.KIZAMIZ) { data -> CraftingStationRenderingParts.KIZAMIZ.process(collector, data) }
         templates.process(ItemTemplateTypes.LORE) { data -> CraftingStationRenderingParts.LORE.process(collector, data) }
 
         val components = item.components
-        components.process(ItemComponentTypes.CUSTOM_NAME) { data -> CraftingStationRenderingParts.CUSTOM_NAME.process(collector, data) }
         components.process(ItemComponentTypes.ENCHANTMENTS) { data -> CraftingStationRenderingParts.ENCHANTMENTS.process(collector, data) }
         components.process(ItemComponentTypes.FOOD) { data -> CraftingStationRenderingParts.FOOD.process(collector, data) }
-        components.process(ItemComponentTypes.ITEM_NAME) { data -> CraftingStationRenderingParts.ITEM_NAME.process(collector, data) }
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> CraftingStationRenderingParts.PORTABLE_CORE.process(collector, data) }
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> CraftingStationRenderingParts.ENCHANTMENTS.process(collector, data) }
 
@@ -144,7 +144,7 @@ internal object CraftingStationRenderingParts : RenderingParts(CraftingStationIt
 
     @JvmField
     val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = configure("custom_name") { data, format ->
-        format.render(Placeholder.component("value", data.rich))
+        format.render(Placeholder.parsed("value", data.plainName))
     }
 
     @JvmField
@@ -175,7 +175,7 @@ internal object CraftingStationRenderingParts : RenderingParts(CraftingStationIt
 
     @JvmField
     val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = configure("item_name") { data, format ->
-        format.render(Placeholder.component("value", data.rich))
+        format.render(Placeholder.parsed("value", data.plainName))
     }
 
     val KIZAMIZ: RenderingPart<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
