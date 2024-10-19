@@ -8,4 +8,5 @@ sealed interface ResourceMap {
     fun maximum(type: ResourceType): Int
     fun add(type: ResourceType, value: Int): Boolean
     fun take(type: ResourceType, value: Int): Boolean
+    fun set(type: ResourceType, value: Int): Boolean
 }

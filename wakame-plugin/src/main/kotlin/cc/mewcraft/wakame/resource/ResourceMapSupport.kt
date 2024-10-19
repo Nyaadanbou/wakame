@@ -42,6 +42,10 @@ private class PlayerResourceMap(
         return getResource(type).take(value)
     }
 
+    override fun set(type: ResourceType, value: Int): Boolean {
+        return getResource(type).set(value)
+    }
+
     private fun getResource(type: ResourceType): Resource {
         return requireNotNull(data[type]) { "The resource type $type" }
     }
@@ -78,6 +82,13 @@ private class Resource(
         if (value > current) return false // insufficient resource - return false
         current -= value
         current = current.coerceAtLeast(0) // minimum should be ZERO for all resource types
+        return true
+    }
+
+    fun set(value: Int): Boolean {
+        current = value
+        current = current.coerceAtMost(maximum())
+        current = current.coerceAtLeast(0)
         return true
     }
 }
