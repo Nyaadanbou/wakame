@@ -17,7 +17,6 @@ rarity_number_mapping:
 # 数据类型: molang
 #
 # 可用上下文:
-#
 # query.source_rarity()
 #   源物品的稀有度所映射到的数值
 # query.source_level()
@@ -36,7 +35,6 @@ rarity_number_mapping:
 #   'all' = 所有词条栏
 #   'selected' = 被选中要重造的词条栏
 #   'unselected' = 未被选中要重造的词条栏
-#
 currency_cost: >-
   10.0 * query.source_level()
   + query.source_rarity() * query.sum_of_cost('unselected')

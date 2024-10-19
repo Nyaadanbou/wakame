@@ -19,7 +19,6 @@ rarity_number_mapping:
 # 计算函数, 用于计算完成整个物品定制的总花费.
 #
 # 可用参数:
-#
 # query.source_item_rarity()
 #   被定制物品的稀有度所映射的数值
 # query.source_item_level()
@@ -32,7 +31,6 @@ rarity_number_mapping:
 #   被定制物品上参与了定制的词条栏的数量
 # query.source_item_changed_cell_cost()
 #   被定制物品上参与了定制的词条栏的总花费
-#
 currency_cost: >-
   200.0 * query.source_item_rarity()
   + 100.0 * query.source_item_changed_cell_count()
