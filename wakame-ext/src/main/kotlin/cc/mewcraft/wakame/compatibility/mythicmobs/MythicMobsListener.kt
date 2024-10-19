@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.io.File
 
-class MythicMobsCompatibilityListener : Listener {
+class MythicMobsListener : Listener {
     @EventHandler
     private fun on(e: MythicMechanicLoadEvent) {
         when (e.mechanicName.lowercase()) {

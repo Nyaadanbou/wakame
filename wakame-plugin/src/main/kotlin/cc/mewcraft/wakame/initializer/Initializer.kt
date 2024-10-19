@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.attribute.AttributeMapPatchListener
 import cc.mewcraft.wakame.command.CommandManager
-import cc.mewcraft.wakame.compatibility.mythicmobs.MythicMobsCompatibilityListener
+import cc.mewcraft.wakame.compatibility.mythicmobs.MythicMobsListener
 import cc.mewcraft.wakame.config.*
 import cc.mewcraft.wakame.damage.DamageListener
 import cc.mewcraft.wakame.damage.VanillaDamageMappings.DAMAGE_GLOBAL_CONFIG_FILE
@@ -17,7 +17,7 @@ import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
-import cc.mewcraft.wakame.item.logic.AdventureLevelHotfix
+import cc.mewcraft.wakame.item.logic.AdventureLevelListener
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
@@ -125,22 +125,39 @@ object Initializer : KoinComponent, Listener {
         // saveResource(SKIN_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
     }
 
-    private fun registerListeners() = with(PLUGIN) {
-        registerTerminableListener(get<AttributeMapPatchListener>()).bindWith(this)
-        registerTerminableListener(get<AdventureLevelHotfix>()).bindWith(this)
-        registerTerminableListener(get<ArmorChangeEventSupport>()).bindWith(this)
-        registerTerminableListener(get<ComponentListener>()).bindWith(this)
-        registerTerminableListener(get<FuckOffHandListener>()).bindWith(this)
-        registerTerminableListener(get<ItemChangeListener>()).bindWith(this)
-        registerTerminableListener(get<DamageDisplay>()).bindWith(this)
-        registerTerminableListener(get<PaperUserManager>()).bindWith(this)
-        registerTerminableListener(get<ResourcePackLifecycleListener>()).bindWith(this)
-        registerTerminableListener(get<ResourcePackPlayerListener>()).bindWith(this)
-        registerTerminableListener(get<ItemBehaviorListener>()).bindWith(this)
-        registerTerminableListener(get<ItemMiscellaneousListener>()).bindWith(this)
-        registerTerminableListener(get<DamageListener>()).bindWith(this)
-        registerTerminableListener(get<ItemSlotChangeMonitor>()).bindWith(this)
-        registerTerminableListener(get<MythicMobsCompatibilityListener>()).bindWith(this)
+    private fun registerListeners() {
+        // item
+        registerListenerAndBind<ArmorChangeEventSupport>()
+        registerListenerAndBind<ItemSlotChangeMonitor>()
+        registerListenerAndBind<ItemChangeListener>()
+        registerListenerAndBind<ItemBehaviorListener>()
+        registerListenerAndBind<ItemMiscellaneousListener>()
+        registerListenerAndBind<FuckOffHandListener>()
+        registerListenerAndBind<ComponentListener>()
+
+        // attribute
+        registerListenerAndBind<AttributeMapPatchListener>()
+
+        // damage
+        registerListenerAndBind<DamageListener>()
+        registerListenerAndBind<DamageDisplay>()
+
+        // rpg player
+        registerListenerAndBind<PaperUserManager>()
+
+        // resourcepack
+        registerListenerAndBind<ResourcePackLifecycleListener>()
+        registerListenerAndBind<ResourcePackPlayerListener>()
+
+        // compatibility
+        registerListenerAndBind<AdventureLevelListener>()
+        registerListenerAndBind<MythicMobsListener>()
+
+        // uncategorized
+    }
+
+    private inline fun <reified T : Listener> registerListenerAndBind() {
+        PLUGIN.bind(PLUGIN.registerTerminableListener(get<T>()))
     }
 
     private fun registerCommands() {
