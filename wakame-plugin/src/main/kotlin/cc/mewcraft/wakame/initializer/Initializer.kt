@@ -26,6 +26,7 @@ import cc.mewcraft.wakame.player.component.ComponentListener
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
+import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.UserListener
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
@@ -140,6 +141,7 @@ object Initializer : KoinComponent, Listener {
         registerListenerAndBind<DamageDisplay>()
 
         // rpg player
+        registerListenerAndBind<PaperUserManager>()
         registerListenerAndBind<UserListener>()
 
         // resourcepack

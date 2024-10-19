@@ -1,40 +1,40 @@
 package cc.mewcraft.wakame.compatibility.husksync
 
+import cc.mewcraft.wakame.user.SaveLoadExecutor
 import cc.mewcraft.wakame.user.UserListener
 import net.william278.husksync.event.BukkitDataSaveEvent
 import net.william278.husksync.event.BukkitSyncCompleteEvent
 import net.william278.husksync.user.BukkitUser
 import org.bukkit.event.EventHandler
-import org.bukkit.persistence.PersistentDataType
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import java.util.concurrent.ConcurrentHashMap
 
 class HuskSyncUserListener : UserListener, KoinComponent {
-    private val userManager: UserManager by inject()
+    private val saveLoadExecutors: MutableSet<SaveLoadExecutor> = ConcurrentHashMap.newKeySet()
+
     @EventHandler
     private fun onDataSave(e: BukkitDataSaveEvent) {
         val player = (e.user as? BukkitUser)?.player ?: return
-        // cleanup user data for the player
-        val user = getPlayer(player)
-        player.persistentDataContainer.set(UserListener.PLAYER_HEALTH, PersistentDataType.DOUBLE, player.health)
-        player.persistentDataContainer.set(UserListener.PLAYER_MANA, PersistentDataType.INTEGER, user.resourceMap.current(ResourceTypeRegistry.MANA))
-
-        user.skillMap.clear()
-        userRepository.invalidate(player)
+        for (executor in saveLoadExecutors) {
+            executor.loadFrom(player.persistentDataContainer)
+        }
     }
 
     @EventHandler
     private fun onSyncComplete(e: BukkitSyncCompleteEvent) {
         // create user data for the player
-        val user = getPlayer(e.player)
+        val player = (e.user as? BukkitUser)?.player ?: return
 
-        val health = e.player.persistentDataContainer.get(UserListener.PLAYER_HEALTH, PersistentDataType.DOUBLE)
-        if (health != null) {
-            e.player.health = health
+        for (executor in saveLoadExecutors) {
+            executor.saveTo(player.persistentDataContainer)
         }
-        val mana = e.player.persistentDataContainer.get(UserListener.PLAYER_MANA, PersistentDataType.INTEGER)
-        if (mana != null) {
-            user.resourceMap.set(ResourceTypeRegistry.MANA, mana)
-        }
+    }
+
+    override fun registerUserPersistentDataAccessor(executor: SaveLoadExecutor) {
+        saveLoadExecutors.add(executor)
+    }
+
+    override fun unregisterUserPersistentDataAccessor(executor: SaveLoadExecutor) {
+        saveLoadExecutors.remove(executor)
     }
 }
