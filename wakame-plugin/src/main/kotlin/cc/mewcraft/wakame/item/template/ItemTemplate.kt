@@ -16,6 +16,7 @@ import net.kyori.examination.Examinable
  *
  * @param T 组件的数据类型, 也就是必须与对应的 [ItemComponentType] 的泛型一致
  */
+// TODO 改名: ItemArchetype?
 interface ItemTemplate<T> : Examinable {
 
     /**

@@ -166,12 +166,6 @@ internal object ItemComponentTypes {
     val LEVEL: ItemComponentType<ItemLevel> = ItemLevel.codec(ItemConstants.LEVEL).register()
 
     /**
-     * 物品的描述 (不同于原版物品组件 `minecraft:lore`).
-     */
-    @JvmField
-    val LORE: ItemComponentType<ExtraLore> = ExtraLore.codec(ItemConstants.LORE).register()
-
-    /**
      * 物品最大可损失的耐久.
      *
      * 对应原版组件: [`minecraft:max_damage`](https://minecraft.wiki/w/Data_component_format#max_damage)
