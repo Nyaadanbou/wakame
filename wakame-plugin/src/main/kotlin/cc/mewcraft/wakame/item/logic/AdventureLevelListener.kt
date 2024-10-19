@@ -6,10 +6,11 @@ import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-// 开发日记 2024/10/7 小米
-// 虽然叫 hotfix, 但我想不出有什么更好的办法了.
-// 也许这种靠 callback 的方案, 本身就已经优雅了.
-internal object AdventureLevelHotfix : Listener {
+internal object AdventureLevelListener : Listener {
+
+    // 开发日记 2024/10/7 小米
+    // 虽然看起来是 hotfix, 但我想不出有什么更好的办法了.
+    // 也许这种靠 callback 解决的方案, 本身就已经优雅了?
     /**
      * 修复与插件 AdventureLevel 异步加载数据的相关问题.
      *

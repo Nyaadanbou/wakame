@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.damage
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemSlot
@@ -8,6 +9,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.User
 import org.bukkit.entity.*
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import java.lang.ref.WeakReference
 import kotlin.math.absoluteValue
 import kotlin.random.Random
@@ -37,6 +40,8 @@ sealed interface DamageMetadata {
      */
     val isCritical: Boolean
 }
+
+private val logger: Logger by Injector.inject()
 
 /**
  * 原版产生的伤害元数据.
@@ -141,7 +146,9 @@ class EntityMeleeAttackMetadata(
     override val isCritical: Boolean
 
     init {
-        val attributeMap = EntityAttributeAccessor.getAttributeMap(entity)
+        val attributeMap = EntityAttributeMapAccess.get(entity).getOrElse {
+            error("Failed to initialize EntityMeleeAttackMetadata because the entity does not have an attribute map: ${it.message}")
+        }
         this.damageBundle = damageBundle(attributeMap) { every { standard() } }
         this.damageValue = this.damageBundle.damageSum
         this.criticalPower =
@@ -284,7 +291,9 @@ class EntityProjectileDamageMetadata(
     override val isCritical: Boolean
 
     init {
-        val attributeMap = EntityAttributeAccessor.getAttributeMap(entity)
+        val attributeMap = EntityAttributeMapAccess.get(entity).getOrElse {
+            error("Failed to initialize EntityProjectileDamageMetadata because the entity does not have an attribute map: ${it.message}")
+        }
         this.damageBundle = damageBundle(attributeMap) { every { standard() } }
         this.damageValue = this.damageBundle.damageSum
         this.criticalPower =
@@ -303,11 +312,11 @@ class EntityProjectileDamageMetadata(
  * 如: 箭矢落地后再次命中, 发射器发射的箭矢命中.
  */
 class DefaultArrowDamageMetadata private constructor(
-    imaginaryAttributeMap: IntangibleAttributeMap,
+    imaginaryAttributeMap: ImaginaryAttributeMap,
     override val projectile: AbstractArrow,
 ) : ProjectileDamageMetadata {
-    constructor(attributeMap: IntangibleAttributeMap, arrow: Arrow) : this(attributeMap, arrow as AbstractArrow)
-    constructor(attributeMap: IntangibleAttributeMap, arrow: SpectralArrow) : this(attributeMap, arrow as AbstractArrow)
+    constructor(attributeMap: ImaginaryAttributeMap, arrow: Arrow) : this(attributeMap, arrow as AbstractArrow)
+    constructor(attributeMap: ImaginaryAttributeMap, arrow: SpectralArrow) : this(attributeMap, arrow as AbstractArrow)
 
     override val damageBundle: DamageBundle = buildDamageBundle(imaginaryAttributeMap)
     override val damageValue: Double = damageBundle.damageSum
@@ -326,7 +335,7 @@ class DefaultArrowDamageMetadata private constructor(
         }
     }
 
-    private fun buildDamageBundle(imaginaryAttributeMap: IntangibleAttributeMap): DamageBundle {
+    private fun buildDamageBundle(imaginaryAttributeMap: ImaginaryAttributeMap): DamageBundle {
         val itemStack = projectile.itemStack
 
         // 不是 NekoStack, 则为原版箭矢
@@ -361,7 +370,7 @@ class DefaultArrowDamageMetadata private constructor(
  * 如: 三叉戟落地后再次命中(原版无此特性).
  */
 class DefaultTridentDamageMetadata(
-    imaginaryAttributeMap: IntangibleAttributeMap,
+    imaginaryAttributeMap: ImaginaryAttributeMap,
     override val projectile: Trident,
 ) : ProjectileDamageMetadata {
     override val damageBundle: DamageBundle = buildDamageBundle(imaginaryAttributeMap)
@@ -381,7 +390,7 @@ class DefaultTridentDamageMetadata(
         }
     }
 
-    private fun buildDamageBundle(intangibleAttributeMap: IntangibleAttributeMap): DamageBundle {
+    private fun buildDamageBundle(imaginaryAttributeMap: ImaginaryAttributeMap): DamageBundle {
         val itemStack = projectile.itemStack
 
         // 不是 NekoStack, 则为原版三叉戟
@@ -392,7 +401,7 @@ class DefaultTridentDamageMetadata(
 
         // 获取无形属性映射的快照, 将三叉戟的属性加上
         val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
-        val attributeMapSnapshot = intangibleAttributeMap.getSnapshot()
+        val attributeMapSnapshot = imaginaryAttributeMap.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
         }

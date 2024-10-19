@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.api.NekooApiProvider
 import cc.mewcraft.wakame.attack.attackModule
 import cc.mewcraft.wakame.attribute.attributeModule
+import cc.mewcraft.wakame.compatibility.compatibilityModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
@@ -66,6 +67,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 adventureModule(),
                 attackModule(),
                 attributeModule(),
+                compatibilityModule(),
                 crateModule(),
                 damageModule(),
                 display2Module(),

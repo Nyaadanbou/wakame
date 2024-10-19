@@ -53,7 +53,7 @@ object AttributeRegistry : Initializable {
     val EMPTY_KEY: Key = Attributes.EMPTY.key()
 
     /**
-     * The facades of all attributes.
+     * The facades of all composite attributes.
      */
     val FACADES: Registry<String, CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>> = SimpleRegistry()
 
@@ -63,7 +63,7 @@ object AttributeRegistry : Initializable {
     val CONFIG: ConfigProvider by lazy { Configs.YAML[ATTRIBUTE_GLOBAL_CONFIG_FILE] }
 
     /**
-     * Builds an attribute facade.
+     * Builds an composite attribute facade.
      *
      * 注意, 参数 [id] 仅仅是词条在 NBT/模板 中的唯一标识.
      * 底层由多个对象组成的词条标识就与这里的 [id] 不同.
@@ -74,52 +74,52 @@ object AttributeRegistry : Initializable {
      *
      * @param id 词条在 NBT/模板 中的唯一标识
      */
-    private fun buildFacade(id: String): FormatSelection {
+    private fun buildComposite(id: String): FormatSelection {
         return FormatSelectionImpl(id)
     }
 
     /**
-     * Registers all attribute facades using DSL.
+     * Registers all composite attributes using DSL.
      */
-    private fun registerFacades() {
-        // Register special attribute
-        +buildFacade("empty").single().bind { EMPTY }
+    private fun registerComposites() {
+        // Register the special attribute
+        +buildComposite("empty").single().bind { EMPTY }
 
-        // Registry more attribute facades here ...
-        +buildFacade("attack_damage").ranged().element().bind({ MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE })
-        +buildFacade("attack_damage_rate").single().element().bind { ATTACK_DAMAGE_RATE }
-        +buildFacade("attack_effect_chance").single().bind { ATTACK_EFFECT_CHANCE }
-        +buildFacade("block_interaction_range").single().bind { BLOCK_INTERACTION_RANGE }
-        +buildFacade("critical_strike_chance").single().bind { CRITICAL_STRIKE_CHANCE }
-        +buildFacade("critical_strike_power").single().bind { CRITICAL_STRIKE_POWER }
-        +buildFacade("negative_critical_strike_power").single().bind { NEGATIVE_CRITICAL_STRIKE_POWER }
-        +buildFacade("defense").single().element().bind { DEFENSE }
-        +buildFacade("defense_penetration").single().element().bind { DEFENSE_PENETRATION }
-        +buildFacade("defense_penetration_rate").single().element().bind { DEFENSE_PENETRATION_RATE }
-        +buildFacade("entity_interaction_range").single().bind { ENTITY_INTERACTION_RANGE }
-        +buildFacade("health_regeneration").single().bind { HEALTH_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
-        +buildFacade("incoming_damage_rate").single().element().bind { INCOMING_DAMAGE_RATE }
-        +buildFacade("lifesteal").single().bind { LIFESTEAL }
-        +buildFacade("mana_consumption_rate").single().bind { MANA_CONSUMPTION_RATE }
-        +buildFacade("mana_regeneration").single().bind { MANA_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
-        +buildFacade("manasteal").single().bind { MANASTEAL }
-        +buildFacade("max_absorption").single().bind { MAX_ABSORPTION }
-        +buildFacade("max_health").single().bind { MAX_HEALTH }
-        +buildFacade("max_mana").single().bind { MAX_MANA }
-        +buildFacade("mining_efficiency").single().bind { MINING_EFFICIENCY }
-        +buildFacade("movement_speed").single().bind { MOVEMENT_SPEED }
-        +buildFacade("safe_fall_distance").single().bind { SAFE_FALL_DISTANCE }
-        +buildFacade("scale").single().bind { SCALE }
-        +buildFacade("step_height").single().bind { STEP_HEIGHT }
-        +buildFacade("universal_attack_damage").ranged().bind({ UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE })
-        +buildFacade("universal_defense").single().bind { UNIVERSAL_DEFENSE }
-        +buildFacade("universal_defense_penetration").single().bind { UNIVERSAL_DEFENSE_PENETRATION }
-        +buildFacade("universal_defense_penetration_rate").single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
+        // Registry more composite attributes here ...
+        +buildComposite("attack_damage").ranged().element().bind({ MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE })
+        +buildComposite("attack_damage_rate").single().element().bind { ATTACK_DAMAGE_RATE }
+        +buildComposite("attack_effect_chance").single().bind { ATTACK_EFFECT_CHANCE }
+        +buildComposite("block_interaction_range").single().bind { BLOCK_INTERACTION_RANGE }
+        +buildComposite("critical_strike_chance").single().bind { CRITICAL_STRIKE_CHANCE }
+        +buildComposite("critical_strike_power").single().bind { CRITICAL_STRIKE_POWER }
+        +buildComposite("negative_critical_strike_power").single().bind { NEGATIVE_CRITICAL_STRIKE_POWER }
+        +buildComposite("defense").single().element().bind { DEFENSE }
+        +buildComposite("defense_penetration").single().element().bind { DEFENSE_PENETRATION }
+        +buildComposite("defense_penetration_rate").single().element().bind { DEFENSE_PENETRATION_RATE }
+        +buildComposite("entity_interaction_range").single().bind { ENTITY_INTERACTION_RANGE }
+        +buildComposite("health_regeneration").single().bind { HEALTH_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
+        +buildComposite("incoming_damage_rate").single().element().bind { INCOMING_DAMAGE_RATE }
+        +buildComposite("lifesteal").single().bind { LIFESTEAL }
+        +buildComposite("mana_consumption_rate").single().bind { MANA_CONSUMPTION_RATE }
+        +buildComposite("mana_regeneration").single().bind { MANA_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
+        +buildComposite("manasteal").single().bind { MANASTEAL }
+        +buildComposite("max_absorption").single().bind { MAX_ABSORPTION }
+        +buildComposite("max_health").single().bind { MAX_HEALTH }
+        +buildComposite("max_mana").single().bind { MAX_MANA }
+        +buildComposite("mining_efficiency").single().bind { MINING_EFFICIENCY }
+        +buildComposite("movement_speed").single().bind { MOVEMENT_SPEED }
+        +buildComposite("safe_fall_distance").single().bind { SAFE_FALL_DISTANCE }
+        +buildComposite("scale").single().bind { SCALE }
+        +buildComposite("step_height").single().bind { STEP_HEIGHT }
+        +buildComposite("universal_attack_damage").ranged().bind({ UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE })
+        +buildComposite("universal_defense").single().bind { UNIVERSAL_DEFENSE }
+        +buildComposite("universal_defense_penetration").single().bind { UNIVERSAL_DEFENSE_PENETRATION }
+        +buildComposite("universal_defense_penetration_rate").single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
     }
 
     override fun onPreWorld() {
-        // 注册所有 facade
-        registerFacades()
+        // 注册所有 composites
+        registerComposites()
         // 初始化
         ElementRegistry.INSTANCES.forEach { (_, element) ->
             Attributes.element(element)
@@ -142,8 +142,8 @@ interface CompositeAttributeFacade<T : ConstantCompositeAttribute, S : VariableC
     /**
      * 属性的唯一标识.
      *
-     * 属性 facade 的唯一标识与单个属性的唯一标识不一定相同,
-     * 当一个属性的 facade 是由多个属性构成时(例如攻击力),
+     * 融合属性的唯一标识与单个属性的唯一标识不一定相同,
+     * 当融合属性是由多个属性构成时(例如攻击力),
      * 它们的唯一标识就不一样.
      */
     val id: String
@@ -206,7 +206,7 @@ inline fun <reified T : CompositeAttributeComponent> CompositeAttributeMetadata.
 }
 
 //
-// Mini DSL for building an attribute facade
+// Mini DSL for building an composite attribute facade
 //
 
 private operator fun CompositeAttributeFacade<*, *>.unaryPlus() {
@@ -653,7 +653,7 @@ private class RangedElementAttributeBinderImpl(
 
 
 private fun ConfigurationNode.getOperation(): Operation {
-    return node("operation").string?.let { Operation.byKeyOrThrow(it) } ?: Operation.ADD
+    return node("operation").string?.let { Operation.byName(it) } ?: Operation.ADD
 }
 
 private fun ConfigurationNode.getElement(): Element {

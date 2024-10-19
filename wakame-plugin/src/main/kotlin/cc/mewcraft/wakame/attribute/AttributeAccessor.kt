@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.user.PlayerAdapter
-import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.UserManager
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -9,39 +7,22 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 /**
- * Provides the access to [AttributeMap] of various subjects.
- *
- * See the document of the subtypes for more details of usage.
- */
-sealed class AttributeAccessor<T> {
-    /**
-     * Gets the [AttributeMap] for the [subject].
-     */
-    abstract fun getAttributeMap(subject: T): AttributeMap
-}
-
-/**
  * Provides the access to the [AttributeMap] of all (online) players.
- *
- * To get the [AttributeMap] of a player, it's recommended using the
- * [PlayerAdapter] (instead of [PlayerAttributeAccessor]) to get the [User]
- * instance, from which you can get the [AttributeMap] for that player.
  */
-data object PlayerAttributeAccessor : KoinComponent, AttributeAccessor<Player>() {
+data object PlayerAttributeMapAccess : KoinComponent, AttributeMapAccess<Player> {
     private val userManager: UserManager<Player> by inject()
 
-    override fun getAttributeMap(subject: Player): AttributeMap {
-        // the implementation simply redirect calls to the UserManager
-        return userManager.getPlayer(subject).attributeMap
+    override fun get(subject: Player): Result<AttributeMap> {
+        // 该实现仅仅把对函数的调用转发到对应的 User 实例之下
+        return runCatching { userManager.getPlayer(subject).attributeMap }
     }
 }
 
 /**
  * Provides the access to [AttributeMap] of all non-player entities.
  */
-data object EntityAttributeAccessor : AttributeAccessor<LivingEntity>() {
-    override fun getAttributeMap(subject: LivingEntity): AttributeMap {
-        // TODO add support for MythicMobs mobs
-        return AttributeMap(subject)
+data object EntityAttributeMapAccess : AttributeMapAccess<LivingEntity> {
+    override fun get(subject: LivingEntity): Result<AttributeMap> {
+        return runCatching { AttributeMap(subject) }
     }
 }

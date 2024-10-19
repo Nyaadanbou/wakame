@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PostWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
@@ -13,7 +11,7 @@ import org.slf4j.Logger
 /**
  * Provides default [AttributeInstance]s for various subject types.
  */
-@PostWorldDependency(
+@PreWorldDependency(
     runBefore = [AttributeRegistry::class],
 )
 @ReloadDependency(
@@ -63,6 +61,7 @@ object DefaultAttributes : KoinComponent, Initializable {
      *
      * @param key the subject key
      * @param supplier the attribute supplier
+     * @return the previous supplier, if any
      */
     fun addSupplier(key: Key, supplier: AttributeSupplier): AttributeSupplier? {
         return SUPPLIERS.put(key, supplier)
@@ -70,7 +69,7 @@ object DefaultAttributes : KoinComponent, Initializable {
 
     /* Internals */
 
-    override fun onPostWorld() {
+    override fun onPreWorld() {
         loadConfiguration()
     }
 

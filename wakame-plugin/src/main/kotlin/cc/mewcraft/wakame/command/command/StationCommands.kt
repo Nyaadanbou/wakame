@@ -1,16 +1,13 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.wakame.command.CommandConstants
-import cc.mewcraft.wakame.command.CommandPermissions
-import cc.mewcraft.wakame.command.buildAndAdd
+import cc.mewcraft.wakame.command.*
 import cc.mewcraft.wakame.command.parser.StationParser
 import cc.mewcraft.wakame.gui.station.StationMenu
 import cc.mewcraft.wakame.station.Station
 import cc.mewcraft.wakame.util.ThreadType
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.incendo.cloud.Command
-import org.incendo.cloud.CommandFactory
+import org.incendo.cloud.*
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.bukkit.data.SinglePlayerSelector
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
@@ -29,8 +26,8 @@ object StationCommands : CommandFactory<CommandSender> {
             ) {
                 permission(CommandPermissions.STATION)
                 literal(STATION_LITERAL)
-                handler {
-                    it.sender().sendPlainMessage("Crafting Station!")
+                handler { ctx ->
+                    ctx.sender().sendPlainMessage("Crafting Station!")
                 }
             }.buildAndAdd(this)
 
@@ -40,7 +37,6 @@ object StationCommands : CommandFactory<CommandSender> {
             ) {
                 permission(CommandPermissions.STATION)
                 literal(STATION_LITERAL)
-                literal("open")
                 required("station", StationParser.stationParser())
                 optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
                 handler { ctx ->
@@ -53,7 +49,7 @@ object StationCommands : CommandFactory<CommandSender> {
                     }
 
                     ThreadType.SYNC.launch {
-                        sender.sendPlainMessage("Opening menu for station: ${station.id}")
+                        sender.sendPlainMessage("Opening crafting station ${station.id} for player ${viewer.name}")
                         StationMenu(station, viewer).open()
                     }
                 }

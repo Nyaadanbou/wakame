@@ -13,19 +13,19 @@ import java.util.UUID
 object AttributeLegacyMappings {
     private val mappings: BiMap<Key, UUID> = HashBiMap.create()
 
-    fun byKey(id: Key): UUID {
+    fun byId(id: UUID): Key {
+        return mappings.inverse().computeIfAbsent(id) { generateName(it.toString()) }
+    }
+
+    fun byName(id: Key): UUID {
         return mappings.computeIfAbsent(id) { generateUUID(it.asString()) }
     }
 
-    fun byId(id: UUID): Key {
-        return mappings.inverse().computeIfAbsent(id) { generateKey(it.toString()) }
+    private fun generateName(name: String): Key {
+        return Key.key(UUID.nameUUIDFromBytes(name.toByteArray()).toString())
     }
 
     private fun generateUUID(name: String): UUID {
         return UUID.nameUUIDFromBytes(name.toByteArray())
-    }
-
-    private fun generateKey(name: String): Key {
-        return Key.key(UUID.nameUUIDFromBytes(name.toByteArray()).toString())
     }
 }

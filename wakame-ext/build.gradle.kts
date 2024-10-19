@@ -1,5 +1,6 @@
 plugins {
     id("neko-kotlin")
+    id("neko-koin")
     id("nyaadanbou-conventions.repositories")
 }
 

@@ -1,203 +1,15 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.commons.collections.enumMap
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import com.google.common.collect.ImmutableSet
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import it.unimi.dsi.fastutil.objects.ObjectArraySet
-import it.unimi.dsi.fastutil.objects.ObjectCollection
-import it.unimi.dsi.fastutil.objects.ObjectSets
+import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.VisibleForTesting
 import java.util.EnumMap
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
-
-/**
- * 属性实例 ([AttributeInstance]) 本质上是一个用于数值计算的容器, 里面包含了一个
- * [Attribute] 和多个与之关联的 [AttributeModifier]. 每一个 [AttributeModifier]
- * 在概念上都是对 [Attribute] 的修饰, 会影响 [AttributeInstance] 的数值计算结果.
- *
- * **Caution:** This should be directly linked to a certain living entity,
- * e.g. a player, a zombie, etc. Any changes on this instance
- * should reflect on the linked entity in real time.
- */
-sealed interface AttributeInstance : AttributeInstanceSnapshotable {
-    /**
-     * The [Attribute] in this [AttributeInstance].
-     *
-     * The object serves as a "prototype", where we might take the [Attribute.defaultValue]
-     * as the return value of [getBaseValue], or we just read the `baseValue` stored in
-     * the [AttributeInstance] object.
-     */
-    val attribute: Attribute
-
-    /**
-     * 获取经过所有 [AttributeModifier] 修饰后的最终数值.
-     */
-    fun getValue(): Double
-
-    /**
-     * 获取该属性实例的基值.
-     */
-    fun getBaseValue(): Double
-
-    /**
-     * 设置该属性实例的基值.
-     */
-    fun setBaseValue(baseValue: Double)
-
-    /**
-     * 获取指定 [id] 的 [AttributeModifier].
-     */
-    fun getModifier(id: Key): AttributeModifier?
-
-    /**
-     * 返回一个包含所有 [AttributeModifier] 的集合. 返回的集合不可变.
-     */
-    fun getModifiers(): Set<AttributeModifier>
-
-    /**
-     * 判断是否存在指定的 [AttributeModifier].
-     */
-    fun hasModifier(modifier: AttributeModifier): Boolean
-
-    /**
-     * 添加一个 [AttributeModifier] 到该属性实例.
-     */
-    fun addModifier(modifier: AttributeModifier)
-
-    /**
-     * 移除指定的 [AttributeModifier].
-     */
-    fun removeModifier(modifier: AttributeModifier)
-
-    /**
-     * 移除指定 [id] 的 [AttributeModifier].
-     */
-    fun removeModifier(id: Key)
-
-    /**
-     * 移除所有 [AttributeModifier].
-     */
-    fun removeModifiers()
-
-    /**
-     * 将本实例的状态替换为 [other] 的状态.
-     */
-    fun replace(other: AttributeInstance)
-}
-
-/**
- * 代表一个无形的属性实例. 该实例不可变, 并且不会对世界状态产生任何副作用.
- */
-sealed interface IntangibleAttributeInstance : AttributeInstanceSnapshotable {
-    /**
-     * 该属性实例的 [Attribute].
-     */
-    val attribute: Attribute
-
-    /**
-     * 获取经过所有 [AttributeModifier] 修饰后的最终数值.
-     */
-    fun getValue(): Double
-
-    /**
-     * 获取该属性实例的基值.
-     */
-    fun getBaseValue(): Double
-
-    /**
-     * 获取指定 [id] 的 [AttributeModifier].
-     */
-    fun getModifier(id: Key): AttributeModifier?
-
-    /**
-     * 返回一个包含所有 [AttributeModifier] 的集合. 返回的集合不可变.
-     */
-    fun getModifiers(): Set<AttributeModifier>
-
-    /**
-     * 判断是否存在指定的 [AttributeModifier].
-     */
-    fun hasModifier(modifier: AttributeModifier): Boolean
-}
-
-/**
- * 代表一个属性实例的快照 (支持读/写), 用于临时的数值储存和计算.
- */
-sealed interface AttributeInstanceSnapshot {
-    /**
-     * 该属性实例的 [Attribute].
-     */
-    val attribute: Attribute
-
-    /**
-     * 获取经过所有 [AttributeModifier] 修饰后的最终数值.
-     */
-    fun getValue(): Double
-
-    /**
-     * 获取该属性实例的基值.
-     */
-    fun getBaseValue(): Double
-
-    /**
-     * 设置该属性实例的基值.
-     */
-    fun setBaseValue(baseValue: Double)
-
-    /**
-     * 获取指定 [id] 的 [AttributeModifier].
-     */
-    fun getModifier(id: Key): AttributeModifier?
-
-    /**
-     * 返回一个包含所有 [AttributeModifier] 的集合. 返回的集合不可变.
-     */
-    fun getModifiers(): Set<AttributeModifier>
-
-    /**
-     * 判断是否存在指定的 [AttributeModifier].
-     */
-    fun hasModifier(modifier: AttributeModifier): Boolean
-
-    /**
-     * 添加一个 [AttributeModifier] 到该属性实例.
-     */
-    fun addModifier(modifier: AttributeModifier)
-
-    /**
-     * 移除指定的 [AttributeModifier].
-     */
-    fun removeModifier(modifier: AttributeModifier)
-
-    /**
-     * 移除指定 [id] 的 [AttributeModifier].
-     */
-    fun removeModifier(id: Key)
-
-    /**
-     * 移除所有 [AttributeModifier].
-     */
-    fun removeModifiers()
-
-    /**
-     * 将本实例转换为一个 [IntangibleAttributeInstance].
-     */
-    fun toIntangible(): IntangibleAttributeInstance
-}
-
-/**
- * 代表一个可以产生 [AttributeInstanceSnapshot] 的对象.
- */
-sealed interface AttributeInstanceSnapshotable {
-    /**
-     * 根据当前状态创建一个 [AttributeInstanceSnapshot].
-     */
-    fun getSnapshot(): AttributeInstanceSnapshot
-}
 
 /**
  * 用于创建各种类型的 [AttributeInstance].
@@ -218,7 +30,7 @@ object AttributeInstanceFactory {
      *
      * @param attribute
      */
-    fun createInstance(attribute: Attribute): AttributeInstance {
+    fun createDataInstance(attribute: Attribute): AttributeInstance {
         return WakameAttributeInstance(AttributeInstanceDelegation(attribute))
     }
 
@@ -232,7 +44,7 @@ object AttributeInstanceFactory {
      * @param attributable 世界状态中需要创建 [AttributeInstance] 的对象
      * @param registerVanilla 是否在世界状态中为 [attributable] 注册属性
      */
-    fun createInstance(attribute: Attribute, attributable: Attributable, registerVanilla: Boolean): AttributeInstance {
+    fun createLiveInstance(attribute: Attribute, attributable: Attributable, registerVanilla: Boolean): AttributeInstance {
         if (!attribute.vanilla) {
             // 是我们自己的萌芽属性, 直接创建实例即可
             return WakameAttributeInstance(AttributeInstanceDelegation(attribute))
@@ -265,7 +77,7 @@ object AttributeInstanceFactory {
             return@run attributable.getAttribute(bukkitAttribute)!!
         }
 
-        return VanillaAttributeInstance(handle)
+        return VanillaAttributeInstance(handle, attributable is Player)
     }
 }
 
@@ -278,20 +90,18 @@ object AttributeInstanceFactory {
  */
 private class AttributeInstanceDelegation(
     val attribute: Attribute,
-    @get:JvmName("baseValue")
-    @set:JvmName("baseValue")
-    var baseValue: Double = attribute.defaultValue,
-    var modifiersById: Object2ObjectArrayMap<Key, AttributeModifier> = Object2ObjectArrayMap(),
-    var modifiersByOp: EnumMap<Operation, Object2ObjectOpenHashMap<Key, AttributeModifier>> = enumMap(),
-    var cachedValue: Double = 0.0,
-    var dirty: Boolean = true,
+    private var baseValue: Double = attribute.defaultValue,
+    private var modifiersById: Object2ObjectArrayMap<Key, AttributeModifier> = Object2ObjectArrayMap(),
+    private var modifiersByOp: EnumMap<Operation, Object2ObjectOpenHashMap<Key, AttributeModifier>> = enumMap(),
+    private var cachedValue: Double = 0.0,
+    private var dirty: Boolean = true,
 
     /**
      * 用于实现 copy-on-write.
      * 当为 false 时, 表示拥有所有权, 可以直接修改数据.
      * 当为 true 时, 表示没有所有权, 必须先复制再修改.
      */
-    var copyOnWrite: Boolean = false,
+    private var copyOnWrite: Boolean = false,
 ) {
 
     fun getBaseValue(): Double {
@@ -332,6 +142,11 @@ private class AttributeInstanceDelegation(
     }
 
     fun addModifier(modifier: AttributeModifier) {
+        // FIXME 因为尚未实现 WakameAttributeInstance 的持久化, 所以暂时不支持添加持久化的 modifier
+        this.addTransientModifier(modifier)
+    }
+
+    fun addTransientModifier(modifier: AttributeModifier) {
         ensureDataOwnership()
         if (modifiersById.putIfAbsent(modifier.id, modifier) != null) {
             AttributeSupport.LOGGER.warn("$modifier is already applied on this attribute (same id)")
@@ -423,7 +238,7 @@ private class AttributeInstanceDelegation(
  * [WakameAttributeInstance], and should not be stored in the world state.
  */
 private class ProtoAttributeInstance(
-    val delegation: AttributeInstanceDelegation,
+    private val delegation: AttributeInstanceDelegation,
 ) : AttributeInstance {
     override val attribute: Attribute
         get() = delegation.attribute
@@ -452,6 +267,9 @@ private class ProtoAttributeInstance(
     override fun addModifier(modifier: AttributeModifier) =
         delegation.addModifier(modifier)
 
+    override fun addTransientModifier(modifier: AttributeModifier) =
+        delegation.addTransientModifier(modifier)
+
     override fun removeModifier(modifier: AttributeModifier) =
         delegation.removeModifier(modifier)
 
@@ -460,6 +278,10 @@ private class ProtoAttributeInstance(
 
     override fun removeModifiers() =
         delegation.removeModifiers()
+
+    override fun replaceBaseValue(other: AttributeInstance) {
+        delegation.setBaseValue(other.getBaseValue())
+    }
 
     override fun replace(other: AttributeInstance): Unit =
         throw UnsupportedOperationException("This operation is not supported for prototype instances.")
@@ -471,7 +293,7 @@ private class ProtoAttributeInstance(
  * This class represents the concrete attribute instance in our own system.
  */
 private class WakameAttributeInstance(
-    val delegation: AttributeInstanceDelegation,
+    private val delegation: AttributeInstanceDelegation,
 ) : AttributeInstance {
     override val attribute: Attribute
         get() = delegation.attribute
@@ -500,6 +322,9 @@ private class WakameAttributeInstance(
     override fun addModifier(modifier: AttributeModifier) =
         delegation.addModifier(modifier)
 
+    override fun addTransientModifier(modifier: AttributeModifier) =
+        delegation.addTransientModifier(modifier)
+
     override fun removeModifier(modifier: AttributeModifier) =
         delegation.removeModifier(modifier)
 
@@ -509,13 +334,17 @@ private class WakameAttributeInstance(
     override fun removeModifiers() =
         delegation.removeModifiers()
 
+    override fun replaceBaseValue(other: AttributeInstance) {
+        delegation.setBaseValue(other.getBaseValue())
+    }
+
     override fun replace(other: AttributeInstance) {
         if (other is WakameAttributeInstance) {
             delegation.replace(other.delegation)
         } else {
             this.setBaseValue(other.getBaseValue())
             this.getModifiers().forEach { this.removeModifier(it) }
-            other.getModifiers().forEach { this.addModifier(it) }
+            other.getModifiers().forEach { this.addTransientModifier(it) }
         }
     }
 }
@@ -528,7 +357,8 @@ private class WakameAttributeInstance(
  * [BukkitAttributeInstance].
  */
 private class VanillaAttributeInstance(
-    val handle: BukkitAttributeInstance, // 封装的世界状态中的对象
+    private val handle: BukkitAttributeInstance, // 封装的世界状态中的对象
+    private val forPlayer: Boolean, // 是否是玩家的属性
 ) : AttributeInstance {
     override val attribute: Attribute
         get() = handle.attribute.toNeko()
@@ -564,11 +394,22 @@ private class VanillaAttributeInstance(
         return handle.getModifier(modifier.id) != null
     }
 
+    // 开发日记 2024/10/18
+    // 选择 addModifier 还是 addTransientModifier?
+    //
+    // 如果玩家手持 wakame 物品, 并且 wakame 物品上有增加最大生命值的属性 (原版属性),
+    // 那么当玩家先离线, 然后再上线, 后台会抛异常: “Modifier is already applied on this attribute!”
+    // 这是因为玩家下线时, 并不会触发移除物品属性的逻辑, 导致属性被永久保存到 NBT 了.
+    // 解决办法: addTransientModifier
+    //
+    // 如果不是玩家, 直接添加永久 modifier 即可.
+    // 这样, 生物的原版属性将由原版来应用和持久化.
+
     override fun addModifier(modifier: AttributeModifier) {
-        // 如果玩家手持 wakame 物品, 并且 wakame 物品上有增加最大生命值的属性 (原版属性),
-        // 那么当玩家先离线, 然后再上线, 后台会抛异常: “Modifier is already applied on this attribute!”
-        // 这是因为玩家下线时, 并不会触发移除物品属性的逻辑, 导致属性被永久保存到 NBT 了.
-        // 解决办法: addTransientModifier
+        handle.addModifier(modifier.toBukkit())
+    }
+
+    override fun addTransientModifier(modifier: AttributeModifier) {
         handle.addTransientModifier(modifier.toBukkit())
     }
 
@@ -587,13 +428,17 @@ private class VanillaAttributeInstance(
     override fun replace(other: AttributeInstance) {
         setBaseValue(other.getBaseValue())
         this.getModifiers().forEach { removeModifier(it) }
-        other.getModifiers().forEach { addModifier(it) }
+        other.getModifiers().forEach { addTransientModifier(it) }
+    }
+
+    override fun replaceBaseValue(other: AttributeInstance) {
+        setBaseValue(other.getBaseValue())
     }
 }
 
-private class IntangibleAttributeInstanceImpl(
-    val delegation: AttributeInstanceDelegation,
-) : IntangibleAttributeInstance {
+private class ImaginaryAttributeInstanceImpl(
+    private val delegation: AttributeInstanceDelegation,
+) : ImaginaryAttributeInstance {
     override val attribute: Attribute
         get() = delegation.attribute
 
@@ -617,7 +462,7 @@ private class IntangibleAttributeInstanceImpl(
 }
 
 private class AttributeInstanceSnapshotImpl(
-    val delegation: AttributeInstanceDelegation,
+    private val delegation: AttributeInstanceDelegation,
 ) : AttributeInstanceSnapshot {
     override val attribute: Attribute
         get() = delegation.attribute
@@ -652,6 +497,6 @@ private class AttributeInstanceSnapshotImpl(
     override fun removeModifiers() =
         delegation.removeModifiers()
 
-    override fun toIntangible(): IntangibleAttributeInstance =
-        IntangibleAttributeInstanceImpl(delegation.copy())
+    override fun toImaginary(): ImaginaryAttributeInstance =
+        ImaginaryAttributeInstanceImpl(delegation.copy())
 }

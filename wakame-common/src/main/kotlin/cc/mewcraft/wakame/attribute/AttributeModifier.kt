@@ -4,8 +4,8 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap
 import net.kyori.adventure.key.Key
 
 /**
- * An [AttributeModifier] is responsible to modify an [Attribute]. By
- * design, all the instance creators of [AttributeModifier] must provide a
+ * An [AttributeModifier] is responsible to conceptually modify an [Attribute].
+ * By design, all the instance creators of [AttributeModifier] must provide a
  * [Key], which is then used to distinguish the "source" of the modifier.
  */
 data class AttributeModifier(
@@ -14,36 +14,28 @@ data class AttributeModifier(
     val operation: Operation,
 ) {
     enum class Operation(
-        val key: String,
         val id: Int,
+        val key: String,
     ) {
-        ADD("add", 0),
-        MULTIPLY_BASE("multiply_base", 1),
-        MULTIPLY_TOTAL("multiply_total", 2);
+        ADD(0, "add"),
+        MULTIPLY_BASE(1, "multiply_base"),
+        MULTIPLY_TOTAL(2, "multiply_total");
 
         val binary: Byte = id.toByte()
 
         companion object {
-            private val BY_KEY: Map<String, Operation> = mapOf(
+            private val BY_NAME: Map<String, Operation> = mapOf(
                 ADD.key to ADD,
                 MULTIPLY_BASE.key to MULTIPLY_BASE,
                 MULTIPLY_TOTAL.key to MULTIPLY_TOTAL
             ).let(::Object2ReferenceArrayMap)
 
-            fun byKey(key: String): Operation? {
-                return BY_KEY[key]
-            }
-
-            fun byKeyOrThrow(key: String): Operation {
-                return requireNotNull(byKey(key)) { "Can't find operation with key '$key'" }
-            }
-
             fun byId(id: Int): Operation? {
                 return entries.getOrNull(id)
             }
 
-            fun byIdOrThrow(id: Int): Operation {
-                return byId(id) ?: throw IllegalArgumentException("Can't find operation with id '$id'")
+            fun byName(key: String): Operation? {
+                return BY_NAME[key]
             }
         }
     }
@@ -52,11 +44,11 @@ data class AttributeModifier(
         if (this === other)
             return true
         if (other is AttributeModifier)
-            return id == other.id && operation == other.operation
+            return id == other.id // 原版无法重复添加 id 相同的属性修饰符, 因此只需要比较 id 即可
         return false
     }
 
     override fun hashCode(): Int {
-        return id.hashCode() * 31 + operation.hashCode()
+        return id.hashCode()
     }
 }

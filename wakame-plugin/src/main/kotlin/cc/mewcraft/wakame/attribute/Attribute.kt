@@ -5,10 +5,8 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -25,7 +23,7 @@ import java.util.stream.Stream
  * are generally used as conceptual types. Instead, use the singleton [Attributes]
  * to get the instances. The same also applies to its subtypes.
  *
- * @property facadeId
+ * @property compositeId
  * @property descriptionId 属性的唯一标识
  * @property defaultValue 属性的默认数值 (非 [Provider])
  * @property vanilla 属性是否由原版属性实现
@@ -33,45 +31,18 @@ import java.util.stream.Stream
  * @see RangedAttribute
  * @see ElementAttribute
  */
-open class Attribute
+open class SimpleAttribute
 /**
  * @param defaultValue 属性的默认数值 ([Provider])
  */
 protected constructor(
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) val facadeId: String,
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING) val descriptionId: String,
+    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING)
+    final override val compositeId: String,
+    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING)
+    final override val descriptionId: String,
     defaultValue: Provider<Double>,
-    val vanilla: Boolean = false,
-) : Keyed, Examinable {
-    /**
-     * Instantiates the type using the global attribute config as value providers.
-     *
-     * This constructor is used if the [facadeId] is different from the [descriptionId].
-     *
-     * @param facadeId the ID of the attribute facade to which this attribute is related
-     */
-    internal constructor(
-        facadeId: String,
-        descriptionId: String,
-        defaultValue: Double,
-        vanilla: Boolean = false,
-    ) : this(
-        facadeId = facadeId,
-        descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
-        vanilla = vanilla
-    )
-
-    internal constructor(
-        descriptionId: String,
-        defaultValue: Double,
-        vanilla: Boolean = false,
-    ) : this(
-        facadeId = descriptionId,
-        descriptionId = descriptionId,
-        defaultValue = defaultValue,
-        vanilla = vanilla,
-    )
+    final override val vanilla: Boolean = false,
+) : Examinable, Attribute {
 
     // 需要注意 (kotlin 委托基础)
     // 当一个 property 将值委托给 provider 时，其返回的是 provider 的值，而不是 provider
@@ -83,19 +54,42 @@ protected constructor(
     // 这也意味着，我们也不需要再写一个 defaultValueProvider 的 property
     //
     // 这里说的同样也适用于该文件其他用到 `by` 的地方
-    val defaultValue: Double by defaultValue
+    final override val defaultValue: Double by defaultValue
 
     /**
-     * 清理给定的数值，使其落在该属性的合理数值范围内。
+     * Instantiates the type using the global attribute config as value providers.
      *
-     * @param value 要清理的数值
-     * @return 清理好的数值
+     * This constructor is used if the [compositeId] is different from the [descriptionId].
+     *
+     * @param compositeId the ID of the composite attribute to which this attribute is related
      */
-    open fun sanitizeValue(value: Double): Double {
+    internal constructor(
+        compositeId: String,
+        descriptionId: String,
+        defaultValue: Double,
+        vanilla: Boolean = false,
+    ) : this(
+        compositeId = compositeId,
+        descriptionId = descriptionId,
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", "default").orElse(defaultValue),
+        vanilla = vanilla    )
+
+    internal constructor(
+        descriptionId: String,
+        defaultValue: Double,
+        vanilla: Boolean = false,
+    ) : this(
+        compositeId = descriptionId,
+        descriptionId = descriptionId,
+        defaultValue = defaultValue,
+        vanilla = vanilla,
+    )
+
+    override fun sanitizeValue(value: Double): Double {
         return value
     }
 
-    override val key: Key = Key(Namespaces.ATTRIBUTE, descriptionId)
+    override val key: Key = Key.key(Namespaces.ATTRIBUTE, descriptionId)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
@@ -134,36 +128,36 @@ open class RangedAttribute
  * @param maxValue 该属性允许的最大数值（[Provider]）
  */
 protected constructor(
-    facadeId: String,
+    compositeId: String,
     descriptionId: String,
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
     vanilla: Boolean = false,
-) : Attribute(facadeId, descriptionId, defaultValue, vanilla) {
+) : SimpleAttribute(compositeId, descriptionId, defaultValue, vanilla) {
     val minValue: Double by minValue
     val maxValue: Double by maxValue
 
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
-     * This constructor is used if the [facadeId] is different from the [descriptionId].
+     * This constructor is used if the [compositeId] is different from the [descriptionId].
      *
-     * @param facadeId the ID of the attribute facade to which this attribute is related
+     * @param compositeId the ID of the composite attribute to which this attribute is related
      */
     internal constructor(
-        facadeId: String,
+        compositeId: String,
         descriptionId: String,
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = facadeId,
+        compositeId = compositeId,
         descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "default").orElse(defaultValue),
-        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "min").orElse(minValue),
-        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", "max").orElse(maxValue),
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", "default").orElse(defaultValue),
+        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", "min").orElse(minValue),
+        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", "max").orElse(maxValue),
         vanilla = vanilla
     )
 
@@ -174,7 +168,7 @@ protected constructor(
         maxValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = descriptionId,
+        compositeId = descriptionId,
         descriptionId = descriptionId,
         defaultValue = defaultValue,
         minValue = minValue,
@@ -219,7 +213,7 @@ protected constructor(
     }
 
     override fun hashCode(): Int {
-        var result = descriptionId.hashCode()
+        val result = descriptionId.hashCode()
         // result = (31 * result) + element.hashCode()
         return result
     }
@@ -230,7 +224,7 @@ protected constructor(
  */
 open class ElementAttribute
 protected constructor(
-    facadeId: String,
+    compositeId: String,
     descriptionId: String,
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
@@ -238,7 +232,7 @@ protected constructor(
     val element: Element,
     vanilla: Boolean = false,
 ) : RangedAttribute(
-    facadeId,
+    compositeId,
     descriptionId + "/" + element.uniqueId,
     defaultValue,
     minValue,
@@ -249,12 +243,12 @@ protected constructor(
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
-     * This constructor is used if the [facadeId] is different from the [descriptionId].
+     * This constructor is used if the [compositeId] is different from the [descriptionId].
      *
-     * @param facadeId the ID of the attribute facade to which this attribute is related
+     * @param compositeId the ID of the composite attribute to which this attribute is related
      */
     internal constructor(
-        facadeId: String,
+        compositeId: String,
         descriptionId: String,
         defaultValue: Double,
         minValue: Double,
@@ -262,11 +256,11 @@ protected constructor(
         element: Element,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = facadeId,
+        compositeId = compositeId,
         descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "default").orElse(defaultValue),
-        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "min").orElse(minValue),
-        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(facadeId, "values", element.uniqueId, "max").orElse(maxValue),
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", element.uniqueId, "default").orElse(defaultValue),
+        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", element.uniqueId, "min").orElse(minValue),
+        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", element.uniqueId, "max").orElse(maxValue),
         element = element,
         vanilla = vanilla
     )
@@ -279,7 +273,7 @@ protected constructor(
         element: Element,
         vanilla: Boolean = false,
     ) : this(
-        facadeId = descriptionId,
+        compositeId = descriptionId,
         descriptionId = descriptionId,
         defaultValue = defaultValue,
         minValue = minValue,
@@ -306,7 +300,7 @@ protected constructor(
     }
 
     override fun hashCode(): Int {
-        var result = descriptionId.hashCode()
+        val result = descriptionId.hashCode()
         // result = (31 * result) + element.hashCode()
         return result
     }

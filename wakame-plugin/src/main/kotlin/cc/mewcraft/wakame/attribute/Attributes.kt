@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.element.Element
-import com.google.common.collect.Multimap
-import com.google.common.collect.MultimapBuilder
+import com.google.common.collect.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -17,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap
 object Attributes : AttributeCollectionProvider<Attribute> {
     // 一个空的属性, 本身没有任何作用.
     // 这只是一个特殊值, 供其他系统使用.
-    val EMPTY = Attribute("empty", .0).register()
+    val EMPTY = SimpleAttribute("empty", .0).register()
 
     //<editor-fold desc="原版属性">
     // 请在这里添加/获取*原版属性*的实例.
@@ -56,6 +55,8 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_min_attack_damage", .0, .0, 16384.0).register()
     //</editor-fold>
 
+    // TODO 想办法把元素属性也放在这里, element 这个函数就不要了
+
     /**
      * Gets specific [ElementAttributes] by the [element].
      *
@@ -70,31 +71,46 @@ object Attributes : AttributeCollectionProvider<Attribute> {
      * @see ElementAttributes
      */
     fun element(element: Element): ElementAttributes {
-        return ElementAttributeInternals.getElementAttributes(element)
+        return ElementAttributeInternals.getOrCreate(element)
     }
 
     /**
-     * Gets all [Attribute.facadeId] of the attributes that are backed by vanilla attributes.
+     * Gets all [Attribute.compositeId] of vanilla-backing attributes.
      */
     fun getVanillaAttributeNames(): Collection<String> {
-        return AttributeNameInternals.getNamesOfVanilla()
+        return AttributeNameInternals.getVanillaAttributeNames()
     }
 
     /**
-     * Gets all [Attribute.facadeId] of the element attributes.
+     * Gets all [Attribute.compositeId] of known element attributes.
      */
     fun getElementAttributeNames(): Collection<String> {
-        return AttributeNameInternals.getNamesOfElement()
+        return AttributeNameInternals.getElementAttributeNames()
     }
 
     /**
-     * Gets specific [Attribute] instances by the [facadeId].
-     *
-     * The returned collect does *not* include any elemental attributes!
+     * Gets all [Attribute.descriptionId] of known attributes (including [ElementAttribute]).
      */
-    override fun getAttributesByFacade(facadeId: String): Collection<Attribute> {
-        return AttributeInternals.byFacade(facadeId)
+    val descriptionIds: Set<String>
+        get() = AttributeInternals.descriptionIds + ElementAttributeInternals.descriptionIds
+
+    /**
+     * Gets specific [Attribute] instances by the [descriptionId] (including [ElementAttribute]).
+     */
+    override fun getBy(descriptionId: String): Attribute? {
+        return AttributeInternals.getBy(descriptionId) ?: ElementAttributeInternals.getBy(descriptionId)
     }
+
+    /**
+     * Gets specific [Attribute] instances by the [compositeId] (not including [ElementAttribute]).
+     *
+     * To get a collection of [ElementAttribute], use [Attributes.element] instead.
+     */
+    override fun getCollectionBy(compositeId: String): Collection<Attribute> {
+        return AttributeInternals.getCollectionBy(compositeId)
+    }
+
+    //////
 
     private fun Attribute.register(): Attribute {
         return AttributeInternals.register(this)
@@ -119,11 +135,12 @@ class ElementAttributes internal constructor(
     val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, ELEMENT).register()
     val INCOMING_DAMAGE_RATE = ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, ELEMENT).register()
 
-    /**
-     * Gets all the [ElementAttribute] instances by the [facadeId].
-     */
-    override fun getAttributesByFacade(facadeId: String): Collection<ElementAttribute> {
-        return ElementAttributeInternals.byFacade(ELEMENT, facadeId)
+    override fun getBy(descriptionId: String): ElementAttribute? {
+        return ElementAttributeInternals.getBy(descriptionId)
+    }
+
+    override fun getCollectionBy(compositeId: String): Collection<ElementAttribute> {
+        return ElementAttributeInternals.getCollectionBy(ELEMENT, compositeId)
     }
 
     private fun ElementAttribute.register(): ElementAttribute {
@@ -136,23 +153,28 @@ class ElementAttributes internal constructor(
  */
 interface AttributeCollectionProvider<T : Attribute> {
     /**
-     * Gets zero or more [Attribute]s by [facadeId].
+     * Gets an [Attribute] by its [descriptionId].
+     */
+    fun getBy(descriptionId: String): T?
+
+    /**
+     * Gets a collection of [Attribute]s by [compositeId].
      *
-     * **Remember that different [Attribute] instances may have the same facade identity!**
+     * **Remember that different [Attribute] instances may have the same composite id!**
      *
      * The returned list may contain zero or more attributes:
-     * - `=0`: the facade is not registered
-     * - `=1`: the facade is bound to exactly one attribute
-     * - `>1`: the facade is bound to more than one attributes
+     * - `=0`: the composition is not registered
+     * - `=1`: the composition is bound to exactly one attribute
+     * - `>1`: the composition is bound to more than one attributes
      *
      * ## Side notes
      *
      * This function is primarily used by the config deserializer.
      *
-     * @param facadeId the facade identity
+     * @param compositeId the composite id
      * @return zero or more attributes
      */
-    fun getAttributesByFacade(facadeId: String): Collection<T>
+    fun getCollectionBy(compositeId: String): Collection<T>
 }
 
 
@@ -161,72 +183,97 @@ interface AttributeCollectionProvider<T : Attribute> {
 
 // 封装了一些内部状态, 以提供更好的接口体验
 private object AttributeInternals {
-    // 从 facadeId 映射到若干个 Attribute
-    private val BY_FACADE_ID: Multimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
+    // 从 descriptionId 映射到单个 Attribute
+    private val BY_DESCRIPTION_ID: HashMap<String, Attribute> = HashMap()
 
+    // 从 compositeId 映射到多个 Attribute
+    private val BY_COMPOSITE_ID: SetMultimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
+
+    // 所有已知的 Attribute 的 descriptionId
+    val descriptionIds: Set<String>
+        get() = BY_DESCRIPTION_ID.keys
+
+    @Synchronized
     fun register(attribute: Attribute): Attribute {
-        BY_FACADE_ID.put(attribute.facadeId, attribute)
+        BY_DESCRIPTION_ID[attribute.descriptionId] = attribute
+        BY_COMPOSITE_ID.put(attribute.compositeId, attribute)
         AttributeNameInternals.register(attribute)
         return attribute
     }
 
-    fun byFacade(facadeId: String): Collection<Attribute> {
-        return BY_FACADE_ID.get(facadeId)
+    fun getBy(descriptionId: String): Attribute? {
+        return BY_DESCRIPTION_ID[descriptionId]
+    }
+
+    fun getCollectionBy(compositeId: String): Collection<Attribute> {
+        return BY_COMPOSITE_ID.get(compositeId)
     }
 }
 
 // 封装了一些内部状态, 以提供更好的接口体验
 private object ElementAttributeInternals {
-    // 从 Element 映射到若干个 ElementAttribute
-    private val BY_FACADE_ID: ConcurrentHashMap<Element, Multimap<String, ElementAttribute>> = ConcurrentHashMap()
+    // 从 descriptionId 映射到单个 ElementAttribute
+    private val BY_DESCRIPTION_ID: HashMap<String, ElementAttribute> = HashMap()
 
+    // 从 compositeId 映射到多个 ElementAttribute
+    private val BY_COMPOSITE_ID: HashBasedTable<Element, String, HashSet<ElementAttribute>> = HashBasedTable.create()
+
+    // 所有已知的 ElementAttribute 的 descriptionId
+    val descriptionIds: Set<String>
+        get() = BY_DESCRIPTION_ID.keys
+
+    @Synchronized
     fun register(attribute: ElementAttribute): ElementAttribute {
-        BY_FACADE_ID.computeIfAbsent(attribute.element) {
-            MultimapBuilder.hashKeys().linkedHashSetValues().build()
-        }.put(attribute.facadeId, attribute)
+        BY_DESCRIPTION_ID[attribute.descriptionId] = attribute
+        BY_COMPOSITE_ID.row(attribute.element).computeIfAbsent(attribute.compositeId) { HashSet() }.add(attribute)
         AttributeNameInternals.register(attribute)
         return attribute
     }
 
-    fun byFacade(element: Element, facadeId: String): Collection<ElementAttribute> {
-        return BY_FACADE_ID[element]?.get(facadeId) ?: throw IllegalArgumentException("Unknown facade identity: '$facadeId'")
+    fun getBy(descriptionId: String): ElementAttribute? {
+        return BY_DESCRIPTION_ID[descriptionId]
+    }
+
+    fun getCollectionBy(element: Element, compositeId: String): Collection<ElementAttribute> {
+        return BY_COMPOSITE_ID.get(element, compositeId) ?: throw IllegalArgumentException("Unknown composite id: '$compositeId'")
     }
 
     // 从 Element 映射到 ElementAttributes
     private val ELEMENT_ATTRIBUTES: ConcurrentHashMap<Element, ElementAttributes> = ConcurrentHashMap()
 
-    fun getElementAttributes(element: Element): ElementAttributes {
+    fun getOrCreate(element: Element): ElementAttributes {
         return ELEMENT_ATTRIBUTES.computeIfAbsent(element, ::ElementAttributes)
     }
 }
 
 // 封装了一些内部状态, 以提供更好的接口体验
 private object AttributeNameInternals {
-    private val VANILLA_ATTRIBUTE_NAMES: MutableSet<String> = ConcurrentHashMap.newKeySet()
-    private val ELEMENT_ATTRIBUTE_NAMES: MutableSet<String> = ConcurrentHashMap.newKeySet()
+    private val VANILLA_ATTRIBUTE_NAMES: HashSet<String> = HashSet()
+    private val ELEMENT_ATTRIBUTE_NAMES: HashSet<String> = HashSet()
 
+    @Synchronized
     fun register(attribute: Attribute) {
         tryRegisterVanillaAttribute(attribute)
         tryRegisterElementAttribute(attribute)
     }
 
-    fun getNamesOfVanilla(): Collection<String> {
+    fun getVanillaAttributeNames(): Collection<String> {
         return VANILLA_ATTRIBUTE_NAMES
     }
 
-    fun getNamesOfElement(): Collection<String> {
+    fun getElementAttributeNames(): Collection<String> {
         return ELEMENT_ATTRIBUTE_NAMES
     }
 
     private fun tryRegisterVanillaAttribute(attribute: Attribute) {
         if (attribute.vanilla) {
-            VANILLA_ATTRIBUTE_NAMES.add(attribute.facadeId)
+            VANILLA_ATTRIBUTE_NAMES.add(attribute.compositeId)
         }
     }
 
     private fun tryRegisterElementAttribute(attribute: Attribute) {
         if (attribute is ElementAttribute) {
-            ELEMENT_ATTRIBUTE_NAMES.add(attribute.facadeId)
+            ELEMENT_ATTRIBUTE_NAMES.add(attribute.compositeId)
         }
     }
 }

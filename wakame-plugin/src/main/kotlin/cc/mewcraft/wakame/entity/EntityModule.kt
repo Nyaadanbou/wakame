@@ -24,7 +24,8 @@ internal fun entityModule(): Module = module {
         }
 
         EntityKeyLookupImpl(buildList {
-            registerImplementation("MythicMobs", this, ::MythicMobsEntityKeyLookup)
+            // 目前的所有实现暂时不需要获取 MythicMobs 的怪物的 id, 等之后需要的时候再把这个注释给去掉.
+            // registerImplementation("MythicMobs", this, ::MythicMobsEntityKeyLookup)
         })
     }
 
