@@ -355,19 +355,17 @@ internal data class CellularEmptyRendererFormat(
 internal data class PortableCoreRendererFormat(
     @Setting @Required
     override val namespace: String,
-) : RendererFormat.Dynamic<PortableCore> {
-    private val unknownIndex = Key.key(namespace, "unknown")
+) : RendererFormat.Simple {
+    override val id = "portable_core"
+    override val index = createIndex()
     override val textMetaFactory = PortableCoreTextMetaFactory(namespace)
+
+    private val unknownIndex = Key.key(namespace, "unknown")
 
     fun render(data: PortableCore): IndexedText {
         val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
-        val index = Key.key(namespace, core.attribute.id)
         val tooltip = AttributeRegistry.FACADES[core.attribute.id].createTooltipLore(core.attribute)
         return SimpleIndexedText(index, tooltip)
-    }
-
-    override fun computeIndex(data: PortableCore): Key {
-        throw UnsupportedOperationException() // 直接在 render(...) 函数中处理
     }
 }
 //</editor-fold>
