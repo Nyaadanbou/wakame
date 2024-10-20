@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.compatibility.husksync.HuskSyncUserListener
+import cc.mewcraft.wakame.item.logic.AdventureLevelListener
 import org.bukkit.entity.Player
 import org.koin.core.module.Module
 import org.koin.dsl.binds
@@ -15,7 +16,7 @@ internal fun userModule(): Module = module {
         if (get<WakamePlugin>().isPluginPresent("HuskSync")) {
             HuskSyncUserListener()
         } else {
-            PaperUserListener()
+            get<AdventureLevelListener>()
         }
     }
 }

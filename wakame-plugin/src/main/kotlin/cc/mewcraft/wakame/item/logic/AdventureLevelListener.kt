@@ -1,12 +1,24 @@
 package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent
+import cc.mewcraft.wakame.user.SaveLoadExecutor
+import cc.mewcraft.wakame.user.UserListener
 import cc.mewcraft.wakame.util.runTask
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerQuitEvent
+import java.util.concurrent.ConcurrentHashMap
 
-internal object AdventureLevelListener : Listener {
+internal object AdventureLevelListener : UserListener {
+    private val saveLoadExecutors: MutableSet<SaveLoadExecutor> = ConcurrentHashMap.newKeySet()
+
+    @EventHandler
+    private fun onQuit(e: PlayerQuitEvent) {
+        val player = e.player
+        for (executor in saveLoadExecutors) {
+            executor.saveTo(player)
+        }
+    }
 
     // 开发日记 2024/10/7 小米
     // 虽然看起来是 hotfix, 但我想不出有什么更好的办法了.
@@ -41,6 +53,18 @@ internal object AdventureLevelListener : Listener {
             for (listener in ItemSlotChangeRegistry.listeners()) {
                 listener.forceUpdate(player)
             }
+
+            for (executor in saveLoadExecutors) {
+                executor.loadFrom(player)
+            }
         }
+    }
+
+    override fun registerSaveLoadExecutor(executor: SaveLoadExecutor) {
+        saveLoadExecutors.add(executor)
+    }
+
+    override fun unregisterSaveLoadExecutor(executor: SaveLoadExecutor) {
+        saveLoadExecutors.remove(executor)
     }
 }

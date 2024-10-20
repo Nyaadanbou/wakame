@@ -76,7 +76,9 @@ internal object AttributeItemSlotChangeListener : ItemSlotChangeListener() {
         val attributeModifiers = cells.collectAttributeModifiers(nekoStack, slot)
         val attributeMap = player.toUser().attributeMap
         attributeModifiers.forEach { type, modifier ->
-            attributeMap.getInstance(type)?.let { instance -> update(instance, modifier) }
+            val instance = attributeMap.getInstance(type)
+            if (instance != null)
+                update(instance, modifier)
         }
     }
 }
