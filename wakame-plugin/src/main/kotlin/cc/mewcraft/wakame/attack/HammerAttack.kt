@@ -5,15 +5,18 @@ import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.ParticleBuilder
+import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.util.NumberConversions
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * 自定义锤攻击.
@@ -60,10 +63,13 @@ class HammerAttack : AttackType {
             )
             val hitLocation = damagee.location
             val radius = attributeMap.getValue(Attributes.HAMMER_DAMAGE_RANGE).coerceAtLeast(0.0)
-            hitLocation.getNearbyLivingEntities(radius).forEach {
-                if (it.uniqueId != player.uniqueId && it.uniqueId != damagee.uniqueId) {
-                    it.hurt(customDamageMetadata, player)
-                }
+            // 目标的判定为:
+            // 以直接受击实体的脚部坐标向y轴正方向(上方)偏移0.5格为中心
+            // 高为1格, 半径为radius的圆柱体
+            hitLocation.clone().add(.0, .5, .0).getNearbyLivingEntities(radius, 0.5) {
+                it.uniqueId != player.uniqueId && it.uniqueId != damagee.uniqueId && distanceXZ(it.location, hitLocation) < radius
+            }.forEach {
+                it.hurt(customDamageMetadata, player)
             }
 
             // 特效
@@ -93,6 +99,18 @@ class HammerAttack : AttackType {
                 .allPlayers()
                 .spawn()
             world.playSound(player.location, Sound.ITEM_MACE_SMASH_GROUND, SoundCategory.PLAYERS, 1F, 1F)
+        }
+    }
+
+    private fun distanceXZ(location1: Location, location2: Location): Double {
+        if (location1.world != null && location2.world != null) {
+            if (location1.world != location2.world) {
+                throw IllegalArgumentException("Cannot measure distance between ${location1.world.name} and ${location2.world.name}")
+            } else {
+                return sqrt(NumberConversions.square(location1.x - location2.x) + NumberConversions.square(location1.z - location2.z))
+            }
+        } else {
+            throw IllegalArgumentException("Cannot measure distance to a null world")
         }
     }
 }

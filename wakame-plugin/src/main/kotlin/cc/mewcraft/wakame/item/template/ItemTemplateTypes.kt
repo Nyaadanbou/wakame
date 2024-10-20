@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.components.ItemAttack
 import cc.mewcraft.wakame.item.templates.components.*
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
