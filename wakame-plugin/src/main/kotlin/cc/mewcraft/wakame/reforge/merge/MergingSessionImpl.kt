@@ -88,20 +88,16 @@ internal class SimpleMergingSession(
     override val currencyCostFunction: MochaFunction = table.currencyCost.total.compile(this)
 
     private fun executeReforge0(): MergingSession.Result {
-        val result = try {
-            MergeOperation(this).execute()
+        return try {
+            MergeOperation(this)
         } catch (e: Exception) {
             logger.error("$PREFIX An unknown error occurred while merging. This is a bug!", e)
             Result.failure("<red>内部错误".mini)
         }
-
-        return result
     }
 
     override fun executeReforge(): MergingSession.Result {
-        val result = executeReforge0()
-        latestResult = result
-        return result
+        return executeReforge0().also { latestResult = it }
     }
 
     override fun reset() {

@@ -507,7 +507,7 @@ private object ReforgeReplace {
 
             // 获取耗材中的便携核心
             val portableCore = ingredient.components.get(ItemComponentTypes.PORTABLE_CORE) ?: run {
-                return ReforgeReplaceResult.failure(ingredient, "<gray>这个物品不是便携核心".mini)
+                return ReforgeReplaceResult.failure(ingredient, "<gray>不是便携核心".mini)
             }
 
             // 获取源物品上的核孔
@@ -519,16 +519,16 @@ private object ReforgeReplace {
             // 源物品的核孔上 必须没有与便携核心相似的核心
             val sourceCellsExcludingThis = sourceCells.filter2 { it.getId() != cell.getId() }
             if (sourceCellsExcludingThis.containSimilarCore(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(ingredient, "<gray>源物品上存在相似的便携核心".mini)
+                return ReforgeReplaceResult.failure(ingredient, "<gray>源物品存在相似的核心".mini)
             }
 
             if (session.replaceParams.containsCoreSimilarTo(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(ingredient, "<gray>输入之中存在相似的便携核心".mini)
+                return ReforgeReplaceResult.failure(ingredient, "<gray>输入中存在相似的核心".mini)
             }
 
             // 便携式核心的类型 必须符合定制规则
             if (!rule.acceptableCores.test(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(ingredient, "<gray>源物品的核孔不接受这种便携核心".mini)
+                return ReforgeReplaceResult.failure(ingredient, "<gray>核孔不接受这样的核心".mini)
             }
 
             // 便携式核心上面的所有元素 必须全部出现在被定制物品上
@@ -537,18 +537,18 @@ private object ReforgeReplace {
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
                 val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.attribute?.element
                 if (elementOnIngredient != null && elementOnIngredient !in elementsOnSource) {
-                    return ReforgeReplaceResult.failure(ingredient, "<gray>便携核心的元素跟源物品的不相融".mini)
+                    return ReforgeReplaceResult.failure(ingredient, "<gray>核心的元素跟源物品不相融".mini)
                 }
             }
 
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
             val modCount = sourceItem.components.get(ItemComponentTypes.CELLS)?.get(id)?.getReforgeHistory()?.modCount ?: Int.MAX_VALUE
             if (modCount >= rule.modLimit) {
-                return ReforgeReplaceResult.failure(ingredient, "<gray>源物品的核孔已经历经无数雕琢".mini)
+                return ReforgeReplaceResult.failure(ingredient, "<gray>核孔已经消磨殆尽".mini)
             }
 
             // 全部检查通过!
-            return ReforgeReplaceResult.success(ingredient, "<green>便携核心准备就绪".mini)
+            return ReforgeReplaceResult.success(ingredient, "<green>核心已准备就绪".mini)
         }
 
         override fun getIngredientLevel(): Int {

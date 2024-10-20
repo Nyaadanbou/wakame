@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.attribute.composite.*
-import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.registry.RarityRegistry
 import me.lucko.helper.text3.mini
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -17,12 +16,17 @@ import kotlin.math.ceil
 /**
  * 封装了一个标准的, 独立的, 重造流程.
  */
-internal class MergeOperation(
+internal class MergeOperation
+private constructor(
     private val session: MergingSession,
 ) : KoinComponent {
 
     companion object {
         private const val PREFIX = ReforgeLoggerPrefix.MERGE
+
+        operator fun invoke(session: MergingSession): MergingSession.Result {
+            return MergeOperation(session).execute()
+        }
     }
 
     private val logger: Logger by inject()
@@ -102,13 +106,17 @@ internal class MergeOperation(
 
         val mergedLevel = session.outputLevelFunction.evaluate().let(::ceil).toInt()
         val mergedRarity = run {
-            val rarity1 = inputItem1.components.get(ItemComponentTypes.RARITY)
-            val rarity2 = inputItem2.components.get(ItemComponentTypes.RARITY)
+            val rarity1 = inputItem1.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
+            val rarity2 = inputItem2.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
+            val rarity = maxOf(rarity1, rarity2)
+            return@run ItemRarity(rarity)
         }
 
         // 输出的物品直接以 inputItem1 为基础进行修改
-        val outputItem: NekoStack = inputItem1
+        val outputItem = inputItem1
+
         outputItem.components.set(ItemComponentTypes.LEVEL, ItemLevel(mergedLevel))
+        outputItem.components.set(ItemComponentTypes.RARITY, mergedRarity)
         outputItem.components.set(ItemComponentTypes.PORTABLE_CORE, PortableCore(mergedCore, mergedPenalty))
 
         val totalCost = session.currencyCostFunction.evaluate()
