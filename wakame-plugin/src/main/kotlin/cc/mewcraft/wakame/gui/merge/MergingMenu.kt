@@ -2,10 +2,11 @@ package cc.mewcraft.wakame.gui.merge
 
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.merge.MergingSession
-import cc.mewcraft.wakame.reforge.merge.MergingTable
-import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession
+import cc.mewcraft.wakame.reforge.merge.*
 import cc.mewcraft.wakame.util.hideTooltip
+import cc.mewcraft.wakame.util.removeItalic
+import me.lucko.helper.text3.mini
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -46,11 +47,11 @@ internal class MergingMenu(
     /**
      * 根据当前 [session] 的状态, 刷新输出容器里的物品.
      */
-    fun updateOutput() {
+    fun updateOutputSlot() {
         // 获取最新的合并结果
         val result = session.latestResult
         // 根据合并的结果, 渲染输出容器里的物品
-        val output = ResultRenderer.render(result)
+        val output = renderOutputSlot(result)
         // 设置输出容器里的物品
         setOutputSlot(output)
     }
@@ -136,7 +137,7 @@ internal class MergingMenu(
                 }
 
                 executeReforge()
-                updateOutput()
+                updateOutputSlot()
             }
 
             e.isRemove -> {
@@ -155,7 +156,7 @@ internal class MergingMenu(
                 }
 
                 executeReforge()
-                updateOutput()
+                updateOutputSlot()
             }
         }
     }
@@ -237,5 +238,55 @@ internal class MergingMenu(
 
     private fun setOutputSlot(item: ItemStack?) {
         outputSlot.setItemSilently(0, item)
+    }
+
+    /**
+     * 负责渲染合并后的物品在 [MergingMenu.outputSlot] 里面的样子.
+     */
+    private fun renderOutputSlot(result: MergingSession.Result): ItemStack {
+        val item = result.item
+        val ret: ItemStack
+
+        val clickToMerge = "<gray>⤷ 点击确认合并".mini
+
+        if (result.successful) {
+            // 渲染成功的结果
+
+            ret = ItemStack(item.itemStack.type)
+            ret.editMeta { meta ->
+                val name = "<white>结果: <green>就绪".mini
+                val lore = buildList<Component> {
+                    add(Component.empty())
+                    add(result.description)
+                    add(Component.empty())
+                    addAll(result.type.description)
+                    addAll(result.cost.description)
+                    add(Component.empty())
+                    add(clickToMerge)
+                }.removeItalic
+
+                meta.displayName(name.removeItalic)
+                meta.lore(lore)
+            }
+        } else {
+            // 渲染失败的结果
+
+            ret = ItemStack(Material.BARRIER) // 使用 `minecraft:barrier` 作为合并失败的“基础物品”
+            ret.editMeta { meta ->
+                val name = "<white>结果: <red>失败".mini
+                val lore = buildList<Component> {
+                    add(Component.empty())
+                    add(result.description)
+                    add(Component.empty())
+                    addAll(result.type.description)
+                    addAll(result.cost.description)
+                }.removeItalic
+
+                meta.itemName(name)
+                meta.lore(lore)
+            }
+        }
+
+        return ret
     }
 }

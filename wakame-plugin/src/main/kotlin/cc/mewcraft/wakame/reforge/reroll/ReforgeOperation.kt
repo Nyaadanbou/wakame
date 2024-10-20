@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
@@ -16,67 +15,62 @@ import cc.mewcraft.wakame.registry.RarityRegistry
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 
 /**
- * 封装了一个标准的, 独立的, 重造流程.
+ * 封装了一个标准的, 独立的, 重造核孔的流程.
  */
 internal class ReforgeOperation
 private constructor(
-    private val session: RerollingSession,
+    private val session: SimpleRerollingSession,
 ) {
-
     companion object : KoinComponent {
         private const val PREFIX = ReforgeLoggerPrefix.REROLL
-        private val LOGGER = get<Logger>()
 
-        operator fun invoke(session: RerollingSession): RerollingSession.Result {
+        operator fun invoke(session: SimpleRerollingSession): RerollingSession.ReforgeResult {
             return ReforgeOperation(session).execute()
         }
     }
 
-    /**
-     * 要被重造的物品; 我们将原地对该实例进行修改.
-     */
-    private val sourceItem: NekoStack? = session.sourceItem
+    private val logger: Logger
+        get() = session.logger
 
     /**
-     * 基于 [session] 和 [sourceItem] 执行一次重造流程, 并返回一个 [RerollingSession.Result].
+     * 基于 [session] 执行一次重造流程, 并返回一个 [RerollingSession.ReforgeResult].
      */
-    private fun execute(): RerollingSession.Result {
+    private fun execute(): RerollingSession.ReforgeResult {
         if (session.frozen) {
-            LOGGER.error("$PREFIX Trying to refresh output in a frozen session. This is a bug!")
-            return Result.error()
+            logger.error("$PREFIX Trying to refresh output in a frozen session. This is a bug!")
+            return ReforgeResult.error()
         }
 
         // 获取源物品
         // 如果源物品不存在, 返回一个空结果
-        val sourceItem = sourceItem ?: return Result.empty()
+        val sourceItem = session.sourceItem ?: return ReforgeResult.empty()
 
         // 获取词条栏的选择状态
         // 如果没有可重造的词条栏, 返回一个失败结果
         val selectionMap = session.selectionMap
         if (selectionMap.isEmpty || selectionMap.values.all { !it.changeable }) {
-            return Result.failure("<gray>没有可重造的核孔".mini)
+            return ReforgeResult.failure("<gray>没有可重造的核孔".mini)
         }
 
         // 如果没有选择任何词条栏, 返回一个失败结果
         if (selectionMap.values.all { !it.selected }) {
-            return Result.failure("<gray>没有要重造的核孔".mini)
+            return ReforgeResult.failure("<gray>没有要重造的核孔".mini)
         }
 
         // 获取必要的物品组件
         val itemId = sourceItem.id
-        val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level ?: return Result.failure("<gray>物品不可重造".mini)
-        val itemCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return Result.failure("<gray>物品不可重造".mini)
+        val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level ?: return ReforgeResult.failure("<gray>物品不可重造".mini)
+        val itemCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return ReforgeResult.failure("<gray>物品不可重造".mini)
 
         // 检查在已选择的核孔当中, 是否有超过了重造次数上限的核孔
         for (selection in selectionMap.values.filter { it.selected }) {
-            val cell = itemCells.get(selection.id) ?: return Result.error()
+            val cell = itemCells.get(selection.id) ?: return ReforgeResult.error()
             val rerollCount = cell.getReforgeHistory().rerollCount
             if (rerollCount >= selection.rule.maxReroll) {
-                return Result.failure("<gray>核孔已经消磨殆尽".mini)
+                return ReforgeResult.failure("<gray>核孔已经消磨殆尽".mini)
             }
         }
 
@@ -96,11 +90,11 @@ private constructor(
                 itemCells
             )
         } catch (e: Exception) { // 有必要 try-catch?
-            LOGGER.error("$PREFIX Unexpected error while preparing generation context", e)
-            return Result.error()
+            logger.error("$PREFIX Unexpected error while preparing generation context", e)
+            return ReforgeResult.error()
         }
 
-        val modifiedItemCells = itemCells.builder().apply {
+        val updatedItemCells = itemCells.builder().apply {
             // 遍历每一个选择:
             for ((id, sel) in selectionMap) {
 
@@ -128,12 +122,12 @@ private constructor(
         val output = sourceItem.clone()
 
         // 将新的词条栏组件写入物品
-        output.components.set(ItemComponentTypes.CELLS, modifiedItemCells)
+        output.components.set(ItemComponentTypes.CELLS, updatedItemCells)
 
         // 计算重造物品的总花费
-        val total = Cost.simple(session.total.evaluate())
+        val total = ReforgeCost.simple(session.total.evaluate())
 
-        return Result.success(output, total)
+        return ReforgeResult.success(output, total)
     }
 
     /**

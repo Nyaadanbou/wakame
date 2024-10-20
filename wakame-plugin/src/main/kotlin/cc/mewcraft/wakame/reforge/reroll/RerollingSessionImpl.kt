@@ -26,7 +26,7 @@ import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class SimpleRerollingSession(
+internal class SimpleRerollingSession(
     override val table: RerollingTable,
     override val viewer: Player,
     sourceItem: NekoStack? = null,
@@ -36,7 +36,7 @@ class SimpleRerollingSession(
         private const val PREFIX = ReforgeLoggerPrefix.REROLL
     }
 
-    private val logger: Logger by inject()
+    val logger: Logger by inject()
 
     override val total: MochaFunction = table.currencyCost.compile(this)
 
@@ -46,7 +46,7 @@ class SimpleRerollingSession(
         logger.info("$PREFIX Selection map updated: $old -> $new")
     }
 
-    override var latestResult: RerollingSession.Result by Delegates.observable(Result.empty()) { _, old, new ->
+    override var latestResult: RerollingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty()) { _, old, new ->
         logger.info("$PREFIX Result status updated: $old -> $new")
     }
 
@@ -60,36 +60,33 @@ class SimpleRerollingSession(
         return@vetoable true
     }
 
-    private fun executeReforge0(): RerollingSession.Result {
-        val result = try {
+    private fun executeReforge0(): RerollingSession.ReforgeResult {
+        return try {
             ReforgeOperation(this)
         } catch (e: Exception) {
             logger.error("$PREFIX An unknown error occurred while rerolling an item", e)
-            Result.error()
+            ReforgeResult.error()
         }
-        return result
     }
 
-    override fun executeReforge(): RerollingSession.Result {
-        val result = executeReforge0()
-        latestResult = result
-        return result
+    override fun executeReforge(): RerollingSession.ReforgeResult {
+        return executeReforge0().also { latestResult = it }
     }
 
     override fun reset() {
         sourceItem = null
         selectionMap = SelectionMap.empty(this)
-        latestResult = Result.empty()
+        latestResult = ReforgeResult.empty()
     }
 
-    override fun getAllPlayerInputs(): Collection<ItemStack> {
-        return buildList {
-            sourceItem?.itemStack?.let(::add)
-        }
+    override fun getAllInputs(): Array<ItemStack> {
+        val result = mutableListOf<ItemStack>()
+        sourceItem?.itemStack?.let(result::add)
+        return result.toTypedArray()
     }
 
-    override fun getUnusedPlayerInputs(): Collection<ItemStack> {
-        return emptyList() // 未来可能会用到?
+    override fun getUnusedInputs(): Array<ItemStack> {
+        return emptyArray() // 未来可能会用到?
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -114,18 +111,18 @@ class SimpleRerollingSession(
     }
 }
 
-internal object Result {
+internal object ReforgeResult {
     /**
      * 空结果; 用于表示没有要重造的物品.
      */
-    fun empty(): RerollingSession.Result {
+    fun empty(): RerollingSession.ReforgeResult {
         return Empty()
     }
 
     /**
      * 错误结果; 用于表示重造过程中出现了内部错误.
      */
-    fun error(): RerollingSession.Result {
+    fun error(): RerollingSession.ReforgeResult {
         return Error()
     }
 
@@ -134,16 +131,16 @@ internal object Result {
      */
     fun failure(
         description: List<Component>,
-    ): RerollingSession.Result {
-        return Simple(false, description, NekoStack.empty(), Cost.empty())
+    ): RerollingSession.ReforgeResult {
+        return Simple(false, description, NekoStack.empty(), ReforgeCost.empty())
     }
 
     /**
-     * 参考 [Result.failure].
+     * 参考 [ReforgeResult.failure].
      */
     fun failure(
         description: Component,
-    ): RerollingSession.Result {
+    ): RerollingSession.ReforgeResult {
         return failure(listOf(description))
     }
 
@@ -152,12 +149,12 @@ internal object Result {
      */
     fun success(
         item: NekoStack,
-        cost: RerollingSession.Cost,
-    ): RerollingSession.Result {
+        cost: RerollingSession.ReforgeCost,
+    ): RerollingSession.ReforgeResult {
         return Simple(true, "<gray>准备就绪!".mini, item, cost)
     }
 
-    private abstract class Base : RerollingSession.Result {
+    private abstract class Base : RerollingSession.ReforgeResult {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("successful", successful),
             ExaminableProperty.of("description", description.plain),
@@ -172,34 +169,34 @@ internal object Result {
         override val successful: Boolean = false
         override val description: List<Component> = listOf(Component.text("<gray>没有要重造的物品"))
         override val item: NekoStack = NekoStack.empty()
-        override val cost: RerollingSession.Cost = Cost.empty()
+        override val cost: RerollingSession.ReforgeCost = ReforgeCost.empty()
     }
 
     private class Error : Base() {
         override val successful: Boolean = false
         override val description: List<Component> = listOf(Component.text("<red>内部错误"))
         override val item: NekoStack = NekoStack.empty()
-        override val cost: RerollingSession.Cost = Cost.error()
+        override val cost: RerollingSession.ReforgeCost = ReforgeCost.error()
     }
 
     private class Simple(
         successful: Boolean,
         description: List<Component>,
         item: NekoStack,
-        cost: RerollingSession.Cost,
+        cost: RerollingSession.ReforgeCost,
     ) : Base() {
 
         constructor(
             successful: Boolean,
             description: Component,
             item: NekoStack,
-            cost: RerollingSession.Cost,
+            cost: RerollingSession.ReforgeCost,
         ) : this(successful, listOf(description), item, cost)
 
         override val successful: Boolean = successful
         override val description: List<Component> = description
         override val item: NekoStack by NekoStackDelegates.copyOnRead(item)
-        override val cost: RerollingSession.Cost = cost
+        override val cost: RerollingSession.ReforgeCost = cost
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("successful", successful),
@@ -212,18 +209,18 @@ internal object Result {
     }
 }
 
-internal object Cost {
+internal object ReforgeCost {
     /**
      * 空的花费; 当没有需要重造的物品时, 使用这个.
      */
-    fun empty(): RerollingSession.Cost {
+    fun empty(): RerollingSession.ReforgeCost {
         return Empty()
     }
 
     /**
      * 错误的花费; 当重造过程中出现了内部错误, 使用这个.
      */
-    fun error(): RerollingSession.Cost {
+    fun error(): RerollingSession.ReforgeCost {
         return Error()
     }
 
@@ -232,11 +229,11 @@ internal object Cost {
      */
     fun simple(
         currencyAmount: Double,
-    ): RerollingSession.Cost {
+    ): RerollingSession.ReforgeCost {
         return Simple(currencyAmount)
     }
 
-    private abstract class Base : RerollingSession.Cost {
+    private abstract class Base : RerollingSession.ReforgeCost {
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain)
         )
@@ -258,7 +255,7 @@ internal object Cost {
 
     private class Simple(
         val currencyAmount: Double,
-    ) : RerollingSession.Cost {
+    ) : RerollingSession.ReforgeCost {
         override fun take(viewer: Player) {
             // TODO 实现 take, test, description
         }

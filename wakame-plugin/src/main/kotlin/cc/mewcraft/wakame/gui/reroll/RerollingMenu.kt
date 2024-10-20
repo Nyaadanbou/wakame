@@ -2,11 +2,12 @@ package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.reroll.RerollingSession
-import cc.mewcraft.wakame.reforge.reroll.RerollingTable
-import cc.mewcraft.wakame.reforge.reroll.SimpleRerollingSession
+import cc.mewcraft.wakame.reforge.reroll.*
 import cc.mewcraft.wakame.util.hideTooltip
-import net.kyori.adventure.text.Component.text
+import cc.mewcraft.wakame.util.removeItalic
+import me.lucko.helper.text3.mini
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -55,7 +56,7 @@ internal class RerollingMenu(
      * 基于 [session] 的当前状态刷新输出容器.
      */
     fun updateOutput() {
-        val output = ResultRenderer.render(session)
+        val output = renderOutputSlot(session)
         setOutputSlot(output)
     }
 
@@ -66,8 +67,12 @@ internal class RerollingMenu(
 
     private val logger: Logger by inject()
 
-    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
-    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
+    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        setPreUpdateHandler(::onInputInventoryPreUpdate)
+    }
+    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        setPreUpdateHandler(::onOutputInventoryPreUpdate)
+    }
     private val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
         builder.setStructure(
             ". . . . . . . . .",
@@ -92,11 +97,6 @@ internal class RerollingMenu(
         builder.addCloseHandler(::onWindowClose)
     }
 
-    init {
-        inputSlot.setPreUpdateHandler(::onInputInventoryPreUpdate)
-        outputSlot.setPreUpdateHandler(::onOutputInventoryPreUpdate)
-    }
-
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
@@ -110,10 +110,8 @@ internal class RerollingMenu(
             }
 
             // 玩家尝试把物品放进 inputSlot:
+            // ... 说明玩家想要开始一次重造流程
             event.isAdd -> {
-
-                // ... 说明玩家想要开始一次重造流程
-
                 val ns = newItem?.tryNekoStack ?: run {
                     viewer.sendPlainMessage("请放入一个萌芽物品!")
                     event.isCancelled = true; return
@@ -130,15 +128,12 @@ internal class RerollingMenu(
             }
 
             // 玩家尝试从 inputSlot 拿出物品:
+            // ... 说明玩家想中途放弃这次重造
             event.isRemove -> {
-
-                // ... 说明玩家想中途放弃这次重造
-
                 event.isCancelled = true
 
                 // 归还玩家输入的所有物品
-                val itemsToReturn = session.getAllPlayerInputs()
-                viewer.inventory.addItem(*itemsToReturn.toTypedArray())
+                viewer.inventory.addItem(*session.getAllInputs())
 
                 // 重置会话的状态
                 session.reset()
@@ -217,8 +212,7 @@ internal class RerollingMenu(
         setOutputSlot(null)
         setSelectionGuis(null)
 
-        val itemsToReturn = session.getAllPlayerInputs()
-        viewer.inventory.addItem(*itemsToReturn.toTypedArray())
+        viewer.inventory.addItem(*session.getAllInputs())
 
         session.reset()
         session.frozen = true
@@ -244,6 +238,80 @@ internal class RerollingMenu(
 
     private fun setOutputSlot(stack: ItemStack?) {
         outputSlot.setItemSilently(0, stack)
+    }
+
+    /**
+     * 负责渲染 [RerollingMenu.outputSlot] 里面的内容.
+     */
+    private fun renderOutputSlot(session: RerollingSession): ItemStack {
+        // TODO 更丰富的结果预览:
+        //  能够显示哪些词条栏会被重造, 哪些不会
+        //  这要求对渲染模块进行重构 ...
+
+        val viewer = session.viewer
+        val result = session.latestResult
+        val item = result.item // deep clone
+
+        if (result.successful) {
+            // 如果可以重造:
+
+            if (!result.cost.test(viewer)) {
+                // 如果玩家没有足够的资源:
+
+                val ret = ItemStack(Material.BARRIER)
+                ret.editMeta { meta ->
+                    val name = "<white>结果: <red>资源不足".mini
+                    val lore = buildList<Component> {
+                        addAll(result.description)
+                        addAll(result.cost.description)
+                    }
+
+                    meta.itemName(name)
+                    meta.lore(lore.removeItalic)
+                }
+
+                return ret
+            }
+
+            // 移除物品的萌芽数据
+            item.erase() // FIXME NekoStackDisplay
+
+            // 在原物品的基础上做修改
+            // 这样可以保留物品的类型以及其他的原版组件信息
+            val ret = item.itemStack
+            ret.editMeta { meta ->
+                val name = "<white>结果: <green>就绪".mini
+                val lore = buildList<Component> {
+                    addAll(result.description)
+                    addAll(result.cost.description)
+                    add(Component.empty())
+                    add("<gray>⤷ 点击确认重造".mini)
+                }
+
+                meta.displayName(name.removeItalic)
+                meta.lore(lore.removeItalic)
+            }
+
+            return ret
+
+        } else {
+            // 如果不可重造:
+
+            // 在新创建的物品上做修改
+            // 因为根本无法重造所以原物品的信息就无所谓了
+            val ret = ItemStack(Material.BARRIER)
+            ret.editMeta { meta ->
+                val name = "<white>结果: <red>失败".mini
+                val lore = buildList<Component> {
+                    addAll(result.description)
+                }
+
+                meta.itemName(name)
+                meta.lore(lore.removeItalic)
+            }
+
+            return ret
+        }
     }
 
     private class PrevItem : ScrollItem(-1) {

@@ -22,11 +22,13 @@ cells:
     # 可用的上下文:
     # query.source_item_level()
     #   被定制的物品的等级
+    # query.source_cell_mod_count()
+    #   本核孔被定制过的次数
     # query.joined_item_level()
     #   参与定制的核心的物品等级
     # query.joined_item_rarity()
     #   参与定制的核心的物品稀有度所映射的数值
-    currency_cost: "100 + query.joined_item_level() * 10"
+    currency_cost: "100 + query.joined_item_level() * 10 + query.cell_mod_count() * 10"
 
     # 是否要求输入的核心的元素类型与被定制物品的元素类型是一致的?
     # 类型: bool

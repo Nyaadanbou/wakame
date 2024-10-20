@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.gui.mod
 
-import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.reforge.mod.ModdingTable
-import cc.mewcraft.wakame.reforge.mod.SimpleModdingSession
-import cc.mewcraft.wakame.util.hideTooltip
-import cc.mewcraft.wakame.util.translateBy
-import net.kyori.adventure.text.Component.text
+import cc.mewcraft.wakame.reforge.mod.*
+import cc.mewcraft.wakame.util.*
+import me.lucko.helper.text3.mini
+import net.kyori.adventure.extra.kotlin.text
+import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -19,9 +18,7 @@ import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
-import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.*
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.ScrollItem
 import xyz.xenondevs.invui.window.Window
@@ -55,6 +52,7 @@ internal class ModdingMenu(
 ) : KoinComponent {
     companion object {
         private const val PREFIX = ReforgeLoggerPrefix.MOD
+        private val MSG_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
     }
 
     /**
@@ -74,21 +72,19 @@ internal class ModdingMenu(
     /**
      * 基于 [session] 的当前状态更新 [outputSlot], 也就是定制后的物品.
      */
-    fun updateOutput() {
+    fun updateOutputSlot() {
         val result = session.latestResult
-        val output = ResultRender.normal(result)
+        val output = renderOutputSlotForPreview(result)
         setOutputSlot(output)
     }
 
     /**
      * 基于 [session] 的当前状态更新子菜单, 也就是每个词条栏的定制菜单.
      */
-    fun updateReplace() {
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun updateReplaceGuis() {
         val replaceParams = session.replaceParams
-        val replaceGuis = replaceParams
-            .map { (_, replace) -> ReplaceMenu(this, replace) }
-            .map { it.primaryGui }
-
+        val replaceGuis = replaceParams.map { (_, replace) -> ReplaceMenu(this, replace) }
         setReplaceGuis(replaceGuis)
     }
 
@@ -148,44 +144,37 @@ internal class ModdingMenu(
 
         if (session.frozen) {
             logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary input slot. This is a bug!")
-            event.isCancelled = true; return
+            event.isCancelled = true
+            return
         }
 
         when {
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
-                viewer.sendPlainMessage("猫咪不可以!")
-                event.isCancelled = true; return
+                viewer.sendMessage(MSG_CANCELLED)
+                event.isCancelled = true
             }
 
             // 玩家尝试把物品放入 inputSlot:
+            // 玩家将物品放入*inputSlot*, 意味着一个新的定制过程开始了.
+            // 这里需要做的就是刷新 ModdingSession 的状态, 然后更新菜单.
             event.isAdd -> {
-                // 玩家将物品放入*inputSlot*, 意味着一个新的定制过程开始了.
-                // 这里需要做的就是刷新 ModdingSession 的状态, 然后更新菜单.
-
-                val stack = newItem?.tryNekoStack ?: run {
-                    viewer.sendPlainMessage("请放入一个萌芽物品!")
-                    event.isCancelled = true; return
-                }
-
-                session.sourceItem = stack
-                updateReplace()
-                updateOutput()
+                session.inputItem = newItem
+                updateReplaceGuis()
+                updateOutputSlot()
 
                 // 重置确认状态
                 confirmed = false
             }
 
             // 玩家尝试把物品从 inputSlot 取出:
+            // 玩家将物品从 inputSlot 取出, 意味着定制过程被 *中途* 终止了.
+            // 我们需要把玩家放入定制台的所有物品 *原封不动* 的归还给玩家.
             event.isRemove -> {
-                // 玩家将物品从*inputSlot*取出, 意味着定制过程被*中途*终止了.
-                // 我们需要把玩家放入定制台的所有物品*原封不动*的归还给玩家.
-
                 event.isCancelled = true
 
                 // 归还玩家放入定制台的所有物品
-                val itemsToReturn = session.getAllPlayerInputs()
-                viewer.inventory.addItem(*itemsToReturn.toTypedArray())
+                viewer.inventory.addItem(*session.getAllInputs())
 
                 // 重置会话状态
                 session.reset()
@@ -211,14 +200,15 @@ internal class ModdingMenu(
 
         if (session.frozen) {
             logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary output slot. This is a bug!")
-            event.isCancelled = true; return
+            event.isCancelled = true
+            return
         }
 
         when {
             // 玩家向 outputSlot 中添加物品:
             event.isAdd || event.isSwap -> {
-                viewer.sendPlainMessage("猫咪不可以!")
-                event.isCancelled = true; return
+                viewer.sendMessage(MSG_CANCELLED)
+                event.isCancelled = true
             }
 
             // 玩家从 outputSlot 中取出物品:
@@ -227,39 +217,28 @@ internal class ModdingMenu(
 
                 // 如果玩家尝试取出定制后的物品, 意味着玩家想要完成这次定制.
                 // 下面要做的就是检查玩家是否满足完成定制的所有要求.
-                // 如果满足就消耗资源, 给予定制后的物品.
-                // 如果不满足则终止操作, 给玩家合适的提示.
+                // - 如果满足则消耗资源, 给予定制后的物品.
+                // - 如果不满足则终止操作, 展示玩家相应的提示.
 
                 // 获取当前定制的结果
-                val result = session.latestResult
+                val reforgeResult = session.latestResult
 
                 // 如果结果成功的话:
-                if (result.successful) {
+                if (reforgeResult.successful) {
 
                     // 玩家必须先确认才能完成定制
                     if (!confirmed) {
-                        val rendered = ResultRender.confirm(result)
-                        setOutputSlot(rendered)
+                        val confirmIcon = renderOutputSlotForConfirm(reforgeResult)
+                        setOutputSlot(confirmIcon)
                         confirmed = true
                         return
                     }
 
-                    // 储存所有需要给予玩家的物品
-                    val itemsToGive = buildList {
-                        // 定制后的物品
-                        add(result.outputItem?.itemStack ?: run {
-                            logger.error("$PREFIX Output item is null, but the player is trying to take it. This is a bug!")
-                            return
-                        })
-
-                        // 未使用的物品, 一般是无效的耗材
-                        addAll(session.getInapplicablePlayerInputs())
-                    }
-                    // 把所有输出的物品给予玩家
-                    viewer.inventory.addItem(*itemsToGive.toTypedArray())
-
                     // 从玩家身上拿走需要的资源
-                    result.cost.take(viewer)
+                    reforgeResult.cost.take(viewer)
+
+                    // 把所有输出的物品给予玩家
+                    viewer.inventory.addItem(*session.getFinalOutputs())
 
                     // 重置会话状态
                     session.reset()
@@ -271,13 +250,11 @@ internal class ModdingMenu(
 
                     // 重置确认状态
                     confirmed = false
-
-                    return
                 }
 
                 // 如果结果失败的话:
                 else {
-                    viewer.sendPlainMessage("猫咪不可以!")
+                    viewer.sendMessage(MSG_CANCELLED)
                 }
             }
         }
@@ -285,8 +262,7 @@ internal class ModdingMenu(
 
     private fun onWindowClose() {
         // 将定制过程中玩家输入的所有物品归还给玩家
-        val itemsToReturn = session.getAllPlayerInputs()
-        viewer.inventory.addItem(*itemsToReturn.toTypedArray())
+        viewer.inventory.addItem(*session.getAllInputs())
 
         // 冻结会话
         session.frozen = true
@@ -303,16 +279,85 @@ internal class ModdingMenu(
         outputSlot.guiPriority = 0
     }
 
-    private fun setReplaceGuis(guis: List<Gui>?) {
-        primaryGui.setContent(guis)
-    }
-
+    @Suppress("SameParameterValue")
     private fun setInputSlot(stack: ItemStack?) {
         inputSlot.setItemSilently(0, stack)
     }
 
     private fun setOutputSlot(stack: ItemStack?) {
         outputSlot.setItemSilently(0, stack)
+    }
+
+    private fun setReplaceGuis(guis: List<Gui>?) {
+        primaryGui.setContent(guis)
+    }
+
+    /**
+     * 渲染定制结果在 [ModdingMenu.outputSlot] 里面的样子.
+     * 本函数渲染的是 *确认图标*, 也就是提示玩家确认取出的图标.
+     *
+     * @param result 定制的结果
+     * @return 渲染后的物品
+     */
+    private fun renderOutputSlotForConfirm(result: ModdingSession.ReforgeResult): ItemStack {
+        val ret = ItemStack(Material.ANVIL)
+        ret.editMeta { meta ->
+            val name = "<white>再次点击确认取出".mini
+            meta.itemName(name)
+        }
+
+        return ret
+    }
+
+    /**
+     * 渲染定制结果在 [ModdingMenu.outputSlot] 里面的样子.
+     * 本函数渲染的是 *普通图标*, 也就是物品经过定制之后的样子.
+     *
+     * @param result 定制的结果
+     * @return 渲染后的物品
+     */
+    private fun renderOutputSlotForPreview(result: ModdingSession.ReforgeResult): ItemStack {
+        val item = result.outputItem
+        val ret: ItemStack
+
+        if (result.successful) {
+            // 定制成功了
+
+            if (item == null) {
+                ret = ItemStack(Material.BARRIER)
+                ret.editMeta { meta ->
+                    val name = "<white>结果: <red>内部错误".mini
+                    meta.itemName(name)
+                }
+            } else {
+                // FIXME 移除萌芽标签 / 实现 NekoStack#gui
+                ret = item.itemStack
+                ret.editMeta { meta ->
+                    val name = "<white>结果: <green>就绪".mini
+                    val lore = buildList {
+                        addAll(result.description)
+                    }
+
+                    meta.itemName(name)
+                    meta.lore(lore.removeItalic)
+                }
+            }
+        } else {
+            // 定制失败了
+
+            ret = ItemStack(Material.BARRIER)
+            ret.editMeta { meta ->
+                val name = "<white>结果: <red>失败".mini
+                val lore = buildList {
+                    addAll(result.description)
+                }
+
+                meta.itemName(name)
+                meta.lore(lore.removeItalic)
+            }
+        }
+
+        return ret
     }
 
     /**

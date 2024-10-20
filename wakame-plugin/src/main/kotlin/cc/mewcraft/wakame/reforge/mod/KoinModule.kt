@@ -6,5 +6,5 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal fun moddingModule(): Module = module {
-    single { ModdingTables } bind Initializable::class
+    single { ModdingTableRegistry } bind Initializable::class
 }

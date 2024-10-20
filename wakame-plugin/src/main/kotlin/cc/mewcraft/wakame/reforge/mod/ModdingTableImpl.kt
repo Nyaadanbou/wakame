@@ -26,9 +26,11 @@ internal object WtfModdingTable : ModdingTable {
 
     override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction> = ZeroTableCurrencyCost
 
-    override val itemRules: ModdingTable.ItemRuleMap = AnyItemRuleMap
+    override val itemRuleMap: ModdingTable.ItemRuleMap = AnyItemRuleMap
 
     override fun toString(): String = toSimpleString()
+
+    private val ZERO_MOCHA_FUNCTION = MochaFunction { .0 }
 
     private class AnyItemRule(
         override val target: Key,
@@ -41,7 +43,7 @@ internal object WtfModdingTable : ModdingTable {
         override val requireElementMatch: Boolean = false
         override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> = ZeroCellCurrencyCost
         override val permission: String? = null
-        override val acceptedCores: CoreMatchRuleContainer = CoreMatchRuleContainer.any()
+        override val acceptableCores: CoreMatchRuleContainer = CoreMatchRuleContainer.any()
     }
 
     private object AnyCellRuleMap : ModdingTable.CellRuleMap {
@@ -53,14 +55,12 @@ internal object WtfModdingTable : ModdingTable {
         override fun contains(key: Key): Boolean = true
     }
 
-    private val ZERO_MOCHA_FUNCTION = MochaFunction { .0 }
-
     private object ZeroTableCurrencyCost : ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction> {
         override val total = ModdingTable.TableTotalFunction { ZERO_MOCHA_FUNCTION }
     }
 
     private object ZeroCellCurrencyCost : ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> {
-        override val total = ModdingTable.CellTotalFunction { session, replace -> ZERO_MOCHA_FUNCTION }
+        override val total = ModdingTable.CellTotalFunction { _, _ -> ZERO_MOCHA_FUNCTION }
     }
 }
 
@@ -73,7 +73,7 @@ internal class SimpleModdingTable(
     override val title: Component,
     override val rarityNumberMapping: RarityNumberMapping,
     override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>,
-    override val itemRules: ModdingTable.ItemRuleMap,
+    override val itemRuleMap: ModdingTable.ItemRuleMap,
 ) : ModdingTable {
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -82,7 +82,7 @@ internal class SimpleModdingTable(
         ExaminableProperty.of("title", title),
         ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
         ExaminableProperty.of("currencyCost", currencyCost),
-        ExaminableProperty.of("itemRules", itemRules),
+        ExaminableProperty.of("itemRules", itemRuleMap),
     )
 
     override fun toString(): String =
@@ -123,14 +123,14 @@ internal class SimpleModdingTable(
         override val requireElementMatch: Boolean,
         override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>,
         override val permission: String?,
-        override val acceptedCores: CoreMatchRuleContainer
+        override val acceptableCores: CoreMatchRuleContainer,
     ) : ModdingTable.CellRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("modLimit", modLimit),
             ExaminableProperty.of("requireElementMatch", requireElementMatch),
             ExaminableProperty.of("currencyCost", currencyCost),
             ExaminableProperty.of("permission", permission),
-            ExaminableProperty.of("acceptedCores", acceptedCores),
+            ExaminableProperty.of("acceptedCores", acceptableCores),
         )
 
         override fun toString(): String = toSimpleString()
@@ -156,6 +156,7 @@ internal class SimpleModdingTable(
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("total", total)
         )
+
         override fun toString(): String = toSimpleString()
     }
 
@@ -165,6 +166,7 @@ internal class SimpleModdingTable(
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("total", total)
         )
+
         override fun toString(): String = toSimpleString()
     }
 
@@ -212,32 +214,32 @@ internal class TableTotalBinding(
     val session: ModdingSession,
 ) {
     @Binding("source_item_rarity")
-    fun sourceItemRarity(): Double {
+    fun getSourceItemRarity(): Double {
         return session.getSourceItemRarityNumber()
     }
 
     @Binding("source_item_level")
-    fun sourceItemLevel(): Int {
+    fun getSourceItemLevel(): Int {
         return session.getSourceItemLevel()
     }
 
     @Binding("source_item_total_cell_count")
-    fun sourceItemTotalCellCount(): Int {
+    fun getSourceItemTotalCellCount(): Int {
         return session.getSourceItemTotalCellCount()
     }
 
     @Binding("source_item_changeable_cell_count")
-    fun sourceItemChangeableCellCount(): Int {
+    fun getSourceItemChangeableCellCount(): Int {
         return session.getSourceItemChangeableCellCount()
     }
 
     @Binding("source_item_changed_cell_count")
-    fun sourceItemChangedCellCount(): Int {
+    fun getSourceItemChangedCellCount(): Int {
         return session.getSourceItemChangedCellCount()
     }
 
     @Binding("source_item_changed_cell_cost")
-    fun sourceItemChangedCellCost(): Double {
+    fun getSourceItemChangedCellCost(): Double {
         return session.getSourceItemChangedCellCost()
     }
 }
@@ -248,17 +250,22 @@ internal class CellTotalBinding(
     val replace: ModdingSession.Replace,
 ) {
     @Binding("source_item_level")
-    fun sourceItemLevel(): Int {
+    fun getSourceItemLevel(): Int {
         return session.getSourceItemLevel()
     }
 
+    @Binding("source_cell_mod_count")
+    fun getSourceCellModCount(): Int {
+        return replace.cell.getReforgeHistory().modCount
+    }
+
     @Binding("joined_item_level")
-    fun joinedItemLevel(): Int {
+    fun getJoinedItemLevel(): Int {
         return replace.getIngredientLevel()
     }
 
     @Binding("joined_item_rarity")
-    fun joinedItemRarity(): Double {
+    fun getJoinedItemRarity(): Double {
         return replace.getIngredientRarityNumber()
     }
 }

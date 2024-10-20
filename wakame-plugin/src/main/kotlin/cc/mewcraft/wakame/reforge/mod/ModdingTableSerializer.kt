@@ -3,20 +3,11 @@ package cc.mewcraft.wakame.reforge.mod
 import cc.mewcraft.commons.collections.associateNotNull
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
-import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
-import cc.mewcraft.wakame.util.NamespacedPathCollector
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.reforge.common.*
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -27,8 +18,8 @@ import java.lang.reflect.Type
  * [ModdingTable] 的序列化器.
  */
 internal object ModdingTableSerializer : KoinComponent {
-    const val REFORGE_DIR_NAME = "reforge"
-    const val MODDING_DIR_NAME = "mod"
+    private const val REFORGE_DIR_NAME = "reforge"
+    private const val MODDING_DIR_NAME = "mod"
 
     private val LOGGER: Logger by inject()
     private val MODDING_DIR by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(MODDING_DIR_NAME) }
@@ -130,7 +121,7 @@ internal object ModdingTableSerializer : KoinComponent {
             title = title,
             rarityNumberMapping = rarityNumberMapping,
             currencyCost = currencyCost,
-            itemRules = itemRuleMap,
+            itemRuleMap = itemRuleMap,
         )
     }
 
@@ -162,7 +153,7 @@ internal object ModdingTableSerializer : KoinComponent {
                 currencyCost = currencyCost,
                 requireElementMatch = requireElementMatch,
                 permission = permission,
-                acceptedCores = acceptedCores,
+                acceptableCores = acceptedCores,
             )
         }
     }

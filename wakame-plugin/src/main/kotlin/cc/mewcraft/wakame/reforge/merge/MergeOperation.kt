@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.merge
 
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeSE
+import cc.mewcraft.wakame.attribute.composite.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemLevel
@@ -44,8 +43,10 @@ internal class MergeOperation(
         }
 
         // 输入的物品必须是*便携式*属性*核心*
-        val core1 = (inputItem1.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? AttributeCore) ?: return Result.failure("<gray>第一个物品不是属性类核心.".mini)
-        val core2 = (inputItem2.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? AttributeCore) ?: return Result.failure("<gray>第二个物品不是属性类核心.".mini)
+        val core1 = (inputItem1.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? AttributeCore)
+            ?: return Result.failure("<gray>第一个物品不是属性类核心.".mini)
+        val core2 = (inputItem2.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? AttributeCore)
+            ?: return Result.failure("<gray>第二个物品不是属性类核心.".mini)
 
         // 两个核心除了数值以外, 其余数据必须一致
         if (!core1.similarTo(core2)) {
@@ -68,6 +69,7 @@ internal class MergeOperation(
         val attribute = core1.attribute
         val mergedOp = attribute.operation
         val mergeType = MergingTable.NumberMergeFunction.Type.by(mergedOp)
+
         val mergedValue = session.numberMergeFunction(mergeType).evaluate()
         val mergedCore = when (attribute /* 或者用 core2, 结果上没有区别 */) {
             is ConstantCompositeAttributeS -> {
@@ -78,12 +80,13 @@ internal class MergeOperation(
                 AttributeCore(id = core1.id, attribute = attribute.copy(value = mergedValue))
             }
 
-            // 我们不支持拥有两个数值的核心, 原因:
-            // - 实际的游戏设计中, 不太可能设计出合并这种核心
-            // - 代码实现上, 每种组合都得考虑. 目前就有2*3=6种
-            // - 拥有两个数值的核心也许本来就是个设计错误...
-
-            else -> {
+            is ConstantCompositeAttributeR,
+            is ConstantCompositeAttributeRE,
+                -> {
+                // 我们不支持拥有两个数值的核心, 原因:
+                // - 实际的游戏设计中, 不太可能设计出合并这种核心
+                // - 代码实现上, 每种组合都得考虑. 目前就有2*3=6种
+                // - 拥有两个数值的核心也许本来就是个设计错误...
                 logger.info("$PREFIX Trying to merge cores with multiple value structure.")
                 return Result.failure("<gray>核心的类型无法参与合并.".mini)
             }
@@ -98,6 +101,10 @@ internal class MergeOperation(
         }
 
         val mergedLevel = session.outputLevelFunction.evaluate().let(::ceil).toInt()
+        val mergedRarity = run {
+            val rarity1 = inputItem1.components.get(ItemComponentTypes.RARITY)
+            val rarity2 = inputItem2.components.get(ItemComponentTypes.RARITY)
+        }
 
         // 输出的物品直接以 inputItem1 为基础进行修改
         val outputItem: NekoStack = inputItem1

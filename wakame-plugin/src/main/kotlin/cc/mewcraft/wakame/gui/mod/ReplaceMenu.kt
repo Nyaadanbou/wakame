@@ -4,6 +4,11 @@ import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.hideTooltip
+import cc.mewcraft.wakame.util.removeItalic
+import me.lucko.helper.text3.mini
+import net.kyori.adventure.extra.kotlin.text
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -26,19 +31,25 @@ import xyz.xenondevs.invui.item.impl.SimpleItem
  *
  * 物品上的*每个*词条栏都有一个对应的 [ReplaceMenu] 实例来处理定制.
  */
-internal class ReplaceMenu(
+internal class ReplaceMenu
+private constructor(
     private val parent: ModdingMenu,
     private val replace: ModdingSession.Replace,
 ) : KoinComponent {
     companion object {
         private const val PREFIX = ReforgeLoggerPrefix.MOD
+        private val MSG_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
+
+        operator fun invoke(parent: ModdingMenu, replace: ModdingSession.Replace): Gui {
+            return ReplaceMenu(parent, replace).primaryGui
+        }
     }
 
     private val logger: Logger by inject()
-    private val viewer: Player = parent.viewer
 
+    private val viewer: Player = parent.viewer
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
-    val primaryGui: Gui = Gui.normal { builder ->
+    private val primaryGui: Gui = Gui.normal { builder ->
         // a: 被定制对象的预览物品
         // b: 接收玩家输入的虚拟容器
         // *: 起视觉引导作用的物品
@@ -71,13 +82,13 @@ internal class ReplaceMenu(
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
                 event.isCancelled = true
-                viewer.sendPlainMessage("猫咪不可以!")
+                viewer.sendMessage(MSG_CANCELLED)
             }
 
             // 玩家尝试向 inputSlot 中添加物品:
             event.isAdd -> {
                 val ns = newItem?.tryNekoStack ?: run {
-                    viewer.sendPlainMessage("猫咪不可以!")
+                    viewer.sendMessage(MSG_CANCELLED)
                     event.isCancelled = true
                     return
                 }
@@ -86,13 +97,13 @@ internal class ReplaceMenu(
                 val replaceResult = replace.executeReplace(ns)
 
                 // 将容器里的物品替换成渲染后的物品
-                event.newItem = ReplaceRender.render(replaceResult)
+                event.newItem = renderOutputSlot(replaceResult)
 
                 // 执行一次定制流程
                 parent.executeReforge()
 
                 // 更新主菜单的状态
-                parent.updateOutput()
+                parent.updateOutputSlot()
 
                 // 重置确认状态
                 parent.confirmed = false
@@ -120,7 +131,7 @@ internal class ReplaceMenu(
                 parent.executeReforge()
 
                 // 更新主菜单
-                parent.updateOutput()
+                parent.updateOutputSlot()
 
                 // 重置确认状态
                 parent.confirmed = false
@@ -128,8 +139,71 @@ internal class ReplaceMenu(
         }
     }
 
+    @Suppress("SameParameterValue")
     private fun setInputSlot(item: ItemStack?) {
         inputSlot.setItem(UpdateReason.SUPPRESSED, 0, item)
+    }
+
+    private fun renderOutputSlot(result: ModdingSession.Replace.Result): ItemStack {
+        val ingredient = result.ingredient
+        val rendered: ItemStack
+
+        val clickToWithdraw = "<gray>⤷ 点击以取回".mini.removeItalic
+
+        if (result.applicable) {
+            // 耗材可用于定制
+
+            if (ingredient == null) {
+                // 出现内部错误
+
+                rendered = ItemStack(Material.BARRIER)
+                rendered.editMeta { meta ->
+                    val name = "<white>结果: <red>内部错误".mini
+                    val lore = buildList {
+                        add(Component.empty())
+                        add(clickToWithdraw)
+                    }
+
+                    meta.itemName(name)
+                    meta.lore(lore.removeItalic)
+                }
+            } else {
+                // 正常情况
+
+                // FIXME NekoStackDisplay 急急急
+                ingredient.erase()
+                rendered = ingredient.itemStack
+                rendered.editMeta { meta ->
+                    val name = "<white>结果: <green>就绪".mini
+                    val lore = buildList<Component> {
+                        // TODO 使用新的渲染器生成文本
+                        result.getPortableCore()?.wrapped?.id?.asString()?.mini?.let { add(it) }
+                        add(Component.empty())
+                        add(clickToWithdraw)
+                    }
+
+                    meta.displayName(name.removeItalic)
+                    meta.lore(lore.removeItalic)
+                }
+            }
+        } else {
+            // 耗材不可用于定制
+
+            rendered = ItemStack(Material.BARRIER)
+            rendered.editMeta { meta ->
+                val name = "<white>结果: <red>无效".mini
+                val lore = buildList<Component> {
+                    addAll(result.description)
+                    add(Component.empty())
+                    add(clickToWithdraw)
+                }
+
+                meta.itemName(name)
+                meta.lore(lore.removeItalic)
+            }
+        }
+
+        return rendered
     }
 
     private class ViewItem(

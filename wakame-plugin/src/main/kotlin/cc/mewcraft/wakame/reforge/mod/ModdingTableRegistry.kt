@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.registry.SkillRegistry
         SkillRegistry::class
     ]
 )
-object ModdingTables : Initializable {
+object ModdingTableRegistry : Initializable {
     private val tables = HashMap<String, ModdingTable>()
 
     /**

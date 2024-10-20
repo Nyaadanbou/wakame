@@ -37,12 +37,10 @@ interface RerollingSession : Examinable {
      * ## 副作用
      *
      * 对该属性赋值时:
-     * - 会生成一个新的 [Result] 并赋值给 [RerollingSession.latestResult]
+     * - 会生成一个新的 [ReforgeResult] 并赋值给 [RerollingSession.latestResult]
      * - 会生成一个新的 [SelectionMap] 并赋值给 [RerollingSession.selectionMap]
      */
     @VariableByPlayer
-    @get:Contract(" -> new")
-    @set:Contract("_ -> param")
     var sourceItem: NekoStack?
 
     /**
@@ -55,7 +53,7 @@ interface RerollingSession : Examinable {
      * 封装了重造后的结果.
      */
     @VariableByPlayer
-    val latestResult: Result
+    val latestResult: ReforgeResult
 
     /**
      * 标记该会话是否已冻结.
@@ -67,9 +65,9 @@ interface RerollingSession : Examinable {
      * 根据会话的当前状态, 执行一次重造.
      *
      * ## 副作用
-     * 该函数会将新的结果 [Result] 赋值到属性 [latestResult].
+     * 该函数会将新的结果 [ReforgeResult] 赋值到属性 [latestResult].
      */
-    fun executeReforge(): Result
+    fun executeReforge(): ReforgeResult
 
     /**
      * 重置会话的状态.
@@ -79,17 +77,17 @@ interface RerollingSession : Examinable {
     /**
      * 返回玩家输入的所有物品.
      */
-    fun getAllPlayerInputs(): Collection<ItemStack>
+    fun getAllInputs(): Array<ItemStack>
 
     /**
      * 返回玩家输入的未使用的物品.
      */
-    fun getUnusedPlayerInputs(): Collection<ItemStack>
+    fun getUnusedInputs(): Array<ItemStack>
 
     /**
      * 封装了一次重造的结果.
      */
-    interface Result : Examinable {
+    interface ReforgeResult : Examinable {
         /**
          * `true` 表示重造已准备就绪.
          */
@@ -109,13 +107,13 @@ interface RerollingSession : Examinable {
         /**
          * 本次重造的总花费.
          */
-        val cost: Cost
+        val cost: ReforgeCost
     }
 
     /**
      * 封装了一次重造所需要消耗的资源.
      */
-    interface Cost : Examinable {
+    interface ReforgeCost : Examinable {
         /**
          * 扣除玩家身上相应的货币.
          */

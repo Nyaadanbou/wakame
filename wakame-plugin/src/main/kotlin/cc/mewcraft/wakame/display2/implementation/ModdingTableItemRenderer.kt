@@ -23,5 +23,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
 
     override fun render(item: NekoStack, context: ModdingTableContext?) {
         // TODO display2 ModdingTable
+        // Replace #display
+        // Result #display
     }
 }

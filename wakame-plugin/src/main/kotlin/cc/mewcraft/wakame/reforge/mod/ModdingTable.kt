@@ -39,7 +39,7 @@ interface ModdingTable : Examinable {
     /**
      * 储存了本定制台支持的所有物品的定制规则.
      */
-    val itemRules: ItemRuleMap
+    val itemRuleMap: ItemRuleMap
 
     /**
      * 封装了某个物品的定制规则.
@@ -51,7 +51,7 @@ interface ModdingTable : Examinable {
         val target: Key
 
         /**
-         * 该物品每个词条栏的定制规则.
+         * 该物品每个核孔的定制规则.
          */
         val cellRules: CellRuleMap
     }
@@ -79,11 +79,11 @@ interface ModdingTable : Examinable {
     }
 
     /**
-     * 代表一个词条栏的定制规则.
+     * 代表一个核孔的定制规则.
      */
     interface CellRule : Examinable {
         /**
-         * 最多可以定制本词条栏多少次?
+         * 最多可以定制本核孔多少次?
          */
         val modLimit: Int
 
@@ -93,19 +93,19 @@ interface ModdingTable : Examinable {
         val requireElementMatch: Boolean
 
         /**
-         * 定制本词条栏所需要的货币.
+         * 定制本核孔所需要的货币.
          */
         val currencyCost: CurrencyCost<CellTotalFunction>
 
         /**
-         * 定制本词条栏所需要的前置权限.
+         * 定制本核孔所需要的前置权限.
          */
         val permission: String?
 
         /**
-         * 记录了哪些核心种类可以参与定制本词条栏.
+         * 记录了哪些核心种类可以参与定制本核孔.
          */
-        val acceptedCores: CoreMatchRuleContainer
+        val acceptableCores: CoreMatchRuleContainer
 
         companion object {
             fun empty(): CellRule = EmptyCellRule
@@ -113,7 +113,7 @@ interface ModdingTable : Examinable {
     }
 
     /**
-     * 代表一个映射, 储存了各个词条栏的定制规则.
+     * 代表一个映射, 储存了各个核孔的定制规则.
      */
     interface CellRuleMap : Examinable {
         operator fun get(key: String): CellRule?
@@ -166,7 +166,7 @@ private object EmptyCellRule : ModdingTable.CellRule {
     override val requireElementMatch: Boolean = false
     override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> = CurrencyCost
     override val permission: String? = null
-    override val acceptedCores: CoreMatchRuleContainer = CoreMatchRuleContainer.empty()
+    override val acceptableCores: CoreMatchRuleContainer = CoreMatchRuleContainer.empty()
 
     private object CurrencyCost : ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> {
         override val total = ModdingTable.CellTotalFunction { _, _ -> MochaFunction { .0 } }
