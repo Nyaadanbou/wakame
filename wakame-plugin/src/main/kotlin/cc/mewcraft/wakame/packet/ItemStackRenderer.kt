@@ -116,10 +116,10 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
      * @return 如果物品发生了变化则返回 `true`, 否则返回 `false`
      */
     private fun ItemStack.modify(): Boolean {
-        var changed = false
+        var changed: Boolean
 
         // 移除任意物品的 PDC
-        changed = changed || customData?.removeTag("PublicBukkitValues") != null
+        changed = customData?.removeTag("PublicBukkitValues") != null
 
         val nekoStack = tryNekoStack
         if (nekoStack != null) {
@@ -127,7 +127,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
                 ItemRenderers.STANDARD.render(nekoStack, StandardContext)
                 changed = true
             } catch (e: Throwable) {
-                logger.error("An error occurred while rendering NekoStack: $this", e)
+                logger.error("An error occurred while rendering NekoStack: ${nekoStack.id}")
             }
         }
 

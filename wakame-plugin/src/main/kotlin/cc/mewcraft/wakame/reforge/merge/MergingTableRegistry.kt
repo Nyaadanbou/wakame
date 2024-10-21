@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.initializer.Initializable
 /**
  * 合并台的注册表.
  */
-object MergingTables : Initializable {
+object MergingTableRegistry : Initializable {
     private val tables = HashMap<String, MergingTable>()
 
     /**

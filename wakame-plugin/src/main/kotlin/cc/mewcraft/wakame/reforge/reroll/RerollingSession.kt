@@ -75,12 +75,12 @@ interface RerollingSession : Examinable {
     fun reset()
 
     /**
-     * 返回玩家输入的所有物品.
+     * 返回输入进菜单的所有物品.
      */
     fun getAllInputs(): Array<ItemStack>
 
     /**
-     * 返回玩家输入的未使用的物品.
+     * 返回输入进菜单但未使用的物品.
      */
     fun getUnusedInputs(): Array<ItemStack>
 

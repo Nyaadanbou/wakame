@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.util.bindInstance
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.*
 import net.kyori.examination.ExaminableProperty
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.MochaFunction
@@ -30,7 +30,7 @@ internal object WtfMergingTable : MergingTable {
         // 无最大输出惩罚限制
         Int.MAX_VALUE
 
-    override val acceptedCoreMatcher: CoreMatchRuleContainer = object : CoreMatchRuleContainer {
+    override val acceptableCoreMatcher: CoreMatchRuleContainer = object : CoreMatchRuleContainer {
         // 匹配任意核心
         override fun test(core: Core): Boolean = true
     }
@@ -74,7 +74,7 @@ internal class SimpleMergingTable(
     override val title: Component,
     override val maxInputItemLevel: Int,
     override val maxOutputItemPenalty: Int,
-    override val acceptedCoreMatcher: CoreMatchRuleContainer,
+    override val acceptableCoreMatcher: CoreMatchRuleContainer,
     override val rarityNumberMapping: RarityNumberMapping,
     override val currencyCost: MergingTable.CurrencyCost,
     override val numberMergeFunction: MergingTable.NumberMergeFunction,
@@ -87,7 +87,7 @@ internal class SimpleMergingTable(
         ExaminableProperty.of("title", title),
         ExaminableProperty.of("maxInputItemLevel", maxInputItemLevel),
         ExaminableProperty.of("maxOutputItemPenalty", maxOutputItemPenalty),
-        ExaminableProperty.of("acceptedCoreMatcher", acceptedCoreMatcher),
+        ExaminableProperty.of("acceptableCoreMatcher", acceptableCoreMatcher),
         ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
         ExaminableProperty.of("numberMergeFunction", numberMergeFunction),
         ExaminableProperty.of("outputLevelFunction", outputLevelFunction),

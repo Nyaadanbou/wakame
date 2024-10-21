@@ -6,5 +6,5 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal fun mergingModule(): Module = module {
-    single { MergingTables } bind Initializable::class
+    single { MergingTableRegistry } bind Initializable::class
 }

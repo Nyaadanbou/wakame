@@ -6,7 +6,9 @@ import cc.mewcraft.wakame.reforge.merge.*
 import cc.mewcraft.wakame.util.hideTooltip
 import cc.mewcraft.wakame.util.removeItalic
 import me.lucko.helper.text3.mini
+import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -28,6 +30,7 @@ internal class MergingMenu(
 
     companion object {
         private const val PREFIX = ReforgeLoggerPrefix.MERGE
+        private val MESSAGE_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
     }
 
     /**
@@ -116,14 +119,15 @@ internal class MergingMenu(
 
         when {
             e.isSwap -> {
-                viewer.sendPlainMessage("猫咪不可以!")
+                viewer.sendMessage(MESSAGE_CANCELLED)
                 e.isCancelled = true
             }
 
             e.isAdd -> {
                 val added = newItem?.tryNekoStack ?: run {
-                    viewer.sendPlainMessage("请放入一个萌芽物品!")
-                    e.isCancelled = true; return
+                    viewer.sendPlainMessage("请放入一个核心!")
+                    e.isCancelled = true
+                    return
                 }
 
                 when (inputSlot) {
@@ -168,7 +172,7 @@ internal class MergingMenu(
 
         when {
             e.isSwap || e.isAdd -> {
-                viewer.sendPlainMessage("猫咪不可以!")
+                viewer.sendMessage(MESSAGE_CANCELLED)
                 e.isCancelled = true
             }
 
@@ -184,7 +188,7 @@ internal class MergingMenu(
                     }
 
                     // 把合并后的物品递给玩家
-                    val handle = result.item.itemStack
+                    val handle = result.item.itemStack // TODO getFinalOutputs
                     viewer.inventory.addItem(handle)
 
                     // 清空菜单中的物品

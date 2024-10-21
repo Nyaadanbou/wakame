@@ -1,16 +1,14 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.reforge.merge.MergingTable
-import cc.mewcraft.wakame.reforge.merge.MergingTables
+import cc.mewcraft.wakame.reforge.merge.MergingTableRegistry
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.context.CommandInput
 import org.incendo.cloud.exception.parsing.ParserException
-import org.incendo.cloud.parser.ArgumentParseResult
-import org.incendo.cloud.parser.ArgumentParser
-import org.incendo.cloud.parser.ParserDescriptor
+import org.incendo.cloud.parser.*
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 
 class MergingTableParser<C : Any> : ArgumentParser<C, MergingTable>, BlockingSuggestionProvider.Strings<C> {
@@ -26,16 +24,16 @@ class MergingTableParser<C : Any> : ArgumentParser<C, MergingTable>, BlockingSug
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<MergingTable> {
         val peekStr = commandInput.peekString()
-        if (peekStr !in MergingTables.NAMES) {
+        if (peekStr !in MergingTableRegistry.NAMES) {
             return ArgumentParseResult.failure(MergingTableParseException(commandContext))
         }
 
         val readStr = commandInput.readString()
-        return ArgumentParseResult.success(MergingTables[readStr]!!)
+        return ArgumentParseResult.success(MergingTableRegistry[readStr]!!)
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return MergingTables.NAMES
+        return MergingTableRegistry.NAMES
     }
 }
 

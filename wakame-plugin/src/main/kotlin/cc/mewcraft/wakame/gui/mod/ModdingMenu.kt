@@ -102,11 +102,17 @@ internal class ModdingMenu(
         logger.info("$PREFIX Confirmed status updated: $old -> $new")
     }
 
-    private val logger: Logger by inject()
+    val logger: Logger by inject()
 
-    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
+    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        guiPriority = 10
+        setPreUpdateHandler(::onInputInventoryPreUpdate)
+    }
 
-    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
+    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        guiPriority = 10
+        setPreUpdateHandler(::onOutputInventoryPreUpdate)
+    }
 
     private val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
         builder.setStructure(
@@ -270,13 +276,6 @@ internal class ModdingMenu(
 
     private fun onWindowOpen() {
         // NOP
-    }
-
-    init {
-        inputSlot.setPreUpdateHandler(::onInputInventoryPreUpdate)
-        outputSlot.setPreUpdateHandler(::onOutputInventoryPreUpdate)
-        inputSlot.guiPriority = 10
-        outputSlot.guiPriority = 0
     }
 
     @Suppress("SameParameterValue")

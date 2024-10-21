@@ -15,8 +15,6 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
@@ -38,14 +36,12 @@ private constructor(
 ) : KoinComponent {
     companion object {
         private const val PREFIX = ReforgeLoggerPrefix.MOD
-        private val MSG_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
+        private val MESSAGE_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
 
         operator fun invoke(parent: ModdingMenu, replace: ModdingSession.Replace): Gui {
             return ReplaceMenu(parent, replace).primaryGui
         }
     }
-
-    private val logger: Logger by inject()
 
     private val viewer: Player = parent.viewer
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
@@ -70,10 +66,10 @@ private constructor(
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val prevItem = event.previousItem
         val newItem = event.newItem
-        logger.info("$PREFIX Replace input updating: ${prevItem?.type} -> ${newItem?.type}")
+        parent.logger.info("$PREFIX Replace input updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (parent.session.frozen) {
-            logger.error("$PREFIX The modding session is frozen, but the player is trying to interact with the replace's input slot. This is a bug!")
+            parent.logger.error("$PREFIX The modding session is frozen, but the player is trying to interact with the replace's input slot. This is a bug!")
             event.isCancelled = true
             return
         }
@@ -82,13 +78,13 @@ private constructor(
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
                 event.isCancelled = true
-                viewer.sendMessage(MSG_CANCELLED)
+                viewer.sendMessage(MESSAGE_CANCELLED)
             }
 
             // 玩家尝试向 inputSlot 中添加物品:
             event.isAdd -> {
                 val ns = newItem?.tryNekoStack ?: run {
-                    viewer.sendMessage(MSG_CANCELLED)
+                    viewer.sendMessage(MESSAGE_CANCELLED)
                     event.isCancelled = true
                     return
                 }
@@ -114,7 +110,7 @@ private constructor(
                 event.isCancelled = true
 
                 val ingredient = replace.latestResult.ingredient ?: run {
-                    logger.error("$PREFIX Ingredient is null, but an item is being removed from the replace menu. This is a bug!")
+                    parent.logger.error("$PREFIX Ingredient is null, but an item is being removed from the replace menu. This is a bug!")
                     return
                 }
 
@@ -148,7 +144,7 @@ private constructor(
         val ingredient = result.ingredient
         val rendered: ItemStack
 
-        val clickToWithdraw = "<gray>⤷ 点击以取回".mini.removeItalic
+        val clickToWithdraw = "<gray>点击以取回".mini.removeItalic
 
         if (result.applicable) {
             // 耗材可用于定制
@@ -175,7 +171,7 @@ private constructor(
                 rendered = ingredient.itemStack
                 rendered.editMeta { meta ->
                     val name = "<white>结果: <green>就绪".mini
-                    val lore = buildList<Component> {
+                    val lore = buildList {
                         // TODO 使用新的渲染器生成文本
                         result.getPortableCore()?.wrapped?.id?.asString()?.mini?.let { add(it) }
                         add(Component.empty())
@@ -192,7 +188,7 @@ private constructor(
             rendered = ItemStack(Material.BARRIER)
             rendered.editMeta { meta ->
                 val name = "<white>结果: <red>无效".mini
-                val lore = buildList<Component> {
+                val lore = buildList {
                     addAll(result.description)
                     add(Component.empty())
                     add(clickToWithdraw)

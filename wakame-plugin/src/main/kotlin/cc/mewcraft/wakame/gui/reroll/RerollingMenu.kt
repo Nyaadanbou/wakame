@@ -6,8 +6,10 @@ import cc.mewcraft.wakame.reforge.reroll.*
 import cc.mewcraft.wakame.util.hideTooltip
 import cc.mewcraft.wakame.util.removeItalic
 import me.lucko.helper.text3.mini
+import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -36,6 +38,7 @@ internal class RerollingMenu(
 
     companion object {
         private const val PREFIX = ReforgeLoggerPrefix.REROLL
+        private val MESSAGE_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
     }
 
     /**
@@ -65,7 +68,7 @@ internal class RerollingMenu(
      */
     val session: RerollingSession = SimpleRerollingSession(table, viewer)
 
-    private val logger: Logger by inject()
+    val logger: Logger by inject()
 
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
         setPreUpdateHandler(::onInputInventoryPreUpdate)
@@ -105,16 +108,17 @@ internal class RerollingMenu(
         when {
             // 玩家尝试交换 inputSlot 里面的物品:
             event.isSwap -> {
-                viewer.sendPlainMessage("猫咪不可以!")
-                event.isCancelled = true; return
+                viewer.sendMessage(MESSAGE_CANCELLED)
+                event.isCancelled = true
             }
 
             // 玩家尝试把物品放进 inputSlot:
             // ... 说明玩家想要开始一次重造流程
             event.isAdd -> {
                 val ns = newItem?.tryNekoStack ?: run {
-                    viewer.sendPlainMessage("请放入一个萌芽物品!")
-                    event.isCancelled = true; return
+                    viewer.sendMessage(MESSAGE_CANCELLED)
+                    event.isCancelled = true
+                    return
                 }
 
                 // 给会话输入源物品
@@ -154,21 +158,19 @@ internal class RerollingMenu(
         when {
             // 玩家尝试交换 outputSlot 里面的物品:
             event.isSwap -> {
-                viewer.sendPlainMessage("猫咪不可以!")
-                event.isCancelled = true; return
+                viewer.sendMessage(MESSAGE_CANCELLED)
+                event.isCancelled = true
             }
 
             // 玩家尝试把物品放进 outputSlot:
             event.isAdd -> {
-                viewer.sendPlainMessage("猫咪不可以!")
-                event.isCancelled = true; return
+                viewer.sendMessage(MESSAGE_CANCELLED)
+                event.isCancelled = true
             }
 
             // 玩家尝试从 outputSlot 拿出物品:
+            // ... 说明玩家想要完成这次重造
             event.isRemove -> {
-
-                // ... 说明玩家想要完成这次重造
-
                 event.isCancelled = true
 
                 if (session.sourceItem == null) {
@@ -192,7 +194,7 @@ internal class RerollingMenu(
                 }
 
                 // 把重造后的源物品给玩家
-                viewer.inventory.addItem(result.item.itemStack)
+                viewer.inventory.addItem(result.item.itemStack) // TODO getFinalOutputs
 
                 // 重置会话状态
                 session.reset()
@@ -223,15 +225,14 @@ internal class RerollingMenu(
     }
 
     private fun createSelectionGuis(): List<Gui> {
-        return session.selectionMap
-            .map { (_, sel) -> SelectionMenu(this, sel) }
-            .map { it.primaryGui }
+        return session.selectionMap.map { (_, sel) -> SelectionMenu(this, sel) }
     }
 
     private fun setSelectionGuis(guis: List<Gui>?) {
         primaryGui.setContent(guis)
     }
 
+    @Suppress("SameParameterValue")
     private fun setInputSlot(stack: ItemStack?) {
         inputSlot.setItemSilently(0, stack)
     }

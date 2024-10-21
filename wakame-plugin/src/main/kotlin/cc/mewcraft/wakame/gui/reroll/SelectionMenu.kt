@@ -1,10 +1,9 @@
 package cc.mewcraft.wakame.gui.reroll
 
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.util.hideAllFlags
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -18,16 +17,19 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 /**
  * 重造台中用于选择*单个*词条栏的子菜单, 将被嵌入进 [RerollingMenu] 中.
  */
-internal class SelectionMenu(
+internal class SelectionMenu
+private constructor(
     val parent: RerollingMenu,
     val selection: RerollingSession.Selection,
 ) {
 
     companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.REROLL
+        operator fun invoke(parent: RerollingMenu, selection: RerollingSession.Selection): Gui {
+            return SelectionMenu(parent, selection).primaryGui
+        }
     }
 
-    val primaryGui: Gui = Gui.normal { builder ->
+    private val primaryGui: Gui = Gui.normal { builder ->
         builder.setStructure(
             "a",
             "b"

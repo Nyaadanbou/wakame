@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
@@ -69,7 +70,7 @@ internal class SimpleMergingSession(
     override fun returnInputItem1(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT1)
     override fun returnInputItem2(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
 
-    override var latestResult: MergingSession.Result by Delegates.vetoable(Result.empty()) { _, old, new ->
+    override var latestResult: MergingSession.Result by Delegates.vetoable(ReforgeResult.empty()) { _, old, new ->
         if (frozen) {
             logger.error("$PREFIX Trying to set result of a frozen merging session. This is a bug!")
             return@vetoable false
@@ -92,7 +93,7 @@ internal class SimpleMergingSession(
             MergeOperation(this)
         } catch (e: Exception) {
             logger.error("$PREFIX An unknown error occurred while merging. This is a bug!", e)
-            Result.failure("<red>内部错误".mini)
+            ReforgeResult.failure("<red>内部错误".mini)
         }
     }
 
@@ -103,7 +104,7 @@ internal class SimpleMergingSession(
     override fun reset() {
         inputItem1 = null
         inputItem2 = null
-        latestResult = Result.empty()
+        latestResult = ReforgeResult.empty()
     }
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
@@ -119,7 +120,9 @@ internal class SimpleMergingSession(
     @Suppress("UNCHECKED_CAST")
     private fun getValue(inputItem: NekoStack?): Double {
         val comp = inputItem?.components?.get(ItemComponentTypes.PORTABLE_CORE) ?: return .0
-        val value = (comp.wrapped as? CompositeAttributeComponent.Scalar<Double>)?.value ?: return .0
+        val core = comp.wrapped as? AttributeCore ?: return .0
+        val scalar = core.attribute as? CompositeAttributeComponent.Scalar<Double> ?: return .0
+        val value = scalar.value
         return value
     }
 
@@ -132,14 +135,14 @@ internal class SimpleMergingSession(
     private fun getRarityNumber(inputItem: NekoStack?): Double {
         val comp = inputItem?.components?.get(ItemComponentTypes.RARITY) ?: return .0
         val rarityKey = comp.rarity.key
-        val mappedValue = table.rarityNumberMapping.get(rarityKey)
-        return mappedValue
+        val value = table.rarityNumberMapping.get(rarityKey)
+        return value
     }
 
     private fun getPenalty(inputItem: NekoStack?): Double {
         val comp = inputItem?.components?.get(ItemComponentTypes.PORTABLE_CORE) ?: return .0
-        val penalty = comp.penalty
-        return penalty.toDouble()
+        val value = comp.penalty.toDouble()
+        return value
     }
 
     override fun getValue1(): Double = getValue(inputItem1)
@@ -162,20 +165,20 @@ internal class SimpleMergingSession(
 /**
  * 包含了构建各种 [MergingSession.Result] 的方法.
  */
-internal object Result {
+internal object ReforgeResult {
 
     /**
      * 构建一个用于表示*没有合并*的 [MergingSession.Result].
      */
     fun empty(): MergingSession.Result {
-        return Result(false, "<gray>没有可以合并的东西.".mini, NekoStack.empty(), Type.empty(), Cost.zero())
+        return Result(false, "<gray>没有可以合并的东西.".mini, NekoStack.empty(), ReforgeType.empty(), ReforgeCost.zero())
     }
 
     /**
      * 构建一个用于表示*合并失败*的 [MergingSession.Result].
      */
     fun failure(description: Component): MergingSession.Result {
-        return Result(false, description, NekoStack.empty(), Type.failure(), Cost.failure())
+        return Result(false, description, NekoStack.empty(), ReforgeType.failure(), ReforgeCost.failure())
     }
 
     /**
@@ -214,7 +217,7 @@ internal object Result {
 /**
  * 包含了构建各种 [MergingSession.Type] 的方法.
  */
-internal object Type {
+internal object ReforgeType {
 
     /**
      * 构建一个用于表示没有合并的 [MergingSession.Type].
@@ -306,7 +309,7 @@ internal object Type {
 /**
  * 包含了构建各种 [MergingSession.Cost] 的方法.
  */
-internal object Cost {
+internal object ReforgeCost {
     /**
      * 表示没有资源消耗.
      */
