@@ -140,7 +140,7 @@ private constructor(
         val ingredient = result.ingredient
         val rendered: ItemStack
 
-        val clickToWithdraw = "<gray>点击以取回".mini.removeItalic
+        val clickToWithdraw = "<gray>点击取回核心".mini.removeItalic
 
         if (result.applicable) {
             // 耗材可用于定制

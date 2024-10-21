@@ -166,7 +166,7 @@ internal object ReforgeResult {
      * 构建一个用于表示*没有合并*的 [MergingSession.Result].
      */
     fun empty(): MergingSession.Result {
-        return Result(false, "<gray>没有输入".mini, NekoStack.empty(), ReforgeType.empty(), ReforgeCost.zero())
+        return Result(false, "<gray>没有输入.".mini, NekoStack.empty(), ReforgeType.empty(), ReforgeCost.zero())
     }
 
     /**
@@ -369,7 +369,7 @@ internal object ReforgeCost {
         }
 
         override val description: List<Component> = listOf(
-            "<white>金币花费: <yellow>${currencyAmount.toInt()} 金币".mini
+            "<white>花费: <yellow>${currencyAmount.toInt()} 金币".mini
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.concat(

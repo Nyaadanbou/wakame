@@ -186,7 +186,7 @@ internal class SimpleModdingSession(
 
             logger.info("Session's input item updated: ${old?.type} -> ${value?.type}")
 
-            val sourceItem0 = _value?.tryNekoStack ?: return
+            val sourceItem0 = _value?.takeIf { it.isCustomNeko }?.tryNekoStack ?: return
             val sourceItemCells = sourceItem0.components.get(ItemComponentTypes.CELLS)
             val sourceItemRule = sourceItem0.let { table.itemRuleMap[it.id] }
 
@@ -361,7 +361,7 @@ internal object ReforgeCost {
         }
 
         override val description: List<Component> = listOf(
-            "<gray>金币花费: <yellow>${currencyAmount}".mini
+            "<gray>花费: <yellow>${currencyAmount.toInt()} 金币".mini
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(

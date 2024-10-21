@@ -239,13 +239,13 @@ internal object ReforgeCost {
     private class Empty : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf("<gray>资源花费: <white>无".mini)
+        override val description: List<Component> = listOf("<gray>花费: <white>无".mini)
     }
 
     private class Error : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = false
-        override val description: List<Component> = listOf("<gray>资源花费: <red>内部错误".mini)
+        override val description: List<Component> = listOf("<gray>花费: <red>内部错误".mini)
     }
 
     private class Simple(
@@ -260,7 +260,7 @@ internal object ReforgeCost {
         }
 
         override val description: List<Component> = listOf(
-            "<gray>金币花费: <yellow>${currencyAmount}".mini
+            "<gray>花费: <yellow>${currencyAmount.toInt()} 金币".mini
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(

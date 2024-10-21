@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.gui.merge
 
+import cc.mewcraft.wakame.item.isCustomNeko
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.*
@@ -121,7 +122,7 @@ internal class MergingMenu(
             }
 
             e.isAdd -> {
-                val added = newItem?.tryNekoStack ?: run {
+                val added = newItem?.takeIf { it.isCustomNeko }?.tryNekoStack ?: run {
                     viewer.sendMessage(text { content("请放入一个核心!"); color(NamedTextColor.RED) })
                     e.isCancelled = true
                     return
@@ -248,7 +249,7 @@ internal class MergingMenu(
         val item = result.item
         val ret: ItemStack
 
-        val clickToMerge = "<gray>⤷ 点击确认合并".mini
+        val clickToMerge = "<gray>点击确认合并".mini
 
         if (result.successful) {
             // 渲染成功的结果

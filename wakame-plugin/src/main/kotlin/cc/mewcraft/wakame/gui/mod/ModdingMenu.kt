@@ -300,7 +300,7 @@ internal class ModdingMenu(
     private fun renderOutputSlotForConfirm(result: ModdingSession.ReforgeResult): ItemStack {
         val ret = ItemStack(Material.ANVIL)
         ret.editMeta { meta ->
-            val name = "<white>再次点击确认取出".mini
+            val name = "<white>再次点击取出".mini
             meta.itemName(name)
         }
 

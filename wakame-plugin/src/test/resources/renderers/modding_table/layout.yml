@@ -19,3 +19,6 @@ primary:
   - stash:cells/empty
 
   - vanilla:item_name
+
+  # 从重铸的上下文获取的数据
+  - reforge:cost

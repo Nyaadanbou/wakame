@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.gui.reroll
 
+import cc.mewcraft.wakame.item.isCustomNeko
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.*
@@ -112,7 +113,7 @@ internal class RerollingMenu(
             // 玩家尝试把物品放进 inputSlot:
             // ... 说明玩家想要开始一次重造流程
             event.isAdd -> {
-                val ns = newItem?.tryNekoStack ?: run {
+                val ns = newItem?.takeIf { it.isCustomNeko }?.tryNekoStack ?: run {
                     viewer.sendMessage(MESSAGE_CANCELLED)
                     event.isCancelled = true
                     return
@@ -283,7 +284,7 @@ internal class RerollingMenu(
                     addAll(result.description)
                     addAll(result.cost.description)
                     add(empty())
-                    add("<gray>⤷ 点击确认重造".mini)
+                    add("<gray>点击确认重造".mini)
                 }
 
                 meta.displayName(name.removeItalic)

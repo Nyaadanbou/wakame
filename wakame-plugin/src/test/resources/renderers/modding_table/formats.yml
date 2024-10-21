@@ -25,6 +25,11 @@ cells/empty:
   namespace: stash
   tooltip: "[ 空核孔 ]"
 
+cost:
+  namespace: reforge
+  tooltip:
+    cost: "花费: <amount> 金币"
+
 # id: `custom_name`
 custom_name:
   namespace: vanilla
