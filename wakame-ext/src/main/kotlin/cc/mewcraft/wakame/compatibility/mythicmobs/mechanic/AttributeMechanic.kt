@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.compatibility.mythicmobs
+package cc.mewcraft.wakame.compatibility.mythicmobs.mechanic
 
 import cc.mewcraft.wakame.attribute.*
 import io.lumine.mythic.api.adapters.AbstractEntity

@@ -8,6 +8,7 @@ version = "0.0.1"
 
 dependencies {
     // internal
+    compileOnly(project(":wakame-api"))
     compileOnly(project(":wakame-common"))
     compileOnly(platform(libs.bom.caffeine))
     compileOnly(local.paper)
