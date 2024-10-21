@@ -44,7 +44,10 @@ private constructor(
     }
 
     private val viewer: Player = parent.viewer
-    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
+    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        setPreUpdateHandler(::onInputInventoryPreUpdate)
+        guiPriority = 10
+    }
     private val primaryGui: Gui = Gui.normal { builder ->
         // a: 被定制对象的预览物品
         // b: 接收玩家输入的虚拟容器
@@ -53,11 +56,6 @@ private constructor(
         builder.addIngredient('a', ViewItem(replace))
         builder.addIngredient('b', inputSlot)
         builder.addIngredient('*', SimpleItem(ItemStack(Material.WHITE_STAINED_GLASS_PANE).hideTooltip(true)))
-    }
-
-    init {
-        inputSlot.setPreUpdateHandler(::onInputInventoryPreUpdate)
-        inputSlot.guiPriority = 10
     }
 
     /**

@@ -71,9 +71,18 @@ internal class MergingMenu(
 
     private val logger: Logger by inject()
 
-    private val inputSlot1: VirtualInventory = VirtualInventory(intArrayOf(1))
-    private val inputSlot2: VirtualInventory = VirtualInventory(intArrayOf(1))
-    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
+    private val inputSlot1: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        guiPriority = 3
+        setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT1) }
+    }
+    private val inputSlot2: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        guiPriority = 2
+        setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT2) }
+    }
+    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        guiPriority = 1
+        setPreUpdateHandler(::onOutputSlotPreUpdate)
+    }
 
     private val primaryGui: Gui = Gui.normal { builder ->
         builder.setStructure(
@@ -97,16 +106,6 @@ internal class MergingMenu(
         builder.addCloseHandler(::onWindowClose)
     }
 
-    init {
-        inputSlot1.guiPriority = 3
-        inputSlot2.guiPriority = 2
-        outputSlot.guiPriority = 1
-
-        inputSlot1.setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT1) }
-        inputSlot2.setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT2) }
-        outputSlot.setPreUpdateHandler(::onOutputSlotPreUpdate)
-    }
-
     private enum class InputSlot {
         INPUT1, INPUT2
     }
@@ -125,7 +124,7 @@ internal class MergingMenu(
 
             e.isAdd -> {
                 val added = newItem?.tryNekoStack ?: run {
-                    viewer.sendPlainMessage("请放入一个核心!")
+                    viewer.sendMessage(text { content("请放入一个核心!"); color(NamedTextColor.RED) })
                     e.isCancelled = true
                     return
                 }
