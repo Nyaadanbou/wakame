@@ -1,8 +1,9 @@
 /**
  * 有关*重造台*的渲染器实现.
  */
-package cc.mewcraft.wakame.display2.implementation
+package cc.mewcraft.wakame.display2.implementation.rerolling_table
 
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.item.NekoStack
 import java.nio.file.Path
 

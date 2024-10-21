@@ -10,6 +10,12 @@ import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.stream.Stream
 
+val Cell.attributeCore: AttributeCore?
+    get() = getCoreAs(CoreType.ATTRIBUTE)
+
+val Cell.attribute: ConstantCompositeAttribute?
+    get() = attributeCore?.attribute
+
 /**
  * 本函数用于直接构建 [AttributeCore].
  *

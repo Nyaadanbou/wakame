@@ -1,12 +1,13 @@
 /**
  * 有关*标准*的渲染器实现.
  */
-package cc.mewcraft.wakame.display2.implementation
+package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import cc.mewcraft.wakame.attribute.composite.*
 import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FireResistant

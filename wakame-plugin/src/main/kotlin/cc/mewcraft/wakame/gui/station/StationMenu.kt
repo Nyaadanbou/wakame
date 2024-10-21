@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.gui.station
 
 import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.CraftingStationContext.*
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.*
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.gui.toItemProvider
 import cc.mewcraft.wakame.item.NekoStack

@@ -1,10 +1,12 @@
 /**
  * 有关*合成站*的渲染器实现.
  */
-package cc.mewcraft.wakame.display2.implementation
+package cc.mewcraft.wakame.display2.implementation.crafting_station
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.standard.AttackSpeedRendererFormat
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes

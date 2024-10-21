@@ -8,6 +8,9 @@ import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
+val Cell.virtualCore: VirtualCore?
+    get() = getCoreAs(CoreType.VIRTUAL)
+
 /**
  * [VirtualCore] 的标准实现.
  */

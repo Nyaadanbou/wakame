@@ -10,6 +10,11 @@ import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.stream.Stream
 
+val Cell.skillCore: SkillCore?
+    get() = getCoreAs(CoreType.SKILL)
+
+val Cell.skill: ConfiguredSkill?
+    get() = skillCore?.skill
 
 /**
  * 本函数用于构建 [SkillCore].
@@ -20,7 +25,7 @@ import java.util.stream.Stream
  * @return 构建的 [SkillCore]
  */
 fun SkillCore(
-    id: Key, skill: ConfiguredSkill
+    id: Key, skill: ConfiguredSkill,
 ): SkillCore {
     return SimpleSkillCore(id, skill)
 }
@@ -36,7 +41,7 @@ fun SkillCore(
  * @return 从 NBT 构建的 [SkillCore]
  */
 fun SkillCore(
-    id: Key, tag: CompoundTag
+    id: Key, tag: CompoundTag,
 ): SkillCore {
     val skillId = id
     val configuredSkill = ConfiguredSkill(skillId, tag)
@@ -52,7 +57,7 @@ fun SkillCore(
  * @return 从配置文件构建的 [SkillCore]
  */
 fun SkillCore(
-    id: Key, node: ConfigurationNode
+    id: Key, node: ConfigurationNode,
 ): SkillCore {
     val skillId = id
     val configuredSkill = ConfiguredSkill(skillId, node)

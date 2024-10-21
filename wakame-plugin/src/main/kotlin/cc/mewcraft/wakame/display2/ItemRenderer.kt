@@ -1,6 +1,11 @@
 package cc.mewcraft.wakame.display2
 
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationItemRenderer
+import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableItemRenderer
+import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableItemRenderer
+import cc.mewcraft.wakame.display2.implementation.recycling_station.RecyclingStationItemRenderer
+import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableItemRenderer
+import cc.mewcraft.wakame.display2.implementation.standard.StandardItemRenderer
 import java.nio.file.Path
 
 /**

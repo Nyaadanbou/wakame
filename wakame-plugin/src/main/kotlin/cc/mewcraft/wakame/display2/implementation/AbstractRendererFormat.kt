@@ -23,6 +23,22 @@ import kotlin.collections.component2
 /* 这里定义了可以在不同渲染器之间通用的 RendererFormat 实现 */
 
 /**
+ * 硬编码的渲染格式.
+ *
+ * 不包含任何现成的格式, 只提供最基本的格式信息.
+ */
+@ConfigSerializable
+internal data class HardcodedRendererFormat(
+    @Setting @Required
+    override val namespace: String,
+    @Setting @NodeKey
+    override val id: String,
+) : RendererFormat.Simple {
+    override val index = createIndex()
+    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+}
+
+/**
  * 一种最简单的渲染格式.
  *
  * 只有一个格式 [tooltip], 可以包含任意占位符.
