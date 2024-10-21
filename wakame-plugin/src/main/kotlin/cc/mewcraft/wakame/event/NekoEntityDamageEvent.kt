@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.event
 
-import cc.mewcraft.wakame.damage.CriticalState
+import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DefenseMetadata
 import cc.mewcraft.wakame.element.Element
@@ -90,8 +90,8 @@ class NekoEntityDamageEvent(
     /**
      * 获取本次伤害的暴击状态.
      */
-    fun getCriticalState(): CriticalState {
-        return damageMetadata.criticalState
+    fun getCriticalState(): CriticalStrikeState {
+        return damageMetadata.criticalStrikeState
     }
 
     /**

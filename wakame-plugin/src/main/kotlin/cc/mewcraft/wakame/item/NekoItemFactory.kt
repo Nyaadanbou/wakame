@@ -2,8 +2,14 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.item.behavior.*
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.behavior.ItemBehavior
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateMap
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -48,6 +54,7 @@ object NekoItemFactory : KoinComponent {
             // tryAdd("damageable", ItemBehaviorTypes.DAMAGEABLE)
             // tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             // tryAdd("food", ItemBehaviorTypes.FOOD)
+            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
             tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
             // tryAdd("tool", ItemBehaviorTypes.TOOL)
             // tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
@@ -92,7 +99,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("cells", ItemTemplateTypes.CELLS)
             tryAdd("crate", ItemTemplateTypes.CRATE) { unsupported() }
             tryAdd("custom_name", ItemTemplateTypes.CUSTOM_NAME) { unsupported() }
-            tryAdd("damageable", ItemTemplateTypes.DAMAGEABLE) { unsupported() }
+            tryAdd("damage", ItemTemplateTypes.DAMAGE) { unsupported() }
             tryAdd("dyed_color", ItemTemplateTypes.DYED_COLOR) { unsupported() }
             tryAdd("elements", ItemTemplateTypes.ELEMENTS)
             tryAdd("enchantments", ItemTemplateTypes.ENCHANTMENTS) { unsupported() }
@@ -105,6 +112,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("kizamiz", ItemTemplateTypes.KIZAMIZ)
             tryAdd("level", ItemTemplateTypes.LEVEL) { restricted { !it.isConstant } } // 对于 VanillaNekoItem, LEVEL 应该始终采用固定值
             tryAdd("lore", ItemTemplateTypes.LORE)
+            tryAdd("max_damage", ItemTemplateTypes.MAX_DAMAGE) { unsupported() }
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE) { unsupported() }
             tryAdd("rarity", ItemTemplateTypes.RARITY) { restricted { !it.isStatic } } // 对于 VanillaNekoItem, RARITY 应该始终采用固定值
             // tryAdd("skin", ItemTemplateTypes.SKIN) { unsupported() }
@@ -150,7 +158,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("attack", ItemBehaviorTypes.ATTACK)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
             tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
-            tryAdd("damageable", ItemBehaviorTypes.DAMAGEABLE)
+            tryAdd("max_damage", ItemBehaviorTypes.MAX_DAMAGE)
             tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             tryAdd("food", ItemBehaviorTypes.FOOD)
             tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
@@ -178,7 +186,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("cells", ItemTemplateTypes.CELLS)
             tryAdd("crate", ItemTemplateTypes.CRATE)
             tryAdd("custom_name", ItemTemplateTypes.CUSTOM_NAME)
-            tryAdd("damageable", ItemTemplateTypes.DAMAGEABLE)
+            tryAdd("damage", ItemTemplateTypes.DAMAGE)
             tryAdd("dyed_color", ItemTemplateTypes.DYED_COLOR)
             tryAdd("elements", ItemTemplateTypes.ELEMENTS)
             tryAdd("enchantments", ItemTemplateTypes.ENCHANTMENTS)
@@ -191,6 +199,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("kizamiz", ItemTemplateTypes.KIZAMIZ)
             tryAdd("level", ItemTemplateTypes.LEVEL)
             tryAdd("lore", ItemTemplateTypes.LORE)
+            tryAdd("max_damage", ItemTemplateTypes.MAX_DAMAGE)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE)
             tryAdd("rarity", ItemTemplateTypes.RARITY)
             // tryAdd("skin", ItemTemplateTypes.SKIN)

@@ -183,7 +183,8 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.DYED_COLOR)
         generate(ItemTemplateTypes.ENCHANTMENTS)
         generate(ItemTemplateTypes.STORED_ENCHANTMENTS)
-        generate(ItemTemplateTypes.DAMAGEABLE)
+        generate(ItemTemplateTypes.MAX_DAMAGE)
+        generate(ItemTemplateTypes.DAMAGE)
         generate(ItemTemplateTypes.TOOL)
         generate(ItemTemplateTypes.FOOD)
 

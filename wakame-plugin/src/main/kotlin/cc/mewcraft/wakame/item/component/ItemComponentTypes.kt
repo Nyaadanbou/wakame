@@ -86,12 +86,6 @@ internal object ItemComponentTypes {
     val DAMAGE: ItemComponentType<Int> = ItemDamage.codec(ItemConstants.DAMAGE).register()
 
     /**
-     * 物品组件 [DAMAGE], [MAX_DAMAGE], [UNBREAKABLE] 的整合.
-     */
-    @JvmField
-    val DAMAGEABLE: ItemComponentType<Damageable> = Damageable.codec(ItemConstants.DAMAGEABLE).register()
-
-    /**
      * 皮革的颜色.
      *
      * 对应原版组件: [`minecraft:dyed_color`](https://minecraft.wiki/w/Data_component_format#dyed_color)

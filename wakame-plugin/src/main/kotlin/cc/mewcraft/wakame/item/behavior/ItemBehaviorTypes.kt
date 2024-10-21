@@ -22,11 +22,6 @@ object ItemBehaviorTypes {
     val CHARGEABLE: ItemBehaviorType<Chargeable> = Chargeable
 
     /**
-     * 物品受损的逻辑.
-     */
-    val DAMAGEABLE: ItemBehaviorType<Damageable> = Damageable
-
-    /**
      * 物品附魔的逻辑.
      */
     val ENCHANTABLE: ItemBehaviorType<Enchantable> = Enchantable
@@ -39,7 +34,17 @@ object ItemBehaviorTypes {
     /**
      * 当玩家的冒险等级 < 物品等级时, 禁用物品的逻辑.
      */
+    val HOLD_LAST_DAMAGE: ItemBehaviorType<HoldLastDamage> = HoldLastDamage
+
+    /**
+     * 当玩家的冒险等级 < 物品等级时, 禁用物品的逻辑.
+     */
     val LEVEL_BARRIER: ItemBehaviorType<LevelBarrier> = LevelBarrier
+
+    /**
+     * 物品受损的逻辑.
+     */
+    val MAX_DAMAGE: ItemBehaviorType<MaxDamage> = MaxDamage
 
     /**
      * 物品作为工具的逻辑.

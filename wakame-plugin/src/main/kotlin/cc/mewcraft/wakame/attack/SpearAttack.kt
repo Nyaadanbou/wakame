@@ -3,14 +3,15 @@ package cc.mewcraft.wakame.attack
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.FluidCollisionMode
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.inventory.ItemStack
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 
@@ -33,14 +34,18 @@ data class SpearAttack(
         const val NAME = "spear"
     }
 
-    override fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
         if (event.damageMetadata is VanillaDamageMetadata) {
             event.isCancelled = true
             applyAttack(player)
         }
     }
 
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
+    override fun handleDirectMeleeAttackEntity(player: Player, nekoStack: NekoStack, event: EntityDamageByEntityEvent): DamageMetadata? {
+
+    }
+
+    override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, event: PlayerInteractEvent) {
         if (!action.isLeftClick) return
         applyAttack(player)
     }
@@ -84,22 +89,22 @@ data class SpearAttack(
         }
         val damageTags = DamageTags(DamageTag.MELEE, DamageTag.SPEAR)
         hitEntities.forEach {
-            val criticalState: CriticalState = if (chance < 0) {
+            val criticalStrikeState: CriticalStrikeState = if (chance < 0) {
                 if (Random.nextDouble() < chance.absoluteValue) {
-                    CriticalState.NEGATIVE
+                    CriticalStrikeState.NEGATIVE
                 } else {
-                    CriticalState.NONE
+                    CriticalStrikeState.NONE
                 }
             } else {
                 if (Random.nextDouble() < chance) {
-                    CriticalState.POSITIVE
+                    CriticalStrikeState.POSITIVE
                 } else {
-                    CriticalState.NONE
+                    CriticalStrikeState.NONE
                 }
             }
             val customDamageMetadata = CustomDamageMetadata(
                 criticalPower = criticalPower,
-                criticalState = criticalState,
+                criticalStrikeState = criticalStrikeState,
                 knockback = true,
                 damageBundle = damageBundle(attributeMap) { every { standard() } },
                 damageTags = damageTags

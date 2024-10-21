@@ -54,7 +54,6 @@ object ItemConstants {
     const val CUSTOM_NAME = "custom_name"
     const val CUSTOM_MODEL_DATA = "custom_model_data"
     const val DAMAGE = "damage"
-    const val DAMAGEABLE = "damageable"
     const val DYED_COLOR = "dyed_color"
     const val ENCHANTMENTS = "enchantments"
     const val MAX_DAMAGE = "max_damage"

@@ -66,10 +66,10 @@ object ItemTemplateTypes {
     val CUSTOM_NAME: ItemTemplateType<CustomName> = CustomName.codec(ItemConstants.CUSTOM_NAME).register()
 
     /**
-     * 组件: [cc.mewcraft.wakame.item.components.Damageable]
+     * 组件: [cc.mewcraft.wakame.item.components.ItemDamage]
      */
     @JvmField
-    val DAMAGEABLE: ItemTemplateType<Damageable> = Damageable.codec(ItemConstants.DAMAGEABLE).register()
+    val DAMAGE: ItemTemplateType<ItemDamage> = ItemDamage.codec(ItemConstants.DAMAGE).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.ItemDyeColor]
@@ -142,6 +142,12 @@ object ItemTemplateTypes {
      */
     @JvmField
     val LORE: ItemTemplateType<ExtraLore> = ExtraLore.codec(ItemConstants.LORE).register()
+
+    /**
+     * 组件: [cc.mewcraft.wakame.item.components.ItemMaxDamage]
+     */
+    @JvmField
+    val MAX_DAMAGE: ItemTemplateType<ItemMaxDamage> = ItemMaxDamage.codec(ItemConstants.MAX_DAMAGE).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.PortableCore]

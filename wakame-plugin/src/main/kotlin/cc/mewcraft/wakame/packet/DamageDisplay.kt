@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.damage.CriticalState
+import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.hologram.Hologram
@@ -12,12 +12,21 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.*
-import org.bukkit.entity.*
-import org.bukkit.event.*
+import org.bukkit.Color
+import org.bukkit.Location
+import org.bukkit.Sound
+import org.bukkit.entity.Display
+import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
+import org.bukkit.entity.TextDisplay
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.joml.Vector3f
 import java.util.*
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.sin
 
 /**
  * 以悬浮文字显示玩家造成的伤害.
@@ -51,7 +60,7 @@ internal class DamageDisplay : Listener {
                     element.styles.forEach { applicableApply(it) }
                 }
                 when (criticalState) {
-                    CriticalState.POSITIVE -> {
+                    CriticalStrikeState.POSITIVE -> {
                         damager.playSound(sound(Sound.ENTITY_PLAYER_ATTACK_CRIT, Source.PLAYER, 1f, 1f), Emitter.self())
                         text {
                             content("\ud83d\udca5 ")
@@ -61,7 +70,7 @@ internal class DamageDisplay : Listener {
                         }
                     }
 
-                    CriticalState.NEGATIVE -> {
+                    CriticalStrikeState.NEGATIVE -> {
                         text {
                             content("\ud83d\udca5 ")
                             color(TextColor.color(0x02afff))
@@ -70,7 +79,7 @@ internal class DamageDisplay : Listener {
                         }
                     }
 
-                    CriticalState.NONE -> damageText
+                    CriticalStrikeState.NONE -> damageText
                 }
             }.let { components ->
                 Component.join(JoinConfiguration.spaces(), components)
@@ -122,7 +131,7 @@ internal class DamageDisplay : Listener {
         hologramViewer: Player,
         hologramLocation: Location,
         damageText: Component,
-        criticalState: CriticalState,
+        criticalStrikeState: CriticalStrikeState,
     ) {
         val hologramData = TextHologramData(
             location = hologramLocation,
@@ -145,7 +154,7 @@ internal class DamageDisplay : Listener {
                 this.startInterpolation = 0
                 this.interpolationDuration = 5
                 this.translation.add(0f, .5f, 0f)
-                if (criticalState == CriticalState.NONE) {
+                if (criticalStrikeState == CriticalStrikeState.NONE) {
                     this.scale.add(1f, 1f, 1f)
                 } else {
                     this.scale.add(3f, 3f, 3f)

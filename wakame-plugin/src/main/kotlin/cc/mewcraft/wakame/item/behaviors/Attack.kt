@@ -20,13 +20,13 @@ interface Attack : ItemBehavior {
         override fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
             val nekoStack = itemStack.toNekoStack
             val attack = nekoStack.templates.get(ItemTemplateTypes.ATTACK) ?: return
-            attack.attackType.handleAttackEntity(player, itemStack, damagee, event)
+            attack.attackType.handleAttackEntity(player, nekoStack, damagee, event)
         }
 
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
             val nekoStack = itemStack.toNekoStack
             val attack = nekoStack.templates.get(ItemTemplateTypes.ATTACK) ?: return
-            attack.attackType.handleInteract(player, itemStack, action, wrappedEvent)
+            attack.attackType.handleInteract(player, nekoStack, action, wrappedEvent)
         }
     }
 

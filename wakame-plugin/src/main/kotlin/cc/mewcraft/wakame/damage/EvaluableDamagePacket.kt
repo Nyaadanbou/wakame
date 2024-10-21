@@ -14,7 +14,7 @@ import java.lang.reflect.Type
 
 data class EvaluableDamageMetadata(
     private val criticalPower: Evaluable<*>,
-    private val criticalState: CriticalState,
+    private val criticalStrikeState: CriticalStrikeState,
     private val knockback: Evaluable<*>,
     private val damagePackets: List<EvaluableDamagePacket>,
     private val damageTags: DamageTags,
@@ -23,7 +23,7 @@ data class EvaluableDamageMetadata(
         fun default(): EvaluableDamageMetadata {
             return EvaluableDamageMetadata(
                 criticalPower = Evaluable.parseNumber(1.0),
-                criticalState = CriticalState.NONE,
+                criticalStrikeState = CriticalStrikeState.NONE,
                 knockback = Evaluable.parseNumber(0.0),
                 damagePackets = listOf(DefaultEvaluableDamagePacket),
                 damageTags = DamageTags.empty()
@@ -34,7 +34,7 @@ data class EvaluableDamageMetadata(
     fun evaluate(engine: MochaEngine<*>): CustomDamageMetadata {
         return CustomDamageMetadata(
             criticalPower = criticalPower.evaluate(engine),
-            criticalState = criticalState,
+            criticalStrikeState = criticalStrikeState,
             knockback = knockback.evaluate(engine) > 0.0,
             damageBundle = damageBundle { damagePackets.forEach { single(it.evaluate(engine)) } },
             damageTags = damageTags
@@ -86,7 +86,7 @@ internal object EvaluableDamageBundleSerializer : SchemaSerializer<EvaluableDama
 
         return EvaluableDamageMetadata(
             criticalPower = node.node("critical_power").krequire(),
-            criticalState = node.node("critical_state").get<CriticalState>(CriticalState.NONE),
+            criticalStrikeState = node.node("critical_state").get<CriticalStrikeState>(CriticalStrikeState.NONE),
             knockback = node.node("knockback").krequire(),
             damagePackets = node.node("damage_packets").childrenList().map { it.krequire<EvaluableDamagePacket>() },
             damageTags = damageTags
