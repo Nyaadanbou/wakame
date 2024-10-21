@@ -7,7 +7,8 @@ import cc.mewcraft.wakame.skill.TriggerVariantSerializer
 import cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.text.Component
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -19,7 +20,7 @@ internal object MergingTableSerializer : KoinComponent {
     const val REFORGE_DIR_NAME = "reforge"
     const val MERGING_DIR_NAME = "merge"
 
-    private val logger: Logger by inject()
+    private val logger: Logger = get()
     private val mergeDirectory by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(MERGING_DIR_NAME) }
 
     /**

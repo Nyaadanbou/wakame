@@ -11,7 +11,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.ScrollGui
@@ -51,7 +51,6 @@ internal class ModdingMenu(
     val viewer: Player,
 ) : KoinComponent {
     companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.MOD
         private val MSG_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
     }
 
@@ -99,10 +98,10 @@ internal class ModdingMenu(
      * 这只是个标记, 具体的作用取决于实现.
      */
     var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
-        logger.info("$PREFIX Confirmed status updated: $old -> $new")
+        logger.info("Confirmed status updated: $old -> $new")
     }
 
-    val logger: Logger by inject()
+    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MOD)
 
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
         guiPriority = 10
@@ -146,10 +145,10 @@ internal class ModdingMenu(
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("$PREFIX Input item updating: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("Input item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (session.frozen) {
-            logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary input slot. This is a bug!")
+            logger.error("Modding session is frozen, but the player is trying to interact with the primary input slot. This is a bug!")
             event.isCancelled = true
             return
         }
@@ -202,10 +201,10 @@ internal class ModdingMenu(
     private fun onOutputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("$PREFIX Output item updating: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("Output item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (session.frozen) {
-            logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary output slot. This is a bug!")
+            logger.error("Modding session is frozen, but the player is trying to interact with the primary output slot. This is a bug!")
             event.isCancelled = true
             return
         }

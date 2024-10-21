@@ -7,7 +7,8 @@ import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -18,7 +19,7 @@ internal object RerollingTableSerializer : KoinComponent {
     private const val REFORGE_DIR_NAME = "reforge"
     private const val REROLLING_DIR_NAME = "reroll"
 
-    private val logger: Logger by inject()
+    private val logger: Logger = get()
     private val rerollDirectory by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(REROLLING_DIR_NAME) }
 
     /**

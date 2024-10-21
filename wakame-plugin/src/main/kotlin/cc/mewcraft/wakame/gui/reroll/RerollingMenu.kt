@@ -3,18 +3,16 @@ package cc.mewcraft.wakame.gui.reroll
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.*
-import cc.mewcraft.wakame.util.hideTooltip
-import cc.mewcraft.wakame.util.removeItalic
+import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.ScrollGui
@@ -37,7 +35,6 @@ internal class RerollingMenu(
 ) : KoinComponent {
 
     companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.REROLL
         private val MESSAGE_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
     }
 
@@ -68,7 +65,7 @@ internal class RerollingMenu(
      */
     val session: RerollingSession = SimpleRerollingSession(table, viewer)
 
-    val logger: Logger by inject()
+    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
         setPreUpdateHandler(::onInputInventoryPreUpdate)
@@ -103,7 +100,7 @@ internal class RerollingMenu(
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("$PREFIX Input slot updating: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("Input slot updating: ${prevItem?.type} -> ${newItem?.type}")
 
         when {
             // 玩家尝试交换 inputSlot 里面的物品:
@@ -153,7 +150,7 @@ internal class RerollingMenu(
     private fun onOutputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("$PREFIX Output item updating: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("Output item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         when {
             // 玩家尝试交换 outputSlot 里面的物品:
@@ -174,7 +171,7 @@ internal class RerollingMenu(
                 event.isCancelled = true
 
                 if (session.sourceItem == null) {
-                    logger.error("$PREFIX An item is being removed from the output slot, but the source item is null. This is a bug!")
+                    logger.error("An item is being removed from the output slot, but the source item is null. This is a bug!")
                     return
                 }
 
@@ -208,7 +205,7 @@ internal class RerollingMenu(
     }
 
     private fun onWindowClose() {
-        logger.info("$PREFIX Rerolling window closed for ${viewer.name}")
+        logger.info("Rerolling window closed for ${viewer.name}")
 
         setInputSlot(null)
         setOutputSlot(null)
@@ -221,7 +218,7 @@ internal class RerollingMenu(
     }
 
     private fun onWindowOpen() {
-        logger.info("$PREFIX RerollingMenu opened for ${viewer.name}")
+        logger.info("RerollingMenu opened for ${viewer.name}")
     }
 
     private fun createSelectionGuis(): List<Gui> {
@@ -262,7 +259,7 @@ internal class RerollingMenu(
                 val ret = ItemStack(Material.BARRIER)
                 ret.editMeta { meta ->
                     val name = "<white>结果: <red>资源不足".mini
-                    val lore = buildList<Component> {
+                    val lore = buildList {
                         addAll(result.description)
                         addAll(result.cost.description)
                     }
@@ -282,10 +279,10 @@ internal class RerollingMenu(
             val ret = item.itemStack
             ret.editMeta { meta ->
                 val name = "<white>结果: <green>就绪".mini
-                val lore = buildList<Component> {
+                val lore = buildList {
                     addAll(result.description)
                     addAll(result.cost.description)
-                    add(Component.empty())
+                    add(empty())
                     add("<gray>⤷ 点击确认重造".mini)
                 }
 
@@ -303,7 +300,7 @@ internal class RerollingMenu(
             val ret = ItemStack(Material.BARRIER)
             ret.editMeta { meta ->
                 val name = "<white>结果: <red>失败".mini
-                val lore = buildList<Component> {
+                val lore = buildList {
                     addAll(result.description)
                 }
 

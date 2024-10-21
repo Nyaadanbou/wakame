@@ -7,14 +7,13 @@ import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
 import java.util.stream.Stream
@@ -26,11 +25,7 @@ internal class SimpleMergingSession(
     inputItem1: NekoStack? = null,
     inputItem2: NekoStack? = null,
 ) : MergingSession, KoinComponent {
-    private val logger: Logger by inject()
-
-    companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.MERGE
-    }
+    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MERGE)
 
     override var inputItem1: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem1)
     override var inputItem2: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem2)
@@ -44,7 +39,7 @@ internal class SimpleMergingSession(
         slot: InputSlot,
     ) {
         if (frozen) {
-            logger.error("$PREFIX Trying to return input item of a frozen merging session. This is a bug!")
+            logger.error("Trying to return input item of a frozen merging session. This is a bug!")
             return
         }
 
@@ -57,7 +52,7 @@ internal class SimpleMergingSession(
             try {
                 viewer.inventory.addItem(item)
             } catch (e: Exception) {
-                logger.error("$PREFIX Failed to return input item '$slot' to player '${viewer.name}'", e)
+                logger.error("Failed to return input item '$slot' to player '${viewer.name}'", e)
             } finally {
                 when (slot) {
                     InputSlot.INPUT1 -> inputItem1 = null
@@ -72,11 +67,11 @@ internal class SimpleMergingSession(
 
     override var latestResult: MergingSession.Result by Delegates.vetoable(ReforgeResult.empty()) { _, old, new ->
         if (frozen) {
-            logger.error("$PREFIX Trying to set result of a frozen merging session. This is a bug!")
+            logger.error("Trying to set result of a frozen merging session. This is a bug!")
             return@vetoable false
         }
 
-        logger.info("$PREFIX Updating result: $new")
+        logger.info("Updating result: $new")
         return@vetoable true
     }
 
@@ -92,7 +87,7 @@ internal class SimpleMergingSession(
         return try {
             MergeOperation(this)
         } catch (e: Exception) {
-            logger.error("$PREFIX An unknown error occurred while merging. This is a bug!", e)
+            logger.error("An unknown error occurred while merging. This is a bug!", e)
             ReforgeResult.failure("<red>内部错误".mini)
         }
     }
@@ -109,11 +104,11 @@ internal class SimpleMergingSession(
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
         if (!new && old) {
-            logger.error("$PREFIX Unfreezing a frozen merging session. This is a bug!")
+            logger.error("Unfreezing a frozen merging session. This is a bug!")
             return@vetoable false
         }
 
-        logger.info("$PREFIX Updating frozen state: $new")
+        logger.info("Updating frozen state: $new")
         return@vetoable true
     }
 

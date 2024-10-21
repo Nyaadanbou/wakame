@@ -3,8 +3,7 @@ package cc.mewcraft.wakame.gui.merge
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.*
-import cc.mewcraft.wakame.util.hideTooltip
-import cc.mewcraft.wakame.util.removeItalic
+import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
@@ -13,7 +12,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
@@ -29,7 +28,6 @@ internal class MergingMenu(
 ) : KoinComponent {
 
     companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.MERGE
         private val MESSAGE_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
     }
 
@@ -69,7 +67,7 @@ internal class MergingMenu(
      */
     private val session: MergingSession = SimpleMergingSession(viewer, table)
 
-    private val logger: Logger by inject()
+    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MERGE)
 
     private val inputSlot1: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
         guiPriority = 3
@@ -114,7 +112,7 @@ internal class MergingMenu(
     private fun onInputSlotPreUpdate(e: ItemPreUpdateEvent, inputSlot: InputSlot) {
         val oldItem = e.previousItem
         val newItem = e.newItem
-        logger.info("$PREFIX Input slot ($inputSlot) pre-update: ${oldItem?.type} -> ${newItem?.type}")
+        logger.info("Input slot ($inputSlot) pre-update: ${oldItem?.type} -> ${newItem?.type}")
 
         when {
             e.isSwap -> {
@@ -167,7 +165,7 @@ internal class MergingMenu(
     private fun onOutputSlotPreUpdate(e: ItemPreUpdateEvent) {
         val oldItem = e.previousItem
         val newItem = e.newItem
-        logger.info("$PREFIX Output slot pre-update: ${oldItem?.type} -> ${newItem?.type}")
+        logger.info("Output slot pre-update: ${oldItem?.type} -> ${newItem?.type}")
 
         when {
             e.isSwap || e.isAdd -> {
@@ -204,7 +202,7 @@ internal class MergingMenu(
     //</editor-fold>
 
     private fun onWindowClose() {
-        logger.info("$PREFIX Menu closed for ${viewer.name}")
+        logger.info("Menu closed for ${viewer.name}")
 
         setInputSlot1(null)
         setInputSlot2(null)
@@ -216,7 +214,7 @@ internal class MergingMenu(
     }
 
     private fun onWindowOpen() {
-        logger.info("$PREFIX Menu opened for ${viewer.name}")
+        logger.info("Menu opened for ${viewer.name}")
     }
 
     private fun getInputSlot1(): ItemStack? {

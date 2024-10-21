@@ -16,7 +16,7 @@ import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
 import java.util.stream.Stream
@@ -31,32 +31,27 @@ internal class SimpleRerollingSession(
     override val viewer: Player,
     sourceItem: NekoStack? = null,
 ) : RerollingSession, KoinComponent {
-
-    companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.REROLL
-    }
-
-    val logger: Logger by inject()
+    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
     override val total: MochaFunction = table.currencyCost.compile(this)
 
     override var sourceItem: NekoStack? by SourceItemDelegate(sourceItem)
 
     override var selectionMap: RerollingSession.SelectionMap by Delegates.observable(SelectionMap.empty(this)) { _, old, new ->
-        logger.info("$PREFIX Selection map updated: $old -> $new")
+        logger.info("Selection map updated: $old -> $new")
     }
 
     override var latestResult: RerollingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty()) { _, old, new ->
-        logger.info("$PREFIX Result status updated: $old -> $new")
+        logger.info("Result status updated: $old -> $new")
     }
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
         if (!new && old) {
-            logger.error("$PREFIX Trying to unfreeze a frozen session. This is a bug!")
+            logger.error("Trying to unfreeze a frozen session. This is a bug!")
             return@vetoable false
         }
 
-        logger.info("$PREFIX Frozen status updated: $old -> $new")
+        logger.info("Frozen status updated: $old -> $new")
         return@vetoable true
     }
 
@@ -64,7 +59,7 @@ internal class SimpleRerollingSession(
         return try {
             ReforgeOperation(this)
         } catch (e: Exception) {
-            logger.error("$PREFIX An unknown error occurred while rerolling an item", e)
+            logger.error("An unknown error occurred while rerolling an item", e)
             ReforgeResult.error()
         }
     }
@@ -298,8 +293,6 @@ internal object Selection {
         return Simple(session, id, rule, template, display)
     }
 
-    private const val PREFIX = ReforgeLoggerPrefix.REROLL
-
     private class Empty(
         override val session: RerollingSession,
     ) : RerollingSession.Selection {
@@ -330,12 +323,12 @@ internal object Selection {
         override val template: Group<CoreBlueprint, ItemGenerationContext>,
         override val display: ItemStack,
     ) : RerollingSession.Selection, KoinComponent {
-        private val logger: Logger by inject()
+        private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
         override val total: MochaFunction = rule.currencyCost.compile(session, this)
         override val changeable: Boolean
             get() = true
         override var selected: Boolean by Delegates.observable(false) { _, old, new ->
-            logger.info("$PREFIX Selection status updated (cell: '$id'): $old -> $new")
+            logger.info("Selection status updated (cell: '$id'): $old -> $new")
         }
 
         override fun invert(): Boolean {
@@ -376,7 +369,7 @@ internal object SelectionMap : KoinComponent {
         // 获取源物品的词条栏模板
         // 如果源物品没有词条栏*模板*, 则判定整个物品不支持重造
         val templates = sourceItem.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
-            LOGGER.info("$PREFIX Source item has no `cells` template.")
+            logger.info("Source item has no `cells` template.")
             return empty(session)
         }
 
@@ -423,8 +416,7 @@ internal object SelectionMap : KoinComponent {
         return selectionMap
     }
 
-    private const val PREFIX = ReforgeLoggerPrefix.REROLL
-    private val LOGGER: Logger by inject()
+    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
     private class Empty(
         override val session: RerollingSession,

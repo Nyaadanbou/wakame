@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.hideTooltip
 import cc.mewcraft.wakame.util.removeItalic
@@ -35,7 +34,6 @@ private constructor(
     private val replace: ModdingSession.Replace,
 ) : KoinComponent {
     companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.MOD
         private val MESSAGE_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
 
         operator fun invoke(parent: ModdingMenu, replace: ModdingSession.Replace): Gui {
@@ -64,10 +62,10 @@ private constructor(
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val prevItem = event.previousItem
         val newItem = event.newItem
-        parent.logger.info("$PREFIX Replace input updating: ${prevItem?.type} -> ${newItem?.type}")
+        parent.logger.info("Replace input updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (parent.session.frozen) {
-            parent.logger.error("$PREFIX The modding session is frozen, but the player is trying to interact with the replace's input slot. This is a bug!")
+            parent.logger.error("The modding session is frozen, but the player is trying to interact with the replace's input slot. This is a bug!")
             event.isCancelled = true
             return
         }
@@ -108,7 +106,7 @@ private constructor(
                 event.isCancelled = true
 
                 val ingredient = replace.latestResult.ingredient ?: run {
-                    parent.logger.error("$PREFIX Ingredient is null, but an item is being removed from the replace menu. This is a bug!")
+                    parent.logger.error("Ingredient is null, but an item is being removed from the replace menu. This is a bug!")
                     return
                 }
 

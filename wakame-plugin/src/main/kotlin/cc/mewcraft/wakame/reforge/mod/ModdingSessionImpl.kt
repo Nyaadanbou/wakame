@@ -14,7 +14,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
 import java.util.stream.Stream
@@ -31,19 +32,7 @@ internal class SimpleModdingSession(
     override val table: ModdingTable,
     override val viewer: Player,
 ) : ModdingSession, KoinComponent {
-    companion object {
-        const val PREFIX = ReforgeLoggerPrefix.MOD
-    }
-
-    val logger: Logger = get()
-
-    fun info(message: String) {
-        logger.info("$PREFIX $message")
-    }
-
-    fun error(message: String, throwable: Throwable? = null) {
-        logger.error("$PREFIX $message", throwable)
-    }
+    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MOD)
 
     // 初始为 null
     override var inputItem: ItemStack? by InputItemDelegate(null)
@@ -53,7 +42,7 @@ internal class SimpleModdingSession(
 
     // 初始为 ReplaceMap.empty()
     override var replaceParams: ModdingSession.ReplaceMap by Delegates.observable(ReforgeReplaceMap.empty()) { _, old, new ->
-        info("Session's replace parameters updated: $old -> $new")
+        logger.info("Session's replace parameters updated: $old -> $new")
     }
 
     // 从配置文件编译 MochaFunction
@@ -61,17 +50,17 @@ internal class SimpleModdingSession(
 
     // 初始为 ReforgeResult.empty()
     override var latestResult: ModdingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty()) { _, old, new ->
-        info("Session's result updated: $old -> $new")
+        logger.info("Session's result updated: $old -> $new")
     }
 
     // 初始为 false
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
         if (!new && old) {
-            error("Trying to unfreeze a frozen session. This is a bug!")
+            logger.error("Trying to unfreeze a frozen session. This is a bug!")
             return@vetoable false
         }
 
-        info("Session's frozen status updated: $new")
+        logger.info("Session's frozen status updated: $new")
         return@vetoable true
     }
 
@@ -79,7 +68,7 @@ internal class SimpleModdingSession(
         return try {
             ReforgeOperation(this)
         } catch (e: Exception) {
-            error("An error occurred while executing reforge operation", e)
+            logger.error("An error occurred while executing reforge operation", e)
             ReforgeResult.failure("<red>内部错误".mini)
         }
     }
@@ -109,7 +98,7 @@ internal class SimpleModdingSession(
             // 定制后的物品
             val itemStack = latestResult.outputItem?.itemStack
             if (itemStack == null) {
-                error("Output item is null, but the player is trying to take it. This is a bug!")
+                logger.error("Output item is null, but the player is trying to take it. This is a bug!")
                 return emptyArray()
             }
             result.add(itemStack)
@@ -195,7 +184,7 @@ internal class SimpleModdingSession(
                 return
             }
 
-            info("Session's input item updated: ${old?.type} -> ${value?.type}")
+            logger.info("Session's input item updated: ${old?.type} -> ${value?.type}")
 
             val sourceItem0 = _value?.tryNekoStack ?: return
             val sourceItemCells = sourceItem0.components.get(ItemComponentTypes.CELLS)
@@ -245,7 +234,7 @@ internal class SimpleModdingSession(
             val old = _value
             _value = value?.clone()
 
-            info("Session's source item updated: ${old?.id} -> ${value?.id}")
+            logger.info("Session's source item updated: ${old?.id} -> ${value?.id}")
         }
     }
 }
@@ -399,15 +388,12 @@ private object ReforgeReplace {
         return Changeable(session, cell, rule)
     }
 
-    private const val PREFIX = ReforgeLoggerPrefix.MOD
     private val ZERO_MOCHA_FUNCTION: MochaFunction = MochaFunction { .0 }
 
     private class Unchangeable(
         override val session: SimpleModdingSession,
         override val cell: Cell,
     ) : ModdingSession.Replace, KoinComponent {
-        private val logger: Logger by inject()
-
         override val id
             get() = cell.getId()
         override val rule
@@ -426,7 +412,7 @@ private object ReforgeReplace {
         override val changeable: Boolean
             get() = false
         override var latestResult by Delegates.observable(ReforgeReplaceResult.empty()) { _, old, new ->
-            session.info("Replace (unchangeable) result updated: $old -> $new")
+            session.logger.info("Replace (unchangeable) result updated: $old -> $new")
         }
         override val hasInput: Boolean
             get() = latestResult.ingredient != null
@@ -459,8 +445,6 @@ private object ReforgeReplace {
         override val cell: Cell,
         override val rule: ModdingTable.CellRule,
     ) : ModdingSession.Replace, KoinComponent {
-        private val logger: Logger by inject()
-
         override val id: String
             get() = cell.getId()
 
@@ -481,7 +465,7 @@ private object ReforgeReplace {
             get() = true
 
         override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReforgeReplaceResult.empty()) { _, old, new ->
-            session.info("Replace (changeable) result updated: $old -> $new")
+            session.logger.info("Replace (changeable) result updated: $old -> $new")
         }
 
         override val hasInput: Boolean
@@ -499,7 +483,7 @@ private object ReforgeReplace {
 
             // 如果源物品为空, 则返回内部错误
             val sourceItem = session.sourceItem ?: run {
-                session.error("Source item is null, but an item is being replaced. This is a bug!")
+                session.logger.error("Source item is null, but an item is being replaced. This is a bug!")
                 return ReforgeReplaceResult.failure(ingredient, "<red>内部错误".mini)
             }
 
@@ -512,7 +496,7 @@ private object ReforgeReplace {
 
             // 获取源物品上的核孔
             val sourceCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: run {
-                session.error("Source item has no cells, but an item is being replaced. This is a bug!")
+                session.logger.error("Source item has no cells, but an item is being replaced. This is a bug!")
                 return ReforgeReplaceResult.failure(ingredient, "<red>内部错误".mini)
             }
 
@@ -552,7 +536,7 @@ private object ReforgeReplace {
         }
 
         override fun getIngredientLevel(): Int {
-            return latestResult.ingredient?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
+            return latestResult.ingredient?.components?.get(ItemComponentTypes.LEVEL)?.level ?: 0
         }
 
         override fun getIngredientRarityNumber(): Double {

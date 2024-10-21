@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreBlueprint
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.registry.RarityRegistry
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
@@ -25,8 +24,6 @@ private constructor(
     private val session: SimpleRerollingSession,
 ) {
     companion object : KoinComponent {
-        private const val PREFIX = ReforgeLoggerPrefix.REROLL
-
         operator fun invoke(session: SimpleRerollingSession): RerollingSession.ReforgeResult {
             return ReforgeOperation(session).execute()
         }
@@ -40,7 +37,7 @@ private constructor(
      */
     private fun execute(): RerollingSession.ReforgeResult {
         if (session.frozen) {
-            logger.error("$PREFIX Trying to refresh output in a frozen session. This is a bug!")
+            logger.error("Trying to refresh output in a frozen session. This is a bug!")
             return ReforgeResult.error()
         }
 
@@ -90,7 +87,7 @@ private constructor(
                 itemCells
             )
         } catch (e: Exception) { // 有必要 try-catch?
-            logger.error("$PREFIX Unexpected error while preparing generation context", e)
+            logger.error("Unexpected error while preparing generation context", e)
             return ReforgeResult.error()
         }
 
