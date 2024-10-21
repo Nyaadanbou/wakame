@@ -19,6 +19,12 @@ primary:
   - stash:cells/empty
 
   - vanilla:item_name
+  - vanilla:custom_name
+
+  # 核心
+  - special:augment
 
   # 从重铸的上下文获取的数据
   - reforge:cost
+  - reforge:replace_preview
+  - reforge:replace_input

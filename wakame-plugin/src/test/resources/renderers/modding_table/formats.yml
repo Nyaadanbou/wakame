@@ -1,7 +1,11 @@
 # 在这里设置定制台的物品 *渲染内容*.
 
+# id: `augment`
+augment:
+  namespace: special
+
 # id: <有效的属性 id>
-cells/attributes:
+cells/attributes/in:
   namespace: attribute
   ordinal:
     element:
@@ -16,19 +20,66 @@ cells/attributes:
       - multiply_base
       - multiply_total
 
+# id: <有效的属性 id>
+cells/attributes/out:
+  namespace: attribute
+  ordinal:
+    element:
+      - neutral
+      - fire
+      - water
+      - wind
+      - earth
+      - thunder
+    operation:
+      - add
+      - multiply_base
+      - multiply_total
+
+# id: `replace_input`
+cells/attributes/replace_input:
+  namespace: reforge
+
+# id: `replace_preview`
+cells/attributes/replace_preview:
+  namespace: reforge
+
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/skills:
+cells/skills/in:
   namespace: skill
 
+# id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
+cells/skills/out:
+  namespace: skill
+
+# id: `replace_input`
+cells/skills/replace_input:
+  namespace: reforge
+
+# id: `replace_preview`
+cells/skills/replace_preview:
+  namespace: reforge
+
 # id: `cells/empty`
-cells/empty:
+cells/empty/in:
   namespace: stash
   tooltip: "[ 空核孔 ]"
 
+# id: `cells/empty`
+cells/empty/out:
+  namespace: stash
+  tooltip: "[ 空核孔 ]"
+
+# id: `replace_input`
+cells/empty/replace_input:
+  namespace: reforge
+
+# id: `replace_preview`
+cells/empty/replace_preview:
+  namespace: reforge
+
 cost:
   namespace: reforge
-  tooltip:
-    cost: "花费: <amount> 金币"
 
 # id: `custom_name`
 custom_name:

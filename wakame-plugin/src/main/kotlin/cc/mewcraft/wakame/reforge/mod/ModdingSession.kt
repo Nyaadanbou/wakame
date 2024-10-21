@@ -173,7 +173,7 @@ interface ModdingSession : Examinable {
          * - 成功(true)  = 玩家可以取出定制后的物品.
          * - 失败(false) = 玩家无法取出定制后的物品.
          */
-        val successful: Boolean
+        val isSuccess: Boolean
 
         /**
          * 本结果的描述信息, 将用于展示给玩家.
@@ -184,7 +184,7 @@ interface ModdingSession : Examinable {
          * 本次定制输出的物品, 也就是被定制后的物品.
          *
          * 该属性在以下情况下为 `null`:
-         * - 本次定制失败, i.e., [ReforgeResult.successful] = `false`
+         * - 本次定制失败, i.e., [ReforgeResult.isSuccess] = `false`
          * - 源物品不存在, i.e., [ModdingSession.sourceItem] = `null`
          */
         @get:Contract(" -> new")
@@ -193,13 +193,13 @@ interface ModdingSession : Examinable {
         /**
          * 本次定制所消耗的资源.
          */
-        val cost: Cost
+        val cost: ReforgeCost
     }
 
     /**
      * 封装了定制操作所消耗的资源.
      */
-    interface Cost : Examinable {
+    interface ReforgeCost : Examinable {
         fun take(viewer: Player)
         fun test(viewer: Player): Boolean
         val description: List<Component>

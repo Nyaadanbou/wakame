@@ -94,7 +94,7 @@ internal class SimpleModdingSession(
     override fun getFinalOutputs(): Array<ItemStack> {
         val result = mutableListOf<ItemStack>()
 
-        if (latestResult.successful) {
+        if (latestResult.isSuccess) {
             // 定制后的物品
             val itemStack = latestResult.outputItem?.itemStack
             if (itemStack == null) {
@@ -266,14 +266,14 @@ internal object ReforgeResult {
      */
     fun success(
         outputItem: NekoStack,
-        cost: ModdingSession.Cost,
+        cost: ModdingSession.ReforgeCost,
     ): ModdingSession.ReforgeResult {
         return Success(outputItem, listOf("<gray>准备就绪!".mini), cost)
     }
 
     private abstract class Base : ModdingSession.ReforgeResult {
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("successful", successful),
+            ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
             ExaminableProperty.of("outputItem", outputItem),
             ExaminableProperty.of("cost", cost),
@@ -284,39 +284,39 @@ internal object ReforgeResult {
 
     private class Empty : Base() {
         override val isEmpty: Boolean = true
-        override val successful: Boolean = false
+        override val isSuccess: Boolean = false
         override val description: List<Component> = listOf(
             "<gray>没有输出.".mini
         )
         override val outputItem: NekoStack? = null
-        override val cost: ModdingSession.Cost = ReforgeCost.empty()
+        override val cost: ModdingSession.ReforgeCost = ReforgeCost.empty()
     }
 
     private class Failure(
         description: List<Component>,
     ) : Base() {
         override val isEmpty: Boolean = false
-        override val successful: Boolean = false
+        override val isSuccess: Boolean = false
         override val description: List<Component> = description
         override val outputItem: NekoStack? = null
-        override val cost: ModdingSession.Cost = ReforgeCost.empty()
+        override val cost: ModdingSession.ReforgeCost = ReforgeCost.empty()
     }
 
     private class Success(
         outputItem: NekoStack,
         description: List<Component>,
-        cost: ModdingSession.Cost,
+        cost: ModdingSession.ReforgeCost,
     ) : Base() {
         override val isEmpty: Boolean = false
-        override val successful: Boolean = true
+        override val isSuccess: Boolean = true
         override val description: List<Component> = description
         override val outputItem: NekoStack by NekoStackDelegates.copyOnRead(outputItem)
-        override val cost: ModdingSession.Cost = cost
+        override val cost: ModdingSession.ReforgeCost = cost
     }
 }
 
 internal object ReforgeCost {
-    fun empty(): ModdingSession.Cost {
+    fun empty(): ModdingSession.ReforgeCost {
         return Empty()
     }
 
@@ -325,11 +325,11 @@ internal object ReforgeCost {
      */
     fun simple(
         currencyAmount: Double,
-    ): ModdingSession.Cost {
+    ): ModdingSession.ReforgeCost {
         return Simple(currencyAmount)
     }
 
-    private class Empty : ModdingSession.Cost {
+    private class Empty : ModdingSession.ReforgeCost {
         override fun take(viewer: Player) {
             // do nothing
         }
@@ -351,7 +351,7 @@ internal object ReforgeCost {
 
     private class Simple(
         val currencyAmount: Double,
-    ) : ModdingSession.Cost {
+    ) : ModdingSession.ReforgeCost {
         override fun take(viewer: Player) {
             // TODO 实现 take, test, description
         }
@@ -420,7 +420,7 @@ private object ReforgeReplace {
         private fun executeReplace0(ingredient: NekoStack?): ModdingSession.Replace.Result {
             if (ingredient == null)
                 return ReforgeReplaceResult.empty()
-            return ReforgeReplaceResult.failure(ingredient, "<gray>核孔不可修改".mini)
+            return ReforgeReplaceResult.failure(ingredient, "<gray>核孔不可修改.".mini)
         }
 
         override fun executeReplace(ingredient: NekoStack?): ModdingSession.Replace.Result {
@@ -503,16 +503,16 @@ private object ReforgeReplace {
             // 源物品的核孔上 必须没有与便携核心相似的核心
             val sourceCellsExcludingThis = sourceCells.filter2 { it.getId() != cell.getId() }
             if (sourceCellsExcludingThis.containSimilarCore(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(ingredient, "<gray>源物品存在相似核心.".mini)
+                return ReforgeReplaceResult.failure(ingredient, "<gray>物品存在相似核心.".mini)
             }
 
             if (session.replaceParams.containsCoreSimilarTo(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(ingredient, "<gray>输入中存在相似核心.".mini)
+                return ReforgeReplaceResult.failure(ingredient, "<gray>输入存在相似核心.".mini)
             }
 
             // 便携式核心的类型 必须符合定制规则
             if (!rule.acceptableCores.test(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(ingredient, "<gray>核孔不兼容此类核心.".mini)
+                return ReforgeReplaceResult.failure(ingredient, "<gray>核孔不兼容此核心.".mini)
             }
 
             // 便携式核心上面的所有元素 必须全部出现在被定制物品上
@@ -521,14 +521,14 @@ private object ReforgeReplace {
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
                 val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.attribute?.element
                 if (elementOnIngredient != null && elementOnIngredient !in elementsOnSource) {
-                    return ReforgeReplaceResult.failure(ingredient, "<gray>核心元素跟物品不相融.".mini)
+                    return ReforgeReplaceResult.failure(ingredient, "<gray>元素跟物品不相融.".mini)
                 }
             }
 
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
             val modCount = sourceItem.components.get(ItemComponentTypes.CELLS)?.get(id)?.getReforgeHistory()?.modCount ?: Int.MAX_VALUE
             if (modCount >= rule.modLimit) {
-                return ReforgeReplaceResult.failure(ingredient, "<gray>核孔已经消磨殆尽".mini)
+                return ReforgeReplaceResult.failure(ingredient, "<gray>核孔已消磨殆尽.".mini)
             }
 
             // 全部检查通过!

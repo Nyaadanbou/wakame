@@ -19,15 +19,15 @@ internal class IndexedTextCycle(
     /**
      * The provider function that provides a [IndexedText] based on the index.
      */
-    private val provider: (Int) -> IndexedText,
+    private val provider: (Int) -> SimpleIndexedText,
 ) {
-    private val cyclingIndexedTextPool: Array<IndexedText?> = arrayOfNulls(limit)
+    private val cyclingIndexedTextPool: Array<SimpleIndexedText?> = arrayOfNulls(limit)
     private val cyclingIntegerCounter: ThreadLocalCounterCycle = ThreadLocalCounterCycle(limit)
 
     /**
      * Provides a [IndexedText] based on the cycling index.
      */
-    fun next(): IndexedText {
+    fun next(): SimpleIndexedText {
         val idx = cyclingIntegerCounter.next()
         val line = cyclingIndexedTextPool[idx]
         if (line == null) {

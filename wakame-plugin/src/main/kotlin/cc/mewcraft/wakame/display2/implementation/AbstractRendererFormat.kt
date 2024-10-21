@@ -32,7 +32,7 @@ internal data class HardcodedRendererFormat(
     @Setting @Required
     override val namespace: String,
     @Setting @NodeKey
-    override val id: String,
+    override val id: String, // id 是配置文件指定的
 ) : RendererFormat.Simple {
     override val index = createIndex()
     override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)

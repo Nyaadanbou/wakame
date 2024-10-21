@@ -1,5 +1,9 @@
 package cc.mewcraft.wakame.gui.mod
 
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.isCustomNeko
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.*
 import cc.mewcraft.wakame.util.*
@@ -69,6 +73,23 @@ internal class ModdingMenu(
     }
 
     /**
+     * 基于 [session] 的当前状态更新 [inputSlot], 也就是玩家放入的物品.
+     */
+    private fun renderInputSlot(): ItemStack? {
+        val sourceItem = session.sourceItem ?: return null
+        val input = renderInputSlotForPreview(sourceItem)
+        return input
+    }
+
+    /**
+     * 基于 [session] 的当前状态更新 [inputSlot], 也就是玩家放入的物品.
+     */
+    fun updateInputSlot() {
+        val input = renderInputSlot()
+        setInputSlot(input)
+    }
+
+    /**
      * 基于 [session] 的当前状态更新 [outputSlot], 也就是定制后的物品.
      */
     fun updateOutputSlot() {
@@ -80,8 +101,7 @@ internal class ModdingMenu(
     /**
      * 基于 [session] 的当前状态更新子菜单, 也就是每个词条栏的定制菜单.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun updateReplaceGuis() {
+    private fun updateReplaceGuis() {
         val replaceParams = session.replaceParams
         val replaceGuis = replaceParams.map { (_, replace) -> ReplaceMenu(this, replace) }
         setReplaceGuis(replaceGuis)
@@ -164,7 +184,17 @@ internal class ModdingMenu(
             // 玩家将物品放入*inputSlot*, 意味着一个新的定制过程开始了.
             // 这里需要做的就是刷新 ModdingSession 的状态, 然后更新菜单.
             event.isAdd -> {
+                if (newItem != null && !newItem.isCustomNeko) {
+                    viewer.sendMessage(MSG_CANCELLED)
+                    event.isCancelled = true
+                    return
+                }
+
                 session.inputItem = newItem
+
+                // 重新渲染放入的物品
+                event.newItem = renderInputSlot()
+
                 updateReplaceGuis()
                 updateOutputSlot()
 
@@ -229,7 +259,7 @@ internal class ModdingMenu(
                 val reforgeResult = session.latestResult
 
                 // 如果结果成功的话:
-                if (reforgeResult.successful) {
+                if (reforgeResult.isSuccess) {
 
                     // 玩家必须先确认才能完成定制
                     if (!confirmed) {
@@ -290,6 +320,12 @@ internal class ModdingMenu(
         primaryGui.setContent(guis)
     }
 
+    private fun renderInputSlotForPreview(sourceItem: NekoStack): ItemStack {
+        val context = ModdingTableContext.MainInputSlot(session)
+        ItemRenderers.MODDING_TABLE.render(sourceItem, context)
+        return sourceItem.itemStack
+    }
+
     /**
      * 渲染定制结果在 [ModdingMenu.outputSlot] 里面的样子.
      * 本函数渲染的是 *确认图标*, 也就是提示玩家确认取出的图标.
@@ -298,13 +334,9 @@ internal class ModdingMenu(
      * @return 渲染后的物品
      */
     private fun renderOutputSlotForConfirm(result: ModdingSession.ReforgeResult): ItemStack {
-        val ret = ItemStack(Material.ANVIL)
-        ret.editMeta { meta ->
-            val name = "<white>再次点击取出".mini
-            meta.itemName(name)
+        return renderOutputSlotForPreview(result).edit {
+            itemName = "<white>确认取出".mini
         }
-
-        return ret
     }
 
     /**
@@ -315,47 +347,26 @@ internal class ModdingMenu(
      * @return 渲染后的物品
      */
     private fun renderOutputSlotForPreview(result: ModdingSession.ReforgeResult): ItemStack {
-        val item = result.outputItem
-        val ret: ItemStack
-
-        if (result.successful) {
+        if (result.isSuccess) {
             // 定制成功了
 
-            if (item == null) {
-                ret = ItemStack(Material.BARRIER)
-                ret.editMeta { meta ->
-                    val name = "<white>结果: <red>内部错误".mini
-                    meta.itemName(name)
-                }
-            } else {
-                // FIXME 移除萌芽标签 / 实现 NekoStack#gui
-                ret = item.itemStack
-                ret.editMeta { meta ->
-                    val name = "<white>结果: <green>就绪".mini
-                    val lore = buildList {
-                        addAll(result.description)
-                    }
-
-                    meta.itemName(name)
-                    meta.lore(lore.removeItalic)
-                }
+            val item = result.outputItem ?: run {
+                logger.error("Output item is null, but the result is successful. This is a bug!")
+                return ItemStack(Material.STONE)
             }
+
+            val context = ModdingTableContext.MainOutputSlot(session)
+            ItemRenderers.MODDING_TABLE.render(item, context)
+            return item.itemStack
+
         } else {
             // 定制失败了
 
-            ret = ItemStack(Material.BARRIER)
-            ret.editMeta { meta ->
-                val name = "<white>结果: <red>失败".mini
-                val lore = buildList {
-                    addAll(result.description)
-                }
-
-                meta.itemName(name)
-                meta.lore(lore.removeItalic)
+            return ItemStack(Material.BARRIER).edit {
+                itemName = "<white>结果: <red>失败".mini
+                lore = result.description.removeItalic
             }
         }
-
-        return ret
     }
 
     /**

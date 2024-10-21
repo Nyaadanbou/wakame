@@ -2,8 +2,7 @@ package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.util.hideTooltip
-import cc.mewcraft.wakame.util.removeItalic
+import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
@@ -88,13 +87,14 @@ private constructor(
                 // 执行一次替换流程, 并获取其结果
                 val replaceResult = replace.executeReplace(ns)
 
-                // 将容器里的物品替换成渲染后的物品
+                // 重新渲染放入的物品
                 event.newItem = renderOutputSlot(replaceResult)
 
                 // 执行一次定制流程
                 parent.executeReforge()
 
                 // 更新主菜单的状态
+                parent.updateInputSlot()
                 parent.updateOutputSlot()
 
                 // 重置确认状态
@@ -123,6 +123,7 @@ private constructor(
                 parent.executeReforge()
 
                 // 更新主菜单
+                parent.updateInputSlot()
                 parent.updateOutputSlot()
 
                 // 重置确认状态
@@ -148,50 +149,38 @@ private constructor(
             if (ingredient == null) {
                 // 出现内部错误
 
-                rendered = ItemStack(Material.BARRIER)
-                rendered.editMeta { meta ->
-                    val name = "<white>结果: <red>内部错误".mini
-                    val lore = buildList {
-                        add(Component.empty())
-                        add(clickToWithdraw)
-                    }
-
-                    meta.itemName(name)
-                    meta.lore(lore.removeItalic)
+                rendered = ItemStack(Material.BARRIER).edit {
+                    itemName = "<white>结果: <red>内部错误".mini.removeItalic
+                    lore = listOf(
+                        Component.empty(),
+                        clickToWithdraw
+                    ).removeItalic
                 }
             } else {
                 // 正常情况
 
                 // FIXME NekoStackDisplay 急急急
                 ingredient.erase()
-                rendered = ingredient.itemStack
-                rendered.editMeta { meta ->
-                    val name = "<white>结果: <green>就绪".mini
-                    val lore = buildList {
+                rendered = ingredient.itemStack.edit {
+                    itemName = "<white>结果: <green>就绪".mini.removeItalic
+                    lore = buildList {
                         // TODO 使用新的渲染器生成文本
-                        result.getPortableCore()?.wrapped?.id?.asString()?.mini?.let { add(it) }
+                        result.getPortableCore()?.wrapped?.id?.asString()?.mini?.let(::add)
                         add(Component.empty())
                         add(clickToWithdraw)
-                    }
-
-                    meta.displayName(name.removeItalic)
-                    meta.lore(lore.removeItalic)
+                    }.removeItalic
                 }
             }
         } else {
             // 耗材不可用于定制
 
-            rendered = ItemStack(Material.BARRIER)
-            rendered.editMeta { meta ->
-                val name = "<white>结果: <red>无效".mini
-                val lore = buildList {
+            rendered = ItemStack(Material.BARRIER).edit {
+                itemName = "<white>结果: <red>无效".mini.removeItalic
+                lore = buildList {
                     addAll(result.description)
                     add(Component.empty())
                     add(clickToWithdraw)
-                }
-
-                meta.itemName(name)
-                meta.lore(lore.removeItalic)
+                }.removeItalic
             }
         }
 

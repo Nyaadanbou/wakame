@@ -491,15 +491,11 @@ internal data class EmptyCoreTextMetaFactory(
     override val namespace: String,
 ) : TextMetaFactory {
     override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == SOURCE_INDEX_VALUE
+        return sourceIndex.namespace() == namespace && sourceIndex.value() == "cells/empty"
     }
 
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return EmptyCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
-    }
-
-    companion object Shared {
-        const val SOURCE_INDEX_VALUE = "cells/empty"
     }
 }
 
@@ -507,15 +503,11 @@ internal data class PortableCoreTextMetaFactory(
     override val namespace: String,
 ) : TextMetaFactory {
     override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == SOURCE_INDEX_VALUE
+        return sourceIndex.namespace() == namespace && sourceIndex.value() == "portable_core"
     }
 
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return SingleSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
-    }
-
-    companion object Shared {
-        const val SOURCE_INDEX_VALUE = "portable_core"
     }
 }
 //</editor-fold>
