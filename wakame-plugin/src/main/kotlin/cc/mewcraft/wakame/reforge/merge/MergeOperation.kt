@@ -33,7 +33,7 @@ private constructor(
     fun execute(): MergingSession.Result {
         if (session.frozen) {
             logger.error("Trying to merge a frozen merging session. This is a bug!")
-            return ReforgeResult.failure("<gray>会话已被冻结.".mini)
+            return ReforgeResult.failure("<gray>会话已冻结.".mini)
         }
 
         val inputItem1 = session.inputItem1
@@ -47,26 +47,26 @@ private constructor(
 
         // 输入的物品必须是*便携式*属性*核心*
         val core1 = (inputItem1.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? AttributeCore)
-            ?: return ReforgeResult.failure("<gray>第一个物品不是属性类核心.".mini)
+            ?: return ReforgeResult.failure("<gray>第一个输入无法参与合并.".mini)
         val core2 = (inputItem2.components.get(ItemComponentTypes.PORTABLE_CORE)?.wrapped as? AttributeCore)
-            ?: return ReforgeResult.failure("<gray>第二个物品不是属性类核心.".mini)
+            ?: return ReforgeResult.failure("<gray>第二个输入无法参与合并.".mini)
 
         // 两个核心除了数值以外, 其余数据必须一致
         if (!core1.similarTo(core2)) {
             logger.info("Trying to merge cores with different attributes.")
-            return ReforgeResult.failure("<gray>两个核心的属性种类不一致.".mini)
+            return ReforgeResult.failure("<gray>核心的种类不一致.".mini)
         }
 
         // 输入的核心种类至少要跟一条规则相匹配
         if (!session.table.acceptableCoreMatcher.test(core1) || !session.table.acceptableCoreMatcher.test(core2)) {
             logger.info("Trying to merge cores with unacceptable types.")
-            return ReforgeResult.failure("<gray>核心无法在本合并台进行合并.".mini)
+            return ReforgeResult.failure("<gray>核心无法在本台合并.".mini)
         }
 
         // 输入的物品等级必须低于工作台指定的值
         if (session.getLevel1() > session.table.maxInputItemLevel || session.getLevel2() > session.table.maxInputItemLevel) {
             logger.info("Trying to merge cores with too high level.")
-            return ReforgeResult.failure("<gray>核心的等级超出了本合并台的上限.".mini)
+            return ReforgeResult.failure("<gray>核心等级过高.".mini)
         }
 
         val attribute = core1.attribute
@@ -91,7 +91,7 @@ private constructor(
                 // - 代码实现上, 每种组合都得考虑. 目前就有2*3=6种
                 // - 拥有两个数值的核心也许本来就是个设计错误...
                 logger.info("Trying to merge cores with multiple value structure.")
-                return ReforgeResult.failure("<gray>核心的类型无法参与合并.".mini)
+                return ReforgeResult.failure("<gray>核心无法合并.".mini)
             }
         }
 

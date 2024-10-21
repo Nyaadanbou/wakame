@@ -36,31 +36,31 @@ private constructor(
         // 如果源物品不存在, 则返回空
         val output = sourceItem ?: run {
             logger.info("Skipped reforge as source item is not legit")
-            return ReforgeResult.failure("<gray>源物品无法定制".mini)
+            return ReforgeResult.failure("<gray>源物品无法定制.".mini)
         }
 
         // 把经过修改的核孔筛选出来
         val changedReplaceParams = replaceParams.filter { (_, repl) -> repl.hasInput }
         if (changedReplaceParams.isEmpty()) {
             logger.info("Skipped reforge as all replaces are not applicable")
-            return ReforgeResult.failure("<gray>没有作出任何修改".mini)
+            return ReforgeResult.failure("<gray>没有修改.".mini)
         }
 
         // 检查经过修改的核孔中是否存在无效的耗材
         if (changedReplaceParams.any { (_, repl) -> !repl.latestResult.applicable }) {
             logger.info("Skipped reforge as some replaces are not applicable")
-            return ReforgeResult.failure("<gray>部分修改无法应用".mini)
+            return ReforgeResult.failure("<gray>部分修改无法应用.".mini)
         }
 
         if (changedReplaceParams.any { (_, repl) -> repl.cell.getReforgeHistory().modCount >= repl.rule.modLimit }) {
             logger.info("Skipped reforge as some replaces exceed mod limit")
-            return ReforgeResult.failure("<gray>部分核孔已消磨殆尽".mini)
+            return ReforgeResult.failure("<gray>部分核孔已消磨殆尽.".mini)
         }
 
         // 如果源物品不合法, 则返回失败
         val builder = output.components.get(ItemComponentTypes.CELLS)?.builder() ?: run {
             logger.info("No cells found in source item")
-            return ReforgeResult.failure("<gray>源物品没有核孔".mini)
+            return ReforgeResult.failure("<gray>源物品没有核孔.".mini)
         }
 
         for ((id, replace) in changedReplaceParams) {

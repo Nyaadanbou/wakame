@@ -49,7 +49,7 @@ private constructor(
         // 如果没有可重造的词条栏, 返回一个失败结果
         val selectionMap = session.selectionMap
         if (selectionMap.isEmpty || selectionMap.values.all { !it.changeable }) {
-            return ReforgeResult.failure("<gray>没有可重造的核孔".mini)
+            return ReforgeResult.failure("<gray>没有可重造的核孔.".mini)
         }
 
         // 如果没有选择任何词条栏, 返回一个失败结果
@@ -59,15 +59,17 @@ private constructor(
 
         // 获取必要的物品组件
         val itemId = sourceItem.id
-        val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level ?: return ReforgeResult.failure("<gray>物品不可重造".mini)
-        val itemCells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return ReforgeResult.failure("<gray>物品不可重造".mini)
+        val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level
+            ?: return ReforgeResult.failure("<gray>物品不可重造.".mini)
+        val itemCells = sourceItem.components.get(ItemComponentTypes.CELLS)
+            ?: return ReforgeResult.failure("<gray>物品不可重造.".mini)
 
         // 检查在已选择的核孔当中, 是否有超过了重造次数上限的核孔
         for (selection in selectionMap.values.filter { it.selected }) {
             val cell = itemCells.get(selection.id) ?: return ReforgeResult.error()
             val rerollCount = cell.getReforgeHistory().rerollCount
             if (rerollCount >= selection.rule.maxReroll) {
-                return ReforgeResult.failure("<gray>核孔已经消磨殆尽".mini)
+                return ReforgeResult.failure("<gray>核孔已经消磨殆尽.".mini)
             }
         }
 

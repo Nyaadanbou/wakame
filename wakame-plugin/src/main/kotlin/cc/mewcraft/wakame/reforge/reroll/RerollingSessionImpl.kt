@@ -162,14 +162,14 @@ internal object ReforgeResult {
 
     private class Empty : Base() {
         override val successful: Boolean = false
-        override val description: List<Component> = listOf(Component.text("<gray>没有要重造的物品"))
+        override val description: List<Component> = listOf(Component.text("<gray>没有输入."))
         override val item: NekoStack = NekoStack.empty()
         override val cost: RerollingSession.ReforgeCost = ReforgeCost.empty()
     }
 
     private class Error : Base() {
         override val successful: Boolean = false
-        override val description: List<Component> = listOf(Component.text("<red>内部错误"))
+        override val description: List<Component> = listOf(Component.text("<red>内部错误."))
         override val item: NekoStack = NekoStack.empty()
         override val cost: RerollingSession.ReforgeCost = ReforgeCost.error()
     }
@@ -239,13 +239,13 @@ internal object ReforgeCost {
     private class Empty : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf("<gray>资源消耗: <white>无".mini)
+        override val description: List<Component> = listOf("<gray>资源花费: <white>无".mini)
     }
 
     private class Error : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = false
-        override val description: List<Component> = listOf("<gray>资源消耗: <red>内部错误".mini)
+        override val description: List<Component> = listOf("<gray>资源花费: <red>内部错误".mini)
     }
 
     private class Simple(
@@ -260,7 +260,7 @@ internal object ReforgeCost {
         }
 
         override val description: List<Component> = listOf(
-            "<gray>金币消耗: <yellow>${currencyAmount}".mini
+            "<gray>金币花费: <yellow>${currencyAmount}".mini
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
