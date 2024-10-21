@@ -19,8 +19,8 @@ attack_speed:
 cells:
   namespace: general
   # 可用标签
-  # <min> 最小词条数量
-  # <max> 最大词条数量
+  # <min> 最小核孔数量
+  # <max> 最大核孔数量
   tooltip: "核孔数量: <min> - <max>"
 
 # TODO 盲盒系统完成后再重新考虑

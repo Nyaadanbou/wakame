@@ -23,7 +23,7 @@ cells/skills:
 # id: `cells/empty`
 cells/empty:
   namespace: stash
-  tooltip: "[ 空词条栏 ]"
+  tooltip: "[ 空核孔 ]"
 
 # id: `custom_name`
 custom_name:
