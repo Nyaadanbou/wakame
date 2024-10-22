@@ -104,6 +104,7 @@ internal class ModdingMenu(
     private fun updateReplaceGuis() {
         val replaceParams = session.replaceParams
         val replaceGuis = replaceParams.map { (_, replace) -> ReplaceMenu(this, replace) }
+        // TODO 对 ReplaceGui 排序
         setReplaceGuis(replaceGuis)
     }
 
