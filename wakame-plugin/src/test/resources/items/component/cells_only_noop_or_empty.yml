@@ -1,6 +1,6 @@
 base: bedrock
 
-# 只有一个空的词条栏
+# 只有一个空的核孔
 cells:
   buckets:
     foo:

@@ -22,19 +22,19 @@ rarity_number_mapping:
 # query.source_level()
 #   源物品的等级
 # query.count_cell(`type`)
-#   返回指定类型的词条栏的数量
+#   返回指定类型的核孔的数量
 #   你必须传入一个参数 `type`
 #   `type` = 'all' | 'selected' | 'unselected'
-#   'all' = 所有词条栏
-#   'selected' = 被选中要重造的词条栏
-#   'unselected' = 未被选中要重造的词条栏
+#   'all' = 所有核孔
+#   'selected' = 被选中要重造的核孔
+#   'unselected' = 未被选中要重造的核孔
 # query.sum_of_cost(`type`)
-#   返回指定类型的词条栏的货币花费(之和)
+#   返回指定类型的核孔的货币花费(之和)
 #   你必须传入一个参数 `type`
 #   `type` = 'all' | 'selected' | 'unselected'
-#   'all' = 所有词条栏
-#   'selected' = 被选中要重造的词条栏
-#   'unselected' = 未被选中要重造的词条栏
+#   'all' = 所有核孔
+#   'selected' = 被选中要重造的核孔
+#   'unselected' = 未被选中要重造的核孔
 currency_cost: >-
   10.0 * query.source_level()
   + query.source_rarity() * query.sum_of_cost('unselected')

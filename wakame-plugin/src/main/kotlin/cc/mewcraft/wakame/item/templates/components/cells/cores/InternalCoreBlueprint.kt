@@ -38,14 +38,14 @@ data object VirtualCoreBlueprint : CoreBlueprint {
 /**
  * 代表一个空核心 [cc.mewcraft.wakame.item.components.cells.EmptyCore] 的模板.
  *
- * “词条栏里有空核心” 在玩家看来就是 “词条栏里没有核心”.
- * 如果词条栏没有核心, 那也就意味着可以被替换成其他的.
+ * “核孔里有空核心” 在玩家看来就是 “核孔里没有核心”.
+ * 如果核孔没有核心, 那也就意味着可以被替换成其他的.
  */
 data object EmptyCoreBlueprint : CoreBlueprint {
     override val id: Key = GenericKeys.EMPTY
 
     override fun generate(context: ItemGenerationContext): Core {
-        // 空词条栏应该不需要写入上下文
+        // 空核孔应该不需要写入上下文
         return CoreFactory.empty()
     }
 

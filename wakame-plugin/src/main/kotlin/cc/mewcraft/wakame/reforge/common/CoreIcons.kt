@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.reforge.common
 
+import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.NekoItemHolder
+import cc.mewcraft.wakame.display2.implementation.simple.SimpleItemRenderContext
 import cc.mewcraft.wakame.item.components.cells.*
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -29,16 +31,20 @@ internal object CoreIcons {
     )
 
     private const val ITEM_ID_PREFIX = "internal:reforge/core_icon"
+    private const val DEFAULT_ITEM_ID = "$ITEM_ID_PREFIX/default"
 
     fun get(core: Core): ItemStack {
         val coreId = core.id.value() // 核心 id, 但去掉 namespace
         val holder = when (core) {
-            is AttributeCore -> NekoItemHolder.get("$ITEM_ID_PREFIX/attribute/$coreId")
-            is SkillCore -> NekoItemHolder.get("$ITEM_ID_PREFIX/skill/$coreId")
-            is EmptyCore -> NekoItemHolder.get("$ITEM_ID_PREFIX/empty")
-            else -> NekoItemHolder.get("$ITEM_ID_PREFIX/default")
+            is AttributeCore -> NekoItemHolder.getOrDefault("$ITEM_ID_PREFIX/attribute/$coreId", DEFAULT_ITEM_ID)
+            is SkillCore -> NekoItemHolder.getOrDefault("$ITEM_ID_PREFIX/skill/$coreId", DEFAULT_ITEM_ID)
+            is EmptyCore -> NekoItemHolder.getOrDefault("$ITEM_ID_PREFIX/empty", DEFAULT_ITEM_ID)
+            else -> NekoItemHolder.get(DEFAULT_ITEM_ID)
         }
-        return holder.createItemStack()
+        val nekoStack = holder.createNekoStack()
+        ItemRenderers.SIMPLE.render(nekoStack, SimpleItemRenderContext())
+        val itemStack = nekoStack.unsafe.handle
+        return itemStack
     }
 
     fun get(hashCode: Int): Material {

@@ -187,7 +187,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.FOOD)
 
         generate(ItemTemplateTypes.PORTABLE_CORE)
-        generate(ItemTemplateTypes.CELLS) // 词条栏最复杂, 并且依赖部分组件, 因此放在最后
+        generate(ItemTemplateTypes.CELLS) // 核孔最复杂, 并且依赖部分组件, 因此放在最后
         generate(ItemTemplateTypes.CRATE)
 
         return nekoStack

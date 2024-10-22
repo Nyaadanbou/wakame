@@ -58,9 +58,9 @@ data class ItemCells(
          * ```yaml
          * <node>:
          *   buckets:
-         *     <词条栏 id>:
+         *     <核孔 id>:
          *       core: <核心选择器>
-         *     <词条栏 id>:
+         *     <核孔 id>:
          *       core: <核心选择器>
          *     ...
          *   selectors:

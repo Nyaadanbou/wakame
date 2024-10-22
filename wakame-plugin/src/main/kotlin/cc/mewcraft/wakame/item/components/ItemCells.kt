@@ -44,7 +44,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
     }
 
     /**
-     * 词条栏的数量.
+     * 核孔的数量.
      */
     val size: Int
 
@@ -54,35 +54,35 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
     fun builder(): Builder
 
     /**
-     * 过滤出符合条件的词条栏.
+     * 过滤出符合条件的核孔.
      */
     // 命名为 filter2 是为了避免跟 Iterable#filter 相冲突
     fun filter2(predicate: (Cell) -> Boolean): ItemCells
 
     /**
-     * 检查指定的词条栏是否存在.
+     * 检查指定的核孔是否存在.
      */
     fun has(id: String): Boolean
 
     /**
-     * 获取指定的词条栏.
+     * 获取指定的核孔.
      */
     fun get(id: String): Cell?
 
     /**
-     * 添加一个词条栏.
+     * 添加一个核孔.
      *
      * @return 修改过的副本
      */
     fun put(id: String, cell: Cell): ItemCells
 
     /**
-     * 修改一个词条栏.
+     * 修改一个核孔.
      *
-     * 传入函数 [block] 中的词条栏为 [id] 所指定的词条栏.
-     * 函数 [block] 所返回的词条栏将写入 [id] 指定的位置.
+     * 传入函数 [block] 中的核孔为 [id] 所指定的核孔.
+     * 函数 [block] 所返回的核孔将写入 [id] 指定的位置.
      *
-     * 如果 [id] 指定的词条栏不存在, 则 [block] 不会执行;
+     * 如果 [id] 指定的核孔不存在, 则 [block] 不会执行;
      * 这种情况下, 该函数所返回的 [ItemCells] 是未经修改的副本.
      *
      * @return 修改过/完全未经修改的副本
@@ -90,19 +90,19 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
     fun modify(id: String, block: (Cell) -> Cell): ItemCells
 
     /**
-     * 移除一个词条栏.
+     * 移除一个核孔.
      *
      * @return 修改过的副本
      */
     fun remove(id: String): ItemCells
 
     /**
-     * 获取所有词条栏上的 [AttributeModifier].
+     * 获取所有核孔上的 [AttributeModifier].
      */
     fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier>
 
     /**
-     * 获取所有词条栏上的 [ConfiguredSkill].
+     * 获取所有核孔上的 [ConfiguredSkill].
      */
     fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Multimap<Trigger, Skill>
 
@@ -244,7 +244,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         }
 
         private fun edit(consumer: (MutableMap<String, Cell>) -> Unit): ItemCells {
-            // 优化: 词条栏绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
+            // 优化: 核孔绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
             val cells = Object2ObjectArrayMap(this.cells)
             consumer.invoke(cells)
             return Value(Object2ObjectArrayMap(cells)) // 显式副本
@@ -257,7 +257,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         override fun read(holder: ItemComponentHolder): ItemCells? {
             val tag = holder.getTag() ?: return null
 
-            // 优化: 词条栏绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
+            // 优化: 核孔绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
             val cells = Object2ObjectArrayMap<String, Cell>(tag.size())
 
             for (id in tag.keySet()) {
@@ -275,7 +275,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
 
                 for ((id, cell) in value) {
                     if (cell.getCore().isVirtual) {
-                        continue // 拥有虚拟核心的词条栏不应该写入物品
+                        continue // 拥有虚拟核心的核孔不应该写入物品
                     }
 
                     tag.put(id, cell.serializeAsTag())

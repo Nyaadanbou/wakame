@@ -15,7 +15,7 @@ import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
 
 /**
- * 重造台中用于选择*单个*词条栏的子菜单, 将被嵌入进 [RerollingMenu] 中.
+ * 重造台中用于选择*单个*核孔的子菜单, 将被嵌入进 [RerollingMenu] 中.
  */
 internal class SelectionMenu
 private constructor(
@@ -39,7 +39,7 @@ private constructor(
     }
 
     /**
-     * 用于给玩家展示词条栏的样子.
+     * 用于给玩家展示核孔的样子.
      */
     private inner class IndicatorItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
@@ -52,7 +52,7 @@ private constructor(
     }
 
     /**
-     * 用于给玩家选择是否重造词条栏.
+     * 用于给玩家选择是否重造核孔.
      */
     private inner class SelectionItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
@@ -75,9 +75,9 @@ private constructor(
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (selection.invert()) {
-                parent.viewer.sendPlainMessage("词条栏 ${selection.id} 将被重造.")
+                parent.viewer.sendPlainMessage("核孔 ${selection.id} 将被重造.")
             } else {
-                parent.viewer.sendPlainMessage("词条栏 ${selection.id} 保持不变.")
+                parent.viewer.sendPlainMessage("核孔 ${selection.id} 保持不变.")
             }
 
             // 执行一次重造, 并更新主菜单

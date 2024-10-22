@@ -21,6 +21,7 @@ components:
   cells:
     enabled: true
     display_name: "<!i><white>词条栏"
+    display_name: "<!i><white>核孔"
 
   crate:
     enabled: true

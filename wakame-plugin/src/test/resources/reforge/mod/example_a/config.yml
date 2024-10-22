@@ -24,13 +24,13 @@ rarity_number_mapping:
 # query.source_item_level()
 #   被定制物品的等级
 # query.source_item_total_cell_count()
-#   被定制物品的词条栏的数量
+#   被定制物品的核孔的数量
 # query.source_item_changeable_cell_count()
-#   被定制物品上可以被定制的词条栏的数量
+#   被定制物品上可以被定制的核孔的数量
 # query.source_item_changed_cell_count()
-#   被定制物品上参与了定制的词条栏的数量
+#   被定制物品上参与了定制的核孔的数量
 # query.source_item_changed_cell_cost()
-#   被定制物品上参与了定制的词条栏的总花费
+#   被定制物品上参与了定制的核孔的总花费
 currency_cost: >-
   200.0 * query.source_item_rarity()
   + 100.0 * query.source_item_changed_cell_count()

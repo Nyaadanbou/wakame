@@ -204,7 +204,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            // 词条栏: attack
+            // 核孔: attack
             run {
                 val cell = it.get("attack")
                 assertNotNull(cell)
@@ -231,7 +231,7 @@ class CustomNekoStackTest : KoinTest {
                 }
             }
 
-            // 词条栏: bonus
+            // 核孔: bonus
             run {
                 val cell = it.get("bonus")
                 assertNotNull(cell)

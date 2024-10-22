@@ -37,11 +37,11 @@ import kotlin.properties.Delegates
  * ## 用户流程
  * 按照整体设计 (假设每一步都没有意外发生):
  * - 玩家首先要将需要定制的物品放入 [inputSlot]
- * - 然后主菜单中便会出现若干个*子菜单*, 每个*子菜单*对应物品上的一个词条栏
+ * - 然后主菜单中便会出现若干个*子菜单*, 每个*子菜单*对应物品上的一个核孔
  * - 在每一个子菜单中:
- *    - 玩家可以看到子菜单所关联的词条栏信息
+ *    - 玩家可以看到子菜单所关联的核孔信息
  *    - 玩家可以将一个便携式核心放入子菜单的*输入容器*中
- *    - 这相当于告诉定制台: 我要消耗这个物品来定制这个词条栏
+ *    - 这相当于告诉定制台: 我要消耗这个物品来定制这个核孔
  * - 主菜单的 [outputSlot] 会实时显示定制之后的物品
  * - 玩家可以随时将定制后的物品从 [outputSlot] 中取出
  * - 如果玩家取出了 [outputSlot] 中的物品, 则相当于完成定制, 同时会消耗掉所有的输入容器中的物品
@@ -99,7 +99,7 @@ internal class ModdingMenu(
     }
 
     /**
-     * 基于 [session] 的当前状态更新子菜单, 也就是每个词条栏的定制菜单.
+     * 基于 [session] 的当前状态更新子菜单, 也就是每个核孔的定制菜单.
      */
     private fun updateReplaceGuis() {
         val replaceParams = session.replaceParams
@@ -362,7 +362,7 @@ internal class ModdingMenu(
         } else {
             // 定制失败了
 
-            return ItemStack(Material.BARRIER).edit {
+            return ItemStack.of(Material.BARRIER).edit {
                 itemName = "<white>结果: <red>失败".mini
                 lore = result.description.removeItalic
             }

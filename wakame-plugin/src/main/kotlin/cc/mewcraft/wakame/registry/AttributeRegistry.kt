@@ -65,14 +65,14 @@ object AttributeRegistry : Initializable {
     /**
      * Builds an composite attribute facade.
      *
-     * 注意, 参数 [id] 仅仅是词条在 NBT/模板 中的唯一标识.
-     * 底层由多个对象组成的词条标识就与这里的 [id] 不同.
+     * 注意, 参数 [id] 仅仅是核心在 NBT/模板 中的唯一标识.
+     * 底层由多个对象组成的核心标识就与这里的 [id] 不同.
      *
-     * 例如攻击力这个属性词条, 底层实际上是由两个属性组成的, 分别是 `MIN_ATTACK_DAMAGE` 和
-     * `MAX_ATTACK_DAMAGE`, 但攻击力属性词条在 NBT/模板中的标识是一个经过“合并”得到的
+     * 例如攻击力这个属性核心, 底层实际上是由两个属性组成的, 分别是 `MIN_ATTACK_DAMAGE` 和
+     * `MAX_ATTACK_DAMAGE`, 但攻击力属性核心在 NBT/模板中的标识是一个经过“合并”得到的
      * `attribute:attack_damage`.
      *
-     * @param id 词条在 NBT/模板 中的唯一标识
+     * @param id 核心在 NBT/模板 中的唯一标识
      */
     private fun buildComposite(id: String): FormatSelection {
         return FormatSelectionImpl(id)

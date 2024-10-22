@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellCurrencyCost
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
@@ -46,7 +46,7 @@ interface RerollingTable : Examinable {
      */
     interface ItemRule : Examinable {
         /**
-         * 该物品每个词条栏的重造规则.
+         * 该物品每个核孔的重造规则.
          */
         val cellRuleMap: CellRuleMap
     }
@@ -68,16 +68,16 @@ interface RerollingTable : Examinable {
     }
 
     /**
-     * 代表一个词条栏的重造规则.
+     * 代表一个核孔的重造规则.
      */
     interface CellRule : Examinable {
         /**
-         * 词条栏最多能重造几次.
+         * 核孔最多能重造几次.
          */
         val maxReroll: Int
 
         /**
-         * 该词条栏的货币花费.
+         * 该核孔的货币花费.
          */
         val currencyCost: CellCurrencyCost
 
@@ -87,15 +87,15 @@ interface RerollingTable : Examinable {
     }
 
     /**
-     * 该对象本质是一个映射, 包含了所有词条栏的重造规则.
+     * 该对象本质是一个映射, 包含了所有核孔的重造规则.
      */
     interface CellRuleMap : Examinable {
         /**
-         * 获取词条栏的重造规则.
+         * 获取核孔的重造规则.
          *
-         * 如果返回 `null` 则说明该词条栏不支持重造.
+         * 如果返回 `null` 则说明该核孔不支持重造.
          *
-         * @param key 词条栏的唯一标识
+         * @param key 核孔的唯一标识
          */
         operator fun get(key: String): CellRule?
 

@@ -244,7 +244,7 @@ internal class RerollingMenu(
      */
     private fun renderOutputSlot(session: RerollingSession): ItemStack {
         // TODO 更丰富的结果预览:
-        //  能够显示哪些词条栏会被重造, 哪些不会
+        //  能够显示哪些核孔会被重造, 哪些不会
         //  这要求对渲染模块进行重构 ...
 
         val viewer = session.viewer

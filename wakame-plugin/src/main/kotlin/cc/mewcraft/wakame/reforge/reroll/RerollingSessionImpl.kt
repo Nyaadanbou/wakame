@@ -370,15 +370,15 @@ internal object SelectionMap : KoinComponent {
         // 如果源物品不存在, 则直接返回空容器
         val sourceItem = session.sourceItem ?: return empty(session)
 
-        // 获取源物品的词条栏模板
-        // 如果源物品没有词条栏*模板*, 则判定整个物品不支持重造
+        // 获取源物品的核孔模板
+        // 如果源物品没有核孔*模板*, 则判定整个物品不支持重造
         val templates = sourceItem.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
             logger.info("Source item has no `cells` template.")
             return empty(session)
         }
 
-        // 获取源物品的词条栏
-        // 如果这个物品没有词条栏组件, 则判定整个物品不支持重造
+        // 获取源物品的核孔
+        // 如果这个物品没有核孔组件, 则判定整个物品不支持重造
         val cells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return empty(session)
 
         // 获取源物品的重造规则
@@ -388,12 +388,12 @@ internal object SelectionMap : KoinComponent {
         val selectionMap = Simple(session)
         for ((id, cell) in cells) {
 
-            // 获取词条栏的重造规则
-            // 如果这个词条栏没有对应的重造规则, 则判定该词条栏不支持重造
+            // 获取核孔的重造规则
+            // 如果这个核孔没有对应的重造规则, 则判定该核孔不支持重造
             val cellRule = itemRule.cellRuleMap[id] ?: continue
 
-            // 获取词条栏的重造模板
-            // 这个词条栏没有对应的模板, 则判定该词条栏不支持重造
+            // 获取核孔的重造模板
+            // 这个核孔没有对应的模板, 则判定该核孔不支持重造
             val template = templates[id]?.core ?: continue
 
             val display = ItemStack(CoreIcons.get(cell.hashCode()))

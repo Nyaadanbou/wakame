@@ -40,7 +40,7 @@ cells/skills:
 cells/empty:
   namespace: stash
   tooltip:
-    - "[ 空词条栏 ]"
+    - "[ 空核孔 ]"
 
 # id: `crate`
 crate:

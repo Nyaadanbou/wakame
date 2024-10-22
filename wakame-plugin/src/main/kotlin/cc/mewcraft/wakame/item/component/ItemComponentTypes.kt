@@ -50,7 +50,7 @@ internal object ItemComponentTypes {
     val CAN_PLACE_ON: ItemComponentType<ItemAdventurePredicate> = ItemAdventurePredicate.codec(ItemConstants.CAN_PLACE_ON).register()
 
     /**
-     * 物品的(所有)词条栏.
+     * 物品的(所有)核孔.
      */
     @JvmField
     val CELLS: ItemComponentType<ItemCells> = ItemCells.codec(ItemConstants.CELLS).register()

@@ -9,41 +9,41 @@ import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
 /**
- * 代表一个词条栏.
+ * 代表一个核孔.
  */
 interface Cell : Examinable, BinarySerializable<CompoundTag> {
 
     /**
-     * 返回词条栏的 id.
+     * 返回核孔的 id.
      */
     fun getId(): String
 
     /**
-     * 设置词条栏的 id.
+     * 设置核孔的 id.
      */
     fun setId(id: String): Cell
 
     /**
-     * 返回词条栏的核心.
+     * 返回核孔的核心.
      */
     fun getCore(): Core
 
     /**
-     * 设置词条栏的核心.
+     * 设置核孔的核心.
      *
-     * @return 修改过的词条栏对象
+     * @return 修改过的核孔对象
      */
     fun setCore(core: Core): Cell
 
     /**
-     * 返回词条栏的重铸数据.
+     * 返回核孔的重铸数据.
      */
     fun getReforgeHistory(): ReforgeHistory
 
     /**
-     * 设置词条栏的重铸数据.
+     * 设置核孔的重铸数据.
      *
-     * @return 修改过的词条栏对象
+     * @return 修改过的核孔对象
      */
     fun setReforgeHistory(reforgeHistory: ReforgeHistory): Cell
 
@@ -71,7 +71,7 @@ interface Cell : Examinable, BinarySerializable<CompoundTag> {
 }
 
 // 非空的实现:
-// 如果词条栏真实存在于物品上,
+// 如果核孔真实存在于物品上,
 // 那么实际实现就会是这个.
 private data class SimpleCell(
     private val id: String,

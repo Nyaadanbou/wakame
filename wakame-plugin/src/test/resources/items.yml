@@ -39,6 +39,7 @@ components:
     display_name: "词条栏"
     # 最多可显示多少个空词条栏
     max_visible_empty_cores: 10
+    display_name: "核孔"
 
   crate:
     enabled: true

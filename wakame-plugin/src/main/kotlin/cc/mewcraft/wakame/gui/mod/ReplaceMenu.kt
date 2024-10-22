@@ -26,9 +26,9 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 
 /**
- * 用于定制*单个*词条栏核心的菜单, 需要被嵌入到 [ModdingMenu] 中.
+ * 用于定制*单个*核孔核心的菜单, 需要被嵌入到 [ModdingMenu] 中.
  *
- * 物品上的*每个*词条栏都有一个对应的 [ReplaceMenu] 实例来处理定制.
+ * 物品上的*每个*核孔都有一个对应的 [ReplaceMenu] 实例来处理定制.
  */
 internal class ReplaceMenu
 private constructor(

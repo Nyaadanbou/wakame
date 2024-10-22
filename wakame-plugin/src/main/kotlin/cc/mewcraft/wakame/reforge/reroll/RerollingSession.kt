@@ -63,7 +63,7 @@ interface RerollingSession : Examinable {
     var sourceItem: NekoStack?
 
     /**
-     * 每个词条栏的选择状态.
+     * 每个核孔的选择状态.
      */
     @VariableByPlayer
     val selectionMap: SelectionMap
@@ -150,7 +150,7 @@ interface RerollingSession : Examinable {
     }
 
     /**
-     * 封装了单个词条栏的选择状态.
+     * 封装了单个核孔的选择状态.
      */
     interface Selection : Examinable {
         /**
@@ -159,39 +159,39 @@ interface RerollingSession : Examinable {
         val session: RerollingSession
 
         /**
-         * 词条栏的唯一标识.
+         * 核孔的唯一标识.
          */
         val id: String
 
         /**
-         * 词条栏的重造规则.
+         * 核孔的重造规则.
          */
         val rule: RerollingTable.CellRule
 
         /**
-         * 用于重新随机词条栏核心的掉落表.
+         * 用于重新随机核孔核心的掉落表.
          */
         val template: Group<CoreBlueprint, ItemGenerationContext>
 
         /**
-         * 词条栏在菜单中的图标, 用于告诉玩家这个词条栏是什么.
+         * 核孔在菜单中的图标, 用于告诉玩家这个核孔是什么.
          */
         val display: ItemStack
 
         /**
-         * 词条栏花费的计算函数.
+         * 核孔花费的计算函数.
          */
         val total: MochaFunction
 
         /**
-         * 词条栏是否可以被重造.
+         * 核孔是否可以被重造.
          */
         val changeable: Boolean
 
         /**
-         * 记录了该词条栏是否被选择重造.
+         * 记录了该核孔是否被选择重造.
          *
-         * `true` 表示该词条栏应该被重造.
+         * `true` 表示该核孔应该被重造.
          */
         @VariableByPlayer
         var selected: Boolean
@@ -205,12 +205,12 @@ interface RerollingSession : Examinable {
     }
 
     /**
-     * 封装了所有词条栏的选择状态 ([Selection]).
+     * 封装了所有核孔的选择状态 ([Selection]).
      *
      * ## 设计哲学
-     * 本对象覆盖了物品上所有的词条栏, 无论这个词条栏能否被重造.
-     * 对于能被重造的词条栏, 会有一个普通的 [Selection] 对象来表示.
-     * 对于不能被重造的词条栏, 会有一个特殊的 [Selection] 对象来表示.
+     * 本对象覆盖了物品上所有的核孔, 无论这个核孔能否被重造.
+     * 对于能被重造的核孔, 会有一个普通的 [Selection] 对象来表示.
+     * 对于不能被重造的核孔, 会有一个特殊的 [Selection] 对象来表示.
      * 这可以让我们优雅的分别处理这两种情况.
      */
     interface SelectionMap : Examinable, Iterable<Map.Entry<String, Selection>> {

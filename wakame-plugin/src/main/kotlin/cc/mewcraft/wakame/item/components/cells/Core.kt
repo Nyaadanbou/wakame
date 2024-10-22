@@ -23,7 +23,7 @@ val Core.isEmpty: Boolean
     get() = this is EmptyCore
 
 /**
- * 代表一个词条栏中的核心. 核心是 [词条栏][Cell] 中提供具体效果的东西.
+ * 代表一个核孔中的核心. 核心是 [核孔][Cell] 中提供具体效果的东西.
  */
 interface Core : Examinable, BinarySerializable<CompoundTag> {
     /**
@@ -66,7 +66,7 @@ interface Core : Examinable, BinarySerializable<CompoundTag> {
 /**
  * [VirtualCore] 代表永远不会被写入物品 NBT 的核心.
  *
- * 用来引导系统在生成萌芽物品时, 不要把当前词条栏写入物品.
+ * 用来引导系统在生成萌芽物品时, 不要把当前核孔写入物品.
  * 因此这个核心永远不会出现在游戏内的物品上, 不然就是 BUG.
  */
 interface VirtualCore : Core
@@ -74,8 +74,8 @@ interface VirtualCore : Core
 /**
  * [EmptyCore] 是一个特殊核心, 表示这个核心不存在.
  *
- * 当一个词条栏里没有核心时 (但词条栏本身存在), 里面实际上存放了一颗空核心.
- * 玩家概念上的“词条栏没有核心”, 就是技术概念上的 “词条栏里装的是空核心”.
+ * 当一个核孔里没有核心时 (但核孔本身存在), 里面实际上存放了一颗空核心.
+ * 玩家概念上的“核孔没有核心”, 就是技术概念上的 “核孔里装的是空核心”.
  */
 interface EmptyCore : Core
 

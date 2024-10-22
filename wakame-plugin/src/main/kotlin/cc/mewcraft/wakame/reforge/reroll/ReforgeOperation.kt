@@ -45,14 +45,14 @@ private constructor(
         // 如果源物品不存在, 返回一个空结果
         val sourceItem = session.sourceItem ?: return ReforgeResult.empty()
 
-        // 获取词条栏的选择状态
-        // 如果没有可重造的词条栏, 返回一个失败结果
+        // 获取核孔的选择状态
+        // 如果没有可重造的核孔, 返回一个失败结果
         val selectionMap = session.selectionMap
         if (selectionMap.isEmpty || selectionMap.values.all { !it.changeable }) {
             return ReforgeResult.failure("<gray>没有可重造的核孔.".mini)
         }
 
-        // 如果没有选择任何词条栏, 返回一个失败结果
+        // 如果没有选择任何核孔, 返回一个失败结果
         if (selectionMap.values.all { !it.selected }) {
             return ReforgeResult.failure("<gray>没有要重造的核孔".mini)
         }
@@ -97,7 +97,7 @@ private constructor(
             // 遍历每一个选择:
             for ((id, sel) in selectionMap) {
 
-                // 如果玩家选择了该词条栏:
+                // 如果玩家选择了该核孔:
                 if (sel.selected) {
 
                     // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
@@ -107,7 +107,7 @@ private constructor(
                         cell.setCore(generated)
                     }
 
-                    // 为重造过的词条栏 +1 重造次数
+                    // 为重造过的核孔 +1 重造次数
                     modify(id) { cell ->
                         val oldValue = cell.getReforgeHistory()
                         val newValue = oldValue.addRerollCount(1)
@@ -120,7 +120,7 @@ private constructor(
         // 准备作为输出的物品
         val output = sourceItem.clone()
 
-        // 将新的词条栏组件写入物品
+        // 将新的核孔组件写入物品
         output.components.set(ItemComponentTypes.CELLS, updatedItemCells)
 
         // 计算重造物品的总花费
@@ -154,8 +154,8 @@ private constructor(
 
         // 然后再把*可由玩家改变的信息*全部写入上下文
         itemCells
-            // 注意, 我们必须跳过玩家选择要重造的词条栏.
-            // 如果不跳过, 那么新的词条栏将无法被正确生成.
+            // 注意, 我们必须跳过玩家选择要重造的核孔.
+            // 如果不跳过, 那么新的核孔将无法被正确生成.
             // 这是因为截止至 2024/8/20, 我们的设计不允许
             // 相似的核心出现在同一个物品上.
             .filter2 { cell -> selectionMap[cell.getId()]?.selected == false }
