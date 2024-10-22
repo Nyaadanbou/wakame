@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.util.removeItalic
@@ -17,6 +16,7 @@ import org.bukkit.enchantments.Enchantment
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.*
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import kotlin.collections.component1
 import kotlin.collections.component2
 

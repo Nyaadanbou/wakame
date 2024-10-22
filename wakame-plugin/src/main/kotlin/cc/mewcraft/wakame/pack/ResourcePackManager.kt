@@ -1,20 +1,9 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.derive
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
-import cc.mewcraft.wakame.pack.generate.ResourcePackCustomModelGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackExternalGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackRegistryModelGeneration
-import cc.mewcraft.wakame.util.formatSize
-import cc.mewcraft.wakame.util.writeToDirectory
-import cc.mewcraft.wakame.util.writeToZipFile
+import cc.mewcraft.wakame.util.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -25,6 +14,7 @@ import team.unnamed.creative.serialize.ResourcePackWriter
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeWriter
+import xyz.xenondevs.commons.provider.immutable.orElse
 import java.io.File
 
 internal class ResourcePackManager(
@@ -97,7 +87,7 @@ internal class ResourcePackManager(
 }
 
 private class ResourcePackGenerationSettings {
-    private val config = RESOURCE_PACK_CONFIG.derive("generation")
+    private val config = RESOURCE_PACK_CONFIG.node("generation")
 
     val description: String by config.entry<String>("description")
     val format: Int by config.entry<Int>("format")

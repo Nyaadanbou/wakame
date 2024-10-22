@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.provider
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
@@ -11,6 +9,8 @@ import com.github.benmanes.caffeine.cache.LoadingCache
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.provider
 
 object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, Byte> {
     /**

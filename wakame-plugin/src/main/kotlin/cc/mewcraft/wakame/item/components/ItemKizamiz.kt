@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.commons.collections.mapToByteArray
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.kizami.Kizami
@@ -8,6 +7,7 @@ import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
+import xyz.xenondevs.commons.collections.mapToByteArray
 
 
 data class ItemKizamiz(

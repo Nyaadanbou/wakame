@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -20,6 +19,7 @@ import org.koin.core.component.*
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import java.nio.file.Path
 import cc.mewcraft.wakame.item.components.ItemKizamiz as ItemKizamizData
 

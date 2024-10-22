@@ -3,8 +3,6 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.map
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.initializer.Initializable
@@ -18,6 +16,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.map
 import java.nio.file.Path
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */

@@ -1,10 +1,6 @@
 package cc.mewcraft.wakame.skill.state.display
 
-import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
-import cc.mewcraft.wakame.config.derive
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.skill.SkillSupport
 import cc.mewcraft.wakame.skill.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill.trigger.Trigger
@@ -14,6 +10,7 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.entity.Player
+import xyz.xenondevs.commons.provider.immutable.orElse
 
 /**
  * Interface for displaying skill state to the user.
@@ -27,7 +24,7 @@ interface StateDisplay<A : Audience> {
 class PlayerStateDisplay : StateDisplay<Player> {
     private val triggerNames: Map<Trigger, String> by SkillSupport.GLOBAL_STATE_DISPLAY_CONFIG.entry("triggers")
 
-    private val playerConfig = SkillSupport.GLOBAL_STATE_DISPLAY_CONFIG.derive("player_state")
+    private val playerConfig = SkillSupport.GLOBAL_STATE_DISPLAY_CONFIG.node("player_state")
 
     private val connector: String by playerConfig.entry("connector")
 

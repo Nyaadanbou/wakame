@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.commons.collections.associateNotNull
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.reforge.common.*
@@ -12,6 +11,7 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
+import xyz.xenondevs.commons.collections.associateNotNull
 import java.io.File
 import java.lang.reflect.Type
 

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.derive
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.SimpleRegistry
@@ -18,7 +17,7 @@ internal object ItemComponentRegistry : KoinComponent, Initializable {
     /**
      * 物品组件的全局配置文件.
      */
-    internal val CONFIG = Configs.YAML[CONFIG_FILE_NAME].derive(NODE_COMPONENTS)
+    internal val CONFIG = Configs.YAML[CONFIG_FILE_NAME].node(NODE_COMPONENTS)
 
     /**
      * 物品组件类型的注册表.

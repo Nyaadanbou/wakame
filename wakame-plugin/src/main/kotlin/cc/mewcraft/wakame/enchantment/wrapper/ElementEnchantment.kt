@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.enchantment.wrapper
 
-import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.enchantment.CustomEnchantment
 import cc.mewcraft.wakame.enchantment.Enchantments
 import cc.mewcraft.wakame.registry.ElementRegistry
 import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
+import xyz.xenondevs.commons.provider.Provider
 
 internal abstract class ElementEnchantment(
     identity: Identity,

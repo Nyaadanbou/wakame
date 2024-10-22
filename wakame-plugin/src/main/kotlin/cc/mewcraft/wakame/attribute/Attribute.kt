@@ -2,16 +2,15 @@
 
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.orElse
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.intellij.lang.annotations.Pattern
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.orElse
 import java.util.stream.Stream
 
 /**
@@ -72,7 +71,8 @@ protected constructor(
         compositeId = compositeId,
         descriptionId = descriptionId,
         defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositeId, "values", "default").orElse(defaultValue),
-        vanilla = vanilla    )
+        vanilla = vanilla
+    )
 
     internal constructor(
         descriptionId: String,

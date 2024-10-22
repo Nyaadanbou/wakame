@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.commons.collections.enumMap
 import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import com.google.common.collect.ImmutableSet
 import it.unimi.dsi.fastutil.objects.*
@@ -8,6 +7,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.VisibleForTesting
+import xyz.xenondevs.commons.collections.enumMap
 import java.util.EnumMap
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
 

@@ -1,31 +1,25 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.commons.provider.Provider
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.derive
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.util.PathChangeWatcher
 import com.sun.net.httpserver.HttpExchange
 import net.kyori.adventure.resource.ResourcePackInfo
 import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.server.ResourcePackServer
 import team.unnamed.creative.server.request.ResourcePackDownloadRequest
+import xyz.xenondevs.commons.provider.Provider
 import java.io.File
 import java.net.URI
 import java.security.MessageDigest
-import java.util.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import java.util.UUID
+import java.util.concurrent.*
 
 
 /**
@@ -93,7 +87,7 @@ object ResourcePackServiceProvider {
         // 停止旧实例
         INSTANCE?.stop()
 
-        val config = RESOURCE_PACK_CONFIG.derive("service")
+        val config = RESOURCE_PACK_CONFIG.node("service")
         val required = config.entry<Boolean>("required")
         val prompt = config.entry<Component>("prompt")
         val inst = when (

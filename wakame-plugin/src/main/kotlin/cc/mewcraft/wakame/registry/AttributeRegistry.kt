@@ -7,7 +7,8 @@ import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import cc.mewcraft.wakame.attribute.composite.*
-import cc.mewcraft.wakame.config.*
+import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
@@ -426,7 +427,7 @@ private class FormatSelectionImpl(
 private class SingleSelectionImpl(
     private val id: String,
 ) : SingleSelection {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id)
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
@@ -479,7 +480,7 @@ private class SingleSelectionImpl(
 private class RangedSelectionImpl(
     private val id: String,
 ) : RangedSelection {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id)
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
@@ -539,7 +540,7 @@ private class RangedSelectionImpl(
 private class SingleElementAttributeBinderImpl(
     private val id: String,
 ) : SingleElementAttributeBinder {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id)
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 
@@ -592,7 +593,7 @@ private class SingleElementAttributeBinderImpl(
 private class RangedElementAttributeBinderImpl(
     private val id: String,
 ) : RangedElementAttributeBinder {
-    private val config: ConfigProvider = AttributeRegistry.CONFIG.derive(id)
+    private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
 

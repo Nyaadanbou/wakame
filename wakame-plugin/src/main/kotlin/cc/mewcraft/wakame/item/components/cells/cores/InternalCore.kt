@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
-import cc.mewcraft.wakame.config.derive
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.components.cells.*
@@ -23,7 +21,7 @@ val Cell.emptyCore: EmptyCore?
  * [VirtualCore] 的标准实现.
  */
 internal data object SimpleVirtualCore : VirtualCore {
-    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).root.derive("virtual_core")
+    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).root.node("virtual_core")
 
     override val id: Key = GenericKeys.NOOP
     override val displayName: Component by config.entry<Component>("display_name")
@@ -50,7 +48,7 @@ internal data object SimpleVirtualCore : VirtualCore {
  * [EmptyCore] 的标准实现.
  */
 internal data object SimpleEmptyCore : EmptyCore {
-    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).root.derive("empty_core")
+    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).root.node("empty_core")
 
     override val id: Key = GenericKeys.EMPTY
     override val displayName: Component by config.entry<Component>("display_name")

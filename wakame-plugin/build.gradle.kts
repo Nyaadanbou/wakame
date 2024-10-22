@@ -1,6 +1,5 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
-import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
-import org.gradle.kotlin.dsl.paper
+import net.minecrell.pluginyml.paper.PaperPluginDescription.*
 
 plugins {
     id("neko-kotlin")
@@ -26,8 +25,9 @@ dependencies {
     // libraries
     compileOnly(local.paper)
     compileOnly(local.helper)
-    implementation(libs.commons.collections)
-    implementation(libs.commons.provider)
+    implementation(local.commons.collections)
+    implementation(local.commons.guava)
+    implementation(local.commons.provider)
     implementation(libs.mocha)
     compileOnly(local.shadow.nbt) // 运行时由 wakame-mixin 提供
     implementation(platform(libs.bom.adventure))
