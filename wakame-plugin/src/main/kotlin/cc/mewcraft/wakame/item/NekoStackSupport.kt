@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
@@ -15,8 +16,8 @@ import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.*
+import org.slf4j.Logger
 import java.util.stream.Stream
 
 /**
@@ -90,6 +91,17 @@ val ItemStack.toNekoStack: NekoStack
 @Contract(pure = true)
 fun ItemStack.takeIfNeko(): ItemStack? {
     return this.takeUnlessEmpty()?.takeIf { it.isNeko }
+}
+
+/**
+ * 直接修改一个被 [NekoStack] 所封装的 [ItemStack]. 仅对 [CustomNekoStack] 有效.
+ */
+fun NekoStack.directEdit(block: ItemStackDSL.() -> Unit) {
+    if (this is CustomNekoStack) {
+        handle.edit(block)
+    } else {
+        Injector.get<Logger>().warn("Attempted to edit a non-custom NekoStack")
+    }
 }
 
 /**

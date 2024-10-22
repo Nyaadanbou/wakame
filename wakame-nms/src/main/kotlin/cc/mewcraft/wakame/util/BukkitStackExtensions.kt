@@ -44,6 +44,18 @@ class ItemStackDSL(
             target.customModelData0 = value
         }
 
+    var hideAdditionalTooltip: Boolean
+        get() = target.hideAdditionalTooltip0
+        set(value) {
+            target.hideAdditionalTooltip0 = value
+        }
+
+    var hideTooltip: Boolean
+        get() = target.hideTooltip0
+        set(value) {
+            target.hideTooltip0 = value
+        }
+
     fun showAttributeModifiers(value: Boolean) {
         target.showAttributeModifiers(value)
     }
@@ -93,6 +105,9 @@ class ItemStackDSL(
     }
 }
 
+/**
+ * 直接修改一个 [ItemStack]. 暂时仅支持部分常用数据.
+ */
 fun ItemStack.edit(block: ItemStackDSL.() -> Unit): ItemStack {
     return ItemStackDSL(this).apply(block).target
 }

@@ -89,6 +89,24 @@ var BukkitStack.customModelData0: Int?
     }
 
 /**
+ * 设置是否隐藏附加提示.
+ */
+var BukkitStack.hideAdditionalTooltip0: Boolean
+    get() = this.handle?.has(DataComponents.HIDE_ADDITIONAL_TOOLTIP) ?: false
+    set(value) {
+        this.handle?.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, if (value) net.minecraft.util.Unit.INSTANCE else null)
+    }
+
+/**
+ * 设置是否隐藏提示.
+ */
+var BukkitStack.hideTooltip0: Boolean
+    get() = this.handle?.has(DataComponents.HIDE_TOOLTIP) ?: false
+    set(value) {
+        this.handle?.set(DataComponents.HIDE_TOOLTIP, if (value) net.minecraft.util.Unit.INSTANCE else null)
+    }
+
+/**
  * Safe read/write.
  */
 var BukkitStack.nbt: CompoundShadowTag?
