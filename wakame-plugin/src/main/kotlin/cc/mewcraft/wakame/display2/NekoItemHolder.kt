@@ -1,17 +1,14 @@
 package cc.mewcraft.wakame.display2
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.*
 import cc.mewcraft.wakame.display2.NekoItemHolder.ObjectPool.get
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.registry.ItemRegistry
 import net.kyori.adventure.key.Key
-import net.kyori.examination.Examinable
-import net.kyori.examination.ExaminableProperty
-import net.kyori.examination.string.StringExaminer
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.provider
 import java.util.concurrent.ConcurrentHashMap
-import java.util.stream.Stream
 
 // TODO 临时实现, 到时候重构 Registry
 //  会有泛用性更强的 Holder 框架
@@ -35,15 +32,15 @@ import java.util.stream.Stream
 internal data class NekoItemHolder
 private constructor(
     private val itemId: Key,
-) : Examinable {
-
+    private val fallback: Key = ItemRegistry.ERROR_NEKO_ITEM_ID,
+) {
     // 所有 property 必须懒加载 (provider) 以支持重载!
-    private val prototype: Provider<NekoItem?> = provider {
-        ItemRegistry.CUSTOM.find(itemId)
-    }
-    private val realized: NekoStack by prototype
-        .mapNonNull(NekoItem::realize)
-        .orElse(ItemRegistry.ERROR_NEKO_STACK)
+
+    private val prototype: Provider<NekoItem> = provider {
+        ItemRegistry.CUSTOM.find(itemId) ?: ItemRegistry.CUSTOM.find(fallback) ?: ItemRegistry.CUSTOM[ItemRegistry.ERROR_NEKO_ITEM_ID]
+    } // FIXME Provider#orElse 不触发更新
+
+    private val realized: NekoStack by prototype.map(NekoItem::realize)
 
     /**
      * 返回一个新的 [NekoStack] 实例.
@@ -59,32 +56,25 @@ private constructor(
         return realized.itemStack
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("itemId", itemId),
-    )
-
-    override fun toString(): String {
-        return StringExaminer.simpleEscaping().examine(this)
-    }
-
     /**
      * [NekoItemHolder] 的对象池.
      */
     companion object ObjectPool {
         // thread-safe object pool
-        private val nekoItemHolderObjectPool: ConcurrentHashMap<Key, NekoItemHolder> = ConcurrentHashMap()
-
-        fun getDefault(): NekoItemHolder {
-            return get(ItemRegistry.ERROR_NEKO_ITEM_ID)
-        }
+        private val POOL: ConcurrentHashMap<Key, NekoItemHolder> = ConcurrentHashMap()
 
         /**
-         * 获取一个持有指定 [NekoItem] 的容器.
-         *
-         * @param id 萌芽物品的唯一标识
+         * @see get
          */
         fun get(id: String): NekoItemHolder {
             return get(Key.key(id))
+        }
+
+        /**
+         * @see getOrDefault
+         */
+        fun getOrDefault(id: String, def: String): NekoItemHolder {
+            return getOrDefault(Key.key(id), Key.key(def))
         }
 
         /**
@@ -93,15 +83,32 @@ private constructor(
          * @param id 萌芽物品的唯一标识
          */
         fun get(id: Key): NekoItemHolder {
-            return nekoItemHolderObjectPool.computeIfAbsent(id, ::NekoItemHolder)
+            return POOL.computeIfAbsent(id, ::NekoItemHolder)
+        }
+
+        /**
+         * 获取一个持有指定 [NekoItem] 的容器, 如果不存在则使用默认值.
+         *
+         * @param id 萌芽物品的唯一标识
+         * @param def 默认的萌芽物品的唯一标识
+         */
+        fun getOrDefault(id: Key, def: Key): NekoItemHolder {
+            return POOL.computeIfAbsent(id) { NekoItemHolder(id, def) }
         }
 
         fun reset() {
-            nekoItemHolderObjectPool.clear()
+            POOL.clear()
         }
 
         fun reload() {
-            nekoItemHolderObjectPool.forEach { (_, instance) -> instance.prototype.update() }
+            val iterator = POOL.iterator()
+            while (iterator.hasNext()) {
+                val (key, holder) = iterator.next()
+                if (!ItemRegistry.CUSTOM.has(key)) {
+                    iterator.remove()
+                }
+                holder.prototype.update()
+            }
         }
     }
 }

@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.*
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.display2.NekoItemHolder
 import cc.mewcraft.wakame.initializer.*
@@ -9,13 +7,15 @@ import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
-import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.annotations.Contract
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.*
 
 @PreWorldDependency(
     runBefore = [
@@ -83,7 +83,7 @@ object ItemRegistry : KoinComponent, Initializable {
      * @return the specific [NekoItem]
      */
     fun Registry<Key, NekoItem>.get(key: String): NekoItem {
-        return this[Key(key)]
+        return this[Key.key(key)]
     }
 
     /**
@@ -93,7 +93,7 @@ object ItemRegistry : KoinComponent, Initializable {
      * @return the specific [NekoItem] or `null` if not found
      */
     fun Registry<Key, NekoItem>.find(key: String): NekoItem? {
-        return this.find(Key(key))
+        return this.find(Key.key(key))
     }
 
     /**
@@ -104,7 +104,7 @@ object ItemRegistry : KoinComponent, Initializable {
      * @return the specific [NekoItem]
      */
     fun Registry<Key, NekoItem>.get(namespace: String, path: String): NekoItem {
-        return this[Key(namespace, path)]
+        return this[Key.key(namespace, path)]
     }
 
     /**
@@ -115,7 +115,7 @@ object ItemRegistry : KoinComponent, Initializable {
      * @return the specific [NekoItem] or `null` if not found
      */
     fun Registry<Key, NekoItem>.find(namespace: String, path: String): NekoItem? {
-        return this.find(Key(namespace, path))
+        return this.find(Key.key(namespace, path))
     }
 
     override fun onPreWorld() {
@@ -129,33 +129,40 @@ object ItemRegistry : KoinComponent, Initializable {
     private val logger: Logger = get()
 
     /**
-     * Error [NekoItem] 的唯一标识.
+     * 默认的 [Error NekoItem][NekoItem] 的唯一标识.
      */
     @JvmField
     val ERROR_NEKO_ITEM_ID: Key = Key.key("internal:error")
 
     /**
-     * Error [NekoStack] 的实例.
+     * 默认的 [Error NekoStack][NekoStack].
      */
-    @get:JvmName("errorNekoStack")
-    val ERROR_NEKO_STACK: NekoStack
-        get() = ItemRegistryInternals.errorNekoStackProvider.get().clone()
+    @get:JvmName("getErrorNekoItemProvider")
+    val ERROR_NEKO_ITEM_PROVIDER: Provider<NekoItem>
+        get() = ItemRegistryInternals.ERROR_NEKO_ITEM_PROVIDER
 
     /**
-     * Error [ItemStack] 的实例 (相当于 [NekoStack.itemStack]).
+     * 默认的 [Error NekoStack][NekoStack].
      */
-    @get:JvmName("errorItemStack")
+    @get:Contract(" -> new")
+    @get:JvmName("getErrorNekoStack")
+    val ERROR_NEKO_STACK: NekoStack
+        get() = ItemRegistryInternals.ERROR_NEKO_STACK_PROVIDER.get().clone()
+
+    /**
+     * 默认的 [Error NekoStack][ItemStack].
+     */
+    @get:Contract(" -> new")
+    @get:JvmName("getErrorItemStack")
     val ERROR_ITEM_STACK: ItemStack
-        get() = ItemRegistryInternals.errorNekoStackProvider.get().itemStack
+        get() = ItemRegistryInternals.ERROR_NEKO_STACK_PROVIDER.get().itemStack
 
     private fun loadConfiguration() {
         // 清空注册表
         VANILLA.clear()
+        logger.info("Unregistered all vanilla items.")
         CUSTOM.clear()
-
-        // 注册默认的 error item
-        // 配置文件可以将该实例覆盖
-        CUSTOM.register(ERROR_NEKO_ITEM_ID, ItemRegistryInternals.defaultErrorNekoItem)
+        logger.info("Unregistered all custom items.")
 
         // 加载所有配置文件
         for ((key, path, node) in NekoItemNodeIterator) {
@@ -172,12 +179,22 @@ object ItemRegistry : KoinComponent, Initializable {
                     .onFailure { logError(key, it) }
             }
         }
+        logger.info("Registered all items.")
 
-        // 重载所有 NekoItemHolder
+        // 注册默认的 error item
+        if (CUSTOM.has(ERROR_NEKO_ITEM_ID)) {
+            logger.info("Found a custom error neko item.")
+        } else {
+            logger.warn("Custom error neko item not found. Registering default one.")
+            CUSTOM.register(ERROR_NEKO_ITEM_ID, ItemRegistryInternals.DEFAULT_ERROR_NEKO_ITEM)
+            logger.info("Registered default error neko item.")
+        }
+
+        // 重新加载 Error NekoItem
+        ItemRegistryInternals.ERROR_NEKO_ITEM_PROVIDER.update()
+
+        // 重新加载 NekoItemHolder
         NekoItemHolder.reload()
-
-        // 重载 Error NekoItem
-        ItemRegistryInternals.errorNekoStackProvider.update()
     }
 
     private fun logError(key: Key, throwable: Throwable) {
@@ -190,8 +207,11 @@ object ItemRegistry : KoinComponent, Initializable {
 }
 
 private object ItemRegistryInternals {
+    /**
+     * 如果用户没有提供默认的物品, 则使用内置的这个.
+     */
     @JvmField
-    val defaultErrorNekoItem: SimpleNekoItem =
+    val DEFAULT_ERROR_NEKO_ITEM: SimpleNekoItem =
         SimpleNekoItem(
             id = ItemRegistry.ERROR_NEKO_ITEM_ID,
             base = ItemBaseImpl(Material.BARRIER, """[item_name="ERROR"]"""),
@@ -201,8 +221,10 @@ private object ItemRegistryInternals {
         )
 
     @JvmField
-    val errorNekoStackProvider: Provider<NekoStack> =
-        provider { ItemRegistry.CUSTOM.find(ItemRegistry.ERROR_NEKO_ITEM_ID) }
-            .orElse(defaultErrorNekoItem)
-            .map(NekoItem::realize)
+    val ERROR_NEKO_ITEM_PROVIDER: Provider<NekoItem> =
+        provider { ItemRegistry.CUSTOM.find(ItemRegistry.ERROR_NEKO_ITEM_ID) }.orElse(DEFAULT_ERROR_NEKO_ITEM)
+
+    @JvmField
+    val ERROR_NEKO_STACK_PROVIDER: Provider<NekoStack> =
+        ERROR_NEKO_ITEM_PROVIDER.map(NekoItem::realize)
 }
