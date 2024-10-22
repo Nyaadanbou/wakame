@@ -42,6 +42,10 @@ private constructor(
 
     private val realized: NekoStack by prototype.map(NekoItem::realize)
 
+    private fun update() {
+        prototype.update()
+    }
+
     /**
      * 返回一个新的 [NekoStack] 实例.
      */
@@ -103,11 +107,8 @@ private constructor(
         fun reload() {
             val iterator = POOL.iterator()
             while (iterator.hasNext()) {
-                val (key, holder) = iterator.next()
-                if (!ItemRegistry.CUSTOM.has(key)) {
-                    iterator.remove()
-                }
-                holder.prototype.update()
+                val (_, holder) = iterator.next()
+                holder.update()
             }
         }
     }

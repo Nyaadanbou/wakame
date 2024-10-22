@@ -127,7 +127,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
                 ItemRenderers.STANDARD.render(nekoStack, StandardContext)
                 changed = true
             } catch (e: Throwable) {
-                logger.error("An error occurred while rendering NekoStack: ${nekoStack.id}")
+                logger.error("An error occurred while rendering network item: ${nekoStack.id}")
             }
         }
 
