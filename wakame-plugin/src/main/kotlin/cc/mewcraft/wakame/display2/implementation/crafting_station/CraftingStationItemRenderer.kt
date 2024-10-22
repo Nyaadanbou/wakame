@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.item.templates.components.CustomName
@@ -26,7 +27,6 @@ import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
-import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -102,18 +102,13 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
             item.erase()
         }
 
-        val handle = item.unsafe.handle
-        handle.lore0 = itemLore
-        handle.customModelData0 = itemCmd
-        handle.showAttributeModifiers(false)
-        // handle.showCanBreak(false)
-        // handle.showCanPlaceOn(false)
-        // handle.showDyedColor(false)
-        handle.showEnchantments(false)
-        // handle.showJukeboxPlayable(false)
-        handle.showStoredEnchantments(false)
-        // handle.showTrim(false)
-        // handle.showUnbreakable(false)
+        item.directEdit {
+            lore = itemLore
+            customModelData = itemCmd
+            showAttributeModifiers(false)
+            showEnchantments(false)
+            showStoredEnchantments(false)
+        }
     }
 }
 
