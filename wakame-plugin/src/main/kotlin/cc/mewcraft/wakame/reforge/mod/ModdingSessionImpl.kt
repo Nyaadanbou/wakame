@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.common.TemporaryIcons
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
@@ -276,7 +275,7 @@ internal object ReforgeResult {
             ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
             ExaminableProperty.of("outputItem", outputItem),
-            ExaminableProperty.of("cost", cost),
+            ExaminableProperty.of("cost", reforgeCost),
         )
 
         override fun toString(): String = toSimpleString()
@@ -289,7 +288,7 @@ internal object ReforgeResult {
             "<gray>没有输出.".mini
         )
         override val outputItem: NekoStack? = null
-        override val cost: ModdingSession.ReforgeCost = ReforgeCost.empty()
+        override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty()
     }
 
     private class Failure(
@@ -299,7 +298,7 @@ internal object ReforgeResult {
         override val isSuccess: Boolean = false
         override val description: List<Component> = description
         override val outputItem: NekoStack? = null
-        override val cost: ModdingSession.ReforgeCost = ReforgeCost.empty()
+        override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty()
     }
 
     private class Success(
@@ -311,7 +310,7 @@ internal object ReforgeResult {
         override val isSuccess: Boolean = true
         override val description: List<Component> = description
         override val outputItem: NekoStack by NekoStackDelegates.copyOnRead(outputItem)
-        override val cost: ModdingSession.ReforgeCost = cost
+        override val reforgeCost: ModdingSession.ReforgeCost = cost
     }
 }
 
@@ -398,15 +397,6 @@ private object ReforgeReplace {
             get() = cell.getId()
         override val rule
             get() = ModdingTable.CellRule.empty()
-        override val display = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
-            val unchangeable = "<red>(不可修改)"
-            editMeta { meta ->
-                // TODO 使用新的渲染器生成文本
-                val name = "${cell.getCore().id.asString()} $unchangeable".mini
-                meta.itemName(name)
-                meta.hideAllFlags()
-            }
-        }
         override val total
             get() = ZERO_MOCHA_FUNCTION // 不可修改的核孔不需要花费 (?)
         override val changeable: Boolean
@@ -447,27 +437,13 @@ private object ReforgeReplace {
     ) : ModdingSession.Replace, KoinComponent {
         override val id: String
             get() = cell.getId()
-
-        override val display: ItemStack = ItemStack(TemporaryIcons.get(id.hashCode())).apply {
-            editMeta { meta ->
-                // TODO 使用新的渲染器生成文本
-                val name = cell.getId().mini
-                val lore = listOf(cell.getCore().id.asString().mini)
-                meta.itemName(name)
-                meta.lore(lore)
-                meta.hideAllFlags()
-            }
-        }
-
-        override val total: MochaFunction = rule.currencyCost.total.compile(session, this)
-
+        override val total: MochaFunction =
+            rule.currencyCost.total.compile(session, this)
         override val changeable: Boolean
             get() = true
-
         override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReforgeReplaceResult.empty()) { _, old, new ->
             session.logger.info("Replace (changeable) result updated: $old -> $new")
         }
-
         override val hasInput: Boolean
             get() = latestResult.ingredient != null
 
@@ -577,9 +553,8 @@ private object ReforgeReplaceResult {
     }
 
     private abstract class Base : ModdingSession.Replace.Result {
-        override fun getPortableCore(): PortableCore? {
-            return ingredient?.components?.get(ItemComponentTypes.PORTABLE_CORE)
-        }
+        override val augment: PortableCore?
+            get() =ingredient?.components?.get(ItemComponentTypes.PORTABLE_CORE)
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("ingredient", ingredient),

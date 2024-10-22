@@ -5,18 +5,22 @@ import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
 val Cell.virtualCore: VirtualCore?
-    get() = getCoreAs(CoreType.VIRTUAL)
+    get() = getCore() as? VirtualCore
 
 /**
  * [VirtualCore] 的标准实现.
  */
-internal data object SimpleVirtualCore : VirtualCore, CoreKind<VirtualCore> {
+internal data object SimpleVirtualCore : VirtualCore {
     override val id: Key = GenericKeys.NOOP
-    override val kind: CoreKind<VirtualCore> = this
+    override val displayName: Component
+        get() = error("Cannot generate display name for virtual core")
+    override val description: List<Component>
+        get() = error("Cannot generate tooltip for virtual core")
 
     override fun similarTo(other: Core): Boolean {
         return other === this
@@ -38,9 +42,12 @@ internal data object SimpleVirtualCore : VirtualCore, CoreKind<VirtualCore> {
 /**
  * [EmptyCore] 的标准实现.
  */
-internal data object SimpleEmptyCore : EmptyCore, CoreKind<EmptyCore> {
+internal data object SimpleEmptyCore : EmptyCore {
     override val id: Key = GenericKeys.EMPTY
-    override val kind: CoreKind<EmptyCore> = this
+    override val displayName: Component
+        get() = error("Cannot generate display name for empty core")
+    override val description: List<Component>
+        get() = error("Cannot generate tooltip for empty core")
 
     override fun similarTo(other: Core): Boolean {
         return other === this

@@ -1,17 +1,21 @@
 package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.examination.ExaminableProperty
+import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.stream.Stream
 
 val Cell.skillCore: SkillCore?
-    get() = getCoreAs(CoreType.SKILL)
+    get() = getCore() as? SkillCore
 
 val Cell.skill: ConfiguredSkill?
     get() = skillCore?.skill
@@ -43,9 +47,7 @@ fun SkillCore(
 fun SkillCore(
     id: Key, tag: CompoundTag,
 ): SkillCore {
-    val skillId = id
-    val configuredSkill = ConfiguredSkill(skillId, tag)
-    return SimpleSkillCore(skillId, configuredSkill)
+    return SimpleSkillCore(id, ConfiguredSkill(id, tag))
 }
 
 /**
@@ -59,9 +61,7 @@ fun SkillCore(
 fun SkillCore(
     id: Key, node: ConfigurationNode,
 ): SkillCore {
-    val skillId = id
-    val configuredSkill = ConfiguredSkill(skillId, node)
-    return SimpleSkillCore(id, configuredSkill)
+    return SimpleSkillCore(id, ConfiguredSkill(id, node))
 }
 
 /**
@@ -71,7 +71,10 @@ internal data class SimpleSkillCore(
     override val id: Key,
     override val skill: ConfiguredSkill,
 ) : SkillCore {
-    override val kind: CoreKind<SkillCore> = Companion
+    override val displayName: Component
+        get() = skill.instance.displays.name.let(MM::deserialize)
+    override val description: List<Component>
+        get() = skill.instance.displays.tooltips.map(MM::deserialize)
 
     override fun similarTo(other: Core): Boolean {
         if (other !is SkillCore)
@@ -97,7 +100,9 @@ internal data class SimpleSkillCore(
         return toSimpleString()
     }
 
-    companion object : CoreKind<SkillCore>
+    companion object Shared {
+        private val MM = Injector.get<MiniMessage>()
+    }
 }
 
 private fun CompoundTag.writeId(id: Key) {

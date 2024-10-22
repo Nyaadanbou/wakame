@@ -25,6 +25,5 @@ primary:
   - special:augment
 
   # 从重铸的上下文获取的数据
-  - reforge:cost
-  - reforge:replace_preview
+  - reforge:reforge_cost
   - reforge:replace_input

@@ -210,7 +210,7 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getCoreAs(CoreType.ATTRIBUTE)
+                val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
                 fun assert(element: Element, expectedMin: Double, expectedMax: Double) {
@@ -237,7 +237,7 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getCoreAs(CoreType.ATTRIBUTE)
+                val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
                 val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
@@ -267,7 +267,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             assertEquals(2, it.size)
             val cell1 = assertNotNull(it.get("foo_1"))
-            val core1 = assertIs<ConstantCompositeAttributeS>(cell1.getCoreAs(CoreType.ATTRIBUTE)?.attribute)
+            val core1 = assertIs<ConstantCompositeAttributeS>((cell1.getCore() as? AttributeCore)?.attribute)
             assertEquals(5.0, core1.value)
             val cell2 = assertNotNull(it.get("foo_2"))
             val core2 = assertIs<EmptyCore>(cell2.getCore())
@@ -342,7 +342,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo")
             assertNotNull(cell)
-            val core = cell.getCoreAs(CoreType.ATTRIBUTE)
+            val core = cell.getCore() as? AttributeCore
             assertNotNull(core)
             assertEquals(Key.key("attribute:attack_damage_rate"), core.id)
         }
@@ -367,7 +367,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo_b")
             assertNotNull(cell)
-            val core = cell.getCoreAs(CoreType.ATTRIBUTE)
+            val core = cell.getCore() as? AttributeCore
             assertNotNull(core)
             assertAny(
                 { assertEquals(Key.key("attribute:critical_strike_chance"), core.id) },

@@ -29,11 +29,6 @@ interface Cell : Examinable, BinarySerializable<CompoundTag> {
     fun getCore(): Core
 
     /**
-     * 尝试返回指定类型的词条栏核心. 如果类型不符则返回 `null`.
-     */
-    fun <T : Core> getCoreAs(type: CoreKind<T>): T?
-
-    /**
      * 设置词条栏的核心.
      *
      * @return 修改过的词条栏对象
@@ -103,14 +98,6 @@ private data class SimpleCell(
 
     override fun getCore(): Core {
         return core
-    }
-
-    override fun <T : Core> getCoreAs(type: CoreKind<T>): T? {
-        if (core.kind === type) {
-            @Suppress("UNCHECKED_CAST")
-            return core as T?
-        }
-        return null
     }
 
     override fun setCore(core: Core): Cell {

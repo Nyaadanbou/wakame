@@ -206,7 +206,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         override fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier> {
             val ret = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
             for ((id, cell) in this) {
-                val core = cell.getCoreAs(CoreType.ATTRIBUTE) ?: continue
+                val core = cell.getCore() as? AttributeCore ?: continue
                 val attribute = core.attribute
                 val sourceId = context.id.value { value -> "$value/${slot.slotIndex}/$id" }
                 val attributeModifiers = attribute.provideAttributeModifiers(sourceId)
@@ -218,7 +218,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         override fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Multimap<Trigger, Skill> {
             val ret = ImmutableListMultimap.builder<Trigger, Skill>()
             for ((_, cell) in this) {
-                val core = cell.getCoreAs(CoreType.SKILL) ?: continue
+                val core = cell.getCore() as? SkillCore ?: continue
                 val skill = core.skill
 
                 val skillVariant = skill.variant

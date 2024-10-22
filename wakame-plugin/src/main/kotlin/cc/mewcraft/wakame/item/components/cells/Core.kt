@@ -6,13 +6,9 @@ import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.item.components.cells.cores.*
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 
-
-/**
- * 代表一个核心的类型. 实现上作为类型标签 (type token).
- */
-interface CoreKind<T : Core>
 
 /**
  * 检查该核心是否为 *virtual*. 设计上 *virtual* 核心不应该出现在游戏中, 仅用于控制物品生成.
@@ -42,9 +38,14 @@ interface Core : Examinable, BinarySerializable<CompoundTag> {
     val id: Key
 
     /**
-     * 核心的类型.
+     * 核心的显示名称, 实现上应该不包含具体数值.
      */
-    val kind: CoreKind<*>
+    val displayName: Component
+
+    /**
+     * 核心的完整描述, 实现上应该包含具体数值和机制说明.
+     */
+    val description: List<Component>
 
     /**
      * 检查该核心是否跟 [other] 相似. 具体结果由实现决定.
@@ -64,18 +65,19 @@ interface Core : Examinable, BinarySerializable<CompoundTag> {
 
 /**
  * [VirtualCore] 代表永远不会被写入物品 NBT 的核心.
- * 这个接口的存在主要是为了能够让 *物品生成* 更加可控.
+ *
+ * 用来引导系统在生成萌芽物品时, 不要把当前词条栏写入物品.
+ * 因此这个核心永远不会出现在游戏内的物品上, 不然就是 BUG.
  */
-interface VirtualCore : Core {
-    override val kind: CoreKind<VirtualCore>
-}
+interface VirtualCore : Core
 
 /**
  * [EmptyCore] 是一个特殊核心, 表示这个核心不存在.
+ *
+ * 当一个词条栏里没有核心时 (但词条栏本身存在), 里面实际上存放了一颗空核心.
+ * 玩家概念上的“词条栏没有核心”, 就是技术概念上的 “词条栏里装的是空核心”.
  */
-interface EmptyCore : Core {
-    override val kind: CoreKind<EmptyCore>
-}
+interface EmptyCore : Core
 
 /**
  * [AttributeCore] 是一个属性核心, 用于表示一个 [ConstantCompositeAttribute].
@@ -85,8 +87,6 @@ interface AttributeCore : Core {
      * 该属性核心的属性种类及其数值.
      */
     val attribute: ConstantCompositeAttribute
-
-    override val kind: CoreKind<AttributeCore>
 }
 
 /**
@@ -97,8 +97,6 @@ interface SkillCore : Core {
      * 该技能核心的技能种类及其变体.
      */
     val skill: ConfiguredSkill
-
-    override val kind: CoreKind<SkillCore>
 }
 
 /**

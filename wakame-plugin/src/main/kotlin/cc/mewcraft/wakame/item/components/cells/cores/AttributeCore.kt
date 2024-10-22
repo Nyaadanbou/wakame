@@ -6,12 +6,13 @@ import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.stream.Stream
 
 val Cell.attributeCore: AttributeCore?
-    get() = getCoreAs(CoreType.ATTRIBUTE)
+    get() = getCore() as? AttributeCore
 
 val Cell.attribute: ConstantCompositeAttribute?
     get() = attributeCore?.attribute
@@ -78,7 +79,10 @@ internal data class SimpleAttributeCore(
     override val id: Key,
     override val attribute: ConstantCompositeAttribute,
 ) : AttributeCore {
-    override val kind: CoreKind<AttributeCore> = Companion
+    override val displayName: Component
+        get() = attribute.displayName
+    override val description: List<Component>
+        get() = attribute.description
 
     /**
      * 检查两个属性核心是否拥有一样的:
@@ -103,14 +107,11 @@ internal data class SimpleAttributeCore(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("type", id.asString()),
-        ExaminableProperty.of("kind", kind),
+        ExaminableProperty.of("id", id.asString()),
         ExaminableProperty.of("attribute", attribute),
     )
 
     override fun toString(): String = toSimpleString()
-
-    companion object : CoreKind<AttributeCore>
 }
 
 private fun CompoundTag.writeId(id: Key) {

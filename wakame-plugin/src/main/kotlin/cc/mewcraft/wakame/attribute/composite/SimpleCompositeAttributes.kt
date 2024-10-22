@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
@@ -58,7 +59,7 @@ val ConstantCompositeAttribute.element: Element?
  * ```
  */
 fun ConstantCompositeAttribute(
-    id: String, tag: CompoundTag
+    id: String, tag: CompoundTag,
 ): ConstantCompositeAttribute {
     return AttributeRegistry.FACADES[id].convertNBT2Constant(tag)
 }
@@ -109,7 +110,7 @@ fun ConstantCompositeAttribute(
  * ```
  */
 fun ConstantCompositeAttribute(
-    id: String, node: ConfigurationNode
+    id: String, node: ConfigurationNode,
 ): ConstantCompositeAttribute {
     return AttributeRegistry.FACADES[id].convertNode2Constant(node)
 }
@@ -118,6 +119,11 @@ fun ConstantCompositeAttribute(
  * 代表一个数值恒定的 [CompositeAttribute].
  */
 sealed class ConstantCompositeAttribute : Examinable, BinarySerializable<CompoundTag>, CompositeAttribute, AttributeModifierSource {
+
+    val displayName: Component
+        get() = AttributeRegistry.FACADES[id].createTooltipName(this)
+    val description: List<Component>
+        get() = AttributeRegistry.FACADES[id].createTooltipLore(this)
 
     /**
      * 检查两个 [ConstantCompositeAttribute] 是否拥有一样的:
@@ -185,7 +191,7 @@ internal data class ConstantCompositeAttributeR(
     override val upper: Double,
 ) : ConstantCompositeAttribute(), CompositeAttributeR<Double> {
     constructor(
-        id: String, compound: CompoundTag
+        id: String, compound: CompoundTag,
     ) : this(
         id,
         compound.readOperation(),
@@ -221,7 +227,7 @@ internal data class ConstantCompositeAttributeSE(
     override val element: Element,
 ) : ConstantCompositeAttribute(), CompositeAttributeSE<Double> {
     constructor(
-        id: String, compound: CompoundTag
+        id: String, compound: CompoundTag,
     ) : this(
         id,
         compound.readOperation(),
@@ -259,7 +265,7 @@ internal data class ConstantCompositeAttributeRE(
     override val element: Element,
 ) : ConstantCompositeAttribute(), CompositeAttributeRE<Double> {
     constructor(
-        id: String, compound: CompoundTag
+        id: String, compound: CompoundTag,
     ) : this(
         id,
         compound.readOperation(),

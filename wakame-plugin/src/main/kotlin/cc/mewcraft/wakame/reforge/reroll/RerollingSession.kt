@@ -32,6 +32,25 @@ interface RerollingSession : Examinable {
     val total: MochaFunction
 
     /**
+     * 需要被重造的物品.
+     *
+     * ### 契约
+     * - 当为 `null` 时, 说明此时玩家还没有放入需要重造的物品.
+     * - 当不为 `null` 时, 说明此时玩家已经放入了需要重造的物品.
+     * - 该物品不一定是合法的可重造物品! 玩家输入什么就是什么.
+     * - 该物品不应该被任何形式修改, 应该完整保存输入时的状态.
+     * - 访问该物品始终会返回一个克隆.
+     *
+     * ### 副作用
+     * 为该物品赋值将自动执行一次完整的重铸流程, 具体如下:
+     * - 如果物品是合法的, [sourceItem] 将不再返回 `null`
+     * - 生成新的 [SelectionMap] 并赋值给 [selectionMap]
+     * - 生成新的 [ReforgeResult] 并赋值给 [latestResult]
+     */
+    @VariableByPlayer
+    var inputItem: ItemStack?
+
+    /**
      * 要被重造的物品; 访问该物品会返回一个克隆.
      *
      * ## 副作用
@@ -91,7 +110,7 @@ interface RerollingSession : Examinable {
         /**
          * `true` 表示重造已准备就绪.
          */
-        val successful: Boolean
+        val isSuccess: Boolean
 
         /**
          * 本次重造的结果的描述.
@@ -99,15 +118,15 @@ interface RerollingSession : Examinable {
         val description: List<Component>
 
         /**
+         * 本次重造的总花费.
+         */
+        val reforgeCost: ReforgeCost
+
+        /**
          * 重造后的物品.
          */
         @get:Contract(" -> new")
-        val item: NekoStack
-
-        /**
-         * 本次重造的总花费.
-         */
-        val cost: ReforgeCost
+        val outputItem: NekoStack
     }
 
     /**

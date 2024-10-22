@@ -26,7 +26,6 @@ import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
@@ -241,10 +240,10 @@ internal data class FuzzyPortableCoreRendererFormat(
     override val textMetaFactory = FuzzyPortableCoreTextMetaFactory(namespace)
 
     fun render(data: PortableCore): IndexedText {
-        val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
+        val core = data.wrapped as? AttributeCore
+            ?: return SimpleIndexedText(unknownIndex, listOf())
         val index = Key.key(namespace, core.attribute.id)
-        val tooltip = AttributeRegistry.FACADES[core.attribute.id].createTooltipLore(core.attribute)
-        return SimpleIndexedText(index, tooltip)
+        return SimpleIndexedText(index, core.description)
     }
 
     override fun computeIndex(data: PortableCore): Key {
@@ -262,15 +261,11 @@ internal data class FuzzyPortableCoreTextMetaFactory(
     override val namespace: String,
 ) : TextMetaFactory {
     override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == SOURCE_INDEX_VALUE
+        return sourceIndex.namespace() == namespace && sourceIndex.value() == "portable_core"
     }
 
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return SingleSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
-    }
-
-    companion object Shared {
-        const val SOURCE_INDEX_VALUE = "portable_core"
     }
 }
 //</editor-fold>

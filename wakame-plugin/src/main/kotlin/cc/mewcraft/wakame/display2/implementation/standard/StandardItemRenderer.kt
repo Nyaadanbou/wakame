@@ -276,9 +276,7 @@ internal data class CellularAttributeRendererFormat(
     override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
 
     fun render(data: ConstantCompositeAttribute): IndexedText {
-        val facade = AttributeRegistry.FACADES[data.id]
-        val tooltip = facade.createTooltipLore(data)
-        return SimpleIndexedText(computeIndex(data), tooltip)
+        return SimpleIndexedText(computeIndex(data), data.description)
     }
 
     /**
@@ -364,9 +362,9 @@ internal data class PortableCoreRendererFormat(
     private val unknownIndex = Key.key(namespace, "unknown")
 
     fun render(data: PortableCore): IndexedText {
-        val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
-        val tooltip = AttributeRegistry.FACADES[core.attribute.id].createTooltipLore(core.attribute)
-        return SimpleIndexedText(index, tooltip)
+        val core = data.wrapped as? AttributeCore
+            ?: return SimpleIndexedText(unknownIndex, listOf())
+        return SimpleIndexedText(index, core.description)
     }
 }
 //</editor-fold>

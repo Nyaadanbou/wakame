@@ -3,8 +3,6 @@
  */
 package cc.mewcraft.wakame.display2.implementation.modding_table
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.*
@@ -19,17 +17,13 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -45,9 +39,6 @@ internal sealed interface ModdingTableContext {
 
     // 输出的物品 (经过定制后的物品)
     data class MainOutputSlot(val session: ModdingSession) : ModdingTableContext
-
-    // 核孔的基本信息
-    data class ReplacePreview(val replace: ModdingSession.Replace) : ModdingTableContext
 
     // 玩家放入的核心
     data class ReplaceInputSlot(val replace: ModdingSession.Replace) : ModdingTableContext
@@ -84,7 +75,6 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         when (context) {
             is ModdingTableContext.MainInputSlot -> process(item, context, collector)
             is ModdingTableContext.MainOutputSlot -> process(item, context, collector)
-            is ModdingTableContext.ReplacePreview -> process(item, context, collector)
             is ModdingTableContext.ReplaceInputSlot -> process(item, context, collector)
         }
 
@@ -110,8 +100,8 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
     private fun process(item: NekoStack, context: ModdingTableContext.MainInputSlot, collector: ReferenceOpenHashSet<IndexedText>) {
         item.components.process(ItemComponentTypes.CELLS) { data ->
             for ((_, cell) in data) when (val core = cell.getCore()) {
-                is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core.attribute, context)
-                is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_IN.process(collector, cell.getId(), core.skill, context)
+                is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
+                is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_IN.process(collector, cell.getId(), core, context)
                 is EmptyCore -> ModdingTableRendererParts.CELLULAR_EMPTY_IN.process(collector, cell.getId(), context)
             }
         }
@@ -120,31 +110,20 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
     private fun process(item: NekoStack, context: ModdingTableContext.MainOutputSlot, collector: ReferenceOpenHashSet<IndexedText>) {
         item.components.process(ItemComponentTypes.CELLS) { data ->
             for ((_, cell) in data) when (val core = cell.getCore()) {
-                is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core.attribute, context)
-                is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_OUT.process(collector, cell.getId(), core.skill, context)
+                is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
+                is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_OUT.process(collector, cell.getId(), core, context)
                 is EmptyCore -> ModdingTableRendererParts.CELLULAR_EMPTY_OUT.process(collector, cell.getId(), context)
             }
         }
 
         // 输出物品需要渲染定制花费
-        ModdingTableRendererParts.COST.process(collector, context)
-    }
-
-    private fun process(item: NekoStack, context: ModdingTableContext.ReplacePreview, collector: ReferenceOpenHashSet<IndexedText>) {
-        val replace = context.replace
-        val cell = replace.cell
-        when (val core = cell.getCore()) {
-            is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_REPLACE_VIEW.process(collector, core.attribute, context)
-            is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_REPLACE_VIEW.process(collector, core.skill, context)
-            is EmptyCore -> ModdingTableRendererParts.CELLULAR_EMPTY_REPLACE_VIEW.process(collector, null, context)
-        }
+        ModdingTableRendererParts.REFORGE_COST.process(collector, context)
     }
 
     private fun process(item: NekoStack, context: ModdingTableContext.ReplaceInputSlot, collector: ReferenceOpenHashSet<IndexedText>) {
         val replace = context.replace
-        val result = replace.latestResult
-        val augment = result.getPortableCore() ?: return
-        ModdingTableRendererParts.AUGMENT.process(collector, augment)
+        val augment = replace.latestResult.augment ?: return
+        ModdingTableRendererParts.REPLACE_IN.process(collector, augment, context)
     }
 }
 
@@ -154,43 +133,23 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
 
 internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRenderer) {
     @JvmField
-    val CELLULAR_ATTRIBUTE_MAIN_IN: RenderingPart3<String, ConstantCompositeAttribute, ModdingTableContext.MainInputSlot, CellularAttributeRendererFormat> = configure3("cells/attributes/in") { id, attribute, inputSlot, format ->
+    val CELLULAR_ATTRIBUTE_MAIN_IN: RenderingPart3<String, AttributeCore, ModdingTableContext.MainInputSlot, CellularAttributeRendererFormat> = configure3("cells/attributes/in") { id, attribute, inputSlot, format ->
         format.render(id, attribute, inputSlot)
     }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE_MAIN_OUT: RenderingPart3<String, ConstantCompositeAttribute, ModdingTableContext.MainOutputSlot, CellularAttributeRendererFormat> = configure3("cells/attributes/out") { id, attribute, outputSlot, format ->
+    val CELLULAR_ATTRIBUTE_MAIN_OUT: RenderingPart3<String, AttributeCore, ModdingTableContext.MainOutputSlot, CellularAttributeRendererFormat> = configure3("cells/attributes/out") { id, attribute, outputSlot, format ->
         format.render(id, attribute, outputSlot)
     }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE_REPLACE_VIEW: RenderingPart2<ConstantCompositeAttribute, ModdingTableContext.ReplacePreview, HardcodedRendererFormat> = configure2("cells/attributes/replace_preview") { attribute, context, format ->
-        TODO()
-    }
-
-    @JvmField
-    val CELLULAR_ATTRIBUTE_REPLACE_IN: RenderingPart2<ConstantCompositeAttribute, ModdingTableContext.ReplaceInputSlot, HardcodedRendererFormat> = configure2("cells/attributes/replace_input") { attribute, context, format ->
-        TODO()
-    }
-
-    @JvmField
-    val CELLULAR_SKILL_IN: RenderingPart3<String, ConfiguredSkill, ModdingTableContext.MainInputSlot, CellularSkillRendererFormat> = configure3("cells/skills/in") { id, skill, inputSlot, format ->
+    val CELLULAR_SKILL_IN: RenderingPart3<String, SkillCore, ModdingTableContext.MainInputSlot, CellularSkillRendererFormat> = configure3("cells/skills/in") { id, skill, inputSlot, format ->
         format.render(id, skill, inputSlot)
     }
 
     @JvmField
-    val CELLULAR_SKILL_OUT: RenderingPart3<String, ConfiguredSkill, ModdingTableContext.MainOutputSlot, CellularSkillRendererFormat> = configure3("cells/skills/out") { id, skill, outputSlot, format ->
+    val CELLULAR_SKILL_OUT: RenderingPart3<String, SkillCore, ModdingTableContext.MainOutputSlot, CellularSkillRendererFormat> = configure3("cells/skills/out") { id, skill, outputSlot, format ->
         format.render(id, skill, outputSlot)
-    }
-
-    @JvmField
-    val CELLULAR_SKILL_REPLACE_VIEW: RenderingPart2<ConfiguredSkill, ModdingTableContext.ReplacePreview, HardcodedRendererFormat> = configure2("cells/skills/replace_preview") { skill, context, format ->
-        TODO()
-    }
-
-    @JvmField
-    val CELLULAR_SKILL_REPLACE_IN: RenderingPart2<ConfiguredSkill, ModdingTableContext.ReplaceInputSlot, HardcodedRendererFormat> = configure2("cells/skills/replace_input") { skill, context, format ->
-        TODO()
     }
 
     @JvmField
@@ -201,21 +160,6 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
     @JvmField
     val CELLULAR_EMPTY_OUT: RenderingPart2<String, ModdingTableContext.MainOutputSlot, CellularEmptyRendererFormat> = configure2("cells/empty/out") { id, outputSlot, format ->
         format.render(id, outputSlot)
-    }
-
-    @JvmField
-    val CELLULAR_EMPTY_REPLACE_VIEW: RenderingPart2<Nothing?, ModdingTableContext.ReplacePreview, HardcodedRendererFormat> = configure2("cells/empty/replace_preview") { _, context, format ->
-        TODO()
-    }
-
-    @JvmField
-    val CELLULAR_EMPTY_REPLACE_IN: RenderingPart2<Nothing?, ModdingTableContext.ReplaceInputSlot, HardcodedRendererFormat> = configure2("cells/empty/replace_input") { _, context, format ->
-        TODO()
-    }
-
-    @JvmField
-    val COST: RenderingPart<ModdingTableContext.MainOutputSlot, HardcodedRendererFormat> = configure("cost") { context, format ->
-        SimpleIndexedText(format.index, context.session.latestResult.cost.description.removeItalic)
     }
 
     @JvmField
@@ -238,14 +182,24 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
         format.render(Placeholder.component("value", Component.text(data.level)))
     }
 
-    @JvmField
-    val AUGMENT: RenderingPart<PortableCore, AugmentRendererFormat> = configure("augment") { data, format ->
-        format.render(data)
-    }
+    // @JvmField
+    // val AUGMENT: RenderingPart<PortableCore, AugmentRendererFormat> = configure("augment") { data, format ->
+    //     format.render(data)
+    // }
 
     @JvmField
     val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = configure("rarity") { data, format ->
         format.render(Placeholder.component("value", data.rarity.displayName))
+    }
+
+    @JvmField
+    val REFORGE_COST: RenderingPart<ModdingTableContext.MainOutputSlot, HardcodedRendererFormat> = configure("reforge_cost") { context, format ->
+        SimpleIndexedText(format.index, context.session.latestResult.reforgeCost.description.removeItalic)
+    }
+
+    @JvmField
+    val REPLACE_IN: RenderingPart2<PortableCore, ModdingTableContext.ReplaceInputSlot, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
+        SimpleIndexedText(format.index, core.description)
     }
 }
 
@@ -253,61 +207,76 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
 //////
 
 
+private fun renderMainInputSlot(text: List<Component>, replace: ModdingSession.Replace): List<Component> {
+    var result = text
+
+    // 核孔不可修改, 渲染成深色
+    if (!replace.changeable) {
+        result = result.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
+    }
+
+    // 核孔存在修改, 渲染成删除线
+    if (replace.hasInput) {
+        result = result.map { it.decorate(TextDecoration.STRIKETHROUGH) }
+    }
+
+    return result
+}
+
+private fun renderMainOutputSlot(text: List<Component>, replace: ModdingSession.Replace): List<Component> {
+    var result = text
+
+    // 不可修改 或 没有输入, 则将属性的颜色变为灰色
+    if (!replace.changeable || !replace.hasInput) {
+        result = result.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
+    }
+
+    return result
+}
+
 @ConfigSerializable
 internal data class CellularAttributeRendererFormat(
     @Setting @Required
     override val namespace: String,
     @Setting @Required
     private val ordinal: Ordinal,
-) : RendererFormat.Dynamic<ConstantCompositeAttribute> {
+) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
 
     /**
      * @param id 核孔的 id
      */
-    fun render(id: String, attribute: ConstantCompositeAttribute, context: ModdingTableContext.MainInputSlot): IndexedText {
-        val facade = AttributeRegistry.FACADES[attribute.id]
-        var tooltip = facade.createTooltipLore(attribute)
+    fun render(id: String, core: AttributeCore, context: ModdingTableContext.MainInputSlot): IndexedText {
         val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
 
-        // 核孔不可修改, 渲染成深色
-        if (!replace.changeable) {
-            tooltip = tooltip.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
-        }
+        val original = core.description
+        val processed = renderMainInputSlot(original, replace)
 
-        // 核孔存在修改, 渲染成删除线
-        if (replace.hasInput) {
-            tooltip = tooltip.map { it.decorate(TextDecoration.STRIKETHROUGH) }
-        }
-
-        return SimpleIndexedText(computeIndex(attribute), tooltip)
+        return SimpleIndexedText(computeIndex(core), processed)
     }
 
     /**
      * @param id 核孔的 id
      */
-    fun render(id: String, attribute: ConstantCompositeAttribute, context: ModdingTableContext.MainOutputSlot): IndexedText {
-        val facade = AttributeRegistry.FACADES[attribute.id]
-        var tooltip = facade.createTooltipLore(attribute)
+    fun render(id: String, core: AttributeCore, context: ModdingTableContext.MainOutputSlot): IndexedText {
         val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
 
-        // 不可修改 或 没有输入, 则将属性的颜色变为灰色
-        if (!replace.changeable || !replace.hasInput) {
-            tooltip = tooltip.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
-        }
+        val original = core.description
+        val processed = renderMainOutputSlot(original, replace)
 
-        return SimpleIndexedText(computeIndex(attribute), tooltip)
+        return SimpleIndexedText(computeIndex(core), processed)
     }
 
     /**
      * 实现要求: 返回值必须是 [AttributeCoreTextMeta.derivedIndexes] 的子集.
      */
-    override fun computeIndex(data: ConstantCompositeAttribute): Key {
+    override fun computeIndex(data: AttributeCore): Key {
+        val attribute = data.attribute
         val indexId = buildString {
-            append(data.id)
+            append(attribute.id)
             append('.')
-            append(data.operation.key)
-            data.element?.let {
+            append(attribute.operation.key)
+            attribute.element?.let {
                 append('.')
                 append(it.uniqueId)
             }
@@ -328,31 +297,32 @@ internal data class CellularAttributeRendererFormat(
 internal data class CellularSkillRendererFormat(
     @Setting @Required
     override val namespace: String,
-) : RendererFormat.Dynamic<ConfiguredSkill> {
+) : RendererFormat.Dynamic<SkillCore> {
     override val textMetaFactory = SkillCoreTextMetaFactory(namespace)
 
-    // FIXME 不完整实现, 有需要再补充
+    fun render(id: String, core: SkillCore, context: ModdingTableContext.MainInputSlot): IndexedText {
+        val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
 
-    fun render(id: String, data: ConfiguredSkill, context: ModdingTableContext.MainInputSlot): IndexedText {
-        val instance = data.instance
-        val tooltip = instance.displays.tooltips.map(MM::deserialize)
-        return SimpleIndexedText(computeIndex(data), tooltip)
+        val original = core.description
+        val processed = renderMainInputSlot(original, replace)
+
+        return SimpleIndexedText(computeIndex(core), processed)
     }
 
-    fun render(id: String, data: ConfiguredSkill, context: ModdingTableContext.MainOutputSlot): IndexedText {
-        val instance = data.instance
-        val tooltip = instance.displays.tooltips.map(MM::deserialize)
-        return SimpleIndexedText(computeIndex(data), tooltip)
+    fun render(id: String, core: SkillCore, context: ModdingTableContext.MainOutputSlot): IndexedText {
+        val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
+
+        val original = core.description
+        val processed = renderMainOutputSlot(original, replace)
+
+        return SimpleIndexedText(computeIndex(core), processed)
     }
 
-    override fun computeIndex(data: ConfiguredSkill): Key {
-        val dataId = data.id
+    override fun computeIndex(data: SkillCore): Key {
+        val skill = data.skill
+        val dataId = skill.id
         val indexId = dataId.namespace() + "/" + dataId.value()
         return Key.key(namespace, indexId)
-    }
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
     }
 }
 
@@ -376,67 +346,52 @@ internal data class CellularEmptyRendererFormat(
     fun render(id: String, context: ModdingTableContext.MainInputSlot): IndexedText {
         val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
 
-        val ret = tooltipCycle.next()
-        var text = ret.text
+        val original = tooltipCycle.next()
+        val processed = renderMainInputSlot(original.text, replace)
 
-        // 核孔不可修改, 渲染成深色
-        if (!replace.changeable) {
-            text = text.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
-        }
-
-        // 核孔存在修改, 渲染成删除线
-        if (replace.hasInput) {
-            text = text.map { it.decorate(TextDecoration.STRIKETHROUGH) }
-        }
-
-        return ret.copy(text = text)
+        return original.copy(text = processed)
     }
 
     fun render(id: String, context: ModdingTableContext.MainOutputSlot): IndexedText {
         val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
 
-        val ret = tooltipCycle.next()
-        var text = ret.text
+        val original = tooltipCycle.next()
+        val processed = renderMainOutputSlot(original.text, replace)
 
-        // 不可修改 或 没有输入, 则将属性的颜色变为灰色
-        if (!replace.changeable || !replace.hasInput) {
-            text = text.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
-        }
-
-        return ret.copy(text = text)
+        return original.copy(text = processed)
     }
 }
 
-@ConfigSerializable
-internal data class AugmentRendererFormat(
-    @Setting @Required
-    override val namespace: String,
-) : RendererFormat.Simple {
-    override val id = "augment"
-    override val index = createIndex()
-    override val textMetaFactory = AugmentTextMetaFactory(namespace)
-
-    private val unknownIndex = Key.key(namespace, "unknown")
-
-    fun render(data: PortableCore): IndexedText {
-        val core = data.wrapped as? AttributeCore ?: return SimpleIndexedText(unknownIndex, listOf())
-        val tooltip = AttributeRegistry.FACADES[core.attribute.id].createTooltipLore(core.attribute)
-        return SimpleIndexedText(index, tooltip)
-    }
-}
+// @ConfigSerializable
+// internal data class AugmentRendererFormat(
+//     @Setting @Required
+//     override val namespace: String,
+// ) : RendererFormat.Simple {
+//     override val id = "augment"
+//     override val index = createIndex()
+//     override val textMetaFactory = AugmentTextMetaFactory(namespace)
+//
+//     private val unknownIndex = Key.key(namespace, "unknown")
+//
+//     fun render(data: PortableCore): IndexedText {
+//         val core = data.wrapped as? AttributeCore
+//             ?: return SimpleIndexedText(unknownIndex, listOf())
+//         return SimpleIndexedText(index, core.description)
+//     }
+// }
 
 
 //////
 
 
-internal data class AugmentTextMetaFactory(
-    override val namespace: String,
-) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == "augment"
-    }
-
-    override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        return SingleSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
-    }
-}
+// internal data class AugmentTextMetaFactory(
+//     override val namespace: String,
+// ) : TextMetaFactory {
+//     override fun test(sourceIndex: SourceIndex): Boolean {
+//         return sourceIndex.namespace() == namespace && sourceIndex.value() == "augment"
+//     }
+//
+//     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
+//         return SingleSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
+//     }
+// }

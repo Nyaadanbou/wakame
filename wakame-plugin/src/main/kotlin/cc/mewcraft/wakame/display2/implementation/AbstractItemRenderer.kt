@@ -94,8 +94,8 @@ internal abstract class RenderingParts(
     fun bootstrap() = Unit
 
     /**
-     * @param id 用来定位配置文件中的节点
-     * @param block 将数据渲染成文本的逻辑
+     * @param id 用来定位配置文件中的节点, 必须唯一
+     * @param block 将数据渲染成 [IndexedText] 的逻辑
      */
     protected inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): RenderingPart<T, F> {
         return provideParams<F>(id).let { params -> RenderingPart(params.show, params.format, block) }

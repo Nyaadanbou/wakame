@@ -181,6 +181,11 @@ interface ModdingSession : Examinable {
         val description: List<Component>
 
         /**
+         * 本次定制所消耗的资源.
+         */
+        val reforgeCost: ReforgeCost
+
+        /**
          * 本次定制输出的物品, 也就是被定制后的物品.
          *
          * 该属性在以下情况下为 `null`:
@@ -189,11 +194,6 @@ interface ModdingSession : Examinable {
          */
         @get:Contract(" -> new")
         val outputItem: NekoStack?
-
-        /**
-         * 本次定制所消耗的资源.
-         */
-        val cost: ReforgeCost
     }
 
     /**
@@ -233,11 +233,6 @@ interface ModdingSession : Examinable {
          */
         val rule: ModdingTable.CellRule
 
-        /**
-         * 被定制的核孔在菜单中的图标, 用于告诉玩家这个核孔是什么.
-         */
-        val display: ItemStack
-
         // 开发日记 2024/8/17
         // 当一个 Replace 实例被创建时, 其对应的 cell & rule & session 也都确定了.
         // 因此, 我们可以在这个时候就编译这个核孔的定制花费, 并且将其缓存起来.
@@ -255,7 +250,7 @@ interface ModdingSession : Examinable {
         /**
          * 储存了当前最新的定制结果.
          *
-         * 当函数 [Replace.executeReplace] 被调用后, 该属性将被重新赋值.
+         * 当函数 [executeReplace] 被调用后, 该属性将被重新赋值.
          */
         @VariableByPlayer
         val latestResult: Result
@@ -270,7 +265,7 @@ interface ModdingSession : Examinable {
          * 尝试将耗材 [ingredient] 应用到这个核孔上.
          *
          * ### 副作用
-         * 该函数还会将其返回值赋值到属性 [Replace.latestResult].
+         * 该函数还会将其返回值赋值到属性 [latestResult].
          *
          * @return 一个新的结果
          */
@@ -304,9 +299,10 @@ interface ModdingSession : Examinable {
             val ingredient: NekoStack?
 
             /**
-             * 获取 [Result.ingredient] 中包含的便携核心.
+             * 方便函数.
+             * 获取 [ingredient] 中包含的便携核心.
              */
-            fun getPortableCore(): PortableCore?
+            val augment: PortableCore?
 
             /**
              * [ingredient] 是否可以应用在核孔上.
@@ -314,7 +310,7 @@ interface ModdingSession : Examinable {
             val applicable: Boolean
 
             /**
-             * 本定制结果的文字描述, 用于展示给玩家.
+             * 本定制结果的文字描述, 将展示给玩家.
              */
             val description: List<Component>
         }

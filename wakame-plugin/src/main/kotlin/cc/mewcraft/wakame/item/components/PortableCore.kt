@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreFactory
 import cc.mewcraft.wakame.util.getCompoundOrNull
+import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 
 data class PortableCore(
@@ -19,6 +20,22 @@ data class PortableCore(
      */
     val penalty: Int,
 ) : PortableObject<Core>, Examinable {
+    /**
+     * 方便函数.
+     *
+     * @see Core.displayName
+     */
+    val displayName: Component
+        get() = wrapped.displayName
+
+    /**
+     * 方便函数.
+     *
+     * @see Core.description
+     */
+    val description: List<Component>
+        get() = wrapped.description
+
     companion object : ItemComponentBridge<PortableCore> {
         /**
          * 该组件的配置文件.

@@ -270,7 +270,7 @@ internal class ModdingMenu(
                     }
 
                     // 从玩家身上拿走需要的资源
-                    reforgeResult.cost.take(viewer)
+                    reforgeResult.reforgeCost.take(viewer)
 
                     // 把所有输出的物品给予玩家
                     viewer.inventory.addItem(*session.getFinalOutputs())

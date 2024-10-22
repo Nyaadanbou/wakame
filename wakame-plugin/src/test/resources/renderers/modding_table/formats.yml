@@ -1,9 +1,5 @@
 # 在这里设置定制台的物品 *渲染内容*.
 
-# id: `augment`
-augment:
-  namespace: special
-
 # id: <有效的属性 id>
 cells/attributes/in:
   namespace: attribute
@@ -36,14 +32,6 @@ cells/attributes/out:
       - multiply_base
       - multiply_total
 
-# id: `replace_input`
-cells/attributes/replace_input:
-  namespace: reforge
-
-# id: `replace_preview`
-cells/attributes/replace_preview:
-  namespace: reforge
-
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
 cells/skills/in:
   namespace: skill
@@ -51,14 +39,6 @@ cells/skills/in:
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
 cells/skills/out:
   namespace: skill
-
-# id: `replace_input`
-cells/skills/replace_input:
-  namespace: reforge
-
-# id: `replace_preview`
-cells/skills/replace_preview:
-  namespace: reforge
 
 # id: `cells/empty`
 cells/empty/in:
@@ -69,17 +49,6 @@ cells/empty/in:
 cells/empty/out:
   namespace: stash
   tooltip: "[ 空核孔 ]"
-
-# id: `replace_input`
-cells/empty/replace_input:
-  namespace: reforge
-
-# id: `replace_preview`
-cells/empty/replace_preview:
-  namespace: reforge
-
-cost:
-  namespace: reforge
 
 # id: `custom_name`
 custom_name:
@@ -119,3 +88,11 @@ rarity:
   # 可用标签
   # <value> 稀有度的名字
   tooltip: "稀有度: <value>"
+
+# id: `reforge_cost`
+reforge_cost:
+  namespace: reforge
+
+# id: `replace_input`
+replace_input:
+  namespace: reforge

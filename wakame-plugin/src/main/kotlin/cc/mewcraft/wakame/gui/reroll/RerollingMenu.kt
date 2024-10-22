@@ -178,7 +178,7 @@ internal class RerollingMenu(
 
                 // 首先获得当前的重造结果
                 val result = session.latestResult
-                if (!result.successful) {
+                if (!result.isSuccess) {
                     return
                 }
 
@@ -187,12 +187,12 @@ internal class RerollingMenu(
                 updateOutput()
 
                 // 判断玩家是否有足够的资源
-                if (!result.cost.test(viewer)) {
+                if (!result.reforgeCost.test(viewer)) {
                     return
                 }
 
                 // 把重造后的源物品给玩家
-                viewer.inventory.addItem(result.item.itemStack) // TODO getFinalOutputs
+                viewer.inventory.addItem(result.outputItem.itemStack) // TODO getFinalOutputs
 
                 // 重置会话状态
                 session.reset()
@@ -249,12 +249,12 @@ internal class RerollingMenu(
 
         val viewer = session.viewer
         val result = session.latestResult
-        val item = result.item // deep clone
+        val item = result.outputItem // deep clone
 
-        if (result.successful) {
+        if (result.isSuccess) {
             // 如果可以重造:
 
-            if (!result.cost.test(viewer)) {
+            if (!result.reforgeCost.test(viewer)) {
                 // 如果玩家没有足够的资源:
 
                 val ret = ItemStack(Material.BARRIER)
@@ -262,7 +262,7 @@ internal class RerollingMenu(
                     val name = "<white>结果: <red>资源不足".mini
                     val lore = buildList {
                         addAll(result.description)
-                        addAll(result.cost.description)
+                        addAll(result.reforgeCost.description)
                     }
 
                     meta.itemName(name)
@@ -282,7 +282,7 @@ internal class RerollingMenu(
                 val name = "<white>结果: <green>就绪".mini
                 val lore = buildList {
                     addAll(result.description)
-                    addAll(result.cost.description)
+                    addAll(result.reforgeCost.description)
                     add(empty())
                     add("<gray>点击确认重造".mini)
                 }

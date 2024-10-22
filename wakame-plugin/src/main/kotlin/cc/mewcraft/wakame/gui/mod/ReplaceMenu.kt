@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.gui.mod
 
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
@@ -78,17 +81,17 @@ private constructor(
 
             // 玩家尝试向 inputSlot 中添加物品:
             event.isAdd -> {
-                val ns = newItem?.tryNekoStack ?: run {
+                val addedNekoStack = newItem?.tryNekoStack ?: run {
                     viewer.sendMessage(MESSAGE_CANCELLED)
                     event.isCancelled = true
                     return
                 }
 
-                // 执行一次替换流程, 并获取其结果
-                val replaceResult = replace.executeReplace(ns)
+                // 执行一次替换流程
+                replace.executeReplace(addedNekoStack)
 
                 // 重新渲染放入的物品
-                event.newItem = renderOutputSlot(replaceResult)
+                event.newItem = renderInputSlot(replace)
 
                 // 执行一次定制流程
                 parent.executeReforge()
@@ -137,20 +140,20 @@ private constructor(
         inputSlot.setItem(UpdateReason.SUPPRESSED, 0, item)
     }
 
-    private fun renderOutputSlot(result: ModdingSession.Replace.Result): ItemStack {
-        val ingredient = result.ingredient
-        val rendered: ItemStack
+    private fun renderInputSlot(replace: ModdingSession.Replace): ItemStack {
+        val replaceResult = replace.latestResult
+        val ingredient = replaceResult.ingredient
 
-        val clickToWithdraw = "<gray>点击取回核心".mini.removeItalic
+        val clickToWithdraw = "<gray>点击取回核心".mini
 
-        if (result.applicable) {
+        if (replaceResult.applicable) {
             // 耗材可用于定制
 
             if (ingredient == null) {
                 // 出现内部错误
 
-                rendered = ItemStack(Material.BARRIER).edit {
-                    itemName = "<white>结果: <red>内部错误".mini.removeItalic
+                return ItemStack.of(Material.BARRIER).edit {
+                    itemName = "<white>结果: <red>内部错误".mini
                     lore = listOf(
                         Component.empty(),
                         clickToWithdraw
@@ -159,13 +162,15 @@ private constructor(
             } else {
                 // 正常情况
 
-                // FIXME NekoStackDisplay 急急急
-                ingredient.erase()
-                rendered = ingredient.itemStack.edit {
-                    itemName = "<white>结果: <green>就绪".mini.removeItalic
+                // 重新渲染耗材
+                ItemRenderers.MODDING_TABLE.render(ingredient, ModdingTableContext.ReplaceInputSlot(replace))
+
+                // 加入其他信息
+                return ingredient.itemStack.edit {
+                    customName = null // 玩家可能改了名, 所以清除一下
+                    itemName = "<white>结果: <green>就绪".mini
                     lore = buildList {
-                        // TODO 使用新的渲染器生成文本
-                        result.getPortableCore()?.wrapped?.id?.asString()?.mini?.let(::add)
+                        lore?.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }?.let(::addAll)
                         add(Component.empty())
                         add(clickToWithdraw)
                     }.removeItalic
@@ -174,24 +179,37 @@ private constructor(
         } else {
             // 耗材不可用于定制
 
-            rendered = ItemStack(Material.BARRIER).edit {
-                itemName = "<white>结果: <red>无效".mini.removeItalic
+            return ItemStack.of(Material.BARRIER).edit {
+                itemName = "<white>结果: <red>无效".mini
                 lore = buildList {
-                    addAll(result.description)
+                    addAll(replaceResult.description)
                     add(Component.empty())
                     add(clickToWithdraw)
                 }.removeItalic
             }
         }
-
-        return rendered
     }
 
     private class ViewItem(
         val replace: ModdingSession.Replace,
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            return ItemWrapper(replace.display)
+            val core = replace.cell.getCore()
+            val changeable = replace.changeable
+            val coreIcon = CoreIcons.get(core)
+            val itemStack = coreIcon.edit {
+                itemName =
+                    if (changeable) {
+                        core.displayName
+                    } else {
+                        core.displayName.append(
+                            text { content(" (不可修改)"); color(NamedTextColor.RED) }
+                        )
+                    }
+                lore = core.description
+            }
+
+            return ItemWrapper(itemStack)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

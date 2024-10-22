@@ -74,6 +74,10 @@ private constructor(
         // thread-safe object pool
         private val nekoItemHolderObjectPool: ConcurrentHashMap<Key, NekoItemHolder> = ConcurrentHashMap()
 
+        fun getDefault(): NekoItemHolder {
+            return get(ItemRegistry.ERROR_NEKO_ITEM_ID)
+        }
+
         /**
          * 获取一个持有指定 [NekoItem] 的容器.
          *

@@ -7,8 +7,8 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
 import cc.mewcraft.wakame.random3.Group
+import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.common.TemporaryIcons
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
@@ -34,6 +34,10 @@ internal class SimpleRerollingSession(
     val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
     override val total: MochaFunction = table.currencyCost.compile(this)
+
+    override var inputItem: ItemStack?
+        get() = TODO("Not yet implemented")
+        set(value) {}
 
     override var sourceItem: NekoStack? by SourceItemDelegate(sourceItem)
 
@@ -151,27 +155,27 @@ internal object ReforgeResult {
 
     private abstract class Base : RerollingSession.ReforgeResult {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("successful", successful),
+            ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("item", item),
-            ExaminableProperty.of("cost", cost),
+            ExaminableProperty.of("item", outputItem),
+            ExaminableProperty.of("cost", reforgeCost),
         )
 
         override fun toString(): String = toSimpleString()
     }
 
     private class Empty : Base() {
-        override val successful: Boolean = false
+        override val isSuccess: Boolean = false
         override val description: List<Component> = listOf(Component.text("<gray>没有输入."))
-        override val item: NekoStack = NekoStack.empty()
-        override val cost: RerollingSession.ReforgeCost = ReforgeCost.empty()
+        override val outputItem: NekoStack = NekoStack.empty()
+        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty()
     }
 
     private class Error : Base() {
-        override val successful: Boolean = false
+        override val isSuccess: Boolean = false
         override val description: List<Component> = listOf(Component.text("<red>内部错误."))
-        override val item: NekoStack = NekoStack.empty()
-        override val cost: RerollingSession.ReforgeCost = ReforgeCost.error()
+        override val outputItem: NekoStack = NekoStack.empty()
+        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error()
     }
 
     private class Simple(
@@ -188,16 +192,16 @@ internal object ReforgeResult {
             cost: RerollingSession.ReforgeCost,
         ) : this(successful, listOf(description), item, cost)
 
-        override val successful: Boolean = successful
+        override val isSuccess: Boolean = successful
         override val description: List<Component> = description
-        override val item: NekoStack by NekoStackDelegates.copyOnRead(item)
-        override val cost: RerollingSession.ReforgeCost = cost
+        override val outputItem: NekoStack by NekoStackDelegates.copyOnRead(item)
+        override val reforgeCost: RerollingSession.ReforgeCost = cost
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("successful", successful),
+            ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("cost", cost),
-            ExaminableProperty.of("item", item),
+            ExaminableProperty.of("cost", reforgeCost),
+            ExaminableProperty.of("item", outputItem),
         )
 
         override fun toString(): String = toSimpleString()
@@ -392,7 +396,7 @@ internal object SelectionMap : KoinComponent {
             // 这个词条栏没有对应的模板, 则判定该词条栏不支持重造
             val template = templates[id]?.core ?: continue
 
-            val display = ItemStack(TemporaryIcons.get(cell.hashCode()))
+            val display = ItemStack(CoreIcons.get(cell.hashCode()))
             display.editMeta {
                 // TODO reforge2
                 val name = cell.getId().mini
