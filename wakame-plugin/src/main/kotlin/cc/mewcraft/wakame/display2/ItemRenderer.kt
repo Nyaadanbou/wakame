@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableItem
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableItemRenderer
 import cc.mewcraft.wakame.display2.implementation.recycling_station.RecyclingStationItemRenderer
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableItemRenderer
+import cc.mewcraft.wakame.display2.implementation.simple.SimpleItemRenderer
 import cc.mewcraft.wakame.display2.implementation.standard.StandardItemRenderer
 import java.nio.file.Path
 
@@ -12,6 +13,9 @@ import java.nio.file.Path
  * 所有的 [ItemRenderers] 实例.
  */
 internal object ItemRenderers {
+    @JvmField
+    val SIMPLE = SimpleItemRenderer
+
     @JvmField // 省去无用的函数调用
     val STANDARD = StandardItemRenderer
 
