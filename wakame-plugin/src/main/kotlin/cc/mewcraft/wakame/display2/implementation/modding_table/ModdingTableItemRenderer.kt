@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -83,18 +84,11 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
 
         item.erase()
 
-        val handle = item.unsafe.handle
-        handle.lore0 = itemLore
-        handle.customModelData0 = itemCmd
-        handle.showAttributeModifiers(false)
-        handle.showCanBreak(false)
-        handle.showCanPlaceOn(false)
-        handle.showDyedColor(false)
-        handle.showEnchantments(false)
-        handle.showJukeboxPlayable(false)
-        handle.showStoredEnchantments(false)
-        handle.showTrim(false)
-        handle.showUnbreakable(false)
+        item.directEdit {
+            lore = itemLore
+            customModelData = itemCmd
+            showNothing()
+        }
     }
 
     private fun process(item: NekoStack, context: ModdingTableContext.MainInputSlot, collector: ReferenceOpenHashSet<IndexedText>) {
@@ -210,12 +204,12 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
 private fun renderMainInputSlot(text: List<Component>, replace: ModdingSession.Replace): List<Component> {
     var result = text
 
-    // 核孔不可修改, 渲染成深色
+    // 核孔不可修改, 渲染成深灰色
     if (!replace.changeable) {
         result = result.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
     }
 
-    // 核孔存在修改, 渲染成删除线
+    // 核孔存在修改, 渲染成深灰色+删除线
     if (replace.hasInput) {
         result = result.map { it.decorate(TextDecoration.STRIKETHROUGH) }
     }
@@ -226,7 +220,7 @@ private fun renderMainInputSlot(text: List<Component>, replace: ModdingSession.R
 private fun renderMainOutputSlot(text: List<Component>, replace: ModdingSession.Replace): List<Component> {
     var result = text
 
-    // 不可修改 或 没有输入, 则将属性的颜色变为灰色
+    // 不可修改 或 没有输入, 则将属性的颜色变为深灰色
     if (!replace.changeable || !replace.hasInput) {
         result = result.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
     }

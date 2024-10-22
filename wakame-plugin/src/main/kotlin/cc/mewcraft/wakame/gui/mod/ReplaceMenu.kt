@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.*
@@ -81,7 +81,7 @@ private constructor(
 
             // 玩家尝试向 inputSlot 中添加物品:
             event.isAdd -> {
-                val addedNekoStack = newItem?.tryNekoStack ?: run {
+                val addedNekoStack = newItem?.takeIf { it.isCustomNeko }?.tryNekoStack ?: run {
                     viewer.sendMessage(MESSAGE_CANCELLED)
                     event.isCancelled = true
                     return
@@ -141,45 +141,42 @@ private constructor(
     }
 
     private fun renderInputSlot(replace: ModdingSession.Replace): ItemStack {
+        val clickToWithdraw = "<gray>点击取回核心".mini
+
         val replaceResult = replace.latestResult
         val ingredient = replaceResult.ingredient
+        if (ingredient == null) {
+            return ItemStack.of(Material.BARRIER).edit {
+                itemName = "<white>结果: <red>内部错误".mini
+                lore = listOf(
+                    Component.empty(),
+                    clickToWithdraw
+                ).removeItalic
+            }
+        }
 
-        val clickToWithdraw = "<gray>点击取回核心".mini
+        // 重新渲染耗材
+        ItemRenderers.MODDING_TABLE.render(ingredient, ModdingTableContext.ReplaceInputSlot(replace))
 
         if (replaceResult.applicable) {
             // 耗材可用于定制
 
-            if (ingredient == null) {
-                // 出现内部错误
-
-                return ItemStack.of(Material.BARRIER).edit {
-                    itemName = "<white>结果: <red>内部错误".mini
-                    lore = listOf(
-                        Component.empty(),
-                        clickToWithdraw
-                    ).removeItalic
-                }
-            } else {
-                // 正常情况
-
-                // 重新渲染耗材
-                ItemRenderers.MODDING_TABLE.render(ingredient, ModdingTableContext.ReplaceInputSlot(replace))
-
-                // 加入其他信息
-                return ingredient.itemStack.edit {
-                    customName = null // 玩家可能改了名, 所以清除一下
-                    itemName = "<white>结果: <green>就绪".mini
-                    lore = buildList {
-                        lore?.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }?.let(::addAll)
-                        add(Component.empty())
-                        add(clickToWithdraw)
-                    }.removeItalic
-                }
+            ingredient.directEdit {
+                customName = null // 玩家可能改了名, 所以清除一下
+                itemName = "<white>结果: <green>就绪".mini
+                lore = buildList {
+                    lore?.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }?.let(::addAll)
+                    add(Component.empty())
+                    add(clickToWithdraw)
+                }.removeItalic
             }
+
+            return ingredient.itemStack
+
         } else {
             // 耗材不可用于定制
 
-            return ItemStack.of(Material.BARRIER).edit {
+            ingredient.directEdit {
                 itemName = "<white>结果: <red>无效".mini
                 lore = buildList {
                     addAll(replaceResult.description)
@@ -187,6 +184,8 @@ private constructor(
                     add(clickToWithdraw)
                 }.removeItalic
             }
+
+            return ingredient.itemStack
         }
     }
 
