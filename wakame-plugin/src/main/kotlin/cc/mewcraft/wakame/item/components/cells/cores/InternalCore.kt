@@ -2,6 +2,10 @@ package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
+import cc.mewcraft.wakame.config.derive
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.item.ItemConstants
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -12,15 +16,18 @@ import java.util.stream.Stream
 val Cell.virtualCore: VirtualCore?
     get() = getCore() as? VirtualCore
 
+val Cell.emptyCore: EmptyCore?
+    get() = getCore() as? EmptyCore
+
 /**
  * [VirtualCore] 的标准实现.
  */
 internal data object SimpleVirtualCore : VirtualCore {
+    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).root.derive("virtual_core")
+
     override val id: Key = GenericKeys.NOOP
-    override val displayName: Component
-        get() = error("Cannot generate display name for virtual core")
-    override val description: List<Component>
-        get() = error("Cannot generate tooltip for virtual core")
+    override val displayName: Component by config.entry<Component>("display_name")
+    override val description: List<Component> by config.entry<List<Component>>("description")
 
     override fun similarTo(other: Core): Boolean {
         return other === this
@@ -43,11 +50,11 @@ internal data object SimpleVirtualCore : VirtualCore {
  * [EmptyCore] 的标准实现.
  */
 internal data object SimpleEmptyCore : EmptyCore {
+    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).root.derive("empty_core")
+
     override val id: Key = GenericKeys.EMPTY
-    override val displayName: Component
-        get() = error("Cannot generate display name for empty core")
-    override val description: List<Component>
-        get() = error("Cannot generate tooltip for empty core")
+    override val displayName: Component by config.entry<Component>("display_name")
+    override val description: List<Component> by config.entry<List<Component>>("description")
 
     override fun similarTo(other: Core): Boolean {
         return other === this

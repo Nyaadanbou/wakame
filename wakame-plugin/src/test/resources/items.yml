@@ -36,10 +36,15 @@ components:
 
   cells:
     enabled: true
-    display_name: "词条栏"
-    # 最多可显示多少个空词条栏
-    max_visible_empty_cores: 10
     display_name: "核孔"
+    # 虚核心的全局设置
+    virtual_core:
+      display_name: "虚核心"
+      description: [ ]
+    # 空核心的全局设置
+    empty_core:
+      display_name: "空核心"
+      description: [ ]
 
   crate:
     enabled: true
