@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.compatibility.mythicmobs
 
 import cc.mewcraft.wakame.compatibility.mythicmobs.condition.HasItemCondition
+import cc.mewcraft.wakame.compatibility.mythicmobs.condition.HoldingCondition
 import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.AttributeMechanic
 import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.AttributeModifierMechanic
 import io.lumine.mythic.api.config.MythicLineConfig
@@ -18,8 +19,9 @@ class MythicMobsListener : Listener {
 
     @EventHandler
     private fun on(e: MythicConditionLoadEvent) {
-        when(e.conditionName.lowercase()) {
+        when (e.conditionName.lowercase()) {
             "nekohasitem" -> e.registerCondition(::HasItemCondition)
+            "nekoholding" -> e.registerCondition(::HoldingCondition)
         }
     }
 
