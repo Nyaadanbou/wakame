@@ -13,6 +13,9 @@ import java.nio.file.Path
  * 所有的 [ItemRenderers] 实例.
  */
 internal object ItemRenderers {
+
+    // 不要忘记在 KoinModule 中注册这些实例 !!!
+
     @JvmField
     val SIMPLE = SimpleItemRenderer
 

@@ -8,6 +8,7 @@ import org.koin.dsl.module
 internal const val RENDERERS_CONFIG_DIR = "renderers"
 
 internal fun display2Module(): Module = module {
+    single { ItemRenderers.SIMPLE } bind Initializable::class
     single { ItemRenderers.STANDARD } bind Initializable::class
     single { ItemRenderers.CRAFTING_STATION } bind Initializable::class
     single { ItemRenderers.MERGING_TABLE } bind Initializable::class
