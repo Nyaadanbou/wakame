@@ -2,7 +2,7 @@
 
 # id: `custom_name`
 custom_name:
-  namespace: general
+  namespace: vanilla
   # 可用标签
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "定制名: <value>"
@@ -42,5 +42,5 @@ merge_output:
 
 # id: `rarity`
 rarity:
-  namespace: "general"
+  namespace: general
   tooltip: "稀有度: <value>"

@@ -15,3 +15,4 @@ primary:
 
   - (fixed:vanilla)
   - vanilla:item_name
+  - vanilla:custom_name
