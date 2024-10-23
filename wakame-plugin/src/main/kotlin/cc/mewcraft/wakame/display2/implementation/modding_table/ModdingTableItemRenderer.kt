@@ -6,8 +6,8 @@ package cc.mewcraft.wakame.display2.implementation.modding_table
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.display2.implementation.standard.*
-import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
@@ -24,7 +24,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -157,24 +156,16 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
     }
 
     @JvmField
-    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = configure("custom_name") { data, format ->
-        format.render(Placeholder.parsed("value", data.plainName))
-    }
+    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingPart<ItemElements, AggregateValueRendererFormat> = configure("elements") { data, format ->
-        format.render(data.elements, Element::displayName)
-    }
+    val ELEMENTS: RenderingPart<ItemElements, AggregateValueRendererFormat> = CommonRenderingParts.ELEMENTS(this)
 
     @JvmField
-    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = configure("item_name") { data, format ->
-        format.render(Placeholder.parsed("value", data.plainName))
-    }
+    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = CommonRenderingParts.ITEM_NAME(this)
 
     @JvmField
-    val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = configure("level") { data, format ->
-        format.render(Placeholder.component("value", Component.text(data.level)))
-    }
+    val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = CommonRenderingParts.LEVEL(this)
 
     // @JvmField
     // val AUGMENT: RenderingPart<PortableCore, AugmentRendererFormat> = configure("augment") { data, format ->
@@ -182,9 +173,7 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
     // }
 
     @JvmField
-    val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = configure("rarity") { data, format ->
-        format.render(Placeholder.component("value", data.rarity.displayName))
-    }
+    val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = CommonRenderingParts.RARITY(this)
 
     @JvmField
     val REFORGE_COST: RenderingPart<ModdingTableContext.MainOutputSlot, HardcodedRendererFormat> = configure("reforge_cost") { context, format ->

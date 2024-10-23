@@ -3,13 +3,13 @@ package cc.mewcraft.wakame.display2.implementation.simple
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import java.nio.file.Path
 
 internal class SimpleItemRendererFormats : AbstractRendererFormats(SimpleItemRenderer)
@@ -56,18 +56,12 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
 
 internal object SimpleItemRendererParts : RenderingParts(SimpleItemRenderer) {
     @JvmField
-    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = configure("custom_name") { data, format ->
-        format.render(Placeholder.parsed("value", data.plainName))
-    }
+    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
 
     @JvmField
-    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = configure("item_name") { data, format ->
-        format.render(Placeholder.parsed("value", data.plainName))
-    }
+    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = CommonRenderingParts.ITEM_NAME(this)
 
     @JvmField
-    val LORE: RenderingPart<ExtraLore, ExtraLoreRendererFormat> = configure("lore") { data, format ->
-        format.render(data.processedLore)
-    }
+    val LORE: RenderingPart<ExtraLore, ExtraLoreRendererFormat> = CommonRenderingParts.LORE(this)
 }
 

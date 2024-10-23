@@ -6,6 +6,7 @@ package cc.mewcraft.wakame.display2.implementation.crafting_station
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.display2.implementation.standard.AttackSpeedRendererFormat
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
@@ -139,9 +140,7 @@ internal object CraftingStationRenderingParts : RenderingParts(CraftingStationIt
     }
 
     @JvmField
-    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = configure("custom_name") { data, format ->
-        format.render(Placeholder.parsed("value", data.plainName))
-    }
+    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
 
     @JvmField
     val ELEMENTS: RenderingPart<ItemElements, AggregateValueRendererFormat> = configure("elements") { data, format ->
@@ -170,9 +169,7 @@ internal object CraftingStationRenderingParts : RenderingParts(CraftingStationIt
     }
 
     @JvmField
-    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = configure("item_name") { data, format ->
-        format.render(Placeholder.parsed("value", data.plainName))
-    }
+    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = CommonRenderingParts.ITEM_NAME(this)
 
     val KIZAMIZ: RenderingPart<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
         val collection = data.possibleKizamiz
@@ -181,9 +178,7 @@ internal object CraftingStationRenderingParts : RenderingParts(CraftingStationIt
     }
 
     @JvmField
-    val LORE: RenderingPart<ExtraLore, ExtraLoreRendererFormat> = configure("lore") { data, format ->
-        format.render(data.processedLore)
-    }
+    val LORE: RenderingPart<ExtraLore, ExtraLoreRendererFormat> = CommonRenderingParts.LORE(this)
 
     @JvmField
     val PORTABLE_CORE: RenderingPart<PortableCore, FuzzyPortableCoreRendererFormat> = configure("portable_core") { data, format ->

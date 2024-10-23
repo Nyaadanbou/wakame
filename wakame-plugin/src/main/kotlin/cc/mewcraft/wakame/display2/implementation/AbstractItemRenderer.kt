@@ -97,27 +97,27 @@ internal abstract class RenderingParts(
      * @param id 用来定位配置文件中的节点, 必须唯一
      * @param block 将数据渲染成 [IndexedText] 的逻辑
      */
-    protected inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): RenderingPart<T, F> {
+    /* protected */ inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): RenderingPart<T, F> {
         return provideParams<F>(id).let { params -> RenderingPart(params.show, params.format, block) }
     }
 
-    protected inline fun <T1, T2, reified F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): RenderingPart2<T1, T2, F> {
+    /* protected */ inline fun <T1, T2, reified F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): RenderingPart2<T1, T2, F> {
         return provideParams<F>(id).let { params -> RenderingPart2(params.show, params.format, block) }
     }
 
-    protected inline fun <T1, T2, T3, reified F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): RenderingPart3<T1, T2, T3, F> {
+    /* protected */ inline fun <T1, T2, T3, reified F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): RenderingPart3<T1, T2, T3, F> {
         return provideParams<F>(id).let { params -> RenderingPart3(params.show, params.format, block) }
     }
 
-    protected inline fun <T1, T2, T3, T4, reified F : RendererFormat> configure4(id: String, block: IndexedDataRenderer4<T1, T2, T3, T4, F>): RenderingPart4<T1, T2, T3, T4, F> {
+    /* protected */ inline fun <T1, T2, T3, T4, reified F : RendererFormat> configure4(id: String, block: IndexedDataRenderer4<T1, T2, T3, T4, F>): RenderingPart4<T1, T2, T3, T4, F> {
         return provideParams<F>(id).let { params -> RenderingPart4(params.show, params.format, block) }
     }
 
-    protected inline fun <T1, T2, T3, T4, T5, reified F : RendererFormat> configure5(id: String, block: IndexedDataRenderer5<T1, T2, T3, T4, T5, F>): RenderingPart5<T1, T2, T3, T4, T5, F> {
+    /* protected */ inline fun <T1, T2, T3, T4, T5, reified F : RendererFormat> configure5(id: String, block: IndexedDataRenderer5<T1, T2, T3, T4, T5, F>): RenderingPart5<T1, T2, T3, T4, T5, F> {
         return provideParams<F>(id).let { params -> RenderingPart5(params.show, params.format, block) }
     }
 
-    protected inline fun <T1, T2, T3, T4, T5, T6, reified F : RendererFormat> configure6(id: String, block: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>): RenderingPart6<T1, T2, T3, T4, T5, T6, F> {
+    /* protected */ inline fun <T1, T2, T3, T4, T5, T6, reified F : RendererFormat> configure6(id: String, block: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>): RenderingPart6<T1, T2, T3, T4, T5, T6, F> {
         return provideParams<F>(id).let { params -> RenderingPart6(params.show, params.format, block) }
     }
 
