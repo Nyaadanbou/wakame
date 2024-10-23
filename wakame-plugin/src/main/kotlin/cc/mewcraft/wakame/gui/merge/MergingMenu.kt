@@ -175,7 +175,7 @@ internal class MergingMenu(
                 e.isCancelled = true
 
                 val result = session.latestResult
-                if (result.successful) {
+                if (result.isSuccess) {
 
                     // 玩家必须有足够的资源
                     if (!result.cost.test(viewer)) {
@@ -183,7 +183,7 @@ internal class MergingMenu(
                     }
 
                     // 把合并后的物品递给玩家
-                    val handle = result.item.itemStack // TODO getFinalOutputs
+                    val handle = result.outputItem.itemStack // TODO getFinalOutputs
                     viewer.inventory.addItem(handle)
 
                     // 清空菜单中的物品
@@ -242,13 +242,13 @@ internal class MergingMenu(
     /**
      * 负责渲染合并后的物品在 [MergingMenu.outputSlot] 里面的样子.
      */
-    private fun renderOutputSlot(result: MergingSession.Result): ItemStack {
-        val item = result.item
+    private fun renderOutputSlot(result: MergingSession.ReforgeResult): ItemStack {
+        val item = result.outputItem
         val ret: ItemStack
 
         val clickToMerge = "<gray>点击确认合并".mini
 
-        if (result.successful) {
+        if (result.isSuccess) {
             // 渲染成功的结果
 
             ret = ItemStack(item.itemStack.type)

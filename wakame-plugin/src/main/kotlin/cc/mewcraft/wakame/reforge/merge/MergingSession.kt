@@ -53,7 +53,7 @@ interface MergingSession : Examinable {
      *
      * 每次调用函数 [executeReforge] 之后, 该属性会被重新赋值.
      */
-    val latestResult: Result
+    val latestResult: ReforgeResult
 
     /**
      * 用于计算当前输出核心的合并数值.
@@ -86,7 +86,7 @@ interface MergingSession : Examinable {
      * ## 副作用
      * 函数的返回值会自动赋值给属性 [latestResult].
      */
-    fun executeReforge(): Result
+    fun executeReforge(): ReforgeResult
 
     /**
      * 重置当前会话的状态. 该函数:
@@ -150,16 +150,16 @@ interface MergingSession : Examinable {
     /**
      * 封装了一次合并操作的结果.
      */
-    sealed interface Result : Examinable {
+    sealed interface ReforgeResult : Examinable {
         /**
          * 本次合并是否成功.
          *
-         * 如果成功 (`true`), [item] 将会是合并成功后的物品, [cost] 将会是合并所消耗的资源,
-         * 并且 [item] 和 [cost] 的所有函数都会正常返回.
+         * 如果成功 (`true`), [outputItem] 将会是合并成功后的物品, [cost] 将会是合并所消耗的资源,
+         * 并且 [outputItem] 和 [cost] 的所有函数都会正常返回.
          *
-         * 如果失败 (`false`), [item] 和 [cost] 的部分函数将不会正常返回 (会抛异常).
+         * 如果失败 (`false`), [outputItem] 和 [cost] 的部分函数将不会正常返回 (会抛异常).
          */
-        val successful: Boolean
+        val isSuccess: Boolean
 
         /**
          * 本次合并结果的描述.
@@ -169,31 +169,31 @@ interface MergingSession : Examinable {
         /**
          * 合并后的物品.
          *
-         * 如果要将该物品给予玩家, 应该先确保 [successful] 为 `true` 后再进行操作.
-         * 当 [successful] 为 `false` 时, 该对象实际上是 [NekoStack.empty].
+         * 如果要将该物品给予玩家, 应该先确保 [isSuccess] 为 `true` 后再进行操作.
+         * 当 [isSuccess] 为 `false` 时, 该对象实际上是 [NekoStack.empty].
          */
         @get:Contract(" -> new")
-        val item: NekoStack
+        val outputItem: NekoStack
 
         /**
          * 合并的类型.
          *
          * 会根据属性修饰符的运算模式, 大致分为三种.
          */
-        val type: Type
+        val type: ReforgeType
 
         /**
          * 合并所消耗的资源.
          *
          * 资源可以是一切玩家可以拥有和提供的东西.
          */
-        val cost: Cost
+        val cost: ReforgeCost
     }
 
     /**
      * 封装了合并操作所属的*类型*.
      */
-    sealed interface Type : Examinable {
+    sealed interface ReforgeType : Examinable {
         /**
          * 本类型所对应的属性运算模式.
          */
@@ -210,7 +210,7 @@ interface MergingSession : Examinable {
      *
      * *资源*可以是任何东西, 例如货币、经验等.
      */
-    sealed interface Cost : Examinable {
+    sealed interface ReforgeCost : Examinable {
         /**
          * 从玩家那里拿走本次合并所需要的资源.
          */

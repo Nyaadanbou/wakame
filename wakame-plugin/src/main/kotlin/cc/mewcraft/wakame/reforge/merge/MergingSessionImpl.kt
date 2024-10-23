@@ -65,7 +65,7 @@ internal class SimpleMergingSession(
     override fun returnInputItem1(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT1)
     override fun returnInputItem2(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
 
-    override var latestResult: MergingSession.Result by Delegates.vetoable(ReforgeResult.empty()) { _, old, new ->
+    override var latestResult: MergingSession.ReforgeResult by Delegates.vetoable(ReforgeResult.empty()) { _, old, new ->
         if (frozen) {
             logger.error("Trying to set result of a frozen merging session. This is a bug!")
             return@vetoable false
@@ -83,7 +83,7 @@ internal class SimpleMergingSession(
     override val outputPenaltyFunction: MochaFunction = table.outputPenaltyFunction.compile(this)
     override val currencyCostFunction: MochaFunction = table.currencyCost.total.compile(this)
 
-    private fun executeReforge0(): MergingSession.Result {
+    private fun executeReforge0(): MergingSession.ReforgeResult {
         return try {
             MergeOperation(this)
         } catch (e: Exception) {
@@ -92,7 +92,7 @@ internal class SimpleMergingSession(
         }
     }
 
-    override fun executeReforge(): MergingSession.Result {
+    override fun executeReforge(): MergingSession.ReforgeResult {
         return executeReforge0().also { latestResult = it }
     }
 
@@ -158,49 +158,49 @@ internal class SimpleMergingSession(
 }
 
 /**
- * 包含了构建各种 [MergingSession.Result] 的方法.
+ * 包含了构建各种 [MergingSession.ReforgeResult] 的方法.
  */
 internal object ReforgeResult {
 
     /**
-     * 构建一个用于表示*没有合并*的 [MergingSession.Result].
+     * 构建一个用于表示*没有合并*的 [MergingSession.ReforgeResult].
      */
-    fun empty(): MergingSession.Result {
-        return Result(false, "<gray>没有输入.".mini, NekoStack.empty(), ReforgeType.empty(), ReforgeCost.zero())
+    fun empty(): MergingSession.ReforgeResult {
+        return Simple(false, "<gray>没有输入.".mini, NekoStack.empty(), ReforgeType.empty(), ReforgeCost.zero())
     }
 
     /**
-     * 构建一个用于表示*合并失败*的 [MergingSession.Result].
+     * 构建一个用于表示*合并失败*的 [MergingSession.ReforgeResult].
      */
-    fun failure(description: Component): MergingSession.Result {
-        return Result(false, description, NekoStack.empty(), ReforgeType.failure(), ReforgeCost.failure())
+    fun failure(description: Component): MergingSession.ReforgeResult {
+        return Simple(false, description, NekoStack.empty(), ReforgeType.failure(), ReforgeCost.failure())
     }
 
     /**
-     * 构建一个用于表示*合并成功*的 [MergingSession.Result].
+     * 构建一个用于表示*合并成功*的 [MergingSession.ReforgeResult].
      */
-    fun success(item: NekoStack, type: MergingSession.Type, cost: MergingSession.Cost): MergingSession.Result {
-        return Result(true, "<gray>准备就绪!".mini, item, type, cost)
+    fun success(item: NekoStack, type: MergingSession.ReforgeType, cost: MergingSession.ReforgeCost): MergingSession.ReforgeResult {
+        return Simple(true, "<gray>准备就绪!".mini, item, type, cost)
     }
 
-    private class Result(
+    private class Simple(
         successful: Boolean,
         description: Component,
         item: NekoStack,
-        type: MergingSession.Type,
-        cost: MergingSession.Cost,
-    ) : MergingSession.Result {
+        type: MergingSession.ReforgeType,
+        cost: MergingSession.ReforgeCost,
+    ) : MergingSession.ReforgeResult {
 
-        override val successful = successful
+        override val isSuccess = successful
         override val description: Component = description
-        override val item: NekoStack by NekoStackDelegates.copyOnRead(item)
-        override val type: MergingSession.Type = type
+        override val outputItem: NekoStack by NekoStackDelegates.copyOnRead(item)
+        override val type: MergingSession.ReforgeType = type
         override val cost = cost
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("successful", successful),
+            ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("item", item),
+            ExaminableProperty.of("item", outputItem),
             ExaminableProperty.of("type", type),
             ExaminableProperty.of("cost", cost),
         )
@@ -210,28 +210,28 @@ internal object ReforgeResult {
 }
 
 /**
- * 包含了构建各种 [MergingSession.Type] 的方法.
+ * 包含了构建各种 [MergingSession.ReforgeType] 的方法.
  */
 internal object ReforgeType {
 
     /**
-     * 构建一个用于表示没有合并的 [MergingSession.Type].
+     * 构建一个用于表示没有合并的 [MergingSession.ReforgeType].
      */
-    fun empty(): MergingSession.Type {
+    fun empty(): MergingSession.ReforgeType {
         return Empty()
     }
 
     /**
-     * 构建一个用于表示合并失败的 [MergingSession.Type].
+     * 构建一个用于表示合并失败的 [MergingSession.ReforgeType].
      */
-    fun failure(): MergingSession.Type {
+    fun failure(): MergingSession.ReforgeType {
         return Failure()
     }
 
     /**
-     * 通过 [AttributeModifier.Operation] 构建 [MergingSession.Type].
+     * 通过 [AttributeModifier.Operation] 构建 [MergingSession.ReforgeType].
      */
-    fun success(operation: AttributeModifier.Operation): MergingSession.Type {
+    fun success(operation: AttributeModifier.Operation): MergingSession.ReforgeType {
         return when (operation) {
             AttributeModifier.Operation.ADD -> Success0()
             AttributeModifier.Operation.MULTIPLY_BASE -> Success1()
@@ -239,7 +239,7 @@ internal object ReforgeType {
         }
     }
 
-    private abstract class Base : MergingSession.Type {
+    private abstract class Base : MergingSession.ReforgeType {
         override fun examinableProperties(): Stream<out ExaminableProperty?> {
             return Stream.of(
                 ExaminableProperty.of("operation", operation),
@@ -302,31 +302,31 @@ internal object ReforgeType {
 }
 
 /**
- * 包含了构建各种 [MergingSession.Cost] 的方法.
+ * 包含了构建各种 [MergingSession.ReforgeCost] 的方法.
  */
 internal object ReforgeCost {
     /**
      * 表示没有资源消耗.
      */
-    fun zero(): MergingSession.Cost {
+    fun zero(): MergingSession.ReforgeCost {
         return Zero
     }
 
     /**
      * 表示由于合并失败而产生的资源消耗.
      */
-    fun failure(): MergingSession.Cost {
+    fun failure(): MergingSession.ReforgeCost {
         return Failure
     }
 
     /**
      * 表示由于合并成功而产生的资源消耗.
      */
-    fun success(defaultCurrencyAmount: Double): MergingSession.Cost {
+    fun success(defaultCurrencyAmount: Double): MergingSession.ReforgeCost {
         return Success(defaultCurrencyAmount)
     }
 
-    private abstract class Base : MergingSession.Cost {
+    private abstract class Base : MergingSession.ReforgeCost {
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain),
         )

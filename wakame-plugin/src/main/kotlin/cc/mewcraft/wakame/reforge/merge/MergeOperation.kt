@@ -23,14 +23,14 @@ private constructor(
 ) : KoinComponent {
 
     companion object {
-        operator fun invoke(session: MergingSession): MergingSession.Result {
+        operator fun invoke(session: MergingSession): MergingSession.ReforgeResult {
             return MergeOperation(session).execute()
         }
     }
 
     private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MERGE)
 
-    fun execute(): MergingSession.Result {
+    fun execute(): MergingSession.ReforgeResult {
         if (session.frozen) {
             logger.error("Trying to merge a frozen merging session. This is a bug!")
             return ReforgeResult.failure("<gray>会话已冻结.".mini)
