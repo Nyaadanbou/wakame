@@ -1,14 +1,13 @@
 package cc.mewcraft.wakame.gui.reroll
 
+import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.item.isCustomNeko
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.*
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
-import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -34,10 +33,6 @@ internal class RerollingMenu(
     val table: RerollingTable,
     val viewer: Player,
 ) : KoinComponent {
-
-    companion object {
-        private val MESSAGE_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
-    }
 
     /**
      * 给玩家显示 GUI.
@@ -106,7 +101,7 @@ internal class RerollingMenu(
         when {
             // 玩家尝试交换 inputSlot 里面的物品:
             event.isSwap -> {
-                viewer.sendMessage(MESSAGE_CANCELLED)
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 event.isCancelled = true
             }
 
@@ -114,7 +109,7 @@ internal class RerollingMenu(
             // ... 说明玩家想要开始一次重造流程
             event.isAdd -> {
                 val ns = newItem?.takeIf { it.isCustomNeko }?.tryNekoStack ?: run {
-                    viewer.sendMessage(MESSAGE_CANCELLED)
+                    viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                     event.isCancelled = true
                     return
                 }
@@ -156,13 +151,13 @@ internal class RerollingMenu(
         when {
             // 玩家尝试交换 outputSlot 里面的物品:
             event.isSwap -> {
-                viewer.sendMessage(MESSAGE_CANCELLED)
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 event.isCancelled = true
             }
 
             // 玩家尝试把物品放进 outputSlot:
             event.isAdd -> {
-                viewer.sendMessage(MESSAGE_CANCELLED)
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 event.isCancelled = true
             }
 

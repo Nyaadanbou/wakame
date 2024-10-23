@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.gui.merge
 
+import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.item.isCustomNeko
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
@@ -27,10 +28,6 @@ internal class MergingMenu(
     val table: MergingTable,
     val viewer: Player,
 ) : KoinComponent {
-
-    companion object {
-        private val MESSAGE_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
-    }
 
     /**
      * 给玩家展示合并台.
@@ -117,7 +114,7 @@ internal class MergingMenu(
 
         when {
             e.isSwap -> {
-                viewer.sendMessage(MESSAGE_CANCELLED)
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 e.isCancelled = true
             }
 
@@ -170,7 +167,7 @@ internal class MergingMenu(
 
         when {
             e.isSwap || e.isAdd -> {
-                viewer.sendMessage(MESSAGE_CANCELLED)
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 e.isCancelled = true
             }
 

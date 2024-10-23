@@ -2,15 +2,14 @@ package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
+import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.isCustomNeko
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.*
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
-import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -54,9 +53,6 @@ internal class ModdingMenu(
     val table: ModdingTable,
     val viewer: Player,
 ) : KoinComponent {
-    companion object {
-        private val MSG_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
-    }
 
     /**
      * 向玩家展示定制台菜单.
@@ -177,7 +173,7 @@ internal class ModdingMenu(
         when {
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
-                viewer.sendMessage(MSG_CANCELLED)
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 event.isCancelled = true
             }
 
@@ -186,7 +182,7 @@ internal class ModdingMenu(
             // 这里需要做的就是刷新 ModdingSession 的状态, 然后更新菜单.
             event.isAdd -> {
                 if (newItem != null && !newItem.isCustomNeko) {
-                    viewer.sendMessage(MSG_CANCELLED)
+                    viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                     event.isCancelled = true
                     return
                 }
@@ -243,7 +239,7 @@ internal class ModdingMenu(
         when {
             // 玩家向 outputSlot 中添加物品:
             event.isAdd || event.isSwap -> {
-                viewer.sendMessage(MSG_CANCELLED)
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 event.isCancelled = true
             }
 
@@ -290,7 +286,7 @@ internal class ModdingMenu(
 
                 // 如果结果失败的话:
                 else {
-                    viewer.sendMessage(MSG_CANCELLED)
+                    viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 }
             }
         }

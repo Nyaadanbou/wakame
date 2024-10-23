@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
+import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
@@ -36,8 +37,6 @@ private constructor(
     private val replace: ModdingSession.Replace,
 ) : KoinComponent {
     companion object {
-        private val MESSAGE_CANCELLED = text { content("猫咪不可以!"); color(NamedTextColor.RED) }
-
         operator fun invoke(parent: ModdingMenu, replace: ModdingSession.Replace): Gui {
             return ReplaceMenu(parent, replace).primaryGui
         }
@@ -76,13 +75,13 @@ private constructor(
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
                 event.isCancelled = true
-                viewer.sendMessage(MESSAGE_CANCELLED)
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
             }
 
             // 玩家尝试向 inputSlot 中添加物品:
             event.isAdd -> {
                 val addedNekoStack = newItem?.takeIf { it.isCustomNeko }?.tryNekoStack ?: run {
-                    viewer.sendMessage(MESSAGE_CANCELLED)
+                    viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                     event.isCancelled = true
                     return
                 }
