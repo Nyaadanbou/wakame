@@ -418,15 +418,6 @@ entity_attributes:
     parent: minecraft:all_zero
     values: { }
 
-  minecraft:trident:
-    parent: minecraft:all_zero
-    values: { }
-
-  minecraft:dispenser:
-    parent: minecraft:all_zero
-    values: { }
-
-
 
 # 实体索引表（目前仅用于条件判断）
 entity_type_holders:

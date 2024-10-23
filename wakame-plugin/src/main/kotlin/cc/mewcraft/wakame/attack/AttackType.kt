@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.util.krequire
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -26,7 +26,7 @@ sealed interface AttackType {
      * 返回空后续会使本次伤害事件取消.
      * 默认返回造成 1 点默认元素伤害的伤害元数据.
      */
-    fun handleDirectMeleeAttackEntity(player: Player, nekoStack: NekoStack, event: EntityDamageByEntityEvent): DamageMetadata? {
+    fun handleDirectMeleeAttackEntity(player: Player, nekoStack: NekoStack, event: EntityDamageEvent): DamageMetadata? {
         return PlayerDamageMetadata.default(player)
     }
 

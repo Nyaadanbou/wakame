@@ -6,25 +6,24 @@ import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import team.unnamed.mocha.MochaEngine
 import java.lang.reflect.Type
 
 data class EvaluableDamageMetadata(
-    private val criticalPower: Evaluable<*>,
-    private val criticalStrikeState: CriticalStrikeState,
-    private val knockback: Evaluable<*>,
+    private val criticalStrikeChance: Evaluable<*>,
+    private val criticalStrikePower: Evaluable<*>,
+    private val negativeCriticalStrikePower: Evaluable<*>,
     private val damagePackets: List<EvaluableDamagePacket>,
     private val damageTags: DamageTags,
 ) {
     companion object {
         fun default(): EvaluableDamageMetadata {
             return EvaluableDamageMetadata(
-                criticalPower = Evaluable.parseNumber(1.0),
-                criticalStrikeState = CriticalStrikeState.NONE,
-                knockback = Evaluable.parseNumber(0.0),
+                criticalStrikeChance = Evaluable.parseNumber(0.0),
+                criticalStrikePower = Evaluable.parseNumber(1.0),
+                negativeCriticalStrikePower = Evaluable.parseNumber(1.0),
                 damagePackets = listOf(DefaultEvaluableDamagePacket),
                 damageTags = DamageTags.empty()
             )
@@ -33,11 +32,13 @@ data class EvaluableDamageMetadata(
 
     fun evaluate(engine: MochaEngine<*>): CustomDamageMetadata {
         return CustomDamageMetadata(
-            criticalPower = criticalPower.evaluate(engine),
-            criticalStrikeState = criticalStrikeState,
-            knockback = knockback.evaluate(engine) > 0.0,
             damageBundle = damageBundle { damagePackets.forEach { single(it.evaluate(engine)) } },
-            damageTags = damageTags
+            damageTags = damageTags,
+            criticalStrikeMetadata = CriticalStrikeMetadata.byCalculate(
+                criticalStrikeChance.evaluate(engine),
+                criticalStrikePower.evaluate(engine),
+                negativeCriticalStrikePower.evaluate(engine)
+            )
         )
     }
 }
@@ -46,7 +47,7 @@ interface EvaluableDamagePacket {
     fun evaluate(engine: MochaEngine<*>): DamagePacket
 }
 
-private data object DefaultEvaluableDamagePacket: EvaluableDamagePacket {
+private data object DefaultEvaluableDamagePacket : EvaluableDamagePacket {
     private val DEFAULT_PACKET by lazy {
         damagePacket(ElementRegistry.DEFAULT) {
             min(1.0)
@@ -67,7 +68,7 @@ private data class EvaluableDamagePacketImpl(
     val rate: Evaluable<*>,
     val defensePenetration: Evaluable<*>,
     val defensePenetrationRate: Evaluable<*>,
-): EvaluableDamagePacket {
+) : EvaluableDamagePacket {
     override fun evaluate(engine: MochaEngine<*>): DamagePacket {
         return damagePacket(element) {
             min(min.evaluate(engine))
@@ -85,9 +86,9 @@ internal object EvaluableDamageBundleSerializer : SchemaSerializer<EvaluableDama
         val damageTags = DamageTags(damageTagList)
 
         return EvaluableDamageMetadata(
-            criticalPower = node.node("critical_power").krequire(),
-            criticalStrikeState = node.node("critical_state").get<CriticalStrikeState>(CriticalStrikeState.NONE),
-            knockback = node.node("knockback").krequire(),
+            criticalStrikeChance = node.node("critical_strike_chance").krequire(),
+            criticalStrikePower = node.node("critical_strike_power").krequire(),
+            negativeCriticalStrikePower = node.node("negative_critical_strike_power").krequire(),
             damagePackets = node.node("damage_packets").childrenList().map { it.krequire<EvaluableDamagePacket>() },
             damageTags = damageTags
         )

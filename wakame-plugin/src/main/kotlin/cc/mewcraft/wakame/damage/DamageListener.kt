@@ -8,7 +8,6 @@ import net.kyori.adventure.text.LinearComponents
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import org.bukkit.Server
-import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -29,18 +28,18 @@ object DamageListener : Listener, KoinComponent {
     private val logger: Logger by inject()
     private val server: Server by inject()
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: EntityDamageEvent) {
-        if (event.isCancelled) {
-            return
-        }
-
         val entity = event.entity
         if (entity !is LivingEntity) {
             return
         }
 
-        val damageMetadata = DamageManager.generateDamageMetadata(event) ?: return
+        val damageMetadata = DamageManager.generateDamageMetadata(event)
+        if (damageMetadata == null) {
+            event.isCancelled = true
+            return
+        }
         val defenseMetadata = DamageManager.generateDefenseMetadata(event)
 
         val nekoEntityDamageEvent = NekoEntityDamageEvent(damageMetadata, defenseMetadata, event)
@@ -84,19 +83,13 @@ object DamageListener : Listener, KoinComponent {
         server.filterAudience { it is Player }.sendMessage(message)
     }
 
-    /**
-     * 在弹射物射出时记录其 [DamageMetadata].
-     */
+
     @EventHandler
     fun on(event: ProjectileLaunchEvent) {
         DamageManager.recordProjectileDamageMetadata(event)
     }
 
-    /**
-     * 在弹射物射出时记录其 [DamageMetadata].
-     *
-     * 玩家射出的箭矢伤害需要根据拉弓的力度进行调整.
-     */
+
     @EventHandler
     fun on(event: EntityShootBowEvent) {
         DamageManager.recordProjectileDamageMetadata(event)
@@ -110,12 +103,7 @@ object DamageListener : Listener, KoinComponent {
         if (event.hitBlock == null) {
             return
         }
-        when (val projectile = event.entity) {
-            // 弹射物是箭矢 (普通箭/光灵箭/药水箭) 和三叉戟
-            is AbstractArrow -> {
-                DamageManager.removeProjectileDamageMetadata(projectile.uniqueId)
-            }
-        }
+        DamageManager.removeProjectileDamageMetadata(event.entity.uniqueId)
     }
 
     /**

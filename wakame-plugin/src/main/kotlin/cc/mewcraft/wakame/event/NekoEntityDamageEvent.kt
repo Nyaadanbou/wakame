@@ -91,14 +91,14 @@ class NekoEntityDamageEvent(
      * 获取本次伤害的暴击状态.
      */
     fun getCriticalState(): CriticalStrikeState {
-        return damageMetadata.criticalStrikeState
+        return damageMetadata.criticalStrikeMetadata.state
     }
 
     /**
      * 获取本次伤害的暴击倍率.
      */
     fun getCriticalPower(): Double {
-        return damageMetadata.criticalPower
+        return damageMetadata.criticalStrikeMetadata.power
     }
 
     override fun isCancelled(): Boolean {

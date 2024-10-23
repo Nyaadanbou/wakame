@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
@@ -148,12 +147,13 @@ private class DashTick(
         val damageCount = context[DASH_DAMAGE_KEY] ?: return TickResult.ALL_DONE
         context[SkillContextKey.NEKO_STACK]?.let {
             val components = it.components
-            val damage = components.get(ItemComponentTypes.DAMAGEABLE) ?: return@let
-            if (damage.damage < damage.maxDamage) {
-                components.set(ItemComponentTypes.DAMAGEABLE, Damageable(damage.damage + damageCount, damage.maxDamage))
-            } else {
-                return TickResult.ALL_DONE
-            }
+// TODO
+//            val damage = components.get(ItemComponentTypes.DAMAGEABLE) ?: return@let
+//            if (damage.damage < damage.maxDamage) {
+//                components.set(ItemComponentTypes.DAMAGEABLE, Damageable(damage.damage + damageCount, damage.maxDamage))
+//            } else {
+//                return TickResult.ALL_DONE
+//            }
         }
         return TickResult.ALL_DONE
     }

@@ -3,6 +3,11 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.attack.SwordAttack
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
+import cc.mewcraft.wakame.attribute.IntangibleAttributeMaps
+import cc.mewcraft.wakame.damage.mappings.DamageTypeMappings
+import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
+import cc.mewcraft.wakame.damage.mappings.ProjectileTypeMappings
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.item.tryNekoStack
@@ -10,15 +15,19 @@ import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Material
 import org.bukkit.entity.*
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import java.time.Duration
 import java.util.UUID
 
-object DamageManager {
+object DamageManager : KoinComponent {
+    val logger: Logger by inject()
+
     fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata? {
         // 先检查是不是自定义伤害; 若是, 则直接返回自定义伤害信息
         val uuid = event.entity.uniqueId
@@ -28,87 +37,175 @@ object DamageManager {
             return customDamageMetadata
         }
 
-        // 不是自定义伤害, 并且存在造成伤害的实体时
-        if (event is EntityDamageByEntityEvent) {
-            when (val damager = event.damager) {
-                // 造成伤害的是玩家
-                is Player -> {
-                    val itemStack = damager.inventory.itemInMainHand
-                    val attack = itemStack.tryNekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
-                    if (attack != null) {
-                        // 玩家手中的物品是 Attack
-                        when (event.cause) {
-                            DamageCause.ENTITY_ATTACK -> {
-                                // handleDirectMeleeAttackEntity的返回值会用于直接受伤的生物的伤害计算
-                                // 该方法中的其他附带效果也会执行, 例如“hammer”攻击特效的伤害周围实体
-                                return attack.attackType.handleDirectMeleeAttackEntity(damager, itemStack.toNekoStack, event)
-                            }
+        val damageSource = event.damageSource
+        val causingEntity = damageSource.causingEntity
+        val directEntity = damageSource.directEntity
 
-                            DamageCause.ENTITY_SWEEP_ATTACK -> {
-                                // TODO 横扫的临时实现, 等待麻将的组件化
-                                // 需要Attack物品的攻击特效是“sword”才能打出横扫伤害
-                                val attackType = attack.attackType
-                                if (attackType is SwordAttack) {
-                                    val attributeMap = damager.toUser().attributeMap
-                                    return PlayerDamageMetadata(
-                                        damager = damager,
-                                        damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD, DamageTag.EXTRA),
-                                        damageBundle = damageBundle(attributeMap) {
-                                            every {
-                                                standard()
-                                                rate { standard() * attributeMap.getValue(Attributes.SWEEPING_DAMAGE_RATIO) }
-                                            }
-                                        }
-                                    )
-                                } else {
-                                    // 取消Bukkit伤害事件
-                                    event.isCancelled = true
-                                    // 返回null是为了供外部识别以不触发neko伤害事件
-                                    return null
-                                }
-                            }
-
-                            else -> {
-                                // TODO 其他Cause的玩家伤害, 考虑副手丢药水等弹射物
-                                // 留到最后视为原版伤害处理
-                                // 理论上来说只有玩家丢伤害药水进入这个else
-                                // 或使用非常规手段使玩家造成异常类型的伤害
-                            }
-                        }
-                    } else {
-                        // 手中的物品无Attack行为甚至不是NekoStack
-                        return PlayerDamageMetadata.default(damager)
-                    }
-                }
-
-                // 造成伤害的是非玩家实体
-                is LivingEntity -> {
-                    return EntityMeleeAttackMetadata(damager)
-                }
-
-                // 造成伤害的是弹射物
-                // 查找是否存在记录; 若不存在, 对箭矢和三叉戟进行特殊处理
-                // 其他弹射物按照默认伤害处理
-                is Projectile -> {
-                    val projectileDamageMetadata = findProjectileDamageMetadata(damager.uniqueId)
-                    if (projectileDamageMetadata != null) return projectileDamageMetadata
-
-                    if (damager is AbstractArrow) {
-                        return DefaultProjectileDamageMetadata(damager)
-                    }
-                }
-            }
+        // 不存在直接实体
+        // 自然伤害(溺水、岩浆)
+        // 使用伤害类型映射, 根据伤害类型调整伤害
+        if (directEntity == null) {
+            val mapping = DamageTypeMappings.get(damageSource.damageType)
+            return VanillaDamageMetadata(mapping.element, event.damage, mapping.defensePenetration, mapping.defensePenetrationRate)
         }
 
-        /*
-        如果:
-         - 伤害没有攻击者
-         - 伤害攻击者非玩家、living实体、弹射物三者之一
-         - 伤害攻击者是弹射物, 但没有记录, 也不是箭矢和三叉戟
-        则视为原版伤害, 使用原版伤害映射
-        */
-        val damageMapping = VanillaDamageMappings.get(event.damageSource.damageType)
-        return VanillaDamageMetadata(event.damage, damageMapping.element, damageMapping.defensePenetration, damageMapping.defensePenetrationRate)
+        // 存在直接实体后
+        when (causingEntity) {
+            // 无来源实体
+            null -> {
+                if (directEntity is Projectile) {
+                    // 直接实体是弹射物
+                    // 使用默认
+                    return buildProjectileDamageMetadataByDefault(directEntity)
+                } else {
+                    // 不应该发生
+                    return warnAndDefaultReturn(event)
+                }
+            }
+            // 来源实体是玩家
+            is Player -> {
+                // 直接实体是弹射物
+                // 查找弹射物是否被记录, 尝试返回记录的值
+                // 箭矢和三叉戟的伤害和词条栏有关, 会被记录
+                // 没有记录则使用默认
+                if (directEntity is Projectile) {
+                    return findProjectileDamageMetadata(directEntity.uniqueId) ?: buildProjectileDamageMetadataByDefault(directEntity)
+                }
+
+                val itemStack = causingEntity.inventory.itemInMainHand
+                val attack = itemStack.tryNekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
+                if (attack != null) {
+                    // 玩家手中的物品是 Attack
+                    when (event.cause) {
+                        DamageCause.ENTITY_ATTACK -> {
+                            // handleDirectMeleeAttackEntity的返回值会用于直接受伤的生物的伤害计算
+                            // 该方法中的其他附带效果也会执行, 例如“hammer”攻击特效的伤害周围实体
+                            return attack.attackType.handleDirectMeleeAttackEntity(causingEntity, itemStack.toNekoStack, event)
+                        }
+
+                        DamageCause.ENTITY_SWEEP_ATTACK -> {
+                            // TODO 横扫的临时实现, 等待麻将的组件化
+                            // 需要Attack物品的攻击特效是“sword”才能打出横扫伤害
+                            val attackType = attack.attackType
+                            if (attackType is SwordAttack) {
+                                val attributeMap = causingEntity.toUser().attributeMap
+                                return PlayerDamageMetadata(
+                                    damager = causingEntity,
+                                    damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD, DamageTag.EXTRA),
+                                    damageBundle = damageBundle(attributeMap) {
+                                        every {
+                                            standard()
+                                            rate { standard() * attributeMap.getValue(Attributes.SWEEPING_DAMAGE_RATIO) }
+                                        }
+                                    }
+                                )
+                            } else {
+                                // 取消Bukkit伤害事件
+                                event.isCancelled = true
+                                // 返回null是为了供外部识别以不触发neko伤害事件
+                                return null
+                            }
+                        }
+
+                        else -> {
+                            // 其他Cause的玩家伤害
+                            // 不应该发生
+                            return warnAndDefaultReturn(event)
+                        }
+                    }
+                } else {
+                    // 手中的物品无Attack行为甚至不是NekoStack
+                    return PlayerDamageMetadata.default(causingEntity)
+                }
+            }
+            // 来源实体是非玩家生物
+            is LivingEntity -> {
+                val damageInfo = EntityAttackMappings.find(event.damageSource)?.damageInfo
+                if (damageInfo == null) {
+                    // 配置文件未指定该情景下生物的伤害映射
+                    // 返回默认元素、无防御穿透、无暴击、原版伤害值
+                    logger.warn("The vanilla entity damage from ${damageSource.causingEntity?.type} to ${event.entity.type} by ${damageSource.directEntity?.type} is not config!")
+                    return EntityDamageMetadata(
+                        damager = causingEntity,
+                        damageBundle = damageBundle {
+                            default {
+                                min(event.damage)
+                                max(event.damage)
+                                rate(1.0)
+                                defensePenetration(0.0)
+                                defensePenetrationRate(0.0)
+                            }
+                        },
+                        criticalStrikeMetadata = CriticalStrikeMetadata.DEFAULT
+                    )
+                } else {
+                    // 配置文件指定了该情景下生物的伤害映射
+                    return EntityDamageMetadata(
+                        damager = causingEntity,
+                        damageBundle = damageBundle {
+                            single(damageInfo.element) {
+                                min(damageInfo.min)
+                                max(damageInfo.max)
+                                rate(1.0)
+                                defensePenetration(damageInfo.defensePenetration)
+                                defensePenetrationRate(damageInfo.defensePenetrationRate)
+                            }
+                        },
+                        criticalStrikeMetadata = CriticalStrikeMetadata.byCalculate(
+                            chance = damageInfo.criticalStrikeChance,
+                            positivePower = damageInfo.criticalStrikePower,
+                            negativePower = 1.0
+                        )
+                    )
+                }
+            }
+            // 不可能发生
+            else -> {
+                return warnAndDefaultReturn(event)
+            }
+        }
+    }
+
+    private fun buildArrowDamageBundleByCells(arrow: AbstractArrow): DamageBundle? {
+        val itemStack = arrow.itemStack
+        val nekoStack = itemStack.tryNekoStack ?: return null
+        if (!nekoStack.templates.has(ItemTemplateTypes.ARROW)) {
+            return null
+        }
+        val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return null
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
+        val attributeMapSnapshot = IntangibleAttributeMaps.ARROW.getSnapshot()
+        attributeModifiers.forEach { attribute, modifier ->
+            attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
+        }
+        return damageBundle(attributeMapSnapshot) { every { standard() } }
+    }
+
+    /**
+     * 默认状态下弹射物伤害元数据
+     * 使用弹射物类型映射, 根据弹射物类型获取伤害元数据
+     * 箭矢特殊处理, 计算词条栏伤害
+     */
+    private fun buildProjectileDamageMetadataByDefault(projectile: Projectile): VanillaDamageMetadata {
+        if (projectile is Arrow) {
+            val damageBundle = buildArrowDamageBundleByCells(projectile)
+            if (damageBundle != null) {
+                return VanillaDamageMetadata(damageBundle)
+            }
+        } else if (projectile is SpectralArrow) {
+            val damageBundle = buildArrowDamageBundleByCells(projectile)
+            if (damageBundle != null) {
+                return VanillaDamageMetadata(damageBundle)
+            }
+        }
+        val mapping = ProjectileTypeMappings.get(projectile.type)
+        return VanillaDamageMetadata(mapping.element, mapping.value, mapping.defensePenetration, mapping.defensePenetrationRate)
+    }
+
+    private fun warnAndDefaultReturn(event: EntityDamageEvent): VanillaDamageMetadata {
+        val damageSource = event.damageSource
+        logger.warn("Why can ${damageSource.causingEntity?.type} cause damage to ${event.entity.type} through ${damageSource.directEntity?.type}? This should not happen.")
+        return VanillaDamageMetadata(event.damage)
     }
 
     fun generateDefenseMetadata(event: EntityDamageEvent): DefenseMetadata {
@@ -134,90 +231,122 @@ object DamageManager {
     private val projectileDamageMetadataMap = Caffeine.newBuilder()
         .softValues()
         .expireAfterAccess(Duration.ofSeconds(60))
-        .build<UUID, ProjectileDamageMetadata>()
+        .build<UUID, DamageMetadata>()
 
     /**
-     * 弹射物生成时, 其伤害信息就应该确定了.
-     * 只记录需要 wakame 属性系统处理的伤害信息.
-     * 如玩家的风弹, 鸡蛋, 雪球, 末影珍珠等弹射物的伤害信息不会被记录, 将会使用 [VanillaDamageMetadata].
-     * 伤害信息不存在时, 弹射物伤害将按原版处理.
+     * 在弹射物射出时记录其 [DamageMetadata].
+     * 目前只记录玩家的箭矢和三叉戟.
      *
-     * 伤害信息过期的情况如下 (满足其一):
+     * 伤害元数据过期的情况如下 (满足其一):
      * - 超过有效期 (60秒)
-     * - 弹射物击中方块
+     * - 击中方块
      */
     fun recordProjectileDamageMetadata(event: ProjectileLaunchEvent) {
         val projectile = event.entity
-        when (
-            val shooter = projectile.shooter
-        ) {
-            // 发射者是玩家时
-            is Player -> {
-                // 记录三叉戟伤害信息
-                when (projectile) {
-                    is Trident -> {
-                        putProjectileDamageMetadata(
-                            projectile.uniqueId,
-                            PlayerTridentDamageMetadata(shooter.toUser(), projectile, DamageTags(DamageTag.PROJECTILE, DamageTag.TRIDENT))
-                        )
-                    }
 
-                    is Arrow, is SpectralArrow -> {
-                        // 玩家箭矢的伤害信息需要拉弓力度
-                        // 由 #recordProjectileDamageMetadata(event: EntityShootBowEvent) 处理
-                    }
-                }
-            }
-
-            // 发射者是非玩家实体时
-            // 非玩家实体的弹射物伤害只和其AttributeMap有关
-            is LivingEntity -> {
+        val shooter = projectile.shooter
+        if (shooter !is Player) return
+        when (projectile) {
+            is Trident -> {
                 putProjectileDamageMetadata(
                     projectile.uniqueId,
-                    EntityProjectileDamageMetadata(shooter, projectile)
+                    PlayerDamageMetadata(
+                        damager = shooter,
+                        damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.TRIDENT),
+                        damageBundle = damageBundle(shooter.toUser().attributeMap) { every { standard() } }
+                    )
                 )
+            }
+
+            is Arrow, is SpectralArrow -> {
+                // 玩家箭矢的伤害信息需要拉弓力度
+                // 由 #recordProjectileDamageMetadata(event: EntityShootBowEvent) 处理
             }
         }
     }
 
+
+    /**
+     * 在弹射物射出时记录其 [DamageMetadata].
+     * 目前只记录玩家的箭矢和三叉戟.
+     * 玩家射出的箭矢伤害需要根据拉弓的力度进行调整.
+     * 故需要监听此事件.
+     *
+     * 伤害元数据过期的情况如下 (满足其一):
+     * - 超过有效期 (60秒)
+     * - 击中方块
+     */
     fun recordProjectileDamageMetadata(event: EntityShootBowEvent) {
         val entity = event.entity
         if (entity !is Player) return
 
         val projectile = event.projectile
-        // 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
-        val force = DamageRules.calculateBowForce(72000 - entity.itemUseRemainingTime)
+        if (projectile !is AbstractArrow) return
 
-        val damageTags = DamageTags(DamageTag.PROJECTILE)
+        val force: Float
+        val damageTags: DamageTags
+        val damageBundle: DamageBundle
         val bowMaterial = event.bow?.type
-        if (bowMaterial == Material.BOW) {
-            damageTags.add(DamageTag.BOW)
-        } else if (bowMaterial == Material.CROSSBOW) {
-            damageTags.add(DamageTag.CROSSBOW)
-        }
-
-        when (projectile) {
-            is Arrow -> {
-                putProjectileDamageMetadata(
-                    projectile.uniqueId,
-                    PlayerArrowDamageMetadata(entity.toUser(), projectile, force, damageTags)
-                )
+        when (bowMaterial) {
+            Material.BOW -> {
+                damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.BOW)
+                // 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
+                force = DamageRules.calculateBowForce(72000 - entity.itemUseRemainingTime)
             }
 
-            is SpectralArrow -> {
-                putProjectileDamageMetadata(
-                    projectile.uniqueId,
-                    PlayerArrowDamageMetadata(entity.toUser(), projectile, force, damageTags)
-                )
+            Material.CROSSBOW -> {
+                damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.CROSSBOW)
+                force = 1F
+            }
+
+            else -> {
+                return
             }
         }
+
+
+        val itemStack = projectile.itemStack
+        val nekoStack = itemStack.tryNekoStack
+        val cells = nekoStack?.components?.get(ItemComponentTypes.CELLS)
+        if (nekoStack?.templates?.has(ItemTemplateTypes.ARROW) == true && cells != null) {
+            val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
+            val attributeMapSnapshot = entity.toUser().attributeMap.getSnapshot()
+            attributeModifiers.forEach { attribute, modifier ->
+                attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
+            }
+
+            damageBundle = damageBundle(attributeMapSnapshot) {
+                every {
+                    standard()
+                    min { force * standard() }
+                    max { force * standard() }
+                }
+            }
+        } else {
+            damageBundle = damageBundle(entity.toUser().attributeMap) {
+                every {
+                    standard()
+                    min { force * standard() }
+                    max { force * standard() }
+                }
+            }
+        }
+
+        putProjectileDamageMetadata(
+            projectile.uniqueId,
+            PlayerDamageMetadata(
+                damager = entity,
+                damageTags = damageTags,
+                damageBundle = damageBundle
+            )
+        )
     }
 
-    fun putProjectileDamageMetadata(uuid: UUID, projectileDamageMetadata: ProjectileDamageMetadata) {
-        projectileDamageMetadataMap.put(uuid, projectileDamageMetadata)
+    fun putProjectileDamageMetadata(uuid: UUID, damageMetadata: DamageMetadata) {
+        projectileDamageMetadataMap.put(uuid, damageMetadata)
     }
 
-    fun findProjectileDamageMetadata(uuid: UUID): ProjectileDamageMetadata? {
+    fun findProjectileDamageMetadata(uuid: UUID): DamageMetadata? {
         return projectileDamageMetadataMap.getIfPresent(uuid)
     }
 
@@ -263,13 +392,13 @@ fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity?, kno
 
     // 如果自定义伤害有源且需要取消击退
     // FIXED BUG: 无源伤害(即没有造成伤害的LivingEntity)不会触发击退事件
-    if (!knockback && source!=null) {
+    if (!knockback && source != null) {
         DamageManager.markCancelKnockback(this.uniqueId)
     }
 
     // 触发一下bukkit的伤害事件
     // 伤害填多少都无所谓, 最后都是要neko伤害事件重新算
-    this.damage(1.0, source)
+    this.damage(4.0, source)
 }
 
 /**

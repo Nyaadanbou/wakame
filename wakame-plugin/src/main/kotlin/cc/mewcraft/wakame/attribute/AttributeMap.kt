@@ -48,8 +48,6 @@ fun AttributeMap(entity: LivingEntity): AttributeMap {
  */
 object ImaginaryAttributeMaps {
     val ARROW: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("arrow")) }
-    val TRIDENT: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("trident")) }
-    val DISPENSER: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("dispenser")) }
 }
 
 

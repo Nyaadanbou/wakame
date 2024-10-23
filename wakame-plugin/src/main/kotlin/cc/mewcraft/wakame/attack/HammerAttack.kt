@@ -11,7 +11,7 @@ import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
 import org.bukkit.entity.Player
-import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.util.NumberConversions
 import kotlin.math.PI
 import kotlin.math.cos
@@ -36,12 +36,11 @@ class HammerAttack : AttackType {
         const val NAME = "hammer"
     }
 
-    override fun handleDirectMeleeAttackEntity(player: Player, nekoStack: NekoStack, event: EntityDamageByEntityEvent): DamageMetadata? {
+    override fun handleDirectMeleeAttackEntity(player: Player, nekoStack: NekoStack, event: EntityDamageEvent): DamageMetadata? {
         val user = player.toUser()
         // 只要这个物品的内部冷却处于激活状态就不处理
         // 内部冷却不一定是攻速组件造成的
         if (user.attackSpeed.isActive(nekoStack.id)) {
-            event.isCancelled = true
             return null
         }
 
