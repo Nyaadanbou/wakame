@@ -31,7 +31,10 @@ koin-core-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines"
 koin-test = { group = "io.insert-koin", name = "koin-test" }
 koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5" }
 
+# Standalone Paper/Velocity plugins
+
 helper = { group = "me.lucko", name = "helper", version = "6.0.0" }
+mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version = "5.8.0-SNAPSHOT" }
 
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "commons" }

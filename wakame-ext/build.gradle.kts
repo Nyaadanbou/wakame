@@ -15,5 +15,5 @@ dependencies {
     compileOnly(local.helper)
 
     // external
-    compileOnly(libs.mythicmobs) { isTransitive = false /* we don't want trash from the MM jar */ }
+    compileOnly(local.mythicmobs) { isTransitive = false /* we don't want trash from the MM jar */ }
 }
