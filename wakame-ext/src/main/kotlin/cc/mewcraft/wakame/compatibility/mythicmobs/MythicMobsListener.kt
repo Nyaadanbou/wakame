@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.compatibility.mythicmobs.condition.HasItemCondition
 import cc.mewcraft.wakame.compatibility.mythicmobs.condition.HoldingCondition
 import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.AttributeMechanic
 import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.AttributeModifierMechanic
+import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.RemoveAttributeModifierMechanic
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ISkillMechanic
 import io.lumine.mythic.api.skills.conditions.ISkillCondition
@@ -30,6 +31,7 @@ class MythicMobsListener : Listener {
         when (e.mechanicName.lowercase()) {
             "nekoattribute" -> e.registerMechanic(::AttributeMechanic)
             "nekoattributemodifier" -> e.registerMechanic(::AttributeModifierMechanic)
+            "nekoremoveattributemodifier" -> e.registerMechanic(::RemoveAttributeModifierMechanic)
         }
     }
 
