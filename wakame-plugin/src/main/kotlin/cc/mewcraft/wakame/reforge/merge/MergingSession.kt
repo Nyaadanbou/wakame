@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
 import team.unnamed.mocha.runtime.MochaFunction
 
@@ -47,6 +48,13 @@ interface MergingSession : Examinable {
      * 该函数返回后, [inputItem2] 将被设置为 `null`.
      */
     fun returnInputItem2(viewer: Player)
+
+    /**
+     * 返回本会话产生的最终物品输出, 无论是合并失败还是成功.
+     * 如果合并成功, 将返回一个包含合并后物品的数组.
+     * 如果合并失败, 将返回一个空数组.
+     */
+    fun getFinalOutputs(): Array<ItemStack>
 
     /**
      * 合并 [inputItem1] 和 [inputItem2] 的结果.
@@ -154,10 +162,10 @@ interface MergingSession : Examinable {
         /**
          * 本次合并是否成功.
          *
-         * 如果成功 (`true`), [outputItem] 将会是合并成功后的物品, [cost] 将会是合并所消耗的资源,
-         * 并且 [outputItem] 和 [cost] 的所有函数都会正常返回.
+         * 如果成功 (`true`), [output] 将会是合并成功后的物品, [reforgeCost] 将会是合并所消耗的资源,
+         * 并且 [output] 和 [reforgeCost] 的所有函数都会正常返回.
          *
-         * 如果失败 (`false`), [outputItem] 和 [cost] 的部分函数将不会正常返回 (会抛异常).
+         * 如果失败 (`false`), [output] 和 [reforgeCost] 的部分函数将不会正常返回 (会抛异常).
          */
         val isSuccess: Boolean
 
@@ -167,27 +175,27 @@ interface MergingSession : Examinable {
         val description: Component
 
         /**
-         * 合并后的物品.
-         *
-         * 如果要将该物品给予玩家, 应该先确保 [isSuccess] 为 `true` 后再进行操作.
-         * 当 [isSuccess] 为 `false` 时, 该对象实际上是 [NekoStack.empty].
-         */
-        @get:Contract(" -> new")
-        val outputItem: NekoStack
-
-        /**
          * 合并的类型.
          *
          * 会根据属性修饰符的运算模式, 大致分为三种.
          */
-        val type: ReforgeType
+        val reforgeType: ReforgeType
 
         /**
          * 合并所消耗的资源.
          *
          * 资源可以是一切玩家可以拥有和提供的东西.
          */
-        val cost: ReforgeCost
+        val reforgeCost: ReforgeCost
+
+        /**
+         * 合并后的物品.
+         *
+         * 如果要将该物品给予玩家, 应该先确保 [isSuccess] 为 `true` 后再进行操作.
+         * 当 [isSuccess] 为 `false` 时, 该对象实际上是 [NekoStack.empty].
+         */
+        @get:Contract(" -> new")
+        val output: NekoStack
     }
 
     /**

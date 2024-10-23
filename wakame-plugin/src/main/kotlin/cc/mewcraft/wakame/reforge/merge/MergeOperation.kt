@@ -54,13 +54,13 @@ private constructor(
         // 两个核心除了数值以外, 其余数据必须一致
         if (!core1.similarTo(core2)) {
             logger.info("Trying to merge cores with different attributes.")
-            return ReforgeResult.failure("<gray>核心的种类不一致.".mini)
+            return ReforgeResult.failure("<gray>核心种类不一致.".mini)
         }
 
         // 输入的核心种类至少要跟一条规则相匹配
         if (!session.table.acceptableCoreMatcher.test(core1) || !session.table.acceptableCoreMatcher.test(core2)) {
             logger.info("Trying to merge cores with unacceptable types.")
-            return ReforgeResult.failure("<gray>核心无法在本台合并.".mini)
+            return ReforgeResult.failure("<gray>核心无法在此合并.".mini)
         }
 
         // 输入的物品等级必须低于工作台指定的值

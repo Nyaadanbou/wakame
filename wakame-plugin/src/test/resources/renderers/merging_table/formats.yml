@@ -35,10 +35,33 @@ level:
 # id: `merge_input`
 merge_input:
   namespace: reforge
+  # 可用标签
+  # <penalty> 惩罚
+  tooltip: "惩罚: <penalty>"
+  # 顺序
+  ordinal:
+    - core
+    - penalty
 
 # id: `merge_output`
 merge_output:
   namespace: reforge
+  # 便携核心的惩罚的渲染格式
+  # 可用标签
+  # <penalty> 惩罚
+  penalty_format: "惩罚: <penalty>"
+  # 内容的整体顺序
+  # - core 是核心的数值描述
+  # - penalty 是其惩罚值的描述
+  overall_ordinal:
+    - core
+    - penalty
+  # 便携核心的数值的混淆格式
+  obfuscation:
+    # 要混淆的模式 (regex)
+    pattern: "[+-]?\\d+(\\.\\d+)?"
+    # 混淆后的内容
+    replacement: "???"
 
 # id: `rarity`
 rarity:

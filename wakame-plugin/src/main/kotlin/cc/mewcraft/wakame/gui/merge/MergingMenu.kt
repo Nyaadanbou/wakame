@@ -1,14 +1,15 @@
 package cc.mewcraft.wakame.gui.merge
 
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
-import cc.mewcraft.wakame.item.isCustomNeko
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.*
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -39,14 +40,23 @@ internal class MergingMenu(
     /**
      * 基于当前 [session] 的状态, 执行一次合并操作.
      */
-    fun executeReforge() {
+    private fun executeReforge() {
         session.executeReforge()
+    }
+
+    /**
+     * 基于当前 [session] 的状态, 渲染物品 [source].
+     */
+    private fun renderInputSlot(source: NekoStack): ItemStack {
+        val context = MergingTableContext.MergeInputSlot(session)
+        ItemRenderers.MERGING_TABLE.render(source, context)
+        return source.itemStack
     }
 
     /**
      * 根据当前 [session] 的状态, 刷新输出容器里的物品.
      */
-    fun updateOutputSlot() {
+    private fun updateOutputSlot() {
         // 获取最新的合并结果
         val result = session.latestResult
         // 根据合并的结果, 渲染输出容器里的物品
@@ -135,6 +145,9 @@ internal class MergingMenu(
                     }
                 }
 
+                // 重新渲染放入容器的物品
+                e.newItem = renderInputSlot(added)
+
                 executeReforge()
                 updateOutputSlot()
             }
@@ -178,13 +191,15 @@ internal class MergingMenu(
                 if (result.isSuccess) {
 
                     // 玩家必须有足够的资源
-                    if (!result.cost.test(viewer)) {
+                    if (!result.reforgeCost.test(viewer)) {
+                        setOutputSlot(ItemStack.of(Material.BARRIER).edit {
+                            itemName = text { content("资源不足!"); color(NamedTextColor.RED) }
+                        })
                         return
                     }
 
                     // 把合并后的物品递给玩家
-                    val handle = result.outputItem.itemStack // TODO getFinalOutputs
-                    viewer.inventory.addItem(handle)
+                    viewer.inventory.addItem(*session.getFinalOutputs())
 
                     // 清空菜单中的物品
                     setInputSlot1(null)
@@ -219,6 +234,7 @@ internal class MergingMenu(
         return inputSlot1.getItem(0)
     }
 
+    @Suppress("SameParameterValue")
     private fun setInputSlot1(item: ItemStack?) {
         inputSlot1.setItemSilently(0, item)
     }
@@ -227,6 +243,7 @@ internal class MergingMenu(
         return inputSlot2.getItem(0)
     }
 
+    @Suppress("SameParameterValue")
     private fun setInputSlot2(item: ItemStack?) {
         inputSlot2.setItemSilently(0, item)
     }
@@ -243,49 +260,33 @@ internal class MergingMenu(
      * 负责渲染合并后的物品在 [MergingMenu.outputSlot] 里面的样子.
      */
     private fun renderOutputSlot(result: MergingSession.ReforgeResult): ItemStack {
-        val item = result.outputItem
-        val ret: ItemStack
-
-        val clickToMerge = "<gray>点击确认合并".mini
+        val clickToMerge = "<gray>[<aqua>点击确认合并</aqua>]".mini
 
         if (result.isSuccess) {
             // 渲染成功的结果
 
-            ret = ItemStack(item.itemStack.type)
-            ret.editMeta { meta ->
-                val name = "<white>结果: <green>就绪".mini
-                val lore = buildList<Component> {
-                    add(Component.empty())
-                    add(result.description)
-                    add(Component.empty())
-                    addAll(result.type.description)
-                    addAll(result.cost.description)
-                    add(Component.empty())
+            // 渲染输出的物品
+            val outputItemStack = result.output.apply {
+                val renderingContext = MergingTableContext.MergeOutputSlot(session)
+                ItemRenderers.MERGING_TABLE.render(this, renderingContext)
+            }.itemStack
+
+            return outputItemStack.edit {
+                itemName = "<white>结果: <green>就绪".mini
+                lore = lore.orEmpty() + buildList {
+                    add(empty())
+                    addAll(result.reforgeType.description)
+                    addAll(result.reforgeCost.description)
                     add(clickToMerge)
                 }.removeItalic
-
-                meta.displayName(name.removeItalic)
-                meta.lore(lore)
             }
         } else {
             // 渲染失败的结果
 
-            ret = ItemStack(Material.BARRIER) // 使用 `minecraft:barrier` 作为合并失败的“基础物品”
-            ret.editMeta { meta ->
-                val name = "<white>结果: <red>失败".mini
-                val lore = buildList<Component> {
-                    add(Component.empty())
-                    add(result.description)
-                    add(Component.empty())
-                    addAll(result.type.description)
-                    addAll(result.cost.description)
-                }.removeItalic
-
-                meta.itemName(name)
-                meta.lore(lore)
+            return ItemStack.of(Material.BARRIER).edit {
+                itemName = "<white>结果: <red>失败".mini
+                lore = listOf(result.description).removeItalic
             }
         }
-
-        return ret
     }
 }

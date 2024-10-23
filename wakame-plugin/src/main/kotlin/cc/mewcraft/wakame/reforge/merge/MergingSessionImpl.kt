@@ -12,6 +12,7 @@ import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
@@ -64,6 +65,13 @@ internal class SimpleMergingSession(
 
     override fun returnInputItem1(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT1)
     override fun returnInputItem2(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
+    override fun getFinalOutputs(): Array<ItemStack> {
+        if (latestResult.isSuccess) {
+            return arrayOf(latestResult.output.itemStack)
+        } else {
+            return emptyArray()
+        }
+    }
 
     override var latestResult: MergingSession.ReforgeResult by Delegates.vetoable(ReforgeResult.empty()) { _, old, new ->
         if (frozen) {
@@ -166,43 +174,43 @@ internal object ReforgeResult {
      * 构建一个用于表示*没有合并*的 [MergingSession.ReforgeResult].
      */
     fun empty(): MergingSession.ReforgeResult {
-        return Simple(false, "<gray>没有输入.".mini, NekoStack.empty(), ReforgeType.empty(), ReforgeCost.zero())
+        return Simple(false, "<gray>没有输入.".mini, ReforgeType.empty(), ReforgeCost.zero(), NekoStack.empty())
     }
 
     /**
      * 构建一个用于表示*合并失败*的 [MergingSession.ReforgeResult].
      */
     fun failure(description: Component): MergingSession.ReforgeResult {
-        return Simple(false, description, NekoStack.empty(), ReforgeType.failure(), ReforgeCost.failure())
+        return Simple(false, description, ReforgeType.failure(), ReforgeCost.failure(), NekoStack.empty())
     }
 
     /**
      * 构建一个用于表示*合并成功*的 [MergingSession.ReforgeResult].
      */
     fun success(item: NekoStack, type: MergingSession.ReforgeType, cost: MergingSession.ReforgeCost): MergingSession.ReforgeResult {
-        return Simple(true, "<gray>准备就绪!".mini, item, type, cost)
+        return Simple(true, "<gray>准备就绪!".mini, type, cost, item)
     }
 
     private class Simple(
-        successful: Boolean,
+        isSuccess: Boolean,
         description: Component,
-        item: NekoStack,
         type: MergingSession.ReforgeType,
         cost: MergingSession.ReforgeCost,
+        output: NekoStack,
     ) : MergingSession.ReforgeResult {
 
-        override val isSuccess = successful
+        override val isSuccess = isSuccess
         override val description: Component = description
-        override val outputItem: NekoStack by NekoStackDelegates.copyOnRead(item)
-        override val type: MergingSession.ReforgeType = type
-        override val cost = cost
+        override val reforgeType: MergingSession.ReforgeType = type
+        override val reforgeCost = cost
+        override val output: NekoStack by NekoStackDelegates.copyOnRead(output)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("item", outputItem),
-            ExaminableProperty.of("type", type),
-            ExaminableProperty.of("cost", cost),
+            ExaminableProperty.of("reforgeType", reforgeType),
+            ExaminableProperty.of("reforgeCost", reforgeCost),
+            ExaminableProperty.of("output", output),
         )
 
         override fun toString(): String = toSimpleString()
@@ -254,7 +262,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("This type is not supposed to be used.")
         override val description: List<Component> = listOf(
-            "<white>类型: <gray>n/a".mini
+            "<gray>类型: <white>n/a".mini
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -267,7 +275,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("This type is not supposed to be used.")
         override val description: List<Component> = listOf(
-            "<white>类型: <gray>n/a".mini
+            "<gray>类型: <white>n/a".mini
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -280,7 +288,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation =
             AttributeModifier.Operation.ADD
         override val description: List<Component> = listOf(
-            "<white>类型: <gray>Type 0".mini
+            "<gray>类型: <white>type 0".mini
         )
     }
 
@@ -288,7 +296,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation =
             AttributeModifier.Operation.MULTIPLY_BASE
         override val description: List<Component> = listOf(
-            "<white>类型: <gray>Type 1".mini
+            "<gray>类型: <white>type 1".mini
         )
     }
 
@@ -296,7 +304,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation =
             AttributeModifier.Operation.MULTIPLY_TOTAL
         override val description: List<Component> = listOf(
-            "<white>类型: <gray>Type 2".mini
+            "<gray>类型: <white>type 2".mini
         )
     }
 }
@@ -338,7 +346,7 @@ internal object ReforgeCost {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
         override val description: List<Component> = listOf(
-            "<white>花费: <gray>n/a".mini
+            "<gray>花费: <white>n/a".mini
         )
     }
 
@@ -350,7 +358,7 @@ internal object ReforgeCost {
             throw IllegalStateException("This cost is not supposed to be tested.")
 
         override val description: List<Component> = listOf(
-            "<white>花费: <gray>n/a".mini
+            "<gray>花费: <white>n/a".mini
         )
     }
 
@@ -369,7 +377,7 @@ internal object ReforgeCost {
         }
 
         override val description: List<Component> = listOf(
-            "<white>花费: <yellow>${currencyAmount.toInt()} 金币".mini
+            "<gray>花费: <yellow>${currencyAmount.toInt()} 金币".mini
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.concat(

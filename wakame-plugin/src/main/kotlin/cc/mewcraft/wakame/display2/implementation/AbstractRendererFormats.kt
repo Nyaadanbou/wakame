@@ -11,6 +11,7 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.objectmapping.ObjectMapper
 import org.spongepowered.configurate.objectmapping.meta.*
+import org.spongepowered.configurate.util.NamingSchemes
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
 import java.nio.file.Path
@@ -66,6 +67,7 @@ internal abstract class AbstractRendererFormats(
             serializers {
                 registerAnnotatedObjects(
                     ObjectMapper.factoryBuilder()
+                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
                         .addNodeResolver(NodeResolver.nodeKey())
                         .addNodeResolver(NodeResolver.onlyWithSetting())
                         .addConstraint(Required::class.java, Constraint.required())
