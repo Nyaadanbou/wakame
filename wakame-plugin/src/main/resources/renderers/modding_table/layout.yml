@@ -1,7 +1,3 @@
-# 在这里设置定制台物品的 *渲染布局*.
-
-# FIXME 补充说明
-
 primary:
   - (fixed:general)
   - general:level
