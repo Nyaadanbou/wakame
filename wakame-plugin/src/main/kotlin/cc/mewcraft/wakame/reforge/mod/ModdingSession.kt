@@ -193,7 +193,7 @@ interface ModdingSession : Examinable {
          * - 源物品不存在, i.e., [ModdingSession.sourceItem] = `null`
          */
         @get:Contract(" -> new")
-        val outputItem: NekoStack?
+        val output: NekoStack?
     }
 
     /**

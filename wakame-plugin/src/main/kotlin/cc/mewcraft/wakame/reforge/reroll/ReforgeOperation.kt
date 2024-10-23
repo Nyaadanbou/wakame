@@ -54,7 +54,7 @@ private constructor(
 
         // 如果没有选择任何核孔, 返回一个失败结果
         if (selectionMap.values.all { !it.selected }) {
-            return ReforgeResult.failure("<gray>没有要重造的核孔".mini)
+            return ReforgeResult.failure("<gray>没有要重造的核孔.".mini)
         }
 
         // 获取必要的物品组件

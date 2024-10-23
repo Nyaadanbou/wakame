@@ -95,7 +95,7 @@ internal class SimpleModdingSession(
 
         if (latestResult.isSuccess) {
             // 定制后的物品
-            val itemStack = latestResult.outputItem?.itemStack
+            val itemStack = latestResult.output?.itemStack
             if (itemStack == null) {
                 logger.error("Output item is null, but the player is trying to take it. This is a bug!")
                 return emptyArray()
@@ -274,8 +274,8 @@ internal object ReforgeResult {
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("outputItem", outputItem),
-            ExaminableProperty.of("cost", reforgeCost),
+            ExaminableProperty.of("reforgeCost", reforgeCost),
+            ExaminableProperty.of("output", output),
         )
 
         override fun toString(): String = toSimpleString()
@@ -287,8 +287,8 @@ internal object ReforgeResult {
         override val description: List<Component> = listOf(
             "<gray>没有输出.".mini
         )
-        override val outputItem: NekoStack? = null
         override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty()
+        override val output: NekoStack? = null
     }
 
     private class Failure(
@@ -297,8 +297,8 @@ internal object ReforgeResult {
         override val isEmpty: Boolean = false
         override val isSuccess: Boolean = false
         override val description: List<Component> = description
-        override val outputItem: NekoStack? = null
         override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty()
+        override val output: NekoStack? = null
     }
 
     private class Success(
@@ -309,8 +309,8 @@ internal object ReforgeResult {
         override val isEmpty: Boolean = false
         override val isSuccess: Boolean = true
         override val description: List<Component> = description
-        override val outputItem: NekoStack by NekoStackDelegates.copyOnRead(outputItem)
         override val reforgeCost: ModdingSession.ReforgeCost = cost
+        override val output: NekoStack by NekoStackDelegates.copyOnRead(outputItem)
     }
 }
 
@@ -554,7 +554,7 @@ private object ReforgeReplaceResult {
 
     private abstract class Base : ModdingSession.Replace.Result {
         override val augment: PortableCore?
-            get() =ingredient?.components?.get(ItemComponentTypes.PORTABLE_CORE)
+            get() = ingredient?.components?.get(ItemComponentTypes.PORTABLE_CORE)
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("ingredient", ingredient),

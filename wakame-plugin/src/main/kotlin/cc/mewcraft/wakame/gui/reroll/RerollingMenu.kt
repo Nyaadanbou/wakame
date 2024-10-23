@@ -187,7 +187,7 @@ internal class RerollingMenu(
                 }
 
                 // 把重造后的源物品给玩家
-                viewer.inventory.addItem(result.outputItem.itemStack) // TODO getFinalOutputs
+                viewer.inventory.addItem(result.output.itemStack) // TODO getFinalOutputs
 
                 // 重置会话状态
                 session.reset()
@@ -244,7 +244,7 @@ internal class RerollingMenu(
 
         val viewer = session.viewer
         val result = session.latestResult
-        val item = result.outputItem // deep clone
+        val item = result.output // deep clone
 
         if (result.isSuccess) {
             // 如果可以重造:
@@ -279,7 +279,7 @@ internal class RerollingMenu(
                     addAll(result.description)
                     addAll(result.reforgeCost.description)
                     add(empty())
-                    add("<gray>点击确认重造".mini)
+                    add("<gray>[<aqua>点击确认重造</aqua>]".mini)
                 }
 
                 meta.displayName(name.removeItalic)

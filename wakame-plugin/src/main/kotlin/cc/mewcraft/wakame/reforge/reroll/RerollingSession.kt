@@ -126,7 +126,7 @@ interface RerollingSession : Examinable {
          * 重造后的物品.
          */
         @get:Contract(" -> new")
-        val outputItem: NekoStack
+        val output: NekoStack
     }
 
     /**

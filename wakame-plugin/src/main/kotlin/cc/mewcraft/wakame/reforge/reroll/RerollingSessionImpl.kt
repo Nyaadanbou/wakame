@@ -157,8 +157,8 @@ internal object ReforgeResult {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("item", outputItem),
-            ExaminableProperty.of("cost", reforgeCost),
+            ExaminableProperty.of("reforgeCost", reforgeCost),
+            ExaminableProperty.of("output", output),
         )
 
         override fun toString(): String = toSimpleString()
@@ -167,15 +167,15 @@ internal object ReforgeResult {
     private class Empty : Base() {
         override val isSuccess: Boolean = false
         override val description: List<Component> = listOf(Component.text("<gray>没有输入."))
-        override val outputItem: NekoStack = NekoStack.empty()
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty()
+        override val output: NekoStack = NekoStack.empty()
     }
 
     private class Error : Base() {
         override val isSuccess: Boolean = false
         override val description: List<Component> = listOf(Component.text("<red>内部错误."))
-        override val outputItem: NekoStack = NekoStack.empty()
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error()
+        override val output: NekoStack = NekoStack.empty()
     }
 
     private class Simple(
@@ -194,14 +194,14 @@ internal object ReforgeResult {
 
         override val isSuccess: Boolean = successful
         override val description: List<Component> = description
-        override val outputItem: NekoStack by NekoStackDelegates.copyOnRead(item)
         override val reforgeCost: RerollingSession.ReforgeCost = cost
+        override val output: NekoStack by NekoStackDelegates.copyOnRead(item)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("cost", reforgeCost),
-            ExaminableProperty.of("item", outputItem),
+            ExaminableProperty.of("reforgeCost", reforgeCost),
+            ExaminableProperty.of("output", output),
         )
 
         override fun toString(): String = toSimpleString()

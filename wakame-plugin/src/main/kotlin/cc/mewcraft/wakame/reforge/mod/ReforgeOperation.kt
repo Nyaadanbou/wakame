@@ -43,7 +43,7 @@ private constructor(
         val changedReplaceParams = replaceParams.filter { (_, repl) -> repl.hasInput }
         if (changedReplaceParams.isEmpty()) {
             logger.info("Skipped reforge as all replaces are not applicable")
-            return ReforgeResult.failure("<gray>没有任何修改.".mini)
+            return ReforgeResult.failure("<gray>没有要修改的核心.".mini)
         }
 
         // 检查经过修改的核孔中是否存在无效的耗材
@@ -60,7 +60,7 @@ private constructor(
         // 如果源物品不合法, 则返回失败
         val builder = output.components.get(ItemComponentTypes.CELLS)?.builder() ?: run {
             logger.info("No cells found in source item")
-            return ReforgeResult.failure("<gray>物品没有核孔.".mini)
+            return ReforgeResult.failure("<gray>物品不存在任何核孔.".mini)
         }
 
         for ((id, replace) in changedReplaceParams) {

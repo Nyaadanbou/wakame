@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.isCustomNeko
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.*
 import cc.mewcraft.wakame.util.*
@@ -72,7 +71,8 @@ internal class ModdingMenu(
      * 基于 [session] 的当前状态更新 [inputSlot], 也就是玩家放入的物品.
      */
     private fun renderInputSlot(): ItemStack? {
-        val sourceItem = session.sourceItem ?: return null
+        val sourceItem = session.sourceItem
+            ?: return session.inputItem // sourceItem 为 null 时, 说明这个物品没法定制, 直接返回玩家放入的原物品
         val input = renderInputSlotForPreview(sourceItem)
         return input
     }
@@ -181,12 +181,6 @@ internal class ModdingMenu(
             // 玩家将物品放入*inputSlot*, 意味着一个新的定制过程开始了.
             // 这里需要做的就是刷新 ModdingSession 的状态, 然后更新菜单.
             event.isAdd -> {
-                if (newItem != null && !newItem.isCustomNeko) {
-                    viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
-                    event.isCancelled = true
-                    return
-                }
-
                 session.inputItem = newItem
 
                 // 重新渲染放入的物品
@@ -332,7 +326,10 @@ internal class ModdingMenu(
      */
     private fun renderOutputSlotForConfirm(result: ModdingSession.ReforgeResult): ItemStack {
         return renderOutputSlotForPreview(result).edit {
-            itemName = "<white>确认取出".mini
+            lore = lore.orEmpty() + listOf(
+                empty(),
+                "<gray>[<aqua>点击确认取出</aqua>]".mini
+            ).removeItalic
         }
     }
 
@@ -347,7 +344,7 @@ internal class ModdingMenu(
         if (result.isSuccess) {
             // 定制成功了
 
-            val item = result.outputItem ?: run {
+            val item = result.output ?: run {
                 logger.error("Output item is null, but the result is successful. This is a bug!")
                 return ItemStack(Material.STONE)
             }

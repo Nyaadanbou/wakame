@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -140,7 +140,7 @@ private constructor(
     }
 
     private fun renderInputSlot(replace: ModdingSession.Replace): ItemStack {
-        val clickToWithdraw = "<gray>点击取回核心".mini
+        val clickToWithdraw = "<gray>[<aqua>点击取回核心</aqua>]".mini
 
         val replaceResult = replace.latestResult
         val ingredient = replaceResult.ingredient
@@ -148,7 +148,7 @@ private constructor(
             return ItemStack.of(Material.BARRIER).edit {
                 itemName = "<white>结果: <red>内部错误".mini
                 lore = listOf(
-                    Component.empty(),
+                    empty(),
                     clickToWithdraw
                 ).removeItalic
             }
@@ -163,9 +163,10 @@ private constructor(
             ingredient.directEdit {
                 customName = null // 玩家可能改了名, 所以清除一下
                 itemName = "<white>结果: <green>就绪".mini
-                lore = buildList {
-                    lore?.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }?.let(::addAll)
-                    add(Component.empty())
+                lore = lore.orEmpty().map {
+                    it.colorRecursively(NamedTextColor.DARK_GRAY)
+                } + buildList {
+                    add(empty())
                     add(clickToWithdraw)
                 }.removeItalic
             }
@@ -179,7 +180,7 @@ private constructor(
                 itemName = "<white>结果: <red>无效".mini
                 lore = buildList {
                     addAll(replaceResult.description)
-                    add(Component.empty())
+                    add(empty())
                     add(clickToWithdraw)
                 }.removeItalic
             }
