@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.reroll
 
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.NekoStackDelegates
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -29,17 +28,14 @@ import kotlin.reflect.KProperty
 internal class SimpleRerollingSession(
     override val table: RerollingTable,
     override val viewer: Player,
-    sourceItem: NekoStack? = null,
 ) : RerollingSession, KoinComponent {
     val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
     override val total: MochaFunction = table.currencyCost.compile(this)
 
-    override var inputItem: ItemStack?
-        get() = TODO("Not yet implemented")
-        set(value) {}
+    override var inputItem: ItemStack? by InputItemDelegate(null)
 
-    override var sourceItem: NekoStack? by SourceItemDelegate(sourceItem)
+    override var sourceItem: NekoStack? by SourceItemDelegate(null)
 
     override var selectionMap: RerollingSession.SelectionMap by Delegates.observable(SelectionMap.empty(this)) { _, old, new ->
         logger.info("Selection map updated: $old -> $new")
@@ -73,7 +69,7 @@ internal class SimpleRerollingSession(
     }
 
     override fun reset() {
-        sourceItem = null
+        inputItem = null
         selectionMap = SelectionMap.empty(this)
         latestResult = ReforgeResult.empty()
     }
@@ -88,6 +84,10 @@ internal class SimpleRerollingSession(
         return emptyArray() // 未来可能会用到?
     }
 
+    override fun getFinalOutputs(): Array<ItemStack> {
+        TODO("Not yet implemented")
+    }
+
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("viewer", viewer.name),
         ExaminableProperty.of("table", table),
@@ -95,17 +95,26 @@ internal class SimpleRerollingSession(
 
     override fun toString(): String = toSimpleString()
 
-    private inner class SourceItemDelegate(
-        private var backing: NekoStack?,
-    ) : ReadWriteProperty<RerollingSession, NekoStack?> {
+    private inner class InputItemDelegate(private var backing: ItemStack?) : ReadWriteProperty<RerollingSession, ItemStack?> {
+        override fun getValue(thisRef: RerollingSession, property: KProperty<*>): ItemStack? {
+            return backing?.clone()
+        }
+
+        override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
+            backing = value?.clone()
+            sourceItem = value?.customNeko
+            selectionMap = SelectionMap.simple(thisRef)
+            latestResult = executeReforge0()
+        }
+    }
+
+    private inner class SourceItemDelegate(private var backing: NekoStack?) : ReadWriteProperty<RerollingSession, NekoStack?> {
         override fun getValue(thisRef: RerollingSession, property: KProperty<*>): NekoStack? {
             return backing?.clone()
         }
 
         override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: NekoStack?) {
             backing = value?.clone()
-            selectionMap = SelectionMap.simple(thisRef)
-            latestResult = executeReforge0()
         }
     }
 }
@@ -280,8 +289,8 @@ internal object Selection {
     /**
      * 创建一个不可修改的 [Selection].
      */
-    fun unchangeable(session: RerollingSession): RerollingSession.Selection {
-        return Empty(session)
+    fun unchangeable(session: RerollingSession, id: String): RerollingSession.Selection {
+        return Empty(session, id)
     }
 
     /**
@@ -292,22 +301,18 @@ internal object Selection {
         id: String,
         rule: RerollingTable.CellRule,
         template: Group<CoreBlueprint, ItemGenerationContext>,
-        display: ItemStack,
     ): RerollingSession.Selection {
-        return Simple(session, id, rule, template, display)
+        return Simple(session, id, rule, template)
     }
 
     private class Empty(
         override val session: RerollingSession,
+        override val id: String,
     ) : RerollingSession.Selection {
-        override val id: String
-            get() = "" // ???
         override val rule: RerollingTable.CellRule
             get() = RerollingTable.CellRule.empty()
         override val template: Group<CoreBlueprint, ItemGenerationContext>
             get() = Group.empty()
-        override val display: ItemStack
-            get() = ItemStack.empty()
         override val total: MochaFunction
             get() = MochaFunction { .0 }
         override val changeable: Boolean
@@ -325,7 +330,6 @@ internal object Selection {
         override val id: String,
         override val rule: RerollingTable.CellRule,
         override val template: Group<CoreBlueprint, ItemGenerationContext>,
-        override val display: ItemStack,
     ) : RerollingSession.Selection, KoinComponent {
         private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
         override val total: MochaFunction = rule.currencyCost.compile(session, this)
@@ -389,12 +393,23 @@ internal object SelectionMap : KoinComponent {
         for ((id, cell) in cells) {
 
             // 获取核孔的重造规则
-            // 如果这个核孔没有对应的重造规则, 则判定该核孔不支持重造
-            val cellRule = itemRule.cellRuleMap[id] ?: continue
+            val cellRule = itemRule.cellRuleMap[id]
 
             // 获取核孔的重造模板
-            // 这个核孔没有对应的模板, 则判定该核孔不支持重造
-            val template = templates[id]?.core ?: continue
+            val template = templates[id]?.core
+
+            // 如果:
+            //   这个核孔没有对应的重造规则, 或者
+            //   这个核孔没有对应的物品模板,
+            // 则判定该核孔不支持重造.
+            // 不支持重造的核孔依然被封装为一个 Selection.unchangeable,
+            // 这样这个核孔会显示在菜单里. 如果连 Selection 对象都不存在,
+            // 那么这个核孔就不会显示在菜单里.
+            if (cellRule == null || template == null) {
+                logger.info("Item cell '$id' does not support rerolling.")
+                selectionMap[id] = Selection.unchangeable(session, id)
+                continue
+            }
 
             val display = ItemStack(CoreIcons.get(cell.hashCode()))
             display.editMeta {
@@ -411,7 +426,6 @@ internal object SelectionMap : KoinComponent {
                 id = id,
                 rule = cellRule,
                 template = template,
-                display = display,
             )
 
             selectionMap[id] = selection

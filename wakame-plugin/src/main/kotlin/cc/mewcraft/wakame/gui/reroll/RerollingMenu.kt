@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.gui.reroll
 
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
-import cc.mewcraft.wakame.item.isCustomNeko
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.*
 import cc.mewcraft.wakame.util.*
@@ -52,8 +53,8 @@ internal class RerollingMenu(
      * 基于 [session] 的当前状态刷新输出容器.
      */
     fun updateOutput() {
-        val output = renderOutputSlot(session)
-        setOutputSlot(output)
+        val itemStack = renderOutputSlot()
+        setOutputSlot(itemStack)
     }
 
     /**
@@ -108,17 +109,20 @@ internal class RerollingMenu(
             // 玩家尝试把物品放进 inputSlot:
             // ... 说明玩家想要开始一次重造流程
             event.isAdd -> {
-                val ns = newItem?.takeIf { it.isCustomNeko }?.tryNekoStack ?: run {
+                val added = newItem?.customNeko ?: run {
                     viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                     event.isCancelled = true
                     return
                 }
 
-                // 给会话输入源物品
-                session.sourceItem = ns
+                // 设置本会话的源物品
+                session.inputItem = newItem
+
+                // 重新渲染放入的物品
+                event.newItem = renderInputSlot(added)
 
                 // 创建并设置子菜单
-                setSelectionGuis(createSelectionGuis())
+                setSelectionMenus(createSelectionMenus())
 
                 // 更新输出容器
                 updateOutput()
@@ -138,7 +142,7 @@ internal class RerollingMenu(
                 // 清空菜单内容
                 setInputSlot(null)
                 setOutputSlot(null)
-                setSelectionGuis(null)
+                setSelectionMenus(null)
             }
         }
     }
@@ -183,6 +187,7 @@ internal class RerollingMenu(
 
                 // 判断玩家是否有足够的资源
                 if (!result.reforgeCost.test(viewer)) {
+                    viewer.sendMessage(GuiMessages.MESSAGE_INSUFFICIENT_RESOURCES)
                     return
                 }
 
@@ -195,7 +200,7 @@ internal class RerollingMenu(
                 // 清空菜单内容
                 setInputSlot(null)
                 setOutputSlot(null)
-                setSelectionGuis(null)
+                setSelectionMenus(null)
             }
         }
     }
@@ -205,7 +210,7 @@ internal class RerollingMenu(
 
         setInputSlot(null)
         setOutputSlot(null)
-        setSelectionGuis(null)
+        setSelectionMenus(null)
 
         viewer.inventory.addItem(*session.getAllInputs())
 
@@ -217,11 +222,11 @@ internal class RerollingMenu(
         logger.info("RerollingMenu opened for ${viewer.name}")
     }
 
-    private fun createSelectionGuis(): List<Gui> {
+    private fun createSelectionMenus(): List<Gui> {
         return session.selectionMap.map { (_, sel) -> SelectionMenu(this, sel) }
     }
 
-    private fun setSelectionGuis(guis: List<Gui>?) {
+    private fun setSelectionMenus(guis: List<Gui>?) {
         primaryGui.setContent(guis)
     }
 
@@ -235,76 +240,48 @@ internal class RerollingMenu(
     }
 
     /**
-     * 负责渲染 [RerollingMenu.outputSlot] 里面的内容.
+     * 渲染 [RerollingMenu.inputSlot] 里面的内容.
      */
-    private fun renderOutputSlot(session: RerollingSession): ItemStack {
-        // TODO 更丰富的结果预览:
-        //  能够显示哪些核孔会被重造, 哪些不会
-        //  这要求对渲染模块进行重构 ...
+    private fun renderInputSlot(source: NekoStack): ItemStack {
+        val context = RerollingTableContext(RerollingTableContext.Slot.INPUT, session)
+        ItemRenderers.REROLLING_TABLE.render(source, context)
+        return source.itemStack
+    }
 
-        val viewer = session.viewer
+    /**
+     * 渲染 [RerollingMenu.outputSlot] 里面的内容.
+     */
+    private fun renderOutputSlot(): ItemStack {
         val result = session.latestResult
-        val item = result.output // deep clone
 
         if (result.isSuccess) {
             // 如果可以重造:
 
-            if (!result.reforgeCost.test(viewer)) {
-                // 如果玩家没有足够的资源:
+            // 这里修改输入的原始物品, 作为输出物品的预览.
+            // 我们重新渲染*原始物品*上要修改的核心, 这样可以准确的反映哪些部分被修改了.
+            // 我们不选择渲染*重造之后*的物品, 因为那样必须绕很多弯路, 非常不好实现.
 
-                val ret = ItemStack(Material.BARRIER)
-                ret.editMeta { meta ->
-                    val name = "<white>结果: <red>资源不足".mini
-                    val lore = buildList {
-                        addAll(result.description)
-                        addAll(result.reforgeCost.description)
-                    }
+            val previewItem = session.inputItem?.customNeko ?: error("Result is successful but the input item is null. This is a bug!")
+            ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(RerollingTableContext.Slot.OUTPUT, session))
 
-                    meta.itemName(name)
-                    meta.lore(lore.removeItalic)
-                }
-
-                return ret
-            }
-
-            // 移除物品的萌芽数据
-            item.erase() // FIXME NekoStackDisplay
-
-            // 在原物品的基础上做修改
-            // 这样可以保留物品的类型以及其他的原版组件信息
-            val ret = item.itemStack
-            ret.editMeta { meta ->
-                val name = "<white>结果: <green>就绪".mini
-                val lore = buildList {
-                    addAll(result.description)
+            return previewItem.directEdit {
+                lore = lore.orEmpty() + buildList {
+                    add(empty())
                     addAll(result.reforgeCost.description)
                     add(empty())
                     add("<gray>[<aqua>点击确认重造</aqua>]".mini)
-                }
-
-                meta.displayName(name.removeItalic)
-                meta.lore(lore.removeItalic)
+                }.removeItalic
             }
-
-            return ret
 
         } else {
             // 如果不可重造:
 
-            // 在新创建的物品上做修改
-            // 因为根本无法重造所以原物品的信息就无所谓了
-            val ret = ItemStack(Material.BARRIER)
-            ret.editMeta { meta ->
-                val name = "<white>结果: <red>失败".mini
-                val lore = buildList {
-                    addAll(result.description)
-                }
-
-                meta.itemName(name)
-                meta.lore(lore.removeItalic)
+            // 由于根本无法重造, 所以也不存在重造后的物品.
+            // 这里直接创建一个新的物品堆叠 (屏障).
+            return ItemStack.of(Material.BARRIER).edit {
+                itemName = "<white>结果: <red>失败".mini
+                lore = result.description.removeItalic
             }
-
-            return ret
         }
     }
 

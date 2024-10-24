@@ -1,22 +1,18 @@
 # 在这里设置重造台物品的 *渲染布局*.
 
-# FIXME 补充说明
-
 primary:
-  - (fixed:general)1
+  - (fixed:general)
   - general:level
   - general:rarity
   - general:elements
 
-  - (fixed:attribute)2
+  - (fixed:attribute)
   - attribute:attack_damage
-  - attribute:block_interaction_range
-  - attribute:critical_strike_chance
   - attribute:defense
-  - attribute:entity_interaction_range
   - attribute:max_health
   - attribute:movement_speed
   - stash:cells/empty
 
-  - (fixed:vanilla)3
+  - (fixed:vanilla)
   - vanilla:item_name
+  - vanilla:custom_name

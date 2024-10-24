@@ -60,7 +60,7 @@ interface RerollingSession : Examinable {
      * - 会生成一个新的 [SelectionMap] 并赋值给 [RerollingSession.selectionMap]
      */
     @VariableByPlayer
-    var sourceItem: NekoStack?
+    val sourceItem: NekoStack?
 
     /**
      * 每个核孔的选择状态.
@@ -102,6 +102,13 @@ interface RerollingSession : Examinable {
      * 返回输入进菜单但未使用的物品.
      */
     fun getUnusedInputs(): Array<ItemStack>
+
+    /**
+     * 返回本会话产生的最终物品输出, 无论是重造成功还是失败.
+     * 如果重造成功, 这包括了重造成功后的物品, 以及所有未使用的耗材.
+     * 如果重造失败, 则包括了需要被重造的物品, 以及输入的所有耗材.
+     */
+    fun getFinalOutputs(): Array<ItemStack>
 
     /**
      * 封装了一次重造的结果.
@@ -172,11 +179,6 @@ interface RerollingSession : Examinable {
          * 用于重新随机核孔核心的掉落表.
          */
         val template: Group<CoreBlueprint, ItemGenerationContext>
-
-        /**
-         * 核孔在菜单中的图标, 用于告诉玩家这个核孔是什么.
-         */
-        val display: ItemStack
 
         /**
          * 核孔花费的计算函数.
