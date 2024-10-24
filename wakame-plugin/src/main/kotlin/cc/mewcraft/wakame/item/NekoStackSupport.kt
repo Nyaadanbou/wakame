@@ -74,6 +74,34 @@ val ItemStack.tryNekoStack: NekoStack?
     }
 
 /**
+ * 尝试获取 [ItemStack] 对应的 [NekoStack].
+ * 如果无法完成转换, 则返回 `null`.
+ */
+val ItemStack.neko: NekoStack?
+    get() {
+        val tag = this.unsafeNyaTag
+        if (tag != null) {
+            if (NekoStackSupport.getPrototype(tag) != null) {
+                return CustomNekoStack(this)
+            }
+        }
+        return VanillaNekoStackRegistry.get(this.type)
+    }
+
+/**
+ * 尝试获取 [ItemStack] 对应的 [CustomNekoStack].
+ * 如果无法完成转换, 则返回 `null`.
+ */
+val ItemStack.customNeko: NekoStack?
+    get() {
+        val tag = this.unsafeNyaTag
+        if (tag != null) {
+            return CustomNekoStack(this)
+        }
+        return null
+    }
+
+/**
  * 将 [ItemStack] 转换为一个 [NekoStack].
  * 如果无法完成转换, 则抛出异常.
  *
@@ -94,13 +122,16 @@ fun ItemStack.takeIfNeko(): ItemStack? {
 }
 
 /**
- * 直接修改一个被 [NekoStack] 所封装的 [ItemStack]. 仅对 [CustomNekoStack] 有效.
+ * 直接修改一个 [NekoStack] 封装的底层 [ItemStack].
+ * 如果 [NekoStack] 不是一个 [CustomNekoStack],
+ * 则返回一个 [ItemStack.empty].
  */
-fun NekoStack.directEdit(block: ItemStackDSL.() -> Unit) {
+fun NekoStack.directEdit(block: ItemStackDSL.() -> Unit): ItemStack {
     if (this is CustomNekoStack) {
-        handle.edit(block)
+        return handle.edit(block)
     } else {
-        Injector.get<Logger>().warn("Attempted to edit a non-custom NekoStack")
+        Injector.get<Logger>().warn("Attempted to edit a non-custom NekoStack. Returning empty one.")
+        return ItemStack.empty()
     }
 }
 

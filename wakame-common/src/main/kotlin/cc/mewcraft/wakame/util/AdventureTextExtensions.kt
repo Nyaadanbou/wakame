@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.util
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextColor
-import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.format.*
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 
 val Component.plain: String
@@ -17,6 +17,12 @@ val Component.removeItalic: Component
 val List<Component>.removeItalic: List<Component>
     get() = map(Component::removeItalic)
 
+fun Component.fontRecursively(font: Key): Component {
+    return this.font(font).children(
+        this.children().map { child -> child.fontRecursively(font) }
+    ).compact()
+}
+
 fun Component.colorRecursively(color: TextColor): Component {
     return this.color(color).children(
         this.children().map { child -> child.colorRecursively(color) }
@@ -28,3 +34,16 @@ fun Component.decorateRecursively(decoration: TextDecoration): Component {
         this.children().map { child -> child.decorateRecursively(decoration) }
     ).compact()
 }
+
+fun Component.styleRecursively(style: Style): Component {
+    return this.style(style).children(
+        this.children().map { child -> child.styleRecursively(style) }
+    ).compact()
+}
+
+fun Component.styleRecursively(style: Style, strategy: Style.Merge.Strategy): Component {
+    return this.style { it.merge(style, strategy) }.children(
+        this.children().map { child -> child.styleRecursively(style) }
+    ).compact()
+}
+
