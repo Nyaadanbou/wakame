@@ -5,10 +5,11 @@ package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.AttributeModifier.*
-import cc.mewcraft.wakame.attribute.composite.*
+import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
@@ -30,7 +31,6 @@ import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.packet.PacketNekoStack
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.*
-import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.StringCombiner
 import cc.mewcraft.wakame.util.value
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -72,24 +72,15 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
 
         val templates = item.templates
         templates.process(ItemTemplateTypes.ARROW) { data -> StandardRenderingParts.ARROW.process(collector, data) }
-        // 最可能需要频繁修改的 `custom_name`, `item_name`, `lore` 直接读取配置模板
+
+        // 对于最可能被频繁修改的 `custom_name`, `item_name`, `lore` 直接读取配置模板里的内容
         templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> StandardRenderingParts.CUSTOM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.ITEM_NAME) { data -> StandardRenderingParts.ITEM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.LORE) { data -> StandardRenderingParts.LORE.process(collector, data) }
 
         val components = item.components
         components.process(ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingParts.ATTACK_SPEED.process(collector, data) }
-        components.process(ItemComponentTypes.CELLS) { data ->
-            for ((_, cell) in data) {
-                when (
-                    val core = cell.getCore()
-                ) {
-                    is AttributeCore -> StandardRenderingParts.CELLULAR_ATTRIBUTE.process(collector, core.attribute)
-                    is SkillCore -> StandardRenderingParts.CELLULAR_SKILL.process(collector, core.skill)
-                    is EmptyCore -> StandardRenderingParts.CELLULAR_EMPTY.process(collector, null)
-                }
-            }
-        }
+        components.process(ItemComponentTypes.CELLS) { data -> for ((_, cell) in data) renderCore(collector, cell.getCore()) }
         components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingParts.CRATE.process(collector, data) }
         components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingParts.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
@@ -102,12 +93,12 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCmd = ItemModelDataLookup[item.id, item.variant]
+        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         item.erase()
 
         item.lore(itemLore)
-        item.customModelData(itemCmd)
+        item.customModelData(itemCustomModelData)
         item.showAttributeModifiers(false)
         // item.showCanBreak(false)
         // item.showCanPlaceOn(false)
@@ -117,6 +108,14 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         item.showStoredEnchantments(false)
         // item.showTrim(false)
         // item.showUnbreakable(false)
+    }
+
+    private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
+        when (core) {
+            is AttributeCore -> StandardRenderingParts.CELLULAR_ATTRIBUTE.process(collector, core)
+            is SkillCore -> StandardRenderingParts.CELLULAR_SKILL.process(collector, core)
+            is EmptyCore -> StandardRenderingParts.CELLULAR_EMPTY.process(collector, core)
+        }
     }
 }
 
@@ -142,18 +141,18 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE: RenderingPart<ConstantCompositeAttribute, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
+    val CELLULAR_ATTRIBUTE: RenderingPart<AttributeCore, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
         format.render(data)
     }
 
     @JvmField
-    val CELLULAR_SKILL: RenderingPart<ConfiguredSkill, CellularSkillRendererFormat> = configure("cells/skills") { data, format ->
+    val CELLULAR_SKILL: RenderingPart<SkillCore, CellularSkillRendererFormat> = configure("cells/skills") { data, format ->
         format.render(data)
     }
 
     @JvmField
-    val CELLULAR_EMPTY: RenderingPart<Nothing?, CellularEmptyRendererFormat> = configure("cells/empty") { _, format ->
-        format.render()
+    val CELLULAR_EMPTY: RenderingPart<EmptyCore, CellularEmptyRendererFormat> = configure("cells/empty") { data, format ->
+        format.render(data)
     }
 
     @JvmField
@@ -260,27 +259,18 @@ internal data class CellularAttributeRendererFormat(
     override val namespace: String,
     @Setting @Required
     private val ordinal: Ordinal,
-) : RendererFormat.Dynamic<ConstantCompositeAttribute> {
+) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
 
-    fun render(data: ConstantCompositeAttribute): IndexedText {
+    fun render(data: AttributeCore): IndexedText {
         return SimpleIndexedText(computeIndex(data), data.description)
     }
 
     /**
      * 实现要求: 返回值必须是 [AttributeCoreTextMeta.derivedIndexes] 的子集.
      */
-    override fun computeIndex(data: ConstantCompositeAttribute): Key {
-        val indexId = buildString {
-            append(data.id)
-            append('.')
-            append(data.operation.key)
-            data.element?.let {
-                append('.')
-                append(it.uniqueId)
-            }
-        }
-        return Key.key(namespace, indexId)
+    override fun computeIndex(data: AttributeCore): Key {
+        return data.computeIndex(namespace)
     }
 
     @ConfigSerializable
@@ -296,17 +286,17 @@ internal data class CellularAttributeRendererFormat(
 internal data class CellularSkillRendererFormat(
     @Setting @Required
     override val namespace: String,
-) : RendererFormat.Dynamic<ConfiguredSkill> {
+) : RendererFormat.Dynamic<SkillCore> {
     override val textMetaFactory = SkillCoreTextMetaFactory(namespace)
 
-    fun render(data: ConfiguredSkill): IndexedText {
-        val instance = data.instance
+    fun render(data: SkillCore): IndexedText {
+        val instance = data.skill.instance
         val tooltip = instance.displays.tooltips.map(MM::deserialize)
         return SimpleIndexedText(computeIndex(data), tooltip)
     }
 
-    override fun computeIndex(data: ConfiguredSkill): Key {
-        val dataId = data.id
+    override fun computeIndex(data: SkillCore): Key {
+        val dataId = data.skill.id
         val indexId = dataId.namespace() + "/" + dataId.value()
         return Key.key(namespace, indexId)
     }
@@ -333,7 +323,7 @@ internal data class CellularEmptyRendererFormat(
         SimpleIndexedText(index.value { v -> "$v/$i" }, tooltip)
     }
 
-    fun render(): IndexedText {
+    fun render(data: EmptyCore): IndexedText {
         return tooltipCycle.next()
     }
 }

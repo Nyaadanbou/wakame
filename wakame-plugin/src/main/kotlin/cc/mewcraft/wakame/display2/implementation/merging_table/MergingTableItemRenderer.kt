@@ -73,14 +73,19 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
         }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCmd = ItemModelDataLookup[item.id, item.variant]
+        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         item.erase()
 
         item.directEdit {
+            // 本 ItemRenderer 专门渲染放在菜单里面的物品,
+            // 而这些物品有些时候会被玩家(用铁砧)修改 `minecraft:custom_name`
+            // 导致在菜单里显示的是玩家自己设置的(奇葩)名字.
+            // 我们在这里统一清除掉这个组件.
             customName = null
+
             lore = itemLore
-            customModelData = itemCmd
+            customModelData = itemCustomModelData
             showNothing()
         }
     }
@@ -99,13 +104,13 @@ internal object MergingTableRenderingParts : RenderingParts(MergingTableItemRend
     @JvmField
     val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = CommonRenderingParts.LEVEL(this)
 
-    // 放在输入容器的便携核心
+    // 渲染放在输入容器的便携核心
     @JvmField
     val MERGE_IN: RenderingPart2<PortableCore, MergingTableContext.MergeInputSlot, MergeInputOutputRendererFormat> = configure2("merge_input") { data, context, format ->
         format.render(data, context)
     }
 
-    // 放在输出容器的便携核心
+    // 渲染放在输出容器的便携核心
     @JvmField
     val MERGE_OUT: RenderingPart2<PortableCore, MergingTableContext.MergeOutputSlot, MergeInputOutputRendererFormat> = configure2("merge_output") { data, context, format ->
         format.render(data, context)

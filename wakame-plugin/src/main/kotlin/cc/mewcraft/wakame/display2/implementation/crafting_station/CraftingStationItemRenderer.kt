@@ -97,7 +97,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> CraftingStationRenderingParts.ENCHANTMENTS.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCmd = ItemModelDataLookup[item.id, item.variant]
+        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         if (context.erase) {
             item.erase()
@@ -105,7 +105,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
 
         item.directEdit {
             lore = itemLore
-            customModelData = itemCmd
+            customModelData = itemCustomModelData
             showAttributeModifiers(false)
             showEnchantments(false)
             showStoredEnchantments(false)

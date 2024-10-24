@@ -3,10 +3,10 @@
  */
 package cc.mewcraft.wakame.display2.implementation.modding_table
 
-import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.display2.implementation.standard.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -79,13 +79,13 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCmd = ItemModelDataLookup[item.id, item.variant]
+        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         item.erase()
 
         item.directEdit {
             lore = itemLore
-            customModelData = itemCmd
+            customModelData = itemCustomModelData
             showNothing()
         }
     }
@@ -166,11 +166,6 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
 
     @JvmField
     val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = CommonRenderingParts.LEVEL(this)
-
-    // @JvmField
-    // val AUGMENT: RenderingPart<PortableCore, AugmentRendererFormat> = configure("augment") { data, format ->
-    //     format.render(data)
-    // }
 
     @JvmField
     val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = CommonRenderingParts.RARITY(this)
@@ -254,17 +249,7 @@ internal data class CellularAttributeRendererFormat(
      * 实现要求: 返回值必须是 [AttributeCoreTextMeta.derivedIndexes] 的子集.
      */
     override fun computeIndex(data: AttributeCore): Key {
-        val attribute = data.attribute
-        val indexId = buildString {
-            append(attribute.id)
-            append('.')
-            append(attribute.operation.key)
-            attribute.element?.let {
-                append('.')
-                append(it.uniqueId)
-            }
-        }
-        return Key.key(namespace, indexId)
+        return data.computeIndex(namespace)
     }
 
     @ConfigSerializable
@@ -344,37 +329,3 @@ internal data class CellularEmptyRendererFormat(
         return original.copy(text = processed)
     }
 }
-
-// @ConfigSerializable
-// internal data class AugmentRendererFormat(
-//     @Setting @Required
-//     override val namespace: String,
-// ) : RendererFormat.Simple {
-//     override val id = "augment"
-//     override val index = createIndex()
-//     override val textMetaFactory = AugmentTextMetaFactory(namespace)
-//
-//     private val unknownIndex = Key.key(namespace, "unknown")
-//
-//     fun render(data: PortableCore): IndexedText {
-//         val core = data.wrapped as? AttributeCore
-//             ?: return SimpleIndexedText(unknownIndex, listOf())
-//         return SimpleIndexedText(index, core.description)
-//     }
-// }
-
-
-//////
-
-
-// internal data class AugmentTextMetaFactory(
-//     override val namespace: String,
-// ) : TextMetaFactory {
-//     override fun test(sourceIndex: SourceIndex): Boolean {
-//         return sourceIndex.namespace() == namespace && sourceIndex.value() == "augment"
-//     }
-//
-//     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-//         return SingleSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
-//     }
-// }
