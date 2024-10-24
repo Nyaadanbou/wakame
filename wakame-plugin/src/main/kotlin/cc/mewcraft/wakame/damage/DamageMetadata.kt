@@ -1,15 +1,12 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
@@ -41,8 +38,6 @@ sealed interface DamageMetadata {
     val criticalStrikeMetadata: CriticalStrikeMetadata
 }
 
-private val logger: Logger by Injector.inject()
-
 /**
  * 非生物造成的伤害元数据.
  * 用于给特定原版伤害类型加上元素和护甲穿透.
@@ -65,15 +60,6 @@ class VanillaDamageMetadata(
     )
 
     constructor(damageValue: Double) : this(ElementRegistry.DEFAULT, damageValue, 0.0, 0.0)
-
-    private val weakElement: WeakReference<Element> = WeakReference(element)
-
-    /**
-     * 这次伤害的元素类型.
-     */
-    val element: Element
-        get() = weakElement.get() ?: throw IllegalStateException("Element reference no longer exists!")
-
 
     override val damageValue: Double = damageBundle.damageSum
     override val damageTags: DamageTags = DamageTags()
@@ -139,7 +125,7 @@ class EntityDamageMetadata(
     private val weakEntity: WeakReference<LivingEntity> = WeakReference(damager)
 
     init {
-        if(damager is Player){
+        if (damager is Player) {
             logger.warn("The damager of EntityDamageMetadata shouldn't be a player!")
         }
     }
@@ -153,14 +139,6 @@ class EntityDamageMetadata(
     override val damageTags: DamageTags = DamageTags()
     override val damageValue: Double = damageBundle.damageSum
 }
-
-sealed interface ProjectileDamageMetadata : DamageMetadata {
-    /**
-     * 造成这次伤害的弹射物.
-     */
-    val projectile: Projectile
-}
-
 
 /**
  * 自定义的伤害元数据.

@@ -2,11 +2,12 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attack.SwordAttack
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.EntityAttributeAccessor
-import cc.mewcraft.wakame.attribute.IntangibleAttributeMaps
+import cc.mewcraft.wakame.attribute.EntityAttributeMapAccess
+import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
 import cc.mewcraft.wakame.damage.mappings.DamageTypeMappings
 import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
 import cc.mewcraft.wakame.damage.mappings.ProjectileTypeMappings
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.toNekoStack
@@ -23,7 +24,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 object DamageManager : KoinComponent {
     val logger: Logger by inject()
@@ -173,8 +174,8 @@ object DamageManager : KoinComponent {
             return null
         }
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return null
-        val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
-        val attributeMapSnapshot = IntangibleAttributeMaps.ARROW.getSnapshot()
+        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
+        val attributeMapSnapshot = ImaginaryAttributeMaps.ARROW.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
         }
@@ -309,7 +310,7 @@ object DamageManager : KoinComponent {
         val nekoStack = itemStack.tryNekoStack
         val cells = nekoStack?.components?.get(ItemComponentTypes.CELLS)
         if (nekoStack?.templates?.has(ItemTemplateTypes.ARROW) == true && cells != null) {
-            val attributeModifiers = cells.collectAttributeModifiers(nekoStack)
+            val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
             val attributeMapSnapshot = entity.toUser().attributeMap.getSnapshot()
             attributeModifiers.forEach { attribute, modifier ->
                 attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)

@@ -21,16 +21,16 @@
 
 empty:
   enabled: true
-  display: "无属性"
+  display: "<!i>无属性"
   tooltips:
-    add: "Empty"
-    multiply_base: "Empty"
-    multiply_total: "Empty"
+    add: "<!i>Empty"
+    multiply_base: "<!i>Empty"
+    multiply_total: "<!i>Empty"
   values: { }
 
 attack_damage:
   enabled: true
-  display: "<element>攻击力"
+  display: "<!i><element>攻击力"
   tooltips:
     add: "<!i><element>攻击力 <min:#;-.> ⎓ <max:#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -63,40 +63,40 @@ attack_damage:
 
 attack_damage_rate:
   enabled: true
-  display: "<element>攻击力"
+  display: "<!i><element>攻击力"
   tooltips:
     add: "<!i><element>攻击力 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
     neutral:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     fire:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     water:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     wind:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     earth:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
     thunder:
-      default: .0
-      min: -0.1
-      max: 5.0
+      default: 1.0
+      min: -1.0
+      max: 16384.0
 
 attack_effect_chance:
   enabled: true
-  display: "元素叠加"
+  display: "<!i>元素叠加"
   tooltips:
     add: "<!i>元素叠加 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -108,7 +108,7 @@ attack_effect_chance:
 
 block_interaction_range:
   enabled: true
-  display: "方块交互距离"
+  display: "<!i>方块交互距离"
   tooltips:
     add: "<!i>方块交互距离 <value:+#.#;-.>"
     multiply_base: "<!i>方块交互距离 <value:+#%;-.%>"
@@ -120,31 +120,31 @@ block_interaction_range:
 
 critical_strike_chance:
   enabled: true
-  display: "暴击概率"
+  display: "<!i>暴击概率"
   tooltips:
     add: "<!i>暴击概率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
-    default: .01
-    min: .0
+    default: .0
+    min: -1.0
     max: 1.0
 
 critical_strike_power:
   enabled: true
-  display: "暴击伤害"
+  display: "<!i>暴击伤害"
   tooltips:
     add: "<!i>暴击伤害 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
     default: 1.0
-    min: .0
-    max: 5.0
+    min: 1.0
+    max: 16384.0
 
 defense:
   enabled: true
-  display: "<element>防御力"
+  display: "<!i><element>防御力"
   tooltips:
     add: "<!i><element>防御力 <value:+#;-.>"
     multiply_base: "<!i><element>防御力 <value:+#%;-.%>"
@@ -177,7 +177,7 @@ defense:
 
 defense_penetration:
   enabled: true
-  display: "<element>防御穿透"
+  display: "<!i><element>防御穿透"
   tooltips:
     add: "<!i><element>防御穿透 <value:+#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -210,7 +210,7 @@ defense_penetration:
 
 defense_penetration_rate:
   enabled: true
-  display: "<element>防御穿透率"
+  display: "<!i><element>防御穿透率"
   tooltips:
     add: "<!i><element>防御穿透率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -243,7 +243,7 @@ defense_penetration_rate:
 
 entity_interaction_range:
   enabled: true
-  display: "实体交互距离"
+  display: "<!i>实体交互距离"
   tooltips:
     add: "<!i>实体交互距离 <value:+#.#;-.>"
     multiply_base: "<!i>实体交互距离 <value:+#%;-.%>"
@@ -253,9 +253,33 @@ entity_interaction_range:
     min: 1.0
     max: 64.0
 
+hammer_damage_range:
+  enabled: true
+  display: "<!i>锤击范围"
+  tooltips:
+    add: "<!i>锤击范围 <value:+#.#;-.>"
+    multiply_base: "<!i>锤击范围 <value:+#%;-.%>"
+    multiply_total: "<!i>锤击范围 ×<value:+#%;-.%>"
+  values:
+    default: 0.0
+    min: 0.0
+    max: 64.0
+
+hammer_damage_ratio:
+  enabled: true
+  display: "<!i>锤击比率"
+  tooltips:
+    add: "<!i>锤击比率 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: 0.0
+    min: 0.0
+    max: 1.0
+
 health_regeneration:
   enabled: true
-  display: "生命恢复"
+  display: "<!i>生命恢复"
   tooltips:
     add: "<!i>生命恢复 <value:+#;-.>"
     multiply_base: "<!i>生命恢复 <value:+#%;-.%>"
@@ -267,40 +291,40 @@ health_regeneration:
 
 incoming_damage_rate:
   enabled: true
-  display: "<element>承伤百分比"
+  display: "<!i><element>承伤百分比"
   tooltips:
     add: "<!i><element>承伤百分比 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
     multiply_total: "<red>DO_NOT_USE"
   values:
     neutral:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     fire:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     water:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     wind:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     earth:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
     thunder:
-      default: .0
+      default: 1.0
       min: -1.0
-      max: 10.0
+      max: 16384.0
 
 lifesteal:
   enabled: true
-  display: "攻击吸血"
+  display: "<!i>攻击吸血"
   tooltips:
     add: "<!i>攻击吸血 <value:+#;-.>"
     multiply_base: "<!i>攻击吸血 <value:+#%;-.%>"
@@ -312,7 +336,7 @@ lifesteal:
 
 mana_consumption_rate:
   enabled: true
-  display: "魔法消耗百分比"
+  display: "<!i>魔法消耗百分比"
   tooltips:
     add: "<!i>魔法消耗率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -324,7 +348,7 @@ mana_consumption_rate:
 
 mana_regeneration:
   enabled: true
-  display: "魔法恢复"
+  display: "<!i>魔法恢复"
   tooltips:
     add: "<!i>魔法恢复 <value:+#;-.>"
     multiply_base: "<!i>魔法恢复 <value:+#%;-.%>"
@@ -336,7 +360,7 @@ mana_regeneration:
 
 manasteal:
   enabled: true
-  display: "魔法汲取"
+  display: "<!i>魔法汲取"
   tooltips:
     add: "<!i>魔法汲取 <value:+#;-.>"
     multiply_base: "<!i>魔法汲取 <value:+#%;-.%>"
@@ -348,7 +372,7 @@ manasteal:
 
 max_absorption:
   enabled: true
-  display: "最大护盾"
+  display: "<!i>最大护盾"
   tooltips:
     add: "<!i>最大护盾 <value:+#;-.>"
     multiply_base: "<!i>最大护盾 <value:+#%;-.%>"
@@ -360,7 +384,7 @@ max_absorption:
 
 max_health:
   enabled: true
-  display: "最大生命"
+  display: "<!i>最大生命"
   tooltips:
     add: "<!i>最大生命 <value:+#;-.>"
     multiply_base: "<!i>最大生命 <value:+#%;-.%>"
@@ -372,7 +396,7 @@ max_health:
 
 max_mana:
   enabled: true
-  display: "最大魔法"
+  display: "<!i>最大魔法"
   tooltips:
     add: "<!i>最大魔法 <value:+#;-.>"
     multiply_base: "<!i>最大魔法 <value:+#%;-.%>"
@@ -396,7 +420,7 @@ mining_efficiency:
 
 movement_speed:
   enabled: true
-  display: "移动速度"
+  display: "<!i>移动速度"
   tooltips:
     add: "<!i>移动速度 <value:+#.#;-.>"
     multiply_base: "<!i>移动速度 <value:+#%;-.%>"
@@ -408,7 +432,7 @@ movement_speed:
 
 negative_critical_strike_power:
   enabled: true
-  display_name: "<!i>负暴击伤害"
+  display: "<!i>负暴击伤害"
   tooltips:
     add: "<!i>负暴击伤害 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"
@@ -454,9 +478,21 @@ step_height:
     min: .0
     max: 10.0
 
+sweeping_damage_ratio:
+  enabled: true
+  display: "<!i>横扫伤害比率"
+  tooltips:
+    add: "<!i>横扫伤害比率 <value:+#%;-.%>"
+    multiply_base: "<red>DO_NOT_USE"
+    multiply_total: "<red>DO_NOT_USE"
+  values:
+    default: 0.1
+    min: 0.0
+    max: 1.0
+
 universal_attack_damage:
   enabled: true
-  display: "通用攻击力"
+  display: "<!i>通用攻击力"
   tooltips:
     add: "<!i>通用攻击力 <min:#;-.> ⎓ <max:#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -468,7 +504,7 @@ universal_attack_damage:
 
 universal_defense:
   enabled: true
-  display: "通用防御"
+  display: "<!i>通用防御"
   tooltips:
     add: "<!i>通用防御 <value:+#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -480,7 +516,7 @@ universal_defense:
 
 universal_defense_penetration:
   enabled: true
-  display: "通用防御穿透"
+  display: "<!i>通用防御穿透"
   tooltips:
     add: "<!i>通用防御穿透 <value:+#;-.>"
     multiply_base: "<red>DO_NOT_USE"
@@ -492,7 +528,7 @@ universal_defense_penetration:
 
 universal_defense_penetration_rate:
   enabled: true
-  display: "通用防御穿透率"
+  display: "<!i>通用防御穿透率"
   tooltips:
     add: "<!i>通用防御穿透率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"

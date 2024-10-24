@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
-import cc.mewcraft.wakame.player.attackspeed.AttackSpeedEventHandler
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
@@ -16,7 +15,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -157,24 +155,8 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
  */
 // FIXME 合并到 [ItemChangeListener] 或 [ItemBehaviorListener] 中去
 internal class ItemMiscellaneousListener : KoinComponent, Listener {
-    private val attackSpeedEventHandler: AttackSpeedEventHandler by inject()
     private val skillEventHandler: SkillEventHandler by inject()
 
-    //<editor-fold desc="Attack Speed">
-    @EventHandler
-    fun on(event: EntityDamageByEntityEvent) {
-        val damager = event.damager as? Player ?: return
-        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        attackSpeedEventHandler.handlePlayerAttackEntity(damager, item, event)
-    }
-
-    @EventHandler
-    fun on(event: EntityShootBowEvent) {
-        val shooter = event.entity as? Player ?: return
-        val item = event.bow ?: return
-        attackSpeedEventHandler.handlePlayerShootBow(shooter, item, event)
-    }
-    //</editor-fold>
 
     //<editor-fold desc="Skills">
     @EventHandler

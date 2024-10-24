@@ -255,7 +255,7 @@ entity_interaction_range:
 
 hammer_damage_range:
   enabled: true
-  display_name: "<!i>锤击范围"
+  display: "<!i>锤击范围"
   tooltips:
     add: "<!i>锤击范围 <value:+#.#;-.>"
     multiply_base: "<!i>锤击范围 <value:+#%;-.%>"
@@ -267,7 +267,7 @@ hammer_damage_range:
 
 hammer_damage_ratio:
   enabled: true
-  display_name: "<!i>锤击比率"
+  display: "<!i>锤击比率"
   tooltips:
     add: "<!i>锤击比率 <value:+#%;-.%>"
     multiply_base: "<red>DO_NOT_USE"

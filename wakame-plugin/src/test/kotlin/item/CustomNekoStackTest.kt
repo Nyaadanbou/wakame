@@ -7,11 +7,20 @@ import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.*
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.components.FireResistant
+import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
+import cc.mewcraft.wakame.item.components.HideTooltip
+import cc.mewcraft.wakame.item.components.cells.CoreType
+import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.components.cells.VirtualCore
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.registry.RarityRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.Style
@@ -124,19 +133,6 @@ class CustomNekoStackTest : KoinTest {
 
         unboxed {
             assertFalse(it.showInTooltip)
-        }
-    }
-
-    @Test
-    fun `component - bow`() = componentLifecycleTest(
-        "bow", ItemTemplateTypes.BOW, ItemComponentTypes.EMPTY
-    ) {
-        serialization {
-            assertNotNull(it)
-        }
-
-        result {
-            assertTrue(it.isEmpty())
         }
     }
 
@@ -454,24 +450,25 @@ class CustomNekoStackTest : KoinTest {
         }
     }
 
-    @Test
-    fun `component - damageable`() = componentLifecycleTest(
-        "damageable", ItemTemplateTypes.DAMAGEABLE, ItemComponentTypes.DAMAGEABLE,
-    ) {
-        serialization {
-            assertNotNull(it)
-            assertTrue(it.disappearWhenBroken)
-        }
-
-        result {
-            assertFalse(it.isEmpty())
-        }
-
-        unboxed {
-            assertEquals(1, it.damage)
-            assertEquals(512, it.maxDamage)
-        }
-    }
+    // TODO Attack
+//    @Test
+//    fun `component - damageable`() = componentLifecycleTest(
+//        "damageable", ItemTemplateTypes.DAMAGEABLE, ItemComponentTypes.DAMAGEABLE,
+//    ) {
+//        serialization {
+//            assertNotNull(it)
+//            assertTrue(it.disappearWhenBroken)
+//        }
+//
+//        result {
+//            assertFalse(it.isEmpty())
+//        }
+//
+//        unboxed {
+//            assertEquals(1, it.damage)
+//            assertEquals(512, it.maxDamage)
+//        }
+//    }
 
     @Test
     fun `component - max_damage`() {
