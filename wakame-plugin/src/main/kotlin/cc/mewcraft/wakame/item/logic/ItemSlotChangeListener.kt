@@ -119,8 +119,8 @@ internal abstract class ItemSlotChangeListener {
 
         val maxDamage = nekoStack.components.get(ItemComponentTypes.MAX_DAMAGE)
         val damage = nekoStack.components.get(ItemComponentTypes.DAMAGE)
-        if (maxDamage == null||damage==null) {
-            return true // 如果物品耐久组件不完整, 那么物品则没有耐久度, 应该返回 true
+        if (maxDamage == null || nekoStack.components.has(ItemComponentTypes.UNBREAKABLE) || damage == null) {
+            return true // 如果物品有“无法破坏”或耐久组件不完整, 那么认为物品没有耐久度, 应该返回 true
         }
 
         if (damage + 1 >= maxDamage) {
