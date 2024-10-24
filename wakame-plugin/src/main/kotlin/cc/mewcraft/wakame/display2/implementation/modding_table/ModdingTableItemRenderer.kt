@@ -5,8 +5,7 @@ package cc.mewcraft.wakame.display2.implementation.modding_table
 
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.*
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
-import cc.mewcraft.wakame.display2.implementation.common.computeIndex
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.display2.implementation.standard.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -18,7 +17,8 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.colorRecursively
+import cc.mewcraft.wakame.util.removeItalic
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -303,12 +303,12 @@ internal data class CellularEmptyRendererFormat(
 ) : RendererFormat.Simple {
     override val id = "cells/empty"
     override val index = createIndex()
-    override val textMetaFactory = EmptyCoreTextMetaFactory(namespace)
 
-    // 由于索引相同的 IndexedText 经过 TextAssembler 的处理后会去重,
-    // 这里循环产生在末尾带有序数的 IndexedText#idx 使得索引不再重复.
-    private val tooltipCycle = IndexedTextCycle(limit = EmptyCoreTextMeta.MAX_DISPLAY_COUNT) { i ->
-        SimpleIndexedText(index.value { v -> "$v/$i" }, tooltip)
+    private val cyclicIndexRule = CyclicIndexRule.SLASH
+    override val textMetaFactory = CyclicTextMetaFactory(namespace, id, cyclicIndexRule)
+
+    private val tooltipCycle = IndexedTextCycle(limit = CyclicTextMeta.MAX_DISPLAY_COUNT) { i ->
+        SimpleIndexedText(cyclicIndexRule.make(index, i), tooltip)
     }
 
     fun render(id: String, context: ModdingTableContext.MainInputSlot): IndexedText {

@@ -8,8 +8,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.*
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
-import cc.mewcraft.wakame.display2.implementation.common.computeIndex
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
@@ -32,7 +31,6 @@ import cc.mewcraft.wakame.packet.PacketNekoStack
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.util.StringCombiner
-import cc.mewcraft.wakame.util.value
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -315,12 +313,12 @@ internal data class CellularEmptyRendererFormat(
 ) : RendererFormat.Simple {
     override val id = "cells/empty"
     override val index = createIndex()
-    override val textMetaFactory = EmptyCoreTextMetaFactory(namespace)
 
-    // 由于索引相同的 IndexedText 经过 TextAssembler 的处理后会去重,
-    // 这里循环产生在末尾带有序数的 IndexedText#idx 使得索引不再重复.
-    private val tooltipCycle = IndexedTextCycle(limit = EmptyCoreTextMeta.MAX_DISPLAY_COUNT) { i ->
-        SimpleIndexedText(index.value { v -> "$v/$i" }, tooltip)
+    private val cyclicIndexRule = CyclicIndexRule.SLASH
+    override val textMetaFactory = CyclicTextMetaFactory(namespace, id, cyclicIndexRule)
+
+    private val tooltipCycle = IndexedTextCycle(limit = CyclicTextMeta.MAX_DISPLAY_COUNT) { i ->
+        SimpleIndexedText(cyclicIndexRule.make(index, i), tooltip)
     }
 
     fun render(data: EmptyCore): IndexedText {
@@ -423,55 +421,12 @@ internal data class SkillCoreTextMetaFactory(
         // FIXME 临时方案, 理想中的技能 key 应该如上面注释所示
         //  也就是说, 如果 sourceIndex 是 skill:buff/potion_drop,
         //  那么对应的技能的 key 应该是 buff:potion_drop (???)
+
         return sourceIndex.namespace() == namespace && SkillRegistry.INSTANCES.has(sourceIndex)
     }
 
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return SkillCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
-    }
-}
-
-internal data class EmptyCoreTextMeta(
-    override val sourceIndex: SourceIndex,
-    override val sourceOrdinal: SourceOrdinal,
-    override val defaultText: List<Component>?,
-) : SimpleTextMeta {
-    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
-
-    // 根据 MAX_DISPLAY_COUNT 生成对应数量的 DerivedIndex. 格式为:
-    // "namespace:value/0",
-    // "namespace:value/1",
-    // "namespace:value/2",
-    // ...
-    override fun deriveIndexes(): List<DerivedIndex> {
-        val ret = mutableListOf<DerivedIndex>()
-        for (i in 0 until MAX_DISPLAY_COUNT) {
-            ret += derive(sourceIndex, i)
-        }
-        return ret
-    }
-
-    /**
-     * 根据索引生成对应的 [DerivedIndex].
-     */
-    private fun derive(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal): DerivedIndex {
-        return Key.key("${sourceIndex.namespace()}:${sourceIndex.value()}/$sourceOrdinal")
-    }
-
-    companion object Shared {
-        const val MAX_DISPLAY_COUNT = 10
-    }
-}
-
-internal data class EmptyCoreTextMetaFactory(
-    override val namespace: String,
-) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == "cells/empty"
-    }
-
-    override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        return EmptyCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
     }
 }
 
