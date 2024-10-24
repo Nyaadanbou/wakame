@@ -185,7 +185,12 @@ internal class SimpleModdingSession(
 
             logger.info("Session's input item updated: ${old?.type} -> ${value?.type}")
 
-            val sourceItem0 = _value?.takeIf { it.isCustomNeko }?.tryNekoStack ?: return
+            val sourceItem0 = _value?.customNeko ?: run {
+                sourceItem = null
+                replaceParams = ReforgeReplaceMap.empty()
+                executeReforge()
+                return
+            }
             val sourceItemCells = sourceItem0.components.get(ItemComponentTypes.CELLS)
             val sourceItemRule = sourceItem0.let { table.itemRuleMap[it.id] }
 
