@@ -111,8 +111,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
 
         // 注册 Nekoo API
         NekooProvider.register(NekooApiProvider())
-
-        logger.warning("${DummyClass.DUMMY} is called from PaperPluginLoader!")
     }
 
     override suspend fun disable() {
