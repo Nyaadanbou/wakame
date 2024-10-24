@@ -260,6 +260,12 @@ internal class ModdingMenu(
                         return
                     }
 
+                    // 检查玩家是否有足够的资源
+                    if (!reforgeResult.reforgeCost.test(viewer)) {
+                        viewer.sendMessage(GuiMessages.MESSAGE_INSUFFICIENT_RESOURCES)
+                        return
+                    }
+
                     // 从玩家身上拿走需要的资源
                     reforgeResult.reforgeCost.take(viewer)
 
