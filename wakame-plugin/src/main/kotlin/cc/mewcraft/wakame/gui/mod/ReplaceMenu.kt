@@ -3,7 +3,8 @@ package cc.mewcraft.wakame.gui.mod
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.customNeko
+import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.*
@@ -80,7 +81,7 @@ private constructor(
 
             // 玩家尝试向 inputSlot 中添加物品:
             event.isAdd -> {
-                val addedNekoStack = newItem?.takeIf { it.isCustomNeko }?.tryNekoStack ?: run {
+                val addedNekoStack = newItem?.customNeko ?: run {
                     viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                     event.isCancelled = true
                     return

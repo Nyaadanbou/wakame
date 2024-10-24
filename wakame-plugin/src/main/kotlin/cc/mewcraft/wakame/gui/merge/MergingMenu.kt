@@ -3,7 +3,8 @@ package cc.mewcraft.wakame.gui.merge
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.customNeko
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.*
 import cc.mewcraft.wakame.util.*
@@ -129,7 +130,7 @@ internal class MergingMenu(
             }
 
             e.isAdd -> {
-                val added = newItem?.takeIf { it.isCustomNeko }?.tryNekoStack ?: run {
+                val added = newItem?.customNeko ?: run {
                     viewer.sendMessage(text { content("请放入一个核心!"); color(NamedTextColor.RED) })
                     e.isCancelled = true
                     return
@@ -277,6 +278,7 @@ internal class MergingMenu(
                     add(empty())
                     addAll(result.reforgeType.description)
                     addAll(result.reforgeCost.description)
+                    add(empty())
                     add(clickToMerge)
                 }.removeItalic
             }
